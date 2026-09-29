@@ -133,7 +133,7 @@ async def _insert_explanation(
     return response.json()[0]
 
 
-async def _recent_messages(run_id: str, limit: int = 8) -> list[dict]:
+async def _recent_messages(run_id: str, limit: int = 4) -> list[dict]:
     async with httpx.AsyncClient(timeout=15.0) as client:
         response = await client.get(
             f"{SUPABASE_URL}/rest/v1/decision_messages",
