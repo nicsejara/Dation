@@ -5,7 +5,10 @@ import httpx
 
 from app.config import SUPABASE_SECRET_KEY, SUPABASE_URL
 from app.services.decision_context import build_decision_context
-from app.services.knowledge_service import load_logistics_knowledge
+from app.services.knowledge_service import (
+    load_logistics_knowledge,
+    load_logistics_knowledge_for_question,
+)
 from app.services.llm_service import (
     chat_completion,
     llm_settings,
@@ -133,7 +136,7 @@ async def _insert_explanation(
     return response.json()[0]
 
 
-async def _recent_messages(run_id: str, limit: int = 4) -> list[dict]:
+async def _recent_messages(run_id: str, limit: int = 2) -> list[dict]:
     async with httpx.AsyncClient(timeout=15.0) as client:
         response = await client.get(
             f"{SUPABASE_URL}/rest/v1/decision_messages",
@@ -253,7 +256,7 @@ async def answer_question(
     question: str,
 ) -> dict:
     run = await _load_completed_run(run_id)
-    knowledge = load_logistics_knowledge()
+    knowledge = load_logistics_knowledge_for_question(question)
     context = build_decision_context(run["result_json"])
     history = await _recent_messages(run_id)
 
