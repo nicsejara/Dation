@@ -1,3 +1,4 @@
+import asyncio
 import json
 
 import httpx
@@ -48,6 +49,18 @@ def llm_configured() -> bool:
     return llm_settings()["configured"]
 
 
+def _retry_delay(response: httpx.Response) -> float:
+    value = response.headers.get("retry-after")
+
+    if value:
+        try:
+            return max(float(value), 1.0)
+        except ValueError:
+            pass
+
+    return 3.0
+
+
 async def chat_completion(
     *,
     messages: list[dict],
@@ -63,7 +76,7 @@ async def chat_completion(
     payload: dict = {
         "model": settings["model"],
         "messages": messages,
-        "max_completion_tokens": 1800 if response_schema else 900,
+        "max_completion_tokens": 1200 if response_schema else 500,
     }
 
     if settings["provider"] == "groq":
@@ -88,6 +101,20 @@ async def chat_completion(
             },
             json=payload,
         )
+
+        # Free tiers can momentarily hit tokens-per-minute limits.
+        # Retry once using the provider's requested cooldown.
+        if response.status_code == 429:
+            await asyncio.sleep(_retry_delay(response))
+            response = await client.post(
+                f"{settings['base_url']}/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {LLM_API_KEY}",
+                    "Content-Type": "application/json",
+                },
+                json=payload,
+            )
+
         response.raise_for_status()
 
     body = response.json()
