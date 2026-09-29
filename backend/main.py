@@ -1,12 +1,13 @@
 from pathlib import Path
 
 import httpx
-from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
+from fastapi import Depends, FastAPI, File, HTTPException, Query, UploadFile
 from fastapi.responses import HTMLResponse
 
 from app.auth import require_upload_access
 from app.config import supabase_configured
 from app.services.dataset_service import upload_dataset
+from app.services.run_service import execute_logistics_run, get_run
 from app.services.supabase_service import check_supabase_connection
 from app.validators.logistics_schema import (
     LogisticsValidationError,
@@ -15,7 +16,7 @@ from app.validators.logistics_schema import (
 
 app = FastAPI(
     title="Dation Core API",
-    version="0.3.0",
+    version="0.4.0",
     description="Backend core for the Dation Decision Data Asset MVP.",
 )
 
@@ -28,7 +29,7 @@ UPLOAD_PAGE = (
 def root():
     return {
         "service": "Dation Core",
-        "version": "0.3.0",
+        "version": "0.4.0",
         "status": "running",
     }
 
@@ -62,6 +63,7 @@ async def upload_logistics_dataset(
         )
 
     filename = file.filename or "input.csv"
+
     if not filename.lower().endswith(".csv"):
         raise HTTPException(
             status_code=400,
@@ -70,6 +72,7 @@ async def upload_logistics_dataset(
 
     contents = await file.read()
     max_bytes = 10 * 1024 * 1024
+
     if len(contents) > max_bytes:
         raise HTTPException(
             status_code=413,
@@ -105,3 +108,54 @@ async def upload_logistics_dataset(
         **stored,
         "validation": validation,
     }
+
+
+@app.post("/api/runs/{dataset_id}")
+async def run_logistics_decision(
+    dataset_id: str,
+    objective: str = Query(
+        default="min_cost",
+        pattern="^(min_cost|min_trips)$",
+    ),
+    _: str = Depends(require_upload_access),
+):
+    try:
+        run = await execute_logistics_run(
+            dataset_id=dataset_id,
+            objective=objective,
+        )
+    except LookupError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except httpx.HTTPStatusError as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Supabase error: {exc.response.text[:500]}",
+        ) from exc
+    except httpx.HTTPError as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Could not reach Supabase: {exc}",
+        ) from exc
+
+    return run
+
+
+@app.get("/api/runs/{run_id}")
+async def read_decision_run(
+    run_id: str,
+    _: str = Depends(require_upload_access),
+):
+    try:
+        run = await get_run(run_id)
+    except httpx.HTTPError as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Could not reach Supabase: {exc}",
+        ) from exc
+
+    if not run:
+        raise HTTPException(status_code=404, detail="Run not found.")
+
+    return run
