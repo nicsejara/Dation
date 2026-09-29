@@ -63,6 +63,7 @@ async def chat_completion(
     payload: dict = {
         "model": settings["model"],
         "messages": messages,
+        "max_completion_tokens": 1800 if response_schema else 900,
     }
 
     if settings["provider"] == "groq":
