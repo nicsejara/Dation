@@ -1,0 +1,711 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Dation · Decision Workspace</title>
+  <link rel="stylesheet" href="/static/css/tokens.css">
+  <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <span></span>
+          <span></span>
+        </div>
+        <div>
+          <strong>Dation</strong>
+          <small>Decision Intelligence</small>
+        </div>
+      </div>
+
+      <nav class="nav" aria-label="Navegación principal">
+        <button class="nav-item is-active" data-view="overview" type="button">
+          <span class="nav-icon">⌂</span>
+          <span>Overview</span>
+        </button>
+        <button class="nav-item" data-view="workspace" type="button">
+          <span class="nav-icon">◆</span>
+          <span>Decision Workspace</span>
+        </button>
+        <button class="nav-item" data-view="datasets" type="button">
+          <span class="nav-icon">▤</span>
+          <span>Datasets</span>
+        </button>
+        <button class="nav-item" data-view="history" type="button">
+          <span class="nav-icon">↺</span>
+          <span>Decision History</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-section">
+        <p class="sidebar-label">Decision Assets</p>
+        <button class="asset-item is-active" data-view="workspace" type="button">
+          <span class="asset-icon">L</span>
+          <span>
+            <strong>Logistics</strong>
+            <small>Engine v0.1</small>
+          </span>
+          <span class="status-dot status-dot--live"></span>
+        </button>
+        <button class="asset-item asset-item--disabled" type="button" disabled>
+          <span class="asset-icon asset-icon--muted">+</span>
+          <span>
+            <strong>New Decision Asset</strong>
+            <small>Coming later</small>
+          </span>
+        </button>
+      </div>
+
+      <div class="sidebar-footer">
+        <button class="nav-item" data-view="settings" type="button">
+          <span class="nav-icon">⚙</span>
+          <span>Settings</span>
+        </button>
+        <div class="environment-card">
+          <div>
+            <span class="status-dot status-dot--live"></span>
+            <strong>MVP environment</strong>
+          </div>
+          <small>Cloud Run · Supabase · Groq</small>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow" id="topbar-eyebrow">Dation Platform</p>
+          <div class="breadcrumb">
+            <span id="breadcrumb-primary">Overview</span>
+            <span class="breadcrumb-separator">/</span>
+            <span id="breadcrumb-secondary">Logistics DDA</span>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <span class="pill pill--neutral">MVP</span>
+          <span class="system-status" id="system-status">
+            <span class="status-dot status-dot--pending"></span>
+            Checking services
+          </span>
+          <button class="avatar-button" type="button" aria-label="Workspace account">D</button>
+        </div>
+      </header>
+
+      <div class="content">
+        <section class="view is-active" data-view-panel="overview">
+          <div class="page-heading page-heading--hero">
+            <div>
+              <span class="section-kicker">Decision Intelligence Platform</span>
+              <h1>Turn operational data into decisions people can act on.</h1>
+              <p>
+                Dation combina datos, motores determinísticos y una capa de interpretación
+                para convertir una decisión compleja en alternativas comparables, trazables
+                y comprensibles.
+              </p>
+            </div>
+            <button class="button button--primary" id="overview-start" type="button">
+              Open Logistics Workspace
+              <span>→</span>
+            </button>
+          </div>
+
+          <div class="stat-grid" id="overview-stats">
+            <article class="stat-card">
+              <span class="stat-label">Datasets</span>
+              <strong id="stat-datasets">—</strong>
+              <small>stored and traceable</small>
+            </article>
+            <article class="stat-card">
+              <span class="stat-label">Decision runs</span>
+              <strong id="stat-runs">—</strong>
+              <small>historical executions</small>
+            </article>
+            <article class="stat-card">
+              <span class="stat-label">Active assets</span>
+              <strong>1</strong>
+              <small>Logistics DDA</small>
+            </article>
+            <article class="stat-card">
+              <span class="stat-label">Interpreter</span>
+              <strong id="stat-ai">—</strong>
+              <small id="stat-ai-detail">checking provider</small>
+            </article>
+          </div>
+
+          <div class="overview-grid">
+            <article class="panel panel--asset">
+              <div class="panel-header">
+                <div>
+                  <span class="section-kicker">Active Decision Asset</span>
+                  <h2>Logistics Decision Asset</h2>
+                </div>
+                <span class="pill pill--live">Live</span>
+              </div>
+              <p class="panel-copy">
+                Compara la asignación actual contra escenarios optimizados de costo
+                y viajes, conserva la evidencia de cálculo y permite interrogar la
+                decisión en lenguaje de negocio.
+              </p>
+              <div class="capability-row">
+                <span>CSV ingestion</span>
+                <span>Deterministic engine</span>
+                <span>Scenario comparison</span>
+                <span>AI interpretation</span>
+              </div>
+              <button class="text-button" id="overview-open-asset" type="button">
+                Open Decision Asset →
+              </button>
+            </article>
+
+            <article class="panel">
+              <div class="panel-header">
+                <div>
+                  <span class="section-kicker">Recent activity</span>
+                  <h2>Latest decisions</h2>
+                </div>
+                <button class="text-button" data-view-target="history" type="button">
+                  View all
+                </button>
+              </div>
+              <div id="overview-recent-runs" class="activity-list">
+                <div class="empty-state empty-state--compact">
+                  Loading decision history...
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="view" data-view-panel="workspace">
+          <div class="page-heading">
+            <div>
+              <div class="heading-meta">
+                <span class="section-kicker">Decision Asset</span>
+                <span class="pill pill--live">Engine v0.1</span>
+              </div>
+              <h1>Logistics Decision Workspace</h1>
+              <p>
+                Prepará los datos, definí el objetivo, compará escenarios y entendé
+                por qué cambia la recomendación.
+              </p>
+            </div>
+            <div class="heading-actions">
+              <button class="button button--ghost" id="workspace-refresh" type="button">
+                Refresh data
+              </button>
+            </div>
+          </div>
+
+          <div class="workflow-rail" aria-label="Flujo de decisión">
+            <button class="workflow-step is-active" data-scroll-target="stage-data" type="button">
+              <span>01</span>
+              <div><strong>Data</strong><small>Dataset</small></div>
+            </button>
+            <div class="workflow-line"></div>
+            <button class="workflow-step" data-scroll-target="stage-decision" type="button">
+              <span>02</span>
+              <div><strong>Decision</strong><small>Objective</small></div>
+            </button>
+            <div class="workflow-line"></div>
+            <button class="workflow-step" data-scroll-target="stage-results" type="button">
+              <span>03</span>
+              <div><strong>Result</strong><small>Scenarios</small></div>
+            </button>
+            <div class="workflow-line"></div>
+            <button class="workflow-step" data-scroll-target="stage-understand" type="button">
+              <span>04</span>
+              <div><strong>Understand</strong><small>AI insight</small></div>
+            </button>
+            <div class="workflow-line"></div>
+            <button class="workflow-step" data-scroll-target="stage-trace" type="button">
+              <span>05</span>
+              <div><strong>Trace</strong><small>Evidence</small></div>
+            </button>
+          </div>
+
+          <section class="stage panel" id="stage-data">
+            <div class="stage-header">
+              <div class="stage-index">01</div>
+              <div>
+                <span class="section-kicker">Data</span>
+                <h2>Choose the evidence for this decision</h2>
+                <p>
+                  Usá un dataset existente o cargá un CSV nuevo. El archivo original
+                  se conserva sin modificaciones para mantener trazabilidad.
+                </p>
+              </div>
+              <div class="stage-state" id="data-stage-state">
+                <span class="status-dot status-dot--pending"></span>
+                Waiting for dataset
+              </div>
+            </div>
+
+            <div class="data-layout">
+              <div>
+                <div id="active-dataset-card" class="active-dataset-card is-empty">
+                  <div class="dataset-icon">CSV</div>
+                  <div class="active-dataset-body">
+                    <span class="section-kicker">Active dataset</span>
+                    <strong id="active-dataset-name">No dataset selected</strong>
+                    <small id="active-dataset-meta">
+                      Select an existing dataset or upload a new file.
+                    </small>
+                  </div>
+                  <span class="dataset-state" id="active-dataset-status">—</span>
+                </div>
+
+                <div class="subsection-header">
+                  <div>
+                    <h3>Recent datasets</h3>
+                    <p>Reuse previously validated data without uploading it again.</p>
+                  </div>
+                  <button class="text-button" data-view-target="datasets" type="button">
+                    View library
+                  </button>
+                </div>
+                <div id="workspace-dataset-list" class="dataset-list">
+                  <div class="empty-state empty-state--compact">Loading datasets...</div>
+                </div>
+              </div>
+
+              <div class="upload-card" id="upload-dropzone">
+                <div class="upload-symbol">↑</div>
+                <h3>Upload a new CSV</h3>
+                <p>
+                  Drop a logistics dataset here or browse your computer.
+                </p>
+                <input id="dataset-file" type="file" accept=".csv,text/csv" hidden>
+                <button class="button button--secondary" id="browse-file" type="button">
+                  Select CSV file
+                </button>
+                <small>UTF-8 · up to 10 MB · required schema validated automatically</small>
+                <div id="upload-progress" class="inline-status is-hidden"></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="stage panel stage--locked" id="stage-decision">
+            <div class="stage-header">
+              <div class="stage-index">02</div>
+              <div>
+                <span class="section-kicker">Decision setup</span>
+                <h2>Define what matters for this run</h2>
+                <p>
+                  El objetivo modifica la alternativa recomendada; el motor conserva
+                  los otros escenarios para que el trade-off siga siendo visible.
+                </p>
+              </div>
+              <div class="stage-state" id="decision-stage-state">
+                <span class="status-dot status-dot--muted"></span>
+                Select a dataset first
+              </div>
+            </div>
+
+            <div class="decision-layout">
+              <div>
+                <label class="field-label">Optimization objective</label>
+                <div class="choice-grid" id="objective-selector">
+                  <button class="choice-card is-selected" type="button" data-objective="min_cost">
+                    <span class="choice-radio"></span>
+                    <div>
+                      <strong>Minimize total cost</strong>
+                      <small>
+                        Prioriza la menor combinación estimada de costo variable
+                        y costo fijo.
+                      </small>
+                    </div>
+                  </button>
+                  <button class="choice-card" type="button" data-objective="min_trips">
+                    <span class="choice-radio"></span>
+                    <div>
+                      <strong>Minimize trips</strong>
+                      <small>
+                        Prioriza la menor cantidad de viajes requeridos para cubrir
+                        los despachos.
+                      </small>
+                    </div>
+                  </button>
+                </div>
+              </div>
+
+              <aside class="engine-card">
+                <span class="section-kicker">Execution profile</span>
+                <div class="engine-row">
+                  <span>Decision engine</span>
+                  <strong>logistics-simple-engine</strong>
+                </div>
+                <div class="engine-row">
+                  <span>Version</span>
+                  <strong>0.1.0</strong>
+                </div>
+                <div class="engine-row">
+                  <span>Mode</span>
+                  <strong>Deterministic</strong>
+                </div>
+                <div class="engine-row">
+                  <span>Execution</span>
+                  <strong>Cloud Run</strong>
+                </div>
+              </aside>
+            </div>
+
+            <div class="stage-actions">
+              <div>
+                <strong id="run-ready-title">Dataset required</strong>
+                <small id="run-ready-copy">
+                  Select a dataset before executing the decision engine.
+                </small>
+              </div>
+              <button class="button button--primary" id="run-decision" type="button" disabled>
+                Run decision
+                <span>→</span>
+              </button>
+            </div>
+            <div id="run-progress" class="inline-status is-hidden"></div>
+          </section>
+
+          <section class="stage panel stage--locked" id="stage-results">
+            <div class="stage-header">
+              <div class="stage-index">03</div>
+              <div>
+                <span class="section-kicker">Decision result</span>
+                <h2>Compare the available paths</h2>
+                <p>
+                  La recomendación corresponde al objetivo de esta corrida, no a una
+                  superioridad absoluta fuera de los supuestos del modelo.
+                </p>
+              </div>
+              <div class="stage-state" id="result-stage-state">
+                <span class="status-dot status-dot--muted"></span>
+                No run yet
+              </div>
+            </div>
+
+            <div id="result-empty" class="empty-state">
+              <div class="empty-symbol">◇</div>
+              <strong>No decision result yet</strong>
+              <p>Run the engine to generate comparable scenarios.</p>
+            </div>
+
+            <div id="result-content" class="is-hidden">
+              <div class="recommendation-hero">
+                <div>
+                  <span class="recommendation-label">Recommended for selected objective</span>
+                  <h3 id="recommendation-title">—</h3>
+                  <p id="recommendation-subtitle">—</p>
+                </div>
+                <div class="recommendation-impact">
+                  <span>Estimated cost change vs baseline</span>
+                  <strong id="recommendation-delta">—</strong>
+                </div>
+              </div>
+
+              <div class="kpi-grid">
+                <article class="kpi-card">
+                  <span>Total cost</span>
+                  <strong id="kpi-cost">—</strong>
+                  <small id="kpi-cost-delta">—</small>
+                </article>
+                <article class="kpi-card">
+                  <span>Total trips</span>
+                  <strong id="kpi-trips">—</strong>
+                  <small id="kpi-trips-delta">—</small>
+                </article>
+                <article class="kpi-card">
+                  <span>Total distance</span>
+                  <strong id="kpi-distance">—</strong>
+                  <small id="kpi-distance-delta">—</small>
+                </article>
+                <article class="kpi-card">
+                  <span>Shipments analyzed</span>
+                  <strong id="kpi-shipments">—</strong>
+                  <small>independent shipments</small>
+                </article>
+              </div>
+
+              <div class="subsection-header">
+                <div>
+                  <h3>Scenario comparison</h3>
+                  <p>Baseline versus the two deterministic alternatives.</p>
+                </div>
+              </div>
+              <div class="comparison-table-wrap">
+                <table class="comparison-table">
+                  <thead>
+                    <tr>
+                      <th>Scenario</th>
+                      <th>Total cost</th>
+                      <th>Trips</th>
+                      <th>Distance</th>
+                      <th>Δ cost</th>
+                      <th>Δ trips</th>
+                    </tr>
+                  </thead>
+                  <tbody id="scenario-table-body"></tbody>
+                </table>
+              </div>
+
+              <div class="subsection-header">
+                <div>
+                  <h3>Largest assignment shifts</h3>
+                  <p>
+                    Shipments with the largest estimated cost impact versus baseline.
+                  </p>
+                </div>
+              </div>
+              <div id="driver-list" class="driver-list"></div>
+            </div>
+          </section>
+
+          <section class="stage panel stage--locked" id="stage-understand">
+            <div class="stage-header">
+              <div class="stage-index">04</div>
+              <div>
+                <span class="section-kicker">Decision intelligence</span>
+                <h2>Understand the recommendation</h2>
+                <p>
+                  El LLM explica evidencia ya calculada. No reemplaza ni recalcula
+                  el resultado del motor.
+                </p>
+              </div>
+              <div class="stage-state" id="ai-stage-state">
+                <span class="status-dot status-dot--muted"></span>
+                Waiting for result
+              </div>
+            </div>
+
+            <div id="ai-empty" class="empty-state">
+              <div class="empty-symbol">✦</div>
+              <strong>AI interpretation becomes available after a run</strong>
+              <p>The interpreter uses the DecisionResult and versioned knowledge base.</p>
+            </div>
+
+            <div id="ai-content" class="is-hidden">
+              <div class="ai-toolbar">
+                <div>
+                  <span class="ai-provider" id="ai-provider">Decision Interpreter</span>
+                  <small id="ai-meta">Checking interpreter...</small>
+                </div>
+                <button class="button button--secondary" id="generate-explanation" type="button">
+                  Generate executive insight
+                </button>
+              </div>
+
+              <div id="ai-progress" class="inline-status is-hidden"></div>
+              <div id="executive-insight" class="executive-insight is-hidden"></div>
+
+              <div class="chat-panel">
+                <div class="chat-header">
+                  <div>
+                    <span class="section-kicker">Ask the decision</span>
+                    <h3>Explore the evidence conversationally</h3>
+                  </div>
+                </div>
+                <div class="prompt-chips" id="prompt-chips">
+                  <button type="button">¿Qué envíos explican la mayor parte del ahorro?</button>
+                  <button type="button">¿Qué cambia frente al escenario actual?</button>
+                  <button type="button">¿Qué trade-off existe entre costo y viajes?</button>
+                  <button type="button">¿Qué supuesto podría cambiar la recomendación?</button>
+                </div>
+                <div id="chat-thread" class="chat-thread">
+                  <div class="assistant-message">
+                    <div class="message-avatar">D</div>
+                    <div>
+                      <strong>Dation Interpreter</strong>
+                      <p>
+                        Cuando tengas una corrida activa, podés preguntarme por los
+                        drivers, trade-offs, supuestos y diferencias entre escenarios.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div class="chat-composer">
+                  <textarea id="decision-question" rows="2" placeholder="Ask why the recommendation changed, what drives the savings, or what the model does not yet consider."></textarea>
+                  <button class="button button--primary button--square" id="ask-decision" type="button" aria-label="Send question">
+                    ↑
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="stage panel stage--locked" id="stage-trace">
+            <div class="stage-header">
+              <div class="stage-index">05</div>
+              <div>
+                <span class="section-kicker">Traceability</span>
+                <h2>Audit the decision evidence</h2>
+                <p>
+                  Identificadores, versiones y resultado técnico de la corrida quedan
+                  disponibles para revisión.
+                </p>
+              </div>
+              <div class="stage-state" id="trace-stage-state">
+                <span class="status-dot status-dot--muted"></span>
+                No run selected
+              </div>
+            </div>
+
+            <div id="trace-empty" class="empty-state">
+              <div class="empty-symbol">≡</div>
+              <strong>Trace information will appear after a run</strong>
+            </div>
+
+            <div id="trace-content" class="is-hidden">
+              <div class="trace-grid">
+                <div><span>Dataset ID</span><strong id="trace-dataset-id">—</strong></div>
+                <div><span>Run ID</span><strong id="trace-run-id">—</strong></div>
+                <div><span>Engine</span><strong id="trace-engine">—</strong></div>
+                <div><span>Engine version</span><strong id="trace-engine-version">—</strong></div>
+                <div><span>Duration</span><strong id="trace-duration">—</strong></div>
+                <div><span>Run status</span><strong id="trace-status">—</strong></div>
+              </div>
+              <details class="technical-details">
+                <summary>View raw DecisionResult JSON</summary>
+                <pre id="raw-run-json"></pre>
+              </details>
+            </div>
+          </section>
+        </section>
+
+        <section class="view" data-view-panel="datasets">
+          <div class="page-heading">
+            <div>
+              <span class="section-kicker">Data library</span>
+              <h1>Datasets</h1>
+              <p>
+                Evidencia de entrada almacenada en Supabase y disponible para nuevas
+                corridas sin volver a cargar el archivo.
+              </p>
+            </div>
+            <button class="button button--primary" data-view-target="workspace" type="button">
+              New decision
+            </button>
+          </div>
+
+          <div class="panel">
+            <div class="table-toolbar">
+              <div>
+                <h2>Dataset library</h2>
+                <p id="datasets-count-label">Loading...</p>
+              </div>
+              <button class="button button--ghost" id="datasets-refresh" type="button">
+                Refresh
+              </button>
+            </div>
+            <div class="data-table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Dataset</th>
+                    <th>Status</th>
+                    <th>Rows</th>
+                    <th>Columns</th>
+                    <th>Uploaded</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="datasets-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" data-view-panel="history">
+          <div class="page-heading">
+            <div>
+              <span class="section-kicker">Decision ledger</span>
+              <h1>Decision History</h1>
+              <p>
+                Cada corrida conserva el dataset, objetivo, versión del engine y
+                resultado asociado.
+              </p>
+            </div>
+            <button class="button button--primary" data-view-target="workspace" type="button">
+              Run new decision
+            </button>
+          </div>
+
+          <div class="panel">
+            <div class="table-toolbar">
+              <div>
+                <h2>Recent runs</h2>
+                <p id="runs-count-label">Loading...</p>
+              </div>
+              <button class="button button--ghost" id="runs-refresh" type="button">
+                Refresh
+              </button>
+            </div>
+            <div class="data-table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Run</th>
+                    <th>Dataset</th>
+                    <th>Objective</th>
+                    <th>Status</th>
+                    <th>Engine</th>
+                    <th>Duration</th>
+                    <th>Created</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="runs-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" data-view-panel="settings">
+          <div class="page-heading">
+            <div>
+              <span class="section-kicker">Platform</span>
+              <h1>Settings & system status</h1>
+              <p>
+                Estado de las capacidades que componen el MVP actual de Dation.
+              </p>
+            </div>
+          </div>
+
+          <div class="settings-grid">
+            <article class="panel settings-card">
+              <span class="section-kicker">Decision engine</span>
+              <h2>Logistics Engine</h2>
+              <div class="settings-row"><span>Execution</span><strong>Cloud Run</strong></div>
+              <div class="settings-row"><span>Engine version</span><strong>0.1.0</strong></div>
+              <div class="settings-row"><span>Mode</span><strong>Deterministic</strong></div>
+              <div class="settings-row"><span>API version</span><strong>0.6.0</strong></div>
+            </article>
+
+            <article class="panel settings-card">
+              <span class="section-kicker">AI Interpreter</span>
+              <h2>Decision explanation layer</h2>
+              <div class="settings-row"><span>Status</span><strong id="settings-ai-status">Checking...</strong></div>
+              <div class="settings-row"><span>Provider</span><strong id="settings-ai-provider">—</strong></div>
+              <div class="settings-row"><span>Model</span><strong id="settings-ai-model">—</strong></div>
+              <div class="settings-row"><span>Knowledge</span><strong id="settings-ai-knowledge">—</strong></div>
+            </article>
+
+            <article class="panel settings-card">
+              <span class="section-kicker">Data layer</span>
+              <h2>Supabase</h2>
+              <div class="settings-row"><span>Database</span><strong>PostgreSQL</strong></div>
+              <div class="settings-row"><span>Raw storage</span><strong>Private bucket</strong></div>
+              <div class="settings-row"><span>Dataset traceability</span><strong>Enabled</strong></div>
+              <div class="settings-row"><span>Decision history</span><strong>Enabled</strong></div>
+            </article>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="/static/js/app.js"></script>
+</body>
+</html>
