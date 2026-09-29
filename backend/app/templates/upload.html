@@ -5,52 +5,311 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Dation · Logistics DDA</title>
   <style>
-    :root { font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    :root {
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #16181d;
+      background: #f6f7f9;
+    }
+    * { box-sizing: border-box; }
     body { margin: 0; background: #f6f7f9; color: #16181d; }
-    main { max-width: 760px; margin: 64px auto; padding: 0 20px; }
-    .card { background: white; border: 1px solid #e4e7ec; border-radius: 18px; padding: 30px; box-shadow: 0 8px 30px rgba(16,24,40,.06); }
+    main { max-width: 980px; margin: 48px auto; padding: 0 20px 60px; }
+    .card {
+      background: white;
+      border: 1px solid #e4e7ec;
+      border-radius: 18px;
+      padding: 30px;
+      box-shadow: 0 8px 30px rgba(16,24,40,.06);
+      margin-bottom: 22px;
+    }
     h1 { margin: 0 0 8px; font-size: 28px; }
+    h2 { margin: 0 0 8px; font-size: 20px; }
+    h3 { margin: 0 0 6px; font-size: 15px; color: #344054; }
     p { color: #667085; line-height: 1.5; }
-    .drop { margin-top: 28px; border: 2px dashed #cfd4dc; border-radius: 14px; padding: 28px; text-align: center; }
-    input[type=file] { width: 100%; }
-    button { margin-top: 22px; width: 100%; border: 0; border-radius: 10px; padding: 14px 18px; font-size: 15px; font-weight: 650; cursor: pointer; background: #111827; color: white; }
+    .drop {
+      margin-top: 28px;
+      border: 2px dashed #cfd4dc;
+      border-radius: 14px;
+      padding: 28px;
+      text-align: center;
+    }
+    input[type=file], select { width: 100%; }
+    select {
+      border: 1px solid #d0d5dd;
+      border-radius: 10px;
+      padding: 12px;
+      background: white;
+      font-size: 14px;
+    }
+    button {
+      margin-top: 18px;
+      width: 100%;
+      border: 0;
+      border-radius: 10px;
+      padding: 14px 18px;
+      font-size: 15px;
+      font-weight: 650;
+      cursor: pointer;
+      background: #111827;
+      color: white;
+    }
     button:disabled { opacity: .5; cursor: not-allowed; }
-    #result { margin-top: 22px; padding: 16px; border-radius: 10px; background: #f2f4f7; white-space: pre-wrap; display: none; overflow-wrap: anywhere; }
+    .secondary { background: #344054; }
+    .status {
+      margin-top: 22px;
+      padding: 16px;
+      border-radius: 10px;
+      background: #f2f4f7;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+    .success {
+      border: 1px solid #abefc6;
+      background: #ecfdf3;
+      color: #067647;
+    }
+    .error {
+      border: 1px solid #fecdca;
+      background: #fef3f2;
+      color: #b42318;
+    }
     .meta { margin-top: 18px; font-size: 13px; color: #667085; }
+    .hidden { display: none; }
+    .dataset-summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .metric, .scenario {
+      border: 1px solid #e4e7ec;
+      border-radius: 12px;
+      padding: 16px;
+      background: #fff;
+    }
+    .metric .value {
+      display: block;
+      margin-top: 6px;
+      font-size: 23px;
+      font-weight: 700;
+    }
+    .decision-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      align-items: end;
+      margin-top: 22px;
+    }
+    .label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 650;
+      color: #344054;
+    }
+    .decision-controls button { margin: 0; }
+    .scenario-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 18px;
+    }
+    .scenario.recommended {
+      border: 2px solid #111827;
+    }
+    .badge {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      background: #f2f4f7;
+      margin-bottom: 10px;
+    }
+    .scenario.recommended .badge {
+      background: #111827;
+      color: white;
+    }
+    .kpi {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid #f2f4f7;
+      font-size: 13px;
+    }
+    .kpi:last-child { border-bottom: 0; }
+    .delta-good { color: #067647; font-weight: 650; }
+    .raw {
+      margin-top: 16px;
+      background: #101828;
+      color: #e4e7ec;
+      border-radius: 10px;
+      padding: 14px;
+      overflow: auto;
+      font-size: 12px;
+      max-height: 360px;
+      white-space: pre-wrap;
+    }
+    @media (max-width: 760px) {
+      .dataset-summary, .scenario-grid, .decision-controls {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
 <main>
-  <div class="card">
+  <section class="card">
     <h1>Logistics Decision Asset</h1>
-    <p>Primera etapa de ingesta de Dation. El archivo se valida contra el schema <strong>logistics_v0.1</strong> antes de almacenarse.</p>
+    <p>
+      Cargá un dataset, validalo y ejecutá el primer motor de decisión logística
+      de Dation.
+    </p>
 
     <form id="upload-form">
       <div class="drop">
         <input id="file" name="file" type="file" accept=".csv,text/csv" required>
       </div>
-      <button id="submit" type="submit">Validar y cargar dataset</button>
+      <button id="upload-button" type="submit">Validar y cargar dataset</button>
     </form>
 
-    <div id="result"></div>
+    <div id="upload-status" class="status hidden"></div>
     <div class="meta">Máximo actual: 10 MB · CSV UTF-8 · 14 columnas requeridas.</div>
-  </div>
+  </section>
+
+  <section id="decision-card" class="card hidden">
+    <h2>Dataset listo para analizar</h2>
+    <p id="dataset-name"></p>
+
+    <div class="dataset-summary">
+      <div class="metric">
+        <span>Registros</span>
+        <span id="dataset-rows" class="value">—</span>
+      </div>
+      <div class="metric">
+        <span>Columnas</span>
+        <span id="dataset-columns" class="value">—</span>
+      </div>
+      <div class="metric">
+        <span>Estado</span>
+        <span class="value">READY</span>
+      </div>
+    </div>
+
+    <div class="decision-controls">
+      <div>
+        <label class="label" for="objective">Objetivo de la decisión</label>
+        <select id="objective">
+          <option value="min_cost">Minimizar costo total</option>
+          <option value="min_trips">Minimizar cantidad de viajes</option>
+        </select>
+      </div>
+      <button id="run-button" type="button">Ejecutar decisión</button>
+    </div>
+
+    <div id="run-status" class="status hidden"></div>
+  </section>
+
+  <section id="results-card" class="card hidden">
+    <h2>Resultado de la decisión</h2>
+    <p>
+      Comparación entre la asignación actual del CSV y los escenarios calculados
+      por el motor Python.
+    </p>
+
+    <div id="scenario-grid" class="scenario-grid"></div>
+
+    <details style="margin-top:18px;">
+      <summary style="cursor:pointer;font-weight:650;">Ver JSON técnico de la corrida</summary>
+      <pre id="raw-json" class="raw"></pre>
+    </details>
+  </section>
 </main>
 
 <script>
-const form = document.getElementById("upload-form");
-const button = document.getElementById("submit");
-const result = document.getElementById("result");
+const uploadForm = document.getElementById("upload-form");
+const uploadButton = document.getElementById("upload-button");
+const uploadStatus = document.getElementById("upload-status");
+const decisionCard = document.getElementById("decision-card");
+const resultsCard = document.getElementById("results-card");
+const runButton = document.getElementById("run-button");
+const runStatus = document.getElementById("run-status");
 
-form.addEventListener("submit", async (event) => {
+let activeDatasetId = null;
+
+function showStatus(element, message, type = "") {
+  element.className = "status";
+  if (type) element.classList.add(type);
+  element.textContent = message;
+}
+
+function money(value) {
+  return new Intl.NumberFormat("es-AR", {
+    style: "currency",
+    currency: "ARS",
+    maximumFractionDigits: 0
+  }).format(value);
+}
+
+function number(value) {
+  return new Intl.NumberFormat("es-AR", {
+    maximumFractionDigits: 0
+  }).format(value);
+}
+
+function delta(value) {
+  if (value === null || value === undefined) return "—";
+  if (value === 0) return "0%";
+  return (value > 0 ? "+" : "") + value.toFixed(2) + "%";
+}
+
+function renderScenario(key, scenario, recommendedKey) {
+  const metrics = scenario.metrics;
+  const d = scenario.delta_vs_baseline || {};
+  const recommended = key === recommendedKey;
+
+  return `
+    <article class="scenario ${recommended ? "recommended" : ""}">
+      <span class="badge">${recommended ? "RECOMENDADO" : "ESCENARIO"}</span>
+      <h3>${scenario.name}</h3>
+
+      <div class="kpi">
+        <span>Costo total</span>
+        <strong>${money(metrics.total_cost)}</strong>
+      </div>
+      <div class="kpi">
+        <span>Viajes</span>
+        <strong>${number(metrics.total_trips)}</strong>
+      </div>
+      <div class="kpi">
+        <span>Distancia</span>
+        <strong>${number(metrics.total_distance_km)} km</strong>
+      </div>
+      <div class="kpi">
+        <span>Δ costo vs baseline</span>
+        <strong class="${(d.cost_pct || 0) < 0 ? "delta-good" : ""}">
+          ${delta(d.cost_pct)}
+        </strong>
+      </div>
+      <div class="kpi">
+        <span>Δ viajes vs baseline</span>
+        <strong class="${(d.trips_pct || 0) < 0 ? "delta-good" : ""}">
+          ${delta(d.trips_pct)}
+        </strong>
+      </div>
+    </article>
+  `;
+}
+
+uploadForm.addEventListener("submit", async (event) => {
   event.preventDefault();
+
   const file = document.getElementById("file").files[0];
   if (!file) return;
 
-  button.disabled = true;
-  button.textContent = "Procesando...";
-  result.style.display = "block";
-  result.textContent = "Validando dataset...";
+  uploadButton.disabled = true;
+  uploadButton.textContent = "Validando y cargando...";
+  showStatus(uploadStatus, "Validando dataset...");
 
   const body = new FormData();
   body.append("file", file);
@@ -60,26 +319,94 @@ form.addEventListener("submit", async (event) => {
       method: "POST",
       body
     });
+
     const data = await response.json();
 
     if (!response.ok) {
       throw new Error(data.detail || JSON.stringify(data));
     }
 
-    if (data.duplicate) {
-      result.textContent =
-        "El archivo ya fue cargado previamente.\n\n" +
-        JSON.stringify(data, null, 2);
-    } else {
-      result.textContent =
-        "Dataset cargado correctamente.\n\n" +
-        JSON.stringify(data, null, 2);
-    }
+    const dataset = data.duplicate ? data.existing_dataset : data.dataset;
+    activeDatasetId = dataset.id;
+
+    showStatus(
+      uploadStatus,
+      data.duplicate
+        ? "Este archivo ya existía. Se reutilizará el dataset almacenado."
+        : "Dataset cargado correctamente.",
+      "success"
+    );
+
+    document.getElementById("dataset-name").textContent =
+      `${dataset.original_filename || file.name} · Dataset ID: ${activeDatasetId}`;
+
+    document.getElementById("dataset-rows").textContent =
+      data.validation?.rows ?? "100";
+
+    document.getElementById("dataset-columns").textContent =
+      data.validation?.columns ?? "14";
+
+    decisionCard.classList.remove("hidden");
+    resultsCard.classList.add("hidden");
+    decisionCard.scrollIntoView({ behavior: "smooth", block: "start" });
+
   } catch (error) {
-    result.textContent = "Error: " + error.message;
+    showStatus(uploadStatus, "Error: " + error.message, "error");
   } finally {
-    button.disabled = false;
-    button.textContent = "Validar y cargar dataset";
+    uploadButton.disabled = false;
+    uploadButton.textContent = "Validar y cargar dataset";
+  }
+});
+
+runButton.addEventListener("click", async () => {
+  if (!activeDatasetId) return;
+
+  const objective = document.getElementById("objective").value;
+
+  runButton.disabled = true;
+  runButton.textContent = "Ejecutando motor Python...";
+  showStatus(
+    runStatus,
+    "Cloud Run está descargando el CSV desde Supabase y ejecutando el motor..."
+  );
+
+  try {
+    const response = await fetch(
+      `/api/runs/${activeDatasetId}?objective=${encodeURIComponent(objective)}`,
+      { method: "POST" }
+    );
+
+    const run = await response.json();
+
+    if (!response.ok) {
+      throw new Error(run.detail || JSON.stringify(run));
+    }
+
+    const result = run.result_json;
+    const scenarios = result.scenarios;
+
+    showStatus(
+      runStatus,
+      `Corrida completada · Run ID: ${run.id} · ${run.duration_ms} ms`,
+      "success"
+    );
+
+    document.getElementById("scenario-grid").innerHTML =
+      renderScenario("baseline", scenarios.baseline, result.recommended_scenario) +
+      renderScenario("min_cost", scenarios.min_cost, result.recommended_scenario) +
+      renderScenario("min_trips", scenarios.min_trips, result.recommended_scenario);
+
+    document.getElementById("raw-json").textContent =
+      JSON.stringify(run, null, 2);
+
+    resultsCard.classList.remove("hidden");
+    resultsCard.scrollIntoView({ behavior: "smooth", block: "start" });
+
+  } catch (error) {
+    showStatus(runStatus, "Error: " + error.message, "error");
+  } finally {
+    runButton.disabled = false;
+    runButton.textContent = "Ejecutar decisión";
   }
 });
 </script>
