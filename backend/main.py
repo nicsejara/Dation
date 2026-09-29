@@ -3,6 +3,7 @@ from pathlib import Path
 import httpx
 from fastapi import Depends, FastAPI, File, HTTPException, Query, UploadFile
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from app.auth import require_upload_access
@@ -15,19 +16,30 @@ from app.services.decision_interpreter_service import (
 )
 from app.services.run_service import execute_logistics_run, get_run
 from app.services.supabase_service import check_supabase_connection
+from app.services.workspace_service import (
+    list_datasets,
+    list_runs,
+    workspace_summary,
+)
 from app.validators.logistics_schema import (
     LogisticsValidationError,
     validate_logistics_csv,
 )
 
+BASE_DIR = Path(__file__).resolve().parent
+APP_PAGE = BASE_DIR / "app" / "templates" / "app.html"
+STATIC_DIR = BASE_DIR / "app" / "static"
+
 app = FastAPI(
     title="Dation Core API",
-    version="0.5.0",
-    description="Backend core for the Dation Decision Data Asset MVP.",
+    version="0.6.0",
+    description="Backend core for the Dation Decision Intelligence MVP.",
 )
 
-UPLOAD_PAGE = (
-    Path(__file__).resolve().parent / "app" / "templates" / "upload.html"
+app.mount(
+    "/static",
+    StaticFiles(directory=STATIC_DIR),
+    name="static",
 )
 
 
@@ -39,7 +51,7 @@ class DecisionQuestion(BaseModel):
 def root():
     return {
         "service": "Dation Core",
-        "version": "0.5.0",
+        "version": "0.6.0",
         "status": "running",
     }
 
@@ -49,6 +61,16 @@ def health():
     return {
         "status": "healthy",
     }
+
+
+@app.get("/app", response_class=HTMLResponse)
+def decision_workspace(_: str = Depends(require_upload_access)):
+    return APP_PAGE.read_text(encoding="utf-8")
+
+
+@app.get("/upload", response_class=HTMLResponse)
+def upload_compatibility(_: str = Depends(require_upload_access)):
+    return APP_PAGE.read_text(encoding="utf-8")
 
 
 @app.get("/api/system/supabase-check")
@@ -64,9 +86,53 @@ def llm_status(_: str = Depends(require_upload_access)):
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
 
-@app.get("/upload", response_class=HTMLResponse)
-def upload_page(_: str = Depends(require_upload_access)):
-    return UPLOAD_PAGE.read_text(encoding="utf-8")
+@app.get("/api/workspace/summary")
+async def get_workspace_summary(
+    _: str = Depends(require_upload_access),
+):
+    try:
+        return await workspace_summary()
+    except httpx.HTTPError as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Could not load workspace summary: {exc}",
+        ) from exc
+
+
+@app.get("/api/datasets")
+async def get_datasets(
+    limit: int = Query(default=25, ge=1, le=100),
+    _: str = Depends(require_upload_access),
+):
+    try:
+        return {
+            "items": await list_datasets(limit=limit),
+        }
+    except httpx.HTTPError as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Could not load datasets: {exc}",
+        ) from exc
+
+
+@app.get("/api/runs")
+async def get_runs(
+    limit: int = Query(default=40, ge=1, le=100),
+    dataset_id: str | None = None,
+    _: str = Depends(require_upload_access),
+):
+    try:
+        return {
+            "items": await list_runs(
+                limit=limit,
+                dataset_id=dataset_id,
+            ),
+        }
+    except httpx.HTTPError as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Could not load decision history: {exc}",
+        ) from exc
 
 
 @app.post("/api/datasets/upload")
