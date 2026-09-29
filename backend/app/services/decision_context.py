@@ -9,7 +9,7 @@ def _top_changes(
     baseline: dict,
     candidate: dict,
     *,
-    limit: int = 10,
+    limit: int = 5,
 ) -> list[dict]:
     base = _index_assignments(baseline)
     alt = _index_assignments(candidate)
