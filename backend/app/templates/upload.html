@@ -150,6 +150,33 @@
       max-height: 360px;
       white-space: pre-wrap;
     }
+    textarea {
+      width: 100%;
+      min-height: 96px;
+      border: 1px solid #d0d5dd;
+      border-radius: 10px;
+      padding: 12px;
+      font: inherit;
+      resize: vertical;
+    }
+    .ai-output {
+      margin-top: 18px;
+      border: 1px solid #e4e7ec;
+      border-radius: 12px;
+      padding: 20px;
+      background: #fcfcfd;
+    }
+    .ai-output h3 { margin-top: 18px; }
+    .ai-output h3:first-child { margin-top: 0; }
+    .ai-output ul { color: #475467; padding-left: 20px; }
+    .chat-answer {
+      margin-top: 16px;
+      padding: 16px;
+      border-left: 3px solid #111827;
+      background: #f9fafb;
+      white-space: pre-wrap;
+      line-height: 1.55;
+    }
     @media (max-width: 760px) {
       .dataset-summary, .scenario-grid, .decision-controls {
         grid-template-columns: 1fr;
@@ -224,6 +251,28 @@
       <pre id="raw-json" class="raw"></pre>
     </details>
   </section>
+
+  <section id="ai-card" class="card hidden">
+    <h2>Interpretación Dation AI</h2>
+    <p>
+      El motor Python ya tomó la decisión. Esta capa usa el JSON de la corrida
+      y la base de conocimiento versionada para explicarla en lenguaje de negocio.
+    </p>
+    <div id="llm-meta" class="meta">Consultando configuración del intérprete...</div>
+    <button id="explain-button" type="button">Generar interpretación de negocio</button>
+    <div id="ai-status" class="status hidden"></div>
+    <div id="explanation" class="ai-output hidden"></div>
+
+    <div style="margin-top:26px;">
+      <label class="label" for="question">Preguntale a Dation sobre esta decisión</label>
+      <textarea
+        id="question"
+        placeholder="Ej.: ¿Por qué esta alternativa reduce el costo? ¿Qué shipments explican el cambio?"
+      ></textarea>
+      <button id="chat-button" class="secondary" type="button">Preguntar sobre la decisión</button>
+      <div id="chat-answer" class="chat-answer hidden"></div>
+    </div>
+  </section>
 </main>
 
 <script>
@@ -234,8 +283,16 @@ const decisionCard = document.getElementById("decision-card");
 const resultsCard = document.getElementById("results-card");
 const runButton = document.getElementById("run-button");
 const runStatus = document.getElementById("run-status");
+const aiCard = document.getElementById("ai-card");
+const aiStatus = document.getElementById("ai-status");
+const llmMeta = document.getElementById("llm-meta");
+const explainButton = document.getElementById("explain-button");
+const chatButton = document.getElementById("chat-button");
+const explanationBox = document.getElementById("explanation");
+const chatAnswer = document.getElementById("chat-answer");
 
 let activeDatasetId = null;
+let activeRunId = null;
 
 function showStatus(element, message, type = "") {
   element.className = "status";
@@ -261,6 +318,60 @@ function delta(value) {
   if (value === null || value === undefined) return "—";
   if (value === 0) return "0%";
   return (value > 0 ? "+" : "") + value.toFixed(2) + "%";
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function listHtml(items) {
+  return "<ul>" + (items || []).map(
+    item => "<li>" + escapeHtml(item) + "</li>"
+  ).join("") + "</ul>";
+}
+
+function renderExplanation(e) {
+  explanationBox.innerHTML =
+    "<h3>Resumen ejecutivo</h3><p>" + escapeHtml(e.executive_summary) + "</p>" +
+    "<h3>Recomendación</h3><p>" + escapeHtml(e.recommendation) + "</p>" +
+    "<h3>Por qué se recomienda</h3><p>" + escapeHtml(e.why_recommended) + "</p>" +
+    "<h3>Impacto de negocio</h3>" +
+      "<div class='kpi'><span>Costo</span><strong>" + escapeHtml(e.business_impact.cost) + "</strong></div>" +
+      "<div class='kpi'><span>Viajes</span><strong>" + escapeHtml(e.business_impact.trips) + "</strong></div>" +
+      "<div class='kpi'><span>Distancia</span><strong>" + escapeHtml(e.business_impact.distance) + "</strong></div>" +
+    "<h3>Principales drivers</h3>" + listHtml(e.key_drivers) +
+    "<h3>Trade-offs</h3>" + listHtml(e.tradeoffs) +
+    "<h3>Supuestos relevantes</h3>" + listHtml(e.assumptions) +
+    "<h3>Limitaciones</h3>" + listHtml(e.caveats) +
+    "<h3>Preguntas sugeridas</h3>" + listHtml(e.suggested_questions);
+
+  explanationBox.classList.remove("hidden");
+}
+
+async function refreshLlmStatus() {
+  try {
+    const response = await fetch("/api/system/llm-status");
+    const data = await response.json();
+
+    if (!response.ok) throw new Error(data.detail || "No disponible");
+
+    llmMeta.textContent = data.configured
+      ? "Intérprete listo · " + data.provider + " · " + data.model +
+        " · Knowledge " + data.knowledge_version
+      : "Base de conocimiento lista. Falta configurar LLM_API_KEY en Cloud Run.";
+
+    explainButton.disabled = !data.configured;
+    chatButton.disabled = !data.configured;
+  } catch (error) {
+    llmMeta.textContent = "No se pudo consultar el estado del intérprete.";
+    explainButton.disabled = true;
+    chatButton.disabled = true;
+  }
 }
 
 function renderScenario(key, scenario, recommendedKey) {
@@ -384,6 +495,7 @@ runButton.addEventListener("click", async () => {
 
     const result = run.result_json;
     const scenarios = result.scenarios;
+    activeRunId = run.id;
 
     showStatus(
       runStatus,
@@ -400,6 +512,10 @@ runButton.addEventListener("click", async () => {
       JSON.stringify(run, null, 2);
 
     resultsCard.classList.remove("hidden");
+    aiCard.classList.remove("hidden");
+    explanationBox.classList.add("hidden");
+    chatAnswer.classList.add("hidden");
+    await refreshLlmStatus();
     resultsCard.scrollIntoView({ behavior: "smooth", block: "start" });
 
   } catch (error) {
@@ -409,6 +525,78 @@ runButton.addEventListener("click", async () => {
     runButton.textContent = "Ejecutar decisión";
   }
 });
+
+explainButton.addEventListener("click", async () => {
+  if (!activeRunId) return;
+
+  explainButton.disabled = true;
+  explainButton.textContent = "Interpretando decisión...";
+  showStatus(
+    aiStatus,
+    "El LLM está leyendo la evidencia calculada y la base de conocimiento..."
+  );
+
+  try {
+    const response = await fetch(
+      "/api/runs/" + activeRunId + "/explain",
+      { method: "POST" }
+    );
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.detail || JSON.stringify(data));
+    }
+
+    renderExplanation(data.explanation);
+    showStatus(
+      aiStatus,
+      "Interpretación generada · " + data.provider + " · " + data.model,
+      "success"
+    );
+  } catch (error) {
+    showStatus(aiStatus, "Error: " + error.message, "error");
+  } finally {
+    explainButton.disabled = false;
+    explainButton.textContent = "Generar interpretación de negocio";
+  }
+});
+
+chatButton.addEventListener("click", async () => {
+  if (!activeRunId) return;
+
+  const question = document.getElementById("question").value.trim();
+  if (!question) return;
+
+  chatButton.disabled = true;
+  chatButton.textContent = "Analizando pregunta...";
+  chatAnswer.classList.remove("hidden");
+  chatAnswer.textContent = "Consultando la decisión...";
+
+  try {
+    const response = await fetch(
+      "/api/runs/" + activeRunId + "/chat",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question })
+      }
+    );
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.detail || JSON.stringify(data));
+    }
+
+    chatAnswer.textContent = data.answer;
+  } catch (error) {
+    chatAnswer.textContent = "Error: " + error.message;
+  } finally {
+    chatButton.disabled = false;
+    chatButton.textContent = "Preguntar sobre la decisión";
+  }
+});
+
+refreshLlmStatus();
 </script>
 </body>
 </html>
