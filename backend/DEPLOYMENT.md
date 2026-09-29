@@ -1,6 +1,8 @@
 # Deployment marker
 
-This file intentionally triggers a clean Cloud Build deployment after the initial
-repository scaffolding commits completed.
+Expected deployed API version: 0.4.0
 
-Expected deployed API version: 0.2.0
+Milestone:
+- Cloud ingestion is working.
+- Supabase connectivity is working.
+- Logistics simple engine endpoints are enabled.
