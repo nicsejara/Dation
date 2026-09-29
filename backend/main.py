@@ -1,8 +1,10 @@
 from fastapi import FastAPI
 
+from app.services.supabase_service import check_supabase_connection
+
 app = FastAPI(
     title="Dation Core API",
-    version="0.1.0",
+    version="0.2.0",
     description="Backend core for the Dation Decision Data Asset MVP.",
 )
 
@@ -11,7 +13,7 @@ app = FastAPI(
 def root():
     return {
         "service": "Dation Core",
-        "version": "0.1.0",
+        "version": "0.2.0",
         "status": "running",
     }
 
@@ -21,3 +23,8 @@ def health():
     return {
         "status": "healthy",
     }
+
+
+@app.get("/api/system/supabase-check")
+async def supabase_check():
+    return await check_supabase_connection()
