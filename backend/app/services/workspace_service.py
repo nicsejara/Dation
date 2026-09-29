@@ -1,3 +1,4 @@
+import asyncio
 import httpx
 
 from app.config import SUPABASE_SECRET_KEY, SUPABASE_URL
@@ -63,7 +64,7 @@ async def list_runs(
 
 async def workspace_summary() -> dict:
     async with httpx.AsyncClient(timeout=15.0) as client:
-        datasets_response, runs_response = await (
+        datasets_response, runs_response = await asyncio.gather(
             client.get(
                 f"{SUPABASE_URL}/rest/v1/datasets",
                 headers={
