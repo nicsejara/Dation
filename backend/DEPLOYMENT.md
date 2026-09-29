@@ -8,4 +8,5 @@ Milestone:
 - Logistics decision engine is working.
 - Decision Interpreter knowledge base is versioned in GitHub.
 - AI explanation and decision chat endpoints are enabled.
-- LLM provider is configurable through Cloud Run secrets/environment variables.
+- Chat uses targeted knowledge retrieval to stay within free-tier token limits.
+- Groq 429 rate limits are retried once automatically.
