@@ -540,41 +540,6 @@ function bindNavigation() {
     }
   );
 
-  $("#open-logistics")
-    .addEventListener(
-      "click",
-      (event) => {
-        event.stopPropagation();
-        navigate(
-          "logistics-config"
-        );
-      }
-    );
-
-  $("#logistics-dda-card")
-    .addEventListener(
-      "click",
-      () => navigate(
-        "logistics-config"
-      )
-    );
-
-  $("#logistics-dda-card")
-    .addEventListener(
-      "keydown",
-      (event) => {
-        if (
-          event.key === "Enter"
-          || event.key === " "
-        ) {
-          event.preventDefault();
-          navigate(
-            "logistics-config"
-          );
-        }
-      }
-    );
-
   $("#back-to-config")
     .addEventListener(
       "click",
