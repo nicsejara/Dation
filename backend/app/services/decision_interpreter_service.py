@@ -22,7 +22,7 @@ from app.services.llm_service import (
 from app.services.run_service import get_run
 
 
-PROMPT_VERSION = "decision_interpreter_v0.2"
+PROMPT_VERSION = "decision_interpreter_v0.3"
 
 EXPLANATION_SCHEMA = {
     "type": "object",
@@ -125,6 +125,13 @@ La evidencia puede incluir una configuración predefinida o una
 ponderación personalizada entre costo y viajes. Si existe sensibilidad,
 compará la configuración seleccionada con los extremos 100% costo y
 100% viajes únicamente a partir de los valores provistos.
+
+REGLA CRÍTICA DE IDENTIDAD DE LA DECISIÓN:
+Si selection_semantics.requested_mode es "custom", la decisión debe
+nombrarse siempre como "Configuración personalizada" e incluir sus pesos.
+Aunque la asignación coincida con min_cost, min_trips o ambos extremos,
+esa coincidencia es un hallazgo de sensibilidad. Nunca renombres una
+decisión personalizada como "Costo mínimo" o "Viajes mínimos".
 
 VERSIÓN DE CONOCIMIENTO:
 {knowledge['version']}
