@@ -43,7 +43,7 @@
 
       <div class="sidebar-section">
         <p class="sidebar-label">Decision Data Assets</p>
-        <button class="asset-item is-active" data-view="logistics-config" type="button" onclick="window.dationNavigate && window.dationNavigate('logistics-config', 'data', event)">
+        <button class="asset-item" data-view="logistics-config" type="button" onclick="window.dationNavigate && window.dationNavigate('logistics-config', 'data', event)">
           <span class="asset-icon asset-icon--route" aria-hidden="true">
             <svg viewBox="0 0 36 36" role="img">
               <circle cx="8" cy="27" r="3"></circle>
@@ -1032,6 +1032,7 @@
         return currentView;
       };
 
+      setSidebarActive('inicio');
       window.dationRenderJourney('inicio', null);
     })();
   </script>
