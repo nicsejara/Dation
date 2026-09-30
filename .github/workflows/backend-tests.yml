@@ -47,7 +47,7 @@ jobs:
           for file in app/static/js/api.js app/static/js/state.js app/static/js/ui.js app/static/js/app.js; do
             node --input-type=module --check < "$file"
           done
-          for file in app/static/js/data-stage.js app/static/js/decision-stage.js app/static/js/dashboard-stage.js; do
+          for file in app/static/js/data-stage.js app/static/js/decision-stage.js app/static/js/dashboard-stage.js app/static/js/interpreter-stage.js; do
             node --check "$file"
           done
 
