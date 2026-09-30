@@ -9078,3 +9078,57 @@ body.has-overlay {
     flex-direction: column;
   }
 }
+
+
+/* Dashboard detail filters + retryable chat state */
+.reassignment-toolbar {
+  grid-template-columns:
+    minmax(210px,1.35fr)
+    minmax(145px,.8fr)
+    minmax(145px,.8fr)
+    minmax(150px,.8fr)
+    minmax(170px,.9fr)
+    auto;
+}
+
+.chat-error-state {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 16px 10px;
+  padding: 10px 11px;
+  border: 1px solid var(--color-danger-border);
+  border-radius: 9px;
+  color: var(--color-danger);
+  background: var(--color-danger-bg);
+}
+
+.chat-error-state span,
+.chat-error-state button {
+  font-size: 12px;
+}
+
+@media (max-width: 1100px) {
+  .reassignment-toolbar {
+    grid-template-columns:
+      minmax(220px,1fr)
+      repeat(2,minmax(150px,.7fr));
+  }
+
+  .reassignment-toolbar
+  #export-reassignments {
+    width: fit-content;
+  }
+}
+
+@media (max-width: 760px) {
+  .reassignment-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .reassignment-toolbar
+  #export-reassignments {
+    width: 100%;
+  }
+}
