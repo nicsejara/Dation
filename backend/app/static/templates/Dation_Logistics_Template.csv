@@ -1,0 +1,7 @@
+shipment_id,product,quantity_units,unit_weight_kg,origin,destination,distance_km,vehicle_type,vehicle_capacity_kg,cost_per_km,fixed_trip_cost,priority,max_delivery_days,dispatch_date
+SHP-DEMO-001,Producto A,10,500,Cordoba,Villa Maria,145,Truck_S,8000,720,25000,Normal,3,2026-10-01
+SHP-DEMO-002,Producto B,12,900,Cordoba,Rio Cuarto,220,Truck_M,15000,920,35000,High,2,2026-10-02
+SHP-DEMO-003,Producto C,8,1400,Rosario,Santa Fe,170,Truck_L,25000,1180,48000,Normal,3,2026-10-03
+SHP-DEMO-004,Producto A,18,500,Buenos Aires,La Plata,60,Truck_S,8000,720,25000,Low,5,2026-10-04
+SHP-DEMO-005,Producto B,16,900,Cordoba,San Luis,410,Truck_M,15000,920,35000,High,2,2026-10-05
+SHP-DEMO-006,Producto C,6,1400,Rosario,Tucuman,850,Truck_L,25000,1180,48000,Normal,4,2026-10-06
