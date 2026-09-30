@@ -1,4 +1,5 @@
 from pathlib import Path
+from uuid import UUID
 
 import httpx
 from fastapi import (
@@ -411,6 +412,9 @@ async def run_logistics_decision(
     objective: str | None = Query(
         default=None
     ),
+    run_id: UUID | None = Query(
+        default=None
+    ),
     _: str = Depends(
         require_upload_access
     ),
@@ -455,6 +459,11 @@ async def run_logistics_decision(
         return await execute_logistics_run(
             dataset_id=dataset_id,
             configuration=configuration,
+            run_id=(
+                str(run_id)
+                if run_id is not None
+                else None
+            ),
         )
     except LookupError as exc:
         raise HTTPException(
