@@ -491,7 +491,6 @@ async function restoreHistoricalRun(
 async function bootstrap() {
   renderActiveDataset(null);
   renderDatasetProfile(null);
-  renderDecisionConfiguration();
   renderTechnicalEvidence(null);
   resetChat([]);
 
@@ -571,30 +570,6 @@ function bindNavigation() {
     );
   }
 
-  const continueToDecision = $("#continue-to-decision");
-
-  if (continueToDecision) {
-    continueToDecision.addEventListener(
-      "click",
-      () => {
-        if (
-          !state.activeDataset
-          || !state.datasetProfile
-        ) {
-          toast(
-            "Validá un dataset antes de configurar la decisión.",
-            "error",
-          );
-          return;
-        }
-
-        navigate(
-          "logistics-config"
-        );
-      }
-    );
-  }
-
   $("#back-to-config")
     .addEventListener(
       "click",
@@ -655,27 +630,26 @@ function bindDatasetActions() {
 
 
 function bindDataStageBridge() {
+  function consumeDataStage(
+    dataset,
+    profile,
+  ) {
+    if (!dataset || !profile) {
+      return;
+    }
+
+    setActiveDataset(dataset);
+    setDatasetProfile(profile);
+    clearDecisionState();
+  }
+
   window.addEventListener(
     "dation:dataset-ready",
     (event) => {
-      const dataset = (
-        event.detail?.dataset
+      consumeDataStage(
+        event.detail?.dataset,
+        event.detail?.profile,
       );
-
-      const profile = (
-        event.detail?.profile
-      );
-
-      if (!dataset || !profile) {
-        return;
-      }
-
-      setActiveDataset(dataset);
-      setDatasetProfile(profile);
-      clearDecisionState();
-
-      renderDecisionConfiguration();
-      updateExecutionReadiness();
     }
   );
 
@@ -685,18 +659,100 @@ function bindDataStageBridge() {
     && window.dationDataStage
       ?.profile
   ) {
-    setActiveDataset(
+    consumeDataStage(
       window.dationDataStage
-        .activeDataset
+        .activeDataset,
+      window.dationDataStage
+        .profile,
+    );
+  }
+}
+
+
+function bindDecisionStageBridge() {
+  async function consumeRun(
+    run,
+    dataset,
+    profile,
+  ) {
+    if (!run || !dataset || !profile) {
+      return;
+    }
+
+    setActiveDataset(dataset);
+    setDatasetProfile(profile);
+    setActiveRun(run);
+    setExplanation(null);
+    setMessages([]);
+
+    restoreRunConfiguration(run);
+
+    renderDashboard(
+      run,
+      profile,
     );
 
-    setDatasetProfile(
-      window.dationDataStage
-        .profile
+    renderExplanation(null);
+    resetChat([]);
+
+    renderInterpreterMeta(
+      state.interpreter
     );
 
-    renderDecisionConfiguration();
-    updateExecutionReadiness();
+    navigate(
+      "decision-dashboard"
+    );
+
+    try {
+      await Promise.all([
+        refreshRuns(),
+        refreshSummary(),
+        refreshDatasets(),
+      ]);
+    } catch (error) {
+      console.warn(
+        "No se pudo refrescar el workspace después de la corrida.",
+        error,
+      );
+    }
+  }
+
+  window.dationConsumeDecisionRun = (
+    run,
+    dataset,
+    profile,
+  ) => {
+    consumeRun(
+      run,
+      dataset,
+      profile,
+    );
+  };
+
+  window.addEventListener(
+    "dation:run-ready",
+    (event) => {
+      consumeRun(
+        event.detail?.run,
+        event.detail?.dataset,
+        event.detail?.profile,
+      );
+    }
+  );
+
+  if (
+    window.dationDecisionStage
+      ?.run
+    && window.dationDecisionStage
+      ?.dataset
+    && window.dationDecisionStage
+      ?.profile
+  ) {
+    consumeRun(
+      window.dationDecisionStage.run,
+      window.dationDecisionStage.dataset,
+      window.dationDecisionStage.profile,
+    );
   }
 }
 
@@ -1360,8 +1416,7 @@ function bindGlobalErrors() {
 bindNavigation();
 bindDatasetActions();
 bindDataStageBridge();
-bindDecisionConfiguration();
-bindDecisionExecution();
+bindDecisionStageBridge();
 bindInterpreter();
 bindExports();
 bindRefreshActions();
