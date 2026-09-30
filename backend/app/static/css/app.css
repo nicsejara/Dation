@@ -7629,3 +7629,15 @@ section[data-view-panel="decision-dashboard"].is-active {
     display: none;
   }
 }
+
+
+/* Keep the final dashboard content clear of the viewport action dock. */
+.dashboard-v2 {
+  padding-bottom: 118px;
+}
+
+@media (max-width: 760px) {
+  .dashboard-v2 {
+    padding-bottom: 108px;
+  }
+}
