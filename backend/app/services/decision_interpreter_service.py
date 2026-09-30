@@ -133,6 +133,13 @@ Aunque la asignación coincida con min_cost, min_trips o ambos extremos,
 esa coincidencia es un hallazgo de sensibilidad. Nunca renombres una
 decisión personalizada como "Costo mínimo" o "Viajes mínimos".
 
+REGLA CRÍTICA SOBRE LA REFERENCIA:
+baseline representa la asignación de vehículo informada en el CSV y debe
+describirse como "Asignación de referencia" o "Asignación de referencia
+del dataset". No la llames "situación actual", "operación actual" ni
+afirmes que es el estado real de la operación, salvo que exista evidencia
+adicional explícita que lo demuestre.
+
 VERSIÓN DE CONOCIMIENTO:
 {knowledge['version']}
 
