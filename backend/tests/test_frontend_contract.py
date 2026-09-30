@@ -54,6 +54,14 @@ DASHBOARD_STAGE_JS = (
     / "dashboard-stage.js"
 )
 
+INTERPRETER_STAGE_JS = (
+    BACKEND_ROOT
+    / "app"
+    / "static"
+    / "js"
+    / "interpreter-stage.js"
+)
+
 
 class FrontendContractTests(
     unittest.TestCase
@@ -84,6 +92,11 @@ class FrontendContractTests(
                 encoding="utf-8"
             )
         )
+        cls.interpreter_stage_js = (
+            INTERPRETER_STAGE_JS.read_text(
+                encoding="utf-8"
+            )
+        )
 
     def test_javascript_referenced_ids_exist(
         self,
@@ -98,6 +111,8 @@ class FrontendContractTests(
             + self.decision_stage_js
             + "\n"
             + self.dashboard_stage_js
+            + "\n"
+            + self.interpreter_stage_js
         )
 
         referenced_ids = set(
@@ -316,6 +331,83 @@ class FrontendContractTests(
         self.assertIn(
             "dationDashboardCompleted",
             self.app_js,
+        )
+
+
+    def test_sidebar_keeps_only_home_primary_nav(
+        self,
+    ):
+        sidebar = self.html.split(
+            '<aside class="sidebar">',
+            1,
+        )[1].split(
+            "</aside>",
+            1,
+        )[0]
+
+        primary_nav = sidebar.split(
+            '<nav class="nav"',
+            1,
+        )[1].split(
+            "</nav>",
+            1,
+        )[0]
+
+        self.assertIn(
+            ">Inicio<",
+            primary_nav,
+        )
+        self.assertNotIn(
+            ">Trazabilidad<",
+            primary_nav,
+        )
+        self.assertNotIn(
+            ">Configuración<",
+            primary_nav,
+        )
+        self.assertNotIn(
+            ">DDA Logística<",
+            primary_nav,
+        )
+        self.assertIn(
+            "Decision Data Assets",
+            sidebar,
+        )
+
+    def test_latest_decision_access_contract(
+        self,
+    ):
+        self.assertIn(
+            'id="open-latest-logistics-decision"',
+            self.html,
+        )
+        self.assertIn(
+            "findLatestCompletedRun",
+            self.dashboard_stage_js,
+        )
+        self.assertIn(
+            "dationOpenLatestDecision",
+            self.dashboard_stage_js,
+        )
+
+    def test_interpreter_stage_contract(
+        self,
+    ):
+        self.assertIn(
+            "/api/system/llm-status",
+            self.interpreter_stage_js,
+        )
+        self.assertIn(
+            "/explain",
+            self.interpreter_stage_js,
+        )
+        self.assertIn(
+            "/chat",
+            self.interpreter_stage_js,
+        )
+        self.assertIn(
+            "dation:dashboard-completed",
+            self.interpreter_stage_js,
         )
 
 
