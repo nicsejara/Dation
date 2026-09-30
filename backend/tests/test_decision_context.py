@@ -120,21 +120,21 @@ class DecisionContextTests(
 
         self.assertEqual(
             reference["label"],
-            "Asignación de referencia",
+            "Asignación actual",
         )
         self.assertIn(
             "vehicle_type",
             reference["source"],
         )
         self.assertIn(
-            "No implica",
+            "Asignación actual",
             reference["meaning"],
         )
         self.assertEqual(
             context["scenarios"][
                 "baseline"
             ]["name"],
-            "Asignación de referencia",
+            "Asignación actual",
         )
 
 
