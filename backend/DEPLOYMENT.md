@@ -190,3 +190,24 @@ Final main-state for the current deployment:
 - Sidebar buttons use the same resilient global navigator.
 - MVP badge, service verification status and avatar were removed from the topbar.
 - app.js delegates view changes to the global journey navigator so programmatic transitions stay synchronized.
+
+
+## Logistics overview flow — 2026-09-30
+
+Navigation now follows:
+- Inicio
+- DDA Logística overview
+- Cargar data
+- Configurar decisión
+- Dashboard decisión
+
+The new DDA Logística overview explains:
+- decision purpose,
+- baseline and alternatives,
+- sensitivity,
+- required input data,
+- decision outputs,
+- current MVP scope and limits.
+
+The home card and sidebar open the overview.
+The overview CTA starts the process at the data-loading stage.
