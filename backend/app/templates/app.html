@@ -157,6 +157,7 @@
                   data-view-target="logistics-config"
                   type="button"
                   aria-label="Abrir DDA Logística"
+                  onclick="window.dationOpenLogistics && window.dationOpenLogistics(event)"
                 >
                   <div class="d-home__asset-icon d-home__asset-icon--logistics" aria-hidden="true">
                     <span class="d-home__route-start"></span>
@@ -807,6 +808,55 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script type="module" src="/static/js/app.js?v=home-v3-20260929"></script>
+  <script>
+    window.dationOpenLogistics = function (event) {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+
+      var target = document.querySelector('[data-view-panel="logistics-config"]');
+
+      if (!target) {
+        return;
+      }
+
+      document.querySelectorAll('[data-view-panel]').forEach(function (panel) {
+        panel.classList.remove('is-active');
+      });
+
+      target.classList.add('is-active');
+
+      document.querySelectorAll('.nav-item[data-view]').forEach(function (button) {
+        button.classList.toggle(
+          'is-active',
+          button.getAttribute('data-view') === 'logistics-config'
+        );
+      });
+
+      var primary = document.getElementById('breadcrumb-primary');
+      var secondary = document.getElementById('breadcrumb-secondary');
+      var separator = document.querySelector('.breadcrumb-context-separator');
+
+      if (primary) {
+        primary.textContent = 'DDA Logística';
+      }
+
+      if (secondary) {
+        secondary.textContent = 'Configuración';
+        secondary.classList.remove('is-hidden');
+      }
+
+      if (separator) {
+        separator.classList.remove('is-hidden');
+      }
+
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    };
+  </script>
+  <script type="module" src="/static/js/app.js?v=home-v3-cta-fix-20260929"></script>
 </body>
 </html>
