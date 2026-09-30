@@ -626,67 +626,79 @@ function bindDatasetActions() {
   document.addEventListener(
     "click",
     async (event) => {
-      const useButton = (
-        event.target.closest(
-          "[data-use-dataset]"
-        )
-      );
-
-      if (useButton) {
-        const dataset = (
-          datasetById(
-            useButton.dataset
-              .useDataset
-          )
-        );
-
-        if (!dataset) {
-          toast(
-            "No se encontró el dataset seleccionado.",
-            "error",
-          );
-          return;
-        }
-
-        await selectDataset(
-          dataset,
-          {
-            navigateToDda: true,
-          },
-        );
-
-        toast(
-          dataset.original_filename
-          + " quedó seleccionado como evidencia."
-        );
-        return;
-      }
-
       const runButton = (
         event.target.closest(
           "[data-open-run]"
         )
       );
 
-      if (runButton) {
-        runButton.disabled = true;
-        runButton.textContent = (
-          "Abriendo…"
-        );
-
-        await restoreHistoricalRun(
-          runButton.dataset.openRun
-        );
-
-        runButton.disabled = false;
-        runButton.textContent = (
-          "Abrir decisión"
-        );
+      if (!runButton) {
+        return;
       }
+
+      runButton.disabled = true;
+      runButton.textContent = (
+        "Abriendo…"
+      );
+
+      await restoreHistoricalRun(
+        runButton.dataset.openRun
+      );
+
+      runButton.disabled = false;
+      runButton.textContent = (
+        "Abrir decisión"
+      );
     }
   );
 }
 
+
+function bindDataStageBridge() {
+  window.addEventListener(
+    "dation:dataset-ready",
+    (event) => {
+      const dataset = (
+        event.detail?.dataset
+      );
+
+      const profile = (
+        event.detail?.profile
+      );
+
+      if (!dataset || !profile) {
+        return;
+      }
+
+      setActiveDataset(dataset);
+      setDatasetProfile(profile);
+      clearDecisionState();
+
+      renderDecisionConfiguration();
+      updateExecutionReadiness();
+    }
+  );
+
+  if (
+    window.dationDataStage
+      ?.activeDataset
+    && window.dationDataStage
+      ?.profile
+  ) {
+    setActiveDataset(
+      window.dationDataStage
+        .activeDataset
+    );
+
+    setDatasetProfile(
+      window.dationDataStage
+        .profile
+    );
+
+    renderDecisionConfiguration();
+    updateExecutionReadiness();
+  }
+}
 
 function bindUpload() {
   const input = (
@@ -1347,7 +1359,7 @@ function bindGlobalErrors() {
 
 bindNavigation();
 bindDatasetActions();
-bindUpload();
+bindDataStageBridge();
 bindDecisionConfiguration();
 bindDecisionExecution();
 bindInterpreter();
