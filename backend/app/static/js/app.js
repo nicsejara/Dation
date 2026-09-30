@@ -339,10 +339,26 @@ async function restoreHistoricalRun(
       || []
     );
 
+    navigate(
+      "decision-dashboard"
+    );
+
     renderDashboard(
       run,
       profile,
     );
+
+    if (
+      typeof window
+        .dationDashboardCompleted
+      === "function"
+    ) {
+      window.dationDashboardCompleted(
+        run,
+        dataset,
+        profile
+      );
+    }
 
     renderExplanation(
       savedExplanation
@@ -354,10 +370,6 @@ async function restoreHistoricalRun(
 
     renderInterpreterMeta(
       state.interpreter
-    );
-
-    navigate(
-      "decision-dashboard"
     );
 
     toast(
@@ -564,6 +576,10 @@ function bindDecisionStageBridge() {
       return;
     }
 
+    navigate(
+      "decision-dashboard"
+    );
+
     setActiveDataset(dataset);
     setDatasetProfile(profile);
     setActiveRun(run);
@@ -572,21 +588,48 @@ function bindDecisionStageBridge() {
 
     restoreRunConfiguration(run);
 
-    renderDashboard(
-      run,
-      profile,
-    );
+    try {
+      renderDashboard(
+        run,
+        profile,
+      );
 
-    renderExplanation(null);
-    resetChat([]);
+      renderExplanation(null);
+      resetChat([]);
 
-    renderInterpreterMeta(
-      state.interpreter
-    );
+      renderInterpreterMeta(
+        state.interpreter
+      );
 
-    navigate(
-      "decision-dashboard"
-    );
+      if (
+        typeof window
+          .dationDashboardCompleted
+        === "function"
+      ) {
+        window.dationDashboardCompleted(
+          run,
+          dataset,
+          profile
+        );
+      }
+    } catch (error) {
+      if (
+        typeof window
+          .dationDashboardExecutionError
+        === "function"
+      ) {
+        window.dationDashboardExecutionError(
+          run.id,
+          (
+            "La corrida terminó, pero el Dashboard "
+            + "no pudo renderizarse: "
+            + error.message
+          )
+        );
+      }
+
+      throw error;
+    }
 
     try {
       await Promise.all([
