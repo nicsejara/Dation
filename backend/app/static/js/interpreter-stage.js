@@ -283,13 +283,6 @@
       "is-hidden"
     );
 
-    var exportButton = (
-      $("#export-decision")
-    );
-
-    if (exportButton) {
-      exportButton.disabled = false;
-    }
   }
 
   function appendMessage(
@@ -574,7 +567,7 @@
     }
   }
 
-  function toggleChat() {
+  function setChatOpen(open) {
     var panel = $("#chat-panel");
     var button = $("#toggle-chat");
     var question = (
@@ -585,25 +578,43 @@
       return;
     }
 
-    var opening = (
+    panel.classList.toggle(
+      "is-hidden",
+      !open
+    );
+
+    button.classList.toggle(
+      "is-open",
+      open
+    );
+
+    button.setAttribute(
+      "aria-expanded",
+      open ? "true" : "false"
+    );
+
+    if (open && question) {
+      window.setTimeout(
+        function () {
+          question.focus();
+        },
+        80
+      );
+    }
+  }
+
+  function toggleChat() {
+    var panel = $("#chat-panel");
+
+    if (!panel) {
+      return;
+    }
+
+    setChatOpen(
       panel.classList.contains(
         "is-hidden"
       )
     );
-
-    panel.classList.toggle(
-      "is-hidden"
-    );
-
-    button.textContent = (
-      opening
-        ? "Cerrar chat"
-        : "Abrir chat"
-    );
-
-    if (opening && question) {
-      question.focus();
-    }
   }
 
   async function sendQuestion() {
@@ -721,6 +732,7 @@
     );
     var toggle = $("#toggle-chat");
     var ask = $("#ask-decision");
+    var close = $("#chat-close");
     var question = (
       $("#decision-question")
     );
@@ -747,6 +759,15 @@
       );
     }
 
+    if (close) {
+      close.addEventListener(
+        "click",
+        function () {
+          setChatOpen(false);
+        }
+      );
+    }
+
     if (question) {
       question.addEventListener(
         "keydown",
@@ -764,6 +785,15 @@
         }
       );
     }
+
+    document.addEventListener(
+      "keydown",
+      function (event) {
+        if (event.key === "Escape") {
+          setChatOpen(false);
+        }
+      }
+    );
 
     if (chips) {
       chips.addEventListener(
