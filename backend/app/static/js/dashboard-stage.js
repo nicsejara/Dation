@@ -456,17 +456,31 @@
       dataset = profilePayload.dataset;
     }
 
+    window.dationDashboardCompleted(
+      run,
+      dataset,
+      profile
+    );
+
     if (
       typeof window
         .dationConsumeDecisionRun
       === "function"
     ) {
-      await window
-        .dationConsumeDecisionRun(
-          run,
-          dataset,
-          profile
+      try {
+        await window
+          .dationConsumeDecisionRun(
+            run,
+            dataset,
+            profile
+          );
+      } catch (error) {
+        console.warn(
+          "El Dashboard ya fue renderizado, pero falló una sincronización secundaria del workspace.",
+          error
         );
+      }
+
       return;
     }
 
@@ -555,6 +569,753 @@
         "No se pudo recuperar el estado "
         + "persistido de la corrida."
       );
+    }
+  }
+
+  function formatDate(value) {
+    if (!value) {
+      return "—";
+    }
+
+    var parsed = new Date(value);
+
+    if (Number.isNaN(parsed.getTime())) {
+      return String(value);
+    }
+
+    return new Intl.DateTimeFormat(
+      "es-AR",
+      {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      }
+    ).format(parsed);
+  }
+
+  function setText(id, value) {
+    var node = document.getElementById(id);
+
+    if (node) {
+      node.textContent = value;
+    }
+  }
+
+  function runConfiguration(run) {
+    return (
+      run.configuration_json
+      || (
+        run.result_json
+        && run.result_json.configuration
+      )
+      || {
+        mode: "preset",
+        objective: "min_cost",
+        weights: {
+          cost: 1,
+          trips: 0
+        }
+      }
+    );
+  }
+
+  function modeLabel(config) {
+    return (
+      config.mode === "custom"
+        ? "Personalizado"
+        : "Predefinido"
+    );
+  }
+
+  function weightLabel(config) {
+    var weights = (
+      config.weights || {}
+    );
+
+    return (
+      "Costo "
+      + Math.round(
+        Number(weights.cost || 0)
+        * 100
+      )
+      + "% · Viajes "
+      + Math.round(
+        Number(weights.trips || 0)
+        * 100
+      )
+      + "%"
+    );
+  }
+
+  function scenarioLabel(key) {
+    if (key === "min_trips") {
+      return "Viajes mínimos";
+    }
+
+    if (key === "custom") {
+      return "Configuración personalizada";
+    }
+
+    if (key === "baseline") {
+      return "Situación actual";
+    }
+
+    return "Costo mínimo";
+  }
+
+  function assignmentMap(scenario) {
+    var map = new Map();
+
+    (
+      scenario
+      && scenario.assignments
+      || []
+    ).forEach(function (item) {
+      map.set(
+        item.shipment_id,
+        item
+      );
+    });
+
+    return map;
+  }
+
+  function assignmentDifferenceCount(
+    first,
+    second
+  ) {
+    var firstMap = assignmentMap(first);
+    var secondMap = assignmentMap(second);
+    var ids = new Set(
+      Array.from(firstMap.keys())
+        .concat(
+          Array.from(secondMap.keys())
+        )
+    );
+
+    var count = 0;
+
+    ids.forEach(function (id) {
+      var firstItem = firstMap.get(id);
+      var secondItem = secondMap.get(id);
+
+      if (
+        (
+          firstItem
+          && firstItem.vehicle_type
+        )
+        !== (
+          secondItem
+          && secondItem.vehicle_type
+        )
+      ) {
+        count += 1;
+      }
+    });
+
+    return count;
+  }
+
+  function renderCoreContext(
+    profilePayload
+  ) {
+    var container = (
+      $("#dashboard-data-context")
+    );
+
+    if (!container) {
+      return;
+    }
+
+    var profile = (
+      profilePayload
+      && profilePayload.profile
+    );
+
+    if (!profile) {
+      container.innerHTML = (
+        '<div class="context-metric">'
+        + "<span>Perfil</span>"
+        + "<strong>No disponible</strong>"
+        + "</div>"
+      );
+      return;
+    }
+
+    var range = (
+      profile.dispatch_date_range
+      || {}
+    );
+
+    var metrics = [
+      ["Despachos", profile.shipments],
+      ["Unidades", profile.total_units],
+      [
+        "Peso",
+        formatNumber(
+          profile.total_weight_kg
+        ) + " kg"
+      ],
+      ["Orígenes", profile.origins],
+      ["Destinos", profile.destinations],
+      [
+        "Vehículos",
+        profile.vehicle_types
+      ],
+      [
+        "Distancia media",
+        formatNumber(
+          profile.average_distance_km,
+          1
+        ) + " km"
+      ],
+      [
+        "Ventana",
+        (
+          range.from
+          && range.to
+            ? (
+              range.from
+              + " → "
+              + range.to
+            )
+            : "—"
+        )
+      ]
+    ];
+
+    container.innerHTML = (
+      metrics.map(function (item) {
+        return (
+          '<div class="context-metric">'
+          + "<span>"
+          + escapeHtml(item[0])
+          + "</span>"
+          + "<strong>"
+          + escapeHtml(
+              formatNumber(item[1])
+              === "—"
+                ? item[1]
+                : item[1]
+            )
+          + "</strong>"
+          + "</div>"
+        );
+      }).join("")
+    );
+  }
+
+  function renderCoreDrivers(result) {
+    var container = (
+      $("#dashboard-driver-list")
+    );
+
+    if (!container) {
+      return;
+    }
+
+    var baseline = (
+      result.scenarios
+      && result.scenarios.baseline
+    );
+
+    var selected = (
+      result.scenarios
+      && result.scenarios[
+        result.recommended_scenario
+      ]
+    );
+
+    var baseMap = assignmentMap(
+      baseline
+    );
+
+    var changes = (
+      selected
+      && selected.assignments
+      || []
+    )
+      .map(function (item) {
+        var base = baseMap.get(
+          item.shipment_id
+        );
+
+        if (!base) {
+          return null;
+        }
+
+        return {
+          shipment_id: item.shipment_id,
+          origin: item.origin,
+          destination: item.destination,
+          baselineVehicle: (
+            base.vehicle_type
+          ),
+          selectedVehicle: (
+            item.vehicle_type
+          ),
+          costDelta: (
+            Number(item.total_cost)
+            - Number(base.total_cost)
+          ),
+          tripsDelta: (
+            Number(item.required_trips)
+            - Number(base.required_trips)
+          )
+        };
+      })
+      .filter(Boolean)
+      .filter(function (item) {
+        return (
+          item.baselineVehicle
+            !== item.selectedVehicle
+          || item.costDelta !== 0
+          || item.tripsDelta !== 0
+        );
+      })
+      .sort(function (a, b) {
+        return (
+          Math.abs(b.costDelta)
+          - Math.abs(a.costDelta)
+        );
+      })
+      .slice(0, 7);
+
+    if (!changes.length) {
+      container.innerHTML = (
+        '<div class="empty-state empty-state--compact">'
+        + "La configuración no genera cambios materiales de asignación frente a la situación actual."
+        + "</div>"
+      );
+      return;
+    }
+
+    container.innerHTML = (
+      changes.map(function (item) {
+        return (
+          '<div class="driver-item">'
+          + "<div><strong>"
+          + escapeHtml(item.shipment_id)
+          + "</strong><small>"
+          + escapeHtml(item.origin)
+          + " → "
+          + escapeHtml(item.destination)
+          + "</small></div>"
+          + '<div class="driver-change">'
+          + escapeHtml(
+              item.baselineVehicle
+            )
+          + " → <strong>"
+          + escapeHtml(
+              item.selectedVehicle
+            )
+          + "</strong></div>"
+          + '<div class="driver-change">'
+          + "Viajes: "
+          + (
+            item.tripsDelta > 0
+              ? "+"
+              : ""
+          )
+          + formatNumber(
+              item.tripsDelta
+            )
+          + "</div>"
+          + '<div class="driver-impact">'
+          + "<small>Impacto estimado en costo</small>"
+          + "<strong>"
+          + formatCurrency(
+              item.costDelta
+            )
+          + "</strong></div>"
+          + "</div>"
+        );
+      }).join("")
+    );
+  }
+
+  function renderCoreSensitivity(
+    result,
+    config
+  ) {
+    var baseline = (
+      result.scenarios.baseline
+    );
+    var selected = (
+      result.scenarios[
+        result.recommended_scenario
+      ]
+    );
+    var minCost = (
+      result.scenarios.min_cost
+    );
+    var minTrips = (
+      result.scenarios.min_trips
+    );
+
+    var baselineNode = (
+      $("#baseline-strip")
+    );
+
+    if (baselineNode && baseline) {
+      baselineNode.innerHTML = (
+        '<div class="baseline-card">'
+        + "<div><strong>Situación actual</strong>"
+        + "<small>Asignación proveniente del CSV · referencia operativa</small></div>"
+        + '<div class="baseline-metric"><span>Costo</span><strong>'
+        + formatCurrency(
+            baseline.metrics.total_cost
+          )
+        + "</strong></div>"
+        + '<div class="baseline-metric"><span>Viajes</span><strong>'
+        + formatNumber(
+            baseline.metrics.total_trips
+          )
+        + "</strong></div>"
+        + '<div class="baseline-metric"><span>Distancia</span><strong>'
+        + formatNumber(
+            baseline.metrics.total_distance_km
+          )
+        + " km</strong></div>"
+        + "</div>"
+      );
+    }
+
+    var cards = [
+      {
+        title: "Configuración elegida",
+        weights: weightLabel(config),
+        scenario: selected,
+        selected: true,
+        differences: 0
+      },
+      {
+        title: "Extremo costo",
+        weights: "Costo 100% · Viajes 0%",
+        scenario: minCost,
+        selected: false,
+        differences: (
+          assignmentDifferenceCount(
+            selected,
+            minCost
+          )
+        )
+      },
+      {
+        title: "Extremo viajes",
+        weights: "Costo 0% · Viajes 100%",
+        scenario: minTrips,
+        selected: false,
+        differences: (
+          assignmentDifferenceCount(
+            selected,
+            minTrips
+          )
+        )
+      }
+    ];
+
+    var grid = $("#sensitivity-grid");
+
+    if (grid) {
+      grid.innerHTML = (
+        cards
+          .filter(function (card) {
+            return Boolean(card.scenario);
+          })
+          .map(function (card) {
+            var delta = (
+              card.scenario
+                .delta_vs_baseline
+              || {}
+            );
+
+            return (
+              '<article class="sensitivity-card '
+              + (
+                card.selected
+                  ? "is-selected"
+                  : ""
+              )
+              + '">'
+              + '<span class="sensitivity-weight">'
+              + escapeHtml(card.weights)
+              + "</span>"
+              + "<h3>"
+              + escapeHtml(card.title)
+              + "</h3>"
+              + "<p>"
+              + (
+                card.selected
+                  ? "Configuración utilizada en esta corrida."
+                  : "Escenario extremo utilizado como referencia."
+              )
+              + "</p>"
+              + '<div class="sensitivity-metrics">'
+              + '<div class="sensitivity-metric"><span>Costo</span><strong>'
+              + formatCurrency(
+                  card.scenario
+                    .metrics.total_cost
+                )
+              + "</strong></div>"
+              + '<div class="sensitivity-metric"><span>Viajes</span><strong>'
+              + formatNumber(
+                  card.scenario
+                    .metrics.total_trips
+                )
+              + "</strong></div>"
+              + '<div class="sensitivity-metric"><span>Distancia</span><strong>'
+              + formatNumber(
+                  card.scenario
+                    .metrics
+                    .total_distance_km
+                )
+              + " km</strong></div>"
+              + '<div class="sensitivity-metric"><span>Δ costo vs actual</span><strong>'
+              + formatPercent(
+                  delta.cost_pct
+                )
+              + "</strong></div>"
+              + '<div class="sensitivity-metric"><span>Δ viajes vs actual</span><strong>'
+              + formatPercent(
+                  delta.trips_pct
+                )
+              + "</strong></div>"
+              + '<div class="sensitivity-metric"><span>Asignaciones distintas</span><strong>'
+              + formatNumber(
+                  card.differences
+                )
+              + "</strong></div>"
+              + "</div></article>"
+            );
+          }).join("")
+      );
+    }
+
+    setText(
+      "sensitivity-note",
+      (
+        result.sensitivity
+        && result.sensitivity.message
+      )
+      || (
+        "La corrida no contiene un resumen de sensibilidad."
+      )
+    );
+  }
+
+  function renderCoreDashboard(
+    run,
+    dataset,
+    profile
+  ) {
+    var result = run.result_json;
+    var selected = selectedScenario(run);
+    var baseline = (
+      result
+      && result.scenarios
+      && result.scenarios.baseline
+    );
+
+    if (
+      !result
+      || !selected
+      || !baseline
+    ) {
+      throw new Error(
+        "La corrida completada no contiene un DecisionResult válido."
+      );
+    }
+
+    var config = runConfiguration(run);
+    var metrics = selected.metrics || {};
+    var delta = (
+      selected.delta_vs_baseline
+      || {}
+    );
+
+    setText(
+      "run-context-dataset",
+      (
+        dataset
+        && dataset.original_filename
+      )
+      || shortId(run.dataset_id)
+    );
+    setText(
+      "run-context-date",
+      formatDate(
+        run.finished_at
+        || run.created_at
+      )
+    );
+    setText(
+      "run-context-id",
+      shortId(run.id)
+    );
+    setText(
+      "run-context-engine",
+      (
+        run.engine_name
+        || (
+          result.engine
+          && result.engine.name
+        )
+        || "—"
+      )
+      + " · v"
+      + (
+        run.engine_version
+        || (
+          result.engine
+          && result.engine.version
+        )
+        || "—"
+      )
+    );
+    setText(
+      "run-context-mode",
+      modeLabel(config)
+    );
+    setText(
+      "run-context-weights",
+      weightLabel(config)
+    );
+
+    setText(
+      "dashboard-recommendation-title",
+      scenarioLabel(
+        result.recommended_scenario
+      )
+    );
+    setText(
+      "dashboard-recommendation-copy",
+      (
+        config.mode === "custom"
+          ? (
+            "Resultado del motor para "
+            + weightLabel(config)
+            + "."
+          )
+          : (
+            "Resultado del motor para el objetivo "
+            + scenarioLabel(
+                result.recommended_scenario
+              )
+            + "."
+          )
+      )
+    );
+    setText(
+      "dashboard-recommendation-delta",
+      formatPercent(delta.cost_pct)
+    );
+
+    setText(
+      "dashboard-kpi-cost",
+      formatCurrency(
+        metrics.total_cost
+      )
+    );
+    setText(
+      "dashboard-kpi-cost-delta",
+      (
+        formatPercent(
+          delta.cost_pct
+        )
+        + " vs situación actual · "
+        + formatCurrency(
+            baseline.metrics
+              .total_cost
+          )
+      )
+    );
+    setText(
+      "dashboard-kpi-trips",
+      formatNumber(
+        metrics.total_trips
+      )
+    );
+    setText(
+      "dashboard-kpi-trips-delta",
+      (
+        formatPercent(
+          delta.trips_pct
+        )
+        + " vs situación actual · "
+        + formatNumber(
+            baseline.metrics
+              .total_trips
+          )
+      )
+    );
+    setText(
+      "dashboard-kpi-distance",
+      (
+        formatNumber(
+          metrics.total_distance_km
+        )
+        + " km"
+      )
+    );
+    setText(
+      "dashboard-kpi-distance-delta",
+      (
+        formatPercent(
+          delta.distance_pct
+        )
+        + " vs situación actual"
+      )
+    );
+    setText(
+      "dashboard-kpi-shipments",
+      formatNumber(
+        metrics.shipments
+      )
+    );
+    setText(
+      "dashboard-kpi-changes",
+      (
+        assignmentDifferenceCount(
+          baseline,
+          selected
+        )
+        + " despachos cambian de vehículo"
+      )
+    );
+
+    renderCoreContext(profile);
+    renderCoreDrivers(result);
+    renderCoreSensitivity(
+      result,
+      config
+    );
+
+    var assumptions = (
+      $("#assumptions-list")
+    );
+
+    if (assumptions) {
+      assumptions.innerHTML = (
+        (
+          result.model_assumptions
+          || []
+        ).map(function (item) {
+          return (
+            "<li>"
+            + escapeHtml(item)
+            + "</li>"
+          );
+        }).join("")
+      );
+    }
+
+    var download = $("#download-json");
+
+    if (download) {
+      download.disabled = false;
     }
   }
 
@@ -1191,7 +1952,20 @@
       );
     }
 
-    renderEnhancedDashboard(run);
+    try {
+      renderCoreDashboard(
+        run,
+        dataset,
+        profile
+      );
+
+      renderEnhancedDashboard(run);
+    } catch (error) {
+      showError(
+        "La corrida terminó correctamente, pero no se pudo renderizar el resultado: "
+        + error.message
+      );
+    }
   };
 
   window.dationDashboardExecutionError = function (
