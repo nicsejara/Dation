@@ -293,10 +293,15 @@ class FrontendContractTests(
             "dashboard-execution-state",
             "dashboard-progress",
             "dashboard-content",
-            "dashboard-impact-chart",
+            "dashboard-objective-chip",
+            "dashboard-assignment-chart",
+            "dashboard-kpi-grid",
             "dashboard-comparison-select",
             "dashboard-comparison-chart",
             "dashboard-comparison-table-body",
+            "dashboard-flow-matrix",
+            "dashboard-sensitivity-content",
+            "dashboard-data-context",
             "generate-explanation",
             "chat-panel",
             "dashboard-retry-run",
@@ -411,7 +416,7 @@ class FrontendContractTests(
         )
 
 
-    def test_dashboard_export_and_floating_chat_contract(
+    def test_dashboard_export_and_drawer_chat_contract(
         self,
     ):
         self.assertEqual(
@@ -420,12 +425,16 @@ class FrontendContractTests(
             ),
             1,
         )
-        self.assertNotIn(
-            'id="download-json"',
+        self.assertIn(
+            'class="decision-command-bar"',
             self.html,
         )
-        self.assertNotIn(
-            'id="back-to-config"',
+        self.assertIn(
+            'class="dashboard-chat dashboard-chat--drawer is-hidden"',
+            self.html,
+        )
+        self.assertIn(
+            'id="dation-chat-fab"',
             self.html,
         )
         self.assertIn(
@@ -436,22 +445,6 @@ class FrontendContractTests(
             ' + ".txt"',
             self.dashboard_stage_js,
         )
-        self.assertNotIn(
-            "buildDecisionMarkdown(",
-            self.app_js,
-        )
-        self.assertIn(
-            'class="dation-floating-actions"',
-            self.html,
-        )
-        self.assertIn(
-            "dashboard-chat--floating",
-            self.html,
-        )
-        self.assertNotIn(
-            "chat-launch-panel",
-            self.html,
-        )
         self.assertIn(
             'id="chat-close"',
             self.html,
@@ -460,37 +453,96 @@ class FrontendContractTests(
             "aria-expanded",
             self.interpreter_stage_js,
         )
+        self.assertIn(
+            'id="execution-details"',
+            self.html,
+        )
+        self.assertIn(
+            'id="copy-run-id"',
+            self.html,
+        )
+
 
     def test_dashboard_separates_objective_from_decision(
         self,
     ):
         self.assertIn(
-            'id="dashboard-objective-label"',
+            'id="dashboard-objective-chip"',
             self.html,
         )
         self.assertIn(
-            'id="dashboard-objective-detail"',
+            'id="dashboard-recommendation-title"',
             self.html,
         )
         self.assertIn(
-            'id="dashboard-assignment-distribution"',
+            'id="dashboard-assignment-chart"',
             self.html,
         )
         self.assertIn(
-            "objectiveLabel",
+            "heroDecision",
             self.dashboard_stage_js,
         )
         self.assertIn(
-            "decisionTitle",
-            self.dashboard_stage_js,
-        )
-        self.assertIn(
-            "Asignación de referencia",
+            "Asignación actual",
             self.html,
         )
         self.assertNotIn(
             "Situación actual",
             self.html,
+        )
+
+    def test_dashboard_has_required_executive_sections(
+        self,
+    ):
+        for section_id in (
+            "dashboard-decision",
+            "dashboard-kpis",
+            "dashboard-comparator",
+            "dashboard-drivers",
+            "dashboard-sensitivity",
+            "dashboard-context",
+            "dashboard-ai",
+        ):
+            self.assertIn(
+                f'id="{section_id}"',
+                self.html,
+            )
+
+        self.assertIn(
+            "Ver reasignaciones",
+            self.html,
+        )
+        self.assertIn(
+            'id="reassignment-search"',
+            self.html,
+        )
+        self.assertIn(
+            'id="export-reassignments"',
+            self.html,
+        )
+
+    def test_dashboard_hides_technical_metadata_from_hero(
+        self,
+    ):
+        dashboard = self.html.split(
+            '<!-- DASHBOARD -->',
+            1,
+        )[1].split(
+            '<!-- TRAZABILIDAD -->',
+            1,
+        )[0]
+
+        self.assertIn(
+            "Detalles de la ejecución",
+            dashboard,
+        )
+        self.assertNotIn(
+            "run-context-id",
+            dashboard,
+        )
+        self.assertNotIn(
+            "ai-dashboard-meta",
+            dashboard,
         )
 
 
