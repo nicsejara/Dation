@@ -428,7 +428,15 @@ class FrontendContractTests(
             1,
         )
         self.assertIn(
+            'class="dashboard-primary-actions"',
+            self.html,
+        )
+        self.assertNotIn(
             'class="decision-command-bar"',
+            self.html,
+        )
+        self.assertNotIn(
+            'class="decision-anchor-nav"',
             self.html,
         )
         self.assertIn(
@@ -462,6 +470,23 @@ class FrontendContractTests(
         self.assertIn(
             'id="copy-run-id"',
             self.html,
+        )
+
+        actions = self.html.split(
+            'class="dashboard-primary-actions"',
+            1,
+        )[1].split(
+            "</div>",
+            1,
+        )[0]
+
+        self.assertLess(
+            actions.index('id="dashboard-reexecute"'),
+            actions.index('id="toggle-chat"'),
+        )
+        self.assertLess(
+            actions.index('id="toggle-chat"'),
+            actions.index('id="export-decision"'),
         )
 
 
