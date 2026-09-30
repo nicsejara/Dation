@@ -34,7 +34,7 @@ Los extremos 100/0 y 0/100 reutilizan exactamente las lógicas de los presets pa
 
 ## Baseline
 
-Baseline no es una alternativa optimizada. Es la asignación existente en el archivo de entrada y funciona como referencia para cuantificar impacto operativo potencial.
+Baseline no es una alternativa optimizada. Es la asignación de vehículo informada en el archivo de entrada y funciona como referencia comparativa para cuantificar impacto potencial. No debe interpretarse automáticamente como la situación operativa actual.
 
 ## Sensibilidad
 
@@ -62,7 +62,7 @@ Por lo tanto, capacidad, costo y viajes pueden empujar la decisión en direccion
 
 1. Identificá modo y pesos.
 2. Identificá el escenario recomendado.
-3. Compará contra baseline para cuantificar impacto.
+3. Compará contra la asignación de referencia (`baseline`) para cuantificar impacto.
 4. Compará contra ambos extremos para explicar sensibilidad.
 5. Indicá cuántos despachos cambian de vehículo.
 6. Usá los principales drivers provistos por backend.
