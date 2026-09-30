@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="light">
   <title>Dation · Decision Intelligence</title>
   <link rel="stylesheet" href="/static/css/tokens.css">
-  <link rel="stylesheet" href="/static/css/app.css?v=dda-overview-v1-20260930">
+  <link rel="stylesheet" href="/static/css/app.css?v=data-stage-v1-20260930">
 </head>
 <body>
   <div class="app-shell">
@@ -228,7 +228,7 @@
                     class="button button--primary button--large"
                     id="start-logistics-decision"
                     type="button"
-                    onclick="window.dationNavigate && window.dationNavigate('logistics-config', 'data', event)"
+                    onclick="window.dationNavigate && window.dationNavigate('logistics-data', 'data', event)"
                   >
                     Iniciar decisión
                     <span aria-hidden="true">→</span>
@@ -378,7 +378,7 @@
               <button
                 class="button button--primary button--large"
                 type="button"
-                onclick="window.dationNavigate && window.dationNavigate('logistics-config', 'data', event)"
+                onclick="window.dationNavigate && window.dationNavigate('logistics-data', 'data', event)"
               >
                 Comenzar con los datos
                 <span aria-hidden="true">→</span>
@@ -387,134 +387,260 @@
           </div>
         </section>
 
-        <!-- CONFIGURACIÓN DDA -->
+        <!-- CARGAR DATA -->
+        <section class="view" data-view-panel="logistics-data">
+          <div class="data-stage">
+            <div class="data-stage__heading">
+              <div>
+                <div class="heading-meta">
+                  <span class="section-kicker">DDA Logística</span>
+                  <span class="pill pill--live">Paso 1 de 3</span>
+                </div>
+                <h1>Cargar y validar datos</h1>
+                <p>
+                  Seleccioná la evidencia que utilizará el motor. Antes de avanzar,
+                  Dation valida estructura, calidad básica y compatibilidad con el
+                  esquema logístico.
+                </p>
+              </div>
+
+              <div class="data-stage__trust">
+                <span class="data-stage__trust-dot"></span>
+                <div>
+                  <strong>Validación previa al cálculo</strong>
+                  <small>El motor no se ejecuta con datos incompatibles.</small>
+                </div>
+              </div>
+            </div>
+
+            <section class="data-stage__source-grid">
+              <div class="data-stage__upload-zone upload-card" id="upload-dropzone">
+                <div class="data-stage__upload-glow" aria-hidden="true"></div>
+                <div class="data-stage__upload-icon" aria-hidden="true">
+                  <span>↑</span>
+                </div>
+                <span class="data-stage__upload-kicker">Nueva evidencia</span>
+                <h2>Arrastrá tu CSV acá</h2>
+                <p>
+                  Soltá el archivo dentro de esta zona o seleccionalo desde tu
+                  equipo. Dation lo valida antes de almacenarlo como evidencia.
+                </p>
+
+                <input id="dataset-file" type="file" accept=".csv,text/csv" hidden>
+
+                <button class="button data-stage__upload-button" id="browse-file" type="button">
+                  Seleccionar archivo CSV
+                </button>
+
+                <div class="data-stage__requirements">
+                  <span>CSV UTF-8</span>
+                  <span>Máximo 10 MB</span>
+                  <span>14 columnas requeridas</span>
+                </div>
+
+                <div id="upload-progress" class="inline-status is-hidden"></div>
+              </div>
+
+              <div class="data-stage__library panel">
+                <div class="data-stage__library-head">
+                  <div>
+                    <span class="section-kicker">Biblioteca</span>
+                    <h2>Reutilizar un dataset</h2>
+                    <p>
+                      También podés continuar con evidencia validada previamente.
+                    </p>
+                  </div>
+
+                  <button
+                    class="text-button"
+                    data-view-target="traceability"
+                    data-trace-target="datasets"
+                    type="button"
+                  >
+                    Ver todos
+                  </button>
+                </div>
+
+                <div id="workspace-dataset-list" class="dataset-list data-stage__dataset-list">
+                  <div class="empty-state empty-state--compact">Cargando datasets…</div>
+                </div>
+              </div>
+            </section>
+
+            <section class="data-stage__selected panel">
+              <div class="data-stage__selected-label">
+                <span class="section-kicker">Evidencia seleccionada</span>
+                <span class="data-stage__state" id="data-config-state">
+                  <span class="status-dot status-dot--pending"></span>
+                  Dataset pendiente
+                </span>
+              </div>
+
+              <div id="active-dataset-card" class="active-dataset-card is-empty data-stage__active-card">
+                <div class="dataset-icon">CSV</div>
+                <div class="active-dataset-body">
+                  <strong id="active-dataset-name">Ningún dataset seleccionado</strong>
+                  <small id="active-dataset-meta">
+                    Cargá un archivo o seleccioná uno existente para iniciar la validación.
+                  </small>
+                </div>
+                <span class="dataset-state" id="active-dataset-status">—</span>
+              </div>
+            </section>
+
+            <section id="dataset-profile-panel" class="data-validator is-hidden">
+              <div class="data-validator__success">
+                <div class="data-validator__check" aria-hidden="true">✓</div>
+                <div>
+                  <span class="section-kicker">Validación completada</span>
+                  <h2>Los datos están listos para continuar</h2>
+                  <p>
+                    Dation verificó la estructura del archivo y generó un perfil
+                    de la evidencia antes de habilitar la configuración de decisión.
+                  </p>
+                </div>
+                <span class="validation-badge" id="profile-validation-badge">Validado</span>
+              </div>
+
+              <div class="data-validator__checks">
+                <article class="data-validator__check-card">
+                  <span class="data-validator__check-icon">✓</span>
+                  <div>
+                    <small>Esquema</small>
+                    <strong id="validator-schema-status">Compatible</strong>
+                    <span id="profile-schema">—</span>
+                  </div>
+                </article>
+
+                <article class="data-validator__check-card">
+                  <span class="data-validator__check-icon">✓</span>
+                  <div>
+                    <small>Columnas requeridas</small>
+                    <strong id="validator-columns-status">—</strong>
+                    <span id="validator-columns-detail">Sin faltantes</span>
+                  </div>
+                </article>
+
+                <article class="data-validator__check-card">
+                  <span class="data-validator__check-icon">✓</span>
+                  <div>
+                    <small>Campos obligatorios</small>
+                    <strong id="validator-empty-status">—</strong>
+                    <span>Celdas vacías detectadas</span>
+                  </div>
+                </article>
+
+                <article class="data-validator__check-card">
+                  <span class="data-validator__check-icon">✓</span>
+                  <div>
+                    <small>Identificadores</small>
+                    <strong id="validator-duplicates-status">—</strong>
+                    <span>shipment_id duplicados</span>
+                  </div>
+                </article>
+              </div>
+
+              <div class="data-validator__profile">
+                <div class="data-validator__profile-head">
+                  <div>
+                    <span class="section-kicker">Perfil del dataset</span>
+                    <h3 id="profile-dataset-title">—</h3>
+                  </div>
+                  <span id="profile-id" class="data-validator__dataset-id">—</span>
+                </div>
+
+                <div class="profile-meta-grid data-validator__meta-grid">
+                  <div><span>Fecha de carga</span><strong id="profile-created">—</strong></div>
+                  <div><span>Filas</span><strong id="profile-rows">—</strong></div>
+                  <div><span>Columnas</span><strong id="profile-columns">—</strong></div>
+                  <div><span>Tamaño</span><strong id="profile-size">—</strong></div>
+                  <div><span>Hash SHA-256</span><strong id="profile-hash-short">—</strong></div>
+                  <div><span>Estado</span><strong>Listo</strong></div>
+                </div>
+
+                <div class="profile-kpi-grid data-validator__kpis">
+                  <article><span>Despachos</span><strong id="profile-shipments">—</strong></article>
+                  <article><span>Unidades</span><strong id="profile-units">—</strong></article>
+                  <article><span>Peso total</span><strong id="profile-weight">—</strong></article>
+                  <article><span>Orígenes</span><strong id="profile-origins">—</strong></article>
+                  <article><span>Destinos</span><strong id="profile-destinations">—</strong></article>
+                  <article><span>Tipos de vehículo</span><strong id="profile-vehicles">—</strong></article>
+                  <article><span>Distancia media</span><strong id="profile-distance">—</strong></article>
+                  <article><span>Ventana de despacho</span><strong id="profile-date-range">—</strong></article>
+                </div>
+
+                <div class="profile-detail-grid">
+                  <div class="profile-priority">
+                    <h4>Distribución de prioridad</h4>
+                    <div id="priority-distribution" class="priority-list"></div>
+                  </div>
+
+                  <div class="profile-hash">
+                    <h4>Huella de evidencia</h4>
+                    <code id="profile-hash">—</code>
+                  </div>
+                </div>
+
+                <details class="preview-details">
+                  <summary>Previsualizar registros validados</summary>
+                  <div class="data-table-wrap">
+                    <table class="data-table data-table--preview">
+                      <thead id="preview-table-head"></thead>
+                      <tbody id="preview-table-body"></tbody>
+                    </table>
+                  </div>
+                </details>
+              </div>
+
+              <div class="data-validator__continue">
+                <div>
+                  <span class="section-kicker">Siguiente etapa</span>
+                  <strong>La evidencia quedó validada y vinculada a la decisión.</strong>
+                  <small>
+                    Ahora podés definir qué objetivo debe priorizar el motor.
+                  </small>
+                </div>
+
+                <button
+                  class="button button--primary button--large"
+                  id="continue-to-decision"
+                  type="button"
+                  disabled
+                >
+                  Configurar decisión
+                  <span aria-hidden="true">→</span>
+                </button>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <!-- CONFIGURAR DECISIÓN -->
         <section class="view" data-view-panel="logistics-config">
           <div class="page-heading">
             <div>
               <div class="heading-meta">
                 <span class="section-kicker">DDA Logística</span>
-                <span class="pill pill--live">Motor 0.2.0</span>
+                <span class="pill pill--live">Paso 2 de 3</span>
               </div>
               <h1>Configurar decisión</h1>
               <p>
-                Definí la evidencia y las prioridades que utilizará el motor.
-                La IA no interviene en el cálculo.
+                Definí qué debe priorizar el motor sobre el dataset ya validado.
+                La configuración quedará persistida junto con la corrida.
               </p>
             </div>
           </div>
 
-          <section class="config-section panel" id="dda-data-section">
+          <section class="config-section panel" id="dda-decision-section">
             <div class="config-section-header">
               <div class="config-number">01</div>
               <div>
-                <span class="section-kicker">Datos</span>
-                <h2>Seleccioná el dataset</h2>
-                <p>Podés reutilizar evidencia ya almacenada o cargar un nuevo CSV.</p>
-              </div>
-              <div class="config-state" id="data-config-state">
-                <span class="status-dot status-dot--pending"></span>
-                Dataset pendiente
-              </div>
-            </div>
-
-            <div class="data-config-grid">
-              <div>
-                <div id="active-dataset-card" class="active-dataset-card is-empty">
-                  <div class="dataset-icon">CSV</div>
-                  <div class="active-dataset-body">
-                    <span class="section-kicker">Dataset activo</span>
-                    <strong id="active-dataset-name">Ningún dataset seleccionado</strong>
-                    <small id="active-dataset-meta">Elegí un dataset existente o cargá uno nuevo.</small>
-                  </div>
-                  <span class="dataset-state" id="active-dataset-status">—</span>
-                </div>
-
-                <div class="subsection-header">
-                  <div>
-                    <h3>Datasets recientes</h3>
-                    <p>Reutilizá información validada sin volver a cargarla.</p>
-                  </div>
-                  <button class="text-button" data-view-target="traceability" data-trace-target="datasets" type="button">
-                    Ver todos
-                  </button>
-                </div>
-                <div id="workspace-dataset-list" class="dataset-list">
-                  <div class="empty-state empty-state--compact">Cargando datasets…</div>
-                </div>
-              </div>
-
-              <div class="upload-card" id="upload-dropzone">
-                <div class="upload-symbol" aria-hidden="true">↑</div>
-                <h3>Cargar nuevo CSV</h3>
-                <p>Arrastrá un dataset logístico o seleccioná un archivo desde tu equipo.</p>
-                <input id="dataset-file" type="file" accept=".csv,text/csv" hidden>
-                <button class="button button--secondary" id="browse-file" type="button">
-                  Seleccionar archivo CSV
-                </button>
-                <small>UTF-8 · máximo 10 MB · schema validado automáticamente</small>
-                <div id="upload-progress" class="inline-status is-hidden"></div>
-              </div>
-            </div>
-
-            <div id="dataset-profile-panel" class="dataset-profile-panel is-hidden">
-              <div class="profile-header">
-                <div>
-                  <span class="section-kicker">Validación y perfil</span>
-                  <h3 id="profile-dataset-title">—</h3>
-                </div>
-                <span class="validation-badge" id="profile-validation-badge">Validado</span>
-              </div>
-
-              <div class="profile-meta-grid">
-                <div><span>Fecha de carga</span><strong id="profile-created">—</strong></div>
-                <div><span>Filas</span><strong id="profile-rows">—</strong></div>
-                <div><span>Columnas</span><strong id="profile-columns">—</strong></div>
-                <div><span>Tamaño</span><strong id="profile-size">—</strong></div>
-                <div><span>Schema</span><strong id="profile-schema">—</strong></div>
-                <div><span>Identificador</span><strong id="profile-id">—</strong></div>
-              </div>
-
-              <div class="profile-kpi-grid">
-                <article><span>Despachos</span><strong id="profile-shipments">—</strong></article>
-                <article><span>Unidades</span><strong id="profile-units">—</strong></article>
-                <article><span>Peso total</span><strong id="profile-weight">—</strong></article>
-                <article><span>Orígenes</span><strong id="profile-origins">—</strong></article>
-                <article><span>Destinos</span><strong id="profile-destinations">—</strong></article>
-                <article><span>Tipos de vehículo</span><strong id="profile-vehicles">—</strong></article>
-                <article><span>Distancia media</span><strong id="profile-distance">—</strong></article>
-                <article><span>Ventana de despacho</span><strong id="profile-date-range">—</strong></article>
-              </div>
-
-              <div class="profile-detail-grid">
-                <div class="profile-priority">
-                  <h4>Distribución de prioridad</h4>
-                  <div id="priority-distribution" class="priority-list"></div>
-                </div>
-                <div class="profile-hash">
-                  <h4>Huella de evidencia</h4>
-                  <code id="profile-hash">—</code>
-                </div>
-              </div>
-
-              <details class="preview-details">
-                <summary>Previsualizar registros</summary>
-                <div class="data-table-wrap">
-                  <table class="data-table data-table--preview">
-                    <thead id="preview-table-head"></thead>
-                    <tbody id="preview-table-body"></tbody>
-                  </table>
-                </div>
-              </details>
-            </div>
-          </section>
-
-          <section class="config-section panel" id="dda-decision-section">
-            <div class="config-section-header">
-              <div class="config-number">02</div>
-              <div>
                 <span class="section-kicker">Objetivo de decisión</span>
                 <h2>Definí cómo querés priorizar la decisión</h2>
-                <p>Los presets reproducen los extremos determinísticos. El modo personalizado pondera ambas dimensiones.</p>
+                <p>
+                  Los presets representan los extremos determinísticos. El modo
+                  personalizado pondera costo y viajes.
+                </p>
               </div>
               <div class="config-state" id="objective-config-state">
                 <span class="status-dot status-dot--live"></span>
@@ -554,7 +680,7 @@
 
           <section class="config-section panel" id="sensitivity-config-section">
             <div class="config-section-header">
-              <div class="config-number">03</div>
+              <div class="config-number">02</div>
               <div>
                 <span class="section-kicker">Configuración de sensibilidad</span>
                 <h2>Ponderación entre costo y viajes</h2>
@@ -608,7 +734,10 @@
               <div class="preset-weight-card">
                 <span>Configuración actual</span>
                 <strong id="preset-weight-label">Costo 100% · Viajes 0%</strong>
-                <small>Los extremos se preservan exactamente para garantizar compatibilidad con la lógica anterior.</small>
+                <small>
+                  Los extremos se preservan exactamente para garantizar compatibilidad
+                  con la lógica anterior.
+                </small>
               </div>
             </div>
 
@@ -988,7 +1117,6 @@
   <script>
     (function () {
       var currentView = 'inicio';
-      var currentStage = null;
 
       function panelFor(view) {
         return document.querySelector('[data-view-panel="' + view + '"]');
@@ -997,6 +1125,7 @@
       function isLogisticsView(view) {
         return (
           view === 'logistics-overview'
+          || view === 'logistics-data'
           || view === 'logistics-config'
           || view === 'decision-dashboard'
         );
@@ -1016,12 +1145,10 @@
 
         document.querySelectorAll('.asset-item[data-view]').forEach(function (button) {
           var buttonView = button.getAttribute('data-view');
-          var active = (
-            buttonView === 'logistics-overview'
-            && isLogisticsView(view)
+          button.classList.toggle(
+            'is-active',
+            buttonView === 'logistics-overview' && isLogisticsView(view)
           );
-
-          button.classList.toggle('is-active', active);
         });
       }
 
@@ -1056,7 +1183,7 @@
         container.appendChild(separator);
       }
 
-      window.dationRenderJourney = function (view, stage) {
+      window.dationRenderJourney = function (view) {
         var container = document.getElementById('journey-nav');
 
         if (!container) {
@@ -1064,7 +1191,6 @@
         }
 
         currentView = view || currentView;
-        currentStage = stage || currentStage;
         container.innerHTML = '';
 
         container.appendChild(
@@ -1087,7 +1213,7 @@
             journeyButton('DDA Logística', {
               current: currentView === 'logistics-overview',
               onClick: function () {
-                window.dationNavigate('logistics-overview', 'dda');
+                window.dationNavigate('logistics-overview');
               }
             })
           );
@@ -1100,9 +1226,9 @@
 
           container.appendChild(
             journeyButton('Cargar data', {
-              current: currentView === 'logistics-config' && currentStage === 'data',
+              current: currentView === 'logistics-data',
               onClick: function () {
-                window.dationNavigate('logistics-config', 'data');
+                window.dationNavigate('logistics-data');
               }
             })
           );
@@ -1111,9 +1237,10 @@
 
           container.appendChild(
             journeyButton('Configurar decisión', {
-              current: currentView === 'logistics-config' && currentStage === 'decision',
+              current: currentView === 'logistics-config',
+              disabled: currentView === 'logistics-data',
               onClick: function () {
-                window.dationNavigate('logistics-config', 'decision');
+                window.dationNavigate('logistics-config');
               }
             })
           );
@@ -1125,7 +1252,7 @@
               current: currentView === 'decision-dashboard',
               disabled: currentView !== 'decision-dashboard',
               onClick: function () {
-                window.dationNavigate('decision-dashboard', 'dashboard');
+                window.dationNavigate('decision-dashboard');
               }
             })
           );
@@ -1169,44 +1296,13 @@
         target.classList.add('is-active');
         currentView = view;
 
-        if (view === 'logistics-overview') {
-          currentStage = 'dda';
-        } else if (view === 'logistics-config') {
-          currentStage = stage || 'data';
-        } else if (view === 'decision-dashboard') {
-          currentStage = 'dashboard';
-        } else {
-          currentStage = null;
-        }
-
         setSidebarActive(view);
-        window.dationRenderJourney(view, currentStage);
+        window.dationRenderJourney(view);
 
         window.scrollTo({
           top: 0,
           behavior: 'smooth'
         });
-
-        if (view === 'logistics-config') {
-          var scrollTarget = null;
-
-          if (currentStage === 'data') {
-            scrollTarget = document.getElementById('dda-data-section');
-          }
-
-          if (currentStage === 'decision') {
-            scrollTarget = document.getElementById('dda-decision-section');
-          }
-
-          if (scrollTarget) {
-            window.setTimeout(function () {
-              scrollTarget.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-              });
-            }, 80);
-          }
-        }
       };
 
       window.dationGetCurrentView = function () {
@@ -1214,9 +1310,9 @@
       };
 
       setSidebarActive('inicio');
-      window.dationRenderJourney('inicio', null);
+      window.dationRenderJourney('inicio');
     })();
   </script>
-  <script type="module" src="/static/js/app.js?v=dda-overview-v1-20260930"></script>
+  <script type="module" src="/static/js/app.js?v=data-stage-v1-20260930"></script>
 </body>
 </html>
