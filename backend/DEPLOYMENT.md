@@ -168,3 +168,14 @@ Latest UI hotfix on main:
 - Its CTA routes to `logistics-config`.
 - DDA Producción is visible but disabled / upcoming.
 - The previous oversized inline SVG illustration was removed from Inicio.
+
+
+## Home v3 — professional DDA selector
+
+Final main-state for the current deployment:
+- Professional executive hero inspired by the dashboard reference.
+- Visual decision tiles in the hero; no inline SVG artwork.
+- Two Decision Data Assets on Inicio.
+- DDA Logística is the only interactive CTA and routes to `logistics-config`.
+- DDA Producción is visible and disabled.
+- CSS and JavaScript URLs are cache-busted from `app.html`.
