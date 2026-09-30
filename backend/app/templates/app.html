@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="color-scheme" content="light">
   <title>Dation · Decision Intelligence</title>
-  <link rel="stylesheet" href="/static/css/tokens.css?v=workspace-v14-20260930">
-  <link rel="stylesheet" href="/static/css/app.css?v=workspace-v14-20260930">
+  <link rel="stylesheet" href="/static/css/tokens.css?v=workspace-v15-20260930">
+  <link rel="stylesheet" href="/static/css/app.css?v=workspace-v15-20260930">
 </head>
 <body>
   <div class="app-shell">
@@ -1066,56 +1066,8 @@
           </div>
 
           <div id="dashboard-content" class="decision-dashboard is-hidden">
-            <header class="decision-command-bar" id="dashboard-command-bar">
-              <div class="decision-command-bar__identity">
-                <div>
-                  <span class="section-kicker">DDA Logística</span>
-                  <strong>Decisión de asignación de flota</strong>
-                </div>
-                <span class="decision-status-chip">
-                  <i aria-hidden="true"></i>
-                  Decisión calculada
-                </span>
-              </div>
-
-              <nav class="decision-anchor-nav" aria-label="Secciones de la decisión">
-                <a href="#dashboard-decision">Decisión</a>
-                <a href="#dashboard-comparator">Comparador</a>
-                <a href="#dashboard-drivers">Qué cambió</a>
-                <a href="#dashboard-sensitivity">Sensibilidad</a>
-                <a href="#dashboard-ai">Resumen IA</a>
-              </nav>
-
-              <div class="decision-command-bar__actions">
-                <details class="execution-details" id="execution-details">
-                  <summary>Detalles de la ejecución</summary>
-                  <div class="execution-details__popover">
-                    <div>
-                      <span>Dataset</span>
-                      <strong id="details-dataset">—</strong>
-                    </div>
-                    <div>
-                      <span>Ejecución</span>
-                      <strong id="details-date">—</strong>
-                    </div>
-                    <div>
-                      <span>Motor</span>
-                      <strong id="details-engine">—</strong>
-                    </div>
-                    <div>
-                      <span>Intérprete IA</span>
-                      <strong id="details-ai">—</strong>
-                    </div>
-                    <div class="execution-details__run">
-                      <span>ID de corrida</span>
-                      <code id="details-run-id">—</code>
-                      <button class="text-button" id="copy-run-id" type="button">
-                        Copiar ID
-                      </button>
-                    </div>
-                  </div>
-                </details>
-
+            <main class="decision-dashboard__body">
+              <div class="dashboard-primary-actions" aria-label="Acciones de la decisión">
                 <button class="button button--secondary" id="dashboard-reexecute" type="button">
                   Re-ejecutar
                 </button>
@@ -1129,9 +1081,6 @@
                   <span aria-hidden="true">↓</span>
                 </button>
               </div>
-            </header>
-
-            <main class="decision-dashboard__body">
               <section class="decision-hero" id="dashboard-decision">
                 <div class="decision-hero__copy">
                   <div class="decision-objective-chip" id="dashboard-objective-chip">
@@ -1291,10 +1240,41 @@
                     <h2>Universo de la decisión</h2>
                   </div>
 
-                  <details class="model-assumptions">
-                    <summary>Supuestos del motor</summary>
-                    <ul id="assumptions-list" class="assumptions-list"></ul>
-                  </details>
+                  <div class="dashboard-context-actions">
+                    <details class="model-assumptions">
+                      <summary>Supuestos del motor</summary>
+                      <ul id="assumptions-list" class="assumptions-list"></ul>
+                    </details>
+
+                    <details class="execution-details execution-details--inline" id="execution-details">
+                      <summary>Detalles de la ejecución</summary>
+                      <div class="execution-details__popover">
+                        <div>
+                          <span>Dataset</span>
+                          <strong id="details-dataset">—</strong>
+                        </div>
+                        <div>
+                          <span>Ejecución</span>
+                          <strong id="details-date">—</strong>
+                        </div>
+                        <div>
+                          <span>Motor</span>
+                          <strong id="details-engine">—</strong>
+                        </div>
+                        <div>
+                          <span>Intérprete IA</span>
+                          <strong id="details-ai">—</strong>
+                        </div>
+                        <div class="execution-details__run">
+                          <span>ID de corrida</span>
+                          <code id="details-run-id">—</code>
+                          <button class="text-button" id="copy-run-id" type="button">
+                            Copiar ID
+                          </button>
+                        </div>
+                      </div>
+                    </details>
+                  </div>
                 </div>
 
                 <div id="dashboard-data-context" class="context-chip-grid"></div>
@@ -1852,12 +1832,12 @@
       window.dationRenderJourney('inicio');
     })();
   </script>
-  <script src="/static/js/data-stage.js?v=workspace-v14-20260930"></script>
-  <script src="/static/js/dashboard-formatters.js?v=workspace-v14-20260930"></script>
-  <script src="/static/js/dashboard-selectors.js?v=workspace-v14-20260930"></script>
-  <script src="/static/js/dashboard-stage.js?v=workspace-v14-20260930"></script>
-  <script src="/static/js/interpreter-stage.js?v=workspace-v14-20260930"></script>
-  <script src="/static/js/decision-stage.js?v=workspace-v14-20260930"></script>
-  <script type="module" src="/static/js/app.js?v=workspace-v14-20260930"></script>
+  <script src="/static/js/data-stage.js?v=workspace-v15-20260930"></script>
+  <script src="/static/js/dashboard-formatters.js?v=workspace-v15-20260930"></script>
+  <script src="/static/js/dashboard-selectors.js?v=workspace-v15-20260930"></script>
+  <script src="/static/js/dashboard-stage.js?v=workspace-v15-20260930"></script>
+  <script src="/static/js/interpreter-stage.js?v=workspace-v15-20260930"></script>
+  <script src="/static/js/decision-stage.js?v=workspace-v15-20260930"></script>
+  <script type="module" src="/static/js/app.js?v=workspace-v15-20260930"></script>
 </body>
 </html>
