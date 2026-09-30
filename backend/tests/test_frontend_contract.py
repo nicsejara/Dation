@@ -46,6 +46,14 @@ DECISION_STAGE_JS = (
     / "decision-stage.js"
 )
 
+DASHBOARD_STAGE_JS = (
+    BACKEND_ROOT
+    / "app"
+    / "static"
+    / "js"
+    / "dashboard-stage.js"
+)
+
 
 class FrontendContractTests(
     unittest.TestCase
@@ -71,6 +79,11 @@ class FrontendContractTests(
                 encoding="utf-8"
             )
         )
+        cls.dashboard_stage_js = (
+            DASHBOARD_STAGE_JS.read_text(
+                encoding="utf-8"
+            )
+        )
 
     def test_javascript_referenced_ids_exist(
         self,
@@ -83,6 +96,8 @@ class FrontendContractTests(
             + self.data_stage_js
             + "\n"
             + self.decision_stage_js
+            + "\n"
+            + self.dashboard_stage_js
         )
 
         referenced_ids = set(
@@ -253,6 +268,54 @@ class FrontendContractTests(
         self.assertIn(
             "dation:dataset-ready",
             self.data_stage_js,
+        )
+
+
+    def test_dashboard_stage_contract(
+        self,
+    ):
+        required_ids = (
+            "dashboard-execution-state",
+            "dashboard-progress",
+            "dashboard-content",
+            "dashboard-impact-chart",
+            "dashboard-comparison-select",
+            "dashboard-comparison-chart",
+            "dashboard-comparison-table-body",
+            "generate-explanation",
+            "chat-panel",
+            "dashboard-retry-run",
+        )
+
+        for element_id in required_ids:
+            self.assertIn(
+                f'id="{element_id}"',
+                self.html,
+            )
+
+        self.assertIn(
+            "dationDashboardStart",
+            self.dashboard_stage_js,
+        )
+        self.assertIn(
+            "dationDashboardCompleted",
+            self.dashboard_stage_js,
+        )
+        self.assertIn(
+            "/api/runs/",
+            self.dashboard_stage_js,
+        )
+        self.assertIn(
+            "?run_id=",
+            self.decision_stage_js,
+        )
+        self.assertIn(
+            "dationDashboardStart",
+            self.decision_stage_js,
+        )
+        self.assertIn(
+            "dationDashboardCompleted",
+            self.app_js,
         )
 
 
