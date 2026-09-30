@@ -337,7 +337,7 @@ async function selectDataset(
 
   if (navigateToDda) {
     navigate(
-      "logistics-config"
+      "logistics-data"
     );
   }
 
@@ -566,6 +566,30 @@ function bindNavigation() {
         navigate(
           "logistics-overview",
           "dda",
+        );
+      }
+    );
+  }
+
+  const continueToDecision = $("#continue-to-decision");
+
+  if (continueToDecision) {
+    continueToDecision.addEventListener(
+      "click",
+      () => {
+        if (
+          !state.activeDataset
+          || !state.datasetProfile
+        ) {
+          toast(
+            "Validá un dataset antes de configurar la decisión.",
+            "error",
+          );
+          return;
+        }
+
+        navigate(
+          "logistics-config"
         );
       }
     );
