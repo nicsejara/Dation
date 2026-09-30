@@ -531,7 +531,7 @@ def run_logistics_engine(
 
     scenarios = {
         "baseline": {
-            "name": "Asignación de referencia",
+            "name": "Asignación actual",
             "metrics": baseline,
             "delta_vs_baseline": {
                 "trips_pct": 0.0,
@@ -598,7 +598,7 @@ def run_logistics_engine(
         "configuration": config,
         "model_assumptions": [
             "Cada fila del CSV representa un despacho independiente.",
-            "El campo vehicle_type de cada fila se interpreta como asignación de referencia del dataset; no implica por sí mismo que represente la situación operativa actual.",
+            "El campo vehicle_type de cada fila se interpreta como la asignación actual informada por el dataset y se usa como referencia comparativa del modelo.",
             "Todos los tipos de vehículo observados en el dataset se consideran disponibles para cada despacho.",
             "Cada viaje incluye ida y regreso.",
             "El engine v0.2 no consolida despachos entre sí.",
