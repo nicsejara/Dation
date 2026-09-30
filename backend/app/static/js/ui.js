@@ -1170,7 +1170,7 @@ function renderPreview(rows) {
 
 function scenarioLabel(key) {
   const labels = {
-    baseline: "Situación actual",
+    baseline: "Asignación de referencia",
     min_cost: "Costo mínimo",
     min_trips: "Viajes mínimos",
     custom: "Configuración elegida",
@@ -1440,7 +1440,7 @@ export function renderDashboard(
 
   $("#dashboard-kpi-cost-delta")
     .textContent = (
-      `${formatPercent(delta.cost_pct)} vs situación actual · `
+      `${formatPercent(delta.cost_pct)} vs asignación de referencia · `
       + formatCurrency(
           baseline.metrics.total_cost
         )
@@ -1455,7 +1455,7 @@ export function renderDashboard(
 
   $("#dashboard-kpi-trips-delta")
     .textContent = (
-      `${formatPercent(delta.trips_pct)} vs situación actual · `
+      `${formatPercent(delta.trips_pct)} vs asignación de referencia · `
       + formatNumber(
           baseline.metrics.total_trips
         )
@@ -1468,7 +1468,7 @@ export function renderDashboard(
 
   $("#dashboard-kpi-distance-delta")
     .textContent = (
-      `${formatPercent(delta.distance_pct)} vs situación actual`
+      `${formatPercent(delta.distance_pct)} vs asignación de referencia`
     );
 
   $("#dashboard-kpi-shipments")
@@ -1719,11 +1719,11 @@ function renderSensitivity(
                   <strong>${formatNumber(card.scenario.metrics.total_distance_km)} km</strong>
                 </div>
                 <div class="sensitivity-metric">
-                  <span>Δ costo vs actual</span>
+                  <span>Δ costo vs referencia</span>
                   <strong>${formatPercent(d.cost_pct)}</strong>
                 </div>
                 <div class="sensitivity-metric">
-                  <span>Δ viajes vs actual</span>
+                  <span>Δ viajes vs referencia</span>
                   <strong>${formatPercent(d.trips_pct)}</strong>
                 </div>
                 <div class="sensitivity-metric">
@@ -1765,7 +1765,7 @@ function renderDrivers(result) {
   if (!changes.length) {
     container.innerHTML = (
       '<div class="empty-state empty-state--compact">'
-      + "La configuración no genera cambios materiales de asignación frente a la situación actual."
+      + "La configuración no genera cambios materiales de asignación frente a la asignación de referencia."
       + "</div>"
     );
     return;
@@ -2163,10 +2163,10 @@ export function buildDecisionMarkdown(
     `- Costo total: ${formatCurrency(selected?.metrics?.total_cost)}`,
     `- Viajes: ${formatNumber(selected?.metrics?.total_trips)}`,
     `- Distancia: ${formatNumber(selected?.metrics?.total_distance_km)} km`,
-    `- Δ costo vs situación actual: ${formatPercent(selected?.delta_vs_baseline?.cost_pct)}`,
-    `- Δ viajes vs situación actual: ${formatPercent(selected?.delta_vs_baseline?.trips_pct)}`,
+    `- Δ costo vs asignación de referencia: ${formatPercent(selected?.delta_vs_baseline?.cost_pct)}`,
+    `- Δ viajes vs asignación de referencia: ${formatPercent(selected?.delta_vs_baseline?.trips_pct)}`,
     "",
-    "## Situación actual",
+    "## Asignación de referencia",
     "",
     `- Costo: ${formatCurrency(baseline?.metrics?.total_cost)}`,
     `- Viajes: ${formatNumber(baseline?.metrics?.total_trips)}`,
