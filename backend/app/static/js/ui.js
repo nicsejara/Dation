@@ -299,48 +299,11 @@ export function activateView(
       }
     );
 
-  const breadcrumb = (
-    VIEW_BREADCRUMBS[view]
-    || VIEW_BREADCRUMBS.inicio
-  );
-
-  $("#breadcrumb-primary")
-    .textContent = (
-      breadcrumb.primary
-    );
-
-  const secondary = (
-    $("#breadcrumb-secondary")
-  );
-  const separator = (
-    $(".breadcrumb-context-separator")
-  );
-
-  if (breadcrumb.secondary) {
-    secondary.textContent = (
-      breadcrumb.secondary
-    );
-    secondary.classList.remove(
-      "is-hidden"
-    );
-    separator.classList.remove(
-      "is-hidden"
-    );
-  } else {
-    secondary.classList.add(
-      "is-hidden"
-    );
-    separator.classList.add(
-      "is-hidden"
-    );
-  }
-
   window.scrollTo({
     top: 0,
     behavior: "smooth",
   });
 }
-
 
 export function activateTraceTab(
   tab
@@ -374,36 +337,39 @@ export function renderSystemStatus(
   const element = (
     $("#system-status")
   );
-  const dot = (
-    element.querySelector(
-      ".status-dot"
-    )
-  );
 
-  if (
-    supabaseOk
-    && interpreter?.configured
-  ) {
-    dot.className = (
-      "status-dot status-dot--live"
+  if (element) {
+    const dot = (
+      element.querySelector(
+        ".status-dot"
+      )
     );
-    element.lastChild.textContent = (
-      " Sistemas operativos"
-    );
-  } else if (supabaseOk) {
-    dot.className = (
-      "status-dot status-dot--pending"
-    );
-    element.lastChild.textContent = (
-      " Core activo · IA pendiente"
-    );
-  } else {
-    dot.className = (
-      "status-dot status-dot--danger"
-    );
-    element.lastChild.textContent = (
-      " Revisar servicios"
-    );
+
+    if (
+      supabaseOk
+      && interpreter?.configured
+    ) {
+      dot.className = (
+        "status-dot status-dot--live"
+      );
+      element.lastChild.textContent = (
+        " Sistemas operativos"
+      );
+    } else if (supabaseOk) {
+      dot.className = (
+        "status-dot status-dot--pending"
+      );
+      element.lastChild.textContent = (
+        " Core activo · IA pendiente"
+      );
+    } else {
+      dot.className = (
+        "status-dot status-dot--danger"
+      );
+      element.lastChild.textContent = (
+        " Revisar servicios"
+      );
+    }
   }
 
   const statAi = $("#stat-ai");
@@ -428,36 +394,44 @@ export function renderSystemStatus(
     );
   }
 
-  $("#settings-ai-status")
-    .textContent = (
+  const settingsStatus = $("#settings-ai-status");
+  const settingsProvider = $("#settings-ai-provider");
+  const settingsModel = $("#settings-ai-model");
+  const settingsKnowledge = $("#settings-ai-knowledge");
+
+  if (settingsStatus) {
+    settingsStatus.textContent = (
       interpreter?.configured
         ? "Disponible"
         : "No configurado"
     );
+  }
 
-  $("#settings-ai-provider")
-    .textContent = (
+  if (settingsProvider) {
+    settingsProvider.textContent = (
       interpreter?.provider
       || "—"
     );
+  }
 
-  $("#settings-ai-model")
-    .textContent = (
+  if (settingsModel) {
+    settingsModel.textContent = (
       interpreter?.model
       || "—"
     );
+  }
 
-  $("#settings-ai-knowledge")
-    .textContent = (
+  if (settingsKnowledge) {
+    settingsKnowledge.textContent = (
       interpreter?.knowledge_version
       || "—"
     );
+  }
 
   renderInterpreterMeta(
     interpreter
   );
 }
-
 
 export function renderHomeSummary(
   summary,
