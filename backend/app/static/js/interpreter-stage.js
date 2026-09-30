@@ -26,7 +26,8 @@
     runId: null,
     status: null,
     explanation: null,
-    messages: []
+    messages: [],
+    lastFailedQuestion: null
   };
 
   function $(selector) {
@@ -893,7 +894,23 @@
     );
   }
 
-  async function sendQuestion() {
+  function setChatError(
+    visible
+  ) {
+    var node = $("#chat-error-state");
+
+    if (node) {
+      node.classList.toggle(
+        "is-hidden",
+        !visible
+      );
+    }
+  }
+
+  async function sendQuestion(
+    forcedQuestion,
+    retrying
+  ) {
     var question = (
       $("#decision-question")
     );
@@ -908,17 +925,23 @@
     }
 
     var text = (
-      question.value.trim()
+      typeof forcedQuestion === "string"
+        ? forcedQuestion.trim()
+        : question.value.trim()
     );
 
     if (!text) {
       return;
     }
 
-    appendMessage(
-      "user",
-      text
-    );
+    setChatError(false);
+
+    if (!retrying) {
+      appendMessage(
+        "user",
+        text
+      );
+    }
 
     question.value = "";
     ask.disabled = true;
@@ -944,6 +967,8 @@
     }
 
     try {
+      // TODO(interpreter-streaming): replace this full-response request
+      // with SSE/streaming when the backend exposes a streaming endpoint.
       var payload = await request(
         "/api/runs/"
         + encodeURIComponent(
@@ -973,6 +998,9 @@
         pending.remove();
       }
 
+      state.lastFailedQuestion = null;
+      setChatError(false);
+
       appendMessage(
         "assistant",
         payload.answer
@@ -988,12 +1016,12 @@
         failedPending.remove();
       }
 
-      appendMessage(
-        "assistant",
-        (
-          "No pude responder esta pregunta: "
-          + error.message
-        )
+      state.lastFailedQuestion = text;
+      setChatError(true);
+
+      console.error(
+        "Dation Interpreter chat error",
+        error
       );
     } finally {
       ask.disabled = false;
@@ -1009,6 +1037,7 @@
     var toggle = $("#toggle-chat");
     var fab = $("#dation-chat-fab");
     var copy = $("#copy-explanation");
+    var retry = $("#chat-retry");
     var ask = $("#ask-decision");
     var close = $("#chat-close");
     var question = (
@@ -1077,6 +1106,22 @@
       ask.addEventListener(
         "click",
         sendQuestion
+      );
+    }
+
+    if (retry) {
+      retry.addEventListener(
+        "click",
+        function () {
+          if (
+            state.lastFailedQuestion
+          ) {
+            sendQuestion(
+              state.lastFailedQuestion,
+              true
+            );
+          }
+        }
       );
     }
 
