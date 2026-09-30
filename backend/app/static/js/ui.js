@@ -247,6 +247,10 @@ const VIEW_BREADCRUMBS = {
     primary: "DDA Logística",
     secondary: null,
   },
+  "logistics-data": {
+    primary: "DDA Logística",
+    secondary: "Cargar data",
+  },
   "logistics-config": {
     primary: "DDA Logística",
     secondary: "Configuración",
@@ -293,6 +297,8 @@ export function activateView(
               === "logistics-overview"
             && (
               view
+                === "logistics-data"
+              || view
                 === "logistics-config"
               || view
                 === "decision-dashboard"
@@ -834,6 +840,10 @@ export function renderActiveDataset(
     $("#active-dataset-card")
   );
 
+  const continueButton = (
+    $("#continue-to-decision")
+  );
+
   if (!dataset) {
     card.classList.add(
       "is-empty"
@@ -846,8 +856,8 @@ export function renderActiveDataset(
 
     $("#active-dataset-meta")
       .textContent = (
-        "Elegí un dataset existente "
-        + "o cargá uno nuevo."
+        "Cargá un archivo o seleccioná uno existente "
+        + "para iniciar la validación."
       );
 
     $("#active-dataset-status")
@@ -863,6 +873,19 @@ export function renderActiveDataset(
       .classList.add(
         "is-hidden"
       );
+
+    if (continueButton) {
+      continueButton.disabled = true;
+    }
+
+    if (
+      typeof window.dationSetDataReady
+      === "function"
+    ) {
+      window.dationSetDataReady(
+        false
+      );
+    }
 
     updateExecutionReadiness();
     return;
@@ -887,20 +910,30 @@ export function renderActiveDataset(
 
   $("#active-dataset-status")
     .textContent = (
-      translatedDatasetStatus(
-        dataset.status
-      )
+      "Validando…"
     );
 
   $("#data-config-state")
     .innerHTML = (
-      '<span class="status-dot status-dot--live"></span>'
-      + " Dataset válido"
+      '<span class="status-dot status-dot--pending"></span>'
+      + " Validando evidencia"
     );
+
+  if (continueButton) {
+    continueButton.disabled = true;
+  }
+
+  if (
+    typeof window.dationSetDataReady
+    === "function"
+  ) {
+    window.dationSetDataReady(
+      false
+    );
+  }
 
   updateExecutionReadiness();
 }
-
 
 export function renderDatasetProfile(
   payload
@@ -909,10 +942,28 @@ export function renderDatasetProfile(
     $("#dataset-profile-panel")
   );
 
+  const continueButton = (
+    $("#continue-to-decision")
+  );
+
   if (!payload) {
     panel.classList.add(
       "is-hidden"
     );
+
+    if (continueButton) {
+      continueButton.disabled = true;
+    }
+
+    if (
+      typeof window.dationSetDataReady
+      === "function"
+    ) {
+      window.dationSetDataReady(
+        false
+      );
+    }
+
     return;
   }
 
@@ -923,6 +974,17 @@ export function renderDatasetProfile(
   panel.classList.remove(
     "is-hidden"
   );
+
+  $("#active-dataset-status")
+    .textContent = (
+      "Listo"
+    );
+
+  $("#data-config-state")
+    .innerHTML = (
+      '<span class="status-dot status-dot--live"></span>'
+      + " Datos validados"
+    );
 
   $("#profile-dataset-title")
     .textContent = (
@@ -965,6 +1027,56 @@ export function renderDatasetProfile(
   $("#profile-id")
     .textContent = (
       shortId(dataset.id)
+    );
+
+  const hashShort = (
+    $("#profile-hash-short")
+  );
+
+  if (hashShort) {
+    hashShort.textContent = (
+      dataset.sha256
+        ? dataset.sha256.slice(0, 12) + "…"
+        : "—"
+    );
+  }
+
+  $("#validator-schema-status")
+    .textContent = (
+      validation.missing_columns?.length
+        ? "Revisar"
+        : "Compatible"
+    );
+
+  $("#validator-columns-status")
+    .textContent = (
+      `${formatNumber(validation.columns)} / 14`
+    );
+
+  $("#validator-columns-detail")
+    .textContent = (
+      validation.missing_columns?.length
+        ? (
+          "Faltan: "
+          + validation.missing_columns.join(", ")
+        )
+        : "Todas las columnas requeridas están presentes"
+    );
+
+  $("#validator-empty-status")
+    .textContent = (
+      formatNumber(
+        validation.empty_required_cells
+        ?? 0
+      )
+    );
+
+  $("#validator-duplicates-status")
+    .textContent = (
+      formatNumber(
+        validation.duplicate_shipments
+        ?? 0
+      )
     );
 
   $("#profile-shipments")
@@ -1060,8 +1172,30 @@ export function renderDatasetProfile(
   renderPreview(
     payload.preview || []
   );
-}
 
+  if (continueButton) {
+    continueButton.disabled = false;
+  }
+
+  if (
+    typeof window.dationSetDataReady
+    === "function"
+  ) {
+    window.dationSetDataReady(
+      true
+    );
+  }
+
+  window.setTimeout(
+    () => {
+      panel.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    },
+    100,
+  );
+}
 
 function renderPreview(rows) {
   const head = (
