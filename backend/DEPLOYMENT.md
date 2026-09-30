@@ -317,3 +317,30 @@ Known backend gaps intentionally not simulated:
 - no granular execution-progress endpoint, so no fake percentages are shown;
 - no server-side cancellation endpoint; "Detener espera" cancels client waiting only;
 - no token streaming endpoint for LLM responses; the UI states this explicitly.
+
+
+## Persistent dashboard + interpreter ownership — 2026-09-30
+
+Navigation:
+- Sidebar primary navigation exposes only Inicio.
+- DDA Logística remains in the Decision Data Assets section.
+- DDA overview exposes two explicit paths:
+  - Iniciar nueva decisión.
+  - Analizar mi última decisión.
+
+Decision persistence:
+- The latest completed run is resolved from Supabase decision_runs through /api/runs.
+- The run summary is resolved to the full run before rendering.
+- Dashboard availability remains unlocked after a completed run.
+- Dashboard can be reconstructed after leaving the view or reloading the page.
+
+Interpreter hardening:
+- interpreter-stage.js owns LLM status, executive explanation, saved interpretation recovery and contextual chat.
+- The interpreter no longer depends on app.js activeRun timing to make its buttons work.
+- Generated explanation is synchronized back to app.js only for export state.
+
+Custom-decision semantics:
+- Engine behavior was verified: custom runs persist mode=custom, objective=custom and recommended_scenario=custom.
+- If a custom assignment equals min_cost and/or min_trips, it remains labeled Configuración personalizada.
+- Equality with an extreme is communicated as sensitivity equivalence rather than a renamed objective.
+- Interpreter knowledge/prompt version is now v0.3.
