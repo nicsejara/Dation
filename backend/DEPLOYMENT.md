@@ -284,3 +284,36 @@ Hardening:
 - validated dataset persisted across stages;
 - GitHub Actions now runs on main pushes and validates data-stage.js + decision-stage.js syntax;
 - frontend contract tests cover stage DOM/API contracts.
+
+
+## Enterprise Decision Dashboard v2 — 2026-09-30
+
+Root cause fixed:
+- execution previously awaited the synchronous POST /api/runs/{dataset_id}
+  before entering Dashboard;
+- rendering also occurred before navigation, so a rendering exception could
+  prevent navigation completely.
+
+Execution flow now:
+- the browser generates a UUID for the run;
+- POST /api/runs/{dataset_id}?run_id={uuid} starts with that persisted ID;
+- Dashboard opens immediately in an execution/loading state;
+- the request continues while Dashboard polls GET /api/runs/{run_id};
+- run_id is stored in the URL and sessionStorage to recover after reload;
+- completed runs replace skeletons with the real dashboard;
+- errors, timeout and cancelled client waiting have explicit UI states and retry actions.
+
+Dashboard v2 includes:
+- decision hero and semantic KPIs;
+- honest indeterminate execution progress and skeletons;
+- impact chart vs baseline;
+- reference selector and decision comparison table;
+- relative comparison chart;
+- drivers, context, sensitivity and assumptions;
+- AI executive summary using the existing /explain endpoint;
+- contextual chat using the existing /chat endpoint.
+
+Known backend gaps intentionally not simulated:
+- no granular execution-progress endpoint, so no fake percentages are shown;
+- no server-side cancellation endpoint; "Detener espera" cancels client waiting only;
+- no token streaming endpoint for LLM responses; the UI states this explicitly.
