@@ -988,6 +988,22 @@
     return F.formatNumber(value);
   }
 
+  function chartMetricFormatter(
+    key,
+    value
+  ) {
+    if (key === "cost") {
+      return F.formatCurrencyCompact(
+        value
+      );
+    }
+
+    return metricFormatter(
+      key,
+      value
+    );
+  }
+
   function metricDeltaFormatter(
     key,
     value
@@ -1144,32 +1160,49 @@
                 )
           );
 
-          var deltaText = (
-            item.key === "reassigned"
-              ? (
-                F.formatNumber(
-                  item.decision
-                )
-                + " de "
-                + F.formatNumber(
-                    selected.metrics
-                      .shipments
-                  )
-                + " despachos"
+          var deltaText;
+
+          if (item.key === "reassigned") {
+            deltaText = (
+              F.formatNumber(
+                item.decision
               )
-              : (
-                metricDeltaFormatter(
+              + " de "
+              + F.formatNumber(
+                  selected.metrics
+                    .shipments
+                )
+              + " despachos"
+            );
+          } else {
+            var savingValue = Number(
+              item.absolute || 0
+            );
+
+            var arrow = (
+              savingValue > 0
+                ? "↓ "
+                : savingValue < 0
+                  ? "↑ "
+                  : "→ "
+            );
+
+            deltaText = (
+              arrow
+              + metricFormatter(
                   item.key,
-                  item.absolute
-                )
-                + " · "
-                + F.formatPercent(
-                    -Number(
-                      item.pct || 0
-                    )
+                  Math.abs(
+                    savingValue
                   )
-              )
-          );
+                )
+              + " · "
+              + F.formatPercent(
+                  -Number(
+                    item.pct || 0
+                  )
+                )
+            );
+          }
 
           return (
             '<article class="decision-kpi-card" title="'
@@ -1341,14 +1374,14 @@
           + "</strong>"
           + "<span>"
           + escapeHtml(
-              metricFormatter(
+              chartMetricFormatter(
                 metric.key,
                 decisionValue
               )
             )
           + " vs "
           + escapeHtml(
-              metricFormatter(
+              chartMetricFormatter(
                 metric.key,
                 referenceValue
               )
@@ -2959,7 +2992,22 @@
     ) {
       navigator.clipboard.writeText(
         runId
-      );
+      ).then(function () {
+        var button = $("#copy-run-id");
+
+        if (!button) {
+          return;
+        }
+
+        button.textContent = "Copiado";
+
+        window.setTimeout(
+          function () {
+            button.textContent = "Copiar ID";
+          },
+          1200
+        );
+      });
     }
   }
 
