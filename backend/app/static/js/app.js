@@ -1,6 +1,4 @@
 import {
-  askRun,
-  explainRun,
   getDatasetProfile,
   getDatasets,
   getInterpreterStatus,
@@ -38,7 +36,6 @@ import {
   renderDatasetsTable,
   renderExplanation,
   renderHomeSummary,
-  renderInterpreterMeta,
   renderRunsTable,
   renderSystemStatus,
   renderTechnicalEvidence,
@@ -160,10 +157,6 @@ async function refreshInterpreter() {
       interpreter
     );
 
-    renderInterpreterMeta(
-      interpreter
-    );
-
     return interpreter;
   } catch {
     const unavailable = {
@@ -174,10 +167,6 @@ async function refreshInterpreter() {
     };
 
     setInterpreter(
-      unavailable
-    );
-
-    renderInterpreterMeta(
       unavailable
     );
 
@@ -360,10 +349,6 @@ async function restoreHistoricalRun(
 
     resetChat(
       state.messages
-    );
-
-    renderInterpreterMeta(
-      state.interpreter
     );
 
     toast(
@@ -594,20 +579,6 @@ function bindDecisionStageBridge() {
     }
 
     try {
-      renderExplanation(null);
-      resetChat([]);
-
-      renderInterpreterMeta(
-        state.interpreter
-      );
-    } catch (error) {
-      console.warn(
-        "El Dashboard está disponible, pero no se pudo inicializar la capa interpretativa.",
-        error,
-      );
-    }
-
-    try {
       await Promise.all([
         refreshRuns(),
         refreshSummary(),
@@ -659,226 +630,6 @@ function bindDecisionStageBridge() {
     );
   }
 }
-
-function bindInterpreter() {
-  const generate = (
-    $("#generate-explanation")
-  );
-  const progress = (
-    $("#ai-progress")
-  );
-  const ask = (
-    $("#ask-decision")
-  );
-  const question = (
-    $("#decision-question")
-  );
-
-  generate.addEventListener(
-    "click",
-    async () => {
-      if (!state.activeRun) {
-        return;
-      }
-
-      generate.disabled = true;
-      generate.textContent = (
-        "Interpretando…"
-      );
-
-      showInlineStatus(
-        progress,
-        "Combinando evidencia calculada con la base de conocimiento versionada…",
-        "loading",
-      );
-
-      try {
-        const payload = (
-          await explainRun(
-            state.activeRun.id
-          )
-        );
-
-        setExplanation(
-          payload.explanation
-        );
-
-        renderExplanation(
-          state.explanation
-        );
-
-        showInlineStatus(
-          progress,
-          "Interpretación generada y persistida.",
-          "success",
-        );
-
-        generate.textContent = (
-          "Regenerar resumen IA"
-        );
-      } catch (error) {
-        showInlineStatus(
-          progress,
-          error.message,
-          "error",
-        );
-      } finally {
-        generate.disabled = false;
-      }
-    }
-  );
-
-  $("#toggle-chat")
-    .addEventListener(
-      "click",
-      () => {
-        const panel = (
-          $("#chat-panel")
-        );
-
-        const opening = (
-          panel.classList.contains(
-            "is-hidden"
-          )
-        );
-
-        panel.classList.toggle(
-          "is-hidden"
-        );
-
-        $("#toggle-chat")
-          .textContent = (
-            opening
-              ? "Cerrar chat"
-              : "Abrir chat"
-          );
-
-        if (opening) {
-          question.focus();
-        }
-      }
-    );
-
-  $("#prompt-chips")
-    .addEventListener(
-      "click",
-      (event) => {
-        const chip = (
-          event.target.closest(
-            "button"
-          )
-        );
-
-        if (!chip) {
-          return;
-        }
-
-        question.value = (
-          chip.textContent.trim()
-        );
-        question.focus();
-      }
-    );
-
-  async function sendQuestion() {
-    const text = (
-      question.value.trim()
-    );
-
-    if (
-      !state.activeRun
-      || !text
-    ) {
-      return;
-    }
-
-    appendChatMessage(
-      "user",
-      text,
-    );
-
-    question.value = "";
-    ask.disabled = true;
-    ask.textContent = "…";
-
-    const pendingId = (
-      "pending-"
-      + Date.now()
-    );
-
-    $("#chat-thread")
-      .insertAdjacentHTML(
-        "beforeend",
-        `
-          <div class="assistant-message" id="${pendingId}">
-            <div class="message-avatar">D</div>
-            <div>
-              <strong>Dation Interpreter</strong>
-              <p>Analizando la evidencia de esta decisión…</p>
-            </div>
-          </div>
-        `,
-      );
-
-    try {
-      const answer = (
-        await askRun(
-          state.activeRun.id,
-          text,
-        )
-      );
-
-      document
-        .getElementById(
-          pendingId
-        )
-        ?.remove();
-
-      appendChatMessage(
-        "assistant",
-        answer.answer,
-      );
-    } catch (error) {
-      document
-        .getElementById(
-          pendingId
-        )
-        ?.remove();
-
-      appendChatMessage(
-        "assistant",
-        "No pude responder esta pregunta: "
-        + error.message,
-      );
-    } finally {
-      ask.disabled = false;
-      ask.textContent = "↑";
-      question.focus();
-    }
-  }
-
-  ask.addEventListener(
-    "click",
-    sendQuestion,
-  );
-
-  question.addEventListener(
-    "keydown",
-    (event) => {
-      if (
-        (
-          event.ctrlKey
-          || event.metaKey
-        )
-        && event.key === "Enter"
-      ) {
-        event.preventDefault();
-        sendQuestion();
-      }
-    }
-  );
-}
-
 
 function downloadText(
   filename,
@@ -1020,7 +771,6 @@ bindNavigation();
 bindDatasetActions();
 bindDataStageBridge();
 bindDecisionStageBridge();
-bindInterpreter();
 bindExports();
 bindRefreshActions();
 bindGlobalErrors();
