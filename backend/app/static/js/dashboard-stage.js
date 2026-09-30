@@ -2260,7 +2260,6 @@
       items.find(function (run) {
         return (
           run.status === "completed"
-          && run.result_json
         );
       })
       || null
@@ -2294,12 +2293,21 @@
     }
 
     try {
-      var latest = await findLatestCompletedRun();
+      var latestSummary = (
+        await findLatestCompletedRun()
+      );
 
-      if (!latest) {
+      if (!latestSummary) {
         updateLatestDecisionCta(null);
         return;
       }
+
+      var latest = await requestJson(
+        "/api/runs/"
+        + encodeURIComponent(
+            latestSummary.id
+          )
+      );
 
       saveContext({
         runId: latest.id,
