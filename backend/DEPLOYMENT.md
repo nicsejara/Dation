@@ -344,3 +344,18 @@ Custom-decision semantics:
 - If a custom assignment equals min_cost and/or min_trips, it remains labeled Configuración personalizada.
 - Equality with an extreme is communicated as sensitivity equivalence rather than a renamed objective.
 - Interpreter knowledge/prompt version is now v0.3.
+
+
+## Dashboard footer + floating contextual chat — 2026-09-30
+
+Dashboard actions:
+- Footer now exposes a single CTA: Exportar decisión.
+- Exportar decisión downloads the active run result_json as JSON.
+- Export no longer depends on Dation Interpreter or a generated explanation.
+
+Interpreter UX:
+- Executive summary now uses the full dashboard width.
+- The fixed chat card was removed from the page layout.
+- Contextual chat is now a floating launcher + floating panel.
+- Chat keeps the same run-scoped /chat endpoint and saved message history.
+- Floating chat supports close button, Escape key and aria-expanded state.
