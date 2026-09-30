@@ -932,7 +932,7 @@
       async function (event) {
         var button = (
           event.target.closest(
-            "[data-data-stage-dataset]"
+            "[data-data-stage-dataset], [data-use-dataset]"
           )
         );
 
@@ -948,10 +948,17 @@
         button.textContent = "Validando…";
 
         try {
-          await selectDataset(
+          var datasetId = (
             button.getAttribute(
               "data-data-stage-dataset"
             )
+            || button.getAttribute(
+              "data-use-dataset"
+            )
+          );
+
+          await selectDataset(
+            datasetId
           );
         } catch (error) {
           showProgress(
