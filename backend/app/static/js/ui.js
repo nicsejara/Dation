@@ -1186,16 +1186,22 @@ export function renderDatasetProfile(
     );
   }
 
-  window.setTimeout(
-    () => {
-      panel.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    },
-    100,
-  );
-}
+  if (
+    typeof window.dationGetCurrentView
+      === "function"
+    && window.dationGetCurrentView()
+      === "logistics-data"
+  ) {
+    window.setTimeout(
+      () => {
+        panel.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      },
+      100,
+    );
+  }
 
 function renderPreview(rows) {
   const head = (
