@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="light">
   <title>Dation · Decision Intelligence</title>
   <link rel="stylesheet" href="/static/css/tokens.css">
-  <link rel="stylesheet" href="/static/css/app.css?v=data-stage-controller-v2-20260930">
+  <link rel="stylesheet" href="/static/css/app.css?v=decision-stage-v1-20260930">
 </head>
 <body>
   <div class="app-shell">
@@ -675,154 +675,330 @@
 
         <!-- CONFIGURAR DECISIÓN -->
         <section class="view" data-view-panel="logistics-config">
-          <div class="page-heading">
-            <div>
-              <div class="heading-meta">
-                <span class="section-kicker">DDA Logística</span>
-                <span class="pill pill--live">Paso 2 de 3</span>
-              </div>
-              <h1>Configurar decisión</h1>
-              <p>
-                Definí qué debe priorizar el motor sobre el dataset ya validado.
-                La configuración quedará persistida junto con la corrida.
-              </p>
-            </div>
-          </div>
-
-          <section class="config-section panel" id="dda-decision-section">
-            <div class="config-section-header">
-              <div class="config-number">01</div>
+          <div class="decision-stage">
+            <div class="decision-stage__heading">
               <div>
-                <span class="section-kicker">Objetivo de decisión</span>
-                <h2>Definí cómo querés priorizar la decisión</h2>
+                <div class="heading-meta">
+                  <span class="section-kicker">DDA Logística</span>
+                  <span class="pill pill--live">Paso 2 de 3</span>
+                </div>
+                <h1>Configurar decisión</h1>
                 <p>
-                  Los presets representan los extremos determinísticos. El modo
-                  personalizado pondera costo y viajes.
+                  Definí qué debe priorizar el motor. Podés partir de un objetivo
+                  predefinido o construir una ponderación propia entre las variables
+                  disponibles.
                 </p>
               </div>
-              <div class="config-state" id="objective-config-state">
-                <span class="status-dot status-dot--live"></span>
-                Configuración válida
-              </div>
-            </div>
 
-            <div class="decision-mode-grid" id="decision-mode-grid">
-              <button class="decision-mode-card is-selected" type="button" data-decision-mode="preset" data-objective="min_cost">
-                <span class="choice-radio"></span>
-                <div>
-                  <span class="mode-tag">Predefinido</span>
-                  <strong>Minimizar costo</strong>
-                  <small>100% prioridad sobre el costo total estimado.</small>
-                </div>
-              </button>
-
-              <button class="decision-mode-card" type="button" data-decision-mode="preset" data-objective="min_trips">
-                <span class="choice-radio"></span>
-                <div>
-                  <span class="mode-tag">Predefinido</span>
-                  <strong>Minimizar viajes</strong>
-                  <small>100% prioridad sobre la cantidad de viajes requeridos.</small>
-                </div>
-              </button>
-
-              <button class="decision-mode-card" type="button" data-decision-mode="custom" data-objective="custom">
-                <span class="choice-radio"></span>
-                <div>
-                  <span class="mode-tag mode-tag--custom">Personalizado</span>
-                  <strong>Configurar prioridades</strong>
-                  <small>Ponderá costo y viajes de acuerdo con el criterio del decisor.</small>
-                </div>
-              </button>
-            </div>
-          </section>
-
-          <section class="config-section panel" id="sensitivity-config-section">
-            <div class="config-section-header">
-              <div class="config-number">02</div>
-              <div>
-                <span class="section-kicker">Configuración de sensibilidad</span>
-                <h2>Ponderación entre costo y viajes</h2>
-                <p id="sensitivity-config-copy">
-                  El modo predefinido seleccionado utiliza una ponderación canónica.
-                </p>
-              </div>
-              <div class="config-state">
-                <span class="status-dot status-dot--live"></span>
-                Suma 100%
-              </div>
-            </div>
-
-            <div id="custom-sensitivity" class="custom-sensitivity is-hidden">
-              <div class="weight-values">
-                <div>
-                  <span>Costo</span>
-                  <strong id="cost-weight-value">70%</strong>
-                </div>
-                <div>
-                  <span>Viajes</span>
-                  <strong id="trips-weight-value">30%</strong>
-                </div>
-              </div>
-
-              <label class="slider-label" for="cost-weight-slider">
-                Prioridad asignada al costo
-              </label>
-              <input
-                id="cost-weight-slider"
-                class="weight-slider"
-                type="range"
-                min="0"
-                max="100"
-                step="1"
-                value="70"
-                aria-describedby="weight-explanation"
-              >
-
-              <div class="weight-bar" aria-hidden="true">
-                <div id="weight-bar-cost" class="weight-bar-cost" style="width:70%"></div>
-                <div id="weight-bar-trips" class="weight-bar-trips" style="width:30%"></div>
-              </div>
-
-              <p id="weight-explanation" class="weight-explanation">
-                Esta configuración prioriza el ahorro económico, manteniendo un 30% de sensibilidad sobre la cantidad de viajes.
-              </p>
-            </div>
-
-            <div id="preset-sensitivity" class="preset-sensitivity">
-              <div class="preset-weight-card">
-                <span>Configuración actual</span>
-                <strong id="preset-weight-label">Costo 100% · Viajes 0%</strong>
-                <small>
-                  Los extremos se preservan exactamente para garantizar compatibilidad
-                  con la lógica anterior.
+              <div class="decision-stage__dataset-card">
+                <span class="section-kicker">Evidencia activa</span>
+                <strong id="decision-dataset-name">Dataset no disponible</strong>
+                <small id="decision-dataset-meta">
+                  Volvé a Cargar data y validá un dataset para continuar.
                 </small>
               </div>
             </div>
 
-            <div class="future-dimensions">
-              <span>Dimensiones preparadas para futuras versiones:</span>
-              <span class="disabled-chip">Tiempo</span>
-              <span class="disabled-chip">CO2</span>
-              <span class="disabled-chip">Riesgo</span>
-              <span class="disabled-chip">Nivel de servicio</span>
-            </div>
-          </section>
+            <section class="decision-stage__section panel">
+              <div class="decision-stage__section-head">
+                <div class="decision-stage__step">01</div>
+                <div>
+                  <span class="section-kicker">Punto de partida</span>
+                  <h2>Elegí un objetivo predefinido</h2>
+                  <p>
+                    Los presets representan configuraciones frecuentes. Podés usarlos
+                    tal cual o partir de ellos y ajustar los pesos manualmente.
+                  </p>
+                </div>
+                <span class="decision-stage__status" id="decision-config-status">
+                  <span class="status-dot status-dot--live"></span>
+                  Configuración válida
+                </span>
+              </div>
 
-          <div class="execution-bar">
-            <div>
-              <span class="section-kicker">Listo para calcular</span>
-              <strong id="execution-summary-title">Seleccioná un dataset para continuar</strong>
-              <small id="execution-summary-copy">
-                El motor permanecerá deshabilitado hasta contar con datos válidos.
-              </small>
+              <div class="decision-stage__preset-grid" id="decision-preset-grid">
+                <button
+                  class="decision-stage__preset is-selected"
+                  type="button"
+                  data-preset="min_cost"
+                >
+                  <span class="decision-stage__preset-index">A</span>
+                  <div>
+                    <span class="mode-tag">Predefinido</span>
+                    <h3>Priorizar ahorro</h3>
+                    <p>Busca la alternativa de menor costo estimado.</p>
+                    <div class="decision-stage__preset-weights">
+                      <span>Costo <strong>100%</strong></span>
+                      <span>Viajes <strong>0%</strong></span>
+                    </div>
+                  </div>
+                </button>
+
+                <button
+                  class="decision-stage__preset"
+                  type="button"
+                  data-preset="min_trips"
+                >
+                  <span class="decision-stage__preset-index">B</span>
+                  <div>
+                    <span class="mode-tag">Predefinido</span>
+                    <h3>Priorizar operación</h3>
+                    <p>Busca reducir al mínimo la cantidad de viajes requeridos.</p>
+                    <div class="decision-stage__preset-weights">
+                      <span>Costo <strong>0%</strong></span>
+                      <span>Viajes <strong>100%</strong></span>
+                    </div>
+                  </div>
+                </button>
+
+                <button
+                  class="decision-stage__preset"
+                  type="button"
+                  data-preset="balanced"
+                >
+                  <span class="decision-stage__preset-index">C</span>
+                  <div>
+                    <span class="mode-tag mode-tag--custom">Balanceado</span>
+                    <h3>Equilibrar criterios</h3>
+                    <p>Asigna el mismo peso a ahorro y cantidad de viajes.</p>
+                    <div class="decision-stage__preset-weights">
+                      <span>Costo <strong>50%</strong></span>
+                      <span>Viajes <strong>50%</strong></span>
+                    </div>
+                  </div>
+                </button>
+              </div>
+            </section>
+
+            <section class="decision-stage__section panel">
+              <div class="decision-stage__section-head">
+                <div class="decision-stage__step">02</div>
+                <div>
+                  <span class="section-kicker">Ponderación personalizada</span>
+                  <h2>Ajustá cuánto pesa cada variable</h2>
+                  <p>
+                    Los pesos siempre suman 100%. Al mover una variable, Dation
+                    recalcula automáticamente la otra para mantener una configuración válida.
+                  </p>
+                </div>
+                <span class="decision-stage__sum" id="decision-weight-sum">
+                  100% asignado
+                </span>
+              </div>
+
+              <div class="decision-stage__weights">
+                <article class="decision-weight-card decision-weight-card--cost">
+                  <div class="decision-weight-card__head">
+                    <div>
+                      <span class="section-kicker">Variable 01</span>
+                      <h3>Costo</h3>
+                      <p>Prioridad asignada al costo total estimado.</p>
+                    </div>
+                    <strong id="decision-cost-value">100%</strong>
+                  </div>
+
+                  <input
+                    id="decision-cost-slider"
+                    class="decision-weight-slider"
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="1"
+                    value="100"
+                    aria-label="Peso de costo"
+                  >
+
+                  <div class="decision-weight-card__scale">
+                    <span>0%</span>
+                    <span>Menor prioridad</span>
+                    <span>100%</span>
+                  </div>
+                </article>
+
+                <article class="decision-weight-card decision-weight-card--trips">
+                  <div class="decision-weight-card__head">
+                    <div>
+                      <span class="section-kicker">Variable 02</span>
+                      <h3>Viajes</h3>
+                      <p>Prioridad asignada a reducir la cantidad de viajes.</p>
+                    </div>
+                    <strong id="decision-trips-value">0%</strong>
+                  </div>
+
+                  <input
+                    id="decision-trips-slider"
+                    class="decision-weight-slider"
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="1"
+                    value="0"
+                    aria-label="Peso de viajes"
+                  >
+
+                  <div class="decision-weight-card__scale">
+                    <span>0%</span>
+                    <span>Menor prioridad</span>
+                    <span>100%</span>
+                  </div>
+                </article>
+              </div>
+
+              <div class="decision-stage__allocation">
+                <div class="decision-stage__allocation-head">
+                  <div>
+                    <span class="section-kicker">Distribución total</span>
+                    <strong id="decision-mode-label">Priorizar ahorro</strong>
+                  </div>
+                  <span id="decision-allocation-label">Costo 100% · Viajes 0%</span>
+                </div>
+
+                <div class="decision-stage__allocation-bar" aria-hidden="true">
+                  <div
+                    id="decision-allocation-cost"
+                    class="decision-stage__allocation-cost"
+                    style="width:100%"
+                  ></div>
+                  <div
+                    id="decision-allocation-trips"
+                    class="decision-stage__allocation-trips"
+                    style="width:0%"
+                  ></div>
+                </div>
+
+                <p id="decision-weight-explanation">
+                  Esta configuración prioriza exclusivamente el costo estimado.
+                </p>
+              </div>
+
+              <div class="decision-stage__future">
+                <div>
+                  <span class="section-kicker">Modelo extensible</span>
+                  <strong>Variables preparadas para futuras versiones</strong>
+                  <small>
+                    El MVP actual calcula únicamente costo y viajes. Las dimensiones
+                    futuras se incorporarán al mismo sistema de ponderación.
+                  </small>
+                </div>
+
+                <div class="decision-stage__future-tags">
+                  <span>Tiempo</span>
+                  <span>CO2</span>
+                  <span>Riesgo</span>
+                  <span>Nivel de servicio</span>
+                </div>
+              </div>
+            </section>
+
+            <div class="decision-stage__execution-bar">
+              <div>
+                <span class="section-kicker">Configuración lista</span>
+                <strong id="decision-execution-title">Priorizar ahorro</strong>
+                <small id="decision-execution-copy">
+                  Costo 100% · Viajes 0% · cálculo determinístico
+                </small>
+              </div>
+
+              <button
+                class="button button--primary button--large"
+                id="decision-review-run"
+                type="button"
+                disabled
+              >
+                Revisar y ejecutar
+                <span aria-hidden="true">→</span>
+              </button>
             </div>
-            <button class="button button--primary button--large" id="run-decision" type="button" disabled>
-              Ejecutar decisión
-              <span aria-hidden="true">→</span>
-            </button>
+
+            <div id="decision-run-progress" class="inline-status is-hidden"></div>
           </div>
-          <div id="run-progress" class="inline-status is-hidden"></div>
         </section>
+
+        <div
+          class="decision-confirm-modal is-hidden"
+          id="decision-confirm-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="decision-confirm-title"
+        >
+          <div class="decision-confirm-modal__backdrop" data-close-decision-modal></div>
+
+          <div class="decision-confirm-modal__panel">
+            <div class="decision-confirm-modal__header">
+              <div>
+                <span class="section-kicker">Confirmación de ejecución</span>
+                <h2 id="decision-confirm-title">Revisá la decisión antes de calcular</h2>
+                <p>
+                  Esta configuración quedará guardada junto con la corrida para
+                  mantener trazabilidad completa.
+                </p>
+              </div>
+
+              <button
+                class="decision-confirm-modal__close"
+                type="button"
+                aria-label="Cerrar"
+                data-close-decision-modal
+              >
+                ×
+              </button>
+            </div>
+
+            <div class="decision-confirm-modal__dataset">
+              <span>Dataset</span>
+              <strong id="confirm-dataset-name">—</strong>
+              <small id="confirm-dataset-meta">—</small>
+            </div>
+
+            <div class="decision-confirm-modal__summary">
+              <article>
+                <span>Modo</span>
+                <strong id="confirm-mode">—</strong>
+              </article>
+              <article>
+                <span>Costo</span>
+                <strong id="confirm-cost">—</strong>
+              </article>
+              <article>
+                <span>Viajes</span>
+                <strong id="confirm-trips">—</strong>
+              </article>
+              <article>
+                <span>Motor</span>
+                <strong>0.2.0</strong>
+              </article>
+            </div>
+
+            <div class="decision-confirm-modal__notice">
+              <span class="decision-confirm-modal__notice-icon">i</span>
+              <p>
+                El motor Python realiza el cálculo de forma determinística.
+                La capa de IA no modifica la solución: sólo interpreta el resultado después.
+              </p>
+            </div>
+
+            <div id="decision-confirm-error" class="inline-status is-hidden"></div>
+
+            <div class="decision-confirm-modal__actions">
+              <button
+                class="button button--ghost"
+                type="button"
+                data-close-decision-modal
+              >
+                Volver a configurar
+              </button>
+
+              <button
+                class="button button--primary button--large"
+                id="decision-confirm-run"
+                type="button"
+              >
+                Confirmar y ejecutar
+                <span aria-hidden="true">→</span>
+              </button>
+            </div>
+          </div>
+        </div>
 
         <!-- DASHBOARD -->
         <section class="view" data-view-panel="decision-dashboard">
@@ -1388,7 +1564,8 @@
       window.dationRenderJourney('inicio');
     })();
   </script>
-  <script src="/static/js/data-stage.js?v=data-stage-controller-v2-20260930"></script>
-  <script type="module" src="/static/js/app.js?v=data-stage-controller-v2-20260930"></script>
+  <script src="/static/js/data-stage.js?v=decision-stage-v1-20260930"></script>
+  <script src="/static/js/decision-stage.js?v=decision-stage-v1-20260930"></script>
+  <script type="module" src="/static/js/app.js?v=decision-stage-v1-20260930"></script>
 </body>
 </html>
