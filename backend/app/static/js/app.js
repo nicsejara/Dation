@@ -666,6 +666,34 @@ function downloadText(
 }
 
 
+function bindInterpreterStateBridge() {
+  window.addEventListener(
+    "dation:interpreter-explanation",
+    (event) => {
+      const explanation = (
+        event.detail?.explanation
+        || null
+      );
+
+      setExplanation(
+        explanation
+      );
+
+      const exportButton = (
+        $("#export-decision")
+      );
+
+      if (exportButton) {
+        exportButton.disabled = (
+          !state.activeRun
+          || !state.explanation
+        );
+      }
+    }
+  );
+}
+
+
 function bindExports() {
   $("#download-json")
     .addEventListener(
@@ -771,6 +799,7 @@ bindNavigation();
 bindDatasetActions();
 bindDataStageBridge();
 bindDecisionStageBridge();
+bindInterpreterStateBridge();
 bindExports();
 bindRefreshActions();
 bindGlobalErrors();
