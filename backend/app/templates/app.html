@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="light">
   <title>Dation · Decision Intelligence</title>
   <link rel="stylesheet" href="/static/css/tokens.css">
-  <link rel="stylesheet" href="/static/css/app.css?v=data-stage-v2-20260930">
+  <link rel="stylesheet" href="/static/css/app.css?v=data-stage-controller-v1-20260930">
 </head>
 <body>
   <div class="app-shell">
@@ -416,6 +416,13 @@
             <section class="data-stage__source-grid">
               <div class="data-stage__upload-zone upload-card" id="upload-dropzone">
                 <div class="data-stage__upload-glow" aria-hidden="true"></div>
+                <div class="data-stage__drop-overlay" aria-hidden="true">
+                  <div class="data-stage__drop-target">
+                    <span class="data-stage__drop-icon">↓</span>
+                    <strong>Soltá el archivo para validarlo</strong>
+                    <small>Dation verificará la estructura antes de continuar.</small>
+                  </div>
+                </div>
                 <div class="data-stage__upload-icon" aria-hidden="true">
                   <span>↑</span>
                 </div>
@@ -465,6 +472,57 @@
                   <div class="empty-state empty-state--compact">Cargando datasets…</div>
                 </div>
               </div>
+            </section>
+
+            <section class="data-stage__template panel">
+              <div class="data-stage__template-icon" aria-hidden="true">CSV</div>
+
+              <div class="data-stage__template-copy">
+                <span class="section-kicker">¿Primera vez usando este DDA?</span>
+                <h2>Descargá la estructura de datos</h2>
+                <p>
+                  Usá esta plantilla como punto de partida. Incluye las 14 columnas
+                  esperadas por el motor y algunos registros simulados para mostrarte
+                  el formato correcto. Reemplazá los datos dummy por tu información
+                  real sin cambiar los encabezados.
+                </p>
+
+                <div class="data-stage__template-steps">
+                  <span><strong>1.</strong> Descargá la plantilla</span>
+                  <span><strong>2.</strong> Reemplazá los datos simulados</span>
+                  <span><strong>3.</strong> Conservá los encabezados</span>
+                  <span><strong>4.</strong> Cargá tu CSV final</span>
+                </div>
+
+                <details class="data-stage__columns">
+                  <summary>Ver las 14 columnas requeridas</summary>
+                  <div class="data-stage__column-list">
+                    <code>shipment_id</code>
+                    <code>product</code>
+                    <code>quantity_units</code>
+                    <code>unit_weight_kg</code>
+                    <code>origin</code>
+                    <code>destination</code>
+                    <code>distance_km</code>
+                    <code>vehicle_type</code>
+                    <code>vehicle_capacity_kg</code>
+                    <code>cost_per_km</code>
+                    <code>fixed_trip_cost</code>
+                    <code>priority</code>
+                    <code>max_delivery_days</code>
+                    <code>dispatch_date</code>
+                  </div>
+                </details>
+              </div>
+
+              <a
+                class="button button--secondary data-stage__template-download"
+                href="/static/templates/Dation_Logistics_Template.csv"
+                download="Dation_Logistics_Template.csv"
+              >
+                Descargar plantilla CSV
+                <span aria-hidden="true">↓</span>
+              </a>
             </section>
 
             <section class="data-stage__selected panel">
@@ -1330,6 +1388,7 @@
       window.dationRenderJourney('inicio');
     })();
   </script>
-  <script type="module" src="/static/js/app.js?v=data-stage-v2-20260930"></script>
+  <script src="/static/js/data-stage.js?v=data-stage-controller-v1-20260930"></script>
+  <script type="module" src="/static/js/app.js?v=data-stage-controller-v1-20260930"></script>
 </body>
 </html>
