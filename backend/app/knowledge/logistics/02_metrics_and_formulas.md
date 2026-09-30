@@ -1,72 +1,63 @@
 # Logistics DDA — Métricas y fórmulas
 
-Este documento describe las métricas generadas por el engine. El intérprete debe usar los valores calculados que recibe; estas fórmulas sirven para entender su significado, no para volver a calcular la corrida.
+Este documento describe las métricas generadas por el engine. El intérprete debe usar los valores calculados que recibe; las fórmulas sirven para entender su significado, no para recalcular la corrida.
 
 ## Peso total del despacho
 
-`total_weight_kg`
-
-Peso total transportado por un shipment.
-
-Conceptualmente:
-
-`quantity_units × unit_weight_kg`
+`total_weight_kg = quantity_units × unit_weight_kg`
 
 ## Viajes requeridos
 
-`required_trips`
-
-Cantidad mínima de viajes completos necesarios para transportar el peso del despacho con el tipo de vehículo evaluado.
-
-Conceptualmente:
-
-`ceil(total_weight_kg / vehicle_capacity_kg)`
+`required_trips = ceil(total_weight_kg / vehicle_capacity_kg)`
 
 Un vehículo de mayor capacidad puede reducir viajes, pero no necesariamente costo total si su costo por km o costo fijo es mayor.
 
 ## Distancia total
 
-`total_distance_km`
+En v0.2 cada viaje contempla ida y regreso:
 
-En v0.1 cada viaje contempla ida y vuelta.
+`total_distance_km = required_trips × distance_km × 2`
 
-Conceptualmente:
-
-`required_trips × distance_km × 2`
-
-Por esta razón, con una distancia origen-destino fija, minimizar viajes también tiende a minimizar kilómetros.
+Por esta razón, con distancia origen-destino fija, minimizar viajes también minimiza kilómetros para ese despacho.
 
 ## Costo variable
 
-`variable_cost`
-
-Costo asociado a los kilómetros recorridos.
-
-Conceptualmente:
-
-`total_distance_km × cost_per_km`
+`variable_cost = total_distance_km × cost_per_km`
 
 ## Costo fijo
 
-`fixed_cost`
-
-Costo fijo acumulado de los viajes necesarios.
-
-Conceptualmente:
-
-`required_trips × fixed_trip_cost`
+`fixed_cost = required_trips × fixed_trip_cost`
 
 ## Costo total
 
-`total_cost`
+`total_cost = variable_cost + fixed_cost`
 
-Suma del costo variable y el costo fijo estimado.
+La interfaz presenta estos valores como ARS. Esa interpretación sólo es válida si las variables de costo del dataset están expresadas consistentemente en esa moneda.
 
-Conceptualmente:
+## Normalización para modo personalizado
 
-`variable_cost + fixed_cost`
+Costo y viajes no se suman directamente porque utilizan unidades y escalas diferentes.
 
-La demo actual presenta monetariamente estos valores como ARS en la interfaz. La validez de la moneda depende de que las variables de costo del dataset estén expresadas consistentemente en esa moneda.
+Para las alternativas disponibles de cada despacho se calcula Min-Max:
+
+`normalized_cost = (cost - min_cost) / (max_cost - min_cost)`
+
+`normalized_trips = (trips - min_trips) / (max_trips - min_trips)`
+
+Si máximo y mínimo son iguales, la dimensión normalizada vale 0.
+
+## Score de decisión
+
+`decision_score = cost_weight × normalized_cost + trips_weight × normalized_trips`
+
+La alternativa con menor score es seleccionada.
+
+Un score menor significa mejor ajuste a las prioridades declaradas dentro del conjunto de alternativas evaluadas para ese despacho. No es una métrica operacional universal.
+
+## Extremos
+
+- 100% costo / 0% viajes reproduce exactamente la lógica de `min_cost`.
+- 0% costo / 100% viajes reproduce exactamente la lógica de `min_trips`.
 
 ## Métricas agregadas de escenario
 
@@ -81,11 +72,8 @@ Cada escenario contiene:
 
 ## Delta versus baseline
 
-Los escenarios optimizados contienen variaciones porcentuales contra baseline.
+- costo negativo: reducción estimada frente a situación actual;
+- viajes negativo: reducción de viajes;
+- distancia negativa: reducción de kilómetros.
 
-- valor negativo en costo: reducción estimada de costo.
-- valor positivo en costo: incremento estimado de costo.
-- valor negativo en viajes: reducción de viajes.
-- valor negativo en distancia: reducción de kilómetros.
-
-No describas un delta como ahorro real ya capturado. Es una diferencia estimada por el modelo entre escenarios.
+No describas un delta como ahorro real ya capturado. Es una diferencia estimada entre escenarios del modelo.
