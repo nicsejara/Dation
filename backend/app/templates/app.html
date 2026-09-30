@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="light">
   <title>Dation · Decision Intelligence</title>
   <link rel="stylesheet" href="/static/css/tokens.css">
-  <link rel="stylesheet" href="/static/css/app.css">
+  <link rel="stylesheet" href="/static/css/app.css?v=home-v3-20260929">
 </head>
 <body>
   <div class="app-shell">
@@ -97,68 +97,111 @@
       <div class="content">
         <!-- INICIO -->
         <section class="view is-active" data-view-panel="inicio">
-          <div class="home-simple">
-            <section class="home-simple-hero" aria-labelledby="home-title">
-              <span class="home-simple-kicker">Dation · Decision Intelligence</span>
-              <h1 id="home-title">
-                Convertí datos operativos en decisiones comparables y trazables.
-              </h1>
-              <p>
-                Dation transforma datos operativos en decisiones configurables,
-                explicables y auditables. Elegí un Decision Data Asset para comenzar.
-              </p>
-            </section>
-
-            <section class="home-dda-section" aria-labelledby="dda-title">
-              <div class="home-dda-heading">
-                <span class="section-kicker">Decision Data Assets</span>
-                <h2 id="dda-title">Seleccioná la decisión que querés trabajar</h2>
+          <div class="d-home">
+            <section class="d-home__hero" aria-labelledby="dation-home-title">
+              <div class="d-home__hero-copy">
+                <span class="d-home__eyebrow">Dation · Decision Intelligence</span>
+                <h1 id="dation-home-title">
+                  Convertí datos operativos en decisiones comparables y trazables.
+                </h1>
                 <p>
-                  Cada DDA concentra los datos, la lógica analítica y la evidencia
-                  necesaria para una decisión específica.
+                  Dation combina evidencia operativa, modelos determinísticos e
+                  interpretación para transformar decisiones complejas en alternativas
+                  cuantificables, explicables y auditables.
                 </p>
               </div>
 
-              <div class="home-dda-grid">
-                <article class="home-dda-card home-dda-card--active">
-                  <button
-                    class="home-dda-logo home-dda-logo--logistics"
-                    id="logistics-dda-card"
-                    data-view-target="logistics-config"
-                    type="button"
-                    aria-label="Abrir DDA Logística"
-                  >
-                    <span class="home-route-dot home-route-dot--start"></span>
-                    <span class="home-route-path"></span>
-                    <span class="home-route-dot home-route-dot--end"></span>
-                  </button>
-
-                  <div class="home-dda-copy">
-                    <span class="home-dda-status">Activo</span>
-                    <h3>DDA Logística</h3>
-                    <p>
-                      Configurá datos y prioridades para comparar alternativas
-                      logísticas con un motor determinístico.
-                    </p>
-                    <small>Tocá el icono para abrir el DDA.</small>
+              <div class="d-home__visual" aria-hidden="true">
+                <article class="d-home__tile d-home__tile--main">
+                  <div>
+                    <span class="d-home__tile-index">01</span>
+                    <strong>Decisión trazable</strong>
+                    <small>
+                      Datos, configuración, resultado y explicación conectados
+                      en una misma evidencia.
+                    </small>
                   </div>
+                  <div class="d-home__tile-mark"><span></span></div>
                 </article>
 
-                <article class="home-dda-card home-dda-card--disabled" aria-disabled="true">
-                  <div class="home-dda-logo home-dda-logo--production" aria-hidden="true">
-                    <span class="home-production-bar home-production-bar--one"></span>
-                    <span class="home-production-bar home-production-bar--two"></span>
-                    <span class="home-production-bar home-production-bar--three"></span>
+                <article class="d-home__tile d-home__tile--sand">
+                  <span class="d-home__tile-index">02</span>
+                  <strong>Compará alternativas</strong>
+                  <small>Sensibilidad y trade-offs visibles.</small>
+                </article>
+
+                <article class="d-home__tile d-home__tile--lime">
+                  <span class="d-home__tile-index">03</span>
+                  <strong>Entendé el porqué</strong>
+                  <small>Interpretación en lenguaje de negocio.</small>
+                </article>
+              </div>
+            </section>
+
+            <section class="d-home__assets" aria-labelledby="dation-dda-title">
+              <div class="d-home__section-head">
+                <div>
+                  <span class="d-home__section-kicker">Decision Data Assets</span>
+                  <h2 id="dation-dda-title">Seleccioná la decisión que querés trabajar</h2>
+                  <p>
+                    Cada DDA encapsula datos, lógica analítica y evidencia para
+                    una decisión específica dentro de la organización.
+                  </p>
+                </div>
+              </div>
+
+              <div class="d-home__asset-grid">
+                <button
+                  id="home-open-logistics"
+                  class="d-home__asset d-home__asset--active"
+                  data-view-target="logistics-config"
+                  type="button"
+                  aria-label="Abrir DDA Logística"
+                >
+                  <div class="d-home__asset-icon d-home__asset-icon--logistics" aria-hidden="true">
+                    <span class="d-home__route-start"></span>
+                    <span class="d-home__route-line"></span>
+                    <span class="d-home__route-end"></span>
                   </div>
 
-                  <div class="home-dda-copy">
-                    <span class="home-dda-status home-dda-status--muted">Próximamente</span>
+                  <div class="d-home__asset-copy">
+                    <div class="d-home__asset-meta">
+                      <span class="d-home__badge">Activo</span>
+                      <span class="d-home__asset-version">Motor 0.2.0</span>
+                    </div>
+
+                    <h3>DDA Logística</h3>
+                    <p>
+                      Cargá o reutilizá un dataset, configurá la prioridad entre
+                      costo y viajes y ejecutá una decisión trazable.
+                    </p>
+
+                    <span class="d-home__asset-action">
+                      Abrir DDA Logística
+                      <span aria-hidden="true">→</span>
+                    </span>
+                  </div>
+                </button>
+
+                <article class="d-home__asset d-home__asset--disabled" aria-disabled="true">
+                  <div class="d-home__asset-icon d-home__asset-icon--production" aria-hidden="true">
+                    <span class="d-home__factory-base"></span>
+                  </div>
+
+                  <div class="d-home__asset-copy">
+                    <div class="d-home__asset-meta">
+                      <span class="d-home__badge d-home__badge--muted">Próximamente</span>
+                    </div>
+
                     <h3>DDA Producción</h3>
                     <p>
-                      Futuro Decision Data Asset para capacidad, secuenciación
-                      y performance de producción.
+                      Futuro Decision Data Asset para decisiones de capacidad,
+                      secuenciación y performance de producción.
                     </p>
-                    <small>Disponible en una próxima versión.</small>
+
+                    <span class="d-home__asset-action">
+                      Disponible próximamente
+                    </span>
                   </div>
                 </article>
               </div>
@@ -764,6 +807,6 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script type="module" src="/static/js/app.js"></script>
+  <script type="module" src="/static/js/app.js?v=home-v3-20260929"></script>
 </body>
 </html>
