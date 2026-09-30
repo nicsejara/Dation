@@ -243,6 +243,10 @@ const VIEW_BREADCRUMBS = {
     primary: "Inicio",
     secondary: null,
   },
+  "logistics-overview": {
+    primary: "DDA Logística",
+    secondary: null,
+  },
   "logistics-config": {
     primary: "DDA Logística",
     secondary: "Configuración",
@@ -286,9 +290,13 @@ export function activateView(
           buttonView === view
           || (
             buttonView
-              === "logistics-config"
-            && view
-              === "decision-dashboard"
+              === "logistics-overview"
+            && (
+              view
+                === "logistics-config"
+              || view
+                === "decision-dashboard"
+            )
           )
         );
 
