@@ -1202,6 +1202,8 @@ export function renderDatasetProfile(
       100,
     );
   }
+}
+
 
 function renderPreview(rows) {
   const head = (
