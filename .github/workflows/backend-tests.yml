@@ -1,6 +1,9 @@
 name: Backend and workspace tests
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
     branches:
       - main
@@ -43,6 +46,9 @@ jobs:
         run: |
           for file in app/static/js/api.js app/static/js/state.js app/static/js/ui.js app/static/js/app.js; do
             node --input-type=module --check < "$file"
+          done
+          for file in app/static/js/data-stage.js app/static/js/decision-stage.js; do
+            node --check "$file"
           done
 
       - name: Run automated tests
