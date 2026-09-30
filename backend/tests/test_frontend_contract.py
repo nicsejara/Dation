@@ -411,5 +411,52 @@ class FrontendContractTests(
         )
 
 
+    def test_dashboard_export_and_floating_chat_contract(
+        self,
+    ):
+        self.assertEqual(
+            self.html.count(
+                'id="export-decision"'
+            ),
+            1,
+        )
+        self.assertNotIn(
+            'id="download-json"',
+            self.html,
+        )
+        self.assertNotIn(
+            'id="back-to-config"',
+            self.html,
+        )
+        self.assertIn(
+            "application/json",
+            self.app_js,
+        )
+        self.assertNotIn(
+            "buildDecisionMarkdown(",
+            self.app_js,
+        )
+        self.assertIn(
+            'class="dation-chat-floating"',
+            self.html,
+        )
+        self.assertIn(
+            "dashboard-chat--floating",
+            self.html,
+        )
+        self.assertNotIn(
+            "chat-launch-panel",
+            self.html,
+        )
+        self.assertIn(
+            'id="chat-close"',
+            self.html,
+        )
+        self.assertIn(
+            "aria-expanded",
+            self.interpreter_stage_js,
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
