@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="light">
   <title>Dation · Decision Intelligence</title>
   <link rel="stylesheet" href="/static/css/tokens.css">
-  <link rel="stylesheet" href="/static/css/app.css?v=dashboard-v4-20260930">
+  <link rel="stylesheet" href="/static/css/app.css?v=workspace-v5-20260930">
 </head>
 <body>
   <div class="app-shell">
@@ -26,18 +26,6 @@
         <button class="nav-item is-active" data-view="inicio" type="button" onclick="window.dationNavigate && window.dationNavigate('inicio', null, event)">
           <span class="nav-icon" aria-hidden="true">⌂</span>
           <span>Inicio</span>
-        </button>
-        <button class="nav-item" data-view="logistics-overview" type="button" onclick="window.dationNavigate && window.dationNavigate('logistics-overview', 'dda', event)">
-          <span class="nav-icon" aria-hidden="true">◇</span>
-          <span>DDA Logística</span>
-        </button>
-        <button class="nav-item" data-view="traceability" type="button" onclick="window.dationNavigate && window.dationNavigate('traceability', null, event)">
-          <span class="nav-icon" aria-hidden="true">≡</span>
-          <span>Trazabilidad</span>
-        </button>
-        <button class="nav-item" data-view="settings" type="button" onclick="window.dationNavigate && window.dationNavigate('settings', null, event)">
-          <span class="nav-icon" aria-hidden="true">⚙</span>
-          <span>Configuración</span>
         </button>
       </nav>
 
@@ -230,12 +218,22 @@
                     type="button"
                     onclick="window.dationNavigate && window.dationNavigate('logistics-data', 'data', event)"
                   >
-                    Iniciar decisión
+                    Iniciar nueva decisión
                     <span aria-hidden="true">→</span>
                   </button>
 
-                  <span class="dda-overview__hero-note">
-                    El cálculo es determinístico. La IA sólo explica el resultado.
+                  <button
+                    class="button button--secondary button--large"
+                    id="open-latest-logistics-decision"
+                    type="button"
+                    disabled
+                  >
+                    Analizar mi última decisión
+                    <span aria-hidden="true">↗</span>
+                  </button>
+
+                  <span class="dda-overview__hero-note" id="latest-logistics-meta">
+                    Buscando la última decisión calculada…
                   </span>
                 </div>
               </div>
@@ -1731,9 +1729,10 @@
       window.dationRenderJourney('inicio');
     })();
   </script>
-  <script src="/static/js/data-stage.js?v=dashboard-v4-20260930"></script>
-  <script src="/static/js/dashboard-stage.js?v=dashboard-v4-20260930"></script>
-  <script src="/static/js/decision-stage.js?v=dashboard-v4-20260930"></script>
-  <script type="module" src="/static/js/app.js?v=dashboard-v4-20260930"></script>
+  <script src="/static/js/data-stage.js?v=workspace-v5-20260930"></script>
+  <script src="/static/js/dashboard-stage.js?v=workspace-v5-20260930"></script>
+  <script src="/static/js/interpreter-stage.js?v=workspace-v5-20260930"></script>
+  <script src="/static/js/decision-stage.js?v=workspace-v5-20260930"></script>
+  <script type="module" src="/static/js/app.js?v=workspace-v5-20260930"></script>
 </body>
 </html>
