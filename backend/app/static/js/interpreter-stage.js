@@ -5,6 +5,18 @@
     "dation.logistics.execution.v1"
   );
 
+  var F = (
+    window.DationDashboardFormatters
+    || {
+      normalizeBusinessText: function (value) {
+        return String(value || "");
+      },
+      objectiveLabel: function () {
+        return "Objetivo";
+      }
+    }
+  );
+
   var state = {
     runId: null,
     status: null,
@@ -155,6 +167,7 @@
     );
     var ask = $("#ask-decision");
     var toggle = $("#toggle-chat");
+    var fab = $("#dation-chat-fab");
 
     if (generate) {
       generate.disabled = !enabled;
@@ -167,6 +180,16 @@
     if (toggle) {
       toggle.disabled = !enabled;
     }
+
+    if (fab) {
+      fab.disabled = !enabled;
+    }
+  }
+
+  function cleanText(value) {
+    return F.normalizeBusinessText(
+      value == null ? "" : value
+    );
   }
 
   function listHtml(items) {
@@ -188,7 +211,9 @@
       + values.map(function (item) {
           return (
             "<li>"
-            + escapeHtml(item)
+            + escapeHtml(
+                cleanText(item)
+              )
             + "</li>"
           );
         }).join("")
@@ -196,11 +221,117 @@
     );
   }
 
+  function currentConfiguration() {
+    var context = executionContext();
+    var run = (
+      context
+      && context.run
+    );
+
+    return (
+      run
+      && (
+        run.configuration_json
+        || (
+          run.result_json
+          && run.result_json
+            .configuration
+        )
+      )
+    )
+    || {};
+  }
+
+  function summaryTitle() {
+    return (
+      "Recomendación: "
+      + F.objectiveLabel(
+          currentConfiguration()
+        )
+          .replace(/^Minimizar/, "minimizar")
+          .replace(/^Objetivo/, "objetivo")
+    );
+  }
+
+  function copyableExplanationText(
+    explanation
+  ) {
+    if (!explanation) {
+      return "";
+    }
+
+    var lines = [
+      summaryTitle(),
+      "",
+      cleanText(
+        explanation.executive_summary
+      ),
+      "",
+      "Recomendación:",
+      cleanText(
+        explanation.recommendation
+      ),
+      "",
+      "Por qué:",
+      cleanText(
+        explanation.why_recommended
+      ),
+      "",
+      "Principales drivers:",
+      (
+        explanation.key_drivers
+        || []
+      ).map(function (item) {
+        return (
+          "- " + cleanText(item)
+        );
+      }).join("\n"),
+      "",
+      "Trade-offs:",
+      (
+        explanation.tradeoffs
+        || []
+      ).map(function (item) {
+        return (
+          "- " + cleanText(item)
+        );
+      }).join("\n"),
+      "",
+      "Supuestos:",
+      (
+        explanation.assumptions
+        || []
+      ).map(function (item) {
+        return (
+          "- " + cleanText(item)
+        );
+      }).join("\n"),
+      "",
+      "Riesgos y limitaciones:",
+      (
+        explanation.caveats
+        || []
+      ).map(function (item) {
+        return (
+          "- " + cleanText(item)
+        );
+      }).join("\n")
+    ];
+
+    return lines.join("\n");
+  }
+
   function renderExplanation(
     explanation
   ) {
     var container = (
       $("#executive-insight")
+    );
+    var title = (
+      $("#ai-summary-title")
+    );
+    var copyButton = (
+      $("#copy-explanation")
     );
 
     if (!container) {
@@ -211,78 +342,110 @@
       container.classList.add(
         "is-hidden"
       );
+
+      if (copyButton) {
+        copyButton.disabled = true;
+      }
+
       return;
     }
 
+    if (title) {
+      title.textContent = (
+        summaryTitle()
+      );
+    }
+
+    var risk = (
+      explanation.caveats
+      && explanation.caveats.length
+        ? explanation.caveats[0]
+        : (
+          explanation.assumptions
+          && explanation.assumptions.length
+            ? explanation.assumptions[0]
+            : "La recomendación depende de los supuestos del modelo."
+        )
+    );
+
+    var summaryBullets = [
+      cleanText(
+        explanation.recommendation
+      ),
+      cleanText(
+        explanation.executive_summary
+      ),
+      cleanText(risk)
+    ];
+
     container.innerHTML = (
-      '<div class="insight-hero">'
-      + '<span class="section-kicker">Resumen ejecutivo</span>'
-      + "<h3>"
-      + escapeHtml(
-          explanation.recommendation
-        )
-      + "</h3>"
-      + "<p>"
-      + escapeHtml(
-          explanation.executive_summary
-        )
-      + "</p>"
+      '<div class="ai-summary-card">'
+      + "<h3>En resumen</h3>"
+      + '<ul class="ai-summary-list">'
+      + summaryBullets.map(
+        function (item) {
+          return (
+            "<li>"
+            + escapeHtml(item)
+            + "</li>"
+          );
+        }
+      ).join("")
+      + "</ul>"
       + "</div>"
-      + '<div class="insight-grid">'
-      + '<div class="insight-column">'
-      + '<div class="insight-section"><h4>Por qué aparece esta recomendación</h4><p>'
+      + '<div class="ai-accordion">'
+      + "<details open>"
+      + "<summary>Por qué esta recomendación</summary>"
+      + '<div class="ai-accordion__body"><p>'
       + escapeHtml(
-          explanation.why_recommended
+          cleanText(
+            explanation.why_recommended
+          )
         )
       + "</p></div>"
-      + '<div class="insight-section"><h4>Principales drivers</h4>'
+      + "</details>"
+      + "<details>"
+      + "<summary>Principales drivers</summary>"
+      + '<div class="ai-accordion__body">'
       + listHtml(
           explanation.key_drivers
         )
       + "</div>"
-      + '<div class="insight-section"><h4>Trade-offs</h4>'
+      + "</details>"
+      + "<details>"
+      + "<summary>Trade-offs</summary>"
+      + '<div class="ai-accordion__body">'
       + listHtml(
           explanation.tradeoffs
         )
-      + "</div></div>"
-      + '<div class="insight-column">'
-      + '<div class="insight-section"><h4>Impacto de negocio</h4>'
-      + '<div class="insight-impact">'
-      + "<div><span>Costo</span><strong>"
-      + escapeHtml(
-          explanation.business_impact
-          && explanation.business_impact.cost
-        )
-      + "</strong></div>"
-      + "<div><span>Viajes</span><strong>"
-      + escapeHtml(
-          explanation.business_impact
-          && explanation.business_impact.trips
-        )
-      + "</strong></div>"
-      + "<div><span>Distancia</span><strong>"
-      + escapeHtml(
-          explanation.business_impact
-          && explanation.business_impact.distance
-        )
-      + "</strong></div>"
-      + "</div></div>"
-      + '<div class="insight-section"><h4>Supuestos relevantes</h4>'
+      + "</div>"
+      + "</details>"
+      + "<details>"
+      + "<summary>Supuestos</summary>"
+      + '<div class="ai-accordion__body">'
       + listHtml(
           explanation.assumptions
         )
       + "</div>"
-      + '<div class="insight-section"><h4>Caveats</h4>'
+      + "</details>"
+      + "<details>"
+      + "<summary>Riesgos y limitaciones</summary>"
+      + '<div class="ai-accordion__body">'
       + listHtml(
           explanation.caveats
         )
-      + "</div></div></div>"
+      + "</div>"
+      + "</details>"
+      + "</div>"
     );
 
     container.classList.remove(
       "is-hidden"
     );
 
+    if (copyButton) {
+      copyButton.disabled = false;
+    }
   }
 
   function appendMessage(
@@ -313,6 +476,12 @@
         : "Dation Interpreter"
     );
 
+    var displayedContent = (
+      role === "assistant"
+        ? cleanText(content)
+        : content
+    );
+
     thread.insertAdjacentHTML(
       "beforeend",
       '<div class="'
@@ -322,7 +491,9 @@
       + "</div><div><strong>"
       + label
       + "</strong><p>"
-      + escapeHtml(content)
+      + escapeHtml(
+          displayedContent
+        )
       + "</p></div></div>"
     );
 
@@ -448,7 +619,7 @@
   }
 
   async function refreshStatus() {
-    var meta = $("#ai-dashboard-meta");
+    var details = $("#details-ai");
 
     try {
       var status = await request(
@@ -457,17 +628,17 @@
 
       state.status = status;
 
-      if (meta) {
-        meta.textContent = (
+      if (details) {
+        details.textContent = (
           status.configured
             ? (
               status.provider
               + " · "
               + status.model
-              + " · Knowledge "
+              + " · conocimiento "
               + status.knowledge_version
             )
-            : "Intérprete IA no configurado"
+            : "No configurado"
         );
       }
 
@@ -482,9 +653,9 @@
         configured: false
       };
 
-      if (meta) {
-        meta.textContent = (
-          "Intérprete IA no disponible"
+      if (details) {
+        details.textContent = (
+          "No disponible"
         );
       }
 
@@ -570,6 +741,7 @@
   function setChatOpen(open) {
     var panel = $("#chat-panel");
     var button = $("#toggle-chat");
+    var fab = $("#dation-chat-fab");
     var question = (
       $("#decision-question")
     );
@@ -592,6 +764,17 @@
       "aria-expanded",
       open ? "true" : "false"
     );
+
+    if (fab) {
+      fab.setAttribute(
+        "aria-expanded",
+        open ? "true" : "false"
+      );
+      fab.classList.toggle(
+        "is-open",
+        open
+      );
+    }
 
     if (open && question) {
       window.setTimeout(
@@ -731,6 +914,8 @@
       $("#generate-explanation")
     );
     var toggle = $("#toggle-chat");
+    var fab = $("#dation-chat-fab");
+    var copy = $("#copy-explanation");
     var ask = $("#ask-decision");
     var close = $("#chat-close");
     var question = (
@@ -749,6 +934,49 @@
       toggle.addEventListener(
         "click",
         toggleChat
+      );
+    }
+
+    if (fab) {
+      fab.addEventListener(
+        "click",
+        toggleChat
+      );
+    }
+
+    if (copy) {
+      copy.addEventListener(
+        "click",
+        function () {
+          var text = (
+            copyableExplanationText(
+              state.explanation
+            )
+          );
+
+          if (
+            text
+            && navigator.clipboard
+            && navigator.clipboard
+              .writeText
+          ) {
+            navigator.clipboard
+              .writeText(text);
+
+            copy.textContent = (
+              "Copiado"
+            );
+
+            window.setTimeout(
+              function () {
+                copy.textContent = (
+                  "Copiar"
+                );
+              },
+              1200
+            );
+          }
+        }
       );
     }
 
