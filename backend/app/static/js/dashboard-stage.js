@@ -2082,23 +2082,19 @@
       return;
     }
 
-    if (!stored && urlRunId) {
+    if (!stored) {
       stored = {
         runId: urlRunId,
         status: "running"
       };
     }
 
-    if (
-      urlRunId
-      && stored.runId !== urlRunId
-    ) {
+    if (urlRunId) {
       stored = Object.assign(
         {},
         stored,
         {
-          runId: urlRunId,
-          status: "running"
+          runId: urlRunId
         }
       );
     }
@@ -2106,19 +2102,35 @@
     saveContext(stored);
 
     if (
-      stored.status === "running"
-      || stored.status === "timeout"
+      typeof window.dationNavigate
+      === "function"
     ) {
-      if (
-        typeof window.dationNavigate
-        === "function"
-      ) {
-        window.dationNavigate(
-          "decision-dashboard"
-        );
-      }
+      window.dationNavigate(
+        "decision-dashboard"
+      );
+    }
 
+    if (
+      stored.status === "completed"
+      && stored.run
+      && stored.run.id === stored.runId
+    ) {
+      window.dationDashboardCompleted(
+        stored.run,
+        stored.dataset,
+        stored.profile
+      );
+      return;
+    }
+
+    /*
+     * Siempre verificamos el run persistido si existe un run_id.
+     * Esto permite recuperar una corrida aunque la sesión anterior
+     * haya quedado en timeout, error visual o "espera detenida".
+     */
+    if (stored.runId) {
       showRunning();
+      state.pollAttempts = 0;
       pollCurrentRun();
     }
   }
