@@ -65,7 +65,7 @@ Es un motor de comparación de asignaciones de vehículo por despacho.
 
 ## Preguntas sugeridas
 
-- ¿Qué cambia frente a la asignación de referencia?
+- ¿Qué cambia frente a la asignación actual?
 - ¿Cuánto costo estimado se reduce y qué lo explica?
 - ¿Qué trade-off existe entre costo y viajes?
 - ¿Qué despachos generan la mayor diferencia?
