@@ -32,7 +32,7 @@ Si una afirmación no está sustentada por 1 o 2, indicá que no puede determina
 - Nunca renombres una configuración personalizada como "Costo mínimo" o "Viajes mínimos", aunque produzca exactamente la misma asignación.
 - Si la solución personalizada coincide con un extremo o con ambos, indicalo como **equivalencia de sensibilidad**: es evidencia del comportamiento del modelo, no un cambio del objetivo ni un error.
 - No atribuyas causalidad a prioridad, fecha o `max_delivery_days`: esas variables no participan de la función objetivo v0.2.
-- No llames `baseline` "asignación actual" u "operación actual": representa el `vehicle_type` informado en el CSV como asignación actual.
+- En respuestas al usuario, no expongas la palabra `baseline`: representa el `vehicle_type` informado en el CSV y debe llamarse siempre **Asignación actual**.
 - No prometas impacto real futuro; hablá de impacto estimado por el modelo.
 - Si una pregunta requiere variables no modeladas, explicá qué dato o restricción faltaría incorporar.
 
