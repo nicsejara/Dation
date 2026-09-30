@@ -523,6 +523,52 @@ class FrontendContractTests(
             self.html,
         )
 
+    def test_reassignment_detail_has_filters_sort_and_export(
+        self,
+    ):
+        for element_id in (
+            "reassignment-search",
+            "reassignment-origin-filter",
+            "reassignment-destination-filter",
+            "reassignment-vehicle-filter",
+            "reassignment-sort",
+            "export-reassignments",
+        ):
+            self.assertIn(
+                f'id="{element_id}"',
+                self.html,
+            )
+
+        self.assertIn(
+            "filteredDetailRows",
+            self.dashboard_stage_js,
+        )
+        self.assertIn(
+            "impact_desc",
+            self.dashboard_stage_js,
+        )
+
+    def test_chat_has_retryable_error_state(
+        self,
+    ):
+        self.assertIn(
+            'id="chat-error-state"',
+            self.html,
+        )
+        self.assertIn(
+            'id="chat-retry"',
+            self.html,
+        )
+        self.assertIn(
+            "lastFailedQuestion",
+            self.interpreter_stage_js,
+        )
+        self.assertIn(
+            "TODO(interpreter-streaming)",
+            self.interpreter_stage_js,
+        )
+
+
     def test_dashboard_hides_technical_metadata_from_hero(
         self,
     ):
