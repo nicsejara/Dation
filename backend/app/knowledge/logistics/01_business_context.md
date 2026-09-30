@@ -22,7 +22,7 @@ El despacho contiene, entre otros datos:
 - origen,
 - destino,
 - distancia,
-- vehículo actualmente asignado,
+- vehículo informado como asignación de referencia,
 - capacidad del vehículo,
 - costo por kilómetro,
 - costo fijo por viaje.
@@ -35,9 +35,9 @@ En v0.2 se supone que todos los tipos detectados pueden evaluarse para todos los
 
 ## Escenarios
 
-### Situación actual
+### Asignación de referencia
 
-Representa la asignación que llega en el CSV. Es baseline y sirve para medir el impacto potencial de adoptar una recomendación.
+Representa el tipo de vehículo informado en cada fila del CSV. Es `baseline` y se usa únicamente como referencia comparativa para medir el impacto potencial de adoptar otra asignación. No implica, por sí sola, que represente la situación operativa actual.
 
 ### Costo mínimo
 
@@ -59,7 +59,7 @@ Los extremos 100% costo y 100% viajes enmarcan la configuración seleccionada. P
 
 Baseline y extremos cumplen funciones diferentes:
 
-- baseline: mide cambio frente a la operación actual;
+- baseline: mide cambio frente a la asignación de referencia del dataset;
 - extremos: muestran sensibilidad frente a las preferencias.
 
 ## Interpretación correcta de "recomendado"
@@ -72,8 +72,8 @@ No significa que sea universalmente superior en servicio, capacidad real de flot
 
 ## Preguntas que v0.2 sí puede responder
 
-- ¿Cuál es el costo estimado de la situación actual?
-- ¿Cuánto cambia el costo frente a baseline?
+- ¿Cuál es el costo estimado de la asignación de referencia?
+- ¿Cuánto cambia el costo frente a la asignación de referencia?
 - ¿Cuántos viajes cambian?
 - ¿Qué diferencia de kilómetros existe?
 - ¿Qué despachos cambian de vehículo?
