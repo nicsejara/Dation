@@ -348,66 +348,6 @@ export function renderSystemStatus(
   supabaseOk,
   interpreter,
 ) {
-  const element = (
-    $("#system-status")
-  );
-
-  if (element) {
-    const dot = (
-      element.querySelector(
-        ".status-dot"
-      )
-    );
-
-    if (
-      supabaseOk
-      && interpreter?.configured
-    ) {
-      dot.className = (
-        "status-dot status-dot--live"
-      );
-      element.lastChild.textContent = (
-        " Sistemas operativos"
-      );
-    } else if (supabaseOk) {
-      dot.className = (
-        "status-dot status-dot--pending"
-      );
-      element.lastChild.textContent = (
-        " Core activo · IA pendiente"
-      );
-    } else {
-      dot.className = (
-        "status-dot status-dot--danger"
-      );
-      element.lastChild.textContent = (
-        " Revisar servicios"
-      );
-    }
-  }
-
-  const statAi = $("#stat-ai");
-  const statAiDetail = $("#stat-ai-detail");
-
-  if (statAi) {
-    statAi.textContent = (
-      interpreter?.configured
-        ? "Disponible"
-        : "Pendiente"
-    );
-  }
-
-  if (statAiDetail) {
-    statAiDetail.textContent = (
-      interpreter?.configured
-        ? (
-          `${interpreter.provider}`
-          + ` · ${interpreter.model}`
-        )
-        : "proveedor no configurado"
-    );
-  }
-
   const settingsStatus = $("#settings-ai-status");
   const settingsProvider = $("#settings-ai-provider");
   const settingsModel = $("#settings-ai-model");
@@ -445,47 +385,24 @@ export function renderSystemStatus(
   renderInterpreterMeta(
     interpreter
   );
+
+  return {
+    supabaseOk,
+    interpreterConfigured: Boolean(
+      interpreter?.configured
+    ),
+  };
 }
+
 
 export function renderHomeSummary(
   summary,
   runs,
 ) {
-  const datasets = $("#stat-datasets");
-  const runsCount = $("#stat-runs");
-  const latestRun = $("#latest-run-label");
-
-  if (datasets) {
-    datasets.textContent = (
-      formatNumber(
-        summary?.datasets ?? 0
-      )
-    );
-  }
-
-  if (runsCount) {
-    runsCount.textContent = (
-      formatNumber(
-        summary?.runs ?? 0
-      )
-    );
-  }
-
-  if (latestRun) {
-    const latest = (
-      Array.isArray(runs)
-        ? runs[0]
-        : null
-    );
-
-    latestRun.textContent = (
-      latest
-        ? formatDate(
-            latest.created_at
-          )
-        : "Sin ejecuciones"
-    );
-  }
+  return {
+    summary,
+    runs,
+  };
 }
 
 function translatedRunStatus(
