@@ -1369,6 +1369,11 @@
 
             <div id="chat-thread" class="chat-thread"></div>
 
+            <div id="chat-error-state" class="chat-error-state is-hidden">
+              <span>No se pudo completar la última pregunta.</span>
+              <button class="text-button" id="chat-retry" type="button">Reintentar</button>
+            </div>
+
             <div class="chat-composer">
               <textarea
                 id="decision-question"
@@ -1401,10 +1406,26 @@
               </div>
 
               <div class="reassignment-toolbar">
-                <input id="reassignment-search" type="search" placeholder="Buscar ID, origen, destino o producto">
+                <input id="reassignment-search" type="search" placeholder="Buscar ID, corredor o producto">
+
+                <select id="reassignment-origin-filter" aria-label="Filtrar por origen">
+                  <option value="">Todos los orígenes</option>
+                </select>
+
+                <select id="reassignment-destination-filter" aria-label="Filtrar por destino">
+                  <option value="">Todos los destinos</option>
+                </select>
+
                 <select id="reassignment-vehicle-filter" aria-label="Filtrar por camión de destino">
                   <option value="">Todos los camiones</option>
                 </select>
+
+                <select id="reassignment-sort" aria-label="Ordenar reasignaciones">
+                  <option value="impact_desc">Mayor impacto en costo</option>
+                  <option value="trips_desc">Más viajes evitados</option>
+                  <option value="corridor_asc">Corredor A–Z</option>
+                </select>
+
                 <button class="button button--secondary" id="export-reassignments" type="button">
                   Exportar detalle
                 </button>
