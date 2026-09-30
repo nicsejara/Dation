@@ -560,8 +560,8 @@
     }
   }
 
-  function closeModal() {
-    if (state.running) {
+  function closeModal(force) {
+    if (state.running && !force) {
       return;
     }
 
@@ -725,7 +725,7 @@
         );
       }
 
-      closeModal();
+      closeModal(true);
     } catch (error) {
       showModalError(
         error.message
