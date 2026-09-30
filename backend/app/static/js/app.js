@@ -9,20 +9,14 @@ import {
   getRuns,
   getSupabaseStatus,
   getWorkspaceSummary,
-  runDecision,
-  uploadDataset,
 } from "./api.js";
 
 import {
-  decisionConfiguration,
   restoreRunConfiguration,
   setActiveDataset,
   setActiveRun,
-  setCostWeight,
-  setCustomMode,
   setDatasetProfile,
   setDatasets,
-  setDecisionPreset,
   setExplanation,
   setInterpreter,
   setMessages,
@@ -39,12 +33,10 @@ import {
   activateView,
   appendChatMessage,
   buildDecisionMarkdown,
-  hideInlineStatus,
   renderActiveDataset,
   renderDashboard,
   renderDatasetProfile,
   renderDatasetsTable,
-  renderDecisionConfiguration,
   renderExplanation,
   renderHomeSummary,
   renderInterpreterMeta,
@@ -55,7 +47,6 @@ import {
   resetChat,
   showInlineStatus,
   toast,
-  updateExecutionReadiness,
 } from "./ui.js";
 
 
@@ -261,110 +252,6 @@ function clearDecisionState() {
   resetChat([]);
   $("#download-json").disabled = true;
   $("#export-decision").disabled = true;
-}
-
-
-async function loadDatasetProfile(
-  dataset,
-) {
-  $("#data-config-state")
-    .innerHTML = (
-      '<span class="status-dot status-dot--pending"></span>'
-      + " Analizando dataset"
-    );
-
-  try {
-    const profile = (
-      await getDatasetProfile(
-        dataset.id
-      )
-    );
-
-    setDatasetProfile(
-      profile
-    );
-
-    renderDatasetProfile(
-      profile
-    );
-
-    $("#data-config-state")
-      .innerHTML = (
-        '<span class="status-dot status-dot--live"></span>'
-        + " Dataset válido"
-      );
-
-    updateExecutionReadiness();
-
-    return profile;
-  } catch (error) {
-    setDatasetProfile(null);
-    renderDatasetProfile(null);
-
-    $("#data-config-state")
-      .innerHTML = (
-        '<span class="status-dot status-dot--danger"></span>'
-        + " Perfil no disponible"
-      );
-
-    updateExecutionReadiness();
-
-    throw error;
-  }
-}
-
-
-async function selectDataset(
-  dataset,
-  {
-    navigateToDda = false,
-  } = {},
-) {
-  setActiveDataset(
-    dataset
-  );
-
-  setDatasetProfile(null);
-  clearDecisionState();
-
-  renderActiveDataset(
-    dataset
-  );
-
-  renderWorkspaceDatasets(
-    state.datasets
-  );
-
-  if (navigateToDda) {
-    navigate(
-      "logistics-data"
-    );
-  }
-
-  try {
-    await loadDatasetProfile(
-      dataset
-    );
-
-    if (navigateToDda) {
-      window.setTimeout(
-        () => {
-          $("#dataset-profile-panel")
-            ?.scrollIntoView({
-              behavior: "smooth",
-              block: "center",
-            });
-        },
-        140,
-      );
-    }
-  } catch (error) {
-    toast(
-      "El dataset fue seleccionado, pero no se pudo generar su perfil: "
-      + error.message,
-      "error",
-    );
-  }
 }
 
 
@@ -753,307 +640,6 @@ function bindDecisionStageBridge() {
     );
   }
 }
-
-function bindUpload() {
-  const input = (
-    $("#dataset-file")
-  );
-  const browse = (
-    $("#browse-file")
-  );
-  const dropzone = (
-    $("#upload-dropzone")
-  );
-  const progress = (
-    $("#upload-progress")
-  );
-
-  browse.addEventListener(
-    "click",
-    () => input.click()
-  );
-
-  async function handleFile(file) {
-    if (!file) {
-      return;
-    }
-
-    if (
-      !file.name
-        .toLowerCase()
-        .endsWith(".csv")
-    ) {
-      showInlineStatus(
-        progress,
-        "Sólo se admiten archivos CSV.",
-        "error",
-      );
-      return;
-    }
-
-    browse.disabled = true;
-    browse.textContent = (
-      "Validando…"
-    );
-
-    showInlineStatus(
-      progress,
-      "Validando schema y almacenando evidencia original…",
-      "loading",
-    );
-
-    try {
-      const result = (
-        await uploadDataset(file)
-      );
-
-      const datasetId = (
-        result.duplicate
-          ? result.existing_dataset.id
-          : result.dataset.id
-      );
-
-      await refreshDatasets();
-
-      const dataset = (
-        datasetById(
-          datasetId
-        )
-      );
-
-      if (!dataset) {
-        throw new Error(
-          "El dataset se almacenó, pero no pudo recargarse."
-        );
-      }
-
-      await selectDataset(
-        dataset
-      );
-
-      showInlineStatus(
-        progress,
-        result.duplicate
-          ? (
-            "El archivo ya existía. "
-            + "Se reutilizó el dataset almacenado."
-          )
-          : (
-            "Dataset validado correctamente: "
-            + `${result.validation.rows} filas y `
-            + `${result.validation.columns} columnas.`
-          ),
-        "success",
-      );
-
-      await refreshSummary();
-
-      toast(
-        result.duplicate
-          ? "Dataset existente reutilizado."
-          : "Dataset validado y almacenado."
-      );
-    } catch (error) {
-      showInlineStatus(
-        progress,
-        error.message,
-        "error",
-      );
-    } finally {
-      browse.disabled = false;
-      browse.textContent = (
-        "Seleccionar archivo CSV"
-      );
-      input.value = "";
-    }
-  }
-
-  input.addEventListener(
-    "change",
-    () => handleFile(
-      input.files?.[0]
-    )
-  );
-
-  [
-    "dragenter",
-    "dragover",
-  ].forEach(
-    (type) => {
-      dropzone.addEventListener(
-        type,
-        (event) => {
-          event.preventDefault();
-          dropzone.classList.add(
-            "is-dragging"
-          );
-        }
-      );
-    }
-  );
-
-  [
-    "dragleave",
-    "drop",
-  ].forEach(
-    (type) => {
-      dropzone.addEventListener(
-        type,
-        (event) => {
-          event.preventDefault();
-          dropzone.classList.remove(
-            "is-dragging"
-          );
-        }
-      );
-    }
-  );
-
-  dropzone.addEventListener(
-    "drop",
-    (event) => {
-      handleFile(
-        event.dataTransfer
-          ?.files?.[0]
-      );
-    }
-  );
-}
-
-
-function bindDecisionConfiguration() {
-  $("#decision-mode-grid")
-    .addEventListener(
-      "click",
-      (event) => {
-        const card = (
-          event.target.closest(
-            "[data-decision-mode]"
-          )
-        );
-
-        if (!card) {
-          return;
-        }
-
-        if (
-          card.dataset
-            .decisionMode
-          === "custom"
-        ) {
-          setCustomMode();
-        } else {
-          setDecisionPreset(
-            card.dataset.objective
-          );
-        }
-
-        renderDecisionConfiguration();
-      }
-    );
-
-  $("#cost-weight-slider")
-    .addEventListener(
-      "input",
-      (event) => {
-        setCostWeight(
-          event.target.value
-        );
-        renderDecisionConfiguration();
-      }
-    );
-}
-
-
-function bindDecisionExecution() {
-  const button = (
-    $("#run-decision")
-  );
-
-  const progress = (
-    $("#run-progress")
-  );
-
-  button.addEventListener(
-    "click",
-    async () => {
-      if (
-        !state.activeDataset
-        || !state.datasetProfile
-      ) {
-        return;
-      }
-
-      button.disabled = true;
-      button.classList.add(
-        "is-loading"
-      );
-      button.textContent = (
-        "Calculando decisión…"
-      );
-
-      showInlineStatus(
-        progress,
-        "Analizando alternativas y persistiendo la evidencia de la corrida…",
-        "loading",
-      );
-
-      try {
-        const run = await runDecision(
-          state.activeDataset.id,
-          decisionConfiguration(),
-        );
-
-        setActiveRun(run);
-        setExplanation(null);
-        setMessages([]);
-
-        renderDashboard(
-          run,
-          state.datasetProfile,
-        );
-
-        renderExplanation(null);
-        resetChat([]);
-
-        renderInterpreterMeta(
-          state.interpreter
-        );
-
-        showInlineStatus(
-          progress,
-          "Decisión calculada y persistida correctamente.",
-          "success",
-        );
-
-        await Promise.all([
-          refreshRuns(),
-          refreshSummary(),
-          refreshDatasets(),
-        ]);
-
-        navigate(
-          "decision-dashboard"
-        );
-      } catch (error) {
-        showInlineStatus(
-          progress,
-          error.message,
-          "error",
-        );
-      } finally {
-        button.classList.remove(
-          "is-loading"
-        );
-        button.textContent = (
-          "Ejecutar decisión"
-        );
-        updateExecutionReadiness();
-      }
-    }
-  );
-}
-
 
 function bindInterpreter() {
   const generate = (
