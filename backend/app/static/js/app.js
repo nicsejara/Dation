@@ -540,6 +540,21 @@ function bindNavigation() {
     }
   );
 
+  const homeLogistics = $("#home-open-logistics");
+
+  if (homeLogistics) {
+    homeLogistics.addEventListener(
+      "click",
+      (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        navigate(
+          "logistics-config"
+        );
+      }
+    );
+  }
+
   $("#back-to-config")
     .addEventListener(
       "click",
