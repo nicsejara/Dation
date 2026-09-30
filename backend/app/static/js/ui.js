@@ -406,20 +406,27 @@ export function renderSystemStatus(
     );
   }
 
-  $("#stat-ai").textContent = (
-    interpreter?.configured
-      ? "Disponible"
-      : "Pendiente"
-  );
+  const statAi = $("#stat-ai");
+  const statAiDetail = $("#stat-ai-detail");
 
-  $("#stat-ai-detail").textContent = (
-    interpreter?.configured
-      ? (
-        `${interpreter.provider}`
-        + ` · ${interpreter.model}`
-      )
-      : "proveedor no configurado"
-  );
+  if (statAi) {
+    statAi.textContent = (
+      interpreter?.configured
+        ? "Disponible"
+        : "Pendiente"
+    );
+  }
+
+  if (statAiDetail) {
+    statAiDetail.textContent = (
+      interpreter?.configured
+        ? (
+          `${interpreter.provider}`
+          + ` · ${interpreter.model}`
+        )
+        : "proveedor no configurado"
+    );
+  }
 
   $("#settings-ai-status")
     .textContent = (
@@ -456,34 +463,42 @@ export function renderHomeSummary(
   summary,
   runs,
 ) {
-  $("#stat-datasets").textContent = (
-    formatNumber(
-      summary?.datasets ?? 0
-    )
-  );
+  const datasets = $("#stat-datasets");
+  const runsCount = $("#stat-runs");
+  const latestRun = $("#latest-run-label");
 
-  $("#stat-runs").textContent = (
-    formatNumber(
-      summary?.runs ?? 0
-    )
-  );
+  if (datasets) {
+    datasets.textContent = (
+      formatNumber(
+        summary?.datasets ?? 0
+      )
+    );
+  }
 
-  const latest = (
-    Array.isArray(runs)
-    ? runs[0]
-    : null
-  );
+  if (runsCount) {
+    runsCount.textContent = (
+      formatNumber(
+        summary?.runs ?? 0
+      )
+    );
+  }
 
-  $("#latest-run-label")
-    .textContent = (
+  if (latestRun) {
+    const latest = (
+      Array.isArray(runs)
+        ? runs[0]
+        : null
+    );
+
+    latestRun.textContent = (
       latest
         ? formatDate(
             latest.created_at
           )
         : "Sin ejecuciones"
     );
+  }
 }
-
 
 function translatedRunStatus(
   status
