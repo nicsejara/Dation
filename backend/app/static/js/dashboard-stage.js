@@ -117,6 +117,7 @@
 
   function saveContext(context) {
     state.context = context;
+    window.dationDashboardContext = context;
 
     try {
       sessionStorage.setItem(
@@ -665,6 +666,71 @@
     return "Costo mínimo";
   }
 
+  function recommendationCopy(
+    run,
+    config
+  ) {
+    var result = run.result_json || {};
+    var sensitivity = (
+      result.sensitivity || {}
+    );
+
+    if (config.mode !== "custom") {
+      return (
+        "Resultado del motor para el objetivo "
+        + scenarioLabel(
+            result.recommended_scenario
+          )
+        + "."
+      );
+    }
+
+    var base = (
+      "Resultado de la configuración personalizada "
+      + weightLabel(config)
+      + "."
+    );
+
+    if (
+      sensitivity.matches_scenario
+      === "both_extremes"
+    ) {
+      return (
+        base
+        + " En este dataset la asignación coincide con los extremos "
+        + "de costo mínimo y viajes mínimos; esto es un resultado de "
+        + "sensibilidad, no un cambio del objetivo configurado."
+      );
+    }
+
+    if (
+      sensitivity.matches_scenario
+      === "min_cost"
+    ) {
+      return (
+        base
+        + " La asignación coincide con el extremo de costo mínimo, "
+        + "pero la decisión evaluada sigue siendo la configuración personalizada."
+      );
+    }
+
+    if (
+      sensitivity.matches_scenario
+      === "min_trips"
+    ) {
+      return (
+        base
+        + " La asignación coincide con el extremo de viajes mínimos, "
+        + "pero la decisión evaluada sigue siendo la configuración personalizada."
+      );
+    }
+
+    return (
+      base
+      + " La asignación resultante es distinta de ambos extremos."
+    );
+  }
+
   function assignmentMap(scenario) {
     var map = new Map();
 
@@ -1192,20 +1258,9 @@
     );
     setText(
       "dashboard-recommendation-copy",
-      (
-        config.mode === "custom"
-          ? (
-            "Resultado del motor para "
-            + weightLabel(config)
-            + "."
-          )
-          : (
-            "Resultado del motor para el objetivo "
-            + scenarioLabel(
-                result.recommended_scenario
-              )
-            + "."
-          )
+      recommendationCopy(
+        run,
+        config
       )
     );
     setText(
@@ -1932,6 +1987,7 @@
 
     saveContext(context);
     setRunInUrl(run.id);
+    updateLatestDecisionCta(run);
 
     var shell = (
       $("#dashboard-execution-state")
@@ -1960,6 +2016,20 @@
       );
 
       renderEnhancedDashboard(run);
+
+      window.dispatchEvent(
+        new CustomEvent(
+          "dation:dashboard-completed",
+          {
+            detail: {
+              run: run,
+              dataset: dataset,
+              profile: profile,
+              context: context
+            }
+          }
+        )
+      );
     } catch (error) {
       showError(
         "La corrida terminó correctamente, pero no se pudo renderizar el resultado: "
@@ -2135,6 +2205,143 @@
     }
   }
 
+  function latestDecisionButton() {
+    return $("#open-latest-logistics-decision");
+  }
+
+  function latestDecisionMeta() {
+    return $("#latest-logistics-meta");
+  }
+
+  function updateLatestDecisionCta(
+    run
+  ) {
+    var button = latestDecisionButton();
+    var meta = latestDecisionMeta();
+
+    if (!button || !meta) {
+      return;
+    }
+
+    if (!run) {
+      button.disabled = true;
+      meta.textContent = (
+        "Todavía no hay decisiones completadas para analizar."
+      );
+      return;
+    }
+
+    button.disabled = false;
+    button.dataset.runId = run.id;
+    meta.textContent = (
+      "Última corrida completada · "
+      + shortId(run.id)
+      + " · "
+      + formatDate(
+          run.finished_at
+          || run.created_at
+        )
+    );
+  }
+
+  async function findLatestCompletedRun() {
+    var payload = await requestJson(
+      "/api/runs?limit=30"
+    );
+
+    var items = (
+      payload
+      && Array.isArray(payload.items)
+        ? payload.items
+        : []
+    );
+
+    return (
+      items.find(function (run) {
+        return (
+          run.status === "completed"
+          && run.result_json
+        );
+      })
+      || null
+    );
+  }
+
+  async function refreshLatestDecisionCta() {
+    try {
+      var latest = await findLatestCompletedRun();
+      updateLatestDecisionCta(latest);
+      return latest;
+    } catch (error) {
+      var meta = latestDecisionMeta();
+
+      if (meta) {
+        meta.textContent = (
+          "No se pudo consultar la última decisión."
+        );
+      }
+
+      return null;
+    }
+  }
+
+  async function openLatestDecision() {
+    var button = latestDecisionButton();
+
+    if (button) {
+      button.disabled = true;
+      button.textContent = "Abriendo última decisión…";
+    }
+
+    try {
+      var latest = await findLatestCompletedRun();
+
+      if (!latest) {
+        updateLatestDecisionCta(null);
+        return;
+      }
+
+      saveContext({
+        runId: latest.id,
+        run: latest,
+        status: "completed",
+        finishedAt: (
+          latest.finished_at
+          || latest.created_at
+        )
+      });
+
+      setRunInUrl(latest.id);
+
+      if (
+        typeof window.dationNavigate
+        === "function"
+      ) {
+        window.dationNavigate(
+          "decision-dashboard"
+        );
+      }
+
+      await recoverRun(latest);
+      updateLatestDecisionCta(latest);
+    } catch (error) {
+      showError(
+        "No se pudo abrir la última decisión: "
+        + error.message
+      );
+    } finally {
+      if (button) {
+        button.textContent = (
+          "Analizar mi última decisión ↗"
+        );
+      }
+    }
+  }
+
+  window.dationOpenLatestDecision = (
+    openLatestDecision
+  );
+
   function bindControls() {
     var retryStatusButton = (
       $("#dashboard-retry-status")
@@ -2167,11 +2374,21 @@
       );
     }
 
+    var latestButton = latestDecisionButton();
+
+    if (latestButton) {
+      latestButton.addEventListener(
+        "click",
+        openLatestDecision
+      );
+    }
+
     bindComparison();
   }
 
   function boot() {
     bindControls();
+    refreshLatestDecisionCta();
     restoreExecution();
   }
 
