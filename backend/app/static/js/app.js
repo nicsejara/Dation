@@ -627,94 +627,6 @@ function bindDecisionStageBridge() {
   }
 }
 
-function downloadText(
-  filename,
-  content,
-  mimeType,
-) {
-  const blob = new Blob(
-    [content],
-    {
-      type: mimeType,
-    },
-  );
-
-  const url = (
-    URL.createObjectURL(blob)
-  );
-
-  const anchor = (
-    document.createElement("a")
-  );
-
-  anchor.href = url;
-  anchor.download = filename;
-  document.body.appendChild(anchor);
-  anchor.click();
-  anchor.remove();
-
-  window.setTimeout(
-    () => URL.revokeObjectURL(
-      url
-    ),
-    500,
-  );
-}
-
-
-function bindInterpreterStateBridge() {
-  window.addEventListener(
-    "dation:interpreter-explanation",
-    (event) => {
-      setExplanation(
-        event.detail?.explanation
-        || null
-      );
-    }
-  );
-}
-
-function bindExports() {
-  const exportButton = (
-    $("#export-decision")
-  );
-
-  if (!exportButton) {
-    return;
-  }
-
-  exportButton.addEventListener(
-    "click",
-    () => {
-      if (
-        !state.activeRun
-        || !state.activeRun.result_json
-      ) {
-        toast(
-          "No hay una decisión activa para exportar.",
-          "error",
-        );
-        return;
-      }
-
-      downloadText(
-        (
-          "dation-decision-"
-          + state.activeRun.id
-            .slice(0, 8)
-          + ".json"
-        ),
-        JSON.stringify(
-          state.activeRun.result_json,
-          null,
-          2,
-        ),
-        "application/json",
-      );
-    }
-  );
-}
-
 function bindRefreshActions() {
   $("#datasets-refresh")
     .addEventListener(
@@ -755,7 +667,6 @@ bindDatasetActions();
 bindDataStageBridge();
 bindDecisionStageBridge();
 bindInterpreterStateBridge();
-bindExports();
 bindRefreshActions();
 bindGlobalErrors();
 
