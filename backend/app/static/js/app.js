@@ -564,8 +564,8 @@ function bindNavigation() {
         event.preventDefault();
         event.stopPropagation();
         navigate(
-          "logistics-config",
-          "data",
+          "logistics-overview",
+          "dda",
         );
       }
     );
