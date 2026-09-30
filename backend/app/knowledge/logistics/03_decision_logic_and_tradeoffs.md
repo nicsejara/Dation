@@ -62,7 +62,7 @@ Por lo tanto, capacidad, costo y viajes pueden empujar la decisión en direccion
 
 1. Identificá modo y pesos.
 2. Identificá el escenario recomendado.
-3. Compará contra la asignación de referencia (`baseline`) para cuantificar impacto.
+3. Compará contra la asignación actual (`baseline`) para cuantificar impacto.
 4. Compará contra ambos extremos para explicar sensibilidad.
 5. Indicá cuántos despachos cambian de vehículo.
 6. Usá los principales drivers provistos por backend.
