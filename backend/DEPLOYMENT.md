@@ -158,3 +158,13 @@ The suite covers:
 - custom score serialization,
 - weight validation,
 - legacy configuration reconstruction.
+
+
+## Home hotfix — simplified DDA selector
+
+Latest UI hotfix on main:
+- Inicio contains only a hero and two Decision Data Assets.
+- DDA Logística is the only interactive home CTA.
+- Its CTA routes to `logistics-config`.
+- DDA Producción is visible but disabled / upcoming.
+- The previous oversized inline SVG illustration was removed from Inicio.
