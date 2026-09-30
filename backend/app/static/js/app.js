@@ -30,7 +30,6 @@ import {
   activateTraceTab,
   activateView,
   appendChatMessage,
-  buildDecisionMarkdown,
   renderActiveDataset,
   renderDatasetProfile,
   renderDatasetsTable,
@@ -238,8 +237,13 @@ function clearDecisionState() {
   renderExplanation(null);
   renderTechnicalEvidence(null);
   resetChat([]);
-  $("#download-json").disabled = true;
-  $("#export-decision").disabled = true;
+  const exportButton = (
+    $("#export-decision")
+  );
+
+  if (exportButton) {
+    exportButton.disabled = true;
+  }
 }
 
 
@@ -445,14 +449,6 @@ function bindNavigation() {
       }
     );
   }
-
-  $("#back-to-config")
-    .addEventListener(
-      "click",
-      () => navigate(
-        "logistics-config"
-      )
-    );
 
   $$(".trace-tab")
     .forEach(
@@ -670,95 +666,54 @@ function bindInterpreterStateBridge() {
   window.addEventListener(
     "dation:interpreter-explanation",
     (event) => {
-      const explanation = (
+      setExplanation(
         event.detail?.explanation
         || null
       );
-
-      setExplanation(
-        explanation
-      );
-
-      const exportButton = (
-        $("#export-decision")
-      );
-
-      if (exportButton) {
-        exportButton.disabled = (
-          !state.activeRun
-          || !state.explanation
-        );
-      }
     }
   );
 }
 
-
 function bindExports() {
-  $("#download-json")
-    .addEventListener(
-      "click",
-      () => {
-        if (!state.activeRun) {
-          return;
-        }
+  const exportButton = (
+    $("#export-decision")
+  );
 
-        downloadText(
-          (
-            "dation-evidencia-"
-            + state.activeRun.id
-              .slice(0, 8)
-            + ".json"
-          ),
-          JSON.stringify(
-            state.activeRun
-              .result_json,
-            null,
-            2,
-          ),
-          "application/json",
+  if (!exportButton) {
+    return;
+  }
+
+  exportButton.addEventListener(
+    "click",
+    () => {
+      if (
+        !state.activeRun
+        || !state.activeRun.result_json
+      ) {
+        toast(
+          "No hay una decisión activa para exportar.",
+          "error",
         );
+        return;
       }
-    );
 
-  $("#export-decision")
-    .addEventListener(
-      "click",
-      () => {
-        if (
-          !state.activeRun
-          || !state.explanation
-        ) {
-          toast(
-            "Generá primero la interpretación ejecutiva para exportar la decisión.",
-            "error",
-          );
-          return;
-        }
-
-        const markdown = (
-          buildDecisionMarkdown(
-            state.activeRun,
-            state.activeDataset,
-            state.datasetProfile,
-            state.explanation,
-          )
-        );
-
-        downloadText(
-          (
-            "dation-decision-"
-            + state.activeRun.id
-              .slice(0, 8)
-            + ".md"
-          ),
-          markdown,
-          "text/markdown;charset=utf-8",
-        );
-      }
-    );
+      downloadText(
+        (
+          "dation-decision-"
+          + state.activeRun.id
+            .slice(0, 8)
+          + ".json"
+        ),
+        JSON.stringify(
+          state.activeRun.result_json,
+          null,
+          2,
+        ),
+        "application/json",
+      );
+    }
+  );
 }
-
 
 function bindRefreshActions() {
   $("#datasets-refresh")
