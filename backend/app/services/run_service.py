@@ -11,6 +11,7 @@ from app.engines.logistics.engine import (
     ENGINE_VERSION,
     run_logistics_engine,
 )
+from app.models.decision_config import DecisionRunConfig
 
 
 def _headers() -> dict[str, str]:
@@ -20,7 +21,7 @@ def _headers() -> dict[str, str]:
     }
 
 
-async def _get_dataset(dataset_id: str) -> dict | None:
+async def get_dataset(dataset_id: str) -> dict | None:
     params = {
         "select": "*",
         "id": f"eq.{dataset_id}",
@@ -39,7 +40,7 @@ async def _get_dataset(dataset_id: str) -> dict | None:
     return data[0] if data else None
 
 
-async def _download_dataset(dataset: dict) -> bytes:
+async def download_dataset(dataset: dict) -> bytes:
     bucket = dataset["storage_bucket"]
     path = quote(dataset["storage_path"], safe="/")
 
@@ -49,7 +50,10 @@ async def _download_dataset(dataset: dict) -> bytes:
     )
 
     async with httpx.AsyncClient(timeout=30.0) as client:
-        response = await client.get(url, headers=_headers())
+        response = await client.get(
+            url,
+            headers=_headers(),
+        )
         response.raise_for_status()
 
     return response.content
@@ -88,7 +92,10 @@ async def _update_run(run_id: str, values: dict) -> dict:
     return response.json()[0]
 
 
-async def _update_dataset(dataset_id: str, values: dict) -> None:
+async def _update_dataset(
+    dataset_id: str,
+    values: dict,
+) -> None:
     async with httpx.AsyncClient(timeout=15.0) as client:
         response = await client.patch(
             f"{SUPABASE_URL}/rest/v1/datasets",
@@ -104,12 +111,19 @@ async def _update_dataset(dataset_id: str, values: dict) -> None:
 
 async def execute_logistics_run(
     dataset_id: str,
-    objective: str,
+    configuration: dict | None = None,
+    *,
+    objective: str | None = None,
 ) -> dict:
-    dataset = await _get_dataset(dataset_id)
+    dataset = await get_dataset(dataset_id)
 
     if not dataset:
-        raise LookupError("Dataset not found.")
+        raise LookupError("No se encontró el dataset solicitado.")
+
+    if configuration is None:
+        configuration = DecisionRunConfig.from_legacy_objective(
+            objective
+        ).model_dump()
 
     run_id = str(uuid4())
     started_at = datetime.now(timezone.utc)
@@ -121,22 +135,31 @@ async def execute_logistics_run(
             "dataset_id": dataset_id,
             "engine_name": ENGINE_NAME,
             "engine_version": ENGINE_VERSION,
-            "configuration_json": {
-                "objective": objective,
-            },
+            "configuration_json": configuration,
             "status": "running",
             "started_at": started_at.isoformat(),
         }
     )
 
-    await _update_dataset(dataset_id, {"status": "processing"})
+    await _update_dataset(
+        dataset_id,
+        {"status": "processing"},
+    )
 
     try:
-        contents = await _download_dataset(dataset)
-        result = run_logistics_engine(contents, objective=objective)
+        contents = await download_dataset(dataset)
 
-        duration_ms = int((perf_counter() - start) * 1000)
-        finished_at = datetime.now(timezone.utc).isoformat()
+        result = run_logistics_engine(
+            contents,
+            configuration=configuration,
+        )
+
+        duration_ms = int(
+            (perf_counter() - start) * 1000
+        )
+        finished_at = datetime.now(
+            timezone.utc
+        ).isoformat()
 
         completed = await _update_run(
             run_id,
@@ -160,8 +183,12 @@ async def execute_logistics_run(
         return completed
 
     except Exception as exc:
-        duration_ms = int((perf_counter() - start) * 1000)
-        finished_at = datetime.now(timezone.utc).isoformat()
+        duration_ms = int(
+            (perf_counter() - start) * 1000
+        )
+        finished_at = datetime.now(
+            timezone.utc
+        ).isoformat()
 
         await _update_run(
             run_id,
