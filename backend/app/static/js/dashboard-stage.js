@@ -660,74 +660,358 @@
     }
 
     if (key === "baseline") {
-      return "Situación actual";
+      return "Asignación de referencia";
     }
 
     return "Costo mínimo";
   }
 
-  function recommendationCopy(
-    run,
-    config
-  ) {
-    var result = run.result_json || {};
-    var sensitivity = (
-      result.sensitivity || {}
-    );
+  function objectiveLabel(config) {
+    if (config.mode === "custom") {
+      return "Objetivo personalizado";
+    }
 
-    if (config.mode !== "custom") {
+    if (config.objective === "min_trips") {
+      return "Minimizar cantidad de viajes";
+    }
+
+    return "Minimizar costo total";
+  }
+
+  function objectiveDetail(config) {
+    if (config.mode === "custom") {
       return (
-        "Resultado del motor para el objetivo "
-        + scenarioLabel(
-            result.recommended_scenario
-          )
-        + "."
+        "Ponderación configurada · "
+        + weightLabel(config)
       );
     }
 
-    var base = (
-      "Resultado de la configuración personalizada "
-      + weightLabel(config)
-      + "."
-    );
-
-    if (
-      sensitivity.matches_scenario
-      === "both_extremes"
-    ) {
+    if (config.objective === "min_trips") {
       return (
-        base
-        + " En este dataset la asignación coincide con los extremos "
-        + "de costo mínimo y viajes mínimos; esto es un resultado de "
-        + "sensibilidad, no un cambio del objetivo configurado."
-      );
-    }
-
-    if (
-      sensitivity.matches_scenario
-      === "min_cost"
-    ) {
-      return (
-        base
-        + " La asignación coincide con el extremo de costo mínimo, "
-        + "pero la decisión evaluada sigue siendo la configuración personalizada."
-      );
-    }
-
-    if (
-      sensitivity.matches_scenario
-      === "min_trips"
-    ) {
-      return (
-        base
-        + " La asignación coincide con el extremo de viajes mínimos, "
-        + "pero la decisión evaluada sigue siendo la configuración personalizada."
+        "Preset · prioridad 100% sobre viajes"
       );
     }
 
     return (
-      base
-      + " La asignación resultante es distinta de ambos extremos."
+      "Preset · prioridad 100% sobre costo"
+    );
+  }
+
+  function assignmentDistribution(
+    scenario
+  ) {
+    var vehicles = new Map();
+
+    (
+      scenario
+      && scenario.assignments
+      || []
+    ).forEach(function (item) {
+      var key = (
+        item.vehicle_type
+        || "Sin vehículo"
+      );
+
+      var current = (
+        vehicles.get(key)
+        || {
+          vehicle_type: key,
+          shipments: 0,
+          units: 0,
+          trips: 0
+        }
+      );
+
+      current.shipments += 1;
+      current.units += Number(
+        item.quantity_units || 0
+      );
+      current.trips += Number(
+        item.required_trips || 0
+      );
+
+      vehicles.set(
+        key,
+        current
+      );
+    });
+
+    return Array.from(
+      vehicles.values()
+    ).sort(function (a, b) {
+      return (
+        b.shipments
+        - a.shipments
+      );
+    });
+  }
+
+  function decisionTitle(
+    scenario
+  ) {
+    var metrics = (
+      scenario
+      && scenario.metrics
+      || {}
+    );
+
+    var distribution = (
+      assignmentDistribution(
+        scenario
+      )
+    );
+
+    var shipments = Number(
+      metrics.shipments
+      || (
+        scenario
+        && scenario.assignments
+        && scenario.assignments.length
+      )
+      || 0
+    );
+
+    var trips = Number(
+      metrics.total_trips || 0
+    );
+
+    var vehicleTypes = (
+      distribution.length
+    );
+
+    return (
+      "Asignar "
+      + formatNumber(shipments)
+      + " despachos entre "
+      + formatNumber(vehicleTypes)
+      + (
+        vehicleTypes === 1
+          ? " tipo de camión"
+          : " tipos de camión"
+      )
+      + " para completar "
+      + formatNumber(trips)
+      + " viajes"
+    );
+  }
+
+  function costImpactPhrase(
+    delta
+  ) {
+    var value = Number(
+      delta && delta.cost_pct
+    );
+
+    if (Number.isNaN(value)) {
+      return (
+        "no permite calcular una variación "
+        + "porcentual de costo"
+      );
+    }
+
+    if (value < 0) {
+      return (
+        "reduce el costo estimado un "
+        + Math.abs(value).toFixed(1)
+        + "%"
+      );
+    }
+
+    if (value > 0) {
+      return (
+        "incrementa el costo estimado un "
+        + value.toFixed(1)
+        + "%"
+      );
+    }
+
+    return (
+      "mantiene el costo estimado "
+      + "de la asignación de referencia"
+    );
+  }
+
+  function sensitivityPhrase(
+    result,
+    config
+  ) {
+    if (config.mode !== "custom") {
+      return "";
+    }
+
+    var matches = (
+      result
+      && result.sensitivity
+      && result.sensitivity
+        .matches_scenario
+    );
+
+    if (matches === "both_extremes") {
+      return (
+        " Con estas ponderaciones, la asignación "
+        + "coincide con los dos extremos evaluados."
+      );
+    }
+
+    if (matches === "min_cost") {
+      return (
+        " Con estas ponderaciones, la asignación "
+        + "coincide con el extremo de costo mínimo."
+      );
+    }
+
+    if (matches === "min_trips") {
+      return (
+        " Con estas ponderaciones, la asignación "
+        + "coincide con el extremo de viajes mínimos."
+      );
+    }
+
+    return (
+      " La ponderación genera una asignación "
+      + "distinta de ambos extremos."
+    );
+  }
+
+  function decisionCopy(
+    run,
+    baseline,
+    selected,
+    config
+  ) {
+    var result = (
+      run.result_json || {}
+    );
+
+    var metrics = (
+      selected.metrics || {}
+    );
+
+    var changed = (
+      assignmentDifferenceCount(
+        baseline,
+        selected
+      )
+    );
+
+    var changePhrase = (
+      changed > 0
+        ? (
+          "Reasigna el tipo de camión de "
+          + formatNumber(changed)
+          + " despachos respecto de la referencia del CSV"
+        )
+        : (
+          "Mantiene la selección de vehículo "
+          + "informada como referencia en el CSV"
+        )
+    );
+
+    return (
+      changePhrase
+      + ", "
+      + costImpactPhrase(
+          selected.delta_vs_baseline
+        )
+      + ", requiere "
+      + formatNumber(
+          metrics.total_trips
+        )
+      + " viajes y proyecta "
+      + formatNumber(
+          metrics.total_distance_km
+        )
+      + " km recorridos."
+      + sensitivityPhrase(
+          result,
+          config
+        )
+    );
+  }
+
+  function renderAssignmentDistribution(
+    selected
+  ) {
+    var container = (
+      $("#dashboard-assignment-distribution")
+    );
+
+    if (!container) {
+      return;
+    }
+
+    var distribution = (
+      assignmentDistribution(
+        selected
+      )
+    );
+
+    if (!distribution.length) {
+      container.innerHTML = "";
+      return;
+    }
+
+    container.innerHTML = (
+      distribution.map(
+        function (item) {
+          return (
+            '<div class="dashboard-assignment-chip">'
+            + "<span>"
+            + escapeHtml(
+                item.vehicle_type
+              )
+            + "</span>"
+            + "<strong>"
+            + formatNumber(
+                item.shipments
+              )
+            + " despachos</strong>"
+            + "<small>"
+            + formatNumber(
+                item.trips
+              )
+            + " viajes · "
+            + formatNumber(
+                item.units
+              )
+            + " unidades</small>"
+            + "</div>"
+          );
+        }
+      ).join("")
+    );
+  }
+
+  function impactBadgeLabel(
+    config,
+    delta
+  ) {
+    var cost = Number(
+      delta && delta.cost_pct
+    );
+    var trips = Number(
+      delta && delta.trips_pct
+    );
+
+    if (config.mode === "custom") {
+      return (
+        "Costo "
+        + formatPercent(cost)
+        + " · Viajes "
+        + formatPercent(trips)
+      );
+    }
+
+    if (config.objective === "min_trips") {
+      return (
+        "Viajes "
+        + formatPercent(trips)
+      );
+    }
+
+    return (
+      "Costo "
+      + formatPercent(cost)
     );
   }
 
@@ -952,7 +1236,7 @@
     if (!changes.length) {
       container.innerHTML = (
         '<div class="empty-state empty-state--compact">'
-        + "La configuración no genera cambios materiales de asignación frente a la situación actual."
+        + "La configuración no genera cambios materiales de asignación frente a la asignación de referencia."
         + "</div>"
       );
       return;
@@ -1028,7 +1312,7 @@
     if (baselineNode && baseline) {
       baselineNode.innerHTML = (
         '<div class="baseline-card">'
-        + "<div><strong>Situación actual</strong>"
+        + "<div><strong>Asignación de referencia</strong>"
         + "<small>Asignación proveniente del CSV · referencia operativa</small></div>"
         + '<div class="baseline-metric"><span>Costo</span><strong>'
         + formatCurrency(
@@ -1139,12 +1423,12 @@
                     .total_distance_km
                 )
               + " km</strong></div>"
-              + '<div class="sensitivity-metric"><span>Δ costo vs actual</span><strong>'
+              + '<div class="sensitivity-metric"><span>Δ costo vs referencia</span><strong>'
               + formatPercent(
                   delta.cost_pct
                 )
               + "</strong></div>"
-              + '<div class="sensitivity-metric"><span>Δ viajes vs actual</span><strong>'
+              + '<div class="sensitivity-metric"><span>Δ viajes vs referencia</span><strong>'
               + formatPercent(
                   delta.trips_pct
                 )
@@ -1251,21 +1535,37 @@
     );
 
     setText(
+      "dashboard-objective-label",
+      objectiveLabel(config)
+    );
+    setText(
+      "dashboard-objective-detail",
+      objectiveDetail(config)
+    );
+
+    setText(
       "dashboard-recommendation-title",
-      scenarioLabel(
-        result.recommended_scenario
-      )
+      decisionTitle(selected)
     );
     setText(
       "dashboard-recommendation-copy",
-      recommendationCopy(
+      decisionCopy(
         run,
+        baseline,
+        selected,
         config
       )
     );
     setText(
       "dashboard-recommendation-delta",
-      formatPercent(delta.cost_pct)
+      impactBadgeLabel(
+        config,
+        delta
+      )
+    );
+
+    renderAssignmentDistribution(
+      selected
     );
 
     setText(
@@ -1280,7 +1580,7 @@
         formatPercent(
           delta.cost_pct
         )
-        + " vs situación actual · "
+        + " vs asignación de referencia · "
         + formatCurrency(
             baseline.metrics
               .total_cost
@@ -1299,7 +1599,7 @@
         formatPercent(
           delta.trips_pct
         )
-        + " vs situación actual · "
+        + " vs asignación de referencia · "
         + formatNumber(
             baseline.metrics
               .total_trips
@@ -1321,7 +1621,7 @@
         formatPercent(
           delta.distance_pct
         )
-        + " vs situación actual"
+        + " vs asignación de referencia"
       )
     );
     setText(
@@ -1506,7 +1806,7 @@
           + '<div class="impact-chart-bar impact-chart-bar--baseline" '
           + 'style="width:'
           + baselineWidth.toFixed(1)
-          + '%"><span>Actual</span></div>'
+          + '%"><span>Referencia</span></div>'
           + '<div class="impact-chart-bar impact-chart-bar--selected" '
           + 'style="width:'
           + selectedWidth.toFixed(1)
@@ -1827,6 +2127,23 @@
       || {}
     );
 
+    var config = runConfiguration(run);
+
+    var primaryDelta;
+
+    if (config.mode === "custom") {
+      primaryDelta = Math.max(
+        Number(delta.cost_pct || 0),
+        Number(delta.trips_pct || 0)
+      );
+    } else if (
+      config.objective === "min_trips"
+    ) {
+      primaryDelta = delta.trips_pct;
+    } else {
+      primaryDelta = delta.cost_pct;
+    }
+
     [
       {
         id: "dashboard-kpi-cost-delta",
@@ -1842,7 +2159,7 @@
       },
       {
         id: "dashboard-recommendation-delta",
-        value: delta.cost_pct
+        value: primaryDelta
       }
     ].forEach(function (item) {
       var node = document.getElementById(
@@ -2373,6 +2690,126 @@
     openLatestDecision
   );
 
+  function downloadDecisionTxt(
+    run
+  ) {
+    if (
+      !run
+      || !run.result_json
+    ) {
+      return false;
+    }
+
+    var blob = new Blob(
+      [
+        JSON.stringify(
+          run.result_json,
+          null,
+          2
+        )
+      ],
+      {
+        type: "text/plain;charset=utf-8"
+      }
+    );
+
+    var url = URL.createObjectURL(
+      blob
+    );
+
+    var anchor = (
+      document.createElement("a")
+    );
+
+    anchor.href = url;
+    anchor.download = (
+      "dation-decision-"
+      + String(run.id).slice(0, 8)
+      + ".txt"
+    );
+
+    document.body.appendChild(
+      anchor
+    );
+
+    anchor.click();
+    anchor.remove();
+
+    window.setTimeout(
+      function () {
+        URL.revokeObjectURL(url);
+      },
+      0
+    );
+
+    return true;
+  }
+
+  async function exportCurrentDecision() {
+    var context = (
+      state.context
+      || loadContext()
+      || {}
+    );
+
+    var run = context.run;
+
+    try {
+      if (
+        !run
+        || !run.result_json
+      ) {
+        if (!context.runId) {
+          throw new Error(
+            "No hay una decisión activa para exportar."
+          );
+        }
+
+        run = await requestJson(
+          "/api/runs/"
+          + encodeURIComponent(
+              context.runId
+            )
+        );
+      }
+
+      if (!downloadDecisionTxt(run)) {
+        throw new Error(
+          "La corrida no contiene un JSON de decisión."
+        );
+      }
+    } catch (error) {
+      var button = (
+        $("#export-decision")
+      );
+
+      if (button) {
+        var original = (
+          button.textContent
+        );
+
+        button.textContent = (
+          "No se pudo exportar"
+        );
+
+        window.setTimeout(
+          function () {
+            button.textContent = (
+              "Exportar decisión ↓"
+            );
+          },
+          1800
+        );
+      }
+
+      console.error(
+        "Error al exportar la decisión.",
+        error
+      );
+    }
+  }
+
+
   function bindControls() {
     var retryStatusButton = (
       $("#dashboard-retry-status")
@@ -2382,6 +2819,9 @@
     );
     var cancelButton = (
       $("#dashboard-cancel-wait")
+    );
+    var exportButton = (
+      $("#export-decision")
     );
 
     if (retryStatusButton) {
@@ -2402,6 +2842,13 @@
       cancelButton.addEventListener(
         "click",
         cancelWait
+      );
+    }
+
+    if (exportButton) {
+      exportButton.addEventListener(
+        "click",
+        exportCurrentDecision
       );
     }
 
