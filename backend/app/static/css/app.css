@@ -7146,3 +7146,28 @@ button.d-home__asset:hover .d-home__asset-action span {
     animation: none !important;
   }
 }
+
+
+/* =========================================================
+   DDA OVERVIEW — PERSISTENT DECISION ACCESS
+   ========================================================= */
+
+.dda-overview__hero-actions {
+  flex-wrap: wrap;
+}
+
+.dda-overview__hero-actions
+#open-latest-logistics-decision {
+  border-color: rgba(255,255,255,.28);
+}
+
+.dda-overview__hero-actions
+#open-latest-logistics-decision:disabled {
+  cursor: not-allowed;
+  opacity: .46;
+}
+
+#latest-logistics-meta {
+  flex-basis: 100%;
+  margin-top: 2px;
+}
