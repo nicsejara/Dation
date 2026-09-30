@@ -5918,9 +5918,30 @@ button.d-home__asset:hover .d-home__asset-action span {
 .decision-stage__execution-bar {
   position: fixed;
   z-index: 55;
-  right: 28px;
+  right: max(
+    32px,
+    calc(
+      (
+        100vw
+        - var(--sidebar-width)
+        - var(--content-width)
+      ) / 2
+    )
+  );
   bottom: 18px;
-  left: calc(var(--sidebar-width) + 28px);
+  left: calc(
+    var(--sidebar-width)
+    + max(
+      32px,
+      calc(
+        (
+          100vw
+          - var(--sidebar-width)
+          - var(--content-width)
+        ) / 2
+      )
+    )
+  );
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -5954,6 +5975,21 @@ button.d-home__asset:hover .d-home__asset-action span {
   cursor: not-allowed;
   opacity: .48;
 }
+
+@media (max-width: 860px) {
+  .decision-stage__execution-bar {
+    left: calc(var(--sidebar-width) + 18px);
+    right: 18px;
+  }
+}
+
+@media (max-width: 760px) {
+  .decision-stage__execution-bar {
+    left: calc(var(--sidebar-width) + 16px);
+    right: 16px;
+  }
+}
+
 
 .decision-modal-open {
   overflow: hidden;
@@ -6154,10 +6190,6 @@ button.d-home__asset:hover .d-home__asset-action span {
     justify-content: flex-start;
   }
 
-  .decision-stage__execution-bar {
-    left: 20px;
-    right: 20px;
-  }
 }
 
 @media (max-width: 700px) {
