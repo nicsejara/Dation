@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="light">
   <title>Dation · Decision Intelligence</title>
   <link rel="stylesheet" href="/static/css/tokens.css">
-  <link rel="stylesheet" href="/static/css/app.css?v=workspace-v11-20260930">
+  <link rel="stylesheet" href="/static/css/app.css?v=workspace-v12-20260930">
 </head>
 <body>
   <div class="app-shell">
@@ -1035,7 +1035,7 @@
             </div>
 
             <p class="dashboard-progress-note">
-              El backend actual no expone progreso porcentual por etapa. La barra es indeterminada para no simular precisión inexistente.
+              El backend no expone progreso porcentual por etapa. La barra es indeterminada para no simular precisión inexistente.
             </p>
 
             <div class="dashboard-loading-skeleton" aria-hidden="true">
@@ -1065,271 +1065,278 @@
             </div>
           </div>
 
-          <div id="dashboard-content" class="dashboard-v2 is-hidden">
-            <section class="dashboard-v2__hero">
-              <div class="dashboard-v2__hero-copy">
-                <div class="dashboard-v2__hero-meta">
-                  <span class="pill pill--live">Decisión calculada</span>
-                  <span id="run-context-engine">—</span>
-                  <span id="run-context-id">—</span>
-                </div>
-
-                <div class="dashboard-v2__objective">
-                  <span class="section-kicker">Objetivo de optimización</span>
-                  <strong id="dashboard-objective-label">—</strong>
-                  <small id="dashboard-objective-detail">—</small>
-                </div>
-
-                <span class="section-kicker">Decisión generada</span>
-                <h1 id="dashboard-recommendation-title">—</h1>
-                <p id="dashboard-recommendation-copy">—</p>
-
-                <div
-                  id="dashboard-assignment-distribution"
-                  class="dashboard-assignment-distribution"
-                  aria-label="Distribución de la asignación recomendada"
-                ></div>
-
-                <div class="dashboard-v2__decision-meta">
-                  <div>
-                    <span>Dataset</span>
-                    <strong id="run-context-dataset">—</strong>
-                  </div>
-                  <div>
-                    <span>Configuración</span>
-                    <strong id="run-context-mode">—</strong>
-                  </div>
-                  <div>
-                    <span>Prioridades</span>
-                    <strong id="run-context-weights">—</strong>
-                  </div>
-                  <div>
-                    <span>Ejecución</span>
-                    <strong id="run-context-date">—</strong>
-                  </div>
-                </div>
-              </div>
-
-              <div class="dashboard-v2__hero-impact">
-                <div class="dashboard-v2__impact-heading">
-                  <div>
-                    <span class="section-kicker">Impacto esperado</span>
-                    <strong>Decisión vs. asignación de referencia</strong>
-                  </div>
-                  <span id="dashboard-recommendation-delta">—</span>
-                </div>
-
-                <div id="dashboard-impact-chart" class="dashboard-impact-chart">
-                  <div class="dashboard-chart-empty">Esperando resultado…</div>
-                </div>
-              </div>
-            </section>
-
-            <section class="dashboard-v2__kpis">
-              <article class="dashboard-kpi-v2">
-                <div class="dashboard-kpi-v2__head">
-                  <span>Costo total</span>
-                  <span class="dashboard-kpi-v2__icon">AR$</span>
-                </div>
-                <strong id="dashboard-kpi-cost">—</strong>
-                <small id="dashboard-kpi-cost-delta">—</small>
-                <div class="dashboard-kpi-v2__track" id="dashboard-kpi-cost-track"></div>
-              </article>
-
-              <article class="dashboard-kpi-v2">
-                <div class="dashboard-kpi-v2__head">
-                  <span>Viajes</span>
-                  <span class="dashboard-kpi-v2__icon">↔</span>
-                </div>
-                <strong id="dashboard-kpi-trips">—</strong>
-                <small id="dashboard-kpi-trips-delta">—</small>
-                <div class="dashboard-kpi-v2__track" id="dashboard-kpi-trips-track"></div>
-              </article>
-
-              <article class="dashboard-kpi-v2">
-                <div class="dashboard-kpi-v2__head">
-                  <span>Distancia total</span>
-                  <span class="dashboard-kpi-v2__icon">KM</span>
-                </div>
-                <strong id="dashboard-kpi-distance">—</strong>
-                <small id="dashboard-kpi-distance-delta">—</small>
-                <div class="dashboard-kpi-v2__track" id="dashboard-kpi-distance-track"></div>
-              </article>
-
-              <article class="dashboard-kpi-v2">
-                <div class="dashboard-kpi-v2__head">
-                  <span>Despachos</span>
-                  <span class="dashboard-kpi-v2__icon">#</span>
-                </div>
-                <strong id="dashboard-kpi-shipments">—</strong>
-                <small id="dashboard-kpi-changes">—</small>
-                <div class="dashboard-kpi-v2__track dashboard-kpi-v2__track--neutral"></div>
-              </article>
-            </section>
-
-            <section class="dashboard-v2__comparison panel">
-              <div class="dashboard-v2__section-head">
+          <div id="dashboard-content" class="decision-dashboard is-hidden">
+            <header class="decision-command-bar" id="dashboard-command-bar">
+              <div class="decision-command-bar__identity">
                 <div>
-                  <span class="section-kicker">Comparador de decisiones</span>
-                  <h2>Decisión generada vs. escenarios de referencia</h2>
-                  <p>
-                    Compará la decisión generada con la asignación de referencia del dataset o con los extremos predefinidos del motor.
-                  </p>
+                  <span class="section-kicker">DDA Logística</span>
+                  <strong>Decisión de asignación de flota</strong>
                 </div>
-
-                <label class="dashboard-compare-select">
-                  <span>Comparar contra</span>
-                  <select id="dashboard-comparison-select">
-                    <option value="baseline">Asignación de referencia</option>
-                    <option value="min_cost">Costo mínimo</option>
-                    <option value="min_trips">Viajes mínimos</option>
-                  </select>
-                </label>
+                <span class="decision-status-chip">
+                  <i aria-hidden="true"></i>
+                  Decisión calculada
+                </span>
               </div>
 
-              <div class="dashboard-v2__comparison-grid">
-                <div class="dashboard-comparison-chart-wrap">
-                  <div class="dashboard-comparison-legend">
-                    <span><i class="is-selected"></i>Decisión elegida</span>
-                    <span><i class="is-reference"></i>Referencia</span>
+              <nav class="decision-anchor-nav" aria-label="Secciones de la decisión">
+                <a href="#dashboard-decision">Decisión</a>
+                <a href="#dashboard-comparator">Comparador</a>
+                <a href="#dashboard-drivers">Qué cambió</a>
+                <a href="#dashboard-sensitivity">Sensibilidad</a>
+                <a href="#dashboard-ai">Resumen IA</a>
+              </nav>
+
+              <div class="decision-command-bar__actions">
+                <details class="execution-details" id="execution-details">
+                  <summary>Detalles de la ejecución</summary>
+                  <div class="execution-details__popover">
+                    <div>
+                      <span>Dataset</span>
+                      <strong id="details-dataset">—</strong>
+                    </div>
+                    <div>
+                      <span>Ejecución</span>
+                      <strong id="details-date">—</strong>
+                    </div>
+                    <div>
+                      <span>Motor</span>
+                      <strong id="details-engine">—</strong>
+                    </div>
+                    <div>
+                      <span>Intérprete IA</span>
+                      <strong id="details-ai">—</strong>
+                    </div>
+                    <div class="execution-details__run">
+                      <span>ID de corrida</span>
+                      <code id="details-run-id">—</code>
+                      <button class="text-button" id="copy-run-id" type="button">
+                        Copiar ID
+                      </button>
+                    </div>
                   </div>
-                  <div id="dashboard-comparison-chart" class="dashboard-comparison-chart"></div>
-                  <small>
-                    Índice relativo por métrica. La referencia seleccionada equivale a 100.
-                  </small>
-                </div>
+                </details>
 
-                <div class="dashboard-comparison-table-wrap">
-                  <table class="dashboard-comparison-table">
-                    <thead>
-                      <tr>
-                        <th>Métrica</th>
-                        <th>Decisión</th>
-                        <th>Referencia</th>
-                        <th>Diferencia</th>
-                        <th>Variación</th>
-                      </tr>
-                    </thead>
-                    <tbody id="dashboard-comparison-table-body"></tbody>
-                  </table>
-                </div>
+                <button class="button button--secondary" id="dashboard-reexecute" type="button">
+                  Re-ejecutar
+                </button>
+
+                <button class="button button--secondary" id="toggle-chat" type="button" aria-controls="chat-panel" aria-expanded="false">
+                  Preguntale a Dation
+                </button>
+
+                <button class="button button--primary" id="export-decision" type="button" disabled>
+                  Exportar
+                  <span aria-hidden="true">↓</span>
+                </button>
               </div>
-            </section>
+            </header>
 
-            <section class="dashboard-v2__evidence-grid">
-              <article class="panel dashboard-v2__panel">
-                <div class="dashboard-v2__section-head">
+            <main class="decision-dashboard__body">
+              <section class="decision-hero" id="dashboard-decision">
+                <div class="decision-hero__copy">
+                  <div class="decision-objective-chip" id="dashboard-objective-chip">
+                    Objetivo: —
+                  </div>
+
+                  <span class="section-kicker">Decisión recomendada</span>
+                  <h1 id="dashboard-recommendation-title">—</h1>
+                  <p class="decision-hero__subtitle" id="dashboard-recommendation-copy">—</p>
+
+                  <div class="decision-savings-card" aria-label="Ahorro estimado">
+                    <span>Ahorro estimado</span>
+                    <strong id="dashboard-savings-value">—</strong>
+                    <small id="dashboard-savings-percent">—</small>
+                  </div>
+
+                  <div class="decision-meta-chips" id="dashboard-meta-chips"></div>
+                </div>
+
+                <div class="panel decision-assignment-panel">
+                  <div class="section-heading-inline">
+                    <div>
+                      <span class="section-kicker">Asignación de flota</span>
+                      <h2>Qué camiones usamos</h2>
+                      <p>Despachos por tipo de camión antes y después de aplicar la decisión.</p>
+                    </div>
+                    <div class="assignment-legend">
+                      <span><i class="legend-current"></i>Asignación actual</span>
+                      <span><i class="legend-decision"></i>Decisión recomendada</span>
+                    </div>
+                  </div>
+
+                  <div id="dashboard-assignment-chart" class="assignment-chart">
+                    <div class="dashboard-chart-empty">Esperando resultado…</div>
+                  </div>
+
+                  <div id="dashboard-assignment-vehicle-details" class="assignment-vehicle-details"></div>
+                </div>
+              </section>
+
+              <section class="dashboard-section" id="dashboard-kpis">
+                <div class="dashboard-section__heading">
                   <div>
-                    <span class="section-kicker">Drivers</span>
-                    <h2>Qué cambió para llegar a esta decisión</h2>
+                    <span class="section-kicker">Impacto cuantificado</span>
+                    <h2>La decisión en cuatro números</h2>
                   </div>
                 </div>
-                <div id="dashboard-driver-list" class="driver-list"></div>
-              </article>
+                <div class="decision-kpi-grid" id="dashboard-kpi-grid"></div>
+              </section>
 
-              <article class="panel dashboard-v2__panel">
-                <div class="dashboard-v2__section-head">
+              <section class="dashboard-section panel dashboard-comparator" id="dashboard-comparator">
+                <div class="dashboard-section__heading dashboard-section__heading--split">
                   <div>
-                    <span class="section-kicker">Contexto</span>
-                    <h2>Universo analizado</h2>
+                    <span class="section-kicker">Comparador</span>
+                    <h2>Decisión recomendada vs. alternativa</h2>
+                    <p>Compará valores reales. Si dos escenarios producen la misma asignación, Dation lo indica explícitamente.</p>
                   </div>
-                </div>
-                <div id="dashboard-data-context" class="context-metric-grid"></div>
-              </article>
-            </section>
 
-            <section class="panel dashboard-v2__sensitivity">
-              <div class="dashboard-v2__section-head">
-                <div>
-                  <span class="section-kicker">Sensibilidad</span>
-                  <h2>Qué ocurre si cambia la prioridad</h2>
-                  <p>
-                    Los extremos permiten entender si la recomendación cambia al mover el peso entre costo y viajes.
-                  </p>
-                </div>
-              </div>
-
-              <div class="baseline-strip" id="baseline-strip"></div>
-              <div class="sensitivity-grid" id="sensitivity-grid"></div>
-              <div class="sensitivity-note" id="sensitivity-note"></div>
-            </section>
-
-            <section class="panel dashboard-v2__assumptions">
-              <details>
-                <summary>
-                  <span>
-                    <span class="section-kicker">Transparencia</span>
-                    <strong>Supuestos y límites del modelo</strong>
-                  </span>
-                  <span>Ver detalle</span>
-                </summary>
-                <ul id="assumptions-list" class="assumptions-list"></ul>
-              </details>
-            </section>
-
-            <section class="dashboard-v2__ai interpretation-section">
-              <div class="dashboard-v2__section-head">
-                <div>
-                  <span class="section-kicker">Dation Interpreter</span>
-                  <h2>Resumen ejecutivo con IA</h2>
-                  <p>
-                    La IA interpreta el DecisionResult persistido. No recalcula ni modifica la decisión del motor.
-                  </p>
+                  <label class="dashboard-compare-select">
+                    <span>Comparar contra</span>
+                    <select id="dashboard-comparison-select">
+                      <option value="baseline">Asignación actual</option>
+                      <option value="min_cost">Costo mínimo</option>
+                      <option value="min_trips">Viajes mínimos</option>
+                    </select>
+                  </label>
                 </div>
 
-                <div id="ai-dashboard-meta" class="ai-meta">Verificando intérprete…</div>
-              </div>
+                <div id="dashboard-comparison-state" class="comparison-state is-hidden"></div>
 
-              <div class="panel interpretation-panel interpretation-panel--full">
-                <div class="interpretation-toolbar">
+                <div class="dashboard-comparison-layout">
                   <div>
-                    <strong>Lectura ejecutiva</strong>
-                    <small>Decisión, impacto, drivers, trade-offs, riesgos y supuestos.</small>
+                    <div id="dashboard-comparison-chart" class="real-comparison-chart"></div>
                   </div>
-                  <button class="button button--secondary" id="generate-explanation" type="button">
-                    Generar resumen IA
+
+                  <div class="dashboard-comparison-table-wrap">
+                    <table class="dashboard-comparison-table">
+                      <thead>
+                        <tr>
+                          <th>Métrica</th>
+                          <th>Decisión</th>
+                          <th>Comparada</th>
+                          <th>Diferencia</th>
+                          <th>Variación</th>
+                        </tr>
+                      </thead>
+                      <tbody id="dashboard-comparison-table-body"></tbody>
+                      <tfoot>
+                        <tr>
+                          <th>Asignaciones distintas</th>
+                          <td colspan="4" id="dashboard-comparison-assignments">—</td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                </div>
+              </section>
+
+              <section class="dashboard-section panel dashboard-drivers" id="dashboard-drivers">
+                <div class="dashboard-section__heading dashboard-section__heading--split">
+                  <div>
+                    <span class="section-kicker">Qué cambió</span>
+                    <h2>Cómo se transforma la asignación de camiones</h2>
+                    <p id="dashboard-drivers-summary">—</p>
+                  </div>
+
+                  <button class="button button--secondary" id="open-reassignment-detail" type="button">
+                    Ver reasignaciones
                   </button>
                 </div>
 
-                <div id="ai-progress" class="inline-status is-hidden"></div>
-                <div id="executive-insight" class="executive-insight is-hidden"></div>
+                <div class="drivers-layout">
+                  <div>
+                    <h3>Flujo de reasignación</h3>
+                    <div id="dashboard-flow-matrix" class="flow-matrix"></div>
+                  </div>
 
-                <div class="dashboard-ai-note">
-                  El backend actual devuelve la respuesta completa; streaming de tokens queda pendiente de un endpoint específico.
+                  <div>
+                    <h3>Corredores con mayor impacto</h3>
+                    <div class="corridor-table-wrap">
+                      <table class="corridor-table">
+                        <thead>
+                          <tr>
+                            <th>Corredor</th>
+                            <th>Despachos</th>
+                            <th>Cambio predominante</th>
+                            <th>Viajes evitados</th>
+                            <th>Impacto en costo</th>
+                          </tr>
+                        </thead>
+                        <tbody id="dashboard-corridor-table-body"></tbody>
+                      </table>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </section>
+              </section>
+
+              <section class="dashboard-section panel dashboard-sensitivity" id="dashboard-sensitivity">
+                <div class="dashboard-section__heading">
+                  <div>
+                    <span class="section-kicker">Sensibilidad</span>
+                    <h2>Qué tan robusta es la decisión</h2>
+                    <p>Comparamos la asignación seleccionada contra los extremos de costo y viajes.</p>
+                  </div>
+                </div>
+
+                <div id="dashboard-sensitivity-content"></div>
+                <div class="sensitivity-backend-note">
+                  Curva 0/25/50/75/100 %: pendiente de que el backend exponga puntos intermedios. No se simulan valores.
+                </div>
+              </section>
+
+              <section class="dashboard-section panel dashboard-context" id="dashboard-context">
+                <div class="dashboard-section__heading dashboard-section__heading--split">
+                  <div>
+                    <span class="section-kicker">Contexto analizado</span>
+                    <h2>Universo de la decisión</h2>
+                  </div>
+
+                  <details class="model-assumptions">
+                    <summary>Supuestos del motor</summary>
+                    <ul id="assumptions-list" class="assumptions-list"></ul>
+                  </details>
+                </div>
+
+                <div id="dashboard-data-context" class="context-chip-grid"></div>
+              </section>
+
+              <section class="dashboard-section dashboard-ai" id="dashboard-ai">
+                <div class="dashboard-section__heading dashboard-section__heading--split">
+                  <div>
+                    <span class="section-kicker">Dation Interpreter</span>
+                    <h2 id="ai-summary-title">Resumen ejecutivo con IA</h2>
+                    <p>La IA interpreta la evidencia persistida. No recalcula ni modifica la decisión.</p>
+                  </div>
+
+                  <div class="ai-heading-actions">
+                    <button class="button button--ghost" id="copy-explanation" type="button" disabled>
+                      Copiar
+                    </button>
+                    <button class="button button--secondary" id="generate-explanation" type="button">
+                      Generar resumen
+                    </button>
+                  </div>
+                </div>
+
+                <div id="ai-progress" class="inline-status is-hidden"></div>
+                <div id="executive-insight" class="executive-insight executive-insight--v3 is-hidden"></div>
+              </section>
+            </main>
           </div>
 
-          <div class="dation-floating-actions" id="dation-floating-actions">
-            <button
-              class="button button--primary dation-floating-export"
-              id="export-decision"
-              type="button"
-              disabled
-            >
-              Exportar decisión
-              <span aria-hidden="true">↓</span>
-            </button>
-
-            <button
-              class="dation-chat-launcher"
-              id="toggle-chat"
-              type="button"
-              aria-controls="chat-panel"
-              aria-expanded="false"
-            >
-              <span class="dation-chat-launcher__mark" aria-hidden="true">D</span>
-              <span>
-                <strong>Preguntale a Dation</strong>
-                <small>Sobre esta decisión</small>
-              </span>
-            </button>
-          </div>
+          <button
+            class="dation-chat-fab"
+            id="dation-chat-fab"
+            type="button"
+            aria-controls="chat-panel"
+            aria-label="Abrir chat con Dation"
+          >
+            D
+          </button>
 
           <aside
             id="chat-panel"
-            class="chat-panel dashboard-chat dashboard-chat--floating is-hidden"
+            class="chat-panel dashboard-chat dashboard-chat--drawer is-hidden"
             aria-label="Chat contextual de Dation"
             aria-live="polite"
           >
@@ -1337,7 +1344,7 @@
               <div>
                 <span class="section-kicker">Chat contextual</span>
                 <strong>Preguntale a Dation</strong>
-                <small>Contexto anclado al run activo</small>
+                <small>La conversación usa la evidencia de esta corrida.</small>
               </div>
 
               <button
@@ -1351,15 +1358,13 @@
             </div>
 
             <div class="dashboard-chat__intro">
-              Preguntá por los datos, la asignación recomendada, sensibilidad, trade-offs o supuestos de esta corrida.
+              Preguntá por la decisión, el impacto, los cambios de camión, sensibilidad o supuestos.
             </div>
 
             <div class="prompt-chips" id="prompt-chips">
-              <button type="button">¿Por qué esta decisión mejora frente a la asignación de referencia?</button>
-              <button type="button">¿Qué variable tiene más impacto en el resultado?</button>
-              <button type="button">¿Qué cambia si priorizo sólo costo?</button>
-              <button type="button">¿Qué cambia si priorizo sólo viajes?</button>
-              <button type="button">¿Qué supuesto podría cambiar la recomendación?</button>
+              <button type="button">¿Por qué esta decisión es mejor que la asignación actual?</button>
+              <button type="button">¿Qué variable tiene más impacto?</button>
+              <button type="button">¿Qué pasa si priorizo viajes?</button>
             </div>
 
             <div id="chat-thread" class="chat-thread"></div>
@@ -1381,9 +1386,56 @@
               </button>
             </div>
           </aside>
+
+          <div class="reassignment-dialog is-hidden" id="reassignment-dialog" role="dialog" aria-modal="true" aria-labelledby="reassignment-dialog-title">
+            <div class="reassignment-dialog__panel">
+              <div class="reassignment-dialog__header">
+                <div>
+                  <span class="section-kicker">Detalle operativo</span>
+                  <h2 id="reassignment-dialog-title">Reasignaciones de despachos</h2>
+                  <p id="reassignment-dialog-copy">—</p>
+                </div>
+                <button class="dation-chat-close" id="close-reassignment-detail" type="button" aria-label="Cerrar detalle">
+                  ×
+                </button>
+              </div>
+
+              <div class="reassignment-toolbar">
+                <input id="reassignment-search" type="search" placeholder="Buscar ID, origen, destino o producto">
+                <select id="reassignment-vehicle-filter" aria-label="Filtrar por camión de destino">
+                  <option value="">Todos los camiones</option>
+                </select>
+                <button class="button button--secondary" id="export-reassignments" type="button">
+                  Exportar detalle
+                </button>
+              </div>
+
+              <div class="reassignment-detail-table-wrap">
+                <table class="reassignment-detail-table">
+                  <thead>
+                    <tr>
+                      <th>Despacho</th>
+                      <th>Corredor</th>
+                      <th>Asignación actual</th>
+                      <th>Decisión</th>
+                      <th>Viajes evitados</th>
+                      <th>Impacto costo</th>
+                    </tr>
+                  </thead>
+                  <tbody id="reassignment-detail-body"></tbody>
+                </table>
+              </div>
+
+              <div class="reassignment-pagination">
+                <button class="button button--ghost" id="reassignment-prev" type="button">Anterior</button>
+                <span id="reassignment-page">—</span>
+                <button class="button button--ghost" id="reassignment-next" type="button">Siguiente</button>
+              </div>
+            </div>
+          </div>
         </section>
 
-                <!-- TRAZABILIDAD -->
+        <!-- TRAZABILIDAD -->
         <section class="view" data-view-panel="traceability">
           <div class="page-heading">
             <div>
@@ -1779,10 +1831,12 @@
       window.dationRenderJourney('inicio');
     })();
   </script>
-  <script src="/static/js/data-stage.js?v=workspace-v11-20260930"></script>
-  <script src="/static/js/dashboard-stage.js?v=workspace-v11-20260930"></script>
-  <script src="/static/js/interpreter-stage.js?v=workspace-v11-20260930"></script>
-  <script src="/static/js/decision-stage.js?v=workspace-v11-20260930"></script>
-  <script type="module" src="/static/js/app.js?v=workspace-v11-20260930"></script>
+  <script src="/static/js/data-stage.js?v=workspace-v12-20260930"></script>
+  <script src="/static/js/dashboard-formatters.js?v=workspace-v12-20260930"></script>
+  <script src="/static/js/dashboard-selectors.js?v=workspace-v12-20260930"></script>
+  <script src="/static/js/dashboard-stage.js?v=workspace-v12-20260930"></script>
+  <script src="/static/js/interpreter-stage.js?v=workspace-v12-20260930"></script>
+  <script src="/static/js/decision-stage.js?v=workspace-v12-20260930"></script>
+  <script type="module" src="/static/js/app.js?v=workspace-v12-20260930"></script>
 </body>
 </html>
