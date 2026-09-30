@@ -114,6 +114,7 @@ async def execute_logistics_run(
     configuration: dict | None = None,
     *,
     objective: str | None = None,
+    run_id: str | None = None,
 ) -> dict:
     dataset = await get_dataset(dataset_id)
 
@@ -125,7 +126,7 @@ async def execute_logistics_run(
             objective
         ).model_dump()
 
-    run_id = str(uuid4())
+    run_id = run_id or str(uuid4())
     started_at = datetime.now(timezone.utc)
     start = perf_counter()
 
