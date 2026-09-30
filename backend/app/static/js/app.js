@@ -408,8 +408,6 @@ async function restoreHistoricalRun(
       state.datasets
     );
 
-    renderDecisionConfiguration();
-
     const [
       profile,
       interpretation,
