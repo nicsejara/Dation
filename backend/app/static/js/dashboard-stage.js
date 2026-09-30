@@ -997,6 +997,74 @@
     );
   }
 
+  function applyDeltaStyles(run) {
+    var selected = selectedScenario(run);
+
+    if (!selected) {
+      return;
+    }
+
+    var delta = (
+      selected.delta_vs_baseline
+      || {}
+    );
+
+    [
+      {
+        id: "dashboard-kpi-cost-delta",
+        value: delta.cost_pct
+      },
+      {
+        id: "dashboard-kpi-trips-delta",
+        value: delta.trips_pct
+      },
+      {
+        id: "dashboard-kpi-distance-delta",
+        value: delta.distance_pct
+      },
+      {
+        id: "dashboard-recommendation-delta",
+        value: delta.cost_pct
+      }
+    ].forEach(function (item) {
+      var node = document.getElementById(
+        item.id
+      );
+
+      if (!node) {
+        return;
+      }
+
+      node.classList.remove(
+        "is-improvement",
+        "is-worse",
+        "is-neutral"
+      );
+
+      var numeric = Number(
+        item.value
+      );
+
+      if (Number.isNaN(numeric)) {
+        node.classList.add(
+          "is-neutral"
+        );
+      } else if (numeric < 0) {
+        node.classList.add(
+          "is-improvement"
+        );
+      } else if (numeric > 0) {
+        node.classList.add(
+          "is-worse"
+        );
+      } else {
+        node.classList.add(
+          "is-neutral"
+        );
+      }
+    });
+  }
+
   function renderEnhancedDashboard(run) {
     if (
       !run
@@ -1011,6 +1079,7 @@
 
     renderImpactChart(run);
     renderKpiTracks(run);
+    applyDeltaStyles(run);
 
     var select = (
       $("#dashboard-comparison-select")
