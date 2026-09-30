@@ -1286,12 +1286,12 @@
       );
 
       layout.classList.add(
-        "is-muted"
+        "is-hidden"
       );
     } else {
       stateNode.innerHTML = "";
       layout.classList.remove(
-        "is-muted"
+        "is-hidden"
       );
     }
 
@@ -2314,6 +2314,79 @@
     }
   }
 
+  function renderSectionSafely(
+    sectionId,
+    renderer
+  ) {
+    var section = document.getElementById(
+      sectionId
+    );
+
+    if (!section) {
+      return;
+    }
+
+    var previous = section.querySelector(
+      ".dashboard-section-error"
+    );
+
+    if (previous) {
+      previous.remove();
+    }
+
+    try {
+      renderer();
+    } catch (error) {
+      console.error(
+        "Error al renderizar "
+        + sectionId,
+        error
+      );
+
+      var notice = (
+        document.createElement("div")
+      );
+
+      notice.className = (
+        "dashboard-section-error"
+      );
+
+      var message = (
+        document.createElement("span")
+      );
+
+      message.textContent = (
+        "No se pudo mostrar esta sección. "
+        + "El resto de la decisión sigue disponible."
+      );
+
+      var retry = (
+        document.createElement("button")
+      );
+
+      retry.type = "button";
+      retry.className = (
+        "button button--secondary"
+      );
+      retry.textContent = "Reintentar";
+
+      retry.addEventListener(
+        "click",
+        function () {
+          renderSectionSafely(
+            sectionId,
+            renderer
+          );
+        }
+      );
+
+      notice.appendChild(message);
+      notice.appendChild(retry);
+      section.prepend(notice);
+    }
+  }
+
+
   function renderDashboard(
     run,
     dataset,
@@ -2350,23 +2423,55 @@
       dataset
     );
 
-    renderHero(
-      run,
-      dataset
+    renderSectionSafely(
+      "dashboard-decision",
+      function () {
+        renderHero(
+          run,
+          dataset
+        );
+      }
     );
 
-    renderKpis(
-      current,
-      selected
+    renderSectionSafely(
+      "dashboard-kpis",
+      function () {
+        renderKpis(
+          current,
+          selected
+        );
+      }
     );
 
-    populateComparison(run);
-    renderDrivers(run);
-    renderSensitivity(run);
+    renderSectionSafely(
+      "dashboard-comparator",
+      function () {
+        populateComparison(run);
+      }
+    );
 
-    renderContext(
-      profile,
-      run.result_json
+    renderSectionSafely(
+      "dashboard-drivers",
+      function () {
+        renderDrivers(run);
+      }
+    );
+
+    renderSectionSafely(
+      "dashboard-sensitivity",
+      function () {
+        renderSensitivity(run);
+      }
+    );
+
+    renderSectionSafely(
+      "dashboard-context",
+      function () {
+        renderContext(
+          profile,
+          run.result_json
+        );
+      }
     );
 
     var exportButton = (
