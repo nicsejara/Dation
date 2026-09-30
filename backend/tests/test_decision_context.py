@@ -101,5 +101,42 @@ class DecisionContextTests(
         )
 
 
+    def test_context_exposes_reference_semantics(
+        self,
+    ):
+        result = run_logistics_engine(
+            CSV,
+            objective="min_cost",
+        )
+
+        context = build_decision_context(
+            result,
+            result["configuration"],
+        )
+
+        reference = context[
+            "reference_semantics"
+        ]
+
+        self.assertEqual(
+            reference["label"],
+            "Asignación de referencia",
+        )
+        self.assertIn(
+            "vehicle_type",
+            reference["source"],
+        )
+        self.assertIn(
+            "No implica",
+            reference["meaning"],
+        )
+        self.assertEqual(
+            context["scenarios"][
+                "baseline"
+            ]["name"],
+            "Asignación de referencia",
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
