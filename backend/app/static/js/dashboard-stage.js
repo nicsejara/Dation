@@ -2228,10 +2228,31 @@
       meta.textContent = (
         "Todavía no hay decisiones completadas para analizar."
       );
+
+      if (
+        typeof window
+          .dationSetDashboardReady
+        === "function"
+      ) {
+        window.dationSetDashboardReady(
+          false
+        );
+      }
+
       return;
     }
 
     button.disabled = false;
+
+    if (
+      typeof window
+        .dationSetDashboardReady
+      === "function"
+    ) {
+      window.dationSetDashboardReady(
+        true
+      );
+    }
     button.dataset.runId = run.id;
     meta.textContent = (
       "Última corrida completada · "
