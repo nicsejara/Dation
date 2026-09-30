@@ -17,6 +17,11 @@
     }
   );
 
+  var S = (
+    window.DationDashboardSelectors
+    || null
+  );
+
   var state = {
     runId: null,
     status: null,
@@ -368,15 +373,103 @@
         )
     );
 
-    var summaryBullets = [
-      cleanText(
-        explanation.recommendation
-      ),
-      cleanText(
-        explanation.executive_summary
-      ),
-      cleanText(risk)
-    ];
+    var context = executionContext();
+    var run = (
+      context
+      && context.run
+    );
+
+    var summaryBullets;
+
+    if (
+      run
+      && run.result_json
+      && S
+    ) {
+      var current = (
+        S.currentScenario(run)
+      );
+      var selected = (
+        S.selectedScenario(run)
+      );
+      var hero = (
+        S.heroDecision(
+          current,
+          selected,
+          run.result_json
+        )
+      );
+      var gain = (
+        S.savings(
+          current,
+          selected
+        )
+      );
+
+      summaryBullets = [
+        (
+          hero.changed > 0
+            ? (
+              "Reasignar "
+              + F.formatNumber(
+                  hero.changed
+                )
+              + " de "
+              + F.formatNumber(
+                  hero.total
+                )
+              + " despachos "
+              + hero.direction
+              + "."
+            )
+            : (
+              "Mantener la asignación actual "
+              + "de los despachos analizados."
+            )
+        ),
+        (
+          "Impacto estimado: "
+          + (
+            gain.cost.absolute >= 0
+              ? "ahorro de "
+              : "costo adicional de "
+          )
+          + F.formatCurrency(
+              Math.abs(
+                gain.cost.absolute
+              )
+            )
+          + " ("
+          + F.formatPercent(
+              -Number(
+                gain.cost.pct || 0
+              )
+            )
+          + "), "
+          + F.formatNumber(
+              selected.metrics
+                .total_trips
+            )
+          + " viajes y "
+          + F.formatKm(
+              selected.metrics
+                .total_distance_km
+            )
+          + "."
+        ),
+        cleanText(risk)
+      ];
+    } else {
+      summaryBullets = [
+        cleanText(
+          explanation.recommendation
+        ),
+        cleanText(
+          explanation.executive_summary
+        ),
+        cleanText(risk)
+      ];
+    }
 
     container.innerHTML = (
       '<div class="ai-summary-card">'
@@ -586,7 +679,7 @@
         && savedExplanation
       ) {
         generate.textContent = (
-          "Regenerar resumen IA"
+          "Regenerar resumen"
         );
       }
     } catch (error) {
@@ -723,7 +816,7 @@
       );
 
       button.textContent = (
-        "Regenerar resumen IA"
+        "Regenerar resumen"
       );
     } catch (error) {
       showStatus(
