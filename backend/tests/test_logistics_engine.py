@@ -288,5 +288,35 @@ class LogisticsEngineV02Tests(
         )
 
 
+    def test_baseline_is_reference_assignment(
+        self,
+    ):
+        result = run_logistics_engine(
+            CSV,
+            objective="min_cost",
+        )
+
+        baseline = result[
+            "scenarios"
+        ]["baseline"]
+
+        self.assertEqual(
+            baseline["name"],
+            "Asignación de referencia",
+        )
+        self.assertTrue(
+            any(
+                "vehicle_type"
+                in assumption
+                and "referencia"
+                in assumption
+                for assumption
+                in result[
+                    "model_assumptions"
+                ]
+            )
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
