@@ -429,15 +429,19 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "application/json",
-            self.app_js,
+            "text/plain;charset=utf-8",
+            self.dashboard_stage_js,
+        )
+        self.assertIn(
+            ' + ".txt"',
+            self.dashboard_stage_js,
         )
         self.assertNotIn(
             "buildDecisionMarkdown(",
             self.app_js,
         )
         self.assertIn(
-            'class="dation-chat-floating"',
+            'class="dation-floating-actions"',
             self.html,
         )
         self.assertIn(
@@ -455,6 +459,38 @@ class FrontendContractTests(
         self.assertIn(
             "aria-expanded",
             self.interpreter_stage_js,
+        )
+
+    def test_dashboard_separates_objective_from_decision(
+        self,
+    ):
+        self.assertIn(
+            'id="dashboard-objective-label"',
+            self.html,
+        )
+        self.assertIn(
+            'id="dashboard-objective-detail"',
+            self.html,
+        )
+        self.assertIn(
+            'id="dashboard-assignment-distribution"',
+            self.html,
+        )
+        self.assertIn(
+            "objectiveLabel",
+            self.dashboard_stage_js,
+        )
+        self.assertIn(
+            "decisionTitle",
+            self.dashboard_stage_js,
+        )
+        self.assertIn(
+            "Asignación de referencia",
+            self.html,
+        )
+        self.assertNotIn(
+            "Situación actual",
+            self.html,
         )
 
 
