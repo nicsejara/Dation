@@ -179,3 +179,14 @@ Final main-state for the current deployment:
 - DDA Logística is the only interactive CTA and routes to `logistics-config`.
 - DDA Producción is visible and disabled.
 - CSS and JavaScript URLs are cache-busted from `app.html`.
+
+
+## Journey navigation hotfix — 2026-09-30
+
+- Topbar simplified to a clickable decision journey.
+- Inicio shows only "Inicio".
+- Logistics flow shows: Inicio > DDA Logística > Cargar data > Configurar decisión > Dashboard decisión.
+- Previous stages are clickable and navigate/scroll back.
+- Sidebar buttons use the same resilient global navigator.
+- MVP badge, service verification status and avatar were removed from the topbar.
+- app.js delegates view changes to the global journey navigator so programmatic transitions stay synchronized.
