@@ -1117,6 +1117,7 @@
   <script>
     (function () {
       var currentView = 'inicio';
+      var dataReady = false;
 
       function panelFor(view) {
         return document.querySelector('[data-view-panel="' + view + '"]');
@@ -1238,7 +1239,7 @@
           container.appendChild(
             journeyButton('Configurar decisión', {
               current: currentView === 'logistics-config',
-              disabled: currentView === 'logistics-data',
+              disabled: currentView === 'logistics-data' && !dataReady,
               onClick: function () {
                 window.dationNavigate('logistics-config');
               }
@@ -1277,10 +1278,26 @@
         );
       };
 
+      window.dationSetDataReady = function (ready) {
+        dataReady = Boolean(ready);
+
+        if (currentView === 'logistics-data') {
+          window.dationRenderJourney(currentView);
+        }
+      };
+
       window.dationNavigate = function (view, stage, event) {
         if (event) {
           event.preventDefault();
           event.stopPropagation();
+        }
+
+        if (
+          view === 'logistics-config'
+          && currentView === 'logistics-data'
+          && !dataReady
+        ) {
+          return;
         }
 
         var target = panelFor(view);
