@@ -172,7 +172,7 @@ def build_decision_context(
 
     scenario_context = {
         "baseline": {
-            "name": "Asignación de referencia",
+            "name": "Asignación actual",
             "metrics": baseline.get(
                 "metrics"
             ),
@@ -261,16 +261,16 @@ def build_decision_context(
         ],
         "recommended_scenario": recommended,
         "reference_semantics": {
-            "label": "Asignación de referencia",
+            "label": "Asignación actual",
             "source": (
                 "vehicle_type informado en cada fila "
                 "del dataset"
             ),
             "meaning": (
-                "Referencia comparativa para cuantificar "
-                "deltas del modelo. No implica por sí "
-                "misma que represente la situación "
-                "operativa actual."
+                "Asignación informada en el CSV utilizada para cuantificar "
+                "deltas frente a la decisión recomendada. "
+                "El glosario de producto la denomina "
+                "Asignación actual."
             ),
         },
         "selection_semantics": {
