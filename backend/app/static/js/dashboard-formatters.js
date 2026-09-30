@@ -308,7 +308,9 @@
       ) {
         return (
           startDay
-          + "–"
+          + " "
+          + startMonth
+          + " – "
           + endDay
           + " "
           + endMonth
