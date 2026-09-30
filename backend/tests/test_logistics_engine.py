@@ -302,7 +302,7 @@ class LogisticsEngineV02Tests(
 
         self.assertEqual(
             baseline["name"],
-            "Asignación de referencia",
+            "Asignación actual",
         )
         self.assertTrue(
             any(
