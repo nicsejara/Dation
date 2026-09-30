@@ -42,6 +42,13 @@
   --color-info-bg: #eff8ff;
   --color-info-border: #b2ddff;
 
+  --color-decision: #5b6cff;
+  --color-decision-strong: #3949d8;
+  --color-decision-soft: #dfe3ff;
+  --color-current: #98a2b3;
+  --color-current-strong: #667085;
+  --color-neutral-bg: #f2f4f7;
+
   --shadow-xs: 0 1px 2px rgba(16, 24, 40, .04);
   --shadow-sm: 0 1px 3px rgba(16, 24, 40, .08), 0 1px 2px rgba(16, 24, 40, .04);
   --shadow-md: 0 8px 24px rgba(16, 24, 40, .07);
