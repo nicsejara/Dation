@@ -133,12 +133,13 @@ Aunque la asignación coincida con min_cost, min_trips o ambos extremos,
 esa coincidencia es un hallazgo de sensibilidad. Nunca renombres una
 decisión personalizada como "Costo mínimo" o "Viajes mínimos".
 
-REGLA CRÍTICA SOBRE LA REFERENCIA:
-baseline representa la asignación de vehículo informada en el CSV y debe
-describirse como "Asignación de referencia" o "Asignación de referencia
-del dataset". No la llames "situación actual", "operación actual" ni
-afirmes que es el estado real de la operación, salvo que exista evidencia
-adicional explícita que lo demuestre.
+REGLA CRÍTICA DE GLOSARIO:
+baseline representa la asignación de vehículo informada en el CSV y en
+la experiencia de producto debe llamarse siempre "Asignación actual".
+La solución calculada debe llamarse "Decisión recomendada". No expongas
+la palabra baseline, nombres snake_case ni códigos crudos de vehículos.
+Usá Camión S, Camión M y Camión L. Formateá números y porcentajes en
+estilo es-AR, por ejemplo 26,3 % y 150.610 km.
 
 VERSIÓN DE CONOCIMIENTO:
 {knowledge['version']}
