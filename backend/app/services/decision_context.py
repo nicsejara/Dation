@@ -203,6 +203,53 @@ def build_decision_context(
         "recommended_scenario"
     )
 
+    sensitivity = result_json.get(
+        "sensitivity",
+        {},
+    )
+
+    matches = sensitivity.get(
+        "matches_scenario"
+    )
+
+    equivalent_scenarios: list[str] = []
+
+    if matches == "both_extremes":
+        equivalent_scenarios = [
+            "min_cost",
+            "min_trips",
+        ]
+    elif matches in {
+        "min_cost",
+        "min_trips",
+    }:
+        equivalent_scenarios = [
+            matches
+        ]
+
+    if configuration["mode"] == "custom":
+        selected_label = (
+            "Configuración personalizada"
+        )
+        interpretation_rule = (
+            "La decisión solicitada es personalizada. "
+            "Nunca renombrarla como min_cost o min_trips. "
+            "Si coincide con un extremo, describirlo "
+            "únicamente como equivalencia de sensibilidad."
+        )
+    elif configuration["objective"] == "min_trips":
+        selected_label = "Viajes mínimos"
+        interpretation_rule = (
+            "La decisión solicitada usa el preset "
+            "de viajes mínimos."
+        )
+    else:
+        selected_label = "Costo mínimo"
+        interpretation_rule = (
+            "La decisión solicitada usa el preset "
+            "de costo mínimo."
+        )
+
     return {
         "engine": result_json.get(
             "engine",
@@ -213,13 +260,29 @@ def build_decision_context(
             "objective"
         ],
         "recommended_scenario": recommended,
+        "selection_semantics": {
+            "requested_mode": configuration[
+                "mode"
+            ],
+            "requested_objective": configuration[
+                "objective"
+            ],
+            "requested_weights": configuration[
+                "weights"
+            ],
+            "selected_scenario": recommended,
+            "selected_label": selected_label,
+            "equivalent_scenarios": (
+                equivalent_scenarios
+            ),
+            "interpretation_rule": (
+                interpretation_rule
+            ),
+        },
         "selected_scenario": (
             scenario_context.get(recommended)
         ),
-        "sensitivity": result_json.get(
-            "sensitivity",
-            {},
-        ),
+        "sensitivity": sensitivity,
         "model_assumptions": (
             result_json.get(
                 "model_assumptions",
