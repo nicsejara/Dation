@@ -257,3 +257,30 @@ Final frontend checks:
 - data-stage.js syntax OK;
 - all data-stage DOM IDs resolved;
 - template contains 14 required columns.
+
+
+## Decision configuration stage v2 — 2026-09-30
+
+The decision configuration stage is now isolated from the legacy workspace bindings.
+
+Flow:
+- validated dataset is persisted in session storage;
+- decision-stage.js restores the dataset independently;
+- three starting presets are available:
+  - min_cost = 100% cost / 0% trips;
+  - min_trips = 0% cost / 100% trips;
+  - balanced = custom 50% / 50%;
+- both Cost and Trips have linked sliders;
+- moving either slider automatically adjusts the other so total weight always remains 100%;
+- all non-extreme weights are submitted as mode=custom, objective=custom;
+- execution requires an explicit review modal;
+- the confirmation modal displays dataset, mode, weights and engine version;
+- confirmed execution POSTs to /api/runs/{dataset_id};
+- successful runs are bridged back to the main workspace and rendered in Decision Dashboard.
+
+Hardening:
+- stale legacy upload and decision binders removed from app.js;
+- stale legacy decision UI renderer removed from ui.js;
+- validated dataset persisted across stages;
+- GitHub Actions now runs on main pushes and validates data-stage.js + decision-stage.js syntax;
+- frontend contract tests cover stage DOM/API contracts.
