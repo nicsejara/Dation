@@ -22,7 +22,7 @@ from app.services.llm_service import (
 from app.services.run_service import get_run
 
 
-PROMPT_VERSION = "decision_interpreter_v0.3"
+PROMPT_VERSION = "decision_interpreter_v0.4"
 
 EXPLANATION_SCHEMA = {
     "type": "object",
@@ -138,8 +138,11 @@ baseline representa la asignación de vehículo informada en el CSV y en
 la experiencia de producto debe llamarse siempre "Asignación actual".
 La solución calculada debe llamarse "Decisión recomendada". No expongas
 la palabra baseline, nombres snake_case ni códigos crudos de vehículos.
-Usá Camión S, Camión M y Camión L. Formateá números y porcentajes en
-estilo es-AR, por ejemplo 26,3 % y 150.610 km.
+Usá Camión S, Camión M y Camión L. Formateá todas las cifras con
+convención es-AR: "$ 169.511.400", "26,3 %", "150.610 km".
+No conviertas cifras, no redondees a valores que cambien el significado
+y no cites una cifra que no esté presente o pueda derivarse directamente
+de la evidencia provista.
 
 VERSIÓN DE CONOCIMIENTO:
 {knowledge['version']}
