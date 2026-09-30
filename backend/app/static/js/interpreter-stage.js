@@ -396,6 +396,19 @@
         savedExplanation
       );
 
+      if (savedExplanation) {
+        window.dispatchEvent(
+          new CustomEvent(
+            "dation:interpreter-explanation",
+            {
+              detail: {
+                explanation: savedExplanation
+              }
+            }
+          )
+        );
+      }
+
       renderMessages(
         state.messages
       );
@@ -527,6 +540,17 @@
 
       renderExplanation(
         state.explanation
+      );
+
+      window.dispatchEvent(
+        new CustomEvent(
+          "dation:interpreter-explanation",
+          {
+            detail: {
+              explanation: state.explanation
+            }
+          }
+        )
       );
 
       showStatus(
