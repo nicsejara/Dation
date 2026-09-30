@@ -359,3 +359,29 @@ Interpreter UX:
 - Contextual chat is now a floating launcher + floating panel.
 - Chat keeps the same run-scoped /chat endpoint and saved message history.
 - Floating chat supports close button, Escape key and aria-expanded state.
+
+
+## Decision-first dashboard + fixed action dock — 2026-09-30
+
+Decision semantics:
+- Dashboard separates optimization objective from generated operational decision.
+- Objective is rendered from persisted configuration:
+  - minimize total cost;
+  - minimize trips;
+  - custom weighted objective.
+- Generated decision summarizes shipment-to-vehicle assignment, total trips and vehicle distribution.
+- Baseline is presented as "Asignación de referencia", sourced from vehicle_type in the input CSV.
+- Baseline must not be described as verified current operation without additional evidence.
+
+Dashboard UX:
+- Exportar decisión and Preguntale a Dation share one fixed viewport action dock.
+- The dock remains visible while scrolling the Dashboard.
+- The contextual chat panel opens above the fixed dock.
+- Decision export is owned by dashboard-stage.js and no longer depends on app.js state timing.
+
+Export:
+- Exports the active DecisionResult JSON as a UTF-8 .txt file.
+- If only run_id is available, the full completed run is fetched before export.
+
+Interpreter:
+- Knowledge/context explicitly distinguish reference assignment from current operational state.
