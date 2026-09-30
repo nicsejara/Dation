@@ -1,6 +1,21 @@
 (function () {
   "use strict";
 
+  var F = (
+    window.DationDashboardFormatters
+  );
+
+  var S = (
+    window.DationDashboardSelectors
+  );
+
+  if (!F || !S) {
+    console.error(
+      "Dation Dashboard no pudo iniciar: faltan formatters o selectors."
+    );
+    return;
+  }
+
   var STORAGE_KEY = (
     "dation.logistics.execution.v1"
   );
@@ -8,12 +23,23 @@
   var state = {
     context: null,
     pollTimer: null,
-    pollAttempts: 0
+    pollAttempts: 0,
+    detailRows: [],
+    detailPage: 1,
+    detailPageSize: 12
   };
 
   function $(selector) {
     return document.querySelector(
       selector
+    );
+  }
+
+  function $$(selector) {
+    return Array.from(
+      document.querySelectorAll(
+        selector
+      )
     );
   }
 
@@ -28,96 +54,25 @@
       .replaceAll("'", "&#039;");
   }
 
-  function formatNumber(
-    value,
-    digits
-  ) {
-    digits = (
-      digits == null
-        ? 0
-        : digits
+  function setText(id, value) {
+    var node = document.getElementById(
+      id
     );
 
-    if (
-      value === null
-      || value === undefined
-      || Number.isNaN(
-        Number(value)
-      )
-    ) {
-      return "—";
+    if (node) {
+      node.textContent = (
+        value == null
+          ? "—"
+          : String(value)
+      );
     }
-
-    return new Intl.NumberFormat(
-      "es-AR",
-      {
-        maximumFractionDigits: digits
-      }
-    ).format(
-      Number(value)
-    );
-  }
-
-  function formatCurrency(value) {
-    if (
-      value === null
-      || value === undefined
-      || Number.isNaN(
-        Number(value)
-      )
-    ) {
-      return "—";
-    }
-
-    return new Intl.NumberFormat(
-      "es-AR",
-      {
-        style: "currency",
-        currency: "ARS",
-        maximumFractionDigits: 0
-      }
-    ).format(
-      Number(value)
-    );
-  }
-
-  function formatPercent(value) {
-    if (
-      value === null
-      || value === undefined
-      || Number.isNaN(
-        Number(value)
-      )
-    ) {
-      return "—";
-    }
-
-    var number = Number(value);
-    var prefix = (
-      number > 0 ? "+" : ""
-    );
-
-    return (
-      prefix
-      + number.toFixed(1)
-      + "%"
-    );
-  }
-
-  function shortId(value) {
-    if (!value) {
-      return "—";
-    }
-
-    return (
-      String(value).slice(0, 8)
-      + "…"
-    );
   }
 
   function saveContext(context) {
     state.context = context;
-    window.dationDashboardContext = context;
+    window.dationDashboardContext = (
+      context
+    );
 
     try {
       sessionStorage.setItem(
@@ -125,7 +80,7 @@
         JSON.stringify(context)
       );
     } catch (error) {
-      // Session persistence is best effort.
+      // Persistencia best effort.
     }
   }
 
@@ -176,6 +131,50 @@
       + url.search
       + url.hash
     );
+  }
+
+  async function requestJson(url) {
+    var response = await fetch(
+      url,
+      {
+        credentials: "same-origin"
+      }
+    );
+
+    var contentType = (
+      response.headers.get(
+        "content-type"
+      )
+      || ""
+    );
+
+    var payload = (
+      contentType.includes(
+        "application/json"
+      )
+        ? await response.json()
+        : await response.text()
+    );
+
+    if (!response.ok) {
+      var error = new Error(
+        typeof payload === "object"
+        && payload
+          ? (
+            payload.detail
+            || JSON.stringify(payload)
+          )
+          : (
+            payload
+            || response.statusText
+          )
+      );
+
+      error.status = response.status;
+      throw error;
+    }
+
+    return payload;
   }
 
   function clearPoll() {
@@ -265,26 +264,24 @@
       "is-hidden"
     );
 
-    if (mode && mode !== "running") {
+    if (
+      mode
+      && mode !== "running"
+    ) {
       shell.classList.add(
         "is-" + mode
       );
     }
 
-    var titleNode = (
-      $("#dashboard-execution-title")
-    );
-    var copyNode = (
-      $("#dashboard-execution-copy")
+    setText(
+      "dashboard-execution-title",
+      title
     );
 
-    if (titleNode) {
-      titleNode.textContent = title;
-    }
-
-    if (copyNode) {
-      copyNode.textContent = copy;
-    }
+    setText(
+      "dashboard-execution-copy",
+      copy
+    );
 
     if (progress) {
       progress.classList.toggle(
@@ -300,20 +297,17 @@
       );
     }
 
-    var runNode = (
-      $("#dashboard-execution-run")
-    );
-
-    if (runNode) {
-      runNode.textContent = (
+    setText(
+      "dashboard-execution-run",
+      (
         state.context
         && state.context.runId
-          ? "Run " + shortId(
-              state.context.runId
-            )
+          ? (
+            "Corrida en proceso"
+          )
           : "—"
-      );
-    }
+      )
+    );
   }
 
   function showRunning() {
@@ -321,9 +315,8 @@
       "running",
       "Ejecutando decisión…",
       (
-        "El motor está evaluando las "
-        + "alternativas y persistiendo "
-        + "la evidencia de la corrida."
+        "El motor está evaluando alternativas "
+        + "de asignación y persistiendo la corrida."
       )
     );
 
@@ -338,11 +331,12 @@
     showExecutionState(
       "error",
       "No se pudo completar la decisión",
-      message
-      || (
-        "La ejecución terminó con un error. "
-        + "Podés verificar el estado persistido "
-        + "o iniciar una nueva corrida."
+      (
+        message
+        || (
+          "La ejecución terminó con un error. "
+          + "Podés verificar el estado o reintentar."
+        )
       )
     );
 
@@ -361,9 +355,8 @@
       "timeout",
       "La ejecución superó el tiempo de espera",
       (
-        "La interfaz dejó de esperar la respuesta, "
-        + "pero la corrida puede continuar en el backend. "
-        + "Podés verificar su estado sin lanzar otra ejecución."
+        "La interfaz dejó de esperar, pero la corrida "
+        + "puede seguir procesándose en el backend."
       )
     );
 
@@ -379,10 +372,8 @@
       "cancelled",
       "Espera detenida",
       (
-        "Detuviste la espera en el navegador. "
-        + "Esto no garantiza la cancelación del cálculo "
-        + "en el backend porque el MVP todavía no expone "
-        + "un endpoint de cancelación."
+        "La espera del navegador fue detenida. "
+        + "La corrida puede seguir en el backend."
       )
     );
 
@@ -393,45 +384,2008 @@
     });
   }
 
-  async function requestJson(url) {
-    var response = await fetch(
-      url,
+  function showDashboard() {
+    var shell = (
+      $("#dashboard-execution-state")
+    );
+    var content = (
+      $("#dashboard-content")
+    );
+
+    if (shell) {
+      shell.classList.add(
+        "is-hidden"
+      );
+    }
+
+    if (content) {
+      content.classList.remove(
+        "is-hidden"
+      );
+    }
+  }
+
+  function runConfiguration(run) {
+    return (
+      run
+      && (
+        run.configuration_json
+        || (
+          run.result_json
+          && run.result_json
+            .configuration
+        )
+      )
+    )
+    || {
+      mode: "preset",
+      objective: "min_cost",
+      weights: {
+        cost: 1,
+        trips: 0
+      }
+    };
+  }
+
+  function percentageImpact(
+    value,
+    positiveVerb,
+    negativeVerb,
+    neutralText
+  ) {
+    var number = F.finite(value);
+
+    if (number === null) {
+      return "sin variación disponible";
+    }
+
+    if (number > 0) {
+      return (
+        positiveVerb
+        + " "
+        + F.formatPercent(
+            number,
+            {
+              signed: false
+            }
+          )
+      );
+    }
+
+    if (number < 0) {
+      return (
+        negativeVerb
+        + " "
+        + F.formatPercent(
+            Math.abs(number),
+            {
+              signed: false
+            }
+          )
+      );
+    }
+
+    return neutralText;
+  }
+
+  function renderExecutionDetails(
+    run,
+    dataset
+  ) {
+    var result = (
+      run.result_json || {}
+    );
+
+    setText(
+      "details-dataset",
+      (
+        dataset
+        && dataset.original_filename
+      )
+      || "—"
+    );
+
+    setText(
+      "details-date",
+      F.formatDate(
+        run.finished_at
+        || run.created_at
+      )
+    );
+
+    setText(
+      "details-engine",
+      (
+        (
+          run.engine_name
+          || (
+            result.engine
+            && result.engine.name
+          )
+          || "Motor logístico"
+        )
+        + " · "
+        + (
+          run.engine_version
+          || (
+            result.engine
+            && result.engine.version
+          )
+          || "—"
+        )
+      )
+    );
+
+    setText(
+      "details-run-id",
+      run.id || "—"
+    );
+  }
+
+  function objectiveChip(config) {
+    return (
+      "Objetivo: "
+      + F.objectiveLabel(config)
+      + " · Prioridad "
+      + F.weightLabel(config)
+    );
+  }
+
+  function renderHero(
+    run,
+    dataset
+  ) {
+    var result = run.result_json;
+    var selected = (
+      S.selectedScenario(run)
+    );
+    var current = (
+      S.currentScenario(run)
+    );
+    var config = (
+      runConfiguration(run)
+    );
+    var hero = (
+      S.heroDecision(
+        current,
+        selected,
+        result
+      )
+    );
+    var gain = (
+      S.savings(
+        current,
+        selected
+      )
+    );
+
+    setText(
+      "dashboard-objective-chip",
+      objectiveChip(config)
+    );
+
+    setText(
+      "dashboard-recommendation-title",
+      hero.title
+    );
+
+    var costMessage = percentageImpact(
+      gain.cost.pct,
+      "reduce el costo",
+      "aumenta el costo",
+      "mantiene el costo"
+    );
+
+    var tripsMessage = (
+      percentageImpact(
+        gain.trips.pct,
+        "reduce los viajes",
+        "aumenta los viajes",
+        "mantiene los viajes"
+      )
+    );
+
+    setText(
+      "dashboard-recommendation-copy",
+      (
+        costMessage.charAt(0)
+          .toUpperCase()
+        + costMessage.slice(1)
+        + " y "
+        + tripsMessage
+        + ", con "
+        + F.formatNumber(
+            selected.metrics
+              .total_trips
+          )
+        + " viajes y "
+        + F.formatKm(
+            selected.metrics
+              .total_distance_km
+          )
+        + "."
+      )
+    );
+
+    var savingLabel = (
+      $(".decision-savings-card span")
+    );
+
+    if (gain.cost.absolute > 0) {
+      if (savingLabel) {
+        savingLabel.textContent = (
+          "Ahorro estimado"
+        );
+      }
+
+      setText(
+        "dashboard-savings-value",
+        F.formatCurrency(
+          gain.cost.absolute
+        )
+      );
+
+      setText(
+        "dashboard-savings-percent",
+        (
+          F.formatPercent(
+            -Math.abs(
+              gain.cost.pct
+            )
+          )
+          + " vs. asignación actual"
+        )
+      );
+    } else if (
+      gain.cost.absolute < 0
+    ) {
+      if (savingLabel) {
+        savingLabel.textContent = (
+          "Costo adicional estimado"
+        );
+      }
+
+      setText(
+        "dashboard-savings-value",
+        F.formatCurrency(
+          Math.abs(
+            gain.cost.absolute
+          )
+        )
+      );
+
+      setText(
+        "dashboard-savings-percent",
+        (
+          F.formatPercent(
+            Math.abs(
+              gain.cost.pct
+            )
+          )
+          + " vs. asignación actual"
+        )
+      );
+    } else {
+      if (savingLabel) {
+        savingLabel.textContent = (
+          "Variación de costo"
+        );
+      }
+
+      setText(
+        "dashboard-savings-value",
+        F.formatCurrency(0)
+      );
+
+      setText(
+        "dashboard-savings-percent",
+        "Sin cambio vs. asignación actual"
+      );
+    }
+
+    var chips = (
+      $("#dashboard-meta-chips")
+    );
+
+    if (chips) {
+      chips.innerHTML = [
+        [
+          "Dataset",
+          (
+            dataset
+            && dataset.original_filename
+          )
+          || "—"
+        ],
+        [
+          "Configuración",
+          (
+            config.mode === "custom"
+              ? "Personalizada"
+              : "Predefinida"
+          )
+        ],
+        [
+          "Prioridades",
+          F.weightLabel(config)
+        ],
+        [
+          "Ejecución",
+          F.formatDate(
+            run.finished_at
+            || run.created_at
+          )
+        ]
+      ]
+        .map(function (item) {
+          return (
+            '<span class="decision-meta-chip">'
+            + "<small>"
+            + escapeHtml(item[0])
+            + "</small>"
+            + "<strong>"
+            + escapeHtml(item[1])
+            + "</strong>"
+            + "</span>"
+          );
+        })
+        .join("");
+    }
+
+    renderAssignmentChart(
+      current,
+      selected
+    );
+  }
+
+  function distributionMap(
+    scenario
+  ) {
+    var map = new Map();
+
+    S.assignmentDistribution(
+      scenario
+    ).forEach(function (item) {
+      map.set(
+        item.vehicle_type,
+        item
+      );
+    });
+
+    return map;
+  }
+
+  function orderedVehicles(
+    current,
+    selected
+  ) {
+    var values = new Set();
+
+    S.assignmentDistribution(
+      current
+    ).forEach(function (item) {
+      values.add(item.vehicle_type);
+    });
+
+    S.assignmentDistribution(
+      selected
+    ).forEach(function (item) {
+      values.add(item.vehicle_type);
+    });
+
+    return Array.from(values)
+      .sort(function (a, b) {
+        return (
+          F.vehicleLabel(a)
+            .localeCompare(
+              F.vehicleLabel(b)
+            )
+        );
+      });
+  }
+
+  function renderStackedBar(
+    label,
+    scenario,
+    vehicles,
+    role
+  ) {
+    var distribution = (
+      distributionMap(scenario)
+    );
+
+    var total = (
+      scenario
+      && scenario.metrics
+      && Number(
+        scenario.metrics.shipments
+      )
+    )
+    || 1;
+
+    var segments = (
+      vehicles.map(
+        function (
+          vehicle,
+          index
+        ) {
+          var item = (
+            distribution.get(vehicle)
+            || {
+              shipments: 0
+            }
+          );
+
+          var width = (
+            Number(
+              item.shipments || 0
+            )
+            / total
+          ) * 100;
+
+          return (
+            '<div class="assignment-segment '
+            + "assignment-segment--"
+            + role
+            + " assignment-segment--tone-"
+            + (
+              index % 3
+            )
+            + '" style="width:'
+            + width.toFixed(3)
+            + '%" title="'
+            + escapeHtml(
+                F.vehicleLabel(vehicle)
+                + ": "
+                + F.formatNumber(
+                    item.shipments
+                  )
+                + " despachos"
+              )
+            + '">'
+            + (
+              width >= 9
+                ? (
+                  "<span>"
+                  + escapeHtml(
+                      F.vehicleLabel(vehicle)
+                    )
+                  + " · "
+                  + F.formatNumber(
+                      item.shipments
+                    )
+                  + "</span>"
+                )
+                : ""
+            )
+            + "</div>"
+          );
+        }
+      ).join("")
+    );
+
+    return (
+      '<div class="assignment-row">'
+      + '<div class="assignment-row__label">'
+      + escapeHtml(label)
+      + "</div>"
+      + '<div class="assignment-row__bar">'
+      + segments
+      + "</div>"
+      + '<strong class="assignment-row__total">'
+      + F.formatNumber(total)
+      + "</strong>"
+      + "</div>"
+    );
+  }
+
+  function renderAssignmentChart(
+    current,
+    selected
+  ) {
+    var chart = (
+      $("#dashboard-assignment-chart")
+    );
+    var detail = (
+      $(
+        "#dashboard-assignment-vehicle-details"
+      )
+    );
+
+    if (!chart || !detail) {
+      return;
+    }
+
+    var vehicles = orderedVehicles(
+      current,
+      selected
+    );
+
+    chart.innerHTML = (
+      renderStackedBar(
+        "Asignación actual",
+        current,
+        vehicles,
+        "current"
+      )
+      + renderStackedBar(
+        "Decisión recomendada",
+        selected,
+        vehicles,
+        "decision"
+      )
+    );
+
+    var currentMap = (
+      distributionMap(current)
+    );
+    var selectedMap = (
+      distributionMap(selected)
+    );
+
+    detail.innerHTML = (
+      vehicles.map(function (vehicle) {
+        var before = (
+          currentMap.get(vehicle)
+          || {
+            shipments: 0,
+            trips: 0,
+            units: 0
+          }
+        );
+
+        var after = (
+          selectedMap.get(vehicle)
+          || {
+            shipments: 0,
+            trips: 0,
+            units: 0
+          }
+        );
+
+        return (
+          '<div class="assignment-vehicle-row">'
+          + "<strong>"
+          + escapeHtml(
+              F.vehicleLabel(vehicle)
+            )
+          + "</strong>"
+          + "<span>"
+          + F.formatNumber(
+              after.shipments
+            )
+          + " despachos</span>"
+          + "<span>"
+          + F.formatNumber(
+              after.trips
+            )
+          + " viajes</span>"
+          + "<span>"
+          + F.formatNumber(
+              after.units
+            )
+          + " unidades</span>"
+          + "<small>Antes: "
+          + F.formatNumber(
+              before.shipments
+            )
+          + " despachos</small>"
+          + "</div>"
+        );
+      }).join("")
+    );
+  }
+
+  function metricFormatter(key, value) {
+    if (key === "cost") {
+      return F.formatCurrency(value);
+    }
+
+    if (key === "distance") {
+      return F.formatKm(value);
+    }
+
+    return F.formatNumber(value);
+  }
+
+  function metricDeltaFormatter(
+    key,
+    value
+  ) {
+    var number = F.finite(value);
+
+    if (number === null) {
+      return "—";
+    }
+
+    var prefix = (
+      number > 0
+        ? "+"
+        : number < 0
+          ? "−"
+          : ""
+    );
+
+    var absolute = Math.abs(number);
+
+    if (key === "cost") {
+      return (
+        prefix
+        + F.formatCurrency(
+            absolute
+          )
+      );
+    }
+
+    if (key === "distance") {
+      return (
+        prefix
+        + F.formatKm(
+            absolute
+          )
+      );
+    }
+
+    return (
+      prefix
+      + F.formatNumber(
+          absolute
+        )
+    );
+  }
+
+  function improvementClass(
+    saving
+  ) {
+    var value = F.finite(saving);
+
+    if (value === null || value === 0) {
+      return "is-neutral";
+    }
+
+    return (
+      value > 0
+        ? "is-improvement"
+        : "is-worse"
+    );
+  }
+
+  function kpiDefinition(key) {
+    var definitions = {
+      cost: (
+        "Costo total = costo variable + "
+        + "costo fijo de todos los viajes."
+      ),
+      trips: (
+        "Viajes requeridos según peso total "
+        + "y capacidad del vehículo asignado."
+      ),
+      distance: (
+        "Distancia total modelada considerando "
+        + "ida y regreso por viaje."
+      ),
+      reassigned: (
+        "Despachos cuyo tipo de camión cambia "
+        + "respecto de la asignación actual."
+      )
+    };
+
+    return definitions[key] || "";
+  }
+
+  function renderKpis(
+    current,
+    selected
+  ) {
+    var container = (
+      $("#dashboard-kpi-grid")
+    );
+
+    if (!container) {
+      return;
+    }
+
+    container.innerHTML = (
+      S.kpis(
+        current,
+        selected
+      )
+        .map(function (item) {
+          var max = Math.max(
+            Math.abs(
+              Number(
+                item.current || 0
+              )
+            ),
+            Math.abs(
+              Number(
+                item.decision || 0
+              )
+            ),
+            1
+          );
+
+          var currentWidth = (
+            Math.abs(
+              Number(
+                item.current || 0
+              )
+            )
+            / max
+          ) * 100;
+
+          var decisionWidth = (
+            Math.abs(
+              Number(
+                item.decision || 0
+              )
+            )
+            / max
+          ) * 100;
+
+          var saving = (
+            Number(
+              item.current || 0
+            )
+            - Number(
+              item.decision || 0
+            )
+          );
+
+          if (item.key === "reassigned") {
+            saving = 0;
+          }
+
+          var deltaClass = (
+            item.key === "reassigned"
+              ? "is-neutral"
+              : improvementClass(
+                  item.absolute
+                )
+          );
+
+          var deltaText = (
+            item.key === "reassigned"
+              ? (
+                F.formatNumber(
+                  item.decision
+                )
+                + " de "
+                + F.formatNumber(
+                    selected.metrics
+                      .shipments
+                  )
+                + " despachos"
+              )
+              : (
+                metricDeltaFormatter(
+                  item.key,
+                  item.absolute
+                )
+                + " · "
+                + F.formatPercent(
+                    -Number(
+                      item.pct || 0
+                    )
+                  )
+              )
+          );
+
+          return (
+            '<article class="decision-kpi-card" title="'
+            + escapeHtml(
+                kpiDefinition(
+                  item.key
+                )
+              )
+            + '">'
+            + '<div class="decision-kpi-card__label">'
+            + "<span>"
+            + escapeHtml(item.label)
+            + "</span>"
+            + '<button class="kpi-info" type="button" aria-label="'
+            + escapeHtml(
+                kpiDefinition(
+                  item.key
+                )
+              )
+            + '">i</button>'
+            + "</div>"
+            + '<strong class="decision-kpi-card__value">'
+            + escapeHtml(
+                metricFormatter(
+                  item.key,
+                  item.decision
+                )
+              )
+            + "</strong>"
+            + '<div class="decision-kpi-card__current">'
+            + "Asignación actual: "
+            + "<span>"
+            + escapeHtml(
+                metricFormatter(
+                  item.key,
+                  item.current
+                )
+              )
+            + "</span>"
+            + "</div>"
+            + '<div class="decision-kpi-card__delta '
+            + deltaClass
+            + '">'
+            + escapeHtml(deltaText)
+            + "</div>"
+            + '<div class="kpi-mini-bars" aria-hidden="true">'
+            + '<span class="kpi-mini-bar kpi-mini-bar--current" style="width:'
+            + currentWidth.toFixed(2)
+            + '%"></span>'
+            + '<span class="kpi-mini-bar kpi-mini-bar--decision" style="width:'
+            + decisionWidth.toFixed(2)
+            + '%"></span>'
+            + "</div>"
+            + "</article>"
+          );
+        }).join("")
+    );
+  }
+
+  function renderComparison(
+    run,
+    referenceKey
+  ) {
+    var result = run.result_json;
+    var selected = (
+      S.selectedScenario(run)
+    );
+    var reference = (
+      result.scenarios[
+        referenceKey
+      ]
+    );
+    var stateNode = (
+      $("#dashboard-comparison-state")
+    );
+    var layout = (
+      $(".dashboard-comparison-layout")
+    );
+    var chart = (
+      $("#dashboard-comparison-chart")
+    );
+    var table = (
+      $("#dashboard-comparison-table-body")
+    );
+
+    if (
+      !selected
+      || !reference
+      || !stateNode
+      || !layout
+      || !chart
+      || !table
+    ) {
+      return;
+    }
+
+    var same = (
+      S.scenariosEquivalent(
+        selected,
+        reference
+      )
+    );
+
+    stateNode.classList.toggle(
+      "is-hidden",
+      !same
+    );
+
+    if (same) {
+      stateNode.innerHTML = (
+        "<strong>Sin diferencias operativas</strong>"
+        + "<span>Este escenario produce la misma asignación "
+        + "que la decisión recomendada. No hay diferencias que mostrar.</span>"
+      );
+
+      layout.classList.add(
+        "is-muted"
+      );
+    } else {
+      stateNode.innerHTML = "";
+      layout.classList.remove(
+        "is-muted"
+      );
+    }
+
+    var metrics = [
       {
-        credentials: "same-origin"
+        key: "cost",
+        source: "total_cost",
+        label: "Costo total"
+      },
+      {
+        key: "trips",
+        source: "total_trips",
+        label: "Viajes"
+      },
+      {
+        key: "distance",
+        source: "total_distance_km",
+        label: "Distancia"
+      }
+    ];
+
+    chart.innerHTML = (
+      metrics.map(function (metric) {
+        var decisionValue = Number(
+          selected.metrics[
+            metric.source
+          ]
+        );
+
+        var referenceValue = Number(
+          reference.metrics[
+            metric.source
+          ]
+        );
+
+        var maximum = Math.max(
+          Math.abs(decisionValue),
+          Math.abs(referenceValue),
+          1
+        );
+
+        return (
+          '<div class="real-comparison-metric">'
+          + '<div class="real-comparison-metric__head">'
+          + "<strong>"
+          + escapeHtml(metric.label)
+          + "</strong>"
+          + "<span>"
+          + escapeHtml(
+              metricFormatter(
+                metric.key,
+                decisionValue
+              )
+            )
+          + " vs "
+          + escapeHtml(
+              metricFormatter(
+                metric.key,
+                referenceValue
+              )
+            )
+          + "</span>"
+          + "</div>"
+          + '<div class="real-comparison-bar">'
+          + "<span>Decisión</span>"
+          + '<div><i class="is-decision" style="width:'
+          + (
+            decisionValue
+            / maximum
+            * 100
+          ).toFixed(2)
+          + '%"></i></div>'
+          + "</div>"
+          + '<div class="real-comparison-bar">'
+          + "<span>Comparada</span>"
+          + '<div><i class="is-current" style="width:'
+          + (
+            referenceValue
+            / maximum
+            * 100
+          ).toFixed(2)
+          + '%"></i></div>'
+          + "</div>"
+          + "</div>"
+        );
+      }).join("")
+    );
+
+    table.innerHTML = (
+      metrics.map(function (metric) {
+        var decisionValue = Number(
+          selected.metrics[
+            metric.source
+          ]
+        );
+
+        var referenceValue = Number(
+          reference.metrics[
+            metric.source
+          ]
+        );
+
+        var difference = (
+          decisionValue
+          - referenceValue
+        );
+
+        var variation = (
+          referenceValue === 0
+            ? null
+            : (
+              difference
+              / referenceValue
+            ) * 100
+        );
+
+        var semantic = (
+          difference < 0
+            ? "is-improvement"
+            : difference > 0
+              ? "is-worse"
+              : "is-neutral"
+        );
+
+        return (
+          "<tr>"
+          + "<th>"
+          + escapeHtml(metric.label)
+          + "</th>"
+          + '<td class="numeric">'
+          + escapeHtml(
+              metricFormatter(
+                metric.key,
+                decisionValue
+              )
+            )
+          + "</td>"
+          + '<td class="numeric">'
+          + escapeHtml(
+              metricFormatter(
+                metric.key,
+                referenceValue
+              )
+            )
+          + "</td>"
+          + '<td class="numeric '
+          + semantic
+          + '">'
+          + escapeHtml(
+              metricDeltaFormatter(
+                metric.key,
+                difference
+              )
+            )
+          + "</td>"
+          + '<td class="numeric '
+          + semantic
+          + '">'
+          + escapeHtml(
+              F.formatPercent(
+                variation
+              )
+            )
+          + "</td>"
+          + "</tr>"
+        );
+      }).join("")
+    );
+
+    setText(
+      "dashboard-comparison-assignments",
+      (
+        F.formatNumber(
+          S.assignmentDifferenceCount(
+            selected,
+            reference
+          )
+        )
+        + " de "
+        + F.formatNumber(
+            selected.metrics
+              .shipments
+          )
+      )
+    );
+  }
+
+  function populateComparison(
+    run
+  ) {
+    var result = run.result_json;
+    var select = (
+      $("#dashboard-comparison-select")
+    );
+
+    if (!select) {
+      return;
+    }
+
+    var options = [
+      ["baseline", "Asignación actual"],
+      ["min_cost", "Costo mínimo"],
+      ["min_trips", "Viajes mínimos"]
+    ];
+
+    select.innerHTML = (
+      options
+        .filter(function (option) {
+          return Boolean(
+            result.scenarios[
+              option[0]
+            ]
+          );
+        })
+        .map(function (option) {
+          return (
+            '<option value="'
+            + option[0]
+            + '">'
+            + escapeHtml(option[1])
+            + "</option>"
+          );
+        }).join("")
+    );
+
+    var defaultKey = (
+      S.chooseDefaultReference(
+        result
+      )
+    );
+
+    select.value = defaultKey;
+
+    renderComparison(
+      run,
+      defaultKey
+    );
+  }
+
+  function renderDrivers(
+    run
+  ) {
+    var result = run.result_json;
+    var current = (
+      S.currentScenario(run)
+    );
+    var selected = (
+      S.selectedScenario(run)
+    );
+
+    var details = (
+      S.reassignmentDetails(
+        current,
+        selected,
+        result
+      )
+    );
+
+    state.detailRows = details;
+    state.detailPage = 1;
+
+    setText(
+      "dashboard-drivers-summary",
+      (
+        F.formatNumber(
+          details.length
+        )
+        + " de "
+        + F.formatNumber(
+            selected.metrics
+              .shipments
+          )
+        + " despachos cambian de camión. "
+        + F.formatNumber(
+            Number(
+              selected.metrics.shipments
+            ) - details.length
+          )
+        + " se mantienen."
+      )
+    );
+
+    var button = (
+      $("#open-reassignment-detail")
+    );
+
+    if (button) {
+      button.textContent = (
+        details.length
+          ? (
+            "Ver las "
+            + F.formatNumber(
+                details.length
+              )
+            + " reasignaciones"
+          )
+          : "Ver detalle"
+      );
+
+      button.disabled = (
+        details.length === 0
+      );
+    }
+
+    var matrix = (
+      $("#dashboard-flow-matrix")
+    );
+
+    if (matrix) {
+      var flows = (
+        S.reassignmentMatrix(
+          current,
+          selected,
+          result
+        )
+      );
+
+      matrix.innerHTML = (
+        flows.length
+          ? flows.map(
+            function (flow) {
+              return (
+                '<div class="flow-card">'
+                + '<div class="flow-card__route">'
+                + "<span>"
+                + escapeHtml(
+                    F.vehicleLabel(
+                      flow.from_vehicle
+                    )
+                  )
+                + "</span>"
+                + '<i aria-hidden="true">→</i>'
+                + "<span>"
+                + escapeHtml(
+                    F.vehicleLabel(
+                      flow.to_vehicle
+                    )
+                  )
+                + "</span>"
+                + "</div>"
+                + "<strong>"
+                + F.formatNumber(
+                    flow.shipments
+                  )
+                + " despachos</strong>"
+                + "<small>"
+                + F.formatNumber(
+                    flow.trips_avoided
+                  )
+                + " viajes evitados · "
+                + F.formatCurrency(
+                    flow.cost_saving
+                  )
+                + " de impacto</small>"
+                + "</div>"
+              );
+            }
+          ).join("")
+          : (
+            '<div class="empty-state">'
+            + "<strong>Sin reasignaciones</strong>"
+            + "<span>La decisión mantiene los mismos "
+            + "tipos de camión informados en la asignación actual.</span>"
+            + "</div>"
+          )
+      );
+    }
+
+    var corridorBody = (
+      $("#dashboard-corridor-table-body")
+    );
+
+    if (corridorBody) {
+      var corridors = (
+        S.corridorGroups(
+          current,
+          selected,
+          result
+        )
+      );
+
+      corridorBody.innerHTML = (
+        corridors.length
+          ? corridors
+            .slice(0, 5)
+            .map(function (row) {
+              var transition = (
+                row.dominant_transition
+                  .split("→")
+              );
+
+              return (
+                "<tr>"
+                + "<th>"
+                + escapeHtml(
+                    row.corridor
+                  )
+                + "</th>"
+                + '<td class="numeric">'
+                + F.formatNumber(
+                    row.shipments
+                  )
+                + "</td>"
+                + "<td>"
+                + escapeHtml(
+                    F.vehicleLabel(
+                      transition[0]
+                    )
+                    + " → "
+                    + F.vehicleLabel(
+                        transition[1]
+                      )
+                  )
+                + "</td>"
+                + '<td class="numeric">'
+                + F.formatNumber(
+                    row.trips_avoided
+                  )
+                + "</td>"
+                + '<td class="numeric '
+                + improvementClass(
+                    row.cost_saving
+                  )
+                + '">'
+                + F.formatCurrency(
+                    row.cost_saving
+                  )
+                + "</td>"
+                + "</tr>"
+              );
+            }).join("")
+          : (
+            '<tr><td colspan="5">'
+            + "No hay corredores con reasignaciones."
+            + "</td></tr>"
+          )
+      );
+    }
+
+    populateDetailVehicleFilter(
+      details
+    );
+
+    renderReassignmentDetail();
+  }
+
+  function populateDetailVehicleFilter(
+    rows
+  ) {
+    var select = (
+      $("#reassignment-vehicle-filter")
+    );
+
+    if (!select) {
+      return;
+    }
+
+    var vehicles = Array.from(
+      new Set(
+        rows.map(function (row) {
+          return row.to_vehicle;
+        })
+      )
+    ).sort();
+
+    select.innerHTML = (
+      '<option value="">Todos los camiones</option>'
+      + vehicles.map(function (vehicle) {
+        return (
+          '<option value="'
+          + escapeHtml(vehicle)
+          + '">'
+          + escapeHtml(
+              F.vehicleLabel(vehicle)
+            )
+          + "</option>"
+        );
+      }).join("")
+    );
+  }
+
+  function filteredDetailRows() {
+    var search = (
+      $("#reassignment-search")
+    );
+    var vehicle = (
+      $("#reassignment-vehicle-filter")
+    );
+
+    var query = (
+      search
+        ? search.value
+          .trim()
+          .toLowerCase()
+        : ""
+    );
+
+    var vehicleValue = (
+      vehicle
+        ? vehicle.value
+        : ""
+    );
+
+    return state.detailRows
+      .filter(function (row) {
+        if (
+          vehicleValue
+          && row.to_vehicle
+            !== vehicleValue
+        ) {
+          return false;
+        }
+
+        if (!query) {
+          return true;
+        }
+
+        return [
+          row.shipment_id,
+          row.product,
+          row.origin,
+          row.destination,
+          row.from_vehicle,
+          row.to_vehicle
+        ]
+          .join(" ")
+          .toLowerCase()
+          .includes(query);
+      });
+  }
+
+  function renderReassignmentDetail() {
+    var rows = (
+      filteredDetailRows()
+    );
+
+    var pages = Math.max(
+      1,
+      Math.ceil(
+        rows.length
+        / state.detailPageSize
+      )
+    );
+
+    state.detailPage = Math.min(
+      Math.max(
+        state.detailPage,
+        1
+      ),
+      pages
+    );
+
+    var start = (
+      (
+        state.detailPage
+        - 1
+      )
+      * state.detailPageSize
+    );
+
+    var pageRows = rows.slice(
+      start,
+      start
+      + state.detailPageSize
+    );
+
+    var body = (
+      $("#reassignment-detail-body")
+    );
+
+    if (body) {
+      body.innerHTML = (
+        pageRows.length
+          ? pageRows.map(
+            function (row) {
+              return (
+                "<tr>"
+                + "<th>"
+                + escapeHtml(
+                    row.shipment_id
+                  )
+                + "</th>"
+                + "<td>"
+                + escapeHtml(
+                    row.origin
+                    + " → "
+                    + row.destination
+                  )
+                + "</td>"
+                + "<td>"
+                + escapeHtml(
+                    F.vehicleLabel(
+                      row.from_vehicle
+                    )
+                  )
+                + "</td>"
+                + "<td>"
+                + escapeHtml(
+                    F.vehicleLabel(
+                      row.to_vehicle
+                    )
+                  )
+                + "</td>"
+                + '<td class="numeric">'
+                + F.formatNumber(
+                    row.trips_avoided
+                  )
+                + "</td>"
+                + '<td class="numeric '
+                + improvementClass(
+                    row.cost_saving
+                  )
+                + '">'
+                + F.formatCurrency(
+                    row.cost_saving
+                  )
+                + "</td>"
+                + "</tr>"
+              );
+            }
+          ).join("")
+          : (
+            '<tr><td colspan="6">'
+            + "No hay resultados para los filtros seleccionados."
+            + "</td></tr>"
+          )
+      );
+    }
+
+    setText(
+      "reassignment-dialog-copy",
+      (
+        F.formatNumber(
+          rows.length
+        )
+        + " reasignaciones encontradas"
+      )
+    );
+
+    setText(
+      "reassignment-page",
+      (
+        "Página "
+        + state.detailPage
+        + " de "
+        + pages
+      )
+    );
+
+    var prev = (
+      $("#reassignment-prev")
+    );
+    var next = (
+      $("#reassignment-next")
+    );
+
+    if (prev) {
+      prev.disabled = (
+        state.detailPage <= 1
+      );
+    }
+
+    if (next) {
+      next.disabled = (
+        state.detailPage >= pages
+      );
+    }
+  }
+
+  function openReassignmentDetail() {
+    var dialog = (
+      $("#reassignment-dialog")
+    );
+
+    if (!dialog) {
+      return;
+    }
+
+    dialog.classList.remove(
+      "is-hidden"
+    );
+
+    document.body.classList.add(
+      "has-overlay"
+    );
+
+    var search = (
+      $("#reassignment-search")
+    );
+
+    if (search) {
+      window.setTimeout(
+        function () {
+          search.focus();
+        },
+        40
+      );
+    }
+  }
+
+  function closeReassignmentDetail() {
+    var dialog = (
+      $("#reassignment-dialog")
+    );
+
+    if (dialog) {
+      dialog.classList.add(
+        "is-hidden"
+      );
+    }
+
+    document.body.classList.remove(
+      "has-overlay"
+    );
+  }
+
+  function csvCell(value) {
+    return (
+      '"'
+      + String(
+          value == null
+            ? ""
+            : value
+        )
+        .replaceAll('"', '""')
+      + '"'
+    );
+  }
+
+  function downloadBlob(
+    filename,
+    content,
+    type
+  ) {
+    var blob = new Blob(
+      [content],
+      {
+        type: type
       }
     );
 
-    var contentType = (
-      response.headers.get(
-        "content-type"
-      )
-      || ""
+    var url = URL.createObjectURL(
+      blob
     );
 
-    var payload = (
-      contentType.includes(
-        "application/json"
-      )
-        ? await response.json()
-        : await response.text()
+    var anchor = (
+      document.createElement("a")
     );
 
-    if (!response.ok) {
-      var error = new Error(
-        typeof payload === "object"
-        && payload
-          ? (
-            payload.detail
-            || JSON.stringify(payload)
-          )
-          : payload
+    anchor.href = url;
+    anchor.download = filename;
+
+    document.body.appendChild(
+      anchor
+    );
+
+    anchor.click();
+    anchor.remove();
+
+    window.setTimeout(
+      function () {
+        URL.revokeObjectURL(url);
+      },
+      0
+    );
+  }
+
+  function exportReassignments() {
+    var rows = (
+      filteredDetailRows()
+    );
+
+    var header = [
+      "shipment_id",
+      "origin",
+      "destination",
+      "current_vehicle",
+      "recommended_vehicle",
+      "trips_avoided",
+      "cost_impact"
+    ];
+
+    var lines = [
+      header.map(csvCell).join(",")
+    ];
+
+    rows.forEach(function (row) {
+      lines.push(
+        [
+          row.shipment_id,
+          row.origin,
+          row.destination,
+          F.vehicleLabel(
+            row.from_vehicle
+          ),
+          F.vehicleLabel(
+            row.to_vehicle
+          ),
+          row.trips_avoided,
+          row.cost_saving
+        ]
+          .map(csvCell)
+          .join(",")
       );
+    });
 
-      error.status = response.status;
-      throw error;
+    downloadBlob(
+      "dation-reasignaciones.csv",
+      lines.join("\n"),
+      "text/csv;charset=utf-8"
+    );
+  }
+
+  function renderSensitivity(run) {
+    var container = (
+      $("#dashboard-sensitivity-content")
+    );
+
+    if (!container) {
+      return;
     }
 
-    return payload;
+    var result = run.result_json;
+    var selected = (
+      S.selectedScenario(run)
+    );
+
+    var summary = (
+      S.sensitivitySummary(
+        result
+      )
+    );
+
+    if (summary.robust) {
+      container.innerHTML = (
+        '<div class="sensitivity-robust">'
+        + '<div class="sensitivity-robust__icon">✓</div>'
+        + "<div>"
+        + "<span>Decisión robusta</span>"
+        + "<strong>No cambia aunque se priorice costo o viajes</strong>"
+        + "<p>Los extremos 100 % costo y 100 % viajes "
+        + "producen la misma asignación de camiones que la decisión recomendada.</p>"
+        + "</div>"
+        + "</div>"
+      );
+
+      return;
+    }
+
+    var unique = [];
+
+    summary.available.forEach(
+      function (item) {
+        var duplicate = unique.some(
+          function (existing) {
+            return (
+              S.scenariosEquivalent(
+                existing.scenario,
+                item.scenario
+              )
+            );
+          }
+        );
+
+        if (!duplicate) {
+          unique.push(item);
+        }
+      }
+    );
+
+    container.innerHTML = (
+      '<div class="sensitivity-comparison-grid">'
+      + unique.map(function (item) {
+        var scenario = item.scenario;
+        var difference = (
+          S.assignmentDifferenceCount(
+            selected,
+            scenario
+          )
+        );
+
+        return (
+          '<article class="sensitivity-comparison-card '
+          + (
+            item.same
+              ? "is-same"
+              : ""
+          )
+          + '">'
+          + "<span>"
+          + escapeHtml(
+              F.scenarioLabel(
+                item.key
+              )
+            )
+          + "</span>"
+          + "<strong>"
+          + F.formatNumber(
+              scenario.metrics
+                .total_trips
+            )
+          + " viajes · "
+          + F.formatCurrency(
+              scenario.metrics
+                .total_cost
+            )
+          + "</strong>"
+          + "<p>"
+          + (
+            item.same
+              ? "Misma asignación que la decisión recomendada."
+              : (
+                F.formatNumber(
+                  difference
+                )
+                + " despachos cambian respecto de la decisión recomendada."
+              )
+          )
+          + "</p>"
+          + "</article>"
+        );
+      }).join("")
+      + "</div>"
+    );
+  }
+
+  function renderContext(
+    profilePayload,
+    result
+  ) {
+    var container = (
+      $("#dashboard-data-context")
+    );
+
+    if (!container) {
+      return;
+    }
+
+    var profile = (
+      profilePayload
+      && profilePayload.profile
+      || {}
+    );
+
+    var range = (
+      profile.dispatch_date_range
+      || {}
+    );
+
+    var chips = [
+      ["Despachos", F.formatNumber(
+        profile.shipments
+      )],
+      ["Unidades", F.formatNumber(
+        profile.total_units
+      )],
+      ["Peso", (
+        F.formatNumber(
+          profile.total_weight_kg,
+          0
+        )
+        + " kg"
+      )],
+      ["Orígenes", F.formatNumber(
+        profile.origins
+      )],
+      ["Destinos", F.formatNumber(
+        profile.destinations
+      )],
+      ["Vehículos", F.formatNumber(
+        profile.vehicle_types
+      )],
+      ["Distancia media", F.formatKm(
+        profile.average_distance_km,
+        0
+      )],
+      ["Ventana", F.formatDateRange(
+        range.from,
+        range.to
+      )]
+    ];
+
+    container.innerHTML = (
+      chips.map(function (item) {
+        return (
+          '<div class="context-chip">'
+          + "<span>"
+          + escapeHtml(item[0])
+          + "</span>"
+          + "<strong>"
+          + escapeHtml(item[1])
+          + "</strong>"
+          + "</div>"
+        );
+      }).join("")
+    );
+
+    var assumptions = (
+      $("#assumptions-list")
+    );
+
+    if (assumptions) {
+      assumptions.innerHTML = (
+        (
+          result.model_assumptions
+          || []
+        )
+          .map(function (item) {
+            return (
+              "<li>"
+              + escapeHtml(
+                  F.normalizeBusinessText(
+                    item
+                  )
+                )
+              + "</li>"
+            );
+          }).join("")
+      );
+    }
+  }
+
+  function renderDashboard(
+    run,
+    dataset,
+    profile
+  ) {
+    if (
+      !run
+      || !run.result_json
+    ) {
+      showError(
+        "La corrida no contiene un DecisionResult válido."
+      );
+      return;
+    }
+
+    var selected = (
+      S.selectedScenario(run)
+    );
+    var current = (
+      S.currentScenario(run)
+    );
+
+    if (!selected || !current) {
+      showError(
+        "La corrida no contiene los escenarios necesarios para construir el Dashboard."
+      );
+      return;
+    }
+
+    showDashboard();
+
+    renderExecutionDetails(
+      run,
+      dataset
+    );
+
+    renderHero(
+      run,
+      dataset
+    );
+
+    renderKpis(
+      current,
+      selected
+    );
+
+    populateComparison(run);
+    renderDrivers(run);
+    renderSensitivity(run);
+
+    renderContext(
+      profile,
+      run.result_json
+    );
+
+    var exportButton = (
+      $("#export-decision")
+    );
+
+    if (exportButton) {
+      exportButton.disabled = false;
+    }
+
+    if (
+      typeof window
+        .dationSetDashboardReady
+      === "function"
+    ) {
+      window.dationSetDashboardReady(
+        true
+      );
+    }
   }
 
   async function recoverRun(run) {
@@ -439,60 +2393,72 @@
       state.context || {}
     );
 
-    var profile = context.profile;
     var dataset = context.dataset;
+    var profile = context.profile;
 
-    if (!profile || !dataset) {
-      var profilePayload = (
-        await requestJson(
-          "/api/datasets/"
-          + encodeURIComponent(
-              run.dataset_id
-            )
-          + "/profile"
-        )
+    if (!dataset || !profile) {
+      var payload = await requestJson(
+        "/api/datasets/"
+        + encodeURIComponent(
+            run.dataset_id
+          )
+        + "/profile"
       );
 
-      profile = profilePayload;
-      dataset = profilePayload.dataset;
+      dataset = payload.dataset;
+      profile = payload;
     }
 
-    window.dationDashboardCompleted(
+    var completed = Object.assign(
+      {},
+      context,
+      {
+        runId: run.id,
+        run: run,
+        dataset: dataset,
+        profile: profile,
+        configuration: (
+          runConfiguration(run)
+        ),
+        status: "completed",
+        finishedAt: (
+          run.finished_at
+          || run.created_at
+        )
+      }
+    );
+
+    saveContext(completed);
+    setRunInUrl(run.id);
+
+    if (
+      typeof window.dationNavigate
+      === "function"
+    ) {
+      window.dationNavigate(
+        "decision-dashboard"
+      );
+    }
+
+    renderDashboard(
       run,
       dataset,
       profile
     );
 
-    if (
-      typeof window
-        .dationConsumeDecisionRun
-      === "function"
-    ) {
-      try {
-        await window
-          .dationConsumeDecisionRun(
-            run,
-            dataset,
-            profile
-          );
-      } catch (error) {
-        console.warn(
-          "El Dashboard ya fue renderizado, pero falló una sincronización secundaria del workspace.",
-          error
-        );
-      }
-
-      return;
-    }
+    updateLatestDecisionCta(
+      run
+    );
 
     window.dispatchEvent(
       new CustomEvent(
-        "dation:run-ready",
+        "dation:dashboard-completed",
         {
           detail: {
             run: run,
             dataset: dataset,
-            profile: profile
+            profile: profile,
+            context: completed
           }
         }
       )
@@ -540,10 +2506,7 @@
 
         showError(
           run.error_message
-          || (
-            "El motor registró un error "
-            + "durante la ejecución."
-          )
+          || "El motor registró un error durante la ejecución."
         );
         return;
       }
@@ -567,1850 +2530,12 @@
       }
 
       showError(
-        "No se pudo recuperar el estado "
-        + "persistido de la corrida."
+        "No se pudo recuperar el estado persistido de la corrida."
       );
     }
   }
 
-  function formatDate(value) {
-    if (!value) {
-      return "—";
-    }
-
-    var parsed = new Date(value);
-
-    if (Number.isNaN(parsed.getTime())) {
-      return String(value);
-    }
-
-    return new Intl.DateTimeFormat(
-      "es-AR",
-      {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit"
-      }
-    ).format(parsed);
-  }
-
-  function setText(id, value) {
-    var node = document.getElementById(id);
-
-    if (node) {
-      node.textContent = value;
-    }
-  }
-
-  function runConfiguration(run) {
-    return (
-      run.configuration_json
-      || (
-        run.result_json
-        && run.result_json.configuration
-      )
-      || {
-        mode: "preset",
-        objective: "min_cost",
-        weights: {
-          cost: 1,
-          trips: 0
-        }
-      }
-    );
-  }
-
-  function modeLabel(config) {
-    return (
-      config.mode === "custom"
-        ? "Personalizado"
-        : "Predefinido"
-    );
-  }
-
-  function weightLabel(config) {
-    var weights = (
-      config.weights || {}
-    );
-
-    return (
-      "Costo "
-      + Math.round(
-        Number(weights.cost || 0)
-        * 100
-      )
-      + "% · Viajes "
-      + Math.round(
-        Number(weights.trips || 0)
-        * 100
-      )
-      + "%"
-    );
-  }
-
-  function scenarioLabel(key) {
-    if (key === "min_trips") {
-      return "Viajes mínimos";
-    }
-
-    if (key === "custom") {
-      return "Configuración personalizada";
-    }
-
-    if (key === "baseline") {
-      return "Asignación de referencia";
-    }
-
-    return "Costo mínimo";
-  }
-
-  function objectiveLabel(config) {
-    if (config.mode === "custom") {
-      return "Objetivo personalizado";
-    }
-
-    if (config.objective === "min_trips") {
-      return "Minimizar cantidad de viajes";
-    }
-
-    return "Minimizar costo total";
-  }
-
-  function objectiveDetail(config) {
-    if (config.mode === "custom") {
-      return (
-        "Ponderación configurada · "
-        + weightLabel(config)
-      );
-    }
-
-    if (config.objective === "min_trips") {
-      return (
-        "Preset · prioridad 100% sobre viajes"
-      );
-    }
-
-    return (
-      "Preset · prioridad 100% sobre costo"
-    );
-  }
-
-  function assignmentDistribution(
-    scenario
-  ) {
-    var vehicles = new Map();
-
-    (
-      scenario
-      && scenario.assignments
-      || []
-    ).forEach(function (item) {
-      var key = (
-        item.vehicle_type
-        || "Sin vehículo"
-      );
-
-      var current = (
-        vehicles.get(key)
-        || {
-          vehicle_type: key,
-          shipments: 0,
-          units: 0,
-          trips: 0
-        }
-      );
-
-      current.shipments += 1;
-      current.units += Number(
-        item.quantity_units || 0
-      );
-      current.trips += Number(
-        item.required_trips || 0
-      );
-
-      vehicles.set(
-        key,
-        current
-      );
-    });
-
-    return Array.from(
-      vehicles.values()
-    ).sort(function (a, b) {
-      return (
-        b.shipments
-        - a.shipments
-      );
-    });
-  }
-
-  function decisionTitle(
-    scenario
-  ) {
-    var metrics = (
-      scenario
-      && scenario.metrics
-      || {}
-    );
-
-    var distribution = (
-      assignmentDistribution(
-        scenario
-      )
-    );
-
-    var shipments = Number(
-      metrics.shipments
-      || (
-        scenario
-        && scenario.assignments
-        && scenario.assignments.length
-      )
-      || 0
-    );
-
-    var trips = Number(
-      metrics.total_trips || 0
-    );
-
-    var vehicleTypes = (
-      distribution.length
-    );
-
-    return (
-      "Asignar "
-      + formatNumber(shipments)
-      + " despachos entre "
-      + formatNumber(vehicleTypes)
-      + (
-        vehicleTypes === 1
-          ? " tipo de camión"
-          : " tipos de camión"
-      )
-      + " para completar "
-      + formatNumber(trips)
-      + " viajes"
-    );
-  }
-
-  function costImpactPhrase(
-    delta
-  ) {
-    var value = Number(
-      delta && delta.cost_pct
-    );
-
-    if (Number.isNaN(value)) {
-      return (
-        "no permite calcular una variación "
-        + "porcentual de costo"
-      );
-    }
-
-    if (value < 0) {
-      return (
-        "reduce el costo estimado un "
-        + Math.abs(value).toFixed(1)
-        + "%"
-      );
-    }
-
-    if (value > 0) {
-      return (
-        "incrementa el costo estimado un "
-        + value.toFixed(1)
-        + "%"
-      );
-    }
-
-    return (
-      "mantiene el costo estimado "
-      + "de la asignación de referencia"
-    );
-  }
-
-  function sensitivityPhrase(
-    result,
-    config
-  ) {
-    if (config.mode !== "custom") {
-      return "";
-    }
-
-    var matches = (
-      result
-      && result.sensitivity
-      && result.sensitivity
-        .matches_scenario
-    );
-
-    if (matches === "both_extremes") {
-      return (
-        " Con estas ponderaciones, la asignación "
-        + "coincide con los dos extremos evaluados."
-      );
-    }
-
-    if (matches === "min_cost") {
-      return (
-        " Con estas ponderaciones, la asignación "
-        + "coincide con el extremo de costo mínimo."
-      );
-    }
-
-    if (matches === "min_trips") {
-      return (
-        " Con estas ponderaciones, la asignación "
-        + "coincide con el extremo de viajes mínimos."
-      );
-    }
-
-    return (
-      " La ponderación genera una asignación "
-      + "distinta de ambos extremos."
-    );
-  }
-
-  function decisionCopy(
-    run,
-    baseline,
-    selected,
-    config
-  ) {
-    var result = (
-      run.result_json || {}
-    );
-
-    var metrics = (
-      selected.metrics || {}
-    );
-
-    var changed = (
-      assignmentDifferenceCount(
-        baseline,
-        selected
-      )
-    );
-
-    var changePhrase = (
-      changed > 0
-        ? (
-          "Reasigna el tipo de camión de "
-          + formatNumber(changed)
-          + " despachos respecto de la referencia del CSV"
-        )
-        : (
-          "Mantiene la selección de vehículo "
-          + "informada como referencia en el CSV"
-        )
-    );
-
-    return (
-      changePhrase
-      + ", "
-      + costImpactPhrase(
-          selected.delta_vs_baseline
-        )
-      + ", requiere "
-      + formatNumber(
-          metrics.total_trips
-        )
-      + " viajes y proyecta "
-      + formatNumber(
-          metrics.total_distance_km
-        )
-      + " km recorridos."
-      + sensitivityPhrase(
-          result,
-          config
-        )
-    );
-  }
-
-  function renderAssignmentDistribution(
-    selected
-  ) {
-    var container = (
-      $("#dashboard-assignment-distribution")
-    );
-
-    if (!container) {
-      return;
-    }
-
-    var distribution = (
-      assignmentDistribution(
-        selected
-      )
-    );
-
-    if (!distribution.length) {
-      container.innerHTML = "";
-      return;
-    }
-
-    container.innerHTML = (
-      distribution.map(
-        function (item) {
-          return (
-            '<div class="dashboard-assignment-chip">'
-            + "<span>"
-            + escapeHtml(
-                item.vehicle_type
-              )
-            + "</span>"
-            + "<strong>"
-            + formatNumber(
-                item.shipments
-              )
-            + " despachos</strong>"
-            + "<small>"
-            + formatNumber(
-                item.trips
-              )
-            + " viajes · "
-            + formatNumber(
-                item.units
-              )
-            + " unidades</small>"
-            + "</div>"
-          );
-        }
-      ).join("")
-    );
-  }
-
-  function impactBadgeLabel(
-    config,
-    delta
-  ) {
-    var cost = Number(
-      delta && delta.cost_pct
-    );
-    var trips = Number(
-      delta && delta.trips_pct
-    );
-
-    if (config.mode === "custom") {
-      return (
-        "Costo "
-        + formatPercent(cost)
-        + " · Viajes "
-        + formatPercent(trips)
-      );
-    }
-
-    if (config.objective === "min_trips") {
-      return (
-        "Viajes "
-        + formatPercent(trips)
-      );
-    }
-
-    return (
-      "Costo "
-      + formatPercent(cost)
-    );
-  }
-
-  function assignmentMap(scenario) {
-    var map = new Map();
-
-    (
-      scenario
-      && scenario.assignments
-      || []
-    ).forEach(function (item) {
-      map.set(
-        item.shipment_id,
-        item
-      );
-    });
-
-    return map;
-  }
-
-  function assignmentDifferenceCount(
-    first,
-    second
-  ) {
-    var firstMap = assignmentMap(first);
-    var secondMap = assignmentMap(second);
-    var ids = new Set(
-      Array.from(firstMap.keys())
-        .concat(
-          Array.from(secondMap.keys())
-        )
-    );
-
-    var count = 0;
-
-    ids.forEach(function (id) {
-      var firstItem = firstMap.get(id);
-      var secondItem = secondMap.get(id);
-
-      if (
-        (
-          firstItem
-          && firstItem.vehicle_type
-        )
-        !== (
-          secondItem
-          && secondItem.vehicle_type
-        )
-      ) {
-        count += 1;
-      }
-    });
-
-    return count;
-  }
-
-  function renderCoreContext(
-    profilePayload
-  ) {
-    var container = (
-      $("#dashboard-data-context")
-    );
-
-    if (!container) {
-      return;
-    }
-
-    var profile = (
-      profilePayload
-      && profilePayload.profile
-    );
-
-    if (!profile) {
-      container.innerHTML = (
-        '<div class="context-metric">'
-        + "<span>Perfil</span>"
-        + "<strong>No disponible</strong>"
-        + "</div>"
-      );
-      return;
-    }
-
-    var range = (
-      profile.dispatch_date_range
-      || {}
-    );
-
-    var metrics = [
-      ["Despachos", profile.shipments],
-      ["Unidades", profile.total_units],
-      [
-        "Peso",
-        formatNumber(
-          profile.total_weight_kg
-        ) + " kg"
-      ],
-      ["Orígenes", profile.origins],
-      ["Destinos", profile.destinations],
-      [
-        "Vehículos",
-        profile.vehicle_types
-      ],
-      [
-        "Distancia media",
-        formatNumber(
-          profile.average_distance_km,
-          1
-        ) + " km"
-      ],
-      [
-        "Ventana",
-        (
-          range.from
-          && range.to
-            ? (
-              range.from
-              + " → "
-              + range.to
-            )
-            : "—"
-        )
-      ]
-    ];
-
-    container.innerHTML = (
-      metrics.map(function (item) {
-        return (
-          '<div class="context-metric">'
-          + "<span>"
-          + escapeHtml(item[0])
-          + "</span>"
-          + "<strong>"
-          + escapeHtml(
-              formatNumber(item[1])
-              === "—"
-                ? item[1]
-                : item[1]
-            )
-          + "</strong>"
-          + "</div>"
-        );
-      }).join("")
-    );
-  }
-
-  function renderCoreDrivers(result) {
-    var container = (
-      $("#dashboard-driver-list")
-    );
-
-    if (!container) {
-      return;
-    }
-
-    var baseline = (
-      result.scenarios
-      && result.scenarios.baseline
-    );
-
-    var selected = (
-      result.scenarios
-      && result.scenarios[
-        result.recommended_scenario
-      ]
-    );
-
-    var baseMap = assignmentMap(
-      baseline
-    );
-
-    var changes = (
-      selected
-      && selected.assignments
-      || []
-    )
-      .map(function (item) {
-        var base = baseMap.get(
-          item.shipment_id
-        );
-
-        if (!base) {
-          return null;
-        }
-
-        return {
-          shipment_id: item.shipment_id,
-          origin: item.origin,
-          destination: item.destination,
-          baselineVehicle: (
-            base.vehicle_type
-          ),
-          selectedVehicle: (
-            item.vehicle_type
-          ),
-          costDelta: (
-            Number(item.total_cost)
-            - Number(base.total_cost)
-          ),
-          tripsDelta: (
-            Number(item.required_trips)
-            - Number(base.required_trips)
-          )
-        };
-      })
-      .filter(Boolean)
-      .filter(function (item) {
-        return (
-          item.baselineVehicle
-            !== item.selectedVehicle
-          || item.costDelta !== 0
-          || item.tripsDelta !== 0
-        );
-      })
-      .sort(function (a, b) {
-        return (
-          Math.abs(b.costDelta)
-          - Math.abs(a.costDelta)
-        );
-      })
-      .slice(0, 7);
-
-    if (!changes.length) {
-      container.innerHTML = (
-        '<div class="empty-state empty-state--compact">'
-        + "La configuración no genera cambios materiales de asignación frente a la asignación de referencia."
-        + "</div>"
-      );
-      return;
-    }
-
-    container.innerHTML = (
-      changes.map(function (item) {
-        return (
-          '<div class="driver-item">'
-          + "<div><strong>"
-          + escapeHtml(item.shipment_id)
-          + "</strong><small>"
-          + escapeHtml(item.origin)
-          + " → "
-          + escapeHtml(item.destination)
-          + "</small></div>"
-          + '<div class="driver-change">'
-          + escapeHtml(
-              item.baselineVehicle
-            )
-          + " → <strong>"
-          + escapeHtml(
-              item.selectedVehicle
-            )
-          + "</strong></div>"
-          + '<div class="driver-change">'
-          + "Viajes: "
-          + (
-            item.tripsDelta > 0
-              ? "+"
-              : ""
-          )
-          + formatNumber(
-              item.tripsDelta
-            )
-          + "</div>"
-          + '<div class="driver-impact">'
-          + "<small>Impacto estimado en costo</small>"
-          + "<strong>"
-          + formatCurrency(
-              item.costDelta
-            )
-          + "</strong></div>"
-          + "</div>"
-        );
-      }).join("")
-    );
-  }
-
-  function renderCoreSensitivity(
-    result,
-    config
-  ) {
-    var baseline = (
-      result.scenarios.baseline
-    );
-    var selected = (
-      result.scenarios[
-        result.recommended_scenario
-      ]
-    );
-    var minCost = (
-      result.scenarios.min_cost
-    );
-    var minTrips = (
-      result.scenarios.min_trips
-    );
-
-    var baselineNode = (
-      $("#baseline-strip")
-    );
-
-    if (baselineNode && baseline) {
-      baselineNode.innerHTML = (
-        '<div class="baseline-card">'
-        + "<div><strong>Asignación de referencia</strong>"
-        + "<small>Asignación proveniente del CSV · referencia operativa</small></div>"
-        + '<div class="baseline-metric"><span>Costo</span><strong>'
-        + formatCurrency(
-            baseline.metrics.total_cost
-          )
-        + "</strong></div>"
-        + '<div class="baseline-metric"><span>Viajes</span><strong>'
-        + formatNumber(
-            baseline.metrics.total_trips
-          )
-        + "</strong></div>"
-        + '<div class="baseline-metric"><span>Distancia</span><strong>'
-        + formatNumber(
-            baseline.metrics.total_distance_km
-          )
-        + " km</strong></div>"
-        + "</div>"
-      );
-    }
-
-    var cards = [
-      {
-        title: "Configuración elegida",
-        weights: weightLabel(config),
-        scenario: selected,
-        selected: true,
-        differences: 0
-      },
-      {
-        title: "Extremo costo",
-        weights: "Costo 100% · Viajes 0%",
-        scenario: minCost,
-        selected: false,
-        differences: (
-          assignmentDifferenceCount(
-            selected,
-            minCost
-          )
-        )
-      },
-      {
-        title: "Extremo viajes",
-        weights: "Costo 0% · Viajes 100%",
-        scenario: minTrips,
-        selected: false,
-        differences: (
-          assignmentDifferenceCount(
-            selected,
-            minTrips
-          )
-        )
-      }
-    ];
-
-    var grid = $("#sensitivity-grid");
-
-    if (grid) {
-      grid.innerHTML = (
-        cards
-          .filter(function (card) {
-            return Boolean(card.scenario);
-          })
-          .map(function (card) {
-            var delta = (
-              card.scenario
-                .delta_vs_baseline
-              || {}
-            );
-
-            return (
-              '<article class="sensitivity-card '
-              + (
-                card.selected
-                  ? "is-selected"
-                  : ""
-              )
-              + '">'
-              + '<span class="sensitivity-weight">'
-              + escapeHtml(card.weights)
-              + "</span>"
-              + "<h3>"
-              + escapeHtml(card.title)
-              + "</h3>"
-              + "<p>"
-              + (
-                card.selected
-                  ? "Configuración utilizada en esta corrida."
-                  : "Escenario extremo utilizado como referencia."
-              )
-              + "</p>"
-              + '<div class="sensitivity-metrics">'
-              + '<div class="sensitivity-metric"><span>Costo</span><strong>'
-              + formatCurrency(
-                  card.scenario
-                    .metrics.total_cost
-                )
-              + "</strong></div>"
-              + '<div class="sensitivity-metric"><span>Viajes</span><strong>'
-              + formatNumber(
-                  card.scenario
-                    .metrics.total_trips
-                )
-              + "</strong></div>"
-              + '<div class="sensitivity-metric"><span>Distancia</span><strong>'
-              + formatNumber(
-                  card.scenario
-                    .metrics
-                    .total_distance_km
-                )
-              + " km</strong></div>"
-              + '<div class="sensitivity-metric"><span>Δ costo vs referencia</span><strong>'
-              + formatPercent(
-                  delta.cost_pct
-                )
-              + "</strong></div>"
-              + '<div class="sensitivity-metric"><span>Δ viajes vs referencia</span><strong>'
-              + formatPercent(
-                  delta.trips_pct
-                )
-              + "</strong></div>"
-              + '<div class="sensitivity-metric"><span>Asignaciones distintas</span><strong>'
-              + formatNumber(
-                  card.differences
-                )
-              + "</strong></div>"
-              + "</div></article>"
-            );
-          }).join("")
-      );
-    }
-
-    setText(
-      "sensitivity-note",
-      (
-        result.sensitivity
-        && result.sensitivity.message
-      )
-      || (
-        "La corrida no contiene un resumen de sensibilidad."
-      )
-    );
-  }
-
-  function renderCoreDashboard(
-    run,
-    dataset,
-    profile
-  ) {
-    var result = run.result_json;
-    var selected = selectedScenario(run);
-    var baseline = (
-      result
-      && result.scenarios
-      && result.scenarios.baseline
-    );
-
-    if (
-      !result
-      || !selected
-      || !baseline
-    ) {
-      throw new Error(
-        "La corrida completada no contiene un DecisionResult válido."
-      );
-    }
-
-    var config = runConfiguration(run);
-    var metrics = selected.metrics || {};
-    var delta = (
-      selected.delta_vs_baseline
-      || {}
-    );
-
-    setText(
-      "run-context-dataset",
-      (
-        dataset
-        && dataset.original_filename
-      )
-      || shortId(run.dataset_id)
-    );
-    setText(
-      "run-context-date",
-      formatDate(
-        run.finished_at
-        || run.created_at
-      )
-    );
-    setText(
-      "run-context-id",
-      shortId(run.id)
-    );
-    setText(
-      "run-context-engine",
-      (
-        run.engine_name
-        || (
-          result.engine
-          && result.engine.name
-        )
-        || "—"
-      )
-      + " · v"
-      + (
-        run.engine_version
-        || (
-          result.engine
-          && result.engine.version
-        )
-        || "—"
-      )
-    );
-    setText(
-      "run-context-mode",
-      modeLabel(config)
-    );
-    setText(
-      "run-context-weights",
-      weightLabel(config)
-    );
-
-    setText(
-      "dashboard-objective-label",
-      objectiveLabel(config)
-    );
-    setText(
-      "dashboard-objective-detail",
-      objectiveDetail(config)
-    );
-
-    setText(
-      "dashboard-recommendation-title",
-      decisionTitle(selected)
-    );
-    setText(
-      "dashboard-recommendation-copy",
-      decisionCopy(
-        run,
-        baseline,
-        selected,
-        config
-      )
-    );
-    setText(
-      "dashboard-recommendation-delta",
-      impactBadgeLabel(
-        config,
-        delta
-      )
-    );
-
-    renderAssignmentDistribution(
-      selected
-    );
-
-    setText(
-      "dashboard-kpi-cost",
-      formatCurrency(
-        metrics.total_cost
-      )
-    );
-    setText(
-      "dashboard-kpi-cost-delta",
-      (
-        formatPercent(
-          delta.cost_pct
-        )
-        + " vs asignación de referencia · "
-        + formatCurrency(
-            baseline.metrics
-              .total_cost
-          )
-      )
-    );
-    setText(
-      "dashboard-kpi-trips",
-      formatNumber(
-        metrics.total_trips
-      )
-    );
-    setText(
-      "dashboard-kpi-trips-delta",
-      (
-        formatPercent(
-          delta.trips_pct
-        )
-        + " vs asignación de referencia · "
-        + formatNumber(
-            baseline.metrics
-              .total_trips
-          )
-      )
-    );
-    setText(
-      "dashboard-kpi-distance",
-      (
-        formatNumber(
-          metrics.total_distance_km
-        )
-        + " km"
-      )
-    );
-    setText(
-      "dashboard-kpi-distance-delta",
-      (
-        formatPercent(
-          delta.distance_pct
-        )
-        + " vs asignación de referencia"
-      )
-    );
-    setText(
-      "dashboard-kpi-shipments",
-      formatNumber(
-        metrics.shipments
-      )
-    );
-    setText(
-      "dashboard-kpi-changes",
-      (
-        assignmentDifferenceCount(
-          baseline,
-          selected
-        )
-        + " despachos cambian de vehículo"
-      )
-    );
-
-    renderCoreContext(profile);
-    renderCoreDrivers(result);
-    renderCoreSensitivity(
-      result,
-      config
-    );
-
-    var assumptions = (
-      $("#assumptions-list")
-    );
-
-    if (assumptions) {
-      assumptions.innerHTML = (
-        (
-          result.model_assumptions
-          || []
-        ).map(function (item) {
-          return (
-            "<li>"
-            + escapeHtml(item)
-            + "</li>"
-          );
-        }).join("")
-      );
-    }
-
-    var exportButton = (
-      $("#export-decision")
-    );
-
-    if (exportButton) {
-      exportButton.disabled = false;
-    }
-  }
-
-  function selectedScenario(run) {
-    var result = (
-      run && run.result_json
-    );
-
-    if (!result) {
-      return null;
-    }
-
-    return (
-      result.scenarios
-      && result.scenarios[
-        result.recommended_scenario
-      ]
-    );
-  }
-
-  function metricDefinitions() {
-    return [
-      {
-        key: "total_cost",
-        label: "Costo total",
-        format: formatCurrency
-      },
-      {
-        key: "total_trips",
-        label: "Viajes",
-        format: function (value) {
-          return formatNumber(value);
-        }
-      },
-      {
-        key: "total_distance_km",
-        label: "Distancia",
-        format: function (value) {
-          return (
-            formatNumber(value)
-            + " km"
-          );
-        }
-      }
-    ];
-  }
-
-  function improvementClass(
-    selected,
-    reference
-  ) {
-    if (
-      selected === reference
-      || reference === null
-      || reference === undefined
-    ) {
-      return "is-neutral";
-    }
-
-    return (
-      selected < reference
-        ? "is-improvement"
-        : "is-worse"
-    );
-  }
-
-  function renderImpactChart(run) {
-    var container = (
-      $("#dashboard-impact-chart")
-    );
-
-    if (!container) {
-      return;
-    }
-
-    var result = run.result_json;
-    var selected = (
-      selectedScenario(run)
-    );
-    var baseline = (
-      result.scenarios.baseline
-    );
-
-    if (!selected || !baseline) {
-      container.innerHTML = (
-        '<div class="dashboard-chart-empty">'
-        + "Sin datos para graficar."
-        + "</div>"
-      );
-      return;
-    }
-
-    var rows = metricDefinitions()
-      .map(function (metric) {
-        var selectedValue = (
-          Number(
-            selected.metrics[
-              metric.key
-            ]
-          )
-        );
-
-        var baselineValue = (
-          Number(
-            baseline.metrics[
-              metric.key
-            ]
-          )
-        );
-
-        var maximum = Math.max(
-          selectedValue,
-          baselineValue,
-          1
-        );
-
-        var selectedWidth = (
-          selectedValue / maximum
-        ) * 100;
-
-        var baselineWidth = (
-          baselineValue / maximum
-        ) * 100;
-
-        return (
-          '<div class="impact-chart-row">'
-          + '<div class="impact-chart-row__label">'
-          + escapeHtml(metric.label)
-          + "</div>"
-          + '<div class="impact-chart-row__bars">'
-          + '<div class="impact-chart-bar impact-chart-bar--baseline" '
-          + 'style="width:'
-          + baselineWidth.toFixed(1)
-          + '%"><span>Referencia</span></div>'
-          + '<div class="impact-chart-bar impact-chart-bar--selected" '
-          + 'style="width:'
-          + selectedWidth.toFixed(1)
-          + '%"><span>Decisión</span></div>'
-          + "</div>"
-          + '<div class="impact-chart-row__value">'
-          + escapeHtml(
-              metric.format(
-                selectedValue
-              )
-            )
-          + "</div>"
-          + "</div>"
-        );
-      })
-      .join("");
-
-    container.innerHTML = rows;
-  }
-
-  function renderKpiTracks(run) {
-    var selected = selectedScenario(run);
-    var baseline = (
-      run.result_json
-      && run.result_json.scenarios
-      && run.result_json.scenarios.baseline
-    );
-
-    if (!selected || !baseline) {
-      return;
-    }
-
-    [
-      {
-        id: "dashboard-kpi-cost-track",
-        key: "total_cost"
-      },
-      {
-        id: "dashboard-kpi-trips-track",
-        key: "total_trips"
-      },
-      {
-        id: "dashboard-kpi-distance-track",
-        key: "total_distance_km"
-      }
-    ].forEach(function (item) {
-      var node = document.getElementById(
-        item.id
-      );
-
-      if (!node) {
-        return;
-      }
-
-      var selectedValue = Number(
-        selected.metrics[item.key]
-      );
-
-      var baselineValue = Number(
-        baseline.metrics[item.key]
-      );
-
-      var ratio = (
-        baselineValue
-          ? (
-            selectedValue
-            / baselineValue
-          )
-          : 1
-      );
-
-      var width = Math.max(
-        4,
-        Math.min(
-          100,
-          ratio * 100
-        )
-      );
-
-      node.innerHTML = (
-        '<span class="'
-        + improvementClass(
-            selectedValue,
-            baselineValue
-          )
-        + '" style="width:'
-        + width.toFixed(1)
-        + '%"></span>'
-      );
-    });
-  }
-
-  function referenceOptions(
-    result
-  ) {
-    var selectedKey = (
-      result.recommended_scenario
-    );
-
-    var select = (
-      $("#dashboard-comparison-select")
-    );
-
-    if (!select) {
-      return;
-    }
-
-    Array.from(
-      select.options
-    ).forEach(function (option) {
-      option.disabled = (
-        option.value === selectedKey
-      );
-    });
-
-    if (
-      select.value === selectedKey
-    ) {
-      select.value = "baseline";
-    }
-  }
-
-  function renderComparison(
-    run,
-    referenceKey
-  ) {
-    var result = run.result_json;
-    var selected = selectedScenario(run);
-    var reference = (
-      result.scenarios[
-        referenceKey
-      ]
-    );
-
-    var tableBody = (
-      $("#dashboard-comparison-table-body")
-    );
-
-    var chart = (
-      $("#dashboard-comparison-chart")
-    );
-
-    if (
-      !selected
-      || !reference
-      || !tableBody
-      || !chart
-    ) {
-      return;
-    }
-
-    var definitions = (
-      metricDefinitions()
-    );
-
-    tableBody.innerHTML = (
-      definitions
-        .map(function (metric) {
-          var selectedValue = Number(
-            selected.metrics[
-              metric.key
-            ]
-          );
-
-          var referenceValue = Number(
-            reference.metrics[
-              metric.key
-            ]
-          );
-
-          var difference = (
-            selectedValue
-            - referenceValue
-          );
-
-          var variation = (
-            referenceValue
-              ? (
-                difference
-                / referenceValue
-                * 100
-              )
-              : null
-          );
-
-          var klass = (
-            improvementClass(
-              selectedValue,
-              referenceValue
-            )
-          );
-
-          var differenceLabel = (
-            metric.key === "total_cost"
-              ? formatCurrency(
-                  difference
-                )
-              : metric.key
-                === "total_distance_km"
-                ? (
-                  formatNumber(
-                    difference,
-                    1
-                  )
-                  + " km"
-                )
-                : formatNumber(
-                    difference
-                  )
-          );
-
-          return (
-            "<tr>"
-            + "<th>"
-            + escapeHtml(metric.label)
-            + "</th>"
-            + "<td>"
-            + escapeHtml(
-                metric.format(
-                  selectedValue
-                )
-              )
-            + "</td>"
-            + "<td>"
-            + escapeHtml(
-                metric.format(
-                  referenceValue
-                )
-              )
-            + "</td>"
-            + '<td class="'
-            + klass
-            + '">'
-            + escapeHtml(
-                differenceLabel
-              )
-            + "</td>"
-            + '<td class="'
-            + klass
-            + '">'
-            + (
-              variation === null
-                ? "—"
-                : formatPercent(
-                    variation
-                  )
-            )
-            + "</td>"
-            + "</tr>"
-          );
-        })
-        .join("")
-    );
-
-    chart.innerHTML = (
-      definitions
-        .map(function (metric) {
-          var selectedValue = Number(
-            selected.metrics[
-              metric.key
-            ]
-          );
-
-          var referenceValue = Number(
-            reference.metrics[
-              metric.key
-            ]
-          );
-
-          var selectedIndex = (
-            referenceValue
-              ? (
-                selectedValue
-                / referenceValue
-                * 100
-              )
-              : 100
-          );
-
-          var displayWidth = Math.min(
-            180,
-            Math.max(
-              2,
-              selectedIndex
-            )
-          );
-
-          return (
-            '<div class="comparison-chart-row">'
-            + "<span>"
-            + escapeHtml(metric.label)
-            + "</span>"
-            + '<div class="comparison-chart-bars">'
-            + '<div class="comparison-chart-reference" style="width:100%"></div>'
-            + '<div class="comparison-chart-selected" style="width:'
-            + displayWidth.toFixed(1)
-            + '%"></div>'
-            + "</div>"
-            + "<strong>"
-            + selectedIndex.toFixed(0)
-            + "</strong>"
-            + "</div>"
-          );
-        })
-        .join("")
-    );
-  }
-
-  function applyDeltaStyles(run) {
-    var selected = selectedScenario(run);
-
-    if (!selected) {
-      return;
-    }
-
-    var delta = (
-      selected.delta_vs_baseline
-      || {}
-    );
-
-    var config = runConfiguration(run);
-
-    var primaryDelta;
-
-    if (config.mode === "custom") {
-      primaryDelta = Math.max(
-        Number(delta.cost_pct || 0),
-        Number(delta.trips_pct || 0)
-      );
-    } else if (
-      config.objective === "min_trips"
-    ) {
-      primaryDelta = delta.trips_pct;
-    } else {
-      primaryDelta = delta.cost_pct;
-    }
-
-    [
-      {
-        id: "dashboard-kpi-cost-delta",
-        value: delta.cost_pct
-      },
-      {
-        id: "dashboard-kpi-trips-delta",
-        value: delta.trips_pct
-      },
-      {
-        id: "dashboard-kpi-distance-delta",
-        value: delta.distance_pct
-      },
-      {
-        id: "dashboard-recommendation-delta",
-        value: primaryDelta
-      }
-    ].forEach(function (item) {
-      var node = document.getElementById(
-        item.id
-      );
-
-      if (!node) {
-        return;
-      }
-
-      node.classList.remove(
-        "is-improvement",
-        "is-worse",
-        "is-neutral"
-      );
-
-      var numeric = Number(
-        item.value
-      );
-
-      if (Number.isNaN(numeric)) {
-        node.classList.add(
-          "is-neutral"
-        );
-      } else if (numeric < 0) {
-        node.classList.add(
-          "is-improvement"
-        );
-      } else if (numeric > 0) {
-        node.classList.add(
-          "is-worse"
-        );
-      } else {
-        node.classList.add(
-          "is-neutral"
-        );
-      }
-    });
-  }
-
-  function renderEnhancedDashboard(run) {
-    if (
-      !run
-      || !run.result_json
-    ) {
-      return;
-    }
-
-    referenceOptions(
-      run.result_json
-    );
-
-    renderImpactChart(run);
-    renderKpiTracks(run);
-    applyDeltaStyles(run);
-
-    var select = (
-      $("#dashboard-comparison-select")
-    );
-
-    renderComparison(
-      run,
-      select
-        ? select.value
-        : "baseline"
-    );
-  }
-
-  function bindComparison() {
-    var select = (
-      $("#dashboard-comparison-select")
-    );
-
-    if (!select) {
-      return;
-    }
-
-    select.addEventListener(
-      "change",
-      function () {
-        if (
-          state.context
-          && state.context.run
-        ) {
-          renderComparison(
-            state.context.run,
-            select.value
-          );
-        }
-      }
-    );
-  }
-
-  window.dationDashboardStart = function (
-    context
-  ) {
-    var normalized = Object.assign(
-      {},
-      context,
-      {
-        status: "running"
-      }
-    );
-
-    saveContext(normalized);
-    setRunInUrl(normalized.runId);
-    state.pollAttempts = 0;
-
-    if (
-      typeof window.dationNavigate
-      === "function"
-    ) {
-      window.dationNavigate(
-        "decision-dashboard"
-      );
-    }
-
-    showRunning();
-    schedulePoll(900);
-  };
-
-  window.dationDashboardCompleted = function (
-    run,
-    dataset,
-    profile
-  ) {
-    clearPoll();
-
-    var context = Object.assign(
-      {},
-      state.context || {},
-      {
-        runId: run.id,
-        run: run,
-        dataset: dataset,
-        profile: profile,
-        status: "completed",
-        finishedAt: (
-          run.finished_at
-          || new Date().toISOString()
-        )
-      }
-    );
-
-    saveContext(context);
-    setRunInUrl(run.id);
-    updateLatestDecisionCta(run);
-
-    var shell = (
-      $("#dashboard-execution-state")
-    );
-    var content = (
-      $("#dashboard-content")
-    );
-
-    if (shell) {
-      shell.classList.add(
-        "is-hidden"
-      );
-    }
-
-    if (content) {
-      content.classList.remove(
-        "is-hidden"
-      );
-    }
-
-    try {
-      renderCoreDashboard(
-        run,
-        dataset,
-        profile
-      );
-
-      renderEnhancedDashboard(run);
-
-      window.dispatchEvent(
-        new CustomEvent(
-          "dation:dashboard-completed",
-          {
-            detail: {
-              run: run,
-              dataset: dataset,
-              profile: profile,
-              context: context
-            }
-          }
-        )
-      );
-    } catch (error) {
-      showError(
-        "La corrida terminó correctamente, pero no se pudo renderizar el resultado: "
-        + error.message
-      );
-    }
-  };
-
-  window.dationDashboardExecutionError = function (
-    runId,
-    message
-  ) {
-    if (
-      state.context
-      && runId
-      && state.context.runId !== runId
-    ) {
-      return;
-    }
-
-    saveContext(
-      Object.assign(
-        {},
-        state.context || {},
-        {
-          runId: runId,
-          status: "error",
-          error: message
-        }
-      )
-    );
-
-    showError(message);
-  };
-
-  window.dationDashboardTimeout = function (
-    runId
-  ) {
-    if (
-      state.context
-      && runId
-      && state.context.runId !== runId
-    ) {
-      return;
-    }
-
-    saveContext(
-      Object.assign(
-        {},
-        state.context || {},
-        {
-          runId: runId,
-          status: "timeout"
-        }
-      )
-    );
-
-    showTimeout();
-    schedulePoll(2500);
-  };
-
-  function retryStatus() {
+  async function retryStatus() {
     if (
       !state.context
       || !state.context.runId
@@ -2420,23 +2545,33 @@
 
     state.pollAttempts = 0;
     showRunning();
-    pollCurrentRun();
+    await pollCurrentRun();
   }
 
-  function retryRun() {
+  async function retryRun() {
     if (
-      !state.context
-      || !state.context.configuration
-      || typeof window
+      state.context
+      && state.context.configuration
+      && typeof window
         .dationRetryDecision
-        !== "function"
+        === "function"
     ) {
+      showRunning();
+
+      await window.dationRetryDecision(
+        state.context.configuration
+      );
       return;
     }
 
-    window.dationRetryDecision(
-      state.context.configuration
-    );
+    if (
+      typeof window.dationNavigate
+      === "function"
+    ) {
+      window.dationNavigate(
+        "logistics-config"
+      );
+    }
   }
 
   function cancelWait() {
@@ -2445,22 +2580,482 @@
     if (
       typeof window
         .dationCancelDecisionWait
-      === "function"
+        === "function"
     ) {
       window.dationCancelDecisionWait();
     }
 
-    saveContext(
-      Object.assign(
-        {},
-        state.context || {},
-        {
-          status: "cancelled"
-        }
-      )
-    );
+    if (state.context) {
+      saveContext(
+        Object.assign(
+          {},
+          state.context,
+          {
+            status: "cancelled"
+          }
+        )
+      );
+    }
 
     showCancelled();
+  }
+
+  function latestDecisionButton() {
+    return (
+      $("#open-latest-logistics-decision")
+    );
+  }
+
+  function latestDecisionMeta() {
+    return (
+      $("#latest-logistics-meta")
+    );
+  }
+
+  function updateLatestDecisionCta(run) {
+    var button = (
+      latestDecisionButton()
+    );
+    var meta = (
+      latestDecisionMeta()
+    );
+
+    if (!button || !meta) {
+      return;
+    }
+
+    if (!run) {
+      button.disabled = true;
+      meta.textContent = (
+        "Todavía no hay decisiones completadas para analizar."
+      );
+
+      if (
+        typeof window
+          .dationSetDashboardReady
+        === "function"
+      ) {
+        window.dationSetDashboardReady(
+          false
+        );
+      }
+
+      return;
+    }
+
+    button.disabled = false;
+    button.dataset.runId = run.id;
+    meta.textContent = (
+      "Última decisión · "
+      + F.formatDate(
+          run.finished_at
+          || run.created_at
+        )
+    );
+
+    if (
+      typeof window
+        .dationSetDashboardReady
+      === "function"
+    ) {
+      window.dationSetDashboardReady(
+        true
+      );
+    }
+  }
+
+  async function findLatestCompletedRun() {
+    var payload = await requestJson(
+      "/api/runs?limit=30"
+    );
+
+    var items = (
+      payload
+      && Array.isArray(
+        payload.items
+      )
+        ? payload.items
+        : []
+    );
+
+    return (
+      items.find(function (run) {
+        return (
+          run.status === "completed"
+        );
+      })
+      || null
+    );
+  }
+
+  async function refreshLatestDecisionCta() {
+    try {
+      var latest = (
+        await findLatestCompletedRun()
+      );
+
+      updateLatestDecisionCta(
+        latest
+      );
+
+      return latest;
+    } catch (error) {
+      var meta = (
+        latestDecisionMeta()
+      );
+
+      if (meta) {
+        meta.textContent = (
+          "No se pudo consultar la última decisión."
+        );
+      }
+
+      return null;
+    }
+  }
+
+  async function openLatestDecision() {
+    var button = (
+      latestDecisionButton()
+    );
+
+    if (button) {
+      button.disabled = true;
+      button.textContent = (
+        "Abriendo última decisión…"
+      );
+    }
+
+    try {
+      var summary = (
+        await findLatestCompletedRun()
+      );
+
+      if (!summary) {
+        updateLatestDecisionCta(
+          null
+        );
+        return;
+      }
+
+      var run = await requestJson(
+        "/api/runs/"
+        + encodeURIComponent(
+            summary.id
+          )
+      );
+
+      saveContext({
+        runId: run.id,
+        run: run,
+        status: "completed",
+        finishedAt: (
+          run.finished_at
+          || run.created_at
+        )
+      });
+
+      setRunInUrl(run.id);
+
+      await recoverRun(run);
+    } catch (error) {
+      showError(
+        "No se pudo abrir la última decisión: "
+        + error.message
+      );
+    } finally {
+      if (button) {
+        button.textContent = (
+          "Analizar mi última decisión ↗"
+        );
+      }
+    }
+  }
+
+  function downloadDecisionTxt(run) {
+    if (
+      !run
+      || !run.result_json
+    ) {
+      return false;
+    }
+
+    downloadBlob(
+      (
+        "dation-decision-"
+        + String(run.id).slice(0, 8)
+        + ".txt"
+      ),
+      JSON.stringify(
+        run.result_json,
+        null,
+        2
+      ),
+      "text/plain;charset=utf-8"
+    );
+
+    return true;
+  }
+
+  async function exportCurrentDecision() {
+    var context = (
+      state.context
+      || loadContext()
+      || {}
+    );
+
+    var run = context.run;
+
+    try {
+      if (
+        !run
+        || !run.result_json
+      ) {
+        if (!context.runId) {
+          throw new Error(
+            "No hay una decisión activa para exportar."
+          );
+        }
+
+        run = await requestJson(
+          "/api/runs/"
+          + encodeURIComponent(
+              context.runId
+            )
+        );
+      }
+
+      if (!downloadDecisionTxt(run)) {
+        throw new Error(
+          "La corrida no contiene un JSON de decisión."
+        );
+      }
+    } catch (error) {
+      console.error(
+        "Error al exportar decisión.",
+        error
+      );
+    }
+  }
+
+  function copyRunId() {
+    var runId = (
+      state.context
+      && state.context.runId
+    );
+
+    if (!runId) {
+      return;
+    }
+
+    if (
+      navigator.clipboard
+      && navigator.clipboard.writeText
+    ) {
+      navigator.clipboard.writeText(
+        runId
+      );
+    }
+  }
+
+  function bindControls() {
+    var retryStatusButton = (
+      $("#dashboard-retry-status")
+    );
+    var retryRunButton = (
+      $("#dashboard-retry-run")
+    );
+    var cancelButton = (
+      $("#dashboard-cancel-wait")
+    );
+    var exportButton = (
+      $("#export-decision")
+    );
+    var reexecute = (
+      $("#dashboard-reexecute")
+    );
+    var copyRun = (
+      $("#copy-run-id")
+    );
+    var comparison = (
+      $("#dashboard-comparison-select")
+    );
+    var detailOpen = (
+      $("#open-reassignment-detail")
+    );
+    var detailClose = (
+      $("#close-reassignment-detail")
+    );
+    var detailSearch = (
+      $("#reassignment-search")
+    );
+    var detailVehicle = (
+      $("#reassignment-vehicle-filter")
+    );
+    var detailPrev = (
+      $("#reassignment-prev")
+    );
+    var detailNext = (
+      $("#reassignment-next")
+    );
+    var detailExport = (
+      $("#export-reassignments")
+    );
+    var latestButton = (
+      latestDecisionButton()
+    );
+
+    if (retryStatusButton) {
+      retryStatusButton.addEventListener(
+        "click",
+        retryStatus
+      );
+    }
+
+    if (retryRunButton) {
+      retryRunButton.addEventListener(
+        "click",
+        retryRun
+      );
+    }
+
+    if (cancelButton) {
+      cancelButton.addEventListener(
+        "click",
+        cancelWait
+      );
+    }
+
+    if (exportButton) {
+      exportButton.addEventListener(
+        "click",
+        exportCurrentDecision
+      );
+    }
+
+    if (reexecute) {
+      reexecute.addEventListener(
+        "click",
+        function () {
+          if (
+            typeof window
+              .dationNavigate
+              === "function"
+          ) {
+            window.dationNavigate(
+              "logistics-config"
+            );
+          }
+        }
+      );
+    }
+
+    if (copyRun) {
+      copyRun.addEventListener(
+        "click",
+        copyRunId
+      );
+    }
+
+    if (comparison) {
+      comparison.addEventListener(
+        "change",
+        function () {
+          if (
+            state.context
+            && state.context.run
+          ) {
+            renderComparison(
+              state.context.run,
+              comparison.value
+            );
+          }
+        }
+      );
+    }
+
+    if (detailOpen) {
+      detailOpen.addEventListener(
+        "click",
+        openReassignmentDetail
+      );
+    }
+
+    if (detailClose) {
+      detailClose.addEventListener(
+        "click",
+        closeReassignmentDetail
+      );
+    }
+
+    if (detailSearch) {
+      detailSearch.addEventListener(
+        "input",
+        function () {
+          state.detailPage = 1;
+          renderReassignmentDetail();
+        }
+      );
+    }
+
+    if (detailVehicle) {
+      detailVehicle.addEventListener(
+        "change",
+        function () {
+          state.detailPage = 1;
+          renderReassignmentDetail();
+        }
+      );
+    }
+
+    if (detailPrev) {
+      detailPrev.addEventListener(
+        "click",
+        function () {
+          state.detailPage -= 1;
+          renderReassignmentDetail();
+        }
+      );
+    }
+
+    if (detailNext) {
+      detailNext.addEventListener(
+        "click",
+        function () {
+          state.detailPage += 1;
+          renderReassignmentDetail();
+        }
+      );
+    }
+
+    if (detailExport) {
+      detailExport.addEventListener(
+        "click",
+        exportReassignments
+      );
+    }
+
+    if (latestButton) {
+      latestButton.addEventListener(
+        "click",
+        openLatestDecision
+      );
+    }
+
+    document.addEventListener(
+      "keydown",
+      function (event) {
+        if (
+          event.key === "Escape"
+          && !$("#reassignment-dialog")
+            .classList.contains(
+              "is-hidden"
+            )
+        ) {
+          closeReassignmentDetail();
+        }
+      }
+    );
   }
 
   async function restoreExecution() {
@@ -2502,367 +3097,156 @@
     if (
       stored.status === "completed"
       && stored.run
-      && stored.run.id === stored.runId
+      && stored.run.id
+        === stored.runId
+      && stored.run.result_json
     ) {
-      window.dationDashboardCompleted(
-        stored.run,
-        stored.dataset,
-        stored.profile
-      );
-      return;
+      try {
+        await recoverRun(
+          stored.run
+        );
+        return;
+      } catch (error) {
+        // Fallback a backend.
+      }
     }
 
-    /*
-     * Siempre verificamos el run persistido si existe un run_id.
-     * Esto permite recuperar una corrida aunque la sesión anterior
-     * haya quedado en timeout, error visual o "espera detenida".
-     */
     if (stored.runId) {
-      showRunning();
       state.pollAttempts = 0;
+      showRunning();
       pollCurrentRun();
     }
   }
 
-  function latestDecisionButton() {
-    return $("#open-latest-logistics-decision");
-  }
-
-  function latestDecisionMeta() {
-    return $("#latest-logistics-meta");
-  }
-
-  function updateLatestDecisionCta(
-    run
+  window.dationDashboardStart = function (
+    context
   ) {
-    var button = latestDecisionButton();
-    var meta = latestDecisionMeta();
-
-    if (!button || !meta) {
-      return;
-    }
-
-    if (!run) {
-      button.disabled = true;
-      meta.textContent = (
-        "Todavía no hay decisiones completadas para analizar."
-      );
-
-      if (
-        typeof window
-          .dationSetDashboardReady
-        === "function"
-      ) {
-        window.dationSetDashboardReady(
-          false
-        );
+    var normalized = Object.assign(
+      {},
+      context,
+      {
+        status: "running"
       }
+    );
 
-      return;
-    }
-
-    button.disabled = false;
+    saveContext(normalized);
+    setRunInUrl(
+      normalized.runId
+    );
+    state.pollAttempts = 0;
 
     if (
-      typeof window
-        .dationSetDashboardReady
+      typeof window.dationNavigate
       === "function"
     ) {
-      window.dationSetDashboardReady(
-        true
+      window.dationNavigate(
+        "decision-dashboard"
       );
     }
-    button.dataset.runId = run.id;
-    meta.textContent = (
-      "Última corrida completada · "
-      + shortId(run.id)
-      + " · "
-      + formatDate(
-          run.finished_at
-          || run.created_at
+
+    showRunning();
+  };
+
+  window.dationDashboardCompleted = function (
+    run,
+    dataset,
+    profile
+  ) {
+    var context = {
+      runId: run.id,
+      run: run,
+      dataset: dataset,
+      profile: profile,
+      configuration: (
+        runConfiguration(run)
+      ),
+      status: "completed",
+      finishedAt: (
+        run.finished_at
+        || run.created_at
+      )
+    };
+
+    clearPoll();
+    saveContext(context);
+    setRunInUrl(run.id);
+
+    if (
+      typeof window.dationNavigate
+      === "function"
+    ) {
+      window.dationNavigate(
+        "decision-dashboard"
+      );
+    }
+
+    renderDashboard(
+      run,
+      dataset,
+      profile
+    );
+
+    updateLatestDecisionCta(run);
+
+    window.dispatchEvent(
+      new CustomEvent(
+        "dation:dashboard-completed",
+        {
+          detail: {
+            run: run,
+            dataset: dataset,
+            profile: profile,
+            context: context
+          }
+        }
+      )
+    );
+  };
+
+  window.dationDashboardExecutionError = (
+    function (
+      runId,
+      message
+    ) {
+      clearPoll();
+
+      saveContext(
+        Object.assign(
+          {},
+          state.context || {},
+          {
+            runId: runId,
+            status: "error"
+          }
         )
-    );
-  }
-
-  async function findLatestCompletedRun() {
-    var payload = await requestJson(
-      "/api/runs?limit=30"
-    );
-
-    var items = (
-      payload
-      && Array.isArray(payload.items)
-        ? payload.items
-        : []
-    );
-
-    return (
-      items.find(function (run) {
-        return (
-          run.status === "completed"
-        );
-      })
-      || null
-    );
-  }
-
-  async function refreshLatestDecisionCta() {
-    try {
-      var latest = await findLatestCompletedRun();
-      updateLatestDecisionCta(latest);
-      return latest;
-    } catch (error) {
-      var meta = latestDecisionMeta();
-
-      if (meta) {
-        meta.textContent = (
-          "No se pudo consultar la última decisión."
-        );
-      }
-
-      return null;
-    }
-  }
-
-  async function openLatestDecision() {
-    var button = latestDecisionButton();
-
-    if (button) {
-      button.disabled = true;
-      button.textContent = "Abriendo última decisión…";
-    }
-
-    try {
-      var latestSummary = (
-        await findLatestCompletedRun()
       );
 
-      if (!latestSummary) {
-        updateLatestDecisionCta(null);
-        return;
-      }
+      showError(message);
+    }
+  );
 
-      var latest = await requestJson(
-        "/api/runs/"
-        + encodeURIComponent(
-            latestSummary.id
-          )
-      );
+  window.dationDashboardTimeout = (
+    function (runId) {
+      clearPoll();
 
-      saveContext({
-        runId: latest.id,
-        run: latest,
-        status: "completed",
-        finishedAt: (
-          latest.finished_at
-          || latest.created_at
+      saveContext(
+        Object.assign(
+          {},
+          state.context || {},
+          {
+            runId: runId,
+            status: "timeout"
+          }
         )
-      });
-
-      setRunInUrl(latest.id);
-
-      if (
-        typeof window.dationNavigate
-        === "function"
-      ) {
-        window.dationNavigate(
-          "decision-dashboard"
-        );
-      }
-
-      await recoverRun(latest);
-      updateLatestDecisionCta(latest);
-    } catch (error) {
-      showError(
-        "No se pudo abrir la última decisión: "
-        + error.message
       );
-    } finally {
-      if (button) {
-        button.textContent = (
-          "Analizar mi última decisión ↗"
-        );
-      }
+
+      showTimeout();
     }
-  }
+  );
 
   window.dationOpenLatestDecision = (
     openLatestDecision
   );
-
-  function downloadDecisionTxt(
-    run
-  ) {
-    if (
-      !run
-      || !run.result_json
-    ) {
-      return false;
-    }
-
-    var blob = new Blob(
-      [
-        JSON.stringify(
-          run.result_json,
-          null,
-          2
-        )
-      ],
-      {
-        type: "text/plain;charset=utf-8"
-      }
-    );
-
-    var url = URL.createObjectURL(
-      blob
-    );
-
-    var anchor = (
-      document.createElement("a")
-    );
-
-    anchor.href = url;
-    anchor.download = (
-      "dation-decision-"
-      + String(run.id).slice(0, 8)
-      + ".txt"
-    );
-
-    document.body.appendChild(
-      anchor
-    );
-
-    anchor.click();
-    anchor.remove();
-
-    window.setTimeout(
-      function () {
-        URL.revokeObjectURL(url);
-      },
-      0
-    );
-
-    return true;
-  }
-
-  async function exportCurrentDecision() {
-    var context = (
-      state.context
-      || loadContext()
-      || {}
-    );
-
-    var run = context.run;
-
-    try {
-      if (
-        !run
-        || !run.result_json
-      ) {
-        if (!context.runId) {
-          throw new Error(
-            "No hay una decisión activa para exportar."
-          );
-        }
-
-        run = await requestJson(
-          "/api/runs/"
-          + encodeURIComponent(
-              context.runId
-            )
-        );
-      }
-
-      if (!downloadDecisionTxt(run)) {
-        throw new Error(
-          "La corrida no contiene un JSON de decisión."
-        );
-      }
-    } catch (error) {
-      var button = (
-        $("#export-decision")
-      );
-
-      if (button) {
-        var original = (
-          button.textContent
-        );
-
-        button.textContent = (
-          "No se pudo exportar"
-        );
-
-        window.setTimeout(
-          function () {
-            button.textContent = (
-              "Exportar decisión ↓"
-            );
-          },
-          1800
-        );
-      }
-
-      console.error(
-        "Error al exportar la decisión.",
-        error
-      );
-    }
-  }
-
-
-  function bindControls() {
-    var retryStatusButton = (
-      $("#dashboard-retry-status")
-    );
-    var retryRunButton = (
-      $("#dashboard-retry-run")
-    );
-    var cancelButton = (
-      $("#dashboard-cancel-wait")
-    );
-    var exportButton = (
-      $("#export-decision")
-    );
-
-    if (retryStatusButton) {
-      retryStatusButton.addEventListener(
-        "click",
-        retryStatus
-      );
-    }
-
-    if (retryRunButton) {
-      retryRunButton.addEventListener(
-        "click",
-        retryRun
-      );
-    }
-
-    if (cancelButton) {
-      cancelButton.addEventListener(
-        "click",
-        cancelWait
-      );
-    }
-
-    if (exportButton) {
-      exportButton.addEventListener(
-        "click",
-        exportCurrentDecision
-      );
-    }
-
-    var latestButton = latestDecisionButton();
-
-    if (latestButton) {
-      latestButton.addEventListener(
-        "click",
-        openLatestDecision
-      );
-    }
-
-    bindComparison();
-  }
 
   function boot() {
     bindControls();
