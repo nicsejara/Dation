@@ -72,8 +72,23 @@ function datasetById(id) {
 }
 
 
-function navigate(view) {
+function navigate(
+  view,
+  stage = null,
+) {
   setView(view);
+
+  if (
+    typeof window.dationNavigate
+    === "function"
+  ) {
+    window.dationNavigate(
+      view,
+      stage,
+    );
+    return;
+  }
+
   activateView(view);
 }
 
@@ -549,7 +564,8 @@ function bindNavigation() {
         event.preventDefault();
         event.stopPropagation();
         navigate(
-          "logistics-config"
+          "logistics-config",
+          "data",
         );
       }
     );
