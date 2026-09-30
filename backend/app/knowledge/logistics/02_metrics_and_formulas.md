@@ -72,7 +72,7 @@ Cada escenario contiene:
 
 ## Delta versus baseline
 
-- costo negativo: reducción estimada frente a la asignación de referencia;
+- costo negativo: reducción estimada frente a la asignación actual;
 - viajes negativo: reducción de viajes;
 - distancia negativa: reducción de kilómetros.
 
