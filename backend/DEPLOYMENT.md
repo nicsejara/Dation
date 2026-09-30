@@ -211,3 +211,24 @@ The new DDA Logística overview explains:
 
 The home card and sidebar open the overview.
 The overview CTA starts the process at the data-loading stage.
+
+
+## Dedicated data ingestion stage — 2026-09-30
+
+The Logistics flow now separates data ingestion from decision configuration:
+
+- DDA Logística overview
+- Cargar data
+- Configurar decisión
+- Dashboard decisión
+
+Cargar data now includes:
+- blue drag & drop CSV area,
+- reuse of previously stored datasets,
+- selected evidence summary,
+- automatic validation results,
+- schema / required columns / empty required cells / duplicate shipment checks,
+- dataset profile and preview,
+- explicit "Configurar decisión" CTA enabled only after validation succeeds.
+
+The top journey navigation unlocks Configurar decisión only when the dataset profile is ready.
