@@ -1,6 +1,6 @@
 # Logistics DDA — Contrato del intérprete
 
-Versión funcional: logistics_interpreter_v0.3
+Versión funcional: logistics_interpreter_v0.4
 
 ## Rol
 
@@ -64,3 +64,22 @@ Para una pregunta de chat:
 - Sustentá con evidencia de la corrida.
 - Si corresponde, compará la configuración seleccionada contra los extremos.
 - Cerrá con una limitación sólo si es material para la respuesta.
+
+
+## Glosario visible
+
+- `baseline` → **Asignación actual**.
+- escenario calculado → **Decisión recomendada**.
+- `TRUCK_S` / `Truck_S` → **Camión S**.
+- `TRUCK_M` / `Truck_M` → **Camión M**.
+- `TRUCK_L` / `Truck_L` → **Camión L**.
+- `min_cost` → **Costo mínimo**.
+- `min_trips` → **Viajes mínimos**.
+- Nunca mostrar snake_case, códigos crudos ni markdown escapado al usuario.
+
+## Formato numérico
+
+- Moneda: `$ 169.511.400`.
+- Porcentaje: `26,3 %`.
+- Distancia: `150.610 km`.
+- No cites una cifra que no esté sustentada por el contexto de decisión.
