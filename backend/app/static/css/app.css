@@ -4249,3 +4249,105 @@ button.d-home__asset:hover .d-home__asset-action span {
     height: 22px;
   }
 }
+
+
+/* =========================================================
+   DDA JOURNEY NAVIGATION
+   ========================================================= */
+
+.topbar--journey {
+  min-height: 66px;
+  justify-content: flex-start;
+  padding: 0 32px;
+}
+
+.journey-nav {
+  display: flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 7px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.journey-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.journey-step {
+  position: relative;
+  min-height: 34px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #667085;
+  background: transparent;
+  font-size: 11px;
+  font-weight: 650;
+  white-space: nowrap;
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.journey-step:hover:not(:disabled) {
+  color: var(--color-text);
+  background: #f2f4f7;
+}
+
+.journey-step.is-current {
+  color: var(--color-text);
+  background: #f2f4f7;
+  font-weight: 800;
+}
+
+.journey-step.is-current::after {
+  position: absolute;
+  right: 8px;
+  bottom: 3px;
+  left: 8px;
+  height: 2px;
+  content: "";
+  border-radius: 999px;
+  background: var(--color-brand);
+}
+
+.journey-step.is-disabled {
+  cursor: default;
+  color: #c2c7d0;
+  background: transparent;
+}
+
+.journey-separator {
+  color: #c1c7d0;
+  font-size: 15px;
+  line-height: 1;
+  user-select: none;
+}
+
+#dda-data-section,
+#dda-decision-section {
+  scroll-margin-top: 88px;
+}
+
+@media (max-width: 620px) {
+  .topbar--journey {
+    min-height: 58px;
+    padding: 0 16px;
+  }
+
+  .journey-nav {
+    gap: 3px;
+  }
+
+  .journey-step {
+    min-height: 32px;
+    padding: 0 6px;
+    font-size: 10px;
+  }
+
+  .journey-separator {
+    font-size: 13px;
+  }
+}
