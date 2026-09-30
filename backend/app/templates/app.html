@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="light">
   <title>Dation · Decision Intelligence</title>
   <link rel="stylesheet" href="/static/css/tokens.css">
-  <link rel="stylesheet" href="/static/css/app.css?v=workspace-v9-20260930">
+  <link rel="stylesheet" href="/static/css/app.css?v=workspace-v10-20260930">
 </head>
 <body>
   <div class="app-shell">
@@ -269,7 +269,7 @@
                 <span class="section-kicker">Qué resuelve</span>
                 <h2>Convierte una asignación logística en una decisión comparable</h2>
                 <p>
-                  Parte de la operación actual y evalúa alternativas por despacho
+                  Parte de la asignación informada en el dataset y evalúa alternativas por despacho
                   para mostrar qué cambia si el decisor prioriza costo, cantidad
                   de viajes o una combinación de ambas dimensiones.
                 </p>
@@ -278,10 +278,10 @@
               <div class="dda-overview__value-grid">
                 <article class="dda-overview__value-card">
                   <span class="dda-overview__value-number">01</span>
-                  <h3>Situación actual</h3>
+                  <h3>Asignación de referencia</h3>
                   <p>
-                    Toma la asignación del CSV como baseline para medir impacto
-                    frente a la operación existente.
+                    Toma el tipo de vehículo informado en el CSV como referencia para
+                    medir el impacto potencial de otras asignaciones.
                   </p>
                 </article>
 
@@ -322,7 +322,7 @@
                   <li>Despachos identificados individualmente.</li>
                   <li>Cantidad de unidades y peso por unidad.</li>
                   <li>Origen, destino y distancia.</li>
-                  <li>Tipo de vehículo utilizado actualmente.</li>
+                  <li>Tipo de vehículo informado como asignación de referencia.</li>
                   <li>Capacidad, costo por km y costo fijo por viaje.</li>
                 </ul>
               </div>
@@ -332,7 +332,7 @@
                 <h2>Resultado de decisión</h2>
                 <ul class="dda-overview__checklist">
                   <li>Escenario recomendado para la prioridad seleccionada.</li>
-                  <li>Costo, viajes y distancia frente a baseline.</li>
+                  <li>Costo, viajes y distancia frente a la asignación de referencia.</li>
                   <li>Comparación contra extremos 100% costo y 100% viajes.</li>
                   <li>Principales cambios de asignación por despacho.</li>
                   <li>DecisionResult JSON trazable e interpretación ejecutiva.</li>
@@ -1074,9 +1074,21 @@
                   <span id="run-context-id">—</span>
                 </div>
 
-                <span class="section-kicker">Decisión recomendada</span>
+                <div class="dashboard-v2__objective">
+                  <span class="section-kicker">Objetivo de optimización</span>
+                  <strong id="dashboard-objective-label">—</strong>
+                  <small id="dashboard-objective-detail">—</small>
+                </div>
+
+                <span class="section-kicker">Decisión generada</span>
                 <h1 id="dashboard-recommendation-title">—</h1>
                 <p id="dashboard-recommendation-copy">—</p>
+
+                <div
+                  id="dashboard-assignment-distribution"
+                  class="dashboard-assignment-distribution"
+                  aria-label="Distribución de la asignación recomendada"
+                ></div>
 
                 <div class="dashboard-v2__decision-meta">
                   <div>
@@ -1084,7 +1096,7 @@
                     <strong id="run-context-dataset">—</strong>
                   </div>
                   <div>
-                    <span>Modo</span>
+                    <span>Configuración</span>
                     <strong id="run-context-mode">—</strong>
                   </div>
                   <div>
@@ -1102,7 +1114,7 @@
                 <div class="dashboard-v2__impact-heading">
                   <div>
                     <span class="section-kicker">Impacto esperado</span>
-                    <strong>Recomendación vs. situación actual</strong>
+                    <strong>Decisión vs. asignación de referencia</strong>
                   </div>
                   <span id="dashboard-recommendation-delta">—</span>
                 </div>
@@ -1161,14 +1173,14 @@
                   <span class="section-kicker">Comparador de decisiones</span>
                   <h2>Óptimo seleccionado vs. referencia</h2>
                   <p>
-                    Compará el escenario recomendado con la situación actual o con los extremos predefinidos del motor.
+                    Compará la decisión generada con la asignación de referencia del dataset o con los extremos predefinidos del motor.
                   </p>
                 </div>
 
                 <label class="dashboard-compare-select">
                   <span>Comparar contra</span>
                   <select id="dashboard-comparison-select">
-                    <option value="baseline">Situación actual</option>
+                    <option value="baseline">Asignación de referencia</option>
                     <option value="min_cost">Costo mínimo</option>
                     <option value="min_trips">Viajes mínimos</option>
                   </select>
@@ -1287,89 +1299,91 @@
                 </div>
               </div>
             </section>
+          </div>
 
-            <section class="dashboard-v2__footer-actions dashboard-v2__footer-actions--single">
-              <button class="button button--primary button--large" id="export-decision" type="button" disabled>
-                Exportar decisión
-                <span aria-hidden="true">↓</span>
-              </button>
-            </section>
+          <div class="dation-floating-actions" id="dation-floating-actions">
+            <button
+              class="button button--primary dation-floating-export"
+              id="export-decision"
+              type="button"
+              disabled
+            >
+              Exportar decisión
+              <span aria-hidden="true">↓</span>
+            </button>
 
-            <div class="dation-chat-floating" id="dation-chat-floating">
+            <button
+              class="dation-chat-launcher"
+              id="toggle-chat"
+              type="button"
+              aria-controls="chat-panel"
+              aria-expanded="false"
+            >
+              <span class="dation-chat-launcher__mark" aria-hidden="true">D</span>
+              <span>
+                <strong>Preguntale a Dation</strong>
+                <small>Sobre esta decisión</small>
+              </span>
+            </button>
+          </div>
+
+          <aside
+            id="chat-panel"
+            class="chat-panel dashboard-chat dashboard-chat--floating is-hidden"
+            aria-label="Chat contextual de Dation"
+            aria-live="polite"
+          >
+            <div class="dashboard-chat__header">
+              <div>
+                <span class="section-kicker">Chat contextual</span>
+                <strong>Preguntale a Dation</strong>
+                <small>Contexto anclado al run activo</small>
+              </div>
+
               <button
-                class="dation-chat-launcher"
-                id="toggle-chat"
+                class="dation-chat-close"
+                id="chat-close"
                 type="button"
-                aria-controls="chat-panel"
-                aria-expanded="false"
+                aria-label="Cerrar chat"
               >
-                <span class="dation-chat-launcher__mark" aria-hidden="true">D</span>
-                <span>
-                  <strong>Preguntale a Dation</strong>
-                  <small>Sobre esta decisión</small>
-                </span>
+                ×
               </button>
-
-              <aside
-                id="chat-panel"
-                class="chat-panel dashboard-chat dashboard-chat--floating is-hidden"
-                aria-label="Chat contextual de Dation"
-                aria-live="polite"
-              >
-                <div class="dashboard-chat__header">
-                  <div>
-                    <span class="section-kicker">Chat contextual</span>
-                    <strong>Preguntale a Dation</strong>
-                    <small>Contexto anclado al run activo</small>
-                  </div>
-
-                  <button
-                    class="dation-chat-close"
-                    id="chat-close"
-                    type="button"
-                    aria-label="Cerrar chat"
-                  >
-                    ×
-                  </button>
-                </div>
-
-                <div class="dashboard-chat__intro">
-                  Preguntá por los datos, la recomendación, sensibilidad, trade-offs o supuestos de esta corrida.
-                </div>
-
-                <div class="prompt-chips" id="prompt-chips">
-                  <button type="button">¿Por qué esta decisión mejora frente a la situación actual?</button>
-                  <button type="button">¿Qué variable tiene más impacto en el resultado?</button>
-                  <button type="button">¿Qué cambia si priorizo sólo costo?</button>
-                  <button type="button">¿Qué cambia si priorizo sólo viajes?</button>
-                  <button type="button">¿Qué supuesto podría cambiar la recomendación?</button>
-                </div>
-
-                <div id="chat-thread" class="chat-thread"></div>
-
-                <div class="chat-composer">
-                  <textarea
-                    id="decision-question"
-                    rows="2"
-                    placeholder="Preguntá por esta decisión…"
-                    aria-label="Pregunta para Dation"
-                  ></textarea>
-                  <button
-                    class="button button--primary button--square"
-                    id="ask-decision"
-                    type="button"
-                    aria-label="Enviar pregunta"
-                  >
-                    ↑
-                  </button>
-                </div>
-              </aside>
             </div>
-          </div>
-          </div>
+
+            <div class="dashboard-chat__intro">
+              Preguntá por los datos, la asignación recomendada, sensibilidad, trade-offs o supuestos de esta corrida.
+            </div>
+
+            <div class="prompt-chips" id="prompt-chips">
+              <button type="button">¿Por qué esta decisión mejora frente a la asignación de referencia?</button>
+              <button type="button">¿Qué variable tiene más impacto en el resultado?</button>
+              <button type="button">¿Qué cambia si priorizo sólo costo?</button>
+              <button type="button">¿Qué cambia si priorizo sólo viajes?</button>
+              <button type="button">¿Qué supuesto podría cambiar la recomendación?</button>
+            </div>
+
+            <div id="chat-thread" class="chat-thread"></div>
+
+            <div class="chat-composer">
+              <textarea
+                id="decision-question"
+                rows="2"
+                placeholder="Preguntá por esta decisión…"
+                aria-label="Pregunta para Dation"
+              ></textarea>
+              <button
+                class="button button--primary button--square"
+                id="ask-decision"
+                type="button"
+                aria-label="Enviar pregunta"
+              >
+                ↑
+              </button>
+            </div>
+          </aside>
         </section>
 
-        <!-- TRAZABILIDAD -->
+                <!-- TRAZABILIDAD -->
         <section class="view" data-view-panel="traceability">
           <div class="page-heading">
             <div>
@@ -1765,10 +1779,10 @@
       window.dationRenderJourney('inicio');
     })();
   </script>
-  <script src="/static/js/data-stage.js?v=workspace-v9-20260930"></script>
-  <script src="/static/js/dashboard-stage.js?v=workspace-v9-20260930"></script>
-  <script src="/static/js/interpreter-stage.js?v=workspace-v9-20260930"></script>
-  <script src="/static/js/decision-stage.js?v=workspace-v9-20260930"></script>
-  <script type="module" src="/static/js/app.js?v=workspace-v9-20260930"></script>
+  <script src="/static/js/data-stage.js?v=workspace-v10-20260930"></script>
+  <script src="/static/js/dashboard-stage.js?v=workspace-v10-20260930"></script>
+  <script src="/static/js/interpreter-stage.js?v=workspace-v10-20260930"></script>
+  <script src="/static/js/decision-stage.js?v=workspace-v10-20260930"></script>
+  <script type="module" src="/static/js/app.js?v=workspace-v10-20260930"></script>
 </body>
 </html>
