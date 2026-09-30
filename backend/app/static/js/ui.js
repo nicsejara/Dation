@@ -382,10 +382,6 @@ export function renderSystemStatus(
     );
   }
 
-  renderInterpreterMeta(
-    interpreter
-  );
-
   return {
     supabaseOk,
     interpreterConfigured: Boolean(
