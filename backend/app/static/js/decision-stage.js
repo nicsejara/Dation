@@ -14,7 +14,9 @@
       cost: 100,
       trips: 0
     },
-    running: false
+    running: false,
+    requestController: null,
+    timeoutId: null
   };
 
   function $(selector) {
@@ -591,16 +593,57 @@
     );
   }
 
+  function newRunId() {
+    if (
+      window.crypto
+      && typeof window.crypto.randomUUID
+        === "function"
+    ) {
+      return window.crypto.randomUUID();
+    }
+
+    return (
+      "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
+        .replace(
+          /[xy]/g,
+          function (character) {
+            var random = (
+              Math.random() * 16
+            ) | 0;
+
+            var value = (
+              character === "x"
+                ? random
+                : (
+                  random & 0x3
+                ) | 0x8
+            );
+
+            return value.toString(16);
+          }
+        )
+    );
+  }
+
   async function requestRun(
     datasetId,
-    configuration
+    configuration,
+    runId,
+    signal
   ) {
-    var response = await fetch(
+    var url = (
       "/api/runs/"
-      + encodeURIComponent(datasetId),
+      + encodeURIComponent(datasetId)
+      + "?run_id="
+      + encodeURIComponent(runId)
+    );
+
+    var response = await fetch(
+      url,
       {
         method: "POST",
         credentials: "same-origin",
+        signal: signal,
         headers: {
           "Content-Type": (
             "application/json"
@@ -647,7 +690,18 @@
     return payload;
   }
 
-  async function executeDecision() {
+  function clearExecutionTimer() {
+    if (state.timeoutId) {
+      window.clearTimeout(
+        state.timeoutId
+      );
+      state.timeoutId = null;
+    }
+  }
+
+  async function executeDecision(
+    configurationOverride
+  ) {
     if (
       state.running
       || !state.dataset
@@ -663,12 +717,33 @@
       $("#decision-review-run")
     );
 
+    var configuration = (
+      configurationOverride
+      || deriveConfiguration()
+    );
+
+    var runId = newRunId();
+
+    var executionContext = {
+      runId: runId,
+      dataset: state.dataset,
+      profile: state.profile,
+      configuration: configuration,
+      startedAt: (
+        new Date().toISOString()
+      ),
+      status: "running"
+    };
+
     state.running = true;
+    state.requestController = (
+      new AbortController()
+    );
 
     if (confirmButton) {
       confirmButton.disabled = true;
       confirmButton.textContent = (
-        "Calculando decisión…"
+        "Iniciando…"
       );
       confirmButton.classList.add(
         "is-loading"
@@ -679,15 +754,58 @@
       reviewButton.disabled = true;
     }
 
-    try {
-      var configuration = (
-        deriveConfiguration()
-      );
+    closeModal(true);
 
+    if (
+      typeof window
+        .dationDashboardStart
+      === "function"
+    ) {
+      window.dationDashboardStart(
+        executionContext
+      );
+    } else if (
+      typeof window.dationNavigate
+      === "function"
+    ) {
+      window.dationNavigate(
+        "decision-dashboard"
+      );
+    }
+
+    state.timeoutId = (
+      window.setTimeout(
+        function () {
+          if (
+            state.running
+            && state.requestController
+          ) {
+            state.requestController.abort();
+
+            if (
+              typeof window
+                .dationDashboardTimeout
+              === "function"
+            ) {
+              window.dationDashboardTimeout(
+                runId
+              );
+            }
+          }
+        },
+        120000
+      )
+    );
+
+    try {
       var run = await requestRun(
         state.dataset.id,
-        configuration
+        configuration,
+        runId,
+        state.requestController.signal
       );
+
+      clearExecutionTimer();
 
       window.dationDecisionStage = {
         run: run,
@@ -730,18 +848,33 @@
           )
         );
       }
-
-      closeModal(true);
     } catch (error) {
-      showModalError(
-        error.message
-        || (
-          "No se pudo ejecutar "
-          + "la decisión."
-        )
-      );
+      clearExecutionTimer();
+
+      if (error.name === "AbortError") {
+        if (
+          typeof window
+            .dationDashboardTimeout
+          === "function"
+        ) {
+          window.dationDashboardTimeout(
+            runId
+          );
+        }
+      } else if (
+        typeof window
+          .dationDashboardExecutionError
+        === "function"
+      ) {
+        window.dationDashboardExecutionError(
+          runId,
+          error.message
+          || "No se pudo ejecutar la decisión."
+        );
+      }
     } finally {
       state.running = false;
+      state.requestController = null;
 
       if (confirmButton) {
         confirmButton.disabled = false;
@@ -762,6 +895,24 @@
       }
     }
   }
+
+  window.dationRetryDecision = function (
+    configuration
+  ) {
+    return executeDecision(
+      configuration
+    );
+  };
+
+  window.dationCancelDecisionWait = function () {
+    if (
+      state.running
+      && state.requestController
+    ) {
+      state.requestController.abort();
+      clearExecutionTimer();
+    }
+  };
 
   function hydrateDataset(
     dataset,
