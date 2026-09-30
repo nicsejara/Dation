@@ -512,11 +512,7 @@
 
     setText(
       "confirm-mode",
-      (
-        config.mode === "preset"
-          ? getModeLabel()
-          : "Personalizado"
-      )
+      getModeLabel()
     );
     setText(
       "confirm-cost",
@@ -705,11 +701,21 @@
           .dationConsumeDecisionRun
         === "function"
       ) {
-        window.dationConsumeDecisionRun(
-          run,
-          state.dataset,
-          state.profile
+        var consumed = (
+          window.dationConsumeDecisionRun(
+            run,
+            state.dataset,
+            state.profile
+          )
         );
+
+        if (
+          consumed
+          && typeof consumed.then
+            === "function"
+        ) {
+          await consumed;
+        }
       } else {
         window.dispatchEvent(
           new CustomEvent(
