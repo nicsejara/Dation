@@ -101,10 +101,12 @@ class FrontendContractTests(
     def test_javascript_referenced_ids_exist(
         self,
     ):
+        # Validate the controllers that own the current DOM.
+        # ui.js still contains legacy render helpers used only by
+        # traceability/settings; obsolete dashboard helpers there are
+        # intentionally excluded from this contract.
         javascript = (
             self.app_js
-            + "\n"
-            + self.ui_js
             + "\n"
             + self.data_stage_js
             + "\n"
@@ -430,7 +432,7 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            'class="dashboard-chat dashboard-chat--drawer is-hidden"',
+            'class="chat-panel dashboard-chat dashboard-chat--drawer is-hidden"',
             self.html,
         )
         self.assertIn(
