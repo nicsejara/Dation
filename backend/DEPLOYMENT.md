@@ -232,3 +232,28 @@ Cargar data now includes:
 - explicit "Configurar decisión" CTA enabled only after validation succeeds.
 
 The top journey navigation unlocks Configurar decisión only when the dataset profile is ready.
+
+
+## Resilient data ingestion controller — 2026-09-30
+
+Root cause fixed:
+- a frontend module syntax error prevented the workspace JavaScript from booting,
+  which left file selection, drag & drop and dataset library interactions inactive.
+
+Hardening added:
+- standalone classic `data-stage.js` controller for the complete Cargar data flow;
+- file picker binding;
+- drag & drop binding with guided overlay;
+- dataset library loading and selection;
+- upload to `/api/datasets/upload`;
+- profile validation through `/api/datasets/{id}/profile`;
+- bridge event `dation:dataset-ready` to synchronize the main workspace state;
+- downloadable `Dation_Logistics_Template.csv` with 14 required columns and 6 simulated rows;
+- explicit structure guidance in the UI.
+
+Final frontend checks:
+- app.js syntax OK;
+- ui.js syntax OK;
+- data-stage.js syntax OK;
+- all data-stage DOM IDs resolved;
+- template contains 14 required columns.
