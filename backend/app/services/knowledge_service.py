@@ -28,7 +28,7 @@ def _knowledge_version(files: list[Path]) -> str:
         hasher.update(content.encode("utf-8"))
         hasher.update(b"\0")
 
-    return f"v0.1-{hasher.hexdigest()[:12]}"
+    return f"v0.2-{hasher.hexdigest()[:12]}"
 
 
 def _load_selected(files: list[Path]) -> dict:
@@ -94,6 +94,13 @@ def load_logistics_knowledge_for_question(question: str) -> dict:
         "ahorro",
         "driver",
         "cambio",
+        "ponderación",
+        "ponderacion",
+        "peso",
+        "sensibilidad",
+        "70/30",
+        "100/0",
+        "0/100",
     )
     limit_terms = (
         "supuesto",
