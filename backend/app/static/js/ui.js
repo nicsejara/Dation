@@ -1513,11 +1513,13 @@ export function renderDashboard(
     run
   );
 
-  $("#download-json")
-    .disabled = false;
+  const exportButton = (
+    $("#export-decision")
+  );
 
-  $("#export-decision")
-    .disabled = !state.explanation;
+  if (exportButton) {
+    exportButton.disabled = false;
+  }
 }
 
 
@@ -1873,9 +1875,6 @@ export function renderExplanation(
         "is-hidden"
       );
 
-    $("#export-decision")
-      .disabled = true;
-
     return;
   }
 
@@ -1938,8 +1937,6 @@ export function renderExplanation(
     "is-hidden"
   );
 
-  $("#export-decision")
-    .disabled = false;
 }
 
 
