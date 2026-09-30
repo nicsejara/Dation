@@ -1367,10 +1367,12 @@
       );
     }
 
-    var download = $("#download-json");
+    var exportButton = (
+      $("#export-decision")
+    );
 
-    if (download) {
-      download.disabled = false;
+    if (exportButton) {
+      exportButton.disabled = false;
     }
   }
 
