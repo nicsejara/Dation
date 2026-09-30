@@ -28,7 +28,7 @@ def _knowledge_version(files: list[Path]) -> str:
         hasher.update(content.encode("utf-8"))
         hasher.update(b"\0")
 
-    return f"v0.2-{hasher.hexdigest()[:12]}"
+    return f"v0.3-{hasher.hexdigest()[:12]}"
 
 
 def _load_selected(files: list[Path]) -> dict:
