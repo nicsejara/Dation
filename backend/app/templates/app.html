@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="light">
   <title>Dation · Decision Intelligence</title>
   <link rel="stylesheet" href="/static/css/tokens.css">
-  <link rel="stylesheet" href="/static/css/app.css?v=workspace-v7-20260930">
+  <link rel="stylesheet" href="/static/css/app.css?v=workspace-v8-20260930">
 </head>
 <body>
   <div class="app-shell">
@@ -1268,48 +1268,73 @@
                 <div id="ai-dashboard-meta" class="ai-meta">Verificando intérprete…</div>
               </div>
 
-              <div class="dashboard-ai-grid">
-                <div class="panel interpretation-panel">
-                  <div class="interpretation-toolbar">
-                    <div>
-                      <strong>Lectura ejecutiva</strong>
-                      <small>Decisión, impacto, drivers, trade-offs, riesgos y supuestos.</small>
-                    </div>
-                    <button class="button button--secondary" id="generate-explanation" type="button">
-                      Generar resumen IA
-                    </button>
-                  </div>
-
-                  <div id="ai-progress" class="inline-status is-hidden"></div>
-                  <div id="executive-insight" class="executive-insight is-hidden"></div>
-
-                  <div class="dashboard-ai-note">
-                    El backend actual devuelve la respuesta completa; streaming de tokens queda pendiente de un endpoint específico.
-                  </div>
-                </div>
-
-                <div class="panel chat-launch-panel">
+              <div class="panel interpretation-panel interpretation-panel--full">
+                <div class="interpretation-toolbar">
                   <div>
-                    <span class="section-kicker">Chat contextual</span>
-                    <h3>Preguntale a Dation sobre esta decisión</h3>
-                    <p>
-                      Cada pregunta usa como contexto la corrida activa, sus KPIs, sensibilidad y evidencia.
-                    </p>
+                    <strong>Lectura ejecutiva</strong>
+                    <small>Decisión, impacto, drivers, trade-offs, riesgos y supuestos.</small>
                   </div>
-
-                  <button class="button button--ghost" id="toggle-chat" type="button">
-                    Abrir chat
+                  <button class="button button--secondary" id="generate-explanation" type="button">
+                    Generar resumen IA
                   </button>
                 </div>
-              </div>
 
-              <div id="chat-panel" class="chat-panel dashboard-chat is-hidden">
+                <div id="ai-progress" class="inline-status is-hidden"></div>
+                <div id="executive-insight" class="executive-insight is-hidden"></div>
+
+                <div class="dashboard-ai-note">
+                  El backend actual devuelve la respuesta completa; streaming de tokens queda pendiente de un endpoint específico.
+                </div>
+              </div>
+            </section>
+
+            <section class="dashboard-v2__footer-actions dashboard-v2__footer-actions--single">
+              <button class="button button--primary button--large" id="export-decision" type="button" disabled>
+                Exportar decisión
+                <span aria-hidden="true">↓</span>
+              </button>
+            </section>
+
+            <div class="dation-chat-floating" id="dation-chat-floating">
+              <button
+                class="dation-chat-launcher"
+                id="toggle-chat"
+                type="button"
+                aria-controls="chat-panel"
+                aria-expanded="false"
+              >
+                <span class="dation-chat-launcher__mark" aria-hidden="true">D</span>
+                <span>
+                  <strong>Preguntale a Dation</strong>
+                  <small>Sobre esta decisión</small>
+                </span>
+              </button>
+
+              <aside
+                id="chat-panel"
+                class="chat-panel dashboard-chat dashboard-chat--floating is-hidden"
+                aria-label="Chat contextual de Dation"
+                aria-live="polite"
+              >
                 <div class="dashboard-chat__header">
                   <div>
-                    <strong>Dation Interpreter</strong>
+                    <span class="section-kicker">Chat contextual</span>
+                    <strong>Preguntale a Dation</strong>
                     <small>Contexto anclado al run activo</small>
                   </div>
-                  <span class="pill pill--neutral">IA explicativa</span>
+
+                  <button
+                    class="dation-chat-close"
+                    id="chat-close"
+                    type="button"
+                    aria-label="Cerrar chat"
+                  >
+                    ×
+                  </button>
+                </div>
+
+                <div class="dashboard-chat__intro">
+                  Preguntá por los datos, la recomendación, sensibilidad, trade-offs o supuestos de esta corrida.
                 </div>
 
                 <div class="prompt-chips" id="prompt-chips">
@@ -1320,13 +1345,14 @@
                   <button type="button">¿Qué supuesto podría cambiar la recomendación?</button>
                 </div>
 
-                <div id="chat-thread" class="chat-thread" aria-live="polite"></div>
+                <div id="chat-thread" class="chat-thread"></div>
 
                 <div class="chat-composer">
                   <textarea
                     id="decision-question"
                     rows="2"
-                    placeholder="Preguntá por drivers, sensibilidad, trade-offs o límites."
+                    placeholder="Preguntá por esta decisión…"
+                    aria-label="Pregunta para Dation"
                   ></textarea>
                   <button
                     class="button button--primary button--square"
@@ -1337,20 +1363,9 @@
                     ↑
                   </button>
                 </div>
-              </div>
-            </section>
-
-            <section class="dashboard-v2__footer-actions">
-              <button class="button button--ghost" id="back-to-config" type="button">
-                ← Ajustar configuración
-              </button>
-              <button class="button button--secondary" id="download-json" type="button" disabled>
-                Descargar evidencia JSON
-              </button>
-              <button class="button button--primary" id="export-decision" type="button" disabled>
-                Exportar decisión
-              </button>
-            </section>
+              </aside>
+            </div>
+          </div>
           </div>
         </section>
 
@@ -1750,10 +1765,10 @@
       window.dationRenderJourney('inicio');
     })();
   </script>
-  <script src="/static/js/data-stage.js?v=workspace-v7-20260930"></script>
-  <script src="/static/js/dashboard-stage.js?v=workspace-v7-20260930"></script>
-  <script src="/static/js/interpreter-stage.js?v=workspace-v7-20260930"></script>
-  <script src="/static/js/decision-stage.js?v=workspace-v7-20260930"></script>
-  <script type="module" src="/static/js/app.js?v=workspace-v7-20260930"></script>
+  <script src="/static/js/data-stage.js?v=workspace-v8-20260930"></script>
+  <script src="/static/js/dashboard-stage.js?v=workspace-v8-20260930"></script>
+  <script src="/static/js/interpreter-stage.js?v=workspace-v8-20260930"></script>
+  <script src="/static/js/decision-stage.js?v=workspace-v8-20260930"></script>
+  <script type="module" src="/static/js/app.js?v=workspace-v8-20260930"></script>
 </body>
 </html>
