@@ -1,9 +1,11 @@
 import {
   askRun,
   explainRun,
+  getDatasetProfile,
   getDatasets,
   getInterpreterStatus,
   getRun,
+  getRunInterpretation,
   getRuns,
   getSupabaseStatus,
   getWorkspaceSummary,
@@ -12,12 +14,20 @@ import {
 } from "./api.js";
 
 import {
+  decisionConfiguration,
+  restoreRunConfiguration,
   setActiveDataset,
   setActiveRun,
+  setCostWeight,
+  setCustomMode,
+  setDatasetProfile,
   setDatasets,
+  setDecisionPreset,
+  setExplanation,
   setInterpreter,
-  setObjective,
+  setMessages,
   setRuns,
+  setTraceTab,
   setView,
   state,
 } from "./state.js";
@@ -25,78 +35,80 @@ import {
 import {
   $,
   $$,
+  activateTraceTab,
   activateView,
   appendChatMessage,
-  clearRunPresentation,
+  buildDecisionMarkdown,
   hideInlineStatus,
   renderActiveDataset,
+  renderDashboard,
+  renderDatasetProfile,
   renderDatasetsTable,
+  renderDecisionConfiguration,
   renderExplanation,
+  renderHomeSummary,
   renderInterpreterMeta,
-  renderObjective,
-  renderOverviewRecentRuns,
-  renderOverviewStats,
-  renderRun,
   renderRunsTable,
   renderSystemStatus,
-  renderWorkspaceDatasetList,
+  renderTechnicalEvidence,
+  renderWorkspaceDatasets,
+  resetChat,
   showInlineStatus,
   toast,
-  updateWorkflowFromState,
+  updateExecutionReadiness,
 } from "./ui.js";
+
 
 let booting = true;
 
+
 function datasetById(id) {
-  return state.datasets.find((item) => item.id === id) || null;
+  return (
+    state.datasets.find(
+      (item) => item.id === id
+    )
+    || null
+  );
 }
+
 
 function navigate(view) {
   setView(view);
   activateView(view);
 }
 
-function resetChatThread() {
-  const thread = $("#chat-thread");
-  thread.innerHTML = `
-    <div class="assistant-message">
-      <div class="message-avatar">D</div>
-      <div>
-        <strong>Dation Interpreter</strong>
-        <p>Esta conversación está anclada a la corrida activa. Podés preguntar por drivers, trade-offs, supuestos y diferencias entre escenarios.</p>
-      </div>
-    </div>
-  `;
+
+function openTraceability(
+  tab = "datasets"
+) {
+  setTraceTab(tab);
+  activateTraceTab(tab);
+  navigate("traceability");
 }
 
-function selectDataset(dataset, { navigateToWorkspace = false } = {}) {
-  setActiveDataset(dataset);
-  setActiveRun(null);
-  renderActiveDataset(dataset);
-  renderWorkspaceDatasetList(state.datasets);
-  clearRunPresentation();
-  resetChatThread();
-  renderInterpreterMeta(state.interpreter);
-
-  if (navigateToWorkspace) {
-    navigate("workspace");
-    window.setTimeout(() => {
-      $("#stage-decision").scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }, 180);
-  }
-}
 
 async function refreshDatasets() {
-  const response = await getDatasets(50);
-  setDatasets(response.items || []);
-  renderWorkspaceDatasetList(state.datasets);
-  renderDatasetsTable(state.datasets);
+  const response = (
+    await getDatasets(80)
+  );
+
+  setDatasets(
+    response.items || []
+  );
+
+  renderWorkspaceDatasets(
+    state.datasets
+  );
+
+  renderDatasetsTable(
+    state.datasets
+  );
 
   if (state.activeDataset) {
-    const fresh = datasetById(state.activeDataset.id);
+    const fresh = datasetById(
+      state.activeDataset.id
+    );
+
     if (fresh) {
       setActiveDataset(fresh);
       renderActiveDataset(fresh);
@@ -104,67 +116,369 @@ async function refreshDatasets() {
   }
 }
 
+
 async function refreshRuns() {
-  const response = await getRuns(60);
-  setRuns(response.items || []);
-  renderRunsTable(state.runs, state.datasets);
-  renderOverviewRecentRuns(state.runs, state.datasets);
+  const response = (
+    await getRuns(100)
+  );
+
+  setRuns(
+    response.items || []
+  );
+
+  renderRunsTable(
+    state.runs,
+    state.datasets,
+  );
 }
 
+
 async function refreshSummary() {
-  const summary = await getWorkspaceSummary();
-  renderOverviewStats(summary);
+  const summary = (
+    await getWorkspaceSummary()
+  );
+
+  renderHomeSummary(
+    summary,
+    state.runs,
+  );
 }
+
 
 async function refreshInterpreter() {
   try {
-    const interpreter = await getInterpreterStatus();
-    setInterpreter(interpreter);
-    renderInterpreterMeta(interpreter);
+    const interpreter = (
+      await getInterpreterStatus()
+    );
+
+    setInterpreter(
+      interpreter
+    );
+
+    renderInterpreterMeta(
+      interpreter
+    );
+
     return interpreter;
-  } catch (error) {
-    setInterpreter({
+  } catch {
+    const unavailable = {
       configured: false,
       provider: "—",
       model: "—",
       knowledge_version: "—",
-    });
-    renderInterpreterMeta(state.interpreter);
-    return state.interpreter;
+    };
+
+    setInterpreter(
+      unavailable
+    );
+
+    renderInterpreterMeta(
+      unavailable
+    );
+
+    return unavailable;
   }
 }
+
 
 async function refreshSystemStatus() {
   let supabaseOk = false;
 
   try {
-    const status = await getSupabaseStatus();
-    supabaseOk = Boolean(status?.ok);
+    const status = (
+      await getSupabaseStatus()
+    );
+
+    supabaseOk = Boolean(
+      status?.ok
+    );
   } catch {
     supabaseOk = false;
   }
 
-  state.services.supabase = supabaseOk;
-  state.services.llm = Boolean(state.interpreter?.configured);
-  renderSystemStatus(supabaseOk, state.interpreter);
+  state.services.supabase = (
+    supabaseOk
+  );
+
+  state.services.llm = Boolean(
+    state.interpreter?.configured
+  );
+
+  renderSystemStatus(
+    supabaseOk,
+    state.interpreter,
+  );
 }
 
-async function refreshWorkspaceData({ notify = false } = {}) {
+
+async function refreshWorkspaceData(
+  {
+    notify = false,
+  } = {},
+) {
   try {
     await refreshDatasets();
     await refreshRuns();
     await refreshSummary();
 
-    if (notify) toast("Workspace data refreshed.");
+    if (notify) {
+      toast(
+        "Información del workspace actualizada."
+      );
+    }
   } catch (error) {
-    toast(`Could not refresh workspace: ${error.message}`, "error");
+    toast(
+      "No se pudo actualizar el workspace: "
+      + error.message,
+      "error",
+    );
   }
 }
 
+
+function clearDecisionState() {
+  setActiveRun(null);
+  setExplanation(null);
+  setMessages([]);
+
+  renderExplanation(null);
+  renderTechnicalEvidence(null);
+  resetChat([]);
+  $("#download-json").disabled = true;
+  $("#export-decision").disabled = true;
+}
+
+
+async function loadDatasetProfile(
+  dataset,
+) {
+  $("#data-config-state")
+    .innerHTML = (
+      '<span class="status-dot status-dot--pending"></span>'
+      + " Analizando dataset"
+    );
+
+  try {
+    const profile = (
+      await getDatasetProfile(
+        dataset.id
+      )
+    );
+
+    setDatasetProfile(
+      profile
+    );
+
+    renderDatasetProfile(
+      profile
+    );
+
+    $("#data-config-state")
+      .innerHTML = (
+        '<span class="status-dot status-dot--live"></span>'
+        + " Dataset válido"
+      );
+
+    updateExecutionReadiness();
+
+    return profile;
+  } catch (error) {
+    setDatasetProfile(null);
+    renderDatasetProfile(null);
+
+    $("#data-config-state")
+      .innerHTML = (
+        '<span class="status-dot status-dot--danger"></span>'
+        + " Perfil no disponible"
+      );
+
+    updateExecutionReadiness();
+
+    throw error;
+  }
+}
+
+
+async function selectDataset(
+  dataset,
+  {
+    navigateToDda = false,
+  } = {},
+) {
+  setActiveDataset(
+    dataset
+  );
+
+  setDatasetProfile(null);
+  clearDecisionState();
+
+  renderActiveDataset(
+    dataset
+  );
+
+  renderWorkspaceDatasets(
+    state.datasets
+  );
+
+  if (navigateToDda) {
+    navigate(
+      "logistics-config"
+    );
+  }
+
+  try {
+    await loadDatasetProfile(
+      dataset
+    );
+
+    if (navigateToDda) {
+      window.setTimeout(
+        () => {
+          $("#dataset-profile-panel")
+            ?.scrollIntoView({
+              behavior: "smooth",
+              block: "center",
+            });
+        },
+        140,
+      );
+    }
+  } catch (error) {
+    toast(
+      "El dataset fue seleccionado, pero no se pudo generar su perfil: "
+      + error.message,
+      "error",
+    );
+  }
+}
+
+
+async function restoreHistoricalRun(
+  runId
+) {
+  try {
+    toast(
+      "Reconstruyendo la decisión histórica…"
+    );
+
+    const run = (
+      await getRun(runId)
+    );
+
+    const dataset = (
+      datasetById(
+        run.dataset_id
+      )
+    );
+
+    if (!dataset) {
+      throw new Error(
+        "No se encontró el dataset asociado a esta corrida."
+      );
+    }
+
+    setActiveDataset(
+      dataset
+    );
+
+    restoreRunConfiguration(
+      run
+    );
+
+    renderActiveDataset(
+      dataset
+    );
+
+    renderWorkspaceDatasets(
+      state.datasets
+    );
+
+    renderDecisionConfiguration();
+
+    const [
+      profile,
+      interpretation,
+    ] = await Promise.all([
+      getDatasetProfile(
+        dataset.id
+      ),
+      getRunInterpretation(
+        run.id
+      ).catch(
+        () => ({
+          explanation: null,
+          messages: [],
+        })
+      ),
+    ]);
+
+    setDatasetProfile(
+      profile
+    );
+
+    renderDatasetProfile(
+      profile
+    );
+
+    setActiveRun(
+      run
+    );
+
+    const savedExplanation = (
+      interpretation?.explanation
+        ?.response_json
+      || null
+    );
+
+    setExplanation(
+      savedExplanation
+    );
+
+    setMessages(
+      interpretation?.messages
+      || []
+    );
+
+    renderDashboard(
+      run,
+      profile,
+    );
+
+    renderExplanation(
+      savedExplanation
+    );
+
+    resetChat(
+      state.messages
+    );
+
+    renderInterpreterMeta(
+      state.interpreter
+    );
+
+    navigate(
+      "decision-dashboard"
+    );
+
+    toast(
+      "Decisión histórica reconstruida."
+    );
+  } catch (error) {
+    toast(
+      "No se pudo abrir la decisión: "
+      + error.message,
+      "error",
+    );
+  }
+}
+
+
 async function bootstrap() {
   renderActiveDataset(null);
-  renderObjective(state.objective);
-  updateWorkflowFromState();
+  renderDatasetProfile(null);
+  renderDecisionConfiguration();
+  renderTechnicalEvidence(null);
+  resetChat([]);
 
   try {
     await Promise.all([
@@ -179,374 +493,845 @@ async function bootstrap() {
 
     await refreshSystemStatus();
   } catch (error) {
-    toast(`Workspace initialization error: ${error.message}`, "error");
+    toast(
+      "No se pudo inicializar el workspace: "
+      + error.message,
+      "error",
+    );
   } finally {
     booting = false;
   }
 }
 
+
 function bindNavigation() {
-  document.addEventListener("click", (event) => {
-    const viewButton = event.target.closest("[data-view], [data-view-target]");
+  document.addEventListener(
+    "click",
+    (event) => {
+      const viewButton = (
+        event.target.closest(
+          "[data-view], [data-view-target]"
+        )
+      );
 
-    if (viewButton) {
-      const view =
-        viewButton.dataset.view ||
-        viewButton.dataset.viewTarget;
+      if (viewButton) {
+        const view = (
+          viewButton.dataset.view
+          || viewButton.dataset.viewTarget
+        );
 
-      if (view) navigate(view);
-    }
+        if (view) {
+          navigate(view);
+        }
 
-    const scrollButton = event.target.closest("[data-scroll-target]");
+        const traceTarget = (
+          viewButton.dataset.traceTarget
+        );
 
-    if (scrollButton) {
-      const target = document.getElementById(scrollButton.dataset.scrollTarget);
-      if (target) {
-        target.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
+        if (traceTarget) {
+          setTraceTab(
+            traceTarget
+          );
+          activateTraceTab(
+            traceTarget
+          );
+        }
       }
     }
-  });
+  );
 
-  $("#overview-start").addEventListener("click", () => navigate("workspace"));
-  $("#overview-open-asset").addEventListener("click", () => navigate("workspace"));
+  $("#open-logistics")
+    .addEventListener(
+      "click",
+      (event) => {
+        event.stopPropagation();
+        navigate(
+          "logistics-config"
+        );
+      }
+    );
+
+  $("#logistics-dda-card")
+    .addEventListener(
+      "click",
+      () => navigate(
+        "logistics-config"
+      )
+    );
+
+  $("#logistics-dda-card")
+    .addEventListener(
+      "keydown",
+      (event) => {
+        if (
+          event.key === "Enter"
+          || event.key === " "
+        ) {
+          event.preventDefault();
+          navigate(
+            "logistics-config"
+          );
+        }
+      }
+    );
+
+  $("#back-to-config")
+    .addEventListener(
+      "click",
+      () => navigate(
+        "logistics-config"
+      )
+    );
+
+  $$(".trace-tab")
+    .forEach(
+      (button) => {
+        button.addEventListener(
+          "click",
+          () => {
+            const tab = (
+              button.dataset.traceTab
+            );
+
+            setTraceTab(tab);
+            activateTraceTab(tab);
+          }
+        );
+      }
+    );
 }
 
-function bindObjectiveSelector() {
-  $("#objective-selector").addEventListener("click", (event) => {
-    const card = event.target.closest("[data-objective]");
-    if (!card) return;
-
-    setObjective(card.dataset.objective);
-    renderObjective(state.objective);
-  });
-}
 
 function bindDatasetActions() {
-  document.addEventListener("click", async (event) => {
-    const useButton = event.target.closest("[data-use-dataset]");
+  document.addEventListener(
+    "click",
+    async (event) => {
+      const useButton = (
+        event.target.closest(
+          "[data-use-dataset]"
+        )
+      );
 
-    if (useButton) {
-      const dataset = datasetById(useButton.dataset.useDataset);
-      if (!dataset) {
-        toast("Dataset could not be found in the current workspace.", "error");
+      if (useButton) {
+        const dataset = (
+          datasetById(
+            useButton.dataset
+              .useDataset
+          )
+        );
+
+        if (!dataset) {
+          toast(
+            "No se encontró el dataset seleccionado.",
+            "error",
+          );
+          return;
+        }
+
+        await selectDataset(
+          dataset,
+          {
+            navigateToDda: true,
+          },
+        );
+
+        toast(
+          dataset.original_filename
+          + " quedó seleccionado como evidencia."
+        );
         return;
       }
 
-      selectDataset(dataset, { navigateToWorkspace: true });
-      toast(`Using ${dataset.original_filename} as source evidence.`);
-      return;
-    }
+      const runButton = (
+        event.target.closest(
+          "[data-open-run]"
+        )
+      );
 
-    const runButton = event.target.closest("[data-open-run]");
+      if (runButton) {
+        runButton.disabled = true;
+        runButton.textContent = (
+          "Abriendo…"
+        );
 
-    if (runButton) {
-      const button = runButton;
-      button.disabled = true;
-      button.textContent = "Opening…";
+        await restoreHistoricalRun(
+          runButton.dataset.openRun
+        );
 
-      try {
-        const run = await getRun(button.dataset.openRun);
-        const dataset = datasetById(run.dataset_id);
-
-        if (dataset) {
-          setActiveDataset(dataset);
-          renderActiveDataset(dataset);
-          renderWorkspaceDatasetList(state.datasets);
-        }
-
-        const objective =
-          run.configuration_json?.objective || "min_cost";
-        setObjective(objective);
-        renderObjective(objective);
-
-        setActiveRun(run);
-        renderRun(run);
-        renderInterpreterMeta(state.interpreter);
-        resetChatThread();
-
-        navigate("workspace");
-
-        window.setTimeout(() => {
-          $("#stage-results").scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          });
-        }, 180);
-      } catch (error) {
-        toast(`Could not open run: ${error.message}`, "error");
-      } finally {
-        button.disabled = false;
-        button.textContent = "Open";
+        runButton.disabled = false;
+        runButton.textContent = (
+          "Abrir decisión"
+        );
       }
     }
-  });
+  );
 }
 
-function bindUpload() {
-  const input = $("#dataset-file");
-  const browseButton = $("#browse-file");
-  const dropzone = $("#upload-dropzone");
-  const progress = $("#upload-progress");
 
-  browseButton.addEventListener("click", () => input.click());
+function bindUpload() {
+  const input = (
+    $("#dataset-file")
+  );
+  const browse = (
+    $("#browse-file")
+  );
+  const dropzone = (
+    $("#upload-dropzone")
+  );
+  const progress = (
+    $("#upload-progress")
+  );
+
+  browse.addEventListener(
+    "click",
+    () => input.click()
+  );
 
   async function handleFile(file) {
-    if (!file) return;
-
-    if (!file.name.toLowerCase().endsWith(".csv")) {
-      showInlineStatus(progress, "Only CSV files are accepted.", "error");
+    if (!file) {
       return;
     }
 
-    browseButton.disabled = true;
-    browseButton.textContent = "Validating…";
+    if (
+      !file.name
+        .toLowerCase()
+        .endsWith(".csv")
+    ) {
+      showInlineStatus(
+        progress,
+        "Sólo se admiten archivos CSV.",
+        "error",
+      );
+      return;
+    }
+
+    browse.disabled = true;
+    browse.textContent = (
+      "Validando…"
+    );
+
     showInlineStatus(
       progress,
-      "Validating schema and storing immutable source data…"
+      "Validando schema y almacenando evidencia original…",
+      "loading",
     );
 
     try {
-      const result = await uploadDataset(file);
-      const datasetId = result.duplicate
-        ? result.existing_dataset.id
-        : result.dataset.id;
+      const result = (
+        await uploadDataset(file)
+      );
+
+      const datasetId = (
+        result.duplicate
+          ? result.existing_dataset.id
+          : result.dataset.id
+      );
 
       await refreshDatasets();
 
-      const dataset = datasetById(datasetId);
+      const dataset = (
+        datasetById(
+          datasetId
+        )
+      );
 
       if (!dataset) {
-        throw new Error("Dataset was stored but could not be reloaded.");
+        throw new Error(
+          "El dataset se almacenó, pero no pudo recargarse."
+        );
       }
 
-      selectDataset(dataset);
+      await selectDataset(
+        dataset
+      );
 
       showInlineStatus(
         progress,
         result.duplicate
-          ? "Dataset already existed. The stored version was reused."
-          : `Dataset validated: ${result.validation.rows} rows, ${result.validation.columns} columns.`,
-        "success"
+          ? (
+            "El archivo ya existía. "
+            + "Se reutilizó el dataset almacenado."
+          )
+          : (
+            "Dataset validado correctamente: "
+            + `${result.validation.rows} filas y `
+            + `${result.validation.columns} columnas.`
+          ),
+        "success",
       );
 
       await refreshSummary();
+
       toast(
         result.duplicate
-          ? "Existing dataset selected."
-          : "Dataset validated and stored successfully."
+          ? "Dataset existente reutilizado."
+          : "Dataset validado y almacenado."
       );
     } catch (error) {
-      showInlineStatus(progress, error.message, "error");
+      showInlineStatus(
+        progress,
+        error.message,
+        "error",
+      );
     } finally {
-      browseButton.disabled = false;
-      browseButton.textContent = "Select CSV file";
+      browse.disabled = false;
+      browse.textContent = (
+        "Seleccionar archivo CSV"
+      );
       input.value = "";
     }
   }
 
-  input.addEventListener("change", () => handleFile(input.files?.[0]));
+  input.addEventListener(
+    "change",
+    () => handleFile(
+      input.files?.[0]
+    )
+  );
 
-  ["dragenter", "dragover"].forEach((type) => {
-    dropzone.addEventListener(type, (event) => {
-      event.preventDefault();
-      dropzone.classList.add("is-dragging");
-    });
-  });
+  [
+    "dragenter",
+    "dragover",
+  ].forEach(
+    (type) => {
+      dropzone.addEventListener(
+        type,
+        (event) => {
+          event.preventDefault();
+          dropzone.classList.add(
+            "is-dragging"
+          );
+        }
+      );
+    }
+  );
 
-  ["dragleave", "drop"].forEach((type) => {
-    dropzone.addEventListener(type, (event) => {
-      event.preventDefault();
-      dropzone.classList.remove("is-dragging");
-    });
-  });
+  [
+    "dragleave",
+    "drop",
+  ].forEach(
+    (type) => {
+      dropzone.addEventListener(
+        type,
+        (event) => {
+          event.preventDefault();
+          dropzone.classList.remove(
+            "is-dragging"
+          );
+        }
+      );
+    }
+  );
 
-  dropzone.addEventListener("drop", (event) => {
-    handleFile(event.dataTransfer?.files?.[0]);
-  });
+  dropzone.addEventListener(
+    "drop",
+    (event) => {
+      handleFile(
+        event.dataTransfer
+          ?.files?.[0]
+      );
+    }
+  );
 }
+
+
+function bindDecisionConfiguration() {
+  $("#decision-mode-grid")
+    .addEventListener(
+      "click",
+      (event) => {
+        const card = (
+          event.target.closest(
+            "[data-decision-mode]"
+          )
+        );
+
+        if (!card) {
+          return;
+        }
+
+        if (
+          card.dataset
+            .decisionMode
+          === "custom"
+        ) {
+          setCustomMode();
+        } else {
+          setDecisionPreset(
+            card.dataset.objective
+          );
+        }
+
+        renderDecisionConfiguration();
+      }
+    );
+
+  $("#cost-weight-slider")
+    .addEventListener(
+      "input",
+      (event) => {
+        setCostWeight(
+          event.target.value
+        );
+        renderDecisionConfiguration();
+      }
+    );
+}
+
 
 function bindDecisionExecution() {
-  const button = $("#run-decision");
-  const progress = $("#run-progress");
+  const button = (
+    $("#run-decision")
+  );
 
-  button.addEventListener("click", async () => {
-    if (!state.activeDataset) return;
+  const progress = (
+    $("#run-progress")
+  );
 
-    button.disabled = true;
-    button.innerHTML = "Running engine <span>…</span>";
+  button.addEventListener(
+    "click",
+    async () => {
+      if (
+        !state.activeDataset
+        || !state.datasetProfile
+      ) {
+        return;
+      }
 
-    showInlineStatus(
-      progress,
-      "Cloud Run is retrieving the CSV, calculating all scenarios and persisting the DecisionResult…"
-    );
-
-    try {
-      const run = await runDecision(
-        state.activeDataset.id,
-        state.objective
+      button.disabled = true;
+      button.classList.add(
+        "is-loading"
       );
-
-      setActiveRun(run);
-      renderRun(run);
-      renderInterpreterMeta(state.interpreter);
-      resetChatThread();
+      button.textContent = (
+        "Calculando decisión…"
+      );
 
       showInlineStatus(
         progress,
-        `Decision completed and persisted · Run ${run.id.slice(0, 8)}… · ${run.duration_ms} ms`,
-        "success"
+        "Analizando alternativas y persistiendo la evidencia de la corrida…",
+        "loading",
       );
 
-      await Promise.all([
-        refreshRuns(),
-        refreshSummary(),
-        refreshDatasets(),
-      ]);
+      try {
+        const run = await runDecision(
+          state.activeDataset.id,
+          decisionConfiguration(),
+        );
 
-      window.setTimeout(() => {
-        $("#stage-results").scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }, 120);
-    } catch (error) {
-      showInlineStatus(progress, error.message, "error");
-    } finally {
-      button.disabled = !state.activeDataset;
-      button.innerHTML = 'Run decision <span>→</span>';
+        setActiveRun(run);
+        setExplanation(null);
+        setMessages([]);
+
+        renderDashboard(
+          run,
+          state.datasetProfile,
+        );
+
+        renderExplanation(null);
+        resetChat([]);
+
+        renderInterpreterMeta(
+          state.interpreter
+        );
+
+        showInlineStatus(
+          progress,
+          "Decisión calculada y persistida correctamente.",
+          "success",
+        );
+
+        await Promise.all([
+          refreshRuns(),
+          refreshSummary(),
+          refreshDatasets(),
+        ]);
+
+        navigate(
+          "decision-dashboard"
+        );
+      } catch (error) {
+        showInlineStatus(
+          progress,
+          error.message,
+          "error",
+        );
+      } finally {
+        button.classList.remove(
+          "is-loading"
+        );
+        button.textContent = (
+          "Ejecutar decisión"
+        );
+        updateExecutionReadiness();
+      }
     }
-  });
+  );
 }
 
+
 function bindInterpreter() {
-  const explainButton = $("#generate-explanation");
-  const progress = $("#ai-progress");
-  const askButton = $("#ask-decision");
-  const questionInput = $("#decision-question");
+  const generate = (
+    $("#generate-explanation")
+  );
+  const progress = (
+    $("#ai-progress")
+  );
+  const ask = (
+    $("#ask-decision")
+  );
+  const question = (
+    $("#decision-question")
+  );
 
-  explainButton.addEventListener("click", async () => {
-    if (!state.activeRun) return;
+  generate.addEventListener(
+    "click",
+    async () => {
+      if (!state.activeRun) {
+        return;
+      }
 
-    explainButton.disabled = true;
-    explainButton.textContent = "Building insight…";
-
-    showInlineStatus(
-      progress,
-      "Combining deterministic decision evidence with the versioned Logistics knowledge base…"
-    );
-
-    try {
-      const explanation = await explainRun(state.activeRun.id);
-      renderExplanation(explanation);
+      generate.disabled = true;
+      generate.textContent = (
+        "Interpretando…"
+      );
 
       showInlineStatus(
         progress,
-        `Interpretation persisted · ${explanation.provider} · ${explanation.model}`,
-        "success"
+        "Combinando evidencia calculada con la base de conocimiento versionada…",
+        "loading",
       );
-    } catch (error) {
-      showInlineStatus(progress, error.message, "error");
-    } finally {
-      explainButton.disabled = false;
-      explainButton.textContent = "Generate executive insight";
+
+      try {
+        const payload = (
+          await explainRun(
+            state.activeRun.id
+          )
+        );
+
+        setExplanation(
+          payload.explanation
+        );
+
+        renderExplanation(
+          state.explanation
+        );
+
+        showInlineStatus(
+          progress,
+          "Interpretación generada y persistida.",
+          "success",
+        );
+
+        generate.textContent = (
+          "Regenerar interpretación"
+        );
+      } catch (error) {
+        showInlineStatus(
+          progress,
+          error.message,
+          "error",
+        );
+      } finally {
+        generate.disabled = false;
+      }
     }
-  });
+  );
 
-  $("#prompt-chips").addEventListener("click", (event) => {
-    const chip = event.target.closest("button");
-    if (!chip) return;
+  $("#toggle-chat")
+    .addEventListener(
+      "click",
+      () => {
+        const panel = (
+          $("#chat-panel")
+        );
 
-    questionInput.value = chip.textContent.trim();
-    questionInput.focus();
-  });
+        const opening = (
+          panel.classList.contains(
+            "is-hidden"
+          )
+        );
+
+        panel.classList.toggle(
+          "is-hidden"
+        );
+
+        $("#toggle-chat")
+          .textContent = (
+            opening
+              ? "Cerrar chat"
+              : "Abrir chat con el intérprete"
+          );
+
+        if (opening) {
+          question.focus();
+        }
+      }
+    );
+
+  $("#prompt-chips")
+    .addEventListener(
+      "click",
+      (event) => {
+        const chip = (
+          event.target.closest(
+            "button"
+          )
+        );
+
+        if (!chip) {
+          return;
+        }
+
+        question.value = (
+          chip.textContent.trim()
+        );
+        question.focus();
+      }
+    );
 
   async function sendQuestion() {
-    const question = questionInput.value.trim();
-
-    if (!state.activeRun || !question) return;
-
-    appendChatMessage("user", question);
-    questionInput.value = "";
-    askButton.disabled = true;
-    askButton.textContent = "…";
-
-    const pendingId = `pending-${Date.now()}`;
-    const thread = $("#chat-thread");
-    thread.insertAdjacentHTML(
-      "beforeend",
-      `
-        <div class="assistant-message" id="${pendingId}">
-          <div class="message-avatar">D</div>
-          <div>
-            <strong>Dation Interpreter</strong>
-            <p>Reading the decision evidence…</p>
-          </div>
-        </div>
-      `
+    const text = (
+      question.value.trim()
     );
-    thread.scrollTop = thread.scrollHeight;
+
+    if (
+      !state.activeRun
+      || !text
+    ) {
+      return;
+    }
+
+    appendChatMessage(
+      "user",
+      text,
+    );
+
+    question.value = "";
+    ask.disabled = true;
+    ask.textContent = "…";
+
+    const pendingId = (
+      "pending-"
+      + Date.now()
+    );
+
+    $("#chat-thread")
+      .insertAdjacentHTML(
+        "beforeend",
+        `
+          <div class="assistant-message" id="${pendingId}">
+            <div class="message-avatar">D</div>
+            <div>
+              <strong>Dation Interpreter</strong>
+              <p>Analizando la evidencia de esta decisión…</p>
+            </div>
+          </div>
+        `,
+      );
 
     try {
-      const answer = await askRun(state.activeRun.id, question);
-      document.getElementById(pendingId)?.remove();
-      appendChatMessage("assistant", answer.answer);
-    } catch (error) {
-      document.getElementById(pendingId)?.remove();
+      const answer = (
+        await askRun(
+          state.activeRun.id,
+          text,
+        )
+      );
+
+      document
+        .getElementById(
+          pendingId
+        )
+        ?.remove();
+
       appendChatMessage(
         "assistant",
-        `I could not answer this question: ${error.message}`
+        answer.answer,
+      );
+    } catch (error) {
+      document
+        .getElementById(
+          pendingId
+        )
+        ?.remove();
+
+      appendChatMessage(
+        "assistant",
+        "No pude responder esta pregunta: "
+        + error.message,
       );
     } finally {
-      askButton.disabled = false;
-      askButton.textContent = "↑";
-      questionInput.focus();
+      ask.disabled = false;
+      ask.textContent = "↑";
+      question.focus();
     }
   }
 
-  askButton.addEventListener("click", sendQuestion);
+  ask.addEventListener(
+    "click",
+    sendQuestion,
+  );
 
-  questionInput.addEventListener("keydown", (event) => {
-    if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
-      event.preventDefault();
-      sendQuestion();
+  question.addEventListener(
+    "keydown",
+    (event) => {
+      if (
+        (
+          event.ctrlKey
+          || event.metaKey
+        )
+        && event.key === "Enter"
+      ) {
+        event.preventDefault();
+        sendQuestion();
+      }
     }
-  });
+  );
 }
+
+
+function downloadText(
+  filename,
+  content,
+  mimeType,
+) {
+  const blob = new Blob(
+    [content],
+    {
+      type: mimeType,
+    },
+  );
+
+  const url = (
+    URL.createObjectURL(blob)
+  );
+
+  const anchor = (
+    document.createElement("a")
+  );
+
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+
+  window.setTimeout(
+    () => URL.revokeObjectURL(
+      url
+    ),
+    500,
+  );
+}
+
+
+function bindExports() {
+  $("#download-json")
+    .addEventListener(
+      "click",
+      () => {
+        if (!state.activeRun) {
+          return;
+        }
+
+        downloadText(
+          (
+            "dation-evidencia-"
+            + state.activeRun.id
+              .slice(0, 8)
+            + ".json"
+          ),
+          JSON.stringify(
+            state.activeRun
+              .result_json,
+            null,
+            2,
+          ),
+          "application/json",
+        );
+      }
+    );
+
+  $("#export-decision")
+    .addEventListener(
+      "click",
+      () => {
+        if (
+          !state.activeRun
+          || !state.explanation
+        ) {
+          toast(
+            "Generá primero la interpretación ejecutiva para exportar la decisión.",
+            "error",
+          );
+          return;
+        }
+
+        const markdown = (
+          buildDecisionMarkdown(
+            state.activeRun,
+            state.activeDataset,
+            state.datasetProfile,
+            state.explanation,
+          )
+        );
+
+        downloadText(
+          (
+            "dation-decision-"
+            + state.activeRun.id
+              .slice(0, 8)
+            + ".md"
+          ),
+          markdown,
+          "text/markdown;charset=utf-8",
+        );
+      }
+    );
+}
+
 
 function bindRefreshActions() {
-  $("#workspace-refresh").addEventListener("click", () =>
-    refreshWorkspaceData({ notify: true })
-  );
+  $("#datasets-refresh")
+    .addEventListener(
+      "click",
+      () => refreshWorkspaceData({
+        notify: true,
+      })
+    );
 
-  $("#datasets-refresh").addEventListener("click", () =>
-    refreshWorkspaceData({ notify: true })
-  );
-
-  $("#runs-refresh").addEventListener("click", () =>
-    refreshWorkspaceData({ notify: true })
-  );
+  $("#runs-refresh")
+    .addEventListener(
+      "click",
+      () => refreshWorkspaceData({
+        notify: true,
+      })
+    );
 }
+
 
 function bindGlobalErrors() {
-  window.addEventListener("unhandledrejection", (event) => {
-    if (!booting) {
-      toast(
-        event.reason?.message || "Unexpected workspace error.",
-        "error"
-      );
+  window.addEventListener(
+    "unhandledrejection",
+    (event) => {
+      if (!booting) {
+        toast(
+          event.reason?.message
+          || "Ocurrió un error inesperado.",
+          "error",
+        );
+      }
     }
-  });
+  );
 }
 
+
 bindNavigation();
-bindObjectiveSelector();
 bindDatasetActions();
 bindUpload();
+bindDecisionConfiguration();
 bindDecisionExecution();
 bindInterpreter();
+bindExports();
 bindRefreshActions();
 bindGlobalErrors();
 
