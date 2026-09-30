@@ -1170,7 +1170,7 @@ function renderPreview(rows) {
 
 function scenarioLabel(key) {
   const labels = {
-    baseline: "Asignación de referencia",
+    baseline: "Asignación actual",
     min_cost: "Costo mínimo",
     min_trips: "Viajes mínimos",
     custom: "Configuración elegida",
@@ -1440,7 +1440,7 @@ export function renderDashboard(
 
   $("#dashboard-kpi-cost-delta")
     .textContent = (
-      `${formatPercent(delta.cost_pct)} vs asignación de referencia · `
+      `${formatPercent(delta.cost_pct)} vs asignación actual · `
       + formatCurrency(
           baseline.metrics.total_cost
         )
@@ -1455,7 +1455,7 @@ export function renderDashboard(
 
   $("#dashboard-kpi-trips-delta")
     .textContent = (
-      `${formatPercent(delta.trips_pct)} vs asignación de referencia · `
+      `${formatPercent(delta.trips_pct)} vs asignación actual · `
       + formatNumber(
           baseline.metrics.total_trips
         )
@@ -1468,7 +1468,7 @@ export function renderDashboard(
 
   $("#dashboard-kpi-distance-delta")
     .textContent = (
-      `${formatPercent(delta.distance_pct)} vs asignación de referencia`
+      `${formatPercent(delta.distance_pct)} vs asignación actual`
     );
 
   $("#dashboard-kpi-shipments")
@@ -1621,7 +1621,7 @@ function renderSensitivity(
     .innerHTML = `
       <div class="baseline-card">
         <div>
-          <strong>Situación actual</strong>
+          <strong>Asignación actual</strong>
           <small>Asignación proveniente del CSV · referencia operativa</small>
         </div>
         <div class="baseline-metric">
@@ -1765,7 +1765,7 @@ function renderDrivers(result) {
   if (!changes.length) {
     container.innerHTML = (
       '<div class="empty-state empty-state--compact">'
-      + "La configuración no genera cambios materiales de asignación frente a la asignación de referencia."
+      + "La configuración no genera cambios materiales de asignación frente a la asignación actual."
       + "</div>"
     );
     return;
@@ -2163,8 +2163,8 @@ export function buildDecisionMarkdown(
     `- Costo total: ${formatCurrency(selected?.metrics?.total_cost)}`,
     `- Viajes: ${formatNumber(selected?.metrics?.total_trips)}`,
     `- Distancia: ${formatNumber(selected?.metrics?.total_distance_km)} km`,
-    `- Δ costo vs asignación de referencia: ${formatPercent(selected?.delta_vs_baseline?.cost_pct)}`,
-    `- Δ viajes vs asignación de referencia: ${formatPercent(selected?.delta_vs_baseline?.trips_pct)}`,
+    `- Δ costo vs asignación actual: ${formatPercent(selected?.delta_vs_baseline?.cost_pct)}`,
+    `- Δ viajes vs asignación actual: ${formatPercent(selected?.delta_vs_baseline?.trips_pct)}`,
     "",
     "## Asignación de referencia",
     "",
