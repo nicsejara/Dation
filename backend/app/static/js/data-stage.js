@@ -1,12 +1,44 @@
 (function () {
   "use strict";
 
+  var STORAGE_KEY = "dation.logistics.data-stage.v1";
+
   var state = {
     datasets: [],
     activeDataset: null,
     profile: null,
     dragDepth: 0
   };
+
+  function persistReadyDataset(dataset, profile) {
+    try {
+      sessionStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({
+          dataset: dataset,
+          profile: profile
+        })
+      );
+    } catch (error) {
+      // Session persistence is a convenience only.
+    }
+  }
+
+  function restoreReadyDataset() {
+    try {
+      var raw = sessionStorage.getItem(
+        STORAGE_KEY
+      );
+
+      if (!raw) {
+        return null;
+      }
+
+      return JSON.parse(raw);
+    } catch (error) {
+      return null;
+    }
+  }
 
   function $(selector) {
     return document.querySelector(selector);
@@ -651,6 +683,11 @@
       profile: payload
     };
 
+    persistReadyDataset(
+      dataset,
+      payload
+    );
+
     window.dispatchEvent(
       new CustomEvent(
         "dation:dataset-ready",
@@ -1018,6 +1055,31 @@
 
     setActiveDatasetSummary(null);
     hideProgress();
+
+    var restored = restoreReadyDataset();
+
+    if (
+      restored
+      && restored.dataset
+      && restored.profile
+    ) {
+      state.activeDataset = restored.dataset;
+      state.profile = restored.profile;
+
+      window.dationDataStage = {
+        activeDataset: restored.dataset,
+        profile: restored.profile
+      };
+
+      setActiveDatasetSummary(
+        restored.dataset,
+        "Listo"
+      );
+
+      renderValidation(
+        restored.profile
+      );
+    }
 
     try {
       await loadDatasets();
