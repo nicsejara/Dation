@@ -738,7 +738,7 @@ function bindInterpreter() {
         );
 
         generate.textContent = (
-          "Regenerar interpretación"
+          "Regenerar resumen IA"
         );
       } catch (error) {
         showInlineStatus(
@@ -774,7 +774,7 @@ function bindInterpreter() {
           .textContent = (
             opening
               ? "Cerrar chat"
-              : "Abrir chat con el intérprete"
+              : "Abrir chat"
           );
 
         if (opening) {
