@@ -606,13 +606,13 @@ function bindDecisionStageBridge() {
     run,
     dataset,
     profile,
-  ) => {
+  ) => (
     consumeRun(
       run,
       dataset,
       profile,
-    );
-  };
+    )
+  );
 
   window.addEventListener(
     "dation:run-ready",
