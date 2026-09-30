@@ -816,6 +816,18 @@
 
       if (
         typeof window
+          .dationDashboardCompleted
+        === "function"
+      ) {
+        window.dationDashboardCompleted(
+          run,
+          state.dataset,
+          state.profile
+        );
+      }
+
+      if (
+        typeof window
           .dationConsumeDecisionRun
         === "function"
       ) {
