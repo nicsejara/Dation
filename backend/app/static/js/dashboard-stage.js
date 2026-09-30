@@ -1764,22 +1764,46 @@
       );
     }
 
-    populateDetailVehicleFilter(
+    populateDetailFilters(
       details
     );
 
     renderReassignmentDetail();
   }
 
-  function populateDetailVehicleFilter(
+  function populateDetailFilters(
     rows
   ) {
-    var select = (
-      $("#reassignment-vehicle-filter")
-    );
+    function populate(
+      selector,
+      values,
+      allLabel,
+      formatter
+    ) {
+      var select = $(selector);
 
-    if (!select) {
-      return;
+      if (!select) {
+        return;
+      }
+
+      select.innerHTML = (
+        '<option value="">'
+        + escapeHtml(allLabel)
+        + "</option>"
+        + values.map(function (value) {
+          return (
+            '<option value="'
+            + escapeHtml(value)
+            + '">'
+            + escapeHtml(
+                formatter
+                  ? formatter(value)
+                  : value
+              )
+            + "</option>"
+          );
+        }).join("")
+      );
     }
 
     var vehicles = Array.from(
@@ -1790,19 +1814,39 @@
       )
     ).sort();
 
-    select.innerHTML = (
-      '<option value="">Todos los camiones</option>'
-      + vehicles.map(function (vehicle) {
-        return (
-          '<option value="'
-          + escapeHtml(vehicle)
-          + '">'
-          + escapeHtml(
-              F.vehicleLabel(vehicle)
-            )
-          + "</option>"
-        );
-      }).join("")
+    var origins = Array.from(
+      new Set(
+        rows.map(function (row) {
+          return row.origin;
+        })
+      )
+    ).sort();
+
+    var destinations = Array.from(
+      new Set(
+        rows.map(function (row) {
+          return row.destination;
+        })
+      )
+    ).sort();
+
+    populate(
+      "#reassignment-vehicle-filter",
+      vehicles,
+      "Todos los camiones",
+      F.vehicleLabel
+    );
+
+    populate(
+      "#reassignment-origin-filter",
+      origins,
+      "Todos los orígenes"
+    );
+
+    populate(
+      "#reassignment-destination-filter",
+      destinations,
+      "Todos los destinos"
     );
   }
 
@@ -1812,6 +1856,15 @@
     );
     var vehicle = (
       $("#reassignment-vehicle-filter")
+    );
+    var origin = (
+      $("#reassignment-origin-filter")
+    );
+    var destination = (
+      $("#reassignment-destination-filter")
+    );
+    var sort = (
+      $("#reassignment-sort")
     );
 
     var query = (
@@ -1823,17 +1876,38 @@
     );
 
     var vehicleValue = (
-      vehicle
-        ? vehicle.value
+      vehicle ? vehicle.value : ""
+    );
+    var originValue = (
+      origin ? origin.value : ""
+    );
+    var destinationValue = (
+      destination
+        ? destination.value
         : ""
     );
 
-    return state.detailRows
+    var rows = state.detailRows
       .filter(function (row) {
         if (
           vehicleValue
           && row.to_vehicle
             !== vehicleValue
+        ) {
+          return false;
+        }
+
+        if (
+          originValue
+          && row.origin !== originValue
+        ) {
+          return false;
+        }
+
+        if (
+          destinationValue
+          && row.destination
+            !== destinationValue
         ) {
           return false;
         }
@@ -1854,6 +1928,42 @@
           .toLowerCase()
           .includes(query);
       });
+
+    var mode = (
+      sort
+        ? sort.value
+        : "impact_desc"
+    );
+
+    return rows.sort(
+      function (a, b) {
+        if (mode === "trips_desc") {
+          return (
+            b.trips_avoided
+            - a.trips_avoided
+          );
+        }
+
+        if (mode === "corridor_asc") {
+          return (
+            (
+              a.origin
+              + " "
+              + a.destination
+            ).localeCompare(
+              b.origin
+              + " "
+              + b.destination
+            )
+          );
+        }
+
+        return (
+          Math.abs(b.cost_saving)
+          - Math.abs(a.cost_saving)
+        );
+      }
+    );
   }
 
   function renderReassignmentDetail() {
@@ -3045,6 +3155,15 @@
     var detailVehicle = (
       $("#reassignment-vehicle-filter")
     );
+    var detailOrigin = (
+      $("#reassignment-origin-filter")
+    );
+    var detailDestination = (
+      $("#reassignment-destination-filter")
+    );
+    var detailSort = (
+      $("#reassignment-sort")
+    );
     var detailPrev = (
       $("#reassignment-prev")
     );
@@ -3160,6 +3279,24 @@
         }
       );
     }
+
+    [
+      detailOrigin,
+      detailDestination,
+      detailSort
+    ].forEach(function (control) {
+      if (!control) {
+        return;
+      }
+
+      control.addEventListener(
+        "change",
+        function () {
+          state.detailPage = 1;
+          renderReassignmentDetail();
+        }
+      );
+    });
 
     if (detailPrev) {
       detailPrev.addEventListener(
