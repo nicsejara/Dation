@@ -7121,3 +7121,28 @@ button.d-home__asset:hover .d-home__asset-action span {
     text-align: left;
   }
 }
+
+
+#dashboard-recommendation-delta.is-improvement {
+  color: #c9f7dd;
+  background: rgba(18,183,106,.14);
+}
+
+#dashboard-recommendation-delta.is-worse {
+  color: #ffd6d2;
+  background: rgba(240,68,56,.16);
+}
+
+#dashboard-recommendation-delta.is-neutral {
+  color: #d0d5dd;
+  background: rgba(255,255,255,.08);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-execution-state__brand span,
+  .dashboard-progress__bar,
+  .dashboard-skeleton::after,
+  .dashboard-v2 {
+    animation: none !important;
+  }
+}
