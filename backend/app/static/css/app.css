@@ -4351,3 +4351,418 @@ button.d-home__asset:hover .d-home__asset-action span {
     font-size: 13px;
   }
 }
+
+
+/* =========================================================
+   DDA LOGÍSTICA — PRODUCT OVERVIEW
+   ========================================================= */
+
+.dda-overview {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.dda-overview__hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(320px, .75fr);
+  gap: 26px;
+  align-items: stretch;
+  padding: 32px;
+  border: 1px solid var(--color-border);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 92% 10%, rgba(91,108,255,.12), transparent 28%),
+    linear-gradient(180deg, #ffffff 0%, #f7f9ff 100%);
+  box-shadow: var(--shadow-sm);
+}
+
+.dda-overview__hero-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.dda-overview__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 14px;
+  color: var(--color-text-muted);
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.dda-overview__badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 9px;
+  border-radius: 999px;
+  color: var(--color-brand-dark);
+  background: var(--color-brand-soft);
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.dda-overview__hero h1 {
+  margin: 0;
+  font-size: clamp(38px, 4.8vw, 60px);
+  letter-spacing: -.05em;
+}
+
+.dda-overview__lead {
+  max-width: 720px;
+  margin: 16px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 15px;
+  line-height: 1.72;
+}
+
+.dda-overview__hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+}
+
+.dda-overview__hero-note {
+  max-width: 390px;
+  color: var(--color-text-muted);
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.dda-overview__decision-card {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 18px;
+  align-items: center;
+  padding: 20px;
+  border: 1px solid #d7dcff;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 14px 30px rgba(44, 56, 136, .08);
+}
+
+.dda-overview__decision-icon {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  overflow: hidden;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 24% 18%, rgba(255,255,255,.25), transparent 26%),
+    linear-gradient(145deg, #6f79f7 0%, #4e5be0 52%, #2f3dbd 100%);
+  box-shadow: 0 12px 24px rgba(78, 91, 224, .18);
+}
+
+.dda-overview__route-start,
+.dda-overview__route-end {
+  position: absolute;
+  z-index: 2;
+  width: 13px;
+  height: 13px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+}
+
+.dda-overview__route-start {
+  left: 17px;
+  bottom: 18px;
+}
+
+.dda-overview__route-end {
+  right: 16px;
+  top: 17px;
+}
+
+.dda-overview__route-line {
+  position: absolute;
+  left: 26px;
+  top: 42px;
+  width: 45px;
+  height: 3px;
+  border-radius: 99px;
+  background: #fff;
+  transform: rotate(-40deg);
+}
+
+.dda-overview__route-line::after {
+  position: absolute;
+  right: -2px;
+  top: -5px;
+  width: 10px;
+  height: 10px;
+  content: "";
+  border-top: 3px solid #fff;
+  border-right: 3px solid #fff;
+  transform: rotate(45deg);
+}
+
+.dda-overview__decision-flow {
+  display: grid;
+  gap: 7px;
+}
+
+.dda-overview__decision-flow > div {
+  padding: 10px 11px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: #fafbfc;
+}
+
+.dda-overview__decision-flow span,
+.dda-overview__decision-flow strong {
+  display: block;
+}
+
+.dda-overview__decision-flow span {
+  color: var(--color-text-muted);
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.dda-overview__decision-flow strong {
+  margin-top: 4px;
+  color: #344054;
+  font-size: 9px;
+}
+
+.dda-overview__flow-arrow {
+  color: #98a2b3;
+  font-size: 12px;
+  text-align: center;
+}
+
+.dda-overview__section {
+  padding: 24px;
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: var(--shadow-xs);
+}
+
+.dda-overview__section-heading {
+  max-width: 790px;
+  margin-bottom: 18px;
+}
+
+.dda-overview__section-heading h2,
+.dda-overview__panel h2,
+.dda-overview__scope h2,
+.dda-overview__start h2 {
+  margin-top: 5px;
+  font-size: 22px;
+  letter-spacing: -.025em;
+}
+
+.dda-overview__section-heading p,
+.dda-overview__panel p,
+.dda-overview__scope p,
+.dda-overview__start p {
+  margin: 6px 0 0;
+  color: var(--color-text-muted);
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+.dda-overview__value-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.dda-overview__value-card {
+  min-height: 170px;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 13px;
+  background: #fbfcfe;
+}
+
+.dda-overview__value-number {
+  display: inline-grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: 9px;
+  color: var(--color-brand-dark);
+  background: var(--color-brand-soft);
+  font-size: 8px;
+  font-weight: 850;
+}
+
+.dda-overview__value-card h3 {
+  margin: 14px 0 6px;
+  font-size: 13px;
+}
+
+.dda-overview__value-card p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 9px;
+  line-height: 1.6;
+}
+
+.dda-overview__section--split {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.dda-overview__panel {
+  padding: 22px;
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: var(--shadow-xs);
+}
+
+.dda-overview__checklist {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dda-overview__checklist li {
+  position: relative;
+  padding-left: 19px;
+  color: var(--color-text-secondary);
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.dda-overview__checklist li::before {
+  position: absolute;
+  left: 0;
+  top: .38em;
+  display: grid;
+  width: 12px;
+  height: 12px;
+  place-items: center;
+  content: "✓";
+  border-radius: 50%;
+  color: var(--color-success);
+  background: var(--color-success-bg);
+  font-size: 7px;
+  font-weight: 900;
+}
+
+.dda-overview__scope {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(260px, .75fr);
+  gap: 22px;
+  align-items: center;
+}
+
+.dda-overview__scope-tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.dda-overview__scope-tag {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  padding: 0 10px;
+  border: 1px dashed #d0d5dd;
+  border-radius: 999px;
+  color: #98a2b3;
+  background: #fafafa;
+  font-size: 8px;
+  font-weight: 750;
+}
+
+.dda-overview__scope-tag.is-active {
+  border-style: solid;
+  border-color: #ccd2ff;
+  color: var(--color-brand-dark);
+  background: var(--color-brand-soft);
+}
+
+.dda-overview__start {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px;
+  border: 1px solid #d8dcff;
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 95% 15%, rgba(91,108,255,.08), transparent 30%),
+    var(--color-brand-faint);
+}
+
+.dda-overview__start > div {
+  max-width: 720px;
+}
+
+@media (max-width: 1080px) {
+  .dda-overview__hero,
+  .dda-overview__scope {
+    grid-template-columns: 1fr;
+  }
+
+  .dda-overview__value-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dda-overview__scope-tags {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 760px) {
+  .dda-overview__hero {
+    padding: 24px;
+  }
+
+  .dda-overview__decision-card {
+    grid-template-columns: 74px 1fr;
+  }
+
+  .dda-overview__decision-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 18px;
+  }
+
+  .dda-overview__section--split {
+    grid-template-columns: 1fr;
+  }
+
+  .dda-overview__start {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 520px) {
+  .dda-overview__value-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dda-overview__decision-card {
+    grid-template-columns: 1fr;
+  }
+
+  .dda-overview__hero-actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
