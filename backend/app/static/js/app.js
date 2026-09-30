@@ -34,7 +34,6 @@ import {
   appendChatMessage,
   buildDecisionMarkdown,
   renderActiveDataset,
-  renderDashboard,
   renderDatasetProfile,
   renderDatasetsTable,
   renderExplanation,
@@ -343,11 +342,6 @@ async function restoreHistoricalRun(
       "decision-dashboard"
     );
 
-    renderDashboard(
-      run,
-      profile,
-    );
-
     if (
       typeof window
         .dationDashboardCompleted
@@ -589,46 +583,28 @@ function bindDecisionStageBridge() {
     restoreRunConfiguration(run);
 
     try {
-      renderDashboard(
-        run,
-        profile,
+      renderTechnicalEvidence(
+        run
       );
+    } catch (error) {
+      console.warn(
+        "No se pudo actualizar la evidencia técnica.",
+        error,
+      );
+    }
 
+    try {
       renderExplanation(null);
       resetChat([]);
 
       renderInterpreterMeta(
         state.interpreter
       );
-
-      if (
-        typeof window
-          .dationDashboardCompleted
-        === "function"
-      ) {
-        window.dationDashboardCompleted(
-          run,
-          dataset,
-          profile
-        );
-      }
     } catch (error) {
-      if (
-        typeof window
-          .dationDashboardExecutionError
-        === "function"
-      ) {
-        window.dationDashboardExecutionError(
-          run.id,
-          (
-            "La corrida terminó, pero el Dashboard "
-            + "no pudo renderizarse: "
-            + error.message
-          )
-        );
-      }
-
-      throw error;
+      console.warn(
+        "El Dashboard está disponible, pero no se pudo inicializar la capa interpretativa.",
+        error,
+      );
     }
 
     try {
