@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="light">
   <title>Dation · Decision Intelligence</title>
   <link rel="stylesheet" href="/static/css/tokens.css">
-  <link rel="stylesheet" href="/static/css/app.css?v=home-v3-20260929">
+  <link rel="stylesheet" href="/static/css/app.css?v=journey-nav-v1-20260930">
 </head>
 <body>
   <div class="app-shell">
@@ -23,19 +23,19 @@
       </div>
 
       <nav class="nav" aria-label="Navegación principal">
-        <button class="nav-item is-active" data-view="inicio" type="button">
+        <button class="nav-item is-active" data-view="inicio" type="button" onclick="window.dationNavigate && window.dationNavigate('inicio', null, event)">
           <span class="nav-icon" aria-hidden="true">⌂</span>
           <span>Inicio</span>
         </button>
-        <button class="nav-item" data-view="logistics-config" type="button">
+        <button class="nav-item" data-view="logistics-config" type="button" onclick="window.dationNavigate && window.dationNavigate('logistics-config', 'data', event)">
           <span class="nav-icon" aria-hidden="true">◇</span>
           <span>DDA Logística</span>
         </button>
-        <button class="nav-item" data-view="traceability" type="button">
+        <button class="nav-item" data-view="traceability" type="button" onclick="window.dationNavigate && window.dationNavigate('traceability', null, event)">
           <span class="nav-icon" aria-hidden="true">≡</span>
           <span>Trazabilidad</span>
         </button>
-        <button class="nav-item" data-view="settings" type="button">
+        <button class="nav-item" data-view="settings" type="button" onclick="window.dationNavigate && window.dationNavigate('settings', null, event)">
           <span class="nav-icon" aria-hidden="true">⚙</span>
           <span>Configuración</span>
         </button>
@@ -43,7 +43,7 @@
 
       <div class="sidebar-section">
         <p class="sidebar-label">Decision Data Assets</p>
-        <button class="asset-item is-active" data-view="logistics-config" type="button">
+        <button class="asset-item is-active" data-view="logistics-config" type="button" onclick="window.dationNavigate && window.dationNavigate('logistics-config', 'data', event)">
           <span class="asset-icon asset-icon--route" aria-hidden="true">
             <svg viewBox="0 0 36 36" role="img">
               <circle cx="8" cy="27" r="3"></circle>
@@ -72,26 +72,21 @@
     </aside>
 
     <main class="main">
-      <header class="topbar">
-        <div>
-          <p class="eyebrow">Dation</p>
-          <div class="breadcrumb" aria-label="Ruta de navegación">
-            <span>Dation</span>
-            <span class="breadcrumb-separator">/</span>
-            <span id="breadcrumb-primary">Inicio</span>
-            <span class="breadcrumb-separator breadcrumb-context-separator is-hidden">/</span>
-            <span id="breadcrumb-secondary" class="is-hidden"></span>
-          </div>
-        </div>
-
-        <div class="topbar-actions">
-          <span class="pill pill--neutral">MVP</span>
-          <span class="system-status" id="system-status">
-            <span class="status-dot status-dot--pending"></span>
-            Verificando servicios
-          </span>
-          <button class="avatar-button" type="button" aria-label="Cuenta del workspace">D</button>
-        </div>
+      <header class="topbar topbar--journey">
+        <nav
+          id="journey-nav"
+          class="journey-nav"
+          aria-label="Progreso de la decisión"
+        >
+          <button
+            class="journey-step is-current"
+            type="button"
+            data-journey-view="inicio"
+            onclick="window.dationNavigate && window.dationNavigate('inicio', null, event)"
+          >
+            Inicio
+          </button>
+        </nav>
       </header>
 
       <div class="content">
@@ -157,7 +152,7 @@
                   data-view-target="logistics-config"
                   type="button"
                   aria-label="Abrir DDA Logística"
-                  onclick="window.dationOpenLogistics && window.dationOpenLogistics(event)"
+                  onclick="window.dationNavigate && window.dationNavigate('logistics-config', 'data', event)"
                 >
                   <div class="d-home__asset-icon d-home__asset-icon--logistics" aria-hidden="true">
                     <span class="d-home__route-start"></span>
@@ -226,7 +221,7 @@
             </div>
           </div>
 
-          <section class="config-section panel">
+          <section class="config-section panel" id="dda-data-section">
             <div class="config-section-header">
               <div class="config-number">01</div>
               <div>
@@ -331,7 +326,7 @@
             </div>
           </section>
 
-          <section class="config-section panel">
+          <section class="config-section panel" id="dda-decision-section">
             <div class="config-section-header">
               <div class="config-number">02</div>
               <div>
@@ -809,54 +804,237 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script>
-    window.dationOpenLogistics = function (event) {
-      if (event) {
-        event.preventDefault();
-        event.stopPropagation();
+    (function () {
+      var currentView = 'inicio';
+      var currentStage = null;
+
+      function panelFor(view) {
+        return document.querySelector('[data-view-panel="' + view + '"]');
       }
 
-      var target = document.querySelector('[data-view-panel="logistics-config"]');
+      function setSidebarActive(view) {
+        document.querySelectorAll('.nav-item[data-view]').forEach(function (button) {
+          var buttonView = button.getAttribute('data-view');
+          var active = buttonView === view
+            || (
+              buttonView === 'logistics-config'
+              && view === 'decision-dashboard'
+            );
 
-      if (!target) {
-        return;
+          button.classList.toggle('is-active', active);
+        });
+
+        document.querySelectorAll('.asset-item[data-view]').forEach(function (button) {
+          var buttonView = button.getAttribute('data-view');
+          var active = (
+            buttonView === 'logistics-config'
+            && (
+              view === 'logistics-config'
+              || view === 'decision-dashboard'
+            )
+          );
+
+          button.classList.toggle('is-active', active);
+        });
       }
 
-      document.querySelectorAll('[data-view-panel]').forEach(function (panel) {
-        panel.classList.remove('is-active');
-      });
+      function journeyButton(label, options) {
+        var button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'journey-step';
 
-      target.classList.add('is-active');
+        if (options.current) {
+          button.classList.add('is-current');
+        }
 
-      document.querySelectorAll('.nav-item[data-view]').forEach(function (button) {
-        button.classList.toggle(
-          'is-active',
-          button.getAttribute('data-view') === 'logistics-config'
+        if (options.disabled) {
+          button.classList.add('is-disabled');
+          button.disabled = true;
+        }
+
+        button.textContent = label;
+
+        if (!options.disabled && options.onClick) {
+          button.addEventListener('click', options.onClick);
+        }
+
+        return button;
+      }
+
+      function addSeparator(container) {
+        var separator = document.createElement('span');
+        separator.className = 'journey-separator';
+        separator.setAttribute('aria-hidden', 'true');
+        separator.textContent = '›';
+        container.appendChild(separator);
+      }
+
+      window.dationRenderJourney = function (view, stage) {
+        var container = document.getElementById('journey-nav');
+
+        if (!container) {
+          return;
+        }
+
+        currentView = view || currentView;
+        currentStage = stage || currentStage;
+
+        container.innerHTML = '';
+
+        if (currentView === 'inicio') {
+          container.appendChild(
+            journeyButton('Inicio', {
+              current: true,
+              onClick: function () {
+                window.dationNavigate('inicio');
+              }
+            })
+          );
+          return;
+        }
+
+        container.appendChild(
+          journeyButton('Inicio', {
+            current: false,
+            onClick: function () {
+              window.dationNavigate('inicio');
+            }
+          })
         );
-      });
 
-      var primary = document.getElementById('breadcrumb-primary');
-      var secondary = document.getElementById('breadcrumb-secondary');
-      var separator = document.querySelector('.breadcrumb-context-separator');
+        if (
+          currentView === 'logistics-config'
+          || currentView === 'decision-dashboard'
+        ) {
+          addSeparator(container);
 
-      if (primary) {
-        primary.textContent = 'DDA Logística';
-      }
+          container.appendChild(
+            journeyButton('DDA Logística', {
+              current: currentView === 'logistics-config' && currentStage === 'dda',
+              onClick: function () {
+                window.dationNavigate('logistics-config', 'dda');
+              }
+            })
+          );
 
-      if (secondary) {
-        secondary.textContent = 'Configuración';
-        secondary.classList.remove('is-hidden');
-      }
+          addSeparator(container);
 
-      if (separator) {
-        separator.classList.remove('is-hidden');
-      }
+          container.appendChild(
+            journeyButton('Cargar data', {
+              current: currentView === 'logistics-config' && currentStage === 'data',
+              onClick: function () {
+                window.dationNavigate('logistics-config', 'data');
+              }
+            })
+          );
 
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
-    };
+          addSeparator(container);
+
+          container.appendChild(
+            journeyButton('Configurar decisión', {
+              current: currentView === 'logistics-config' && currentStage === 'decision',
+              onClick: function () {
+                window.dationNavigate('logistics-config', 'decision');
+              }
+            })
+          );
+
+          addSeparator(container);
+
+          container.appendChild(
+            journeyButton('Dashboard decisión', {
+              current: currentView === 'decision-dashboard',
+              disabled: currentView !== 'decision-dashboard',
+              onClick: function () {
+                window.dationNavigate('decision-dashboard', 'dashboard');
+              }
+            })
+          );
+
+          return;
+        }
+
+        addSeparator(container);
+
+        container.appendChild(
+          journeyButton(
+            currentView === 'traceability'
+              ? 'Trazabilidad'
+              : 'Configuración',
+            {
+              current: true,
+              onClick: function () {
+                window.dationNavigate(currentView);
+              }
+            }
+          )
+        );
+      };
+
+      window.dationNavigate = function (view, stage, event) {
+        if (event) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+
+        var target = panelFor(view);
+
+        if (!target) {
+          return;
+        }
+
+        document.querySelectorAll('[data-view-panel]').forEach(function (panel) {
+          panel.classList.remove('is-active');
+        });
+
+        target.classList.add('is-active');
+        currentView = view;
+
+        if (view === 'logistics-config') {
+          currentStage = stage || 'data';
+        } else if (view === 'decision-dashboard') {
+          currentStage = 'dashboard';
+        } else {
+          currentStage = null;
+        }
+
+        setSidebarActive(view);
+        window.dationRenderJourney(view, currentStage);
+
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+
+        if (view === 'logistics-config') {
+          var scrollTarget = null;
+
+          if (currentStage === 'data') {
+            scrollTarget = document.getElementById('dda-data-section');
+          }
+
+          if (currentStage === 'decision') {
+            scrollTarget = document.getElementById('dda-decision-section');
+          }
+
+          if (scrollTarget) {
+            window.setTimeout(function () {
+              scrollTarget.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+              });
+            }, 80);
+          }
+        }
+      };
+
+      window.dationGetCurrentView = function () {
+        return currentView;
+      };
+
+      window.dationRenderJourney('inicio', null);
+    })();
   </script>
-  <script type="module" src="/static/js/app.js?v=home-v3-cta-fix-20260929"></script>
+  <script type="module" src="/static/js/app.js?v=journey-nav-v1-20260930"></script>
 </body>
 </html>
