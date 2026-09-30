@@ -1,76 +1,77 @@
 # Logistics DDA — Lógica de decisión y trade-offs
 
-## Objetivo min_cost
+## Preset: minimizar costo
 
-Para cada shipment, el engine evalúa cada tipo de vehículo disponible en el catálogo y prioriza:
+Para cada despacho el engine prioriza:
 
 1. menor `total_cost`,
 2. ante empate, menor `required_trips`,
-3. ante nuevo empate, menor `total_distance_km`.
+3. ante nuevo empate, menor `total_distance_km`,
+4. finalmente nombre de vehículo para desempate determinístico.
 
-El escenario agregado es la suma de esas elecciones individuales.
+## Preset: minimizar viajes
 
-Interpretación correcta:
-"Esta alternativa es la recomendada porque minimiza el costo estimado dentro del universo de alternativas modeladas."
-
-## Objetivo min_trips
-
-Para cada shipment, el engine prioriza:
+Para cada despacho el engine prioriza:
 
 1. menor `required_trips`,
 2. ante empate, menor `total_distance_km`,
-3. ante nuevo empate, menor `total_cost`.
+3. ante nuevo empate, menor `total_cost`,
+4. finalmente nombre de vehículo.
 
-Interpretación correcta:
-"Esta alternativa es la recomendada porque minimiza los viajes requeridos dentro del universo de alternativas modeladas."
+## Modo personalizado
+
+Para cada despacho:
+
+1. se evalúan todas las alternativas disponibles;
+2. costo y viajes se normalizan con Min-Max;
+3. se aplica el score ponderado;
+4. se elige el menor score;
+5. se aplican criterios de desempate determinísticos.
+
+Si el peso de costo es mayor o igual que el de viajes, el desempate favorece primero menor costo. Si viajes tiene mayor peso, favorece primero menor cantidad de viajes.
+
+Los extremos 100/0 y 0/100 reutilizan exactamente las lógicas de los presets para garantizar compatibilidad matemática.
 
 ## Baseline
 
-Baseline no es una alternativa optimizada. Es la asignación existente en el archivo de entrada y funciona como referencia para medir el impacto potencial.
+Baseline no es una alternativa optimizada. Es la asignación existente en el archivo de entrada y funciona como referencia para cuantificar impacto operativo potencial.
+
+## Sensibilidad
+
+Cuando una configuración personalizada coincide con `min_cost` o `min_trips`, explicalo explícitamente.
+
+Ejemplo:
+
+> Con 85% de prioridad sobre costo y 15% sobre viajes, la asignación resultante coincide con el escenario de costo mínimo. Aumentar todavía más el peso de costo no cambia la solución dentro de las alternativas modeladas.
+
+Si no coincide con ningún extremo, describí qué cambia y cuántas asignaciones difieren.
 
 ## Trade-offs esperables
 
 ### Vehículo más grande
 
-Puede:
-- reducir cantidad de viajes,
-- reducir kilómetros totales,
-- aumentar costo por km,
-- aumentar costo fijo por viaje.
-
-Por lo tanto, el vehículo de mayor capacidad no es automáticamente el de menor costo.
+Puede reducir viajes y kilómetros, pero aumentar costo por km o costo fijo.
 
 ### Vehículo más pequeño
 
-Puede:
-- tener menor costo unitario de operación,
-- necesitar más viajes,
-- acumular más kilómetros,
-- acumular más costos fijos.
+Puede tener menor costo unitario, pero necesitar más viajes y acumular más kilómetros o costos fijos.
 
-Tampoco es automáticamente más económico.
+Por lo tanto, capacidad, costo y viajes pueden empujar la decisión en direcciones distintas.
 
-## Cómo explicar por qué cambia una recomendación
+## Cómo explicar una recomendación
 
-Usá este orden:
-
-1. Identificá el objetivo de la corrida.
-2. Compará el KPI objetivo contra baseline.
-3. Señalá los KPI secundarios que mejoran o empeoran.
-4. Indicá cuántos shipments cambian de tipo de vehículo si ese dato está disponible.
-5. Usá los principales drivers por shipment provistos por el backend.
-6. Cerrá con el supuesto o restricción más material.
+1. Identificá modo y pesos.
+2. Identificá el escenario recomendado.
+3. Compará contra baseline para cuantificar impacto.
+4. Compará contra ambos extremos para explicar sensibilidad.
+5. Indicá cuántos despachos cambian de vehículo.
+6. Usá los principales drivers provistos por backend.
+7. Cerrá con el supuesto o restricción más material.
 
 ## "Mejor alternativa"
 
 Cuando el usuario pregunte "¿por qué es la mejor alternativa?", interpretalo como:
 
-"¿por qué el motor la recomienda para el objetivo seleccionado?"
+> ¿por qué el motor la recomienda para la configuración seleccionada dentro del universo de alternativas modeladas?
 
 No conviertas esa frase en una afirmación absoluta.
-
-## Driver de una mejora
-
-Un shipment es un driver cuando su cambio de asignación explica una parte relevante de la diferencia de costo, viajes o distancia contra baseline.
-
-El backend puede proveer una lista de principales cambios. Utilizá esos valores directamente; no inventes drivers que no estén presentes.

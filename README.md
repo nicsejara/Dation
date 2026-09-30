@@ -1,49 +1,74 @@
 # Dation
 
-Dation is an experimental Decision Intelligence platform built around
-**Decision Data Assets (DDA)**: repeatable, auditable decision processes that
-combine structured data, deterministic analytics and human validation.
+Dation is an experimental **Decision Intelligence** platform built around
+**Decision Data Assets (DDA)**: repeatable and auditable decision processes
+that combine structured data, deterministic analytics, configurable priorities
+and human validation.
 
-## MVP focus
+## Current MVP
 
-The first Decision Asset is a simplified Logistics DDA.
+The first active Decision Asset is **DDA Logística**.
 
-Initial technical flow:
+Current end-to-end flow:
 
 ```text
-CSV
- -> validation
- -> cloud ingestion
- -> Python engine
- -> structured JSON result
- -> Supabase
- -> dashboard
+CSV / stored dataset
+        ↓
+validation + dataset profile
+        ↓
+decision configuration
+(preset or weighted)
+        ↓
+Python deterministic engine
+        ↓
+DecisionResult JSON
+        ↓
+decision dashboard + sensitivity
+        ↓
+AI interpretation / contextual chat
+        ↓
+traceability + export
 ```
+
+## Current versions
+
+- Workspace / API: **0.7.0**
+- Logistics engine: **0.2.0**
+- Frontend: HTML + CSS + vanilla JavaScript
+- Runtime: Google Cloud Run
+- Data / storage: Supabase
+- AI Interpreter: Groq-backed, with versioned knowledge in GitHub
 
 ## Repository
 
 ```text
 Dation/
-├── backend/          FastAPI and Decision Asset engines
-├── frontend/         Landing and future SaaS interface
-├── sample_data/      Synthetic test datasets
-├── docs/             Architecture and technical documentation
-├── infra/            Cloud deployment notes
-├── index.html        Existing landing page (temporarily preserved)
-└── Logo.png          Existing landing asset (temporarily preserved)
+├── backend/
+│   ├── app/
+│   │   ├── engines/       deterministic DDA engines
+│   │   ├── knowledge/     interpreter knowledge base
+│   │   ├── models/        typed decision configuration
+│   │   ├── services/      data, runs, profiles and AI
+│   │   ├── static/        workspace CSS + JavaScript
+│   │   └── templates/     application shell
+│   └── tests/             engine compatibility tests
+├── frontend/              commercial landing assets
+├── sample_data/           synthetic logistics inputs
+├── docs/                  architecture documentation
+├── infra/                 deployment notes
+├── index.html             existing commercial landing
+└── Logo.png
 ```
 
-## Current milestone
+## Design principle
 
-Deploy `backend/` to Google Cloud Run and verify:
+The deterministic engine is the source of truth.
 
-- `GET /` returns the Dation Core service status.
-- `GET /health` returns a healthy status.
-
-After that, the next milestone is connecting Cloud Run to the existing Supabase
-project for CSV ingestion.
+The LLM does **not** optimize, recalculate or override the decision.
+It explains the DecisionResult produced by the engine using a versioned
+business knowledge base.
 
 ## Security
 
-Real credentials and `.env` files must never be committed. Only
-`.env.example` belongs in the repository.
+Real credentials and `.env` files must never be committed.
+Runtime secrets remain in Google Secret Manager / Cloud Run.

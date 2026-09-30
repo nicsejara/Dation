@@ -2,13 +2,13 @@
 
 ## Propósito
 
-El Logistics Decision Asset v0.1 compara alternativas de asignación de tipo de vehículo para un conjunto de despachos y permite observar su impacto estimado en:
+El DDA Logística v0.2 compara alternativas de asignación de tipo de vehículo para un conjunto de despachos y cuantifica su impacto estimado en:
 
 - costo total,
 - cantidad total de viajes,
 - distancia total recorrida.
 
-El objetivo del DDA no es automatizar ciegamente una decisión. Presenta escenarios comparables para que el decisor entienda el impacto de distintas prioridades.
+El DDA no automatiza ciegamente una decisión. Presenta escenarios comparables y trazables para que el decisor pueda elegir prioridades y entender sus consecuencias.
 
 ## Unidad de análisis
 
@@ -29,47 +29,58 @@ El despacho contiene, entre otros datos:
 
 ## Catálogo de vehículos
 
-El engine construye un catálogo a partir de los tipos de vehículo observados en el dataset. Para cada tipo utiliza:
+El engine construye un catálogo a partir de los tipos de vehículo observados en el dataset. Para cada tipo utiliza capacidad, costo por kilómetro y costo fijo por viaje.
 
-- capacidad en kg,
-- costo por km,
-- costo fijo por viaje.
+En v0.2 se supone que todos los tipos detectados pueden evaluarse para todos los despachos.
 
-En v0.1 se supone que todos los tipos detectados pueden evaluarse para todos los despachos.
+## Escenarios
 
-## Decisión representada
+### Situación actual
 
-El motor compara tres vistas:
+Representa la asignación que llega en el CSV. Es baseline y sirve para medir el impacto potencial de adoptar una recomendación.
 
-### Baseline
+### Costo mínimo
 
-Representa la asignación de vehículo que llega en el CSV. Es el punto de referencia operativo.
+Prioriza la alternativa de menor costo total estimado por despacho.
 
-### Minimum total cost
+### Viajes mínimos
 
-Para cada despacho selecciona la alternativa que minimiza el costo total estimado, utilizando viajes, kilómetros, costo por km y costo fijo.
+Prioriza la alternativa con menor cantidad de viajes requeridos por despacho.
 
-### Minimum trips
+### Configuración personalizada
 
-Para cada despacho selecciona la alternativa que minimiza la cantidad de viajes. Si hay empate, utiliza distancia y costo como criterios secundarios.
+Cuando el usuario selecciona pesos intermedios, el motor normaliza costo y viajes dentro del conjunto de alternativas de cada despacho y aplica un score ponderado.
+
+Este escenario representa la preferencia declarada por el decisor, no una mezcla de unidades monetarias con cantidad de viajes.
+
+## Sensibilidad
+
+Los extremos 100% costo y 100% viajes enmarcan la configuración seleccionada. Permiten responder si una ponderación intermedia modifica realmente la asignación o si la solución permanece igual que uno de los extremos.
+
+Baseline y extremos cumplen funciones diferentes:
+
+- baseline: mide cambio frente a la operación actual;
+- extremos: muestran sensibilidad frente a las preferencias.
 
 ## Interpretación correcta de "recomendado"
 
-El campo `recommended_scenario` significa:
+`recommended_scenario` significa:
 
-> escenario recomendado por el motor para el objetivo explícitamente seleccionado en esa corrida.
+> escenario recomendado por el motor para la configuración explícitamente seleccionada en esa corrida.
 
 No significa que sea universalmente superior en servicio, capacidad real de flota, riesgo, plazo o cualquier dimensión que el modelo todavía no contemple.
 
-## Preguntas de negocio que v0.1 sí puede responder
+## Preguntas que v0.2 sí puede responder
 
-- ¿Cuál es el costo estimado del escenario actual?
-- ¿Cuánto cambia el costo si priorizo minimizar costo?
-- ¿Cuántos viajes se reducen si priorizo viajes?
-- ¿Qué diferencia de kilómetros existe contra baseline?
-- ¿Cuántos despachos cambian de tipo de vehículo?
-- ¿Qué despachos explican los mayores cambios estimados?
-- ¿Qué trade-off existe entre costo y cantidad de viajes?
+- ¿Cuál es el costo estimado de la situación actual?
+- ¿Cuánto cambia el costo frente a baseline?
+- ¿Cuántos viajes cambian?
+- ¿Qué diferencia de kilómetros existe?
+- ¿Qué despachos cambian de vehículo?
+- ¿Qué despachos explican los mayores cambios?
+- ¿Qué trade-off existe entre costo y viajes?
+- ¿La configuración personalizada cambia la solución frente al extremo de costo?
+- ¿Qué ocurre en el extremo de viajes?
 
 ## Preguntas que requieren una versión posterior
 
@@ -78,5 +89,6 @@ No significa que sea universalmente superior en servicio, capacidad real de flot
 - ¿Cómo consolido varios despachos en un mismo viaje?
 - ¿Cuál es la mejor secuencia de paradas?
 - ¿Qué efecto tiene el clima o el tránsito?
+- ¿Cuál es el tiempo real de transporte?
 - ¿Qué impacto tiene CO2?
 - ¿Qué alternativa maximiza nivel de servicio?
