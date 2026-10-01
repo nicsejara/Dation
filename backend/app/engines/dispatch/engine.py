@@ -29,12 +29,16 @@ def plan_signature(scenario):
 def run_dispatch_engine(orders_bytes, fleet_bytes, configuration=None, options=None, inputs=None, progress=None):
     started=perf_counter();config=DispatchConfig.model_validate(configuration or {}).model_dump()
     opts=DispatchOptions.model_validate(options or {}).model_dump()
-    notify=progress or (lambda stage:None);notify('validating')
+    def notify(stage):
+        if perf_counter()-started > opts['total_time_limit_s']:
+            raise TimeoutError('Se agotó el presupuesto global; no se publica una decisión parcial.')
+        if progress:progress(stage)
+    notify('validating')
     orders=sorted(validate_orders_csv(orders_bytes)['records'],key=lambda o:o['order_id'])
     full_fleet=sorted(validate_fleet_csv(fleet_bytes)['records'],key=lambda v:v['vehicle_type'])
     fleet=[v for v in full_fleet if opts['allow_third_party'] or v['ownership']=='own']
     if not fleet:raise ValueError('No hay flota habilitada.')
-    check=preflight(orders,fleet)
+    check=preflight(orders,fleet,full_fleet)
     if check['errors']:raise ValueError('; '.join(e['detail']+' '+e.get('order_id','') for e in check['errors']))
     anomalies=check['anomalies']
     for a in anomalies:
@@ -71,9 +75,9 @@ def run_dispatch_engine(orders_bytes, fleet_bytes, configuration=None, options=N
         return min(candidates,key=lambda s:(sum(weights[k]*metric(s,k)/scales[k] for k in weights),metric(s,'cost'),metric(s,'trips'),plan_signature(s)))
     def optimize(weights,label):
         notify('optimizing:'+label)
-        if perf_counter()-started<opts['total_time_limit_s']-opts['solve_time_limit_s']:
-            p,meta=solve(orders,fleet,weights,scales,opts)
-        else:p,meta=None,{'status':'timeout','method':'heuristic','gap':None,'reason':'Presupuesto global agotado'}
+        if len(orders)<=300:
+            p,meta=solve(orders,fleet,weights,scales,opts,choose(weights)['trips'] if candidates else None)
+        else:p,meta=None,{'status':'feasible','method':'heuristic','gap':None,'reason':'Política determinística para más de 300 órdenes'}
         if p:
             validate_plan(p,orders,fleet);candidate=summarize(p,orders,fleet);candidates.append(candidate)
         if not candidates:
@@ -100,17 +104,23 @@ def run_dispatch_engine(orders_bytes, fleet_bytes, configuration=None, options=N
     settings=[(1,0,0),(0,1,0),(0,0,1),(.5,.5,0),(.5,0,.5),(0,.5,.5),(1/3,1/3,1/3)] if opts['sensitivity'] else []
     selected=scenarios['selected']
     def order_map(s):
-        return {o['order_id']:tuple(sorted((t['dispatch_date'],t['vehicle_type'],tuple((l['order_id'],l['units']) for l in t['loads'])) for t in s['trips'] if any(l['order_id']==o['order_id'] for l in t['loads']))) for o in orders}
+        mapping={o['order_id']:[] for o in orders}
+        for t in s['trips']:
+            signature=(t['dispatch_date'],t['vehicle_type'],tuple((l['order_id'],l['units']) for l in t['loads']))
+            for l in t['loads']:mapping[l['order_id']].append(signature)
+        return {k:tuple(sorted(v)) for k,v in mapping.items()}
     selected_map=order_map(selected)
+    previous_map=None
     for index,ws in enumerate(settings):
         w=dict(zip(('cost','trips','time'),ws))
         if index<3:s=scenarios[('min_cost','min_trips','min_time')[index]]
-        elif perf_counter()-started<opts['total_time_limit_s']-opts['solve_time_limit_s']:s=optimize(w,'sensitivity')
-        else:break
+        else:s=optimize(w,'sensitivity')
         om=order_map(s)
         sweep.append({'weights':w,'metrics':s['metrics'],'solver':s['solver'],
                       'plan_fingerprint':digest(plan_signature(s)),
-                      'orders_changed_vs_selected':sum(om[k]!=selected_map[k] for k in om)})
+                      'orders_changed_vs_selected':sum(om[k]!=selected_map[k] for k in om),
+                      'orders_changed_vs_previous':None if previous_map is None else sum(om[k]!=previous_map[k] for k in om)})
+        previous_map=om
     notify('summarizing')
     for name,s in scenarios.items():
         if s.get('metrics'):
@@ -118,6 +128,7 @@ def run_dispatch_engine(orders_bytes, fleet_bytes, configuration=None, options=N
             s['delta_vs_baseline']={k:s['metrics'][k]-baseline['metrics'][k] for k in DIRECTIONS} if baseline['feasible'] else None
         if name not in ('selected','baseline_direct'):
             s.pop('trips',None)
+            s.pop('order_outcomes',None)
     result={'schema_version':'dispatch_v1','engine':{'name':ENGINE_NAME,'version':ENGINE_VERSION,'executed_at':datetime.now(timezone.utc).isoformat(),'solver':selected['solver']},
         'inputs':{'orders':{'sha256':hashlib.sha256(orders_bytes).hexdigest(),'rows':len(orders)+len(excluded),**(inputs or {}).get('orders',{})},
                   'fleet':{'sha256':hashlib.sha256(fleet_bytes).hexdigest(),'rows':len(full_fleet),**(inputs or {}).get('fleet',{})},'anomalies':anomalies,'preflight':check},
@@ -134,6 +145,8 @@ def run_dispatch_engine(orders_bytes, fleet_bytes, configuration=None, options=N
     stable={'version':ENGINE_VERSION,'configuration':result['configuration'],'orders_hash':result['inputs']['orders']['sha256'],
             'fleet_hash':result['inputs']['fleet']['sha256'],'scenarios':{k:{n:v for n,v in s.items() if n!='solver'} for k,s in scenarios.items()},
             'sensitivity':[{k:v for k,v in p.items() if k!='solver'} for p in sweep]}
+    if perf_counter()-started > opts['total_time_limit_s']:
+        raise TimeoutError('Se agotó el presupuesto global; no se publica una decisión parcial.')
     result['result_fingerprint']=digest(stable)
     result['engine']['wall_ms']=int((perf_counter()-started)*1000)
     return result

@@ -33,9 +33,9 @@ def departure_days(order, vehicle, fleet):
     return [(start + timedelta(days=i)).isoformat() for i in range(max(0,(end-start).days+1))]
 
 
-def preflight(orders, fleet):
+def preflight(orders, fleet, reference_fleet=None):
     warnings, errors, anomalies = [], [], []
-    names = {v['vehicle_type'] for v in fleet}
+    names = {v['vehicle_type'] for v in (reference_fleet or fleet)}
     own = [v['capacity_kg'] for v in fleet if v['ownership']=='own']
     cap = max(own or [v['capacity_kg'] for v in fleet])
     if not any(v['units_available'] is None for v in fleet):

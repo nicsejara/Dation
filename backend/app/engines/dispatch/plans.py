@@ -56,6 +56,7 @@ def greedy(orders, fleet, objective='min_cost', direct=False, current=False):
             if not choices:return None
             _,day,_,idx,n,v=min(choices,key=lambda c:(c[0],c[1],c[2],c[3]))
             if idx==len(plan):
+                if len(plan)>=10000:raise ValueError('El plan supera el límite operativo de 10.000 viajes. Dividí el horizonte en lotes; no se publica cobertura parcial.')
                 plan.append(trip(o,v,day));used[(v['vehicle_type'],day)]+=1
             add_load(plan[idx],o,n);remaining-=n
     return canonical(plan)
@@ -81,7 +82,12 @@ def validate_plan(plan, orders, fleet, *, direct=False):
             if (t['origin'],t['destination'])!=(o['origin'],o['destination']):raise ValueError('Ruta inconsistente.')
             days=[o['dispatch_date']] if direct else departure_days(o,v,fleet)
             if t['dispatch_date'] not in days:raise ValueError('Salida fuera de ventana.')
-            load+=D(o['unit_weight_kg'])*l['units'];counts[o['order_id']]+=l['units']
+            kg=D(o['unit_weight_kg'])*l['units']
+            expected_arrival=(date.fromisoformat(t['dispatch_date'])+timedelta(days=transit(o,v))).isoformat()
+            if t['arrival_date']!=expected_arrival or D(l['kg'])!=kg:raise ValueError('Llegada o peso de carga inconsistente.')
+            if D(t['distance_km'])!=D(o['distance_km']):raise ValueError('Distancia inconsistente.')
+            load+=kg;counts[o['order_id']]+=l['units']
+        if not t['loads'] or D(t['load_kg'])!=load or D(t['capacity_kg'])!=D(v['capacity_kg']):raise ValueError('Carga o capacidad declarada inconsistente.')
         if load>D(v['capacity_kg']):raise ValueError('Capacidad excedida.')
     if counts!=Counter({o['order_id']:o['quantity_units'] for o in orders}):raise ValueError('No se conservan las unidades.')
     for (name,day),n in daily.items():

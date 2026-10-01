@@ -33,3 +33,16 @@ class DispatchValidationTests(unittest.TestCase):
     def test_legacy_weights(self):
         config=DispatchConfig(mode='custom',objective='custom',weights={'cost':.7,'trips':.3})
         self.assertEqual(config.weights.time,0)
+
+    def test_alias_and_explicit_day_first_dates(self):
+        from test_dispatch_engine import order,csv_bytes,COLUMNS
+        data=csv_bytes(COLUMNS,[{**order(),'dispatch_date':'10/1/2026'}]).replace(b'order_id;',b'shipment_id;',1)
+        record=validate_orders_csv(data)['records'][0]
+        self.assertEqual(record['order_id'],'A')
+        self.assertEqual(record['dispatch_date'],'2026-01-10')
+        with self.assertRaises(ValueError):validate_orders_csv(data.replace(b'10/1/2026',b'1/31/2026'))
+
+    def test_inconsistent_route_distances(self):
+        from test_dispatch_engine import order,csv_bytes,COLUMNS
+        with self.assertRaisesRegex(ValueError,'distancia inconsistente'):
+            validate_orders_csv(csv_bytes(COLUMNS,[order('A'),{**order('B'),'distance_km':200}]))

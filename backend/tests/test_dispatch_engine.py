@@ -59,3 +59,46 @@ class DispatchEngineTests(unittest.TestCase):
         r=self.run_case([order(units=2,weight=600,window=2)],fleet(third=False))
         self.assertEqual(r['scenarios']['selected']['metrics']['units_delivered'],2)
         self.assertEqual(len(set(t['dispatch_date'] for t in r['scenarios']['selected']['trips'])),2)
+
+    def test_conservation_and_weighted_reference(self):
+        rows=[order('A',3,600),order('B',2,400)]
+        r=self.run_case(rows,configuration={'mode':'custom','objective':'custom','weights':{'cost':.4,'trips':.3,'time':.3}})
+        for scenario in r['scenarios'].values():
+            if scenario.get('feasible'):
+                self.assertEqual(scenario['metrics']['units_delivered'],5)
+        def score(s):
+            return sum(r['configuration']['weights'][k]*s['metrics'][metric]/r['normalization'][k]['scale']
+                for k,metric in [('cost','total_cost'),('trips','total_trips'),('time','avg_lead_time_days')])
+        self.assertLessEqual(score(r['scenarios']['selected']),score(r['scenarios']['baseline_direct'])+1e-8)
+
+    def test_anomalies_include_and_exclude(self):
+        data=csv_bytes(COLUMNS,[order('A',51),order('B')])
+        for decision,units in [('include',52),('exclude',1)]:
+            r=run_dispatch_engine(data,fleet(),options={'sensitivity':False,'anomaly_decisions':{'A':decision}})
+            self.assertEqual(r['scenarios']['selected']['metrics']['units_delivered'],units)
+            self.assertEqual(r['inputs']['anomalies'][0]['decision'],decision)
+
+    def test_current_reference_and_disabled_third_party(self):
+        row={**order(),'current_vehicle_type':'missing'}
+        data=csv_bytes(COLUMNS+['current_vehicle_type'],[row])
+        with self.assertRaisesRegex(ValueError,'referencia'):run_dispatch_engine(data,fleet())
+        row['current_vehicle_type']='T'
+        data=csv_bytes(COLUMNS+['current_vehicle_type'],[row])
+        r=run_dispatch_engine(data,fleet(),options={'allow_third_party':False,'sensitivity':False})
+        self.assertFalse(r['scenarios']['baseline_current']['feasible'])
+        self.assertEqual(r['scenarios']['selected']['metrics']['outsourced_trips_share'],0)
+
+    def test_sensitivity_reports_consecutive_changes(self):
+        r=run_dispatch_engine(csv_bytes(COLUMNS,[order('A'),order('B')]),fleet())
+        points=r['sensitivity']['weight_sweep']
+        self.assertEqual(len(points),7)
+        self.assertIsNone(points[0]['orders_changed_vs_previous'])
+        self.assertTrue(all(0<=p['orders_changed_vs_previous']<=2 for p in points[1:]))
+
+    def test_validation_rejects_corrupt_plan(self):
+        from app.engines.dispatch.plans import validate_plan
+        from app.validators.orders_schema import validate_orders_csv
+        from app.validators.fleet_schema import validate_fleet_csv
+        data=csv_bytes(COLUMNS,[order()]);r=run_dispatch_engine(data,fleet(),options={'sensitivity':False})
+        plan=r['scenarios']['selected']['trips'];plan[0]['arrival_date']='2026-12-01'
+        with self.assertRaisesRegex(ValueError,'Llegada'):validate_plan(plan,validate_orders_csv(data)['records'],validate_fleet_csv(fleet())['records'])

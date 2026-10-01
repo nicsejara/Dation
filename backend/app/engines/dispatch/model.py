@@ -11,8 +11,10 @@ from .plans import trip, add_load, canonical
 MAX_VARIABLES = 25000
 
 
-def solve(orders, fleet, weights, scales, options):
+def solve(orders, fleet, weights, scales, options, hint_plan=None):
     started=perf_counter();model=cp_model.CpModel();slots=[];xs=defaultdict(list);daily=defaultdict(list)
+    hints=defaultdict(list)
+    for t in hint_plan or []:hints[((t['origin'],t['destination']),t['dispatch_date'],t['vehicle_type'])].append({l['order_id']:l['units'] for l in t['loads']})
     groups=defaultdict(list)
     for i,o in enumerate(orders):groups[(o['origin'],o['destination'])].append(i)
     count=0
@@ -30,12 +32,16 @@ def solve(orders, fleet, weights, scales, options):
                 previous=None
                 for j in range(limit):
                     y=model.new_bool_var(f'y{len(slots)}');loads=[]
+                    seeds=hints[(route,day,v['vehicle_type'])]
+                    seed=seeds[j] if j<len(seeds) else {}
+                    if hint_plan is not None:model.add_hint(y,int(bool(seed)))
                     if previous is not None:model.add(y<=previous)
                     previous=y
                     for i in eligible:
                         o=orders[i];upper=min(o['quantity_units'],capacity_units(o,v))
                         x=model.new_int_var(0,upper,f'x{i}_{len(slots)}');model.add(x<=upper*y)
                         xs[i].append(x);loads.append((i,x))
+                        if hint_plan is not None:model.add_hint(x,seed.get(o['order_id'],0))
                     model.add(sum(int(D(orders[i]['unit_weight_kg'])*1000)*x for i,x in loads)<=int(D(v['capacity_kg'])*1000)*y)
                     model.add(sum(x for _,x in loads)>=y)
                     slots.append((v,day,y,loads));daily[(v['vehicle_type'],day)].append(y)
@@ -59,13 +65,14 @@ def solve(orders, fleet, weights, scales, options):
     meta={'name':'OR-Tools CP-SAT','version':ortools.__version__,'status':name,'gap':None,'seed':0,
           'time_limit_s':options['solve_time_limit_s'],'deterministic_limit':options['deterministic_limit'],
           'deterministic_time':proto.deterministic_time,'wall_ms':int((perf_counter()-started)*1000),'method':'cp_sat'}
+    if status == cp_model.UNKNOWN and proto.deterministic_time+1e-6 < options['deterministic_limit']:
+        raise TimeoutError('El tiempo de reloj fue insuficiente para completar el presupuesto determinístico.')
     if status not in (cp_model.OPTIMAL,cp_model.FEASIBLE):
         meta['status']='infeasible' if status==cp_model.INFEASIBLE else 'timeout'
         return None,meta
     # A wall-clock interruption must not select a machine-speed-dependent incumbent.
     if status!=cp_model.OPTIMAL and proto.deterministic_time+1e-6<options['deterministic_limit']:
-        meta.update(status='timeout',reason='Límite operativo; se usa la política reproducible')
-        return None,meta
+        raise TimeoutError('El límite de reloj interrumpió la búsqueda determinística. Aumentá el tiempo por escenario.')
     meta['gap']=abs(solver.objective_value-solver.best_objective_bound)/max(1,abs(solver.objective_value))
     plan=[]
     for v,day,y,loads in slots:
