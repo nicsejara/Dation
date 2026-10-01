@@ -1,27 +1,26 @@
 import {esc,num,date,vehicle,api,post,errorBox} from './shared.mjs';import {rebalance} from './selectors.mjs';import {render as dashboard} from './dashboard.mjs';
+import {mountUploadScreen} from './upload/index.mjs';
 const KEY='dation.dispatch.workspace.v1';let saved={};try{saved=JSON.parse(sessionStorage.getItem(KEY)||'{}');}catch{}
 const state={orders:null,fleet:null,weights:{cost:34,trips:33,time:33},objective:'balanced',allow:true,decisions:{},...saved,preflight:null,available:false,run:null};
 let timer=null,pollGeneration=0;const roots={};function persist(){try{sessionStorage.setItem(KEY,JSON.stringify({orders:state.orders,fleet:state.fleet,weights:state.weights,objective:state.objective,allow:state.allow,decisions:state.decisions}));}catch{}}
 function root(view,id){const parent=document.querySelector('[data-view-panel="'+view+'"]');let node=document.getElementById(id);if(!node){node=document.createElement('div');node.id=id;node.className='dispatch';parent.append(node);}return node;}
-function ready(){return !!(state.orders&&state.fleet&&state.preflight?.valid);}
+function ready(){return !!(state.available&&state.orders&&state.fleet&&state.preflight?.valid);}
 function navigate(view){window.dationSetDataReady(ready());window.dationNavigate(view);}
 function urlRun(id){const url=new URL(location.href);url.searchParams.set('run_id',id);url.searchParams.set('dda','dispatch_v1');history.replaceState(null,'',url);}
 function action(b,fn){b.onclick=async()=>{b.disabled=true;try{await fn();}catch(e){alert(e.message);}finally{b.disabled=false;}};}
 async function preflight(){state.preflight=null;window.dationSetDataReady(false);if(!state.orders||!state.fleet)return;state.preflight=await post('/api/runs/preflight',{orders_dataset_id:state.orders.id,fleet_dataset_id:state.fleet.id,allow_third_party:state.allow});window.dationSetDataReady(ready());persist();}
-async function loadData(){const node=roots.data;node.innerHTML='<h1>Cargar órdenes y flota</h1><p>Las órdenes describen qué hay que entregar. La flota define con qué recursos podemos hacerlo.</p><div data-status role="status">Consultando datos…</div><div class="dispatch-data-grid"></div><div class="dispatch-panel" data-preflight></div><div class="dispatch-footer"><p>Se requieren órdenes y flota válidas para continuar.</p><button data-next disabled>Configurar decisión →</button></div><button data-legacy>Usar formato anterior</button>';
-node.querySelector('[data-legacy]').onclick=()=>{document.body.classList.remove('dispatch-enabled');node.hidden=true;roots.config.hidden=true;window.dationSetDataReady(Boolean(window.dationDataStage?.activeDataset));};
-try{const status=await api('/api/dispatch/status');state.available=status.available;node.querySelector('[data-status]').textContent=status.message||'Modelo de despacho listo para recibir datos.';if(!status.available)return;
-const [orders,fleets]=await Promise.all([api('/api/datasets?type=orders'),api('/api/datasets?type=fleet')]);if(state.orders)state.orders=orders.items.find(x=>x.id===state.orders.id)||null;if(state.fleet)state.fleet=fleets.items.find(x=>x.id===state.fleet.id)||null;state.fleet=state.fleet||fleets.items.find(x=>x.is_default)||null;
-for(const [kind,items,label] of [['orders',orders.items,'Órdenes de envío'],['fleet',fleets.items,'Flota disponible']]){const card=document.createElement('section');card.className='dispatch-panel';const selected=state[kind];card.innerHTML=`<h2>${label}</h2><p>${kind==='orders'?'Cargá la demanda que querés planificar.':'Reutilizá una versión o cargá una nueva sin alterar las anteriores.'}</p><label>Dataset guardado<select data-select><option value="">Seleccionar…</option>${items.map(x=>`<option value="${esc(x.id)}" ${selected?.id===x.id?'selected':''}>${esc(x.label||x.original_filename)} · ${esc(x.created_at.slice(0,10))}${x.is_default?' · Vigente':''}</option>`).join('')}</select></label><label class="dispatch-drop">Arrastrá un CSV o elegí un archivo<input type="file" accept=".csv,text/csv" data-upload></label><a href="/api/dispatch/templates/${kind}" download>Descargar ejemplo sintético</a>${kind==='fleet'?'<label>Etiqueta de la nueva versión<input data-label placeholder="Flota octubre"></label><button data-default>Marcar como vigente</button>':''}<div data-profile></div>`;
-card.querySelector('[data-select]').onchange=async e=>{state[kind]=items.find(x=>x.id===e.target.value)||null;persist();await refresh();};
-async function upload(file){if(!file)return;const form=new FormData();form.append('file',file);if(kind==='fleet'){form.append('label',card.querySelector('[data-label]').value||file.name);if(state.fleet)form.append('parent_dataset_id',state.fleet.id);}card.querySelector('[data-upload]').disabled=true;try{const d=await api('/api/datasets/upload?dataset_type='+kind,{method:'POST',body:form});state[kind]=d.dataset||d.existing_dataset;persist();await loadData();}catch(e){errorBox(card.querySelector('[data-profile]'),e);card.querySelector('[data-upload]').disabled=false;}}
-card.querySelector('[data-upload]').onchange=e=>upload(e.target.files[0]);const drop=card.querySelector('.dispatch-drop');drop.ondragover=e=>{e.preventDefault();drop.classList.add('dragging');};drop.ondragleave=()=>drop.classList.remove('dragging');drop.ondrop=e=>{e.preventDefault();drop.classList.remove('dragging');upload(e.dataTransfer.files[0]);};
-if(kind==='fleet')action(card.querySelector('[data-default]'),async()=>{if(!state.fleet)throw new Error('Elegí una flota.');await post('/api/datasets/'+state.fleet.id+'/default');await loadData();});
-node.querySelector('.dispatch-data-grid').append(card);card.dataset.kind=kind;}
-async function refresh(){for(const card of node.querySelectorAll('[data-kind]')){const d=state[card.dataset.kind];const p=d?.profile_json?.profile;card.querySelector('[data-profile]').innerHTML=!d?'':`<h3>${esc(d.label||d.original_filename)}</h3><p>${num(d.row_count)} registros · versión ${esc(d.created_at.slice(0,10))}</p>`+(p?.fleet?'<div class="dispatch-table-wrap"><table><thead><tr><th>Camión</th><th>Capacidad</th><th>Salidas/día</th></tr></thead><tbody>'+p.fleet.map(v=>`<tr><td>${esc(vehicle(v.vehicle_type))}</td><td>${num(v.capacity_kg)} kg</td><td>${v.units_available??'Sin límite'}</td></tr>`).join('')+'</tbody></table></div>':p?`<p>${num(p.total_units)} unidades · ${num(p.total_weight_kg)} kg · ${num(p.routes)} rutas</p><p>${date(p.date_from)} – ${date(p.date_to)}</p>`:'');}
-try{await preflight();const p=state.preflight;node.querySelector('[data-preflight]').innerHTML=p?`<h2>Revisión conjunta</h2><p>${p.valid?'Archivos compatibles. Revisá las advertencias antes de ejecutar.':'Hay errores que impiden ejecutar.'}</p>${[...p.errors,...p.warnings,...p.anomalies].map(x=>`<p class="dispatch-alert">${esc(x.order_id||'')} ${esc(x.detail)}</p>`).join('')}`:'<p>Seleccioná ambos archivos para revisar compatibilidad y plazos.</p>';node.querySelector('[data-next]').disabled=!ready();}catch(e){errorBox(node.querySelector('[data-preflight]'),e,refresh);}}
-node.querySelector('[data-next]').onclick=()=>navigate('logistics-config');await refresh();
-}catch(e){errorBox(node.querySelector('[data-status]'),e,loadData);}}
+async function loadData() {
+  await mountUploadScreen(
+    roots.data,
+    {
+      state,
+      persist,
+      runPreflight: preflight,
+      onNext: () => navigate('logistics-config'),
+      isReady: ready,
+    },
+  );
+}
 function configuration(){const weights=state.objective==='balanced'?{cost:1/3,trips:1/3,time:1/3}:Object.fromEntries(Object.entries(state.weights).map(([k,v])=>[k,v/100]));return {mode:state.objective==='custom'?'custom':'preset',objective:state.objective,weights};}
 async function loadConfig(){const node=roots.config;node.innerHTML='<h1>Configurar la decisión</h1>';if(!state.orders||!state.fleet){node.innerHTML+='<p>Primero seleccioná órdenes y flota.</p><button data-back>Ir a cargar data</button>';node.querySelector('[data-back]').onclick=()=>navigate('logistics-data');return;}
 try{await preflight();}catch(e){errorBox(node,e,loadConfig);return;}

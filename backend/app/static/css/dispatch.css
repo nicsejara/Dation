@@ -40,3 +40,407 @@ body.dispatch-result .dation-chat-launcher,body.dispatch-result .dashboard-chat-
 @media(max-width:760px){.dispatch-data-grid,.dispatch-sliders,.dispatch-presets,.dispatch-comparison-charts{grid-template-columns:minmax(0,1fr)}.dispatch-panel{padding:18px}.dispatch-mini,.dispatch-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.dispatch-footer{align-items:stretch;flex-direction:column;padding:16px}.dispatch-details{position:fixed;top:90px;left:88px;right:16px;width:auto}.dispatch th,.dispatch td{padding:10px 8px;min-width:95px}.dispatch-command{padding:12px}.dispatch-command nav{gap:12px}.dispatch-actions button{flex:1}.dispatch-chart{height:280px}.dispatch-kpi{padding:12px}.dispatch-kpi>strong{font-size:19px}}
 @media(max-width:450px){.dispatch-kpis,.dispatch-mini{grid-template-columns:minmax(0,1fr)}.dispatch-mini{gap:12px}.dispatch-mini>div{display:flex;justify-content:space-between;gap:10px;align-items:center}.dispatch-mini strong{font-size:19px}.dispatch h1{font-size:25px}.dispatch-actions{width:100%}}
 @media(prefers-reduced-motion:reduce){.dispatch-loading{animation:none}}
+
+
+/* Dispatch single ingestion screen */
+.dispatch-upload-screen {
+  padding-bottom: 96px;
+}
+
+.dispatch-upload-heading {
+  margin-bottom: 20px;
+}
+
+.dispatch-upload-heading-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dispatch-step-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 4px 9px;
+  border: 1px solid #d8dbee;
+  border-radius: 999px;
+  background: #f7f7fc;
+  color: #525b73;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.dispatch-system-banner {
+  margin-bottom: 20px;
+  padding: 18px 20px;
+  border: 1px solid #e5c56d;
+  border-radius: 14px;
+  background: #fff9e8;
+}
+
+.dispatch-system-banner > div > p {
+  margin-bottom: 8px;
+}
+
+.dispatch-system-checks {
+  display: grid;
+  gap: 9px;
+  margin-top: 14px;
+}
+
+.dispatch-system-checks article {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 2px 10px;
+  padding: 11px 12px;
+  border: 1px solid #eadfbf;
+  border-radius: 10px;
+  background: #fffdfa;
+}
+
+.dispatch-system-checks article > strong,
+.dispatch-system-checks article > p,
+.dispatch-system-checks article > small {
+  grid-column: 2;
+}
+
+.dispatch-system-checks article > p {
+  margin: 0;
+}
+
+.dispatch-system-check-icon {
+  grid-row: 1 / span 3;
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border-radius: 50%;
+  background: #f5e4ae;
+  font-weight: 800;
+}
+
+.dispatch-how-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 18px 0;
+}
+
+.dispatch-how-steps article {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  min-width: 0;
+  padding: 13px;
+  border: 1px solid #e3e6ee;
+  border-radius: 11px;
+  background: #fafbfe;
+}
+
+.dispatch-how-steps span {
+  display: grid;
+  flex: 0 0 25px;
+  height: 25px;
+  place-items: center;
+  border-radius: 50%;
+  background: #ececff;
+  color: #4645bc;
+  font-weight: 800;
+}
+
+.dispatch-upload-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.dispatch-upload-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.dispatch-upload-card-head h2 {
+  margin-top: 3px;
+}
+
+.dispatch-upload-status {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  min-height: 28px;
+  padding: 4px 9px;
+  border: 1px solid #d9deea;
+  border-radius: 999px;
+  background: #f7f8fb;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.dispatch-upload-status.is-success {
+  border-color: #a9ddcf;
+  background: #edf9f5;
+  color: #126756;
+}
+
+.dispatch-upload-status.is-warning {
+  border-color: #e8cf8e;
+  background: #fff8e9;
+  color: #765617;
+}
+
+.dispatch-upload-status.is-error {
+  border-color: #ebbbb0;
+  background: #fff1ed;
+  color: #973d27;
+}
+
+.dispatch-upload-status.is-pending {
+  border-color: #c8c9f4;
+  background: #f2f2ff;
+  color: #4544b7;
+}
+
+.dispatch-upload-drop {
+  width: 100%;
+  min-height: 126px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 5px;
+  border: 2px dashed #b8bcea !important;
+  background: #f8f8ff !important;
+  text-align: center;
+}
+
+.dispatch-upload-drop:hover,
+.dispatch-upload-drop.is-dragging,
+.dispatch-upload-drop:focus-visible {
+  border-color: #5b5cff !important;
+  background: #ededff !important;
+  outline: 3px solid #5b5cff26;
+  outline-offset: 2px;
+}
+
+.dispatch-upload-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.dispatch-upload-links a {
+  font-size: 13px;
+}
+
+.dispatch-contract-details {
+  border-top: 1px solid #e8ebf2;
+  padding-top: 12px;
+}
+
+.dispatch-contract-details .dispatch-table-wrap {
+  max-height: 390px;
+}
+
+.dispatch-upload-fields {
+  display: grid;
+  gap: 4px;
+}
+
+.dispatch-check-label {
+  display: flex !important;
+  align-items: center;
+  gap: 4px;
+}
+
+.dispatch-validation-report {
+  min-height: 20px;
+}
+
+.dispatch-validation-summary {
+  padding: 12px 14px;
+  border: 1px solid #e1e5ee;
+  border-radius: 10px;
+  background: #fafbfe;
+}
+
+.dispatch-validation-summary p {
+  margin-bottom: 0;
+}
+
+.dispatch-validation-group {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1px solid #e4e7ee;
+  border-radius: 10px;
+}
+
+.dispatch-validation-group.is-error {
+  border-color: #efc0b6;
+  background: #fff8f5;
+}
+
+.dispatch-validation-group.is-warning {
+  border-color: #ebd49b;
+  background: #fffaf0;
+}
+
+.dispatch-validation-group ol {
+  margin: 10px 0 0;
+  padding-left: 22px;
+}
+
+.dispatch-validation-group li {
+  margin: 8px 0;
+}
+
+.dispatch-validation-group li small {
+  margin-top: 3px;
+}
+
+.dispatch-upload-profile {
+  padding: 12px 0;
+  border-top: 1px solid #eceef4;
+}
+
+.dispatch-upload-note {
+  color: #126756 !important;
+  font-weight: 650;
+}
+
+.dispatch-library {
+  margin-top: auto;
+  padding-top: 13px;
+  border-top: 1px solid #eceef4;
+}
+
+.dispatch-library-heading {
+  margin-bottom: 8px;
+}
+
+.dispatch-library-list {
+  display: grid;
+  gap: 8px;
+}
+
+.dispatch-library-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid #e3e6ee;
+  border-radius: 10px;
+}
+
+.dispatch-library-row.is-selected {
+  border-color: #9f9ff0;
+  background: #f6f6ff;
+}
+
+.dispatch-library-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.dispatch-library-actions button {
+  min-height: 34px;
+  padding: 6px 9px;
+  font-size: 12px;
+}
+
+.dispatch-library-empty {
+  font-size: 13px;
+}
+
+.dispatch-preflight-item {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  margin: 9px 0;
+  padding: 11px 12px;
+  border: 1px solid #e2e6ef;
+  border-radius: 10px;
+}
+
+.dispatch-preflight-item p {
+  margin: 3px 0 0;
+}
+
+.dispatch-preflight-item.is-error {
+  border-color: #efc0b6;
+  background: #fff8f5;
+}
+
+.dispatch-preflight-item.is-warning {
+  border-color: #ead39b;
+  background: #fffaf0;
+}
+
+.dispatch-preflight-item.is-success {
+  border-color: #b7ddd3;
+  background: #f3fbf8;
+}
+
+.dispatch-preflight-mark {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border-radius: 50%;
+  background: #eef0f6;
+  font-weight: 800;
+}
+
+.dispatch-preflight-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #e7eaf1;
+}
+
+.dispatch-preflight-summary p {
+  margin: 0;
+}
+
+.dispatch-upload-footer {
+  position: sticky;
+  bottom: 14px;
+  z-index: 35;
+  box-shadow: 0 10px 35px #1a2a4b1f;
+}
+
+@media (max-width: 960px) {
+  .dispatch-how-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .dispatch-upload-card-head,
+  .dispatch-library-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .dispatch-upload-status {
+    width: fit-content;
+  }
+
+  .dispatch-how-steps,
+  .dispatch-preflight-summary {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dispatch-upload-screen {
+    padding-bottom: 42px;
+  }
+
+  .dispatch-upload-footer {
+    bottom: 8px;
+  }
+}
