@@ -5512,6 +5512,16 @@ button.d-home__asset:hover .d-home__asset-action span {
    DECISION CONFIGURATION STAGE v2
    ========================================================= */
 
+/* Keep the fixed execution bar anchored to the viewport during and after entry. */
+.view[data-view-panel="logistics-config"].is-active {
+  animation-name: decision-config-in;
+}
+
+@keyframes decision-config-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 .decision-stage {
   display: flex;
   flex-direction: column;
@@ -5922,7 +5932,7 @@ button.d-home__asset:hover .d-home__asset-action span {
     32px,
     calc(
       (
-        100vw
+        100%
         - var(--sidebar-width)
         - var(--content-width)
       ) / 2
@@ -5935,7 +5945,7 @@ button.d-home__asset:hover .d-home__asset-action span {
       32px,
       calc(
         (
-          100vw
+          100%
           - var(--sidebar-width)
           - var(--content-width)
         ) / 2
