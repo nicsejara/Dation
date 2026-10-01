@@ -117,7 +117,7 @@ def validate_orders_report(contents: bytes, max_problems: int = 100) -> dict:
                 if route in routes and routes[route] != distance:
                     problems.error(
                         "INCONSISTENT_ROUTE_DISTANCE",
-                        "La distancia es inconsistente para la misma ruta.",
+                        "distancia inconsistente para la misma ruta.",
                         row=row["_row"],
                         column="distance_km",
                         hint=f"Usá la misma distancia para {route[0]} → {route[1]}.",
