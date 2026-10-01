@@ -51,8 +51,13 @@ jobs:
             node --check "$file"
           done
 
+          for file in app/static/js/dispatch/*.mjs; do
+            node --check "$file"
+          done
+
       - name: Run automated tests
         working-directory: backend
         run: |
           python -m unittest discover -s tests -v
           node tests/test_dashboard_selectors.js
+          node --test tests/test_dispatch_selectors.mjs

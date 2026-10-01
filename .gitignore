@@ -22,3 +22,6 @@ Thumbs.db
 
 # Logs and local runtime
 *.log
+
+# Supabase local CLI cache
+supabase/.temp/
