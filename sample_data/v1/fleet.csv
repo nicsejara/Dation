@@ -1,0 +1,5 @@
+vehicle_type;ownership;capacity_kg;cost_per_km;fixed_trip_cost;units_available;avg_speed_kmh;driving_hours_per_day;fuel_l_per_100km;co2_kg_per_km
+Truck_S;own;8000;720;25000;4;70;10;22;0.59
+Truck_M;own;15000;920;35000;4;70;10;30;0.80
+Truck_L;own;25000;1180;48000;3;70;10;38;1.02
+Third_Party_L;third_party;25000;1534;62400;;70;10;38;1.02
