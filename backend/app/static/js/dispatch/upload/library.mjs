@@ -13,8 +13,11 @@ export function renderLibrary(
     kind,
     items,
     selected,
+    query = "",
     onSelect,
     onArchive,
+    onSearch,
+    onMakeDefault,
   },
 ) {
   root.replaceChildren();
@@ -30,12 +33,35 @@ export function renderLibrary(
   heading.append(title);
   root.append(heading);
 
+  const search = document.createElement("input");
+  search.type = "search";
+  search.value = query;
+  search.placeholder = (
+    kind === "orders"
+      ? "Buscar cargas anteriores…"
+      : "Buscar versiones de flota…"
+  );
+  search.setAttribute("aria-label", search.placeholder);
+  let timer = null;
+  search.oninput = () => {
+    window.clearTimeout(timer);
+    timer = window.setTimeout(
+      () => onSearch(search.value.trim()),
+      250,
+    );
+  };
+  root.append(search);
+
   if (!items?.length) {
     root.append(
       empty(
-        kind === "orders"
-          ? "Todavía no hay órdenes guardadas."
-          : "Todavía no hay versiones de flota guardadas.",
+        query
+          ? "No encontramos cargas que coincidan con la búsqueda."
+          : (
+            kind === "orders"
+              ? "Todavía no hay órdenes guardadas."
+              : "Todavía no hay versiones de flota guardadas."
+          ),
       ),
     );
     return;
@@ -71,6 +97,14 @@ export function renderLibrary(
     use.disabled = selected?.id === item.id;
     use.onclick = () => onSelect(item);
     actions.append(use);
+
+    if (kind === "fleet" && !item.is_default) {
+      const makeDefault = document.createElement("button");
+      makeDefault.type = "button";
+      makeDefault.textContent = "Marcar vigente";
+      makeDefault.onclick = () => onMakeDefault(item);
+      actions.append(makeDefault);
+    }
 
     if (!(kind === "fleet" && item.is_default)) {
       const archive = document.createElement("button");

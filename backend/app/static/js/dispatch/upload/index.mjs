@@ -145,6 +145,29 @@ function makeExplainer() {
     ),
   );
   section.append(details);
+
+  const common = document.createElement("details");
+  const commonSummary = document.createElement("summary");
+  commonSummary.textContent = "Errores frecuentes y cómo resolverlos";
+  common.append(
+    commonSummary,
+    element(
+      "p",
+      (
+        "Encabezados cambiados: volvé a descargar la plantilla y conservá sus nombres. "
+        + "Fechas inválidas: usá AAAA-MM-DD o día/mes/año. "
+        + "IDs repetidos: cada orden y cada tipo de camión debe identificarse de forma única."
+      ),
+    ),
+    element(
+      "p",
+      (
+        "Si Dation detecta el formato anterior de 14 columnas, separá la información "
+        + "en los archivos nuevos de Órdenes y Flota."
+      ),
+    ),
+  );
+  section.append(common);
   return section;
 }
 
@@ -186,6 +209,14 @@ export async function mountUploadScreen(
     libraries: {
       orders: [],
       fleet: [],
+    },
+    queries: {
+      orders: "",
+      fleet: "",
+    },
+    duplicateNotice: {
+      orders: null,
+      fleet: null,
     },
   };
 
@@ -267,6 +298,15 @@ export async function mountUploadScreen(
       }),
     );
     renderValidationReport(card.report, report);
+    if (local.duplicateNotice[kind]) {
+      card.report.prepend(
+        element(
+          "p",
+          local.duplicateNotice[kind],
+          "dispatch-upload-note",
+        ),
+      );
+    }
     renderProfile(card.profile, kind, dataset, report);
   }
 
@@ -304,22 +344,29 @@ export async function mountUploadScreen(
     updateFooter();
   }
 
-  async function loadLibrary(kind) {
+  async function loadLibrary(kind, query = local.queries[kind]) {
+    local.queries[kind] = query;
     if (!local.status?.available) {
       local.libraries[kind] = [];
       renderLibrary(refs[kind].library, {
         kind,
         items: [],
         selected: state[kind],
+        query,
         onSelect: () => {},
         onArchive: () => {},
+        onSearch: (value) => loadLibrary(kind, value),
+        onMakeDefault: () => {},
       });
       return;
     }
 
     try {
+      const search = query
+        ? `&q=${encodeURIComponent(query)}`
+        : "";
       const response = await api(
-        `/api/datasets?type=${kind}&limit=20&offset=0`,
+        `/api/datasets?type=${kind}&limit=20&offset=0${search}`,
       );
       local.libraries[kind] = response.items || [];
 
@@ -341,6 +388,8 @@ export async function mountUploadScreen(
         kind,
         items: local.libraries[kind],
         selected: state[kind],
+        query,
+        onSearch: (value) => loadLibrary(kind, value),
         onSelect: async (dataset) => {
           state[kind] = dataset;
           local.reports[kind] = dataset.profile_json || null;
@@ -349,6 +398,19 @@ export async function mountUploadScreen(
           updateCard(kind);
           await refreshPreflight();
           await loadLibrary(kind);
+        },
+        onMakeDefault: async (dataset) => {
+          try {
+            await post(`/api/datasets/${dataset.id}/default`, {});
+            state.fleet = dataset;
+            persist();
+            await loadLibrary("fleet", local.queries.fleet);
+            updateCard("fleet");
+            await refreshPreflight();
+          } catch (error) {
+            local.saveErrors.fleet = error.message;
+            updateCard("fleet");
+          }
         },
         onArchive: async (dataset) => {
           try {
@@ -415,18 +477,13 @@ export async function mountUploadScreen(
       }
 
       if (stored.duplicate) {
-        const note = element(
-          "p",
-          (
-            "Este archivo ya estaba cargado"
-            + (dataset.created_at
-              ? ` el ${date(dataset.created_at.slice(0, 10))}`
-              : "")
-            + ": se reutilizó esa versión."
-          ),
-          "dispatch-upload-note",
+        local.duplicateNotice[kind] = (
+          "Este archivo ya estaba cargado"
+          + (dataset.created_at
+            ? ` el ${date(dataset.created_at.slice(0, 10))}`
+            : "")
+          + ": se reutilizó esa versión."
         );
-        refs[kind].report.prepend(note);
       }
 
       await loadLibrary(kind);
@@ -463,6 +520,7 @@ export async function mountUploadScreen(
 
     local.validating[kind] = true;
     local.saveErrors[kind] = null;
+    local.duplicateNotice[kind] = null;
     updateCard(kind);
 
     try {
