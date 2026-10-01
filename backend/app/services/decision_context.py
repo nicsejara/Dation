@@ -160,6 +160,9 @@ def build_decision_context(
     result_json: dict,
     configuration_json: dict | None = None,
 ) -> dict:
+    if result_json.get('schema_version') == 'dispatch_v1':
+        from app.services.dispatch_context import build_dispatch_context
+        return build_dispatch_context(result_json)
     scenarios = result_json["scenarios"]
     baseline = scenarios["baseline"]
 
