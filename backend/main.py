@@ -7,6 +7,7 @@ from fastapi import (
     Depends,
     FastAPI,
     File,
+    Form,
     HTTPException,
     Query,
     Request,
@@ -77,12 +78,17 @@ STATIC_DIR = (
 
 app = FastAPI(
     title="Dation Core API",
-    version="0.7.0",
+    version="1.0.0",
     description=(
         "Backend para Dation Decision "
         "Intelligence Workspace."
     ),
 )
+
+from app.routes.dispatch import router as dispatch_router
+from app.services import dispatch_service
+
+app.include_router(dispatch_router)
 
 app.mount(
     "/static",
@@ -139,7 +145,7 @@ async def validation_exception_handler(
 def root():
     return {
         "service": "Dation Core",
-        "version": "0.7.0",
+        "version": "1.0.0",
         "status": "running",
     }
 
@@ -182,7 +188,7 @@ def upload_compatibility(
 @app.get(
     "/api/system/supabase-check"
 )
-async def supabase_check():
+async def supabase_check(_: str = Depends(require_upload_access)):
     return await (
         check_supabase_connection()
     )
@@ -223,6 +229,7 @@ async def get_workspace_summary(
 
 @app.get("/api/datasets")
 async def get_datasets(
+    type: str | None = Query(default=None),
     limit: int = Query(
         default=25,
         ge=1,
@@ -232,6 +239,13 @@ async def get_datasets(
         require_upload_access
     ),
 ):
+    if type is not None:
+        if type not in ("orders", "fleet"):
+            raise HTTPException(422, "Tipo de dataset inválido.")
+        try:
+            return {"items": await dispatch_service.list_typed(type, limit)}
+        except httpx.HTTPError as exc:
+            raise HTTPException(503, "Aplicá la migración de despacho para cargar estos datos.") from exc
     try:
         return {
             "items": await list_datasets(
@@ -313,6 +327,9 @@ async def get_runs(
 @app.post("/api/datasets/upload")
 async def upload_logistics_dataset(
     file: UploadFile = File(...),
+    dataset_type: str | None = Query(default=None),
+    label: str | None = Form(default=None),
+    parent_dataset_id: UUID | None = Form(default=None),
     _: str = Depends(
         require_upload_access
     ),
@@ -352,6 +369,19 @@ async def upload_logistics_dataset(
                 "límite actual de 10 MB."
             ),
         )
+
+    if dataset_type is not None:
+        if dataset_type not in ('orders', 'fleet'):
+            raise HTTPException(422, 'Tipo de dataset inválido.')
+        if not await dispatch_service.available():
+            raise HTTPException(503, 'Aplicá primero la migración de despacho.')
+        try:
+            return await dispatch_service.store_input(filename, contents, dataset_type, label,
+                str(parent_dataset_id) if parent_dataset_id else None)
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from exc
+        except httpx.HTTPError as exc:
+            raise HTTPException(502, 'No se pudo guardar el dataset de despacho.') from exc
 
     try:
         validation = (

@@ -52,6 +52,8 @@ begin
  return new;
 end;
 $$;
+revoke all on function public.validate_dispatch_run() from public, anon, authenticated;
+grant execute on function public.validate_dispatch_run() to service_role;
 drop trigger if exists decision_runs_dispatch_contract on public.decision_runs;
 create trigger decision_runs_dispatch_contract before insert or update on public.decision_runs
  for each row execute function public.validate_dispatch_run();

@@ -38,6 +38,9 @@ async def get_dataset_profile(
             "No se encontró el dataset solicitado."
         )
 
+    if dataset.get('dataset_type') in ('orders', 'fleet'):
+        return {'dataset': dataset, **(dataset.get('profile_json') or {})}
+
     contents = await download_dataset(dataset)
     validation = validate_logistics_csv(contents)
     parsed = parse_logistics_csv(contents)
