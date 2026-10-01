@@ -507,46 +507,6 @@ function bindDatasetActions() {
 }
 
 
-function bindDataStageBridge() {
-  function consumeDataStage(
-    dataset,
-    profile,
-  ) {
-    if (!dataset || !profile) {
-      return;
-    }
-
-    setActiveDataset(dataset);
-    setDatasetProfile(profile);
-    clearDecisionState();
-  }
-
-  window.addEventListener(
-    "dation:dataset-ready",
-    (event) => {
-      consumeDataStage(
-        event.detail?.dataset,
-        event.detail?.profile,
-      );
-    }
-  );
-
-  if (
-    window.dationDataStage
-      ?.activeDataset
-    && window.dationDataStage
-      ?.profile
-  ) {
-    consumeDataStage(
-      window.dationDataStage
-        .activeDataset,
-      window.dationDataStage
-        .profile,
-    );
-  }
-}
-
-
 function bindDecisionStageBridge() {
   async function consumeRun(
     run,
@@ -676,7 +636,6 @@ function bindGlobalErrors() {
 
 bindNavigation();
 bindDatasetActions();
-bindDataStageBridge();
 bindDecisionStageBridge();
 bindInterpreterStateBridge();
 bindRefreshActions();

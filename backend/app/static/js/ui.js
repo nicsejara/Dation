@@ -495,6 +495,10 @@ export function renderWorkspaceDatasets(
     $("#workspace-dataset-list")
   );
 
+  if (!container) {
+    return;
+  }
+
   if (!datasets.length) {
     container.innerHTML = (
       '<div class="empty-state empty-state--compact">'
@@ -756,6 +760,10 @@ export function renderActiveDataset(
     $("#active-dataset-card")
   );
 
+  if (!card) {
+    return;
+  }
+
   const continueButton = (
     $("#continue-to-decision")
   );
@@ -855,6 +863,10 @@ export function renderDatasetProfile(
   const panel = (
     $("#dataset-profile-panel")
   );
+
+  if (!panel) {
+    return;
+  }
 
   const continueButton = (
     $("#continue-to-decision")

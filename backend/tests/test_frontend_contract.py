@@ -108,8 +108,6 @@ class FrontendContractTests(
         javascript = (
             self.app_js
             + "\n"
-            + self.data_stage_js
-            + "\n"
             + self.decision_stage_js
             + "\n"
             + self.dashboard_stage_js
@@ -263,28 +261,67 @@ class FrontendContractTests(
             self.app_js,
         )
 
-    def test_data_stage_contract(
+    def test_single_ingestion_contract(
         self,
     ):
-        self.assertIn(
+        workspace = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+            / "workspace.mjs"
+        ).read_text(encoding="utf-8")
+        upload_index = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+            / "upload"
+            / "index.mjs"
+        ).read_text(encoding="utf-8")
+        system_banner = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+            / "upload"
+            / "system-banner.mjs"
+        ).read_text(encoding="utf-8")
+
+        self.assertNotIn(
             'id="upload-dropzone"',
             self.html,
         )
-        self.assertIn(
-            'id="dataset-file"',
-            self.html,
-        )
-        self.assertIn(
+        self.assertNotIn(
             "Dation_Logistics_Template.csv",
             self.html,
         )
-        self.assertIn(
-            "/api/datasets/upload",
-            self.data_stage_js,
+        self.assertNotIn(
+            "/static/js/data-stage.js",
+            self.html,
         )
         self.assertIn(
-            "dation:dataset-ready",
-            self.data_stage_js,
+            "mountUploadScreen",
+            workspace,
+        )
+        self.assertNotIn(
+            "Usar formato anterior",
+            workspace,
+        )
+        self.assertIn(
+            "/api/datasets/validate",
+            upload_index,
+        )
+        self.assertIn(
+            "/api/dispatch/contracts",
+            upload_index,
+        )
+        self.assertIn(
+            "Activación pendiente",
+            system_banner,
         )
 
 
