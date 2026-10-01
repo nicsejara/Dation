@@ -1,0 +1,1001 @@
+order_id;product;quantity_units;unit_weight_kg;origin;destination;distance_km;priority;max_delivery_days;dispatch_date;current_vehicle_type
+B-00001;C;11;1400;Buenos Aires;Mendoza;1050;Normal;2;2026-10-09;Truck_S
+B-00002;A;37;500;Cordoba;Villa Maria;150;Low;4;2026-10-10;Truck_M
+B-00003;A;42;500;Buenos Aires;La Plata;60;Normal;3;2026-10-05;Truck_M
+B-00004;A;18;500;Cordoba;Tucuman;570;Normal;2;2026-10-06;Truck_L
+B-00005;A;43;500;Cordoba;San Luis;420;High;1;2026-10-05;Truck_S
+B-00006;A;29;500;Buenos Aires;Rio Cuarto;610;High;1;2026-10-02;Truck_M
+B-00007;C;28;1400;Buenos Aires;Mar del Plata;415;High;1;2026-10-10;Truck_S
+B-00008;A;10;500;Cordoba;Santa Fe;350;High;1;2026-10-04;Truck_M
+B-00009;A;18;500;Rosario;San Luis;585;Normal;3;2026-10-05;Truck_M
+B-00010;C;39;1400;Buenos Aires;Rio Cuarto;610;Normal;2;2026-10-04;Truck_L
+B-00011;A;8;500;Rosario;La Plata;330;Normal;3;2026-10-04;Truck_M
+B-00012;A;18;500;Rosario;Mendoza;760;Low;5;2026-10-08;Truck_L
+B-00013;B;20;900;Buenos Aires;Bahia Blanca;640;Low;4;2026-10-09;Truck_L
+B-00014;C;30;1400;Buenos Aires;Tucuman;1200;High;1;2026-10-06;Truck_S
+B-00015;A;12;500;Cordoba;La Plata;730;Normal;2;2026-10-03;Truck_L
+B-00016;C;29;1400;Buenos Aires;Tucuman;1200;Normal;3;2026-10-10;Truck_S
+B-00017;B;48;900;Buenos Aires;Villa Maria;555;Normal;2;2026-10-09;Truck_M
+B-00018;B;34;900;Rosario;Rio Cuarto;410;Normal;2;2026-10-01;Truck_L
+B-00019;C;37;1400;Rosario;La Plata;330;High;1;2026-10-02;Truck_L
+B-00020;C;28;1400;Buenos Aires;La Plata;60;Normal;2;2026-10-03;Truck_S
+B-00021;C;6;1400;Buenos Aires;Villa Maria;555;Normal;3;2026-10-02;Truck_L
+B-00022;B;10;900;Rosario;Santa Fe;170;Low;4;2026-10-08;Truck_L
+B-00023;A;40;500;Buenos Aires;San Francisco;575;Low;5;2026-10-03;Truck_L
+B-00024;B;39;900;Buenos Aires;Tucuman;1200;High;1;2026-10-04;Truck_M
+B-00025;C;12;1400;Buenos Aires;San Luis;790;Normal;3;2026-10-04;Truck_M
+B-00026;A;5;500;Cordoba;Mar del Plata;1050;Normal;2;2026-10-02;Truck_S
+B-00027;C;26;1400;Cordoba;Rio Cuarto;220;High;1;2026-10-02;Truck_M
+B-00028;C;41;1400;Buenos Aires;Bahia Blanca;640;Normal;2;2026-10-10;Truck_S
+B-00029;B;47;900;Rosario;Tucuman;810;Normal;2;2026-10-07;Truck_S
+B-00030;B;8;900;Rosario;Villa Maria;255;Normal;2;2026-10-07;Truck_M
+B-00031;C;13;1400;Cordoba;Santa Fe;350;Normal;3;2026-10-07;Truck_M
+B-00032;A;8;500;Cordoba;Rio Cuarto;220;Normal;2;2026-10-09;Truck_S
+B-00033;A;18;500;Cordoba;San Francisco;205;Normal;3;2026-10-07;Truck_L
+B-00034;A;23;500;Cordoba;Tucuman;570;Normal;3;2026-10-07;Truck_S
+B-00035;C;18;1400;Buenos Aires;Bahia Blanca;640;Normal;3;2026-10-01;Truck_L
+B-00036;C;37;1400;Cordoba;San Luis;420;Low;5;2026-10-09;Truck_M
+B-00037;A;9;500;Buenos Aires;Rio Cuarto;610;High;1;2026-10-10;Truck_S
+B-00038;A;42;500;Cordoba;Tucuman;570;Low;4;2026-10-10;Truck_M
+B-00039;A;21;500;Rosario;Mar del Plata;700;Normal;3;2026-10-04;Truck_M
+B-00040;C;34;1400;Cordoba;Mendoza;650;Normal;3;2026-10-06;Truck_M
+B-00041;A;9;500;Buenos Aires;Mar del Plata;415;High;1;2026-10-09;Truck_S
+B-00042;A;20;500;Cordoba;San Luis;420;High;1;2026-10-06;Truck_M
+B-00043;B;47;900;Buenos Aires;Mendoza;1050;Normal;2;2026-10-09;Truck_S
+B-00044;B;40;900;Cordoba;San Francisco;205;Normal;2;2026-10-03;Truck_L
+B-00045;B;37;900;Cordoba;San Luis;420;Normal;3;2026-10-08;Truck_S
+B-00046;B;7;900;Cordoba;Rio Cuarto;220;Normal;3;2026-10-01;Truck_L
+B-00047;B;40;900;Buenos Aires;Mendoza;1050;Normal;3;2026-10-07;Truck_L
+B-00048;C;42;1400;Cordoba;San Francisco;205;Normal;3;2026-10-09;Truck_S
+B-00049;A;27;500;Cordoba;Mendoza;650;Normal;2;2026-10-04;Truck_M
+B-00050;C;31;1400;Cordoba;San Luis;420;High;1;2026-10-10;Truck_S
+B-00051;C;16;1400;Cordoba;San Francisco;205;High;1;2026-10-07;Truck_S
+B-00052;A;20;500;Rosario;Tucuman;810;High;1;2026-10-05;Truck_S
+B-00053;A;35;500;Cordoba;Tucuman;570;High;1;2026-10-04;Truck_L
+B-00054;A;19;500;Rosario;San Luis;585;Normal;2;2026-10-01;Truck_L
+B-00055;C;22;1400;Rosario;Mendoza;760;High;1;2026-10-06;Truck_S
+B-00056;C;12;1400;Buenos Aires;La Plata;60;Normal;2;2026-10-05;Truck_M
+B-00057;A;27;500;Rosario;Villa Maria;255;Low;5;2026-10-06;Truck_M
+B-00058;B;21;900;Buenos Aires;Rio Cuarto;610;Normal;2;2026-10-01;Truck_M
+B-00059;C;28;1400;Buenos Aires;La Plata;60;Normal;2;2026-10-07;Truck_M
+B-00060;A;24;500;Rosario;Mar del Plata;700;Normal;2;2026-10-09;Truck_L
+B-00061;B;17;900;Rosario;Tucuman;810;Normal;2;2026-10-07;Truck_M
+B-00062;C;30;1400;Buenos Aires;San Francisco;575;Normal;3;2026-10-09;Truck_L
+B-00063;A;43;500;Cordoba;Tucuman;570;High;1;2026-10-06;Truck_M
+B-00064;B;47;900;Buenos Aires;Santa Fe;475;Normal;2;2026-10-02;Truck_M
+B-00065;B;48;900;Buenos Aires;Mar del Plata;415;Normal;2;2026-10-05;Truck_M
+B-00066;A;44;500;Cordoba;Villa Maria;150;Low;5;2026-10-02;Truck_L
+B-00067;B;36;900;Buenos Aires;Mar del Plata;415;Normal;3;2026-10-07;Truck_M
+B-00068;A;11;500;Buenos Aires;Villa Maria;555;High;1;2026-10-07;Truck_S
+B-00069;A;12;500;Buenos Aires;La Plata;60;Normal;2;2026-10-08;Truck_S
+B-00070;A;43;500;Buenos Aires;La Plata;60;High;1;2026-10-06;Truck_L
+B-00071;B;15;900;Buenos Aires;La Plata;60;Normal;3;2026-10-08;Truck_M
+B-00072;B;38;900;Cordoba;Mendoza;650;High;1;2026-10-08;Truck_S
+B-00073;C;22;1400;Rosario;Rio Cuarto;410;Normal;2;2026-10-06;Truck_S
+B-00074;B;49;900;Cordoba;San Francisco;205;Normal;3;2026-10-03;Truck_L
+B-00075;C;31;1400;Rosario;Tucuman;810;Normal;3;2026-10-01;Truck_S
+B-00076;A;6;500;Rosario;Mar del Plata;700;High;1;2026-10-10;Truck_L
+B-00077;B;31;900;Rosario;Mendoza;760;High;1;2026-10-09;Truck_M
+B-00078;C;32;1400;Buenos Aires;Santa Fe;475;Normal;3;2026-10-08;Truck_M
+B-00079;A;13;500;Buenos Aires;Tucuman;1200;Normal;3;2026-10-10;Truck_M
+B-00080;C;10;1400;Rosario;Mar del Plata;700;Normal;2;2026-10-07;Truck_S
+B-00081;A;18;500;Cordoba;Villa Maria;150;Normal;3;2026-10-08;Truck_L
+B-00082;B;31;900;Rosario;Mendoza;760;High;1;2026-10-05;Truck_M
+B-00083;A;19;500;Buenos Aires;La Plata;60;Low;5;2026-10-02;Truck_M
+B-00084;C;44;1400;Cordoba;Santa Fe;350;Normal;2;2026-10-03;Truck_S
+B-00085;A;34;500;Buenos Aires;Rio Cuarto;610;Normal;2;2026-10-05;Truck_S
+B-00086;B;15;900;Buenos Aires;Rio Cuarto;610;High;1;2026-10-05;Truck_S
+B-00087;A;30;500;Rosario;Mar del Plata;700;Normal;3;2026-10-04;Truck_M
+B-00088;A;48;500;Buenos Aires;Santa Fe;475;Low;5;2026-10-10;Truck_M
+B-00089;A;47;500;Buenos Aires;Villa Maria;555;Normal;3;2026-10-06;Truck_L
+B-00090;A;36;500;Rosario;Villa Maria;255;High;1;2026-10-02;Truck_M
+B-00091;B;16;900;Buenos Aires;Bahia Blanca;640;Normal;3;2026-10-09;Truck_L
+B-00092;C;25;1400;Buenos Aires;Bahia Blanca;640;Normal;3;2026-10-04;Truck_S
+B-00093;A;41;500;Rosario;Santa Fe;170;High;1;2026-10-10;Truck_S
+B-00094;C;16;1400;Cordoba;Bahia Blanca;825;High;1;2026-10-08;Truck_M
+B-00095;A;40;500;Rosario;San Luis;585;Normal;3;2026-10-01;Truck_M
+B-00096;C;40;1400;Cordoba;Santa Fe;350;Normal;3;2026-10-04;Truck_L
+B-00097;C;10;1400;Buenos Aires;Bahia Blanca;640;Normal;2;2026-10-05;Truck_M
+B-00098;A;35;500;Cordoba;Mendoza;650;Normal;3;2026-10-09;Truck_M
+B-00099;C;22;1400;Buenos Aires;La Plata;60;Normal;3;2026-10-05;Truck_M
+B-00100;B;17;900;Buenos Aires;Santa Fe;475;Normal;2;2026-10-04;Truck_S
+B-00101;C;11;1400;Buenos Aires;Mendoza;1050;Normal;2;2026-10-09;Truck_S
+B-00102;A;37;500;Cordoba;Villa Maria;150;Low;4;2026-10-10;Truck_M
+B-00103;A;42;500;Buenos Aires;La Plata;60;Normal;3;2026-10-05;Truck_M
+B-00104;A;18;500;Cordoba;Tucuman;570;Normal;2;2026-10-06;Truck_L
+B-00105;A;43;500;Cordoba;San Luis;420;High;1;2026-10-05;Truck_S
+B-00106;A;29;500;Buenos Aires;Rio Cuarto;610;High;1;2026-10-02;Truck_M
+B-00107;C;28;1400;Buenos Aires;Mar del Plata;415;High;1;2026-10-10;Truck_S
+B-00108;A;10;500;Cordoba;Santa Fe;350;High;1;2026-10-04;Truck_M
+B-00109;A;18;500;Rosario;San Luis;585;Normal;3;2026-10-05;Truck_M
+B-00110;C;39;1400;Buenos Aires;Rio Cuarto;610;Normal;2;2026-10-04;Truck_L
+B-00111;A;8;500;Rosario;La Plata;330;Normal;3;2026-10-04;Truck_M
+B-00112;A;18;500;Rosario;Mendoza;760;Low;5;2026-10-08;Truck_L
+B-00113;B;20;900;Buenos Aires;Bahia Blanca;640;Low;4;2026-10-09;Truck_L
+B-00114;C;30;1400;Buenos Aires;Tucuman;1200;High;1;2026-10-06;Truck_S
+B-00115;A;12;500;Cordoba;La Plata;730;Normal;2;2026-10-03;Truck_L
+B-00116;C;29;1400;Buenos Aires;Tucuman;1200;Normal;3;2026-10-10;Truck_S
+B-00117;B;48;900;Buenos Aires;Villa Maria;555;Normal;2;2026-10-09;Truck_M
+B-00118;B;34;900;Rosario;Rio Cuarto;410;Normal;2;2026-10-01;Truck_L
+B-00119;C;37;1400;Rosario;La Plata;330;High;1;2026-10-02;Truck_L
+B-00120;C;28;1400;Buenos Aires;La Plata;60;Normal;2;2026-10-03;Truck_S
+B-00121;C;6;1400;Buenos Aires;Villa Maria;555;Normal;3;2026-10-02;Truck_L
+B-00122;B;10;900;Rosario;Santa Fe;170;Low;4;2026-10-08;Truck_L
+B-00123;A;40;500;Buenos Aires;San Francisco;575;Low;5;2026-10-03;Truck_L
+B-00124;B;39;900;Buenos Aires;Tucuman;1200;High;1;2026-10-04;Truck_M
+B-00125;C;12;1400;Buenos Aires;San Luis;790;Normal;3;2026-10-04;Truck_M
+B-00126;A;5;500;Cordoba;Mar del Plata;1050;Normal;2;2026-10-02;Truck_S
+B-00127;C;26;1400;Cordoba;Rio Cuarto;220;High;1;2026-10-02;Truck_M
+B-00128;C;41;1400;Buenos Aires;Bahia Blanca;640;Normal;2;2026-10-10;Truck_S
+B-00129;B;47;900;Rosario;Tucuman;810;Normal;2;2026-10-07;Truck_S
+B-00130;B;8;900;Rosario;Villa Maria;255;Normal;2;2026-10-07;Truck_M
+B-00131;C;13;1400;Cordoba;Santa Fe;350;Normal;3;2026-10-07;Truck_M
+B-00132;A;8;500;Cordoba;Rio Cuarto;220;Normal;2;2026-10-09;Truck_S
+B-00133;A;18;500;Cordoba;San Francisco;205;Normal;3;2026-10-07;Truck_L
+B-00134;A;23;500;Cordoba;Tucuman;570;Normal;3;2026-10-07;Truck_S
+B-00135;C;18;1400;Buenos Aires;Bahia Blanca;640;Normal;3;2026-10-01;Truck_L
+B-00136;C;37;1400;Cordoba;San Luis;420;Low;5;2026-10-09;Truck_M
+B-00137;A;9;500;Buenos Aires;Rio Cuarto;610;High;1;2026-10-10;Truck_S
+B-00138;A;42;500;Cordoba;Tucuman;570;Low;4;2026-10-10;Truck_M
+B-00139;A;21;500;Rosario;Mar del Plata;700;Normal;3;2026-10-04;Truck_M
+B-00140;C;34;1400;Cordoba;Mendoza;650;Normal;3;2026-10-06;Truck_M
+B-00141;A;9;500;Buenos Aires;Mar del Plata;415;High;1;2026-10-09;Truck_S
+B-00142;A;20;500;Cordoba;San Luis;420;High;1;2026-10-06;Truck_M
+B-00143;B;47;900;Buenos Aires;Mendoza;1050;Normal;2;2026-10-09;Truck_S
+B-00144;B;40;900;Cordoba;San Francisco;205;Normal;2;2026-10-03;Truck_L
+B-00145;B;37;900;Cordoba;San Luis;420;Normal;3;2026-10-08;Truck_S
+B-00146;B;7;900;Cordoba;Rio Cuarto;220;Normal;3;2026-10-01;Truck_L
+B-00147;B;40;900;Buenos Aires;Mendoza;1050;Normal;3;2026-10-07;Truck_L
+B-00148;C;42;1400;Cordoba;San Francisco;205;Normal;3;2026-10-09;Truck_S
+B-00149;A;27;500;Cordoba;Mendoza;650;Normal;2;2026-10-04;Truck_M
+B-00150;C;31;1400;Cordoba;San Luis;420;High;1;2026-10-10;Truck_S
+B-00151;C;16;1400;Cordoba;San Francisco;205;High;1;2026-10-07;Truck_S
+B-00152;A;20;500;Rosario;Tucuman;810;High;1;2026-10-05;Truck_S
+B-00153;A;35;500;Cordoba;Tucuman;570;High;1;2026-10-04;Truck_L
+B-00154;A;19;500;Rosario;San Luis;585;Normal;2;2026-10-01;Truck_L
+B-00155;C;22;1400;Rosario;Mendoza;760;High;1;2026-10-06;Truck_S
+B-00156;C;12;1400;Buenos Aires;La Plata;60;Normal;2;2026-10-05;Truck_M
+B-00157;A;27;500;Rosario;Villa Maria;255;Low;5;2026-10-06;Truck_M
+B-00158;B;21;900;Buenos Aires;Rio Cuarto;610;Normal;2;2026-10-01;Truck_M
+B-00159;C;28;1400;Buenos Aires;La Plata;60;Normal;2;2026-10-07;Truck_M
+B-00160;A;24;500;Rosario;Mar del Plata;700;Normal;2;2026-10-09;Truck_L
+B-00161;B;17;900;Rosario;Tucuman;810;Normal;2;2026-10-07;Truck_M
+B-00162;C;30;1400;Buenos Aires;San Francisco;575;Normal;3;2026-10-09;Truck_L
+B-00163;A;43;500;Cordoba;Tucuman;570;High;1;2026-10-06;Truck_M
+B-00164;B;47;900;Buenos Aires;Santa Fe;475;Normal;2;2026-10-02;Truck_M
+B-00165;B;48;900;Buenos Aires;Mar del Plata;415;Normal;2;2026-10-05;Truck_M
+B-00166;A;44;500;Cordoba;Villa Maria;150;Low;5;2026-10-02;Truck_L
+B-00167;B;36;900;Buenos Aires;Mar del Plata;415;Normal;3;2026-10-07;Truck_M
+B-00168;A;11;500;Buenos Aires;Villa Maria;555;High;1;2026-10-07;Truck_S
+B-00169;A;12;500;Buenos Aires;La Plata;60;Normal;2;2026-10-08;Truck_S
+B-00170;A;43;500;Buenos Aires;La Plata;60;High;1;2026-10-06;Truck_L
+B-00171;B;15;900;Buenos Aires;La Plata;60;Normal;3;2026-10-08;Truck_M
+B-00172;B;38;900;Cordoba;Mendoza;650;High;1;2026-10-08;Truck_S
+B-00173;C;22;1400;Rosario;Rio Cuarto;410;Normal;2;2026-10-06;Truck_S
+B-00174;B;49;900;Cordoba;San Francisco;205;Normal;3;2026-10-03;Truck_L
+B-00175;C;31;1400;Rosario;Tucuman;810;Normal;3;2026-10-01;Truck_S
+B-00176;A;6;500;Rosario;Mar del Plata;700;High;1;2026-10-10;Truck_L
+B-00177;B;31;900;Rosario;Mendoza;760;High;1;2026-10-09;Truck_M
+B-00178;C;32;1400;Buenos Aires;Santa Fe;475;Normal;3;2026-10-08;Truck_M
+B-00179;A;13;500;Buenos Aires;Tucuman;1200;Normal;3;2026-10-10;Truck_M
+B-00180;C;10;1400;Rosario;Mar del Plata;700;Normal;2;2026-10-07;Truck_S
+B-00181;A;18;500;Cordoba;Villa Maria;150;Normal;3;2026-10-08;Truck_L
+B-00182;B;31;900;Rosario;Mendoza;760;High;1;2026-10-05;Truck_M
+B-00183;A;19;500;Buenos Aires;La Plata;60;Low;5;2026-10-02;Truck_M
+B-00184;C;44;1400;Cordoba;Santa Fe;350;Normal;2;2026-10-03;Truck_S
+B-00185;A;34;500;Buenos Aires;Rio Cuarto;610;Normal;2;2026-10-05;Truck_S
+B-00186;B;15;900;Buenos Aires;Rio Cuarto;610;High;1;2026-10-05;Truck_S
+B-00187;A;30;500;Rosario;Mar del Plata;700;Normal;3;2026-10-04;Truck_M
+B-00188;A;48;500;Buenos Aires;Santa Fe;475;Low;5;2026-10-10;Truck_M
+B-00189;A;47;500;Buenos Aires;Villa Maria;555;Normal;3;2026-10-06;Truck_L
+B-00190;A;36;500;Rosario;Villa Maria;255;High;1;2026-10-02;Truck_M
+B-00191;B;16;900;Buenos Aires;Bahia Blanca;640;Normal;3;2026-10-09;Truck_L
+B-00192;C;25;1400;Buenos Aires;Bahia Blanca;640;Normal;3;2026-10-04;Truck_S
+B-00193;A;41;500;Rosario;Santa Fe;170;High;1;2026-10-10;Truck_S
+B-00194;C;16;1400;Cordoba;Bahia Blanca;825;High;1;2026-10-08;Truck_M
+B-00195;A;40;500;Rosario;San Luis;585;Normal;3;2026-10-01;Truck_M
+B-00196;C;40;1400;Cordoba;Santa Fe;350;Normal;3;2026-10-04;Truck_L
+B-00197;C;10;1400;Buenos Aires;Bahia Blanca;640;Normal;2;2026-10-05;Truck_M
+B-00198;A;35;500;Cordoba;Mendoza;650;Normal;3;2026-10-09;Truck_M
+B-00199;C;22;1400;Buenos Aires;La Plata;60;Normal;3;2026-10-05;Truck_M
+B-00200;B;17;900;Buenos Aires;Santa Fe;475;Normal;2;2026-10-04;Truck_S
+B-00201;C;11;1400;Buenos Aires;Mendoza;1050;Normal;2;2026-10-09;Truck_S
+B-00202;A;37;500;Cordoba;Villa Maria;150;Low;4;2026-10-10;Truck_M
+B-00203;A;42;500;Buenos Aires;La Plata;60;Normal;3;2026-10-05;Truck_M
+B-00204;A;18;500;Cordoba;Tucuman;570;Normal;2;2026-10-06;Truck_L
+B-00205;A;43;500;Cordoba;San Luis;420;High;1;2026-10-05;Truck_S
+B-00206;A;29;500;Buenos Aires;Rio Cuarto;610;High;1;2026-10-02;Truck_M
+B-00207;C;28;1400;Buenos Aires;Mar del Plata;415;High;1;2026-10-10;Truck_S
+B-00208;A;10;500;Cordoba;Santa Fe;350;High;1;2026-10-04;Truck_M
+B-00209;A;18;500;Rosario;San Luis;585;Normal;3;2026-10-05;Truck_M
+B-00210;C;39;1400;Buenos Aires;Rio Cuarto;610;Normal;2;2026-10-04;Truck_L
+B-00211;A;8;500;Rosario;La Plata;330;Normal;3;2026-10-04;Truck_M
+B-00212;A;18;500;Rosario;Mendoza;760;Low;5;2026-10-08;Truck_L
+B-00213;B;20;900;Buenos Aires;Bahia Blanca;640;Low;4;2026-10-09;Truck_L
+B-00214;C;30;1400;Buenos Aires;Tucuman;1200;High;1;2026-10-06;Truck_S
+B-00215;A;12;500;Cordoba;La Plata;730;Normal;2;2026-10-03;Truck_L
+B-00216;C;29;1400;Buenos Aires;Tucuman;1200;Normal;3;2026-10-10;Truck_S
+B-00217;B;48;900;Buenos Aires;Villa Maria;555;Normal;2;2026-10-09;Truck_M
+B-00218;B;34;900;Rosario;Rio Cuarto;410;Normal;2;2026-10-01;Truck_L
+B-00219;C;37;1400;Rosario;La Plata;330;High;1;2026-10-02;Truck_L
+B-00220;C;28;1400;Buenos Aires;La Plata;60;Normal;2;2026-10-03;Truck_S
+B-00221;C;6;1400;Buenos Aires;Villa Maria;555;Normal;3;2026-10-02;Truck_L
+B-00222;B;10;900;Rosario;Santa Fe;170;Low;4;2026-10-08;Truck_L
+B-00223;A;40;500;Buenos Aires;San Francisco;575;Low;5;2026-10-03;Truck_L
+B-00224;B;39;900;Buenos Aires;Tucuman;1200;High;1;2026-10-04;Truck_M
+B-00225;C;12;1400;Buenos Aires;San Luis;790;Normal;3;2026-10-04;Truck_M
+B-00226;A;5;500;Cordoba;Mar del Plata;1050;Normal;2;2026-10-02;Truck_S
+B-00227;C;26;1400;Cordoba;Rio Cuarto;220;High;1;2026-10-02;Truck_M
+B-00228;C;41;1400;Buenos Aires;Bahia Blanca;640;Normal;2;2026-10-10;Truck_S
+B-00229;B;47;900;Rosario;Tucuman;810;Normal;2;2026-10-07;Truck_S
+B-00230;B;8;900;Rosario;Villa Maria;255;Normal;2;2026-10-07;Truck_M
+B-00231;C;13;1400;Cordoba;Santa Fe;350;Normal;3;2026-10-07;Truck_M
+B-00232;A;8;500;Cordoba;Rio Cuarto;220;Normal;2;2026-10-09;Truck_S
+B-00233;A;18;500;Cordoba;San Francisco;205;Normal;3;2026-10-07;Truck_L
+B-00234;A;23;500;Cordoba;Tucuman;570;Normal;3;2026-10-07;Truck_S
+B-00235;C;18;1400;Buenos Aires;Bahia Blanca;640;Normal;3;2026-10-01;Truck_L
+B-00236;C;37;1400;Cordoba;San Luis;420;Low;5;2026-10-09;Truck_M
+B-00237;A;9;500;Buenos Aires;Rio Cuarto;610;High;1;2026-10-10;Truck_S
+B-00238;A;42;500;Cordoba;Tucuman;570;Low;4;2026-10-10;Truck_M
+B-00239;A;21;500;Rosario;Mar del Plata;700;Normal;3;2026-10-04;Truck_M
+B-00240;C;34;1400;Cordoba;Mendoza;650;Normal;3;2026-10-06;Truck_M
+B-00241;A;9;500;Buenos Aires;Mar del Plata;415;High;1;2026-10-09;Truck_S
+B-00242;A;20;500;Cordoba;San Luis;420;High;1;2026-10-06;Truck_M
+B-00243;B;47;900;Buenos Aires;Mendoza;1050;Normal;2;2026-10-09;Truck_S
+B-00244;B;40;900;Cordoba;San Francisco;205;Normal;2;2026-10-03;Truck_L
+B-00245;B;37;900;Cordoba;San Luis;420;Normal;3;2026-10-08;Truck_S
+B-00246;B;7;900;Cordoba;Rio Cuarto;220;Normal;3;2026-10-01;Truck_L
+B-00247;B;40;900;Buenos Aires;Mendoza;1050;Normal;3;2026-10-07;Truck_L
+B-00248;C;42;1400;Cordoba;San Francisco;205;Normal;3;2026-10-09;Truck_S
+B-00249;A;27;500;Cordoba;Mendoza;650;Normal;2;2026-10-04;Truck_M
+B-00250;C;31;1400;Cordoba;San Luis;420;High;1;2026-10-10;Truck_S
+B-00251;C;16;1400;Cordoba;San Francisco;205;High;1;2026-10-07;Truck_S
+B-00252;A;20;500;Rosario;Tucuman;810;High;1;2026-10-05;Truck_S
+B-00253;A;35;500;Cordoba;Tucuman;570;High;1;2026-10-04;Truck_L
+B-00254;A;19;500;Rosario;San Luis;585;Normal;2;2026-10-01;Truck_L
+B-00255;C;22;1400;Rosario;Mendoza;760;High;1;2026-10-06;Truck_S
+B-00256;C;12;1400;Buenos Aires;La Plata;60;Normal;2;2026-10-05;Truck_M
+B-00257;A;27;500;Rosario;Villa Maria;255;Low;5;2026-10-06;Truck_M
+B-00258;B;21;900;Buenos Aires;Rio Cuarto;610;Normal;2;2026-10-01;Truck_M
+B-00259;C;28;1400;Buenos Aires;La Plata;60;Normal;2;2026-10-07;Truck_M
+B-00260;A;24;500;Rosario;Mar del Plata;700;Normal;2;2026-10-09;Truck_L
+B-00261;B;17;900;Rosario;Tucuman;810;Normal;2;2026-10-07;Truck_M
+B-00262;C;30;1400;Buenos Aires;San Francisco;575;Normal;3;2026-10-09;Truck_L
+B-00263;A;43;500;Cordoba;Tucuman;570;High;1;2026-10-06;Truck_M
+B-00264;B;47;900;Buenos Aires;Santa Fe;475;Normal;2;2026-10-02;Truck_M
+B-00265;B;48;900;Buenos Aires;Mar del Plata;415;Normal;2;2026-10-05;Truck_M
+B-00266;A;44;500;Cordoba;Villa Maria;150;Low;5;2026-10-02;Truck_L
+B-00267;B;36;900;Buenos Aires;Mar del Plata;415;Normal;3;2026-10-07;Truck_M
+B-00268;A;11;500;Buenos Aires;Villa Maria;555;High;1;2026-10-07;Truck_S
+B-00269;A;12;500;Buenos Aires;La Plata;60;Normal;2;2026-10-08;Truck_S
+B-00270;A;43;500;Buenos Aires;La Plata;60;High;1;2026-10-06;Truck_L
+B-00271;B;15;900;Buenos Aires;La Plata;60;Normal;3;2026-10-08;Truck_M
+B-00272;B;38;900;Cordoba;Mendoza;650;High;1;2026-10-08;Truck_S
+B-00273;C;22;1400;Rosario;Rio Cuarto;410;Normal;2;2026-10-06;Truck_S
+B-00274;B;49;900;Cordoba;San Francisco;205;Normal;3;2026-10-03;Truck_L
+B-00275;C;31;1400;Rosario;Tucuman;810;Normal;3;2026-10-01;Truck_S
+B-00276;A;6;500;Rosario;Mar del Plata;700;High;1;2026-10-10;Truck_L
+B-00277;B;31;900;Rosario;Mendoza;760;High;1;2026-10-09;Truck_M
+B-00278;C;32;1400;Buenos Aires;Santa Fe;475;Normal;3;2026-10-08;Truck_M
+B-00279;A;13;500;Buenos Aires;Tucuman;1200;Normal;3;2026-10-10;Truck_M
+B-00280;C;10;1400;Rosario;Mar del Plata;700;Normal;2;2026-10-07;Truck_S
+B-00281;A;18;500;Cordoba;Villa Maria;150;Normal;3;2026-10-08;Truck_L
+B-00282;B;31;900;Rosario;Mendoza;760;High;1;2026-10-05;Truck_M
+B-00283;A;19;500;Buenos Aires;La Plata;60;Low;5;2026-10-02;Truck_M
+B-00284;C;44;1400;Cordoba;Santa Fe;350;Normal;2;2026-10-03;Truck_S
+B-00285;A;34;500;Buenos Aires;Rio Cuarto;610;Normal;2;2026-10-05;Truck_S
+B-00286;B;15;900;Buenos Aires;Rio Cuarto;610;High;1;2026-10-05;Truck_S
+B-00287;A;30;500;Rosario;Mar del Plata;700;Normal;3;2026-10-04;Truck_M
+B-00288;A;48;500;Buenos Aires;Santa Fe;475;Low;5;2026-10-10;Truck_M
+B-00289;A;47;500;Buenos Aires;Villa Maria;555;Normal;3;2026-10-06;Truck_L
+B-00290;A;36;500;Rosario;Villa Maria;255;High;1;2026-10-02;Truck_M
+B-00291;B;16;900;Buenos Aires;Bahia Blanca;640;Normal;3;2026-10-09;Truck_L
+B-00292;C;25;1400;Buenos Aires;Bahia Blanca;640;Normal;3;2026-10-04;Truck_S
+B-00293;A;41;500;Rosario;Santa Fe;170;High;1;2026-10-10;Truck_S
+B-00294;C;16;1400;Cordoba;Bahia Blanca;825;High;1;2026-10-08;Truck_M
+B-00295;A;40;500;Rosario;San Luis;585;Normal;3;2026-10-01;Truck_M
+B-00296;C;40;1400;Cordoba;Santa Fe;350;Normal;3;2026-10-04;Truck_L
+B-00297;C;10;1400;Buenos Aires;Bahia Blanca;640;Normal;2;2026-10-05;Truck_M
+B-00298;A;35;500;Cordoba;Mendoza;650;Normal;3;2026-10-09;Truck_M
+B-00299;C;22;1400;Buenos Aires;La Plata;60;Normal;3;2026-10-05;Truck_M
+B-00300;B;17;900;Buenos Aires;Santa Fe;475;Normal;2;2026-10-04;Truck_S
+B-00301;C;11;1400;Buenos Aires;Mendoza;1050;Normal;2;2026-10-09;Truck_S
+B-00302;A;37;500;Cordoba;Villa Maria;150;Low;4;2026-10-10;Truck_M
+B-00303;A;42;500;Buenos Aires;La Plata;60;Normal;3;2026-10-05;Truck_M
+B-00304;A;18;500;Cordoba;Tucuman;570;Normal;2;2026-10-06;Truck_L
+B-00305;A;43;500;Cordoba;San Luis;420;High;1;2026-10-05;Truck_S
+B-00306;A;29;500;Buenos Aires;Rio Cuarto;610;High;1;2026-10-02;Truck_M
+B-00307;C;28;1400;Buenos Aires;Mar del Plata;415;High;1;2026-10-10;Truck_S
+B-00308;A;10;500;Cordoba;Santa Fe;350;High;1;2026-10-04;Truck_M
+B-00309;A;18;500;Rosario;San Luis;585;Normal;3;2026-10-05;Truck_M
+B-00310;C;39;1400;Buenos Aires;Rio Cuarto;610;Normal;2;2026-10-04;Truck_L
+B-00311;A;8;500;Rosario;La Plata;330;Normal;3;2026-10-04;Truck_M
+B-00312;A;18;500;Rosario;Mendoza;760;Low;5;2026-10-08;Truck_L
+B-00313;B;20;900;Buenos Aires;Bahia Blanca;640;Low;4;2026-10-09;Truck_L
+B-00314;C;30;1400;Buenos Aires;Tucuman;1200;High;1;2026-10-06;Truck_S
+B-00315;A;12;500;Cordoba;La Plata;730;Normal;2;2026-10-03;Truck_L
+B-00316;C;29;1400;Buenos Aires;Tucuman;1200;Normal;3;2026-10-10;Truck_S
+B-00317;B;48;900;Buenos Aires;Villa Maria;555;Normal;2;2026-10-09;Truck_M
+B-00318;B;34;900;Rosario;Rio Cuarto;410;Normal;2;2026-10-01;Truck_L
+B-00319;C;37;1400;Rosario;La Plata;330;High;1;2026-10-02;Truck_L
+B-00320;C;28;1400;Buenos Aires;La Plata;60;Normal;2;2026-10-03;Truck_S
+B-00321;C;6;1400;Buenos Aires;Villa Maria;555;Normal;3;2026-10-02;Truck_L
+B-00322;B;10;900;Rosario;Santa Fe;170;Low;4;2026-10-08;Truck_L
+B-00323;A;40;500;Buenos Aires;San Francisco;575;Low;5;2026-10-03;Truck_L
+B-00324;B;39;900;Buenos Aires;Tucuman;1200;High;1;2026-10-04;Truck_M
+B-00325;C;12;1400;Buenos Aires;San Luis;790;Normal;3;2026-10-04;Truck_M
+B-00326;A;5;500;Cordoba;Mar del Plata;1050;Normal;2;2026-10-02;Truck_S
+B-00327;C;26;1400;Cordoba;Rio Cuarto;220;High;1;2026-10-02;Truck_M
+B-00328;C;41;1400;Buenos Aires;Bahia Blanca;640;Normal;2;2026-10-10;Truck_S
+B-00329;B;47;900;Rosario;Tucuman;810;Normal;2;2026-10-07;Truck_S
+B-00330;B;8;900;Rosario;Villa Maria;255;Normal;2;2026-10-07;Truck_M
+B-00331;C;13;1400;Cordoba;Santa Fe;350;Normal;3;2026-10-07;Truck_M
+B-00332;A;8;500;Cordoba;Rio Cuarto;220;Normal;2;2026-10-09;Truck_S
+B-00333;A;18;500;Cordoba;San Francisco;205;Normal;3;2026-10-07;Truck_L
+B-00334;A;23;500;Cordoba;Tucuman;570;Normal;3;2026-10-07;Truck_S
+B-00335;C;18;1400;Buenos Aires;Bahia Blanca;640;Normal;3;2026-10-01;Truck_L
+B-00336;C;37;1400;Cordoba;San Luis;420;Low;5;2026-10-09;Truck_M
+B-00337;A;9;500;Buenos Aires;Rio Cuarto;610;High;1;2026-10-10;Truck_S
+B-00338;A;42;500;Cordoba;Tucuman;570;Low;4;2026-10-10;Truck_M
+B-00339;A;21;500;Rosario;Mar del Plata;700;Normal;3;2026-10-04;Truck_M
+B-00340;C;34;1400;Cordoba;Mendoza;650;Normal;3;2026-10-06;Truck_M
+B-00341;A;9;500;Buenos Aires;Mar del Plata;415;High;1;2026-10-09;Truck_S
+B-00342;A;20;500;Cordoba;San Luis;420;High;1;2026-10-06;Truck_M
+B-00343;B;47;900;Buenos Aires;Mendoza;1050;Normal;2;2026-10-09;Truck_S
+B-00344;B;40;900;Cordoba;San Francisco;205;Normal;2;2026-10-03;Truck_L
+B-00345;B;37;900;Cordoba;San Luis;420;Normal;3;2026-10-08;Truck_S
+B-00346;B;7;900;Cordoba;Rio Cuarto;220;Normal;3;2026-10-01;Truck_L
+B-00347;B;40;900;Buenos Aires;Mendoza;1050;Normal;3;2026-10-07;Truck_L
+B-00348;C;42;1400;Cordoba;San Francisco;205;Normal;3;2026-10-09;Truck_S
+B-00349;A;27;500;Cordoba;Mendoza;650;Normal;2;2026-10-04;Truck_M
+B-00350;C;31;1400;Cordoba;San Luis;420;High;1;2026-10-10;Truck_S
+B-00351;C;16;1400;Cordoba;San Francisco;205;High;1;2026-10-07;Truck_S
+B-00352;A;20;500;Rosario;Tucuman;810;High;1;2026-10-05;Truck_S
+B-00353;A;35;500;Cordoba;Tucuman;570;High;1;2026-10-04;Truck_L
+B-00354;A;19;500;Rosario;San Luis;585;Normal;2;2026-10-01;Truck_L
+B-00355;C;22;1400;Rosario;Mendoza;760;High;1;2026-10-06;Truck_S
+B-00356;C;12;1400;Buenos Aires;La Plata;60;Normal;2;2026-10-05;Truck_M
+B-00357;A;27;500;Rosario;Villa Maria;255;Low;5;2026-10-06;Truck_M
+B-00358;B;21;900;Buenos Aires;Rio Cuarto;610;Normal;2;2026-10-01;Truck_M
+B-00359;C;28;1400;Buenos Aires;La Plata;60;Normal;2;2026-10-07;Truck_M
+B-00360;A;24;500;Rosario;Mar del Plata;700;Normal;2;2026-10-09;Truck_L
+B-00361;B;17;900;Rosario;Tucuman;810;Normal;2;2026-10-07;Truck_M
+B-00362;C;30;1400;Buenos Aires;San Francisco;575;Normal;3;2026-10-09;Truck_L
+B-00363;A;43;500;Cordoba;Tucuman;570;High;1;2026-10-06;Truck_M
+B-00364;B;47;900;Buenos Aires;Santa Fe;475;Normal;2;2026-10-02;Truck_M
+B-00365;B;48;900;Buenos Aires;Mar del Plata;415;Normal;2;2026-10-05;Truck_M
+B-00366;A;44;500;Cordoba;Villa Maria;150;Low;5;2026-10-02;Truck_L
+B-00367;B;36;900;Buenos Aires;Mar del Plata;415;Normal;3;2026-10-07;Truck_M
+B-00368;A;11;500;Buenos Aires;Villa Maria;555;High;1;2026-10-07;Truck_S
+B-00369;A;12;500;Buenos Aires;La Plata;60;Normal;2;2026-10-08;Truck_S
+B-00370;A;43;500;Buenos Aires;La Plata;60;High;1;2026-10-06;Truck_L
+B-00371;B;15;900;Buenos Aires;La Plata;60;Normal;3;2026-10-08;Truck_M
+B-00372;B;38;900;Cordoba;Mendoza;650;High;1;2026-10-08;Truck_S
+B-00373;C;22;1400;Rosario;Rio Cuarto;410;Normal;2;2026-10-06;Truck_S
+B-00374;B;49;900;Cordoba;San Francisco;205;Normal;3;2026-10-03;Truck_L
+B-00375;C;31;1400;Rosario;Tucuman;810;Normal;3;2026-10-01;Truck_S
+B-00376;A;6;500;Rosario;Mar del Plata;700;High;1;2026-10-10;Truck_L
+B-00377;B;31;900;Rosario;Mendoza;760;High;1;2026-10-09;Truck_M
+B-00378;C;32;1400;Buenos Aires;Santa Fe;475;Normal;3;2026-10-08;Truck_M
+B-00379;A;13;500;Buenos Aires;Tucuman;1200;Normal;3;2026-10-10;Truck_M
+B-00380;C;10;1400;Rosario;Mar del Plata;700;Normal;2;2026-10-07;Truck_S
+B-00381;A;18;500;Cordoba;Villa Maria;150;Normal;3;2026-10-08;Truck_L
+B-00382;B;31;900;Rosario;Mendoza;760;High;1;2026-10-05;Truck_M
+B-00383;A;19;500;Buenos Aires;La Plata;60;Low;5;2026-10-02;Truck_M
+B-00384;C;44;1400;Cordoba;Santa Fe;350;Normal;2;2026-10-03;Truck_S
+B-00385;A;34;500;Buenos Aires;Rio Cuarto;610;Normal;2;2026-10-05;Truck_S
+B-00386;B;15;900;Buenos Aires;Rio Cuarto;610;High;1;2026-10-05;Truck_S
+B-00387;A;30;500;Rosario;Mar del Plata;700;Normal;3;2026-10-04;Truck_M
+B-00388;A;48;500;Buenos Aires;Santa Fe;475;Low;5;2026-10-10;Truck_M
+B-00389;A;47;500;Buenos Aires;Villa Maria;555;Normal;3;2026-10-06;Truck_L
+B-00390;A;36;500;Rosario;Villa Maria;255;High;1;2026-10-02;Truck_M
+B-00391;B;16;900;Buenos Aires;Bahia Blanca;640;Normal;3;2026-10-09;Truck_L
+B-00392;C;25;1400;Buenos Aires;Bahia Blanca;640;Normal;3;2026-10-04;Truck_S
+B-00393;A;41;500;Rosario;Santa Fe;170;High;1;2026-10-10;Truck_S
+B-00394;C;16;1400;Cordoba;Bahia Blanca;825;High;1;2026-10-08;Truck_M
+B-00395;A;40;500;Rosario;San Luis;585;Normal;3;2026-10-01;Truck_M
+B-00396;C;40;1400;Cordoba;Santa Fe;350;Normal;3;2026-10-04;Truck_L
+B-00397;C;10;1400;Buenos Aires;Bahia Blanca;640;Normal;2;2026-10-05;Truck_M
+B-00398;A;35;500;Cordoba;Mendoza;650;Normal;3;2026-10-09;Truck_M
+B-00399;C;22;1400;Buenos Aires;La Plata;60;Normal;3;2026-10-05;Truck_M
+B-00400;B;17;900;Buenos Aires;Santa Fe;475;Normal;2;2026-10-04;Truck_S
+B-00401;C;11;1400;Buenos Aires;Mendoza;1050;Normal;2;2026-10-09;Truck_S
+B-00402;A;37;500;Cordoba;Villa Maria;150;Low;4;2026-10-10;Truck_M
+B-00403;A;42;500;Buenos Aires;La Plata;60;Normal;3;2026-10-05;Truck_M
+B-00404;A;18;500;Cordoba;Tucuman;570;Normal;2;2026-10-06;Truck_L
+B-00405;A;43;500;Cordoba;San Luis;420;High;1;2026-10-05;Truck_S
+B-00406;A;29;500;Buenos Aires;Rio Cuarto;610;High;1;2026-10-02;Truck_M
+B-00407;C;28;1400;Buenos Aires;Mar del Plata;415;High;1;2026-10-10;Truck_S
+B-00408;A;10;500;Cordoba;Santa Fe;350;High;1;2026-10-04;Truck_M
+B-00409;A;18;500;Rosario;San Luis;585;Normal;3;2026-10-05;Truck_M
+B-00410;C;39;1400;Buenos Aires;Rio Cuarto;610;Normal;2;2026-10-04;Truck_L
+B-00411;A;8;500;Rosario;La Plata;330;Normal;3;2026-10-04;Truck_M
+B-00412;A;18;500;Rosario;Mendoza;760;Low;5;2026-10-08;Truck_L
+B-00413;B;20;900;Buenos Aires;Bahia Blanca;640;Low;4;2026-10-09;Truck_L
+B-00414;C;30;1400;Buenos Aires;Tucuman;1200;High;1;2026-10-06;Truck_S
+B-00415;A;12;500;Cordoba;La Plata;730;Normal;2;2026-10-03;Truck_L
+B-00416;C;29;1400;Buenos Aires;Tucuman;1200;Normal;3;2026-10-10;Truck_S
+B-00417;B;48;900;Buenos Aires;Villa Maria;555;Normal;2;2026-10-09;Truck_M
+B-00418;B;34;900;Rosario;Rio Cuarto;410;Normal;2;2026-10-01;Truck_L
+B-00419;C;37;1400;Rosario;La Plata;330;High;1;2026-10-02;Truck_L
+B-00420;C;28;1400;Buenos Aires;La Plata;60;Normal;2;2026-10-03;Truck_S
+B-00421;C;6;1400;Buenos Aires;Villa Maria;555;Normal;3;2026-10-02;Truck_L
+B-00422;B;10;900;Rosario;Santa Fe;170;Low;4;2026-10-08;Truck_L
+B-00423;A;40;500;Buenos Aires;San Francisco;575;Low;5;2026-10-03;Truck_L
+B-00424;B;39;900;Buenos Aires;Tucuman;1200;High;1;2026-10-04;Truck_M
+B-00425;C;12;1400;Buenos Aires;San Luis;790;Normal;3;2026-10-04;Truck_M
+B-00426;A;5;500;Cordoba;Mar del Plata;1050;Normal;2;2026-10-02;Truck_S
+B-00427;C;26;1400;Cordoba;Rio Cuarto;220;High;1;2026-10-02;Truck_M
+B-00428;C;41;1400;Buenos Aires;Bahia Blanca;640;Normal;2;2026-10-10;Truck_S
+B-00429;B;47;900;Rosario;Tucuman;810;Normal;2;2026-10-07;Truck_S
+B-00430;B;8;900;Rosario;Villa Maria;255;Normal;2;2026-10-07;Truck_M
+B-00431;C;13;1400;Cordoba;Santa Fe;350;Normal;3;2026-10-07;Truck_M
+B-00432;A;8;500;Cordoba;Rio Cuarto;220;Normal;2;2026-10-09;Truck_S
+B-00433;A;18;500;Cordoba;San Francisco;205;Normal;3;2026-10-07;Truck_L
+B-00434;A;23;500;Cordoba;Tucuman;570;Normal;3;2026-10-07;Truck_S
+B-00435;C;18;1400;Buenos Aires;Bahia Blanca;640;Normal;3;2026-10-01;Truck_L
+B-00436;C;37;1400;Cordoba;San Luis;420;Low;5;2026-10-09;Truck_M
+B-00437;A;9;500;Buenos Aires;Rio Cuarto;610;High;1;2026-10-10;Truck_S
+B-00438;A;42;500;Cordoba;Tucuman;570;Low;4;2026-10-10;Truck_M
+B-00439;A;21;500;Rosario;Mar del Plata;700;Normal;3;2026-10-04;Truck_M
+B-00440;C;34;1400;Cordoba;Mendoza;650;Normal;3;2026-10-06;Truck_M
+B-00441;A;9;500;Buenos Aires;Mar del Plata;415;High;1;2026-10-09;Truck_S
+B-00442;A;20;500;Cordoba;San Luis;420;High;1;2026-10-06;Truck_M
+B-00443;B;47;900;Buenos Aires;Mendoza;1050;Normal;2;2026-10-09;Truck_S
+B-00444;B;40;900;Cordoba;San Francisco;205;Normal;2;2026-10-03;Truck_L
+B-00445;B;37;900;Cordoba;San Luis;420;Normal;3;2026-10-08;Truck_S
+B-00446;B;7;900;Cordoba;Rio Cuarto;220;Normal;3;2026-10-01;Truck_L
+B-00447;B;40;900;Buenos Aires;Mendoza;1050;Normal;3;2026-10-07;Truck_L
+B-00448;C;42;1400;Cordoba;San Francisco;205;Normal;3;2026-10-09;Truck_S
+B-00449;A;27;500;Cordoba;Mendoza;650;Normal;2;2026-10-04;Truck_M
+B-00450;C;31;1400;Cordoba;San Luis;420;High;1;2026-10-10;Truck_S
+B-00451;C;16;1400;Cordoba;San Francisco;205;High;1;2026-10-07;Truck_S
+B-00452;A;20;500;Rosario;Tucuman;810;High;1;2026-10-05;Truck_S
+B-00453;A;35;500;Cordoba;Tucuman;570;High;1;2026-10-04;Truck_L
+B-00454;A;19;500;Rosario;San Luis;585;Normal;2;2026-10-01;Truck_L
+B-00455;C;22;1400;Rosario;Mendoza;760;High;1;2026-10-06;Truck_S
+B-00456;C;12;1400;Buenos Aires;La Plata;60;Normal;2;2026-10-05;Truck_M
+B-00457;A;27;500;Rosario;Villa Maria;255;Low;5;2026-10-06;Truck_M
+B-00458;B;21;900;Buenos Aires;Rio Cuarto;610;Normal;2;2026-10-01;Truck_M
+B-00459;C;28;1400;Buenos Aires;La Plata;60;Normal;2;2026-10-07;Truck_M
+B-00460;A;24;500;Rosario;Mar del Plata;700;Normal;2;2026-10-09;Truck_L
+B-00461;B;17;900;Rosario;Tucuman;810;Normal;2;2026-10-07;Truck_M
+B-00462;C;30;1400;Buenos Aires;San Francisco;575;Normal;3;2026-10-09;Truck_L
+B-00463;A;43;500;Cordoba;Tucuman;570;High;1;2026-10-06;Truck_M
+B-00464;B;47;900;Buenos Aires;Santa Fe;475;Normal;2;2026-10-02;Truck_M
+B-00465;B;48;900;Buenos Aires;Mar del Plata;415;Normal;2;2026-10-05;Truck_M
+B-00466;A;44;500;Cordoba;Villa Maria;150;Low;5;2026-10-02;Truck_L
+B-00467;B;36;900;Buenos Aires;Mar del Plata;415;Normal;3;2026-10-07;Truck_M
+B-00468;A;11;500;Buenos Aires;Villa Maria;555;High;1;2026-10-07;Truck_S
+B-00469;A;12;500;Buenos Aires;La Plata;60;Normal;2;2026-10-08;Truck_S
+B-00470;A;43;500;Buenos Aires;La Plata;60;High;1;2026-10-06;Truck_L
+B-00471;B;15;900;Buenos Aires;La Plata;60;Normal;3;2026-10-08;Truck_M
+B-00472;B;38;900;Cordoba;Mendoza;650;High;1;2026-10-08;Truck_S
+B-00473;C;22;1400;Rosario;Rio Cuarto;410;Normal;2;2026-10-06;Truck_S
+B-00474;B;49;900;Cordoba;San Francisco;205;Normal;3;2026-10-03;Truck_L
+B-00475;C;31;1400;Rosario;Tucuman;810;Normal;3;2026-10-01;Truck_S
+B-00476;A;6;500;Rosario;Mar del Plata;700;High;1;2026-10-10;Truck_L
+B-00477;B;31;900;Rosario;Mendoza;760;High;1;2026-10-09;Truck_M
+B-00478;C;32;1400;Buenos Aires;Santa Fe;475;Normal;3;2026-10-08;Truck_M
+B-00479;A;13;500;Buenos Aires;Tucuman;1200;Normal;3;2026-10-10;Truck_M
+B-00480;C;10;1400;Rosario;Mar del Plata;700;Normal;2;2026-10-07;Truck_S
+B-00481;A;18;500;Cordoba;Villa Maria;150;Normal;3;2026-10-08;Truck_L
+B-00482;B;31;900;Rosario;Mendoza;760;High;1;2026-10-05;Truck_M
+B-00483;A;19;500;Buenos Aires;La Plata;60;Low;5;2026-10-02;Truck_M
+B-00484;C;44;1400;Cordoba;Santa Fe;350;Normal;2;2026-10-03;Truck_S
+B-00485;A;34;500;Buenos Aires;Rio Cuarto;610;Normal;2;2026-10-05;Truck_S
+B-00486;B;15;900;Buenos Aires;Rio Cuarto;610;High;1;2026-10-05;Truck_S
+B-00487;A;30;500;Rosario;Mar del Plata;700;Normal;3;2026-10-04;Truck_M
+B-00488;A;48;500;Buenos Aires;Santa Fe;475;Low;5;2026-10-10;Truck_M
+B-00489;A;47;500;Buenos Aires;Villa Maria;555;Normal;3;2026-10-06;Truck_L
+B-00490;A;36;500;Rosario;Villa Maria;255;High;1;2026-10-02;Truck_M
+B-00491;B;16;900;Buenos Aires;Bahia Blanca;640;Normal;3;2026-10-09;Truck_L
+B-00492;C;25;1400;Buenos Aires;Bahia Blanca;640;Normal;3;2026-10-04;Truck_S
+B-00493;A;41;500;Rosario;Santa Fe;170;High;1;2026-10-10;Truck_S
+B-00494;C;16;1400;Cordoba;Bahia Blanca;825;High;1;2026-10-08;Truck_M
+B-00495;A;40;500;Rosario;San Luis;585;Normal;3;2026-10-01;Truck_M
+B-00496;C;40;1400;Cordoba;Santa Fe;350;Normal;3;2026-10-04;Truck_L
+B-00497;C;10;1400;Buenos Aires;Bahia Blanca;640;Normal;2;2026-10-05;Truck_M
+B-00498;A;35;500;Cordoba;Mendoza;650;Normal;3;2026-10-09;Truck_M
+B-00499;C;22;1400;Buenos Aires;La Plata;60;Normal;3;2026-10-05;Truck_M
+B-00500;B;17;900;Buenos Aires;Santa Fe;475;Normal;2;2026-10-04;Truck_S
+B-00501;C;11;1400;Buenos Aires;Mendoza;1050;Normal;2;2026-10-09;Truck_S
+B-00502;A;37;500;Cordoba;Villa Maria;150;Low;4;2026-10-10;Truck_M
+B-00503;A;42;500;Buenos Aires;La Plata;60;Normal;3;2026-10-05;Truck_M
+B-00504;A;18;500;Cordoba;Tucuman;570;Normal;2;2026-10-06;Truck_L
+B-00505;A;43;500;Cordoba;San Luis;420;High;1;2026-10-05;Truck_S
+B-00506;A;29;500;Buenos Aires;Rio Cuarto;610;High;1;2026-10-02;Truck_M
+B-00507;C;28;1400;Buenos Aires;Mar del Plata;415;High;1;2026-10-10;Truck_S
+B-00508;A;10;500;Cordoba;Santa Fe;350;High;1;2026-10-04;Truck_M
+B-00509;A;18;500;Rosario;San Luis;585;Normal;3;2026-10-05;Truck_M
+B-00510;C;39;1400;Buenos Aires;Rio Cuarto;610;Normal;2;2026-10-04;Truck_L
+B-00511;A;8;500;Rosario;La Plata;330;Normal;3;2026-10-04;Truck_M
+B-00512;A;18;500;Rosario;Mendoza;760;Low;5;2026-10-08;Truck_L
+B-00513;B;20;900;Buenos Aires;Bahia Blanca;640;Low;4;2026-10-09;Truck_L
+B-00514;C;30;1400;Buenos Aires;Tucuman;1200;High;1;2026-10-06;Truck_S
+B-00515;A;12;500;Cordoba;La Plata;730;Normal;2;2026-10-03;Truck_L
+B-00516;C;29;1400;Buenos Aires;Tucuman;1200;Normal;3;2026-10-10;Truck_S
+B-00517;B;48;900;Buenos Aires;Villa Maria;555;Normal;2;2026-10-09;Truck_M
+B-00518;B;34;900;Rosario;Rio Cuarto;410;Normal;2;2026-10-01;Truck_L
+B-00519;C;37;1400;Rosario;La Plata;330;High;1;2026-10-02;Truck_L
+B-00520;C;28;1400;Buenos Aires;La Plata;60;Normal;2;2026-10-03;Truck_S
+B-00521;C;6;1400;Buenos Aires;Villa Maria;555;Normal;3;2026-10-02;Truck_L
+B-00522;B;10;900;Rosario;Santa Fe;170;Low;4;2026-10-08;Truck_L
+B-00523;A;40;500;Buenos Aires;San Francisco;575;Low;5;2026-10-03;Truck_L
+B-00524;B;39;900;Buenos Aires;Tucuman;1200;High;1;2026-10-04;Truck_M
+B-00525;C;12;1400;Buenos Aires;San Luis;790;Normal;3;2026-10-04;Truck_M
+B-00526;A;5;500;Cordoba;Mar del Plata;1050;Normal;2;2026-10-02;Truck_S
+B-00527;C;26;1400;Cordoba;Rio Cuarto;220;High;1;2026-10-02;Truck_M
+B-00528;C;41;1400;Buenos Aires;Bahia Blanca;640;Normal;2;2026-10-10;Truck_S
+B-00529;B;47;900;Rosario;Tucuman;810;Normal;2;2026-10-07;Truck_S
+B-00530;B;8;900;Rosario;Villa Maria;255;Normal;2;2026-10-07;Truck_M
+B-00531;C;13;1400;Cordoba;Santa Fe;350;Normal;3;2026-10-07;Truck_M
+B-00532;A;8;500;Cordoba;Rio Cuarto;220;Normal;2;2026-10-09;Truck_S
+B-00533;A;18;500;Cordoba;San Francisco;205;Normal;3;2026-10-07;Truck_L
+B-00534;A;23;500;Cordoba;Tucuman;570;Normal;3;2026-10-07;Truck_S
+B-00535;C;18;1400;Buenos Aires;Bahia Blanca;640;Normal;3;2026-10-01;Truck_L
+B-00536;C;37;1400;Cordoba;San Luis;420;Low;5;2026-10-09;Truck_M
+B-00537;A;9;500;Buenos Aires;Rio Cuarto;610;High;1;2026-10-10;Truck_S
+B-00538;A;42;500;Cordoba;Tucuman;570;Low;4;2026-10-10;Truck_M
+B-00539;A;21;500;Rosario;Mar del Plata;700;Normal;3;2026-10-04;Truck_M
+B-00540;C;34;1400;Cordoba;Mendoza;650;Normal;3;2026-10-06;Truck_M
+B-00541;A;9;500;Buenos Aires;Mar del Plata;415;High;1;2026-10-09;Truck_S
+B-00542;A;20;500;Cordoba;San Luis;420;High;1;2026-10-06;Truck_M
+B-00543;B;47;900;Buenos Aires;Mendoza;1050;Normal;2;2026-10-09;Truck_S
+B-00544;B;40;900;Cordoba;San Francisco;205;Normal;2;2026-10-03;Truck_L
+B-00545;B;37;900;Cordoba;San Luis;420;Normal;3;2026-10-08;Truck_S
+B-00546;B;7;900;Cordoba;Rio Cuarto;220;Normal;3;2026-10-01;Truck_L
+B-00547;B;40;900;Buenos Aires;Mendoza;1050;Normal;3;2026-10-07;Truck_L
+B-00548;C;42;1400;Cordoba;San Francisco;205;Normal;3;2026-10-09;Truck_S
+B-00549;A;27;500;Cordoba;Mendoza;650;Normal;2;2026-10-04;Truck_M
+B-00550;C;31;1400;Cordoba;San Luis;420;High;1;2026-10-10;Truck_S
+B-00551;C;16;1400;Cordoba;San Francisco;205;High;1;2026-10-07;Truck_S
+B-00552;A;20;500;Rosario;Tucuman;810;High;1;2026-10-05;Truck_S
+B-00553;A;35;500;Cordoba;Tucuman;570;High;1;2026-10-04;Truck_L
+B-00554;A;19;500;Rosario;San Luis;585;Normal;2;2026-10-01;Truck_L
+B-00555;C;22;1400;Rosario;Mendoza;760;High;1;2026-10-06;Truck_S
+B-00556;C;12;1400;Buenos Aires;La Plata;60;Normal;2;2026-10-05;Truck_M
+B-00557;A;27;500;Rosario;Villa Maria;255;Low;5;2026-10-06;Truck_M
+B-00558;B;21;900;Buenos Aires;Rio Cuarto;610;Normal;2;2026-10-01;Truck_M
+B-00559;C;28;1400;Buenos Aires;La Plata;60;Normal;2;2026-10-07;Truck_M
+B-00560;A;24;500;Rosario;Mar del Plata;700;Normal;2;2026-10-09;Truck_L
+B-00561;B;17;900;Rosario;Tucuman;810;Normal;2;2026-10-07;Truck_M
+B-00562;C;30;1400;Buenos Aires;San Francisco;575;Normal;3;2026-10-09;Truck_L
+B-00563;A;43;500;Cordoba;Tucuman;570;High;1;2026-10-06;Truck_M
+B-00564;B;47;900;Buenos Aires;Santa Fe;475;Normal;2;2026-10-02;Truck_M
+B-00565;B;48;900;Buenos Aires;Mar del Plata;415;Normal;2;2026-10-05;Truck_M
+B-00566;A;44;500;Cordoba;Villa Maria;150;Low;5;2026-10-02;Truck_L
+B-00567;B;36;900;Buenos Aires;Mar del Plata;415;Normal;3;2026-10-07;Truck_M
+B-00568;A;11;500;Buenos Aires;Villa Maria;555;High;1;2026-10-07;Truck_S
+B-00569;A;12;500;Buenos Aires;La Plata;60;Normal;2;2026-10-08;Truck_S
+B-00570;A;43;500;Buenos Aires;La Plata;60;High;1;2026-10-06;Truck_L
+B-00571;B;15;900;Buenos Aires;La Plata;60;Normal;3;2026-10-08;Truck_M
+B-00572;B;38;900;Cordoba;Mendoza;650;High;1;2026-10-08;Truck_S
+B-00573;C;22;1400;Rosario;Rio Cuarto;410;Normal;2;2026-10-06;Truck_S
+B-00574;B;49;900;Cordoba;San Francisco;205;Normal;3;2026-10-03;Truck_L
+B-00575;C;31;1400;Rosario;Tucuman;810;Normal;3;2026-10-01;Truck_S
+B-00576;A;6;500;Rosario;Mar del Plata;700;High;1;2026-10-10;Truck_L
+B-00577;B;31;900;Rosario;Mendoza;760;High;1;2026-10-09;Truck_M
+B-00578;C;32;1400;Buenos Aires;Santa Fe;475;Normal;3;2026-10-08;Truck_M
+B-00579;A;13;500;Buenos Aires;Tucuman;1200;Normal;3;2026-10-10;Truck_M
+B-00580;C;10;1400;Rosario;Mar del Plata;700;Normal;2;2026-10-07;Truck_S
+B-00581;A;18;500;Cordoba;Villa Maria;150;Normal;3;2026-10-08;Truck_L
+B-00582;B;31;900;Rosario;Mendoza;760;High;1;2026-10-05;Truck_M
+B-00583;A;19;500;Buenos Aires;La Plata;60;Low;5;2026-10-02;Truck_M
+B-00584;C;44;1400;Cordoba;Santa Fe;350;Normal;2;2026-10-03;Truck_S
+B-00585;A;34;500;Buenos Aires;Rio Cuarto;610;Normal;2;2026-10-05;Truck_S
+B-00586;B;15;900;Buenos Aires;Rio Cuarto;610;High;1;2026-10-05;Truck_S
+B-00587;A;30;500;Rosario;Mar del Plata;700;Normal;3;2026-10-04;Truck_M
+B-00588;A;48;500;Buenos Aires;Santa Fe;475;Low;5;2026-10-10;Truck_M
+B-00589;A;47;500;Buenos Aires;Villa Maria;555;Normal;3;2026-10-06;Truck_L
+B-00590;A;36;500;Rosario;Villa Maria;255;High;1;2026-10-02;Truck_M
+B-00591;B;16;900;Buenos Aires;Bahia Blanca;640;Normal;3;2026-10-09;Truck_L
+B-00592;C;25;1400;Buenos Aires;Bahia Blanca;640;Normal;3;2026-10-04;Truck_S
+B-00593;A;41;500;Rosario;Santa Fe;170;High;1;2026-10-10;Truck_S
+B-00594;C;16;1400;Cordoba;Bahia Blanca;825;High;1;2026-10-08;Truck_M
+B-00595;A;40;500;Rosario;San Luis;585;Normal;3;2026-10-01;Truck_M
+B-00596;C;40;1400;Cordoba;Santa Fe;350;Normal;3;2026-10-04;Truck_L
+B-00597;C;10;1400;Buenos Aires;Bahia Blanca;640;Normal;2;2026-10-05;Truck_M
+B-00598;A;35;500;Cordoba;Mendoza;650;Normal;3;2026-10-09;Truck_M
+B-00599;C;22;1400;Buenos Aires;La Plata;60;Normal;3;2026-10-05;Truck_M
+B-00600;B;17;900;Buenos Aires;Santa Fe;475;Normal;2;2026-10-04;Truck_S
+B-00601;C;11;1400;Buenos Aires;Mendoza;1050;Normal;2;2026-10-09;Truck_S
+B-00602;A;37;500;Cordoba;Villa Maria;150;Low;4;2026-10-10;Truck_M
+B-00603;A;42;500;Buenos Aires;La Plata;60;Normal;3;2026-10-05;Truck_M
+B-00604;A;18;500;Cordoba;Tucuman;570;Normal;2;2026-10-06;Truck_L
+B-00605;A;43;500;Cordoba;San Luis;420;High;1;2026-10-05;Truck_S
+B-00606;A;29;500;Buenos Aires;Rio Cuarto;610;High;1;2026-10-02;Truck_M
+B-00607;C;28;1400;Buenos Aires;Mar del Plata;415;High;1;2026-10-10;Truck_S
+B-00608;A;10;500;Cordoba;Santa Fe;350;High;1;2026-10-04;Truck_M
+B-00609;A;18;500;Rosario;San Luis;585;Normal;3;2026-10-05;Truck_M
+B-00610;C;39;1400;Buenos Aires;Rio Cuarto;610;Normal;2;2026-10-04;Truck_L
+B-00611;A;8;500;Rosario;La Plata;330;Normal;3;2026-10-04;Truck_M
+B-00612;A;18;500;Rosario;Mendoza;760;Low;5;2026-10-08;Truck_L
+B-00613;B;20;900;Buenos Aires;Bahia Blanca;640;Low;4;2026-10-09;Truck_L
+B-00614;C;30;1400;Buenos Aires;Tucuman;1200;High;1;2026-10-06;Truck_S
+B-00615;A;12;500;Cordoba;La Plata;730;Normal;2;2026-10-03;Truck_L
+B-00616;C;29;1400;Buenos Aires;Tucuman;1200;Normal;3;2026-10-10;Truck_S
+B-00617;B;48;900;Buenos Aires;Villa Maria;555;Normal;2;2026-10-09;Truck_M
+B-00618;B;34;900;Rosario;Rio Cuarto;410;Normal;2;2026-10-01;Truck_L
+B-00619;C;37;1400;Rosario;La Plata;330;High;1;2026-10-02;Truck_L
+B-00620;C;28;1400;Buenos Aires;La Plata;60;Normal;2;2026-10-03;Truck_S
+B-00621;C;6;1400;Buenos Aires;Villa Maria;555;Normal;3;2026-10-02;Truck_L
+B-00622;B;10;900;Rosario;Santa Fe;170;Low;4;2026-10-08;Truck_L
+B-00623;A;40;500;Buenos Aires;San Francisco;575;Low;5;2026-10-03;Truck_L
+B-00624;B;39;900;Buenos Aires;Tucuman;1200;High;1;2026-10-04;Truck_M
+B-00625;C;12;1400;Buenos Aires;San Luis;790;Normal;3;2026-10-04;Truck_M
+B-00626;A;5;500;Cordoba;Mar del Plata;1050;Normal;2;2026-10-02;Truck_S
+B-00627;C;26;1400;Cordoba;Rio Cuarto;220;High;1;2026-10-02;Truck_M
+B-00628;C;41;1400;Buenos Aires;Bahia Blanca;640;Normal;2;2026-10-10;Truck_S
+B-00629;B;47;900;Rosario;Tucuman;810;Normal;2;2026-10-07;Truck_S
+B-00630;B;8;900;Rosario;Villa Maria;255;Normal;2;2026-10-07;Truck_M
+B-00631;C;13;1400;Cordoba;Santa Fe;350;Normal;3;2026-10-07;Truck_M
+B-00632;A;8;500;Cordoba;Rio Cuarto;220;Normal;2;2026-10-09;Truck_S
+B-00633;A;18;500;Cordoba;San Francisco;205;Normal;3;2026-10-07;Truck_L
+B-00634;A;23;500;Cordoba;Tucuman;570;Normal;3;2026-10-07;Truck_S
+B-00635;C;18;1400;Buenos Aires;Bahia Blanca;640;Normal;3;2026-10-01;Truck_L
+B-00636;C;37;1400;Cordoba;San Luis;420;Low;5;2026-10-09;Truck_M
+B-00637;A;9;500;Buenos Aires;Rio Cuarto;610;High;1;2026-10-10;Truck_S
+B-00638;A;42;500;Cordoba;Tucuman;570;Low;4;2026-10-10;Truck_M
+B-00639;A;21;500;Rosario;Mar del Plata;700;Normal;3;2026-10-04;Truck_M
+B-00640;C;34;1400;Cordoba;Mendoza;650;Normal;3;2026-10-06;Truck_M
+B-00641;A;9;500;Buenos Aires;Mar del Plata;415;High;1;2026-10-09;Truck_S
+B-00642;A;20;500;Cordoba;San Luis;420;High;1;2026-10-06;Truck_M
+B-00643;B;47;900;Buenos Aires;Mendoza;1050;Normal;2;2026-10-09;Truck_S
+B-00644;B;40;900;Cordoba;San Francisco;205;Normal;2;2026-10-03;Truck_L
+B-00645;B;37;900;Cordoba;San Luis;420;Normal;3;2026-10-08;Truck_S
+B-00646;B;7;900;Cordoba;Rio Cuarto;220;Normal;3;2026-10-01;Truck_L
+B-00647;B;40;900;Buenos Aires;Mendoza;1050;Normal;3;2026-10-07;Truck_L
+B-00648;C;42;1400;Cordoba;San Francisco;205;Normal;3;2026-10-09;Truck_S
+B-00649;A;27;500;Cordoba;Mendoza;650;Normal;2;2026-10-04;Truck_M
+B-00650;C;31;1400;Cordoba;San Luis;420;High;1;2026-10-10;Truck_S
+B-00651;C;16;1400;Cordoba;San Francisco;205;High;1;2026-10-07;Truck_S
+B-00652;A;20;500;Rosario;Tucuman;810;High;1;2026-10-05;Truck_S
+B-00653;A;35;500;Cordoba;Tucuman;570;High;1;2026-10-04;Truck_L
+B-00654;A;19;500;Rosario;San Luis;585;Normal;2;2026-10-01;Truck_L
+B-00655;C;22;1400;Rosario;Mendoza;760;High;1;2026-10-06;Truck_S
+B-00656;C;12;1400;Buenos Aires;La Plata;60;Normal;2;2026-10-05;Truck_M
+B-00657;A;27;500;Rosario;Villa Maria;255;Low;5;2026-10-06;Truck_M
+B-00658;B;21;900;Buenos Aires;Rio Cuarto;610;Normal;2;2026-10-01;Truck_M
+B-00659;C;28;1400;Buenos Aires;La Plata;60;Normal;2;2026-10-07;Truck_M
+B-00660;A;24;500;Rosario;Mar del Plata;700;Normal;2;2026-10-09;Truck_L
+B-00661;B;17;900;Rosario;Tucuman;810;Normal;2;2026-10-07;Truck_M
+B-00662;C;30;1400;Buenos Aires;San Francisco;575;Normal;3;2026-10-09;Truck_L
+B-00663;A;43;500;Cordoba;Tucuman;570;High;1;2026-10-06;Truck_M
+B-00664;B;47;900;Buenos Aires;Santa Fe;475;Normal;2;2026-10-02;Truck_M
+B-00665;B;48;900;Buenos Aires;Mar del Plata;415;Normal;2;2026-10-05;Truck_M
+B-00666;A;44;500;Cordoba;Villa Maria;150;Low;5;2026-10-02;Truck_L
+B-00667;B;36;900;Buenos Aires;Mar del Plata;415;Normal;3;2026-10-07;Truck_M
+B-00668;A;11;500;Buenos Aires;Villa Maria;555;High;1;2026-10-07;Truck_S
+B-00669;A;12;500;Buenos Aires;La Plata;60;Normal;2;2026-10-08;Truck_S
+B-00670;A;43;500;Buenos Aires;La Plata;60;High;1;2026-10-06;Truck_L
+B-00671;B;15;900;Buenos Aires;La Plata;60;Normal;3;2026-10-08;Truck_M
+B-00672;B;38;900;Cordoba;Mendoza;650;High;1;2026-10-08;Truck_S
+B-00673;C;22;1400;Rosario;Rio Cuarto;410;Normal;2;2026-10-06;Truck_S
+B-00674;B;49;900;Cordoba;San Francisco;205;Normal;3;2026-10-03;Truck_L
+B-00675;C;31;1400;Rosario;Tucuman;810;Normal;3;2026-10-01;Truck_S
+B-00676;A;6;500;Rosario;Mar del Plata;700;High;1;2026-10-10;Truck_L
+B-00677;B;31;900;Rosario;Mendoza;760;High;1;2026-10-09;Truck_M
+B-00678;C;32;1400;Buenos Aires;Santa Fe;475;Normal;3;2026-10-08;Truck_M
+B-00679;A;13;500;Buenos Aires;Tucuman;1200;Normal;3;2026-10-10;Truck_M
+B-00680;C;10;1400;Rosario;Mar del Plata;700;Normal;2;2026-10-07;Truck_S
+B-00681;A;18;500;Cordoba;Villa Maria;150;Normal;3;2026-10-08;Truck_L
+B-00682;B;31;900;Rosario;Mendoza;760;High;1;2026-10-05;Truck_M
+B-00683;A;19;500;Buenos Aires;La Plata;60;Low;5;2026-10-02;Truck_M
+B-00684;C;44;1400;Cordoba;Santa Fe;350;Normal;2;2026-10-03;Truck_S
+B-00685;A;34;500;Buenos Aires;Rio Cuarto;610;Normal;2;2026-10-05;Truck_S
+B-00686;B;15;900;Buenos Aires;Rio Cuarto;610;High;1;2026-10-05;Truck_S
+B-00687;A;30;500;Rosario;Mar del Plata;700;Normal;3;2026-10-04;Truck_M
+B-00688;A;48;500;Buenos Aires;Santa Fe;475;Low;5;2026-10-10;Truck_M
+B-00689;A;47;500;Buenos Aires;Villa Maria;555;Normal;3;2026-10-06;Truck_L
+B-00690;A;36;500;Rosario;Villa Maria;255;High;1;2026-10-02;Truck_M
+B-00691;B;16;900;Buenos Aires;Bahia Blanca;640;Normal;3;2026-10-09;Truck_L
+B-00692;C;25;1400;Buenos Aires;Bahia Blanca;640;Normal;3;2026-10-04;Truck_S
+B-00693;A;41;500;Rosario;Santa Fe;170;High;1;2026-10-10;Truck_S
+B-00694;C;16;1400;Cordoba;Bahia Blanca;825;High;1;2026-10-08;Truck_M
+B-00695;A;40;500;Rosario;San Luis;585;Normal;3;2026-10-01;Truck_M
+B-00696;C;40;1400;Cordoba;Santa Fe;350;Normal;3;2026-10-04;Truck_L
+B-00697;C;10;1400;Buenos Aires;Bahia Blanca;640;Normal;2;2026-10-05;Truck_M
+B-00698;A;35;500;Cordoba;Mendoza;650;Normal;3;2026-10-09;Truck_M
+B-00699;C;22;1400;Buenos Aires;La Plata;60;Normal;3;2026-10-05;Truck_M
+B-00700;B;17;900;Buenos Aires;Santa Fe;475;Normal;2;2026-10-04;Truck_S
+B-00701;C;11;1400;Buenos Aires;Mendoza;1050;Normal;2;2026-10-09;Truck_S
+B-00702;A;37;500;Cordoba;Villa Maria;150;Low;4;2026-10-10;Truck_M
+B-00703;A;42;500;Buenos Aires;La Plata;60;Normal;3;2026-10-05;Truck_M
+B-00704;A;18;500;Cordoba;Tucuman;570;Normal;2;2026-10-06;Truck_L
+B-00705;A;43;500;Cordoba;San Luis;420;High;1;2026-10-05;Truck_S
+B-00706;A;29;500;Buenos Aires;Rio Cuarto;610;High;1;2026-10-02;Truck_M
+B-00707;C;28;1400;Buenos Aires;Mar del Plata;415;High;1;2026-10-10;Truck_S
+B-00708;A;10;500;Cordoba;Santa Fe;350;High;1;2026-10-04;Truck_M
+B-00709;A;18;500;Rosario;San Luis;585;Normal;3;2026-10-05;Truck_M
+B-00710;C;39;1400;Buenos Aires;Rio Cuarto;610;Normal;2;2026-10-04;Truck_L
+B-00711;A;8;500;Rosario;La Plata;330;Normal;3;2026-10-04;Truck_M
+B-00712;A;18;500;Rosario;Mendoza;760;Low;5;2026-10-08;Truck_L
+B-00713;B;20;900;Buenos Aires;Bahia Blanca;640;Low;4;2026-10-09;Truck_L
+B-00714;C;30;1400;Buenos Aires;Tucuman;1200;High;1;2026-10-06;Truck_S
+B-00715;A;12;500;Cordoba;La Plata;730;Normal;2;2026-10-03;Truck_L
+B-00716;C;29;1400;Buenos Aires;Tucuman;1200;Normal;3;2026-10-10;Truck_S
+B-00717;B;48;900;Buenos Aires;Villa Maria;555;Normal;2;2026-10-09;Truck_M
+B-00718;B;34;900;Rosario;Rio Cuarto;410;Normal;2;2026-10-01;Truck_L
+B-00719;C;37;1400;Rosario;La Plata;330;High;1;2026-10-02;Truck_L
+B-00720;C;28;1400;Buenos Aires;La Plata;60;Normal;2;2026-10-03;Truck_S
+B-00721;C;6;1400;Buenos Aires;Villa Maria;555;Normal;3;2026-10-02;Truck_L
+B-00722;B;10;900;Rosario;Santa Fe;170;Low;4;2026-10-08;Truck_L
+B-00723;A;40;500;Buenos Aires;San Francisco;575;Low;5;2026-10-03;Truck_L
+B-00724;B;39;900;Buenos Aires;Tucuman;1200;High;1;2026-10-04;Truck_M
+B-00725;C;12;1400;Buenos Aires;San Luis;790;Normal;3;2026-10-04;Truck_M
+B-00726;A;5;500;Cordoba;Mar del Plata;1050;Normal;2;2026-10-02;Truck_S
+B-00727;C;26;1400;Cordoba;Rio Cuarto;220;High;1;2026-10-02;Truck_M
+B-00728;C;41;1400;Buenos Aires;Bahia Blanca;640;Normal;2;2026-10-10;Truck_S
+B-00729;B;47;900;Rosario;Tucuman;810;Normal;2;2026-10-07;Truck_S
+B-00730;B;8;900;Rosario;Villa Maria;255;Normal;2;2026-10-07;Truck_M
+B-00731;C;13;1400;Cordoba;Santa Fe;350;Normal;3;2026-10-07;Truck_M
+B-00732;A;8;500;Cordoba;Rio Cuarto;220;Normal;2;2026-10-09;Truck_S
+B-00733;A;18;500;Cordoba;San Francisco;205;Normal;3;2026-10-07;Truck_L
+B-00734;A;23;500;Cordoba;Tucuman;570;Normal;3;2026-10-07;Truck_S
+B-00735;C;18;1400;Buenos Aires;Bahia Blanca;640;Normal;3;2026-10-01;Truck_L
+B-00736;C;37;1400;Cordoba;San Luis;420;Low;5;2026-10-09;Truck_M
+B-00737;A;9;500;Buenos Aires;Rio Cuarto;610;High;1;2026-10-10;Truck_S
+B-00738;A;42;500;Cordoba;Tucuman;570;Low;4;2026-10-10;Truck_M
+B-00739;A;21;500;Rosario;Mar del Plata;700;Normal;3;2026-10-04;Truck_M
+B-00740;C;34;1400;Cordoba;Mendoza;650;Normal;3;2026-10-06;Truck_M
+B-00741;A;9;500;Buenos Aires;Mar del Plata;415;High;1;2026-10-09;Truck_S
+B-00742;A;20;500;Cordoba;San Luis;420;High;1;2026-10-06;Truck_M
+B-00743;B;47;900;Buenos Aires;Mendoza;1050;Normal;2;2026-10-09;Truck_S
+B-00744;B;40;900;Cordoba;San Francisco;205;Normal;2;2026-10-03;Truck_L
+B-00745;B;37;900;Cordoba;San Luis;420;Normal;3;2026-10-08;Truck_S
+B-00746;B;7;900;Cordoba;Rio Cuarto;220;Normal;3;2026-10-01;Truck_L
+B-00747;B;40;900;Buenos Aires;Mendoza;1050;Normal;3;2026-10-07;Truck_L
+B-00748;C;42;1400;Cordoba;San Francisco;205;Normal;3;2026-10-09;Truck_S
+B-00749;A;27;500;Cordoba;Mendoza;650;Normal;2;2026-10-04;Truck_M
+B-00750;C;31;1400;Cordoba;San Luis;420;High;1;2026-10-10;Truck_S
+B-00751;C;16;1400;Cordoba;San Francisco;205;High;1;2026-10-07;Truck_S
+B-00752;A;20;500;Rosario;Tucuman;810;High;1;2026-10-05;Truck_S
+B-00753;A;35;500;Cordoba;Tucuman;570;High;1;2026-10-04;Truck_L
+B-00754;A;19;500;Rosario;San Luis;585;Normal;2;2026-10-01;Truck_L
+B-00755;C;22;1400;Rosario;Mendoza;760;High;1;2026-10-06;Truck_S
+B-00756;C;12;1400;Buenos Aires;La Plata;60;Normal;2;2026-10-05;Truck_M
+B-00757;A;27;500;Rosario;Villa Maria;255;Low;5;2026-10-06;Truck_M
+B-00758;B;21;900;Buenos Aires;Rio Cuarto;610;Normal;2;2026-10-01;Truck_M
+B-00759;C;28;1400;Buenos Aires;La Plata;60;Normal;2;2026-10-07;Truck_M
+B-00760;A;24;500;Rosario;Mar del Plata;700;Normal;2;2026-10-09;Truck_L
+B-00761;B;17;900;Rosario;Tucuman;810;Normal;2;2026-10-07;Truck_M
+B-00762;C;30;1400;Buenos Aires;San Francisco;575;Normal;3;2026-10-09;Truck_L
+B-00763;A;43;500;Cordoba;Tucuman;570;High;1;2026-10-06;Truck_M
+B-00764;B;47;900;Buenos Aires;Santa Fe;475;Normal;2;2026-10-02;Truck_M
+B-00765;B;48;900;Buenos Aires;Mar del Plata;415;Normal;2;2026-10-05;Truck_M
+B-00766;A;44;500;Cordoba;Villa Maria;150;Low;5;2026-10-02;Truck_L
+B-00767;B;36;900;Buenos Aires;Mar del Plata;415;Normal;3;2026-10-07;Truck_M
+B-00768;A;11;500;Buenos Aires;Villa Maria;555;High;1;2026-10-07;Truck_S
+B-00769;A;12;500;Buenos Aires;La Plata;60;Normal;2;2026-10-08;Truck_S
+B-00770;A;43;500;Buenos Aires;La Plata;60;High;1;2026-10-06;Truck_L
+B-00771;B;15;900;Buenos Aires;La Plata;60;Normal;3;2026-10-08;Truck_M
+B-00772;B;38;900;Cordoba;Mendoza;650;High;1;2026-10-08;Truck_S
+B-00773;C;22;1400;Rosario;Rio Cuarto;410;Normal;2;2026-10-06;Truck_S
+B-00774;B;49;900;Cordoba;San Francisco;205;Normal;3;2026-10-03;Truck_L
+B-00775;C;31;1400;Rosario;Tucuman;810;Normal;3;2026-10-01;Truck_S
+B-00776;A;6;500;Rosario;Mar del Plata;700;High;1;2026-10-10;Truck_L
+B-00777;B;31;900;Rosario;Mendoza;760;High;1;2026-10-09;Truck_M
+B-00778;C;32;1400;Buenos Aires;Santa Fe;475;Normal;3;2026-10-08;Truck_M
+B-00779;A;13;500;Buenos Aires;Tucuman;1200;Normal;3;2026-10-10;Truck_M
+B-00780;C;10;1400;Rosario;Mar del Plata;700;Normal;2;2026-10-07;Truck_S
+B-00781;A;18;500;Cordoba;Villa Maria;150;Normal;3;2026-10-08;Truck_L
+B-00782;B;31;900;Rosario;Mendoza;760;High;1;2026-10-05;Truck_M
+B-00783;A;19;500;Buenos Aires;La Plata;60;Low;5;2026-10-02;Truck_M
+B-00784;C;44;1400;Cordoba;Santa Fe;350;Normal;2;2026-10-03;Truck_S
+B-00785;A;34;500;Buenos Aires;Rio Cuarto;610;Normal;2;2026-10-05;Truck_S
+B-00786;B;15;900;Buenos Aires;Rio Cuarto;610;High;1;2026-10-05;Truck_S
+B-00787;A;30;500;Rosario;Mar del Plata;700;Normal;3;2026-10-04;Truck_M
+B-00788;A;48;500;Buenos Aires;Santa Fe;475;Low;5;2026-10-10;Truck_M
+B-00789;A;47;500;Buenos Aires;Villa Maria;555;Normal;3;2026-10-06;Truck_L
+B-00790;A;36;500;Rosario;Villa Maria;255;High;1;2026-10-02;Truck_M
+B-00791;B;16;900;Buenos Aires;Bahia Blanca;640;Normal;3;2026-10-09;Truck_L
+B-00792;C;25;1400;Buenos Aires;Bahia Blanca;640;Normal;3;2026-10-04;Truck_S
+B-00793;A;41;500;Rosario;Santa Fe;170;High;1;2026-10-10;Truck_S
+B-00794;C;16;1400;Cordoba;Bahia Blanca;825;High;1;2026-10-08;Truck_M
+B-00795;A;40;500;Rosario;San Luis;585;Normal;3;2026-10-01;Truck_M
+B-00796;C;40;1400;Cordoba;Santa Fe;350;Normal;3;2026-10-04;Truck_L
+B-00797;C;10;1400;Buenos Aires;Bahia Blanca;640;Normal;2;2026-10-05;Truck_M
+B-00798;A;35;500;Cordoba;Mendoza;650;Normal;3;2026-10-09;Truck_M
+B-00799;C;22;1400;Buenos Aires;La Plata;60;Normal;3;2026-10-05;Truck_M
+B-00800;B;17;900;Buenos Aires;Santa Fe;475;Normal;2;2026-10-04;Truck_S
+B-00801;C;11;1400;Buenos Aires;Mendoza;1050;Normal;2;2026-10-09;Truck_S
+B-00802;A;37;500;Cordoba;Villa Maria;150;Low;4;2026-10-10;Truck_M
+B-00803;A;42;500;Buenos Aires;La Plata;60;Normal;3;2026-10-05;Truck_M
+B-00804;A;18;500;Cordoba;Tucuman;570;Normal;2;2026-10-06;Truck_L
+B-00805;A;43;500;Cordoba;San Luis;420;High;1;2026-10-05;Truck_S
+B-00806;A;29;500;Buenos Aires;Rio Cuarto;610;High;1;2026-10-02;Truck_M
+B-00807;C;28;1400;Buenos Aires;Mar del Plata;415;High;1;2026-10-10;Truck_S
+B-00808;A;10;500;Cordoba;Santa Fe;350;High;1;2026-10-04;Truck_M
+B-00809;A;18;500;Rosario;San Luis;585;Normal;3;2026-10-05;Truck_M
+B-00810;C;39;1400;Buenos Aires;Rio Cuarto;610;Normal;2;2026-10-04;Truck_L
+B-00811;A;8;500;Rosario;La Plata;330;Normal;3;2026-10-04;Truck_M
+B-00812;A;18;500;Rosario;Mendoza;760;Low;5;2026-10-08;Truck_L
+B-00813;B;20;900;Buenos Aires;Bahia Blanca;640;Low;4;2026-10-09;Truck_L
+B-00814;C;30;1400;Buenos Aires;Tucuman;1200;High;1;2026-10-06;Truck_S
+B-00815;A;12;500;Cordoba;La Plata;730;Normal;2;2026-10-03;Truck_L
+B-00816;C;29;1400;Buenos Aires;Tucuman;1200;Normal;3;2026-10-10;Truck_S
+B-00817;B;48;900;Buenos Aires;Villa Maria;555;Normal;2;2026-10-09;Truck_M
+B-00818;B;34;900;Rosario;Rio Cuarto;410;Normal;2;2026-10-01;Truck_L
+B-00819;C;37;1400;Rosario;La Plata;330;High;1;2026-10-02;Truck_L
+B-00820;C;28;1400;Buenos Aires;La Plata;60;Normal;2;2026-10-03;Truck_S
+B-00821;C;6;1400;Buenos Aires;Villa Maria;555;Normal;3;2026-10-02;Truck_L
+B-00822;B;10;900;Rosario;Santa Fe;170;Low;4;2026-10-08;Truck_L
+B-00823;A;40;500;Buenos Aires;San Francisco;575;Low;5;2026-10-03;Truck_L
+B-00824;B;39;900;Buenos Aires;Tucuman;1200;High;1;2026-10-04;Truck_M
+B-00825;C;12;1400;Buenos Aires;San Luis;790;Normal;3;2026-10-04;Truck_M
+B-00826;A;5;500;Cordoba;Mar del Plata;1050;Normal;2;2026-10-02;Truck_S
+B-00827;C;26;1400;Cordoba;Rio Cuarto;220;High;1;2026-10-02;Truck_M
+B-00828;C;41;1400;Buenos Aires;Bahia Blanca;640;Normal;2;2026-10-10;Truck_S
+B-00829;B;47;900;Rosario;Tucuman;810;Normal;2;2026-10-07;Truck_S
+B-00830;B;8;900;Rosario;Villa Maria;255;Normal;2;2026-10-07;Truck_M
+B-00831;C;13;1400;Cordoba;Santa Fe;350;Normal;3;2026-10-07;Truck_M
+B-00832;A;8;500;Cordoba;Rio Cuarto;220;Normal;2;2026-10-09;Truck_S
+B-00833;A;18;500;Cordoba;San Francisco;205;Normal;3;2026-10-07;Truck_L
+B-00834;A;23;500;Cordoba;Tucuman;570;Normal;3;2026-10-07;Truck_S
+B-00835;C;18;1400;Buenos Aires;Bahia Blanca;640;Normal;3;2026-10-01;Truck_L
+B-00836;C;37;1400;Cordoba;San Luis;420;Low;5;2026-10-09;Truck_M
+B-00837;A;9;500;Buenos Aires;Rio Cuarto;610;High;1;2026-10-10;Truck_S
+B-00838;A;42;500;Cordoba;Tucuman;570;Low;4;2026-10-10;Truck_M
+B-00839;A;21;500;Rosario;Mar del Plata;700;Normal;3;2026-10-04;Truck_M
+B-00840;C;34;1400;Cordoba;Mendoza;650;Normal;3;2026-10-06;Truck_M
+B-00841;A;9;500;Buenos Aires;Mar del Plata;415;High;1;2026-10-09;Truck_S
+B-00842;A;20;500;Cordoba;San Luis;420;High;1;2026-10-06;Truck_M
+B-00843;B;47;900;Buenos Aires;Mendoza;1050;Normal;2;2026-10-09;Truck_S
+B-00844;B;40;900;Cordoba;San Francisco;205;Normal;2;2026-10-03;Truck_L
+B-00845;B;37;900;Cordoba;San Luis;420;Normal;3;2026-10-08;Truck_S
+B-00846;B;7;900;Cordoba;Rio Cuarto;220;Normal;3;2026-10-01;Truck_L
+B-00847;B;40;900;Buenos Aires;Mendoza;1050;Normal;3;2026-10-07;Truck_L
+B-00848;C;42;1400;Cordoba;San Francisco;205;Normal;3;2026-10-09;Truck_S
+B-00849;A;27;500;Cordoba;Mendoza;650;Normal;2;2026-10-04;Truck_M
+B-00850;C;31;1400;Cordoba;San Luis;420;High;1;2026-10-10;Truck_S
+B-00851;C;16;1400;Cordoba;San Francisco;205;High;1;2026-10-07;Truck_S
+B-00852;A;20;500;Rosario;Tucuman;810;High;1;2026-10-05;Truck_S
+B-00853;A;35;500;Cordoba;Tucuman;570;High;1;2026-10-04;Truck_L
+B-00854;A;19;500;Rosario;San Luis;585;Normal;2;2026-10-01;Truck_L
+B-00855;C;22;1400;Rosario;Mendoza;760;High;1;2026-10-06;Truck_S
+B-00856;C;12;1400;Buenos Aires;La Plata;60;Normal;2;2026-10-05;Truck_M
+B-00857;A;27;500;Rosario;Villa Maria;255;Low;5;2026-10-06;Truck_M
+B-00858;B;21;900;Buenos Aires;Rio Cuarto;610;Normal;2;2026-10-01;Truck_M
+B-00859;C;28;1400;Buenos Aires;La Plata;60;Normal;2;2026-10-07;Truck_M
+B-00860;A;24;500;Rosario;Mar del Plata;700;Normal;2;2026-10-09;Truck_L
+B-00861;B;17;900;Rosario;Tucuman;810;Normal;2;2026-10-07;Truck_M
+B-00862;C;30;1400;Buenos Aires;San Francisco;575;Normal;3;2026-10-09;Truck_L
+B-00863;A;43;500;Cordoba;Tucuman;570;High;1;2026-10-06;Truck_M
+B-00864;B;47;900;Buenos Aires;Santa Fe;475;Normal;2;2026-10-02;Truck_M
+B-00865;B;48;900;Buenos Aires;Mar del Plata;415;Normal;2;2026-10-05;Truck_M
+B-00866;A;44;500;Cordoba;Villa Maria;150;Low;5;2026-10-02;Truck_L
+B-00867;B;36;900;Buenos Aires;Mar del Plata;415;Normal;3;2026-10-07;Truck_M
+B-00868;A;11;500;Buenos Aires;Villa Maria;555;High;1;2026-10-07;Truck_S
+B-00869;A;12;500;Buenos Aires;La Plata;60;Normal;2;2026-10-08;Truck_S
+B-00870;A;43;500;Buenos Aires;La Plata;60;High;1;2026-10-06;Truck_L
+B-00871;B;15;900;Buenos Aires;La Plata;60;Normal;3;2026-10-08;Truck_M
+B-00872;B;38;900;Cordoba;Mendoza;650;High;1;2026-10-08;Truck_S
+B-00873;C;22;1400;Rosario;Rio Cuarto;410;Normal;2;2026-10-06;Truck_S
+B-00874;B;49;900;Cordoba;San Francisco;205;Normal;3;2026-10-03;Truck_L
+B-00875;C;31;1400;Rosario;Tucuman;810;Normal;3;2026-10-01;Truck_S
+B-00876;A;6;500;Rosario;Mar del Plata;700;High;1;2026-10-10;Truck_L
+B-00877;B;31;900;Rosario;Mendoza;760;High;1;2026-10-09;Truck_M
+B-00878;C;32;1400;Buenos Aires;Santa Fe;475;Normal;3;2026-10-08;Truck_M
+B-00879;A;13;500;Buenos Aires;Tucuman;1200;Normal;3;2026-10-10;Truck_M
+B-00880;C;10;1400;Rosario;Mar del Plata;700;Normal;2;2026-10-07;Truck_S
+B-00881;A;18;500;Cordoba;Villa Maria;150;Normal;3;2026-10-08;Truck_L
+B-00882;B;31;900;Rosario;Mendoza;760;High;1;2026-10-05;Truck_M
+B-00883;A;19;500;Buenos Aires;La Plata;60;Low;5;2026-10-02;Truck_M
+B-00884;C;44;1400;Cordoba;Santa Fe;350;Normal;2;2026-10-03;Truck_S
+B-00885;A;34;500;Buenos Aires;Rio Cuarto;610;Normal;2;2026-10-05;Truck_S
+B-00886;B;15;900;Buenos Aires;Rio Cuarto;610;High;1;2026-10-05;Truck_S
+B-00887;A;30;500;Rosario;Mar del Plata;700;Normal;3;2026-10-04;Truck_M
+B-00888;A;48;500;Buenos Aires;Santa Fe;475;Low;5;2026-10-10;Truck_M
+B-00889;A;47;500;Buenos Aires;Villa Maria;555;Normal;3;2026-10-06;Truck_L
+B-00890;A;36;500;Rosario;Villa Maria;255;High;1;2026-10-02;Truck_M
+B-00891;B;16;900;Buenos Aires;Bahia Blanca;640;Normal;3;2026-10-09;Truck_L
+B-00892;C;25;1400;Buenos Aires;Bahia Blanca;640;Normal;3;2026-10-04;Truck_S
+B-00893;A;41;500;Rosario;Santa Fe;170;High;1;2026-10-10;Truck_S
+B-00894;C;16;1400;Cordoba;Bahia Blanca;825;High;1;2026-10-08;Truck_M
+B-00895;A;40;500;Rosario;San Luis;585;Normal;3;2026-10-01;Truck_M
+B-00896;C;40;1400;Cordoba;Santa Fe;350;Normal;3;2026-10-04;Truck_L
+B-00897;C;10;1400;Buenos Aires;Bahia Blanca;640;Normal;2;2026-10-05;Truck_M
+B-00898;A;35;500;Cordoba;Mendoza;650;Normal;3;2026-10-09;Truck_M
+B-00899;C;22;1400;Buenos Aires;La Plata;60;Normal;3;2026-10-05;Truck_M
+B-00900;B;17;900;Buenos Aires;Santa Fe;475;Normal;2;2026-10-04;Truck_S
+B-00901;C;11;1400;Buenos Aires;Mendoza;1050;Normal;2;2026-10-09;Truck_S
+B-00902;A;37;500;Cordoba;Villa Maria;150;Low;4;2026-10-10;Truck_M
+B-00903;A;42;500;Buenos Aires;La Plata;60;Normal;3;2026-10-05;Truck_M
+B-00904;A;18;500;Cordoba;Tucuman;570;Normal;2;2026-10-06;Truck_L
+B-00905;A;43;500;Cordoba;San Luis;420;High;1;2026-10-05;Truck_S
+B-00906;A;29;500;Buenos Aires;Rio Cuarto;610;High;1;2026-10-02;Truck_M
+B-00907;C;28;1400;Buenos Aires;Mar del Plata;415;High;1;2026-10-10;Truck_S
+B-00908;A;10;500;Cordoba;Santa Fe;350;High;1;2026-10-04;Truck_M
+B-00909;A;18;500;Rosario;San Luis;585;Normal;3;2026-10-05;Truck_M
+B-00910;C;39;1400;Buenos Aires;Rio Cuarto;610;Normal;2;2026-10-04;Truck_L
+B-00911;A;8;500;Rosario;La Plata;330;Normal;3;2026-10-04;Truck_M
+B-00912;A;18;500;Rosario;Mendoza;760;Low;5;2026-10-08;Truck_L
+B-00913;B;20;900;Buenos Aires;Bahia Blanca;640;Low;4;2026-10-09;Truck_L
+B-00914;C;30;1400;Buenos Aires;Tucuman;1200;High;1;2026-10-06;Truck_S
+B-00915;A;12;500;Cordoba;La Plata;730;Normal;2;2026-10-03;Truck_L
+B-00916;C;29;1400;Buenos Aires;Tucuman;1200;Normal;3;2026-10-10;Truck_S
+B-00917;B;48;900;Buenos Aires;Villa Maria;555;Normal;2;2026-10-09;Truck_M
+B-00918;B;34;900;Rosario;Rio Cuarto;410;Normal;2;2026-10-01;Truck_L
+B-00919;C;37;1400;Rosario;La Plata;330;High;1;2026-10-02;Truck_L
+B-00920;C;28;1400;Buenos Aires;La Plata;60;Normal;2;2026-10-03;Truck_S
+B-00921;C;6;1400;Buenos Aires;Villa Maria;555;Normal;3;2026-10-02;Truck_L
+B-00922;B;10;900;Rosario;Santa Fe;170;Low;4;2026-10-08;Truck_L
+B-00923;A;40;500;Buenos Aires;San Francisco;575;Low;5;2026-10-03;Truck_L
+B-00924;B;39;900;Buenos Aires;Tucuman;1200;High;1;2026-10-04;Truck_M
+B-00925;C;12;1400;Buenos Aires;San Luis;790;Normal;3;2026-10-04;Truck_M
+B-00926;A;5;500;Cordoba;Mar del Plata;1050;Normal;2;2026-10-02;Truck_S
+B-00927;C;26;1400;Cordoba;Rio Cuarto;220;High;1;2026-10-02;Truck_M
+B-00928;C;41;1400;Buenos Aires;Bahia Blanca;640;Normal;2;2026-10-10;Truck_S
+B-00929;B;47;900;Rosario;Tucuman;810;Normal;2;2026-10-07;Truck_S
+B-00930;B;8;900;Rosario;Villa Maria;255;Normal;2;2026-10-07;Truck_M
+B-00931;C;13;1400;Cordoba;Santa Fe;350;Normal;3;2026-10-07;Truck_M
+B-00932;A;8;500;Cordoba;Rio Cuarto;220;Normal;2;2026-10-09;Truck_S
+B-00933;A;18;500;Cordoba;San Francisco;205;Normal;3;2026-10-07;Truck_L
+B-00934;A;23;500;Cordoba;Tucuman;570;Normal;3;2026-10-07;Truck_S
+B-00935;C;18;1400;Buenos Aires;Bahia Blanca;640;Normal;3;2026-10-01;Truck_L
+B-00936;C;37;1400;Cordoba;San Luis;420;Low;5;2026-10-09;Truck_M
+B-00937;A;9;500;Buenos Aires;Rio Cuarto;610;High;1;2026-10-10;Truck_S
+B-00938;A;42;500;Cordoba;Tucuman;570;Low;4;2026-10-10;Truck_M
+B-00939;A;21;500;Rosario;Mar del Plata;700;Normal;3;2026-10-04;Truck_M
+B-00940;C;34;1400;Cordoba;Mendoza;650;Normal;3;2026-10-06;Truck_M
+B-00941;A;9;500;Buenos Aires;Mar del Plata;415;High;1;2026-10-09;Truck_S
+B-00942;A;20;500;Cordoba;San Luis;420;High;1;2026-10-06;Truck_M
+B-00943;B;47;900;Buenos Aires;Mendoza;1050;Normal;2;2026-10-09;Truck_S
+B-00944;B;40;900;Cordoba;San Francisco;205;Normal;2;2026-10-03;Truck_L
+B-00945;B;37;900;Cordoba;San Luis;420;Normal;3;2026-10-08;Truck_S
+B-00946;B;7;900;Cordoba;Rio Cuarto;220;Normal;3;2026-10-01;Truck_L
+B-00947;B;40;900;Buenos Aires;Mendoza;1050;Normal;3;2026-10-07;Truck_L
+B-00948;C;42;1400;Cordoba;San Francisco;205;Normal;3;2026-10-09;Truck_S
+B-00949;A;27;500;Cordoba;Mendoza;650;Normal;2;2026-10-04;Truck_M
+B-00950;C;31;1400;Cordoba;San Luis;420;High;1;2026-10-10;Truck_S
+B-00951;C;16;1400;Cordoba;San Francisco;205;High;1;2026-10-07;Truck_S
+B-00952;A;20;500;Rosario;Tucuman;810;High;1;2026-10-05;Truck_S
+B-00953;A;35;500;Cordoba;Tucuman;570;High;1;2026-10-04;Truck_L
+B-00954;A;19;500;Rosario;San Luis;585;Normal;2;2026-10-01;Truck_L
+B-00955;C;22;1400;Rosario;Mendoza;760;High;1;2026-10-06;Truck_S
+B-00956;C;12;1400;Buenos Aires;La Plata;60;Normal;2;2026-10-05;Truck_M
+B-00957;A;27;500;Rosario;Villa Maria;255;Low;5;2026-10-06;Truck_M
+B-00958;B;21;900;Buenos Aires;Rio Cuarto;610;Normal;2;2026-10-01;Truck_M
+B-00959;C;28;1400;Buenos Aires;La Plata;60;Normal;2;2026-10-07;Truck_M
+B-00960;A;24;500;Rosario;Mar del Plata;700;Normal;2;2026-10-09;Truck_L
+B-00961;B;17;900;Rosario;Tucuman;810;Normal;2;2026-10-07;Truck_M
+B-00962;C;30;1400;Buenos Aires;San Francisco;575;Normal;3;2026-10-09;Truck_L
+B-00963;A;43;500;Cordoba;Tucuman;570;High;1;2026-10-06;Truck_M
+B-00964;B;47;900;Buenos Aires;Santa Fe;475;Normal;2;2026-10-02;Truck_M
+B-00965;B;48;900;Buenos Aires;Mar del Plata;415;Normal;2;2026-10-05;Truck_M
+B-00966;A;44;500;Cordoba;Villa Maria;150;Low;5;2026-10-02;Truck_L
+B-00967;B;36;900;Buenos Aires;Mar del Plata;415;Normal;3;2026-10-07;Truck_M
+B-00968;A;11;500;Buenos Aires;Villa Maria;555;High;1;2026-10-07;Truck_S
+B-00969;A;12;500;Buenos Aires;La Plata;60;Normal;2;2026-10-08;Truck_S
+B-00970;A;43;500;Buenos Aires;La Plata;60;High;1;2026-10-06;Truck_L
+B-00971;B;15;900;Buenos Aires;La Plata;60;Normal;3;2026-10-08;Truck_M
+B-00972;B;38;900;Cordoba;Mendoza;650;High;1;2026-10-08;Truck_S
+B-00973;C;22;1400;Rosario;Rio Cuarto;410;Normal;2;2026-10-06;Truck_S
+B-00974;B;49;900;Cordoba;San Francisco;205;Normal;3;2026-10-03;Truck_L
+B-00975;C;31;1400;Rosario;Tucuman;810;Normal;3;2026-10-01;Truck_S
+B-00976;A;6;500;Rosario;Mar del Plata;700;High;1;2026-10-10;Truck_L
+B-00977;B;31;900;Rosario;Mendoza;760;High;1;2026-10-09;Truck_M
+B-00978;C;32;1400;Buenos Aires;Santa Fe;475;Normal;3;2026-10-08;Truck_M
+B-00979;A;13;500;Buenos Aires;Tucuman;1200;Normal;3;2026-10-10;Truck_M
+B-00980;C;10;1400;Rosario;Mar del Plata;700;Normal;2;2026-10-07;Truck_S
+B-00981;A;18;500;Cordoba;Villa Maria;150;Normal;3;2026-10-08;Truck_L
+B-00982;B;31;900;Rosario;Mendoza;760;High;1;2026-10-05;Truck_M
+B-00983;A;19;500;Buenos Aires;La Plata;60;Low;5;2026-10-02;Truck_M
+B-00984;C;44;1400;Cordoba;Santa Fe;350;Normal;2;2026-10-03;Truck_S
+B-00985;A;34;500;Buenos Aires;Rio Cuarto;610;Normal;2;2026-10-05;Truck_S
+B-00986;B;15;900;Buenos Aires;Rio Cuarto;610;High;1;2026-10-05;Truck_S
+B-00987;A;30;500;Rosario;Mar del Plata;700;Normal;3;2026-10-04;Truck_M
+B-00988;A;48;500;Buenos Aires;Santa Fe;475;Low;5;2026-10-10;Truck_M
+B-00989;A;47;500;Buenos Aires;Villa Maria;555;Normal;3;2026-10-06;Truck_L
+B-00990;A;36;500;Rosario;Villa Maria;255;High;1;2026-10-02;Truck_M
+B-00991;B;16;900;Buenos Aires;Bahia Blanca;640;Normal;3;2026-10-09;Truck_L
+B-00992;C;25;1400;Buenos Aires;Bahia Blanca;640;Normal;3;2026-10-04;Truck_S
+B-00993;A;41;500;Rosario;Santa Fe;170;High;1;2026-10-10;Truck_S
+B-00994;C;16;1400;Cordoba;Bahia Blanca;825;High;1;2026-10-08;Truck_M
+B-00995;A;40;500;Rosario;San Luis;585;Normal;3;2026-10-01;Truck_M
+B-00996;C;40;1400;Cordoba;Santa Fe;350;Normal;3;2026-10-04;Truck_L
+B-00997;C;10;1400;Buenos Aires;Bahia Blanca;640;Normal;2;2026-10-05;Truck_M
+B-00998;A;35;500;Cordoba;Mendoza;650;Normal;3;2026-10-09;Truck_M
+B-00999;C;22;1400;Buenos Aires;La Plata;60;Normal;3;2026-10-05;Truck_M
+B-01000;B;17;900;Buenos Aires;Santa Fe;475;Normal;2;2026-10-04;Truck_S

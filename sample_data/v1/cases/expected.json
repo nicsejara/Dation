@@ -1,0 +1,107 @@
+[
+  {
+    "case": "01_consolidacion",
+    "configuration": {
+      "objective": "min_trips"
+    },
+    "options": {},
+    "expected": {
+      "units_delivered": 2,
+      "total_trips": 1
+    }
+  },
+  {
+    "case": "02_unidades_indivisibles",
+    "configuration": {
+      "objective": "min_cost"
+    },
+    "options": {},
+    "expected": {
+      "units_delivered": 3,
+      "total_trips": 3,
+      "outsourced_trips_share": 0.6666666666666666
+    }
+  },
+  {
+    "case": "03_reprogramacion",
+    "configuration": {
+      "objective": "min_cost"
+    },
+    "options": {},
+    "expected": {
+      "units_delivered": 2,
+      "total_trips": 2,
+      "outsourced_trips_share": 0
+    }
+  },
+  {
+    "case": "04_tardanza_inevitable",
+    "configuration": {
+      "objective": "min_time"
+    },
+    "options": {},
+    "expected": {
+      "units_delivered": 1,
+      "late_orders_unavoidable": 1,
+      "on_time_rate": 0
+    }
+  },
+  {
+    "case": "05_anomalia_incluir",
+    "configuration": {
+      "objective": "min_cost"
+    },
+    "options": {
+      "anomaly_decisions": {
+        "A": "include"
+      }
+    },
+    "expected": {
+      "units_delivered": 52
+    }
+  },
+  {
+    "case": "06_anomalia_excluir",
+    "configuration": {
+      "objective": "min_cost"
+    },
+    "options": {
+      "anomaly_decisions": {
+        "A": "exclude"
+      }
+    },
+    "expected": {
+      "units_delivered": 1
+    }
+  },
+  {
+    "case": "07_sin_cobertura",
+    "configuration": {
+      "objective": "min_cost"
+    },
+    "options": {},
+    "expected": {
+      "error_contains": "No se encontró un plan factible"
+    }
+  },
+  {
+    "case": "08_fecha_invalida",
+    "configuration": {
+      "objective": "min_cost"
+    },
+    "options": {},
+    "expected": {
+      "error_contains": "dispatch_date"
+    }
+  },
+  {
+    "case": "09_ruta_inconsistente",
+    "configuration": {
+      "objective": "min_cost"
+    },
+    "options": {},
+    "expected": {
+      "error_contains": "distancia inconsistente"
+    }
+  }
+]

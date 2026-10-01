@@ -12,14 +12,14 @@ The first active Decision Asset is **DDA Logística**.
 Current end-to-end flow:
 
 ```text
-CSV / stored dataset
+Orders CSV + versioned fleet CSV
         ↓
 validation + dataset profile
         ↓
 decision configuration
-(preset or weighted)
+(cost / trips / delivery time)
         ↓
-Python deterministic engine
+Bounded CP-SAT + validated deterministic candidates
         ↓
 DecisionResult JSON
         ↓
@@ -32,8 +32,8 @@ traceability + export
 
 ## Current versions
 
-- Workspace / API: **0.7.0**
-- Logistics engine: **0.2.0**
+- Workspace / API: **1.0.0**
+- Dispatch engine: **1.0.0** (`dispatch_v1`); historical engine **0.2.0** retained
 - Frontend: HTML + CSS + vanilla JavaScript
 - Runtime: Google Cloud Run
 - Data / storage: Supabase
@@ -72,3 +72,12 @@ business knowledge base.
 
 Real credentials and `.env` files must never be committed.
 Runtime secrets remain in Google Secret Manager / Cloud Run.
+
+
+## Dispatch 1.0 activation
+
+The new flow requires the additive Supabase migration applied manually by the owner.
+Until then the UI reports the missing activation and offers the legacy workflow.
+See [deployment](backend/DEPLOYMENT.md), [architecture](docs/architecture.md),
+[data contracts](docs/data-contracts.md), [model ADR](docs/adr/0001-dispatch-decision-model.md),
+[validation](docs/validation-dispatch-v1.md) and [CSV test guide](sample_data/v1/README.md).

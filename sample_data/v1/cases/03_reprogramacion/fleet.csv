@@ -1,0 +1,2 @@
+vehicle_type;ownership;capacity_kg;cost_per_km;fixed_trip_cost;units_available;avg_speed_kmh;driving_hours_per_day;fuel_l_per_100km;co2_kg_per_km
+Small;own;1000;1;10;1;100;10;20;0.5

@@ -1,0 +1,2 @@
+order_id;product;quantity_units;unit_weight_kg;origin;destination;distance_km;priority;max_delivery_days;dispatch_date
+A;Producto sintético;2;600;Origen;Destino;100;Normal;2;2026-10-01

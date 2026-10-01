@@ -1,387 +1,45 @@
-# Dation Decision Workspace v0.2
+# Despliegue de Dispatch 1.0.0
 
-Expected deployed API version: **0.7.0**
+API esperada: **1.0.0**. Motor nuevo: **1.0.0**, esquema `dispatch_v1`. Motor histórico: **0.2.0**. Python **3.12**, OR-Tools **9.15.6755** fijado en `requirements.txt`.
 
-Expected Logistics engine version: **0.2.0**
+## Activación manual en Supabase (propietario)
 
-Primary application URL:
-- `/app`
+**Esta entrega no aplica migraciones productivas.** La puerta de la fase 2 del prompt reserva esa acción y su confirmación al usuario.
 
-Compatibility URL:
-- `/upload` (serves the same workspace)
+1. Verificar proyecto y respaldo. Revisar `supabase/migrations/20261001004934_dispatch_v1.sql` desde la raíz del repositorio.
+2. Ejecutar el archivo completo en SQL Editor del proyecto correspondiente. Está encapsulado en una transacción y es aditivo/idempotente; no borra registros ni altera las políticas RLS existentes.
+3. Confirmar las columnas nuevas en `datasets` y `decision_runs`, los índices y `set_default_fleet`. Actualizar la caché de esquema PostgREST si fuera necesario (`NOTIFY pgrst, 'reload schema';`).
+4. Con backend actualizado y autenticación válida, consultar `/api/dispatch/status`; debe responder `available: true`.
+5. Subir `sample_data/v1/fleet.csv`, marcarla vigente y subir `orders.csv`. Ejecutar los casos de la guía `sample_data/v1/README.md`.
 
-## Experience architecture
+La inspección previa fue de solo lectura. Se observó `dataset_id NOT NULL`, índices SHA no únicos y RLS activado sin políticas; por eso se preserva el acceso del servidor con service role y no se expone una API de base de datos al navegador. No se ejecutó la migración en el proyecto del usuario ni se afirma una validación SQL productiva.
 
-The application is a vanilla HTML + CSS + JavaScript SPA with four primary areas:
+## Backend / Cloud Run
 
-1. **Inicio**
-   - Decision Data Asset selector.
-   - DDA Logística is the only active Decision Asset.
-2. **DDA Logística**
-   - Dataset selection / upload / profile.
-   - Preset decision modes.
-   - Custom cost/trips weighting.
-   - Deterministic execution.
-3. **Dashboard de decisión**
-   - Run context.
-   - KPIs and baseline impact.
-   - Dataset context.
-   - Sensitivity against 100/0 and 0/100 extremes.
-   - Assignment drivers.
-   - Model assumptions.
-   - AI interpretation, export and contextual chat.
-4. **Trazabilidad**
-   - Datasets.
-   - Decision history.
-   - Technical evidence.
+Instalar `pip install -r backend/requirements.txt`. Si el directorio de build es `backend`, respetar su `.python-version` y Procfile:
 
-## Decision API
-
-Primary execution endpoint:
-
-`POST /api/runs/{dataset_id}`
-
-Body:
-
-```json
-{
-  "mode": "custom",
-  "objective": "custom",
-  "weights": {
-    "cost": 0.7,
-    "trips": 0.3
-  }
-}
+```bash
+uvicorn main:app --host 0.0.0.0 --port "${PORT:-8080}"
 ```
 
-Presets use canonical weights:
+Variables existentes: `SUPABASE_URL`, `SUPABASE_SECRET_KEY`, `SUPABASE_INPUT_BUCKET`, `DATION_ACCESS_PASSWORD`, configuración `LLM_*`. No incluir credenciales en GitHub. Conservar el bucket privado y los secretos actuales.
 
-- `min_cost` → cost 1.0 / trips 0.0.
-- `min_trips` → cost 0.0 / trips 1.0.
+Revisar timeout del request, memoria y concurrencia reales antes de activar. Se recomienda empezar con concurrencia 1 para tareas CPU y timeout de al menos 300 s, sujeto a medición real. El POST mantiene la petición abierta, mientras el polling consulta progreso. No se lanzan procesos en paralelo: la configuración vCPU del Cloud Run real no fue accesible para comprobarla. `DATION_STALE_RUN_SECONDS` vale 600 por defecto. El presupuesto global del motor incluye callbacks de progreso y puede fallar si Supabase responde muy lentamente; se informa como error sin publicar resultado parcial.
 
-Legacy calls that use `?objective=min_cost` or `?objective=min_trips` remain supported.
+La publicación en GitHub no demuestra por sí misma un despliegue correcto en Cloud Run. Verificar logs de build, `/health`, `/app`, `/upload`, endpoint autenticado de estado, y una ejecución persistida antes de considerar activado el MVP.
 
-## Engine v0.2
+## Verificación local y CI
 
-The custom mode uses per-shipment Min-Max normalization:
-
-```text
-normalized_cost = (cost - min_cost) / (max_cost - min_cost)
-normalized_trips = (trips - min_trips) / (max_trips - min_trips)
-
-decision_score =
-    cost_weight * normalized_cost
-  + trips_weight * normalized_trips
-```
-
-When max equals min, the normalized value is 0.
-
-The exact extremes reuse the preset selectors, guaranteeing:
-
-- 100/0 == `min_cost`
-- 0/100 == `min_trips`
-
-The DecisionResult preserves:
-
-- baseline,
-- min_cost,
-- min_trips,
-- custom (when applicable),
-- configuration,
-- sensitivity metadata,
-- model assumptions,
-- deterministic assignment evidence.
-
-## Data profile
-
-`GET /api/datasets/{dataset_id}/profile`
-
-Profiles the raw stored CSV on demand without a new Supabase migration. It returns validation, dataset metadata, operational summary and a small record preview.
-
-## AI Interpreter
-
-The interpreter remains downstream from the deterministic engine.
-
-It receives:
-
-- mode,
-- weights,
-- selected scenario,
-- baseline,
-- sensitivity extremes,
-- major changes,
-- model assumptions.
-
-It never recalculates the decision.
-
-Historical explanations and chat messages can be restored with:
-
-`GET /api/runs/{run_id}/interpretation`
-
-## Compatibility
-
-The implementation preserves:
-
-- HTTP Basic authentication,
-- CSV upload,
-- deduplication,
-- Supabase Storage,
-- Postgres persistence,
-- Cloud Run,
-- Groq,
-- `/app`,
-- `/upload`,
-- engine 0.1 historical runs.
-
-Historical runs with only:
-
-```json
-{"objective": "min_cost"}
-```
-
-are reconstructed as the canonical 100/0 preset.
-
-## Automated tests
-
-Run from `backend/`:
+Desde `backend`:
 
 ```bash
 python -m unittest discover -s tests -v
+node tests/test_dashboard_selectors.js
+node --test tests/test_dispatch_selectors.mjs
 ```
 
-The suite covers:
+Desde raíz: `PYTHONPATH=backend python scripts/benchmark_dispatch.py`. Ver `docs/validation-dispatch-v1.md` para alcance de pruebas y resultados medidos. CI ejecuta Python 3.12, Node 22, compilación, sintaxis JavaScript y tests.
 
-- custom 100/0 equivalence with min_cost,
-- custom 0/100 equivalence with min_trips,
-- deterministic 70/30 behavior,
-- baseline preservation,
-- custom score serialization,
-- weight validation,
-- legacy configuration reconstruction.
+## Rollback sin pérdida
 
-
-## Home hotfix — simplified DDA selector
-
-Latest UI hotfix on main:
-- Inicio contains only a hero and two Decision Data Assets.
-- DDA Logística is the only interactive home CTA.
-- Its CTA routes to `logistics-config`.
-- DDA Producción is visible but disabled / upcoming.
-- The previous oversized inline SVG illustration was removed from Inicio.
-
-
-## Home v3 — professional DDA selector
-
-Final main-state for the current deployment:
-- Professional executive hero inspired by the dashboard reference.
-- Visual decision tiles in the hero; no inline SVG artwork.
-- Two Decision Data Assets on Inicio.
-- DDA Logística is the only interactive CTA and routes to `logistics-config`.
-- DDA Producción is visible and disabled.
-- CSS and JavaScript URLs are cache-busted from `app.html`.
-
-
-## Journey navigation hotfix — 2026-09-30
-
-- Topbar simplified to a clickable decision journey.
-- Inicio shows only "Inicio".
-- Logistics flow shows: Inicio > DDA Logística > Cargar data > Configurar decisión > Dashboard decisión.
-- Previous stages are clickable and navigate/scroll back.
-- Sidebar buttons use the same resilient global navigator.
-- MVP badge, service verification status and avatar were removed from the topbar.
-- app.js delegates view changes to the global journey navigator so programmatic transitions stay synchronized.
-
-
-## Logistics overview flow — 2026-09-30
-
-Navigation now follows:
-- Inicio
-- DDA Logística overview
-- Cargar data
-- Configurar decisión
-- Dashboard decisión
-
-The new DDA Logística overview explains:
-- decision purpose,
-- baseline and alternatives,
-- sensitivity,
-- required input data,
-- decision outputs,
-- current MVP scope and limits.
-
-The home card and sidebar open the overview.
-The overview CTA starts the process at the data-loading stage.
-
-
-## Dedicated data ingestion stage — 2026-09-30
-
-The Logistics flow now separates data ingestion from decision configuration:
-
-- DDA Logística overview
-- Cargar data
-- Configurar decisión
-- Dashboard decisión
-
-Cargar data now includes:
-- blue drag & drop CSV area,
-- reuse of previously stored datasets,
-- selected evidence summary,
-- automatic validation results,
-- schema / required columns / empty required cells / duplicate shipment checks,
-- dataset profile and preview,
-- explicit "Configurar decisión" CTA enabled only after validation succeeds.
-
-The top journey navigation unlocks Configurar decisión only when the dataset profile is ready.
-
-
-## Resilient data ingestion controller — 2026-09-30
-
-Root cause fixed:
-- a frontend module syntax error prevented the workspace JavaScript from booting,
-  which left file selection, drag & drop and dataset library interactions inactive.
-
-Hardening added:
-- standalone classic `data-stage.js` controller for the complete Cargar data flow;
-- file picker binding;
-- drag & drop binding with guided overlay;
-- dataset library loading and selection;
-- upload to `/api/datasets/upload`;
-- profile validation through `/api/datasets/{id}/profile`;
-- bridge event `dation:dataset-ready` to synchronize the main workspace state;
-- downloadable `Dation_Logistics_Template.csv` with 14 required columns and 6 simulated rows;
-- explicit structure guidance in the UI.
-
-Final frontend checks:
-- app.js syntax OK;
-- ui.js syntax OK;
-- data-stage.js syntax OK;
-- all data-stage DOM IDs resolved;
-- template contains 14 required columns.
-
-
-## Decision configuration stage v2 — 2026-09-30
-
-The decision configuration stage is now isolated from the legacy workspace bindings.
-
-Flow:
-- validated dataset is persisted in session storage;
-- decision-stage.js restores the dataset independently;
-- three starting presets are available:
-  - min_cost = 100% cost / 0% trips;
-  - min_trips = 0% cost / 100% trips;
-  - balanced = custom 50% / 50%;
-- both Cost and Trips have linked sliders;
-- moving either slider automatically adjusts the other so total weight always remains 100%;
-- all non-extreme weights are submitted as mode=custom, objective=custom;
-- execution requires an explicit review modal;
-- the confirmation modal displays dataset, mode, weights and engine version;
-- confirmed execution POSTs to /api/runs/{dataset_id};
-- successful runs are bridged back to the main workspace and rendered in Decision Dashboard.
-
-Hardening:
-- stale legacy upload and decision binders removed from app.js;
-- stale legacy decision UI renderer removed from ui.js;
-- validated dataset persisted across stages;
-- GitHub Actions now runs on main pushes and validates data-stage.js + decision-stage.js syntax;
-- frontend contract tests cover stage DOM/API contracts.
-
-
-## Enterprise Decision Dashboard v2 — 2026-09-30
-
-Root cause fixed:
-- execution previously awaited the synchronous POST /api/runs/{dataset_id}
-  before entering Dashboard;
-- rendering also occurred before navigation, so a rendering exception could
-  prevent navigation completely.
-
-Execution flow now:
-- the browser generates a UUID for the run;
-- POST /api/runs/{dataset_id}?run_id={uuid} starts with that persisted ID;
-- Dashboard opens immediately in an execution/loading state;
-- the request continues while Dashboard polls GET /api/runs/{run_id};
-- run_id is stored in the URL and sessionStorage to recover after reload;
-- completed runs replace skeletons with the real dashboard;
-- errors, timeout and cancelled client waiting have explicit UI states and retry actions.
-
-Dashboard v2 includes:
-- decision hero and semantic KPIs;
-- honest indeterminate execution progress and skeletons;
-- impact chart vs baseline;
-- reference selector and decision comparison table;
-- relative comparison chart;
-- drivers, context, sensitivity and assumptions;
-- AI executive summary using the existing /explain endpoint;
-- contextual chat using the existing /chat endpoint.
-
-Known backend gaps intentionally not simulated:
-- no granular execution-progress endpoint, so no fake percentages are shown;
-- no server-side cancellation endpoint; "Detener espera" cancels client waiting only;
-- no token streaming endpoint for LLM responses; the UI states this explicitly.
-
-
-## Persistent dashboard + interpreter ownership — 2026-09-30
-
-Navigation:
-- Sidebar primary navigation exposes only Inicio.
-- DDA Logística remains in the Decision Data Assets section.
-- DDA overview exposes two explicit paths:
-  - Iniciar nueva decisión.
-  - Analizar mi última decisión.
-
-Decision persistence:
-- The latest completed run is resolved from Supabase decision_runs through /api/runs.
-- The run summary is resolved to the full run before rendering.
-- Dashboard availability remains unlocked after a completed run.
-- Dashboard can be reconstructed after leaving the view or reloading the page.
-
-Interpreter hardening:
-- interpreter-stage.js owns LLM status, executive explanation, saved interpretation recovery and contextual chat.
-- The interpreter no longer depends on app.js activeRun timing to make its buttons work.
-- Generated explanation is synchronized back to app.js only for export state.
-
-Custom-decision semantics:
-- Engine behavior was verified: custom runs persist mode=custom, objective=custom and recommended_scenario=custom.
-- If a custom assignment equals min_cost and/or min_trips, it remains labeled Configuración personalizada.
-- Equality with an extreme is communicated as sensitivity equivalence rather than a renamed objective.
-- Interpreter knowledge/prompt version is now v0.3.
-
-
-## Dashboard footer + floating contextual chat — 2026-09-30
-
-Dashboard actions:
-- Footer now exposes a single CTA: Exportar decisión.
-- Exportar decisión downloads the active run result_json as JSON.
-- Export no longer depends on Dation Interpreter or a generated explanation.
-
-Interpreter UX:
-- Executive summary now uses the full dashboard width.
-- The fixed chat card was removed from the page layout.
-- Contextual chat is now a floating launcher + floating panel.
-- Chat keeps the same run-scoped /chat endpoint and saved message history.
-- Floating chat supports close button, Escape key and aria-expanded state.
-
-
-## Decision-first dashboard + fixed action dock — 2026-09-30
-
-Decision semantics:
-- Dashboard separates optimization objective from generated operational decision.
-- Objective is rendered from persisted configuration:
-  - minimize total cost;
-  - minimize trips;
-  - custom weighted objective.
-- Generated decision summarizes shipment-to-vehicle assignment, total trips and vehicle distribution.
-- Baseline is presented as "Asignación de referencia", sourced from vehicle_type in the input CSV.
-- Baseline must not be described as verified current operation without additional evidence.
-
-Dashboard UX:
-- Exportar decisión and Preguntale a Dation share one fixed viewport action dock.
-- The dock remains visible while scrolling the Dashboard.
-- The contextual chat panel opens above the fixed dock.
-- Decision export is owned by dashboard-stage.js and no longer depends on app.js state timing.
-
-Export:
-- Exports the active DecisionResult JSON as a UTF-8 .txt file.
-- If only run_id is available, the full completed run is fetched before export.
-
-Interpreter:
-- Knowledge/context explicitly distinguish reference assignment from current operational state.
+Replegar la versión anterior de la aplicación manteniendo columnas, índices, funciones y datos nuevos. Las corridas `dispatch_v1` seguirán almacenadas aunque esa interfaz anterior no sepa abrirlas; volver a la versión nueva para visualizarlas. No borrar columnas con corridas existentes. Antes de migrar, el fallback legacy y sus endpoints permanecen disponibles. No hay downgrade SQL destructivo automático.
