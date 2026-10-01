@@ -77,11 +77,6 @@ class FrontendContractTests(
         cls.ui_js = UI_JS.read_text(
             encoding="utf-8"
         )
-        cls.data_stage_js = (
-            DATA_STAGE_JS.read_text(
-                encoding="utf-8"
-            )
-        )
         cls.decision_stage_js = (
             DECISION_STAGE_JS.read_text(
                 encoding="utf-8"
