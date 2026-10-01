@@ -171,6 +171,9 @@ export function decisionConfiguration() {
 export function normalizeRunConfiguration(
   run
 ) {
+  if (run?.schema_version === "dispatch_v1" || run?.result_json?.schema_version === "dispatch_v1") {
+    return run.result_json?.configuration || run.configuration_json;
+  }
   const raw = (
     run?.configuration_json || {}
   );

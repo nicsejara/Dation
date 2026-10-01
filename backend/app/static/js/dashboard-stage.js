@@ -536,6 +536,9 @@
     dataset
   ) {
     var result = run.result_json;
+    document.body.classList.remove('dispatch-result');
+    var legacyNotice = document.getElementById('dispatch-legacy-notice');
+    if (!legacyNotice) { legacyNotice = document.createElement('p'); legacyNotice.id = 'dispatch-legacy-notice'; legacyNotice.textContent = 'Corrida con motor anterior: asignación por despacho, sin planificación de flota.'; document.querySelector('[data-view-panel="decision-dashboard"]').prepend(legacyNotice); }
     var selected = (
       S.selectedScenario(run)
     );
@@ -2361,102 +2364,6 @@
     );
   }
 
-  function renderContext(
-    profilePayload,
-    result
-  ) {
-    var container = (
-      $("#dashboard-data-context")
-    );
-
-    if (!container) {
-      return;
-    }
-
-    var profile = (
-      profilePayload
-      && profilePayload.profile
-      || {}
-    );
-
-    var range = (
-      profile.dispatch_date_range
-      || {}
-    );
-
-    var chips = [
-      ["Despachos", F.formatNumber(
-        profile.shipments
-      )],
-      ["Unidades", F.formatNumber(
-        profile.total_units
-      )],
-      ["Peso", (
-        F.formatNumber(
-          profile.total_weight_kg,
-          0
-        )
-        + " kg"
-      )],
-      ["Orígenes", F.formatNumber(
-        profile.origins
-      )],
-      ["Destinos", F.formatNumber(
-        profile.destinations
-      )],
-      ["Vehículos", F.formatNumber(
-        profile.vehicle_types
-      )],
-      ["Distancia media", F.formatKm(
-        profile.average_distance_km,
-        0
-      )],
-      ["Ventana", F.formatDateRange(
-        range.from,
-        range.to
-      )]
-    ];
-
-    container.innerHTML = (
-      chips.map(function (item) {
-        return (
-          '<div class="context-chip">'
-          + "<span>"
-          + escapeHtml(item[0])
-          + "</span>"
-          + "<strong>"
-          + escapeHtml(item[1])
-          + "</strong>"
-          + "</div>"
-        );
-      }).join("")
-    );
-
-    var assumptions = (
-      $("#assumptions-list")
-    );
-
-    if (assumptions) {
-      assumptions.innerHTML = (
-        (
-          result.model_assumptions
-          || []
-        )
-          .map(function (item) {
-            return (
-              "<li>"
-              + escapeHtml(
-                  F.normalizeBusinessText(
-                    item
-                  )
-                )
-              + "</li>"
-            );
-          }).join("")
-      );
-    }
-  }
-
   function renderSectionSafely(
     sectionId,
     renderer
@@ -2607,15 +2514,6 @@
       }
     );
 
-    renderSectionSafely(
-      "dashboard-context",
-      function () {
-        renderContext(
-          profile,
-          run.result_json
-        );
-      }
-    );
 
     var exportButton = (
       $("#export-decision")
@@ -2637,6 +2535,12 @@
   }
 
   async function recoverRun(run) {
+    if (run.result_json && run.result_json.schema_version === 'dispatch_v1') {
+      var dispatch = await import('./dispatch/workspace.mjs');
+      dispatch.show(run);
+      return;
+    }
+    document.body.classList.remove('dispatch-result');
     var context = (
       state.context || {}
     );
@@ -3349,6 +3253,7 @@
   }
 
   async function restoreExecution() {
+    if (new URLSearchParams(location.search).get('dda') === 'dispatch_v1') return;
     var stored = loadContext();
     var urlRunId = runFromUrl();
 

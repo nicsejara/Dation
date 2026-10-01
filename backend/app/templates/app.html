@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="color-scheme" content="light">
   <title>Dation · Decision Intelligence</title>
-  <link rel="stylesheet" href="/static/css/tokens.css?v=workspace-v17-20260930">
-  <link rel="stylesheet" href="/static/css/app.css?v=workspace-v18-20260930">
+  <link rel="stylesheet" href="/static/css/tokens.css?v=dispatch-v1">
+  <link rel="stylesheet" href="/static/css/app.css?v=dispatch-v1">
+  <link rel="stylesheet" href="/static/css/dispatch.css?v=dispatch-v1">
 </head>
 <body>
   <div class="app-shell">
@@ -42,7 +43,7 @@
           </span>
           <span>
             <strong>DDA Logística</strong>
-            <small>Motor 0.2.0</small>
+            <small>Planificación de despachos</small>
           </span>
           <span class="status-dot status-dot--live" aria-label="Activo"></span>
         </button>
@@ -200,15 +201,14 @@
               <div class="dda-overview__hero-copy">
                 <div class="dda-overview__meta">
                   <span class="dda-overview__badge">Decision Data Asset</span>
-                  <span>Motor 0.2.0</span>
+                  <span>Motor de despacho 1.0.0</span>
                 </div>
 
                 <h1>DDA Logística</h1>
 
                 <p class="dda-overview__lead">
-                  Un motor de decisión para comparar alternativas de asignación
-                  de vehículos por despacho y entender el impacto estimado sobre
-                  costo, viajes y distancia.
+                  Planificá cuándo despachar cada orden y qué camión utilizar,
+                  con prioridades de costo, cantidad de viajes y tiempo de entrega.
                 </p>
 
                 <div class="dda-overview__hero-actions">
@@ -248,12 +248,12 @@
                 <div class="dda-overview__decision-flow">
                   <div>
                     <span>Entrada</span>
-                    <strong>Datos de despachos y vehículos</strong>
+                    <strong>Órdenes + flota disponible</strong>
                   </div>
                   <span class="dda-overview__flow-arrow">↓</span>
                   <div>
                     <span>Motor</span>
-                    <strong>Compara alternativas</strong>
+                    <strong>Consolida y programa despachos</strong>
                   </div>
                   <span class="dda-overview__flow-arrow">↓</span>
                   <div>
@@ -267,21 +267,20 @@
             <section class="dda-overview__section">
               <div class="dda-overview__section-heading">
                 <span class="section-kicker">Qué resuelve</span>
-                <h2>Convierte una asignación logística en una decisión comparable</h2>
+                <h2>Convierte órdenes y recursos en un plan de despacho</h2>
                 <p>
-                  Parte de la asignación informada en el dataset y evalúa alternativas por despacho
-                  para mostrar qué cambia si el decisor prioriza costo, cantidad
-                  de viajes o una combinación de ambas dimensiones.
+                  Combina órdenes de una misma ruta, respeta la disponibilidad diaria
+                  y compara planes según costo, viajes y tiempo de entrega.
                 </p>
               </div>
 
               <div class="dda-overview__value-grid">
                 <article class="dda-overview__value-card">
                   <span class="dda-overview__value-number">01</span>
-                  <h3>Asignación actual</h3>
+                  <h3>Despacho directo</h3>
                   <p>
-                    Toma el tipo de vehículo informado en el CSV como referencia para
-                    medir el impacto potencial de otras asignaciones.
+                    Construye una referencia sin consolidación ni reprogramación
+                    para comparar el impacto del plan.
                   </p>
                 </article>
 
@@ -289,8 +288,8 @@
                   <span class="dda-overview__value-number">02</span>
                   <h3>Alternativas</h3>
                   <p>
-                    Evalúa los tipos de vehículo disponibles para cada despacho
-                    y calcula viajes, distancia y costo estimado.
+                    Asigna unidades enteras, consolida cargas compatibles y evalúa
+                    salidas con flota propia o tercerizada.
                   </p>
                 </article>
 
@@ -298,8 +297,8 @@
                   <span class="dda-overview__value-number">03</span>
                   <h3>Sensibilidad</h3>
                   <p>
-                    Permite comparar costo mínimo, viajes mínimos y una
-                    ponderación personalizada entre ambas prioridades.
+                    Compara costo, viajes y rapidez, con tres prioridades
+                    vinculadas y un objetivo balanceado.
                   </p>
                 </article>
 
@@ -319,11 +318,11 @@
                 <span class="section-kicker">Qué necesita</span>
                 <h2>Datos de entrada</h2>
                 <ul class="dda-overview__checklist">
-                  <li>Despachos identificados individualmente.</li>
+                  <li>Órdenes identificadas individualmente.</li>
                   <li>Cantidad de unidades y peso por unidad.</li>
                   <li>Origen, destino y distancia.</li>
-                  <li>Tipo de vehículo informado como asignación actual.</li>
-                  <li>Capacidad, costo por km y costo fijo por viaje.</li>
+                  <li>Fecha de disponibilidad y plazo máximo de entrega.</li>
+                  <li>Archivo de flota: capacidad, disponibilidad diaria, costos y velocidad.</li>
                 </ul>
               </div>
 
@@ -332,9 +331,9 @@
                 <h2>Resultado de decisión</h2>
                 <ul class="dda-overview__checklist">
                   <li>Escenario recomendado para la prioridad seleccionada.</li>
-                  <li>Costo, viajes y distancia frente a la asignación actual.</li>
-                  <li>Comparación contra extremos 100% costo y 100% viajes.</li>
-                  <li>Principales cambios de asignación por despacho.</li>
+                  <li>Costo, viajes, plazo, utilización y entregas a tiempo.</li>
+                  <li>Comparación contra despacho directo y alternativas de prioridad.</li>
+                  <li>Calendario, viajes, cargas por orden y exportación CSV.</li>
                   <li>DecisionResult JSON trazable e interpretación ejecutiva.</li>
                 </ul>
               </div>
@@ -344,18 +343,18 @@
               <div class="dda-overview__scope">
                 <div>
                   <span class="section-kicker">Alcance actual</span>
-                  <h2>Qué hace — y qué todavía no hace</h2>
+                  <h2>Supuestos del plan</h2>
                   <p>
-                    Este MVP compara asignaciones de vehículo por despacho.
-                    Todavía no resuelve consolidación entre despachos, secuencia
-                    de paradas, disponibilidad temporal de flota ni rutas geográficas.
+                    Cada viaje conecta un origen y un destino, sin multiparada.
+                    La flota propia limita salidas por día; no se modela su ocupación
+                    durante el retorno. CO₂ y combustible son estimaciones informativas.
                   </p>
                 </div>
 
                 <div class="dda-overview__scope-tags">
                   <span class="dda-overview__scope-tag is-active">Costo</span>
                   <span class="dda-overview__scope-tag is-active">Viajes</span>
-                  <span class="dda-overview__scope-tag">Tiempo</span>
+                  <span class="dda-overview__scope-tag is-active">Tiempo</span>
                   <span class="dda-overview__scope-tag">CO2</span>
                   <span class="dda-overview__scope-tag">Riesgo</span>
                   <span class="dda-overview__scope-tag">Servicio</span>
@@ -1233,19 +1232,6 @@
                 </div>
               </section>
 
-              <section class="dashboard-section panel dashboard-context" id="dashboard-context">
-                <div class="dashboard-section__heading dashboard-section__heading--split">
-                  <div>
-                    <span class="section-kicker">Contexto analizado</span>
-                    <h2>Universo de la decisión</h2>
-                  </div>
-
-                  <div class="dashboard-context-actions">
-                    <details class="model-assumptions">
-                      <summary>Supuestos del motor</summary>
-                      <ul id="assumptions-list" class="assumptions-list"></ul>
-                    </details>
-
                     <details class="execution-details execution-details--inline" id="execution-details">
                       <summary>Detalles de la ejecución</summary>
                       <div class="execution-details__popover">
@@ -1274,11 +1260,6 @@
                         </div>
                       </div>
                     </details>
-                  </div>
-                </div>
-
-                <div id="dashboard-data-context" class="context-chip-grid"></div>
-              </section>
 
               <section class="dashboard-section dashboard-ai" id="dashboard-ai">
                 <div class="dashboard-section__heading dashboard-section__heading--split">
@@ -1771,7 +1752,7 @@
       };
 
       window.dationSetDataReady = function (ready) {
-        dataReady = Boolean(ready);
+        dataReady = document.body.classList.contains('dispatch-enabled') && window.DationDispatch ? window.DationDispatch.isReady() : Boolean(ready);
 
         if (currentView === 'logistics-data') {
           window.dationRenderJourney(currentView);
@@ -1814,6 +1795,7 @@
 
         target.classList.add('is-active');
         currentView = view;
+        window.dispatchEvent(new CustomEvent('dation:view', {detail: {view: view}}));
 
         setSidebarActive(view);
         window.dationRenderJourney(view);
@@ -1832,12 +1814,14 @@
       window.dationRenderJourney('inicio');
     })();
   </script>
-  <script src="/static/js/data-stage.js?v=workspace-v17-20260930"></script>
-  <script src="/static/js/dashboard-formatters.js?v=workspace-v17-20260930"></script>
-  <script src="/static/js/dashboard-selectors.js?v=workspace-v17-20260930"></script>
-  <script src="/static/js/dashboard-stage.js?v=workspace-v17-20260930"></script>
-  <script src="/static/js/interpreter-stage.js?v=workspace-v17-20260930"></script>
-  <script src="/static/js/decision-stage.js?v=workspace-v17-20260930"></script>
-  <script type="module" src="/static/js/app.js?v=workspace-v17-20260930"></script>
+  <script src="/static/js/data-stage.js?v=dispatch-v1"></script>
+  <script src="/static/js/dashboard-formatters.js?v=dispatch-v1"></script>
+  <script src="/static/js/dashboard-selectors.js?v=dispatch-v1"></script>
+  <script src="/static/js/dashboard-stage.js?v=dispatch-v1"></script>
+  <script src="/static/js/interpreter-stage.js?v=dispatch-v1"></script>
+  <script src="/static/js/decision-stage.js?v=dispatch-v1"></script>
+  <script src="/static/vendor/echarts-dispatch-6.0.0.min.js"></script>
+  <script type="module" src="/static/js/dispatch/workspace.mjs?v=dispatch-v1"></script>
+  <script type="module" src="/static/js/app.js?v=dispatch-v1"></script>
 </body>
 </html>

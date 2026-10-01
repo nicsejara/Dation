@@ -614,6 +614,8 @@ function modeLabel(config) {
 
 
 function objectiveLabel(config) {
+  if (config.objective === "min_time") return "Entrega más rápida";
+  if (config.objective === "balanced") return "Balanceado";
   if (
     config.objective
     === "min_trips"
@@ -647,6 +649,7 @@ function weightLabel(config) {
   return (
     `Costo ${cost}% · `
     + `Viajes ${trips}%`
+    + (config.weights?.time != null ? ` · Tiempo ${Math.round(config.weights.time * 100)}%` : "")
   );
 }
 
@@ -800,7 +803,6 @@ export function renderActiveDataset(
       );
     }
 
-    updateExecutionReadiness();
     return;
   }
 
@@ -845,7 +847,6 @@ export function renderActiveDataset(
     );
   }
 
-  updateExecutionReadiness();
 }
 
 export function renderDatasetProfile(
@@ -1484,9 +1485,6 @@ export function renderDashboard(
       + "despachos cambian de vehículo"
     );
 
-  renderDashboardDataContext(
-    profilePayload
-  );
 
   renderSensitivity(
     result,
@@ -1520,81 +1518,6 @@ export function renderDashboard(
   if (exportButton) {
     exportButton.disabled = false;
   }
-}
-
-
-function renderDashboardDataContext(
-  payload
-) {
-  const container = (
-    $("#dashboard-data-context")
-  );
-
-  if (!payload?.profile) {
-    container.innerHTML = (
-      '<div class="context-metric">'
-      + "<span>Perfil</span>"
-      + "<strong>No disponible</strong>"
-      + "</div>"
-    );
-    return;
-  }
-
-  const p = payload.profile;
-  const range = (
-    p.dispatch_date_range
-  );
-
-  const metrics = [
-    [
-      "Despachos",
-      formatNumber(p.shipments),
-    ],
-    [
-      "Unidades",
-      formatNumber(p.total_units),
-    ],
-    [
-      "Peso",
-      `${formatNumber(p.total_weight_kg)} kg`,
-    ],
-    [
-      "Orígenes",
-      formatNumber(p.origins),
-    ],
-    [
-      "Destinos",
-      formatNumber(p.destinations),
-    ],
-    [
-      "Vehículos",
-      formatNumber(p.vehicle_types),
-    ],
-    [
-      "Distancia media",
-      `${formatNumber(p.average_distance_km, 1)} km`,
-    ],
-    [
-      "Ventana",
-      (
-        range?.from
-        && range?.to
-          ? `${range.from} → ${range.to}`
-          : "—"
-      ),
-    ],
-  ];
-
-  container.innerHTML = (
-    metrics.map(
-      ([label, value]) => `
-        <div class="context-metric">
-          <span>${escapeHtml(label)}</span>
-          <strong>${escapeHtml(value)}</strong>
-        </div>
-      `
-    ).join("")
-  );
 }
 
 

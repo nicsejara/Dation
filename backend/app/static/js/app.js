@@ -259,6 +259,12 @@ async function restoreHistoricalRun(
       await getRun(runId)
     );
 
+    if (run.result_json?.schema_version === 'dispatch_v1') {
+      const dispatch = await import('./dispatch/workspace.mjs');
+      dispatch.show(run);
+      return;
+    }
+
     const dataset = (
       datasetById(
         run.dataset_id
@@ -625,6 +631,12 @@ function bindDecisionStageBridge() {
       window.dationDecisionStage.profile,
     );
   }
+}
+
+function bindInterpreterStateBridge() {
+  window.addEventListener("dation:interpreter-explanation", (event) => {
+    setExplanation(event.detail?.explanation || null);
+  });
 }
 
 function bindRefreshActions() {

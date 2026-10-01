@@ -303,7 +303,6 @@ class FrontendContractTests(
             "dashboard-comparison-table-body",
             "dashboard-flow-matrix",
             "dashboard-sensitivity-content",
-            "dashboard-data-context",
             "generate-explanation",
             "chat-panel",
             "dashboard-retry-run",
@@ -527,7 +526,6 @@ class FrontendContractTests(
             "dashboard-comparator",
             "dashboard-drivers",
             "dashboard-sensitivity",
-            "dashboard-context",
             "dashboard-ai",
         ):
             self.assertIn(
