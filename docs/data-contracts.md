@@ -1,6 +1,8 @@
 # Contratos de datos — dispatch_v1
 
-Dos archivos UTF-8 (BOM opcional), con encabezado y separador `;` o `,`. Se recomiendan fechas ISO y decimal con punto. Con separador `;` también se admite coma decimal. Hasta tres decimales, magnitudes finitas de máximo 1.000.000.000. Campos obligatorios no vacíos; IDs únicos, sin encabezados duplicados ni filas desalineadas. Los mensajes indican fila y columna. Tamaño de carga máximo: 10 MB.
+La ingesta nueva usa dos archivos CSV separados: **órdenes** y **flota**. Ambos aceptan UTF-8 con BOM opcional, encabezado en la primera fila, separador `;' o `,`, hasta 10 MB. Se recomiendan fechas ISO y decimales con punto; con separador punto y coma también se admite coma decimal. La validación informa hasta 100 problemas con código, fila, columna, mensaje y sugerencia.
+
+La fuente ejecutable de estos contratos es `backend/app/validators/contracts.py`. El endpoint `GET /api/dispatch/contracts`, la ayuda de la pantalla y las plantillas descargables se derivan de esa definición. Los archivos `sample_data/v1/orders.csv` y `fleet.csv` se mantienen como fixtures completos y los tests verifican que sigan validando.
 
 ## orders.csv — orders_v1
 
@@ -8,21 +10,16 @@ Dos archivos UTF-8 (BOM opcional), con encabezado y separador `;` o `,`. Se reco
 |---|---|
 | `order_id` | Identificador único; alias `shipment_id` |
 | `product` | Nombre del producto |
-| `quantity_units` | Entero positivo; la unidad es indivisible |
+| `quantity_units` | Entero positivo; cada unidad es indivisible |
 | `unit_weight_kg` | Peso positivo por unidad, kg |
-| `origin`, `destination` | Textos no vacíos, distintos |
+| `origin`, `destination` | Textos no vacíos y distintos |
 | `distance_km` | Distancia positiva de ida; consistente para la misma ruta |
 | `priority` | `High`, `Normal` o `Low` |
-| `max_delivery_days` | Entero de 1 a 90 desde disponibilidad hasta entrega |
-| `dispatch_date` | Fecha de disponibilidad ISO `YYYY-MM-DD` o explícitamente día/mes/año |
-| `current_vehicle_type` | Opcional, exclusivamente para referencia; alias `vehicle_type` |
+| `max_delivery_days` | Entero de 1 a 90 |
+| `dispatch_date` | `YYYY-MM-DD` o día/mes/año |
+| `current_vehicle_type` | Opcional; referencia informada, alias `vehicle_type` |
 
-`10/1/2026` significa 10 de enero. No se infiere formato estadounidense. Preferí ISO para evitar confusión. Variaciones de peso para el mismo producto generan advertencia, no una normalización silenciosa. Columnas de resultado no alimentan el motor. Un archivo mezclado del formato anterior con tarifas/capacidades se rechaza y requiere conversión explícita.
-
-```csv
-order_id;product;quantity_units;unit_weight_kg;origin;destination;distance_km;priority;max_delivery_days;dispatch_date
-A;Pallet;2;400;Origen;Destino;100;Normal;2;2026-10-01
-```
+`10/1/2026` significa 10 de enero. No se infiere formato estadounidense. Una variación de peso para el mismo producto es advertencia; no se normaliza ni corrige en silencio. Un CSV del formato histórico mezclado se detecta como `legacy_mixed` y la interfaz explica que debe separarse en órdenes y flota.
 
 ## fleet.csv — fleet_v1
 
@@ -31,55 +28,71 @@ A;Pallet;2;400;Origen;Destino;100;Normal;2;2026-10-01
 | `vehicle_type` | Identificador único del tipo de camión |
 | `ownership` | `own` o `third_party` |
 | `capacity_kg` | Capacidad positiva |
-| `cost_per_km`, `fixed_trip_cost` | No negativos, moneda homogénea para todo el archivo |
-| `units_available` | Entero no negativo, obligatorio para propios; vacío solo en tercerizados = sin límite |
+| `cost_per_km`, `fixed_trip_cost` | Valores no negativos |
+| `units_available` | Entero no negativo para propios; vacío en tercerizados = sin límite |
 | `avg_speed_kmh` | Velocidad positiva |
-| `driving_hours_per_day` | Entre 1 y 24 horas |
-| `fuel_l_per_100km` | Litros por 100 km, no negativo |
-| `co2_kg_per_km` | Factor informado por km, no negativo; no certificado |
+| `driving_hours_per_day` | Entre 1 y 24 |
+| `fuel_l_per_100km` | No negativo |
+| `co2_kg_per_km` | No negativo; informativo y no certificado |
 
-```csv
-vehicle_type;ownership;capacity_kg;cost_per_km;fixed_trip_cost;units_available;avg_speed_kmh;driving_hours_per_day;fuel_l_per_100km;co2_kg_per_km
-Small;own;1000;1;10;1;100;10;20;0.5
-External;third_party;1000;2;20;;100;10;20;0.5
-```
+## Validar no es guardar
 
-## Validación conjunta
+`POST /api/datasets/validate?dataset_type=orders|fleet` valida el multipart `file` sin leer ni escribir Supabase. Por eso funciona aun cuando las migraciones de persistencia todavía no estén activadas.
 
-Errores: vehículo de referencia desconocido; ninguna flota habilitada; ninguna unidad entera cabe en vehículos disponibles. Advertencias: flota finita, al menos 21 viajes para una orden, tardanza inevitable. Anomalía de peso: carga mayor que 20 veces la mayor capacidad propia (o de flota habilitada si no hay propia). Requiere decisión explícita `include`/`exclude`, conservada en el resultado. Excluir no altera el archivo fuente; todos los escenarios usan el mismo universo incluido. Ausencia de plan encontrado no siempre prueba inviabilidad global.
-
-## Configuración y API
-
-`POST /api/runs` recibe `orders_dataset_id`, `fleet_dataset_id`, `configuration` y `options`. Los IDs son UUID. `?run_id=` permite recuperar una petición que continúa ejecutándose.
+Respuesta resumida:
 
 ```json
 {
-  "orders_dataset_id": "00000000-0000-4000-8000-000000000001",
-  "fleet_dataset_id": "00000000-0000-4000-8000-000000000002",
-  "configuration": {
-    "mode": "custom", "objective": "custom",
-    "weights": {"cost": 0.4, "trips": 0.3, "time": 0.3}
-  },
-  "options": {"allow_third_party": true, "anomaly_decisions": {}, "sensitivity": true}
+  "valid": false,
+  "detected_format": "orders_v1",
+  "file": {"name": "orders.csv", "size_bytes": 8600, "sha256": "..."},
+  "rows": 100,
+  "columns": 11,
+  "profile": null,
+  "errors": [
+    {
+      "code": "INVALID_DATE",
+      "row": 15,
+      "column": "dispatch_date",
+      "message": "La fecha no es válida.",
+      "hint": "Usá AAAA-MM-DD o d/m/AAAA."
+    }
+  ],
+  "warnings": [],
+  "counts": {"errors": 1, "warnings": 0},
+  "truncated": false
 }
 ```
 
-Presets: `min_cost` 1/0/0, `min_trips` 0/1/0, `min_time` 0/0/1, `balanced` tercios exactos. Pesos personalizados suman 1; configuraciones de dos pesos admiten `time=0`.
+Los consumidores estrictos del motor continúan usando `validate_orders_csv` y `validate_fleet_csv`: si existe un error, esos wrappers lanzan el primer problema y nunca entregan registros parcialmente válidos.
+
+## Validación conjunta
+
+Cuando ambos datasets válidos ya están guardados, `POST /api/runs/preflight` verifica compatibilidad cruzada: referencias de camión, capacidad por unidad, disponibilidad y plazos. Los errores bloquean; las advertencias permiten continuar; las anomalías requieren una decisión explícita posterior.
+
+## Biblioteca y versionado
+
+Las cargas `orders` y `fleet` se listan por separado. La biblioteca admite búsqueda, paginación por `limit/offset`, archivado lógico y reutilización. Una flota vigente no puede archivarse hasta marcar otra versión como vigente. Un archivo idéntico reutiliza la fila existente por `(dataset_type, sha256)`.
+
+## API de ingesta
 
 | Endpoint | Uso |
 |---|---|
-| `POST /api/datasets/upload?dataset_type=orders` o `fleet` | Multipart `file`, opcionales `label`, `parent_dataset_id` |
-| `GET /api/datasets?type=orders` o `fleet` | Versiones disponibles |
-| `GET /api/datasets/{id}/profile` | Perfil según tipo |
+| `GET /api/dispatch/contracts` | Contratos y reglas de archivo |
+| `POST /api/datasets/validate?dataset_type=...` | Validación sin persistencia |
+| `GET /api/dispatch/templates/orders` o `fleet` | Plantilla generada desde el contrato |
+| `GET /api/dispatch/examples/orders` o `fleet` | Fixture sintético completo |
+| `POST /api/datasets/upload?dataset_type=...` | Guardar un archivo ya válido |
+| `GET /api/datasets?type=...&q=...&limit=...&offset=...` | Biblioteca activa |
+| `POST /api/datasets/{id}/archive` | Archivar lógicamente |
+| `POST /api/datasets/{id}/unarchive` | Recuperar un archivado |
 | `POST /api/datasets/{id}/default` | Marcar flota vigente |
-| `POST /api/runs/preflight` | Ambos IDs, opcional `allow_third_party` |
-| `POST /api/runs` | Ejecutar despacho nuevo |
-| `GET /api/runs/{id}` | Resultado y etapa persistida |
-| `GET /api/dispatch/status` | Disponibilidad de la migración |
-| `GET /api/dispatch/templates/orders` o `fleet` | Ejemplos sintéticos |
+| `POST /api/runs/preflight` | Validación cruzada |
+| `POST /api/runs` | Ejecutar Dispatch v1 |
+| `GET /api/dispatch/status` | Diagnóstico de activación |
 
-Todos requieren la autenticación de la plataforma. Upload sin tipo y `POST /api/runs/{dataset_id}` conservan el contrato anterior. Conversor: `python scripts/convert_legacy_csv.py sample_data/InputData-LogisticsDDA.csv sample_data/v1/orders.csv`.
+Todos requieren la autenticación de la plataforma. El upload sin `dataset_type` y `POST /api/runs/{dataset_id}` se preservan para compatibilidad histórica.
 
 ## Resultado
 
-`schema_version=dispatch_v1`, motor 1.0.0, inputs versionados, configuración, reglas, anomalías, escenarios, sensibilidad y huella. Los viajes incluyen cargas enteras por orden, fechas, ruta, peso, utilización, costo, combustible y CO₂. Los estados del solver y la factibilidad de la referencia deben interpretarse antes de comparar ahorros. `result_fingerprint` identifica la parte determinística, no los metadatos de persistencia.
+`schema_version=dispatch_v1`, motor 1.0.0, inputs versionados, configuración, reglas, anomalías, escenarios, sensibilidad y huella. El `result_fingerprint` identifica la parte determinística, no metadatos de persistencia.

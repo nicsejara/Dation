@@ -1,5 +1,17 @@
 # Historial
 
+## Ingesta única Dispatch — 2026-10-01
+
+- Nueva pantalla única de **Cargar datos** con órdenes + flota.
+- Validación previa sin Supabase y reporte acumulativo de errores.
+- Contrato único backend para validadores, ayuda y plantillas.
+- Banner de activación con diagnóstico; nunca más un contenedor vacío.
+- Biblioteca separada de órdenes y versiones de flota, búsqueda y archivado lógico.
+- Retirada la pantalla legacy de carga y el botón “Usar formato anterior”; se preservan corridas y API históricas.
+- Nueva migración aditiva de biblioteca: `archived_at` e `is_sample`.
+- Nuevos tests de validación y selectores de ingesta.
+
+
 ## Dispatch 1.0.0 — 2026-10-01
 
 Órdenes y flota versionadas, planificación con unidades enteras, CP-SAT acotado, fallback validado, API y dashboard modulares. Activación sujeta a migración manual.

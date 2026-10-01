@@ -1,34 +1,89 @@
 # Despliegue de Dispatch 1.0.0
 
-API esperada: **1.0.0**. Motor nuevo: **1.0.0**, esquema `dispatch_v1`. Motor histórico: **0.2.0**. Python **3.13**, OR-Tools **9.15.6755** fijado en `requirements.txt`.
+API esperada: **1.0.0**. Motor Dispatch: **1.0.0**. Motor histórico: **0.2.0**. Runtime: Python **3.13**, OR-Tools **9.15.6755**.
 
-## Activación manual en Supabase (propietario)
+## Activación manual en Supabase
 
-**Esta entrega no aplica migraciones productivas.** La puerta de la fase 2 del prompt reserva esa acción y su confirmación al usuario.
+**El código no aplica migraciones productivas automáticamente. El propietario las ejecuta en SQL Editor.**
 
-1. Verificar proyecto y respaldo. Revisar `supabase/migrations/20261001004934_dispatch_v1.sql` desde la raíz del repositorio.
-2. Ejecutar el archivo completo en SQL Editor del proyecto correspondiente. Está encapsulado en una transacción y es aditivo/idempotente; no borra registros ni altera las políticas RLS existentes.
-3. Confirmar las columnas nuevas en `datasets` y `decision_runs`, los índices y `set_default_fleet`. Actualizar la caché de esquema PostgREST si fuera necesario (`NOTIFY pgrst, 'reload schema';`).
-4. Con backend actualizado y autenticación válida, consultar `/api/dispatch/status`; debe responder `available: true`.
-5. Subir `sample_data/v1/fleet.csv`, marcarla vigente y subir `orders.csv`. Ejecutar los casos de la guía `sample_data/v1/README.md`.
+Aplicar en este orden:
 
-La inspección previa fue de solo lectura. Se observó `dataset_id NOT NULL`, índices SHA no únicos y RLS activado sin políticas; por eso se preserva el acceso del servidor con service role y no se expone una API de base de datos al navegador. No se ejecutó la migración en el proyecto del usuario ni se afirma una validación SQL productiva.
+1. `supabase/migrations/20261001004934_dispatch_v1.sql`
+2. `supabase/migrations/20261001193000_dataset_library.sql`
 
-## Backend / Cloud Run
+Ambas son aditivas. La segunda agrega `datasets.archived_at`, `datasets.is_sample`, un índice parcial para la biblioteca y solicita recarga de PostgREST.
 
-Instalar `pip install -r backend/requirements.txt`. El despliegue automático de Cloud Run usa el buildpack `latest` (stack google-24 / Ubuntu 24), por lo que el runtime del repositorio se mantiene en Python 3.13, soportado por ese builder. Si el directorio de build es `backend`, respetar su `.python-version` y Procfile:
+Después ejecutar:
+
+```sql
+notify pgrst, 'reload schema';
+```
+
+Verificación:
+
+```sql
+select table_name, column_name
+from information_schema.columns
+where table_schema = 'public'
+  and (
+    (
+      table_name = 'datasets'
+      and column_name in (
+        'dataset_type',
+        'schema_version',
+        'label',
+        'is_default',
+        'parent_dataset_id',
+        'profile_json',
+        'archived_at',
+        'is_sample'
+      )
+    )
+    or (
+      table_name = 'decision_runs'
+      and column_name in (
+        'schema_version',
+        'orders_dataset_id',
+        'fleet_dataset_id',
+        'input_fingerprint',
+        'result_fingerprint',
+        'summary_json',
+        'progress_json'
+      )
+    )
+  )
+order by 1, 2;
+
+select proname
+from pg_proc
+where proname in ('set_default_fleet', 'validate_dispatch_run');
+
+select id, public
+from storage.buckets
+where id = 'dda-inputs';
+```
+
+El 1 de octubre de 2026 el propietario confirmó por SQL que el bucket `dda-inputs` existe y tiene `public = false`. Esa comprobación no confirma por sí sola que las columnas y funciones de ambas migraciones estén instaladas.
+
+Con backend actualizado y autenticación válida, `GET /api/dispatch/status` debe responder `available: true`. Si las columnas existen en PostgreSQL pero el endpoint todavía las informa como no visibles, volver a ejecutar el `NOTIFY` y reintentar.
+
+## Validación antes de activar almacenamiento
+
+`POST /api/datasets/validate?dataset_type=orders|fleet` no depende de Supabase. Esto permite probar estructura, tipos y errores antes de aplicar las migraciones. Mientras `available=false`, la pantalla muestra “Activación pendiente”, mantiene visibles ambas cajas y bloquea guardar/continuar con una explicación.
+
+## Cloud Run
+
+El despliegue automático usa el buildpack actual de Google Cloud sobre Ubuntu 24; el repo está alineado con Python 3.13. El proceso de aplicación sigue siendo:
 
 ```bash
 uvicorn main:app --host 0.0.0.0 --port "${PORT:-8080}"
 ```
 
-Variables existentes: `SUPABASE_URL`, `SUPABASE_SECRET_KEY`, `SUPABASE_INPUT_BUCKET`, `DATION_ACCESS_PASSWORD`, configuración `LLM_*`. No incluir credenciales en GitHub. Conservar el bucket privado y los secretos actuales.
+Variables existentes: `SUPABASE_URL`, `SUPABASE_SECRET_KEY`, `SUPABASE_INPUT_BUCKET`, `DATION_ACCESS_PASSWORD` y `LLM_*`. No guardar credenciales en GitHub.
 
-Revisar timeout del request, memoria y concurrencia reales antes de activar. Se recomienda empezar con concurrencia 1 para tareas CPU y timeout de al menos 300 s, sujeto a medición real. El POST mantiene la petición abierta, mientras el polling consulta progreso. No se lanzan procesos en paralelo: la configuración vCPU del Cloud Run real no fue accesible para comprobarla. `DATION_STALE_RUN_SECONDS` vale 600 por defecto. El presupuesto global del motor incluye callbacks de progreso y puede fallar si Supabase responde muy lentamente; se informa como error sin publicar resultado parcial.
+Antes de uso intensivo revisar timeout, memoria y concurrencia. El POST de corrida mantiene la petición abierta; el polling consulta progreso. `DATION_STALE_RUN_SECONDS` vale 600 por defecto.
 
-La publicación en GitHub no demuestra por sí misma un despliegue correcto en Cloud Run. Verificar logs de build, `/health`, `/app`, `/upload`, endpoint autenticado de estado, y una ejecución persistida antes de considerar activado el MVP.
-
-## Verificación local y CI
+## Verificación
 
 Desde `backend`:
 
@@ -36,10 +91,15 @@ Desde `backend`:
 python -m unittest discover -s tests -v
 node tests/test_dashboard_selectors.js
 node --test tests/test_dispatch_selectors.mjs
+node --test tests/test_dispatch_upload_selectors.mjs
 ```
 
-Desde raíz: `PYTHONPATH=backend python scripts/benchmark_dispatch.py`. Ver `docs/validation-dispatch-v1.md` para alcance de pruebas y resultados medidos. CI ejecuta Python 3.13, Node 22, compilación, sintaxis JavaScript y tests.
+En despliegue verificar `/health`, `/app`, `/upload`, `/api/dispatch/status`, una validación de cada tipo, una persistencia de ambos archivos y una corrida completa.
 
-## Rollback sin pérdida
+## Baseline SQL pendiente
 
-Replegar la versión anterior de la aplicación manteniendo columnas, índices, funciones y datos nuevos. Las corridas `dispatch_v1` seguirán almacenadas aunque esa interfaz anterior no sepa abrirlas; volver a la versión nueva para visualizarlas. No borrar columnas con corridas existentes. Antes de migrar, el fallback legacy y sus endpoints permanecen disponibles. No hay downgrade SQL destructivo automático.
+El repositorio aún no dispone del DDL original completo de `datasets` y `decision_runs`. No se genera un `baseline.sql` por inferencia: primero debe capturarse el esquema real mediante `information_schema`/catálogo. Esto evita versionar una reconstrucción incorrecta.
+
+## Rollback
+
+Replegar la aplicación anterior sin borrar columnas ni datos nuevos. No eliminar columnas de Dispatch si ya existen corridas `dispatch_v1`. No hay downgrade destructivo automático.
