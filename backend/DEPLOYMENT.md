@@ -1,6 +1,6 @@
 # Despliegue de Dispatch 1.0.0
 
-API esperada: **1.0.0**. Motor nuevo: **1.0.0**, esquema `dispatch_v1`. Motor histórico: **0.2.0**. Python **3.12**, OR-Tools **9.15.6755** fijado en `requirements.txt`.
+API esperada: **1.0.0**. Motor nuevo: **1.0.0**, esquema `dispatch_v1`. Motor histórico: **0.2.0**. Python **3.13**, OR-Tools **9.15.6755** fijado en `requirements.txt`.
 
 ## Activación manual en Supabase (propietario)
 
@@ -16,7 +16,7 @@ La inspección previa fue de solo lectura. Se observó `dataset_id NOT NULL`, í
 
 ## Backend / Cloud Run
 
-Instalar `pip install -r backend/requirements.txt`. Si el directorio de build es `backend`, respetar su `.python-version` y Procfile:
+Instalar `pip install -r backend/requirements.txt`. El despliegue automático de Cloud Run usa el buildpack `latest` (stack google-24 / Ubuntu 24), por lo que el runtime del repositorio se mantiene en Python 3.13, soportado por ese builder. Si el directorio de build es `backend`, respetar su `.python-version` y Procfile:
 
 ```bash
 uvicorn main:app --host 0.0.0.0 --port "${PORT:-8080}"
@@ -38,7 +38,7 @@ node tests/test_dashboard_selectors.js
 node --test tests/test_dispatch_selectors.mjs
 ```
 
-Desde raíz: `PYTHONPATH=backend python scripts/benchmark_dispatch.py`. Ver `docs/validation-dispatch-v1.md` para alcance de pruebas y resultados medidos. CI ejecuta Python 3.12, Node 22, compilación, sintaxis JavaScript y tests.
+Desde raíz: `PYTHONPATH=backend python scripts/benchmark_dispatch.py`. Ver `docs/validation-dispatch-v1.md` para alcance de pruebas y resultados medidos. CI ejecuta Python 3.13, Node 22, compilación, sintaxis JavaScript y tests.
 
 ## Rollback sin pérdida
 
