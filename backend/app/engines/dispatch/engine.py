@@ -11,7 +11,7 @@ from .plans import greedy, summarize, validate_plan
 from .model import solve
 
 ENGINE_NAME='logistics-dispatch-engine'
-ENGINE_VERSION='1.1.0'
+ENGINE_VERSION='1.2.0'
 NAMES={'baseline_direct':'Despacho directo','baseline_current':'Asignación informada','min_cost':'Costo mínimo',
        'min_trips':'Viajes mínimos','min_time':'Entrega más rápida','selected':'Decisión recomendada'}
 DIRECTIONS={k:('higher_better' if k in ('on_time_rate','load_utilization') else 'lower_better') for k in
@@ -135,11 +135,11 @@ def run_dispatch_engine(orders_bytes, fleet_bytes, configuration=None, options=N
         'configuration':{**config,'options':opts},'fleet':full_fleet,'kpi_directions':DIRECTIONS,'normalization':normalization,
         'assumptions':['Un viaje conecta un origen y un destino; no hay multiparada.',
             'La flota se asigna sólo desde pools cuya base coincide con el origen; tercerizados con base * pueden operar desde cualquier origen.',
-            'La flota propia se limita por salidas diarias por pool, sin ocupación durante el retorno.',
+            'Los pools con disponibilidad finita permanecen ocupados desde la salida hasta completar ida, entrega y retorno a base.',
             'Costo, combustible y CO₂ contemplan ida y vuelta. El costo por km ya incluye combustible.',
             'El plazo se pondera por unidades; llegada de una orden es la última entrega.',
             'Factores de emisiones informados por el usuario; no están certificados.',
-            'No se modelan volumen, dimensiones, ventanas horarias ni tarifas por ruta.',
+            'No se modelan volumen, dimensiones, ventanas horarias, tiempos de carga/descarga, multiparada ni reposicionamiento entre bases.',
             'Las escalas usan extremos factibles conocidos; un resultado factible no demuestra optimalidad.'],
         'scenarios':scenarios,'sensitivity':{'weight_sweep':sweep,'frontier':sweep,'complete':len(sweep)==len(settings)}}
     # Exclude timing, storage identity, and solver runtime metadata from the deterministic fingerprint.

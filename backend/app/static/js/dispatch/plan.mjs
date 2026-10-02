@@ -9,11 +9,24 @@ function baseLabel(value){
 function poolLabel(value){
   return `${vehicle(value.vehicle_type)} · ${baseLabel(value)} · ${poolId(value)}`;
 }
+function nextDay(value){
+  const current=new Date(value+'T00:00:00Z');
+  current.setUTCDate(current.getUTCDate()+1);
+  return current.toISOString().slice(0,10);
+}
+function availableAgain(value){
+  return value.resource_available_again||nextDay(value.dispatch_date);
+}
+function occupiedDays(value){
+  const result=[];
+  for(let current=value.dispatch_date;current<availableAgain(value);current=nextDay(current))result.push(current);
+  return result;
+}
 
 export function exportPlan(r){
-  const headers=['Viaje','Salida','Llegada','Origen','Destino','Pool de flota','Base','Camión','Propiedad','Orden','Unidades','Kg','Costo del viaje','CO2 del viaje'];
+  const headers=['Viaje','Salida','Llegada','Recurso disponible','Días de ciclo','Origen','Destino','Pool de flota','Base','Camión','Propiedad','Orden','Unidades','Kg','Costo del viaje','CO2 del viaje'];
   const rows=r.scenarios.selected.trips.flatMap(t=>t.loads.map((l,i)=>[
-    t.trip_id,t.dispatch_date,t.arrival_date,t.origin,t.destination,poolId(t),
+    t.trip_id,t.dispatch_date,t.arrival_date,availableAgain(t),t.cycle_days||1,t.origin,t.destination,poolId(t),
     baseLabel(t),vehicle(t.vehicle_type),t.ownership==='own'?'Propio':'Tercerizado',
     l.order_id,l.units,l.kg,i===0?t.cost:'',i===0?t.co2_kg:''
   ]));
@@ -37,11 +50,15 @@ export function render(root,r){
 
 function calendar(root,r){
   const trips=r.scenarios.selected.trips;
-  const days=[...new Set(trips.map(t=>t.dispatch_date))].sort();
-  root.innerHTML='<p>Salidas por día y pool de flota. Cada pool sólo puede atender órdenes cuyo origen coincide con su base; los tercerizados con base * pueden operar desde cualquier origen. En esta fase los vehículos vuelven a estar disponibles al día siguiente.</p><div class="dispatch-chart" role="img" aria-label="Calendario de salidas por pool de flota"></div><div class="dispatch-table-wrap"><table><thead><tr><th>Día</th><th>Base</th><th>Pool / camión</th><th>Viajes</th><th>Disponibles</th></tr></thead><tbody>'+
+  const daySet=new Set();
+  trips.forEach(t=>occupiedDays(t).forEach(d=>daySet.add(d)));
+  const days=[...daySet].sort();
+  root.innerHTML='<p>Ocupación real por día y pool. Una unidad finita queda reservada desde la salida hasta completar ida, entrega y retorno a su base; recién vuelve a estar disponible en la fecha indicada por el motor.</p><div class="dispatch-chart" role="img" aria-label="Ocupación temporal por pool de flota"></div><div class="dispatch-table-wrap"><table><thead><tr><th>Día</th><th>Base</th><th>Pool / camión</th><th>Salidas</th><th>En uso</th><th>Disponibles</th></tr></thead><tbody>'+
     days.flatMap(d=>r.fleet.map(v=>{
-      const n=trips.filter(t=>t.dispatch_date===d&&poolId(t)===poolId(v)).length;
-      return n?`<tr><td>${date(d)}</td><td>${esc(baseLabel(v))}</td><td>${esc(poolId(v))}<small>${esc(vehicle(v.vehicle_type))}</small></td><td>${n}</td><td>${v.units_available??'Sin límite'}</td></tr>`:'';
+      const poolTrips=trips.filter(t=>poolId(t)===poolId(v));
+      const departures=poolTrips.filter(t=>t.dispatch_date===d).length;
+      const inUse=poolTrips.filter(t=>t.dispatch_date<=d&&d<availableAgain(t)).length;
+      return (departures||inUse)?`<tr><td>${date(d)}</td><td>${esc(baseLabel(v))}</td><td>${esc(poolId(v))}<small>${esc(vehicle(v.vehicle_type))}</small></td><td>${departures}</td><td>${inUse}</td><td>${v.units_available??'Sin límite'}</td></tr>`:'';
     })).join('')+'</tbody></table></div>';
 
   chart(root.querySelector('.dispatch-chart'),{
@@ -52,13 +69,12 @@ function calendar(root,r){
     yAxis:{type:'value',minInterval:1},
     series:r.fleet.flatMap(v=>[
       {
-        name:poolLabel(v),
+        name:'En uso: '+poolLabel(v),
         type:'bar',
-        stack:'salidas',
-        data:days.map(d=>trips.filter(t=>t.dispatch_date===d&&poolId(t)===poolId(v)).length),
+        data:days.map(d=>trips.filter(t=>poolId(t)===poolId(v)&&t.dispatch_date<=d&&d<availableAgain(t)).length),
       },
       ...(v.units_available!=null?[{
-        name:'Disponible: '+poolId(v),
+        name:'Capacidad: '+poolId(v),
         type:'line',
         symbol:'none',
         lineStyle:{type:'dashed'},
@@ -77,7 +93,7 @@ function trips(root,r){
     const filters={};
     root.querySelectorAll('[name]').forEach(n=>filters[n.name]=n.type==='checkbox'?n.checked:n.value);
     const rows=filteredTrips(r,filters);
-    root.querySelector('tbody').innerHTML=rows.map(t=>`<tr><td><details><summary>${esc(t.trip_id)} · ${t.loads.length} órdenes</summary>${t.loads.map(l=>`<p>${esc(l.order_id)}: ${num(l.units)} un. · ${num(l.kg)} kg · plazo ${date(outcomes.get(l.order_id)?.deadline)}${outcomes.get(l.order_id)?.late_days?' · entrega tardía':''}</p>`).join('')}</details></td><td>${date(t.dispatch_date)}<small>${date(t.arrival_date)}</small></td><td>${esc(t.origin)} → ${esc(t.destination)}<small>${esc(vehicle(t.vehicle_type))} · ${esc(poolId(t))} · base ${esc(baseLabel(t))}${t.ownership==='third_party'?' · Tercerizado':''}</small></td><td>${num(t.load_kg)} kg · ${pct(t.utilization)}<meter min="0" max="1" value="${t.utilization}" aria-label="Utilización ${pct(t.utilization)}"></meter></td><td>${money(t.cost)}</td><td>${num(t.co2_kg,1)} kg</td></tr>`).join('');
+    root.querySelector('tbody').innerHTML=rows.map(t=>`<tr><td><details><summary>${esc(t.trip_id)} · ${t.loads.length} órdenes</summary>${t.loads.map(l=>`<p>${esc(l.order_id)}: ${num(l.units)} un. · ${num(l.kg)} kg · plazo ${date(outcomes.get(l.order_id)?.deadline)}${outcomes.get(l.order_id)?.late_days?' · entrega tardía':''}</p>`).join('')}</details></td><td>${date(t.dispatch_date)}<small>Llegada ${date(t.arrival_date)} · recurso libre ${date(availableAgain(t))}</small></td><td>${esc(t.origin)} → ${esc(t.destination)}<small>${esc(vehicle(t.vehicle_type))} · ${esc(poolId(t))} · base ${esc(baseLabel(t))}${t.ownership==='third_party'?' · Tercerizado':''}</small></td><td>${num(t.load_kg)} kg · ${pct(t.utilization)}<meter min="0" max="1" value="${t.utilization}" aria-label="Utilización ${pct(t.utilization)}"></meter></td><td>${money(t.cost)}</td><td>${num(t.co2_kg,1)} kg</td></tr>`).join('');
     root.querySelector('[data-count]').textContent=rows.length+' viajes encontrados';
   };
   root.querySelectorAll('[name]').forEach(n=>n.oninput=update);

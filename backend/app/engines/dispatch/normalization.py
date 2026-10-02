@@ -30,7 +30,8 @@ FINDING_COPY = {
     "capacity_vs_demand": {
         "severity": "warning",
         "consequence": (
-            "La decisión podrá tercerizar o reprogramar salidas dentro de cada plazo."
+            "Es una comparación nominal del día; la optimización además descuenta "
+            "unidades que sigan ocupadas por viajes anteriores."
         ),
     },
     "zero_slack": {
@@ -86,6 +87,36 @@ def transit(order, vehicle):
             * D(vehicle["driving_hours_per_day"])
         )
     )
+
+
+def cycle_days(order, vehicle):
+    """Calendar days that one finite resource remains occupied, including return."""
+    daily_distance = (
+        D(vehicle["avg_speed_kmh"])
+        * D(vehicle["driving_hours_per_day"])
+    )
+    return max(
+        1,
+        math.ceil(
+            (D(order["distance_km"]) * D(2))
+            / daily_distance
+        ),
+    )
+
+
+def resource_available_again(order, vehicle, dispatch_day):
+    return (
+        date.fromisoformat(dispatch_day)
+        + timedelta(days=cycle_days(order, vehicle))
+    ).isoformat()
+
+
+def occupied_dates(order, vehicle, dispatch_day):
+    start = date.fromisoformat(dispatch_day)
+    return [
+        (start + timedelta(days=offset)).isoformat()
+        for offset in range(cycle_days(order, vehicle))
+    ]
 
 
 def capacity_units(order, vehicle):
@@ -191,6 +222,7 @@ def _capacity_check(orders, fleet):
                 }
             )
         return {
+            "basis": "nominal_same_day",
             "scope": "global_legacy",
             "own_capacity_kg_per_day": float(own_capacity),
             "capacity_by_origin": {},
@@ -241,6 +273,7 @@ def _capacity_check(orders, fleet):
         )
 
     return {
+        "basis": "nominal_same_day",
         "scope": "by_origin",
         "own_capacity_kg_per_day": float(sum(capacity_by_key.values(), D(0))),
         "capacity_by_origin": {
@@ -453,7 +486,7 @@ def preflight(orders, fleet, reference_fleet=None):
             _finding(
                 "capacity_vs_demand",
                 (
-                    "Tu demanda supera la capacidad propia en "
+                    "La demanda del día supera la capacidad propia nominal en "
                     f"{capacity_check['days_over']} de "
                     f"{capacity_check['total_days']} {scope_label}"
                 ),
