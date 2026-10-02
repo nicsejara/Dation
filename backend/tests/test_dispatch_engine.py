@@ -176,7 +176,7 @@ class DispatchEngineTests(unittest.TestCase):
         )
         self.assertEqual(
             first["engine"]["version"],
-            "2.0.0",
+            "2.1.0",
         )
         self.assertEqual(
             first["result_fingerprint"],
@@ -609,6 +609,7 @@ class DispatchEngineTests(unittest.TestCase):
             ),
             fleet(),
             options={
+                "analysis_depth": "deep",
                 "deterministic_limit": .05,
                 "solve_time_limit_s": 5,
             },
@@ -643,6 +644,72 @@ class DispatchEngineTests(unittest.TestCase):
                 for point in points[1:]
             )
         )
+
+    def test_active_dimensions_limit_comparative_scenarios(self):
+        result = self.run_case(
+            [order("A"), order("B")],
+            configuration={
+                "objective": "balanced",
+                "dimensions": ["cost", "time"],
+            },
+            options={
+                "analysis_depth": "comparative",
+                "sensitivity": None,
+            },
+        )
+
+        self.assertEqual(
+            result["analysis"]["active_dimensions"],
+            ["cost", "time"],
+        )
+        self.assertEqual(
+            result["configuration"]["weights"],
+            {
+                "cost": .5,
+                "time": .5,
+                "utilization": 0,
+                "co2": 0,
+            },
+        )
+        self.assertIn("min_cost", result["scenarios"])
+        self.assertIn("min_time", result["scenarios"])
+        self.assertIn("balanced", result["scenarios"])
+        self.assertNotIn("min_co2", result["scenarios"])
+        self.assertNotIn("max_utilization", result["scenarios"])
+        self.assertEqual(
+            result["sensitivity"]["weight_sweep"],
+            [],
+        )
+
+    def test_essential_depth_solves_only_required_preset(self):
+        result = self.run_case(
+            [order("A"), order("B")],
+            configuration={
+                "objective": "min_cost",
+                "dimensions": [
+                    "cost",
+                    "time",
+                    "utilization",
+                    "co2",
+                ],
+            },
+            options={
+                "analysis_depth": "essential",
+                "sensitivity": None,
+            },
+        )
+
+        self.assertEqual(
+            result["analysis"]["depth"],
+            "essential",
+        )
+        self.assertEqual(
+            result["analysis"]["scenario_count"],
+            1,
+        )
+        self.assertIn("min_cost", result["scenarios"])
+        self.assertNotIn("min_time", result["scenarios"])
+        self.assertNotIn("balanced", result["scenarios"])
 
     def test_validation_rejects_corrupt_plan(self):
         from app.engines.dispatch.plans import validate_plan
