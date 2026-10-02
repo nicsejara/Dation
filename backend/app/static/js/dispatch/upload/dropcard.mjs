@@ -1,95 +1,111 @@
-export function createDropCard(kind, contract) {
-  const card = document.createElement("section");
-  card.className = "dispatch-panel dispatch-upload-card";
+function el(tag, value, className = "") {
+  const node = document.createElement(tag);
+  if (className) {
+    node.className = className;
+  }
+  if (value != null) {
+    node.textContent = value;
+  }
+  return node;
+}
+
+export function createDropCard(kind, contract, onGuide) {
+  const card = el("section", null, "dispatch-panel dispatch-upload-card");
   card.dataset.kind = kind;
+  card.id = `dispatch-upload-${kind}`;
 
-  const head = document.createElement("div");
-  head.className = "dispatch-upload-card-head";
+  const head = el("div", null, "dispatch-upload-card-head");
+  const titleWrap = el("div");
+  titleWrap.append(
+    el(
+      "span",
+      kind === "orders" ? "1 · Órdenes" : "2 · Flota",
+      "dispatch-kicker",
+    ),
+    el("h2", contract.label),
+    el("p", contract.role),
+  );
 
-  const titleWrap = document.createElement("div");
-  const eyebrow = document.createElement("span");
-  eyebrow.className = "dispatch-kicker";
-  eyebrow.textContent = kind === "orders" ? "1 · Datos variables" : "2 · Capacidad operativa";
-
-  const title = document.createElement("h2");
-  title.textContent = contract.label;
-
-  const role = document.createElement("p");
-  role.textContent = contract.role;
-  titleWrap.append(eyebrow, title, role);
-
-  const status = document.createElement("span");
-  status.className = "dispatch-upload-status is-neutral";
-  status.textContent = "Sin archivo";
+  const status = el(
+    "span",
+    "○ Sin archivo",
+    "dispatch-upload-status is-neutral",
+  );
   head.append(titleWrap, status);
 
   const drop = document.createElement("button");
   drop.type = "button";
   drop.className = "dispatch-upload-drop";
-  drop.setAttribute("aria-label", `Elegir archivo CSV de ${contract.label}`);
-  const dropStrong = document.createElement("strong");
-  dropStrong.textContent = "Arrastrá el CSV acá o elegilo desde tu equipo";
-  const dropSmall = document.createElement("small");
-  dropSmall.textContent = "CSV UTF-8 · hasta 10 MB · se valida antes de guardarse";
-  drop.append(dropStrong, dropSmall);
+  drop.setAttribute(
+    "aria-label",
+    kind === "orders"
+      ? "Elegir archivo CSV de órdenes"
+      : "Elegir archivo CSV de flota",
+  );
+  drop.append(
+    el(
+      "strong",
+      kind === "orders"
+        ? "Arrastrá tu CSV de órdenes acá"
+        : "Arrastrá tu CSV de flota acá",
+    ),
+    el("span", "Elegir archivo", "dispatch-upload-drop-action"),
+    el(
+      "small",
+      "CSV UTF-8 · hasta 10 MB · separador ; o ,",
+    ),
+  );
+
+  const progress = el("div", null, "dispatch-upload-progress");
+  progress.hidden = true;
+  progress.append(
+    el("strong", "Validando tu archivo…"),
+    el("div", "", "dispatch-upload-progress-bar"),
+    el(
+      "small",
+      "Leyendo → Validando estructura → Revisando reglas → Guardando",
+    ),
+  );
+
+  const fileRow = el("div", null, "dispatch-file-row");
+  fileRow.hidden = true;
+  const fileInfo = el("div", null, "dispatch-file-info");
+  const fileName = el("strong", "");
+  const fileMeta = el("small", "");
+  fileInfo.append(fileName, fileMeta);
+  const replace = document.createElement("button");
+  replace.type = "button";
+  replace.className = "dispatch-text-action";
+  replace.textContent = "Reemplazar";
+  fileRow.append(el("span", "CSV", "dispatch-file-icon"), fileInfo, replace);
 
   const file = document.createElement("input");
   file.type = "file";
   file.accept = ".csv,text/csv";
   file.hidden = true;
 
-  const actions = document.createElement("div");
-  actions.className = "dispatch-upload-links";
+  const actions = el("div", null, "dispatch-upload-links");
   const template = document.createElement("a");
   template.href = `/api/dispatch/templates/${kind}`;
   template.download = `${kind}.csv`;
-  template.textContent = "Descargar plantilla";
+  template.textContent = "↓ Descargar plantilla";
   const example = document.createElement("a");
   example.href = `/api/dispatch/examples/${kind}`;
   example.download = `${kind}_ejemplo.csv`;
-  example.textContent = "Descargar ejemplo completo";
-  actions.append(template, example);
+  example.textContent = "↗ Ver ejemplo";
+  const guide = document.createElement("button");
+  guide.type = "button";
+  guide.className = "dispatch-text-action";
+  guide.textContent = "ⓘ Guía de formato";
+  guide.onclick = () => onGuide(kind, guide);
+  actions.append(template, example, guide);
 
-  const details = document.createElement("details");
-  details.className = "dispatch-contract-details";
-  const summary = document.createElement("summary");
-  summary.textContent = "Ver columnas y reglas";
-  details.append(summary);
-
-  const wrap = document.createElement("div");
-  wrap.className = "dispatch-table-wrap";
-  const table = document.createElement("table");
-  const thead = document.createElement("thead");
-  thead.innerHTML = (
-    "<tr><th>Columna</th><th>Obligatoria</th><th>Formato / regla</th>"
-    + "<th>Ejemplo</th><th>Para qué sirve</th></tr>"
-  );
-  const tbody = document.createElement("tbody");
-  for (const column of contract.columns) {
-    const tr = document.createElement("tr");
-    for (const value of [
-      column.name,
-      column.required ? "Sí" : "No",
-      column.rule,
-      column.example,
-      column.description,
-    ]) {
-      const td = document.createElement("td");
-      td.textContent = value;
-      tr.append(td);
-    }
-    tbody.append(tr);
-  }
-  table.append(thead, tbody);
-  wrap.append(table);
-  details.append(wrap);
-
-  const fields = document.createElement("div");
-  fields.className = "dispatch-upload-fields";
+  const fields = el("div", null, "dispatch-upload-fields");
+  fields.hidden = true;
   const label = document.createElement("label");
-  label.textContent = kind === "orders" ? "Etiqueta opcional" : "Etiqueta de la versión";
+  label.append(el("span", "Nombre de la carga"));
   const labelInput = document.createElement("input");
-  labelInput.placeholder = kind === "orders" ? "Semana 40" : "Flota octubre";
+  labelInput.maxLength = 120;
   label.append(labelInput);
   fields.append(label);
 
@@ -102,30 +118,33 @@ export function createDropCard(kind, contract) {
     defaultInput.checked = true;
     defaultLabel.append(
       defaultInput,
-      document.createTextNode(" Usarla como flota vigente"),
+      document.createTextNode(" Usar como flota vigente"),
+      el(
+        "small",
+        "Las próximas corridas la usarán automáticamente.",
+      ),
     );
     fields.append(defaultLabel);
   }
 
-  const profile = document.createElement("div");
-  profile.className = "dispatch-upload-profile";
-
-  const report = document.createElement("div");
-  report.className = "dispatch-validation-report";
+  const notice = el("div", null, "dispatch-card-notice");
+  notice.hidden = true;
+  const report = el("div", null, "dispatch-validation-report");
   report.setAttribute("aria-live", "polite");
-
-  const library = document.createElement("div");
-  library.className = "dispatch-library";
+  const understood = el("div", null, "dispatch-upload-profile");
+  const library = el("div", null, "dispatch-library");
 
   card.append(
     head,
+    progress,
+    fileRow,
     drop,
     file,
     actions,
-    details,
     fields,
+    notice,
     report,
-    profile,
+    understood,
     library,
   );
 
@@ -133,11 +152,18 @@ export function createDropCard(kind, contract) {
     card,
     status,
     drop,
+    progress,
+    fileRow,
+    fileName,
+    fileMeta,
+    replace,
     file,
+    fields,
     labelInput,
     defaultInput,
+    notice,
     report,
-    profile,
+    understood,
     library,
   };
 }

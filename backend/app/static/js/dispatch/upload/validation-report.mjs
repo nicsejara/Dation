@@ -11,27 +11,20 @@ function text(tag, value, className = "") {
 }
 
 function issueRow(item) {
-  const row = document.createElement("li");
-  const where = [
-    item.row ? `fila ${item.row}` : null,
-    item.column ? `columna ${item.column}` : null,
-  ].filter(Boolean).join(" · ");
-
-  row.append(
-    text("strong", where || "Archivo"),
-    document.createTextNode(" — "),
-    text("span", item.message || "Problema de validación"),
-  );
-  if (item.value !== undefined) {
-    row.append(text("small", `Valor: ${item.value}`));
-  }
-  if (item.hint) {
-    row.append(text("small", `Cómo corregirlo: ${item.hint}`));
+  const row = document.createElement("tr");
+  const values = [
+    item.row || "—",
+    item.column || "—",
+    item.value ?? "—",
+    item.hint || item.message || "Revisá el dato.",
+  ];
+  for (const value of values) {
+    row.append(text("td", value));
   }
   return row;
 }
 
-export function renderValidationReport(root, report) {
+export function renderValidationReport(root, report, state = null) {
   root.replaceChildren();
   if (!report) {
     return;
@@ -39,29 +32,36 @@ export function renderValidationReport(root, report) {
 
   const errors = Number(report.counts?.errors || 0);
   const warnings = Number(report.counts?.warnings || 0);
-  const summary = document.createElement("div");
-  summary.className = "dispatch-validation-summary";
-  summary.append(
-    text(
-      "strong",
-      `${errors} errores y ${warnings} advertencias en ${report.rows || 0} filas`,
-    ),
-  );
+  if (!errors && !warnings) {
+    return;
+  }
 
-  if (report.valid) {
+  const summary = text("div", "", "dispatch-validation-summary");
+  if (errors) {
     summary.append(
       text(
+        "strong",
+        (
+          `Encontramos ${errors} ${errors === 1 ? "error" : "errores"} `
+          + `en ${report.rows || 0} filas.`
+        ),
+      ),
+      text(
         "p",
-        warnings
-          ? "El archivo es válido. Revisá las advertencias antes de continuar."
-          : "El archivo cumple el contrato y está listo para guardarse.",
+        "No se guardó: corregilos y volvé a cargarlo.",
       ),
     );
   } else {
     summary.append(
       text(
+        "strong",
+        `${warnings} ${warnings === 1 ? "aviso" : "avisos"} para revisar`,
+      ),
+      text(
         "p",
-        "No se guardó. Corregí los errores y volvé a cargarlo.",
+        state?.saved
+          ? "El archivo está guardado y podés continuar."
+          : "El archivo es válido.",
       ),
     );
   }
@@ -72,22 +72,39 @@ export function renderValidationReport(root, report) {
     details.className = `dispatch-validation-group is-${group.severity}`;
     const summaryNode = document.createElement("summary");
     summaryNode.textContent = (
-      `${group.items.length} ${group.items.length === 1 ? "caso" : "casos"} · `
+      `${group.items.length} `
+      + `${group.items.length === 1 ? "fila" : "filas"}: `
       + group.title
     );
     details.append(summaryNode);
 
-    const list = document.createElement("ol");
-    group.items.slice(0, 5).forEach((item) => list.append(issueRow(item)));
-    details.append(list);
+    const wrap = text("div", "", "dispatch-table-wrap");
+    const table = document.createElement("table");
+    const head = document.createElement("thead");
+    const headRow = document.createElement("tr");
+    ["Fila", "Columna", "Valor", "Cómo corregirlo"].forEach(
+      (value) => headRow.append(text("th", value)),
+    );
+    head.append(headRow);
+
+    const body = document.createElement("tbody");
+    group.items.slice(0, 5).forEach((item) => {
+      body.append(issueRow(item));
+    });
+    table.append(head, body);
+    wrap.append(table);
+    details.append(wrap);
 
     if (group.items.length > 5) {
-      details.append(
-        text(
-          "small",
-          `Se muestran 5 de ${group.items.length} casos de este tipo.`,
-        ),
-      );
+      const all = document.createElement("button");
+      all.type = "button";
+      all.textContent = `Ver las ${group.items.length} filas`;
+      all.onclick = () => {
+        body.replaceChildren();
+        group.items.forEach((item) => body.append(issueRow(item)));
+        all.remove();
+      };
+      details.append(all);
     }
     root.append(details);
   }
@@ -102,38 +119,45 @@ export function renderValidationReport(root, report) {
     );
   }
 
-  if (errors || warnings) {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.textContent = "Descargar informe de errores (CSV)";
-    button.onclick = () => {
-      const rows = [
-        ["tipo", "codigo", "fila", "columna", "valor", "mensaje", "como_corregir"],
-        ...(report.errors || []).map((item) => [
-          "error",
-          item.code,
-          item.row,
-          item.column,
-          item.value,
-          item.message,
-          item.hint,
-        ]),
-        ...(report.warnings || []).map((item) => [
-          "advertencia",
-          item.code,
-          item.row,
-          item.column,
-          item.value,
-          item.message,
-          item.hint,
-        ]),
-      ];
-      download(
-        "dation_informe_validacion.csv",
-        csv(rows),
-        "text/csv;charset=utf-8",
-      );
-    };
-    root.append(button);
-  }
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "dispatch-text-action";
+  button.textContent = "Descargar informe de errores (CSV)";
+  button.onclick = () => {
+    const rows = [
+      [
+        "tipo",
+        "codigo",
+        "fila",
+        "columna",
+        "valor",
+        "mensaje",
+        "como_corregir",
+      ],
+      ...(report.errors || []).map((item) => [
+        "error",
+        item.code,
+        item.row,
+        item.column,
+        item.value,
+        item.message,
+        item.hint,
+      ]),
+      ...(report.warnings || []).map((item) => [
+        "aviso",
+        item.code,
+        item.row,
+        item.column,
+        item.value,
+        item.message,
+        item.hint,
+      ]),
+    ];
+    download(
+      "dation_informe_validacion.csv",
+      csv(rows),
+      "text/csv;charset=utf-8",
+    );
+  };
+  root.append(button);
 }

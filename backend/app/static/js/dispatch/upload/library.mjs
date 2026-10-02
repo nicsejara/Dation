@@ -1,10 +1,45 @@
 import {date, num} from "../shared.mjs";
 
-function empty(message) {
-  const p = document.createElement("p");
-  p.className = "dispatch-library-empty";
-  p.textContent = message;
-  return p;
+function el(tag, value, className = "") {
+  const node = document.createElement(tag);
+  if (className) {
+    node.className = className;
+  }
+  if (value != null) {
+    node.textContent = value;
+  }
+  return node;
+}
+
+function tons(kg) {
+  return `${num((kg || 0) / 1000, 1)} t`;
+}
+
+function metaFor(kind, item) {
+  const profile = item.profile_json?.profile || {};
+  if (kind === "orders") {
+    return [
+      `${num(item.row_count)} órdenes`,
+      profile.total_weight_kg != null
+        ? tons(profile.total_weight_kg)
+        : null,
+      profile.routes != null
+        ? `${num(profile.routes)} rutas`
+        : null,
+      item.created_at
+        ? `cargado ${date(item.created_at.slice(0, 10))}`
+        : null,
+    ].filter(Boolean).join(" · ");
+  }
+  return [
+    profile.types != null
+      ? `${num(profile.types)} tipos`
+      : null,
+    profile.own_units_per_day != null
+      ? `${num(profile.own_units_per_day)} propios/día`
+      : null,
+    item.is_default ? "Vigente" : null,
+  ].filter(Boolean).join(" · ");
 }
 
 export function renderLibrary(
@@ -18,79 +53,65 @@ export function renderLibrary(
     onArchive,
     onSearch,
     onMakeDefault,
+    onUndo,
   },
 ) {
   root.replaceChildren();
 
-  const heading = document.createElement("div");
-  heading.className = "dispatch-library-heading";
-  const title = document.createElement("strong");
-  title.textContent = (
-    kind === "orders"
-      ? "Cargas anteriores"
-      : "Versiones de flota"
-  );
-  heading.append(title);
-  root.append(heading);
+  const details = document.createElement("details");
+  details.className = "dispatch-library-details";
+  const summary = document.createElement("summary");
+  summary.textContent = kind === "orders"
+    ? `Usar una carga anterior (${items?.length || 0})`
+    : `Cambiar flota o subir una nueva versión (${items?.length || 0})`;
+  details.append(summary);
 
-  const search = document.createElement("input");
-  search.type = "search";
-  search.value = query;
-  search.placeholder = (
-    kind === "orders"
-      ? "Buscar cargas anteriores…"
-      : "Buscar versiones de flota…"
-  );
-  search.setAttribute("aria-label", search.placeholder);
-  let timer = null;
-  search.oninput = () => {
-    window.clearTimeout(timer);
-    timer = window.setTimeout(
-      () => onSearch(search.value.trim()),
-      250,
-    );
-  };
-  root.append(search);
+  if ((items?.length || 0) > 5) {
+    const search = document.createElement("input");
+    search.type = "search";
+    search.value = query;
+    search.placeholder = "Buscar por nombre…";
+    search.setAttribute("aria-label", search.placeholder);
+    let timer = null;
+    search.oninput = () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(
+        () => onSearch(search.value.trim()),
+        250,
+      );
+    };
+    details.append(search);
+  }
 
   if (!items?.length) {
-    root.append(
-      empty(
-        query
-          ? "No encontramos cargas que coincidan con la búsqueda."
-          : (
-            kind === "orders"
-              ? "Todavía no hay órdenes guardadas."
-              : "Todavía no hay versiones de flota guardadas."
-          ),
+    details.append(
+      el(
+        "p",
+        kind === "orders"
+          ? "Todavía no hay órdenes guardadas."
+          : "Todavía no hay versiones de flota guardadas.",
+        "dispatch-library-empty",
       ),
     );
+    root.append(details);
     return;
   }
 
-  const list = document.createElement("div");
-  list.className = "dispatch-library-list";
-
+  const list = el("div", null, "dispatch-library-list");
   for (const item of items) {
-    const row = document.createElement("article");
-    row.className = "dispatch-library-row";
+    const row = el("article", null, "dispatch-library-row");
     if (selected?.id === item.id) {
       row.classList.add("is-selected");
     }
 
-    const info = document.createElement("div");
-    const name = document.createElement("strong");
-    name.textContent = item.label || item.original_filename;
-    const meta = document.createElement("small");
-    meta.textContent = [
-      item.created_at ? date(item.created_at.slice(0, 10)) : null,
-      item.row_count != null ? `${num(item.row_count)} registros` : null,
-      item.is_default ? "Vigente" : null,
-    ].filter(Boolean).join(" · ");
-    info.append(name, meta);
+    const info = el("div");
+    info.append(
+      el("strong", item.label || item.original_filename),
+      el("small", metaFor(kind, item)),
+      el("small", item.original_filename, "dispatch-muted-file"),
+    );
 
-    const actions = document.createElement("div");
-    actions.className = "dispatch-library-actions";
-
+    const actions = el("div", null, "dispatch-library-actions");
     const use = document.createElement("button");
     use.type = "button";
     use.textContent = selected?.id === item.id ? "En uso" : "Usar";
@@ -101,22 +122,45 @@ export function renderLibrary(
     if (kind === "fleet" && !item.is_default) {
       const makeDefault = document.createElement("button");
       makeDefault.type = "button";
+      makeDefault.className = "dispatch-text-action";
       makeDefault.textContent = "Marcar vigente";
       makeDefault.onclick = () => onMakeDefault(item);
       actions.append(makeDefault);
     }
 
     if (!(kind === "fleet" && item.is_default)) {
+      const menu = document.createElement("details");
+      menu.className = "dispatch-row-menu";
+      const menuSummary = document.createElement("summary");
+      menuSummary.setAttribute("aria-label", "Más acciones");
+      menuSummary.textContent = "⋯";
+      menu.append(menuSummary);
       const archive = document.createElement("button");
       archive.type = "button";
       archive.textContent = "Archivar";
-      archive.onclick = () => onArchive(item);
-      actions.append(archive);
+      archive.onclick = async () => {
+        await onArchive(item);
+        menu.open = false;
+        const undo = el(
+          "div",
+          "Carga archivada.",
+          "dispatch-undo",
+        );
+        const undoButton = document.createElement("button");
+        undoButton.type = "button";
+        undoButton.textContent = "Deshacer";
+        undoButton.onclick = () => onUndo(item);
+        undo.append(undoButton);
+        root.prepend(undo);
+        window.setTimeout(() => undo.remove(), 8000);
+      };
+      menu.append(archive);
+      actions.append(menu);
     }
 
     row.append(info, actions);
     list.append(row);
   }
-
-  root.append(list);
+  details.append(list);
+  root.append(details);
 }
