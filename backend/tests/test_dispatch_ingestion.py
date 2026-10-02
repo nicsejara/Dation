@@ -6,7 +6,11 @@ import httpx
 
 from app.auth import require_upload_access
 from app.services import dispatch_service
-from app.validators.fleet_schema import validate_fleet_report
+from app.engines.dispatch.normalization import preflight
+from app.validators.fleet_schema import (
+    validate_fleet_csv,
+    validate_fleet_report,
+)
 from app.validators.orders_schema import (
     validate_orders_csv,
     validate_orders_report,
@@ -47,6 +51,111 @@ class DispatchIngestionValidationTests(unittest.TestCase):
         report = validate_orders_report(legacy)
         self.assertEqual(report["detected_format"], "legacy_mixed")
         self.assertTrue(any(issue["code"] == "LEGACY_MIXED" for issue in report["errors"]))
+
+    def test_sample_profiles_match_ux_acceptance(self):
+        orders = validate_orders_report(
+            (ROOT / "sample_data" / "v1" / "orders.csv").read_bytes()
+        )
+        fleet = validate_fleet_report(
+            (ROOT / "sample_data" / "v1" / "fleet.csv").read_bytes()
+        )
+
+        profile = orders["profile"]
+        self.assertEqual(orders["rows"], 100)
+        self.assertEqual(profile["total_units"], 2682)
+        self.assertEqual(profile["total_weight_kg"], 2384000)
+        self.assertEqual(profile["routes"], 28)
+        self.assertEqual(profile["origins"], 3)
+        self.assertEqual(profile["destinations"], 10)
+        self.assertEqual(profile["date_from"], "2026-10-01")
+        self.assertEqual(profile["date_to"], "2026-10-10")
+        self.assertEqual(profile["max_order_kg"], 61600)
+        self.assertEqual(
+            profile["priority_mix"],
+            {"High": 27, "Normal": 62, "Low": 11},
+        )
+        self.assertEqual(
+            orders["suggested_label"],
+            "Órdenes 1–10 oct 2026",
+        )
+        self.assertEqual(len(orders["preview"]["rows"]), 5)
+        self.assertEqual(orders["detected"]["delimiter"], ";")
+        self.assertEqual(orders["detected"]["encoding"], "UTF-8")
+        self.assertEqual(orders["detected"]["columns"], 11)
+
+        fleet_profile = fleet["profile"]
+        self.assertEqual(fleet_profile["types"], 4)
+        self.assertEqual(fleet_profile["own_units_per_day"], 11)
+        self.assertEqual(
+            fleet_profile["own_capacity_kg_per_day"],
+            167000,
+        )
+        self.assertTrue(fleet_profile["has_third_party"])
+
+    def test_sample_preflight_is_grouped_for_business(self):
+        orders = validate_orders_csv(
+            (ROOT / "sample_data" / "v1" / "orders.csv").read_bytes()
+        )
+        fleet = validate_fleet_csv(
+            (ROOT / "sample_data" / "v1" / "fleet.csv").read_bytes()
+        )
+        result = preflight(
+            orders["records"],
+            fleet["records"],
+            fleet["records"],
+        )
+
+        late = next(
+            item
+            for item in result["findings"]
+            if item["id"] == "late_orders"
+        )
+        self.assertEqual(late["count"], 7)
+        self.assertEqual(
+            [item["order_id"] for item in late["items"]],
+            [
+                "SHP-0014",
+                "SHP-0024",
+                "SHP-0052",
+                "SHP-0055",
+                "SHP-0077",
+                "SHP-0082",
+                "SHP-0094",
+            ],
+        )
+
+        capacity = result["capacity_check"]
+        self.assertEqual(capacity["own_capacity_kg_per_day"], 167000)
+        self.assertEqual(capacity["days_over"], 9)
+        self.assertEqual(capacity["total_days"], 10)
+        peak = max(capacity["days"], key=lambda item: item["kg"])
+        self.assertEqual(peak["date"], "2026-10-09")
+        self.assertEqual(peak["kg"], 351800)
+        self.assertAlmostEqual(peak["ratio"], 2.1065868, places=5)
+        self.assertTrue(result["readiness"]["can_continue"])
+
+    def test_report_caps_visible_problems_at_one_hundred(self):
+        header = (
+            "order_id;product;quantity_units;unit_weight_kg;origin;"
+            "destination;distance_km;priority;max_delivery_days;"
+            "dispatch_date\n"
+        )
+        rows = "".join(
+            (
+                f"X-{index};P;0;NaN;A;A;-1;Urgent;95;"
+                "31/02/2026\n"
+            )
+            for index in range(40)
+        )
+        report = validate_orders_report(
+            (header + rows).encode("utf-8")
+        )
+        self.assertFalse(report["valid"])
+        self.assertTrue(report["truncated"])
+        self.assertLessEqual(
+            len(report["errors"]) + len(report["warnings"]),
+            100,
+        )
 
     def test_templates_and_sample_data_validate(self):
         from app.validators.contracts import template_csv
