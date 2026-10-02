@@ -78,14 +78,17 @@ class DispatchEngineTests(unittest.TestCase):
             self.assertEqual(r['scenarios']['selected']['metrics']['units_delivered'],units)
             self.assertEqual(r['inputs']['anomalies'][0]['decision'],decision)
 
-    def test_current_reference_and_disabled_third_party(self):
+    def test_historical_vehicle_assignment_is_ignored(self):
         row={**order(),'current_vehicle_type':'missing'}
         data=csv_bytes(COLUMNS+['current_vehicle_type'],[row])
-        with self.assertRaisesRegex(ValueError,'referencia'):run_dispatch_engine(data,fleet())
+        r=run_dispatch_engine(data,fleet(),options={'sensitivity':False})
+        self.assertNotIn('baseline_current',r['scenarios'])
+        self.assertEqual(r['scenarios']['selected']['metrics']['units_delivered'],1)
+
         row['current_vehicle_type']='T'
         data=csv_bytes(COLUMNS+['current_vehicle_type'],[row])
         r=run_dispatch_engine(data,fleet(),options={'allow_third_party':False,'sensitivity':False})
-        self.assertFalse(r['scenarios']['baseline_current']['feasible'])
+        self.assertNotIn('baseline_current',r['scenarios'])
         self.assertEqual(r['scenarios']['selected']['metrics']['outsourced_trips_share'],0)
 
     def test_sensitivity_reports_consecutive_changes(self):
