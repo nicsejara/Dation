@@ -39,7 +39,13 @@ async function loadData() {
     },
   );
 }
-function configuration(){const weights=state.objective==='balanced'?{cost:.25,time:.25,utilization:.25,co2:.25}:Object.fromEntries(PRIORITY_KEYS.map(k=>[k,state.weights[k]/100]));return {mode:state.objective==='custom'?'custom':'preset',objective:state.objective,weights};}
+function decimalWeights(){
+  const weights=state.objective==='custom'?normalizeWeights(state.weights,state.dimensions):presetWeights(state.objective,state.dimensions);
+  return Object.fromEntries(PRIORITY_KEYS.map(k=>[k,weights[k]/100]));
+}
+function configuration(){return {mode:state.objective==='custom'?'custom':'preset',objective:state.objective,dimensions:[...state.dimensions],weights:decimalWeights()};}
+function activeDimensionText(){return state.dimensions.map(k=>DIMENSION_LABELS[k]).join(' · ');}
+function decisionSummary(){return `${OBJECTIVE_LABELS[state.objective]} · ${state.dimensions.length} dimensión${state.dimensions.length===1?'':'es'} · análisis ${DEPTH_LABELS[state.analysisDepth].toLowerCase()}`;}
 async function loadConfig(){const node=roots.config;if(!state.orders||!state.fleet){node.innerHTML='<h1>Configurar la decisión</h1><p>Primero seleccioná órdenes y flota.</p><button data-back>Ir a cargar data</button>';node.querySelector('[data-back]').onclick=()=>navigate('logistics-data');return;}
 node.innerHTML='<h1>Configurar la decisión</h1><p role="status">Validando la evidencia seleccionada…</p>';
 try{await preflight();}catch(e){errorBox(node,e,loadConfig);return;}
