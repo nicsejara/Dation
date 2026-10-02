@@ -1,6 +1,6 @@
 # Contratos de datos — transición Dispatch v2
 
-La ingesta usa dos archivos CSV separados: **órdenes** y **flota**. En la segunda fase de transición a Dispatch v2, órdenes usa **orders_v2** y la flota adopta **fleet_v2** con pools y base operativa. El resultado continúa usando el envelope **dispatch_v1**, pero el motor 1.1.0 ya aplica elegibilidad geográfica por origen. Ambos archivos aceptan UTF-8 con BOM opcional, encabezado en la primera fila, separador `;` o `,`, hasta 10 MB. Se recomiendan fechas ISO y decimales con punto; con separador punto y coma también se admite coma decimal. La validación informa hasta 100 problemas con código, fila, columna, mensaje y sugerencia.
+La ingesta usa dos archivos CSV separados: **órdenes** y **flota**. Órdenes usa **orders_v2** y flota usa **fleet_v2** con pools y base operativa. Desde Dispatch Engine **2.0.0**, las corridas nuevas producen el envelope **dispatch_v2**, con capacidad espacial/temporal y SLA jerárquico. Ambos archivos aceptan UTF-8 con BOM opcional, encabezado en la primera fila, separador `;` o `,`, hasta 10 MB. Se recomiendan fechas ISO y decimales con punto; con separador punto y coma también se admite coma decimal. La validación informa hasta 100 problemas con código, fila, columna, mensaje y sugerencia.
 
 La fuente ejecutable de estos contratos es `backend/app/validators/contracts.py`. El endpoint `GET /api/dispatch/contracts`, la ayuda de la pantalla y las plantillas descargables se derivan de esa definición. Cada plantilla incluye exactamente 5 registros de ejemplo válidos y funciona como template y ejemplo a la vez. Los archivos `sample_data/v1/orders.csv` y `fleet.csv` se mantienen sólo como fixtures internos de QA.
 
@@ -92,14 +92,14 @@ Las cargas `orders` y `fleet` se listan por separado. La biblioteca admite búsq
 | `POST /api/datasets/{id}/unarchive` | Recuperar un archivado |
 | `POST /api/datasets/{id}/default` | Marcar flota vigente |
 | `POST /api/runs/preflight` | Validación cruzada |
-| `POST /api/runs` | Ejecutar Dispatch v1 |
+| `POST /api/runs` | Ejecutar Dispatch v2 |
 | `GET /api/dispatch/status` | Diagnóstico de activación |
 
 Todos requieren la autenticación de la plataforma. El upload sin `dataset_type` y `POST /api/runs/{dataset_id}` se preservan para compatibilidad histórica.
 
 ## Resultado
 
-En esta fase el resultado sigue siendo `schema_version=dispatch_v1`, con motor **1.2.0**. `ready_date` representa disponibilidad; la asignación selecciona únicamente pools cuya `base_location` coincide con el origen de la orden, salvo tercerizados globales con `*`, y los pools finitos permanecen ocupados hasta completar ida y retorno. Cada viaje expone `cycle_days` y `resource_available_again`. El `result_fingerprint` continúa identificando la parte determinística, no metadatos de persistencia.
+`schema_version=dispatch_v2` usa motor **2.0.0**. El SLA se resuelve antes que el objetivo de negocio: primero se minimizan órdenes tardías y luego días de tardanza ponderados por prioridad. Después se optimiza costo, tiempo, participación de flota propia, CO₂ o una ponderación personalizada. Viajes permanece como KPI y desempate. Cada resultado incluye `decision`, `feasibility`, `decision_drivers`, `exceptions`, escenarios comparables y la `Distribución recomendada`. Cada viaje conserva `cycle_days` y `resource_available_again`. El `result_fingerprint` identifica la parte determinística, no metadatos de persistencia.
 
 
 ## UX de ingesta v2
@@ -128,3 +128,12 @@ decisión**.
 Las columnas históricas `current_vehicle_type` o `vehicle_type` pueden generar una advertencia
 de columna extra, pero no bloquean la carga y se descartan antes del motor. La asignación de
 vehículo será responsabilidad exclusiva de la decisión generada.
+
+
+## Contrato de decisión — dispatch_v2
+
+Las prioridades configurables son `cost`, `time`, `utilization` y `co2`; sus pesos deben sumar 1. `max_utilization` significa minimizar la participación de kg tercerizados, mientras `own_load_utilization` se conserva como KPI complementario.
+
+El horizonte de recuperación tardía está acotado por `max_late_days` (30 días por defecto). Si una distribución completa existe dentro de ese horizonte, el motor puede devolver `recommended_with_exceptions` en lugar de declarar inviabilidad.
+
+Los escenarios estándar son `min_cost`, `min_time`, `max_utilization`, `min_co2`, `balanced` y `selected`. La referencia `baseline_direct` es una política declarada y no representa una operación real verificada.
