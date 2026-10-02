@@ -41,7 +41,7 @@ function calendar(root,r){
   root.innerHTML='<p>Salidas por día y pool de flota. Cada pool sólo puede atender órdenes cuyo origen coincide con su base; los tercerizados con base * pueden operar desde cualquier origen. En esta fase los vehículos vuelven a estar disponibles al día siguiente.</p><div class="dispatch-chart" role="img" aria-label="Calendario de salidas por pool de flota"></div><div class="dispatch-table-wrap"><table><thead><tr><th>Día</th><th>Base</th><th>Pool / camión</th><th>Viajes</th><th>Disponibles</th></tr></thead><tbody>'+
     days.flatMap(d=>r.fleet.map(v=>{
       const n=trips.filter(t=>t.dispatch_date===d&&poolId(t)===poolId(v)).length;
-      return n?`<tr><td>${date(d)}</td><td>${esc(v.base_location==='*'?'Cualquier origen':v.base_location)}</td><td>${esc(poolId(v))}<small>${esc(vehicle(v.vehicle_type))}</small></td><td>${n}</td><td>${v.units_available??'Sin límite'}</td></tr>`:'';
+      return n?`<tr><td>${date(d)}</td><td>${esc(baseLabel(v))}</td><td>${esc(poolId(v))}<small>${esc(vehicle(v.vehicle_type))}</small></td><td>${n}</td><td>${v.units_available??'Sin límite'}</td></tr>`:'';
     })).join('')+'</tbody></table></div>';
 
   chart(root.querySelector('.dispatch-chart'),{
@@ -77,7 +77,7 @@ function trips(root,r){
     const filters={};
     root.querySelectorAll('[name]').forEach(n=>filters[n.name]=n.type==='checkbox'?n.checked:n.value);
     const rows=filteredTrips(r,filters);
-    root.querySelector('tbody').innerHTML=rows.map(t=>`<tr><td><details><summary>${esc(t.trip_id)} · ${t.loads.length} órdenes</summary>${t.loads.map(l=>`<p>${esc(l.order_id)}: ${num(l.units)} un. · ${num(l.kg)} kg · plazo ${date(outcomes.get(l.order_id)?.deadline)}${outcomes.get(l.order_id)?.late_days?' · entrega tardía':''}</p>`).join('')}</details></td><td>${date(t.dispatch_date)}<small>${date(t.arrival_date)}</small></td><td>${esc(t.origin)} → ${esc(t.destination)}<small>${esc(vehicle(t.vehicle_type))} · ${esc(poolId(t))} · base ${esc(t.base_location==='*'?'cualquier origen':t.base_location)}${t.ownership==='third_party'?' · Tercerizado':''}</small></td><td>${num(t.load_kg)} kg · ${pct(t.utilization)}<meter min="0" max="1" value="${t.utilization}" aria-label="Utilización ${pct(t.utilization)}"></meter></td><td>${money(t.cost)}</td><td>${num(t.co2_kg,1)} kg</td></tr>`).join('');
+    root.querySelector('tbody').innerHTML=rows.map(t=>`<tr><td><details><summary>${esc(t.trip_id)} · ${t.loads.length} órdenes</summary>${t.loads.map(l=>`<p>${esc(l.order_id)}: ${num(l.units)} un. · ${num(l.kg)} kg · plazo ${date(outcomes.get(l.order_id)?.deadline)}${outcomes.get(l.order_id)?.late_days?' · entrega tardía':''}</p>`).join('')}</details></td><td>${date(t.dispatch_date)}<small>${date(t.arrival_date)}</small></td><td>${esc(t.origin)} → ${esc(t.destination)}<small>${esc(vehicle(t.vehicle_type))} · ${esc(poolId(t))} · base ${esc(baseLabel(t))}${t.ownership==='third_party'?' · Tercerizado':''}</small></td><td>${num(t.load_kg)} kg · ${pct(t.utilization)}<meter min="0" max="1" value="${t.utilization}" aria-label="Utilización ${pct(t.utilization)}"></meter></td><td>${money(t.cost)}</td><td>${num(t.co2_kg,1)} kg</td></tr>`).join('');
     root.querySelector('[data-count]').textContent=rows.length+' viajes encontrados';
   };
   root.querySelectorAll('[name]').forEach(n=>n.oninput=update);
