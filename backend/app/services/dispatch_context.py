@@ -5,11 +5,63 @@ import re
 
 def build_dispatch_context(result):
     selected = result["scenarios"]["selected"]
+    assignment = {}
+    for trip in selected.get("trips", []):
+        pool_id = trip.get("fleet_pool_id") or trip.get("vehicle_type") or "legacy"
+        current = assignment.setdefault(
+            pool_id,
+            {
+                "fleet_pool_id": pool_id,
+                "vehicle_type": trip.get("vehicle_type"),
+                "ownership": trip.get("ownership"),
+                "base_location": trip.get("base_location"),
+                "trips": 0,
+                "load_kg": 0.0,
+                "capacity_kg": 0.0,
+                "products": {},
+                "orders": set(),
+            },
+        )
+        current["trips"] += 1
+        current["load_kg"] += float(trip.get("load_kg") or 0)
+        current["capacity_kg"] += float(trip.get("capacity_kg") or 0)
+        for load in trip.get("loads", []):
+            current["orders"].add(load.get("order_id"))
+            product = load.get("product") or "Producto no registrado"
+            current["products"][product] = (
+                current["products"].get(product, 0.0)
+                + float(load.get("kg") or 0)
+            )
+
+    assignment_by_pool = []
+    for current in assignment.values():
+        capacity = current.pop("capacity_kg")
+        current["orders"] = len(current["orders"])
+        current["utilization"] = (
+            current["load_kg"] / capacity
+            if capacity
+            else 0
+        )
+        current["products"] = dict(
+            sorted(
+                current["products"].items(),
+                key=lambda item: (-item[1], item[0]),
+            )
+        )
+        assignment_by_pool.append(current)
+    assignment_by_pool.sort(
+        key=lambda item: (
+            -item["load_kg"],
+            item["fleet_pool_id"],
+        )
+    )
+
     context = {
         "schema_version": result.get("schema_version", "dispatch_v1"),
         "decision": result.get("decision"),
         "feasibility": result.get("feasibility"),
         "decision_drivers": result.get("decision_drivers"),
+        "assignment_by_pool": assignment_by_pool[:12],
         "exceptions": (result.get("exceptions") or [])[:10],
         "configuration": result["configuration"],
         "solver": selected["solver"],
@@ -134,6 +186,9 @@ def build_dispatch_context(result):
             ),
             "decision_drivers": bounded(
                 result.get("decision_drivers")
+            ),
+            "assignment_by_pool": bounded(
+                assignment_by_pool[:8]
             ),
             "configuration": {
                 key: result["configuration"][key]
@@ -281,11 +336,12 @@ def safe_explanation(result):
         ),
         "business_impact": {
             "cost": (
-                "Consultá el costo calculado en los KPIs."
+                "El costo corresponde a la distribución calculada; "
+                "no representa ahorro real frente a una operación histórica."
             ),
             "trips": (
-                "Consultá la distribución de viajes y "
-                "la participación propia/tercerizada."
+                "Consultá la asignación de carga para revisar viajes, "
+                "pools, productos y participación propia/tercerizada."
             ),
             "distance": (
                 "Costo y emisiones contemplan ida y vuelta."
