@@ -1,7 +1,26 @@
 import {esc,num,date,vehicle,api,post,errorBox} from './shared.mjs';import {rebalance} from './selectors.mjs';import {render as dashboard} from './dashboard.mjs';
 import {mountUploadScreen} from './upload/index.mjs';
-const KEY='dation.dispatch.workspace.v2';const PRIORITY_KEYS=['cost','time','utilization','co2'];const DEFAULT_WEIGHTS={cost:25,time:25,utilization:25,co2:25};const PRESETS={min_cost:{cost:100,time:0,utilization:0,co2:0},min_time:{cost:0,time:100,utilization:0,co2:0},max_utilization:{cost:0,time:0,utilization:100,co2:0},min_co2:{cost:0,time:0,utilization:0,co2:100},balanced:{...DEFAULT_WEIGHTS}};let saved={};try{saved=JSON.parse(sessionStorage.getItem(KEY)||'{}');}catch{}const validSavedWeights=saved.weights&&PRIORITY_KEYS.every(k=>Number.isFinite(+saved.weights[k]))&&PRIORITY_KEYS.reduce((s,k)=>s+(+saved.weights[k]),0)===100;const state={orders:null,fleet:null,weights:validSavedWeights?saved.weights:{...DEFAULT_WEIGHTS},objective:['min_cost','min_time','max_utilization','min_co2','balanced','custom'].includes(saved.objective)?saved.objective:'balanced',allow:true,decisions:{},...saved,preflight:null,available:false,run:null};if(!validSavedWeights){state.weights={...DEFAULT_WEIGHTS};state.objective='balanced';}if(!['min_cost','min_time','max_utilization','min_co2','balanced','custom'].includes(state.objective)){state.objective='balanced';state.weights={...DEFAULT_WEIGHTS};}
-let timer=null,pollGeneration=0;const roots={};function persist(){try{sessionStorage.setItem(KEY,JSON.stringify({orders:state.orders,fleet:state.fleet,weights:state.weights,objective:state.objective,allow:state.allow,decisions:state.decisions}));}catch{}}
+const KEY='dation.dispatch.workspace.v3';
+const PRIORITY_KEYS=['cost','time','utilization','co2'];
+const DEFAULT_DIMENSIONS=[...PRIORITY_KEYS];
+const DEFAULT_WEIGHTS={cost:25,time:25,utilization:25,co2:25};
+const PRESETS={min_cost:{cost:100,time:0,utilization:0,co2:0},min_time:{cost:0,time:100,utilization:0,co2:0},max_utilization:{cost:0,time:0,utilization:100,co2:0},min_co2:{cost:0,time:0,utilization:0,co2:100}};
+const OBJECTIVE_DIMENSION={min_cost:'cost',min_time:'time',max_utilization:'utilization',min_co2:'co2'};
+const OBJECTIVE_LABELS={min_cost:'Costo mínimo',min_time:'Tiempo mínimo',max_utilization:'Máxima utilización propia',min_co2:'CO₂ mínimo',balanced:'Balanceado',custom:'Personalizado'};
+const DIMENSION_LABELS={cost:'Costo operativo',time:'Tiempo de entrega',utilization:'Uso de flota propia',co2:'Emisiones CO₂'};
+const DEPTH_LABELS={essential:'Esencial',comparative:'Comparativo',deep:'Profundo'};
+function balancedWeights(dimensions){const out=Object.fromEntries(PRIORITY_KEYS.map(k=>[k,0]));const base=Math.floor(100/dimensions.length);let rest=100-base*dimensions.length;dimensions.forEach(k=>{out[k]=base+(rest>0?1:0);rest=Math.max(0,rest-1);});return out;}
+function normalizeWeights(weights,dimensions){const out=Object.fromEntries(PRIORITY_KEYS.map(k=>[k,0]));const total=dimensions.reduce((s,k)=>s+(Number(weights?.[k])||0),0);if(total<=0)return balancedWeights(dimensions);const raw=dimensions.map((k,i)=>{const v=100*(Number(weights?.[k])||0)/total;return {k,i,base:Math.floor(v),fraction:v-Math.floor(v)};});let missing=100-raw.reduce((s,x)=>s+x.base,0);[...raw].sort((a,b)=>b.fraction-a.fraction||a.i-b.i).slice(0,missing).forEach(x=>x.base+=1);raw.forEach(x=>out[x.k]=x.base);return out;}
+function presetWeights(objective,dimensions){if(objective==='balanced')return balancedWeights(dimensions);const out=Object.fromEntries(PRIORITY_KEYS.map(k=>[k,0]));const key=OBJECTIVE_DIMENSION[objective];if(key)out[key]=100;return out;}
+let saved={};try{saved=JSON.parse(sessionStorage.getItem(KEY)||'{}');}catch{}
+const restoredDimensions=Array.isArray(saved.dimensions)?DEFAULT_DIMENSIONS.filter(k=>saved.dimensions.includes(k)):DEFAULT_DIMENSIONS;
+const state={orders:null,fleet:null,dimensions:restoredDimensions.length?restoredDimensions:[...DEFAULT_DIMENSIONS],weights:{...DEFAULT_WEIGHTS},objective:['min_cost','min_time','max_utilization','min_co2','balanced','custom'].includes(saved.objective)?saved.objective:'balanced',analysisDepth:['essential','comparative','deep'].includes(saved.analysisDepth)?saved.analysisDepth:'comparative',allow:saved.allow??true,maxLateDays:Number.isFinite(+saved.maxLateDays)?Math.min(90,Math.max(0,+saved.maxLateDays)):30,decisions:saved.decisions||{},...saved,preflight:null,available:false,run:null};
+if(!Array.isArray(state.dimensions)||!state.dimensions.length)state.dimensions=[...DEFAULT_DIMENSIONS];
+state.dimensions=DEFAULT_DIMENSIONS.filter(k=>state.dimensions.includes(k));
+if(OBJECTIVE_DIMENSION[state.objective]&&!state.dimensions.includes(OBJECTIVE_DIMENSION[state.objective]))state.objective='balanced';
+state.weights=state.objective==='custom'?normalizeWeights(state.weights,state.dimensions):presetWeights(state.objective,state.dimensions);
+let timer=null,pollGeneration=0;const roots={};
+function persist(){try{sessionStorage.setItem(KEY,JSON.stringify({orders:state.orders,fleet:state.fleet,dimensions:state.dimensions,weights:state.weights,objective:state.objective,analysisDepth:state.analysisDepth,allow:state.allow,maxLateDays:state.maxLateDays,decisions:state.decisions}));}catch{}}
 function root(view,id){const parent=document.querySelector('[data-view-panel="'+view+'"]');let node=document.getElementById(id);if(!node){node=document.createElement('div');node.id=id;node.className='dispatch';parent.append(node);}return node;}
 function ready(){return !!(state.available&&state.orders&&state.fleet&&state.preflight?.valid);}
 function navigate(view){window.dationSetDataReady(ready());window.dationNavigate(view);}
