@@ -1,5 +1,15 @@
 # Historial
 
+## Optimización UX/UI de Cargar datos — 2026-10-02
+
+- Asistente de ingesta con stepper, resumen sticky y CTA primario.
+- Perfil visual de órdenes y flota, vista previa y detección de formato.
+- Preflight agrupado con consecuencias y gráfico demanda/capacidad.
+- Flota vigente reutilizable y cargas compactas después de validar.
+- Guía lateral de formato, carga de ejemplos y biblioteca con archivado reversible.
+- Estado único de tarjeta mediante `deriveCardState`, sin mensajes contradictorios.
+
+
 ## Ingesta única Dispatch — 2026-10-01
 
 - Nueva pantalla única de **Cargar datos** con órdenes + flota.

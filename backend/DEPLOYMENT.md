@@ -103,3 +103,19 @@ El repositorio aún no dispone del DDL original completo de `datasets` y `decisi
 ## Rollback
 
 Replegar la aplicación anterior sin borrar columnas ni datos nuevos. No eliminar columnas de Dispatch si ya existen corridas `dispatch_v1`. No hay downgrade destructivo automático.
+
+
+## Smoke test de ingesta UX
+
+Después del deploy validar en 1440 px y 390 px:
+- primera vez y datos de ejemplo;
+- flota vigente + nuevas órdenes;
+- archivo con errores múltiples;
+- formato anterior;
+- duplicado;
+- error de guardado;
+- activación pendiente;
+- listo con avisos y botón Configurar decisión habilitado.
+
+El script `scripts/qa/dispatch-browser.cjs` mantiene mocks para el flujo completo y
+comprueba que no haya overflow horizontal.

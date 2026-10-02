@@ -31,8 +31,17 @@ const orders = {
       total_units: 2682,
       total_weight_kg: 2384000,
       routes: 28,
+      origins: 3,
+      destinations: 10,
       date_from: "2026-10-01",
       date_to: "2026-10-10",
+      max_order_kg: 61600,
+      priority_mix: {High: 27, Normal: 62, Low: 11},
+      delivery_days: {min: 1, max: 5},
+      daily: [
+        {date: "2026-10-01", orders: 7, kg: 153900},
+        {date: "2026-10-09", orders: 13, kg: 351800},
+      ],
     },
   },
 };
@@ -48,7 +57,13 @@ const fleet = {
   profile_json: {
     valid: true,
     counts: {errors: 0, warnings: 0},
-    profile: {fleet: result.fleet},
+    profile: {
+      fleet: result.fleet,
+      types: 4,
+      own_units_per_day: 11,
+      own_capacity_kg_per_day: 167000,
+      has_third_party: true,
+    },
   },
 };
 
@@ -166,6 +181,60 @@ result.inputs.fleet = {
           warnings: result.inputs.preflight.warnings,
           errors: [],
           anomalies: [],
+          findings: [
+            {
+              id: "references_ok",
+              severity: "success",
+              title: "Todos los camiones de referencia existen en la flota",
+              consequence: null,
+              items: [],
+            },
+            {
+              id: "late_orders",
+              severity: "warning",
+              title: "7 órdenes llegarán tarde aunque salgan el primer día",
+              consequence: "El plan las entrega igual y las marca como tardías.",
+              items: [
+                {order_id: "SHP-0014", detail: "Tránsito 2 días; plazo 1 día."},
+              ],
+            },
+            {
+              id: "capacity_vs_demand",
+              severity: "warning",
+              title: "Tu demanda supera la capacidad propia en 9 de 10 días",
+              consequence: (
+                "El plan usará camiones tercerizados o reprogramará salidas "
+                + "dentro de cada plazo."
+              ),
+              items: [],
+            },
+          ],
+          capacity_check: {
+            own_capacity_kg_per_day: 167000,
+            days_over: 9,
+            total_days: 10,
+            days: [
+              {
+                date: "2026-10-01",
+                orders: 7,
+                kg: 153900,
+                ratio: 0.92,
+                over: false,
+              },
+              {
+                date: "2026-10-09",
+                orders: 13,
+                kg: 351800,
+                ratio: 2.11,
+                over: true,
+              },
+            ],
+          },
+          readiness: {
+            can_continue: true,
+            blockers: [],
+            reason: null,
+          },
         };
       } else if (path === "/api/runs" && route.request().method() === "POST") {
         const body = route.request().postDataJSON();
@@ -243,6 +312,15 @@ result.inputs.fleet = {
       .locator("[data-kind='fleet']")
       .getByRole("button", {name: "Usar", exact: true})
       .click();
+
+    await page.getByText("2.384 t", {exact: false}).waitFor();
+    await page.getByText("28", {exact: true}).first().waitFor();
+    await page
+      .getByText("7 órdenes llegarán tarde aunque salgan el primer día")
+      .waitFor();
+    await page
+      .getByText("Tu demanda supera la capacidad propia en 9 de 10 días")
+      .waitFor();
 
     const next = page.getByRole(
       "button",

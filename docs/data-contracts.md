@@ -96,3 +96,19 @@ Todos requieren la autenticación de la plataforma. El upload sin `dataset_type`
 ## Resultado
 
 `schema_version=dispatch_v1`, motor 1.0.0, inputs versionados, configuración, reglas, anomalías, escenarios, sensibilidad y huella. El `result_fingerprint` identifica la parte determinística, no metadatos de persistencia.
+
+
+## UX de ingesta v2
+
+La validación devuelve además `profile_version=2`, `preview`, `detected` y
+`suggested_label`. Para órdenes, el perfil incluye orígenes, destinos, peso máximo,
+mezcla de prioridades, rango de plazos y demanda diaria. Para flota, incluye cantidad
+de tipos, camiones propios por día, capacidad propia diaria y presencia de tercerizados.
+
+El preflight conserva `errors`, `warnings` y `anomalies`, y agrega:
+`findings` agrupados en lenguaje de negocio, `capacity_check` para demanda versus
+capacidad propia y `readiness` para decidir si la pantalla puede avanzar.
+
+`POST /api/datasets/load-sample` carga o reutiliza por hash los fixtures de
+`sample_data/v1`. `GET /api/datasets/{id}/download` permite descargar un input
+guardado y `PATCH /api/datasets/{id}` actualiza su etiqueta.

@@ -47,3 +47,14 @@ Regenerar casos:
 ```bash
 PYTHONPATH=backend python scripts/generate_dispatch_fixtures.py
 ```
+
+
+## Criterios visuales de la carga
+
+Con estos fixtures la UI debe mostrar 100 órdenes, 2.682 unidades, 2.384 t, 28 rutas,
+3 orígenes → 10 destinos, período 1–10 oct 2026 y prioridades 27 / 62 / 11. La flota
+debe resumirse como 4 tipos, 11 camiones propios por día y 167 t/día.
+
+La revisión conjunta debe agrupar las 7 órdenes con tardanza inevitable en un solo
+aviso y mostrar que la demanda supera la capacidad propia en 9 de 10 días, con pico de
+351,8 t el 9 oct.

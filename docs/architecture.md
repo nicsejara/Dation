@@ -65,3 +65,15 @@ El intérprete recibe un contexto derivado del `DecisionResult`. No recalcula ni
 - Desacoplar y retirar el configurador legacy cuando las corridas históricas estén cubiertas por pruebas de navegador.
 - Incorporar ocupación real de vehículos, volumen y multiparada en una versión posterior.
 - Evaluar colas y aislamiento al aumentar concurrencia.
+
+
+## UX de carga 2026-10-02
+
+La pantalla de carga funciona como asistente de ingesta: stepper Órdenes → Flota →
+Revisión, resumen sticky en escritorio y barra inferior en móvil. La flota vigente se
+reutiliza automáticamente, la carga se compacta una vez validada y el frontend muestra
+qué interpretó del CSV antes de avanzar.
+
+Los avisos del preflight llegan agrupados desde backend; la UI no traduce códigos del
+motor. El gráfico de demanda versus capacidad propia usa ECharts vendorizado y tiene
+alternativa tabular. La guía de formato usa el contrato servido por backend.

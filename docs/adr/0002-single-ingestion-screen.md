@@ -30,3 +30,14 @@ Dispatch v1 requiere órdenes y flota separados, pero la SPA conservaba una pant
 - Mantener dos pantallas de carga: duplica contratos y UX.
 - Validar únicamente durante upload: impide diagnóstico sin DB.
 - Inferir automáticamente el baseline SQL: riesgo de versionar un esquema que no coincide con producción.
+
+
+## Evolución UX v2
+
+Se mantiene la decisión de una sola pantalla, pero se reduce el tiempo hasta el primer
+valor: la ayuda extensa pasa a un drawer, la introducción sólo aparece la primera vez y
+la flota vigente se reutiliza. El backend redacta findings agrupados para evitar que la
+UI repita un aviso por orden.
+
+El estado visible de cada tarjeta depende exclusivamente de `deriveCardState`. El
+texto "No se guardó" sólo corresponde a errores de validación o persistencia.
