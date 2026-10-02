@@ -20,4 +20,10 @@ class DispatchContextTests(unittest.TestCase):
         self.assertEqual(context['schema_version'], 'dispatch_v2')
         self.assertIn('decision_drivers', context)
         self.assertIn('feasibility', context)
+        self.assertIn('assignment_by_pool', context)
+        self.assertTrue(context['assignment_by_pool'])
+        self.assertIn(
+            'products',
+            context['assignment_by_pool'][0],
+        )
         self.assertLessEqual(len(json.dumps(context,ensure_ascii=False)),18000)
