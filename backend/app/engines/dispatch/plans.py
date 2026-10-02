@@ -10,6 +10,9 @@ from .normalization import (
     departure_days,
     eligible_fleet,
     vehicle_can_serve_origin,
+    cycle_days,
+    resource_available_again,
+    occupied_dates,
 )
 
 
@@ -23,6 +26,8 @@ def trip(order, vehicle, day):
         'arrival_date': (
             date.fromisoformat(day) + timedelta(days=transit(order, vehicle))
         ).isoformat(),
+        'cycle_days': cycle_days(order, vehicle),
+        'resource_available_again': resource_available_again(order, vehicle, day),
         'origin': order['origin'],
         'destination': order['destination'],
         'distance_km': order['distance_km'],
@@ -44,7 +49,7 @@ def add_load(t, order, units):
 
 def greedy(orders, fleet, objective='min_cost', direct=False, current=False):
     """Deterministic constructive candidate. Failure is UNKNOWN, never proof of infeasibility."""
-    plan, used = [], Counter()
+    plan, occupied = [], Counter()
     priority = {'High': 0, 'Normal': 1, 'Low': 2}
     ordered = sorted(
         orders,
@@ -70,7 +75,6 @@ def greedy(orders, fleet, objective='min_cost', direct=False, current=False):
                 days = [o['dispatch_date']] if direct else departure_days(o, v, fleet)
                 for day in days:
                     pool_id = v['fleet_pool_id']
-                    key = (pool_id, day)
                     # Existing consolidated trip costs no additional departure.
                     if not direct:
                         for idx, t in enumerate(plan):
@@ -110,11 +114,12 @@ def greedy(orders, fleet, objective='min_cost', direct=False, current=False):
                                         v,
                                     )
                                 )
-                    if (
-                        v['units_available'] is not None
-                        and used[key] >= v['units_available']
-                    ):
-                        continue
+                    if v['units_available'] is not None:
+                        if any(
+                            occupied[(pool_id, busy_day)] >= v['units_available']
+                            for busy_day in occupied_dates(o, v, day)
+                        ):
+                            continue
                     n = min(capacity_units(o, v), remaining)
                     lead = (
                         date.fromisoformat(day)
@@ -155,7 +160,8 @@ def greedy(orders, fleet, objective='min_cost', direct=False, current=False):
                         'cobertura parcial.'
                     )
                 plan.append(trip(o, v, day))
-                used[(v['fleet_pool_id'], day)] += 1
+                for busy_day in occupied_dates(o, v, day):
+                    occupied[(v['fleet_pool_id'], busy_day)] += 1
             add_load(plan[idx], o, n)
             remaining -= n
     return canonical(plan)
@@ -181,7 +187,7 @@ def canonical(plan):
 def validate_plan(plan, orders, fleet, *, direct=False):
     by_id = {o['order_id']: o for o in orders}
     pools = {v['fleet_pool_id']: v for v in fleet}
-    counts, daily = Counter(), Counter()
+    counts, occupancy = Counter(), Counter()
     for t in plan:
         if t['fleet_pool_id'] not in pools:
             raise ValueError('Pool de flota inexistente.')
@@ -190,7 +196,22 @@ def validate_plan(plan, orders, fleet, *, direct=False):
             raise ValueError('Tipo de vehículo inconsistente con el pool.')
         if t.get('base_location') != v['base_location']:
             raise ValueError('Base operativa inconsistente con el pool.')
-        daily[(v['fleet_pool_id'], t['dispatch_date'])] += 1
+        expected_cycle = cycle_days(by_id[t['loads'][0]['order_id']], v)
+        expected_available = resource_available_again(
+            by_id[t['loads'][0]['order_id']],
+            v,
+            t['dispatch_date'],
+        )
+        if t.get('cycle_days') != expected_cycle:
+            raise ValueError('Duración de ciclo inconsistente.')
+        if t.get('resource_available_again') != expected_available:
+            raise ValueError('Disponibilidad futura inconsistente.')
+        for busy_day in occupied_dates(
+            by_id[t['loads'][0]['order_id']],
+            v,
+            t['dispatch_date'],
+        ):
+            occupancy[(v['fleet_pool_id'], busy_day)] += 1
         load = D(0)
         for l in t['loads']:
             o = by_id[l['order_id']]
@@ -226,10 +247,12 @@ def validate_plan(plan, orders, fleet, *, direct=False):
         {o['order_id']: o['quantity_units'] for o in orders}
     ):
         raise ValueError('No se conservan las unidades.')
-    for (pool_id, day), n in daily.items():
+    for (pool_id, day), n in occupancy.items():
         limit = pools[pool_id]['units_available']
         if limit is not None and n > limit:
-            raise ValueError('Disponibilidad del pool de flota excedida.')
+            raise ValueError(
+                f'Disponibilidad temporal del pool de flota excedida en {day}.'
+            )
 
 
 def rounded(value):
@@ -321,6 +344,10 @@ def summarize(plan, orders, fleet):
         'outsourced_trips_share': (
             sum(t['ownership'] == 'third_party' for t in plan)
             / len(plan)
+        ),
+        'avg_cycle_days': round(
+            sum(t['cycle_days'] for t in plan) / len(plan),
+            6,
         ),
         'fuel_l': rounded(fuel),
         'co2_kg': rounded(co2),
