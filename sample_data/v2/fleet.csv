@@ -1,0 +1,11 @@
+fleet_pool_id;vehicle_type;ownership;base_location;capacity_kg;cost_per_km;fixed_trip_cost;units_available;avg_speed_kmh;driving_hours_per_day;fuel_l_per_100km;co2_kg_per_km
+OWN-CBA-S;Truck_S;own;Cordoba;8000;720;25000;2;70;10;22;0.59
+OWN-BUE-S;Truck_S;own;Buenos Aires;8000;720;25000;1;70;10;22;0.59
+OWN-ROS-S;Truck_S;own;Rosario;8000;720;25000;1;70;10;22;0.59
+OWN-CBA-M;Truck_M;own;Cordoba;15000;920;35000;2;70;10;30;0.80
+OWN-BUE-M;Truck_M;own;Buenos Aires;15000;920;35000;1;70;10;30;0.80
+OWN-ROS-M;Truck_M;own;Rosario;15000;920;35000;1;70;10;30;0.80
+OWN-CBA-L;Truck_L;own;Cordoba;25000;1180;48000;1;70;10;38;1.02
+OWN-BUE-L;Truck_L;own;Buenos Aires;25000;1180;48000;1;70;10;38;1.02
+OWN-ROS-L;Truck_L;own;Rosario;25000;1180;48000;1;70;10;38;1.02
+TP-ALL-L;Third_Party_L;third_party;*;25000;1534;62400;;70;10;38;1.02
