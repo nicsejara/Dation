@@ -90,8 +90,6 @@ class FrontendContractTests(
         javascript = (
             self.app_js
             + "\n"
-            + self.decision_stage_js
-            + "\n"
             + self.dashboard_stage_js
             + "\n"
             + self.interpreter_stage_js
@@ -357,13 +355,21 @@ class FrontendContractTests(
             "/api/runs/",
             self.dashboard_stage_js,
         )
+        workspace = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+            / "workspace.mjs"
+        ).read_text(encoding="utf-8")
         self.assertIn(
             "?run_id=",
-            self.decision_stage_js,
+            workspace,
         )
         self.assertIn(
-            "dationDashboardStart",
-            self.decision_stage_js,
+            "pending(",
+            workspace,
         )
         self.assertIn(
             "dationDashboardCompleted",
