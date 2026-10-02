@@ -194,6 +194,139 @@ CONTRACTS = {
     },
 }
 
+TEMPLATE_ROWS = {
+    "orders": [
+        {
+            "order_id": "SHP-0001",
+            "product": "A",
+            "quantity_units": "10",
+            "unit_weight_kg": "500",
+            "origin": "Cordoba",
+            "destination": "Villa Maria",
+            "distance_km": "150",
+            "priority": "Normal",
+            "max_delivery_days": "3",
+            "dispatch_date": "2026-10-01",
+            "current_vehicle_type": "Truck_M",
+        },
+        {
+            "order_id": "SHP-0002",
+            "product": "B",
+            "quantity_units": "8",
+            "unit_weight_kg": "900",
+            "origin": "Cordoba",
+            "destination": "San Luis",
+            "distance_km": "420",
+            "priority": "High",
+            "max_delivery_days": "2",
+            "dispatch_date": "2026-10-02",
+            "current_vehicle_type": "Truck_L",
+        },
+        {
+            "order_id": "SHP-0003",
+            "product": "C",
+            "quantity_units": "12",
+            "unit_weight_kg": "1400",
+            "origin": "Rosario",
+            "destination": "La Plata",
+            "distance_km": "330",
+            "priority": "Low",
+            "max_delivery_days": "4",
+            "dispatch_date": "2026-10-03",
+            "current_vehicle_type": "Truck_S",
+        },
+        {
+            "order_id": "SHP-0004",
+            "product": "A",
+            "quantity_units": "6",
+            "unit_weight_kg": "500",
+            "origin": "Buenos Aires",
+            "destination": "Rio Cuarto",
+            "distance_km": "610",
+            "priority": "Normal",
+            "max_delivery_days": "3",
+            "dispatch_date": "2026-10-04",
+            "current_vehicle_type": "Truck_XL",
+        },
+        {
+            "order_id": "SHP-0005",
+            "product": "B",
+            "quantity_units": "15",
+            "unit_weight_kg": "900",
+            "origin": "Cordoba",
+            "destination": "Santa Fe",
+            "distance_km": "350",
+            "priority": "Normal",
+            "max_delivery_days": "2",
+            "dispatch_date": "2026-10-05",
+            "current_vehicle_type": "Third_Party_L",
+        },
+    ],
+    "fleet": [
+        {
+            "vehicle_type": "Truck_S",
+            "ownership": "own",
+            "capacity_kg": "8000",
+            "cost_per_km": "850",
+            "fixed_trip_cost": "30000",
+            "units_available": "4",
+            "avg_speed_kmh": "70",
+            "driving_hours_per_day": "10",
+            "fuel_l_per_100km": "25",
+            "co2_kg_per_km": "0.75",
+        },
+        {
+            "vehicle_type": "Truck_M",
+            "ownership": "own",
+            "capacity_kg": "15000",
+            "cost_per_km": "980",
+            "fixed_trip_cost": "38000",
+            "units_available": "4",
+            "avg_speed_kmh": "70",
+            "driving_hours_per_day": "10",
+            "fuel_l_per_100km": "30",
+            "co2_kg_per_km": "0.85",
+        },
+        {
+            "vehicle_type": "Truck_L",
+            "ownership": "own",
+            "capacity_kg": "25000",
+            "cost_per_km": "1180",
+            "fixed_trip_cost": "48000",
+            "units_available": "3",
+            "avg_speed_kmh": "70",
+            "driving_hours_per_day": "10",
+            "fuel_l_per_100km": "38",
+            "co2_kg_per_km": "1.02",
+        },
+        {
+            "vehicle_type": "Truck_XL",
+            "ownership": "own",
+            "capacity_kg": "30000",
+            "cost_per_km": "1300",
+            "fixed_trip_cost": "52000",
+            "units_available": "1",
+            "avg_speed_kmh": "65",
+            "driving_hours_per_day": "10",
+            "fuel_l_per_100km": "42",
+            "co2_kg_per_km": "1.15",
+        },
+        {
+            "vehicle_type": "Third_Party_L",
+            "ownership": "third_party",
+            "capacity_kg": "25000",
+            "cost_per_km": "1534",
+            "fixed_trip_cost": "62400",
+            "units_available": "",
+            "avg_speed_kmh": "70",
+            "driving_hours_per_day": "10",
+            "fuel_l_per_100km": "38",
+            "co2_kg_per_km": "1.02",
+        },
+    ],
+}
+
+
 LEGACY_MIXED_COLUMNS = {
     "shipment_id",
     "product",
@@ -251,10 +384,7 @@ def known_columns(kind: str) -> list[str]:
 def template_csv(kind: str) -> str:
     contract = CONTRACTS[kind]
     columns = [column["name"] for column in contract["columns"]]
-    example = {
-        column["name"]: column["example"]
-        for column in contract["columns"]
-    }
+    examples = TEMPLATE_ROWS[kind]
     buffer = io.StringIO()
     writer = csv.DictWriter(
         buffer,
@@ -263,5 +393,5 @@ def template_csv(kind: str) -> str:
         lineterminator="\r\n",
     )
     writer.writeheader()
-    writer.writerow(example)
+    writer.writerows(examples)
     return buffer.getvalue()

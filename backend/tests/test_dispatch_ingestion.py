@@ -170,7 +170,9 @@ class DispatchIngestionValidationTests(unittest.TestCase):
             ("orders", validate_orders_report),
             ("fleet", validate_fleet_report),
         ):
-            self.assertTrue(validator(template_csv(kind).encode())["valid"])
+            template_report = validator(template_csv(kind).encode())
+            self.assertTrue(template_report["valid"])
+            self.assertEqual(template_report["rows"], 5)
             sample = (ROOT / "sample_data" / "v1" / f"{kind}.csv").read_bytes()
             self.assertTrue(validator(sample)["valid"])
 
