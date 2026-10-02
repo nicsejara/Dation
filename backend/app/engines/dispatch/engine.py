@@ -19,7 +19,7 @@ from .model import solve
 
 
 ENGINE_NAME = "logistics-dispatch-engine"
-ENGINE_VERSION = "2.0.0"
+ENGINE_VERSION = "2.1.0"
 SCHEMA_VERSION = "dispatch_v2"
 
 NAMES = {
@@ -175,6 +175,14 @@ def run_dispatch_engine(
     opts = DispatchOptions.model_validate(
         options or {}
     ).model_dump()
+    active_dimensions = tuple(config["dimensions"])
+    analysis_depth = opts["analysis_depth"]
+    run_sensitivity = (
+        opts["sensitivity"]
+        if opts["sensitivity"] is not None
+        else analysis_depth == "deep"
+    )
+    opts["sensitivity"] = run_sensitivity
 
     def notify(stage):
         if (
@@ -328,12 +336,21 @@ def run_dispatch_engine(
         }
     scenarios["baseline_direct"] = baseline
 
-    for objective in (
-        "min_cost",
-        "min_time",
-        "max_utilization",
-        "min_co2",
+    if (
+        analysis_depth == "essential"
+        and config["objective"]
+        not in ("balanced", "custom")
     ):
+        candidate_objectives = (
+            config["objective"],
+        )
+    else:
+        candidate_objectives = tuple(
+            SCENARIO_FOR_OBJECTIVE[key]
+            for key in active_dimensions
+        )
+
+    for objective in candidate_objectives:
         candidate_plan = greedy(
             orders,
             fleet,
@@ -496,15 +513,36 @@ def run_dispatch_engine(
         )
         return result
 
-    # Extreme scenarios establish known ranges. For a one-dimensional
-    # objective, scale=1 does not change the ordering.
+    # The analysis depth controls how many alternative objectives are solved.
+    # Essential only computes what is needed for the requested decision.
+    # Comparative adds active extreme scenarios and a balanced reference.
+    # Deep adds the same comparisons plus sensitivity evidence.
     extreme_map = {
         "min_cost": "cost",
         "min_time": "time",
         "max_utilization": "utilization",
         "min_co2": "co2",
     }
-    for scenario_name, objective_key in extreme_map.items():
+    active_extremes = {
+        scenario: dimension
+        for scenario, dimension in extreme_map.items()
+        if dimension in active_dimensions
+    }
+
+    if (
+        analysis_depth == "essential"
+        and config["objective"]
+        not in ("balanced", "custom")
+    ):
+        scenarios_to_solve = {
+            config["objective"]: active_extremes[
+                config["objective"]
+            ]
+        }
+    else:
+        scenarios_to_solve = active_extremes
+
+    for scenario_name, objective_key in scenarios_to_solve.items():
         weights = {
             key: float(key == objective_key)
             for key in OBJECTIVE_KEYS
@@ -516,7 +554,17 @@ def run_dispatch_engine(
         )
 
     normalization = {}
-    for objective_key in OBJECTIVE_KEYS:
+    dimensions_to_normalize = (
+        active_dimensions
+        if (
+            analysis_depth != "essential"
+            or config["objective"] in ("balanced", "custom")
+        )
+        else (
+            extreme_map[config["objective"]],
+        )
+    )
+    for objective_key in dimensions_to_normalize:
         values = [
             _metric(scenario, objective_key)
             for scenario in scenarios.values()
@@ -542,41 +590,42 @@ def run_dispatch_engine(
             1e-6,
         )
         scales[objective_key] = scale
-        extreme_name = (
-            SCENARIO_FOR_OBJECTIVE[
-                objective_key
-            ]
-        )
+        extreme_name = SCENARIO_FOR_OBJECTIVE[
+            objective_key
+        ]
+        extreme = scenarios.get(extreme_name)
         normalization[objective_key] = {
             "best_known": best,
             "reference": reference,
             "scale": scale,
-            "certified_optimal": (
-                scenarios[
-                    extreme_name
-                ]["solver"].get(
-                    "status"
-                )
+            "certified_optimal": bool(
+                extreme
+                and extreme["solver"].get("status")
                 == "optimal"
-                and scenarios[
-                    extreme_name
-                ]["solver"].get(
+                and extreme["solver"].get(
                     "sla_certified",
                     False,
                 )
             ),
         }
 
-    scenarios["balanced"] = optimize(
-        dict(
-            zip(
-                OBJECTIVE_KEYS,
-                PRESETS["balanced"],
-            )
-        ),
-        "balanced",
-        scales,
-    )
+    balanced_weights = {
+        key: (
+            1 / len(active_dimensions)
+            if key in active_dimensions
+            else 0
+        )
+        for key in OBJECTIVE_KEYS
+    }
+    if (
+        analysis_depth != "essential"
+        or config["objective"] == "balanced"
+    ):
+        scenarios["balanced"] = optimize(
+            balanced_weights,
+            "balanced",
+            scales,
+        )
 
     weights = config["weights"]
     if config["objective"] in scenarios:
@@ -594,7 +643,18 @@ def run_dispatch_engine(
 
     notify("sensitivity")
     sweep = []
-    if opts["sensitivity"]:
+    sensitivity_names = [
+        scenario
+        for scenario in (
+            "min_cost",
+            "min_time",
+            "max_utilization",
+            "min_co2",
+            "balanced",
+        )
+        if scenario in scenarios
+    ]
+    if run_sensitivity:
         previous_map = None
 
         def order_map(scenario):
@@ -626,24 +686,23 @@ def run_dispatch_engine(
             }
 
         selected_map = order_map(selected)
-        for scenario_name in (
-            "min_cost",
-            "min_time",
-            "max_utilization",
-            "min_co2",
-            "balanced",
-        ):
+        for scenario_name in sensitivity_names:
             scenario = scenarios[scenario_name]
             current_map = order_map(scenario)
+            if scenario_name == "balanced":
+                point_weights = balanced_weights
+            else:
+                objective_key = extreme_map[
+                    scenario_name
+                ]
+                point_weights = {
+                    key: float(key == objective_key)
+                    for key in OBJECTIVE_KEYS
+                }
             point = {
                 "scenario": scenario_name,
                 "label": NAMES[scenario_name],
-                "weights": dict(
-                    zip(
-                        OBJECTIVE_KEYS,
-                        PRESETS[scenario_name],
-                    )
-                ),
+                "weights": point_weights,
                 "metrics": scenario["metrics"],
                 "solver": scenario["solver"],
                 "plan_fingerprint": digest(
@@ -742,6 +801,18 @@ def run_dispatch_engine(
             "objective": config["objective"],
             "label": "Decisión recomendada",
         },
+        "analysis": {
+            "depth": analysis_depth,
+            "active_dimensions": list(active_dimensions),
+            "scenario_count": len(
+                [
+                    key
+                    for key in scenarios
+                    if key not in ("selected", "baseline_direct")
+                ]
+            ),
+            "sensitivity_enabled": run_sensitivity,
+        },
         "feasibility": feasibility,
         "decision_drivers": decision_drivers,
         "exceptions": exceptions,
@@ -836,8 +907,8 @@ def run_dispatch_engine(
             "weight_sweep": sweep,
             "frontier": sweep,
             "complete": (
-                not opts["sensitivity"]
-                or len(sweep) == 5
+                not run_sensitivity
+                or len(sweep) == len(sensitivity_names)
             ),
         },
     }
