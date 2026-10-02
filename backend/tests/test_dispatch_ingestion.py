@@ -170,9 +170,15 @@ class DispatchIngestionValidationTests(unittest.TestCase):
             ("orders", validate_orders_report),
             ("fleet", validate_fleet_report),
         ):
-            template_report = validator(template_csv(kind).encode())
+            template_text = template_csv(kind)
+            template_report = validator(template_text.encode())
             self.assertTrue(template_report["valid"])
             self.assertEqual(template_report["rows"], 5)
+            if kind == "orders":
+                header = template_text.splitlines()[0]
+                self.assertIn("ready_date", header)
+                self.assertNotIn("current_vehicle_type", header)
+                self.assertNotIn("dispatch_date", header)
             sample = (ROOT / "sample_data" / "v1" / f"{kind}.csv").read_bytes()
             self.assertTrue(validator(sample)["valid"])
 
@@ -204,7 +210,7 @@ class DispatchIngestionHTTPTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.json()["formats"]["orders"]["schema"],
-            "orders_v1",
+            "orders_v2",
         )
 
     async def test_status_uses_detailed_service(self):
