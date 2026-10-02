@@ -91,7 +91,7 @@
     },
     "options": {},
     "expected": {
-      "error_contains": "dispatch_date"
+      "error_contains": "ready_date"
     }
   },
   {

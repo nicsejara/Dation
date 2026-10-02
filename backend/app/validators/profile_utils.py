@@ -49,7 +49,7 @@ def detected_metadata(contents: bytes, kind: str, columns: list[str]) -> dict:
     alias_map = {
         "orders": {
             "shipment_id": "order_id",
-            "vehicle_type": "current_vehicle_type",
+            "dispatch_date": "ready_date",
         },
         "fleet": {},
     }[kind]
@@ -60,7 +60,7 @@ def detected_metadata(contents: bytes, kind: str, columns: list[str]) -> dict:
     ]
 
     date_format = None
-    if kind == "orders" and "dispatch_date" in columns:
+    if kind == "orders" and "ready_date" in columns:
         date_format = (
             "d/m/AAAA"
             if any("/" in line for line in text.splitlines()[1:6])

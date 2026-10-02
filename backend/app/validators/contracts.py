@@ -78,21 +78,13 @@ ORDERS_COLUMNS = [
         "description": "Días máximos desde disponibilidad hasta entrega.",
     },
     {
-        "name": "dispatch_date",
+        "name": "ready_date",
         "required": True,
         "type": "fecha",
         "rule": "AAAA-MM-DD o d/m/AAAA, con día primero.",
         "example": "2026-10-09",
-        "description": "Primer día en que la orden puede salir.",
-    },
-    {
-        "name": "current_vehicle_type",
-        "required": False,
-        "type": "texto",
-        "rule": "Opcional. También acepta vehicle_type.",
-        "example": "Truck_S",
-        "description": "Referencia informada para comparar; no decide el plan.",
-        "aliases": ["vehicle_type"],
+        "description": "Fecha desde la que la carga está disponible para despacho.",
+        "aliases": ["dispatch_date"],
     },
 ]
 
@@ -181,7 +173,7 @@ FLEET_COLUMNS = [
 
 CONTRACTS = {
     "orders": {
-        "schema": "orders_v1",
+        "schema": "orders_v2",
         "label": "Órdenes de envío",
         "role": "Qué hay que entregar. Cambian en cada corrida.",
         "columns": ORDERS_COLUMNS,
@@ -206,8 +198,7 @@ TEMPLATE_ROWS = {
             "distance_km": "150",
             "priority": "Normal",
             "max_delivery_days": "3",
-            "dispatch_date": "2026-10-01",
-            "current_vehicle_type": "Truck_M",
+            "ready_date": "2026-10-01",
         },
         {
             "order_id": "SHP-0002",
@@ -219,8 +210,7 @@ TEMPLATE_ROWS = {
             "distance_km": "420",
             "priority": "High",
             "max_delivery_days": "2",
-            "dispatch_date": "2026-10-02",
-            "current_vehicle_type": "Truck_L",
+            "ready_date": "2026-10-02",
         },
         {
             "order_id": "SHP-0003",
@@ -232,8 +222,7 @@ TEMPLATE_ROWS = {
             "distance_km": "330",
             "priority": "Low",
             "max_delivery_days": "4",
-            "dispatch_date": "2026-10-03",
-            "current_vehicle_type": "Truck_S",
+            "ready_date": "2026-10-03",
         },
         {
             "order_id": "SHP-0004",
@@ -245,8 +234,7 @@ TEMPLATE_ROWS = {
             "distance_km": "610",
             "priority": "Normal",
             "max_delivery_days": "3",
-            "dispatch_date": "2026-10-04",
-            "current_vehicle_type": "Truck_XL",
+            "ready_date": "2026-10-04",
         },
         {
             "order_id": "SHP-0005",
@@ -258,8 +246,7 @@ TEMPLATE_ROWS = {
             "distance_km": "350",
             "priority": "Normal",
             "max_delivery_days": "2",
-            "dispatch_date": "2026-10-05",
-            "current_vehicle_type": "Third_Party_L",
+            "ready_date": "2026-10-05",
         },
     ],
     "fleet": [

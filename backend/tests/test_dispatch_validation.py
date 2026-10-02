@@ -20,7 +20,8 @@ class DispatchValidationTests(unittest.TestCase):
             data=validate_orders_csv(target.read_bytes())
             self.assertEqual(data['profile']['total_units'],2682)
             self.assertEqual(data['profile']['total_weight_kg'],2384000)
-            self.assertIn('current_vehicle_type',data['records'][0])
+            self.assertIn('ready_date',data['records'][0])
+            self.assertNotIn('current_vehicle_type',data['records'][0])
 
     def test_invalid_inputs(self):
         data=(ROOT/'sample_data/v1/orders.csv').read_bytes()
@@ -36,9 +37,11 @@ class DispatchValidationTests(unittest.TestCase):
 
     def test_alias_and_explicit_day_first_dates(self):
         from test_dispatch_engine import order,csv_bytes,COLUMNS
-        data=csv_bytes(COLUMNS,[{**order(),'dispatch_date':'10/1/2026'}]).replace(b'order_id;',b'shipment_id;',1)
+        data=csv_bytes(COLUMNS,[{**order(),'ready_date':'10/1/2026'}])
+        data=data.replace(b'order_id;',b'shipment_id;',1).replace(b'ready_date',b'dispatch_date',1)
         record=validate_orders_csv(data)['records'][0]
         self.assertEqual(record['order_id'],'A')
+        self.assertEqual(record['ready_date'],'2026-01-10')
         self.assertEqual(record['dispatch_date'],'2026-01-10')
         with self.assertRaises(ValueError):validate_orders_csv(data.replace(b'10/1/2026',b'1/31/2026'))
 

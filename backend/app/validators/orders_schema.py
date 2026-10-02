@@ -37,6 +37,11 @@ def validate_orders_report(contents: bytes, max_problems: int = 100) -> dict:
         routes = {}
         products = {}
         for row in rows:
+            # Historical assignment columns are accepted only for upload
+            # compatibility. They never reach the decision engine.
+            row.pop("current_vehicle_type", None)
+            row.pop("vehicle_type", None)
+
             quantity = parse_number(
                 row,
                 "quantity_units",
@@ -104,7 +109,7 @@ def validate_orders_report(contents: bytes, max_problems: int = 100) -> dict:
                 )
 
             parsed_date = None
-            raw_date = row.get("dispatch_date", "")
+            raw_date = row.get("ready_date", "")
             if raw_date:
                 try:
                     parsed_date = (
@@ -117,7 +122,7 @@ def validate_orders_report(contents: bytes, max_problems: int = 100) -> dict:
                         "INVALID_DATE",
                         f"La fecha '{raw_date}' no es válida.",
                         row=row["_row"],
-                        column="dispatch_date",
+                        column="ready_date",
                         hint="Usá AAAA-MM-DD o d/m/AAAA; el día va primero.",
                         value=raw_date,
                     )
@@ -158,7 +163,12 @@ def validate_orders_report(contents: bytes, max_problems: int = 100) -> dict:
             if window is not None:
                 row["max_delivery_days"] = window
             if parsed_date is not None and window is not None:
-                row["dispatch_date"] = parsed_date.isoformat()
+                row["ready_date"] = parsed_date.isoformat()
+                # Internal compatibility for Dispatch Engine 1.x. The public
+                # input contract no longer asks the user for a dispatch date:
+                # the engine receives the availability date under its legacy
+                # internal key until the temporal V2 solver replaces it.
+                row["dispatch_date"] = row["ready_date"]
                 row["deadline"] = (
                     parsed_date + timedelta(days=window)
                 ).isoformat()
@@ -180,12 +190,12 @@ def validate_orders_report(contents: bytes, max_problems: int = 100) -> dict:
             order_kg = row["quantity_units"] * row["unit_weight_kg"]
             order_weights.append(order_kg)
             delivery_days.append(row["max_delivery_days"])
-            item = daily[row["dispatch_date"]]
+            item = daily[row["ready_date"]]
             item["orders"] += 1
             item["kg"] += order_kg
 
-        date_from = min(row["dispatch_date"] for row in rows)
-        date_to = max(row["dispatch_date"] for row in rows)
+        date_from = min(row["ready_date"] for row in rows)
+        date_to = max(row["ready_date"] for row in rows)
         profile = {
             "profile_version": 2,
             "total_units": sum(row["quantity_units"] for row in rows),
@@ -218,7 +228,7 @@ def validate_orders_report(contents: bytes, max_problems: int = 100) -> dict:
     return {
         "valid": valid,
         "detected_format": detected,
-        "schema": "orders_v1",
+        "schema": CONTRACTS["orders"]["schema"],
         "rows": len(rows),
         "columns": len(columns),
         "profile": profile,

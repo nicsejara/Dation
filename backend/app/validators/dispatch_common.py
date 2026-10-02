@@ -6,6 +6,7 @@ from decimal import Decimal, InvalidOperation
 from app.validators.contracts import (
     LEGACY_MIXED_COLUMNS,
     aliases_for,
+    get_contract,
     known_columns,
     required_columns,
 )
@@ -85,7 +86,7 @@ def _detected_format(kind: str, raw_columns: list[str], normalized: list[str]) -
         return "legacy_mixed"
     known = set(known_columns(kind))
     if normalized and len(known.intersection(normalized)) >= max(2, len(known) // 2):
-        return f"{kind}_v1"
+        return get_contract(kind)["schema"]
     return "unknown"
 
 
