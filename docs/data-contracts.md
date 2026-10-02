@@ -1,6 +1,6 @@
 # Contratos de datos — transición Dispatch v2
 
-La ingesta usa dos archivos CSV separados: **órdenes** y **flota**. En la primera fase de transición a Dispatch v2, órdenes adopta el contrato **orders_v2** mientras flota continúa en **fleet_v1** y el motor sigue ejecutando **dispatch_v1**. Ambos archivos aceptan UTF-8 con BOM opcional, encabezado en la primera fila, separador `;` o `,`, hasta 10 MB. Se recomiendan fechas ISO y decimales con punto; con separador punto y coma también se admite coma decimal. La validación informa hasta 100 problemas con código, fila, columna, mensaje y sugerencia.
+La ingesta usa dos archivos CSV separados: **órdenes** y **flota**. En la segunda fase de transición a Dispatch v2, órdenes usa **orders_v2** y la flota adopta **fleet_v2** con pools y base operativa. El resultado continúa usando el envelope **dispatch_v1**, pero el motor 1.1.0 ya aplica elegibilidad geográfica por origen. Ambos archivos aceptan UTF-8 con BOM opcional, encabezado en la primera fila, separador `;` o `,`, hasta 10 MB. Se recomiendan fechas ISO y decimales con punto; con separador punto y coma también se admite coma decimal. La validación informa hasta 100 problemas con código, fila, columna, mensaje y sugerencia.
 
 La fuente ejecutable de estos contratos es `backend/app/validators/contracts.py`. El endpoint `GET /api/dispatch/contracts`, la ayuda de la pantalla y las plantillas descargables se derivan de esa definición. Cada plantilla incluye exactamente 5 registros de ejemplo válidos y funciona como template y ejemplo a la vez. Los archivos `sample_data/v1/orders.csv` y `fleet.csv` se mantienen sólo como fixtures internos de QA.
 
@@ -20,19 +20,25 @@ La fuente ejecutable de estos contratos es `backend/app/validators/contracts.py`
 
 `dispatch_date` se acepta temporalmente como alias de `ready_date` para archivos ya existentes. `current_vehicle_type` y `vehicle_type` ya no forman parte del contrato de órdenes: si aparecen en un archivo histórico se informan como columnas extra y se eliminan antes de ejecutar el motor, por lo que no pueden condicionar la decisión. `10/1/2026` significa 10 de enero. No se infiere formato estadounidense. Una variación de peso para el mismo producto es advertencia; no se normaliza ni corrige en silencio. Un CSV del formato histórico mezclado se detecta como `legacy_mixed` y la interfaz explica que debe separarse en órdenes y flota.
 
-## fleet.csv — fleet_v1
+## fleet.csv — fleet_v2
 
 | Columna | Contrato |
 |---|---|
-| `vehicle_type` | Identificador único del tipo de camión |
+| `fleet_pool_id` | Identificador único del pool de flota |
+| `vehicle_type` | Tipo de vehículo; puede repetirse entre pools |
 | `ownership` | `own` o `third_party` |
-| `capacity_kg` | Capacidad positiva |
+| `base_location` | Base desde la que puede iniciar el despacho; `*` sólo para tercerizados disponibles desde cualquier origen |
+| `capacity_kg` | Capacidad positiva por viaje |
 | `cost_per_km`, `fixed_trip_cost` | Valores no negativos |
 | `units_available` | Entero no negativo para propios; vacío en tercerizados = sin límite |
 | `avg_speed_kmh` | Velocidad positiva |
 | `driving_hours_per_day` | Entre 1 y 24 |
 | `fuel_l_per_100km` | No negativo |
 | `co2_kg_per_km` | No negativo; informativo y no certificado |
+
+Un mismo `vehicle_type` puede existir en varias bases porque la identidad operacional es `fleet_pool_id`. La flota propia debe informar una ubicación concreta. Un pool tercerizado puede usar `base_location=*` cuando el proveedor realmente puede despachar desde cualquier origen.
+
+Los archivos `fleet_v1` históricos siguen siendo ejecutables. Al no contener ubicación, se adaptan sólo en memoria con un pool sintético por tipo y alcance global `*`; la validación devuelve la advertencia `LEGACY_FLEET_GLOBAL_SCOPE`. Esta compatibilidad evita romper corridas antiguas, pero no debe usarse para representar una flota real cuando la ubicación importa.
 
 ## Validar no es guardar
 
@@ -67,7 +73,7 @@ Los consumidores estrictos del motor continúan usando `validate_orders_csv` y `
 
 ## Validación conjunta
 
-Cuando ambos datasets válidos ya están guardados, `POST /api/runs/preflight` verifica compatibilidad cruzada: capacidad por unidad, disponibilidad y plazos. Las columnas históricas de asignación de vehículo no participan de esta verificación. Los errores bloquean; las advertencias permiten continuar; las anomalías requieren una decisión explícita posterior.
+Cuando ambos datasets válidos ya están guardados, `POST /api/runs/preflight` verifica compatibilidad cruzada: cobertura de flota por origen, capacidad por unidad, disponibilidad y plazos. Las columnas históricas de asignación de vehículo no participan de esta verificación. Los errores bloquean; las advertencias permiten continuar; las anomalías requieren una decisión explícita posterior.
 
 ## Biblioteca y versionado
 
@@ -93,22 +99,21 @@ Todos requieren la autenticación de la plataforma. El upload sin `dataset_type`
 
 ## Resultado
 
-En esta fase el resultado sigue siendo `schema_version=dispatch_v1` y motor 1.0.0. El cambio afecta únicamente al contrato de órdenes y a su semántica: `ready_date` representa disponibilidad, no una salida ya decidida. El `result_fingerprint` continúa identificando la parte determinística, no metadatos de persistencia.
+En esta fase el resultado sigue siendo `schema_version=dispatch_v1`, con motor **1.1.0**. `ready_date` representa disponibilidad y la asignación selecciona únicamente pools cuya `base_location` coincide con el origen de la orden, salvo tercerizados globales con `*`. El `result_fingerprint` continúa identificando la parte determinística, no metadatos de persistencia.
 
 
 ## UX de ingesta v2
 
-La validación devuelve además `profile_version=2`, `preview`, `detected` y
+La validación devuelve además perfiles versionados, `preview`, `detected` y
 `suggested_label`. Para órdenes, el perfil incluye orígenes, destinos, peso máximo,
-mezcla de prioridades, rango de plazos y demanda diaria. Para flota, incluye cantidad
-de tipos, camiones propios por día, capacidad propia diaria y presencia de tercerizados.
+mezcla de prioridades, rango de plazos y demanda diaria. Para flota, el perfil v3 incluye pools, tipos, bases, capacidad por base, unidades propias y presencia de tercerizados.
 
 El preflight conserva `errors`, `warnings` y `anomalies`, y agrega:
 `findings` agrupados en lenguaje de negocio, `capacity_check` para demanda versus
 capacidad propia y `readiness` para decidir si la pantalla puede avanzar.
 
 `POST /api/datasets/load-sample` carga o reutiliza por hash los fixtures de
-`sample_data/v1`. `GET /api/datasets/{id}/download` permite descargar un input
+`sample_data/v2`. `GET /api/datasets/{id}/download` permite descargar un input
 guardado y `PATCH /api/datasets/{id}` actualiza su etiqueta.
 
 
