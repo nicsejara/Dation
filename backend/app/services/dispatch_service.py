@@ -531,7 +531,7 @@ async def download_input(dataset_id: str):
 
 async def load_sample_inputs():
     root = Path(__file__).resolve().parents[3]
-    sample_dir = root / "sample_data" / "v1"
+    sample_dir = root / "sample_data" / "v2"
 
     orders_bytes = (sample_dir / "orders.csv").read_bytes()
     fleet_bytes = (sample_dir / "fleet.csv").read_bytes()
