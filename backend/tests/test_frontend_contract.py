@@ -38,14 +38,6 @@ DATA_STAGE_JS = (
     / "data-stage.js"
 )
 
-DECISION_STAGE_JS = (
-    BACKEND_ROOT
-    / "app"
-    / "static"
-    / "js"
-    / "decision-stage.js"
-)
-
 DASHBOARD_STAGE_JS = (
     BACKEND_ROOT
     / "app"
@@ -76,11 +68,6 @@ class FrontendContractTests(
         )
         cls.ui_js = UI_JS.read_text(
             encoding="utf-8"
-        )
-        cls.decision_stage_js = (
-            DECISION_STAGE_JS.read_text(
-                encoding="utf-8"
-            )
         )
         cls.dashboard_stage_js = (
             DASHBOARD_STAGE_JS.read_text(
@@ -225,36 +212,48 @@ class FrontendContractTests(
         )
 
 
-    def test_decision_stage_contract(
+    def test_dispatch_configuration_has_single_renderer(
         self,
     ):
-        required_ids = (
+        workspace = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+            / "workspace.mjs"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn(
+            'data-view-panel="logistics-config"',
+            self.html,
+        )
+        self.assertNotIn(
+            "/static/js/decision-stage.js",
+            self.html,
+        )
+        for legacy_id in (
             "decision-preset-grid",
             "decision-cost-slider",
             "decision-trips-slider",
             "decision-review-run",
             "decision-confirm-modal",
             "decision-confirm-run",
-        )
-
-        for element_id in required_ids:
-            self.assertIn(
-                f'id="{element_id}"',
+        ):
+            self.assertNotIn(
+                f'id="{legacy_id}"',
                 self.html,
             )
 
         self.assertIn(
-            "dation:dataset-ready",
-            self.decision_stage_js,
+            "async function loadConfig()",
+            workspace,
         )
         self.assertIn(
-            "/api/runs/",
-            self.decision_stage_js,
+            "Configurar la decisión",
+            workspace,
         )
-        self.assertIn(
-            "dationConsumeDecisionRun",
-            self.app_js,
-        )
+
 
     def test_single_ingestion_contract(
         self,
