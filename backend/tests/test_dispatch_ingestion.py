@@ -258,7 +258,7 @@ class DispatchIngestionHTTPTests(unittest.IsolatedAsyncioTestCase):
     async def test_status_uses_detailed_service(self):
         expected = {
             "available": False,
-            "engine_version": "1.0.0",
+            "engine_version": "1.1.0",
             "checks": [],
             "message": "Activación pendiente",
         }
