@@ -10,7 +10,7 @@ from fastapi import (
     Query,
     UploadFile,
 )
-from fastapi.responses import FileResponse, Response
+from fastapi.responses import Response
 from pydantic import BaseModel
 
 from app.auth import require_upload_access
@@ -227,15 +227,3 @@ async def template(kind: str):
         },
     )
 
-
-@router.get("/api/dispatch/examples/{kind}")
-async def example(kind: str):
-    if kind not in ("orders", "fleet"):
-        raise HTTPException(404, "Ejemplo no disponible.")
-    root = Path(__file__).resolve().parents[3]
-    path = root / "sample_data" / "v1" / f"{kind}.csv"
-    return FileResponse(
-        path,
-        media_type="text/csv",
-        filename=f"{kind}_ejemplo.csv",
-    )

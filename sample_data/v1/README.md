@@ -6,11 +6,11 @@ Todos los datos de esta carpeta son **sintéticos**. No representan disponibilid
 
 1. Abrir **Inicio → DDA Logística → Cargar datos**.
 2. Confirmar que aparecen dos tarjetas: **Órdenes de envío** y **Flota disponible**.
-3. Descargar las plantillas y los ejemplos completos desde cada tarjeta.
-4. Cargar `orders.csv`: debe validar 100 registros, 2.682 unidades, 2.384.000 kg, 28 rutas y fechas del 1 al 10 de octubre de 2026.
-5. Cargar `fleet.csv`, etiquetarla y dejar marcada “Usarla como flota vigente”.
-6. Revisar la compatibilidad conjunta. Las tardanzas inevitables son advertencias, no errores de archivo.
-7. Continuar a **Configurar decisión**, elegir Balanceado y permitir tercerización.
+3. Descargar una única plantilla desde cada tarjeta. Cada plantilla contiene 5 registros de ejemplo y debe volver a cargarse sin errores.
+4. Cargar `orders.csv`: la pantalla principal debe mostrar sólo nombre, tamaño, estado y 100 registros.
+5. Cargar `fleet.csv`: la pantalla principal debe mostrar sólo nombre, tamaño, estado y 4 registros.
+6. Revisar la validación técnica. No deben aparecer advertencias de plazos, capacidad, costos, viajes ni resultados del optimizador.
+7. Continuar a **Configurar decisión** cuando ambos archivos superen los controles técnicos.
 8. Ejecutar y verificar calendario, viajes, entregas por orden y comparación contra **Despacho directo**.
 9. Reejecutar el mismo caso: el `result_fingerprint` debe mantenerse; ID y hora de corrida cambian.
 10. Recargar la pantalla: órdenes y flota guardadas deben poder reutilizarse sin volver a subir los CSV.

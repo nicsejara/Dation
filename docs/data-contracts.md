@@ -2,7 +2,7 @@
 
 La ingesta nueva usa dos archivos CSV separados: **órdenes** y **flota**. Ambos aceptan UTF-8 con BOM opcional, encabezado en la primera fila, separador `;' o `,`, hasta 10 MB. Se recomiendan fechas ISO y decimales con punto; con separador punto y coma también se admite coma decimal. La validación informa hasta 100 problemas con código, fila, columna, mensaje y sugerencia.
 
-La fuente ejecutable de estos contratos es `backend/app/validators/contracts.py`. El endpoint `GET /api/dispatch/contracts`, la ayuda de la pantalla y las plantillas descargables se derivan de esa definición. Los archivos `sample_data/v1/orders.csv` y `fleet.csv` se mantienen como fixtures completos y los tests verifican que sigan validando.
+La fuente ejecutable de estos contratos es `backend/app/validators/contracts.py`. El endpoint `GET /api/dispatch/contracts`, la ayuda de la pantalla y las plantillas descargables se derivan de esa definición. Cada plantilla incluye exactamente 5 registros de ejemplo válidos y funciona como template y ejemplo a la vez. Los archivos `sample_data/v1/orders.csv` y `fleet.csv` se mantienen sólo como fixtures internos de QA.
 
 ## orders.csv — orders_v1
 
@@ -80,8 +80,7 @@ Las cargas `orders` y `fleet` se listan por separado. La biblioteca admite búsq
 |---|---|
 | `GET /api/dispatch/contracts` | Contratos y reglas de archivo |
 | `POST /api/datasets/validate?dataset_type=...` | Validación sin persistencia |
-| `GET /api/dispatch/templates/orders` o `fleet` | Plantilla generada desde el contrato |
-| `GET /api/dispatch/examples/orders` o `fleet` | Fixture sintético completo |
+| `GET /api/dispatch/templates/orders` o `fleet` | Plantilla con 5 registros de ejemplo |
 | `POST /api/datasets/upload?dataset_type=...` | Guardar un archivo ya válido |
 | `GET /api/datasets?type=...&q=...&limit=...&offset=...` | Biblioteca activa |
 | `POST /api/datasets/{id}/archive` | Archivar lógicamente |
@@ -112,3 +111,16 @@ capacidad propia y `readiness` para decidir si la pantalla puede avanzar.
 `POST /api/datasets/load-sample` carga o reutiliza por hash los fixtures de
 `sample_data/v1`. `GET /api/datasets/{id}/download` permite descargar un input
 guardado y `PATCH /api/datasets/{id}` actualiza su etiqueta.
+
+
+## Alcance de validación en Cargar datos
+
+La pantalla **Cargar datos** muestra únicamente calidad técnica del archivo y compatibilidad
+mínima entre inputs. No presenta plazos, capacidad operativa, costos, viajes, utilización,
+emisiones, consolidación ni resultados potenciales del optimizador. Esos datos pueden seguir
+existiendo en el preflight por compatibilidad, pero se consumen a partir de **Configurar
+decisión**.
+
+Un error de referencia entre archivos, como un tipo de camión informado en órdenes que no
+existe en flota, sí pertenece a esta etapa porque impide resolver correctamente el contrato
+de datos.

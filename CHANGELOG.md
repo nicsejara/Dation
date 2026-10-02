@@ -1,5 +1,17 @@
 # Historial
 
+## Cargar datos — separación definitiva de responsabilidades — 2026-10-02
+
+- La pantalla de carga valida exclusivamente calidad técnica y compatibilidad mínima.
+- Se retiraron del paso 1 los avisos de plazos, capacidad, costos, viajes y performance.
+- Orders y Fleet usan cards protagonistas con identidades cromáticas distintas.
+- Cada dataset expone un único botón **Descargar plantilla**; la plantilla trae 5 ejemplos.
+- Se eliminó de la UI cualquier control de “flota vigente” y el endpoint de ejemplo descargable.
+- Después del upload sólo se muestran archivo, estado, tamaño y registros.
+- Cargas anteriores y columnas se revisan bajo demanda en drawers.
+- CTA final estático: sólo habilita **Configurar decisión** con inputs técnicamente válidos.
+
+
 ## Optimización UX/UI de Cargar datos — 2026-10-02
 
 - Asistente de ingesta con stepper, resumen sticky y CTA primario.
