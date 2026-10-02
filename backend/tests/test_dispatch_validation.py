@@ -90,9 +90,28 @@ class DispatchValidationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'base operativa concreta'):
             validate_fleet_csv(csv_bytes(FC, [row]))
 
-    def test_legacy_weights(self):
-        config=DispatchConfig(mode='custom',objective='custom',weights={'cost':.7,'trips':.3})
-        self.assertEqual(config.weights.time,0)
+    def test_phase4_weights_require_four_business_dimensions(self):
+        with self.assertRaises(ValueError):
+            DispatchConfig(
+                mode='custom',
+                objective='custom',
+                weights={'cost':.7,'trips':.3},
+            )
+
+        config=DispatchConfig(
+            mode='custom',
+            objective='custom',
+            weights={
+                'cost':.4,
+                'time':.2,
+                'utilization':.2,
+                'co2':.2,
+            },
+        )
+        self.assertAlmostEqual(config.weights.cost, .4)
+        self.assertAlmostEqual(config.weights.time, .2)
+        self.assertAlmostEqual(config.weights.utilization, .2)
+        self.assertAlmostEqual(config.weights.co2, .2)
 
     def test_alias_and_explicit_day_first_dates(self):
         from test_dispatch_engine import order,csv_bytes,COLUMNS
