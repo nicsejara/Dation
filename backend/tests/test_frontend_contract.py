@@ -310,7 +310,7 @@ class FrontendContractTests(
             self.dashboard_stage_js,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=decision-composer-v1",
+            "/static/js/dispatch/workspace.mjs?v=dashboard-focus-v1",
             self.html,
         )
         self.assertIn(
@@ -337,6 +337,104 @@ class FrontendContractTests(
             "dispatch-config-screen",
             config_render,
         )
+
+    def test_focused_dispatch_dashboard_contract(
+        self,
+    ):
+        dashboard = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+            / "dashboard.mjs"
+        ).read_text(encoding="utf-8")
+        hero = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+            / "hero.mjs"
+        ).read_text(encoding="utf-8")
+        assignment = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+            / "assignment.mjs"
+        ).read_text(encoding="utf-8")
+        review = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+            / "review.mjs"
+        ).read_text(encoding="utf-8")
+        explanation = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+            / "explanation.mjs"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn(
+            "Exportar distribución",
+            dashboard,
+        )
+        self.assertIn(
+            "assignment.mjs",
+            dashboard,
+        )
+        self.assertIn(
+            "review.mjs",
+            dashboard,
+        )
+        self.assertNotIn(
+            "kpis.mjs",
+            dashboard,
+        )
+        self.assertNotIn(
+            "compare.mjs",
+            dashboard,
+        )
+        self.assertNotIn(
+            "sensitivity.mjs",
+            dashboard,
+        )
+        self.assertNotIn(
+            "Ahorro estimado",
+            hero,
+        )
+        self.assertNotIn(
+            "Despacho directo",
+            hero,
+        )
+        self.assertIn(
+            "Cómo quedó distribuida la carga",
+            assignment,
+        )
+        self.assertIn(
+            "Qué productos lleva",
+            assignment,
+        )
+        self.assertIn(
+            "data-assignment-metric",
+            assignment,
+        )
+        self.assertIn(
+            "Revisar antes de ejecutar",
+            review,
+        )
+        self.assertIn(
+            "no recalcula el optimizador",
+            explanation,
+        )
+
 
     def test_single_ingestion_contract(
         self,
