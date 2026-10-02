@@ -8,7 +8,7 @@ Dispatch 1.2.0 ya representaba demanda, ubicación de flota y ocupación tempora
 
 ## Decisión
 
-El motor adopta `schema_version=dispatch_v2` y `engine_version=2.1.0`.
+El motor adopta `schema_version=dispatch_v2` y `engine_version=2.2.0`.
 
 La optimización se resuelve lexicográficamente:
 
@@ -88,3 +88,7 @@ La clasificación `capacity_or_policy_sla_violations` no atribuye causalidad esp
 ## Decision Composer 2.1
 
 La configuración distingue entre restricciones físicas obligatorias y dimensiones de negocio opcionales. `dimensions` controla qué ejes participan del balance, comparaciones y sensibilidad. `analysis_depth` puede ser `essential`, `comparative` o `deep`; este valor controla cuántos escenarios ejecuta el motor y no es sólo una preferencia visual.
+
+## Dashboard 2.2
+
+Las diferencias contra `baseline_direct` no se presentan como ahorro real. La referencia es una política sintética de despacho individual, no una observación histórica. El dashboard prioriza la distribución ejecutable y la asignación por pool; comparaciones y sensibilidad quedan como evidencia secundaria disponible para auditoría e interpretación IA.
