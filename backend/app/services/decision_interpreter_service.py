@@ -22,7 +22,7 @@ from app.services.llm_service import (
 from app.services.run_service import get_run
 
 
-PROMPT_VERSION = "decision_interpreter_v2.0"
+PROMPT_VERSION = "decision_interpreter_v2.1"
 
 EXPLANATION_SCHEMA = {
     "type": "object",
@@ -122,7 +122,7 @@ def _system_prompt(
             'nunca recalcules, reasignes ni inventes causas. '
             'REGLA CENTRAL: el SLA se optimiza antes que costo, tiempo, uso de flota propia y CO₂. '
             'No sugieras que una mejora económica justificó una tardanza si la evidencia no lo dice. '
-            'Usá decision_drivers y exceptions para explicar consolidación, división, tercerización, '
+            'Usá decision_drivers, assignment_by_pool y exceptions para explicar consolidación, división, tercerización y distribución de carga, '
             'postergaciones y excepciones de SLA. '
             'Diferenciá physical_sla_violations de capacity_or_policy_sla_violations. '
             'La prioridad utilization significa minimizar participación de kg tercerizados; '
