@@ -19,11 +19,11 @@ from .model import solve
 
 
 ENGINE_NAME = "logistics-dispatch-engine"
-ENGINE_VERSION = "2.1.0"
+ENGINE_VERSION = "2.2.0"
 SCHEMA_VERSION = "dispatch_v2"
 
 NAMES = {
-    "baseline_direct": "Despacho directo",
+    "baseline_direct": "Referencia sintética: despacho individual",
     "min_cost": "Costo mínimo",
     "min_time": "Tiempo mínimo",
     "max_utilization": "Máxima utilización propia",
