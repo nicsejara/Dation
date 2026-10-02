@@ -1,3 +1,4 @@
+from collections import Counter, defaultdict
 from datetime import date, datetime, timedelta
 
 from app.validators.contracts import CONTRACTS
@@ -8,6 +9,11 @@ from app.validators.dispatch_common import (
     issue_text,
     parse_csv_report,
     parse_number,
+)
+from app.validators.profile_utils import (
+    detected_metadata,
+    format_orders_label,
+    preview_payload,
 )
 
 COLUMNS = [
@@ -83,7 +89,11 @@ def validate_orders_report(contents: bytes, max_problems: int = 100) -> dict:
                     value=row.get("destination"),
                 )
 
-            if row.get("priority") and row["priority"] not in ("High", "Normal", "Low"):
+            if row.get("priority") and row["priority"] not in (
+                "High",
+                "Normal",
+                "Low",
+            ):
                 problems.error(
                     "INVALID_OPTION",
                     f"'{row['priority']}' no es una prioridad válida.",
@@ -155,21 +165,55 @@ def validate_orders_report(contents: bytes, max_problems: int = 100) -> dict:
 
     valid = problems.error_count == 0
     profile = None
+    suggested_label = None
     if valid and rows:
         route_keys = {
             (row["origin"], row["destination"])
             for row in rows
         }
+        priority_mix = Counter(row["priority"] for row in rows)
+        daily = defaultdict(lambda: {"orders": 0, "kg": 0.0})
+        order_weights = []
+        delivery_days = []
+
+        for row in rows:
+            order_kg = row["quantity_units"] * row["unit_weight_kg"]
+            order_weights.append(order_kg)
+            delivery_days.append(row["max_delivery_days"])
+            item = daily[row["dispatch_date"]]
+            item["orders"] += 1
+            item["kg"] += order_kg
+
+        date_from = min(row["dispatch_date"] for row in rows)
+        date_to = max(row["dispatch_date"] for row in rows)
         profile = {
+            "profile_version": 2,
             "total_units": sum(row["quantity_units"] for row in rows),
-            "total_weight_kg": sum(
-                row["quantity_units"] * row["unit_weight_kg"]
-                for row in rows
-            ),
+            "total_weight_kg": sum(order_weights),
             "routes": len(route_keys),
-            "date_from": min(row["dispatch_date"] for row in rows),
-            "date_to": max(row["dispatch_date"] for row in rows),
+            "origins": len({row["origin"] for row in rows}),
+            "destinations": len({row["destination"] for row in rows}),
+            "date_from": date_from,
+            "date_to": date_to,
+            "max_order_kg": max(order_weights),
+            "priority_mix": {
+                key: priority_mix.get(key, 0)
+                for key in ("High", "Normal", "Low")
+            },
+            "delivery_days": {
+                "min": min(delivery_days),
+                "max": max(delivery_days),
+            },
+            "daily": [
+                {
+                    "date": key,
+                    "orders": value["orders"],
+                    "kg": value["kg"],
+                }
+                for key, value in sorted(daily.items())
+            ],
         }
+        suggested_label = format_orders_label(date_from, date_to)
 
     return {
         "valid": valid,
@@ -178,6 +222,9 @@ def validate_orders_report(contents: bytes, max_problems: int = 100) -> dict:
         "rows": len(rows),
         "columns": len(columns),
         "profile": profile,
+        "preview": preview_payload(columns, rows),
+        "detected": detected_metadata(contents, "orders", columns),
+        "suggested_label": suggested_label,
         "errors": problems.errors,
         "warnings": problems.warnings,
         "counts": {
@@ -206,4 +253,7 @@ def validate_orders_csv(contents: bytes) -> dict:
         ],
         "records": report["records"],
         "profile": report["profile"],
+        "preview": report["preview"],
+        "detected": report["detected"],
+        "suggested_label": report["suggested_label"],
     }

@@ -7,6 +7,11 @@ from app.validators.dispatch_common import (
     parse_csv_report,
     parse_number,
 )
+from app.validators.profile_utils import (
+    detected_metadata,
+    format_fleet_label,
+    preview_payload,
+)
 
 COLUMNS = [
     column["name"]
@@ -131,15 +136,27 @@ def validate_fleet_report(contents: bytes, max_problems: int = 100) -> dict:
 
     valid = problems.error_count == 0
     profile = None
+    suggested_label = None
     if valid and rows:
+        own = [row for row in rows if row["ownership"] == "own"]
         profile = {
+            "profile_version": 2,
             "fleet": rows,
+            "types": len(rows),
+            "own_units_per_day": sum(
+                row["units_available"]
+                for row in own
+            ),
             "own_capacity_kg_per_day": sum(
                 row["capacity_kg"] * row["units_available"]
+                for row in own
+            ),
+            "has_third_party": any(
+                row["ownership"] == "third_party"
                 for row in rows
-                if row["ownership"] == "own"
             ),
         }
+        suggested_label = format_fleet_label()
 
     return {
         "valid": valid,
@@ -148,6 +165,9 @@ def validate_fleet_report(contents: bytes, max_problems: int = 100) -> dict:
         "rows": len(rows),
         "columns": len(columns),
         "profile": profile,
+        "preview": preview_payload(columns, rows),
+        "detected": detected_metadata(contents, "fleet", columns),
+        "suggested_label": suggested_label,
         "errors": problems.errors,
         "warnings": problems.warnings,
         "counts": {
@@ -176,4 +196,7 @@ def validate_fleet_csv(contents: bytes) -> dict:
         ],
         "records": report["records"],
         "profile": report["profile"],
+        "preview": report["preview"],
+        "detected": report["detected"],
+        "suggested_label": report["suggested_label"],
     }

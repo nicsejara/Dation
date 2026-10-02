@@ -1,4 +1,5 @@
 """Pure preparation and cross-file validation; no persistence."""
+from collections import defaultdict
 from datetime import date, timedelta
 from decimal import Decimal
 import math
@@ -6,52 +7,430 @@ import math
 D = lambda value: Decimal(str(value))
 
 
+FINDING_COPY = {
+    "unknown_reference": {
+        "severity": "error",
+        "consequence": (
+            "Corregí el tipo de camión informado antes de calcular el plan."
+        ),
+    },
+    "unit_without_capacity": {
+        "severity": "error",
+        "consequence": (
+            "No existe un camión habilitado que pueda transportar una unidad entera."
+        ),
+    },
+    "late_orders": {
+        "severity": "warning",
+        "consequence": (
+            "El plan las entrega igual y las marca como tardías."
+        ),
+    },
+    "capacity_vs_demand": {
+        "severity": "warning",
+        "consequence": (
+            "El plan usará camiones tercerizados o reprogramará salidas "
+            "dentro de cada plazo."
+        ),
+    },
+    "zero_slack": {
+        "severity": "info",
+        "consequence": "Su salida es el primer día posible.",
+    },
+    "no_third_party": {
+        "severity": "warning",
+        "consequence": (
+            "Las órdenes que excedan la flota propia pueden quedar sin cobertura."
+        ),
+    },
+    "weight_anomalies": {
+        "severity": "warning",
+        "consequence": (
+            "Vas a decidir qué hacer con estas órdenes en el próximo paso."
+        ),
+    },
+}
+
+
 def transit(order, vehicle):
-    return math.ceil(D(order['distance_km']) / (D(vehicle['avg_speed_kmh']) * D(vehicle['driving_hours_per_day'])))
+    return math.ceil(
+        D(order["distance_km"])
+        / (
+            D(vehicle["avg_speed_kmh"])
+            * D(vehicle["driving_hours_per_day"])
+        )
+    )
 
 
 def capacity_units(order, vehicle):
-    return int(D(vehicle['capacity_kg']) // D(order['unit_weight_kg']))
+    return int(
+        D(vehicle["capacity_kg"])
+        // D(order["unit_weight_kg"])
+    )
 
 
 def raw_cost(order, vehicle):
-    return 2 * D(order['distance_km']) * D(vehicle['cost_per_km']) + D(vehicle['fixed_trip_cost'])
+    return (
+        2
+        * D(order["distance_km"])
+        * D(vehicle["cost_per_km"])
+        + D(vehicle["fixed_trip_cost"])
+    )
 
 
 def eligible_fleet(order, fleet):
-    return [v for v in fleet if capacity_units(order,v) and v['units_available'] != 0]
+    return [
+        vehicle
+        for vehicle in fleet
+        if capacity_units(order, vehicle)
+        and vehicle["units_available"] != 0
+    ]
 
 
 def departure_days(order, vehicle, fleet):
-    start = date.fromisoformat(order['dispatch_date'])
-    deadline = date.fromisoformat(order['deadline'])
+    start = date.fromisoformat(order["dispatch_date"])
+    deadline = date.fromisoformat(order["deadline"])
     eligible = eligible_fleet(order, fleet)
     if not eligible:
         return []
-    inevitable = all(transit(order,v) > order['max_delivery_days'] for v in eligible)
-    end = start if inevitable else deadline - timedelta(days=transit(order, vehicle))
-    return [(start + timedelta(days=i)).isoformat() for i in range(max(0,(end-start).days+1))]
+    inevitable = all(
+        transit(order, candidate) > order["max_delivery_days"]
+        for candidate in eligible
+    )
+    end = (
+        start
+        if inevitable
+        else deadline - timedelta(days=transit(order, vehicle))
+    )
+    return [
+        (start + timedelta(days=index)).isoformat()
+        for index in range(max(0, (end - start).days + 1))
+    ]
+
+
+def _finding(identifier, title, items=None):
+    copy = FINDING_COPY[identifier]
+    return {
+        "id": identifier,
+        "severity": copy["severity"],
+        "title": title,
+        "consequence": copy["consequence"],
+        "count": len(items or []),
+        "items": items or [],
+    }
+
+
+def _capacity_check(orders, fleet):
+    own = [
+        vehicle
+        for vehicle in fleet
+        if vehicle["ownership"] == "own"
+    ]
+    own_capacity = sum(
+        D(vehicle["capacity_kg"])
+        * D(vehicle["units_available"] or 0)
+        for vehicle in own
+    )
+    by_day = defaultdict(lambda: {"orders": 0, "kg": D(0)})
+    for order in orders:
+        item = by_day[order["dispatch_date"]]
+        item["orders"] += 1
+        item["kg"] += (
+            D(order["quantity_units"])
+            * D(order["unit_weight_kg"])
+        )
+
+    days = []
+    days_over = 0
+    for current_date, value in sorted(by_day.items()):
+        ratio = (
+            float(value["kg"] / own_capacity)
+            if own_capacity > 0
+            else None
+        )
+        over = own_capacity > 0 and value["kg"] > own_capacity
+        days_over += int(over)
+        days.append(
+            {
+                "date": current_date,
+                "orders": value["orders"],
+                "kg": float(value["kg"]),
+                "ratio": ratio,
+                "over": over,
+            }
+        )
+
+    return {
+        "own_capacity_kg_per_day": float(own_capacity),
+        "days_over": days_over,
+        "total_days": len(days),
+        "days": days,
+    }
 
 
 def preflight(orders, fleet, reference_fleet=None):
-    warnings, errors, anomalies = [], [], []
-    names = {v['vehicle_type'] for v in (reference_fleet or fleet)}
-    own = [v['capacity_kg'] for v in fleet if v['ownership']=='own']
-    cap = max(own or [v['capacity_kg'] for v in fleet])
-    if not any(v['units_available'] is None for v in fleet):
-        warnings.append({'code':'FINITE_FLEET','detail':'No hay flota ilimitada; la cobertura depende de las fechas y la disponibilidad.'})
-    for o in orders:
-        base = {'order_id':o['order_id'], 'row':o.get('_row')}
-        if o.get('current_vehicle_type') and o['current_vehicle_type'] not in names:
-            errors.append({**base,'code':'UNKNOWN_CURRENT_VEHICLE','detail':'El camión de referencia no existe en la flota.'})
-        eligible = eligible_fleet(o,fleet)
+    warnings = []
+    errors = []
+    anomalies = []
+    findings = []
+
+    reference = reference_fleet or fleet
+    names = {
+        vehicle["vehicle_type"]
+        for vehicle in reference
+    }
+    own_capacities = [
+        vehicle["capacity_kg"]
+        for vehicle in fleet
+        if vehicle["ownership"] == "own"
+    ]
+    cap = max(
+        own_capacities
+        or [vehicle["capacity_kg"] for vehicle in fleet]
+    )
+
+    if not any(
+        vehicle["units_available"] is None
+        for vehicle in fleet
+    ):
+        warnings.append(
+            {
+                "code": "FINITE_FLEET",
+                "detail": (
+                    "No hay flota ilimitada; la cobertura depende "
+                    "de las fechas y la disponibilidad."
+                ),
+            }
+        )
+
+    late_items = []
+    unknown_items = []
+    capacity_items = []
+    zero_slack_items = []
+
+    for order in orders:
+        base = {
+            "order_id": order["order_id"],
+            "row": order.get("_row"),
+        }
+        current_vehicle = order.get("current_vehicle_type")
+        if current_vehicle and current_vehicle not in names:
+            error = {
+                **base,
+                "code": "UNKNOWN_CURRENT_VEHICLE",
+                "detail": (
+                    "El camión de referencia no existe en la flota."
+                ),
+            }
+            errors.append(error)
+            unknown_items.append(
+                {
+                    **base,
+                    "detail": current_vehicle,
+                }
+            )
+
+        eligible = eligible_fleet(order, fleet)
         if not eligible:
-            errors.append({**base,'code':'UNIT_EXCEEDS_CAPACITY','detail':'No hay un camión disponible que pueda transportar una unidad entera.'})
-        elif min(transit(o,v) for v in eligible) > o['max_delivery_days']:
-            warnings.append({**base,'code':'UNAVOIDABLE_LATE','detail':'La entrega resulta tardía aun con la salida más temprana y el camión más rápido.'})
-        n = min((math.ceil(o['quantity_units']/capacity_units(o,v)) for v in eligible), default=0)
-        if n > 20:
-            warnings.append({**base,'code':'MANY_TRIPS','detail':f'La orden requiere al menos {n} viajes independientes.'})
-        if D(o['quantity_units'])*D(o['unit_weight_kg']) > D(cap)*20:
-            anomalies.append({**base,'code':'ORDER_WEIGHT_OUTLIER','detail':'La orden supera 20 veces la mayor capacidad propia; decidí incluirla o excluirla.'})
-    return {'valid':not errors,'errors':errors,'warnings':warnings,'anomalies':anomalies}
+            error = {
+                **base,
+                "code": "UNIT_EXCEEDS_CAPACITY",
+                "detail": (
+                    "No hay un camión disponible que pueda transportar "
+                    "una unidad entera."
+                ),
+            }
+            errors.append(error)
+            capacity_items.append(base)
+            continue
+
+        fastest = min(transit(order, vehicle) for vehicle in eligible)
+        if fastest > order["max_delivery_days"]:
+            warning = {
+                **base,
+                "code": "UNAVOIDABLE_LATE",
+                "detail": (
+                    "La entrega resulta tardía aun con la salida más "
+                    "temprana y el camión más rápido."
+                ),
+            }
+            warnings.append(warning)
+            late_items.append(
+                {
+                    **base,
+                    "route": (
+                        f"{order['origin']} → {order['destination']}"
+                    ),
+                    "delivery_days": order["max_delivery_days"],
+                    "transit_days": fastest,
+                    "detail": (
+                        f"Tránsito {fastest} días; "
+                        f"plazo {order['max_delivery_days']} días."
+                    ),
+                }
+            )
+        elif fastest == order["max_delivery_days"]:
+            zero_slack_items.append(
+                {
+                    **base,
+                    "route": (
+                        f"{order['origin']} → {order['destination']}"
+                    ),
+                    "detail": "Sin margen para reprogramar la salida.",
+                }
+            )
+
+        trips = min(
+            (
+                math.ceil(
+                    order["quantity_units"]
+                    / capacity_units(order, vehicle)
+                )
+                for vehicle in eligible
+            ),
+            default=0,
+        )
+        if trips > 20:
+            warnings.append(
+                {
+                    **base,
+                    "code": "MANY_TRIPS",
+                    "detail": (
+                        f"La orden requiere al menos {trips} "
+                        "viajes independientes."
+                    ),
+                }
+            )
+
+        if (
+            D(order["quantity_units"])
+            * D(order["unit_weight_kg"])
+            > D(cap) * 20
+        ):
+            anomalies.append(
+                {
+                    **base,
+                    "code": "ORDER_WEIGHT_OUTLIER",
+                    "detail": (
+                        "La orden supera 20 veces la mayor capacidad "
+                        "propia; decidí incluirla o excluirla."
+                    ),
+                }
+            )
+
+    if unknown_items:
+        findings.append(
+            _finding(
+                "unknown_reference",
+                (
+                    f"{len(unknown_items)} referencias de camión "
+                    "no existen en la flota"
+                ),
+                unknown_items,
+            )
+        )
+    elif any(order.get("current_vehicle_type") for order in orders):
+        findings.append(
+            {
+                "id": "references_ok",
+                "severity": "success",
+                "title": "Todos los camiones de referencia existen en la flota",
+                "consequence": None,
+                "count": 0,
+                "items": [],
+            }
+        )
+
+    if capacity_items:
+        findings.append(
+            _finding(
+                "unit_without_capacity",
+                (
+                    f"{len(capacity_items)} órdenes no tienen "
+                    "capacidad disponible"
+                ),
+                capacity_items,
+            )
+        )
+
+    if late_items:
+        findings.append(
+            _finding(
+                "late_orders",
+                (
+                    f"{len(late_items)} órdenes llegarán tarde "
+                    "aunque salgan el primer día"
+                ),
+                late_items,
+            )
+        )
+
+    capacity_check = _capacity_check(orders, reference)
+    if capacity_check["days_over"]:
+        findings.append(
+            _finding(
+                "capacity_vs_demand",
+                (
+                    "Tu demanda supera la capacidad propia en "
+                    f"{capacity_check['days_over']} de "
+                    f"{capacity_check['total_days']} días"
+                ),
+                [
+                    item
+                    for item in capacity_check["days"]
+                    if item["over"]
+                ],
+            )
+        )
+
+    if zero_slack_items:
+        findings.append(
+            _finding(
+                "zero_slack",
+                (
+                    f"{len(zero_slack_items)} órdenes no tienen "
+                    "margen para reprogramarse"
+                ),
+                zero_slack_items,
+            )
+        )
+
+    has_third_party = any(
+        vehicle["ownership"] == "third_party"
+        for vehicle in reference
+    )
+    if not has_third_party:
+        findings.append(
+            _finding(
+                "no_third_party",
+                "La flota no incluye camiones tercerizados",
+            )
+        )
+
+    if anomalies:
+        findings.append(
+            _finding(
+                "weight_anomalies",
+                f"{len(anomalies)} órdenes requieren revisión de peso",
+                anomalies,
+            )
+        )
+
+    blockers = [
+        finding["title"]
+        for finding in findings
+        if finding["severity"] == "error"
+    ]
+    return {
+        "valid": not errors,
+        "errors": errors,
+        "warnings": warnings,
+        "anomalies": anomalies,
+        "findings": findings,
+        "capacity_check": capacity_check,
+        "readiness": {
+            "can_continue": not blockers,
+            "blockers": blockers,
+            "reason": blockers[0] if blockers else None,
+        },
+    }
