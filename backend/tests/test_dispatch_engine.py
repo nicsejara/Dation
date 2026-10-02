@@ -176,7 +176,7 @@ class DispatchEngineTests(unittest.TestCase):
         )
         self.assertEqual(
             first["engine"]["version"],
-            "2.1.0",
+            "2.2.0",
         )
         self.assertEqual(
             first["result_fingerprint"],
@@ -197,6 +197,15 @@ class DispatchEngineTests(unittest.TestCase):
                 result["scenarios"][name]["metrics"],
                 result["scenarios"]["selected"]["metrics"],
             )
+
+    def test_trip_load_exposes_product_for_assignment_dashboard(self):
+        result = self.run_case(
+            [order("A")],
+            configuration={"objective": "min_cost"},
+        )
+        load = result["scenarios"]["selected"]["trips"][0]["loads"][0]
+        self.assertEqual(load["order_id"], "A")
+        self.assertEqual(load["product"], "Producto")
 
     def test_finite_fleet_returns_sla_exception_instead_of_error(self):
         result = self.run_case(
