@@ -19,6 +19,7 @@ from app.config import (
 from app.engines.dispatch import (
     ENGINE_NAME,
     ENGINE_VERSION,
+    SCHEMA_VERSION,
     run_dispatch_engine,
 )
 from app.engines.dispatch.normalization import preflight
@@ -220,7 +221,7 @@ async def system_status():
                 else f"Columnas nuevas no visibles ({runs_detail})."
             ),
             "fix": (
-                "Aplicá 20261001004934_dispatch_v1.sql y recargá el esquema."
+                "Aplicá las migraciones Dispatch pendientes y recargá el esquema."
             ),
         },
         {
@@ -673,7 +674,7 @@ async def execute(orders_id, fleet_id, configuration, options, run_id=None):
             "dataset_id": orders_id,
             "orders_dataset_id": orders_id,
             "fleet_dataset_id": fleet_id,
-            "schema_version": "dispatch_v1",
+            "schema_version": SCHEMA_VERSION,
             "engine_name": ENGINE_NAME,
             "engine_version": ENGINE_VERSION,
             "configuration_json": {
