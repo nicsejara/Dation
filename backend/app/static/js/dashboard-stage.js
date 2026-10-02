@@ -2536,8 +2536,12 @@
 
   async function recoverRun(run) {
     if (run.result_json && ['dispatch_v1','dispatch_v2'].includes(run.result_json.schema_version)) {
-      var dispatch = await import('./dispatch/workspace.mjs');
-      dispatch.show(run);
+      if (window.DationDispatch && typeof window.DationDispatch.show === "function") {
+        window.DationDispatch.show(run);
+      } else {
+        var dispatch = await import('/static/js/dispatch/workspace.mjs?v=dispatch-ingestion-v3');
+        dispatch.show(run);
+      }
       return;
     }
     document.body.classList.remove('dispatch-result');

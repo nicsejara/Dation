@@ -269,6 +269,55 @@ class FrontendContractTests(
         )
 
 
+    def test_dispatch_workspace_is_loaded_once(
+        self,
+    ):
+        workspace = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+            / "workspace.mjs"
+        ).read_text(encoding="utf-8")
+
+        self.assertNotIn(
+            "import('./dispatch/workspace.mjs')",
+            self.app_js,
+        )
+        self.assertNotIn(
+            "import('./dispatch/workspace.mjs')",
+            self.dashboard_stage_js,
+        )
+        self.assertIn(
+            "/static/js/dispatch/workspace.mjs?v=dispatch-ingestion-v3",
+            self.html,
+        )
+        self.assertIn(
+            "window.DationDispatch?.show",
+            self.app_js,
+        )
+        self.assertIn(
+            "window.DationDispatch.show",
+            self.dashboard_stage_js,
+        )
+
+        config_render = workspace.split(
+            "async function loadConfig()",
+            1,
+        )[1].split(
+            "function pending(",
+            1,
+        )[0]
+        self.assertNotIn(
+            "node.innerHTML+=",
+            config_render,
+        )
+        self.assertIn(
+            "node.innerHTML=`<h1>Configurar la decisión",
+            config_render,
+        )
+
     def test_single_ingestion_contract(
         self,
     ):
