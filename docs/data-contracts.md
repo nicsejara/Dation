@@ -99,7 +99,7 @@ Todos requieren la autenticación de la plataforma. El upload sin `dataset_type`
 
 ## Resultado
 
-En esta fase el resultado sigue siendo `schema_version=dispatch_v1`, con motor **1.1.0**. `ready_date` representa disponibilidad y la asignación selecciona únicamente pools cuya `base_location` coincide con el origen de la orden, salvo tercerizados globales con `*`. El `result_fingerprint` continúa identificando la parte determinística, no metadatos de persistencia.
+En esta fase el resultado sigue siendo `schema_version=dispatch_v1`, con motor **1.2.0**. `ready_date` representa disponibilidad; la asignación selecciona únicamente pools cuya `base_location` coincide con el origen de la orden, salvo tercerizados globales con `*`, y los pools finitos permanecen ocupados hasta completar ida y retorno. Cada viaje expone `cycle_days` y `resource_available_again`. El `result_fingerprint` continúa identificando la parte determinística, no metadatos de persistencia.
 
 
 ## UX de ingesta v2
