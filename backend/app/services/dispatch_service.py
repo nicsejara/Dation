@@ -298,7 +298,11 @@ async def _ensure_profile(dataset):
 
     stored = dataset.get("profile_json") or {}
     profile = stored.get("profile") or {}
-    if profile.get("profile_version") == 2:
+    expected_profile_version = {
+        "orders": 2,
+        "fleet": 3,
+    }[kind]
+    if profile.get("profile_version") == expected_profile_version:
         return dataset
 
     try:
@@ -715,6 +719,7 @@ async def execute(orders_id, fleet_id, configuration, options, run_id=None):
             "filename": value["original_filename"],
             "label": value.get("label"),
             "created_at": value["created_at"],
+            "schema_version": value.get("schema_version"),
         }
         for key, value in (
             ("orders", orders_dataset),
