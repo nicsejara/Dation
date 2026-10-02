@@ -57,6 +57,7 @@ def add_load(current_trip, order, units):
     current_trip["loads"].append(
         {
             "order_id": order["order_id"],
+            "product": order["product"],
             "units": units,
             "kg": float(kg),
         }

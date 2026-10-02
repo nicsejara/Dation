@@ -1,6 +1,6 @@
 # Contratos de datos — transición Dispatch v2
 
-La ingesta usa dos archivos CSV separados: **órdenes** y **flota**. Órdenes usa **orders_v2** y flota usa **fleet_v2** con pools y base operativa. Desde Dispatch Engine **2.1.0**, las corridas nuevas producen el envelope **dispatch_v2**, con capacidad espacial/temporal y SLA jerárquico. Ambos archivos aceptan UTF-8 con BOM opcional, encabezado en la primera fila, separador `;` o `,`, hasta 10 MB. Se recomiendan fechas ISO y decimales con punto; con separador punto y coma también se admite coma decimal. La validación informa hasta 100 problemas con código, fila, columna, mensaje y sugerencia.
+La ingesta usa dos archivos CSV separados: **órdenes** y **flota**. Órdenes usa **orders_v2** y flota usa **fleet_v2** con pools y base operativa. Desde Dispatch Engine **2.2.0**, las corridas nuevas producen el envelope **dispatch_v2**, con capacidad espacial/temporal y SLA jerárquico. Ambos archivos aceptan UTF-8 con BOM opcional, encabezado en la primera fila, separador `;` o `,`, hasta 10 MB. Se recomiendan fechas ISO y decimales con punto; con separador punto y coma también se admite coma decimal. La validación informa hasta 100 problemas con código, fila, columna, mensaje y sugerencia.
 
 La fuente ejecutable de estos contratos es `backend/app/validators/contracts.py`. El endpoint `GET /api/dispatch/contracts`, la ayuda de la pantalla y las plantillas descargables se derivan de esa definición. Cada plantilla incluye exactamente 5 registros de ejemplo válidos y funciona como template y ejemplo a la vez. Los archivos `sample_data/v1/orders.csv` y `fleet.csv` se mantienen sólo como fixtures internos de QA.
 
@@ -99,7 +99,7 @@ Todos requieren la autenticación de la plataforma. El upload sin `dataset_type`
 
 ## Resultado
 
-`schema_version=dispatch_v2` usa motor **2.1.0**. El SLA se resuelve antes que el objetivo de negocio: primero se minimizan órdenes tardías y luego días de tardanza ponderados por prioridad. Después se optimiza costo, tiempo, participación de flota propia, CO₂ o una ponderación personalizada. Viajes permanece como KPI y desempate. Cada resultado incluye `decision`, `feasibility`, `decision_drivers`, `exceptions`, escenarios comparables y la `Distribución recomendada`. Cada viaje conserva `cycle_days` y `resource_available_again`. El `result_fingerprint` identifica la parte determinística, no metadatos de persistencia.
+`schema_version=dispatch_v2` usa motor **2.2.0**. El SLA se resuelve antes que el objetivo de negocio: primero se minimizan órdenes tardías y luego días de tardanza ponderados por prioridad. Después se optimiza costo, tiempo, participación de flota propia, CO₂ o una ponderación personalizada. Viajes permanece como KPI y desempate. Cada resultado incluye `decision`, `feasibility`, `decision_drivers`, `exceptions`, escenarios comparables y la `Distribución recomendada`. Cada viaje conserva `cycle_days` y `resource_available_again`. El `result_fingerprint` identifica la parte determinística, no metadatos de persistencia.
 
 
 ## UX de ingesta v2
@@ -135,3 +135,7 @@ Las dimensiones configurables son `cost`, `time`, `utilization` y `co2`. Al meno
 El horizonte de recuperación tardía está acotado por `max_late_days` (30 días por defecto). Si una distribución completa existe dentro de ese horizonte, el motor puede devolver `recommended_with_exceptions` en lugar de declarar inviabilidad.
 
 La profundidad `essential` resuelve sólo los escenarios necesarios para la decisión elegida; `comparative` agrega los extremos de las dimensiones activas y una referencia balanceada; `deep` agrega además sensibilidad. La referencia `baseline_direct` es una política declarada y no representa una operación real verificada.
+
+## Dashboard de decisión 2.2
+
+La vista principal ya no presenta `baseline_direct` como ahorro. Esa referencia es sintética y sólo sirve para análisis de escenarios. El recorrido principal muestra la Decisión recomendada, la asignación de carga por pool, excepciones que requieren revisión e interpretación IA bajo demanda. Cada `load` de una corrida 2.2 incluye `product` para poder auditar qué productos y órdenes transporta cada pool.

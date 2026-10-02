@@ -23,7 +23,7 @@ Lexicographic CP-SAT: SLA first + spatial/temporal resources + business objectiv
         ↓
 DecisionResult JSON
         ↓
-decision dashboard + sensitivity
+focused decision dashboard + assignment explorer + AI explanation
         ↓
 AI interpretation / contextual chat
         ↓
@@ -33,7 +33,7 @@ traceability + export
 ## Current versions
 
 - Workspace / API: **1.0.0**
-- Dispatch engine: **2.1.0** (`dispatch_v2`, SLA-first + cost/time/own-fleet/CO₂ objectives); historical engine **0.2.0** retained
+- Dispatch engine: **2.2.0** (`dispatch_v2`, SLA-first + cost/time/own-fleet/CO₂ objectives); historical engine **0.2.0** retained
 - Frontend: HTML + CSS + vanilla JavaScript
 - Runtime: Google Cloud Run
 - Data / storage: Supabase

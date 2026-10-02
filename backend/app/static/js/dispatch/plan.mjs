@@ -24,11 +24,11 @@ function occupiedDays(value){
 }
 
 export function exportPlan(r){
-  const headers=['Viaje','Salida','Llegada','Recurso disponible','Días de ciclo','Origen','Destino','Pool de flota','Base','Camión','Propiedad','Orden','Unidades','Kg','Costo del viaje','CO2 del viaje'];
+  const headers=['Viaje','Salida','Llegada','Recurso disponible','Días de ciclo','Origen','Destino','Pool de flota','Base','Camión','Propiedad','Orden','Producto','Unidades','Kg','Costo del viaje','CO2 del viaje'];
   const rows=r.scenarios.selected.trips.flatMap(t=>t.loads.map((l,i)=>[
     t.trip_id,t.dispatch_date,t.arrival_date,availableAgain(t),t.cycle_days||1,t.origin,t.destination,poolId(t),
     baseLabel(t),vehicle(t.vehicle_type),t.ownership==='own'?'Propio':'Tercerizado',
-    l.order_id,l.units,l.kg,i===0?t.cost:'',i===0?t.co2_kg:''
+    l.order_id,l.product||'',l.units,l.kg,i===0?t.cost:'',i===0?t.co2_kg:''
   ]));
   download('distribucion-recomendada.csv',csv([headers,...rows]),'text/csv;charset=utf-8');
 }

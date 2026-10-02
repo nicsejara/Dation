@@ -1,3 +1,48 @@
 import {esc,num,money,pct} from './shared.mjs';
-export function render(root,r){const s=r.scenarios.selected,b=r.scenarios.baseline_direct,m=s.metrics,solver=s.solver;const saving=b.feasible?b.metrics.total_cost-m.total_cost:null;const tripDelta=b.feasible?b.metrics.total_trips-m.total_trips:null;const names={min_cost:'Minimizar costo',min_trips:'Priorizar viajes (histórico)',min_time:'Minimizar tiempo',max_utilization:'Maximizar utilización propia',min_co2:'Minimizar CO₂',balanced:'Objetivo balanceado',custom:'Objetivo personalizado'};
-root.innerHTML=`<span class="dispatch-kicker">DECISIÓN RECOMENDADA · DDA LOGÍSTICA</span><h1>Despachar ${num(m.orders)} órdenes en ${num(m.total_trips)} viajes${tripDelta===null?'':tripDelta===0?', la misma cantidad que el despacho directo':', '+num(Math.abs(tripDelta))+(tripDelta>0?' menos':' más')+' que el despacho directo'}</h1><p class="dispatch-saving">${saving==null?'Referencia directa sin cobertura factible':saving>=0?'Ahorro estimado '+money(saving):'Costo adicional '+money(-saving)} ${saving!=null&&b.metrics.total_cost?'('+pct(saving/b.metrics.total_cost)+')':''}</p><div class="dispatch-chips"><span>${esc(names[r.configuration.objective])}</span><span>${r.schema_version==='dispatch_v2'?(solver.sla_certified?'SLA óptimo certificado':'Mejor SLA encontrado'):(solver.status==='optimal'?'Solución óptima histórica':'Solución factible histórica')} · ${r.schema_version==='dispatch_v2'?(solver.status==='optimal'?'objetivo óptimo':'objetivo factible'):''}${solver.gap!=null&&solver.status!=='optimal'?' · brecha '+pct(solver.gap):''}</span><span>${r.schema_version==='dispatch_v2'?`Costo ${pct(r.configuration.weights.cost)} · Tiempo ${pct(r.configuration.weights.time)} · Uso propio ${pct(r.configuration.weights.utilization)} · CO₂ ${pct(r.configuration.weights.co2)}`:`Costo ${pct(r.configuration.weights.cost)} · Viajes ${pct(r.configuration.weights.trips)} · Tiempo ${pct(r.configuration.weights.time)}`}</span></div><div class="dispatch-mini">${[['Costo',money(m.total_cost)],['Entregas a tiempo',pct(m.on_time_rate)],['Uso flota propia',pct(m.own_weight_share)],['CO₂ estimado',num(m.co2_kg,1)+' kg']].map(([n,v])=>`<div><small>${n}</small><strong>${v}</strong></div>`).join('')}</div>${m.late_orders?`<p class="dispatch-alert">${num(m.late_orders)} órdenes quedan fuera de SLA en la mejor solución de servicio encontrada; ${num(r.feasibility?.physical_sla_violations||0)} son físicamente inevitables por distancia/plazo.</p>`:''}${m.outsourced_weight_share?`<p>Se terceriza el ${pct(m.outsourced_weight_share)} del peso para sostener la distribución recomendada.</p>`:''}${r.inputs.anomalies.length?`<p class="dispatch-alert">Anomalías: ${r.inputs.anomalies.filter(a=>a.decision==='include').length} incluidas y ${r.inputs.anomalies.filter(a=>a.decision==='exclude').length} excluidas por decisión explícita.</p>`:''}`;}
+
+const OBJECTIVES={
+  min_cost:{label:'Minimizar costo',metric:'total_cost',format:money,title:'Costo de la distribución'},
+  min_time:{label:'Minimizar tiempo',metric:'avg_lead_time_days',format:value=>num(value,2)+' días',title:'Tiempo medio'},
+  max_utilization:{label:'Maximizar utilización propia',metric:'own_weight_share',format:pct,title:'Carga con flota propia'},
+  min_co2:{label:'Minimizar CO₂',metric:'co2_kg',format:value=>num(value,1)+' kg',title:'CO₂ estimado'},
+  balanced:{label:'Objetivo balanceado',metric:null,format:null,title:'Dimensiones activas'},
+  custom:{label:'Objetivo personalizado',metric:null,format:null,title:'Dimensiones activas'},
+  min_trips:{label:'Priorizar viajes (histórico)',metric:'total_trips',format:num,title:'Viajes'},
+};
+
+export function render(root,result){
+  const selected=result.scenarios.selected;
+  const metrics=selected.metrics;
+  const objective=OBJECTIVES[result.configuration.objective]||OBJECTIVES.balanced;
+  const late=metrics.late_orders||0;
+  const dimensions=result.configuration.dimensions||['cost','time','utilization','co2'];
+  const objectiveValue=objective.metric
+    ?objective.format(metrics[objective.metric])
+    :num(dimensions.length);
+  const status=late
+    ?'Requiere revisar '+num(late)+' excepción'+(late===1?'':'es')+' de SLA'
+    :'Distribución dentro del SLA encontrado';
+
+  root.innerHTML=
+    '<div class="dispatch-decision-hero">'
+      +'<div class="dispatch-decision-copy">'
+        +'<span class="dispatch-kicker">DECISIÓN RECOMENDADA · DDA LOGÍSTICA</span>'
+        +'<h1>Distribuir '+num(metrics.orders)+' órdenes en '+num(metrics.total_trips)+' viajes</h1>'
+        +'<p>La distribución cumple el objetivo <strong>'+esc(objective.label)+'</strong> bajo las restricciones de capacidad, ubicación, disponibilidad y SLA configuradas.</p>'
+        +'<div class="dispatch-decision-next"><span aria-hidden="true">→</span><div><strong>Siguiente paso</strong><p>Revisá la asignación de carga y las excepciones antes de exportar la distribución.</p></div></div>'
+      +'</div>'
+      +'<div class="dispatch-decision-status">'
+        +'<span class="dispatch-status-pill '+(late?'is-warning':'is-good')+'">'+esc(status)+'</span>'
+        +'<div class="dispatch-decision-metrics">'
+          +'<div><small>'+esc(objective.title)+'</small><strong>'+objectiveValue+'</strong></div>'
+          +'<div><small>Entregas a tiempo</small><strong>'+pct(metrics.on_time_rate)+'</strong></div>'
+          +'<div><small>Viajes</small><strong>'+num(metrics.total_trips)+'</strong></div>'
+        +'</div>'
+        +(metrics.own_weight_share!=null
+          ?'<p class="dispatch-decision-mix">'+pct(metrics.own_weight_share)+' de la carga con flota propia'
+            +(metrics.outsourced_weight_share?' · '+pct(metrics.outsourced_weight_share)+' tercerizada':'')
+            +'</p>'
+          :'')
+      +'</div>'
+    +'</div>';
+}
