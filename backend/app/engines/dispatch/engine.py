@@ -11,7 +11,7 @@ from .plans import greedy, summarize, validate_plan
 from .model import solve
 
 ENGINE_NAME='logistics-dispatch-engine'
-ENGINE_VERSION='1.0.0'
+ENGINE_VERSION='1.1.0'
 NAMES={'baseline_direct':'Despacho directo','baseline_current':'Asignación informada','min_cost':'Costo mínimo',
        'min_trips':'Viajes mínimos','min_time':'Entrega más rápida','selected':'Decisión recomendada'}
 DIRECTIONS={k:('higher_better' if k in ('on_time_rate','load_utilization') else 'lower_better') for k in
@@ -23,7 +23,7 @@ def digest(value):
 
 
 def plan_signature(scenario):
-    return [(t['dispatch_date'],t['vehicle_type'],t['origin'],t['destination'],[(l['order_id'],l['units']) for l in t['loads']]) for t in scenario['trips']]
+    return [(t['dispatch_date'],t['fleet_pool_id'],t['origin'],t['destination'],[(l['order_id'],l['units']) for l in t['loads']]) for t in scenario['trips']]
 
 
 def run_dispatch_engine(orders_bytes, fleet_bytes, configuration=None, options=None, inputs=None, progress=None):
@@ -35,7 +35,7 @@ def run_dispatch_engine(orders_bytes, fleet_bytes, configuration=None, options=N
         if progress:progress(stage)
     notify('validating')
     orders=sorted(validate_orders_csv(orders_bytes)['records'],key=lambda o:o['order_id'])
-    full_fleet=sorted(validate_fleet_csv(fleet_bytes)['records'],key=lambda v:v['vehicle_type'])
+    full_fleet=sorted(validate_fleet_csv(fleet_bytes)['records'],key=lambda v:(v['base_location'],v['vehicle_type'],v['fleet_pool_id']))
     fleet=[v for v in full_fleet if opts['allow_third_party'] or v['ownership']=='own']
     if not fleet:raise ValueError('No hay flota habilitada.')
     check=preflight(orders,fleet,full_fleet)
@@ -81,7 +81,7 @@ def run_dispatch_engine(orders_bytes, fleet_bytes, configuration=None, options=N
         if p:
             validate_plan(p,orders,fleet);candidate=summarize(p,orders,fleet);candidates.append(candidate)
         if not candidates:
-            raise ValueError('No se encontró un plan factible dentro del presupuesto. Revisá flota y ventanas; no se descartaron órdenes.')
+            raise ValueError('No se encontró una distribución factible dentro del presupuesto. Revisá bases, flota y ventanas; no se descartaron órdenes.')
         result=copy.deepcopy(choose(weights))
         if not p or plan_signature(result)!=plan_signature(candidate):
             meta={**meta,'status':'feasible','method':'heuristic' if not p else 'best_candidate','gap':None}
@@ -106,7 +106,7 @@ def run_dispatch_engine(orders_bytes, fleet_bytes, configuration=None, options=N
     def order_map(s):
         mapping={o['order_id']:[] for o in orders}
         for t in s['trips']:
-            signature=(t['dispatch_date'],t['vehicle_type'],tuple((l['order_id'],l['units']) for l in t['loads']))
+            signature=(t['dispatch_date'],t['fleet_pool_id'],tuple((l['order_id'],l['units']) for l in t['loads']))
             for l in t['loads']:mapping[l['order_id']].append(signature)
         return {k:tuple(sorted(v)) for k,v in mapping.items()}
     selected_map=order_map(selected)
@@ -134,7 +134,8 @@ def run_dispatch_engine(orders_bytes, fleet_bytes, configuration=None, options=N
                   'fleet':{'sha256':hashlib.sha256(fleet_bytes).hexdigest(),'rows':len(full_fleet),**(inputs or {}).get('fleet',{})},'anomalies':anomalies,'preflight':check},
         'configuration':{**config,'options':opts},'fleet':full_fleet,'kpi_directions':DIRECTIONS,'normalization':normalization,
         'assumptions':['Un viaje conecta un origen y un destino; no hay multiparada.',
-            'La flota propia se limita por salidas diarias, sin ocupación durante el retorno.',
+            'La flota se asigna sólo desde pools cuya base coincide con el origen; tercerizados con base * pueden operar desde cualquier origen.',
+            'La flota propia se limita por salidas diarias por pool, sin ocupación durante el retorno.',
             'Costo, combustible y CO₂ contemplan ida y vuelta. El costo por km ya incluye combustible.',
             'El plazo se pondera por unidades; llegada de una orden es la última entrega.',
             'Factores de emisiones informados por el usuario; no están certificados.',

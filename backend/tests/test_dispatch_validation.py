@@ -31,6 +31,65 @@ class DispatchValidationTests(unittest.TestCase):
         with self.assertRaises(ValueError):validate_fleet_csv(fleet.replace(b';4;70',b';;70',1))
         self.assertEqual(validate_fleet_csv(fleet)['rows'],4)
 
+    def test_fleet_v2_uses_pool_identity_not_vehicle_type(self):
+        from test_dispatch_engine import csv_bytes
+        from app.validators.fleet_schema import COLUMNS as FC
+
+        base = {
+            'vehicle_type':'Truck_L',
+            'ownership':'own',
+            'capacity_kg':25000,
+            'cost_per_km':1180,
+            'fixed_trip_cost':48000,
+            'units_available':1,
+            'avg_speed_kmh':70,
+            'driving_hours_per_day':10,
+            'fuel_l_per_100km':38,
+            'co2_kg_per_km':1.02,
+        }
+        rows = [
+            {**base,'fleet_pool_id':'OWN-CBA-L','base_location':'Cordoba'},
+            {**base,'fleet_pool_id':'OWN-ROS-L','base_location':'Rosario'},
+        ]
+        report = validate_fleet_csv(csv_bytes(FC, rows))
+        self.assertEqual(report['rows'], 2)
+        self.assertEqual(
+            {row['vehicle_type'] for row in report['records']},
+            {'Truck_L'},
+        )
+        self.assertEqual(
+            {row['fleet_pool_id'] for row in report['records']},
+            {'OWN-CBA-L','OWN-ROS-L'},
+        )
+
+        duplicate = [
+            rows[0],
+            {**rows[1],'fleet_pool_id':'OWN-CBA-L'},
+        ]
+        with self.assertRaisesRegex(ValueError,'repetido'):
+            validate_fleet_csv(csv_bytes(FC, duplicate))
+
+    def test_own_pool_requires_concrete_base(self):
+        from test_dispatch_engine import csv_bytes
+        from app.validators.fleet_schema import COLUMNS as FC
+
+        row = {
+            'fleet_pool_id':'OWN-GLOBAL-L',
+            'vehicle_type':'Truck_L',
+            'ownership':'own',
+            'base_location':'*',
+            'capacity_kg':25000,
+            'cost_per_km':1180,
+            'fixed_trip_cost':48000,
+            'units_available':1,
+            'avg_speed_kmh':70,
+            'driving_hours_per_day':10,
+            'fuel_l_per_100km':38,
+            'co2_kg_per_km':1.02,
+        }
+        with self.assertRaisesRegex(ValueError,'base operativa concreta'):
+            validate_fleet_csv(csv_bytes(FC, [row]))
+
     def test_legacy_weights(self):
         config=DispatchConfig(mode='custom',objective='custom',weights={'cost':.7,'trips':.3})
         self.assertEqual(config.weights.time,0)

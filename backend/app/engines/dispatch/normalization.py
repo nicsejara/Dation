@@ -3,34 +3,34 @@ from collections import defaultdict
 from datetime import date, timedelta
 from decimal import Decimal
 import math
+import unicodedata
 
 D = lambda value: Decimal(str(value))
 
 
 FINDING_COPY = {
-    "unknown_reference": {
+    "origin_without_fleet": {
         "severity": "error",
         "consequence": (
-            "Corregí el tipo de camión informado antes de calcular el plan."
+            "Agregá capacidad propia o tercerizada disponible desde ese origen."
         ),
     },
     "unit_without_capacity": {
         "severity": "error",
         "consequence": (
-            "No existe un camión habilitado que pueda transportar una unidad entera."
+            "No existe un vehículo habilitado en ese origen que pueda transportar una unidad entera."
         ),
     },
     "late_orders": {
         "severity": "warning",
         "consequence": (
-            "El plan las entrega igual y las marca como tardías."
+            "La decisión las entrega igual y las marca como tardías."
         ),
     },
     "capacity_vs_demand": {
         "severity": "warning",
         "consequence": (
-            "El plan usará camiones tercerizados o reprogramará salidas "
-            "dentro de cada plazo."
+            "La decisión podrá tercerizar o reprogramar salidas dentro de cada plazo."
         ),
     },
     "zero_slack": {
@@ -50,6 +50,32 @@ FINDING_COPY = {
         ),
     },
 }
+
+
+def _location_key(value):
+    text = unicodedata.normalize("NFKD", str(value or "").strip())
+    return "".join(
+        char
+        for char in text
+        if not unicodedata.combining(char)
+    ).casefold()
+
+
+def vehicle_can_serve_origin(order, vehicle):
+    base = str(vehicle.get("base_location") or "").strip()
+    return (
+        base == "*"
+        or _location_key(base) == _location_key(order.get("origin"))
+    )
+
+
+def fleet_for_origin(order, fleet):
+    return [
+        vehicle
+        for vehicle in fleet
+        if vehicle["units_available"] != 0
+        and vehicle_can_serve_origin(order, vehicle)
+    ]
 
 
 def transit(order, vehicle):
@@ -81,13 +107,14 @@ def raw_cost(order, vehicle):
 def eligible_fleet(order, fleet):
     return [
         vehicle
-        for vehicle in fleet
+        for vehicle in fleet_for_origin(order, fleet)
         if capacity_units(order, vehicle)
-        and vehicle["units_available"] != 0
     ]
 
 
 def departure_days(order, vehicle, fleet):
+    if not vehicle_can_serve_origin(order, vehicle):
+        return []
     start = date.fromisoformat(order["dispatch_date"])
     deadline = date.fromisoformat(order["deadline"])
     eligible = eligible_fleet(order, fleet)
@@ -126,14 +153,67 @@ def _capacity_check(orders, fleet):
         for vehicle in fleet
         if vehicle["ownership"] == "own"
     ]
-    own_capacity = sum(
-        D(vehicle["capacity_kg"])
-        * D(vehicle["units_available"] or 0)
+    global_legacy = any(
+        vehicle.get("base_location") == "*"
         for vehicle in own
     )
-    by_day = defaultdict(lambda: {"orders": 0, "kg": D(0)})
+
+    if global_legacy:
+        own_capacity = sum(
+            D(vehicle["capacity_kg"])
+            * D(vehicle["units_available"] or 0)
+            for vehicle in own
+        )
+        by_day = defaultdict(lambda: {"orders": 0, "kg": D(0)})
+        for order in orders:
+            item = by_day[order["dispatch_date"]]
+            item["orders"] += 1
+            item["kg"] += (
+                D(order["quantity_units"])
+                * D(order["unit_weight_kg"])
+            )
+        days = []
+        for current_date, value in sorted(by_day.items()):
+            ratio = (
+                float(value["kg"] / own_capacity)
+                if own_capacity > 0
+                else None
+            )
+            days.append(
+                {
+                    "date": current_date,
+                    "origin": "*",
+                    "orders": value["orders"],
+                    "kg": float(value["kg"]),
+                    "own_capacity_kg": float(own_capacity),
+                    "ratio": ratio,
+                    "over": own_capacity > 0 and value["kg"] > own_capacity,
+                }
+            )
+        return {
+            "scope": "global_legacy",
+            "own_capacity_kg_per_day": float(own_capacity),
+            "capacity_by_origin": {},
+            "days_over": sum(item["over"] for item in days),
+            "total_days": len(days),
+            "days": days,
+        }
+
+    capacity_by_key = defaultdict(Decimal)
+    display_by_key = {}
+    for vehicle in own:
+        key = _location_key(vehicle.get("base_location"))
+        display_by_key.setdefault(key, vehicle.get("base_location"))
+        capacity_by_key[key] += (
+            D(vehicle["capacity_kg"])
+            * D(vehicle["units_available"] or 0)
+        )
+
+    demand = defaultdict(lambda: {"orders": 0, "kg": D(0), "origin": ""})
     for order in orders:
-        item = by_day[order["dispatch_date"]]
+        key = _location_key(order["origin"])
+        item = demand[(order["dispatch_date"], key)]
+        item["origin"] = order["origin"]
         item["orders"] += 1
         item["kg"] += (
             D(order["quantity_units"])
@@ -141,28 +221,33 @@ def _capacity_check(orders, fleet):
         )
 
     days = []
-    days_over = 0
-    for current_date, value in sorted(by_day.items()):
+    for (current_date, key), value in sorted(demand.items()):
+        own_capacity = capacity_by_key.get(key, D(0))
         ratio = (
             float(value["kg"] / own_capacity)
             if own_capacity > 0
             else None
         )
-        over = own_capacity > 0 and value["kg"] > own_capacity
-        days_over += int(over)
         days.append(
             {
                 "date": current_date,
+                "origin": value["origin"],
                 "orders": value["orders"],
                 "kg": float(value["kg"]),
+                "own_capacity_kg": float(own_capacity),
                 "ratio": ratio,
-                "over": over,
+                "over": own_capacity > 0 and value["kg"] > own_capacity,
             }
         )
 
     return {
-        "own_capacity_kg_per_day": float(own_capacity),
-        "days_over": days_over,
+        "scope": "by_origin",
+        "own_capacity_kg_per_day": float(sum(capacity_by_key.values(), D(0))),
+        "capacity_by_origin": {
+            display_by_key[key]: float(value)
+            for key, value in sorted(capacity_by_key.items())
+        },
+        "days_over": sum(item["over"] for item in days),
         "total_days": len(days),
         "days": days,
     }
@@ -175,10 +260,6 @@ def preflight(orders, fleet, reference_fleet=None):
     findings = []
 
     reference = reference_fleet or fleet
-    names = {
-        vehicle["vehicle_type"]
-        for vehicle in reference
-    }
     own_capacities = [
         vehicle["capacity_kg"]
         for vehicle in fleet
@@ -198,13 +279,13 @@ def preflight(orders, fleet, reference_fleet=None):
                 "code": "FINITE_FLEET",
                 "detail": (
                     "No hay flota ilimitada; la cobertura depende "
-                    "de las fechas y la disponibilidad."
+                    "del origen, las fechas y la disponibilidad."
                 ),
             }
         )
 
     late_items = []
-    unknown_items = []
+    origin_items = []
     capacity_items = []
     zero_slack_items = []
 
@@ -212,32 +293,39 @@ def preflight(orders, fleet, reference_fleet=None):
         base = {
             "order_id": order["order_id"],
             "row": order.get("_row"),
+            "origin": order["origin"],
         }
-        current_vehicle = order.get("current_vehicle_type")
-        if current_vehicle and current_vehicle not in names:
+
+        available_at_origin = fleet_for_origin(order, fleet)
+        if not available_at_origin:
             error = {
                 **base,
-                "code": "UNKNOWN_CURRENT_VEHICLE",
+                "code": "NO_FLEET_AT_ORIGIN",
                 "detail": (
-                    "El camión de referencia no existe en la flota."
+                    f"No hay flota habilitada para despachar desde {order['origin']}."
                 ),
             }
             errors.append(error)
-            unknown_items.append(
+            origin_items.append(
                 {
                     **base,
-                    "detail": current_vehicle,
+                    "detail": order["origin"],
                 }
             )
+            continue
 
-        eligible = eligible_fleet(order, fleet)
+        eligible = [
+            vehicle
+            for vehicle in available_at_origin
+            if capacity_units(order, vehicle)
+        ]
         if not eligible:
             error = {
                 **base,
                 "code": "UNIT_EXCEEDS_CAPACITY",
                 "detail": (
-                    "No hay un camión disponible que pueda transportar "
-                    "una unidad entera."
+                    "No hay un vehículo disponible en este origen que pueda "
+                    "transportar una unidad entera."
                 ),
             }
             errors.append(error)
@@ -251,7 +339,7 @@ def preflight(orders, fleet, reference_fleet=None):
                 "code": "UNAVOIDABLE_LATE",
                 "detail": (
                     "La entrega resulta tardía aun con la salida más "
-                    "temprana y el camión más rápido."
+                    "temprana y el vehículo más rápido disponible en el origen."
                 ),
             }
             warnings.append(warning)
@@ -318,27 +406,16 @@ def preflight(orders, fleet, reference_fleet=None):
                 }
             )
 
-    if unknown_items:
+    if origin_items:
         findings.append(
             _finding(
-                "unknown_reference",
+                "origin_without_fleet",
                 (
-                    f"{len(unknown_items)} referencias de camión "
-                    "no existen en la flota"
+                    f"{len(origin_items)} órdenes tienen un origen "
+                    "sin flota habilitada"
                 ),
-                unknown_items,
+                origin_items,
             )
-        )
-    elif any(order.get("current_vehicle_type") for order in orders):
-        findings.append(
-            {
-                "id": "references_ok",
-                "severity": "success",
-                "title": "Todos los camiones de referencia existen en la flota",
-                "consequence": None,
-                "count": 0,
-                "items": [],
-            }
         )
 
     if capacity_items:
@@ -347,7 +424,7 @@ def preflight(orders, fleet, reference_fleet=None):
                 "unit_without_capacity",
                 (
                     f"{len(capacity_items)} órdenes no tienen "
-                    "capacidad disponible"
+                    "capacidad suficiente en su origen"
                 ),
                 capacity_items,
             )
@@ -367,13 +444,18 @@ def preflight(orders, fleet, reference_fleet=None):
 
     capacity_check = _capacity_check(orders, reference)
     if capacity_check["days_over"]:
+        scope_label = (
+            "combinaciones origen/fecha"
+            if capacity_check["scope"] == "by_origin"
+            else "días"
+        )
         findings.append(
             _finding(
                 "capacity_vs_demand",
                 (
                     "Tu demanda supera la capacidad propia en "
                     f"{capacity_check['days_over']} de "
-                    f"{capacity_check['total_days']} días"
+                    f"{capacity_check['total_days']} {scope_label}"
                 ),
                 [
                     item
@@ -403,7 +485,7 @@ def preflight(orders, fleet, reference_fleet=None):
         findings.append(
             _finding(
                 "no_third_party",
-                "La flota no incluye camiones tercerizados",
+                "La flota no incluye vehículos tercerizados",
             )
         )
 

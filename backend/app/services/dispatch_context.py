@@ -61,11 +61,11 @@ def verify_numbers(text, context):
 
 def safe_explanation(result):
     m=result['scenarios']['selected']['metrics']
-    return {'executive_summary':f"Plan validado para {m['orders']} órdenes y {m['total_trips']} viajes.",
-        'recommendation':'Revisá el calendario y las entregas tardías antes de aprobar el despacho.',
-        'why_recommended':'El motor evaluó capacidad por unidades enteras, disponibilidad diaria y ventanas de salida.',
-        'business_impact':{'cost':'Consultá el costo calculado en los KPIs.','trips':'Consultá el plan de viajes.','distance':'Se contempla ida y vuelta.'},
-        'key_drivers':['Disponibilidad de flota y posibilidad de consolidar cargas.'],
+    return {'executive_summary':f"Distribución validada para {m['orders']} órdenes y {m['total_trips']} viajes.",
+        'recommendation':'Revisá la distribución, las bases utilizadas y las entregas tardías antes de aprobar el despacho.',
+        'why_recommended':'El motor evaluó capacidad por unidades enteras, base operativa por origen, disponibilidad diaria por pool y ventanas de salida.',
+        'business_impact':{'cost':'Consultá el costo calculado en los KPIs.','trips':'Consultá la distribución de viajes.','distance':'Se contempla ida y vuelta.'},
+        'key_drivers':['Ubicación y disponibilidad de los pools de flota, además de la posibilidad de consolidar cargas.'],
         'tradeoffs':['La prioridad elegida puede aumentar la tercerización o postergar salidas.'],
         'assumptions':result['assumptions'],
         'caveats':['La respuesta de IA no superó la comprobación de cifras. Se muestra una explicación determinística de respaldo.'],

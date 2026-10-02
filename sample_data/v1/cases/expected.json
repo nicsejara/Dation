@@ -81,7 +81,7 @@
     },
     "options": {},
     "expected": {
-      "error_contains": "No se encontró un plan factible"
+      "error_contains": "No se encontró una distribución factible"
     }
   },
   {

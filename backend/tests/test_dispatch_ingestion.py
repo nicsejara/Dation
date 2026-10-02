@@ -91,6 +91,9 @@ class DispatchIngestionValidationTests(unittest.TestCase):
             167000,
         )
         self.assertTrue(fleet_profile["has_third_party"])
+        self.assertEqual(fleet_profile["pools"], 4)
+        self.assertFalse(fleet_profile["spatially_scoped"])
+        self.assertEqual(fleet_profile["global_scope_pools"], 4)
 
     def test_sample_preflight_is_grouped_for_business(self):
         orders = validate_orders_csv(
@@ -140,6 +143,29 @@ class DispatchIngestionValidationTests(unittest.TestCase):
         self.assertEqual(zero_slack["count"], 26)
         self.assertTrue(result["readiness"]["can_continue"])
 
+    def test_v2_sample_is_spatially_scoped(self):
+        orders = validate_orders_report(
+            (ROOT / "sample_data" / "v2" / "orders.csv").read_bytes()
+        )
+        fleet = validate_fleet_report(
+            (ROOT / "sample_data" / "v2" / "fleet.csv").read_bytes()
+        )
+        self.assertTrue(orders["valid"])
+        self.assertEqual(orders["schema"], "orders_v2")
+        self.assertTrue(fleet["valid"])
+        self.assertEqual(fleet["schema"], "fleet_v2")
+        self.assertTrue(fleet["profile"]["spatially_scoped"])
+        self.assertEqual(
+            fleet["profile"]["bases"],
+            ["Buenos Aires", "Cordoba", "Rosario"],
+        )
+        self.assertEqual(fleet["profile"]["own_units_per_day"], 11)
+        self.assertEqual(
+            fleet["profile"]["own_capacity_kg_per_day"],
+            167000,
+        )
+        self.assertEqual(fleet["profile"]["global_scope_pools"], 1)
+
     def test_report_caps_visible_problems_at_one_hundred(self):
         header = (
             "order_id;product;quantity_units;unit_weight_kg;origin;"
@@ -174,13 +200,25 @@ class DispatchIngestionValidationTests(unittest.TestCase):
             template_report = validator(template_text.encode())
             self.assertTrue(template_report["valid"])
             self.assertEqual(template_report["rows"], 5)
+            header = template_text.splitlines()[0]
             if kind == "orders":
-                header = template_text.splitlines()[0]
                 self.assertIn("ready_date", header)
                 self.assertNotIn("current_vehicle_type", header)
                 self.assertNotIn("dispatch_date", header)
+            else:
+                self.assertIn("fleet_pool_id", header)
+                self.assertIn("base_location", header)
+                self.assertEqual(template_report["schema"], "fleet_v2")
             sample = (ROOT / "sample_data" / "v1" / f"{kind}.csv").read_bytes()
-            self.assertTrue(validator(sample)["valid"])
+            sample_report = validator(sample)
+            self.assertTrue(sample_report["valid"])
+            if kind == "fleet":
+                self.assertEqual(sample_report["schema"], "fleet_v1")
+                self.assertFalse(sample_report["profile"]["spatially_scoped"])
+                self.assertTrue(any(
+                    issue["code"] == "LEGACY_FLEET_GLOBAL_SCOPE"
+                    for issue in sample_report["warnings"]
+                ))
 
 
 class DispatchIngestionHTTPTests(unittest.IsolatedAsyncioTestCase):
@@ -212,11 +250,15 @@ class DispatchIngestionHTTPTests(unittest.IsolatedAsyncioTestCase):
             response.json()["formats"]["orders"]["schema"],
             "orders_v2",
         )
+        self.assertEqual(
+            response.json()["formats"]["fleet"]["schema"],
+            "fleet_v2",
+        )
 
     async def test_status_uses_detailed_service(self):
         expected = {
             "available": False,
-            "engine_version": "1.0.0",
+            "engine_version": "1.1.0",
             "checks": [],
             "message": "Activación pendiente",
         }
