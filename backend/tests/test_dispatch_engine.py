@@ -15,9 +15,36 @@ def order(id='A', units=1, weight=400, day='2026-10-01', window=2):
     return dict(zip(COLUMNS,[id,'Producto',units,weight,'Origen','Destino',100,'Normal',window,day]))
 
 
-def fleet(own=1, third=True):
-    rows=[dict(zip(FC,['S','own',1000,1,10,own,100,10,20,.5]))]
-    if third:rows.append(dict(zip(FC,['T','third_party',1000,2,20,'',100,10,20,.5])))
+def fleet(own=1, third=True, base='Origen'):
+    rows=[{
+        'fleet_pool_id':'OWN-S',
+        'vehicle_type':'S',
+        'ownership':'own',
+        'base_location':base,
+        'capacity_kg':1000,
+        'cost_per_km':1,
+        'fixed_trip_cost':10,
+        'units_available':own,
+        'avg_speed_kmh':100,
+        'driving_hours_per_day':10,
+        'fuel_l_per_100km':20,
+        'co2_kg_per_km':.5,
+    }]
+    if third:
+        rows.append({
+            'fleet_pool_id':'TP-T',
+            'vehicle_type':'T',
+            'ownership':'third_party',
+            'base_location':'*',
+            'capacity_kg':1000,
+            'cost_per_km':2,
+            'fixed_trip_cost':20,
+            'units_available':'',
+            'avg_speed_kmh':100,
+            'driving_hours_per_day':10,
+            'fuel_l_per_100km':20,
+            'co2_kg_per_km':.5,
+        })
     return csv_bytes(FC,rows)
 
 
@@ -90,6 +117,16 @@ class DispatchEngineTests(unittest.TestCase):
         r=run_dispatch_engine(data,fleet(),options={'allow_third_party':False,'sensitivity':False})
         self.assertNotIn('baseline_current',r['scenarios'])
         self.assertEqual(r['scenarios']['selected']['metrics']['outsourced_trips_share'],0)
+
+    def test_spatial_pool_cannot_serve_another_origin(self):
+        with self.assertRaisesRegex(ValueError,'No hay flota habilitada'):
+            self.run_case([order()],fleet(own=1,third=False,base='Otra Base'))
+
+    def test_trip_exposes_pool_and_base(self):
+        r=self.run_case([order()],fleet(own=1,third=False,base='Origen'))
+        trip=r['scenarios']['selected']['trips'][0]
+        self.assertEqual(trip['fleet_pool_id'],'OWN-S')
+        self.assertEqual(trip['base_location'],'Origen')
 
     def test_sensitivity_reports_consecutive_changes(self):
         r=run_dispatch_engine(csv_bytes(COLUMNS,[order('A'),order('B')]),fleet())
