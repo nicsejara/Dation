@@ -1,20 +1,17 @@
-import {api, date, num, post} from "../shared.mjs";
+import {api, date, num} from "../shared.mjs";
 import {createDropCard} from "./dropcard.mjs";
 import {createGuideDrawer} from "./guide-drawer.mjs";
-import {renderLibrary} from "./library.mjs";
-import {renderUnderstood} from "./metrics.mjs";
-import {renderPreflight} from "./preflight-panel.mjs";
+import {createPreviousDrawer} from "./library.mjs";
+import {renderValidationPanel} from "./preflight-panel.mjs";
 import {
   continueState,
   deriveCardState,
-  stepTone,
+  technicalPreflightErrors,
 } from "./selectors.mjs";
-import {createSummaryPanel} from "./summary-panel.mjs";
 import {renderSystemBanner} from "./system-banner.mjs";
-import {renderValidationReport} from "./validation-report.mjs";
+import {createValidationDrawer} from "./validation-report.mjs";
 
 const MAX_BYTES = 10 * 1024 * 1024;
-const INTRO_KEY = "dation.dispatch.ingestion.intro.dismissed.v1";
 
 function el(tag, value, className = "") {
   const node = document.createElement(tag);
@@ -29,7 +26,7 @@ function el(tag, value, className = "") {
 
 function fileSize(bytes) {
   if (bytes == null) {
-    return "";
+    return "—";
   }
   if (bytes < 1024) {
     return `${bytes} B`;
@@ -37,20 +34,10 @@ function fileSize(bytes) {
   return `${num(bytes / 1024, 1)} KB`;
 }
 
-function todayTime(value) {
-  if (!value) {
-    return "";
-  }
-  const parsed = new Date(value);
-  return new Intl.DateTimeFormat(
-    "es-AR",
-    {
-      day: "numeric",
-      month: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-    },
-  ).format(parsed);
+function dropTitle(kind) {
+  return kind === "orders"
+    ? "Arrastrá orders.csv acá"
+    : "Arrastrá fleet.csv acá";
 }
 
 function clientFileProblem(file) {
@@ -63,124 +50,124 @@ function clientFileProblem(file) {
   return null;
 }
 
-function cardReport(dataset, localReport) {
-  return localReport || dataset?.profile_json || null;
+function makeHowItWorks() {
+  const section = el("section", null, "dispatch-panel dispatch-how-compact");
+  section.append(el("h2", "Cómo funciona"));
+
+  const steps = el("div", null, "dispatch-how-compact-steps");
+  [
+    [
+      "1",
+      "Descargá la plantilla",
+      "Usá el formato correcto desde el inicio.",
+    ],
+    [
+      "2",
+      "Completá tus datos",
+      "No cambies nombres ni encabezados.",
+    ],
+    [
+      "3",
+      "Subí y validá",
+      "Dation revisa los datos antes de continuar.",
+    ],
+  ].forEach(([number, title, copy], index) => {
+    const item = el("article");
+    item.append(
+      el("span", number, "dispatch-how-number"),
+      el("div", null, "dispatch-how-copy"),
+    );
+    item.querySelector(".dispatch-how-copy").append(
+      el("strong", title),
+      el("small", copy),
+    );
+    steps.append(item);
+    if (index < 2) {
+      steps.append(el("span", "→", "dispatch-how-arrow"));
+    }
+  });
+  section.append(steps);
+  return section;
 }
 
-function currentFile(kind, dataset, report) {
-  if (dataset) {
-    return {
-      name: dataset.original_filename,
-      size: dataset.size_bytes,
-      createdAt: dataset.created_at,
-    };
+function makeFinalBar(onNext) {
+  const bar = el("section", null, "dispatch-final-bar is-pending");
+  const icon = el("span", "○", "dispatch-final-icon");
+  const copy = el("div");
+  const title = el("strong", "Completá los dos archivos");
+  const description = el(
+    "p",
+    "Necesitamos órdenes y flota técnicamente válidas para continuar.",
+  );
+  copy.append(title, description);
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "dispatch-final-cta";
+  button.textContent = "Configurar decisión →";
+  button.disabled = true;
+  button.onclick = () => {
+    if (!button.disabled) {
+      onNext();
+    }
+  };
+
+  bar.append(icon, copy, button);
+
+  function update(result) {
+    bar.className = `dispatch-final-bar is-${result.kind}`;
+    button.disabled = !result.enabled;
+
+    if (result.enabled) {
+      icon.textContent = "✓";
+      title.textContent = "Datos listos para configurar la decisión";
+      description.textContent = (
+        "Los dos archivos superaron las validaciones necesarias. "
+        + "Podés continuar."
+      );
+      return;
+    }
+
+    if (result.kind === "error") {
+      icon.textContent = "⛔";
+      title.textContent = "Hay archivos que necesitan corrección";
+      description.textContent = (
+        "Corregí los problemas indicados antes de continuar."
+      );
+      return;
+    }
+
+    icon.textContent = "○";
+    title.textContent = "Completá los dos archivos";
+    description.textContent = result.message;
   }
+
+  return {bar, update, button};
+}
+
+function currentFile(dataset, report, pendingFile) {
   if (report?.file) {
     return {
       name: report.file.name,
       size: report.file.size_bytes,
-      createdAt: null,
+      rows: report.rows,
+    };
+  }
+  if (dataset) {
+    return {
+      name: dataset.original_filename,
+      size: dataset.size_bytes,
+      rows: dataset.row_count,
+    };
+  }
+  if (pendingFile) {
+    return {
+      name: pendingFile.name,
+      size: pendingFile.size,
+      rows: null,
     };
   }
   return null;
-}
-
-function makeStepper() {
-  const nav = el("nav", null, "dispatch-ingestion-stepper");
-  nav.setAttribute("aria-label", "Progreso de la carga");
-  const items = {};
-  [
-    ["orders", "1", "Órdenes", "dispatch-upload-orders"],
-    ["fleet", "2", "Flota", "dispatch-upload-fleet"],
-    ["review", "3", "Revisión", "dispatch-upload-review"],
-  ].forEach(([key, number, label, target]) => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.dataset.step = key;
-    button.append(
-      el("span", number),
-      el("strong", label),
-    );
-    button.onclick = () => {
-      document.getElementById(target)?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    };
-    nav.append(button);
-    items[key] = button;
-  });
-  return {nav, items};
-}
-
-function updateStepper(stepper, state, reports, preflight) {
-  for (const kind of ["orders", "fleet"]) {
-    const tone = stepTone({
-      dataset: state[kind],
-      report: reports[kind],
-      kind,
-    });
-    stepper.items[kind].className = `is-${tone}`;
-  }
-  const reviewTone = stepTone({
-    preflight,
-    kind: "review",
-  });
-  stepper.items.review.className = `is-${reviewTone}`;
-}
-
-function makeIntroduction(onSample, onGuide, onDismiss) {
-  const section = el("section", null, "dispatch-panel dispatch-intro");
-  const copy = el("div");
-  copy.append(
-    el("span", "Primera vez", "dispatch-kicker"),
-    el("h2", "Prepará tus datos en pocos minutos"),
-    el(
-      "p",
-      (
-        "Las órdenes cambian en cada corrida. "
-        + "La flota se carga una vez y se reutiliza."
-      ),
-    ),
-  );
-
-  const close = document.createElement("button");
-  close.type = "button";
-  close.className = "dispatch-intro-close";
-  close.setAttribute("aria-label", "Cerrar introducción");
-  close.textContent = "×";
-  close.onclick = onDismiss;
-
-  const steps = el("div", null, "dispatch-intro-steps");
-  [
-    "Descargá la plantilla",
-    "Completala sin cambiar los encabezados",
-    "Subí el CSV y lo validamos al instante",
-  ].forEach((value, index) => {
-    const item = el("div");
-    item.append(
-      el("span", String(index + 1)),
-      el("strong", value),
-    );
-    steps.append(item);
-  });
-
-  const actions = el("div", null, "dispatch-actions");
-  const sample = document.createElement("button");
-  sample.type = "button";
-  sample.className = "dispatch-primary-action";
-  sample.textContent = "Probar con datos de ejemplo";
-  sample.onclick = onSample;
-
-  const guide = document.createElement("button");
-  guide.type = "button";
-  guide.className = "dispatch-text-action";
-  guide.textContent = "Ver la guía de formato";
-  guide.onclick = () => onGuide("orders", guide);
-  actions.append(sample, guide);
-
-  section.append(copy, close, steps, actions);
-  return section;
 }
 
 export async function mountUploadScreen(
@@ -190,7 +177,6 @@ export async function mountUploadScreen(
     persist,
     runPreflight,
     onNext,
-    isReady,
   },
 ) {
   const local = {
@@ -200,11 +186,15 @@ export async function mountUploadScreen(
       orders: null,
       fleet: null,
     },
-    validating: {
-      orders: false,
-      fleet: false,
+    phases: {
+      orders: "idle",
+      fleet: "idle",
     },
     saveErrors: {
+      orders: null,
+      fleet: null,
+    },
+    duplicateNotice: {
       orders: null,
       fleet: null,
     },
@@ -212,129 +202,142 @@ export async function mountUploadScreen(
       orders: false,
       fleet: false,
     },
-    duplicateNotice: {
-      orders: null,
-      fleet: null,
-    },
     replacing: {
       orders: false,
       fleet: false,
     },
+    pendingFiles: {
+      orders: null,
+      fleet: null,
+    },
     libraries: {
       orders: [],
       fleet: [],
-    },
-    queries: {
-      orders: "",
-      fleet: "",
     },
   };
 
   root.replaceChildren();
   root.className = "dispatch dispatch-upload-screen";
 
-  const heading = el("header", null, "dispatch-upload-heading");
-  const headingCopy = el("div");
-  headingCopy.append(
+  const heading = el("header", null, "dispatch-upload-heading-v3");
+  const meta = el("div", null, "dispatch-upload-meta");
+  meta.append(
+    el("span", "DDA Logística", "dispatch-kicker"),
     el("span", "Paso 1 de 3", "dispatch-step-chip"),
+  );
+  heading.append(
+    meta,
     el("h1", "Cargar datos"),
     el(
       "p",
-      (
-        "Para calcular el plan necesitamos dos archivos: "
-        + "qué hay que entregar y con qué camiones."
-      ),
+      "Subí los dos archivos necesarios. Validamos todo antes de continuar.",
     ),
   );
-  const guideButton = document.createElement("button");
-  guideButton.type = "button";
-  guideButton.className = "dispatch-guide-button";
-  guideButton.textContent = "ⓘ Guía de formato";
-  heading.append(headingCopy, guideButton);
 
-  const stepper = makeStepper();
   const banner = el("section");
   banner.hidden = true;
-  const introSlot = el("div");
-  const shell = el("div", null, "dispatch-ingestion-layout");
-  const main = el("main", null, "dispatch-ingestion-main");
-  const preflightRoot = el("section");
-  const common = document.createElement("details");
-  common.className = "dispatch-common-errors";
-  const commonSummary = document.createElement("summary");
-  commonSummary.textContent = "Errores frecuentes y cómo resolverlos";
-  common.append(
-    commonSummary,
-    el(
-      "p",
-      (
-        "Fechas inválidas, IDs repetidos, distancias distintas para la misma ruta "
-        + "y encabezados cambiados se informan juntos para que puedas corregirlos "
-        + "en una sola pasada."
-      ),
-    ),
-  );
-  const summary = createSummaryPanel(() => {
-    if (!summary.button.disabled) {
-      onNext();
-    }
-  });
-  shell.append(main, summary.panel);
+
+  const cards = el("div", null, "dispatch-upload-cards-v3");
+  const validationRoot = el("section");
+  const finalBar = makeFinalBar(onNext);
+
   root.append(
     heading,
-    stepper.nav,
     banner,
-    introSlot,
-    shell,
+    makeHowItWorks(),
+    cards,
+    validationRoot,
+    finalBar.bar,
   );
-  main.append(preflightRoot, common);
 
   let guide = null;
+  let previousDrawer = null;
+  let validationDrawer = null;
   const refs = {};
 
-  function summaryState() {
-    const result = summary.update({
+  function reportFor(kind) {
+    return local.reports[kind] || state[kind]?.profile_json || null;
+  }
+
+  function finalState() {
+    const result = continueState({
       storageAvailable: Boolean(local.status?.available),
       orders: state.orders,
       fleet: state.fleet,
-      reports: local.reports,
+      reports: {
+        orders: reportFor("orders"),
+        fleet: reportFor("fleet"),
+      },
       preflight: state.preflight,
+      phases: local.phases,
+      saveErrors: local.saveErrors,
     });
-    updateStepper(
-      stepper,
-      state,
-      local.reports,
-      state.preflight,
-    );
-    window.dationSetDataReady(
-      Boolean(result.enabled && isReady()),
-    );
+    finalBar.update(result);
+    window.dationSetDataReady(Boolean(result.enabled));
+    return result;
   }
 
-  async function rename(kind) {
-    const dataset = state[kind];
-    const value = refs[kind].labelInput.value.trim();
-    if (!dataset || !value || value === dataset.label) {
+  function openValidation(kind, source) {
+    const report = reportFor(kind);
+    const file = currentFile(
+      state[kind],
+      report,
+      local.pendingFiles[kind],
+    );
+    if (!report) {
       return;
     }
-    try {
-      const response = await api(
-        `/api/datasets/${dataset.id}`,
-        {
-          method: "PATCH",
-          headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({label: value}),
+    validationDrawer.open({
+      report,
+      filename: file?.name || null,
+      source,
+      heading: Number(report.counts?.errors || 0)
+        ? "Revisar problemas"
+        : "Revisar observaciones",
+    });
+  }
+
+  function openRelationValidation(source) {
+    const errors = technicalPreflightErrors(state.preflight).map(
+      (item) => ({
+        ...item,
+        message: item.detail || "Referencia no encontrada.",
+        hint: (
+          "Corregí el identificador para que exista en el archivo de flota."
+        ),
+      }),
+    );
+    validationDrawer.open({
+      report: {
+        errors,
+        warnings: [],
+      },
+      source,
+      heading: "Compatibilidad entre archivos",
+    });
+  }
+
+  function renderValidation() {
+    renderValidationPanel(
+      validationRoot,
+      {
+        storageAvailable: Boolean(local.status?.available),
+        datasets: {
+          orders: state.orders,
+          fleet: state.fleet,
         },
-      );
-      state[kind] = response.dataset;
-      persist();
-      await loadLibrary(kind);
-      renderCard(kind);
-      summaryState();
-    } catch (error) {
-      local.saveErrors[kind] = error.message;
-      renderCard(kind);
-    }
+        reports: {
+          orders: reportFor("orders"),
+          fleet: reportFor("fleet"),
+        },
+        phases: local.phases,
+        saveErrors: local.saveErrors,
+        preflight: state.preflight,
+        onReview: openValidation,
+        onReviewRelations: openRelationValidation,
+      },
+    );
+    finalState();
   }
 
   function renderCard(kind) {
@@ -342,209 +345,126 @@ export async function mountUploadScreen(
     if (!ref) {
       return;
     }
-    const dataset = state[kind];
-    const report = cardReport(dataset, local.reports[kind]);
-    local.reports[kind] = report;
 
-    const visibleState = deriveCardState({
-      validation: report,
-      saved: dataset,
-      error: local.saveErrors[kind],
-      validating: local.validating[kind],
+    const report = reportFor(kind);
+    if (report) {
+      local.reports[kind] = report;
+    }
+
+    const cardState = deriveCardState({
+      report,
+      dataset: state[kind],
+      saveError: local.saveErrors[kind],
+      phase: local.phases[kind],
       storageAvailable: Boolean(local.status?.available),
       duplicate: local.duplicate[kind],
     });
-    ref.status.className = (
-      `dispatch-upload-status is-${visibleState.tone}`
-    );
-    ref.status.textContent = visibleState.label;
 
-    const fileInfo = currentFile(kind, dataset, report);
-    const compact = Boolean(
-      fileInfo
-      && !local.replacing[kind]
-      && !local.validating[kind],
+    const fileInfo = currentFile(
+      state[kind],
+      report,
+      local.pendingFiles[kind],
     );
-    ref.fileRow.hidden = !compact;
-    ref.drop.hidden = compact || local.validating[kind];
-    ref.progress.hidden = !local.validating[kind];
-    ref.card.classList.toggle("is-loaded", compact);
-    ref.card.classList.toggle(
-      "is-recurrent-fleet",
-      kind === "fleet" && Boolean(dataset),
-    );
+
+    const busy = local.phases[kind] !== "idle";
+    const showFile = Boolean(fileInfo) && !busy && !local.replacing[kind];
+    const showDrop = !busy && (!showFile || local.replacing[kind]);
+
+    ref.drop.hidden = !showDrop;
+    ref.progress.hidden = !busy;
+    ref.filePanel.hidden = !showFile;
+    ref.actions.hidden = !showFile;
+
+    if (busy) {
+      ref.progressTitle.textContent = local.phases[kind] === "uploading"
+        ? "Subiendo archivo…"
+        : "Validando estructura…";
+      ref.progressFile.textContent = local.pendingFiles[kind]?.name || "";
+    }
 
     if (fileInfo) {
       ref.fileName.textContent = fileInfo.name;
+      ref.fileState.textContent = cardState.label;
+      ref.fileState.className = (
+        `dispatch-file-state is-${cardState.tone}`
+      );
       ref.fileMeta.textContent = [
         fileSize(fileInfo.size),
-        fileInfo.createdAt
-          ? `cargado ${todayTime(fileInfo.createdAt)}`
-          : report?.detected
-            ? "validado"
-            : null,
+        fileInfo.rows != null
+          ? `${num(fileInfo.rows)} registros`
+          : null,
       ].filter(Boolean).join(" · ");
     }
 
-    ref.fields.hidden = !report?.valid;
-    if (
-      report?.valid
-      && document.activeElement !== ref.labelInput
-    ) {
-      ref.labelInput.value = (
-        dataset?.label
-        || report.suggested_label
-        || fileInfo?.name
-        || ""
-      );
-    }
-    if (kind === "fleet" && ref.defaultInput) {
-      ref.defaultInput.checked = dataset
-        ? Boolean(dataset.is_default)
-        : true;
-    }
+    const issues = (
+      Number(report?.counts?.errors || 0)
+      + Number(report?.counts?.warnings || 0)
+    );
+    ref.reviewProblems.hidden = !issues;
+    ref.reviewProblems.textContent = Number(report?.counts?.errors || 0)
+      ? "Revisar problemas"
+      : "Ver observaciones";
 
-    ref.notice.replaceChildren();
     ref.notice.hidden = true;
-    if (
+    ref.notice.replaceChildren();
+    const notice = (
       local.duplicateNotice[kind]
       || local.saveErrors[kind]
       || (
         report?.valid
-        && !dataset
+        && !state[kind]
         && !local.status?.available
+        ? (
+          "El archivo es válido, pero falta activar el almacenamiento "
+          + "para poder continuar."
+        )
+        : null
       )
-    ) {
+    );
+    if (notice) {
       ref.notice.hidden = false;
-      ref.notice.textContent = (
-        local.duplicateNotice[kind]
-        || local.saveErrors[kind]
-        || "Falta activar el almacenamiento. El archivo es válido, pero aún no se guarda."
-      );
+      ref.notice.textContent = notice;
     }
 
-    renderValidationReport(
-      ref.report,
-      report,
-      {saved: Boolean(dataset)},
+    ref.card.classList.toggle(
+      "is-file-valid",
+      cardState.key === "valid" || cardState.key === "duplicate",
     );
-    renderUnderstood(ref.understood, kind, report);
-    summaryState();
+
+    renderValidation();
   }
 
-  function libraryOptions(kind) {
-    return {
-      kind,
-      items: local.libraries[kind],
-      selected: state[kind],
-      query: local.queries[kind],
-      onSearch: (value) => loadLibrary(kind, value),
-      onSelect: async (dataset) => {
-        state[kind] = dataset;
-        local.reports[kind] = dataset.profile_json || null;
-        local.saveErrors[kind] = null;
-        local.replacing[kind] = false;
-        persist();
-        renderCard(kind);
-        await refreshPreflight();
-        await loadLibrary(kind);
-      },
-      onMakeDefault: async (dataset) => {
-        await post(`/api/datasets/${dataset.id}/default`, {});
-        state.fleet = {
-          ...dataset,
-          is_default: true,
-        };
-        persist();
-        await loadLibrary("fleet");
-        renderCard("fleet");
-        await refreshPreflight();
-      },
-      onArchive: async (dataset) => {
-        await post(`/api/datasets/${dataset.id}/archive`, {});
-        if (state[kind]?.id === dataset.id) {
-          state[kind] = null;
-          local.reports[kind] = null;
-          persist();
-        }
-        await loadLibrary(kind);
-        renderCard(kind);
-        await refreshPreflight();
-      },
-      onUndo: async (dataset) => {
-        await post(`/api/datasets/${dataset.id}/unarchive`, {});
-        await loadLibrary(kind);
-      },
-    };
-  }
-
-  async function loadLibrary(
-    kind,
-    query = local.queries[kind],
-  ) {
-    local.queries[kind] = query;
+  async function loadLibrary(kind) {
     if (!local.status?.available) {
       local.libraries[kind] = [];
-      if (refs[kind]) {
-        renderLibrary(
-          refs[kind].library,
-          libraryOptions(kind),
-        );
-      }
       return;
     }
-
-    const search = query
-      ? `&q=${encodeURIComponent(query)}`
-      : "";
     const response = await api(
-      `/api/datasets?type=${kind}&limit=20&offset=0${search}`,
+      `/api/datasets?type=${kind}&limit=20&offset=0`,
     );
     local.libraries[kind] = response.items || [];
 
     if (state[kind]) {
-      state[kind] = (
-        local.libraries[kind].find(
-          (item) => item.id === state[kind].id,
-        )
-        || state[kind]
+      const refreshed = local.libraries[kind].find(
+        (item) => item.id === state[kind].id,
       );
-    }
-
-    if (kind === "fleet" && !state.fleet) {
-      state.fleet = (
-        local.libraries.fleet.find(
-          (item) => item.is_default,
-        )
-        || null
-      );
-      if (state.fleet) {
-        local.reports.fleet = state.fleet.profile_json || null;
+      if (refreshed) {
+        state[kind] = refreshed;
+        local.reports[kind] = refreshed.profile_json || null;
+        persist();
       }
-    }
-
-    persist();
-    if (refs[kind]) {
-      renderLibrary(
-        refs[kind].library,
-        libraryOptions(kind),
-      );
     }
   }
 
   async function refreshPreflight() {
     state.preflight = null;
-    renderPreflight(
-      preflightRoot,
-      null,
-      state.orders,
-      state.fleet,
-    );
-    summaryState();
+    renderValidation();
 
     if (
       !state.orders
       || !state.fleet
+      || !reportFor("orders")?.valid
+      || !reportFor("fleet")?.valid
       || !local.status?.available
     ) {
       return;
@@ -555,51 +475,54 @@ export async function mountUploadScreen(
     } catch (error) {
       state.preflight = {
         valid: false,
-        findings: [
+        errors: [
           {
-            id: "preflight_error",
-            severity: "error",
-            title: "No pudimos completar la revisión conjunta",
-            consequence: error.message,
-            items: [],
+            code: "PREFLIGHT_REQUEST_FAILED",
+            detail: error.message,
           },
         ],
-        errors: [{detail: error.message}],
         warnings: [],
         anomalies: [],
-        readiness: {
-          can_continue: false,
-          blockers: [error.message],
-          reason: error.message,
-        },
       };
     }
+    renderValidation();
+  }
 
-    renderPreflight(
-      preflightRoot,
-      state.preflight,
-      state.orders,
-      state.fleet,
-    );
-    summaryState();
+  async function selectPrevious(kind, dataset) {
+    state[kind] = dataset;
+    local.reports[kind] = dataset.profile_json || null;
+    local.pendingFiles[kind] = null;
+    local.saveErrors[kind] = null;
+    local.duplicateNotice[kind] = null;
+    local.duplicate[kind] = false;
+    local.replacing[kind] = false;
+    persist();
+    renderCard(kind);
+    await refreshPreflight();
+  }
+
+  function openPrevious(kind, source) {
+    previousDrawer.open({
+      kind,
+      items: local.libraries[kind],
+      selected: state[kind],
+      source,
+      onSelect: (dataset) => selectPrevious(kind, dataset),
+    });
   }
 
   async function saveValid(kind, file) {
-    const report = local.reports[kind];
     if (!local.status?.available) {
+      local.phases[kind] = "idle";
       renderCard(kind);
       return;
     }
 
+    local.phases[kind] = "uploading";
+    renderCard(kind);
+
     const form = new FormData();
     form.append("file", file);
-    form.append(
-      "label",
-      report?.suggested_label || file.name,
-    );
-    if (kind === "fleet" && state.fleet?.id) {
-      form.append("parent_dataset_id", state.fleet.id);
-    }
 
     try {
       const stored = await api(
@@ -609,11 +532,10 @@ export async function mountUploadScreen(
           body: form,
         },
       );
-      const dataset = (
-        stored.dataset
-        || stored.existing_dataset
-      );
+
+      const dataset = stored.dataset || stored.existing_dataset;
       state[kind] = dataset;
+      local.reports[kind] = stored.validation || local.reports[kind];
       local.saveErrors[kind] = null;
       local.duplicate[kind] = Boolean(stored.duplicate);
       local.duplicateNotice[kind] = stored.duplicate
@@ -627,38 +549,53 @@ export async function mountUploadScreen(
           + ". Usamos esa versión."
         )
         : null;
-
-      if (
-        kind === "fleet"
-        && refs[kind].defaultInput?.checked
-      ) {
-        await post(
-          `/api/datasets/${dataset.id}/default`,
-          {},
-        );
-        state.fleet = {
-          ...dataset,
-          is_default: true,
-        };
-      }
-
-      persist();
       local.replacing[kind] = false;
+      local.pendingFiles[kind] = null;
+      local.phases[kind] = "idle";
+      persist();
+
       await loadLibrary(kind);
       renderCard(kind);
+      refocusSuccess(kind);
       await refreshPreflight();
     } catch (error) {
+      local.phases[kind] = "idle";
       local.saveErrors[kind] = error.message;
+      state[kind] = null;
+      persist();
       renderCard(kind);
     }
   }
 
+  function refocusSuccess(kind) {
+    const card = refs[kind].card;
+    card.classList.remove("is-accepted");
+    window.requestAnimationFrame(() => {
+      card.classList.add("is-accepted");
+      window.setTimeout(
+        () => card.classList.remove("is-accepted"),
+        500,
+      );
+    });
+  }
+
   async function handleFile(kind, file) {
     const problem = clientFileProblem(file);
+    local.pendingFiles[kind] = file;
+    local.saveErrors[kind] = null;
+    local.duplicate[kind] = false;
+    local.duplicateNotice[kind] = null;
+    local.replacing[kind] = false;
+
     if (problem) {
+      state[kind] = null;
       local.reports[kind] = {
         valid: false,
         rows: 0,
+        file: {
+          name: file?.name || "archivo.csv",
+          size_bytes: file?.size || 0,
+        },
         errors: [
           {
             code: "INVALID_FILE",
@@ -670,14 +607,14 @@ export async function mountUploadScreen(
         counts: {errors: 1, warnings: 0},
         truncated: false,
       };
+      local.phases[kind] = "idle";
+      persist();
       renderCard(kind);
+      await refreshPreflight();
       return;
     }
 
-    local.validating[kind] = true;
-    local.saveErrors[kind] = null;
-    local.duplicate[kind] = false;
-    local.duplicateNotice[kind] = null;
+    local.phases[kind] = "processing";
     renderCard(kind);
 
     try {
@@ -690,66 +627,42 @@ export async function mountUploadScreen(
           body: form,
         },
       );
+
       local.reports[kind] = report;
       if (!report.valid) {
         state[kind] = null;
+        local.phases[kind] = "idle";
         persist();
+        renderCard(kind);
+        await refreshPreflight();
+        return;
       }
-      if (report.valid) {
-        await saveValid(kind, file);
-      }
+
+      await saveValid(kind, file);
     } catch (error) {
+      state[kind] = null;
+      local.phases[kind] = "idle";
       local.reports[kind] = {
         valid: false,
         rows: 0,
+        file: {
+          name: file.name,
+          size_bytes: file.size,
+        },
         errors: [
           {
             code: "VALIDATION_REQUEST_FAILED",
             message: error.message,
-            hint: "Reintentá. Si persiste, revisá la conexión.",
+            hint: "Reintentá la carga. Si persiste, revisá la conexión.",
           },
         ],
         warnings: [],
         counts: {errors: 1, warnings: 0},
         truncated: false,
       };
-    } finally {
-      local.validating[kind] = false;
-      renderCard(kind);
-    }
-  }
-
-  async function loadSamples(button) {
-    button.disabled = true;
-    button.textContent = "Cargando datos de ejemplo…";
-    try {
-      const result = await post(
-        "/api/datasets/load-sample",
-        {},
-      );
-      state.orders = result.orders;
-      state.fleet = result.fleet;
-      local.reports.orders = result.orders_validation;
-      local.reports.fleet = result.fleet_validation;
       persist();
-      localStorage.setItem(INTRO_KEY, "1");
-      introSlot.replaceChildren();
-      await Promise.all([
-        loadLibrary("orders"),
-        loadLibrary("fleet"),
-      ]);
-      renderCard("orders");
-      renderCard("fleet");
+      renderCard(kind);
       await refreshPreflight();
-    } catch (error) {
-      button.disabled = false;
-      button.textContent = "Probar con datos de ejemplo";
-      banner.hidden = false;
-      banner.className = "dispatch-system-banner";
-      banner.replaceChildren(
-        el("strong", "No pudimos cargar los datos de ejemplo"),
-        el("p", error.message),
-      );
     }
   }
 
@@ -764,31 +677,15 @@ export async function mountUploadScreen(
     renderSystemBanner(banner, status);
 
     guide = createGuideDrawer(contracts);
-    guideButton.onclick = () => {
-      guide.open("orders", guideButton);
-    };
+    previousDrawer = createPreviousDrawer();
+    validationDrawer = createValidationDrawer();
 
     for (const kind of ["orders", "fleet"]) {
-      refs[kind] = createDropCard(
-        kind,
-        contracts.formats[kind],
-        (tab, source) => guide.open(tab, source),
-      );
-    }
+      const ref = createDropCard(kind, contracts.formats[kind]);
+      refs[kind] = ref;
+      cards.append(ref.card);
 
-    main.prepend(
-      refs.orders.card,
-      refs.fleet.card,
-    );
-
-    for (const kind of ["orders", "fleet"]) {
-      const ref = refs[kind];
       ref.drop.onclick = () => ref.file.click();
-      ref.replace.onclick = () => {
-        local.replacing[kind] = true;
-        renderCard(kind);
-        ref.file.click();
-      };
       ref.file.onchange = () => {
         const selected = ref.file.files?.[0];
         if (selected) {
@@ -796,6 +693,7 @@ export async function mountUploadScreen(
         }
         ref.file.value = "";
       };
+
       ref.drop.ondragover = (event) => {
         event.preventDefault();
         ref.drop.classList.add("is-dragging");
@@ -803,88 +701,45 @@ export async function mountUploadScreen(
       };
       ref.drop.ondragleave = () => {
         ref.drop.classList.remove("is-dragging");
+        ref.drop.querySelector("strong").textContent = dropTitle(kind);
       };
       ref.drop.ondrop = (event) => {
         event.preventDefault();
         ref.drop.classList.remove("is-dragging");
+        ref.drop.querySelector("strong").textContent = dropTitle(kind);
         const selected = event.dataTransfer?.files?.[0];
         if (selected) {
           handleFile(kind, selected);
         }
       };
-      ref.labelInput.onchange = () => rename(kind);
-      if (kind === "fleet" && ref.defaultInput) {
-        ref.defaultInput.onchange = async () => {
-          if (!state.fleet) {
-            return;
-          }
-          if (!ref.defaultInput.checked && state.fleet.is_default) {
-            ref.defaultInput.checked = true;
-            ref.notice.hidden = false;
-            ref.notice.textContent = (
-              "Para dejar de usar esta flota como vigente, "
-              + "marcá otra versión como vigente."
-            );
-            return;
-          }
-          if (ref.defaultInput.checked) {
-            await post(
-              `/api/datasets/${state.fleet.id}/default`,
-              {},
-            );
-            state.fleet.is_default = true;
-            persist();
-            await loadLibrary("fleet");
-            renderCard("fleet");
-          }
-        };
+
+      ref.replace.onclick = () => {
+        local.replacing[kind] = true;
+        renderCard(kind);
+        ref.file.click();
+      };
+      ref.reviewColumns.onclick = () => {
+        guide.open(kind, ref.reviewColumns);
+      };
+      ref.reviewProblems.onclick = () => {
+        openValidation(kind, ref.reviewProblems);
+      };
+      ref.previous.onclick = () => {
+        openPrevious(kind, ref.previous);
+      };
+
+      if (state[kind]?.profile_json) {
+        local.reports[kind] = state[kind].profile_json;
       }
+      renderCard(kind);
     }
 
     await Promise.all([
       loadLibrary("orders"),
       loadLibrary("fleet"),
     ]);
-
-    if (state.orders?.profile_json) {
-      local.reports.orders = state.orders.profile_json;
-    }
-    if (state.fleet?.profile_json) {
-      local.reports.fleet = state.fleet.profile_json;
-    }
-
-    renderLibrary(
-      refs.orders.library,
-      libraryOptions("orders"),
-    );
-    renderLibrary(
-      refs.fleet.library,
-      libraryOptions("fleet"),
-    );
     renderCard("orders");
     renderCard("fleet");
-
-    const dismissed = localStorage.getItem(INTRO_KEY) === "1";
-    const firstTime = (
-      !dismissed
-      && !state.orders
-      && !state.fleet
-      && !local.libraries.orders.length
-      && !local.libraries.fleet.length
-    );
-    if (firstTime) {
-      let intro = null;
-      intro = makeIntroduction(
-        (event) => loadSamples(event.currentTarget),
-        (tab, source) => guide.open(tab, source),
-        () => {
-          localStorage.setItem(INTRO_KEY, "1");
-          intro?.remove();
-        },
-      );
-      introSlot.append(intro);
-    }
-
     await refreshPreflight();
   } catch (error) {
     state.available = false;
@@ -893,13 +748,10 @@ export async function mountUploadScreen(
       checks: [],
       message: (
         "No pudimos consultar el estado del sistema. "
-        + "Podés reintentar recargando la pantalla."
+        + "Recargá la pantalla para reintentar."
       ),
     };
     renderSystemBanner(banner, local.status);
-    preflightRoot.replaceChildren(
-      el("p", error.message, "dispatch-alert"),
-    );
-    summaryState();
+    renderValidation();
   }
 }
