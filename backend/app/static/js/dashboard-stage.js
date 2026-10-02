@@ -2535,7 +2535,7 @@
   }
 
   async function recoverRun(run) {
-    if (run.result_json && run.result_json.schema_version === 'dispatch_v1') {
+    if (run.result_json && ['dispatch_v1','dispatch_v2'].includes(run.result_json.schema_version)) {
       var dispatch = await import('./dispatch/workspace.mjs');
       dispatch.show(run);
       return;
@@ -3253,7 +3253,7 @@
   }
 
   async function restoreExecution() {
-    if (new URLSearchParams(location.search).get('dda') === 'dispatch_v1') return;
+    if (['dispatch_v1','dispatch_v2'].includes(new URLSearchParams(location.search).get('dda'))) return;
     var stored = loadContext();
     var urlRunId = runFromUrl();
 
