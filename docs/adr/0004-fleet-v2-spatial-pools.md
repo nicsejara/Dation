@@ -33,4 +33,4 @@ No se agregan tablas ni columnas. `datasets.schema_version` ya acepta texto y pu
 
 ## Limitación deliberada
 
-La disponibilidad sigue siendo diaria. Un vehículo utilizado hoy vuelve a estar disponible al día siguiente aunque el viaje/retorno dure más de un día. Esa limitación queda explícita en assumptions y será eliminada en la fase 3 mediante ocupación temporal de recursos.
+Esta ADR documenta el alcance de la fase 2. La limitación de disponibilidad diaria fue eliminada posteriormente por ADR 0005, que introduce ocupación temporal multiday del recurso.
