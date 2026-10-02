@@ -263,6 +263,26 @@ class FrontendContractTests(
             "SLA",
             workspace,
         )
+        self.assertIn(
+            "Dimensiones del modelo",
+            workspace,
+        )
+        self.assertIn(
+            "Profundidad del análisis",
+            workspace,
+        )
+        self.assertIn(
+            "analysis_depth",
+            workspace,
+        )
+        self.assertNotIn(
+            "Reglas de la distribución",
+            workspace,
+        )
+        self.assertNotIn(
+            "state.preflight.warnings",
+            workspace,
+        )
         self.assertNotIn(
             "Viajes mínimos",
             workspace,
@@ -290,7 +310,7 @@ class FrontendContractTests(
             self.dashboard_stage_js,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=dispatch-ingestion-v3",
+            "/static/js/dispatch/workspace.mjs?v=decision-composer-v1",
             self.html,
         )
         self.assertIn(
@@ -314,7 +334,7 @@ class FrontendContractTests(
             config_render,
         )
         self.assertIn(
-            "node.innerHTML=`<h1>Configurar la decisión",
+            "dispatch-config-screen",
             config_render,
         )
 

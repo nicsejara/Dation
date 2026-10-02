@@ -113,6 +113,39 @@ class DispatchValidationTests(unittest.TestCase):
         self.assertAlmostEqual(config.weights.utilization, .2)
         self.assertAlmostEqual(config.weights.co2, .2)
 
+    def test_dimension_contract_and_dynamic_balanced_weights(self):
+        config = DispatchConfig(
+            objective='balanced',
+            dimensions=['cost', 'time'],
+        )
+        self.assertEqual(
+            config.dimensions,
+            ['cost', 'time'],
+        )
+        self.assertAlmostEqual(config.weights.cost, .5)
+        self.assertAlmostEqual(config.weights.time, .5)
+        self.assertEqual(config.weights.utilization, 0)
+        self.assertEqual(config.weights.co2, 0)
+
+        with self.assertRaisesRegex(ValueError, 'requiere activar'):
+            DispatchConfig(
+                objective='min_co2',
+                dimensions=['cost', 'time'],
+            )
+
+        with self.assertRaisesRegex(ValueError, 'inactiva'):
+            DispatchConfig(
+                mode='custom',
+                objective='custom',
+                dimensions=['cost', 'time'],
+                weights={
+                    'cost': .4,
+                    'time': .4,
+                    'utilization': .2,
+                    'co2': 0,
+                },
+            )
+
     def test_alias_and_explicit_day_first_dates(self):
         from test_dispatch_engine import order,csv_bytes,COLUMNS
         data=csv_bytes(COLUMNS,[{**order(),'ready_date':'10/1/2026'}])

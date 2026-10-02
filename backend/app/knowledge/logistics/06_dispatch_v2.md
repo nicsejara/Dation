@@ -1,6 +1,6 @@
 # Contrato dispatch_v2 — SLA primero, negocio después
 
-Estas reglas corresponden a logistics-dispatch-engine 2.0.0 y al envelope `dispatch_v2`.
+Estas reglas corresponden a logistics-dispatch-engine 2.1.0 y al envelope `dispatch_v2`.
 
 ## Orden de decisión
 
@@ -17,7 +17,7 @@ Nunca explicar una tardanza como consecuencia aceptada para ahorrar costo o CO�
 - `min_time`: minimizar tiempo medio de entrega ponderado por unidades.
 - `max_utilization`: maximizar participación de flota propia minimizando el peso tercerizado. `own_load_utilization` es un KPI complementario y no debe confundirse con el objetivo.
 - `min_co2`: minimizar CO₂ estimado del ciclo ida y vuelta.
-- `balanced`: ponderación equivalente de costo, tiempo, uso propio y CO₂.
+- `balanced`: ponderación equivalente entre las dimensiones activas.
 - `custom`: ponderación explícita del usuario entre las cuatro dimensiones.
 
 Viajes sigue siendo KPI y desempate, no una prioridad configurable.

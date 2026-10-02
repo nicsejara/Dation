@@ -8,7 +8,7 @@ Dispatch 1.2.0 ya representaba demanda, ubicación de flota y ocupación tempora
 
 ## Decisión
 
-El motor adopta `schema_version=dispatch_v2` y `engine_version=2.0.0`.
+El motor adopta `schema_version=dispatch_v2` y `engine_version=2.1.0`.
 
 La optimización se resuelve lexicográficamente:
 
@@ -28,7 +28,7 @@ Los objetivos configurables son:
 - `min_time`: tiempo medio ponderado por unidades;
 - `max_utilization`: minimizar participación de kg tercerizados, equivalente operacional a maximizar participación de flota propia;
 - `min_co2`: emisiones estimadas ida + vuelta;
-- `balanced`: 25 % por dimensión;
+- `balanced`: reparto uniforme entre las dimensiones activas;
 - `custom`: pesos explícitos entre costo, tiempo, uso propio y CO₂.
 
 `total_trips` permanece como KPI y desempate determinístico, no como objetivo configurable.
@@ -84,3 +84,7 @@ La migración `20261002184751_dispatch_v2_integrity.sql` amplía el trigger exis
 El horizonte de recuperación no convierte una tardanza en una solución deseable: únicamente permite encontrar la distribución completa de menor daño de servicio.
 
 La clasificación `capacity_or_policy_sla_violations` no atribuye causalidad específica. Para afirmar que una tardanza fue causada por capacidad, tercerización deshabilitada u otra política se requiere evidencia determinística adicional.
+
+## Decision Composer 2.1
+
+La configuración distingue entre restricciones físicas obligatorias y dimensiones de negocio opcionales. `dimensions` controla qué ejes participan del balance, comparaciones y sensibilidad. `analysis_depth` puede ser `essential`, `comparative` o `deep`; este valor controla cuántos escenarios ejecuta el motor y no es sólo una preferencia visual.
