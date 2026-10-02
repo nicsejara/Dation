@@ -143,6 +143,29 @@ class DispatchIngestionValidationTests(unittest.TestCase):
         self.assertEqual(zero_slack["count"], 26)
         self.assertTrue(result["readiness"]["can_continue"])
 
+    def test_v2_sample_is_spatially_scoped(self):
+        orders = validate_orders_report(
+            (ROOT / "sample_data" / "v2" / "orders.csv").read_bytes()
+        )
+        fleet = validate_fleet_report(
+            (ROOT / "sample_data" / "v2" / "fleet.csv").read_bytes()
+        )
+        self.assertTrue(orders["valid"])
+        self.assertEqual(orders["schema"], "orders_v2")
+        self.assertTrue(fleet["valid"])
+        self.assertEqual(fleet["schema"], "fleet_v2")
+        self.assertTrue(fleet["profile"]["spatially_scoped"])
+        self.assertEqual(
+            fleet["profile"]["bases"],
+            ["Buenos Aires", "Cordoba", "Rosario"],
+        )
+        self.assertEqual(fleet["profile"]["own_units_per_day"], 11)
+        self.assertEqual(
+            fleet["profile"]["own_capacity_kg_per_day"],
+            167000,
+        )
+        self.assertEqual(fleet["profile"]["global_scope_pools"], 1)
+
     def test_report_caps_visible_problems_at_one_hundred(self):
         header = (
             "order_id;product;quantity_units;unit_weight_kg;origin;"
