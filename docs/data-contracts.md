@@ -1,10 +1,10 @@
-# Contratos de datos — dispatch_v1
+# Contratos de datos — transición Dispatch v2
 
-La ingesta nueva usa dos archivos CSV separados: **órdenes** y **flota**. Ambos aceptan UTF-8 con BOM opcional, encabezado en la primera fila, separador `;' o `,`, hasta 10 MB. Se recomiendan fechas ISO y decimales con punto; con separador punto y coma también se admite coma decimal. La validación informa hasta 100 problemas con código, fila, columna, mensaje y sugerencia.
+La ingesta usa dos archivos CSV separados: **órdenes** y **flota**. En la primera fase de transición a Dispatch v2, órdenes adopta el contrato **orders_v2** mientras flota continúa en **fleet_v1** y el motor sigue ejecutando **dispatch_v1**. Ambos archivos aceptan UTF-8 con BOM opcional, encabezado en la primera fila, separador `;` o `,`, hasta 10 MB. Se recomiendan fechas ISO y decimales con punto; con separador punto y coma también se admite coma decimal. La validación informa hasta 100 problemas con código, fila, columna, mensaje y sugerencia.
 
 La fuente ejecutable de estos contratos es `backend/app/validators/contracts.py`. El endpoint `GET /api/dispatch/contracts`, la ayuda de la pantalla y las plantillas descargables se derivan de esa definición. Cada plantilla incluye exactamente 5 registros de ejemplo válidos y funciona como template y ejemplo a la vez. Los archivos `sample_data/v1/orders.csv` y `fleet.csv` se mantienen sólo como fixtures internos de QA.
 
-## orders.csv — orders_v1
+## orders.csv — orders_v2
 
 | Columna | Contrato |
 |---|---|
@@ -16,10 +16,9 @@ La fuente ejecutable de estos contratos es `backend/app/validators/contracts.py`
 | `distance_km` | Distancia positiva de ida; consistente para la misma ruta |
 | `priority` | `High`, `Normal` o `Low` |
 | `max_delivery_days` | Entero de 1 a 90 |
-| `dispatch_date` | `YYYY-MM-DD` o día/mes/año |
-| `current_vehicle_type` | Opcional; referencia informada, alias `vehicle_type` |
+| `ready_date` | Primera fecha en la que la carga está disponible; `YYYY-MM-DD` o día/mes/año |
 
-`10/1/2026` significa 10 de enero. No se infiere formato estadounidense. Una variación de peso para el mismo producto es advertencia; no se normaliza ni corrige en silencio. Un CSV del formato histórico mezclado se detecta como `legacy_mixed` y la interfaz explica que debe separarse en órdenes y flota.
+`dispatch_date` se acepta temporalmente como alias de `ready_date` para archivos ya existentes. `current_vehicle_type` y `vehicle_type` ya no forman parte del contrato de órdenes: si aparecen en un archivo histórico se informan como columnas extra y se eliminan antes de ejecutar el motor, por lo que no pueden condicionar la decisión. `10/1/2026` significa 10 de enero. No se infiere formato estadounidense. Una variación de peso para el mismo producto es advertencia; no se normaliza ni corrige en silencio. Un CSV del formato histórico mezclado se detecta como `legacy_mixed` y la interfaz explica que debe separarse en órdenes y flota.
 
 ## fleet.csv — fleet_v1
 
@@ -44,7 +43,7 @@ Respuesta resumida:
 ```json
 {
   "valid": false,
-  "detected_format": "orders_v1",
+  "detected_format": "orders_v2",
   "file": {"name": "orders.csv", "size_bytes": 8600, "sha256": "..."},
   "rows": 100,
   "columns": 11,
@@ -53,7 +52,7 @@ Respuesta resumida:
     {
       "code": "INVALID_DATE",
       "row": 15,
-      "column": "dispatch_date",
+      "column": "ready_date",
       "message": "La fecha no es válida.",
       "hint": "Usá AAAA-MM-DD o d/m/AAAA."
     }
@@ -68,7 +67,7 @@ Los consumidores estrictos del motor continúan usando `validate_orders_csv` y `
 
 ## Validación conjunta
 
-Cuando ambos datasets válidos ya están guardados, `POST /api/runs/preflight` verifica compatibilidad cruzada: referencias de camión, capacidad por unidad, disponibilidad y plazos. Los errores bloquean; las advertencias permiten continuar; las anomalías requieren una decisión explícita posterior.
+Cuando ambos datasets válidos ya están guardados, `POST /api/runs/preflight` verifica compatibilidad cruzada: capacidad por unidad, disponibilidad y plazos. Las columnas históricas de asignación de vehículo no participan de esta verificación. Los errores bloquean; las advertencias permiten continuar; las anomalías requieren una decisión explícita posterior.
 
 ## Biblioteca y versionado
 
@@ -94,7 +93,7 @@ Todos requieren la autenticación de la plataforma. El upload sin `dataset_type`
 
 ## Resultado
 
-`schema_version=dispatch_v1`, motor 1.0.0, inputs versionados, configuración, reglas, anomalías, escenarios, sensibilidad y huella. El `result_fingerprint` identifica la parte determinística, no metadatos de persistencia.
+En esta fase el resultado sigue siendo `schema_version=dispatch_v1` y motor 1.0.0. El cambio afecta únicamente al contrato de órdenes y a su semántica: `ready_date` representa disponibilidad, no una salida ya decidida. El `result_fingerprint` continúa identificando la parte determinística, no metadatos de persistencia.
 
 
 ## UX de ingesta v2
@@ -121,6 +120,6 @@ emisiones, consolidación ni resultados potenciales del optimizador. Esos datos 
 existiendo en el preflight por compatibilidad, pero se consumen a partir de **Configurar
 decisión**.
 
-Un error de referencia entre archivos, como un tipo de camión informado en órdenes que no
-existe en flota, sí pertenece a esta etapa porque impide resolver correctamente el contrato
-de datos.
+Las columnas históricas `current_vehicle_type` o `vehicle_type` pueden generar una advertencia
+de columna extra, pero no bloquean la carga y se descartan antes del motor. La asignación de
+vehículo será responsabilidad exclusiva de la decisión generada.
