@@ -12,9 +12,9 @@ The first active Decision Asset is **DDA Logística**.
 Current end-to-end flow:
 
 ```text
-Orders CSV + versioned fleet CSV
+Orders v2 CSV + spatial fleet v2 CSV
         ↓
-validation + dataset profile
+validation + dataset profile + origin/base compatibility
         ↓
 decision configuration
 (cost / trips / delivery time)
@@ -33,7 +33,7 @@ traceability + export
 ## Current versions
 
 - Workspace / API: **1.0.0**
-- Dispatch engine: **1.0.0** (`dispatch_v1`); historical engine **0.2.0** retained
+- Dispatch engine: **1.1.0** (`dispatch_v1` envelope, spatial fleet pools enabled); historical engine **0.2.0** retained
 - Frontend: HTML + CSS + vanilla JavaScript
 - Runtime: Google Cloud Run
 - Data / storage: Supabase
