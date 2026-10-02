@@ -2,7 +2,7 @@
   {
     "case": "01_consolidacion",
     "configuration": {
-      "objective": "min_trips"
+      "objective": "min_cost"
     },
     "options": {},
     "expected": {
@@ -81,7 +81,10 @@
     },
     "options": {},
     "expected": {
-      "error_contains": "No se encontró una distribución factible"
+      "units_delivered": 3,
+      "total_trips": 3,
+      "late_orders": 1,
+      "on_time_rate": 0
     }
   },
   {
