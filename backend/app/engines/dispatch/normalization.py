@@ -30,7 +30,8 @@ FINDING_COPY = {
     "capacity_vs_demand": {
         "severity": "warning",
         "consequence": (
-            "La decisión podrá tercerizar o reprogramar salidas dentro de cada plazo."
+            "Es una comparación nominal del día; la optimización además descuenta "
+            "unidades que sigan ocupadas por viajes anteriores."
         ),
     },
     "zero_slack": {
@@ -221,6 +222,7 @@ def _capacity_check(orders, fleet):
                 }
             )
         return {
+            "basis": "nominal_same_day",
             "scope": "global_legacy",
             "own_capacity_kg_per_day": float(own_capacity),
             "capacity_by_origin": {},
@@ -271,6 +273,7 @@ def _capacity_check(orders, fleet):
         )
 
     return {
+        "basis": "nominal_same_day",
         "scope": "by_origin",
         "own_capacity_kg_per_day": float(sum(capacity_by_key.values(), D(0))),
         "capacity_by_origin": {
@@ -483,7 +486,7 @@ def preflight(orders, fleet, reference_fleet=None):
             _finding(
                 "capacity_vs_demand",
                 (
-                    "Tu demanda supera la capacidad propia en "
+                    "La demanda del día supera la capacidad propia nominal en "
                     f"{capacity_check['days_over']} de "
                     f"{capacity_check['total_days']} {scope_label}"
                 ),
