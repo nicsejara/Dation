@@ -82,9 +82,13 @@ export function render(root,run,onRerun){
     explanation.chat(aside,run,question);
   }
 
-  root.addEventListener('dispatch:open-chat',event=>{
+  if(root._dispatchChatHandler){
+    root.removeEventListener('dispatch:open-chat',root._dispatchChatHandler);
+  }
+  root._dispatchChatHandler=event=>{
     openChat(event.detail?.question||'');
-  });
+  };
+  root.addEventListener('dispatch:open-chat',root._dispatchChatHandler);
 
   root.querySelector('[data-csv]').onclick=()=>plan.exportPlan(result);
   root.querySelector('[data-rerun]').onclick=onRerun;
