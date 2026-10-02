@@ -17,9 +17,9 @@ Orders v2 CSV + spatial fleet v2 CSV
 validation + dataset profile + origin/base compatibility
         ↓
 decision configuration
-(cost / trips / delivery time)
+(SLA first → cost / time / own-fleet use / CO₂)
         ↓
-Bounded CP-SAT + spatial/temporal resource constraints + validated deterministic candidates
+Lexicographic CP-SAT: SLA first + spatial/temporal resources + business objective
         ↓
 DecisionResult JSON
         ↓
@@ -33,7 +33,7 @@ traceability + export
 ## Current versions
 
 - Workspace / API: **1.0.0**
-- Dispatch engine: **1.2.0** (`dispatch_v1` envelope, spatial pools + multiday resource occupancy enabled); historical engine **0.2.0** retained
+- Dispatch engine: **2.0.0** (`dispatch_v2`, SLA-first + cost/time/own-fleet/CO₂ objectives); historical engine **0.2.0** retained
 - Frontend: HTML + CSS + vanilla JavaScript
 - Runtime: Google Cloud Run
 - Data / storage: Supabase
