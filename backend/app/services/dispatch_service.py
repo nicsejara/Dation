@@ -1,6 +1,7 @@
 """Versioned input persistence and Dispatch execution services."""
 import asyncio
 from datetime import datetime, timezone
+from pathlib import Path
 import hashlib
 import json
 from time import perf_counter
@@ -290,6 +291,48 @@ async def available():
     return bool((await system_status())["available"])
 
 
+async def _ensure_profile(dataset):
+    kind = dataset.get("dataset_type")
+    if kind not in REPORT_VALIDATORS:
+        return dataset
+
+    stored = dataset.get("profile_json") or {}
+    profile = stored.get("profile") or {}
+    if profile.get("profile_version") == 2:
+        return dataset
+
+    try:
+        contents = await download_dataset(dataset)
+        report = REPORT_VALIDATORS[kind](contents)
+        if not report["valid"]:
+            return dataset
+
+        public = {
+            key: value
+            for key, value in report.items()
+            if key != "records"
+        }
+        values = {
+            "profile_json": public,
+            "row_count": report["rows"],
+            "column_count": report["columns"],
+        }
+        if not dataset.get("label"):
+            values["label"] = (
+                report.get("suggested_label")
+                or dataset.get("original_filename")
+            )
+        rows = await db(
+            "PATCH",
+            "datasets",
+            params={"id": f"eq.{dataset['id']}"},
+            body=values,
+        )
+        return rows[0] if rows else {**dataset, **values}
+    except (httpx.HTTPError, ValueError):
+        return dataset
+
+
 async def list_typed(kind, limit=100, offset=0, q=None, include_archived=False):
     params = {
         "select": "*",
@@ -306,7 +349,11 @@ async def list_typed(kind, limit=100, offset=0, q=None, include_archived=False):
             params["or"] = (
                 f"(label.ilike.*{safe}*,original_filename.ilike.*{safe}*)"
             )
-    return await db("GET", "datasets", params=params)
+
+    rows = await db("GET", "datasets", params=params)
+    return await asyncio.gather(
+        *(_ensure_profile(dataset) for dataset in rows)
+    )
 
 
 async def archive_dataset(dataset_id: str, archived: bool):
@@ -369,6 +416,11 @@ async def store_input(
         for key, value in validation.items()
         if key != "records"
     }
+    public["valid"] = True
+    public["counts"] = {
+        "errors": 0,
+        "warnings": len(validation.get("warnings") or []),
+    }
     if existing:
         return {
             "duplicate": True,
@@ -410,7 +462,11 @@ async def store_input(
                     "column_count": validation["columns"],
                     "dataset_type": kind,
                     "schema_version": validation["schema"],
-                    "label": label or filename,
+                    "label": (
+                        label
+                        or validation.get("suggested_label")
+                        or filename
+                    ),
                     "parent_dataset_id": parent,
                     "profile_json": public,
                     "is_sample": bool(is_sample),
@@ -444,6 +500,112 @@ async def store_input(
         "duplicate": False,
         "dataset": result[0],
         "validation": public,
+    }
+
+
+async def update_dataset_label(dataset_id: str, label: str):
+    clean = label.strip()
+    if not clean:
+        raise ValueError("El nombre no puede quedar vacío.")
+    if len(clean) > 120:
+        raise ValueError("El nombre no puede superar 120 caracteres.")
+    rows = await db(
+        "PATCH",
+        "datasets",
+        params={"id": f"eq.{dataset_id}"},
+        body={"label": clean},
+    )
+    if not rows:
+        raise LookupError("No se encontró el dataset.")
+    return rows[0]
+
+
+async def download_input(dataset_id: str):
+    dataset = await get_dataset(dataset_id)
+    if not dataset:
+        raise LookupError("No se encontró el dataset.")
+    if dataset.get("dataset_type") not in ("orders", "fleet"):
+        raise ValueError("La descarga sólo está disponible para Dispatch.")
+    return dataset, await download_dataset(dataset)
+
+
+async def load_sample_inputs():
+    root = Path(__file__).resolve().parents[3]
+    sample_dir = root / "sample_data" / "v1"
+
+    orders_bytes = (sample_dir / "orders.csv").read_bytes()
+    fleet_bytes = (sample_dir / "fleet.csv").read_bytes()
+
+    orders_report = validate_orders_report(orders_bytes)
+    fleet_report = validate_fleet_report(fleet_bytes)
+
+    orders_result = await store_input(
+        "orders.csv",
+        orders_bytes,
+        "orders",
+        orders_report.get("suggested_label"),
+        is_sample=True,
+    )
+    fleet_result = await store_input(
+        "fleet.csv",
+        fleet_bytes,
+        "fleet",
+        fleet_report.get("suggested_label"),
+        is_sample=True,
+    )
+
+    orders_dataset = (
+        orders_result.get("dataset")
+        or orders_result["existing_dataset"]
+    )
+    fleet_dataset = (
+        fleet_result.get("dataset")
+        or fleet_result["existing_dataset"]
+    )
+
+    await db(
+        "PATCH",
+        "datasets",
+        params={
+            "id": (
+                f"in.({orders_dataset['id']},{fleet_dataset['id']})"
+            )
+        },
+        body={"is_sample": True},
+    )
+    await db(
+        "POST",
+        "rpc/set_default_fleet",
+        body={"target_id": fleet_dataset["id"]},
+    )
+
+    fleet_dataset = {
+        **fleet_dataset,
+        "is_default": True,
+        "is_sample": True,
+    }
+    orders_dataset = {
+        **orders_dataset,
+        "is_sample": True,
+    }
+
+    return {
+        "orders": orders_dataset,
+        "fleet": fleet_dataset,
+        "orders_validation": {
+            key: value
+            for key, value in orders_report.items()
+            if key != "records"
+        },
+        "fleet_validation": {
+            key: value
+            for key, value in fleet_report.items()
+            if key != "records"
+        },
+        "duplicate": {
+            "orders": bool(orders_result.get("duplicate")),
+            "fleet": bool(fleet_result.get("duplicate")),
+        },
     }
 
 
