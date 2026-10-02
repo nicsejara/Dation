@@ -1,6 +1,6 @@
 # Contrato dispatch_v2 — SLA primero, negocio después
 
-Estas reglas corresponden a logistics-dispatch-engine 2.1.0 y al envelope `dispatch_v2`.
+Estas reglas corresponden a logistics-dispatch-engine 2.2.0 y al envelope `dispatch_v2`.
 
 ## Orden de decisión
 
@@ -57,3 +57,7 @@ La salida principal se llama **Decisión recomendada**. La ejecución detallada 
 Nunca presentar la recomendación como “la mejor opción absoluta”: es la recomendación bajo datos, restricciones, disponibilidad y objetivo configurado.
 
 Nunca llamar “óptimo” a un resultado cuando el solver no lo certificó.
+
+## Referencias económicas
+
+`baseline_direct` es una referencia sintética de despacho individual construida por el motor. No es evidencia de la operación histórica real. Las diferencias de costo contra esa referencia deben describirse como diferencias entre escenarios, nunca como ahorro real o valor capturado. Para medir ahorro real se requiere una baseline observada o una política actual formalmente modelada con costos verificables.
