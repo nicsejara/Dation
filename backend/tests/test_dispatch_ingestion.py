@@ -91,6 +91,9 @@ class DispatchIngestionValidationTests(unittest.TestCase):
             167000,
         )
         self.assertTrue(fleet_profile["has_third_party"])
+        self.assertEqual(fleet_profile["pools"], 4)
+        self.assertFalse(fleet_profile["spatially_scoped"])
+        self.assertEqual(fleet_profile["global_scope_pools"], 4)
 
     def test_sample_preflight_is_grouped_for_business(self):
         orders = validate_orders_csv(
@@ -174,13 +177,25 @@ class DispatchIngestionValidationTests(unittest.TestCase):
             template_report = validator(template_text.encode())
             self.assertTrue(template_report["valid"])
             self.assertEqual(template_report["rows"], 5)
+            header = template_text.splitlines()[0]
             if kind == "orders":
-                header = template_text.splitlines()[0]
                 self.assertIn("ready_date", header)
                 self.assertNotIn("current_vehicle_type", header)
                 self.assertNotIn("dispatch_date", header)
+            else:
+                self.assertIn("fleet_pool_id", header)
+                self.assertIn("base_location", header)
+                self.assertEqual(template_report["schema"], "fleet_v2")
             sample = (ROOT / "sample_data" / "v1" / f"{kind}.csv").read_bytes()
-            self.assertTrue(validator(sample)["valid"])
+            sample_report = validator(sample)
+            self.assertTrue(sample_report["valid"])
+            if kind == "fleet":
+                self.assertEqual(sample_report["schema"], "fleet_v1")
+                self.assertFalse(sample_report["profile"]["spatially_scoped"])
+                self.assertTrue(any(
+                    issue["code"] == "LEGACY_FLEET_GLOBAL_SCOPE"
+                    for issue in sample_report["warnings"]
+                ))
 
 
 class DispatchIngestionHTTPTests(unittest.IsolatedAsyncioTestCase):
@@ -211,6 +226,10 @@ class DispatchIngestionHTTPTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(
             response.json()["formats"]["orders"]["schema"],
             "orders_v2",
+        )
+        self.assertEqual(
+            response.json()["formats"]["fleet"]["schema"],
+            "fleet_v2",
         )
 
     async def test_status_uses_detailed_service(self):
