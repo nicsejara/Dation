@@ -43,6 +43,11 @@ def solve(orders, fleet, weights, scales, options, hint_plan=None):
     for i, order in enumerate(orders):
         groups[(order['origin'], order['destination'])].append(i)
 
+    horizon_start = min(
+        date.fromisoformat(order['dispatch_date'])
+        for order in orders
+    )
+
     count = 0
     for route, indices in sorted(groups.items()):
         for vehicle in sorted(
@@ -130,11 +135,7 @@ def solve(orders, fleet, weights, scales, options, hint_plan=None):
                     if vehicle['units_available'] is not None:
                         duration = cycle_days(orders[eligible[0]], vehicle)
                         start_offset = (
-                            date.fromisoformat(day)
-                            - min(
-                                date.fromisoformat(order['dispatch_date'])
-                                for order in orders
-                            )
+                            date.fromisoformat(day) - horizon_start
                         ).days
                         interval = model.new_optional_interval_var(
                             start_offset,
