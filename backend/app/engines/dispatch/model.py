@@ -7,7 +7,14 @@ from time import perf_counter
 from ortools.sat.python import cp_model
 import ortools
 
-from .normalization import D, capacity_units, departure_days, raw_cost, transit
+from .normalization import (
+    D,
+    capacity_units,
+    departure_days,
+    raw_cost,
+    transit,
+    cycle_days,
+)
 from .plans import trip, add_load, canonical
 
 MAX_VARIABLES = 25000
@@ -18,7 +25,7 @@ def solve(orders, fleet, weights, scales, options, hint_plan=None):
     model = cp_model.CpModel()
     slots = []
     xs = defaultdict(list)
-    daily = defaultdict(list)
+    resource_intervals = defaultdict(list)
     hints = defaultdict(list)
 
     for t in hint_plan or []:
@@ -120,7 +127,25 @@ def solve(orders, fleet, weights, scales, options, hint_plan=None):
                     )
                     model.add(sum(x for _, x in loads) >= y)
                     slots.append((vehicle, day, y, loads))
-                    daily[(vehicle['fleet_pool_id'], day)].append(y)
+                    if vehicle['units_available'] is not None:
+                        duration = cycle_days(orders[eligible[0]], vehicle)
+                        start_offset = (
+                            date.fromisoformat(day)
+                            - min(
+                                date.fromisoformat(order['dispatch_date'])
+                                for order in orders
+                            )
+                        ).days
+                        interval = model.new_optional_interval_var(
+                            start_offset,
+                            duration,
+                            start_offset + duration,
+                            y,
+                            f'iv{len(slots) - 1}',
+                        )
+                        resource_intervals[
+                            vehicle['fleet_pool_id']
+                        ].append(interval)
 
     for i, order in enumerate(orders):
         model.add(sum(xs[i]) == order['quantity_units'])
@@ -128,9 +153,13 @@ def solve(orders, fleet, weights, scales, options, hint_plan=None):
     for vehicle in fleet:
         if vehicle['units_available'] is None:
             continue
-        for (pool_id, day), ys in daily.items():
-            if pool_id == vehicle['fleet_pool_id']:
-                model.add(sum(ys) <= vehicle['units_available'])
+        intervals = resource_intervals.get(vehicle['fleet_pool_id'], [])
+        if intervals:
+            model.add_cumulative(
+                intervals,
+                [1] * len(intervals),
+                vehicle['units_available'],
+            )
 
     cost = sum(
         float(raw_cost(orders[loads[0][0]], vehicle)) * y
