@@ -1,5 +1,5 @@
 # Contrato dispatch_v1
-Estas reglas corresponden a logistics-dispatch-engine 1.1.0, que mantiene el envelope dispatch_v1 e incorpora flota espacial por pools.
+Estas reglas corresponden a logistics-dispatch-engine 1.2.0, que mantiene el envelope dispatch_v1 e incorpora flota espacial por pools.
 
 La referencia principal es Despacho directo, una política declarada sin consolidación ni reprogramación. No es una operación verificada. Si no encuentra cobertura, no se muestran ahorros ejecutables contra ella.
 
@@ -7,7 +7,7 @@ Cada viaje tiene un origen, un destino, fecha, `fleet_pool_id`, base operativa, 
 
 Ubicación: un pool sólo puede atender órdenes cuyo origen coincide con `base_location`. Un tercerizado con base `*` puede operar desde cualquier origen. `vehicle_type` no identifica de forma única un recurso: la identidad operacional es `fleet_pool_id`.
 
-Disponibilidad: se limita por pool y día; todavía no se modela ocupación durante ida y retorno. La flota tercerizada puede ser ilimitada si así lo declara el dataset.
+Disponibilidad: los pools finitos quedan ocupados desde la salida hasta completar ida, entrega y retorno a base. La fecha `resource_available_again` marca el primer día en que esa unidad puede volver a utilizarse. La flota tercerizada puede ser ilimitada si así lo declara el dataset.
 
 Costo: distancia de ida × 2 × costo por km + costo fijo. El combustible ya está incluido en costo/km. CO₂ y litros se calculan sobre ida y vuelta, con factores informados, no certificados.
 
