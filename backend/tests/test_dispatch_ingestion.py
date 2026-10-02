@@ -132,6 +132,12 @@ class DispatchIngestionValidationTests(unittest.TestCase):
         self.assertEqual(peak["date"], "2026-10-09")
         self.assertEqual(peak["kg"], 351800)
         self.assertAlmostEqual(peak["ratio"], 2.1065868, places=5)
+        zero_slack = next(
+            item
+            for item in result["findings"]
+            if item["id"] == "zero_slack"
+        )
+        self.assertEqual(zero_slack["count"], 26)
         self.assertTrue(result["readiness"]["can_continue"])
 
     def test_report_caps_visible_problems_at_one_hundred(self):

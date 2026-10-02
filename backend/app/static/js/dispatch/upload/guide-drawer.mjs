@@ -10,6 +10,9 @@ function el(tag, value, className = "") {
 }
 
 export function createGuideDrawer(contracts) {
+  document
+    .querySelectorAll(".dispatch-guide-overlay")
+    .forEach((node) => node.remove());
   const overlay = el("div", null, "dispatch-guide-overlay");
   overlay.hidden = true;
   const drawer = el("aside", null, "dispatch-guide");

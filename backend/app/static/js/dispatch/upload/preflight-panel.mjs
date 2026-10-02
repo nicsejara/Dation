@@ -1,4 +1,10 @@
-import {chart, csv, download, num} from "../shared.mjs";
+import {
+  chart,
+  csv,
+  dispose,
+  download,
+  num,
+} from "../shared.mjs";
 
 function el(tag, value, className = "") {
   const node = document.createElement(tag);
@@ -188,6 +194,7 @@ function capacityChart(root, capacity) {
 }
 
 export function renderPreflight(root, preflight, orders, fleet) {
+  dispose(root);
   root.replaceChildren();
   root.className = "dispatch-panel dispatch-preflight";
   root.id = "dispatch-upload-review";

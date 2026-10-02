@@ -36,7 +36,12 @@ MONTHS_LONG = (
 
 
 def detected_metadata(contents: bytes, kind: str, columns: list[str]) -> dict:
-    text = contents.decode("utf-8-sig", errors="replace")
+    try:
+        text = contents.decode("utf-8-sig")
+        encoding = "UTF-8"
+    except UnicodeDecodeError:
+        text = contents.decode("utf-8-sig", errors="replace")
+        encoding = "No reconocido"
     first_line = text.splitlines()[0] if text.splitlines() else ""
     delimiter = ";" if first_line.count(";") > first_line.count(",") else ","
     raw_columns = [value.strip() for value in first_line.split(delimiter)]
@@ -64,7 +69,7 @@ def detected_metadata(contents: bytes, kind: str, columns: list[str]) -> dict:
 
     return {
         "delimiter": delimiter,
-        "encoding": "UTF-8",
+        "encoding": encoding,
         "date_format": date_format,
         "aliases": aliases,
         "columns": len(columns),

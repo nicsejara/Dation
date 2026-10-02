@@ -131,7 +131,15 @@ async def download_dataset(dataset_id: UUID):
     dataset, contents = await guarded(
         service.download_input(str(dataset_id))
     )
-    filename = dataset.get("original_filename") or "datos.csv"
+    filename = Path(
+        dataset.get("original_filename") or "datos.csv"
+    ).name
+    filename = (
+        filename
+        .replace("\r", "")
+        .replace("\n", "")
+        .replace('"', "")
+    )
     return Response(
         content=contents,
         media_type="text/csv; charset=utf-8",
