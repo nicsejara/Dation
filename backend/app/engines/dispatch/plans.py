@@ -192,6 +192,8 @@ def validate_plan(plan, orders, fleet, *, direct=False):
         if t['fleet_pool_id'] not in pools:
             raise ValueError('Pool de flota inexistente.')
         v = pools[t['fleet_pool_id']]
+        if not t.get('loads'):
+            raise ValueError('Viaje sin cargas.')
         if t['vehicle_type'] != v['vehicle_type']:
             raise ValueError('Tipo de vehículo inconsistente con el pool.')
         if t.get('base_location') != v['base_location']:
