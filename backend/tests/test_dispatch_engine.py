@@ -128,6 +128,80 @@ class DispatchEngineTests(unittest.TestCase):
         self.assertEqual(trip['fleet_pool_id'],'OWN-S')
         self.assertEqual(trip['base_location'],'Origen')
 
+    def test_multiday_cycle_blocks_own_fleet_until_return(self):
+        first=order('A',weight=600,day='2026-10-01',window=3)
+        second=order('B',weight=600,day='2026-10-02',window=2)
+        first['distance_km']=600
+        second['distance_km']=600
+        r=self.run_case(
+            [first,second],
+            fleet(third=False),
+            configuration={'objective':'min_cost'},
+        )
+        trips=r['scenarios']['selected']['trips']
+        self.assertEqual(
+            [trip['dispatch_date'] for trip in trips],
+            ['2026-10-01','2026-10-03'],
+        )
+        self.assertEqual(trips[0]['cycle_days'],2)
+        self.assertEqual(
+            trips[0]['resource_available_again'],
+            '2026-10-03',
+        )
+        self.assertEqual(
+            r['scenarios']['selected']['metrics']['avg_cycle_days'],
+            2,
+        )
+
+    def test_min_time_can_outsource_while_own_vehicle_is_busy(self):
+        first=order('A',weight=600,day='2026-10-01',window=3)
+        second=order('B',weight=600,day='2026-10-02',window=2)
+        first['distance_km']=600
+        second['distance_km']=600
+        r=self.run_case(
+            [first,second],
+            fleet(third=True),
+            configuration={'objective':'min_time'},
+        )
+        selected=r['scenarios']['selected']
+        self.assertEqual(
+            [trip['dispatch_date'] for trip in selected['trips']],
+            ['2026-10-01','2026-10-02'],
+        )
+        self.assertAlmostEqual(
+            selected['metrics']['outsourced_trips_share'],
+            .5,
+        )
+
+    def test_validation_rejects_temporal_double_booking(self):
+        import copy
+        from app.engines.dispatch.plans import validate_plan
+        from app.validators.orders_schema import validate_orders_csv
+        from app.validators.fleet_schema import validate_fleet_csv
+
+        first=order('A',weight=600,day='2026-10-01',window=3)
+        second=order('B',weight=600,day='2026-10-02',window=2)
+        first['distance_km']=600
+        second['distance_km']=600
+        orders_bytes=csv_bytes(COLUMNS,[first,second])
+        fleet_bytes=fleet(third=False)
+        result=run_dispatch_engine(
+            orders_bytes,
+            fleet_bytes,
+            configuration={'objective':'min_cost'},
+            options={'sensitivity':False},
+        )
+        plan=copy.deepcopy(result['scenarios']['selected']['trips'])
+        plan[1]['dispatch_date']='2026-10-02'
+        plan[1]['arrival_date']='2026-10-03'
+        plan[1]['resource_available_again']='2026-10-04'
+        with self.assertRaisesRegex(ValueError,'Disponibilidad temporal'):
+            validate_plan(
+                plan,
+                validate_orders_csv(orders_bytes)['records'],
+                validate_fleet_csv(fleet_bytes)['records'],
+            )
+
     def test_sensitivity_reports_consecutive_changes(self):
         r=run_dispatch_engine(csv_bytes(COLUMNS,[order('A'),order('B')]),fleet())
         points=r['sensitivity']['weight_sweep']
