@@ -3,105 +3,46 @@ import {
   continueState,
   deriveCardState,
   groupProblems,
-  stepTone,
+  technicalPreflightErrors,
 } from "../app/static/js/dispatch/upload/selectors.mjs";
 
-const table = [
-  [
-    {},
-    "sin_archivo",
-  ],
-  [
-    {validating: true},
-    "validando",
-  ],
-  [
-    {
-      validation: {
-        valid: false,
-        counts: {errors: 2, warnings: 0},
-      },
-    },
-    "invalido",
-  ],
-  [
-    {
-      validation: {
-        valid: true,
-        counts: {errors: 0, warnings: 2},
-      },
-      saved: {id: "saved"},
-    },
-    "con_avisos",
-  ],
-  [
-    {
-      validation: {
-        valid: true,
-        counts: {errors: 0, warnings: 0},
-      },
-      saved: {id: "saved"},
-    },
-    "valido",
-  ],
-  [
-    {
-      validation: {
-        valid: true,
-        counts: {errors: 0, warnings: 0},
-      },
-      storageAvailable: false,
-    },
-    "valido_sin_guardar",
-  ],
-  [
-    {
-      validation: {
-        valid: true,
-        counts: {errors: 0, warnings: 0},
-      },
-      error: "network",
-    },
-    "error_de_guardado",
-  ],
-  [
-    {
-      validation: {
-        valid: true,
-        counts: {errors: 0, warnings: 0},
-      },
-      saved: {id: "saved"},
-      duplicate: true,
-    },
-    "reutilizado",
-  ],
-  [
-    {
-      validation: {
-        valid: false,
-        detected_format: "legacy_mixed",
-        counts: {errors: 1, warnings: 0},
-      },
-    },
-    "formato_anterior",
-  ],
-];
-
-for (const [input, expected] of table) {
-  const state = deriveCardState(input);
-  assert.equal(state.key, expected);
-}
-
-const validSaved = deriveCardState({
-  validation: {
-    valid: true,
-    counts: {errors: 0, warnings: 0},
-  },
-  saved: {id: "saved"},
-});
+assert.equal(deriveCardState({}).key, "empty");
 assert.equal(
-  validSaved.message.includes("No se guardó"),
-  false,
+  deriveCardState({phase: "processing"}).key,
+  "processing",
+);
+assert.equal(
+  deriveCardState({phase: "uploading"}).key,
+  "uploading",
+);
+assert.equal(
+  deriveCardState({
+    report: {
+      valid: false,
+      counts: {errors: 3, warnings: 0},
+    },
+  }).key,
+  "error",
+);
+assert.equal(
+  deriveCardState({
+    report: {
+      valid: true,
+      counts: {errors: 0, warnings: 2},
+    },
+    dataset: {id: "saved"},
+  }).key,
+  "warning",
+);
+assert.equal(
+  deriveCardState({
+    report: {
+      valid: true,
+      counts: {errors: 0, warnings: 0},
+    },
+    dataset: {id: "saved"},
+  }).label,
+  "✓ Archivo correcto",
 );
 
 const groups = groupProblems({
@@ -116,54 +57,57 @@ const groups = groupProblems({
 assert.equal(groups.length, 2);
 assert.equal(groups[0].items.length, 2);
 
-assert.equal(
-  continueState({
-    storageAvailable: false,
-  }).message,
-  "Falta activar el almacenamiento de datos.",
-);
-
-assert.equal(
-  continueState({
-    storageAvailable: true,
-    orders: {id: "o"},
-    fleet: {id: "f"},
-    preflight: {
-      valid: true,
-      findings: [
-        {severity: "warning"},
-        {severity: "warning"},
-      ],
-      readiness: {
-        blockers: [],
-      },
+const businessOnly = {
+  valid: false,
+  errors: [
+    {
+      code: "UNIT_EXCEEDS_CAPACITY",
+      detail: "Una unidad supera la capacidad disponible.",
     },
-  }).message,
-  "2 avisos: podés continuar.",
-);
-
-assert.equal(
-  continueState({
-    storageAvailable: true,
-    orders: {id: "o"},
-    fleet: {id: "f"},
-    preflight: {
-      valid: true,
-      readiness: {
-        blockers: [],
-      },
+  ],
+  warnings: [
+    {
+      code: "UNAVOIDABLE_LATE",
+      detail: "Entrega tardía.",
     },
-  }).enabled,
-  true,
-);
+  ],
+};
+assert.equal(technicalPreflightErrors(businessOnly).length, 0);
 
-assert.equal(
-  stepTone({
-    dataset: {id: "o"},
-    report: {counts: {errors: 0, warnings: 0}},
-    kind: "orders",
-  }),
-  "success",
-);
+const ready = continueState({
+  storageAvailable: true,
+  orders: {id: "o"},
+  fleet: {id: "f"},
+  reports: {
+    orders: {valid: true, counts: {errors: 0, warnings: 0}},
+    fleet: {valid: true, counts: {errors: 0, warnings: 0}},
+  },
+  preflight: businessOnly,
+  phases: {orders: "idle", fleet: "idle"},
+  saveErrors: {},
+});
+assert.equal(ready.enabled, true);
+
+const relationFailure = continueState({
+  storageAvailable: true,
+  orders: {id: "o"},
+  fleet: {id: "f"},
+  reports: {
+    orders: {valid: true, counts: {errors: 0, warnings: 0}},
+    fleet: {valid: true, counts: {errors: 0, warnings: 0}},
+  },
+  preflight: {
+    errors: [
+      {
+        code: "UNKNOWN_CURRENT_VEHICLE",
+        detail: "Referencia inexistente.",
+      },
+    ],
+  },
+  phases: {orders: "idle", fleet: "idle"},
+  saveErrors: {},
+});
+assert.equal(relationFailure.enabled, false);
+assert.equal(relationFailure.kind, "error");
 
 console.log("dispatch upload selectors: ok");

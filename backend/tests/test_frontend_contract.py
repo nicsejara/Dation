@@ -264,31 +264,29 @@ class FrontendContractTests(
             / "dispatch"
             / "workspace.mjs"
         ).read_text(encoding="utf-8")
-        upload_index = (
+        upload_root = (
             BACKEND_ROOT
             / "app"
             / "static"
             / "js"
             / "dispatch"
             / "upload"
-            / "index.mjs"
-        ).read_text(encoding="utf-8")
-        system_banner = (
-            BACKEND_ROOT
-            / "app"
-            / "static"
-            / "js"
-            / "dispatch"
-            / "upload"
-            / "system-banner.mjs"
-        ).read_text(encoding="utf-8")
+        )
+        upload_index = (upload_root / "index.mjs").read_text(
+            encoding="utf-8"
+        )
+        dropcard = (upload_root / "dropcard.mjs").read_text(
+            encoding="utf-8"
+        )
+        guide = (upload_root / "guide-drawer.mjs").read_text(
+            encoding="utf-8"
+        )
+        quality = (upload_root / "preflight-panel.mjs").read_text(
+            encoding="utf-8"
+        )
 
         self.assertNotIn(
             'id="upload-dropzone"',
-            self.html,
-        )
-        self.assertNotIn(
-            "Dation_Logistics_Template.csv",
             self.html,
         )
         self.assertNotIn(
@@ -299,21 +297,33 @@ class FrontendContractTests(
             "mountUploadScreen",
             workspace,
         )
-        self.assertNotIn(
-            "Usar formato anterior",
-            workspace,
-        )
         self.assertIn(
             "/api/datasets/validate",
             upload_index,
         )
         self.assertIn(
-            "/api/dispatch/contracts",
-            upload_index,
+            "Validación de archivos",
+            quality,
         )
         self.assertIn(
-            "Activación pendiente",
-            system_banner,
+            "Descargar plantilla",
+            dropcard,
+        )
+        self.assertNotIn(
+            "Ver ejemplo",
+            dropcard + guide + upload_index,
+        )
+        self.assertNotIn(
+            "flota vigente",
+            dropcard.lower() + upload_index.lower(),
+        )
+        self.assertNotIn(
+            "llegarán tarde",
+            quality.lower(),
+        )
+        self.assertNotIn(
+            "demanda supera",
+            quality.lower(),
         )
 
 

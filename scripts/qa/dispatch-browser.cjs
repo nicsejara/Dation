@@ -183,53 +183,13 @@ result.inputs.fleet = {
           anomalies: [],
           findings: [
             {
-              id: "references_ok",
-              severity: "success",
-              title: "Todos los camiones de referencia existen en la flota",
-              consequence: null,
-              items: [],
-            },
-            {
               id: "late_orders",
               severity: "warning",
               title: "7 órdenes llegarán tarde aunque salgan el primer día",
-              consequence: "El plan las entrega igual y las marca como tardías.",
-              items: [
-                {order_id: "SHP-0014", detail: "Tránsito 2 días; plazo 1 día."},
-              ],
-            },
-            {
-              id: "capacity_vs_demand",
-              severity: "warning",
-              title: "Tu demanda supera la capacidad propia en 9 de 10 días",
-              consequence: (
-                "El plan usará camiones tercerizados o reprogramará salidas "
-                + "dentro de cada plazo."
-              ),
+              consequence: "Resultado operacional reservado para la siguiente etapa.",
               items: [],
             },
           ],
-          capacity_check: {
-            own_capacity_kg_per_day: 167000,
-            days_over: 9,
-            total_days: 10,
-            days: [
-              {
-                date: "2026-10-01",
-                orders: 7,
-                kg: 153900,
-                ratio: 0.92,
-                over: false,
-              },
-              {
-                date: "2026-10-09",
-                orders: 13,
-                kg: 351800,
-                ratio: 2.11,
-                over: true,
-              },
-            ],
-          },
           readiness: {
             can_continue: true,
             blockers: [],
@@ -305,22 +265,36 @@ result.inputs.fleet = {
     await page.locator(".dispatch-upload-screen").waitFor();
 
     await page
-      .locator("[data-kind='orders']")
-      .getByRole("button", {name: "Usar", exact: true})
+      .getByRole("button", {name: "Usar una carga anterior →"})
       .click();
     await page
-      .locator("[data-kind='fleet']")
+      .locator(".dispatch-previous-drawer")
       .getByRole("button", {name: "Usar", exact: true})
       .click();
 
-    await page.getByText("2.384 t", {exact: false}).waitFor();
-    await page.getByText("28", {exact: true}).first().waitFor();
     await page
-      .getByText("7 órdenes llegarán tarde aunque salgan el primer día")
-      .waitFor();
+      .getByRole("button", {name: "Usar una flota guardada →"})
+      .click();
     await page
-      .getByText("Tu demanda supera la capacidad propia en 9 de 10 días")
-      .waitFor();
+      .locator(".dispatch-previous-drawer")
+      .getByRole("button", {name: "Usar", exact: true})
+      .click();
+
+    await page.getByText("orders.csv", {exact: true}).waitFor();
+    await page.getByText("100 registros", {exact: false}).waitFor();
+    await page.getByText("fleet.csv", {exact: true}).waitFor();
+    await page.getByText("4 registros", {exact: false}).waitFor();
+
+    assert.equal(
+      await page
+        .getByText("7 órdenes llegarán tarde aunque salgan el primer día")
+        .count(),
+      0,
+    );
+    assert.equal(
+      await page.getByText("Demanda vs. capacidad propia por día").count(),
+      0,
+    );
 
     const next = page.getByRole(
       "button",
