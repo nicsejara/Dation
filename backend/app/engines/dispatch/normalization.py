@@ -88,6 +88,36 @@ def transit(order, vehicle):
     )
 
 
+def cycle_days(order, vehicle):
+    """Calendar days that one finite resource remains occupied, including return."""
+    daily_distance = (
+        D(vehicle["avg_speed_kmh"])
+        * D(vehicle["driving_hours_per_day"])
+    )
+    return max(
+        1,
+        math.ceil(
+            (D(order["distance_km"]) * D(2))
+            / daily_distance
+        ),
+    )
+
+
+def resource_available_again(order, vehicle, dispatch_day):
+    return (
+        date.fromisoformat(dispatch_day)
+        + timedelta(days=cycle_days(order, vehicle))
+    ).isoformat()
+
+
+def occupied_dates(order, vehicle, dispatch_day):
+    start = date.fromisoformat(dispatch_day)
+    return [
+        (start + timedelta(days=offset)).isoformat()
+        for offset in range(cycle_days(order, vehicle))
+    ]
+
+
 def capacity_units(order, vehicle):
     return int(
         D(vehicle["capacity_kg"])
