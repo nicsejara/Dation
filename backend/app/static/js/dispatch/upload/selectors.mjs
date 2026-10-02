@@ -1,3 +1,8 @@
+const TECHNICAL_PREFLIGHT_CODES = new Set([
+  "UNKNOWN_CURRENT_VEHICLE",
+  "PREFLIGHT_REQUEST_FAILED",
+]);
+
 export function groupProblems(report) {
   const items = [
     ...(report?.errors || []).map((item) => ({
@@ -17,7 +22,7 @@ export function groupProblems(report) {
       groups.set(key, {
         code: key,
         severity: item.severity,
-        title: item.message || "Problema de validación",
+        title: item.message || item.detail || "Problema de validación",
         items: [],
       });
     }
@@ -26,104 +31,108 @@ export function groupProblems(report) {
   return [...groups.values()];
 }
 
+export function technicalPreflightErrors(preflight) {
+  if (!preflight) {
+    return [];
+  }
+  return (preflight.errors || []).filter(
+    (item) => TECHNICAL_PREFLIGHT_CODES.has(item.code),
+  );
+}
+
 export function deriveCardState({
-  validation = null,
-  saved = null,
-  error = null,
-  dirty = false,
-  validating = false,
+  report = null,
+  dataset = null,
+  saveError = null,
+  phase = "idle",
   storageAvailable = true,
   duplicate = false,
 } = {}) {
-  if (validating) {
+  if (phase === "uploading") {
     return {
-      key: "validando",
-      label: "Validando…",
+      key: "uploading",
+      label: "Subiendo archivo…",
       tone: "pending",
-      message: "Leyendo y revisando el archivo.",
     };
   }
 
-  if (error) {
+  if (phase === "processing") {
     return {
-      key: "error_de_guardado",
+      key: "processing",
+      label: "Validando estructura…",
+      tone: "pending",
+    };
+  }
+
+  if (saveError) {
+    return {
+      key: "save_error",
       label: "⛔ No se pudo guardar",
       tone: "error",
-      message: "El archivo es válido, pero no se pudo guardar. Reintentá.",
     };
   }
 
-  if (validation?.detected_format === "legacy_mixed") {
+  if (report?.detected_format === "legacy_mixed") {
     return {
-      key: "formato_anterior",
-      label: "⛔ Formato anterior",
+      key: "legacy",
+      label: "⛔ Archivo equivocado",
       tone: "error",
-      message: "Separalo en órdenes y flota con las plantillas nuevas.",
     };
   }
 
-  if (Number(validation?.counts?.errors || 0) > 0) {
+  const errors = Number(report?.counts?.errors || 0);
+  const warnings = Number(report?.counts?.warnings || 0);
+
+  if (errors > 0) {
     return {
-      key: "invalido",
-      label: "⛔ Con errores",
+      key: "error",
+      label: (
+        `⛔ ${errors} ${errors === 1 ? "problema" : "problemas"}`
+      ),
       tone: "error",
-      message: "No se guardó. Corregí los errores y volvé a cargarlo.",
     };
   }
 
-  if (duplicate && saved) {
+  if (report?.valid && !dataset && !storageAvailable) {
     return {
-      key: "reutilizado",
-      label: "✓ Ya cargado",
-      tone: "success",
-      message: "Usamos la versión que ya estaba guardada.",
-    };
-  }
-
-  if (validation?.valid && !saved && !storageAvailable) {
-    return {
-      key: "valido_sin_guardar",
-      label: "✓ Válido · ⏳ Sin guardar",
+      key: "valid_not_saved",
+      label: "✓ Archivo válido · sin guardar",
       tone: "warning",
-      message: "Falta activar el almacenamiento.",
     };
   }
 
-  if (saved) {
-    const warnings = Number(validation?.counts?.warnings || 0);
-    return warnings
-      ? {
-        key: "con_avisos",
-        label: "⚠ Guardado con avisos",
-        tone: "warning",
-        message: "Guardado. Revisá los avisos.",
-      }
-      : {
-        key: dirty ? "editado" : "valido",
-        label: "✓ Guardado y válido",
-        tone: "success",
-        message: "Listo.",
-      };
+  if (duplicate && dataset) {
+    return {
+      key: "duplicate",
+      label: "✓ Archivo válido",
+      tone: "success",
+    };
   }
 
-  if (validation?.valid) {
+  if (report?.valid || dataset) {
+    if (warnings > 0) {
+      return {
+        key: "warning",
+        label: (
+          `⚠ Archivo válido con ${warnings} `
+          + `${warnings === 1 ? "observación" : "observaciones"}`
+        ),
+        tone: "warning",
+      };
+    }
     return {
-      key: "valido",
-      label: "✓ Válido",
+      key: "valid",
+      label: "✓ Archivo correcto",
       tone: "success",
-      message: "Listo para guardar.",
     };
   }
 
   return {
-    key: "sin_archivo",
-    label: "○ Sin archivo",
+    key: "empty",
+    label: "Pendiente de carga",
     tone: "neutral",
-    message: null,
   };
 }
-
-export const cardState = deriveCardState;
 
 export function continueState({
   storageAvailable,
@@ -131,94 +140,83 @@ export function continueState({
   fleet,
   reports = {},
   preflight,
+  phases = {},
+  saveErrors = {},
 } = {}) {
   if (!storageAvailable) {
     return {
       enabled: false,
       message: "Falta activar el almacenamiento de datos.",
+      kind: "pending",
+    };
+  }
+
+  if (phases.orders !== "idle" || phases.fleet !== "idle") {
+    return {
+      enabled: false,
+      message: "Esperá a que termine la validación de los archivos.",
+      kind: "pending",
+    };
+  }
+
+  if (saveErrors.orders || saveErrors.fleet) {
+    return {
+      enabled: false,
+      message: "Hay un archivo válido que todavía no pudo guardarse.",
+      kind: "error",
     };
   }
 
   if (!orders) {
-    if (Number(reports.orders?.counts?.errors || 0) > 0) {
-      return {
-        enabled: false,
-        message: "Corregí los errores de las órdenes.",
-      };
-    }
+    const errors = Number(reports.orders?.counts?.errors || 0);
     return {
       enabled: false,
-      message: "Falta cargar las órdenes.",
+      message: errors
+        ? "Corregí los problemas del archivo de órdenes."
+        : "Falta cargar el archivo de órdenes.",
+      kind: errors ? "error" : "pending",
     };
   }
 
   if (!fleet) {
-    if (Number(reports.fleet?.counts?.errors || 0) > 0) {
-      return {
-        enabled: false,
-        message: "Corregí los errores de la flota.",
-      };
-    }
+    const errors = Number(reports.fleet?.counts?.errors || 0);
     return {
       enabled: false,
-      message: "Falta cargar la flota.",
+      message: errors
+        ? "Corregí los problemas del archivo de flota."
+        : "Falta cargar el archivo de flota.",
+      kind: errors ? "error" : "pending",
+    };
+  }
+
+  if (!reports.orders?.valid || !reports.fleet?.valid) {
+    return {
+      enabled: false,
+      message: "Ambos archivos deben superar la validación técnica.",
+      kind: "error",
     };
   }
 
   if (!preflight) {
     return {
       enabled: false,
-      message: "Estamos revisando la compatibilidad entre ambos archivos.",
+      message: "Comprobando la compatibilidad mínima entre ambos archivos.",
+      kind: "pending",
     };
   }
 
-  const blockers = preflight.readiness?.blockers || [];
-  if (!preflight.valid || blockers.length) {
+  const relationErrors = technicalPreflightErrors(preflight);
+  if (relationErrors.length) {
     return {
       enabled: false,
-      message: preflight.readiness?.reason
-        || "La revisión conjunta detectó errores que impiden continuar.",
+      message: "Hay referencias entre los archivos que necesitás corregir.",
+      kind: "error",
     };
   }
 
-  const warnings = (preflight.findings || []).filter(
-    (item) => item.severity === "warning",
-  ).length;
   return {
     enabled: true,
-    message: warnings
-      ? `${warnings} avisos: podés continuar.`
-      : "Todo listo para continuar.",
+    message: "Los dos archivos superaron las validaciones necesarias.",
+    kind: "success",
   };
-}
-
-export function stepTone({
-  dataset,
-  report,
-  preflight,
-  kind,
-} = {}) {
-  if (kind === "review") {
-    if (!preflight) {
-      return "pending";
-    }
-    if (!preflight.valid) {
-      return "error";
-    }
-    return (preflight.findings || []).some(
-      (item) => item.severity === "warning",
-    )
-      ? "warning"
-      : "success";
-  }
-
-  if (Number(report?.counts?.errors || 0) > 0) {
-    return "error";
-  }
-  if (!dataset) {
-    return "pending";
-  }
-  return Number(report?.counts?.warnings || 0) > 0
-    ? "warning"
-    : "success";
 }
