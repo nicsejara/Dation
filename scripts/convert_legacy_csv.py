@@ -1,9 +1,9 @@
-"""Explicit converter. Preserve current assignment only as optional reference."""
+"""Explicit converter from the historical mixed CSV to the orders_v2 contract."""
 import argparse
 import csv
 from pathlib import Path
 
-COLUMNS = ['order_id', 'product', 'quantity_units', 'unit_weight_kg', 'origin', 'destination', 'distance_km', 'priority', 'max_delivery_days', 'dispatch_date', 'current_vehicle_type']
+COLUMNS = ['order_id', 'product', 'quantity_units', 'unit_weight_kg', 'origin', 'destination', 'distance_km', 'priority', 'max_delivery_days', 'ready_date']
 
 
 def convert(source: Path, target: Path):
@@ -16,7 +16,7 @@ def convert(source: Path, target: Path):
         writer.writeheader()
         for row in rows:
             row['order_id'] = row['shipment_id']
-            row['current_vehicle_type'] = row['vehicle_type']
+            row['ready_date'] = row['dispatch_date']
             writer.writerow({k: row[k] for k in COLUMNS})
     return len(rows)
 
