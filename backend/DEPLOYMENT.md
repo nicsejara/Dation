@@ -1,6 +1,6 @@
-# Despliegue de Dispatch 1.1.0
+# Despliegue de Dispatch 1.2.0
 
-API esperada: **1.0.0**. Motor Dispatch: **1.1.0**. Motor histórico: **0.2.0**. Runtime: Python **3.13**, OR-Tools **9.15.6755**.
+API esperada: **1.0.0**. Motor Dispatch: **1.2.0**. Motor histórico: **0.2.0**. Runtime: Python **3.13**, OR-Tools **9.15.6755**.
 
 ## Activación manual en Supabase
 
@@ -75,7 +75,7 @@ Con backend actualizado y autenticación válida, `GET /api/dispatch/status` deb
 
 No requiere una migración adicional de Supabase. `datasets.schema_version` ya almacena texto y permite registrar `fleet_v2`; los archivos siguen viviendo en Storage y el resultado permanece en el envelope `dispatch_v1`.
 
-Después del deploy verificar que `GET /api/dispatch/contracts` informe `orders_v2` y `fleet_v2`, que la plantilla de flota contenga `fleet_pool_id` y `base_location`, y que una orden no pueda utilizar un pool propio cuya base pertenezca a otro origen. Los datasets `fleet_v1` históricos deben continuar validando con la advertencia `LEGACY_FLEET_GLOBAL_SCOPE`.
+Después del deploy verificar que `GET /api/dispatch/contracts` informe `orders_v2` y `fleet_v2`, que la plantilla de flota contenga `fleet_pool_id` y `base_location`, que una orden no pueda utilizar un pool propio cuya base pertenezca a otro origen y que un recurso finito no pueda reutilizarse antes de `resource_available_again`. Los datasets `fleet_v1` históricos deben continuar validando con la advertencia `LEGACY_FLEET_GLOBAL_SCOPE`.
 
 ## Cloud Run
 
