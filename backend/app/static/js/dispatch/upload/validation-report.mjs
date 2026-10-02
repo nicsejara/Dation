@@ -1,163 +1,181 @@
 import {csv, download} from "../shared.mjs";
 import {groupProblems} from "./selectors.mjs";
 
-function text(tag, value, className = "") {
+function el(tag, value, className = "") {
   const node = document.createElement(tag);
   if (className) {
     node.className = className;
   }
-  node.textContent = value;
+  if (value != null) {
+    node.textContent = value;
+  }
   return node;
 }
 
-function issueRow(item) {
-  const row = document.createElement("tr");
-  const values = [
-    item.row || "—",
-    item.column || "—",
-    item.value ?? "—",
-    item.hint || item.message || "Revisá el dato.",
-  ];
-  for (const value of values) {
-    row.append(text("td", value));
-  }
-  return row;
-}
+export function createValidationDrawer() {
+  document
+    .querySelectorAll(".dispatch-validation-overlay")
+    .forEach((node) => node.remove());
 
-export function renderValidationReport(root, report, state = null) {
-  root.replaceChildren();
-  if (!report) {
-    return;
-  }
+  const overlay = el("div", null, "dispatch-validation-overlay");
+  overlay.hidden = true;
+  const drawer = el("aside", null, "dispatch-validation-drawer");
+  drawer.setAttribute("role", "dialog");
+  drawer.setAttribute("aria-modal", "true");
+  drawer.setAttribute("aria-label", "Problemas de validación");
 
-  const errors = Number(report.counts?.errors || 0);
-  const warnings = Number(report.counts?.warnings || 0);
-  if (!errors && !warnings) {
-    return;
-  }
+  const head = el("div", null, "dispatch-validation-head");
+  const title = el("h2", "Revisar problemas");
+  const close = document.createElement("button");
+  close.type = "button";
+  close.setAttribute("aria-label", "Cerrar");
+  close.textContent = "×";
+  head.append(title, close);
 
-  const summary = text("div", "", "dispatch-validation-summary");
-  if (errors) {
-    summary.append(
-      text(
-        "strong",
-        (
-          `Encontramos ${errors} ${errors === 1 ? "error" : "errores"} `
-          + `en ${report.rows || 0} filas.`
-        ),
-      ),
-      text(
-        "p",
-        "No se guardó: corregilos y volvé a cargarlo.",
-      ),
-    );
-  } else {
-    summary.append(
-      text(
-        "strong",
-        `${warnings} ${warnings === 1 ? "aviso" : "avisos"} para revisar`,
-      ),
-      text(
-        "p",
-        state?.saved
-          ? "El archivo está guardado y podés continuar."
-          : "El archivo es válido.",
-      ),
-    );
-  }
-  root.append(summary);
+  const content = el("div", null, "dispatch-validation-content");
+  drawer.append(head, content);
+  overlay.append(drawer);
+  document.body.append(overlay);
 
-  for (const group of groupProblems(report)) {
-    const details = document.createElement("details");
-    details.className = `dispatch-validation-group is-${group.severity}`;
-    const summaryNode = document.createElement("summary");
-    summaryNode.textContent = (
-      `${group.items.length} `
-      + `${group.items.length === 1 ? "fila" : "filas"}: `
-      + group.title
-    );
-    details.append(summaryNode);
+  let opener = null;
 
-    const wrap = text("div", "", "dispatch-table-wrap");
-    const table = document.createElement("table");
-    const head = document.createElement("thead");
-    const headRow = document.createElement("tr");
-    ["Fila", "Columna", "Valor", "Cómo corregirlo"].forEach(
-      (value) => headRow.append(text("th", value)),
-    );
-    head.append(headRow);
+  function render(report, filename) {
+    content.replaceChildren();
 
-    const body = document.createElement("tbody");
-    group.items.slice(0, 5).forEach((item) => {
-      body.append(issueRow(item));
-    });
-    table.append(head, body);
-    wrap.append(table);
-    details.append(wrap);
-
-    if (group.items.length > 5) {
-      const all = document.createElement("button");
-      all.type = "button";
-      all.textContent = `Ver las ${group.items.length} filas`;
-      all.onclick = () => {
-        body.replaceChildren();
-        group.items.forEach((item) => body.append(issueRow(item)));
-        all.remove();
-      };
-      details.append(all);
+    if (filename) {
+      content.append(el("p", `Archivo: ${filename}`));
     }
-    root.append(details);
-  }
 
-  if (report.truncated) {
-    root.append(
-      text(
-        "p",
-        "Mostramos los primeros 100 problemas; corregí estos y volvé a validar.",
-        "dispatch-alert",
-      ),
-    );
-  }
+    const groups = groupProblems(report);
+    if (!groups.length) {
+      content.append(
+        el("p", "No hay problemas técnicos para revisar."),
+      );
+      return;
+    }
 
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = "dispatch-text-action";
-  button.textContent = "Descargar informe de errores (CSV)";
-  button.onclick = () => {
-    const rows = [
+    groups.forEach((group) => {
+      const section = el(
+        "section",
+        null,
+        `dispatch-validation-group is-${group.severity}`,
+      );
+      section.append(
+        el(
+          "h3",
+          (
+            `${group.items.length} `
+            + `${group.items.length === 1 ? "caso" : "casos"} · `
+            + group.title
+          ),
+        ),
+      );
+
+      const wrap = el("div", null, "dispatch-table-wrap");
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      const tr = document.createElement("tr");
       [
-        "tipo",
-        "codigo",
-        "fila",
-        "columna",
-        "valor",
-        "mensaje",
-        "como_corregir",
-      ],
-      ...(report.errors || []).map((item) => [
-        "error",
-        item.code,
-        item.row,
-        item.column,
-        item.value,
-        item.message,
-        item.hint,
-      ]),
-      ...(report.warnings || []).map((item) => [
-        "aviso",
-        item.code,
-        item.row,
-        item.column,
-        item.value,
-        item.message,
-        item.hint,
-      ]),
-    ];
-    download(
-      "dation_informe_validacion.csv",
-      csv(rows),
-      "text/csv;charset=utf-8",
-    );
+        "Fila",
+        "Columna",
+        "Problema",
+        "Valor encontrado",
+        "Cómo corregirlo",
+      ].forEach((value) => tr.append(el("th", value)));
+      thead.append(tr);
+
+      const tbody = document.createElement("tbody");
+      group.items.forEach((item) => {
+        const row = document.createElement("tr");
+        [
+          item.row ?? "—",
+          item.column ?? "—",
+          item.message || item.detail || "Problema de validación",
+          item.value ?? "—",
+          item.hint || "Revisá el dato informado.",
+        ].forEach((value) => row.append(el("td", value)));
+        tbody.append(row);
+      });
+      table.append(thead, tbody);
+      wrap.append(table);
+      section.append(wrap);
+      content.append(section);
+    });
+
+    const downloadButton = document.createElement("button");
+    downloadButton.type = "button";
+    downloadButton.className = "dispatch-text-action";
+    downloadButton.textContent = "Descargar informe (CSV)";
+    downloadButton.onclick = () => {
+      const rows = [
+        [
+          "tipo",
+          "codigo",
+          "fila",
+          "columna",
+          "valor",
+          "problema",
+          "como_corregir",
+        ],
+        ...(report.errors || []).map((item) => [
+          "error",
+          item.code,
+          item.row,
+          item.column,
+          item.value,
+          item.message || item.detail,
+          item.hint,
+        ]),
+        ...(report.warnings || []).map((item) => [
+          "observacion",
+          item.code,
+          item.row,
+          item.column,
+          item.value,
+          item.message || item.detail,
+          item.hint,
+        ]),
+      ];
+      download(
+        "dation_validacion.csv",
+        csv(rows),
+        "text/csv;charset=utf-8",
+      );
+    };
+    content.append(downloadButton);
+  }
+
+  function open({
+    report,
+    filename = null,
+    source = null,
+    heading = "Revisar problemas",
+  }) {
+    opener = source;
+    title.textContent = heading;
+    render(report, filename);
+    overlay.hidden = false;
+    document.body.classList.add("dispatch-drawer-open");
+    close.focus();
+  }
+
+  function hide() {
+    overlay.hidden = true;
+    document.body.classList.remove("dispatch-drawer-open");
+    opener?.focus();
+  }
+
+  close.onclick = hide;
+  overlay.onclick = (event) => {
+    if (event.target === overlay) {
+      hide();
+    }
   };
-  root.append(button);
+  overlay.onkeydown = (event) => {
+    if (event.key === "Escape") {
+      hide();
+    }
+  };
+
+  return {open, close: hide};
 }

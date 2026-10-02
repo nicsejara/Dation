@@ -11,156 +11,135 @@ function el(tag, value, className = "") {
   return node;
 }
 
-function tons(kg) {
-  return `${num((kg || 0) / 1000, 1)} t`;
-}
+export function createPreviousDrawer() {
+  document
+    .querySelectorAll(".dispatch-previous-overlay")
+    .forEach((node) => node.remove());
 
-function metaFor(kind, item) {
-  const profile = item.profile_json?.profile || {};
-  if (kind === "orders") {
-    return [
-      `${num(item.row_count)} órdenes`,
-      profile.total_weight_kg != null
-        ? tons(profile.total_weight_kg)
-        : null,
-      profile.routes != null
-        ? `${num(profile.routes)} rutas`
-        : null,
-      item.created_at
-        ? `cargado ${date(item.created_at.slice(0, 10))}`
-        : null,
-    ].filter(Boolean).join(" · ");
-  }
-  return [
-    profile.types != null
-      ? `${num(profile.types)} tipos`
-      : null,
-    profile.own_units_per_day != null
-      ? `${num(profile.own_units_per_day)} propios/día`
-      : null,
-    item.is_default ? "Vigente" : null,
-  ].filter(Boolean).join(" · ");
-}
+  const overlay = el("div", null, "dispatch-previous-overlay");
+  overlay.hidden = true;
 
-export function renderLibrary(
-  root,
-  {
-    kind,
-    items,
-    selected,
-    query = "",
-    onSelect,
-    onArchive,
-    onSearch,
-    onMakeDefault,
-    onUndo,
-  },
-) {
-  root.replaceChildren();
+  const drawer = el("aside", null, "dispatch-previous-drawer");
+  drawer.setAttribute("role", "dialog");
+  drawer.setAttribute("aria-modal", "true");
 
-  const details = document.createElement("details");
-  details.className = "dispatch-library-details";
-  const summary = document.createElement("summary");
-  summary.textContent = kind === "orders"
-    ? `Usar una carga anterior (${items?.length || 0})`
-    : `Cambiar flota o subir una nueva versión (${items?.length || 0})`;
-  details.append(summary);
+  const head = el("div", null, "dispatch-previous-head");
+  const title = el("h2", "");
+  const close = document.createElement("button");
+  close.type = "button";
+  close.setAttribute("aria-label", "Cerrar selector");
+  close.textContent = "×";
+  head.append(title, close);
 
-  if ((items?.length || 0) > 5) {
-    const search = document.createElement("input");
-    search.type = "search";
-    search.value = query;
-    search.placeholder = "Buscar por nombre…";
-    search.setAttribute("aria-label", search.placeholder);
-    let timer = null;
-    search.oninput = () => {
-      window.clearTimeout(timer);
-      timer = window.setTimeout(
-        () => onSearch(search.value.trim()),
-        250,
+  const search = document.createElement("input");
+  search.type = "search";
+  search.placeholder = "Buscar por nombre de archivo";
+  search.setAttribute("aria-label", search.placeholder);
+
+  const list = el("div", null, "dispatch-previous-list");
+  drawer.append(head, search, list);
+  overlay.append(drawer);
+  document.body.append(overlay);
+
+  let opener = null;
+  let current = [];
+  let selectedId = null;
+  let onSelect = null;
+  let kind = "orders";
+
+  function render() {
+    list.replaceChildren();
+    const query = search.value.trim().toLowerCase();
+    const items = current.filter((item) => {
+      if (!query) {
+        return true;
+      }
+      return [
+        item.label,
+        item.original_filename,
+      ].some((value) => String(value || "").toLowerCase().includes(query));
+    });
+
+    if (!items.length) {
+      list.append(
+        el(
+          "p",
+          "No encontramos archivos guardados para esta búsqueda.",
+          "dispatch-library-empty",
+        ),
       );
-    };
-    details.append(search);
-  }
-
-  if (!items?.length) {
-    details.append(
-      el(
-        "p",
-        kind === "orders"
-          ? "Todavía no hay órdenes guardadas."
-          : "Todavía no hay versiones de flota guardadas.",
-        "dispatch-library-empty",
-      ),
-    );
-    root.append(details);
-    return;
-  }
-
-  const list = el("div", null, "dispatch-library-list");
-  for (const item of items) {
-    const row = el("article", null, "dispatch-library-row");
-    if (selected?.id === item.id) {
-      row.classList.add("is-selected");
+      return;
     }
 
-    const info = el("div");
-    info.append(
-      el("strong", item.label || item.original_filename),
-      el("small", metaFor(kind, item)),
-      el("small", item.original_filename, "dispatch-muted-file"),
-    );
+    items.forEach((item) => {
+      const row = el("article", null, "dispatch-previous-row");
+      const info = el("div");
+      info.append(
+        el("strong", item.original_filename || item.label || "Archivo"),
+        el(
+          "small",
+          [
+            item.size_bytes != null
+              ? `${num(item.size_bytes / 1024, 1)} KB`
+              : null,
+            item.row_count != null
+              ? `${num(item.row_count)} registros`
+              : null,
+            item.created_at
+              ? `cargado ${date(item.created_at.slice(0, 10))}`
+              : null,
+          ].filter(Boolean).join(" · "),
+        ),
+      );
 
-    const actions = el("div", null, "dispatch-library-actions");
-    const use = document.createElement("button");
-    use.type = "button";
-    use.textContent = selected?.id === item.id ? "En uso" : "Usar";
-    use.disabled = selected?.id === item.id;
-    use.onclick = () => onSelect(item);
-    actions.append(use);
-
-    if (kind === "fleet" && !item.is_default) {
-      const makeDefault = document.createElement("button");
-      makeDefault.type = "button";
-      makeDefault.className = "dispatch-text-action";
-      makeDefault.textContent = "Marcar vigente";
-      makeDefault.onclick = () => onMakeDefault(item);
-      actions.append(makeDefault);
-    }
-
-    if (!(kind === "fleet" && item.is_default)) {
-      const menu = document.createElement("details");
-      menu.className = "dispatch-row-menu";
-      const menuSummary = document.createElement("summary");
-      menuSummary.setAttribute("aria-label", "Más acciones");
-      menuSummary.textContent = "⋯";
-      menu.append(menuSummary);
-      const archive = document.createElement("button");
-      archive.type = "button";
-      archive.textContent = "Archivar";
-      archive.onclick = async () => {
-        await onArchive(item);
-        menu.open = false;
-        const undo = el(
-          "div",
-          "Carga archivada.",
-          "dispatch-undo",
-        );
-        const undoButton = document.createElement("button");
-        undoButton.type = "button";
-        undoButton.textContent = "Deshacer";
-        undoButton.onclick = () => onUndo(item);
-        undo.append(undoButton);
-        root.prepend(undo);
-        window.setTimeout(() => undo.remove(), 8000);
+      const use = document.createElement("button");
+      use.type = "button";
+      use.textContent = item.id === selectedId ? "En uso" : "Usar";
+      use.disabled = item.id === selectedId;
+      use.onclick = async () => {
+        await onSelect?.(item);
+        hide();
       };
-      menu.append(archive);
-      actions.append(menu);
-    }
-
-    row.append(info, actions);
-    list.append(row);
+      row.append(info, use);
+      list.append(row);
+    });
   }
-  details.append(list);
-  root.append(details);
+
+  function open(options) {
+    kind = options.kind;
+    current = options.items || [];
+    selectedId = options.selected?.id || null;
+    onSelect = options.onSelect;
+    opener = options.source || null;
+    title.textContent = kind === "orders"
+      ? "Usar una carga anterior"
+      : "Usar una flota guardada";
+    search.hidden = current.length <= 5;
+    search.value = "";
+    render();
+    overlay.hidden = false;
+    document.body.classList.add("dispatch-drawer-open");
+    close.focus();
+  }
+
+  function hide() {
+    overlay.hidden = true;
+    document.body.classList.remove("dispatch-drawer-open");
+    opener?.focus();
+  }
+
+  search.oninput = render;
+  close.onclick = hide;
+  overlay.onclick = (event) => {
+    if (event.target === overlay) {
+      hide();
+    }
+  };
+  overlay.onkeydown = (event) => {
+    if (event.key === "Escape") {
+      hide();
+    }
+  };
+
+  return {open, close: hide};
 }
