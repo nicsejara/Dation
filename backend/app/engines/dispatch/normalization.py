@@ -135,6 +135,14 @@ def raw_cost(order, vehicle):
     )
 
 
+def raw_co2(order, vehicle):
+    return (
+        D(order["distance_km"])
+        * D(2)
+        * D(vehicle["co2_kg_per_km"])
+    )
+
+
 def eligible_fleet(order, fleet):
     return [
         vehicle
@@ -143,27 +151,35 @@ def eligible_fleet(order, fleet):
     ]
 
 
-def departure_days(order, vehicle, fleet):
+def departure_days(order, vehicle, fleet, max_late_days=0):
+    """Candidate departure dates including a bounded late-recovery horizon."""
     if not vehicle_can_serve_origin(order, vehicle):
         return []
     start = date.fromisoformat(order["dispatch_date"])
     deadline = date.fromisoformat(order["deadline"])
-    eligible = eligible_fleet(order, fleet)
-    if not eligible:
+    if not eligible_fleet(order, fleet):
         return []
-    inevitable = all(
-        transit(order, candidate) > order["max_delivery_days"]
-        for candidate in eligible
-    )
-    end = (
-        start
-        if inevitable
-        else deadline - timedelta(days=transit(order, vehicle))
-    )
+
+    latest_on_time = deadline - timedelta(days=transit(order, vehicle))
+    # A physically unavoidable late order starts its recovery window from the
+    # earliest possible dispatch rather than from an already-expired date.
+    recovery_anchor = max(start, latest_on_time)
+    end = recovery_anchor + timedelta(days=max_late_days)
     return [
         (start + timedelta(days=index)).isoformat()
         for index in range(max(0, (end - start).days + 1))
     ]
+
+
+def lateness_days(order, vehicle, dispatch_day):
+    arrival = (
+        date.fromisoformat(dispatch_day)
+        + timedelta(days=transit(order, vehicle))
+    )
+    return max(
+        0,
+        (arrival - date.fromisoformat(order["deadline"])).days,
+    )
 
 
 def _finding(identifier, title, items=None):
