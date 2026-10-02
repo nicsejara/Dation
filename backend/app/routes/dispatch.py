@@ -37,6 +37,10 @@ class RunRequest(BaseModel):
     options: DispatchOptions = DispatchOptions()
 
 
+class LabelUpdate(BaseModel):
+    label: str
+
+
 async def guarded(call):
     try:
         return await call
@@ -98,6 +102,42 @@ async def validate_dataset(
         filename,
         contents,
         dataset_type,
+    )
+
+
+@router.post("/api/datasets/load-sample")
+async def load_sample():
+    if not await service.available():
+        raise HTTPException(
+            503,
+            "Falta activar el almacenamiento de datos.",
+        )
+    return await guarded(service.load_sample_inputs())
+
+
+@router.patch("/api/datasets/{dataset_id}")
+async def update_dataset(dataset_id: UUID, payload: LabelUpdate):
+    dataset = await guarded(
+        service.update_dataset_label(
+            str(dataset_id),
+            payload.label,
+        )
+    )
+    return {"dataset": dataset}
+
+
+@router.get("/api/datasets/{dataset_id}/download")
+async def download_dataset(dataset_id: UUID):
+    dataset, contents = await guarded(
+        service.download_input(str(dataset_id))
+    )
+    filename = dataset.get("original_filename") or "datos.csv"
+    return Response(
+        content=contents,
+        media_type="text/csv; charset=utf-8",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+        },
     )
 
 
