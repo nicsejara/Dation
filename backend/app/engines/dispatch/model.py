@@ -517,10 +517,17 @@ def solve(
         for index, x, _ in loads
     )
 
+    total_weight_kg = sum(
+        float(D(order["unit_weight_kg"]))
+        * order["quantity_units"]
+        for order in orders
+    )
     business_terms = {
         "cost": cost,
-        "time": time / max(units, 1),
-        "utilization": outsourced_weight,
+        "time": (1 / max(units, 1)) * time,
+        "utilization": (
+            1 / max(total_weight_kg, 1e-9)
+        ) * outsourced_weight,
         "co2": co2,
     }
     business_score = sum(
