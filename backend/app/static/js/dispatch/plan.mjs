@@ -1,17 +1,20 @@
 import {esc,num,money,pct,date,vehicle,chart,dispose,csv,download} from './shared.mjs';
 import {changes,filteredTrips} from './selectors.mjs';
 
+function poolId(value){return value.fleet_pool_id||value.vehicle_type||'legacy';}
+function baseLabel(value){
+  if(value.base_location==='*')return 'cualquier origen';
+  return value.base_location||'base no informada';
+}
 function poolLabel(value){
-  return value.base_location==='*'
-    ? `${vehicle(value.vehicle_type)} · cualquier origen · ${value.fleet_pool_id}`
-    : `${vehicle(value.vehicle_type)} · ${value.base_location} · ${value.fleet_pool_id}`;
+  return `${vehicle(value.vehicle_type)} · ${baseLabel(value)} · ${poolId(value)}`;
 }
 
 export function exportPlan(r){
   const headers=['Viaje','Salida','Llegada','Origen','Destino','Pool de flota','Base','Camión','Propiedad','Orden','Unidades','Kg','Costo del viaje','CO2 del viaje'];
   const rows=r.scenarios.selected.trips.flatMap(t=>t.loads.map((l,i)=>[
-    t.trip_id,t.dispatch_date,t.arrival_date,t.origin,t.destination,t.fleet_pool_id,
-    t.base_location,vehicle(t.vehicle_type),t.ownership==='own'?'Propio':'Tercerizado',
+    t.trip_id,t.dispatch_date,t.arrival_date,t.origin,t.destination,poolId(t),
+    baseLabel(t),vehicle(t.vehicle_type),t.ownership==='own'?'Propio':'Tercerizado',
     l.order_id,l.units,l.kg,i===0?t.cost:'',i===0?t.co2_kg:''
   ]));
   download('distribucion-recomendada.csv',csv([headers,...rows]),'text/csv;charset=utf-8');
@@ -37,8 +40,8 @@ function calendar(root,r){
   const days=[...new Set(trips.map(t=>t.dispatch_date))].sort();
   root.innerHTML='<p>Salidas por día y pool de flota. Cada pool sólo puede atender órdenes cuyo origen coincide con su base; los tercerizados con base * pueden operar desde cualquier origen. En esta fase los vehículos vuelven a estar disponibles al día siguiente.</p><div class="dispatch-chart" role="img" aria-label="Calendario de salidas por pool de flota"></div><div class="dispatch-table-wrap"><table><thead><tr><th>Día</th><th>Base</th><th>Pool / camión</th><th>Viajes</th><th>Disponibles</th></tr></thead><tbody>'+
     days.flatMap(d=>r.fleet.map(v=>{
-      const n=trips.filter(t=>t.dispatch_date===d&&t.fleet_pool_id===v.fleet_pool_id).length;
-      return n?`<tr><td>${date(d)}</td><td>${esc(v.base_location==='*'?'Cualquier origen':v.base_location)}</td><td>${esc(v.fleet_pool_id)}<small>${esc(vehicle(v.vehicle_type))}</small></td><td>${n}</td><td>${v.units_available??'Sin límite'}</td></tr>`:'';
+      const n=trips.filter(t=>t.dispatch_date===d&&poolId(t)===poolId(v)).length;
+      return n?`<tr><td>${date(d)}</td><td>${esc(v.base_location==='*'?'Cualquier origen':v.base_location)}</td><td>${esc(poolId(v))}<small>${esc(vehicle(v.vehicle_type))}</small></td><td>${n}</td><td>${v.units_available??'Sin límite'}</td></tr>`:'';
     })).join('')+'</tbody></table></div>';
 
   chart(root.querySelector('.dispatch-chart'),{
@@ -52,10 +55,10 @@ function calendar(root,r){
         name:poolLabel(v),
         type:'bar',
         stack:'salidas',
-        data:days.map(d=>trips.filter(t=>t.dispatch_date===d&&t.fleet_pool_id===v.fleet_pool_id).length),
+        data:days.map(d=>trips.filter(t=>t.dispatch_date===d&&poolId(t)===poolId(v)).length),
       },
       ...(v.units_available!=null?[{
-        name:'Disponible: '+v.fleet_pool_id,
+        name:'Disponible: '+poolId(v),
         type:'line',
         symbol:'none',
         lineStyle:{type:'dashed'},
@@ -67,14 +70,14 @@ function calendar(root,r){
 
 function trips(root,r){
   const outcomes=new Map(r.scenarios.selected.order_outcomes.map(o=>[o.order_id,o]));
-  const pools=[...new Map(r.scenarios.selected.trips.map(t=>[t.fleet_pool_id,t])).values()];
+  const pools=[...new Map(r.scenarios.selected.trips.map(t=>[poolId(t),t])).values()];
   const routes=[...new Set(r.scenarios.selected.trips.map(t=>t.origin+' → '+t.destination))];
-  root.innerHTML=`<div class="dispatch-filters"><input name="search" placeholder="Buscar orden, viaje, pool o destino" aria-label="Buscar viajes"><select name="pool" aria-label="Pool de flota"><option value="">Todos los pools</option>${pools.map(v=>`<option value="${esc(v.fleet_pool_id)}">${esc(poolLabel(v))}</option>`).join('')}</select><select name="route" aria-label="Ruta"><option value="">Todas las rutas</option>${routes.map(v=>`<option>${esc(v)}</option>`).join('')}</select><select name="sort" aria-label="Ordenar"><option value="date">Fecha de salida</option><option value="cost">Mayor costo</option></select><label><input name="outsourced" type="checkbox">Tercerizados</label><label><input name="late" type="checkbox">Con tardanzas</label><button data-export>Exportar CSV</button></div><div class="dispatch-table-wrap"><table><thead><tr><th>Viaje / carga</th><th>Salida / llegada</th><th>Ruta / recurso</th><th>Utilización</th><th>Costo</th><th>CO₂</th></tr></thead><tbody></tbody></table></div><p data-count></p>`;
+  root.innerHTML=`<div class="dispatch-filters"><input name="search" placeholder="Buscar orden, viaje, pool o destino" aria-label="Buscar viajes"><select name="pool" aria-label="Pool de flota"><option value="">Todos los pools</option>${pools.map(v=>`<option value="${esc(poolId(v))}">${esc(poolLabel(v))}</option>`).join('')}</select><select name="route" aria-label="Ruta"><option value="">Todas las rutas</option>${routes.map(v=>`<option>${esc(v)}</option>`).join('')}</select><select name="sort" aria-label="Ordenar"><option value="date">Fecha de salida</option><option value="cost">Mayor costo</option></select><label><input name="outsourced" type="checkbox">Tercerizados</label><label><input name="late" type="checkbox">Con tardanzas</label><button data-export>Exportar CSV</button></div><div class="dispatch-table-wrap"><table><thead><tr><th>Viaje / carga</th><th>Salida / llegada</th><th>Ruta / recurso</th><th>Utilización</th><th>Costo</th><th>CO₂</th></tr></thead><tbody></tbody></table></div><p data-count></p>`;
   const update=()=>{
     const filters={};
     root.querySelectorAll('[name]').forEach(n=>filters[n.name]=n.type==='checkbox'?n.checked:n.value);
     const rows=filteredTrips(r,filters);
-    root.querySelector('tbody').innerHTML=rows.map(t=>`<tr><td><details><summary>${esc(t.trip_id)} · ${t.loads.length} órdenes</summary>${t.loads.map(l=>`<p>${esc(l.order_id)}: ${num(l.units)} un. · ${num(l.kg)} kg · plazo ${date(outcomes.get(l.order_id)?.deadline)}${outcomes.get(l.order_id)?.late_days?' · entrega tardía':''}</p>`).join('')}</details></td><td>${date(t.dispatch_date)}<small>${date(t.arrival_date)}</small></td><td>${esc(t.origin)} → ${esc(t.destination)}<small>${esc(vehicle(t.vehicle_type))} · ${esc(t.fleet_pool_id)} · base ${esc(t.base_location==='*'?'cualquier origen':t.base_location)}${t.ownership==='third_party'?' · Tercerizado':''}</small></td><td>${num(t.load_kg)} kg · ${pct(t.utilization)}<meter min="0" max="1" value="${t.utilization}" aria-label="Utilización ${pct(t.utilization)}"></meter></td><td>${money(t.cost)}</td><td>${num(t.co2_kg,1)} kg</td></tr>`).join('');
+    root.querySelector('tbody').innerHTML=rows.map(t=>`<tr><td><details><summary>${esc(t.trip_id)} · ${t.loads.length} órdenes</summary>${t.loads.map(l=>`<p>${esc(l.order_id)}: ${num(l.units)} un. · ${num(l.kg)} kg · plazo ${date(outcomes.get(l.order_id)?.deadline)}${outcomes.get(l.order_id)?.late_days?' · entrega tardía':''}</p>`).join('')}</details></td><td>${date(t.dispatch_date)}<small>${date(t.arrival_date)}</small></td><td>${esc(t.origin)} → ${esc(t.destination)}<small>${esc(vehicle(t.vehicle_type))} · ${esc(poolId(t))} · base ${esc(t.base_location==='*'?'cualquier origen':t.base_location)}${t.ownership==='third_party'?' · Tercerizado':''}</small></td><td>${num(t.load_kg)} kg · ${pct(t.utilization)}<meter min="0" max="1" value="${t.utilization}" aria-label="Utilización ${pct(t.utilization)}"></meter></td><td>${money(t.cost)}</td><td>${num(t.co2_kg,1)} kg</td></tr>`).join('');
     root.querySelector('[data-count]').textContent=rows.length+' viajes encontrados';
   };
   root.querySelectorAll('[name]').forEach(n=>n.oninput=update);
