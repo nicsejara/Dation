@@ -1,6 +1,6 @@
-# Despliegue de Dispatch 2.0.0
+# Despliegue de Dispatch 2.1.0
 
-API esperada: **1.0.0**. Motor Dispatch: **2.0.0**. Motor histórico: **0.2.0**. Runtime: Python **3.13**, OR-Tools **9.15.6755**.
+API esperada: **1.0.0**. Motor Dispatch: **2.1.0**. Motor histórico: **0.2.0**. Runtime: Python **3.13**, OR-Tools **9.15.6755**.
 
 ## Activación manual en Supabase
 
@@ -74,7 +74,7 @@ Con backend actualizado y autenticación válida, `GET /api/dispatch/status` deb
 
 ## Fase espacial de flota
 
-`fleet_v2` no requiere columnas nuevas en `datasets`. Dispatch 2.0.0 sí agrega una migración de integridad para que `decision_runs` acepte y valide el envelope `dispatch_v2` sin reescribir corridas históricas.
+`fleet_v2` no requiere columnas nuevas en `datasets`. Dispatch 2.1.0 sí agrega una migración de integridad para que `decision_runs` acepte y valide el envelope `dispatch_v2` sin reescribir corridas históricas.
 
 Después del deploy verificar que `GET /api/dispatch/contracts` informe `orders_v2` y `fleet_v2`, que la plantilla de flota contenga `fleet_pool_id` y `base_location`, que una orden no pueda utilizar un pool propio cuya base pertenezca a otro origen y que un recurso finito no pueda reutilizarse antes de `resource_available_again`. Los datasets `fleet_v1` históricos deben continuar validando con la advertencia `LEGACY_FLEET_GLOBAL_SCOPE`.
 
