@@ -17,4 +17,7 @@ class DispatchContextTests(unittest.TestCase):
         for scenario in result['scenarios'].values():
             if scenario.get('metrics'):scenario['metrics']['trips_by_vehicle_type']={'T'+str(i)+'x'*1000:i for i in range(100)}
         context=build_dispatch_context(result)
+        self.assertEqual(context['schema_version'], 'dispatch_v2')
+        self.assertIn('decision_drivers', context)
+        self.assertIn('feasibility', context)
         self.assertLessEqual(len(json.dumps(context,ensure_ascii=False)),18000)

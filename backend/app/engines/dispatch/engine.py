@@ -3,151 +3,891 @@ import hashlib
 import json
 from datetime import datetime, timezone
 from time import perf_counter
-from app.models.dispatch_config import DispatchConfig, DispatchOptions, PRESETS
+
+from app.models.dispatch_config import (
+    DispatchConfig,
+    DispatchOptions,
+    OBJECTIVE_KEYS,
+    PRESETS,
+)
 from app.validators.orders_schema import validate_orders_csv
 from app.validators.fleet_schema import validate_fleet_csv
+
 from .normalization import preflight
 from .plans import greedy, summarize, validate_plan
 from .model import solve
 
-ENGINE_NAME='logistics-dispatch-engine'
-ENGINE_VERSION='1.2.0'
-NAMES={'baseline_direct':'Despacho directo','baseline_current':'Asignación informada','min_cost':'Costo mínimo',
-       'min_trips':'Viajes mínimos','min_time':'Entrega más rápida','selected':'Decisión recomendada'}
-DIRECTIONS={k:('higher_better' if k in ('on_time_rate','load_utilization') else 'lower_better') for k in
-            ('total_cost','total_trips','avg_lead_time_days','on_time_rate','load_utilization','co2_kg','fuel_l','outsourced_trips_share')}
+
+ENGINE_NAME = "logistics-dispatch-engine"
+ENGINE_VERSION = "2.0.0"
+SCHEMA_VERSION = "dispatch_v2"
+
+NAMES = {
+    "baseline_direct": "Despacho directo",
+    "min_cost": "Costo mínimo",
+    "min_time": "Tiempo mínimo",
+    "max_utilization": "Máxima utilización propia",
+    "min_co2": "CO₂ mínimo",
+    "balanced": "Balanceado",
+    "selected": "Decisión recomendada",
+}
+
+METRICS = {
+    "cost": "total_cost",
+    "time": "avg_lead_time_days",
+    "utilization": "outsourced_weight_share",
+    "co2": "co2_kg",
+}
+
+SCENARIO_FOR_OBJECTIVE = {
+    "cost": "min_cost",
+    "time": "min_time",
+    "utilization": "max_utilization",
+    "co2": "min_co2",
+}
+
+DIRECTIONS = {
+    "total_cost": "lower_better",
+    "total_trips": "lower_better",
+    "avg_lead_time_days": "lower_better",
+    "on_time_rate": "higher_better",
+    "late_orders": "lower_better",
+    "total_late_days": "lower_better",
+    "priority_weighted_late_days": "lower_better",
+    "load_utilization": "higher_better",
+    "own_load_utilization": "higher_better",
+    "own_weight_share": "higher_better",
+    "outsourced_weight_share": "lower_better",
+    "outsourced_trips_share": "lower_better",
+    "co2_kg": "lower_better",
+    "fuel_l": "lower_better",
+}
 
 
 def digest(value):
-    return hashlib.sha256(json.dumps(value,sort_keys=True,separators=(',',':'),ensure_ascii=False).encode()).hexdigest()
+    return hashlib.sha256(
+        json.dumps(
+            value,
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+        ).encode()
+    ).hexdigest()
 
 
 def plan_signature(scenario):
-    return [(t['dispatch_date'],t['fleet_pool_id'],t['origin'],t['destination'],[(l['order_id'],l['units']) for l in t['loads']]) for t in scenario['trips']]
+    return [
+        (
+            current["dispatch_date"],
+            current["fleet_pool_id"],
+            current["origin"],
+            current["destination"],
+            [
+                (
+                    load["order_id"],
+                    load["units"],
+                )
+                for load in current["loads"]
+            ],
+        )
+        for current in scenario["trips"]
+    ]
 
 
-def run_dispatch_engine(orders_bytes, fleet_bytes, configuration=None, options=None, inputs=None, progress=None):
-    started=perf_counter();config=DispatchConfig.model_validate(configuration or {}).model_dump()
-    opts=DispatchOptions.model_validate(options or {}).model_dump()
+def _sla_key(scenario):
+    metrics = scenario["metrics"]
+    return (
+        metrics["late_orders"],
+        metrics["priority_weighted_late_days"],
+        metrics["total_late_days"],
+    )
+
+
+def _metric(scenario, key):
+    return scenario["metrics"][METRICS[key]]
+
+
+def _decision_drivers(selected):
+    outcomes = selected["order_outcomes"]
+    metrics = selected["metrics"]
+    return {
+        "orders_consolidated": sum(
+            outcome["consolidated"]
+            for outcome in outcomes
+        ),
+        "orders_split": sum(
+            outcome["split"]
+            for outcome in outcomes
+        ),
+        "orders_outsourced": sum(
+            outcome["outsourced"]
+            for outcome in outcomes
+        ),
+        "orders_postponed": sum(
+            outcome["postponed_days"] > 0
+            for outcome in outcomes
+        ),
+        "late_orders": metrics["late_orders"],
+        "physical_sla_violations": (
+            metrics["late_orders_unavoidable"]
+        ),
+        "capacity_or_policy_sla_violations": max(
+            0,
+            metrics["late_orders"]
+            - metrics["late_orders_unavoidable"],
+        ),
+        "own_weight_share": metrics["own_weight_share"],
+        "outsourced_weight_kg": (
+            metrics["outsourced_weight_kg"]
+        ),
+        "own_trips": metrics["own_trips"],
+        "outsourced_trips": metrics["outsourced_trips"],
+    }
+
+
+def _exceptions(selected):
+    return [
+        {
+            "order_id": outcome["order_id"],
+            "priority": outcome["priority"],
+            "late_days": outcome["late_days"],
+            "deadline": outcome["deadline"],
+            "arrival_date": outcome["arrival_date"],
+            "trip_ids": outcome["trip_ids"],
+        }
+        for outcome in selected["order_outcomes"]
+        if outcome["late_days"] > 0
+    ]
+
+
+def run_dispatch_engine(
+    orders_bytes,
+    fleet_bytes,
+    configuration=None,
+    options=None,
+    inputs=None,
+    progress=None,
+):
+    started = perf_counter()
+    config = DispatchConfig.model_validate(
+        configuration or {}
+    ).model_dump()
+    opts = DispatchOptions.model_validate(
+        options or {}
+    ).model_dump()
+
     def notify(stage):
-        if perf_counter()-started > opts['total_time_limit_s']:
-            raise TimeoutError('Se agotó el presupuesto global; no se publica una decisión parcial.')
-        if progress:progress(stage)
-    notify('validating')
-    orders=sorted(validate_orders_csv(orders_bytes)['records'],key=lambda o:o['order_id'])
-    full_fleet=sorted(validate_fleet_csv(fleet_bytes)['records'],key=lambda v:(v['base_location'],v['vehicle_type'],v['fleet_pool_id']))
-    fleet=[v for v in full_fleet if opts['allow_third_party'] or v['ownership']=='own']
-    if not fleet:raise ValueError('No hay flota habilitada.')
-    check=preflight(orders,fleet,full_fleet)
-    if check['errors']:raise ValueError('; '.join(e['detail']+' '+e.get('order_id','') for e in check['errors']))
-    anomalies=check['anomalies']
-    for a in anomalies:
-        decision=opts['anomaly_decisions'].get(a['order_id'])
-        if decision is None:raise ValueError('Debés decidir incluir o excluir la anomalía '+a['order_id'])
-        a['decision']=decision
-    excluded={a['order_id'] for a in anomalies if a['decision']=='exclude'}
-    orders=[o for o in orders if o['order_id'] not in excluded]
-    if not orders:raise ValueError('No quedan órdenes incluidas.')
-    notify('baseline');scenarios={};candidates=[]
-    for key,current in [('baseline_direct',False),('baseline_current',True)]:
-        if current and not all(o.get('current_vehicle_type') for o in orders):continue
-        p=greedy(orders,fleet,direct=True,current=current)
-        if p:
-            validate_plan(p,orders,fleet,direct=True)
-            scenarios[key]={**summarize(p,orders,fleet),'name':NAMES[key],'feasible':True,'solver':{'status':'feasible','method':'declared_policy','gap':None}}
+        if (
+            perf_counter() - started
+            > opts["total_time_limit_s"]
+        ):
+            raise TimeoutError(
+                "Se agotó el presupuesto global; "
+                "no se publica una decisión parcial."
+            )
+        if progress:
+            progress(stage)
+
+    notify("validating")
+    orders = sorted(
+        validate_orders_csv(
+            orders_bytes
+        )["records"],
+        key=lambda order: order["order_id"],
+    )
+    full_fleet = sorted(
+        validate_fleet_csv(
+            fleet_bytes
+        )["records"],
+        key=lambda vehicle: (
+            vehicle["base_location"],
+            vehicle["vehicle_type"],
+            vehicle["fleet_pool_id"],
+        ),
+    )
+    fleet = [
+        vehicle
+        for vehicle in full_fleet
+        if (
+            opts["allow_third_party"]
+            or vehicle["ownership"] == "own"
+        )
+    ]
+    if not fleet:
+        raise ValueError("No hay flota habilitada.")
+
+    check = preflight(
+        orders,
+        fleet,
+        full_fleet,
+    )
+    if check["errors"]:
+        raise ValueError(
+            "; ".join(
+                error["detail"]
+                + " "
+                + error.get("order_id", "")
+                for error in check["errors"]
+            )
+        )
+
+    anomalies = check["anomalies"]
+    for anomaly in anomalies:
+        decision = opts[
+            "anomaly_decisions"
+        ].get(anomaly["order_id"])
+        if decision is None:
+            raise ValueError(
+                "Debés decidir incluir o excluir la anomalía "
+                + anomaly["order_id"]
+            )
+        anomaly["decision"] = decision
+
+    excluded = {
+        anomaly["order_id"]
+        for anomaly in anomalies
+        if anomaly["decision"] == "exclude"
+    }
+    orders = [
+        order
+        for order in orders
+        if order["order_id"] not in excluded
+    ]
+    if not orders:
+        raise ValueError(
+            "No quedan órdenes incluidas."
+        )
+
+    notify("baseline")
+    scenarios = {}
+    candidates = []
+
+    direct = greedy(
+        orders,
+        fleet,
+        direct=True,
+    )
+    if direct:
+        try:
+            validate_plan(
+                direct,
+                orders,
+                fleet,
+                direct=True,
+            )
+            baseline = {
+                **summarize(
+                    direct,
+                    orders,
+                    fleet,
+                ),
+                "name": NAMES["baseline_direct"],
+                "feasible": True,
+                "solver": {
+                    "status": "feasible",
+                    "method": "declared_policy",
+                    "gap": None,
+                    "sla_certified": False,
+                },
+            }
+        except ValueError:
+            baseline = {
+                "name": NAMES["baseline_direct"],
+                "feasible": False,
+                "metrics": None,
+                "trips": [],
+                "order_outcomes": [],
+                "solver": {
+                    "status": "unknown",
+                    "method": "declared_policy",
+                    "gap": None,
+                    "sla_certified": False,
+                },
+                "warning": (
+                    "La política directa no respeta todas "
+                    "las restricciones temporales."
+                ),
+            }
+    else:
+        baseline = {
+            "name": NAMES["baseline_direct"],
+            "feasible": False,
+            "metrics": None,
+            "trips": [],
+            "order_outcomes": [],
+            "solver": {
+                "status": "unknown",
+                "method": "declared_policy",
+                "gap": None,
+                "sla_certified": False,
+            },
+            "warning": (
+                "La política directa no encuentra cobertura "
+                "con la flota disponible."
+            ),
+        }
+    scenarios["baseline_direct"] = baseline
+
+    for objective in (
+        "min_cost",
+        "min_time",
+        "max_utilization",
+        "min_co2",
+    ):
+        candidate_plan = greedy(
+            orders,
+            fleet,
+            objective=objective,
+            max_late_days=opts["max_late_days"],
+        )
+        if candidate_plan:
+            validate_plan(
+                candidate_plan,
+                orders,
+                fleet,
+                max_late_days=opts[
+                    "max_late_days"
+                ],
+            )
+            candidates.append(
+                summarize(
+                    candidate_plan,
+                    orders,
+                    fleet,
+                )
+            )
+
+    if baseline["feasible"]:
+        try:
+            validate_plan(
+                baseline["trips"],
+                orders,
+                fleet,
+                max_late_days=opts[
+                    "max_late_days"
+                ],
+            )
+            candidates.append(
+                copy.deepcopy(baseline)
+            )
+        except ValueError:
+            pass
+
+    if not candidates:
+        raise ValueError(
+            "No se encontró una distribución completa "
+            "dentro del horizonte de recuperación."
+        )
+
+    scales = {
+        key: 1.0
+        for key in OBJECTIVE_KEYS
+    }
+
+    def choose(weights, active_scales):
+        def key(scenario):
+            business = sum(
+                weights[name]
+                * _metric(scenario, name)
+                / max(
+                    active_scales[name],
+                    1e-9,
+                )
+                for name in OBJECTIVE_KEYS
+            )
+            return (
+                *_sla_key(scenario),
+                business,
+                scenario["metrics"]["total_trips"],
+                scenario["metrics"]["total_cost"],
+                plan_signature(scenario),
+            )
+
+        return min(
+            candidates,
+            key=key,
+        )
+
+    def optimize(weights, label, active_scales):
+        notify("optimizing:" + label)
+        if len(orders) <= 300:
+            hint = (
+                choose(
+                    weights,
+                    active_scales,
+                )["trips"]
+                if candidates
+                else None
+            )
+            plan, meta = solve(
+                orders,
+                fleet,
+                weights,
+                active_scales,
+                opts,
+                hint,
+            )
         else:
-            scenarios[key]={'name':NAMES[key],'feasible':False,'metrics':None,'trips':[],
-                'solver':{'status':'unknown','method':'declared_policy','gap':None},
-                'warning':'La política directa no encuentra cobertura con la flota disponible; no es una prueba de inviabilidad global.'}
-    for objective in ('min_cost','min_trips','min_time'):
-        p=greedy(orders,fleet,objective)
-        if p:
-            validate_plan(p,orders,fleet)
-            candidates.append(summarize(p,orders,fleet))
-    # Only a direct reference that also satisfies the planning windows is a candidate.
-    baseline=scenarios['baseline_direct']
-    if baseline['feasible']:
-        try:validate_plan(baseline['trips'],orders,fleet);candidates.append(copy.deepcopy(baseline))
-        except ValueError:baseline['feasible']=False;baseline['warning']='Referencia directa fuera de las ventanas de planificación.'
-    def metric(s,k):return s['metrics'][{'cost':'total_cost','trips':'total_trips','time':'avg_lead_time_days'}[k]]
-    scales={k:1.0 for k in ('cost','trips','time')}
-    def choose(weights):
-        return min(candidates,key=lambda s:(sum(weights[k]*metric(s,k)/scales[k] for k in weights),metric(s,'cost'),metric(s,'trips'),plan_signature(s)))
-    def optimize(weights,label):
-        notify('optimizing:'+label)
-        if len(orders)<=300:
-            p,meta=solve(orders,fleet,weights,scales,opts,choose(weights)['trips'] if candidates else None)
-        else:p,meta=None,{'status':'feasible','method':'heuristic','gap':None,'reason':'Política determinística para más de 300 órdenes'}
-        if p:
-            validate_plan(p,orders,fleet);candidate=summarize(p,orders,fleet);candidates.append(candidate)
+            plan = None
+            meta = {
+                "status": "feasible",
+                "method": "heuristic",
+                "gap": None,
+                "sla_status": "not_run",
+                "sla_certified": False,
+                "reason": (
+                    "Política determinística para "
+                    "más de 300 órdenes."
+                ),
+            }
+
+        solver_candidate = None
+        if plan:
+            validate_plan(
+                plan,
+                orders,
+                fleet,
+                max_late_days=opts[
+                    "max_late_days"
+                ],
+            )
+            solver_candidate = summarize(
+                plan,
+                orders,
+                fleet,
+            )
+            candidates.append(
+                solver_candidate
+            )
+
         if not candidates:
-            raise ValueError('No se encontró una distribución factible dentro del presupuesto. Revisá bases, flota y ventanas; no se descartaron órdenes.')
-        result=copy.deepcopy(choose(weights))
-        if not p or plan_signature(result)!=plan_signature(candidate):
-            meta={**meta,'status':'feasible','method':'heuristic' if not p else 'best_candidate','gap':None}
-        result.update(solver=meta,feasible=True,name=NAMES.get(label,label))
+            raise ValueError(
+                "No se encontró una distribución factible "
+                "dentro del presupuesto."
+            )
+
+        result = copy.deepcopy(
+            choose(
+                weights,
+                active_scales,
+            )
+        )
+        if (
+            not solver_candidate
+            or plan_signature(result)
+            != plan_signature(
+                solver_candidate
+            )
+        ):
+            meta = {
+                **meta,
+                "status": "feasible",
+                "method": (
+                    "heuristic"
+                    if not solver_candidate
+                    else "best_candidate"
+                ),
+                "gap": None,
+            }
+        result.update(
+            solver=meta,
+            feasible=True,
+            name=NAMES.get(label, label),
+        )
         return result
-    for k in ('min_cost','min_trips','min_time'):
-        scenarios[k]=optimize(dict(zip(('cost','trips','time'),PRESETS[k])),k)
-    # Known feasible extremes, never claim f* unless certified optimal.
-    normalization={}
-    for k in scales:
-        vals=[metric(s,k) for s in scenarios.values() if s.get('feasible') and s.get('metrics')]
-        low=min(vals);ref=metric(baseline,k) if baseline['feasible'] else max(vals)
-        scales[k]=max(ref-low,max(vals)-low,abs(low)*.01,1.0)
-        normalization[k]={'best_known':low,'reference':ref,'scale':scales[k],
-                          'certified_optimal':scenarios['min_'+k]['solver']['status']=='optimal'}
-    weights=config['weights'];preset=next((k for k,v in PRESETS.items() if k!='balanced' and all(abs(weights[n]-w)<1e-8 for n,w in zip(weights,v))),None)
-    scenarios['selected']=copy.deepcopy(scenarios[preset]) if preset else optimize(weights,'selected')
-    scenarios['selected']['name']=NAMES['selected']
-    notify('sensitivity');sweep=[]
-    settings=[(1,0,0),(0,1,0),(0,0,1),(.5,.5,0),(.5,0,.5),(0,.5,.5),(1/3,1/3,1/3)] if opts['sensitivity'] else []
-    selected=scenarios['selected']
-    def order_map(s):
-        mapping={o['order_id']:[] for o in orders}
-        for t in s['trips']:
-            signature=(t['dispatch_date'],t['fleet_pool_id'],tuple((l['order_id'],l['units']) for l in t['loads']))
-            for l in t['loads']:mapping[l['order_id']].append(signature)
-        return {k:tuple(sorted(v)) for k,v in mapping.items()}
-    selected_map=order_map(selected)
-    previous_map=None
-    for index,ws in enumerate(settings):
-        w=dict(zip(('cost','trips','time'),ws))
-        if index<3:s=scenarios[('min_cost','min_trips','min_time')[index]]
-        else:s=optimize(w,'sensitivity')
-        om=order_map(s)
-        sweep.append({'weights':w,'metrics':s['metrics'],'solver':s['solver'],
-                      'plan_fingerprint':digest(plan_signature(s)),
-                      'orders_changed_vs_selected':sum(om[k]!=selected_map[k] for k in om),
-                      'orders_changed_vs_previous':None if previous_map is None else sum(om[k]!=previous_map[k] for k in om)})
-        previous_map=om
-    notify('summarizing')
-    for name,s in scenarios.items():
-        if s.get('metrics'):
-            s['plan_fingerprint']=digest(plan_signature(s))
-            s['delta_vs_baseline']={k:s['metrics'][k]-baseline['metrics'][k] for k in DIRECTIONS} if baseline['feasible'] else None
-        if name not in ('selected','baseline_direct'):
-            s.pop('trips',None)
-            s.pop('order_outcomes',None)
-    result={'schema_version':'dispatch_v1','engine':{'name':ENGINE_NAME,'version':ENGINE_VERSION,'executed_at':datetime.now(timezone.utc).isoformat(),'solver':selected['solver']},
-        'inputs':{'orders':{'sha256':hashlib.sha256(orders_bytes).hexdigest(),'rows':len(orders)+len(excluded),**(inputs or {}).get('orders',{})},
-                  'fleet':{'sha256':hashlib.sha256(fleet_bytes).hexdigest(),'rows':len(full_fleet),**(inputs or {}).get('fleet',{})},'anomalies':anomalies,'preflight':check},
-        'configuration':{**config,'options':opts},'fleet':full_fleet,'kpi_directions':DIRECTIONS,'normalization':normalization,
-        'assumptions':['Un viaje conecta un origen y un destino; no hay multiparada.',
-            'La flota se asigna sólo desde pools cuya base coincide con el origen; tercerizados con base * pueden operar desde cualquier origen.',
-            'Los pools con disponibilidad finita permanecen ocupados desde la salida hasta completar ida, entrega y retorno a base.',
-            'Costo, combustible y CO₂ contemplan ida y vuelta. El costo por km ya incluye combustible.',
-            'El plazo se pondera por unidades; llegada de una orden es la última entrega.',
-            'Factores de emisiones informados por el usuario; no están certificados.',
-            'No se modelan volumen, dimensiones, ventanas horarias, tiempos de carga/descarga, multiparada ni reposicionamiento entre bases.',
-            'Las escalas usan extremos factibles conocidos; un resultado factible no demuestra optimalidad.'],
-        'scenarios':scenarios,'sensitivity':{'weight_sweep':sweep,'frontier':sweep,'complete':len(sweep)==len(settings)}}
-    # Exclude timing, storage identity, and solver runtime metadata from the deterministic fingerprint.
-    stable={'version':ENGINE_VERSION,'configuration':result['configuration'],'orders_hash':result['inputs']['orders']['sha256'],
-            'fleet_hash':result['inputs']['fleet']['sha256'],'scenarios':{k:{n:v for n,v in s.items() if n!='solver'} for k,s in scenarios.items()},
-            'sensitivity':[{k:v for k,v in p.items() if k!='solver'} for p in sweep]}
-    if perf_counter()-started > opts['total_time_limit_s']:
-        raise TimeoutError('Se agotó el presupuesto global; no se publica una decisión parcial.')
-    result['result_fingerprint']=digest(stable)
-    result['engine']['wall_ms']=int((perf_counter()-started)*1000)
+
+    # Extreme scenarios establish known ranges. For a one-dimensional
+    # objective, scale=1 does not change the ordering.
+    extreme_map = {
+        "min_cost": "cost",
+        "min_time": "time",
+        "max_utilization": "utilization",
+        "min_co2": "co2",
+    }
+    for scenario_name, objective_key in extreme_map.items():
+        weights = {
+            key: float(key == objective_key)
+            for key in OBJECTIVE_KEYS
+        }
+        scenarios[scenario_name] = optimize(
+            weights,
+            scenario_name,
+            scales,
+        )
+
+    normalization = {}
+    for objective_key in OBJECTIVE_KEYS:
+        values = [
+            _metric(scenario, objective_key)
+            for scenario in scenarios.values()
+            if (
+                scenario.get("feasible")
+                and scenario.get("metrics")
+            )
+        ]
+        if baseline["feasible"]:
+            reference = _metric(
+                baseline,
+                objective_key,
+            )
+            values.append(reference)
+        else:
+            reference = max(values)
+
+        best = min(values)
+        scale = max(
+            max(values) - best,
+            abs(reference - best),
+            abs(best) * .01,
+            1e-6,
+        )
+        scales[objective_key] = scale
+        extreme_name = (
+            SCENARIO_FOR_OBJECTIVE[
+                objective_key
+            ]
+        )
+        normalization[objective_key] = {
+            "best_known": best,
+            "reference": reference,
+            "scale": scale,
+            "certified_optimal": (
+                scenarios[
+                    extreme_name
+                ]["solver"].get(
+                    "status"
+                )
+                == "optimal"
+                and scenarios[
+                    extreme_name
+                ]["solver"].get(
+                    "sla_certified",
+                    False,
+                )
+            ),
+        }
+
+    scenarios["balanced"] = optimize(
+        dict(
+            zip(
+                OBJECTIVE_KEYS,
+                PRESETS["balanced"],
+            )
+        ),
+        "balanced",
+        scales,
+    )
+
+    weights = config["weights"]
+    if config["objective"] in scenarios:
+        selected = copy.deepcopy(
+            scenarios[config["objective"]]
+        )
+    else:
+        selected = optimize(
+            weights,
+            "selected",
+            scales,
+        )
+    selected["name"] = NAMES["selected"]
+    scenarios["selected"] = selected
+
+    notify("sensitivity")
+    sweep = []
+    if opts["sensitivity"]:
+        previous_map = None
+
+        def order_map(scenario):
+            mapping = {
+                order["order_id"]: []
+                for order in orders
+            }
+            for current in scenario["trips"]:
+                signature = (
+                    current["dispatch_date"],
+                    current["fleet_pool_id"],
+                    tuple(
+                        (
+                            load["order_id"],
+                            load["units"],
+                        )
+                        for load in current[
+                            "loads"
+                        ]
+                    ),
+                )
+                for load in current["loads"]:
+                    mapping[
+                        load["order_id"]
+                    ].append(signature)
+            return {
+                key: tuple(sorted(value))
+                for key, value in mapping.items()
+            }
+
+        selected_map = order_map(selected)
+        for scenario_name in (
+            "min_cost",
+            "min_time",
+            "max_utilization",
+            "min_co2",
+            "balanced",
+        ):
+            scenario = scenarios[scenario_name]
+            current_map = order_map(scenario)
+            point = {
+                "scenario": scenario_name,
+                "label": NAMES[scenario_name],
+                "weights": dict(
+                    zip(
+                        OBJECTIVE_KEYS,
+                        PRESETS[scenario_name],
+                    )
+                ),
+                "metrics": scenario["metrics"],
+                "solver": scenario["solver"],
+                "plan_fingerprint": digest(
+                    plan_signature(scenario)
+                ),
+                "orders_changed_vs_selected": sum(
+                    current_map[key]
+                    != selected_map[key]
+                    for key in current_map
+                ),
+                "orders_changed_vs_previous": (
+                    None
+                    if previous_map is None
+                    else sum(
+                        current_map[key]
+                        != previous_map[key]
+                        for key in current_map
+                    )
+                ),
+            }
+            sweep.append(point)
+            previous_map = current_map
+
+    notify("summarizing")
+    decision_drivers = _decision_drivers(
+        selected
+    )
+    exceptions = _exceptions(selected)
+    feasibility = {
+        "orders": selected["metrics"]["orders"],
+        "on_time_orders": (
+            selected["metrics"]["orders"]
+            - selected["metrics"]["late_orders"]
+        ),
+        "late_orders": selected["metrics"][
+            "late_orders"
+        ],
+        "physical_sla_violations": selected[
+            "metrics"
+        ]["late_orders_unavoidable"],
+        "capacity_or_policy_sla_violations": (
+            decision_drivers[
+                "capacity_or_policy_sla_violations"
+            ]
+        ),
+        "best_known_late_orders": selected[
+            "metrics"
+        ]["late_orders"],
+        "sla_optimal_certified": selected[
+            "solver"
+        ].get("sla_certified", False),
+        "recovery_horizon_days": opts[
+            "max_late_days"
+        ],
+    }
+    decision_status = (
+        "recommended"
+        if not exceptions
+        else "recommended_with_exceptions"
+    )
+
+    for name, scenario in scenarios.items():
+        if scenario.get("metrics"):
+            scenario["plan_fingerprint"] = digest(
+                plan_signature(scenario)
+            )
+            scenario["delta_vs_baseline"] = (
+                {
+                    key: (
+                        scenario["metrics"][key]
+                        - baseline["metrics"][key]
+                    )
+                    for key in DIRECTIONS
+                    if key
+                    in scenario["metrics"]
+                    and key
+                    in baseline["metrics"]
+                }
+                if baseline["feasible"]
+                else None
+            )
+        if name not in (
+            "selected",
+            "baseline_direct",
+        ):
+            scenario.pop("trips", None)
+            scenario.pop(
+                "order_outcomes",
+                None,
+            )
+
+    result = {
+        "schema_version": SCHEMA_VERSION,
+        "decision": {
+            "status": decision_status,
+            "objective": config["objective"],
+            "label": "Decisión recomendada",
+        },
+        "feasibility": feasibility,
+        "decision_drivers": decision_drivers,
+        "exceptions": exceptions,
+        "engine": {
+            "name": ENGINE_NAME,
+            "version": ENGINE_VERSION,
+            "executed_at": (
+                datetime.now(
+                    timezone.utc
+                ).isoformat()
+            ),
+            "solver": selected["solver"],
+        },
+        "inputs": {
+            "orders": {
+                "sha256": hashlib.sha256(
+                    orders_bytes
+                ).hexdigest(),
+                "rows": len(orders)
+                + len(excluded),
+                **(inputs or {}).get(
+                    "orders",
+                    {},
+                ),
+            },
+            "fleet": {
+                "sha256": hashlib.sha256(
+                    fleet_bytes
+                ).hexdigest(),
+                "rows": len(full_fleet),
+                **(inputs or {}).get(
+                    "fleet",
+                    {},
+                ),
+            },
+            "anomalies": anomalies,
+            "preflight": check,
+        },
+        "configuration": {
+            **config,
+            "options": opts,
+        },
+        "fleet": full_fleet,
+        "kpi_directions": DIRECTIONS,
+        "normalization": normalization,
+        "assumptions": [
+            (
+                "El SLA se optimiza antes que costo, tiempo, "
+                "utilización propia o CO₂."
+            ),
+            (
+                "Las entregas tardías sólo se exploran dentro de "
+                f"{opts['max_late_days']} días de recuperación."
+            ),
+            (
+                "Un viaje conecta un origen y un destino; "
+                "no hay multiparada."
+            ),
+            (
+                "La flota se asigna sólo desde pools cuya base "
+                "coincide con el origen; tercerizados con base * "
+                "pueden operar desde cualquier origen."
+            ),
+            (
+                "Los pools finitos permanecen ocupados desde la "
+                "salida hasta completar ida, entrega y retorno."
+            ),
+            (
+                "Maximizar utilización propia minimiza primero "
+                "la participación de kg tercerizados; la "
+                "utilización de carga propia se informa como KPI."
+            ),
+            (
+                "Costo, combustible y CO₂ contemplan ida y vuelta."
+            ),
+            (
+                "Los factores de emisiones son informados por "
+                "el usuario y no están certificados."
+            ),
+            (
+                "No se modelan volumen, dimensiones, ventanas "
+                "horarias, carga/descarga, multiparada ni "
+                "reposicionamiento entre bases."
+            ),
+            (
+                "Un resultado factible no demuestra optimalidad; "
+                "el dashboard distingue la certificación del solver."
+            ),
+        ],
+        "scenarios": scenarios,
+        "sensitivity": {
+            "weight_sweep": sweep,
+            "frontier": sweep,
+            "complete": (
+                not opts["sensitivity"]
+                or len(sweep) == 5
+            ),
+        },
+    }
+
+    stable = {
+        "schema_version": SCHEMA_VERSION,
+        "version": ENGINE_VERSION,
+        "configuration": result[
+            "configuration"
+        ],
+        "orders_hash": result[
+            "inputs"
+        ]["orders"]["sha256"],
+        "fleet_hash": result[
+            "inputs"
+        ]["fleet"]["sha256"],
+        "decision": result["decision"],
+        "feasibility": feasibility,
+        "decision_drivers": decision_drivers,
+        "scenarios": {
+            key: {
+                name: value
+                for name, value in scenario.items()
+                if name != "solver"
+            }
+            for key, scenario in scenarios.items()
+        },
+        "sensitivity": [
+            {
+                key: value
+                for key, value in point.items()
+                if key != "solver"
+            }
+            for point in sweep
+        ],
+    }
+
+    if (
+        perf_counter() - started
+        > opts["total_time_limit_s"]
+    ):
+        raise TimeoutError(
+            "Se agotó el presupuesto global; "
+            "no se publica una decisión parcial."
+        )
+
+    result["result_fingerprint"] = digest(
+        stable
+    )
+    result["engine"]["wall_ms"] = int(
+        (perf_counter() - started) * 1000
+    )
     return result

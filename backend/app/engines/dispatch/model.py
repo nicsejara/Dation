@@ -1,4 +1,4 @@
-"""Bounded CP-SAT slot formulation. All hard constraints use integer grams/units."""
+"""CP-SAT dispatch model with lexicographic SLA-first optimization."""
 from collections import defaultdict
 from datetime import date
 import math
@@ -12,243 +12,597 @@ from .normalization import (
     capacity_units,
     departure_days,
     raw_cost,
+    raw_co2,
     transit,
     cycle_days,
+    lateness_days,
 )
-from .plans import trip, add_load, canonical
+from .plans import (
+    PRIORITY_WEIGHT,
+    trip,
+    add_load,
+    canonical,
+)
 
-MAX_VARIABLES = 25000
+MAX_VARIABLES = 30000
 
 
-def solve(orders, fleet, weights, scales, options, hint_plan=None):
-    started = perf_counter()
-    model = cp_model.CpModel()
-    slots = []
-    xs = defaultdict(list)
-    resource_intervals = defaultdict(list)
-    hints = defaultdict(list)
-
-    for t in hint_plan or []:
-        hints[
-            (
-                (t['origin'], t['destination']),
-                t['dispatch_date'],
-                t['fleet_pool_id'],
-            )
-        ].append(
-            {l['order_id']: l['units'] for l in t['loads']}
-        )
-
-    groups = defaultdict(list)
-    for i, order in enumerate(orders):
-        groups[(order['origin'], order['destination'])].append(i)
-
-    horizon_start = min(
-        date.fromisoformat(order['dispatch_date'])
-        for order in orders
-    )
-
-    count = 0
-    for route, indices in sorted(groups.items()):
-        for vehicle in sorted(
-            fleet,
-            key=lambda v: (
-                v['base_location'],
-                v['vehicle_type'],
-                v['fleet_pool_id'],
-            ),
-        ):
-            days = defaultdict(list)
-            for i in indices:
-                order = orders[i]
-                if (
-                    not capacity_units(order, vehicle)
-                    or vehicle['units_available'] == 0
-                ):
-                    continue
-                for day in departure_days(order, vehicle, fleet):
-                    days[day].append(i)
-
-            for day, eligible in sorted(days.items()):
-                limit = sum(
-                    math.ceil(
-                        orders[i]['quantity_units']
-                        / capacity_units(orders[i], vehicle)
-                    )
-                    for i in eligible
-                )
-                if vehicle['units_available'] is not None:
-                    limit = min(limit, vehicle['units_available'])
-                count += limit * (len(eligible) + 1)
-                if count > MAX_VARIABLES:
-                    return None, {
-                        'status': 'timeout',
-                        'method': 'heuristic',
-                        'reason': 'Presupuesto de tamaño del modelo',
-                        'gap': None,
-                        'wall_ms': int((perf_counter() - started) * 1000),
-                    }
-
-                previous = None
-                for j in range(limit):
-                    y = model.new_bool_var(f'y{len(slots)}')
-                    loads = []
-                    seeds = hints[
-                        (route, day, vehicle['fleet_pool_id'])
-                    ]
-                    seed = seeds[j] if j < len(seeds) else {}
-                    if hint_plan is not None:
-                        model.add_hint(y, int(bool(seed)))
-                    if previous is not None:
-                        model.add(y <= previous)
-                    previous = y
-
-                    for i in eligible:
-                        order = orders[i]
-                        upper = min(
-                            order['quantity_units'],
-                            capacity_units(order, vehicle),
-                        )
-                        x = model.new_int_var(
-                            0,
-                            upper,
-                            f'x{i}_{len(slots)}',
-                        )
-                        model.add(x <= upper * y)
-                        xs[i].append(x)
-                        loads.append((i, x))
-                        if hint_plan is not None:
-                            model.add_hint(
-                                x,
-                                seed.get(order['order_id'], 0),
-                            )
-
-                    model.add(
-                        sum(
-                            int(D(orders[i]['unit_weight_kg']) * 1000) * x
-                            for i, x in loads
-                        )
-                        <= int(D(vehicle['capacity_kg']) * 1000) * y
-                    )
-                    model.add(sum(x for _, x in loads) >= y)
-                    slots.append((vehicle, day, y, loads))
-                    if vehicle['units_available'] is not None:
-                        duration = cycle_days(orders[eligible[0]], vehicle)
-                        start_offset = (
-                            date.fromisoformat(day) - horizon_start
-                        ).days
-                        interval = model.new_optional_interval_var(
-                            start_offset,
-                            duration,
-                            start_offset + duration,
-                            y,
-                            f'iv{len(slots) - 1}',
-                        )
-                        resource_intervals[
-                            vehicle['fleet_pool_id']
-                        ].append(interval)
-
-    for i, order in enumerate(orders):
-        model.add(sum(xs[i]) == order['quantity_units'])
-
-    for vehicle in fleet:
-        if vehicle['units_available'] is None:
-            continue
-        intervals = resource_intervals.get(vehicle['fleet_pool_id'], [])
-        if intervals:
-            model.add_cumulative(
-                intervals,
-                [1] * len(intervals),
-                vehicle['units_available'],
-            )
-
-    cost = sum(
-        float(raw_cost(orders[loads[0][0]], vehicle)) * y
-        for vehicle, day, y, loads in slots
-    )
-    trips = sum(y for _, _, y, _ in slots)
-    units = sum(order['quantity_units'] for order in orders)
-    time = sum(
-        (
-            (
-                date.fromisoformat(day)
-                - date.fromisoformat(orders[i]['dispatch_date'])
-            ).days
-            + transit(orders[i], vehicle)
-        )
-        * x
-        for vehicle, day, y, loads in slots
-        for i, x in loads
-    )
-    score = (
-        weights['cost'] / scales['cost'] * cost
-        + weights['trips'] / scales['trips'] * trips
-        + weights['time'] / scales['time'] / units * time
-    )
-    model.minimize(score)
-
+def _solver(options):
     solver = cp_model.CpSolver()
     solver.parameters.num_search_workers = 1
     solver.parameters.random_seed = 0
-    solver.parameters.max_deterministic_time = options['deterministic_limit']
-    solver.parameters.max_time_in_seconds = options['solve_time_limit_s']
-    status = solver.solve(model)
-    proto = solver.response_proto
-    name = solver.status_name(status).lower()
-    meta = {
-        'name': 'OR-Tools CP-SAT',
-        'version': ortools.__version__,
-        'status': name,
-        'gap': None,
-        'seed': 0,
-        'time_limit_s': options['solve_time_limit_s'],
-        'deterministic_limit': options['deterministic_limit'],
-        'deterministic_time': proto.deterministic_time,
-        'wall_ms': int((perf_counter() - started) * 1000),
-        'method': 'cp_sat',
-    }
-    if (
-        status == cp_model.UNKNOWN
-        and proto.deterministic_time + 1e-6
-        < options['deterministic_limit']
-    ):
-        raise TimeoutError(
-            'El tiempo de reloj fue insuficiente para completar '
-            'el presupuesto determinístico.'
-        )
-    if status not in (cp_model.OPTIMAL, cp_model.FEASIBLE):
-        meta['status'] = (
-            'infeasible'
-            if status == cp_model.INFEASIBLE
-            else 'timeout'
-        )
-        return None, meta
+    solver.parameters.max_deterministic_time = options[
+        "deterministic_limit"
+    ]
+    solver.parameters.max_time_in_seconds = options[
+        "solve_time_limit_s"
+    ]
+    return solver
 
-    if (
-        status != cp_model.OPTIMAL
-        and proto.deterministic_time + 1e-6
-        < options['deterministic_limit']
-    ):
-        raise TimeoutError(
-            'El límite de reloj interrumpió la búsqueda determinística. '
-            'Aumentá el tiempo por escenario.'
-        )
 
-    meta['gap'] = (
-        abs(solver.objective_value - solver.best_objective_bound)
-        / max(1, abs(solver.objective_value))
-    )
+def _extract_plan(solver, slots, orders):
     plan = []
     for vehicle, day, y, loads in slots:
         if not solver.value(y):
             continue
         selected = [
-            (i, solver.value(x))
-            for i, x in loads
-            if solver.value(x)
+            (index, solver.value(variable))
+            for index, variable, _ in loads
+            if solver.value(variable)
         ]
-        current = trip(orders[selected[0][0]], vehicle, day)
-        for i, quantity in selected:
-            add_load(current, orders[i], quantity)
+        if not selected:
+            continue
+        current = trip(
+            orders[selected[0][0]],
+            vehicle,
+            day,
+        )
+        for index, quantity in selected:
+            add_load(
+                current,
+                orders[index],
+                quantity,
+            )
         plan.append(current)
-    return canonical(plan), meta
+    return canonical(plan)
+
+
+def solve(
+    orders,
+    fleet,
+    weights,
+    scales,
+    options,
+    hint_plan=None,
+):
+    started = perf_counter()
+    model = cp_model.CpModel()
+    slots = []
+    xs = defaultdict(list)
+    resource_intervals = defaultdict(list)
+    load_presence = defaultdict(list)
+    hints = defaultdict(list)
+
+    for current in hint_plan or []:
+        hints[
+            (
+                (
+                    current["origin"],
+                    current["destination"],
+                ),
+                current["dispatch_date"],
+                current["fleet_pool_id"],
+            )
+        ].append(
+            {
+                load["order_id"]: load["units"]
+                for load in current["loads"]
+            }
+        )
+
+    groups = defaultdict(list)
+    for index, order in enumerate(orders):
+        groups[
+            (order["origin"], order["destination"])
+        ].append(index)
+
+    horizon_start = min(
+        date.fromisoformat(order["dispatch_date"])
+        for order in orders
+    )
+    variable_count = 0
+
+    for route, indices in sorted(groups.items()):
+        for vehicle in sorted(
+            fleet,
+            key=lambda item: (
+                item["base_location"],
+                item["vehicle_type"],
+                item["fleet_pool_id"],
+            ),
+        ):
+            days = defaultdict(list)
+            for index in indices:
+                order = orders[index]
+                if (
+                    not capacity_units(order, vehicle)
+                    or vehicle["units_available"] == 0
+                ):
+                    continue
+                for day in departure_days(
+                    order,
+                    vehicle,
+                    fleet,
+                    max_late_days=options["max_late_days"],
+                ):
+                    days[day].append(index)
+
+            for day, eligible in sorted(days.items()):
+                limit = sum(
+                    math.ceil(
+                        orders[index]["quantity_units"]
+                        / capacity_units(
+                            orders[index],
+                            vehicle,
+                        )
+                    )
+                    for index in eligible
+                )
+                if vehicle["units_available"] is not None:
+                    limit = min(
+                        limit,
+                        vehicle["units_available"],
+                    )
+
+                variable_count += limit * (
+                    2 * len(eligible) + 2
+                )
+                if variable_count > MAX_VARIABLES:
+                    return None, {
+                        "status": "timeout",
+                        "method": "heuristic",
+                        "reason": (
+                            "Presupuesto de tamaño del modelo"
+                        ),
+                        "gap": None,
+                        "sla_status": "not_run",
+                        "sla_certified": False,
+                        "wall_ms": int(
+                            (perf_counter() - started) * 1000
+                        ),
+                    }
+
+                previous = None
+                for slot_index in range(limit):
+                    y = model.new_bool_var(
+                        f"y{len(slots)}"
+                    )
+                    loads = []
+                    seed_rows = hints[
+                        (
+                            route,
+                            day,
+                            vehicle["fleet_pool_id"],
+                        )
+                    ]
+                    seed = (
+                        seed_rows[slot_index]
+                        if slot_index < len(seed_rows)
+                        else {}
+                    )
+                    if hint_plan is not None:
+                        model.add_hint(
+                            y,
+                            int(bool(seed)),
+                        )
+                    if previous is not None:
+                        model.add(y <= previous)
+                    previous = y
+
+                    for index in eligible:
+                        order = orders[index]
+                        upper = min(
+                            order["quantity_units"],
+                            capacity_units(
+                                order,
+                                vehicle,
+                            ),
+                        )
+                        x = model.new_int_var(
+                            0,
+                            upper,
+                            f"x{index}_{len(slots)}",
+                        )
+                        used = model.new_bool_var(
+                            f"z{index}_{len(slots)}",
+                        )
+                        model.add(x <= upper * used)
+                        model.add(x >= used)
+                        model.add(used <= y)
+                        xs[index].append(x)
+                        late = lateness_days(
+                            order,
+                            vehicle,
+                            day,
+                        )
+                        load_presence[index].append(
+                            (used, late)
+                        )
+                        loads.append(
+                            (index, x, used)
+                        )
+                        if hint_plan is not None:
+                            model.add_hint(
+                                x,
+                                seed.get(
+                                    order["order_id"],
+                                    0,
+                                ),
+                            )
+
+                    model.add(
+                        sum(
+                            int(
+                                D(
+                                    orders[index][
+                                        "unit_weight_kg"
+                                    ]
+                                )
+                                * 1000
+                            )
+                            * x
+                            for index, x, _ in loads
+                        )
+                        <= int(
+                            D(vehicle["capacity_kg"])
+                            * 1000
+                        )
+                        * y
+                    )
+                    model.add(
+                        sum(
+                            x
+                            for _, x, _ in loads
+                        )
+                        >= y
+                    )
+
+                    slots.append(
+                        (vehicle, day, y, loads)
+                    )
+
+                    if (
+                        vehicle["units_available"]
+                        is not None
+                    ):
+                        duration = cycle_days(
+                            orders[eligible[0]],
+                            vehicle,
+                        )
+                        start_offset = (
+                            date.fromisoformat(day)
+                            - horizon_start
+                        ).days
+                        interval = (
+                            model.new_optional_interval_var(
+                                start_offset,
+                                duration,
+                                start_offset + duration,
+                                y,
+                                f"iv{len(slots) - 1}",
+                            )
+                        )
+                        resource_intervals[
+                            vehicle["fleet_pool_id"]
+                        ].append(interval)
+
+    for index, order in enumerate(orders):
+        if not xs[index]:
+            return None, {
+                "status": "infeasible",
+                "method": "cp_sat",
+                "gap": None,
+                "sla_status": "infeasible",
+                "sla_certified": True,
+                "reason": (
+                    "Una orden no tiene slots de asignación "
+                    "dentro del horizonte de recuperación."
+                ),
+                "wall_ms": int(
+                    (perf_counter() - started) * 1000
+                ),
+            }
+        model.add(
+            sum(xs[index])
+            == order["quantity_units"]
+        )
+
+    for vehicle in fleet:
+        if vehicle["units_available"] is None:
+            continue
+        intervals = resource_intervals.get(
+            vehicle["fleet_pool_id"],
+            [],
+        )
+        if intervals:
+            model.add_cumulative(
+                intervals,
+                [1] * len(intervals),
+                vehicle["units_available"],
+            )
+
+    late_order_vars = []
+    late_day_vars = []
+    max_secondary = 0
+
+    for index, order in enumerate(orders):
+        late_candidates = [
+            (used, late)
+            for used, late in load_presence[index]
+            if late > 0
+        ]
+        maximum = max(
+            [late for _, late in late_candidates],
+            default=0,
+        )
+        late_order = model.new_bool_var(
+            f"late_order_{index}"
+        )
+        late_days = model.new_int_var(
+            0,
+            maximum,
+            f"late_days_{index}",
+        )
+
+        if late_candidates:
+            for used, late in late_candidates:
+                model.add(late_order >= used)
+                model.add(late_days >= late * used)
+            model.add(
+                late_order
+                <= sum(
+                    used
+                    for used, _ in late_candidates
+                )
+            )
+        else:
+            model.add(late_order == 0)
+            model.add(late_days == 0)
+
+        late_order_vars.append(late_order)
+        late_day_vars.append(late_days)
+        max_secondary += (
+            PRIORITY_WEIGHT[order["priority"]]
+            * maximum
+        )
+
+    late_count = sum(late_order_vars)
+    weighted_late_days = sum(
+        PRIORITY_WEIGHT[orders[index]["priority"]]
+        * late_day_vars[index]
+        for index in range(len(orders))
+    )
+    late_count_multiplier = max_secondary + 1
+    sla_score = (
+        late_count * late_count_multiplier
+        + weighted_late_days
+    )
+
+    # Stage 1: establish the best service level before considering business
+    # economics. If optimality is not proven, the second stage may only keep
+    # or improve the best SLA incumbent found.
+    model.minimize(sla_score)
+    sla_solver = _solver(options)
+    sla_status = sla_solver.solve(model)
+    sla_name = sla_solver.status_name(
+        sla_status
+    ).lower()
+
+    base_meta = {
+        "name": "OR-Tools CP-SAT",
+        "version": ortools.__version__,
+        "status": sla_name,
+        "gap": None,
+        "seed": 0,
+        "time_limit_s": options[
+            "solve_time_limit_s"
+        ],
+        "deterministic_limit": options[
+            "deterministic_limit"
+        ],
+        "wall_ms": int(
+            (perf_counter() - started) * 1000
+        ),
+        "method": "cp_sat",
+        "sla_status": sla_name,
+        "sla_certified": (
+            sla_status == cp_model.OPTIMAL
+        ),
+    }
+
+    if sla_status not in (
+        cp_model.OPTIMAL,
+        cp_model.FEASIBLE,
+    ):
+        base_meta["status"] = (
+            "infeasible"
+            if sla_status == cp_model.INFEASIBLE
+            else "timeout"
+        )
+        return None, base_meta
+
+    best_sla_score = int(
+        round(sla_solver.objective_value)
+    )
+    best_late_orders = sum(
+        sla_solver.value(variable)
+        for variable in late_order_vars
+    )
+    best_weighted_late_days = sum(
+        PRIORITY_WEIGHT[
+            orders[index]["priority"]
+        ]
+        * sla_solver.value(late_day_vars[index])
+        for index in range(len(orders))
+    )
+    base_meta.update(
+        {
+            "sla_score": best_sla_score,
+            "minimum_late_orders": (
+                best_late_orders
+            ),
+            "minimum_priority_weighted_late_days": (
+                best_weighted_late_days
+            ),
+        }
+    )
+
+    if sla_status == cp_model.OPTIMAL:
+        model.add(sla_score == best_sla_score)
+    else:
+        model.add(sla_score <= best_sla_score)
+
+    cost = sum(
+        float(
+            raw_cost(
+                orders[loads[0][0]],
+                vehicle,
+            )
+        )
+        * y
+        for vehicle, _, y, loads in slots
+    )
+    co2 = sum(
+        float(
+            raw_co2(
+                orders[loads[0][0]],
+                vehicle,
+            )
+        )
+        * y
+        for vehicle, _, y, loads in slots
+    )
+    trips = sum(
+        y
+        for _, _, y, _ in slots
+    )
+    units = sum(
+        order["quantity_units"]
+        for order in orders
+    )
+    time = sum(
+        (
+            (
+                date.fromisoformat(day)
+                - date.fromisoformat(
+                    orders[index]["dispatch_date"]
+                )
+            ).days
+            + transit(
+                orders[index],
+                vehicle,
+            )
+        )
+        * x
+        for vehicle, day, _, loads in slots
+        for index, x, _ in loads
+    )
+    outsourced_weight = sum(
+        float(
+            D(orders[index]["unit_weight_kg"])
+        )
+        * x
+        for vehicle, _, _, loads in slots
+        if vehicle["ownership"] == "third_party"
+        for index, x, _ in loads
+    )
+
+    total_weight_kg = sum(
+        float(D(order["unit_weight_kg"]))
+        * order["quantity_units"]
+        for order in orders
+    )
+    business_terms = {
+        "cost": cost,
+        "time": (1 / max(units, 1)) * time,
+        "utilization": (
+            1 / max(total_weight_kg, 1e-9)
+        ) * outsourced_weight,
+        "co2": co2,
+    }
+    business_score = sum(
+        weights[key]
+        / max(scales[key], 1e-9)
+        * business_terms[key]
+        for key in weights
+    )
+    # Trips are intentionally not a configurable objective anymore. This tiny
+    # deterministic tie-break keeps equally scored solutions compact.
+    model.minimize(
+        business_score
+        + 1e-8 * trips
+    )
+
+    business_solver = _solver(options)
+    business_status = business_solver.solve(
+        model
+    )
+
+    if business_status not in (
+        cp_model.OPTIMAL,
+        cp_model.FEASIBLE,
+    ):
+        # The SLA incumbent is still a complete valid solution and is safer
+        # than publishing a partial result when stage 2 times out.
+        plan = _extract_plan(
+            sla_solver,
+            slots,
+            orders,
+        )
+        return plan, {
+            **base_meta,
+            "status": "feasible",
+            "method": "sla_incumbent",
+            "business_status": (
+                business_solver.status_name(
+                    business_status
+                ).lower()
+            ),
+            "gap": None,
+            "wall_ms": int(
+                (perf_counter() - started) * 1000
+            ),
+        }
+
+    proto = business_solver.response_proto
+    business_name = business_solver.status_name(
+        business_status
+    ).lower()
+    gap = (
+        abs(
+            business_solver.objective_value
+            - business_solver.best_objective_bound
+        )
+        / max(
+            1,
+            abs(business_solver.objective_value),
+        )
+    )
+    plan = _extract_plan(
+        business_solver,
+        slots,
+        orders,
+    )
+    return plan, {
+        **base_meta,
+        "status": business_name,
+        "business_status": business_name,
+        "gap": gap,
+        "deterministic_time": (
+            proto.deterministic_time
+        ),
+        "wall_ms": int(
+            (perf_counter() - started) * 1000
+        ),
+        "method": "cp_sat_lexicographic",
+    }

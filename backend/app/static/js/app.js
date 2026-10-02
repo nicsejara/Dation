@@ -259,7 +259,7 @@ async function restoreHistoricalRun(
       await getRun(runId)
     );
 
-    if (run.result_json?.schema_version === 'dispatch_v1') {
+    if (['dispatch_v1','dispatch_v2'].includes(run.result_json?.schema_version)) {
       const dispatch = await import('./dispatch/workspace.mjs');
       dispatch.show(run);
       return;

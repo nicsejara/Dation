@@ -1,6 +1,6 @@
-# Despliegue de Dispatch 1.2.0
+# Despliegue de Dispatch 2.0.0
 
-API esperada: **1.0.0**. Motor Dispatch: **1.2.0**. Motor histórico: **0.2.0**. Runtime: Python **3.13**, OR-Tools **9.15.6755**.
+API esperada: **1.0.0**. Motor Dispatch: **2.0.0**. Motor histórico: **0.2.0**. Runtime: Python **3.13**, OR-Tools **9.15.6755**.
 
 ## Activación manual en Supabase
 
@@ -10,8 +10,9 @@ Aplicar en este orden:
 
 1. `supabase/migrations/20261001004934_dispatch_v1.sql`
 2. `supabase/migrations/20261001193000_dataset_library.sql`
+3. `supabase/migrations/20261002184751_dispatch_v2_integrity.sql`
 
-Ambas son aditivas. La segunda agrega `datasets.archived_at`, `datasets.is_sample`, un índice parcial para la biblioteca y solicita recarga de PostgREST.
+Las tres son aditivas. La segunda agrega `datasets.archived_at`, `datasets.is_sample`, un índice parcial para la biblioteca y solicita recarga de PostgREST.
 
 Después ejecutar:
 
@@ -63,7 +64,7 @@ from storage.buckets
 where id = 'dda-inputs';
 ```
 
-El 1 de octubre de 2026 el propietario confirmó por SQL que el bucket `dda-inputs` existe y tiene `public = false`. Esa comprobación no confirma por sí sola que las columnas y funciones de ambas migraciones estén instaladas.
+El 2 de octubre de 2026 se verificó en el proyecto productivo la migración `dispatch_v2_integrity`: el trigger acepta `dispatch_v1` y `dispatch_v2`, valida coherencia con `result_json.schema_version` y existe el índice por versión/fecha.
 
 Con backend actualizado y autenticación válida, `GET /api/dispatch/status` debe responder `available: true`. Si las columnas existen en PostgreSQL pero el endpoint todavía las informa como no visibles, volver a ejecutar el `NOTIFY` y reintentar.
 
@@ -73,7 +74,7 @@ Con backend actualizado y autenticación válida, `GET /api/dispatch/status` deb
 
 ## Fase espacial de flota
 
-No requiere una migración adicional de Supabase. `datasets.schema_version` ya almacena texto y permite registrar `fleet_v2`; los archivos siguen viviendo en Storage y el resultado permanece en el envelope `dispatch_v1`.
+`fleet_v2` no requiere columnas nuevas en `datasets`. Dispatch 2.0.0 sí agrega una migración de integridad para que `decision_runs` acepte y valide el envelope `dispatch_v2` sin reescribir corridas históricas.
 
 Después del deploy verificar que `GET /api/dispatch/contracts` informe `orders_v2` y `fleet_v2`, que la plantilla de flota contenga `fleet_pool_id` y `base_location`, que una orden no pueda utilizar un pool propio cuya base pertenezca a otro origen y que un recurso finito no pueda reutilizarse antes de `resource_available_again`. Los datasets `fleet_v1` históricos deben continuar validando con la advertencia `LEGACY_FLEET_GLOBAL_SCOPE`.
 

@@ -35,7 +35,7 @@ export function exportPlan(r){
 
 export function render(root,r){
   const change=changes(r);
-  root.innerHTML=`<h2>Distribución recomendada</h2><p>${num(change.consolidated)} órdenes consolidadas · ${num(change.postponed)} reprogramadas · ${num(change.outsourced)} tercerizadas</p><div class="dispatch-tabs" role="tablist" aria-label="Vistas de la distribución">${['Calendario','Viajes','Por orden'].map((s,i)=>`<button role="tab" data-tab="${i}" aria-selected="${i===0}">${s}</button>`).join('')}</div><div class="dispatch-plan-body"></div>`;
+  root.innerHTML=`<h2>Distribución recomendada</h2><p>${num(change.consolidated)} consolidadas · ${num(change.split)} divididas · ${num(change.postponed)} reprogramadas · ${num(change.outsourced)} tercerizadas · ${num(change.late)} fuera de SLA</p><div class="dispatch-tabs" role="tablist" aria-label="Vistas de la distribución">${['Calendario','Viajes','Por orden'].map((s,i)=>`<button role="tab" data-tab="${i}" aria-selected="${i===0}">${s}</button>`).join('')}</div><div class="dispatch-plan-body"></div>`;
   const body=root.querySelector('.dispatch-plan-body');
   function tab(index){
     dispose(body);

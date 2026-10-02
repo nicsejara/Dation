@@ -251,6 +251,22 @@ class FrontendContractTests(
             "Configurar la decisión",
             workspace,
         )
+        self.assertIn(
+            "max_utilization",
+            workspace,
+        )
+        self.assertIn(
+            "min_co2",
+            workspace,
+        )
+        self.assertIn(
+            "SLA",
+            workspace,
+        )
+        self.assertNotIn(
+            "Viajes mínimos",
+            workspace,
+        )
 
 
     def test_single_ingestion_contract(
