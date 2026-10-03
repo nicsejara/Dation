@@ -69,6 +69,83 @@ class DispatchContextTests(unittest.TestCase):
             context,
         )
 
+    def test_scheduling_context_keeps_assignment_locked(self):
+        from app.engines.assignment import run_assignment_engine
+        from app.engines.scheduling import run_scheduling_engine
+        from app.services.decision_context import build_decision_context
+        from test_scheduling_engine import (
+            FLEET_COLUMNS,
+            ORDER_COLUMNS,
+            csv_bytes,
+            order,
+            vehicle,
+        )
+
+        orders = [order("A", "Mendoza")]
+        fleet = [vehicle()]
+        assignment = run_assignment_engine(
+            csv_bytes(
+                ORDER_COLUMNS,
+                orders,
+            ),
+            csv_bytes(
+                FLEET_COLUMNS,
+                fleet,
+            ),
+            configuration={
+                "objective": "min_trips",
+                "dimensions": [
+                    "trips",
+                    "own_fleet",
+                ],
+            },
+            options={
+                "analysis_depth": "essential",
+            },
+        )
+        scheduling = run_scheduling_engine(
+            csv_bytes(
+                ORDER_COLUMNS,
+                orders,
+            ),
+            csv_bytes(
+                FLEET_COLUMNS,
+                fleet,
+            ),
+            assignment,
+        )
+        context = build_decision_context(
+            scheduling,
+            scheduling["configuration"],
+        )
+
+        self.assertEqual(
+            context["schema_version"],
+            "scheduling_v1",
+        )
+        self.assertTrue(
+            context[
+                "interpretation_boundary"
+            ]["assignment_locked"],
+        )
+        self.assertFalse(
+            context[
+                "interpretation_boundary"
+            ]["can_change_vehicle"],
+        )
+        self.assertTrue(
+            context[
+                "interpretation_boundary"
+            ]["temporal"],
+        )
+        self.assertIn(
+            "sequence_by_vehicle",
+            context,
+        )
+        self.assertTrue(
+            context["sequence_by_vehicle"]
+        )
+
     def test_context_has_hard_size_bound(self):
         import json
         from app.services.dispatch_context import build_dispatch_context
