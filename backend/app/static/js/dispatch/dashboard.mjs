@@ -32,7 +32,7 @@ export function render(root,run,onRerun,caseActions={}){
   root.className='dispatch dispatch-dashboard dispatch-dashboard-focused';
   root.innerHTML=
     '<header class="dispatch-command dispatch-command-focused">'
-      +'<div class="dispatch-command-title"><strong>DDA Logística</strong><span class="dispatch-status" data-case-status>'+esc(caseStatus)+'</span></div>'
+      +'<div class="dispatch-command-title"><button type="button" data-flow class="dispatch-dashboard-map-back">← Mapa de decisiones</button><strong>DDA Logística · Assignment</strong><span class="dispatch-status" data-case-status>'+esc(caseStatus)+'</span></div>'
       +'<div class="dispatch-actions dispatch-actions--focused">'
         +(caseActions.onApprove?'<button data-approve class="dispatch-primary-action" '+(caseActions.status==='approved'?'disabled':'')+'>'+(caseActions.status==='approved'?'✓ Decisión aprobada':'Aprobar decisión')+'</button>':'')
         +'<button type="button" data-export-decision class="dispatch-export-action" title="Descargar la tabla completa de asignaciones">↓ '+esc(exportButtonLabel)+'</button>'
