@@ -924,6 +924,14 @@ class FrontendContractTests(
             decision_map,
         )
         self.assertIn(
+            'slice(0, 10)',
+            decision_map,
+        )
+        self.assertNotIn(
+            "assignmentEvidence()?.data_ready",
+            workspace.split("function ready()", 1)[1].split("function ensureDecisionCase", 1)[0],
+        )
+        self.assertIn(
             "Asignación de carga",
             decision_map,
         )
