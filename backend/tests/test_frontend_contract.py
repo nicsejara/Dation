@@ -171,6 +171,7 @@ class FrontendContractTests(
             "inicio",
             "logistics-overview",
             "logistics-data",
+            "logistics-map",
             "logistics-config",
             "decision-dashboard",
             "traceability",
@@ -310,7 +311,7 @@ class FrontendContractTests(
             self.dashboard_stage_js,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=data-pack-v3-v1",
+            "/static/js/dispatch/workspace.mjs?v=decision-chain-v1",
             self.html,
         )
         self.assertIn(
@@ -484,6 +485,18 @@ class FrontendContractTests(
             workspace,
         )
         self.assertIn(
+            "renderDecisionMap",
+            workspace,
+        )
+        self.assertIn(
+            "navigate('logistics-map')",
+            workspace,
+        )
+        self.assertIn(
+            "decision_case",
+            workspace,
+        )
+        self.assertIn(
             "/api/datasets/validate",
             upload_index,
         )
@@ -532,6 +545,99 @@ class FrontendContractTests(
             quality.lower(),
         )
 
+
+    def test_decision_chain_phase2_contract(self):
+        workspace = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+            / "workspace.mjs"
+        ).read_text(encoding="utf-8")
+        decision_map = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+            / "decision-map.mjs"
+        ).read_text(encoding="utf-8")
+        decision_case = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+            / "decision-case.mjs"
+        ).read_text(encoding="utf-8")
+        dashboard = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+            / "dashboard.mjs"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn(
+            'data-view-panel="logistics-map"',
+            self.html,
+        )
+        self.assertIn(
+            "Mapa de decisiones",
+            decision_map,
+        )
+        self.assertIn(
+            "Asignación de carga",
+            decision_map,
+        )
+        self.assertIn(
+            "Planificación",
+            decision_map,
+        )
+        self.assertIn(
+            "Asignación final",
+            decision_map,
+        )
+        for state in (
+            "available",
+            "running",
+            "review",
+            "approved",
+            "locked",
+            "needs_data",
+            "error",
+            "stale",
+        ):
+            self.assertIn(
+                '"' + state + '"',
+                decision_case,
+            )
+        self.assertIn(
+            "transitionNode",
+            workspace,
+        )
+        self.assertIn(
+            "STATUS.RUNNING",
+            workspace,
+        )
+        self.assertIn(
+            "STATUS.REVIEW",
+            workspace,
+        )
+        self.assertIn(
+            "STATUS.APPROVED",
+            workspace,
+        )
+        self.assertIn(
+            "Aprobar decisión",
+            dashboard,
+        )
+        self.assertIn(
+            "Mapa de decisiones",
+            dashboard,
+        )
 
     def test_dashboard_stage_contract(
         self,

@@ -5,17 +5,26 @@ import * as review from './review.mjs';
 import * as explanation from './explanation.mjs';
 import * as plan from './plan.mjs';
 
-export function render(root,run,onRerun){
+export function render(root,run,onRerun,caseActions={}){
   dispose(root);
   const result=run.result_json;
   const metrics=result.scenarios.selected.metrics;
+  const statusLabels={
+    running:'Procesando',
+    review:'En revisión',
+    approved:'Aprobada',
+    error:'Error',
+  };
+  const caseStatus=statusLabels[caseActions.status]||'Decisión disponible';
 
   root.className='dispatch dispatch-dashboard dispatch-dashboard-focused';
   root.innerHTML=
     '<header class="dispatch-command dispatch-command-focused">'
-      +'<div class="dispatch-command-title"><strong>DDA Logística</strong><span class="dispatch-status">Decisión disponible</span></div>'
+      +'<div class="dispatch-command-title"><strong>DDA Logística</strong><span class="dispatch-status" data-case-status>'+esc(caseStatus)+'</span></div>'
       +'<div class="dispatch-actions">'
-        +'<button data-csv class="dispatch-primary-action">Exportar distribución</button>'
+        +(caseActions.onMap?'<button data-map>Mapa de decisiones</button>':'')
+        +(caseActions.onApprove?'<button data-approve class="dispatch-primary-action" '+(caseActions.status==='approved'?'disabled':'')+'>'+(caseActions.status==='approved'?'Decisión aprobada':'Aprobar decisión')+'</button>':'')
+        +'<button data-csv>Exportar distribución</button>'
         +'<button data-rerun>Reejecutar</button>'
         +'<button data-chat>Preguntale a Dation</button>'
         +'<details class="dispatch-more"><summary>Más</summary><div class="dispatch-details">'
@@ -92,6 +101,16 @@ export function render(root,run,onRerun){
 
   root.querySelector('[data-csv]').onclick=()=>plan.exportPlan(result);
   root.querySelector('[data-rerun]').onclick=onRerun;
+  const mapButton=root.querySelector('[data-map]');
+  if(mapButton)mapButton.onclick=()=>caseActions.onMap?.();
+  const approveButton=root.querySelector('[data-approve]');
+  if(approveButton)approveButton.onclick=()=>{
+    caseActions.onApprove?.();
+    approveButton.disabled=true;
+    approveButton.textContent='Decisión aprobada';
+    const status=root.querySelector('[data-case-status]');
+    if(status)status.textContent='Aprobada';
+  };
   root.querySelector('[data-chat]').onclick=()=>openChat();
   root.querySelector('[data-json]').onclick=()=>download('decision-'+run.id+'.json',JSON.stringify(result,null,2));
   root.querySelector('[data-copy]').onclick=async event=>{

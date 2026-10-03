@@ -121,7 +121,7 @@ Capacidades adicionales:
 
 ### Nivel 2 — Planificación
 
-Durante Fase 1 permanece `locked` porque todavía no existe la aprobación upstream. Puede quedar **data-ready** si están completos:
+En Fase 2 permanece `locked` hasta que **Asignación de carga** quede `APPROVED`. Después pasa a `AVAILABLE` si están completos:
 - `estimated_dispatch_date`;
 - `avg_speed_kmh`;
 - `driving_hours_per_day`;
@@ -132,7 +132,7 @@ Durante Fase 1 permanece `locked` porque todavía no existe la aprobación upstr
 
 ### Nivel 3 — Asignación final
 
-Durante Fase 1 permanece `locked`. La identificación física queda data-ready cuando `license_plate` está completa. En fases posteriores también dependerá de una Planificación aprobada.
+En Fase 2 permanece `locked` porque el motor de Planificación todavía no está implementado. La identificación física queda data-ready cuando `license_plate` está completa y, conceptualmente, sólo se habilitará después de una Planificación aprobada.
 
 ## Validar no es guardar
 
@@ -160,11 +160,22 @@ Durante la transición:
 
 Estos adaptadores son implementación transitoria, no parte del nuevo contrato de producto.
 
+## Decision Case y lineage
+
+Fase 2 introduce `decision_case_v1` en el workspace. El caso se identifica por las versiones seleccionadas de Orders y Fleet y conserva el estado de la cadena:
+
+`AVAILABLE → RUNNING → REVIEW → APPROVED`.
+
+Si cambia cualquiera de los dos datasets, se crea un caso nuevo y el anterior queda referenciado como `STALE`.
+
+Al ejecutar Assignment, la corrida guarda `decision_case.case_id` y `decision_case.node_id` dentro de `configuration_json` y `result_json`. Esta metadata no participa del fingerprint matemático del solver.
+
 ## Persistencia
 
-Phase 1 no requiere migración de Supabase:
+Fases 1 y 2 no requieren migración de Supabase:
 - `datasets.schema_version` ya es texto;
-- `datasets.profile_json` ya es JSONB.
+- `datasets.profile_json` ya es JSONB;
+- `decision_runs.configuration_json` y `result_json` aceptan metadata del Decision Case.
 
 Los nuevos datasets se guardan con `orders_v3` o `fleet_v3`.
 

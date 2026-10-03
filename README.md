@@ -16,16 +16,18 @@ technical validation
         ↓
 Decision Readiness
         ↓
-01 Assignment      AVAILABLE
-02 Scheduling      LOCKED
-03 Final Assignment LOCKED
+Decision Case + Decision Map
+        ↓
+01 Assignment       AVAILABLE → RUNNING → REVIEW → APPROVED
+02 Scheduling       LOCKED → AVAILABLE after Assignment approval
+03 Final Assignment LOCKED → depends on Scheduling approval
 ```
 
 The templates are deliberately complete, but users only need the core columns required for the first decision. Optional fields can be added later to the same two datasets to unlock scheduling, SLA analysis, cost/CO₂ objectives and physical-vehicle assignment.
 
 Fleet V3 contains **one row per real truck**. There is no user-facing pool concept.
 
-Phase 1 keeps the existing Dispatch 2.2 temporal engine behind a compatibility adapter while the new decision chain is introduced incrementally. The next phase adds Decision Cases, approval states and the visual Decision Map.
+Phase 2 adds a session-persistent Decision Case, a visual Decision Map and explicit human approval states. Changing Orders or Fleet starts a new case and marks the predecessor STALE. Executed runs persist `decision_case_id` and `decision_node_id` as lineage metadata without changing the deterministic solver fingerprint.
 
 ## Current versions
 

@@ -669,7 +669,14 @@ async def check_inputs(orders_id, fleet_id, allow_third_party=True):
     }
 
 
-async def execute(orders_id, fleet_id, configuration, options, run_id=None):
+async def execute(
+    orders_id,
+    fleet_id,
+    configuration,
+    options,
+    run_id=None,
+    decision_case=None,
+):
     orders_dataset, fleet_dataset, orders_bytes, fleet_bytes = await load_inputs(
         orders_id,
         fleet_id,
@@ -689,6 +696,11 @@ async def execute(orders_id, fleet_id, configuration, options, run_id=None):
             "configuration_json": {
                 **configuration,
                 "options": options,
+                **(
+                    {"decision_case": decision_case}
+                    if decision_case
+                    else {}
+                ),
             },
             "status": "running",
             "started_at": now,
@@ -746,6 +758,9 @@ async def execute(orders_id, fleet_id, configuration, options, run_id=None):
             metadata,
             progress,
         )
+        if decision_case:
+            result["decision_case"] = decision_case
+
         rows = await update(
             {
                 "status": "completed",

@@ -1,5 +1,7 @@
 import {esc,num,date,vehicle,api,post,errorBox} from './shared.mjs';import {rebalance} from './selectors.mjs';import {render as dashboard} from './dashboard.mjs';
-import {mountUploadScreen} from './upload/index.mjs?v=data-pack-v3-v1';
+import {mountUploadScreen} from './upload/index.mjs?v=decision-chain-v1';
+import {renderDecisionMap} from './decision-map.mjs';
+import {STATUS,createDecisionCase,replaceInputs,transitionNode,inputSignature,caseRef} from './decision-case.mjs';
 const KEY='dation.dispatch.workspace.v3';
 const PRIORITY_KEYS=['cost','time','utilization','co2'];
 const DEFAULT_DIMENSIONS=[...PRIORITY_KEYS];
@@ -14,19 +16,46 @@ function normalizeWeights(weights,dimensions){const out=Object.fromEntries(PRIOR
 function presetWeights(objective,dimensions){if(objective==='balanced')return balancedWeights(dimensions);const out=Object.fromEntries(PRIORITY_KEYS.map(k=>[k,0]));const key=OBJECTIVE_DIMENSION[objective];if(key)out[key]=100;return out;}
 let saved={};try{saved=JSON.parse(sessionStorage.getItem(KEY)||'{}');}catch{}
 const restoredDimensions=Array.isArray(saved.dimensions)?DEFAULT_DIMENSIONS.filter(k=>saved.dimensions.includes(k)):DEFAULT_DIMENSIONS;
-const state={orders:saved.orders||null,fleet:saved.fleet||null,dimensions:restoredDimensions.length?restoredDimensions:[...DEFAULT_DIMENSIONS],weights:saved.weights||{...DEFAULT_WEIGHTS},objective:['min_cost','min_time','max_utilization','min_co2','balanced','custom'].includes(saved.objective)?saved.objective:'balanced',analysisDepth:['essential','comparative','deep'].includes(saved.analysisDepth)?saved.analysisDepth:'comparative',allow:saved.allow??true,maxLateDays:Number.isFinite(+saved.maxLateDays)?Math.min(90,Math.max(0,+saved.maxLateDays)):30,decisions:saved.decisions||{},preflight:null,available:false,run:null};
+const state={orders:saved.orders||null,fleet:saved.fleet||null,dimensions:restoredDimensions.length?restoredDimensions:[...DEFAULT_DIMENSIONS],weights:saved.weights||{...DEFAULT_WEIGHTS},objective:['min_cost','min_time','max_utilization','min_co2','balanced','custom'].includes(saved.objective)?saved.objective:'balanced',analysisDepth:['essential','comparative','deep'].includes(saved.analysisDepth)?saved.analysisDepth:'comparative',allow:saved.allow??true,maxLateDays:Number.isFinite(+saved.maxLateDays)?Math.min(90,Math.max(0,+saved.maxLateDays)):30,decisions:saved.decisions||{},decisionCase:saved.decisionCase||null,preflight:null,available:false,run:null};
 if(!Array.isArray(state.dimensions)||!state.dimensions.length)state.dimensions=[...DEFAULT_DIMENSIONS];
 state.dimensions=DEFAULT_DIMENSIONS.filter(k=>state.dimensions.includes(k));
 if(OBJECTIVE_DIMENSION[state.objective]&&!state.dimensions.includes(OBJECTIVE_DIMENSION[state.objective]))state.objective='balanced';
 state.weights=state.objective==='custom'?normalizeWeights(state.weights,state.dimensions):presetWeights(state.objective,state.dimensions);
 let timer=null,pollGeneration=0;const roots={};
-function persist(){try{sessionStorage.setItem(KEY,JSON.stringify({orders:state.orders,fleet:state.fleet,dimensions:state.dimensions,weights:state.weights,objective:state.objective,analysisDepth:state.analysisDepth,allow:state.allow,maxLateDays:state.maxLateDays,decisions:state.decisions}));}catch{}}
+function persist(){try{sessionStorage.setItem(KEY,JSON.stringify({orders:state.orders,fleet:state.fleet,dimensions:state.dimensions,weights:state.weights,objective:state.objective,analysisDepth:state.analysisDepth,allow:state.allow,maxLateDays:state.maxLateDays,decisions:state.decisions,decisionCase:state.decisionCase}));}catch{}}
 function root(view,id){const parent=document.querySelector('[data-view-panel="'+view+'"]');let node=document.getElementById(id);if(!node){node=document.createElement('div');node.id=id;node.className='dispatch';parent.append(node);}return node;}
-function ready(){return !!(state.available&&state.orders&&state.fleet&&state.preflight?.valid);}
+function assignmentEvidence(){
+  return state.preflight?.decision_readiness?.decisions?.find(item=>item.id==='logistics_assignment')||null;
+}
+function ready(){return !!(state.available&&state.orders&&state.fleet&&state.preflight?.valid&&assignmentEvidence()?.data_ready);}
+function ensureDecisionCase(){
+  const signature=inputSignature(state.orders,state.fleet);
+  if(!signature){state.decisionCase=null;persist();return null;}
+  if(!state.decisionCase){
+    state.decisionCase=createDecisionCase(crypto.randomUUID(),state.orders,state.fleet);
+  }else if(state.decisionCase.signature!==signature){
+    state.decisionCase=replaceInputs(state.decisionCase,crypto.randomUUID(),state.orders,state.fleet);
+    state.run=null;
+  }
+  persist();
+  return state.decisionCase;
+}
 function navigate(view){window.dationSetDataReady(ready());window.dationNavigate(view);}
 function urlRun(id,schema='dispatch_v2'){const url=new URL(location.href);url.searchParams.set('run_id',id);url.searchParams.set('dda',schema);history.replaceState(null,'',url);}
 function action(b,fn){b.onclick=async()=>{b.disabled=true;try{await fn();}catch(e){alert(e.message);}finally{b.disabled=false;}};}
-async function preflight(){state.preflight=null;window.dationSetDataReady(false);if(!state.orders||!state.fleet)return;state.preflight=await post('/api/runs/preflight',{orders_dataset_id:state.orders.id,fleet_dataset_id:state.fleet.id,allow_third_party:state.allow});window.dationSetDataReady(ready());persist();}
+async function preflight(){
+  state.preflight=null;
+  window.dationSetDataReady(false);
+  if(!state.orders||!state.fleet)return;
+  state.preflight=await post('/api/runs/preflight',{
+    orders_dataset_id:state.orders.id,
+    fleet_dataset_id:state.fleet.id,
+    allow_third_party:state.allow,
+  });
+  ensureDecisionCase();
+  window.dationSetDataReady(ready());
+  persist();
+}
 async function loadData() {
   await mountUploadScreen(
     roots.data,
@@ -34,10 +63,66 @@ async function loadData() {
       state,
       persist,
       runPreflight: preflight,
-      onNext: () => navigate('logistics-config'),
+      onNext: () => {ensureDecisionCase();navigate('logistics-map');},
       isReady: ready,
     },
   );
+}
+async function openCaseResult(){
+  const runId=state.decisionCase?.nodes?.logistics_assignment?.run_id;
+  if(!runId)return;
+  try{
+    const run=state.run?.id===runId
+      ?state.run
+      :await api('/api/runs/'+runId);
+    if(run.status==='completed'){
+      show(run);
+      return;
+    }
+    if(run.status==='running'||run.status==='queued'){
+      pending('Recuperando el estado de la ejecución…');
+      navigate('decision-dashboard');
+      clearTimeout(timer);
+      poll(runId,++pollGeneration);
+      return;
+    }
+    if(run.status==='error'){
+      state.decisionCase=transitionNode(
+        state.decisionCase,
+        'logistics_assignment',
+        STATUS.ERROR,
+        {run_id:runId,error:run.error_message||'La ejecución terminó con error.'},
+      );
+      persist();
+      loadDecisionMap();
+      return;
+    }
+  }catch(error){
+    errorBox(roots.map,error,loadDecisionMap);
+  }
+}
+async function loadDecisionMap(){
+  const node=roots.map;
+  if(!state.orders||!state.fleet){
+    node.innerHTML='<section class="dispatch-panel"><h1>Mapa de decisiones</h1><p>Primero cargá Orders y Fleet para crear un Decision Case.</p><button data-data>Ir al Data Pack</button></section>';
+    node.querySelector('[data-data]').onclick=()=>navigate('logistics-data');
+    return;
+  }
+  try{
+    if(!state.preflight)await preflight();
+    ensureDecisionCase();
+    renderDecisionMap(node,{
+      decisionCase:state.decisionCase,
+      readiness:state.preflight?.decision_readiness,
+      orders:state.orders,
+      fleet:state.fleet,
+      onConfigure:()=>navigate('logistics-config'),
+      onOpenResult:openCaseResult,
+      onData:()=>navigate('logistics-data'),
+    });
+  }catch(error){
+    errorBox(node,error,loadDecisionMap);
+  }
 }
 function decimalWeights(){
   const weights=state.objective==='custom'?normalizeWeights(state.weights,state.dimensions):presetWeights(state.objective,state.dimensions);
@@ -157,12 +242,152 @@ async function loadConfig(){
   node.querySelector('[data-execute]').onclick=()=>{modal.close();execute();};
   sync();
 }
-function pending(message){document.body.classList.add('dispatch-result');roots.dashboard.innerHTML=`<section class="dispatch-panel"><h1>Preparando tu decisión</h1><p role="status">${esc(message)}</p><div class="dispatch-loading" aria-label="Procesando"></div><p>Se muestran etapas reales, sin porcentajes estimados.</p><button data-return>Volver a configuración</button></section>`;roots.dashboard.querySelector('[data-return]').onclick=()=>navigate('logistics-config');}
+function pending(message){document.body.classList.add('dispatch-result');roots.dashboard.innerHTML=`<section class="dispatch-panel"><h1>Preparando tu decisión</h1><p role="status">${esc(message)}</p><div class="dispatch-loading" aria-label="Procesando"></div><p>El Decision Case conserva el estado real de esta ejecución.</p><button data-return>Volver al mapa</button></section>`;roots.dashboard.querySelector('[data-return]').onclick=()=>navigate('logistics-map');}
 async function poll(id,generation){if(generation!==pollGeneration)return;try{const run=await api('/api/runs/'+id);if(generation!==pollGeneration)return;if(run.status==='completed'){show(run);return;}if(run.status==='error')throw new Error(run.error_message||'La corrida no pudo completarse.');const stage=run.progress_json?.stage||'validating',names={validating:'Validando órdenes y flota',baseline:'Construyendo referencia directa',sensitivity:'Comparando objetivos de negocio',summarizing:'Preparando la decisión recomendada'};pending(stage.startsWith('optimizing:')?'Protegiendo SLA y evaluando alternativas':(names[stage]||'Evaluando alternativas de asignación'));}catch(e){if(e.status!==404){errorBox(roots.dashboard,e,()=>poll(id,generation));return;}}timer=setTimeout(()=>poll(id,generation),1500);}
-async function execute(){const id=crypto.randomUUID();urlRun(id);pending('Registrando la corrida…');navigate('decision-dashboard');const generation=++pollGeneration;clearTimeout(timer);timer=setTimeout(()=>poll(id,generation),1000);try{const run=await post('/api/runs?run_id='+id,{orders_dataset_id:state.orders.id,fleet_dataset_id:state.fleet.id,configuration:configuration(),options:{allow_third_party:state.allow,max_late_days:state.maxLateDays,analysis_depth:state.analysisDepth,anomaly_decisions:Object.fromEntries(Object.entries(state.decisions).filter(([,v])=>v))}});if(generation===pollGeneration)show(run);}catch(e){if(generation!==pollGeneration)return;clearTimeout(timer);errorBox(roots.dashboard,e,()=>poll(id,generation));}}
-export function show(run){clearTimeout(timer);pollGeneration++;state.run=run;const r=run.result_json;document.body.classList.add('dispatch-result');urlRun(run.id,r?.schema_version||'dispatch_v2');window.dationSetDashboardReady(true);dashboard(roots.dashboard,run,async()=>{const config=r.configuration||{},w=config.weights||{};const dims=Array.isArray(config.dimensions)?DEFAULT_DIMENSIONS.filter(k=>config.dimensions.includes(k)):DEFAULT_DIMENSIONS;state.dimensions=dims.length?dims:[...DEFAULT_DIMENSIONS];state.objective=['min_cost','min_time','max_utilization','min_co2','balanced','custom'].includes(config.objective)?config.objective:'balanced';if(PRIORITY_KEYS.every(k=>Number.isFinite(+w[k]))){state.weights=normalizeWeights(Object.fromEntries(PRIORITY_KEYS.map(k=>[k,Math.round(+w[k]*100)])),state.dimensions);}else{state.weights=presetWeights(state.objective,state.dimensions);}state.analysisDepth=['essential','comparative','deep'].includes(config.options?.analysis_depth)?config.options.analysis_depth:(config.options?.sensitivity?'deep':'comparative');state.allow=config.options?.allow_third_party??true;state.maxLateDays=config.options?.max_late_days??30;state.decisions=config.options?.anomaly_decisions||{};try{const [o,f]=await Promise.all([api('/api/datasets/'+r.inputs.orders.dataset_id+'/profile'),api('/api/datasets/'+r.inputs.fleet.dataset_id+'/profile')]);state.orders=o.dataset;state.fleet=f.dataset;persist();navigate('logistics-config');}catch(e){alert(e.message);}});navigate('decision-dashboard');}
-for(const [key,view]of [['data','logistics-data'],['config','logistics-config'],['dashboard','decision-dashboard']])roots[key]=root(view,'dispatch-'+key+'-root');
+async function execute(){
+  const decisionCase=ensureDecisionCase();
+  const id=crypto.randomUUID();
+  state.decisionCase=transitionNode(
+    decisionCase,
+    'logistics_assignment',
+    STATUS.RUNNING,
+    {run_id:id,error:null},
+  );
+  persist();
+  urlRun(id);
+  pending('Registrando la corrida…');
+  navigate('decision-dashboard');
+  const generation=++pollGeneration;
+  clearTimeout(timer);
+  timer=setTimeout(()=>poll(id,generation),1000);
+  try{
+    const run=await post('/api/runs?run_id='+id,{
+      orders_dataset_id:state.orders.id,
+      fleet_dataset_id:state.fleet.id,
+      configuration:configuration(),
+      options:{
+        allow_third_party:state.allow,
+        max_late_days:state.maxLateDays,
+        analysis_depth:state.analysisDepth,
+        anomaly_decisions:Object.fromEntries(
+          Object.entries(state.decisions).filter(([,v])=>v),
+        ),
+      },
+      decision_case:caseRef(state.decisionCase),
+    });
+    if(generation===pollGeneration)show(run);
+  }catch(e){
+    if(generation!==pollGeneration)return;
+    clearTimeout(timer);
+    state.decisionCase=transitionNode(
+      state.decisionCase,
+      'logistics_assignment',
+      STATUS.ERROR,
+      {run_id:id,error:e.message},
+    );
+    persist();
+    errorBox(roots.dashboard,e,()=>poll(id,generation));
+  }
+}
+export function show(run){
+  clearTimeout(timer);
+  pollGeneration++;
+  state.run=run;
+  const r=run.result_json;
+  const caseMeta=r?.decision_case;
+  if(caseMeta?.case_id){
+    if(!state.decisionCase||state.decisionCase.id!==caseMeta.case_id){
+      state.decisionCase=createDecisionCase(
+        caseMeta.case_id,
+        {id:r.inputs?.orders?.dataset_id},
+        {id:r.inputs?.fleet?.dataset_id},
+        run.created_at,
+      );
+    }
+    if(
+      state.decisionCase?.nodes?.logistics_assignment?.status
+      !== STATUS.APPROVED
+    ){
+      state.decisionCase=transitionNode(
+        state.decisionCase,
+        'logistics_assignment',
+        STATUS.REVIEW,
+        {run_id:run.id,error:null},
+      );
+    }
+  }
+  persist();
+  document.body.classList.add('dispatch-result');
+  urlRun(run.id,r?.schema_version||'dispatch_v2');
+  window.dationSetDashboardReady(true);
+  dashboard(
+    roots.dashboard,
+    run,
+    async()=>{
+      const config=r.configuration||{},w=config.weights||{};
+      const dims=Array.isArray(config.dimensions)
+        ?DEFAULT_DIMENSIONS.filter(k=>config.dimensions.includes(k))
+        :DEFAULT_DIMENSIONS;
+      state.dimensions=dims.length?dims:[...DEFAULT_DIMENSIONS];
+      state.objective=['min_cost','min_time','max_utilization','min_co2','balanced','custom'].includes(config.objective)
+        ?config.objective
+        :'balanced';
+      if(PRIORITY_KEYS.every(k=>Number.isFinite(+w[k]))){
+        state.weights=normalizeWeights(
+          Object.fromEntries(PRIORITY_KEYS.map(k=>[k,Math.round(+w[k]*100)])),
+          state.dimensions,
+        );
+      }else{
+        state.weights=presetWeights(state.objective,state.dimensions);
+      }
+      state.analysisDepth=['essential','comparative','deep'].includes(config.options?.analysis_depth)
+        ?config.options.analysis_depth
+        :(config.options?.sensitivity?'deep':'comparative');
+      state.allow=config.options?.allow_third_party??true;
+      state.maxLateDays=config.options?.max_late_days??30;
+      state.decisions=config.options?.anomaly_decisions||{};
+      try{
+        const [o,f]=await Promise.all([
+          api('/api/datasets/'+r.inputs.orders.dataset_id+'/profile'),
+          api('/api/datasets/'+r.inputs.fleet.dataset_id+'/profile'),
+        ]);
+        state.orders=o.dataset;
+        state.fleet=f.dataset;
+        persist();
+        navigate('logistics-config');
+      }catch(e){
+        alert(e.message);
+      }
+    },
+    {
+      status:(
+        caseMeta?.case_id
+        && state.decisionCase?.id===caseMeta.case_id
+      )
+        ?state.decisionCase.nodes?.logistics_assignment?.status
+        :null,
+      onMap:state.decisionCase?()=>navigate('logistics-map'):null,
+      onApprove:(
+        caseMeta?.case_id
+        && state.decisionCase?.id===caseMeta.case_id
+      )
+        ?()=>{
+          state.decisionCase=transitionNode(
+            state.decisionCase,
+            'logistics_assignment',
+            STATUS.APPROVED,
+            {run_id:run.id,approved_at:new Date().toISOString(),error:null},
+          );
+          persist();
+          return state.decisionCase;
+        }
+        :null,
+    },
+  );
+  navigate('decision-dashboard');
+}
+for(const [key,view]of [['data','logistics-data'],['map','logistics-map'],['config','logistics-config'],['dashboard','decision-dashboard']])roots[key]=root(view,'dispatch-'+key+'-root');
 window.DationDispatch={show,isReady:ready};document.body.classList.add('dispatch-enabled');
-window.addEventListener('dation:view',e=>{const view=e.detail.view;if(view==='logistics-data'){roots.data.hidden=false;document.body.classList.add('dispatch-enabled');loadData();}if(view==='logistics-config'&&document.body.classList.contains('dispatch-enabled')){roots.config.hidden=false;loadConfig();}});
+window.addEventListener('dation:view',e=>{const view=e.detail.view;if(view==='logistics-data'){roots.data.hidden=false;document.body.classList.add('dispatch-enabled');loadData();}if(view==='logistics-map'&&document.body.classList.contains('dispatch-enabled')){roots.map.hidden=false;loadDecisionMap();}if(view==='logistics-config'&&document.body.classList.contains('dispatch-enabled')){roots.config.hidden=false;loadConfig();}});
 const query=new URLSearchParams(location.search);if(['dispatch_v1','dispatch_v2'].includes(query.get('dda'))&&query.get('run_id')){pending('Recuperando la corrida…');navigate('decision-dashboard');poll(query.get('run_id'),++pollGeneration);}
-if(window.dationGetCurrentView?.()==='logistics-data')loadData();
+if(window.dationGetCurrentView?.()==='logistics-data')loadData();if(window.dationGetCurrentView?.()==='logistics-map')loadDecisionMap();

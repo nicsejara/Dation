@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Literal
 from uuid import UUID
 
 import httpx
@@ -11,7 +12,7 @@ from fastapi import (
     UploadFile,
 )
 from fastapi.responses import Response
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from app.auth import require_upload_access
 from app.models.dispatch_config import DispatchConfig, DispatchOptions
@@ -30,11 +31,19 @@ class Inputs(BaseModel):
     allow_third_party: bool = True
 
 
+class DecisionCaseRef(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    case_id: UUID
+    node_id: Literal["logistics_assignment"]
+
+
 class RunRequest(BaseModel):
     orders_dataset_id: UUID
     fleet_dataset_id: UUID
     configuration: DispatchConfig = DispatchConfig()
     options: DispatchOptions = DispatchOptions()
+    decision_case: DecisionCaseRef | None = None
 
 
 class LabelUpdate(BaseModel):
@@ -177,6 +186,11 @@ async def run(
             payload.configuration.model_dump(),
             payload.options.model_dump(),
             str(run_id) if run_id else None,
+            (
+                payload.decision_case.model_dump(mode="json")
+                if payload.decision_case
+                else None
+            ),
         )
     )
 
