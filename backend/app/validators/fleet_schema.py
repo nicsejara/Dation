@@ -46,7 +46,7 @@ def _upgrade_legacy_pool_fleet(contents: bytes) -> tuple[bytes, bool, int, set[s
         return contents, False, 0, set()
     lines = text.splitlines()
     if not lines:
-        return contents, False, 0
+        return contents, False, 0, set()
 
     delimiter = ";" if lines[0].count(";") > lines[0].count(",") else ","
     reader = csv.DictReader(io.StringIO(text), delimiter=delimiter)
@@ -55,7 +55,7 @@ def _upgrade_legacy_pool_fleet(contents: bytes) -> tuple[bytes, bool, int, set[s
     if "vehicle_id" in raw_columns:
         return contents, False, len(raw_columns), set()
     if not LEGACY_POOL_COLUMNS.issubset(set(raw_columns)):
-        return contents, False, len(raw_columns)
+        return contents, False, len(raw_columns), set()
 
     legacy_unlimited_ids = set()
     buffer = io.StringIO()
