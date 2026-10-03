@@ -249,24 +249,47 @@ class FrontendContractTests(
             workspace,
         )
         self.assertIn(
-            "Configurar la decisión",
+            "Configurar Assignment",
             workspace,
         )
         self.assertIn(
-            "max_utilization",
+            "min_trips",
+            workspace,
+        )
+        self.assertIn(
+            "max_own_fleet",
             workspace,
         )
         self.assertIn(
             "min_co2",
             workspace,
         )
-        self.assertIn(
-            "SLA",
-            workspace,
+        config_render = workspace.split(
+            "async function loadConfig()",
+            1,
+        )[1].split(
+            "function pending(",
+            1,
+        )[0]
+        self.assertNotIn(
+            "Tiempo mínimo",
+            config_render,
+        )
+        self.assertNotIn(
+            "Horizonte máximo de recuperación SLA",
+            config_render,
+        )
+        self.assertNotIn(
+            "ocupación temporal",
+            config_render,
         )
         self.assertIn(
-            "Dimensiones del modelo",
-            workspace,
+            "Variables que intervienen",
+            config_render,
+        )
+        self.assertIn(
+            "Las fechas se deciden después",
+            config_render,
         )
         self.assertIn(
             "Profundidad del análisis",
@@ -282,10 +305,6 @@ class FrontendContractTests(
         )
         self.assertNotIn(
             "state.preflight.warnings",
-            workspace,
-        )
-        self.assertNotIn(
-            "Viajes mínimos",
             workspace,
         )
 
@@ -311,7 +330,7 @@ class FrontendContractTests(
             self.dashboard_stage_js,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=decision-chain-v1",
+            "/static/js/dispatch/workspace.mjs?v=assignment-v1",
             self.html,
         )
         self.assertIn(
@@ -384,7 +403,7 @@ class FrontendContractTests(
         ).read_text(encoding="utf-8")
 
         self.assertIn(
-            "Exportar distribución",
+            "Exportar asignación",
             dashboard,
         )
         self.assertIn(
@@ -416,7 +435,7 @@ class FrontendContractTests(
             hero,
         )
         self.assertIn(
-            "Cómo quedó distribuida la carga",
+            "Qué vehículo toma cada carga",
             assignment,
         )
         self.assertIn(
@@ -428,7 +447,7 @@ class FrontendContractTests(
             assignment,
         )
         self.assertIn(
-            "Revisar antes de ejecutar",
+            "Revisar antes de aprobar",
             review,
         )
         self.assertIn(
@@ -436,6 +455,81 @@ class FrontendContractTests(
             explanation,
         )
 
+
+    def test_assignment_phase3_is_non_temporal_in_frontend(self):
+        workspace = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+            / "workspace.mjs"
+        ).read_text(encoding="utf-8")
+        hero = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+            / "hero.mjs"
+        ).read_text(encoding="utf-8")
+        assignment = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+            / "assignment.mjs"
+        ).read_text(encoding="utf-8")
+        plan = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+            / "plan.mjs"
+        ).read_text(encoding="utf-8")
+
+        config_render = workspace.split(
+            "async function loadConfig()",
+            1,
+        )[1].split(
+            "function pending(",
+            1,
+        )[0]
+
+        for forbidden in (
+            "Tiempo mínimo",
+            "max_late_days",
+            "Horizonte máximo",
+            "SLA protegido",
+            "ocupación temporal",
+        ):
+            self.assertNotIn(
+                forbidden,
+                config_render,
+            )
+
+        self.assertIn(
+            "Assignment no define fechas",
+            assignment,
+        )
+        self.assertIn(
+            "Planificación",
+            hero,
+        )
+        self.assertIn(
+            "assignment-recomendada.csv",
+            plan,
+        )
+        self.assertIn(
+            "Vehicle ID",
+            plan,
+        )
+        self.assertIn(
+            "assignment_v1",
+            workspace,
+        )
 
     def test_single_ingestion_contract(
         self,
