@@ -140,6 +140,11 @@ function ensureDecisionCase(){
   }else if(state.decisionCase.signature!==signature){
     state.decisionCase=replaceInputs(state.decisionCase,crypto.randomUUID(),state.orders,state.fleet);
     state.run=null;
+    state.configured=false;
+    state.decisions={};
+    state.dimensions=[...CORE_DIMENSIONS];
+    state.objective='balanced';
+    state.weights=balancedWeights(state.dimensions);
   }
   persist();
   return state.decisionCase;
