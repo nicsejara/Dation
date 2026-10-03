@@ -62,6 +62,17 @@ function decisionCard(decision) {
     copy.append(capabilityChips(decision.capabilities));
   }
 
+  if (decision.blockers?.length) {
+    const blocker = el("div", null, "dispatch-readiness-blocker");
+    blocker.append(
+      el("strong", "Revisá la compatibilidad del Data Pack"),
+      ...decision.blockers.slice(0, 3).map((item) => (
+        el("small", item.detail || item.code)
+      )),
+    );
+    copy.append(blocker);
+  }
+
   if (decision.missing?.length) {
     const details = document.createElement("details");
     details.className = "dispatch-readiness-missing";
