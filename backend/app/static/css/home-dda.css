@@ -1,0 +1,108 @@
+/* Dation Home — DDA selector refinement v2 */
+
+.d-home__hero-copy{
+  max-width:820px;
+}
+
+.d-home__hero h1{
+  max-width:860px;
+  font-size:clamp(36px,4.1vw,58px);
+}
+
+.d-home__hero p{
+  max-width:720px;
+}
+
+.d-home__hero-definition{
+  max-width:700px!important;
+  margin-top:14px!important;
+  padding-left:14px;
+  border-left:2px solid rgba(105,205,207,.48);
+  color:#c5d7dc!important;
+  font-size:12px!important;
+  line-height:1.65!important;
+}
+
+.d-home__hero-definition strong{
+  color:#f2fbfb;
+  font-weight:750;
+}
+
+.d-home__tile{
+  border:1px solid rgba(255,255,255,.18);
+}
+
+.d-home__tile small{
+  opacity:.72;
+}
+
+/* Make the DDA identity block more visible without increasing page density. */
+.d-home__asset{
+  grid-template-columns:122px minmax(0,1fr);
+  gap:22px;
+}
+
+.d-home__asset-icon{
+  width:116px;
+  height:116px;
+  border-width:1px;
+  border-radius:27px;
+}
+
+.d-home__asset-icon img{
+  width:84px;
+  height:84px;
+}
+
+.d-home__asset-icon--logistics{
+  border-color:#b9dcdf;
+  background:
+    radial-gradient(circle at 24% 16%,rgba(255,255,255,.92),transparent 30%),
+    linear-gradient(145deg,#eaf8f7 0%,#d8efef 100%);
+  box-shadow:
+    0 14px 28px rgba(19,125,131,.13),
+    inset 0 0 0 1px rgba(19,125,131,.035);
+}
+
+.d-home__asset-icon--production{
+  border-color:#d8e0e6;
+  background:linear-gradient(145deg,#f3f7f9 0%,#e5ebef 100%);
+  box-shadow:
+    0 10px 22px rgba(53,89,139,.06),
+    inset 0 0 0 1px rgba(53,89,139,.025);
+}
+
+.d-home__asset--disabled{
+  background:#f7f9fa;
+}
+
+.d-home__asset--disabled .d-home__asset-copy{
+  opacity:.62;
+}
+
+.d-home__asset--disabled .d-home__asset-icon{
+  opacity:.60;
+}
+
+@media(max-width:760px){
+  .d-home__hero-definition{
+    font-size:11px!important;
+  }
+}
+
+@media(max-width:520px){
+  .d-home__asset{
+    grid-template-columns:88px minmax(0,1fr);
+  }
+
+  .d-home__asset-icon{
+    width:84px;
+    height:84px;
+    border-radius:21px;
+  }
+
+  .d-home__asset-icon img{
+    width:62px;
+    height:62px;
+  }
+}
