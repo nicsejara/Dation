@@ -1,7 +1,7 @@
 import {esc,num,pct,date,chart,dispose,download,api,errorBox} from './shared.mjs';
 import {exportDecision} from './export.mjs';
 import * as explanation from './explanation.mjs';
-import {decisionRail,bindDecisionRail} from './decision-nav.mjs';
+import {decisionRail,bindDecisionRail} from './decision-nav.mjs?v=decision-map-phase1-v1';
 
 function exportSchedule(result){
   return exportDecision(result);
