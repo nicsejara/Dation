@@ -1,6 +1,6 @@
 import {esc,num,date} from "./shared.mjs";
 import {STATUS, deriveDecisionNodes} from "./decision-case.mjs";
-import {renderDecisionReadiness} from "./upload/readiness-panel.mjs";
+import {renderDecisionReadiness} from "./upload/readiness-panel.mjs?v=decision-map-phase1-v1";
 
 const LABELS = {
   [STATUS.AVAILABLE]: "Disponible",
