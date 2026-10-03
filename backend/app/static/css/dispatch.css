@@ -2554,3 +2554,54 @@ body.dispatch-drawer-open {
   .dispatch-map-evidence{grid-template-columns:1fr;}
   .dispatch-map-case{width:100%;}
 }
+
+
+/* Decision Chain Phase 3 · Assignment boundaries */
+.dispatch-objective-card.is-disabled{
+  opacity:.52;
+  cursor:not-allowed;
+  background:#f7f8fa!important;
+}
+.dispatch-objective-card em,
+.dispatch-dimension-row em{
+  display:block;
+  margin-top:auto;
+  font-size:9.5px;
+  line-height:1.35;
+  font-style:normal;
+  color:#8a6470;
+}
+.dispatch-dimension-row.is-unavailable{
+  background:#f7f8fa;
+}
+.dispatch-dimension-row.is-unavailable .dispatch-toggle{
+  background:#e4e7ed;
+}
+.dispatch-assignment-boundary{
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+  margin-top:14px;
+  padding:15px 17px;
+  border:1px solid #d9dcf1;
+  border-radius:12px;
+  background:#f7f7ff;
+}
+.dispatch-assignment-boundary>span{
+  display:grid;
+  place-items:center;
+  width:25px;
+  height:25px;
+  flex:0 0 25px;
+  border-radius:50%;
+  background:#e9e9ff;
+  color:#4f4fc4;
+  font-weight:850;
+}
+.dispatch-assignment-boundary strong{
+  font-size:13px;
+}
+.dispatch-assignment-boundary p{
+  margin:4px 0 0;
+  font-size:12px;
+}
