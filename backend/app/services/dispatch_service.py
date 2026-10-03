@@ -682,6 +682,111 @@ async def check_inputs(orders_id, fleet_id, allow_third_party=True):
     }
 
 
+async def approve_decision_run(
+    run_id,
+    *,
+    case_id,
+    node_id,
+):
+    run = await get_run(run_id)
+    if (
+        not run
+        or run.get("status")
+        != "completed"
+        or not run.get("result_json")
+    ):
+        raise ValueError(
+            "Sólo se puede aprobar una corrida completada."
+        )
+
+    expected_schema = {
+        "logistics_assignment": (
+            ASSIGNMENT_SCHEMA_VERSION
+        ),
+        "logistics_scheduling": (
+            SCHEDULING_SCHEMA_VERSION
+        ),
+    }.get(node_id)
+    if not expected_schema:
+        raise ValueError(
+            "Ese nodo todavía no admite aprobación persistida."
+        )
+
+    result = {
+        **run["result_json"]
+    }
+    if (
+        result.get("schema_version")
+        != expected_schema
+    ):
+        raise ValueError(
+            "La corrida no corresponde al nodo que intentás aprobar."
+        )
+
+    current_case = (
+        result.get("decision_case")
+        or {}
+    )
+    if (
+        current_case.get("case_id")
+        != case_id
+        or current_case.get("node_id")
+        != node_id
+    ):
+        raise ValueError(
+            "La corrida pertenece a otro Decision Case."
+        )
+
+    approved_at = (
+        current_case.get(
+            "approved_at"
+        )
+        or datetime.now(
+            timezone.utc
+        ).isoformat()
+    )
+    approved_case = {
+        **current_case,
+        "status": "approved",
+        "approved_at": approved_at,
+    }
+    result[
+        "decision_case"
+    ] = approved_case
+
+    configuration = {
+        **(
+            run.get(
+                "configuration_json"
+            )
+            or {}
+        ),
+        "decision_case": (
+            approved_case
+        ),
+    }
+
+    rows = await db(
+        "PATCH",
+        "decision_runs",
+        params={
+            "id": f"eq.{run_id}",
+            "status": "eq.completed",
+        },
+        body={
+            "result_json": result,
+            "configuration_json": (
+                configuration
+            ),
+        },
+    )
+    if not rows:
+        raise ValueError(
+            "No se pudo persistir la aprobación."
+        )
+    return rows[0]
+
+
 async def execute(
     orders_id,
     fleet_id,
