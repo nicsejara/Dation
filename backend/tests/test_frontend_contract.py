@@ -46,6 +46,14 @@ DASHBOARD_STAGE_JS = (
     / "dashboard-stage.js"
 )
 
+DDA_LANDING_JS = (
+    BACKEND_ROOT
+    / "app"
+    / "static"
+    / "js"
+    / "dda-logistics-landing.js"
+)
+
 INTERPRETER_STAGE_JS = (
     BACKEND_ROOT
     / "app"
@@ -71,6 +79,11 @@ class FrontendContractTests(
         )
         cls.dashboard_stage_js = (
             DASHBOARD_STAGE_JS.read_text(
+                encoding="utf-8"
+            )
+        )
+        cls.dda_landing_js = (
+            DDA_LANDING_JS.read_text(
                 encoding="utf-8"
             )
         )
@@ -1566,46 +1579,133 @@ class FrontendContractTests(
 
         for copy in (
             "De órdenes y flota a despachos que podés explicar.",
+            "Cargá tus órdenes y tu flota.",
             "Motor 0.2.0",
             "Cuatro pasos de los datos a la decisión.",
-            "Una cadena de decisiones, desbloqueada paso a paso.",
+            "el expediente que reúne tus datos, los criterios y el resultado",
+            "Qué variables optimiza el motor hoy.",
+            "Tu mapa de decisiones, desbloqueado paso a paso.",
+            "¿Qué órdenes van en cada viaje y con qué vehículo?",
             "Así se ve una decisión con evidencia.",
-            "Datos de ejemplo",
-            "Qué cubre hoy y qué viene.",
+            "Consolidá las 24 órdenes en 12 viajes.",
+            "A cambio, tarda 0,4 días más",
+            "Lo que necesitás para empezar",
+            "Lo que recibís",
+            "Lo que conviene saber antes de decidir.",
             "¿Listo para tomar tu primera decisión?",
         ):
             self.assertIn(copy, overview)
 
-        self.assertIn(
-            "/static/css/dda-logistics-landing.css?v=dda-logistics-landing-v4",
-            self.html,
-        )
-        self.assertIn(
-            "/static/js/dda-logistics-landing.js?v=dda-logistics-landing-v4",
-            self.html,
-        )
-        self.assertIn(
-            "/static/js/dashboard-stage.js?v=dda-logistics-landing-v4",
-            self.html,
-        )
-        self.assertNotIn(
+        for phase in (
+            "Cargar datos",
+            "Validar",
+            "Configurar",
+            "Resultado",
+        ):
+            self.assertIn(
+                f">{phase}<",
+                overview,
+            )
+
+        for forbidden in (
+            "Evidencia exportable (CSV + JSON)",
+            "Comparación contra despacho directo</span>",
+            "Explicación en lenguaje de negocio</span>",
             "Dispatch 2.2.0",
+            "Decisión + sensibilidad + evidencia",
+            "Qué cubre hoy y qué viene.",
+            "dda-landing__value-strip",
+            "dda-landing__features",
+            "dda-landing__flow-brand",
+            "dda-landing__result-kpis",
+            "dda-landing__heatmap",
+        ):
+            self.assertNotIn(
+                forbidden,
+                overview,
+            )
+
+        self.assertIn(
+            "Decisión + alternativas + evidencia",
             overview,
         )
         self.assertIn(
-            'id="open-latest-logistics-decision"',
+            'data-variable-group="active"',
             overview,
         )
         self.assertIn(
-            'id="latest-logistics-meta"',
+            'data-variable-group="consolidating"',
             overview,
+        )
+        self.assertIn(
+            "Data Pack progresivo.",
+            overview,
+        )
+        self.assertEqual(
+            overview.count("DecisionResult JSON · ejemplo"),
+            0,
+        )
+        self.assertEqual(
+            overview.count("Ver evidencia completa (JSON)"),
+            1,
+        )
+        self.assertIn(
+            "<code class=\"dda-landing__file-chip\">Orders</code>",
+            overview,
+        )
+        self.assertIn(
+            "<code class=\"dda-landing__file-chip\">Fleet</code>",
+            overview,
+        )
+
+        self.assertIn(
+            "/static/css/dda-logistics-landing.css?v=dda-logistics-landing-v5",
+            self.html,
+        )
+        self.assertIn(
+            "/static/js/dda-logistics-landing.js?v=dda-logistics-landing-v5",
+            self.html,
+        )
+        self.assertIn(
+            "/static/js/dashboard-stage.js?v=dda-logistics-landing-v5",
+            self.html,
+        )
+
+        for variable in (
+            'label:"Costo"',
+            'label:"Viajes"',
+            'label:"Tiempo"',
+            'label:"CO₂"',
+            'label:"Riesgo"',
+            'label:"Servicio"',
+        ):
+            self.assertIn(
+                variable,
+                self.dda_landing_js,
+            )
+
+        self.assertIn(
+            "deriveMapStates",
+            self.dda_landing_js,
+        )
+        self.assertIn(
+            'logistics_assignment:"pending"',
+            self.dda_landing_js,
+        )
+        self.assertIn(
+            'logistics_scheduling:"locked"',
+            self.dda_landing_js,
+        )
+        self.assertIn(
+            'logistics_final_assignment:"locked"',
+            self.dda_landing_js,
         )
         self.assertIn(
             "Ver un ejemplo de resultado",
             self.dashboard_stage_js,
         )
         self.assertIn(
-            "formatLandingDecisionDate",
+            "hour12: false",
             self.dashboard_stage_js,
         )
         self.assertIn(
