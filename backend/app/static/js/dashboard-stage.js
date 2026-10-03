@@ -2535,11 +2535,11 @@
   }
 
   async function recoverRun(run) {
-    if (run.result_json && ['dispatch_v1','dispatch_v2'].includes(run.result_json.schema_version)) {
+    if (run.result_json && ['assignment_v1','dispatch_v1','dispatch_v2'].includes(run.result_json.schema_version)) {
       if (window.DationDispatch && typeof window.DationDispatch.show === "function") {
         window.DationDispatch.show(run);
       } else {
-        var dispatch = await import('/static/js/dispatch/workspace.mjs?v=decision-chain-v1');
+        var dispatch = await import('/static/js/dispatch/workspace.mjs?v=assignment-v1');
         dispatch.show(run);
       }
       return;
@@ -3257,7 +3257,7 @@
   }
 
   async function restoreExecution() {
-    if (['dispatch_v1','dispatch_v2'].includes(new URLSearchParams(location.search).get('dda'))) return;
+    if (['assignment_v1','dispatch_v1','dispatch_v2'].includes(new URLSearchParams(location.search).get('dda'))) return;
     var stored = loadContext();
     var urlRunId = runFromUrl();
 

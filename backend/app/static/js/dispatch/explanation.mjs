@@ -25,19 +25,25 @@ export function render(root,run){
   const result=run.result_json;
   const outsourced=result.scenarios.selected.metrics.outsourced_weight_share||0;
   const late=result.scenarios.selected.metrics.late_orders||0;
+  const isAssignment=result.schema_version==='assignment_v1';
 
-  const questions=[
-    '¿Por qué algunos pools tienen más carga que otros?',
+  const questions=(isAssignment?[
+    '¿Por qué algunos vehículos reciben más carga que otros?',
+    ...(outsourced?['¿Por qué se utiliza flota tercerizada?']:[]),
+    '¿Qué productos lleva cada vehículo?',
+    '¿Cómo se relaciona esta asignación con el objetivo seleccionado?',
+  ]:[
+    '¿Por qué algunos recursos tienen más carga que otros?',
     ...(outsourced?['¿Por qué se utiliza flota tercerizada?']:[]),
     ...(late?['¿Qué órdenes fuera de SLA debería revisar primero?']:[]),
     '¿Cómo se relaciona esta asignación con el objetivo seleccionado?',
-  ].slice(0,4);
+  ]).slice(0,4);
 
   root.innerHTML=
     '<div class="dispatch-section-heading">'
       +'<div><span class="dispatch-kicker">DATION IA</span><h2>Explicar la decisión</h2>'
       +'<p>La IA interpreta el resultado ya calculado. No reasigna camiones, no recalcula el optimizador y no inventa un ahorro contra una operación histórica.</p></div>'
-      +'<button data-explain>Explicar esta distribución</button>'
+      +'<button data-explain>'+(isAssignment?'Explicar esta asignación':'Explicar esta distribución')+'</button>'
     +'</div>'
     +'<div class="dispatch-ai-response" data-response aria-live="polite"></div>'
     +'<div class="dispatch-ai-questions"><small>Preguntas útiles</small>'
@@ -85,9 +91,9 @@ export function render(root,run){
 export function chat(root,run,initialQuestion=''){
   root.innerHTML=
     '<div class="dispatch-chat-heading"><div><span class="dispatch-kicker">DATION IA</span><h2>Preguntar sobre esta distribución</h2></div><button data-close aria-label="Cerrar chat">Cerrar</button></div>'
-    +'<p>Las respuestas usan la corrida persistida, sus drivers y excepciones. La IA no modifica la asignación.</p>'
+    +'<p>Las respuestas usan la corrida persistida y su evidencia. La IA no modifica la asignación ni decide fechas.</p>'
     +'<div data-messages role="log" aria-live="polite"></div>'
-    +'<form><label>Tu pregunta<textarea required minlength="2" maxlength="2000" rows="3" placeholder="¿Por qué este pool concentra más carga?"></textarea></label><button>Enviar</button></form>';
+    +'<form><label>Tu pregunta<textarea required minlength="2" maxlength="2000" rows="3" placeholder="¿Por qué este vehículo concentra más carga?"></textarea></label><button>Enviar</button></form>';
 
   root.querySelector('[data-close]').onclick=()=>{
     root.hidden=true;

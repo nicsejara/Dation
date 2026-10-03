@@ -24,6 +24,17 @@ function occupiedDays(value){
 }
 
 export function exportPlan(r){
+  if(r.schema_version==='assignment_v1'){
+    const headers=['Viaje','Origen','Destino','Vehicle ID','Tipo de vehículo','Propiedad','Proveedor','Site base','Orden','Producto','Unidades','Kg','Utilización','Costo estimado del viaje','CO2 estimado del viaje'];
+    const rows=r.scenarios.selected.trips.flatMap(t=>t.loads.map((l,i)=>[
+      t.trip_id,t.origin,t.destination,t.vehicle_id,vehicle(t.vehicle_type),
+      t.ownership==='own'?'Propio':'Tercerizado',t.provider_name||'',t.base_site||'',
+      l.order_id,l.product||'',l.units,l.kg,t.utilization,
+      i===0?(t.estimated_cost??''):'',i===0?(t.estimated_co2_kg??''):''
+    ]));
+    download('assignment-recomendada.csv',csv([headers,...rows]),'text/csv;charset=utf-8');
+    return;
+  }
   const headers=['Viaje','Salida','Llegada','Recurso disponible','Días de ciclo','Origen','Destino','Pool de flota','Base','Camión','Propiedad','Orden','Producto','Unidades','Kg','Costo del viaje','CO2 del viaje'];
   const rows=r.scenarios.selected.trips.flatMap(t=>t.loads.map((l,i)=>[
     t.trip_id,t.dispatch_date,t.arrival_date,availableAgain(t),t.cycle_days||1,t.origin,t.destination,poolId(t),

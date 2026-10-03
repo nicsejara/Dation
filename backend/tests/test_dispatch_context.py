@@ -7,6 +7,68 @@ class DispatchContextTests(unittest.TestCase):
         self.assertTrue(verify_numbers('Costo $ 1.234.567,50 en 12 viajes; 90 % a tiempo.',context))
         self.assertFalse(verify_numbers('Costo $ 9.999.999.',context))
 
+    def test_assignment_context_excludes_temporal_semantics(self):
+        from app.engines.assignment import run_assignment_engine
+        from app.services.dispatch_context import build_dispatch_context
+        from test_assignment_engine import (
+            FLEET_COLUMNS,
+            ORDER_COLUMNS,
+            csv_bytes,
+            order,
+            vehicle,
+        )
+
+        result = run_assignment_engine(
+            csv_bytes(
+                ORDER_COLUMNS,
+                [order("A")],
+            ),
+            csv_bytes(
+                FLEET_COLUMNS,
+                [vehicle("VEH-001")],
+            ),
+            configuration={
+                "objective": "min_trips",
+                "dimensions": [
+                    "trips",
+                    "own_fleet",
+                ],
+            },
+            options={
+                "analysis_depth": "essential",
+            },
+        )
+        context = build_dispatch_context(
+            result
+        )
+
+        self.assertEqual(
+            context["schema_version"],
+            "assignment_v1",
+        )
+        self.assertFalse(
+            context[
+                "interpretation_boundary"
+            ]["temporal"],
+        )
+        self.assertFalse(
+            context[
+                "interpretation_boundary"
+            ]["sla_is_decided_here"],
+        )
+        self.assertIn(
+            "assignment_by_vehicle",
+            context,
+        )
+        self.assertNotIn(
+            "feasibility",
+            context,
+        )
+        self.assertNotIn(
+            "exceptions",
+            context,
+        )
+
     def test_context_has_hard_size_bound(self):
         import json
         from app.services.dispatch_context import build_dispatch_context
