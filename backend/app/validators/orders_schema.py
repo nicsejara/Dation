@@ -269,7 +269,8 @@ def validate_orders_report(contents: bytes, max_problems: int = 100) -> dict:
                     for row in rows
                 }
             ),
-            "origins": sorted({row["origin"] for row in rows}),
+            "origins": len({row["origin"] for row in rows}),
+            "origin_sites": sorted({row["origin"] for row in rows}),
             "destinations": len({row["destination"] for row in rows}),
             "products": len({row["product"] for row in rows}),
             "max_order_kg": max(order_weights),
