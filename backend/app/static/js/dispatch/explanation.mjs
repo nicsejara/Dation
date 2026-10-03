@@ -201,7 +201,9 @@ export function chat(root,run,initialQuestion=''){
 
   root.querySelector('[data-close]').onclick=()=>{
     root.hidden=true;
-    root.closest('.dispatch-dashboard')?.classList.remove('with-chat');
+    const dashboard=root.closest('.dispatch-dashboard');
+    dashboard?.classList.remove('with-chat');
+    dashboard?.querySelector('[data-chat]')?.setAttribute('aria-expanded','false');
   };
 
   const messages=root.querySelector('[data-messages]');
