@@ -84,6 +84,8 @@ const state={
   decisions:saved.decisions||{},
   configured:Boolean(saved.configured),
   decisionCase:saved.decisionCase||null,
+  activeNode:saved.activeNode||'logistics_assignment',
+  schedulingUseDueDates:saved.schedulingUseDueDates??true,
   preflight:null,
   available:false,
   run:null,
@@ -93,10 +95,18 @@ state.weights=state.objective==='custom'
   ?normalizeWeights(state.weights,state.dimensions)
   :presetWeights(state.objective,state.dimensions);
 let timer=null,pollGeneration=0;const roots={};
-function persist(){try{sessionStorage.setItem(KEY,JSON.stringify({orders:state.orders,fleet:state.fleet,dimensions:state.dimensions,weights:state.weights,objective:state.objective,analysisDepth:state.analysisDepth,allow:state.allow,decisions:state.decisions,configured:state.configured,decisionCase:state.decisionCase}));}catch{}}
+function persist(){try{sessionStorage.setItem(KEY,JSON.stringify({orders:state.orders,fleet:state.fleet,dimensions:state.dimensions,weights:state.weights,objective:state.objective,analysisDepth:state.analysisDepth,allow:state.allow,decisions:state.decisions,configured:state.configured,decisionCase:state.decisionCase,activeNode:state.activeNode,schedulingUseDueDates:state.schedulingUseDueDates}));}catch{}}
 function root(view,id){const parent=document.querySelector('[data-view-panel="'+view+'"]');let node=document.getElementById(id);if(!node){node=document.createElement('div');node.id=id;node.className='dispatch';parent.append(node);}return node;}
 function assignmentEvidence(){
   return state.preflight?.decision_readiness?.decisions?.find(item=>item.id==='logistics_assignment')||null;
+}
+function schedulingEvidence(){
+  return state.preflight?.decision_readiness?.decisions?.find(item=>item.id==='logistics_scheduling')||null;
+}
+function schedulingSlaAvailable(){
+  return Boolean(
+    schedulingEvidence()?.capabilities?.find(item=>item.id==='sla')?.available
+  );
 }
 function assignmentCapabilities(){
   return Object.fromEntries(
