@@ -1,5 +1,5 @@
 import {esc,num,date,vehicle,api,post,errorBox} from './shared.mjs';import {rebalance} from './selectors.mjs';import {render as dashboard} from './dashboard.mjs';
-import {mountUploadScreen} from './upload/index.mjs?v=decision-chain-v1';
+import {mountUploadScreen} from './upload/index.mjs?v=assignment-v1';
 import {renderDecisionMap} from './decision-map.mjs';
 import {STATUS,createDecisionCase,replaceInputs,transitionNode,inputSignature,caseRef} from './decision-case.mjs';
 const KEY='dation.dispatch.workspace.v4';
