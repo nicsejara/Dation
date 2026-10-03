@@ -1,5 +1,5 @@
-import {esc,num,date,vehicle,api,post,errorBox} from './shared.mjs';import {rebalance} from './selectors.mjs';import {render as dashboard} from './dashboard.mjs?v=decision-dashboard-v2';
-import {mountUploadScreen} from './upload/index.mjs?v=decision-flow-v1';
+import {esc,num,date,vehicle,api,post,errorBox} from './shared.mjs';import {rebalance} from './selectors.mjs';import {render as dashboard} from './dashboard.mjs?v=decision-map-phase1-v1';
+import {mountUploadScreen} from './upload/index.mjs?v=decision-map-phase1-v1';
 import {renderDecisionMap} from './decision-map.mjs';
 import {STATUS,createDecisionCase,replaceInputs,transitionNode,inputSignature,caseRef,deriveDecisionNodes} from './decision-case.mjs';
 const KEY='dation.dispatch.workspace.v4';
@@ -161,6 +161,17 @@ function ensureDecisionCase(){
   persist();
   return state.decisionCase;
 }
+function decisionContext(nodeId){
+  if(nodeId==='logistics_scheduling'){
+    window.dationSetDecisionContext?.('Configurar Planificación','Decisión · Planificación');
+    return;
+  }
+  if(nodeId==='logistics_final_assignment'){
+    window.dationSetDecisionContext?.('Configurar Asignación final','Decisión · Asignación final');
+    return;
+  }
+  window.dationSetDecisionContext?.('Configurar Assignment','Decisión · Assignment');
+}
 function navigate(view){window.dationSetDataReady(ready());window.dationNavigate(view);}
 function nextNodeId(nodeId){
   if(nodeId==='logistics_assignment')return 'logistics_scheduling';
@@ -212,6 +223,7 @@ async function openCaseResult(nodeId='logistics_assignment'){
   const runId=state.decisionCase?.nodes?.[nodeId]?.run_id;
   if(!runId)return;
   state.activeNode=nodeId;
+  decisionContext(nodeId);
   persist();
   try{
     const run=state.run?.id===runId
@@ -268,6 +280,7 @@ async function loadDecisionMap(){
       fleet:state.fleet,
       onConfigure:(nodeId)=>{
         state.activeNode=nodeId||'logistics_assignment';
+        decisionContext(state.activeNode);
         persist();
         navigate('logistics-config');
       },
@@ -841,6 +854,7 @@ export function show(run){
       },
     );
     state.activeNode=nodeId;
+    decisionContext(nodeId);
   }
 
   persist();
@@ -957,10 +971,8 @@ export function show(run){
         &&state.decisionCase
       )
         ?()=>{
-          const next=unlockNextNode(nodeId);
-          if(next)state.activeNode=next;
+          unlockNextNode(nodeId);
           persist();
-          navigate('logistics-map');
         }
         :null,
     },
