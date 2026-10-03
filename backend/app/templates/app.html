@@ -998,6 +998,7 @@
         return (
           view === 'logistics-overview'
           || view === 'logistics-data'
+          || view === 'logistics-map'
           || view === 'logistics-config'
           || view === 'decision-dashboard'
         );
@@ -1108,9 +1109,21 @@
           addSeparator(container);
 
           container.appendChild(
-            journeyButton('Configurar decisión', {
+            journeyButton('Mapa de decisiones', {
+              current: currentView === 'logistics-map',
+              disabled: !dataReady,
+              onClick: function () {
+                window.dationNavigate('logistics-map');
+              }
+            })
+          );
+
+          addSeparator(container);
+
+          container.appendChild(
+            journeyButton('Configurar Assignment', {
               current: currentView === 'logistics-config',
-              disabled: currentView === 'logistics-data' && !dataReady,
+              disabled: !dataReady,
               onClick: function () {
                 window.dationNavigate('logistics-config');
               }
@@ -1120,7 +1133,7 @@
           addSeparator(container);
 
           container.appendChild(
-            journeyButton('Dashboard decisión', {
+            journeyButton('Decisión', {
               current: currentView === 'decision-dashboard',
               disabled: !dashboardReady,
               onClick: function () {
@@ -1162,7 +1175,10 @@
       window.dationSetDataReady = function (ready) {
         dataReady = document.body.classList.contains('dispatch-enabled') && window.DationDispatch ? window.DationDispatch.isReady() : Boolean(ready);
 
-        if (currentView === 'logistics-data') {
+        if (
+          currentView === 'logistics-data'
+          || currentView === 'logistics-map'
+        ) {
           window.dationRenderJourney(currentView);
         }
       };
@@ -1184,8 +1200,10 @@
         }
 
         if (
-          view === 'logistics-config'
-          && currentView === 'logistics-data'
+          (
+            view === 'logistics-map'
+            || view === 'logistics-config'
+          )
           && !dataReady
         ) {
           return;
