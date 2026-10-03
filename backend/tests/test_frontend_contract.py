@@ -760,6 +760,28 @@ class FrontendContractTests(
             self.html,
         )
 
+    def test_brand_assets_contract(self):
+        self.assertIn(
+            "/static/assets/dation-logo.png",
+            self.html,
+        )
+        self.assertIn(
+            "/static/assets/dda-logistics.svg",
+            self.html,
+        )
+        self.assertIn(
+            "/static/assets/dda-production.svg",
+            self.html,
+        )
+        self.assertIn(
+            "dation-brand-v1",
+            self.html,
+        )
+        self.assertNotIn(
+            '<div class="brand-mark" aria-hidden="true">\n          <span></span>',
+            self.html,
+        )
+
     def test_single_ingestion_contract(
         self,
     ):
