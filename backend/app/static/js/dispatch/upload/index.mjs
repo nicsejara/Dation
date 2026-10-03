@@ -10,6 +10,7 @@ import {
 } from "./selectors.mjs";
 import {renderSystemBanner} from "./system-banner.mjs";
 import {createValidationDrawer} from "./validation-report.mjs";
+import {renderDecisionReadiness} from "./readiness-panel.mjs";
 
 const MAX_BYTES = 10 * 1024 * 1024;
 
@@ -63,8 +64,8 @@ function makeHowItWorks() {
     ],
     [
       "2",
-      "Completá tus datos",
-      "No cambies nombres ni encabezados.",
+      "Completá lo necesario",
+      "Las columnas opcionales pueden quedar vacías hasta necesitarlas.",
     ],
     [
       "3",
@@ -104,7 +105,7 @@ function makeFinalBar(onNext) {
   const button = document.createElement("button");
   button.type = "button";
   button.className = "dispatch-final-cta";
-  button.textContent = "Configurar decisión →";
+  button.textContent = "Continuar →";
   button.disabled = true;
   button.onclick = () => {
     if (!button.disabled) {
@@ -120,10 +121,10 @@ function makeFinalBar(onNext) {
 
     if (result.enabled) {
       icon.textContent = "✓";
-      title.textContent = "Datos listos para configurar la decisión";
+      title.textContent = "Asignación de carga disponible";
       description.textContent = (
-        "Los dos archivos superaron las validaciones necesarias. "
-        + "Podés continuar."
+        "El Data Pack tiene lo necesario para la primera decisión. "
+        + "Los datos opcionales pueden completarse más adelante."
       );
       return;
     }
@@ -222,15 +223,15 @@ export async function mountUploadScreen(
   const heading = el("header", null, "dispatch-upload-heading-v3");
   const meta = el("div", null, "dispatch-upload-meta");
   meta.append(
-    el("span", "DDA Logística", "dispatch-kicker"),
-    el("span", "Paso 1 de 3", "dispatch-step-chip"),
+    el("span", "LOGISTICS DATA PACK", "dispatch-kicker"),
+    el("span", "Fase 1 · Datos", "dispatch-step-chip"),
   );
   heading.append(
     meta,
     el("h1", "Cargar datos"),
     el(
       "p",
-      "Subí los dos archivos necesarios. Validamos todo antes de continuar.",
+      "Cargá Órdenes y Flota. Dation valida el núcleo mínimo y detecta qué decisiones pueden habilitarse con la información disponible.",
     ),
   );
 
@@ -239,6 +240,7 @@ export async function mountUploadScreen(
 
   const cards = el("div", null, "dispatch-upload-cards-v3");
   const validationRoot = el("section");
+  const readinessRoot = el("section");
   const finalBar = makeFinalBar(onNext);
 
   root.append(
@@ -247,6 +249,7 @@ export async function mountUploadScreen(
     makeHowItWorks(),
     cards,
     validationRoot,
+    readinessRoot,
     finalBar.bar,
   );
 
@@ -272,8 +275,13 @@ export async function mountUploadScreen(
       phases: local.phases,
       saveErrors: local.saveErrors,
     });
+    const readiness = state.preflight?.decision_readiness || null;
+    renderDecisionReadiness(readinessRoot, readiness);
     finalBar.update(result);
-    window.dationSetDataReady(Boolean(result.enabled));
+    window.dationSetDataReady(Boolean(
+      result.enabled
+      && readiness?.decisions?.[0]?.state === "available"
+    ));
     return result;
   }
 
