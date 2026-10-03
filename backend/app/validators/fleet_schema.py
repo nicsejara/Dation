@@ -1,6 +1,7 @@
 import csv
 import io
-from collections import defaultdict
+from collections import Counter
+from datetime import date, datetime
 
 from app.validators.contracts import CONTRACTS
 from app.validators.dispatch_common import (
@@ -13,7 +14,6 @@ from app.validators.dispatch_common import (
 )
 from app.validators.profile_utils import (
     detected_metadata,
-    format_fleet_label,
     preview_payload,
 )
 
@@ -22,9 +22,11 @@ COLUMNS = [
     for column in CONTRACTS["fleet"]["columns"]
 ]
 
-LEGACY_FLEET_COLUMNS = [
+LEGACY_POOL_COLUMNS = {
+    "fleet_pool_id",
     "vehicle_type",
     "ownership",
+    "base_location",
     "capacity_kg",
     "cost_per_km",
     "fixed_trip_cost",
@@ -33,11 +35,11 @@ LEGACY_FLEET_COLUMNS = [
     "driving_hours_per_day",
     "fuel_l_per_100km",
     "co2_kg_per_km",
-]
+}
 
 
-def _upgrade_legacy_fleet(contents: bytes) -> tuple[bytes, bool, int]:
-    """Adapt fleet_v1 only in memory so historical datasets remain executable."""
+def _upgrade_legacy_pool_fleet(contents: bytes) -> tuple[bytes, bool, int]:
+    """Expand historical pool rows into unit-level rows in memory."""
     try:
         text = contents.decode("utf-8-sig")
     except UnicodeDecodeError:
@@ -45,12 +47,14 @@ def _upgrade_legacy_fleet(contents: bytes) -> tuple[bytes, bool, int]:
     lines = text.splitlines()
     if not lines:
         return contents, False, 0
+
     delimiter = ";" if lines[0].count(";") > lines[0].count(",") else ","
     reader = csv.DictReader(io.StringIO(text), delimiter=delimiter)
     raw_columns = [str(value).strip() for value in (reader.fieldnames or [])]
-    if "fleet_pool_id" in raw_columns or "base_location" in raw_columns:
+
+    if "vehicle_id" in raw_columns:
         return contents, False, len(raw_columns)
-    if not set(LEGACY_FLEET_COLUMNS).issubset(raw_columns):
+    if not LEGACY_POOL_COLUMNS.issubset(set(raw_columns)):
         return contents, False, len(raw_columns)
 
     buffer = io.StringIO()
@@ -61,30 +65,89 @@ def _upgrade_legacy_fleet(contents: bytes) -> tuple[bytes, bool, int]:
         lineterminator="\r\n",
     )
     writer.writeheader()
+
     for raw in reader:
         row = {
             str(key).strip(): ("" if value is None else str(value).strip())
             for key, value in raw.items()
             if key is not None
         }
-        vehicle_type = row.get("vehicle_type", "")
-        upgraded = {
-            "fleet_pool_id": f"LEGACY-{vehicle_type}",
-            "vehicle_type": vehicle_type,
-            "ownership": row.get("ownership", ""),
-            "base_location": "*",
-            **{
-                key: row.get(key, "")
-                for key in LEGACY_FLEET_COLUMNS
-                if key not in {"vehicle_type", "ownership"}
-            },
-        }
-        writer.writerow(upgraded)
+        try:
+            requested_units = int(row.get("units_available") or "1")
+        except ValueError:
+            requested_units = 1
+        units = max(1, requested_units)
+        pool_id = row.get("fleet_pool_id") or row.get("vehicle_type") or "FLEET"
+
+        for index in range(1, units + 1):
+            writer.writerow(
+                {
+                    "vehicle_id": f"LEGACY-{pool_id}-{index:02d}",
+                    "license_plate": "",
+                    "vehicle_type": row.get("vehicle_type", ""),
+                    "ownership": row.get("ownership", ""),
+                    "provider_name": "",
+                    "base_site": row.get("base_location", ""),
+                    "capacity_kg": row.get("capacity_kg", ""),
+                    "capacity_m3": "",
+                    "cost_per_km": row.get("cost_per_km", ""),
+                    "fixed_trip_cost": row.get("fixed_trip_cost", ""),
+                    "fuel_l_per_100km": row.get("fuel_l_per_100km", ""),
+                    "co2_kg_per_km": row.get("co2_kg_per_km", ""),
+                    "avg_speed_kmh": row.get("avg_speed_kmh", ""),
+                    "driving_hours_per_day": row.get("driving_hours_per_day", ""),
+                    "status": "available",
+                    "available_from": "",
+                    "available_until": "",
+                }
+            )
+
     return buffer.getvalue().encode("utf-8"), True, len(raw_columns)
 
 
+def _parse_optional_date(row, key, problems):
+    raw = row.get(key, "")
+    if not raw:
+        return None
+    try:
+        return (
+            datetime.strptime(raw, "%d/%m/%Y").date()
+            if "/" in raw
+            else date.fromisoformat(raw)
+        )
+    except ValueError:
+        problems.error(
+            "INVALID_DATE",
+            f"La fecha '{raw}' no es válida.",
+            row=row["_row"],
+            column=key,
+            hint="Usá AAAA-MM-DD o d/m/AAAA; el día va primero.",
+            value=raw,
+        )
+        return None
+
+
+def _completeness(columns, rows):
+    result = {}
+    for column in CONTRACTS["fleet"]["columns"]:
+        name = column["name"]
+        filled = sum(bool(row.get(name, "")) for row in rows)
+        result[name] = {
+            "present": name in columns,
+            "filled_rows": filled,
+            "total_rows": len(rows),
+            "complete": bool(rows) and filled == len(rows),
+            "required": bool(column["required"]),
+            "used_by": column.get("used_by", []),
+            "unlock_label": column.get("unlock_label"),
+        }
+    return result
+
+
 def validate_fleet_report(contents: bytes, max_problems: int = 100) -> dict:
-    normalized_contents, legacy_v1, raw_column_count = _upgrade_legacy_fleet(contents)
+    normalized_contents, legacy_pool, raw_column_count = _upgrade_legacy_pool_fleet(
+        contents
+    )
     problems = ValidationProblems(max_problems)
     rows, columns, delimiter, detected = parse_csv_report(
         normalized_contents,
@@ -92,23 +155,21 @@ def validate_fleet_report(contents: bytes, max_problems: int = 100) -> dict:
         problems,
     )
 
-    if legacy_v1:
-        detected = "fleet_v1"
+    if legacy_pool:
+        detected = "fleet_v2_legacy"
         problems.warning(
-            "LEGACY_FLEET_GLOBAL_SCOPE",
+            "LEGACY_FLEET_POOL_FORMAT",
             (
-                "Esta flota no informa base operativa. Por compatibilidad se "
-                "considera disponible desde cualquier origen."
+                "Esta flota usa el formato anterior por grupos. "
+                "Dation la adaptó temporalmente a vehículos individuales."
             ),
             row=1,
-            hint=(
-                "Cargá una versión fleet_v2 con fleet_pool_id y base_location "
-                "para que la decisión respete la ubicación real de la flota."
-            ),
+            hint="Para nuevas cargas usá Fleet V3: una fila por camión real.",
         )
 
-    duplicate_values(rows, "fleet_pool_id", problems)
+    duplicate_values(rows, "vehicle_id", problems)
 
+    seen_plates = {}
     for row in rows:
         ownership = row.get("ownership")
         if ownership and ownership not in ("own", "third_party"):
@@ -121,16 +182,31 @@ def validate_fleet_report(contents: bytes, max_problems: int = 100) -> dict:
                 value=ownership,
             )
 
-        base_location = row.get("base_location", "")
-        if base_location == "*" and ownership == "own" and not legacy_v1:
+        base_site = row.get("base_site", "")
+        if base_site == "*" and ownership == "own" and not legacy_pool:
             problems.error(
-                "INVALID_BASE_LOCATION",
-                "La flota propia debe indicar una base operativa concreta.",
+                "INVALID_BASE_SITE",
+                "La flota propia debe indicar un site concreto.",
                 row=row["_row"],
-                column="base_location",
-                hint="Indicá el origen real del pool, por ejemplo Cordoba.",
-                value=base_location,
+                column="base_site",
+                hint="Por ejemplo: Cordoba.",
+                value=base_site,
             )
+
+        plate = row.get("license_plate", "")
+        if plate:
+            key = plate.replace(" ", "").upper()
+            if key in seen_plates:
+                problems.error(
+                    "DUPLICATE_LICENSE_PLATE",
+                    f"La patente '{plate}' está repetida.",
+                    row=row["_row"],
+                    column="license_plate",
+                    hint=f"Ya aparece en la fila {seen_plates[key]}.",
+                    value=plate,
+                )
+            else:
+                seen_plates[key] = row["_row"]
 
         capacity = parse_number(
             row,
@@ -139,16 +215,40 @@ def validate_fleet_report(contents: bytes, max_problems: int = 100) -> dict:
             positive=True,
             delimiter=delimiter,
         )
+        capacity_m3 = parse_number(
+            row,
+            "capacity_m3",
+            problems,
+            positive=True,
+            allow_empty=True,
+            delimiter=delimiter,
+        )
         cost = parse_number(
             row,
             "cost_per_km",
             problems,
+            allow_empty=True,
             delimiter=delimiter,
         )
         fixed = parse_number(
             row,
             "fixed_trip_cost",
             problems,
+            allow_empty=True,
+            delimiter=delimiter,
+        )
+        fuel = parse_number(
+            row,
+            "fuel_l_per_100km",
+            problems,
+            allow_empty=True,
+            delimiter=delimiter,
+        )
+        co2 = parse_number(
+            row,
+            "co2_kg_per_km",
+            problems,
+            allow_empty=True,
             delimiter=delimiter,
         )
         speed = parse_number(
@@ -156,6 +256,7 @@ def validate_fleet_report(contents: bytes, max_problems: int = 100) -> dict:
             "avg_speed_kmh",
             problems,
             positive=True,
+            allow_empty=True,
             delimiter=delimiter,
         )
         driving = parse_number(
@@ -163,18 +264,7 @@ def validate_fleet_report(contents: bytes, max_problems: int = 100) -> dict:
             "driving_hours_per_day",
             problems,
             minimum=1,
-            delimiter=delimiter,
-        )
-        fuel = parse_number(
-            row,
-            "fuel_l_per_100km",
-            problems,
-            delimiter=delimiter,
-        )
-        co2 = parse_number(
-            row,
-            "co2_kg_per_km",
-            problems,
+            allow_empty=True,
             delimiter=delimiter,
         )
 
@@ -189,112 +279,116 @@ def validate_fleet_report(contents: bytes, max_problems: int = 100) -> dict:
             )
             driving = None
 
-        raw_units = row.get("units_available", "")
-        if raw_units == "":
-            if ownership == "own":
-                problems.error(
-                    "REQUIRED_EMPTY",
-                    "La flota propia requiere disponibilidad.",
-                    row=row["_row"],
-                    column="units_available",
-                    hint="Ingresá cuántos vehículos pertenecen a este pool.",
-                )
-                units = None
-            else:
-                units = None
-        else:
-            units = parse_number(
-                row,
-                "units_available",
-                problems,
-                integer=True,
-                delimiter=delimiter,
+        status = row.get("status", "")
+        if status and status not in ("available", "maintenance", "unavailable"):
+            problems.error(
+                "INVALID_OPTION",
+                f"'{status}' no es un estado válido.",
+                row=row["_row"],
+                column="status",
+                hint="Usá available, maintenance o unavailable.",
+                value=status,
+            )
+
+        available_from = _parse_optional_date(row, "available_from", problems)
+        available_until = _parse_optional_date(row, "available_until", problems)
+        if (
+            available_from
+            and available_until
+            and available_until < available_from
+        ):
+            problems.error(
+                "INVALID_DATE_RANGE",
+                "available_until no puede ser anterior a available_from.",
+                row=row["_row"],
+                column="available_until",
+                hint="Revisá el rango de disponibilidad.",
+                value=row.get("available_until"),
             )
 
         parsed = {
             "capacity_kg": capacity,
+            "capacity_m3": capacity_m3,
             "cost_per_km": cost,
             "fixed_trip_cost": fixed,
-            "avg_speed_kmh": speed,
-            "driving_hours_per_day": driving,
             "fuel_l_per_100km": fuel,
             "co2_kg_per_km": co2,
-            "units_available": units,
+            "avg_speed_kmh": speed,
+            "driving_hours_per_day": driving,
         }
         for key, value in parsed.items():
-            if value is not None or key == "units_available":
+            if value is not None:
                 row[key] = value
-        row["legacy_global_scope"] = bool(legacy_v1)
+
+        if available_from:
+            row["available_from"] = available_from.isoformat()
+        if available_until:
+            row["available_until"] = available_until.isoformat()
+
+        # Compatibility adapter for Dispatch 2.x. The user-facing contract has
+        # no pools; each physical vehicle is temporarily exposed as one finite
+        # internal resource until Assignment and Scheduling are split.
+        row["fleet_pool_id"] = row["vehicle_id"]
+        row["base_location"] = row["base_site"]
+        row["units_available"] = (
+            0 if status in ("maintenance", "unavailable") else 1
+        )
+        row["avg_speed_kmh"] = speed if speed is not None else 70.0
+        row["driving_hours_per_day"] = (
+            driving if driving is not None else 10.0
+        )
+        row["cost_per_km"] = cost if cost is not None else 0.0
+        row["fixed_trip_cost"] = fixed if fixed is not None else 0.0
+        row["fuel_l_per_100km"] = fuel if fuel is not None else 0.0
+        row["co2_kg_per_km"] = co2 if co2 is not None else 0.0
+        row["legacy_global_scope"] = bool(legacy_pool)
 
     valid = problems.error_count == 0
+    completeness = _completeness(columns, rows)
     profile = None
     suggested_label = None
-    if valid and rows:
-        own = [row for row in rows if row["ownership"] == "own"]
-        by_base = defaultdict(lambda: {"units": 0, "capacity_kg_per_day": 0.0})
-        for row in own:
-            base = row["base_location"]
-            units = row["units_available"] or 0
-            by_base[base]["units"] += units
-            by_base[base]["capacity_kg_per_day"] += row["capacity_kg"] * units
 
+    if valid and rows:
+        ownership_mix = Counter(row["ownership"] for row in rows)
+        sites = sorted(
+            {
+                row["base_site"]
+                for row in rows
+                if row.get("base_site") and row["base_site"] != "*"
+            }
+        )
         profile = {
-            "profile_version": 3,
+            "profile_version": 4,
             "fleet": rows,
-            "pools": len(rows),
+            "vehicles": len(rows),
+            "own_vehicles": ownership_mix.get("own", 0),
+            "third_party_vehicles": ownership_mix.get("third_party", 0),
             "types": len({row["vehicle_type"] for row in rows}),
-            "bases": sorted(
-                {
-                    row["base_location"]
-                    for row in rows
-                    if row["base_location"] != "*"
-                }
-            ),
-            "spatially_scoped": not legacy_v1,
-            "global_scope_pools": sum(
-                row["base_location"] == "*"
+            "sites": sites,
+            "available_now": sum(
+                row.get("status", "available") in ("", "available")
                 for row in rows
             ),
-            "own_units_per_day": sum(
-                row["units_available"] or 0
-                for row in own
-            ),
-            "own_capacity_kg_per_day": sum(
-                row["capacity_kg"] * (row["units_available"] or 0)
-                for row in own
-            ),
-            "capacity_by_base": {
-                key: value
-                for key, value in sorted(by_base.items())
-            },
-            "has_third_party": any(
-                row["ownership"] == "third_party"
-                for row in rows
-            ),
+            "total_capacity_kg": sum(row["capacity_kg"] for row in rows),
+            "has_third_party": ownership_mix.get("third_party", 0) > 0,
         }
-        suggested_label = format_fleet_label()
+        suggested_label = f"Flota · {len(rows)} vehículos"
 
     metadata = detected_metadata(
         contents,
         "fleet",
         columns,
     )
-    if legacy_v1:
-        metadata["aliases"].extend(
-            [
-                {"from": "(ausente)", "to": "fleet_pool_id"},
-                {"from": "(ausente)", "to": "base_location"},
-            ]
-        )
-        metadata["columns"] = raw_column_count
+    metadata["source_format"] = "fleet_v2_legacy" if legacy_pool else "fleet_v3"
 
     return {
         "valid": valid,
         "detected_format": detected,
-        "schema": "fleet_v1" if legacy_v1 else CONTRACTS["fleet"]["schema"],
+        "schema": "fleet_v2" if legacy_pool else CONTRACTS["fleet"]["schema"],
         "rows": len(rows),
-        "columns": raw_column_count if legacy_v1 else len(columns),
+        "columns": raw_column_count if legacy_pool else len(columns),
         "profile": profile,
+        "completeness": completeness,
         "preview": preview_payload(columns, rows),
         "detected": metadata,
         "suggested_label": suggested_label,
@@ -326,6 +420,7 @@ def validate_fleet_csv(contents: bytes) -> dict:
         ],
         "records": report["records"],
         "profile": report["profile"],
+        "completeness": report["completeness"],
         "preview": report["preview"],
         "detected": report["detected"],
         "suggested_label": report["suggested_label"],
