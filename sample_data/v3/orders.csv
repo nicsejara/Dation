@@ -1,0 +1,31 @@
+order_id;product;quantity_units;unit_weight_kg;origin;destination;distance_km;estimated_dispatch_date;priority;delivery_due_date
+SHP-0001;Producto C;12;500;Cordoba;San Luis;420;2026-10-04;Normal;2026-10-07
+SHP-0002;Producto B;19;1200;Cordoba;Tucuman;570;2026-10-07;Normal;2026-10-11
+SHP-0003;Producto A;26;800;Cordoba;San Francisco;205;2026-10-10;Normal;2026-10-12
+SHP-0004;Producto C;7;500;Cordoba;San Francisco;205;2026-10-03;Normal;2026-10-06
+SHP-0005;Producto B;14;1200;Cordoba;Rosario;400;2026-10-06;Normal;2026-10-10
+SHP-0006;Producto A;21;800;Cordoba;Villa Maria;150;2026-10-09;Normal;2026-10-11
+SHP-0007;Producto C;28;500;Cordoba;San Luis;420;2026-10-02;High;2026-10-05
+SHP-0008;Producto B;9;1200;Cordoba;San Luis;420;2026-10-05;Normal;2026-10-09
+SHP-0009;Producto A;16;800;Cordoba;Tucuman;570;2026-10-08;Low;2026-10-10
+SHP-0010;Producto C;23;500;Cordoba;San Francisco;205;2026-10-01;Normal;2026-10-04
+SHP-0011;Producto B;30;1200;Cordoba;Rosario;400;2026-10-04;Normal;2026-10-08
+SHP-0012;Producto A;11;800;Cordoba;Rosario;400;2026-10-07;Normal;2026-10-09
+SHP-0013;Producto C;18;500;Cordoba;Villa Maria;150;2026-10-10;Normal;2026-10-13
+SHP-0014;Producto B;25;1200;Cordoba;San Luis;420;2026-10-03;High;2026-10-07
+SHP-0015;Producto A;6;800;Cordoba;Tucuman;570;2026-10-06;Normal;2026-10-08
+SHP-0016;Producto C;13;500;Cordoba;Tucuman;570;2026-10-09;Normal;2026-10-12
+SHP-0017;Producto B;20;1200;Cordoba;San Francisco;205;2026-10-02;Normal;2026-10-06
+SHP-0018;Producto A;27;800;Cordoba;Rosario;400;2026-10-05;Low;2026-10-07
+SHP-0019;Producto C;8;500;Cordoba;Villa Maria;150;2026-10-08;Normal;2026-10-11
+SHP-0020;Producto B;15;1200;Cordoba;Villa Maria;150;2026-10-01;Normal;2026-10-05
+SHP-0021;Producto A;22;800;Cordoba;San Luis;420;2026-10-04;High;2026-10-06
+SHP-0022;Producto C;29;500;Cordoba;Tucuman;570;2026-10-07;Normal;2026-10-10
+SHP-0023;Producto B;10;1200;Cordoba;San Francisco;205;2026-10-10;Normal;2026-10-14
+SHP-0024;Producto A;17;800;Cordoba;San Francisco;205;2026-10-03;Normal;2026-10-05
+SHP-0025;Producto C;24;500;Cordoba;Rosario;400;2026-10-06;Normal;2026-10-09
+SHP-0026;Producto B;5;1200;Cordoba;Villa Maria;150;2026-10-09;Normal;2026-10-13
+SHP-0027;Producto A;12;800;Cordoba;San Luis;420;2026-10-02;Low;2026-10-04
+SHP-0028;Producto C;19;500;Cordoba;San Luis;420;2026-10-05;High;2026-10-08
+SHP-0029;Producto B;26;1200;Cordoba;Tucuman;570;2026-10-08;Normal;2026-10-12
+SHP-0030;Producto A;7;800;Cordoba;San Francisco;205;2026-10-01;Normal;2026-10-03
