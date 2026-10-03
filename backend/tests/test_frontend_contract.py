@@ -451,7 +451,7 @@ class FrontendContractTests(
             review,
         )
         self.assertIn(
-            "no recalcula el optimizador",
+            "La IA no recalcula",
             explanation,
         )
 
@@ -489,6 +489,14 @@ class FrontendContractTests(
             / "dispatch"
             / "plan.mjs"
         ).read_text(encoding="utf-8")
+        exporter = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+            / "export.mjs"
+        ).read_text(encoding="utf-8")
 
         config_render = workspace.split(
             "async function loadConfig()",
@@ -519,8 +527,12 @@ class FrontendContractTests(
             hero,
         )
         self.assertIn(
-            "assignment-recomendada.csv",
+            "exportDecision",
             plan,
+        )
+        self.assertIn(
+            "assignment-recomendada.csv",
+            exporter,
         )
         self.assertIn(
             "Vehicle ID",
@@ -572,6 +584,14 @@ class FrontendContractTests(
             / "dispatch"
             / "scheduling-dashboard.mjs"
         ).read_text(encoding="utf-8")
+        exporter = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+            / "export.mjs"
+        ).read_text(encoding="utf-8")
 
         self.assertIn(
             "Configurar planificación",
@@ -610,8 +630,12 @@ class FrontendContractTests(
             scheduling,
         )
         self.assertIn(
-            "planificacion-recomendada.csv",
+            "exportDecision",
             scheduling,
+        )
+        self.assertIn(
+            "planificacion-recomendada.csv",
+            exporter,
         )
         self.assertIn(
             "resource_available_again",
