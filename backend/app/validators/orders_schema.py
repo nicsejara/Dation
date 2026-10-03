@@ -133,6 +133,26 @@ def validate_orders_report(contents: bytes, max_problems: int = 100) -> dict:
                 "estimated_dispatch_date",
                 problems,
             )
+            legacy_window = parse_number(
+                row,
+                "max_delivery_days",
+                problems,
+                positive=True,
+                integer=True,
+                allow_empty=True,
+                delimiter=delimiter,
+            )
+            if legacy_window is not None and legacy_window > 90:
+                problems.error(
+                    "OUT_OF_RANGE",
+                    "El horizonte máximo compatible es 90 días.",
+                    row=row["_row"],
+                    column="max_delivery_days",
+                    hint="Ingresá un valor entre 1 y 90.",
+                    value=legacy_window,
+                )
+                legacy_window = None
+
             due = _parse_optional_date(
                 row,
                 "delivery_due_date",
@@ -191,13 +211,23 @@ def validate_orders_report(contents: bytes, max_problems: int = 100) -> dict:
             compatibility_ready = estimated or COMPATIBILITY_READY_DATE
             compatibility_due = due or (
                 compatibility_ready
-                + timedelta(days=COMPATIBILITY_WINDOW_DAYS)
+                + timedelta(
+                    days=(
+                        legacy_window
+                        if legacy_window is not None
+                        else COMPATIBILITY_WINDOW_DAYS
+                    )
+                )
             )
             window = max(
                 1,
                 min(
                     90,
-                    (compatibility_due - compatibility_ready).days,
+                    (
+                        legacy_window
+                        if legacy_window is not None and due is None
+                        else (compatibility_due - compatibility_ready).days
+                    ),
                 ),
             )
             row["priority"] = priority or "Normal"
