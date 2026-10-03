@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="/static/css/tokens.css?v=home-dda-selector-v2">
   <link rel="stylesheet" href="/static/css/app.css?v=home-dda-selector-v2">
   <link rel="stylesheet" href="/static/css/home-dda.css?v=home-dda-hero-v4">
+  <link rel="stylesheet" href="/static/css/dda-logistics-landing.css?v=dda-logistics-landing-v1">
   <link rel="stylesheet" href="/static/css/dispatch.css?v=home-dda-selector-v2">
 </head>
 <body>
@@ -196,189 +197,382 @@
 
         <!-- OVERVIEW DDA LOGÍSTICA -->
         <section class="view" data-view-panel="logistics-overview">
-          <div class="dda-overview">
-            <section class="dda-overview__hero">
-              <div class="dda-overview__hero-copy">
-                <div class="dda-overview__meta">
-                  <span class="dda-overview__badge">Decision Data Asset</span>
-                  <span>Decision Chain · Dispatch 2.2.0</span>
+          <div class="dda-landing">
+            <svg width="0" height="0" aria-hidden="true" focusable="false" class="dda-landing__sprite">
+              <defs>
+                <symbol id="dda-i-package" viewBox="0 0 24 24"><path d="m16.5 9.4-9-5.2"/><path d="M21 16V8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></symbol>
+                <symbol id="dda-i-cpu" viewBox="0 0 24 24"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></symbol>
+                <symbol id="dda-i-file-check" viewBox="0 0 24 24"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5Z"/><polyline points="14 2 14 8 20 8"/><path d="m9 15 2 2 4-4"/></symbol>
+                <symbol id="dda-i-git" viewBox="0 0 24 24"><circle cx="6" cy="4" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="6" cy="20" r="2"/><path d="M6 6v12M8 6c6 0 4 8 8 8h2"/><path d="M16 14h2V8"/></symbol>
+                <symbol id="dda-i-scale" viewBox="0 0 24 24"><path d="m16 16 3-8 3 8a5 5 0 0 1-6 0Z"/><path d="m2 16 3-8 3 8a5 5 0 0 1-6 0Z"/><path d="M7 21h10M12 3v18M3 7h18"/></symbol>
+                <symbol id="dda-i-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V5l8-3 8 3Z"/><path d="m9 12 2 2 4-4"/></symbol>
+                <symbol id="dda-i-upload" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 8 5-5 5 5"/><path d="M5 21h14a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2"/></symbol>
+                <symbol id="dda-i-tree" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="5" rx="1"/><rect x="14" y="16" width="7" height="5" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><path d="M6.5 8v4a2 2 0 0 0 2 2H17v2M17.5 8v8"/></symbol>
+                <symbol id="dda-i-sliders" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></symbol>
+                <symbol id="dda-i-calendar" viewBox="0 0 24 24"><path d="M8 2v4M16 2v4M3 10h18"/><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></symbol>
+                <symbol id="dda-i-truck" viewBox="0 0 24 24"><path d="M10 17h4V5H2v12h3"/><path d="M14 9h4l4 4v4h-3"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="17.5" r="2.5"/></symbol>
+                <symbol id="dda-i-layers" viewBox="0 0 24 24"><path d="m12.8 2.2 8.4 4.2a1 1 0 0 1 0 1.8l-8.4 4.2a2 2 0 0 1-1.6 0L2.8 8.2a1 1 0 0 1 0-1.8l8.4-4.2a2 2 0 0 1 1.6 0Z"/><path d="m22 12.5-9.2 4.6a2 2 0 0 1-1.6 0L2 12.5M22 17.5l-9.2 4.6a2 2 0 0 1-1.6 0L2 17.5"/></symbol>
+                <symbol id="dda-i-map" viewBox="0 0 24 24"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></symbol>
+                <symbol id="dda-i-route" viewBox="0 0 24 24"><circle cx="6" cy="19" r="3"/><path d="M9 19h5.5a3.5 3.5 0 0 0 0-7h-5a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/></symbol>
+                <symbol id="dda-i-sparkles" viewBox="0 0 24 24"><path d="m12 3-1.5 4.5L6 9l4.5 1.5L12 15l1.5-4.5L18 9l-4.5-1.5Z"/><path d="M5 3v4M3 5h4M19 17v4M17 19h4"/></symbol>
+                <symbol id="dda-i-dollar" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></symbol>
+                <symbol id="dda-i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+                <symbol id="dda-i-gauge" viewBox="0 0 24 24"><path d="M20 13a8 8 0 1 0-16 0"/><path d="m12 13 4-4"/><path d="M4 17h16"/></symbol>
+                <symbol id="dda-i-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/></symbol>
+                <symbol id="dda-i-database" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></symbol>
+                <symbol id="dda-i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></symbol>
+                <symbol id="dda-i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+              </defs>
+            </svg>
+
+            <nav class="dda-landing__progress" aria-label="Progresión del DDA">
+              <span class="dda-landing__progress-step is-current" data-step="1">Datos</span>
+              <span class="dda-landing__progress-step" data-step="2">Decisión</span>
+              <span class="dda-landing__progress-step" data-step="3">Resultado</span>
+              <span class="dda-landing__progress-step" data-step="4">Evidencia</span>
+            </nav>
+
+            <section class="dda-landing__hero" data-reveal>
+              <div class="dda-landing__hero-copy">
+                <div class="dda-landing__badges">
+                  <span class="dda-landing__badge">Decision Data Asset</span>
+                  <span class="dda-landing__version">Motor 0.2.0</span>
                 </div>
-
-                <h1>DDA Logística</h1>
-
-                <p class="dda-overview__lead">
-                  Transformá Orders y Fleet en una cadena de decisiones trazable:
-                  primero asignación de carga, luego planificación y finalmente ejecución física.
+                <span class="dda-landing__eyebrow">Dation · DDA Logística</span>
+                <h1>De órdenes y flota a despachos que podés explicar.</h1>
+                <p class="dda-landing__hero-lead">
+                  Cargá tus Orders y tu Fleet. Dation asigna la carga, planifica los viajes y
+                  te muestra cuánto cuesta, cuánto tarda y por qué esa es la mejor opción.
                 </p>
 
-                <div class="dda-overview__hero-actions">
+                <div class="dda-landing__hero-actions">
                   <button
-                    class="button button--primary button--large"
+                    class="button button--landing-primary"
                     id="start-logistics-decision"
                     type="button"
-                    onclick="window.dationNavigate && window.dationNavigate('logistics-data', 'data', event)"
+                    data-dda-data-cta
+                    data-go-data
                   >
-                    Iniciar nueva decisión
-                    <span aria-hidden="true">→</span>
+                    Iniciar nueva decisión <span aria-hidden="true">→</span>
                   </button>
-
                   <button
-                    class="button button--secondary button--large"
+                    class="button button--landing-secondary"
                     id="open-latest-logistics-decision"
                     type="button"
-                    disabled
+                    data-mode="latest"
                   >
-                    Analizar mi última decisión
-                    <span aria-hidden="true">↗</span>
+                    Analizar mi última decisión <span aria-hidden="true">↗</span>
                   </button>
+                </div>
 
-                  <span class="dda-overview__hero-note" id="latest-logistics-meta">
-                    Buscando la última decisión calculada…
-                  </span>
+                <div class="dda-landing__latest">
+                  <span class="dda-landing__latest-dot" aria-hidden="true"></span>
+                  <span id="latest-logistics-meta">Buscando la última decisión calculada…</span>
+                </div>
+
+                <div class="dda-landing__trust" aria-label="Capacidades de trazabilidad">
+                  <span>Evidencia exportable (CSV + JSON)</span>
+                  <span>Comparación contra despacho directo</span>
+                  <span>Explicación en lenguaje de negocio</span>
                 </div>
               </div>
 
-              <div class="dda-overview__decision-card" aria-label="Flujo del DDA Logística">
-                <div class="dda-overview__decision-icon" aria-hidden="true">
-                  <img src="/static/assets/dda-logistics.svg?v=home-dda-selector-v2" alt="">
-                </div>
-
-                <div class="dda-overview__decision-flow">
-                  <div>
-                    <span>Entrada</span>
-                    <strong>Órdenes + flota disponible</strong>
+              <div class="dda-landing__hero-visual" aria-label="Flujo del DDA Logística">
+                <img class="dda-landing__emblem" src="/static/assets/dda-logistics.svg?v=dda-logistics-landing-v1" alt="">
+                <div class="dda-landing__flow-panel">
+                  <img class="dda-landing__flow-brand" src="/static/assets/dation-logo.png?v=dda-logistics-landing-v1" alt="">
+                  <div class="dda-landing__flow-node">
+                    <span class="dda-landing__flow-node-icon">
+                      <svg class="dda-icon" aria-hidden="true"><use href="#dda-i-package"></use></svg>
+                    </span>
+                    <div><small>Entrada</small><strong>Órdenes + flota disponible</strong></div>
                   </div>
-                  <span class="dda-overview__flow-arrow">↓</span>
-                  <div>
-                    <span>Motor</span>
-                    <strong>Consolida y programa despachos</strong>
+                  <span class="dda-landing__flow-connector" aria-hidden="true"></span>
+                  <div class="dda-landing__flow-node">
+                    <span class="dda-landing__flow-node-icon">
+                      <svg class="dda-icon" aria-hidden="true"><use href="#dda-i-cpu"></use></svg>
+                    </span>
+                    <div><small>Motor</small><strong>Consolida y programa despachos</strong></div>
                   </div>
-                  <span class="dda-overview__flow-arrow">↓</span>
-                  <div>
-                    <span>Salida</span>
-                    <strong>Decisión + sensibilidad + evidencia</strong>
+                  <span class="dda-landing__flow-connector" aria-hidden="true"></span>
+                  <div class="dda-landing__flow-node">
+                    <span class="dda-landing__flow-node-icon">
+                      <svg class="dda-icon" aria-hidden="true"><use href="#dda-i-file-check"></use></svg>
+                    </span>
+                    <div><small>Salida</small><strong>Decisión + sensibilidad + evidencia</strong></div>
                   </div>
                 </div>
               </div>
             </section>
 
-            <section class="dda-overview__section">
-              <div class="dda-overview__section-heading">
-                <span class="section-kicker">Qué resuelve</span>
-                <h2>Convierte datos operativos en decisiones encadenadas</h2>
-                <p>
-                  El Data Pack habilita decisiones de forma progresiva. Cada resultado
-                  puede revisarse, aprobarse y desbloquear el siguiente nivel de la cadena.
-                </p>
+            <section class="dda-landing__value-strip" aria-label="Valor del DDA" data-reveal>
+              <article class="dda-landing__stat">
+                <span class="dda-landing__iconbox"><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-git"></use></svg></span>
+                <div><strong><span data-count="3">3</span> niveles de decisión encadenados</strong><small>Asignación, planificación y ejecución.</small></div>
+              </article>
+              <article class="dda-landing__stat">
+                <span class="dda-landing__iconbox"><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-scale"></use></svg></span>
+                <div><strong>Alternativas comparables</strong><small>Cada prioridad contra despacho directo.</small></div>
+              </article>
+              <article class="dda-landing__stat">
+                <span class="dda-landing__iconbox"><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-shield"></use></svg></span>
+                <div><strong>Evidencia trazable</strong><small>DecisionResult JSON y calendario CSV.</small></div>
+              </article>
+            </section>
+
+            <section class="dda-landing__section" data-reveal>
+              <div class="dda-landing__section-head">
+                <span class="dda-landing__section-eyebrow">Cómo funciona</span>
+                <h2>Cuatro pasos de los datos a la decisión.</h2>
               </div>
 
-              <div class="dda-overview__value-grid">
-                <article class="dda-overview__value-card">
-                  <span class="dda-overview__value-number">01</span>
+              <div class="dda-landing__steps">
+                <article class="dda-landing__step">
+                  <div class="dda-landing__step-top"><span class="dda-landing__step-number">01</span><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-upload"></use></svg></div>
+                  <h3>Cargá tus datos</h3>
+                  <p>Subí o reutilizá tus Orders y tu Fleet. Con el núcleo mínimo alcanza para empezar.</p>
+                </article>
+                <article class="dda-landing__step">
+                  <div class="dda-landing__step-top"><span class="dda-landing__step-number">02</span><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-tree"></use></svg></div>
+                  <h3>Dation crea el Decision Case</h3>
+                  <p>Validamos tus datos y te mostramos qué decisión se puede resolver ahora.</p>
+                </article>
+                <article class="dda-landing__step">
+                  <div class="dda-landing__step-top"><span class="dda-landing__step-number">03</span><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-sliders"></use></svg></div>
+                  <h3>Configurá y compará</h3>
+                  <p>Elegí tus objetivos —costo, viajes o tiempo— y compará escenarios antes de decidir.</p>
+                </article>
+                <article class="dda-landing__step">
+                  <div class="dda-landing__step-top"><span class="dda-landing__step-number">04</span><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-file-check"></use></svg></div>
+                  <h3>Revisá, aprobá y exportá</h3>
+                  <p>Recibí la recomendación con su evidencia y desbloqueá el siguiente nivel de la cadena.</p>
+                </article>
+              </div>
+
+              <div class="dda-landing__section-cta">
+                <button class="button button--primary" type="button" data-go-data>Empezar con mis datos →</button>
+              </div>
+            </section>
+
+            <section class="dda-landing__section" data-reveal>
+              <div class="dda-landing__section-head">
+                <span class="dda-landing__section-eyebrow">Qué resuelve</span>
+                <h2>Una cadena de decisiones, desbloqueada paso a paso.</h2>
+                <p>Cada resultado se revisa y se aprueba antes de habilitar el siguiente nivel. Siempre sabés qué está disponible y qué falta.</p>
+              </div>
+
+              <div class="dda-landing__chain" aria-label="Cadena de decisiones">
+                <article class="dda-landing__node is-available" data-decision-node="logistics_assignment">
+                  <div class="dda-landing__node-top">
+                    <span class="dda-landing__iconbox"><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-package"></use></svg></span>
+                    <span class="dda-landing__state is-available" data-node-state>Disponible</span>
+                  </div>
+                  <h3>Asignación de carga</h3>
+                  <p>Definí qué órdenes van en cada viaje.</p>
+                  <button class="dda-landing__node-action" type="button" data-node-action="logistics_assignment">Abrir →</button>
+                </article>
+                <span class="dda-landing__chain-link" aria-hidden="true"></span>
+                <article class="dda-landing__node is-review" data-decision-node="logistics_scheduling">
+                  <div class="dda-landing__node-top">
+                    <span class="dda-landing__iconbox"><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-calendar"></use></svg></span>
+                    <span class="dda-landing__state is-review" data-node-state>Requiere revisión</span>
+                  </div>
+                  <h3>Planificación de despachos</h3>
+                  <p>Programá salidas según la flota y las fechas disponibles.</p>
+                  <button class="dda-landing__node-action" type="button" data-node-action="logistics_scheduling">Ver dependencias</button>
+                </article>
+                <span class="dda-landing__chain-link" aria-hidden="true"></span>
+                <article class="dda-landing__node is-locked" data-decision-node="logistics_final_assignment">
+                  <div class="dda-landing__node-top">
+                    <span class="dda-landing__iconbox"><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-truck"></use></svg></span>
+                    <span class="dda-landing__state is-locked" data-node-state><svg class="dda-icon" aria-hidden="true" style="width:12px;height:12px"><use href="#dda-i-lock"></use></svg>Bloqueado</span>
+                  </div>
+                  <h3>Ejecución física</h3>
+                  <p>Convertí el plan en carga por viaje y vehículo asignado.</p>
+                  <button class="dda-landing__node-action" type="button" data-node-action="logistics_final_assignment" title="Se habilita al aprobar la planificación.">Se habilita al aprobar Planificación</button>
+                </article>
+              </div>
+
+              <div class="dda-landing__features">
+                <article class="dda-landing__feature">
+                  <span class="dda-landing__iconbox"><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-layers"></use></svg></span>
                   <h3>Data Pack progresivo</h3>
-                  <p>
-                    Empezá con el núcleo mínimo y agregá información cuando quieras
-                    desbloquear decisiones posteriores.
-                  </p>
+                  <p>Empezá con lo mínimo y sumá información cuando quieras desbloquear decisiones posteriores.</p>
                 </article>
-
-                <article class="dda-overview__value-card">
-                  <span class="dda-overview__value-number">02</span>
+                <article class="dda-landing__feature">
+                  <span class="dda-landing__iconbox"><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-map"></use></svg></span>
                   <h3>Decision Map</h3>
-                  <p>
-                    Visualizá qué decisión está disponible, cuál requiere revisión
-                    y qué dependencias mantienen bloqueado el siguiente nivel.
-                  </p>
+                  <p>Visualizá disponibilidad, revisión y dependencias que bloquean el siguiente nivel.</p>
                 </article>
-
-                <article class="dda-overview__value-card">
-                  <span class="dda-overview__value-number">03</span>
+                <article class="dda-landing__feature">
+                  <span class="dda-landing__iconbox"><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-route"></use></svg></span>
                   <h3>Decisión trazable</h3>
-                  <p>
-                    Configurá objetivos, compará alternativas y conservá la evidencia
-                    que llevó al resultado recomendado.
-                  </p>
+                  <p>Definí objetivos, compará alternativas y conservá la evidencia del resultado recomendado.</p>
                 </article>
-
-                <article class="dda-overview__value-card">
-                  <span class="dda-overview__value-number">04</span>
-                  <h3>Explicación</h3>
-                  <p>
-                    Conserva la evidencia del cálculo y habilita una capa de IA
-                    para traducir el resultado a lenguaje de negocio.
-                  </p>
+                <article class="dda-landing__feature">
+                  <span class="dda-landing__iconbox"><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-sparkles"></use></svg></span>
+                  <h3>Explicación con IA</h3>
+                  <p>Dejá el cálculo documentado y pedí una lectura en lenguaje de negocio, lista para compartir.</p>
                 </article>
               </div>
             </section>
 
-            <section class="dda-overview__section dda-overview__section--split">
-              <div class="dda-overview__panel">
-                <span class="section-kicker">Qué necesita</span>
-                <h2>Datos de entrada</h2>
-                <ul class="dda-overview__checklist">
+            <section class="dda-landing__section dda-landing__result" id="dda-logistics-example-result" data-reveal>
+              <div class="dda-landing__result-shell">
+                <div class="dda-landing__section-head">
+                  <span class="dda-landing__section-eyebrow">Qué entrega</span>
+                  <h2>Así se ve una decisión con evidencia.</h2>
+                </div>
+
+                <div class="dda-landing__result-head">
+                  <div class="dda-landing__result-title">
+                    <span class="dda-landing__example-badge">Datos de ejemplo</span>
+                    <h3>Escenario recomendado · Prioridad: Costo</h3>
+                  </div>
+                  <span class="dda-landing__recommend-badge">Recomendado</span>
+                </div>
+
+                <div class="dda-landing__result-kpis">
+                  <article class="dda-landing__result-kpi"><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-dollar"></use></svg><span>Costo</span><strong>USD 4.820</strong><small>Ejemplo</small></article>
+                  <article class="dda-landing__result-kpi"><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-route"></use></svg><span>Viajes</span><strong>12</strong><small>Ejemplo</small></article>
+                  <article class="dda-landing__result-kpi"><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-clock"></use></svg><span>Plazo</span><strong>2,4 días</strong><small>Ejemplo</small></article>
+                  <article class="dda-landing__result-kpi"><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-gauge"></use></svg><span>Utilización</span><strong>82%</strong><small>Ejemplo</small></article>
+                  <article class="dda-landing__result-kpi"><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-check-circle"></use></svg><span>A tiempo</span><strong>92%</strong><small>Ejemplo</small></article>
+                </div>
+
+                <div class="dda-landing__result-grid">
+                  <div class="dda-landing__compare">
+                    <h4>Escenario recomendado vs. despacho directo</h4>
+                    <div class="dda-landing__bar-row is-recommended"><span>Recomendado</span><span class="dda-landing__bar"><i style="width:76%"></i></span><strong>USD 4.820</strong></div>
+                    <div class="dda-landing__bar-row"><span>Despacho directo</span><span class="dda-landing__bar"><i style="width:88%"></i></span><strong>USD 5.430</strong></div>
+                    <p class="dda-landing__difference">Diferencia del ejemplo: USD 610.</p>
+                  </div>
+
+                  <div class="dda-landing__calendar">
+                    <h4>Mini calendario de viajes</h4>
+                    <div class="dda-landing__heatmap" aria-label="Calendario ilustrativo">
+                      <span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="dda-landing__result-actions">
+                  <button type="button" data-example-csv>Exportar CSV</button>
+                  <button type="button" data-example-json>Ver DecisionResult JSON</button>
+                </div>
+
+                <details class="dda-landing__json" id="dda-example-json">
+                  <summary>DecisionResult JSON · ejemplo</summary>
+                  <pre>{
+  "schema_version": "assignment_v1",
+  "objective": "min_cost",
+  "status": "recommended",
+  "evidence": "example"
+}</pre>
+                </details>
+
+                <div class="dda-landing__section-cta">
+                  <button class="button button--primary" type="button" data-go-data>Probar con mis datos →</button>
+                </div>
+              </div>
+            </section>
+
+            <section class="dda-landing__io" data-reveal>
+              <article class="dda-landing__io-card">
+                <div class="dda-landing__io-card-head">
+                  <span class="dda-landing__iconbox"><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-database"></use></svg></span>
+                  <div><span class="dda-landing__section-eyebrow">Datos de entrada</span><h3>Lo que necesitás para empezar</h3></div>
+                </div>
+                <ul class="dda-landing__checklist">
                   <li>Órdenes identificadas individualmente.</li>
                   <li>Cantidad de unidades y peso por unidad.</li>
                   <li>Origen, destino y distancia.</li>
                   <li>Fecha de disponibilidad y plazo máximo de entrega.</li>
                   <li>Archivo de flota: capacidad, disponibilidad diaria, costos y velocidad.</li>
                 </ul>
-              </div>
+              </article>
 
-              <div class="dda-overview__panel">
-                <span class="section-kicker">Qué entrega</span>
-                <h2>Resultado de decisión</h2>
-                <ul class="dda-overview__checklist">
-                  <li>Escenario recomendado para la prioridad seleccionada.</li>
+              <article class="dda-landing__io-card">
+                <div class="dda-landing__io-card-head">
+                  <span class="dda-landing__iconbox"><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-target"></use></svg></span>
+                  <div><span class="dda-landing__section-eyebrow">Resultado de decisión</span><h3>Lo que recibís</h3></div>
+                </div>
+                <ul class="dda-landing__checklist">
+                  <li>Escenario recomendado para la prioridad elegida.</li>
                   <li>Costo, viajes, plazo, utilización y entregas a tiempo.</li>
-                  <li>Comparación contra despacho directo y alternativas de prioridad.</li>
-                  <li>Calendario, viajes, cargas por orden y exportación CSV.</li>
+                  <li>Comparación contra despacho directo y otras prioridades.</li>
+                  <li>Calendario, viajes y cargas por orden, con exportación CSV.</li>
                   <li>DecisionResult JSON trazable e interpretación ejecutiva.</li>
                 </ul>
-              </div>
+              </article>
             </section>
 
-            <section class="dda-overview__section">
-              <div class="dda-overview__scope">
-                <div>
-                  <span class="section-kicker">Alcance actual</span>
-                  <h2>Supuestos del plan</h2>
-                  <p>
-                    Cada viaje conecta un origen y un destino, sin multiparada.
-                    La flota propia limita salidas por día; no se modela su ocupación
-                    durante el retorno. CO₂ y combustible son estimaciones informativas.
-                  </p>
-                </div>
-
-                <div class="dda-overview__scope-tags">
-                  <span class="dda-overview__scope-tag is-active">Costo</span>
-                  <span class="dda-overview__scope-tag is-active">Viajes</span>
-                  <span class="dda-overview__scope-tag is-active">Tiempo</span>
-                  <span class="dda-overview__scope-tag">CO2</span>
-                  <span class="dda-overview__scope-tag">Riesgo</span>
-                  <span class="dda-overview__scope-tag">Servicio</span>
-                </div>
+            <section class="dda-landing__section" data-reveal>
+              <div class="dda-landing__section-head">
+                <span class="dda-landing__section-eyebrow">Alcance actual</span>
+                <h2>Qué cubre hoy y qué viene.</h2>
               </div>
+
+              <div class="dda-landing__scope-grid">
+                <article class="dda-landing__scope-card">
+                  <h3>Incluido hoy</h3>
+                  <div class="dda-landing__chips">
+                    <span class="dda-landing__chip is-active">✓ Costo</span>
+                    <span class="dda-landing__chip is-active">✓ Viajes</span>
+                    <span class="dda-landing__chip is-active">✓ Tiempo</span>
+                  </div>
+                </article>
+                <article class="dda-landing__scope-card">
+                  <h3>En roadmap</h3>
+                  <div class="dda-landing__chips">
+                    <span class="dda-landing__chip is-roadmap" title="En desarrollo">⌕ CO₂</span>
+                    <span class="dda-landing__chip is-roadmap" title="En desarrollo">⌕ Riesgo</span>
+                    <span class="dda-landing__chip is-roadmap" title="En desarrollo">⌕ Servicio</span>
+                  </div>
+                </article>
+              </div>
+
+              <details style="margin-top:14px">
+                <summary>Supuestos del plan</summary>
+                <ul>
+                  <li>Cada viaje conecta un origen y un destino, sin multiparada.</li>
+                  <li>La flota propia limita las salidas por día; no se modela su ocupación durante el retorno.</li>
+                  <li>CO₂ y combustible son estimaciones informativas.</li>
+                </ul>
+              </details>
+              <p class="dda-landing__trust-copy">Conocer los límites del modelo también es parte de una decisión trazable.</p>
             </section>
 
-            <section class="dda-overview__start">
+            <section class="dda-landing__section dda-landing__faq" data-reveal>
+              <div class="dda-landing__section-head">
+                <span class="dda-landing__section-eyebrow">FAQ</span>
+                <h2>Antes de empezar.</h2>
+                <p>Lo esencial para entender cómo se usa y qué queda guardado.</p>
+              </div>
               <div>
-                <span class="section-kicker">Comenzar</span>
-                <h2>¿Listo para probar el DDA?</h2>
-                <p>
-                  El primer paso es cargar o reutilizar Orders y Fleet. Dation crea
-                  un Decision Case y te muestra qué decisión puede resolverse ahora.
-                </p>
+                <details><summary>¿Necesito todos los datos desde el principio?</summary><p>No. El Data Pack es progresivo: empezás con el núcleo mínimo y sumás información para desbloquear decisiones posteriores.</p></details>
+                <details><summary>¿Puedo comparar distintos objetivos?</summary><p>Sí. Podés evaluar prioridades como costo, viajes o tiempo y compararlas contra despacho directo.</p></details>
+                <details><summary>¿Qué pasa con mis resultados anteriores?</summary><p>Cada decisión queda guardada con su evidencia, así podés volver a analizarla cuando quieras.</p></details>
+                <details><summary>¿Qué formatos puedo exportar?</summary><p>Calendario y cargas en CSV, y el DecisionResult completo en JSON.</p></details>
               </div>
-
-              <button
-                class="button button--primary button--large"
-                type="button"
-                onclick="window.dationNavigate && window.dationNavigate('logistics-data', 'data', event)"
-              >
-                Comenzar con los datos
-                <span aria-hidden="true">→</span>
-              </button>
             </section>
+
+            <section class="dda-landing__final" data-reveal>
+              <img class="dda-landing__final-watermark" src="/static/assets/dda-logistics.svg?v=dda-logistics-landing-v1" alt="">
+              <div class="dda-landing__final-copy">
+                <span class="dda-landing__section-eyebrow">Comenzar</span>
+                <h2>¿Listo para tomar tu primera decisión?</h2>
+                <p>Cargá o reutilizá Orders y Fleet. Dation crea el Decision Case y te muestra qué decisión podés resolver ahora.</p>
+              </div>
+              <div class="dda-landing__final-actions">
+                <button class="button button--primary button--large" type="button" data-go-data>Comenzar con los datos →</button>
+                <button class="button button--secondary button--large" type="button" data-go-home>Volver a Inicio</button>
+              </div>
+            </section>
+
+            <button class="button button--primary button--large dda-landing__mobile-primary" type="button" data-go-data>
+              Comenzar con los datos →
+            </button>
           </div>
         </section>
 
@@ -1255,6 +1449,7 @@
   <script src="/static/js/dashboard-formatters.js?v=dispatch-v1"></script>
   <script src="/static/js/dashboard-selectors.js?v=dispatch-v1"></script>
   <script src="/static/js/dashboard-stage.js?v=dispatch-v1"></script>
+  <script src="/static/js/dda-logistics-landing.js?v=dda-logistics-landing-v1"></script>
   <script src="/static/js/interpreter-stage.js?v=dispatch-v1"></script>
   <script src="/static/vendor/echarts-dispatch-6.0.0.min.js"></script>
   <script type="module" src="/static/js/dispatch/workspace.mjs?v=decision-map-nodal-v1"></script>
