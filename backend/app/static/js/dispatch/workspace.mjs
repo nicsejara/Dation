@@ -167,6 +167,20 @@ function nextNodeId(nodeId){
   if(nodeId==='logistics_scheduling')return 'logistics_final_assignment';
   return null;
 }
+function unlockNextNode(nodeId){
+  const next=nextNodeId(nodeId);
+  if(!next||!state.decisionCase?.nodes?.[next])return next;
+  const current=state.decisionCase.nodes[next];
+  if(current.status!==STATUS.LOCKED&&current.status!==STATUS.NEEDS_DATA)return next;
+  const evidence=state.preflight?.decision_readiness?.decisions?.find(item=>item.id===next);
+  state.decisionCase=transitionNode(
+    state.decisionCase,
+    next,
+    evidence?.data_ready?STATUS.AVAILABLE:STATUS.NEEDS_DATA,
+    {error:null},
+  );
+  return next;
+}
 function urlRun(id,schema='assignment_v1'){const url=new URL(location.href);url.searchParams.set('run_id',id);url.searchParams.set('dda',schema);history.replaceState(null,'',url);}
 function action(b,fn){b.onclick=async()=>{b.disabled=true;try{await fn();}catch(e){alert(e.message);}finally{b.disabled=false;}};}
 async function preflight(){
@@ -925,6 +939,7 @@ export function show(run){
               error:null,
             },
           );
+          unlockNextNode(nodeId);
           persist();
           return state.decisionCase;
         }
@@ -934,7 +949,7 @@ export function show(run){
         &&state.decisionCase
       )
         ?()=>{
-          const next=nextNodeId(nodeId);
+          const next=unlockNextNode(nodeId);
           if(next)state.activeNode=next;
           persist();
           navigate('logistics-map');
