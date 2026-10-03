@@ -330,7 +330,7 @@ class FrontendContractTests(
             self.dashboard_stage_js,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=scheduling-v1",
+            "/static/js/dispatch/workspace.mjs?v=dashboard-ai-v1",
             self.html,
         )
         self.assertIn(
@@ -636,6 +636,88 @@ class FrontendContractTests(
         self.assertIn(
             "scheduling_v1",
             self.dashboard_stage_js,
+        )
+
+    def test_export_and_ai_ux_contract(self):
+        dispatch_root = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+        )
+        shared = (
+            dispatch_root / "shared.mjs"
+        ).read_text(encoding="utf-8")
+        exporter = (
+            dispatch_root / "export.mjs"
+        ).read_text(encoding="utf-8")
+        dashboard = (
+            dispatch_root / "dashboard.mjs"
+        ).read_text(encoding="utf-8")
+        scheduling = (
+            dispatch_root
+            / "scheduling-dashboard.mjs"
+        ).read_text(encoding="utf-8")
+        explanation = (
+            dispatch_root / "explanation.mjs"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn(
+            "document.body.append(anchor)",
+            shared,
+        )
+        self.assertIn(
+            "anchor.remove()",
+            shared,
+        )
+        self.assertIn(
+            "export function exportDecision",
+            exporter,
+        )
+        self.assertIn(
+            "assignment-recomendada.csv",
+            exporter,
+        )
+        self.assertIn(
+            "planificacion-recomendada.csv",
+            exporter,
+        )
+        self.assertIn(
+            "dispatch-action-menu",
+            dashboard,
+        )
+        self.assertIn(
+            "✦ Dation IA",
+            dashboard,
+        )
+        self.assertIn(
+            "dispatch-action-menu",
+            scheduling,
+        )
+        self.assertIn(
+            "Eventos clave",
+            explanation,
+        )
+        self.assertIn(
+            "Por qué ocurrió",
+            explanation,
+        )
+        self.assertIn(
+            "Si una causa no está demostrada",
+            explanation,
+        )
+        self.assertIn(
+            "data-starter",
+            explanation,
+        )
+        self.assertIn(
+            "Enter para enviar",
+            explanation,
+        )
+        self.assertIn(
+            "dashboard-ai-v1",
+            self.html,
         )
 
     def test_single_ingestion_contract(
