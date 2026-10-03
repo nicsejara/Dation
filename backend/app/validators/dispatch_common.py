@@ -84,6 +84,12 @@ def _detected_format(kind: str, raw_columns: list[str], normalized: list[str]) -
     raw_set = set(raw_columns)
     if len(LEGACY_MIXED_COLUMNS.intersection(raw_set)) >= 12:
         return "legacy_mixed"
+
+    normalized_set = set(normalized)
+    required = set(required_columns(kind))
+    if required and required.issubset(normalized_set):
+        return get_contract(kind)["schema"]
+
     known = set(known_columns(kind))
     if normalized and len(known.intersection(normalized)) >= max(2, len(known) // 2):
         return get_contract(kind)["schema"]
