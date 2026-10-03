@@ -1,6 +1,6 @@
 import {esc,num,date,vehicle,api,post,errorBox} from './shared.mjs';import {rebalance} from './selectors.mjs';import {render as dashboard} from './dashboard.mjs?v=decision-map-phase1-v1';
 import {mountUploadScreen} from './upload/index.mjs?v=decision-map-phase1-v1';
-import {renderDecisionMap} from './decision-map.mjs';
+import {renderDecisionMap} from './decision-map.mjs?v=decision-map-phase1-v1';
 import {STATUS,createDecisionCase,replaceInputs,transitionNode,inputSignature,caseRef,deriveDecisionNodes} from './decision-case.mjs';
 const KEY='dation.dispatch.workspace.v4';
 const PRIORITY_KEYS=['trips','cost','own_fleet','co2'];
