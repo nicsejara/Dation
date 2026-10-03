@@ -1,4 +1,4 @@
-from collections import Counter, defaultdict
+from collections import Counter
 from datetime import date, datetime, timedelta
 
 from app.validators.contracts import CONTRACTS
@@ -12,7 +12,6 @@ from app.validators.dispatch_common import (
 )
 from app.validators.profile_utils import (
     detected_metadata,
-    format_orders_label,
     preview_payload,
 )
 
@@ -21,6 +20,52 @@ COLUMNS = [
     for column in CONTRACTS["orders"]["columns"]
     if column["required"]
 ]
+
+COMPATIBILITY_READY_DATE = date(2000, 1, 1)
+COMPATIBILITY_WINDOW_DAYS = 90
+
+
+def _parse_optional_date(
+    row,
+    key,
+    problems,
+):
+    raw = row.get(key, "")
+    if not raw:
+        return None
+    try:
+        return (
+            datetime.strptime(raw, "%d/%m/%Y").date()
+            if "/" in raw
+            else date.fromisoformat(raw)
+        )
+    except ValueError:
+        problems.error(
+            "INVALID_DATE",
+            f"La fecha '{raw}' no es válida.",
+            row=row["_row"],
+            column=key,
+            hint="Usá AAAA-MM-DD o d/m/AAAA; el día va primero.",
+            value=raw,
+        )
+        return None
+
+
+def _completeness(columns, rows):
+    result = {}
+    for column in CONTRACTS["orders"]["columns"]:
+        name = column["name"]
+        filled = sum(bool(row.get(name, "")) for row in rows)
+        result[name] = {
+            "present": name in columns,
+            "filled_rows": filled,
+            "total_rows": len(rows),
+            "complete": bool(rows) and filled == len(rows),
+            "required": bool(column["required"]),
+            "used_by": column.get("used_by", []),
+            "unlock_label": column.get("unlock_label"),
+        }
+    return result
 
 
 def validate_orders_report(contents: bytes, max_problems: int = 100) -> dict:
@@ -37,22 +82,9 @@ def validate_orders_report(contents: bytes, max_problems: int = 100) -> dict:
         routes = {}
         products = {}
         for row in rows:
-            # Historical assignment columns are accepted only for upload
-            # compatibility. They never reach the decision engine.
-            row.pop("current_vehicle_type", None)
-            row.pop("vehicle_type", None)
-
             quantity = parse_number(
                 row,
                 "quantity_units",
-                problems,
-                positive=True,
-                integer=True,
-                delimiter=delimiter,
-            )
-            window = parse_number(
-                row,
-                "max_delivery_days",
                 problems,
                 positive=True,
                 integer=True,
@@ -73,17 +105,6 @@ def validate_orders_report(contents: bytes, max_problems: int = 100) -> dict:
                 delimiter=delimiter,
             )
 
-            if window is not None and window > 90:
-                problems.error(
-                    "OUT_OF_RANGE",
-                    "El horizonte máximo del MVP es 90 días.",
-                    row=row["_row"],
-                    column="max_delivery_days",
-                    hint="Ingresá un valor entre 1 y 90.",
-                    value=window,
-                )
-                window = None
-
             if row.get("origin") and row.get("origin") == row.get("destination"):
                 problems.error(
                     "SAME_ORIGIN_DESTINATION",
@@ -94,45 +115,43 @@ def validate_orders_report(contents: bytes, max_problems: int = 100) -> dict:
                     value=row.get("destination"),
                 )
 
-            if row.get("priority") and row["priority"] not in (
-                "High",
-                "Normal",
-                "Low",
-            ):
+            priority = row.get("priority", "")
+            if priority and priority not in ("High", "Normal", "Low"):
                 problems.error(
                     "INVALID_OPTION",
-                    f"'{row['priority']}' no es una prioridad válida.",
+                    f"'{priority}' no es una prioridad válida.",
                     row=row["_row"],
                     column="priority",
                     hint="Usá High, Normal o Low.",
-                    value=row["priority"],
+                    value=priority,
                 )
 
-            parsed_date = None
-            raw_date = row.get("ready_date", "")
-            if raw_date:
-                try:
-                    parsed_date = (
-                        datetime.strptime(raw_date, "%d/%m/%Y").date()
-                        if "/" in raw_date
-                        else date.fromisoformat(raw_date)
-                    )
-                except ValueError:
-                    problems.error(
-                        "INVALID_DATE",
-                        f"La fecha '{raw_date}' no es válida.",
-                        row=row["_row"],
-                        column="ready_date",
-                        hint="Usá AAAA-MM-DD o d/m/AAAA; el día va primero.",
-                        value=raw_date,
-                    )
+            estimated = _parse_optional_date(
+                row,
+                "estimated_dispatch_date",
+                problems,
+            )
+            due = _parse_optional_date(
+                row,
+                "delivery_due_date",
+                problems,
+            )
+            if estimated and due and due < estimated:
+                problems.error(
+                    "INVALID_DATE_RANGE",
+                    "La fecha objetivo de entrega no puede ser anterior al despacho estimado.",
+                    row=row["_row"],
+                    column="delivery_due_date",
+                    hint="Revisá ambas fechas.",
+                    value=row.get("delivery_due_date"),
+                )
 
             route = (row.get("origin"), row.get("destination"))
             if route[0] and route[1] and distance is not None:
                 if route in routes and routes[route] != distance:
                     problems.error(
                         "INCONSISTENT_ROUTE_DISTANCE",
-                        "distancia inconsistente para la misma ruta.",
+                        "La distancia es inconsistente para la misma ruta.",
                         row=row["_row"],
                         column="distance_km",
                         hint=f"Usá la misma distancia para {route[0]} → {route[1]}.",
@@ -160,70 +179,77 @@ def validate_orders_report(contents: bytes, max_problems: int = 100) -> dict:
                 row["unit_weight_kg"] = weight
             if distance is not None:
                 row["distance_km"] = distance
-            if window is not None:
-                row["max_delivery_days"] = window
-            if parsed_date is not None and window is not None:
-                row["ready_date"] = parsed_date.isoformat()
-                # Internal compatibility for Dispatch Engine 1.x. The public
-                # input contract no longer asks the user for a dispatch date:
-                # the engine receives the availability date under its legacy
-                # internal key until the temporal V2 solver replaces it.
-                row["dispatch_date"] = row["ready_date"]
-                row["deadline"] = (
-                    parsed_date + timedelta(days=window)
-                ).isoformat()
+            if estimated is not None:
+                row["estimated_dispatch_date"] = estimated.isoformat()
+            if due is not None:
+                row["delivery_due_date"] = due.isoformat()
+
+            # Compatibility adapter for the existing Dispatch 2.x engine.
+            # These fields are internal only and are not part of Orders V3.
+            compatibility_ready = estimated or COMPATIBILITY_READY_DATE
+            compatibility_due = due or (
+                compatibility_ready
+                + timedelta(days=COMPATIBILITY_WINDOW_DAYS)
+            )
+            window = max(
+                1,
+                min(
+                    90,
+                    (compatibility_due - compatibility_ready).days,
+                ),
+            )
+            row["priority"] = priority or "Normal"
+            row["ready_date"] = compatibility_ready.isoformat()
+            row["dispatch_date"] = compatibility_ready.isoformat()
+            row["max_delivery_days"] = window
+            row["deadline"] = (
+                compatibility_ready + timedelta(days=window)
+            ).isoformat()
 
     valid = problems.error_count == 0
+    completeness = _completeness(columns, rows)
     profile = None
     suggested_label = None
+
     if valid and rows:
-        route_keys = {
-            (row["origin"], row["destination"])
+        order_weights = [
+            row["quantity_units"] * row["unit_weight_kg"]
             for row in rows
-        }
-        priority_mix = Counter(row["priority"] for row in rows)
-        daily = defaultdict(lambda: {"orders": 0, "kg": 0.0})
-        order_weights = []
-        delivery_days = []
-
-        for row in rows:
-            order_kg = row["quantity_units"] * row["unit_weight_kg"]
-            order_weights.append(order_kg)
-            delivery_days.append(row["max_delivery_days"])
-            item = daily[row["ready_date"]]
-            item["orders"] += 1
-            item["kg"] += order_kg
-
-        date_from = min(row["ready_date"] for row in rows)
-        date_to = max(row["ready_date"] for row in rows)
+        ]
+        estimated_dates = [
+            row.get("estimated_dispatch_date")
+            for row in rows
+            if row.get("estimated_dispatch_date")
+        ]
+        priorities = Counter(
+            row.get("priority")
+            for row in rows
+            if row.get("priority")
+        )
         profile = {
-            "profile_version": 2,
+            "profile_version": 3,
+            "orders": len(rows),
             "total_units": sum(row["quantity_units"] for row in rows),
             "total_weight_kg": sum(order_weights),
-            "routes": len(route_keys),
-            "origins": len({row["origin"] for row in rows}),
-            "destinations": len({row["destination"] for row in rows}),
-            "date_from": date_from,
-            "date_to": date_to,
-            "max_order_kg": max(order_weights),
-            "priority_mix": {
-                key: priority_mix.get(key, 0)
-                for key in ("High", "Normal", "Low")
-            },
-            "delivery_days": {
-                "min": min(delivery_days),
-                "max": max(delivery_days),
-            },
-            "daily": [
+            "routes": len(
                 {
-                    "date": key,
-                    "orders": value["orders"],
-                    "kg": value["kg"],
+                    (row["origin"], row["destination"])
+                    for row in rows
                 }
-                for key, value in sorted(daily.items())
-            ],
+            ),
+            "origins": sorted({row["origin"] for row in rows}),
+            "destinations": len({row["destination"] for row in rows}),
+            "products": len({row["product"] for row in rows}),
+            "max_order_kg": max(order_weights),
+            "estimated_dispatch_date_range": {
+                "from": min(estimated_dates) if estimated_dates else None,
+                "to": max(estimated_dates) if estimated_dates else None,
+            },
+            "priority_mix": dict(sorted(priorities.items())),
         }
-        suggested_label = format_orders_label(date_from, date_to)
+        suggested_label = (
+            f"Órdenes · {len(rows)} registros"
+        )
 
     return {
         "valid": valid,
@@ -232,6 +258,7 @@ def validate_orders_report(contents: bytes, max_problems: int = 100) -> dict:
         "rows": len(rows),
         "columns": len(columns),
         "profile": profile,
+        "completeness": completeness,
         "preview": preview_payload(columns, rows),
         "detected": detected_metadata(contents, "orders", columns),
         "suggested_label": suggested_label,
@@ -263,6 +290,7 @@ def validate_orders_csv(contents: bytes) -> dict:
         ],
         "records": report["records"],
         "profile": report["profile"],
+        "completeness": report["completeness"],
         "preview": report["preview"],
         "detected": report["detected"],
         "suggested_label": report["suggested_label"],
