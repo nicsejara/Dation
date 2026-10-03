@@ -762,15 +762,21 @@ async function executeScheduling(sourceRunId){
   }
 }
 
+
 export function show(run){
   clearTimeout(timer);
   pollGeneration++;
   state.run=run;
   const r=run.result_json;
-  const isAssignmentRun=r?.schema_version==='assignment_v1';
+  const schema=r?.schema_version;
+  const isAssignmentRun=schema==='assignment_v1';
+  const isSchedulingRun=schema==='scheduling_v1';
   const caseMeta=r?.decision_case;
+  const nodeId=isSchedulingRun
+    ?'logistics_scheduling'
+    :(isAssignmentRun?'logistics_assignment':null);
 
-  if(isAssignmentRun&&caseMeta?.case_id){
+  if(nodeId&&caseMeta?.case_id){
     if(!state.decisionCase||state.decisionCase.id!==caseMeta.case_id){
       state.decisionCase=createDecisionCase(
         caseMeta.case_id,
@@ -779,22 +785,40 @@ export function show(run){
         run.created_at,
       );
     }
-    if(
-      state.decisionCase?.nodes?.logistics_assignment?.status
-      !==STATUS.APPROVED
-    ){
-      state.decisionCase=transitionNode(
-        state.decisionCase,
-        'logistics_assignment',
-        STATUS.REVIEW,
-        {run_id:run.id,error:null},
-      );
+
+    if(isSchedulingRun){
+      const sourceRunId=r.inputs?.assignment?.run_id;
+      if(sourceRunId){
+        state.decisionCase=transitionNode(
+          state.decisionCase,
+          'logistics_assignment',
+          STATUS.APPROVED,
+          {
+            run_id:sourceRunId,
+            approved_at:r.inputs?.assignment?.approved_at||state.decisionCase.nodes?.logistics_assignment?.approved_at||run.created_at,
+            error:null,
+          },
+        );
+      }
     }
+
+    const persistedApproved=caseMeta.status==='approved'&&caseMeta.approved_at;
+    state.decisionCase=transitionNode(
+      state.decisionCase,
+      nodeId,
+      persistedApproved?STATUS.APPROVED:STATUS.REVIEW,
+      {
+        run_id:run.id,
+        approved_at:persistedApproved?caseMeta.approved_at:null,
+        error:null,
+      },
+    );
+    state.activeNode=nodeId;
   }
 
   persist();
   document.body.classList.add('dispatch-result');
-  urlRun(run.id,r?.schema_version||'assignment_v1');
+  urlRun(run.id,schema||'assignment_v1');
   window.dationSetDashboardReady(true);
 
   dashboard(
@@ -803,7 +827,12 @@ export function show(run){
     async()=>{
       const config=r.configuration||{};
       const options=config.options||{};
-      if(isAssignmentRun){
+
+      if(isSchedulingRun){
+        state.activeNode='logistics_scheduling';
+        state.schedulingUseDueDates=config.use_delivery_due_dates??true;
+      }else if(isAssignmentRun){
+        state.activeNode='logistics_assignment';
         const dims=Array.isArray(config.dimensions)
           ?PRIORITY_KEYS.filter(key=>config.dimensions.includes(key))
           :[...CORE_DIMENSIONS];
@@ -829,6 +858,7 @@ export function show(run){
         state.decisions=options.anomaly_decisions||{};
         state.configured=true;
       }else{
+        state.activeNode='logistics_assignment';
         state.dimensions=[...CORE_DIMENSIONS];
         state.objective='balanced';
         state.weights=balancedWeights(state.dimensions);
@@ -855,26 +885,35 @@ export function show(run){
     },
     {
       status:(
-        isAssignmentRun
+        nodeId
         &&caseMeta?.case_id
         &&state.decisionCase?.id===caseMeta.case_id
       )
-        ?state.decisionCase.nodes?.logistics_assignment?.status
+        ?state.decisionCase.nodes?.[nodeId]?.status
         :null,
       onMap:state.decisionCase?()=>navigate('logistics-map'):null,
       onApprove:(
-        isAssignmentRun
+        nodeId
         &&caseMeta?.case_id
         &&state.decisionCase?.id===caseMeta.case_id
       )
-        ?()=>{
+        ?async()=>{
+          const approved=await post(
+            '/api/runs/'+run.id+'/approve',
+            {
+              case_id:state.decisionCase.id,
+              node_id:nodeId,
+            },
+          );
+          const approvedAt=approved.result_json?.decision_case?.approved_at||new Date().toISOString();
+          state.run=approved;
           state.decisionCase=transitionNode(
             state.decisionCase,
-            'logistics_assignment',
+            nodeId,
             STATUS.APPROVED,
             {
               run_id:run.id,
-              approved_at:new Date().toISOString(),
+              approved_at:approvedAt,
               error:null,
             },
           );
@@ -889,5 +928,5 @@ export function show(run){
 for(const [key,view]of [['data','logistics-data'],['map','logistics-map'],['config','logistics-config'],['dashboard','decision-dashboard']])roots[key]=root(view,'dispatch-'+key+'-root');
 window.DationDispatch={show,isReady:ready};document.body.classList.add('dispatch-enabled');
 window.addEventListener('dation:view',e=>{const view=e.detail.view;if(view==='logistics-data'){roots.data.hidden=false;document.body.classList.add('dispatch-enabled');loadData();}if(view==='logistics-map'&&document.body.classList.contains('dispatch-enabled')){roots.map.hidden=false;loadDecisionMap();}if(view==='logistics-config'&&document.body.classList.contains('dispatch-enabled')){roots.config.hidden=false;loadConfig();}});
-const query=new URLSearchParams(location.search);if(['assignment_v1','dispatch_v1','dispatch_v2'].includes(query.get('dda'))&&query.get('run_id')){pending('Recuperando la corrida…');navigate('decision-dashboard');poll(query.get('run_id'),++pollGeneration);}
+const query=new URLSearchParams(location.search);if(['assignment_v1','scheduling_v1','dispatch_v1','dispatch_v2'].includes(query.get('dda'))&&query.get('run_id')){const queryNode=query.get('dda')==='scheduling_v1'?'logistics_scheduling':'logistics_assignment';state.activeNode=queryNode;pending('Recuperando la corrida…');navigate('decision-dashboard');poll(query.get('run_id'),++pollGeneration,queryNode);}
 if(window.dationGetCurrentView?.()==='logistics-data')loadData();if(window.dationGetCurrentView?.()==='logistics-map')loadDecisionMap();
