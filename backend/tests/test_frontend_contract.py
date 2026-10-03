@@ -1577,15 +1577,15 @@ class FrontendContractTests(
             self.assertIn(copy, overview)
 
         self.assertIn(
-            "/static/css/dda-logistics-landing.css?v=dda-logistics-landing-v1",
+            "/static/css/dda-logistics-landing.css?v=dda-logistics-landing-v2",
             self.html,
         )
         self.assertIn(
-            "/static/js/dda-logistics-landing.js?v=dda-logistics-landing-v1",
+            "/static/js/dda-logistics-landing.js?v=dda-logistics-landing-v2",
             self.html,
         )
         self.assertIn(
-            "/static/js/dashboard-stage.js?v=dda-logistics-landing-v1",
+            "/static/js/dashboard-stage.js?v=dda-logistics-landing-v2",
             self.html,
         )
         self.assertNotIn(
@@ -1606,6 +1606,14 @@ class FrontendContractTests(
         )
         self.assertIn(
             "formatLandingDecisionDate",
+            self.dashboard_stage_js,
+        )
+        self.assertIn(
+            "landingHasData",
+            self.dashboard_stage_js,
+        )
+        self.assertIn(
+            "Nueva decisión ↗",
             self.dashboard_stage_js,
         )
 
