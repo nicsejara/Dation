@@ -32,14 +32,14 @@ export function render(root,run,onRerun,caseActions={}){
   root.innerHTML=
     '<header class="dispatch-command dispatch-command-focused">'
       +'<div class="dispatch-command-title"><strong>DDA Logística</strong><span class="dispatch-status" data-case-status>'+esc(caseStatus)+'</span></div>'
-      +'<div class="dispatch-actions">'
-        +(caseActions.onMap?'<button data-map>Mapa de decisiones</button>':'')
-        +(caseActions.onApprove?'<button data-approve class="dispatch-primary-action" '+(caseActions.status==='approved'?'disabled':'')+'>'+(caseActions.status==='approved'?'Decisión aprobada':'Aprobar decisión')+'</button>':'')
-        +'<button data-csv>'+esc(exportLabel)+'</button>'
-        +'<button data-rerun>Reejecutar</button>'
-        +'<button data-chat>Preguntale a Dation</button>'
-        +'<details class="dispatch-more"><summary>Más</summary><div class="dispatch-details">'
-          +'<button data-json>Exportar JSON</button>'
+      +'<div class="dispatch-actions dispatch-actions--focused">'
+        +(caseActions.onMap?'<button data-map class="dispatch-action-quiet">← Mapa</button>':'')
+        +(caseActions.onApprove?'<button data-approve class="dispatch-primary-action" '+(caseActions.status==='approved'?'disabled':'')+'>'+(caseActions.status==='approved'?'✓ Decisión aprobada':'Aprobar decisión')+'</button>':'')
+        +'<button data-chat class="dispatch-ai-action">✦ Dation IA</button>'
+        +'<details class="dispatch-action-menu"><summary>Acciones ···</summary><div class="dispatch-action-menu__panel">'
+          +'<button data-csv>↓ '+esc(exportLabel)+' CSV</button>'
+          +'<button data-json>Exportar JSON técnico</button>'
+          +'<button data-rerun>Re-ejecutar Assignment</button>'
           +'<button data-copy>Copiar detalles técnicos</button>'
           +'<dl>'
             +Object.entries({
@@ -110,7 +110,31 @@ export function render(root,run,onRerun,caseActions={}){
   };
   root.addEventListener('dispatch:open-chat',root._dispatchChatHandler);
 
-  root.querySelector('[data-csv]').onclick=()=>plan.exportPlan(result);
+  function feedback(button,working,done){
+    const original=button.dataset.originalLabel||button.textContent;
+    button.dataset.originalLabel=original;
+    button.disabled=true;
+    button.textContent=working;
+    window.setTimeout(()=>{
+      button.textContent=done;
+      window.setTimeout(()=>{
+        button.textContent=original;
+        button.disabled=false;
+      },1200);
+    },120);
+  }
+
+  root.querySelector('[data-csv]').onclick=event=>{
+    try{
+      plan.exportPlan(result);
+      feedback(event.currentTarget,'Preparando archivo…','✓ Exportado');
+    }catch(error){
+      event.currentTarget.textContent='No se pudo exportar';
+      window.setTimeout(()=>{
+        event.currentTarget.textContent=event.currentTarget.dataset.originalLabel||('↓ '+exportLabel+' CSV');
+      },1500);
+    }
+  };
   root.querySelector('[data-rerun]').onclick=onRerun;
   const mapButton=root.querySelector('[data-map]');
   if(mapButton)mapButton.onclick=()=>caseActions.onMap?.();
