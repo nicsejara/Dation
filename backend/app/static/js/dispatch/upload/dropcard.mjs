@@ -19,20 +19,27 @@ export function createDropCard(kind, contract) {
 
   const header = el("div", null, "dispatch-upload-card-header");
   const copy = el("div");
+  const requiredCount = contract.columns.filter((column) => column.required).length;
+  const optionalCount = contract.columns.length - requiredCount;
   copy.append(
     el(
       "span",
       kind === "orders"
-        ? "1 · Datos variables"
-        : "2 · Capacidad operativa",
+        ? "01 · Demanda"
+        : "02 · Recursos",
       "dispatch-kicker",
     ),
     el("h2", contract.label),
     el(
       "p",
       kind === "orders"
-        ? "Qué hay que entregar. Cambia en cada corrida."
-        : "Con qué vehículos se puede realizar el despacho.",
+        ? "Qué productos y cantidades deben transportarse desde Córdoba hacia cada destino."
+        : "Una fila por camión real, propio o tercerizado, con su capacidad y atributos disponibles.",
+    ),
+    el(
+      "small",
+      `${requiredCount} columnas mínimas · ${optionalCount} opcionales para decisiones posteriores`,
+      "dispatch-upload-contract-summary",
     ),
   );
 
