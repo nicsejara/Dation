@@ -1516,5 +1516,32 @@ class FrontendContractTests(
         )
 
 
+    def test_home_dda_selector_copy_contract(self):
+        self.assertIn(
+            "Elegí el Decision Data Asset que querés utilizar",
+            self.html,
+        )
+        self.assertIn(
+            "Un DDA es un activo diseñado para una decisión concreta",
+            self.html,
+        )
+        self.assertIn(
+            "datos → análisis → recomendación → evidencia trazable",
+            self.html,
+        )
+        self.assertIn(
+            "/static/css/home-dda.css?v=home-dda-selector-v2",
+            self.html,
+        )
+        self.assertIn(
+            "DDA Producción",
+            self.html,
+        )
+        self.assertIn(
+            "Próximamente",
+            self.html,
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
