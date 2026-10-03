@@ -1,6 +1,6 @@
-# Despliegue de Dispatch 2.2.0
+# Despliegue de Assignment 1.0.0 + compatibilidad Dispatch
 
-API esperada: **1.0.0**. Motor Dispatch: **2.2.0**. Motor histórico: **0.2.0**. Runtime: Python **3.13**, OR-Tools **9.15.6755**.
+API esperada: **1.0.0**. Motor Assignment activo: **1.0.0** (`assignment_v1`). Motor Dispatch histórico: **2.2.0** (`dispatch_v2`). Motor histórico anterior: **0.2.0**. Runtime: Python **3.13**, OR-Tools **9.15.6755**.
 
 ## Activación manual en Supabase
 
@@ -84,7 +84,7 @@ Also verify Decision Readiness:
 - completing `estimated_dispatch_date`, speed/hours/status/availability marks Scheduling data-ready but it remains locked until the upstream decision is approved in Phase 2;
 - completing `license_plate` marks Final Assignment data-ready.
 
-The current Dispatch 2.2 temporal engine remains available through internal compatibility fields during this transition. Those internal fields must never appear in the V3 templates.
+New `logistics_assignment` executions use Assignment Engine 1.0.0 and no longer consume temporal compatibility fields. Dispatch 2.2 remains available to recover historical runs.
 
 ## Cloud Run
 
@@ -165,3 +165,32 @@ Después del deploy verificar:
    - puede visualizarse;
    - no debe ofrecer **Aprobar decisión** para el caso activo.
 9. En móvil, el mapa debe apilar los tres nodos sin overflow horizontal.
+
+
+## Smoke test — Assignment Engine Phase 3
+
+No agrega tablas ni columnas nuevas en Supabase. El trigger histórico de integridad sigue validando `dispatch_v1/dispatch_v2`; nuevas corridas `assignment_v1` son validadas por la API/servicio antes de persistirse.
+
+Después del deploy verificar:
+
+1. Cargar un Data Pack mínimo sin fechas y ejecutar Assignment.
+2. La corrida debe persistirse con:
+   - `schema_version=assignment_v1`;
+   - `engine_name=logistics-assignment-engine`;
+   - `engine_version=1.0.0`.
+3. El resultado seleccionado no debe contener:
+   - `dispatch_date`;
+   - `arrival_date`;
+   - `cycle_days`;
+   - `resource_available_again`.
+4. Cambiar sólo `estimated_dispatch_date` o `delivery_due_date` y repetir con iguales prioridades debe mantener la misma asignación.
+5. Un mismo `vehicle_id` puede aparecer en varios viajes abstractos.
+6. Configurar Costo sin `cost_per_km` + `fixed_trip_cost` completos debe quedar deshabilitado en UI y rechazarse en backend.
+7. Aprobar Assignment debe conservar el handoff:
+   - `handoff.schema_version=scheduling_input_v1`;
+   - `source_path=scenarios.selected.trips`.
+8. El dashboard debe mostrar vehículo → viajes → productos, sin calendario ni SLA.
+9. El CSV exportado debe llamarse `assignment-recomendada.csv` y no contener columnas temporales.
+10. Una corrida histórica `dispatch_v2` debe seguir abriendo, pero no debe aprobar el Assignment del caso activo.
+
+El deploy sólo se considera validado después de ejecutar este smoke test contra la revisión de Cloud Run que esté recibiendo tráfico.
