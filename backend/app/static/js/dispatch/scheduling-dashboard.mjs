@@ -187,7 +187,7 @@ export function render(root,run,onRerun,caseActions={}){
   root.className='dispatch dispatch-dashboard dispatch-dashboard-focused dispatch-scheduling-dashboard';
   root.innerHTML=
     '<header class="dispatch-command dispatch-command-focused">'
-      +'<div class="dispatch-command-title"><strong>DDA Logística · Planificación</strong><span class="dispatch-status" data-case-status>'+esc(caseStatus)+'</span></div>'
+      +'<div class="dispatch-command-title"><button type="button" data-flow class="dispatch-dashboard-map-back">← Mapa de decisiones</button><strong>DDA Logística · Planificación</strong><span class="dispatch-status" data-case-status>'+esc(caseStatus)+'</span></div>'
       +'<div class="dispatch-actions dispatch-actions--focused">'
         +(caseActions.onApprove?'<button data-approve class="dispatch-primary-action" '+(caseActions.status==='approved'?'disabled':'')+'>'+(caseActions.status==='approved'?'✓ Planificación aprobada':'Aprobar planificación')+'</button>':'')
         +'<details class="dispatch-action-menu"><summary>Acciones ···</summary><div class="dispatch-action-menu__panel">'
