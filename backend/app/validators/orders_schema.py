@@ -76,6 +76,8 @@ def validate_orders_report(contents: bytes, max_problems: int = 100) -> dict:
         problems,
     )
 
+    source_completeness = _completeness(columns, rows)
+
     if detected != "legacy_mixed":
         duplicate_values(rows, "order_id", problems)
 
@@ -207,7 +209,7 @@ def validate_orders_report(contents: bytes, max_problems: int = 100) -> dict:
             ).isoformat()
 
     valid = problems.error_count == 0
-    completeness = _completeness(columns, rows)
+    completeness = source_completeness
     profile = None
     suggested_label = None
 
