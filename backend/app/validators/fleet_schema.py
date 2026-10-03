@@ -37,6 +37,19 @@ LEGACY_POOL_COLUMNS = {
     "co2_kg_per_km",
 }
 
+LEGACY_FLEET_V1_COLUMNS = {
+    "vehicle_type",
+    "ownership",
+    "capacity_kg",
+    "cost_per_km",
+    "fixed_trip_cost",
+    "units_available",
+    "avg_speed_kmh",
+    "driving_hours_per_day",
+    "fuel_l_per_100km",
+    "co2_kg_per_km",
+}
+
 
 def _upgrade_legacy_pool_fleet(contents: bytes) -> tuple[bytes, bool, int, set[str]]:
     """Expand historical pool rows into unit-level rows in memory."""
@@ -54,7 +67,14 @@ def _upgrade_legacy_pool_fleet(contents: bytes) -> tuple[bytes, bool, int, set[s
 
     if "vehicle_id" in raw_columns:
         return contents, False, len(raw_columns), set()
-    if not LEGACY_POOL_COLUMNS.issubset(set(raw_columns)):
+
+    raw_set = set(raw_columns)
+    is_pool_v2 = LEGACY_POOL_COLUMNS.issubset(raw_set)
+    is_fleet_v1 = (
+        not is_pool_v2
+        and LEGACY_FLEET_V1_COLUMNS.issubset(raw_set)
+    )
+    if not is_pool_v2 and not is_fleet_v1:
         return contents, False, len(raw_columns), set()
 
     legacy_unlimited_ids = set()
@@ -80,6 +100,7 @@ def _upgrade_legacy_pool_fleet(contents: bytes) -> tuple[bytes, bool, int, set[s
             requested_units = 1
         units = max(1, requested_units)
         pool_id = row.get("fleet_pool_id") or row.get("vehicle_type") or "FLEET"
+        base_site = row.get("base_location") or "*"
 
         for index in range(1, units + 1):
             vehicle_id = f"LEGACY-{pool_id}-{index:02d}"
@@ -92,7 +113,7 @@ def _upgrade_legacy_pool_fleet(contents: bytes) -> tuple[bytes, bool, int, set[s
                     "vehicle_type": row.get("vehicle_type", ""),
                     "ownership": row.get("ownership", ""),
                     "provider_name": "",
-                    "base_site": row.get("base_location", ""),
+                    "base_site": base_site,
                     "capacity_kg": row.get("capacity_kg", ""),
                     "capacity_m3": "",
                     "cost_per_km": row.get("cost_per_km", ""),
