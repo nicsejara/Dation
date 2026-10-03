@@ -145,7 +145,7 @@ function ensureDecisionCase(){
   return state.decisionCase;
 }
 function navigate(view){window.dationSetDataReady(ready());window.dationNavigate(view);}
-function urlRun(id,schema='dispatch_v2'){const url=new URL(location.href);url.searchParams.set('run_id',id);url.searchParams.set('dda',schema);history.replaceState(null,'',url);}
+function urlRun(id,schema='assignment_v1'){const url=new URL(location.href);url.searchParams.set('run_id',id);url.searchParams.set('dda',schema);history.replaceState(null,'',url);}
 function action(b,fn){b.onclick=async()=>{b.disabled=true;try{await fn();}catch(e){alert(e.message);}finally{b.disabled=false;}};}
 async function preflight(){
   state.preflight=null;
@@ -235,115 +235,248 @@ function decimalWeights(){
 function configuration(){const config={mode:state.objective==='custom'?'custom':'preset',objective:state.objective,dimensions:[...state.dimensions]};if(state.objective==='custom')config.weights=decimalWeights();return config;}
 function activeDimensionText(){return state.dimensions.map(k=>DIMENSION_LABELS[k]).join(' · ');}
 function decisionSummary(){return `${OBJECTIVE_LABELS[state.objective]} · ${state.dimensions.length} dimensión${state.dimensions.length===1?'':'es'} · análisis ${DEPTH_LABELS[state.analysisDepth].toLowerCase()}`;}
+
 async function loadConfig(){
   const node=roots.config;
   if(!state.orders||!state.fleet){
-    node.innerHTML='<h1>Configurar la decisión</h1><p>Primero seleccioná órdenes y flota.</p><button data-back>Ir a cargar data</button>';
+    node.innerHTML='<h1>Configurar Assignment</h1><p>Primero seleccioná Orders y Fleet.</p><button data-back>Ir al Data Pack</button>';
     node.querySelector('[data-back]').onclick=()=>navigate('logistics-data');
     return;
   }
 
-  node.innerHTML='<div class="dispatch-config-heading"><span class="dispatch-kicker">Modelo de decisión</span><h1>Configurar la decisión</h1><p>Definí qué querés optimizar, qué dimensiones deben intervenir y cuánto análisis necesita esta decisión.</p><p role="status">Validando la evidencia seleccionada…</p></div>';
-  try{await preflight();}catch(error){errorBox(node,error,loadConfig);return;}
+  node.innerHTML='<div class="dispatch-config-heading"><span class="dispatch-kicker">DECISIÓN 01 · ASIGNACIÓN DE CARGA</span><h1>Configurar Assignment</h1><p>Elegí cómo querés distribuir la carga entre los vehículos disponibles. Las fechas se resolverán después, en Planificación.</p><p role="status">Validando la evidencia seleccionada…</p></div>';
+  try{
+    await preflight();
+    syncDimensionsToEvidence({initialize:true});
+  }catch(error){
+    errorBox(node,error,loadConfig);
+    return;
+  }
 
+  const capabilities=assignmentCapabilities();
+  const capabilityAvailable=key=>Boolean(capabilities[key]?.available);
+  const objectiveRequirement=key=>OBJECTIVE_DIMENSION[key]||null;
+  const objectiveEnabled=key=>{
+    const required=objectiveRequirement(key);
+    return !required||capabilityAvailable(required);
+  };
   const objectives=[
-    ['min_cost','Costo mínimo','Reduce el costo total después de proteger el SLA.'],
-    ['min_time','Tiempo mínimo','Prioriza entregas más rápidas con el mejor nivel de servicio encontrado.'],
-    ['max_utilization','Máxima utilización propia','Reduce la participación de kg tercerizados.'],
-    ['min_co2','CO₂ mínimo','Reduce las emisiones estimadas del ciclo ida y vuelta.'],
-    ['balanced','Balanceado','Equilibra todas las dimensiones activas.'],
+    ['min_trips','Menor cantidad de viajes','Consolida la carga para reducir la cantidad total de viajes.'],
+    ['min_cost','Costo mínimo','Minimiza el costo estimado de ida y vuelta más el costo fijo por viaje.'],
+    ['max_own_fleet','Mayor uso de flota propia','Reduce el peso asignado a transportistas tercerizados.'],
+    ['min_co2','CO₂ mínimo','Reduce las emisiones estimadas de los viajes necesarios.'],
+    ['balanced','Balanceado','Equilibra las variables activas con el mismo peso.'],
   ];
   const dimensionCopy={
-    cost:'Costo total de ida y vuelta más costo fijo por viaje.',
-    time:'Tiempo desde disponibilidad hasta entrega.',
-    utilization:'Participación del peso transportado con flota propia.',
-    co2:'Emisiones estimadas según los factores cargados.',
+    trips:'Cantidad de viajes necesarios para transportar toda la demanda.',
+    cost:'Costo estimado por distancia recorrida y costo fijo de cada viaje.',
+    own_fleet:'Porción de la carga asignada a vehículos propios frente a terceros.',
+    co2:'Emisiones estimadas de ida y vuelta según el factor informado.',
+  };
+  const missingCopy={
+    cost:'Requiere cost_per_km y fixed_trip_cost completos en Fleet.',
+    co2:'Requiere co2_kg_per_km completo en Fleet.',
   };
   const depths=[
-    ['essential','Esencial','Decisión principal con el mínimo conjunto de escenarios necesario.'],
-    ['comparative','Comparativo','Decisión + alternativas para entender trade-offs entre dimensiones activas.'],
-    ['deep','Profundo','Comparación completa + sensibilidad y evidencia ampliada.'],
+    ['essential','Esencial','Resuelve la recomendación principal con el mínimo análisis necesario.'],
+    ['comparative','Comparativo','Suma alternativas por objetivo para entender los trade-offs.'],
+    ['deep','Profundo','Conserva evidencia ampliada de las alternativas evaluadas.'],
   ];
 
   node.innerHTML=`
-    <div class="dispatch-config-screen">
+    <div class="dispatch-config-screen dispatch-assignment-config">
       <header class="dispatch-config-heading">
-        <span class="dispatch-kicker">Modelo de decisión</span>
-        <h1>Configurar la decisión</h1>
-        <p>Definí qué querés optimizar, qué dimensiones deben intervenir y cuánto análisis necesita esta decisión.</p>
+        <span class="dispatch-kicker">DECISIÓN 01 · ASIGNACIÓN DE CARGA</span>
+        <h1>Configurar Assignment</h1>
+        <p>Definí qué significa una buena distribución de carga. Esta decisión no programa fechas ni calcula SLA.</p>
       </header>
 
       <section class="dispatch-evidence-card">
-        <div><span class="dispatch-config-eyebrow">Órdenes</span><strong>${esc(state.orders.original_filename)}</strong><small>${num(state.orders.row_count)} registros</small></div>
-        <div><span class="dispatch-config-eyebrow">Flota</span><strong>${esc(state.fleet.label||state.fleet.original_filename)}</strong><small>${num(state.fleet.row_count)} registros</small></div>
+        <div><span class="dispatch-config-eyebrow">Orders</span><strong>${esc(state.orders.original_filename)}</strong><small>${num(state.orders.row_count)} registros</small></div>
+        <div><span class="dispatch-config-eyebrow">Fleet</span><strong>${esc(state.fleet.label||state.fleet.original_filename)}</strong><small>${num(state.fleet.row_count)} vehículos</small></div>
+        <button data-map>Volver al mapa</button>
         <button data-data>Cambiar datos</button>
       </section>
 
       <section class="dispatch-panel dispatch-config-section">
-        <div class="dispatch-config-section-head"><span class="dispatch-config-step">01</span><div><h2>Objetivo de la decisión</h2><p>Elegí el criterio principal. El SLA permanece por encima del objetivo de negocio.</p></div></div>
-        <div class="dispatch-objective-grid">${objectives.map(([key,label,copy])=>`<button class="dispatch-objective-card" data-preset="${key}" aria-pressed="${state.objective===key}"><strong>${label}</strong><small>${copy}</small></button>`).join('')}</div>
-        <div class="dispatch-sla-guard"><span aria-hidden="true">✓</span><div><strong>Nivel de servicio protegido</strong><p>Dation busca primero la menor cantidad posible de incumplimientos y días de tardanza. Después optimiza tus prioridades de negocio.</p></div></div>
+        <div class="dispatch-config-section-head"><span class="dispatch-config-step">01</span><div><h2>Objetivo de Assignment</h2><p>Elegí el criterio principal para construir los viajes y distribuir la carga.</p></div></div>
+        <div class="dispatch-objective-grid">
+          ${objectives.map(([key,label,copy])=>{
+            const enabled=objectiveEnabled(key);
+            return `<button class="dispatch-objective-card ${enabled?'':'is-disabled'}" data-preset="${key}" aria-pressed="${state.objective===key}" ${enabled?'':'disabled'}><strong>${label}</strong><small>${copy}</small>${enabled?'':`<em>${missingCopy[objectiveRequirement(key)]||'Faltan datos para este objetivo'}</em>`}</button>`;
+          }).join('')}
+        </div>
         <details class="dispatch-custom-priorities" ${state.objective==='custom'?'open':''}>
           <summary>Personalizar prioridades</summary>
-          <p>Usá pesos sólo si necesitás una combinación distinta de los objetivos predefinidos.</p>
+          <p>Combiná únicamente las variables que tengan evidencia suficiente en el Data Pack.</p>
           <button type="button" data-customize>Activar configuración personalizada</button>
-          <div class="dispatch-sliders">${PRIORITY_KEYS.map(key=>`<label class="dispatch-weight-row ${state.dimensions.includes(key)?'':'is-disabled'}"><span>${DIMENSION_LABELS[key]}</span><output data-weight="${key}">${state.weights[key]} %</output><input type="range" min="0" max="100" step="1" value="${state.weights[key]}" data-slider="${key}" ${state.dimensions.includes(key)?'':'disabled'}></label>`).join('')}</div>
+          <div class="dispatch-sliders">
+            ${PRIORITY_KEYS.map(key=>{
+              const available=capabilityAvailable(key);
+              return `<label class="dispatch-weight-row ${state.dimensions.includes(key)&&available?'':'is-disabled'}"><span>${DIMENSION_LABELS[key]}</span><output data-weight="${key}">${state.weights[key]} %</output><input type="range" min="0" max="100" step="1" value="${state.weights[key]}" data-slider="${key}" ${state.dimensions.includes(key)&&available?'':'disabled'}></label>`;
+            }).join('')}
+          </div>
         </details>
       </section>
 
       <section class="dispatch-panel dispatch-config-section">
-        <div class="dispatch-config-section-head"><span class="dispatch-config-step">02</span><div><h2>Dimensiones del modelo</h2><p>Elegí qué variables de negocio deben intervenir en el balance, las comparaciones y la sensibilidad.</p></div></div>
-        <div class="dispatch-dimensions">${PRIORITY_KEYS.map(key=>`<label class="dispatch-dimension-row"><div><strong>${DIMENSION_LABELS[key]}</strong><small>${dimensionCopy[key]}</small></div><input type="checkbox" data-dimension="${key}" ${state.dimensions.includes(key)?'checked':''}><span class="dispatch-toggle" aria-hidden="true"></span></label>`).join('')}</div>
-        <div class="dispatch-locked-model"><div><span class="dispatch-config-eyebrow">Siempre activas</span><strong>Restricciones operativas esenciales</strong><p>Capacidad · ubicación · disponibilidad · ready date · distancia · ocupación temporal · SLA</p></div><span class="dispatch-lock">Modelo físico</span></div>
+        <div class="dispatch-config-section-head"><span class="dispatch-config-step">02</span><div><h2>Variables que intervienen</h2><p>Hacé el análisis tan simple o tan completo como necesites. Lo que no tenga datos suficientes queda deshabilitado.</p></div></div>
+        <div class="dispatch-dimensions">
+          ${PRIORITY_KEYS.map(key=>{
+            const available=capabilityAvailable(key);
+            return `<label class="dispatch-dimension-row ${available?'':'is-unavailable'}"><div><strong>${DIMENSION_LABELS[key]}</strong><small>${dimensionCopy[key]}</small>${available?'':`<em>${missingCopy[key]||'No disponible con este Data Pack.'}</em>`}</div><input type="checkbox" data-dimension="${key}" ${state.dimensions.includes(key)?'checked':''} ${available?'':'disabled'}><span class="dispatch-toggle" aria-hidden="true"></span></label>`;
+          }).join('')}
+        </div>
+        <div class="dispatch-locked-model"><div><span class="dispatch-config-eyebrow">Siempre activas</span><strong>Restricciones físicas de Assignment</strong><p>Unidades enteras · capacidad por viaje · origen/site · ruta · distancia</p></div><span class="dispatch-lock">Sin calendario</span></div>
+        <div class="dispatch-assignment-boundary"><span aria-hidden="true">→</span><div><strong>Las fechas se deciden después</strong><p>estimated_dispatch_date, velocidad, horas de conducción, disponibilidad futura y SLA quedan reservados para Planificación.</p></div></div>
       </section>
 
       <section class="dispatch-panel dispatch-config-section">
-        <div class="dispatch-config-section-head"><span class="dispatch-config-step">03</span><div><h2>Profundidad del análisis</h2><p>Elegí cuánto querés explorar antes de generar la Decisión recomendada.</p></div></div>
+        <div class="dispatch-config-section-head"><span class="dispatch-config-step">03</span><div><h2>Profundidad del análisis</h2><p>Elegí cuántas alternativas querés evaluar antes de recomendar una asignación.</p></div></div>
         <div class="dispatch-depth-grid">${depths.map(([key,label,copy])=>`<button class="dispatch-depth-card" data-depth="${key}" aria-pressed="${state.analysisDepth===key}"><span class="dispatch-depth-radio" aria-hidden="true"></span><strong>${label}${key==='comparative'?'<em>Recomendado</em>':''}</strong><small>${copy}</small></button>`).join('')}</div>
       </section>
 
       <section class="dispatch-panel dispatch-config-section">
-        <div class="dispatch-config-section-head"><span class="dispatch-config-step">04</span><div><h2>Políticas operativas</h2><p>Definí qué políticas puede usar Dation al construir la distribución.</p></div></div>
-        <label class="dispatch-policy-row"><div><strong>Permitir flota tercerizada</strong><small>Habilita recursos externos cuando mejoran la decisión dentro de las restricciones.</small></div><input type="checkbox" data-outsourcing ${state.allow?'checked':''}><span class="dispatch-toggle" aria-hidden="true"></span></label>
-        <details class="dispatch-advanced-policy"><summary>Configuración avanzada</summary><label>Horizonte máximo de recuperación SLA <span><input type="number" min="0" max="90" step="1" value="${state.maxLateDays}" data-late-days> días</span><small>Hasta cuántos días posteriores al plazo puede explorar el motor para encontrar una distribución completa con excepciones.</small></label></details>
+        <div class="dispatch-config-section-head"><span class="dispatch-config-step">04</span><div><h2>Política de recursos</h2><p>Definí qué flota puede participar en esta asignación.</p></div></div>
+        <label class="dispatch-policy-row"><div><strong>Permitir flota tercerizada</strong><small>Permite asignar carga a recursos externos cuando el objetivo seleccionado lo justifica.</small></div><input type="checkbox" data-outsourcing ${state.allow?'checked':''}><span class="dispatch-toggle" aria-hidden="true"></span></label>
       </section>
 
-      ${state.preflight.anomalies.length?`<section class="dispatch-panel dispatch-required-review"><div class="dispatch-config-section-head"><span class="dispatch-config-step">!</span><div><h2>Revisión requerida</h2><p>Sólo estas anomalías necesitan una acción explícita antes de ejecutar.</p></div></div>${state.preflight.anomalies.map(a=>`<label class="dispatch-review-row"><span><strong>${esc(a.order_id)}</strong><small>${esc(a.detail)}</small></span><select data-anomaly="${esc(a.order_id)}"><option value="">Elegí una acción…</option><option value="include" ${state.decisions[a.order_id]==='include'?'selected':''}>Incluir</option><option value="exclude" ${state.decisions[a.order_id]==='exclude'?'selected':''}>Excluir</option></select></label>`).join('')}</section>`:''}
+      ${state.preflight.anomalies.length?`<section class="dispatch-panel dispatch-required-review"><div class="dispatch-config-section-head"><span class="dispatch-config-step">!</span><div><h2>Revisión requerida</h2><p>Estas órdenes son outliers de tamaño y necesitan una decisión explícita antes de ejecutar.</p></div></div>${state.preflight.anomalies.map(a=>`<label class="dispatch-review-row"><span><strong>${esc(a.order_id)}</strong><small>${esc(a.detail)}</small></span><select data-anomaly="${esc(a.order_id)}"><option value="">Elegí una acción…</option><option value="include" ${state.decisions[a.order_id]==='include'?'selected':''}>Incluir</option><option value="exclude" ${state.decisions[a.order_id]==='exclude'?'selected':''}>Excluir</option></select></label>`).join('')}</section>`:''}
 
-      <footer class="dispatch-footer dispatch-config-footer"><div><span class="dispatch-config-eyebrow">Configuración lista</span><strong data-config-summary></strong><small data-config-detail></small></div><button data-review>Revisar y ejecutar →</button></footer>
+      <footer class="dispatch-footer dispatch-config-footer"><div><span class="dispatch-config-eyebrow">Assignment listo para ejecutar</span><strong data-config-summary></strong><small data-config-detail></small></div><button data-review>Revisar y ejecutar →</button></footer>
 
-      <dialog class="dispatch dispatch-review"><form method="dialog"><span class="dispatch-config-eyebrow">Antes de ejecutar</span><h2>Revisar la decisión</h2><div data-summary></div><p>Motor Dispatch 2.1.0 · SLA jerárquico + capacidad espacial y temporal. La configuración y los archivos quedan vinculados a la corrida.</p><div class="dispatch-actions"><button value="cancel">Volver</button><button type="button" data-execute>Generar decisión</button></div></form></dialog>
+      <dialog class="dispatch dispatch-review"><form method="dialog"><span class="dispatch-config-eyebrow">Antes de ejecutar</span><h2>Revisar Assignment</h2><div data-summary></div><div class="dispatch-assignment-boundary"><span aria-hidden="true">i</span><div><strong>Esta corrida no programa fechas</strong><p>El resultado será una distribución de carga por viaje y vehículo. El cuándo se ejecuta cada viaje se resolverá en Planificación.</p></div></div><p>Motor Assignment 1.0.0 · capacidad, site, ruta y unidades enteras. La configuración y los archivos quedan vinculados al Decision Case.</p><div class="dispatch-actions"><button value="cancel">Volver</button><button type="button" data-execute>Generar Assignment</button></div></form></dialog>
     </div>`;
 
   function sync(){
-    state.weights=state.objective==='custom'?normalizeWeights(state.weights,state.dimensions):presetWeights(state.objective,state.dimensions);
-    node.querySelectorAll('[data-preset]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.preset===state.objective)));
+    syncDimensionsToEvidence();
+    state.weights=state.objective==='custom'
+      ?normalizeWeights(state.weights,state.dimensions)
+      :presetWeights(state.objective,state.dimensions);
+
+    node.querySelectorAll('[data-preset]').forEach(button=>{
+      const required=OBJECTIVE_DIMENSION[button.dataset.preset];
+      const enabled=!required||capabilityAvailable(required);
+      button.disabled=!enabled;
+      button.setAttribute('aria-pressed',String(button.dataset.preset===state.objective));
+    });
     node.querySelectorAll('[data-depth]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.depth===state.analysisDepth)));
-    node.querySelectorAll('[data-dimension]').forEach(input=>{input.checked=state.dimensions.includes(input.dataset.dimension);input.disabled=state.dimensions.length===1&&input.checked;});
-    PRIORITY_KEYS.forEach(key=>{const output=node.querySelector('[data-weight="'+key+'"]');const slider=node.querySelector('[data-slider="'+key+'"]');if(output)output.textContent=state.weights[key]+' %';if(slider){slider.value=state.weights[key];slider.disabled=!state.dimensions.includes(key);slider.closest('.dispatch-weight-row')?.classList.toggle('is-disabled',slider.disabled);}});
+    node.querySelectorAll('[data-dimension]').forEach(input=>{
+      const available=capabilityAvailable(input.dataset.dimension);
+      input.checked=state.dimensions.includes(input.dataset.dimension);
+      input.disabled=!available||(state.dimensions.length===1&&input.checked);
+    });
+    PRIORITY_KEYS.forEach(key=>{
+      const output=node.querySelector('[data-weight="'+key+'"]');
+      const slider=node.querySelector('[data-slider="'+key+'"]');
+      if(output)output.textContent=state.weights[key]+' %';
+      if(slider){
+        slider.value=state.weights[key];
+        slider.disabled=!capabilityAvailable(key)||!state.dimensions.includes(key);
+        slider.closest('.dispatch-weight-row')?.classList.toggle('is-disabled',slider.disabled);
+      }
+    });
     node.querySelector('[data-config-summary]').textContent=decisionSummary();
-    node.querySelector('[data-config-detail]').textContent=activeDimensionText()+' · SLA protegido';
+    node.querySelector('[data-config-detail]').textContent=activeDimensionText()+' · sin variables temporales';
     node.querySelector('[data-review]').disabled=!ready()||state.preflight.anomalies.some(a=>!state.decisions[a.order_id]);
     persist();
   }
 
+  node.querySelector('[data-map]').onclick=()=>navigate('logistics-map');
   node.querySelector('[data-data]').onclick=()=>navigate('logistics-data');
-  node.querySelectorAll('[data-preset]').forEach(button=>button.onclick=()=>{const next=button.dataset.preset;const required=OBJECTIVE_DIMENSION[next];if(required&&!state.dimensions.includes(required))state.dimensions=[...new Set([...state.dimensions,required])].sort((a,b)=>PRIORITY_KEYS.indexOf(a)-PRIORITY_KEYS.indexOf(b));state.objective=next;state.weights=presetWeights(next,state.dimensions);sync();});
-  node.querySelector('[data-customize]').onclick=()=>{state.objective='custom';state.weights=balancedWeights(state.dimensions);node.querySelector('.dispatch-custom-priorities').open=true;sync();};
-  node.querySelectorAll('[data-slider]').forEach(slider=>slider.oninput=()=>{state.objective='custom';const key=slider.dataset.slider;const others=state.dimensions.filter(item=>item!==key);const target=others.length?+slider.value:100;const next={...state.weights,[key]:target};const remaining=100-target;if(others.length){const total=others.reduce((sum,item)=>sum+(state.weights[item]||0),0);const raw=others.map((item,index)=>{const share=total?remaining*(state.weights[item]||0)/total:remaining/others.length;return {item,index,base:Math.floor(share),fraction:share-Math.floor(share)};});let missing=remaining-raw.reduce((sum,item)=>sum+item.base,0);[...raw].sort((a,b)=>b.fraction-a.fraction||a.index-b.index).slice(0,missing).forEach(item=>item.base+=1);raw.forEach(item=>next[item.item]=item.base);}PRIORITY_KEYS.filter(item=>!state.dimensions.includes(item)).forEach(item=>next[item]=0);state.weights=next;sync();});
-  node.querySelectorAll('[data-dimension]').forEach(input=>input.onchange=()=>{const key=input.dataset.dimension;if(input.checked){state.dimensions=[...new Set([...state.dimensions,key])].sort((a,b)=>PRIORITY_KEYS.indexOf(a)-PRIORITY_KEYS.indexOf(b));}else{state.dimensions=state.dimensions.filter(item=>item!==key);if(!state.dimensions.length){state.dimensions=[key];input.checked=true;return;}if(OBJECTIVE_DIMENSION[state.objective]===key)state.objective='balanced';}state.weights=state.objective==='custom'?normalizeWeights(state.weights,state.dimensions):presetWeights(state.objective,state.dimensions);sync();});
-  node.querySelectorAll('[data-depth]').forEach(button=>button.onclick=()=>{state.analysisDepth=button.dataset.depth;sync();});
-  node.querySelector('[data-outsourcing]').onchange=async event=>{state.allow=event.target.checked;persist();await preflight();sync();};
-  node.querySelector('[data-late-days]').onchange=event=>{state.maxLateDays=Math.min(90,Math.max(0,Number(event.target.value)||0));event.target.value=state.maxLateDays;sync();};
-  node.querySelectorAll('[data-anomaly]').forEach(select=>select.onchange=()=>{state.decisions[select.dataset.anomaly]=select.value;sync();});
+  node.querySelectorAll('[data-preset]').forEach(button=>button.onclick=()=>{
+    if(button.disabled)return;
+    const next=button.dataset.preset;
+    const required=OBJECTIVE_DIMENSION[next];
+    if(required&&!state.dimensions.includes(required)){
+      state.dimensions=[...new Set([...state.dimensions,required])].sort((a,b)=>PRIORITY_KEYS.indexOf(a)-PRIORITY_KEYS.indexOf(b));
+    }
+    state.objective=next;
+    state.configured=true;
+    state.weights=presetWeights(next,state.dimensions);
+    sync();
+  });
+  node.querySelector('[data-customize]').onclick=()=>{
+    state.objective='custom';
+    state.configured=true;
+    state.weights=balancedWeights(state.dimensions);
+    node.querySelector('.dispatch-custom-priorities').open=true;
+    sync();
+  };
+  node.querySelectorAll('[data-slider]').forEach(slider=>slider.oninput=()=>{
+    state.objective='custom';
+    state.configured=true;
+    const key=slider.dataset.slider;
+    const others=state.dimensions.filter(item=>item!==key);
+    const target=others.length?+slider.value:100;
+    const next={...state.weights,[key]:target};
+    const remaining=100-target;
+    if(others.length){
+      const total=others.reduce((sum,item)=>sum+(state.weights[item]||0),0);
+      const raw=others.map((item,index)=>{
+        const share=total?remaining*(state.weights[item]||0)/total:remaining/others.length;
+        return {item,index,base:Math.floor(share),fraction:share-Math.floor(share)};
+      });
+      let missing=remaining-raw.reduce((sum,item)=>sum+item.base,0);
+      [...raw].sort((a,b)=>b.fraction-a.fraction||a.index-b.index).slice(0,missing).forEach(item=>item.base+=1);
+      raw.forEach(item=>next[item.item]=item.base);
+    }
+    PRIORITY_KEYS.filter(item=>!state.dimensions.includes(item)).forEach(item=>next[item]=0);
+    state.weights=next;
+    sync();
+  });
+  node.querySelectorAll('[data-dimension]').forEach(input=>input.onchange=()=>{
+    const key=input.dataset.dimension;
+    if(!capabilityAvailable(key))return;
+    state.configured=true;
+    if(input.checked){
+      state.dimensions=[...new Set([...state.dimensions,key])].sort((a,b)=>PRIORITY_KEYS.indexOf(a)-PRIORITY_KEYS.indexOf(b));
+    }else{
+      state.dimensions=state.dimensions.filter(item=>item!==key);
+      if(!state.dimensions.length){
+        state.dimensions=[key];
+        input.checked=true;
+        return;
+      }
+      if(OBJECTIVE_DIMENSION[state.objective]===key)state.objective='balanced';
+    }
+    state.weights=state.objective==='custom'
+      ?normalizeWeights(state.weights,state.dimensions)
+      :presetWeights(state.objective,state.dimensions);
+    sync();
+  });
+  node.querySelectorAll('[data-depth]').forEach(button=>button.onclick=()=>{
+    state.analysisDepth=button.dataset.depth;
+    state.configured=true;
+    sync();
+  });
+  node.querySelector('[data-outsourcing]').onchange=async event=>{
+    state.allow=event.target.checked;
+    state.configured=true;
+    persist();
+    try{
+      await preflight();
+      syncDimensionsToEvidence();
+      sync();
+    }catch(error){
+      errorBox(node,error,loadConfig);
+    }
+  };
+  node.querySelectorAll('[data-anomaly]').forEach(select=>select.onchange=()=>{
+    state.decisions[select.dataset.anomaly]=select.value;
+    sync();
+  });
 
   const modal=node.querySelector('dialog');
   node.querySelector('[data-review]').onclick=()=>{
     const weights=decimalWeights();
-    node.querySelector('[data-summary]').innerHTML=`<div class="dispatch-review-summary"><p><strong>Objetivo</strong><span>${esc(OBJECTIVE_LABELS[state.objective])}</span></p><p><strong>Dimensiones</strong><span>${esc(activeDimensionText())}</span></p><p><strong>Prioridades</strong><span>${state.dimensions.map(key=>DIMENSION_LABELS[key]+' '+num(weights[key]*100,2)+' %').join(' · ')}</span></p><p><strong>Profundidad</strong><span>${esc(DEPTH_LABELS[state.analysisDepth])}</span></p><p><strong>Tercerización</strong><span>${state.allow?'Permitida':'Deshabilitada'}</span></p><p><strong>Recuperación SLA</strong><span>Hasta ${num(state.maxLateDays)} días</span></p></div><div class="dispatch-sla-guard"><span aria-hidden="true">✓</span><div><strong>SLA protegido antes del objetivo de negocio</strong><p>Dation aplicará siempre capacidad, ubicación, disponibilidad, fechas, distancia y ocupación temporal.</p></div></div>`;
+    node.querySelector('[data-summary]').innerHTML=`<div class="dispatch-review-summary"><p><strong>Objetivo</strong><span>${esc(OBJECTIVE_LABELS[state.objective])}</span></p><p><strong>Variables</strong><span>${esc(activeDimensionText())}</span></p><p><strong>Prioridades</strong><span>${state.dimensions.map(key=>DIMENSION_LABELS[key]+' '+num(weights[key]*100,2)+' %').join(' · ')}</span></p><p><strong>Profundidad</strong><span>${esc(DEPTH_LABELS[state.analysisDepth])}</span></p><p><strong>Tercerización</strong><span>${state.allow?'Permitida':'Deshabilitada'}</span></p></div>`;
     modal.showModal();
   };
-  node.querySelector('[data-execute]').onclick=()=>{modal.close();execute();};
+  node.querySelector('[data-execute]').onclick=()=>{
+    modal.close();
+    execute();
+  };
   sync();
 }
 function pending(message){document.body.classList.add('dispatch-result');roots.dashboard.innerHTML=`<section class="dispatch-panel"><h1>Preparando tu decisión</h1><p role="status">${esc(message)}</p><div class="dispatch-loading" aria-label="Procesando"></div><p>El Decision Case conserva el estado real de esta ejecución.</p><button data-return>Volver al mapa</button></section>`;roots.dashboard.querySelector('[data-return]').onclick=()=>navigate('logistics-map');}
