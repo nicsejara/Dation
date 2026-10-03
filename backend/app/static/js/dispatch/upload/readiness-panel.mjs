@@ -49,7 +49,7 @@ function decisionCard(decision) {
       : decision.data_ready
         ? "✓ Datos suficientes · pendiente de jerarquía"
         : "○ Requiere datos opcionales",
-    `dispatch-readiness-state is-${decision.state}`,
+    `dispatch-readiness-state is-${decision.data_ready ? "data-ready" : decision.state}`,
   );
 
   copy.append(
