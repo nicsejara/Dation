@@ -259,7 +259,7 @@ async function restoreHistoricalRun(
       await getRun(runId)
     );
 
-    if (['dispatch_v1','dispatch_v2'].includes(run.result_json?.schema_version)) {
+    if (['assignment_v1','dispatch_v1','dispatch_v2'].includes(run.result_json?.schema_version)) {
       if (window.DationDispatch?.show) {
         window.DationDispatch.show(run);
       } else {
