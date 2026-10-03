@@ -2605,3 +2605,157 @@ body.dispatch-drawer-open {
   margin:4px 0 0;
   font-size:12px;
 }
+
+
+/* Decision Chain Phase 4 · Scheduling */
+.dispatch-scheduling-rules{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+.dispatch-scheduling-rules article{
+  padding:16px 17px;
+  border:1px solid #e1e5ed;
+  border-radius:12px;
+  background:#fff;
+}
+.dispatch-scheduling-rules strong{
+  display:block;
+  font-size:13px;
+  margin-bottom:5px;
+}
+.dispatch-scheduling-rules p{
+  margin:0;
+  font-size:11.5px;
+}
+.dispatch-schedule-priority{
+  margin-bottom:16px;
+  padding:16px 18px;
+  border:1px solid #dfe2f1;
+  border-radius:12px;
+  background:#f8f8ff;
+}
+.dispatch-schedule-priority ol{
+  display:grid;
+  gap:10px;
+  margin:0;
+  padding-left:22px;
+}
+.dispatch-schedule-priority li{
+  padding-left:4px;
+}
+.dispatch-schedule-priority strong{
+  display:block;
+  font-size:13px;
+}
+.dispatch-schedule-priority small{
+  display:block;
+  margin-top:3px;
+}
+.dispatch-policy-row.is-unavailable{
+  opacity:.58;
+  background:#f7f8fa;
+}
+.dispatch-schedule-chart{
+  height:380px;
+  margin-bottom:20px;
+}
+.dispatch-schedule-vehicles{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+.dispatch-schedule-vehicle{
+  overflow:hidden;
+  border:1px solid #e0e5ee;
+  border-radius:12px;
+  background:#fff;
+}
+.dispatch-schedule-vehicle>header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:13px 15px;
+  background:#fafbfe;
+  border-bottom:1px solid #e8ebf1;
+}
+.dispatch-schedule-vehicle>header strong{
+  display:block;
+  font-size:13px;
+}
+.dispatch-schedule-vehicle>header small{
+  display:block;
+  margin-top:2px;
+}
+.dispatch-schedule-vehicle>header>span{
+  font-size:10.5px;
+  font-weight:800;
+  white-space:nowrap;
+}
+.dispatch-schedule-trip{
+  display:grid;
+  grid-template-columns:86px minmax(0,1fr) auto;
+  gap:12px;
+  align-items:center;
+  padding:11px 14px;
+  border-bottom:1px solid #edf0f5;
+}
+.dispatch-schedule-trip:last-child{
+  border-bottom:0;
+}
+.dispatch-schedule-trip__date{
+  font-size:11px;
+  font-weight:800;
+}
+.dispatch-schedule-trip strong{
+  display:block;
+  font-size:11.5px;
+}
+.dispatch-schedule-trip small{
+  display:block;
+  margin-top:3px;
+  font-size:9.8px;
+}
+.dispatch-schedule-trip>span:last-child{
+  font-size:11px;
+  font-weight:750;
+  white-space:nowrap;
+}
+.dispatch-schedule-kpis{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+  margin-bottom:18px;
+}
+.dispatch-schedule-kpis>div{
+  padding:14px 15px;
+  border:1px solid #e1e5ed;
+  border-radius:11px;
+  background:#fafbfe;
+}
+.dispatch-schedule-kpis small{
+  display:block;
+}
+.dispatch-schedule-kpis strong{
+  display:block;
+  margin-top:5px;
+  font-size:18px;
+}
+@media(max-width:1000px){
+  .dispatch-schedule-vehicles{
+    grid-template-columns:minmax(0,1fr);
+  }
+}
+@media(max-width:760px){
+  .dispatch-scheduling-rules,
+  .dispatch-schedule-kpis{
+    grid-template-columns:minmax(0,1fr);
+  }
+  .dispatch-schedule-trip{
+    grid-template-columns:minmax(0,1fr);
+  }
+  .dispatch-schedule-trip__date{
+    font-size:10px;
+  }
+}
