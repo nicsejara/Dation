@@ -12,9 +12,10 @@ from fastapi import (
     UploadFile,
 )
 from fastapi.responses import Response
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.auth import require_upload_access
+from app.models.assignment_config import AssignmentConfig, AssignmentOptions
 from app.models.dispatch_config import DispatchConfig, DispatchOptions
 from app.services import dispatch_service as service
 from app.validators.contracts import public_contracts, template_csv
@@ -41,9 +42,39 @@ class DecisionCaseRef(BaseModel):
 class RunRequest(BaseModel):
     orders_dataset_id: UUID
     fleet_dataset_id: UUID
-    configuration: DispatchConfig = DispatchConfig()
-    options: DispatchOptions = DispatchOptions()
+    configuration: dict = Field(default_factory=dict)
+    options: dict = Field(default_factory=dict)
     decision_case: DecisionCaseRef | None = None
+
+    @model_validator(mode="after")
+    def canonical(self):
+        if (
+            self.decision_case
+            and self.decision_case.node_id
+            == "logistics_assignment"
+        ):
+            self.configuration = (
+                AssignmentConfig.model_validate(
+                    self.configuration
+                ).model_dump()
+            )
+            self.options = (
+                AssignmentOptions.model_validate(
+                    self.options
+                ).model_dump()
+            )
+        else:
+            self.configuration = (
+                DispatchConfig.model_validate(
+                    self.configuration
+                ).model_dump()
+            )
+            self.options = (
+                DispatchOptions.model_validate(
+                    self.options
+                ).model_dump()
+            )
+        return self
 
 
 class LabelUpdate(BaseModel):
@@ -183,8 +214,8 @@ async def run(
         service.execute(
             str(payload.orders_dataset_id),
             str(payload.fleet_dataset_id),
-            payload.configuration.model_dump(),
-            payload.options.model_dump(),
+            payload.configuration,
+            payload.options,
             str(run_id) if run_id else None,
             (
                 payload.decision_case.model_dump(mode="json")
