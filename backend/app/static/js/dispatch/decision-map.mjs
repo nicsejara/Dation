@@ -54,9 +54,14 @@ function actionFor(nodeId, status) {
       status === STATUS.RUNNING
       || status === STATUS.REVIEW
       || status === STATUS.APPROVED
-      || status === STATUS.ERROR
     ) {
-      return {label: "Ver decisión →", action: "open-result"};
+      return {
+        label: status === STATUS.RUNNING ? "Ver ejecución →" : "Ver decisión →",
+        action: "open-result",
+      };
+    }
+    if (status === STATUS.ERROR) {
+      return {label: "Revisar y reintentar →", action: "configure"};
     }
     if (status === STATUS.NEEDS_DATA) {
       return {label: "Completar datos", action: "data"};
