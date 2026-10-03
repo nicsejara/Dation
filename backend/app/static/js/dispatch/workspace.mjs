@@ -71,9 +71,32 @@ async function loadData() {
 async function openCaseResult(){
   const runId=state.decisionCase?.nodes?.logistics_assignment?.run_id;
   if(!runId)return;
-  if(state.run?.id===runId){show(state.run);return;}
   try{
-    show(await api('/api/runs/'+runId));
+    const run=state.run?.id===runId
+      ?state.run
+      :await api('/api/runs/'+runId);
+    if(run.status==='completed'){
+      show(run);
+      return;
+    }
+    if(run.status==='running'||run.status==='queued'){
+      pending('Recuperando el estado de la ejecución…');
+      navigate('decision-dashboard');
+      clearTimeout(timer);
+      poll(runId,++pollGeneration);
+      return;
+    }
+    if(run.status==='error'){
+      state.decisionCase=transitionNode(
+        state.decisionCase,
+        'logistics_assignment',
+        STATUS.ERROR,
+        {run_id:runId,error:run.error_message||'La ejecución terminó con error.'},
+      );
+      persist();
+      loadDecisionMap();
+      return;
+    }
   }catch(error){
     errorBox(roots.map,error,loadDecisionMap);
   }
