@@ -32,6 +32,57 @@ class DispatchHTTPTests(unittest.IsolatedAsyncioTestCase):
         r=await self.client.post('/api/runs',json={'orders_dataset_id':O,'fleet_dataset_id':F,'configuration':{'mode':'custom','objective':'custom','weights':{'cost':1,'trips':1}}})
         self.assertEqual(r.status_code,422)
 
+    async def test_assignment_run_uses_non_temporal_configuration(self):
+        app.dependency_overrides[require_upload_access]=lambda:'dation'
+        case_id='00000000-0000-4000-8000-000000000098'
+        with patch.object(
+            dispatch_service,
+            'available',
+            AsyncMock(return_value=True),
+        ), patch.object(
+            dispatch_service,
+            'execute',
+            AsyncMock(return_value={'id':O,'status':'completed'}),
+        ) as execute:
+            response=await self.client.post(
+                '/api/runs?run_id='+O,
+                json={
+                    'orders_dataset_id':O,
+                    'fleet_dataset_id':F,
+                    'configuration':{
+                        'objective':'min_trips',
+                        'dimensions':['trips','own_fleet'],
+                    },
+                    'decision_case':{
+                        'case_id':case_id,
+                        'node_id':'logistics_assignment',
+                    },
+                },
+            )
+            self.assertEqual(response.status_code,200)
+            config=execute.call_args.args[2]
+            options=execute.call_args.args[3]
+            self.assertEqual(config['weights']['trips'],1)
+            self.assertEqual(config['weights']['cost'],0)
+            self.assertNotIn('time',config['weights'])
+            self.assertNotIn('max_late_days',options)
+
+        invalid=await self.client.post(
+            '/api/runs',
+            json={
+                'orders_dataset_id':O,
+                'fleet_dataset_id':F,
+                'configuration':{
+                    'objective':'min_time',
+                },
+                'decision_case':{
+                    'case_id':case_id,
+                    'node_id':'logistics_assignment',
+                },
+            },
+        )
+        self.assertEqual(invalid.status_code,422)
+
     async def test_run_accepts_decision_case_lineage(self):
         app.dependency_overrides[require_upload_access]=lambda:'dation'
         case_id='00000000-0000-4000-8000-000000000099'
