@@ -48,9 +48,10 @@ export function createGuideDrawer(contracts) {
     const headRow = document.createElement("tr");
     [
       "Columna",
-      "Obligatoria",
+      "Para empezar",
       "Formato",
       "Ejemplo",
+      "Se usa en",
       "Para qué sirve",
     ].forEach((value) => headRow.append(el("th", value)));
     thead.append(headRow);
@@ -58,11 +59,17 @@ export function createGuideDrawer(contracts) {
     const tbody = document.createElement("tbody");
     contract.columns.forEach((column) => {
       const row = document.createElement("tr");
+      const stageLabels = {
+        assignment: "Asignación",
+        scheduling: "Planificación",
+        final_assignment: "Asignación final",
+      };
       [
         column.name,
-        column.required ? "Sí" : "No",
+        column.required ? "Sí" : "Opcional",
         column.rule,
         column.example,
+        (column.used_by || []).map((key) => stageLabels[key] || key).join(" · "),
         column.description,
       ].forEach((value) => row.append(el("td", value)));
       tbody.append(row);
@@ -74,7 +81,8 @@ export function createGuideDrawer(contracts) {
       "p",
       (
         "CSV UTF-8 · hasta 10 MB · separador ; o , · "
-        + "fechas AAAA-MM-DD o d/m/AAAA."
+        + "fechas AAAA-MM-DD o d/m/AAAA. "
+        + "Sólo las columnas marcadas como Sí son necesarias para iniciar Asignación."
       ),
       "dispatch-guide-rules",
     );
