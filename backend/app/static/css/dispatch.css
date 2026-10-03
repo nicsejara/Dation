@@ -2297,7 +2297,8 @@ body.dispatch-drawer-open {
   font-weight:800;
 }
 
-.dispatch-readiness-state.is-available{
+.dispatch-readiness-state.is-available,
+.dispatch-readiness-state.is-data-ready{
   background:#e6f4ee;
   color:#126b57;
 }
