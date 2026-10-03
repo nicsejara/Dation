@@ -712,7 +712,11 @@ class FrontendContractTests(
             dashboard,
         )
         self.assertIn(
-            "✦ Dation IA",
+            "dispatch-ai-fab",
+            dashboard,
+        )
+        self.assertIn(
+            "<strong>Dation IA</strong>",
             dashboard,
         )
         self.assertIn(
