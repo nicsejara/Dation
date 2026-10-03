@@ -623,7 +623,7 @@ async function loadConfig(){
   sync();
 }
 function pending(message){document.body.classList.add('dispatch-result');roots.dashboard.innerHTML=`<section class="dispatch-panel"><h1>Preparando tu decisión</h1><p role="status">${esc(message)}</p><div class="dispatch-loading" aria-label="Procesando"></div><p>El Decision Case conserva el estado real de esta ejecución.</p><button data-return>Volver al mapa</button></section>`;roots.dashboard.querySelector('[data-return]').onclick=()=>navigate('logistics-map');}
-async function poll(id,generation){
+async function poll(id,generation,nodeId=state.activeNode){
   if(generation!==pollGeneration)return;
   try{
     const run=await api('/api/runs/'+id);
@@ -633,10 +633,10 @@ async function poll(id,generation){
       return;
     }
     if(run.status==='error'){
-      if(state.decisionCase?.nodes?.logistics_assignment?.run_id===id){
+      if(state.decisionCase?.nodes?.[nodeId]?.run_id===id){
         state.decisionCase=transitionNode(
           state.decisionCase,
-          'logistics_assignment',
+          nodeId,
           STATUS.ERROR,
           {run_id:id,error:run.error_message||'La corrida no pudo completarse.'},
         );
@@ -645,25 +645,33 @@ async function poll(id,generation){
       throw new Error(run.error_message||'La corrida no pudo completarse.');
     }
     const stage=run.progress_json?.stage||'validating';
-    const names={
+    const assignmentNames={
       validating:'Validando Orders y Fleet',
       constructing:'Construyendo alternativas de carga',
       baseline:'Preparando referencia histórica',
       sensitivity:'Comparando objetivos',
       summarizing:'Preparando la asignación recomendada',
     };
+    const schedulingNames={
+      validating:'Validando Assignment y evidencia temporal',
+      constructing:'Construyendo secuencia temporal',
+      summarizing:'Preparando la planificación recomendada',
+    };
+    const names=nodeId==='logistics_scheduling'?schedulingNames:assignmentNames;
     pending(
       stage.startsWith('optimizing:')
-        ?'Optimizando la distribución de carga'
-        :(names[stage]||'Evaluando alternativas de asignación')
+        ?(nodeId==='logistics_scheduling'
+          ?'Optimizando secuencia y nivel de servicio'
+          :'Optimizando la distribución de carga')
+        :(names[stage]||'Evaluando la decisión')
     );
   }catch(e){
     if(e.status!==404){
-      errorBox(roots.dashboard,e,()=>poll(id,generation));
+      errorBox(roots.dashboard,e,()=>poll(id,generation,nodeId));
       return;
     }
   }
-  timer=setTimeout(()=>poll(id,generation),1500);
+  timer=setTimeout(()=>poll(id,generation,nodeId),1500);
 }
 async function execute(){
   const decisionCase=ensureDecisionCase();
@@ -680,7 +688,7 @@ async function execute(){
   navigate('decision-dashboard');
   const generation=++pollGeneration;
   clearTimeout(timer);
-  timer=setTimeout(()=>poll(id,generation),1000);
+  timer=setTimeout(()=>poll(id,generation,'logistics_assignment'),1000);
   try{
     const run=await post('/api/runs?run_id='+id,{
       orders_dataset_id:state.orders.id,
@@ -707,6 +715,50 @@ async function execute(){
     );
     persist();
     errorBox(roots.dashboard,e,()=>poll(id,generation));
+  }
+}
+
+async function executeScheduling(sourceRunId){
+  const decisionCase=ensureDecisionCase();
+  const id=crypto.randomUUID();
+  state.activeNode='logistics_scheduling';
+  state.decisionCase=transitionNode(
+    decisionCase,
+    'logistics_scheduling',
+    STATUS.RUNNING,
+    {run_id:id,error:null},
+  );
+  persist();
+  urlRun(id,'scheduling_v1');
+  pending('Registrando la planificación…');
+  navigate('decision-dashboard');
+  const generation=++pollGeneration;
+  clearTimeout(timer);
+  timer=setTimeout(()=>poll(id,generation,'logistics_scheduling'),1000);
+  try{
+    const run=await post('/api/runs?run_id='+id,{
+      orders_dataset_id:state.orders.id,
+      fleet_dataset_id:state.fleet.id,
+      source_run_id:sourceRunId,
+      configuration:{
+        strategy:'service_first',
+        use_delivery_due_dates:Boolean(state.schedulingUseDueDates),
+      },
+      options:{},
+      decision_case:caseRef(state.decisionCase,'logistics_scheduling'),
+    });
+    if(generation===pollGeneration)show(run);
+  }catch(e){
+    if(generation!==pollGeneration)return;
+    clearTimeout(timer);
+    state.decisionCase=transitionNode(
+      state.decisionCase,
+      'logistics_scheduling',
+      STATUS.ERROR,
+      {run_id:id,error:e.message},
+    );
+    persist();
+    errorBox(roots.dashboard,e,()=>poll(id,generation,'logistics_scheduling'));
   }
 }
 
