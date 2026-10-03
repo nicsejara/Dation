@@ -2539,7 +2539,7 @@
       if (window.DationDispatch && typeof window.DationDispatch.show === "function") {
         window.DationDispatch.show(run);
       } else {
-        var dispatch = await import('/static/js/dispatch/workspace.mjs?v=dashboard-ai-v1');
+        var dispatch = await import('/static/js/dispatch/workspace.mjs?v=decision-flow-v1');
         dispatch.show(run);
       }
       return;
@@ -3004,7 +3004,7 @@
         )
       ) {
         var exporter = await import(
-          "/static/js/dispatch/export.mjs?v=dashboard-ai-v1"
+          "/static/js/dispatch/export.mjs?v=decision-flow-v1"
         );
         exporter.exportDecision(
           run.result_json

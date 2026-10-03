@@ -330,7 +330,7 @@ class FrontendContractTests(
             self.dashboard_stage_js,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=dashboard-ai-v1",
+            "/static/js/dispatch/workspace.mjs?v=decision-flow-v1",
             self.html,
         )
         self.assertIn(
@@ -712,7 +712,11 @@ class FrontendContractTests(
             dashboard,
         )
         self.assertIn(
-            "✦ Dation IA",
+            "dispatch-ai-fab",
+            dashboard,
+        )
+        self.assertIn(
+            "<strong>Dation IA</strong>",
             dashboard,
         )
         self.assertIn(
@@ -740,7 +744,7 @@ class FrontendContractTests(
             explanation,
         )
         self.assertIn(
-            "dashboard-ai-v1",
+            "decision-flow-v1",
             self.html,
         )
 
@@ -892,7 +896,11 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "Mapa de decisiones",
+            "Flujo de decisiones",
+            decision_map,
+        )
+        self.assertIn(
+            "SIGUIENTE PASO",
             decision_map,
         )
         self.assertIn(
@@ -942,12 +950,94 @@ class FrontendContractTests(
             dashboard,
         )
         self.assertIn(
-            "← Mapa",
+            "decisionRail",
             dashboard,
         )
         self.assertIn(
-            "data-map",
+            "dispatch-ai-fab",
             dashboard,
+        )
+
+    def test_decision_flow_continues_after_approval(self):
+        dispatch_root = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+        )
+        workspace = (
+            dispatch_root / "workspace.mjs"
+        ).read_text(encoding="utf-8")
+        decision_map = (
+            dispatch_root / "decision-map.mjs"
+        ).read_text(encoding="utf-8")
+        decision_nav = (
+            dispatch_root / "decision-nav.mjs"
+        ).read_text(encoding="utf-8")
+        dashboard = (
+            dispatch_root / "dashboard.mjs"
+        ).read_text(encoding="utf-8")
+        scheduling = (
+            dispatch_root
+            / "scheduling-dashboard.mjs"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn(
+            "unlockNextNode(nodeId)",
+            workspace,
+        )
+        self.assertIn(
+            "onApprovalComplete",
+            workspace,
+        )
+        self.assertIn(
+            "navigate('logistics-map')",
+            workspace,
+        )
+        self.assertIn(
+            "SIGUIENTE PASO",
+            decision_map,
+        )
+        self.assertIn(
+            "Configurar planificación",
+            decision_map,
+        )
+        self.assertIn(
+            "Decisiones del análisis",
+            decision_nav,
+        )
+        self.assertIn(
+            "data-decision-node",
+            decision_nav,
+        )
+        self.assertIn(
+            "Ver flujo completo",
+            decision_nav,
+        )
+        self.assertIn(
+            "bindDecisionRail",
+            dashboard,
+        )
+        self.assertIn(
+            "bindDecisionRail",
+            scheduling,
+        )
+        self.assertIn(
+            "dispatch-ai-fab",
+            dashboard,
+        )
+        self.assertIn(
+            "dispatch-ai-fab",
+            scheduling,
+        )
+        self.assertNotIn(
+            "dispatch-ai-action",
+            dashboard,
+        )
+        self.assertNotIn(
+            "dispatch-ai-action",
+            scheduling,
         )
 
     def test_dashboard_stage_contract(

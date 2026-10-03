@@ -5,6 +5,7 @@ import * as review from './review.mjs';
 import * as explanation from './explanation.mjs';
 import * as plan from './plan.mjs';
 import * as schedulingDashboard from './scheduling-dashboard.mjs';
+import {decisionRail,bindDecisionRail} from './decision-nav.mjs';
 
 export function render(root,run,onRerun,caseActions={}){
   dispose(root);
@@ -33,9 +34,7 @@ export function render(root,run,onRerun,caseActions={}){
     '<header class="dispatch-command dispatch-command-focused">'
       +'<div class="dispatch-command-title"><strong>DDA Logística</strong><span class="dispatch-status" data-case-status>'+esc(caseStatus)+'</span></div>'
       +'<div class="dispatch-actions dispatch-actions--focused">'
-        +(caseActions.onMap?'<button data-map class="dispatch-action-quiet">← Mapa</button>':'')
         +(caseActions.onApprove?'<button data-approve class="dispatch-primary-action" '+(caseActions.status==='approved'?'disabled':'')+'>'+(caseActions.status==='approved'?'✓ Decisión aprobada':'Aprobar decisión')+'</button>':'')
-        +'<button data-chat class="dispatch-ai-action">✦ Dation IA</button>'
         +'<details class="dispatch-action-menu"><summary>Acciones ···</summary><div class="dispatch-action-menu__panel">'
           +'<button data-csv>↓ '+esc(exportLabel)+' CSV</button>'
           +'<button data-json>Exportar JSON técnico</button>'
@@ -60,12 +59,14 @@ export function render(root,run,onRerun,caseActions={}){
         +'</div></details>'
       +'</div>'
     +'</header>'
+    +decisionRail(caseActions)
     +'<main class="dispatch-focus-main">'
       +'<section class="dispatch-panel dispatch-focus-hero" id="dispatch-hero"></section>'
       +'<section class="dispatch-panel dispatch-focus-assignment" id="dispatch-assignment"></section>'
       +'<section class="dispatch-panel dispatch-focus-review" id="dispatch-review"></section>'
       +'<section class="dispatch-panel dispatch-focus-ai" id="dispatch-explanation"></section>'
     +'</main>'
+    +'<button type="button" class="dispatch-ai-fab" data-chat aria-expanded="false" aria-label="Abrir Dation IA"><span>✦</span><strong>Dation IA</strong></button>'
     +'<aside class="dispatch-chat dispatch-panel" hidden aria-label="Chat de la decisión"></aside>';
 
   api('/api/system/llm-status')
@@ -97,8 +98,10 @@ export function render(root,run,onRerun,caseActions={}){
 
   function openChat(question=''){
     const aside=root.querySelector('.dispatch-chat');
+    const fab=root.querySelector('[data-chat]');
     aside.hidden=false;
     root.classList.add('with-chat');
+    fab?.setAttribute('aria-expanded','true');
     explanation.chat(aside,run,question);
   }
 
@@ -136,8 +139,7 @@ export function render(root,run,onRerun,caseActions={}){
     }
   };
   root.querySelector('[data-rerun]').onclick=onRerun;
-  const mapButton=root.querySelector('[data-map]');
-  if(mapButton)mapButton.onclick=()=>caseActions.onMap?.();
+  bindDecisionRail(root,caseActions);
   const approveButton=root.querySelector('[data-approve]');
   if(approveButton)approveButton.onclick=async()=>{
     approveButton.disabled=true;
@@ -146,12 +148,22 @@ export function render(root,run,onRerun,caseActions={}){
       approveButton.textContent='Decisión aprobada';
       const status=root.querySelector('[data-case-status]');
       if(status)status.textContent='Aprobada';
+      caseActions.onApprovalComplete?.();
     }catch(error){
       approveButton.disabled=false;
       alert(error.message);
     }
   };
-  root.querySelector('[data-chat]').onclick=()=>openChat();
+  root.querySelector('[data-chat]').onclick=()=>{
+    const aside=root.querySelector('.dispatch-chat');
+    if(!aside.hidden){
+      aside.hidden=true;
+      root.classList.remove('with-chat');
+      root.querySelector('[data-chat]')?.setAttribute('aria-expanded','false');
+      return;
+    }
+    openChat();
+  };
   root.querySelector('[data-json]').onclick=()=>download('decision-'+run.id+'.json',JSON.stringify(result,null,2));
   root.querySelector('[data-copy]').onclick=async event=>{
     try{

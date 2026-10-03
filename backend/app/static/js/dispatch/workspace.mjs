@@ -1,7 +1,7 @@
 import {esc,num,date,vehicle,api,post,errorBox} from './shared.mjs';import {rebalance} from './selectors.mjs';import {render as dashboard} from './dashboard.mjs';
-import {mountUploadScreen} from './upload/index.mjs?v=dashboard-ai-v1';
+import {mountUploadScreen} from './upload/index.mjs?v=decision-flow-v1';
 import {renderDecisionMap} from './decision-map.mjs';
-import {STATUS,createDecisionCase,replaceInputs,transitionNode,inputSignature,caseRef} from './decision-case.mjs';
+import {STATUS,createDecisionCase,replaceInputs,transitionNode,inputSignature,caseRef,deriveDecisionNodes} from './decision-case.mjs';
 const KEY='dation.dispatch.workspace.v4';
 const PRIORITY_KEYS=['trips','cost','own_fleet','co2'];
 const CORE_DIMENSIONS=['trips','own_fleet'];
@@ -162,6 +162,25 @@ function ensureDecisionCase(){
   return state.decisionCase;
 }
 function navigate(view){window.dationSetDataReady(ready());window.dationNavigate(view);}
+function nextNodeId(nodeId){
+  if(nodeId==='logistics_assignment')return 'logistics_scheduling';
+  if(nodeId==='logistics_scheduling')return 'logistics_final_assignment';
+  return null;
+}
+function unlockNextNode(nodeId){
+  const next=nextNodeId(nodeId);
+  if(!next||!state.decisionCase?.nodes?.[next])return next;
+  const current=state.decisionCase.nodes[next];
+  if(current.status!==STATUS.LOCKED&&current.status!==STATUS.NEEDS_DATA)return next;
+  const evidence=state.preflight?.decision_readiness?.decisions?.find(item=>item.id===next);
+  state.decisionCase=transitionNode(
+    state.decisionCase,
+    next,
+    evidence?.data_ready?STATUS.AVAILABLE:STATUS.NEEDS_DATA,
+    {error:null},
+  );
+  return next;
+}
 function urlRun(id,schema='assignment_v1'){const url=new URL(location.href);url.searchParams.set('run_id',id);url.searchParams.set('dda',schema);history.replaceState(null,'',url);}
 function action(b,fn){b.onclick=async()=>{b.disabled=true;try{await fn();}catch(e){alert(e.message);}finally{b.disabled=false;}};}
 async function preflight(){
@@ -234,6 +253,14 @@ async function loadDecisionMap(){
   try{
     if(!state.preflight)await preflight();
     ensureDecisionCase();
+    state.decisionCase={
+      ...state.decisionCase,
+      nodes:deriveDecisionNodes(
+        state.decisionCase,
+        state.preflight?.decision_readiness,
+      ),
+    };
+    persist();
     renderDecisionMap(node,{
       decisionCase:state.decisionCase,
       readiness:state.preflight?.decision_readiness,
@@ -891,7 +918,10 @@ export function show(run){
       )
         ?state.decisionCase.nodes?.[nodeId]?.status
         :null,
-      onMap:state.decisionCase?()=>navigate('logistics-map'):null,
+      decisionCase:state.decisionCase,
+      activeNode:nodeId,
+      onFlow:state.decisionCase?()=>navigate('logistics-map'):null,
+      onOpenNode:state.decisionCase?openCaseResult:null,
       onApprove:(
         nodeId
         &&caseMeta?.case_id
@@ -917,8 +947,20 @@ export function show(run){
               error:null,
             },
           );
+          unlockNextNode(nodeId);
           persist();
           return state.decisionCase;
+        }
+        :null,
+      onApprovalComplete:(
+        nodeId
+        &&state.decisionCase
+      )
+        ?()=>{
+          const next=unlockNextNode(nodeId);
+          if(next)state.activeNode=next;
+          persist();
+          navigate('logistics-map');
         }
         :null,
     },

@@ -56,7 +56,7 @@ function actionFor(nodeId, status) {
       || status === STATUS.APPROVED
     ) {
       return {
-        label: status === STATUS.RUNNING ? "Ver ejecución →" : "Ver decisión →",
+        label: status === STATUS.RUNNING ? "Ver ejecución →" : "Abrir análisis →",
         action: "open-result",
       };
     }
@@ -78,7 +78,7 @@ function actionFor(nodeId, status) {
       || status === STATUS.APPROVED
     ) {
       return {
-        label: status === STATUS.RUNNING ? "Ver ejecución →" : "Ver planificación →",
+        label: status === STATUS.RUNNING ? "Ver ejecución →" : "Abrir análisis →",
         action: "open-result",
       };
     }
@@ -93,6 +93,32 @@ function actionFor(nodeId, status) {
 
   if (status === STATUS.AVAILABLE) {
     return {label: "Motor en próxima fase", action: null};
+  }
+
+  return null;
+}
+
+function nextActionable(nodes) {
+  const order = [
+    "logistics_assignment",
+    "logistics_scheduling",
+    "logistics_final_assignment",
+  ];
+
+  for (const nodeId of order) {
+    const node = nodes[nodeId];
+    const action = actionFor(nodeId, node.status);
+    if (
+      node.status !== STATUS.APPROVED
+      && action?.action
+    ) {
+      return {
+        nodeId,
+        node,
+        meta: COPY[nodeId],
+        action,
+      };
+    }
   }
 
   return null;
@@ -189,14 +215,15 @@ export function renderDecisionMap(
   const approved = Object.values(nodes).filter(
     (node) => node.status === STATUS.APPROVED,
   ).length;
+  const next = nextActionable(nodes);
 
   root.className = "dispatch dispatch-decision-map";
   root.innerHTML =
     '<header class="dispatch-map-hero">'
       + '<div>'
         + '<span class="dispatch-kicker">DECISION CASE</span>'
-        + '<h1>Mapa de decisiones</h1>'
-        + '<p>La información se transforma en decisiones encadenadas. Cada nivel se habilita cuando tiene datos suficientes y la decisión anterior fue validada.</p>'
+        + '<h1>Flujo de decisiones</h1>'
+        + '<p>Continuá el caso desde acá. Podés configurar la próxima decisión disponible o volver a abrir el análisis de una decisión ya aprobada.</p>'
       + '</div>'
       + '<div class="dispatch-map-case">'
         + '<small>Caso</small>'
@@ -212,6 +239,23 @@ export function renderDecisionMap(
           + '<p>El caso anterior quedó marcado como desactualizado. Esta cadena usa las versiones de Orders y Fleet seleccionadas ahora.</p></div>'
         + '</section>'
         : ''
+    )
+    + (
+      next
+        ? '<section class="dispatch-next-step">'
+          + '<div class="dispatch-next-step__index">' + esc(next.meta.kicker) + '</div>'
+          + '<div><span class="dispatch-kicker">SIGUIENTE PASO</span>'
+          + '<h2>' + esc(next.meta.title) + '</h2>'
+          + '<p>' + esc(next.meta.question) + '</p></div>'
+          + '<button type="button" data-map-action="' + esc(next.action.action) + '" data-map-node="' + esc(next.nodeId) + '">'
+            + esc(next.action.label)
+          + '</button>'
+        + '</section>'
+        : '<section class="dispatch-next-step is-complete">'
+          + '<div class="dispatch-next-step__index">✓</div>'
+          + '<div><span class="dispatch-kicker">CASO AL DÍA</span><h2>No hay otra decisión ejecutable en esta versión</h2>'
+          + '<p>Podés volver a abrir cualquiera de las decisiones aprobadas desde las tarjetas del flujo o desde el panel de análisis.</p></div>'
+        + '</section>'
     )
     + '<section class="dispatch-map-evidence">'
       + '<div><small>Orders</small><strong>'
@@ -242,8 +286,8 @@ export function renderDecisionMap(
         )
     + '</section>'
     + '<section class="dispatch-panel dispatch-map-principle">'
-      + '<div><span class="dispatch-kicker">LÓGICA DE DESBLOQUEO</span><h2>Datos suficientes + decisión anterior aprobada</h2></div>'
-      + '<p>Completar columnas futuras no ejecuta automáticamente una decisión. Dation separa disponibilidad de datos, ejecución del motor y validación humana.</p>'
+      + '<div><span class="dispatch-kicker">CÓMO AVANZA EL CASO</span><h2>Aprobar una decisión habilita la siguiente</h2></div>'
+      + '<p>El flujo conserva las decisiones ya validadas y sólo habilita el siguiente motor cuando están disponibles sus datos y su dependencia anterior fue aprobada.</p>'
     + '</section>';
 
   root.querySelectorAll("[data-map-action]").forEach((button) => {
