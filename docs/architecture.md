@@ -39,6 +39,7 @@ La validación y la persistencia están desacopladas. Si Supabase o las migracio
 | `static/js/dispatch/upload/*` | Pantalla única de ingesta, errores, biblioteca, preflight y banner |
 | `static/js/dispatch/workspace.mjs` | Orquestación de ingesta, configuración y corrida |
 | `engines/assignment/*` | Motor activo de Assignment: packing, CP-SAT no temporal, invariantes y handoff |
+| `engines/scheduling/*` | Motor activo de Scheduling: secuencia temporal con Assignment inmutable |
 | `engines/dispatch/*` | Motor temporal Dispatch 2.2 conservado para corridas históricas |
 
 ## Persistencia y compatibilidad
@@ -63,6 +64,10 @@ Para un Decision Case nuevo, `logistics_assignment` enruta a Assignment Engine 1
 
 Fechas, transit time, SLA, tardanzas, velocidad, horas de conducción y ocupación temporal quedan fuera de Assignment y pertenecen a Scheduling. El resultado expone `handoff.schema_version=scheduling_input_v1` y `scenarios.selected.trips` como input versionado de la siguiente decisión.
 
+Scheduling Engine 1.0.0 sólo acepta una corrida `assignment_v1` aprobada del mismo Decision Case y del mismo Data Pack. Conserva exactamente viajes, `vehicle_id`, rutas, órdenes, productos, unidades y kg. CP-SAT decide únicamente fechas de salida con `NoOverlap` por vehículo físico. Cuando `delivery_due_date` está completo y habilitado, la jerarquía es: órdenes tardías → días de tardanza → espera → makespan. Sin SLA: espera → makespan.
+
+La aprobación humana de Assignment y Scheduling se persiste dentro de la metadata `decision_case` del run, de modo que el siguiente motor no dependa sólo de `sessionStorage`. La aprobación no altera el fingerprint matemático del resultado.
+
 Dispatch 2.2 permanece disponible únicamente para recuperar y explicar corridas históricas.
 
 ## Frontend
@@ -79,7 +84,7 @@ El intérprete recibe un contexto derivado del `DecisionResult`. No recalcula ni
 
 - Crear un baseline SQL reproducible cuando se disponga del DDL completo de las tablas originales.
 - Desacoplar y retirar el configurador legacy cuando las corridas históricas estén cubiertas por pruebas de navegador.
-- Incorporar ocupación real de vehículos, volumen y multiparada en una versión posterior.
+- Incorporar horas intradía, descansos regulatorios detallados, tiempos de carga/descarga, volumen y multiparada en una versión posterior.
 - Evaluar colas y aislamiento al aumentar concurrencia.
 
 
@@ -120,3 +125,20 @@ Assignment y Scheduling dejan de compartir motor.
 El preflight activo también es específico de Assignment y ya no genera hallazgos de tardanza o capacidad diaria. Decision Readiness conserva las columnas temporales para indicar si Scheduling tendrá datos suficientes una vez aprobado Assignment.
 
 Las corridas `dispatch_v1/dispatch_v2` permanecen visibles, pero no pueden aprobar un nodo Assignment nuevo.
+
+
+## Decision Chain — Fase 4
+
+Scheduling pasa a ser un motor ejecutable.
+
+**Scheduling 1.0.0**
+- schema: `scheduling_v1`;
+- input obligatorio: Assignment V1 aprobada + `scheduling_input_v1`;
+- Assignment queda inmutable;
+- usa `estimated_dispatch_date`, `available_from`, `available_until`, velocidad y horas de conducción;
+- bloquea superposición de viajes del mismo `vehicle_id`;
+- calcula salida, llegada, ciclo y próxima disponibilidad;
+- puede proteger `delivery_due_date` de forma jerárquica cuando el dato está completo;
+- handoff: `final_assignment_input_v1`.
+
+El Decision Map permite configurar, ejecutar, revisar y aprobar Scheduling. Sólo después de una Scheduling aprobada puede desbloquearse Final Assignment si su Data Readiness está completo.

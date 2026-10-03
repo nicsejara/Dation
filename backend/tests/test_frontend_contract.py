@@ -330,7 +330,7 @@ class FrontendContractTests(
             self.dashboard_stage_js,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=assignment-v1",
+            "/static/js/dispatch/workspace.mjs?v=scheduling-v1",
             self.html,
         )
         self.assertIn(
@@ -529,6 +529,113 @@ class FrontendContractTests(
         self.assertIn(
             "assignment_v1",
             workspace,
+        )
+
+    def test_scheduling_phase4_frontend_contract(self):
+        workspace = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+            / "workspace.mjs"
+        ).read_text(encoding="utf-8")
+        decision_map = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+            / "decision-map.mjs"
+        ).read_text(encoding="utf-8")
+        decision_case = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+            / "decision-case.mjs"
+        ).read_text(encoding="utf-8")
+        dashboard = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+            / "dashboard.mjs"
+        ).read_text(encoding="utf-8")
+        scheduling = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+            / "scheduling-dashboard.mjs"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn(
+            "Configurar planificación",
+            decision_map,
+        )
+        self.assertIn(
+            "async function loadSchedulingConfig()",
+            workspace,
+        )
+        self.assertIn(
+            "source_run_id",
+            workspace,
+        )
+        self.assertIn(
+            "use_delivery_due_dates",
+            workspace,
+        )
+        self.assertIn(
+            "Assignment queda congelada",
+            workspace,
+        )
+        self.assertIn(
+            "logistics_scheduling",
+            workspace,
+        )
+        self.assertIn(
+            "scheduling_v1",
+            dashboard,
+        )
+        self.assertIn(
+            "scheduling-dashboard.mjs",
+            dashboard,
+        )
+        self.assertIn(
+            "Aprobar planificación",
+            scheduling,
+        )
+        self.assertIn(
+            "planificacion-recomendada.csv",
+            scheduling,
+        )
+        self.assertIn(
+            "resource_available_again",
+            scheduling,
+        )
+        self.assertIn(
+            "CALENDARIO OPERATIVO",
+            scheduling,
+        )
+        self.assertIn(
+            "STATUS.REVIEW",
+            decision_case,
+        )
+        self.assertIn(
+            "STATUS.APPROVED",
+            decision_case,
+        )
+        self.assertIn(
+            "scheduling_v1",
+            self.app_js,
+        )
+        self.assertIn(
+            "scheduling_v1",
+            self.dashboard_stage_js,
         )
 
     def test_single_ingestion_contract(

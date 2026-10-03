@@ -1,5 +1,5 @@
 import {esc,num,date,vehicle,api,post,errorBox} from './shared.mjs';import {rebalance} from './selectors.mjs';import {render as dashboard} from './dashboard.mjs';
-import {mountUploadScreen} from './upload/index.mjs?v=assignment-v1';
+import {mountUploadScreen} from './upload/index.mjs?v=scheduling-v1';
 import {renderDecisionMap} from './decision-map.mjs';
 import {STATUS,createDecisionCase,replaceInputs,transitionNode,inputSignature,caseRef} from './decision-case.mjs';
 const KEY='dation.dispatch.workspace.v4';
@@ -84,6 +84,8 @@ const state={
   decisions:saved.decisions||{},
   configured:Boolean(saved.configured),
   decisionCase:saved.decisionCase||null,
+  activeNode:saved.activeNode||'logistics_assignment',
+  schedulingUseDueDates:saved.schedulingUseDueDates??true,
   preflight:null,
   available:false,
   run:null,
@@ -93,10 +95,18 @@ state.weights=state.objective==='custom'
   ?normalizeWeights(state.weights,state.dimensions)
   :presetWeights(state.objective,state.dimensions);
 let timer=null,pollGeneration=0;const roots={};
-function persist(){try{sessionStorage.setItem(KEY,JSON.stringify({orders:state.orders,fleet:state.fleet,dimensions:state.dimensions,weights:state.weights,objective:state.objective,analysisDepth:state.analysisDepth,allow:state.allow,decisions:state.decisions,configured:state.configured,decisionCase:state.decisionCase}));}catch{}}
+function persist(){try{sessionStorage.setItem(KEY,JSON.stringify({orders:state.orders,fleet:state.fleet,dimensions:state.dimensions,weights:state.weights,objective:state.objective,analysisDepth:state.analysisDepth,allow:state.allow,decisions:state.decisions,configured:state.configured,decisionCase:state.decisionCase,activeNode:state.activeNode,schedulingUseDueDates:state.schedulingUseDueDates}));}catch{}}
 function root(view,id){const parent=document.querySelector('[data-view-panel="'+view+'"]');let node=document.getElementById(id);if(!node){node=document.createElement('div');node.id=id;node.className='dispatch';parent.append(node);}return node;}
 function assignmentEvidence(){
   return state.preflight?.decision_readiness?.decisions?.find(item=>item.id==='logistics_assignment')||null;
+}
+function schedulingEvidence(){
+  return state.preflight?.decision_readiness?.decisions?.find(item=>item.id==='logistics_scheduling')||null;
+}
+function schedulingSlaAvailable(){
+  return Boolean(
+    schedulingEvidence()?.capabilities?.find(item=>item.id==='sla')?.available
+  );
 }
 function assignmentCapabilities(){
   return Object.fromEntries(
@@ -145,6 +155,8 @@ function ensureDecisionCase(){
     state.dimensions=[...CORE_DIMENSIONS];
     state.objective='balanced';
     state.weights=balancedWeights(state.dimensions);
+    state.activeNode='logistics_assignment';
+    state.schedulingUseDueDates=true;
   }
   persist();
   return state.decisionCase;
@@ -177,9 +189,11 @@ async function loadData() {
     },
   );
 }
-async function openCaseResult(){
-  const runId=state.decisionCase?.nodes?.logistics_assignment?.run_id;
+async function openCaseResult(nodeId='logistics_assignment'){
+  const runId=state.decisionCase?.nodes?.[nodeId]?.run_id;
   if(!runId)return;
+  state.activeNode=nodeId;
+  persist();
   try{
     const run=state.run?.id===runId
       ?state.run
@@ -192,13 +206,13 @@ async function openCaseResult(){
       pending('Recuperando el estado de la ejecución…');
       navigate('decision-dashboard');
       clearTimeout(timer);
-      poll(runId,++pollGeneration);
+      poll(runId,++pollGeneration,nodeId);
       return;
     }
     if(run.status==='error'){
       state.decisionCase=transitionNode(
         state.decisionCase,
-        'logistics_assignment',
+        nodeId,
         STATUS.ERROR,
         {run_id:runId,error:run.error_message||'La ejecución terminó con error.'},
       );
@@ -225,7 +239,11 @@ async function loadDecisionMap(){
       readiness:state.preflight?.decision_readiness,
       orders:state.orders,
       fleet:state.fleet,
-      onConfigure:()=>navigate('logistics-config'),
+      onConfigure:(nodeId)=>{
+        state.activeNode=nodeId||'logistics_assignment';
+        persist();
+        navigate('logistics-config');
+      },
       onOpenResult:openCaseResult,
       onData:()=>navigate('logistics-data'),
     });
@@ -241,7 +259,127 @@ function configuration(){const config={mode:state.objective==='custom'?'custom':
 function activeDimensionText(){return state.dimensions.map(k=>DIMENSION_LABELS[k]).join(' · ');}
 function decisionSummary(){return `${OBJECTIVE_LABELS[state.objective]} · ${state.dimensions.length} dimensión${state.dimensions.length===1?'':'es'} · análisis ${DEPTH_LABELS[state.analysisDepth].toLowerCase()}`;}
 
+
+async function ensurePersistedApproval(nodeId){
+  const node=state.decisionCase?.nodes?.[nodeId];
+  if(!node?.run_id||node.status!==STATUS.APPROVED)return null;
+  const run=await api('/api/runs/'+node.run_id);
+  const meta=run.result_json?.decision_case||{};
+  if(meta.status==='approved'&&meta.approved_at)return run;
+  return await post('/api/runs/'+node.run_id+'/approve',{
+    case_id:state.decisionCase.id,
+    node_id:nodeId,
+  });
+}
+
+async function loadSchedulingConfig(){
+  const node=roots.config;
+  if(!state.orders||!state.fleet){
+    node.innerHTML='<h1>Configurar Planificación</h1><p>Primero seleccioná Orders y Fleet.</p><button data-back>Ir al Data Pack</button>';
+    node.querySelector('[data-back]').onclick=()=>navigate('logistics-data');
+    return;
+  }
+
+  if(!state.preflight){
+    try{await preflight();}catch(error){errorBox(node,error,loadSchedulingConfig);return;}
+  }
+
+  const scheduling=schedulingEvidence();
+  const assignmentNode=state.decisionCase?.nodes?.logistics_assignment;
+  if(assignmentNode?.status!==STATUS.APPROVED){
+    node.innerHTML='<section class="dispatch-panel"><span class="dispatch-kicker">DECISIÓN 02 · PLANIFICACIÓN</span><h1>Scheduling todavía está bloqueado</h1><p>Primero aprobá Assignment para fijar qué viajes y vehículos puede programar este motor.</p><button data-map>Volver al mapa</button></section>';
+    node.querySelector('[data-map]').onclick=()=>navigate('logistics-map');
+    return;
+  }
+  if(!scheduling?.data_ready){
+    const missing=(scheduling?.missing||[]).map(item=>item.label).join(' · ');
+    node.innerHTML='<section class="dispatch-panel"><span class="dispatch-kicker">DECISIÓN 02 · PLANIFICACIÓN</span><h1>Faltan datos temporales</h1><p>Scheduling necesita completar: '+esc(missing||'datos de planificación')+'.</p><button data-data>Completar Data Pack</button><button data-map>Volver al mapa</button></section>';
+    node.querySelector('[data-data]').onclick=()=>navigate('logistics-data');
+    node.querySelector('[data-map]').onclick=()=>navigate('logistics-map');
+    return;
+  }
+
+  let sourceRun;
+  try{
+    sourceRun=await ensurePersistedApproval('logistics_assignment');
+  }catch(error){
+    errorBox(node,error,loadSchedulingConfig);
+    return;
+  }
+  if(!sourceRun?.result_json){
+    errorBox(node,new Error('No se pudo recuperar Assignment aprobada.'),loadSchedulingConfig);
+    return;
+  }
+
+  const assignment=sourceRun.result_json;
+  const assignmentMetrics=assignment.scenarios?.selected?.metrics||{};
+  const slaAvailable=schedulingSlaAvailable();
+  if(!slaAvailable)state.schedulingUseDueDates=false;
+
+  node.innerHTML=`
+    <div class="dispatch-config-screen dispatch-scheduling-config">
+      <header class="dispatch-config-heading">
+        <span class="dispatch-kicker">DECISIÓN 02 · PLANIFICACIÓN</span>
+        <h1>Configurar Scheduling</h1>
+        <p>Programá en el tiempo los viajes aprobados. Scheduling no puede cambiar vehículos, cargas ni cantidades definidos en Assignment.</p>
+      </header>
+
+      <section class="dispatch-evidence-card">
+        <div><span class="dispatch-config-eyebrow">Assignment aprobada</span><strong>${num(assignmentMetrics.total_trips||0)} viajes</strong><small>Corrida ${esc(String(sourceRun.id).slice(0,8))}…</small></div>
+        <div><span class="dispatch-config-eyebrow">Vehículos</span><strong>${num(assignmentMetrics.vehicles_used||0)} recursos</strong><small>Asignación bloqueada para esta decisión</small></div>
+        <button data-map>Volver al mapa</button>
+      </section>
+
+      <section class="dispatch-panel dispatch-config-section">
+        <div class="dispatch-config-section-head"><span class="dispatch-config-step">01</span><div><h2>Reglas temporales</h2><p>Estas reglas se aplican automáticamente a cada viaje aprobado.</p></div></div>
+        <div class="dispatch-scheduling-rules">
+          <article><strong>Fecha mínima de salida</strong><p>La más tardía entre las órdenes cargadas y available_from del vehículo.</p></article>
+          <article><strong>Duración del viaje</strong><p>Se calcula con distancia, velocidad media y horas de conducción por día.</p></article>
+          <article><strong>Ocupación del vehículo</strong><p>El recurso queda ocupado hasta completar ida, entrega y retorno a su base.</p></article>
+          <article><strong>Asignación inmutable</strong><p>Vehicle ID, órdenes, productos y cantidades vienen aprobados desde Assignment.</p></article>
+        </div>
+      </section>
+
+      <section class="dispatch-panel dispatch-config-section">
+        <div class="dispatch-config-section-head"><span class="dispatch-config-step">02</span><div><h2>Prioridad del calendario</h2><p>Scheduling usa una jerarquía explícita para ordenar viajes que compiten por el mismo vehículo.</p></div></div>
+        <div class="dispatch-schedule-priority">
+          ${slaAvailable
+            ?'<ol><li><strong>1. Minimizar órdenes fuera de fecha objetivo</strong><small>delivery_due_date domina el resto del objetivo.</small></li><li><strong>2. Minimizar días totales de tardanza</strong></li><li><strong>3. Minimizar espera desde ready date</strong></li><li><strong>4. Compactar el calendario</strong></li></ol>'
+            :'<ol><li><strong>1. Minimizar espera desde ready date</strong></li><li><strong>2. Compactar el calendario</strong></li></ol>'}
+        </div>
+        <label class="dispatch-policy-row ${slaAvailable?'':'is-unavailable'}"><div><strong>Considerar fecha objetivo de entrega</strong><small>${slaAvailable?'Usa delivery_due_date para proteger el nivel de servicio.':'No disponible: delivery_due_date no está completo en Orders.'}</small></div><input type="checkbox" data-sla ${state.schedulingUseDueDates&&slaAvailable?'checked':''} ${slaAvailable?'':'disabled'}><span class="dispatch-toggle" aria-hidden="true"></span></label>
+      </section>
+
+      <section class="dispatch-panel dispatch-config-section">
+        <div class="dispatch-config-section-head"><span class="dispatch-config-step">03</span><div><h2>Qué no puede cambiar</h2><p>Esta separación protege la trazabilidad entre decisiones.</p></div></div>
+        <div class="dispatch-assignment-boundary"><span aria-hidden="true">✓</span><div><strong>Assignment queda congelada</strong><p>Scheduling sólo agrega dispatch_date, arrival_date, cycle_days y resource_available_again sobre los viajes aprobados.</p></div></div>
+      </section>
+
+      <footer class="dispatch-footer dispatch-config-footer"><div><span class="dispatch-config-eyebrow">Scheduling listo para ejecutar</span><strong>${slaAvailable&&state.schedulingUseDueDates?'SLA → tardanza → espera → calendario':'Espera → calendario'}</strong><small>${num(assignmentMetrics.total_trips||0)} viajes fijos · ${num(assignmentMetrics.vehicles_used||0)} vehículos</small></div><button data-review>Revisar y ejecutar →</button></footer>
+
+      <dialog class="dispatch dispatch-review"><form method="dialog"><span class="dispatch-config-eyebrow">Antes de ejecutar</span><h2>Revisar Scheduling</h2><div class="dispatch-review-summary"><p><strong>Input</strong><span>${num(assignmentMetrics.total_trips||0)} viajes de Assignment aprobada</span></p><p><strong>Asignación</strong><span>No se puede modificar</span></p><p><strong>SLA</strong><span>${slaAvailable&&state.schedulingUseDueDates?'Activo':'No participa'}</span></p><p><strong>Objetivo</strong><span>${slaAvailable&&state.schedulingUseDueDates?'Servicio primero':'Salida temprana'}</span></p></div><p>Motor Scheduling 1.0.0 · secuencia temporal por vehículo físico.</p><div class="dispatch-actions"><button value="cancel">Volver</button><button type="button" data-execute>Generar planificación</button></div></form></dialog>
+    </div>`;
+
+  node.querySelector('[data-map]').onclick=()=>navigate('logistics-map');
+  const sla=node.querySelector('[data-sla]');
+  if(sla)sla.onchange=()=>{
+    state.schedulingUseDueDates=sla.checked;
+    persist();
+    loadSchedulingConfig();
+  };
+  const modal=node.querySelector('dialog');
+  node.querySelector('[data-review]').onclick=()=>modal.showModal();
+  node.querySelector('[data-execute]').onclick=()=>{
+    modal.close();
+    executeScheduling(sourceRun.id);
+  };
+  persist();
+}
+
 async function loadConfig(){
+  if(state.activeNode==='logistics_scheduling'){
+    return loadSchedulingConfig();
+  }
   const node=roots.config;
   if(!state.orders||!state.fleet){
     node.innerHTML='<h1>Configurar Assignment</h1><p>Primero seleccioná Orders y Fleet.</p><button data-back>Ir al Data Pack</button>';
@@ -485,7 +623,7 @@ async function loadConfig(){
   sync();
 }
 function pending(message){document.body.classList.add('dispatch-result');roots.dashboard.innerHTML=`<section class="dispatch-panel"><h1>Preparando tu decisión</h1><p role="status">${esc(message)}</p><div class="dispatch-loading" aria-label="Procesando"></div><p>El Decision Case conserva el estado real de esta ejecución.</p><button data-return>Volver al mapa</button></section>`;roots.dashboard.querySelector('[data-return]').onclick=()=>navigate('logistics-map');}
-async function poll(id,generation){
+async function poll(id,generation,nodeId=state.activeNode){
   if(generation!==pollGeneration)return;
   try{
     const run=await api('/api/runs/'+id);
@@ -495,10 +633,10 @@ async function poll(id,generation){
       return;
     }
     if(run.status==='error'){
-      if(state.decisionCase?.nodes?.logistics_assignment?.run_id===id){
+      if(state.decisionCase?.nodes?.[nodeId]?.run_id===id){
         state.decisionCase=transitionNode(
           state.decisionCase,
-          'logistics_assignment',
+          nodeId,
           STATUS.ERROR,
           {run_id:id,error:run.error_message||'La corrida no pudo completarse.'},
         );
@@ -507,25 +645,33 @@ async function poll(id,generation){
       throw new Error(run.error_message||'La corrida no pudo completarse.');
     }
     const stage=run.progress_json?.stage||'validating';
-    const names={
+    const assignmentNames={
       validating:'Validando Orders y Fleet',
       constructing:'Construyendo alternativas de carga',
       baseline:'Preparando referencia histórica',
       sensitivity:'Comparando objetivos',
       summarizing:'Preparando la asignación recomendada',
     };
+    const schedulingNames={
+      validating:'Validando Assignment y evidencia temporal',
+      constructing:'Construyendo secuencia temporal',
+      summarizing:'Preparando la planificación recomendada',
+    };
+    const names=nodeId==='logistics_scheduling'?schedulingNames:assignmentNames;
     pending(
       stage.startsWith('optimizing:')
-        ?'Optimizando la distribución de carga'
-        :(names[stage]||'Evaluando alternativas de asignación')
+        ?(nodeId==='logistics_scheduling'
+          ?'Optimizando secuencia y nivel de servicio'
+          :'Optimizando la distribución de carga')
+        :(names[stage]||'Evaluando la decisión')
     );
   }catch(e){
     if(e.status!==404){
-      errorBox(roots.dashboard,e,()=>poll(id,generation));
+      errorBox(roots.dashboard,e,()=>poll(id,generation,nodeId));
       return;
     }
   }
-  timer=setTimeout(()=>poll(id,generation),1500);
+  timer=setTimeout(()=>poll(id,generation,nodeId),1500);
 }
 async function execute(){
   const decisionCase=ensureDecisionCase();
@@ -542,7 +688,7 @@ async function execute(){
   navigate('decision-dashboard');
   const generation=++pollGeneration;
   clearTimeout(timer);
-  timer=setTimeout(()=>poll(id,generation),1000);
+  timer=setTimeout(()=>poll(id,generation,'logistics_assignment'),1000);
   try{
     const run=await post('/api/runs?run_id='+id,{
       orders_dataset_id:state.orders.id,
@@ -572,15 +718,65 @@ async function execute(){
   }
 }
 
+async function executeScheduling(sourceRunId){
+  const decisionCase=ensureDecisionCase();
+  const id=crypto.randomUUID();
+  state.activeNode='logistics_scheduling';
+  state.decisionCase=transitionNode(
+    decisionCase,
+    'logistics_scheduling',
+    STATUS.RUNNING,
+    {run_id:id,error:null},
+  );
+  persist();
+  urlRun(id,'scheduling_v1');
+  pending('Registrando la planificación…');
+  navigate('decision-dashboard');
+  const generation=++pollGeneration;
+  clearTimeout(timer);
+  timer=setTimeout(()=>poll(id,generation,'logistics_scheduling'),1000);
+  try{
+    const run=await post('/api/runs?run_id='+id,{
+      orders_dataset_id:state.orders.id,
+      fleet_dataset_id:state.fleet.id,
+      source_run_id:sourceRunId,
+      configuration:{
+        strategy:'service_first',
+        use_delivery_due_dates:Boolean(state.schedulingUseDueDates),
+      },
+      options:{},
+      decision_case:caseRef(state.decisionCase,'logistics_scheduling'),
+    });
+    if(generation===pollGeneration)show(run);
+  }catch(e){
+    if(generation!==pollGeneration)return;
+    clearTimeout(timer);
+    state.decisionCase=transitionNode(
+      state.decisionCase,
+      'logistics_scheduling',
+      STATUS.ERROR,
+      {run_id:id,error:e.message},
+    );
+    persist();
+    errorBox(roots.dashboard,e,()=>poll(id,generation,'logistics_scheduling'));
+  }
+}
+
+
 export function show(run){
   clearTimeout(timer);
   pollGeneration++;
   state.run=run;
   const r=run.result_json;
-  const isAssignmentRun=r?.schema_version==='assignment_v1';
+  const schema=r?.schema_version;
+  const isAssignmentRun=schema==='assignment_v1';
+  const isSchedulingRun=schema==='scheduling_v1';
   const caseMeta=r?.decision_case;
+  const nodeId=isSchedulingRun
+    ?'logistics_scheduling'
+    :(isAssignmentRun?'logistics_assignment':null);
 
-  if(isAssignmentRun&&caseMeta?.case_id){
+  if(nodeId&&caseMeta?.case_id){
     if(!state.decisionCase||state.decisionCase.id!==caseMeta.case_id){
       state.decisionCase=createDecisionCase(
         caseMeta.case_id,
@@ -589,22 +785,40 @@ export function show(run){
         run.created_at,
       );
     }
-    if(
-      state.decisionCase?.nodes?.logistics_assignment?.status
-      !==STATUS.APPROVED
-    ){
-      state.decisionCase=transitionNode(
-        state.decisionCase,
-        'logistics_assignment',
-        STATUS.REVIEW,
-        {run_id:run.id,error:null},
-      );
+
+    if(isSchedulingRun){
+      const sourceRunId=r.inputs?.assignment?.run_id;
+      if(sourceRunId){
+        state.decisionCase=transitionNode(
+          state.decisionCase,
+          'logistics_assignment',
+          STATUS.APPROVED,
+          {
+            run_id:sourceRunId,
+            approved_at:r.inputs?.assignment?.approved_at||state.decisionCase.nodes?.logistics_assignment?.approved_at||run.created_at,
+            error:null,
+          },
+        );
+      }
     }
+
+    const persistedApproved=caseMeta.status==='approved'&&caseMeta.approved_at;
+    state.decisionCase=transitionNode(
+      state.decisionCase,
+      nodeId,
+      persistedApproved?STATUS.APPROVED:STATUS.REVIEW,
+      {
+        run_id:run.id,
+        approved_at:persistedApproved?caseMeta.approved_at:null,
+        error:null,
+      },
+    );
+    state.activeNode=nodeId;
   }
 
   persist();
   document.body.classList.add('dispatch-result');
-  urlRun(run.id,r?.schema_version||'assignment_v1');
+  urlRun(run.id,schema||'assignment_v1');
   window.dationSetDashboardReady(true);
 
   dashboard(
@@ -613,7 +827,12 @@ export function show(run){
     async()=>{
       const config=r.configuration||{};
       const options=config.options||{};
-      if(isAssignmentRun){
+
+      if(isSchedulingRun){
+        state.activeNode='logistics_scheduling';
+        state.schedulingUseDueDates=config.use_delivery_due_dates??true;
+      }else if(isAssignmentRun){
+        state.activeNode='logistics_assignment';
         const dims=Array.isArray(config.dimensions)
           ?PRIORITY_KEYS.filter(key=>config.dimensions.includes(key))
           :[...CORE_DIMENSIONS];
@@ -639,6 +858,7 @@ export function show(run){
         state.decisions=options.anomaly_decisions||{};
         state.configured=true;
       }else{
+        state.activeNode='logistics_assignment';
         state.dimensions=[...CORE_DIMENSIONS];
         state.objective='balanced';
         state.weights=balancedWeights(state.dimensions);
@@ -665,26 +885,35 @@ export function show(run){
     },
     {
       status:(
-        isAssignmentRun
+        nodeId
         &&caseMeta?.case_id
         &&state.decisionCase?.id===caseMeta.case_id
       )
-        ?state.decisionCase.nodes?.logistics_assignment?.status
+        ?state.decisionCase.nodes?.[nodeId]?.status
         :null,
       onMap:state.decisionCase?()=>navigate('logistics-map'):null,
       onApprove:(
-        isAssignmentRun
+        nodeId
         &&caseMeta?.case_id
         &&state.decisionCase?.id===caseMeta.case_id
       )
-        ?()=>{
+        ?async()=>{
+          const approved=await post(
+            '/api/runs/'+run.id+'/approve',
+            {
+              case_id:state.decisionCase.id,
+              node_id:nodeId,
+            },
+          );
+          const approvedAt=approved.result_json?.decision_case?.approved_at||new Date().toISOString();
+          state.run=approved;
           state.decisionCase=transitionNode(
             state.decisionCase,
-            'logistics_assignment',
+            nodeId,
             STATUS.APPROVED,
             {
               run_id:run.id,
-              approved_at:new Date().toISOString(),
+              approved_at:approvedAt,
               error:null,
             },
           );
@@ -699,5 +928,5 @@ export function show(run){
 for(const [key,view]of [['data','logistics-data'],['map','logistics-map'],['config','logistics-config'],['dashboard','decision-dashboard']])roots[key]=root(view,'dispatch-'+key+'-root');
 window.DationDispatch={show,isReady:ready};document.body.classList.add('dispatch-enabled');
 window.addEventListener('dation:view',e=>{const view=e.detail.view;if(view==='logistics-data'){roots.data.hidden=false;document.body.classList.add('dispatch-enabled');loadData();}if(view==='logistics-map'&&document.body.classList.contains('dispatch-enabled')){roots.map.hidden=false;loadDecisionMap();}if(view==='logistics-config'&&document.body.classList.contains('dispatch-enabled')){roots.config.hidden=false;loadConfig();}});
-const query=new URLSearchParams(location.search);if(['assignment_v1','dispatch_v1','dispatch_v2'].includes(query.get('dda'))&&query.get('run_id')){pending('Recuperando la corrida…');navigate('decision-dashboard');poll(query.get('run_id'),++pollGeneration);}
+const query=new URLSearchParams(location.search);if(['assignment_v1','scheduling_v1','dispatch_v1','dispatch_v2'].includes(query.get('dda'))&&query.get('run_id')){const queryNode=query.get('dda')==='scheduling_v1'?'logistics_scheduling':'logistics_assignment';state.activeNode=queryNode;pending('Recuperando la corrida…');navigate('decision-dashboard');poll(query.get('run_id'),++pollGeneration,queryNode);}
 if(window.dationGetCurrentView?.()==='logistics-data')loadData();if(window.dationGetCurrentView?.()==='logistics-map')loadDecisionMap();

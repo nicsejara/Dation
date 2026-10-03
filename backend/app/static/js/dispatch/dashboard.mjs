@@ -4,10 +4,19 @@ import * as assignment from './assignment.mjs';
 import * as review from './review.mjs';
 import * as explanation from './explanation.mjs';
 import * as plan from './plan.mjs';
+import * as schedulingDashboard from './scheduling-dashboard.mjs';
 
 export function render(root,run,onRerun,caseActions={}){
   dispose(root);
   const result=run.result_json;
+  if(result?.schema_version==='scheduling_v1'){
+    return schedulingDashboard.render(
+      root,
+      run,
+      onRerun,
+      caseActions,
+    );
+  }
   const metrics=result.scenarios.selected.metrics;
   const statusLabels={
     running:'Procesando',
@@ -106,12 +115,17 @@ export function render(root,run,onRerun,caseActions={}){
   const mapButton=root.querySelector('[data-map]');
   if(mapButton)mapButton.onclick=()=>caseActions.onMap?.();
   const approveButton=root.querySelector('[data-approve]');
-  if(approveButton)approveButton.onclick=()=>{
-    caseActions.onApprove?.();
+  if(approveButton)approveButton.onclick=async()=>{
     approveButton.disabled=true;
-    approveButton.textContent='Decisión aprobada';
-    const status=root.querySelector('[data-case-status]');
-    if(status)status.textContent='Aprobada';
+    try{
+      await caseActions.onApprove?.();
+      approveButton.textContent='Decisión aprobada';
+      const status=root.querySelector('[data-case-status]');
+      if(status)status.textContent='Aprobada';
+    }catch(error){
+      approveButton.disabled=false;
+      alert(error.message);
+    }
   };
   root.querySelector('[data-chat]').onclick=()=>openChat();
   root.querySelector('[data-json]').onclick=()=>download('decision-'+run.id+'.json',JSON.stringify(result,null,2));

@@ -151,21 +151,37 @@ export function deriveDecisionNodes(current, readiness) {
 
   const scheduling = nodes.logistics_scheduling;
   const schedulingEvidence = evidence.logistics_scheduling;
-  if (assignment.status === STATUS.APPROVED) {
+  if (
+    assignment.status === STATUS.APPROVED
+    && ![
+      STATUS.RUNNING,
+      STATUS.REVIEW,
+      STATUS.APPROVED,
+      STATUS.ERROR,
+    ].includes(scheduling.status)
+  ) {
     scheduling.status = schedulingEvidence?.data_ready
       ? STATUS.AVAILABLE
       : STATUS.NEEDS_DATA;
-  } else {
+  } else if (assignment.status !== STATUS.APPROVED) {
     scheduling.status = STATUS.LOCKED;
   }
 
   const finalAssignment = nodes.logistics_final_assignment;
   const finalEvidence = evidence.logistics_final_assignment;
-  if (scheduling.status === STATUS.APPROVED) {
+  if (
+    scheduling.status === STATUS.APPROVED
+    && ![
+      STATUS.RUNNING,
+      STATUS.REVIEW,
+      STATUS.APPROVED,
+      STATUS.ERROR,
+    ].includes(finalAssignment.status)
+  ) {
     finalAssignment.status = finalEvidence?.data_ready
       ? STATUS.AVAILABLE
       : STATUS.NEEDS_DATA;
-  } else {
+  } else if (scheduling.status !== STATUS.APPROVED) {
     finalAssignment.status = STATUS.LOCKED;
   }
 

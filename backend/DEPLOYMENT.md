@@ -1,6 +1,6 @@
-# Despliegue de Assignment 1.0.0 + compatibilidad Dispatch
+# Despliegue de Assignment 1.0.0 + Scheduling 1.0.0
 
-API esperada: **1.0.0**. Motor Assignment activo: **1.0.0** (`assignment_v1`). Motor Dispatch histórico: **2.2.0** (`dispatch_v2`). Motor histórico anterior: **0.2.0**. Runtime: Python **3.13**, OR-Tools **9.15.6755**.
+API esperada: **1.0.0**. Motor Assignment activo: **1.0.0** (`assignment_v1`). Motor Scheduling activo: **1.0.0** (`scheduling_v1`). Motor Dispatch histórico: **2.2.0** (`dispatch_v2`). Motor histórico anterior: **0.2.0**. Runtime: Python **3.13**, OR-Tools **9.15.6755**.
 
 ## Activación manual en Supabase
 
@@ -192,5 +192,56 @@ Después del deploy verificar:
 8. El dashboard debe mostrar vehículo → viajes → productos, sin calendario ni SLA.
 9. El CSV exportado debe llamarse `assignment-recomendada.csv` y no contener columnas temporales.
 10. Una corrida histórica `dispatch_v2` debe seguir abriendo, pero no debe aprobar el Assignment del caso activo.
+
+El deploy sólo se considera validado después de ejecutar este smoke test contra la revisión de Cloud Run que esté recibiendo tráfico.
+
+
+## Smoke test — Scheduling Engine Phase 4
+
+Fase 4 no agrega tablas ni columnas nuevas. Las aprobaciones se persisten dentro de los JSON existentes de `decision_runs`.
+
+Después del deploy verificar:
+
+1. Usar un Data Pack V3 con:
+   - `estimated_dispatch_date`;
+   - `avg_speed_kmh`;
+   - `driving_hours_per_day`;
+   - `status`;
+   - `available_from`;
+   - opcionalmente `available_until` y `delivery_due_date`.
+2. Ejecutar y aprobar Assignment.
+3. Confirmar que el run Assignment persista:
+   - `decision_case.status=approved`;
+   - `approved_at`;
+   - `handoff.schema_version=scheduling_input_v1`.
+4. Volver al Mapa de decisiones. Scheduling debe aparecer `AVAILABLE` cuando su Data Readiness esté completo.
+5. Ejecutar Scheduling:
+   - `schema_version=scheduling_v1`;
+   - `engine_name=logistics-scheduling-engine`;
+   - `engine_version=1.0.0`;
+   - `inputs.assignment.run_id` apunta a la Assignment aprobada.
+6. Comparar Assignment vs Scheduling y verificar que sean idénticos:
+   - trip IDs;
+   - vehicle IDs;
+   - rutas;
+   - órdenes;
+   - productos;
+   - unidades y kg.
+7. Para cada vehículo, verificar que ningún `dispatch_date` ocurra antes de `resource_available_again` del viaje anterior.
+8. Verificar que ninguna salida sea anterior al ready date de su carga ni a `available_from`.
+9. Si `available_until` está informado, todo el ciclo debe quedar dentro de la ventana.
+10. Con `delivery_due_date` completo:
+    - el dashboard muestra on-time/tardanza;
+    - una excepción inevitable queda visible y no invalida un calendario físicamente factible.
+11. Sin `delivery_due_date` completo:
+    - Scheduling sigue funcionando;
+    - la UI no presenta cumplimiento de SLA como optimizado.
+12. El dashboard debe mostrar calendario operativo, secuencia por vehículo, espera y makespan.
+13. El CSV debe llamarse `planificacion-recomendada.csv`.
+14. Aprobar Scheduling:
+    - persiste `decision_case.status=approved`;
+    - Final Assignment se desbloquea sólo si además está data-ready;
+    - el handoff es `final_assignment_input_v1`.
+15. Recargar la página y abrir el run de Scheduling. Las aprobaciones de Assignment/Scheduling deben reconstruirse desde evidencia persistida, no sólo desde sessionStorage.
 
 El deploy sólo se considera validado después de ejecutar este smoke test contra la revisión de Cloud Run que esté recibiendo tráfico.

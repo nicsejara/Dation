@@ -83,6 +83,100 @@ class DispatchHTTPTests(unittest.IsolatedAsyncioTestCase):
         )
         self.assertEqual(invalid.status_code,422)
 
+    async def test_scheduling_run_requires_assignment_source(self):
+        app.dependency_overrides[require_upload_access]=lambda:'dation'
+        case_id='00000000-0000-4000-8000-000000000097'
+        missing=await self.client.post(
+            '/api/runs',
+            json={
+                'orders_dataset_id':O,
+                'fleet_dataset_id':F,
+                'decision_case':{
+                    'case_id':case_id,
+                    'node_id':'logistics_scheduling',
+                },
+            },
+        )
+        self.assertEqual(missing.status_code,422)
+
+        with patch.object(
+            dispatch_service,
+            'available',
+            AsyncMock(return_value=True),
+        ), patch.object(
+            dispatch_service,
+            'execute',
+            AsyncMock(return_value={'id':O,'status':'completed'}),
+        ) as execute:
+            response=await self.client.post(
+                '/api/runs?run_id='+O,
+                json={
+                    'orders_dataset_id':O,
+                    'fleet_dataset_id':F,
+                    'source_run_id':O,
+                    'configuration':{
+                        'strategy':'service_first',
+                        'use_delivery_due_dates':True,
+                    },
+                    'decision_case':{
+                        'case_id':case_id,
+                        'node_id':'logistics_scheduling',
+                    },
+                },
+            )
+            self.assertEqual(response.status_code,200)
+            self.assertEqual(
+                execute.call_args.args[2]['strategy'],
+                'service_first',
+            )
+            self.assertTrue(
+                execute.call_args.args[2]['use_delivery_due_dates']
+            )
+            self.assertEqual(
+                execute.call_args.args[5],
+                {
+                    'case_id':case_id,
+                    'node_id':'logistics_scheduling',
+                },
+            )
+            self.assertEqual(
+                execute.call_args.args[6],
+                O,
+            )
+
+    async def test_decision_approval_endpoint(self):
+        app.dependency_overrides[require_upload_access]=lambda:'dation'
+        case_id='00000000-0000-4000-8000-000000000096'
+        approved={
+            'id':O,
+            'status':'completed',
+            'result_json':{
+                'decision_case':{
+                    'case_id':case_id,
+                    'node_id':'logistics_assignment',
+                    'status':'approved',
+                },
+            },
+        }
+        with patch.object(
+            dispatch_service,
+            'approve_decision_run',
+            AsyncMock(return_value=approved),
+        ) as approve:
+            response=await self.client.post(
+                '/api/runs/'+O+'/approve',
+                json={
+                    'case_id':case_id,
+                    'node_id':'logistics_assignment',
+                },
+            )
+            self.assertEqual(response.status_code,200)
+            approve.assert_awaited_once_with(
+                O,
+                case_id=case_id,
+                node_id='logistics_assignment',
+            )
+
     async def test_run_accepts_decision_case_lineage(self):
         app.dependency_overrides[require_upload_access]=lambda:'dation'
         case_id='00000000-0000-4000-8000-000000000099'

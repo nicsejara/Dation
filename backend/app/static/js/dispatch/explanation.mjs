@@ -26,8 +26,14 @@ export function render(root,run){
   const outsourced=result.scenarios.selected.metrics.outsourced_weight_share||0;
   const late=result.scenarios.selected.metrics.late_orders||0;
   const isAssignment=result.schema_version==='assignment_v1';
+  const isScheduling=result.schema_version==='scheduling_v1';
 
-  const questions=(isAssignment?[
+  const questions=(isScheduling?[
+    '¿Por qué este viaje sale en esa fecha?',
+    '¿Qué vehículo tiene la secuencia más ajustada?',
+    ...(late?['¿Qué órdenes fuera de fecha objetivo debería revisar primero?']:[]),
+    '¿Qué parte de esta planificación proviene de Assignment?',
+  ]:isAssignment?[
     '¿Por qué algunos vehículos reciben más carga que otros?',
     ...(outsourced?['¿Por qué se utiliza flota tercerizada?']:[]),
     '¿Qué productos lleva cada vehículo?',
@@ -43,7 +49,7 @@ export function render(root,run){
     '<div class="dispatch-section-heading">'
       +'<div><span class="dispatch-kicker">DATION IA</span><h2>Explicar la decisión</h2>'
       +'<p>La IA interpreta el resultado ya calculado. No reasigna camiones, no recalcula el optimizador y no inventa un ahorro contra una operación histórica.</p></div>'
-      +'<button data-explain>'+(isAssignment?'Explicar esta asignación':'Explicar esta distribución')+'</button>'
+      +'<button data-explain>'+(isScheduling?'Explicar esta planificación':(isAssignment?'Explicar esta asignación':'Explicar esta distribución'))+'</button>'
     +'</div>'
     +'<div class="dispatch-ai-response" data-response aria-live="polite"></div>'
     +'<div class="dispatch-ai-questions"><small>Preguntas útiles</small>'
@@ -62,7 +68,7 @@ export function render(root,run){
 
   button.onclick=async()=>{
     button.disabled=true;
-    response.innerHTML='<p>Preparando una explicación basada en la distribución persistida…</p>';
+    response.innerHTML='<p>Preparando una explicación basada en la decisión persistida…</p>';
     try{
       show(await post('/api/runs/'+run.id+'/explain'));
     }catch(error){
@@ -89,11 +95,12 @@ export function render(root,run){
 }
 
 export function chat(root,run,initialQuestion=''){
+  const isScheduling=run.result_json?.schema_version==='scheduling_v1';
   root.innerHTML=
-    '<div class="dispatch-chat-heading"><div><span class="dispatch-kicker">DATION IA</span><h2>Preguntar sobre esta distribución</h2></div><button data-close aria-label="Cerrar chat">Cerrar</button></div>'
-    +'<p>Las respuestas usan la corrida persistida y su evidencia. La IA no modifica la asignación ni decide fechas.</p>'
+    '<div class="dispatch-chat-heading"><div><span class="dispatch-kicker">DATION IA</span><h2>'+(isScheduling?'Preguntar sobre esta planificación':'Preguntar sobre esta distribución')+'</h2></div><button data-close aria-label="Cerrar chat">Cerrar</button></div>'
+    +'<p>'+(isScheduling?'Las respuestas explican fechas y secuencia calculadas. La IA no puede cambiar la Assignment aprobada.':'Las respuestas usan la corrida persistida y su evidencia. La IA no modifica la asignación ni decide fechas.')+'</p>'
     +'<div data-messages role="log" aria-live="polite"></div>'
-    +'<form><label>Tu pregunta<textarea required minlength="2" maxlength="2000" rows="3" placeholder="¿Por qué este vehículo concentra más carga?"></textarea></label><button>Enviar</button></form>';
+    +'<form><label>Tu pregunta<textarea required minlength="2" maxlength="2000" rows="3" placeholder="'+(isScheduling?'¿Por qué este viaje sale en esa fecha?':'¿Por qué este vehículo concentra más carga?')+'"></textarea></label><button>Enviar</button></form>';
 
   root.querySelector('[data-close]').onclick=()=>{
     root.hidden=true;
