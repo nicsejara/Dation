@@ -162,6 +162,11 @@ function ensureDecisionCase(){
   return state.decisionCase;
 }
 function navigate(view){window.dationSetDataReady(ready());window.dationNavigate(view);}
+function nextNodeId(nodeId){
+  if(nodeId==='logistics_assignment')return 'logistics_scheduling';
+  if(nodeId==='logistics_scheduling')return 'logistics_final_assignment';
+  return null;
+}
 function urlRun(id,schema='assignment_v1'){const url=new URL(location.href);url.searchParams.set('run_id',id);url.searchParams.set('dda',schema);history.replaceState(null,'',url);}
 function action(b,fn){b.onclick=async()=>{b.disabled=true;try{await fn();}catch(e){alert(e.message);}finally{b.disabled=false;}};}
 async function preflight(){
@@ -891,7 +896,10 @@ export function show(run){
       )
         ?state.decisionCase.nodes?.[nodeId]?.status
         :null,
-      onMap:state.decisionCase?()=>navigate('logistics-map'):null,
+      decisionCase:state.decisionCase,
+      activeNode:nodeId,
+      onFlow:state.decisionCase?()=>navigate('logistics-map'):null,
+      onOpenNode:state.decisionCase?openCaseResult:null,
       onApprove:(
         nodeId
         &&caseMeta?.case_id
@@ -919,6 +927,17 @@ export function show(run){
           );
           persist();
           return state.decisionCase;
+        }
+        :null,
+      onApprovalComplete:(
+        nodeId
+        &&state.decisionCase
+      )
+        ?()=>{
+          const next=nextNodeId(nodeId);
+          if(next)state.activeNode=next;
+          persist();
+          navigate('logistics-map');
         }
         :null,
     },
