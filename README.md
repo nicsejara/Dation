@@ -27,12 +27,13 @@ The templates are deliberately complete, but users only need the core columns re
 
 Fleet V3 contains **one row per real truck**. There is no user-facing pool concept.
 
-Phase 2 adds a session-persistent Decision Case, a visual Decision Map and explicit human approval states. Changing Orders or Fleet starts a new case and marks the predecessor STALE. Executed runs persist `decision_case_id` and `decision_node_id` as lineage metadata without changing the deterministic solver fingerprint.
+Phase 3 separates the first two decisions at engine level. New Assignment runs use `assignment_v1` / Assignment Engine 1.0.0 and do **not** calculate dates, SLA, lead time or temporal fleet occupancy. Their approved trips are exposed through a versioned `scheduling_input_v1` handoff for the future Scheduling engine. Dispatch 2.2 remains readable for historical runs.
 
 ## Current versions
 
 - Workspace / API: **1.0.0**
-- Dispatch engine: **2.2.0** (`dispatch_v2`, SLA-first + cost/time/own-fleet/CO₂ objectives); historical engine **0.2.0** retained
+- Assignment engine: **1.0.0** (`assignment_v1`, trips/cost/own-fleet/CO₂, non-temporal)
+- Historical Dispatch engine: **2.2.0** (`dispatch_v2`, temporal) retained for prior runs; engine **0.2.0** also retained
 - Frontend: HTML + CSS + vanilla JavaScript
 - Runtime: Google Cloud Run
 - Data / storage: Supabase
