@@ -251,6 +251,10 @@ const VIEW_BREADCRUMBS = {
     primary: "DDA Logística",
     secondary: "Cargar data",
   },
+  "logistics-map": {
+    primary: "DDA Logística",
+    secondary: "Mapa de decisiones",
+  },
   "logistics-config": {
     primary: "DDA Logística",
     secondary: "Configuración",
@@ -298,6 +302,8 @@ export function activateView(
             && (
               view
                 === "logistics-data"
+              || view
+                === "logistics-map"
               || view
                 === "logistics-config"
               || view
