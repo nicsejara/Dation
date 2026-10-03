@@ -155,6 +155,8 @@ function ensureDecisionCase(){
     state.dimensions=[...CORE_DIMENSIONS];
     state.objective='balanced';
     state.weights=balancedWeights(state.dimensions);
+    state.activeNode='logistics_assignment';
+    state.schedulingUseDueDates=true;
   }
   persist();
   return state.decisionCase;
