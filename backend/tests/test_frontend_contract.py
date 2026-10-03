@@ -330,7 +330,7 @@ class FrontendContractTests(
             self.dashboard_stage_js,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=decision-dashboard-v2",
+            "/static/js/dispatch/workspace.mjs?v=decision-map-phase1-v1",
             self.html,
         )
         self.assertIn(
@@ -756,7 +756,7 @@ class FrontendContractTests(
             explanation,
         )
         self.assertIn(
-            "decision-dashboard-v2",
+            "decision-map-phase1-v1",
             self.html,
         )
 
@@ -843,7 +843,7 @@ class FrontendContractTests(
             "Data Pack progresivo",
             readiness,
         )
-        self.assertIn(
+        self.assertNotIn(
             "renderDecisionReadiness",
             upload_index,
         )
@@ -913,6 +913,14 @@ class FrontendContractTests(
         )
         self.assertIn(
             "SIGUIENTE PASO",
+            decision_map,
+        )
+        self.assertIn(
+            "renderDecisionReadiness",
+            decision_map,
+        )
+        self.assertIn(
+            "JERARQUÍA DE DECISIONES",
             decision_map,
         )
         self.assertIn(
@@ -1004,8 +1012,12 @@ class FrontendContractTests(
             workspace,
         )
         self.assertIn(
-            "navigate('logistics-map')",
+            "unlockNextNode(nodeId)",
             workspace,
+        )
+        self.assertIn(
+            "dispatch-dashboard-map-back",
+            dashboard,
         )
         self.assertIn(
             "SIGUIENTE PASO",
@@ -1024,7 +1036,7 @@ class FrontendContractTests(
             decision_nav,
         )
         self.assertIn(
-            "Ver flujo completo",
+            "Explorar mapa",
             decision_nav,
         )
         self.assertIn(
@@ -1050,6 +1062,14 @@ class FrontendContractTests(
         self.assertNotIn(
             "dispatch-ai-action",
             scheduling,
+        )
+        self.assertIn(
+            "dispatch-dashboard-map-back",
+            scheduling,
+        )
+        self.assertIn(
+            "dationSetDecisionContext",
+            workspace,
         )
 
     def test_dashboard_stage_contract(
