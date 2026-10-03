@@ -16,6 +16,8 @@ export function render(root,run,onRerun,caseActions={}){
     error:'Error',
   };
   const caseStatus=statusLabels[caseActions.status]||'Decisión disponible';
+  const isAssignment=result.schema_version==='assignment_v1';
+  const exportLabel=isAssignment?'Exportar asignación':'Exportar distribución';
 
   root.className='dispatch dispatch-dashboard dispatch-dashboard-focused';
   root.innerHTML=
@@ -24,7 +26,7 @@ export function render(root,run,onRerun,caseActions={}){
       +'<div class="dispatch-actions">'
         +(caseActions.onMap?'<button data-map>Mapa de decisiones</button>':'')
         +(caseActions.onApprove?'<button data-approve class="dispatch-primary-action" '+(caseActions.status==='approved'?'disabled':'')+'>'+(caseActions.status==='approved'?'Decisión aprobada':'Aprobar decisión')+'</button>':'')
-        +'<button data-csv>Exportar distribución</button>'
+        +'<button data-csv>'+esc(exportLabel)+'</button>'
         +'<button data-rerun>Reejecutar</button>'
         +'<button data-chat>Preguntale a Dation</button>'
         +'<details class="dispatch-more"><summary>Más</summary><div class="dispatch-details">'
