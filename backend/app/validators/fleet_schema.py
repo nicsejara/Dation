@@ -38,12 +38,12 @@ LEGACY_POOL_COLUMNS = {
 }
 
 
-def _upgrade_legacy_pool_fleet(contents: bytes) -> tuple[bytes, bool, int]:
+def _upgrade_legacy_pool_fleet(contents: bytes) -> tuple[bytes, bool, int, set[str]]:
     """Expand historical pool rows into unit-level rows in memory."""
     try:
         text = contents.decode("utf-8-sig")
     except UnicodeDecodeError:
-        return contents, False, 0
+        return contents, False, 0, set()
     lines = text.splitlines()
     if not lines:
         return contents, False, 0
@@ -53,10 +53,11 @@ def _upgrade_legacy_pool_fleet(contents: bytes) -> tuple[bytes, bool, int]:
     raw_columns = [str(value).strip() for value in (reader.fieldnames or [])]
 
     if "vehicle_id" in raw_columns:
-        return contents, False, len(raw_columns)
+        return contents, False, len(raw_columns), set()
     if not LEGACY_POOL_COLUMNS.issubset(set(raw_columns)):
         return contents, False, len(raw_columns)
 
+    legacy_unlimited_ids = set()
     buffer = io.StringIO()
     writer = csv.DictWriter(
         buffer,
@@ -72,17 +73,21 @@ def _upgrade_legacy_pool_fleet(contents: bytes) -> tuple[bytes, bool, int]:
             for key, value in raw.items()
             if key is not None
         }
+        raw_units = row.get("units_available", "")
         try:
-            requested_units = int(row.get("units_available") or "1")
+            requested_units = int(raw_units or "1")
         except ValueError:
             requested_units = 1
         units = max(1, requested_units)
         pool_id = row.get("fleet_pool_id") or row.get("vehicle_type") or "FLEET"
 
         for index in range(1, units + 1):
+            vehicle_id = f"LEGACY-{pool_id}-{index:02d}"
+            if row.get("ownership") == "third_party" and raw_units == "":
+                legacy_unlimited_ids.add(vehicle_id)
             writer.writerow(
                 {
-                    "vehicle_id": f"LEGACY-{pool_id}-{index:02d}",
+                    "vehicle_id": vehicle_id,
                     "license_plate": "",
                     "vehicle_type": row.get("vehicle_type", ""),
                     "ownership": row.get("ownership", ""),
@@ -102,7 +107,12 @@ def _upgrade_legacy_pool_fleet(contents: bytes) -> tuple[bytes, bool, int]:
                 }
             )
 
-    return buffer.getvalue().encode("utf-8"), True, len(raw_columns)
+    return (
+        buffer.getvalue().encode("utf-8"),
+        True,
+        len(raw_columns),
+        legacy_unlimited_ids,
+    )
 
 
 def _parse_optional_date(row, key, problems):
@@ -145,9 +155,12 @@ def _completeness(columns, rows):
 
 
 def validate_fleet_report(contents: bytes, max_problems: int = 100) -> dict:
-    normalized_contents, legacy_pool, raw_column_count = _upgrade_legacy_pool_fleet(
-        contents
-    )
+    (
+        normalized_contents,
+        legacy_pool,
+        raw_column_count,
+        legacy_unlimited_ids,
+    ) = _upgrade_legacy_pool_fleet(contents)
     problems = ValidationProblems(max_problems)
     rows, columns, delimiter, detected = parse_csv_report(
         normalized_contents,
@@ -333,7 +346,9 @@ def validate_fleet_report(contents: bytes, max_problems: int = 100) -> dict:
         row["fleet_pool_id"] = row["vehicle_id"]
         row["base_location"] = row["base_site"]
         row["units_available"] = (
-            0 if status in ("maintenance", "unavailable") else 1
+            None
+            if row["vehicle_id"] in legacy_unlimited_ids
+            else (0 if status in ("maintenance", "unavailable") else 1)
         )
         row["avg_speed_kmh"] = speed if speed is not None else 70.0
         row["driving_hours_per_day"] = (
