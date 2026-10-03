@@ -649,14 +649,15 @@ async def check_inputs(orders_id, fleet_id, allow_third_party=True):
     if not vehicles:
         raise ValueError("No hay flota habilitada.")
 
-    decision_readiness = build_decision_readiness(
-        orders,
-        fleet,
-    )
     compatibility_preflight = preflight(
         orders["records"],
         vehicles,
         fleet["records"],
+    )
+    decision_readiness = build_decision_readiness(
+        orders,
+        fleet,
+        compatibility_preflight,
     )
     return {
         **compatibility_preflight,
