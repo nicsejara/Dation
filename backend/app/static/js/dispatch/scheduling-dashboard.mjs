@@ -1,39 +1,9 @@
-import {esc,num,pct,date,chart,dispose,csv,download,api,errorBox} from './shared.mjs';
+import {esc,num,pct,date,chart,dispose,download,api,errorBox} from './shared.mjs';
+import {exportDecision} from './export.mjs';
 import * as explanation from './explanation.mjs';
 
 function exportSchedule(result){
-  const headers=[
-    'Viaje','Vehicle ID','Tipo de vehículo','Origen','Destino',
-    'Ready date','Salida','Llegada','Recurso disponible',
-    'Días de tránsito','Días de ciclo','Espera (días)',
-    'Fecha objetivo','Orden','Producto','Unidades','Kg'
-  ];
-  const rows=result.scenarios.selected.trips.flatMap(trip=>
-    (trip.loads||[]).map(load=>[
-      trip.trip_id,
-      trip.vehicle_id,
-      trip.vehicle_type,
-      trip.origin,
-      trip.destination,
-      trip.ready_date,
-      trip.dispatch_date,
-      trip.arrival_date,
-      trip.resource_available_again,
-      trip.transit_days,
-      trip.cycle_days,
-      trip.wait_days,
-      trip.delivery_due_date||'',
-      load.order_id,
-      load.product||'',
-      load.units,
-      load.kg,
-    ])
-  );
-  download(
-    'planificacion-recomendada.csv',
-    csv([headers,...rows]),
-    'text/csv;charset=utf-8',
-  );
+  return exportDecision(result);
 }
 
 function dayDiff(from,to){
