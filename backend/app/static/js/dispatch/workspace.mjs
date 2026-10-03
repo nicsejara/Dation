@@ -1,5 +1,5 @@
 import {esc,num,date,vehicle,api,post,errorBox} from './shared.mjs';import {rebalance} from './selectors.mjs';import {render as dashboard} from './dashboard.mjs';
-import {mountUploadScreen} from './upload/index.mjs';
+import {mountUploadScreen} from './upload/index.mjs?v=data-pack-v3-v1';
 const KEY='dation.dispatch.workspace.v3';
 const PRIORITY_KEYS=['cost','time','utilization','co2'];
 const DEFAULT_DIMENSIONS=[...PRIORITY_KEYS];
