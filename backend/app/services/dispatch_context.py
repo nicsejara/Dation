@@ -92,6 +92,94 @@ def build_assignment_context(result):
         )
     )
 
+    metrics = selected.get("metrics") or {}
+    drivers = result.get("decision_drivers") or {}
+    key_events = []
+
+    if assignment_by_vehicle:
+        top = assignment_by_vehicle[0]
+        key_events.append(
+            {
+                "type": "load_concentration",
+                "title": "Vehículo con mayor carga asignada",
+                "fact": (
+                    f"{top['vehicle_id']} concentra "
+                    f"{top['load_kg']:.0f} kg en "
+                    f"{top['trips']} viajes."
+                ),
+                "cause_status": "model_result",
+                "cause": (
+                    "La evidencia confirma la concentración, pero no "
+                    "atribuye una única causa aislada. Debe explicarse "
+                    "junto con el objetivo configurado, la capacidad, "
+                    "la ruta y las alternativas disponibles."
+                ),
+                "entity_id": top["vehicle_id"],
+            }
+        )
+
+    consolidated = int(
+        drivers.get("orders_consolidated") or 0
+    )
+    if consolidated:
+        key_events.append(
+            {
+                "type": "consolidation",
+                "title": "Órdenes consolidadas",
+                "fact": (
+                    f"{consolidated} órdenes quedaron consolidadas "
+                    "en viajes compartidos."
+                ),
+                "cause_status": "modeled",
+                "cause": (
+                    "Assignment puede consolidar cargas compatibles "
+                    "cuando comparten ruta y la capacidad del viaje "
+                    "permite transportar unidades enteras."
+                ),
+            }
+        )
+
+    split = int(
+        drivers.get("orders_split") or 0
+    )
+    if split:
+        key_events.append(
+            {
+                "type": "split",
+                "title": "Órdenes divididas",
+                "fact": (
+                    f"{split} órdenes se distribuyeron en más de un viaje."
+                ),
+                "cause_status": "modeled",
+                "cause": (
+                    "Una orden se divide cuando no cabe completa en un "
+                    "único viaje compatible o cuando la combinación "
+                    "seleccionada por el objetivo utiliza varios viajes."
+                ),
+            }
+        )
+
+    outsourced_share = float(
+        metrics.get("outsourced_weight_share") or 0
+    )
+    if outsourced_share > 0:
+        key_events.append(
+            {
+                "type": "outsourcing",
+                "title": "Uso de flota tercerizada",
+                "fact": (
+                    f"{outsourced_share * 100:.1f} % del peso "
+                    "quedó asignado a vehículos tercerizados."
+                ),
+                "cause_status": "model_result",
+                "cause": (
+                    "La evidencia muestra el uso de terceros, pero no "
+                    "debe inventarse una causa única. La explicación "
+                    "debe contrastarlo con el objetivo y las alternativas."
+                ),
+            }
+        )
+
     return {
         "schema_version": "assignment_v1",
         "decision": result.get("decision"),
@@ -104,6 +192,7 @@ def build_assignment_context(result):
         "decision_drivers": result.get(
             "decision_drivers"
         ),
+        "key_events": key_events[:6],
         "selected_metrics": selected.get(
             "metrics"
         ),

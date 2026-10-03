@@ -1,39 +1,9 @@
-import {esc,num,pct,date,chart,dispose,csv,download,api,errorBox} from './shared.mjs';
+import {esc,num,pct,date,chart,dispose,download,api,errorBox} from './shared.mjs';
+import {exportDecision} from './export.mjs';
 import * as explanation from './explanation.mjs';
 
 function exportSchedule(result){
-  const headers=[
-    'Viaje','Vehicle ID','Tipo de vehículo','Origen','Destino',
-    'Ready date','Salida','Llegada','Recurso disponible',
-    'Días de tránsito','Días de ciclo','Espera (días)',
-    'Fecha objetivo','Orden','Producto','Unidades','Kg'
-  ];
-  const rows=result.scenarios.selected.trips.flatMap(trip=>
-    (trip.loads||[]).map(load=>[
-      trip.trip_id,
-      trip.vehicle_id,
-      trip.vehicle_type,
-      trip.origin,
-      trip.destination,
-      trip.ready_date,
-      trip.dispatch_date,
-      trip.arrival_date,
-      trip.resource_available_again,
-      trip.transit_days,
-      trip.cycle_days,
-      trip.wait_days,
-      trip.delivery_due_date||'',
-      load.order_id,
-      load.product||'',
-      load.units,
-      load.kg,
-    ])
-  );
-  download(
-    'planificacion-recomendada.csv',
-    csv([headers,...rows]),
-    'text/csv;charset=utf-8',
-  );
+  return exportDecision(result);
 }
 
 function dayDiff(from,to){
@@ -217,14 +187,14 @@ export function render(root,run,onRerun,caseActions={}){
   root.innerHTML=
     '<header class="dispatch-command dispatch-command-focused">'
       +'<div class="dispatch-command-title"><strong>DDA Logística · Planificación</strong><span class="dispatch-status" data-case-status>'+esc(caseStatus)+'</span></div>'
-      +'<div class="dispatch-actions">'
-        +(caseActions.onMap?'<button data-map>Mapa de decisiones</button>':'')
-        +(caseActions.onApprove?'<button data-approve class="dispatch-primary-action" '+(caseActions.status==='approved'?'disabled':'')+'>'+(caseActions.status==='approved'?'Planificación aprobada':'Aprobar planificación')+'</button>':'')
-        +'<button data-csv>Exportar planificación</button>'
-        +'<button data-rerun>Reejecutar</button>'
-        +'<button data-chat>Preguntale a Dation</button>'
-        +'<details class="dispatch-more"><summary>Más</summary><div class="dispatch-details">'
-          +'<button data-json>Exportar JSON</button>'
+      +'<div class="dispatch-actions dispatch-actions--focused">'
+        +(caseActions.onMap?'<button data-map class="dispatch-action-quiet">← Mapa</button>':'')
+        +(caseActions.onApprove?'<button data-approve class="dispatch-primary-action" '+(caseActions.status==='approved'?'disabled':'')+'>'+(caseActions.status==='approved'?'✓ Planificación aprobada':'Aprobar planificación')+'</button>':'')
+        +'<button data-chat class="dispatch-ai-action">✦ Dation IA</button>'
+        +'<details class="dispatch-action-menu"><summary>Acciones ···</summary><div class="dispatch-action-menu__panel">'
+          +'<button data-csv>↓ Exportar planificación CSV</button>'
+          +'<button data-json>Exportar JSON técnico</button>'
+          +'<button data-rerun>Re-ejecutar Scheduling</button>'
           +'<dl>'
             +Object.entries({
               'Corrida':run.id,
@@ -290,7 +260,31 @@ export function render(root,run,onRerun,caseActions={}){
     openChat(event.detail?.question||'');
   });
 
-  root.querySelector('[data-csv]').onclick=()=>exportSchedule(result);
+  function feedback(button,working,done){
+    const original=button.dataset.originalLabel||button.textContent;
+    button.dataset.originalLabel=original;
+    button.disabled=true;
+    button.textContent=working;
+    window.setTimeout(()=>{
+      button.textContent=done;
+      window.setTimeout(()=>{
+        button.textContent=original;
+        button.disabled=false;
+      },1200);
+    },120);
+  }
+
+  root.querySelector('[data-csv]').onclick=event=>{
+    try{
+      exportSchedule(result);
+      feedback(event.currentTarget,'Preparando archivo…','✓ Exportado');
+    }catch(error){
+      event.currentTarget.textContent='No se pudo exportar';
+      window.setTimeout(()=>{
+        event.currentTarget.textContent=event.currentTarget.dataset.originalLabel||'↓ Exportar planificación CSV';
+      },1500);
+    }
+  };
   root.querySelector('[data-rerun]').onclick=onRerun;
   root.querySelector('[data-chat]').onclick=()=>openChat();
   root.querySelector('[data-json]').onclick=()=>download(

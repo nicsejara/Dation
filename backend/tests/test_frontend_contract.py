@@ -330,7 +330,7 @@ class FrontendContractTests(
             self.dashboard_stage_js,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=scheduling-v1",
+            "/static/js/dispatch/workspace.mjs?v=dashboard-ai-v1",
             self.html,
         )
         self.assertIn(
@@ -451,7 +451,7 @@ class FrontendContractTests(
             review,
         )
         self.assertIn(
-            "no recalcula el optimizador",
+            "La IA no recalcula",
             explanation,
         )
 
@@ -489,6 +489,14 @@ class FrontendContractTests(
             / "dispatch"
             / "plan.mjs"
         ).read_text(encoding="utf-8")
+        exporter = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+            / "export.mjs"
+        ).read_text(encoding="utf-8")
 
         config_render = workspace.split(
             "async function loadConfig()",
@@ -519,12 +527,16 @@ class FrontendContractTests(
             hero,
         )
         self.assertIn(
-            "assignment-recomendada.csv",
+            "exportDecision",
             plan,
         )
         self.assertIn(
+            "assignment-recomendada.csv",
+            exporter,
+        )
+        self.assertIn(
             "Vehicle ID",
-            plan,
+            exporter,
         )
         self.assertIn(
             "assignment_v1",
@@ -572,6 +584,14 @@ class FrontendContractTests(
             / "dispatch"
             / "scheduling-dashboard.mjs"
         ).read_text(encoding="utf-8")
+        exporter = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+            / "export.mjs"
+        ).read_text(encoding="utf-8")
 
         self.assertIn(
             "Configurar planificación",
@@ -610,8 +630,12 @@ class FrontendContractTests(
             scheduling,
         )
         self.assertIn(
-            "planificacion-recomendada.csv",
+            "exportDecision",
             scheduling,
+        )
+        self.assertIn(
+            "planificacion-recomendada.csv",
+            exporter,
         )
         self.assertIn(
             "resource_available_again",
@@ -636,6 +660,88 @@ class FrontendContractTests(
         self.assertIn(
             "scheduling_v1",
             self.dashboard_stage_js,
+        )
+
+    def test_export_and_ai_ux_contract(self):
+        dispatch_root = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+        )
+        shared = (
+            dispatch_root / "shared.mjs"
+        ).read_text(encoding="utf-8")
+        exporter = (
+            dispatch_root / "export.mjs"
+        ).read_text(encoding="utf-8")
+        dashboard = (
+            dispatch_root / "dashboard.mjs"
+        ).read_text(encoding="utf-8")
+        scheduling = (
+            dispatch_root
+            / "scheduling-dashboard.mjs"
+        ).read_text(encoding="utf-8")
+        explanation = (
+            dispatch_root / "explanation.mjs"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn(
+            "document.body.append(anchor)",
+            shared,
+        )
+        self.assertIn(
+            "anchor.remove()",
+            shared,
+        )
+        self.assertIn(
+            "export function exportDecision",
+            exporter,
+        )
+        self.assertIn(
+            "assignment-recomendada.csv",
+            exporter,
+        )
+        self.assertIn(
+            "planificacion-recomendada.csv",
+            exporter,
+        )
+        self.assertIn(
+            "dispatch-action-menu",
+            dashboard,
+        )
+        self.assertIn(
+            "✦ Dation IA",
+            dashboard,
+        )
+        self.assertIn(
+            "dispatch-action-menu",
+            scheduling,
+        )
+        self.assertIn(
+            "Eventos clave",
+            explanation,
+        )
+        self.assertIn(
+            "Por qué ocurrió",
+            explanation,
+        )
+        self.assertIn(
+            "Si una causa no está demostrada",
+            explanation,
+        )
+        self.assertIn(
+            "data-starter",
+            explanation,
+        )
+        self.assertIn(
+            "Enter para enviar",
+            explanation,
+        )
+        self.assertIn(
+            "dashboard-ai-v1",
+            self.html,
         )
 
     def test_single_ingestion_contract(
@@ -836,7 +942,11 @@ class FrontendContractTests(
             dashboard,
         )
         self.assertIn(
-            "Mapa de decisiones",
+            "← Mapa",
+            dashboard,
+        )
+        self.assertIn(
+            "data-map",
             dashboard,
         )
 

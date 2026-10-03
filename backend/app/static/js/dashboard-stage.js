@@ -2539,7 +2539,7 @@
       if (window.DationDispatch && typeof window.DationDispatch.show === "function") {
         window.DationDispatch.show(run);
       } else {
-        var dispatch = await import('/static/js/dispatch/workspace.mjs?v=scheduling-v1');
+        var dispatch = await import('/static/js/dispatch/workspace.mjs?v=dashboard-ai-v1');
         dispatch.show(run);
       }
       return;
@@ -2961,13 +2961,19 @@
     );
 
     var run = context.run;
+    var button = $("#export-decision");
 
     try {
+      var runId = (
+        context.runId
+        || runFromUrl()
+      );
+
       if (
         !run
         || !run.result_json
       ) {
-        if (!context.runId) {
+        if (!runId) {
           throw new Error(
             "No hay una decisión activa para exportar."
           );
@@ -2976,14 +2982,49 @@
         run = await requestJson(
           "/api/runs/"
           + encodeURIComponent(
-              context.runId
+              runId
             )
         );
       }
 
-      if (!downloadDecisionTxt(run)) {
+      if (button) {
+        button.disabled = true;
+        button.textContent = "Preparando…";
+      }
+
+      if (
+        run.result_json
+        && [
+          "assignment_v1",
+          "scheduling_v1",
+          "dispatch_v1",
+          "dispatch_v2"
+        ].includes(
+          run.result_json.schema_version
+        )
+      ) {
+        var exporter = await import(
+          "/static/js/dispatch/export.mjs?v=dashboard-ai-v1"
+        );
+        exporter.exportDecision(
+          run.result_json
+        );
+      } else if (
+        !downloadDecisionTxt(run)
+      ) {
         throw new Error(
-          "La corrida no contiene un JSON de decisión."
+          "La corrida no contiene un resultado exportable."
+        );
+      }
+
+      if (button) {
+        button.textContent = "✓ Exportado";
+        window.setTimeout(
+          function () {
+            button.textContent = "Exportar";
+            button.disabled = false;
+          },
+          1200
         );
       }
     } catch (error) {
@@ -2991,6 +3032,17 @@
         "Error al exportar decisión.",
         error
       );
+
+      if (button) {
+        button.disabled = false;
+        button.textContent = "Error al exportar";
+        window.setTimeout(
+          function () {
+            button.textContent = "Exportar";
+          },
+          1500
+        );
+      }
     }
   }
 

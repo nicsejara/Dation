@@ -7,7 +7,23 @@ export const vehicle=v=>({Truck_S:'Camión pequeño',Truck_M:'Camión mediano',T
 export const metricInfo={total_cost:['Costo total',money,'Costo de ida y vuelta más costo fijo por viaje.'],on_time_rate:['Entregas a tiempo',pct,'Órdenes completadas dentro de su plazo / órdenes incluidas. El SLA se optimiza antes que el objetivo de negocio.'],late_orders:['Órdenes tardías',num,'Cantidad de órdenes cuya última entrega supera el plazo.'],avg_lead_time_days:['Tiempo medio',v=>num(v,2)+' días','Días desde disponibilidad hasta entrega, ponderados por unidades.'],own_weight_share:['Uso de flota propia',pct,'Peso transportado por recursos propios / peso total.'],own_load_utilization:['Ocupación de carga propia',pct,'Peso transportado / capacidad de los viajes propios utilizados.'],outsourced_weight_share:['Kg tercerizados',pct,'Peso tercerizado / peso total transportado.'],co2_kg:['CO₂ estimado',v=>num(v,1)+' kg','Kilómetros de ida y vuelta × factor informado; no certificado.'],total_trips:['Viajes',num,'Cantidad total de salidas; es KPI y desempate, no prioridad configurable.']};
 export async function api(path,options={}){const r=await fetch(path,options);const data=await r.json();if(!r.ok)throw Object.assign(new Error(typeof data.detail==='string'?data.detail:'No se pudo completar la solicitud.'),{status:r.status});return data;}
 export const post=(path,body)=>api(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-export function download(name,content,type='application/json'){const url=URL.createObjectURL(new Blob([content],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+export function download(name,content,type='application/json'){
+  const blob=new Blob([content],{type});
+  const url=URL.createObjectURL(blob);
+  const anchor=document.createElement('a');
+  anchor.href=url;
+  anchor.download=name;
+  anchor.rel='noopener';
+  anchor.style.display='none';
+  document.body.append(anchor);
+  try{
+    anchor.click();
+  }finally{
+    anchor.remove();
+    window.setTimeout(()=>URL.revokeObjectURL(url),5000);
+  }
+  return true;
+}
 export function csv(rows){return '\ufeff'+rows.map(row=>row.map(x=>{let s=String(x??'');if(/^[=+@\-]/.test(s))s="'"+s;return '"'+s.replaceAll('"','""')+'"';}).join(';')).join('\r\n');}
 export function errorBox(root,error,retry){root.replaceChildren();const p=document.createElement('p');p.className='dispatch-alert';p.textContent=error.message;root.append(p);if(retry){const b=document.createElement('button');b.textContent='Reintentar';b.onclick=retry;root.append(b);}}
 export function chart(root,options){if(!window.DationCharts){root.textContent='El gráfico no está disponible. Consultá la tabla de esta sección.';return null;}const c=window.DationCharts.init(root,null,{renderer:'svg'});c.setOption({...options,textStyle:{fontFamily:'inherit',fontSize:12},aria:{enabled:true}});const observer=new ResizeObserver(()=>c.resize());observer.observe(root);root._dispose=()=>{observer.disconnect();c.dispose();};return c;}

@@ -22,7 +22,7 @@ from app.services.llm_service import (
 from app.services.run_service import get_run
 
 
-PROMPT_VERSION = "decision_interpreter_v2.1"
+PROMPT_VERSION = "decision_interpreter_v3.0"
 
 EXPLANATION_SCHEMA = {
     "type": "object",
@@ -123,6 +123,9 @@ def _system_prompt(
             'Scheduling sólo decide fechas y secuencia temporal. '
             'Explicá ready_date, dispatch_date, arrival_date, resource_available_again, '
             'wait_days, cycle_days, makespan y excepciones de fecha objetivo usando la evidencia. '
+            'Usá key_events como fuente causal prioritaria. Para cada evento separá HECHO, CAUSA MODELADA '
+            'y LÍMITE: si cause_status es not_determined, decí explícitamente que la evidencia no permite '
+            'atribuir una causa única. Nunca completes esa causa con intuición logística. '
             'Cuando analysis.sla_enabled sea true, la jerarquía es: minimizar órdenes tardías, '
             'luego días totales de tardanza, luego espera y finalmente makespan. '
             'Cuando sea false, no afirmes cumplimiento de SLA: delivery_due_date no participó. '
@@ -143,7 +146,9 @@ def _system_prompt(
             'ni disponibilidad futura como si hubieran sido optimizados aquí. '
             'Esos temas pertenecen a la siguiente decisión: Planificación. '
             'Un mismo vehicle_id puede recibir varios viajes abstractos; eso no es doble booking en Assignment. '
-            'Explicá usando assignment_by_vehicle, decision_drivers, selected_metrics y alternatives. '
+            'Explicá usando assignment_by_vehicle, decision_drivers, selected_metrics, alternatives y key_events. '
+            'Usá key_events como fuente causal prioritaria. Para cada evento separá HECHO, CAUSA MODELADA '
+            'y LÍMITE: si cause_status es model_result, no inventes una causa única que la evidencia no contiene. '
             'Los objetivos válidos son viajes, costo, uso de flota propia y CO₂, sólo si la evidencia los habilita. '
             'Costo y CO₂ son estimaciones de ida y vuelta cuando existen datos completos. '
             'No llames óptima a la solución si solver.status no es optimal. '
@@ -279,7 +284,7 @@ async def _insert_explanation(
 
 async def _recent_messages(
     run_id: str,
-    limit: int = 2,
+    limit: int = 6,
 ) -> list[dict]:
     async with httpx.AsyncClient(
         timeout=15.0
@@ -401,11 +406,15 @@ async def generate_explanation(
             {
                 "role": "user",
                 "content": (
-                    "Generá la explicación ejecutiva "
-                    "inicial de esta decisión. "
-                    "Respondé únicamente en español "
-                    "y respetá estrictamente el "
-                    "JSON Schema."
+                    "Generá la explicación ejecutiva inicial de esta decisión. "
+                    "La salida debe poder leerse como una historia causal verificable: "
+                    "executive_summary = qué decidió Dation; "
+                    "key_drivers = 2 a 5 eventos concretos tomados de key_events; "
+                    "why_recommended = por qué esos eventos son coherentes con el objetivo y restricciones; "
+                    "business_impact = evidencia cuantificada, sin llamar ahorro a una diferencia sintética; "
+                    "caveats = qué no puede concluirse; "
+                    "recommendation = qué debería revisar o hacer el usuario a continuación. "
+                    "Respondé únicamente en español y respetá estrictamente el JSON Schema."
                 ),
             },
         ],
@@ -483,7 +492,14 @@ async def answer_question(
             *history,
             {
                 "role": "user",
-                "content": question,
+                "content": (
+                    question
+                    + "\n\nRespondé centrado en la evidencia de esta corrida. "
+                    + "Si la pregunta pide por qué ocurrió un evento, estructurá la respuesta como: "
+                    + "1) hecho observado, 2) causa modelada verificable, "
+                    + "3) evidencia concreta, 4) límite o dato faltante si la causa no es determinable. "
+                    + "No inventes causas operativas externas."
+                ),
             },
         ]
     )

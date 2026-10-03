@@ -89,6 +89,103 @@ def build_scheduling_context(result):
         )
     )
 
+    key_events = []
+    for vehicle in sequence_by_vehicle:
+        previous = None
+        for trip in vehicle["trips"]:
+            wait_days = int(
+                trip.get("wait_days") or 0
+            )
+            if wait_days > 0:
+                if (
+                    previous
+                    and previous.get(
+                        "resource_available_again"
+                    )
+                    == trip.get("dispatch_date")
+                ):
+                    cause = (
+                        f"{vehicle['vehicle_id']} recién volvió a quedar "
+                        f"disponible el {trip.get('dispatch_date')} después "
+                        f"de {previous.get('trip_id')}."
+                    )
+                    cause_status = "derived"
+                else:
+                    cause = (
+                        "La salida quedó después del ready date. La evidencia "
+                        "resumida no permite atribuir una única causa si no "
+                        "proviene de la ocupación inmediatamente anterior."
+                    )
+                    cause_status = "not_determined"
+
+                key_events.append(
+                    {
+                        "type": "wait",
+                        "title": (
+                            f"{trip.get('trip_id')} espera "
+                            f"{wait_days} días"
+                        ),
+                        "fact": (
+                            f"Ready {trip.get('ready_date')} · salida "
+                            f"{trip.get('dispatch_date')} · vehículo "
+                            f"{vehicle['vehicle_id']}."
+                        ),
+                        "cause_status": cause_status,
+                        "cause": cause,
+                        "trip_id": trip.get("trip_id"),
+                        "vehicle_id": vehicle["vehicle_id"],
+                    }
+                )
+            elif (
+                previous
+                and previous.get(
+                    "resource_available_again"
+                )
+                == trip.get("dispatch_date")
+            ):
+                key_events.append(
+                    {
+                        "type": "tight_sequence",
+                        "title": (
+                            f"{vehicle['vehicle_id']} encadena "
+                            f"{previous.get('trip_id')} y {trip.get('trip_id')}"
+                        ),
+                        "fact": (
+                            f"{trip.get('trip_id')} sale el mismo día "
+                            "en que el vehículo vuelve a estar disponible."
+                        ),
+                        "cause_status": "derived",
+                        "cause": (
+                            "Scheduling compactó la secuencia sin superponer "
+                            "la ocupación del recurso."
+                        ),
+                        "trip_id": trip.get("trip_id"),
+                        "vehicle_id": vehicle["vehicle_id"],
+                    }
+                )
+            previous = trip
+
+    for exception in (result.get("exceptions") or [])[:6]:
+        key_events.append(
+            {
+                "type": "late_order",
+                "title": (
+                    f"{exception.get('order_id')} queda fuera "
+                    "de fecha objetivo"
+                ),
+                "fact": (
+                    f"Llega {exception.get('arrival_date')} con "
+                    f"{exception.get('late_days')} días de tardanza."
+                ),
+                "cause_status": "model_result",
+                "cause": (
+                    "La excepción permanece después de aplicar la jerarquía "
+                    "de Scheduling. No atribuir una causa externa no modelada."
+                ),
+                "order_id": exception.get("order_id"),
+            }
+        )
+
     return {
         "schema_version": (
             "scheduling_v1"
@@ -107,6 +204,7 @@ def build_scheduling_context(result):
                 "decision_drivers"
             )
         ),
+        "key_events": key_events[:10],
         "selected_metrics": (
             selected.get(
                 "metrics"
