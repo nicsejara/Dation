@@ -137,3 +137,31 @@ Después del deploy validar en 1440 px y 390 px:
 
 El script `scripts/qa/dispatch-browser.cjs` mantiene mocks para el flujo completo y
 comprueba que no haya overflow horizontal.
+
+
+## Smoke test — Decision Chain Phase 2
+
+No requiere migración adicional de Supabase.
+
+Después del deploy verificar:
+
+1. Cargar o seleccionar Orders V3 + Fleet V3 válidos.
+2. El CTA de Cargar datos debe abrir **Mapa de decisiones**, no Configurar decisión.
+3. Assignment debe aparecer `AVAILABLE`.
+4. Scheduling y Final Assignment deben aparecer `LOCKED`.
+5. Ejecutar Assignment:
+   - el nodo pasa a `RUNNING`;
+   - al completar, pasa a `REVIEW`;
+   - la corrida conserva `decision_case.case_id` y `node_id=logistics_assignment`.
+6. Aprobar la decisión:
+   - Assignment pasa a `APPROVED`;
+   - Scheduling pasa a `AVAILABLE` si su Data Readiness está completo;
+   - o a `NEEDS_DATA` si faltan columnas.
+7. Cambiar Orders o Fleet:
+   - se crea un caso nuevo;
+   - el caso previo se muestra como `STALE`;
+   - la aprobación anterior no se reutiliza.
+8. Abrir una corrida histórica sin `decision_case`:
+   - puede visualizarse;
+   - no debe ofrecer **Aprobar decisión** para el caso activo.
+9. En móvil, el mapa debe apilar los tres nodos sin overflow horizontal.
