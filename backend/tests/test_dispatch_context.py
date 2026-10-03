@@ -60,6 +60,13 @@ class DispatchContextTests(unittest.TestCase):
             "assignment_by_vehicle",
             context,
         )
+        self.assertIn(
+            "key_events",
+            context,
+        )
+        self.assertTrue(
+            context["key_events"],
+        )
         self.assertNotIn(
             "feasibility",
             context,
@@ -144,6 +151,10 @@ class DispatchContextTests(unittest.TestCase):
         )
         self.assertTrue(
             context["sequence_by_vehicle"]
+        )
+        self.assertIn(
+            "key_events",
+            context,
         )
 
     def test_context_has_hard_size_bound(self):
