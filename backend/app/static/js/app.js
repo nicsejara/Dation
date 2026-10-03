@@ -263,7 +263,7 @@ async function restoreHistoricalRun(
       if (window.DationDispatch?.show) {
         window.DationDispatch.show(run);
       } else {
-        const dispatch = await import('/static/js/dispatch/workspace.mjs?v=decision-chain-v1');
+        const dispatch = await import('/static/js/dispatch/workspace.mjs?v=assignment-v1');
         dispatch.show(run);
       }
       return;
