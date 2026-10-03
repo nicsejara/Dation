@@ -1,0 +1,9 @@
+vehicle_id;license_plate;vehicle_type;ownership;provider_name;base_site;capacity_kg;capacity_m3;cost_per_km;fixed_trip_cost;fuel_l_per_100km;co2_kg_per_km;avg_speed_kmh;driving_hours_per_day;status;available_from;available_until
+VEH-001;AE123XX;Truck_L;own;;Cordoba;25000;65;1180;48000;38;1.02;70;10;available;2026-10-01;2026-10-31
+VEH-002;AF456YY;Truck_L;own;;Cordoba;25000;65;1180;48000;38;1.02;70;10;available;2026-10-01;2026-10-31
+VEH-003;AG789ZZ;Truck_M;own;;Cordoba;15000;42;920;35000;30;0.8;70;10;available;2026-10-01;2026-10-31
+VEH-004;AH321CC;Truck_M;own;;Cordoba;15000;42;920;35000;30;0.8;70;10;available;2026-10-01;2026-10-31
+VEH-005;AI654DD;Truck_S;own;;Cordoba;8000;25;720;25000;22;0.59;70;10;available;2026-10-01;2026-10-31
+VEH-101;AJ111AA;Truck_L;third_party;Transportes Norte;Cordoba;25000;65;1534;62400;38;1.02;70;10;available;2026-10-01;2026-10-31
+VEH-102;AK222BB;Truck_M;third_party;Logistica Centro;Cordoba;15000;42;1270;52000;30;0.8;70;10;available;2026-10-01;2026-10-31
+VEH-103;AL333CC;Truck_S;third_party;Carga Express;Cordoba;8000;25;1030;39000;22;0.59;70;10;available;2026-10-01;2026-10-31

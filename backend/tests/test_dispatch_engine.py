@@ -4,8 +4,35 @@ import io
 import unittest
 
 from app.engines.dispatch import run_dispatch_engine
-from app.validators.orders_schema import COLUMNS
-from app.validators.fleet_schema import COLUMNS as FC
+
+# Historical Dispatch 2.x fixtures remain on the old public CSV shape.
+# Phase 1 introduces V3 ingestion without changing the temporal engine yet.
+COLUMNS = [
+    "order_id",
+    "product",
+    "quantity_units",
+    "unit_weight_kg",
+    "origin",
+    "destination",
+    "distance_km",
+    "priority",
+    "max_delivery_days",
+    "ready_date",
+]
+FC = [
+    "fleet_pool_id",
+    "vehicle_type",
+    "ownership",
+    "base_location",
+    "capacity_kg",
+    "cost_per_km",
+    "fixed_trip_cost",
+    "units_available",
+    "avg_speed_kmh",
+    "driving_hours_per_day",
+    "fuel_l_per_100km",
+    "co2_kg_per_km",
+]
 
 
 def csv_bytes(cols, rows):
@@ -407,7 +434,7 @@ class DispatchEngineTests(unittest.TestCase):
         trip = result["scenarios"]["selected"]["trips"][0]
         self.assertEqual(
             trip["fleet_pool_id"],
-            "OWN-S",
+            "LEGACY-OWN-S-01",
         )
         self.assertEqual(
             trip["base_location"],

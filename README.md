@@ -7,28 +7,25 @@ and human validation.
 
 ## Current MVP
 
-The first active Decision Asset is **DDA Logística**.
-
-Current end-to-end flow:
+The first active domain is **DDA Logística**. Its data layer is now organized as a progressive **Logistics Data Pack**:
 
 ```text
-Orders v2 CSV + spatial fleet v2 CSV
+Orders V3 + Fleet V3
         ↓
-validation + dataset profile + origin/base compatibility
+technical validation
         ↓
-decision composer
-(SLA first → active dimensions → objective → analysis depth)
+Decision Readiness
         ↓
-Lexicographic CP-SAT: SLA first + spatial/temporal resources + business objective
-        ↓
-DecisionResult JSON
-        ↓
-focused decision dashboard + assignment explorer + AI explanation
-        ↓
-AI interpretation / contextual chat
-        ↓
-traceability + export
+01 Assignment      AVAILABLE
+02 Scheduling      LOCKED
+03 Final Assignment LOCKED
 ```
+
+The templates are deliberately complete, but users only need the core columns required for the first decision. Optional fields can be added later to the same two datasets to unlock scheduling, SLA analysis, cost/CO₂ objectives and physical-vehicle assignment.
+
+Fleet V3 contains **one row per real truck**. There is no user-facing pool concept.
+
+Phase 1 keeps the existing Dispatch 2.2 temporal engine behind a compatibility adapter while the new decision chain is introduced incrementally. The next phase adds Decision Cases, approval states and the visual Decision Map.
 
 ## Current versions
 

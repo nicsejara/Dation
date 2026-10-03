@@ -310,7 +310,7 @@ class FrontendContractTests(
             self.dashboard_stage_js,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=dashboard-focus-v1",
+            "/static/js/dispatch/workspace.mjs?v=data-pack-v3-v1",
             self.html,
         )
         self.assertIn(
@@ -467,6 +467,9 @@ class FrontendContractTests(
         quality = (upload_root / "preflight-panel.mjs").read_text(
             encoding="utf-8"
         )
+        readiness = (upload_root / "readiness-panel.mjs").read_text(
+            encoding="utf-8"
+        )
 
         self.assertNotIn(
             'id="upload-dropzone"',
@@ -491,6 +494,26 @@ class FrontendContractTests(
         self.assertIn(
             "Descargar plantilla",
             dropcard,
+        )
+        self.assertIn(
+            "columnas mínimas",
+            dropcard,
+        )
+        self.assertIn(
+            "Qué decisiones habilitan estos datos",
+            readiness,
+        )
+        self.assertIn(
+            "Data Pack progresivo",
+            readiness,
+        )
+        self.assertIn(
+            "renderDecisionReadiness",
+            upload_index,
+        )
+        self.assertNotIn(
+            "fleet_pool_id",
+            dropcard + guide + readiness,
         )
         self.assertNotIn(
             "Ver ejemplo",

@@ -94,7 +94,7 @@
     },
     "options": {},
     "expected": {
-      "error_contains": "ready_date"
+      "error_contains": "estimated_dispatch_date"
     }
   },
   {
@@ -104,7 +104,7 @@
     },
     "options": {},
     "expected": {
-      "error_contains": "distancia inconsistente"
+      "error_contains": "distancia.*inconsistente"
     }
   }
 ]
