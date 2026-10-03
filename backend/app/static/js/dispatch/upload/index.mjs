@@ -10,7 +10,6 @@ import {
 } from "./selectors.mjs";
 import {renderSystemBanner} from "./system-banner.mjs";
 import {createValidationDrawer} from "./validation-report.mjs";
-import {renderDecisionReadiness} from "./readiness-panel.mjs";
 
 const MAX_BYTES = 10 * 1024 * 1024;
 
@@ -105,7 +104,7 @@ function makeFinalBar(onNext) {
   const button = document.createElement("button");
   button.type = "button";
   button.className = "dispatch-final-cta";
-  button.textContent = "Continuar →";
+  button.textContent = "Ir al mapa de decisiones →";
   button.disabled = true;
   button.onclick = () => {
     if (!button.disabled) {
@@ -121,10 +120,10 @@ function makeFinalBar(onNext) {
 
     if (result.enabled) {
       icon.textContent = "✓";
-      title.textContent = "Asignación de carga disponible";
+      title.textContent = "Data Pack validado";
       description.textContent = (
-        "El Data Pack tiene lo necesario para la primera decisión. "
-        + "Los datos opcionales pueden completarse más adelante."
+        "Órdenes y Flota superaron la validación técnica. "
+        + "Explorá en el mapa qué decisiones están habilitadas y cuál sigue en la cadena."
       );
       return;
     }
@@ -231,7 +230,7 @@ export async function mountUploadScreen(
     el("h1", "Cargar datos"),
     el(
       "p",
-      "Cargá Órdenes y Flota. Dation valida el núcleo mínimo y detecta qué decisiones pueden habilitarse con la información disponible.",
+      "Cargá Órdenes y Flota. Dation valida estructura, tipos y compatibilidad entre archivos antes de habilitar el mapa de decisiones.",
     ),
   );
 
@@ -240,7 +239,6 @@ export async function mountUploadScreen(
 
   const cards = el("div", null, "dispatch-upload-cards-v3");
   const validationRoot = el("section");
-  const readinessRoot = el("section");
   const finalBar = makeFinalBar(onNext);
 
   root.append(
@@ -249,7 +247,6 @@ export async function mountUploadScreen(
     makeHowItWorks(),
     cards,
     validationRoot,
-    readinessRoot,
     finalBar.bar,
   );
 
@@ -275,13 +272,8 @@ export async function mountUploadScreen(
       phases: local.phases,
       saveErrors: local.saveErrors,
     });
-    const readiness = state.preflight?.decision_readiness || null;
-    renderDecisionReadiness(readinessRoot, readiness);
     finalBar.update(result);
-    window.dationSetDataReady(Boolean(
-      result.enabled
-      && readiness?.decisions?.[0]?.state === "available"
-    ));
+    window.dationSetDataReady(Boolean(result.enabled));
     return result;
   }
 
