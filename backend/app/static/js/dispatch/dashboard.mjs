@@ -4,8 +4,8 @@ import * as assignment from './assignment.mjs';
 import * as review from './review.mjs';
 import * as explanation from './explanation.mjs';
 import {exportDecision} from './export.mjs?v=decision-dashboard-v2';
-import * as schedulingDashboard from './scheduling-dashboard.mjs';
-import {decisionRail,bindDecisionRail} from './decision-nav.mjs';
+import * as schedulingDashboard from './scheduling-dashboard.mjs?v=decision-map-phase1-v1';
+import {decisionRail,bindDecisionRail} from './decision-nav.mjs?v=decision-map-phase1-v1';
 
 export function render(root,run,onRerun,caseActions={}){
   dispose(root);
