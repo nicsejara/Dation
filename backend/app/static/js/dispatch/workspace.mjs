@@ -1,7 +1,7 @@
 import {esc,num,date,vehicle,api,post,errorBox} from './shared.mjs';import {rebalance} from './selectors.mjs';import {render as dashboard} from './dashboard.mjs';
 import {mountUploadScreen} from './upload/index.mjs?v=decision-flow-v1';
 import {renderDecisionMap} from './decision-map.mjs';
-import {STATUS,createDecisionCase,replaceInputs,transitionNode,inputSignature,caseRef} from './decision-case.mjs';
+import {STATUS,createDecisionCase,replaceInputs,transitionNode,inputSignature,caseRef,deriveDecisionNodes} from './decision-case.mjs';
 const KEY='dation.dispatch.workspace.v4';
 const PRIORITY_KEYS=['trips','cost','own_fleet','co2'];
 const CORE_DIMENSIONS=['trips','own_fleet'];
@@ -253,6 +253,14 @@ async function loadDecisionMap(){
   try{
     if(!state.preflight)await preflight();
     ensureDecisionCase();
+    state.decisionCase={
+      ...state.decisionCase,
+      nodes:deriveDecisionNodes(
+        state.decisionCase,
+        state.preflight?.decision_readiness,
+      ),
+    };
+    persist();
     renderDecisionMap(node,{
       decisionCase:state.decisionCase,
       readiness:state.preflight?.decision_readiness,
