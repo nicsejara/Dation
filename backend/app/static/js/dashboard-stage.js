@@ -2768,6 +2768,29 @@
     );
   }
 
+  function formatLandingDecisionDate(value) {
+    if (!value) {
+      return "";
+    }
+
+    var parsed = new Date(value);
+
+    if (Number.isNaN(parsed.getTime())) {
+      return F.formatDate(value);
+    }
+
+    return new Intl.DateTimeFormat(
+      "es-AR",
+      {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      }
+    ).format(parsed);
+  }
+
   function updateLatestDecisionCta(run) {
     var button = (
       latestDecisionButton()
@@ -2781,9 +2804,12 @@
     }
 
     if (!run) {
-      button.disabled = true;
+      button.disabled = false;
+      button.dataset.mode = "example";
+      delete button.dataset.runId;
+      button.textContent = "Ver un ejemplo de resultado ↘";
       meta.textContent = (
-        "Todavía no hay decisiones completadas para analizar."
+        "Todavía no hay decisiones completadas · podés explorar un resultado de ejemplo."
       );
 
       if (
@@ -2800,10 +2826,12 @@
     }
 
     button.disabled = false;
+    button.dataset.mode = "latest";
     button.dataset.runId = run.id;
+    button.textContent = "Analizar mi última decisión ↗";
     meta.textContent = (
       "Última decisión · "
-      + F.formatDate(
+      + formatLandingDecisionDate(
           run.finished_at
           || run.created_at
         )
@@ -2875,6 +2903,24 @@
       latestDecisionButton()
     );
 
+    if (
+      button
+      && button.dataset.mode === "example"
+    ) {
+      var example = document.getElementById(
+        "dda-logistics-example-result"
+      );
+
+      if (example) {
+        example.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+      }
+
+      return;
+    }
+
     if (button) {
       button.disabled = true;
       button.textContent = (
@@ -2920,10 +2966,14 @@
         + error.message
       );
     } finally {
-      if (button) {
+      if (
+        button
+        && button.dataset.mode !== "example"
+      ) {
         button.textContent = (
           "Analizar mi última decisión ↗"
         );
+        button.disabled = false;
       }
     }
   }
