@@ -86,15 +86,25 @@ def _missing(reports, requirements):
     ]
 
 
-def build_decision_readiness(orders, fleet):
+def build_decision_readiness(orders, fleet, compatibility=None):
     reports = {
         "orders": orders,
         "fleet": fleet,
     }
 
+    compatibility = compatibility or {}
+    assignment_blockers = [
+        error
+        for error in compatibility.get("errors", [])
+        if error.get("code") in {
+            "NO_FLEET_AT_ORIGIN",
+            "UNIT_EXCEEDS_CAPACITY",
+        }
+    ]
     assignment_ready = bool(
         orders.get("profile")
         and fleet.get("profile")
+        and not assignment_blockers
     )
     scheduling_missing = _missing(
         reports,
@@ -126,6 +136,7 @@ def build_decision_readiness(orders, fleet):
             "data_ready": assignment_ready,
             "state": "available" if assignment_ready else "needs_data",
             "missing": [],
+            "blockers": assignment_blockers,
             "capabilities": capabilities,
         },
         {
