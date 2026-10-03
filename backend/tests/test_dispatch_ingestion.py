@@ -7,6 +7,7 @@ import httpx
 from app.auth import require_upload_access
 from app.services import dispatch_service
 from app.services.decision_readiness import build_decision_readiness
+from app.engines.dispatch.normalization import preflight
 from app.validators.fleet_schema import (
     validate_fleet_csv,
     validate_fleet_report,
