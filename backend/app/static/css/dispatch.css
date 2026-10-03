@@ -2057,7 +2057,20 @@ body.dispatch-drawer-open {
 .dispatch-dashboard-focused>.dispatch-focus-main{grid-column:1;min-width:0}
 .dispatch-dashboard-focused>.dispatch-chat{grid-column:2;grid-row:2;position:sticky;top:94px;align-self:start;max-height:calc(100vh - 118px);overflow:auto}
 .dispatch-command-focused{position:sticky;top:var(--topbar-height,76px);z-index:42;display:flex;gap:16px;justify-content:space-between;align-items:center;border:1px solid #dce2ec;border-radius:14px;background:#fff;padding:14px 16px;box-shadow:0 7px 22px #25395f0c;margin-bottom:22px}
-.dispatch-command-title{display:flex;align-items:center;gap:10px}
+.dispatch-command-title{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.dispatch-dashboard-map-back{
+  min-height:32px!important;
+  padding:6px 9px!important;
+  border-color:#d7dce7!important;
+  background:#fff!important;
+  color:#536078!important;
+  font-size:10.5px!important;
+  font-weight:750!important;
+}
+.dispatch-dashboard-map-back:hover{
+  border-color:#bfc6d5!important;
+  background:#f7f8fb!important;
+}
 .dispatch-command-focused .dispatch-actions{justify-content:flex-end}
 .dispatch-command-focused .dispatch-primary-action{background:#5958e8;border-color:#5958e8;color:#fff}
 .dispatch-more{position:relative}
@@ -2471,6 +2484,27 @@ body.dispatch-drawer-open {
 .dispatch-map-evidence>div{display:grid;gap:3px;}
 .dispatch-map-evidence small,.dispatch-map-evidence span{color:#788196;font-size:11px;}
 .dispatch-map-evidence button{align-self:stretch;}
+.dispatch-decision-map .dispatch-readiness-panel{
+  margin:0 0 18px;
+}
+.dispatch-map-chain-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:24px;
+  margin:6px 0 14px;
+}
+.dispatch-map-chain-head h2{
+  margin:4px 0 0;
+  font-size:20px;
+}
+.dispatch-map-chain-head p{
+  max-width:650px;
+  margin:0;
+  color:#667085;
+  font-size:12px;
+  line-height:1.5;
+}
 .dispatch-map-stale{
   display:flex;
   gap:12px;
@@ -2550,7 +2584,7 @@ body.dispatch-drawer-open {
   .dispatch-map-node{min-height:0;}
 }
 @media(max-width:700px){
-  .dispatch-map-hero,.dispatch-map-principle{flex-direction:column;}
+  .dispatch-map-hero,.dispatch-map-principle,.dispatch-map-chain-head{flex-direction:column;align-items:flex-start;}
   .dispatch-map-evidence{grid-template-columns:1fr;}
   .dispatch-map-case{width:100%;}
 }
