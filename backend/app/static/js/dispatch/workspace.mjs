@@ -337,18 +337,28 @@ export function show(run){
       }
     },
     {
-      status:state.decisionCase?.nodes?.logistics_assignment?.status,
-      onMap:()=>navigate('logistics-map'),
-      onApprove:()=>{
-        state.decisionCase=transitionNode(
-          state.decisionCase,
-          'logistics_assignment',
-          STATUS.APPROVED,
-          {run_id:run.id,approved_at:new Date().toISOString(),error:null},
-        );
-        persist();
-        return state.decisionCase;
-      },
+      status:(
+        caseMeta?.case_id
+        && state.decisionCase?.id===caseMeta.case_id
+      )
+        ?state.decisionCase.nodes?.logistics_assignment?.status
+        :null,
+      onMap:state.decisionCase?()=>navigate('logistics-map'):null,
+      onApprove:(
+        caseMeta?.case_id
+        && state.decisionCase?.id===caseMeta.case_id
+      )
+        ?()=>{
+          state.decisionCase=transitionNode(
+            state.decisionCase,
+            'logistics_assignment',
+            STATUS.APPROVED,
+            {run_id:run.id,approved_at:new Date().toISOString(),error:null},
+          );
+          persist();
+          return state.decisionCase;
+        }
+        :null,
     },
   );
   navigate('decision-dashboard');
