@@ -137,6 +137,7 @@ def solve_schedule(
 
     late_bools = []
     late_days_vars = []
+    late_day_bounds = []
     if use_due_dates:
         order_due = {}
         for item in trips:
@@ -154,13 +155,17 @@ def solve_schedule(
             model.add_max_equality(order_arrival, arrivals)
             due_offset = _days(due, horizon_start)
 
+            late_upper = max(
+                0,
+                horizon_end - due_offset,
+            )
             late_days = model.new_int_var(
                 0,
-                max(
-                    0,
-                    horizon_end - due_offset,
-                ),
+                late_upper,
                 f"late_days_{order_id}",
+            )
+            late_day_bounds.append(
+                late_upper
             )
             model.add_max_equality(
                 late_days,
@@ -182,8 +187,7 @@ def solve_schedule(
     if late_days_vars:
         total_late_days = sum(late_days_vars)
         max_late_sum = sum(
-            var.Proto().domain[-1]
-            for var in late_days_vars
+            late_day_bounds
         )
         late_days_weight = lower_max + 1
         late_count_weight = (
