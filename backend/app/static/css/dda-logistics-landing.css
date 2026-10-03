@@ -1264,3 +1264,145 @@
     transition:none;
   }
 }
+
+
+/* LANDING READABILITY SCALE v2 */
+.dda-landing__eyebrow,
+.dda-landing__section-eyebrow{
+  font-size:11px;
+}
+
+.dda-landing__hero-lead{
+  font-size:16px;
+}
+
+.dda-landing .button--landing-primary,
+.dda-landing .button--landing-secondary{
+  font-size:13px;
+}
+
+.dda-landing__latest{
+  font-size:12px;
+}
+
+.dda-landing__trust span{
+  font-size:12px;
+}
+
+.dda-landing__flow-node small{
+  font-size:10px;
+}
+
+.dda-landing__flow-node strong{
+  font-size:14px;
+}
+
+.dda-landing__stat strong{
+  font-size:15px;
+}
+
+.dda-landing__stat small{
+  font-size:14px;
+}
+
+.dda-landing__section-head p{
+  font-size:14px;
+}
+
+.dda-landing__step h3{
+  font-size:16px;
+}
+
+.dda-landing__step p{
+  font-size:14px;
+}
+
+.dda-landing__node h3{
+  font-size:17px;
+}
+
+.dda-landing__node p{
+  font-size:14px;
+}
+
+.dda-landing__node-action{
+  font-size:13px;
+}
+
+.dda-landing__feature h3{
+  font-size:15px;
+}
+
+.dda-landing__feature p{
+  font-size:14px;
+}
+
+.dda-landing__result-kpi span{
+  font-size:10px;
+}
+
+.dda-landing__result-kpi strong{
+  font-size:20px;
+}
+
+.dda-landing__result-kpi small{
+  font-size:10px;
+}
+
+.dda-landing__compare h4,
+.dda-landing__calendar h4{
+  font-size:14px;
+}
+
+.dda-landing__bar-row{
+  font-size:12px;
+}
+
+.dda-landing__bar-row strong{
+  font-size:12px;
+}
+
+.dda-landing__difference{
+  font-size:12px;
+}
+
+.dda-landing__heatmap span{
+  font-size:10px;
+}
+
+.dda-landing__result-actions button{
+  font-size:12px;
+}
+
+.dda-landing__json pre{
+  font-size:11px;
+}
+
+.dda-landing__checklist li{
+  font-size:14px;
+}
+
+.dda-landing__scope-card h3{
+  font-size:16px;
+}
+
+.dda-landing__chip{
+  font-size:12px;
+}
+
+.dda-landing summary{
+  font-size:14px;
+}
+
+.dda-landing details p,
+.dda-landing details ul{
+  font-size:14px;
+}
+
+.dda-landing__trust-copy{
+  font-size:13px;
+}
+
+.dda-landing__final p{
+  font-size:14px;
+}
