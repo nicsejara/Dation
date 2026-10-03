@@ -1555,5 +1555,60 @@ class FrontendContractTests(
         )
 
 
+    def test_dda_logistics_landing_contract(self):
+        overview = self.html.split(
+            "<!-- OVERVIEW DDA LOGÍSTICA -->",
+            1,
+        )[1].split(
+            "<!-- CARGAR DATOS:",
+            1,
+        )[0]
+
+        for copy in (
+            "De órdenes y flota a despachos que podés explicar.",
+            "Motor 0.2.0",
+            "Cuatro pasos de los datos a la decisión.",
+            "Una cadena de decisiones, desbloqueada paso a paso.",
+            "Así se ve una decisión con evidencia.",
+            "Datos de ejemplo",
+            "Qué cubre hoy y qué viene.",
+            "¿Listo para tomar tu primera decisión?",
+        ):
+            self.assertIn(copy, overview)
+
+        self.assertIn(
+            "/static/css/dda-logistics-landing.css?v=dda-logistics-landing-v1",
+            self.html,
+        )
+        self.assertIn(
+            "/static/js/dda-logistics-landing.js?v=dda-logistics-landing-v1",
+            self.html,
+        )
+        self.assertIn(
+            "/static/js/dashboard-stage.js?v=dda-logistics-landing-v1",
+            self.html,
+        )
+        self.assertNotIn(
+            "Dispatch 2.2.0",
+            overview,
+        )
+        self.assertIn(
+            'id="open-latest-logistics-decision"',
+            overview,
+        )
+        self.assertIn(
+            'id="latest-logistics-meta"',
+            overview,
+        )
+        self.assertIn(
+            "Ver un ejemplo de resultado",
+            self.dashboard_stage_js,
+        )
+        self.assertIn(
+            "formatLandingDecisionDate",
+            self.dashboard_stage_js,
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
