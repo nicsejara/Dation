@@ -330,7 +330,7 @@ class FrontendContractTests(
             self.dashboard_stage_js,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=decision-flow-v1",
+            "/static/js/dispatch/workspace.mjs?v=decision-dashboard-v2",
             self.html,
         )
         self.assertIn(
@@ -712,6 +712,18 @@ class FrontendContractTests(
             dashboard,
         )
         self.assertIn(
+            "data-export-decision",
+            dashboard,
+        )
+        self.assertIn(
+            "Exportar decisión",
+            dashboard,
+        )
+        self.assertIn(
+            "Carga total viaje (kg)",
+            exporter,
+        )
+        self.assertIn(
             "dispatch-ai-fab",
             dashboard,
         )
@@ -744,7 +756,7 @@ class FrontendContractTests(
             explanation,
         )
         self.assertIn(
-            "decision-flow-v1",
+            "decision-dashboard-v2",
             self.html,
         )
 
