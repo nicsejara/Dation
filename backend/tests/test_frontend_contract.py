@@ -1534,7 +1534,7 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "/static/css/home-dda.css?v=home-dda-hero-v3",
+            "/static/css/home-dda.css?v=home-dda-hero-v4",
             self.html,
         )
         self.assertIn(
