@@ -155,3 +155,32 @@
     font-size:10px;
   }
 }
+
+
+/* HERO PRIMARY CONCEPT CARD BALANCE v4 */
+.d-home__tile--main .d-home__tile-index{
+  font-size:10px;
+}
+
+.d-home__tile--main strong{
+  margin-top:10px;
+  font-size:17px;
+  line-height:1.22;
+}
+
+.d-home__tile--main small{
+  margin-top:9px;
+  font-size:10.5px;
+  line-height:1.5;
+  opacity:.78;
+}
+
+@media(max-width:1080px){
+  .d-home__tile--main strong{
+    font-size:16px;
+  }
+
+  .d-home__tile--main small{
+    font-size:10px;
+  }
+}
