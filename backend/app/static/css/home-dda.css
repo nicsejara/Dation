@@ -106,3 +106,52 @@
     height:62px;
   }
 }
+
+
+/* HOME HERO COPY v3 */
+.d-home__hero-copy > p:not(.d-home__hero-definition) strong{
+  color:#f5fbfc;
+  font-weight:760;
+}
+
+.d-home__hero-definition{
+  font-size:12.5px!important;
+}
+
+/* Improve readability of the two compact concept cards on the right. */
+.d-home__tile--sand,
+.d-home__tile--lime{
+  padding:18px;
+}
+
+.d-home__tile--sand .d-home__tile-index,
+.d-home__tile--lime .d-home__tile-index{
+  font-size:10px;
+}
+
+.d-home__tile--sand strong,
+.d-home__tile--lime strong{
+  margin-top:10px;
+  font-size:17px;
+  line-height:1.22;
+}
+
+.d-home__tile--sand small,
+.d-home__tile--lime small{
+  margin-top:9px;
+  font-size:10.5px;
+  line-height:1.5;
+  opacity:.78;
+}
+
+@media(max-width:1080px){
+  .d-home__tile--sand strong,
+  .d-home__tile--lime strong{
+    font-size:16px;
+  }
+
+  .d-home__tile--sand small,
+  .d-home__tile--lime small{
+    font-size:10px;
+  }
+}
