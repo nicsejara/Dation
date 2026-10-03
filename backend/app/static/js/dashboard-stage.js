@@ -2768,6 +2768,25 @@
     );
   }
 
+  function landingHasData() {
+    try {
+      var saved = JSON.parse(
+        sessionStorage.getItem(
+          "dation.dispatch.workspace.v4"
+        )
+        || "{}"
+      );
+
+      return Boolean(
+        saved
+        && saved.orders
+        && saved.fleet
+      );
+    } catch (error) {
+      return false;
+    }
+  }
+
   function formatLandingDecisionDate(value) {
     if (!value) {
       return "";
