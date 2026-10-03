@@ -164,6 +164,43 @@ class DataPackValidationTests(unittest.TestCase):
         self.assertFalse(capabilities["cost"]["available"])
         self.assertFalse(capabilities["co2"]["available"])
 
+    def test_readiness_blocks_assignment_when_site_has_no_fleet(self):
+        orders = validate_orders_csv(
+            (
+                "order_id;product;quantity_units;unit_weight_kg;origin;"
+                "destination;distance_km\n"
+                "A;Producto A;10;800;Cordoba;Mendoza;650\n"
+            ).encode()
+        )
+        fleet = validate_fleet_csv(
+            (
+                "vehicle_id;vehicle_type;ownership;base_site;capacity_kg\n"
+                "VEH-001;Truck_L;own;Rosario;25000\n"
+            ).encode()
+        )
+        compatibility = preflight(
+            orders["records"],
+            fleet["records"],
+            fleet["records"],
+        )
+        readiness = build_decision_readiness(
+            orders,
+            fleet,
+            compatibility,
+        )
+
+        assignment = readiness["decisions"][0]
+        self.assertEqual(
+            assignment["state"],
+            "needs_data",
+        )
+        self.assertFalse(assignment["data_ready"])
+        self.assertTrue(assignment["blockers"])
+        self.assertEqual(
+            assignment["blockers"][0]["code"],
+            "NO_FLEET_AT_ORIGIN",
+        )
+
     def test_templates_are_complete_but_only_core_is_required(self):
         from app.validators.contracts import (
             public_contracts,
