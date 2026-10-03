@@ -44,7 +44,7 @@ export function decisionRail(caseActions={}){
   return '<section class="dispatch-decision-rail" aria-label="Decisiones del caso">'
     +'<div class="dispatch-decision-rail__head">'
       +'<div><span class="dispatch-kicker">DECISION CASE</span><strong>Decisiones del análisis</strong></div>'
-      +'<button type="button" data-flow class="dispatch-flow-button">Ver flujo completo →</button>'
+      +'<button type="button" data-flow class="dispatch-flow-button">Explorar mapa →</button>'
     +'</div>'
     +'<nav>'+nodes+'</nav>'
     +'</section>';
@@ -57,6 +57,7 @@ export function bindDecisionRail(root,caseActions={}){
       caseActions.onOpenNode?.(button.dataset.decisionNode);
     };
   });
-  const flow=root.querySelector('[data-flow]');
-  if(flow)flow.onclick=()=>caseActions.onFlow?.();
+  root.querySelectorAll('[data-flow]').forEach(flow=>{
+    flow.onclick=()=>caseActions.onFlow?.();
+  });
 }
