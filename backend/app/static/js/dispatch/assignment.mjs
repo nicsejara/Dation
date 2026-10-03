@@ -1,25 +1,26 @@
-import {esc,num,pct,date,vehicle,chart,dispose} from './shared.mjs';
+import {esc,num,pct,vehicle,chart,dispose} from './shared.mjs';
 
-function poolId(value){
-  return value.fleet_pool_id||value.vehicle_type||'legacy';
+function resourceId(value){
+  return value.vehicle_id||value.fleet_pool_id||value.vehicle_type||'legacy';
 }
 
 function baseLabel(value){
-  if(value.base_location==='*')return 'Cualquier origen';
-  return value.base_location||'Base no informada';
+  if(value.base_site==='*'||value.base_location==='*')return 'Cualquier origen';
+  return value.base_site||value.base_location||'Site no informado';
 }
 
 function aggregate(result){
   const groups=new Map();
 
-  for(const trip of result.scenarios.selected.trips){
-    const id=poolId(trip);
+  for(const trip of result.scenarios.selected.trips||[]){
+    const id=resourceId(trip);
     if(!groups.has(id)){
       groups.set(id,{
         id,
         vehicle_type:trip.vehicle_type,
         ownership:trip.ownership,
-        base_location:trip.base_location,
+        provider_name:trip.provider_name||null,
+        base_site:trip.base_site||trip.base_location,
         trips:[],
         load_kg:0,
         capacity_kg:0,
@@ -67,12 +68,12 @@ const METRICS={
     format:value=>num(value,0)+' kg',
   },
   trips:{
-    label:'Viajes',
+    label:'Viajes asignados',
     value:item=>item.trips.length,
     format:value=>num(value),
   },
   utilization:{
-    label:'Utilización',
+    label:'Utilización media',
     value:item=>item.utilization,
     format:value=>pct(value),
   },
@@ -80,55 +81,57 @@ const METRICS={
 
 export function render(root,result){
   dispose(root);
-  const pools=aggregate(result);
+  const resources=aggregate(result);
 
-  if(!pools.length){
+  if(!resources.length){
     root.innerHTML='<h2>Asignación de carga</h2><p>No hay viajes para mostrar.</p>';
     return;
   }
 
+  const isAssignment=result.schema_version==='assignment_v1';
   let metric='load';
-  let selectedId=pools[0].id;
+  let selectedId=resources[0].id;
 
   root.innerHTML=
     '<div class="dispatch-section-heading">'
-      +'<div><span class="dispatch-kicker">ASIGNACIÓN</span><h2>Cómo quedó distribuida la carga</h2>'
-      +'<p>Seleccioná un pool para revisar qué carga toma, cuántos viajes realiza y qué productos transporta.</p></div>'
+      +'<div><span class="dispatch-kicker">ASIGNACIÓN</span><h2>Qué vehículo toma cada carga</h2>'
+      +'<p>Seleccioná un vehículo para revisar cuántos viajes recibe, qué productos transporta y cómo se utiliza su capacidad.</p></div>'
       +'<label class="dispatch-metric-picker">Ver por <select data-assignment-metric>'
       +Object.entries(METRICS).map(([key,item])=>'<option value="'+key+'">'+esc(item.label)+'</option>').join('')
       +'</select></label>'
     +'</div>'
     +'<div class="dispatch-assignment-layout">'
       +'<div>'
-        +'<div class="dispatch-assignment-chart dispatch-chart" role="img" aria-label="Asignación de carga por pool de flota"></div>'
-        +'<div class="dispatch-pool-grid" data-pool-grid></div>'
+        +'<div class="dispatch-assignment-chart dispatch-chart" role="img" aria-label="Asignación de carga por vehículo"></div>'
+        +'<div class="dispatch-pool-grid" data-resource-grid></div>'
       +'</div>'
       +'<aside class="dispatch-assignment-detail" data-assignment-detail></aside>'
     +'</div>'
-    +'<p class="dispatch-model-note">La asignación actual es por <strong>pool homogéneo de flota</strong>. Dation decide tipo/base/pool y viajes; no individualiza patente o unidad física dentro del pool.</p>';
+    +(isAssignment
+      ?'<p class="dispatch-model-note"><strong>Assignment no define fechas.</strong> Un mismo vehículo puede recibir varios viajes abstractos; Planificación decidirá cuándo ejecutarlos y verificará que no se superpongan.</p>'
+      :'<p class="dispatch-model-note">Esta es una corrida histórica calculada con el motor temporal anterior.</p>');
 
-  const grid=root.querySelector('[data-pool-grid]');
+  const grid=root.querySelector('[data-resource-grid]');
   const detail=root.querySelector('[data-assignment-detail]');
   const chartNode=root.querySelector('.dispatch-assignment-chart');
-  let chartInstance=null;
 
   function renderGrid(){
-    grid.innerHTML=pools.map(pool=>{
-      const active=pool.id===selectedId;
-      return '<button class="dispatch-pool-card" data-pool="'+esc(pool.id)+'" aria-pressed="'+active+'">'
-        +'<span class="dispatch-pool-card-top"><strong>'+esc(vehicle(pool.vehicle_type))+'</strong><small>'+esc(pool.ownership==='own'?'Propio':'Tercerizado')+'</small></span>'
-        +'<span class="dispatch-pool-id">'+esc(pool.id)+'</span>'
+    grid.innerHTML=resources.map(resource=>{
+      const active=resource.id===selectedId;
+      return '<button class="dispatch-pool-card" data-resource="'+esc(resource.id)+'" aria-pressed="'+active+'">'
+        +'<span class="dispatch-pool-card-top"><strong>'+esc(resource.id)+'</strong><small>'+esc(resource.ownership==='own'?'Propio':'Tercerizado')+'</small></span>'
+        +'<span class="dispatch-pool-id">'+esc(vehicle(resource.vehicle_type))+' · '+esc(baseLabel(resource))+'</span>'
         +'<span class="dispatch-pool-stats">'
-          +'<span><small>Carga</small><strong>'+num(pool.load_kg,0)+' kg</strong></span>'
-          +'<span><small>Viajes</small><strong>'+num(pool.trips.length)+'</strong></span>'
-          +'<span><small>Utilización</small><strong>'+pct(pool.utilization)+'</strong></span>'
+          +'<span><small>Carga</small><strong>'+num(resource.load_kg,0)+' kg</strong></span>'
+          +'<span><small>Viajes</small><strong>'+num(resource.trips.length)+'</strong></span>'
+          +'<span><small>Utilización</small><strong>'+pct(resource.utilization)+'</strong></span>'
         +'</span>'
       +'</button>';
     }).join('');
 
-    grid.querySelectorAll('[data-pool]').forEach(button=>{
+    grid.querySelectorAll('[data-resource]').forEach(button=>{
       button.onclick=()=>{
-        selectedId=button.dataset.pool;
+        selectedId=button.dataset.resource;
         renderGrid();
         renderDetail();
         drawChart();
@@ -137,18 +140,19 @@ export function render(root,result){
   }
 
   function renderDetail(){
-    const pool=pools.find(item=>item.id===selectedId)||pools[0];
-    const products=pool.product_rows;
+    const resource=resources.find(item=>item.id===selectedId)||resources[0];
+    const products=resource.product_rows;
 
     detail.innerHTML=
-      '<span class="dispatch-config-eyebrow">Detalle seleccionado</span>'
-      +'<h3>'+esc(vehicle(pool.vehicle_type))+'</h3>'
-      +'<p>'+esc(pool.id)+' · base '+esc(baseLabel(pool))+' · '+esc(pool.ownership==='own'?'Flota propia':'Tercerizado')+'</p>'
+      '<span class="dispatch-config-eyebrow">Vehículo seleccionado</span>'
+      +'<h3>'+esc(resource.id)+'</h3>'
+      +'<p>'+esc(vehicle(resource.vehicle_type))+' · '+esc(baseLabel(resource))+' · '+esc(resource.ownership==='own'?'Flota propia':'Tercerizado')
+        +(resource.provider_name?' · '+esc(resource.provider_name):'')+'</p>'
       +'<div class="dispatch-assignment-summary">'
-        +'<span><small>Carga</small><strong>'+num(pool.load_kg,0)+' kg</strong></span>'
-        +'<span><small>Viajes</small><strong>'+num(pool.trips.length)+'</strong></span>'
-        +'<span><small>Órdenes</small><strong>'+num(pool.orders.size)+'</strong></span>'
-        +'<span><small>Utilización</small><strong>'+pct(pool.utilization)+'</strong></span>'
+        +'<span><small>Carga</small><strong>'+num(resource.load_kg,0)+' kg</strong></span>'
+        +'<span><small>Viajes</small><strong>'+num(resource.trips.length)+'</strong></span>'
+        +'<span><small>Órdenes</small><strong>'+num(resource.orders.size)+'</strong></span>'
+        +'<span><small>Utilización</small><strong>'+pct(resource.utilization)+'</strong></span>'
       +'</div>'
       +'<h4>Qué productos lleva</h4>'
       +'<div class="dispatch-product-list">'
@@ -157,17 +161,17 @@ export function render(root,result){
             +'<div><strong>'+esc(item.product)+'</strong><small>'+num(item.orders.length)+' órdenes · '+num(item.units)+' unidades</small></div>'
             +'<span>'+num(item.kg,0)+' kg</span>'
           +'</div>'
-        ).join(''):'<p>No hay detalle de producto disponible para esta corrida histórica.</p>')
+        ).join(''):'<p>No hay detalle de producto disponible.</p>')
       +'</div>'
       +'<details class="dispatch-trip-detail"><summary>Ver viajes y órdenes</summary>'
-        +'<div class="dispatch-table-wrap"><table><thead><tr><th>Viaje</th><th>Ruta</th><th>Salida</th><th>Carga</th><th>Órdenes / productos</th></tr></thead><tbody>'
-        +pool.trips.map(trip=>
+        +'<div class="dispatch-table-wrap"><table><thead><tr><th>Viaje</th><th>Ruta</th><th>Carga</th><th>Utilización</th><th>Órdenes / productos</th></tr></thead><tbody>'
+        +resource.trips.map(trip=>
           '<tr>'
             +'<td>'+esc(trip.trip_id)+'</td>'
             +'<td>'+esc(trip.origin)+' → '+esc(trip.destination)+'</td>'
-            +'<td>'+date(trip.dispatch_date)+'</td>'
-            +'<td>'+num(trip.load_kg,0)+' kg<small>'+pct(trip.utilization)+'</small></td>'
-            +'<td>'+(trip.loads||[]).map(load=>esc(load.order_id)+' · '+esc(load.product||'Producto no registrado')).join('<br>')+'</td>'
+            +'<td>'+num(trip.load_kg,0)+' kg</td>'
+            +'<td>'+pct(trip.utilization)+'</td>'
+            +'<td>'+(trip.loads||[]).map(load=>esc(load.order_id)+' · '+esc(load.product||'Producto no registrado')+' · '+num(load.units)+' un.').join('<br>')+'</td>'
           +'</tr>'
         ).join('')
         +'</tbody></table></div>'
@@ -177,19 +181,20 @@ export function render(root,result){
   function drawChart(){
     chartNode._dispose?.();
     const definition=METRICS[metric];
-    const ordered=[...pools].sort((a,b)=>definition.value(b)-definition.value(a)||a.id.localeCompare(b.id));
-    chartInstance=chart(chartNode,{
+    const ordered=[...resources].sort((a,b)=>definition.value(b)-definition.value(a)||a.id.localeCompare(b.id));
+    const instance=chart(chartNode,{
       grid:{left:145,right:28,top:20,bottom:30},
       tooltip:{
         trigger:'item',
         renderMode:'richText',
         formatter:params=>{
-          const pool=ordered[params.dataIndex];
-          return vehicle(pool.vehicle_type)+' · '+pool.id
-            +'\n'+definition.label+': '+definition.format(definition.value(pool))
-            +'\nCarga: '+num(pool.load_kg,0)+' kg'
-            +'\nViajes: '+num(pool.trips.length)
-            +'\nUtilización: '+pct(pool.utilization);
+          const resource=ordered[params.dataIndex];
+          return resource.id
+            +'\n'+vehicle(resource.vehicle_type)
+            +'\n'+definition.label+': '+definition.format(definition.value(resource))
+            +'\nCarga: '+num(resource.load_kg,0)+' kg'
+            +'\nViajes: '+num(resource.trips.length)
+            +'\nUtilización: '+pct(resource.utilization);
         },
       },
       xAxis:{
@@ -207,9 +212,7 @@ export function render(root,result){
         type:'bar',
         data:ordered.map(item=>({
           value:definition.value(item),
-          itemStyle:{
-            opacity:itemSelected(item.id)?1:.42,
-          },
+          itemStyle:{opacity:item.id===selectedId?1:.42},
         })),
         label:{
           show:true,
@@ -218,18 +221,14 @@ export function render(root,result){
         },
       }],
     });
-    chartInstance?.on('click',params=>{
-      const pool=ordered[params.dataIndex];
-      if(!pool)return;
-      selectedId=pool.id;
+    instance?.on('click',params=>{
+      const resource=ordered[params.dataIndex];
+      if(!resource)return;
+      selectedId=resource.id;
       renderGrid();
       renderDetail();
       drawChart();
     });
-  }
-
-  function itemSelected(id){
-    return id===selectedId;
   }
 
   root.querySelector('[data-assignment-metric]').onchange=event=>{
