@@ -1577,15 +1577,15 @@ class FrontendContractTests(
             self.assertIn(copy, overview)
 
         self.assertIn(
-            "/static/css/dda-logistics-landing.css?v=dda-logistics-landing-v2",
+            "/static/css/dda-logistics-landing.css?v=dda-logistics-landing-v3",
             self.html,
         )
         self.assertIn(
-            "/static/js/dda-logistics-landing.js?v=dda-logistics-landing-v2",
+            "/static/js/dda-logistics-landing.js?v=dda-logistics-landing-v3",
             self.html,
         )
         self.assertIn(
-            "/static/js/dashboard-stage.js?v=dda-logistics-landing-v2",
+            "/static/js/dashboard-stage.js?v=dda-logistics-landing-v3",
             self.html,
         )
         self.assertNotIn(
