@@ -29,6 +29,7 @@ from app.services.run_service import (
     download_dataset,
     get_dataset,
 )
+from app.services.decision_readiness import build_decision_readiness
 from app.validators.fleet_schema import (
     validate_fleet_csv,
     validate_fleet_report,
@@ -300,8 +301,8 @@ async def _ensure_profile(dataset):
     stored = dataset.get("profile_json") or {}
     profile = stored.get("profile") or {}
     expected_profile_version = {
-        "orders": 2,
-        "fleet": 3,
+        "orders": 3,
+        "fleet": 4,
     }[kind]
     if profile.get("profile_version") == expected_profile_version:
         return dataset
@@ -647,12 +648,19 @@ async def check_inputs(orders_id, fleet_id, allow_third_party=True):
     ]
     if not vehicles:
         raise ValueError("No hay flota habilitada.")
+
+    decision_readiness = build_decision_readiness(
+        orders,
+        fleet,
+    )
+    compatibility_preflight = preflight(
+        orders["records"],
+        vehicles,
+        fleet["records"],
+    )
     return {
-        **preflight(
-            orders["records"],
-            vehicles,
-            fleet["records"],
-        ),
+        **compatibility_preflight,
+        "decision_readiness": decision_readiness,
         "orders_profile": orders["profile"],
         "fleet_profile": fleet["profile"],
         "orders_dataset": orders_dataset,
