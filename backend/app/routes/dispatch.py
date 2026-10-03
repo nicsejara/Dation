@@ -17,6 +17,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from app.auth import require_upload_access
 from app.models.assignment_config import AssignmentConfig, AssignmentOptions
 from app.models.dispatch_config import DispatchConfig, DispatchOptions
+from app.models.scheduling_config import SchedulingConfig, SchedulingOptions
 from app.services import dispatch_service as service
 from app.validators.contracts import public_contracts, template_csv
 
@@ -36,7 +37,7 @@ class DecisionCaseRef(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     case_id: UUID
-    node_id: Literal["logistics_assignment"]
+    node_id: Literal["logistics_assignment", "logistics_scheduling"]
 
 
 class RunRequest(BaseModel):
@@ -45,14 +46,16 @@ class RunRequest(BaseModel):
     configuration: dict = Field(default_factory=dict)
     options: dict = Field(default_factory=dict)
     decision_case: DecisionCaseRef | None = None
+    source_run_id: UUID | None = None
 
     @model_validator(mode="after")
     def canonical(self):
-        if (
-            self.decision_case
-            and self.decision_case.node_id
-            == "logistics_assignment"
-        ):
+        node_id = (
+            self.decision_case.node_id
+            if self.decision_case
+            else None
+        )
+        if node_id == "logistics_assignment":
             self.configuration = (
                 AssignmentConfig.model_validate(
                     self.configuration
@@ -60,6 +63,21 @@ class RunRequest(BaseModel):
             )
             self.options = (
                 AssignmentOptions.model_validate(
+                    self.options
+                ).model_dump()
+            )
+        elif node_id == "logistics_scheduling":
+            if not self.source_run_id:
+                raise ValueError(
+                    "Scheduling requiere source_run_id de Assignment."
+                )
+            self.configuration = (
+                SchedulingConfig.model_validate(
+                    self.configuration
+                ).model_dump()
+            )
+            self.options = (
+                SchedulingOptions.model_validate(
                     self.options
                 ).model_dump()
             )
@@ -75,6 +93,16 @@ class RunRequest(BaseModel):
                 ).model_dump()
             )
         return self
+
+
+class ApprovalRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    case_id: UUID
+    node_id: Literal[
+        "logistics_assignment",
+        "logistics_scheduling",
+    ]
 
 
 class LabelUpdate(BaseModel):
@@ -222,6 +250,27 @@ async def run(
                 if payload.decision_case
                 else None
             ),
+            (
+                str(payload.source_run_id)
+                if payload.source_run_id
+                else None
+            ),
+        )
+    )
+
+
+@router.post("/api/runs/{run_id}/approve")
+async def approve_run(
+    run_id: UUID,
+    payload: ApprovalRequest,
+):
+    return await guarded(
+        service.approve_decision_run(
+            str(run_id),
+            case_id=str(
+                payload.case_id
+            ),
+            node_id=payload.node_id,
         )
     )
 
