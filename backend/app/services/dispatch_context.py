@@ -3,7 +3,167 @@ import json
 import re
 
 
+def build_assignment_context(result):
+    """Bounded evidence for Assignment V1; deliberately excludes time/SLA."""
+    selected = result["scenarios"]["selected"]
+    resources = {}
+
+    for trip in selected.get("trips", []):
+        resource_id = (
+            trip.get("vehicle_id")
+            or trip.get("fleet_pool_id")
+            or trip.get("vehicle_type")
+            or "legacy"
+        )
+        current = resources.setdefault(
+            resource_id,
+            {
+                "vehicle_id": resource_id,
+                "vehicle_type": trip.get("vehicle_type"),
+                "ownership": trip.get("ownership"),
+                "provider_name": trip.get("provider_name"),
+                "base_site": (
+                    trip.get("base_site")
+                    or trip.get("base_location")
+                ),
+                "trips": 0,
+                "load_kg": 0.0,
+                "capacity_kg": 0.0,
+                "orders": set(),
+                "products": {},
+            },
+        )
+        current["trips"] += 1
+        current["load_kg"] += float(
+            trip.get("load_kg") or 0
+        )
+        current["capacity_kg"] += float(
+            trip.get("capacity_kg") or 0
+        )
+        for load in trip.get("loads", []):
+            current["orders"].add(
+                load.get("order_id")
+            )
+            product = (
+                load.get("product")
+                or "Producto no registrado"
+            )
+            current["products"][product] = (
+                current["products"].get(
+                    product,
+                    0.0,
+                )
+                + float(
+                    load.get("kg") or 0
+                )
+            )
+
+    assignment_by_vehicle = []
+    for current in resources.values():
+        capacity = current.pop(
+            "capacity_kg"
+        )
+        current["orders"] = len(
+            current["orders"]
+        )
+        current["utilization"] = (
+            current["load_kg"]
+            / capacity
+            if capacity
+            else 0
+        )
+        current["products"] = dict(
+            sorted(
+                current["products"].items(),
+                key=lambda item: (
+                    -item[1],
+                    item[0],
+                ),
+            )
+        )
+        assignment_by_vehicle.append(
+            current
+        )
+
+    assignment_by_vehicle.sort(
+        key=lambda item: (
+            -item["load_kg"],
+            item["vehicle_id"],
+        )
+    )
+
+    return {
+        "schema_version": "assignment_v1",
+        "decision": result.get("decision"),
+        "configuration": result.get(
+            "configuration"
+        ),
+        "capabilities": result.get(
+            "capabilities"
+        ),
+        "decision_drivers": result.get(
+            "decision_drivers"
+        ),
+        "selected_metrics": selected.get(
+            "metrics"
+        ),
+        "assignment_by_vehicle": (
+            assignment_by_vehicle[:16]
+        ),
+        "order_examples": (
+            selected.get(
+                "order_outcomes",
+                []
+            )[:8]
+        ),
+        "alternatives": [
+            {
+                "scenario": item.get(
+                    "scenario"
+                ),
+                "label": item.get(
+                    "label"
+                ),
+                "metrics": item.get(
+                    "metrics"
+                ),
+            }
+            for item in result.get(
+                "sensitivity",
+                {},
+            ).get(
+                "frontier",
+                [],
+            )[:8]
+        ],
+        "handoff": result.get("handoff"),
+        "anomalies": (
+            result.get(
+                "inputs",
+                {},
+            ).get(
+                "anomalies",
+                []
+            )[:10]
+        ),
+        "assumptions": result.get(
+            "assumptions",
+            []
+        ),
+        "interpretation_boundary": {
+            "temporal": False,
+            "dates_are_decided_here": False,
+            "sla_is_decided_here": False,
+            "next_decision": (
+                "logistics_scheduling"
+            ),
+        },
+    }
+
+
 def build_dispatch_context(result):
+    if result.get("schema_version") == "assignment_v1":
+        return build_assignment_context(result)
     selected = result["scenarios"]["selected"]
     assignment = {}
     for trip in selected.get("trips", []):
@@ -306,6 +466,78 @@ def verify_numbers(text, context):
 
 
 def safe_explanation(result):
+    if result.get("schema_version") == "assignment_v1":
+        metrics = result["scenarios"]["selected"]["metrics"]
+        drivers = result.get("decision_drivers", {})
+        cost = metrics.get("total_cost")
+        co2 = metrics.get("co2_kg")
+        return {
+            "executive_summary": (
+                "Assignment distribuye "
+                f"{metrics['orders']} órdenes en "
+                f"{metrics['total_trips']} viajes abstractos."
+            ),
+            "recommendation": (
+                "Revisá qué vehículo recibe cada viaje y aprobá "
+                "la asignación si la distribución es operativamente aceptable. "
+                "Las fechas se decidirán en Planificación."
+            ),
+            "why_recommended": (
+                "El motor aplicó el objetivo configurado respetando "
+                "capacidad por viaje, origen/site, ruta y unidades enteras."
+            ),
+            "business_impact": {
+                "cost": (
+                    f"Costo estimado de la asignación: {cost}."
+                    if cost is not None
+                    else "No se calculó costo porque el Data Pack no tiene costos completos."
+                ),
+                "trips": (
+                    f"La asignación usa {metrics['total_trips']} viajes "
+                    f"y {metrics['vehicles_used']} vehículos."
+                ),
+                "distance": (
+                    "La distancia de ruta participa en costo y CO₂ cuando "
+                    "esas dimensiones están disponibles; no se programan fechas."
+                ),
+            },
+            "key_drivers": [
+                (
+                    f"{drivers.get('orders_consolidated', 0)} órdenes "
+                    "quedaron consolidadas y "
+                    f"{drivers.get('orders_split', 0)} divididas."
+                ),
+                (
+                    f"La flota propia transporta "
+                    f"{metrics.get('own_weight_share', 0) * 100:.1f} % "
+                    "del peso."
+                ),
+            ],
+            "tradeoffs": [
+                (
+                    "Viajes, costo, uso de flota propia y CO₂ pueden "
+                    "competir entre sí según la configuración elegida."
+                )
+            ],
+            "assumptions": result.get("assumptions", []),
+            "caveats": [
+                (
+                    "Assignment no evalúa disponibilidad futura, "
+                    "solapamientos temporales, SLA ni fechas de salida."
+                ),
+                (
+                    "El CO₂ es estimado con factores informados."
+                    if co2 is not None
+                    else "CO₂ no está disponible con este Data Pack."
+                ),
+            ],
+            "suggested_questions": [
+                "¿Por qué este vehículo recibe más carga?",
+                "¿Por qué se utiliza flota tercerizada?",
+                "¿Qué cambia si priorizo menos viajes?",
+            ],
+        }
+
     metrics = result[
         "scenarios"
     ]["selected"]["metrics"]
