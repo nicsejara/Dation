@@ -141,7 +141,7 @@ function syncDimensionsToEvidence({initialize=false}={}){
     ?normalizeWeights(state.weights,state.dimensions)
     :presetWeights(state.objective,state.dimensions);
 }
-function ready(){return !!(state.available&&state.orders&&state.fleet&&state.preflight?.valid&&assignmentEvidence()?.data_ready);}
+function ready(){return !!(state.available&&state.orders&&state.fleet&&state.preflight?.valid);}
 function ensureDecisionCase(){
   const signature=inputSignature(state.orders,state.fleet);
   if(!signature){state.decisionCase=null;persist();return null;}
