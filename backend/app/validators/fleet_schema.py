@@ -155,6 +155,8 @@ def validate_fleet_report(contents: bytes, max_problems: int = 100) -> dict:
         problems,
     )
 
+    source_completeness = _completeness(columns, rows)
+
     if legacy_pool:
         detected = "fleet_v2_legacy"
         problems.warning(
@@ -344,7 +346,7 @@ def validate_fleet_report(contents: bytes, max_problems: int = 100) -> dict:
         row["legacy_global_scope"] = bool(legacy_pool)
 
     valid = problems.error_count == 0
-    completeness = _completeness(columns, rows)
+    completeness = source_completeness
     profile = None
     suggested_label = None
 
