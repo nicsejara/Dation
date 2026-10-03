@@ -16,13 +16,19 @@ from app.config import (
     SUPABASE_URL,
     supabase_configured,
 )
+from app.engines.assignment import (
+    ENGINE_NAME as ASSIGNMENT_ENGINE_NAME,
+    ENGINE_VERSION as ASSIGNMENT_ENGINE_VERSION,
+    SCHEMA_VERSION as ASSIGNMENT_SCHEMA_VERSION,
+    run_assignment_engine,
+)
+from app.engines.assignment.preflight import assignment_preflight
 from app.engines.dispatch import (
     ENGINE_NAME,
     ENGINE_VERSION,
     SCHEMA_VERSION,
     run_dispatch_engine,
 )
-from app.engines.dispatch.normalization import preflight
 from app.services.run_service import (
     _headers,
     _insert_run,
@@ -649,7 +655,7 @@ async def check_inputs(orders_id, fleet_id, allow_third_party=True):
     if not vehicles:
         raise ValueError("No hay flota habilitada.")
 
-    compatibility_preflight = preflight(
+    compatibility_preflight = assignment_preflight(
         orders["records"],
         vehicles,
         fleet["records"],
@@ -682,6 +688,32 @@ async def execute(
         fleet_id,
     )
     run_id = run_id or str(uuid4())
+    is_assignment = bool(
+        decision_case
+        and decision_case.get("node_id")
+        == "logistics_assignment"
+    )
+    engine_name = (
+        ASSIGNMENT_ENGINE_NAME
+        if is_assignment
+        else ENGINE_NAME
+    )
+    engine_version = (
+        ASSIGNMENT_ENGINE_VERSION
+        if is_assignment
+        else ENGINE_VERSION
+    )
+    schema_version = (
+        ASSIGNMENT_SCHEMA_VERSION
+        if is_assignment
+        else SCHEMA_VERSION
+    )
+    runner = (
+        run_assignment_engine
+        if is_assignment
+        else run_dispatch_engine
+    )
+
     start = perf_counter()
     now = datetime.now(timezone.utc).isoformat()
     await _insert_run(
@@ -690,9 +722,9 @@ async def execute(
             "dataset_id": orders_id,
             "orders_dataset_id": orders_id,
             "fleet_dataset_id": fleet_id,
-            "schema_version": SCHEMA_VERSION,
-            "engine_name": ENGINE_NAME,
-            "engine_version": ENGINE_VERSION,
+            "schema_version": schema_version,
+            "engine_name": engine_name,
+            "engine_version": engine_version,
             "configuration_json": {
                 **configuration,
                 "options": options,
@@ -705,7 +737,9 @@ async def execute(
             "status": "running",
             "started_at": now,
             "input_fingerprint": hashlib.sha256(
-                orders_bytes
+                engine_name.encode()
+                + b"\0"
+                + orders_bytes
                 + b"\0"
                 + fleet_bytes
                 + json.dumps(configuration, sort_keys=True).encode()
@@ -750,7 +784,7 @@ async def execute(
     }
     try:
         result = await asyncio.to_thread(
-            run_dispatch_engine,
+            runner,
             orders_bytes,
             fleet_bytes,
             configuration,
