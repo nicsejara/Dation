@@ -7,7 +7,7 @@
   <title>Dation · Decision Intelligence</title>
   <link rel="stylesheet" href="/static/css/tokens.css?v=dispatch-v1">
   <link rel="stylesheet" href="/static/css/app.css?v=dispatch-v1">
-  <link rel="stylesheet" href="/static/css/dispatch.css?v=decision-dashboard-v2">
+  <link rel="stylesheet" href="/static/css/dispatch.css?v=decision-map-phase1-v1">
 </head>
 <body>
   <div class="app-shell">
@@ -989,6 +989,8 @@
       var currentView = 'inicio';
       var dataReady = false;
       var dashboardReady = false;
+      var decisionConfigLabel = 'Configurar Assignment';
+      var decisionDashboardLabel = 'Decisión · Assignment';
 
       function panelFor(view) {
         return document.querySelector('[data-view-panel="' + view + '"]');
@@ -1121,7 +1123,7 @@
           addSeparator(container);
 
           container.appendChild(
-            journeyButton('Configurar Assignment', {
+            journeyButton(decisionConfigLabel, {
               current: currentView === 'logistics-config',
               disabled: !dataReady,
               onClick: function () {
@@ -1133,7 +1135,7 @@
           addSeparator(container);
 
           container.appendChild(
-            journeyButton('Decisión', {
+            journeyButton(decisionDashboardLabel, {
               current: currentView === 'decision-dashboard',
               disabled: !dashboardReady,
               onClick: function () {
@@ -1179,6 +1181,18 @@
           currentView === 'logistics-data'
           || currentView === 'logistics-map'
         ) {
+          window.dationRenderJourney(currentView);
+        }
+      };
+
+      window.dationSetDecisionContext = function (configLabel, dashboardLabel) {
+        if (configLabel) {
+          decisionConfigLabel = configLabel;
+        }
+        if (dashboardLabel) {
+          decisionDashboardLabel = dashboardLabel;
+        }
+        if (isLogisticsView(currentView)) {
           window.dationRenderJourney(currentView);
         }
       };
@@ -1245,7 +1259,7 @@
   <script src="/static/js/dashboard-stage.js?v=dispatch-v1"></script>
   <script src="/static/js/interpreter-stage.js?v=dispatch-v1"></script>
   <script src="/static/vendor/echarts-dispatch-6.0.0.min.js"></script>
-  <script type="module" src="/static/js/dispatch/workspace.mjs?v=decision-dashboard-v2"></script>
+  <script type="module" src="/static/js/dispatch/workspace.mjs?v=decision-map-phase1-v1"></script>
   <script type="module" src="/static/js/app.js?v=dispatch-v1"></script>
 </body>
 </html>
