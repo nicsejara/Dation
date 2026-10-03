@@ -2772,6 +2772,17 @@ body.dispatch-drawer-open {
   color:#4f5c73!important;
   border-color:#d9dee8!important;
 }
+.dispatch-export-action{
+  background:#fff!important;
+  color:#4d49bd!important;
+  border-color:#c9c8f5!important;
+  font-weight:800!important;
+  white-space:nowrap;
+}
+.dispatch-export-action:hover{
+  background:#f5f4ff!important;
+  border-color:#aaa8ef!important;
+}
 .dispatch-ai-action{
   background:#f1f0ff!important;
   color:#4d49bd!important;
@@ -3069,9 +3080,11 @@ body.dispatch-drawer-open {
     display:grid;
     grid-template-columns:1fr 1fr;
   }
-  .dispatch-command-focused .dispatch-primary-action,
-  .dispatch-command-focused .dispatch-ai-action{
+  .dispatch-command-focused .dispatch-primary-action{
     grid-column:1/-1;
+  }
+  .dispatch-command-focused .dispatch-export-action{
+    width:100%;
   }
   .dispatch-action-menu{
     width:100%;
@@ -3294,14 +3307,14 @@ body.dispatch-result #chat-panel{
   font-size:12px;
 }
 .dispatch-ai-fab[aria-expanded="true"]{
-  right:30px;
-  bottom:min(calc(70vh + 38px),610px);
+  right:28px;
+  bottom:24px;
   background:#34329e!important;
 }
 .dispatch-dashboard-focused>.dispatch-chat{
   position:fixed!important;
   right:24px!important;
-  bottom:24px!important;
+  bottom:82px!important;
   top:auto!important;
   z-index:145;
   width:min(410px,calc(100vw - 32px))!important;
@@ -3336,11 +3349,11 @@ body.dispatch-result #chat-panel{
   }
   .dispatch-ai-fab[aria-expanded="true"]{
     right:16px;
-    bottom:calc(min(72vh,620px) + 24px);
+    bottom:16px;
   }
   .dispatch-dashboard-focused>.dispatch-chat{
     right:8px!important;
-    bottom:8px!important;
+    bottom:72px!important;
     width:calc(100vw - 16px)!important;
     max-height:min(72vh,620px)!important;
   }
