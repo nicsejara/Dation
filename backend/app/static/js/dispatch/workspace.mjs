@@ -187,9 +187,11 @@ async function loadData() {
     },
   );
 }
-async function openCaseResult(){
-  const runId=state.decisionCase?.nodes?.logistics_assignment?.run_id;
+async function openCaseResult(nodeId='logistics_assignment'){
+  const runId=state.decisionCase?.nodes?.[nodeId]?.run_id;
   if(!runId)return;
+  state.activeNode=nodeId;
+  persist();
   try{
     const run=state.run?.id===runId
       ?state.run
@@ -202,13 +204,13 @@ async function openCaseResult(){
       pending('Recuperando el estado de la ejecución…');
       navigate('decision-dashboard');
       clearTimeout(timer);
-      poll(runId,++pollGeneration);
+      poll(runId,++pollGeneration,nodeId);
       return;
     }
     if(run.status==='error'){
       state.decisionCase=transitionNode(
         state.decisionCase,
-        'logistics_assignment',
+        nodeId,
         STATUS.ERROR,
         {run_id:runId,error:run.error_message||'La ejecución terminó con error.'},
       );
@@ -235,7 +237,11 @@ async function loadDecisionMap(){
       readiness:state.preflight?.decision_readiness,
       orders:state.orders,
       fleet:state.fleet,
-      onConfigure:()=>navigate('logistics-config'),
+      onConfigure:(nodeId)=>{
+        state.activeNode=nodeId||'logistics_assignment';
+        persist();
+        navigate('logistics-config');
+      },
       onOpenResult:openCaseResult,
       onData:()=>navigate('logistics-data'),
     });
