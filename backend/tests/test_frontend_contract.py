@@ -330,7 +330,7 @@ class FrontendContractTests(
             self.dashboard_stage_js,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=decision-map-phase1-v1",
+            "/static/js/dispatch/workspace.mjs?v=decision-map-nodal-v1",
             self.html,
         )
         self.assertIn(
@@ -756,7 +756,7 @@ class FrontendContractTests(
             explanation,
         )
         self.assertIn(
-            "decision-map-phase1-v1",
+            "decision-map-nodal-v1",
             self.html,
         )
 
@@ -908,19 +908,39 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "Flujo de decisiones",
+            "Mapa de decisiones",
             decision_map,
         )
         self.assertIn(
+            "dispatch-node-map",
+            decision_map,
+        )
+        self.assertIn(
+            "deriveNodePresentationState",
+            decision_map,
+        )
+        self.assertNotIn(
+            "renderDecisionReadiness",
+            decision_map,
+        )
+        self.assertNotIn(
+            "JERARQUÍA DE DECISIONES",
+            decision_map,
+        )
+        self.assertNotIn(
             "SIGUIENTE PASO",
             decision_map,
         )
         self.assertIn(
-            "renderDecisionReadiness",
+            "Bloqueada por jerarquía",
             decision_map,
         )
         self.assertIn(
-            "JERARQUÍA DE DECISIONES",
+            "Output aprobado",
+            decision_map,
+        )
+        self.assertIn(
+            "Requiere aprobación",
             decision_map,
         )
         self.assertIn(
@@ -1028,12 +1048,20 @@ class FrontendContractTests(
             dashboard,
         )
         self.assertIn(
-            "SIGUIENTE PASO",
+            "SIGUIENTE DECISIÓN",
             decision_map,
         )
         self.assertIn(
-            "Configurar planificación",
+            "Configurar Planificación",
             decision_map,
+        )
+        self.assertIn(
+            "open-result",
+            decision_map,
+        )
+        self.assertIn(
+            "state.decisionCase?.nodes?.[nodeId]?.run_id",
+            workspace,
         )
         self.assertIn(
             "Decisiones del análisis",
@@ -1079,6 +1107,55 @@ class FrontendContractTests(
             "dationSetDecisionContext",
             workspace,
         )
+
+    def test_nodal_map_unifies_readiness_and_hierarchy(self):
+        decision_map = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+            / "decision-map.mjs"
+        ).read_text(encoding="utf-8")
+        css = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "css"
+            / "dispatch.css"
+        ).read_text(encoding="utf-8")
+
+        for marker in (
+            "dispatch-decision-node__readiness",
+            "dispatch-decision-edge",
+            "dispatch-map-datapack",
+            "dependencyReady",
+            "dataReady",
+            "missingData",
+        ):
+            self.assertIn(marker, decision_map)
+
+        self.assertIn(
+            "grid-template-columns:minmax(0,1fr) 92px",
+            css,
+        )
+        self.assertIn(
+            "@media(max-width:820px)",
+            css,
+        )
+        self.assertIn(
+            "height:46px",
+            css,
+        )
+        self.assertNotIn(
+            "data-map-readiness",
+            decision_map,
+        )
+        self.assertNotIn(
+            "dispatch-map-chain-head",
+            decision_map,
+        )
+
 
     def test_dashboard_stage_contract(
         self,
