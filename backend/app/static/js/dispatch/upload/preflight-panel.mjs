@@ -97,8 +97,8 @@ export function renderValidationPanel(
     el(
       "p",
       (
-        "Comprobamos que ambos archivos tengan la estructura y "
-        + "los datos necesarios para continuar."
+        "Comprobamos la estructura mínima para iniciar Asignación. "
+        + "Las columnas de niveles posteriores no bloquean esta carga."
       ),
     ),
   );
@@ -171,7 +171,7 @@ export function renderValidationPanel(
     `dispatch-quality-result is-${final.kind}`,
   );
   result.textContent = final.enabled
-    ? "✓ Todos los controles fueron superados"
+    ? "✓ Data Pack técnicamente válido"
     : final.message;
   root.append(result);
 }
