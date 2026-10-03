@@ -466,6 +466,76 @@ def verify_numbers(text, context):
 
 
 def safe_explanation(result):
+    if result.get("schema_version") == "scheduling_v1":
+        metrics = result["scenarios"]["selected"]["metrics"]
+        sla_enabled = bool(
+            result.get("analysis", {}).get("sla_enabled")
+        )
+        return {
+            "executive_summary": (
+                "Scheduling secuenció "
+                f"{metrics['total_trips']} viajes con "
+                f"{metrics['vehicles_used']} vehículos."
+            ),
+            "recommendation": (
+                "Revisá el calendario, las esperas y las excepciones "
+                "antes de aprobar la planificación."
+            ),
+            "why_recommended": (
+                "El motor mantuvo intacta Assignment y ordenó los viajes "
+                "respetando ready date, disponibilidad del vehículo y "
+                "ocupación hasta su retorno."
+            ),
+            "business_impact": {
+                "cost": (
+                    "Scheduling no recalcula costos ni reasigna vehículos."
+                ),
+                "trips": (
+                    f"Los {metrics['total_trips']} viajes provienen "
+                    "sin cambios de Assignment."
+                ),
+                "distance": (
+                    "La distancia participa en tránsito y ciclo temporal "
+                    "junto con velocidad y horas de conducción."
+                ),
+            },
+            "key_drivers": [
+                (
+                    f"La espera media es {metrics['avg_wait_days']:.2f} días."
+                ),
+                (
+                    (
+                        f"{metrics['late_orders']} órdenes quedan fuera "
+                        "de fecha objetivo."
+                    )
+                    if sla_enabled
+                    else "La fecha objetivo no participó en esta corrida."
+                ),
+            ],
+            "tradeoffs": [
+                (
+                    "Cuando SLA está activo, menos órdenes tardías domina "
+                    "sobre espera y compactación del calendario."
+                )
+                if sla_enabled
+                else (
+                    "Sin SLA, el motor prioriza menor espera y un calendario compacto."
+                )
+            ],
+            "assumptions": result.get("assumptions", []),
+            "caveats": [
+                (
+                    "No se modelan tráfico, clima, horas intradía, "
+                    "carga/descarga ni descansos regulatorios detallados."
+                )
+            ],
+            "suggested_questions": [
+                "¿Por qué este viaje sale en esa fecha?",
+                "¿Qué vehículo tiene la secuencia más ajustada?",
+                "¿Qué órdenes llegan fuera de fecha objetivo?",
+            ],
+        }
+
     if result.get("schema_version") == "assignment_v1":
         metrics = result["scenarios"]["selected"]["metrics"]
         drivers = result.get("decision_drivers", {})
