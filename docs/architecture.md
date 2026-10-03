@@ -2,15 +2,26 @@
 
 Dation ejecuta decisiones de logística a partir de **órdenes + una versión de flota + configuración**. FastAPI sirve la SPA y una API autenticada; Supabase almacena CSV privados, perfiles, corridas, explicaciones y mensajes. La IA explica resultados persistidos y no participa del cálculo.
 
-## Flujo de ingesta
+## Flujo de ingesta y decisión
 
-La etapa de carga es una sola pantalla:
+La carga continúa siendo una sola pantalla, pero ya no navega directamente al configurador:
 
 ```text
-Órdenes CSV ──┐
-              ├─> validación local sin DB ─> persistencia versionada ─┐
-Flota CSV ────┘                                                       ├─> preflight
-                                                                      └─> Configurar decisión
+Órdenes V3 ──┐
+             ├─> validación + persistencia ─> Decision Readiness
+Fleet V3 ────┘                                   ↓
+                                           Decision Case
+                                                ↓
+                                           Decision Map
+                                                ↓
+                                      Assignment disponible
+                                                ↓
+                                  configurar → ejecutar → revisar
+                                                ↓
+                                           aprobación humana
+                                                ↓
+                                   Scheduling se desbloquea si
+                                   además tiene datos suficientes
 ```
 
 La validación y la persistencia están desacopladas. Si Supabase o las migraciones todavía no están listos, el usuario puede validar ambos CSV y revisar sus problemas; sólo quedan bloqueados guardar y continuar.
@@ -77,3 +88,14 @@ qué interpretó del CSV antes de avanzar.
 Los avisos del preflight llegan agrupados desde backend; la UI no traduce códigos del
 motor. El gráfico de demanda versus capacidad propia usa ECharts vendorizado y tiene
 alternativa tabular. La guía de formato usa el contrato servido por backend.
+
+
+## Decision Chain — Fase 2
+
+`static/js/dispatch/decision-case.mjs` implementa la máquina de estados del caso y `decision-map.mjs` su representación. El estado operativo de un nodo es distinto de su Data Readiness.
+
+Estados soportados: `AVAILABLE`, `RUNNING`, `REVIEW`, `APPROVED`, `LOCKED`, `NEEDS_DATA`, `ERROR` y `STALE`.
+
+Sólo Assignment tiene motor ejecutable en esta fase. Scheduling puede aparecer como `AVAILABLE` después de aprobar Assignment cuando sus datos están completos, pero el CTA informa que su motor llega en la siguiente fase. Final Assignment permanece bloqueado hasta disponer de una Scheduling aprobada.
+
+El caso vive en `sessionStorage` para preservar navegación y recarga dentro de la sesión. Las corridas sí conservan lineage durable mediante `decision_case` dentro de JSON existente. No se agregó tabla ni migración.
