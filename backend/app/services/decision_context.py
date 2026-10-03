@@ -160,6 +160,9 @@ def build_decision_context(
     result_json: dict,
     configuration_json: dict | None = None,
 ) -> dict:
+    if result_json.get('schema_version') == 'scheduling_v1':
+        from app.services.scheduling_context import build_scheduling_context
+        return build_scheduling_context(result_json)
     if result_json.get('schema_version') in ('assignment_v1', 'dispatch_v1', 'dispatch_v2'):
         from app.services.dispatch_context import build_dispatch_context
         return build_dispatch_context(result_json)
