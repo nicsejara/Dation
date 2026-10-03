@@ -403,7 +403,7 @@ class FrontendContractTests(
         ).read_text(encoding="utf-8")
 
         self.assertIn(
-            "Exportar asignación",
+            "Exportar decisión",
             dashboard,
         )
         self.assertIn(
