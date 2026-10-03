@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Literal
 from uuid import UUID
 
 import httpx
@@ -34,7 +35,7 @@ class DecisionCaseRef(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     case_id: UUID
-    node_id: str
+    node_id: Literal["logistics_assignment"]
 
 
 class RunRequest(BaseModel):
