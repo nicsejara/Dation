@@ -38,7 +38,8 @@ La validación y la persistencia están desacopladas. Si Supabase o las migracio
 | `routes/dispatch.py` | Contratos, validación, plantillas, ejemplos, status y API Dispatch |
 | `static/js/dispatch/upload/*` | Pantalla única de ingesta, errores, biblioteca, preflight y banner |
 | `static/js/dispatch/workspace.mjs` | Orquestación de ingesta, configuración y corrida |
-| `engines/dispatch/*` | Motor determinístico, invariantes, escenarios y sensibilidad |
+| `engines/assignment/*` | Motor activo de Assignment: packing, CP-SAT no temporal, invariantes y handoff |
+| `engines/dispatch/*` | Motor temporal Dispatch 2.2 conservado para corridas históricas |
 
 ## Persistencia y compatibilidad
 
@@ -56,9 +57,13 @@ La clase `dispatch-enabled` todavía se conserva para aislar la configuración D
 
 ## Ejecución y límites
 
-El request de ejecución permanece abierto mientras `asyncio.to_thread` ejecuta el motor y el navegador consulta progreso persistido. CP-SAT usa un hilo, seed 0 y presupuestos acotados. Cada candidato se valida antes de compararse; no se publican planes parciales ni se etiqueta como óptimo un resultado no certificado.
+El request de ejecución permanece abierto mientras `asyncio.to_thread` ejecuta el motor y el navegador consulta progreso persistido. CP-SAT usa un hilo, seed 0 y presupuestos acotados. Cada candidato se valida antes de compararse; no se publican resultados parciales ni se etiqueta como óptimo un resultado no certificado.
 
-El modelo actual no representa multiparada, volumen, ventanas horarias completas ni ocupación física de un vehículo durante varios días.
+Para un Decision Case nuevo, `logistics_assignment` enruta a Assignment Engine 1.0.0. El modelo genera viajes abstractos respetando unidades enteras, capacidad, origen/site y ruta. Un mismo `vehicle_id` puede recibir varios viajes porque todavía no existe un calendario.
+
+Fechas, transit time, SLA, tardanzas, velocidad, horas de conducción y ocupación temporal quedan fuera de Assignment y pertenecen a Scheduling. El resultado expone `handoff.schema_version=scheduling_input_v1` y `scenarios.selected.trips` como input versionado de la siguiente decisión.
+
+Dispatch 2.2 permanece disponible únicamente para recuperar y explicar corridas históricas.
 
 ## Frontend
 
@@ -99,3 +104,19 @@ Estados soportados: `AVAILABLE`, `RUNNING`, `REVIEW`, `APPROVED`, `LOCKED`, `NEE
 Sólo Assignment tiene motor ejecutable en esta fase. Scheduling puede aparecer como `AVAILABLE` después de aprobar Assignment cuando sus datos están completos, pero el CTA informa que su motor llega en la siguiente fase. Final Assignment permanece bloqueado hasta disponer de una Scheduling aprobada.
 
 El caso vive en `sessionStorage` para preservar navegación y recarga dentro de la sesión. Las corridas sí conservan lineage durable mediante `decision_case` dentro de JSON existente. No se agregó tabla ni migración.
+
+
+## Decision Chain — Fase 3
+
+Assignment y Scheduling dejan de compartir motor.
+
+**Assignment 1.0.0**
+- schema: `assignment_v1`;
+- objetivos: viajes, costo, uso de flota propia y CO₂;
+- no usa fechas ni SLA;
+- salida principal: viajes + vehículo + cargas;
+- handoff: `scheduling_input_v1`.
+
+El preflight activo también es específico de Assignment y ya no genera hallazgos de tardanza o capacidad diaria. Decision Readiness conserva las columnas temporales para indicar si Scheduling tendrá datos suficientes una vez aprobado Assignment.
+
+Las corridas `dispatch_v1/dispatch_v2` permanecen visibles, pero no pueden aprobar un nodo Assignment nuevo.
