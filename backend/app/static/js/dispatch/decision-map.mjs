@@ -1,5 +1,6 @@
 import {esc,num,date} from "./shared.mjs";
 import {STATUS, deriveDecisionNodes} from "./decision-case.mjs";
+import {renderDecisionReadiness} from "./upload/readiness-panel.mjs";
 
 const LABELS = {
   [STATUS.AVAILABLE]: "Disponible",
@@ -174,7 +175,7 @@ function nodeCard(
       + (
         node.approved_at
           ? '<small class="dispatch-map-node__approved">Aprobada '
-            + esc(date(node.approved_at))
+            + esc(date(String(node.approved_at).slice(0, 10)))
             + '</small>'
           : ''
       )
@@ -240,6 +241,16 @@ export function renderDecisionMap(
         + '</section>'
         : ''
     )
+    + '<section class="dispatch-map-evidence">'
+      + '<div><small>Orders</small><strong>'
+        + esc(orders?.original_filename || "—")
+        + '</strong><span>' + num(orders?.row_count || 0) + ' registros</span></div>'
+      + '<div><small>Fleet</small><strong>'
+        + esc(fleet?.label || fleet?.original_filename || "—")
+        + '</strong><span>' + num(fleet?.row_count || 0) + ' vehículos</span></div>'
+      + '<button type="button" data-map-action="data">Cambiar datos</button>'
+    + '</section>'
+    + '<section data-map-readiness></section>'
     + (
       next
         ? '<section class="dispatch-next-step">'
@@ -257,15 +268,7 @@ export function renderDecisionMap(
           + '<p>Podés volver a abrir cualquiera de las decisiones aprobadas desde las tarjetas del flujo o desde el panel de análisis.</p></div>'
         + '</section>'
     )
-    + '<section class="dispatch-map-evidence">'
-      + '<div><small>Orders</small><strong>'
-        + esc(orders?.original_filename || "—")
-        + '</strong><span>' + num(orders?.row_count || 0) + ' registros</span></div>'
-      + '<div><small>Fleet</small><strong>'
-        + esc(fleet?.label || fleet?.original_filename || "—")
-        + '</strong><span>' + num(fleet?.row_count || 0) + ' vehículos</span></div>'
-      + '<button type="button" data-map-action="data">Cambiar datos</button>'
-    + '</section>'
+    + '<div class="dispatch-map-chain-head"><div><span class="dispatch-kicker">JERARQUÍA DE DECISIONES</span><h2>Una decisión habilita la siguiente</h2></div><p>El output aprobado de cada nivel pasa a ser evidencia de entrada del nivel siguiente. Las decisiones aprobadas quedan disponibles para volver a abrir su dashboard.</p></div>'
     + '<section class="dispatch-map-chain" aria-label="Cadena de decisiones">'
       + nodeCard(
           "logistics_assignment",
@@ -289,6 +292,11 @@ export function renderDecisionMap(
       + '<div><span class="dispatch-kicker">CÓMO AVANZA EL CASO</span><h2>Aprobar una decisión habilita la siguiente</h2></div>'
       + '<p>El flujo conserva las decisiones ya validadas y sólo habilita el siguiente motor cuando están disponibles sus datos y su dependencia anterior fue aprobada.</p>'
     + '</section>';
+
+  const readinessRoot = root.querySelector("[data-map-readiness]");
+  if (readinessRoot) {
+    renderDecisionReadiness(readinessRoot, readiness);
+  }
 
   root.querySelectorAll("[data-map-action]").forEach((button) => {
     button.onclick = () => {
