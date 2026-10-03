@@ -1522,7 +1522,11 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "Un DDA es un activo diseñado para una decisión concreta",
+            "Decisiones operativas que podés explicar, comparar y repetir.",
+            self.html,
+        )
+        self.assertIn(
+            "Decision Data Asset (DDA)",
             self.html,
         )
         self.assertIn(
@@ -1530,7 +1534,15 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "/static/css/home-dda.css?v=home-dda-selector-v2",
+            "/static/css/home-dda.css?v=home-dda-hero-v3",
+            self.html,
+        )
+        self.assertIn(
+            "antes de comprometer recursos",
+            self.html,
+        )
+        self.assertIn(
+            "listas para compartir y auditar",
             self.html,
         )
         self.assertIn(
