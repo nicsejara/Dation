@@ -117,7 +117,16 @@
 
   function bindActions(container){
     container.querySelectorAll("[data-go-data]").forEach(function(button){
-      button.addEventListener("click",function(){navigate("logistics-data");});
+      button.addEventListener("click",function(){
+        if(
+          button.dataset.mode === "latest"
+          && typeof window.dationOpenLatestDecision === "function"
+        ){
+          window.dationOpenLatestDecision();
+          return;
+        }
+        navigate("logistics-data");
+      });
     });
 
     container.querySelectorAll("[data-go-home]").forEach(function(button){
