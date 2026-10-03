@@ -29,11 +29,18 @@ from app.engines.dispatch import (
     SCHEMA_VERSION,
     run_dispatch_engine,
 )
+from app.engines.scheduling import (
+    ENGINE_NAME as SCHEDULING_ENGINE_NAME,
+    ENGINE_VERSION as SCHEDULING_ENGINE_VERSION,
+    SCHEMA_VERSION as SCHEDULING_SCHEMA_VERSION,
+    run_scheduling_engine,
+)
 from app.services.run_service import (
     _headers,
     _insert_run,
     download_dataset,
     get_dataset,
+    get_run,
 )
 from app.services.decision_readiness import build_decision_readiness
 from app.validators.fleet_schema import (
@@ -682,37 +689,132 @@ async def execute(
     options,
     run_id=None,
     decision_case=None,
+    source_run_id=None,
 ):
     orders_dataset, fleet_dataset, orders_bytes, fleet_bytes = await load_inputs(
         orders_id,
         fleet_id,
     )
     run_id = run_id or str(uuid4())
-    is_assignment = bool(
-        decision_case
-        and decision_case.get("node_id")
+    node_id = (
+        decision_case.get("node_id")
+        if decision_case
+        else None
+    )
+    is_assignment = (
+        node_id
         == "logistics_assignment"
     )
-    engine_name = (
-        ASSIGNMENT_ENGINE_NAME
-        if is_assignment
-        else ENGINE_NAME
+    is_scheduling = (
+        node_id
+        == "logistics_scheduling"
     )
-    engine_version = (
-        ASSIGNMENT_ENGINE_VERSION
-        if is_assignment
-        else ENGINE_VERSION
-    )
-    schema_version = (
-        ASSIGNMENT_SCHEMA_VERSION
-        if is_assignment
-        else SCHEMA_VERSION
-    )
-    runner = (
-        run_assignment_engine
-        if is_assignment
-        else run_dispatch_engine
-    )
+
+    source_run = None
+    if is_scheduling:
+        if not source_run_id:
+            raise ValueError(
+                "Scheduling requiere la corrida aprobada de Assignment."
+            )
+        source_run = await get_run(
+            source_run_id
+        )
+        if (
+            not source_run
+            or source_run.get("status")
+            != "completed"
+            or not source_run.get(
+                "result_json"
+            )
+        ):
+            raise ValueError(
+                "La corrida fuente de Assignment no está completada."
+            )
+
+        source_result = source_run[
+            "result_json"
+        ]
+        source_case = source_result.get(
+            "decision_case"
+        ) or {}
+        if (
+            source_result.get(
+                "schema_version"
+            )
+            != ASSIGNMENT_SCHEMA_VERSION
+            or source_case.get(
+                "node_id"
+            )
+            != "logistics_assignment"
+            or source_case.get(
+                "case_id"
+            )
+            != decision_case.get(
+                "case_id"
+            )
+        ):
+            raise ValueError(
+                "Scheduling requiere Assignment V1 del mismo Decision Case."
+            )
+        if (
+            source_case.get("status")
+            != "approved"
+            or not source_case.get(
+                "approved_at"
+            )
+        ):
+            raise ValueError(
+                "Primero aprobá Assignment antes de ejecutar Scheduling."
+            )
+        if (
+            str(
+                source_run.get(
+                    "orders_dataset_id"
+                )
+            )
+            != str(orders_id)
+            or str(
+                source_run.get(
+                    "fleet_dataset_id"
+                )
+            )
+            != str(fleet_id)
+        ):
+            raise ValueError(
+                "La corrida fuente usa un Data Pack distinto."
+            )
+
+    if is_assignment:
+        engine_name = (
+            ASSIGNMENT_ENGINE_NAME
+        )
+        engine_version = (
+            ASSIGNMENT_ENGINE_VERSION
+        )
+        schema_version = (
+            ASSIGNMENT_SCHEMA_VERSION
+        )
+        runner = run_assignment_engine
+    elif is_scheduling:
+        engine_name = (
+            SCHEDULING_ENGINE_NAME
+        )
+        engine_version = (
+            SCHEDULING_ENGINE_VERSION
+        )
+        schema_version = (
+            SCHEDULING_SCHEMA_VERSION
+        )
+        runner = run_scheduling_engine
+    else:
+        engine_name = ENGINE_NAME
+        engine_version = (
+            ENGINE_VERSION
+        )
+        schema_version = (
+            SCHEMA_VERSION
+        )
+        runner = run_dispatch_engine
 
     start = perf_counter()
     now = datetime.now(timezone.utc).isoformat()
@@ -733,6 +835,15 @@ async def execute(
                     if decision_case
                     else {}
                 ),
+                **(
+                    {
+                        "source_assignment_run_id": (
+                            source_run_id
+                        )
+                    }
+                    if is_scheduling
+                    else {}
+                ),
             },
             "status": "running",
             "started_at": now,
@@ -744,6 +855,17 @@ async def execute(
                 + fleet_bytes
                 + json.dumps(configuration, sort_keys=True).encode()
                 + json.dumps(options, sort_keys=True).encode()
+                + (
+                    (
+                        source_run["result_json"][
+                            "handoff"
+                        ][
+                            "assignment_fingerprint"
+                        ]
+                    ).encode()
+                    if is_scheduling
+                    else b""
+                )
             ).hexdigest(),
             "progress_json": {"stage": "validating"},
         }
@@ -782,16 +904,51 @@ async def execute(
             ("fleet", fleet_dataset),
         )
     }
+    if is_scheduling:
+        metadata["assignment"] = {
+            "run_id": (
+                source_run["id"]
+            ),
+            "result_fingerprint": (
+                source_run.get(
+                    "result_fingerprint"
+                )
+            ),
+            "approved_at": (
+                source_run[
+                    "result_json"
+                ].get(
+                    "decision_case",
+                    {},
+                ).get(
+                    "approved_at"
+                )
+            ),
+        }
     try:
-        result = await asyncio.to_thread(
-            runner,
-            orders_bytes,
-            fleet_bytes,
-            configuration,
-            options,
-            metadata,
-            progress,
-        )
+        if is_scheduling:
+            result = await asyncio.to_thread(
+                runner,
+                orders_bytes,
+                fleet_bytes,
+                source_run[
+                    "result_json"
+                ],
+                configuration,
+                options,
+                metadata,
+                progress,
+            )
+        else:
+            result = await asyncio.to_thread(
+                runner,
+                orders_bytes,
+                fleet_bytes,
+                configuration,
+                options,
+                metadata,
+                progress,
+            )
         if decision_case:
             result["decision_case"] = decision_case
 
