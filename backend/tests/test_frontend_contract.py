@@ -536,7 +536,7 @@ class FrontendContractTests(
         )
         self.assertIn(
             "Vehicle ID",
-            plan,
+            exporter,
         )
         self.assertIn(
             "assignment_v1",
@@ -942,7 +942,11 @@ class FrontendContractTests(
             dashboard,
         )
         self.assertIn(
-            "Mapa de decisiones",
+            "← Mapa",
+            dashboard,
+        )
+        self.assertIn(
+            "data-map",
             dashboard,
         )
 
