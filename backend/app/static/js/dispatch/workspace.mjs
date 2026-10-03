@@ -259,7 +259,127 @@ function configuration(){const config={mode:state.objective==='custom'?'custom':
 function activeDimensionText(){return state.dimensions.map(k=>DIMENSION_LABELS[k]).join(' · ');}
 function decisionSummary(){return `${OBJECTIVE_LABELS[state.objective]} · ${state.dimensions.length} dimensión${state.dimensions.length===1?'':'es'} · análisis ${DEPTH_LABELS[state.analysisDepth].toLowerCase()}`;}
 
+
+async function ensurePersistedApproval(nodeId){
+  const node=state.decisionCase?.nodes?.[nodeId];
+  if(!node?.run_id||node.status!==STATUS.APPROVED)return null;
+  const run=await api('/api/runs/'+node.run_id);
+  const meta=run.result_json?.decision_case||{};
+  if(meta.status==='approved'&&meta.approved_at)return run;
+  return await post('/api/runs/'+node.run_id+'/approve',{
+    case_id:state.decisionCase.id,
+    node_id:nodeId,
+  });
+}
+
+async function loadSchedulingConfig(){
+  const node=roots.config;
+  if(!state.orders||!state.fleet){
+    node.innerHTML='<h1>Configurar Planificación</h1><p>Primero seleccioná Orders y Fleet.</p><button data-back>Ir al Data Pack</button>';
+    node.querySelector('[data-back]').onclick=()=>navigate('logistics-data');
+    return;
+  }
+
+  if(!state.preflight){
+    try{await preflight();}catch(error){errorBox(node,error,loadSchedulingConfig);return;}
+  }
+
+  const scheduling=schedulingEvidence();
+  const assignmentNode=state.decisionCase?.nodes?.logistics_assignment;
+  if(assignmentNode?.status!==STATUS.APPROVED){
+    node.innerHTML='<section class="dispatch-panel"><span class="dispatch-kicker">DECISIÓN 02 · PLANIFICACIÓN</span><h1>Scheduling todavía está bloqueado</h1><p>Primero aprobá Assignment para fijar qué viajes y vehículos puede programar este motor.</p><button data-map>Volver al mapa</button></section>';
+    node.querySelector('[data-map]').onclick=()=>navigate('logistics-map');
+    return;
+  }
+  if(!scheduling?.data_ready){
+    const missing=(scheduling?.missing||[]).map(item=>item.label).join(' · ');
+    node.innerHTML='<section class="dispatch-panel"><span class="dispatch-kicker">DECISIÓN 02 · PLANIFICACIÓN</span><h1>Faltan datos temporales</h1><p>Scheduling necesita completar: '+esc(missing||'datos de planificación')+'.</p><button data-data>Completar Data Pack</button><button data-map>Volver al mapa</button></section>';
+    node.querySelector('[data-data]').onclick=()=>navigate('logistics-data');
+    node.querySelector('[data-map]').onclick=()=>navigate('logistics-map');
+    return;
+  }
+
+  let sourceRun;
+  try{
+    sourceRun=await ensurePersistedApproval('logistics_assignment');
+  }catch(error){
+    errorBox(node,error,loadSchedulingConfig);
+    return;
+  }
+  if(!sourceRun?.result_json){
+    errorBox(node,new Error('No se pudo recuperar Assignment aprobada.'),loadSchedulingConfig);
+    return;
+  }
+
+  const assignment=sourceRun.result_json;
+  const assignmentMetrics=assignment.scenarios?.selected?.metrics||{};
+  const slaAvailable=schedulingSlaAvailable();
+  if(!slaAvailable)state.schedulingUseDueDates=false;
+
+  node.innerHTML=`
+    <div class="dispatch-config-screen dispatch-scheduling-config">
+      <header class="dispatch-config-heading">
+        <span class="dispatch-kicker">DECISIÓN 02 · PLANIFICACIÓN</span>
+        <h1>Configurar Scheduling</h1>
+        <p>Programá en el tiempo los viajes aprobados. Scheduling no puede cambiar vehículos, cargas ni cantidades definidos en Assignment.</p>
+      </header>
+
+      <section class="dispatch-evidence-card">
+        <div><span class="dispatch-config-eyebrow">Assignment aprobada</span><strong>${num(assignmentMetrics.total_trips||0)} viajes</strong><small>Corrida ${esc(String(sourceRun.id).slice(0,8))}…</small></div>
+        <div><span class="dispatch-config-eyebrow">Vehículos</span><strong>${num(assignmentMetrics.vehicles_used||0)} recursos</strong><small>Asignación bloqueada para esta decisión</small></div>
+        <button data-map>Volver al mapa</button>
+      </section>
+
+      <section class="dispatch-panel dispatch-config-section">
+        <div class="dispatch-config-section-head"><span class="dispatch-config-step">01</span><div><h2>Reglas temporales</h2><p>Estas reglas se aplican automáticamente a cada viaje aprobado.</p></div></div>
+        <div class="dispatch-scheduling-rules">
+          <article><strong>Fecha mínima de salida</strong><p>La más tardía entre las órdenes cargadas y available_from del vehículo.</p></article>
+          <article><strong>Duración del viaje</strong><p>Se calcula con distancia, velocidad media y horas de conducción por día.</p></article>
+          <article><strong>Ocupación del vehículo</strong><p>El recurso queda ocupado hasta completar ida, entrega y retorno a su base.</p></article>
+          <article><strong>Asignación inmutable</strong><p>Vehicle ID, órdenes, productos y cantidades vienen aprobados desde Assignment.</p></article>
+        </div>
+      </section>
+
+      <section class="dispatch-panel dispatch-config-section">
+        <div class="dispatch-config-section-head"><span class="dispatch-config-step">02</span><div><h2>Prioridad del calendario</h2><p>Scheduling usa una jerarquía explícita para ordenar viajes que compiten por el mismo vehículo.</p></div></div>
+        <div class="dispatch-schedule-priority">
+          ${slaAvailable
+            ?'<ol><li><strong>1. Minimizar órdenes fuera de fecha objetivo</strong><small>delivery_due_date domina el resto del objetivo.</small></li><li><strong>2. Minimizar días totales de tardanza</strong></li><li><strong>3. Minimizar espera desde ready date</strong></li><li><strong>4. Compactar el calendario</strong></li></ol>'
+            :'<ol><li><strong>1. Minimizar espera desde ready date</strong></li><li><strong>2. Compactar el calendario</strong></li></ol>'}
+        </div>
+        <label class="dispatch-policy-row ${slaAvailable?'':'is-unavailable'}"><div><strong>Considerar fecha objetivo de entrega</strong><small>${slaAvailable?'Usa delivery_due_date para proteger el nivel de servicio.':'No disponible: delivery_due_date no está completo en Orders.'}</small></div><input type="checkbox" data-sla ${state.schedulingUseDueDates&&slaAvailable?'checked':''} ${slaAvailable?'':'disabled'}><span class="dispatch-toggle" aria-hidden="true"></span></label>
+      </section>
+
+      <section class="dispatch-panel dispatch-config-section">
+        <div class="dispatch-config-section-head"><span class="dispatch-config-step">03</span><div><h2>Qué no puede cambiar</h2><p>Esta separación protege la trazabilidad entre decisiones.</p></div></div>
+        <div class="dispatch-assignment-boundary"><span aria-hidden="true">✓</span><div><strong>Assignment queda congelada</strong><p>Scheduling sólo agrega dispatch_date, arrival_date, cycle_days y resource_available_again sobre los viajes aprobados.</p></div></div>
+      </section>
+
+      <footer class="dispatch-footer dispatch-config-footer"><div><span class="dispatch-config-eyebrow">Scheduling listo para ejecutar</span><strong>${slaAvailable&&state.schedulingUseDueDates?'SLA → tardanza → espera → calendario':'Espera → calendario'}</strong><small>${num(assignmentMetrics.total_trips||0)} viajes fijos · ${num(assignmentMetrics.vehicles_used||0)} vehículos</small></div><button data-review>Revisar y ejecutar →</button></footer>
+
+      <dialog class="dispatch dispatch-review"><form method="dialog"><span class="dispatch-config-eyebrow">Antes de ejecutar</span><h2>Revisar Scheduling</h2><div class="dispatch-review-summary"><p><strong>Input</strong><span>${num(assignmentMetrics.total_trips||0)} viajes de Assignment aprobada</span></p><p><strong>Asignación</strong><span>No se puede modificar</span></p><p><strong>SLA</strong><span>${slaAvailable&&state.schedulingUseDueDates?'Activo':'No participa'}</span></p><p><strong>Objetivo</strong><span>${slaAvailable&&state.schedulingUseDueDates?'Servicio primero':'Salida temprana'}</span></p></div><p>Motor Scheduling 1.0.0 · secuencia temporal por vehículo físico.</p><div class="dispatch-actions"><button value="cancel">Volver</button><button type="button" data-execute>Generar planificación</button></div></form></dialog>
+    </div>`;
+
+  node.querySelector('[data-map]').onclick=()=>navigate('logistics-map');
+  const sla=node.querySelector('[data-sla]');
+  if(sla)sla.onchange=()=>{
+    state.schedulingUseDueDates=sla.checked;
+    persist();
+    loadSchedulingConfig();
+  };
+  const modal=node.querySelector('dialog');
+  node.querySelector('[data-review]').onclick=()=>modal.showModal();
+  node.querySelector('[data-execute]').onclick=()=>{
+    modal.close();
+    executeScheduling(sourceRun.id);
+  };
+  persist();
+}
+
 async function loadConfig(){
+  if(state.activeNode==='logistics_scheduling'){
+    return loadSchedulingConfig();
+  }
   const node=roots.config;
   if(!state.orders||!state.fleet){
     node.innerHTML='<h1>Configurar Assignment</h1><p>Primero seleccioná Orders y Fleet.</p><button data-back>Ir al Data Pack</button>';
