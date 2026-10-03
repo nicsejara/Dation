@@ -45,10 +45,10 @@ function decisionCard(decision) {
   const state = el(
     "span",
     decision.state === "available"
-      ? "● Disponible"
+      ? "● Datos listos"
       : decision.data_ready
-        ? "🔒 Datos listos · requiere decisión previa"
-        : "🔒 Requiere datos opcionales",
+        ? "✓ Datos suficientes · pendiente de jerarquía"
+        : "○ Requiere datos opcionales",
     `dispatch-readiness-state is-${decision.state}`,
   );
 
@@ -109,8 +109,8 @@ export function renderDecisionReadiness(root, readiness) {
     el(
       "p",
       (
-        "No necesitás completar toda la plantilla para empezar. "
-        + "Dation usa sólo los datos requeridos por cada nivel de decisión."
+        "Esta capa evalúa sólo si los datos alcanzan para cada nivel. "
+        + "La jerarquía de ejecución se controla en la cadena de decisiones que aparece debajo."
       ),
     ),
   );
