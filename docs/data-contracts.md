@@ -111,17 +111,19 @@ Al validar ambos archivos, `POST /api/runs/preflight` devuelve además:
 
 ### Nivel 1 — Asignación de carga
 
-Se habilita con el núcleo requerido de Orders V3 y Fleet V3.
+Se habilita con el núcleo requerido de Orders V3 y Fleet V3 y usa Assignment Engine 1.0.0 (`assignment_v1`).
 
-Capacidades adicionales:
+Capacidades:
 - Menor cantidad de viajes: disponible con el núcleo.
-- Priorizar flota propia: disponible con el núcleo.
+- Mayor uso de flota propia: disponible con el núcleo.
 - Optimizar costo: requiere `cost_per_km` y `fixed_trip_cost`.
 - Optimizar CO₂: requiere `co2_kg_per_km`.
 
+Assignment no consume `estimated_dispatch_date`, `delivery_due_date`, velocidad, horas de conducción ni disponibilidad futura. Cambiar esos valores no debe cambiar la asignación.
+
 ### Nivel 2 — Planificación
 
-En Fase 2 permanece `locked` hasta que **Asignación de carga** quede `APPROVED`. Después pasa a `AVAILABLE` si están completos:
+En Fase 3 permanece `locked` hasta que **Asignación de carga** quede `APPROVED`. Después pasa a `AVAILABLE` si están completos:
 - `estimated_dispatch_date`;
 - `avg_speed_kmh`;
 - `driving_hours_per_day`;
@@ -132,7 +134,7 @@ En Fase 2 permanece `locked` hasta que **Asignación de carga** quede `APPROVED`
 
 ### Nivel 3 — Asignación final
 
-En Fase 2 permanece `locked` porque el motor de Planificación todavía no está implementado. La identificación física queda data-ready cuando `license_plate` está completa y, conceptualmente, sólo se habilitará después de una Planificación aprobada.
+En Fase 3 permanece `locked` porque el motor de Planificación todavía no está implementado. La identificación física queda data-ready cuando `license_plate` está completa y, conceptualmente, sólo se habilitará después de una Planificación aprobada.
 
 ## Validar no es guardar
 
@@ -156,7 +158,8 @@ Durante la transición:
 - Orders V2 puede leerse mediante aliases y campos de compatibilidad;
 - Fleet V1/V2 se expande en memoria a recursos unitarios;
 - los pools históricos nunca se vuelven a exponer en las plantillas V3;
-- el motor Dispatch 2.2 existente recibe temporalmente campos internos compatibles para no romper corridas mientras Assignment y Scheduling se separan.
+- Dispatch 2.2 conserva sus adaptadores para corridas históricas;
+- las nuevas corridas de Assignment ya no usan el motor temporal ni sus campos de calendario.
 
 Estos adaptadores son implementación transitoria, no parte del nuevo contrato de producto.
 
@@ -172,7 +175,7 @@ Al ejecutar Assignment, la corrida guarda `decision_case.case_id` y `decision_ca
 
 ## Persistencia
 
-Fases 1 y 2 no requieren migración de Supabase:
+Fases 1, 2 y 3 no requieren columnas nuevas en Supabase:
 - `datasets.schema_version` ya es texto;
 - `datasets.profile_json` ya es JSONB;
 - `decision_runs.configuration_json` y `result_json` aceptan metadata del Decision Case.
@@ -201,3 +204,25 @@ Los nuevos datasets se guardan con `orders_v3` o `fleet_v3`.
 - costos, emisiones y datos temporales completos.
 
 La muestra está intencionalmente completa para demostrar toda la lectura de Decision Readiness. Un usuario real puede comenzar con sólo las columnas mínimas.
+
+
+## Output de Assignment V1
+
+Una corrida nueva del nodo `logistics_assignment` se persiste con `schema_version=assignment_v1`.
+
+Cada viaje seleccionado contiene `trip_id`, `vehicle_id`, tipo/propiedad, site base, origen, destino, distancia, capacidad, carga total y detalle por orden/producto. No contiene fechas.
+
+El resultado publica además:
+
+```json
+{
+  "handoff": {
+    "schema_version": "scheduling_input_v1",
+    "source_decision": "logistics_assignment",
+    "next_decision": "logistics_scheduling",
+    "source_path": "scenarios.selected.trips"
+  }
+}
+```
+
+Scheduling deberá consumir ese handoff aprobado en una fase posterior.
