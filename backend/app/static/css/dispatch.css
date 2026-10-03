@@ -3098,3 +3098,10 @@ body.dispatch-drawer-open {
 @media(prefers-reduced-motion:reduce){
   .dispatch-ai-loading>span{animation:none}
 }
+
+
+/* New Decision Chain dashboards own the AI entry point. */
+body.dispatch-result #dation-chat-fab,
+body.dispatch-result #chat-panel{
+  display:none!important;
+}
