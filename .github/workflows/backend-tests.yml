@@ -62,3 +62,4 @@ jobs:
           node tests/test_dashboard_selectors.js
           node --test tests/test_dispatch_selectors.mjs
           node --test tests/test_dispatch_upload_selectors.mjs
+          node --test tests/test_decision_case.mjs
