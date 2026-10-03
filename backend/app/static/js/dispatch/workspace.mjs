@@ -219,12 +219,142 @@ async function loadConfig(){
   node.querySelector('[data-execute]').onclick=()=>{modal.close();execute();};
   sync();
 }
-function pending(message){document.body.classList.add('dispatch-result');roots.dashboard.innerHTML=`<section class="dispatch-panel"><h1>Preparando tu decisión</h1><p role="status">${esc(message)}</p><div class="dispatch-loading" aria-label="Procesando"></div><p>Se muestran etapas reales, sin porcentajes estimados.</p><button data-return>Volver a configuración</button></section>`;roots.dashboard.querySelector('[data-return]').onclick=()=>navigate('logistics-config');}
+function pending(message){document.body.classList.add('dispatch-result');roots.dashboard.innerHTML=`<section class="dispatch-panel"><h1>Preparando tu decisión</h1><p role="status">${esc(message)}</p><div class="dispatch-loading" aria-label="Procesando"></div><p>El Decision Case conserva el estado real de esta ejecución.</p><button data-return>Volver al mapa</button></section>`;roots.dashboard.querySelector('[data-return]').onclick=()=>navigate('logistics-map');}
 async function poll(id,generation){if(generation!==pollGeneration)return;try{const run=await api('/api/runs/'+id);if(generation!==pollGeneration)return;if(run.status==='completed'){show(run);return;}if(run.status==='error')throw new Error(run.error_message||'La corrida no pudo completarse.');const stage=run.progress_json?.stage||'validating',names={validating:'Validando órdenes y flota',baseline:'Construyendo referencia directa',sensitivity:'Comparando objetivos de negocio',summarizing:'Preparando la decisión recomendada'};pending(stage.startsWith('optimizing:')?'Protegiendo SLA y evaluando alternativas':(names[stage]||'Evaluando alternativas de asignación'));}catch(e){if(e.status!==404){errorBox(roots.dashboard,e,()=>poll(id,generation));return;}}timer=setTimeout(()=>poll(id,generation),1500);}
-async function execute(){const id=crypto.randomUUID();urlRun(id);pending('Registrando la corrida…');navigate('decision-dashboard');const generation=++pollGeneration;clearTimeout(timer);timer=setTimeout(()=>poll(id,generation),1000);try{const run=await post('/api/runs?run_id='+id,{orders_dataset_id:state.orders.id,fleet_dataset_id:state.fleet.id,configuration:configuration(),options:{allow_third_party:state.allow,max_late_days:state.maxLateDays,analysis_depth:state.analysisDepth,anomaly_decisions:Object.fromEntries(Object.entries(state.decisions).filter(([,v])=>v))}});if(generation===pollGeneration)show(run);}catch(e){if(generation!==pollGeneration)return;clearTimeout(timer);errorBox(roots.dashboard,e,()=>poll(id,generation));}}
-export function show(run){clearTimeout(timer);pollGeneration++;state.run=run;const r=run.result_json;document.body.classList.add('dispatch-result');urlRun(run.id,r?.schema_version||'dispatch_v2');window.dationSetDashboardReady(true);dashboard(roots.dashboard,run,async()=>{const config=r.configuration||{},w=config.weights||{};const dims=Array.isArray(config.dimensions)?DEFAULT_DIMENSIONS.filter(k=>config.dimensions.includes(k)):DEFAULT_DIMENSIONS;state.dimensions=dims.length?dims:[...DEFAULT_DIMENSIONS];state.objective=['min_cost','min_time','max_utilization','min_co2','balanced','custom'].includes(config.objective)?config.objective:'balanced';if(PRIORITY_KEYS.every(k=>Number.isFinite(+w[k]))){state.weights=normalizeWeights(Object.fromEntries(PRIORITY_KEYS.map(k=>[k,Math.round(+w[k]*100)])),state.dimensions);}else{state.weights=presetWeights(state.objective,state.dimensions);}state.analysisDepth=['essential','comparative','deep'].includes(config.options?.analysis_depth)?config.options.analysis_depth:(config.options?.sensitivity?'deep':'comparative');state.allow=config.options?.allow_third_party??true;state.maxLateDays=config.options?.max_late_days??30;state.decisions=config.options?.anomaly_decisions||{};try{const [o,f]=await Promise.all([api('/api/datasets/'+r.inputs.orders.dataset_id+'/profile'),api('/api/datasets/'+r.inputs.fleet.dataset_id+'/profile')]);state.orders=o.dataset;state.fleet=f.dataset;persist();navigate('logistics-config');}catch(e){alert(e.message);}});navigate('decision-dashboard');}
-for(const [key,view]of [['data','logistics-data'],['config','logistics-config'],['dashboard','decision-dashboard']])roots[key]=root(view,'dispatch-'+key+'-root');
+async function execute(){
+  const decisionCase=ensureDecisionCase();
+  const id=crypto.randomUUID();
+  state.decisionCase=transitionNode(
+    decisionCase,
+    'logistics_assignment',
+    STATUS.RUNNING,
+    {run_id:id,error:null},
+  );
+  persist();
+  urlRun(id);
+  pending('Registrando la corrida…');
+  navigate('decision-dashboard');
+  const generation=++pollGeneration;
+  clearTimeout(timer);
+  timer=setTimeout(()=>poll(id,generation),1000);
+  try{
+    const run=await post('/api/runs?run_id='+id,{
+      orders_dataset_id:state.orders.id,
+      fleet_dataset_id:state.fleet.id,
+      configuration:configuration(),
+      options:{
+        allow_third_party:state.allow,
+        max_late_days:state.maxLateDays,
+        analysis_depth:state.analysisDepth,
+        anomaly_decisions:Object.fromEntries(
+          Object.entries(state.decisions).filter(([,v])=>v),
+        ),
+      },
+      decision_case:caseRef(state.decisionCase),
+    });
+    if(generation===pollGeneration)show(run);
+  }catch(e){
+    if(generation!==pollGeneration)return;
+    clearTimeout(timer);
+    state.decisionCase=transitionNode(
+      state.decisionCase,
+      'logistics_assignment',
+      STATUS.ERROR,
+      {run_id:id,error:e.message},
+    );
+    persist();
+    errorBox(roots.dashboard,e,()=>poll(id,generation));
+  }
+}
+export function show(run){
+  clearTimeout(timer);
+  pollGeneration++;
+  state.run=run;
+  const r=run.result_json;
+  const caseMeta=r?.decision_case;
+  if(caseMeta?.case_id){
+    if(!state.decisionCase||state.decisionCase.id!==caseMeta.case_id){
+      state.decisionCase=createDecisionCase(
+        caseMeta.case_id,
+        {id:r.inputs?.orders?.dataset_id},
+        {id:r.inputs?.fleet?.dataset_id},
+        run.created_at,
+      );
+    }
+    if(
+      state.decisionCase?.nodes?.logistics_assignment?.status
+      !== STATUS.APPROVED
+    ){
+      state.decisionCase=transitionNode(
+        state.decisionCase,
+        'logistics_assignment',
+        STATUS.REVIEW,
+        {run_id:run.id,error:null},
+      );
+    }
+  }
+  persist();
+  document.body.classList.add('dispatch-result');
+  urlRun(run.id,r?.schema_version||'dispatch_v2');
+  window.dationSetDashboardReady(true);
+  dashboard(
+    roots.dashboard,
+    run,
+    async()=>{
+      const config=r.configuration||{},w=config.weights||{};
+      const dims=Array.isArray(config.dimensions)
+        ?DEFAULT_DIMENSIONS.filter(k=>config.dimensions.includes(k))
+        :DEFAULT_DIMENSIONS;
+      state.dimensions=dims.length?dims:[...DEFAULT_DIMENSIONS];
+      state.objective=['min_cost','min_time','max_utilization','min_co2','balanced','custom'].includes(config.objective)
+        ?config.objective
+        :'balanced';
+      if(PRIORITY_KEYS.every(k=>Number.isFinite(+w[k]))){
+        state.weights=normalizeWeights(
+          Object.fromEntries(PRIORITY_KEYS.map(k=>[k,Math.round(+w[k]*100)])),
+          state.dimensions,
+        );
+      }else{
+        state.weights=presetWeights(state.objective,state.dimensions);
+      }
+      state.analysisDepth=['essential','comparative','deep'].includes(config.options?.analysis_depth)
+        ?config.options.analysis_depth
+        :(config.options?.sensitivity?'deep':'comparative');
+      state.allow=config.options?.allow_third_party??true;
+      state.maxLateDays=config.options?.max_late_days??30;
+      state.decisions=config.options?.anomaly_decisions||{};
+      try{
+        const [o,f]=await Promise.all([
+          api('/api/datasets/'+r.inputs.orders.dataset_id+'/profile'),
+          api('/api/datasets/'+r.inputs.fleet.dataset_id+'/profile'),
+        ]);
+        state.orders=o.dataset;
+        state.fleet=f.dataset;
+        persist();
+        navigate('logistics-config');
+      }catch(e){
+        alert(e.message);
+      }
+    },
+    {
+      status:state.decisionCase?.nodes?.logistics_assignment?.status,
+      onMap:()=>navigate('logistics-map'),
+      onApprove:()=>{
+        state.decisionCase=transitionNode(
+          state.decisionCase,
+          'logistics_assignment',
+          STATUS.APPROVED,
+          {run_id:run.id,approved_at:new Date().toISOString(),error:null},
+        );
+        persist();
+        return state.decisionCase;
+      },
+    },
+  );
+  navigate('decision-dashboard');
+}
+for(const [key,view]of [['data','logistics-data'],['map','logistics-map'],['config','logistics-config'],['dashboard','decision-dashboard']])roots[key]=root(view,'dispatch-'+key+'-root');
 window.DationDispatch={show,isReady:ready};document.body.classList.add('dispatch-enabled');
-window.addEventListener('dation:view',e=>{const view=e.detail.view;if(view==='logistics-data'){roots.data.hidden=false;document.body.classList.add('dispatch-enabled');loadData();}if(view==='logistics-config'&&document.body.classList.contains('dispatch-enabled')){roots.config.hidden=false;loadConfig();}});
+window.addEventListener('dation:view',e=>{const view=e.detail.view;if(view==='logistics-data'){roots.data.hidden=false;document.body.classList.add('dispatch-enabled');loadData();}if(view==='logistics-map'&&document.body.classList.contains('dispatch-enabled')){roots.map.hidden=false;loadDecisionMap();}if(view==='logistics-config'&&document.body.classList.contains('dispatch-enabled')){roots.config.hidden=false;loadConfig();}});
 const query=new URLSearchParams(location.search);if(['dispatch_v1','dispatch_v2'].includes(query.get('dda'))&&query.get('run_id')){pending('Recuperando la corrida…');navigate('decision-dashboard');poll(query.get('run_id'),++pollGeneration);}
-if(window.dationGetCurrentView?.()==='logistics-data')loadData();
+if(window.dationGetCurrentView?.()==='logistics-data')loadData();if(window.dationGetCurrentView?.()==='logistics-map')loadDecisionMap();
