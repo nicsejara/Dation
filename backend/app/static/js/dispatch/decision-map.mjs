@@ -68,6 +68,25 @@ function actionFor(nodeId, status) {
     }
   }
 
+  if (nodeId === "logistics_scheduling") {
+    if (status === STATUS.AVAILABLE) {
+      return {label: "Configurar planificación →", action: "configure"};
+    }
+    if (
+      status === STATUS.RUNNING
+      || status === STATUS.REVIEW
+      || status === STATUS.APPROVED
+    ) {
+      return {
+        label: status === STATUS.RUNNING ? "Ver ejecución →" : "Ver planificación →",
+        action: "open-result",
+      };
+    }
+    if (status === STATUS.ERROR) {
+      return {label: "Revisar y reintentar →", action: "configure"};
+    }
+  }
+
   if (status === STATUS.NEEDS_DATA) {
     return {label: "Completar Data Pack", action: "data"};
   }
@@ -230,8 +249,9 @@ export function renderDecisionMap(
   root.querySelectorAll("[data-map-action]").forEach((button) => {
     button.onclick = () => {
       const action = button.dataset.mapAction;
-      if (action === "configure") onConfigure?.();
-      if (action === "open-result") onOpenResult?.();
+      const nodeId = button.dataset.mapNode;
+      if (action === "configure") onConfigure?.(nodeId);
+      if (action === "open-result") onOpenResult?.(nodeId);
       if (action === "data") onData?.();
     };
   });
