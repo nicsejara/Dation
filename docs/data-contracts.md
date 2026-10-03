@@ -123,18 +123,18 @@ Assignment no consume `estimated_dispatch_date`, `delivery_due_date`, velocidad,
 
 ### Nivel 2 — Planificación
 
-En Fase 3 permanece `locked` hasta que **Asignación de carga** quede `APPROVED`. Después pasa a `AVAILABLE` si están completos:
+En Fase 4 permanece `locked` hasta que **Asignación de carga** quede `APPROVED`. Después pasa a `AVAILABLE` si están completos:
 - `estimated_dispatch_date`;
 - `avg_speed_kmh`;
 - `driving_hours_per_day`;
 - `status`;
 - `available_from`.
 
-`delivery_due_date` habilita además análisis de SLA.
+Scheduling Engine 1.0.0 consume los viajes aprobados y no puede modificar su `vehicle_id`, ruta ni cargas. `delivery_due_date` habilita además análisis de fecha objetivo/SLA.
 
 ### Nivel 3 — Asignación final
 
-En Fase 3 permanece `locked` porque el motor de Planificación todavía no está implementado. La identificación física queda data-ready cuando `license_plate` está completa y, conceptualmente, sólo se habilitará después de una Planificación aprobada.
+En Fase 4 permanece `locked` hasta que Scheduling quede `APPROVED`. La identificación física queda data-ready cuando `license_plate` está completa.
 
 ## Validar no es guardar
 
@@ -171,11 +171,11 @@ Fase 2 introduce `decision_case_v1` en el workspace. El caso se identifica por l
 
 Si cambia cualquiera de los dos datasets, se crea un caso nuevo y el anterior queda referenciado como `STALE`.
 
-Al ejecutar Assignment, la corrida guarda `decision_case.case_id` y `decision_case.node_id` dentro de `configuration_json` y `result_json`. Esta metadata no participa del fingerprint matemático del solver.
+Al ejecutar Assignment o Scheduling, la corrida guarda `decision_case.case_id` y `decision_case.node_id` dentro de `configuration_json` y `result_json`. Al aprobar, se persisten además `decision_case.status=approved` y `approved_at`. Esta metadata no participa del fingerprint matemático del solver.
 
 ## Persistencia
 
-Fases 1, 2 y 3 no requieren columnas nuevas en Supabase:
+Fases 1, 2, 3 y 4 no requieren columnas nuevas en Supabase:
 - `datasets.schema_version` ya es texto;
 - `datasets.profile_json` ya es JSONB;
 - `decision_runs.configuration_json` y `result_json` aceptan metadata del Decision Case.
@@ -192,6 +192,8 @@ Los nuevos datasets se guardan con `orders_v3` o `fleet_v3`.
 | `POST /api/datasets/validate?dataset_type=...` | Validación local |
 | `POST /api/datasets/upload?dataset_type=...` | Persistir dataset válido |
 | `POST /api/runs/preflight` | Compatibilidad + Decision Readiness |
+| `POST /api/runs` | Ejecutar Assignment o Scheduling según `decision_case.node_id` |
+| `POST /api/runs/{run_id}/approve` | Persistir aprobación humana de Assignment/Scheduling |
 | `POST /api/datasets/load-sample` | Cargar `sample_data/v3` |
 
 ## Dataset de ejemplo
@@ -225,4 +227,34 @@ El resultado publica además:
 }
 ```
 
-Scheduling deberá consumir ese handoff aprobado en una fase posterior.
+Scheduling consume ese handoff únicamente cuando la corrida Assignment está aprobada dentro del mismo Decision Case.
+
+
+## Output de Scheduling V1
+
+Una corrida del nodo `logistics_scheduling` se persiste con `schema_version=scheduling_v1` y referencia la corrida Assignment aprobada mediante `source_run_id`.
+
+Scheduling conserva intactos los viajes de Assignment y agrega por viaje:
+- `ready_date`;
+- `dispatch_date`;
+- `arrival_date`;
+- `transit_days`;
+- `cycle_days`;
+- `resource_available_again`;
+- `wait_days`;
+- `delivery_due_date` cuando participa.
+
+La salida incluye métricas de calendario, espera, lead time y —si SLA está habilitado— cumplimiento/tardanza por orden.
+
+El handoff hacia Decision 03 es:
+
+```json
+{
+  "handoff": {
+    "schema_version": "final_assignment_input_v1",
+    "source_decision": "logistics_scheduling",
+    "next_decision": "logistics_final_assignment",
+    "source_path": "scenarios.selected.trips"
+  }
+}
+```
