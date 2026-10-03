@@ -198,7 +198,10 @@
     var saved = savedWorkspace();
     var hasData = Boolean(saved && saved.orders && saved.fleet);
     container.querySelectorAll("[data-dda-data-cta]").forEach(function(button){
-      if(button.dataset.fixedCopy === "true") return;
+      if(
+        button.dataset.fixedCopy === "true"
+        || button.dataset.mode === "latest"
+      ) return;
       button.childNodes[0].nodeValue = hasData
         ? "Iniciar nueva decisión "
         : "Cargar mis datos ";
