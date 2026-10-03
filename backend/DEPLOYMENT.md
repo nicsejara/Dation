@@ -72,11 +72,19 @@ Con backend actualizado y autenticación válida, `GET /api/dispatch/status` deb
 
 `POST /api/datasets/validate?dataset_type=orders|fleet` no depende de Supabase. Esto permite probar estructura, tipos y errores antes de aplicar las migraciones. Mientras `available=false`, la pantalla muestra “Activación pendiente”, mantiene visibles ambas cajas y bloquea guardar/continuar con una explicación.
 
-## Fase espacial de flota
+## Logistics Data Pack V3
 
-`fleet_v2` no requiere columnas nuevas en `datasets`. Dispatch 2.2.0 sí agrega una migración de integridad para que `decision_runs` acepte y valide el envelope `dispatch_v2` sin reescribir corridas históricas.
+Phase 1 introduces `orders_v3` and `fleet_v3` without adding database columns. `datasets.schema_version` is already text and `profile_json` is JSONB, so no Supabase migration is required.
 
-Después del deploy verificar que `GET /api/dispatch/contracts` informe `orders_v2` y `fleet_v2`, que la plantilla de flota contenga `fleet_pool_id` y `base_location`, que una orden no pueda utilizar un pool propio cuya base pertenezca a otro origen y que un recurso finito no pueda reutilizarse antes de `resource_available_again`. Los datasets `fleet_v1` históricos deben continuar validando con la advertencia `LEGACY_FLEET_GLOBAL_SCOPE`.
+After deploy verify that `GET /api/dispatch/contracts` reports `orders_v3` and `fleet_v3`. The fleet template must contain `vehicle_id` and `base_site`, and must not expose `fleet_pool_id` or `units_available`. A new Fleet V3 row represents one real truck. Historical Fleet V1/V2 datasets remain readable through in-memory adapters.
+
+Also verify Decision Readiness:
+- a minimal valid Data Pack unlocks **Asignación de carga**;
+- missing scheduling columns do not block Assignment;
+- completing `estimated_dispatch_date`, speed/hours/status/availability marks Scheduling data-ready but it remains locked until the upstream decision is approved in Phase 2;
+- completing `license_plate` marks Final Assignment data-ready.
+
+The current Dispatch 2.2 temporal engine remains available through internal compatibility fields during this transition. Those internal fields must never appear in the V3 templates.
 
 ## Cloud Run
 
@@ -122,7 +130,10 @@ Después del deploy validar en 1440 px y 390 px:
 - duplicado;
 - error de guardado;
 - activación pendiente;
-- listo con avisos y botón Configurar decisión habilitado.
+- Data Pack mínimo con Asignación disponible;
+- Data Pack completo con Scheduling y Final Assignment marcados como data-ready;
+- columnas opcionales vacías sin falsos errores;
+- CTA Continuar habilitado sólo cuando Assignment está disponible.
 
 El script `scripts/qa/dispatch-browser.cjs` mantiene mocks para el flujo completo y
 comprueba que no haya overflow horizontal.
