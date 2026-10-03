@@ -27,12 +27,13 @@ The templates are deliberately complete, but users only need the core columns re
 
 Fleet V3 contains **one row per real truck**. There is no user-facing pool concept.
 
-Phase 3 separates the first two decisions at engine level. New Assignment runs use `assignment_v1` / Assignment Engine 1.0.0 and do **not** calculate dates, SLA, lead time or temporal fleet occupancy. Their approved trips are exposed through a versioned `scheduling_input_v1` handoff for the future Scheduling engine. Dispatch 2.2 remains readable for historical runs.
+Phase 4 activates the second engine in the chain. Assignment 1.0.0 still decides **what vehicle carries what load** without dates. Once a human approves that result, Scheduling 1.0.0 consumes the immutable `scheduling_input_v1` handoff and decides **when each approved trip can run**, respecting ready dates, vehicle availability and non-overlapping round-trip occupancy. Scheduling emits `final_assignment_input_v1` for Decision 03. Dispatch 2.2 remains readable for historical runs.
 
 ## Current versions
 
 - Workspace / API: **1.0.0**
 - Assignment engine: **1.0.0** (`assignment_v1`, trips/cost/own-fleet/CO₂, non-temporal)
+- Scheduling engine: **1.0.0** (`scheduling_v1`, fixed Assignment + temporal sequencing + optional SLA)
 - Historical Dispatch engine: **2.2.0** (`dispatch_v2`, temporal) retained for prior runs; engine **0.2.0** also retained
 - Frontend: HTML + CSS + vanilla JavaScript
 - Runtime: Google Cloud Run
