@@ -2756,99 +2756,17 @@
     showCancelled();
   }
 
-  function latestDecisionButton() {
-    return (
-      $("#open-latest-logistics-decision")
-    );
-  }
-
-  function latestDecisionMeta() {
-    return (
-      $("#latest-logistics-meta")
-    );
-  }
-
-
-  function formatLandingDecisionDate(value) {
-    if (!value) {
-      return "";
-    }
-
-    var parsed = new Date(value);
-
-    if (Number.isNaN(parsed.getTime())) {
-      return F.formatDate(value);
-    }
-
-    return new Intl.DateTimeFormat(
-      "es-AR",
-      {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false
-      }
-    ).format(parsed);
-  }
-
   function updateLatestDecisionCta(run) {
-    var button = (
-      latestDecisionButton()
-    );
-    var meta = (
-      latestDecisionMeta()
-    );
-
-    if (!button || !meta) {
-      return;
-    }
-
-    if (!run) {
-      button.disabled = false;
-      button.dataset.mode = "decision-map";
-      delete button.dataset.runId;
-      button.textContent = "Ver Decision Map ↘";
-      meta.textContent = (
-        "Todavía no hay decisiones completadas · explorá la cadena de decisiones del DDA."
-      );
-
-      if (
-        typeof window
-          .dationSetDashboardReady
-        === "function"
-      ) {
-        window.dationSetDashboardReady(
-          false
-        );
-      }
-
-      return;
-    }
-
-    button.disabled = false;
-    button.dataset.mode = "latest";
-    button.dataset.runId = run.id;
-    button.textContent = "Analizar mi última decisión ↗";
-    meta.textContent = (
-      "Última decisión · "
-      + formatLandingDecisionDate(
-          run.finished_at
-          || run.created_at
-        )
-    );
-
     if (
-      typeof window
-        .dationSetDashboardReady
+      typeof window.dationSetDashboardReady
       === "function"
     ) {
       window.dationSetDashboardReady(
-        true
+        Boolean(run)
       );
     }
   }
+
 
   async function findLatestCompletedRun() {
     var payload = await requestJson(
@@ -2879,73 +2797,22 @@
       var latest = (
         await findLatestCompletedRun()
       );
-
-      updateLatestDecisionCta(
-        latest
-      );
-
+      updateLatestDecisionCta(latest);
       return latest;
     } catch (error) {
-      var meta = (
-        latestDecisionMeta()
-      );
-
-      if (meta) {
-        meta.textContent = (
-          "No se pudo consultar la última decisión."
-        );
-      }
-
+      updateLatestDecisionCta(null);
       return null;
     }
   }
 
   async function openLatestDecision() {
-    var button = (
-      latestDecisionButton()
-    );
-
-    if (
-      button
-      && button.dataset.mode === "decision-map"
-    ) {
-      if (
-        typeof window.dationScrollToDecisionMap
-        === "function"
-      ) {
-        window.dationScrollToDecisionMap();
-      } else {
-        var decisionMap = document.getElementById(
-          "dda-logistics-decision-map"
-        );
-
-        if (decisionMap) {
-          decisionMap.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-          });
-        }
-      }
-
-      return;
-    }
-
-    if (button) {
-      button.disabled = true;
-      button.textContent = (
-        "Abriendo última decisión…"
-      );
-    }
-
     try {
       var summary = (
         await findLatestCompletedRun()
       );
 
       if (!summary) {
-        updateLatestDecisionCta(
-          null
-        );
+        updateLatestDecisionCta(null);
         return;
       }
 
@@ -2967,23 +2834,12 @@
       });
 
       setRunInUrl(run.id);
-
       await recoverRun(run);
     } catch (error) {
       showError(
         "No se pudo abrir la última decisión: "
         + error.message
       );
-    } finally {
-      if (
-        button
-        && button.dataset.mode !== "decision-map"
-      ) {
-        button.textContent = (
-          "Analizar mi última decisión ↗"
-        );
-        button.disabled = false;
-      }
     }
   }
 
@@ -3192,10 +3048,6 @@
     var detailExport = (
       $("#export-reassignments")
     );
-    var latestButton = (
-      latestDecisionButton()
-    );
-
     if (retryStatusButton) {
       retryStatusButton.addEventListener(
         "click",
@@ -3341,13 +3193,6 @@
       detailExport.addEventListener(
         "click",
         exportReassignments
-      );
-    }
-
-    if (latestButton) {
-      latestButton.addEventListener(
-        "click",
-        openLatestDecision
       );
     }
 
