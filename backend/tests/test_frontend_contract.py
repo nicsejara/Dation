@@ -54,6 +54,14 @@ DDA_LANDING_JS = (
     / "dda-logistics-landing.js"
 )
 
+DDA_LANDING_CSS = (
+    BACKEND_ROOT
+    / "app"
+    / "static"
+    / "css"
+    / "dda-logistics-landing.css"
+)
+
 INTERPRETER_STAGE_JS = (
     BACKEND_ROOT
     / "app"
@@ -84,6 +92,11 @@ class FrontendContractTests(
         )
         cls.dda_landing_js = (
             DDA_LANDING_JS.read_text(
+                encoding="utf-8"
+            )
+        )
+        cls.dda_landing_css = (
+            DDA_LANDING_CSS.read_text(
                 encoding="utf-8"
             )
         )
