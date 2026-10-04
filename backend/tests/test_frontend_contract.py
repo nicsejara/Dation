@@ -356,7 +356,7 @@ class FrontendContractTests(
             self.dashboard_stage_js,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=workspace-nav-v1",
+            "/static/js/dispatch/workspace.mjs?v=workspace-nav-v2",
             self.html,
         )
         self.assertIn(
@@ -862,11 +862,11 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "/static/css/dda-logistics-upload.css?v=upload-pro-v1",
+            "/static/css/dda-logistics-upload.css?v=workspace-nav-v2",
             self.html,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=workspace-nav-v1",
+            "/static/js/dispatch/workspace.mjs?v=workspace-nav-v2",
             self.html,
         )
         self.assertIn(
@@ -874,7 +874,7 @@ class FrontendContractTests(
             workspace,
         )
         self.assertIn(
-            "./upload/index.mjs?v=upload-pro-v1",
+            "./upload/index.mjs?v=workspace-nav-v2",
             workspace,
         )
         self.assertIn(
@@ -1013,8 +1013,12 @@ class FrontendContractTests(
                 upload_css,
             )
 
-        self.assertNotIn(
+        self.assertIn(
             ".dispatch-pro-stepper",
+            upload_css,
+        )
+        self.assertIn(
+            "display:none!important",
             upload_css,
         )
         self.assertNotIn(
@@ -1482,6 +1486,14 @@ class FrontendContractTests(
             )
 
         self.assertIn(
+            "journeyButton('Inicio'",
+            self.html,
+        )
+        self.assertIn(
+            "journeySeparator()",
+            self.html,
+        )
+        self.assertIn(
             "journeyButton('DDA Logística'",
             self.html,
         )
@@ -1550,11 +1562,11 @@ class FrontendContractTests(
             upload,
         )
         self.assertIn(
-            "/static/css/app.css?v=workspace-nav-v1",
+            "/static/css/app.css?v=workspace-nav-v2",
             self.html,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=workspace-nav-v1",
+            "/static/js/dispatch/workspace.mjs?v=workspace-nav-v2",
             self.html,
         )
 
