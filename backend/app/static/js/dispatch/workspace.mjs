@@ -3,6 +3,12 @@ import {mountUploadScreen} from './upload/index.mjs?v=upload-pro-v1';
 import {renderDecisionMap} from './decision-map.mjs?v=decision-map-nodal-v1';
 import {STATUS,createDecisionCase,replaceInputs,transitionNode,inputSignature,caseRef,deriveDecisionNodes} from './decision-case.mjs';
 const KEY='dation.dispatch.workspace.v4';
+const NAV_VERSION='workspace-nav-v1';
+const DECISION_LABELS={
+  logistics_assignment:'Asignación de carga',
+  logistics_scheduling:'Planificación',
+  logistics_final_assignment:'Asignación final',
+};
 const PRIORITY_KEYS=['trips','cost','own_fleet','co2'];
 const CORE_DIMENSIONS=['trips','own_fleet'];
 const PRESETS={
@@ -84,7 +90,9 @@ const state={
   decisions:saved.decisions||{},
   configured:Boolean(saved.configured),
   decisionCase:saved.decisionCase||null,
-  activeNode:saved.activeNode||'logistics_assignment',
+  activeNode:saved.navigationVersion===NAV_VERSION
+    ?(saved.activeNode||null)
+    :null,
   schedulingUseDueDates:saved.schedulingUseDueDates??true,
   preflight:null,
   available:false,
@@ -95,7 +103,7 @@ state.weights=state.objective==='custom'
   ?normalizeWeights(state.weights,state.dimensions)
   :presetWeights(state.objective,state.dimensions);
 let timer=null,pollGeneration=0;const roots={};
-function persist(){try{sessionStorage.setItem(KEY,JSON.stringify({orders:state.orders,fleet:state.fleet,dimensions:state.dimensions,weights:state.weights,objective:state.objective,analysisDepth:state.analysisDepth,allow:state.allow,decisions:state.decisions,configured:state.configured,decisionCase:state.decisionCase,activeNode:state.activeNode,schedulingUseDueDates:state.schedulingUseDueDates}));}catch{}}
+function persist(){try{sessionStorage.setItem(KEY,JSON.stringify({orders:state.orders,fleet:state.fleet,dimensions:state.dimensions,weights:state.weights,objective:state.objective,analysisDepth:state.analysisDepth,allow:state.allow,decisions:state.decisions,configured:state.configured,decisionCase:state.decisionCase,activeNode:state.activeNode,schedulingUseDueDates:state.schedulingUseDueDates,navigationVersion:NAV_VERSION}));}catch{}}
 function root(view,id){const parent=document.querySelector('[data-view-panel="'+view+'"]');let node=document.getElementById(id);if(!node){node=document.createElement('div');node.id=id;node.className='dispatch';parent.append(node);}return node;}
 function assignmentEvidence(){
   return state.preflight?.decision_readiness?.decisions?.find(item=>item.id==='logistics_assignment')||null;
@@ -144,9 +152,17 @@ function syncDimensionsToEvidence({initialize=false}={}){
 function ready(){return !!(state.available&&state.orders&&state.fleet&&state.preflight?.valid);}
 function ensureDecisionCase(){
   const signature=inputSignature(state.orders,state.fleet);
-  if(!signature){state.decisionCase=null;persist();return null;}
+  if(!signature){
+    state.decisionCase=null;
+    state.activeNode=null;
+    window.dationSetDecisionContext?.(null);
+    persist();
+    return null;
+  }
   if(!state.decisionCase){
     state.decisionCase=createDecisionCase(crypto.randomUUID(),state.orders,state.fleet);
+    state.activeNode=null;
+    window.dationSetDecisionContext?.(null);
   }else if(state.decisionCase.signature!==signature){
     state.decisionCase=replaceInputs(state.decisionCase,crypto.randomUUID(),state.orders,state.fleet);
     state.run=null;
@@ -155,22 +171,25 @@ function ensureDecisionCase(){
     state.dimensions=[...CORE_DIMENSIONS];
     state.objective='balanced';
     state.weights=balancedWeights(state.dimensions);
-    state.activeNode='logistics_assignment';
+    state.activeNode=null;
     state.schedulingUseDueDates=true;
+    window.dationSetDecisionContext?.(null);
   }
   persist();
   return state.decisionCase;
 }
 function decisionContext(nodeId){
-  if(nodeId==='logistics_scheduling'){
-    window.dationSetDecisionContext?.('Configurar Planificación','Decisión · Planificación');
+  if(!nodeId){
+    window.dationSetDecisionContext?.(null);
     return;
   }
-  if(nodeId==='logistics_final_assignment'){
-    window.dationSetDecisionContext?.('Configurar Asignación final','Decisión · Asignación final');
-    return;
-  }
-  window.dationSetDecisionContext?.('Configurar Assignment','Decisión · Assignment');
+  const node=state.decisionCase?.nodes?.[nodeId]||null;
+  window.dationSetDecisionContext?.({
+    id:nodeId,
+    label:DECISION_LABELS[nodeId]||'Decisión',
+    hasRun:Boolean(node?.run_id),
+    status:node?.status||null,
+  });
 }
 function navigate(view){window.dationSetDataReady(ready());window.dationNavigate(view);}
 function nextNodeId(nodeId){
@@ -417,10 +436,16 @@ async function loadSchedulingConfig(){
 }
 
 async function loadConfig(){
+  const node=roots.config;
+  if(!state.activeNode){
+    node.innerHTML='<section class="dispatch-panel"><span class="dispatch-kicker">CONFIGURAR DECISIÓN</span><h1>Primero elegí una decisión.</h1><p>Volvé al mapa para seleccionar qué decisión querés analizar antes de configurar criterios.</p><button data-map>Ir al mapa de decisiones</button></section>';
+    node.querySelector('[data-map]').onclick=()=>navigate('logistics-map');
+    return;
+  }
+  decisionContext(state.activeNode);
   if(state.activeNode==='logistics_scheduling'){
     return loadSchedulingConfig();
   }
-  const node=roots.config;
   if(!state.orders||!state.fleet){
     node.innerHTML='<h1>Configurar Assignment</h1><p>Primero seleccioná Orders y Fleet.</p><button data-back>Ir al Data Pack</button>';
     node.querySelector('[data-back]').onclick=()=>navigate('logistics-data');
@@ -716,12 +741,14 @@ async function poll(id,generation,nodeId=state.activeNode){
 async function execute(){
   const decisionCase=ensureDecisionCase();
   const id=crypto.randomUUID();
+  state.activeNode='logistics_assignment';
   state.decisionCase=transitionNode(
     decisionCase,
     'logistics_assignment',
     STATUS.RUNNING,
     {run_id:id,error:null},
   );
+  decisionContext('logistics_assignment');
   persist();
   urlRun(id);
   pending('Registrando la corrida…');
@@ -768,6 +795,7 @@ async function executeScheduling(sourceRunId){
     STATUS.RUNNING,
     {run_id:id,error:null},
   );
+  decisionContext('logistics_scheduling');
   persist();
   urlRun(id,'scheduling_v1');
   pending('Registrando la planificación…');
@@ -918,6 +946,7 @@ export function show(run){
         state.fleet=f.dataset;
         state.preflight=null;
         ensureDecisionCase();
+        decisionContext(state.activeNode);
         persist();
         navigate('logistics-config');
       }catch(e){
@@ -980,7 +1009,23 @@ export function show(run){
   navigate('decision-dashboard');
 }
 for(const [key,view]of [['data','logistics-data'],['map','logistics-map'],['config','logistics-config'],['dashboard','decision-dashboard']])roots[key]=root(view,'dispatch-'+key+'-root');
-window.DationDispatch={show,isReady:ready};document.body.classList.add('dispatch-enabled');
+window.DationDispatch={
+  show,
+  isReady:ready,
+  openActiveDecisionResult:()=>{
+    if(!state.activeNode)return;
+    return openCaseResult(state.activeNode);
+  },
+  getActiveDecision:()=>({
+    id:state.activeNode,
+    label:state.activeNode?DECISION_LABELS[state.activeNode]||'Decisión':null,
+    hasRun:Boolean(state.activeNode&&state.decisionCase?.nodes?.[state.activeNode]?.run_id),
+    status:state.activeNode?state.decisionCase?.nodes?.[state.activeNode]?.status||null:null,
+  }),
+};
+document.body.classList.add('dispatch-enabled');
 window.addEventListener('dation:view',e=>{const view=e.detail.view;if(view==='logistics-data'){roots.data.hidden=false;document.body.classList.add('dispatch-enabled');loadData();}if(view==='logistics-map'&&document.body.classList.contains('dispatch-enabled')){roots.map.hidden=false;loadDecisionMap();}if(view==='logistics-config'&&document.body.classList.contains('dispatch-enabled')){roots.config.hidden=false;loadConfig();}});
-const query=new URLSearchParams(location.search);if(['assignment_v1','scheduling_v1','dispatch_v1','dispatch_v2'].includes(query.get('dda'))&&query.get('run_id')){const queryNode=query.get('dda')==='scheduling_v1'?'logistics_scheduling':'logistics_assignment';state.activeNode=queryNode;pending('Recuperando la corrida…');navigate('decision-dashboard');poll(query.get('run_id'),++pollGeneration,queryNode);}
-if(window.dationGetCurrentView?.()==='logistics-data')loadData();if(window.dationGetCurrentView?.()==='logistics-map')loadDecisionMap();
+const query=new URLSearchParams(location.search);if(['assignment_v1','scheduling_v1','dispatch_v1','dispatch_v2'].includes(query.get('dda'))&&query.get('run_id')){const queryNode=query.get('dda')==='scheduling_v1'?'logistics_scheduling':'logistics_assignment';state.activeNode=queryNode;if(state.decisionCase?.nodes?.[queryNode]&&!state.decisionCase.nodes[queryNode].run_id){state.decisionCase=transitionNode(state.decisionCase,queryNode,STATUS.RUNNING,{run_id:query.get('run_id'),error:null});}decisionContext(queryNode);pending('Recuperando la corrida…');navigate('decision-dashboard');poll(query.get('run_id'),++pollGeneration,queryNode);}
+if(state.activeNode)decisionContext(state.activeNode);
+if(window.dationGetCurrentView?.()==='logistics-data')loadData();
+if(window.dationGetCurrentView?.()==='logistics-map')loadDecisionMap();
