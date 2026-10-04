@@ -1882,9 +1882,9 @@
 
 .dispatch-pro-header-state{
   align-self:start;
-  min-height:29px;
+  min-height:30px;
   padding:0 9px;
-  font-size:12px;
+  font-size:13px;
 }
 
 .dispatch-pro-header-state.is-validating .dispatch-pro-icon{
@@ -2172,7 +2172,7 @@
   border-radius:999px;
   color:#60747e;
   background:rgba(255,255,255,.78);
-  font-size:12.5px;
+  font-size:13px;
   font-weight:650;
 }
 
@@ -2370,7 +2370,7 @@
 .dispatch-pro-library-row-copy small{
   margin-top:2px;
   color:#71848d;
-  font-size:12.5px;
+  font-size:13px;
 }
 
 .dispatch-pro-library-state{
@@ -2381,7 +2381,7 @@
   margin-top:5px;
   padding:0 7px;
   border-radius:999px;
-  font-size:11.5px;
+  font-size:13px;
   font-weight:750;
 }
 
@@ -2396,7 +2396,7 @@
   color:var(--identity-dark);
   border-color:color-mix(in srgb,var(--identity) 28%,#d0dde1);
   background:var(--identity-faint);
-  font-size:12.5px;
+  font-size:13px;
 }
 
 .dispatch-pro-library-empty{
@@ -2487,7 +2487,7 @@
 
 .dispatch-pro-validation-hint{
   color:#7a8b93;
-  font-size:12.5px;
+  font-size:13px;
   text-align:right;
 }
 
@@ -2542,7 +2542,7 @@
 
 .dispatch-pro-validation-row-metric{
   color:#6d7f88;
-  font-size:12.5px;
+  font-size:13px;
 }
 
 .dispatch-pro-validation-row.is-success .dispatch-pro-validation-row-icon,
@@ -2604,7 +2604,7 @@
 .dispatch-pro-validation-actions .dispatch-pro-text-action{
   min-height:30px;
   color:var(--identity-dark)!important;
-  font-size:12.5px;
+  font-size:13px;
   text-decoration:none;
 }
 
@@ -2637,7 +2637,7 @@
 
 .dispatch-pro-validation-success>summary small{
   color:#5f7c71;
-  font-size:12px;
+  font-size:13px;
 }
 
 .dispatch-pro-validation-success-body{
@@ -2650,7 +2650,7 @@
   display:block;
   margin:5px 2px 0;
   color:#7a8b93;
-  font-size:12.5px;
+  font-size:13px;
 }
 
 .dispatch-pro-compatibility{
@@ -2730,7 +2730,7 @@
   border:1px solid #e5ecee;
   border-radius:10px;
   background:#fff;
-  font-size:12.5px;
+  font-size:13px;
 }
 
 .dispatch-pro-history-row.is-header{
@@ -2738,7 +2738,7 @@
   border:0;
   color:#75868e;
   background:#f5f8f9;
-  font-size:11.5px;
+  font-size:13px;
   font-weight:750;
 }
 
