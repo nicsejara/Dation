@@ -1,3 +1,5 @@
+import "../dda-variable-config.js?v=assignment-config-v2";
+
 export const DECISION_ORDER = [
   "logistics_assignment",
   "logistics_scheduling",
@@ -94,7 +96,20 @@ export const STATUS_UI = Object.freeze({
 const ICONS = Object.freeze({
   packageCheck: '<path d="m16.5 9.4-9-5.2"/><path d="M21 16V8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/><path d="m15.5 16 1.5 1.5 3-3"/>',
   calendarRange: '<path d="M8 2v4M16 2v4M3 10h18"/><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M7 15h4M13 18h4"/>',
+  calendarClock: '<path d="M8 2v4M16 2v4M3 10h8"/><rect x="3" y="4" width="18" height="18" rx="2"/><circle cx="16" cy="16" r="4"/><path d="M16 14v2l1.5 1"/>',
   truck: '<path d="M10 17h4V5H2v12h3"/><path d="M14 9h4l4 4v4h-3"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="17.5" r="2.5"/>',
+  route: '<circle cx="6" cy="19" r="3"/><path d="M9 19h5.5a3.5 3.5 0 0 0 0-7h-5a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/>',
+  dollarSign: '<path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
+  scale: '<path d="m16 16 3-8 3 8a5 5 0 0 1-6 0ZM2 16l3-8 3 8a5 5 0 0 1-6 0ZM7 21h10M12 3v18M3 7h18"/>',
+  leaf: '<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 18 2 18 2c1 5.5-.5 11.5-5 14.5"/><path d="M2 21c0-3 1.85-5.36 5.08-6.94C9.46 12.9 12 10 13 8"/>',
+  target: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
+  filter: '<path d="M4 5h16l-6 7v5l-4 2v-7Z"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  shuffle: '<path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="m15 15 6 6"/><path d="M4 4l5 5"/>',
+  handshake: '<path d="m11 17 2 2a2 2 0 0 0 3-3l-3-3"/><path d="m14 14 2.5 2.5a2 2 0 0 0 3-3L15 9"/><path d="M3 7l5-3 4 3-3 3a2 2 0 0 0 3 3l3-3"/><path d="m2 8 4 8 3-2M22 8l-4 8-2-1"/>',
+  layoutDashboard: '<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>',
+  messageCircleQuestion: '<path d="M21 12a8 8 0 0 1-8 8H7l-4 2 1.4-4.2A8 8 0 1 1 21 12Z"/><path d="M9.6 9a2.5 2.5 0 0 1 4.8 1c0 1.8-2.4 2-2.4 3.5M12 17h.01"/>',
+  slidersHorizontal: '<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3"/><path d="M1 14h6M9 8h6M17 16h6"/>',
   playCircle: '<circle cx="12" cy="12" r="9"/><path d="m10 8 6 4-6 4Z"/>',
   checkCircle: '<circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/>',
   alertTriangle: '<path d="M12 3 2.5 20h19Z"/><path d="M12 9v4M12 17h.01"/>',

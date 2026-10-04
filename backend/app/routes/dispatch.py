@@ -15,10 +15,16 @@ from fastapi.responses import Response
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.auth import require_upload_access
-from app.models.assignment_config import AssignmentConfig, AssignmentOptions
+from app.models.assignment_config import (
+    AssignmentConfig,
+    AssignmentOptions,
+    AssignmentResourceMode,
+    AssignmentScopeFilter,
+)
 from app.models.dispatch_config import DispatchConfig, DispatchOptions
 from app.models.scheduling_config import SchedulingConfig, SchedulingOptions
 from app.services import dispatch_service as service
+from app.services.assignment_config_service import preview_assignment_configuration
 from app.validators.contracts import public_contracts, template_csv
 
 
@@ -31,6 +37,15 @@ class Inputs(BaseModel):
     orders_dataset_id: UUID
     fleet_dataset_id: UUID
     allow_third_party: bool = True
+
+
+class AssignmentPreviewRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    orders_dataset_id: UUID
+    fleet_dataset_id: UUID
+    filters: list[AssignmentScopeFilter] = Field(default_factory=list, max_length=12)
+    resource_mode: AssignmentResourceMode = "mixed"
 
 
 class DecisionCaseRef(BaseModel):
@@ -228,6 +243,18 @@ async def preflight(payload: Inputs):
     )
 
 
+@router.post("/api/runs/assignment-preview")
+async def assignment_preview(payload: AssignmentPreviewRequest):
+    return await guarded(
+        preview_assignment_configuration(
+            str(payload.orders_dataset_id),
+            str(payload.fleet_dataset_id),
+            filters=[item.model_dump() for item in payload.filters],
+            resource_mode=payload.resource_mode,
+        )
+    )
+
+
 @router.post("/api/runs")
 async def run(
     payload: RunRequest,
@@ -320,4 +347,3 @@ async def template(kind: str):
             "Content-Disposition": f'attachment; filename="{kind}.csv"',
         },
     )
-
