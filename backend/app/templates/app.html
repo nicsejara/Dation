@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="/static/css/tokens.css?v=home-dda-selector-v2">
   <link rel="stylesheet" href="/static/css/app.css?v=home-dda-selector-v2">
   <link rel="stylesheet" href="/static/css/home-dda.css?v=home-dda-hero-v4">
-  <link rel="stylesheet" href="/static/css/dda-logistics-landing.css?v=dda-logistics-landing-v6">
+  <link rel="stylesheet" href="/static/css/dda-logistics-landing.css?v=dda-logistics-landing-v7">
   <link rel="stylesheet" href="/static/css/dispatch.css?v=home-dda-selector-v2">
 </head>
 <body>
@@ -225,15 +225,11 @@
 
             <section class="dda-landing__hero" data-reveal>
               <div class="dda-landing__hero-copy">
-                <div class="dda-landing__badges">
-                  <span class="dda-landing__badge">Decision Data Asset</span>
-                  <span class="dda-landing__version">Motor 0.2.0</span>
-                </div>
-                <span class="dda-landing__eyebrow">Dation · DDA Logística</span>
-                <h1>De órdenes y flota a despachos que podés explicar.</h1>
+                <span class="dda-landing__eyebrow">DDA LOGÍSTICA · PLANIFICACIÓN DE DESPACHOS</span>
+                <h1>Decidí tus despachos más rápido y con mejor análisis.</h1>
                 <p class="dda-landing__hero-lead">
-                  Cargá tus órdenes y tu flota. Dation asigna la carga, planifica los viajes y
-                  te muestra cuánto cuesta, cuánto tarda y por qué esa es la mejor opción.
+                  Dation compara alternativas de asignación, planificación y ejecución, y te muestra
+                  cuál conviene y por qué. Menos tiempo armando análisis, más tiempo para decidir.
                 </p>
 
                 <div class="dda-landing__hero-actions">
@@ -241,88 +237,117 @@
                     class="button button--landing-primary"
                     id="start-logistics-decision"
                     type="button"
-                    data-dda-data-cta
                     data-go-data
                   >
-                    Cargar mis datos <span aria-hidden="true">→</span>
+                    Iniciar nueva decisión <span aria-hidden="true">→</span>
                   </button>
                   <button
                     class="button button--landing-secondary"
-                    id="open-latest-logistics-decision"
                     type="button"
-                    data-mode="decision-map"
+                    data-scroll-decision-map
                   >
                     Ver Decision Map <span aria-hidden="true">↘</span>
                   </button>
                 </div>
-
-                <div class="dda-landing__latest">
-                  <span class="dda-landing__latest-dot" aria-hidden="true"></span>
-                  <span id="latest-logistics-meta">Buscando la última decisión calculada…</span>
-                </div>
               </div>
 
-              <div class="dda-landing__hero-visual" aria-label="Flujo del DDA Logística">
-                <img class="dda-landing__emblem" src="/static/assets/dda-logistics.svg?v=dda-logistics-landing-v5" alt="">
+              <div class="dda-landing__hero-visual" aria-label="Proceso del DDA Logística">
+                <img class="dda-landing__emblem" src="/static/assets/dda-logistics.svg?v=dda-logistics-landing-v7" alt="">
                 <div class="dda-landing__flow-panel">
                   <div class="dda-landing__flow-node">
                     <span class="dda-landing__flow-node-icon">
                       <svg class="dda-icon" aria-hidden="true"><use href="#dda-i-package"></use></svg>
                     </span>
-                    <div><small>Entrada</small><strong>Órdenes + flota disponible</strong></div>
+                    <div><small>VOS APORTÁS</small><strong>Tus órdenes y tu flota</strong></div>
                   </div>
                   <span class="dda-landing__flow-connector" aria-hidden="true"></span>
                   <div class="dda-landing__flow-node">
                     <span class="dda-landing__flow-node-icon">
                       <svg class="dda-icon" aria-hidden="true"><use href="#dda-i-cpu"></use></svg>
                     </span>
-                    <div><small>Motor</small><strong>Consolida y programa despachos</strong></div>
+                    <div><small>DATION ANALIZA</small><strong>Compara alternativas y optimiza</strong></div>
                   </div>
                   <span class="dda-landing__flow-connector" aria-hidden="true"></span>
                   <div class="dda-landing__flow-node">
                     <span class="dda-landing__flow-node-icon">
                       <svg class="dda-icon" aria-hidden="true"><use href="#dda-i-file-check"></use></svg>
                     </span>
-                    <div><small>Salida</small><strong>Decisión + alternativas + evidencia</strong></div>
+                    <div><small>VOS DECIDÍS</small><strong>Con recomendación y evidencia</strong></div>
                   </div>
                 </div>
               </div>
             </section>
 
-            <section class="dda-landing__section dda-landing__section--white" data-reveal>
-              <div class="dda-landing__section-head">
+            <section class="dda-landing__section dda-landing__section--white dda-landing__how" data-reveal>
+              <div class="dda-landing__section-head dda-landing__section-head--how">
                 <span class="dda-landing__section-eyebrow">Cómo funciona</span>
-                <h2>Cuatro pasos de los datos a la decisión.</h2>
+                <h2>De tus datos a una decisión, en 4 pasos.</h2>
                 <p class="dda-landing__section-support">
-                  Cada decisión vive en un <strong>Decision Case</strong>: el expediente que reúne tus datos, los criterios y el resultado.
+                  Cada decisión se arma en un <strong>Decision Case</strong>: un expediente con tus datos, tus criterios y el resultado.
                 </p>
               </div>
 
               <div class="dda-landing__steps">
                 <article class="dda-landing__step">
-                  <div class="dda-landing__step-top"><span class="dda-landing__step-number">01</span><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-upload"></use></svg></div>
-                  <small class="dda-landing__step-phase">Cargar datos</small><h3>Cargá tus datos</h3>
-                  <p>Subí o reutilizá tus órdenes y tu flota. Con el núcleo mínimo alcanza para empezar.</p>
+                  <div class="dda-landing__step-top">
+                    <span class="dda-landing__step-number">01</span>
+                    <svg class="dda-icon" aria-hidden="true"><use href="#dda-i-upload"></use></svg>
+                  </div>
+                  <small class="dda-landing__step-phase">Paso 1</small>
+                  <h3>Cargá tus datos</h3>
+                  <p>Subí tus órdenes y tu flota. Con lo mínimo alcanza.</p>
+                  <span class="dda-landing__step-role is-user">
+                    <svg class="dda-icon" aria-hidden="true"><use href="#dda-i-upload"></use></svg>
+                    Lo hacés vos
+                  </span>
                 </article>
+
                 <article class="dda-landing__step">
-                  <div class="dda-landing__step-top"><span class="dda-landing__step-number">02</span><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-tree"></use></svg></div>
-                  <small class="dda-landing__step-phase">Validar</small><h3>Validamos y creamos el Decision Case</h3>
-                  <p>Revisamos tus datos y te mostramos qué decisión se puede resolver ahora.</p>
+                  <div class="dda-landing__step-top">
+                    <span class="dda-landing__step-number">02</span>
+                    <svg class="dda-icon" aria-hidden="true"><use href="#dda-i-tree"></use></svg>
+                  </div>
+                  <small class="dda-landing__step-phase">Paso 2</small>
+                  <h3>Dation valida y arma el caso</h3>
+                  <p>Revisamos los datos y te mostramos qué decisión podés resolver.</p>
+                  <span class="dda-landing__step-role is-dation">
+                    <svg class="dda-icon" aria-hidden="true"><use href="#dda-i-cpu"></use></svg>
+                    Lo hace Dation
+                  </span>
                 </article>
+
                 <article class="dda-landing__step">
-                  <div class="dda-landing__step-top"><span class="dda-landing__step-number">03</span><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-sliders"></use></svg></div>
-                  <small class="dda-landing__step-phase">Configurar</small><h3>Configurá y compará</h3>
-                  <p>Elegí tu prioridad —costo, viajes o tiempo— y compará escenarios antes de decidir.</p>
+                  <div class="dda-landing__step-top">
+                    <span class="dda-landing__step-number">03</span>
+                    <svg class="dda-icon" aria-hidden="true"><use href="#dda-i-sliders"></use></svg>
+                  </div>
+                  <small class="dda-landing__step-phase">Paso 3</small>
+                  <h3>Elegí tu prioridad</h3>
+                  <p>Costo, viajes o tiempo: compará escenarios antes de decidir.</p>
+                  <span class="dda-landing__step-role is-user">
+                    <svg class="dda-icon" aria-hidden="true"><use href="#dda-i-sliders"></use></svg>
+                    Lo hacés vos
+                  </span>
                 </article>
+
                 <article class="dda-landing__step">
-                  <div class="dda-landing__step-top"><span class="dda-landing__step-number">04</span><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-file-check"></use></svg></div>
-                  <small class="dda-landing__step-phase">Resultado</small><h3>Revisá, aprobá y exportá</h3>
-                  <p>Recibí la recomendación con su evidencia y desbloqueá la siguiente decisión.</p>
+                  <div class="dda-landing__step-top">
+                    <span class="dda-landing__step-number">04</span>
+                    <svg class="dda-icon" aria-hidden="true"><use href="#dda-i-file-check"></use></svg>
+                  </div>
+                  <small class="dda-landing__step-phase">Paso 4</small>
+                  <h3>Aprobá y exportá</h3>
+                  <p>Recibí la recomendación con su evidencia y habilitá la siguiente decisión.</p>
+                  <span class="dda-landing__step-role is-user">
+                    <svg class="dda-icon" aria-hidden="true"><use href="#dda-i-file-check"></use></svg>
+                    Lo hacés vos
+                  </span>
                 </article>
               </div>
 
-              <div class="dda-landing__section-cta">
+              <div class="dda-landing__steps-cta">
                 <button class="button button--primary" type="button" data-go-data>Empezar con mis datos →</button>
+                <span>Empezás con el núcleo mínimo de datos.</span>
               </div>
             </section>
 
@@ -422,13 +447,10 @@
             </section>
 
             <section class="dda-landing__section dda-landing__section--white" data-reveal>
-              <div class="dda-landing__section-head">
+              <div class="dda-landing__section-head dda-landing__section-head--summary">
                 <span class="dda-landing__section-eyebrow">Datos, resultado y límites</span>
                 <h2>Lo que necesitás y lo que obtenés.</h2>
-                <p>
-                  Una vista rápida de los datos mínimos, el resultado que entrega el DDA
-                  y los límites que conviene conocer antes de aprobar una decisión.
-                </p>
+                <p>Una vista rápida de los datos mínimos, el resultado que entrega el DDA y los límites que conviene conocer antes de aprobar una decisión.</p>
               </div>
 
               <div class="dda-landing__summary-grid">
@@ -498,7 +520,7 @@
                 <h2>Antes de empezar.</h2>
                 <p>Lo esencial para entender cómo se usa y qué queda guardado.</p>
               </div>
-              <div>
+              <div class="dda-landing__faq-grid">
                 <details><summary>¿Necesito todos los datos desde el principio?</summary><p>No. El Data Pack es progresivo: empezás con el núcleo mínimo y sumás información para desbloquear decisiones posteriores.</p></details>
                 <details><summary>¿Puedo comparar distintos objetivos?</summary><p>Sí. Podés evaluar prioridades como costo, viajes o tiempo y compararlas contra despacho directo.</p></details>
                 <details><summary>¿Qué pasa con mis resultados anteriores?</summary><p>Cada decisión queda guardada con su evidencia, así podés volver a analizarla cuando quieras.</p></details>
@@ -507,7 +529,7 @@
             </section>
 
             <section class="dda-landing__final" data-reveal>
-              <img class="dda-landing__final-watermark" src="/static/assets/dda-logistics.svg?v=dda-logistics-landing-v5" alt="">
+              <img class="dda-landing__final-watermark" src="/static/assets/dda-logistics.svg?v=dda-logistics-landing-v7" alt="">
               <div class="dda-landing__final-copy">
                 <span class="dda-landing__section-eyebrow">Comenzar</span>
                 <h2>¿Listo para tomar tu primera decisión?</h2>
@@ -1397,8 +1419,8 @@
   </script>
   <script src="/static/js/dashboard-formatters.js?v=dispatch-v1"></script>
   <script src="/static/js/dashboard-selectors.js?v=dispatch-v1"></script>
-  <script src="/static/js/dashboard-stage.js?v=dda-logistics-landing-v6"></script>
-  <script src="/static/js/dda-logistics-landing.js?v=dda-logistics-landing-v6"></script>
+  <script src="/static/js/dashboard-stage.js?v=dda-logistics-landing-v7"></script>
+  <script src="/static/js/dda-logistics-landing.js?v=dda-logistics-landing-v7"></script>
   <script src="/static/js/interpreter-stage.js?v=dispatch-v1"></script>
   <script src="/static/vendor/echarts-dispatch-6.0.0.min.js"></script>
   <script type="module" src="/static/js/dispatch/workspace.mjs?v=decision-map-nodal-v1"></script>
