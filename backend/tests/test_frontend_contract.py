@@ -862,7 +862,7 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "/static/css/dda-logistics-upload.css?v=upload-unified-v2",
+            "/static/css/dda-logistics-upload.css?v=upload-unified-v3",
             self.html,
         )
         self.assertIn(
@@ -1098,6 +1098,18 @@ class FrontendContractTests(
         ):
             self.assertIn(
                 css_contract,
+                upload_css,
+            )
+
+        for source_selector_contract in (
+            "height:46px",
+            "border:1px solid #cfdade",
+            "cursor:pointer",
+            "transform:translateY(-1px)",
+            "button:focus-visible",
+        ):
+            self.assertIn(
+                source_selector_contract,
                 upload_css,
             )
 
