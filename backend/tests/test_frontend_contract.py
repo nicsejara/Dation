@@ -1486,7 +1486,11 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "showContext",
+            "configContext",
+            self.html,
+        )
+        self.assertIn(
+            "dashboardContext",
             self.html,
         )
         self.assertIn(
