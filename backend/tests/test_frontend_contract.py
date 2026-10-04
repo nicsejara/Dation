@@ -1522,7 +1522,7 @@ class FrontendContractTests(
             workspace,
         )
         self.assertIn(
-            "activeNode:null",
+            "?(saved.activeNode||null)",
             workspace,
         )
         self.assertIn(
