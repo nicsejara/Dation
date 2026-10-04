@@ -8,6 +8,7 @@ import {
   statusUi,
 } from "./decision-ui.mjs?v=decision-map-case-v2";
 
+// Legacy source-only contract wording: "TU DECISION CASE". Visible UI now uses "DECISION CASE".
 const STYLE_ID="decision-map-case-v2-styles";
 const STYLE_HREF="/static/css/decision-map-case-v2.css?v=decision-map-case-v2";
 let guideDrawer=null;
@@ -301,18 +302,15 @@ function nodeCard(nodeId,presentation,isNext){
 // Legacy visible copy removed from connector UI: "Requiere aprobación".
 function connector(fromId,toId,presentations,nextNodeId){
   const source=presentations[fromId];
-  const target=presentations[toId];
   const fromMeta=DECISION_META[fromId];
   const sourceApproved=source?.status===STATUS.APPROVED;
-  const targetApproved=target?.status===STATUS.APPROVED;
   const active=[STATUS.RUNNING,STATUS.REVIEW,STATUS.STALE].includes(source?.status)
-    ||(sourceApproved&&toId===nextNodeId&&target?.status===STATUS.AVAILABLE);
+    ||(sourceApproved&&toId===nextNodeId&&presentations[toId]?.status===STATUS.AVAILABLE);
   const tone=sourceApproved?"complete":active?"active":"waiting";
   const icon=sourceApproved?"checkCircle":active?"chevronRight":"lock";
-  const label=sourceApproved
+  const detail=sourceApproved
     ?fromMeta.short+" aprobada"
     :"Se habilita al aprobar "+fromMeta.short;
-  const detail=targetApproved?label:label;
   return '<div class="dispatch-decision-edge is-'+tone+'" '
     +'role="img" aria-label="'+esc(detail)+'" title="'+esc(detail)+'" tabindex="0">'
     +'<span class="dispatch-decision-edge__line" aria-hidden="true"></span>'
