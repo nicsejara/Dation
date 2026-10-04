@@ -1,15 +1,15 @@
 import {api, date, num} from "../shared.mjs";
-import {createDropCard} from "./dropcard.mjs?v=upload-pro-v1";
-import {createGuideDrawer} from "./guide-drawer.mjs?v=upload-pro-v1";
-import {createPreviousDrawer} from "./library.mjs?v=upload-pro-v1";
-import {renderValidationPanel} from "./preflight-panel.mjs?v=upload-pro-v1";
+import {createDropCard} from "./dropcard.mjs?v=upload-unified-v1";
+import {createGuideDrawer} from "./guide-drawer.mjs?v=upload-unified-v1";
+import {createPreviousDrawer} from "./library.mjs?v=upload-unified-v1";
+import {renderInlineValidation, renderCompatibilityStrip} from "./preflight-panel.mjs?v=upload-unified-v1";
 import {
   continueState,
   deriveCardState,
   technicalPreflightErrors,
-} from "./selectors.mjs?v=upload-pro-v1";
-import {renderSystemBanner} from "./system-banner.mjs?v=upload-pro-v1";
-import {createValidationDrawer} from "./validation-report.mjs?v=upload-pro-v1";
+} from "./selectors.mjs?v=upload-unified-v1";
+import {renderSystemBanner} from "./system-banner.mjs?v=upload-unified-v1";
+import {createValidationDrawer} from "./validation-report.mjs?v=upload-unified-v1";
 
 const MAX_BYTES = 10 * 1024 * 1024;
 
@@ -68,10 +68,13 @@ function dropTitle(kind) {
 
 function clientFileProblem(file) {
   if (!file?.name?.toLowerCase().endsWith(".csv")) {
-    return "Solo se admiten archivos con extensión .csv.";
+    return "Este archivo no es un CSV. Descargá la plantilla o exportalo en formato CSV.";
   }
   if (file.size > MAX_BYTES) {
-    return "El archivo supera el límite de 10 MB.";
+    return "El archivo supera los 10 MB. Probá con uno más liviano.";
+  }
+  if (file.size === 0) {
+    return "El archivo no tiene datos. Revisalo y volvé a cargarlo.";
   }
   return null;
 }
@@ -194,7 +197,7 @@ function makeDataPackHeader() {
     el("h2", "Elegí cómo cargar tus datos."),
     el(
       "p",
-      "Podés subir archivos nuevos o reutilizar cargas anteriores. Cada archivo se valida apenas lo cargás.",
+      "Subí archivos nuevos o reutilizá una carga anterior. Cada archivo se valida apenas lo cargás; las columnas opcionales no bloquean este paso.",
     ),
   );
   return head;
@@ -440,6 +443,7 @@ export async function mountUploadScreen(
     replacing: {orders: false, fleet: false},
     pendingFiles: {orders: null, fleet: null},
     libraries: {orders: [], fleet: []},
+    controllers: {orders: null, fleet: null},
     finalVisible: false,
   };
 
@@ -456,8 +460,9 @@ export async function mountUploadScreen(
   const cards = el("div", null, "dispatch-pro-file-grid");
   dataPack.append(makeDataPackHeader(), cards);
 
-  const validationRoot = el("section");
-  validationRoot.dataset.reveal = "";
+  const compatibilityRoot = el("section", null, "dispatch-pro-compatibility");
+  compatibilityRoot.hidden = true;
+  compatibilityRoot.dataset.reveal = "";
 
   const refs = {};
   let guide = null;
@@ -519,7 +524,7 @@ export async function mountUploadScreen(
     hero.hero,
     banner,
     dataPack,
-    validationRoot,
+    compatibilityRoot,
     finalBar.bar,
     sticky.bar,
   );
@@ -658,24 +663,32 @@ export async function mountUploadScreen(
   }
 
   function renderValidation() {
-    renderValidationPanel(
-      validationRoot,
+    ["orders", "fleet"].forEach((kind) => {
+      const ref = refs[kind];
+      if (!ref) return;
+      renderInlineValidation(
+        ref,
+        {
+          kind,
+          report: reportFor(kind),
+          phase: local.phases[kind],
+          requiredCount: ref.requiredCount,
+          optionalCount: ref.optionalCount,
+          onReview: openValidation,
+          onReplace: triggerReplace,
+        },
+      );
+    });
+
+    renderCompatibilityStrip(
+      compatibilityRoot,
       {
-        storageAvailable: Boolean(local.status?.available),
         datasets: {
           orders: state.orders,
           fleet: state.fleet,
         },
-        reports: {
-          orders: reportFor("orders"),
-          fleet: reportFor("fleet"),
-        },
-        phases: local.phases,
-        saveErrors: local.saveErrors,
         preflight: state.preflight,
-        onReview: openValidation,
         onReviewRelations: openRelationValidation,
-        onReplace: triggerReplace,
       },
     );
     finalState();
@@ -687,36 +700,49 @@ export async function mountUploadScreen(
     ref.previousList.replaceChildren();
 
     const items = local.libraries[kind].slice(0, 3);
+    ref.setReuseCount(local.libraries[kind].length);
     ref.previousEmpty.hidden = items.length > 0;
     ref.previousAll.hidden = local.libraries[kind].length <= 3;
 
     items.forEach((item) => {
+      const selected = state[kind]?.id === item.id;
       const row = el(
         "article",
         null,
-        `dispatch-pro-inline-library-row ${state[kind]?.id === item.id ? "is-selected" : ""}`,
+        `dispatch-pro-inline-library-row ${selected ? "is-selected" : ""}`,
       );
+      const radio = el("span", null, "dispatch-pro-library-radio");
       const fileIcon = el("span", "CSV", "dispatch-pro-library-file-icon");
-      const copy = el("div");
+      const copy = el("div", null, "dispatch-pro-library-row-copy");
+      const status = deriveCardState({
+        report: item.profile_json || null,
+        dataset: item,
+      });
+      const statusChip = el(
+        "span",
+        status.label,
+        `dispatch-pro-library-state is-${status.tone}`,
+      );
       copy.append(
         el("strong", item.original_filename || item.label || "Archivo"),
         el(
           "small",
           [
-            domainRows(kind, item.row_count),
             item.created_at
               ? date(item.created_at.slice(0, 10))
               : null,
+            domainRows(kind, item.row_count),
           ].filter(Boolean).join(" · "),
         ),
+        statusChip,
       );
       const use = document.createElement("button");
       use.type = "button";
       use.className = "dispatch-pro-secondary-button";
-      use.textContent = state[kind]?.id === item.id ? "En uso" : "Usar";
-      use.disabled = state[kind]?.id === item.id;
+      use.textContent = selected ? "En uso" : "Usar esta carga";
+      use.disabled = selected;
       use.onclick = () => selectPrevious(kind, item);
-      row.append(fileIcon, copy, use);
+      row.append(radio, fileIcon, copy, use);
       ref.previousList.append(row);
     });
   }
@@ -759,27 +785,33 @@ export async function mountUploadScreen(
       ref.progressFile.textContent = local.pendingFiles[kind]?.name || "";
     }
 
+    const stateIconName = cardState.tone === "success"
+      ? "check"
+      : cardState.tone === "warning"
+        ? "warning"
+        : cardState.tone === "error"
+          ? "error"
+          : cardState.key === "uploading" || cardState.key === "processing"
+            ? "loader"
+            : "pending";
+    ref.headerState.replaceChildren();
+    ref.headerState.className = `dispatch-pro-state-badge dispatch-pro-header-state is-${cardState.tone}`;
+    ref.headerState.append(
+      icon(stateIconName),
+      document.createTextNode(cardState.label),
+    );
+
     if (fileInfo) {
       ref.fileName.textContent = fileInfo.name;
-      ref.fileState.replaceChildren();
-      ref.fileState.className = `dispatch-pro-state-badge is-${cardState.tone}`;
-      const stateIconName = cardState.tone === "success"
-        ? "check"
-        : cardState.tone === "warning"
-          ? "warning"
-          : cardState.tone === "error"
-            ? "error"
-            : cardState.tone === "pending"
-              ? "pending"
-              : "loader";
-      ref.fileState.append(
-        icon(stateIconName),
-        document.createTextNode(cardState.label),
-      );
-      ref.fileMeta.textContent = [
+      ref.fileMeta.replaceChildren();
+      [
         domainRows(kind, fileInfo.rows),
         fileSize(fileInfo.size),
-      ].filter(Boolean).join(" · ");
+      ].filter(Boolean).forEach((value) => {
+        ref.fileMeta.append(
+          el("span", value, "dispatch-pro-file-meta-pill"),
+        );
+      });
 
       const reused = local.reused[kind];
       ref.reusedBadge.hidden = !reused;
@@ -788,38 +820,11 @@ export async function mountUploadScreen(
         : "";
     }
 
-    const issues = (
-      Number(report?.counts?.errors || 0)
-      + Number(report?.counts?.warnings || 0)
-    );
-    ref.reviewProblems.hidden = !issues;
-    if (issues) {
-      ref.reviewProblems.lastChild.textContent = Number(report?.counts?.errors || 0)
-        ? "Revisar problemas"
-        : "Ver avisos";
-    }
-
     ref.notice.hidden = true;
     ref.notice.replaceChildren();
-    const firstError = report?.errors?.[0];
-    const firstWarning = report?.warnings?.[0];
-    const issueNotice = firstError
-      ? [
-          firstError.message || firstError.detail || "Hay un dato para corregir.",
-          firstError.column ? `Columna: ${firstError.column}.` : null,
-          firstError.hint || null,
-        ].filter(Boolean).join(" ")
-      : firstWarning
-        ? [
-            firstWarning.message || firstWarning.detail || "Hay un aviso para revisar.",
-            firstWarning.hint || "Podés continuar si no bloquea este paso.",
-          ].filter(Boolean).join(" ")
-        : null;
-
     const notice = (
       local.duplicateNotice[kind]
       || local.saveErrors[kind]
-      || issueNotice
       || (
         report?.valid
         && !state[kind]
@@ -930,6 +935,19 @@ export async function mountUploadScreen(
     });
   }
 
+  function cancelCurrent(kind) {
+    local.controllers[kind]?.abort();
+    local.controllers[kind] = null;
+    local.phases[kind] = "idle";
+    local.pendingFiles[kind] = null;
+    local.replacing[kind] = false;
+    if (!state[kind]) {
+      local.reports[kind] = null;
+    }
+    renderCard(kind);
+    refreshPreflight();
+  }
+
   async function saveValid(kind, file) {
     if (!local.status?.available) {
       local.phases[kind] = "idle";
@@ -944,10 +962,13 @@ export async function mountUploadScreen(
     form.append("file", file);
 
     try {
+      const controller = new AbortController();
+      local.controllers[kind] = controller;
       const stored = await api(
         `/api/datasets/upload?dataset_type=${kind}`,
-        {method: "POST", body: form},
+        {method: "POST", body: form, signal: controller.signal},
       );
+      local.controllers[kind] = null;
 
       const dataset = stored.dataset || stored.existing_dataset;
       state[kind] = dataset;
@@ -974,8 +995,15 @@ export async function mountUploadScreen(
       refocusSuccess(kind);
       await refreshPreflight();
     } catch (error) {
+      local.controllers[kind] = null;
       local.phases[kind] = "idle";
-      local.saveErrors[kind] = error.message;
+      if (error?.name === "AbortError") {
+        local.pendingFiles[kind] = null;
+        local.replacing[kind] = false;
+        renderCard(kind);
+        return;
+      }
+      local.saveErrors[kind] = "No pudimos subir el archivo. Reintentar.";
       state[kind] = null;
       persist();
       renderCard(kind);
@@ -1015,7 +1043,7 @@ export async function mountUploadScreen(
         errors: [{
           code: "INVALID_FILE",
           message: problem,
-          hint: "Elegí un CSV válido de hasta 10 MB.",
+          hint: "Corregí el archivo o descargá la plantilla para usar la estructura esperada.",
         }],
         warnings: [],
         counts: {errors: 1, warnings: 0},
@@ -1034,10 +1062,13 @@ export async function mountUploadScreen(
     try {
       const form = new FormData();
       form.append("file", file);
+      const controller = new AbortController();
+      local.controllers[kind] = controller;
       const report = await api(
         `/api/datasets/validate?dataset_type=${kind}`,
-        {method: "POST", body: form},
+        {method: "POST", body: form, signal: controller.signal},
       );
+      local.controllers[kind] = null;
 
       local.reports[kind] = report;
       if (!report.valid) {
@@ -1051,15 +1082,22 @@ export async function mountUploadScreen(
 
       await saveValid(kind, file);
     } catch (error) {
+      local.controllers[kind] = null;
       state[kind] = null;
       local.phases[kind] = "idle";
+      if (error?.name === "AbortError") {
+        local.pendingFiles[kind] = null;
+        renderCard(kind);
+        await refreshPreflight();
+        return;
+      }
       local.reports[kind] = {
         valid: false,
         rows: 0,
         file: {name: file.name, size_bytes: file.size},
         errors: [{
           code: "VALIDATION_REQUEST_FAILED",
-          message: error.message,
+          message: "No pudimos subir el archivo.",
           hint: "Reintentá la carga. Si persiste, revisá la conexión.",
         }],
         warnings: [],
@@ -1073,6 +1111,8 @@ export async function mountUploadScreen(
   }
 
   async function removeFile(kind) {
+    local.controllers[kind]?.abort();
+    local.controllers[kind] = null;
     state[kind] = null;
     local.reports[kind] = null;
     local.pendingFiles[kind] = null;
@@ -1148,6 +1188,7 @@ export async function mountUploadScreen(
       };
 
       ref.replace.onclick = () => triggerReplace(kind);
+      ref.cancelUpload.onclick = () => cancelCurrent(kind);
       ref.remove.onclick = () => removeFile(kind);
       ref.reviewColumns.onclick = () => {
         guide.open(
@@ -1158,9 +1199,6 @@ export async function mountUploadScreen(
             fleet: reportFor("fleet"),
           },
         );
-      };
-      ref.reviewProblems.onclick = () => {
-        openValidation(kind, ref.reviewProblems);
       };
       ref.reuseTab.addEventListener("click", () => renderPreviousInline(kind));
       ref.previousAll.onclick = () => openPrevious(kind, ref.previousAll);
