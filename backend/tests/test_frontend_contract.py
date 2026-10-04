@@ -1585,13 +1585,11 @@ class FrontendContractTests(
             "el expediente que reúne tus datos, los criterios y el resultado",
             "Qué variables optimiza el motor hoy.",
             "Tu mapa de decisiones, desbloqueado paso a paso.",
-            "¿Qué órdenes van en cada viaje y con qué vehículo?",
-            "Así se ve una decisión con evidencia.",
-            "Consolidá las 24 órdenes en 12 viajes.",
-            "A cambio, tarda 0,4 días más",
+            "Un DDA no resuelve una sola decisión: resuelve una cadena.",
+            "Lo que necesitás y lo que obtenés.",
             "Lo que necesitás para empezar",
             "Lo que recibís",
-            "Lo que conviene saber antes de decidir.",
+            "Lo que conviene saber",
             "¿Listo para tomar tu primera decisión?",
         ):
             self.assertIn(copy, overview)
@@ -1608,15 +1606,18 @@ class FrontendContractTests(
             )
 
         for forbidden in (
+            "dda-landing__progress",
+            "dda-logistics-example-result",
+            "Así se ve una decisión con evidencia.",
+            "Consolidá las 24 órdenes en 12 viajes.",
+            "Ver evidencia completa (JSON)",
+            "data-example-csv",
+            "Supuestos del plan",
+            "dda-landing__io",
             "Evidencia exportable (CSV + JSON)",
-            "Comparación contra despacho directo</span>",
-            "Explicación en lenguaje de negocio</span>",
             "Dispatch 2.2.0",
-            "Decisión + sensibilidad + evidencia",
-            "Qué cubre hoy y qué viene.",
             "dda-landing__value-strip",
             "dda-landing__features",
-            "dda-landing__flow-brand",
             "dda-landing__result-kpis",
             "dda-landing__heatmap",
         ):
@@ -1630,24 +1631,20 @@ class FrontendContractTests(
             overview,
         )
         self.assertIn(
-            'data-variable-group="active"',
+            'data-variables-inline',
             overview,
         )
         self.assertIn(
-            'data-variable-group="consolidating"',
+            'id="dda-logistics-decision-map"',
             overview,
         )
         self.assertIn(
             "Data Pack progresivo.",
             overview,
         )
-        self.assertEqual(
-            overview.count("DecisionResult JSON · ejemplo"),
-            0,
-        )
-        self.assertEqual(
-            overview.count("Ver evidencia completa (JSON)"),
-            1,
+        self.assertIn(
+            "dda-landing__summary-grid",
+            overview,
         )
         self.assertIn(
             "<code class=\"dda-landing__file-chip\">Orders</code>",
@@ -1659,15 +1656,15 @@ class FrontendContractTests(
         )
 
         self.assertIn(
-            "/static/css/dda-logistics-landing.css?v=dda-logistics-landing-v5",
+            "/static/css/dda-logistics-landing.css?v=dda-logistics-landing-v6",
             self.html,
         )
         self.assertIn(
-            "/static/js/dda-logistics-landing.js?v=dda-logistics-landing-v5",
+            "/static/js/dda-logistics-landing.js?v=dda-logistics-landing-v6",
             self.html,
         )
         self.assertIn(
-            "/static/js/dashboard-stage.js?v=dda-logistics-landing-v5",
+            "/static/js/dashboard-stage.js?v=dda-logistics-landing-v6",
             self.html,
         )
 
@@ -1685,6 +1682,26 @@ class FrontendContractTests(
             )
 
         self.assertIn(
+            "dda-landing__variable-pill",
+            self.dda_landing_js,
+        )
+        self.assertIn(
+            "dationScrollToDecisionMap",
+            self.dda_landing_js,
+        )
+        self.assertNotIn(
+            "syncProgress",
+            self.dda_landing_js,
+        )
+        self.assertNotIn(
+            "scrollToExample",
+            self.dda_landing_js,
+        )
+        self.assertNotIn(
+            "downloadExampleCsv",
+            self.dda_landing_js,
+        )
+        self.assertIn(
             "deriveMapStates",
             self.dda_landing_js,
         )
@@ -1701,6 +1718,10 @@ class FrontendContractTests(
             self.dda_landing_js,
         )
         self.assertIn(
+            "Ver Decision Map ↘",
+            self.dashboard_stage_js,
+        )
+        self.assertNotIn(
             "Ver un ejemplo de resultado",
             self.dashboard_stage_js,
         )
