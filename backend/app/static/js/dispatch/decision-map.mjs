@@ -350,7 +350,7 @@ function connector(fromId,toId,presentations,nextNodeId){
   const source=presentations[fromId];
   const complete=source?.status===STATUS.APPROVED;
   const active=complete&&toId===nextNodeId;
-  const tone=complete?"complete":active?"active":"waiting";
+  const tone=active?"active":complete?"complete":"waiting";
   const icon=complete?"checkCircle":active?"playCircle":"lock";
 
   return (
