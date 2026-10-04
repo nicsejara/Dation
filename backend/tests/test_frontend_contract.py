@@ -356,7 +356,7 @@ class FrontendContractTests(
             self.dashboard_stage_js,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=upload-pro-v1",
+            "/static/js/dispatch/workspace.mjs?v=workspace-nav-v1",
             self.html,
         )
         self.assertIn(
@@ -866,7 +866,7 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=upload-pro-v1",
+            "/static/js/dispatch/workspace.mjs?v=workspace-nav-v1",
             self.html,
         )
         self.assertIn(
@@ -1002,7 +1002,6 @@ class FrontendContractTests(
 
         for css_class in (
             ".dispatch-pro-hero",
-            ".dispatch-pro-stepper",
             ".dispatch-pro-file-grid",
             ".dispatch-pro-source-switch",
             ".dispatch-pro-validation-summary",
@@ -1013,6 +1012,15 @@ class FrontendContractTests(
                 css_class,
                 upload_css,
             )
+
+        self.assertNotIn(
+            ".dispatch-pro-stepper",
+            upload_css,
+        )
+        self.assertNotIn(
+            "makeStepper",
+            upload_index,
+        )
 
         for forbidden in (
             "LOGISTICS DATA PACK",
@@ -1415,6 +1423,135 @@ class FrontendContractTests(
         self.assertIn(
             "Decision Data Assets",
             sidebar,
+        )
+
+    def test_dda_internal_navigation_contract(
+        self,
+    ):
+        workspace = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+            / "workspace.mjs"
+        ).read_text(encoding="utf-8")
+        upload = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+            / "upload"
+            / "index.mjs"
+        ).read_text(encoding="utf-8")
+        app_css = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "css"
+            / "app.css"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn(
+            'aria-label="Navegación global"',
+            self.html,
+        )
+        self.assertIn(
+            'id="dda-workspace-nav-shell"',
+            self.html,
+        )
+        self.assertIn(
+            'id="dda-workspace-nav"',
+            self.html,
+        )
+        self.assertIn(
+            "window.dationRenderWorkspaceNav",
+            self.html,
+        )
+
+        for label in (
+            "Cargar y validar datos",
+            "Mapa de decisiones",
+            "Configurar decisión",
+            "Dashboard",
+        ):
+            self.assertIn(
+                label,
+                self.html,
+            )
+
+        self.assertIn(
+            "journeyButton('DDA Logística'",
+            self.html,
+        )
+        self.assertIn(
+            "showContext",
+            self.html,
+        )
+        self.assertIn(
+            "currentView === 'logistics-config'",
+            self.html,
+        )
+        self.assertIn(
+            "currentView === 'decision-dashboard'",
+            self.html,
+        )
+        self.assertIn(
+            "window.DationDispatch.openActiveDecisionResult",
+            self.html,
+        )
+
+        for css_class in (
+            ".dda-workspace-nav-shell",
+            ".dda-workspace-nav",
+            ".dda-workspace-step",
+            ".dda-workspace-step__context",
+        ):
+            self.assertIn(
+                css_class,
+                app_css,
+            )
+
+        self.assertIn(
+            "const NAV_VERSION='workspace-nav-v1'",
+            workspace,
+        )
+        self.assertIn(
+            "saved.navigationVersion===NAV_VERSION",
+            workspace,
+        )
+        self.assertIn(
+            "activeNode:null",
+            workspace,
+        )
+        self.assertIn(
+            "window.dationSetDecisionContext?.({",
+            workspace,
+        )
+        self.assertIn(
+            "openActiveDecisionResult",
+            workspace,
+        )
+        self.assertIn(
+            "Primero elegí una decisión.",
+            workspace,
+        )
+        self.assertIn(
+            "state.activeNode=null",
+            workspace,
+        )
+        self.assertNotIn(
+            "makeStepper",
+            upload,
+        )
+        self.assertIn(
+            "/static/css/app.css?v=workspace-nav-v1",
+            self.html,
+        )
+        self.assertIn(
+            "/static/js/dispatch/workspace.mjs?v=workspace-nav-v1",
+            self.html,
         )
 
     def test_latest_decision_access_contract(
