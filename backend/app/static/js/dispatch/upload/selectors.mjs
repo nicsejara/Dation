@@ -51,16 +51,16 @@ export function deriveCardState({
   if (phase === "uploading") {
     return {
       key: "uploading",
-      label: "Subiendo archivo…",
-      tone: "pending",
+      label: "Subiendo",
+      tone: "validating",
     };
   }
 
   if (phase === "processing") {
     return {
       key: "processing",
-      label: "Validando estructura…",
-      tone: "pending",
+      label: "Validando",
+      tone: "validating",
     };
   }
 
@@ -126,8 +126,8 @@ export function deriveCardState({
 
   return {
     key: "empty",
-    label: "Pendiente de carga",
-    tone: "neutral",
+    label: "Pendiente",
+    tone: "pending",
   };
 }
 
