@@ -1,6 +1,8 @@
 import unittest
+from datetime import datetime
 from pathlib import Path
 from unittest.mock import AsyncMock, patch
+from zoneinfo import ZoneInfo
 
 import httpx
 
@@ -23,6 +25,31 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class DataPackValidationTests(unittest.TestCase):
+    def test_canonical_filename_uses_kind_and_cordoba_time(self):
+        instant = datetime(
+            2026,
+            10,
+            4,
+            18,
+            30,
+            27,
+            tzinfo=ZoneInfo("UTC"),
+        )
+        self.assertEqual(
+            dispatch_service.canonical_filename(
+                "orders",
+                now=instant,
+            ),
+            "Orders_20261004_153027.csv",
+        )
+        self.assertEqual(
+            dispatch_service.canonical_filename(
+                "fleet",
+                now=instant,
+            ),
+            "Fleet_20261004_153027.csv",
+        )
+
     def test_report_accumulates_multiple_errors(self):
         data = (
             b"order_id;product;quantity_units;unit_weight_kg;origin;"
