@@ -1,7 +1,7 @@
 import {api, date, num} from "../shared.mjs";
 import {createDropCard} from "./dropcard.mjs?v=upload-unified-v2";
 import {createGuideDrawer} from "./guide-drawer.mjs?v=upload-unified-v2";
-import {createPreviousDrawer} from "./library.mjs?v=upload-unified-v2";
+import {createPreviousDrawer} from "./library.mjs?v=canonical-names-v1";
 import {renderInlineValidation, renderCompatibilityStrip} from "./preflight-panel.mjs?v=upload-unified-v2";
 import {
   continueState,
@@ -361,7 +361,12 @@ function currentFile(dataset, report, pendingFile) {
   }
   if (dataset) {
     return {
-      name: dataset.original_filename,
+      name: (
+        dataset.canonical_filename
+        || dataset.label
+        || dataset.original_filename
+        || "Archivo"
+      ),
       size: dataset.size_bytes,
       rows: dataset.row_count,
     };
@@ -698,7 +703,13 @@ export async function mountUploadScreen(
         `dispatch-pro-library-state is-${status.tone}`,
       );
       copy.append(
-        el("strong", item.original_filename || item.label || "Archivo"),
+        el(
+          "strong",
+          item.canonical_filename
+            || item.label
+            || item.original_filename
+            || "Archivo",
+        ),
         el(
           "small",
           [
