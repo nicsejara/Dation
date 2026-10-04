@@ -356,7 +356,7 @@ class FrontendContractTests(
             self.dashboard_stage_js,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=decision-map-nodal-v1",
+            "/static/js/dispatch/workspace.mjs?v=upload-pro-v1",
             self.html,
         )
         self.assertIn(
@@ -782,7 +782,7 @@ class FrontendContractTests(
             explanation,
         )
         self.assertIn(
-            "decision-map-nodal-v1",
+            "upload-pro-v1",
             self.html,
         )
 
@@ -800,7 +800,7 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "dation-brand-v1",
+            "/static/assets/dation-logo.png",
             self.html,
         )
         self.assertNotIn(
@@ -839,9 +839,19 @@ class FrontendContractTests(
         quality = (upload_root / "preflight-panel.mjs").read_text(
             encoding="utf-8"
         )
-        readiness = (upload_root / "readiness-panel.mjs").read_text(
+        library = (upload_root / "library.mjs").read_text(
             encoding="utf-8"
         )
+        selectors = (upload_root / "selectors.mjs").read_text(
+            encoding="utf-8"
+        )
+        upload_css = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "css"
+            / "dda-logistics-upload.css"
+        ).read_text(encoding="utf-8")
 
         self.assertNotIn(
             'id="upload-dropzone"',
@@ -852,7 +862,19 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
+            "/static/css/dda-logistics-upload.css?v=upload-pro-v1",
+            self.html,
+        )
+        self.assertIn(
+            "/static/js/dispatch/workspace.mjs?v=upload-pro-v1",
+            self.html,
+        )
+        self.assertIn(
             "mountUploadScreen",
+            workspace,
+        )
+        self.assertIn(
+            "./upload/index.mjs?v=upload-pro-v1",
             workspace,
         )
         self.assertIn(
@@ -867,54 +889,144 @@ class FrontendContractTests(
             "decision_case",
             workspace,
         )
+
+        for copy in (
+            "Cargá tus datos y habilitá tu mapa de decisiones.",
+            "PASO 1 · DATOS",
+            "DATION · CARGA DE DATOS",
+            "Data Pack: los archivos que alimentan tus decisiones.",
+            "0 de 2 archivos listos",
+            "DESCARGÁ",
+            "COMPLETÁ",
+            "SUBÍ Y VALIDÁ",
+            "Elegí cómo cargar tus datos.",
+            "Tu Decision Case está listo.",
+            "Ir al mapa de decisiones →",
+            "Revisar mis datos",
+        ):
+            self.assertIn(
+                copy,
+                upload_index,
+            )
+
+        for copy in (
+            "Subir nuevo",
+            "Reutilizar anterior",
+            "Descargar plantilla",
+            "Arrastrá tu archivo de órdenes",
+            "Arrastrá tu archivo de flota",
+            "Reemplazar",
+            "Ver columnas",
+            "Quitar",
+        ):
+            self.assertIn(
+                copy,
+                dropcard,
+            )
+
+        self.assertIn(
+            "role",
+            dropcard,
+        )
+        self.assertIn(
+            'event.key === "Enter"',
+            upload_index,
+        )
+        self.assertIn(
+            'event.key === " "',
+            upload_index,
+        )
         self.assertIn(
             "/api/datasets/validate",
             upload_index,
         )
         self.assertIn(
-            "Validación de archivos",
+            "IntersectionObserver",
+            upload_index,
+        )
+        self.assertIn(
+            "prefers-reduced-motion",
+            upload_index,
+        )
+        self.assertIn(
+            "dispatch-pro-sticky",
+            upload_index,
+        )
+        self.assertIn(
+            "dispatch-pro-preview-chain",
+            upload_index,
+        )
+
+        for copy in (
+            "Cargá tus dos archivos para validar.",
+            "Tus datos están listos.",
+            "Tus datos están listos, con avisos.",
+            "Estructura del archivo",
+            "Columnas mínimas",
+            "Tipos de datos",
+            "Compatibilidad entre archivos",
+        ):
+            self.assertIn(
+                copy,
+                quality,
+            )
+
+        self.assertIn(
+            'aria-live',
             quality,
         )
         self.assertIn(
-            "Descargar plantilla",
-            dropcard,
+            "technicalPreflightErrors",
+            quality,
         )
         self.assertIn(
-            "columnas mínimas",
-            dropcard,
+            "Encontrada",
+            guide,
         )
         self.assertIn(
-            "Qué decisiones habilitan estos datos",
-            readiness,
+            "Opcional pendiente",
+            guide,
         )
         self.assertIn(
-            "Data Pack progresivo",
-            readiness,
+            "Tus cargas anteriores",
+            library,
         )
-        self.assertNotIn(
-            "renderDecisionReadiness",
-            upload_index,
+        self.assertIn(
+            "vehículos",
+            library,
         )
-        self.assertNotIn(
-            "fleet_pool_id",
-            dropcard + guide + readiness,
+        self.assertIn(
+            'kind: warningCount ? "warning" : "success"',
+            selectors,
         )
-        self.assertNotIn(
-            "Ver ejemplo",
-            dropcard + guide + upload_index,
-        )
-        self.assertNotIn(
-            "flota vigente",
-            dropcard.lower() + upload_index.lower(),
-        )
-        self.assertNotIn(
-            "llegarán tarde",
-            quality.lower(),
-        )
-        self.assertNotIn(
-            "demanda supera",
-            quality.lower(),
-        )
+
+        for css_class in (
+            ".dispatch-pro-hero",
+            ".dispatch-pro-stepper",
+            ".dispatch-pro-file-grid",
+            ".dispatch-pro-source-switch",
+            ".dispatch-pro-validation-summary",
+            ".dispatch-pro-final",
+            ".dispatch-pro-sticky",
+        ):
+            self.assertIn(
+                css_class,
+                upload_css,
+            )
+
+        for forbidden in (
+            "LOGISTICS DATA PACK",
+            "Fase 1 · Datos",
+            "Data Pack técnicamente válido",
+            "Órdenes de envío",
+            "Flota disponible",
+            "Arrastrá orders.csv",
+            "Arrastrá fleet.csv",
+        ):
+            self.assertNotIn(
+                forbidden,
+                upload_index + dropcard + quality,
+            )
 
 
     def test_decision_chain_phase2_contract(self):
@@ -1308,7 +1420,7 @@ class FrontendContractTests(
     def test_latest_decision_access_contract(
         self,
     ):
-        self.assertIn(
+        self.assertNotIn(
             'id="open-latest-logistics-decision"',
             self.html,
         )
