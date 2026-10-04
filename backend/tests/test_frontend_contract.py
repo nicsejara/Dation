@@ -1673,6 +1673,14 @@ class FrontendContractTests(
             "dda-landing__faq-grid",
             overview,
         )
+        self.assertIn(
+            ".dda-landing__section--plain{",
+            self.dda_landing_css,
+        )
+        self.assertIn(
+            "padding:8px 32px",
+            self.dda_landing_css,
+        )
         self.assertEqual(
             overview.count("<details>"),
             4,
@@ -1687,7 +1695,7 @@ class FrontendContractTests(
         )
 
         self.assertIn(
-            "/static/css/dda-logistics-landing.css?v=dda-logistics-landing-v7",
+            "/static/css/dda-logistics-landing.css?v=dda-logistics-landing-v8",
             self.html,
         )
         self.assertIn(
