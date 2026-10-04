@@ -2,7 +2,7 @@ import {esc,num,date,vehicle,api,post,errorBox} from './shared.mjs';import {reba
 import {mountUploadScreen} from './upload/index.mjs?v=upload-canonical-v1';
 import {renderDecisionMap} from './decision-map.mjs?v=decision-map-nodal-v1';
 import {STATUS,createDecisionCase,replaceInputs,transitionNode,inputSignature,caseRef,deriveDecisionNodes} from './decision-case.mjs';
-const KEY='dation.dispatch.workspace.v4';
+const KEY='dation.dispatch.workspace.v5';
 const NAV_VERSION='workspace-nav-v1';
 const DECISION_LABELS={
   logistics_assignment:'Asignación de carga',
