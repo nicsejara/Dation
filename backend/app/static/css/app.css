@@ -9643,3 +9643,19 @@ button.d-home__asset:focus-visible{
     font-size:8px;
   }
 }
+
+
+/* Global DDA breadcrumb */
+.journey-separator--global{
+  color:#9aaab2;
+  font-size:14px;
+  font-weight:700;
+}
+
+.journey-step--title:not(.is-current){
+  color:#667a84;
+}
+
+.journey-step--title:not(.is-current):hover{
+  color:#0f6f73;
+}
