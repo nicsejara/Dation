@@ -1685,3 +1685,9 @@
     transition:none;
   }
 }
+
+
+/* Duplicate stepper hard-stop: navigation is owned by the DDA workspace shell. */
+.dispatch-pro-stepper{
+  display:none!important;
+}
