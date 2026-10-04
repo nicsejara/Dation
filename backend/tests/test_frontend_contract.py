@@ -891,7 +891,7 @@ class FrontendContractTests(
             "Elegí cómo cargar tus datos.",
             "Subí archivos nuevos o reutilizá una carga anterior.",
             "las columnas opcionales no bloquean este paso.",
-            "Tu Decision Case está listo.",
+            "Todo listo para continuar.",
             "Ir al mapa de decisiones →",
         ):
             self.assertIn(
