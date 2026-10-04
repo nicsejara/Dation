@@ -870,14 +870,14 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "./upload/index.mjs?v=upload-finalbar-v2",
+            "./upload/index.mjs?v=upload-canonical-v1",
             workspace,
         )
 
         for module_version in (
             "./dropcard.mjs?v=upload-unified-v2",
             "./guide-drawer.mjs?v=upload-unified-v2",
-            "./library.mjs?v=upload-unified-v2",
+            "./library.mjs?v=canonical-names-v1",
             "./preflight-panel.mjs?v=upload-unified-v2",
             "./selectors.mjs?v=upload-unified-v2",
         ):
