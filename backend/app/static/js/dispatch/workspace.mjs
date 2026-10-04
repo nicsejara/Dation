@@ -2,13 +2,12 @@ import {esc,num,date,vehicle,api,post,errorBox} from './shared.mjs';import {reba
 import {mountUploadScreen} from './upload/index.mjs?v=upload-canonical-v1';
 import {renderDecisionMap} from './decision-map.mjs?v=decision-map-nodal-v1';
 import {STATUS,createDecisionCase,replaceInputs,transitionNode,inputSignature,caseRef,deriveDecisionNodes} from './decision-case.mjs';
+import {DECISION_META} from './decision-ui.mjs?v=decision-map-premium-v1';
 const KEY='dation.dispatch.workspace.v5';
 const NAV_VERSION='workspace-nav-v1';
-const DECISION_LABELS={
-  logistics_assignment:'Asignación de carga',
-  logistics_scheduling:'Planificación',
-  logistics_final_assignment:'Asignación final',
-};
+const DECISION_LABELS=Object.fromEntries(
+  Object.entries(DECISION_META).map(([id,meta])=>[id,meta.label])
+);
 const PRIORITY_KEYS=['trips','cost','own_fleet','co2'];
 const CORE_DIMENSIONS=['trips','own_fleet'];
 const PRESETS={
