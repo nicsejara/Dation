@@ -67,7 +67,7 @@ export function deriveCardState({
   if (saveError) {
     return {
       key: "save_error",
-      label: "⛔ No se pudo guardar",
+      label: "Para corregir",
       tone: "error",
     };
   }
@@ -75,7 +75,7 @@ export function deriveCardState({
   if (report?.detected_format === "legacy_mixed") {
     return {
       key: "legacy",
-      label: "⛔ Archivo equivocado",
+      label: "Para corregir",
       tone: "error",
     };
   }
@@ -96,7 +96,7 @@ export function deriveCardState({
   if (report?.valid && !dataset && !storageAvailable) {
     return {
       key: "valid_not_saved",
-      label: "✓ Archivo válido · sin guardar",
+      label: "Listo, sin guardar",
       tone: "warning",
     };
   }
@@ -104,7 +104,7 @@ export function deriveCardState({
   if (duplicate && dataset) {
     return {
       key: "duplicate",
-      label: "✓ Archivo válido",
+      label: "Listo",
       tone: "success",
     };
   }
@@ -113,16 +113,13 @@ export function deriveCardState({
     if (warnings > 0) {
       return {
         key: "warning",
-        label: (
-          `⚠ Archivo válido con ${warnings} `
-          + `${warnings === 1 ? "observación" : "observaciones"}`
-        ),
+        label: "Listo, con avisos",
         tone: "warning",
       };
     }
     return {
       key: "valid",
-      label: "✓ Archivo correcto",
+      label: "Listo",
       tone: "success",
     };
   }
@@ -214,9 +211,17 @@ export function continueState({
     };
   }
 
+  const warningCount = (
+    Number(reports.orders?.counts?.warnings || 0)
+    + Number(reports.fleet?.counts?.warnings || 0)
+  );
+
   return {
     enabled: true,
-    message: "Los dos archivos superaron las validaciones necesarias.",
-    kind: "success",
+    message: warningCount
+      ? `Podés avanzar: hay ${warningCount} ${warningCount === 1 ? "aviso" : "avisos"} sobre los archivos.`
+      : "Los dos archivos superaron las validaciones necesarias.",
+    kind: warningCount ? "warning" : "success",
+    warnings: warningCount,
   };
 }
