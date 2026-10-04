@@ -59,7 +59,7 @@
   display:grid;
   grid-template-columns:minmax(0,1.05fr) minmax(360px,.95fr);
   gap:38px;
-  align-items:center;
+  align-items:stretch;
   overflow:hidden;
   padding:34px 36px;
   border:1px solid rgba(67,166,199,.12);
@@ -79,25 +79,32 @@
 }
 
 .dispatch-pro-hero-copy{
+  display:flex;
   width:100%;
   max-width:560px;
-  align-self:center;
+  min-height:100%;
+  flex-direction:column;
+  align-self:stretch;
+  padding:20px 0 43px;
+  box-sizing:border-box;
 }
 
 .dispatch-pro-hero-badge{
   display:inline-flex;
-  min-height:28px;
+  min-height:23px;
   align-items:center;
-  margin:0 0 16px;
-  padding:0 10px;
-  border:1px solid rgba(140,232,218,.28);
+  align-self:flex-start;
+  margin:0 0 14px;
+  padding:0 8px;
+  border:1px solid rgba(140,232,218,.20);
   border-radius:999px;
-  color:var(--upload-hero-teal);
-  background:rgba(19,125,131,.19);
-  font-size:13px;
-  font-weight:850;
-  letter-spacing:.055em;
+  color:#bdece4;
+  background:rgba(19,125,131,.11);
+  font-size:10.5px;
+  font-weight:800;
+  letter-spacing:.045em;
   text-transform:uppercase;
+  opacity:.9;
 }
 
 .dispatch-pro-hero h1{
@@ -112,14 +119,14 @@
 .dispatch-pro-hero-lead{
   max-width:560px;
   margin:0;
-  color:var(--upload-hero-body);
+  color:#eef7f9;
   font-size:16px;
   line-height:1.58;
 }
 
 .dispatch-pro-hero-lead strong{
-  color:var(--upload-hero-title);
-  font-weight:650;
+  color:#ffffff;
+  font-weight:750;
 }
 
 .dispatch-pro-hero-file-chips{
@@ -127,7 +134,7 @@
   flex-wrap:wrap;
   gap:8px;
   align-items:center;
-  margin-top:20px;
+  margin-top:auto;
 }
 
 .dispatch-pro-hero-chip-prefix{
@@ -138,16 +145,21 @@
 
 .dispatch-pro-hero-file-chip{
   display:inline-flex;
-  min-height:32px;
+  width:104px;
+  min-width:104px;
+  min-height:34px;
   align-items:center;
+  justify-content:center;
   gap:7px;
-  padding:0 10px;
+  padding:0 12px;
   border:1px solid rgba(255,255,255,.14);
   border-radius:999px;
   color:var(--upload-hero-chip);
   background:rgba(255,255,255,.07);
+  box-sizing:border-box;
   font-size:13px;
   font-weight:700;
+  text-align:center;
 }
 
 .dispatch-pro-hero-file-chip .dispatch-pro-icon{
@@ -209,6 +221,7 @@
 
 .dispatch-pro-how-node{
   display:grid;
+  min-height:76px;
   grid-template-columns:42px minmax(0,1fr);
   gap:12px;
   align-items:center;
@@ -216,6 +229,7 @@
   border:1px solid rgba(255,255,255,.10);
   border-radius:13px;
   background:rgba(255,255,255,.055);
+  box-sizing:border-box;
 }
 
 .dispatch-pro-how-icon{
@@ -298,17 +312,20 @@
   color:var(--upload-hero-teal);
 }
 
-.dispatch-pro-how-reuse-link{
-  color:var(--upload-hero-teal);
+.dispatch-pro-how-reuse-link,
+.dispatch-pro-how-reuse-link:visited{
+  color:#ffffff;
   font-size:13px;
-  font-weight:800;
+  font-weight:850;
   text-decoration:underline;
+  text-decoration-color:rgba(255,255,255,.62);
   text-decoration-thickness:1px;
   text-underline-offset:3px;
 }
 
 .dispatch-pro-how-reuse-link:hover{
-  color:#b0f4ea;
+  color:#8ce8da;
+  text-decoration-color:#8ce8da;
 }
 
 /* Data pack */
@@ -1471,6 +1488,7 @@
 
   .dispatch-pro-hero-copy{
     max-width:720px;
+    padding:0;
   }
 
   .dispatch-pro-hero-lead{
@@ -1533,6 +1551,10 @@
 
   .dispatch-pro-hero-lead{
     font-size:15px;
+  }
+
+  .dispatch-pro-hero-file-chips{
+    margin-top:22px;
   }
 
   .dispatch-pro-hero-chip-prefix{
