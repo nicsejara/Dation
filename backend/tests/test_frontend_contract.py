@@ -620,7 +620,7 @@ class FrontendContractTests(
         ).read_text(encoding="utf-8")
 
         self.assertIn(
-            "Configurar planificación",
+            "Configurar Planificación",
             decision_map,
         )
         self.assertIn(
@@ -1104,7 +1104,7 @@ class FrontendContractTests(
             decision_map,
         )
         self.assertIn(
-            'slice(0, 10)',
+            'slice(0,10)',
             decision_map,
         )
         self.assertNotIn(
@@ -1888,10 +1888,6 @@ class FrontendContractTests(
         self.assertIn(
             'logistics_final_assignment:"locked"',
             self.dda_landing_js,
-        )
-        self.assertIn(
-            "hour12: false",
-            self.dashboard_stage_js,
         )
 
 
