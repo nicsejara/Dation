@@ -317,7 +317,7 @@
 }
 
 .dda-landing__section--plain{
-  padding:8px 0;
+  padding:8px 32px;
 }
 
 .dda-landing__section-head{
@@ -1739,5 +1739,19 @@
 
   .dda-landing__faq-grid{
     grid-template-columns:1fr;
+  }
+}
+
+
+/* SECTION ALIGNMENT v8
+   Keep every section heading on the same horizontal content axis. */
+.dda-landing__section > .dda-landing__section-head{
+  margin-left:0;
+  margin-right:0;
+}
+
+@media(max-width:620px){
+  .dda-landing__section--plain{
+    padding:22px 18px;
   }
 }
