@@ -42,7 +42,7 @@ assert.equal(
     },
     dataset: {id: "saved"},
   }).label,
-  "✓ Archivo correcto",
+  "Listo",
 );
 
 const groups = groupProblems({
@@ -87,6 +87,22 @@ const ready = continueState({
   saveErrors: {},
 });
 assert.equal(ready.enabled, true);
+
+
+const readyWithWarnings = continueState({
+  storageAvailable: true,
+  orders: {id: "o"},
+  fleet: {id: "f"},
+  reports: {
+    orders: {valid: true, counts: {errors: 0, warnings: 1}},
+    fleet: {valid: true, counts: {errors: 0, warnings: 0}},
+  },
+  preflight: {valid: true, errors: [], warnings: []},
+  phases: {orders: "idle", fleet: "idle"},
+  saveErrors: {},
+});
+assert.equal(readyWithWarnings.enabled, true);
+assert.equal(readyWithWarnings.kind, "warning");
 
 const relationFailure = continueState({
   storageAvailable: true,
