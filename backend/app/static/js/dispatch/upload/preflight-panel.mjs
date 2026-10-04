@@ -82,9 +82,13 @@ function requiredStats(report, requiredCount) {
   const entries = Object.values(report?.completeness || {}).filter(
     (item) => item?.required,
   );
-  const complete = entries.filter(
-    (item) => item.present && item.complete,
-  ).length;
+  const complete = entries.length
+    ? entries.filter(
+        (item) => item.present && item.complete,
+      ).length
+    : report?.valid
+      ? requiredCount
+      : 0;
   return {
     complete: report ? complete : 0,
     total: requiredCount,
@@ -95,9 +99,11 @@ function optionalStats(report, optionalCount) {
   const entries = Object.values(report?.completeness || {}).filter(
     (item) => item && !item.required,
   );
-  const complete = entries.filter(
-    (item) => item.present && item.complete,
-  ).length;
+  const complete = entries.length
+    ? entries.filter(
+        (item) => item.present && item.complete,
+      ).length
+    : 0;
   return {
     complete: report ? complete : 0,
     total: optionalCount,
