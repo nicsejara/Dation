@@ -1,15 +1,15 @@
 import {api, date, num} from "../shared.mjs";
-import {createDropCard} from "./dropcard.mjs?v=upload-unified-v1";
-import {createGuideDrawer} from "./guide-drawer.mjs?v=upload-unified-v1";
-import {createPreviousDrawer} from "./library.mjs?v=upload-unified-v1";
-import {renderInlineValidation, renderCompatibilityStrip} from "./preflight-panel.mjs?v=upload-unified-v1";
+import {createDropCard} from "./dropcard.mjs?v=upload-unified-v2";
+import {createGuideDrawer} from "./guide-drawer.mjs?v=upload-unified-v2";
+import {createPreviousDrawer} from "./library.mjs?v=upload-unified-v2";
+import {renderInlineValidation, renderCompatibilityStrip} from "./preflight-panel.mjs?v=upload-unified-v2";
 import {
   continueState,
   deriveCardState,
   technicalPreflightErrors,
-} from "./selectors.mjs?v=upload-unified-v1";
-import {renderSystemBanner} from "./system-banner.mjs?v=upload-unified-v1";
-import {createValidationDrawer} from "./validation-report.mjs?v=upload-unified-v1";
+} from "./selectors.mjs?v=upload-unified-v2";
+import {renderSystemBanner} from "./system-banner.mjs?v=upload-unified-v2";
+import {createValidationDrawer} from "./validation-report.mjs?v=upload-unified-v2";
 
 const MAX_BYTES = 10 * 1024 * 1024;
 
