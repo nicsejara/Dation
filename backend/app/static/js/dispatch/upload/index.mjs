@@ -220,63 +220,64 @@ function makeFinalBar(onNext, scrollToData, scrollToProblem) {
   bar.dataset.reveal = "";
 
   const watermark = document.createElement("img");
-  watermark.src = "/static/assets/dda-logistics.svg?v=upload-pro-v1";
+  watermark.src = "/static/assets/dda-logistics.svg?v=upload-finalbar-v1";
   watermark.alt = "";
   watermark.className = "dispatch-pro-final-watermark";
 
   const copy = el("div", null, "dispatch-pro-final-copy");
   const eyebrow = el("span", "SIGUIENTE PASO", "dispatch-pro-eyebrow");
-  const title = el("h2", "Todavía falta un paso.");
+  const title = el("h2", "Completá tu Data Pack.");
   const description = el(
     "p",
-    "Completá Órdenes y Flota para crear tu Decision Case.",
+    "Cuando Órdenes y Flota estén listas, se habilita el mapa de decisiones.",
   );
   const note = el("small", "", "dispatch-pro-final-note");
   note.hidden = true;
   copy.append(eyebrow, title, description, note);
 
-  const actions = el("div", null, "dispatch-pro-final-actions");
+  const status = el("div", null, "dispatch-pro-final-status is-pending");
+  const statusIcon = el("span", null, "dispatch-pro-final-status-icon");
+  statusIcon.append(icon("pending"));
+  const statusCopy = el("div", null, "dispatch-pro-final-status-copy");
+  const statusTitle = el("strong", "Datos pendientes");
+  const statusMeta = el(
+    "small",
+    "Completá los archivos para continuar.",
+  );
+  statusCopy.append(statusTitle, statusMeta);
+  status.append(statusIcon, statusCopy);
+
   const primary = document.createElement("button");
   primary.type = "button";
-  primary.className = "button button--primary";
-  primary.textContent = "Faltan 2 archivos";
-  const secondary = document.createElement("button");
-  secondary.type = "button";
-  secondary.className = "button button--secondary";
-  secondary.textContent = "Revisar mis datos";
-  secondary.onclick = scrollToData;
-  actions.append(primary, secondary);
+  primary.className = "button button--primary dispatch-pro-next-button";
+  primary.textContent = "Ir al mapa de decisiones →";
+  primary.disabled = true;
 
-  const preview = el("div", null, "dispatch-pro-map-preview");
-  preview.append(el("span", "ESTO VAS A VER", "dispatch-pro-eyebrow"));
-  const chain = el("div", null, "dispatch-pro-preview-chain");
-  const assignment = el("div", null, "dispatch-pro-preview-node is-pending");
-  assignment.append(
-    icon("map"),
-    el("strong", "Asignación de carga"),
-    el("small", "Pendiente"),
+  const next = el("div", null, "dispatch-pro-next-stage");
+  const nextIcon = el("span", null, "dispatch-pro-next-stage-icon");
+  nextIcon.append(icon("map"));
+  const nextCopy = el("div", null, "dispatch-pro-next-stage-copy");
+  const nextEyebrow = el(
+    "span",
+    "PRÓXIMA ETAPA",
+    "dispatch-pro-eyebrow",
   );
-  const planning = el("div", null, "dispatch-pro-preview-node is-locked");
-  planning.append(
-    icon("lock"),
-    el("strong", "Planificación"),
-    el("small", "Bloqueada"),
+  const nextTitle = el("strong", "Seleccioná tu próxima decisión");
+  const nextDescription = el(
+    "p",
+    "Se habilita automáticamente cuando tus datos estén listos.",
   );
-  const execution = el("div", null, "dispatch-pro-preview-node is-locked");
-  execution.append(
-    icon("lock"),
-    el("strong", "Ejecución física"),
-    el("small", "Bloqueada"),
-  );
-  chain.append(
-    assignment,
-    el("i", "", "dispatch-pro-preview-link"),
-    planning,
-    el("i", "", "dispatch-pro-preview-link"),
-    execution,
-  );
-  preview.append(chain);
-  bar.append(watermark, copy, actions, preview);
+  nextCopy.append(nextEyebrow, nextTitle, nextDescription);
+  next.append(nextIcon, nextCopy);
+
+  bar.append(watermark, copy, status, primary, next);
+
+  function setStatus(tone, label, meta, iconName) {
+    status.className = `dispatch-pro-final-status is-${tone}`;
+    statusIcon.replaceChildren(icon(iconName));
+    statusTitle.textContent = label;
+    statusMeta.textContent = meta;
+  }
 
   function update(result, context = {}) {
     const {
@@ -284,50 +285,77 @@ function makeFinalBar(onNext, scrollToData, scrollToProblem) {
       errorCount = 0,
       warningCount = 0,
     } = context;
+
     bar.className = `dispatch-pro-final is-${result.kind}`;
     note.hidden = true;
-    primary.className = "button button--secondary";
+    primary.disabled = true;
+    primary.onclick = null;
 
     if (result.enabled) {
-      title.textContent = "Tu Decision Case está listo.";
+      title.textContent = "Todo listo para continuar.";
       description.textContent = (
-        "Explorá en el Decision Map qué decisión podés resolver ahora "
-        + "y cuál sigue en la cadena."
+        "Órdenes y Flota están validadas. Ya podés pasar al mapa de decisiones."
       );
-      primary.className = "button button--primary";
-      primary.textContent = "Ir al mapa de decisiones →";
+      setStatus(
+        warningCount ? "warning" : "success",
+        warningCount ? "Datos listos · con avisos" : "Datos listos",
+        warningCount
+          ? "Los avisos no bloquean este paso."
+          : "Tu Data Pack está validado.",
+        warningCount ? "warning" : "check",
+      );
+      primary.disabled = false;
       primary.onclick = onNext;
+      nextDescription.textContent = (
+        "Entrá al mapa y elegí qué decisión querés analizar ahora."
+      );
+
       if (warningCount) {
         note.hidden = false;
         note.textContent = (
-          `Podés avanzar: hay ${warningCount} `
+          `Hay ${warningCount} `
           + `${warningCount === 1 ? "aviso" : "avisos"} sobre columnas opcionales.`
         );
       }
-      assignment.className = "dispatch-pro-preview-node is-ready";
-      assignment.querySelector("small").textContent = "Disponible";
       return;
     }
 
-    assignment.className = "dispatch-pro-preview-node is-pending";
-    assignment.querySelector("small").textContent = "Pendiente";
+    nextDescription.textContent = (
+      "Se habilita automáticamente cuando tus datos estén listos."
+    );
 
     if (result.kind === "error") {
-      title.textContent = `Hay ${errorCount || 1} ${(errorCount || 1) === 1 ? "cosa" : "cosas"} para corregir.`;
-      description.textContent = "Revisá el primer problema y corregí el archivo antes de continuar.";
-      primary.textContent = "Corregir archivos";
-      primary.onclick = scrollToProblem;
+      title.textContent = "Hay datos para corregir.";
+      description.textContent = (
+        "Corregí los errores marcados en Órdenes o Flota. "
+        + "El mapa se habilita cuando ambos archivos estén listos."
+      );
+      setStatus(
+        "error",
+        "Datos por corregir",
+        `${errorCount || 1} ${(errorCount || 1) === 1 ? "problema bloquea" : "problemas bloquean"} el avance.`,
+        "error",
+      );
       return;
     }
 
-    title.textContent = "Todavía falta un paso.";
+    title.textContent = "Completá tu Data Pack.";
     description.textContent = missingCount
-      ? "Completá los archivos pendientes para crear tu Decision Case."
+      ? (
+          `Todavía ${missingCount === 1 ? "falta" : "faltan"} `
+          + `${missingCount} ${missingCount === 1 ? "archivo" : "archivos"}. `
+          + "Cuando todo esté listo, se habilita el mapa de decisiones."
+        )
       : result.message;
-    primary.textContent = missingCount
-      ? `Faltan ${missingCount} ${missingCount === 1 ? "archivo" : "archivos"}`
-      : "Revisar carga";
-    primary.onclick = missingCount ? scrollToProblem : scrollToData;
+
+    setStatus(
+      "pending",
+      "Datos pendientes",
+      missingCount
+        ? `${missingCount} ${missingCount === 1 ? "archivo pendiente" : "archivos pendientes"}.`
+        : "Terminá la validación para continuar.",
+      "pending",
+    );
   }
 
   return {bar, update};
