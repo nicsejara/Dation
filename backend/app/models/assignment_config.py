@@ -6,6 +6,20 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 AssignmentObjectiveKey = Literal["trips", "cost", "own_fleet", "co2"]
 ASSIGNMENT_OBJECTIVE_KEYS = ("trips", "cost", "own_fleet", "co2")
 
+AssignmentFilterColumn = Literal[
+    "estimated_dispatch_date",
+    "delivery_due_date",
+    "destination",
+    "origin",
+    "product",
+    "priority",
+    "quantity_units",
+    "unit_weight_kg",
+    "distance_km",
+]
+AssignmentFilterType = Literal["date", "category", "number"]
+AssignmentResourceMode = Literal["own", "mixed", "outsourced"]
+
 ASSIGNMENT_PRESETS = {
     "min_trips": (1, 0, 0, 0),
     "min_cost": (0, 1, 0, 0),
@@ -19,6 +33,50 @@ ASSIGNMENT_OBJECTIVE_DIMENSION = {
     "max_own_fleet": "own_fleet",
     "min_co2": "co2",
 }
+
+
+class AssignmentScopeFilter(BaseModel):
+    """A resolved, reproducible filter applied to Orders before Assignment."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    column: AssignmentFilterColumn
+    type: AssignmentFilterType
+    operator: Literal["between", "in"]
+    value: list[str | float] = Field(default_factory=list, max_length=100)
+    resolved: list[str | float] | None = Field(default=None, max_length=100)
+
+    @model_validator(mode="after")
+    def canonical(self):
+        expected = {
+            "estimated_dispatch_date": "date",
+            "delivery_due_date": "date",
+            "destination": "category",
+            "origin": "category",
+            "product": "category",
+            "priority": "category",
+            "quantity_units": "number",
+            "unit_weight_kg": "number",
+            "distance_km": "number",
+        }[self.column]
+        if self.type != expected:
+            raise ValueError(
+                f"El filtro {self.column} debe ser de tipo {expected}."
+            )
+        if self.type == "category" and self.operator != "in":
+            raise ValueError("Los filtros categóricos usan el operador in.")
+        if self.type in ("date", "number") and self.operator != "between":
+            raise ValueError("Los filtros de rango usan el operador between.")
+        values = self.resolved if self.resolved is not None else self.value
+        if self.type in ("date", "number") and len(values) != 2:
+            raise ValueError("El filtro de rango requiere dos valores.")
+        return self
+
+
+class AssignmentScope(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    filters: list[AssignmentScopeFilter] = Field(default_factory=list, max_length=12)
 
 
 class AssignmentWeights(BaseModel):
@@ -64,6 +122,7 @@ class AssignmentConfig(BaseModel):
         min_length=1,
     )
     weights: AssignmentWeights | None = None
+    scope: AssignmentScope = Field(default_factory=AssignmentScope)
 
     @model_validator(mode="after")
     def canonical(self):
@@ -158,6 +217,7 @@ class AssignmentOptions(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     allow_third_party: bool = True
+    resource_mode: AssignmentResourceMode = "mixed"
     anomaly_decisions: dict[
         str,
         Literal["include", "exclude"],
@@ -182,3 +242,16 @@ class AssignmentOptions(BaseModel):
         ge=5,
         le=180,
     )
+
+    @model_validator(mode="before")
+    @classmethod
+    def resource_compatibility(cls, values):
+        data = dict(values or {})
+        if "resource_mode" not in data:
+            data["resource_mode"] = (
+                "mixed"
+                if data.get("allow_third_party", True)
+                else "own"
+            )
+        data["allow_third_party"] = data["resource_mode"] != "own"
+        return data
