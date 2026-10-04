@@ -174,8 +174,8 @@ function makeHero() {
 
   const history = el("div", null, "dispatch-pro-how-history");
   const historyCopy = el("span", "¿Ya cargaste datos antes? ");
-  const reuseLink = document.createElement("a");
-  reuseLink.href = "#dispatch-data-pack";
+  const reuseLink = document.createElement("button");
+  reuseLink.type = "button";
   reuseLink.className = "dispatch-pro-how-reuse-link";
   reuseLink.textContent = "Reutilizalos →";
   history.append(icon("history"), historyCopy, reuseLink);
