@@ -1178,7 +1178,14 @@ export async function mountUploadScreen(
       ref.replace.onclick = () => triggerReplace(kind);
       ref.remove.onclick = () => removeFile(kind);
       ref.reviewColumns.onclick = () => {
-        guide.open(kind, ref.reviewColumns, reportFor(kind));
+        guide.open(
+          kind,
+          ref.reviewColumns,
+          {
+            orders: reportFor("orders"),
+            fleet: reportFor("fleet"),
+          },
+        );
       };
       ref.reviewProblems.onclick = () => {
         openValidation(kind, ref.reviewProblems);
@@ -1200,11 +1207,13 @@ export async function mountUploadScreen(
     renderCard("fleet");
     await refreshPreflight();
 
-    const finalObserver = new IntersectionObserver((entries) => {
-      local.finalVisible = entries.some((entry) => entry.isIntersecting);
-      finalState();
-    }, {threshold: 0.18});
-    finalObserver.observe(finalBar.bar);
+    if ("IntersectionObserver" in window) {
+      const finalObserver = new IntersectionObserver((entries) => {
+        local.finalVisible = entries.some((entry) => entry.isIntersecting);
+        finalState();
+      }, {threshold: 0.18});
+      finalObserver.observe(finalBar.bar);
+    }
 
     revealSections(root);
   } catch (error) {
