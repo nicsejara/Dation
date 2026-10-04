@@ -356,7 +356,7 @@ class FrontendContractTests(
             self.dashboard_stage_js,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=hero-upload-v1",
+            "/static/js/dispatch/workspace.mjs?v=hero-upload-v3",
             self.html,
         )
         self.assertIn(
@@ -862,11 +862,11 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "/static/css/dda-logistics-upload.css?v=hero-upload-v2",
+            "/static/css/dda-logistics-upload.css?v=hero-upload-v3",
             self.html,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=hero-upload-v1",
+            "/static/js/dispatch/workspace.mjs?v=hero-upload-v3",
             self.html,
         )
         self.assertIn(
@@ -874,7 +874,7 @@ class FrontendContractTests(
             workspace,
         )
         self.assertIn(
-            "./upload/index.mjs?v=hero-upload-v1",
+            "./upload/index.mjs?v=hero-upload-v3",
             workspace,
         )
         self.assertIn(
@@ -983,6 +983,10 @@ class FrontendContractTests(
             upload_index,
         )
         self.assertIn(
+            'document.createElement("button")',
+            upload_index,
+        )
+        self.assertIn(
             'refs[kind]?.setMode("reuse")',
             upload_index,
         )
@@ -1015,12 +1019,15 @@ class FrontendContractTests(
             )
 
         for polish in (
-            "min-height:76px",
+            "height:72px",
+            "min-height:72px",
+            "white-space:nowrap",
+            "width:min(100%,460px)",
+            "color:#ffffff!important",
+            "background:#8ce8da!important",
             "width:104px",
             "min-width:104px",
             "margin-top:auto",
-            "color:#eef7f9",
-            "color:#ffffff",
             "font-size:10.5px",
             "align-self:flex-start",
         ):
@@ -1030,7 +1037,7 @@ class FrontendContractTests(
             )
 
         self.assertIn(
-            ".dispatch-pro-how-reuse-link:visited",
+            ".dispatch-upload-pro .dispatch-pro-how-reuse-link",
             upload_css,
         )
 
@@ -1651,7 +1658,7 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=hero-upload-v1",
+            "/static/js/dispatch/workspace.mjs?v=hero-upload-v3",
             self.html,
         )
 
