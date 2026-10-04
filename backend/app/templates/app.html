@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="/static/css/home-dda.css?v=home-dda-hero-v4">
   <link rel="stylesheet" href="/static/css/dda-logistics-landing.css?v=dda-logistics-landing-v8">
   <link rel="stylesheet" href="/static/css/dispatch.css?v=home-dda-selector-v2">
-  <link rel="stylesheet" href="/static/css/dda-logistics-upload.css?v=workspace-nav-v2">
+  <link rel="stylesheet" href="/static/css/dda-logistics-upload.css?v=hero-upload-v1">
 </head>
 <body>
   <div class="app-shell">
@@ -1161,6 +1161,7 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+  <script src="/static/js/dda-workflow-config.js?v=hero-upload-v1"></script>
   <script>
     (function () {
       var currentView = 'inicio';
@@ -1242,6 +1243,22 @@
         separator.setAttribute('aria-hidden', 'true');
         separator.textContent = '›';
         return separator;
+      }
+
+      function workflowStep(id, fallback) {
+        var steps = (
+          window.DationDdaFlow
+          && Array.isArray(window.DationDdaFlow.steps)
+        )
+          ? window.DationDdaFlow.steps
+          : [];
+
+        return (
+          steps.find(function (step) {
+            return step.id === id;
+          })
+          || fallback
+        );
       }
 
       function workspaceStep(number, label, options) {
@@ -1372,42 +1389,67 @@
           ? decisionSelection.label
           : null;
 
+        var dataStep = workflowStep('data', {
+          id: 'data',
+          number: 1,
+          label: 'Carga de datos',
+          view: 'logistics-data'
+        });
+        var mapStep = workflowStep('map', {
+          id: 'map',
+          number: 2,
+          label: 'Mapa de decisiones',
+          view: 'logistics-map'
+        });
+        var configStep = workflowStep('config', {
+          id: 'config',
+          number: 3,
+          label: 'Configurar decisión',
+          view: 'logistics-config'
+        });
+        var dashboardStep = workflowStep('dashboard', {
+          id: 'dashboard',
+          number: 4,
+          label: 'Dashboard',
+          view: 'decision-dashboard'
+        });
+
         var steps = [
           {
-            number: 1,
-            label: 'Cargar y validar datos',
-            view: 'logistics-data',
+            number: dataStep.number,
+            label: dataStep.label,
+            view: dataStep.view,
             disabled: false,
             completed: dataReady,
             onClick: function () {
-              window.dationNavigate('logistics-data');
+              window.dationNavigate(dataStep.view);
             }
           },
           {
-            number: 2,
-            label: 'Mapa de decisiones',
-            view: 'logistics-map',
+            number: mapStep.number,
+            label: mapStep.label,
+            view: mapStep.view,
             disabled: !dataReady,
             completed: selected,
             onClick: function () {
-              window.dationNavigate('logistics-map');
+              window.dationNavigate(mapStep.view);
             }
           },
           {
-            number: 3,
-            label: 'Configurar decisión',
-            view: 'logistics-config',
+            number: configStep.number,
+            label: configStep.label,
+            view: configStep.view,
             disabled: !dataReady || !selected,
             completed: runReady,
             context: configContext,
             onClick: function () {
-              window.dationNavigate('logistics-config');
+              window.dationNavigate(configStep.view);
             }
           },
           {
-            number: 4,
-            label: 'Dashboard',
-            view: 'decision-dashboard',
+            number: dashboardStep.number,
+            label: dashboardStep.label,
+            view: dashboardStep.view,
             disabled: !runReady,
             completed: false,
             context: dashboardContext,
@@ -1419,7 +1461,7 @@
                 window.DationDispatch.openActiveDecisionResult();
                 return;
               }
-              window.dationNavigate('decision-dashboard');
+              window.dationNavigate(dashboardStep.view);
             }
           }
         ];
@@ -1571,7 +1613,7 @@
   <script src="/static/js/dda-logistics-landing.js?v=dda-logistics-landing-v7"></script>
   <script src="/static/js/interpreter-stage.js?v=dispatch-v1"></script>
   <script src="/static/vendor/echarts-dispatch-6.0.0.min.js"></script>
-  <script type="module" src="/static/js/dispatch/workspace.mjs?v=workspace-nav-v2"></script>
+  <script type="module" src="/static/js/dispatch/workspace.mjs?v=hero-upload-v1"></script>
   <script type="module" src="/static/js/app.js?v=dispatch-v1"></script>
 </body>
 </html>
