@@ -1,4 +1,4 @@
-import {date, num} from "../shared.mjs";
+import {num} from "../shared.mjs";
 
 function el(tag, value, className = "") {
   const node = document.createElement(tag);
@@ -8,11 +8,33 @@ function el(tag, value, className = "") {
 }
 
 function domainRows(kind, item) {
-  if (item.row_count == null) return null;
+  if (item.row_count == null) return "—";
   const label = kind === "orders"
     ? (Number(item.row_count) === 1 ? "orden" : "órdenes")
     : (Number(item.row_count) === 1 ? "vehículo" : "vehículos");
   return `${num(item.row_count)} ${label}`;
+}
+
+function dateTime(value) {
+  if (!value) return "—";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "—";
+  return new Intl.DateTimeFormat("es-AR", {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+}
+
+function datasetStatus(item) {
+  const report = item.profile_json || null;
+  const errors = Number(report?.counts?.errors || 0);
+  const warnings = Number(report?.counts?.warnings || 0);
+  if (errors) return ["Para corregir", "error"];
+  if (warnings) return ["Listo con avisos", "warning"];
+  if (report?.valid || item.id) return ["Listo", "success"];
+  return ["Pendiente", "pending"];
 }
 
 export function createPreviousDrawer() {
@@ -86,39 +108,52 @@ export function createPreviousDrawer() {
       return;
     }
 
+    const table = el("div", null, "dispatch-pro-history-table");
+    const header = el("div", null, "dispatch-pro-history-row is-header");
+    ["Archivo", "Fecha", "Datos", "Estado", ""].forEach((value) => (
+      header.append(el("span", value))
+    ));
+    table.append(header);
+
     items.forEach((item) => {
+      const selected = item.id === selectedId;
       const row = el(
         "article",
         null,
-        `dispatch-previous-row ${item.id === selectedId ? "is-selected" : ""}`,
+        `dispatch-pro-history-row ${selected ? "is-selected" : ""}`,
       );
-      const icon = el("span", "CSV", "dispatch-pro-library-file-icon");
-      const info = el("div");
-      info.append(
+      const name = el("div", null, "dispatch-pro-history-name");
+      name.append(
+        el("span", "CSV", "dispatch-pro-library-file-icon"),
         el("strong", item.original_filename || item.label || "Archivo"),
-        el(
-          "small",
-          [
-            domainRows(kind, item),
-            item.created_at
-              ? `cargado ${date(item.created_at.slice(0, 10))}`
-              : null,
-          ].filter(Boolean).join(" · "),
-        ),
+      );
+      const [label, tone] = datasetStatus(item);
+      const status = el(
+        "span",
+        label,
+        `dispatch-pro-library-state is-${tone}`,
       );
 
       const use = document.createElement("button");
       use.type = "button";
       use.className = "dispatch-pro-secondary-button";
-      use.textContent = item.id === selectedId ? "En uso" : "Usar";
-      use.disabled = item.id === selectedId;
+      use.textContent = selected ? "En uso" : "Usar";
+      use.disabled = selected;
       use.onclick = async () => {
         await onSelect?.(item);
         hide();
       };
-      row.append(icon, info, use);
-      list.append(row);
+
+      row.append(
+        name,
+        el("span", dateTime(item.created_at)),
+        el("span", domainRows(kind, item)),
+        status,
+        use,
+      );
+      table.append(row);
     });
+    list.append(table);
   }
 
   function open(options) {
@@ -128,8 +163,8 @@ export function createPreviousDrawer() {
     onSelect = options.onSelect;
     opener = options.source || null;
     title.textContent = kind === "orders"
-      ? "Tus cargas anteriores"
-      : "Tus flotas guardadas";
+      ? "Historial completo de Órdenes"
+      : "Historial completo de Flota";
     search.hidden = current.length <= 5;
     search.value = "";
     render();
