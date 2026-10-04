@@ -2,13 +2,17 @@ import {date, num} from "../shared.mjs";
 
 function el(tag, value, className = "") {
   const node = document.createElement(tag);
-  if (className) {
-    node.className = className;
-  }
-  if (value != null) {
-    node.textContent = value;
-  }
+  if (className) node.className = className;
+  if (value != null) node.textContent = value;
   return node;
+}
+
+function domainRows(kind, item) {
+  if (item.row_count == null) return null;
+  const label = kind === "orders"
+    ? (Number(item.row_count) === 1 ? "orden" : "órdenes")
+    : (Number(item.row_count) === 1 ? "vehículo" : "vehículos");
+  return `${num(item.row_count)} ${label}`;
 }
 
 export function createPreviousDrawer() {
@@ -19,17 +23,26 @@ export function createPreviousDrawer() {
   const overlay = el("div", null, "dispatch-previous-overlay");
   overlay.hidden = true;
 
-  const drawer = el("aside", null, "dispatch-previous-drawer");
+  const drawer = el(
+    "aside",
+    null,
+    "dispatch-previous-drawer dispatch-pro-previous-drawer",
+  );
   drawer.setAttribute("role", "dialog");
   drawer.setAttribute("aria-modal", "true");
 
   const head = el("div", null, "dispatch-previous-head");
+  const headCopy = el("div");
   const title = el("h2", "");
+  headCopy.append(
+    el("span", "HISTORIAL DE DATOS", "dispatch-pro-eyebrow"),
+    title,
+  );
   const close = document.createElement("button");
   close.type = "button";
   close.setAttribute("aria-label", "Cerrar selector");
   close.textContent = "×";
-  head.append(title, close);
+  head.append(headCopy, close);
 
   const search = document.createElement("input");
   search.type = "search";
@@ -51,20 +64,22 @@ export function createPreviousDrawer() {
     list.replaceChildren();
     const query = search.value.trim().toLowerCase();
     const items = current.filter((item) => {
-      if (!query) {
-        return true;
-      }
+      if (!query) return true;
       return [
         item.label,
         item.original_filename,
-      ].some((value) => String(value || "").toLowerCase().includes(query));
+      ].some((value) => (
+        String(value || "").toLowerCase().includes(query)
+      ));
     });
 
     if (!items.length) {
       list.append(
         el(
           "p",
-          "No encontramos archivos guardados para esta búsqueda.",
+          kind === "orders"
+            ? "Todavía no tenés cargas de Órdenes guardadas."
+            : "Todavía no tenés flotas guardadas.",
           "dispatch-library-empty",
         ),
       );
@@ -72,19 +87,19 @@ export function createPreviousDrawer() {
     }
 
     items.forEach((item) => {
-      const row = el("article", null, "dispatch-previous-row");
+      const row = el(
+        "article",
+        null,
+        `dispatch-previous-row ${item.id === selectedId ? "is-selected" : ""}`,
+      );
+      const icon = el("span", "CSV", "dispatch-pro-library-file-icon");
       const info = el("div");
       info.append(
         el("strong", item.original_filename || item.label || "Archivo"),
         el(
           "small",
           [
-            item.size_bytes != null
-              ? `${num(item.size_bytes / 1024, 1)} KB`
-              : null,
-            item.row_count != null
-              ? `${num(item.row_count)} registros`
-              : null,
+            domainRows(kind, item),
             item.created_at
               ? `cargado ${date(item.created_at.slice(0, 10))}`
               : null,
@@ -94,13 +109,14 @@ export function createPreviousDrawer() {
 
       const use = document.createElement("button");
       use.type = "button";
+      use.className = "dispatch-pro-secondary-button";
       use.textContent = item.id === selectedId ? "En uso" : "Usar";
       use.disabled = item.id === selectedId;
       use.onclick = async () => {
         await onSelect?.(item);
         hide();
       };
-      row.append(info, use);
+      row.append(icon, info, use);
       list.append(row);
     });
   }
@@ -112,8 +128,8 @@ export function createPreviousDrawer() {
     onSelect = options.onSelect;
     opener = options.source || null;
     title.textContent = kind === "orders"
-      ? "Usar una carga anterior"
-      : "Usar una flota guardada";
+      ? "Tus cargas anteriores"
+      : "Tus flotas guardadas";
     search.hidden = current.length <= 5;
     search.value = "";
     render();
@@ -131,14 +147,10 @@ export function createPreviousDrawer() {
   search.oninput = render;
   close.onclick = hide;
   overlay.onclick = (event) => {
-    if (event.target === overlay) {
-      hide();
-    }
+    if (event.target === overlay) hide();
   };
   overlay.onkeydown = (event) => {
-    if (event.key === "Escape") {
-      hide();
-    }
+    if (event.key === "Escape") hide();
   };
 
   return {open, close: hide};
