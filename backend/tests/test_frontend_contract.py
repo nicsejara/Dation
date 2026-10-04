@@ -1578,15 +1578,31 @@ class FrontendContractTests(
         )[0]
 
         for copy in (
-            "De órdenes y flota a despachos que podés explicar.",
-            "Cargá tus órdenes y tu flota.",
-            "Motor 0.2.0",
-            "Cuatro pasos de los datos a la decisión.",
-            "el expediente que reúne tus datos, los criterios y el resultado",
+            "DDA LOGÍSTICA · PLANIFICACIÓN DE DESPACHOS",
+            "Decidí tus despachos más rápido y con mejor análisis.",
+            "Dation compara alternativas de asignación, planificación y ejecución",
+            "Menos tiempo armando análisis, más tiempo para decidir.",
+            "Iniciar nueva decisión",
+            "Ver Decision Map",
+            "VOS APORTÁS",
+            "Tus órdenes y tu flota",
+            "DATION ANALIZA",
+            "Compara alternativas y optimiza",
+            "VOS DECIDÍS",
+            "Con recomendación y evidencia",
+            "De tus datos a una decisión, en 4 pasos.",
+            "Cada decisión se arma en un",
+            "Dation valida y arma el caso",
+            "Elegí tu prioridad",
+            "Aprobá y exportá",
+            "Lo hacés vos",
+            "Lo hace Dation",
+            "Empezás con el núcleo mínimo de datos.",
             "Qué variables optimiza el motor hoy.",
             "Tu mapa de decisiones, desbloqueado paso a paso.",
             "Un DDA no resuelve una sola decisión: resuelve una cadena.",
             "Lo que necesitás y lo que obtenés.",
+            "Una vista rápida de los datos mínimos, el resultado que entrega el DDA y los límites que conviene conocer antes de aprobar una decisión.",
             "Lo que necesitás para empezar",
             "Lo que recibís",
             "Lo que conviene saber",
@@ -1594,14 +1610,14 @@ class FrontendContractTests(
         ):
             self.assertIn(copy, overview)
 
-        for phase in (
-            "Cargar datos",
-            "Validar",
-            "Configurar",
-            "Resultado",
+        for step in (
+            "Paso 1",
+            "Paso 2",
+            "Paso 3",
+            "Paso 4",
         ):
             self.assertIn(
-                f">{phase}<",
+                f">{step}<",
                 overview,
             )
 
@@ -1620,6 +1636,9 @@ class FrontendContractTests(
             "dda-landing__features",
             "dda-landing__result-kpis",
             "dda-landing__heatmap",
+            'id="open-latest-logistics-decision"',
+            'id="latest-logistics-meta"',
+            "Motor 0.2.0",
         ):
             self.assertNotIn(
                 forbidden,
@@ -1627,7 +1646,7 @@ class FrontendContractTests(
             )
 
         self.assertIn(
-            "Decisión + alternativas + evidencia",
+            'data-scroll-decision-map',
             overview,
         )
         self.assertIn(
@@ -1647,6 +1666,18 @@ class FrontendContractTests(
             overview,
         )
         self.assertIn(
+            "dda-landing__section-head--summary",
+            overview,
+        )
+        self.assertIn(
+            "dda-landing__faq-grid",
+            overview,
+        )
+        self.assertEqual(
+            overview.count("<details>"),
+            4,
+        )
+        self.assertIn(
             "<code class=\"dda-landing__file-chip\">Orders</code>",
             overview,
         )
@@ -1656,15 +1687,15 @@ class FrontendContractTests(
         )
 
         self.assertIn(
-            "/static/css/dda-logistics-landing.css?v=dda-logistics-landing-v6",
+            "/static/css/dda-logistics-landing.css?v=dda-logistics-landing-v7",
             self.html,
         )
         self.assertIn(
-            "/static/js/dda-logistics-landing.js?v=dda-logistics-landing-v6",
+            "/static/js/dda-logistics-landing.js?v=dda-logistics-landing-v7",
             self.html,
         )
         self.assertIn(
-            "/static/js/dashboard-stage.js?v=dda-logistics-landing-v6",
+            "/static/js/dashboard-stage.js?v=dda-logistics-landing-v7",
             self.html,
         )
 
@@ -1689,8 +1720,16 @@ class FrontendContractTests(
             "dationScrollToDecisionMap",
             self.dda_landing_js,
         )
+        self.assertIn(
+            "[data-scroll-decision-map]",
+            self.dda_landing_js,
+        )
         self.assertNotIn(
             "syncProgress",
+            self.dda_landing_js,
+        )
+        self.assertNotIn(
+            "syncPrimaryCopy",
             self.dda_landing_js,
         )
         self.assertNotIn(
@@ -1716,14 +1755,6 @@ class FrontendContractTests(
         self.assertIn(
             'logistics_final_assignment:"locked"',
             self.dda_landing_js,
-        )
-        self.assertIn(
-            "Ver Decision Map ↘",
-            self.dashboard_stage_js,
-        )
-        self.assertNotIn(
-            "Ver un ejemplo de resultado",
-            self.dashboard_stage_js,
         )
         self.assertIn(
             "hour12: false",
