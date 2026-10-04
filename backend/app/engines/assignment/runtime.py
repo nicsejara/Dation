@@ -10,8 +10,24 @@ from .engine import run_assignment_engine as _run_assignment_engine
 from .scope import apply_order_scope
 
 
-def _csv_bytes(kind, records):
-    columns = [column["name"] for column in CONTRACTS[kind]["columns"]]
+def _csv_bytes(kind, records, completeness):
+    """Serialize only columns that actually existed in the source CSV.
+
+    The validators expose canonical records with optional keys filled with None. If we
+    wrote every contract column back out, an originally absent optional column would
+    become a present-but-empty column and capability checks could incorrectly treat it
+    as part of the source schema. Preserving source presence keeps scoped runs
+    semantically equivalent to unfiltered runs.
+    """
+
+    columns = [
+        column["name"]
+        for column in CONTRACTS[kind]["columns"]
+        if (completeness or {}).get(column["name"], {}).get("present")
+    ]
+    if not columns:
+        raise ValueError(f"No se pudieron conservar las columnas del archivo {kind}.")
+
     buffer = io.StringIO()
     writer = csv.DictWriter(
         buffer,
@@ -79,8 +95,16 @@ def run_assignment_engine(
     canonical_options["allow_third_party"] = opts.resource_mode != "own"
 
     result = _run_assignment_engine(
-        _csv_bytes("orders", scoped_orders),
-        _csv_bytes("fleet", scoped_fleet),
+        _csv_bytes(
+            "orders",
+            scoped_orders,
+            orders_report.get("completeness"),
+        ),
+        _csv_bytes(
+            "fleet",
+            scoped_fleet,
+            fleet_report.get("completeness"),
+        ),
         config.model_dump(),
         canonical_options,
         inputs,
