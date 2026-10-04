@@ -1205,8 +1205,8 @@
 .dispatch-pro-final{
   position:relative;
   display:grid;
-  grid-template-columns:minmax(0,1.15fr) minmax(190px,.52fr) auto minmax(260px,.76fr);
-  gap:18px;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:28px;
   align-items:center;
   overflow:hidden;
   padding:28px 30px;
@@ -1243,9 +1243,7 @@
 }
 
 .dispatch-pro-final-copy,
-.dispatch-pro-final-status,
-.dispatch-pro-next-button,
-.dispatch-pro-next-stage{
+.dispatch-pro-next-button{
   position:relative;
   z-index:2;
 }
@@ -1272,157 +1270,38 @@
   font-size:12px;
 }
 
-.dispatch-pro-final-status{
-  display:grid;
-  min-height:64px;
-  grid-template-columns:38px minmax(0,1fr);
-  gap:10px;
-  align-items:center;
-  padding:11px 13px;
-  border:1px solid rgba(92,118,128,.16);
-  border-radius:14px;
-  background:rgba(255,255,255,.58);
-  box-shadow:0 7px 18px rgba(31,73,88,.055);
-  backdrop-filter:blur(10px);
-}
-
-.dispatch-pro-final-status-icon{
-  display:grid;
-  width:38px;
-  height:38px;
-  place-items:center;
-  border-radius:11px;
-  color:#71848c;
-  background:#eef3f4;
-}
-
-.dispatch-pro-final-status-icon .dispatch-pro-icon{
-  width:19px;
-  height:19px;
-}
-
-.dispatch-pro-final-status-copy{
-  min-width:0;
-}
-
-.dispatch-pro-final-status-copy strong,
-.dispatch-pro-final-status-copy small{
-  display:block;
-}
-
-.dispatch-pro-final-status-copy strong{
-  color:#294752;
-  font-size:13px;
-  font-weight:800;
-}
-
-.dispatch-pro-final-status-copy small{
-  margin-top:3px;
-  color:#6d818a;
-  font-size:12px;
-  line-height:1.35;
-}
-
-.dispatch-pro-final-status.is-success{
-  border-color:#abd9ca;
-  background:rgba(239,250,245,.82);
-}
-
-.dispatch-pro-final-status.is-success .dispatch-pro-final-status-icon{
-  color:#08764d;
-  background:#dcf2e8;
-}
-
-.dispatch-pro-final-status.is-warning{
-  border-color:#e4ce91;
-  background:rgba(255,249,232,.84);
-}
-
-.dispatch-pro-final-status.is-warning .dispatch-pro-final-status-icon{
-  color:#946812;
-  background:#fff0c9;
-}
-
-.dispatch-pro-final-status.is-error{
-  border-color:#e7beb4;
-  background:rgba(255,243,239,.86);
-}
-
-.dispatch-pro-final-status.is-error .dispatch-pro-final-status-icon{
-  color:#ad4431;
-  background:#ffe9e3;
-}
-
 .dispatch-pro-next-button{
-  min-width:190px;
-  min-height:44px;
+  min-width:228px;
+  min-height:48px;
   justify-content:center;
+  padding-inline:20px;
   white-space:nowrap;
-  font-size:12.5px;
-  font-weight:800;
+  font-size:13px;
+  font-weight:850;
+  box-shadow:0 8px 20px rgba(19,125,131,.14);
+  transition:
+    transform .16s ease,
+    box-shadow .16s ease,
+    background .16s ease,
+    border-color .16s ease;
+}
+
+.dispatch-pro-next-button:not(:disabled):hover{
+  transform:translateY(-1px);
+  box-shadow:0 12px 26px rgba(19,125,131,.20);
+}
+
+.dispatch-pro-next-button:not(:disabled):active{
+  transform:translateY(0);
 }
 
 .dispatch-pro-next-button:disabled{
   cursor:not-allowed;
-  color:#87979f;
+  color:#8b9aa1;
   border-color:#cfdadd;
-  background:rgba(255,255,255,.52);
-  box-shadow:none;
-  opacity:.82;
-}
-
-.dispatch-pro-next-stage{
-  display:grid;
-  min-height:88px;
-  grid-template-columns:42px minmax(0,1fr);
-  gap:12px;
-  align-items:center;
-  padding:15px 16px;
-  border:1px solid rgba(255,255,255,.58);
-  border-radius:16px;
   background:rgba(255,255,255,.56);
-  box-shadow:0 8px 20px rgba(39,65,92,.06);
-  backdrop-filter:blur(11px);
-}
-
-.dispatch-pro-next-stage-icon{
-  display:grid;
-  width:42px;
-  height:42px;
-  place-items:center;
-  border-radius:12px;
-  color:#5264aa;
-  background:#eef0fb;
-}
-
-.dispatch-pro-next-stage-icon .dispatch-pro-icon{
-  width:21px;
-  height:21px;
-}
-
-.dispatch-pro-next-stage-copy{
-  min-width:0;
-}
-
-.dispatch-pro-next-stage-copy .dispatch-pro-eyebrow{
-  margin-bottom:4px;
-  color:#667b86;
-  font-size:10.5px;
-}
-
-.dispatch-pro-next-stage-copy strong{
-  display:block;
-  color:#243f4a;
-  font-size:14px;
-  font-weight:800;
-  line-height:1.25;
-}
-
-.dispatch-pro-next-stage-copy p{
-  margin-top:4px;
-  color:#617681;
-  font-size:12.5px;
-  line-height:1.4;
+  box-shadow:none;
+  opacity:.88;
 }
 
 /* Sticky progress */
@@ -1621,11 +1500,7 @@
   }
 
   .dispatch-pro-final{
-    grid-template-columns:minmax(0,1fr) minmax(180px,.55fr) auto;
-  }
-
-  .dispatch-pro-next-stage{
-    grid-column:1/-1;
+    grid-template-columns:minmax(0,1fr) auto;
   }
 }
 
@@ -1737,13 +1612,8 @@
     padding:22px 18px;
   }
 
-  .dispatch-pro-final-status,
-  .dispatch-pro-next-button,
-  .dispatch-pro-next-stage{
-    width:100%;
-  }
-
   .dispatch-pro-next-button{
+    width:100%;
     min-width:0;
   }
 
