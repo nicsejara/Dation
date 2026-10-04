@@ -220,7 +220,7 @@ function makeFinalBar(onNext, scrollToData, scrollToProblem) {
   bar.dataset.reveal = "";
 
   const watermark = document.createElement("img");
-  watermark.src = "/static/assets/dda-logistics.svg?v=upload-finalbar-v1";
+  watermark.src = "/static/assets/dda-logistics.svg?v=upload-finalbar-v2";
   watermark.alt = "";
   watermark.className = "dispatch-pro-final-watermark";
 
@@ -229,55 +229,19 @@ function makeFinalBar(onNext, scrollToData, scrollToProblem) {
   const title = el("h2", "Completá tu Data Pack.");
   const description = el(
     "p",
-    "Cuando Órdenes y Flota estén listas, se habilita el mapa de decisiones.",
+    "Cuando Órdenes y Flota estén listas, se habilita la selección de tu próxima decisión.",
   );
   const note = el("small", "", "dispatch-pro-final-note");
   note.hidden = true;
   copy.append(eyebrow, title, description, note);
 
-  const status = el("div", null, "dispatch-pro-final-status is-pending");
-  const statusIcon = el("span", null, "dispatch-pro-final-status-icon");
-  statusIcon.append(icon("pending"));
-  const statusCopy = el("div", null, "dispatch-pro-final-status-copy");
-  const statusTitle = el("strong", "Datos pendientes");
-  const statusMeta = el(
-    "small",
-    "Completá los archivos para continuar.",
-  );
-  statusCopy.append(statusTitle, statusMeta);
-  status.append(statusIcon, statusCopy);
-
   const primary = document.createElement("button");
   primary.type = "button";
   primary.className = "button button--primary dispatch-pro-next-button";
-  primary.textContent = "Ir al mapa de decisiones →";
+  primary.textContent = "Seleccioná tu decisión →";
   primary.disabled = true;
 
-  const next = el("div", null, "dispatch-pro-next-stage");
-  const nextIcon = el("span", null, "dispatch-pro-next-stage-icon");
-  nextIcon.append(icon("map"));
-  const nextCopy = el("div", null, "dispatch-pro-next-stage-copy");
-  const nextEyebrow = el(
-    "span",
-    "PRÓXIMA ETAPA",
-    "dispatch-pro-eyebrow",
-  );
-  const nextTitle = el("strong", "Seleccioná tu próxima decisión");
-  const nextDescription = el(
-    "p",
-    "Se habilita automáticamente cuando tus datos estén listos.",
-  );
-  nextCopy.append(nextEyebrow, nextTitle, nextDescription);
-  next.append(nextIcon, nextCopy);
-
-  bar.append(watermark, copy, status, primary, next);
-
-  function setStatus(tone, label, meta, iconName) {
-    status.className = `dispatch-pro-final-status is-${tone}`;
-    statusIcon.replaceChildren(icon(iconName));
-    statusTitle.textContent = label;
-    statusMeta.textContent = meta;
-  }
+  bar.append(watermark, copy, primary);
 
   function update(result, context = {}) {
     const {
@@ -294,47 +258,26 @@ function makeFinalBar(onNext, scrollToData, scrollToProblem) {
     if (result.enabled) {
       title.textContent = "Todo listo para continuar.";
       description.textContent = (
-        "Órdenes y Flota están validadas. Ya podés pasar al mapa de decisiones."
-      );
-      setStatus(
-        warningCount ? "warning" : "success",
-        warningCount ? "Datos listos · con avisos" : "Datos listos",
-        warningCount
-          ? "Los avisos no bloquean este paso."
-          : "Tu Data Pack está validado.",
-        warningCount ? "warning" : "check",
+        "Órdenes y Flota están validadas. Ya podés seleccionar la decisión que querés analizar."
       );
       primary.disabled = false;
       primary.onclick = onNext;
-      nextDescription.textContent = (
-        "Entrá al mapa y elegí qué decisión querés analizar ahora."
-      );
 
       if (warningCount) {
         note.hidden = false;
         note.textContent = (
           `Hay ${warningCount} `
-          + `${warningCount === 1 ? "aviso" : "avisos"} sobre columnas opcionales.`
+          + `${warningCount === 1 ? "aviso" : "avisos"} sobre columnas opcionales, pero podés continuar.`
         );
       }
       return;
     }
 
-    nextDescription.textContent = (
-      "Se habilita automáticamente cuando tus datos estén listos."
-    );
-
     if (result.kind === "error") {
       title.textContent = "Hay datos para corregir.";
       description.textContent = (
         "Corregí los errores marcados en Órdenes o Flota. "
-        + "El mapa se habilita cuando ambos archivos estén listos."
-      );
-      setStatus(
-        "error",
-        "Datos por corregir",
-        `${errorCount || 1} ${(errorCount || 1) === 1 ? "problema bloquea" : "problemas bloquean"} el avance.`,
-        "error",
+        + "La selección de decisiones se habilita cuando ambos archivos estén listos."
       );
       return;
     }
@@ -344,18 +287,9 @@ function makeFinalBar(onNext, scrollToData, scrollToProblem) {
       ? (
           `Todavía ${missingCount === 1 ? "falta" : "faltan"} `
           + `${missingCount} ${missingCount === 1 ? "archivo" : "archivos"}. `
-          + "Cuando todo esté listo, se habilita el mapa de decisiones."
+          + "Cuando todo esté listo, se habilita la selección de tu próxima decisión."
         )
       : result.message;
-
-    setStatus(
-      "pending",
-      "Datos pendientes",
-      missingCount
-        ? `${missingCount} ${missingCount === 1 ? "archivo pendiente" : "archivos pendientes"}.`
-        : "Terminá la validación para continuar.",
-      "pending",
-    );
   }
 
   return {bar, update};
@@ -403,7 +337,7 @@ function makeSticky(onNext, scrollToProblem) {
 
     if (result.enabled) {
       button.className = "button button--primary";
-      button.textContent = "Ir al mapa de decisiones →";
+      button.textContent = "Seleccioná tu decisión →";
       button.onclick = onNext;
       return;
     }
