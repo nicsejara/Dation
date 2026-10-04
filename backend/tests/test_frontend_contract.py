@@ -356,7 +356,7 @@ class FrontendContractTests(
             self.dashboard_stage_js,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=upload-unified-v1",
+            "/static/js/dispatch/workspace.mjs?v=upload-unified-v2",
             self.html,
         )
         self.assertIn(
@@ -862,24 +862,24 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "/static/css/dda-logistics-upload.css?v=upload-unified-v1",
+            "/static/css/dda-logistics-upload.css?v=upload-unified-v2",
             self.html,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=upload-unified-v1",
+            "/static/js/dispatch/workspace.mjs?v=upload-unified-v2",
             self.html,
         )
         self.assertIn(
-            "./upload/index.mjs?v=upload-unified-v1",
+            "./upload/index.mjs?v=upload-unified-v2",
             workspace,
         )
 
         for module_version in (
-            "./dropcard.mjs?v=upload-unified-v1",
-            "./guide-drawer.mjs?v=upload-unified-v1",
-            "./library.mjs?v=upload-unified-v1",
-            "./preflight-panel.mjs?v=upload-unified-v1",
-            "./selectors.mjs?v=upload-unified-v1",
+            "./dropcard.mjs?v=upload-unified-v2",
+            "./guide-drawer.mjs?v=upload-unified-v2",
+            "./library.mjs?v=upload-unified-v2",
+            "./preflight-panel.mjs?v=upload-unified-v2",
+            "./selectors.mjs?v=upload-unified-v2",
         ):
             self.assertIn(
                 module_version,
@@ -1652,7 +1652,7 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=upload-unified-v1",
+            "/static/js/dispatch/workspace.mjs?v=upload-unified-v2",
             self.html,
         )
 
