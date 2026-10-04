@@ -1,15 +1,15 @@
 import {api, date, num} from "../shared.mjs";
-import {createDropCard} from "./dropcard.mjs";
-import {createGuideDrawer} from "./guide-drawer.mjs";
-import {createPreviousDrawer} from "./library.mjs";
-import {renderValidationPanel} from "./preflight-panel.mjs";
+import {createDropCard} from "./dropcard.mjs?v=upload-pro-v1";
+import {createGuideDrawer} from "./guide-drawer.mjs?v=upload-pro-v1";
+import {createPreviousDrawer} from "./library.mjs?v=upload-pro-v1";
+import {renderValidationPanel} from "./preflight-panel.mjs?v=upload-pro-v1";
 import {
   continueState,
   deriveCardState,
   technicalPreflightErrors,
-} from "./selectors.mjs";
-import {renderSystemBanner} from "./system-banner.mjs";
-import {createValidationDrawer} from "./validation-report.mjs";
+} from "./selectors.mjs?v=upload-pro-v1";
+import {renderSystemBanner} from "./system-banner.mjs?v=upload-pro-v1";
+import {createValidationDrawer} from "./validation-report.mjs?v=upload-pro-v1";
 
 const MAX_BYTES = 10 * 1024 * 1024;
 
