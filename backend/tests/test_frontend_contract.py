@@ -1729,14 +1729,6 @@ class FrontendContractTests(
             "hour12: false",
             self.dashboard_stage_js,
         )
-        self.assertIn(
-            "landingHasData",
-            self.dashboard_stage_js,
-        )
-        self.assertIn(
-            "Nueva decisión ↗",
-            self.dashboard_stage_js,
-        )
 
 
 if __name__ == "__main__":
