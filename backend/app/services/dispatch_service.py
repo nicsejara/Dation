@@ -2,6 +2,7 @@
 import asyncio
 from datetime import datetime, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 import hashlib
 import json
 from time import perf_counter
@@ -61,6 +62,30 @@ REPORT_VALIDATORS = {
     "orders": validate_orders_report,
     "fleet": validate_fleet_report,
 }
+
+CANONICAL_TIMEZONE = ZoneInfo("America/Argentina/Cordoba")
+CANONICAL_PREFIXES = {
+    "orders": "Orders",
+    "fleet": "Fleet",
+}
+
+
+def canonical_filename(
+    kind: str,
+    *,
+    now: datetime | None = None,
+) -> str:
+    if kind not in CANONICAL_PREFIXES:
+        raise ValueError("Tipo de dataset inválido.")
+
+    instant = now or datetime.now(CANONICAL_TIMEZONE)
+    if instant.tzinfo is None:
+        instant = instant.replace(tzinfo=CANONICAL_TIMEZONE)
+    else:
+        instant = instant.astimezone(CANONICAL_TIMEZONE)
+
+    timestamp = instant.strftime("%Y%m%d_%H%M%S")
+    return f"{CANONICAL_PREFIXES[kind]}_{timestamp}.csv"
 
 
 async def db(method, path, *, params=None, body=None):
@@ -179,7 +204,7 @@ async def system_status():
         "datasets",
         {
             "select": (
-                "id,dataset_type,schema_version,label,is_default,"
+                "id,dataset_type,schema_version,label,canonical_filename,is_default,"
                 "parent_dataset_id,profile_json,archived_at,is_sample"
             ),
             "limit": "0",
@@ -366,7 +391,10 @@ async def list_typed(kind, limit=100, offset=0, q=None, include_archived=False):
         safe = q.replace("*", "").replace(",", " ").strip()
         if safe:
             params["or"] = (
-                f"(label.ilike.*{safe}*,original_filename.ilike.*{safe}*)"
+                (
+                f"(canonical_filename.ilike.*{safe}*,"
+                f"label.ilike.*{safe}*,original_filename.ilike.*{safe}*)"
+            )
             )
 
     rows = await db("GET", "datasets", params=params)
@@ -448,7 +476,8 @@ async def store_input(
         }
 
     dataset_id = str(uuid4())
-    storage_path = f"{dataset_id}/{kind}.csv"
+    canonical_name = canonical_filename(kind)
+    storage_path = f"{dataset_id}/{canonical_name}"
     url = (
         f"{SUPABASE_URL}/storage/v1/object/"
         f"{SUPABASE_INPUT_BUCKET}/{quote(storage_path, safe='/')}"
@@ -471,6 +500,7 @@ async def store_input(
                 body={
                     "id": dataset_id,
                     "original_filename": filename,
+                    "canonical_filename": canonical_name,
                     "storage_bucket": SUPABASE_INPUT_BUCKET,
                     "storage_path": storage_path,
                     "mime_type": "text/csv",
