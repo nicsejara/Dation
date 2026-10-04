@@ -862,7 +862,7 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "/static/css/dda-logistics-upload.css?v=hero-upload-v1",
+            "/static/css/dda-logistics-upload.css?v=hero-upload-v2",
             self.html,
         )
         self.assertIn(
@@ -1013,6 +1013,26 @@ class FrontendContractTests(
                 selector,
                 upload_css,
             )
+
+        for polish in (
+            "min-height:76px",
+            "width:104px",
+            "min-width:104px",
+            "margin-top:auto",
+            "color:#eef7f9",
+            "color:#ffffff",
+            "font-size:10.5px",
+            "align-self:flex-start",
+        ):
+            self.assertIn(
+                polish,
+                upload_css,
+            )
+
+        self.assertIn(
+            ".dispatch-pro-how-reuse-link:visited",
+            upload_css,
+        )
 
         for copy in (
             "Cargá tus dos archivos para validar.",
