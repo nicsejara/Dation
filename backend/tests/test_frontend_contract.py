@@ -356,7 +356,7 @@ class FrontendContractTests(
             self.dashboard_stage_js,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=workspace-nav-v2",
+            "/static/js/dispatch/workspace.mjs?v=hero-upload-v1",
             self.html,
         )
         self.assertIn(
@@ -782,7 +782,7 @@ class FrontendContractTests(
             explanation,
         )
         self.assertIn(
-            "workspace-nav-v2",
+            "hero-upload-v1",
             self.html,
         )
 
@@ -862,11 +862,11 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "/static/css/dda-logistics-upload.css?v=workspace-nav-v2",
+            "/static/css/dda-logistics-upload.css?v=hero-upload-v1",
             self.html,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=workspace-nav-v2",
+            "/static/js/dispatch/workspace.mjs?v=hero-upload-v1",
             self.html,
         )
         self.assertIn(
@@ -874,7 +874,7 @@ class FrontendContractTests(
             workspace,
         )
         self.assertIn(
-            "./upload/index.mjs?v=workspace-nav-v2",
+            "./upload/index.mjs?v=hero-upload-v1",
             workspace,
         )
         self.assertIn(
@@ -892,20 +892,42 @@ class FrontendContractTests(
 
         for copy in (
             "Cargá tus datos y habilitá tu mapa de decisiones.",
-            "PASO 1 · DATOS",
-            "DATION · CARGA DE DATOS",
-            "Data Pack: los archivos que alimentan tus decisiones.",
-            "0 de 2 archivos listos",
+            "Paso ",
+            "Carga de datos",
+            "Tu ",
+            "Data Pack",
+            "son los archivos que alimentan tus decisiones: Órdenes y Flota.",
+            "Subilos o reutilizá una carga anterior, y Dation los valida automáticamente.",
+            "Vas a cargar",
+            "Órdenes",
+            "Flota",
             "DESCARGÁ",
             "COMPLETÁ",
-            "SUBÍ Y VALIDÁ",
-            "Elegí cómo cargar tus datos.",
+            "SUBÍ",
+            "Dation valida tus archivos automáticamente.",
+            "¿Ya cargaste datos antes? ",
+            "Reutilizalos →",
             "Tu Decision Case está listo.",
             "Ir al mapa de decisiones →",
             "Revisar mis datos",
         ):
             self.assertIn(
                 copy,
+                upload_index,
+            )
+
+        for removed_copy in (
+            "Volver a DDA Logística",
+            "DDA LOGÍSTICA",
+            "DATION · CARGA DE DATOS",
+            "PASO 1 · DATOS",
+            "0 de 2 archivos listos",
+            "SUBÍ Y VALIDÁ",
+            "Dation revisa todo antes de seguir.",
+            "Empezá con los mínimos y sumá el resto cuando quieras.",
+        ):
+            self.assertNotIn(
+                removed_copy,
                 upload_index,
             )
 
@@ -956,6 +978,41 @@ class FrontendContractTests(
             "dispatch-pro-preview-chain",
             upload_index,
         )
+        self.assertIn(
+            'hero.reuseLink.addEventListener("click", openReuseMode)',
+            upload_index,
+        )
+        self.assertIn(
+            'refs[kind]?.setMode("reuse")',
+            upload_index,
+        )
+        self.assertIn(
+            "window.DationDdaFlow",
+            upload_index,
+        )
+
+        for token in (
+            "--upload-hero-title",
+            "--upload-hero-body",
+            "--upload-hero-secondary",
+            "--upload-hero-teal",
+            "--upload-hero-chip",
+        ):
+            self.assertIn(
+                token,
+                upload_css,
+            )
+
+        for selector in (
+            ".dispatch-pro-how-title",
+            ".dispatch-pro-how-reuse-link",
+            ".dispatch-pro-hero-chip-prefix",
+            ".dispatch-pro-hero-file-chip",
+        ):
+            self.assertIn(
+                selector,
+                upload_css,
+            )
 
         for copy in (
             "Cargá tus dos archivos para validar.",
@@ -1473,9 +1530,17 @@ class FrontendContractTests(
             "window.dationRenderWorkspaceNav",
             self.html,
         )
+        self.assertIn(
+            "/static/js/dda-workflow-config.js?v=hero-upload-v1",
+            self.html,
+        )
+        self.assertIn(
+            "workflowStep('data'",
+            self.html,
+        )
 
         for label in (
-            "Cargar y validar datos",
+            "Carga de datos",
             "Mapa de decisiones",
             "Configurar decisión",
             "Dashboard",
@@ -1566,7 +1631,7 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=workspace-nav-v2",
+            "/static/js/dispatch/workspace.mjs?v=hero-upload-v1",
             self.html,
         )
 
