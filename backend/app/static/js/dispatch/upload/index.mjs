@@ -60,6 +60,18 @@ function domainRows(kind, rows) {
   return `${amount} ${Number(rows) === 1 ? "vehículo" : "vehículos"}`;
 }
 
+function shortDateTime(value) {
+  if (!value) return null;
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return new Intl.DateTimeFormat("es-AR", {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(parsed);
+}
+
 function dropTitle(kind) {
   return kind === "orders"
     ? "Arrastrá tu archivo de órdenes"
@@ -728,9 +740,7 @@ export async function mountUploadScreen(
         el(
           "small",
           [
-            item.created_at
-              ? date(item.created_at.slice(0, 10))
-              : null,
+            shortDateTime(item.created_at),
             domainRows(kind, item.row_count),
           ].filter(Boolean).join(" · "),
         ),
