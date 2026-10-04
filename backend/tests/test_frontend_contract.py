@@ -356,7 +356,7 @@ class FrontendContractTests(
             self.dashboard_stage_js,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=upload-unified-v2",
+            "/static/js/dispatch/workspace.mjs?v=upload-finalbar-v1",
             self.html,
         )
         self.assertIn(
@@ -862,15 +862,15 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "/static/css/dda-logistics-upload.css?v=upload-unified-v3",
+            "/static/css/dda-logistics-upload.css?v=upload-finalbar-v1",
             self.html,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=upload-unified-v2",
+            "/static/js/dispatch/workspace.mjs?v=upload-finalbar-v1",
             self.html,
         )
         self.assertIn(
-            "./upload/index.mjs?v=upload-unified-v2",
+            "./upload/index.mjs?v=upload-finalbar-v1",
             workspace,
         )
 
@@ -1025,6 +1025,42 @@ class FrontendContractTests(
             "dispatch-pro-sticky",
             upload_index,
         )
+
+        for final_copy in (
+            "Datos pendientes",
+            "Datos listos",
+            "Datos listos · con avisos",
+            "Datos por corregir",
+            "Seleccioná tu próxima decisión",
+            "PRÓXIMA ETAPA",
+            "Ir al mapa de decisiones →",
+            "Todo listo para continuar.",
+        ):
+            self.assertIn(
+                final_copy,
+                upload_index,
+            )
+
+        for removed_final_copy in (
+            "Faltan 2 archivos",
+            "Revisar mis datos",
+            "ESTO VAS A VER",
+        ):
+            self.assertNotIn(
+                removed_final_copy,
+                upload_index,
+            )
+
+        for final_selector in (
+            ".dispatch-pro-final-status",
+            ".dispatch-pro-next-button",
+            ".dispatch-pro-next-stage",
+            ".dispatch-pro-next-stage-icon",
+        ):
+            self.assertIn(
+                final_selector,
+                upload_css,
+            )
 
         for history_copy in (
             "Historial completo de Órdenes",
@@ -1664,7 +1700,7 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=upload-unified-v2",
+            "/static/js/dispatch/workspace.mjs?v=upload-finalbar-v1",
             self.html,
         )
 
