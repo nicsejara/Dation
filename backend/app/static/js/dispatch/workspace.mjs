@@ -1,5 +1,5 @@
 import {esc,num,date,vehicle,api,post,errorBox} from './shared.mjs';import {rebalance} from './selectors.mjs';import {render as dashboard} from './dashboard.mjs?v=decision-map-nodal-v1';
-import {mountUploadScreen} from './upload/index.mjs?v=hero-upload-v1';
+import {mountUploadScreen} from './upload/index.mjs?v=hero-upload-v3';
 import {renderDecisionMap} from './decision-map.mjs?v=decision-map-nodal-v1';
 import {STATUS,createDecisionCase,replaceInputs,transitionNode,inputSignature,caseRef,deriveDecisionNodes} from './decision-case.mjs';
 const KEY='dation.dispatch.workspace.v4';
