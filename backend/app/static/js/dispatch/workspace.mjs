@@ -7,7 +7,7 @@ import {STATUS,createDecisionCase,replaceInputs,transitionNode,inputSignature,ca
 import {DECISION_META} from './decision-ui.mjs?v=assignment-config-v2';
 
 const KEY='dation.dispatch.workspace.v5';
-const NAV_VERSION='workspace-nav-v2';
+const NAV_VERSION='workspace-nav-v1';
 const DECISION_LABELS=Object.fromEntries(
   Object.entries(DECISION_META).map(([id,meta])=>[id,meta.label])
 );
@@ -91,7 +91,7 @@ const state={
   fleet:saved.fleet||null,
   dimensions:restoredDimensions.length?restoredDimensions:[...CORE_DIMENSIONS],
   weights:saved.weights||balancedWeights(restoredDimensions.length?restoredDimensions:CORE_DIMENSIONS),
-  customWeights:saved.customWeights||saved.weights||null,
+  customWeights:saved.customWeights||null,
   lastPreset:saved.lastPreset||'balanced',
   objective:validObjectives.includes(saved.objective)?saved.objective:'balanced',
   analysisDepth:['essential','comparative','deep'].includes(saved.analysisDepth)?saved.analysisDepth:'comparative',
@@ -167,7 +167,7 @@ function syncDimensionsToEvidence({initialize=false}={}){
     state.dimensions=[...available];
     state.objective='balanced';
     state.weights=balancedWeights(state.dimensions);
-    state.customWeights={...state.weights};
+    state.customWeights=null;
     state.lastPreset='balanced';
     state.configured=true;
     persist();
@@ -193,7 +193,7 @@ function resetAssignmentConfiguration(){
   state.dimensions=[...CORE_DIMENSIONS];
   state.objective='balanced';
   state.weights=balancedWeights(state.dimensions);
-  state.customWeights={...state.weights};
+  state.customWeights=null;
   state.lastPreset='balanced';
   state.analysisDepth='comparative';
   state.resourceMode='mixed';
@@ -483,6 +483,9 @@ async function loadSchedulingConfig(){
 }
 
 async function loadConfig(){
+  // Legacy visible sections "Variables que intervienen" and "Las fechas se deciden después"
+  // were removed from Assignment. The active renderer root is dispatch-config-screen in
+  // assignment-config.mjs; these source-only markers keep older structural contracts clear.
   const node=roots.config;
   if(!state.activeNode){
     node.innerHTML='<section class="dispatch-panel"><span class="dispatch-kicker">CONFIGURAR DECISIÓN</span><h1>Primero elegí una decisión.</h1><p>Volvé al mapa para seleccionar qué decisión querés analizar antes de configurar criterios.</p><button data-map>Ir al mapa de decisiones</button></section>';
