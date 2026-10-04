@@ -1343,14 +1343,16 @@
 
         var selected = Boolean(decisionSelection.id);
         var runReady = Boolean(selected && decisionSelection.hasRun);
-        var showContext = (
-          selected
-          && (
-            currentView === 'logistics-config'
-            || currentView === 'decision-dashboard'
-          )
-        );
-        var contextLabel = showContext ? decisionSelection.label : null;
+        var configContext = (
+          selected && currentView === 'logistics-config'
+        )
+          ? decisionSelection.label
+          : null;
+        var dashboardContext = (
+          selected && currentView === 'decision-dashboard'
+        )
+          ? decisionSelection.label
+          : null;
 
         var steps = [
           {
@@ -1379,7 +1381,7 @@
             view: 'logistics-config',
             disabled: !dataReady || !selected,
             completed: runReady,
-            context: contextLabel,
+            context: configContext,
             onClick: function () {
               window.dationNavigate('logistics-config');
             }
@@ -1390,7 +1392,7 @@
             view: 'decision-dashboard',
             disabled: !runReady,
             completed: false,
-            context: contextLabel,
+            context: dashboardContext,
             onClick: function () {
               if (
                 window.DationDispatch
