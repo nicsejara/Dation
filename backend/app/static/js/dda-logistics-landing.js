@@ -343,26 +343,6 @@
   }
 
 
-  function syncPrimaryCopy(container){
-    var saved=savedWorkspace();
-    var dataReady=hasData(saved);
-
-    container.querySelectorAll(
-      "[data-dda-data-cta]"
-    ).forEach(function(button){
-      if(button.dataset.mode==="latest")return;
-
-      var text=(
-        dataReady
-          ?"Iniciar nueva decisión "
-          :"Cargar mis datos "
-      );
-
-      if(button.firstChild){
-        button.firstChild.nodeValue=text;
-      }
-    });
-  }
 
   function scrollToDecisionMap(){
     var target=document.getElementById(
@@ -406,6 +386,15 @@
     });
 
     container.querySelectorAll(
+      "[data-scroll-decision-map]"
+    ).forEach(function(button){
+      button.addEventListener(
+        "click",
+        scrollToDecisionMap
+      );
+    });
+
+    container.querySelectorAll(
       "[data-node-action]"
     ).forEach(function(button){
       button.addEventListener("click",function(){
@@ -424,7 +413,6 @@
   function refresh(container){
     renderVariables(container);
     syncDecisionMap(container);
-    syncPrimaryCopy(container);
   }
 
   function boot(){
