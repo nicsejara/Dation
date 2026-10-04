@@ -43,14 +43,54 @@ export const DECISION_META = Object.freeze({
 });
 
 export const STATUS_UI = Object.freeze({
-  available: Object.freeze({label:"Disponible",icon:"playCircle",tone:"available",description:"La decisión puede configurarse ahora."}),
-  running: Object.freeze({label:"Procesando",icon:"loader",tone:"running",description:"Dation está procesando esta decisión."}),
-  review: Object.freeze({label:"Requiere revisión",icon:"alertTriangle",tone:"review",description:"El resultado está listo para revisar."}),
-  approved: Object.freeze({label:"Aprobada",icon:"checkCircle",tone:"approved",description:"La decisión fue aprobada y queda registrada en el caso."}),
-  locked: Object.freeze({label:"En espera",icon:"clock",tone:"waiting",description:"Se habilita cuando se cumple la dependencia anterior."}),
-  needs_data: Object.freeze({label:"En espera",icon:"clock",tone:"waiting",description:"Necesita completar datos antes de continuar."}),
-  error: Object.freeze({label:"Requiere revisión",icon:"alertTriangle",tone:"review",description:"La ejecución necesita revisión antes de continuar."}),
-  stale: Object.freeze({label:"Requiere revisión",icon:"alertTriangle",tone:"review",description:"Los datos cambiaron y la decisión debe revisarse."}),
+  available: Object.freeze({
+    label: "Disponible",
+    icon: "playCircle",
+    tone: "available",
+    description: "La decisión puede configurarse ahora.",
+  }),
+  running: Object.freeze({
+    label: "Procesando",
+    icon: "loader",
+    tone: "running",
+    description: "Dation está procesando esta decisión.",
+  }),
+  review: Object.freeze({
+    label: "Requiere revisión",
+    icon: "alertTriangle",
+    tone: "review",
+    description: "El resultado está listo para revisar.",
+  }),
+  approved: Object.freeze({
+    label: "Aprobada",
+    icon: "checkCircle",
+    tone: "approved",
+    description: "La decisión fue aprobada y queda registrada en el caso.",
+  }),
+  locked: Object.freeze({
+    label: "En espera",
+    icon: "clock",
+    tone: "waiting",
+    description: "Se habilita cuando se cumple la dependencia anterior.",
+  }),
+  needs_data: Object.freeze({
+    label: "En espera",
+    icon: "clock",
+    tone: "waiting",
+    description: "Necesita completar datos antes de continuar.",
+  }),
+  error: Object.freeze({
+    label: "Requiere revisión",
+    icon: "alertTriangle",
+    tone: "review",
+    description: "La ejecución necesita revisión antes de continuar.",
+  }),
+  stale: Object.freeze({
+    label: "Requiere revisión",
+    icon: "alertTriangle",
+    tone: "review",
+    description: "Los datos cambiaron y la decisión debe revisarse.",
+  }),
 });
 
 const ICONS = Object.freeze({
