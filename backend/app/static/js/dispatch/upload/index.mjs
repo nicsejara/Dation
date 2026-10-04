@@ -76,67 +76,86 @@ function clientFileProblem(file) {
   return null;
 }
 
+function workflowStep(id, fallback) {
+  const steps = (
+    window.DationDdaFlow
+    && Array.isArray(window.DationDdaFlow.steps)
+  )
+    ? window.DationDdaFlow.steps
+    : [];
+  return steps.find((step) => step.id === id) || fallback;
+}
+
 function makeHero() {
   const hero = el("section", null, "dispatch-pro-hero");
   hero.dataset.reveal = "";
 
   const copy = el("div", null, "dispatch-pro-hero-copy");
-  const back = document.createElement("button");
-  back.type = "button";
-  back.className = "dispatch-pro-back";
-  back.append(icon("back"), document.createTextNode("Volver a DDA Logística"));
-  back.onclick = () => window.dationNavigate?.("logistics-overview");
-
-  const badges = el("div", null, "dispatch-pro-hero-badges");
-  badges.append(
-    el("span", "DDA LOGÍSTICA", "dispatch-pro-hero-badge"),
-    el("span", "PASO 1 · DATOS", "dispatch-pro-hero-badge is-step"),
+  const dataStep = workflowStep(
+    "data",
+    {number: 1, label: "Carga de datos"},
   );
 
-  copy.append(
-    back,
-    badges,
-    el("span", "DATION · CARGA DE DATOS", "dispatch-pro-eyebrow is-on-dark"),
-    el("h1", "Cargá tus datos y habilitá tu mapa de decisiones."),
-    el(
-      "p",
-      "Subí tu Data Pack o reutilizá uno que ya cargaste. Dation lo valida y te abre el mapa de decisiones.",
-      "dispatch-pro-hero-lead",
-    ),
-    el(
-      "p",
-      "Data Pack: los archivos que alimentan tus decisiones. Empezá con los mínimos y sumá el resto cuando quieras.",
-      "dispatch-pro-datapack-definition",
+  const badge = el(
+    "span",
+    `Paso ${dataStep.number}: ${dataStep.label}`,
+    "dispatch-pro-hero-badge is-step",
+  );
+
+  const title = el(
+    "h1",
+    "Cargá tus datos y habilitá tu mapa de decisiones.",
+  );
+
+  const lead = el("p", null, "dispatch-pro-hero-lead");
+  lead.append(
+    document.createTextNode("Tu "),
+    el("strong", "Data Pack"),
+    document.createTextNode(
+      " son los archivos que alimentan tus decisiones: Órdenes y Flota. "
+      + "Subilos o reutilizá una carga anterior, y Dation los valida automáticamente.",
     ),
   );
 
   const fileChips = el("div", null, "dispatch-pro-hero-file-chips");
-  const ordersChip = el("span", "Órdenes");
-  ordersChip.className = "is-orders";
-  const fleetChip = el("span", "Flota");
-  fleetChip.className = "is-fleet";
-  fileChips.append(ordersChip, fleetChip);
-
-  const status = el("div", null, "dispatch-pro-hero-status is-pending");
-  status.append(
-    el("i", ""),
-    el("span", "0 de 2 archivos listos"),
+  const prefix = el(
+    "span",
+    "Vas a cargar",
+    "dispatch-pro-hero-chip-prefix",
   );
-  copy.append(fileChips, status);
+
+  const ordersChip = el("span", null, "dispatch-pro-hero-file-chip is-orders");
+  ordersChip.append(
+    icon("orders"),
+    document.createTextNode("Órdenes"),
+  );
+
+  const fleetChip = el("span", null, "dispatch-pro-hero-file-chip is-fleet");
+  fleetChip.append(
+    icon("fleet"),
+    document.createTextNode("Flota"),
+  );
+
+  fileChips.append(prefix, ordersChip, fleetChip);
+  copy.append(badge, title, lead, fileChips);
 
   const visual = el("div", null, "dispatch-pro-hero-visual");
   const watermark = document.createElement("img");
-  watermark.src = "/static/assets/dda-logistics.svg?v=upload-pro-v1";
+  watermark.src = "/static/assets/dda-logistics.svg?v=hero-upload-v1";
   watermark.alt = "";
   watermark.className = "dispatch-pro-hero-watermark";
 
   const panel = el("div", null, "dispatch-pro-how-panel");
-  panel.append(el("span", "CÓMO FUNCIONA", "dispatch-pro-eyebrow is-on-dark"));
+  const panelTitle = el("div", null, "dispatch-pro-how-title");
+  panelTitle.append(
+    el("span", "CÓMO FUNCIONA"),
+  );
+  panel.append(panelTitle);
 
   [
     ["1", "DESCARGÁ", "La plantilla con el formato correcto.", "download"],
     ["2", "COMPLETÁ", "Solo lo mínimo. Lo opcional puede esperar.", "table"],
-    ["3", "SUBÍ Y VALIDÁ", "Dation revisa todo antes de seguir.", "shield"],
+    ["3", "SUBÍ", "Dation valida tus archivos automáticamente.", "shield"],
   ].forEach(([number, label, description, iconName], index) => {
     const node = el("div", null, "dispatch-pro-how-node");
     const iconWrap = el("span", null, "dispatch-pro-how-icon");
@@ -148,32 +167,24 @@ function makeHero() {
     );
     node.append(iconWrap, text);
     panel.append(node);
-    if (index < 2) panel.append(el("span", "", "dispatch-pro-how-connector"));
+    if (index < 2) {
+      panel.append(el("span", "", "dispatch-pro-how-connector"));
+    }
   });
 
   const history = el("div", null, "dispatch-pro-how-history");
-  history.append(
-    icon("history"),
-    el("span", "¿Ya cargaste datos antes? Podés reutilizarlos."),
-  );
+  const historyCopy = el("span", "¿Ya cargaste datos antes? ");
+  const reuseLink = document.createElement("a");
+  reuseLink.href = "#dispatch-data-pack";
+  reuseLink.className = "dispatch-pro-how-reuse-link";
+  reuseLink.textContent = "Reutilizalos →";
+  history.append(icon("history"), historyCopy, reuseLink);
+
   panel.append(history);
   visual.append(watermark, panel);
   hero.append(copy, visual);
 
-  function update(readyCount, busy) {
-    const statusCopy = status.querySelector("span");
-    status.className = (
-      "dispatch-pro-hero-status "
-      + (readyCount === 2
-        ? "is-ready"
-        : busy || readyCount
-          ? "is-progress"
-          : "is-pending")
-    );
-    statusCopy.textContent = `${readyCount} de 2 archivos listos`;
-  }
-
-  return {hero, update};
+  return {hero, reuseLink};
 }
 
 function makeDataPackHeader() {
@@ -457,6 +468,17 @@ export async function mountUploadScreen(
     dataPack.scrollIntoView({behavior: "smooth", block: "start"});
   }
 
+  function openReuseMode(event) {
+    event?.preventDefault();
+    ["orders", "fleet"].forEach((kind) => {
+      refs[kind]?.setMode("reuse");
+      renderPreviousInline(kind);
+    });
+    scrollToData();
+  }
+
+  hero.reuseLink.addEventListener("click", openReuseMode);
+
   function firstProblemKind() {
     for (const kind of ["orders", "fleet"]) {
       const report = reportFor(kind);
@@ -520,11 +542,6 @@ export async function mountUploadScreen(
     return "pending";
   }
 
-  function readyCount() {
-    return ["orders", "fleet"].filter((kind) => (
-      state[kind] && reportFor(kind)?.valid
-    )).length;
-  }
 
   function warningCount() {
     return ["orders", "fleet"].reduce(
@@ -591,9 +608,6 @@ export async function mountUploadScreen(
     sticky.update(result, context);
     sticky.bar.hidden = sticky.bar.hidden || local.finalVisible;
 
-    const count = readyCount();
-    const busy = local.phases.orders !== "idle" || local.phases.fleet !== "idle";
-    hero.update(count, busy);
     window.dationSetDataReady(Boolean(result.enabled));
     return result;
   }
