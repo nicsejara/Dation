@@ -39,6 +39,8 @@ const DIMENSION_LABELS={
   own_fleet:'Uso de flota propia',
   co2:'Emisiones CO₂',
 };
+// "Profundidad del análisis" is rendered by assignment-config.mjs; workspace
+// owns and persists the analysis_depth value used by the execution contract.
 const DEPTH_LABELS={
   essential:'Esencial',
   comparative:'Comparativo',
