@@ -4872,7 +4872,7 @@ body.dispatch-result #chat-panel{
   outline-offset:3px;
 }
 
-@media(max-width:1180px){
+@media(max-width:1099px){
   .dispatch-map-casebar{
     grid-template-columns:1fr 1fr;
   }
