@@ -94,35 +94,38 @@
   }
 
   function renderVariables(container){
-    Object.keys(ENGINE_VARIABLES).forEach(function(group){
-      var target=container.querySelector(
-        '[data-variable-group="'+group+'"]'
-      );
-      if(!target)return;
+    var target=container.querySelector(
+      "[data-variables-inline]"
+    );
+    if(!target)return;
 
-      var isActive=group==="active";
-      target.innerHTML=ENGINE_VARIABLES[group]
-        .map(function(item){
-          return (
-            '<article class="dda-landing__variable '
-            +(isActive?"is-active":"is-consolidating")
-            +'" title="'
-            +(isActive
-              ?"Activa en el motor"
-              :"Se suma a medida que se consolide")
-            +'">'
-              +'<span class="dda-landing__variable-icon">'
-                +iconMarkup(isActive?"dda-i-check-circle":item.icon)
-              +'</span>'
-              +'<div>'
-                +'<strong>'+item.label+'</strong>'
-                +'<small>'+item.description+'</small>'
-              +'</div>'
-            +'</article>'
-          );
+    var items=[]
+      .concat(
+        ENGINE_VARIABLES.active.map(function(item){
+          return Object.assign({},item,{state:"active"});
+        }),
+        ENGINE_VARIABLES.consolidating.map(function(item){
+          return Object.assign({},item,{state:"inactive"});
         })
-        .join("");
-    });
+      );
+
+    target.innerHTML=items.map(function(item){
+      var active=item.state==="active";
+      return (
+        '<span class="dda-landing__variable-pill '
+        +(active?"is-active":"is-inactive")
+        +'" title="'+item.description+'">'
+          +'<span class="dda-landing__variable-pill-icon">'
+            +iconMarkup(
+              active
+                ?"dda-i-check-circle"
+                :"dda-i-clock"
+            )
+          +'</span>'
+          +'<strong>'+item.label+'</strong>'
+        +'</span>'
+      );
+    }).join("");
   }
 
   function enhanceReveal(container){
@@ -339,52 +342,6 @@
     });
   }
 
-  function syncProgress(container){
-    var saved=savedWorkspace();
-    var steps=container.querySelectorAll(
-      "[data-process-step]"
-    );
-
-    steps.forEach(function(step){
-      step.classList.remove("is-current");
-      step.removeAttribute("aria-current");
-    });
-
-    if(
-      !saved
-      ||!saved.decisionCase
-    ){
-      return;
-    }
-
-    var nodes=decisionNodes(saved);
-    var statuses=Object.keys(nodes).map(function(key){
-      return nodes[key]&&nodes[key].status;
-    });
-
-    var current=(
-      statuses.some(function(status){
-        return [
-          "running",
-          "review",
-          "approved",
-          "error",
-          "stale"
-        ].includes(status);
-      })
-        ?4
-        :3
-    );
-
-    var active=container.querySelector(
-      '[data-process-step="'+current+'"]'
-    );
-
-    if(active){
-      active.classList.add("is-current");
-      active.setAttribute("aria-current","step");
-    }
-  }
 
   function syncPrimaryCopy(container){
     var saved=savedWorkspace();
@@ -407,9 +364,9 @@
     });
   }
 
-  function scrollToExample(){
+  function scrollToDecisionMap(){
     var target=document.getElementById(
-      "dda-logistics-example-result"
+      "dda-logistics-decision-map"
     );
 
     if(target){
@@ -420,28 +377,8 @@
     }
   }
 
-  function downloadExampleCsv(){
-    var csv=[
-      "trip_id,orders,capacity_utilization,vehicle",
-      "TRIP-01,ORD-001|ORD-004|ORD-008|ORD-011,0.86,VEH-003",
-      "TRIP-02,ORD-002|ORD-006|ORD-014,0.81,VEH-007",
-      "TRIP-03,ORD-003|ORD-009|ORD-015|ORD-021,0.84,VEH-002",
-      "TRIP-04,ORD-005|ORD-010|ORD-018,0.79,VEH-004"
-    ].join("\n");
+  window.dationScrollToDecisionMap=scrollToDecisionMap;
 
-    var blob=new Blob(
-      [csv],
-      {type:"text/csv;charset=utf-8"}
-    );
-    var url=URL.createObjectURL(blob);
-    var anchor=document.createElement("a");
-    anchor.href=url;
-    anchor.download="dation-ejemplo-asignacion.csv";
-    document.body.appendChild(anchor);
-    anchor.click();
-    anchor.remove();
-    URL.revokeObjectURL(url);
-  }
 
   function bindActions(container){
     container.querySelectorAll(
@@ -469,15 +406,6 @@
     });
 
     container.querySelectorAll(
-      "[data-scroll-example]"
-    ).forEach(function(button){
-      button.addEventListener(
-        "click",
-        scrollToExample
-      );
-    });
-
-    container.querySelectorAll(
       "[data-node-action]"
     ).forEach(function(button){
       button.addEventListener("click",function(){
@@ -491,21 +419,11 @@
       });
     });
 
-    var csv=container.querySelector(
-      "[data-example-csv]"
-    );
-    if(csv){
-      csv.addEventListener(
-        "click",
-        downloadExampleCsv
-      );
-    }
   }
 
   function refresh(container){
     renderVariables(container);
     syncDecisionMap(container);
-    syncProgress(container);
     syncPrimaryCopy(container);
   }
 
