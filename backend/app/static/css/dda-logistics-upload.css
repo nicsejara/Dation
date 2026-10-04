@@ -47,67 +47,6 @@
   color:#8fd5d7;
 }
 
-/* Process stepper */
-.dispatch-pro-stepper{
-  position:sticky;
-  top:calc(var(--topbar-height) + 8px);
-  z-index:32;
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:8px;
-  padding:8px;
-  border:1px solid rgba(220,231,234,.92);
-  border-radius:14px;
-  background:rgba(255,255,255,.92);
-  box-shadow:0 10px 28px rgba(15,45,58,.07);
-  backdrop-filter:blur(16px);
-}
-
-.dispatch-pro-step{
-  display:flex;
-  min-height:36px;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  border-radius:9px;
-  color:#768891;
-  font-size:12px;
-  font-weight:750;
-}
-
-.dispatch-pro-step i{
-  display:grid;
-  width:20px;
-  height:20px;
-  place-items:center;
-  border:1px solid #d4dfe3;
-  border-radius:50%;
-  background:#fff;
-  font-size:9px;
-  font-style:normal;
-}
-
-.dispatch-pro-step.is-current{
-  color:#0e6d73;
-  background:#eaf6f5;
-}
-
-.dispatch-pro-step.is-current i{
-  border-color:#137d83;
-  color:#fff;
-  background:#137d83;
-}
-
-.dispatch-pro-step.is-done{
-  color:#476a72;
-}
-
-.dispatch-pro-step.is-done i{
-  border-color:#a8d7cf;
-  color:#0d765e;
-  background:#e5f5ef;
-}
-
 /* Compact hero */
 .dispatch-pro-hero{
   position:relative;
@@ -1591,16 +1530,6 @@
 @media(max-width:700px){
   .dispatch-upload-pro{
     padding-bottom:130px;
-  }
-
-  .dispatch-pro-stepper{
-    grid-template-columns:repeat(4,max-content);
-    justify-content:start;
-    overflow-x:auto;
-  }
-
-  .dispatch-pro-step{
-    padding:0 9px;
   }
 
   .dispatch-pro-hero{
