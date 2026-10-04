@@ -49,7 +49,7 @@ export function createValidationDrawer() {
     const groups = groupProblems(report);
     if (!groups.length) {
       content.append(
-        el("p", "No hay problemas técnicos para revisar."),
+        el("p", "No hay problemas para revisar."),
       );
       return;
     }
@@ -90,7 +90,7 @@ export function createValidationDrawer() {
         [
           item.row ?? "—",
           item.column ?? "—",
-          item.message || item.detail || "Problema de validación",
+          item.message || item.detail || "Dato para revisar",
           item.value ?? "—",
           item.hint || "Revisá el dato informado.",
         ].forEach((value) => row.append(el("td", value)));
