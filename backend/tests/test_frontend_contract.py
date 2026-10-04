@@ -782,7 +782,7 @@ class FrontendContractTests(
             explanation,
         )
         self.assertIn(
-            "upload-pro-v1",
+            "workspace-nav-v2",
             self.html,
         )
 
