@@ -1,30 +1,20 @@
 import {esc} from './shared.mjs';
-
-const META={
-  logistics_assignment:{index:'01',label:'Assignment'},
-  logistics_scheduling:{index:'02',label:'Planificación'},
-  logistics_final_assignment:{index:'03',label:'Asignación final'},
-};
-
-const STATUS_LABELS={
-  available:'Disponible',
-  running:'Procesando',
-  review:'En revisión',
-  approved:'Aprobada',
-  locked:'Bloqueada',
-  needs_data:'Requiere datos',
-  error:'Error',
-  stale:'Desactualizada',
-};
+import {
+  DECISION_ORDER,
+  DECISION_META,
+  statusUi,
+} from './decision-ui.mjs?v=decision-map-premium-v1';
 
 export function decisionRail(caseActions={}){
   const decisionCase=caseActions.decisionCase;
   if(!decisionCase?.nodes)return '';
 
   const activeNode=caseActions.activeNode;
-  const nodes=Object.entries(META)
-    .map(([nodeId,meta])=>{
+  const nodes=DECISION_ORDER
+    .map((nodeId)=>{
+      const meta=DECISION_META[nodeId];
       const node=decisionCase.nodes[nodeId]||{};
+      const ui=statusUi(node.status);
       const hasResult=Boolean(node.run_id);
       const canOpen=hasResult&&['review','approved','running'].includes(node.status);
       return '<button type="button" class="dispatch-decision-tab'
@@ -35,7 +25,7 @@ export function decisionRail(caseActions={}){
         +'>'
           +'<span>'+esc(meta.index)+'</span>'
           +'<div><strong>'+esc(meta.label)+'</strong>'
-          +'<small>'+esc(STATUS_LABELS[node.status]||node.status||'Pendiente')+'</small></div>'
+          +'<small>'+esc(ui.label)+'</small></div>'
           +(node.status==='approved'?'<i aria-hidden="true">✓</i>':'')
         +'</button>';
     })
