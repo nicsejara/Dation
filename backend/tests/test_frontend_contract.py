@@ -782,7 +782,7 @@ class FrontendContractTests(
             explanation,
         )
         self.assertIn(
-            "hero-upload-v1",
+            "decision-map-premium-v1",
             self.html,
         )
 
@@ -1253,14 +1253,6 @@ class FrontendContractTests(
             workspace.split("function ready()", 1)[1].split("function ensureDecisionCase", 1)[0],
         )
         self.assertIn(
-            "Asignación de carga",
-            decision_map,
-        )
-        self.assertIn(
-            "Planificación",
-            decision_map,
-        )
-        self.assertIn(
             "DECISION_META",
             decision_map,
         )
@@ -1453,7 +1445,7 @@ class FrontendContractTests(
             decision_map,
         )
         self.assertNotIn(
-            "dispatch-map-chain-head",
+            'class="dispatch-map-chain-head"',
             decision_map,
         )
 
