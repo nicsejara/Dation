@@ -30,6 +30,10 @@ function icon(name) {
     shield: '<path d="M20 13c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V5l8-3 8 3Z"/><path d="m9 12 2 2 4-4"/>',
     history: '<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/>',
     check: '<circle cx="12" cy="12" r="9"/><path d="m8 12 2.5 2.5L16 9"/>',
+    warning: '<path d="M12 3 2.5 20h19Z"/><path d="M12 9v4M12 17h.01"/>',
+    error: '<circle cx="12" cy="12" r="9"/><path d="m9 9 6 6M15 9l-6 6"/>',
+    pending: '<circle cx="12" cy="12" r="9"/>',
+    loader: '<path d="M21 12a9 9 0 1 1-3-6.7"/>',
     lock: '<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
     map: '<polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/>',
   };
@@ -787,7 +791,19 @@ export async function mountUploadScreen(
       ref.fileName.textContent = fileInfo.name;
       ref.fileState.replaceChildren();
       ref.fileState.className = `dispatch-pro-state-badge is-${cardState.tone}`;
-      ref.fileState.textContent = cardState.label;
+      const stateIconName = cardState.tone === "success"
+        ? "check"
+        : cardState.tone === "warning"
+          ? "warning"
+          : cardState.tone === "error"
+            ? "error"
+            : cardState.tone === "pending"
+              ? "pending"
+              : "loader";
+      ref.fileState.append(
+        icon(stateIconName),
+        document.createTextNode(cardState.label),
+      );
       ref.fileMeta.textContent = [
         domainRows(kind, fileInfo.rows),
         fileSize(fileInfo.size),
@@ -813,9 +829,25 @@ export async function mountUploadScreen(
 
     ref.notice.hidden = true;
     ref.notice.replaceChildren();
+    const firstError = report?.errors?.[0];
+    const firstWarning = report?.warnings?.[0];
+    const issueNotice = firstError
+      ? [
+          firstError.message || firstError.detail || "Hay un dato para corregir.",
+          firstError.column ? `Columna: ${firstError.column}.` : null,
+          firstError.hint || null,
+        ].filter(Boolean).join(" ")
+      : firstWarning
+        ? [
+            firstWarning.message || firstWarning.detail || "Hay un aviso para revisar.",
+            firstWarning.hint || "Podés continuar si no bloquea este paso.",
+          ].filter(Boolean).join(" ")
+        : null;
+
     const notice = (
       local.duplicateNotice[kind]
       || local.saveErrors[kind]
+      || issueNotice
       || (
         report?.valid
         && !state[kind]
