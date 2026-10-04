@@ -1111,7 +1111,7 @@ class FrontendContractTests(
         )
         self.assertNotIn(
             ".dispatch-pro-validation-counters",
-            upload_css.split("/* UNIFIED DATA PACK v1 */", 1)[1],
+            upload_css.split("UNIFIED DATA PACK v1", 1)[1],
         )
         self.assertNotIn(
             "makeStepper",
