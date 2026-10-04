@@ -2825,11 +2825,11 @@
 
     if (!run) {
       button.disabled = false;
-      button.dataset.mode = "example";
+      button.dataset.mode = "decision-map";
       delete button.dataset.runId;
-      button.textContent = "Ver un ejemplo de resultado ↘";
+      button.textContent = "Ver Decision Map ↘";
       meta.textContent = (
-        "Todavía no hay decisiones completadas · podés explorar un resultado de ejemplo."
+        "Todavía no hay decisiones completadas · explorá la cadena de decisiones del DDA."
       );
 
       if (
@@ -2925,17 +2925,24 @@
 
     if (
       button
-      && button.dataset.mode === "example"
+      && button.dataset.mode === "decision-map"
     ) {
-      var example = document.getElementById(
-        "dda-logistics-example-result"
-      );
+      if (
+        typeof window.dationScrollToDecisionMap
+        === "function"
+      ) {
+        window.dationScrollToDecisionMap();
+      } else {
+        var decisionMap = document.getElementById(
+          "dda-logistics-decision-map"
+        );
 
-      if (example) {
-        example.scrollIntoView({
-          behavior: "smooth",
-          block: "start"
-        });
+        if (decisionMap) {
+          decisionMap.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+          });
+        }
       }
 
       return;
@@ -2988,7 +2995,7 @@
     } finally {
       if (
         button
-        && button.dataset.mode !== "example"
+        && button.dataset.mode !== "decision-map"
       ) {
         button.textContent = (
           "Analizar mi última decisión ↗"
