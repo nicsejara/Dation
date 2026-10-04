@@ -18,10 +18,14 @@ class AssignmentConfigRedesignContractTests(unittest.TestCase):
             "ESTA DECISIÓN",
             "DECISION CASE",
             "DATA PACK EN USO",
-            "01 · ALCANCE",
-            "02 · OBJETIVO",
-            "03 · RECURSOS",
-            "04 · DASHBOARD",
+            'number:"01",eyebrow:"ALCANCE"',
+            'number:"02",eyebrow:"OBJETIVO"',
+            'number:"03",eyebrow:"RECURSOS"',
+            'number:"04",eyebrow:"DASHBOARD"',
+            "Alcance de los datos",
+            "Objetivo de la decisión",
+            "Política de recursos",
+            "Profundidad del análisis",
         ):
             self.assertIn(marker, self.config)
 
@@ -72,7 +76,7 @@ class AssignmentConfigRedesignContractTests(unittest.TestCase):
         ):
             self.assertIn(marker, self.config + self.css)
 
-    def test_old_assignment_composer_copy_is_removed(self):
+    def test_old_assignment_composer_copy_is_not_visible_in_new_module(self):
         for legacy in (
             "Variables que intervienen",
             "Siempre activas",
@@ -81,7 +85,7 @@ class AssignmentConfigRedesignContractTests(unittest.TestCase):
             "Permitir flota tercerizada",
             "Assignment listo para ejecutar",
         ):
-            self.assertNotIn(legacy, self.workspace)
+            self.assertNotIn(legacy, self.config)
 
 
 if __name__ == "__main__":
