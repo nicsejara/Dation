@@ -86,9 +86,7 @@ export function deriveCardState({
   if (errors > 0) {
     return {
       key: "error",
-      label: (
-        `⛔ ${errors} ${errors === 1 ? "problema" : "problemas"}`
-      ),
+      label: "Para corregir",
       tone: "error",
     };
   }
