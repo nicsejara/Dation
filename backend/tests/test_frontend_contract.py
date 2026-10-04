@@ -356,7 +356,7 @@ class FrontendContractTests(
             self.dashboard_stage_js,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=upload-finalbar-v1",
+            "/static/js/dispatch/workspace.mjs?v=upload-finalbar-v2",
             self.html,
         )
         self.assertIn(
@@ -862,15 +862,15 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "/static/css/dda-logistics-upload.css?v=upload-finalbar-v1",
+            "/static/css/dda-logistics-upload.css?v=upload-finalbar-v2",
             self.html,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=upload-finalbar-v1",
+            "/static/js/dispatch/workspace.mjs?v=upload-finalbar-v2",
             self.html,
         )
         self.assertIn(
-            "./upload/index.mjs?v=upload-finalbar-v1",
+            "./upload/index.mjs?v=upload-finalbar-v2",
             workspace,
         )
 
@@ -892,7 +892,7 @@ class FrontendContractTests(
             "Subí archivos nuevos o reutilizá una carga anterior.",
             "las columnas opcionales no bloquean este paso.",
             "Todo listo para continuar.",
-            "Ir al mapa de decisiones →",
+            "Seleccioná tu decisión →",
         ):
             self.assertIn(
                 copy,
@@ -1027,14 +1027,9 @@ class FrontendContractTests(
         )
 
         for final_copy in (
-            "Datos pendientes",
-            "Datos listos",
-            "Datos listos · con avisos",
-            "Datos por corregir",
-            "Seleccioná tu próxima decisión",
-            "PRÓXIMA ETAPA",
-            "Ir al mapa de decisiones →",
+            "Completá tu Data Pack.",
             "Todo listo para continuar.",
+            "Seleccioná tu decisión →",
         ):
             self.assertIn(
                 final_copy,
@@ -1045,22 +1040,30 @@ class FrontendContractTests(
             "Faltan 2 archivos",
             "Revisar mis datos",
             "ESTO VAS A VER",
+            "Datos pendientes",
+            "Datos listos · con avisos",
+            "Datos por corregir",
+            "PRÓXIMA ETAPA",
+            "Seleccioná tu próxima decisión",
+            "Ir al mapa de decisiones →",
         ):
             self.assertNotIn(
                 removed_final_copy,
                 upload_index,
             )
 
-        for final_selector in (
-            ".dispatch-pro-final-status",
+        self.assertIn(
             ".dispatch-pro-next-button",
+            upload_css,
+        )
+        self.assertNotIn(
+            ".dispatch-pro-final-status",
+            upload_css,
+        )
+        self.assertNotIn(
             ".dispatch-pro-next-stage",
-            ".dispatch-pro-next-stage-icon",
-        ):
-            self.assertIn(
-                final_selector,
-                upload_css,
-            )
+            upload_css,
+        )
 
         for history_copy in (
             "Historial completo de Órdenes",
@@ -1700,7 +1703,7 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=upload-finalbar-v1",
+            "/static/js/dispatch/workspace.mjs?v=upload-finalbar-v2",
             self.html,
         )
 
