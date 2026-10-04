@@ -88,6 +88,7 @@ export function createPreviousDrawer() {
     const items = current.filter((item) => {
       if (!query) return true;
       return [
+        item.canonical_filename,
         item.label,
         item.original_filename,
       ].some((value) => (
@@ -125,7 +126,13 @@ export function createPreviousDrawer() {
       const name = el("div", null, "dispatch-pro-history-name");
       name.append(
         el("span", "CSV", "dispatch-pro-library-file-icon"),
-        el("strong", item.original_filename || item.label || "Archivo"),
+        el(
+          "strong",
+          item.canonical_filename
+            || item.label
+            || item.original_filename
+            || "Archivo",
+        ),
       );
       const [label, tone] = datasetStatus(item);
       const status = el(
