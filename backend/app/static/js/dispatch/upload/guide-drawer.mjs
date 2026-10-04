@@ -70,7 +70,7 @@ export function createGuideDrawer(contracts) {
 
   let active = "orders";
   let opener = null;
-  let activeReport = null;
+  let reports = {orders: null, fleet: null};
 
   function renderContent() {
     content.replaceChildren();
@@ -104,7 +104,7 @@ export function createGuideDrawer(contracts) {
     const tbody = document.createElement("tbody");
     contract.columns.forEach((column) => {
       const row = document.createElement("tr");
-      const state = columnState(column, activeReport);
+      const state = columnState(column, reports[active]);
       const requirement = column.required ? "Mínima" : "Opcional";
       const status = el(
         "span",
@@ -165,7 +165,6 @@ export function createGuideDrawer(contracts) {
       button.setAttribute("aria-pressed", String(active === key));
       button.onclick = () => {
         active = key;
-        activeReport = null;
         renderTabs();
         renderContent();
       };
@@ -173,10 +172,13 @@ export function createGuideDrawer(contracts) {
     });
   }
 
-  function open(kind = "orders", source = null, report = null) {
+  function open(kind = "orders", source = null, reportMap = {}) {
     active = kind;
     opener = source;
-    activeReport = report;
+    reports = {
+      orders: reportMap.orders || null,
+      fleet: reportMap.fleet || null,
+    };
     renderTabs();
     renderContent();
     overlay.hidden = false;
