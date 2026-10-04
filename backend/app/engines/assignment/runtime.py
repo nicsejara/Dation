@@ -13,11 +13,10 @@ from .scope import apply_order_scope
 def _csv_bytes(kind, records, completeness):
     """Serialize only columns that actually existed in the source CSV.
 
-    The validators expose canonical records with optional keys filled with None. If we
-    wrote every contract column back out, an originally absent optional column would
-    become a present-but-empty column and capability checks could incorrectly treat it
-    as part of the source schema. Preserving source presence keeps scoped runs
-    semantically equivalent to unfiltered runs.
+    Validators expose canonical records with compatibility defaults. Keeping only
+    source columns avoids manufacturing optional fields that were never supplied.
+    Capability completeness is checked separately before the scoped run because
+    canonical records intentionally replace some blank optional values with zero.
     """
 
     columns = [
@@ -50,6 +49,34 @@ def _csv_bytes(kind, records, completeness):
     return buffer.getvalue().encode("utf-8")
 
 
+def _validate_source_capabilities(config, fleet_report):
+    """Keep the original engine's capability semantics before canonical defaults.
+
+    Fleet validation normalizes missing optional numeric values to zero for legacy
+    compatibility. That default is useful for non-cost/non-CO₂ runs, but it must not
+    make an incomplete source suddenly eligible for a cost or emissions objective.
+    """
+
+    completeness = fleet_report.get("completeness", {})
+
+    def complete(column):
+        return bool(completeness.get(column, {}).get("complete"))
+
+    unavailable = []
+    if "cost" in config.dimensions and not (
+        complete("cost_per_km") and complete("fixed_trip_cost")
+    ):
+        unavailable.append("costo por km y costo fijo")
+    if "co2" in config.dimensions and not complete("co2_kg_per_km"):
+        unavailable.append("factor de CO₂")
+    if unavailable:
+        raise ValueError(
+            "La configuración usa dimensiones sin datos completos: "
+            + ", ".join(unavailable)
+            + "."
+        )
+
+
 def _resource_records(records, mode):
     if mode == "own":
         return [row for row in records if row.get("ownership") == "own"]
@@ -71,6 +98,8 @@ def run_assignment_engine(
 
     orders_report = validate_orders_csv(orders_bytes)
     fleet_report = validate_fleet_csv(fleet_bytes)
+    _validate_source_capabilities(config, fleet_report)
+
     source_orders = orders_report["records"]
     source_fleet = fleet_report["records"]
 
