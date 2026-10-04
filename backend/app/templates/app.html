@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="/static/css/app.css?v=workspace-nav-v2">
   <link rel="stylesheet" href="/static/css/home-dda.css?v=home-dda-hero-v4">
   <link rel="stylesheet" href="/static/css/dda-logistics-landing.css?v=dda-logistics-landing-v8">
-  <link rel="stylesheet" href="/static/css/dispatch.css?v=home-dda-selector-v2">
+  <link rel="stylesheet" href="/static/css/dispatch.css?v=decision-map-premium-v1">
   <link rel="stylesheet" href="/static/css/dda-logistics-upload.css?v=upload-finalbar-v2">
 </head>
 <body>
@@ -397,13 +397,13 @@
                 <article class="dda-landing__node is-pending" data-decision-node="logistics_assignment">
                   <div class="dda-landing__node-top">
                     <span class="dda-landing__iconbox"><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-package"></use></svg></span>
-                    <span class="dda-landing__state is-pending" data-node-state><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-clock"></use></svg>Pendiente de datos</span>
+                    <span class="dda-landing__state is-pending" data-node-state><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-clock"></use></svg>En espera</span>
                   </div>
                   <h3>Asignación de carga</h3>
-                  <p class="dda-landing__node-question">¿Qué órdenes van en cada viaje y con qué vehículo?</p>
+                  <p class="dda-landing__node-question">¿Cómo conviene armar los viajes y repartir la carga?</p>
                   <div class="dda-landing__node-facts">
                     <div class="dda-landing__node-fact"><small>Necesita</small><strong>Órdenes + flota</strong></div>
-                    <div class="dda-landing__node-fact"><small>Entrega</small><strong>Asignación aprobada</strong></div>
+                    <div class="dda-landing__node-fact"><small>Entrega</small><strong>Viajes propuestos + distribución de carga</strong></div>
                   </div>
                   <div class="dda-landing__node-footer">
                     <button class="dda-landing__node-action" type="button" data-node-action="logistics_assignment" hidden>Open</button>
@@ -416,13 +416,13 @@
                 <article class="dda-landing__node is-locked" data-decision-node="logistics_scheduling">
                   <div class="dda-landing__node-top">
                     <span class="dda-landing__iconbox"><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-calendar"></use></svg></span>
-                    <span class="dda-landing__state is-locked" data-node-state><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-lock"></use></svg>Bloqueada</span>
+                    <span class="dda-landing__state is-locked" data-node-state><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-clock"></use></svg>En espera</span>
                   </div>
                   <h3>Planificación de despachos</h3>
-                  <p class="dda-landing__node-question">¿Cuándo sale cada viaje?</p>
+                  <p class="dda-landing__node-question">¿Cuándo conviene ejecutar los viajes ya definidos?</p>
                   <div class="dda-landing__node-facts">
                     <div class="dda-landing__node-fact"><small>Necesita</small><strong>Asignación aprobada</strong></div>
-                    <div class="dda-landing__node-fact"><small>Entrega</small><strong>Calendario de despachos</strong></div>
+                    <div class="dda-landing__node-fact"><small>Entrega</small><strong>Calendario operativo + secuencia</strong></div>
                   </div>
                   <div class="dda-landing__node-footer">
                     <button class="dda-landing__node-action" type="button" data-node-action="logistics_scheduling" hidden>Open</button>
@@ -435,13 +435,13 @@
                 <article class="dda-landing__node is-locked" data-decision-node="logistics_final_assignment">
                   <div class="dda-landing__node-top">
                     <span class="dda-landing__iconbox"><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-truck"></use></svg></span>
-                    <span class="dda-landing__state is-locked" data-node-state><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-lock"></use></svg>Bloqueada</span>
+                    <span class="dda-landing__state is-locked" data-node-state><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-clock"></use></svg>En espera</span>
                   </div>
-                  <h3>Ejecución física</h3>
-                  <p class="dda-landing__node-question">¿Cómo se carga cada vehículo?</p>
+                  <h3>Asignación de vehículos</h3>
+                  <p class="dda-landing__node-question">¿Qué vehículo ejecuta cada viaje programado?</p>
                   <div class="dda-landing__node-facts">
                     <div class="dda-landing__node-fact"><small>Necesita</small><strong>Planificación aprobada</strong></div>
-                    <div class="dda-landing__node-fact"><small>Entrega</small><strong>Carga por viaje y vehículo</strong></div>
+                    <div class="dda-landing__node-fact"><small>Entrega</small><strong>Vehículo asignado a cada viaje</strong></div>
                   </div>
                   <div class="dda-landing__node-footer">
                     <button class="dda-landing__node-action" type="button" data-node-action="logistics_final_assignment" hidden>Open</button>
@@ -454,7 +454,7 @@
                 <div class="dda-landing__legend-item"><span class="dda-landing__legend-icon" style="color:#087a4b"><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-play-circle"></use></svg></span><div><strong>Disponible</strong><small>Lista para resolver.</small></div></div>
                 <div class="dda-landing__legend-item"><span class="dda-landing__legend-icon" style="color:#795814"><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-alert-circle"></use></svg></span><div><strong>Requiere revisión</strong><small>Hay algo para revisar antes de aprobar.</small></div></div>
                 <div class="dda-landing__legend-item"><span class="dda-landing__legend-icon" style="color:#0d716f"><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-check-circle"></use></svg></span><div><strong>Aprobada</strong><small>Resultado revisado y aprobado.</small></div></div>
-                <div class="dda-landing__legend-item"><span class="dda-landing__legend-icon" style="color:#687984"><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-lock"></use></svg></span><div><strong>Bloqueada</strong><small>Se habilita al aprobar la decisión anterior.</small></div></div>
+                <div class="dda-landing__legend-item"><span class="dda-landing__legend-icon" style="color:#687984"><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-clock"></use></svg></span><div><strong>En espera</strong><small>Se habilita al aprobar la decisión anterior.</small></div></div>
               </div>
 
               <p class="dda-landing__map-close">Cada resultado se revisa y se aprueba antes de habilitar el siguiente nivel.</p>
@@ -1161,7 +1161,7 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="/static/js/dda-workflow-config.js?v=hero-upload-v1"></script>
+  <script src="/static/js/dda-workflow-config.js?v=decision-map-premium-v1"></script>
   <script>
     (function () {
       var currentView = 'inicio';
@@ -1277,6 +1277,10 @@
         if (options.disabled) {
           button.classList.add('is-disabled');
           button.disabled = true;
+          button.setAttribute('aria-disabled', 'true');
+        }
+        if (options.tooltip) {
+          button.title = options.tooltip;
         }
 
         var marker = document.createElement('span');
@@ -1421,6 +1425,9 @@
             view: dataStep.view,
             disabled: false,
             completed: dataReady,
+            tooltip: currentView === 'logistics-map'
+              ? 'Volver a Carga de datos'
+              : null,
             onClick: function () {
               window.dationNavigate(dataStep.view);
             }
@@ -1442,6 +1449,9 @@
             disabled: !dataReady || !selected,
             completed: runReady,
             context: configContext,
+            tooltip: !selected
+              ? 'Elegí una decisión para configurarla'
+              : null,
             onClick: function () {
               window.dationNavigate(configStep.view);
             }
@@ -1473,6 +1483,7 @@
               completed: step.completed,
               disabled: step.disabled,
               context: step.context,
+              tooltip: step.tooltip,
               onClick: step.onClick
             })
           );
@@ -1610,10 +1621,10 @@
   <script src="/static/js/dashboard-formatters.js?v=dispatch-v1"></script>
   <script src="/static/js/dashboard-selectors.js?v=dispatch-v1"></script>
   <script src="/static/js/dashboard-stage.js?v=dda-logistics-landing-v7"></script>
-  <script src="/static/js/dda-logistics-landing.js?v=dda-logistics-landing-v7"></script>
+  <script src="/static/js/dda-logistics-landing.js?v=dda-logistics-landing-v8"></script>
   <script src="/static/js/interpreter-stage.js?v=dispatch-v1"></script>
   <script src="/static/vendor/echarts-dispatch-6.0.0.min.js"></script>
-  <script type="module" src="/static/js/dispatch/workspace.mjs?v=upload-finalbar-v2"></script>
+  <script type="module" src="/static/js/dispatch/workspace.mjs?v=decision-map-premium-v1"></script>
   <script type="module" src="/static/js/app.js?v=dispatch-v1"></script>
 </body>
 </html>
