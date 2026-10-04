@@ -1,14 +1,13 @@
 import {esc,num,date,vehicle,api,post,errorBox} from './shared.mjs';import {rebalance} from './selectors.mjs';import {render as dashboard} from './dashboard.mjs?v=decision-map-nodal-v1';
 import {mountUploadScreen} from './upload/index.mjs?v=upload-canonical-v1';
-import {renderDecisionMap} from './decision-map.mjs?v=decision-map-nodal-v1';
+import {renderDecisionMap} from './decision-map.mjs?v=decision-map-premium-v1';
 import {STATUS,createDecisionCase,replaceInputs,transitionNode,inputSignature,caseRef,deriveDecisionNodes} from './decision-case.mjs';
+import {DECISION_META} from './decision-ui.mjs?v=decision-map-premium-v1';
 const KEY='dation.dispatch.workspace.v5';
 const NAV_VERSION='workspace-nav-v1';
-const DECISION_LABELS={
-  logistics_assignment:'Asignación de carga',
-  logistics_scheduling:'Planificación',
-  logistics_final_assignment:'Asignación final',
-};
+const DECISION_LABELS=Object.fromEntries(
+  Object.entries(DECISION_META).map(([id,meta])=>[id,meta.label])
+);
 const PRIORITY_KEYS=['trips','cost','own_fleet','co2'];
 const CORE_DIMENSIONS=['trips','own_fleet'];
 const PRESETS={
@@ -334,7 +333,7 @@ async function ensurePersistedApproval(nodeId){
 async function loadSchedulingConfig(){
   const node=roots.config;
   if(!state.orders||!state.fleet){
-    node.innerHTML='<h1>Configurar Planificación</h1><p>Primero seleccioná Orders y Fleet.</p><button data-back>Ir al Data Pack</button>';
+    node.innerHTML='<h1>Configurar planificación de despachos</h1><p>Primero seleccioná Órdenes y Flota.</p><button data-back>Ir al Data Pack</button>';
     node.querySelector('[data-back]').onclick=()=>navigate('logistics-data');
     return;
   }
@@ -346,13 +345,13 @@ async function loadSchedulingConfig(){
   const scheduling=schedulingEvidence();
   const assignmentNode=state.decisionCase?.nodes?.logistics_assignment;
   if(assignmentNode?.status!==STATUS.APPROVED){
-    node.innerHTML='<section class="dispatch-panel"><span class="dispatch-kicker">DECISIÓN 02 · PLANIFICACIÓN</span><h1>Scheduling todavía está bloqueado</h1><p>Primero aprobá Assignment para fijar qué viajes y vehículos puede programar este motor.</p><button data-map>Volver al mapa</button></section>';
+    node.innerHTML='<section class="dispatch-panel"><span class="dispatch-kicker">DECISIÓN 02 · PLANIFICACIÓN DE DESPACHOS</span><h1>Planificación de despachos está en espera</h1><p>Primero aprobá Asignación de carga para fijar qué viajes y vehículos puede programar este motor.</p><button data-map>Volver al mapa</button></section>';
     node.querySelector('[data-map]').onclick=()=>navigate('logistics-map');
     return;
   }
   if(!scheduling?.data_ready){
     const missing=(scheduling?.missing||[]).map(item=>item.label).join(' · ');
-    node.innerHTML='<section class="dispatch-panel"><span class="dispatch-kicker">DECISIÓN 02 · PLANIFICACIÓN</span><h1>Faltan datos temporales</h1><p>Scheduling necesita completar: '+esc(missing||'datos de planificación')+'.</p><button data-data>Completar Data Pack</button><button data-map>Volver al mapa</button></section>';
+    node.innerHTML='<section class="dispatch-panel"><span class="dispatch-kicker">DECISIÓN 02 · PLANIFICACIÓN DE DESPACHOS</span><h1>Faltan datos temporales</h1><p>Planificación de despachos necesita completar: '+esc(missing||'datos de planificación')+'.</p><button data-data>Completar Data Pack</button><button data-map>Volver al mapa</button></section>';
     node.querySelector('[data-data]').onclick=()=>navigate('logistics-data');
     node.querySelector('[data-map]').onclick=()=>navigate('logistics-map');
     return;
@@ -378,13 +377,13 @@ async function loadSchedulingConfig(){
   node.innerHTML=`
     <div class="dispatch-config-screen dispatch-scheduling-config">
       <header class="dispatch-config-heading">
-        <span class="dispatch-kicker">DECISIÓN 02 · PLANIFICACIÓN</span>
-        <h1>Configurar Scheduling</h1>
-        <p>Programá en el tiempo los viajes aprobados. Scheduling no puede cambiar vehículos, cargas ni cantidades definidos en Assignment.</p>
+        <span class="dispatch-kicker">DECISIÓN 02 · PLANIFICACIÓN DE DESPACHOS</span>
+        <h1>Configurar planificación de despachos</h1>
+        <p>Programá en el tiempo los viajes aprobados. Esta decisión no puede cambiar vehículos, cargas ni cantidades definidos en Asignación de carga.</p>
       </header>
 
       <section class="dispatch-evidence-card">
-        <div><span class="dispatch-config-eyebrow">Assignment aprobada</span><strong>${num(assignmentMetrics.total_trips||0)} viajes</strong><small>Corrida ${esc(String(sourceRun.id).slice(0,8))}…</small></div>
+        <div><span class="dispatch-config-eyebrow">Asignación de carga aprobada</span><strong>${num(assignmentMetrics.total_trips||0)} viajes</strong><small>Corrida ${esc(String(sourceRun.id).slice(0,8))}…</small></div>
         <div><span class="dispatch-config-eyebrow">Vehículos</span><strong>${num(assignmentMetrics.vehicles_used||0)} recursos</strong><small>Asignación bloqueada para esta decisión</small></div>
         <button data-map>Volver al mapa</button>
       </section>
@@ -411,7 +410,7 @@ async function loadSchedulingConfig(){
 
       <section class="dispatch-panel dispatch-config-section">
         <div class="dispatch-config-section-head"><span class="dispatch-config-step">03</span><div><h2>Qué no puede cambiar</h2><p>Esta separación protege la trazabilidad entre decisiones.</p></div></div>
-        <div class="dispatch-assignment-boundary"><span aria-hidden="true">✓</span><div><strong>Assignment queda congelada</strong><p>Scheduling sólo agrega dispatch_date, arrival_date, cycle_days y resource_available_again sobre los viajes aprobados.</p></div></div>
+        <div class="dispatch-assignment-boundary"><span aria-hidden="true">✓</span><div><strong>La asignación de carga queda congelada</strong><p>Scheduling sólo agrega dispatch_date, arrival_date, cycle_days y resource_available_again sobre los viajes aprobados.</p></div></div>
       </section>
 
       <footer class="dispatch-footer dispatch-config-footer"><div><span class="dispatch-config-eyebrow">Scheduling listo para ejecutar</span><strong>${slaAvailable&&state.schedulingUseDueDates?'SLA → tardanza → espera → calendario':'Espera → calendario'}</strong><small>${num(assignmentMetrics.total_trips||0)} viajes fijos · ${num(assignmentMetrics.vehicles_used||0)} vehículos</small></div><button data-review>Revisar y ejecutar →</button></footer>
@@ -447,12 +446,12 @@ async function loadConfig(){
     return loadSchedulingConfig();
   }
   if(!state.orders||!state.fleet){
-    node.innerHTML='<h1>Configurar Assignment</h1><p>Primero seleccioná Orders y Fleet.</p><button data-back>Ir al Data Pack</button>';
+    node.innerHTML='<h1>Configurar asignación</h1><p>Primero seleccioná Órdenes y Flota.</p><button data-back>Ir al Data Pack</button>';
     node.querySelector('[data-back]').onclick=()=>navigate('logistics-data');
     return;
   }
 
-  node.innerHTML='<div class="dispatch-config-heading"><span class="dispatch-kicker">DECISIÓN 01 · ASIGNACIÓN DE CARGA</span><h1>Configurar Assignment</h1><p>Elegí cómo querés distribuir la carga entre los vehículos disponibles. Las fechas se resolverán después, en Planificación.</p><p role="status">Validando la evidencia seleccionada…</p></div>';
+  node.innerHTML='<div class="dispatch-config-heading"><span class="dispatch-kicker">DECISIÓN 01 · ASIGNACIÓN DE CARGA</span><h1>Configurar asignación</h1><p>Elegí cómo querés distribuir la carga entre los vehículos disponibles. Las fechas se resolverán después, en Planificación de despachos.</p><p role="status">Validando la evidencia seleccionada…</p></div>';
   try{
     await preflight();
     syncDimensionsToEvidence({initialize:true});
@@ -495,19 +494,19 @@ async function loadConfig(){
     <div class="dispatch-config-screen dispatch-assignment-config">
       <header class="dispatch-config-heading">
         <span class="dispatch-kicker">DECISIÓN 01 · ASIGNACIÓN DE CARGA</span>
-        <h1>Configurar Assignment</h1>
+        <h1>Configurar asignación</h1>
         <p>Definí qué significa una buena distribución de carga. Esta decisión no programa fechas ni calcula SLA.</p>
       </header>
 
       <section class="dispatch-evidence-card">
-        <div><span class="dispatch-config-eyebrow">Orders</span><strong>${esc(state.orders.original_filename)}</strong><small>${num(state.orders.row_count)} registros</small></div>
-        <div><span class="dispatch-config-eyebrow">Fleet</span><strong>${esc(state.fleet.label||state.fleet.original_filename)}</strong><small>${num(state.fleet.row_count)} vehículos</small></div>
+        <div><span class="dispatch-config-eyebrow">Órdenes</span><strong>${esc(state.orders.canonical_filename||state.orders.label||state.orders.original_filename)}</strong><small>${num(state.orders.row_count)} registros</small></div>
+        <div><span class="dispatch-config-eyebrow">Flota</span><strong>${esc(state.fleet.canonical_filename||state.fleet.label||state.fleet.original_filename)}</strong><small>${num(state.fleet.row_count)} vehículos</small></div>
         <button data-map>Volver al mapa</button>
         <button data-data>Cambiar datos</button>
       </section>
 
       <section class="dispatch-panel dispatch-config-section">
-        <div class="dispatch-config-section-head"><span class="dispatch-config-step">01</span><div><h2>Objetivo de Assignment</h2><p>Elegí el criterio principal para construir los viajes y distribuir la carga.</p></div></div>
+        <div class="dispatch-config-section-head"><span class="dispatch-config-step">01</span><div><h2>Objetivo de la asignación</h2><p>Elegí el criterio principal para construir los viajes y distribuir la carga.</p></div></div>
         <div class="dispatch-objective-grid">
           ${objectives.map(([key,label,copy])=>{
             const enabled=objectiveEnabled(key);
@@ -535,7 +534,7 @@ async function loadConfig(){
             return `<label class="dispatch-dimension-row ${available?'':'is-unavailable'}"><div><strong>${DIMENSION_LABELS[key]}</strong><small>${dimensionCopy[key]}</small>${available?'':`<em>${missingCopy[key]||'No disponible con este Data Pack.'}</em>`}</div><input type="checkbox" data-dimension="${key}" ${state.dimensions.includes(key)?'checked':''} ${available?'':'disabled'}><span class="dispatch-toggle" aria-hidden="true"></span></label>`;
           }).join('')}
         </div>
-        <div class="dispatch-locked-model"><div><span class="dispatch-config-eyebrow">Siempre activas</span><strong>Restricciones físicas de Assignment</strong><p>Unidades enteras · capacidad por viaje · origen/site · ruta · distancia</p></div><span class="dispatch-lock">Sin calendario</span></div>
+        <div class="dispatch-locked-model"><div><span class="dispatch-config-eyebrow">Siempre activas</span><strong>Restricciones físicas de la asignación</strong><p>Unidades enteras · capacidad por viaje · origen/site · ruta · distancia</p></div><span class="dispatch-lock">Sin calendario</span></div>
         <div class="dispatch-assignment-boundary"><span aria-hidden="true">→</span><div><strong>Las fechas se deciden después</strong><p>estimated_dispatch_date, velocidad, horas de conducción, disponibilidad futura y SLA quedan reservados para Planificación.</p></div></div>
       </section>
 

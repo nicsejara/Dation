@@ -2,7 +2,7 @@
   "use strict";
 
   var ROOT_SELECTOR=".dda-landing";
-  var WORKSPACE_KEY="dation.dispatch.workspace.v4";
+  var WORKSPACE_KEY="dation.dispatch.workspace.v5";
 
   var ENGINE_VARIABLES={
     active:[
@@ -247,7 +247,7 @@
   function statePresentation(state){
     var map={
       pending:{
-        label:"Pendiente de datos",
+        label:"En espera",
         css:"is-pending",
         icon:"dda-i-clock",
         action:null
@@ -271,9 +271,9 @@
         action:"Ver análisis →"
       },
       locked:{
-        label:"Bloqueada",
+        label:"En espera",
         css:"is-locked",
-        icon:"dda-i-lock",
+        icon:"dda-i-clock",
         action:null
       }
     };
