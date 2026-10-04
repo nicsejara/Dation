@@ -76,41 +76,6 @@ function clientFileProblem(file) {
   return null;
 }
 
-function makeStepper() {
-  const stepper = el("nav", null, "dispatch-pro-stepper");
-  stepper.setAttribute("aria-label", "Proceso del DDA");
-  const refs = [];
-
-  [
-    ["1", "Cargar datos"],
-    ["2", "Validar"],
-    ["3", "Configurar"],
-    ["4", "Resultado"],
-  ].forEach(([number, label]) => {
-    const item = el("span", null, "dispatch-pro-step");
-    item.dataset.step = number;
-    item.append(
-      el("i", number),
-      el("strong", label),
-    );
-    stepper.append(item);
-    refs.push(item);
-  });
-
-  function update({readyCount = 0, busy = false, complete = false} = {}) {
-    refs.forEach((node) => {
-      node.classList.remove("is-current", "is-done");
-      node.removeAttribute("aria-current");
-    });
-    const active = complete || readyCount > 0 || busy ? 1 : 0;
-    if (active === 1) refs[0].classList.add("is-done");
-    refs[active].classList.add("is-current");
-    refs[active].setAttribute("aria-current", "step");
-  }
-
-  return {stepper, update};
-}
-
 function makeHero() {
   const hero = el("section", null, "dispatch-pro-hero");
   hero.dataset.reveal = "";
@@ -470,7 +435,6 @@ export async function mountUploadScreen(
   root.replaceChildren();
   root.className = "dispatch dispatch-upload-screen dispatch-upload-pro";
 
-  const stepper = makeStepper();
   const hero = makeHero();
   const banner = el("section");
   banner.hidden = true;
@@ -530,7 +494,6 @@ export async function mountUploadScreen(
   const sticky = makeSticky(onNext, scrollToProblem);
 
   root.append(
-    stepper.stepper,
     hero.hero,
     banner,
     dataPack,
@@ -631,11 +594,6 @@ export async function mountUploadScreen(
     const count = readyCount();
     const busy = local.phases.orders !== "idle" || local.phases.fleet !== "idle";
     hero.update(count, busy);
-    stepper.update({
-      readyCount: count,
-      busy,
-      complete: Boolean(result.enabled),
-    });
     window.dationSetDataReady(Boolean(result.enabled));
     return result;
   }
