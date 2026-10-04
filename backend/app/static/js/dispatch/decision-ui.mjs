@@ -9,6 +9,7 @@ export const DECISION_META = Object.freeze({
     index: "01",
     label: "Asignación de carga",
     short: "Asignación de carga",
+    progressLabel: "Asignación de carga",
     icon: "packageCheck",
     question: "¿Cómo conviene armar los viajes y repartir la carga?",
     output: "Viajes propuestos + distribución de carga",
@@ -19,6 +20,7 @@ export const DECISION_META = Object.freeze({
     index: "02",
     label: "Planificación de despachos",
     short: "Planificación de despachos",
+    progressLabel: "Planificación",
     icon: "calendarRange",
     question: "¿Cuándo conviene ejecutar los viajes ya definidos?",
     output: "Calendario operativo + secuencia",
@@ -29,6 +31,7 @@ export const DECISION_META = Object.freeze({
     index: "03",
     label: "Asignación de vehículos",
     short: "Asignación de vehículos",
+    progressLabel: "Vehículos",
     icon: "truck",
     question: "¿Qué vehículo ejecuta cada viaje programado?",
     output: "Vehículo asignado a cada viaje, listo para ejecutar",
@@ -42,41 +45,49 @@ export const STATUS_UI = Object.freeze({
     label: "Disponible",
     icon: "playCircle",
     tone: "available",
+    description: "La decisión puede configurarse ahora.",
   }),
   running: Object.freeze({
     label: "Procesando",
     icon: "loader",
     tone: "running",
+    description: "Dation está procesando esta decisión.",
   }),
   review: Object.freeze({
     label: "Requiere revisión",
     icon: "alertTriangle",
     tone: "review",
+    description: "El resultado está listo para revisar.",
   }),
   approved: Object.freeze({
     label: "Aprobada",
     icon: "checkCircle",
     tone: "approved",
+    description: "La decisión fue aprobada y queda registrada en el caso.",
   }),
   locked: Object.freeze({
     label: "En espera",
     icon: "clock",
     tone: "waiting",
+    description: "Se habilita cuando se cumple la dependencia anterior.",
   }),
   needs_data: Object.freeze({
     label: "En espera",
     icon: "clock",
     tone: "waiting",
+    description: "Necesita completar datos antes de continuar.",
   }),
   error: Object.freeze({
     label: "Requiere revisión",
     icon: "alertTriangle",
     tone: "review",
+    description: "La ejecución necesita revisión antes de continuar.",
   }),
   stale: Object.freeze({
     label: "Requiere revisión",
     icon: "alertTriangle",
     tone: "review",
+    description: "Los datos cambiaron y la decisión debe revisarse.",
   }),
 });
 
@@ -100,6 +111,11 @@ const ICONS = Object.freeze({
   mousePointer: '<path d="m4 3 7 17 2-7 7-2Z"/><path d="m13 13 6 6"/>',
   sliders: '<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3"/><path d="M1 14h6M9 8h6M17 16h6"/>',
   arrowRight: '<path d="M5 12h14"/><path d="m14 7 5 5-5 5"/>',
+  chevronRight: '<path d="m9 18 6-6-6-6"/>',
+  database: '<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/>',
+  columns: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M15 4v16"/>',
+  history: '<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/>',
+  link: '<path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1.1 1.1"/><path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1.1-1.1"/>',
 });
 
 export function statusUi(status) {
@@ -107,6 +123,7 @@ export function statusUi(status) {
     label: "En espera",
     icon: "clock",
     tone: "waiting",
+    description: "La decisión está esperando sus condiciones de habilitación.",
   };
 }
 
