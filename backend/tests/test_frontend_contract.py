@@ -275,7 +275,7 @@ class FrontendContractTests(
             workspace,
         )
         self.assertIn(
-            "Configurar Assignment",
+            "Configurar asignación",
             workspace,
         )
         self.assertIn(
@@ -356,7 +356,7 @@ class FrontendContractTests(
             self.dashboard_stage_js,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=upload-finalbar-v2",
+            "/static/js/dispatch/workspace.mjs?v=decision-map-premium-v1",
             self.html,
         )
         self.assertIn(
@@ -620,7 +620,7 @@ class FrontendContractTests(
         ).read_text(encoding="utf-8")
 
         self.assertIn(
-            "Configurar Planificación",
+            "meta.configureLabel",
             decision_map,
         )
         self.assertIn(
@@ -636,7 +636,7 @@ class FrontendContractTests(
             workspace,
         )
         self.assertIn(
-            "Assignment queda congelada",
+            "La asignación de carga queda congelada",
             workspace,
         )
         self.assertIn(
@@ -866,7 +866,7 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=upload-finalbar-v2",
+            "/static/js/dispatch/workspace.mjs?v=decision-map-premium-v1",
             self.html,
         )
         self.assertIn(
@@ -1232,11 +1232,11 @@ class FrontendContractTests(
             "SIGUIENTE PASO",
             decision_map,
         )
-        self.assertIn(
+        self.assertNotIn(
             "Bloqueada por jerarquía",
             decision_map,
         )
-        self.assertIn(
+        self.assertNotIn(
             "Output aprobado",
             decision_map,
         )
@@ -1245,7 +1245,7 @@ class FrontendContractTests(
             decision_map,
         )
         self.assertIn(
-            'slice(0,10)',
+            'slice(0,8)',
             decision_map,
         )
         self.assertNotIn(
@@ -1261,7 +1261,7 @@ class FrontendContractTests(
             decision_map,
         )
         self.assertIn(
-            "Asignación final",
+            "DECISION_META",
             decision_map,
         )
         for state in (
@@ -1353,7 +1353,7 @@ class FrontendContractTests(
             decision_map,
         )
         self.assertIn(
-            "Configurar Planificación",
+            "meta.configureLabel",
             decision_map,
         )
         self.assertIn(
@@ -1427,9 +1427,9 @@ class FrontendContractTests(
         ).read_text(encoding="utf-8")
 
         for marker in (
-            "dispatch-decision-node__readiness",
+            "dispatch-decision-node__statusline",
             "dispatch-decision-edge",
-            "dispatch-map-datapack",
+            "dispatch-map-casebar",
             "dependencyReady",
             "dataReady",
             "missingData",
@@ -1437,7 +1437,7 @@ class FrontendContractTests(
             self.assertIn(marker, decision_map)
 
         self.assertIn(
-            "grid-template-columns:minmax(0,1fr) 92px",
+            "grid-template-columns:minmax(0,1fr) 72px",
             css,
         )
         self.assertIn(
@@ -1455,6 +1455,73 @@ class FrontendContractTests(
         self.assertNotIn(
             "dispatch-map-chain-head",
             decision_map,
+        )
+
+
+    def test_premium_decision_map_contract(self):
+        dispatch_root = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+        )
+        decision_map = (
+            dispatch_root / "decision-map.mjs"
+        ).read_text(encoding="utf-8")
+        decision_ui = (
+            dispatch_root / "decision-ui.mjs"
+        ).read_text(encoding="utf-8")
+        css = (
+            BACKEND_ROOT
+            / "app"
+            / "static"
+            / "css"
+            / "dispatch.css"
+        ).read_text(encoding="utf-8")
+
+        for copy in (
+            "Elegí la decisión que tus datos ya pueden resolver.",
+            "CÓMO AVANZA EL CASO",
+            "TU DECISION CASE",
+            "DATA PACK ACTIVO",
+            "Datos validados",
+            "Tu cadena de decisiones.",
+            "SIGUIENTE DECISIÓN",
+            "canonical_filename",
+        ):
+            self.assertIn(copy, decision_map)
+
+        for copy in (
+            'label: "Asignación de carga"',
+            'label: "Planificación de despachos"',
+            'label: "Asignación de vehículos"',
+            'label: "Disponible"',
+            'label: "Requiere revisión"',
+            'label: "Aprobada"',
+            'label: "En espera"',
+        ):
+            self.assertIn(copy, decision_ui)
+
+        self.assertNotIn(
+            "Bloqueada por jerarquía",
+            decision_map,
+        )
+        self.assertNotIn(
+            "dispatch-decision-node__chips",
+            decision_map,
+        )
+        self.assertIn(
+            ".dispatch-decision-node.is-next",
+            css,
+        )
+        self.assertIn(
+            "@media(max-width:1099px)",
+            css,
+        )
+        self.assertIn(
+            "@media(prefers-reduced-motion:reduce)",
+            css,
         )
 
 
@@ -1603,7 +1670,7 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "/static/js/dda-workflow-config.js?v=hero-upload-v1",
+            "/static/js/dda-workflow-config.js?v=decision-map-premium-v1",
             self.html,
         )
         self.assertIn(
@@ -1703,7 +1770,7 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=upload-finalbar-v2",
+            "/static/js/dispatch/workspace.mjs?v=decision-map-premium-v1",
             self.html,
         )
 
@@ -2114,7 +2181,7 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "/static/js/dda-logistics-landing.js?v=dda-logistics-landing-v7",
+            "/static/js/dda-logistics-landing.js?v=dda-logistics-landing-v8",
             self.html,
         )
         self.assertIn(
