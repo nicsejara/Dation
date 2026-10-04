@@ -702,7 +702,7 @@ export async function mountUploadScreen(
     const items = local.libraries[kind].slice(0, 3);
     ref.setReuseCount(local.libraries[kind].length);
     ref.previousEmpty.hidden = items.length > 0;
-    ref.previousAll.hidden = local.libraries[kind].length <= 3;
+    ref.previousAll.hidden = items.length === 0;
 
     items.forEach((item) => {
       const selected = state[kind]?.id === item.id;
@@ -815,9 +815,15 @@ export async function mountUploadScreen(
 
       const reused = local.reused[kind];
       ref.reusedBadge.hidden = !reused;
-      ref.reusedBadge.textContent = reused
-        ? `Carga anterior${reused.date ? ` · ${reused.date}` : ""}`
-        : "";
+      ref.reusedBadge.replaceChildren();
+      if (reused) {
+        ref.reusedBadge.append(
+          icon("history"),
+          document.createTextNode(
+            `Carga anterior${reused.date ? ` · ${reused.date}` : ""}`,
+          ),
+        );
+      }
     }
 
     ref.notice.hidden = true;
