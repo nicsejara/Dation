@@ -61,7 +61,28 @@ async def download_dataset(dataset: dict) -> bytes:
     return response.content
 
 
+def _promote_decision_history(run: dict) -> dict:
+    """Promote lineage embedded by decision engines into normalized columns."""
+    configuration = run.get("configuration_json") or {}
+    decision_case = configuration.get("decision_case") or {}
+    case_id = decision_case.get("case_id")
+    node_id = decision_case.get("node_id")
+    if not case_id or not node_id:
+        return run
+
+    promoted = dict(run)
+    promoted.setdefault("decision_case_id", case_id)
+    promoted.setdefault("node_id", node_id)
+    if node_id == "logistics_scheduling":
+        promoted.setdefault(
+            "upstream_run_id",
+            configuration.get("source_assignment_run_id"),
+        )
+    return promoted
+
+
 async def _insert_run(run: dict) -> dict:
+    payload = _promote_decision_history(run)
     async with httpx.AsyncClient(timeout=15.0) as client:
         response = await client.post(
             f"{SUPABASE_URL}/rest/v1/decision_runs",
@@ -70,7 +91,7 @@ async def _insert_run(run: dict) -> dict:
                 "Content-Type": "application/json",
                 "Prefer": "return=representation",
             },
-            json=run,
+            json=payload,
         )
         response.raise_for_status()
 
