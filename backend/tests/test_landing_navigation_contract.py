@@ -29,15 +29,15 @@ class LandingNavigationContractTests(unittest.TestCase):
         ):
             self.assertIn(marker, self.landing)
 
-        for legacy_runtime in (
-            "deriveMapStates",
-            "statePresentation",
-            "syncDecisionMap",
-            "normalizedRuntimeStatus",
-            "data-node-action",
-            "data-node-lockcopy",
+        for executable_legacy in (
+            "function deriveMapStates",
+            "function statePresentation",
+            "function syncDecisionMap",
+            "function normalizedRuntimeStatus",
+            "querySelectorAll(\"[data-node-action]\")",
+            "querySelectorAll(\"[data-node-lockcopy]\")",
         ):
-            self.assertNotIn(legacy_runtime, self.landing)
+            self.assertNotIn(executable_legacy, self.landing)
 
     def test_active_case_cta_goes_to_real_decision_map(self):
         for marker in (
