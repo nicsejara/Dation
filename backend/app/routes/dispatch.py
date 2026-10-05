@@ -219,6 +219,27 @@ async def get_decision_case(case_id: UUID):
     return await guarded(case_service.get_case(str(case_id)))
 
 
+@router.get("/api/decision-cases/{case_id}/runs")
+async def get_decision_case_runs(
+    case_id: UUID,
+    node_id: Literal[
+        "logistics_assignment",
+        "logistics_scheduling",
+        "logistics_final_assignment",
+    ] | None = Query(None),
+    limit: int = Query(50, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+):
+    return await guarded(
+        case_service.get_run_history(
+            str(case_id),
+            node_id=node_id,
+            limit=limit,
+            offset=offset,
+        )
+    )
+
+
 @router.patch("/api/decision-cases/{case_id}")
 async def update_decision_case(case_id: UUID, payload: DecisionCaseUpdate):
     case = await guarded(
@@ -349,6 +370,12 @@ async def run(
                 str(payload.orders_dataset_id),
                 str(payload.fleet_dataset_id),
             )
+            if case_ref["node_id"] in case_service.UPSTREAM_NODE:
+                await case_service.validate_upstream_run(
+                    case_ref["case_id"],
+                    case_ref["node_id"],
+                    str(payload.source_run_id),
+                )
             await case_service.record_node_state(
                 case_ref["case_id"],
                 case_ref["node_id"],
@@ -379,6 +406,7 @@ async def run(
                         status="error",
                         error=str(exc)[:1500],
                     )
+                    await case_service.sync_case_history(case_ref["case_id"])
                 except Exception:
                     pass
             raise
@@ -389,6 +417,7 @@ async def run(
                 run_id=effective_run_id,
                 status="review",
             )
+            await case_service.sync_case_history(case_ref["case_id"])
         return result
 
     return await guarded(operation())
@@ -400,19 +429,19 @@ async def approve_run(
     payload: ApprovalRequest,
 ):
     async def operation():
-        run = await service.approve_decision_run(
+        run = await case_service.approve_run_version(
             str(run_id),
             case_id=str(payload.case_id),
             node_id=payload.node_id,
         )
-        decision_case = (run.get("result_json") or {}).get("decision_case") or {}
         await case_service.record_node_state(
             str(payload.case_id),
             payload.node_id,
             run_id=str(run_id),
             status="approved",
-            approved_at=decision_case.get("approved_at"),
+            approved_at=run.get("approved_at"),
         )
+        await case_service.sync_case_history(str(payload.case_id))
         return run
 
     return await guarded(operation())
