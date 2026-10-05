@@ -140,7 +140,7 @@ function runConfiguration(run){
 function runCard(run){
   const state=RUN_STATES[run.decision_state]||RUN_STATES.error;
   const config=runConfiguration(run);
-  const openable=['approved','candidate','superseded','running'].includes(run.decision_state);
+  const openable=['approved','candidate','superseded'].includes(run.decision_state);
   return '<article class="dispatch-run-history__item is-'+esc(state.tone)+'">'
     +'<div class="dispatch-run-history__top">'
       +'<div><small>CORRIDA</small><strong>R-'+esc(shortRunId(run.id))+'</strong></div>'
@@ -158,8 +158,8 @@ function runCard(run){
     +'<div class="dispatch-run-history__footer">'
       +(run.error_message?'<span class="dispatch-run-history__error">'+esc(run.error_message)+'</span>':'<span></span>')
       +(openable?'<button type="button" data-open-run="'+esc(run.id)+'" data-run-state="'+esc(run.decision_state)+'">'
-        +(run.decision_state==='candidate'?'Ver y decidir →':run.decision_state==='running'?'Ver ejecución →':run.decision_state==='superseded'?'Ver histórico →':'Ver análisis →')
-      +'</button>':'')
+        +(run.decision_state==='candidate'?'Ver y decidir →':run.decision_state==='superseded'?'Ver histórico →':'Ver análisis →')
+      +'</button>':run.decision_state==='running'?'<small>Resultado disponible al finalizar.</small>':'')
     +'</div>'
   +'</article>';
 }
