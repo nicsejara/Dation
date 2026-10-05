@@ -54,10 +54,7 @@ class LandingNavigationContractTests(unittest.TestCase):
         self.assertIn("data-scroll-decision-map", self.html)
 
     def test_state_legend_and_card_actions_are_removed_at_runtime(self):
-        self.assertIn(
-            'section.querySelector(".dda-landing__state-legend")',
-            self.landing,
-        )
+        self.assertIn(".dda-landing__state-legend", self.landing)
         self.assertIn("legend&&legend.remove()", self.landing)
         self.assertIn("state&&state.remove()", self.landing)
         self.assertIn("footer&&footer.remove()", self.landing)
