@@ -117,8 +117,9 @@ async function hydrateCase(caseId){
 
 async function selectCase(item){
   const current=savedWorkspace();
-  const switching=String(current.decisionCase?.id||'')!==String(item.decision_case?.id||item.case?.id||'');
-  if(!switching&&sameCaseState(current.decisionCase,item.decision_case)){
+  const selectedId=item.decision_case?.id||item.case?.id||'';
+  const switching=String(current.decisionCase?.id||'')!==String(selectedId);
+  if(!switching&&sameCaseState(current.decisionCase,item.decision_case)&&window.DationDispatch?.isReady?.()){
     navigateDirect('logistics-map');
     return;
   }
@@ -131,7 +132,8 @@ export async function openDecisionMap(){
   const current=savedWorkspace();
   if(!cases.length){
     if(current.decisionCase?.id&&current.orders&&current.fleet){
-      navigateDirect('logistics-map');
+      if(window.DationDispatch?.isReady?.())navigateDirect('logistics-map');
+      else reloadInto('logistics-map');
     }else{
       navigateDirect('logistics-data');
     }
@@ -222,7 +224,7 @@ function dashboardBanner(runState,nodeId){
 
 async function openRun(runId,nodeId,runState){
   const run=await api('/api/runs/'+encodeURIComponent(runId));
-  if(run.status!=='completed'){
+  if(run.status!=='completed'||!run.result_json){
     throw new Error('La corrida todavía no tiene un análisis completo para abrir.');
   }
   window.DationDispatch?.show?.(run);
@@ -319,14 +321,41 @@ function exposeDispatchExtensions(){
   return true;
 }
 
-function restoreRequestedView(){
+function waitForWorkspaceReady(timeoutMs=15000){
+  const started=Date.now();
+  return new Promise(resolve=>{
+    const check=()=>{
+      if(window.DationDispatch?.isReady?.()){
+        resolve(true);
+        return;
+      }
+      if(Date.now()-started>=timeoutMs){
+        resolve(false);
+        return;
+      }
+      window.setTimeout(check,80);
+    };
+    check();
+  });
+}
+
+async function restoreRequestedView(){
   const view=sessionStorage.getItem(OPEN_VIEW_KEY);
   if(!view)return;
   sessionStorage.removeItem(OPEN_VIEW_KEY);
-  window.setTimeout(()=>{
-    if(view==='logistics-map')navigateDirect(view);
-    else originalNavigate?.(view);
-  },0);
+
+  // A full reload resets the global router's in-memory dataReady flag. Opening
+  // Carga de datos first remounts the persisted Data Pack and runs preflight;
+  // only then can Map/Config navigation pass the existing route guards.
+  originalNavigate?.('logistics-data');
+  const ready=await waitForWorkspaceReady();
+  if(!ready)return;
+
+  if(view==='logistics-map'){
+    navigateDirect('logistics-map');
+    return;
+  }
+  originalNavigate?.(view);
 }
 
 function boot(){
