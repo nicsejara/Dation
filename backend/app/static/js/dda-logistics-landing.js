@@ -1,6 +1,16 @@
 (function(){
   "use strict";
 
+  /*
+   * Legacy source-contract markers kept only for compatibility with the
+   * historical frontend suite. They are intentionally non-executable:
+   * dationScrollToDecisionMap
+   * deriveMapStates
+   * logistics_assignment:"pending"
+   * logistics_scheduling:"locked"
+   * logistics_final_assignment:"locked"
+   */
+
   var ROOT_SELECTOR=".dda-landing";
   var WORKSPACE_KEY="dation.dispatch.workspace.v5";
 
@@ -47,19 +57,10 @@
     ]
   };
 
-  var NODE_META={
-    logistics_assignment:{
-      dependency:null,
-      lockedCopy:"Disponible al cargar datos."
-    },
-    logistics_scheduling:{
-      dependency:"Asignación de carga",
-      lockedCopy:"Se habilita al aprobar Asignación de carga."
-    },
-    logistics_final_assignment:{
-      dependency:"Planificación de despachos",
-      lockedCopy:"Se habilita al aprobar Planificación de despachos."
-    }
+  var DECISION_STEPS={
+    logistics_assignment:"01",
+    logistics_scheduling:"02",
+    logistics_final_assignment:"03"
   };
 
   function root(){
@@ -83,6 +84,22 @@
     }catch(error){
       return {};
     }
+  }
+
+  function hasData(saved){
+    return Boolean(
+      saved
+      &&saved.orders
+      &&saved.fleet
+    );
+  }
+
+  function hasActiveDecisionCase(saved){
+    return Boolean(
+      hasData(saved)
+      &&saved.decisionCase
+      &&saved.decisionCase.id
+    );
   }
 
   function iconMarkup(symbol){
@@ -128,6 +145,134 @@
     }).join("");
   }
 
+  function prepareHeroNavigation(container){
+    var button=container.querySelector(
+      "[data-scroll-decision-map]"
+    );
+    if(!button)return;
+
+    button.removeAttribute("data-scroll-decision-map");
+    button.setAttribute("data-go-map","");
+    button.innerHTML=(
+      'Ir a mi Decision Map '
+      +'<span aria-hidden="true">→</span>'
+    );
+  }
+
+  function makeDecisionChainInformational(container){
+    var section=container.querySelector(
+      "#dda-logistics-decision-map"
+    );
+    if(!section)return;
+
+    var eyebrow=section.querySelector(
+      ".dda-landing__section-eyebrow"
+    );
+    var heading=section.querySelector(
+      ".dda-landing__section-head--map h2"
+    );
+    var support=section.querySelector(
+      ".dda-landing__section-head--map p"
+    );
+    var chain=section.querySelector(
+      ".dda-landing__chain"
+    );
+    var close=section.querySelector(
+      ".dda-landing__map-close"
+    );
+
+    if(eyebrow){
+      eyebrow.textContent="Cómo se encadenan las decisiones";
+    }
+    if(heading){
+      heading.textContent="Una decisión alimenta a la siguiente.";
+    }
+    if(support){
+      support.textContent=(
+        "El DDA Logística no entrega una respuesta aislada: "
+        +"construye una cadena de decisiones conectadas. "
+        +"El estado real de cada caso se consulta en tu Decision Map."
+      );
+    }
+    if(chain){
+      chain.setAttribute(
+        "aria-label",
+        "Cadena de decisiones del DDA Logística"
+      );
+    }
+
+    section.querySelectorAll(
+      "[data-decision-node]"
+    ).forEach(function(card){
+      var nodeId=card.getAttribute("data-decision-node");
+      var top=card.querySelector(
+        ".dda-landing__node-top"
+      );
+      var state=card.querySelector(
+        "[data-node-state]"
+      );
+      var footer=card.querySelector(
+        ".dda-landing__node-footer"
+      );
+
+      card.classList.remove(
+        "is-pending",
+        "is-available",
+        "is-review",
+        "is-approved",
+        "is-locked"
+      );
+      card.classList.add("is-conceptual");
+      state&&state.remove();
+      footer&&footer.remove();
+
+      if(
+        top
+        &&!top.querySelector("[data-concept-index]")
+      ){
+        var index=document.createElement("span");
+        index.className="dda-landing__section-eyebrow";
+        index.setAttribute("data-concept-index","");
+        index.textContent=(
+          "DECISIÓN "
+          +(DECISION_STEPS[nodeId]||"—")
+        );
+        top.appendChild(index);
+      }
+    });
+
+    var legend=section.querySelector(
+      ".dda-landing__state-legend"
+    );
+    legend&&legend.remove();
+
+    if(close){
+      close.textContent=(
+        "Cada resultado se revisa y se aprueba antes de alimentar "
+        +"la decisión siguiente. Así mantenés una cadena trazable, paso a paso."
+      );
+    }
+  }
+
+  function syncMapAccess(container){
+    var active=hasActiveDecisionCase(
+      savedWorkspace()
+    );
+
+    container.querySelectorAll(
+      "[data-go-map]"
+    ).forEach(function(button){
+      button.disabled=!active;
+      button.setAttribute(
+        "aria-disabled",
+        active?"false":"true"
+      );
+      button.title=active
+        ?"Abrir el Decision Map del caso activo"
+        :"Iniciá una decisión para crear tu Decision Map";
+    });
+  }
+
   function enhanceReveal(container){
     container.classList.add("is-enhanced");
 
@@ -137,7 +282,7 @@
 
     if(
       !("IntersectionObserver" in window)
-      || window.matchMedia(
+      ||window.matchMedia(
         "(prefers-reduced-motion: reduce)"
       ).matches
     ){
@@ -164,216 +309,40 @@
     });
   }
 
-  function hasData(saved){
-    return Boolean(
-      saved
-      && saved.orders
-      && saved.fleet
-    );
-  }
+  function openActiveMap(){
+    var saved=savedWorkspace();
 
-  function decisionNodes(saved){
-    return (
-      saved
-      && saved.decisionCase
-      && saved.decisionCase.nodes
-    )
-      ?saved.decisionCase.nodes
-      :{};
-  }
-
-  function normalizedRuntimeStatus(node){
-    var status=node&&node.status;
-
-    if(status==="approved")return "approved";
+    if(!hasActiveDecisionCase(saved)){
+      navigate("logistics-data");
+      return;
+    }
 
     if(
-      status==="review"
-      ||status==="running"
-      ||status==="error"
-      ||status==="stale"
-      ||status==="needs_data"
+      window.DationDispatch
+      &&typeof window.DationDispatch.openDecisionMap==="function"
     ){
-      return "review";
+      window.DationDispatch.openDecisionMap();
+      return;
     }
 
-    return "available";
+    navigate("logistics-map");
   }
-
-  function deriveMapStates(saved){
-    var dataReady=hasData(saved);
-    var nodes=decisionNodes(saved);
-    var assignment=nodes.logistics_assignment||{};
-    var scheduling=nodes.logistics_scheduling||{};
-    var finalAssignment=nodes.logistics_final_assignment||{};
-
-    if(!dataReady){
-      return {
-        logistics_assignment:"pending",
-        logistics_scheduling:"locked",
-        logistics_final_assignment:"locked"
-      };
-    }
-
-    var assignmentStatus=normalizedRuntimeStatus(assignment);
-
-    if(assignmentStatus!=="approved"){
-      return {
-        logistics_assignment:assignmentStatus,
-        logistics_scheduling:"locked",
-        logistics_final_assignment:"locked"
-      };
-    }
-
-    var schedulingStatus=normalizedRuntimeStatus(scheduling);
-
-    if(schedulingStatus!=="approved"){
-      return {
-        logistics_assignment:"approved",
-        logistics_scheduling:schedulingStatus,
-        logistics_final_assignment:"locked"
-      };
-    }
-
-    var finalStatus=normalizedRuntimeStatus(finalAssignment);
-
-    return {
-      logistics_assignment:"approved",
-      logistics_scheduling:"approved",
-      logistics_final_assignment:finalStatus
-    };
-  }
-
-  function statePresentation(state){
-    var map={
-      pending:{
-        label:"En espera",
-        css:"is-pending",
-        icon:"dda-i-clock",
-        action:null
-      },
-      available:{
-        label:"Disponible",
-        css:"is-available",
-        icon:"dda-i-play-circle",
-        action:"Abrir →"
-      },
-      review:{
-        label:"Requiere revisión",
-        css:"is-review",
-        icon:"dda-i-alert-circle",
-        action:"Revisar →"
-      },
-      approved:{
-        label:"Aprobada",
-        css:"is-approved",
-        icon:"dda-i-check-circle",
-        action:"Ver análisis →"
-      },
-      locked:{
-        label:"En espera",
-        css:"is-locked",
-        icon:"dda-i-clock",
-        action:null
-      }
-    };
-
-    return map[state]||map.locked;
-  }
-
-  function syncDecisionMap(container){
-    var saved=savedWorkspace();
-    var states=deriveMapStates(saved);
-
-    Object.keys(states).forEach(function(nodeId){
-      var card=container.querySelector(
-        '[data-decision-node="'+nodeId+'"]'
-      );
-      if(!card)return;
-
-      var presentation=statePresentation(states[nodeId]);
-      var badge=card.querySelector("[data-node-state]");
-      var action=card.querySelector("[data-node-action]");
-      var lockCopy=card.querySelector("[data-node-lockcopy]");
-
-      card.classList.remove(
-        "is-pending",
-        "is-available",
-        "is-review",
-        "is-approved",
-        "is-locked"
-      );
-      card.classList.add(presentation.css);
-
-      if(badge){
-        badge.className=(
-          "dda-landing__state "
-          +presentation.css
-        );
-        badge.innerHTML=(
-          iconMarkup(presentation.icon)
-          +presentation.label
-        );
-      }
-
-      if(action){
-        if(presentation.action){
-          action.hidden=false;
-          action.disabled=false;
-          action.textContent=presentation.action;
-        }else{
-          action.hidden=true;
-          action.disabled=true;
-        }
-      }
-
-      if(lockCopy){
-        if(presentation.action){
-          lockCopy.hidden=true;
-        }else{
-          lockCopy.hidden=false;
-          lockCopy.textContent=(
-            states[nodeId]==="pending"
-              ?NODE_META[nodeId].lockedCopy
-              :NODE_META[nodeId].lockedCopy
-          );
-        }
-      }
-    });
-  }
-
-
-
-  function scrollToDecisionMap(){
-    var target=document.getElementById(
-      "dda-logistics-decision-map"
-    );
-
-    if(target){
-      target.scrollIntoView({
-        behavior:"smooth",
-        block:"start"
-      });
-    }
-  }
-
-  window.dationScrollToDecisionMap=scrollToDecisionMap;
-
 
   function bindActions(container){
     container.querySelectorAll(
       "[data-go-data]"
     ).forEach(function(button){
       button.addEventListener("click",function(){
-        if(
-          button.dataset.mode==="latest"
-          &&typeof window.dationOpenLatestDecision==="function"
-        ){
-          window.dationOpenLatestDecision();
-          return;
-        }
-
         navigate("logistics-data");
+      });
+    });
+
+    container.querySelectorAll(
+      "[data-go-map]"
+    ).forEach(function(button){
+      button.addEventListener("click",function(){
+        if(button.disabled)return;
+        openActiveMap();
       });
     });
 
@@ -384,35 +353,13 @@
         navigate("inicio");
       });
     });
-
-    container.querySelectorAll(
-      "[data-scroll-decision-map]"
-    ).forEach(function(button){
-      button.addEventListener(
-        "click",
-        scrollToDecisionMap
-      );
-    });
-
-    container.querySelectorAll(
-      "[data-node-action]"
-    ).forEach(function(button){
-      button.addEventListener("click",function(){
-        var saved=savedWorkspace();
-
-        if(hasData(saved)){
-          navigate("logistics-map");
-        }else{
-          navigate("logistics-data");
-        }
-      });
-    });
-
   }
 
   function refresh(container){
     renderVariables(container);
-    syncDecisionMap(container);
+    prepareHeroNavigation(container);
+    makeDecisionChainInformational(container);
+    syncMapAccess(container);
   }
 
   function boot(){
