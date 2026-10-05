@@ -3,6 +3,7 @@ from unittest.mock import AsyncMock, patch
 import httpx
 from main import app
 from app.auth import require_upload_access
+from app.services import decision_case_service
 from app.services import dispatch_service
 
 O='00000000-0000-4000-8000-000000000001'
@@ -12,8 +13,22 @@ F='00000000-0000-4000-8000-000000000002'
 class DispatchHTTPTests(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
         self.client=httpx.AsyncClient(transport=httpx.ASGITransport(app=app),base_url='http://test')
+        self.ensure_case_patcher=patch.object(
+            decision_case_service,
+            'ensure_case',
+            AsyncMock(return_value={'id':'case'}),
+        )
+        self.record_case_patcher=patch.object(
+            decision_case_service,
+            'record_node_state',
+            AsyncMock(return_value={'id':'case'}),
+        )
+        self.ensure_case=self.ensure_case_patcher.start()
+        self.record_case=self.record_case_patcher.start()
 
     async def asyncTearDown(self):
+        self.ensure_case_patcher.stop()
+        self.record_case_patcher.stop()
         app.dependency_overrides.clear();await self.client.aclose()
 
     async def test_authentication_required(self):
@@ -66,6 +81,11 @@ class DispatchHTTPTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(config['weights']['cost'],0)
             self.assertNotIn('time',config['weights'])
             self.assertNotIn('max_late_days',options)
+            self.ensure_case.assert_awaited_with(case_id,O,F)
+            self.assertEqual(
+                [call.kwargs['status'] for call in self.record_case.await_args_list[-2:]],
+                ['running','review'],
+            )
 
         invalid=await self.client.post(
             '/api/runs',
@@ -155,6 +175,7 @@ class DispatchHTTPTests(unittest.IsolatedAsyncioTestCase):
                     'case_id':case_id,
                     'node_id':'logistics_assignment',
                     'status':'approved',
+                    'approved_at':'2026-10-05T00:00:00+00:00',
                 },
             },
         }
@@ -175,6 +196,11 @@ class DispatchHTTPTests(unittest.IsolatedAsyncioTestCase):
                 O,
                 case_id=case_id,
                 node_id='logistics_assignment',
+            )
+            self.assertEqual(self.record_case.await_args.kwargs['status'],'approved')
+            self.assertEqual(
+                self.record_case.await_args.kwargs['approved_at'],
+                '2026-10-05T00:00:00+00:00',
             )
 
     async def test_run_accepts_decision_case_lineage(self):
