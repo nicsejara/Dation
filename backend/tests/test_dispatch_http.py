@@ -23,12 +23,26 @@ class DispatchHTTPTests(unittest.IsolatedAsyncioTestCase):
             'record_node_state',
             AsyncMock(return_value={'id':'case'}),
         )
+        self.sync_case_patcher=patch.object(
+            decision_case_service,
+            'sync_case_history',
+            AsyncMock(return_value={'id':'case'}),
+        )
+        self.validate_upstream_patcher=patch.object(
+            decision_case_service,
+            'validate_upstream_run',
+            AsyncMock(return_value={'id':O,'approved_at':'2026-10-05T00:00:00+00:00'}),
+        )
         self.ensure_case=self.ensure_case_patcher.start()
         self.record_case=self.record_case_patcher.start()
+        self.sync_case=self.sync_case_patcher.start()
+        self.validate_upstream=self.validate_upstream_patcher.start()
 
     async def asyncTearDown(self):
         self.ensure_case_patcher.stop()
         self.record_case_patcher.stop()
+        self.sync_case_patcher.stop()
+        self.validate_upstream_patcher.stop()
         app.dependency_overrides.clear();await self.client.aclose()
 
     async def test_authentication_required(self):
@@ -86,6 +100,7 @@ class DispatchHTTPTests(unittest.IsolatedAsyncioTestCase):
                 [call.kwargs['status'] for call in self.record_case.await_args_list[-2:]],
                 ['running','review'],
             )
+            self.sync_case.assert_awaited_with(case_id)
 
         invalid=await self.client.post(
             '/api/runs',
@@ -163,6 +178,11 @@ class DispatchHTTPTests(unittest.IsolatedAsyncioTestCase):
                 execute.call_args.args[6],
                 O,
             )
+            self.validate_upstream.assert_awaited_with(
+                case_id,
+                'logistics_scheduling',
+                O,
+            )
 
     async def test_decision_approval_endpoint(self):
         app.dependency_overrides[require_upload_access]=lambda:'dation'
@@ -170,18 +190,13 @@ class DispatchHTTPTests(unittest.IsolatedAsyncioTestCase):
         approved={
             'id':O,
             'status':'completed',
-            'result_json':{
-                'decision_case':{
-                    'case_id':case_id,
-                    'node_id':'logistics_assignment',
-                    'status':'approved',
-                    'approved_at':'2026-10-05T00:00:00+00:00',
-                },
-            },
+            'approved_at':'2026-10-05T00:00:00+00:00',
+            'decision_case_id':case_id,
+            'node_id':'logistics_assignment',
         }
         with patch.object(
-            dispatch_service,
-            'approve_decision_run',
+            decision_case_service,
+            'approve_run_version',
             AsyncMock(return_value=approved),
         ) as approve:
             response=await self.client.post(
@@ -202,6 +217,7 @@ class DispatchHTTPTests(unittest.IsolatedAsyncioTestCase):
                 self.record_case.await_args.kwargs['approved_at'],
                 '2026-10-05T00:00:00+00:00',
             )
+            self.sync_case.assert_awaited_with(case_id)
 
     async def test_run_accepts_decision_case_lineage(self):
         app.dependency_overrides[require_upload_access]=lambda:'dation'
