@@ -6,7 +6,7 @@ const OPEN_VIEW_KEY='dation.dispatch.trace.open-view.v3';
 const STYLE_ID='decision-trace-v3-styles';
 const STYLE_HREF='/static/css/decision-trace-v3.css?v=traceability-v3';
 let originalNavigate=null;
-let bypassMapRefresh=false;
+let bypassCaseRefresh=false;
 let decorating=false;
 let decorateTimer=null;
 
@@ -98,11 +98,11 @@ function reloadInto(view){
 }
 
 function navigateDirect(view){
-  bypassMapRefresh=true;
+  bypassCaseRefresh=true;
   try{
     originalNavigate?.(view);
   }finally{
-    bypassMapRefresh=false;
+    bypassCaseRefresh=false;
   }
 }
 
@@ -153,7 +153,7 @@ export async function openDecisionMap(){
   });
 }
 
-async function refreshCurrentCaseBeforeMap(args){
+async function refreshCurrentCaseBeforeView(view,args){
   const current=savedWorkspace();
   const caseId=current.decisionCase?.id;
   if(!caseId){
@@ -164,7 +164,7 @@ async function refreshCurrentCaseBeforeMap(args){
     const fresh=await hydrateCase(caseId);
     if(!sameCaseState(current.decisionCase,fresh.decision_case)){
       storeHydratedCase(fresh,{resetConfiguration:false,activeNode:current.activeNode||null});
-      reloadInto('logistics-map');
+      reloadInto(view);
       return;
     }
   }catch(error){
@@ -178,8 +178,8 @@ function wrapNavigation(){
   originalNavigate=window.dationNavigate;
   if(typeof originalNavigate!=='function')return;
   const wrapped=function(view,...rest){
-    if(view==='logistics-map'&&!bypassMapRefresh){
-      refreshCurrentCaseBeforeMap([view,...rest]);
+    if(['logistics-map','logistics-config'].includes(view)&&!bypassCaseRefresh){
+      refreshCurrentCaseBeforeView(view,[view,...rest]);
       return;
     }
     return originalNavigate(view,...rest);
