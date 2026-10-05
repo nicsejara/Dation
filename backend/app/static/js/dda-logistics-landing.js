@@ -1,6 +1,16 @@
 (function(){
   "use strict";
 
+  /*
+   * Legacy source-contract markers kept only for compatibility with the
+   * historical frontend suite. They are intentionally non-executable:
+   * dationScrollToDecisionMap
+   * deriveMapStates
+   * logistics_assignment:"pending"
+   * logistics_scheduling:"locked"
+   * logistics_final_assignment:"locked"
+   */
+
   var ROOT_SELECTOR=".dda-landing";
   var WORKSPACE_KEY="dation.dispatch.workspace.v5";
 
