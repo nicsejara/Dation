@@ -56,7 +56,7 @@ function ensureStyles(){
   style.textContent=`
 .assignment-config-root .assignment-filter-row.is-collapsible{padding:0;overflow:hidden;transition:border-color .18s ease,box-shadow .18s ease,background .18s ease}
 .assignment-config-root .assignment-filter-row.is-collapsible:hover{border-color:#c8dadd}
-.assignment-config-root .assignment-filter-row.is-collapsible .assignment-filter-row__head{margin:0;padding:13px 14px;gap:10px;background:#fbfcfd}
+.assignment-config-root .assignment-filter-row.is-collapsible .assignment-filter-row__head{margin:0;padding:13px 14px;gap:8px;background:#fbfcfd}
 .assignment-config-root .assignment-filter-row.is-collapsible:not(.is-collapsed) .assignment-filter-row__head{border-bottom:1px solid #e4ebed}
 .assignment-config-root .assignment-filter-row.is-collapsible .assignment-filter-row__head>div:first-child{display:grid;grid-template-columns:auto auto;gap:2px 8px;align-items:baseline;min-width:0}
 .assignment-config-root .assignment-filter-row.is-collapsible .assignment-filter-row__summary{grid-column:1/-1;display:none;min-width:0;overflow:hidden;color:#5e747e;font-size:12px;font-weight:650;line-height:1.35;text-overflow:ellipsis;white-space:nowrap}
@@ -68,15 +68,14 @@ function ensureStyles(){
 .assignment-config-root .assignment-filter-row.is-collapsible>.assignment-filter-date{margin:12px 14px 14px}
 .assignment-config-root .assignment-filter-row.is-collapsible>.assignment-filter-reference{margin:0 14px 14px}
 .assignment-config-root .assignment-filter-row.is-collapsible.is-collapsed>:not(.assignment-filter-row__head){display:none!important}
-.assignment-config-root .assignment-filter-row__head-actions{display:flex;gap:6px;align-items:center;margin-left:auto}
-.assignment-config-root .assignment-filter-toggle{display:grid!important;width:32px!important;height:32px!important;min-height:32px!important;place-items:center;padding:0!important;border:1px solid #d6e1e4!important;border-radius:9px!important;color:#55707b!important;background:#fff!important;cursor:pointer;transition:border-color .16s ease,background .16s ease,color .16s ease,transform .16s ease!important}
+.assignment-config-root .assignment-filter-toggle{display:grid!important;width:32px!important;height:32px!important;min-height:32px!important;flex:0 0 32px;place-items:center;margin-left:auto;padding:0!important;border:1px solid #d6e1e4!important;border-radius:9px!important;color:#55707b!important;background:#fff!important;cursor:pointer;transition:border-color .16s ease,background .16s ease,color .16s ease!important}
 .assignment-config-root .assignment-filter-toggle:hover{border-color:#8db9bc!important;color:#0b6d70!important;background:#f2f9f8!important}
 .assignment-config-root .assignment-filter-toggle svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .18s ease}
 .assignment-config-root .assignment-filter-row:not(.is-collapsed) .assignment-filter-toggle svg{transform:rotate(180deg)}
 .assignment-config-root .assignment-filter-row.is-collapsed .assignment-filter-toggle svg{transform:rotate(0deg)}
 .assignment-config-root .assignment-filter-row.is-collapsed{background:#fff}
 .assignment-config-root .assignment-filter-row.is-collapsed .assignment-filter-row__head{background:#fff}
-@media(max-width:560px){.assignment-config-root .assignment-filter-row.is-collapsible .assignment-filter-row__head>div:first-child{grid-template-columns:1fr}.assignment-config-root .assignment-filter-row.is-collapsible .assignment-filter-row__head>div:first-child small{grid-column:1}.assignment-config-root .assignment-filter-row__head-actions{align-self:start}}
+@media(max-width:560px){.assignment-config-root .assignment-filter-row.is-collapsible .assignment-filter-row__head>div:first-child{grid-template-columns:1fr}.assignment-config-root .assignment-filter-row.is-collapsible .assignment-filter-row__head>div:first-child small{grid-column:1}}
 @media(prefers-reduced-motion:reduce){.assignment-config-root .assignment-filter-row.is-collapsible,.assignment-config-root .assignment-filter-toggle,.assignment-config-root .assignment-filter-toggle svg{transition:none!important}}
 `;
   document.head.append(style);
@@ -92,7 +91,10 @@ function setExpanded(row,key,expanded){
     toggle.title=expanded?"Cerrar filtro":"Abrir filtro";
   }
   const summary=row.querySelector(".assignment-filter-row__summary");
-  if(summary)summary.textContent=filterSummary(row);
+  if(summary){
+    const next=filterSummary(row);
+    if(summary.textContent!==next)summary.textContent=next;
+  }
 }
 
 function decorateRow(row){
@@ -112,23 +114,15 @@ function decorateRow(row){
     copy.append(summary);
   }
 
-  let actions=head.querySelector(".assignment-filter-row__head-actions");
-  const remove=head.querySelector("[data-filter-remove]");
-  if(!actions){
-    actions=document.createElement("div");
-    actions.className="assignment-filter-row__head-actions";
-    head.append(actions);
-  }
-  if(remove&&remove.parentElement!==actions)actions.append(remove);
-
-  let toggle=actions.querySelector("[data-filter-collapse-toggle]");
+  let toggle=head.querySelector("[data-filter-collapse-toggle]");
   if(!toggle){
     toggle=document.createElement("button");
     toggle.type="button";
     toggle.className="assignment-filter-toggle";
     toggle.dataset.filterCollapseToggle=key;
     toggle.innerHTML=chevronSvg();
-    actions.prepend(toggle);
+    const remove=head.querySelector("[data-filter-remove]");
+    head.insertBefore(toggle,remove||null);
     toggle.addEventListener("click",event=>{
       event.preventDefault();
       event.stopPropagation();
