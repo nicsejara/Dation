@@ -1,3 +1,5 @@
+import "./dispatch/assignment-filter-collapse.mjs?v=scope-filter-collapse-v1";
+
 (function(){
   "use strict";
 
