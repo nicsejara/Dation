@@ -1,4 +1,4 @@
-from .engine import (
+from .configured_engine import (
     ENGINE_NAME,
     ENGINE_VERSION,
     SCHEMA_VERSION,
