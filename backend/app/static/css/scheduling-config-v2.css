@@ -1,0 +1,73 @@
+.scheduling-config-v2{--sched-ink:#0a2834;--sched-muted:#607681;--sched-line:#dce6e9;--sched-soft:#f5f9f9;--sched-teal:#107d80;--sched-blue:#436e9e;display:grid;gap:18px;max-width:1120px;margin:0 auto 48px;color:var(--sched-ink)}
+.scheduling-config-v2 *{box-sizing:border-box}
+.scheduling-config-v2 .assignment-config-hero{margin:0}
+.scheduling-config-v2 .scheduling-case-strip{margin:0}
+.scheduling-config-v2 .scheduling-section{padding:24px;border:1px solid var(--sched-line);border-radius:20px;background:#fff;box-shadow:0 8px 28px rgba(20,51,62,.045)}
+.scheduling-config-v2 .scheduling-section__head{display:grid;grid-template-columns:42px minmax(0,1fr) auto;gap:12px;align-items:start;margin-bottom:20px}
+.scheduling-config-v2 .scheduling-section__index{display:grid;width:38px;height:38px;place-items:center;border-radius:11px;color:#0c7477;background:#eaf6f5;font-size:13px;font-weight:900}
+.scheduling-config-v2 .scheduling-section__head h2{margin:0 0 5px;font-size:21px;line-height:1.15}
+.scheduling-config-v2 .scheduling-section__head p{margin:0;max-width:720px;color:var(--sched-muted);font-size:13px;line-height:1.55}
+.scheduling-config-v2 .scheduling-section__badge{align-self:center;padding:7px 10px;border:1px solid #cce2df;border-radius:999px;color:#0a7777;background:#f2fbf9;font-size:11px;font-weight:850;white-space:nowrap}
+.scheduling-config-v2 .scheduling-source{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.scheduling-config-v2 .scheduling-source article{padding:15px;border:1px solid #dce7e9;border-radius:14px;background:#fbfdfd}
+.scheduling-config-v2 .scheduling-source small{display:block;margin-bottom:7px;color:#70858e;font-size:10px;font-weight:850;letter-spacing:.08em;text-transform:uppercase}
+.scheduling-config-v2 .scheduling-source strong{display:block;font-size:18px;line-height:1.1}
+.scheduling-config-v2 .scheduling-source span{display:block;margin-top:5px;color:#627781;font-size:11px;line-height:1.4}
+.scheduling-config-v2 .scheduling-boundary{display:flex;gap:10px;align-items:flex-start;padding:13px 15px;border:1px solid #d7e5e6;border-radius:13px;background:#f7fbfb;color:#4d6570;font-size:12px;line-height:1.5}
+.scheduling-config-v2 .scheduling-boundary b{color:#183c48}
+.scheduling-config-v2 .scheduling-window-mode{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.scheduling-config-v2 .scheduling-choice{position:relative;display:grid;gap:6px;min-height:105px;padding:16px;border:1px solid #d7e3e6;border-radius:15px;background:#fff;cursor:pointer;transition:border-color .16s ease,box-shadow .16s ease,transform .16s ease}
+.scheduling-config-v2 .scheduling-choice:hover{border-color:#87b6b8;box-shadow:0 10px 25px rgba(21,76,82,.08);transform:translateY(-1px)}
+.scheduling-config-v2 .scheduling-choice.is-selected{border-color:#258e91;box-shadow:0 0 0 2px rgba(37,142,145,.10);background:#f8fdfc}
+.scheduling-config-v2 .scheduling-choice.is-disabled{cursor:not-allowed;opacity:.54;background:#f6f8f8;transform:none;box-shadow:none}
+.scheduling-config-v2 .scheduling-choice input{position:absolute;opacity:0;pointer-events:none}
+.scheduling-config-v2 .scheduling-choice__top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.scheduling-config-v2 .scheduling-choice strong{font-size:14px}
+.scheduling-config-v2 .scheduling-choice p{margin:0;color:#667b84;font-size:12px;line-height:1.48}
+.scheduling-config-v2 .scheduling-choice em{font-style:normal;color:#0b7678;font-size:10px;font-weight:850;text-transform:uppercase;letter-spacing:.06em}
+.scheduling-config-v2 .scheduling-window-editor{display:none;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:16px;border:1px solid #dbe6e8;border-radius:15px;background:#f9fbfb}
+.scheduling-config-v2 .scheduling-window-editor.is-visible{display:grid}
+.scheduling-config-v2 .scheduling-field{display:grid;gap:6px}
+.scheduling-config-v2 .scheduling-field span{color:#526a74;font-size:11px;font-weight:800}
+.scheduling-config-v2 .scheduling-field input{width:100%;height:42px;padding:0 11px;border:1px solid #cfdde1;border-radius:10px;color:#183844;background:#fff;font:inherit;font-size:13px}
+.scheduling-config-v2 .scheduling-window-note{grid-column:1/-1;margin:0;color:#687e87;font-size:11px;line-height:1.45}
+.scheduling-config-v2 .scheduling-objectives{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.scheduling-config-v2 .scheduling-resource-policy{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(220px,.6fr);gap:14px;align-items:stretch}
+.scheduling-config-v2 .scheduling-inherited{padding:17px;border:1px solid #d6e3e5;border-radius:15px;background:#f8fbfb}
+.scheduling-config-v2 .scheduling-inherited__top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:7px}
+.scheduling-config-v2 .scheduling-inherited strong{font-size:14px}
+.scheduling-config-v2 .scheduling-inherited p{margin:0;color:#627983;font-size:12px;line-height:1.5}
+.scheduling-config-v2 .scheduling-lock{padding:6px 9px;border-radius:999px;color:#526d78;background:#eaf0f2;font-size:10px;font-weight:850;text-transform:uppercase}
+.scheduling-config-v2 .scheduling-resource-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.scheduling-config-v2 .scheduling-resource-stats div{display:grid;place-items:center;padding:13px;border:1px solid #dce6e8;border-radius:14px;background:#fff;text-align:center}
+.scheduling-config-v2 .scheduling-resource-stats strong{font-size:19px}
+.scheduling-config-v2 .scheduling-resource-stats span{color:#6a7d85;font-size:10px;font-weight:800;text-transform:uppercase}
+.scheduling-config-v2 .scheduling-depth-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+.scheduling-config-v2 .scheduling-depth{padding:15px;border:1px solid #d8e3e6;border-radius:14px;background:#fff}
+.scheduling-config-v2 .scheduling-depth.is-selected{border-color:#2a8c8f;background:#f7fcfb;box-shadow:0 0 0 2px rgba(42,140,143,.08)}
+.scheduling-config-v2 .scheduling-depth.is-disabled{opacity:.5;background:#f5f7f7}
+.scheduling-config-v2 .scheduling-depth strong{display:block;margin-bottom:5px;font-size:13px}
+.scheduling-config-v2 .scheduling-depth p{margin:0;color:#657b84;font-size:11px;line-height:1.45}
+.scheduling-config-v2 .scheduling-depth small{display:block;margin-top:9px;color:#168084;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.06em}
+.scheduling-config-v2 .scheduling-footer{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:18px 20px;border:1px solid #d8e4e6;border-radius:17px;background:linear-gradient(105deg,#f8fcfb,#f6f8fc)}
+.scheduling-config-v2 .scheduling-footer small{display:block;margin-bottom:4px;color:#6b818a;font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.scheduling-config-v2 .scheduling-footer strong{display:block;font-size:14px}
+.scheduling-config-v2 .scheduling-footer span{display:block;margin-top:4px;color:#667b84;font-size:11px}
+.scheduling-config-v2 .scheduling-primary{min-height:44px;padding:0 18px;border:0;border-radius:11px;color:#fff;background:linear-gradient(135deg,#087b7d,#396e98);font-weight:850;cursor:pointer;box-shadow:0 9px 20px rgba(29,92,108,.18)}
+.scheduling-config-v2 .scheduling-primary:hover{transform:translateY(-1px);box-shadow:0 12px 25px rgba(29,92,108,.24)}
+.scheduling-config-v2 .scheduling-primary:disabled{cursor:wait;opacity:.6;transform:none}
+.scheduling-config-v2 .scheduling-review{width:min(620px,calc(100vw - 28px));padding:0;border:0;border-radius:18px;box-shadow:0 24px 70px rgba(12,37,47,.28)}
+.scheduling-config-v2 .scheduling-review::backdrop{background:rgba(9,30,39,.46);backdrop-filter:blur(2px)}
+.scheduling-config-v2 .scheduling-review form{padding:24px}
+.scheduling-config-v2 .scheduling-review h2{margin:5px 0 16px;font-size:22px}
+.scheduling-config-v2 .scheduling-review-grid{display:grid;gap:0;border:1px solid #dce5e8;border-radius:13px;overflow:hidden}
+.scheduling-config-v2 .scheduling-review-grid p{display:grid;grid-template-columns:150px 1fr;gap:10px;margin:0;padding:11px 13px;border-bottom:1px solid #e5ecee;font-size:12px}
+.scheduling-config-v2 .scheduling-review-grid p:last-child{border-bottom:0}
+.scheduling-config-v2 .scheduling-review-grid strong{color:#536c77}.scheduling-config-v2 .scheduling-review-grid span{color:#173a47;font-weight:700}
+.scheduling-config-v2 .scheduling-review-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:17px}
+.scheduling-config-v2 .scheduling-review-actions button{min-height:40px;padding:0 14px;border:1px solid #cfdee1;border-radius:10px;background:#fff;font-weight:800;cursor:pointer}
+.scheduling-config-v2 .scheduling-review-actions .scheduling-primary{border:0;background:linear-gradient(135deg,#087b7d,#396e98);color:#fff}
+.scheduling-config-v2 .scheduling-error{padding:11px 13px;border:1px solid #e8c8c8;border-radius:11px;color:#8a3434;background:#fff7f7;font-size:12px}
+@media(max-width:820px){.scheduling-config-v2 .scheduling-source,.scheduling-config-v2 .scheduling-depth-grid{grid-template-columns:1fr}.scheduling-config-v2 .scheduling-resource-policy{grid-template-columns:1fr}}
+@media(max-width:620px){.scheduling-config-v2 .scheduling-window-mode,.scheduling-config-v2 .scheduling-objectives,.scheduling-config-v2 .scheduling-window-editor{grid-template-columns:1fr}.scheduling-config-v2 .scheduling-section{padding:18px 15px}.scheduling-config-v2 .scheduling-section__head{grid-template-columns:36px 1fr}.scheduling-config-v2 .scheduling-section__badge{grid-column:2;justify-self:start}.scheduling-config-v2 .scheduling-footer{align-items:stretch;flex-direction:column}.scheduling-config-v2 .scheduling-primary{width:100%}.scheduling-config-v2 .scheduling-review-grid p{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.scheduling-config-v2 .scheduling-choice,.scheduling-config-v2 .scheduling-primary{transition:none!important}.scheduling-config-v2 .scheduling-choice:hover,.scheduling-config-v2 .scheduling-primary:hover{transform:none}}
