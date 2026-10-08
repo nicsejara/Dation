@@ -49,6 +49,11 @@ def solve_schedule(
     for index, item in enumerate(trips):
         earliest = _days(item["earliest_dispatch"], horizon_start)
         latest_start = max_horizon_days
+        if item.get("latest_dispatch"):
+            latest_start = min(
+                latest_start,
+                _days(item["latest_dispatch"], horizon_start),
+            )
         if item.get("available_until"):
             latest_resource_end = (
                 _days(item["available_until"], horizon_start) + 1
@@ -112,6 +117,7 @@ def solve_schedule(
                 "end": end,
                 "arrival": arrival,
                 "earliest": earliest,
+                "priority_rank": int(item.get("priority_rank") or 0),
             }
         )
 
@@ -124,6 +130,17 @@ def solve_schedule(
         for row in variables
     ]
     total_wait = sum(wait_terms) if wait_terms else 0
+
+    priority_wait_terms = [
+        (row["start"] - row["earliest"]) * row["priority_rank"]
+        for row in variables
+        if row["priority_rank"] > 0
+    ]
+    priority_wait = (
+        sum(priority_wait_terms)
+        if priority_wait_terms
+        else 0
+    )
 
     makespan = model.new_int_var(
         0,
@@ -164,16 +181,12 @@ def solve_schedule(
                 late_upper,
                 f"late_days_{order_id}",
             )
-            late_day_bounds.append(
-                late_upper
-            )
+            late_day_bounds.append(late_upper)
             model.add_max_equality(
                 late_days,
                 [order_arrival - due_offset, 0],
             )
-            is_late = model.new_bool_var(
-                f"late_{order_id}"
-            )
+            is_late = model.new_bool_var(f"late_{order_id}")
             model.add(late_days >= 1).only_enforce_if(is_late)
             model.add(late_days == 0).only_enforce_if(is_late.Not())
 
@@ -184,31 +197,47 @@ def solve_schedule(
     wait_weight = horizon_end + 1
     lower_max = max_wait * wait_weight + horizon_end
 
+    max_priority_rank = max(
+        (row["priority_rank"] for row in variables),
+        default=0,
+    )
+    max_priority_wait = (
+        len(trips) * max_horizon_days * max_priority_rank
+    )
+    priority_weight = lower_max + 1
+    lower_with_priority_max = (
+        max_priority_wait * priority_weight + lower_max
+    )
+    lower_objective = (
+        priority_wait * priority_weight
+        + total_wait * wait_weight
+        + makespan
+    )
+
     if late_days_vars:
         total_late_days = sum(late_days_vars)
-        max_late_sum = sum(
-            late_day_bounds
-        )
-        late_days_weight = lower_max + 1
+        max_late_sum = sum(late_day_bounds)
+        late_days_weight = lower_with_priority_max + 1
         late_count_weight = (
             max_late_sum * late_days_weight
-            + lower_max
+            + lower_with_priority_max
             + 1
         )
         objective = (
             sum(late_bools) * late_count_weight
             + total_late_days * late_days_weight
-            + total_wait * wait_weight
-            + makespan
+            + lower_objective
         )
     else:
-        objective = (
-            total_wait * wait_weight
-            + makespan
-        )
+        objective = lower_objective
 
-    # Guard against integer overflow in unusually large inputs.
-    if late_days_vars and late_count_weight * max(1, len(late_bools)) > 8_000_000_000_000_000_000:
+    max_objective_guard = lower_with_priority_max
+    if late_days_vars:
+        max_objective_guard = max(
+            max_objective_guard,
+            late_count_weight * max(1, len(late_bools)),
+        )
+    if max_objective_guard > 8_000_000_000_000_000_000:
         return None, {
             "name": "OR-Tools CP-SAT",
             "version": ortools.__version__,
