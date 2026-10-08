@@ -1,6 +1,7 @@
+from datetime import date
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class SchedulingConfig(BaseModel):
@@ -8,8 +9,27 @@ class SchedulingConfig(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    strategy: Literal["service_first"] = "service_first"
+    strategy: Literal[
+        "service_first",
+        "earliest_dispatch",
+    ] = "service_first"
     use_delivery_due_dates: bool = True
+    planning_window_start: date | None = None
+    planning_window_end: date | None = None
+
+    @model_validator(mode="after")
+    def validate_window(self):
+        if (
+            self.planning_window_start
+            and self.planning_window_end
+            and self.planning_window_end < self.planning_window_start
+        ):
+            raise ValueError(
+                "La fecha hasta de la ventana de planificación no puede ser anterior a la fecha desde."
+            )
+        if self.strategy == "earliest_dispatch":
+            self.use_delivery_due_dates = False
+        return self
 
 
 class SchedulingOptions(BaseModel):
@@ -34,6 +54,6 @@ class SchedulingOptions(BaseModel):
     )
     max_horizon_days: int = Field(
         default=180,
-        ge=14,
+        ge=1,
         le=365,
     )
