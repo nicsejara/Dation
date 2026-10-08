@@ -217,7 +217,7 @@ class SchedulingPhase2EngineTests(unittest.TestCase):
 class SchedulingPhase2FrontendContractTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.ui = (
+        main_ui = (
             ROOT
             / "app"
             / "static"
@@ -225,6 +225,15 @@ class SchedulingPhase2FrontendContractTests(unittest.TestCase):
             / "dispatch"
             / "scheduling-config-v2.mjs"
         ).read_text(encoding="utf-8")
+        focus_ui = (
+            ROOT
+            / "app"
+            / "static"
+            / "js"
+            / "dispatch"
+            / "scheduling-focus-rules.mjs"
+        ).read_text(encoding="utf-8")
+        cls.ui = main_ui + "\n" + focus_ui
         cls.css = (
             ROOT
             / "app"
@@ -242,8 +251,9 @@ class SchedulingPhase2FrontendContractTests(unittest.TestCase):
             "product",
         ):
             self.assertIn(value, self.ui)
-        self.assertIn("Reglas por foco", self.ui)
-        self.assertIn("Viajes afectados", self.ui)
+        self.assertIn("REGLAS POR FOCO", self.ui)
+        self.assertIn("VIAJES AFECTADOS", self.ui)
+        self.assertIn("matchingTripIds", self.ui)
 
     def test_ui_exposes_priority_and_specific_window_actions(self):
         self.assertIn("Priorizar salida", self.ui)
@@ -256,7 +266,8 @@ class SchedulingPhase2FrontendContractTests(unittest.TestCase):
     def test_execution_sends_temporal_rules(self):
         self.assertIn("temporal_rules", self.ui)
         self.assertIn("config.temporalRules", self.ui)
-        self.assertIn("matchedTripIds", self.ui)
+        self.assertIn("executionRules(config)", self.ui)
+        self.assertIn("hydrateExecutionRules", self.ui)
 
     def test_phase2_rules_are_responsive(self):
         self.assertIn("scheduling-rule-builder", self.css)
