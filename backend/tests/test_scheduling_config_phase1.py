@@ -1,6 +1,6 @@
 from pathlib import Path
+import unittest
 
-import pytest
 from pydantic import ValidationError
 
 from app.engines.scheduling import run_scheduling_engine
@@ -59,127 +59,125 @@ def run_schedule(orders, fleet, assignment, configuration=None, options=None):
     )
 
 
-def test_scheduling_window_is_part_of_canonical_configuration():
-    config = SchedulingConfig.model_validate(
-        {
-            "strategy": "service_first",
-            "planning_window_start": "2026-10-05",
-            "planning_window_end": "2026-10-15",
-        }
-    )
-    payload = config.model_dump(mode="json")
-    assert payload["planning_window_start"] == "2026-10-05"
-    assert payload["planning_window_end"] == "2026-10-15"
-
-
-def test_scheduling_window_rejects_reversed_dates():
-    with pytest.raises(ValidationError):
-        SchedulingConfig.model_validate(
+class SchedulingConfigPhase1Tests(unittest.TestCase):
+    def test_scheduling_window_is_part_of_canonical_configuration(self):
+        config = SchedulingConfig.model_validate(
             {
-                "planning_window_start": "2026-10-20",
-                "planning_window_end": "2026-10-10",
+                "strategy": "service_first",
+                "planning_window_start": "2026-10-05",
+                "planning_window_end": "2026-10-15",
             }
         )
+        payload = config.model_dump(mode="json")
+        self.assertEqual(payload["planning_window_start"], "2026-10-05")
+        self.assertEqual(payload["planning_window_end"], "2026-10-15")
 
+    def test_scheduling_window_rejects_reversed_dates(self):
+        with self.assertRaises(ValidationError):
+            SchedulingConfig.model_validate(
+                {
+                    "planning_window_start": "2026-10-20",
+                    "planning_window_end": "2026-10-10",
+                }
+            )
 
-def test_custom_window_delays_dispatch_but_keeps_assignment():
-    orders = [order("A", "Mendoza", ready="2026-10-01", due="2026-10-20")]
-    fleet = [vehicle(available_from="2026-10-01", available_until="2026-10-31")]
-    assignment = assignment_for(orders, fleet)
+    def test_custom_window_delays_dispatch_but_keeps_assignment(self):
+        orders = [order("A", "Mendoza", ready="2026-10-01", due="2026-10-20")]
+        fleet = [vehicle(available_from="2026-10-01", available_until="2026-10-31")]
+        assignment = assignment_for(orders, fleet)
 
-    result = run_schedule(
-        orders,
-        fleet,
-        assignment,
-        configuration={
-            "strategy": "service_first",
-            "planning_window_start": "2026-10-07",
-            "planning_window_end": "2026-10-10",
-        },
-        options={"max_horizon_days": 3},
-    )
-
-    scheduled = result["scenarios"]["selected"]["trips"][0]
-    source = assignment["scenarios"]["selected"]["trips"][0]
-    assert scheduled["dispatch_date"] == "2026-10-07"
-    assert scheduled["vehicle_id"] == source["vehicle_id"]
-    assert scheduled["loads"] == source["loads"]
-    assert result["analysis"]["planning_window"]["start"] == "2026-10-07"
-    assert result["analysis"]["planning_window"]["end"] == "2026-10-10"
-
-
-def test_custom_window_fails_if_all_dispatches_cannot_fit():
-    orders = [
-        order("A", "Mendoza", ready="2026-10-01", due="2026-10-20"),
-        order("B", "Rosario", ready="2026-10-01", due="2026-10-20"),
-    ]
-    fleet = [vehicle(available_from="2026-10-01", available_until="2026-10-31")]
-    assignment = assignment_for(orders, fleet)
-
-    with pytest.raises(ValueError, match="ventana|planificación"):
-        run_schedule(
+        result = run_schedule(
             orders,
             fleet,
             assignment,
             configuration={
-                "strategy": "earliest_dispatch",
-                "planning_window_start": "2026-10-01",
-                "planning_window_end": "2026-10-01",
+                "strategy": "service_first",
+                "planning_window_start": "2026-10-07",
+                "planning_window_end": "2026-10-10",
             },
-            options={"max_horizon_days": 1},
+            options={"max_horizon_days": 3},
         )
 
+        scheduled = result["scenarios"]["selected"]["trips"][0]
+        source = assignment["scenarios"]["selected"]["trips"][0]
+        self.assertEqual(scheduled["dispatch_date"], "2026-10-07")
+        self.assertEqual(scheduled["vehicle_id"], source["vehicle_id"])
+        self.assertEqual(scheduled["loads"], source["loads"])
+        self.assertEqual(result["analysis"]["planning_window"]["start"], "2026-10-07")
+        self.assertEqual(result["analysis"]["planning_window"]["end"], "2026-10-10")
 
-def test_earliest_dispatch_strategy_does_not_use_due_dates():
-    config = SchedulingConfig.model_validate(
-        {
-            "strategy": "earliest_dispatch",
-            "use_delivery_due_dates": True,
-        }
-    )
-    assert config.use_delivery_due_dates is False
+    def test_custom_window_fails_if_all_dispatches_cannot_fit(self):
+        orders = [
+            order("A", "Mendoza", ready="2026-10-01", due="2026-10-20"),
+            order("B", "Rosario", ready="2026-10-01", due="2026-10-20"),
+        ]
+        fleet = [vehicle(available_from="2026-10-01", available_until="2026-10-31")]
+        assignment = assignment_for(orders, fleet)
 
-    orders = [order("A", "Mendoza", due="2026-10-01")]
-    fleet = [vehicle()]
-    assignment = assignment_for(orders, fleet)
-    result = run_schedule(
-        orders,
-        fleet,
-        assignment,
-        configuration={"strategy": "earliest_dispatch"},
-    )
-    assert result["analysis"]["sla_enabled"] is False
-    assert result["analysis"]["objective_hierarchy"] == [
-        "total_wait_days",
-        "makespan",
-    ]
+        with self.assertRaisesRegex(ValueError, "ventana|planificación"):
+            run_schedule(
+                orders,
+                fleet,
+                assignment,
+                configuration={
+                    "strategy": "earliest_dispatch",
+                    "planning_window_start": "2026-10-01",
+                    "planning_window_end": "2026-10-01",
+                },
+                options={"max_horizon_days": 1},
+            )
+
+    def test_earliest_dispatch_strategy_does_not_use_due_dates(self):
+        config = SchedulingConfig.model_validate(
+            {
+                "strategy": "earliest_dispatch",
+                "use_delivery_due_dates": True,
+            }
+        )
+        self.assertFalse(config.use_delivery_due_dates)
+
+        orders = [order("A", "Mendoza", due="2026-10-01")]
+        fleet = [vehicle()]
+        assignment = assignment_for(orders, fleet)
+        result = run_schedule(
+            orders,
+            fleet,
+            assignment,
+            configuration={"strategy": "earliest_dispatch"},
+        )
+        self.assertFalse(result["analysis"]["sla_enabled"])
+        self.assertEqual(
+            result["analysis"]["objective_hierarchy"],
+            ["total_wait_days", "makespan"],
+        )
+
+    def test_phase1_scheduling_ui_matches_assignment_configuration_language(self):
+        self.assertIn("DECISIÓN 02 DE 3", UI)
+        self.assertIn("Decision Case y Data Pack en uso", UI)
+        self.assertIn("Alcance temporal", UI)
+        self.assertIn("Objetivo del calendario", UI)
+        self.assertIn("Política de recursos", UI)
+        self.assertIn("Profundidad del análisis", UI)
+        self.assertIn("Ventana automática", UI)
+        self.assertIn("Ventana personalizada", UI)
+        self.assertIn('type="date"', UI)
+        self.assertIn("Servicio primero", UI)
+        self.assertIn("Salida más temprana", UI)
+        self.assertIn("Heredada y bloqueada", UI)
+
+    def test_phase1_ui_is_loaded_and_responsive(self):
+        self.assertIn('scheduling-config-v2.mjs?v=scheduling-config-phase1', BOOTSTRAP)
+        self.assertIn(".scheduling-config-v2", CSS)
+        self.assertIn("@media(max-width:620px)", CSS)
+        self.assertIn("@media(prefers-reduced-motion:reduce)", CSS)
+
+    def test_phase1_execution_sends_real_window_and_strategy(self):
+        self.assertIn("planning_window_start", UI)
+        self.assertIn("planning_window_end", UI)
+        self.assertIn('strategy:config.strategy', UI)
+        self.assertIn('node_id:"logistics_scheduling"', UI)
+        self.assertIn("source_run_id:sourceRun.id", UI)
 
 
-def test_phase1_scheduling_ui_matches_assignment_configuration_language():
-    assert "DECISIÓN 02 DE 3" in UI
-    assert "Decision Case y Data Pack en uso" in UI
-    assert "Alcance temporal" in UI
-    assert "Objetivo del calendario" in UI
-    assert "Política de recursos" in UI
-    assert "Profundidad del análisis" in UI
-    assert "Ventana automática" in UI
-    assert "Ventana personalizada" in UI
-    assert 'type="date"' in UI
-    assert "Servicio primero" in UI
-    assert "Salida más temprana" in UI
-    assert "Heredada y bloqueada" in UI
-
-
-def test_phase1_ui_is_loaded_and_responsive():
-    assert 'scheduling-config-v2.mjs?v=scheduling-config-phase1' in BOOTSTRAP
-    assert ".scheduling-config-v2" in CSS
-    assert "@media(max-width:620px)" in CSS
-    assert "@media(prefers-reduced-motion:reduce)" in CSS
-
-
-def test_phase1_execution_sends_real_window_and_strategy():
-    assert "planning_window_start" in UI
-    assert "planning_window_end" in UI
-    assert 'strategy:config.strategy' in UI
-    assert 'node_id:"logistics_scheduling"' in UI
-    assert "source_run_id:sourceRun.id" in UI
+if __name__ == "__main__":
+    unittest.main()
