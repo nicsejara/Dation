@@ -1,11 +1,12 @@
-"""Phase 1 scheduling configuration layer.
+"""Scheduling configuration layer.
 
-Keeps the scheduling_v1 result contract while adding an explicit planning window
-and an earliest-dispatch objective without changing the approved Assignment.
+Keeps the scheduling_v1 result contract while adding explicit planning windows,
+objective selection and filtered temporal rules without changing Assignment.
 """
 
 import hashlib
-from datetime import date, datetime, timezone
+from collections import defaultdict
+from datetime import date, datetime, timedelta, timezone
 from time import perf_counter
 
 from app.models.scheduling_config import SchedulingConfig, SchedulingOptions
@@ -24,6 +25,99 @@ def _as_date(value):
     if value is None or isinstance(value, date):
         return value
     return date.fromisoformat(str(value))
+
+
+def _normalized(value):
+    return str(value or "").strip().casefold()
+
+
+def _source_values(source, field):
+    if field == "product":
+        return [
+            load.get("product")
+            for load in source.get("loads", [])
+            if load.get("product") is not None
+        ]
+    value = source.get(field)
+    return [] if value is None else [value]
+
+
+def _matches_rule(source, rule):
+    expected = {
+        _normalized(value)
+        for value in rule.get("values", [])
+    }
+    actual = {
+        _normalized(value)
+        for value in _source_values(source, rule["field"])
+    }
+    return bool(expected & actual)
+
+
+def _apply_focus_rules(prepared, rules):
+    evidence = []
+    for rule in rules:
+        matched = []
+        start = _as_date(rule.get("planning_window_start"))
+        end = _as_date(rule.get("planning_window_end"))
+
+        for item in prepared:
+            source = item["source"]
+            if not _matches_rule(source, rule):
+                continue
+
+            matched.append(item["trip_id"])
+            item.setdefault("focus_rule_ids", []).append(rule["id"])
+
+            if rule["action"] == "prioritize":
+                item["priority_rank"] = max(
+                    int(item.get("priority_rank") or 0),
+                    1,
+                )
+                continue
+
+            if start and item["earliest_dispatch"] < start:
+                item["earliest_dispatch"] = start
+            if end:
+                current_end = item.get("latest_dispatch")
+                item["latest_dispatch"] = (
+                    min(current_end, end)
+                    if current_end
+                    else end
+                )
+            if (
+                item.get("latest_dispatch")
+                and item["latest_dispatch"] < item["earliest_dispatch"]
+            ):
+                raise ValueError(
+                    "La regla temporal "
+                    + rule["id"]
+                    + " deja al viaje "
+                    + item["trip_id"]
+                    + " sin una fecha de salida factible."
+                )
+
+        if not matched:
+            raise ValueError(
+                "La regla temporal "
+                + rule["id"]
+                + " no coincide con ningún viaje de la asignación aprobada."
+            )
+
+        evidence.append(
+            {
+                "id": rule["id"],
+                "field": rule["field"],
+                "values": list(rule["values"]),
+                "action": rule["action"],
+                "planning_window_start": rule.get("planning_window_start"),
+                "planning_window_end": rule.get("planning_window_end"),
+                "matched_trip_count": len(matched),
+                "matched_trip_ids": sorted(matched),
+            }
+        )
+
+    return evidence
 
 
 def _apply_planning_window(prepared, config, options):
@@ -48,12 +142,85 @@ def _apply_planning_window(prepared, config, options):
             max(0, (end - horizon_start).days),
         )
 
+    for item in prepared:
+        if (
+            item.get("latest_dispatch")
+            and item["latest_dispatch"] < item["earliest_dispatch"]
+        ):
+            raise ValueError(
+                f"{item['trip_id']} no tiene una ventana temporal factible."
+            )
+
     return horizon_start, horizon_days, start, end
 
 
-def _validate_window_result(scheduled, start, end):
-    for trip in scheduled:
-        dispatch = date.fromisoformat(trip["dispatch_date"])
+def _focused_greedy_offsets(trips, horizon_start):
+    by_vehicle = defaultdict(list)
+    for item in trips:
+        by_vehicle[item["vehicle_id"]].append(item)
+
+    offsets = {}
+    for items in by_vehicle.values():
+        remaining = list(items)
+        free = min(item["earliest_dispatch"] for item in remaining)
+
+        while remaining:
+            available = [
+                item
+                for item in remaining
+                if item["earliest_dispatch"] <= free
+            ]
+            if not available:
+                free = max(
+                    free,
+                    min(item["earliest_dispatch"] for item in remaining),
+                )
+                available = [
+                    item
+                    for item in remaining
+                    if item["earliest_dispatch"] <= free
+                ]
+
+            current = min(
+                available,
+                key=lambda item: (
+                    item["strictest_due"] or date.max,
+                    -int(item.get("priority_rank") or 0),
+                    item["earliest_dispatch"],
+                    item["cycle_days"],
+                    item["trip_id"],
+                ),
+            )
+            dispatch = max(free, current["earliest_dispatch"])
+            if (
+                current.get("latest_dispatch")
+                and dispatch > current["latest_dispatch"]
+            ):
+                return None
+
+            resource_free = dispatch + timedelta(days=current["cycle_days"])
+            if (
+                current["available_until"]
+                and resource_free - timedelta(days=1)
+                > current["available_until"]
+            ):
+                return None
+
+            offsets[current["trip_id"]] = (
+                dispatch - horizon_start
+            ).days
+            free = resource_free
+            remaining.remove(current)
+
+    return offsets
+
+
+def _validate_window_result(scheduled, start, end, focus_evidence):
+    by_trip = {
+        item["trip_id"]: date.fromisoformat(item["dispatch_date"])
+        for item in scheduled
+    }
+    for dispatch in by_trip.values():
         if start and dispatch < start:
             raise ValueError(
                 "La planificación generó un despacho anterior a la ventana configurada."
@@ -62,6 +229,22 @@ def _validate_window_result(scheduled, start, end):
             raise ValueError(
                 "No existe una planificación factible que ubique todos los despachos dentro de la ventana configurada."
             )
+
+    for rule in focus_evidence:
+        if rule["action"] != "window":
+            continue
+        rule_start = _as_date(rule.get("planning_window_start"))
+        rule_end = _as_date(rule.get("planning_window_end"))
+        for trip_id in rule["matched_trip_ids"]:
+            dispatch = by_trip[trip_id]
+            if rule_start and dispatch < rule_start:
+                raise ValueError(
+                    f"{trip_id} quedó antes de la ventana definida por {rule['id']}."
+                )
+            if rule_end and dispatch > rule_end:
+                raise ValueError(
+                    f"{trip_id} quedó después de la ventana definida por {rule['id']}."
+                )
 
 
 def run_scheduling_engine(
@@ -110,6 +293,10 @@ def run_scheduling_engine(
         selected_assignment["trips"],
         sla_enabled=sla_enabled,
     )
+    focus_evidence = _apply_focus_rules(
+        prepared,
+        config.get("temporal_rules") or [],
+    )
     (
         horizon_start,
         effective_horizon_days,
@@ -118,16 +305,12 @@ def run_scheduling_engine(
     ) = _apply_planning_window(prepared, config, opts)
 
     notify("constructing")
-    greedy_hint = core._greedy_offsets(
+    greedy_hint = _focused_greedy_offsets(
         prepared,
         horizon_start,
     )
-    if greedy_hint is None:
-        raise ValueError(
-            "No existe una secuencia temporal factible dentro de las ventanas de disponibilidad."
-        )
 
-    greedy_inside_window = all(
+    greedy_inside_window = bool(greedy_hint) and all(
         int(offset) <= effective_horizon_days
         for offset in greedy_hint.values()
     )
@@ -156,11 +339,11 @@ def run_scheduling_engine(
         if solver_meta.get("status") == "infeasible":
             raise ValueError(
                 solver_meta.get("reason")
-                or "No existe una programación temporal factible dentro de la ventana configurada."
+                or "No existe una programación temporal factible dentro de las restricciones configuradas."
             )
         if not greedy_inside_window:
             raise ValueError(
-                "No se encontró una planificación completa dentro de la ventana temporal configurada."
+                "No se encontró una planificación completa dentro de las restricciones temporales configuradas."
             )
         offsets = greedy_hint
         solver_meta = {
@@ -184,6 +367,7 @@ def run_scheduling_engine(
         scheduled,
         window_start,
         window_end,
+        focus_evidence,
     )
 
     notify("summarizing")
@@ -201,6 +385,30 @@ def run_scheduling_engine(
     schedule_fingerprint = core._digest(
         core._schedule_signature(scheduled)
     )
+    focused_trip_ids = sorted(
+        {
+            trip_id
+            for rule in focus_evidence
+            for trip_id in rule["matched_trip_ids"]
+        }
+    )
+    has_priority_rules = any(
+        rule["action"] == "prioritize"
+        for rule in focus_evidence
+    )
+
+    objective_hierarchy = []
+    if sla_enabled:
+        objective_hierarchy.extend([
+            "late_orders",
+            "total_late_days",
+        ])
+    if has_priority_rules:
+        objective_hierarchy.append("focus_priority_wait")
+    objective_hierarchy.extend([
+        "total_wait_days",
+        "makespan",
+    ])
 
     result = {
         "schema_version": SCHEMA_VERSION,
@@ -227,19 +435,10 @@ def run_scheduling_engine(
                 "effective_horizon_start": horizon_start.isoformat(),
                 "effective_horizon_days": effective_horizon_days,
             },
-            "objective_hierarchy": (
-                [
-                    "late_orders",
-                    "total_late_days",
-                    "total_wait_days",
-                    "makespan",
-                ]
-                if sla_enabled
-                else [
-                    "total_wait_days",
-                    "makespan",
-                ]
-            ),
+            "focus_rules": focus_evidence,
+            "focused_trip_count": len(focused_trip_ids),
+            "focused_trip_ids": focused_trip_ids,
+            "objective_hierarchy": objective_hierarchy,
         },
         "inputs": {
             "orders": {
@@ -275,6 +474,8 @@ def run_scheduling_engine(
             "total_late_days": metrics["total_late_days"],
             "total_wait_days": metrics["total_wait_days"],
             "makespan_days": metrics["makespan_days"],
+            "temporal_rules": len(focus_evidence),
+            "focused_trips": len(focused_trip_ids),
         },
         "exceptions": summary["exceptions"],
         "scenarios": {
@@ -294,8 +495,12 @@ def run_scheduling_engine(
                 "aprobados en Assignment."
             ),
             (
+                "Los filtros temporales nunca excluyen viajes: sólo priorizan o "
+                "restringen la fecha de salida del subconjunto seleccionado."
+            ),
+            (
                 "La fecha mínima de salida respeta disponibilidad de carga, "
-                "disponibilidad del vehículo y la ventana configurada."
+                "disponibilidad del vehículo y las ventanas configuradas."
             ),
             (
                 "La duración diaria usa distance_km, avg_speed_kmh y "
