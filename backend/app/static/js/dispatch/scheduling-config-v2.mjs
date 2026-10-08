@@ -1,5 +1,14 @@
 import {api,esc,num,post} from "./shared.mjs";
 import {iconSvg} from "./decision-ui.mjs?v=assignment-config-v2";
+import {
+  bindFocusRuleEvents,
+  executionRules,
+  focusRulesMarkup,
+  focusedTripIds,
+  hydrateExecutionRules,
+  normalizeFocusConfig,
+  validateFocusRules,
+} from "./scheduling-focus-rules.mjs?v=scheduling-config-phase2";
 
 const WORKSPACE_KEY="dation.dispatch.workspace.v5";
 const CONFIG_KEY="dation.scheduling.config.v1";
@@ -23,9 +32,9 @@ function ensureLink(id,href){
 }
 
 function ensureStyles(){
-  ensureLink(STYLE_IDS.case,"/static/css/decision-map-case-v2.css?v=scheduling-config-phase1");
-  ensureLink(STYLE_IDS.assignment,"/static/css/assignment-config-v2.css?v=scheduling-config-phase1");
-  ensureLink(STYLE_IDS.own,"/static/css/scheduling-config-v2.css?v=scheduling-config-phase1");
+  ensureLink(STYLE_IDS.case,"/static/css/decision-map-case-v2.css?v=scheduling-config-phase2");
+  ensureLink(STYLE_IDS.assignment,"/static/css/assignment-config-v2.css?v=scheduling-config-phase2");
+  ensureLink(STYLE_IDS.own,"/static/css/scheduling-config-v2.css?v=scheduling-config-phase2");
 }
 
 function readJson(key,fallback={}){
@@ -33,7 +42,6 @@ function readJson(key,fallback={}){
 }
 
 function workspace(){return readJson(WORKSPACE_KEY,{});}
-
 function configStore(){return readJson(CONFIG_KEY,{});}
 
 function writeConfig(caseId,value){
@@ -50,6 +58,14 @@ function defaults(){
     windowStart:"",
     windowEnd:"",
     analysisDepth:"essential",
+    temporalRules:[],
+    ruleDraft:{
+      field:"destination",
+      values:[],
+      action:"prioritize",
+      windowStart:"",
+      windowEnd:"",
+    },
   };
 }
 
@@ -191,15 +207,25 @@ function objectiveLabel(config){
   return config.strategy==="service_first"?"Servicio primero":"Salida más temprana";
 }
 
+function rulesLabel(config,trips){
+  const rules=config.temporalRules||[];
+  if(!rules.length)return "Sin reglas específicas";
+  const focused=focusedTripIds(config,trips).length;
+  return rules.length+' '+(rules.length===1?'regla':'reglas')+' · '+focused+' '+(focused===1?'viaje afectado':'viajes afectados');
+}
+
 function markup({state,sourceRun,slaAvailable,config}){
   const stats=sourceStats(sourceRun);
   const serviceSelected=config.strategy==="service_first"&&slaAvailable;
   const auto=config.windowMode!=="custom";
+  const focused=focusedTripIds(config,stats.trips).length;
+  const rules=config.temporalRules||[];
+
   return '<div class="scheduling-config-v2">'
     +heroMarkup()
     +caseStrip(state)
     +'<section class="scheduling-section">'
-      +sectionHead(1,"Alcance temporal","Todos los viajes aprobados en Asignación participan. En esta decisión definís cuándo pueden salir, sin alterar su carga ni su recurso.",stats.totalTrips+' viajes heredados')
+      +sectionHead(1,"Alcance temporal","Todos los viajes aprobados en Asignación participan. Definí la ventana general y, si hace falta, aplicá reglas a grupos concretos sin excluirlos del Decision Case.",stats.totalTrips+' viajes heredados')
       +'<div class="scheduling-source">'
         +'<article><small>ASIGNACIÓN APROBADA</small><strong>'+num(stats.totalTrips)+' viajes</strong><span>Run '+esc(formatRunId(sourceRun.id))+'</span></article>'
         +'<article><small>RECURSOS YA DEFINIDOS</small><strong>'+num(stats.vehicles)+' vehículos</strong><span>No pueden reasignarse en esta decisión</span></article>'
@@ -214,32 +240,33 @@ function markup({state,sourceRun,slaAvailable,config}){
         +'<label class="scheduling-field"><span>Planificar hasta</span><input type="date" data-scheduling-window-end value="'+esc(config.windowEnd||"")+'"></label>'
         +'<p class="scheduling-window-note">La ventana limita las fechas de salida. La llegada y el retorno del vehículo pueden ocurrir después del último día seleccionado.</p>'
       +'</div>'
-      +'<div class="scheduling-boundary"><span aria-hidden="true">✓</span><div><b>Asignación congelada.</b> Los filtros de foco temporal se aplicarán sobre estos viajes sin excluirlos del Decision Case.</div></div>'
+      +focusRulesMarkup(config,stats.trips)
+      +'<div class="scheduling-boundary"><span aria-hidden="true">✓</span><div><b>Asignación congelada.</b> Los filtros sólo priorizan o restringen fechas. Ninguna regla puede eliminar viajes, cambiar cargas ni reasignar vehículos.</div></div>'
     +'</section>'
     +'<section class="scheduling-section">'
       +sectionHead(2,"Objetivo del calendario","Elegí qué debe priorizar el motor cuando varios viajes compiten por el mismo recurso.","Objetivo")
       +'<div class="scheduling-objectives">'
-        +choice({name:"scheduling-objective",value:"service_first",title:"Servicio primero",copy:slaAvailable?"Prioriza cumplir fechas objetivo; después reduce tardanza, espera y duración total del calendario.":"No disponible porque delivery_due_date no está completo en Órdenes.",selected:serviceSelected,disabled:!slaAvailable,tag:slaAvailable?"SLA":"Sin datos"})
-        +choice({name:"scheduling-objective",value:"earliest_dispatch",title:"Salida más temprana",copy:"Minimiza la espera desde que carga y vehículo están disponibles y luego compacta el calendario.",selected:!serviceSelected,tag:"Operativo"})
+        +choice({name:"scheduling-objective",value:"service_first",title:"Servicio primero",copy:slaAvailable?"Prioriza cumplir fechas objetivo; luego aplica las reglas de foco y reduce espera y duración total.":"No disponible porque delivery_due_date no está completo en Órdenes.",selected:serviceSelected,disabled:!slaAvailable,tag:slaAvailable?"SLA":"Sin datos"})
+        +choice({name:"scheduling-objective",value:"earliest_dispatch",title:"Salida más temprana",copy:"Aplica primero las reglas de foco y luego minimiza la espera desde que carga y vehículo están disponibles.",selected:!serviceSelected,tag:"Operativo"})
       +'</div>'
     +'</section>'
     +'<section class="scheduling-section">'
       +sectionHead(3,"Política de recursos","Scheduling no vuelve a decidir la flota: respeta exactamente los vehículos aprobados en Asignación de carga.","Heredada y bloqueada")
       +'<div class="scheduling-resource-policy">'
-        +'<div class="scheduling-inherited"><div class="scheduling-inherited__top"><strong>Usar los recursos de la asignación aprobada</strong><span class="scheduling-lock">Bloqueada</span></div><p>Vehículo, órdenes, producto y cantidades permanecen inmutables. Esta decisión sólo agrega fecha y secuencia.</p></div>'
+        +'<div class="scheduling-inherited"><div class="scheduling-inherited__top"><strong>Usar los recursos de la asignación aprobada</strong><span class="scheduling-lock">Bloqueada</span></div><p>Vehículo, órdenes, producto y cantidades permanecen inmutables. Esta decisión sólo agrega fecha, secuencia y reglas temporales.</p></div>'
         +'<div class="scheduling-resource-stats"><div><strong>'+num(stats.resources.own)+'</strong><span>Propios</span></div><div><strong>'+num(stats.resources.third)+'</strong><span>Terceros</span></div></div>'
       +'</div>'
     +'</section>'
     +'<section class="scheduling-section">'
       +sectionHead(4,"Profundidad del análisis","Definí cuánto detalle querés recibir. El motor actual publica la planificación recomendada y su evidencia operativa.","Dashboard")
       +'<div class="scheduling-depth-grid">'
-        +'<article class="scheduling-depth is-selected"><strong>Esencial</strong><p>Calendario recomendado, fechas, secuencia, esperas, SLA y excepciones.</p><small>Activo</small></article>'
+        +'<article class="scheduling-depth is-selected"><strong>Esencial</strong><p>Calendario recomendado, fechas, secuencia, reglas aplicadas, esperas, SLA y excepciones.</p><small>Activo</small></article>'
         +'<article class="scheduling-depth is-disabled"><strong>Comparativo</strong><p>Comparación formal entre estrategias temporales alternativas.</p><small>Próxima fase</small></article>'
         +'<article class="scheduling-depth is-disabled"><strong>Profundo</strong><p>Evidencia ampliada y sensibilidad de restricciones.</p><small>Próxima fase</small></article>'
       +'</div>'
     +'</section>'
     +'<footer class="scheduling-footer">'
-      +'<div><small>PLANIFICACIÓN LISTA PARA REVISAR</small><strong>'+esc(objectiveLabel(config))+' · '+esc(windowLabel(config))+'</strong><span>'+num(stats.totalTrips)+' viajes · '+num(stats.vehicles)+' recursos · asignación inmutable</span></div>'
+      +'<div><small>PLANIFICACIÓN LISTA PARA REVISAR</small><strong>'+esc(objectiveLabel(config))+' · '+esc(windowLabel(config))+'</strong><span>'+num(stats.totalTrips)+' viajes · '+num(stats.vehicles)+' recursos · '+num(rules.length)+' reglas · '+num(focused)+' focalizados</span></div>'
       +'<button class="scheduling-primary" type="button" data-scheduling-review>Revisar y ejecutar →</button>'
     +'</footer>'
     +'<dialog class="scheduling-review" data-scheduling-review-dialog><form method="dialog">'
@@ -247,6 +274,7 @@ function markup({state,sourceRun,slaAvailable,config}){
       +'<div class="scheduling-review-grid">'
         +'<p><strong>Entrada</strong><span>'+num(stats.totalTrips)+' viajes de Assignment · Run '+esc(formatRunId(sourceRun.id))+'</span></p>'
         +'<p><strong>Ventana</strong><span>'+esc(windowLabel(config))+'</span></p>'
+        +'<p><strong>Reglas por foco</strong><span>'+esc(rulesLabel(config,stats.trips))+'</span></p>'
         +'<p><strong>Objetivo</strong><span>'+esc(objectiveLabel(config))+'</span></p>'
         +'<p><strong>Recursos</strong><span>Heredados de la asignación aprobada</span></p>'
         +'<p><strong>Profundidad</strong><span>Esencial</span></p>'
@@ -283,6 +311,7 @@ async function restoreFromQuery(caseId,config){
       windowMode:(source.planning_window_start||source.planning_window_end)?"custom":"auto",
       windowStart:source.planning_window_start||"",
       windowEnd:source.planning_window_end||"",
+      temporalRules:hydrateExecutionRules(source.temporal_rules||[]),
       analysisDepth:"essential",
     };
     writeConfig(caseId,restored);
@@ -290,7 +319,7 @@ async function restoreFromQuery(caseId,config){
   }catch{return config;}
 }
 
-function validateConfig(config,slaAvailable){
+function validateConfig(config,slaAvailable,trips=[]){
   if(config.strategy==="service_first"&&!slaAvailable)return "Servicio primero requiere fechas objetivo completas en Órdenes.";
   if(config.windowMode==="custom"){
     if(!config.windowStart||!config.windowEnd)return "Elegí fecha desde y fecha hasta para la ventana personalizada.";
@@ -301,15 +330,18 @@ function validateConfig(config,slaAvailable){
     const days=Math.round((end-start)/86400000);
     if(days>365)return "La ventana temporal no puede superar 365 días.";
   }
-  return null;
+  return validateFocusRules(config,trips);
 }
 
 function executionOptions(config){
-  if(config.windowMode!=="custom")return {};
-  const start=new Date(config.windowStart+'T12:00:00');
-  const end=new Date(config.windowEnd+'T12:00:00');
-  const days=Math.max(1,Math.round((end-start)/86400000));
-  return {max_horizon_days:Math.min(365,days)};
+  if(config.windowMode==="custom"){
+    const start=new Date(config.windowStart+'T12:00:00');
+    const end=new Date(config.windowEnd+'T12:00:00');
+    const days=Math.max(1,Math.round((end-start)/86400000));
+    return {max_horizon_days:Math.min(365,days)};
+  }
+  if((config.temporalRules||[]).some(rule=>rule.action==="window"))return {max_horizon_days:365};
+  return {};
 }
 
 function executionConfiguration(config){
@@ -318,6 +350,7 @@ function executionConfiguration(config){
     use_delivery_due_dates:config.strategy==="service_first",
     planning_window_start:config.windowMode==="custom"?config.windowStart:null,
     planning_window_end:config.windowMode==="custom"?config.windowEnd:null,
+    temporal_rules:executionRules(config),
   };
 }
 
@@ -328,13 +361,14 @@ function showPending(runId){
   history.replaceState(null,"",url);
   const dashboard=document.getElementById("dispatch-dashboard-root");
   if(dashboard){
-    dashboard.innerHTML='<section class="dispatch-panel"><h1>Preparando tu planificación</h1><p role="status">Aplicando ventana temporal, restricciones y objetivo…</p><div class="dispatch-loading" aria-label="Procesando"></div><p>El Decision Case conserva la trazabilidad de esta corrida.</p></section>';
+    dashboard.innerHTML='<section class="dispatch-panel"><h1>Preparando tu planificación</h1><p role="status">Aplicando ventana temporal, filtros, restricciones y objetivo…</p><div class="dispatch-loading" aria-label="Procesando"></div><p>El Decision Case conserva la trazabilidad de esta corrida.</p></section>';
   }
   window.dationNavigate?.("decision-dashboard");
 }
 
 async function execute({state,sourceRun,slaAvailable,config,button,dialog,errorNode}){
-  const error=validateConfig(config,slaAvailable);
+  const trips=sourceStats(sourceRun).trips;
+  const error=validateConfig(config,slaAvailable,trips);
   if(error){
     if(errorNode)errorNode.innerHTML='<p class="scheduling-error">'+esc(error)+'</p>';
     return;
@@ -370,7 +404,8 @@ async function execute({state,sourceRun,slaAvailable,config,button,dialog,errorN
 function bind(root,context){
   const {state,sourceRun,slaAvailable}=context;
   const caseId=state.decisionCase.id;
-  let config=context.config;
+  const trips=sourceStats(sourceRun).trips;
+  let config=normalizeFocusConfig(context.config,trips);
   const rerender=()=>{
     writeConfig(caseId,config);
     root.innerHTML=markup({state,sourceRun,slaAvailable,config});
@@ -404,6 +439,16 @@ function bind(root,context){
     const footer=root.querySelector('.scheduling-footer strong');
     if(footer)footer.textContent=objectiveLabel(config)+' · '+windowLabel(config);
   });
+
+  bindFocusRuleEvents(root,{
+    config,
+    trips,
+    onChange:next=>{
+      config=next;
+      rerender();
+    },
+  });
+
   root.querySelectorAll('input[name="scheduling-objective"]').forEach(input=>{
     input.addEventListener("change",()=>{
       config={...config,strategy:input.value};
@@ -413,7 +458,7 @@ function bind(root,context){
 
   const dialog=root.querySelector('[data-scheduling-review-dialog]');
   root.querySelector('[data-scheduling-review]')?.addEventListener("click",()=>{
-    const error=validateConfig(config,slaAvailable);
+    const error=validateConfig(config,slaAvailable,trips);
     if(error){
       const footer=root.querySelector('.scheduling-footer');
       let message=footer.querySelector('.scheduling-error');
@@ -457,6 +502,7 @@ async function mount(root){
     ]);
     const slaAvailable=readinessSla(preflight);
     if(!slaAvailable&&config.strategy==="service_first")config={...config,strategy:"earliest_dispatch"};
+    config=normalizeFocusConfig(config,sourceStats(sourceRun).trips);
     writeConfig(state.decisionCase.id,config);
     root.innerHTML=markup({state,sourceRun,slaAvailable,config});
     bind(root,{state,sourceRun,slaAvailable,config});

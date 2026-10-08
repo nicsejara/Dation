@@ -1,5 +1,5 @@
 import "./dispatch/assignment-filter-collapse.mjs?v=scope-filter-collapse-v1";
-import "./dispatch/scheduling-config-v2.mjs?v=scheduling-config-phase1";
+import "./dispatch/scheduling-config-v2.mjs?v=scheduling-config-phase2";
 
 (function(){
   "use strict";
