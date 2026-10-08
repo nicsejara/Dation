@@ -339,11 +339,11 @@ def run_scheduling_engine(
         if solver_meta.get("status") == "infeasible":
             raise ValueError(
                 solver_meta.get("reason")
-                or "No existe una programación temporal factible dentro de las restricciones configuradas."
+                or "No existe una programación temporal factible dentro de la ventana o restricciones configuradas."
             )
         if not greedy_inside_window:
             raise ValueError(
-                "No se encontró una planificación completa dentro de las restricciones temporales configuradas."
+                "No se encontró una planificación completa dentro de la ventana o restricciones temporales configuradas."
             )
         offsets = greedy_hint
         solver_meta = {
