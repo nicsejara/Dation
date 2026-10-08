@@ -166,7 +166,7 @@ class SchedulingConfigPhase1Tests(unittest.TestCase):
         self.assertIn("Heredada y bloqueada", UI)
 
     def test_phase1_ui_is_loaded_and_responsive(self):
-        self.assertIn('scheduling-config-v2.mjs?v=scheduling-config-phase1', BOOTSTRAP)
+        self.assertIn('scheduling-config-v2.mjs?v=scheduling-config-phase2', BOOTSTRAP)
         self.assertIn(".scheduling-config-v2", CSS)
         self.assertIn("@media(max-width:620px)", CSS)
         self.assertIn("@media(prefers-reduced-motion:reduce)", CSS)
