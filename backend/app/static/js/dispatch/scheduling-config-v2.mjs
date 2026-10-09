@@ -1,5 +1,14 @@
 import {api,esc,num,post} from "./shared.mjs";
-import {iconSvg} from "./decision-ui.mjs?v=assignment-config-v2";
+import {
+  configSummaryBar,
+  decisionCaseCard,
+  decisionChoiceCard,
+  decisionDataFileCard,
+  decisionDepthCard,
+  decisionHero,
+  decisionInfoNote,
+  decisionSectionHeader,
+} from "./decision-config-ui.mjs?v=scheduling-shared-phase2-v1";
 import {
   bindFocusRuleEvents,
   executionRules,
@@ -17,6 +26,7 @@ const STYLE_IDS={
   case:"scheduling-case-language",
   assignment:"scheduling-assignment-language",
   own:"scheduling-config-v2-styles",
+  shared:"scheduling-shared-phase2-styles",
 };
 const restoredRuns=new Set();
 let observer=null;
@@ -32,9 +42,10 @@ function ensureLink(id,href){
 }
 
 function ensureStyles(){
-  ensureLink(STYLE_IDS.case,"/static/css/decision-map-case-v2.css?v=scheduling-config-phase2");
-  ensureLink(STYLE_IDS.assignment,"/static/css/assignment-config-v2.css?v=scheduling-config-phase2");
-  ensureLink(STYLE_IDS.own,"/static/css/scheduling-config-v2.css?v=scheduling-config-phase2");
+  ensureLink(STYLE_IDS.case,"/static/css/decision-map-case-v2.css?v=scheduling-shared-phase2-v1");
+  ensureLink(STYLE_IDS.assignment,"/static/css/assignment-config-v2.css?v=scheduling-shared-phase2-v1");
+  ensureLink(STYLE_IDS.own,"/static/css/scheduling-config-v2.css?v=scheduling-shared-phase2-v1");
+  ensureLink(STYLE_IDS.shared,"/static/css/scheduling-config-shared-phase2.css?v=scheduling-shared-phase2-v1");
 }
 
 function readJson(key,fallback={}){
@@ -58,6 +69,7 @@ function defaults(){
     windowStart:"",
     windowEnd:"",
     analysisDepth:"essential",
+    focusRulesOpen:false,
     temporalRules:[],
     ruleDraft:{
       field:"destination",
@@ -73,86 +85,43 @@ function caseConfig(caseId){
   return {...defaults(),...(configStore()[caseId]||{})};
 }
 
-function displayCaseId(value){
-  if(!value)return "—";
-  return "DC-"+String(value).slice(0,8).toUpperCase();
-}
-
-function middleEllipsis(value,max=36){
-  const text=String(value||"—");
-  if(text.length<=max)return text;
-  const extension=text.toLowerCase().endsWith(".csv")?".csv":"";
-  const stem=extension?text.slice(0,-4):text;
-  const tailLength=Math.min(12,Math.max(8,Math.floor(max*.32)));
-  const headLength=Math.max(10,max-tailLength-extension.length-1);
-  return stem.slice(0,headLength)+"…"+stem.slice(-tailLength)+extension;
-}
-
 function datasetFile(kind,dataset){
   const orders=kind==="orders";
   const total=Number(dataset?.row_count||0);
-  const fullName=dataset?.canonical_filename||dataset?.label||dataset?.original_filename||"Archivo sin nombre";
-  return '<article class="dispatch-datapack-file is-'+kind+' assignment-case-file">'
-    +'<span class="dispatch-datapack-file__accent" aria-hidden="true"></span>'
-    +'<span class="dispatch-datapack-file__icon">'+iconSvg(orders?"clipboardList":"truck","dispatch-map-icon")+'</span>'
-    +'<div class="dispatch-datapack-file__body">'
-      +'<div class="dispatch-datapack-file__topline"><small>'+(orders?'ÓRDENES':'FLOTA')+'</small></div>'
-      +'<strong class="dispatch-datapack-file__name" title="'+esc(fullName)+'">'+esc(middleEllipsis(fullName))+'</strong>'
-      +'<div class="dispatch-datapack-file__meta"><span class="is-count">'+num(total)+' '+(orders?(total===1?'orden':'órdenes'):(total===1?'vehículo':'vehículos'))+'</span></div>'
-    +'</div>'
-  +'</article>';
+  return decisionDataFileCard({
+    kind,
+    dataset,
+    countText:num(total)+" "+(orders?(total===1?"orden":"órdenes"):(total===1?"vehículo":"vehículos")),
+  });
 }
 
 function caseStrip(state){
-  const id=String(state.decisionCase?.id||"");
-  return '<section class="dispatch-case-card assignment-case-strip scheduling-case-strip" aria-label="Decision Case y Data Pack en uso">'
-    +'<div class="assignment-case-strip__identity">'
-      +'<span class="dispatch-case-identity__icon">'+iconSvg("folderOpen","dispatch-map-icon")+'</span>'
-      +'<div><small class="assignment-case-strip__eyebrow">DECISION CASE</small>'
-        +'<div class="dispatch-case-identity__idrow">'
-          +'<strong title="'+esc(id)+'">'+esc(displayCaseId(id))+'</strong>'
-          +'<button type="button" data-scheduling-copy-case title="Copiar ID" aria-label="Copiar ID completo del caso">'+iconSvg("copy","dispatch-map-icon")+'</button>'
-        +'</div>'
-        +'<span class="assignment-case-strip__feedback" data-scheduling-copy-feedback aria-live="polite"></span>'
-      +'</div>'
-    +'</div>'
-    +'<div class="assignment-case-strip__pack">'
-      +'<div class="assignment-case-strip__pack-title"><span>DATA PACK EN USO</span></div>'
-      +datasetFile("orders",state.orders)
-      +datasetFile("fleet",state.fleet)
-    +'</div>'
-    +'<button class="assignment-change-data" type="button" data-scheduling-change-data>'
-      +iconSvg("refresh","assignment-icon")+'<span>Cambiar datos</span>'
-    +'</button>'
-  +'</section>';
+  return decisionCaseCard({
+    caseId:state.decisionCase?.id,
+    files:[
+      datasetFile("orders",state.orders),
+      datasetFile("fleet",state.fleet),
+    ],
+    copyHook:"data-scheduling-copy-case",
+    feedbackHook:"data-scheduling-copy-feedback",
+    changeHook:"data-scheduling-change-data",
+    extraClass:"scheduling-case-strip",
+  });
 }
 
 function heroMarkup(){
-  return '<section class="dispatch-pro-hero assignment-config-hero">'
-    +'<div class="dispatch-pro-hero-copy">'
-      +'<div class="assignment-config-hero__badges">'
-        +'<span class="dispatch-pro-hero-badge is-step">PASO 3: CONFIGURAR DECISIÓN</span>'
-        +'<span class="assignment-decision-chip">DECISIÓN 02 DE 3</span>'
-      +'</div>'
-      +'<h1>Definí cuándo querés despachar los viajes.</h1>'
-      +'<p class="dispatch-pro-hero-lead">Partí de la asignación aprobada, fijá la ventana temporal y elegí qué criterio debe ordenar el calendario. Cargas, cantidades y recursos quedan trazados desde la decisión anterior.</p>'
-    +'</div>'
-    +'<div class="dispatch-pro-hero-visual">'
-      +'<div class="dispatch-pro-how-panel assignment-decision-panel">'
-        +'<div class="dispatch-pro-how-title"><span>ESTA DECISIÓN</span></div>'
-        +[
-          ["1 · PREGUNTA","¿Cuándo conviene ejecutar los viajes ya definidos?","messageCircleQuestion"],
-          ["2 · ENTREGA","Calendario operativo + secuencia de despachos.","calendarClock"],
-          ["3 · QUEDA PARA DESPUÉS","La ejecución final se consolida en Asignación de vehículos.","truck"],
-        ].map(([label,description,icon],index)=>(
-          '<div class="dispatch-pro-how-node">'
-            +'<span class="dispatch-pro-how-icon">'+iconSvg(icon,"dispatch-pro-icon assignment-icon")+'</span>'
-            +'<div><small>'+esc(label)+'</small><strong>'+esc(description)+'</strong></div>'
-          +'</div>'+(index<2?'<span class="dispatch-pro-how-connector" aria-hidden="true"></span>':'')
-        )).join("")
-      +'</div>'
-    +'</div>'
-  +'</section>';
+  return decisionHero({
+    step:{number:3,label:"Configurar decisión"},
+    decisionIndex:2,
+    totalDecisions:3,
+    title:"Definí cuándo querés despachar los viajes.",
+    description:"Partí de la asignación aprobada, fijá la ventana temporal y elegí qué criterio debe ordenar el calendario. Cargas, cantidades y recursos quedan trazados desde la decisión anterior.",
+    panelItems:[
+      {label:"1 · PREGUNTA",description:"¿Cuándo conviene ejecutar los viajes ya definidos?",icon:"messageCircleQuestion"},
+      {label:"2 · ENTREGA",description:"Calendario operativo + secuencia de despachos.",icon:"calendarClock"},
+      {label:"3 · QUEDA PARA DESPUÉS",description:"La ejecución final se consolida en Asignación de vehículos.",icon:"truck"},
+    ],
+  });
 }
 
 function uniqueResources(trips){
@@ -180,22 +149,6 @@ function sourceStats(sourceRun){
   };
 }
 
-function sectionHead(number,title,copy,badge=""){
-  return '<header class="scheduling-section__head">'
-    +'<span class="scheduling-section__index">'+esc(String(number).padStart(2,"0"))+'</span>'
-    +'<div><h2>'+esc(title)+'</h2><p>'+esc(copy)+'</p></div>'
-    +(badge?'<span class="scheduling-section__badge">'+esc(badge)+'</span>':'')
-  +'</header>';
-}
-
-function choice({name,value,title,copy,selected,disabled=false,tag=""}){
-  return '<label class="scheduling-choice '+(selected?'is-selected ':'')+(disabled?'is-disabled':'')+'">'
-    +'<input type="radio" name="'+esc(name)+'" value="'+esc(value)+'" '+(selected?'checked':'')+' '+(disabled?'disabled':'')+'>'
-    +'<span class="scheduling-choice__top"><strong>'+esc(title)+'</strong>'+(tag?'<em>'+esc(tag)+'</em>':'')+'</span>'
-    +'<p>'+esc(copy)+'</p>'
-  +'</label>';
-}
-
 function formatRunId(id){return id?String(id).slice(0,8).toUpperCase():"—";}
 
 function windowLabel(config){
@@ -211,77 +164,251 @@ function rulesLabel(config,trips){
   const rules=config.temporalRules||[];
   if(!rules.length)return "Sin reglas específicas";
   const focused=focusedTripIds(config,trips).length;
-  return rules.length+' '+(rules.length===1?'regla':'reglas')+' · '+focused+' '+(focused===1?'viaje afectado':'viajes afectados');
+  return rules.length+" "+(rules.length===1?"regla":"reglas")+" · "+focused+" "+(focused===1?"viaje afectado":"viajes afectados");
+}
+
+function scopeCurrent(config,trips){
+  const rules=config.temporalRules||[];
+  if(!rules.length)return config.windowMode==="custom"?"Ventana personalizada":"Ventana automática";
+  return (config.windowMode==="custom"?"Ventana personalizada":"Ventana automática")+" · "+rules.length+" "+(rules.length===1?"regla":"reglas");
+}
+
+function resourceLabel(stats){
+  return num(stats.vehicles)+" heredados";
+}
+
+function configProblem(config,slaAvailable,trips){
+  const reason=validateConfig(config,slaAvailable,trips);
+  if(!reason)return null;
+  const objectiveIssue=reason.startsWith("Servicio primero");
+  return {
+    section:objectiveIssue?"scheduling-objective":"scheduling-scope",
+    reason,
+  };
+}
+
+function sourceSummary(stats,sourceRun){
+  return '<div class="scheduling-source" aria-label="Entrada heredada de la asignación aprobada">'
+    +'<article><small>ASIGNACIÓN APROBADA</small><strong>'+num(stats.totalTrips)+' viajes</strong><span>Run '+esc(formatRunId(sourceRun.id))+'</span></article>'
+    +'<article><small>RECURSOS YA DEFINIDOS</small><strong>'+num(stats.vehicles)+' vehículos</strong><span>No pueden reasignarse en esta decisión</span></article>'
+    +'<article><small>DESTINOS</small><strong>'+num(stats.destinations)+'</strong><span>Provenientes de los viajes aprobados</span></article>'
+  +'</div>';
+}
+
+function focusDisclosure(config,trips){
+  const rules=config.temporalRules||[];
+  const focused=focusedTripIds(config,trips).length;
+  const open=Boolean(config.focusRulesOpen);
+  const summary=rules.length
+    ?rules.length+" "+(rules.length===1?"regla":"reglas")+" · "+focused+" "+(focused===1?"viaje":"viajes")
+    :"Opcional";
+  return '<div class="scheduling-focus-disclosure '+(open?"is-open":"")+'">'
+    +'<button type="button" class="scheduling-focus-disclosure__toggle" data-scheduling-focus-toggle aria-expanded="'+open+'">'
+      +'<span class="scheduling-focus-disclosure__icon">'
+        +'<svg class="assignment-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16l-6 7v5l-4 2v-7Z"/></svg>'
+      +'</span>'
+      +'<span class="scheduling-focus-disclosure__copy"><small>REGLAS POR FOCO</small><strong>Aplicá condiciones sólo cuando necesites priorizar un grupo</strong><span>Destino, origen, vehículo, tipo de recurso o producto. Los viajes nunca se eliminan del caso.</span></span>'
+      +'<em>'+esc(summary)+'</em>'
+      +'<svg class="scheduling-focus-disclosure__chevron assignment-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>'
+    +'</button>'
+    +'<div class="scheduling-focus-disclosure__body" '+(open?"":"hidden")+'>'+focusRulesMarkup(config,trips)+'</div>'
+  +'</div>';
+}
+
+function scopeSection(config,stats,sourceRun){
+  const auto=config.windowMode!=="custom";
+  return '<section class="assignment-section scheduling-section" id="scheduling-scope" data-config-section="scope">'
+    +decisionSectionHeader({
+      number:"01",
+      eyebrow:"ALCANCE",
+      title:"Alcance temporal",
+      copy:"Todos los viajes aprobados participan. Definí la ventana general y abrí reglas por foco sólo si necesitás priorizar o restringir un subconjunto.",
+      icon:"calendarRange",
+      current:scopeCurrent(config,stats.trips),
+    })
+    +sourceSummary(stats,sourceRun)
+    +'<div class="assignment-objective-grid scheduling-window-mode">'
+      +decisionChoiceCard({
+        className:"scheduling-window-card",
+        icon:"calendarRange",
+        title:"Ventana automática",
+        copy:"El motor comienza en la primera fecha factible y encuentra el calendario completo respetando disponibilidad.",
+        selected:auto,
+        tags:["Recomendada"],
+        attributes:{"data-scheduling-window-mode":"auto"},
+      })
+      +decisionChoiceCard({
+        className:"scheduling-window-card",
+        icon:"calendarClock",
+        title:"Ventana personalizada",
+        copy:"Fijá el período dentro del cual deben ocurrir las fechas de salida de todos los despachos.",
+        selected:!auto,
+        attributes:{"data-scheduling-window-mode":"custom"},
+      })
+    +'</div>'
+    +'<div class="scheduling-window-editor '+(!auto?"is-visible":"")+'" data-scheduling-window-editor>'
+      +'<label class="scheduling-field"><span>Planificar desde</span><input type="date" data-scheduling-window-start value="'+esc(config.windowStart||"")+'"></label>'
+      +'<label class="scheduling-field"><span>Planificar hasta</span><input type="date" data-scheduling-window-end value="'+esc(config.windowEnd||"")+'"></label>'
+      +'<p class="scheduling-window-note">La ventana limita las fechas de salida. La llegada y el retorno del vehículo pueden ocurrir después del último día seleccionado.</p>'
+    +'</div>'
+    +focusDisclosure(config,stats.trips)
+    +decisionInfoNote({
+      icon:"lock",
+      title:"Asignación congelada.",
+      copy:"Los filtros y reglas sólo priorizan o restringen fechas. Ninguna regla puede eliminar viajes, cambiar cargas ni reasignar vehículos.",
+      className:"scheduling-boundary-note",
+    })
+  +'</section>';
+}
+
+function objectiveSection(config,slaAvailable){
+  const serviceSelected=config.strategy==="service_first"&&slaAvailable;
+  return '<section class="assignment-section scheduling-section" id="scheduling-objective" data-config-section="objective">'
+    +decisionSectionHeader({
+      number:"02",
+      eyebrow:"OBJETIVO",
+      title:"Objetivo del calendario",
+      copy:"Elegí qué debe priorizar el motor cuando varios viajes compiten por el mismo recurso.",
+      icon:"target",
+      current:objectiveLabel(config),
+    })
+    +'<div class="assignment-objective-grid scheduling-objectives">'
+      +decisionChoiceCard({
+        className:"scheduling-objective-card",
+        icon:"target",
+        title:"Servicio primero",
+        copy:slaAvailable
+          ?"Prioriza cumplir fechas objetivo; luego aplica las reglas de foco y reduce espera y duración total."
+          :"No disponible porque delivery_due_date no está completo en Órdenes.",
+        selected:serviceSelected,
+        disabled:!slaAvailable,
+        disabledTitle:!slaAvailable?"Requiere fechas objetivo completas en Órdenes":"",
+        tags:[slaAvailable?"SLA":"Sin datos"],
+        attributes:{"data-scheduling-objective":"service_first"},
+      })
+      +decisionChoiceCard({
+        className:"scheduling-objective-card",
+        icon:"clock",
+        title:"Salida más temprana",
+        copy:"Aplica primero las reglas de foco y luego minimiza la espera desde que carga y vehículo están disponibles.",
+        selected:!serviceSelected,
+        tags:["Operativo"],
+        attributes:{"data-scheduling-objective":"earliest_dispatch"},
+      })
+    +'</div>'
+  +'</section>';
+}
+
+function resourceSection(stats){
+  return '<section class="assignment-section scheduling-section" id="scheduling-resources" data-config-section="resources">'
+    +decisionSectionHeader({
+      number:"03",
+      eyebrow:"RECURSOS",
+      title:"Política de recursos",
+      copy:"Planificación no vuelve a decidir la flota: respeta exactamente los vehículos aprobados en Asignación de carga.",
+      icon:"truck",
+      current:"Heredada y bloqueada",
+    })
+    +'<div class="scheduling-resource-policy">'
+      +decisionChoiceCard({
+        className:"scheduling-resource-card",
+        icon:"lock",
+        title:"Usar los recursos de la asignación aprobada",
+        copy:"Vehículo, órdenes, producto y cantidades permanecen inmutables. Esta decisión sólo agrega fecha, secuencia y reglas temporales.",
+        selected:true,
+        locked:true,
+        tags:["Bloqueada"],
+        attributes:{"data-scheduling-resource-policy":"inherited"},
+      })
+      +'<div class="scheduling-resource-stats" aria-label="Composición de recursos heredados">'
+        +'<div><strong>'+num(stats.resources.own)+'</strong><span>Propios</span></div>'
+        +'<div><strong>'+num(stats.resources.third)+'</strong><span>Terceros</span></div>'
+      +'</div>'
+    +'</div>'
+  +'</section>';
+}
+
+function depthSection(config){
+  const depths={
+    essential:{
+      label:"Esencial",
+      copy:"Calendario recomendado, fechas, secuencia, reglas aplicadas, esperas, SLA y excepciones.",
+      rows:[["Calendario recomendado",true],["SLA y excepciones",true],["Comparación de estrategias",false]],
+    },
+    comparative:{
+      label:"Comparativo",
+      copy:"Comparación formal entre estrategias temporales alternativas.",
+      rows:[["Calendario recomendado",false],["SLA y excepciones",false],["Comparación de estrategias",false]],
+    },
+    deep:{
+      label:"Profundo",
+      copy:"Evidencia ampliada y sensibilidad de restricciones.",
+      rows:[["Calendario recomendado",false],["SLA y excepciones",false],["Comparación de estrategias",false]],
+    },
+  };
+  return '<section class="assignment-section scheduling-section" id="scheduling-dashboard" data-config-section="dashboard">'
+    +decisionSectionHeader({
+      number:"04",
+      eyebrow:"DASHBOARD",
+      title:"Profundidad del análisis",
+      copy:"Definí cuánto detalle querés recibir. En esta versión Planificación publica el análisis Esencial.",
+      icon:"layoutDashboard",
+      current:"Esencial",
+    })
+    +'<div class="assignment-depth-grid scheduling-depth-grid">'
+      +decisionDepthCard({key:"essential",item:depths.essential,selected:config.analysisDepth==="essential",tag:"Activo"})
+      +decisionDepthCard({key:"comparative",item:depths.comparative,disabled:true,tag:"Próximamente",disabledTitle:"Se habilita en futuras versiones"})
+      +decisionDepthCard({key:"deep",item:depths.deep,disabled:true,tag:"Próximamente",disabledTitle:"Se habilita en futuras versiones"})
+    +'</div>'
+  +'</section>';
+}
+
+function summaryBar(config,stats,slaAvailable){
+  const problem=configProblem(config,slaAvailable,stats.trips);
+  return configSummaryBar({
+    ready:!problem,
+    reason:problem?.reason||"",
+    ctaLabel:"Revisar y ejecutar",
+    reviewHook:"data-scheduling-review",
+    extraClass:"scheduling-summary-bar",
+    chips:[
+      {target:"scheduling-scope",icon:"calendarRange",label:"Alcance",value:scopeCurrent(config,stats.trips)},
+      {target:"scheduling-objective",icon:"target",label:"Objetivo",value:objectiveLabel(config)},
+      {target:"scheduling-resources",icon:"truck",label:"Recursos",value:resourceLabel(stats)},
+      {target:"scheduling-dashboard",icon:"layoutDashboard",label:"Dashboard",value:"Esencial"},
+    ],
+  });
+}
+
+function reviewDialog(config,stats,sourceRun){
+  return '<dialog class="dispatch dispatch-review assignment-review-dialog scheduling-review" data-scheduling-review-dialog><form method="dialog">'
+    +'<span class="assignment-section__eyebrow">ANTES DE EJECUTAR</span><h2>Revisar planificación</h2>'
+    +'<div class="dispatch-review-summary scheduling-review-grid">'
+      +'<p><strong>Entrada</strong><span>'+num(stats.totalTrips)+' viajes de Assignment · Run '+esc(formatRunId(sourceRun.id))+'</span></p>'
+      +'<p><strong>Ventana</strong><span>'+esc(windowLabel(config))+'</span></p>'
+      +'<p><strong>Reglas por foco</strong><span>'+esc(rulesLabel(config,stats.trips))+'</span></p>'
+      +'<p><strong>Objetivo</strong><span>'+esc(objectiveLabel(config))+'</span></p>'
+      +'<p><strong>Recursos</strong><span>Heredados de la asignación aprobada</span></p>'
+      +'<p><strong>Profundidad</strong><span>Esencial</span></p>'
+    +'</div>'
+    +'<div data-scheduling-review-error></div>'
+    +'<div class="dispatch-actions scheduling-review-actions"><button value="cancel">Volver</button><button class="scheduling-primary" type="button" data-scheduling-execute>Generar planificación</button></div>'
+  +'</form></dialog>';
 }
 
 function markup({state,sourceRun,slaAvailable,config}){
   const stats=sourceStats(sourceRun);
-  const serviceSelected=config.strategy==="service_first"&&slaAvailable;
-  const auto=config.windowMode!=="custom";
-  const focused=focusedTripIds(config,stats.trips).length;
-  const rules=config.temporalRules||[];
-
-  return '<div class="scheduling-config-v2">'
+  return '<div class="scheduling-config-v2 assignment-config-v2">'
     +heroMarkup()
     +caseStrip(state)
-    +'<section class="scheduling-section">'
-      +sectionHead(1,"Alcance temporal","Todos los viajes aprobados en Asignación participan. Definí la ventana general y, si hace falta, aplicá reglas a grupos concretos sin excluirlos del Decision Case.",stats.totalTrips+' viajes heredados')
-      +'<div class="scheduling-source">'
-        +'<article><small>ASIGNACIÓN APROBADA</small><strong>'+num(stats.totalTrips)+' viajes</strong><span>Run '+esc(formatRunId(sourceRun.id))+'</span></article>'
-        +'<article><small>RECURSOS YA DEFINIDOS</small><strong>'+num(stats.vehicles)+' vehículos</strong><span>No pueden reasignarse en esta decisión</span></article>'
-        +'<article><small>DESTINOS</small><strong>'+num(stats.destinations)+'</strong><span>Provenientes de los viajes aprobados</span></article>'
-      +'</div>'
-      +'<div class="scheduling-window-mode">'
-        +choice({name:"scheduling-window",value:"auto",title:"Ventana automática",copy:"El motor comienza en la primera fecha factible y encuentra el calendario completo respetando disponibilidad.",selected:auto,tag:"Recomendada"})
-        +choice({name:"scheduling-window",value:"custom",title:"Ventana personalizada",copy:"Fijá con calendario el período dentro del cual deben ocurrir las fechas de salida de todos los despachos.",selected:!auto})
-      +'</div>'
-      +'<div class="scheduling-window-editor '+(!auto?'is-visible':'')+'" data-scheduling-window-editor>'
-        +'<label class="scheduling-field"><span>Planificar desde</span><input type="date" data-scheduling-window-start value="'+esc(config.windowStart||"")+'"></label>'
-        +'<label class="scheduling-field"><span>Planificar hasta</span><input type="date" data-scheduling-window-end value="'+esc(config.windowEnd||"")+'"></label>'
-        +'<p class="scheduling-window-note">La ventana limita las fechas de salida. La llegada y el retorno del vehículo pueden ocurrir después del último día seleccionado.</p>'
-      +'</div>'
-      +focusRulesMarkup(config,stats.trips)
-      +'<div class="scheduling-boundary"><span aria-hidden="true">✓</span><div><b>Asignación congelada.</b> Los filtros sólo priorizan o restringen fechas. Ninguna regla puede eliminar viajes, cambiar cargas ni reasignar vehículos.</div></div>'
-    +'</section>'
-    +'<section class="scheduling-section">'
-      +sectionHead(2,"Objetivo del calendario","Elegí qué debe priorizar el motor cuando varios viajes compiten por el mismo recurso.","Objetivo")
-      +'<div class="scheduling-objectives">'
-        +choice({name:"scheduling-objective",value:"service_first",title:"Servicio primero",copy:slaAvailable?"Prioriza cumplir fechas objetivo; luego aplica las reglas de foco y reduce espera y duración total.":"No disponible porque delivery_due_date no está completo en Órdenes.",selected:serviceSelected,disabled:!slaAvailable,tag:slaAvailable?"SLA":"Sin datos"})
-        +choice({name:"scheduling-objective",value:"earliest_dispatch",title:"Salida más temprana",copy:"Aplica primero las reglas de foco y luego minimiza la espera desde que carga y vehículo están disponibles.",selected:!serviceSelected,tag:"Operativo"})
-      +'</div>'
-    +'</section>'
-    +'<section class="scheduling-section">'
-      +sectionHead(3,"Política de recursos","Scheduling no vuelve a decidir la flota: respeta exactamente los vehículos aprobados en Asignación de carga.","Heredada y bloqueada")
-      +'<div class="scheduling-resource-policy">'
-        +'<div class="scheduling-inherited"><div class="scheduling-inherited__top"><strong>Usar los recursos de la asignación aprobada</strong><span class="scheduling-lock">Bloqueada</span></div><p>Vehículo, órdenes, producto y cantidades permanecen inmutables. Esta decisión sólo agrega fecha, secuencia y reglas temporales.</p></div>'
-        +'<div class="scheduling-resource-stats"><div><strong>'+num(stats.resources.own)+'</strong><span>Propios</span></div><div><strong>'+num(stats.resources.third)+'</strong><span>Terceros</span></div></div>'
-      +'</div>'
-    +'</section>'
-    +'<section class="scheduling-section">'
-      +sectionHead(4,"Profundidad del análisis","Definí cuánto detalle querés recibir. El motor actual publica la planificación recomendada y su evidencia operativa.","Dashboard")
-      +'<div class="scheduling-depth-grid">'
-        +'<article class="scheduling-depth is-selected"><strong>Esencial</strong><p>Calendario recomendado, fechas, secuencia, reglas aplicadas, esperas, SLA y excepciones.</p><small>Activo</small></article>'
-        +'<article class="scheduling-depth is-disabled"><strong>Comparativo</strong><p>Comparación formal entre estrategias temporales alternativas.</p><small>Próxima fase</small></article>'
-        +'<article class="scheduling-depth is-disabled"><strong>Profundo</strong><p>Evidencia ampliada y sensibilidad de restricciones.</p><small>Próxima fase</small></article>'
-      +'</div>'
-    +'</section>'
-    +'<footer class="scheduling-footer">'
-      +'<div><small>PLANIFICACIÓN LISTA PARA REVISAR</small><strong>'+esc(objectiveLabel(config))+' · '+esc(windowLabel(config))+'</strong><span>'+num(stats.totalTrips)+' viajes · '+num(stats.vehicles)+' recursos · '+num(rules.length)+' reglas · '+num(focused)+' focalizados</span></div>'
-      +'<button class="scheduling-primary" type="button" data-scheduling-review>Revisar y ejecutar →</button>'
-    +'</footer>'
-    +'<dialog class="scheduling-review" data-scheduling-review-dialog><form method="dialog">'
-      +'<small>ANTES DE EJECUTAR</small><h2>Revisar planificación</h2>'
-      +'<div class="scheduling-review-grid">'
-        +'<p><strong>Entrada</strong><span>'+num(stats.totalTrips)+' viajes de Assignment · Run '+esc(formatRunId(sourceRun.id))+'</span></p>'
-        +'<p><strong>Ventana</strong><span>'+esc(windowLabel(config))+'</span></p>'
-        +'<p><strong>Reglas por foco</strong><span>'+esc(rulesLabel(config,stats.trips))+'</span></p>'
-        +'<p><strong>Objetivo</strong><span>'+esc(objectiveLabel(config))+'</span></p>'
-        +'<p><strong>Recursos</strong><span>Heredados de la asignación aprobada</span></p>'
-        +'<p><strong>Profundidad</strong><span>Esencial</span></p>'
-      +'</div>'
-      +'<div data-scheduling-review-error></div>'
-      +'<div class="scheduling-review-actions"><button value="cancel">Volver</button><button class="scheduling-primary" type="button" data-scheduling-execute>Generar planificación</button></div>'
-    +'</form></dialog>'
+    +'<main class="assignment-config-sections scheduling-config-sections">'
+      +scopeSection(config,stats,sourceRun)
+      +objectiveSection(config,slaAvailable)
+      +resourceSection(stats)
+      +depthSection(config)
+    +'</main>'
+    +summaryBar(config,stats,slaAvailable)
+    +reviewDialog(config,stats,sourceRun)
   +'</div>';
 }
 
@@ -301,7 +428,7 @@ async function restoreFromQuery(caseId,config){
   if(query.get("dda")!=="scheduling_v1"||!runId||restoredRuns.has(runId))return config;
   restoredRuns.add(runId);
   try{
-    const run=await api('/api/runs/'+runId);
+    const run=await api("/api/runs/"+runId);
     const source=run?.result_json?.configuration||{};
     const metaCase=run?.result_json?.decision_case?.case_id;
     if(metaCase&&String(metaCase)!==String(caseId))return config;
@@ -312,6 +439,7 @@ async function restoreFromQuery(caseId,config){
       windowStart:source.planning_window_start||"",
       windowEnd:source.planning_window_end||"",
       temporalRules:hydrateExecutionRules(source.temporal_rules||[]),
+      focusRulesOpen:Boolean(source.temporal_rules?.length),
       analysisDepth:"essential",
     };
     writeConfig(caseId,restored);
@@ -323,8 +451,8 @@ function validateConfig(config,slaAvailable,trips=[]){
   if(config.strategy==="service_first"&&!slaAvailable)return "Servicio primero requiere fechas objetivo completas en Órdenes.";
   if(config.windowMode==="custom"){
     if(!config.windowStart||!config.windowEnd)return "Elegí fecha desde y fecha hasta para la ventana personalizada.";
-    const start=new Date(config.windowStart+'T12:00:00');
-    const end=new Date(config.windowEnd+'T12:00:00');
+    const start=new Date(config.windowStart+"T12:00:00");
+    const end=new Date(config.windowEnd+"T12:00:00");
     if(Number.isNaN(start.getTime())||Number.isNaN(end.getTime()))return "La ventana temporal no tiene fechas válidas.";
     if(end<start)return "La fecha hasta no puede ser anterior a la fecha desde.";
     const days=Math.round((end-start)/86400000);
@@ -335,8 +463,8 @@ function validateConfig(config,slaAvailable,trips=[]){
 
 function executionOptions(config){
   if(config.windowMode==="custom"){
-    const start=new Date(config.windowStart+'T12:00:00');
-    const end=new Date(config.windowEnd+'T12:00:00');
+    const start=new Date(config.windowStart+"T12:00:00");
+    const end=new Date(config.windowEnd+"T12:00:00");
     const days=Math.max(1,Math.round((end-start)/86400000));
     return {max_horizon_days:Math.min(365,days)};
   }
@@ -379,7 +507,7 @@ async function execute({state,sourceRun,slaAvailable,config,button,dialog,errorN
   dialog?.close();
   showPending(runId);
   try{
-    const run=await post('/api/runs?run_id='+runId,{
+    const run=await post("/api/runs?run_id="+runId,{
       orders_dataset_id:state.orders.id,
       fleet_dataset_id:state.fleet.id,
       source_run_id:sourceRun.id,
@@ -401,10 +529,21 @@ async function execute({state,sourceRun,slaAvailable,config,button,dialog,errorN
   }
 }
 
+function scrollToProblem(problem){
+  const target=document.getElementById(problem.section);
+  if(!target)return;
+  target.classList.remove("is-attention");
+  void target.offsetWidth;
+  target.classList.add("is-attention");
+  target.scrollIntoView({behavior:"smooth",block:"center"});
+  window.setTimeout(()=>target.classList.remove("is-attention"),1800);
+}
+
 function bind(root,context){
   const {state,sourceRun,slaAvailable}=context;
   const caseId=state.decisionCase.id;
-  const trips=sourceStats(sourceRun).trips;
+  const stats=sourceStats(sourceRun);
+  const trips=stats.trips;
   let config=normalizeFocusConfig(context.config,trips);
   const rerender=()=>{
     writeConfig(caseId,config);
@@ -412,63 +551,70 @@ function bind(root,context){
     bind(root,{...context,config});
   };
 
-  root.querySelector('[data-scheduling-copy-case]')?.addEventListener("click",async()=>{
+  root.querySelector("[data-scheduling-copy-case]")?.addEventListener("click",async()=>{
     try{
       await navigator.clipboard.writeText(String(caseId));
-      const feedback=root.querySelector('[data-scheduling-copy-feedback]');
+      const feedback=root.querySelector("[data-scheduling-copy-feedback]");
       if(feedback){feedback.textContent="Copiado";setTimeout(()=>feedback.textContent="",1200);}
     }catch{}
   });
-  root.querySelector('[data-scheduling-change-data]')?.addEventListener("click",()=>window.dationNavigate?.("logistics-data"));
+  root.querySelector("[data-scheduling-change-data]")?.addEventListener("click",()=>window.dationNavigate?.("logistics-data"));
 
-  root.querySelectorAll('input[name="scheduling-window"]').forEach(input=>{
-    input.addEventListener("change",()=>{
-      config={...config,windowMode:input.value};
+  root.querySelectorAll("[data-scheduling-window-mode]").forEach(button=>{
+    button.addEventListener("click",()=>{
+      if(button.disabled)return;
+      config={...config,windowMode:button.dataset.schedulingWindowMode};
       rerender();
     });
   });
-  root.querySelector('[data-scheduling-window-start]')?.addEventListener("change",event=>{
+
+  root.querySelector("[data-scheduling-window-start]")?.addEventListener("change",event=>{
     config={...config,windowStart:event.target.value};
-    writeConfig(caseId,config);
-    const footer=root.querySelector('.scheduling-footer strong');
-    if(footer)footer.textContent=objectiveLabel(config)+' · '+windowLabel(config);
+    rerender();
   });
-  root.querySelector('[data-scheduling-window-end]')?.addEventListener("change",event=>{
+  root.querySelector("[data-scheduling-window-end]")?.addEventListener("change",event=>{
     config={...config,windowEnd:event.target.value};
-    writeConfig(caseId,config);
-    const footer=root.querySelector('.scheduling-footer strong');
-    if(footer)footer.textContent=objectiveLabel(config)+' · '+windowLabel(config);
+    rerender();
+  });
+
+  root.querySelector("[data-scheduling-focus-toggle]")?.addEventListener("click",()=>{
+    config={...config,focusRulesOpen:!config.focusRulesOpen};
+    rerender();
   });
 
   bindFocusRuleEvents(root,{
     config,
     trips,
     onChange:next=>{
-      config=next;
+      config={...next,focusRulesOpen:true};
       rerender();
     },
   });
 
-  root.querySelectorAll('input[name="scheduling-objective"]').forEach(input=>{
-    input.addEventListener("change",()=>{
-      config={...config,strategy:input.value};
+  root.querySelectorAll("[data-scheduling-objective]").forEach(button=>{
+    button.addEventListener("click",()=>{
+      if(button.disabled)return;
+      config={...config,strategy:button.dataset.schedulingObjective};
       rerender();
     });
   });
 
-  const dialog=root.querySelector('[data-scheduling-review-dialog]');
-  root.querySelector('[data-scheduling-review]')?.addEventListener("click",()=>{
-    const error=validateConfig(config,slaAvailable,trips);
-    if(error){
-      const footer=root.querySelector('.scheduling-footer');
-      let message=footer.querySelector('.scheduling-error');
-      if(!message){message=document.createElement('p');message.className='scheduling-error';footer.prepend(message);}
-      message.textContent=error;
+  root.querySelectorAll("[data-summary-target]").forEach(button=>button.addEventListener("click",()=>{
+    document.getElementById(button.dataset.summaryTarget)?.scrollIntoView({behavior:"smooth",block:"center"});
+  }));
+
+  const dialog=root.querySelector("[data-scheduling-review-dialog]");
+  root.querySelector("[data-scheduling-review]")?.addEventListener("click",()=>{
+    const problem=configProblem(config,slaAvailable,trips);
+    if(problem){
+      if(problem.section==="scheduling-scope"&&(config.temporalRules||[]).length)config={...config,focusRulesOpen:true};
+      writeConfig(caseId,config);
+      scrollToProblem(problem);
       return;
     }
     dialog?.showModal();
   });
-  root.querySelector('[data-scheduling-execute]')?.addEventListener("click",event=>{
+  root.querySelector("[data-scheduling-execute]")?.addEventListener("click",event=>{
     execute({
       state,
       sourceRun,
@@ -476,25 +622,26 @@ function bind(root,context){
       config,
       button:event.currentTarget,
       dialog,
-      errorNode:root.querySelector('[data-scheduling-review-error]'),
+      errorNode:root.querySelector("[data-scheduling-review-error]"),
     });
   });
 }
 
 async function mount(root){
-  if(mounting||root.querySelector('.scheduling-config-v2'))return;
+  if(mounting||root.querySelector(".scheduling-config-v2"))return;
   const state=workspace();
   if(state.activeNode!=="logistics_scheduling"||!state.decisionCase?.id)return;
   const sourceRunId=currentSourceRunId(state);
   if(!sourceRunId)return;
   mounting=true;
+  root.className="dispatch dispatch-upload-pro assignment-config-root scheduling-config-root";
   root.innerHTML='<section class="dispatch-panel"><p role="status">Preparando la configuración temporal…</p><div class="dispatch-loading"></div></section>';
   try{
     let config=caseConfig(state.decisionCase.id);
     config=await restoreFromQuery(state.decisionCase.id,config);
     const [sourceRun,preflight]=await Promise.all([
-      api('/api/runs/'+sourceRunId),
-      post('/api/runs/preflight',{
+      api("/api/runs/"+sourceRunId),
+      post("/api/runs/preflight",{
         orders_dataset_id:state.orders.id,
         fleet_dataset_id:state.fleet.id,
         allow_third_party:true,
@@ -502,13 +649,13 @@ async function mount(root){
     ]);
     const slaAvailable=readinessSla(preflight);
     if(!slaAvailable&&config.strategy==="service_first")config={...config,strategy:"earliest_dispatch"};
-    config=normalizeFocusConfig(config,sourceStats(sourceRun).trips);
+    config={...normalizeFocusConfig(config,sourceStats(sourceRun).trips),analysisDepth:"essential"};
     writeConfig(state.decisionCase.id,config);
     root.innerHTML=markup({state,sourceRun,slaAvailable,config});
     bind(root,{state,sourceRun,slaAvailable,config});
   }catch(error){
     root.innerHTML='<section class="dispatch-panel"><h1>No se pudo preparar Planificación</h1><p>'+esc(error.message||String(error))+'</p><button type="button" data-scheduling-retry>Reintentar</button></section>';
-    root.querySelector('[data-scheduling-retry]')?.addEventListener("click",()=>{root.innerHTML="";mount(root);});
+    root.querySelector("[data-scheduling-retry]")?.addEventListener("click",()=>{root.innerHTML="";mount(root);});
   }finally{
     mounting=false;
   }
@@ -519,8 +666,8 @@ function maybeMount(){
   const state=workspace();
   if(state.activeNode!=="logistics_scheduling")return;
   const root=document.getElementById(ROOT_ID);
-  if(!root||root.querySelector('.scheduling-config-v2'))return;
-  if(!root.querySelector('.dispatch-scheduling-config'))return;
+  if(!root||root.querySelector(".scheduling-config-v2"))return;
+  if(!root.querySelector(".dispatch-scheduling-config"))return;
   mount(root);
 }
 
