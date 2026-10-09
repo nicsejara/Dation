@@ -6,18 +6,82 @@ import * as explanation from './explanation.mjs';
 import {exportDecision} from './export.mjs?v=decision-dashboard-v2';
 import * as schedulingDashboard from './scheduling-dashboard.mjs?v=decision-map-phase1-v1';
 import {decisionRail,bindDecisionRail} from './decision-nav.mjs?v=decision-map-phase1-v1';
+import {
+  renderAssignmentShell,
+  bindAssignmentShell,
+} from './assignment-dashboard-shell.mjs?v=assignment-dashboard-phase1';
 
-export function render(root,run,onRerun,caseActions={}){
-  dispose(root);
-  const result=run.result_json;
-  if(result?.schema_version==='scheduling_v1'){
-    return schedulingDashboard.render(
-      root,
-      run,
-      onRerun,
-      caseActions,
-    );
+function cleanupAssignmentShell(root){
+  if(root._assignmentDashboardKeydown){
+    document.removeEventListener('keydown',root._assignmentDashboardKeydown);
+    root._assignmentDashboardKeydown=null;
   }
+  document.body.classList.remove('assignment-dashboard-drawer-open');
+}
+
+function renderModule(element,module,value){
+  const draw=()=>{
+    try{
+      module.render(element,value);
+    }catch(error){
+      errorBox(element,error,draw);
+    }
+  };
+  draw();
+}
+
+function installDecisionChat(root,run,chatNode,toggleButton){
+  function openChat(question=''){
+    if(!chatNode)return;
+    chatNode.hidden=false;
+    root.classList.add('with-chat');
+    toggleButton?.setAttribute('aria-expanded','true');
+    explanation.chat(chatNode,run,question);
+  }
+
+  function toggleChat(){
+    if(!chatNode)return;
+    if(!chatNode.hidden){
+      chatNode.hidden=true;
+      root.classList.remove('with-chat');
+      toggleButton?.setAttribute('aria-expanded','false');
+      return;
+    }
+    openChat();
+  }
+
+  if(root._dispatchChatHandler){
+    root.removeEventListener('dispatch:open-chat',root._dispatchChatHandler);
+  }
+  root._dispatchChatHandler=event=>{
+    openChat(event.detail?.question||'');
+  };
+  root.addEventListener('dispatch:open-chat',root._dispatchChatHandler);
+
+  return {openChat,toggleChat};
+}
+
+function renderAssignmentDashboard(root,run,onRerun,caseActions={}){
+  const result=run.result_json;
+  const nodes=renderAssignmentShell(root,run,caseActions);
+
+  renderModule(nodes.hero,hero,result);
+  renderModule(nodes.assignment,assignment,result);
+  renderModule(nodes.review,review,result);
+  renderModule(nodes.explanation,explanation,run);
+
+  const chatButton=root.querySelector('[data-chat]');
+  const chat=installDecisionChat(root,run,nodes.chat,chatButton);
+
+  bindAssignmentShell(root,run,{
+    onRerun,
+    caseActions,
+    onOpenChat:chat.toggleChat,
+  });
+}
+
+function renderLegacyDashboard(root,run,onRerun,caseActions={}){
+  const result=run.result_json;
   const metrics=result.scenarios.selected.metrics;
   const statusLabels={
     running:'Procesando',
@@ -26,8 +90,7 @@ export function render(root,run,onRerun,caseActions={}){
     error:'Error',
   };
   const caseStatus=statusLabels[caseActions.status]||'Decisión disponible';
-  const isAssignment=result.schema_version==='assignment_v1';
-  const exportButtonLabel=isAssignment?'Exportar decisión':'Exportar distribución';
+  const exportButtonLabel='Exportar distribución';
 
   root.className='dispatch dispatch-dashboard dispatch-dashboard-focused';
   root.innerHTML=
@@ -71,47 +134,26 @@ export function render(root,run,onRerun,caseActions={}){
 
   api('/api/system/llm-status')
     .then(data=>{
-      root.querySelector('[data-ai-details]').textContent='IA: '+(data.configured?(data.provider+' · '+data.model):'Sin configurar');
+      const target=root.querySelector('[data-ai-details]');
+      if(target)target.textContent='IA: '+(data.configured?(data.provider+' · '+data.model):'Sin configurar');
     })
     .catch(()=>{
-      root.querySelector('[data-ai-details]').textContent='No se pudo consultar el modelo de IA.';
+      const target=root.querySelector('[data-ai-details]');
+      if(target)target.textContent='No se pudo consultar el modelo de IA.';
     });
 
-  const sections=[
-    ['hero',hero,result],
-    ['assignment',assignment,result],
-    ['review',review,result],
-    ['explanation',explanation,run],
-  ];
+  renderModule(root.querySelector('#dispatch-hero'),hero,result);
+  renderModule(root.querySelector('#dispatch-assignment'),assignment,result);
+  renderModule(root.querySelector('#dispatch-review'),review,result);
+  renderModule(root.querySelector('#dispatch-explanation'),explanation,run);
 
-  for(const [key,module,value] of sections){
-    const element=root.querySelector('#dispatch-'+key);
-    const draw=()=>{
-      try{
-        module.render(element,value);
-      }catch(error){
-        errorBox(element,error,draw);
-      }
-    };
-    draw();
-  }
-
-  function openChat(question=''){
-    const aside=root.querySelector('.dispatch-chat');
-    const fab=root.querySelector('[data-chat]');
-    aside.hidden=false;
-    root.classList.add('with-chat');
-    fab?.setAttribute('aria-expanded','true');
-    explanation.chat(aside,run,question);
-  }
-
-  if(root._dispatchChatHandler){
-    root.removeEventListener('dispatch:open-chat',root._dispatchChatHandler);
-  }
-  root._dispatchChatHandler=event=>{
-    openChat(event.detail?.question||'');
-  };
-  root.addEventListener('dispatch:open-chat',root._dispatchChatHandler);
+  const chatButton=root.querySelector('[data-chat]');
+  const chat=installDecisionChat(
+    root,
+    run,
+    root.querySelector('.dispatch-chat'),
+    chatButton,
+  );
 
   function feedback(button,working,done){
     const original=button.dataset.originalLabel||button.textContent;
@@ -154,16 +196,7 @@ export function render(root,run,onRerun,caseActions={}){
       alert(error.message);
     }
   };
-  root.querySelector('[data-chat]').onclick=()=>{
-    const aside=root.querySelector('.dispatch-chat');
-    if(!aside.hidden){
-      aside.hidden=true;
-      root.classList.remove('with-chat');
-      root.querySelector('[data-chat]')?.setAttribute('aria-expanded','false');
-      return;
-    }
-    openChat();
-  };
+  chatButton.onclick=chat.toggleChat;
   root.querySelector('[data-json]').onclick=()=>download('decision-'+run.id+'.json',JSON.stringify(result,null,2));
   root.querySelector('[data-copy]').onclick=async event=>{
     try{
@@ -179,4 +212,26 @@ export function render(root,run,onRerun,caseActions={}){
       event.target.textContent='No se pudo copiar';
     }
   };
+}
+
+export function render(root,run,onRerun,caseActions={}){
+  cleanupAssignmentShell(root);
+  dispose(root);
+  const result=run.result_json;
+
+  if(result?.schema_version==='scheduling_v1'){
+    return schedulingDashboard.render(
+      root,
+      run,
+      onRerun,
+      caseActions,
+    );
+  }
+
+  if(result?.schema_version==='assignment_v1'){
+    renderAssignmentDashboard(root,run,onRerun,caseActions);
+    return;
+  }
+
+  renderLegacyDashboard(root,run,onRerun,caseActions);
 }
