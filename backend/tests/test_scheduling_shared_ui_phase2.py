@@ -36,7 +36,7 @@ class SchedulingSharedUiPhase2Tests(unittest.TestCase):
             'focusRulesOpen',
             'data-scheduling-focus-toggle',
             'aria-expanded',
-            'focusRulesMarkup(config,stats.trips)',
+            'focusRulesMarkup(config,trips)',
             'bindFocusRuleEvents(root',
             'executionRules(config)',
         ):
