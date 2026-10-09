@@ -39,6 +39,12 @@ class DecisionConfigUiFoundationTests(unittest.TestCase):
         ):
             self.assertIn(marker, self.shared)
 
+    def test_shared_option_components_keep_disabled_accessibility_contract(self):
+        self.assertIn('buttonAttrs.disabled=true', self.shared)
+        self.assertIn('buttonAttrs["aria-disabled"]="true"', self.shared)
+        self.assertIn('attributes.disabled=true', self.shared)
+        self.assertIn('attributes["aria-disabled"]="true"', self.shared)
+
     def test_assignment_consumes_shared_primitives(self):
         self.assertIn('from "./decision-config-ui.mjs?v=decision-config-foundation"', self.assignment)
         for name in (
@@ -53,13 +59,6 @@ class DecisionConfigUiFoundationTests(unittest.TestCase):
             self.assertIn(name, self.assignment)
 
     def test_assignment_no_longer_owns_duplicate_component_renderers(self):
-        for old_definition in (
-            "function sectionHeader(",
-            "function datasetFile(kind,dataset,preview,hasFilters){\n  const orders",
-            "function summaryFooter(state,preview,capabilities){\n  const error=blocker",
-        ):
-            if old_definition.startswith("function sectionHeader"):
-                self.assertNotIn(old_definition, self.assignment)
         self.assertNotIn("function sectionHeader(", self.assignment)
 
     def test_phase_zero_does_not_migrate_scheduling_yet(self):
