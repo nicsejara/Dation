@@ -252,7 +252,7 @@ class SchedulingPhase2FrontendContractTests(unittest.TestCase):
         ):
             self.assertIn(value, self.ui)
         self.assertIn("REGLAS POR FOCO", self.ui)
-        self.assertIn("VIAJES AFECTADOS", self.ui)
+        self.assertIn("IMPACTO PREVIO", self.ui)
         self.assertIn("matchingTripIds", self.ui)
 
     def test_ui_exposes_priority_and_specific_window_actions(self):
