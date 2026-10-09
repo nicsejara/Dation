@@ -6,7 +6,7 @@ import {
   decisionStatusUi,
   shortRunId,
   solverStatusLabel,
-} from './assignment-dashboard-selectors.mjs?v=assignment-dashboard-phase1';
+} from './assignment-dashboard-selectors.mjs?v=assignment-dashboard-phase2';
 
 function detailRows(run,caseActions){
   const result=run.result_json||{};
@@ -33,18 +33,17 @@ function approvalMarkup(caseActions){
   const approved=caseActions.status==='approved';
   return '<div class="assignment-dashboard-v2__approval '+(approved?'is-approved':'is-review')+'" data-approval-block>'
     +'<div class="assignment-dashboard-v2__approval-copy">'
-      +'<span class="assignment-dashboard-v2__approval-icon" aria-hidden="true">'+(approved?'✓':'✓')+'</span>'
+      +'<span class="assignment-dashboard-v2__approval-icon" aria-hidden="true">✓</span>'
       +'<div>'
-        +'<strong data-approval-title>'+(approved?'Decisión aprobada':'Validá la evidencia antes de aprobar')+'</strong>'
+        +'<strong data-approval-title>'+(approved?'✓ Asignación aprobada':'Validá la evidencia antes de aprobar')+'</strong>'
         +'<p data-approval-copy>'+(approved
-          ?'La asignación quedó fijada para este Decision Case. Podés continuar desde el mapa cuando quieras.'
-          :'La aprobación fija esta asignación como entrada de la próxima decisión. Dation IA no es requisito para aprobar.')+'</p>'
+          ?'Esta decisión quedó congelada como entrada para Planificación.'
+          :'La aprobación congela esta asignación como entrada de Planificación. Dation IA no es requisito para aprobar.')+'</p>'
       +'</div>'
     +'</div>'
     +'<div class="assignment-dashboard-v2__approval-actions">'
-      +'<button type="button" data-approve class="assignment-dashboard-v2__approve" '+(approved?'disabled':'')+'>'
-        +(approved?'✓ Decisión aprobada':'Aprobar decisión →')
-      +'</button>'
+      +'<button type="button" data-rerun-validation class="assignment-dashboard-v2__reconfigure" '+(approved?'hidden':'')+'>Reconfigurar decisión</button>'
+      +'<button type="button" data-approve class="assignment-dashboard-v2__approve" '+(approved?'hidden':'')+'>Aprobar asignación →</button>'
       +(caseActions.onFlow
         ?'<button type="button" data-after-approve data-flow class="assignment-dashboard-v2__continue" '+(approved?'':'hidden')+'>Continuar en el mapa →</button>'
         :'')
@@ -203,6 +202,7 @@ export function bindAssignmentShell(root,run,{onRerun,caseActions={},onOpenChat}
     closeMenus(root);
     onRerun?.();
   });
+  root.querySelector('[data-rerun-validation]')?.addEventListener('click',()=>onRerun?.());
 
   bindDecisionRail(root,caseActions);
 
@@ -212,7 +212,6 @@ export function bindAssignmentShell(root,run,{onRerun,caseActions={},onOpenChat}
     approveButton.textContent='Aprobando…';
     try{
       await caseActions.onApprove?.();
-      approveButton.textContent='✓ Decisión aprobada';
       const statusBadge=root.querySelector('[data-status-badge]');
       if(statusBadge){
         statusBadge.textContent='Aprobada';
@@ -223,15 +222,18 @@ export function bindAssignmentShell(root,run,{onRerun,caseActions={},onOpenChat}
       block?.classList.remove('is-review');
       block?.classList.add('is-approved');
       const title=root.querySelector('[data-approval-title]');
-      if(title)title.textContent='Decisión aprobada';
+      if(title)title.textContent='✓ Asignación aprobada';
       const copy=root.querySelector('[data-approval-copy]');
-      if(copy)copy.textContent='La asignación quedó fijada para este Decision Case. Podés continuar desde el mapa cuando quieras.';
+      if(copy)copy.textContent='Esta decisión quedó congelada como entrada para Planificación.';
+      const rerunValidation=root.querySelector('[data-rerun-validation]');
+      if(rerunValidation)rerunValidation.hidden=true;
+      approveButton.hidden=true;
       const continuation=root.querySelector('[data-after-approve]');
       if(continuation)continuation.hidden=false;
       caseActions.onApprovalComplete?.();
     }catch(error){
       approveButton.disabled=false;
-      approveButton.textContent='Aprobar decisión →';
+      approveButton.textContent='Aprobar asignación →';
       alert(error.message);
     }
   };
