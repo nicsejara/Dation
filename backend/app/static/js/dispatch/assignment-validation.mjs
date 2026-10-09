@@ -60,7 +60,7 @@ export function render(root,result){
 
   root.innerHTML=
     '<div class="dispatch-section-heading assignment-validation__heading">'
-      +'<div><span class="dispatch-kicker">VALIDACIÓN HUMANA</span><h2>Validá la asignación antes de aprobar</h2><p>Revisá los puntos que requieren criterio operativo. Dation muestra sólo controles y observaciones respaldados por la evidencia persistida de esta corrida.</p></div>'
+      +'<div><span class="dispatch-kicker">VALIDACIÓN HUMANA</span><h2>Validá la asignación antes de aprobar</h2><p>Revisá los puntos que requieren criterio operativo. Dation muestra sólo controles y observaciones respaldados por la evidencia persistida. No se simulan validaciones que el resultado no expone.</p></div>'
       +'<span class="assignment-validation__status '+(warnings.length?'is-review':'is-good')+'">'+(warnings.length?'Revisar':'Sin observaciones')+'</span>'
     +'</div>'
     +'<div class="assignment-validation__grid">'
