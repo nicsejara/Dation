@@ -61,10 +61,20 @@ class DecisionConfigUiFoundationTests(unittest.TestCase):
     def test_assignment_no_longer_owns_duplicate_component_renderers(self):
         self.assertNotIn("function sectionHeader(", self.assignment)
 
-    def test_phase_zero_does_not_migrate_scheduling_yet(self):
-        self.assertNotIn("decision-config-ui.mjs", self.scheduling)
-        self.assertIn("function sectionHead(", self.scheduling)
-        self.assertIn("function choice(", self.scheduling)
+    def test_scheduling_now_consumes_shared_primitives(self):
+        self.assertIn('from "./decision-config-ui.mjs?v=scheduling-shared-phase2-v1"', self.scheduling)
+        for name in (
+            "decisionHero(",
+            "decisionCaseCard(",
+            "decisionDataFileCard(",
+            "decisionSectionHeader(",
+            "decisionChoiceCard(",
+            "decisionDepthCard(",
+            "configSummaryBar(",
+        ):
+            self.assertIn(name, self.scheduling)
+        self.assertNotIn("function sectionHead(", self.scheduling)
+        self.assertNotIn("function choice(", self.scheduling)
 
 
 if __name__ == "__main__":
