@@ -11,6 +11,18 @@ import {
   bindAssignmentShell,
 } from './assignment-dashboard-shell.mjs?v=assignment-dashboard-phase1';
 
+const ASSIGNMENT_STYLE_ID='assignment-dashboard-v2-styles';
+const ASSIGNMENT_STYLE_HREF='/static/css/assignment-dashboard-v2.css?v=assignment-dashboard-phase1';
+
+function ensureAssignmentStyles(){
+  if(document.getElementById(ASSIGNMENT_STYLE_ID))return;
+  const link=document.createElement('link');
+  link.id=ASSIGNMENT_STYLE_ID;
+  link.rel='stylesheet';
+  link.href=ASSIGNMENT_STYLE_HREF;
+  document.head.append(link);
+}
+
 function cleanupAssignmentShell(root){
   if(root._assignmentDashboardKeydown){
     document.removeEventListener('keydown',root._assignmentDashboardKeydown);
@@ -62,6 +74,7 @@ function installDecisionChat(root,run,chatNode,toggleButton){
 }
 
 function renderAssignmentDashboard(root,run,onRerun,caseActions={}){
+  ensureAssignmentStyles();
   const result=run.result_json;
   const nodes=renderAssignmentShell(root,run,caseActions);
 
