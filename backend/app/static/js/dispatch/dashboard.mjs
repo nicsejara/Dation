@@ -3,24 +3,35 @@ import * as hero from './hero.mjs';
 import * as assignment from './assignment.mjs';
 import * as review from './review.mjs';
 import * as explanation from './explanation.mjs';
+import * as assignmentSummary from './assignment-summary.mjs?v=assignment-dashboard-phase2';
+import * as assignmentEvidence from './assignment-evidence.mjs?v=assignment-dashboard-phase2';
+import * as assignmentValidation from './assignment-validation.mjs?v=assignment-dashboard-phase2';
+import {getAnalysisDepth} from './assignment-dashboard-selectors.mjs?v=assignment-dashboard-phase2';
 import {exportDecision} from './export.mjs?v=decision-dashboard-v2';
 import * as schedulingDashboard from './scheduling-dashboard.mjs?v=decision-map-phase1-v1';
 import {decisionRail,bindDecisionRail} from './decision-nav.mjs?v=decision-map-phase1-v1';
 import {
   renderAssignmentShell,
   bindAssignmentShell,
-} from './assignment-dashboard-shell.mjs?v=assignment-dashboard-phase1';
+} from './assignment-dashboard-shell.mjs?v=assignment-dashboard-phase2';
 
 const ASSIGNMENT_STYLE_ID='assignment-dashboard-v2-styles';
 const ASSIGNMENT_STYLE_HREF='/static/css/assignment-dashboard-v2.css?v=assignment-dashboard-phase1';
+const ASSIGNMENT_ESSENTIAL_STYLE_ID='assignment-dashboard-essential-styles';
+const ASSIGNMENT_ESSENTIAL_STYLE_HREF='/static/css/assignment-dashboard-essential.css?v=assignment-dashboard-phase2';
+
+function ensureStylesheet(id,href){
+  if(document.getElementById(id))return;
+  const link=document.createElement('link');
+  link.id=id;
+  link.rel='stylesheet';
+  link.href=href;
+  document.head.append(link);
+}
 
 function ensureAssignmentStyles(){
-  if(document.getElementById(ASSIGNMENT_STYLE_ID))return;
-  const link=document.createElement('link');
-  link.id=ASSIGNMENT_STYLE_ID;
-  link.rel='stylesheet';
-  link.href=ASSIGNMENT_STYLE_HREF;
-  document.head.append(link);
+  ensureStylesheet(ASSIGNMENT_STYLE_ID,ASSIGNMENT_STYLE_HREF);
+  ensureStylesheet(ASSIGNMENT_ESSENTIAL_STYLE_ID,ASSIGNMENT_ESSENTIAL_STYLE_HREF);
 }
 
 function cleanupAssignmentShell(root){
@@ -76,11 +87,19 @@ function installDecisionChat(root,run,chatNode,toggleButton){
 function renderAssignmentDashboard(root,run,onRerun,caseActions={}){
   ensureAssignmentStyles();
   const result=run.result_json;
+  const depth=getAnalysisDepth(run);
   const nodes=renderAssignmentShell(root,run,caseActions);
 
-  renderModule(nodes.hero,hero,result);
-  renderModule(nodes.assignment,assignment,result);
-  renderModule(nodes.review,review,result);
+  if(depth==='essential'){
+    renderModule(nodes.hero,assignmentSummary,result);
+    renderModule(nodes.assignment,assignmentEvidence,result);
+    renderModule(nodes.review,assignmentValidation,result);
+  }else{
+    // Phase 3 will replace this comparative composition. Keep existing content intact meanwhile.
+    renderModule(nodes.hero,hero,result);
+    renderModule(nodes.assignment,assignment,result);
+    renderModule(nodes.review,review,result);
+  }
   renderModule(nodes.explanation,explanation,run);
 
   const chatButton=root.querySelector('[data-chat]');
