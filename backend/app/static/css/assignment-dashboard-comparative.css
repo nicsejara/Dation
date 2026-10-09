@@ -1,0 +1,603 @@
+/* Assignment Dashboard V2 · Phase 3
+   Comparative analysis only. Scoped by persisted analysis depth. */
+.assignment-dashboard-v2[data-analysis-depth="comparative"]{
+  --cmp-ink:#17313d;
+  --cmp-muted:#687b85;
+  --cmp-border:#dce6e8;
+  --cmp-soft:#f7fafb;
+  --cmp-teal:#137d83;
+  --cmp-teal-dark:#0e666b;
+  --cmp-green:#287a5d;
+  --cmp-green-soft:#edf8f3;
+  --cmp-amber:#9a6a16;
+  --cmp-amber-soft:#fff8e9;
+  --cmp-gray:#647680;
+  --cmp-gray-soft:#f1f4f5;
+  --cmp-red:#a34d45;
+  --cmp-red-soft:#fff3f1;
+}
+
+.assignment-dashboard-v2[data-analysis-depth="comparative"] .assignment-dashboard-v2__hero{
+  padding:24px!important;
+  background:linear-gradient(135deg,#eff8f7 0%,#fff 66%)!important;
+}
+
+.assignment-comparative-summary{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 300px;
+  gap:26px;
+  align-items:start;
+}
+
+.assignment-comparative-summary__copy h1{
+  max-width:800px;
+  margin:8px 0 10px;
+  color:var(--cmp-ink);
+  font-size:clamp(28px,3vw,39px);
+  line-height:1.08;
+  letter-spacing:-.035em;
+}
+
+.assignment-comparative-summary__copy>p{
+  max-width:760px;
+  margin:0;
+  color:#5f747e;
+  font-size:14px;
+  line-height:1.6;
+}
+
+.assignment-comparative-summary__status{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:18px;
+}
+
+.assignment-comparative-summary__status>span{
+  min-width:145px;
+  padding:10px 12px;
+  border:1px solid #d9e5e7;
+  border-radius:11px;
+  background:rgba(255,255,255,.78);
+}
+
+.assignment-comparative-summary__status small,
+.assignment-comparative-summary__status strong{
+  display:block;
+}
+
+.assignment-comparative-summary__status small{
+  color:#788991;
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+
+.assignment-comparative-summary__status strong{
+  margin-top:4px;
+  color:#25434d;
+  font-size:12px;
+}
+
+.assignment-comparative-summary__guide{
+  padding:17px;
+  border:1px solid #cfdfdf;
+  border-radius:14px;
+  background:rgba(255,255,255,.88);
+  box-shadow:0 10px 28px rgba(23,49,61,.05);
+}
+
+.assignment-comparative-summary__guide>span{
+  color:#71858d;
+  font-size:9px;
+  font-weight:850;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+
+.assignment-comparative-summary__guide>strong{
+  display:block;
+  margin-top:7px;
+  color:#22434b;
+  font-size:14px;
+  line-height:1.35;
+}
+
+.assignment-comparative-summary__guide>p{
+  margin:8px 0 0;
+  color:#667a83;
+  font-size:11px;
+  line-height:1.55;
+}
+
+.assignment-comparative-summary__metrics{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:9px;
+  margin-top:20px;
+}
+
+.assignment-comparative-summary__metric{
+  padding:13px 14px;
+  border:1px solid var(--cmp-border);
+  border-radius:12px;
+  background:#fff;
+}
+
+.assignment-comparative-summary__metric.is-objective{
+  border-color:#b7d9d7;
+  background:linear-gradient(145deg,#eef8f7,#fff);
+}
+
+.assignment-comparative-summary__metric>div{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:8px;
+}
+
+.assignment-comparative-summary__metric span{
+  color:#6f828b;
+  font-size:10px;
+  font-weight:780;
+}
+
+.assignment-comparative-summary__metric em{
+  padding:3px 6px;
+  border-radius:999px;
+  background:#f0f3f4;
+  color:#71828a;
+  font-size:8px;
+  font-style:normal;
+  font-weight:850;
+  white-space:nowrap;
+}
+
+.assignment-comparative-summary__metric.is-objective em{
+  background:#e2f2ef;
+  color:#146b70;
+}
+
+.assignment-comparative-summary__metric>strong{
+  display:block;
+  margin-top:10px;
+  color:#193943;
+  font-size:22px;
+  letter-spacing:-.025em;
+}
+
+.assignment-dashboard-v2[data-analysis-depth="comparative"] .assignment-dashboard-v2__assignment{
+  padding:22px!important;
+}
+
+.assignment-comparison__heading{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:24px;
+}
+
+.assignment-comparison__heading h2{
+  margin:5px 0 5px;
+  color:var(--cmp-ink);
+  font-size:23px;
+  letter-spacing:-.025em;
+}
+
+.assignment-comparison__heading p{
+  max-width:720px;
+  margin:0;
+  color:#687b84;
+  font-size:12px;
+  line-height:1.55;
+}
+
+.assignment-comparison__selector{
+  flex:0 0 285px;
+}
+
+.assignment-comparison__selector>span{
+  display:block;
+  margin:0 0 6px 2px;
+  color:#72858d;
+  font-size:9px;
+  font-weight:850;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+
+.assignment-comparison__selector select{
+  width:100%;
+  min-height:42px;
+  padding:0 36px 0 12px;
+  border:1px solid #cbdadc;
+  border-radius:11px;
+  background:#fff;
+  color:#24414b;
+  font:inherit;
+  font-size:12px;
+  font-weight:750;
+}
+
+.assignment-comparison__selector select:focus-visible{
+  outline:3px solid rgba(19,125,131,.16);
+  outline-offset:2px;
+}
+
+.assignment-comparison__legend{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+  margin-top:15px;
+}
+
+.assignment-comparison__legend span,
+.assignment-comparison__metric header em,
+.assignment-comparison__outcomes li>span{
+  display:inline-flex;
+  align-items:center;
+  min-height:24px;
+  padding:4px 8px;
+  border-radius:999px;
+  font-size:9px;
+  font-style:normal;
+  font-weight:850;
+}
+
+.assignment-comparison__legend .is-improvement,
+.assignment-comparison__metric.is-improvement header em,
+.assignment-comparison__outcomes li.is-improvement>span{
+  background:var(--cmp-green-soft);
+  color:var(--cmp-green);
+}
+
+.assignment-comparison__legend .is-tradeoff,
+.assignment-comparison__metric.is-tradeoff header em,
+.assignment-comparison__outcomes li.is-tradeoff>span{
+  background:var(--cmp-amber-soft);
+  color:var(--cmp-amber);
+}
+
+.assignment-comparison__legend .is-same,
+.assignment-comparison__metric.is-same header em,
+.assignment-comparison__outcomes li.is-same>span{
+  background:#edf4f5;
+  color:#55717a;
+}
+
+.assignment-comparison__legend .is-not-comparable,
+.assignment-comparison__metric.is-not-comparable header em,
+.assignment-comparison__outcomes li.is-not-comparable>span{
+  background:var(--cmp-gray-soft);
+  color:var(--cmp-gray);
+}
+
+.assignment-comparison__state{
+  display:flex;
+  gap:10px 18px;
+  align-items:center;
+  margin-top:18px;
+  padding:13px 15px;
+  border:1px solid #d8e3e5;
+  border-radius:11px;
+  background:#f8fbfb;
+}
+
+.assignment-comparison__state strong{
+  flex:0 0 auto;
+  color:#294750;
+  font-size:11px;
+}
+
+.assignment-comparison__state span{
+  color:#637880;
+  font-size:11px;
+  line-height:1.45;
+}
+
+.assignment-comparison__state.is-warning{
+  border-color:#efdcae;
+  background:var(--cmp-amber-soft);
+}
+
+.assignment-comparison__state.is-warning strong{
+  color:#855d16;
+}
+
+.assignment-comparison__state.is-same{
+  border-color:#d5e1e4;
+  background:#f4f7f8;
+}
+
+.assignment-comparison__metrics{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:11px;
+  margin-top:18px;
+}
+
+.assignment-comparison__metric{
+  min-width:0;
+  padding:16px;
+  border:1px solid var(--cmp-border);
+  border-radius:13px;
+  background:#fff;
+}
+
+.assignment-comparison__metric.is-improvement{
+  border-color:#cae2d8;
+}
+
+.assignment-comparison__metric.is-tradeoff{
+  border-color:#eadbb8;
+}
+
+.assignment-comparison__metric header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.assignment-comparison__metric header>span{
+  color:#29454f;
+  font-size:12px;
+  font-weight:850;
+}
+
+.assignment-comparison__metric-values{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 22px minmax(0,1fr);
+  gap:8px;
+  align-items:center;
+  margin-top:15px;
+}
+
+.assignment-comparison__metric-values>span{
+  color:#9aabb1;
+  font-size:15px;
+  text-align:center;
+}
+
+.assignment-comparison__metric-values>div{
+  min-width:0;
+  padding:10px 11px;
+  border-radius:10px;
+  background:#f7fafb;
+}
+
+.assignment-comparison__metric-values small,
+.assignment-comparison__metric-values strong{
+  display:block;
+}
+
+.assignment-comparison__metric-values small{
+  overflow:hidden;
+  color:#788990;
+  font-size:9px;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.assignment-comparison__metric-values strong{
+  margin-top:4px;
+  overflow:hidden;
+  color:#1e3c47;
+  font-size:17px;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.assignment-comparison__metric-delta{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:11px;
+}
+
+.assignment-comparison__metric-delta strong{
+  color:#294550;
+  font-size:11px;
+}
+
+.assignment-comparison__metric.is-improvement .assignment-comparison__metric-delta strong{
+  color:var(--cmp-green);
+}
+
+.assignment-comparison__metric.is-tradeoff .assignment-comparison__metric-delta strong{
+  color:var(--cmp-amber);
+}
+
+.assignment-comparison__metric-delta small{
+  color:#7b8c93;
+  font-size:9px;
+  text-align:right;
+}
+
+.assignment-comparison__implications{
+  margin-top:20px;
+  padding-top:20px;
+  border-top:1px solid #e3eaec;
+}
+
+.assignment-comparison__implications-head h3{
+  margin:5px 0 5px;
+  color:#203e49;
+  font-size:18px;
+  letter-spacing:-.02em;
+}
+
+.assignment-comparison__implications-head p{
+  max-width:780px;
+  margin:0;
+  color:#6d7f87;
+  font-size:11px;
+  line-height:1.5;
+}
+
+.assignment-comparison__implications-grid{
+  display:grid;
+  grid-template-columns:270px minmax(0,1fr);
+  gap:14px;
+  margin-top:15px;
+}
+
+.assignment-comparison__priorities,
+.assignment-comparison__outcomes{
+  padding:15px;
+  border:1px solid #dfe7e9;
+  border-radius:12px;
+  background:#fbfcfc;
+}
+
+.assignment-comparison__priorities h4,
+.assignment-comparison__outcomes h4{
+  margin:0 0 10px;
+  color:#36515a;
+  font-size:10px;
+  font-weight:850;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+
+.assignment-comparison__priority{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:9px 10px;
+  border-radius:9px;
+  background:#fff;
+}
+
+.assignment-comparison__priority+.assignment-comparison__priority{
+  margin-top:7px;
+}
+
+.assignment-comparison__priority span{
+  color:#5e737c;
+  font-size:11px;
+}
+
+.assignment-comparison__priority strong{
+  color:#176c72;
+  font-size:11px;
+}
+
+.assignment-comparison__priority.is-empty strong{
+  color:#75878e;
+}
+
+.assignment-comparison__outcomes ul{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+  margin:0;
+  padding:0;
+  list-style:none;
+}
+
+.assignment-comparison__outcomes li{
+  min-width:0;
+  padding:10px;
+  border-radius:10px;
+  background:#fff;
+}
+
+.assignment-comparison__outcomes li>strong{
+  display:block;
+  margin-top:7px;
+  color:#294650;
+  font-size:11px;
+}
+
+.assignment-comparison__outcomes li>p{
+  margin:4px 0 0;
+  color:#6d7f87;
+  font-size:10px;
+  line-height:1.45;
+}
+
+.assignment-dashboard-v2[data-analysis-depth="comparative"] .assignment-dashboard-v2__review{
+  padding:22px!important;
+}
+
+@media(max-width:980px){
+  .assignment-comparative-summary{
+    grid-template-columns:1fr;
+  }
+  .assignment-comparative-summary__guide{
+    max-width:none;
+  }
+  .assignment-comparative-summary__metrics{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .assignment-comparison__heading{
+    align-items:stretch;
+    flex-direction:column;
+  }
+  .assignment-comparison__selector{
+    flex-basis:auto;
+    width:min(100%,420px);
+  }
+  .assignment-comparison__implications-grid{
+    grid-template-columns:1fr;
+  }
+}
+
+@media(max-width:760px){
+  .assignment-dashboard-v2[data-analysis-depth="comparative"] .assignment-dashboard-v2__hero,
+  .assignment-dashboard-v2[data-analysis-depth="comparative"] .assignment-dashboard-v2__assignment,
+  .assignment-dashboard-v2[data-analysis-depth="comparative"] .assignment-dashboard-v2__review{
+    padding:17px!important;
+  }
+  .assignment-comparative-summary__copy h1{
+    font-size:29px;
+  }
+  .assignment-comparison__metrics,
+  .assignment-comparison__outcomes ul{
+    grid-template-columns:1fr;
+  }
+  .assignment-comparison__state{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+}
+
+@media(max-width:520px){
+  .assignment-comparative-summary__metrics{
+    grid-template-columns:1fr;
+  }
+  .assignment-comparative-summary__status{
+    display:grid;
+    grid-template-columns:1fr;
+  }
+  .assignment-comparative-summary__status>span{
+    min-width:0;
+  }
+  .assignment-comparison__metric-values{
+    grid-template-columns:1fr;
+  }
+  .assignment-comparison__metric-values>span{
+    transform:rotate(90deg);
+  }
+  .assignment-comparison__metric-delta{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+  .assignment-comparison__metric-delta small{
+    text-align:left;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .assignment-dashboard-v2[data-analysis-depth="comparative"] *,
+  .assignment-dashboard-v2[data-analysis-depth="comparative"] *::before,
+  .assignment-dashboard-v2[data-analysis-depth="comparative"] *::after{
+    scroll-behavior:auto!important;
+    transition:none!important;
+    animation:none!important;
+  }
+}
