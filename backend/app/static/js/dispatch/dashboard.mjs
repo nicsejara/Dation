@@ -6,7 +6,9 @@ import * as explanation from './explanation.mjs';
 import * as assignmentSummary from './assignment-summary.mjs?v=assignment-dashboard-phase2';
 import * as assignmentEvidence from './assignment-evidence.mjs?v=assignment-dashboard-phase2';
 import * as assignmentValidation from './assignment-validation.mjs?v=assignment-dashboard-phase2';
-import {getAnalysisDepth} from './assignment-dashboard-selectors.mjs?v=assignment-dashboard-phase2';
+import * as assignmentComparativeSummary from './assignment-comparative-summary.mjs?v=assignment-dashboard-phase3';
+import * as assignmentComparison from './assignment-comparison.mjs?v=assignment-dashboard-phase3';
+import {getAnalysisDepth} from './assignment-dashboard-selectors.mjs?v=assignment-dashboard-phase3';
 import {exportDecision} from './export.mjs?v=decision-dashboard-v2';
 import * as schedulingDashboard from './scheduling-dashboard.mjs?v=decision-map-phase1-v1';
 import {decisionRail,bindDecisionRail} from './decision-nav.mjs?v=decision-map-phase1-v1';
@@ -19,6 +21,8 @@ const ASSIGNMENT_STYLE_ID='assignment-dashboard-v2-styles';
 const ASSIGNMENT_STYLE_HREF='/static/css/assignment-dashboard-v2.css?v=assignment-dashboard-phase1';
 const ASSIGNMENT_ESSENTIAL_STYLE_ID='assignment-dashboard-essential-styles';
 const ASSIGNMENT_ESSENTIAL_STYLE_HREF='/static/css/assignment-dashboard-essential.css?v=assignment-dashboard-phase2';
+const ASSIGNMENT_COMPARATIVE_STYLE_ID='assignment-dashboard-comparative-styles';
+const ASSIGNMENT_COMPARATIVE_STYLE_HREF='/static/css/assignment-dashboard-comparative.css?v=assignment-dashboard-phase3';
 
 function ensureStylesheet(id,href){
   if(document.getElementById(id))return;
@@ -32,6 +36,7 @@ function ensureStylesheet(id,href){
 function ensureAssignmentStyles(){
   ensureStylesheet(ASSIGNMENT_STYLE_ID,ASSIGNMENT_STYLE_HREF);
   ensureStylesheet(ASSIGNMENT_ESSENTIAL_STYLE_ID,ASSIGNMENT_ESSENTIAL_STYLE_HREF);
+  ensureStylesheet(ASSIGNMENT_COMPARATIVE_STYLE_ID,ASSIGNMENT_COMPARATIVE_STYLE_HREF);
 }
 
 function cleanupAssignmentShell(root){
@@ -94,8 +99,11 @@ function renderAssignmentDashboard(root,run,onRerun,caseActions={}){
     renderModule(nodes.hero,assignmentSummary,result);
     renderModule(nodes.assignment,assignmentEvidence,result);
     renderModule(nodes.review,assignmentValidation,result);
+  }else if(depth==='comparative'){
+    renderModule(nodes.hero,assignmentComparativeSummary,result);
+    renderModule(nodes.assignment,assignmentComparison,result);
+    renderModule(nodes.review,assignmentValidation,result);
   }else{
-    // Phase 3 will replace this comparative composition. Keep existing content intact meanwhile.
     renderModule(nodes.hero,hero,result);
     renderModule(nodes.assignment,assignment,result);
     renderModule(nodes.review,review,result);
