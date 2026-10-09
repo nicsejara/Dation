@@ -1,0 +1,413 @@
+{
+  "id": "44444444-4444-4444-8444-444444444444",
+  "status": "completed",
+  "schema_version": "assignment_v1",
+  "engine_name": "logistics-assignment-engine",
+  "engine_version": "1.0.0",
+  "created_at": "2026-10-09T12:05:00+00:00",
+  "configuration_json": {
+    "mode": "preset",
+    "objective": "min_trips",
+    "dimensions": ["trips", "cost", "own_fleet", "co2"],
+    "weights": {
+      "trips": 1.0,
+      "cost": 0.0,
+      "own_fleet": 0.0,
+      "co2": 0.0
+    },
+    "scope": {"filters": []},
+    "options": {
+      "allow_third_party": true,
+      "resource_mode": "mixed",
+      "anomaly_decisions": {},
+      "analysis_depth": "comparative",
+      "solve_time_limit_s": 10,
+      "deterministic_limit": 0.12,
+      "total_time_limit_s": 90
+    },
+    "decision_case": {
+      "case_id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "node_id": "logistics_assignment"
+    }
+  },
+  "result_fingerprint": "fixture-comparative-result-fingerprint",
+  "result_json": {
+    "schema_version": "assignment_v1",
+    "decision": {
+      "id": "logistics_assignment",
+      "status": "recommended",
+      "objective": "min_trips",
+      "label": "Asignación recomendada"
+    },
+    "analysis": {
+      "depth": "comparative",
+      "active_dimensions": ["trips", "cost", "own_fleet", "co2"],
+      "scenario_count": 5,
+      "temporal": false
+    },
+    "capabilities": {
+      "trips": true,
+      "own_fleet": true,
+      "cost": true,
+      "co2": true
+    },
+    "decision_drivers": {
+      "trips": 2,
+      "vehicles_used": 1,
+      "orders_consolidated": 2,
+      "orders_split": 1,
+      "orders_outsourced": 0,
+      "own_weight_share": 1.0,
+      "outsourced_weight_kg": 0.0
+    },
+    "exceptions": [],
+    "engine": {
+      "name": "logistics-assignment-engine",
+      "version": "1.0.0",
+      "executed_at": "2026-10-09T12:05:00+00:00",
+      "wall_ms": 410,
+      "solver": {
+        "status": "feasible",
+        "method": "best_candidate",
+        "gap": null
+      }
+    },
+    "inputs": {
+      "orders": {
+        "dataset_id": "55555555-5555-4555-8555-555555555555",
+        "filename": "Orders_20261009_090500.csv",
+        "label": "Órdenes comparativo demo",
+        "rows": 2,
+        "sha256": "fixture-comparative-orders-sha",
+        "schema_version": "orders_v3"
+      },
+      "fleet": {
+        "dataset_id": "66666666-6666-4666-8666-666666666666",
+        "filename": "Fleet_20261009_090501.csv",
+        "label": "Flota comparativo demo",
+        "rows": 2,
+        "sha256": "fixture-comparative-fleet-sha",
+        "schema_version": "fleet_v3"
+      },
+      "anomalies": [],
+      "preflight": {
+        "errors": [],
+        "anomalies": []
+      }
+    },
+    "configuration": {
+      "mode": "preset",
+      "objective": "min_trips",
+      "dimensions": ["trips", "cost", "own_fleet", "co2"],
+      "weights": {
+        "trips": 1.0,
+        "cost": 0.0,
+        "own_fleet": 0.0,
+        "co2": 0.0
+      },
+      "scope": {"filters": []},
+      "options": {
+        "allow_third_party": true,
+        "resource_mode": "mixed",
+        "anomaly_decisions": {},
+        "analysis_depth": "comparative",
+        "solve_time_limit_s": 10,
+        "deterministic_limit": 0.12,
+        "total_time_limit_s": 90
+      }
+    },
+    "resources": [
+      {
+        "vehicle_id": "VEH-001",
+        "vehicle_type": "Truck",
+        "ownership": "own",
+        "provider_name": null,
+        "base_site": "Cordoba",
+        "capacity_kg": 6000,
+        "status": "available"
+      },
+      {
+        "vehicle_id": "TP-001",
+        "vehicle_type": "Truck",
+        "ownership": "third_party",
+        "provider_name": "Transportes Demo",
+        "base_site": "*",
+        "capacity_kg": 6000,
+        "status": "available"
+      }
+    ],
+    "kpi_directions": {
+      "total_trips": "lower_better",
+      "total_cost": "lower_better",
+      "outsourced_weight_kg": "lower_better",
+      "outsourced_weight_share": "lower_better",
+      "own_weight_share": "higher_better",
+      "load_utilization": "higher_better",
+      "co2_kg": "lower_better"
+    },
+    "normalization": {
+      "trips": {"best_candidate": 2.0, "reference_candidate": 3.0, "scale": 1.0},
+      "cost": {"best_candidate": 2100.0, "reference_candidate": 3000.0, "scale": 900.0},
+      "own_fleet": {"best_candidate": 0.0, "reference_candidate": 3500.0, "scale": 3500.0},
+      "co2": {"best_candidate": 500.0, "reference_candidate": 760.0, "scale": 260.0}
+    },
+    "assumptions": [
+      "Assignment decide cómo distribuir la carga, no cuándo ejecutar los viajes.",
+      "Cada unidad se asigna completa y ningún viaje supera la capacidad del vehículo.",
+      "Un mismo vehículo puede recibir varios viajes abstractos porque su secuencia temporal se resuelve en Scheduling."
+    ],
+    "scenarios": {
+      "min_trips": {
+        "name": "Menor cantidad de viajes",
+        "feasible": true,
+        "solver": {"status": "feasible", "method": "best_candidate", "gap": null},
+        "plan_fingerprint": "fixture-plan-min-trips",
+        "metrics": {
+          "orders": 2,
+          "units_assigned": 10,
+          "total_weight_kg": 10000.0,
+          "total_trips": 2,
+          "vehicles_used": 1,
+          "own_trips": 2,
+          "outsourced_trips": 0,
+          "load_utilization": 0.8333333333,
+          "own_weight_kg": 10000.0,
+          "outsourced_weight_kg": 0.0,
+          "own_weight_share": 1.0,
+          "outsourced_weight_share": 0.0,
+          "total_cost": 2600.0,
+          "co2_kg": 650.0
+        }
+      },
+      "min_cost": {
+        "name": "Costo mínimo",
+        "feasible": true,
+        "solver": {"status": "feasible", "method": "best_candidate", "gap": null},
+        "plan_fingerprint": "fixture-plan-min-cost",
+        "metrics": {
+          "orders": 2,
+          "units_assigned": 10,
+          "total_weight_kg": 10000.0,
+          "total_trips": 3,
+          "vehicles_used": 2,
+          "own_trips": 2,
+          "outsourced_trips": 1,
+          "load_utilization": 0.72,
+          "own_weight_kg": 7000.0,
+          "outsourced_weight_kg": 3000.0,
+          "own_weight_share": 0.7,
+          "outsourced_weight_share": 0.3,
+          "total_cost": 2100.0,
+          "co2_kg": 720.0
+        }
+      },
+      "max_own_fleet": {
+        "name": "Mayor uso de flota propia",
+        "feasible": true,
+        "solver": {"status": "feasible", "method": "best_candidate", "gap": null},
+        "plan_fingerprint": "fixture-plan-own-fleet",
+        "metrics": {
+          "orders": 2,
+          "units_assigned": 10,
+          "total_weight_kg": 10000.0,
+          "total_trips": 3,
+          "vehicles_used": 1,
+          "own_trips": 3,
+          "outsourced_trips": 0,
+          "load_utilization": 0.7,
+          "own_weight_kg": 10000.0,
+          "outsourced_weight_kg": 0.0,
+          "own_weight_share": 1.0,
+          "outsourced_weight_share": 0.0,
+          "total_cost": 2850.0,
+          "co2_kg": 760.0
+        }
+      },
+      "min_co2": {
+        "name": "CO₂ mínimo",
+        "feasible": true,
+        "solver": {"status": "feasible", "method": "best_candidate", "gap": null},
+        "plan_fingerprint": "fixture-plan-min-co2",
+        "metrics": {
+          "orders": 2,
+          "units_assigned": 10,
+          "total_weight_kg": 10000.0,
+          "total_trips": 3,
+          "vehicles_used": 2,
+          "own_trips": 2,
+          "outsourced_trips": 1,
+          "load_utilization": 0.75,
+          "own_weight_kg": 6500.0,
+          "outsourced_weight_kg": 3500.0,
+          "own_weight_share": 0.65,
+          "outsourced_weight_share": 0.35,
+          "total_cost": 3000.0,
+          "co2_kg": 500.0
+        }
+      },
+      "balanced": {
+        "name": "Balanceado",
+        "feasible": true,
+        "solver": {"status": "feasible", "method": "best_candidate", "gap": null},
+        "plan_fingerprint": "fixture-plan-balanced",
+        "metrics": {
+          "orders": 2,
+          "units_assigned": 10,
+          "total_weight_kg": 10000.0,
+          "total_trips": 2,
+          "vehicles_used": 2,
+          "own_trips": 1,
+          "outsourced_trips": 1,
+          "load_utilization": 0.8,
+          "own_weight_kg": 8000.0,
+          "outsourced_weight_kg": 2000.0,
+          "own_weight_share": 0.8,
+          "outsourced_weight_share": 0.2,
+          "total_cost": 2450.0,
+          "co2_kg": 610.0
+        }
+      },
+      "selected": {
+        "name": "Decisión recomendada",
+        "feasible": true,
+        "solver": {"status": "feasible", "method": "best_candidate", "gap": null},
+        "plan_fingerprint": "fixture-plan-min-trips",
+        "metrics": {
+          "orders": 2,
+          "units_assigned": 10,
+          "total_weight_kg": 10000.0,
+          "total_trips": 2,
+          "vehicles_used": 1,
+          "own_trips": 2,
+          "outsourced_trips": 0,
+          "load_utilization": 0.8333333333,
+          "own_weight_kg": 10000.0,
+          "outsourced_weight_kg": 0.0,
+          "own_weight_share": 1.0,
+          "outsourced_weight_share": 0.0,
+          "total_cost": 2600.0,
+          "co2_kg": 650.0
+        },
+        "trips": [
+          {
+            "trip_id": "A-00001",
+            "vehicle_id": "VEH-001",
+            "vehicle_type": "Truck",
+            "ownership": "own",
+            "provider_name": null,
+            "base_site": "Cordoba",
+            "origin": "Cordoba",
+            "destination": "Rosario",
+            "distance_km": 400,
+            "capacity_kg": 6000,
+            "load_kg": 6000.0,
+            "utilization": 1.0,
+            "estimated_cost": 1300.0,
+            "estimated_co2_kg": 325.0,
+            "loads": [
+              {"order_id": "ORD-001", "product": "Producto A", "units": 4, "kg": 4000.0},
+              {"order_id": "ORD-002", "product": "Producto B", "units": 2, "kg": 2000.0}
+            ]
+          },
+          {
+            "trip_id": "A-00002",
+            "vehicle_id": "VEH-001",
+            "vehicle_type": "Truck",
+            "ownership": "own",
+            "provider_name": null,
+            "base_site": "Cordoba",
+            "origin": "Cordoba",
+            "destination": "Rosario",
+            "distance_km": 400,
+            "capacity_kg": 6000,
+            "load_kg": 4000.0,
+            "utilization": 0.6666666667,
+            "estimated_cost": 1300.0,
+            "estimated_co2_kg": 325.0,
+            "loads": [
+              {"order_id": "ORD-002", "product": "Producto B", "units": 4, "kg": 4000.0}
+            ]
+          }
+        ],
+        "order_outcomes": [
+          {
+            "order_id": "ORD-001",
+            "product": "Producto A",
+            "units": 4,
+            "kg": 4000.0,
+            "trip_ids": ["A-00001"],
+            "vehicle_ids": ["VEH-001"],
+            "split": false,
+            "consolidated": true,
+            "outsourced": false
+          },
+          {
+            "order_id": "ORD-002",
+            "product": "Producto B",
+            "units": 6,
+            "kg": 6000.0,
+            "trip_ids": ["A-00001", "A-00002"],
+            "vehicle_ids": ["VEH-001"],
+            "split": true,
+            "consolidated": true,
+            "outsourced": false
+          }
+        ]
+      }
+    },
+    "sensitivity": {
+      "frontier": [
+        {
+          "scenario": "min_trips",
+          "label": "Menor cantidad de viajes",
+          "metrics": {"total_trips": 2, "total_cost": 2600.0, "own_weight_share": 1.0, "outsourced_weight_share": 0.0, "load_utilization": 0.8333333333, "vehicles_used": 1, "co2_kg": 650.0},
+          "solver": {"status": "feasible", "method": "best_candidate", "gap": null},
+          "plan_fingerprint": "fixture-plan-min-trips"
+        },
+        {
+          "scenario": "min_cost",
+          "label": "Costo mínimo",
+          "metrics": {"total_trips": 3, "total_cost": 2100.0, "own_weight_share": 0.7, "outsourced_weight_share": 0.3, "load_utilization": 0.72, "vehicles_used": 2, "co2_kg": 720.0},
+          "solver": {"status": "feasible", "method": "best_candidate", "gap": null},
+          "plan_fingerprint": "fixture-plan-min-cost"
+        },
+        {
+          "scenario": "max_own_fleet",
+          "label": "Mayor uso de flota propia",
+          "metrics": {"total_trips": 3, "total_cost": 2850.0, "own_weight_share": 1.0, "outsourced_weight_share": 0.0, "load_utilization": 0.7, "vehicles_used": 1, "co2_kg": 760.0},
+          "solver": {"status": "feasible", "method": "best_candidate", "gap": null},
+          "plan_fingerprint": "fixture-plan-own-fleet"
+        },
+        {
+          "scenario": "min_co2",
+          "label": "CO₂ mínimo",
+          "metrics": {"total_trips": 3, "total_cost": 3000.0, "own_weight_share": 0.65, "outsourced_weight_share": 0.35, "load_utilization": 0.75, "vehicles_used": 2, "co2_kg": 500.0},
+          "solver": {"status": "feasible", "method": "best_candidate", "gap": null},
+          "plan_fingerprint": "fixture-plan-min-co2"
+        },
+        {
+          "scenario": "balanced",
+          "label": "Balanceado",
+          "metrics": {"total_trips": 2, "total_cost": 2450.0, "own_weight_share": 0.8, "outsourced_weight_share": 0.2, "load_utilization": 0.8, "vehicles_used": 2, "co2_kg": 610.0},
+          "solver": {"status": "feasible", "method": "best_candidate", "gap": null},
+          "plan_fingerprint": "fixture-plan-balanced"
+        }
+      ],
+      "complete": true
+    },
+    "handoff": {
+      "schema_version": "scheduling_input_v1",
+      "source_decision": "logistics_assignment",
+      "next_decision": "logistics_scheduling",
+      "source_path": "scenarios.selected.trips",
+      "assignment_fingerprint": "fixture-plan-min-trips",
+      "trip_count": 2,
+      "trip_ids": ["A-00001", "A-00002"]
+    },
+    "result_fingerprint": "fixture-comparative-result-fingerprint",
+    "decision_case": {
+      "case_id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "node_id": "logistics_assignment"
+    }
+  }
+}
