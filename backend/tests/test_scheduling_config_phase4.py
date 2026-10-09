@@ -7,6 +7,7 @@ DISPATCH = STATIC / "js" / "dispatch"
 
 LIFECYCLE = (DISPATCH / "scheduling-execution-phase4.mjs").read_text(encoding="utf-8")
 CONFIG = (DISPATCH / "scheduling-config-v2.mjs").read_text(encoding="utf-8")
+FOCUS = (DISPATCH / "scheduling-focus-rules.mjs").read_text(encoding="utf-8")
 BOOTSTRAP = (STATIC / "js" / "dda-variable-config.js").read_text(encoding="utf-8")
 SHELL = (STATIC / "js" / "dda-workflow-config.js").read_text(encoding="utf-8")
 CSS = (STATIC / "css" / "scheduling-execution-phase4.css").read_text(encoding="utf-8")
@@ -43,8 +44,9 @@ class SchedulingConfigPhase4LifecycleTests(unittest.TestCase):
         self.assertIn('[data-scheduling-execute]', LIFECYCLE)
         self.assertIn("event.stopImmediatePropagation()", LIFECYCLE)
         self.assertIn(".scheduling-config-v2", LIFECYCLE)
-        self.assertIn("data-scheduling-rule-add", CONFIG)
-        self.assertIn("data-scheduling-rule-edit", (DISPATCH / "scheduling-focus-rules.mjs").read_text(encoding="utf-8"))
+        self.assertIn("data-scheduling-rule-add", FOCUS)
+        self.assertIn("data-scheduling-rule-edit", FOCUS)
+        self.assertIn("bindFocusRuleEvents", CONFIG)
 
     def test_decision_case_moves_running_review_and_error(self):
         self.assertIn("STATUS.RUNNING", LIFECYCLE)
@@ -60,9 +62,9 @@ class SchedulingConfigPhase4LifecycleTests(unittest.TestCase):
         self.assertIn("recoverAfterPostError", LIFECYCLE)
         self.assertIn('api("/api/runs/"+runId)', LIFECYCLE)
         self.assertIn("POLL_MS", LIFECYCLE)
-        self.assertIn("run?.status==\"completed\"", LIFECYCLE)
-        self.assertIn("run?.status==\"error\"", LIFECYCLE)
-        self.assertIn("run?.status==\"running\"", LIFECYCLE)
+        self.assertIn('run?.status==="completed"', LIFECYCLE)
+        self.assertIn('run?.status==="error"', LIFECYCLE)
+        self.assertIn('run?.status==="running"', LIFECYCLE)
         self.assertIn("El Run ID permite recuperar esta misma corrida", LIFECYCLE)
 
     def test_error_state_preserves_config_and_offers_retry(self):
