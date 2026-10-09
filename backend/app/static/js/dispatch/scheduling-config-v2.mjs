@@ -14,10 +14,12 @@ import {
   executionRules,
   focusRulesMarkup,
   focusedTripIds,
+  hasPendingRuleDraft,
   hydrateExecutionRules,
   normalizeFocusConfig,
+  pendingRuleProblem,
   validateFocusRules,
-} from "./scheduling-focus-rules.mjs?v=scheduling-config-phase2";
+} from "./scheduling-focus-rules.mjs?v=scheduling-rule-editor-phase3-v1";
 
 const WORKSPACE_KEY="dation.dispatch.workspace.v5";
 const CONFIG_KEY="dation.scheduling.config.v1";
@@ -27,6 +29,7 @@ const STYLE_IDS={
   assignment:"scheduling-assignment-language",
   own:"scheduling-config-v2-styles",
   shared:"scheduling-shared-phase2-styles",
+  rules:"scheduling-rule-editor-phase3-styles",
 };
 const restoredRuns=new Set();
 let observer=null;
@@ -46,6 +49,7 @@ function ensureStyles(){
   ensureLink(STYLE_IDS.assignment,"/static/css/assignment-config-v2.css?v=scheduling-shared-phase2-v1");
   ensureLink(STYLE_IDS.own,"/static/css/scheduling-config-v2.css?v=scheduling-shared-phase2-v1");
   ensureLink(STYLE_IDS.shared,"/static/css/scheduling-config-shared-phase2.css?v=scheduling-shared-phase2-v1");
+  ensureLink(STYLE_IDS.rules,"/static/css/scheduling-rule-editor-phase3.css?v=scheduling-rule-editor-phase3-v1");
 }
 
 function readJson(key,fallback={}){
@@ -71,6 +75,7 @@ function defaults(){
     analysisDepth:"essential",
     focusRulesOpen:false,
     temporalRules:[],
+    editingRuleId:null,
     ruleDraft:{
       field:"destination",
       values:[],
@@ -169,6 +174,7 @@ function rulesLabel(config,trips){
 
 function scopeCurrent(config,trips){
   const rules=config.temporalRules||[];
+  if(hasPendingRuleDraft(config))return config.editingRuleId?"Editando regla":"Regla sin aplicar";
   if(!rules.length)return config.windowMode==="custom"?"Ventana personalizada":"Ventana automática";
   return (config.windowMode==="custom"?"Ventana personalizada":"Ventana automática")+" · "+rules.length+" "+(rules.length===1?"regla":"reglas");
 }
@@ -199,10 +205,13 @@ function focusDisclosure(config,trips){
   const rules=config.temporalRules||[];
   const focused=focusedTripIds(config,trips).length;
   const open=Boolean(config.focusRulesOpen);
-  const summary=rules.length
-    ?rules.length+" "+(rules.length===1?"regla":"reglas")+" · "+focused+" "+(focused===1?"viaje":"viajes")
-    :"Opcional";
-  return '<div class="scheduling-focus-disclosure '+(open?"is-open":"")+'">'
+  const pending=hasPendingRuleDraft(config);
+  const summary=pending
+    ?(config.editingRuleId?"Editando regla":"Regla pendiente")
+    :(rules.length
+      ?rules.length+" "+(rules.length===1?"regla":"reglas")+" · "+focused+" "+(focused===1?"viaje":"viajes")
+      :"Opcional");
+  return '<div class="scheduling-focus-disclosure '+(open?"is-open":"")+' '+(pending?'has-pending-rule':'')+'">'
     +'<button type="button" class="scheduling-focus-disclosure__toggle" data-scheduling-focus-toggle aria-expanded="'+open+'">'
       +'<span class="scheduling-focus-disclosure__icon">'
         +'<svg class="assignment-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16l-6 7v5l-4 2v-7Z"/></svg>'
@@ -439,6 +448,8 @@ async function restoreFromQuery(caseId,config){
       windowStart:source.planning_window_start||"",
       windowEnd:source.planning_window_end||"",
       temporalRules:hydrateExecutionRules(source.temporal_rules||[]),
+      editingRuleId:null,
+      ruleDraft:{field:"destination",values:[],action:"prioritize",windowStart:"",windowEnd:""},
       focusRulesOpen:Boolean(source.temporal_rules?.length),
       analysisDepth:"essential",
     };
@@ -448,6 +459,8 @@ async function restoreFromQuery(caseId,config){
 }
 
 function validateConfig(config,slaAvailable,trips=[]){
+  const pending=pendingRuleProblem(config,trips);
+  if(pending)return pending;
   if(config.strategy==="service_first"&&!slaAvailable)return "Servicio primero requiere fechas objetivo completas en Órdenes.";
   if(config.windowMode==="custom"){
     if(!config.windowStart||!config.windowEnd)return "Elegí fecha desde y fecha hasta para la ventana personalizada.";
@@ -607,9 +620,10 @@ function bind(root,context){
   root.querySelector("[data-scheduling-review]")?.addEventListener("click",()=>{
     const problem=configProblem(config,slaAvailable,trips);
     if(problem){
-      if(problem.section==="scheduling-scope"&&(config.temporalRules||[]).length)config={...config,focusRulesOpen:true};
+      if(problem.section==="scheduling-scope")config={...config,focusRulesOpen:true};
       writeConfig(caseId,config);
-      scrollToProblem(problem);
+      rerender();
+      queueMicrotask(()=>scrollToProblem(problem));
       return;
     }
     dialog?.showModal();
