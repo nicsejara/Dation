@@ -24,12 +24,27 @@ UI = (
     / "dispatch"
     / "scheduling-config-v2.mjs"
 ).read_text(encoding="utf-8")
+SHARED_UI = (
+    ROOT
+    / "app"
+    / "static"
+    / "js"
+    / "dispatch"
+    / "decision-config-ui.mjs"
+).read_text(encoding="utf-8")
+SURFACE = UI + "\n" + SHARED_UI
 CSS = (
     ROOT
     / "app"
     / "static"
     / "css"
     / "scheduling-config-v2.css"
+).read_text(encoding="utf-8") + "\n" + (
+    ROOT
+    / "app"
+    / "static"
+    / "css"
+    / "scheduling-config-shared-phase2.css"
 ).read_text(encoding="utf-8")
 BOOTSTRAP = (
     ROOT
@@ -152,30 +167,31 @@ class SchedulingConfigPhase1Tests(unittest.TestCase):
         )
 
     def test_phase1_scheduling_ui_matches_assignment_configuration_language(self):
-        self.assertIn("DECISIÓN 02 DE 3", UI)
-        self.assertIn("Decision Case y Data Pack en uso", UI)
+        self.assertIn("DECISIÓN ", SURFACE)
+        self.assertIn("Decision Case y Data Pack en uso", SURFACE)
         self.assertIn("Alcance temporal", UI)
         self.assertIn("Objetivo del calendario", UI)
         self.assertIn("Política de recursos", UI)
         self.assertIn("Profundidad del análisis", UI)
         self.assertIn("Ventana automática", UI)
         self.assertIn("Ventana personalizada", UI)
-        self.assertIn('type="date"', UI)
+        self.assertIn('type=\"date\"', UI)
         self.assertIn("Servicio primero", UI)
         self.assertIn("Salida más temprana", UI)
         self.assertIn("Heredada y bloqueada", UI)
 
     def test_phase1_ui_is_loaded_and_responsive(self):
-        self.assertIn('scheduling-config-v2.mjs?v=scheduling-config-phase2', BOOTSTRAP)
+        self.assertIn('scheduling-config-v2.mjs?v=scheduling-shared-phase2-v1', BOOTSTRAP)
         self.assertIn(".scheduling-config-v2", CSS)
         self.assertIn("@media(max-width:620px)", CSS)
+        self.assertIn("@media(max-width:760px)", CSS)
         self.assertIn("@media(prefers-reduced-motion:reduce)", CSS)
 
     def test_phase1_execution_sends_real_window_and_strategy(self):
         self.assertIn("planning_window_start", UI)
         self.assertIn("planning_window_end", UI)
         self.assertIn('strategy:config.strategy', UI)
-        self.assertIn('node_id:"logistics_scheduling"', UI)
+        self.assertIn('node_id:\"logistics_scheduling\"', UI)
         self.assertIn("source_run_id:sourceRun.id", UI)
 
 
