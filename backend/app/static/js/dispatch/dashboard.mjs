@@ -103,7 +103,7 @@ function renderLegacyDashboard(root,run,onRerun,caseActions={}){
     error:'Error',
   };
   const caseStatus=statusLabels[caseActions.status]||'Decisión disponible';
-  const exportButtonLabel='Exportar distribución';
+  const exportButtonLabel='Exportar decisión';
 
   root.className='dispatch dispatch-dashboard dispatch-dashboard-focused';
   root.innerHTML=
