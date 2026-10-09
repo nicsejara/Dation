@@ -33,4 +33,13 @@
     label: "DDA Logística",
     steps: Object.freeze(steps)
   });
+
+  // The decision-configuration layer is part of the DDA shell, not a
+  // side effect of an individual screen. Dynamic import keeps this classic
+  // bootstrap backward compatible while guaranteeing that Scheduling phases
+  // 1–4 are loaded before the user reaches Configurar decisión.
+  import("./dda-variable-config.js?v=scheduling-execution-phase4-v1")
+    .catch(function (error) {
+      console.error("No se pudo iniciar la configuración compartida de decisiones.", error);
+    });
 })();
