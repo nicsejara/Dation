@@ -181,7 +181,7 @@ class SchedulingConfigPhase1Tests(unittest.TestCase):
         self.assertIn("Heredada y bloqueada", UI)
 
     def test_phase1_ui_is_loaded_and_responsive(self):
-        self.assertIn('scheduling-config-v2.mjs?v=scheduling-shared-phase2-v1', BOOTSTRAP)
+        self.assertIn('scheduling-config-v2.mjs?v=scheduling-rule-editor-phase3-v1', BOOTSTRAP)
         self.assertIn(".scheduling-config-v2", CSS)
         self.assertIn("@media(max-width:620px)", CSS)
         self.assertIn("@media(max-width:760px)", CSS)
