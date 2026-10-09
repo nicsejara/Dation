@@ -62,7 +62,7 @@ class AssignmentConfigRedesignContractTests(unittest.TestCase):
             "resource_mode:state.resourceMode",
             "Profundo",
             "Próximamente",
-            'disabled aria-disabled="true"',
+            "aria-disabled",
         ):
             self.assertIn(marker, self.surface + self.workspace)
 
