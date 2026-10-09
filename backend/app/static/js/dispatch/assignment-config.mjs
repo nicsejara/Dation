@@ -1,5 +1,14 @@
 import {esc,num,post,api} from "./shared.mjs";
 import {iconSvg} from "./decision-ui.mjs?v=assignment-config-v2";
+import {
+  configSummaryBar,
+  decisionCaseCard,
+  decisionChoiceCard,
+  decisionDataFileCard,
+  decisionDepthCard,
+  decisionHero,
+  decisionSectionHeader,
+} from "./decision-config-ui.mjs?v=decision-config-foundation";
 
 const STYLE_ID="assignment-config-v2-styles";
 const CASE_STYLE_ID="assignment-config-case-styles";
@@ -82,21 +91,6 @@ function productVariableAvailable(key){
   return variableStatus(key)==="active";
 }
 
-function middleEllipsis(value,max=36){
-  const text=String(value||"—");
-  if(text.length<=max)return text;
-  const extension=text.toLowerCase().endsWith(".csv")?".csv":"";
-  const stem=extension?text.slice(0,-4):text;
-  const tailLength=Math.min(12,Math.max(8,Math.floor(max*.32)));
-  const headLength=Math.max(10,max-tailLength-extension.length-1);
-  return stem.slice(0,headLength)+"…"+stem.slice(-tailLength)+extension;
-}
-
-function displayCaseId(value){
-  if(!value)return "—";
-  return "DC-"+String(value).slice(0,8).toUpperCase();
-}
-
 function filterPayload(filters){
   return (filters||[]).map(filter=>({
     column:filter.column,
@@ -149,46 +143,20 @@ function presetRaw(objective,dimensions){
   return Object.fromEntries(PRIORITY_KEYS.map(key=>[key,key===target?100:0]));
 }
 
-function sectionHeader({number,eyebrow,title,copy,icon,current}){
-  return '<header class="assignment-section__head">'
-    +'<span class="assignment-section__icon">'+iconSvg(icon,"assignment-icon")+'</span>'
-    +'<div class="assignment-section__copy">'
-      +'<span class="assignment-section__eyebrow">'+esc(number+' · '+eyebrow)+'</span>'
-      +'<h2>'+esc(title)+'</h2>'
-      +'<p>'+esc(copy)+'</p>'
-    +'</div>'
-    +(current?'<span class="assignment-section__current">'+esc(current)+'</span>':'')
-  +'</header>';
-}
-
 function heroMarkup(){
   const step=workflowStep("config",{number:3,label:"Configurar decisión"});
-  return '<section class="dispatch-pro-hero assignment-config-hero">'
-    +'<div class="dispatch-pro-hero-copy">'
-      +'<div class="assignment-config-hero__badges">'
-        +'<span class="dispatch-pro-hero-badge is-step">PASO '+esc(step.number)+': '+esc(step.label.toUpperCase())+'</span>'
-        +'<span class="assignment-decision-chip">DECISIÓN 01 DE 3</span>'
-      +'</div>'
-      +'<h1>Definí cómo querés distribuir tu carga.</h1>'
-      +'<p class="dispatch-pro-hero-lead">Elegí qué datos analizar, qué querés optimizar y cuánto detalle ver en el dashboard. Esta decisión reparte la carga entre tu flota; las fechas se definen después.</p>'
-    +'</div>'
-    +'<div class="dispatch-pro-hero-visual">'
-      +'<div class="dispatch-pro-how-panel assignment-decision-panel">'
-        +'<div class="dispatch-pro-how-title"><span>ESTA DECISIÓN</span></div>'
-        +[
-          ["1 · PREGUNTA","¿Cómo conviene armar los viajes y repartir la carga?","messageCircleQuestion"],
-          ["2 · ENTREGA","Viajes propuestos + distribución de carga.","packageCheck"],
-          ["3 · QUEDA PARA DESPUÉS","Fechas y calendario: se definen en Planificación de despachos.","calendarClock"],
-        ].map(([label,description,icon],index)=>(
-          '<div class="dispatch-pro-how-node">'
-            +'<span class="dispatch-pro-how-icon">'+iconSvg(icon,"dispatch-pro-icon assignment-icon")+'</span>'
-            +'<div><small>'+esc(label)+'</small><strong>'+esc(description)+'</strong></div>'
-          +'</div>'
-          +(index<2?'<span class="dispatch-pro-how-connector" aria-hidden="true"></span>':'')
-        )).join("")
-      +'</div>'
-    +'</div>'
-  +'</section>';
+  return decisionHero({
+    step,
+    decisionIndex:1,
+    totalDecisions:3,
+    title:"Definí cómo querés distribuir tu carga.",
+    description:"Elegí qué datos analizar, qué querés optimizar y cuánto detalle ver en el dashboard. Esta decisión reparte la carga entre tu flota; las fechas se definen después.",
+    panelItems:[
+      {label:"1 · PREGUNTA",description:"¿Cómo conviene armar los viajes y repartir la carga?",icon:"messageCircleQuestion"},
+      {label:"2 · ENTREGA",description:"Viajes propuestos + distribución de carga.",icon:"packageCheck"},
+      {label:"3 · QUEDA PARA DESPUÉS",description:"Fechas y calendario: se definen en Planificación de despachos.",icon:"calendarClock"},
+    ],
+  });
 }
 
 function datasetFile(kind,dataset,preview,hasFilters){
@@ -206,43 +174,23 @@ function datasetFile(kind,dataset,preview,hasFilters){
         :num(total)+' '+(total===1?'orden':'órdenes')
     )
     :num(total)+' '+(total===1?'vehículo':'vehículos');
-  const fullName=dataset?.canonical_filename||dataset?.label||dataset?.original_filename||"Archivo sin nombre";
-  return '<article class="dispatch-datapack-file is-'+kind+' assignment-case-file">'
-    +'<span class="dispatch-datapack-file__accent" aria-hidden="true"></span>'
-    +'<span class="dispatch-datapack-file__icon">'+iconSvg(orders?"clipboardList":"truck","dispatch-map-icon")+'</span>'
-    +'<div class="dispatch-datapack-file__body">'
-      +'<div class="dispatch-datapack-file__topline"><small>'+(orders?'ÓRDENES':'FLOTA')+'</small></div>'
-      +'<strong class="dispatch-datapack-file__name" title="'+esc(fullName)+'">'+esc(middleEllipsis(fullName))+'</strong>'
-      +'<div class="dispatch-datapack-file__meta">'
-        +'<span class="is-count" '+(orders&&hasFilters?'title="Filtros aplicados"':'')+'>'+esc(count)+'</span>'
-      +'</div>'
-    +'</div>'
-  +'</article>';
+  return decisionDataFileCard({
+    kind,
+    dataset,
+    countText:count,
+    filtered:orders&&hasFilters,
+  });
 }
 
 function caseStrip(state,preview){
-  const id=String(state.decisionCase?.id||"");
   const hasFilters=Boolean(state.scopeFilters?.length);
-  return '<section class="dispatch-case-card assignment-case-strip" aria-label="Decision Case y Data Pack en uso">'
-    +'<div class="assignment-case-strip__identity">'
-      +'<span class="dispatch-case-identity__icon">'+iconSvg("folderOpen","dispatch-map-icon")+'</span>'
-      +'<div><small class="assignment-case-strip__eyebrow">DECISION CASE</small>'
-        +'<div class="dispatch-case-identity__idrow">'
-          +'<strong title="'+esc(id)+'">'+esc(displayCaseId(id))+'</strong>'
-          +'<button type="button" data-config-copy-case title="Copiar ID" aria-label="Copiar ID completo del caso">'+iconSvg("copy","dispatch-map-icon")+'</button>'
-        +'</div>'
-        +'<span class="assignment-case-strip__feedback" data-config-copy-feedback aria-live="polite"></span>'
-      +'</div>'
-    +'</div>'
-    +'<div class="assignment-case-strip__pack">'
-      +'<div class="assignment-case-strip__pack-title"><span>DATA PACK EN USO</span></div>'
-      +datasetFile("orders",state.orders,preview,hasFilters)
-      +datasetFile("fleet",state.fleet,preview,hasFilters)
-    +'</div>'
-    +'<button class="assignment-change-data" type="button" data-config-change-data>'
-      +iconSvg("refresh","assignment-icon")+'<span>Cambiar datos</span>'
-    +'</button>'
-  +'</section>';
+  return decisionCaseCard({
+    caseId:state.decisionCase?.id,
+    files:[
+      datasetFile("orders",state.orders,preview,hasFilters),
+      datasetFile("fleet",state.fleet,preview,hasFilters),
+    ],
+  });
 }
 
 function scopeSummary(preview,filters){
@@ -327,7 +275,7 @@ function scopeSection(state,preview){
     ?'<div class="assignment-config-alert is-error" role="alert">'+iconSvg("alertTriangle","assignment-icon")+'<span>Los filtros no dejan ninguna orden. Ampliá el alcance.</span></div>'
     :"";
   return '<section class="assignment-section" id="config-scope" data-config-section="scope">'
-    +sectionHeader({number:"01",eyebrow:"ALCANCE",title:"Alcance de los datos",copy:"Elegí qué parte de tus datos querés analizar. Tus archivos no se modifican.",icon:"filter",current:scopeSummary(preview,filters)})
+    +decisionSectionHeader({number:"01",eyebrow:"ALCANCE",title:"Alcance de los datos",copy:"Elegí qué parte de tus datos querés analizar. Tus archivos no se modifican.",icon:"filter",current:scopeSummary(preview,filters)})
     +'<div class="assignment-scope-counters" aria-live="polite">'
       +'<div><span>Órdenes en el análisis</span><strong>'+num(ordersIncluded)+' de '+num(ordersTotal)+'</strong><progress max="'+Math.max(ordersTotal,1)+'" value="'+ordersIncluded+'"></progress></div>'
       +'<div><span>Flota habilitada</span><strong>'+num(fleetIncluded)+' de '+num(fleetTotal)+' vehículos</strong><progress max="'+Math.max(fleetTotal,1)+'" value="'+fleetIncluded+'"></progress></div>'
@@ -356,20 +304,26 @@ function objectiveSection(state,capabilities){
   const effective=normalizeRawWeights(state.customWeights||state.weights,dims);
   const customInvalid=state.objective==="custom"&&dims.every(key=>(Number(state.customWeights?.[key])||0)<=0);
   return '<section class="assignment-section" id="config-objective" data-config-section="objective">'
-    +sectionHeader({number:"02",eyebrow:"OBJETIVO",title:"Objetivo de la decisión",copy:"Elegí el criterio principal para construir los viajes y distribuir la carga.",icon:"target",current:OBJECTIVE_LABELS[state.objective]||"Balanceado"})
+    +decisionSectionHeader({number:"02",eyebrow:"OBJETIVO",title:"Objetivo de la decisión",copy:"Elegí el criterio principal para construir los viajes y distribuir la carga.",icon:"target",current:OBJECTIVE_LABELS[state.objective]||"Balanceado"})
     +'<div class="assignment-objective-grid">'
       +OBJECTIVES.map(([key,label,copy,icon,required])=>{
         const enabled=objectiveEnabled(key,required,capabilities,state);
         const consolidating=key==="min_co2"&&!productVariableAvailable("co2");
         const selected=state.objective===key;
-        return '<button type="button" class="assignment-choice-card assignment-objective-card '+(key==="custom"?'is-custom ':'')+(selected?'is-selected ':'')+(enabled?'':'is-disabled')+'" data-objective="'+key+'" aria-pressed="'+selected+'" '+(enabled?'':'disabled aria-disabled="true"')+'>'
-          +'<span class="assignment-choice-card__icon">'+iconSvg(icon,"assignment-icon")+'</span>'
-          +'<span class="assignment-choice-card__check">'+iconSvg("check","assignment-icon")+'</span>'
-          +'<strong>'+esc(label)+'</strong><small>'+esc(copy)+'</small>'
-          +(key==="custom"?'<em>Avanzado</em>':'')
-          +(consolidating?'<em>En consolidación</em>':'')
-          +(!enabled&&!consolidating?'<em>Faltan datos suficientes</em>':'')
-        +'</button>';
+        const tags=[];
+        if(key==="custom")tags.push("Avanzado");
+        if(consolidating)tags.push("En consolidación");
+        if(!enabled&&!consolidating)tags.push("Faltan datos suficientes");
+        return decisionChoiceCard({
+          className:'assignment-objective-card '+(key==="custom"?'is-custom':''),
+          icon,
+          title:label,
+          copy,
+          selected,
+          disabled:!enabled,
+          tags,
+          attributes:{"data-objective":key},
+        });
       }).join("")
     +'</div>'
     +(state.resourceMode==="own"&&state.objective==="max_own_fleet"
@@ -407,17 +361,24 @@ function resourceSection(state,preview){
   const third=Number(preview?.resources?.third_party??state.fleet?.profile_json?.profile?.third_party_vehicles??0);
   const labels={own:num(own)+' propios',mixed:num(own)+' propios + '+num(third)+' tercerizados',outsourced:num(third)+' tercerizados'};
   return '<section class="assignment-section" id="config-resources" data-config-section="resources">'
-    +sectionHeader({number:"03",eyebrow:"RECURSOS",title:"Política de recursos",copy:"Definí qué flota puede participar en esta asignación.",icon:"truck",current:RESOURCE_MODES[state.resourceMode]?.label||"Mixta"})
+    +decisionSectionHeader({number:"03",eyebrow:"RECURSOS",title:"Política de recursos",copy:"Definí qué flota puede participar en esta asignación.",icon:"truck",current:RESOURCE_MODES[state.resourceMode]?.label||"Mixta"})
     +'<div class="assignment-resource-grid">'
       +Object.entries(RESOURCE_MODES).map(([key,item])=>{
         const enabled=(key!=="own"||own>0)&&(key==="own"||third>0)&&(key!=="mixed"||(own>0&&third>0));
         const reason=!enabled
           ?(key==="own"?"Tu flota no incluye vehículos propios":"Tu flota no incluye vehículos tercerizados")
           :"";
-        return '<button type="button" class="assignment-choice-card assignment-resource-card '+(state.resourceMode===key?'is-selected ':'')+(enabled?'':'is-disabled')+'" data-resource-mode="'+key+'" aria-pressed="'+(state.resourceMode===key)+'" '+(enabled?'':'disabled aria-disabled="true" title="'+esc(reason)+'"')+'>'
-          +'<span class="assignment-choice-card__icon">'+iconSvg(item.icon,"assignment-icon")+'</span><span class="assignment-choice-card__check">'+iconSvg("check","assignment-icon")+'</span>'
-          +'<strong>'+esc(item.label)+'</strong><small>'+esc(item.copy)+'</small><em>'+esc(labels[key])+'</em>'
-        +'</button>';
+        return decisionChoiceCard({
+          className:"assignment-resource-card",
+          icon:item.icon,
+          title:item.label,
+          copy:item.copy,
+          selected:state.resourceMode===key,
+          disabled:!enabled,
+          disabledTitle:reason,
+          tags:[labels[key]],
+          attributes:{"data-resource-mode":key},
+        });
       }).join("")
     +'</div>'
     +'<div class="assignment-resource-rule"><span>REGLA 01</span><strong>Modo de flota</strong><small>Este contenedor queda preparado para sumar nuevas reglas de recursos sin cambiar el esqueleto.</small></div>'
@@ -427,16 +388,20 @@ function resourceSection(state,preview){
 function depthSection(state){
   if(state.analysisDepth==="deep")state.analysisDepth="comparative";
   return '<section class="assignment-section" id="config-depth" data-config-section="depth">'
-    +sectionHeader({number:"04",eyebrow:"DASHBOARD",title:"Profundidad del análisis",copy:"No cambia la asignación: define cuánto contexto vas a ver en el dashboard.",icon:"layoutDashboard",current:DEPTHS[state.analysisDepth]?.label||"Comparativo"})
+    +decisionSectionHeader({number:"04",eyebrow:"DASHBOARD",title:"Profundidad del análisis",copy:"No cambia la asignación: define cuánto contexto vas a ver en el dashboard.",icon:"layoutDashboard",current:DEPTHS[state.analysisDepth]?.label||"Comparativo"})
     +'<div class="assignment-depth-grid">'
       +Object.entries(DEPTHS).map(([key,item])=>{
         const disabled=key==="deep";
         const selected=state.analysisDepth===key;
-        return '<button type="button" class="assignment-depth-card '+(selected?'is-selected ':'')+(disabled?'is-disabled':'')+'" data-depth="'+key+'" aria-pressed="'+selected+'" '+(disabled?'disabled aria-disabled="true" title="Se habilita en futuras versiones"':'')+'>'
-          +'<div class="assignment-depth-card__top"><span class="assignment-depth-radio"></span><strong>'+esc(item.label)+'</strong>'+(key==="comparative"?'<em>Recomendado</em>':disabled?'<em>Próximamente</em>':'')+'</div>'
-          +'<p>'+esc(item.copy)+'</p>'
-          +'<ul>'+item.rows.map(([label,ok])=>'<li class="'+(ok?'is-on':'is-off')+'">'+(ok?iconSvg("check","assignment-icon"):'<span>—</span>')+esc(label)+'</li>').join("")+'</ul>'
-        +'</button>';
+        const tag=key==="comparative"?"Recomendado":disabled?"Próximamente":"";
+        return decisionDepthCard({
+          key,
+          item,
+          selected,
+          disabled,
+          tag,
+          disabledTitle:disabled?"Se habilita en futuras versiones":"",
+        });
       }).join("")
     +'</div>'
   +'</section>';
@@ -463,20 +428,16 @@ function anomalyReview(state,preview){
 
 function summaryFooter(state,preview,capabilities){
   const error=blocker(state,preview,capabilities);
-  const status=error
-    ?'<span class="assignment-summary-status is-warning">'+iconSvg("alertTriangle","assignment-icon")+'Falta completar</span>'
-    :'<span class="assignment-summary-status is-ready">'+iconSvg("checkCircle","assignment-icon")+'Lista para ejecutar</span>';
-  const chips=[
-    ["config-scope","filter","Alcance",scopeSummary(preview,state.scopeFilters||[])],
-    ["config-objective","target","Objetivo",OBJECTIVE_LABELS[state.objective]||"Balanceado"],
-    ["config-resources","truck","Recursos",RESOURCE_MODES[state.resourceMode]?.label||"Mixta"],
-    ["config-depth","layoutDashboard","Dashboard",DEPTHS[state.analysisDepth]?.label||"Comparativo"],
-  ];
-  return '<footer class="assignment-summary-bar">'
-    +'<div class="assignment-summary-bar__meta"><span>TU CONFIGURACIÓN</span>'+status+(error?'<small>'+esc(error.reason)+'</small>':'<small>Los cambios se guardan automáticamente en esta sesión.</small>')+'</div>'
-    +'<nav class="assignment-summary-chips" aria-label="Resumen de configuración">'+chips.map(([target,icon,label,value])=>'<button type="button" data-summary-target="'+target+'">'+iconSvg(icon,"assignment-icon")+'<span><small>'+esc(label)+'</small><strong>'+esc(value)+'</strong></span></button>').join("")+'</nav>'
-    +'<button type="button" class="assignment-review-cta" data-config-review>Revisar y ejecutar '+iconSvg("arrowRight","assignment-icon")+'</button>'
-  +'</footer>';
+  return configSummaryBar({
+    ready:!error,
+    reason:error?.reason||"",
+    chips:[
+      {target:"config-scope",icon:"filter",label:"Alcance",value:scopeSummary(preview,state.scopeFilters||[])},
+      {target:"config-objective",icon:"target",label:"Objetivo",value:OBJECTIVE_LABELS[state.objective]||"Balanceado"},
+      {target:"config-resources",icon:"truck",label:"Recursos",value:RESOURCE_MODES[state.resourceMode]?.label||"Mixta"},
+      {target:"config-depth",icon:"layoutDashboard",label:"Dashboard",value:DEPTHS[state.analysisDepth]?.label||"Comparativo"},
+    ],
+  });
 }
 
 function reviewDialog(state,preview,capabilities){

@@ -9,6 +9,8 @@ CSS_ROOT = BACKEND_ROOT / "app" / "static" / "css"
 class AssignmentConfigRedesignContractTests(unittest.TestCase):
     def setUp(self):
         self.config = (DISPATCH_JS / "assignment-config.mjs").read_text(encoding="utf-8")
+        self.shared_ui = (DISPATCH_JS / "decision-config-ui.mjs").read_text(encoding="utf-8")
+        self.surface = self.config + self.shared_ui
         self.workspace = (DISPATCH_JS / "workspace.mjs").read_text(encoding="utf-8")
         self.css = (CSS_ROOT / "assignment-config-v2.css").read_text(encoding="utf-8")
 
@@ -27,7 +29,7 @@ class AssignmentConfigRedesignContractTests(unittest.TestCase):
             "Política de recursos",
             "Profundidad del análisis",
         ):
-            self.assertIn(marker, self.config)
+            self.assertIn(marker, self.surface)
 
     def test_scope_is_real_and_previewed_server_side(self):
         for marker in (
@@ -60,9 +62,9 @@ class AssignmentConfigRedesignContractTests(unittest.TestCase):
             "resource_mode:state.resourceMode",
             "Profundo",
             "Próximamente",
-            'disabled aria-disabled="true"',
+            "aria-disabled",
         ):
-            self.assertIn(marker, self.config + self.workspace)
+            self.assertIn(marker, self.surface + self.workspace)
 
     def test_summary_and_accessibility(self):
         for marker in (
@@ -74,7 +76,7 @@ class AssignmentConfigRedesignContractTests(unittest.TestCase):
             "@media(prefers-reduced-motion:reduce)",
             "@media(max-width:760px)",
         ):
-            self.assertIn(marker, self.config + self.css)
+            self.assertIn(marker, self.surface + self.css)
 
     def test_old_assignment_composer_copy_is_not_visible_in_new_module(self):
         for legacy in (
