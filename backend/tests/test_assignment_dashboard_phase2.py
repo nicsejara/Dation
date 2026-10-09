@@ -118,11 +118,21 @@ class AssignmentDashboardPhase2Tests(unittest.TestCase):
         self.assertIn("Proveedor:", self.evidence)
         self.assertIn("Órdenes y productos", self.evidence)
         self.assertIn("Frontera de esta decisión", self.evidence)
-        self.assertIn("posibles superposiciones", self.evidence)
+        boundary = "Las fechas y posibles superposiciones se resolverán en Planificación."
+        self.assertEqual(self.evidence.count(boundary), 1)
         self.assertNotIn("chart(", self.evidence)
         self.assertNotIn("ECharts", self.evidence)
-        self.assertNotIn("fecha", self.evidence.lower())
-        self.assertNotIn("sla", self.evidence.lower())
+        for forbidden in (
+            "dispatch_date",
+            "arrival_date",
+            "due_date",
+            "deadline",
+            "late_days",
+            "avg_lead_time_days",
+            "on_time_rate",
+            "sla",
+        ):
+            self.assertNotIn(forbidden, self.evidence.lower())
 
     def test_single_vehicle_has_compact_summary_instead_of_bar_chart(self):
         self.assertIn("assignment-evidence__single-vehicle", self.evidence)
@@ -141,7 +151,7 @@ class AssignmentDashboardPhase2Tests(unittest.TestCase):
         self.assertIn("Evidencia del motor", self.validation)
         self.assertIn("Puntos de revisión humana", self.validation)
         self.assertIn("no replica las validaciones internas del motor", self.validation)
-        self.assertIn("no se simulan validaciones", self.validation)
+        self.assertIn("no se simulan validaciones", self.validation.lower())
         for forbidden in (
             "capacity_respected",
             "route_consistency",
