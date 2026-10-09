@@ -35,6 +35,29 @@ const OBJECTIVE_DIMENSION={
   min_co2:'co2',
 };
 
+const COMPARISON_SCENARIO_ORDER=[
+  'balanced',
+  'min_cost',
+  'min_trips',
+  'max_own_fleet',
+  'min_co2',
+];
+
+const COMPARISON_SCENARIO_LABELS={
+  balanced:'Balanceado',
+  min_cost:'Costo mínimo',
+  min_trips:'Viajes mínimos',
+  max_own_fleet:'Mayor uso de flota propia',
+  min_co2:'CO₂ mínimo',
+};
+
+const COMPARISON_METRICS=[
+  {key:'total_trips',dimension:'trips',label:'Viajes',format:'integer',fallbackDirection:'lower_better'},
+  {key:'total_cost',dimension:'cost',label:'Costo estimado',format:'money',fallbackDirection:'lower_better'},
+  {key:'own_weight_share',dimension:'own_fleet',label:'Flota propia',format:'percent',fallbackDirection:'higher_better'},
+  {key:'co2_kg',dimension:'co2',label:'CO₂ estimado',format:'co2',fallbackDirection:'lower_better'},
+];
+
 function selected(result){
   return result?.scenarios?.selected||{};
 }
@@ -46,6 +69,12 @@ function normalizeWeight(value){
 
 function resourceId(value){
   return value?.vehicle_id||value?.fleet_pool_id||value?.vehicle_type||'Recurso sin ID';
+}
+
+function finiteMetric(value){
+  if(value===null||value===undefined||value==='')return null;
+  const number=Number(value);
+  return Number.isFinite(number)?number:null;
 }
 
 export function getAnalysisDepth(run){
@@ -326,4 +355,141 @@ export function getApprovalWarnings(result){
   }
 
   return warnings;
+}
+
+export function sameAssignmentPlan(first,second){
+  const a=first?.plan_fingerprint;
+  const b=second?.plan_fingerprint;
+  return Boolean(a&&b&&a===b);
+}
+
+export function getScenarioLabel(key,scenario){
+  return scenario?.name||COMPARISON_SCENARIO_LABELS[key]||String(key||'Escenario').replaceAll('_',' ');
+}
+
+export function getComparableScenarios(result){
+  const scenarios=result?.scenarios||{};
+  const selectedScenario=scenarios.selected||{};
+  const known=[];
+  const remainder=[];
+
+  for(const [key,scenario] of Object.entries(scenarios)){
+    if(key==='selected'||!scenario?.metrics)continue;
+    const item={
+      key,
+      label:getScenarioLabel(key,scenario),
+      feasible:scenario.feasible!==false,
+      samePlan:sameAssignmentPlan(selectedScenario,scenario),
+      solverStatus:scenario.solver?.status||null,
+      scenario,
+    };
+    if(COMPARISON_SCENARIO_ORDER.includes(key))known.push(item);
+    else remainder.push(item);
+  }
+
+  known.sort((a,b)=>COMPARISON_SCENARIO_ORDER.indexOf(a.key)-COMPARISON_SCENARIO_ORDER.indexOf(b.key));
+  remainder.sort((a,b)=>a.label.localeCompare(b.label,'es'));
+  return known.concat(remainder);
+}
+
+export function getDefaultComparisonKey(result){
+  const alternatives=getComparableScenarios(result);
+  if(!alternatives.length)return null;
+  const selectedScenario=selected(result);
+  const objective=result?.configuration?.objective||result?.decision?.objective||null;
+  const preferred=[];
+
+  if(objective!=='balanced')preferred.push('balanced');
+  if(objective!=='min_cost')preferred.push('min_cost');
+  if(objective!=='min_trips')preferred.push('min_trips');
+  if(objective!=='max_own_fleet')preferred.push('max_own_fleet');
+  if(objective!=='min_co2')preferred.push('min_co2');
+
+  const executableDifferent=alternatives.filter(item=>item.feasible&&!sameAssignmentPlan(selectedScenario,item.scenario));
+  for(const key of preferred){
+    const match=executableDifferent.find(item=>item.key===key);
+    if(match)return match.key;
+  }
+  return executableDifferent[0]?.key
+    ||alternatives.find(item=>item.feasible)?.key
+    ||alternatives[0].key;
+}
+
+export function getComparisonMetricDefinitions(){
+  return COMPARISON_METRICS.map(item=>({...item}));
+}
+
+export function compareScenarioMetric(result,referenceKey,metricKey){
+  const definition=COMPARISON_METRICS.find(item=>item.key===metricKey);
+  const selectedScenario=selected(result);
+  const reference=result?.scenarios?.[referenceKey];
+  const selectedValue=finiteMetric(selectedScenario?.metrics?.[metricKey]);
+  const referenceValue=finiteMetric(reference?.metrics?.[metricKey]);
+  const base={
+    ...(definition||{key:metricKey,dimension:null,label:metricKey,format:'number',fallbackDirection:'lower_better'}),
+    selectedValue,
+    referenceValue,
+    absolute:null,
+    percent:null,
+    semantic:'no_comparable',
+    semanticLabel:'No comparable',
+    reason:null,
+  };
+
+  if(!reference){
+    return {...base,reason:'Escenario no disponible'};
+  }
+  if(selectedValue===null||referenceValue===null){
+    return {...base,reason:'Métrica no publicada en ambos escenarios'};
+  }
+  if(reference.feasible===false){
+    return {...base,reason:'La referencia está marcada como no factible'};
+  }
+
+  const absolute=selectedValue-referenceValue;
+  const percent=referenceValue===0?null:absolute/Math.abs(referenceValue);
+  if(Math.abs(absolute)<1e-12){
+    return {
+      ...base,
+      absolute:0,
+      percent:0,
+      semantic:'same',
+      semanticLabel:'Sin cambio',
+    };
+  }
+
+  const direction=result?.kpi_directions?.[metricKey]||base.fallbackDirection;
+  const improved=direction==='higher_better'?absolute>0:absolute<0;
+  return {
+    ...base,
+    absolute,
+    percent,
+    direction,
+    semantic:improved?'improvement':'tradeoff',
+    semanticLabel:improved?'Mejora':'Trade-off',
+  };
+}
+
+export function getComparisonRows(result,referenceKey){
+  return COMPARISON_METRICS.map(metric=>compareScenarioMetric(result,referenceKey,metric.key));
+}
+
+export function getComparisonContext(result,referenceKey){
+  const alternatives=getComparableScenarios(result);
+  const key=referenceKey&&result?.scenarios?.[referenceKey]
+    ?referenceKey
+    :getDefaultComparisonKey(result);
+  const reference=key?result?.scenarios?.[key]:null;
+  const selectedScenario=selected(result);
+  return {
+    key,
+    selected:selectedScenario,
+    reference,
+    referenceLabel:key?getScenarioLabel(key,reference):'Sin alternativa',
+    alternatives,
+    samePlan:reference?sameAssignmentPlan(selectedScenario,reference):false,
+    feasible:reference?.feasible!==false,
+    rows:key?getComparisonRows(result,key):[],
+    priorities:getObjectiveWeights(result),
+  };
 }
