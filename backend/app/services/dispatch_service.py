@@ -11,6 +11,8 @@ from uuid import uuid4
 
 import httpx
 
+from app.services.http_service import http_client
+
 from app.config import (
     SUPABASE_INPUT_BUCKET,
     SUPABASE_SECRET_KEY,
@@ -89,7 +91,7 @@ def canonical_filename(
 
 
 async def db(method, path, *, params=None, body=None):
-    async with httpx.AsyncClient(timeout=30) as client:
+    async with http_client() as client:
         response = await client.request(
             method,
             f"{SUPABASE_URL}/rest/v1/{path}",
@@ -99,6 +101,7 @@ async def db(method, path, *, params=None, body=None):
             },
             params=params,
             json=body,
+            timeout=30,
         )
         response.raise_for_status()
         return response.json() if response.content else None
@@ -136,10 +139,11 @@ async def _probe_rpc_catalog(required):
     if not supabase_configured():
         return False, "Supabase no está configurado."
     try:
-        async with httpx.AsyncClient(timeout=15) as client:
+        async with http_client() as client:
             response = await client.get(
                 f"{SUPABASE_URL}/rest/v1/",
                 headers={**_headers(), "Accept": "application/openapi+json"},
+                timeout=15,
             )
         if not response.is_success:
             return False, f"No se pudo verificar la función (HTTP {response.status_code})."
@@ -161,13 +165,14 @@ async def _probe_bucket():
         return False, "Supabase no está configurado."
     url = f"{SUPABASE_URL}/storage/v1/bucket/{quote(SUPABASE_INPUT_BUCKET)}"
     try:
-        async with httpx.AsyncClient(timeout=15) as client:
+        async with http_client() as client:
             response = await client.get(
                 url,
                 headers={
                     "apikey": SUPABASE_SECRET_KEY,
                     "Authorization": f"Bearer {SUPABASE_SECRET_KEY}",
                 },
+                timeout=15,
             )
         if response.status_code == 200:
             data = response.json()
@@ -232,6 +237,7 @@ async def system_status():
         "enqueue_dispatch_run", "claim_dispatch_job", "heartbeat_dispatch_job",
         "finish_dispatch_job", "cancel_dispatch_job", "ack_case_reconciliation",
         "decision_case_history", "approve_decision_run_version",
+        "list_decision_cases",
     ])
     bucket_ok, bucket_detail = await _probe_bucket()
     schema_ok = datasets_ok and runs_ok
@@ -499,7 +505,7 @@ async def store_input(
         f"{SUPABASE_URL}/storage/v1/object/"
         f"{SUPABASE_INPUT_BUCKET}/{quote(storage_path, safe='/')}"
     )
-    async with httpx.AsyncClient(timeout=30) as client:
+    async with http_client() as client:
         response = await client.post(
             url,
             headers={
@@ -508,6 +514,7 @@ async def store_input(
                 "x-upsert": "false",
             },
             content=contents,
+            timeout=30,
         )
         response.raise_for_status()
         try:
@@ -539,7 +546,7 @@ async def store_input(
                 },
             )
         except Exception as exc:
-            await client.delete(url, headers=_headers())
+            await client.delete(url, headers=_headers(), timeout=30)
             if (
                 isinstance(exc, httpx.HTTPStatusError)
                 and exc.response.status_code == 409

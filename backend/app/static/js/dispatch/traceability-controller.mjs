@@ -4,7 +4,7 @@ import {openCaseSelector,openRunHistory} from './traceability-ui.mjs';
 import {DECISION_ORDER} from './decision-ui.mjs';
 let scope=null;
 function interaction(){scope?.dispose();scope=createScope(document.createElement('div'));return scope;}
-export async function listDecisionCases(signal){const payload=await api('/api/decision-cases?status=active&limit=100&offset=0',{signal});return Array.isArray(payload.cases)?payload.cases:[];}
+export async function listDecisionCases(signal){const payload=await api('/api/decision-cases?status=active&limit=100&offset=0&summary=true',{signal});return Array.isArray(payload.cases)?payload.cases:[];}
 export async function openDecisionMap(){
   const owner=interaction();
   try{

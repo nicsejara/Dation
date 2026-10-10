@@ -1,6 +1,8 @@
 import asyncio
 import httpx
 
+from app.services.http_service import http_client
+
 from app.config import SUPABASE_SECRET_KEY, SUPABASE_URL
 
 
@@ -22,11 +24,12 @@ async def list_datasets(limit: int = 25) -> list[dict]:
         "limit": str(limit),
     }
 
-    async with httpx.AsyncClient(timeout=15.0) as client:
+    async with http_client() as client:
         response = await client.get(
             f"{SUPABASE_URL}/rest/v1/datasets",
             headers=_headers(),
             params=params,
+            timeout=15.0,
         )
         response.raise_for_status()
 
@@ -51,11 +54,12 @@ async def list_runs(
     if dataset_id:
         params["dataset_id"] = f"eq.{dataset_id}"
 
-    async with httpx.AsyncClient(timeout=15.0) as client:
+    async with http_client() as client:
         response = await client.get(
             f"{SUPABASE_URL}/rest/v1/decision_runs",
             headers=_headers(),
             params=params,
+            timeout=15.0,
         )
         response.raise_for_status()
 
@@ -63,7 +67,7 @@ async def list_runs(
 
 
 async def workspace_summary() -> dict:
-    async with httpx.AsyncClient(timeout=15.0) as client:
+    async with http_client() as client:
         datasets_response, runs_response = await asyncio.gather(
             client.get(
                 f"{SUPABASE_URL}/rest/v1/datasets",
@@ -73,6 +77,7 @@ async def workspace_summary() -> dict:
                     "Range": "0-0",
                 },
                 params={"select": "id"},
+                timeout=15.0,
             ),
             client.get(
                 f"{SUPABASE_URL}/rest/v1/decision_runs",
@@ -82,6 +87,7 @@ async def workspace_summary() -> dict:
                     "Range": "0-0",
                 },
                 params={"select": "id"},
+                timeout=15.0,
             ),
         )
 

@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from pathlib import Path
 from uuid import UUID
 
@@ -23,6 +24,7 @@ from app.config import supabase_configured
 from app.models.decision_config import DecisionRunConfig
 from app.services.dataset_profile_service import get_dataset_profile
 from app.services.dataset_service import upload_dataset
+from app.services.http_service import http_pool
 from app.services.decision_interpreter_service import (
     answer_question,
     generate_explanation,
@@ -47,7 +49,14 @@ APP_PAGE = BASE_DIR / "app" / "templates" / "app.html"
 STATIC_DIR = BASE_DIR / "app" / "static"
 
 
+@asynccontextmanager
+async def lifespan(app):
+    async with http_pool():
+        yield
+
+
 app = FastAPI(
+    lifespan=lifespan,
     title="Dation Core API",
     version="1.0.0",
     description="Backend para Dation Decision Intelligence Workspace.",

@@ -7,6 +7,8 @@ from uuid import uuid4
 
 import httpx
 
+from app.services.http_service import http_client
+
 from app.config import SUPABASE_SECRET_KEY, SUPABASE_URL
 from app.engines.logistics.engine import (
     ENGINE_NAME,
@@ -30,11 +32,12 @@ async def get_dataset(dataset_id: str) -> dict | None:
         "limit": "1",
     }
 
-    async with httpx.AsyncClient(timeout=15.0) as client:
+    async with http_client() as client:
         response = await client.get(
             f"{SUPABASE_URL}/rest/v1/datasets",
             headers=_headers(),
             params=params,
+            timeout=15.0,
         )
         response.raise_for_status()
 
@@ -51,10 +54,11 @@ async def download_dataset(dataset: dict) -> bytes:
         f"{bucket}/{path}"
     )
 
-    async with httpx.AsyncClient(timeout=30.0) as client:
+    async with http_client() as client:
         response = await client.get(
             url,
             headers=_headers(),
+            timeout=30.0,
         )
         response.raise_for_status()
 
@@ -83,7 +87,7 @@ def _promote_decision_history(run: dict) -> dict:
 
 async def _insert_run(run: dict) -> dict:
     payload = _promote_decision_history(run)
-    async with httpx.AsyncClient(timeout=15.0) as client:
+    async with http_client() as client:
         response = await client.post(
             f"{SUPABASE_URL}/rest/v1/decision_runs",
             headers={
@@ -92,6 +96,7 @@ async def _insert_run(run: dict) -> dict:
                 "Prefer": "return=representation",
             },
             json=payload,
+            timeout=15.0,
         )
         response.raise_for_status()
 
@@ -99,7 +104,7 @@ async def _insert_run(run: dict) -> dict:
 
 
 async def _update_run(run_id: str, values: dict) -> dict:
-    async with httpx.AsyncClient(timeout=15.0) as client:
+    async with http_client() as client:
         response = await client.patch(
             f"{SUPABASE_URL}/rest/v1/decision_runs",
             headers={
@@ -109,6 +114,7 @@ async def _update_run(run_id: str, values: dict) -> dict:
             },
             params={"id": f"eq.{run_id}"},
             json=values,
+            timeout=15.0,
         )
         response.raise_for_status()
 
@@ -119,7 +125,7 @@ async def _update_dataset(
     dataset_id: str,
     values: dict,
 ) -> None:
-    async with httpx.AsyncClient(timeout=15.0) as client:
+    async with http_client() as client:
         response = await client.patch(
             f"{SUPABASE_URL}/rest/v1/datasets",
             headers={
@@ -128,6 +134,7 @@ async def _update_dataset(
             },
             params={"id": f"eq.{dataset_id}"},
             json=values,
+            timeout=15.0,
         )
         response.raise_for_status()
 
@@ -242,11 +249,12 @@ async def get_run(run_id: str) -> dict | None:
         "limit": "1",
     }
 
-    async with httpx.AsyncClient(timeout=15.0) as client:
+    async with http_client() as client:
         response = await client.get(
             f"{SUPABASE_URL}/rest/v1/decision_runs",
             headers=_headers(),
             params=params,
+            timeout=15.0,
         )
         response.raise_for_status()
 
