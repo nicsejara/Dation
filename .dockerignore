@@ -8,4 +8,5 @@
 .env.*
 release-artifacts
 backend/tests
-sample_data
+sample_data/*
+!sample_data/v3/
