@@ -15,6 +15,7 @@ permissions:
 jobs:
   tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - name: Checkout
@@ -60,15 +61,11 @@ jobs:
         working-directory: backend
         run: |
           python -m unittest discover -s tests -v
-          node tests/test_dashboard_selectors.js
-          node --test tests/test_dispatch_selectors.mjs
-          node --test tests/test_dispatch_upload_selectors.mjs
-          node --test tests/test_decision_case.mjs
-          node --test tests/test_navigation.mjs tests/test_lifecycle.mjs
+          node --test tests/test_*.js tests/test_*.mjs
 
       - name: Run browser regression tests with synthetic API data
         working-directory: backend
-        run: .browser-venv/bin/python tests/browser/test_navigation.py
+        run: .browser-venv/bin/python -m unittest discover -s tests/browser -p 'test_*.py' -v
 
       - name: Verify schema, history, approvals and durable jobs on PostgreSQL 17
         working-directory: backend
@@ -98,3 +95,32 @@ jobs:
               print("::error title=PostgreSQL regression failure::" + detail)
           sys.exit(result.returncode)
           PY
+
+      - name: Exercise real API, worker, database and browser workflow
+        working-directory: backend
+        env:
+          DATION_E2E_ARTIFACTS: ${{ runner.temp }}/dation-e2e-artifacts
+        run: |
+          python - <<'PY'
+          import json, subprocess, sys
+          result = subprocess.run([sys.executable, "tests/e2e/run_suite.py"], capture_output=True, text=True)
+          output = result.stdout + result.stderr
+          print(output)
+          if result.returncode:
+              # Keep the actual assertion, not log tails that exceed annotation limits.
+              reports = [line.removeprefix("DATION_E2E_RESULT=") for line in result.stdout.splitlines() if line.startswith("DATION_E2E_RESULT=")]
+              failures = json.loads(reports[-1]).get("failure_details", []) if reports else []
+              failure = "\n".join(item["test"] + "\n" + item["traceback"] for item in failures) or output
+              detail = failure[-3500:].replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+              print("::error title=End-to-end regression failure::" + detail)
+          sys.exit(result.returncode)
+          PY
+
+      - name: Save synthetic E2E traces and diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dation-e2e-diagnostics
+          path: ${{ runner.temp }}/dation-e2e-artifacts
+          if-no-files-found: ignore
+          retention-days: 7

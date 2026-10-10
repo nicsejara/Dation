@@ -29,3 +29,20 @@ Prueba con persistencia real terminada el **10 de octubre de 2026, 14:59 ART (17
 Todos los casos y archivos de QA quedaron archivados y la flota vigente permaneció igual. La recuperación tras reinicio y el fencing se comprobaron con SQL transaccional aislado; no se reinició un worker con trabajos de operadores para hacer QA.
 
 Los accesos administrativos ya están configurados en el entorno seguro. Las instrucciones y el orden reproducible de publicación están en [phase3-production.md](phase3-production.md). La verificación posterior al merge debe consultar el check de Cloud Build del commit de main y la revisión que recibe tráfico, además de salud y el diagnóstico durable.
+
+## Publicaciones posteriores verificadas
+
+- **Fase 4**: [PR #39](https://github.com/nicsejara/Dation/pull/39) y [PR #40](https://github.com/nicsejara/Dation/pull/40), main `afebb9189d3d29f5aabfe4fa82bdd01cffc032b7`. [CI](https://github.com/nicsejara/Dation/actions/runs/38087766503) verde; Cloud Build `b11f1f12-d681-47b0-a1a0-3187651dbae9` exitoso, Worker y Deploy SUCCESS. Ambas migraciones de persistencia aplicadas. Historial, aprobaciones concurrentes/idempotentes, versiones reemplazadas y Scheduling stale verificados. Todo QA archivado; flota vigente intacta. Diseño: [phase4-persistence.md](phase4-persistence.md).
+- **Fase 5**: [PR #41](https://github.com/nicsejara/Dation/pull/41), main `e4861cdae710341f4a79938a61bcf1e662c1cef2`. [CI](https://github.com/nicsejara/Dation/actions/runs/38090765365) verde; Cloud Build `baf90838-b4c8-493d-acdc-6d579b8490e5` exitoso, Worker y Deploy SUCCESS. Migración de lista compacta aplicada y repetición idempotente verificada. Selector de cinco casos: 16.431 bytes frente a 87.613, 81,25 % menos; estados y aprobaciones iguales. Chromium real sin errores, selector con una petición, móvil/refresh verificados. Todo QA archivado; flota vigente intacta. Diseño: [phase5-performance.md](phase5-performance.md).
+
+## Fase 6: gate de regresiones integral
+
+Implementación y matriz de cobertura: [phase6-testing.md](phase6-testing.md).
+Validación local: 320 Python, 19 unidades Node, 27 recorridos Chromium, 27 SQL
+reales sobre PostgreSQL 17 y cuatro E2E con API/worker/engine/PostgREST reales.
+El recorrido de navegador crea desde archivos y aprueba Assignment y Scheduling;
+también se verifica recuperación tras reiniciar la API y matar un worker aislado.
+No requiere migraciones ni cambia el runtime. El resultado final de CI y Cloud
+Build del commit integrado se registra en el PR de publicación. Los reinicios y
+las alteraciones de datos de las pruebas ocurren exclusivamente en la base
+descartable; la verificación productiva posterior usa lecturas.
