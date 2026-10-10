@@ -3,6 +3,7 @@ from concurrent.futures import ThreadPoolExecutor
 import json
 from pathlib import Path
 import sys
+import subprocess
 import time
 import unittest
 from uuid import uuid4
@@ -27,6 +28,29 @@ def normalize(value):
 @unittest.skipUnless(CONTAINER,'Requires disposable PostgreSQL 17')
 class PersistenceSQLTests(SQLSandbox,unittest.TestCase):
     def sql(self,sql): return self.command(sql).stdout.strip()
+
+    def lock_case(self):
+        # Hold the lock until the test explicitly releases it. No timed sleep race.
+        process=subprocess.Popen(['docker','exec','-i',CONTAINER,'psql','-U','postgres',
+            '-d',self.database,'-X','-A','-t','-q','-v','ON_ERROR_STOP=1'],
+            stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
+        process.stdin.write(f"BEGIN; SELECT id FROM decision_cases WHERE id='{CASE}' FOR UPDATE;\n")
+        process.stdin.flush()
+        self.assertEqual(process.stdout.readline().strip(),CASE)
+        return process
+
+    def release_case(self,process,sql=''):
+        process.stdin.write(sql+'COMMIT;\n\\q\n');process.stdin.flush()
+        _,error=process.communicate(timeout=15)
+        self.assertEqual(process.returncode,0,error)
+
+    def wait_for_approval(self,rid):
+        deadline=time.monotonic()+10
+        while time.monotonic()<deadline:
+            if self.sql(f"SELECT EXISTS(SELECT 1 FROM pg_stat_activity WHERE wait_event_type='Lock' AND query LIKE '%{rid}%' AND query LIKE '%approve_decision_run_version%');")=='t':
+                return
+            time.sleep(.01)
+        self.fail('Approval did not wait for the case lock')
 
     def setUp(self):
         self.sql('TRUNCATE datasets,decision_runs,decision_cases,decision_approval_events CASCADE;')
@@ -112,16 +136,13 @@ class PersistenceSQLTests(SQLSandbox,unittest.TestCase):
         a,b=self.candidate(),self.candidate();self.approve(a)
         child=self.candidate(node='logistics_scheduling',upstream=a)
         # Ensure the parent replacement wins the case lock while the child request is waiting.
-        name='dation_parent_'+uuid4().hex
-        with ThreadPoolExecutor(max_workers=2) as pool:
-            replacement=pool.submit(self.command,f"SET application_name='{name}'; BEGIN; SELECT id FROM decision_cases WHERE id='{CASE}' FOR UPDATE; SELECT pg_sleep(2); SELECT id FROM approve_decision_run_version('{b}','{CASE}','logistics_assignment'); COMMIT;")
-            for _ in range(30):
-                if self.sql(f"SELECT EXISTS(SELECT 1 FROM pg_stat_activity WHERE application_name='{name}' AND wait_event='PgSleep');")=='t':
-                    break
-                time.sleep(.01)
-            else:self.fail('Parent did not acquire the case lock')
+        holder=self.lock_case()
+        with ThreadPoolExecutor(max_workers=1) as pool:
             child_result=pool.submit(self.approve,child,'logistics_scheduling',False)
-            self.assertEqual(replacement.result().returncode,0)
+            try:
+                self.wait_for_approval(child)
+            finally:
+                self.release_case(holder,f"SELECT id FROM approve_decision_run_version('{b}','{CASE}','logistics_assignment');\n")
             self.assertNotEqual(child_result.result().returncode,0)
 
     def test_admitted_child_can_finish_after_parent_replacement(self):
@@ -138,22 +159,13 @@ class PersistenceSQLTests(SQLSandbox,unittest.TestCase):
         self.assertNotEqual(self.approve(child,'logistics_scheduling',False).returncode,0)
 
     def test_approval_timestamp_is_taken_after_waiting_for_case_lock(self):
-        rid=self.candidate();name='dation_clock_'+uuid4().hex
-        with ThreadPoolExecutor(max_workers=2) as pool:
-            holder=pool.submit(self.command,f"SET application_name='{name}'; BEGIN; SELECT id FROM decision_cases WHERE id='{CASE}' FOR UPDATE; SELECT pg_sleep(2); COMMIT;")
-            for _ in range(30):
-                if self.sql(f"SELECT EXISTS(SELECT 1 FROM pg_stat_activity WHERE application_name='{name}' AND wait_event='PgSleep');")=='t':
-                    break
-                time.sleep(.01)
-            else:self.fail('Case lock holder did not start')
+        rid=self.candidate();holder=self.lock_case()
+        with ThreadPoolExecutor(max_workers=1) as pool:
             waiting=pool.submit(self.approve,rid)
-            for _ in range(30):
-                if self.sql(f"SELECT EXISTS(SELECT 1 FROM pg_stat_activity WHERE wait_event_type='Lock' AND query LIKE '%{rid}%' AND query LIKE '%approve_decision_run_version%');")=='t':
-                    break
-                time.sleep(.01)
-            else:self.fail('Approval did not wait for the case lock')
-            marker=self.sql('SELECT clock_timestamp()::text;')
-            self.assertEqual(holder.result().returncode,0)
+            try:
+                self.wait_for_approval(rid)
+                marker=self.sql('SELECT clock_timestamp()::text;')
+            finally:self.release_case(holder)
             self.assertEqual(waiting.result().returncode,0)
         self.assertEqual(self.sql(f"SELECT approved_at >= '{marker}'::timestamptz FROM decision_runs WHERE id='{rid}';"),'t')
 
