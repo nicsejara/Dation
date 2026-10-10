@@ -137,6 +137,26 @@ class PersistenceSQLTests(SQLSandbox,unittest.TestCase):
         self.assertEqual(self.sql(f"SELECT id FROM finish_dispatch_job('{child}','{token}','{json.dumps(values)}');"),child)
         self.assertNotEqual(self.approve(child,'logistics_scheduling',False).returncode,0)
 
+    def test_approval_timestamp_is_taken_after_waiting_for_case_lock(self):
+        rid=self.candidate();name='dation_clock_'+uuid4().hex
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            holder=pool.submit(self.command,f"SET application_name='{name}'; BEGIN; SELECT id FROM decision_cases WHERE id='{CASE}' FOR UPDATE; SELECT pg_sleep(2); COMMIT;")
+            for _ in range(30):
+                if self.sql(f"SELECT EXISTS(SELECT 1 FROM pg_stat_activity WHERE application_name='{name}' AND wait_event='PgSleep');")=='t':
+                    break
+                time.sleep(.01)
+            else:self.fail('Case lock holder did not start')
+            waiting=pool.submit(self.approve,rid)
+            for _ in range(30):
+                if self.sql(f"SELECT EXISTS(SELECT 1 FROM pg_stat_activity WHERE wait_event_type='Lock' AND query LIKE '%{rid}%' AND query LIKE '%approve_decision_run_version%');")=='t':
+                    break
+                time.sleep(.01)
+            else:self.fail('Approval did not wait for the case lock')
+            marker=self.sql('SELECT clock_timestamp()::text;')
+            self.assertEqual(holder.result().returncode,0)
+            self.assertEqual(waiting.result().returncode,0)
+        self.assertEqual(self.sql(f"SELECT approved_at >= '{marker}'::timestamptz FROM decision_runs WHERE id='{rid}';"),'t')
+
     def test_identity_result_and_event_mutation_are_rejected(self):
         rid=self.candidate();self.approve(rid)
         for sql in [f"UPDATE datasets SET storage_path='changed' WHERE id='{ORDERS}';",

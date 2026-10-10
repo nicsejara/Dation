@@ -11,6 +11,7 @@ from capture_public_schema import SQL as CATALOG_SQL
 
 ROOT=Path(__file__).resolve().parents[1]
 MIGRATION=ROOT/'supabase/migrations/20261010183000_persistence_traceability.sql'
+CLOCK_MIGRATION=ROOT/'supabase/migrations/20261010190000_approval_clock_after_lock.sql'
 VERIFY="""
 SELECT
  to_regclass('public.decision_approval_events') IS NOT NULL AS audit_table,
@@ -39,7 +40,8 @@ def main():
     if 'decision_approval_events' in names:
         if not all(query(VERIFY)[0].values()):
             raise RuntimeError('Incomplete Phase 4 schema. Review before deploying.')
-        print('Phase 4 already present; schema and privileges verified.')
+        ensure_approval_clock()
+        print('Phase 4 already present; schema, approval clock and privileges verified.')
         return
     expected=json.loads((ROOT/'supabase/baseline/20261010100000_catalog.json').read_text())
     if normalize(catalog)!=normalize(expected):
@@ -47,7 +49,27 @@ def main():
     query(MIGRATION.read_text())
     if not all(query(VERIFY)[0].values()):
         raise RuntimeError('Phase 4 verification failed. Do not deploy new application code.')
-    print('Phase 4 applied atomically; history RPC, immutable audit, actor, triggers and private privileges verified.')
+    ensure_approval_clock()
+    print('Phase 4 transactional migrations applied; history RPC, immutable audit, actor, clock, triggers and private privileges verified.')
+
+
+def approval_body(path):
+    function=path.read_text().split('CREATE OR REPLACE FUNCTION public.approve_decision_run_version(',1)[1]
+    return function.split('AS $$',1)[1].split('$$;',1)[0].strip()
+
+
+def ensure_approval_clock():
+    sql="SELECT prosrc AS body FROM pg_proc WHERE oid='public.approve_decision_run_version(uuid,uuid,text)'::regprocedure;"
+    current=query(sql)[0]['body'].strip()
+    expected=approval_body(CLOCK_MIGRATION)
+    if current==expected:
+        return
+    if current!=approval_body(MIGRATION):
+        raise RuntimeError('Approval function drift. No clock upgrade applied.')
+    query(CLOCK_MIGRATION.read_text())
+    if query(sql)[0]['body'].strip()!=expected:
+        raise RuntimeError('Approval clock upgrade verification failed.')
+    print('Approval clock migration applied; timestamp is recorded after the case lock.')
 
 
 if __name__=='__main__':
