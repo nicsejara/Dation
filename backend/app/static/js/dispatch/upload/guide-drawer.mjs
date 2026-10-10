@@ -1,3 +1,4 @@
+import {trapFocus} from "../lifecycle.mjs";
 function el(tag, value, className = "") {
   const node = document.createElement(tag);
   if (className) node.className = className;
@@ -37,7 +38,7 @@ function columnState(column, report) {
   };
 }
 
-export function createGuideDrawer(contracts) {
+export function createGuideDrawer(contracts, scope) {
   document
     .querySelectorAll(".dispatch-guide-overlay")
     .forEach((node) => node.remove());
@@ -67,6 +68,7 @@ export function createGuideDrawer(contracts) {
   drawer.append(head, tabs, content);
   overlay.append(drawer);
   document.body.append(overlay);
+  scope?.own(()=>{overlay.remove();document.body.classList.remove("dispatch-drawer-open");});
 
   let active = "orders";
   let opener = null;
@@ -197,6 +199,7 @@ export function createGuideDrawer(contracts) {
     if (event.target === overlay) hide();
   };
   overlay.onkeydown = (event) => {
+    trapFocus(event,drawer);
     if (event.key === "Escape") {
       hide();
       return;

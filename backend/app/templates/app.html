@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="/static/css/dda-logistics-landing.css?v=dda-logistics-landing-v8">
   <link rel="stylesheet" href="/static/css/dispatch.css?v=decision-map-premium-v1">
   <link rel="stylesheet" href="/static/css/dda-logistics-upload.css?v=upload-finalbar-v2">
+  <link rel="stylesheet" href="/static/css/dispatch-lifecycle.css">
 </head>
 <body>
   <div class="app-shell">
@@ -1551,35 +1552,6 @@
           event.stopPropagation();
         }
 
-        if (view === 'logistics-map' && !dataReady) {
-          return;
-        }
-
-        if (
-          view === 'logistics-config'
-          && (!dataReady || !decisionSelection.id)
-        ) {
-          if (dataReady) {
-            view = 'logistics-map';
-          } else {
-            return;
-          }
-        }
-
-        if (
-          view === 'decision-dashboard'
-          && (
-            !decisionSelection.id
-            || !decisionSelection.hasRun
-          )
-        ) {
-          if (dataReady) {
-            view = 'logistics-map';
-          } else {
-            return;
-          }
-        }
-
         var target = panelFor(view);
 
         if (!target) {
@@ -1624,7 +1596,7 @@
   <script src="/static/js/dda-logistics-landing.js?v=dda-logistics-landing-v8"></script>
   <script src="/static/js/interpreter-stage.js?v=dispatch-v1"></script>
   <script src="/static/vendor/echarts-dispatch-6.0.0.min.js"></script>
-  <script type="module" src="/static/js/dispatch/workspace.mjs?v=decision-map-premium-v1"></script>
+  <script type="module" src="/static/js/dispatch/workspace.mjs"></script>
   <script type="module" src="/static/js/app.js?v=dispatch-v1"></script>
 </body>
 </html>

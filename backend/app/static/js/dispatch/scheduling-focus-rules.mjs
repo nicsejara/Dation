@@ -1,5 +1,5 @@
 import {esc,num} from "./shared.mjs";
-import {decisionRuleCard} from "./decision-config-ui.mjs?v=scheduling-rule-editor-phase3-v1";
+import {decisionRuleCard} from "./decision-config-ui.mjs";
 
 const FIELD_META={
   destination:{label:"Destino",help:"Ciudad o destino operativo del viaje."},

@@ -1,5 +1,5 @@
 import {esc} from "./shared.mjs";
-import {iconSvg} from "./decision-ui.mjs?v=decision-config-foundation";
+import {iconSvg} from "./decision-ui.mjs";
 
 function attr(name,value){
   if(value===false||value===null||value===undefined)return "";

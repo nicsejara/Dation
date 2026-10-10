@@ -6,7 +6,7 @@ VARIABLE_BOOTSTRAP = (ROOT / "app" / "static" / "js" / "dda-variable-config.js")
 
 
 def test_collapsible_filter_behavior_is_loaded_by_assignment_workspace():
-    assert 'assignment-filter-collapse.mjs?v=scope-filter-collapse-v1' in VARIABLE_BOOTSTRAP
+    assert 'assignment-filter-collapse.mjs' in VARIABLE_BOOTSTRAP
 
 
 def test_applied_filters_have_independent_expand_and_remove_actions():
@@ -23,7 +23,7 @@ def test_filter_open_state_survives_config_rerenders():
     assert 'const knownKeys=new Set()' in FILTER_JS
     assert 'if(firstSeen)expandedKeys.add(key)' in FILTER_JS
     assert 'setExpanded(row,key,expandedKeys.has(key))' in FILTER_JS
-    assert 'MutationObserver(scheduleReconcile)' in FILTER_JS
+    assert 'return {update:reconcileRows}' in FILTER_JS
 
 
 def test_collapsed_filter_keeps_a_compact_summary():
@@ -38,3 +38,11 @@ def test_filter_toggle_has_responsive_and_reduced_motion_styles():
     assert '@media(max-width:560px)' in FILTER_JS
     assert '@media(prefers-reduced-motion:reduce)' in FILTER_JS
     assert 'assignment-filter-toggle svg' in FILTER_JS
+
+
+def load_tests(loader, tests, pattern):
+    import unittest
+    for name, value in sorted(globals().items()):
+        if name.startswith("test_") and callable(value):
+            tests.addTest(unittest.FunctionTestCase(value))
+    return tests

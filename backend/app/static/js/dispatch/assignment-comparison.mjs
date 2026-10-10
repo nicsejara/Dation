@@ -2,7 +2,7 @@ import {esc,num,money,pct} from './shared.mjs';
 import {
   getComparisonContext,
   getDefaultComparisonKey,
-} from './assignment-dashboard-selectors.mjs?v=assignment-dashboard-phase3';
+} from './assignment-dashboard-selectors.mjs';
 
 function formatValue(row,value){
   if(value==null)return '—';

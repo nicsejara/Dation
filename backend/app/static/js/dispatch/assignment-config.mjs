@@ -1,5 +1,7 @@
+import {createScope} from "./lifecycle.mjs";
+import {mountFilterCollapse} from "./assignment-filter-collapse.mjs";
 import {esc,num,post,api} from "./shared.mjs";
-import {iconSvg} from "./decision-ui.mjs?v=assignment-config-v2";
+import {iconSvg} from "./decision-ui.mjs";
 import {
   configSummaryBar,
   decisionCaseCard,
@@ -8,7 +10,7 @@ import {
   decisionDepthCard,
   decisionHero,
   decisionSectionHeader,
-} from "./decision-config-ui.mjs?v=decision-config-foundation";
+} from "./decision-config-ui.mjs";
 
 const STYLE_ID="assignment-config-v2-styles";
 const CASE_STYLE_ID="assignment-config-case-styles";
@@ -495,6 +497,8 @@ function defaultFilter(field){
 
 export async function mountAssignmentConfig(root,context){
   ensureStyles();
+  const scope=createScope(root),collapse=mountFilterCollapse(root);
+  const current=()=>scope.active&&context.isCurrent?.()!==false;
   const {state,persist,capabilities,onData,onExecute}=context;
   state.scopeFilters=Array.isArray(state.scopeFilters)?state.scopeFilters:[];
   state.resourceMode=["own","mixed","outsourced"].includes(state.resourceMode)
@@ -520,7 +524,8 @@ export async function mountAssignmentConfig(root,context){
       fleet_dataset_id:state.fleet.id,
       filters:filterPayload(state.scopeFilters),
       resource_mode:state.resourceMode,
-    });
+    },{signal:scope.signal});
+    if(!current())return preview;
     if(generation!==previewGeneration)return preview;
     preview=data;
     state.configPreview=data;
@@ -569,7 +574,7 @@ export async function mountAssignmentConfig(root,context){
     void target.offsetWidth;
     target.classList.add("is-attention");
     target.scrollIntoView({behavior:"smooth",block:"center"});
-    window.setTimeout(()=>target.classList.remove("is-attention"),1800);
+    scope.timeout(()=>target.classList.remove("is-attention"),1800);
   }
 
   async function rerender({previewFirst=false}={}){
@@ -579,11 +584,11 @@ export async function mountAssignmentConfig(root,context){
         preview={valid:false,errors:[{detail:error.message}],orders:{included:0,total:Number(state.orders?.row_count||0)},fleet:{included:Number(state.fleet?.row_count||0),total:Number(state.fleet?.row_count||0)},fields:preview?.fields||[]};
       }
     }
-    if(generation!==renderGeneration)return;
+    if(!current()||generation!==renderGeneration)return;
     syncWeights();
     root.className="dispatch dispatch-upload-pro assignment-config-root";
     root.innerHTML=pageMarkup();
-    bind();
+    bind();collapse.update();
   }
 
   function addFilter(column){
@@ -665,7 +670,7 @@ export async function mountAssignmentConfig(root,context){
       try{
         await navigator.clipboard.writeText(String(state.decisionCase?.id||""));
         if(feedback)feedback.textContent="ID copiado";
-        window.setTimeout(()=>{if(feedback)feedback.textContent="";},1800);
+        scope.timeout(()=>{if(feedback)feedback.textContent="";},1800);
       }catch{if(feedback)feedback.textContent="No se pudo copiar";}
     };
 
@@ -772,7 +777,7 @@ export async function mountAssignmentConfig(root,context){
     root.querySelector("[data-config-retry]").onclick=()=>mountAssignmentConfig(root,context);
     return;
   }
-  await rerender();
+  if(current())await rerender();
 }
 
 export {filterPayload,normalizeRawWeights};

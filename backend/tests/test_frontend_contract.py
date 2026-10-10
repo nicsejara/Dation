@@ -356,7 +356,7 @@ class FrontendContractTests(
             self.dashboard_stage_js,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=decision-map-premium-v1",
+            "/static/js/dispatch/workspace.mjs",
             self.html,
         )
         self.assertIn(
@@ -636,7 +636,7 @@ class FrontendContractTests(
             workspace,
         )
         self.assertIn(
-            "La asignación de carga queda congelada",
+            "mountSchedulingConfig",
             workspace,
         )
         self.assertIn(
@@ -866,20 +866,20 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=decision-map-premium-v1",
+            "/static/js/dispatch/workspace.mjs",
             self.html,
         )
         self.assertIn(
-            "./upload/index.mjs?v=upload-canonical-v1",
+            "./upload/index.mjs",
             workspace,
         )
 
         for module_version in (
-            "./dropcard.mjs?v=upload-unified-v2",
-            "./guide-drawer.mjs?v=upload-unified-v2",
-            "./library.mjs?v=canonical-names-v1",
-            "./preflight-panel.mjs?v=upload-unified-v2",
-            "./selectors.mjs?v=upload-unified-v2",
+            "./dropcard.mjs",
+            "./guide-drawer.mjs",
+            "./library.mjs",
+            "./preflight-panel.mjs",
+            "./selectors.mjs",
         ):
             self.assertIn(
                 module_version,
@@ -1279,7 +1279,7 @@ class FrontendContractTests(
             workspace,
         )
         self.assertIn(
-            "STATUS.REVIEW",
+            "runDecisionState",
             workspace,
         )
         self.assertIn(
@@ -1662,7 +1662,7 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "/static/js/dda-workflow-config.js?v=decision-map-premium-v1",
+            "/static/js/dda-workflow-config.js",
             self.html,
         )
         self.assertIn(
@@ -1762,7 +1762,7 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "/static/js/dispatch/workspace.mjs?v=decision-map-premium-v1",
+            "/static/js/dispatch/workspace.mjs",
             self.html,
         )
 
@@ -2173,11 +2173,11 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "/static/js/dda-logistics-landing.js?v=dda-logistics-landing-v8",
+            "/static/js/dda-logistics-landing.js",
             self.html,
         )
         self.assertIn(
-            "/static/js/dashboard-stage.js?v=dda-logistics-landing-v7",
+            "/static/js/dashboard-stage.js",
             self.html,
         )
 

@@ -1,12 +1,13 @@
+import {scopeFor,trapFocus} from "./lifecycle.mjs";
 import {api,esc,num} from './shared.mjs';
-import {decisionRail,bindDecisionRail} from './decision-nav.mjs?v=assignment-dashboard-phase1';
-import {exportDecision,exportDecisionJson} from './export.mjs?v=assignment-dashboard-phase1';
+import {decisionRail,bindDecisionRail} from './decision-nav.mjs';
+import {exportDecision,exportDecisionJson} from './export.mjs';
 import {
   analysisDepthUi,
   decisionStatusUi,
   shortRunId,
   solverStatusLabel,
-} from './assignment-dashboard-selectors.mjs?v=assignment-dashboard-phase2';
+} from './assignment-dashboard-selectors.mjs';
 
 function detailRows(run,caseActions){
   const result=run.result_json||{};
@@ -130,9 +131,9 @@ function feedback(button,working,done){
   button.dataset.originalLabel=original;
   button.disabled=true;
   button.textContent=working;
-  window.setTimeout(()=>{
+  scopeFor(button)?.timeout(()=>{
     button.textContent=done;
-    window.setTimeout(()=>{
+    scopeFor(button)?.timeout(()=>{
       button.innerHTML=original;
       button.disabled=false;
     },1000);
@@ -155,23 +156,24 @@ export function bindAssignmentShell(root,run,{onRerun,caseActions={},onOpenChat}
   };
   const openDrawer=trigger=>{
     if(!drawer)return;
-    restoreFocus=trigger||document.activeElement;
+    restoreFocus=trigger?.closest('details')?.querySelector('summary')||trigger||document.activeElement;
     drawer.hidden=false;
     backdrop.hidden=false;
     document.body.classList.add('assignment-dashboard-drawer-open');
-    window.requestAnimationFrame(()=>closeButton?.focus());
+    window.requestAnimationFrame(()=>{if(scopeFor(root)?.active)closeButton?.focus();});
   };
 
   if(root._assignmentDashboardKeydown){
     document.removeEventListener('keydown',root._assignmentDashboardKeydown);
   }
   root._assignmentDashboardKeydown=event=>{
+    if(!drawer?.hidden)trapFocus(event,drawer);
     if(event.key==='Escape'&&!drawer?.hidden){
       event.preventDefault();
       closeDrawer();
     }
   };
-  document.addEventListener('keydown',root._assignmentDashboardKeydown);
+  scopeFor(root)?.listen(document,'keydown',root._assignmentDashboardKeydown);
 
   backdrop?.addEventListener('click',closeDrawer);
   closeButton?.addEventListener('click',closeDrawer);
@@ -212,6 +214,7 @@ export function bindAssignmentShell(root,run,{onRerun,caseActions={},onOpenChat}
     approveButton.textContent='Aprobando…';
     try{
       await caseActions.onApprove?.();
+      if(!scopeFor(root)?.active)return;
       const statusBadge=root.querySelector('[data-status-badge]');
       if(statusBadge){
         statusBadge.textContent='Aprobada';
@@ -240,8 +243,9 @@ export function bindAssignmentShell(root,run,{onRerun,caseActions={},onOpenChat}
 
   root.querySelector('[data-chat]')?.addEventListener('click',()=>onOpenChat?.());
 
-  api('/api/system/llm-status')
+  api('/api/system/llm-status',{signal:scopeFor(root)?.signal})
     .then(data=>{
+      if(!scopeFor(root)?.active)return;
       const target=root.querySelector('[data-ai-details]');
       if(target)target.textContent=data.configured?(data.provider+' · '+data.model):'Sin configurar';
     })

@@ -1,15 +1,16 @@
+import {createScope,scopeFor} from "../lifecycle.mjs";
 import {api, date, num} from "../shared.mjs";
-import {createDropCard} from "./dropcard.mjs?v=upload-unified-v2";
-import {createGuideDrawer} from "./guide-drawer.mjs?v=upload-unified-v2";
-import {createPreviousDrawer} from "./library.mjs?v=canonical-names-v1";
-import {renderInlineValidation, renderCompatibilityStrip} from "./preflight-panel.mjs?v=upload-unified-v2";
+import {createDropCard} from "./dropcard.mjs";
+import {createGuideDrawer} from "./guide-drawer.mjs";
+import {createPreviousDrawer} from "./library.mjs";
+import {renderInlineValidation, renderCompatibilityStrip} from "./preflight-panel.mjs";
 import {
   continueState,
   deriveCardState,
   technicalPreflightErrors,
-} from "./selectors.mjs?v=upload-unified-v2";
-import {renderSystemBanner} from "./system-banner.mjs?v=upload-unified-v2";
-import {createValidationDrawer} from "./validation-report.mjs?v=upload-unified-v2";
+} from "./selectors.mjs";
+import {renderSystemBanner} from "./system-banner.mjs";
+import {createValidationDrawer} from "./validation-report.mjs";
 
 const MAX_BYTES = 10 * 1024 * 1024;
 
@@ -398,6 +399,7 @@ function revealSections(root) {
       observer.unobserve(entry.target);
     });
   }, {threshold: 0.08});
+  scopeFor(root)?.own(()=>observer.disconnect());
   nodes.forEach((node) => observer.observe(node));
 }
 
@@ -408,8 +410,10 @@ export async function mountUploadScreen(
     persist,
     runPreflight,
     onNext,
+    isCurrent=()=>true,
   },
 ) {
+  const scope=createScope(root),current=()=>scope.active&&isCurrent();
   const local = {
     status: null,
     contracts: null,
@@ -426,6 +430,7 @@ export async function mountUploadScreen(
     finalVisible: false,
   };
 
+  scope.own(()=>{for(const controller of Object.values(local.controllers))controller?.abort();});
   root.replaceChildren();
   root.className = "dispatch dispatch-upload-screen dispatch-upload-pro";
 
@@ -489,7 +494,7 @@ export async function mountUploadScreen(
     card.classList.remove("is-attention");
     window.requestAnimationFrame(() => {
       card.classList.add("is-attention");
-      window.setTimeout(
+      scope.timeout(
         () => card.classList.remove("is-attention"),
         1100,
       );
@@ -842,14 +847,16 @@ export async function mountUploadScreen(
 
   async function loadLibrary(kind) {
     if (!local.status?.available) {
-      local.libraries[kind] = [];
+      if(!current())return;
+    local.libraries[kind] = [];
       renderPreviousInline(kind);
       return;
     }
 
     const response = await api(
-      `/api/datasets?type=${kind}&limit=20&offset=0`,
+      `/api/datasets?type=${kind}&limit=20&offset=0`, {signal:scope.signal},
     );
+    if(!current())return;
     local.libraries[kind] = response.items || [];
 
     if (state[kind]) {
@@ -857,8 +864,10 @@ export async function mountUploadScreen(
         (item) => item.id === state[kind].id,
       );
       if (refreshed) {
-        state[kind] = refreshed;
-        local.reports[kind] = refreshed.profile_json || null;
+        if(!current())return;
+      state[kind] = refreshed;
+        if(!current())return;
+      local.reports[kind] = refreshed.profile_json || null;
         persist();
       }
     }
@@ -931,6 +940,7 @@ export async function mountUploadScreen(
     local.pendingFiles[kind] = null;
     local.replacing[kind] = false;
     if (!state[kind]) {
+      if(!current())return;
       local.reports[kind] = null;
     }
     renderCard(kind);
@@ -960,7 +970,9 @@ export async function mountUploadScreen(
       local.controllers[kind] = null;
 
       const dataset = stored.dataset || stored.existing_dataset;
+      if(!current())return;
       state[kind] = dataset;
+      if(!current())return;
       local.reports[kind] = stored.validation || local.reports[kind];
       local.saveErrors[kind] = null;
       local.duplicate[kind] = Boolean(stored.duplicate);
@@ -993,6 +1005,7 @@ export async function mountUploadScreen(
         return;
       }
       local.saveErrors[kind] = "No pudimos subir el archivo. Reintentar.";
+      if(!current())return;
       state[kind] = null;
       persist();
       renderCard(kind);
@@ -1004,7 +1017,7 @@ export async function mountUploadScreen(
     card.classList.remove("is-accepted");
     window.requestAnimationFrame(() => {
       card.classList.add("is-accepted");
-      window.setTimeout(
+      scope.timeout(
         () => card.classList.remove("is-accepted"),
         500,
       );
@@ -1021,7 +1034,9 @@ export async function mountUploadScreen(
     local.replacing[kind] = false;
 
     if (problem) {
+      if(!current())return;
       state[kind] = null;
+      if(!current())return;
       local.reports[kind] = {
         valid: false,
         rows: 0,
@@ -1059,9 +1074,11 @@ export async function mountUploadScreen(
       );
       local.controllers[kind] = null;
 
+      if(!current())return;
       local.reports[kind] = report;
       if (!report.valid) {
-        state[kind] = null;
+        if(!current())return;
+      state[kind] = null;
         local.phases[kind] = "idle";
         persist();
         renderCard(kind);
@@ -1072,6 +1089,7 @@ export async function mountUploadScreen(
       await saveValid(kind, file);
     } catch (error) {
       local.controllers[kind] = null;
+      if(!current())return;
       state[kind] = null;
       local.phases[kind] = "idle";
       if (error?.name === "AbortError") {
@@ -1080,6 +1098,7 @@ export async function mountUploadScreen(
         await refreshPreflight();
         return;
       }
+      if(!current())return;
       local.reports[kind] = {
         valid: false,
         rows: 0,
@@ -1119,17 +1138,18 @@ export async function mountUploadScreen(
 
   try {
     const [status, contracts] = await Promise.all([
-      api("/api/dispatch/status"),
-      api("/api/dispatch/contracts"),
+      api("/api/dispatch/status",{signal:scope.signal}),
+      api("/api/dispatch/contracts",{signal:scope.signal}),
     ]);
+    if(!current())return;
     local.status = status;
     local.contracts = contracts;
     state.available = Boolean(status.available);
     renderSystemBanner(banner, status);
 
-    guide = createGuideDrawer(contracts);
-    previousDrawer = createPreviousDrawer();
-    validationDrawer = createValidationDrawer();
+    guide = createGuideDrawer(contracts,scope);
+    previousDrawer = createPreviousDrawer(scope);
+    validationDrawer = createValidationDrawer(scope);
 
     for (const kind of ["orders", "fleet"]) {
       const ref = createDropCard(kind, contracts.formats[kind]);
@@ -1193,7 +1213,8 @@ export async function mountUploadScreen(
       ref.previousAll.onclick = () => openPrevious(kind, ref.previousAll);
 
       if (state[kind]?.profile_json) {
-        local.reports[kind] = state[kind].profile_json;
+        if(!current())return;
+      local.reports[kind] = state[kind].profile_json;
       }
       renderCard(kind);
     }
@@ -1202,20 +1223,23 @@ export async function mountUploadScreen(
       loadLibrary("orders"),
       loadLibrary("fleet"),
     ]);
+    if(!current())return;
     renderCard("orders");
     renderCard("fleet");
     await refreshPreflight();
 
+    if(!current())return;
     if ("IntersectionObserver" in window) {
       const finalObserver = new IntersectionObserver((entries) => {
         local.finalVisible = entries.some((entry) => entry.isIntersecting);
         finalState();
       }, {threshold: 0.18});
-      finalObserver.observe(finalBar.bar);
+      scope.observe(finalObserver,finalBar.bar);
     }
 
     revealSections(root);
   } catch (error) {
+    if(!current())return;
     state.available = false;
     local.status = {
       available: false,

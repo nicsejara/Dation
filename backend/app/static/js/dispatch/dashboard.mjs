@@ -1,21 +1,22 @@
+import {createScope,disposeScope} from "./lifecycle.mjs";
 import {esc,num,download,dispose,errorBox,api} from './shared.mjs';
 import * as hero from './hero.mjs';
 import * as assignment from './assignment.mjs';
 import * as review from './review.mjs';
 import * as explanation from './explanation.mjs';
-import * as assignmentSummary from './assignment-summary.mjs?v=assignment-dashboard-phase2';
-import * as assignmentEvidence from './assignment-evidence.mjs?v=assignment-dashboard-phase2';
-import * as assignmentValidation from './assignment-validation.mjs?v=assignment-dashboard-phase2';
-import * as assignmentComparativeSummary from './assignment-comparative-summary.mjs?v=assignment-dashboard-phase3';
-import * as assignmentComparison from './assignment-comparison.mjs?v=assignment-dashboard-phase3';
-import {getAnalysisDepth} from './assignment-dashboard-selectors.mjs?v=assignment-dashboard-phase3';
-import {exportDecision} from './export.mjs?v=decision-dashboard-v2';
-import * as schedulingDashboard from './scheduling-dashboard.mjs?v=decision-map-phase1-v1';
-import {decisionRail,bindDecisionRail} from './decision-nav.mjs?v=decision-map-phase1-v1';
+import * as assignmentSummary from './assignment-summary.mjs';
+import * as assignmentEvidence from './assignment-evidence.mjs';
+import * as assignmentValidation from './assignment-validation.mjs';
+import * as assignmentComparativeSummary from './assignment-comparative-summary.mjs';
+import * as assignmentComparison from './assignment-comparison.mjs';
+import {getAnalysisDepth} from './assignment-dashboard-selectors.mjs';
+import {exportDecision} from './export.mjs';
+import * as schedulingDashboard from './scheduling-dashboard.mjs';
+import {decisionRail,bindDecisionRail} from './decision-nav.mjs';
 import {
   renderAssignmentShell,
   bindAssignmentShell,
-} from './assignment-dashboard-shell.mjs?v=assignment-dashboard-phase2';
+} from './assignment-dashboard-shell.mjs';
 
 const ASSIGNMENT_STYLE_ID='assignment-dashboard-v2-styles';
 const ASSIGNMENT_STYLE_HREF='/static/css/assignment-dashboard-v2.css?v=assignment-dashboard-phase1';
@@ -70,7 +71,7 @@ function installDecisionChat(root,run,chatNode,toggleButton){
   function toggleChat(){
     if(!chatNode)return;
     if(!chatNode.hidden){
-      chatNode.hidden=true;
+      disposeScope(chatNode);chatNode.hidden=true;
       root.classList.remove('with-chat');
       toggleButton?.setAttribute('aria-expanded','false');
       return;
@@ -255,6 +256,7 @@ function renderLegacyDashboard(root,run,onRerun,caseActions={}){
 }
 
 export function render(root,run,onRerun,caseActions={}){
+  const scope=createScope(root);scope.own(()=>{cleanupAssignmentShell(root);dispose(root);});
   cleanupAssignmentShell(root);
   dispose(root);
   const result=run.result_json;

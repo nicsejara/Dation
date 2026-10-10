@@ -14,7 +14,7 @@ class SchedulingSharedUiPhase2Tests(unittest.TestCase):
         self.css = (CSS_ROOT / "scheduling-config-shared-phase2.css").read_text(encoding="utf-8")
 
     def test_scheduling_uses_assignment_reference_shell(self):
-        self.assertIn('decision-config-ui.mjs?v=scheduling-shared-phase2-v1', self.ui)
+        self.assertIn('decision-config-ui.mjs', self.ui)
         for marker in (
             "decisionHero(",
             "decisionCaseCard(",

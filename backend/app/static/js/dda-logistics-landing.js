@@ -1,4 +1,5 @@
 (function(){
+  var revealObserver=null;
   "use strict";
 
   /*
@@ -145,13 +146,14 @@
   }
 
   function enhanceReveal(container){
+    revealObserver&&revealObserver.disconnect();
     container.classList.add("is-enhanced");
     var nodes=Array.prototype.slice.call(container.querySelectorAll("[data-reveal]"));
     if(!("IntersectionObserver" in window)||window.matchMedia("(prefers-reduced-motion: reduce)").matches){
       nodes.forEach(function(node){node.classList.add("is-visible");});
       return;
     }
-    var observer=new IntersectionObserver(function(entries){
+    var observer=revealObserver=new IntersectionObserver(function(entries){
       entries.forEach(function(entry){
         if(entry.isIntersecting){
           entry.target.classList.add("is-visible");
@@ -202,12 +204,13 @@
   function boot(){
     var container=root();
     if(!container)return;
-    refresh(container);
-    enhanceReveal(container);
+    makeDecisionChainInformational(container);
+    prepareHeroNavigation(container);
     bindActions(container);
+    if(window.dationGetCurrentView?.()==="logistics-overview"){refresh(container);enhanceReveal(container);}
   }
 
-  import("/static/js/dispatch/traceability-controller.mjs?v=traceability-v3").catch(function(){});
+  import("/static/js/dispatch/traceability-controller.mjs").catch(function(){});
 
   if(document.readyState==="loading"){
     document.addEventListener("DOMContentLoaded",boot,{once:true});
@@ -216,14 +219,21 @@
   }
 
   window.addEventListener("dation:view",function(event){
+    revealObserver&&revealObserver.disconnect();
     if(event.detail&&event.detail.view==="logistics-overview"){
       var container=root();
-      if(container)refresh(container);
+      if(container){refresh(container);enhanceReveal(container);}
     }
   });
 
   window.addEventListener("dation:cases-ready",function(){
     var container=root();
-    if(container)syncMapAccess(container);
+    if(container&&window.dationGetCurrentView?.()==="logistics-overview")syncMapAccess(container);
+  });
+  window.addEventListener("pagehide",function(){revealObserver&&revealObserver.disconnect();});
+  window.addEventListener("pageshow",function(event){
+    if(event.persisted&&window.dationGetCurrentView?.()==="logistics-overview"){
+      var container=root();if(container)enhanceReveal(container);
+    }
   });
 })();

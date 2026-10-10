@@ -95,8 +95,7 @@ class AssignmentDashboardPhase2Tests(unittest.TestCase):
         self.assertIn("renderModule(nodes.hero,assignmentSummary,result)", self.dashboard)
         self.assertIn("renderModule(nodes.assignment,assignmentEvidence,result)", self.dashboard)
         self.assertIn("renderModule(nodes.review,assignmentValidation,result)", self.dashboard)
-        self.assertIn("renderModule(nodes.hero,hero,result)", self.dashboard)
-        self.assertIn("Phase 3 will replace this comparative composition", self.dashboard)
+        self.assertIn("renderModule(nodes.hero,assignmentComparativeSummary,result)", self.dashboard)
         self.assertNotIn("data-depth-toggle", self.dashboard)
 
     def test_summary_separates_objective_metrics_from_descriptive_kpis(self):

@@ -2,7 +2,7 @@ import {esc,num,money,pct} from './shared.mjs';
 import {
   getAssignmentSummary,
   getOperationalKpis,
-} from './assignment-dashboard-selectors.mjs?v=assignment-dashboard-phase2';
+} from './assignment-dashboard-selectors.mjs';
 
 function formatKpi(item){
   if(item.value==null)return '—';

@@ -1,12 +1,13 @@
+import {createScope,scopeFor} from "./lifecycle.mjs";
 import {api,esc,num} from "./shared.mjs";
 import {STATUS,deriveDecisionNodes} from "./decision-case.mjs";
-import {createGuideDrawer} from "./upload/guide-drawer.mjs?v=decision-map-case-v2";
+import {createGuideDrawer} from "./upload/guide-drawer.mjs";
 import {
   DECISION_ORDER,
   DECISION_META,
   iconSvg,
   statusUi,
-} from "./decision-ui.mjs?v=decision-map-case-v2";
+} from "./decision-ui.mjs";
 
 // Legacy source-only contract wording: "TU DECISION CASE". Visible UI now uses "DECISION CASE".
 const STYLE_ID="decision-map-case-v2-styles";
@@ -264,7 +265,7 @@ function nodeCard(nodeId,presentation,isNext){
     +(review?" is-review":"")
     +(waiting?" is-waiting":"");
 
-  return '<article class="'+cardClass+'" '
+  return '<article class="'+cardClass+'" data-decision-node="'+esc(nodeId)+'" '
     +'aria-label="Decisión '+esc(meta.index)+': '+esc(meta.label)+'" '
     +(isNext?'aria-current="step" ':'')
     +(waiting?'tabindex="0" aria-disabled="true" aria-describedby="'+esc(statusId)+'" ':'')
@@ -542,12 +543,15 @@ function changeDataDialog(presentations){
 }
 
 async function openDatasetColumns(kind,source,orders,fleet){
+  const scope=scopeFor(source),owner=source.closest(".dispatch");
   try{
-    if(!guideDrawer){
-      const contracts=await api("/api/dispatch/contracts");
-      guideDrawer=createGuideDrawer(contracts);
+    if(!owner._guideDrawer){
+      const contracts=await api("/api/dispatch/contracts",{signal:scope?.signal});
+      if(!scope?.active)return;
+      owner._guideDrawer=createGuideDrawer(contracts,scope);
     }
-    guideDrawer.open(kind,source,{
+    if(!scope?.active)return;
+    owner._guideDrawer.open(kind,source,{
       orders:orders?.profile_json||null,
       fleet:fleet?.profile_json||null,
     });
@@ -561,6 +565,7 @@ export function renderDecisionMap(
   root,
   {decisionCase,readiness,orders,fleet,onConfigure,onOpenResult,onData},
 ){
+  const scope=createScope(root);scope.own(()=>{root._guideDrawer=null;});
   ensureDecisionMapStyles();
   const nodes=deriveDecisionNodes(decisionCase,readiness);
   const evidence=readinessById(readiness);
@@ -622,7 +627,7 @@ export function renderDecisionMap(
         copyButton.classList.add("is-copied");
         copyButton.setAttribute("title","ID copiado");
         if(feedback)feedback.textContent="ID copiado";
-        window.setTimeout(()=>{
+        scope.timeout(()=>{
           copyButton.classList.remove("is-copied");
           copyButton.setAttribute("title","Copiar ID");
           if(feedback)feedback.textContent="";

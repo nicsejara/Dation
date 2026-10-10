@@ -1,8 +1,8 @@
-import "./dispatch/assignment-filter-collapse.mjs?v=scope-filter-collapse-v1";
+import "./dispatch/assignment-filter-collapse.mjs";
 // Previous cache contract retained as a source marker for Phase 3 regression checks:
-// scheduling-config-v2.mjs?v=scheduling-rule-editor-phase3-v1
-import "./dispatch/scheduling-config-v2.mjs?v=scheduling-execution-phase4-v1";
-import "./dispatch/scheduling-execution-phase4.mjs?v=scheduling-execution-phase4-v1";
+// scheduling-config-v2.mjs
+import "./dispatch/scheduling-config-v2.mjs";
+import "./dispatch/scheduling-execution-phase4.mjs";
 
 (function(){
   "use strict";

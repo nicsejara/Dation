@@ -38,7 +38,7 @@
   // side effect of an individual screen. Dynamic import keeps this classic
   // bootstrap backward compatible while guaranteeing that Scheduling phases
   // 1–4 are loaded before the user reaches Configurar decisión.
-  import("./dda-variable-config.js?v=scheduling-execution-phase4-v1")
+  import("./dda-variable-config.js")
     .catch(function (error) {
       console.error("No se pudo iniciar la configuración compartida de decisiones.", error);
     });

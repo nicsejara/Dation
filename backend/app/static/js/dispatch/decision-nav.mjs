@@ -3,7 +3,7 @@ import {
   DECISION_ORDER,
   DECISION_META,
   statusUi,
-} from './decision-ui.mjs?v=decision-map-premium-v1';
+} from './decision-ui.mjs';
 
 export function decisionRail(caseActions={}){
   const decisionCase=caseActions.decisionCase;

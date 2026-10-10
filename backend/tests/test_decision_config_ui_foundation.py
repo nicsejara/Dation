@@ -46,7 +46,7 @@ class DecisionConfigUiFoundationTests(unittest.TestCase):
         self.assertIn('attributes["aria-disabled"]="true"', self.shared)
 
     def test_assignment_consumes_shared_primitives(self):
-        self.assertIn('from "./decision-config-ui.mjs?v=decision-config-foundation"', self.assignment)
+        self.assertIn('from "./decision-config-ui.mjs"', self.assignment)
         for name in (
             "decisionHero(",
             "decisionCaseCard(",
@@ -62,7 +62,7 @@ class DecisionConfigUiFoundationTests(unittest.TestCase):
         self.assertNotIn("function sectionHeader(", self.assignment)
 
     def test_scheduling_now_consumes_shared_primitives(self):
-        self.assertIn('from "./decision-config-ui.mjs?v=scheduling-shared-phase2-v1"', self.scheduling)
+        self.assertIn('from "./decision-config-ui.mjs"', self.scheduling)
         for name in (
             "decisionHero(",
             "decisionCaseCard(",
