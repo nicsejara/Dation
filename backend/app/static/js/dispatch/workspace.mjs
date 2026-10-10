@@ -454,7 +454,6 @@ async function execute(){
   pending('Registrando la corrida…');
   const generation=++pollGeneration;
   runPolling.stop();
-  poll(id,generation,'logistics_assignment',{delay:1000,graceUntil:Date.now()+10000});
   try{
     const run=await post('/api/runs?run_id='+id,{
       orders_dataset_id:state.orders.id,
@@ -470,7 +469,7 @@ async function execute(){
       },
       decision_case:caseRef(state.decisionCase),
     });
-    if(generation===pollGeneration){if(run.status==='completed')await show(run);else await runPolling.refresh();}
+    if(generation===pollGeneration){if(run.status==='completed')await show(run);else {poll(id,generation,'logistics_assignment');await runPolling.refresh();}}
   }catch(e){
     if(generation!==pollGeneration)return;
     poll(id,generation,'logistics_assignment',{graceUntil:Date.now()+10000});
@@ -495,7 +494,6 @@ async function executeScheduling(sourceRunId){
   pending('Registrando la planificación…');
   const generation=++pollGeneration;
   runPolling.stop();
-  poll(id,generation,'logistics_scheduling',{delay:500,graceUntil:Date.now()+10000});
   try{
     const run=await post('/api/runs?run_id='+id,{
       orders_dataset_id:state.orders.id,
@@ -508,7 +506,7 @@ async function executeScheduling(sourceRunId){
       options:{},
       decision_case:caseRef(state.decisionCase,'logistics_scheduling'),
     });
-    if(generation===pollGeneration){if(run.status==='completed')await show(run);else await runPolling.refresh();}
+    if(generation===pollGeneration){if(run.status==='completed')await show(run);else {poll(id,generation,'logistics_scheduling');await runPolling.refresh();}}
   }catch(e){
     if(generation!==pollGeneration)return;
     poll(id,generation,'logistics_scheduling',{graceUntil:Date.now()+10000});
@@ -679,8 +677,8 @@ async function openRun(id,nodeId=state.activeNode,caseId=state.decisionCase?.id)
 async function executeConfiguredScheduling({sourceRun,configuration,options}){
   const id=crypto.randomUUID(),caseId=state.decisionCase.id;
   await navigateResource('decision-dashboard',{runId:id,nodeId:'logistics_scheduling',render:false});pending('Registrando la planificación…');
-  const generation=pollGeneration;poll(id,generation,'logistics_scheduling',{delay:500,graceUntil:Date.now()+10000});
-  try{const run=await post('/api/runs?run_id='+id,{orders_dataset_id:state.orders.id,fleet_dataset_id:state.fleet.id,source_run_id:sourceRun.id,configuration,options,decision_case:{case_id:caseId,node_id:'logistics_scheduling'}});if(generation===pollGeneration){if(run.status==='completed')await show(run);else await runPolling.refresh();}}
+  const generation=pollGeneration;
+  try{const run=await post('/api/runs?run_id='+id,{orders_dataset_id:state.orders.id,fleet_dataset_id:state.fleet.id,source_run_id:sourceRun.id,configuration,options,decision_case:{case_id:caseId,node_id:'logistics_scheduling'}});if(generation===pollGeneration){if(run.status==='completed')await show(run);else {poll(id,generation,'logistics_scheduling');await runPolling.refresh();}}}
   catch(error){if(generation===pollGeneration){poll(id,generation,'logistics_scheduling',{graceUntil:Date.now()+10000});await runPolling.refresh();}}
 }
 window.DationDispatch={show,openRun,isReady:ready,getWorkspace:()=>state,openCase:(caseId,view='logistics-map',nodeId=null)=>navigateResource(view,{caseId,nodeId}),openActiveDecisionResult:()=>openCaseResult(state.activeNode),getActiveDecision:()=>({id:state.activeNode,label:DECISION_LABELS[state.activeNode],hasRun:Boolean(state.decisionCase?.nodes?.[state.activeNode]?.run_id),status:state.decisionCase?.nodes?.[state.activeNode]?.status})};

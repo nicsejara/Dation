@@ -1,5 +1,8 @@
 import asyncio
 import json
+import math
+from app.services.http_service import http_client
+from app.observability import event
 
 import httpx
 
@@ -9,6 +12,17 @@ from app.config import (
     LLM_MODEL,
     LLM_PROVIDER,
 )
+
+
+TOTAL_DEADLINE_SECONDS = 60.0
+MAX_RETRY_DELAY_SECONDS = 5.0
+
+
+def safe_usage(value):
+    if not isinstance(value, dict): return {}
+    return {key: number for key, number in value.items()
+            if key in {"prompt_tokens", "completion_tokens", "total_tokens"}
+            and type(number) is int and 0 <= number < 10**10}
 
 
 DEFAULTS = {
@@ -54,7 +68,9 @@ def _retry_delay(response: httpx.Response) -> float:
 
     if value:
         try:
-            return max(float(value), 1.0)
+            delay = float(value)
+            if math.isfinite(delay):
+                return min(MAX_RETRY_DELAY_SECONDS, max(delay, 0.0))
         except ValueError:
             pass
 
@@ -92,7 +108,7 @@ async def chat_completion(
             },
         }
 
-    async with httpx.AsyncClient(timeout=60.0) as client:
+    async with asyncio.timeout(TOTAL_DEADLINE_SECONDS), http_client() as client:
         response = await client.post(
             f"{settings['base_url']}/chat/completions",
             headers={
@@ -100,11 +116,12 @@ async def chat_completion(
                 "Content-Type": "application/json",
             },
             json=payload,
+            timeout=TOTAL_DEADLINE_SECONDS,
         )
 
-        # Free tiers can momentarily hit tokens-per-minute limits.
-        # Retry once using the provider's requested cooldown.
+        # One bounded retry shares the same total deadline, including cooldown.
         if response.status_code == 429:
+            event("llm_retry", outcome="rate_limited", wait_ms=_retry_delay(response)*1000)
             await asyncio.sleep(_retry_delay(response))
             response = await client.post(
                 f"{settings['base_url']}/chat/completions",
@@ -113,6 +130,7 @@ async def chat_completion(
                     "Content-Type": "application/json",
                 },
                 json=payload,
+                timeout=TOTAL_DEADLINE_SECONDS,
             )
 
         response.raise_for_status()
@@ -120,11 +138,14 @@ async def chat_completion(
     body = response.json()
     content = body["choices"][0]["message"]["content"]
 
+    usage = safe_usage(body.get("usage"))
+    event("llm_completed", input_tokens=usage.get("prompt_tokens"),
+          output_tokens=usage.get("completion_tokens"), total_tokens=usage.get("total_tokens"))
     return {
         "provider": settings["provider"],
         "model": settings["model"],
         "content": content,
-        "usage": body.get("usage", {}),
+        "usage": usage,
         "raw_id": body.get("id"),
     }
 

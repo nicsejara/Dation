@@ -1,0 +1,261 @@
+{
+  "tables": [
+    {
+      "rls": true,
+      "anon": false,
+      "name": "decision_chat_turns",
+      "authenticated": false,
+      "service_delete": false,
+      "service_insert": true,
+      "service_select": true,
+      "service_update": false
+    },
+    {
+      "rls": true,
+      "anon": false,
+      "name": "dispatch_worker_instances",
+      "authenticated": false,
+      "service_delete": true,
+      "service_insert": true,
+      "service_select": true,
+      "service_update": true
+    }
+  ],
+  "columns": [
+    {
+      "type": "uuid",
+      "table": "decision_chat_turns",
+      "column": "turn_id",
+      "default": null,
+      "nullable": "NO"
+    },
+    {
+      "type": "uuid",
+      "table": "decision_chat_turns",
+      "column": "run_id",
+      "default": null,
+      "nullable": "NO"
+    },
+    {
+      "type": "text",
+      "table": "decision_chat_turns",
+      "column": "question_hash",
+      "default": null,
+      "nullable": "NO"
+    },
+    {
+      "type": "timestamptz",
+      "table": "decision_chat_turns",
+      "column": "created_at",
+      "default": "clock_timestamp()",
+      "nullable": "NO"
+    },
+    {
+      "type": "text",
+      "table": "decision_chat_turns",
+      "column": "provider",
+      "default": null,
+      "nullable": "NO"
+    },
+    {
+      "type": "text",
+      "table": "decision_chat_turns",
+      "column": "model",
+      "default": null,
+      "nullable": "NO"
+    },
+    {
+      "type": "text",
+      "table": "decision_chat_turns",
+      "column": "knowledge_version",
+      "default": null,
+      "nullable": "NO"
+    },
+    {
+      "type": "text",
+      "table": "decision_chat_turns",
+      "column": "prompt_version",
+      "default": null,
+      "nullable": "NO"
+    },
+    {
+      "type": "jsonb",
+      "table": "decision_chat_turns",
+      "column": "usage_json",
+      "default": "'{}'::jsonb",
+      "nullable": "NO"
+    },
+    {
+      "type": "uuid",
+      "table": "decision_chat_turns",
+      "column": "request_id",
+      "default": null,
+      "nullable": "YES"
+    },
+    {
+      "type": "uuid",
+      "table": "decision_messages",
+      "column": "turn_id",
+      "default": null,
+      "nullable": "YES"
+    },
+    {
+      "type": "uuid",
+      "table": "dispatch_worker_instances",
+      "column": "worker_id",
+      "default": null,
+      "nullable": "NO"
+    },
+    {
+      "type": "text",
+      "table": "dispatch_worker_instances",
+      "column": "revision",
+      "default": null,
+      "nullable": "NO"
+    },
+    {
+      "type": "timestamptz",
+      "table": "dispatch_worker_instances",
+      "column": "seen_at",
+      "default": null,
+      "nullable": "NO"
+    },
+    {
+      "type": "bool",
+      "table": "dispatch_worker_instances",
+      "column": "ready",
+      "default": null,
+      "nullable": "NO"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "decision_chat_turns_created_idx",
+      "definition": "CREATE INDEX decision_chat_turns_created_idx ON public.decision_chat_turns USING btree (created_at)"
+    },
+    {
+      "name": "decision_chat_turns_pkey",
+      "definition": "CREATE UNIQUE INDEX decision_chat_turns_pkey ON public.decision_chat_turns USING btree (turn_id)"
+    },
+    {
+      "name": "decision_messages_recent_idx",
+      "definition": "CREATE INDEX decision_messages_recent_idx ON public.decision_messages USING btree (run_id, created_at DESC, id DESC)"
+    },
+    {
+      "name": "decision_messages_turn_role_idx",
+      "definition": "CREATE UNIQUE INDEX decision_messages_turn_role_idx ON public.decision_messages USING btree (turn_id, role) WHERE (turn_id IS NOT NULL)"
+    },
+    {
+      "name": "decision_runs_operational_idx",
+      "definition": "CREATE INDEX decision_runs_operational_idx ON public.decision_runs USING btree (created_at, status) INCLUDE (duration_ms)"
+    },
+    {
+      "name": "dispatch_worker_instances_pkey",
+      "definition": "CREATE UNIQUE INDEX dispatch_worker_instances_pkey ON public.dispatch_worker_instances USING btree (worker_id)"
+    },
+    {
+      "name": "dispatch_worker_seen_idx",
+      "definition": "CREATE INDEX dispatch_worker_seen_idx ON public.dispatch_worker_instances USING btree (seen_at)"
+    }
+  ],
+  "functions": [
+    {
+      "anon": false,
+      "body": "\n SELECT jsonb_build_object(\n 'sampled_at',statement_timestamp(),\n 'queue',(SELECT jsonb_build_object(\n  'queued',count(*) FILTER(WHERE state='queued'),\n  'running',count(*) FILTER(WHERE state='running'),\n  'retried_active',count(*) FILTER(WHERE state IN('queued','running') AND attempts>1),\n  'expired_leases',count(*) FILTER(WHERE state='running' AND lease_expires_at<statement_timestamp()),\n  'past_deadline',count(*) FILTER(WHERE state IN('queued','running') AND deadline_at<statement_timestamp()),\n  'oldest_queued_seconds',coalesce(max(extract(epoch FROM statement_timestamp()-created_at)) FILTER(WHERE state='queued'),0)\n ) FROM dispatch_run_jobs WHERE state IN('queued','running')),\n 'workers',(SELECT jsonb_build_object('healthy',count(*) FILTER(WHERE ready), 'reporting',count(*))\n  FROM dispatch_worker_instances WHERE seen_at>statement_timestamp()-interval '90 seconds'),\n 'reconciliation',(SELECT jsonb_build_object('pending',count(*),'retrying',count(*) FILTER(WHERE attempts>0),\n  'oldest_pending_seconds',coalesce(max(extract(epoch FROM statement_timestamp()-available_at)) FILTER(WHERE available_at<=statement_timestamp()),0))\n  FROM decision_case_reconciliations),\n 'runs_24h',(SELECT jsonb_build_object('completed',count(*) FILTER(WHERE status='completed'),\n  'errors',count(*) FILTER(WHERE status='error'),'duration_p95_ms',\n  percentile_cont(0.95) WITHIN GROUP(ORDER BY duration_ms) FILTER(WHERE status='completed' AND duration_ms IS NOT NULL))\n  FROM decision_runs WHERE created_at>statement_timestamp()-interval '24 hours'),\n 'chat_24h',(SELECT jsonb_build_object('turns',count(*),\n  'total_tokens',coalesce(sum((usage_json->>'total_tokens')::bigint),0))\n  FROM decision_chat_turns WHERE created_at>statement_timestamp()-interval '24 hours')\n );\n",
+      "name": "dispatch_operational_snapshot",
+      "config": [
+        "search_path=public, pg_temp"
+      ],
+      "definer": false,
+      "arguments": "",
+      "volatility": "s",
+      "service_role": true,
+      "authenticated": false
+    },
+    {
+      "anon": false,
+      "body": "\nDECLARE t decision_chat_turns; answer text;\nBEGIN\n SELECT * INTO t FROM decision_chat_turns WHERE turn_id=target_turn_id;\n IF NOT FOUND THEN RETURN NULL; END IF;\n IF t.run_id IS DISTINCT FROM target_run_id OR t.question_hash IS DISTINCT FROM intent_hash THEN\n  RAISE EXCEPTION 'Turn intention conflict' USING ERRCODE='22023';\n END IF;\n SELECT content INTO STRICT answer FROM decision_messages WHERE turn_id=t.turn_id AND role='assistant';\n RETURN jsonb_build_object('turn_id',t.turn_id,'run_id',t.run_id,'provider',t.provider,'model',t.model,\n  'knowledge_version',t.knowledge_version,'prompt_version',t.prompt_version,'usage',t.usage_json,'answer',answer);\nEND; ",
+      "name": "read_decision_chat_turn",
+      "config": [
+        "search_path=public, pg_temp"
+      ],
+      "definer": false,
+      "arguments": "target_turn_id uuid, target_run_id uuid, intent_hash text",
+      "volatility": "s",
+      "service_role": true,
+      "authenticated": false
+    },
+    {
+      "anon": false,
+      "body": "\nDECLARE replay jsonb; stamp timestamptz; usage jsonb;\nBEGIN\n IF target_turn_id IS NULL OR target_run_id IS NULL OR intent_hash IS NULL OR\n    length(question_text) NOT BETWEEN 2 AND 2000 OR question_text IS NULL OR\n    length(answer_text) NOT BETWEEN 1 AND 20000 OR answer_text IS NULL OR\n    jsonb_typeof(metadata) IS DISTINCT FROM 'object' THEN\n  RAISE EXCEPTION 'Invalid chat turn' USING ERRCODE='22023';\n END IF;\n -- Serializes the same UUID without serializing unrelated conversations.\n PERFORM pg_advisory_xact_lock(hashtextextended(target_turn_id::text,0));\n replay=read_decision_chat_turn(target_turn_id,target_run_id,intent_hash);\n IF replay IS NOT NULL THEN RETURN replay; END IF;\n PERFORM 1 FROM decision_runs WHERE id=target_run_id AND status='completed' FOR SHARE;\n IF NOT FOUND THEN RAISE EXCEPTION 'Completed run required' USING ERRCODE='22023'; END IF;\n IF NOT (metadata ?& ARRAY['provider','model','knowledge_version','prompt_version']) THEN\n  RAISE EXCEPTION 'Missing audit metadata' USING ERRCODE='22023';\n END IF;\n -- Accept only bounded token counts; arbitrary provider metadata is never persisted.\n SELECT coalesce(jsonb_object_agg(key,value),'{}') INTO usage FROM jsonb_each(coalesce(metadata->'usage','{}'))\n WHERE key IN ('prompt_tokens','completion_tokens','total_tokens') AND value::text ~ '^[0-9]{1,10}$';\n stamp=clock_timestamp();\n INSERT INTO decision_chat_turns(turn_id,run_id,question_hash,created_at,provider,model,knowledge_version,prompt_version,usage_json,request_id)\n VALUES(target_turn_id,target_run_id,intent_hash,stamp,metadata->>'provider',metadata->>'model',\n  metadata->>'knowledge_version',metadata->>'prompt_version',usage,(metadata->>'request_id')::uuid);\n INSERT INTO decision_messages(run_id,created_at,role,content,provider,model,knowledge_version,turn_id) VALUES\n (target_run_id,stamp,'user',question_text,NULL,NULL,metadata->>'knowledge_version',target_turn_id),\n (target_run_id,stamp+interval '1 microsecond','assistant',answer_text,metadata->>'provider',metadata->>'model',metadata->>'knowledge_version',target_turn_id);\n RETURN read_decision_chat_turn(target_turn_id,target_run_id,intent_hash);\nEND; ",
+      "name": "record_decision_chat_turn",
+      "config": [
+        "search_path=public, pg_temp"
+      ],
+      "definer": false,
+      "arguments": "target_turn_id uuid, target_run_id uuid, intent_hash text, question_text text, answer_text text, metadata jsonb",
+      "volatility": "v",
+      "service_role": true,
+      "authenticated": false
+    },
+    {
+      "anon": false,
+      "body": "\nBEGIN\n IF target_worker_id IS NULL OR worker_revision IS NULL OR is_ready IS NULL THEN\n  RAISE EXCEPTION 'Invalid worker report' USING ERRCODE='22023';\n END IF;\n INSERT INTO dispatch_worker_instances VALUES(target_worker_id,worker_revision,clock_timestamp(),is_ready)\n ON CONFLICT(worker_id) DO UPDATE SET revision=excluded.revision,seen_at=excluded.seen_at,ready=excluded.ready;\n DELETE FROM dispatch_worker_instances WHERE seen_at < clock_timestamp()-interval '24 hours';\n RETURN true;\nEND; ",
+      "name": "report_dispatch_worker",
+      "config": [
+        "search_path=public, pg_temp"
+      ],
+      "definer": false,
+      "arguments": "target_worker_id uuid, worker_revision text, is_ready boolean",
+      "volatility": "v",
+      "service_role": true,
+      "authenticated": false
+    }
+  ],
+  "constraints": [
+    {
+      "name": "decision_chat_turns_knowledge_version_check",
+      "definition": "CHECK (((length(knowledge_version) >= 1) AND (length(knowledge_version) <= 150)))"
+    },
+    {
+      "name": "decision_chat_turns_model_check",
+      "definition": "CHECK (((length(model) >= 1) AND (length(model) <= 150)))"
+    },
+    {
+      "name": "decision_chat_turns_pkey",
+      "definition": "PRIMARY KEY (turn_id)"
+    },
+    {
+      "name": "decision_chat_turns_prompt_version_check",
+      "definition": "CHECK (((length(prompt_version) >= 1) AND (length(prompt_version) <= 150)))"
+    },
+    {
+      "name": "decision_chat_turns_provider_check",
+      "definition": "CHECK (((length(provider) >= 1) AND (length(provider) <= 100)))"
+    },
+    {
+      "name": "decision_chat_turns_question_hash_check",
+      "definition": "CHECK ((question_hash ~ '^[0-9a-f]{64}$'::text))"
+    },
+    {
+      "name": "decision_chat_turns_run_id_fkey",
+      "definition": "FOREIGN KEY (run_id) REFERENCES decision_runs(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "decision_chat_turns_usage_json_check",
+      "definition": "CHECK ((jsonb_typeof(usage_json) = 'object'::text))"
+    },
+    {
+      "name": "decision_messages_turn_id_fkey",
+      "definition": "FOREIGN KEY (turn_id) REFERENCES decision_chat_turns(turn_id) ON DELETE CASCADE"
+    },
+    {
+      "name": "dispatch_worker_instances_pkey",
+      "definition": "PRIMARY KEY (worker_id)"
+    },
+    {
+      "name": "dispatch_worker_instances_revision_check",
+      "definition": "CHECK ((revision ~ '^[a-zA-Z0-9-]{1,100}$'::text))"
+    }
+  ]
+}

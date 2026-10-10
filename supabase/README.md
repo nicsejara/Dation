@@ -74,3 +74,19 @@ La lista de casos se limita a 100 y mantiene las aprobaciones/conteos actuales.
 `summary=true` omite los perfiles completos de datasets para el selector; el
 detalle se obtiene al abrir el caso. Sin ese parámetro se mantiene la respuesta
 completa. Ver [Fase 5](../docs/phase5-performance.md) para presupuestos y validación.
+
+
+## Fase 7: disponibilidad y turnos auditados
+
+`20261010233000_operational_observability.sql` añade heartbeat de workers, snapshot
+operativo privado de solo lectura y persistencia atómica de turnos de chat. Los
+mensajes históricos conservan el campo nuevo null. Aplicar antes del worker/API:
+
+```bash
+python scripts/apply_production_observability.py
+```
+
+El manifiesto de `catalog/20261010233000_observability.json` se captura en la base
+PostgreSQL 17 aislada reconstruida desde baseline y migraciones. La instalación
+verifica el catálogo completo y se puede repetir sin escrituras. Runbook, privacidad,
+readiness y rollback: [Fase 7](../docs/phase7-observability.md).

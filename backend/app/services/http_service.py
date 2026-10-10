@@ -8,6 +8,7 @@ from contextlib import asynccontextmanager
 from weakref import WeakKeyDictionary
 
 import httpx
+from app.observability import instrument_http
 
 _clients = WeakKeyDictionary()
 
@@ -22,6 +23,7 @@ async def http_pool():
         limits=httpx.Limits(max_connections=32, max_keepalive_connections=16,
                             keepalive_expiry=30.0),
     ) as client:
+        instrument_http(client)
         _clients[loop] = client
         try:
             yield client
@@ -36,4 +38,5 @@ async def http_client():
         yield client
     else:
         async with httpx.AsyncClient(timeout=30.0) as temporary:
+            instrument_http(temporary)
             yield temporary

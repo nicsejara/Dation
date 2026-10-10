@@ -59,6 +59,9 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.missing_run = False
         self.history_rows = None
         self.history_failure = False
+        self.chat_calls = []
+        self.chat_fail_once = False
+        self.chat_history = None
         self.selector_size = 1
         self.selector_queries = []
         self.pw = await async_playwright().start()
@@ -148,9 +151,17 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             row["result_json"]["decision_case"].update(status="approved",approved_at=row["approved_at"])
             self.case["nodes"][row["node_id"]].update(status="approved",approved_run_id=rid,run_id=rid)
             data = row
-        elif path.endswith("/interpretation"): data = {"explanation":None,"messages":[],"configured":False}
+        elif path.endswith("/interpretation"):
+            data = {"explanation":None,"messages":[],"configured":False}
+            if self.chat_history:
+                offset=int(query.get('offset',['0'])[0])
+                rows=self.chat_history[offset:offset+2]
+                data.update(messages=list(reversed(rows)),pagination={'has_more':len(self.chat_history)>offset+2,'next_offset':offset+2})
         elif path.endswith("/explain"): data = {"summary":"Synthetic explanation"}
-        elif path.endswith("/chat"): data = {"answer":"Synthetic answer"}
+        elif path.endswith("/chat"):
+            self.chat_calls.append(request.post_data_json)
+            data = {"answer":"Synthetic answer"}
+            if self.chat_fail_once and len(self.chat_calls)==1:status,data=504,{'detail':'Synthetic timeout'}
         elif path.startswith("/api/runs/"):
             data = self.runs.get(path.split("/")[3])
             if not data or self.missing_run: status, data = 404, {"detail":"No se encontró la corrida."}
@@ -401,6 +412,26 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(await drawer.is_visible(),False)
         self.assertEqual(await self.page.evaluate("document.activeElement.tagName"),"SUMMARY")
 
+    async def test_chat_retry_reuses_turn_id_and_older_messages_prepend(self):
+        self.chat_fail_once=True
+        self.chat_history=[{'id':str(i),'role':'user' if i%2 else 'assistant','content':'Message '+str(i)} for i in range(4,0,-1)]
+        await self.open("decision-dashboard","logistics_assignment",self.f["ids"]["assignment"])
+        await self.page.locator('[data-chat]').click()
+        await self.page.locator('[data-older]').wait_for(state='visible')
+        await self.page.locator('[data-older]').click()
+        await self.page.wait_for_function("document.querySelector('[data-older]').hidden")
+        self.assertEqual(await self.page.locator('[data-messages] article div').all_text_contents(),['Message 1','Message 2','Message 3','Message 4'])
+        field=self.page.locator('.dispatch-chat textarea')
+        await field.fill('¿Qué debo revisar?')
+        await self.page.locator('.dispatch-chat button[type=submit]').click()
+        await self.page.wait_for_function("document.querySelector('.dispatch-chat textarea').value.length>0")
+        await self.page.locator('.dispatch-chat button[type=submit]').click()
+        await self.page.get_by_text('Synthetic answer',exact=True).wait_for()
+        self.assertEqual(len(self.chat_calls),2)
+        self.assertEqual(self.chat_calls[0]['turn_id'],self.chat_calls[1]['turn_id'])
+        from uuid import UUID
+        UUID(self.chat_calls[0]['turn_id'])
+
     async def test_chat_response_cannot_focus_a_departed_screen(self):
         await self.open("decision-dashboard","logistics_assignment",self.f["ids"]["assignment"])
         self.delay[f"/api/runs/{self.f['ids']['assignment']}/chat"]=.8
@@ -411,6 +442,18 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.page.wait_for_timeout(950)
         self.assertEqual(await self.page.locator(".dispatch-chat").count(),0)
         self.assertNotIn("Synthetic answer",await self.page.locator("body").inner_text())
+
+    async def test_scheduling_does_not_poll_before_admission_finishes(self):
+        self.delay['/api/runs']=1
+        await self.open('logistics-config','logistics_scheduling')
+        await self.page.locator('[data-scheduling-review]').click()
+        await self.page.locator('[data-scheduling-execute]').click()
+        from urllib.parse import parse_qs,urlparse
+        identifier=parse_qs(urlparse(self.page.url).query)['run_id'][0]
+        await self.page.wait_for_timeout(650)
+        self.assertNotIn(('GET','/api/runs/'+identifier),self.requests)
+        await self.page.wait_for_selector('.dispatch-scheduling-dashboard')
+        self.assertIn(('GET','/api/runs/'+identifier),self.requests)
 
     async def test_late_execution_response_does_not_reopen_dashboard(self):
         self.delay['/api/runs']=.8

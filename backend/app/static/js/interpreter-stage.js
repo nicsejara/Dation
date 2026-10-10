@@ -27,7 +27,9 @@
     status: null,
     explanation: null,
     messages: [],
-    lastFailedQuestion: null
+    lastFailedQuestion: null,
+    lastFailedTurnId: null,
+    lastFailedRunId: null
   };
 
   function $(selector) {
@@ -934,6 +936,8 @@
       return;
     }
 
+    var turnId = state.lastFailedQuestion === text && state.lastFailedRunId === state.runId && state.lastFailedTurnId
+      ? state.lastFailedTurnId : crypto.randomUUID();
     setChatError(false);
 
     if (!retrying) {
@@ -983,7 +987,8 @@
             )
           },
           body: JSON.stringify({
-            question: text
+            question: text,
+            turn_id: turnId
           })
         }
       );
@@ -999,6 +1004,7 @@
       }
 
       state.lastFailedQuestion = null;
+      state.lastFailedTurnId = null;
       setChatError(false);
 
       appendMessage(
@@ -1017,6 +1023,8 @@
       }
 
       state.lastFailedQuestion = text;
+      state.lastFailedTurnId = turnId;
+      state.lastFailedRunId = state.runId;
       setChatError(true);
 
       console.error(

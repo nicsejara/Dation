@@ -15,10 +15,12 @@ from fastapi import (
     UploadFile,
 )
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel, Field, ValidationError
+from pydantic import BaseModel, Field, ValidationError, field_validator
 
+from app.observability import RequestTelemetry, configure_logging, identify
+from app.services.operations_service import operational_snapshot, render_metrics
 from app.auth import require_upload_access
 from app.config import supabase_configured
 from app.models.decision_config import DecisionRunConfig
@@ -27,6 +29,7 @@ from app.services.dataset_service import upload_dataset
 from app.services.http_service import http_pool
 from app.services.decision_interpreter_service import (
     answer_question,
+    ChatConflict,
     generate_explanation,
     get_saved_interpretation,
     interpreter_status,
@@ -51,6 +54,7 @@ STATIC_DIR = BASE_DIR / "app" / "static"
 
 @asynccontextmanager
 async def lifespan(app):
+    configure_logging("api")
     async with http_pool():
         yield
 
@@ -65,6 +69,7 @@ app = FastAPI(
 from app.routes.dispatch import router as dispatch_router
 from app.services import dispatch_service
 
+app.add_middleware(RequestTelemetry)
 app.include_router(dispatch_router)
 class RevalidatedStaticFiles(StaticFiles):
     async def get_response(self, path, scope):
@@ -83,6 +88,12 @@ app.mount(
 
 class DecisionQuestion(BaseModel):
     question: str = Field(min_length=2, max_length=2000)
+    turn_id: UUID | None = None
+
+    @field_validator('question', mode='before')
+    @classmethod
+    def trim_question(cls, value):
+        return value.strip() if isinstance(value, str) else value
 
 
 @app.exception_handler(RequestValidationError)
@@ -123,6 +134,26 @@ def root():
 @app.get("/health")
 def health():
     return {"status": "healthy"}
+
+
+@app.get("/ready")
+async def ready(_: str = Depends(require_upload_access)):
+    snapshot = await operational_snapshot()
+    return JSONResponse({"ready": snapshot["ready"], "database": snapshot["database"],
+                         "alerts": snapshot["alerts"]}, status_code=200 if snapshot["ready"] else 503)
+
+
+@app.get("/api/system/operations")
+async def operations(_: str = Depends(require_upload_access)):
+    snapshot = await operational_snapshot()
+    return JSONResponse(snapshot, status_code=200 if snapshot["database"] == "available" else 503)
+
+
+@app.get("/metrics", response_class=PlainTextResponse)
+async def prometheus_metrics(_: str = Depends(require_upload_access)):
+    snapshot = await operational_snapshot()
+    return PlainTextResponse(render_metrics(snapshot), media_type="text/plain; version=0.0.4",
+                             status_code=200 if snapshot["database"] == "available" else 503)
 
 
 @app.get("/app", response_class=HTMLResponse)
@@ -437,10 +468,12 @@ async def read_decision_run(
 @app.get("/api/runs/{run_id}/interpretation")
 async def read_run_interpretation(
     run_id: str,
+    limit: int = Query(default=50, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
     _: str = Depends(require_upload_access),
 ):
     try:
-        return await get_saved_interpretation(run_id)
+        return await get_saved_interpretation(run_id, limit=limit, offset=offset)
     except httpx.HTTPError as exc:
         raise HTTPException(
             status_code=502,
@@ -455,6 +488,8 @@ async def explain_decision_run(
 ):
     try:
         return await generate_explanation(run_id)
+    except TimeoutError as exc:
+        raise HTTPException(504, "El intérprete tardó demasiado. Podés reintentar la solicitud.") from exc
     except LookupError as exc:
         raise HTTPException(
             status_code=404,
@@ -493,7 +528,12 @@ async def chat_about_decision(
         return await answer_question(
             run_id=run_id,
             question=payload.question.strip(),
+            turn_id=str(payload.turn_id) if payload.turn_id else None,
         )
+    except TimeoutError as exc:
+        raise HTTPException(504, "El intérprete tardó demasiado. Podés reintentar la solicitud.") from exc
+    except ChatConflict as exc:
+        raise HTTPException(409, str(exc)) from exc
     except LookupError as exc:
         raise HTTPException(
             status_code=404,

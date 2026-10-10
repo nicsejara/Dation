@@ -201,6 +201,7 @@ export function chat(root,run,initialQuestion=''){
     +'<div class="dispatch-chat-starters">'
       +questions.map(question=>'<button type="button" data-starter="'+esc(question)+'">'+esc(question)+'</button>').join('')
     +'</div>'
+    +'<button type="button" data-older hidden>Ver mensajes anteriores</button>'
     +'<div class="dispatch-chat-thread" data-messages role="log" aria-live="polite"></div>'
     +'<form class="dispatch-chat-composer">'
       +'<textarea required minlength="2" maxlength="2000" rows="3" placeholder="'+esc(meta.placeholder)+'" aria-label="Pregunta para Dation"></textarea>'
@@ -221,8 +222,12 @@ export function chat(root,run,initialQuestion=''){
   const submit=form.querySelector('button[type="submit"]');
   let historyLoaded=false;
   let sending=false;
+  let retryTurn=null;
+  let nextOffset=0;
+  const seenMessages=new Set();
+  const older=root.querySelector("[data-older]");
 
-  function add(role,text,{loading=false,error=false}={}){
+  function add(role,text,{loading=false,error=false,before=null}={}){
     const article=document.createElement('article');
     article.className='dispatch-chat-message is-'+role+(loading?' is-loading':'')+(error?' is-error':'');
     const label=document.createElement('small');
@@ -230,7 +235,7 @@ export function chat(root,run,initialQuestion=''){
     const body=document.createElement('div');
     body.textContent=text;
     article.append(label,body);
-    messages.append(article);
+    messages.insertBefore(article,before);
     messages.scrollTop=messages.scrollHeight;
     return article;
   }
@@ -238,18 +243,22 @@ export function chat(root,run,initialQuestion=''){
   async function sendQuestion(raw){
     const question=String(raw||'').trim();
     if(question.length<2||sending)return;
+    const turn=retryTurn?.question===question?retryTurn:{question,id:crypto.randomUUID()};
     sending=true;
     submit.disabled=true;
     add('user',question);
     field.value='';
     const pending=add('assistant','Analizando la evidencia de esta corrida…',{loading:true});
     try{
-      const data=await post('/api/runs/'+run.id+'/chat',{question},{signal:scope.signal});
+      const data=await post('/api/runs/'+run.id+'/chat',{question,turn_id:turn.id},{signal:scope.signal});
       if(!scope.active)return;
+      retryTurn=null;
+      nextOffset+=2;
       pending.remove();
       add('assistant',data.answer||data.message||data.response||'La respuesta no tiene texto.');
     }catch(error){
       if(!scope.active)return;
+      retryTurn=turn;
       pending.remove();
       add('assistant',error.message,{error:true});
       field.value=question;
@@ -261,10 +270,33 @@ export function chat(root,run,initialQuestion=''){
     }
   }
 
+  function showHistory(data,{prepend=false}={}){
+    const before=prepend?messages.firstChild:null;
+    (data.messages||[]).forEach(message=>{
+      if(message.id&&seenMessages.has(message.id))return;
+      if(message.id)seenMessages.add(message.id);
+      add(message.role,message.content,{before});
+    });
+    nextOffset=data.pagination?.next_offset||nextOffset;
+    older.hidden=!data.pagination?.has_more;
+  }
+
+  older.onclick=async()=>{
+    older.disabled=true;
+    try{
+      const data=await api('/api/runs/'+run.id+'/interpretation?offset='+nextOffset,{signal:scope.signal});
+      if(scope.active)showHistory(data,{prepend:true});
+    }catch(error){
+      if(scope.active)add('assistant',error.message,{error:true});
+    }finally{
+      if(scope.active)older.disabled=false;
+    }
+  };
+
   api('/api/runs/'+run.id+'/interpretation',{signal:scope.signal})
     .then(data=>{
       if(!scope.active)return;
-      (data.messages||[]).forEach(message=>add(message.role,message.content));
+      showHistory(data);
     })
     .catch(()=>{})
     .finally(()=>{
