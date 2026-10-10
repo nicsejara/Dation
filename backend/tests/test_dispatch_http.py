@@ -5,6 +5,7 @@ from main import app
 from app.auth import require_upload_access
 from app.services import decision_case_service
 from app.services import dispatch_service
+from app.services import dispatch_job_service
 
 O='00000000-0000-4000-8000-000000000001'
 F='00000000-0000-4000-8000-000000000002'
@@ -55,9 +56,9 @@ class DispatchHTTPTests(unittest.IsolatedAsyncioTestCase):
         with patch.object(dispatch_service,'check_inputs',AsyncMock(return_value={'valid':True})):
             r=await self.client.post('/api/runs/preflight',json={'orders_dataset_id':O,'fleet_dataset_id':F})
             self.assertEqual(r.status_code,200);self.assertTrue(r.json()['valid'])
-        with patch.object(dispatch_service,'available',AsyncMock(return_value=True)),patch.object(dispatch_service,'execute',AsyncMock(return_value={'id':O,'status':'completed'})) as execute:
+        with patch.object(dispatch_service,'available',AsyncMock(return_value=True)),patch.object(dispatch_job_service,'enqueue',AsyncMock(return_value={'id':O,'status':'completed'})) as execute:
             r=await self.client.post('/api/runs?run_id='+O,json={'orders_dataset_id':O,'fleet_dataset_id':F,'configuration':{'objective':'min_time'}})
-            self.assertEqual(r.status_code,200);self.assertEqual(execute.call_args.args[2]['weights']['time'],1)
+            self.assertEqual(r.status_code,202);self.assertEqual(execute.call_args.args[2]['weights']['time'],1)
         r=await self.client.post('/api/runs',json={'orders_dataset_id':O,'fleet_dataset_id':F,'configuration':{'mode':'custom','objective':'custom','weights':{'cost':1,'trips':1}}})
         self.assertEqual(r.status_code,422)
 
@@ -69,8 +70,8 @@ class DispatchHTTPTests(unittest.IsolatedAsyncioTestCase):
             'available',
             AsyncMock(return_value=True),
         ), patch.object(
-            dispatch_service,
-            'execute',
+            dispatch_job_service,
+            'enqueue',
             AsyncMock(return_value={'id':O,'status':'completed'}),
         ) as execute:
             response=await self.client.post(
@@ -88,19 +89,17 @@ class DispatchHTTPTests(unittest.IsolatedAsyncioTestCase):
                     },
                 },
             )
-            self.assertEqual(response.status_code,200)
+            self.assertEqual(response.status_code,202)
             config=execute.call_args.args[2]
             options=execute.call_args.args[3]
             self.assertEqual(config['weights']['trips'],1)
             self.assertEqual(config['weights']['cost'],0)
             self.assertNotIn('time',config['weights'])
             self.assertNotIn('max_late_days',options)
-            self.ensure_case.assert_awaited_with(case_id,O,F)
-            self.assertEqual(
-                [call.kwargs['status'] for call in self.record_case.await_args_list[-2:]],
-                ['running','review'],
-            )
-            self.sync_case.assert_awaited_with(case_id)
+            self.assertEqual(response.headers['Location'], '/api/runs/'+O)
+            self.assertEqual(response.headers['Retry-After'], '2')
+            self.record_case.assert_not_awaited()
+            self.sync_case.assert_not_awaited()
 
         invalid=await self.client.post(
             '/api/runs',
@@ -139,8 +138,8 @@ class DispatchHTTPTests(unittest.IsolatedAsyncioTestCase):
             'available',
             AsyncMock(return_value=True),
         ), patch.object(
-            dispatch_service,
-            'execute',
+            dispatch_job_service,
+            'enqueue',
             AsyncMock(return_value={'id':O,'status':'completed'}),
         ) as execute:
             response=await self.client.post(
@@ -159,7 +158,7 @@ class DispatchHTTPTests(unittest.IsolatedAsyncioTestCase):
                     },
                 },
             )
-            self.assertEqual(response.status_code,200)
+            self.assertEqual(response.status_code,202)
             self.assertEqual(
                 execute.call_args.args[2]['strategy'],
                 'service_first',
@@ -178,11 +177,7 @@ class DispatchHTTPTests(unittest.IsolatedAsyncioTestCase):
                 execute.call_args.args[6],
                 O,
             )
-            self.validate_upstream.assert_awaited_with(
-                case_id,
-                'logistics_scheduling',
-                O,
-            )
+
 
     async def test_decision_approval_endpoint(self):
         app.dependency_overrides[require_upload_access]=lambda:'dation'
@@ -212,11 +207,7 @@ class DispatchHTTPTests(unittest.IsolatedAsyncioTestCase):
                 case_id=case_id,
                 node_id='logistics_assignment',
             )
-            self.assertEqual(self.record_case.await_args.kwargs['status'],'approved')
-            self.assertEqual(
-                self.record_case.await_args.kwargs['approved_at'],
-                '2026-10-05T00:00:00+00:00',
-            )
+            self.record_case.assert_not_awaited()
             self.sync_case.assert_awaited_with(case_id)
 
     async def test_run_accepts_decision_case_lineage(self):
@@ -227,8 +218,8 @@ class DispatchHTTPTests(unittest.IsolatedAsyncioTestCase):
             'available',
             AsyncMock(return_value=True),
         ), patch.object(
-            dispatch_service,
-            'execute',
+            dispatch_job_service,
+            'enqueue',
             AsyncMock(return_value={'id':O,'status':'completed'}),
         ) as execute:
             response=await self.client.post(
@@ -242,7 +233,7 @@ class DispatchHTTPTests(unittest.IsolatedAsyncioTestCase):
                     },
                 },
             )
-            self.assertEqual(response.status_code,200)
+            self.assertEqual(response.status_code,202)
             self.assertEqual(
                 execute.call_args.args[5],
                 {
