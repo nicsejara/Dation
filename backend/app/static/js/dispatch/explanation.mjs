@@ -1,3 +1,4 @@
+import {createScope} from "./lifecycle.mjs";
 import {esc,api,post,errorBox} from './shared.mjs';
 
 function textBlock(value){
@@ -115,6 +116,7 @@ function starterQuestions(result){
 }
 
 export function render(root,run){
+  const scope=createScope(root);
   const result=run.result_json;
   const meta=schemaMeta(result);
   const questions=starterQuestions(result).slice(0,4);
@@ -140,6 +142,7 @@ export function render(root,run){
   const button=root.querySelector('[data-explain]');
 
   function show(data){
+    if(!scope.active)return;
     response.innerHTML=explanationView(data);
   }
 
@@ -149,12 +152,15 @@ export function render(root,run){
     button.textContent='Analizando evidencia…';
     response.innerHTML='<div class="dispatch-ai-loading"><span></span><p>Identificando eventos, causas modeladas y puntos que requieren revisión…</p></div>';
     try{
-      show(await post('/api/runs/'+run.id+'/explain'));
+      show(await post('/api/runs/'+run.id+'/explain',undefined,{signal:scope.signal}));
+      if(!scope.active)return;
       button.textContent='↻ Regenerar explicación';
     }catch(error){
+      if(!scope.active)return;
       errorBox(response,error,()=>button.click());
       button.textContent=original;
     }finally{
+      if(!scope.active)return;
       button.disabled=false;
     }
   };
@@ -168,8 +174,9 @@ export function render(root,run){
     };
   });
 
-  api('/api/runs/'+run.id+'/interpretation')
+  api('/api/runs/'+run.id+'/interpretation',{signal:scope.signal})
     .then(data=>{
+      if(!scope.active)return;
       if(data.explanation?.response_json){
         show(data.explanation.response_json);
         button.textContent='↻ Regenerar explicación';
@@ -179,6 +186,7 @@ export function render(root,run){
 }
 
 export function chat(root,run,initialQuestion=''){
+  const scope=createScope(root);
   const result=run.result_json;
   const meta=schemaMeta(result);
   const questions=starterQuestions(result).slice(0,4);
@@ -200,6 +208,7 @@ export function chat(root,run,initialQuestion=''){
     +'</form>';
 
   root.querySelector('[data-close]').onclick=()=>{
+    scope.dispose();
     root.hidden=true;
     const dashboard=root.closest('.dispatch-dashboard');
     dashboard?.classList.remove('with-chat');
@@ -235,26 +244,31 @@ export function chat(root,run,initialQuestion=''){
     field.value='';
     const pending=add('assistant','Analizando la evidencia de esta corrida…',{loading:true});
     try{
-      const data=await post('/api/runs/'+run.id+'/chat',{question});
+      const data=await post('/api/runs/'+run.id+'/chat',{question},{signal:scope.signal});
+      if(!scope.active)return;
       pending.remove();
       add('assistant',data.answer||data.message||data.response||'La respuesta no tiene texto.');
     }catch(error){
+      if(!scope.active)return;
       pending.remove();
       add('assistant',error.message,{error:true});
       field.value=question;
     }finally{
+      if(!scope.active)return;
       sending=false;
       submit.disabled=false;
       field.focus();
     }
   }
 
-  api('/api/runs/'+run.id+'/interpretation')
+  api('/api/runs/'+run.id+'/interpretation',{signal:scope.signal})
     .then(data=>{
+      if(!scope.active)return;
       (data.messages||[]).forEach(message=>add(message.role,message.content));
     })
     .catch(()=>{})
     .finally(()=>{
+      if(!scope.active)return;
       historyLoaded=true;
       if(initialQuestion)sendQuestion(initialQuestion);
     });

@@ -25,3 +25,9 @@ Thumbs.db
 
 # Supabase local CLI cache
 supabase/.temp/
+
+.browser-venv/
+browser-artifacts/
+release-artifacts/
+
+.audit-venv/

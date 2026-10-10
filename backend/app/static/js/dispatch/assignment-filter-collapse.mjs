@@ -1,9 +1,6 @@
 const STYLE_ID="assignment-filter-collapse-styles";
 const ROW_SELECTOR=".assignment-config-root .assignment-filter-row:not(.is-invalid)";
-const expandedKeys=new Set();
-const knownKeys=new Set();
-let observer=null;
-let scheduled=false;
+
 
 function rowKey(row){
   const label=row.querySelector(".assignment-filter-row__head strong")?.textContent?.trim();
@@ -81,6 +78,8 @@ function ensureStyles(){
   document.head.append(style);
 }
 
+export function mountFilterCollapse(root){
+  ensureStyles();const expandedKeys=new Set();const knownKeys=new Set();
 function setExpanded(row,key,expanded){
   row.classList.toggle("is-collapsed",!expanded);
   if(expanded)expandedKeys.add(key);else expandedKeys.delete(key);
@@ -133,8 +132,7 @@ function decorateRow(row){
 }
 
 function reconcileRows(){
-  scheduled=false;
-  const rows=[...document.querySelectorAll(ROW_SELECTOR)];
+  const rows=[...root.querySelectorAll(".assignment-filter-row:not(.is-invalid)")];
   const currentKeys=new Set();
   rows.forEach(row=>{
     const key=rowKey(row);
@@ -149,21 +147,6 @@ function reconcileRows(){
   });
 }
 
-function scheduleReconcile(){
-  if(scheduled)return;
-  scheduled=true;
-  queueMicrotask(reconcileRows);
+  return {update:reconcileRows};
 }
-
-function start(){
-  ensureStyles();
-  scheduleReconcile();
-  if(observer)return;
-  observer=new MutationObserver(scheduleReconcile);
-  observer.observe(document.documentElement,{childList:true,subtree:true});
-}
-
-if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start,{once:true});
-else start();
-
 export {filterSummary,rowKey};

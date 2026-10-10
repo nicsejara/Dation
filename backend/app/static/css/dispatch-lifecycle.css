@@ -1,0 +1,4 @@
+.dispatch,.dispatch-trace-dialog{--dation-text:#173b47;--dation-muted:#536b76;--dation-border:#d7e2e5;--dation-focus:#126c70}
+#dispatch-data-root,#dispatch-map-root,#dispatch-config-root,#dispatch-dashboard-root{min-width:0;max-width:100%}
+#dispatch-data-root :focus-visible,#dispatch-map-root :focus-visible,#dispatch-config-root :focus-visible,#dispatch-dashboard-root :focus-visible,.dispatch-trace-dialog :focus-visible,.dispatch-guide-overlay :focus-visible,.dispatch-previous-overlay :focus-visible,.dispatch-validation-overlay :focus-visible{outline:3px solid #126c70!important;outline-offset:3px!important;transition-property:background-color,border-color,box-shadow,transform!important}
+@media(prefers-reduced-motion:reduce){.dispatch *,.dispatch-trace-dialog *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}

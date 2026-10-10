@@ -1,4 +1,4 @@
-import "../dda-variable-config.js?v=assignment-config-v2";
+import "../dda-variable-config.js";
 
 export const DECISION_ORDER = [
   "logistics_assignment",

@@ -17,19 +17,21 @@ class TraceabilityPhase3Contracts(unittest.TestCase):
     def test_controller_restores_data_pack_before_guarded_views(self):
         source = (ROOT / "js" / "dispatch" / "traceability-controller.mjs").read_text(encoding="utf-8")
         self.assertIn("/api/decision-cases?status=active", source)
-        self.assertIn("storeHydratedCase", source)
-        self.assertIn("originalNavigate?.('logistics-data')", source)
-        self.assertIn("waitForWorkspaceReady", source)
-        self.assertIn("reloadInto('logistics-map')", source)
-        self.assertIn("reloadInto('logistics-config')", source)
+        self.assertIn("window.DationDispatch.openCase", source)
+        self.assertNotIn("location.reload", source)
+        self.assertNotIn("sessionStorage", source)
+        workspace = (ROOT / "js" / "dispatch" / "workspace.mjs").read_text()
+        self.assertIn("async function hydrateCase", workspace)
+        self.assertIn("resourceUrl", workspace)
 
     def test_map_exposes_run_history_and_new_run_flow(self):
         source = (ROOT / "js" / "dispatch" / "traceability-controller.mjs").read_text(encoding="utf-8")
         self.assertIn("/runs?node_id=", source)
         self.assertIn("+ Nueva corrida", source)
-        self.assertIn("Historial →", source)
-        self.assertIn("Alternativa nueva", source)
-        self.assertIn("Aprobación anterior", source)
+        self.assertIn("Historial · ", source)
+        ui = (ROOT / "js" / "dispatch" / "traceability-ui.mjs").read_text()
+        self.assertIn("Alternativa", ui)
+        self.assertIn("Aprobación anterior", ui)
         self.assertIn("openRunHistory", source)
 
     def test_history_distinguishes_current_candidate_and_superseded(self):

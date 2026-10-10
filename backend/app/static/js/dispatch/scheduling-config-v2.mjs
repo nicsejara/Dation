@@ -1,3 +1,4 @@
+import {createScope,scopeFor} from "./lifecycle.mjs";
 import {api,esc,num,post} from "./shared.mjs";
 import {
   configSummaryBar,
@@ -8,7 +9,7 @@ import {
   decisionHero,
   decisionInfoNote,
   decisionSectionHeader,
-} from "./decision-config-ui.mjs?v=scheduling-shared-phase2-v1";
+} from "./decision-config-ui.mjs";
 import {
   bindFocusRuleEvents,
   executionRules,
@@ -19,7 +20,7 @@ import {
   normalizeFocusConfig,
   pendingRuleProblem,
   validateFocusRules,
-} from "./scheduling-focus-rules.mjs?v=scheduling-rule-editor-phase3-v1";
+} from "./scheduling-focus-rules.mjs";
 
 const WORKSPACE_KEY="dation.dispatch.workspace.v5";
 const CONFIG_KEY="dation.scheduling.config.v1";
@@ -53,7 +54,7 @@ function ensureStyles(){
 }
 
 function readJson(key,fallback={}){
-  try{return JSON.parse(sessionStorage.getItem(key)||"")||fallback;}catch{return fallback;}
+  try{const value=JSON.parse(sessionStorage.getItem(key)||"");return value&&typeof value==="object"&&!Array.isArray(value)?value:fallback;}catch{return fallback;}
 }
 
 function workspace(){return readJson(WORKSPACE_KEY,{});}
@@ -549,10 +550,11 @@ function scrollToProblem(problem){
   void target.offsetWidth;
   target.classList.add("is-attention");
   target.scrollIntoView({behavior:"smooth",block:"center"});
-  window.setTimeout(()=>target.classList.remove("is-attention"),1800);
+  scopeFor(document.getElementById(ROOT_ID))?.timeout(()=>target.classList.remove("is-attention"),1800);
 }
 
 function bind(root,context){
+  const scope=scopeFor(root);
   const {state,sourceRun,slaAvailable}=context;
   const caseId=state.decisionCase.id;
   const stats=sourceStats(sourceRun);
@@ -568,7 +570,7 @@ function bind(root,context){
     try{
       await navigator.clipboard.writeText(String(caseId));
       const feedback=root.querySelector("[data-scheduling-copy-feedback]");
-      if(feedback){feedback.textContent="Copiado";setTimeout(()=>feedback.textContent="",1200);}
+      if(feedback){feedback.textContent="Copiado";scope?.timeout(()=>feedback.textContent="",1200);}
     }catch{}
   });
   root.querySelector("[data-scheduling-change-data]")?.addEventListener("click",()=>window.dationNavigate?.("logistics-data"));
@@ -629,6 +631,7 @@ function bind(root,context){
     dialog?.showModal();
   });
   root.querySelector("[data-scheduling-execute]")?.addEventListener("click",event=>{
+    if(context.onExecute){const problem=validateConfig(config,slaAvailable,trips);if(problem){root.querySelector("[data-scheduling-review-error]").textContent=problem;return;}dialog?.close();context.onExecute({sourceRun,configuration:executionConfiguration(config),options:executionOptions(config)});return;}
     execute({
       state,
       sourceRun,
@@ -641,61 +644,23 @@ function bind(root,context){
   });
 }
 
-async function mount(root){
-  if(mounting||root.querySelector(".scheduling-config-v2"))return;
-  const state=workspace();
-  if(state.activeNode!=="logistics_scheduling"||!state.decisionCase?.id)return;
-  const sourceRunId=currentSourceRunId(state);
-  if(!sourceRunId)return;
-  mounting=true;
+export async function mount(root,context={}){
+  ensureStyles();const scope=createScope(root),state=context.state||workspace();
+  const sourceRunId=currentSourceRunId(state);if(!sourceRunId)return;
   root.className="dispatch dispatch-upload-pro assignment-config-root scheduling-config-root";
-  root.innerHTML='<section class="dispatch-panel"><p role="status">Preparando la configuración temporal…</p><div class="dispatch-loading"></div></section>';
+  root.innerHTML='<section class="dispatch-panel"><p role="status">Preparando la configuración temporal…</p></section>';
   try{
-    let config=caseConfig(state.decisionCase.id);
-    config=await restoreFromQuery(state.decisionCase.id,config);
-    const [sourceRun,preflight]=await Promise.all([
-      api("/api/runs/"+sourceRunId),
-      post("/api/runs/preflight",{
-        orders_dataset_id:state.orders.id,
-        fleet_dataset_id:state.fleet.id,
-        allow_third_party:true,
-      }),
-    ]);
-    const slaAvailable=readinessSla(preflight);
-    if(!slaAvailable&&config.strategy==="service_first")config={...config,strategy:"earliest_dispatch"};
-    config={...normalizeFocusConfig(config,sourceStats(sourceRun).trips),analysisDepth:"essential"};
-    writeConfig(state.decisionCase.id,config);
-    root.innerHTML=markup({state,sourceRun,slaAvailable,config});
-    bind(root,{state,sourceRun,slaAvailable,config});
-  }catch(error){
-    root.innerHTML='<section class="dispatch-panel"><h1>No se pudo preparar Planificación</h1><p>'+esc(error.message||String(error))+'</p><button type="button" data-scheduling-retry>Reintentar</button></section>';
-    root.querySelector("[data-scheduling-retry]")?.addEventListener("click",()=>{root.innerHTML="";mount(root);});
-  }finally{
-    mounting=false;
-  }
+    const [sourceRun,preflight]=await Promise.all([api('/api/runs/'+sourceRunId,{signal:scope.signal}),context.preflight||post('/api/runs/preflight',{orders_dataset_id:state.orders.id,fleet_dataset_id:state.fleet.id,allow_third_party:true},{signal:scope.signal})]);
+    if(!scope.active||context.isCurrent?.()===false)return;
+    let config=caseConfig(state.decisionCase.id);const slaAvailable=readinessSla(preflight);
+    if(!slaAvailable&&config.strategy==='service_first')config={...config,strategy:'earliest_dispatch'};
+    config={...normalizeFocusConfig(config,sourceStats(sourceRun).trips),analysisDepth:'essential'};
+    writeConfig(state.decisionCase.id,config);root.innerHTML=markup({state,sourceRun,slaAvailable,config});bind(root,{...context,state,sourceRun,slaAvailable,config});
+  }catch(error){if(scope.active)root.textContent=error.message;}
 }
-
-function maybeMount(){
-  if(window.dationGetCurrentView?.()!=="logistics-config")return;
-  const state=workspace();
-  if(state.activeNode!=="logistics_scheduling")return;
-  const root=document.getElementById(ROOT_ID);
-  if(!root||root.querySelector(".scheduling-config-v2"))return;
-  if(!root.querySelector(".dispatch-scheduling-config"))return;
-  mount(root);
-}
-
-function start(){
-  ensureStyles();
-  window.addEventListener("dation:view",()=>queueMicrotask(maybeMount));
-  if(!observer){
-    observer=new MutationObserver(()=>queueMicrotask(maybeMount));
-    observer.observe(document.documentElement,{childList:true,subtree:true});
-  }
-  queueMicrotask(maybeMount);
-}
-
-if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start,{once:true});
-else start();
-
 export {executionConfiguration,executionOptions,validateConfig,windowLabel};
+
+export function restoreRunConfiguration(caseId,source){
+  const config={...defaults(),strategy:source.strategy||'service_first',windowMode:(source.planning_window_start||source.planning_window_end)?'custom':'auto',windowStart:source.planning_window_start||'',windowEnd:source.planning_window_end||'',temporalRules:hydrateExecutionRules(source.temporal_rules||[]),focusRulesOpen:Boolean(source.temporal_rules?.length)};
+  writeConfig(caseId,config);
+}

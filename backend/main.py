@@ -57,9 +57,17 @@ from app.routes.dispatch import router as dispatch_router
 from app.services import dispatch_service
 
 app.include_router(dispatch_router)
+class RevalidatedStaticFiles(StaticFiles):
+    async def get_response(self, path, scope):
+        response = await super().get_response(path, scope)
+        if Path(path).suffix in {".js", ".mjs", ".css"}:
+            response.headers["Cache-Control"] = "no-cache"
+        return response
+
+
 app.mount(
     "/static",
-    StaticFiles(directory=STATIC_DIR),
+    RevalidatedStaticFiles(directory=STATIC_DIR),
     name="static",
 )
 

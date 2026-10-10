@@ -1,3 +1,4 @@
+import {trapFocus} from "../lifecycle.mjs";
 import {csv, download} from "../shared.mjs";
 import {groupProblems} from "./selectors.mjs";
 
@@ -12,7 +13,7 @@ function el(tag, value, className = "") {
   return node;
 }
 
-export function createValidationDrawer() {
+export function createValidationDrawer(scope) {
   document
     .querySelectorAll(".dispatch-validation-overlay")
     .forEach((node) => node.remove());
@@ -36,6 +37,7 @@ export function createValidationDrawer() {
   drawer.append(head, content);
   overlay.append(drawer);
   document.body.append(overlay);
+  scope?.own(()=>{overlay.remove();document.body.classList.remove("dispatch-drawer-open");});
 
   let opener = null;
 
@@ -172,6 +174,7 @@ export function createValidationDrawer() {
     }
   };
   overlay.onkeydown = (event) => {
+    trapFocus(event,drawer);
     if (event.key === "Escape") {
       hide();
     }

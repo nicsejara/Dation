@@ -1,3 +1,4 @@
+import {trapFocus} from "../lifecycle.mjs";
 import {num} from "../shared.mjs";
 
 function el(tag, value, className = "") {
@@ -37,7 +38,7 @@ function datasetStatus(item) {
   return ["Pendiente", "pending"];
 }
 
-export function createPreviousDrawer() {
+export function createPreviousDrawer(scope) {
   document
     .querySelectorAll(".dispatch-previous-overlay")
     .forEach((node) => node.remove());
@@ -75,6 +76,7 @@ export function createPreviousDrawer() {
   drawer.append(head, search, list);
   overlay.append(drawer);
   document.body.append(overlay);
+  scope?.own(()=>{overlay.remove();document.body.classList.remove("dispatch-drawer-open");});
 
   let opener = null;
   let current = [];
@@ -192,6 +194,7 @@ export function createPreviousDrawer() {
     if (event.target === overlay) hide();
   };
   overlay.onkeydown = (event) => {
+    trapFocus(event,drawer);
     if (event.key === "Escape") hide();
   };
 

@@ -1,3 +1,4 @@
+import {createScope} from "./dispatch/lifecycle.mjs";
 import {
   getDatasetProfile,
   getDatasets,
@@ -46,6 +47,7 @@ import {
 
 
 let booting = true;
+let libraryScope=null;
 
 
 function datasetById(id) {
@@ -88,11 +90,13 @@ function openTraceability(
 }
 
 
-async function refreshDatasets() {
+async function refreshDatasets(scope=libraryScope) {
+  if(!scope?.active)return;
   const response = (
-    await getDatasets(80)
+    await getDatasets(80,{signal:scope.signal})
   );
 
+  if(!scope.active)return;
   setDatasets(
     response.items || []
   );
@@ -118,11 +122,13 @@ async function refreshDatasets() {
 }
 
 
-async function refreshRuns() {
+async function refreshRuns(scope=libraryScope) {
+  if(!scope?.active)return;
   const response = (
-    await getRuns(100)
+    await getRuns(100,null,{signal:scope.signal})
   );
 
+  if(!scope.active)return;
   setRuns(
     response.items || []
   );
@@ -134,11 +140,13 @@ async function refreshRuns() {
 }
 
 
-async function refreshSummary() {
+async function refreshSummary(scope=libraryScope) {
+  if(!scope?.active)return;
   const summary = (
-    await getWorkspaceSummary()
+    await getWorkspaceSummary({signal:scope.signal})
   );
 
+  if(!scope.active)return;
   renderHomeSummary(
     summary,
     state.runs,
@@ -146,12 +154,14 @@ async function refreshSummary() {
 }
 
 
-async function refreshInterpreter() {
+async function refreshInterpreter(scope=libraryScope) {
+  if(!scope?.active)return;
   try {
     const interpreter = (
-      await getInterpreterStatus()
+      await getInterpreterStatus({signal:scope.signal})
     );
 
+    if(!scope.active)return;
     setInterpreter(
       interpreter
     );
@@ -165,6 +175,7 @@ async function refreshInterpreter() {
       knowledge_version: "—",
     };
 
+    if(!scope.active)return;
     setInterpreter(
       unavailable
     );
@@ -174,12 +185,13 @@ async function refreshInterpreter() {
 }
 
 
-async function refreshSystemStatus() {
+async function refreshSystemStatus(scope=libraryScope) {
+  if(!scope?.active)return;
   let supabaseOk = false;
 
   try {
     const status = (
-      await getSupabaseStatus()
+      await getSupabaseStatus({signal:scope.signal})
     );
 
     supabaseOk = Boolean(
@@ -189,6 +201,7 @@ async function refreshSystemStatus() {
     supabaseOk = false;
   }
 
+  if(!scope.active)return;
   state.services.supabase = (
     supabaseOk
   );
@@ -260,10 +273,11 @@ async function restoreHistoricalRun(
     );
 
     if (['assignment_v1','scheduling_v1','dispatch_v1','dispatch_v2'].includes(run.result_json?.schema_version)) {
+      if(window.DationDispatch?.openRun)return window.DationDispatch.openRun(run.id);
       if (window.DationDispatch?.show) {
         window.DationDispatch.show(run);
       } else {
-        const dispatch = await import('/static/js/dispatch/workspace.mjs?v=upload-finalbar-v2');
+        const dispatch = await import('/static/js/dispatch/workspace.mjs');
         dispatch.show(run);
       }
       return;
@@ -384,27 +398,9 @@ async function bootstrap() {
   renderTechnicalEvidence(null);
   resetChat([]);
 
-  try {
-    await Promise.all([
-      refreshInterpreter(),
-      refreshDatasets(),
-    ]);
+  booting = false;
+  mountLibraryView(window.dationGetCurrentView?.());
 
-    await Promise.all([
-      refreshRuns(),
-      refreshSummary(),
-    ]);
-
-    await refreshSystemStatus();
-  } catch (error) {
-    toast(
-      "No se pudo inicializar el workspace: "
-      + error.message,
-      "error",
-    );
-  } finally {
-    booting = false;
-  }
 }
 
 
@@ -517,6 +513,7 @@ function bindDecisionStageBridge() {
     dataset,
     profile,
   ) {
+    if(['assignment_v1','scheduling_v1','dispatch_v1','dispatch_v2'].includes(run?.result_json?.schema_version)&&window.DationDispatch)return window.DationDispatch.openRun(run.id);
     if (!run || !dataset || !profile) {
       return;
     }
@@ -646,3 +643,15 @@ bindRefreshActions();
 bindGlobalErrors();
 
 bootstrap();
+
+function mountLibraryView(view){
+  libraryScope?.dispose();libraryScope=null;
+  if(!['traceability','settings','inicio'].includes(view))return;
+  const panel=document.querySelector('[data-view-panel="'+view+'"]');if(!panel)return;
+  const scope=libraryScope=createScope(panel);
+  const work=view==='settings'?refreshInterpreter(scope).then(()=>scope.active&&refreshSystemStatus(scope)):Promise.all([refreshDatasets(scope),refreshRuns(scope),refreshSummary(scope)]);
+  work.catch(error=>{if(scope.active)toast(error.message,'error');});
+}
+window.addEventListener('dation:view',event=>mountLibraryView(event.detail.view));
+window.addEventListener('pagehide',()=>libraryScope?.dispose());
+window.addEventListener('pageshow',event=>{if(event.persisted)mountLibraryView(window.dationGetCurrentView?.());});

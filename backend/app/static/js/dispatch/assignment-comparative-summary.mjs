@@ -4,7 +4,7 @@ import {
   getActiveObjectiveMetrics,
   getComparableScenarios,
   solverStatusLabel,
-} from './assignment-dashboard-selectors.mjs?v=assignment-dashboard-phase3';
+} from './assignment-dashboard-selectors.mjs';
 
 function formatMetric(key,value){
   if(value==null)return '—';

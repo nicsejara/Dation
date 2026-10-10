@@ -4,7 +4,7 @@ import {
   executionConfiguration,
   executionOptions,
   validateConfig,
-} from "./scheduling-config-v2.mjs?v=scheduling-execution-phase4-v1";
+} from "./scheduling-config-v2.mjs";
 
 const WORKSPACE_KEY="dation.dispatch.workspace.v5";
 const CONFIG_KEY="dation.scheduling.config.v1";
@@ -433,7 +433,7 @@ function start(){
   queueMicrotask(enhanceHistoricalDashboard);
 }
 
-start();
+// Compatibility exports only; the canonical workspace owns execution.
 
 export {
   beginExecution,

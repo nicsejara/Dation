@@ -2539,7 +2539,7 @@
       if (window.DationDispatch && typeof window.DationDispatch.show === "function") {
         window.DationDispatch.show(run);
       } else {
-        var dispatch = await import('/static/js/dispatch/workspace.mjs?v=decision-map-nodal-v1');
+        var dispatch = await import('/static/js/dispatch/workspace.mjs');
         dispatch.show(run);
       }
       return;
@@ -2919,7 +2919,7 @@
         )
       ) {
         var exporter = await import(
-          "/static/js/dispatch/export.mjs?v=decision-map-nodal-v1"
+          "/static/js/dispatch/export.mjs"
         );
         exporter.exportDecision(
           run.result_json
@@ -3213,6 +3213,7 @@
   }
 
   async function restoreExecution() {
+    if(window.DationDispatch||new URLSearchParams(location.search).has('view'))return;
     if (['assignment_v1','scheduling_v1','dispatch_v1','dispatch_v2'].includes(new URLSearchParams(location.search).get('dda'))) return;
     var stored = loadContext();
     var urlRunId = runFromUrl();

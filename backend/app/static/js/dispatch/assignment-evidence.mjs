@@ -3,7 +3,7 @@ import {
   getAssignmentTrips,
   getAssignmentVehicles,
   getAssignmentOrders,
-} from './assignment-dashboard-selectors.mjs?v=assignment-dashboard-phase2';
+} from './assignment-dashboard-selectors.mjs';
 
 function ownershipBadge(ownership){
   const thirdParty=ownership==='third_party';

@@ -1,5 +1,5 @@
 import {esc,num} from './shared.mjs';
-import {DECISION_META} from './decision-ui.mjs?v=traceability-v3';
+import {DECISION_META} from './decision-ui.mjs';
 
 const OBJECTIVE_LABELS={
   min_trips:'Menor cantidad de viajes',
@@ -76,17 +76,18 @@ function caseCard(item,currentCaseId){
   +'</article>';
 }
 
-function makeDialog(className,label){
+function makeDialog(className,label,scope){
   const dialog=document.createElement('dialog');
   dialog.className=className;
   dialog.setAttribute('aria-label',label);
   document.body.append(dialog);
+  scope?.own(()=>dialog.remove());
   dialog.addEventListener('close',()=>dialog.remove(),{once:true});
   return dialog;
 }
 
-export function openCaseSelector(cases,{currentCaseId=null,onSelect}={}){
-  const dialog=makeDialog('dispatch-trace-dialog dispatch-case-selector','Seleccionar Decision Case');
+export function openCaseSelector(cases,{currentCaseId=null,onSelect,scope}={}){
+  const dialog=makeDialog('dispatch-trace-dialog dispatch-case-selector','Seleccionar Decision Case',scope);
   dialog.innerHTML='<div class="dispatch-trace-shell">'
     +'<header class="dispatch-trace-header">'
       +'<div><span class="dispatch-trace-eyebrow">TRAZABILIDAD</span><h2>Elegí el Decision Case que querés abrir.</h2>'
@@ -164,10 +165,10 @@ function runCard(run){
   +'</article>';
 }
 
-export function openRunHistory({caseId,nodeId,history,onOpenRun}){
+export function openRunHistory({caseId,nodeId,history,onOpenRun,scope}){
   const meta=DECISION_META[nodeId]||{label:'Decisión'};
   const runs=history?.runs||[];
-  const dialog=makeDialog('dispatch-trace-dialog dispatch-run-history','Historial de corridas');
+  const dialog=makeDialog('dispatch-trace-dialog dispatch-run-history','Historial de corridas',scope);
   dialog.innerHTML='<div class="dispatch-trace-shell dispatch-trace-shell--history">'
     +'<header class="dispatch-trace-header">'
       +'<div><span class="dispatch-trace-eyebrow">'+esc(shortCaseId(caseId))+' · HISTORIAL</span><h2>'+esc(meta.label)+'</h2>'

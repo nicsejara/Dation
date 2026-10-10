@@ -38,18 +38,19 @@ async function request(
 }
 
 
-export function getWorkspaceSummary() {
+export function getWorkspaceSummary(options={}) {
   return request(
-    "/api/workspace/summary"
+    "/api/workspace/summary", options
   );
 }
 
 
 export function getDatasets(
   limit = 50,
+  options = {},
 ) {
   return request(
-    `/api/datasets?limit=${limit}`
+    `/api/datasets?limit=${limit}`, options
   );
 }
 
@@ -68,6 +69,7 @@ export function getDatasetProfile(
 export function getRuns(
   limit = 60,
   datasetId = null,
+  options = {},
 ) {
   const params = new URLSearchParams({
     limit: String(limit),
@@ -81,7 +83,7 @@ export function getRuns(
   }
 
   return request(
-    `/api/runs?${params.toString()}`
+    `/api/runs?${params.toString()}`, options
   );
 }
 
@@ -105,16 +107,16 @@ export function getRunInterpretation(
 }
 
 
-export function getInterpreterStatus() {
+export function getInterpreterStatus(options={}) {
   return request(
-    "/api/system/llm-status"
+    "/api/system/llm-status", options
   );
 }
 
 
-export function getSupabaseStatus() {
+export function getSupabaseStatus(options={}) {
   return request(
-    "/api/system/supabase-check"
+    "/api/system/supabase-check", options
   );
 }
 

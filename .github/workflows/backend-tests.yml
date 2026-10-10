@@ -34,7 +34,15 @@ jobs:
         working-directory: backend
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install --require-hashes -r requirements.txt
+          pip check
+          python -m venv .audit-venv
+          .audit-venv/bin/pip install --require-hashes -r requirements-dev.txt
+          .audit-venv/bin/pip-audit --disable-pip --no-deps -r requirements.txt
+          .audit-venv/bin/pip-audit --disable-pip --no-deps -r requirements-browser.txt
+          python -m venv .browser-venv
+          .browser-venv/bin/pip install --require-hashes -r requirements-browser.txt
+          .browser-venv/bin/playwright install --with-deps chromium
 
       - name: Compile backend
         working-directory: backend
@@ -44,15 +52,8 @@ jobs:
       - name: Check frontend JavaScript syntax
         working-directory: backend
         run: |
-          for file in app/static/js/api.js app/static/js/state.js app/static/js/ui.js app/static/js/app.js; do
+          find app/static/js \( -name '*.js' -o -name '*.mjs' \) -print0 | while IFS= read -r -d '' file; do
             node --input-type=module --check < "$file"
-          done
-          for file in app/static/js/decision-stage.js app/static/js/dashboard-formatters.js app/static/js/dashboard-selectors.js app/static/js/dashboard-stage.js app/static/js/interpreter-stage.js; do
-            node --check "$file"
-          done
-
-          find app/static/js/dispatch -name '*.mjs' -print0 | while IFS= read -r -d '' file; do
-            node --check "$file"
           done
 
       - name: Run automated tests
@@ -63,3 +64,8 @@ jobs:
           node --test tests/test_dispatch_selectors.mjs
           node --test tests/test_dispatch_upload_selectors.mjs
           node --test tests/test_decision_case.mjs
+          node --test tests/test_navigation.mjs tests/test_lifecycle.mjs
+
+      - name: Run browser regression tests with synthetic API data
+        working-directory: backend
+        run: .browser-venv/bin/python tests/browser/test_navigation.py

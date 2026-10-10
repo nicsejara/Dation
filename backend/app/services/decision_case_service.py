@@ -705,12 +705,15 @@ async def list_cases(
     rows = await _db("GET", "decision_cases", params=params) or []
 
     async def hydrate(row: dict) -> dict:
-        orders, fleet = await _validate_data_pack(
-            str(row["orders_dataset_id"]),
-            str(row["fleet_dataset_id"]),
+        orders, fleet, runs = await asyncio.gather(
+            get_dataset(str(row["orders_dataset_id"])),
+            get_dataset(str(row["fleet_dataset_id"])),
+            list_case_runs(str(row["id"])),
         )
-        state = _validate_state(
-            row.get("state_json") or {},
+        if not orders or not fleet:
+            raise LookupError("No se encontró el Data Pack del Decision Case.")
+        state = _state_with_history(
+            row.get("state_json") or {}, runs,
             case_id=str(row["id"]),
             orders_dataset_id=str(row["orders_dataset_id"]),
             fleet_dataset_id=str(row["fleet_dataset_id"]),

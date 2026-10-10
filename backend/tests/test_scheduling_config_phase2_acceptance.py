@@ -39,3 +39,11 @@ def test_phase2_progressive_disclosure_does_not_change_execution_payload():
     assert 'temporal_rules:executionRules(config)' in UI
     assert 'planning_window_start:config.windowMode==="custom"?config.windowStart:null' in UI
     assert 'planning_window_end:config.windowMode==="custom"?config.windowEnd:null' in UI
+
+
+def load_tests(loader, tests, pattern):
+    import unittest
+    for name, value in sorted(globals().items()):
+        if name.startswith("test_") and callable(value):
+            tests.addTest(unittest.FunctionTestCase(value))
+    return tests

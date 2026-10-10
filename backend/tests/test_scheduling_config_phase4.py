@@ -16,15 +16,15 @@ CSS = (STATIC / "css" / "scheduling-execution-phase4.css").read_text(encoding="u
 class SchedulingConfigPhase4LifecycleTests(unittest.TestCase):
     def test_shell_bootstraps_shared_configuration_layer_explicitly(self):
         self.assertIn(
-            'import("./dda-variable-config.js?v=scheduling-execution-phase4-v1")',
+            'import("./dda-variable-config.js")',
             SHELL,
         )
         self.assertIn(
-            'scheduling-config-v2.mjs?v=scheduling-execution-phase4-v1',
+            'scheduling-config-v2.mjs',
             BOOTSTRAP,
         )
         self.assertIn(
-            'scheduling-execution-phase4.mjs?v=scheduling-execution-phase4-v1',
+            'scheduling-execution-phase4.mjs',
             BOOTSTRAP,
         )
 

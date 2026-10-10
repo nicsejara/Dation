@@ -30,3 +30,11 @@ def test_decision_panel_copy_wraps_instead_of_overflowing():
 def test_mobile_case_summary_stacks_cleanly():
     assert "@media(max-width:760px)" in CSS
     assert 'grid-template-areas:"identity" "action" "pack"' in CSS
+
+
+def load_tests(loader, tests, pattern):
+    import unittest
+    for name, value in sorted(globals().items()):
+        if name.startswith("test_") and callable(value):
+            tests.addTest(unittest.FunctionTestCase(value))
+    return tests

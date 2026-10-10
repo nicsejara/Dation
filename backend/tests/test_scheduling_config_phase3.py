@@ -25,11 +25,11 @@ BOOTSTRAP = (
 class SchedulingConfigPhase3RuleEditorTests(unittest.TestCase):
     def test_phase3_is_bootstrapped_and_cache_busted(self):
         self.assertIn(
-            'scheduling-config-v2.mjs?v=scheduling-rule-editor-phase3-v1',
+            'scheduling-config-v2.mjs',
             BOOTSTRAP,
         )
         self.assertIn(
-            'scheduling-focus-rules.mjs?v=scheduling-rule-editor-phase3-v1',
+            'scheduling-focus-rules.mjs',
             CONFIG,
         )
         self.assertIn(
@@ -39,7 +39,7 @@ class SchedulingConfigPhase3RuleEditorTests(unittest.TestCase):
 
     def test_rule_list_reuses_shared_rule_card_primitive(self):
         self.assertIn(
-            'decisionRuleCard} from "./decision-config-ui.mjs?v=scheduling-rule-editor-phase3-v1"',
+            'decisionRuleCard} from "./decision-config-ui.mjs"',
             FOCUS,
         )
         self.assertIn("decisionRuleCard({", FOCUS)

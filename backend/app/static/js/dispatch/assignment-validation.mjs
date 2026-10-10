@@ -2,7 +2,7 @@ import {esc,num} from './shared.mjs';
 import {
   getApprovalWarnings,
   solverStatusLabel,
-} from './assignment-dashboard-selectors.mjs?v=assignment-dashboard-phase2';
+} from './assignment-dashboard-selectors.mjs';
 
 function engineEvidence(result){
   const selected=result?.scenarios?.selected||{};

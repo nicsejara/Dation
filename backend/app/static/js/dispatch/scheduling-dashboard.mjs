@@ -1,7 +1,8 @@
+import {scopeFor} from "./lifecycle.mjs";
 import {esc,num,pct,date,chart,dispose,download,api,errorBox} from './shared.mjs';
 import {exportDecision} from './export.mjs';
 import * as explanation from './explanation.mjs';
-import {decisionRail,bindDecisionRail} from './decision-nav.mjs?v=decision-map-phase1-v1';
+import {decisionRail,bindDecisionRail} from './decision-nav.mjs';
 
 function exportSchedule(result){
   return exportDecision(result);
@@ -243,8 +244,9 @@ export function render(root,run,onRerun,caseActions={}){
     errorBox(explainRoot,error,()=>explanation.render(explainRoot,run));
   }
 
-  api('/api/system/llm-status')
+  api('/api/system/llm-status',{signal:scopeFor(root)?.signal})
     .then(data=>{
+      if(!scopeFor(root)?.active)return;
       const el=root.querySelector('[data-ai-details]');
       if(el)el.textContent='IA: '+(data.configured?(data.provider+' · '+data.model):'Sin configurar');
     })
