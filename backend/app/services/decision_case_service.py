@@ -344,10 +344,13 @@ async def history_snapshot(case_id: str, *, node_id: str | None = None,
         raise ValueError("Nodo de Decision Case inválido.")
     if not 0 <= limit <= 200 or offset < 0:
         raise ValueError("Paginación de corridas inválida.")
-    return await _db("POST", "rpc/decision_case_history", body={
-        "target_case_id": case_id, "target_node_id": node_id,
+    params = {
+        "target_case_id": case_id,
         "page_limit": limit, "page_offset": offset,
-    })
+    }
+    if node_id is not None:
+        params["target_node_id"] = node_id
+    return await _db("GET", "rpc/decision_case_history", params=params)
 
 
 def _execution_node_status(run: dict) -> str:

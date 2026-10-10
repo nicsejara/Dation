@@ -10,6 +10,19 @@ from test_decision_run_history_v2 import CASE_ID,ORDERS_ID,FLEET_ID,ASSIGNMENT_1
 
 
 class PersistenceTests(unittest.IsolatedAsyncioTestCase):
+    async def test_history_rpc_uses_only_a_read_request_and_omits_null_node(self):
+        requests=[]
+        def respond(request):
+            requests.append(request)
+            return httpx.Response(200,json=self.snapshot())
+        client=httpx.AsyncClient(transport=httpx.MockTransport(respond))
+        with patch.object(cases.httpx,'AsyncClient',return_value=client), \
+             patch.object(cases,'SUPABASE_URL','https://qa.invalid'):
+            snapshot=await cases.history_snapshot(CASE_ID)
+        self.assertEqual([r.method for r in requests],['GET'])
+        self.assertNotIn('target_node_id',requests[0].url.params)
+        self.assertEqual(snapshot['summaries']['logistics_assignment']['run_count'],1501)
+
     async def test_private_api_requires_credentials(self):
         async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app),base_url='http://test') as client:
             response=await client.get(f'/api/decision-cases/{CASE_ID}/runs')
