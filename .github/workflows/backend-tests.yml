@@ -102,12 +102,16 @@ jobs:
           DATION_E2E_ARTIFACTS: ${{ runner.temp }}/dation-e2e-artifacts
         run: |
           python - <<'PY'
-          import subprocess, sys
+          import json, subprocess, sys
           result = subprocess.run([sys.executable, "tests/e2e/run_suite.py"], capture_output=True, text=True)
           output = result.stdout + result.stderr
           print(output)
           if result.returncode:
-              detail = output[-15000:].replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+              # Keep the actual assertion, not log tails that exceed annotation limits.
+              reports = [line.removeprefix("DATION_E2E_RESULT=") for line in result.stdout.splitlines() if line.startswith("DATION_E2E_RESULT=")]
+              failures = json.loads(reports[-1]).get("failure_details", []) if reports else []
+              failure = "\n".join(item["test"] + "\n" + item["traceback"] for item in failures) or output
+              detail = failure[-3500:].replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
               print("::error title=End-to-end regression failure::" + detail)
           sys.exit(result.returncode)
           PY
