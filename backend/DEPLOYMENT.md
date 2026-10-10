@@ -4,7 +4,7 @@ API esperada: **1.0.0**. Motor Assignment activo: **1.0.0** (`assignment_v1`). M
 
 ## Activación manual en Supabase
 
-**El código no aplica migraciones productivas automáticamente. El propietario las ejecuta en SQL Editor.**
+**El arranque no aplica migraciones productivas automáticamente. Las migraciones se ejecutan explícitamente con acceso administrativo.** La publicación de las Fases 0–3 se describe en [la guía de producción](../docs/phase3-production.md).
 
 Aplicar en este orden:
 
@@ -96,7 +96,7 @@ uvicorn main:app --host 0.0.0.0 --port "${PORT:-8080}"
 
 Variables existentes: `SUPABASE_URL`, `SUPABASE_SECRET_KEY`, `SUPABASE_INPUT_BUCKET`, `DATION_ACCESS_PASSWORD` y `LLM_*`. No guardar credenciales en GitHub.
 
-Antes de uso intensivo revisar timeout, memoria y concurrencia. El POST de corrida mantiene la petición abierta; el polling consulta progreso. `DATION_STALE_RUN_SECONDS` vale 600 por defecto.
+Con Fase 3, `POST /api/runs` devuelve `202` después de guardar atómicamente corrida e intención. Un worker independiente calcula y persiste el resultado con lease; el polling sólo lee. La expiración y recuperación pertenecen al worker, con tres intentos y plazo de treinta minutos. Los workers usan CPU asignada permanentemente y al menos una instancia.
 
 ## Verificación
 

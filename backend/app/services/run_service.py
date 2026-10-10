@@ -252,12 +252,4 @@ async def get_run(run_id: str) -> dict | None:
 
     data = response.json()
     run = data[0] if data else None
-    if run and run.get('status') == 'running' and run.get('started_at'):
-        started = datetime.fromisoformat(run['started_at'].replace('Z', '+00:00'))
-        if (datetime.now(timezone.utc)-started).total_seconds() > max(300, int(os.getenv('DATION_STALE_RUN_SECONDS', '600'))):
-            values = {'status':'error','error_message':'La corrida excedió el tiempo máximo. Volvé a ejecutarla.',
-                      'finished_at':datetime.now(timezone.utc).isoformat()}
-            from app.services.dispatch_service import db
-            updated = await db('PATCH', 'decision_runs', params={'id':f'eq.{run_id}','status':'eq.running'}, body=values)
-            if updated: run = updated[0]
     return run

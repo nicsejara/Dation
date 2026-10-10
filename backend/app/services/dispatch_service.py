@@ -131,28 +131,29 @@ async def _probe_rest(path, params):
         return False, "No se pudo conectar con Supabase."
 
 
-async def _probe_default_rpc():
+async def _probe_rpc_catalog(required):
+    """Inspect PostgREST's authorized OpenAPI surface without invoking business RPCs."""
     if not supabase_configured():
         return False, "Supabase no está configurado."
-    url = f"{SUPABASE_URL}/rest/v1/rpc/set_default_fleet"
-    body = {"target_id": "00000000-0000-0000-0000-000000000000"}
     try:
         async with httpx.AsyncClient(timeout=15) as client:
-            response = await client.post(
-                url,
-                headers={
-                    **_headers(),
-                    "Content-Type": "application/json",
-                },
-                json=body,
+            response = await client.get(
+                f"{SUPABASE_URL}/rest/v1/",
+                headers={**_headers(), "Accept": "application/openapi+json"},
             )
-        if response.status_code == 404:
-            return False, "La función set_default_fleet no está expuesta."
-        if response.status_code < 500:
-            return True, "La función está disponible."
-        return False, f"Supabase respondió HTTP {response.status_code}."
-    except httpx.HTTPError:
-        return False, "No se pudo comprobar la función."
+        if not response.is_success:
+            return False, f"No se pudo verificar la función (HTTP {response.status_code})."
+        paths = response.json().get("paths", {})
+        missing = [name for name in required if "post" not in paths.get("/rpc/" + name, {})]
+        if missing:
+            return False, "Funciones ausentes en el catálogo autorizado: " + ", ".join(missing)
+        return True, "Funciones visibles en el catálogo autorizado; no se ejecutaron."
+    except (httpx.HTTPError, ValueError, AttributeError):
+        return False, "No se pudo comprobar el catálogo de funciones."
+
+
+async def _probe_default_rpc():
+    return await _probe_rpc_catalog(["set_default_fleet"])
 
 
 async def _probe_bucket():
@@ -221,10 +222,26 @@ async def system_status():
         },
     )
     rpc_ok, rpc_detail = await _probe_default_rpc()
+    jobs_ok, jobs_detail = await _probe_rest("dispatch_run_jobs", {
+        "select": "run_id,request_json,request_fingerprint,state,attempts,lease_token,lease_expires_at,deadline_at", "limit": "0",
+    })
+    outbox_ok, outbox_detail = await _probe_rest("decision_case_reconciliations", {
+        "select": "case_id,version,attempts,available_at", "limit": "0",
+    })
+    queue_rpc_ok, queue_rpc_detail = await _probe_rpc_catalog([
+        "enqueue_dispatch_run", "claim_dispatch_job", "heartbeat_dispatch_job",
+        "finish_dispatch_job", "cancel_dispatch_job", "ack_case_reconciliation",
+    ])
     bucket_ok, bucket_detail = await _probe_bucket()
     schema_ok = datasets_ok and runs_ok
 
     checks = [
+        {
+            "id": "durable_queue", "label": "Ejecuciones recuperables",
+            "ok": jobs_ok and outbox_ok and queue_rpc_ok,
+            "detail": "Cola y reconciliación disponibles." if jobs_ok and outbox_ok and queue_rpc_ok else (jobs_detail or outbox_detail or queue_rpc_detail),
+            "fix": "Aplicá la migración dispatch_durable_jobs y desplegá el worker independiente.",
+        },
         {
             "id": "supabase",
             "label": "Conexión a Supabase",
@@ -331,7 +348,7 @@ async def available():
     return bool((await system_status())["available"])
 
 
-async def _ensure_profile(dataset):
+async def _ensure_profile(dataset, *, persist=False):
     kind = dataset.get("dataset_type")
     if kind not in REPORT_VALIDATORS:
         return dataset
@@ -366,11 +383,10 @@ async def _ensure_profile(dataset):
                 report.get("suggested_label")
                 or dataset.get("original_filename")
             )
+        if not persist:
+            return {**dataset, **values}
         rows = await db(
-            "PATCH",
-            "datasets",
-            params={"id": f"eq.{dataset['id']}"},
-            body=values,
+            "PATCH", "datasets", params={"id": f"eq.{dataset['id']}"}, body=values,
         )
         return rows[0] if rows else {**dataset, **values}
     except (httpx.HTTPError, ValueError):
@@ -825,11 +841,17 @@ async def execute(
     run_id=None,
     decision_case=None,
     source_run_id=None,
+    *,
+    execution_writer=None,
+    progress_handler=None,
 ):
     orders_dataset, fleet_dataset, orders_bytes, fleet_bytes = await load_inputs(
         orders_id,
         fleet_id,
     )
+    for dataset, contents in ((orders_dataset, orders_bytes), (fleet_dataset, fleet_bytes)):
+        if dataset.get("sha256") and hashlib.sha256(contents).hexdigest() != dataset["sha256"]:
+            raise ValueError("El archivo almacenado cambió desde la carga del dataset.")
     run_id = run_id or str(uuid4())
     node_id = (
         decision_case.get("node_id")
@@ -953,7 +975,7 @@ async def execute(
 
     start = perf_counter()
     now = datetime.now(timezone.utc).isoformat()
-    await _insert_run(
+    run_payload = (
         {
             "id": run_id,
             "dataset_id": orders_id,
@@ -1006,7 +1028,12 @@ async def execute(
         }
     )
 
+    if execution_writer is None:
+        await _insert_run(run_payload)
+
     async def update(values):
+        if execution_writer is not None:
+            return await execution_writer(values)
         return await db(
             "PATCH",
             "decision_runs",
@@ -1020,11 +1047,14 @@ async def execute(
     loop = asyncio.get_running_loop()
 
     def progress(stage):
+        if progress_handler is not None:
+            progress_handler(stage)
+            return
         future = asyncio.run_coroutine_threadsafe(
             update({"progress_json": {"stage": stage}}),
             loop,
         )
-        future.result(timeout=35)
+        future.result(timeout=15)
 
     metadata = {
         key: {
@@ -1094,6 +1124,7 @@ async def execute(
                 "duration_ms": int((perf_counter() - start) * 1000),
                 "result_json": result,
                 "result_fingerprint": result["result_fingerprint"],
+                "input_fingerprint": run_payload["input_fingerprint"],
                 "summary_json": result["scenarios"]["selected"]["metrics"],
                 "progress_json": {"stage": "completed"},
                 "error_message": None,

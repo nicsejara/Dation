@@ -3,6 +3,7 @@ from typing import Literal
 from uuid import UUID, uuid4
 
 import httpx
+import logging
 from fastapi import (
     APIRouter,
     Depends,
@@ -25,6 +26,7 @@ from app.models.dispatch_config import DispatchConfig, DispatchOptions
 from app.models.scheduling_config import SchedulingConfig, SchedulingOptions
 from app.services import decision_case_service as case_service
 from app.services import dispatch_service as service
+from app.services import dispatch_job_service as jobs
 from app.services.assignment_config_service import preview_assignment_configuration
 from app.validators.contracts import public_contracts, template_csv
 
@@ -154,6 +156,10 @@ async def guarded(call):
         raise HTTPException(408, str(exc)) from exc
     except LookupError as exc:
         raise HTTPException(404, str(exc)) from exc
+    except jobs.RunConflict as exc:
+        raise HTTPException(409, str(exc)) from exc
+    except jobs.QueueFull as exc:
+        raise HTTPException(429, str(exc), headers={"Retry-After":"5"}) from exc
     except ValueError as exc:
         raise HTTPException(422, str(exc)) from exc
     except httpx.HTTPError as exc:
@@ -345,82 +351,25 @@ async def assignment_preview(payload: AssignmentPreviewRequest):
     )
 
 
-@router.post("/api/runs")
-async def run(
-    payload: RunRequest,
-    run_id: UUID | None = Query(None),
-):
+@router.post("/api/runs", status_code=202)
+async def run(payload: RunRequest, response: Response, run_id: UUID | None = Query(None)):
     if not await service.available():
-        raise HTTPException(
-            503,
-            "El almacenamiento de Dispatch todavía no está activado.",
-        )
-
+        raise HTTPException(503, "El almacenamiento de Dispatch todavía no está activado.")
     effective_run_id = str(run_id or uuid4())
-    case_ref = (
-        payload.decision_case.model_dump(mode="json")
-        if payload.decision_case
-        else None
-    )
+    case_ref = payload.decision_case.model_dump(mode="json") if payload.decision_case else None
+    result = await guarded(jobs.enqueue(
+        str(payload.orders_dataset_id), str(payload.fleet_dataset_id),
+        payload.configuration, payload.options, effective_run_id, case_ref,
+        str(payload.source_run_id) if payload.source_run_id else None,
+    ))
+    response.headers["Location"] = "/api/runs/" + effective_run_id
+    response.headers["Retry-After"] = "2"
+    return result
 
-    async def operation():
-        if case_ref:
-            await case_service.ensure_case(
-                case_ref["case_id"],
-                str(payload.orders_dataset_id),
-                str(payload.fleet_dataset_id),
-            )
-            if case_ref["node_id"] in case_service.UPSTREAM_NODE:
-                await case_service.validate_upstream_run(
-                    case_ref["case_id"],
-                    case_ref["node_id"],
-                    str(payload.source_run_id),
-                )
-            await case_service.record_node_state(
-                case_ref["case_id"],
-                case_ref["node_id"],
-                run_id=effective_run_id,
-                status="running",
-            )
-        try:
-            result = await service.execute(
-                str(payload.orders_dataset_id),
-                str(payload.fleet_dataset_id),
-                payload.configuration,
-                payload.options,
-                effective_run_id,
-                case_ref,
-                (
-                    str(payload.source_run_id)
-                    if payload.source_run_id
-                    else None
-                ),
-            )
-        except Exception as exc:
-            if case_ref:
-                try:
-                    await case_service.record_node_state(
-                        case_ref["case_id"],
-                        case_ref["node_id"],
-                        run_id=effective_run_id,
-                        status="error",
-                        error=str(exc)[:1500],
-                    )
-                    await case_service.sync_case_history(case_ref["case_id"])
-                except Exception:
-                    pass
-            raise
-        if case_ref:
-            await case_service.record_node_state(
-                case_ref["case_id"],
-                case_ref["node_id"],
-                run_id=effective_run_id,
-                status="review",
-            )
-            await case_service.sync_case_history(case_ref["case_id"])
-        return result
 
-    return await guarded(operation())
+@router.post("/api/runs/{run_id}/cancel")
+async def cancel_run(run_id: UUID):
+    return await guarded(jobs.cancel(str(run_id)))
 
 
 @router.post("/api/runs/{run_id}/approve")
@@ -434,14 +383,13 @@ async def approve_run(
             case_id=str(payload.case_id),
             node_id=payload.node_id,
         )
-        await case_service.record_node_state(
-            str(payload.case_id),
-            payload.node_id,
-            run_id=str(run_id),
-            status="approved",
-            approved_at=run.get("approved_at"),
-        )
-        await case_service.sync_case_history(str(payload.case_id))
+        # Approval and the reconciliation outbox commit together in the database.
+        # A failed projection cannot turn a persisted approval into an HTTP failure.
+        try:
+            await case_service.sync_case_history(str(payload.case_id))
+        except (httpx.HTTPError, ValueError, LookupError):
+            logging.getLogger(__name__).warning("approval_projection_pending run_id=%s case_id=%s",run_id,payload.case_id)
+            run = {**run, "projection_pending": True}
         return run
 
     return await guarded(operation())
@@ -492,3 +440,13 @@ async def template(kind: str):
             "Content-Disposition": f'attachment; filename="{kind}.csv"',
         },
     )
+
+
+@router.post("/api/datasets/{dataset_id}/refresh-profile")
+async def refresh_dataset_profile(dataset_id: UUID):
+    async def operation():
+        dataset = await service.get_dataset(str(dataset_id))
+        if not dataset:
+            raise LookupError("No se encontró el dataset.")
+        return {"dataset": await service._ensure_profile(dataset, persist=True)}
+    return await guarded(operation())

@@ -47,7 +47,7 @@ jobs:
       - name: Compile backend
         working-directory: backend
         run: |
-          python -m compileall app main.py
+          python -m compileall app main.py worker.py
 
       - name: Check frontend JavaScript syntax
         working-directory: backend
@@ -69,3 +69,14 @@ jobs:
       - name: Run browser regression tests with synthetic API data
         working-directory: backend
         run: .browser-venv/bin/python tests/browser/test_navigation.py
+
+      - name: Verify durable jobs on disposable PostgreSQL 16
+        working-directory: backend
+        run: |
+          docker run -d --name dation-ci-postgres -e POSTGRES_HOST_AUTH_METHOD=trust postgres:16-alpine
+          trap 'docker rm -f dation-ci-postgres' EXIT
+          for attempt in {1..30}; do
+            if docker exec dation-ci-postgres pg_isready -U postgres; then break; fi
+            sleep 1
+          done
+          DATION_SQL_TEST_CONTAINER=dation-ci-postgres python tests/integration/test_durable_queue_sql.py -v
