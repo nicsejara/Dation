@@ -4,9 +4,12 @@ API esperada: **1.0.0**. Motor Assignment activo: **1.0.0** (`assignment_v1`). M
 
 ## Activación manual en Supabase
 
-**El arranque no aplica migraciones productivas automáticamente. Las migraciones se ejecutan explícitamente con acceso administrativo.** La publicación de las Fases 0–3 se describe en [la guía de producción](../docs/phase3-production.md).
+**El arranque no aplica migraciones productivas automáticamente.** Consultar el
+[baseline real y orden completo de instalación/upgrade](../supabase/README.md),
+la [publicación de Fase 3](../docs/phase3-production.md) y la
+[persistencia y trazabilidad de Fase 4](../docs/phase4-persistence.md).
 
-Aplicar en este orden:
+Las primeras migraciones históricas fueron:
 
 1. `supabase/migrations/20261001004934_dispatch_v1.sql`
 2. `supabase/migrations/20261001193000_dataset_library.sql`
@@ -88,7 +91,9 @@ New `logistics_assignment` executions use Assignment Engine 1.0.0 and no longer 
 
 ## Cloud Run
 
-El despliegue automático usa el buildpack actual de Google Cloud sobre Ubuntu 24; el repo está alineado con Python 3.13. El proceso de aplicación sigue siendo:
+El despliegue automático desde GitHub `main` usa el Dockerfile raíz, con Python 3.13
+y dependencias verificadas por hashes. Cloud Build publica la misma imagen en el
+worker y espera su disponibilidad antes de actualizar la API. El proceso HTTP es:
 
 ```bash
 uvicorn main:app --host 0.0.0.0 --port "${PORT:-8080}"
@@ -111,9 +116,13 @@ node --test tests/test_dispatch_upload_selectors.mjs
 
 En despliegue verificar `/health`, `/app`, `/upload`, `/api/dispatch/status`, una validación de cada tipo, una persistencia de ambos archivos y una corrida completa.
 
-## Baseline SQL pendiente
+## Baseline SQL capturado
 
-El repositorio aún no dispone del DDL original completo de `datasets` y `decision_runs`. No se genera un `baseline.sql` por inferencia: primero debe capturarse el esquema real mediante `information_schema`/catálogo. Esto evita versionar una reconstrucción incorrecta.
+El DDL público real de producción al cierre de Fase 3 está en
+`supabase/baseline/20261010100000_public_schema.sql`, acompañado de su manifiesto.
+Una instalación nueva aplica ese baseline y sólo las migraciones posteriores.
+Producción existente aplica únicamente la migración de Fase 4. Las pruebas de CI
+comparan la reconstrucción contra el catálogo capturado sobre PostgreSQL 17.
 
 ## Rollback
 
@@ -167,7 +176,7 @@ Después del deploy verificar:
 9. En móvil, el mapa debe apilar los tres nodos sin overflow horizontal.
 
 
-## Smoke test — Assignment Engine Phase 3
+## Smoke test — Assignment Engine (hito histórico)
 
 No agrega tablas ni columnas nuevas en Supabase. El trigger histórico de integridad sigue validando `dispatch_v1/dispatch_v2`; nuevas corridas `assignment_v1` son validadas por la API/servicio antes de persistirse.
 
@@ -196,9 +205,12 @@ Después del deploy verificar:
 El deploy sólo se considera validado después de ejecutar este smoke test contra la revisión de Cloud Run que esté recibiendo tráfico.
 
 
-## Smoke test — Scheduling Engine Phase 4
+## Smoke test — Scheduling Engine (hito histórico)
 
-Fase 4 no agrega tablas ni columnas nuevas. Las aprobaciones se persisten dentro de los JSON existentes de `decision_runs`.
+Scheduling conserva su contrato `scheduling_v1`. Las aprobaciones están normalizadas
+en `decision_runs.approved_at`, `superseded_at` y `superseded_by_run_id`, además de los
+JSON de compatibilidad. Fase 4 de la auditoría agrega `approved_by` y el ledger de
+eventos, sin atribuir retroactivamente las aprobaciones históricas.
 
 Después del deploy verificar:
 

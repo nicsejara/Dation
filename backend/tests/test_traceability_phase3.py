@@ -45,7 +45,7 @@ class TraceabilityPhase3Contracts(unittest.TestCase):
             "Ver análisis →",
         ):
             self.assertIn(text, source)
-        self.assertIn("['approved','candidate','superseded']", source)
+        self.assertIn("['approved','candidate','superseded','stale']", source)
         self.assertNotIn("['approved','candidate','superseded','running']", source)
 
     def test_traceability_ui_is_responsive(self):

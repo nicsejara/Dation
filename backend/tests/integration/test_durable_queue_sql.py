@@ -6,6 +6,7 @@ from pathlib import Path
 import subprocess
 import unittest
 from uuid import uuid4
+from sql_support import SQLSandbox
 
 REPO = Path(__file__).resolve().parents[3]
 CONTAINER = os.getenv("DATION_SQL_TEST_CONTAINER")
@@ -15,31 +16,11 @@ FLEET = "00000000-0000-4000-8000-000000000002"
 
 
 @unittest.skipUnless(CONTAINER,"Set DATION_SQL_TEST_CONTAINER to a disposable PostgreSQL container")
-class DurableQueueSQLTests(unittest.TestCase):
-    @classmethod
-    def command(cls, sql, database=None, check=True):
-        result = subprocess.run(["docker","exec","-i",CONTAINER,"psql","-U","postgres",
-            "-d",database or cls.database,"-X","-A","-t","-v","ON_ERROR_STOP=1"],
-            input=sql,text=True,capture_output=True)
-        if check and result.returncode:
-            raise AssertionError(result.stderr)
-        return result
-
-    @classmethod
-    def setUpClass(cls):
-        cls.database = "dation_phase3_"+uuid4().hex
-        cls.command("create database "+cls.database+";",database="postgres")
-        cls.command((Path(__file__).parent/"base_schema.sql").read_text())
-        for migration in sorted((REPO/"supabase/migrations").glob("*.sql")):
-            cls.command(migration.read_text())
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.command("drop database "+cls.database+";",database="postgres")
+class DurableQueueSQLTests(SQLSandbox, unittest.TestCase):
 
     def setUp(self):
         self.command("truncate public.datasets,public.decision_runs,public.decision_cases,public.dispatch_run_jobs,public.decision_case_reconciliations cascade;")
-        self.command(f"insert into public.datasets(id,dataset_type) values ('{ORDERS}','orders'),('{FLEET}','fleet');"
+        self.command(f"insert into public.datasets(id,dataset_type,original_filename,storage_path) values ('{ORDERS}','orders','orders.csv','qa/orders.csv'),('{FLEET}','fleet','fleet.csv','qa/fleet.csv');"
             f"insert into public.decision_cases(id,orders_dataset_id,fleet_dataset_id,input_signature) values ('{CASE}','{ORDERS}','{FLEET}','{ORDERS}:{FLEET}');")
 
     def sql(self, sql):

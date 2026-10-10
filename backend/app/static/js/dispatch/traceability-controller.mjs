@@ -17,8 +17,9 @@ export async function openDecisionMap(){
 export async function showHistory(nodeId){
   const owner=interaction(),caseId=window.DationDispatch.getWorkspace().decisionCase?.id;if(!caseId)return;
   try{
-    const history=await api('/api/decision-cases/'+caseId+'/runs?node_id='+nodeId+'&limit=100&offset=0',{signal:owner.signal});if(!owner.active)return;
-    openRunHistory({scope:owner,caseId,nodeId,history,onOpenRun:(runId,node)=>window.DationDispatch.openRun(runId,node,caseId)});
+    const loadPage=(offset,limit)=>api('/api/decision-cases/'+caseId+'/runs?node_id='+nodeId+'&limit='+limit+'&offset='+offset,{signal:owner.signal});
+    const history=await loadPage(0,100);if(!owner.active)return;
+    openRunHistory({scope:owner,caseId,nodeId,history,onLoadPage:loadPage,onOpenRun:(runId,node)=>window.DationDispatch.openRun(runId,node,caseId)});
   }catch(error){if(owner.active)console.error('History unavailable',error);}
 }
 export function decorateDecisionMap(root){

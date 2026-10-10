@@ -18,6 +18,7 @@ const RUN_STATES={
   approved:{label:'Aprobada vigente',tone:'approved'},
   candidate:{label:'Alternativa',tone:'candidate'},
   superseded:{label:'Aprobación anterior',tone:'superseded'},
+  stale:{label:'Requiere nueva aprobación upstream',tone:'superseded'},
   running:{label:'Procesando',tone:'running'},
   error:{label:'Error',tone:'error'},
 };
@@ -82,7 +83,7 @@ function makeDialog(className,label,scope){
   dialog.setAttribute('aria-label',label);
   document.body.append(dialog);
   scope?.own(()=>dialog.remove());
-  dialog.addEventListener('close',()=>dialog.remove(),{once:true});
+  dialog.addEventListener('close',()=>{scope?.dispose();dialog.remove();},{once:true});
   return dialog;
 }
 
@@ -141,7 +142,7 @@ function runConfiguration(run){
 function runCard(run){
   const state=RUN_STATES[run.decision_state]||RUN_STATES.error;
   const config=runConfiguration(run);
-  const openable=['approved','candidate','superseded'].includes(run.decision_state);
+  const openable=['approved','candidate','superseded','stale'].includes(run.decision_state);
   return '<article class="dispatch-run-history__item is-'+esc(state.tone)+'">'
     +'<div class="dispatch-run-history__top">'
       +'<div><small>CORRIDA</small><strong>R-'+esc(shortRunId(run.id))+'</strong></div>'
@@ -151,6 +152,7 @@ function runCard(run){
       +'<strong>'+esc(config.title)+'</strong>'
       +(config.meta.length?'<p>'+config.meta.map(esc).join(' · ')+'</p>':'')
       +'<small>'+esc(dateTime(run.finished_at||run.created_at))+'</small>'
+      +(run.approved_at?'<small>'+esc(run.approved_by==='shared_workspace:dation'?'Aprobación · acceso compartido':'Aprobación histórica · autor no registrado')+'</small>':'')
     +'</div>'
     +'<div class="dispatch-run-history__flags">'
       +(run.is_latest?'<span>Última corrida</span>':'')
@@ -165,7 +167,7 @@ function runCard(run){
   +'</article>';
 }
 
-export function openRunHistory({caseId,nodeId,history,onOpenRun,scope}){
+export function openRunHistory({caseId,nodeId,history,onOpenRun,onLoadPage,scope}){
   const meta=DECISION_META[nodeId]||{label:'Decisión'};
   const runs=history?.runs||[];
   const dialog=makeDialog('dispatch-trace-dialog dispatch-run-history','Historial de corridas',scope);
@@ -177,15 +179,23 @@ export function openRunHistory({caseId,nodeId,history,onOpenRun,scope}){
     +'</header>'
     +'<div class="dispatch-run-history__summary">'
       +'<strong>'+num(history?.total||runs.length)+' corrida'+((history?.total||runs.length)===1?'':'s')+'</strong>'
-      +(history?.summary?.approved_run_id?'<span>Aprobada vigente · R-'+esc(shortRunId(history.summary.approved_run_id))+'</span>':'<span>Sin aprobación vigente</span>')
+      +(history?.summary?.approved_run_id?'<span>'+esc(history.summary.status==='stale'?'Aprobación desactualizada':'Aprobada vigente')+' · R-'+esc(shortRunId(history.summary.approved_run_id))+'</span>':'<span>Sin aprobación vigente</span>')
     +'</div>'
     +'<div class="dispatch-run-history__list">'
       +(runs.length?runs.map(runCard).join(''):'<div class="dispatch-run-history__empty">Todavía no hay corridas registradas para esta decisión.</div>')
     +'</div>'
+    +'<nav class="dispatch-run-history__pagination" aria-label="Páginas del historial">'
+      +'<button type="button" data-history-prev>← Anterior</button>'
+      +'<span data-history-range aria-live="polite"></span>'
+      +'<button type="button" data-history-next>Siguiente →</button>'
+    +'</nav><p data-history-error role="status"></p>'
   +'</div>';
 
   dialog.querySelector('[data-close]').onclick=()=>dialog.close();
-  dialog.querySelectorAll('[data-open-run]').forEach(button=>{
+  let current=history,closed=false,loading=false;
+  dialog.addEventListener('close',()=>{closed=true;},{once:true});
+  const active=()=>!closed&&dialog.isConnected&&(!scope||scope.active);
+  function bindRuns(){dialog.querySelectorAll('[data-open-run]').forEach(button=>{
     button.onclick=async()=>{
       button.disabled=true;
       try{
@@ -196,7 +206,30 @@ export function openRunHistory({caseId,nodeId,history,onOpenRun,scope}){
         button.textContent=error?.message||'No pudimos abrir la corrida';
       }
     };
-  });
+  });}
+  const previous=dialog.querySelector('[data-history-prev]'),next=dialog.querySelector('[data-history-next]');
+  function pagination(){
+    const offset=Number(current.offset)||0,limit=Number(current.limit)||100,total=Number(current.total)||0;
+    previous.disabled=loading||!onLoadPage||offset===0;
+    next.disabled=loading||!onLoadPage||offset+limit>=total;
+    dialog.querySelector('[data-history-range]').textContent=total?`${offset+1}–${Math.min(offset+(current.runs?.length||0),total)} de ${total}`:'0 corridas';
+  }
+  async function changePage(direction){
+    if(loading||!active())return;
+    const limit=Number(current.limit)||100,offset=Math.max(0,(Number(current.offset)||0)+direction*limit);
+    loading=true;pagination();dialog.querySelector('[data-history-error]').textContent='';
+    try{
+      const page=await onLoadPage(offset,limit);if(!active())return;
+      current=page;
+      dialog.querySelector('.dispatch-run-history__list').innerHTML=page.runs.length?page.runs.map(runCard).join(''):'<div class="dispatch-run-history__empty">No hay corridas en esta página.</div>';
+      dialog.querySelector('.dispatch-run-history__summary').innerHTML='<strong>'+num(page.total)+' corridas</strong>'
+        +(page.summary?.approved_run_id?'<span>'+esc(page.summary.status==='stale'?'Aprobación desactualizada':'Aprobada vigente')+' · R-'+esc(shortRunId(page.summary.approved_run_id))+'</span>':'<span>Sin aprobación vigente</span>');
+      bindRuns();
+    }catch(error){if(active())dialog.querySelector('[data-history-error]').textContent=error?.message||'No pudimos cargar esta página. Reintentá.';}
+    finally{loading=false;if(active())pagination();}
+  }
+  previous.onclick=()=>changePage(-1);next.onclick=()=>changePage(1);
+  bindRuns();pagination();
   dialog.showModal();
   return dialog;
 }
