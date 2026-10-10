@@ -23,7 +23,9 @@ queda fuera de las páginas; abrir una corrida carga su resultado completo.
 Las aprobaciones toman primero un lock por caso, compartido por todos sus nodos.
 Dos alternativas simultáneas se serializan; queda una aprobación vigente y la
 anterior conserva su fecha y el identificador que la reemplazó. Repetir una
-aprobación vigente conserva fecha/actor/eventos. Una aprobación reemplazada se
+aprobación vigente conserva fecha/actor/eventos. La fecha se toma después de
+adquirir el bloqueo, para reflejar la aprobación efectiva aunque la solicitud
+haya esperado otra transacción. Una aprobación reemplazada se
 rechaza con conflicto HTTP 409; para elegir de nuevo se crea una nueva corrida.
 Las validaciones del upstream se repiten dentro de la transacción, incluida la
 admisión de nuevas dependencias. Una corrida ya admitida conserva su evidencia
@@ -52,7 +54,9 @@ instalación nueva y el upgrade con evidencia histórica en PostgreSQL 17.
 1. Validar CI de la revisión candidata y registrar la imagen/revisión anterior.
 2. Ejecutar `python scripts/apply_production_persistence.py` con el token
    administrativo seguro: sólo aplica la migración aditiva de Fase 4 si el catálogo
-   coincide con el de Fase 3. Nunca aplica el baseline a producción.
+   coincide con el de Fase 3 y luego el ajuste `approval_clock_after_lock`.
+   Si Fase 4 ya existe, verifica y completa sólo el ajuste pendiente.
+   Nunca aplica el baseline a producción.
 3. Incorporar la revisión validada en `main`. Cloud Build usa el Dockerfile y
    publica la misma imagen primero en el worker y luego en la API, preservando
    secretos, IAM y configuración existentes.

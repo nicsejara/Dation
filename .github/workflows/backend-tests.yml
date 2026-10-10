@@ -79,4 +79,13 @@ jobs:
             if docker exec dation-ci-postgres pg_isready -U postgres; then break; fi
             sleep 1
           done
-          DATION_SQL_TEST_CONTAINER=dation-ci-postgres python -m unittest discover -s tests/integration -v
+          DATION_SQL_TEST_CONTAINER=dation-ci-postgres python - <<'PY'
+          import subprocess, sys
+          result = subprocess.run([sys.executable, "-m", "unittest", "discover", "-s", "tests/integration", "-v"], capture_output=True, text=True)
+          output = result.stdout + result.stderr
+          print(output)
+          if result.returncode:
+              detail = output[-15000:].replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+              print("::error title=PostgreSQL regression failure::" + detail)
+          sys.exit(result.returncode)
+          PY
