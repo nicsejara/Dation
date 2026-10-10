@@ -50,6 +50,10 @@ stale. SQL corre sobre el baseline real y todas las migraciones. Un plan
 índices y exclusión de resultados pesados. Chromium abre un selector de 100 tarjetas
 con una sola petición de lista y obtiene el detalle al seleccionar.
 
+CI espera al servidor PostgreSQL definitivo mediante TCP dentro del contenedor,
+sin publicar puertos. El servidor temporal de `initdb`, accesible únicamente por
+socket, no permite iniciar los tests antes de que termine la inicialización.
+
 La línea base productiva, antes del despliegue, contiene cinco casos activos y
 87.613 bytes: 10,539 s en la primera solicitud; 1,382 y 1,222 s en las siguientes.
 Estas son tres observaciones desde el entorno de desarrollo, no un p95 ni una

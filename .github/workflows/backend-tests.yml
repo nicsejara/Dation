@@ -75,10 +75,19 @@ jobs:
         run: |
           docker run -d --name dation-ci-postgres -e POSTGRES_HOST_AUTH_METHOD=trust postgres:17-alpine
           trap 'docker rm -f dation-ci-postgres' EXIT
+          ready=false
           for attempt in {1..30}; do
-            if docker exec dation-ci-postgres pg_isready -U postgres; then break; fi
+            # initdb briefly starts a Unix-socket-only server. Wait for final TCP.
+            if docker exec dation-ci-postgres pg_isready -h 127.0.0.1 -U postgres; then
+              ready=true
+              break
+            fi
             sleep 1
           done
+          if [ "$ready" != true ]; then
+            echo '::error title=PostgreSQL startup failure::The final server did not accept TCP inside the container.'
+            exit 1
+          fi
           DATION_SQL_TEST_CONTAINER=dation-ci-postgres python - <<'PY'
           import subprocess, sys
           result = subprocess.run([sys.executable, "-m", "unittest", "discover", "-s", "tests/integration", "-v"], capture_output=True, text=True)
