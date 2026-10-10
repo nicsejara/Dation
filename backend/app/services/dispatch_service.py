@@ -216,7 +216,7 @@ async def system_status():
         {
             "select": (
                 "id,schema_version,orders_dataset_id,fleet_dataset_id,"
-                "input_fingerprint,result_fingerprint,summary_json,progress_json"
+                "input_fingerprint,result_fingerprint,summary_json,progress_json,approved_by"
             ),
             "limit": "0",
         },
@@ -231,6 +231,7 @@ async def system_status():
     queue_rpc_ok, queue_rpc_detail = await _probe_rpc_catalog([
         "enqueue_dispatch_run", "claim_dispatch_job", "heartbeat_dispatch_job",
         "finish_dispatch_job", "cancel_dispatch_job", "ack_case_reconciliation",
+        "decision_case_history", "approve_decision_run_version",
     ])
     bucket_ok, bucket_detail = await _probe_bucket()
     schema_ok = datasets_ok and runs_ok
@@ -240,7 +241,7 @@ async def system_status():
             "id": "durable_queue", "label": "Ejecuciones recuperables",
             "ok": jobs_ok and outbox_ok and queue_rpc_ok,
             "detail": "Cola y reconciliación disponibles." if jobs_ok and outbox_ok and queue_rpc_ok else (jobs_detail or outbox_detail or queue_rpc_detail),
-            "fix": "Aplicá la migración dispatch_durable_jobs y desplegá el worker independiente.",
+            "fix": "Aplicá las migraciones dispatch_durable_jobs y persistence_traceability, y desplegá el worker independiente.",
         },
         {
             "id": "supabase",

@@ -1,0 +1,1166 @@
+{
+  "functions": [
+    {
+      "definition": "CREATE OR REPLACE FUNCTION public.ack_case_reconciliation(target_case_id uuid, observed_version bigint)\n RETURNS void\n LANGUAGE sql\n SET search_path TO 'public', 'pg_temp'\nAS $function$\n    delete from public.decision_case_reconciliations\n    where case_id=target_case_id and version=observed_version;\n$function$\n",
+      "grants": [
+        {
+          "grantable": false,
+          "privilege": "EXECUTE",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "EXECUTE",
+          "role": "service_role"
+        }
+      ],
+      "signature": "public.ack_case_reconciliation(target_case_id uuid, observed_version bigint)"
+    },
+    {
+      "definition": "CREATE OR REPLACE FUNCTION public.approve_decision_run_version(target_run_id uuid, target_case_id uuid, target_node_id text)\n RETURNS SETOF decision_runs\n LANGUAGE plpgsql\n SET search_path TO 'public', 'pg_temp'\nAS $function$\ndeclare\n    target public.decision_runs%rowtype;\n    approval_time timestamptz;\n    source public.decision_runs%rowtype;\nbegin\n    select * into target\n      from public.decision_runs\n     where id = target_run_id\n     for update;\n\n    if not found\n       or target.status <> 'completed'\n       or target.decision_case_id is distinct from target_case_id\n       or target.node_id is distinct from target_node_id then\n        raise exception 'La corrida no puede aprobarse para ese Decision Case';\n    end if;\n\n    if target.upstream_run_id is not null then\n        select * into source\n          from public.decision_runs\n         where id = target.upstream_run_id;\n\n        if not found\n           or source.decision_case_id is distinct from target_case_id\n           or source.approved_at is null\n           or source.superseded_at is not null then\n            raise exception 'La corrida upstream ya no es la decisi\u00f3n aprobada vigente';\n        end if;\n    end if;\n\n    approval_time := coalesce(\n        target.approved_at,\n        nullif(target.result_json #>> '{decision_case,approved_at}', '')::timestamptz,\n        now()\n    );\n\n    update public.decision_runs\n       set superseded_at = approval_time,\n           superseded_by_run_id = target_run_id\n     where decision_case_id = target_case_id\n       and node_id = target_node_id\n       and id <> target_run_id\n       and approved_at is not null\n       and superseded_at is null;\n\n    update public.decision_runs\n       set approved_at = approval_time,\n           superseded_at = null,\n           superseded_by_run_id = null,\n           configuration_json = jsonb_set(\n               coalesce(configuration_json, '{}'::jsonb),\n               '{decision_case}',\n               coalesce(configuration_json -> 'decision_case', '{}'::jsonb)\n                 || jsonb_build_object(\n                     'case_id', target_case_id::text,\n                     'node_id', target_node_id,\n                     'status', 'approved',\n                     'approved_at', approval_time\n                 ),\n               true\n           ),\n           result_json = jsonb_set(\n               coalesce(result_json, '{}'::jsonb),\n               '{decision_case}',\n               coalesce(result_json -> 'decision_case', '{}'::jsonb)\n                 || jsonb_build_object(\n                     'case_id', target_case_id::text,\n                     'node_id', target_node_id,\n                     'status', 'approved',\n                     'approved_at', approval_time\n                 ),\n               true\n           )\n     where id = target_run_id;\n\n    return query\n    select * from public.decision_runs where id = target_run_id;\nend;\n$function$\n",
+      "grants": [
+        {
+          "grantable": false,
+          "privilege": "EXECUTE",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "EXECUTE",
+          "role": "service_role"
+        }
+      ],
+      "signature": "public.approve_decision_run_version(target_run_id uuid, target_case_id uuid, target_node_id text)"
+    },
+    {
+      "definition": "CREATE OR REPLACE FUNCTION public.cancel_dispatch_job(target_run_id uuid)\n RETURNS SETOF decision_runs\n LANGUAGE plpgsql\n SET search_path TO 'public', 'pg_temp'\nAS $function$\nbegin\n    perform 1 from public.dispatch_run_jobs where run_id=target_run_id for update;\n    if not found then return; end if;\n    update public.dispatch_run_jobs set state='error', lease_token=null, lease_expires_at=null\n    where run_id=target_run_id and state in ('queued','running');\n    if found then\n        update public.decision_runs set status='error',finished_at=now(),\n          error_message='La ejecuci\u00f3n fue cancelada.',\n          progress_json=jsonb_build_object('stage','cancelled')\n        where id=target_run_id and status in ('queued','running');\n    end if;\n    return query select * from public.decision_runs where id=target_run_id;\nend;\n$function$\n",
+      "grants": [
+        {
+          "grantable": false,
+          "privilege": "EXECUTE",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "EXECUTE",
+          "role": "service_role"
+        }
+      ],
+      "signature": "public.cancel_dispatch_job(target_run_id uuid)"
+    },
+    {
+      "definition": "CREATE OR REPLACE FUNCTION public.claim_dispatch_job(worker_token uuid, lease_seconds integer DEFAULT 120)\n RETURNS SETOF dispatch_run_jobs\n LANGUAGE plpgsql\n SET search_path TO 'public', 'pg_temp'\nAS $function$\ndeclare target public.dispatch_run_jobs%rowtype;\nbegin\n    perform public.maintain_dispatch_jobs();\n    select * into target from public.dispatch_run_jobs\n    where ((state='queued' and available_at <= now()) or (state='running' and lease_expires_at <= now()))\n      and attempts < max_attempts and deadline_at > now()\n    order by available_at, created_at for update skip locked limit 1;\n    if not found then return; end if;\n    update public.dispatch_run_jobs set state='running', attempts=attempts+1,\n        lease_token=worker_token, heartbeat_at=now(),\n        lease_expires_at=least(deadline_at,now()+make_interval(secs=>greatest(30,least(lease_seconds,300))))\n    where run_id=target.run_id;\n    update public.decision_runs set status='running', started_at=coalesce(started_at,now()),\n        progress_json=jsonb_build_object('stage','validating','attempt',target.attempts+1), error_message=null\n    where id=target.run_id and status in ('queued','running');\n    return query select * from public.dispatch_run_jobs where run_id=target.run_id;\nend;\n$function$\n",
+      "grants": [
+        {
+          "grantable": false,
+          "privilege": "EXECUTE",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "EXECUTE",
+          "role": "service_role"
+        }
+      ],
+      "signature": "public.claim_dispatch_job(worker_token uuid, lease_seconds integer)"
+    },
+    {
+      "definition": "CREATE OR REPLACE FUNCTION public.enqueue_case_reconciliation()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO 'public', 'pg_temp'\nAS $function$\nbegin\n    if new.decision_case_id is not null then\n        perform public.request_case_reconciliation(new.decision_case_id);\n    end if;\n    return new;\nend;\n$function$\n",
+      "grants": [
+        {
+          "grantable": false,
+          "privilege": "EXECUTE",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "EXECUTE",
+          "role": "service_role"
+        }
+      ],
+      "signature": "public.enqueue_case_reconciliation()"
+    },
+    {
+      "definition": "CREATE OR REPLACE FUNCTION public.enqueue_dispatch_run(run_payload jsonb, job_request jsonb, intent_fingerprint text, queue_limit integer DEFAULT 32)\n RETURNS SETOF decision_runs\n LANGUAGE plpgsql\n SET search_path TO 'public', 'pg_temp'\nAS $function$\ndeclare\n    existing_job public.dispatch_run_jobs%rowtype;\n    target_id uuid := (run_payload ->> 'id')::uuid;\nbegin\n    -- Serialize admission, but never calculation. Replays do not consume capacity.\n    perform pg_advisory_xact_lock(701003);\n    select * into existing_job from public.dispatch_run_jobs where run_id = target_id;\n    if found then\n        if existing_job.request_fingerprint is distinct from intent_fingerprint then\n            raise exception using errcode = '22023', message = 'run_id ya pertenece a otra intenci\u00f3n';\n        end if;\n        return query select * from public.decision_runs where id = target_id;\n        return;\n    end if;\n    if exists(select 1 from public.decision_runs where id = target_id) then\n        raise exception using errcode = '22023', message = 'run_id ya existe';\n    end if;\n    if (select count(*) from public.dispatch_run_jobs where state in ('queued','running'))\n       >= greatest(1, least(queue_limit, 256)) then\n        raise exception using errcode = '53300', message = 'La cola de ejecuci\u00f3n est\u00e1 llena';\n    end if;\n    insert into public.decision_runs(\n        id, dataset_id, orders_dataset_id, fleet_dataset_id, schema_version,\n        engine_name, engine_version, configuration_json, decision_case_id, node_id,\n        upstream_run_id, status, progress_json\n    ) values (\n        target_id, (run_payload ->> 'dataset_id')::uuid,\n        (run_payload ->> 'orders_dataset_id')::uuid, (run_payload ->> 'fleet_dataset_id')::uuid,\n        run_payload ->> 'schema_version', run_payload ->> 'engine_name', run_payload ->> 'engine_version',\n        run_payload -> 'configuration_json', (run_payload ->> 'decision_case_id')::uuid,\n        run_payload ->> 'node_id', (run_payload ->> 'upstream_run_id')::uuid,\n        'queued', jsonb_build_object('stage','queued')\n    );\n    insert into public.dispatch_run_jobs(run_id, request_json, request_fingerprint)\n    values (target_id, job_request, intent_fingerprint);\n    return query select * from public.decision_runs where id = target_id;\nend;\n$function$\n",
+      "grants": [
+        {
+          "grantable": false,
+          "privilege": "EXECUTE",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "EXECUTE",
+          "role": "service_role"
+        }
+      ],
+      "signature": "public.enqueue_dispatch_run(run_payload jsonb, job_request jsonb, intent_fingerprint text, queue_limit integer)"
+    },
+    {
+      "definition": "CREATE OR REPLACE FUNCTION public.finish_dispatch_job(target_run_id uuid, worker_token uuid, terminal_values jsonb)\n RETURNS SETOF decision_runs\n LANGUAGE plpgsql\n SET search_path TO 'public', 'pg_temp'\nAS $function$\ndeclare target public.dispatch_run_jobs%rowtype; outcome text := terminal_values ->> 'status';\nbegin\n    if outcome not in ('completed','error') then raise exception 'Estado terminal inv\u00e1lido'; end if;\n    select * into target from public.dispatch_run_jobs where run_id=target_run_id for update;\n    if not found or target.state <> 'running' or target.lease_token is distinct from worker_token\n       or target.lease_expires_at <= now() or target.deadline_at <= now() then return; end if;\n    if outcome='completed' and (terminal_values -> 'result_json' is null\n       or jsonb_typeof(terminal_values -> 'result_json') <> 'object') then\n        raise exception 'Falta el resultado completado';\n    end if;\n    update public.decision_runs set status=outcome, finished_at=now(),\n        duration_ms=(terminal_values ->> 'duration_ms')::integer,\n        result_json=terminal_values -> 'result_json',\n        result_fingerprint=terminal_values ->> 'result_fingerprint',\n        input_fingerprint=coalesce(terminal_values ->> 'input_fingerprint',input_fingerprint),\n        summary_json=terminal_values -> 'summary_json',\n        progress_json=coalesce(terminal_values -> 'progress_json',jsonb_build_object('stage',outcome)),\n        error_message=terminal_values ->> 'error_message'\n    where id=target_run_id and status='running';\n    if not found then return; end if;\n    update public.dispatch_run_jobs set state=outcome, lease_token=null, lease_expires_at=null\n    where run_id=target_run_id;\n    return query select * from public.decision_runs where id=target_run_id;\nend;\n$function$\n",
+      "grants": [
+        {
+          "grantable": false,
+          "privilege": "EXECUTE",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "EXECUTE",
+          "role": "service_role"
+        }
+      ],
+      "signature": "public.finish_dispatch_job(target_run_id uuid, worker_token uuid, terminal_values jsonb)"
+    },
+    {
+      "definition": "CREATE OR REPLACE FUNCTION public.heartbeat_dispatch_job(target_run_id uuid, worker_token uuid, lease_seconds integer DEFAULT 120, progress jsonb DEFAULT NULL::jsonb)\n RETURNS boolean\n LANGUAGE plpgsql\n SET search_path TO 'public', 'pg_temp'\nAS $function$\nbegin\n    update public.dispatch_run_jobs set heartbeat_at=now(),\n        lease_expires_at=least(deadline_at,now()+make_interval(secs=>greatest(30,least(lease_seconds,300))))\n    where run_id=target_run_id and state='running' and lease_token=worker_token\n      and lease_expires_at > now() and deadline_at > now();\n    if not found then return false; end if;\n    if progress is not null then\n        update public.decision_runs set progress_json=progress\n        where id=target_run_id and status='running';\n    end if;\n    return true;\nend;\n$function$\n",
+      "grants": [
+        {
+          "grantable": false,
+          "privilege": "EXECUTE",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "EXECUTE",
+          "role": "service_role"
+        }
+      ],
+      "signature": "public.heartbeat_dispatch_job(target_run_id uuid, worker_token uuid, lease_seconds integer, progress jsonb)"
+    },
+    {
+      "definition": "CREATE OR REPLACE FUNCTION public.maintain_dispatch_jobs()\n RETURNS integer\n LANGUAGE plpgsql\n SET search_path TO 'public', 'pg_temp'\nAS $function$\ndeclare changed integer;\nbegin\n    with expired as (\n        update public.dispatch_run_jobs set state='error', lease_token=null, lease_expires_at=null\n        where state in ('queued','running') and (\n            deadline_at <= now()\n            or (state='running' and lease_expires_at <= now() and attempts >= max_attempts)\n        ) returning run_id\n    )\n    update public.decision_runs set status='error', finished_at=now(),\n        error_message='La ejecuci\u00f3n agot\u00f3 su plazo o sus intentos de recuperaci\u00f3n.',\n        progress_json=jsonb_build_object('stage','error','reason','recovery_exhausted')\n    where id in (select run_id from expired) and status in ('queued','running');\n    get diagnostics changed = row_count;\n    return changed;\nend;\n$function$\n",
+      "grants": [
+        {
+          "grantable": false,
+          "privilege": "EXECUTE",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "EXECUTE",
+          "role": "service_role"
+        }
+      ],
+      "signature": "public.maintain_dispatch_jobs()"
+    },
+    {
+      "definition": "CREATE OR REPLACE FUNCTION public.request_case_reconciliation(target_case_id uuid)\n RETURNS void\n LANGUAGE sql\n SET search_path TO 'public', 'pg_temp'\nAS $function$\n    insert into public.decision_case_reconciliations(case_id)\n    values (target_case_id)\n    on conflict (case_id) do update set version = decision_case_reconciliations.version + 1,\n      available_at = now(), updated_at = now();\n$function$\n",
+      "grants": [
+        {
+          "grantable": false,
+          "privilege": "EXECUTE",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "EXECUTE",
+          "role": "service_role"
+        }
+      ],
+      "signature": "public.request_case_reconciliation(target_case_id uuid)"
+    },
+    {
+      "definition": "CREATE OR REPLACE FUNCTION public.set_default_fleet(target_id uuid)\n RETURNS void\n LANGUAGE plpgsql\n SET search_path TO 'public', 'pg_temp'\nAS $function$\nbegin\n perform pg_advisory_xact_lock(701001);\n if not exists(select 1 from public.datasets where id=target_id and dataset_type='fleet') then\n  raise exception 'La flota solicitada no existe';\n end if;\n update public.datasets set is_default=false where dataset_type='fleet' and is_default;\n update public.datasets set is_default=true where id=target_id;\nend;\n$function$\n",
+      "grants": [
+        {
+          "grantable": false,
+          "privilege": "EXECUTE",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "EXECUTE",
+          "role": "service_role"
+        }
+      ],
+      "signature": "public.set_default_fleet(target_id uuid)"
+    },
+    {
+      "definition": "CREATE OR REPLACE FUNCTION public.validate_decision_run_history()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO 'public', 'pg_temp'\nAS $function$\ndeclare\n    case_orders uuid;\n    case_fleet uuid;\n    source_case uuid;\n    source_node text;\n    source_approved_at timestamptz;\n    expected_source_node text;\nbegin\n    if tg_op = 'UPDATE' then\n        if new.decision_case_id is distinct from old.decision_case_id\n           or new.node_id is distinct from old.node_id\n           or new.upstream_run_id is distinct from old.upstream_run_id then\n            raise exception 'La identidad y el lineage de una Decision Run son inmutables';\n        end if;\n    end if;\n\n    if new.decision_case_id is null then\n        if new.node_id is not null or new.upstream_run_id is not null then\n            raise exception 'Una corrida sin Decision Case no puede declarar nodo o dependencia';\n        end if;\n        return new;\n    end if;\n\n    select orders_dataset_id, fleet_dataset_id\n      into case_orders, case_fleet\n      from public.decision_cases\n     where id = new.decision_case_id;\n\n    if not found then\n        raise exception 'El Decision Case de la corrida no existe';\n    end if;\n\n    if new.orders_dataset_id is distinct from case_orders\n       or new.fleet_dataset_id is distinct from case_fleet then\n        raise exception 'La Decision Run usa un Data Pack distinto al Decision Case';\n    end if;\n\n    expected_source_node := case new.node_id\n        when 'logistics_assignment' then null\n        when 'logistics_scheduling' then 'logistics_assignment'\n        when 'logistics_final_assignment' then 'logistics_scheduling'\n        else null\n    end;\n\n    if expected_source_node is null then\n        if new.upstream_run_id is not null then\n            raise exception 'Assignment no admite una corrida upstream';\n        end if;\n    else\n        if new.upstream_run_id is null then\n            raise exception 'La decisi\u00f3n requiere una corrida upstream aprobada';\n        end if;\n\n        select decision_case_id, node_id, approved_at\n          into source_case, source_node, source_approved_at\n          from public.decision_runs\n         where id = new.upstream_run_id;\n\n        if not found\n           or source_case is distinct from new.decision_case_id\n           or source_node is distinct from expected_source_node\n           or source_approved_at is null then\n            raise exception 'El lineage de la Decision Run no corresponde al Decision Case';\n        end if;\n    end if;\n\n    if new.approved_at is not null and new.status <> 'completed' then\n        raise exception 'S\u00f3lo una corrida completada puede aprobarse';\n    end if;\n\n    return new;\nend;\n$function$\n",
+      "grants": [
+        {
+          "grantable": false,
+          "privilege": "EXECUTE",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "EXECUTE",
+          "role": "service_role"
+        }
+      ],
+      "signature": "public.validate_decision_run_history()"
+    },
+    {
+      "definition": "CREATE OR REPLACE FUNCTION public.validate_dispatch_run()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO 'public', 'pg_temp'\nAS $function$\nbegin\n  if new.schema_version in ('dispatch_v1', 'dispatch_v2') then\n    if new.orders_dataset_id is null\n       or new.fleet_dataset_id is null\n       or new.dataset_id <> new.orders_dataset_id then\n      raise exception 'Una corrida dispatch requiere \u00f3rdenes y flota';\n    end if;\n\n    if not exists (\n      select 1\n      from public.datasets\n      where id = new.orders_dataset_id\n        and dataset_type = 'orders'\n    )\n    or not exists (\n      select 1\n      from public.datasets\n      where id = new.fleet_dataset_id\n        and dataset_type = 'fleet'\n    ) then\n      raise exception 'Tipos de datasets incorrectos';\n    end if;\n\n    if new.status = 'completed'\n       and new.result_json is not null\n       and coalesce(new.result_json ->> 'schema_version', '') <> new.schema_version then\n      raise exception 'La versi\u00f3n del resultado no coincide con la corrida';\n    end if;\n  end if;\n\n  return new;\nend;\n$function$\n",
+      "grants": [
+        {
+          "grantable": false,
+          "privilege": "EXECUTE",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "EXECUTE",
+          "role": "service_role"
+        }
+      ],
+      "signature": "public.validate_dispatch_run()"
+    }
+  ],
+  "policies": [],
+  "server_version_num": 170006,
+  "tables": [
+    {
+      "columns": [
+        "id uuid DEFAULT gen_random_uuid() NOT NULL",
+        "created_at timestamp with time zone DEFAULT now() NOT NULL",
+        "original_filename text NOT NULL",
+        "storage_bucket text DEFAULT 'dda-inputs'::text NOT NULL",
+        "storage_path text NOT NULL",
+        "mime_type text",
+        "size_bytes bigint",
+        "sha256 text",
+        "status text DEFAULT 'uploaded'::text NOT NULL",
+        "row_count integer",
+        "column_count integer",
+        "error_message text",
+        "dataset_type text DEFAULT 'logistics_legacy'::text NOT NULL",
+        "schema_version text",
+        "label text",
+        "is_default boolean DEFAULT false NOT NULL",
+        "parent_dataset_id uuid",
+        "profile_json jsonb",
+        "archived_at timestamp with time zone",
+        "is_sample boolean DEFAULT false NOT NULL",
+        "canonical_filename text"
+      ],
+      "constraints": [
+        {
+          "definition": "CHECK (column_count IS NULL OR column_count >= 0)",
+          "kind": "c",
+          "name": "datasets_column_count_nonnegative"
+        },
+        {
+          "definition": "CHECK (dataset_type = ANY (ARRAY['logistics_legacy'::text, 'orders'::text, 'fleet'::text]))",
+          "kind": "c",
+          "name": "datasets_dataset_type_check"
+        },
+        {
+          "definition": "FOREIGN KEY (parent_dataset_id) REFERENCES datasets(id)",
+          "kind": "f",
+          "name": "datasets_parent_dataset_id_fkey"
+        },
+        {
+          "definition": "PRIMARY KEY (id)",
+          "kind": "p",
+          "name": "datasets_pkey"
+        },
+        {
+          "definition": "CHECK (row_count IS NULL OR row_count >= 0)",
+          "kind": "c",
+          "name": "datasets_row_count_nonnegative"
+        },
+        {
+          "definition": "CHECK (sha256 IS NULL OR sha256 ~ '^[0-9a-f]{64}$'::text)",
+          "kind": "c",
+          "name": "datasets_sha256_format"
+        },
+        {
+          "definition": "CHECK (size_bytes IS NULL OR size_bytes >= 0)",
+          "kind": "c",
+          "name": "datasets_size_bytes_nonnegative"
+        },
+        {
+          "definition": "CHECK (status = ANY (ARRAY['uploaded'::text, 'processing'::text, 'processed'::text, 'error'::text]))",
+          "kind": "c",
+          "name": "datasets_status_valid"
+        },
+        {
+          "definition": "UNIQUE (storage_path)",
+          "kind": "u",
+          "name": "datasets_storage_path_key"
+        }
+      ],
+      "force_rls": false,
+      "grants": [
+        {
+          "grantable": false,
+          "privilege": "INSERT",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "SELECT",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "UPDATE",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "DELETE",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "TRUNCATE",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "REFERENCES",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "TRIGGER",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "MAINTAIN",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "INSERT",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "SELECT",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "UPDATE",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "DELETE",
+          "role": "service_role"
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX datasets_created_at_idx ON public.datasets USING btree (created_at DESC)",
+        "CREATE INDEX datasets_dispatch_active_idx ON public.datasets USING btree (dataset_type, created_at DESC) WHERE ((archived_at IS NULL) AND (dataset_type = ANY (ARRAY['orders'::text, 'fleet'::text])))",
+        "CREATE UNIQUE INDEX datasets_dispatch_hash_key ON public.datasets USING btree (dataset_type, sha256) WHERE ((dataset_type = ANY (ARRAY['orders'::text, 'fleet'::text])) AND (sha256 IS NOT NULL))",
+        "CREATE UNIQUE INDEX datasets_one_default_per_type ON public.datasets USING btree (dataset_type) WHERE is_default",
+        "CREATE INDEX datasets_parent_idx ON public.datasets USING btree (parent_dataset_id) WHERE (parent_dataset_id IS NOT NULL)",
+        "CREATE INDEX datasets_sha256_idx ON public.datasets USING btree (sha256) WHERE (sha256 IS NOT NULL)",
+        "CREATE INDEX datasets_status_idx ON public.datasets USING btree (status)"
+      ],
+      "name": "datasets",
+      "qualified": "public.datasets",
+      "rls": true,
+      "triggers": []
+    },
+    {
+      "columns": [
+        "case_id uuid NOT NULL",
+        "version bigint DEFAULT 1 NOT NULL",
+        "attempts integer DEFAULT 0 NOT NULL",
+        "available_at timestamp with time zone DEFAULT now() NOT NULL",
+        "updated_at timestamp with time zone DEFAULT now() NOT NULL"
+      ],
+      "constraints": [
+        {
+          "definition": "FOREIGN KEY (case_id) REFERENCES decision_cases(id) ON DELETE CASCADE",
+          "kind": "f",
+          "name": "decision_case_reconciliations_case_id_fkey"
+        },
+        {
+          "definition": "PRIMARY KEY (case_id)",
+          "kind": "p",
+          "name": "decision_case_reconciliations_pkey"
+        }
+      ],
+      "force_rls": false,
+      "grants": [
+        {
+          "grantable": false,
+          "privilege": "INSERT",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "SELECT",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "UPDATE",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "DELETE",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "TRUNCATE",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "REFERENCES",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "TRIGGER",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "MAINTAIN",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "INSERT",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "SELECT",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "UPDATE",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "DELETE",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "TRUNCATE",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "REFERENCES",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "TRIGGER",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "MAINTAIN",
+          "role": "service_role"
+        }
+      ],
+      "indexes": [],
+      "name": "decision_case_reconciliations",
+      "qualified": "public.decision_case_reconciliations",
+      "rls": true,
+      "triggers": []
+    },
+    {
+      "columns": [
+        "id uuid DEFAULT gen_random_uuid() NOT NULL",
+        "schema_version text DEFAULT 'decision_case_v1'::text NOT NULL",
+        "domain text DEFAULT 'logistics'::text NOT NULL",
+        "status text DEFAULT 'active'::text NOT NULL",
+        "orders_dataset_id uuid NOT NULL",
+        "fleet_dataset_id uuid NOT NULL",
+        "input_signature text NOT NULL",
+        "state_json jsonb DEFAULT '{}'::jsonb NOT NULL",
+        "created_at timestamp with time zone DEFAULT now() NOT NULL",
+        "updated_at timestamp with time zone DEFAULT now() NOT NULL",
+        "last_activity_at timestamp with time zone DEFAULT now() NOT NULL",
+        "archived_at timestamp with time zone"
+      ],
+      "constraints": [
+        {
+          "definition": "CHECK (orders_dataset_id <> fleet_dataset_id)",
+          "kind": "c",
+          "name": "decision_cases_distinct_inputs_check"
+        },
+        {
+          "definition": "CHECK (domain = 'logistics'::text)",
+          "kind": "c",
+          "name": "decision_cases_domain_check"
+        },
+        {
+          "definition": "FOREIGN KEY (fleet_dataset_id) REFERENCES datasets(id) ON DELETE RESTRICT",
+          "kind": "f",
+          "name": "decision_cases_fleet_dataset_id_fkey"
+        },
+        {
+          "definition": "FOREIGN KEY (orders_dataset_id) REFERENCES datasets(id) ON DELETE RESTRICT",
+          "kind": "f",
+          "name": "decision_cases_orders_dataset_id_fkey"
+        },
+        {
+          "definition": "PRIMARY KEY (id)",
+          "kind": "p",
+          "name": "decision_cases_pkey"
+        },
+        {
+          "definition": "CHECK (status = ANY (ARRAY['active'::text, 'completed'::text, 'archived'::text]))",
+          "kind": "c",
+          "name": "decision_cases_status_check"
+        }
+      ],
+      "force_rls": false,
+      "grants": [
+        {
+          "grantable": false,
+          "privilege": "INSERT",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "SELECT",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "UPDATE",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "DELETE",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "TRUNCATE",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "REFERENCES",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "TRIGGER",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "MAINTAIN",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "INSERT",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "SELECT",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "UPDATE",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "DELETE",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "TRUNCATE",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "REFERENCES",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "TRIGGER",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "MAINTAIN",
+          "role": "service_role"
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX decision_cases_fleet_idx ON public.decision_cases USING btree (fleet_dataset_id)",
+        "CREATE INDEX decision_cases_orders_idx ON public.decision_cases USING btree (orders_dataset_id)",
+        "CREATE INDEX decision_cases_signature_idx ON public.decision_cases USING btree (input_signature)",
+        "CREATE INDEX decision_cases_status_activity_idx ON public.decision_cases USING btree (status, last_activity_at DESC)"
+      ],
+      "name": "decision_cases",
+      "qualified": "public.decision_cases",
+      "rls": true,
+      "triggers": []
+    },
+    {
+      "columns": [
+        "id uuid DEFAULT gen_random_uuid() NOT NULL",
+        "run_id uuid NOT NULL",
+        "created_at timestamp with time zone DEFAULT now() NOT NULL",
+        "provider text NOT NULL",
+        "model text NOT NULL",
+        "knowledge_version text NOT NULL",
+        "prompt_version text NOT NULL",
+        "response_json jsonb NOT NULL",
+        "usage_json jsonb DEFAULT '{}'::jsonb NOT NULL"
+      ],
+      "constraints": [
+        {
+          "definition": "PRIMARY KEY (id)",
+          "kind": "p",
+          "name": "decision_explanations_pkey"
+        },
+        {
+          "definition": "FOREIGN KEY (run_id) REFERENCES decision_runs(id) ON UPDATE RESTRICT ON DELETE CASCADE",
+          "kind": "f",
+          "name": "decision_explanations_run_id_fkey"
+        }
+      ],
+      "force_rls": false,
+      "grants": [
+        {
+          "grantable": false,
+          "privilege": "INSERT",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "SELECT",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "UPDATE",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "DELETE",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "TRUNCATE",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "REFERENCES",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "TRIGGER",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "MAINTAIN",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "INSERT",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "SELECT",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "UPDATE",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "DELETE",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "TRUNCATE",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "REFERENCES",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "TRIGGER",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "MAINTAIN",
+          "role": "service_role"
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX decision_explanations_created_at_idx ON public.decision_explanations USING btree (created_at DESC)",
+        "CREATE INDEX decision_explanations_run_id_idx ON public.decision_explanations USING btree (run_id)"
+      ],
+      "name": "decision_explanations",
+      "qualified": "public.decision_explanations",
+      "rls": true,
+      "triggers": []
+    },
+    {
+      "columns": [
+        "id uuid DEFAULT gen_random_uuid() NOT NULL",
+        "run_id uuid NOT NULL",
+        "created_at timestamp with time zone DEFAULT now() NOT NULL",
+        "role text NOT NULL",
+        "content text NOT NULL",
+        "provider text",
+        "model text",
+        "knowledge_version text"
+      ],
+      "constraints": [
+        {
+          "definition": "PRIMARY KEY (id)",
+          "kind": "p",
+          "name": "decision_messages_pkey"
+        },
+        {
+          "definition": "CHECK (role = ANY (ARRAY['user'::text, 'assistant'::text]))",
+          "kind": "c",
+          "name": "decision_messages_role_check"
+        },
+        {
+          "definition": "FOREIGN KEY (run_id) REFERENCES decision_runs(id) ON UPDATE RESTRICT ON DELETE CASCADE",
+          "kind": "f",
+          "name": "decision_messages_run_id_fkey"
+        }
+      ],
+      "force_rls": false,
+      "grants": [
+        {
+          "grantable": false,
+          "privilege": "INSERT",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "SELECT",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "UPDATE",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "DELETE",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "TRUNCATE",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "REFERENCES",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "TRIGGER",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "MAINTAIN",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "INSERT",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "SELECT",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "UPDATE",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "DELETE",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "TRUNCATE",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "REFERENCES",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "TRIGGER",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "MAINTAIN",
+          "role": "service_role"
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX decision_messages_run_id_created_at_idx ON public.decision_messages USING btree (run_id, created_at)"
+      ],
+      "name": "decision_messages",
+      "qualified": "public.decision_messages",
+      "rls": true,
+      "triggers": []
+    },
+    {
+      "columns": [
+        "id uuid DEFAULT gen_random_uuid() NOT NULL",
+        "dataset_id uuid NOT NULL",
+        "created_at timestamp with time zone DEFAULT now() NOT NULL",
+        "started_at timestamp with time zone",
+        "finished_at timestamp with time zone",
+        "engine_name text NOT NULL",
+        "engine_version text NOT NULL",
+        "configuration_json jsonb DEFAULT '{}'::jsonb NOT NULL",
+        "status text DEFAULT 'queued'::text NOT NULL",
+        "result_json jsonb",
+        "error_message text",
+        "duration_ms bigint",
+        "schema_version text DEFAULT 'legacy_v0.2'::text NOT NULL",
+        "orders_dataset_id uuid",
+        "fleet_dataset_id uuid",
+        "input_fingerprint text",
+        "result_fingerprint text",
+        "summary_json jsonb",
+        "progress_json jsonb",
+        "decision_case_id uuid",
+        "node_id text",
+        "upstream_run_id uuid",
+        "approved_at timestamp with time zone",
+        "superseded_at timestamp with time zone",
+        "superseded_by_run_id uuid"
+      ],
+      "constraints": [
+        {
+          "definition": "CHECK (decision_case_id IS NULL AND node_id IS NULL OR decision_case_id IS NOT NULL AND node_id IS NOT NULL)",
+          "kind": "c",
+          "name": "decision_runs_case_node_pair_check"
+        },
+        {
+          "definition": "CHECK (status <> 'completed'::text OR result_json IS NOT NULL)",
+          "kind": "c",
+          "name": "decision_runs_completed_has_result"
+        },
+        {
+          "definition": "FOREIGN KEY (dataset_id) REFERENCES datasets(id) ON UPDATE RESTRICT ON DELETE RESTRICT",
+          "kind": "f",
+          "name": "decision_runs_dataset_id_fkey"
+        },
+        {
+          "definition": "FOREIGN KEY (decision_case_id) REFERENCES decision_cases(id) ON DELETE RESTRICT",
+          "kind": "f",
+          "name": "decision_runs_decision_case_id_fkey"
+        },
+        {
+          "definition": "CHECK (duration_ms IS NULL OR duration_ms >= 0)",
+          "kind": "c",
+          "name": "decision_runs_duration_nonnegative"
+        },
+        {
+          "definition": "CHECK (status <> 'error'::text OR error_message IS NOT NULL)",
+          "kind": "c",
+          "name": "decision_runs_error_has_message"
+        },
+        {
+          "definition": "FOREIGN KEY (fleet_dataset_id) REFERENCES datasets(id)",
+          "kind": "f",
+          "name": "decision_runs_fleet_dataset_id_fkey"
+        },
+        {
+          "definition": "CHECK (node_id IS NULL OR (node_id = ANY (ARRAY['logistics_assignment'::text, 'logistics_scheduling'::text, 'logistics_final_assignment'::text])))",
+          "kind": "c",
+          "name": "decision_runs_node_id_check"
+        },
+        {
+          "definition": "FOREIGN KEY (orders_dataset_id) REFERENCES datasets(id)",
+          "kind": "f",
+          "name": "decision_runs_orders_dataset_id_fkey"
+        },
+        {
+          "definition": "PRIMARY KEY (id)",
+          "kind": "p",
+          "name": "decision_runs_pkey"
+        },
+        {
+          "definition": "CHECK (status = ANY (ARRAY['queued'::text, 'running'::text, 'completed'::text, 'error'::text]))",
+          "kind": "c",
+          "name": "decision_runs_status_valid"
+        },
+        {
+          "definition": "FOREIGN KEY (superseded_by_run_id) REFERENCES decision_runs(id) ON DELETE SET NULL",
+          "kind": "f",
+          "name": "decision_runs_superseded_by_run_id_fkey"
+        },
+        {
+          "definition": "CHECK (superseded_at IS NULL OR approved_at IS NOT NULL)",
+          "kind": "c",
+          "name": "decision_runs_superseded_requires_approval_check"
+        },
+        {
+          "definition": "FOREIGN KEY (upstream_run_id) REFERENCES decision_runs(id) ON DELETE RESTRICT",
+          "kind": "f",
+          "name": "decision_runs_upstream_run_id_fkey"
+        }
+      ],
+      "force_rls": false,
+      "grants": [
+        {
+          "grantable": false,
+          "privilege": "INSERT",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "SELECT",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "UPDATE",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "DELETE",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "TRUNCATE",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "REFERENCES",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "TRIGGER",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "MAINTAIN",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "INSERT",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "SELECT",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "UPDATE",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "DELETE",
+          "role": "service_role"
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX decision_runs_case_node_created_idx ON public.decision_runs USING btree (decision_case_id, node_id, created_at DESC) WHERE (decision_case_id IS NOT NULL)",
+        "CREATE INDEX decision_runs_created_at_idx ON public.decision_runs USING btree (created_at DESC)",
+        "CREATE INDEX decision_runs_dataset_id_idx ON public.decision_runs USING btree (dataset_id)",
+        "CREATE INDEX decision_runs_fleet_idx ON public.decision_runs USING btree (fleet_dataset_id)",
+        "CREATE UNIQUE INDEX decision_runs_one_current_approval_idx ON public.decision_runs USING btree (decision_case_id, node_id) WHERE ((decision_case_id IS NOT NULL) AND (approved_at IS NOT NULL) AND (superseded_at IS NULL))",
+        "CREATE INDEX decision_runs_orders_idx ON public.decision_runs USING btree (orders_dataset_id)",
+        "CREATE INDEX decision_runs_schema_created_idx ON public.decision_runs USING btree (schema_version, created_at DESC)",
+        "CREATE INDEX decision_runs_status_idx ON public.decision_runs USING btree (status)",
+        "CREATE INDEX decision_runs_upstream_idx ON public.decision_runs USING btree (upstream_run_id) WHERE (upstream_run_id IS NOT NULL)"
+      ],
+      "name": "decision_runs",
+      "qualified": "public.decision_runs",
+      "rls": true,
+      "triggers": [
+        "CREATE TRIGGER decision_runs_dispatch_contract BEFORE INSERT OR UPDATE ON decision_runs FOR EACH ROW EXECUTE FUNCTION validate_dispatch_run()",
+        "CREATE TRIGGER decision_runs_history_contract BEFORE INSERT OR UPDATE ON decision_runs FOR EACH ROW EXECUTE FUNCTION validate_decision_run_history()",
+        "CREATE TRIGGER decision_runs_reconcile_insert AFTER INSERT ON decision_runs FOR EACH ROW EXECUTE FUNCTION enqueue_case_reconciliation()",
+        "CREATE TRIGGER decision_runs_reconcile_update AFTER UPDATE OF status, approved_at, superseded_at ON decision_runs FOR EACH ROW EXECUTE FUNCTION enqueue_case_reconciliation()"
+      ]
+    },
+    {
+      "columns": [
+        "run_id uuid NOT NULL",
+        "request_json jsonb NOT NULL",
+        "request_fingerprint text NOT NULL",
+        "state text DEFAULT 'queued'::text NOT NULL",
+        "attempts integer DEFAULT 0 NOT NULL",
+        "max_attempts integer DEFAULT 3 NOT NULL",
+        "lease_token uuid",
+        "lease_expires_at timestamp with time zone",
+        "heartbeat_at timestamp with time zone",
+        "available_at timestamp with time zone DEFAULT now() NOT NULL",
+        "deadline_at timestamp with time zone DEFAULT (now() + '00:30:00'::interval) NOT NULL",
+        "created_at timestamp with time zone DEFAULT now() NOT NULL"
+      ],
+      "constraints": [
+        {
+          "definition": "CHECK (state = 'running'::text AND lease_token IS NOT NULL AND lease_expires_at IS NOT NULL OR state <> 'running'::text AND lease_token IS NULL AND lease_expires_at IS NULL)",
+          "kind": "c",
+          "name": "dispatch_job_lease_pair"
+        },
+        {
+          "definition": "CHECK (max_attempts >= 1 AND max_attempts <= 5)",
+          "kind": "c",
+          "name": "dispatch_run_jobs_max_attempts_check"
+        },
+        {
+          "definition": "PRIMARY KEY (run_id)",
+          "kind": "p",
+          "name": "dispatch_run_jobs_pkey"
+        },
+        {
+          "definition": "FOREIGN KEY (run_id) REFERENCES decision_runs(id) ON DELETE RESTRICT",
+          "kind": "f",
+          "name": "dispatch_run_jobs_run_id_fkey"
+        },
+        {
+          "definition": "CHECK (state = ANY (ARRAY['queued'::text, 'running'::text, 'completed'::text, 'error'::text]))",
+          "kind": "c",
+          "name": "dispatch_run_jobs_state_check"
+        }
+      ],
+      "force_rls": false,
+      "grants": [
+        {
+          "grantable": false,
+          "privilege": "INSERT",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "SELECT",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "UPDATE",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "DELETE",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "TRUNCATE",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "REFERENCES",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "TRIGGER",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "MAINTAIN",
+          "role": "postgres"
+        },
+        {
+          "grantable": false,
+          "privilege": "INSERT",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "SELECT",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "UPDATE",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "DELETE",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "TRUNCATE",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "REFERENCES",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "TRIGGER",
+          "role": "service_role"
+        },
+        {
+          "grantable": false,
+          "privilege": "MAINTAIN",
+          "role": "service_role"
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX dispatch_jobs_claim_idx ON public.dispatch_run_jobs USING btree (available_at, created_at) WHERE (state = ANY (ARRAY['queued'::text, 'running'::text]))"
+      ],
+      "name": "dispatch_run_jobs",
+      "qualified": "public.dispatch_run_jobs",
+      "rls": true,
+      "triggers": []
+    }
+  ]
+}

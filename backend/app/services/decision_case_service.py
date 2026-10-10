@@ -41,7 +41,7 @@ RUN_HISTORY_SELECT = (
     "finished_at,engine_name,engine_version,configuration_json,status,"
     "error_message,duration_ms,schema_version,input_fingerprint,"
     "result_fingerprint,summary_json,progress_json,approved_at,"
-    "superseded_at,superseded_by_run_id"
+    "superseded_at,superseded_by_run_id,approved_by"
 )
 
 
@@ -235,26 +235,38 @@ async def ensure_case(
     canonical_state["created_at"] = canonical_state.get("created_at") or now
     canonical_state["updated_at"] = now
 
-    rows = await _db(
-        "POST",
-        "decision_cases",
-        body={
-            "id": case_id,
-            "schema_version": CASE_SCHEMA_VERSION,
-            "domain": CASE_DOMAIN,
-            "status": "active",
-            "orders_dataset_id": orders_dataset_id,
-            "fleet_dataset_id": fleet_dataset_id,
-            "input_signature": input_signature(
-                orders_dataset_id,
-                fleet_dataset_id,
-            ),
-            "state_json": canonical_state,
-            "created_at": canonical_state["created_at"],
-            "updated_at": now,
-            "last_activity_at": now,
-        },
-    )
+    try:
+        rows = await _db(
+            "POST",
+            "decision_cases",
+            body={
+                "id": case_id,
+                "schema_version": CASE_SCHEMA_VERSION,
+                "domain": CASE_DOMAIN,
+                "status": "active",
+                "orders_dataset_id": orders_dataset_id,
+                "fleet_dataset_id": fleet_dataset_id,
+                "input_signature": input_signature(
+                    orders_dataset_id,
+                    fleet_dataset_id,
+                ),
+                "state_json": canonical_state,
+                "created_at": canonical_state["created_at"],
+                "updated_at": now,
+                "last_activity_at": now,
+            },
+        )
+    except httpx.HTTPStatusError as exc:
+        if exc.response.status_code != 409:
+            raise
+        # Two admissions may create the same case. Recheck its immutable Data Pack.
+        existing = await get_case_row(case_id)
+        if not existing:
+            raise
+        if (str(existing["orders_dataset_id"]) != str(orders_dataset_id)
+                or str(existing["fleet_dataset_id"]) != str(fleet_dataset_id)):
+            raise ValueError("El Decision Case ya existe y pertenece a otro Data Pack.") from exc
+        return await update_case(case_id, state=state) if state is not None else existing
     return rows[0]
 
 
@@ -316,13 +328,29 @@ async def list_case_runs(
     params = {
         "select": RUN_HISTORY_SELECT,
         "decision_case_id": f"eq.{case_id}",
-        "order": "created_at.desc",
+        "order": "created_at.desc,id.desc",
         "limit": str(limit),
         "offset": str(offset),
     }
     if node_id is not None:
         params["node_id"] = f"eq.{node_id}"
     return await _db("GET", "decision_runs", params=params) or []
+
+
+async def history_snapshot(case_id: str, *, node_id: str | None = None,
+                           limit: int = 0, offset: int = 0) -> dict:
+    """Read full counts/current approvals and a bounded page in one SQL snapshot."""
+    if node_id is not None and node_id not in NODE_IDS:
+        raise ValueError("Nodo de Decision Case inválido.")
+    if not 0 <= limit <= 200 or offset < 0:
+        raise ValueError("Paginación de corridas inválida.")
+    params = {
+        "target_case_id": case_id,
+        "page_limit": limit, "page_offset": offset,
+    }
+    if node_id is not None:
+        params["target_node_id"] = node_id
+    return await _db("GET", "rpc/decision_case_history", params=params)
 
 
 def _execution_node_status(run: dict) -> str:
@@ -341,6 +369,7 @@ def _state_with_history(
     case_id: str,
     orders_dataset_id: str,
     fleet_dataset_id: str,
+    summaries: dict | None = None,
 ) -> dict:
     canonical = _validate_state(
         state,
@@ -349,6 +378,16 @@ def _state_with_history(
         fleet_dataset_id=fleet_dataset_id,
     )
     grouped = {node_id: [] for node_id in NODE_IDS}
+    if summaries is not None:
+        # At most two rows per node. Current approval may be thousands of runs old.
+        runs = []
+        for node_id in NODE_IDS:
+            summary = summaries[node_id]
+            latest, approved = summary.get("latest"), summary.get("approved")
+            if latest:
+                runs.append(latest)
+            if approved and (not latest or approved["id"] != latest["id"]):
+                runs.append(approved)
     for run in runs:
         node_id = run.get("node_id")
         if node_id in grouped:
@@ -368,7 +407,7 @@ def _state_with_history(
             None,
         )
         current_approved[node_id] = approved
-        node["run_count"] = len(entries)
+        node["run_count"] = summaries[node_id]["run_count"] if summaries is not None else len(entries)
         node["latest_run_id"] = latest.get("id") if latest else None
         node["latest_execution_status"] = (
             latest.get("status") if latest else None
@@ -443,13 +482,14 @@ async def sync_case_history(case_id: str) -> dict:
     row = await get_case_row(case_id)
     if not row:
         raise LookupError("No se encontró el Decision Case.")
-    runs = await list_case_runs(case_id)
+    snapshot = await history_snapshot(case_id)
     state = _state_with_history(
         row.get("state_json") or {},
-        runs,
+        [],
         case_id=case_id,
         orders_dataset_id=str(row["orders_dataset_id"]),
         fleet_dataset_id=str(row["fleet_dataset_id"]),
+        summaries=snapshot["summaries"],
     )
     return await update_case(case_id, state=state)
 
@@ -572,15 +612,25 @@ async def approve_run_version(
             node_id,
             str(run["upstream_run_id"]),
         )
-    rows = await _db(
-        "POST",
-        "rpc/approve_decision_run_version",
-        body={
-            "target_run_id": run_id,
-            "target_case_id": case_id,
-            "target_node_id": node_id,
-        },
-    )
+    try:
+        rows = await _db(
+            "POST",
+            "rpc/approve_decision_run_version",
+            body={
+                "target_run_id": run_id,
+                "target_case_id": case_id,
+                "target_node_id": node_id,
+            },
+        )
+    except httpx.HTTPStatusError as exc:
+        try:
+            code = exc.response.json().get("code")
+        except (ValueError, AttributeError):
+            code = None
+        if code == "22023":
+            from app.services.dispatch_job_service import RunConflict
+            raise RunConflict("La decisión cambió o ya fue reemplazada. Actualizá el caso antes de aprobar.") from exc
+        raise
     if not rows:
         raise ValueError("No se pudo persistir la aprobación de la corrida.")
     return rows[0]
@@ -591,7 +641,7 @@ def _history_item(run: dict, state: dict) -> dict:
     if run.get("superseded_at"):
         decision_state = "superseded"
     elif run.get("approved_at"):
-        decision_state = "approved"
+        decision_state = "stale" if node.get("status") == "stale" else "approved"
     elif run.get("status") == "completed":
         decision_state = "candidate"
     elif run.get("status") in {"queued", "running"}:
@@ -603,7 +653,7 @@ def _history_item(run: dict, state: dict) -> dict:
         "decision_state": decision_state,
         "is_latest": str(node.get("latest_run_id")) == str(run.get("id")),
         "is_current_approved": (
-            str(node.get("approved_run_id")) == str(run.get("id"))
+            node.get("status") == "approved" and str(node.get("approved_run_id")) == str(run.get("id"))
         ),
     }
 
@@ -618,15 +668,16 @@ async def get_run_history(
     row = await get_case_row(case_id)
     if not row:
         raise LookupError("No se encontró el Decision Case.")
-    all_runs = await list_case_runs(case_id, node_id=node_id)
+    snapshot = await history_snapshot(case_id, node_id=node_id, limit=limit, offset=offset)
     state = _state_with_history(
         row.get("state_json") or {},
-        all_runs,
+        [],
         case_id=case_id,
         orders_dataset_id=str(row["orders_dataset_id"]),
         fleet_dataset_id=str(row["fleet_dataset_id"]),
+        summaries=snapshot["summaries"],
     )
-    page = all_runs[offset : offset + limit]
+    page = snapshot["runs"]
     if node_id:
         node = state["nodes"][node_id]
         summary = {
@@ -662,10 +713,10 @@ async def get_case(case_id: str) -> dict:
     row = await get_case_row(case_id)
     if not row:
         raise LookupError("No se encontró el Decision Case.")
-    orders, fleet, runs = await asyncio.gather(
+    orders, fleet, snapshot = await asyncio.gather(
         get_dataset(str(row["orders_dataset_id"])),
         get_dataset(str(row["fleet_dataset_id"])),
-        list_case_runs(case_id),
+        history_snapshot(case_id),
     )
     if not orders or not fleet:
         raise LookupError("No se encontró el Data Pack del Decision Case.")
@@ -673,10 +724,11 @@ async def get_case(case_id: str) -> dict:
         raise ValueError("El Data Pack del Decision Case no conserva sus tipos.")
     state = _state_with_history(
         row.get("state_json") or {},
-        runs,
+        [],
         case_id=case_id,
         orders_dataset_id=str(row["orders_dataset_id"]),
         fleet_dataset_id=str(row["fleet_dataset_id"]),
+        summaries=snapshot["summaries"],
     )
     return {
         "case": row,
@@ -705,18 +757,19 @@ async def list_cases(
     rows = await _db("GET", "decision_cases", params=params) or []
 
     async def hydrate(row: dict) -> dict:
-        orders, fleet, runs = await asyncio.gather(
+        orders, fleet, snapshot = await asyncio.gather(
             get_dataset(str(row["orders_dataset_id"])),
             get_dataset(str(row["fleet_dataset_id"])),
-            list_case_runs(str(row["id"])),
+            history_snapshot(str(row["id"])),
         )
         if not orders or not fleet:
             raise LookupError("No se encontró el Data Pack del Decision Case.")
         state = _state_with_history(
-            row.get("state_json") or {}, runs,
+            row.get("state_json") or {}, [],
             case_id=str(row["id"]),
             orders_dataset_id=str(row["orders_dataset_id"]),
             fleet_dataset_id=str(row["fleet_dataset_id"]),
+            summaries=snapshot["summaries"],
         )
         return {
             "case": row,

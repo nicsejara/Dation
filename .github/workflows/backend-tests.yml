@@ -70,13 +70,13 @@ jobs:
         working-directory: backend
         run: .browser-venv/bin/python tests/browser/test_navigation.py
 
-      - name: Verify durable jobs on disposable PostgreSQL 16
+      - name: Verify schema, history, approvals and durable jobs on PostgreSQL 17
         working-directory: backend
         run: |
-          docker run -d --name dation-ci-postgres -e POSTGRES_HOST_AUTH_METHOD=trust postgres:16-alpine
+          docker run -d --name dation-ci-postgres -e POSTGRES_HOST_AUTH_METHOD=trust postgres:17-alpine
           trap 'docker rm -f dation-ci-postgres' EXIT
           for attempt in {1..30}; do
             if docker exec dation-ci-postgres pg_isready -U postgres; then break; fi
             sleep 1
           done
-          DATION_SQL_TEST_CONTAINER=dation-ci-postgres python tests/integration/test_durable_queue_sql.py -v
+          DATION_SQL_TEST_CONTAINER=dation-ci-postgres python -m unittest discover -s tests/integration -v

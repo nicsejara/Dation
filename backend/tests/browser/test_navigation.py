@@ -57,6 +57,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.delay = {}
         self.post_status = 202
         self.missing_run = False
+        self.history_rows = None
+        self.history_failure = False
         self.pw = await async_playwright().start()
         executable = os.getenv("CHROMIUM_EXECUTABLE")
         if not executable and Path("/usr/bin/chromium").exists():
@@ -103,9 +105,13 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         elif path == "/api/decision-cases": data = {"cases":[self.hydrated()]}
         elif path.startswith("/api/decision-cases/") and path.endswith("/runs"):
             node = query.get("node_id", ["logistics_assignment"])[0]
-            runs = [r for r in self.runs.values() if r.get("node_id") == node]
+            runs = self.history_rows if self.history_rows is not None else [r for r in self.runs.values() if r.get("node_id") == node]
+            offset,limit=int(query.get('offset',['0'])[0]),int(query.get('limit',['100'])[0])
             data = {"case_id":self.case["id"],"node_id":node,"total":len(runs),"summary":self.case["nodes"][node],
-                    "runs":[{**r,"result_json":None,"decision_state":"approved" if r.get("approved_at") else "candidate"} for r in runs]}
+                    "offset":offset,"limit":limit,
+                    "runs":[{**r,"result_json":None,"decision_state":"approved" if r.get("approved_at") else "candidate"} for r in runs[offset:offset+limit]]}
+            if self.history_failure and offset:
+                status,data=503,{'detail':'Historial temporalmente no disponible'}
         elif path.startswith("/api/decision-cases/"):
             if path.split("/")[-1] != self.case["id"]:
                 status, data = 404, {"detail":"No se encontró el Decision Case."}
@@ -260,6 +266,49 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.page.wait_for_selector(".dispatch-trace-dialog")
         await self.nav("logistics-data")
         self.assertEqual(await self.page.locator(".dispatch-trace-dialog").count(),0)
+
+    def large_history(self):
+        row=self.f['runs']['assignment']
+        self.history_rows=[{**row,'id':f'00000000-0000-4000-8000-{index:012d}','approved_at':None} for index in range(205,0,-1)]
+        self.history_rows[-1]=row
+
+    async def test_history_paginates_and_preserves_approval_outside_page(self):
+        self.large_history()
+        await self.page.set_viewport_size({'width':390,'height':844})
+        await self.open()
+        await self.page.evaluate("window.DationDispatch.openRunHistory('logistics_assignment')")
+        await self.page.wait_for_selector('[data-history-next]')
+        self.assertEqual(await self.page.locator('[data-history-range]').inner_text(),'1–100 de 205')
+        summary=await self.page.locator('.dispatch-run-history__summary').inner_text()
+        self.assertIn('Aprobada vigente',summary)
+        await self.page.locator('[data-history-next]').click()
+        await self.page.wait_for_function("document.querySelector('[data-history-range]')?.textContent==='101–200 de 205'")
+        self.assertEqual(await self.page.locator('.dispatch-run-history__summary').inner_text(),summary)
+        await self.page.locator('[data-history-next]').click()
+        await self.page.wait_for_function("document.querySelector('[data-history-range]')?.textContent==='201–205 de 205'")
+        self.assertTrue(await self.page.locator('[data-history-next]').is_disabled())
+        self.assertEqual(await self.page.locator('.dispatch-run-history__item').count(),5)
+        self.assertIn('Aprobación histórica',await self.page.locator('.dispatch-run-history__list').inner_text())
+        self.assertFalse(await self.page.evaluate('document.documentElement.scrollWidth>innerWidth'))
+        await self.page.locator('[data-history-prev]').click()
+        await self.page.wait_for_function("document.querySelector('[data-history-range]')?.textContent==='101–200 de 205'")
+
+    async def test_history_page_error_retries_and_late_response_cannot_reopen_dialog(self):
+        self.large_history();self.history_failure=True
+        await self.open()
+        await self.page.evaluate("window.DationDispatch.openRunHistory('logistics_assignment')")
+        await self.page.wait_for_selector('[data-history-next]')
+        await self.page.locator('[data-history-next]').click()
+        await self.page.wait_for_function("document.querySelector('[data-history-error]')?.textContent.includes('no disponible')")
+        self.assertEqual(await self.page.locator('[data-history-range]').inner_text(),'1–100 de 205')
+        self.history_failure=False
+        await self.page.locator('[data-history-next]').click()
+        await self.page.wait_for_function("document.querySelector('[data-history-range]')?.textContent==='101–200 de 205'")
+        self.delay[f"/api/decision-cases/{self.case['id']}/runs"]=.6
+        await self.page.locator('[data-history-next]').click()
+        await self.nav('logistics-data')
+        await self.page.wait_for_timeout(750)
+        self.assertEqual(await self.page.locator('.dispatch-trace-dialog').count(),0)
 
     async def test_mobile_config_stays_within_viewport(self):
         await self.page.set_viewport_size({"width":390,"height":844})
