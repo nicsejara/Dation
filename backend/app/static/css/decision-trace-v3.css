@@ -265,3 +265,4 @@
 .dispatch-run-history__pagination button{border:1px solid #d7dfe7;border-radius:8px;background:white;padding:10px 14px;cursor:pointer}
 .dispatch-run-history__pagination button:disabled{opacity:.45;cursor:default}
 [data-history-error]{color:#a52b31}
+.dispatch-run-history__body small+small{display:block;margin-top:4px}
