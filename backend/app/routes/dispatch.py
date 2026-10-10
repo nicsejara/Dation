@@ -196,12 +196,14 @@ async def list_decision_cases(
     status: Literal["active", "completed", "archived"] | None = Query("active"),
     limit: int = Query(50, ge=1, le=100),
     offset: int = Query(0, ge=0),
+    summary: bool = Query(False),
 ):
     cases = await guarded(
         case_service.list_cases(
             status=status,
             limit=limit,
             offset=offset,
+            summary=summary,
         )
     )
     return {"cases": cases}

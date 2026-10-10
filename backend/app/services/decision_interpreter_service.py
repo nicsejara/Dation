@@ -3,6 +3,8 @@ from uuid import uuid4
 
 import httpx
 
+from app.services.http_service import http_client
+
 from app.config import (
     SUPABASE_SECRET_KEY,
     SUPABASE_URL,
@@ -258,9 +260,7 @@ async def _insert_explanation(
         "usage_json": usage_json,
     }
 
-    async with httpx.AsyncClient(
-        timeout=15.0
-    ) as client:
+    async with http_client() as client:
         response = await client.post(
             (
                 f"{SUPABASE_URL}/rest/v1/"
@@ -276,6 +276,7 @@ async def _insert_explanation(
                 ),
             },
             json=payload,
+            timeout=15.0,
         )
         response.raise_for_status()
 
@@ -286,9 +287,7 @@ async def _recent_messages(
     run_id: str,
     limit: int = 6,
 ) -> list[dict]:
-    async with httpx.AsyncClient(
-        timeout=15.0
-    ) as client:
+    async with http_client() as client:
         response = await client.get(
             (
                 f"{SUPABASE_URL}/rest/v1/"
@@ -303,6 +302,7 @@ async def _recent_messages(
                 "order": "created_at.desc",
                 "limit": str(limit),
             },
+            timeout=15.0,
         )
         response.raise_for_status()
 
@@ -339,9 +339,7 @@ async def _insert_message(
         ),
     }
 
-    async with httpx.AsyncClient(
-        timeout=15.0
-    ) as client:
+    async with http_client() as client:
         response = await client.post(
             (
                 f"{SUPABASE_URL}/rest/v1/"
@@ -354,6 +352,7 @@ async def _insert_message(
                 ),
             },
             json=payload,
+            timeout=15.0,
         )
         response.raise_for_status()
 
@@ -546,9 +545,7 @@ async def answer_question(
 async def get_saved_interpretation(
     run_id: str,
 ) -> dict:
-    async with httpx.AsyncClient(
-        timeout=15.0
-    ) as client:
+    async with http_client() as client:
         explanation_response = (
             await client.get(
                 (
@@ -566,6 +563,7 @@ async def get_saved_interpretation(
                     ),
                     "limit": "1",
                 },
+                timeout=15.0,
             )
         )
 
@@ -591,6 +589,7 @@ async def get_saved_interpretation(
                     ),
                     "limit": "50",
                 },
+                timeout=15.0,
             )
         )
 

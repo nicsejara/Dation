@@ -7,6 +7,7 @@ import signal
 from app.config import supabase_configured
 from app.services.dispatch_job_service import worker_loop
 from app.services import dispatch_service
+from app.services.http_service import http_pool
 
 
 async def health_handler(reader, writer):
@@ -17,6 +18,11 @@ async def health_handler(reader, writer):
 
 
 async def main():
+    async with http_pool():
+        await run_worker()
+
+
+async def run_worker():
     if not supabase_configured():
         raise RuntimeError("El worker requiere las variables de Supabase.")
     queue_ok, _ = await dispatch_service._probe_rpc_catalog([

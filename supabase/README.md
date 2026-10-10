@@ -15,7 +15,8 @@ Sobre un proyecto Supabase nuevo, con sus roles `anon`, `authenticated` y
 1. Aplicar **una sola vez** el baseline completo `20261010100000_public_schema.sql`.
 2. Aplicar sólo las migraciones cuya fecha sea **posterior a `20261010100000`**, en
    orden: `20261010183000_persistence_traceability.sql` y
-   `20261010190000_approval_clock_after_lock.sql`.
+   `20261010190000_approval_clock_after_lock.sql` y
+   `20261010220000_case_list_performance.sql`.
 3. Configurar el bucket privado de entradas `dda-inputs` en Supabase Storage y las
    variables/secretos de la aplicación. El baseline no reemplaza `auth`, `storage`,
    `vault`, roles administrados ni configuración del proveedor.
@@ -60,3 +61,16 @@ docker rm -f dation-qa-postgres
 `scripts/capture_public_schema.py` es una herramienta de lectura administrativa;
 se limita al esquema de Fase 3 para evitar sobrescribir este baseline con otro
 estado. Para capturas futuras se debe versionar un baseline nuevo.
+
+## Fase 5: listas agrupadas
+
+Sobre Fase 4, aplicar `20261010220000_case_list_performance.sql` con
+`python scripts/apply_production_performance.py` antes de desplegar la API nueva.
+Añade únicamente una función de lectura `STABLE`, con permisos exclusivos para
+`service_role`. Verifica definición, prerrequisitos y permisos; una repetición
+verifica el estado y no reemplaza funciones que tengan drift.
+
+La lista de casos se limita a 100 y mantiene las aprobaciones/conteos actuales.
+`summary=true` omite los perfiles completos de datasets para el selector; el
+detalle se obtiene al abrir el caso. Sin ese parámetro se mantiene la respuesta
+completa. Ver [Fase 5](../docs/phase5-performance.md) para presupuestos y validación.

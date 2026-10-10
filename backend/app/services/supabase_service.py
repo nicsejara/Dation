@@ -1,5 +1,7 @@
 import httpx
 
+from app.services.http_service import http_client
+
 from app.config import SUPABASE_SECRET_KEY, SUPABASE_URL, supabase_configured
 
 
@@ -25,11 +27,12 @@ async def check_supabase_connection() -> dict:
     }
 
     try:
-        async with httpx.AsyncClient(timeout=10.0) as client:
+        async with http_client() as client:
             response = await client.get(
                 url,
                 headers=_headers(),
                 params=params,
+                timeout=10.0,
             )
 
         if response.is_success:

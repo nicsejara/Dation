@@ -153,6 +153,7 @@ class DecisionCaseHTTPTests(unittest.IsolatedAsyncioTestCase):
                 status="active",
                 limit=50,
                 offset=0,
+                summary=False,
             )
 
             restored = await self.client.get(

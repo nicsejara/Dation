@@ -59,6 +59,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.missing_run = False
         self.history_rows = None
         self.history_failure = False
+        self.selector_size = 1
+        self.selector_queries = []
         self.pw = await async_playwright().start()
         executable = os.getenv("CHROMIUM_EXECUTABLE")
         if not executable and Path("/usr/bin/chromium").exists():
@@ -102,7 +104,16 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             data = {"dataset":self.f["datasets"][kind]}
         elif path in {"/api/runs/preflight", "/api/runs/assignment-preview"}:
             data = self.f["preflight" if path.endswith("preflight") else "preview"]
-        elif path == "/api/decision-cases": data = {"cases":[self.hydrated()]}
+        elif path == "/api/decision-cases":
+            self.selector_queries.append(query)
+            items=[self.hydrated() for _ in range(self.selector_size)]
+            for i,item in enumerate(items):
+                if i:item['case']['id']=f'00000000-0000-4000-9000-{i:012d}'
+                if query.get('summary') == ['true']:
+                    for kind in ('orders','fleet'):
+                        item[kind]={k:v for k,v in item[kind].items() if k in
+                            ('id','dataset_type','canonical_filename','label','original_filename')}
+            data = {"cases":items}
         elif path.startswith("/api/decision-cases/") and path.endswith("/runs"):
             node = query.get("node_id", ["logistics_assignment"])[0]
             runs = self.history_rows if self.history_rows is not None else [r for r in self.runs.values() if r.get("node_id") == node]
@@ -163,6 +174,20 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
     async def test_cold_assignment_link(self):
         await self.open("decision-dashboard","logistics_assignment",self.f["ids"]["assignment"])
         self.assertEqual(await self.page.evaluate("window.DationDispatch.getWorkspace().orders.id"),self.f["ids"]["orders"])
+
+    async def test_case_selector_requests_one_compact_page_and_hydrates_only_selection(self):
+        self.selector_size=100
+        await self.open()
+        before=len(self.requests)
+        await self.page.evaluate('window.DationDispatch.openDecisionMap()')
+        await self.page.wait_for_selector('[data-open-case]')
+        self.assertEqual(await self.page.locator('[data-open-case]').count(),100)
+        self.assertEqual(self.selector_queries[-1].get('summary'),['true'])
+        self.assertEqual(self.requests[before:],[('GET','/api/decision-cases')])
+        await self.page.locator('[data-open-case="'+self.case['id']+'"]').click()
+        await self.page.wait_for_selector('[data-map-node=logistics_assignment]')
+        self.assertEqual(await self.page.locator('[data-open-case]').count(),0)
+        self.assertIn(('GET','/api/decision-cases/'+self.case['id']),self.requests[before:])
 
     async def test_cold_scheduling_link_and_refresh(self):
         await self.open("decision-dashboard","logistics_scheduling",self.f["ids"]["scheduling"])

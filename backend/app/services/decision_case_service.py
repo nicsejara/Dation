@@ -6,6 +6,8 @@ from datetime import datetime, timezone
 
 import httpx
 
+from app.services.http_service import http_client
+
 from app.config import SUPABASE_URL
 from app.services.run_service import _headers, get_dataset, get_run
 
@@ -95,7 +97,7 @@ def _base_state(
 
 
 async def _db(method: str, path: str, *, params=None, body=None):
-    async with httpx.AsyncClient(timeout=30.0) as client:
+    async with http_client() as client:
         response = await client.request(
             method,
             f"{SUPABASE_URL}/rest/v1/{path}",
@@ -106,6 +108,7 @@ async def _db(method: str, path: str, *, params=None, body=None):
             },
             params=params,
             json=body,
+            timeout=30.0,
         )
         response.raise_for_status()
         return response.json() if response.content else None
@@ -743,39 +746,36 @@ async def list_cases(
     status: str | None = "active",
     limit: int = 50,
     offset: int = 0,
+    summary: bool = False,
 ) -> list[dict]:
     if status is not None and status not in CASE_STATUSES:
         raise ValueError("Estado de Decision Case inválido.")
-    params = {
-        "select": "*",
-        "order": "last_activity_at.desc",
-        "limit": str(limit),
-        "offset": str(offset),
-    }
-    if status is not None:
-        params["status"] = f"eq.{status}"
-    rows = await _db("GET", "decision_cases", params=params) or []
-
-    async def hydrate(row: dict) -> dict:
-        orders, fleet, snapshot = await asyncio.gather(
-            get_dataset(str(row["orders_dataset_id"])),
-            get_dataset(str(row["fleet_dataset_id"])),
-            history_snapshot(str(row["id"])),
-        )
+    if not 1 <= limit <= 100 or offset < 0:
+        raise ValueError("Paginación de casos inválida.")
+    # POST transports nullable SQL parameters correctly (GET encodes None as '').
+    # The STABLE RPC only reads; no response or approval is cached between requests.
+    bundles = await _db("POST", "rpc/list_decision_cases", body={
+        "case_status": status, "page_limit": limit, "page_offset": offset,
+        "summary_only": summary,
+    }) or []
+    result = []
+    for bundle in bundles:
+        row, orders, fleet = bundle["case_row"], bundle["orders"], bundle["fleet"]
         if not orders or not fleet:
             raise LookupError("No se encontró el Data Pack del Decision Case.")
+        if orders.get("dataset_type") != "orders" or fleet.get("dataset_type") != "fleet":
+            raise ValueError("El Data Pack del Decision Case no conserva sus tipos.")
         state = _state_with_history(
             row.get("state_json") or {}, [],
             case_id=str(row["id"]),
             orders_dataset_id=str(row["orders_dataset_id"]),
             fleet_dataset_id=str(row["fleet_dataset_id"]),
-            summaries=snapshot["summaries"],
+            summaries=bundle["summaries"],
         )
-        return {
+        result.append({
             "case": row,
             "decision_case": state,
             "orders": orders,
             "fleet": fleet,
-        }
-
-    return await asyncio.gather(*(hydrate(row) for row in rows))
+        })
+    return result

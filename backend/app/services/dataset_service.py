@@ -4,6 +4,8 @@ from uuid import uuid4
 
 import httpx
 
+from app.services.http_service import http_client
+
 from app.config import (
     SUPABASE_INPUT_BUCKET,
     SUPABASE_SECRET_KEY,
@@ -26,8 +28,8 @@ async def find_dataset_by_hash(file_hash: str) -> dict | None:
         "limit": "1",
     }
 
-    async with httpx.AsyncClient(timeout=15.0) as client:
-        response = await client.get(url, headers=_headers(), params=params)
+    async with http_client() as client:
+        response = await client.get(url, headers=_headers(), params=params, timeout=15.0)
         response.raise_for_status()
 
     data = response.json()
@@ -65,11 +67,12 @@ async def upload_dataset(
         "x-upsert": "false",
     }
 
-    async with httpx.AsyncClient(timeout=30.0) as client:
+    async with http_client() as client:
         storage_response = await client.post(
             storage_url,
             headers=storage_headers,
             content=contents,
+            timeout=30.0,
         )
         storage_response.raise_for_status()
 
@@ -94,11 +97,12 @@ async def upload_dataset(
                 "Prefer": "return=representation",
             },
             json=metadata,
+            timeout=30.0,
         )
 
         if not db_response.is_success:
             # Best-effort rollback so Storage and database do not drift.
-            await client.delete(storage_url, headers=_headers())
+            await client.delete(storage_url, headers=_headers(), timeout=30.0)
             db_response.raise_for_status()
 
     created = db_response.json()[0]
