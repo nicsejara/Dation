@@ -112,9 +112,14 @@ class PersistenceSQLTests(SQLSandbox,unittest.TestCase):
         a,b=self.candidate(),self.candidate();self.approve(a)
         child=self.candidate(node='logistics_scheduling',upstream=a)
         # Ensure the parent replacement wins the case lock while the child request is waiting.
+        name='dation_parent_'+uuid4().hex
         with ThreadPoolExecutor(max_workers=2) as pool:
-            replacement=pool.submit(self.command,f"BEGIN; SELECT id FROM decision_cases WHERE id='{CASE}' FOR UPDATE; SELECT pg_sleep(.3); SELECT id FROM approve_decision_run_version('{b}','{CASE}','logistics_assignment'); COMMIT;")
-            time.sleep(.1)
+            replacement=pool.submit(self.command,f"SET application_name='{name}'; BEGIN; SELECT id FROM decision_cases WHERE id='{CASE}' FOR UPDATE; SELECT pg_sleep(2); SELECT id FROM approve_decision_run_version('{b}','{CASE}','logistics_assignment'); COMMIT;")
+            for _ in range(30):
+                if self.sql(f"SELECT EXISTS(SELECT 1 FROM pg_stat_activity WHERE application_name='{name}' AND wait_event='PgSleep');")=='t':
+                    break
+                time.sleep(.01)
+            else:self.fail('Parent did not acquire the case lock')
             child_result=pool.submit(self.approve,child,'logistics_scheduling',False)
             self.assertEqual(replacement.result().returncode,0)
             self.assertNotEqual(child_result.result().returncode,0)

@@ -63,5 +63,5 @@ instalación nueva y el upgrade con evidencia histórica en PostgreSQL 17.
 Rollback: replegar la imagen anterior de API/worker sin eliminar esquema ni
 evidencia. Las restricciones y RPCs nuevas son compatibles con los consumidores
 de Fase 3; las nuevas aprobaciones mantienen semántica monotónica también durante
-el rollback. La publicación efectiva se registra en
-[production-release-status.md](production-release-status.md).
+el rollback. El estado de CI y la verificación de publicación de esta fase se
+registran en [PR #39](https://github.com/nicsejara/Dation/pull/39).
