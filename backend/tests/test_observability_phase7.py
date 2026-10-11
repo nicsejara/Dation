@@ -99,7 +99,7 @@ class TelemetryTests(unittest.IsolatedAsyncioTestCase):
 class LLMTests(unittest.IsolatedAsyncioTestCase):
     @asynccontextmanager
     async def client(self,handler):
-        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler), base_url='https://synthetic.local') as client:
             telemetry.instrument_http(client);yield client
 
     async def test_retry_is_capped_once_and_usage_is_sanitized(self):
