@@ -1,4 +1,9 @@
 import json
+import asyncio
+import hashlib
+from functools import wraps
+from app.observability import context as telemetry_context, identify, event
+from app.services import dispatch_service as dispatch
 from uuid import uuid4
 
 import httpx
@@ -24,7 +29,28 @@ from app.services.llm_service import (
 from app.services.run_service import get_run
 
 
+class ChatConflict(ValueError):
+    pass
+
+
 PROMPT_VERSION = "decision_interpreter_v3.0"
+TURN_DEADLINE_SECONDS = 90.0
+
+
+def bounded_turn(function):
+    @wraps(function)
+    async def bounded(*args, **kwargs):
+        identify(run_id=kwargs.get('run_id') or (args[0] if args else None), turn_id=kwargs.get('turn_id'))
+        try:
+            async with asyncio.timeout(TURN_DEADLINE_SECONDS):
+                return await function(*args, **kwargs)
+        except httpx.HTTPStatusError as exc:
+            try: code = exc.response.json().get('code')
+            except (ValueError, AttributeError): code = None
+            if code == '22023':
+                raise ChatConflict('Ese turno identifica otra pregunta o una corrida no disponible.') from exc
+            raise
+    return bounded
 
 EXPLANATION_SCHEMA = {
     "type": "object",
@@ -299,7 +325,7 @@ async def _recent_messages(
                     "role,content,created_at"
                 ),
                 "run_id": f"eq.{run_id}",
-                "order": "created_at.desc",
+                "order": "created_at.desc,id.desc",
                 "limit": str(limit),
             },
             timeout=15.0,
@@ -316,45 +342,6 @@ async def _recent_messages(
         }
         for item in messages
     ]
-
-
-async def _insert_message(
-    *,
-    run_id: str,
-    role: str,
-    content: str,
-    provider: str | None = None,
-    model: str | None = None,
-    knowledge_version: str | None = None,
-) -> None:
-    payload = {
-        "id": str(uuid4()),
-        "run_id": run_id,
-        "role": role,
-        "content": content,
-        "provider": provider,
-        "model": model,
-        "knowledge_version": (
-            knowledge_version
-        ),
-    }
-
-    async with http_client() as client:
-        response = await client.post(
-            (
-                f"{SUPABASE_URL}/rest/v1/"
-                "decision_messages"
-            ),
-            headers={
-                **_headers(),
-                "Content-Type": (
-                    "application/json"
-                ),
-            },
-            json=payload,
-            timeout=15.0,
-        )
-        response.raise_for_status()
 
 
 async def _load_completed_run(
@@ -379,6 +366,7 @@ async def _load_completed_run(
     return run
 
 
+@bounded_turn
 async def generate_explanation(
     run_id: str,
 ) -> dict:
@@ -458,11 +446,21 @@ async def generate_explanation(
     }
 
 
+@bounded_turn
 async def answer_question(
     *,
     run_id: str,
     question: str,
+    turn_id: str | None = None,
 ) -> dict:
+    turn_id = turn_id or str(uuid4())
+    identify(run_id=run_id, turn_id=turn_id)
+    intent_hash = hashlib.sha256(question.encode()).hexdigest()
+    replay = await dispatch.db('POST', 'rpc/read_decision_chat_turn', body={
+        'target_turn_id': turn_id, 'target_run_id': run_id, 'intent_hash': intent_hash})
+    if replay:
+        event('chat_replayed', prompt_version=replay['prompt_version'])
+        return replay
     run = await _load_completed_run(
         run_id
     )
@@ -508,42 +506,20 @@ async def answer_question(
         if not verify_numbers(response['content'], context):
             response['content'] = 'No pude verificar las cifras de la respuesta generada. Consultá los valores exactos del plan y reformulá la pregunta.'
 
-    await _insert_message(
-        run_id=run_id,
-        role="user",
-        content=question,
-        knowledge_version=(
-            knowledge["version"]
-        ),
-    )
-    await _insert_message(
-        run_id=run_id,
-        role="assistant",
-        content=response["content"],
-        provider=response["provider"],
-        model=response["model"],
-        knowledge_version=(
-            knowledge["version"]
-        ),
-    )
-
-    return {
-        "run_id": run_id,
-        "provider": response["provider"],
-        "model": response["model"],
-        "knowledge_version": (
-            knowledge["version"]
-        ),
-        "answer": response["content"],
-        "usage": response.get(
-            "usage",
-            {},
-        ),
-    }
+    result = await dispatch.db('POST', 'rpc/record_decision_chat_turn', body={
+        'target_turn_id': turn_id, 'target_run_id': run_id, 'intent_hash': intent_hash,
+        'question_text': question, 'answer_text': response['content'],
+        'metadata': {'provider': response['provider'], 'model': response['model'],
+                     'knowledge_version': knowledge['version'], 'prompt_version': PROMPT_VERSION,
+                     'usage': response.get('usage', {}), 'request_id': telemetry_context.get().get('request_id')},
+    })
+    event('chat_turn_persisted', prompt_version=PROMPT_VERSION)
+    return result
 
 
 async def get_saved_interpretation(
     run_id: str,
+    *, limit: int = 50, offset: int = 0,
 ) -> dict:
     async with http_client() as client:
         explanation_response = (
@@ -576,18 +552,19 @@ async def get_saved_interpretation(
                 headers=_headers(),
                 params={
                     "select": (
-                        "role,content,"
+                        "id,role,content,"
                         "created_at,provider,"
                         "model,"
-                        "knowledge_version"
+                        "knowledge_version,turn_id"
                     ),
                     "run_id": (
                         f"eq.{run_id}"
                     ),
                     "order": (
-                        "created_at.asc"
+                        "created_at.desc,id.desc"
                     ),
-                    "limit": "50",
+                    "limit": str(limit+1),
+                    "offset": str(offset),
                 },
                 timeout=15.0,
             )
@@ -600,15 +577,17 @@ async def get_saved_interpretation(
         explanation_response.json()
     )
 
+    recent = messages_response.json()
     return {
         "run_id": run_id,
+        "pagination": {"has_more": len(recent) > limit, "next_offset": offset+limit, "limit": limit},
         "explanation": (
             explanations[0]
             if explanations
             else None
         ),
         "messages": (
-            messages_response.json()
+            list(reversed(recent[:limit]))
         ),
     }
 

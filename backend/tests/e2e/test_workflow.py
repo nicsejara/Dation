@@ -21,7 +21,7 @@ class WorkflowTests(unittest.TestCase):
 
     def setUp(self):
         self.s.stop(self.s.worker)
-        self.s.sql('TRUNCATE datasets,decision_runs,decision_cases,decision_approval_events CASCADE;')
+        self.s.sql('TRUNCATE datasets,decision_runs,decision_cases,decision_approval_events,dispatch_worker_instances CASCADE;')
         shutil.rmtree(self.s.storage);self.s.storage.mkdir()
 
     def tearDown(self):
@@ -77,6 +77,43 @@ class WorkflowTests(unittest.TestCase):
 
     def approve(self,run,case,node='logistics_assignment'):
         return self.checked(self.s.api_client.post('/api/runs/'+run+'/approve',json={'case_id':case,'node_id':node}))
+
+    def test_private_operations_trace_worker_readiness_and_cluster_metrics(self):
+        for path in ['/ready','/metrics','/api/system/operations']:
+            response=self.s.http.get(self.s.api_url+path)
+            self.assertEqual(response.status_code,401)
+            self.assertIn('x-request-id',response.headers)
+        self.assertEqual(self.s.api_client.get('/ready').status_code,503)
+        self.assertEqual(self.checked(self.s.api_client.get('/api/system/operations'))['database'],'available')
+        case,orders,fleet=self.case();identifier=str(uuid4());request_id=str(uuid4());trace=uuid4().hex
+        response=self.s.api_client.post('/api/runs',params={'run_id':identifier},json=self.body(case,orders,fleet),
+            headers={'X-Request-ID':request_id,'traceparent':'00-'+trace+'-'+'1'*16+'-01'})
+        self.checked(response,202);self.assertEqual(response.headers['x-request-id'],request_id)
+        self.assertIn(trace,response.headers['traceparent'])
+        metadata=self.job(identifier)['request_json']['_observability']
+        self.assertEqual(metadata,{'request_id':request_id,'trace_id':trace})
+        self.s.start_worker();run=self.finish(identifier)
+        ready=self.checked(self.s.api_client.get('/ready'));self.assertTrue(ready['ready'])
+        snapshot=self.checked(self.s.api_client.get('/api/system/operations'))
+        self.assertEqual(snapshot['workers']['healthy'],1);self.assertEqual(snapshot['queue']['queued'],0)
+        self.assertEqual(snapshot['runs_24h']['duration_p95_ms'],run['duration_ms'])
+        metrics=self.s.api_client.get('/metrics');self.assertEqual(metrics.status_code,200)
+        self.assertIn('dation_workers_healthy 1',metrics.text);self.assertNotIn(identifier,metrics.text)
+        worker_metrics=self.s.http.get('http://127.0.0.1:'+str(self.s.worker_port)+'/metrics')
+        self.assertEqual(worker_metrics.status_code,200)
+        self.assertIn('dation_worker_execution_seconds_count',worker_metrics.text)
+        records=[]
+        for logfile in self.s.logs:
+            for line in Path(logfile.name).read_text().splitlines():
+                try:records.append(json.loads(line))
+                except ValueError:pass
+        lifecycle=[r for r in records if r.get('run_id')==identifier and r.get('event') in ('dispatch_admitted','dispatch_claimed','dispatch_completed')]
+        self.assertEqual({r['event'] for r in lifecycle},{'dispatch_admitted','dispatch_claimed','dispatch_completed'})
+        self.assertTrue(all(r['request_id']==request_id and r['trace_id']==trace for r in lifecycle))
+        self.assertTrue(any(r['component']=='worker' for r in lifecycle))
+        self.s.stop(self.s.worker)
+        self.assertEqual(self.s.api_client.get('/ready').status_code,503)
+        self.assertEqual(self.checked(self.s.api_client.get('/health')),{'status':'healthy'})
 
     def test_private_ingestion_deduplication_and_tampered_storage_fail_closed(self):
         for path in ['/app','/api/decision-cases']:

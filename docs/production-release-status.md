@@ -46,3 +46,19 @@ No requiere migraciones ni cambia el runtime. El resultado final de CI y Cloud
 Build del commit integrado se registra en el PR de publicación. Los reinicios y
 las alteraciones de datos de las pruebas ocurren exclusivamente en la base
 descartable; la verificación productiva posterior usa lecturas.
+
+
+## Fase 7: cierre de observabilidad y auditoría
+
+Implementación y runbook: [phase7-observability.md](phase7-observability.md).
+La publicación incluye logs JSON correlacionados API/cola/worker, métricas privadas,
+readiness con heartbeat persistido y alertas de cola/reconciliación. El intérprete
+incorpora deadlines, reintento acotado, turnos atómicos/auditados e historial reciente
+paginado. La primera lectura de la corrida espera su admisión 202.
+
+La migración aditiva se instala con `scripts/apply_production_observability.py`,
+que compara el catálogo exacto y detiene instalaciones parciales o con drift.
+El PR de publicación registra CI, commit integrado, Cloud Build, revisiones con
+tráfico y verificaciones productivas finales. Los fallos y reinicios forzados se
+prueban exclusivamente en infraestructura descartable. No se crean políticas
+externas de notificación ni se modifican permisos del workspace compartido.

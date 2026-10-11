@@ -7,6 +7,8 @@ import logging
 import os
 from threading import Event, Lock
 from uuid import uuid4
+from time import perf_counter
+from app.observability import bind_context, context, event, identify, metrics
 
 import httpx
 
@@ -39,6 +41,7 @@ def engine_identity(node):
 
 async def enqueue(orders_id, fleet_id, configuration, options, run_id, decision_case=None, source_run_id=None):
     node = (decision_case or {}).get("node_id")
+    identify(run_id=run_id, case_id=(decision_case or {}).get("case_id"))
     engine_name, engine_version, schema = engine_identity(node)
     request = {"orders_id":orders_id,"fleet_id":fleet_id,"configuration":configuration,
                "options":options,"decision_case":decision_case,"source_run_id":source_run_id,
@@ -52,6 +55,7 @@ async def enqueue(orders_id, fleet_id, configuration, options, run_id, decision_
         run = await get_run(run_id)
         if not run:
             raise RuntimeError("Falta la corrida registrada por la cola.")
+        event("dispatch_replayed", node_id=node)
         return run
     if decision_case:
         await cases.ensure_case(decision_case["case_id"],orders_id,fleet_id)
@@ -69,6 +73,8 @@ async def enqueue(orders_id, fleet_id, configuration, options, run_id, decision_
     payload = {"id":run_id,"dataset_id":orders_id,"orders_dataset_id":orders_id,"fleet_dataset_id":fleet_id,
                "configuration_json":stored_config,"schema_version":schema,"engine_name":engine_name,"engine_version":engine_version,
                "decision_case_id":(decision_case or {}).get("case_id"),"node_id":node,"upstream_run_id":source_run_id}
+    if context.get():
+        request["_observability"] = {k: context.get()[k] for k in ("request_id", "trace_id")}
     try:
         rows = await dispatch.db("POST","rpc/enqueue_dispatch_run",body={
             "run_payload":payload,"job_request":request,"intent_fingerprint":fingerprint,
@@ -82,7 +88,7 @@ async def enqueue(orders_id, fleet_id, configuration, options, run_id, decision_
         raise
     if not rows:
         raise RuntimeError("La cola no devolvió la corrida aceptada.")
-    log.info("dispatch_accepted run_id=%s",run_id)
+    event("dispatch_admitted", node_id=node, stage="queued")
     return rows[0]
 
 
@@ -102,7 +108,7 @@ async def reconcile_cases(limit=10):
         try:
             await cases.sync_case_history(case_id)
             await dispatch.db("POST","rpc/ack_case_reconciliation",body={"target_case_id":case_id,"observed_version":version})
-            log.info("case_reconciled case_id=%s version=%s",case_id,version)
+            event("case_reconciled", case_id=case_id, version=version)
         except (httpx.HTTPError,ValueError,LookupError):
             attempts = task["attempts"] + 1
             # Conditional write: never delay a newer completion or approval.
@@ -111,10 +117,24 @@ async def reconcile_cases(limit=10):
                     body={"attempts":attempts,"available_at":(now+timedelta(seconds=min(300,2**min(attempts,8)))).isoformat()})
             except httpx.HTTPError:
                 pass
-            log.warning("case_reconciliation_pending case_id=%s version=%s",case_id,version)
+            event("case_reconciliation_pending", level=logging.WARNING, case_id=case_id, version=version, attempt=attempts)
 
 
 async def process_job(job):
+    request = job['request_json']
+    case = request.get('decision_case') or {}
+    with bind_context(request.get('_observability'), run_id=job['run_id'], case_id=case.get('case_id')):
+        started = perf_counter()
+        event('dispatch_claimed', node_id=case.get('node_id'), attempt=job['attempts'],
+              wait_ms=max(0, (datetime.now(timezone.utc)-datetime.fromisoformat(job['created_at'].replace('Z','+00:00'))).total_seconds()*1000) if job.get('created_at') else None)
+        try:
+            return await _process_job(job)
+        finally:
+            metrics.observe('dation_worker_execution_seconds', perf_counter()-started,
+                            (('node', case.get('node_id') if case.get('node_id') in cases.UPSTREAM_NODE or case.get('node_id') == 'logistics_assignment' else 'dispatch'),))
+
+
+async def _process_job(job):
     run_id, token = job["run_id"], job["lease_token"]
     lost = Event()
     progress_lock = Lock()
@@ -159,11 +179,13 @@ async def process_job(job):
                 continue
             try:
                 await heartbeat(stage if version != observed else None)
+                if version != observed:
+                    event("dispatch_stage", stage=stage["stage"])
                 observed = version
                 last_heartbeat = now
             except (httpx.HTTPError,LeaseLost):
                 lost.set()
-                log.warning("dispatch_lease_lost run_id=%s",run_id)
+                event("dispatch_lease_lost", level=logging.WARNING)
                 return
 
     pulse = asyncio.create_task(keep_alive())
@@ -177,20 +199,20 @@ async def process_job(job):
             await cases.validate_upstream_run(case["case_id"],case["node_id"],request["source_run_id"])
         result = await dispatch.execute(request["orders_id"],request["fleet_id"],request["configuration"],request["options"],
             run_id,case,request.get("source_run_id"),execution_writer=writer,progress_handler=progress)
-        log.info("dispatch_completed run_id=%s attempt=%s",run_id,job["attempts"])
+        event("dispatch_completed", attempt=job["attempts"], stage="completed")
         return result
     except LeaseLost:
-        log.warning("dispatch_fenced run_id=%s",run_id)
+        event("dispatch_fenced", level=logging.WARNING)
     except httpx.HTTPError:
         # The job remains durable; expiration permits recovery after a provider outage.
-        log.warning("dispatch_dependency_unavailable run_id=%s",run_id)
+        event("dispatch_dependency_unavailable", level=logging.WARNING)
     except Exception as exc:
         if not lost.is_set():
             try:
                 await writer({"status":"error","progress_json":{"stage":"error"},"error_message":str(exc)[:1500]})
             except (httpx.HTTPError,LeaseLost):
-                log.warning("dispatch_error_persistence_pending run_id=%s",run_id)
-        log.warning("dispatch_failed run_id=%s error_type=%s",run_id,type(exc).__name__)
+                event("dispatch_error_persistence_pending", level=logging.WARNING)
+        event("dispatch_failed", level=logging.WARNING, error_type=type(exc).__name__)
     finally:
         pulse.cancel()
         await asyncio.gather(pulse,return_exceptions=True)
@@ -203,14 +225,16 @@ async def worker_step():
     return bool(rows)
 
 
-async def worker_loop(stop):
+async def worker_loop(stop, health_callback=None):
     # One solver at a time per process; instance count is capped by deployment.
     while not stop.is_set():
         try:
             busy = await worker_step()
+            if health_callback: health_callback(True)
         except httpx.HTTPError:
             busy = False
-            log.warning("dispatch_worker_dependency_unavailable")
+            if health_callback: health_callback(False)
+            event("dispatch_worker_dependency_unavailable", level=logging.WARNING)
         if not busy:
             try: await asyncio.wait_for(stop.wait(),timeout=2)
             except TimeoutError: pass
