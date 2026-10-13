@@ -291,6 +291,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(await self.page.evaluate('window.DationDispatch.getWorkspace().orders.id'),self.f['ids']['orders'])
 
     async def test_approved_assignment_continues_directly_to_scheduling_configuration(self):
+        self.case['nodes']['logistics_scheduling'].update(status='locked',run_id=None,latest_run_id=None,run_count=0)
         await self.dashboard()
         await self.page.locator('[data-after-approve]').click()
         await self.page.wait_for_selector('[data-scheduling-review]')
@@ -298,6 +299,13 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertNotIn('run_id=',self.page.url)
         await self.page.go_back();await self.page.wait_for_selector('.assignment-dashboard-v2')
         await self.page.go_forward();await self.page.wait_for_selector('[data-scheduling-review]')
+
+    async def test_existing_review_does_not_offer_another_next_configuration(self):
+        await self.dashboard()
+        await self.page.wait_for_function("document.querySelector('[data-next-decision-status]')?.textContent.includes('para revisar')")
+        self.assertFalse(await self.page.locator('[data-after-approve]').is_visible())
+        await self.page.locator('[data-decision-node=logistics_scheduling]').click()
+        await self.page.wait_for_selector('.dispatch-scheduling-dashboard')
 
     async def test_mobile_trip_detail_has_no_document_overflow(self):
         await self.page.set_viewport_size({'width':390,'height':844});await self.dashboard()

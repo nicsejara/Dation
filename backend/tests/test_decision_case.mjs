@@ -46,6 +46,13 @@ test('approved downstream and unimplemented decisions do not open an empty confi
   assert.equal(continuationState(current,'logistics_scheduling','s',fullReadiness,metadata).state,'unavailable');
   assert.equal(nextDecisionId('unknown'),null);assert.equal(nextDecisionId('logistics_final_assignment'),null);
 });
+test('running or review next nodes open through the existing-run rail, never through a new config',()=>{
+  let current=transitionNode(createDecisionCase('case',orders,fleet),'logistics_assignment',STATUS.APPROVED,{run_id:'a',approved_run_id:'a'});
+  for(const status of [STATUS.RUNNING,STATUS.REVIEW,STATUS.STALE]){
+    current=transitionNode(current,'logistics_scheduling',status,{run_id:'s'});
+    assert.equal(continuationState(current,'logistics_assignment','a',fullReadiness,metadata).state,status);
+  }
+});
 
 test("new Decision Cases use the v2 run history contract", () => {
   const current = createDecisionCase("case-1", orders, fleet);
