@@ -1,3 +1,4 @@
+import {bindDashboardActions} from './dashboard-actions.mjs';
 import {scopeFor} from "./lifecycle.mjs";
 import {esc,num,pct,date,chart,dispose,download,api,errorBox} from './shared.mjs';
 import {exportDecision} from './export.mjs';
@@ -188,13 +189,14 @@ export function render(root,run,onRerun,caseActions={}){
   root.className='dispatch dispatch-dashboard dispatch-dashboard-focused dispatch-scheduling-dashboard';
   root.innerHTML=
     '<header class="dispatch-command dispatch-command-focused">'
-      +'<div class="dispatch-command-title"><button type="button" data-flow class="dispatch-dashboard-map-back">← Mapa de decisiones</button><strong>DDA Logística · Planificación</strong><span class="dispatch-status" data-case-status>'+esc(caseStatus)+'</span></div>'
+      +'<div class="dispatch-command-title"><strong>DDA Logística · Planificación</strong><span class="dispatch-status" data-case-status>'+esc(caseStatus)+'</span></div>'
       +'<div class="dispatch-actions dispatch-actions--focused">'
         +(caseActions.onApprove?'<button data-approve class="dispatch-primary-action" '+(caseActions.status==='approved'?'disabled':'')+'>'+(caseActions.status==='approved'?'✓ Planificación aprobada':'Aprobar planificación')+'</button>':'')
         +'<details class="dispatch-action-menu"><summary>Acciones ···</summary><div class="dispatch-action-menu__panel">'
           +'<button data-csv>↓ Exportar planificación CSV</button>'
           +'<button data-json>Exportar JSON técnico</button>'
-          +'<button data-rerun>Re-ejecutar Scheduling</button>'
+          +'<button type="button" data-new-decision>Nueva decisión · cargar otros datos</button>'
+          +'<button data-rerun>Nueva corrida</button>'
           +'<dl>'
             +Object.entries({
               'Corrida':run.id,
@@ -212,6 +214,7 @@ export function render(root,run,onRerun,caseActions={}){
         +'</div></details>'
       +'</div>'
     +'</header>'
+    +'<div class="dispatch-dashboard-continuation"><button type="button" data-after-approve hidden>Continuar con la siguiente decisión →</button><p data-next-decision-status role="status"></p></div>'
     +decisionRail(caseActions)
     +'<main class="dispatch-focus-main">'
       +'<section class="dispatch-panel dispatch-focus-hero">'
@@ -292,6 +295,7 @@ export function render(root,run,onRerun,caseActions={}){
   };
   root.querySelector('[data-rerun]').onclick=onRerun;
   bindDecisionRail(root,caseActions);
+  const actions=bindDashboardActions(root,caseActions);
   root.querySelector('[data-chat]').onclick=()=>{
     const aside=root.querySelector('.dispatch-chat');
     if(!aside.hidden){
@@ -315,6 +319,7 @@ export function render(root,run,onRerun,caseActions={}){
       const status=root.querySelector('[data-case-status]');
       if(status)status.textContent='Aprobada';
       caseActions.onApprovalComplete?.();
+      await actions.refresh();
     }catch(error){
       approveButton.disabled=false;
       alert(error.message);

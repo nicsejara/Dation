@@ -7,6 +7,8 @@ import {
   deriveDecisionNodes,
   replaceInputs,
   transitionNode,
+  continuationState,
+  nextDecisionId,
 } from "../app/static/js/dispatch/decision-case.mjs";
 
 const orders = {id: "orders-1"};
@@ -27,6 +29,23 @@ const partialReadiness = {
     {id: "logistics_final_assignment", data_ready: false},
   ],
 };
+
+const metadata={logistics_scheduling:{implemented:true,label:'Planificación',short:'Planificación'},logistics_final_assignment:{implemented:false,label:'Asignación final'}};
+test('continuation uses actual approval and readiness without changing the case',()=>{
+  const current=transitionNode(createDecisionCase('case',orders,fleet),'logistics_assignment',STATUS.APPROVED,{run_id:'approved',approved_run_id:'approved'});
+  const before=structuredClone(current);
+  assert.equal(continuationState(current,'logistics_assignment','candidate',fullReadiness,metadata),null);
+  assert.equal(continuationState(current,'logistics_assignment','approved',partialReadiness,metadata).state,'needs_data');
+  assert.deepEqual(continuationState(current,'logistics_assignment','approved',fullReadiness,metadata),{state:'available',nodeId:'logistics_scheduling',label:'Continuar con Planificación →'});
+  assert.deepEqual(current,before);
+});
+test('approved downstream and unimplemented decisions do not open an empty configuration',()=>{
+  let current=transitionNode(createDecisionCase('case',orders,fleet),'logistics_assignment',STATUS.APPROVED,{run_id:'a',approved_run_id:'a'});
+  current=transitionNode(current,'logistics_scheduling',STATUS.APPROVED,{run_id:'s',approved_run_id:'s'});
+  assert.equal(continuationState(current,'logistics_assignment','a',fullReadiness,metadata).state,'finished');
+  assert.equal(continuationState(current,'logistics_scheduling','s',fullReadiness,metadata).state,'unavailable');
+  assert.equal(nextDecisionId('unknown'),null);assert.equal(nextDecisionId('logistics_final_assignment'),null);
+});
 
 test("new Decision Cases use the v2 run history contract", () => {
   const current = createDecisionCase("case-1", orders, fleet);

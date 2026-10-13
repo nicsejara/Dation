@@ -92,6 +92,7 @@ def run_assignment_engine(
     options=None,
     inputs=None,
     progress=None,
+    *, reference_result=None,
 ):
     config = AssignmentConfig.model_validate(configuration or {})
     opts = AssignmentOptions.model_validate(options or {})
@@ -138,6 +139,7 @@ def run_assignment_engine(
         canonical_options,
         inputs,
         progress,
+        **({'reference_result':reference_result} if reference_result is not None else {}),
     )
     result["scope"] = {
         "filters": filters,

@@ -64,6 +64,10 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.chat_history = None
         self.selector_size = 1
         self.selector_queries = []
+        self.comparative=None
+        self.comparative_posts=0
+        self.comparative_fail_once=False
+        self.saved_explanation=None
         self.pw = await async_playwright().start()
         executable = os.getenv("CHROMIUM_EXECUTABLE")
         if not executable and Path("/usr/bin/chromium").exists():
@@ -91,6 +95,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         u = urlparse(request.url)
         path, query, method = u.path, parse_qs(u.query), request.method
         self.requests.append((method, path))
+        captured_evidence=self.comparative['id'] if self.comparative and self.comparative['status']=='completed' else None
         await asyncio.sleep(self.delay.get(path, .01))
         data, status = {}, 200
         if path == "/api/dispatch/status":
@@ -153,6 +158,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             data = row
         elif path.endswith("/interpretation"):
             data = {"explanation":None,"messages":[],"configured":False}
+            if self.saved_explanation:data.update(explanation=self.saved_explanation,explanation_is_current=captured_evidence is None)
+            data['current_evidence_analysis_id']=captured_evidence
             if self.chat_history:
                 offset=int(query.get('offset',['0'])[0])
                 rows=self.chat_history[offset:offset+2]
@@ -160,8 +167,19 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         elif path.endswith("/explain"): data = {"summary":"Synthetic explanation"}
         elif path.endswith("/chat"):
             self.chat_calls.append(request.post_data_json)
-            data = {"answer":"Synthetic answer"}
+            data = {"answer":"Synthetic answer","evidence_analysis_id":captured_evidence}
             if self.chat_fail_once and len(self.chat_calls)==1:status,data=504,{'detail':'Synthetic timeout'}
+        elif path.endswith('/comparative'):
+            if method=='POST':
+                self.comparative_posts+=1
+                if self.comparative_fail_once and self.comparative_posts==1:
+                    status,data=503,{'detail':'Análisis temporalmente no disponible'}
+                else:
+                    self.comparative={'id':'00000000-0000-4000-8000-000000000099','base_run_id':self.f['ids']['assignment'],
+                        'status':'queued','source_mode':'computed','result_json':self.f['runs']['assignment']['result_json'],
+                        'finished_at':'2026-10-13T12:00:00Z'}
+                    status,data=202,self.comparative
+            else:data=self.comparative or {'status':'available','id':None}
         elif path.startswith("/api/runs/"):
             data = self.runs.get(path.split("/")[3])
             if not data or self.missing_run: status, data = 404, {"detail":"No se encontró la corrida."}
@@ -185,6 +203,126 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
     async def test_cold_assignment_link(self):
         await self.open("decision-dashboard","logistics_assignment",self.f["ids"]["assignment"])
         self.assertEqual(await self.page.evaluate("window.DationDispatch.getWorkspace().orders.id"),self.f["ids"]["orders"])
+
+    def essential(self):
+        run=self.f['runs']['assignment']
+        run['result_json']['analysis']['depth']='essential'
+        run['result_json']['configuration']['options']['analysis_depth']='essential'
+
+    async def dashboard(self):
+        await self.open('decision-dashboard','logistics_assignment',self.f['ids']['assignment'])
+
+    async def test_comparative_original_always_keeps_essential_before_comparative_and_ia(self):
+        await self.dashboard()
+        self.assertEqual(await self.page.locator('[data-generate-comparative]').count(),0)
+        order=await self.page.evaluate("[...document.querySelectorAll('.assignment-dashboard-v2 section[id]')].map(x=>x.id)")
+        self.assertLess(order.index('dispatch-assignment'),order.index('dispatch-comparative'))
+        self.assertLess(order.index('dispatch-review'),order.index('dispatch-comparative'))
+        self.assertEqual(await self.page.locator('[data-flow],[data-case-flow],.dispatch-dashboard-map-back').count(),0)
+        self.assertFalse(await self.page.locator('#dda-workspace-nav-shell').is_visible())
+
+    async def test_trip_detail_is_contextual_toggleable_and_escape_restores_focus(self):
+        await self.dashboard()
+        self.assertEqual(await self.page.locator('[data-trip-detail]').count(),0)
+        controls=self.page.locator('[data-trip-detail-button]')
+        await controls.first.click()
+        self.assertEqual(await controls.first.get_attribute('aria-expanded'),'true')
+        self.assertTrue(await self.page.locator('[data-close-trip]').evaluate('(x)=>x===document.activeElement'))
+        self.assertEqual(await self.page.locator('[data-trip-detail]').count(),1)
+        self.assertTrue(await self.page.locator('[data-trip-detail]').evaluate('(x)=>x.closest("tr").previousElementSibling.classList.contains("is-selected")'))
+        await self.page.keyboard.press('Escape')
+        self.assertEqual(await self.page.locator('[data-trip-detail]').count(),0)
+        self.assertTrue(await controls.first.evaluate('(x)=>x===document.activeElement'))
+        await controls.first.press('Enter');await controls.first.click()
+        self.assertEqual(await self.page.locator('[data-trip-detail]').count(),0)
+        if await controls.count()>1:
+            await controls.first.click();await controls.nth(1).click()
+            self.assertEqual(await self.page.locator('[data-trip-detail]').count(),1)
+            self.assertEqual(await controls.first.get_attribute('aria-expanded'),'false')
+        await self.page.locator('[data-evidence-tab=trips]').focus();await self.page.keyboard.press('ArrowRight')
+        self.assertEqual(await self.page.locator('[data-evidence-tab=vehicles]').get_attribute('aria-selected'),'true')
+        self.assertEqual(await self.page.locator('[data-trip-detail]').count(),0)
+
+    async def test_progressive_analysis_is_local_and_restores_after_reload(self):
+        self.essential();await self.dashboard();url=self.page.url
+        await self.page.locator('[data-generate-comparative]').click()
+        await self.page.wait_for_selector('[data-comparative-state=queued]')
+        self.assertTrue(await self.page.locator('#dispatch-assignment').is_visible())
+        self.assertEqual(self.page.url,url)
+        self.comparative['status']='completed'
+        await self.page.wait_for_selector('[data-comparative-state=completed]')
+        await self.page.reload();await self.page.wait_for_selector('[data-comparative-state=completed]')
+        self.assertEqual(self.comparative_posts,1)
+        self.assertEqual(sum(m=='POST' and p=='/api/runs' for m,p in self.requests),0)
+        self.assertEqual(self.page.url,url)
+
+    async def test_comparative_error_retry_and_departure_cancels_polling(self):
+        self.essential();self.comparative_fail_once=True;await self.dashboard()
+        await self.page.locator('[data-generate-comparative]').click()
+        await self.page.wait_for_selector('[data-comparative-state=error]')
+        self.assertIn('temporalmente',await self.page.locator('#dispatch-comparative').inner_text())
+        await self.page.locator('[data-generate-comparative]').click()
+        await self.page.wait_for_selector('[data-comparative-state=queued]')
+        self.assertEqual(self.comparative_posts,2)
+        await self.nav('inicio');count=sum(p.endswith('/comparative') for _,p in self.requests)
+        await self.page.wait_for_timeout(1800)
+        self.assertEqual(sum(p.endswith('/comparative') for _,p in self.requests),count)
+        self.assertEqual(await self.page.locator('[data-comparative-state]').count(),0)
+
+    async def test_new_run_direct_configuration_preserves_business_context_and_history(self):
+        await self.dashboard();before=copy.deepcopy(self.case)
+        await self.page.locator('[data-more-menu] summary').click()
+        await self.page.locator('[data-rerun]').click()
+        await self.page.wait_for_selector('[data-config-review]')
+        self.assertEqual(parse_qs(urlparse(self.page.url).query)['case_id'],[before['id']])
+        self.assertNotIn('run_id=',self.page.url)
+        self.assertEqual(self.case,before)
+        self.assertFalse(any(m=='POST' and p=='/api/runs' for m,p in self.requests))
+
+    async def test_new_decision_goes_to_empty_data_without_losing_existing_case(self):
+        await self.dashboard();before=copy.deepcopy(self.case)
+        await self.page.locator('[data-more-menu] summary').click()
+        await self.page.locator('[data-new-decision]').click()
+        await self.page.wait_for_selector('[data-kind=orders] input[type=file]',state='attached')
+        self.assertIn('view=logistics-data',self.page.url)
+        self.assertEqual(await self.page.evaluate('window.DationDispatch.getWorkspace().orders'),None)
+        self.assertEqual(self.case,before)
+        await self.page.go_back();await self.page.wait_for_selector('.assignment-dashboard-v2')
+        self.assertEqual(await self.page.evaluate('window.DationDispatch.getWorkspace().orders.id'),self.f['ids']['orders'])
+
+    async def test_approved_assignment_continues_directly_to_scheduling_configuration(self):
+        await self.dashboard()
+        await self.page.locator('[data-after-approve]').click()
+        await self.page.wait_for_selector('[data-scheduling-review]')
+        self.assertIn('view=logistics-config',self.page.url);self.assertIn('node_id=logistics_scheduling',self.page.url)
+        self.assertNotIn('run_id=',self.page.url)
+        await self.page.go_back();await self.page.wait_for_selector('.assignment-dashboard-v2')
+        await self.page.go_forward();await self.page.wait_for_selector('[data-scheduling-review]')
+
+    async def test_mobile_trip_detail_has_no_document_overflow(self):
+        await self.page.set_viewport_size({'width':390,'height':844});await self.dashboard()
+        await self.page.locator('[data-trip-detail-button]').first.click()
+        self.assertEqual(await self.page.locator('[data-trip-detail]').count(),1)
+        self.assertFalse(await self.page.evaluate('document.documentElement.scrollWidth>innerWidth'))
+        bounds=await self.page.locator('[data-trip-detail]').bounding_box()
+        self.assertGreaterEqual(bounds['x'],0);self.assertLessEqual(bounds['x']+bounds['width'],390)
+        await self.page.locator('[data-close-trip]').click()
+        self.assertEqual(await self.page.locator('[data-trip-detail]').count(),0)
+
+    async def test_ia_retains_and_labels_original_turn_when_comparative_finishes_mid_response(self):
+        self.essential();self.saved_explanation={'id':'saved','response_json':{'executive_summary':'Explicación original'}}
+        await self.dashboard()
+        await self.page.locator('[data-chat]').click()
+        self.delay[f"/api/runs/{self.f['ids']['assignment']}/chat"]=3
+        await self.page.locator('.dispatch-chat textarea').fill('¿Qué debería revisar?')
+        await self.page.locator('.dispatch-chat button[type=submit]').click()
+        await self.page.locator('[data-generate-comparative]').click()
+        await self.page.wait_for_selector('[data-comparative-state=queued]')
+        self.comparative['status']='completed'
+        await self.page.wait_for_selector('[data-comparative-state=completed]')
+        await self.page.get_by_text('Synthetic answer',exact=True).wait_for()
+        self.assertIn('interpretación de la corrida original',(await self.page.locator('[data-messages]').inner_text()).lower())
+        self.assertIn('Ya hay nueva evidencia comparativa',await self.page.locator('#dispatch-explanation').inner_text())
 
     async def test_case_selector_requests_one_compact_page_and_hydrates_only_selection(self):
         self.selector_size=100

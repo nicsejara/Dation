@@ -1325,7 +1325,7 @@ class FrontendContractTests(
         ).read_text(encoding="utf-8")
 
         self.assertIn(
-            "unlockNextNode(nodeId)",
+            "dashboardContinuation(run,nodeId,generation)",
             workspace,
         )
         self.assertIn(
@@ -1333,11 +1333,11 @@ class FrontendContractTests(
             workspace,
         )
         self.assertIn(
-            "unlockNextNode(nodeId)",
+            "dashboardContinuation(run,nodeId,generation)",
             workspace,
         )
         self.assertIn(
-            "dispatch-dashboard-map-back",
+            "data-new-decision",
             dashboard,
         )
         self.assertIn(
@@ -1364,7 +1364,7 @@ class FrontendContractTests(
             "data-decision-node",
             decision_nav,
         )
-        self.assertIn(
+        self.assertNotIn(
             "Explorar mapa",
             decision_nav,
         )
@@ -1393,7 +1393,7 @@ class FrontendContractTests(
             scheduling,
         )
         self.assertIn(
-            "dispatch-dashboard-map-back",
+            "bindDashboardActions",
             scheduling,
         )
         self.assertIn(

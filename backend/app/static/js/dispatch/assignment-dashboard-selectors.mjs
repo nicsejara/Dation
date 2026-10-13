@@ -10,6 +10,7 @@ const STATUSES={
   approved:{label:'Aprobada',className:'is-approved'},
   error:{label:'Requiere revisión',className:'is-error'},
   stale:{label:'Requiere revisión',className:'is-error'},
+  superseded:{label:'Reemplazada',className:'is-review'},
 };
 
 const OBJECTIVES={

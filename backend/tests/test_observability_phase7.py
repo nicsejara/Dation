@@ -145,7 +145,7 @@ class LLMTests(unittest.IsolatedAsyncioTestCase):
              patch.object(interpreter,'chat_completion',AsyncMock(return_value=response)):
             await interpreter.answer_question(run_id=run,question='Why?',turn_id=turn)
         self.assertEqual(db.await_count,2)
-        self.assertEqual(db.call_args.args[1],'rpc/record_decision_chat_turn')
+        self.assertEqual(db.call_args.args[1],'rpc/record_decision_chat_turn_with_evidence')
         body=db.call_args.kwargs['body'];self.assertEqual(body['question_text'],'Why?')
         self.assertEqual(body['metadata']['usage'],{'total_tokens':9});self.assertEqual(body['target_turn_id'],turn)
 

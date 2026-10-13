@@ -71,14 +71,22 @@ async def journey():
             assert (await pending.json())['status'] in ('queued','running')
             gate.unlink()
             await page.wait_for_selector('.assignment-dashboard-v2')
+            assert await page.locator('[data-trip-detail]').count()==0
+            await page.locator('[data-trip-detail-button]').first.click()
+            assert await page.locator('[data-trip-detail]').count()==1
+            await page.keyboard.press('Escape')
+            assert await page.locator('[data-trip-detail]').count()==0
+            await page.locator('[data-generate-comparative]').click()
+            await page.wait_for_selector('[data-comparative-state=completed]')
+            await page.reload(wait_until='domcontentloaded')
+            await page.wait_for_selector('[data-comparative-state=completed]')
+            assert await page.locator('[data-generate-comparative]').count()==0
             await page.locator('[data-approve]').click()
             await page.wait_for_function("window.DationDispatch.getWorkspace().decisionCase.nodes.logistics_assignment.status==='approved'")
             await page.locator('[data-after-approve]').click()
-            await page.wait_for_selector('[data-map-node="logistics_scheduling"][data-map-action]')
-            await page.locator('[data-map-node="logistics_scheduling"][data-map-action]').first.click()
             await page.wait_for_selector('[data-scheduling-review]')
             assert 'run_id=' not in page.url
-            await page.go_back();await page.wait_for_selector('[data-map-node="logistics_assignment"]')
+            await page.go_back();await page.wait_for_selector('.assignment-dashboard-v2')
             await page.go_forward();await page.wait_for_selector('[data-scheduling-review]')
             await page.reload(wait_until='domcontentloaded');await page.wait_for_selector('[data-scheduling-review]')
             await page.locator('[data-scheduling-review]').click()
@@ -122,6 +130,7 @@ async def journey():
             report={'passed':True,'creation_from_files':True,'refresh_during_queue':True,
                 'assignment_and_scheduling_approved':True,'cold_link':True,'back_forward_refresh':True,
                 'idle_request_budget':True,'mobile_history':True,'export_has_records':True,
+                'comparative_reused_and_restored':True,'trip_detail_keyboard':True,'direct_next_configuration':True,
                 'javascript_errors':errors,'unexpected_http_errors':failed,
                 'expected_draft_hydration_misses':len(expected_draft_misses),'requests':len(requests)}
             if artifact:

@@ -195,3 +195,23 @@ export function caseRef(current, nodeId = "logistics_assignment") {
     node_id: nodeId,
   };
 }
+
+
+export function nextDecisionId(nodeId){
+  const index=NODE_IDS.indexOf(nodeId);
+  return index>=0?NODE_IDS[index+1]||null:null;
+}
+
+export function continuationState(current,nodeId,runId,readiness,metadata){
+  const node=current?.nodes?.[nodeId];
+  if(node?.status!==STATUS.APPROVED||String(node.approved_run_id||node.run_id)!==String(runId))return null;
+  const next=nextDecisionId(nodeId);
+  if(!next)return {state:'finished',message:'No hay otra decisión pendiente en este caso.'};
+  const meta=metadata[next];
+  if(!meta?.implemented)return {state:'unavailable',nodeId:next,message:'La siguiente decisión todavía no está disponible en Dation.'};
+  const nextNode=current.nodes[next];
+  if(nextNode?.status===STATUS.APPROVED)return {state:'finished',message:meta.label+' ya está aprobada. Podés abrir su análisis en la barra de decisiones.'};
+  const evidence=readinessById(readiness)[next];
+  if(!evidence?.data_ready)return {state:'needs_data',nodeId:next,message:'Faltan datos para '+meta.label+': '+(evidence?.missing||[]).map(item=>item.label||item.column).filter(Boolean).join(', ')+'. Podés iniciar una nueva decisión con un Data Pack completo.'};
+  return {state:'available',nodeId:next,label:'Continuar con '+(next==='logistics_scheduling'?'Planificación':meta.short)+' →'};
+}

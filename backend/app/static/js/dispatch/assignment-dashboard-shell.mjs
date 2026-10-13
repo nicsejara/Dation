@@ -1,3 +1,4 @@
+import {bindDashboardActions} from './dashboard-actions.mjs';
 import {scopeFor,trapFocus} from "./lifecycle.mjs";
 import {api,esc,num} from './shared.mjs';
 import {decisionRail,bindDecisionRail} from './decision-nav.mjs';
@@ -43,17 +44,18 @@ function approvalMarkup(caseActions){
       +'</div>'
     +'</div>'
     +'<div class="assignment-dashboard-v2__approval-actions">'
-      +'<button type="button" data-rerun-validation class="assignment-dashboard-v2__reconfigure" '+(approved?'hidden':'')+'>Reconfigurar decisión</button>'
+      +'<button type="button" data-rerun-validation class="assignment-dashboard-v2__reconfigure" '+(approved?'hidden':'')+'>Nueva corrida</button>'
       +'<button type="button" data-approve class="assignment-dashboard-v2__approve" '+(approved?'hidden':'')+'>Aprobar asignación →</button>'
-      +(caseActions.onFlow
-        ?'<button type="button" data-after-approve data-flow class="assignment-dashboard-v2__continue" '+(approved?'':'hidden')+'>Continuar en el mapa →</button>'
-        :'')
+
     +'</div>'
   +'</div>';
 }
 
-function toolsMarkup(){
+function toolsMarkup(caseActions){
   return '<div class="assignment-dashboard-v2__tools" aria-label="Herramientas de la decisión">'
+    +'<button type="button" data-approve-toolbar class="assignment-dashboard-v2__approve" '+(!caseActions.onApprove||caseActions.status==='approved'?'hidden':'')+'>Aprobar asignación</button>'
+    +'<button type="button" data-after-approve class="assignment-dashboard-v2__continue" hidden>Continuar con la siguiente decisión →</button>'
+    +'<span data-next-decision-status role="status"></span>'
     +'<details class="assignment-dashboard-v2__menu" data-export-menu>'
       +'<summary>Exportar <span aria-hidden="true">⌄</span></summary>'
       +'<div class="assignment-dashboard-v2__menu-panel" role="menu">'
@@ -64,7 +66,8 @@ function toolsMarkup(){
     +'<details class="assignment-dashboard-v2__menu" data-more-menu>'
       +'<summary>Más <span aria-hidden="true">···</span></summary>'
       +'<div class="assignment-dashboard-v2__menu-panel" role="menu">'
-        +'<button type="button" data-rerun role="menuitem"><span aria-hidden="true">↻</span><div><strong>Reconfigurar</strong><small>Volver a configuración sin ejecutar</small></div></button>'
+        +'<button type="button" data-rerun role="menuitem"><span aria-hidden="true">↻</span><div><strong>Nueva corrida</strong><small>Mismos datos, otra configuración</small></div></button>'
+        +'<button type="button" data-new-decision role="menuitem"><span aria-hidden="true">＋</span><div><strong>Nueva decisión</strong><small>Cargar otros datos y crear un nuevo Decision Case</small></div></button>'
         +'<button type="button" data-run-details role="menuitem"><span aria-hidden="true">i</span><div><strong>Detalles de ejecución</strong><small>Motor, solver, archivos y huella</small></div></button>'
       +'</div>'
     +'</details>'
@@ -82,7 +85,6 @@ export function renderAssignmentShell(root,run,caseActions={}){
   root.innerHTML=
     '<header class="assignment-dashboard-v2__toolbar">'
       +'<div class="assignment-dashboard-v2__identity">'
-        +'<button type="button" data-flow class="assignment-dashboard-v2__map-back" aria-label="Volver al mapa de decisiones">←</button>'
         +'<div class="assignment-dashboard-v2__identity-copy">'
           +'<span class="assignment-dashboard-v2__eyebrow">DDA LOGÍSTICA · DECISIÓN 01</span>'
           +'<div class="assignment-dashboard-v2__title-row">'
@@ -93,13 +95,14 @@ export function renderAssignmentShell(root,run,caseActions={}){
           +'<small>Corrida '+esc(shortRunId(run.id))+' · '+num(result.scenarios?.selected?.metrics?.orders||0)+' órdenes analizadas</small>'
         +'</div>'
       +'</div>'
-      +toolsMarkup()
+      +toolsMarkup(caseActions)
     +'</header>'
     +'<div class="assignment-dashboard-v2__rail">'+decisionRail(caseActions)+'</div>'
     +'<main class="assignment-dashboard-v2__main">'
       +'<section class="dispatch-panel assignment-dashboard-v2__section assignment-dashboard-v2__hero" id="dispatch-hero"></section>'
       +'<section class="dispatch-panel assignment-dashboard-v2__section assignment-dashboard-v2__assignment" id="dispatch-assignment"></section>'
       +'<section class="dispatch-panel assignment-dashboard-v2__section assignment-dashboard-v2__review" id="dispatch-review"><div data-review-content></div>'+approvalMarkup(caseActions)+'</section>'
+      +'<section class="dispatch-panel assignment-dashboard-v2__section assignment-comparative-layer" id="dispatch-comparative"></section>'
       +'<section class="dispatch-panel assignment-dashboard-v2__section assignment-dashboard-v2__ai" id="dispatch-explanation"></section>'
     +'</main>'
     +'<button type="button" class="dispatch-ai-fab assignment-dashboard-v2__ai-fab" data-chat aria-expanded="false" aria-label="Abrir Dation IA"><span>✦</span><strong>Dation IA</strong></button>'
@@ -117,6 +120,7 @@ export function renderAssignmentShell(root,run,caseActions={}){
     hero:root.querySelector('#dispatch-hero'),
     assignment:root.querySelector('#dispatch-assignment'),
     review:root.querySelector('[data-review-content]'),
+    comparative:root.querySelector('#dispatch-comparative'),
     explanation:root.querySelector('#dispatch-explanation'),
     chat:root.querySelector('.assignment-dashboard-v2__chat'),
   };
@@ -207,10 +211,14 @@ export function bindAssignmentShell(root,run,{onRerun,caseActions={},onOpenChat}
   root.querySelector('[data-rerun-validation]')?.addEventListener('click',()=>onRerun?.());
 
   bindDecisionRail(root,caseActions);
+  const actions=bindDashboardActions(root,caseActions);
 
   const approveButton=root.querySelector('[data-approve]');
+  const toolbarApprove=root.querySelector('[data-approve-toolbar]');
+  if(toolbarApprove)toolbarApprove.onclick=()=>approveButton?.click();
   if(approveButton)approveButton.onclick=async()=>{
     approveButton.disabled=true;
+    if(toolbarApprove)toolbarApprove.disabled=true;
     approveButton.textContent='Aprobando…';
     try{
       await caseActions.onApprove?.();
@@ -231,11 +239,12 @@ export function bindAssignmentShell(root,run,{onRerun,caseActions={},onOpenChat}
       const rerunValidation=root.querySelector('[data-rerun-validation]');
       if(rerunValidation)rerunValidation.hidden=true;
       approveButton.hidden=true;
-      const continuation=root.querySelector('[data-after-approve]');
-      if(continuation)continuation.hidden=false;
+      if(toolbarApprove)toolbarApprove.hidden=true;
       caseActions.onApprovalComplete?.();
+      await actions.refresh();
     }catch(error){
       approveButton.disabled=false;
+      if(toolbarApprove)toolbarApprove.disabled=false;
       approveButton.textContent='Aprobar asignación →';
       alert(error.message);
     }

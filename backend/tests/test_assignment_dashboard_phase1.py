@@ -161,7 +161,8 @@ class AssignmentDashboardPhase1Tests(unittest.TestCase):
         self.assertIn("data-status-badge", self.shell)
         self.assertIn("statusBadge.textContent='Aprobada'", self.shell)
         self.assertIn("data-after-approve", self.shell)
-        self.assertIn("Continuar en el mapa", self.shell)
+        self.assertNotIn("Continuar en el mapa", self.shell)
+        self.assertIn("bindDashboardActions", self.shell)
 
     def test_decision_case_rail_preserves_disabled_navigation_guard(self):
         self.assertIn("decisionRail(caseActions)", self.shell)
@@ -170,12 +171,12 @@ class AssignmentDashboardPhase1Tests(unittest.TestCase):
         self.assertIn("disabled", self.rail)
 
     def test_existing_assignment_content_modules_are_preserved(self):
-        self.assertIn("renderModule(nodes.hero,hero,result)", self.dashboard)
+        self.assertIn("renderModule(nodes.hero,assignmentSummary,result)", self.dashboard)
         self.assertIn(
-            "renderModule(nodes.assignment,assignment,result)",
+            "renderModule(nodes.assignment,assignmentEvidence,result)",
             self.dashboard,
         )
-        self.assertIn("renderModule(nodes.review,review,result)", self.dashboard)
+        self.assertIn("renderModule(nodes.review,assignmentValidation,result)", self.dashboard)
         self.assertIn(
             "renderModule(nodes.explanation,explanation,run)",
             self.dashboard,

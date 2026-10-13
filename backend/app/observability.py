@@ -17,11 +17,11 @@ from starlette.responses import JSONResponse
 
 context = ContextVar('dation_observability', default={})
 component = 'api'
-FIELDS = {'request_id', 'trace_id', 'span_id', 'run_id', 'case_id', 'node_id',
+FIELDS = {'analysis_id', 'request_id', 'trace_id', 'span_id', 'run_id', 'case_id', 'node_id',
           'attempt', 'version', 'stage', 'outcome', 'status_code', 'route', 'method',
           'duration_ms', 'wait_ms', 'dependency', 'error_type', 'prompt_version',
           'input_tokens', 'output_tokens', 'total_tokens', 'turn_id'}
-IDENTITIES = {'request_id', 'run_id', 'case_id', 'turn_id'}
+IDENTITIES = {'analysis_id', 'request_id', 'run_id', 'case_id', 'turn_id'}
 BUCKETS = (.01, .05, .1, .25, .5, 1, 2.5, 5, 10, 30, 60, 120)
 
 

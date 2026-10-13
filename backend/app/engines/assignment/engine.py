@@ -210,6 +210,7 @@ def run_assignment_engine(
     options=None,
     inputs=None,
     progress=None,
+    *, reference_result=None,
 ):
     started = perf_counter()
     config = AssignmentConfig.model_validate(
@@ -500,6 +501,15 @@ def run_assignment_engine(
         )
 
     scenarios = {}
+    references = (reference_result or {}).get('scenarios', {})
+    anchor = copy.deepcopy(references.get('selected'))
+    if reference_result is not None:
+        for kind,data in [('orders',orders_bytes),('fleet',fleet_bytes)]:
+            if hashlib.sha256(data).hexdigest()!=reference_result.get('inputs',{}).get(kind,{}).get('sha256'):
+                raise ValueError('El alcance de los datos no coincide con la corrida base.')
+        if not anchor or reference_result.get('configuration', {}) != {**config, 'options': {**opts, 'analysis_depth': reference_result.get('configuration', {}).get('options', {}).get('analysis_depth')}}:
+            raise ValueError('La configuración de la evidencia base no coincide.')
+        validate_assignment(anchor['trips'], orders, fleet)
 
     def optimize(
         weights,
@@ -641,10 +651,10 @@ def run_assignment_engine(
                 ASSIGNMENT_OBJECTIVE_KEYS
             )
         }
-        scenarios[name] = optimize(
-            weights,
-            name,
-        )
+        if anchor is not None and name in references:
+            scenarios[name] = copy.deepcopy(references[name])
+        else:
+            scenarios[name] = optimize(weights, name)
 
     balanced_weights = {
         key: (
@@ -666,17 +676,16 @@ def run_assignment_engine(
         or config["objective"]
         == "balanced"
     ):
-        scenarios[
-            "balanced"
-        ] = optimize(
-            balanced_weights,
-            "balanced",
-        )
+        scenarios['balanced'] = (copy.deepcopy(references['balanced'])
+            if anchor is not None and 'balanced' in references
+            else optimize(balanced_weights, 'balanced'))
 
     configured_weights = (
         config["weights"]
     )
-    if (
+    if anchor is not None:
+        selected = anchor
+    elif (
         config["objective"]
         in scenarios
     ):
@@ -692,9 +701,8 @@ def run_assignment_engine(
             configured_weights,
             "selected",
         )
-    selected["name"] = NAMES[
-        "selected"
-    ]
+    if anchor is None:
+        selected["name"] = NAMES["selected"]
     scenarios["selected"] = (
         selected
     )
@@ -710,13 +718,8 @@ def run_assignment_engine(
     for name, scenario in (
         scenarios.items()
     ):
-        scenario[
-            "plan_fingerprint"
-        ] = digest(
-            plan_signature(
-                scenario
-            )
-        )
+        if not (name == 'selected' and anchor is not None) and 'trips' in scenario:
+            scenario['plan_fingerprint'] = digest(plan_signature(scenario))
         if name != "selected":
             scenario.pop(
                 "trips",
