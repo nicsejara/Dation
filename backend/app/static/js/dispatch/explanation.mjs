@@ -179,6 +179,11 @@ export function render(root,run){
       if(!scope.active)return;
       if(data.explanation?.response_json){
         show(data.explanation.response_json);
+        if(data.explanation_is_current===false){
+          const notice=document.createElement('p');notice.className='dispatch-model-note';notice.setAttribute('role','status');
+          notice.textContent='Esta interpretación corresponde a la corrida original. Ya hay nueva evidencia comparativa; generá una interpretación enriquecida para incluirla.';
+          response.prepend(notice);
+        }
         button.textContent='↻ Regenerar explicación';
       }
     })
@@ -224,14 +229,17 @@ export function chat(root,run,initialQuestion=''){
   let sending=false;
   let retryTurn=null;
   let nextOffset=0;
+  let currentEvidence=null;
   const seenMessages=new Set();
   const older=root.querySelector("[data-older]");
 
-  function add(role,text,{loading=false,error=false,before=null}={}){
+  function add(role,text,{loading=false,error=false,before=null,evidence=null}={}){
     const article=document.createElement('article');
+    article.dataset.evidenceId=evidence||'';
+    article.dataset.pending=String(loading||error);
     article.className='dispatch-chat-message is-'+role+(loading?' is-loading':'')+(error?' is-error':'');
     const label=document.createElement('small');
-    label.textContent=role==='user'?'Vos':'Dation';
+    label.textContent=role==='user'?'Vos':(currentEvidence&&!loading&&!error&&evidence!==currentEvidence?'Dation · interpretación de la corrida original':'Dation');
     const body=document.createElement('div');
     body.textContent=text;
     article.append(label,body);
@@ -255,7 +263,7 @@ export function chat(root,run,initialQuestion=''){
       retryTurn=null;
       nextOffset+=2;
       pending.remove();
-      add('assistant',data.answer||data.message||data.response||'La respuesta no tiene texto.');
+      add('assistant',data.answer||data.message||data.response||'La respuesta no tiene texto.',{evidence:data.evidence_analysis_id||null});
     }catch(error){
       if(!scope.active)return;
       retryTurn=turn;
@@ -271,15 +279,25 @@ export function chat(root,run,initialQuestion=''){
   }
 
   function showHistory(data,{prepend=false}={}){
+    currentEvidence=data.current_evidence_analysis_id||null;
     const before=prepend?messages.firstChild:null;
     (data.messages||[]).forEach(message=>{
       if(message.id&&seenMessages.has(message.id))return;
       if(message.id)seenMessages.add(message.id);
-      add(message.role,message.content,{before});
+      add(message.role,message.content,{before,evidence:message.evidence_analysis_id||null});
     });
     nextOffset=data.pagination?.next_offset||nextOffset;
     older.hidden=!data.pagination?.has_more;
   }
+
+  scope.listen(root,'dispatch:evidence-changed',event=>{
+    currentEvidence=event.detail.id;
+    messages.querySelectorAll('article.is-assistant').forEach(article=>{
+      if(article.dataset.pending==='true')return;
+      const label=article.querySelector('small');
+      if(label)label.textContent=article.dataset.evidenceId!==currentEvidence?'Dation · interpretación de la corrida original':'Dation';
+    });
+  });
 
   older.onclick=async()=>{
     older.disabled=true;

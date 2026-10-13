@@ -1373,7 +1373,7 @@
         }
 
         currentView = view || currentView;
-        var visible = isDdaFlowView(currentView);
+        var visible = isDdaFlowView(currentView) && currentView !== 'decision-dashboard';
         shell.hidden = !visible;
         container.innerHTML = '';
 

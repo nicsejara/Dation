@@ -12,7 +12,7 @@ from fastapi import (
     Query,
     UploadFile,
 )
-from fastapi.responses import Response
+from fastapi.responses import Response, JSONResponse
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.auth import require_upload_access
@@ -452,3 +452,37 @@ async def refresh_dataset_profile(dataset_id: UUID):
             raise LookupError("No se encontró el dataset.")
         return {"dataset": await service._ensure_profile(dataset, persist=True)}
     return await guarded(operation())
+
+
+@router.get('/api/runs/{run_id}/comparative')
+async def comparative_state(run_id: UUID):
+    from app.services.comparative_analysis_service import get_analysis, AnalysisConflict
+    try:
+        return await get_analysis(str(run_id))
+    except AnalysisConflict as exc:
+        raise HTTPException(409,str(exc)) from exc
+    except LookupError as exc:
+        raise HTTPException(404,str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(422,str(exc)) from exc
+    except httpx.HTTPError as exc:
+        raise HTTPException(503,'No se pudo recuperar el análisis comparativo.') from exc
+
+
+@router.post('/api/runs/{run_id}/comparative')
+async def comparative_generate(run_id: UUID, retry: bool = Query(default=False)):
+    from app.services.comparative_analysis_service import generate_analysis, AnalysisConflict
+    try:
+        artifact = await generate_analysis(str(run_id),retry=retry)
+        return JSONResponse(artifact,status_code=202 if artifact['status'] in ('queued','running') else 200,
+                            headers={'Location':'/api/runs/'+str(run_id)+'/comparative','Retry-After':'2'})
+    except AnalysisConflict as exc:
+        raise HTTPException(409,str(exc)) from exc
+    except LookupError as exc:
+        raise HTTPException(404,str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(422,str(exc)) from exc
+    except jobs.QueueFull as exc:
+        raise HTTPException(429,str(exc),headers={'Retry-After':'5'}) from exc
+    except httpx.HTTPError as exc:
+        raise HTTPException(503,'No se pudo recuperar o registrar el análisis comparativo.') from exc

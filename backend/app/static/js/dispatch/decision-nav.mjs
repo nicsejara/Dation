@@ -16,7 +16,7 @@ export function decisionRail(caseActions={}){
       const node=decisionCase.nodes[nodeId]||{};
       const ui=statusUi(node.status);
       const hasResult=Boolean(node.run_id);
-      const canOpen=hasResult&&['review','approved','running'].includes(node.status);
+      const canOpen=hasResult&&['review','approved','running','stale','error'].includes(node.status);
       return '<button type="button" class="dispatch-decision-tab'
         +(nodeId===activeNode?' is-active':'')
         +(node.status==='approved'?' is-approved':'')
@@ -34,7 +34,6 @@ export function decisionRail(caseActions={}){
   return '<section class="dispatch-decision-rail" aria-label="Decisiones del caso">'
     +'<div class="dispatch-decision-rail__head">'
       +'<div><span class="dispatch-kicker">DECISION CASE</span><strong>Decisiones del análisis</strong></div>'
-      +'<button type="button" data-flow class="dispatch-flow-button">Explorar mapa →</button>'
     +'</div>'
     +'<nav>'+nodes+'</nav>'
     +'</section>';
@@ -46,8 +45,5 @@ export function bindDecisionRail(root,caseActions={}){
       if(button.disabled)return;
       caseActions.onOpenNode?.(button.dataset.decisionNode);
     };
-  });
-  root.querySelectorAll('[data-flow]').forEach(flow=>{
-    flow.onclick=()=>caseActions.onFlow?.();
   });
 }

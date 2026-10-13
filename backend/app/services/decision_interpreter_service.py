@@ -27,13 +27,14 @@ from app.services.llm_service import (
     structured_completion,
 )
 from app.services.run_service import get_run
+from app.services.comparative_analysis_service import completed_evidence
 
 
 class ChatConflict(ValueError):
     pass
 
 
-PROMPT_VERSION = "decision_interpreter_v3.0"
+PROMPT_VERSION = "decision_interpreter_v3.1_progressive"
 TURN_DEADLINE_SECONDS = 90.0
 
 
@@ -272,6 +273,7 @@ async def _insert_explanation(
     knowledge_version: str,
     response_json: dict,
     usage_json: dict,
+    evidence_analysis_id: str | None = None,
 ) -> dict:
     payload = {
         "id": str(uuid4()),
@@ -286,27 +288,9 @@ async def _insert_explanation(
         "usage_json": usage_json,
     }
 
-    async with http_client() as client:
-        response = await client.post(
-            (
-                f"{SUPABASE_URL}/rest/v1/"
-                "decision_explanations"
-            ),
-            headers={
-                **_headers(),
-                "Content-Type": (
-                    "application/json"
-                ),
-                "Prefer": (
-                    "return=representation"
-                ),
-            },
-            json=payload,
-            timeout=15.0,
-        )
-        response.raise_for_status()
-
-    return response.json()[0]
+    rows = await dispatch.db('POST','rpc/record_decision_explanation_with_evidence',body={
+        'explanation':payload,'evidence_analysis_id':evidence_analysis_id})
+    return rows[0]
 
 
 async def _recent_messages(
@@ -376,8 +360,9 @@ async def generate_explanation(
     knowledge = (
         load_logistics_knowledge()
     )
+    evidence, evidence_analysis_id = await completed_evidence(run)
     context = build_decision_context(
-        run["result_json"],
+        evidence,
         run.get("configuration_json"),
     )
 
@@ -413,7 +398,7 @@ async def generate_explanation(
     if run['result_json'].get('schema_version') in ('scheduling_v1', 'assignment_v1', 'dispatch_v1', 'dispatch_v2'):
         from app.services.dispatch_context import verify_numbers, safe_explanation
         if not verify_numbers(json.dumps(response['parsed'], ensure_ascii=False), context):
-            response['parsed'] = safe_explanation(run['result_json'])
+            response['parsed'] = safe_explanation(evidence)
 
     stored = await _insert_explanation(
         run_id=run_id,
@@ -427,6 +412,7 @@ async def generate_explanation(
             "usage",
             {},
         ),
+        evidence_analysis_id=evidence_analysis_id,
     )
 
     return {
@@ -438,6 +424,7 @@ async def generate_explanation(
             knowledge["version"]
         ),
         "prompt_version": PROMPT_VERSION,
+        "evidence_analysis_id": evidence_analysis_id,
         "explanation": response["parsed"],
         "usage": response.get(
             "usage",
@@ -456,7 +443,7 @@ async def answer_question(
     turn_id = turn_id or str(uuid4())
     identify(run_id=run_id, turn_id=turn_id)
     intent_hash = hashlib.sha256(question.encode()).hexdigest()
-    replay = await dispatch.db('POST', 'rpc/read_decision_chat_turn', body={
+    replay = await dispatch.db('POST', 'rpc/read_decision_chat_turn_with_evidence', body={
         'target_turn_id': turn_id, 'target_run_id': run_id, 'intent_hash': intent_hash})
     if replay:
         event('chat_replayed', prompt_version=replay['prompt_version'])
@@ -469,8 +456,9 @@ async def answer_question(
             question
         )
     )
+    evidence, evidence_analysis_id = await completed_evidence(run)
     context = build_decision_context(
-        run["result_json"],
+        evidence,
         run.get("configuration_json"),
     )
     history = await _recent_messages(
@@ -506,9 +494,10 @@ async def answer_question(
         if not verify_numbers(response['content'], context):
             response['content'] = 'No pude verificar las cifras de la respuesta generada. Consultá los valores exactos del plan y reformulá la pregunta.'
 
-    result = await dispatch.db('POST', 'rpc/record_decision_chat_turn', body={
+    result = await dispatch.db('POST', 'rpc/record_decision_chat_turn_with_evidence', body={
         'target_turn_id': turn_id, 'target_run_id': run_id, 'intent_hash': intent_hash,
         'question_text': question, 'answer_text': response['content'],
+        'evidence_analysis_id': evidence_analysis_id,
         'metadata': {'provider': response['provider'], 'model': response['model'],
                      'knowledge_version': knowledge['version'], 'prompt_version': PROMPT_VERSION,
                      'usage': response.get('usage', {}), 'request_id': telemetry_context.get().get('request_id')},
@@ -522,26 +511,9 @@ async def get_saved_interpretation(
     *, limit: int = 50, offset: int = 0,
 ) -> dict:
     async with http_client() as client:
-        explanation_response = (
-            await client.get(
-                (
-                    f"{SUPABASE_URL}/rest/v1/"
-                    "decision_explanations"
-                ),
-                headers=_headers(),
-                params={
-                    "select": "*",
-                    "run_id": (
-                        f"eq.{run_id}"
-                    ),
-                    "order": (
-                        "created_at.desc"
-                    ),
-                    "limit": "1",
-                },
-                timeout=15.0,
-            )
-        )
+        explanation_response = await client.post(
+            f'{SUPABASE_URL}/rest/v1/rpc/current_decision_explanation',headers=_headers(),
+            json={'target_run_id':run_id},timeout=15)
 
         messages_response = (
             await client.get(
@@ -572,14 +544,42 @@ async def get_saved_interpretation(
 
         explanation_response.raise_for_status()
         messages_response.raise_for_status()
+        filters=[]
+        if explanation_response.json(): filters.append('explanation_id.eq.'+explanation_response.json()[0]['id'])
+        turn_ids=[row['turn_id'] for row in messages_response.json() if row.get('turn_id')]
+        if turn_ids: filters.append('chat_turn_id.in.('+','.join(turn_ids)+')')
+        source_params={'select':'explanation_id,chat_turn_id,analysis_id','run_id':f'eq.{run_id}'}
+        if filters: source_params['or']='('+','.join(filters)+')'
+        else: source_params['limit']='0'
+        sources_response = await client.get(
+            f'{SUPABASE_URL}/rest/v1/decision_interpretation_sources',headers=_headers(),
+            params=source_params,timeout=15)
+        sources_response.raise_for_status()
+        comparative_response = await client.get(
+            f'{SUPABASE_URL}/rest/v1/decision_comparative_analyses',headers=_headers(),
+            params={'select':'id,source_mode','base_run_id':f'eq.{run_id}','status':'eq.completed','limit':'1'},timeout=15)
+        comparative_response.raise_for_status()
+        explanation_response.raise_for_status()
+        messages_response.raise_for_status()
 
     explanations = (
         explanation_response.json()
     )
 
     recent = messages_response.json()
+    sources = sources_response.json()
+    current_analysis = next(iter(comparative_response.json()),None)
+    current_analysis_id = current_analysis['id'] if current_analysis else None
+    explanation = explanations[0] if explanations else None
+    explanation_source = next((row.get('analysis_id') for row in sources if explanation and row.get('explanation_id')==explanation['id']),None)
+    turn_sources = {row['chat_turn_id']:row.get('analysis_id') for row in sources if row.get('chat_turn_id')}
+    for message in recent:
+        message['evidence_analysis_id'] = turn_sources.get(message.get('turn_id'))
     return {
         "run_id": run_id,
+        "current_evidence_analysis_id": current_analysis_id,
+        "explanation_is_current": bool(explanation_source==current_analysis_id or (explanation_source is None and current_analysis and current_analysis["source_mode"]=="existing")),
+        "explanation_evidence_analysis_id": explanation_source,
         "pagination": {"has_more": len(recent) > limit, "next_offset": offset+limit, "limit": limit},
         "explanation": (
             explanations[0]

@@ -204,6 +204,68 @@ class WorkflowTests(unittest.TestCase):
         events=self.checked(self.s.db.get('decision_approval_events',params={'case_id':'eq.'+case}))
         self.assertEqual(len(events),4)
 
+    def analysis(self,identifier):
+        return self.checked(self.s.api_client.get('/api/runs/'+identifier+'/comparative'))
+
+    def complete_analysis(self,identifier,status='completed'):
+        rows=[]
+        def terminal():
+            row=self.analysis(identifier)
+            if row['status'] not in ('completed','error'):return False
+            self.assertEqual(row['status'],status,row.get('error_message'));rows.append(row);return True
+        wait_for(terminal,'comparative completion',timeout=60)
+        return rows[0]
+
+    def test_progressive_comparative_recovers_real_worker_without_changing_case_or_history(self):
+        case,orders,fleet=self.case();body=self.body(case,orders,fleet);body['configuration']['objective']='min_trips'
+        self.s.start_worker();assignment=self.finish(self.admit(body));self.approve(assignment['id'],case)
+        scheduling=self.finish(self.admit(self.body(case,orders,fleet,'logistics_scheduling',assignment['id'])))
+        self.approve(scheduling['id'],case,'logistics_scheduling')
+        wait_for(lambda:self.checked(self.s.db.get('decision_case_reconciliations'))==[],'settled original case')
+        self.s.stop(self.s.worker)
+        def business():
+            return {table:self.checked(self.s.db.get(table,params={'order':'id.asc'}))
+                for table in ('decision_runs','decision_cases','decision_approval_events')}
+        before=business()
+        path='/api/runs/'+assignment['id']+'/comparative'
+        accepted=self.checked(self.s.api_client.post(path),202)
+        self.assertEqual(self.checked(self.s.api_client.post(path),202)['id'],accepted['id'])
+        self.s.stop(self.s.api);self.s.start_api()
+        self.assertEqual(self.analysis(assignment['id'])['id'],accepted['id'])
+        gate=self.s.storage/'block-downloads';gate.touch();self.s.start_worker()
+        wait_for(lambda:self.analysis(assignment['id'])['status']=='running','comparative worker claim')
+        first=self.checked(self.s.db.get('decision_comparative_analyses'))[0]
+        self.s.stop(self.s.worker,kill=True)
+        self.s.sql(f"UPDATE decision_comparative_analyses SET lease_expires_at=clock_timestamp()-interval '1 second' WHERE id='{accepted['id']}';")
+        gate.unlink();self.s.start_worker();artifact=self.complete_analysis(assignment['id'])
+        self.assertEqual(artifact['attempts'],2);self.assertEqual(artifact['id'],accepted['id'])
+        self.assertEqual(artifact['result_json']['scenarios']['selected'],assignment['result_json']['scenarios']['selected'])
+        self.assertGreater(len(artifact['result_json']['scenarios']),len(assignment['result_json']['scenarios']))
+        fenced=self.checked(self.s.db.post('rpc/finish_comparative_analysis',json={'target_analysis_id':accepted['id'],
+            'worker_token':first['lease_token'],'terminal_values':{'status':'error','error_message':'old worker'}}))
+        self.assertEqual(fenced,[]);self.assertEqual(business(),before)
+        self.assertEqual(self.checked(self.s.api_client.post(path))['id'],artifact['id'])
+        metrics=self.s.api_client.get('/metrics')
+        self.assertIn('dation_comparative_queue_queued 0',metrics.text)
+
+    def test_comparative_error_retry_and_existing_reference_reuse(self):
+        case,orders,fleet=self.case();body=self.body(case,orders,fleet);body['configuration']['objective']='min_trips'
+        self.s.start_worker();base=self.finish(self.admit(body));self.s.stop(self.s.worker)
+        file=self.s.storage/orders['storage_bucket']/orders['storage_path'];original=file.read_bytes()
+        file.write_bytes(original+b'\ncorrupted')
+        path='/api/runs/'+base['id']+'/comparative';artifact=self.checked(self.s.api_client.post(path),202)
+        self.s.start_worker();failed=self.complete_analysis(base['id'],'error')
+        self.assertTrue(failed['error_message']);self.assertEqual(self.checked(self.s.api_client.post(path))['status'],'error')
+        file.write_bytes(original)
+        retry=self.checked(self.s.api_client.post(path,params={'retry':'true'}),202)
+        self.assertEqual(retry['id'],artifact['id']);self.assertEqual(retry['generation'],2)
+        self.complete_analysis(base['id'])
+        balanced=self.finish(self.admit(self.body(case,orders,fleet)));self.s.stop(self.s.worker)
+        reused=self.checked(self.s.api_client.post('/api/runs/'+balanced['id']+'/comparative'))
+        self.assertEqual(reused['status'],'completed');self.assertEqual(reused['source_mode'],'existing')
+        self.assertEqual(reused['result_json'],balanced['result_json']);self.assertEqual(reused['attempts'],0)
+        self.assertEqual(len(self.checked(self.s.db.get('decision_runs'))),2)
+
     def test_browser_creation_execution_approval_navigation_and_mobile_history(self):
         self.s.start_worker()
         browser_python=os.getenv('DATION_BROWSER_PYTHON',str(ROOT/'.browser-venv/bin/python'))

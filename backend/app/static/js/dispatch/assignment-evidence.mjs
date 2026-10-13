@@ -1,3 +1,4 @@
+import {createScope} from './lifecycle.mjs';
 import {esc,num,money,pct,vehicle} from './shared.mjs';
 import {
   getAssignmentTrips,
@@ -24,7 +25,7 @@ function utilizationCell(value){
 function tripRows(trips){
   return trips.map(trip=>
     '<tr>'
-      +'<td><button type="button" class="assignment-evidence__trip-link" data-trip-detail-button="'+esc(trip.trip_id)+'">'+esc(trip.trip_id)+'</button></td>'
+      +'<td><strong>'+esc(trip.trip_id)+'</strong></td>'
       +'<td><strong>'+esc(trip.resource_id)+'</strong><small>'+esc(vehicle(trip.vehicle_type||''))+'</small></td>'
       +'<td>'+esc(trip.origin||'—')+' → '+esc(trip.destination||'—')+'</td>'
       +'<td>'+num(trip.load_kg,0)+' kg</td>'
@@ -32,6 +33,7 @@ function tripRows(trips){
       +'<td>'+utilizationCell(trip.utilization)+'</td>'
       +'<td>'+num(trip.order_count)+'</td>'
       +'<td>'+ownershipBadge(trip.ownership)+'</td>'
+      +'<td><button type="button" class="assignment-evidence__trip-link" data-trip-detail-button="'+esc(trip.trip_id)+'" aria-expanded="false" aria-label="Ver detalle del viaje '+esc(trip.trip_id)+'">Ver detalle</button></td>'
     +'</tr>'
   ).join('');
 }
@@ -98,10 +100,6 @@ function detailMetric(label,value){
 }
 
 function renderTripDetail(root,trip){
-  if(!trip){
-    root.innerHTML='<div class="assignment-evidence__detail-empty"><strong>Seleccioná un viaje</strong><p>Podés abrir cualquier fila para inspeccionar vehículo, ruta, carga y órdenes.</p></div>';
-    return;
-  }
   const cost=trip.estimated_cost==null?'':detailMetric('Costo estimado',money(trip.estimated_cost));
   const co2=trip.estimated_co2_kg==null?'':detailMetric('CO₂ estimado',num(trip.estimated_co2_kg,1)+' kg');
   const provider=trip.ownership==='third_party'&&trip.provider_name
@@ -112,7 +110,7 @@ function renderTripDetail(root,trip){
   root.innerHTML=
     '<div class="assignment-evidence__detail-head">'
       +'<div><span class="dispatch-kicker">DETALLE DEL VIAJE</span><h3>'+esc(trip.trip_id)+'</h3><p>'+esc(trip.origin||'—')+' → '+esc(trip.destination||'—')+'</p></div>'
-      +ownershipBadge(trip.ownership)
+      +'<div>'+ownershipBadge(trip.ownership)+'<button type="button" data-close-trip>Cerrar</button></div>'
     +'</div>'
     +'<div class="assignment-evidence__detail-grid">'
       +detailMetric('Vehículo',trip.resource_id)
@@ -133,6 +131,7 @@ function renderTripDetail(root,trip){
 }
 
 export function render(root,result){
+  const scope=createScope(root);
   const trips=getAssignmentTrips(result);
   const vehicles=getAssignmentVehicles(result);
   const orders=getAssignmentOrders(result);
@@ -148,31 +147,70 @@ export function render(root,result){
     +'</div>'
     +'<section role="tabpanel" data-evidence-panel="trips">'
       +(trips.length
-        ?'<div class="dispatch-table-wrap assignment-evidence__table-wrap"><table class="assignment-evidence__table"><thead><tr><th>Viaje</th><th>Vehículo</th><th>Ruta</th><th>Carga</th><th>Capacidad</th><th>Utilización</th><th>Órdenes</th><th>Flota</th></tr></thead><tbody>'+tripRows(trips)+'</tbody></table></div>'
+        ?'<div class="dispatch-table-wrap assignment-evidence__table-wrap"><table class="assignment-evidence__table"><thead><tr><th>Viaje</th><th>Vehículo</th><th>Ruta</th><th>Carga</th><th>Capacidad</th><th>Utilización</th><th>Órdenes</th><th>Flota</th><th>Detalle</th></tr></thead><tbody>'+tripRows(trips)+'</tbody></table></div>'
         :'<p class="assignment-evidence__empty">No hay viajes para mostrar.</p>')
-      +'<aside class="assignment-evidence__trip-detail" data-trip-detail aria-live="polite"></aside>'
     +'</section>'
     +'<section role="tabpanel" data-evidence-panel="vehicles" hidden>'+vehicleView(vehicles)+'</section>'
     +'<section role="tabpanel" data-evidence-panel="orders" hidden>'+orderView(orders)+'</section>'
     +'<div class="assignment-evidence__boundary"><span aria-hidden="true">i</span><p><strong>Frontera de esta decisión.</strong> Esta decisión distribuye carga y construye viajes. Las fechas y posibles superposiciones se resolverán en Planificación.</p></div>';
 
-  const detail=root.querySelector('[data-trip-detail]');
-  renderTripDetail(detail,null);
+  const controls=[...root.querySelectorAll('[data-trip-detail-button]')];
+  const panelId='assignment-trip-'+crypto.randomUUID();
+  let selectedButton=null,detailRow=null;
+  controls.forEach(button=>button.setAttribute('aria-controls',panelId));
 
-  root.querySelectorAll('[data-evidence-tab]').forEach(button=>{
-    button.addEventListener('click',()=>{
-      const target=button.dataset.evidenceTab;
-      root.querySelectorAll('[data-evidence-tab]').forEach(item=>item.setAttribute('aria-selected',String(item===button)));
-      root.querySelectorAll('[data-evidence-panel]').forEach(panel=>{panel.hidden=panel.dataset.evidencePanel!==target;});
+  function closeDetail({focus=true}={}){
+    const old=selectedButton;
+    selectedButton=null;
+    detailRow?.remove();detailRow=null;
+    controls.forEach(button=>{
+      button.setAttribute('aria-expanded','false');
+      button.closest('tr').classList.remove('is-selected');
     });
+    if(focus)old?.focus({preventScroll:true});
+  }
+
+  controls.forEach(button=>scope.listen(button,'click',()=>{
+    if(selectedButton===button){closeDetail();return;}
+    closeDetail({focus:false});
+    const trip=trips.find(item=>item.trip_id===button.dataset.tripDetailButton);
+    if(!trip)return;
+    selectedButton=button;
+    button.setAttribute('aria-expanded','true');
+    button.closest('tr').classList.add('is-selected');
+    detailRow=document.createElement('tr');
+    detailRow.className='assignment-evidence__detail-row';
+    detailRow.innerHTML='<td colspan="9"><section class="assignment-evidence__trip-detail" data-trip-detail id="'+panelId+'" role="region" aria-label="Detalle del viaje '+esc(trip.trip_id)+'"></section></td>';
+    button.closest('tr').after(detailRow);
+    const detail=detailRow.querySelector('[data-trip-detail]');
+    renderTripDetail(detail,trip);
+    const close=detail.querySelector('[data-close-trip]');
+    close.onclick=()=>closeDetail();
+    close.focus({preventScroll:true});
+  }));
+  scope.listen(root,'keydown',event=>{
+    if(event.key==='Escape'&&selectedButton){event.preventDefault();closeDetail();}
   });
 
-  root.querySelectorAll('[data-trip-detail-button]').forEach(button=>{
-    button.addEventListener('click',()=>{
-      const trip=trips.find(item=>item.trip_id===button.dataset.tripDetailButton);
-      renderTripDetail(detail,trip);
-      root.querySelectorAll('[data-trip-detail-button]').forEach(item=>item.setAttribute('aria-current',String(item===button)));
-      detail?.scrollIntoView?.({behavior:'smooth',block:'nearest'});
+  const tabs=[...root.querySelectorAll('[data-evidence-tab]')];
+  function selectTab(button){
+    closeDetail({focus:false});
+    tabs.forEach(item=>{
+      item.setAttribute('aria-selected',String(item===button));
+      item.tabIndex=item===button?0:-1;
+    });
+    root.querySelectorAll('[data-evidence-panel]').forEach(panel=>{
+      panel.hidden=panel.dataset.evidencePanel!==button.dataset.evidenceTab;
+    });
+  }
+  tabs.forEach((button,index)=>{
+    button.tabIndex=index===0?0:-1;
+    scope.listen(button,'click',()=>selectTab(button));
+    scope.listen(button,'keydown',event=>{
+      if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
+      event.preventDefault();
+      const next=event.key==='Home'?0:event.key==='End'?tabs.length-1:(index+(event.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;
+      selectTab(tabs[next]);tabs[next].focus();
     });
   });
 }

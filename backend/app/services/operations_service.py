@@ -9,6 +9,7 @@ async def operational_snapshot():
     try:
         async with asyncio.timeout(8):
             snapshot = await dispatch.db('POST', 'rpc/dispatch_operational_snapshot', body={})
+            snapshot['comparative_queue'] = await dispatch.db('POST', 'rpc/comparative_operational_snapshot', body={})
     except (httpx.HTTPError, TimeoutError):
         event('readiness_unavailable', outcome='database_unavailable')
         return {'ready': False, 'database': 'unavailable', 'alerts': ['database_unavailable']}
@@ -31,7 +32,7 @@ def render_metrics(snapshot):
         lines.append('dation_database_available 0')
         return '\n'.join(lines)+'\n'
     lines.append('dation_database_available 1')
-    for group in ('queue', 'workers', 'reconciliation', 'runs_24h', 'chat_24h'):
+    for group in ('queue', 'workers', 'reconciliation', 'runs_24h', 'chat_24h', 'comparative_queue'):
         for field, value in snapshot[group].items():
             if isinstance(value, (int, float)) and not isinstance(value, bool):
                 lines.append('dation_'+group+'_'+field+' '+str(value))

@@ -134,7 +134,7 @@ async def process_job(job):
                             (('node', case.get('node_id') if case.get('node_id') in cases.UPSTREAM_NODE or case.get('node_id') == 'logistics_assignment' else 'dispatch'),))
 
 
-async def _process_job(job):
+async def _process_job(job, *, executor=None, job_kind="dispatch_job", target_key="target_run_id", event_prefix="dispatch"):
     run_id, token = job["run_id"], job["lease_token"]
     lost = Event()
     progress_lock = Lock()
@@ -149,8 +149,8 @@ async def _process_job(job):
             pending_progress[1] = {"stage": stage}
 
     async def heartbeat(progress=None):
-        ok = await dispatch.db("POST","rpc/heartbeat_dispatch_job",body={
-            "target_run_id":run_id,"worker_token":token,"lease_seconds":120,"progress":progress})
+        ok = await dispatch.db("POST","rpc/heartbeat_"+job_kind,body={
+            target_key:run_id,"worker_token":token,"lease_seconds":120,"progress":progress})
         if ok is not True:
             lost.set()
             raise LeaseLost("La ejecución ya no pertenece a este worker.")
@@ -158,8 +158,8 @@ async def _process_job(job):
     async def writer(values):
         if lost.is_set(): raise LeaseLost("La ejecución perdió su lease.")
         if values.get("status") in {"completed","error"}:
-            rows = await dispatch.db("POST","rpc/finish_dispatch_job",body={
-                "target_run_id":run_id,"worker_token":token,"terminal_values":values})
+            rows = await dispatch.db("POST","rpc/finish_"+job_kind,body={
+                target_key:run_id,"worker_token":token,"terminal_values":values})
             if not rows:
                 lost.set()
                 raise LeaseLost("Otro worker o una cancelación cerró esta ejecución.")
@@ -180,12 +180,12 @@ async def _process_job(job):
             try:
                 await heartbeat(stage if version != observed else None)
                 if version != observed:
-                    event("dispatch_stage", stage=stage["stage"])
+                    event(event_prefix+"_stage", stage=stage["stage"])
                 observed = version
                 last_heartbeat = now
             except (httpx.HTTPError,LeaseLost):
                 lost.set()
-                event("dispatch_lease_lost", level=logging.WARNING)
+                event(event_prefix+"_lease_lost", level=logging.WARNING)
                 return
 
     pulse = asyncio.create_task(keep_alive())
@@ -197,39 +197,47 @@ async def _process_job(job):
         case = request.get("decision_case")
         if case and case["node_id"] in cases.UPSTREAM_NODE:
             await cases.validate_upstream_run(case["case_id"],case["node_id"],request["source_run_id"])
-        result = await dispatch.execute(request["orders_id"],request["fleet_id"],request["configuration"],request["options"],
-            run_id,case,request.get("source_run_id"),execution_writer=writer,progress_handler=progress)
-        event("dispatch_completed", attempt=job["attempts"], stage="completed")
+        if executor:
+            result = await executor(request, writer, progress)
+        else:
+            result = await dispatch.execute(request["orders_id"],request["fleet_id"],request["configuration"],request["options"],
+                run_id,case,request.get("source_run_id"),execution_writer=writer,progress_handler=progress)
+        event(event_prefix+"_completed", attempt=job["attempts"], stage="completed")
         return result
     except LeaseLost:
-        event("dispatch_fenced", level=logging.WARNING)
+        event(event_prefix+"_fenced", level=logging.WARNING)
     except httpx.HTTPError:
         # The job remains durable; expiration permits recovery after a provider outage.
-        event("dispatch_dependency_unavailable", level=logging.WARNING)
+        event(event_prefix+"_dependency_unavailable", level=logging.WARNING)
     except Exception as exc:
         if not lost.is_set():
             try:
                 await writer({"status":"error","progress_json":{"stage":"error"},"error_message":str(exc)[:1500]})
             except (httpx.HTTPError,LeaseLost):
-                event("dispatch_error_persistence_pending", level=logging.WARNING)
-        event("dispatch_failed", level=logging.WARNING, error_type=type(exc).__name__)
+                event(event_prefix+"_error_persistence_pending", level=logging.WARNING)
+        event(event_prefix+"_failed", level=logging.WARNING, error_type=type(exc).__name__)
     finally:
         pulse.cancel()
         await asyncio.gather(pulse,return_exceptions=True)
 
 
-async def worker_step():
+async def worker_step(*, include_analyses=False, stop=None):
     rows = await dispatch.db("POST","rpc/claim_dispatch_job",body={"worker_token":str(uuid4()),"lease_seconds":120}) or []
     if rows: await process_job(rows[0])
+    analysis_rows = []
+    if include_analyses and not (stop and stop.is_set()):
+        from app.services.comparative_analysis_service import process_analysis_job
+        analysis_rows = await dispatch.db('POST','rpc/claim_comparative_analysis',body={'worker_token':str(uuid4()),'lease_seconds':120}) or []
+        if analysis_rows: await process_analysis_job(analysis_rows[0])
     await reconcile_cases()
-    return bool(rows)
+    return bool(rows or analysis_rows)
 
 
 async def worker_loop(stop, health_callback=None):
     # One solver at a time per process; instance count is capped by deployment.
     while not stop.is_set():
         try:
-            busy = await worker_step()
+            busy = await worker_step(include_analyses=True, stop=stop)
             if health_callback: health_callback(True)
         except httpx.HTTPError:
             busy = False

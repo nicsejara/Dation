@@ -89,13 +89,12 @@ class AssignmentDashboardPhase2Tests(unittest.TestCase):
         )
         self.assertEqual(completed.returncode, 0, completed.stderr)
 
-    def test_essential_composition_is_selected_only_by_persisted_depth(self):
-        self.assertIn("const depth=getAnalysisDepth(run)", self.dashboard)
-        self.assertIn("if(depth==='essential')", self.dashboard)
+    def test_essential_is_always_base_and_comparative_is_insertable(self):
         self.assertIn("renderModule(nodes.hero,assignmentSummary,result)", self.dashboard)
         self.assertIn("renderModule(nodes.assignment,assignmentEvidence,result)", self.dashboard)
         self.assertIn("renderModule(nodes.review,assignmentValidation,result)", self.dashboard)
-        self.assertIn("renderModule(nodes.hero,assignmentComparativeSummary,result)", self.dashboard)
+        self.assertIn("comparativeUpgrade.render(nodes.comparative,run",self.dashboard)
+        self.assertLess(self.dashboard.index('comparativeUpgrade.render'),self.dashboard.index('renderModule(nodes.explanation'))
         self.assertNotIn("data-depth-toggle", self.dashboard)
 
     def test_summary_separates_objective_metrics_from_descriptive_kpis(self):
@@ -161,17 +160,17 @@ class AssignmentDashboardPhase2Tests(unittest.TestCase):
             self.assertNotIn(forbidden, self.validation.lower())
 
     def test_approval_is_final_action_and_approved_state_has_no_dead_disabled_cta(self):
-        self.assertIn("Reconfigurar decisión", self.shell)
+        self.assertIn("Nueva corrida", self.shell)
         self.assertIn("Aprobar asignación →", self.shell)
         self.assertIn("Esta decisión quedó congelada como entrada para Planificación.", self.shell)
         self.assertIn("approveButton.hidden=true", self.shell)
         self.assertIn("rerunValidation.hidden=true", self.shell)
-        self.assertIn("continuation.hidden=false", self.shell)
+        self.assertIn("await actions.refresh()", self.shell)
         self.assertIn("caseActions.onApprovalComplete?.()", self.shell)
         self.assertIn("data-after-approve", self.shell)
 
     def test_phase2_css_is_depth_scoped_responsive_and_does_not_touch_scheduling(self):
-        self.assertIn('.assignment-dashboard-v2[data-analysis-depth="essential"]', self.styles)
+        self.assertIn('.assignment-dashboard-v2', self.styles)
         self.assertIn("assignment-essential__kpi-strip", self.styles)
         self.assertIn("assignment-evidence__tabs", self.styles)
         self.assertIn("assignment-validation__grid", self.styles)

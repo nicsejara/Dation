@@ -1,10 +1,7 @@
 import "../dda-variable-config.js";
 
-export const DECISION_ORDER = [
-  "logistics_assignment",
-  "logistics_scheduling",
-  "logistics_final_assignment",
-];
+import {NODE_IDS} from './decision-case.mjs';
+export const DECISION_ORDER = NODE_IDS;
 
 export const DECISION_META = Object.freeze({
   logistics_assignment: Object.freeze({

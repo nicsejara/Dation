@@ -40,6 +40,7 @@ async def run_worker():
     queue_ok, _ = await dispatch_service._probe_rpc_catalog([
         'claim_dispatch_job', 'heartbeat_dispatch_job', 'finish_dispatch_job', 'ack_case_reconciliation',
         'report_dispatch_worker', 'dispatch_operational_snapshot',
+        'claim_comparative_analysis', 'heartbeat_comparative_analysis', 'finish_comparative_analysis',
     ])
     if not queue_ok:
         raise RuntimeError('Las migraciones operativas no están disponibles para el worker.')

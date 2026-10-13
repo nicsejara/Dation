@@ -3,7 +3,7 @@ import {render as dashboard} from './dashboard.mjs';
 import {mountUploadScreen} from './upload/index.mjs';
 import {renderDecisionMap} from './decision-map.mjs';
 import {mountAssignmentConfig,filterPayload,normalizeRawWeights} from './assignment-config.mjs';
-import {STATUS,createDecisionCase,replaceInputs,transitionNode,inputSignature,caseRef,deriveDecisionNodes} from './decision-case.mjs';
+import {STATUS,createDecisionCase,replaceInputs,transitionNode,inputSignature,caseRef,deriveDecisionNodes,continuationState} from './decision-case.mjs';
 import {DECISION_META} from './decision-ui.mjs';
 
 const KEY='dation.dispatch.workspace.v5';
@@ -254,25 +254,25 @@ function decisionContext(nodeId){
   });
 }
 function navigate(view,options={}){persist();window.dationSetDataReady(ready());return navigateResource(view,options);}
-function nextNodeId(nodeId){
-  if(nodeId==='logistics_assignment')return 'logistics_scheduling';
-  if(nodeId==='logistics_scheduling')return 'logistics_final_assignment';
-  return null;
+async function startNewDecision(){
+  saveDraft();
+  resetAssignmentConfiguration();
+  Object.assign(state,{orders:null,fleet:null,decisionCase:null,run:null,activeNode:null,
+    preflight:null,configPreview:null,configured:false,decisions:{},schedulingUseDueDates:true});
+  decisionContext(null);
+  window.dationSetDataReady(false);
+  persist();
+  return navigateResource('logistics-data',{caseId:null,nodeId:null,runId:null});
 }
-function unlockNextNode(nodeId){
-  const next=nextNodeId(nodeId);
-  if(!next||!state.decisionCase?.nodes?.[next])return next;
-  const current=state.decisionCase.nodes[next];
-  if(current.status!==STATUS.LOCKED&&current.status!==STATUS.NEEDS_DATA)return next;
-  const evidence=state.preflight?.decision_readiness?.decisions?.find(item=>item.id===next);
-  state.decisionCase=transitionNode(
-    state.decisionCase,
-    next,
-    evidence?.data_ready?STATUS.AVAILABLE:STATUS.NEEDS_DATA,
-    {error:null},
-  );
-  return next;
+
+async function dashboardContinuation(run,nodeId,generation){
+  if(!nodeId||!state.decisionCase)return null;
+  if(runDecisionState(run,state.decisionCase,nodeId)!=='approved')return null;
+  if(!state.preflight)await preflight();
+  if(generation!==routeGeneration)return null;
+  return continuationState(state.decisionCase,nodeId,run.id,state.preflight?.decision_readiness,DECISION_META);
 }
+
 function urlRun(id,schema='assignment_v1'){resource={view:'decision-dashboard',caseId:state.decisionCase?.id||null,nodeId:schema==='scheduling_v1'?'logistics_scheduling':'logistics_assignment',runId:id};history.replaceState(null,'',resourceUrl(location.href,resource));}
 
 async function preflight(){
@@ -611,7 +611,17 @@ export async function show(run){
         :null,
       decisionCase:state.decisionCase,
       activeNode:nodeId,
-      onFlow:state.decisionCase?()=>navigate('logistics-map'):null,
+      onNewDecision:startNewDecision,
+      getContinuation:()=>dashboardContinuation(run,nodeId,generation),
+      onContinue:async()=>{
+        await hydrateCase(caseMeta.case_id,generation);
+        if(generation!==routeGeneration)return;
+        state.preflight=null;
+        const next=await dashboardContinuation(run,nodeId,generation);
+        if(generation!==routeGeneration)return;
+        if(next?.state!=='available')throw new Error(next?.message||'La siguiente decisión todavía no está disponible.');
+        return navigateResource('logistics-config',{caseId:caseMeta.case_id,nodeId:next.nodeId,runId:null});
+      },
       onOpenNode:state.decisionCase?openCaseResult:null,
       onApprove:(nodeId&&caseMeta?.case_id&&state.decisionCase?.id===caseMeta.case_id&&!['stale','superseded'].includes(runDecisionState(run,state.decisionCase,nodeId)))
         ?async()=>{
@@ -623,12 +633,13 @@ export async function show(run){
           state.run=approved;
           await hydrateCase(caseMeta.case_id,generation);
           if(generation!==routeGeneration)return state.decisionCase;
+          if(state.preflight)state.decisionCase={...state.decisionCase,nodes:deriveDecisionNodes(state.decisionCase,state.preflight.decision_readiness)};
           persist();
           return state.decisionCase;
         }
         :null,
       onApprovalComplete:(nodeId&&state.decisionCase)
-        ?()=>{unlockNextNode(nodeId);persist();}
+        ?()=>{persist();}
         :null,
     },
   );
@@ -681,7 +692,7 @@ async function executeConfiguredScheduling({sourceRun,configuration,options}){
   try{const run=await post('/api/runs?run_id='+id,{orders_dataset_id:state.orders.id,fleet_dataset_id:state.fleet.id,source_run_id:sourceRun.id,configuration,options,decision_case:{case_id:caseId,node_id:'logistics_scheduling'}});if(generation===pollGeneration){if(run.status==='completed')await show(run);else {poll(id,generation,'logistics_scheduling');await runPolling.refresh();}}}
   catch(error){if(generation===pollGeneration){poll(id,generation,'logistics_scheduling',{graceUntil:Date.now()+10000});await runPolling.refresh();}}
 }
-window.DationDispatch={show,openRun,isReady:ready,getWorkspace:()=>state,openCase:(caseId,view='logistics-map',nodeId=null)=>navigateResource(view,{caseId,nodeId}),openActiveDecisionResult:()=>openCaseResult(state.activeNode),getActiveDecision:()=>({id:state.activeNode,label:DECISION_LABELS[state.activeNode],hasRun:Boolean(state.decisionCase?.nodes?.[state.activeNode]?.run_id),status:state.decisionCase?.nodes?.[state.activeNode]?.status})};
+window.DationDispatch={show,openRun,isReady:ready,getWorkspace:()=>state,startNewDecision,openCase:(caseId,view='logistics-map',nodeId=null)=>navigateResource(view,{caseId,nodeId}),openActiveDecisionResult:()=>openCaseResult(state.activeNode),getActiveDecision:()=>({id:state.activeNode,label:DECISION_LABELS[state.activeNode],hasRun:Boolean(state.decisionCase?.nodes?.[state.activeNode]?.run_id),status:state.decisionCase?.nodes?.[state.activeNode]?.status})};
 window.dationNavigate=(view,stage,event)=>{event?.preventDefault();return navigateResource(view);};
 document.body.classList.add('dispatch-enabled');
 mountTraceability();

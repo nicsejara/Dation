@@ -75,12 +75,12 @@ class AssignmentDashboardPhase3Tests(unittest.TestCase):
         )
         self.assertEqual(completed.returncode, 0, completed.stderr)
 
-    def test_comparative_composition_replaces_legacy_assignment_modules(self):
-        self.assertIn("else if(depth==='comparative')", self.dashboard)
-        self.assertIn("renderModule(nodes.hero,assignmentComparativeSummary,result)", self.dashboard)
-        self.assertIn("renderModule(nodes.assignment,assignmentComparison,result)", self.dashboard)
-        self.assertIn("renderModule(nodes.review,assignmentValidation,result)", self.dashboard)
-        self.assertNotIn("Phase 3 will replace this comparative composition", self.dashboard)
+    def test_comparative_composition_extends_essential_in_the_same_dashboard(self):
+        self.assertIn("renderModule(nodes.hero,assignmentSummary,result)", self.dashboard)
+        self.assertIn("renderModule(nodes.assignment,assignmentEvidence,result)", self.dashboard)
+        widget=(JS/'comparative-upgrade.mjs').read_text()
+        self.assertIn("assignment-comparative-summary.mjs",widget)
+        self.assertIn("assignment-comparison.mjs",widget)
         self.assertIn("assignment-dashboard-comparative.css?v=assignment-dashboard-phase3", self.dashboard)
 
     def test_comparison_explains_tradeoffs_without_reconstructing_alternative_detail(self):
@@ -116,7 +116,7 @@ class AssignmentDashboardPhase3Tests(unittest.TestCase):
         self.assertNotIn("comparison", self.validation.lower())
 
     def test_phase3_css_is_scoped_responsive_and_does_not_touch_scheduling(self):
-        self.assertIn('.assignment-dashboard-v2[data-analysis-depth="comparative"]', self.styles)
+        self.assertIn('.assignment-dashboard-v2 .assignment-comparative-layer', self.styles)
         self.assertIn("assignment-comparison__metrics", self.styles)
         self.assertIn("assignment-comparison__implications-grid", self.styles)
         self.assertIn("@media(max-width:980px)", self.styles)

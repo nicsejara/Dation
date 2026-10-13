@@ -1,3 +1,4 @@
+import {bindDashboardActions} from './dashboard-actions.mjs';
 import {createScope,disposeScope} from "./lifecycle.mjs";
 import {esc,num,download,dispose,errorBox,api} from './shared.mjs';
 import * as hero from './hero.mjs';
@@ -7,9 +8,7 @@ import * as explanation from './explanation.mjs';
 import * as assignmentSummary from './assignment-summary.mjs';
 import * as assignmentEvidence from './assignment-evidence.mjs';
 import * as assignmentValidation from './assignment-validation.mjs';
-import * as assignmentComparativeSummary from './assignment-comparative-summary.mjs';
-import * as assignmentComparison from './assignment-comparison.mjs';
-import {getAnalysisDepth} from './assignment-dashboard-selectors.mjs';
+import * as comparativeUpgrade from './comparative-upgrade.mjs';
 import {exportDecision} from './export.mjs';
 import * as schedulingDashboard from './scheduling-dashboard.mjs';
 import {decisionRail,bindDecisionRail} from './decision-nav.mjs';
@@ -93,22 +92,17 @@ function installDecisionChat(root,run,chatNode,toggleButton){
 function renderAssignmentDashboard(root,run,onRerun,caseActions={}){
   ensureAssignmentStyles();
   const result=run.result_json;
-  const depth=getAnalysisDepth(run);
   const nodes=renderAssignmentShell(root,run,caseActions);
 
-  if(depth==='essential'){
-    renderModule(nodes.hero,assignmentSummary,result);
-    renderModule(nodes.assignment,assignmentEvidence,result);
-    renderModule(nodes.review,assignmentValidation,result);
-  }else if(depth==='comparative'){
-    renderModule(nodes.hero,assignmentComparativeSummary,result);
-    renderModule(nodes.assignment,assignmentComparison,result);
-    renderModule(nodes.review,assignmentValidation,result);
-  }else{
-    renderModule(nodes.hero,hero,result);
-    renderModule(nodes.assignment,assignment,result);
-    renderModule(nodes.review,review,result);
-  }
+  renderModule(nodes.hero,assignmentSummary,result);
+  renderModule(nodes.assignment,assignmentEvidence,result);
+  renderModule(nodes.review,assignmentValidation,result);
+  comparativeUpgrade.render(nodes.comparative,run,{
+    onEvidenceReady:artifact=>{
+      renderModule(nodes.explanation,explanation,run);
+      nodes.chat.dispatchEvent(new CustomEvent('dispatch:evidence-changed',{detail:{id:artifact.id}}));
+    },
+  });
   renderModule(nodes.explanation,explanation,run);
 
   const chatButton=root.querySelector('[data-chat]');
@@ -136,13 +130,14 @@ function renderLegacyDashboard(root,run,onRerun,caseActions={}){
   root.className='dispatch dispatch-dashboard dispatch-dashboard-focused';
   root.innerHTML=
     '<header class="dispatch-command dispatch-command-focused">'
-      +'<div class="dispatch-command-title"><button type="button" data-flow class="dispatch-dashboard-map-back">← Mapa de decisiones</button><strong>DDA Logística · Assignment</strong><span class="dispatch-status" data-case-status>'+esc(caseStatus)+'</span></div>'
+      +'<div class="dispatch-command-title"><strong>DDA Logística · Assignment</strong><span class="dispatch-status" data-case-status>'+esc(caseStatus)+'</span></div>'
       +'<div class="dispatch-actions dispatch-actions--focused">'
         +(caseActions.onApprove?'<button data-approve class="dispatch-primary-action" '+(caseActions.status==='approved'?'disabled':'')+'>'+(caseActions.status==='approved'?'✓ Decisión aprobada':'Aprobar decisión')+'</button>':'')
         +'<button type="button" data-export-decision class="dispatch-export-action" title="Descargar la tabla completa de asignaciones">↓ '+esc(exportButtonLabel)+'</button>'
         +'<details class="dispatch-action-menu"><summary>Acciones ···</summary><div class="dispatch-action-menu__panel">'
           +'<button data-json>Exportar JSON técnico</button>'
-          +'<button data-rerun>Re-ejecutar Assignment</button>'
+          +'<button type="button" data-new-decision>Nueva decisión · cargar otros datos</button>'
+          +'<button data-rerun>Nueva corrida</button>'
           +'<button data-copy>Copiar detalles técnicos</button>'
           +'<dl>'
             +Object.entries({
@@ -163,6 +158,7 @@ function renderLegacyDashboard(root,run,onRerun,caseActions={}){
         +'</div></details>'
       +'</div>'
     +'</header>'
+    +'<div class="dispatch-dashboard-continuation"><button type="button" data-after-approve hidden>Continuar con la siguiente decisión →</button><p data-next-decision-status role="status"></p></div>'
     +decisionRail(caseActions)
     +'<main class="dispatch-focus-main">'
       +'<section class="dispatch-panel dispatch-focus-hero" id="dispatch-hero"></section>'
@@ -223,6 +219,7 @@ function renderLegacyDashboard(root,run,onRerun,caseActions={}){
   };
   root.querySelector('[data-rerun]').onclick=onRerun;
   bindDecisionRail(root,caseActions);
+  const actions=bindDashboardActions(root,caseActions);
   const approveButton=root.querySelector('[data-approve]');
   if(approveButton)approveButton.onclick=async()=>{
     approveButton.disabled=true;
@@ -232,6 +229,7 @@ function renderLegacyDashboard(root,run,onRerun,caseActions={}){
       const status=root.querySelector('[data-case-status]');
       if(status)status.textContent='Aprobada';
       caseActions.onApprovalComplete?.();
+      await actions.refresh();
     }catch(error){
       approveButton.disabled=false;
       alert(error.message);

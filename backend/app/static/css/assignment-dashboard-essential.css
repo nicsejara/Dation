@@ -1,6 +1,6 @@
 /* Assignment Dashboard V2 · Phase 2
    Essential analysis only. Scoped by persisted analysis depth. */
-.assignment-dashboard-v2[data-analysis-depth="essential"]{
+.assignment-dashboard-v2{
   --essential-border:#dde7ea;
   --essential-soft:#f7fafb;
   --essential-teal:#137d83;
@@ -11,7 +11,7 @@
   --essential-muted:#687b85;
 }
 
-.assignment-dashboard-v2[data-analysis-depth="essential"] .assignment-dashboard-v2__hero{
+.assignment-dashboard-v2 .assignment-dashboard-v2__hero{
   padding:24px!important;
   background:linear-gradient(135deg,#f1f8f7 0%,#fff 65%)!important;
 }
@@ -167,7 +167,7 @@
   line-height:1.5;
 }
 
-.assignment-dashboard-v2[data-analysis-depth="essential"] .assignment-dashboard-v2__assignment{
+.assignment-dashboard-v2 .assignment-dashboard-v2__assignment{
   padding:22px!important;
 }
 
@@ -580,7 +580,7 @@
   line-height:1.5;
 }
 
-.assignment-dashboard-v2[data-analysis-depth="essential"] .assignment-dashboard-v2__review{
+.assignment-dashboard-v2 .assignment-dashboard-v2__review{
   padding:22px!important;
 }
 
@@ -735,7 +735,7 @@
   line-height:1.5;
 }
 
-.assignment-dashboard-v2[data-analysis-depth="essential"] .assignment-dashboard-v2__approval{
+.assignment-dashboard-v2 .assignment-dashboard-v2__approval{
   margin-top:18px;
   border-color:#cfe1e1;
   background:linear-gradient(100deg,#f5faf9,#fff);
@@ -803,9 +803,9 @@
 }
 
 @media(max-width:520px){
-  .assignment-dashboard-v2[data-analysis-depth="essential"] .assignment-dashboard-v2__hero,
-  .assignment-dashboard-v2[data-analysis-depth="essential"] .assignment-dashboard-v2__assignment,
-  .assignment-dashboard-v2[data-analysis-depth="essential"] .assignment-dashboard-v2__review{
+  .assignment-dashboard-v2 .assignment-dashboard-v2__hero,
+  .assignment-dashboard-v2 .assignment-dashboard-v2__assignment,
+  .assignment-dashboard-v2 .assignment-dashboard-v2__review{
     padding:16px!important;
   }
   .assignment-essential__summary-copy h1{
@@ -840,4 +840,23 @@
   .assignment-evidence__tabs button{
     transition:none!important;
   }
+}
+
+.assignment-dashboard-v2 .assignment-evidence__table tr.is-selected{background:#edf5f0;box-shadow:inset 3px 0 #26715a;}
+.assignment-dashboard-v2 .assignment-evidence__detail-row>td{padding:12px;white-space:normal;}
+.assignment-dashboard-v2 .assignment-evidence__detail-row .assignment-evidence__trip-detail{margin:0;max-width:100%;}
+.assignment-dashboard-v2 .assignment-evidence__detail-head>div:last-child{display:flex;gap:12px;align-items:center;}
+.assignment-dashboard-v2 [data-close-trip]{border:1px solid #cbd5cf;border-radius:8px;padding:8px 12px;background:white;cursor:pointer;}
+.assignment-dashboard-v2 [data-trip-detail-button]:focus-visible,.assignment-dashboard-v2 [data-close-trip]:focus-visible{outline:3px solid #28745b;outline-offset:3px;}
+@media(max-width:760px){
+ .assignment-dashboard-v2 .assignment-evidence__table-wrap{container-type:inline-size;}
+ .assignment-dashboard-v2 .assignment-evidence__detail-row>td{padding:8px;}
+ .assignment-dashboard-v2 .assignment-evidence__detail-row .assignment-evidence__trip-detail{position:sticky;left:8px;width:calc(100cqw - 20px);box-sizing:border-box;}
+ .assignment-dashboard-v2 .assignment-evidence__detail-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+ .assignment-dashboard-v2 .assignment-evidence__detail-head{align-items:flex-start;gap:8px;}
+}
+@media(max-width:520px){
+ .assignment-dashboard-v2 .assignment-evidence__detail-grid{grid-template-columns:1fr;}
+ .assignment-dashboard-v2 .assignment-evidence__detail-head{flex-direction:column;}
+ .assignment-dashboard-v2 .assignment-evidence__detail-head>div:last-child{flex-wrap:wrap;}
 }
