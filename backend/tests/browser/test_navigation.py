@@ -304,7 +304,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.dashboard()
         await self.page.wait_for_function("document.querySelector('[data-next-decision-status]')?.textContent.includes('para revisar')")
         self.assertFalse(await self.page.locator('[data-after-approve]').is_visible())
-        await self.page.locator('[data-decision-node=logistics_scheduling]').click()
+        await self.page.locator('.dispatch-decision-rail [data-decision-node=logistics_scheduling]').click()
         await self.page.wait_for_selector('.dispatch-scheduling-dashboard')
 
     async def test_mobile_trip_detail_has_no_document_overflow(self):
