@@ -323,7 +323,7 @@ function connector(fromId,toId,presentations,nextNodeId){
 
 function heroMarkup(){
   const mapStep=workflowStep("map",{number:2,label:"Mapa de decisiones"});
-  return '<section class="dispatch-pro-hero dispatch-map-premium__hero" data-reveal>'
+  return '<section class="dispatch-pro-hero dispatch-map-premium__hero d-page-hero" data-reveal>'
     +'<div class="dispatch-pro-hero-copy">'
       +'<span class="dispatch-pro-hero-badge is-step">Paso '+esc(mapStep.number)+': '+esc(mapStep.label)+'</span>'
       +'<h1>Elegí la decisión que tus datos ya pueden resolver.</h1>'

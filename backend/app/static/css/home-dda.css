@@ -6,7 +6,7 @@
 
 .d-home__hero h1{
   max-width:860px;
-  font-size:clamp(36px,4.1vw,58px);
+  font-size:var(--hero-title-size);
 }
 
 .d-home__hero p{
@@ -33,7 +33,7 @@
 }
 
 .d-home__tile small{
-  opacity:.72;
+  opacity:1;
 }
 
 /* Make the DDA identity block more visible without increasing page density. */
@@ -141,7 +141,7 @@
   margin-top:9px;
   font-size:10.5px;
   line-height:1.5;
-  opacity:.78;
+  opacity:1;
 }
 
 @media(max-width:1080px){
@@ -172,7 +172,7 @@
   margin-top:9px;
   font-size:10.5px;
   line-height:1.5;
-  opacity:.78;
+  opacity:1;
 }
 
 @media(max-width:1080px){

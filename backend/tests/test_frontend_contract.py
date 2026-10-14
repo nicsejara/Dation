@@ -862,7 +862,7 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "/static/css/dda-logistics-upload.css?v=upload-finalbar-v2",
+            "/static/css/dda-logistics-upload.css?v=dark-foundation-v1",
             self.html,
         )
         self.assertIn(
@@ -1758,7 +1758,7 @@ class FrontendContractTests(
             upload,
         )
         self.assertIn(
-            "/static/css/app.css?v=workspace-nav-v2",
+            "/static/css/app.css?v=dark-foundation-v1",
             self.html,
         )
         self.assertIn(
@@ -2021,7 +2021,7 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "/static/css/home-dda.css?v=home-dda-hero-v4",
+            "/static/css/home-dda.css?v=dark-foundation-v1",
             self.html,
         )
         self.assertIn(
@@ -2168,7 +2168,7 @@ class FrontendContractTests(
         )
 
         self.assertIn(
-            "/static/css/dda-logistics-landing.css?v=dda-logistics-landing-v8",
+            "/static/css/dda-logistics-landing.css?v=dark-foundation-v1",
             self.html,
         )
         self.assertIn(

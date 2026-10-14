@@ -3,16 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="color-scheme" content="light">
+  <meta name="color-scheme" content="dark">
   <title>Dation · Decision Intelligence</title>
   <link rel="icon" type="image/png" href="/static/assets/dation-logo.png?v=home-dda-selector-v2">
-  <link rel="stylesheet" href="/static/css/tokens.css?v=home-dda-selector-v2">
-  <link rel="stylesheet" href="/static/css/app.css?v=workspace-nav-v2">
-  <link rel="stylesheet" href="/static/css/home-dda.css?v=home-dda-hero-v4">
-  <link rel="stylesheet" href="/static/css/dda-logistics-landing.css?v=dda-logistics-landing-v8">
-  <link rel="stylesheet" href="/static/css/dispatch.css?v=decision-map-premium-v1">
-  <link rel="stylesheet" href="/static/css/dda-logistics-upload.css?v=upload-finalbar-v2">
-  <link rel="stylesheet" href="/static/css/dispatch-lifecycle.css">
+  <link rel="stylesheet" href="/static/css/tokens.css?v=dark-foundation-v1">
+  <link rel="stylesheet" href="/static/css/app.css?v=dark-foundation-v1">
+  <link rel="stylesheet" href="/static/css/home-dda.css?v=dark-foundation-v1">
+  <link rel="stylesheet" href="/static/css/dda-logistics-landing.css?v=dark-foundation-v1">
+  <link rel="stylesheet" href="/static/css/dispatch.css?v=dark-foundation-v1">
+  <link rel="stylesheet" href="/static/css/dda-logistics-upload.css?v=dark-foundation-v1">
+  <link rel="stylesheet" href="/static/css/dispatch-lifecycle.css?v=dark-foundation-v1">
+  <link rel="stylesheet" href="/static/css/dation-legacy-surfaces.css?v=dark-foundation-v1">
+  <link rel="stylesheet" href="/static/css/dation-design-system.css?v=dark-foundation-v1">
 </head>
 <body>
   <div class="app-shell">
@@ -92,9 +94,9 @@
 
       <div class="content">
         <!-- INICIO -->
-        <section class="view is-active" data-view-panel="inicio">
+        <section class="view is-active" data-view-panel="inicio" data-dation-surface="legacy-light">
           <div class="d-home">
-            <section class="d-home__hero" aria-labelledby="dation-home-title">
+            <section class="d-home__hero d-page-hero" aria-labelledby="dation-home-title">
               <div class="d-home__hero-copy">
                 <span class="d-home__eyebrow">Dation · Decision Intelligence</span>
                 <h1 id="dation-home-title">
@@ -211,7 +213,7 @@
         </section>
 
         <!-- OVERVIEW DDA LOGÍSTICA -->
-        <section class="view" data-view-panel="logistics-overview">
+        <section class="view" data-view-panel="logistics-overview" data-dation-surface="legacy-light">
           <div class="dda-landing">
             <svg width="0" height="0" aria-hidden="true" focusable="false" class="dda-landing__sprite">
               <defs>
@@ -238,7 +240,7 @@
               </defs>
             </svg>
 
-            <section class="dda-landing__hero" data-reveal>
+            <section class="dda-landing__hero d-page-hero" data-reveal>
               <div class="dda-landing__hero-copy">
                 <span class="dda-landing__eyebrow">DDA LOGÍSTICA · PLANIFICACIÓN DE DESPACHOS</span>
                 <h1>Decidí tus despachos más rápido y con mejor análisis.</h1>
@@ -249,7 +251,7 @@
 
                 <div class="dda-landing__hero-actions">
                   <button
-                    class="button button--landing-primary"
+                    class="button d-button d-button--primary button--landing-primary"
                     id="start-logistics-decision"
                     type="button"
                     data-start-new-decision
@@ -257,7 +259,7 @@
                     Iniciar nueva decisión <span aria-hidden="true">→</span>
                   </button>
                   <button
-                    class="button button--landing-secondary"
+                    class="button d-button d-button--secondary button--landing-secondary"
                     type="button"
                     data-open-decision-map
                     disabled
@@ -560,26 +562,26 @@
         <!-- CARGAR DATOS: el contenido se monta desde dispatch/upload/index.mjs -->
         <section
           class="view"
-          data-view-panel="logistics-data"
+          data-view-panel="logistics-data" data-dation-surface="legacy-light"
           aria-live="polite"
         ></section>
 
         <!-- MAPA DE DECISIONES: el contenido se monta desde dispatch/workspace.mjs -->
         <section
           class="view"
-          data-view-panel="logistics-map"
+          data-view-panel="logistics-map" data-dation-surface="legacy-light"
           aria-live="polite"
         ></section>
 
         <!-- CONFIGURAR DECISIÓN: el contenido se monta desde dispatch/workspace.mjs -->
         <section
           class="view"
-          data-view-panel="logistics-config"
+          data-view-panel="logistics-config" data-dation-surface="legacy-light"
           aria-live="polite"
         ></section>
 
         <!-- DASHBOARD -->
-        <section class="view" data-view-panel="decision-dashboard">
+        <section class="view" data-view-panel="decision-dashboard" data-dation-surface="legacy-light">
           <div id="dashboard-execution-state" class="dashboard-execution-state is-hidden">
             <div class="dashboard-execution-state__hero">
               <div class="dashboard-execution-state__brand" aria-hidden="true">
@@ -999,7 +1001,7 @@
         </section>
 
         <!-- TRAZABILIDAD -->
-        <section class="view" data-view-panel="traceability">
+        <section class="view" data-view-panel="traceability" data-dation-surface="legacy-light">
           <div class="page-heading">
             <div>
               <span class="section-kicker">Auditoría</span>
@@ -1113,7 +1115,7 @@
         </section>
 
         <!-- CONFIGURACIÓN -->
-        <section class="view" data-view-panel="settings">
+        <section class="view" data-view-panel="settings" data-dation-surface="legacy-light">
           <div class="page-heading">
             <div>
               <span class="section-kicker">Plataforma</span>

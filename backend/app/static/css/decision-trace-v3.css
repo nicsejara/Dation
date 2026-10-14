@@ -25,9 +25,9 @@
   min-width:0;
 }
 .assignment-config-root .assignment-decision-panel .dispatch-pro-how-node{
-  grid-template-columns:38px minmax(0,1fr);
+  grid-template-columns:32px minmax(0,1fr);
   min-width:0;
-  min-height:62px;
+  min-height:48px;
   height:auto;
   align-items:center;
 }
