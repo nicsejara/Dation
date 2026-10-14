@@ -33,6 +33,8 @@ La Fase 1 no equivale a una aplicación completamente oscura: las superficies cl
 | Contrato DOM | `app/templates/app.html`, `app/static/js/dispatch/decision-config-ui.mjs`, `decision-map.mjs`, `upload/index.mjs` |
 | Regresiones | `tests/browser/test_navigation.py`, `tests/test_frontend_contract.py`, `tests/test_assignment_config_visual_consistency.py` |
 
+CI: `.github/workflows/backend-tests.yml` conserva la suite de Chromium y publica su diagnóstico como anotación si falla; permite leer el caso exacto cuando el proveedor bloquea la descarga de logs.
+
 Documentación: este informe y la nota de estado en `DATION_DESIGN_SYSTEM_V1.md`. No se modifican dependencias, lógica de backend, esquema, permisos, autenticación ni datos de negocio.
 
 ## E. Pruebas y aceptación
@@ -49,6 +51,17 @@ Validación local:
 Los tres nuevos casos de Chromium comprueban el tema bajo preferencia de sistema clara, shell y seis heroes a cinco anchos, transición SPA Scheduling→Assignment, foco con teclado, gradientes calculados del CTA, disabled estable, reduced motion y el límite claro de controles/dialog. Se amplía la regresión del botón Overview deshabilitado. Los contratos de assets y el tamaño del icono compacto se actualizan con el cambio.
 
 El E2E recorre creación, ejecución, aprobación, navegación móvil, historial, reemplazo, comparativa y recuperación de jobs. La infraestructura es desechable y no utiliza Supabase productivo. También se verifican sintaxis de todos los JS, compileall, pip check y `git diff --check`.
+
+Comandos desde `backend/` (activar primero el entorno):
+
+```bash
+python -m unittest discover -s tests -p 'test_*.py'
+node --test tests/test_*.js tests/test_*.mjs
+CHROMIUM_EXECUTABLE=/usr/bin/chromium .browser-venv/bin/python -m unittest discover -s tests/browser -p 'test_*.py'
+DATION_BROWSER_PYTHON="$PWD/.browser-venv/bin/python" CHROMIUM_EXECUTABLE=/usr/bin/chromium python tests/e2e/run_suite.py
+python -m compileall -q app main.py worker.py
+python -m pip check
+```
 
 La CI requerida añade 46 pruebas SQL: total esperado **508**. La publicación exige CI del head exacto, merge verificado y Cloud Build correcto; el comprobante final de ejecución, revisión y tráfico se registra en el PR y en `/workspace/dation-audit/rebrand-phase1-release.json`.
 

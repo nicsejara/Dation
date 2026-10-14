@@ -1127,6 +1127,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             self.assertFalse(await self.page.evaluate("document.documentElement.scrollWidth>innerWidth"))
 
     async def test_dark_buttons_have_keyboard_focus_contrast_and_stable_disabled_state(self):
+        # Isolate control states from the decorative page entrance animation.
+        await self.page.emulate_media(reduced_motion="reduce")
         await self.page.goto(f"http://127.0.0.1:{self.port}/app?view=logistics-overview")
         primary=self.page.locator("[data-start-new-decision]")
         await primary.wait_for(state="visible")
