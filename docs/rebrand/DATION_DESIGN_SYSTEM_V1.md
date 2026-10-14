@@ -196,7 +196,7 @@ Dialogs nativos conservan top layer. Drawer modal conserva trap de foco, Escape 
 - `color-scheme:dark` en meta y root desde Fase 1; revisar date picker nativo y autofill. Un estado invalid agrega icono/mensaje además de borde. Range y checkbox mantienen teclado, `aria-valuetext` y selección perceptible.
 - Tablas: surface-1, separadores sutiles, header sticky opaco dark, hover de fila y scroll local con nombre accesible. No ocultar columnas operativas esenciales sin alternativa.
 - KPI: surface-raised, número principal, label muted; deltas semánticos con signo/unidad. Conservar el cálculo canónico; el tema no cambia los denominadores.
-- Charts: el helper `shared.chart()` hoy inicializa ECharts sin tema y reemplaza `textStyle` del caller con familia/tamaño. La migración debe combinar opciones y alimentar texto, ejes, grilla, leyenda, tooltip, series y background. Scheduling y Assignment usan SVG con tooltip richText; no asumir que sus defaults ya son dark.
+- Charts: implementado en Fase 5 mediante `chart-theme.mjs` y `shared.chart()`: combina opciones sin mutar datos ni callbacks y conserva tipografía personalizada. Texto, ejes, grilla, leyenda, tooltip SVG/richText, series y background reciben el tema oscuro. El resize adapta márgenes y libera observadores al navegar.
 - Series: teal/cyan/violet con trazos, símbolos, labels o patrón que distingan categorías sin depender sólo del color. Usar rojo/ámbar para semántica, no para identificar recursos arbitrarios.
 - Tooltips sobre overlay, texto principal y borde; SVG/richText recibe opciones del gráfico, no un selector CSS HTML. Mantener tabla alternativa y formatter/fechas actuales.
 - Empty, error, warning, success y loading: icono + label + acción real. Skeleton de luminancia oscura y motion reducido. No introducir confirmaciones falsas, warnings genéricos ni estados «Validado» puramente decorativos.
@@ -217,3 +217,5 @@ Cada fase visual debe comprobar normal/hover/focus/disabled/error, cold y warm n
 
 
 Estado implementado Fase 4: Config dark, Advanced Options disabled, barra común en ambas decisiones y retiro de depth de la UX. Nuevas Assignment envían essential explícito; históricos conservados. Efecto funcional medido y límites en [informe Fase 4](DATION_DARK_PHASE4_IMPLEMENTATION.md). La toolbar sólo retira badge/fila de profundidad; su migración dark queda en Fase 5.
+
+Estado implementado Fase 5: dashboards Assignment, Scheduling y Dispatch histórico dark; gráficos y tooltip compartidos, tablas/KPI/evidencia/IA/chat, toolbar SVG sticky y menús exclusivos con cierre exterior/Escape. La carga de CSS espera y deduplica; navegación, comparativa e históricos conservan sus contratos. Validación, límites y gate en [informe Fase 5](DATION_DARK_PHASE5_IMPLEMENTATION.md). Pendientes Fases 6–7: QA extendida y consolidación.

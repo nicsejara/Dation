@@ -1,13 +1,13 @@
 /* Assignment dashboard layout and evidence. Shared controls use dashboard-toolbar.css. */
 .assignment-dashboard-v2{
-  --assignment-ink:#17313d;
-  --assignment-muted:#667884;
-  --assignment-line:#dfe7ea;
-  --assignment-soft:#f7f9fa;
-  --assignment-teal:#137d83;
-  --assignment-teal-dark:#0b646a;
-  --assignment-indigo:#4f4b9a;
-  --assignment-shadow:0 14px 38px rgba(27,52,64,.08);
+  --assignment-ink:var(--color-text);
+  --assignment-muted:var(--color-text-muted);
+  --assignment-line:var(--color-border);
+  --assignment-soft:var(--color-surface-raised);
+  --assignment-teal:var(--d-brand-teal-bright);
+  --assignment-teal-dark:var(--d-brand-teal-bright);
+  --assignment-indigo:var(--d-brand-teal-bright);
+  --assignment-shadow:var(--shadow-md);
   display:block!important;
   width:100%;
   max-width:1220px;
@@ -18,14 +18,14 @@
 .assignment-dashboard-v2__eyebrow{
   display:block;
   margin-bottom:2px;
-  color:#70838d;
+  color:var(--color-text-accent);
   font-size:10px;
   font-weight:850;
   letter-spacing:.11em;
 }
 
 .assignment-dashboard-v2 button:focus-visible{
-  outline:3px solid rgba(19,125,131,.18);
+  outline:3px solid var(--d-brand-teal-bright);
   outline-offset:2px;
 }
 
@@ -33,10 +33,10 @@
   max-width:none;
   margin:0 0 18px;
   padding:9px 11px;
-  border-color:#e2e8eb;
+  border-color:var(--color-border);
   border-radius:13px;
   box-shadow:none;
-  background:#fbfcfc;
+  background:var(--color-surface);
 }
 
 .assignment-dashboard-v2__rail .dispatch-decision-rail__head{
@@ -53,7 +53,7 @@
 }
 
 .assignment-dashboard-v2__rail .dispatch-decision-rail__head strong{
-  color:#60737d;
+  color:var(--color-text);
   font-size:10px;
 }
 
@@ -64,9 +64,9 @@
 .assignment-dashboard-v2__rail .dispatch-decision-tab{
   min-height:48px!important;
   padding:7px 9px!important;
-  border-color:#e1e7e9!important;
+  border-color:var(--d-border-control)!important;
   border-radius:10px!important;
-  background:#fff!important;
+  background:var(--color-surface)!important;
 }
 
 .assignment-dashboard-v2__rail .dispatch-decision-tab>span{
@@ -85,9 +85,9 @@
 }
 
 .assignment-dashboard-v2__rail .dispatch-decision-tab.is-active{
-  border-color:#8bbabd!important;
-  background:#f0f8f7!important;
-  box-shadow:inset 0 0 0 1px rgba(19,125,131,.08);
+  border-color:var(--d-border-control)!important;
+  background:var(--color-brand-soft)!important;
+  box-shadow:var(--shadow-sm);
 }
 
 .assignment-dashboard-v2__rail .dispatch-decision-tab:disabled{
@@ -101,14 +101,14 @@
 
 .assignment-dashboard-v2__section{
   margin-bottom:18px!important;
-  border-color:#dee7ea!important;
+  border-color:var(--color-border)!important;
   border-radius:17px!important;
-  box-shadow:0 5px 18px rgba(25,53,64,.035)!important;
+  box-shadow:var(--shadow-sm)!important;
 }
 
 .assignment-dashboard-v2__hero{
-  background:linear-gradient(128deg,#f3f8f8 0%,#fff 67%)!important;
-  border-color:#d6e5e5!important;
+  background:linear-gradient(135deg,var(--color-brand-soft),var(--color-surface) 80%)!important;
+  border-color:var(--color-border)!important;
 }
 
 .assignment-dashboard-v2__review{
@@ -118,20 +118,20 @@
 .assignment-dashboard-v2 .assignment-dashboard-v2__ai-fab{
   right:28px;
   bottom:24px;
-  z-index:80;
+  z-index:70;
 }
 
 .assignment-dashboard-v2 .assignment-dashboard-v2__chat{
   position:fixed!important;
   right:24px;
   bottom:82px;
-  z-index:79;
+  z-index:90;
   width:min(370px,calc(100vw - 48px));
   max-height:min(620px,calc(100vh - 130px));
   margin:0!important;
   overflow:auto;
   border-radius:16px!important;
-  box-shadow:0 22px 70px rgba(23,49,61,.19)!important;
+  box-shadow:var(--shadow-sm)!important;
 }
 
 .assignment-dashboard-v2 .assignment-dashboard-v2__chat[hidden]{display:none!important}

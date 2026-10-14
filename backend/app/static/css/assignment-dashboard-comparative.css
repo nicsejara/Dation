@@ -1,45 +1,48 @@
 /* The advanced layer compares the same four executive metrics as Essential. */
 .assignment-comparative-layer__header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
 .assignment-comparative-layer__header>div{min-width:0;}
-.assignment-comparative-layer__header [data-close-comparative],.assignment-comparative-layer__collapsed button{flex:0 0 auto;min-height:38px;padding:9px 12px;border:1px solid #d2dde1;border-radius:10px;background:#fff;color:#29444e;font-size:12px;font-weight:750;}
-.assignment-comparative-layer__collapsed{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;color:#29444e;font-size:13px;}
-.assignment-comparative-layer__header button:focus-visible,.assignment-comparative-layer__collapsed button:focus-visible{outline:3px solid #67aaa8;outline-offset:3px;}
+.assignment-comparative-layer__header [data-close-comparative],
+.assignment-comparative-layer__collapsed button{flex:0 0 auto;min-height:38px;padding:9px 12px;border:1px solid var(--d-border-control);border-radius:10px;background:var(--color-surface-raised);color:var(--color-text);font-size:12px;font-weight:750;}
+.assignment-comparative-layer__collapsed{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--color-text);font-size:13px;}
+.assignment-comparative-layer__header button:focus-visible,
+.assignment-comparative-layer__collapsed button:focus-visible{outline:3px solid var(--d-brand-teal-bright);outline-offset:3px;}
 @media(max-width:520px){.assignment-comparative-layer__header{flex-wrap:wrap;}.assignment-comparative-layer__header [data-close-comparative]{margin-left:auto;}}
-.assignment-dashboard-v2 .assignment-comparative-layer{container-type:inline-size;--cmp-ink:#17313d;--cmp-muted:#687b85;--cmp-border:#dce6e8;--cmp-green:#287a5d;--cmp-green-soft:#edf8f3;--cmp-amber:#9a6a16;--cmp-amber-soft:#fff8e9;--cmp-gray:#647680;--cmp-gray-soft:#f1f4f5;}
+.assignment-dashboard-v2 .assignment-comparative-layer{container-type:inline-size;--cmp-ink:var(--color-text);--cmp-muted:var(--color-text-muted);--cmp-border:var(--color-border);--cmp-green:var(--color-success);--cmp-green-soft:var(--color-success-bg);--cmp-amber:var(--color-warning);--cmp-amber-soft:var(--color-warning-bg);--cmp-gray:var(--color-text-muted);--cmp-gray-soft:var(--color-surface-raised);}
 .assignment-comparative-summary__copy h2{margin:5px 0 7px;color:var(--cmp-ink);font-size:23px;letter-spacing:-.025em;}
 .assignment-comparative-summary__copy>p{margin:0;color:var(--cmp-muted);font-size:13px;line-height:1.5;}
 .assignment-comparison__heading{display:flex;justify-content:flex-end;margin:18px 0 14px;}
 .assignment-comparison__selector{display:grid;gap:6px;width:min(340px,100%);}
-.assignment-comparison__selector>span{color:#607782;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;}
-.assignment-comparison__selector select{box-sizing:border-box;width:100%;min-width:0;min-height:40px;padding:9px 12px;border:1px solid #cbdcdf;border-radius:10px;background:#fff;color:#24454f;font-size:12px;font-weight:700;}
-.assignment-comparison__selector select:focus-visible{outline:3px solid #67aaa8;outline-offset:2px;}
-.assignment-comparison__state{display:flex;flex-wrap:wrap;gap:5px 12px;align-items:center;margin-bottom:14px;padding:11px 13px;border:1px solid #dbe6e5;border-radius:10px;background:#f5faf8;color:#48685e;}
+.assignment-comparison__selector>span{color:var(--color-text);font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;}
+.assignment-comparison__selector select{box-sizing:border-box;width:100%;min-width:0;min-height:40px;padding:9px 12px;border:1px solid var(--d-border-control);border-radius:10px;background:var(--color-surface-raised);color:var(--color-text);font-size:12px;font-weight:700;}
+.assignment-comparison__selector select:focus-visible{outline:3px solid var(--d-brand-teal-bright);outline-offset:2px;}
+.assignment-comparison__state{display:flex;flex-wrap:wrap;gap:5px 12px;align-items:center;margin-bottom:14px;padding:11px 13px;border:1px solid var(--color-border);border-radius:10px;background:var(--color-surface-raised);color:var(--color-text);}
 .assignment-comparison__state strong{font-size:12px;}
 .assignment-comparison__state span{font-size:11px;line-height:1.5;}
-.assignment-comparison__state.is-warning{border-color:#e2bdb3;background:#fff5f1;color:#944331;}
+.assignment-comparison__state.is-warning{border-color:var(--color-warning-border);background:var(--color-warning-bg);color:var(--color-warning);}
 .assignment-comparison__metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
-.assignment-comparison__metric{min-width:0;padding:15px;border:1px solid var(--cmp-border);border-radius:12px;background:#fff;}
+.assignment-comparison__metric{min-width:0;padding:15px;border:1px solid var(--cmp-border);border-radius:12px;background:var(--color-surface);}
 .assignment-comparison__metric header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;flex-wrap:wrap;}
-.assignment-comparison__metric header>span{color:#506c78;font-size:12px;font-weight:800;}
+.assignment-comparison__metric header>span{color:var(--color-text);font-size:12px;font-weight:800;}
 .assignment-comparison__metric header em{padding:4px 7px;border-radius:999px;background:var(--cmp-gray-soft);color:var(--cmp-gray);font-size:9px;font-weight:800;font-style:normal;}
 .assignment-comparison__metric.is-improvement header em{background:var(--cmp-green-soft);color:var(--cmp-green);}
 .assignment-comparison__metric.is-tradeoff header em{background:var(--cmp-amber-soft);color:var(--cmp-amber);}
 .assignment-comparison__metric-values{display:grid;grid-template-columns:1fr;gap:10px;margin:16px 0;}
 .assignment-comparison__metric-values>span{display:none;}
-.assignment-comparison__metric-values>div{min-width:0;padding:9px 10px;border-radius:9px;background:#f6fafb;}
-.assignment-comparison__metric-values small,.assignment-comparison__metric-values strong{display:block;overflow-wrap:anywhere;}
-.assignment-comparison__metric-values small{color:#687e88;font-size:10px;line-height:1.4;}
-.assignment-comparison__metric-values strong{margin-top:3px;color:#24454f;font-size:20px;font-weight:850;letter-spacing:-.015em;}
-.assignment-comparison__metric-delta{display:grid;gap:5px;padding-top:12px;border-top:1px solid #edf1f2;}
-.assignment-comparison__metric-delta strong{color:#617882;font-size:12px;}
+.assignment-comparison__metric-values>div{min-width:0;padding:9px 10px;border-radius:9px;background:var(--color-surface);}
+.assignment-comparison__metric-values small,
+.assignment-comparison__metric-values strong{display:block;overflow-wrap:anywhere;}
+.assignment-comparison__metric-values small{color:var(--color-text-muted);font-size:10px;line-height:1.4;}
+.assignment-comparison__metric-values strong{margin-top:3px;color:var(--color-text);font-size:20px;font-weight:850;letter-spacing:-.015em;}
+.assignment-comparison__metric-delta{display:grid;gap:5px;padding-top:12px;border-top:1px solid var(--color-border);}
+.assignment-comparison__metric-delta strong{color:var(--color-text);font-size:12px;}
 .assignment-comparison__metric.is-improvement .assignment-comparison__metric-delta strong{color:var(--cmp-green);}
 .assignment-comparison__metric.is-tradeoff .assignment-comparison__metric-delta strong{color:var(--cmp-amber);}
-.assignment-comparison__metric-delta small{color:#74868e;font-size:10px;line-height:1.4;}
+.assignment-comparison__metric-delta small{color:var(--color-text-muted);font-size:10px;line-height:1.4;}
 .assignment-dashboard-v2 .assignment-comparative-layer__intro{padding:4px 0;}
 .assignment-dashboard-v2 .assignment-comparative-layer__intro h2{margin:8px 0;font-size:24px;}
-.assignment-dashboard-v2 .assignment-comparative-layer__intro p{max-width:740px;color:#526770;}
-.assignment-dashboard-v2 .assignment-comparative-layer__intro button{padding:12px 18px;border:0;border-radius:10px;background:#286b52;color:#fff;font-weight:700;cursor:pointer;}
-.assignment-dashboard-v2 .assignment-comparative-layer__intro button:focus-visible{outline:3px solid #67aaa8;outline-offset:3px;}
+.assignment-dashboard-v2 .assignment-comparative-layer__intro p{max-width:740px;color:var(--color-text);}
+.assignment-dashboard-v2 .assignment-comparative-layer__intro button{padding:12px 18px;border:0;border-radius:10px;background:var(--color-surface-raised);color:var(--color-text);font-weight:700;cursor:pointer;}
+.assignment-dashboard-v2 .assignment-comparative-layer__intro button:focus-visible{outline:3px solid var(--d-brand-teal-bright);outline-offset:3px;}
 .assignment-dashboard-v2 .assignment-comparative-layer__loading{display:flex;align-items:center;gap:12px;}
 @container(max-width:850px){.assignment-comparison__metrics{grid-template-columns:repeat(2,minmax(0,1fr));}}
 @container(max-width:480px){.assignment-comparison__metrics{grid-template-columns:1fr;}.assignment-comparison__selector{width:100%;}.assignment-comparison__state{align-items:flex-start;flex-direction:column;}}

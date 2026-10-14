@@ -41,6 +41,7 @@
   --color-text: var(--d-text-primary);
   --color-text-secondary: var(--d-text-secondary);
   --color-text-muted: var(--d-text-muted);
+  --color-text-accent: var(--d-brand-teal-bright);
   --color-text-disabled: var(--d-text-disabled);
   --color-text-faint: var(--d-text-muted);
   --color-border: var(--d-border);

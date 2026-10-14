@@ -1,3 +1,5 @@
+import {esc} from "./shared.mjs";
+import {iconSvg} from "./decision-ui.mjs";
 import {scopeFor} from './lifecycle.mjs';
 
 // Resolve again after approval and immediately before navigating; state is owned by the workspace.
@@ -19,7 +21,8 @@ export function bindDashboardActions(root,caseActions={}){
       const next=await caseActions.getContinuation?.();
       if(!scope?.active)return;
       if(next?.state==='available'){
-        button.textContent=next.label;
+        if(button.closest('[data-dashboard-toolbar]'))button.innerHTML=iconSvg('arrowRight','dashboard-toolbar__icon')+'<span>'+esc(next.label)+'</span>';
+        else button.textContent=next.label;
         button.hidden=false;
       }else if(message&&next?.message){
         message.textContent=next.message;

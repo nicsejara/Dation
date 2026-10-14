@@ -1,3 +1,4 @@
+import {ensureStylesheet} from "./styles.mjs";
 import {createWorkflowActionBar} from "./workflow-action-bar.mjs";
 import {scopeFor} from "./lifecycle.mjs";
 import {esc} from "./shared.mjs";
@@ -231,29 +232,6 @@ export function decisionRuleCard({index,title,summary="",body="",expanded=true,c
   +'</article>';
 }
 
-const pendingConfigStyles=new WeakMap();
-const failedConfigStyles=new WeakSet();
 export function ensureDecisionConfigStyle(id,path,version="dark-config-phase4-v1"){
-  const existing=[...document.querySelectorAll('link[rel="stylesheet"]')].find(link=>new URL(link.href,location.href).pathname===path);
-  if(existing&&failedConfigStyles.has(existing)){
-    existing.remove();
-    return ensureDecisionConfigStyle(id,path,version);
-  }
-  const href=new URL(path+'?v='+version,location.href).href;
-  if(existing?.href===href&&existing.sheet&&!failedConfigStyles.has(existing))return Promise.resolve();
-  const link=existing||document.createElement('link');
-  const pending=pendingConfigStyles.get(link);
-  if(pending?.href===href)return pending.promise;
-  const promise=new Promise((resolve,reject)=>{
-    const cleanup=()=>{link.removeEventListener('load',loaded);link.removeEventListener('error',failed);pendingConfigStyles.delete(link);};
-    const loaded=()=>{cleanup();failedConfigStyles.delete(link);resolve();};
-    const failed=()=>{cleanup();failedConfigStyles.add(link);reject(new Error('No pudimos cargar el estilo de configuración. Reintentá.'));};
-    link.addEventListener('load',loaded);link.addEventListener('error',failed);
-    if(!existing){link.id=id;link.rel='stylesheet';}
-    // A settled failed link must issue a new request when the user retries.
-    link.href=href;
-    if(!existing)document.head.append(link);
-  });
-  pendingConfigStyles.set(link,{href,promise});
-  return promise;
+  return ensureStylesheet(id,path,version);
 }

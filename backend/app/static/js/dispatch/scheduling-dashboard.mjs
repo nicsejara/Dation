@@ -1,3 +1,4 @@
+import {iconSvg} from "./decision-ui.mjs";
 import {renderDashboardToolbar,bindDashboardToolbar} from './dashboard-toolbar.mjs';
 import {scopeFor,disposeScope} from "./lifecycle.mjs";
 import {esc,num,pct,date,chart,dispose,errorBox} from './shared.mjs';
@@ -51,7 +52,7 @@ function renderTimeline(root,result){
       +'<div><span class="dispatch-kicker">CALENDARIO OPERATIVO</span><h2>Secuencia por vehículo</h2>'
       +'<p>Cada barra representa el período en que el vehículo queda ocupado por un viaje, incluyendo su retorno a base.</p></div>'
     +'</div>'
-    +'<div class="dispatch-schedule-chart dispatch-chart" role="img" aria-label="Calendario por vehículo"></div>'
+    +'<div class="dispatch-schedule-chart-scroll" role="region" tabindex="0" aria-label="Calendario desplazable por vehículo"><div class="dispatch-schedule-chart dispatch-chart" role="img" aria-label="Calendario por vehículo"></div></div>'
     +'<div class="dispatch-schedule-vehicles">'
       +groups.map(group=>
         '<article class="dispatch-schedule-vehicle">'
@@ -82,6 +83,7 @@ function renderTimeline(root,result){
     }
   }
 
+  chartNode.style.height=Math.max(320,categories.length*28+70)+'px';
   chart(chartNode,{
     grid:{left:170,right:28,top:20,bottom:45},
     tooltip:{
@@ -112,6 +114,7 @@ function renderTimeline(root,result){
     },
     yAxis:{
       type:'category',
+      inverse:true,
       data:categories,
       axisLabel:{width:160,overflow:'truncate'},
     },
@@ -127,11 +130,7 @@ function renderTimeline(root,result){
         type:'bar',
         stack:'schedule',
         data:series.map(item=>item.duration),
-        label:{
-          show:true,
-          position:'inside',
-          formatter:params=>series[params.dataIndex]?.trip.trip_id||'',
-        },
+        label:{show:false},
       },
     ],
   });
@@ -173,7 +172,7 @@ export function render(root,run,onRerun,caseActions={}){
   const result=run.result_json;
   const metrics=result.scenarios.selected.metrics;
   const {toolbar,drawer}=renderDashboardToolbar(run,caseActions);
-  root.className='dispatch dispatch-dashboard dispatch-dashboard-focused dispatch-scheduling-dashboard';
+  root.className='dispatch dispatch-dashboard dispatch-dashboard-focused dispatch-scheduling-dashboard d-decision-dashboard';
   root.innerHTML=toolbar
     +decisionRail(caseActions)
     +'<main class="dispatch-focus-main">'
@@ -194,7 +193,7 @@ export function render(root,run,onRerun,caseActions={}){
       +'<section class="dispatch-panel" id="scheduling-service"></section>'
       +'<section class="dispatch-panel dispatch-focus-ai" id="dispatch-explanation"></section>'
     +'</main>'
-    +'<button type="button" class="dispatch-ai-fab" data-chat aria-expanded="false" aria-label="Abrir Dation IA"><span>✦</span><strong>Dation IA</strong></button>'
+    +'<button type="button" class="dispatch-ai-fab" data-chat aria-expanded="false" aria-label="Abrir Dation IA">'+iconSvg("sparkles","dispatch-action-icon")+'<strong>Dation IA</strong></button>'
     +'<aside class="dispatch-chat dispatch-panel" hidden aria-label="Chat de la planificación"></aside>'
     +drawer;
 

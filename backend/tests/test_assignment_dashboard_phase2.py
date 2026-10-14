@@ -173,7 +173,7 @@ class AssignmentDashboardPhase2Tests(unittest.TestCase):
         self.assertIn("@media(max-width:760px)", self.styles)
         self.assertIn("@media(max-width:520px)", self.styles)
         self.assertIn("prefers-reduced-motion", self.styles)
-        self.assertIn("ASSIGNMENT_ESSENTIAL_STYLE_HREF='/static/css/assignment-dashboard-essential.css?v=assignment-dashboard-phase2'", self.dashboard)
+        self.assertIn("ensureStylesheet(ASSIGNMENT_ESSENTIAL_STYLE_ID,'/static/css/assignment-dashboard-essential.css')", self.dashboard)
         scheduling = (JS / "scheduling-dashboard.mjs").read_text()
         self.assertNotIn("assignment-summary.mjs", scheduling)
         self.assertNotIn("assignment-evidence.mjs", scheduling)

@@ -212,7 +212,7 @@ export function render(root,result){
         type:'bar',
         data:ordered.map(item=>({
           value:definition.value(item),
-          itemStyle:{opacity:item.id===selectedId?1:.42},
+          itemStyle:{opacity:item.id===selectedId?1:.72},
         })),
         label:{
           show:true,

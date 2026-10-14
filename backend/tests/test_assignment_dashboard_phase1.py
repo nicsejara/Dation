@@ -183,7 +183,7 @@ class AssignmentDashboardPhase1Tests(unittest.TestCase):
         self.assertIn(":focus-visible", self.styles)
         self.assertNotIn("transition:",self.toolbar_styles)
         self.assertIn(
-            "ASSIGNMENT_STYLE_HREF='/static/css/assignment-dashboard-v2.css?v=assignment-dashboard-phase1'",
+            "ensureStylesheet(ASSIGNMENT_STYLE_ID,'/static/css/assignment-dashboard-v2.css')",
             self.dashboard,
         )
 

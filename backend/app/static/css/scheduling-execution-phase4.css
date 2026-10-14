@@ -10,10 +10,10 @@
   width:min(980px,calc(100% - 40px));
   margin:42px auto;
   padding:30px;
-  border:1px solid #d7e2e5;
+  border:1px solid var(--color-border);
   border-radius:22px;
-  background:linear-gradient(145deg,#ffffff 0%,#f8fbfb 100%);
-  box-shadow:0 18px 44px rgba(23,58,70,.08);
+  background:var(--color-surface);
+  box-shadow:var(--shadow-sm);
 }
 
 .scheduling-run-phase4__hero{
@@ -26,8 +26,8 @@
 .scheduling-run-phase4__spinner{
   width:48px;
   height:48px;
-  border:4px solid #dbe9e9;
-  border-top-color:#177d81;
+  border:4px solid var(--color-border);
+  border-top-color:var(--color-border);
   border-radius:50%;
   animation:scheduling-phase4-spin .9s linear infinite;
 }
@@ -36,7 +36,7 @@
 .scheduling-run-phase4__hero span,
 .scheduling-run-phase4--error>span,
 .scheduling-execution-evidence__head span{
-  color:#5d7882;
+  color:var(--color-danger);
   font-size:9px;
   font-weight:900;
   letter-spacing:.09em;
@@ -44,14 +44,14 @@
 
 .scheduling-run-phase4 h1{
   margin:0;
-  color:#173b47;
+  color:var(--color-text);
   font-size:28px;
   line-height:1.12;
 }
 
 .scheduling-run-phase4 p{
   margin:0;
-  color:#627881;
+  color:var(--color-text);
   font-size:13px;
   line-height:1.55;
 }
@@ -59,10 +59,10 @@
 .scheduling-run-phase4 code,
 .scheduling-execution-evidence__head code{
   padding:7px 9px;
-  border:1px solid #d8e2e4;
+  border:1px solid var(--color-border);
   border-radius:9px;
-  color:#46616c;
-  background:#fff;
+  color:var(--color-text);
+  background:var(--color-surface);
   font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
   font-size:10px;
   font-weight:800;
@@ -74,7 +74,7 @@
   margin:28px 0 14px;
   overflow:hidden;
   border-radius:999px;
-  background:#e5ecee;
+  background:var(--color-surface);
 }
 
 .scheduling-run-phase4__progress i{
@@ -82,7 +82,7 @@
   inset:0 auto 0 -36%;
   width:36%;
   border-radius:inherit;
-  background:linear-gradient(90deg,#167a7e,#4876a3,#5a4b97);
+  background:var(--color-surface);
   animation:scheduling-phase4-progress 1.55s ease-in-out infinite;
 }
 
@@ -95,7 +95,7 @@
 .scheduling-run-phase4__steps span{
   position:relative;
   padding-top:15px;
-  color:#83939a;
+  color:var(--color-text);
   font-size:9px;
   font-weight:800;
   text-align:center;
@@ -109,28 +109,28 @@
   width:8px;
   height:8px;
   transform:translateX(-50%);
-  border:2px solid #cbd7da;
+  border:2px solid var(--color-border);
   border-radius:50%;
-  background:#fff;
+  background:var(--color-surface);
 }
 
 .scheduling-run-phase4__steps span.is-active{
-  color:#176f73;
+  color:var(--color-text-accent);
 }
 
 .scheduling-run-phase4__steps span.is-active::before{
-  border-color:#177d81;
-  background:#177d81;
-  box-shadow:0 0 0 4px rgba(23,125,129,.10);
+  border-color:var(--color-border);
+  background:var(--color-brand-soft);
+  box-shadow:var(--shadow-sm);
 }
 
 .scheduling-run-phase4__trust{
   margin-top:22px!important;
   padding:12px 14px;
-  border:1px solid #dce6e8;
+  border:1px solid var(--color-border);
   border-radius:12px;
-  color:#70838b!important;
-  background:#fbfcfc;
+  color:var(--color-text)!important;
+  background:var(--color-surface);
   font-size:10px!important;
 }
 
@@ -138,8 +138,8 @@
   display:grid;
   justify-items:start;
   gap:10px;
-  border-color:#ead4d4;
-  background:linear-gradient(145deg,#fff,#fffafa);
+  border-color:var(--color-danger-border);
+  background:var(--color-danger-bg);
 }
 
 .scheduling-run-phase4__error-icon{
@@ -149,8 +149,8 @@
   place-items:center;
   margin-bottom:4px;
   border-radius:13px;
-  color:#945353;
-  background:#f9eaea;
+  color:var(--color-danger);
+  background:var(--color-danger-bg);
   font-size:19px;
   font-weight:950;
 }
@@ -158,7 +158,7 @@
 .scheduling-run-phase4--error h1{font-size:25px;}
 .scheduling-run-phase4--error code{margin-top:4px;}
 .scheduling-run-phase4--error>small{
-  color:#778990;
+  color:var(--color-danger);
   font-size:10px;
   line-height:1.45;
 }
@@ -172,10 +172,10 @@
 .scheduling-run-phase4__error-actions button{
   min-height:42px;
   padding:0 15px;
-  border:1px solid #197f82;
+  border:1px solid var(--color-danger-border);
   border-radius:10px;
-  color:#fff;
-  background:linear-gradient(135deg,#147b7e,#426f99);
+  color:var(--color-danger);
+  background:var(--color-danger-bg);
   font:inherit;
   font-size:10px;
   font-weight:900;
@@ -183,16 +183,16 @@
 }
 
 .scheduling-run-phase4__error-actions button.is-secondary{
-  border-color:#d5dfe2;
-  color:#536d77;
-  background:#fff;
+  border-color:var(--color-danger-border);
+  color:var(--color-danger);
+  background:var(--color-danger-bg);
 }
 
 .scheduling-execution-evidence{
   display:grid;
   gap:18px;
-  border-color:#d5e3e4!important;
-  background:linear-gradient(150deg,#fff 0%,#f7fbfa 100%)!important;
+  border-color:var(--color-border)!important;
+  background:var(--color-surface)!important;
 }
 
 .scheduling-execution-evidence__head{
@@ -209,13 +209,13 @@
 
 .scheduling-execution-evidence__head h2{
   margin:0;
-  color:#183c48;
+  color:var(--color-text);
   font-size:19px;
 }
 
 .scheduling-execution-evidence__head p{
   margin:0;
-  color:#6e8189;
+  color:var(--color-text);
   font-size:11px;
   line-height:1.45;
 }
@@ -231,13 +231,13 @@
   gap:4px;
   min-width:0;
   padding:13px;
-  border:1px solid #dde7e9;
+  border:1px solid var(--color-border);
   border-radius:12px;
-  background:#fff;
+  background:var(--color-surface);
 }
 
 .scheduling-execution-evidence__grid small{
-  color:#75888f;
+  color:var(--color-text-muted);
   font-size:8px;
   font-weight:850;
   letter-spacing:.04em;
@@ -246,7 +246,7 @@
 
 .scheduling-execution-evidence__grid strong{
   overflow:hidden;
-  color:#173a46;
+  color:var(--color-text);
   font-size:11px;
   text-overflow:ellipsis;
   white-space:nowrap;
@@ -263,10 +263,10 @@
   gap:8px;
   align-items:center;
   padding:7px 9px;
-  border:1px solid #d5e4e2;
+  border:1px solid var(--color-border);
   border-radius:999px;
-  color:#46636d;
-  background:#f4faf8;
+  color:var(--color-text);
+  background:var(--color-surface);
 }
 
 .scheduling-execution-evidence__rules b{
@@ -274,7 +274,7 @@
 }
 
 .scheduling-execution-evidence__rules em{
-  color:#17777a;
+  color:var(--color-text);
   font-size:8px;
   font-style:normal;
   font-weight:850;
@@ -283,8 +283,8 @@
 .scheduling-execution-evidence__note{
   margin:0;
   padding-top:12px;
-  border-top:1px solid #e2e9eb;
-  color:#71848b;
+  border-top:1px solid var(--color-border);
+  color:var(--color-text-muted);
   font-size:10px;
   line-height:1.45;
 }
@@ -315,7 +315,7 @@
 
 @media(prefers-reduced-motion:reduce){
   .scheduling-run-phase4__spinner,
-  .scheduling-run-phase4__progress i{
+.scheduling-run-phase4__progress i{
     animation:none!important;
   }
   .scheduling-run-phase4__progress i{

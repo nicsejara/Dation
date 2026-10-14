@@ -615,7 +615,7 @@ export async function show(run){
   urlRun(run.id,schema||'assignment_v1');
   window.dationSetDashboardReady(true);
 
-  dashboard(
+  await dashboard(
     roots.dashboard,
     run,
     ()=>reconfigureRun(run,nodeId),
@@ -658,6 +658,7 @@ export async function show(run){
         :null,
     },
   );
+  if(generation!==routeGeneration)return;
   renderView('decision-dashboard');
 }
 
