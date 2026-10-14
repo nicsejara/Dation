@@ -1196,5 +1196,78 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.execution_bodies,[])
 
 
+    async def test_home_overview_dark_contrast_compact_heroes_and_responsive_actions(self):
+        audit = (Path(__file__).parent / "theme_audit.js").read_text()
+        await self.page.emulate_media(reduced_motion="reduce", color_scheme="light")
+        for width in (1440, 1280, 1024, 768, 390):
+            await self.page.set_viewport_size({"width": width, "height": 844})
+            heights = {}
+            for view in ("inicio", "logistics-overview"):
+                with self.subTest(width=width, view=view):
+                    await self.page.goto(f"http://127.0.0.1:{self.port}/app?view={view}")
+                    await self.page.locator(".view.is-active h1").wait_for(state="visible")
+                    await self.page.locator(".view.is-active").evaluate("el=>el.scrollIntoView({block:'start',behavior:'instant'})")
+                    metrics = await self.page.evaluate(audit)
+                    self.assertEqual(metrics["scheme"], "dark")
+                    self.assertFalse(metrics["legacyBoundary"])
+                    self.assertFalse(metrics["overflow"])
+                    self.assertGreater(metrics["textCount"], 15)
+                    self.assertEqual(metrics["failures"], [], "Rendered text must meet AA, including muted informational content")
+                    for card in metrics["cards"]:
+                        # Transparent sections inherit the dark canvas; solid cards must stay dark.
+                        channels = card["background"].removeprefix("rgba(").removeprefix("rgb(").rstrip(")").split(",")
+                        self.assertLess(max(float(x) for x in channels[:3]), 80)
+                    heights[view] = metrics["hero"]["height"]
+                    if view == "logistics-overview":
+                        self.assertEqual(await self.page.locator(".dda-landing__final").count(), 0)
+                        actions = self.page.locator(".dda-landing__hero-actions button")
+                        self.assertEqual(await actions.count(), 2)
+                        if width == 390:
+                            boxes = [await actions.nth(i).bounding_box() for i in range(2)]
+                            self.assertLess(boxes[1]["y"] + boxes[1]["height"], 844)
+                            self.assertGreaterEqual(boxes[1]["y"], boxes[0]["y"] + boxes[0]["height"])
+                            self.assertAlmostEqual(boxes[0]["width"], boxes[1]["width"], delta=1)
+            if width >= 1280:
+                self.assertLessEqual(heights["inicio"], heights["logistics-overview"] * 1.1 + 1)
+                self.assertLessEqual(heights["inicio"], 250)
+        self.assertEqual(self.execution_bodies, [])
+
+    async def test_home_card_keyboard_and_informational_overview_with_native_faq(self):
+        await self.page.emulate_media(reduced_motion="reduce")
+        await self.page.goto(f"http://127.0.0.1:{self.port}/app?view=inicio")
+        active = self.page.locator("#home-open-logistics")
+        await active.wait_for(state="visible")
+        inactive = self.page.locator(".d-home__asset--disabled")
+        self.assertEqual(await inactive.get_attribute("aria-disabled"), "true")
+        self.assertEqual(await inactive.evaluate("el=>el.tagName"), "ARTICLE")
+        self.assertEqual(await inactive.locator("button,a,[tabindex]").count(), 0)
+        self.assertEqual(await inactive.evaluate("el=>getComputedStyle(el).opacity"), "1")
+        await active.focus()
+        self.assertTrue(await active.evaluate("el=>el.matches(':focus-visible')"))
+        self.assertEqual(await active.evaluate("el=>getComputedStyle(el).outlineWidth"), "3px")
+        await self.page.keyboard.press("Enter")
+        await self.page.locator(".dda-landing__hero").wait_for(state="visible")
+        self.assertEqual(await self.page.evaluate("window.dationGetCurrentView()"), "logistics-overview")
+        for state, label in (("is-active", "Optimiza hoy"), ("is-inactive", "En consolidación")):
+            pills = self.page.locator(".dda-landing__variable-pill." + state)
+            self.assertEqual(await pills.count(), 3)
+            self.assertEqual(await pills.locator(".dda-landing__variable-status").all_text_contents(), [label] * 3)
+        chain = self.page.locator(".dda-landing__chain")
+        self.assertEqual(await chain.locator(".is-conceptual").count(), 3)
+        self.assertEqual(await chain.locator("button,[data-node-state],.dda-landing__node-footer").count(), 0)
+        summaries = self.page.locator(".dda-landing__faq-grid summary")
+        self.assertEqual(await summaries.count(), 4)
+        for index in range(4):
+            summary = summaries.nth(index)
+            await summary.focus()
+            self.assertTrue(await summary.evaluate("el=>el.matches(':focus-visible')"))
+            self.assertEqual(await summary.evaluate("el=>getComputedStyle(el).outlineWidth"), "3px")
+            await self.page.keyboard.press("Enter" if index % 2 == 0 else "Space")
+            self.assertTrue(await summary.evaluate("el=>el.parentElement.open"))
+        audit = await self.page.evaluate((Path(__file__).parent / "theme_audit.js").read_text())
+        self.assertEqual(audit["failures"], [])
+        self.assertEqual(self.execution_bodies, [])
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

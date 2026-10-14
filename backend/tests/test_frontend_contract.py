@@ -1758,7 +1758,7 @@ class FrontendContractTests(
             upload,
         )
         self.assertIn(
-            "/static/css/app.css?v=dark-foundation-v1",
+            "/static/css/app.css?v=dark-home-overview-v1",
             self.html,
         )
         self.assertIn(
@@ -2009,7 +2009,7 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "Decisiones operativas que podés explicar, comparar y repetir.",
+            "Decisiones que podés explicar, comparar y repetir.",
             self.html,
         )
         self.assertIn(
@@ -2021,15 +2021,15 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "/static/css/home-dda.css?v=dark-foundation-v1",
+            "/static/css/home-dda.css?v=dark-home-overview-v1",
             self.html,
         )
         self.assertIn(
-            "antes de comprometer recursos",
+            "Evaluá antes de decidir.",
             self.html,
         )
         self.assertIn(
-            "listas para compartir y auditar",
+            "Evidencia para compartir.",
             self.html,
         )
         self.assertIn(
@@ -2053,9 +2053,8 @@ class FrontendContractTests(
 
         for copy in (
             "DDA LOGÍSTICA · PLANIFICACIÓN DE DESPACHOS",
-            "Decidí tus despachos más rápido y con mejor análisis.",
-            "Dation compara alternativas de asignación, planificación y ejecución",
-            "Menos tiempo armando análisis, más tiempo para decidir.",
+            "Tus despachos, con mejor análisis.",
+            "Compará alternativas y revisá la evidencia antes de aprobar.",
             "Iniciar nueva decisión",
             "VOS APORTÁS",
             "Tus órdenes y tu flota",
@@ -2079,7 +2078,6 @@ class FrontendContractTests(
             "Lo que necesitás para empezar",
             "Lo que recibís",
             "Lo que conviene saber",
-            "¿Listo para tomar tu primera decisión?",
         ):
             self.assertIn(copy, overview)
 
@@ -2095,6 +2093,8 @@ class FrontendContractTests(
             )
 
         for forbidden in (
+            "¿Listo para tomar tu primera decisión?",
+            "dda-landing__final",
             "dda-landing__progress",
             "dda-logistics-example-result",
             "Así se ve una decisión con evidencia.",
@@ -2147,11 +2147,11 @@ class FrontendContractTests(
             overview,
         )
         self.assertIn(
-            ".dda-landing__section--plain{",
+            ".dda-landing__section--plain",
             self.dda_landing_css,
         )
-        self.assertIn(
-            "padding:8px 32px",
+        self.assertNotIn(
+            ".dda-landing__final",
             self.dda_landing_css,
         )
         self.assertEqual(
@@ -2168,7 +2168,7 @@ class FrontendContractTests(
         )
 
         self.assertIn(
-            "/static/css/dda-logistics-landing.css?v=dark-foundation-v1",
+            "/static/css/dda-logistics-landing.css?v=dark-home-overview-v1",
             self.html,
         )
         self.assertIn(

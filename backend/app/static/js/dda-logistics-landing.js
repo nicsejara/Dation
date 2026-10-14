@@ -58,7 +58,7 @@
       var active=item.state==="active";
       return '<span class="dda-landing__variable-pill '+(active?"is-active":"is-inactive")+'" title="'+item.description+'">'
         +'<span class="dda-landing__variable-pill-icon">'+iconMarkup(active?"dda-i-check-circle":"dda-i-clock")+'</span>'
-        +'<strong>'+item.label+'</strong></span>';
+        +'<strong>'+item.label+'</strong><small class="dda-landing__variable-status">'+(active?'Optimiza hoy':'En consolidación')+'</small></span>';
     }).join("");
   }
 
