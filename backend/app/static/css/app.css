@@ -9475,6 +9475,9 @@ button.d-home__asset:focus-visible{
 
 .dda-workspace-step.is-disabled{
   cursor:default;
+}
+
+.dda-workspace-step.is-disabled:not(.is-current){
   color:var(--color-text-disabled);
   background:transparent;
 }
@@ -9504,7 +9507,7 @@ button.d-home__asset:focus-visible{
   background:var(--color-surface-raised);
 }
 
-.dda-workspace-step.is-disabled .dda-workspace-step__marker{
+.dda-workspace-step.is-disabled:not(.is-current) .dda-workspace-step__marker{
   border-color:var(--color-border);
   color:var(--color-text-disabled);
   background:var(--color-surface);
