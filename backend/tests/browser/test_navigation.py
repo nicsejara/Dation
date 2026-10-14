@@ -1107,7 +1107,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                         overflow:document.documentElement.scrollWidth>innerWidth,
                         childrenFit:[...el.children].every(x=>x.getBoundingClientRect().right<=r.right+1),
                         workspace:document.querySelector('.dda-workspace-nav-shell[hidden]')?null:getComputedStyle(document.querySelector('.dda-workspace-nav')).backgroundColor,
-                        current:document.querySelector('.dda-workspace-step.is-current')?getComputedStyle(document.querySelector('.dda-workspace-step.is-current')).color:null};
+                        current:document.querySelector('.dda-workspace-step.is-current')?getComputedStyle(document.querySelector('.dda-workspace-step.is-current')).color:null,
+                        disabledCursors:[...document.querySelectorAll('.dda-workspace-step.is-disabled')].map(x=>getComputedStyle(x).cursor)};
                 }""")
                 with self.subTest(width=width,view=view,node=node):
                     self.assertEqual(metrics["scheme"],"dark")
@@ -1121,6 +1122,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                     self.assertTrue(28<=metrics["title"]<=40)
                     if metrics["workspace"]:self.assertEqual(metrics["workspace"],"rgb(15, 27, 36)")
                     if metrics["current"]:self.assertEqual(metrics["current"],"rgb(243, 248, 250)")
+                    self.assertTrue(all(cursor=="default" for cursor in metrics["disabledCursors"]))
             # The real SPA path retains dynamically loaded styles across decisions.
             await self.page.evaluate("id=>window.DationDispatch.openCase(id,'logistics-config','logistics_scheduling')",self.case["id"])
             await self.page.locator(".scheduling-config-v2 .d-page-hero").wait_for(state="visible")

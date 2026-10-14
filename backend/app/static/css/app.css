@@ -9473,8 +9473,11 @@ button.d-home__asset:focus-visible{
   color:var(--color-text-secondary);
 }
 
-.dda-workspace-step.is-disabled:not(.is-current){
+.dda-workspace-step.is-disabled{
   cursor:default;
+}
+
+.dda-workspace-step.is-disabled:not(.is-current){
   color:var(--color-text-disabled);
   background:transparent;
 }
