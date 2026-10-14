@@ -862,7 +862,7 @@ class FrontendContractTests(
             self.html,
         )
         self.assertIn(
-            "/static/css/dda-logistics-upload.css?v=dark-foundation-v1",
+            "/static/css/dda-logistics-upload.css?v=dark-data-pack-v1",
             self.html,
         )
         self.assertIn(
@@ -887,12 +887,11 @@ class FrontendContractTests(
             )
 
         for copy in (
-            "Cargá tus datos y habilitá tu mapa de decisiones.",
+            "Prepará tu Data Pack.",
             "Elegí cómo cargar tus datos.",
             "Subí archivos nuevos o reutilizá una carga anterior.",
             "las columnas opcionales no bloquean este paso.",
-            "Todo listo para continuar.",
-            "Seleccioná tu decisión →",
+            "createWorkflowActionBar",
         ):
             self.assertIn(
                 copy,
@@ -1022,19 +1021,13 @@ class FrontendContractTests(
             upload_index,
         )
         self.assertIn(
-            "dispatch-pro-sticky",
+            "actionBar.update(result, context)",
             upload_index,
         )
 
-        for final_copy in (
-            "Completá tu Data Pack.",
-            "Todo listo para continuar.",
-            "Seleccioná tu decisión →",
-        ):
-            self.assertIn(
-                final_copy,
-                upload_index,
-            )
+        self.assertNotIn("makeFinalBar", upload_index)
+        self.assertNotIn("makeSticky", upload_index)
+        self.assertNotIn("finalObserver", upload_index)
 
         for removed_final_copy in (
             "Faltan 2 archivos",
@@ -1052,10 +1045,7 @@ class FrontendContractTests(
                 upload_index,
             )
 
-        self.assertIn(
-            ".dispatch-pro-next-button",
-            upload_css,
-        )
+        self.assertIn("createWorkflowActionBar", upload_index)
         self.assertNotIn(
             ".dispatch-pro-final-status",
             upload_css,
@@ -1125,32 +1115,9 @@ class FrontendContractTests(
                 upload_css,
             )
 
-        for css_contract in (
-            "grid-template-columns:repeat(2,minmax(0,1fr))",
-            "gap:24px",
-            "min-height:122px",
-            "min-height:222px",
-            "font-size:13px",
-            "border:1.5px dashed",
-            "min-height:218px",
-            "prefers-reduced-motion:reduce",
-        ):
-            self.assertIn(
-                css_contract,
-                upload_css,
-            )
-
-        for source_selector_contract in (
-            "height:46px",
-            "border:1px solid #cfdade",
-            "cursor:pointer",
-            "transform:translateY(-1px)",
-            "button:focus-visible",
-        ):
-            self.assertIn(
-                source_selector_contract,
-                upload_css,
-            )
+        self.assertIn("prefers-reduced-motion:reduce", upload_css)
+        self.assertNotIn("dispatch-pro-sticky", upload_css)
+        self.assertNotIn("dispatch-pro-final", upload_css)
 
         self.assertNotIn(
             "renderValidationPanel",
@@ -1162,7 +1129,7 @@ class FrontendContractTests(
         )
         self.assertNotIn(
             ".dispatch-pro-validation-counters",
-            upload_css.split("UNIFIED DATA PACK v1", 1)[1],
+            upload_css,
         )
         self.assertNotIn(
             "makeStepper",

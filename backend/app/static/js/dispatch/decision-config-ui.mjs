@@ -92,7 +92,7 @@ export function decisionCaseCard({
   extraClass="",
 }){
   const rawId=String(caseId||"");
-  return '<details data-config-context class="decision-config-case dispatch-case-card assignment-case-strip '+esc(extraClass)+'" aria-label="Decision Case y Data Pack en uso">'
+  return '<details data-config-context class="d-data-context decision-config-case dispatch-case-card assignment-case-strip '+esc(extraClass)+'" aria-label="Decision Case y Data Pack en uso">'
     +'<summary class="decision-config-case__summary"><span>Decision Case <strong>'+esc(displayDecisionCaseId(rawId))+'</strong></span><small>Data Pack en uso</small><span class="decision-context-chevron" aria-hidden="true">⌄</span></summary>'
     +'<div class="decision-config-case__body">'
     +'<div class="assignment-case-strip__identity">'

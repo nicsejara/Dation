@@ -18,7 +18,7 @@ export function createValidationDrawer(scope) {
     .querySelectorAll(".dispatch-validation-overlay")
     .forEach((node) => node.remove());
 
-  const overlay = el("div", null, "dispatch-validation-overlay");
+  const overlay = el("div", null, "dispatch-validation-overlay dispatch-upload-overlay");
   overlay.hidden = true;
   const drawer = el("aside", null, "dispatch-validation-drawer");
   drawer.setAttribute("role", "dialog");
@@ -74,6 +74,9 @@ export function createValidationDrawer(scope) {
       );
 
       const wrap = el("div", null, "dispatch-table-wrap");
+    wrap.tabIndex = 0;
+    wrap.setAttribute("role", "region");
+    wrap.setAttribute("aria-label", "Problemas de validación");
       const table = document.createElement("table");
       const thead = document.createElement("thead");
       const tr = document.createElement("tr");
@@ -106,7 +109,7 @@ export function createValidationDrawer(scope) {
 
     const downloadButton = document.createElement("button");
     downloadButton.type = "button";
-    downloadButton.className = "dispatch-text-action";
+    downloadButton.className = "d-button d-button--secondary";
     downloadButton.textContent = "Descargar informe (CSV)";
     downloadButton.onclick = () => {
       const rows = [

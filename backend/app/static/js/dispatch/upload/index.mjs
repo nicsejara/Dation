@@ -1,4 +1,5 @@
 import {createScope,scopeFor} from "../lifecycle.mjs";
+import {createWorkflowActionBar} from "../workflow-action-bar.mjs";
 import {api, date, num} from "../shared.mjs";
 import {createDropCard} from "./dropcard.mjs";
 import {createGuideDrawer} from "./guide-drawer.mjs";
@@ -120,7 +121,7 @@ function makeHero() {
 
   const title = el(
     "h1",
-    "Cargá tus datos y habilitá tu mapa de decisiones.",
+    "Prepará tu Data Pack.",
   );
 
   const lead = el("p", null, "dispatch-pro-hero-lead");
@@ -128,8 +129,7 @@ function makeHero() {
     document.createTextNode("Tu "),
     el("strong", "Data Pack"),
     document.createTextNode(
-      " son los archivos que alimentan tus decisiones: Órdenes y Flota. "
-      + "Subilos o reutilizá una carga anterior, y Dation los valida automáticamente.",
+      " reúne Órdenes y Flota. Subí archivos nuevos o reutilizá una carga anterior; Dation valida su estructura y compatibilidad.",
     ),
   );
 
@@ -171,7 +171,7 @@ function makeHero() {
   [
     ["1", "DESCARGÁ", "La plantilla con el formato correcto.", "download"],
     ["2", "COMPLETÁ", "Solo lo mínimo. Lo opcional puede esperar.", "table"],
-    ["3", "SUBÍ", "Dation valida tus archivos automáticamente.", "shield"],
+    ["3", "SUBÍ", "Validación automática de archivos.", "shield"],
   ].forEach(([number, label, description, iconName], index) => {
     const node = el("div", null, "dispatch-pro-how-node");
     const iconWrap = el("span", null, "dispatch-pro-how-icon");
@@ -214,142 +214,6 @@ function makeDataPackHeader() {
     ),
   );
   return head;
-}
-
-function makeFinalBar(onNext, scrollToData, scrollToProblem) {
-  const bar = el("section", null, "dispatch-pro-final is-pending");
-  bar.dataset.reveal = "";
-
-  const watermark = document.createElement("img");
-  watermark.src = "/static/assets/dda-logistics.svg?v=upload-finalbar-v2";
-  watermark.alt = "";
-  watermark.className = "dispatch-pro-final-watermark";
-
-  const copy = el("div", null, "dispatch-pro-final-copy");
-  const eyebrow = el("span", "SIGUIENTE PASO", "dispatch-pro-eyebrow");
-  const title = el("h2", "Completá tu Data Pack.");
-  const description = el(
-    "p",
-    "Cuando Órdenes y Flota estén listas, se habilita la selección de tu próxima decisión.",
-  );
-  const note = el("small", "", "dispatch-pro-final-note");
-  note.hidden = true;
-  copy.append(eyebrow, title, description, note);
-
-  const primary = document.createElement("button");
-  primary.type = "button";
-  primary.className = "button button--primary dispatch-pro-next-button";
-  primary.textContent = "Seleccioná tu decisión →";
-  primary.disabled = true;
-
-  bar.append(watermark, copy, primary);
-
-  function update(result, context = {}) {
-    const {
-      missingCount = 0,
-      errorCount = 0,
-      warningCount = 0,
-    } = context;
-
-    bar.className = `dispatch-pro-final is-${result.kind}`;
-    note.hidden = true;
-    primary.disabled = true;
-    primary.onclick = null;
-
-    if (result.enabled) {
-      title.textContent = "Todo listo para continuar.";
-      description.textContent = (
-        "Órdenes y Flota están validadas. Ya podés seleccionar la decisión que querés analizar."
-      );
-      primary.disabled = false;
-      primary.onclick = onNext;
-
-      if (warningCount) {
-        note.hidden = false;
-        note.textContent = (
-          `Hay ${warningCount} `
-          + `${warningCount === 1 ? "aviso" : "avisos"} sobre columnas opcionales, pero podés continuar.`
-        );
-      }
-      return;
-    }
-
-    if (result.kind === "error") {
-      title.textContent = "Hay datos para corregir.";
-      description.textContent = (
-        "Corregí los errores marcados en Órdenes o Flota. "
-        + "La selección de decisiones se habilita cuando ambos archivos estén listos."
-      );
-      return;
-    }
-
-    title.textContent = "Completá tu Data Pack.";
-    description.textContent = missingCount
-      ? (
-          `Todavía ${missingCount === 1 ? "falta" : "faltan"} `
-          + `${missingCount} ${missingCount === 1 ? "archivo" : "archivos"}. `
-          + "Cuando todo esté listo, se habilita la selección de tu próxima decisión."
-        )
-      : result.message;
-  }
-
-  return {bar, update};
-}
-
-function makeSticky(onNext, scrollToProblem) {
-  const bar = el("div", null, "dispatch-pro-sticky");
-  bar.hidden = true;
-  const status = el("div", null, "dispatch-pro-sticky-status");
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = "button button--primary";
-  bar.append(status, button);
-
-  function update(result, context = {}) {
-    const {
-      ordersTone = "pending",
-      fleetTone = "pending",
-      missingCount = 0,
-      errorCount = 0,
-      engaged = false,
-    } = context;
-
-    bar.hidden = !engaged;
-    status.replaceChildren();
-
-    [
-      ["orders", "Órdenes", ordersTone],
-      ["fleet", "Flota", fleetTone],
-    ].forEach(([kind, label, tone]) => {
-      const item = el(
-        "span",
-        null,
-        `dispatch-pro-sticky-file is-${kind} is-${tone}`,
-      );
-      item.append(
-        el("i", ""),
-        el(
-          "strong",
-          `${label} ${tone === "success" || tone === "warning" ? "✓" : tone === "error" ? "!" : "pendiente"}`,
-        ),
-      );
-      status.append(item);
-    });
-
-    if (result.enabled) {
-      button.className = "button button--primary";
-      button.textContent = "Seleccioná tu decisión →";
-      button.onclick = onNext;
-      return;
-    }
-    button.className = "button button--secondary";
-    button.textContent = result.kind === "error"
-      ? `Corregir ${errorCount || 1} ${(errorCount || 1) === 1 ? "problema" : "problemas"}`
-      : `Faltan ${missingCount || 1} ${(missingCount || 1) === 1 ? "archivo" : "archivos"}`;
-    button.onclick = scrollToProblem;
-  }
-
-  return {bar, update};
 }
 
 function currentFile(dataset, report, pendingFile) {
@@ -427,7 +291,6 @@ export async function mountUploadScreen(
     pendingFiles: {orders: null, fleet: null},
     libraries: {orders: [], fleet: []},
     controllers: {orders: null, fleet: null},
-    finalVisible: false,
   };
 
   scope.own(()=>{for(const controller of Object.values(local.controllers))controller?.abort();});
@@ -490,7 +353,9 @@ export async function mountUploadScreen(
       scrollToData();
       return;
     }
-    card.scrollIntoView({behavior: "smooth", block: "center"});
+    card.scrollIntoView({behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "center"});
+    card.tabIndex = -1;
+    card.focus({preventScroll:true});
     card.classList.remove("is-attention");
     window.requestAnimationFrame(() => {
       card.classList.add("is-attention");
@@ -501,16 +366,19 @@ export async function mountUploadScreen(
     });
   }
 
-  const finalBar = makeFinalBar(onNext, scrollToData, scrollToProblem);
-  const sticky = makeSticky(onNext, scrollToProblem);
+  const actionBar = createWorkflowActionBar({label:"Data Pack", onContinue:onNext, onProblem:scrollToProblem});
+  if (typeof ResizeObserver !== "undefined") {
+    scope.observe(new ResizeObserver(() => {
+      root.style.setProperty("--workflow-bar-space", `${actionBar.bar.getBoundingClientRect().height + 32}px`);
+    }), actionBar.bar);
+  }
 
   root.append(
     hero.hero,
     banner,
     dataPack,
     compatibilityRoot,
-    finalBar.bar,
-    sticky.bar,
+    actionBar.bar,
   );
 
   function reportFor(kind) {
@@ -532,42 +400,8 @@ export async function mountUploadScreen(
   }
 
 
-  function warningCount() {
-    return ["orders", "fleet"].reduce(
-      (total, kind) => total + Number(reportFor(kind)?.counts?.warnings || 0),
-      0,
-    );
-  }
-
-  function errorCount() {
-    const fileErrors = ["orders", "fleet"].reduce(
-      (total, kind) => {
-        const report = reportFor(kind);
-        return total + (
-          local.saveErrors[kind]
-          || Number(report?.counts?.errors || 0)
-            ? 1
-            : 0
-        );
-      },
-      0,
-    );
-    return fileErrors + (
-      technicalPreflightErrors(state.preflight).length ? 1 : 0
-    );
-  }
-
   function missingCount() {
     return ["orders", "fleet"].filter((kind) => !state[kind]).length;
-  }
-
-  function engaged() {
-    return ["orders", "fleet"].some((kind) => (
-      Boolean(state[kind])
-      || Boolean(reportFor(kind))
-      || Boolean(local.pendingFiles[kind])
-      || local.phases[kind] !== "idle"
-    ));
   }
 
   function finalState() {
@@ -586,16 +420,12 @@ export async function mountUploadScreen(
 
     const context = {
       missingCount: missingCount(),
-      errorCount: errorCount(),
-      warningCount: warningCount(),
-      ordersTone: fileTone("orders"),
-      fleetTone: fileTone("fleet"),
-      engaged: engaged(),
+      items: ["orders", "fleet"].map(key => ({key, label:key === "orders" ? "Órdenes" : "Flota", tone:fileTone(key)})),
+      busy: Object.values(local.phases).some(phase => phase !== "idle"),
+      storageAvailable: Boolean(local.status?.available),
     };
 
-    finalBar.update(result, context);
-    sticky.update(result, context);
-    sticky.bar.hidden = sticky.bar.hidden || local.finalVisible;
+    actionBar.update(result, context);
 
     window.dationSetDataReady(Boolean(result.enabled));
     return result;
@@ -1229,14 +1059,6 @@ export async function mountUploadScreen(
     await refreshPreflight();
 
     if(!current())return;
-    if ("IntersectionObserver" in window) {
-      const finalObserver = new IntersectionObserver((entries) => {
-        local.finalVisible = entries.some((entry) => entry.isIntersecting);
-        finalState();
-      }, {threshold: 0.18});
-      scope.observe(finalObserver,finalBar.bar);
-    }
-
     revealSections(root);
   } catch (error) {
     if(!current())return;

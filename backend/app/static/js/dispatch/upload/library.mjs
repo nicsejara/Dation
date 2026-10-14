@@ -43,7 +43,7 @@ export function createPreviousDrawer(scope) {
     .querySelectorAll(".dispatch-previous-overlay")
     .forEach((node) => node.remove());
 
-  const overlay = el("div", null, "dispatch-previous-overlay");
+  const overlay = el("div", null, "dispatch-previous-overlay dispatch-upload-overlay");
   overlay.hidden = true;
 
   const drawer = el(
@@ -57,6 +57,8 @@ export function createPreviousDrawer(scope) {
   const head = el("div", null, "dispatch-previous-head");
   const headCopy = el("div");
   const title = el("h2", "");
+  title.id = "dispatch-previous-title";
+  drawer.setAttribute("aria-labelledby", title.id);
   headCopy.append(
     el("span", "HISTORIAL DE DATOS", "dispatch-pro-eyebrow"),
     title,
@@ -112,6 +114,9 @@ export function createPreviousDrawer(scope) {
     }
 
     const table = el("div", null, "dispatch-pro-history-table");
+    table.tabIndex = 0;
+    table.setAttribute("role", "region");
+    table.setAttribute("aria-label", "Cargas anteriores");
     const header = el("div", null, "dispatch-pro-history-row is-header");
     ["Archivo", "Fecha", "Datos", "Estado", ""].forEach((value) => (
       header.append(el("span", value))
