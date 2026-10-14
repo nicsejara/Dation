@@ -42,15 +42,16 @@ class LandingNavigationContractTests(unittest.TestCase):
     def test_active_case_cta_goes_to_real_decision_map(self):
         for marker in (
             "activeCase",
-            "data-primary-decision",
-            "Continuar en Decision Map",
-            "resolvePrimaryAction",
+            "data-start-new-decision",
+            "data-open-decision-map",
+            "syncHeroActions",
+            "startNewDecision",
             "navigate('logistics-map')",
-            "Iniciar proceso de decisión",
+            "setMapAvailability",
         ):
             self.assertIn(marker, self.landing)
 
-        self.assertIn("Iniciar proceso de decisión", self.html)
+        self.assertIn("data-open-decision-map", self.html)
         self.assertNotIn("data-scroll-decision-map", self.html)
 
     def test_state_legend_and_card_actions_are_removed_at_runtime(self):

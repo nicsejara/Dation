@@ -42,7 +42,12 @@ async def journey():
         watch(page)
         context.on('page',watch)
         try:
-            await page.goto(base+'/app?view=logistics-data',wait_until='domcontentloaded')
+            await page.goto(base+'/app?view=overview',wait_until='domcontentloaded')
+            await page.wait_for_selector('[data-start-new-decision]')
+            assert await page.locator('.dda-landing button').count()==2
+            assert not await page.locator('[data-start-new-decision]').is_disabled()
+            assert await page.locator('[data-open-decision-map]').is_disabled()
+            await page.locator('[data-start-new-decision]').click()
             await page.wait_for_selector('[data-kind="orders"] input[type=file]',state='attached')
             for kind in ('orders','fleet'):
                 async with page.expect_response(lambda response:
@@ -158,6 +163,23 @@ async def journey():
             download=await downloaded.value
             contents=Path(await download.path()).read_text()
             assert contents and len(contents.splitlines())>=2
+            retained_case=await (await context.request.get(base+'/api/decision-cases/'+case)).json()
+            runs_before=sum(method=='POST' and path=='/api/runs' for method,path in requests)
+            await page.evaluate("window.dationNavigate('logistics-overview')")
+            await page.wait_for_selector('[data-start-new-decision]')
+            assert not await page.locator('[data-open-decision-map]').is_disabled()
+            await page.locator('[data-open-decision-map]').click()
+            await page.wait_for_selector('[data-map-node="logistics_assignment"]')
+            assert await page.locator('.dispatch-case-selector').count()==0
+            await page.evaluate("window.dationNavigate('logistics-overview')")
+            await page.locator('[data-start-new-decision]').click()
+            await page.wait_for_selector('[data-kind="orders"] input[type=file]',state='attached')
+            workspace=await page.evaluate('window.DationDispatch.getWorkspace()')
+            assert all(workspace[key] is None for key in ('orders','decisionCase','run','activeNode'))
+            assert 'case_id=' not in page.url
+            assert sum(method=='POST' and path=='/api/runs' for method,path in requests)==runs_before
+            assert await (await context.request.get(base+'/api/decision-cases/'+case)).json()==retained_case
+            assert case in await page.evaluate("JSON.parse(sessionStorage.getItem('dation.dispatch.drafts.v1'))")
             assert not errors
             assert not failed,failed
             report={'passed':True,'creation_from_files':True,'refresh_during_queue':True,
@@ -166,6 +188,8 @@ async def journey():
                 'comparative_reused_and_restored':True,'trip_detail_keyboard':True,'direct_next_configuration':True,
                 'comparative_close_reopen_without_post':True,'terminal_scheduling_reconfigured_as_new_run':True,
                 'failed_run_retained_unchanged':True,'map_toolbar_and_closed_contexts':True,
+                'overview_dual_cta_without_cases':True,'overview_single_case_direct_map':True,
+                'new_decision_clears_context_and_preserves_history':True,
                 'javascript_errors':errors,'unexpected_http_errors':failed,
                 'expected_draft_hydration_misses':len(expected_draft_misses),'requests':len(requests)}
             if artifact:
