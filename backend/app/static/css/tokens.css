@@ -50,6 +50,7 @@
   --dation-focus: var(--color-focus);
   --color-brand: var(--d-brand-teal);
   --color-brand-hover: var(--d-brand-teal-bright);
+  --color-brand-glow: rgba(67,166,199,.09);
   --color-brand-dark: var(--d-brand-deep-violet);
   --color-brand-soft: var(--d-surface-2);
   --color-brand-faint: var(--d-bg-2);

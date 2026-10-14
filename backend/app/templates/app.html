@@ -6,10 +6,10 @@
   <meta name="color-scheme" content="dark">
   <title>Dation · Decision Intelligence</title>
   <link rel="icon" type="image/png" href="/static/assets/dation-logo.png?v=home-dda-selector-v2">
-  <link rel="stylesheet" href="/static/css/tokens.css?v=dark-foundation-v1">
-  <link rel="stylesheet" href="/static/css/app.css?v=dark-foundation-v1">
-  <link rel="stylesheet" href="/static/css/home-dda.css?v=dark-foundation-v1">
-  <link rel="stylesheet" href="/static/css/dda-logistics-landing.css?v=dark-foundation-v1">
+  <link rel="stylesheet" href="/static/css/tokens.css?v=dark-home-overview-v1">
+  <link rel="stylesheet" href="/static/css/app.css?v=dark-home-overview-v1">
+  <link rel="stylesheet" href="/static/css/home-dda.css?v=dark-home-overview-v1">
+  <link rel="stylesheet" href="/static/css/dda-logistics-landing.css?v=dark-home-overview-v1">
   <link rel="stylesheet" href="/static/css/dispatch.css?v=dark-foundation-v1">
   <link rel="stylesheet" href="/static/css/dda-logistics-upload.css?v=dark-foundation-v1">
   <link rel="stylesheet" href="/static/css/dispatch-lifecycle.css?v=dark-foundation-v1">
@@ -94,51 +94,26 @@
 
       <div class="content">
         <!-- INICIO -->
-        <section class="view is-active" data-view-panel="inicio" data-dation-surface="legacy-light">
+        <section class="view is-active" data-view-panel="inicio">
           <div class="d-home">
             <section class="d-home__hero d-page-hero" aria-labelledby="dation-home-title">
               <div class="d-home__hero-copy">
-                <span class="d-home__eyebrow">Dation · Decision Intelligence</span>
+                <span class="d-home__eyebrow"><img src="/static/assets/dation-logo.png?v=home-dda-selector-v2" alt="" aria-hidden="true">Dation · Decision Intelligence</span>
                 <h1 id="dation-home-title">
-                  Decisiones operativas que podés explicar, comparar y repetir.
+                  Decisiones que podés explicar, comparar y repetir.
                 </h1>
                 <p>
-                  Un <strong>Decision Data Asset (DDA)</strong> reúne los datos, la lógica y la evidencia
-                  de una decisión concreta de tu operación. Compará alternativas, obtené una recomendación
-                  y entendé exactamente por qué, cada vez que tengas que decidir.
+                  Un <strong>Decision Data Asset (DDA)</strong> conecta tus datos, criterios y evidencia.
                 </p>
                 <p class="d-home__hero-definition">
-                  Un proceso repetible para cada decisión:
                   <strong>datos → análisis → recomendación → evidencia trazable.</strong>
                 </p>
               </div>
 
               <div class="d-home__visual" aria-hidden="true">
-                <article class="d-home__tile d-home__tile--main">
-                  <div>
-                    <span class="d-home__tile-index">01</span>
-                    <strong>Decisión trazable</strong>
-                    <small>
-                      Cada recomendación queda conectada a los datos y criterios
-                      que la originaron.
-                    </small>
-                  </div>
-                  <div class="d-home__tile-mark" aria-hidden="true">
-                    <img src="/static/assets/dation-logo.png?v=home-dda-selector-v2" alt="">
-                  </div>
-                </article>
-
-                <article class="d-home__tile d-home__tile--sand">
-                  <span class="d-home__tile-index">02</span>
-                  <strong>Compará alternativas</strong>
-                  <small>Evaluá escenarios y trade-offs antes de comprometer recursos.</small>
-                </article>
-
-                <article class="d-home__tile d-home__tile--lime">
-                  <span class="d-home__tile-index">03</span>
-                  <strong>Entendé el porqué</strong>
-                  <small>Explicaciones en lenguaje de negocio, listas para compartir y auditar.</small>
-                </article>
+                <article class="d-home__tile d-home__tile--main"><span class="d-home__tile-index">01</span><div><strong>Decisión trazable</strong><small>Datos y criterios conectados.</small></div></article>
+                <article class="d-home__tile"><span class="d-home__tile-index">02</span><div><strong>Compará alternativas</strong><small>Evaluá antes de decidir.</small></div></article>
+                <article class="d-home__tile"><span class="d-home__tile-index">03</span><div><strong>Entendé el porqué</strong><small>Evidencia para compartir.</small></div></article>
               </div>
             </section>
 
@@ -148,8 +123,7 @@
                   <span class="d-home__section-kicker">Decision Data Assets</span>
                   <h2 id="dation-dda-title">Elegí el Decision Data Asset que querés utilizar</h2>
                   <p>
-                    Cada DDA está diseñado para una familia concreta de decisiones y reúne
-                    los datos, la lógica analítica y la evidencia necesaria para resolverla.
+                    Un sistema para cada familia de decisiones: datos, lógica analítica y evidencia en un mismo lugar.
                   </p>
                 </div>
               </div>
@@ -213,7 +187,7 @@
         </section>
 
         <!-- OVERVIEW DDA LOGÍSTICA -->
-        <section class="view" data-view-panel="logistics-overview" data-dation-surface="legacy-light">
+        <section class="view" data-view-panel="logistics-overview">
           <div class="dda-landing">
             <svg width="0" height="0" aria-hidden="true" focusable="false" class="dda-landing__sprite">
               <defs>
@@ -243,10 +217,9 @@
             <section class="dda-landing__hero d-page-hero" data-reveal>
               <div class="dda-landing__hero-copy">
                 <span class="dda-landing__eyebrow">DDA LOGÍSTICA · PLANIFICACIÓN DE DESPACHOS</span>
-                <h1>Decidí tus despachos más rápido y con mejor análisis.</h1>
+                <h1>Tus despachos, con mejor análisis.</h1>
                 <p class="dda-landing__hero-lead">
-                  Dation compara alternativas de asignación, planificación y ejecución, y te muestra
-                  cuál conviene y por qué. Menos tiempo armando análisis, más tiempo para decidir.
+                  Compará alternativas y revisá la evidencia antes de aprobar.
                 </p>
 
                 <div class="dda-landing__hero-actions">
@@ -298,7 +271,7 @@
               </div>
             </section>
 
-            <section class="dda-landing__section dda-landing__section--white dda-landing__how" data-reveal>
+            <section class="dda-landing__section dda-landing__section--surface dda-landing__how" data-reveal>
               <div class="dda-landing__section-head dda-landing__section-head--how">
                 <span class="dda-landing__section-eyebrow">Cómo funciona</span>
                 <h2>De tus datos a una decisión, en 4 pasos.</h2>
@@ -385,7 +358,7 @@
             </section>
 
             <section
-              class="dda-landing__section dda-landing__section--wash"
+              class="dda-landing__section dda-landing__section--raised"
               id="dda-logistics-decision-map"
               data-reveal
             >
@@ -399,10 +372,9 @@
               </div>
 
               <div class="dda-landing__chain" aria-label="Cadena de decisiones">
-                <article class="dda-landing__node is-pending" data-decision-node="logistics_assignment">
+                <article class="dda-landing__node is-conceptual" data-decision-node="logistics_assignment">
                   <div class="dda-landing__node-top">
                     <span class="dda-landing__iconbox"><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-package"></use></svg></span>
-                    <span class="dda-landing__state is-pending" data-node-state><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-clock"></use></svg>En espera</span>
                   </div>
                   <h3>Asignación de carga</h3>
                   <p class="dda-landing__node-question">¿Cómo conviene armar los viajes y repartir la carga?</p>
@@ -410,18 +382,13 @@
                     <div class="dda-landing__node-fact"><small>Necesita</small><strong>Órdenes + flota</strong></div>
                     <div class="dda-landing__node-fact"><small>Entrega</small><strong>Viajes propuestos + distribución de carga</strong></div>
                   </div>
-                  <div class="dda-landing__node-footer">
-                    <button class="dda-landing__node-action" type="button" data-node-action="logistics_assignment" hidden>Open</button>
-                    <p class="dda-landing__node-lockcopy" data-node-lockcopy>Disponible al cargar datos.</p>
-                  </div>
                 </article>
 
                 <span class="dda-landing__chain-link" aria-hidden="true"></span>
 
-                <article class="dda-landing__node is-locked" data-decision-node="logistics_scheduling">
+                <article class="dda-landing__node is-conceptual" data-decision-node="logistics_scheduling">
                   <div class="dda-landing__node-top">
                     <span class="dda-landing__iconbox"><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-calendar"></use></svg></span>
-                    <span class="dda-landing__state is-locked" data-node-state><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-clock"></use></svg>En espera</span>
                   </div>
                   <h3>Planificación de despachos</h3>
                   <p class="dda-landing__node-question">¿Cuándo conviene ejecutar los viajes ya definidos?</p>
@@ -429,18 +396,13 @@
                     <div class="dda-landing__node-fact"><small>Necesita</small><strong>Asignación aprobada</strong></div>
                     <div class="dda-landing__node-fact"><small>Entrega</small><strong>Calendario operativo + secuencia</strong></div>
                   </div>
-                  <div class="dda-landing__node-footer">
-                    <button class="dda-landing__node-action" type="button" data-node-action="logistics_scheduling" hidden>Open</button>
-                    <p class="dda-landing__node-lockcopy" data-node-lockcopy>Se habilita al aprobar Asignación de carga.</p>
-                  </div>
                 </article>
 
                 <span class="dda-landing__chain-link" aria-hidden="true"></span>
 
-                <article class="dda-landing__node is-locked" data-decision-node="logistics_final_assignment">
+                <article class="dda-landing__node is-conceptual" data-decision-node="logistics_final_assignment">
                   <div class="dda-landing__node-top">
                     <span class="dda-landing__iconbox"><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-truck"></use></svg></span>
-                    <span class="dda-landing__state is-locked" data-node-state><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-clock"></use></svg>En espera</span>
                   </div>
                   <h3>Asignación de vehículos</h3>
                   <p class="dda-landing__node-question">¿Qué vehículo ejecuta cada viaje programado?</p>
@@ -448,24 +410,13 @@
                     <div class="dda-landing__node-fact"><small>Necesita</small><strong>Planificación aprobada</strong></div>
                     <div class="dda-landing__node-fact"><small>Entrega</small><strong>Vehículo asignado a cada viaje</strong></div>
                   </div>
-                  <div class="dda-landing__node-footer">
-                    <button class="dda-landing__node-action" type="button" data-node-action="logistics_final_assignment" hidden>Open</button>
-                    <p class="dda-landing__node-lockcopy" data-node-lockcopy>Se habilita al aprobar Planificación de despachos.</p>
-                  </div>
                 </article>
-              </div>
-
-              <div class="dda-landing__state-legend" aria-label="Estados del Decision Map">
-                <div class="dda-landing__legend-item"><span class="dda-landing__legend-icon" style="color:#087a4b"><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-play-circle"></use></svg></span><div><strong>Disponible</strong><small>Lista para resolver.</small></div></div>
-                <div class="dda-landing__legend-item"><span class="dda-landing__legend-icon" style="color:#795814"><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-alert-circle"></use></svg></span><div><strong>Requiere revisión</strong><small>Hay algo para revisar antes de aprobar.</small></div></div>
-                <div class="dda-landing__legend-item"><span class="dda-landing__legend-icon" style="color:#0d716f"><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-check-circle"></use></svg></span><div><strong>Aprobada</strong><small>Resultado revisado y aprobado.</small></div></div>
-                <div class="dda-landing__legend-item"><span class="dda-landing__legend-icon" style="color:#687984"><svg class="dda-icon" aria-hidden="true"><use href="#dda-i-clock"></use></svg></span><div><strong>En espera</strong><small>Se habilita al aprobar la decisión anterior.</small></div></div>
               </div>
 
               <p class="dda-landing__map-close">Cada resultado se revisa y se aprueba antes de habilitar el siguiente nivel.</p>
             </section>
 
-            <section class="dda-landing__section dda-landing__section--white" data-reveal>
+            <section class="dda-landing__section dda-landing__section--surface" data-reveal>
               <div class="dda-landing__section-head dda-landing__section-head--summary">
                 <span class="dda-landing__section-eyebrow">Datos, resultado y límites</span>
                 <h2>Lo que necesitás y lo que obtenés.</h2>
@@ -533,7 +484,7 @@
               </div>
             </section>
 
-            <section class="dda-landing__section dda-landing__section--white dda-landing__faq" data-reveal>
+            <section class="dda-landing__section dda-landing__section--surface dda-landing__faq" data-reveal>
               <div class="dda-landing__section-head">
                 <span class="dda-landing__section-eyebrow">FAQ</span>
                 <h2>Antes de empezar.</h2>
@@ -544,15 +495,6 @@
                 <details><summary>¿Puedo comparar distintos objetivos?</summary><p>Sí. Podés evaluar prioridades como costo, viajes o tiempo y compararlas contra despacho directo.</p></details>
                 <details><summary>¿Qué pasa con mis resultados anteriores?</summary><p>Cada decisión queda guardada con su evidencia, así podés volver a analizarla cuando quieras.</p></details>
                 <details><summary>¿Qué formatos puedo exportar?</summary><p>Asignaciones y resultados operativos en CSV, y el DecisionResult completo en JSON.</p></details>
-              </div>
-            </section>
-
-            <section class="dda-landing__final" data-reveal>
-              <img class="dda-landing__final-watermark" src="/static/assets/dda-logistics.svg?v=dda-logistics-landing-v7" alt="">
-              <div class="dda-landing__final-copy">
-                <span class="dda-landing__section-eyebrow">Comenzar</span>
-                <h2>¿Listo para tomar tu primera decisión?</h2>
-                <p>Cargá o reutilizá tus órdenes y tu flota. Dation crea el Decision Case y te muestra qué decisión podés resolver ahora.</p>
               </div>
             </section>
 
@@ -1590,7 +1532,7 @@
   <script src="/static/js/dashboard-formatters.js?v=dispatch-v1"></script>
   <script src="/static/js/dashboard-selectors.js?v=dispatch-v1"></script>
   <script src="/static/js/dashboard-stage.js?v=dda-logistics-landing-v7"></script>
-  <script src="/static/js/dda-logistics-landing.js?v=dda-logistics-landing-v8"></script>
+  <script src="/static/js/dda-logistics-landing.js?v=dark-home-overview-v1"></script>
   <script src="/static/js/interpreter-stage.js?v=dispatch-v1"></script>
   <script src="/static/vendor/echarts-dispatch-6.0.0.min.js"></script>
   <script type="module" src="/static/js/dispatch/workspace.mjs"></script>
