@@ -81,7 +81,7 @@ async def journey():
             await page.reload(wait_until='domcontentloaded')
             await page.wait_for_selector('[data-comparative-state=completed]')
             assert await page.locator('[data-generate-comparative]').count()==0
-            await page.locator('[data-approve]').click()
+            await page.locator('[data-approve-toolbar]').click()
             await page.wait_for_function("window.DationDispatch.getWorkspace().decisionCase.nodes.logistics_assignment.status==='approved'")
             await page.locator('[data-after-approve]').click()
             await page.wait_for_selector('[data-scheduling-review]')
@@ -96,7 +96,7 @@ async def journey():
             assert (await accepted.value).status==202
             scheduling=(await (await accepted.value).json())['id']
             await page.wait_for_selector('.dispatch-scheduling-dashboard')
-            await page.locator('[data-approve]').click()
+            await page.locator('[data-approve-toolbar]').click()
             await page.wait_for_function("window.DationDispatch.getWorkspace().decisionCase.nodes.logistics_scheduling.status==='approved'")
             # Cold access in a new tab has no workspace sessionStorage.
             cold=await context.new_page()

@@ -8,7 +8,6 @@ function formatKpi(item){
   if(item.value==null)return '—';
   if(item.format==='percent')return pct(item.value);
   if(item.format==='money')return money(item.value);
-  if(item.format==='co2')return num(item.value,1)+' kg';
   return num(item.value);
 }
 
@@ -25,16 +24,12 @@ function weightsMarkup(summary){
 }
 
 function kpiMarkup(item){
-  const secondary=item.secondaryValue==null
-    ?''
-    :'<small>'+esc(item.secondaryLabel||'Referencia')+' '+pct(item.secondaryValue)+'</small>';
-  return '<article class="assignment-essential__kpi '+(item.objective?'is-objective':'is-descriptive')+'">'
+  return '<article data-executive-kpi="'+esc(item.key)+'" class="assignment-essential__kpi '+(item.objective?'is-objective':'is-descriptive')+'">'
     +'<div class="assignment-essential__kpi-top">'
-      +'<span>'+esc(item.label)+'</span>'
+      +'<span'+(item.description?' title="'+esc(item.description)+'" aria-label="'+esc(item.label+' · '+item.description)+'"':'')+'>'+esc(item.label)+'</span>'
       +'<em>'+(item.objective?'Parte del objetivo':'KPI del resultado')+'</em>'
     +'</div>'
     +'<strong>'+esc(formatKpi(item))+'</strong>'
-    +secondary
   +'</article>';
 }
 

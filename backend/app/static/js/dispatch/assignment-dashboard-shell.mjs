@@ -1,267 +1,33 @@
-import {bindDashboardActions} from './dashboard-actions.mjs';
-import {scopeFor,trapFocus} from "./lifecycle.mjs";
-import {api,esc,num} from './shared.mjs';
+import {scopeFor} from './lifecycle.mjs';
 import {decisionRail,bindDecisionRail} from './decision-nav.mjs';
-import {exportDecision,exportDecisionJson} from './export.mjs';
-import {
-  analysisDepthUi,
-  decisionStatusUi,
-  shortRunId,
-  solverStatusLabel,
-} from './assignment-dashboard-selectors.mjs';
-
-function detailRows(run,caseActions){
-  const result=run.result_json||{};
-  const solver=result.engine?.solver||{};
-  const depth=analysisDepthUi(run);
-  const decisionCase=caseActions.decisionCase||{};
-  const rows=[
-    ['Corrida',run.id||'—'],
-    ['Decision Case',decisionCase.id||result.decision_case?.case_id||'—'],
-    ['Motor',[result.engine?.name,result.engine?.version].filter(Boolean).join(' ')||'—'],
-    ['Solver',solver.name||solver.method||'Política heurística'],
-    ['Estado solver',solverStatusLabel(solver.status)],
-    ['Profundidad',depth.label],
-    ['Escenarios evaluados',result.analysis?.scenario_count??'—'],
-    ['Huella',result.result_fingerprint||'—'],
-    ['Órdenes',result.inputs?.orders?.filename||result.inputs?.orders?.label||'Órdenes'],
-    ['Flota',result.inputs?.fleet?.label||result.inputs?.fleet?.filename||'Flota'],
-  ];
-  return rows;
-}
-
-function approvalMarkup(caseActions){
-  if(!caseActions.onApprove)return '';
-  const approved=caseActions.status==='approved';
-  return '<div class="assignment-dashboard-v2__approval '+(approved?'is-approved':'is-review')+'" data-approval-block>'
-    +'<div class="assignment-dashboard-v2__approval-copy">'
-      +'<span class="assignment-dashboard-v2__approval-icon" aria-hidden="true">✓</span>'
-      +'<div>'
-        +'<strong data-approval-title>'+(approved?'✓ Asignación aprobada':'Validá la evidencia antes de aprobar')+'</strong>'
-        +'<p data-approval-copy>'+(approved
-          ?'Esta decisión quedó congelada como entrada para Planificación.'
-          :'La aprobación congela esta asignación como entrada de Planificación. Dation IA no es requisito para aprobar.')+'</p>'
-      +'</div>'
-    +'</div>'
-    +'<div class="assignment-dashboard-v2__approval-actions">'
-      +'<button type="button" data-rerun-validation class="assignment-dashboard-v2__reconfigure" '+(approved?'hidden':'')+'>Nueva corrida</button>'
-      +'<button type="button" data-approve class="assignment-dashboard-v2__approve" '+(approved?'hidden':'')+'>Aprobar asignación →</button>'
-
-    +'</div>'
-  +'</div>';
-}
-
-function toolsMarkup(caseActions){
-  return '<div class="assignment-dashboard-v2__tools" aria-label="Herramientas de la decisión">'
-    +'<button type="button" data-approve-toolbar class="assignment-dashboard-v2__approve" '+(!caseActions.onApprove||caseActions.status==='approved'?'hidden':'')+'>Aprobar asignación</button>'
-    +'<button type="button" data-after-approve class="assignment-dashboard-v2__continue" hidden>Continuar con la siguiente decisión →</button>'
-    +'<span data-next-decision-status role="status"></span>'
-    +'<details class="assignment-dashboard-v2__menu" data-export-menu>'
-      +'<summary>Exportar <span aria-hidden="true">⌄</span></summary>'
-      +'<div class="assignment-dashboard-v2__menu-panel" role="menu">'
-        +'<button type="button" data-export-csv role="menuitem"><span aria-hidden="true">↓</span><div><strong>Asignación CSV</strong><small>Viajes, vehículos, órdenes y cargas</small></div></button>'
-        +'<button type="button" data-export-json role="menuitem"><span aria-hidden="true">{ }</span><div><strong>JSON técnico</strong><small>Resultado completo de la corrida</small></div></button>'
-      +'</div>'
-    +'</details>'
-    +'<details class="assignment-dashboard-v2__menu" data-more-menu>'
-      +'<summary>Más <span aria-hidden="true">···</span></summary>'
-      +'<div class="assignment-dashboard-v2__menu-panel" role="menu">'
-        +'<button type="button" data-rerun role="menuitem"><span aria-hidden="true">↻</span><div><strong>Nueva corrida</strong><small>Mismos datos, otra configuración</small></div></button>'
-        +'<button type="button" data-new-decision role="menuitem"><span aria-hidden="true">＋</span><div><strong>Nueva decisión</strong><small>Cargar otros datos y crear un nuevo Decision Case</small></div></button>'
-        +'<button type="button" data-run-details role="menuitem"><span aria-hidden="true">i</span><div><strong>Detalles de ejecución</strong><small>Motor, solver, archivos y huella</small></div></button>'
-      +'</div>'
-    +'</details>'
-  +'</div>';
-}
+import {analysisDepthUi} from './assignment-dashboard-selectors.mjs';
+import {renderDashboardToolbar,bindDashboardToolbar} from './dashboard-toolbar.mjs';
 
 export function renderAssignmentShell(root,run,caseActions={}){
-  const result=run.result_json||{};
   const depth=analysisDepthUi(run);
-  const status=decisionStatusUi(caseActions.status);
-  const rows=detailRows(run,caseActions);
-
-  root.className='dispatch assignment-dashboard-v2';
-  root.dataset.analysisDepth=depth.depth;
-  root.innerHTML=
-    '<header class="assignment-dashboard-v2__toolbar">'
-      +'<div class="assignment-dashboard-v2__identity">'
-        +'<div class="assignment-dashboard-v2__identity-copy">'
-          +'<span class="assignment-dashboard-v2__eyebrow">DDA LOGÍSTICA · DECISIÓN 01</span>'
-          +'<div class="assignment-dashboard-v2__title-row">'
-            +'<strong>Asignación de carga</strong>'
-            +'<span class="assignment-dashboard-v2__badge assignment-dashboard-v2__badge--depth '+esc(depth.className)+'" data-depth-badge>'+esc(depth.label)+'</span>'
-            +'<span class="assignment-dashboard-v2__badge assignment-dashboard-v2__badge--status '+esc(status.className)+'" data-status-badge>'+esc(status.label)+'</span>'
-          +'</div>'
-          +'<small>Corrida '+esc(shortRunId(run.id))+' · '+num(result.scenarios?.selected?.metrics?.orders||0)+' órdenes analizadas</small>'
-        +'</div>'
-      +'</div>'
-      +toolsMarkup(caseActions)
-    +'</header>'
+  const {toolbar,drawer}=renderDashboardToolbar(run,caseActions);
+  root.className='dispatch assignment-dashboard-v2';root.dataset.analysisDepth=depth.depth;
+  root.innerHTML=toolbar
     +'<div class="assignment-dashboard-v2__rail">'+decisionRail(caseActions)+'</div>'
     +'<main class="assignment-dashboard-v2__main">'
       +'<section class="dispatch-panel assignment-dashboard-v2__section assignment-dashboard-v2__hero" id="dispatch-hero"></section>'
       +'<section class="dispatch-panel assignment-dashboard-v2__section assignment-dashboard-v2__assignment" id="dispatch-assignment"></section>'
-      +'<section class="dispatch-panel assignment-dashboard-v2__section assignment-dashboard-v2__review" id="dispatch-review"><div data-review-content></div>'+approvalMarkup(caseActions)+'</section>'
+      +'<section class="dispatch-panel assignment-dashboard-v2__section assignment-dashboard-v2__review" id="dispatch-review"><div data-review-content></div></section>'
       +'<section class="dispatch-panel assignment-dashboard-v2__section assignment-comparative-layer" id="dispatch-comparative"></section>'
       +'<section class="dispatch-panel assignment-dashboard-v2__section assignment-dashboard-v2__ai" id="dispatch-explanation"></section>'
     +'</main>'
     +'<button type="button" class="dispatch-ai-fab assignment-dashboard-v2__ai-fab" data-chat aria-expanded="false" aria-label="Abrir Dation IA"><span>✦</span><strong>Dation IA</strong></button>'
     +'<aside class="dispatch-chat dispatch-panel assignment-dashboard-v2__chat" hidden aria-label="Chat de la decisión"></aside>'
-    +'<div class="assignment-dashboard-v2__drawer-backdrop" data-run-drawer-backdrop hidden></div>'
-    +'<aside class="assignment-dashboard-v2__drawer" data-run-drawer hidden role="dialog" aria-modal="true" aria-labelledby="assignment-run-details-title">'
-      +'<header><div><span class="assignment-dashboard-v2__eyebrow">TRAZABILIDAD TÉCNICA</span><h2 id="assignment-run-details-title">Detalles de ejecución</h2><p>Información persistida de esta corrida. No modifica la decisión.</p></div><button type="button" data-close-drawer aria-label="Cerrar detalles de ejecución">×</button></header>'
-      +'<dl class="assignment-dashboard-v2__details">'
-        +rows.map(([key,value])=>'<div><dt>'+esc(key)+'</dt><dd>'+esc(value)+'</dd></div>').join('')
-      +'</dl>'
-      +'<div class="assignment-dashboard-v2__ai-runtime"><span>Servicio de IA</span><strong data-ai-details>Consultando…</strong></div>'
-    +'</aside>';
-
+    +drawer;
   return {
-    hero:root.querySelector('#dispatch-hero'),
-    assignment:root.querySelector('#dispatch-assignment'),
-    review:root.querySelector('[data-review-content]'),
-    comparative:root.querySelector('#dispatch-comparative'),
-    explanation:root.querySelector('#dispatch-explanation'),
-    chat:root.querySelector('.assignment-dashboard-v2__chat'),
+    hero:root.querySelector('#dispatch-hero'),assignment:root.querySelector('#dispatch-assignment'),
+    review:root.querySelector('[data-review-content]'),comparative:root.querySelector('#dispatch-comparative'),
+    explanation:root.querySelector('#dispatch-explanation'),chat:root.querySelector('.assignment-dashboard-v2__chat'),
   };
-}
-
-function closeMenus(root){
-  root.querySelectorAll('.assignment-dashboard-v2__menu[open]').forEach(menu=>menu.removeAttribute('open'));
-}
-
-function feedback(button,working,done){
-  const original=button.dataset.originalLabel||button.innerHTML;
-  button.dataset.originalLabel=original;
-  button.disabled=true;
-  button.textContent=working;
-  scopeFor(button)?.timeout(()=>{
-    button.textContent=done;
-    scopeFor(button)?.timeout(()=>{
-      button.innerHTML=original;
-      button.disabled=false;
-    },1000);
-  },120);
 }
 
 export function bindAssignmentShell(root,run,{onRerun,caseActions={},onOpenChat}={}){
-  const result=run.result_json||{};
-  const drawer=root.querySelector('[data-run-drawer]');
-  const backdrop=root.querySelector('[data-run-drawer-backdrop]');
-  const closeButton=root.querySelector('[data-close-drawer]');
-  let restoreFocus=null;
-
-  const closeDrawer=()=>{
-    if(!drawer||drawer.hidden)return;
-    drawer.hidden=true;
-    backdrop.hidden=true;
-    document.body.classList.remove('assignment-dashboard-drawer-open');
-    restoreFocus?.focus?.();
-  };
-  const openDrawer=trigger=>{
-    if(!drawer)return;
-    restoreFocus=trigger?.closest('details')?.querySelector('summary')||trigger||document.activeElement;
-    drawer.hidden=false;
-    backdrop.hidden=false;
-    document.body.classList.add('assignment-dashboard-drawer-open');
-    window.requestAnimationFrame(()=>{if(scopeFor(root)?.active)closeButton?.focus();});
-  };
-
-  if(root._assignmentDashboardKeydown){
-    document.removeEventListener('keydown',root._assignmentDashboardKeydown);
-  }
-  root._assignmentDashboardKeydown=event=>{
-    if(!drawer?.hidden)trapFocus(event,drawer);
-    if(event.key==='Escape'&&!drawer?.hidden){
-      event.preventDefault();
-      closeDrawer();
-    }
-  };
-  scopeFor(root)?.listen(document,'keydown',root._assignmentDashboardKeydown);
-
-  backdrop?.addEventListener('click',closeDrawer);
-  closeButton?.addEventListener('click',closeDrawer);
-  root.querySelector('[data-run-details]')?.addEventListener('click',event=>{
-    closeMenus(root);
-    openDrawer(event.currentTarget);
-  });
-
-  root.querySelector('[data-export-csv]')?.addEventListener('click',event=>{
-    closeMenus(root);
-    try{
-      exportDecision(result);
-      feedback(event.currentTarget,'Preparando CSV…','✓ CSV exportado');
-    }catch(error){
-      event.currentTarget.textContent='No se pudo exportar';
-    }
-  });
-  root.querySelector('[data-export-json]')?.addEventListener('click',event=>{
-    closeMenus(root);
-    try{
-      exportDecisionJson(result,run.id);
-      feedback(event.currentTarget,'Preparando JSON…','✓ JSON exportado');
-    }catch(error){
-      event.currentTarget.textContent='No se pudo exportar';
-    }
-  });
-  root.querySelector('[data-rerun]')?.addEventListener('click',()=>{
-    closeMenus(root);
-    onRerun?.();
-  });
-  root.querySelector('[data-rerun-validation]')?.addEventListener('click',()=>onRerun?.());
-
   bindDecisionRail(root,caseActions);
-  const actions=bindDashboardActions(root,caseActions);
-
-  const approveButton=root.querySelector('[data-approve]');
-  const toolbarApprove=root.querySelector('[data-approve-toolbar]');
-  if(toolbarApprove)toolbarApprove.onclick=()=>approveButton?.click();
-  if(approveButton)approveButton.onclick=async()=>{
-    approveButton.disabled=true;
-    if(toolbarApprove)toolbarApprove.disabled=true;
-    approveButton.textContent='Aprobando…';
-    try{
-      await caseActions.onApprove?.();
-      if(!scopeFor(root)?.active)return;
-      const statusBadge=root.querySelector('[data-status-badge]');
-      if(statusBadge){
-        statusBadge.textContent='Aprobada';
-        statusBadge.classList.remove('is-review','is-running','is-error','is-available');
-        statusBadge.classList.add('is-approved');
-      }
-      const block=root.querySelector('[data-approval-block]');
-      block?.classList.remove('is-review');
-      block?.classList.add('is-approved');
-      const title=root.querySelector('[data-approval-title]');
-      if(title)title.textContent='✓ Asignación aprobada';
-      const copy=root.querySelector('[data-approval-copy]');
-      if(copy)copy.textContent='Esta decisión quedó congelada como entrada para Planificación.';
-      const rerunValidation=root.querySelector('[data-rerun-validation]');
-      if(rerunValidation)rerunValidation.hidden=true;
-      approveButton.hidden=true;
-      if(toolbarApprove)toolbarApprove.hidden=true;
-      caseActions.onApprovalComplete?.();
-      await actions.refresh();
-    }catch(error){
-      approveButton.disabled=false;
-      if(toolbarApprove)toolbarApprove.disabled=false;
-      approveButton.textContent='Aprobar asignación →';
-      alert(error.message);
-    }
-  };
-
-  root.querySelector('[data-chat]')?.addEventListener('click',()=>onOpenChat?.());
-
-  api('/api/system/llm-status',{signal:scopeFor(root)?.signal})
-    .then(data=>{
-      if(!scopeFor(root)?.active)return;
-      const target=root.querySelector('[data-ai-details]');
-      if(target)target.textContent=data.configured?(data.provider+' · '+data.model):'Sin configurar';
-    })
-    .catch(()=>{
-      const target=root.querySelector('[data-ai-details]');
-      if(target)target.textContent='No disponible';
-    });
-
-  return {openDrawer,closeDrawer};
+  scopeFor(root).listen(root.querySelector('[data-chat]'),'click',()=>onOpenChat?.());
+  return bindDashboardToolbar(root,run,{onRerun,caseActions});
 }

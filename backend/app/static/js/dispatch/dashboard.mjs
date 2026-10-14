@@ -1,5 +1,5 @@
 import {bindDashboardActions} from './dashboard-actions.mjs';
-import {createScope,disposeScope} from "./lifecycle.mjs";
+import {createScope,disposeScope,scopeFor} from "./lifecycle.mjs";
 import {esc,num,download,dispose,errorBox,api} from './shared.mjs';
 import * as hero from './hero.mjs';
 import * as assignment from './assignment.mjs';
@@ -39,14 +39,6 @@ function ensureAssignmentStyles(){
   ensureStylesheet(ASSIGNMENT_COMPARATIVE_STYLE_ID,ASSIGNMENT_COMPARATIVE_STYLE_HREF);
 }
 
-function cleanupAssignmentShell(root){
-  if(root._assignmentDashboardKeydown){
-    document.removeEventListener('keydown',root._assignmentDashboardKeydown);
-    root._assignmentDashboardKeydown=null;
-  }
-  document.body.classList.remove('assignment-dashboard-drawer-open');
-}
-
 function renderModule(element,module,value){
   const draw=()=>{
     try{
@@ -78,13 +70,9 @@ function installDecisionChat(root,run,chatNode,toggleButton){
     openChat();
   }
 
-  if(root._dispatchChatHandler){
-    root.removeEventListener('dispatch:open-chat',root._dispatchChatHandler);
-  }
-  root._dispatchChatHandler=event=>{
+  scopeFor(root).listen(root,'dispatch:open-chat',event=>{
     openChat(event.detail?.question||'');
-  };
-  root.addEventListener('dispatch:open-chat',root._dispatchChatHandler);
+  });
 
   return {openChat,toggleChat};
 }
@@ -254,8 +242,8 @@ function renderLegacyDashboard(root,run,onRerun,caseActions={}){
 }
 
 export function render(root,run,onRerun,caseActions={}){
-  const scope=createScope(root);scope.own(()=>{cleanupAssignmentShell(root);dispose(root);});
-  cleanupAssignmentShell(root);
+  const scope=createScope(root);scope.own(()=>{dispose(root);});
+
   dispose(root);
   const result=run.result_json;
 

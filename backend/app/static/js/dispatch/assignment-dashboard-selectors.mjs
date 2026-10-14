@@ -52,12 +52,15 @@ const COMPARISON_SCENARIO_LABELS={
   min_co2:'CO₂ mínimo',
 };
 
-const COMPARISON_METRICS=[
-  {key:'total_trips',dimension:'trips',label:'Viajes',format:'integer',fallbackDirection:'lower_better'},
-  {key:'total_cost',dimension:'cost',label:'Costo estimado',format:'money',fallbackDirection:'lower_better'},
-  {key:'own_weight_share',dimension:'own_fleet',label:'Flota propia',format:'percent',fallbackDirection:'higher_better'},
-  {key:'co2_kg',dimension:'co2',label:'CO₂ estimado',format:'co2',fallbackDirection:'lower_better'},
-];
+// Both executive cards and comparisons use these definitions. Ownership is by weight.
+export const EXECUTIVE_KPIS=Object.freeze([
+  {key:'total_trips',dimension:'trips',label:'Cantidad de viajes',format:'integer',fallbackDirection:'lower_better'},
+  {key:'load_utilization',dimension:null,label:'Utilización media',format:'percent',fallbackDirection:'higher_better',
+    description:'Carga transportada dividida por la capacidad total de los viajes utilizados.'},
+  {key:'avg_cost_per_trip',dimension:'cost',label:'Costo promedio por viaje',format:'money',fallbackDirection:'lower_better'},
+  {key:'own_weight_share',dimension:'own_fleet',label:'% flota propia',format:'percent',fallbackDirection:'higher_better',
+    description:'Participación de la carga transportada con flota propia, medida por peso.'},
+].map(Object.freeze));
 
 function selected(result){
   return result?.scenarios?.selected||{};
@@ -73,9 +76,22 @@ function resourceId(value){
 }
 
 function finiteMetric(value){
-  if(value===null||value===undefined||value==='')return null;
+  if(typeof value!=='number'&&(typeof value!=='string'||!value.trim()))return null;
   const number=Number(value);
   return Number.isFinite(number)?number:null;
+}
+
+export function getScenarioMetric(scenario,metricKey){
+  const metrics=scenario?.metrics||{};
+  if(metricKey!=='avg_cost_per_trip')return finiteMetric(metrics[metricKey]);
+  const cost=finiteMetric(metrics.total_cost),trips=finiteMetric(metrics.total_trips);
+  if(cost===null||trips===null||trips<=0)return null;
+  const value=cost/trips;
+  return Number.isFinite(value)?value:null;
+}
+
+export function getExecutiveKpisForScenario(scenario){
+  return EXECUTIVE_KPIS.map(item=>({...item,value:getScenarioMetric(scenario,item.key)}));
 }
 
 export function getAnalysisDepth(run){
@@ -174,55 +190,9 @@ export function getAssignmentSummary(result){
 }
 
 export function getOperationalKpis(result){
-  const metrics=selected(result).metrics||{};
   const active=new Set(getActiveObjectiveMetrics(result).map(item=>item.metric));
-  const rows=[
-    {
-      key:'total_trips',
-      label:'Viajes propuestos',
-      value:metrics.total_trips,
-      format:'integer',
-      objective:active.has('total_trips'),
-    },
-    {
-      key:'load_utilization',
-      label:'Utilización media',
-      value:metrics.load_utilization,
-      format:'percent',
-      objective:false,
-    },
-    {
-      key:'own_weight_share',
-      label:'Flota propia',
-      value:metrics.own_weight_share,
-      secondaryValue:metrics.outsourced_weight_share,
-      secondaryLabel:'Tercerizada',
-      format:'percent',
-      objective:active.has('own_weight_share'),
-    },
-    {
-      key:'vehicles_used',
-      label:'Vehículos utilizados',
-      value:metrics.vehicles_used,
-      format:'integer',
-      objective:false,
-    },
-    {
-      key:'total_cost',
-      label:'Costo estimado',
-      value:metrics.total_cost,
-      format:'money',
-      objective:active.has('total_cost'),
-    },
-    {
-      key:'co2_kg',
-      label:'CO₂ estimado',
-      value:metrics.co2_kg,
-      format:'co2',
-      objective:active.has('co2_kg'),
-    },
-  ];
-  return rows.filter(item=>item.value!==null&&item.value!==undefined);
+  // Average cost is descriptive: minimizing total cost does not minimize a ratio.
+  return getExecutiveKpisForScenario(selected(result)).map(item=>({...item,objective:active.has(item.key)}));
 }
 
 export function getAssignmentTrips(result){
@@ -305,17 +275,17 @@ export function getApprovalWarnings(result){
   const trips=getAssignmentTrips(result);
   const orders=getAssignmentOrders(result);
   const exceptions=Array.isArray(result?.exceptions)?result.exceptions:[];
-  const includedAnomalies=(result?.inputs?.anomalies||[]).filter(item=>item?.decision==='include');
+  const includedAnomalies=(Array.isArray(result?.inputs?.anomalies)?result.inputs.anomalies:[]).filter(item=>item?.decision==='include');
   const outsourcedTrips=trips.filter(trip=>trip.ownership==='third_party');
   const splitOrders=orders.filter(order=>order.split);
 
-  if(scenario.feasible===false){
+  if(scenario.feasible===false||scenario.solver?.status==='infeasible'||result?.engine?.solver?.status==='infeasible'){
     warnings.push({
       key:'infeasible',
       level:'attention',
-      label:'Atención',
+      label:'Atención crítica',
       title:'El escenario seleccionado está marcado como no factible',
-      detail:'El resultado persistido indica feasible = false. No conviene aprobar esta asignación sin revisar la corrida.',
+      detail:'La evidencia publicada indica que el plan no es factible. Revisá esta condición antes de considerar una aprobación.',
     });
   }
   if(exceptions.length){
@@ -324,7 +294,12 @@ export function getApprovalWarnings(result){
       level:'attention',
       label:'Atención',
       title:`${exceptions.length} observación${exceptions.length===1?'':'es'} publicada${exceptions.length===1?'':'s'} por el motor`,
-      detail:'Revisá la evidencia persistida de la corrida antes de aprobar.',
+      detail:exceptions.map(item=>{
+        if(typeof item==='string')return item;
+        const message=[item?.title,item?.message,item?.detail,item?.description,item?.code].filter(value=>typeof value==='string'&&value.trim());
+        const identity=[item?.order_id,item?.trip_id,item?.vehicle_id].filter(value=>typeof value==='string'&&value.trim());
+        return [...new Set([...message,...identity])].join(' · ')||'Observación del motor sin detalle adicional publicado.';
+      }).join('; '),
     });
   }
   if(outsourcedTrips.length){
@@ -417,15 +392,15 @@ export function getDefaultComparisonKey(result){
 }
 
 export function getComparisonMetricDefinitions(){
-  return COMPARISON_METRICS.map(item=>({...item}));
+  return EXECUTIVE_KPIS.map(item=>({...item}));
 }
 
 export function compareScenarioMetric(result,referenceKey,metricKey){
-  const definition=COMPARISON_METRICS.find(item=>item.key===metricKey);
+  const definition=EXECUTIVE_KPIS.find(item=>item.key===metricKey);
   const selectedScenario=selected(result);
   const reference=result?.scenarios?.[referenceKey];
-  const selectedValue=finiteMetric(selectedScenario?.metrics?.[metricKey]);
-  const referenceValue=finiteMetric(reference?.metrics?.[metricKey]);
+  const selectedValue=getScenarioMetric(selectedScenario,metricKey);
+  const referenceValue=getScenarioMetric(reference,metricKey);
   const base={
     ...(definition||{key:metricKey,dimension:null,label:metricKey,format:'number',fallbackDirection:'lower_better'}),
     selectedValue,
@@ -446,20 +421,25 @@ export function compareScenarioMetric(result,referenceKey,metricKey){
   if(reference.feasible===false){
     return {...base,reason:'La referencia está marcada como no factible'};
   }
+  if(selectedScenario.feasible===false){
+    return {...base,reason:'La recomendación está marcada como no factible'};
+  }
 
   const absolute=selectedValue-referenceValue;
-  const percent=referenceValue===0?null:absolute/Math.abs(referenceValue);
+  if(!Number.isFinite(absolute))return {...base,reason:'La diferencia no puede representarse como un valor finito'};
+  const ratio=referenceValue===0?null:absolute/Math.abs(referenceValue);
+  const percent=Number.isFinite(ratio)?ratio:null;
   if(Math.abs(absolute)<1e-12){
     return {
       ...base,
       absolute:0,
-      percent:0,
+      percent:referenceValue===0?null:0,
       semantic:'same',
       semanticLabel:'Sin cambio',
     };
   }
 
-  const direction=result?.kpi_directions?.[metricKey]||base.fallbackDirection;
+  const direction=definition?.fallbackDirection||result?.kpi_directions?.[metricKey]||base.fallbackDirection;
   const improved=direction==='higher_better'?absolute>0:absolute<0;
   return {
     ...base,
@@ -472,7 +452,7 @@ export function compareScenarioMetric(result,referenceKey,metricKey){
 }
 
 export function getComparisonRows(result,referenceKey){
-  return COMPARISON_METRICS.map(metric=>compareScenarioMetric(result,referenceKey,metric.key));
+  return EXECUTIVE_KPIS.map(metric=>compareScenarioMetric(result,referenceKey,metric.key));
 }
 
 export function getComparisonContext(result,referenceKey){
@@ -491,6 +471,5 @@ export function getComparisonContext(result,referenceKey){
     samePlan:reference?sameAssignmentPlan(selectedScenario,reference):false,
     feasible:reference?.feasible!==false,
     rows:key?getComparisonRows(result,key):[],
-    priorities:getObjectiveWeights(result),
   };
 }

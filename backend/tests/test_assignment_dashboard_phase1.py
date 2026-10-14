@@ -20,6 +20,8 @@ class AssignmentDashboardPhase1Tests(unittest.TestCase):
         cls.selectors = (
             JS / "assignment-dashboard-selectors.mjs"
         ).read_text()
+        cls.toolbar = (JS / "dashboard-toolbar.mjs").read_text()
+        cls.toolbar_styles = (CSS / "dashboard-toolbar.css").read_text()
         cls.rail = (JS / "decision-nav.mjs").read_text()
         cls.scheduling = (
             JS / "scheduling-dashboard.mjs"
@@ -96,37 +98,32 @@ class AssignmentDashboardPhase1Tests(unittest.TestCase):
             "root.dataset.analysisDepth=depth.depth",
             self.shell,
         )
-        self.assertIn("data-depth-badge", self.shell)
+        self.assertIn("data-depth-badge", self.toolbar)
         self.assertNotIn("data-depth-toggle", self.shell)
         self.assertNotIn("data-analysis-depth-select", self.shell)
         self.assertNotIn("analysis_depth=", self.shell)
 
-    def test_toolbar_keeps_tools_and_moves_approval_to_validation(self):
-        self.assertIn(
-            "assignment-dashboard-v2__toolbar",
-            self.shell,
-        )
-        self.assertIn("data-export-menu", self.shell)
-        self.assertIn("data-more-menu", self.shell)
-        self.assertIn(
-            "assignment-dashboard-v2__approval",
-            self.shell,
-        )
-        self.assertIn("data-approve", self.shell)
-        self.assertIn(
-            "Dation IA no es requisito para aprobar.",
-            self.shell,
-        )
+    def test_toolbar_is_shared_and_approval_lives_only_there(self):
+        self.assertIn('renderDashboardToolbar(run,caseActions)',self.shell)
+        self.assertIn('renderDashboardToolbar(run,caseActions)',self.scheduling)
+        self.assertIn('data-export-menu',self.toolbar)
+        self.assertIn('data-more-menu',self.toolbar)
+        self.assertIn('data-approve-toolbar',self.toolbar)
+        self.assertNotIn('approvalMarkup',self.shell)
+        self.assertNotIn('data-approve',self.shell)
+        self.assertNotIn('data-rerun-validation',self.shell)
+        self.assertIn('await caseActions.onApprove()',self.toolbar)
+        self.assertNotIn('approveButton?.click()',self.toolbar)
 
     def test_export_reuses_existing_csv_and_json_helpers(self):
         self.assertIn(
             "exportDecision,exportDecisionJson",
-            self.shell,
+            self.toolbar,
         )
-        self.assertIn("exportDecision(result)", self.shell)
+        self.assertIn("exportDecision(run.result_json)", self.toolbar)
         self.assertIn(
-            "exportDecisionJson(result,run.id)",
-            self.shell,
+            "exportDecisionJson(run.result_json,run.id)",
+            self.toolbar,
         )
         export_source = (JS / "export.mjs").read_text()
         self.assertIn(
@@ -137,32 +134,27 @@ class AssignmentDashboardPhase1Tests(unittest.TestCase):
         self.assertNotIn("pdf", self.shell.lower())
 
     def test_rerun_returns_to_existing_handler_without_auto_execution(self):
-        self.assertIn("onRerun?.();", self.shell)
+        self.assertIn("onRerun?.();", self.toolbar)
         self.assertNotIn("post('/api/runs", self.shell)
         self.assertNotIn("execute()", self.shell)
 
     def test_execution_drawer_closes_with_button_escape_and_backdrop(self):
-        self.assertIn("data-run-drawer", self.shell)
-        self.assertIn("aria-modal=\"true\"", self.shell)
-        self.assertIn(
-            "backdrop?.addEventListener('click',closeDrawer)",
-            self.shell,
-        )
-        self.assertIn(
-            "closeButton?.addEventListener('click',closeDrawer)",
-            self.shell,
-        )
-        self.assertIn("event.key==='Escape'", self.shell)
-        self.assertIn("restoreFocus?.focus?.()", self.shell)
+        self.assertIn('data-run-drawer',self.toolbar)
+        self.assertIn('aria-modal="true"',self.toolbar)
+        self.assertIn("scope.listen(backdrop,'click'",self.toolbar)
+        self.assertIn("scope.listen(closeButton,'click'",self.toolbar)
+        self.assertIn("event.key==='Escape'",self.toolbar)
+        self.assertIn('restoreFocus?.focus',self.toolbar)
+        self.assertIn('scope.own(()=>closeDrawer({focus:false}))',self.toolbar)
 
     def test_review_and_approved_states_are_explicit(self):
         self.assertIn("review:{label:'En revisión'", self.selectors)
         self.assertIn("approved:{label:'Aprobada'", self.selectors)
-        self.assertIn("data-status-badge", self.shell)
-        self.assertIn("statusBadge.textContent='Aprobada'", self.shell)
-        self.assertIn("data-after-approve", self.shell)
+        self.assertIn("data-status-badge", self.toolbar)
+        self.assertIn("badge.textContent='Aprobada'", self.toolbar)
+        self.assertIn("data-after-approve", self.toolbar)
         self.assertNotIn("Continuar en el mapa", self.shell)
-        self.assertIn("bindDashboardActions", self.shell)
+        self.assertIn("bindDashboardActions", self.toolbar)
 
     def test_decision_case_rail_preserves_disabled_navigation_guard(self):
         self.assertIn("decisionRail(caseActions)", self.shell)
@@ -184,11 +176,11 @@ class AssignmentDashboardPhase1Tests(unittest.TestCase):
 
     def test_styles_are_scoped_responsive_and_focus_visible(self):
         self.assertIn(".assignment-dashboard-v2{", self.styles)
-        self.assertIn("@media(max-width:980px)", self.styles)
-        self.assertIn("@media(max-width:760px)", self.styles)
-        self.assertIn("@media(max-width:520px)", self.styles)
+        self.assertIn("@media(max-width:980px)", self.toolbar_styles)
+        self.assertIn("@media(max-width:760px)", self.toolbar_styles)
+        self.assertIn("@media(max-width:520px)", self.toolbar_styles)
         self.assertIn(":focus-visible", self.styles)
-        self.assertIn("prefers-reduced-motion", self.styles)
+        self.assertNotIn("transition:",self.toolbar_styles)
         self.assertIn(
             "ASSIGNMENT_STYLE_HREF='/static/css/assignment-dashboard-v2.css?v=assignment-dashboard-phase1'",
             self.dashboard,
