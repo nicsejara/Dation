@@ -1,7 +1,7 @@
 /* Data Pack: page composition, validation and its three owned drawers. */
 .dispatch-upload-pro { display:flex; flex-direction:column; gap:24px; min-width:0; max-width:1320px; margin:0 auto; padding:0 0 16px; color:var(--color-text); }
 .dispatch-upload-pro [hidden], .dispatch-upload-overlay[hidden] { display:none; }
-.dispatch-upload-pro :is(button,a,[tabindex]), .dispatch-pro-file-card { scroll-margin-block:100px var(--workflow-bar-space,180px); }
+.dispatch-upload-pro :is(button,a,summary,input,select,textarea,[tabindex]), .dispatch-pro-file-card { scroll-margin-block:160px var(--workflow-bar-space,180px); }
 .dispatch-upload-pro :focus-visible, .dispatch-upload-overlay :focus-visible { outline:3px solid var(--color-focus); outline-offset:3px; }
 .dispatch-upload-pro .dispatch-pro-icon, .dispatch-upload-overlay .dispatch-pro-icon { width:20px; height:20px; flex:0 0 auto; fill:none; stroke:currentColor; stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round; }
 .dispatch-pro-eyebrow { display:block; color:var(--color-text-muted); font-size:10px; font-weight:750; letter-spacing:.08em; text-transform:uppercase; }

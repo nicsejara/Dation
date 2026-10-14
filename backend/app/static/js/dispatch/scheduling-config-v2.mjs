@@ -354,7 +354,7 @@ function summaryBar(config,stats,slaAvailable){
 }
 
 function reviewDialog(config,stats,sourceRun){
-  return '<dialog class="dispatch dispatch-review d-config-dialog assignment-review-dialog scheduling-review" data-scheduling-review-dialog><form method="dialog">'
+  return '<dialog class="dispatch dispatch-review d-config-dialog assignment-review-dialog scheduling-review" data-scheduling-review-dialog aria-label="Revisar Scheduling antes de ejecutar"><form method="dialog">'
     +'<span class="assignment-section__eyebrow">ANTES DE EJECUTAR</span><h2>Revisar planificación</h2>'
     +'<div class="dispatch-review-summary scheduling-review-grid">'
       +'<p><strong>Entrada</strong><span>'+num(stats.totalTrips)+' viajes de Assignment · Run '+esc(formatRunId(sourceRun.id))+'</span></p>'

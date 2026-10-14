@@ -11,7 +11,7 @@ import {
 
 // Legacy source-only contract wording: "TU DECISION CASE". Visible UI now uses "DECISION CASE".
 const STYLE_ID="decision-map-case-v2-styles";
-const STYLE_HREF="/static/css/decision-map-case-v2.css?v=decision-map-case-v2";
+const STYLE_HREF="/static/css/decision-map-case-v2.css?v=dark-map-phase6-v1";
 let guideDrawer=null;
 
 function ensureDecisionMapStyles(){

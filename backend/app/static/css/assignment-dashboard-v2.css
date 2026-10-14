@@ -170,3 +170,8 @@
     width:calc(100vw - 24px);
   }
 }
+
+/* Narrow rails keep every decision and status readable without overlapping. */
+@media(max-width:760px) {
+  .assignment-dashboard-v2__rail .dispatch-decision-rail nav { grid-template-columns:minmax(0,1fr); }
+}

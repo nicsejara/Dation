@@ -17,7 +17,7 @@ class DecisionMapMicroPolishTests(unittest.TestCase):
             "font-size:16px",
             "font-weight:800",
             "transform:translateY(-2px)",
-            "box-shadow:0 17px 36px",
+            "box-shadow:var(--shadow-sm-dark)",
             "transform:translateX(3px)",
         ):
             self.assertIn(marker, CSS)
