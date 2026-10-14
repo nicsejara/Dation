@@ -2,7 +2,7 @@
 
 **Especificación de Fase 0, 14 de octubre de 2026.** La paleta y los contratos de este archivo son el destino de las fases 1–7; no están aplicados a producción. Baseline: `bcda3e55f80ec216711e428c9451ac6ef8d86756`.
 
-> Estado de implementación: la base dark, el shell, los botones y el contrato de heroes se aplican en [Fase 1](DATION_DARK_PHASE1_IMPLEMENTATION.md). Home y Overview se migran en [Fase 2](DATION_DARK_PHASE2_IMPLEMENTATION.md), con heroes compactos y retirada de la caja CTA final. Data Pack, workflow y dashboards siguen siendo el destino de las fases siguientes. El diagnóstico y baseline de este documento corresponden a Fase 0.
+> Estado de implementación: la base dark, el shell, los botones y el contrato de heroes se aplican en [Fase 1](DATION_DARK_PHASE1_IMPLEMENTATION.md). Home y Overview se migran en [Fase 2](DATION_DARK_PHASE2_IMPLEMENTATION.md), con heroes compactos y retirada de la caja CTA final. [Fase 3](DATION_DARK_PHASE3_IMPLEMENTATION.md) migra Data Pack, sus drawers, los contextos compartidos y una única Workflow Action Bar. Los formularios Config y dashboards siguen siendo el destino de las fases siguientes. El diagnóstico y baseline de este documento corresponden a Fase 0.
 
 Consultar los [wireframes](DATION_DARK_WIREFRAME_V1.md) y el [inventario](DATION_COMPONENT_INVENTORY_V1.md) para rutas, implementaciones y secuencia de migración.
 

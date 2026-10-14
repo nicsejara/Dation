@@ -457,7 +457,7 @@ function caseCardMarkup(decisionCase,presentations,orders,fleet,approved){
   const caseId=displayCaseId(fullId);
   const created=dateTime(decisionCase?.created_at);
   const pack=dataPackHealth(orders,fleet);
-  return '<details data-map-context class="dispatch-map-casebar dispatch-case-card" aria-label="Decision Case y Data Pack activo">'
+  return '<details data-map-context class="d-data-context dispatch-map-casebar dispatch-case-card" aria-label="Decision Case y Data Pack activo">'
     +'<summary class="dispatch-map-context-summary"><span>Decision Case <strong>'+esc(caseId)+'</strong></span><small>Data Pack activo · '+esc(pack.label)+'</small><span class="decision-context-chevron" aria-hidden="true">⌄</span></summary>'
     +'<div class="dispatch-case-card__top">'
       +'<div class="dispatch-case-identity">'

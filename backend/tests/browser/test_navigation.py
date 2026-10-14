@@ -1269,5 +1269,160 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.execution_bodies, [])
 
 
+    async def upload_reuse_pair(self):
+        for kind in ("orders", "fleet"):
+            card = self.page.locator(f"[data-kind={kind}]")
+            await card.locator("[data-mode=reuse]").click()
+            await card.get_by_role("button", name="Usar esta carga", exact=True).click()
+
+    async def test_data_pack_has_one_stable_dark_bar_across_responsive_reuse(self):
+        audit = (Path(__file__).parent / "theme_audit.js").read_text()
+        await self.page.emulate_media(reduced_motion="reduce", color_scheme="light")
+        await self.page.add_init_script("sessionStorage.clear()")
+        for width in (1440, 1280, 1024, 768, 390):
+            await self.page.set_viewport_size({"width": width, "height": 844})
+            await self.page.goto(f"http://127.0.0.1:{self.port}/app?view=logistics-data")
+            await self.page.locator("[data-kind=fleet] .dispatch-pro-dropzone").wait_for(state="visible")
+            bar = self.page.locator(".d-workflow-action-bar")
+            self.assertEqual(await bar.count(), 1)
+            self.assertEqual(await bar.locator("button").count(), 1)
+            self.assertTrue(await bar.locator("button").is_disabled())
+            await bar.evaluate("el=>window.__originalActionBar=el")
+            for ready in (False, True):
+                if ready:
+                    await self.upload_reuse_pair()
+                    await self.page.locator(".d-workflow-action-bar[data-state=ready]").wait_for(state="visible")
+                    self.assertFalse(await bar.locator("button").is_disabled())
+                    self.assertTrue(await bar.evaluate("el=>el===window.__originalActionBar"))
+                metrics = await self.page.evaluate(audit)
+                self.assertEqual(metrics["scheme"], "dark")
+                self.assertFalse(metrics["legacyBoundary"])
+                self.assertFalse(metrics["overflow"])
+                self.assertEqual(metrics["failures"], [])
+                await self.page.evaluate("scrollTo({top:0,behavior:'instant'})")
+                box = await bar.bounding_box()
+                self.assertAlmostEqual(box["y"] + box["height"], 828, delta=1)
+                if width >= 1280:
+                    self.assertGreaterEqual(box["height"], 76)
+                    self.assertLessEqual(box["height"], 88)
+                await self.page.evaluate("scrollTo({top:document.documentElement.scrollHeight,behavior:'instant'})")
+                if ready:
+                    last = self.page.locator("[data-kind=fleet] .dispatch-pro-validation-success summary")
+                    await last.focus()
+                    control, footer = await last.bounding_box(), await bar.bounding_box()
+                    self.assertLessEqual(control["y"] + control["height"], footer["y"])
+            self.assertNotIn(("POST", "/api/decision-cases"), self.requests)
+        self.assertEqual(self.execution_bodies, [])
+
+    async def test_data_pack_invalid_file_focus_busy_cancel_and_service_unavailable(self):
+        audit = (Path(__file__).parent / "theme_audit.js").read_text()
+        await self.page.emulate_media(reduced_motion="reduce")
+        await self.page.goto(f"http://127.0.0.1:{self.port}/app?view=logistics-data")
+        file = self.page.locator("[data-kind=orders] input[type=file]")
+        await file.wait_for(state="attached")
+        await file.set_input_files({"name":"bad.txt", "mimeType":"text/plain", "buffer":b"bad"})
+        bar = self.page.locator(".d-workflow-action-bar")
+        await self.page.locator(".d-workflow-action-bar[data-state=error]").wait_for(state="visible")
+        await bar.locator("button").click()
+        self.assertEqual(await self.page.evaluate("document.activeElement.dataset.kind"), "orders")
+        self.assertEqual(await self.page.evaluate("window.dationGetCurrentView()"), "logistics-data")
+        await self.page.get_by_role("button", name="Ver detalle", exact=True).first.click()
+        await self.page.locator(".dispatch-validation-drawer").wait_for(state="visible")
+        self.assertEqual((await self.page.evaluate(audit, ".dispatch-validation-drawer"))["failures"], [])
+        await self.page.keyboard.press("Escape")
+        started, release = asyncio.Event(), asyncio.Event()
+        async def validation(route):
+            started.set()
+            await release.wait()
+            try:
+                await route.fulfill(status=200, content_type="application/json", body=json.dumps({"valid":False,"errors":[],"counts":{"errors":1}}))
+            except Exception:
+                pass  # Cancellation aborts this owned synthetic request.
+        await self.context.route("**/api/datasets/validate**", validation)
+        await file.set_input_files({"name":"orders.csv", "mimeType":"text/csv", "buffer":b"order_id\n1"})
+        await asyncio.wait_for(started.wait(), 5)
+        await self.page.locator(".d-workflow-action-bar[data-state=validating]").wait_for(state="visible")
+        self.assertTrue(await bar.locator("button").is_disabled())
+        self.assertEqual(await bar.locator("button").get_attribute("aria-busy"), "true")
+        await bar.locator("button").dispatch_event("click")
+        await self.page.locator("[data-kind=orders] .dispatch-pro-progress button").click()
+        release.set()
+        await self.page.locator(".d-workflow-action-bar[data-state=pending]").wait_for(state="visible")
+        async def unavailable(route):
+            await route.fulfill(status=200, content_type="application/json", body=json.dumps({"available":False,"checks":[{"ok":False,"label":"Storage","detail":"No disponible"}]}))
+        await self.context.route("**/api/dispatch/status", unavailable)
+        await self.page.reload()
+        await self.page.locator(".dispatch-system-banner").wait_for(state="visible")
+        await self.page.locator(".dispatch-system-banner summary").click()
+        self.assertTrue(await bar.locator("button").is_disabled())
+        self.assertIn("Servicio no disponible", await bar.inner_text())
+        self.assertEqual((await self.page.evaluate(audit))["failures"], [])
+        self.assertNotIn(("POST", "/api/decision-cases"), self.requests)
+        self.assertEqual(self.execution_bodies, [])
+
+    async def test_data_pack_relation_error_recovers_to_ready_with_optional_warnings(self):
+        audit = (Path(__file__).parent / "theme_audit.js").read_text()
+        self.f["preflight"]["errors"] = [{"code":"UNKNOWN_CURRENT_VEHICLE", "detail":"Vehículo no encontrado"}]
+        profile = self.f["datasets"]["orders"]["profile_json"]
+        profile["counts"]["warnings"] = 1
+        profile["warnings"] = [{"code":"EXTRA_COLUMN", "message":"Columna opcional adicional"}]
+        await self.page.emulate_media(reduced_motion="reduce")
+        await self.page.goto(f"http://127.0.0.1:{self.port}/app?view=logistics-data")
+        await self.page.locator("[data-kind=fleet] input[type=file]").wait_for(state="attached")
+        await self.upload_reuse_pair()
+        await self.page.locator(".d-workflow-action-bar[data-state=error]").wait_for(state="visible")
+        await self.page.locator(".dispatch-pro-compatibility button").click()
+        await self.page.locator(".dispatch-validation-drawer").wait_for(state="visible")
+        self.assertEqual((await self.page.evaluate(audit, ".dispatch-validation-drawer"))["failures"], [])
+        await self.page.keyboard.press("Escape")
+        self.f["preflight"]["errors"] = []
+        await self.page.locator("[data-kind=fleet] .dispatch-pro-file-actions .is-danger").click()
+        fleet = self.page.locator("[data-kind=fleet]")
+        await fleet.locator("[data-mode=reuse]").click()
+        await fleet.get_by_role("button", name="Usar esta carga", exact=True).click()
+        await self.page.locator(".d-workflow-action-bar[data-state=ready]").wait_for(state="visible")
+        self.assertFalse(await self.page.locator(".dispatch-pro-next-button").is_disabled())
+        self.assertIn("con avisos", await self.page.locator(".d-workflow-action-bar").inner_text())
+        self.assertEqual((await self.page.evaluate(audit))["failures"], [])
+        await fleet.locator("[data-mode=reuse]").click()
+        await fleet.locator(".dispatch-pro-view-all").click()
+        drawer = self.page.locator(".dispatch-previous-drawer")
+        await drawer.wait_for(state="visible")
+        self.assertEqual((await self.page.evaluate(audit, ".dispatch-previous-drawer"))["failures"], [])
+        self.assertEqual(await drawer.get_attribute("aria-labelledby"), "dispatch-previous-title")
+        await self.page.keyboard.press("Escape")
+        self.assertTrue(await fleet.locator(".dispatch-pro-view-all").evaluate("el=>el===document.activeElement"))
+        self.assertNotIn(("POST", "/api/decision-cases"), self.requests)
+
+    async def test_data_pack_context_is_dark_with_native_disclosure_in_map_and_configs(self):
+        audit = (Path(__file__).parent / "theme_audit.js").read_text()
+        await self.page.emulate_media(reduced_motion="reduce")
+        for width in (1440, 1280, 1024, 768, 390):
+            await self.page.set_viewport_size({"width":width,"height":1000})
+            for view, node in (("logistics-map", None), ("logistics-config", "logistics_assignment"), ("logistics-config", "logistics_scheduling")):
+                await self.open(view, node)
+                context = self.page.locator(".d-data-context")
+                self.assertFalse(await context.evaluate("el=>el.open"))
+                summary = context.locator("summary")
+                await summary.focus()
+                await self.page.keyboard.press("Enter")
+                metrics = await self.page.evaluate(audit, ".d-data-context")
+                self.assertEqual(metrics["scheme"], "dark")
+                self.assertEqual(metrics["failures"], [])
+                self.assertFalse(metrics["overflow"])
+                copy = context.locator('button[aria-label="Copiar ID completo del caso"]')
+                await copy.focus()
+                self.assertEqual(await copy.evaluate("el=>getComputedStyle(el).outlineColor"), "rgb(57, 188, 192)")
+                if view == "logistics-map":
+                    await context.locator("[data-map-columns=orders]").click()
+                    await self.page.locator(".dispatch-guide").wait_for(state="visible")
+                    self.assertEqual((await self.page.evaluate(audit, ".dispatch-guide"))["failures"], [])
+                    await self.page.keyboard.press("Escape")
+                await summary.focus()
+                await self.page.keyboard.press("Space")
+                self.assertFalse(await context.evaluate("el=>el.open"))
+        self.assertEqual(self.execution_bodies, [])
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

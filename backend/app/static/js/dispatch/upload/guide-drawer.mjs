@@ -43,7 +43,7 @@ export function createGuideDrawer(contracts, scope) {
     .querySelectorAll(".dispatch-guide-overlay")
     .forEach((node) => node.remove());
 
-  const overlay = el("div", null, "dispatch-guide-overlay");
+  const overlay = el("div", null, "dispatch-guide-overlay dispatch-upload-overlay");
   overlay.hidden = true;
 
   const drawer = el("aside", null, "dispatch-guide dispatch-pro-guide");
@@ -90,6 +90,9 @@ export function createGuideDrawer(contracts, scope) {
     content.append(intro);
 
     const wrap = el("div", null, "dispatch-table-wrap");
+    wrap.tabIndex = 0;
+    wrap.setAttribute("role", "region");
+    wrap.setAttribute("aria-label", "Columnas del archivo");
     const table = document.createElement("table");
     table.className = "dispatch-pro-columns-table";
     const thead = document.createElement("thead");

@@ -1,5 +1,5 @@
-() => {
-  const view = document.querySelector('.view.is-active');
+(selector = '.view.is-active') => {
+  const view = document.querySelector(selector || '.view.is-active');
   const rgb = value => {
     const found = value.match(/^rgba?\(([^)]+)\)$/);
     if (!found) throw Error('Unsupported computed color: '+value);
@@ -49,9 +49,9 @@
   }
   const hero=view.querySelector('.d-page-hero');
   const geometry=el=>{const b=el.getBoundingClientRect();return {x:b.x,y:b.y,width:b.width,height:b.height,right:b.right,bottom:b.bottom};};
-  return {textCount:count,minimumContrast:minimum,failures,hero:geometry(hero),
+  return {textCount:count,minimumContrast:minimum,failures,hero:hero?geometry(hero):null,
     overflow:document.documentElement.scrollWidth>innerWidth,
     legacyBoundary:!!view.closest('[data-dation-surface="legacy-light"]'),
     scheme:getComputedStyle(view).colorScheme,
-    cards:[...view.querySelectorAll('.d-home__asset,.dda-landing__section,.dda-landing__step,.dda-landing__node,.dda-landing__summary-card,.dda-landing__faq-grid details')].map(el=>({background:getComputedStyle(el).backgroundColor,...geometry(el)}))};
+    cards:[...view.querySelectorAll('.d-home__asset,.dda-landing__section,.dda-landing__step,.dda-landing__node,.dda-landing__summary-card,.dda-landing__faq-grid details,.dispatch-pro-file-card,.dispatch-pro-validation-row,.dispatch-pro-inline-library-row,.d-workflow-action-bar')].map(el=>({background:getComputedStyle(el).backgroundColor,...geometry(el)}))};
 }

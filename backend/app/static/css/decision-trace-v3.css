@@ -61,8 +61,8 @@
   overflow:hidden;
   border:1px solid var(--case-line);
   border-radius:24px;
-  background:#fff;
-  box-shadow:0 12px 34px rgba(18,48,60,.06);
+  background:var(--d-surface-1);
+  box-shadow:var(--shadow-sm-dark);
 }
 .assignment-config-root .assignment-case-strip__identity{
   grid-area:identity;
@@ -78,14 +78,14 @@
   place-items:center;
   border-radius:14px;
   color:var(--case-fleet);
-  background:rgba(19,125,131,.10);
+  background:var(--d-surface-2);
 }
 .assignment-config-root .assignment-case-strip__identity .dispatch-case-identity__icon .dispatch-map-icon{
   width:21px;
   height:21px;
 }
 .assignment-config-root .assignment-case-strip__eyebrow{
-  color:#617680;
+  color:var(--d-text-muted);
   font-size:12px;
   font-weight:850;
   letter-spacing:.08em;
@@ -104,10 +104,10 @@
 .assignment-config-root .assignment-case-strip .dispatch-case-identity__idrow>button{
   width:36px;
   height:36px;
-  border:1px solid #d3dfe3;
+  border:1px solid var(--d-border-control);
   border-radius:10px;
-  color:#56717d;
-  background:#fff;
+  color:var(--d-text-primary);
+  background:var(--d-surface-2);
 }
 .assignment-config-root .assignment-case-strip .dispatch-case-identity__idrow::after{
   content:"En curso";
@@ -115,10 +115,10 @@
   min-height:32px;
   align-items:center;
   padding:0 10px;
-  border:1px solid #b6ddd9;
+  border:1px solid var(--d-border);
   border-radius:999px;
   color:var(--case-success);
-  background:#edf9f7;
+  background:var(--d-surface-1);
   font-size:13px;
   font-weight:800;
 }
@@ -126,7 +126,7 @@
   content:"Todo lo que decidas queda registrado en este caso.";
   display:block;
   margin-top:7px;
-  color:#3f5965;
+  color:var(--d-text-primary);
   font-size:13px;
   font-weight:700;
   line-height:1.45;
@@ -152,7 +152,7 @@
   align-items:stretch;
   min-width:0;
   padding:18px 26px 24px;
-  border-top:1px solid #e7edef;
+  border-top:1px solid var(--d-border);
 }
 .assignment-config-root .assignment-case-strip__pack-title{
   grid-column:1/-1;
@@ -164,7 +164,7 @@
   white-space:normal;
 }
 .assignment-config-root .assignment-case-strip__pack-title span{
-  color:#617680;
+  color:var(--d-text-primary);
   font-size:12px;
   font-weight:850;
   letter-spacing:.08em;
@@ -175,10 +175,10 @@
   min-height:29px;
   align-items:center;
   padding:0 9px;
-  border:1px solid #bee4d2;
+  border:1px solid var(--d-border);
   border-radius:999px;
-  color:#087a4b;
-  background:#ecf8f2;
+  color:var(--d-text-primary);
+  background:var(--d-surface-1);
   font-size:12px;
   font-weight:800;
   letter-spacing:0;
@@ -188,9 +188,9 @@
   grid-template-columns:44px minmax(0,1fr)!important;
   gap:12px!important;
   padding:16px 18px!important;
-  border:1px solid #e0e8eb!important;
+  border:1px solid var(--d-border)!important;
   border-radius:16px!important;
-  background:#fbfcfd!important;
+  background:var(--d-surface-2)!important;
 }
 .assignment-config-root .assignment-case-file::after{
   content:"✓  Validado";
@@ -201,10 +201,10 @@
   min-height:28px;
   align-items:center;
   padding:0 8px;
-  border:1px solid #bee4d2;
+  border:1px solid var(--d-border);
   border-radius:999px;
-  color:#087a4b;
-  background:#ecf8f2;
+  color:var(--d-text-primary);
+  background:var(--d-surface-2);
   font-size:11px;
   font-weight:800;
 }

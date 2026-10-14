@@ -8,7 +8,7 @@ def test_decision_summary_reuses_case_visual_language():
     assert ".assignment-config-root .assignment-case-strip" in CSS
     assert 'grid-template-areas:"identity action" "pack pack"' in CSS
     assert ".assignment-config-root .assignment-case-strip__pack" in CSS
-    assert "border-top:1px solid #e7edef" in CSS
+    assert "border-top:1px solid var(--d-border)" in CSS
     assert 'content:"✓  2 archivos · Datos validados"' in CSS
     assert 'content:"✓  Validado"' in CSS
 
