@@ -1,3 +1,4 @@
+import {iconSvg} from "./decision-ui.mjs";
 import {createScope} from "./lifecycle.mjs";
 import {esc,api,post,errorBox} from './shared.mjs';
 
@@ -126,7 +127,7 @@ export function render(root,run){
       +'<div><span class="dispatch-kicker">DATION IA · '+esc(meta.label.toUpperCase())+'</span>'
       +'<h2>Explicar los eventos de la decisión</h2>'
       +'<p>'+esc(meta.description)+' La IA no recalcula ni modifica el resultado.</p></div>'
-      +'<button data-explain class="dispatch-ai-primary">✦ Generar explicación</button>'
+      +'<button data-explain class="dispatch-ai-primary">'+iconSvg("sparkles","dispatch-action-icon")+'<span>Generar explicación</span></button>'
     +'</div>'
     +'<div class="dispatch-ai-response" data-response aria-live="polite">'
       +'<div class="dispatch-ai-empty"><strong>Todavía no generamos la explicación.</strong><span>Podés generar un resumen causal o abrir una pregunta puntual.</span></div>'
@@ -148,17 +149,17 @@ export function render(root,run){
 
   button.onclick=async()=>{
     button.disabled=true;
-    const original=button.textContent;
-    button.textContent='Analizando evidencia…';
+    const original=button.innerHTML;
+    button.innerHTML=iconSvg('clock','dispatch-action-icon')+'<span>Analizando evidencia…</span>';
     response.innerHTML='<div class="dispatch-ai-loading"><span></span><p>Identificando eventos, causas modeladas y puntos que requieren revisión…</p></div>';
     try{
       show(await post('/api/runs/'+run.id+'/explain',undefined,{signal:scope.signal}));
       if(!scope.active)return;
-      button.textContent='↻ Regenerar explicación';
+      button.innerHTML=iconSvg('refresh','dispatch-action-icon')+'<span>Regenerar explicación</span>';
     }catch(error){
       if(!scope.active)return;
       errorBox(response,error,()=>button.click());
-      button.textContent=original;
+      button.innerHTML=original;
     }finally{
       if(!scope.active)return;
       button.disabled=false;
@@ -184,7 +185,7 @@ export function render(root,run){
           notice.textContent='Esta interpretación corresponde a la corrida original. Ya hay nueva evidencia comparativa; generá una interpretación enriquecida para incluirla.';
           response.prepend(notice);
         }
-        button.textContent='↻ Regenerar explicación';
+        button.innerHTML=iconSvg('refresh','dispatch-action-icon')+'<span>Regenerar explicación</span>';
       }
     })
     .catch(()=>{});
@@ -200,9 +201,9 @@ export function chat(root,run,initialQuestion=''){
     '<div class="dispatch-chat-heading">'
       +'<div><span class="dispatch-kicker">DATION IA</span><h2>'+esc(meta.title)+'</h2>'
       +'<small class="dispatch-chat-context">Contexto · '+esc(meta.label)+' · corrida '+esc(String(run.id).slice(0,8))+'…</small></div>'
-      +'<button data-close class="dispatch-chat-close" aria-label="Cerrar chat">×</button>'
+      +'<button data-close class="dispatch-chat-close" aria-label="Cerrar chat">'+iconSvg("x","dispatch-action-icon")+'</button>'
     +'</div>'
-    +'<div class="dispatch-chat-boundary"><span>✦</span><p>'+esc(meta.description)+' Si una causa no está demostrada por la evidencia, Dation lo indica explícitamente.</p></div>'
+    +'<div class="dispatch-chat-boundary">'+iconSvg("sparkles","dispatch-action-icon")+'<p>'+esc(meta.description)+' Si una causa no está demostrada por la evidencia, Dation lo indica explícitamente.</p></div>'
     +'<div class="dispatch-chat-starters">'
       +questions.map(question=>'<button type="button" data-starter="'+esc(question)+'">'+esc(question)+'</button>').join('')
     +'</div>'
@@ -210,16 +211,19 @@ export function chat(root,run,initialQuestion=''){
     +'<div class="dispatch-chat-thread" data-messages role="log" aria-live="polite"></div>'
     +'<form class="dispatch-chat-composer">'
       +'<textarea required minlength="2" maxlength="2000" rows="3" placeholder="'+esc(meta.placeholder)+'" aria-label="Pregunta para Dation"></textarea>'
-      +'<div><small>Enter para enviar · Shift+Enter para nueva línea</small><button type="submit">Enviar ↑</button></div>'
+      +'<div><small>Enter para enviar · Shift+Enter para nueva línea</small><button type="submit"><span>Enviar</span>'+iconSvg("arrowUp","dispatch-action-icon")+'</button></div>'
     +'</form>';
 
-  root.querySelector('[data-close]').onclick=()=>{
+  const closeChat=()=>{
     scope.dispose();
     root.hidden=true;
-    const dashboard=root.closest('.dispatch-dashboard');
+    const dashboard=root.closest('.d-decision-dashboard');
     dashboard?.classList.remove('with-chat');
-    dashboard?.querySelector('[data-chat]')?.setAttribute('aria-expanded','false');
+    const toggle=dashboard?.querySelector('[data-chat]');
+    toggle?.setAttribute('aria-expanded','false');toggle?.focus({preventScroll:true});
   };
+  root.querySelector('[data-close]').onclick=closeChat;
+  scope.listen(root,'keydown',event=>{if(event.key==='Escape'){event.preventDefault();event.stopPropagation();closeChat();}});
 
   const messages=root.querySelector('[data-messages]');
   const field=root.querySelector('textarea');

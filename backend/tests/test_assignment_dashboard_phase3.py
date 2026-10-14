@@ -81,7 +81,7 @@ class AssignmentDashboardPhase3Tests(unittest.TestCase):
         widget=(JS/'comparative-upgrade.mjs').read_text()
         self.assertIn("assignment-comparative-summary.mjs",widget)
         self.assertIn("assignment-comparison.mjs",widget)
-        self.assertIn("assignment-dashboard-comparative.css?v=assignment-dashboard-phase3", self.dashboard)
+        self.assertIn("assignment-dashboard-comparative.css", self.dashboard)
 
     def test_comparison_is_quantitative_without_narrative_or_reference_trip_reconstruction(self):
         for label in ('Misma distribución','Referencia no factible'):

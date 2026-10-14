@@ -1,14 +1,12 @@
+import {iconSvg} from "./decision-ui.mjs";
 import {createScope,trapFocus} from './lifecycle.mjs';
 import {api,esc,download} from './shared.mjs';
 import {bindDashboardActions} from './dashboard-actions.mjs';
 import {decisionStatusUi,shortRunId,solverStatusLabel} from './assignment-dashboard-selectors.mjs';
 import {exportDecision,exportDecisionJson} from './export.mjs';
 
-function ensureStyles(){
-  if(document.getElementById('dashboard-toolbar-styles'))return;
-  const link=document.createElement('link');link.id='dashboard-toolbar-styles';link.rel='stylesheet';
-  link.href='/static/css/dashboard-toolbar.css';document.head.append(link);
-}
+const icon=name=>iconSvg(name,"dashboard-toolbar__icon");
+const actionLabel=(text,name)=>icon(name)+'<span>'+esc(text)+'</span>';
 
 function detailRows(run,caseActions,scheduling){
   const result=run.result_json||{},metrics=result.scenarios?.selected?.metrics||{},solver=result.engine?.solver||{};
@@ -28,7 +26,6 @@ function detailRows(run,caseActions,scheduling){
 }
 
 export function renderDashboardToolbar(run,caseActions={}){
-  ensureStyles();
   const scheduling=run.result_json?.schema_version==='scheduling_v1';
   const status=decisionStatusUi(caseActions.status);
   const title=scheduling?'Planificación de despachos':'Asignación de carga';
@@ -41,37 +38,70 @@ export function renderDashboardToolbar(run,caseActions={}){
         +'<span class="dashboard-toolbar__badge '+esc(status.className)+'" data-status-badge>'+esc(status.label)+'</span></div>'
       +'<small>Corrida '+esc(shortRunId(run.id))+'</small></div>'
     +'<div class="dashboard-toolbar__tools" aria-label="Herramientas de la decisión">'
-      +(caseActions.onApprove?'<button type="button" data-approve-toolbar class="dashboard-toolbar__approve" '+(caseActions.status==='approved'?'hidden':'')+'>'+approveLabel+'</button>':'')
-      +'<button type="button" data-after-approve class="dashboard-toolbar__continue" hidden>Continuar con la siguiente decisión →</button>'
-      +(caseActions.onMap?'<button type="button" data-dashboard-map class="dashboard-toolbar__map">Decision Map</button>':'')
-      +'<details class="dashboard-toolbar__menu" data-export-menu><summary>Exportar <span aria-hidden="true">⌄</span></summary>'
+      +(caseActions.onApprove?'<button type="button" data-approve-toolbar class="dashboard-toolbar__approve" '+(caseActions.status==='approved'?'hidden':'')+'>'+actionLabel(approveLabel,'check')+'</button>':'')
+      +'<button type="button" data-after-approve class="dashboard-toolbar__continue" hidden>'+actionLabel("Continuar con la siguiente decisión","arrowRight")+'</button>'
+      +(caseActions.onMap?'<button type="button" data-dashboard-map class="dashboard-toolbar__map">'+actionLabel("Decision Map","map")+'</button>':'')
+      +'<details class="dashboard-toolbar__menu" data-export-menu><summary aria-expanded="false">'+icon("download")+'<span>Exportar</span>'+icon("chevronDown")+'</summary>'
         +'<div class="dashboard-toolbar__menu-panel">'
-          +'<button type="button" data-export-csv><span aria-hidden="true">↓</span><div><strong>'+(scheduling?'Planificación CSV':'Asignación CSV')+'</strong><small>'+(scheduling?'Viajes, fechas y cargas':'Viajes, vehículos, órdenes y cargas')+'</small></div></button>'
-          +'<button type="button" data-export-json><span aria-hidden="true">{ }</span><div><strong>JSON técnico</strong><small>Resultado completo de la corrida</small></div></button>'
+          +'<button type="button" data-export-csv>'+icon("download")+'<div><strong>'+(scheduling?'Planificación CSV':'Asignación CSV')+'</strong><small>'+(scheduling?'Viajes, fechas y cargas':'Viajes, vehículos, órdenes y cargas')+'</small></div></button>'
+          +'<button type="button" data-export-json>'+icon("fileJson")+'<div><strong>JSON técnico</strong><small>Resultado completo de la corrida</small></div></button>'
         +'</div></details>'
-      +'<details class="dashboard-toolbar__menu" data-more-menu><summary>Más <span aria-hidden="true">···</span></summary>'
+      +'<details class="dashboard-toolbar__menu" data-more-menu><summary aria-expanded="false">'+icon("moreHorizontal")+'<span>Más</span>'+icon("chevronDown")+'</summary>'
         +'<div class="dashboard-toolbar__menu-panel">'
-          +'<button type="button" data-rerun><span aria-hidden="true">↻</span><div><strong>Nueva corrida</strong><small>'+(scheduling?'Misma Assignment aprobada, otra configuración temporal':'Mismos datos, otra configuración')+'</small></div></button>'
-          +'<button type="button" data-new-decision><span aria-hidden="true">＋</span><div><strong>Nueva decisión</strong><small>Cargar otros datos y crear un nuevo Decision Case</small></div></button>'
-          +'<button type="button" data-run-details aria-haspopup="dialog" aria-controls="'+drawerId+'"><span aria-hidden="true">i</span><div><strong>Detalles de ejecución</strong><small>Motor, solver, archivos y huella</small></div></button>'
+          +'<button type="button" data-rerun>'+icon("refresh")+'<div><strong>Nueva corrida</strong><small>'+(scheduling?'Misma Assignment aprobada, otra configuración temporal':'Mismos datos, otra configuración')+'</small></div></button>'
+          +'<button type="button" data-new-decision>'+icon("plus")+'<div><strong>Nueva decisión</strong><small>Cargar otros datos y crear un nuevo Decision Case</small></div></button>'
+          +'<button type="button" data-run-details aria-haspopup="dialog" aria-controls="'+drawerId+'">'+icon("info")+'<div><strong>Detalles de ejecución</strong><small>Motor, solver, archivos y huella</small></div></button>'
         +'</div></details>'
     +'</div><p class="dashboard-toolbar__status" data-next-decision-status role="status"></p>'
     +'<p class="dashboard-toolbar__error" data-approval-error role="alert" hidden></p></header>';
   const drawer='<div class="dashboard-toolbar__backdrop" data-run-drawer-backdrop hidden></div>'
     +'<aside class="dashboard-toolbar__drawer" data-run-drawer id="'+drawerId+'" hidden role="dialog" aria-modal="true" aria-labelledby="'+drawerId+'-title">'
       +'<header><div><span class="dashboard-toolbar__eyebrow">TRAZABILIDAD TÉCNICA</span><h2 id="'+drawerId+'-title">Detalles de ejecución</h2>'
-        +'<p>Información persistida de esta corrida.</p></div><button type="button" data-close-drawer aria-label="Cerrar detalles de ejecución">×</button></header>'
+        +'<p>Información persistida de esta corrida.</p></div><button type="button" data-close-drawer aria-label="Cerrar detalles de ejecución">'+icon("x")+'</button></header>'
       +'<dl class="dashboard-toolbar__details">'+rows.map(([key,value])=>'<div><dt>'+esc(key)+'</dt><dd>'+esc(value??'—')+'</dd></div>').join('')+'</dl>'
       +'<div class="dashboard-toolbar__ai-runtime"><span>Servicio de IA</span><strong data-ai-details>Consultando…</strong></div></aside>';
   return {toolbar,drawer};
 }
 
 export function bindDashboardToolbar(root,run,{onRerun,caseActions={}}={}){
-  const scope=createScope(root.querySelector('[data-dashboard-toolbar]'));
+  const toolbar=root.querySelector('[data-dashboard-toolbar]');
+  const scope=createScope(toolbar);
   const drawer=root.querySelector('[data-run-drawer]'),backdrop=root.querySelector('[data-run-drawer-backdrop]');
   const closeButton=drawer.querySelector('[data-close-drawer]');
   let restoreFocus=null,pendingApproval=false;
-  const closeMenus=()=>root.querySelectorAll('.dashboard-toolbar__menu[open]').forEach(menu=>menu.open=false);
+  const menus=[...toolbar.querySelectorAll('.dashboard-toolbar__menu')];
+  const closeMenus=(except=null)=>menus.forEach(menu=>{
+    if(menu!==except)menu.open=false;
+    menu.querySelector('summary').setAttribute('aria-expanded',String(menu.open));
+  });
+  function positionMenu(menu){
+    if(!menu.open)return;
+    const panel=menu.querySelector('.dashboard-toolbar__menu-panel');
+    const anchor=menu.getBoundingClientRect(),width=Math.min(300,innerWidth-32);
+    const left=Math.max(16,Math.min(innerWidth-width-16,anchor.right-width));
+    const below=innerHeight-anchor.bottom-24,above=anchor.top-24;
+    const up=below<180&&above>below,space=Math.max(80,up?above:below);
+    panel.style.width=width+'px';panel.style.maxHeight=space+'px';
+    panel.style.left=(left-anchor.left)+'px';panel.style.right='auto';
+    const height=Math.min(panel.scrollHeight,space);
+    panel.style.top=(up?-height-8:anchor.height+8)+'px';
+  }
+  for(const menu of menus){
+    const summary=menu.querySelector('summary');
+    scope.listen(summary,'click',event=>{
+      event.preventDefault();const open=!menu.open;closeMenus();menu.open=open;
+      summary.setAttribute('aria-expanded',String(open));positionMenu(menu);
+    });
+    scope.listen(menu,'toggle',()=>{if(menu.open){closeMenus(menu);positionMenu(menu);}else summary.setAttribute('aria-expanded','false');});
+  }
+  scope.listen(document,'click',event=>{if(!toolbar.contains(event.target))closeMenus();});
+  const positionOpen=()=>menus.forEach(positionMenu);
+  scope.listen(window,'resize',positionOpen);
+  scope.listen(window,'scroll',positionOpen,{passive:true});
+  const topbar=document.querySelector('.topbar');
+  const measure=()=>{toolbar.style.setProperty('--dashboard-toolbar-top',Math.ceil(topbar?.getBoundingClientRect().height||76)+'px');positionOpen();};
+  if(topbar&&typeof ResizeObserver!=='undefined')scope.observe(new ResizeObserver(measure),topbar);
+  measure();
   function closeDrawer({focus=true}={}){
     if(drawer.hidden)return;
     drawer.hidden=true;backdrop.hidden=true;document.body.classList.remove('dashboard-drawer-open');
@@ -107,7 +137,7 @@ export function bindDashboardToolbar(root,run,{onRerun,caseActions={}}={}){
   function exportFile(event,handler){
     const button=event.currentTarget,original=button.innerHTML;
     closeMenus();button.disabled=true;button.textContent='Preparando archivo…';
-    try{handler();button.textContent='✓ Exportado';}
+    try{handler();button.innerHTML=actionLabel('Exportado','check');}
     catch{button.textContent='No se pudo exportar';}
     scope.timeout(()=>{button.innerHTML=original;button.disabled=false;},1200);
   }
@@ -122,7 +152,7 @@ export function bindDashboardToolbar(root,run,{onRerun,caseActions={}}={}){
   async function approve(){
     if(pendingApproval||!caseActions.onApprove||!scope.active)return;
     pendingApproval=true;approveButton.disabled=true;errorBox.hidden=true;
-    const label=approveButton.textContent;approveButton.textContent='Aprobando…';
+    const label=approveButton.innerHTML;approveButton.innerHTML=actionLabel('Aprobando…','clock');
     try{
       await caseActions.onApprove();
       if(!scope.active)return;
@@ -130,7 +160,7 @@ export function bindDashboardToolbar(root,run,{onRerun,caseActions={}}={}){
       approveButton.hidden=true;
       caseActions.onApprovalComplete?.();await actions.refresh();
     }catch(error){
-      if(scope.active){approveButton.textContent=label;approveButton.disabled=false;errorBox.textContent=error.message||'No se pudo aprobar la decisión.';errorBox.hidden=false;}
+      if(scope.active){approveButton.innerHTML=label;approveButton.disabled=false;errorBox.textContent=error.message||'No se pudo aprobar la decisión.';errorBox.hidden=false;}
     }finally{pendingApproval=false;}
   }
   if(approveButton)scope.listen(approveButton,'click',approve);

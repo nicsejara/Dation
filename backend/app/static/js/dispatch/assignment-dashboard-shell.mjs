@@ -1,3 +1,4 @@
+import {iconSvg} from "./decision-ui.mjs";
 import {scopeFor} from './lifecycle.mjs';
 import {decisionRail,bindDecisionRail} from './decision-nav.mjs';
 import {analysisDepthUi} from './assignment-dashboard-selectors.mjs';
@@ -6,7 +7,7 @@ import {renderDashboardToolbar,bindDashboardToolbar} from './dashboard-toolbar.m
 export function renderAssignmentShell(root,run,caseActions={}){
   const depth=analysisDepthUi(run);
   const {toolbar,drawer}=renderDashboardToolbar(run,caseActions);
-  root.className='dispatch assignment-dashboard-v2';root.dataset.analysisDepth=depth.depth;
+  root.className='dispatch assignment-dashboard-v2 d-decision-dashboard';root.dataset.analysisDepth=depth.depth;
   root.innerHTML=toolbar
     +'<div class="assignment-dashboard-v2__rail">'+decisionRail(caseActions)+'</div>'
     +'<main class="assignment-dashboard-v2__main">'
@@ -16,7 +17,7 @@ export function renderAssignmentShell(root,run,caseActions={}){
       +'<section class="dispatch-panel assignment-dashboard-v2__section assignment-comparative-layer" id="dispatch-comparative"></section>'
       +'<section class="dispatch-panel assignment-dashboard-v2__section assignment-dashboard-v2__ai" id="dispatch-explanation"></section>'
     +'</main>'
-    +'<button type="button" class="dispatch-ai-fab assignment-dashboard-v2__ai-fab" data-chat aria-expanded="false" aria-label="Abrir Dation IA"><span>✦</span><strong>Dation IA</strong></button>'
+    +'<button type="button" class="dispatch-ai-fab assignment-dashboard-v2__ai-fab" data-chat aria-expanded="false" aria-label="Abrir Dation IA">'+iconSvg("sparkles","dispatch-action-icon")+'<strong>Dation IA</strong></button>'
     +'<aside class="dispatch-chat dispatch-panel assignment-dashboard-v2__chat" hidden aria-label="Chat de la decisión"></aside>'
     +drawer;
   return {

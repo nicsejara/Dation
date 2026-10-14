@@ -1,3 +1,4 @@
+import {chartPalette,themedChartOptions} from "./chart-theme.mjs";
 import {scopeFor} from "./lifecycle.mjs";
 export const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const num=(v,d=0)=>v==null?'—':new Intl.NumberFormat('es-AR',{maximumFractionDigits:d}).format(v);
@@ -27,5 +28,26 @@ export function download(name,content,type='application/json'){
 }
 export function csv(rows){return '\ufeff'+rows.map(row=>row.map(x=>{let s=String(x??'');if(/^[=+@\-]/.test(s))s="'"+s;return '"'+s.replaceAll('"','""')+'"';}).join(';')).join('\r\n');}
 export function errorBox(root,error,retry){root.replaceChildren();const p=document.createElement('p');p.className='dispatch-alert';p.textContent=error.message;root.append(p);if(retry){const b=document.createElement('button');b.textContent='Reintentar';b.onclick=retry;root.append(b);}}
-export function chart(root,options){if(!window.DationCharts){root.textContent='El gráfico no está disponible. Consultá la tabla de esta sección.';return null;}const c=window.DationCharts.init(root,null,{renderer:'svg'});c.setOption({...options,textStyle:{fontFamily:'inherit',fontSize:12},aria:{enabled:true}});const observer=new ResizeObserver(()=>c.resize());observer.observe(root);let disposed=false;root._dispose=()=>{if(disposed)return;disposed=true;observer.disconnect();c.dispose();};scopeFor(root)?.own(root._dispose);return c;}
+export function chart(root,options){
+  if(!window.DationCharts){root.textContent='El gráfico no está disponible. Consultá la tabla de esta sección.';return null;}
+  root._dispose?.();
+  const palette=chartPalette(root);
+  const c=window.DationCharts.init(root,{color:palette.series,textStyle:{color:palette.text}},{renderer:'svg'});
+  c.setOption(themedChartOptions(options,palette,root.clientWidth));
+  let disposed=false,release,compact=root.clientWidth<480;
+  const observer=new ResizeObserver(()=>{
+    if(disposed)return;
+    const nextCompact=root.clientWidth<480;
+    if(nextCompact!==compact){
+      const themed=themedChartOptions(options,palette,root.clientWidth);
+      c.setOption({...(themed.grid?{grid:themed.grid}:{}),...(themed.yAxis?{yAxis:themed.yAxis}:{})});
+      compact=nextCompact;
+    }
+    c.resize();
+  });observer.observe(root);
+  root._dispose=()=>{if(disposed)return;disposed=true;observer.disconnect();c.dispose();release?.();};
+  release=scopeFor(root)?.own(root._dispose);
+  return c;
+}
+
 export function dispose(root){root.querySelectorAll('.dispatch-chart').forEach(n=>n._dispose?.());}

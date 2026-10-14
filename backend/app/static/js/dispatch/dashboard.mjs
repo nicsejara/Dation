@@ -1,3 +1,5 @@
+import {iconSvg} from "./decision-ui.mjs";
+import {ensureStylesheet} from "./styles.mjs";
 import {bindDashboardActions} from './dashboard-actions.mjs';
 import {createScope,disposeScope,scopeFor} from "./lifecycle.mjs";
 import {esc,num,download,dispose,errorBox,api} from './shared.mjs';
@@ -18,25 +20,17 @@ import {
 } from './assignment-dashboard-shell.mjs';
 
 const ASSIGNMENT_STYLE_ID='assignment-dashboard-v2-styles';
-const ASSIGNMENT_STYLE_HREF='/static/css/assignment-dashboard-v2.css?v=assignment-dashboard-phase1';
 const ASSIGNMENT_ESSENTIAL_STYLE_ID='assignment-dashboard-essential-styles';
-const ASSIGNMENT_ESSENTIAL_STYLE_HREF='/static/css/assignment-dashboard-essential.css?v=assignment-dashboard-phase2';
 const ASSIGNMENT_COMPARATIVE_STYLE_ID='assignment-dashboard-comparative-styles';
-const ASSIGNMENT_COMPARATIVE_STYLE_HREF='/static/css/assignment-dashboard-comparative.css?v=assignment-dashboard-phase3';
 
-function ensureStylesheet(id,href){
-  if(document.getElementById(id))return;
-  const link=document.createElement('link');
-  link.id=id;
-  link.rel='stylesheet';
-  link.href=href;
-  document.head.append(link);
-}
-
-function ensureAssignmentStyles(){
-  ensureStylesheet(ASSIGNMENT_STYLE_ID,ASSIGNMENT_STYLE_HREF);
-  ensureStylesheet(ASSIGNMENT_ESSENTIAL_STYLE_ID,ASSIGNMENT_ESSENTIAL_STYLE_HREF);
-  ensureStylesheet(ASSIGNMENT_COMPARATIVE_STYLE_ID,ASSIGNMENT_COMPARATIVE_STYLE_HREF);
+function ensureDashboardStyles(schema){
+  const styles=[ensureStylesheet('dashboard-toolbar-styles','/static/css/dashboard-toolbar.css')];
+  if(schema==='assignment_v1')styles.push(
+    ensureStylesheet(ASSIGNMENT_STYLE_ID,'/static/css/assignment-dashboard-v2.css'),
+    ensureStylesheet(ASSIGNMENT_ESSENTIAL_STYLE_ID,'/static/css/assignment-dashboard-essential.css'),
+    ensureStylesheet(ASSIGNMENT_COMPARATIVE_STYLE_ID,'/static/css/assignment-dashboard-comparative.css'),
+  );
+  return Promise.all(styles);
 }
 
 function renderModule(element,module,value){
@@ -78,7 +72,6 @@ function installDecisionChat(root,run,chatNode,toggleButton){
 }
 
 function renderAssignmentDashboard(root,run,onRerun,caseActions={}){
-  ensureAssignmentStyles();
   const result=run.result_json;
   const nodes=renderAssignmentShell(root,run,caseActions);
 
@@ -115,7 +108,7 @@ function renderLegacyDashboard(root,run,onRerun,caseActions={}){
   const caseStatus=statusLabels[caseActions.status]||'Decisión disponible';
   const exportButtonLabel='Exportar decisión';
 
-  root.className='dispatch dispatch-dashboard dispatch-dashboard-focused';
+  root.className='dispatch dispatch-dashboard dispatch-dashboard-focused d-decision-dashboard';
   root.innerHTML=
     '<header class="dispatch-command dispatch-command-focused">'
       +'<div class="dispatch-command-title"><strong>DDA Logística · Assignment</strong><span class="dispatch-status" data-case-status>'+esc(caseStatus)+'</span></div>'
@@ -136,7 +129,6 @@ function renderLegacyDashboard(root,run,onRerun,caseActions={}){
               'Huella':result.result_fingerprint,
               'Órdenes':result.inputs.orders.filename||'Órdenes',
               'Flota':result.inputs.fleet.label||result.inputs.fleet.filename||'Flota',
-              'Profundidad':result.analysis?.depth||result.configuration?.options?.analysis_depth||'No informada',
               'Escenarios evaluados':result.analysis?.scenario_count??'—',
               'Órdenes incluidas':metrics.orders,
               'Kg totales':num(metrics.total_weight_kg),
@@ -154,7 +146,7 @@ function renderLegacyDashboard(root,run,onRerun,caseActions={}){
       +'<section class="dispatch-panel dispatch-focus-review" id="dispatch-review"></section>'
       +'<section class="dispatch-panel dispatch-focus-ai" id="dispatch-explanation"></section>'
     +'</main>'
-    +'<button type="button" class="dispatch-ai-fab" data-chat aria-expanded="false" aria-label="Abrir Dation IA"><span>✦</span><strong>Dation IA</strong></button>'
+    +'<button type="button" class="dispatch-ai-fab" data-chat aria-expanded="false" aria-label="Abrir Dation IA">'+iconSvg("sparkles","dispatch-action-icon")+'<strong>Dation IA</strong></button>'
     +'<aside class="dispatch-chat dispatch-panel" hidden aria-label="Chat de la decisión"></aside>';
 
   api('/api/system/llm-status')
@@ -241,11 +233,13 @@ function renderLegacyDashboard(root,run,onRerun,caseActions={}){
   };
 }
 
-export function render(root,run,onRerun,caseActions={}){
+export async function render(root,run,onRerun,caseActions={}){
   const scope=createScope(root);scope.own(()=>{dispose(root);});
 
   dispose(root);
   const result=run.result_json;
+  await ensureDashboardStyles(result?.schema_version);
+  if(!scope.active)return;
 
   if(result?.schema_version==='scheduling_v1'){
     return schedulingDashboard.render(

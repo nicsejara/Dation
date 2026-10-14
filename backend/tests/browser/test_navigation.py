@@ -858,6 +858,167 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.page.wait_for_timeout(1700)
         self.assertEqual(len(self.requests),count)
 
+    async def test_phase5_toolbar_menus_are_exclusive_outside_escape_and_viewport_safe(self):
+        for width in (1440,1280,1024,768,390):
+            await self.page.set_viewport_size({'width':width,'height':844});await self.page.wait_for_timeout(250)
+            for kind in ('assignment','scheduling'):
+                await self.open('decision-dashboard','logistics_'+kind,self.f['ids'][kind])
+                export=self.page.locator('[data-export-menu] summary');more=self.page.locator('[data-more-menu] summary')
+                for control in await self.page.locator('.dashboard-toolbar__tools>button:visible,.dashboard-toolbar__menu>summary').all():
+                    self.assertGreater(await control.locator('svg[aria-hidden=true]').count(),0)
+                await export.click();await more.click()
+                await self.page.wait_for_function("document.querySelectorAll('.dashboard-toolbar__menu[open]').length===1")
+                self.assertEqual(await more.get_attribute('aria-expanded'),'true')
+                self.assertEqual(await export.get_attribute('aria-expanded'),'false')
+                box=await self.page.locator('[data-more-menu] .dashboard-toolbar__menu-panel').bounding_box()
+                self.assertGreaterEqual(box['x'],15);self.assertLessEqual(box['x']+box['width'],width-15)
+                self.assertGreaterEqual(box['y'],0);self.assertLessEqual(box['y']+box['height'],845)
+                await self.page.keyboard.press('Escape')
+                self.assertTrue(await more.evaluate('el=>el===document.activeElement'))
+                await export.click();await self.page.locator('.topbar').click(position={'x':5,'y':5})
+                self.assertEqual(await self.page.locator('.dashboard-toolbar__menu[open]').count(),0)
+                await more.focus();await self.page.keyboard.press('Enter')
+                await self.page.locator('[data-run-details]').click()
+                self.assertEqual(await self.page.locator('.dashboard-toolbar__menu[open]').count(),0)
+                await self.page.keyboard.press('Escape')
+                self.assertTrue(await more.evaluate('el=>el===document.activeElement'))
+                self.assertFalse(await self.page.evaluate('document.documentElement.scrollWidth>innerWidth'))
+        self.assertFalse(any(m=='POST' and p=='/api/runs' for m,p in self.requests))
+
+    async def test_phase5_programmatic_menu_opening_is_exclusive_and_cleanup_survives_navigation(self):
+        await self.dashboard()
+        await self.page.locator('[data-export-menu]').evaluate('el=>el.open=true')
+        await self.page.locator('[data-more-menu]').evaluate('el=>el.open=true')
+        await self.page.wait_for_function("document.querySelectorAll('.dashboard-toolbar__menu[open]').length===1")
+        await self.nav('logistics-map')
+        await self.page.keyboard.press('Escape')
+        await self.page.locator('[data-select-case]').wait_for(state='visible')
+        await self.page.evaluate('window.DationDispatch.openRun('+json.dumps(self.f['ids']['assignment'])+',"logistics_assignment")')
+        await self.page.locator('.assignment-dashboard-v2').wait_for(state='visible')
+        await self.page.locator('[data-export-menu] summary').click()
+        self.assertEqual(await self.page.locator('.dashboard-toolbar__menu[open]').count(),1)
+        self.assertEqual(await self.page.locator('[data-dashboard-toolbar]').count(),1)
+
+    async def test_phase5_dashboard_dark_roles_and_contrast_at_five_widths(self):
+        audit=(Path(__file__).parent/'theme_audit.js').read_text()
+        await self.page.emulate_media(reduced_motion='reduce',color_scheme='light')
+        for width in (1440,1280,1024,768,390):
+            await self.page.set_viewport_size({'width':width,'height':844});await self.page.wait_for_timeout(250)
+            for kind in ('assignment','scheduling'):
+                await self.open('decision-dashboard','logistics_'+kind,self.f['ids'][kind])
+                result=await self.page.evaluate(audit)
+                self.assertEqual(result['scheme'],'dark');self.assertFalse(result['legacyBoundary']);self.assertFalse(result['overflow'])
+                self.assertEqual(result['failures'],[],(kind,width,result['failures']))
+                await self.page.locator('[data-more-menu] summary').click();await self.page.locator('[data-run-details]').click()
+                drawer=await self.page.evaluate(audit,'[data-run-drawer]')
+                self.assertEqual(drawer['failures'],[]);self.assertEqual(drawer['scheme'],'dark')
+                await self.page.keyboard.press('Escape')
+                await self.page.locator('[data-chat]').click()
+                chat=await self.page.evaluate(audit,'.dispatch-chat')
+                self.assertEqual(chat['failures'],[]);self.assertEqual(chat['scheme'],'dark')
+                await self.page.keyboard.press('Escape')
+
+    async def test_phase5_schedule_chart_preserves_data_dates_and_dark_tooltip(self):
+        await self.page.set_viewport_size({'width':390,'height':844})
+        before=copy.deepcopy(self.f['runs']['scheduling'])
+        await self.open('decision-dashboard','logistics_scheduling',self.f['ids']['scheduling'])
+        chart=self.page.locator('.dispatch-schedule-chart')
+        actual=await chart.evaluate('''el=>{
+            const instance=window.DationCharts.getInstanceByDom(el),o=instance.getOption();
+            return {background:o.backgroundColor,text:o.textStyle.color,tooltip:o.tooltip[0],
+                offsets:o.series[0].data,durations:o.series[1].data,hidden:o.series[0].itemStyle.opacity,
+                axis:o.xAxis[0].axisLabel,labels:o.yAxis[0].axisLabel,
+                height:el.clientHeight,rows:o.yAxis[0].data.length,
+                detail:o.tooltip[0].formatter({dataIndex:0})};
+        }''')
+        self.assertEqual(actual['background'],'transparent');self.assertEqual(actual['text'],'#f3f8fa')
+        self.assertEqual(actual['tooltip']['backgroundColor'],'#172731');self.assertEqual(actual['tooltip']['textStyle']['color'],'#f3f8fa')
+        trips=before['result_json']['scenarios']['selected']['trips']
+        self.assertEqual(len(actual['durations']),len(trips));self.assertEqual(actual['hidden'],0)
+        self.assertIn('Salida:',actual['detail']);self.assertIn('Disponible:',actual['detail'])
+        self.assertGreaterEqual(actual['height'],actual['rows']*28)
+        viewport=self.page.locator('.dispatch-schedule-chart-scroll');await viewport.scroll_into_view_if_needed();await viewport.focus()
+        await viewport.press('PageDown');await self.page.wait_for_timeout(200)
+        self.assertGreater(await viewport.evaluate('el=>el.scrollTop'),0)
+        await chart.evaluate("el=>window.DationCharts.getInstanceByDom(el).dispatchAction({type:'showTip',seriesIndex:1,dataIndex:0})")
+        svg_audit=(Path(__file__).parent/'svg_chart_audit.js').read_text()
+        result=await self.page.evaluate(svg_audit,'.dispatch-schedule-chart')
+        self.assertGreater(result['count'],0);self.assertEqual(result['failures'],[])
+        await self.page.set_viewport_size({'width':1440,'height':1000})
+        await self.page.wait_for_function("window.DationCharts.getInstanceByDom(document.querySelector('.dispatch-schedule-chart')).getOption().grid[0].left===170")
+        self.assertEqual(self.f['runs']['scheduling'],before)
+        await self.nav('logistics-map')
+        self.assertEqual(await self.page.locator('#dispatch-dashboard-root svg').count(),0)
+
+    async def test_phase5_chat_escape_restores_focus_and_all_dashboard_state(self):
+        for kind in ('assignment','scheduling'):
+            await self.open('decision-dashboard','logistics_'+kind,self.f['ids'][kind])
+            toggle=self.page.locator('[data-chat]');await toggle.click()
+            self.assertEqual(await toggle.get_attribute('aria-expanded'),'true')
+            self.assertTrue(await self.page.locator('.d-decision-dashboard').evaluate("el=>el.classList.contains('with-chat')"))
+            await self.page.keyboard.press('Escape')
+            self.assertTrue(await self.page.locator('.dispatch-chat').is_hidden())
+            self.assertEqual(await toggle.get_attribute('aria-expanded'),'false')
+            self.assertTrue(await toggle.evaluate('el=>el===document.activeElement'))
+            self.assertFalse(await self.page.locator('.d-decision-dashboard').evaluate("el=>el.classList.contains('with-chat')"))
+            before=sum(p.endswith('/interpretation') for _,p in self.requests)
+            await toggle.click();await self.page.wait_for_timeout(150)
+            self.assertEqual(sum(p.endswith('/interpretation') for _,p in self.requests)-before,1)
+            await self.page.locator('.dispatch-chat [data-close]').click()
+            self.assertEqual(await toggle.get_attribute('aria-expanded'),'false')
+
+    async def test_phase5_comparative_states_stay_dark_and_do_not_change_the_base(self):
+        self.essential();base=copy.deepcopy(self.f['runs']['assignment']);case=copy.deepcopy(self.case)
+        await self.dashboard();audit=(Path(__file__).parent/'theme_audit.js').read_text()
+        layer=self.page.locator('#dispatch-comparative')
+        self.assertEqual((await self.page.evaluate(audit,'#dispatch-comparative'))['failures'],[])
+        await self.page.locator('[data-generate-comparative]').click()
+        await self.page.wait_for_function("document.querySelector('[data-comparative-state]')?.dataset.comparativeState==='queued'")
+        self.assertEqual((await self.page.evaluate(audit,'#dispatch-comparative'))['failures'],[])
+        self.comparative.update(status='error',error_message='Fallo sintético de referencia')
+        await layer.get_by_role('button',name='Reintentar',exact=True).wait_for(state='visible')
+        self.assertEqual((await self.page.evaluate(audit,'#dispatch-comparative'))['failures'],[])
+        await layer.get_by_role('button',name='Reintentar',exact=True).click()
+        await self.page.wait_for_function("document.querySelector('[data-comparative-state]')?.dataset.comparativeState==='queued'")
+        self.comparative['status']='completed'
+        await self.page.locator('[data-close-comparative]').wait_for(state='visible')
+        self.assertEqual((await self.page.evaluate(audit,'#dispatch-comparative'))['failures'],[])
+        artifact=copy.deepcopy(self.comparative)
+        await self.page.locator('[data-close-comparative]').click();await self.page.locator('[data-open-comparative]').click()
+        self.assertEqual(self.comparative_posts,2);self.assertEqual(self.comparative,artifact)
+        self.assertEqual(self.f['runs']['assignment'],base);self.assertEqual(self.case,case)
+
+    async def test_phase5_delayed_dashboard_styles_cannot_reopen_a_view_after_navigation(self):
+        requested,release=asyncio.Event(),asyncio.Event()
+        async def slow_style(route):requested.set();await release.wait();await route.continue_()
+        await self.context.route('**/static/css/assignment-dashboard-v2.css*',slow_style)
+        try:
+            await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=decision-dashboard&case_id={self.case["id"]}&node_id=logistics_assignment&run_id={self.f["ids"]["assignment"]}',wait_until='domcontentloaded')
+            await asyncio.wait_for(requested.wait(),6)
+            await self.nav('logistics-overview')
+        finally:release.set()
+        await self.page.locator('[data-start-new-decision]').wait_for(state='visible');await self.page.wait_for_timeout(150)
+        self.assertEqual(await self.page.locator('.view.is-active').get_attribute('data-view-panel'),'logistics-overview')
+        await self.page.evaluate('window.DationDispatch.openRun('+json.dumps(self.f['ids']['assignment'])+',"logistics_assignment")')
+        await self.page.locator('.assignment-dashboard-v2').wait_for(state='visible')
+        count=await self.page.evaluate("[...document.querySelectorAll('link[rel=stylesheet]')].filter(x=>new URL(x.href).pathname==='/static/css/assignment-dashboard-v2.css').length")
+        self.assertEqual(count,1)
+
+    async def test_phase5_historical_dispatch_remains_dark_readable_and_exports_original_json(self):
+        row=self.f['runs']['assignment'];row['schema_version']='dispatch_v2';row['result_json']['schema_version']='dispatch_v2'
+        before=copy.deepcopy(row)
+        await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=decision-dashboard&case_id={self.case["id"]}&run_id={row["id"]}')
+        await self.page.locator('.dispatch-dashboard-focused').wait_for(state='visible')
+        self.assertIn('CORRIDA HISTÓRICA',await self.page.locator('#dispatch-hero').inner_text())
+        audit=(Path(__file__).parent/'theme_audit.js').read_text();result=await self.page.evaluate(audit)
+        self.assertEqual(result['scheme'],'dark');self.assertEqual(result['failures'],[])
+        self.assertNotIn('Profundidad',await self.page.locator('.dispatch-action-menu').inner_text())
+        await self.page.locator('.dispatch-action-menu summary').click()
+        async with self.page.expect_download() as downloaded:await self.page.locator('[data-json]').click()
+        content=json.loads(Path(await (await downloaded.value).path()).read_text())
+        self.assertEqual(content,before['result_json']);self.assertEqual(row,before)
+        self.assertFalse(any(m=='POST' and p=='/api/runs' for m,p in self.requests))
+
     async def test_phase4_config_waits_for_its_stylesheet_before_rendering(self):
         requested,release=asyncio.Event(),asyncio.Event()
         attempts=0

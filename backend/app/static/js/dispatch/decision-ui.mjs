@@ -91,6 +91,16 @@ export const STATUS_UI = Object.freeze({
 });
 
 const ICONS = Object.freeze({
+  map:'<path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3Z"/><path d="M9 3v15M15 6v15"/>',
+  download:'<path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/>',
+  fileJson:'<path d="M14 2H5v20h14V7Z"/><path d="M14 2v6h5M9 11H7v7h2M15 11h2v7h-2"/>',
+  moreHorizontal:'<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>',
+  chevronDown:'<path d="m6 9 6 6 6-6"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/>',
+  x:'<path d="m6 6 12 12M6 18 18 6"/>',
+  sparkles:'<path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5ZM20 2v4M18 4h4"/>',
+  arrowUp:'<path d="M12 20V4m-6 6 6-6 6 6"/>',
+
   packageCheck: '<path d="m16.5 9.4-9-5.2"/><path d="M21 16V8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/><path d="m15.5 16 1.5 1.5 3-3"/>',
   calendarRange: '<path d="M8 2v4M16 2v4M3 10h18"/><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M7 15h4M13 18h4"/>',
   calendarClock: '<path d="M8 2v4M16 2v4M3 10h8"/><rect x="3" y="4" width="18" height="18" rx="2"/><circle cx="16" cy="16" r="4"/><path d="M16 14v2l1.5 1"/>',
