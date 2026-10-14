@@ -607,7 +607,7 @@ export async function show(run){
   const schema=r?.schema_version;
   const isAssignmentRun=schema==='assignment_v1';
   const isSchedulingRun=schema==='scheduling_v1';
-  const caseMeta=r?.decision_case||{case_id:runContext(run).caseId};
+  const caseMeta={...r?.decision_case,case_id:runContext(run).caseId};
   const nodeId=isSchedulingRun
     ?'logistics_scheduling'
     :(isAssignmentRun?'logistics_assignment':null);
