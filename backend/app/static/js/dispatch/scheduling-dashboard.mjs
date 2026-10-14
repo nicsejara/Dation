@@ -1,6 +1,6 @@
-import {bindDashboardActions} from './dashboard-actions.mjs';
-import {scopeFor} from "./lifecycle.mjs";
-import {esc,num,pct,date,chart,dispose,download,api,errorBox} from './shared.mjs';
+import {renderDashboardToolbar,bindDashboardToolbar} from './dashboard-toolbar.mjs';
+import {scopeFor,disposeScope} from "./lifecycle.mjs";
+import {esc,num,pct,date,chart,dispose,errorBox} from './shared.mjs';
 import {exportDecision} from './export.mjs';
 import * as explanation from './explanation.mjs';
 import {decisionRail,bindDecisionRail} from './decision-nav.mjs';
@@ -178,43 +178,9 @@ export function render(root,run,onRerun,caseActions={}){
   dispose(root);
   const result=run.result_json;
   const metrics=result.scenarios.selected.metrics;
-  const statusLabels={
-    running:'Procesando',
-    review:'En revisión',
-    approved:'Aprobada',
-    error:'Error',
-  };
-  const caseStatus=statusLabels[caseActions.status]||'Planificación disponible';
-
+  const {toolbar,drawer}=renderDashboardToolbar(run,caseActions);
   root.className='dispatch dispatch-dashboard dispatch-dashboard-focused dispatch-scheduling-dashboard';
-  root.innerHTML=
-    '<header class="dispatch-command dispatch-command-focused">'
-      +'<div class="dispatch-command-title"><strong>DDA Logística · Planificación</strong><span class="dispatch-status" data-case-status>'+esc(caseStatus)+'</span></div>'
-      +'<div class="dispatch-actions dispatch-actions--focused">'
-        +(caseActions.onApprove?'<button data-approve class="dispatch-primary-action" '+(caseActions.status==='approved'?'disabled':'')+'>'+(caseActions.status==='approved'?'✓ Planificación aprobada':'Aprobar planificación')+'</button>':'')
-        +'<details class="dispatch-action-menu"><summary>Acciones ···</summary><div class="dispatch-action-menu__panel">'
-          +'<button data-csv>↓ Exportar planificación CSV</button>'
-          +'<button data-json>Exportar JSON técnico</button>'
-          +'<button type="button" data-new-decision>Nueva decisión · cargar otros datos</button>'
-          +'<button data-rerun>Nueva corrida</button>'
-          +'<dl>'
-            +Object.entries({
-              'Corrida':run.id,
-              'Motor':result.engine.name+' '+result.engine.version,
-              'Solver':result.engine.solver.name||result.engine.solver.method||'Motor temporal',
-              'Estado solver':result.engine.solver.status,
-              'Assignment fuente':result.inputs.assignment.run_id||'—',
-              'Viajes':metrics.total_trips,
-              'Vehículos':metrics.vehicles_used,
-              'Inicio':metrics.schedule_start,
-              'Fin':metrics.schedule_end,
-            }).map(([key,value])=>'<dt>'+esc(key)+'</dt><dd>'+esc(value)+'</dd>').join('')
-          +'</dl>'
-          +'<p data-ai-details>Modelo de IA: consultando…</p>'
-        +'</div></details>'
-      +'</div>'
-    +'</header>'
-    +'<div class="dispatch-dashboard-continuation"><button type="button" data-after-approve hidden>Continuar con la siguiente decisión →</button><p data-next-decision-status role="status"></p></div>'
+  root.innerHTML=toolbar
     +decisionRail(caseActions)
     +'<main class="dispatch-focus-main">'
       +'<section class="dispatch-panel dispatch-focus-hero">'
@@ -235,7 +201,8 @@ export function render(root,run,onRerun,caseActions={}){
       +'<section class="dispatch-panel dispatch-focus-ai" id="dispatch-explanation"></section>'
     +'</main>'
     +'<button type="button" class="dispatch-ai-fab" data-chat aria-expanded="false" aria-label="Abrir Dation IA"><span>✦</span><strong>Dation IA</strong></button>'
-    +'<aside class="dispatch-chat dispatch-panel" hidden aria-label="Chat de la planificación"></aside>';
+    +'<aside class="dispatch-chat dispatch-panel" hidden aria-label="Chat de la planificación"></aside>'
+    +drawer;
 
   renderTimeline(root.querySelector('#scheduling-timeline'),result);
   renderService(root.querySelector('#scheduling-service'),result);
@@ -247,14 +214,6 @@ export function render(root,run,onRerun,caseActions={}){
     errorBox(explainRoot,error,()=>explanation.render(explainRoot,run));
   }
 
-  api('/api/system/llm-status',{signal:scopeFor(root)?.signal})
-    .then(data=>{
-      if(!scopeFor(root)?.active)return;
-      const el=root.querySelector('[data-ai-details]');
-      if(el)el.textContent='IA: '+(data.configured?(data.provider+' · '+data.model):'Sin configurar');
-    })
-    .catch(()=>{});
-
   function openChat(question=''){
     const aside=root.querySelector('.dispatch-chat');
     const fab=root.querySelector('[data-chat]');
@@ -264,65 +223,20 @@ export function render(root,run,onRerun,caseActions={}){
     explanation.chat(aside,run,question);
   }
 
-  root.addEventListener('dispatch:open-chat',event=>{
+  scopeFor(root).listen(root,'dispatch:open-chat',event=>{
     openChat(event.detail?.question||'');
   });
 
-  function feedback(button,working,done){
-    const original=button.dataset.originalLabel||button.textContent;
-    button.dataset.originalLabel=original;
-    button.disabled=true;
-    button.textContent=working;
-    window.setTimeout(()=>{
-      button.textContent=done;
-      window.setTimeout(()=>{
-        button.textContent=original;
-        button.disabled=false;
-      },1200);
-    },120);
-  }
-
-  root.querySelector('[data-csv]').onclick=event=>{
-    try{
-      exportSchedule(result);
-      feedback(event.currentTarget,'Preparando archivo…','✓ Exportado');
-    }catch(error){
-      event.currentTarget.textContent='No se pudo exportar';
-      window.setTimeout(()=>{
-        event.currentTarget.textContent=event.currentTarget.dataset.originalLabel||'↓ Exportar planificación CSV';
-      },1500);
-    }
-  };
-  root.querySelector('[data-rerun]').onclick=onRerun;
   bindDecisionRail(root,caseActions);
-  const actions=bindDashboardActions(root,caseActions);
+  bindDashboardToolbar(root,run,{onRerun,caseActions});
   root.querySelector('[data-chat]').onclick=()=>{
     const aside=root.querySelector('.dispatch-chat');
     if(!aside.hidden){
-      aside.hidden=true;
+      disposeScope(aside);aside.hidden=true;
       root.classList.remove('with-chat');
       root.querySelector('[data-chat]')?.setAttribute('aria-expanded','false');
       return;
     }
     openChat();
-  };
-  root.querySelector('[data-json]').onclick=()=>download(
-    'planificacion-'+run.id+'.json',
-    JSON.stringify(result,null,2),
-  );
-  const approveButton=root.querySelector('[data-approve]');
-  if(approveButton)approveButton.onclick=async()=>{
-    approveButton.disabled=true;
-    try{
-      await caseActions.onApprove?.();
-      approveButton.textContent='Planificación aprobada';
-      const status=root.querySelector('[data-case-status]');
-      if(status)status.textContent='Aprobada';
-      caseActions.onApprovalComplete?.();
-      await actions.refresh();
-    }catch(error){
-      approveButton.disabled=false;
-      alert(error.message);
-    }
   };
 }

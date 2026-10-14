@@ -652,7 +652,7 @@ class FrontendContractTests(
             dashboard,
         )
         self.assertIn(
-            "Aprobar planificación",
+            "renderDashboardToolbar(run,caseActions)",
             scheduling,
         )
         self.assertIn(
@@ -758,7 +758,7 @@ class FrontendContractTests(
             dashboard,
         )
         self.assertIn(
-            "dispatch-action-menu",
+            "bindDashboardToolbar(root,run",
             scheduling,
         )
         self.assertIn(
@@ -1393,7 +1393,7 @@ class FrontendContractTests(
             scheduling,
         )
         self.assertIn(
-            "bindDashboardActions",
+            "bindDashboardToolbar",
             scheduling,
         )
         self.assertIn(

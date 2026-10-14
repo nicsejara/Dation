@@ -68,6 +68,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.comparative_posts=0
         self.comparative_fail_once=False
         self.saved_explanation=None
+        self.approval_calls=0
+        self.approval_fail_once=False
         self.pw = await async_playwright().start()
         executable = os.getenv("CHROMIUM_EXECUTABLE")
         if not executable and Path("/usr/bin/chromium").exists():
@@ -150,12 +152,16 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             if status >= 400: data = {"detail":"Lost response after acceptance"}
         elif path == "/api/runs": data = {"items":list(self.runs.values())}
         elif path.endswith("/approve"):
-            rid = path.split("/")[3]
-            row = self.runs[rid]
-            row["approved_at"] = "2026-10-10T12:00:00+00:00"
-            row["result_json"]["decision_case"].update(status="approved",approved_at=row["approved_at"])
-            self.case["nodes"][row["node_id"]].update(status="approved",approved_run_id=rid,run_id=rid)
-            data = row
+            self.approval_calls+=1
+            if self.approval_fail_once and self.approval_calls==1:
+                status,data=503,{'detail':'Fallo sintético de aprobación'}
+            else:
+                rid = path.split("/")[3]
+                row = self.runs[rid]
+                row["approved_at"] = "2026-10-10T12:00:00+00:00"
+                row["result_json"]["decision_case"].update(status="approved",approved_at=row["approved_at"])
+                self.case["nodes"][row["node_id"]].update(status="approved",approved_run_id=rid,run_id=rid)
+                data = row
         elif path.endswith("/interpretation"):
             data = {"explanation":None,"messages":[],"configured":False}
             if self.saved_explanation:data.update(explanation=self.saved_explanation,explanation_is_current=captured_evidence is None)
@@ -317,6 +323,133 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.page.locator('[data-close-trip]').click()
         self.assertEqual(await self.page.locator('[data-trip-detail]').count(),0)
 
+    def review_assignment(self):
+        row=self.f['runs']['assignment'];row['approved_at']=None
+        row['result_json']['decision_case'].update(status='review',approved_at=None)
+        self.case['nodes']['logistics_assignment'].update(status='review',approved_run_id=None,approved_at=None)
+        self.case['nodes']['logistics_scheduling'].update(status='locked',run_id=None,latest_run_id=None,run_count=0)
+
+    async def test_four_kpis_and_comparator_use_independent_scenario_averages_and_pp(self):
+        result=self.f['runs']['assignment']['result_json']
+        result['scenarios']['selected']['metrics'].update(total_cost=1000,total_trips=4,load_utilization=.82,own_weight_share=.78)
+        result['scenarios']['min_cost']['metrics'].update(total_cost=1200,total_trips=3,load_utilization=.75,own_weight_share=.64)
+        await self.dashboard()
+        self.assertEqual(await self.page.locator('[data-executive-kpi]').count(),4)
+        self.assertIn('$ 250',await self.page.locator('[data-executive-kpi=avg_cost_per_trip]').inner_text())
+        self.assertEqual(await self.page.locator('[data-comparison-kpi]').count(),4)
+        await self.page.locator('[data-comparison-select]').select_option('min_cost')
+        cost=await self.page.locator('[data-comparison-kpi=avg_cost_per_trip]').inner_text()
+        self.assertIn('$ 250',cost);self.assertIn('$ 400',cost);self.assertIn('−$ 150 · −37,5 %',cost)
+        self.assertIn('+7 pp',await self.page.locator('[data-comparison-kpi=load_utilization]').inner_text())
+        self.assertIn('+14 pp',await self.page.locator('[data-comparison-kpi=own_weight_share]').inner_text())
+        self.assertIn('peso',await self.page.locator('[data-executive-kpi=own_weight_share] span').first.get_attribute('aria-label'))
+        advanced=await self.page.locator('#dispatch-comparative').inner_text()
+        for forbidden in ('CO₂ estimado','Costo estimado','Lectura de la elección','Prioridades configuradas','Trazabilidad del análisis','corrida base','huella','Estado del solver','Objetivo original'):
+            self.assertNotIn(forbidden,advanced)
+        self.assertEqual(await self.page.locator('#dispatch-comparative h2').count(),1)
+
+    async def test_validation_without_controls_is_one_simple_state_and_no_inline_actions(self):
+        result=self.f['runs']['assignment']['result_json']
+        result['exceptions']=[];result['inputs']['anomalies']=[]
+        result['scenarios']['selected']['trips']=[];result['scenarios']['selected']['order_outcomes']=[]
+        await self.dashboard()
+        self.assertEqual(await self.page.locator('.assignment-validation__empty').count(),1)
+        self.assertEqual(await self.page.locator('#dispatch-review button').count(),0)
+        self.assertEqual(await self.page.locator('#dispatch-review article').count(),0)
+        content=await self.page.locator('#dispatch-review').inner_text()
+        self.assertIn('No se detectaron controles u observaciones pendientes',content)
+        for forbidden in ('Evidencia del motor','Estado del solver','entrada para Planificación','Nueva corrida','Aprobar asignación'):
+            self.assertNotIn(forbidden,content)
+
+    async def test_validation_retains_real_operational_and_critical_controls(self):
+        result=self.f['runs']['assignment']['result_json'];scenario=result['scenarios']['selected']
+        scenario['trips'][0]['ownership']='third_party';scenario['order_outcomes'][0]['split']=True
+        result['inputs']['anomalies']=[{'decision':'include'}];scenario['feasible']=False
+        result['exceptions']=[{'title':'Carga incompatible','detail':'Revisar vehículo','trip_id':'T1'}]
+        await self.dashboard()
+        for key in ('infeasible','engine_exceptions','outsourced','anomalies','split_orders'):
+            self.assertEqual(await self.page.locator('[data-approval-warning='+key+']').count(),1)
+        self.assertEqual(await self.page.locator('.assignment-validation__empty').count(),0)
+        self.assertIn('Carga incompatible',await self.page.locator('#dispatch-review').inner_text())
+        self.assertEqual(await self.page.locator('#dispatch-review button').count(),0)
+
+    async def test_toolbar_approval_is_unique_direct_and_preserves_continuation(self):
+        self.review_assignment();path=f"/api/runs/{self.f['ids']['assignment']}/approve";self.delay[path]=.5
+        await self.dashboard()
+        self.assertEqual(await self.page.locator('[data-approve-toolbar]').count(),1)
+        self.assertEqual(await self.page.locator('[data-approve]').count(),0)
+        button=self.page.locator('[data-dashboard-toolbar] [data-approve-toolbar]')
+        await button.click()
+        self.assertTrue(await button.is_disabled());self.assertEqual(await button.inner_text(),'Aprobando…')
+        await button.dispatch_event('click')
+        await self.page.wait_for_function("document.querySelector('[data-status-badge]').textContent==='Aprobada'")
+        self.assertEqual(self.approval_calls,1);self.assertFalse(await button.is_visible())
+        await self.page.locator('[data-after-approve]').wait_for(state='visible')
+        self.assertEqual(self.case['nodes']['logistics_assignment']['approved_run_id'],self.f['ids']['assignment'])
+
+    async def test_toolbar_approval_error_restores_button_and_can_retry_once(self):
+        self.review_assignment();self.approval_fail_once=True;await self.dashboard()
+        button=self.page.locator('[data-approve-toolbar]');await button.click()
+        await self.page.locator('[data-approval-error]').wait_for(state='visible')
+        self.assertFalse(await button.is_disabled());self.assertEqual(await button.inner_text(),'Aprobar asignación')
+        self.assertIn('Fallo sintético',await self.page.locator('[data-approval-error]').inner_text())
+        self.assertIsNone(self.case['nodes']['logistics_assignment']['approved_run_id'])
+        self.assertEqual(await self.page.locator('[data-status-badge]').inner_text(),'En revisión')
+        await button.click();await self.page.wait_for_function("document.querySelector('[data-status-badge]').textContent==='Aprobada'")
+        self.assertEqual(self.approval_calls,2);self.assertFalse(await self.page.locator('[data-approval-error]').is_visible())
+
+    async def test_scheduling_uses_shared_menus_drawer_and_exports_without_format_changes(self):
+        await self.open('decision-dashboard','logistics_scheduling',self.f['ids']['scheduling'])
+        self.assertEqual(await self.page.locator('[data-more-menu] button').count(),3)
+        self.assertEqual(await self.page.locator('[data-export-menu] button').count(),2)
+        self.assertNotIn('Acciones ···',await self.page.locator('[data-dashboard-toolbar]').inner_text())
+        self.assertFalse(await self.page.locator('[data-run-drawer]').is_visible())
+        await self.page.locator('[data-more-menu] summary').click();await self.page.locator('[data-run-details]').click()
+        drawer=self.page.locator('[data-run-drawer]');await drawer.wait_for(state='visible')
+        content=await drawer.inner_text()
+        for value in ('Assignment fuente',self.f['ids']['assignment'],'Inicio','Fin','Motor','Solver','Servicio de IA'):
+            self.assertIn(value,content)
+        await self.page.keyboard.press('Shift+Tab');self.assertTrue(await drawer.evaluate('(x)=>x.contains(document.activeElement)'))
+        await self.page.keyboard.press('Escape');self.assertFalse(await drawer.is_visible())
+        self.assertTrue(await self.page.locator('[data-more-menu] summary').evaluate('(x)=>x===document.activeElement'))
+        await self.page.locator('[data-more-menu] summary').click();await self.page.locator('[data-run-details]').click()
+        await self.page.locator('[data-run-drawer-backdrop]').click(position={'x':5,'y':5})
+        self.assertFalse(await drawer.is_visible())
+        await self.page.locator('[data-export-menu] summary').click()
+        async with self.page.expect_download() as downloaded:await self.page.locator('[data-export-csv]').click()
+        download=await downloaded.value;self.assertEqual(download.suggested_filename,'planificacion-recomendada.csv')
+        self.assertIn('Salida',Path(await download.path()).read_text())
+        await self.page.locator('[data-export-menu] summary').click()
+        async with self.page.expect_download() as downloaded:await self.page.locator('[data-export-json]').click()
+        download=await downloaded.value;self.assertEqual(download.suggested_filename,'planificacion-'+self.f['ids']['scheduling']+'.json')
+        self.assertEqual(json.loads(Path(await download.path()).read_text()),self.f['runs']['scheduling']['result_json'])
+
+    async def test_shared_drawer_cleans_up_on_navigation_and_scheduling_chat_has_one_listener(self):
+        await self.dashboard()
+        await self.page.locator('[data-more-menu] summary').click();await self.page.locator('[data-run-details]').click()
+        await self.nav('logistics-map')
+        self.assertFalse(await self.page.evaluate("document.body.classList.contains('dashboard-drawer-open')"))
+        await self.page.evaluate("id=>window.DationDispatch.openRun(id,'logistics_scheduling')",self.f['ids']['scheduling'])
+        await self.page.wait_for_selector('.dispatch-scheduling-dashboard')
+        before=sum(p.endswith('/interpretation') for _,p in self.requests)
+        await self.page.locator('#dispatch-explanation [data-question]').first.click()
+        await self.page.wait_for_selector('.dispatch-chat textarea')
+        await self.page.wait_for_timeout(150)
+        self.assertEqual(sum(p.endswith('/interpretation') for _,p in self.requests)-before,1)
+
+    async def test_refined_comparator_and_scheduling_drawer_fit_mobile_viewport(self):
+        await self.page.set_viewport_size({'width':390,'height':844});await self.dashboard()
+        cards=await self.page.locator('[data-comparison-kpi]').all()
+        bounds=[await card.bounding_box() for card in cards]
+        self.assertEqual(len(bounds),4);self.assertTrue(all(abs(b['x']-bounds[0]['x'])<1 for b in bounds))
+        self.assertFalse(await self.page.evaluate('document.documentElement.scrollWidth>innerWidth'))
+        await self.page.evaluate("id=>window.DationDispatch.openRun(id,'logistics_scheduling')",self.f['ids']['scheduling'])
+        await self.page.wait_for_selector('.dispatch-scheduling-dashboard')
+        await self.page.locator('[data-more-menu] summary').click();await self.page.locator('[data-run-details]').click()
+        bounds=await self.page.locator('[data-run-drawer]').bounding_box()
+        self.assertGreaterEqual(bounds['x'],0);self.assertLessEqual(bounds['x']+bounds['width'],390)
+        self.assertFalse(await self.page.evaluate('document.documentElement.scrollWidth>innerWidth'))
+
     async def test_ia_retains_and_labels_original_turn_when_comparative_finishes_mid_response(self):
         self.essential();self.saved_explanation={'id':'saved','response_json':{'executive_summary':'Explicación original'}}
         await self.dashboard()
@@ -422,7 +555,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.case["nodes"]["logistics_scheduling"]["status"] = "stale"
         self.case["nodes"]["logistics_scheduling"]["approved_run_id"] = self.f["ids"]["scheduling"]
         await self.open("decision-dashboard","logistics_scheduling",self.f["ids"]["scheduling"])
-        self.assertEqual(await self.page.locator("[data-approve]").count(),0)
+        self.assertEqual(await self.page.locator("[data-approve-toolbar]").count(),0)
 
     async def test_module_urls_have_single_identity(self):
         await self.open("logistics-config","logistics_scheduling")

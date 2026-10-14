@@ -17,6 +17,7 @@ class AssignmentDashboardPhase2Tests(unittest.TestCase):
     def setUpClass(cls):
         cls.dashboard = (JS / "dashboard.mjs").read_text()
         cls.shell = (JS / "assignment-dashboard-shell.mjs").read_text()
+        cls.toolbar = (JS / "dashboard-toolbar.mjs").read_text()
         cls.selectors = (JS / "assignment-dashboard-selectors.mjs").read_text()
         cls.summary = (JS / "assignment-summary.mjs").read_text()
         cls.evidence = (JS / "assignment-evidence.mjs").read_text()
@@ -56,8 +57,8 @@ class AssignmentDashboardPhase2Tests(unittest.TestCase):
             if (kpis.find(item => item.key === 'load_utilization').objective) {{
               throw new Error('utilization must stay descriptive');
             }}
-            if (kpis.find(item => item.key === 'vehicles_used').objective) {{
-              throw new Error('vehicles used must stay descriptive');
+            if (kpis.find(item => item.key === 'avg_cost_per_trip').objective) {{
+              throw new Error('average cost must stay descriptive');
             }}
 
             const trips = getAssignmentTrips(result);
@@ -145,35 +146,29 @@ class AssignmentDashboardPhase2Tests(unittest.TestCase):
         self.assertIn("Consolidada", self.evidence)
         self.assertIn("Tercerizada", self.evidence)
 
-    def test_validation_does_not_fake_engine_checklist(self):
-        self.assertIn("Evidencia del motor", self.validation)
-        self.assertIn("Puntos de revisión humana", self.validation)
-        self.assertIn("no replica las validaciones internas del motor", self.validation)
-        self.assertIn("no se simulan validaciones", self.validation.lower())
-        for forbidden in (
-            "capacity_respected",
-            "route_consistency",
-            "origin_site_compatibility",
-            "ningún viaje supera la capacidad",
-            "las rutas son consistentes",
-        ):
-            self.assertNotIn(forbidden, self.validation.lower())
+    def test_validation_keeps_real_warnings_and_has_a_single_empty_state(self):
+        self.assertIn('getApprovalWarnings(result)',self.validation)
+        self.assertIn('No se detectaron controles u observaciones pendientes',self.validation)
+        self.assertNotIn('engineEvidence',self.validation)
+        self.assertNotIn('Evidencia del motor',self.validation)
+        self.assertNotIn('.filter(',self.validation)
+        self.assertNotIn('data-approve',self.validation)
+        self.assertNotIn('approval-note',self.validation)
 
-    def test_approval_is_final_action_and_approved_state_has_no_dead_disabled_cta(self):
-        self.assertIn("Nueva corrida", self.shell)
-        self.assertIn("Aprobar asignación →", self.shell)
-        self.assertIn("Esta decisión quedó congelada como entrada para Planificación.", self.shell)
-        self.assertIn("approveButton.hidden=true", self.shell)
-        self.assertIn("rerunValidation.hidden=true", self.shell)
-        self.assertIn("await actions.refresh()", self.shell)
-        self.assertIn("caseActions.onApprovalComplete?.()", self.shell)
-        self.assertIn("data-after-approve", self.shell)
+    def test_approval_is_only_in_toolbar_and_approved_state_has_no_dead_disabled_cta(self):
+        self.assertIn('Nueva corrida',self.toolbar)
+        self.assertIn('Aprobar asignación',self.toolbar)
+        self.assertIn('approveButton.hidden=true',self.toolbar)
+        self.assertIn('await actions.refresh()',self.toolbar)
+        self.assertIn('caseActions.onApprovalComplete?.()',self.toolbar)
+        self.assertIn('data-after-approve',self.toolbar)
+        self.assertNotIn('data-rerun-validation',self.shell)
 
     def test_phase2_css_is_depth_scoped_responsive_and_does_not_touch_scheduling(self):
         self.assertIn('.assignment-dashboard-v2', self.styles)
         self.assertIn("assignment-essential__kpi-strip", self.styles)
         self.assertIn("assignment-evidence__tabs", self.styles)
-        self.assertIn("assignment-validation__grid", self.styles)
+        self.assertIn("assignment-validation__empty", self.styles)
         self.assertIn("@media(max-width:980px)", self.styles)
         self.assertIn("@media(max-width:760px)", self.styles)
         self.assertIn("@media(max-width:520px)", self.styles)

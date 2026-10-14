@@ -49,13 +49,13 @@ class AssignmentDashboardPhase3Tests(unittest.TestCase):
             const balanced = getComparisonContext(result, 'balanced');
             const semantic = Object.fromEntries(balanced.rows.map(row => [row.key, row.semantic]));
             if (semantic.total_trips !== 'same') throw new Error('trips semantic mismatch');
-            if (semantic.total_cost !== 'tradeoff') throw new Error('cost direction mismatch');
+            if (semantic.avg_cost_per_trip !== 'tradeoff') throw new Error('cost direction mismatch');
             if (semantic.own_weight_share !== 'improvement') throw new Error('own-fleet direction mismatch');
-            if (semantic.co2_kg !== 'tradeoff') throw new Error('co2 direction mismatch');
+            if (semantic.load_utilization !== 'improvement') throw new Error('utilization direction mismatch');
 
             const missing = structuredClone(result);
-            delete missing.scenarios.balanced.metrics.co2_kg;
-            if (compareScenarioMetric(missing, 'balanced', 'co2_kg').semantic !== 'no_comparable') {{
+            delete missing.scenarios.balanced.metrics.total_cost;
+            if (compareScenarioMetric(missing, 'balanced', 'avg_cost_per_trip').semantic !== 'no_comparable') {{
               throw new Error('missing metric must be no_comparable');
             }}
 
@@ -83,49 +83,42 @@ class AssignmentDashboardPhase3Tests(unittest.TestCase):
         self.assertIn("assignment-comparison.mjs",widget)
         self.assertIn("assignment-dashboard-comparative.css?v=assignment-dashboard-phase3", self.dashboard)
 
-    def test_comparison_explains_tradeoffs_without_reconstructing_alternative_detail(self):
-        for label in (
-            "RECOMENDACIÓN VS ALTERNATIVAS",
-            "Compará la recomendación antes de aprobarla",
-            "Mejora",
-            "Trade-off",
-            "Sin cambio",
-            "No comparable",
-            "Misma distribución",
-            "Referencia no factible",
-            "Prioridades configuradas → Qué implicó la elección",
-        ):
-            self.assertIn(label, self.comparison)
-        self.assertIn("métricas agregadas", self.comparison)
-        self.assertNotIn("order_outcomes", self.comparison)
-        self.assertNotIn(".trips", self.comparison)
-        self.assertNotIn("dispatch_date", self.comparison)
-        self.assertNotIn("arrival_date", self.comparison)
+    def test_comparison_is_quantitative_without_narrative_or_reference_trip_reconstruction(self):
+        for label in ('Misma distribución','Referencia no factible'):
+            self.assertIn(label,self.comparison)
+        for label in ('Mejora','Trade-off','Sin cambio','No comparable'):
+            self.assertIn(label,self.selectors)
+        for forbidden in ('prioritiesMarkup','implicationText','LECTURA DE LA ELECCIÓN','order_outcomes','.trips','dispatch_date','arrival_date'):
+            self.assertNotIn(forbidden,self.comparison)
+        self.assertIn('data-comparison-select',self.comparison)
 
-    def test_comparative_summary_does_not_overclaim_solver_or_savings(self):
-        self.assertIn("Estado del solver", self.summary)
-        self.assertIn("solverStatusLabel", self.summary)
-        self.assertIn("escenarios de referencia", self.summary)
-        self.assertNotIn("ahorro", self.summary.lower())
-        self.assertNotIn("óptim", self.summary.lower())
+    def test_comparative_summary_focuses_on_the_four_indicators(self):
+        self.assertIn('Compará la decisión con otros escenarios',self.summary)
+        self.assertIn('cuatro indicadores principales',self.summary)
+        for forbidden in ('Estado del solver','Objetivo original','solverStatusLabel','escenarios de referencia'):
+            self.assertNotIn(forbidden,self.summary)
+        widget=(JS/'comparative-upgrade.mjs').read_text()
+        self.assertNotIn('data-comparative-trace',widget)
+        self.assertNotIn('Trazabilidad del análisis',widget)
+        self.assertIn('onEvidenceReady?.(artifact)',widget)
 
-    def test_comparative_keeps_phase2_validation_as_final_review(self):
-        self.assertIn("Evidencia del motor", self.validation)
-        self.assertIn("Puntos de revisión humana", self.validation)
-        self.assertIn("aprobar", self.validation.lower())
-        self.assertNotIn("comparison", self.validation.lower())
+    def test_comparative_keeps_real_validation_as_final_review(self):
+        self.assertIn('getApprovalWarnings(result)',self.validation)
+        self.assertNotIn('engineEvidence',self.validation)
+        self.assertNotIn('capacity_respected',self.validation)
+        self.assertNotIn('origin_site_compatibility',self.validation)
 
     def test_phase3_css_is_scoped_responsive_and_does_not_touch_scheduling(self):
-        self.assertIn('.assignment-dashboard-v2 .assignment-comparative-layer', self.styles)
-        self.assertIn("assignment-comparison__metrics", self.styles)
-        self.assertIn("assignment-comparison__implications-grid", self.styles)
-        self.assertIn("@media(max-width:980px)", self.styles)
-        self.assertIn("@media(max-width:760px)", self.styles)
-        self.assertIn("@media(max-width:520px)", self.styles)
-        self.assertIn("prefers-reduced-motion", self.styles)
-        scheduling = (JS / "scheduling-dashboard.mjs").read_text()
-        self.assertNotIn("assignment-comparative-summary.mjs", scheduling)
-        self.assertNotIn("assignment-comparison.mjs", scheduling)
+        self.assertIn('.assignment-dashboard-v2 .assignment-comparative-layer',self.styles)
+        self.assertIn('assignment-comparison__metrics',self.styles)
+        self.assertIn('assignment-comparison__metric-delta',self.styles)
+        self.assertIn('@container(max-width:850px)',self.styles)
+        self.assertIn('@container(max-width:480px)',self.styles)
+        for orphan in ('implications','priorities','outcomes','layer__trace'):
+            self.assertNotIn(orphan,self.styles)
+        scheduling=(JS/'scheduling-dashboard.mjs').read_text()
+        self.assertNotIn('assignment-comparison.mjs',scheduling)
+        self.assertNotIn('assignment-comparative-summary.mjs',scheduling)
 
 
 if __name__ == "__main__":

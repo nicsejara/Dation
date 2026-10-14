@@ -15,19 +15,9 @@ export function render(root,run,{onEvidenceReady}={}){
   const endpoint='/api/runs/'+run.id+'/comparative';
 
   function completed(){
-    root.innerHTML='<div data-comparative-summary></div><div data-comparative-trace class="assignment-comparative-layer__trace"></div><div data-comparative-content></div>';
+    root.innerHTML='<div data-comparative-summary></div><div data-comparative-content></div>';
     summary.render(root.querySelector('[data-comparative-summary]'),artifact.result_json);
     comparison.render(root.querySelector('[data-comparative-content]'),artifact.result_json);
-    const trace=root.querySelector('[data-comparative-trace]');
-    trace.textContent=artifact.source_mode==='computed'
-      ?'Evidencia comparativa generada el '+new Date(artifact.finished_at).toLocaleString('es-AR')+'. La asignación original permanece intacta.'
-      :'Escenarios ya calculados en la corrida original; no se ejecutó nuevamente el motor.';
-    if(artifact.id){
-      const details=document.createElement('details');
-      const heading=document.createElement('summary');heading.textContent='Trazabilidad del análisis';
-      const body=document.createElement('p');body.textContent='Análisis '+artifact.id+' · corrida base '+run.id+' · huella '+(artifact.result_fingerprint||'—');
-      details.append(heading,body);trace.append(details);
-    }
     if(needsRefresh&&!notified){notified=true;onEvidenceReady?.(artifact);}
   }
 
