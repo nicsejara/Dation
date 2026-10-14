@@ -1,7 +1,7 @@
 import {createScope,trapFocus} from './lifecycle.mjs';
 import {api,esc,download} from './shared.mjs';
 import {bindDashboardActions} from './dashboard-actions.mjs';
-import {analysisDepthUi,decisionStatusUi,shortRunId,solverStatusLabel} from './assignment-dashboard-selectors.mjs';
+import {decisionStatusUi,shortRunId,solverStatusLabel} from './assignment-dashboard-selectors.mjs';
 import {exportDecision,exportDecisionJson} from './export.mjs';
 
 function ensureStyles(){
@@ -20,7 +20,7 @@ function detailRows(run,caseActions,scheduling){
       ['Assignment fuente',result.inputs?.assignment?.run_id||run.upstream_run_id],
       ['Viajes',metrics.total_trips],['Vehículos',metrics.vehicles_used],
       ['Inicio',metrics.schedule_start],['Fin',metrics.schedule_end],
-    ]:[['Profundidad',analysisDepthUi(run).label],['Escenarios evaluados',result.analysis?.scenario_count]]),
+    ]:[['Escenarios evaluados',result.analysis?.scenario_count]]),
     ['Huella',run.result_fingerprint||result.result_fingerprint],
     ['Órdenes',result.inputs?.orders?.filename||result.inputs?.orders?.label],
     ['Flota',result.inputs?.fleet?.label||result.inputs?.fleet?.filename],
@@ -30,7 +30,7 @@ function detailRows(run,caseActions,scheduling){
 export function renderDashboardToolbar(run,caseActions={}){
   ensureStyles();
   const scheduling=run.result_json?.schema_version==='scheduling_v1';
-  const status=decisionStatusUi(caseActions.status),depth=analysisDepthUi(run);
+  const status=decisionStatusUi(caseActions.status);
   const title=scheduling?'Planificación de despachos':'Asignación de carga';
   const approveLabel=scheduling?'Aprobar planificación':'Aprobar asignación';
   const drawerId='dashboard-run-details-'+crypto.randomUUID();
@@ -38,7 +38,6 @@ export function renderDashboardToolbar(run,caseActions={}){
   const toolbar='<header class="dashboard-toolbar" data-dashboard-toolbar>'
     +'<div class="dashboard-toolbar__identity"><span class="dashboard-toolbar__eyebrow">DDA LOGÍSTICA · DECISIÓN '+(scheduling?'02':'01')+'</span>'
       +'<div class="dashboard-toolbar__title"><strong>'+title+'</strong>'
-        +(!scheduling?'<span class="dashboard-toolbar__badge '+esc(depth.className)+'" data-depth-badge>'+esc(depth.label)+'</span>':'')
         +'<span class="dashboard-toolbar__badge '+esc(status.className)+'" data-status-badge>'+esc(status.label)+'</span></div>'
       +'<small>Corrida '+esc(shortRunId(run.id))+'</small></div>'
     +'<div class="dashboard-toolbar__tools" aria-label="Herramientas de la decisión">'

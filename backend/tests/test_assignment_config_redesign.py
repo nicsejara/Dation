@@ -23,11 +23,11 @@ class AssignmentConfigRedesignContractTests(unittest.TestCase):
             'number:"01",eyebrow:"ALCANCE"',
             'number:"02",eyebrow:"OBJETIVO"',
             'number:"03",eyebrow:"RECURSOS"',
-            'number:"04",eyebrow:"DASHBOARD"',
+            'number:"04",eyebrow:"OPCIONES AVANZADAS"',
             "Alcance de los datos",
             "Objetivo de la decisión",
             "Política de recursos",
-            "Profundidad del análisis",
+            "Opciones avanzadas",
         ):
             self.assertIn(marker, self.surface)
 
@@ -54,13 +54,13 @@ class AssignmentConfigRedesignContractTests(unittest.TestCase):
         ):
             self.assertIn(marker, self.config)
 
-    def test_resource_policy_and_depth(self):
+    def test_resource_policy_and_inert_advanced_options(self):
         for marker in (
             "Solo propia",
             "Mixta",
             "Solo tercerizada",
             "resource_mode:state.resourceMode",
-            "Profundo",
+            "Límite de tercerización",
             "Próximamente",
             "aria-disabled",
         ):
@@ -68,10 +68,10 @@ class AssignmentConfigRedesignContractTests(unittest.TestCase):
 
     def test_summary_and_accessibility(self):
         for marker in (
-            "TU CONFIGURACIÓN",
-            "Lista para ejecutar",
-            "Falta completar",
-            "Revisar y ejecutar",
+            "Tu configuración",
+            "Lista para revisar.",
+            "d-workflow-action-bar--config",
+            "aria-label=\"Opciones avanzadas\"",
             "aria-live=\"polite\"",
             "@media(prefers-reduced-motion:reduce)",
             "@media(max-width:760px)",

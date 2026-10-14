@@ -317,7 +317,7 @@ class FrontendContractTests(
             "Las fechas se deciden después",
             config_render,
         )
-        self.assertIn(
+        self.assertNotIn(
             "Profundidad del análisis",
             workspace,
         )

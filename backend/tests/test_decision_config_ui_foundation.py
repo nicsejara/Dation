@@ -18,7 +18,7 @@ class DecisionConfigUiFoundationTests(unittest.TestCase):
             "decisionDataFileCard",
             "decisionSectionHeader",
             "decisionChoiceCard",
-            "decisionDepthCard",
+            "decisionAdvancedOptionsSection",
             "configSummaryBar",
             "decisionInfoNote",
             "decisionEmptyState",
@@ -33,17 +33,16 @@ class DecisionConfigUiFoundationTests(unittest.TestCase):
             "dispatch-case-card assignment-case-strip",
             "assignment-section__head",
             "assignment-choice-card",
-            "assignment-depth-card",
-            "assignment-summary-bar",
-            "assignment-review-cta",
+            "decision-advanced-option",
+            "d-workflow-action-bar--config",
+            "createWorkflowActionBar",
         ):
             self.assertIn(marker, self.shared)
 
     def test_shared_option_components_keep_disabled_accessibility_contract(self):
         self.assertIn('buttonAttrs.disabled=true', self.shared)
         self.assertIn('buttonAttrs["aria-disabled"]="true"', self.shared)
-        self.assertIn('attributes.disabled=true', self.shared)
-        self.assertIn('attributes["aria-disabled"]="true"', self.shared)
+        self.assertIn('disabled aria-disabled="true"', self.shared)
 
     def test_assignment_consumes_shared_primitives(self):
         self.assertIn('from "./decision-config-ui.mjs"', self.assignment)
@@ -53,7 +52,7 @@ class DecisionConfigUiFoundationTests(unittest.TestCase):
             "decisionDataFileCard(",
             "decisionSectionHeader(",
             "decisionChoiceCard(",
-            "decisionDepthCard(",
+            "decisionAdvancedOptionsSection(",
             "configSummaryBar(",
         ):
             self.assertIn(name, self.assignment)
@@ -69,7 +68,7 @@ class DecisionConfigUiFoundationTests(unittest.TestCase):
             "decisionDataFileCard(",
             "decisionSectionHeader(",
             "decisionChoiceCard(",
-            "decisionDepthCard(",
+            "decisionAdvancedOptionsSection(",
             "configSummaryBar(",
         ):
             self.assertIn(name, self.scheduling)

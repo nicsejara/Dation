@@ -610,7 +610,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.page.locator('[data-reconfigure-run]').click()
         await self.page.locator('[data-config-review]').wait_for(state='visible')
         state=await self.page.evaluate('window.DationDispatch.getWorkspace()')
-        self.assertEqual((state['objective'],state['analysisDepth'],state['resourceMode']),('min_cost','essential','own'))
+        self.assertEqual((state['objective'],state['resourceMode']),('min_cost','own'))
+        self.assertNotIn('analysisDepth',state)
         self.assertEqual(self.runs[failed['id']],before)
 
     async def test_transient_run_fetch_error_retries_without_showing_terminal_actions(self):
@@ -857,6 +858,167 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.page.wait_for_timeout(1700)
         self.assertEqual(len(self.requests),count)
 
+    async def test_phase4_config_waits_for_its_stylesheet_before_rendering(self):
+        requested,release=asyncio.Event(),asyncio.Event()
+        attempts=0
+        async def slow_style(route):
+            nonlocal attempts
+            attempts+=1
+            if attempts==1:
+                requested.set();await release.wait();await route.abort()
+            else:await route.continue_()
+        await self.context.route('**/static/css/assignment-config-v2.css*',slow_style)
+        try:
+            await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=logistics-config&case_id={self.case["id"]}&node_id=logistics_assignment',wait_until='domcontentloaded')
+            await asyncio.wait_for(requested.wait(),6)
+            self.assertEqual(await self.page.locator('[data-config-review]').count(),0)
+        finally:release.set()
+        await self.page.get_by_role('button',name='Reintentar',exact=True).click()
+        await self.page.locator('[data-config-review]').wait_for(state='visible')
+        audit=(Path(__file__).parent/'theme_audit.js').read_text()
+        self.assertEqual((await self.page.evaluate(audit))['failures'],[])
+        await self.nav('logistics-map')
+        await self.page.evaluate('window.DationDispatch.openCase('+json.dumps(self.case['id'])+',"logistics-config","logistics_assignment")')
+        await self.page.locator('[data-config-review]').wait_for(state='visible')
+        count=await self.page.evaluate("[...document.querySelectorAll('link[rel=stylesheet]')].filter(x=>new URL(x.href).pathname==='/static/css/assignment-config-v2.css').length")
+        self.assertEqual(count,1)
+        self.assertEqual(attempts,2)
+
+    async def test_phase4_weight_edits_refresh_validation_and_review_without_losing_focus(self):
+        await self.open('logistics-config','logistics_assignment')
+        await self.page.locator('[data-objective=custom]').click()
+        sliders=self.page.locator('[data-custom-weight]:not(:disabled)')
+        for slider in await sliders.all():
+            await slider.focus();await slider.press('Home')
+        self.assertEqual(await self.page.locator('.d-workflow-action-bar').get_attribute('data-state'),'error')
+        await self.page.locator('[data-config-review]').click()
+        self.assertEqual(await self.page.locator('dialog[open]').count(),0)
+        await sliders.first.focus();await sliders.first.press('End')
+        self.assertTrue(await sliders.first.evaluate('el=>el===document.activeElement'))
+        self.assertEqual(await self.page.locator('.d-workflow-action-bar').get_attribute('data-state'),'ready')
+        await self.page.locator('[data-config-review]').click()
+        self.assertIn('Cantidad de viajes 100 %',await self.page.locator('dialog[open]').inner_text())
+        self.assertFalse(any(m=='POST' and p=='/api/runs' for m,p in self.requests))
+
+    async def test_phase4_filter_dialog_is_dark_accessible_and_preserves_escape_focus(self):
+        await self.open('logistics-config','logistics_assignment')
+        trigger=self.page.locator('[data-filter-dialog-open]');await trigger.click()
+        audit=(Path(__file__).parent/'theme_audit.js').read_text()
+        result=await self.page.evaluate(audit,'dialog[open]')
+        self.assertEqual(result['failures'],[])
+        self.assertEqual(result['scheme'],'dark')
+        await self.page.locator('[data-filter-field-search]').fill('dest')
+        self.assertTrue(await self.page.locator('[data-filter-add]:visible').count())
+        await self.page.keyboard.press('Escape')
+        await self.page.locator('dialog[open]').wait_for(state='detached')
+        await self.page.wait_for_function("document.activeElement?.hasAttribute('data-filter-dialog-open')")
+        self.assertTrue(await trigger.evaluate('el=>el===document.activeElement'))
+        self.assertFalse(any(m=='POST' and p=='/api/runs' for m,p in self.requests))
+
+    async def test_phase4_old_assignment_drafts_keep_criteria_and_send_essential(self):
+        draft={'objective':'custom','customWeights':{'trips':60,'cost':30,'own_fleet':10},'resourceMode':'own','configured':True,'dimensions':['trips','cost','own_fleet'],'analysisDepth':'comparative'}
+        saved={'analysisDepth':'deep'}
+        drafts={self.case['id']:draft,'another-case':{'objective':'min_cost','analysisDepth':'deep'}}
+        await self.page.add_init_script('sessionStorage.setItem('+json.dumps(KEY)+','+json.dumps(json.dumps(saved))+');sessionStorage.setItem("dation.dispatch.drafts.v1",'+json.dumps(json.dumps(drafts))+');')
+        await self.open('logistics-config','logistics_assignment')
+        state=await self.page.evaluate('window.DationDispatch.getWorkspace()')
+        self.assertNotIn('analysisDepth',state)
+        self.assertEqual((state['objective'],state['resourceMode']),('custom','own'))
+        self.assertEqual(state['customWeights']['trips'],60)
+        stored=await self.page.evaluate('({workspace:JSON.parse(sessionStorage.getItem("'+KEY+'")),drafts:JSON.parse(sessionStorage.getItem("dation.dispatch.drafts.v1"))})')
+        self.assertNotIn('analysisDepth',stored['workspace'])
+        self.assertTrue(all('analysisDepth' not in value for value in stored['drafts'].values()))
+        for select in await self.page.locator('[data-config-anomaly]').all():await select.select_option('include')
+        await self.page.locator('[data-config-review]').click()
+        await self.page.locator('[data-config-execute]').click()
+        await self.page.wait_for_selector('.assignment-dashboard-v2')
+        body=self.execution_bodies[-1]
+        self.assertEqual(body['options']['analysis_depth'],'essential')
+        self.assertEqual(body['options']['resource_mode'],'own')
+        self.assertEqual(body['configuration']['objective'],'custom')
+        self.assertEqual(body['configuration']['weights']['trips'],.6)
+
+    async def test_phase4_scheduling_old_depth_and_unknown_options_are_not_reactivated(self):
+        config={self.case['id']:{'strategy':'earliest_dispatch','windowMode':'custom','windowStart':'2026-01-01','windowEnd':'2026-12-31','analysisDepth':'deep','bufferBetweenTrips':123}}
+        await self.page.add_init_script('sessionStorage.setItem("dation.scheduling.config.v1",'+json.dumps(json.dumps(config))+');')
+        await self.open('logistics-config','logistics_scheduling')
+        stored=await self.page.evaluate('JSON.parse(sessionStorage.getItem("dation.scheduling.config.v1"))')
+        self.assertNotIn('analysisDepth',stored[self.case['id']]);self.assertNotIn('bufferBetweenTrips',stored[self.case['id']])
+        self.assertEqual(await self.page.locator('[data-scheduling-window-start]').input_value(),'2026-01-01')
+        await self.page.locator('[data-scheduling-review]').click()
+        await self.page.locator('[data-scheduling-execute]').click()
+        await self.page.wait_for_selector('.dispatch-scheduling-dashboard')
+        body=self.execution_bodies[-1]
+        self.assertEqual(body['source_run_id'],self.f['ids']['assignment'])
+        self.assertEqual(body['configuration']['planning_window_start'],'2026-01-01')
+        self.assertEqual(body['configuration']['planning_window_end'],'2026-12-31')
+        self.assertEqual(body['configuration']['strategy'],'earliest_dispatch')
+        self.assertNotIn('analysis_depth',body['options'])
+        self.assertNotIn('bufferBetweenTrips',json.dumps(body))
+
+    async def test_phase4_advanced_options_are_disabled_and_workflow_is_shared(self):
+        for kind in ('assignment','scheduling'):
+            await self.open('logistics-config','logistics_'+kind)
+            self.assertEqual(await self.page.locator('.d-workflow-action-bar').count(),1)
+            self.assertEqual(await self.page.locator('.d-workflow-action-bar__chip').count(),3)
+            self.assertEqual(await self.page.locator('[data-depth]').count(),0)
+            options=self.page.locator('.decision-advanced-option')
+            self.assertEqual(await options.count(),3)
+            for option in await options.all():
+                self.assertTrue(await option.is_disabled())
+                self.assertIn('Próximamente',await option.inner_text())
+                self.assertEqual(await option.get_attribute('aria-disabled'),'true')
+                self.assertIsNone(await option.get_attribute('name'))
+            before=await self.page.evaluate('sessionStorage.getItem("'+KEY+'")')
+            await options.first.dispatch_event('click')
+            self.assertEqual(await self.page.evaluate('sessionStorage.getItem("'+KEY+'")'),before)
+            await self.page.locator('.d-workflow-action-bar__chip').nth(1).click()
+            self.assertFalse(any(m=='POST' and p=='/api/runs' for m,p in self.requests))
+
+    async def test_phase4_historical_depths_open_without_recalculation_or_depth_badge(self):
+        for depth in ('essential','comparative','deep'):
+            run=self.f['runs']['assignment'];run['result_json']['analysis']['depth']=depth
+            run['result_json']['configuration']['options']['analysis_depth']=depth
+            before=copy.deepcopy(run)
+            await self.dashboard()
+            self.assertEqual(await self.page.locator('[data-depth-badge]').count(),0)
+            self.assertEqual(await self.page.locator('.assignment-dashboard-v2').get_attribute('data-analysis-depth'),depth)
+            await self.page.locator('[data-more-menu] summary').click()
+            await self.page.locator('[data-run-details]').click()
+            self.assertNotIn('Profundidad',await self.page.locator('[data-run-drawer]').inner_text())
+            self.assertEqual(run,before)
+        self.assertFalse(any(m=='POST' and p in ('/api/runs',f'/api/runs/{self.f["ids"]["assignment"]}/comparative') for m,p in self.requests))
+
+    async def test_phase4_dark_config_forms_review_and_footer_at_five_widths(self):
+        audit=(Path(__file__).parent/'theme_audit.js').read_text()
+        for width in (1440,1280,1024,768,390):
+            await self.page.set_viewport_size({'width':width,'height':1000});await self.page.wait_for_timeout(250)
+            for kind in ('assignment','scheduling'):
+                await self.open('logistics-config','logistics_'+kind)
+                self.assertFalse(await self.page.locator('.view.is-active').get_attribute('data-dation-surface'))
+                if kind=='assignment':await self.page.locator('[data-objective=custom]').click()
+                else:await self.page.locator('[data-scheduling-focus-toggle]').click()
+                result=await self.page.evaluate(audit)
+                self.assertEqual(result['failures'],[],(width,kind,result['failures']))
+                self.assertFalse(result['overflow'])
+                await self.page.locator('.decision-advanced-option').last.scroll_into_view_if_needed()
+                await self.page.evaluate('window.scrollTo(0,document.documentElement.scrollHeight)')
+                geometry=await self.page.evaluate('''()=>{
+                  const last=document.querySelector('.decision-advanced-option:last-child').getBoundingClientRect();
+                  const bar=document.querySelector('.d-workflow-action-bar').getBoundingClientRect();
+                  return {last:last.bottom,bar:bar.top,padding:parseFloat(getComputedStyle(document.querySelector('#dispatch-config-root')).paddingBottom),height:bar.height};
+                }''')
+                self.assertLessEqual(geometry['last'],geometry['bar']+1)
+                self.assertGreater(geometry['padding'],geometry['height'])
+                for select in await self.page.locator('[data-config-anomaly]').all():await select.select_option('include')
+                await self.page.locator('[data-config-review]' if kind=='assignment' else '[data-scheduling-review]').click()
+                dialog=self.page.locator('dialog[open]');await dialog.wait_for(state='visible')
+                result=await self.page.evaluate(audit,'dialog[open]')
+                self.assertEqual(result['failures'],[],(width,kind,result['failures']))
+                self.assertEqual(result['scheme'],'dark')
+                await self.page.keyboard.press('Escape')
+                self.assertEqual(await self.page.locator('dialog[open]').count(),0)
+
     async def test_malformed_saved_state(self):
         await self.page.add_init_script(f"sessionStorage.setItem('{KEY}','null');sessionStorage.setItem('dation.scheduling.config.v1','[]');")
         await self.open("logistics-config","logistics_scheduling")
@@ -867,6 +1029,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.page.locator("[data-config-review]").click()
         await self.page.locator("[data-config-execute]").click()
         await self.page.wait_for_selector(".assignment-dashboard-v2")
+        self.assertEqual(self.execution_bodies[-1]["options"]["analysis_depth"],"essential")
         approved = await self.page.evaluate("window.DationDispatch.getWorkspace().decisionCase.nodes.logistics_assignment.approved_run_id")
         self.assertEqual(approved,self.f["ids"]["assignment"])
         self.assertNotEqual(parse_qs(urlparse(self.page.url).query)["run_id"][0],approved)
@@ -1178,15 +1341,15 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await primary.hover()
         self.assertEqual(await primary.evaluate("el=>getComputedStyle(el).transform"),"none")
 
-    async def test_legacy_controls_and_review_keep_native_light_boundary(self):
+    async def test_config_controls_and_review_use_native_dark_roles(self):
         await self.open("logistics-config","logistics_assignment")
         panel=self.page.locator(".view.is-active")
-        self.assertEqual(await panel.evaluate("el=>getComputedStyle(el).colorScheme"),"light")
+        self.assertEqual(await panel.evaluate("el=>getComputedStyle(el).colorScheme"),"dark")
         self.assertEqual(await panel.locator(".d-page-hero").evaluate("el=>getComputedStyle(el).colorScheme"),"dark")
         await self.page.locator("[data-config-review]").click()
         dialog=self.page.locator("dialog[open]")
         await dialog.wait_for(state="visible")
-        self.assertEqual(await dialog.evaluate("el=>getComputedStyle(el).colorScheme"),"light")
+        self.assertEqual(await dialog.evaluate("el=>getComputedStyle(el).colorScheme"),"dark")
         execute=self.page.locator("[data-config-execute]")
         await self.page.keyboard.press("Tab")
         await execute.focus()

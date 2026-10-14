@@ -172,7 +172,7 @@ Section header comparte número, eyebrow, H2, descripción y contexto actual; ca
 
 ## Workflow Action Bar
 
-Un patrón compartido para Upload, Assignment y Scheduling, con propietario en `decision-config-ui.mjs`. Mantener `configSummaryBar()` como adaptador mientras sus consumidores migran. Upload convierte su composición DOM a la misma salida común; no implementa otra versión visual.
+Implementado en Fases 3–4: `workflow-action-bar.mjs` es el propietario DOM de Upload, Assignment y Scheduling. `decision-config-ui.mjs` adapta y monta la variante de Config mediante `configSummaryBar()` y `mountConfigActionBar()`. La medición se libera al rerender y al abandonar la ruta.
 
 Contrato: nombre de proceso, estado/razón, summary items con destinos opcionales y un primary con label, icono, estado y hooks del flujo existente. Las actualizaciones de preflight no deben reemplazar un botón que mantiene foco ni perder callbacks. El componente representa estado; la página sigue siendo dueña de validar, confirmar y ejecutar.
 
@@ -214,3 +214,6 @@ Esta fase valida la especificación y los cálculos, con 70 capturas del estado 
 Cada fase visual debe comprobar normal/hover/focus/disabled/error, cold y warm navigation, nombres largos, contraste sobre superficies compuestas, keyboard y última acción visible sobre footer. Fase 6 añade zoom, focus sin clipping, reduced motion, pickers nativos, autofill y E2E completo; Fase 7 elimina bridges y reglas sin consumidores demostrados.
 
 **FASE 0 COMPLETA — especificación lista para Fase 1.** No se inicia implementación dark por la existencia de estos snippets.
+
+
+Estado implementado Fase 4: Config dark, Advanced Options disabled, barra común en ambas decisiones y retiro de depth de la UX. Nuevas Assignment envían essential explícito; históricos conservados. Efecto funcional medido y límites en [informe Fase 4](DATION_DARK_PHASE4_IMPLEMENTATION.md). La toolbar sólo retira badge/fila de profundidad; su migración dark queda en Fase 5.

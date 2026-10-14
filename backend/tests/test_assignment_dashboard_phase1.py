@@ -93,12 +93,13 @@ class AssignmentDashboardPhase1Tests(unittest.TestCase):
             self.scheduling,
         )
 
-    def test_shell_exposes_persisted_depth_as_badge_not_editable_switch(self):
+    def test_shell_keeps_technical_depth_without_product_badge(self):
         self.assertIn(
             "root.dataset.analysisDepth=depth.depth",
             self.shell,
         )
-        self.assertIn("data-depth-badge", self.toolbar)
+        self.assertNotIn("data-depth-badge", self.toolbar)
+        self.assertNotIn("Profundidad", self.toolbar)
         self.assertNotIn("data-depth-toggle", self.shell)
         self.assertNotIn("data-analysis-depth-select", self.shell)
         self.assertNotIn("analysis_depth=", self.shell)

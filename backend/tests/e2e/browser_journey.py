@@ -61,7 +61,8 @@ async def journey():
             await page.locator('[data-map-node="logistics_assignment"][data-map-action]').first.click()
             await page.wait_for_selector('[data-config-review]')
             assert not await page.locator('[data-config-context]').get_attribute('open')
-            await page.locator('[data-depth="essential"]').click()
+            assert await page.locator("[data-depth]").count()==0
+            assert await page.locator(".decision-advanced-option:disabled").count()==3
             for select in await page.locator('[data-config-anomaly]').all():await select.select_option('include')
             await page.locator('[data-config-review]').click()
             gate.touch()
@@ -70,6 +71,7 @@ async def journey():
                 await page.locator('[data-config-execute]').click()
             response=await accepted.value
             assert response.status==202
+            assert response.request.post_data_json["options"]["analysis_depth"]=="essential"
             admitted=True
             assignment=(await response.json())['id']
             case=(await response.json())['decision_case_id']

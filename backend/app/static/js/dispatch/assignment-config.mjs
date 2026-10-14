@@ -7,15 +7,14 @@ import {
   decisionCaseCard,
   decisionChoiceCard,
   decisionDataFileCard,
-  decisionDepthCard,
+  decisionAdvancedOptionsSection,
+  mountConfigActionBar,
+  updateConfigActionBar,
+  ensureDecisionConfigStyle,
   decisionHero,
   decisionSectionHeader,
 } from "./decision-config-ui.mjs";
 
-const STYLE_ID="assignment-config-v2-styles";
-const CASE_STYLE_ID="assignment-config-case-styles";
-const STYLE_HREF="/static/css/assignment-config-v2.css?v=assignment-config-v2";
-const CASE_STYLE_HREF="/static/css/decision-map-case-v2.css?v=assignment-config-v2";
 const PRIORITY_KEYS=["trips","cost","own_fleet","co2"];
 const OBJECTIVES=[
   ["min_trips","Menor cantidad de viajes","Consolida la carga para reducir los viajes totales.","route","trips"],
@@ -43,39 +42,12 @@ const RESOURCE_MODES={
   mixed:{label:"Mixta",icon:"shuffle",copy:"Usa tus vehículos y suma terceros cuando el objetivo lo justifica."},
   outsourced:{label:"Solo tercerizada",icon:"handshake",copy:"Asigna toda la carga a transportistas externos."},
 };
-const DEPTHS={
-  essential:{
-    label:"Esencial",
-    copy:"Ves la asignación resultante: qué órdenes van en cada viaje y vehículo.",
-    rows:[["Asignación",true],["Comparación con alternativas",false],["Evidencia ampliada",false]],
-  },
-  comparative:{
-    label:"Comparativo",
-    copy:"Además, comparás la asignación contra alternativas como costo mínimo o menos viajes.",
-    rows:[["Asignación",true],["Comparación con alternativas",true],["Evidencia ampliada",false]],
-  },
-  deep:{
-    label:"Profundo",
-    copy:"Evidencia ampliada de todas las alternativas evaluadas.",
-    rows:[["Asignación",false],["Comparación con alternativas",false],["Evidencia ampliada",false]],
-  },
-};
 
 function ensureStyles(){
-  if(!document.getElementById(CASE_STYLE_ID)){
-    const link=document.createElement("link");
-    link.id=CASE_STYLE_ID;
-    link.rel="stylesheet";
-    link.href=CASE_STYLE_HREF;
-    document.head.append(link);
-  }
-  if(!document.getElementById(STYLE_ID)){
-    const link=document.createElement("link");
-    link.id=STYLE_ID;
-    link.rel="stylesheet";
-    link.href=STYLE_HREF;
-    document.head.append(link);
-  }
+  return Promise.all([
+    ensureDecisionConfigStyle("assignment-config-case-styles","/static/css/decision-map-case-v2.css","dark-data-pack-phase3-v1"),
+    ensureDecisionConfigStyle("assignment-config-v2-styles","/static/css/assignment-config-v2.css")
+  ]);
 }
 
 function workflowStep(id,fallback){
@@ -152,7 +124,7 @@ function heroMarkup(){
     decisionIndex:1,
     totalDecisions:3,
     title:"Definí cómo querés distribuir tu carga.",
-    description:"Elegí qué datos analizar, qué querés optimizar y cuánto detalle ver en el dashboard. Esta decisión reparte la carga entre tu flota; las fechas se definen después.",
+    description:"Elegí qué datos analizar, qué querés optimizar y qué recursos usar. Esta decisión reparte la carga entre tu flota; las fechas se definen después.",
     panelItems:[
       {label:"1 · PREGUNTA",description:"¿Cómo conviene armar los viajes y repartir la carga?",icon:"messageCircleQuestion"},
       {label:"2 · ENTREGA",description:"Viajes propuestos + distribución de carga.",icon:"packageCheck"},
@@ -383,29 +355,7 @@ function resourceSection(state,preview){
         });
       }).join("")
     +'</div>'
-    +'<div class="assignment-resource-rule"><span>REGLA 01</span><strong>Modo de flota</strong><small>Este contenedor queda preparado para sumar nuevas reglas de recursos sin cambiar el esqueleto.</small></div>'
-  +'</section>';
-}
-
-function depthSection(state){
-  if(state.analysisDepth==="deep")state.analysisDepth="comparative";
-  return '<section class="assignment-section" id="config-depth" data-config-section="depth">'
-    +decisionSectionHeader({number:"04",eyebrow:"DASHBOARD",title:"Profundidad del análisis",copy:"No cambia la asignación: define cuánto contexto vas a ver en el dashboard.",icon:"layoutDashboard",current:DEPTHS[state.analysisDepth]?.label||"Comparativo"})
-    +'<div class="assignment-depth-grid">'
-      +Object.entries(DEPTHS).map(([key,item])=>{
-        const disabled=key==="deep";
-        const selected=state.analysisDepth===key;
-        const tag=key==="comparative"?"Recomendado":disabled?"Próximamente":"";
-        return decisionDepthCard({
-          key,
-          item,
-          selected,
-          disabled,
-          tag,
-          disabledTitle:disabled?"Se habilita en futuras versiones":"",
-        });
-      }).join("")
-    +'</div>'
+    +'<div class="assignment-resource-rule"><span>REGLA 01</span><strong>Modo de flota</strong></div>'
   +'</section>';
 }
 
@@ -437,7 +387,6 @@ function summaryFooter(state,preview,capabilities){
       {target:"config-scope",icon:"filter",label:"Alcance",value:scopeSummary(preview,state.scopeFilters||[])},
       {target:"config-objective",icon:"target",label:"Objetivo",value:OBJECTIVE_LABELS[state.objective]||"Balanceado"},
       {target:"config-resources",icon:"truck",label:"Recursos",value:RESOURCE_MODES[state.resourceMode]?.label||"Mixta"},
-      {target:"config-depth",icon:"layoutDashboard",label:"Dashboard",value:DEPTHS[state.analysisDepth]?.label||"Comparativo"},
     ],
   });
 }
@@ -448,14 +397,13 @@ function reviewDialog(state,preview,capabilities){
   const priority=state.objective==="custom"
     ?dims.map(key=>DIMENSION_LABELS[key]+' '+(effective?.[key]||0)+' %').join(' · ')
     :"Definido por el objetivo seleccionado";
-  return '<dialog class="dispatch dispatch-review assignment-review-dialog" data-assignment-review-dialog><form method="dialog">'
+  return '<dialog class="dispatch dispatch-review d-config-dialog assignment-review-dialog" data-assignment-review-dialog><form method="dialog">'
     +'<span class="assignment-section__eyebrow">ANTES DE EJECUTAR</span><h2>Revisá tu configuración</h2>'
     +'<div class="dispatch-review-summary">'
       +'<p><strong>Alcance</strong><span>'+esc(scopeSummary(preview,state.scopeFilters||[]))+'</span></p>'
       +'<p><strong>Objetivo</strong><span>'+esc(OBJECTIVE_LABELS[state.objective]||"Balanceado")+'</span></p>'
       +'<p><strong>Prioridades</strong><span>'+esc(priority)+'</span></p>'
       +'<p><strong>Recursos</strong><span>'+esc(RESOURCE_MODES[state.resourceMode]?.label||"Mixta")+'</span></p>'
-      +'<p><strong>Dashboard</strong><span>'+esc(DEPTHS[state.analysisDepth]?.label||"Comparativo")+'</span></p>'
     +'</div>'
     +'<p class="assignment-review-note">La decisión distribuirá la carga entre los recursos habilitados. Las fechas y el calendario se resolverán después en Planificación de despachos.</p>'
     +'<div class="dispatch-actions"><button value="cancel">Volver</button><button type="button" data-config-execute>Generar asignación</button></div>'
@@ -464,7 +412,7 @@ function reviewDialog(state,preview,capabilities){
 
 function filterDialog(preview){
   const fields=preview?.fields||[];
-  return '<dialog class="assignment-filter-dialog" data-filter-dialog><form method="dialog">'
+  return '<dialog class="assignment-filter-dialog d-config-dialog" data-filter-dialog><form method="dialog">'
     +'<div class="assignment-filter-dialog__head"><div><span class="assignment-section__eyebrow">ALCANCE</span><h3>Agregar filtro</h3><p>Elegí una columna disponible en el archivo de Órdenes.</p></div><button value="cancel" aria-label="Cerrar">×</button></div>'
     +'<input type="search" placeholder="Buscar columna…" data-filter-field-search aria-label="Buscar columna para filtrar">'
     +'<div class="assignment-filter-field-list" data-filter-field-list>'
@@ -477,7 +425,7 @@ function changeDataDialog(hasFilters,hasApproved){
   const impact=[];
   if(hasFilters)impact.push("Los filtros actuales dependen de columnas del Data Pack en uso.");
   if(hasApproved)impact.push("Hay decisiones aprobadas vinculadas a los archivos actuales.");
-  return '<dialog class="assignment-change-dialog" data-assignment-change-dialog><form method="dialog">'
+  return '<dialog class="assignment-change-dialog d-config-dialog" data-assignment-change-dialog><form method="dialog">'
     +'<span class="assignment-section__icon">'+iconSvg("refresh","assignment-icon")+'</span><h3>¿Cambiar los datos?</h3>'
     +'<p>Al seleccionar otros archivos, Dation crea un nuevo Decision Case y conserva el historial del actual.</p>'
     +(impact.length?'<ul>'+impact.map(item=>'<li>'+esc(item)+'</li>').join("")+'</ul>':'')
@@ -496,18 +444,16 @@ function defaultFilter(field){
 }
 
 export async function mountAssignmentConfig(root,context){
-  ensureStyles();
   const scope=createScope(root),collapse=mountFilterCollapse(root);
   const current=()=>scope.active&&context.isCurrent?.()!==false;
+  await ensureStyles();
+  if(!current())return;
   const {state,persist,capabilities,onData,onExecute}=context;
   state.scopeFilters=Array.isArray(state.scopeFilters)?state.scopeFilters:[];
   state.resourceMode=["own","mixed","outsourced"].includes(state.resourceMode)
     ?state.resourceMode
     :(state.allow===false?"own":"mixed");
   state.allow=state.resourceMode!=="own";
-  state.analysisDepth=["essential","comparative"].includes(state.analysisDepth)
-    ?state.analysisDepth
-    :"comparative";
   const dims=activeDimensions(capabilities);
   state.dimensions=dims.length?dims:["trips"];
   state.customWeights=state.customWeights||{...state.weights};
@@ -558,7 +504,7 @@ export async function mountAssignmentConfig(root,context){
         +anomalyReview(state,preview)
         +objectiveSection(state,capabilities)
         +resourceSection(state,preview)
-        +depthSection(state)
+        +decisionAdvancedOptionsSection({kind:"assignment"})
       +'</main>'
       +summaryFooter(state,preview,capabilities)
       +filterDialog(preview)
@@ -664,6 +610,7 @@ export async function mountAssignmentConfig(root,context){
   }
 
   function bind(){
+    mountConfigActionBar(root);
     const copy=root.querySelector("[data-config-copy-case]");
     if(copy)copy.onclick=async()=>{
       const feedback=root.querySelector("[data-config-copy-feedback]");
@@ -724,6 +671,8 @@ export async function mountAssignmentConfig(root,context){
         const segmentKey=state.dimensions[index];
         if(segmentKey)segment.style.setProperty("--weight",(effective[segmentKey]||0)+'%');
       });
+      const problem=blocker(state,preview,capabilities);
+      updateConfigActionBar(root,{ready:!problem,reason:problem?.reason});
       slider.setAttribute("aria-valuetext",DIMENSION_LABELS[key]+', '+slider.value+' de 100, equivale al '+effective[key]+' %');
     });
     root.querySelector("[data-custom-base]")?.addEventListener("change",async event=>{
@@ -745,13 +694,6 @@ export async function mountAssignmentConfig(root,context){
       await rerender({previewFirst:true});
     });
 
-    root.querySelectorAll("[data-depth]").forEach(button=>button.onclick=async()=>{
-      if(button.disabled)return;
-      state.analysisDepth=button.dataset.depth;
-      state.configured=true;
-      persist();
-      await rerender();
-    });
 
     root.querySelectorAll("[data-config-anomaly]").forEach(select=>select.onchange=async()=>{
       state.decisions={...state.decisions,[select.dataset.configAnomaly]:select.value};
@@ -759,15 +701,18 @@ export async function mountAssignmentConfig(root,context){
       await rerender();
     });
 
-    root.querySelectorAll("[data-summary-target]").forEach(button=>button.onclick=()=>document.getElementById(button.dataset.summaryTarget)?.scrollIntoView({behavior:"smooth",block:"center"}));
     const reviewDialogNode=root.querySelector("[data-assignment-review-dialog]");
     root.querySelector("[data-config-review]")?.addEventListener("click",()=>{
       const problem=blocker(state,preview,capabilities);
       if(problem){scrollToProblem(problem);return;}
-      reviewDialogNode?.showModal?.();
+      const template=document.createElement("template");
+      template.innerHTML=reviewDialog(state,preview,capabilities);
+      reviewDialogNode.replaceChildren(...template.content.firstElementChild.childNodes);
+      reviewDialogNode.showModal();
     });
-    root.querySelector("[data-config-execute]")?.addEventListener("click",event=>{
-      event.preventDefault();reviewDialogNode?.close();onExecute?.();
+    reviewDialogNode?.addEventListener("click",event=>{
+      if(!event.target.closest("[data-config-execute]"))return;
+      event.preventDefault();reviewDialogNode.close();onExecute?.();
     });
   }
 
