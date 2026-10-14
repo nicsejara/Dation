@@ -37,7 +37,7 @@ Los doce planes son factibles y asignan las 30 órdenes / 519 unidades / 430,100
 
 ## E. Validación funcional
 
-Suites: 349 Python, 37 Node, 83 Chromium, 7 E2E reales; CI añade 46 SQL sobre PostgreSQL 17. Total esperado: 522. El gate exige verde en el head exacto y después en main, sin fallos ni omisiones. Los ocho nuevos casos Chromium ejercitan drafts legacy, payload essential, opciones inactivas, limpieza de Scheduling, apertura de los tres tipos históricos sin recalcular, pesos/review, espera de CSS sin duplicados, filtros, teclado y footer a cinco anchos.
+Suites: 349 Python, 37 Node, 83 Chromium, 7 E2E reales; CI añade 46 SQL sobre PostgreSQL 17. Total esperado: 522. El gate exige verde en el head exacto y después en main, sin fallos ni omisiones. Los ocho nuevos casos Chromium ejercitan drafts legacy, payload essential, opciones inactivas, limpieza de Scheduling, apertura de los tres tipos históricos sin recalcular, pesos/review, espera/retry de CSS sin duplicados, filtros, teclado y footer a cinco anchos.
 
 El E2E real usa API, worker, base y storage desechables, con creación, ejecución, aprobación, reemplazo e historial. La prueba browser comprueba el payload enviado sin seleccionar profundidad. No usa datos productivos para escrituras de prueba.
 
