@@ -13,8 +13,7 @@ def test_phase2_keeps_same_four_section_anatomy_as_assignment():
         'eyebrow:"OBJETIVO"',
         'number:"03"',
         'eyebrow:"RECURSOS"',
-        'number:"04"',
-        'eyebrow:"DASHBOARD"',
+        'decisionAdvancedOptionsSection({kind:"scheduling"})',
     ):
         assert marker in UI
 

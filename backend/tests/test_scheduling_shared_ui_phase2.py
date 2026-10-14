@@ -69,25 +69,20 @@ class SchedulingSharedUiPhase2Tests(unittest.TestCase):
         self.assertIn('locked?"is-locked":""', self.shared)
         self.assertIn("scheduling-resource-card.is-locked", self.css)
 
-    def test_dashboard_depth_keeps_only_essential_active(self):
-        for marker in (
-            'key:"essential"',
-            'selected:config.analysisDepth==="essential"',
-            'key:"comparative"',
-            'key:"deep"',
-            'disabled:true',
-            'tag:"Próximamente"',
-            'analysisDepth:"essential"',
-        ):
-            self.assertIn(marker, self.ui)
+    def test_advanced_options_replace_active_depth_configuration(self):
+        self.assertIn('decisionAdvancedOptionsSection({kind:"scheduling"})', self.ui)
+        self.assertNotIn('analysisDepth', self.ui)
+        self.assertNotIn('data-depth', self.shared)
+        self.assertIn('Buffer entre viajes', self.shared)
+        self.assertIn('disabled aria-disabled="true"', self.shared)
 
     def test_summary_chips_are_reactive_and_validate_before_review(self):
         for marker in (
             'target:"scheduling-scope"',
             'target:"scheduling-objective"',
             'target:"scheduling-resources"',
-            'target:"scheduling-dashboard"',
-            'data-summary-target',
+            'label:"Ventana"',
+            'mountConfigActionBar(root)',
             'configProblem(config,slaAvailable,trips)',
             'scrollToProblem(problem)',
             'reviewHook:"data-scheduling-review"',

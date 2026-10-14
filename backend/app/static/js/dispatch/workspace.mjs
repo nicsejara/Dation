@@ -39,13 +39,6 @@ const DIMENSION_LABELS={
   own_fleet:'Uso de flota propia',
   co2:'Emisiones CO₂',
 };
-// "Profundidad del análisis" is rendered by assignment-config.mjs; workspace
-// owns and persists the analysis_depth value used by the execution contract.
-const DEPTH_LABELS={
-  essential:'Esencial',
-  comparative:'Comparativo',
-  deep:'Profundo',
-};
 
 function balancedWeights(dimensions){
   const out=Object.fromEntries(PRIORITY_KEYS.map(k=>[k,0]));
@@ -102,7 +95,6 @@ const state={
   customWeights:saved.customWeights||null,
   lastPreset:saved.lastPreset||'balanced',
   objective:validObjectives.includes(saved.objective)?saved.objective:'balanced',
-  analysisDepth:['essential','comparative','deep'].includes(saved.analysisDepth)?saved.analysisDepth:'comparative',
   allow:savedResourceMode!=='own',
   resourceMode:savedResourceMode,
   scopeFilters:Array.isArray(saved.scopeFilters)?saved.scopeFilters:[],
@@ -127,7 +119,11 @@ const renderView=window.dationNavigate;
 const DRAFT_KEY='dation.dispatch.drafts.v1';
 let drafts={};try{drafts=JSON.parse(sessionStorage.getItem(DRAFT_KEY)||'{}');}catch{}
 if(!drafts||typeof drafts!=='object'||Array.isArray(drafts))drafts={};
-const draftFields=['dimensions','weights','customWeights','lastPreset','objective','analysisDepth','resourceMode','allow','scopeFilters','decisions','configured'];
+const draftFields=['dimensions','weights','customWeights','lastPreset','objective','resourceMode','allow','scopeFilters','decisions','configured'];
+// Restore only active criteria, including drafts saved by earlier versions.
+const cleanDraft=value=>Object.fromEntries(draftFields.filter(key=>Object.hasOwn(value||{},key)).map(key=>[key,value[key]]));
+drafts=Object.fromEntries(Object.entries(drafts).map(([id,value])=>[id,cleanDraft(value)]));
+try{sessionStorage.setItem(DRAFT_KEY,JSON.stringify(drafts));}catch{}
 function saveDraft(){if(state.decisionCase?.id){drafts[state.decisionCase.id]=Object.fromEntries(draftFields.map(key=>[key,state[key]]));try{sessionStorage.setItem(DRAFT_KEY,JSON.stringify(drafts));}catch{}}}
 
 function persist(){
@@ -140,7 +136,6 @@ function persist(){
       customWeights:state.customWeights,
       lastPreset:state.lastPreset,
       objective:state.objective,
-      analysisDepth:state.analysisDepth,
       allow:state.allow,
       resourceMode:state.resourceMode,
       scopeFilters:state.scopeFilters,
@@ -209,7 +204,6 @@ function resetAssignmentConfiguration(){
   state.weights=balancedWeights(state.dimensions);
   state.customWeights=null;
   state.lastPreset='balanced';
-  state.analysisDepth='comparative';
   state.resourceMode='mixed';
   state.allow=true;
   state.scopeFilters=[];
@@ -463,7 +457,7 @@ async function execute(){
       options:{
         allow_third_party:state.resourceMode!=='own',
         resource_mode:state.resourceMode,
-        analysis_depth:state.analysisDepth,
+        analysis_depth:'essential',
         anomaly_decisions:Object.fromEntries(
           Object.entries(state.decisions).filter(([,v])=>v),
         ),
@@ -548,9 +542,6 @@ async function reconfigureRun(run,nodeId){
     state.scopeFilters=Array.isArray(config.scope?.filters)
       ?config.scope.filters.map(item=>({...item,preset:'custom'}))
       :[];
-    state.analysisDepth=['essential','comparative'].includes(options.analysis_depth)
-      ?options.analysis_depth
-      :'comparative';
     state.resourceMode=['own','mixed','outsourced'].includes(options.resource_mode)
       ?options.resource_mode
       :(options.allow_third_party===false?'own':'mixed');
@@ -676,7 +667,7 @@ async function hydrateCase(caseId,generation=routeGeneration){
   const item=await api('/api/decision-cases/'+caseId,{signal:routeController?.signal});
   if(generation!==routeGeneration)return;
   if(String(item.decision_case?.id)!==String(caseId)||String(item.orders?.id)!==String(item.decision_case?.inputs?.orders_dataset_id||item.case?.orders_dataset_id)||String(item.fleet?.id)!==String(item.decision_case?.inputs?.fleet_dataset_id||item.case?.fleet_dataset_id))throw new Error('El Decision Case no coincide con su Data Pack.');
-  if(state.decisionCase?.id!==caseId){saveDraft();resetAssignmentConfiguration();Object.assign(state,drafts[caseId]||{});state.preflight=null;state.configPreview=null;state.run=null;}
+  if(state.decisionCase?.id!==caseId){saveDraft();resetAssignmentConfiguration();Object.assign(state,cleanDraft(drafts[caseId]));state.preflight=null;state.configPreview=null;state.run=null;}
   state.orders=item.orders;state.fleet=item.fleet;state.decisionCase={...item.decision_case,persisted:true};persist();return item;
 }
 async function navigateResource(view,options={}){

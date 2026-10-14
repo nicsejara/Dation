@@ -1,3 +1,5 @@
+import {createWorkflowActionBar} from "./workflow-action-bar.mjs";
+import {scopeFor} from "./lifecycle.mjs";
 import {esc} from "./shared.mjs";
 import {iconSvg} from "./decision-ui.mjs";
 
@@ -153,44 +155,59 @@ export function decisionChoiceCard({
   +'</button>';
 }
 
-export function decisionDepthCard({
-  key,
-  item,
-  selected=false,
-  disabled=false,
-  tag="",
-  disabledTitle="",
-  rowLabels=null,
-}){
-  const rows=rowLabels||item.rows||[];
-  const attributes={"data-depth":key,"aria-pressed":String(Boolean(selected))};
-  if(disabled){attributes.disabled=true;attributes["aria-disabled"]="true";}
-  if(disabledTitle)attributes.title=disabledTitle;
-  return '<button type="button" class="decision-config-depth assignment-depth-card '+(selected?'is-selected ':'')+(disabled?'is-disabled':'')+'"'+attrs(attributes)+'>'
-    +'<div class="assignment-depth-card__top"><span class="assignment-depth-radio"></span><strong>'+esc(item.label)+'</strong>'+(tag?'<em>'+esc(tag)+'</em>':'')+'</div>'
-    +'<p>'+esc(item.copy)+'</p>'
-    +'<ul>'+rows.map(([label,ok])=>'<li class="'+(ok?'is-on':'is-off')+'">'+(ok?iconSvg("check","assignment-icon"):'<span>—</span>')+esc(label)+'</li>').join("")+'</ul>'
-  +'</button>';
+/** Informational only: no form names, state keys, or event hooks. */
+export function decisionAdvancedOptionsSection({kind}){
+  const items=kind==="scheduling"?[
+    ["Buffer entre viajes","Agregá tiempo operativo mínimo entre dos usos del mismo recurso."],
+    ["Ventanas por recurso","Definí calendarios específicos por vehículo o grupo."],
+    ["Penalización por atraso","Controlá cuánto pesa el atraso relativo entre distintos grupos."],
+  ]:[
+    ["Límite de tercerización","Controlá cuánto volumen puede enviarse a terceros."],
+    ["Utilización mínima por viaje","Definí un umbral mínimo de ocupación."],
+    ["Reglas avanzadas por proveedor","Aplicá restricciones o penalizaciones por transportista."],
+  ];
+  return '<section class="assignment-section decision-advanced-options" aria-label="Opciones avanzadas">'
+    +decisionSectionHeader({number:"04",eyebrow:"OPCIONES AVANZADAS",title:"Opciones avanzadas",copy:"Estas opciones estarán disponibles en próximas versiones.",icon:"slidersHorizontal"})
+    +'<div class="decision-advanced-options__grid">'+items.map(([title,copy])=>
+      '<button type="button" disabled aria-disabled="true" class="decision-advanced-option"><span>Próximamente</span><strong>'+esc(title)+'</strong><small>'+esc(copy)+'</small></button>'
+    ).join("")+'</div></section>';
 }
 
-export function configSummaryBar({
-  ready=true,
-  reason="",
-  chips=[],
-  ctaLabel="Revisar y ejecutar",
-  reviewHook="data-config-review",
-  extraClass="",
-}){
-  const status=ready
-    ?'<span class="assignment-summary-status is-ready">'+iconSvg("checkCircle","assignment-icon")+'Lista para ejecutar</span>'
-    :'<span class="assignment-summary-status is-warning">'+iconSvg("alertTriangle","assignment-icon")+'Falta completar</span>';
-  return '<footer class="decision-config-summary assignment-summary-bar '+esc(extraClass)+'">'
-    +'<div class="assignment-summary-bar__meta"><span>TU CONFIGURACIÓN</span>'+status+(ready?'<small>Los cambios se guardan automáticamente en esta sesión.</small>':'<small>'+esc(reason)+'</small>')+'</div>'
-    +'<nav class="assignment-summary-chips" aria-label="Resumen de configuración">'
-      +chips.map(chip=>'<button type="button" data-summary-target="'+esc(chip.target)+'">'+iconSvg(chip.icon,"assignment-icon")+'<span><small>'+esc(chip.label)+'</small><strong>'+esc(chip.value)+'</strong></span></button>').join("")
-    +'</nav>'
-    +'<button type="button" class="assignment-review-cta" '+reviewHook+'>'+esc(ctaLabel)+' '+iconSvg("arrowRight","assignment-icon")+'</button>'
-  +'</footer>';
+/** The configuration owners supply validation; the shared workflow owns the bar. */
+export function configSummaryBar(options){
+  return '<div data-config-summary="'+esc(JSON.stringify(options))+'"></div>';
+}
+
+const actionBars=new WeakMap();
+export function mountConfigActionBar(root){
+  actionBars.get(root)?.dispose();
+  root.querySelectorAll('dialog.d-config-dialog').forEach(dialog=>dialog.addEventListener('keydown',event=>{
+    if(event.key!=="Escape"||!dialog.open)return;
+    event.preventDefault();event.stopPropagation();dialog.close();
+  }));
+  const placeholder=root.querySelector('[data-config-summary]');
+  if(!placeholder)return;
+  const {ready=true,reason="",chips=[],reviewHook="data-config-review"}=JSON.parse(placeholder.dataset.configSummary);
+  const {bar,button,update}=createWorkflowActionBar({label:"Tu configuración",variant:"configuration",onSelect:id=>{
+    const section=root.querySelector('#'+CSS.escape(id));
+    section?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:"center"});
+  }});
+  bar.classList.add("d-workflow-action-bar--config");
+  button.setAttribute(reviewHook,"");
+  update({kind:ready?"ready":"error",enabled:ready,message:ready?"Lista para revisar. Cambios guardados en esta sesión.":reason},{items:chips});
+  placeholder.replaceWith(bar);
+  const measure=()=>root.style.setProperty('--config-action-height',Math.ceil(bar.getBoundingClientRect().height)+'px');
+  const observer=typeof ResizeObserver==='undefined'?null:new ResizeObserver(measure);
+  observer?.observe(bar);measure();
+  let release;
+  const dispose=()=>{observer?.disconnect();release?.();root.style.removeProperty('--config-action-height');actionBars.delete(root);};
+  release=scopeFor(root)?.own(dispose);
+  actionBars.set(root,{dispose,update,items:chips});
+}
+
+export function updateConfigActionBar(root,{ready,reason=""}){
+  const mounted=actionBars.get(root);
+  mounted?.update({kind:ready?"ready":"error",enabled:ready,message:ready?"Lista para revisar. Cambios guardados en esta sesión.":reason},{items:mounted.items});
 }
 
 export function decisionInfoNote({icon="info",title="",copy="",className=""}){
@@ -212,4 +229,11 @@ export function decisionRuleCard({index,title,summary="",body="",expanded=true,c
     +'<header><div><span>REGLA '+esc(number)+'</span><strong>'+esc(title)+'</strong>'+(summary?'<small>'+esc(summary)+'</small>':'')+'</div></header>'
     +'<div class="decision-config-rule-card__body">'+body+'</div>'
   +'</article>';
+}
+
+export function ensureDecisionConfigStyle(id,path,version="dark-config-phase4-v1"){
+  const existing=[...document.querySelectorAll('link[rel="stylesheet"]')].find(link=>new URL(link.href,location.href).pathname===path);
+  const link=existing||document.createElement('link');
+  if(!existing){link.id=id;link.rel='stylesheet';document.head.append(link);}
+  link.href=path+'?v='+version;
 }

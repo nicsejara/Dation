@@ -33,7 +33,7 @@ class SchedulingConfigPhase3RuleEditorTests(unittest.TestCase):
             CONFIG,
         )
         self.assertIn(
-            'scheduling-rule-editor-phase3.css?v=scheduling-rule-editor-phase3-v1',
+            'ensureDecisionConfigStyle(STYLE_IDS.rules,"/static/css/scheduling-rule-editor-phase3.css")',
             CONFIG,
         )
 

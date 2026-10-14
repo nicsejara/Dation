@@ -34,7 +34,7 @@
   const failures=[];
   while(node=walker.nextNode()) {
     const content=node.textContent.trim(),el=node.parentElement;
-    if(!content||el.closest('svg,script,style,[aria-hidden="true"],button:disabled'))continue;
+    if(!content||el.closest('svg,script,style,[aria-hidden="true"],button:disabled:not(.decision-advanced-option)'))continue;
     const bounds=el.getBoundingClientRect(),style=getComputedStyle(el);
     if(!bounds.width||!bounds.height||style.visibility!=='visible')continue;
     // Closed native details omit their body from layout.
@@ -47,11 +47,21 @@
     count++;minimum=Math.min(minimum,contrast);
     if(contrast<threshold)failures.push({text:content.slice(0,90),element:el.className||el.tagName,contrast,threshold,color:style.color});
   }
+  // Native values and placeholders have no text nodes. Audit their rendered roles too.
+  for(const el of view.querySelectorAll('input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=range]),select,textarea')) {
+    const bounds=el.getBoundingClientRect(),style=getComputedStyle(el);
+    if(el.disabled||!bounds.width||!bounds.height||style.visibility!=='visible')continue;
+    const placeholder=el.tagName==='INPUT'&&!el.value&&el.placeholder;
+    const foreground=rgb(placeholder?getComputedStyle(el,'::placeholder').color:style.color);
+    const contrast=Math.min(...backgrounds(el).map(bg=>ratio(over(foreground,bg),bg)));
+    count++;minimum=Math.min(minimum,contrast);
+    if(contrast<4.5)failures.push({element:el.tagName,control:placeholder?'placeholder':'value',contrast,threshold:4.5});
+  }
   const hero=view.querySelector('.d-page-hero');
   const geometry=el=>{const b=el.getBoundingClientRect();return {x:b.x,y:b.y,width:b.width,height:b.height,right:b.right,bottom:b.bottom};};
   return {textCount:count,minimumContrast:minimum,failures,hero:hero?geometry(hero):null,
     overflow:document.documentElement.scrollWidth>innerWidth,
     legacyBoundary:!!view.closest('[data-dation-surface="legacy-light"]'),
     scheme:getComputedStyle(view).colorScheme,
-    cards:[...view.querySelectorAll('.d-home__asset,.dda-landing__section,.dda-landing__step,.dda-landing__node,.dda-landing__summary-card,.dda-landing__faq-grid details,.dispatch-pro-file-card,.dispatch-pro-validation-row,.dispatch-pro-inline-library-row,.d-workflow-action-bar')].map(el=>({background:getComputedStyle(el).backgroundColor,...geometry(el)}))};
+    cards:[...view.querySelectorAll('.d-home__asset,.dda-landing__section,.dda-landing__step,.dda-landing__node,.dda-landing__summary-card,.dda-landing__faq-grid details,.dispatch-pro-file-card,.dispatch-pro-validation-row,.dispatch-pro-inline-library-row,.d-workflow-action-bar,.assignment-section,.assignment-choice-card,.decision-advanced-option,.scheduling-rule-builder')].map(el=>({background:getComputedStyle(el).backgroundColor,...geometry(el)}))};
 }

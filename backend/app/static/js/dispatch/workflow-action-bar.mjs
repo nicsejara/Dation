@@ -26,7 +26,7 @@ function icon(name) {
 }
 
 /** One stable action node; callers retain validation and continuation ownership. */
-export function createWorkflowActionBar({label, onContinue, onProblem}) {
+export function createWorkflowActionBar({label, onContinue, onProblem, onSelect, variant = "data"}) {
   const bar = node("section", null, "d-workflow-action-bar");
   bar.setAttribute("aria-label", `${label}: acciones`);
   const meta = node("div", null, "d-workflow-action-bar__meta");
@@ -34,7 +34,8 @@ export function createWorkflowActionBar({label, onContinue, onProblem}) {
   message.id = `workflow-action-message-${++sequence}`;
   message.setAttribute("role", "status");
   meta.append(node("strong", label), message);
-  const files = node("div", null, "d-workflow-action-bar__items");
+  const files = node(variant === "configuration" ? "nav" : "div", null, "d-workflow-action-bar__items");
+  if (variant === "configuration") files.setAttribute("aria-label", "Resumen de configuración");
   const button = node("button", null, "d-button d-button--primary dispatch-pro-next-button");
   button.type = "button";
   button.disabled = true;
@@ -47,7 +48,15 @@ export function createWorkflowActionBar({label, onContinue, onProblem}) {
     const state = busy ? "validating" : result.enabled ? "ready" : result.kind;
     bar.dataset.state = state;
     button.setAttribute("aria-busy", String(busy));
-    files.replaceChildren(...items.map(({key, label: title, tone}) => {
+    files.replaceChildren(...items.map(({key, label: title, tone, value, target}) => {
+      if (variant === "configuration") {
+        const item = node("button", null, "d-workflow-action-bar__item d-workflow-action-bar__chip");
+        item.type = "button";
+        item.dataset.summaryTarget = target;
+        item.addEventListener("click", () => onSelect?.(target));
+        item.append(node("small", title), node("strong", value));
+        return item;
+      }
       const item = node("span", null, `d-workflow-action-bar__item is-${tone}`);
       const status = {success:"listo", warning:"con avisos", error:"con errores", validating:"validando", pending:"pendiente"}[tone];
       item.append(icon(key), node("span", `${title}: ${status}`), icon(tone));
@@ -56,9 +65,13 @@ export function createWorkflowActionBar({label, onContinue, onProblem}) {
     message.textContent = result.message;
     action = null;
     button.disabled = true;
-    button.className = "d-button d-button--secondary dispatch-pro-next-button";
+    button.className = `d-button d-button--secondary ${variant === "data" ? "dispatch-pro-next-button" : ""}`;
     let title;
-    if (busy) title = "Validando archivos…";
+    if (variant === "configuration") {
+      title = "Revisar y ejecutar";
+      button.disabled = false;
+      button.classList.replace("d-button--secondary", "d-button--primary");
+    } else if (busy) title = "Validando archivos…";
     else if (!storageAvailable) title = "Servicio no disponible";
     else if (result.enabled) {
       title = "Seleccioná tu decisión";
@@ -71,8 +84,8 @@ export function createWorkflowActionBar({label, onContinue, onProblem}) {
       action = onProblem;
     } else if (missingCount) title = `Falta${missingCount === 1 ? "" : "n"} ${missingCount} archivo${missingCount === 1 ? "" : "s"}`;
     else title = "Comprobando archivos…";
-    button.replaceChildren(node("span", title), icon(result.enabled ? "arrow" : state === "error" ? "error" : busy ? "validating" : "pending"));
+    button.replaceChildren(node("span", title), icon(variant === "configuration" || result.enabled ? "arrow" : state === "error" ? "error" : busy ? "validating" : "pending"));
   }
   update({kind:"pending", enabled:false, message:"Completá tu Data Pack."}, {missingCount:2});
-  return {bar, update};
+  return {bar, button, update};
 }

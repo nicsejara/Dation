@@ -5,7 +5,9 @@ import {
   decisionCaseCard,
   decisionChoiceCard,
   decisionDataFileCard,
-  decisionDepthCard,
+  decisionAdvancedOptionsSection,
+  mountConfigActionBar,
+  ensureDecisionConfigStyle,
   decisionHero,
   decisionInfoNote,
   decisionSectionHeader,
@@ -36,21 +38,12 @@ const restoredRuns=new Set();
 let observer=null;
 let mounting=false;
 
-function ensureLink(id,href){
-  if(document.getElementById(id))return;
-  const link=document.createElement("link");
-  link.id=id;
-  link.rel="stylesheet";
-  link.href=href;
-  document.head.append(link);
-}
-
 function ensureStyles(){
-  ensureLink(STYLE_IDS.case,"/static/css/decision-map-case-v2.css?v=scheduling-shared-phase2-v1");
-  ensureLink(STYLE_IDS.assignment,"/static/css/assignment-config-v2.css?v=scheduling-shared-phase2-v1");
-  ensureLink(STYLE_IDS.own,"/static/css/scheduling-config-v2.css?v=scheduling-shared-phase2-v1");
-  ensureLink(STYLE_IDS.shared,"/static/css/scheduling-config-shared-phase2.css?v=scheduling-shared-phase2-v1");
-  ensureLink(STYLE_IDS.rules,"/static/css/scheduling-rule-editor-phase3.css?v=scheduling-rule-editor-phase3-v1");
+  ensureDecisionConfigStyle(STYLE_IDS.case,"/static/css/decision-map-case-v2.css","dark-data-pack-phase3-v1");
+  ensureDecisionConfigStyle(STYLE_IDS.assignment,"/static/css/assignment-config-v2.css");
+  ensureDecisionConfigStyle(STYLE_IDS.own,"/static/css/scheduling-config-v2.css");
+  ensureDecisionConfigStyle(STYLE_IDS.shared,"/static/css/scheduling-config-shared-phase2.css");
+  ensureDecisionConfigStyle(STYLE_IDS.rules,"/static/css/scheduling-rule-editor-phase3.css");
 }
 
 function readJson(key,fallback={}){
@@ -58,12 +51,17 @@ function readJson(key,fallback={}){
 }
 
 function workspace(){return readJson(WORKSPACE_KEY,{});}
-function configStore(){return readJson(CONFIG_KEY,{});}
+function configStore(){
+  return Object.fromEntries(Object.entries(readJson(CONFIG_KEY,{})).map(([id,value])=>[id,cleanConfig(value)]));
+}
+function cleanConfig(value){
+  return Object.fromEntries(Object.keys(defaults()).filter(key=>Object.hasOwn(value||{},key)).map(key=>[key,value[key]]));
+}
 
 function writeConfig(caseId,value){
   if(!caseId)return;
   const store=configStore();
-  store[caseId]=value;
+  store[caseId]=cleanConfig(value);
   try{sessionStorage.setItem(CONFIG_KEY,JSON.stringify(store));}catch{}
 }
 
@@ -73,7 +71,6 @@ function defaults(){
     windowMode:"auto",
     windowStart:"",
     windowEnd:"",
-    analysisDepth:"essential",
     focusRulesOpen:false,
     temporalRules:[],
     editingRuleId:null,
@@ -338,41 +335,6 @@ function resourceSection(stats){
   +'</section>';
 }
 
-function depthSection(config){
-  const depths={
-    essential:{
-      label:"Esencial",
-      copy:"Calendario recomendado, fechas, secuencia, reglas aplicadas, esperas, SLA y excepciones.",
-      rows:[["Calendario recomendado",true],["SLA y excepciones",true],["Comparación de estrategias",false]],
-    },
-    comparative:{
-      label:"Comparativo",
-      copy:"Comparación formal entre estrategias temporales alternativas.",
-      rows:[["Calendario recomendado",false],["SLA y excepciones",false],["Comparación de estrategias",false]],
-    },
-    deep:{
-      label:"Profundo",
-      copy:"Evidencia ampliada y sensibilidad de restricciones.",
-      rows:[["Calendario recomendado",false],["SLA y excepciones",false],["Comparación de estrategias",false]],
-    },
-  };
-  return '<section class="assignment-section scheduling-section" id="scheduling-dashboard" data-config-section="dashboard">'
-    +decisionSectionHeader({
-      number:"04",
-      eyebrow:"DASHBOARD",
-      title:"Profundidad del análisis",
-      copy:"Definí cuánto detalle querés recibir. En esta versión Planificación publica el análisis Esencial.",
-      icon:"layoutDashboard",
-      current:"Esencial",
-    })
-    +'<div class="assignment-depth-grid scheduling-depth-grid">'
-      +decisionDepthCard({key:"essential",item:depths.essential,selected:config.analysisDepth==="essential",tag:"Activo"})
-      +decisionDepthCard({key:"comparative",item:depths.comparative,disabled:true,tag:"Próximamente",disabledTitle:"Se habilita en futuras versiones"})
-      +decisionDepthCard({key:"deep",item:depths.deep,disabled:true,tag:"Próximamente",disabledTitle:"Se habilita en futuras versiones"})
-    +'</div>'
-  +'</section>';
-}
-
 function summaryBar(config,stats,slaAvailable){
   const problem=configProblem(config,slaAvailable,stats.trips);
   return configSummaryBar({
@@ -382,16 +344,15 @@ function summaryBar(config,stats,slaAvailable){
     reviewHook:"data-scheduling-review",
     extraClass:"scheduling-summary-bar",
     chips:[
-      {target:"scheduling-scope",icon:"calendarRange",label:"Alcance",value:scopeCurrent(config,stats.trips)},
+      {target:"scheduling-scope",icon:"calendarRange",label:"Ventana",value:scopeCurrent(config,stats.trips)},
       {target:"scheduling-objective",icon:"target",label:"Objetivo",value:objectiveLabel(config)},
       {target:"scheduling-resources",icon:"truck",label:"Recursos",value:resourceLabel(stats)},
-      {target:"scheduling-dashboard",icon:"layoutDashboard",label:"Dashboard",value:"Esencial"},
     ],
   });
 }
 
 function reviewDialog(config,stats,sourceRun){
-  return '<dialog class="dispatch dispatch-review assignment-review-dialog scheduling-review" data-scheduling-review-dialog><form method="dialog">'
+  return '<dialog class="dispatch dispatch-review d-config-dialog assignment-review-dialog scheduling-review" data-scheduling-review-dialog><form method="dialog">'
     +'<span class="assignment-section__eyebrow">ANTES DE EJECUTAR</span><h2>Revisar planificación</h2>'
     +'<div class="dispatch-review-summary scheduling-review-grid">'
       +'<p><strong>Entrada</strong><span>'+num(stats.totalTrips)+' viajes de Assignment · Run '+esc(formatRunId(sourceRun.id))+'</span></p>'
@@ -399,7 +360,6 @@ function reviewDialog(config,stats,sourceRun){
       +'<p><strong>Reglas por foco</strong><span>'+esc(rulesLabel(config,stats.trips))+'</span></p>'
       +'<p><strong>Objetivo</strong><span>'+esc(objectiveLabel(config))+'</span></p>'
       +'<p><strong>Recursos</strong><span>Heredados de la asignación aprobada</span></p>'
-      +'<p><strong>Profundidad</strong><span>Esencial</span></p>'
     +'</div>'
     +'<div data-scheduling-review-error></div>'
     +'<div class="dispatch-actions scheduling-review-actions"><button value="cancel">Volver</button><button class="scheduling-primary" type="button" data-scheduling-execute>Generar planificación</button></div>'
@@ -415,7 +375,7 @@ function markup({state,sourceRun,slaAvailable,config}){
       +scopeSection(config,stats,sourceRun)
       +objectiveSection(config,slaAvailable)
       +resourceSection(stats)
-      +depthSection(config)
+      +decisionAdvancedOptionsSection({kind:"scheduling"})
     +'</main>'
     +summaryBar(config,stats,slaAvailable)
     +reviewDialog(config,stats,sourceRun)
@@ -452,7 +412,6 @@ async function restoreFromQuery(caseId,config){
       editingRuleId:null,
       ruleDraft:{field:"destination",values:[],action:"prioritize",windowStart:"",windowEnd:""},
       focusRulesOpen:Boolean(source.temporal_rules?.length),
-      analysisDepth:"essential",
     };
     writeConfig(caseId,restored);
     return restored;
@@ -554,6 +513,7 @@ function scrollToProblem(problem){
 }
 
 function bind(root,context){
+  mountConfigActionBar(root);
   const scope=scopeFor(root);
   const {state,sourceRun,slaAvailable}=context;
   const caseId=state.decisionCase.id;
@@ -614,9 +574,6 @@ function bind(root,context){
     });
   });
 
-  root.querySelectorAll("[data-summary-target]").forEach(button=>button.addEventListener("click",()=>{
-    document.getElementById(button.dataset.summaryTarget)?.scrollIntoView({behavior:"smooth",block:"center"});
-  }));
 
   const dialog=root.querySelector("[data-scheduling-review-dialog]");
   root.querySelector("[data-scheduling-review]")?.addEventListener("click",()=>{
@@ -654,7 +611,7 @@ export async function mount(root,context={}){
     if(!scope.active||context.isCurrent?.()===false)return;
     let config=caseConfig(state.decisionCase.id);const slaAvailable=readinessSla(preflight);
     if(!slaAvailable&&config.strategy==='service_first')config={...config,strategy:'earliest_dispatch'};
-    config={...normalizeFocusConfig(config,sourceStats(sourceRun).trips),analysisDepth:'essential'};
+    config=normalizeFocusConfig(config,sourceStats(sourceRun).trips);
     writeConfig(state.decisionCase.id,config);root.innerHTML=markup({state,sourceRun,slaAvailable,config});bind(root,{...context,state,sourceRun,slaAvailable,config});
   }catch(error){if(scope.active)root.textContent=error.message;}
 }

@@ -1,7 +1,7 @@
 /* Temporary boundary for pages and overlays owned by phases 2–5.
    Remove each opt-in as its page adopts the dark roles; never apply to the shell. */
 [data-dation-surface="legacy-light"],
-.dispatch-review, .dispatch-trace-dialog, .dispatch-chat {
+.dispatch-review:where(:not(.d-config-dialog)), .dispatch-trace-dialog, .dispatch-chat {
   color-scheme: light;
   --color-bg: #f4f8fa;
   --color-surface: #ffffff;
