@@ -44,8 +44,10 @@ const RESOURCE_MODES={
 };
 
 function ensureStyles(){
-  ensureDecisionConfigStyle("assignment-config-case-styles","/static/css/decision-map-case-v2.css","dark-data-pack-phase3-v1");
-  ensureDecisionConfigStyle("assignment-config-v2-styles","/static/css/assignment-config-v2.css");
+  return Promise.all([
+    ensureDecisionConfigStyle("assignment-config-case-styles","/static/css/decision-map-case-v2.css","dark-data-pack-phase3-v1"),
+    ensureDecisionConfigStyle("assignment-config-v2-styles","/static/css/assignment-config-v2.css")
+  ]);
 }
 
 function workflowStep(id,fallback){
@@ -442,9 +444,10 @@ function defaultFilter(field){
 }
 
 export async function mountAssignmentConfig(root,context){
-  ensureStyles();
   const scope=createScope(root),collapse=mountFilterCollapse(root);
   const current=()=>scope.active&&context.isCurrent?.()!==false;
+  await ensureStyles();
+  if(!current())return;
   const {state,persist,capabilities,onData,onExecute}=context;
   state.scopeFilters=Array.isArray(state.scopeFilters)?state.scopeFilters:[];
   state.resourceMode=["own","mixed","outsourced"].includes(state.resourceMode)

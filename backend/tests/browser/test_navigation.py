@@ -858,6 +858,25 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.page.wait_for_timeout(1700)
         self.assertEqual(len(self.requests),count)
 
+    async def test_phase4_config_waits_for_its_stylesheet_before_rendering(self):
+        requested,release=asyncio.Event(),asyncio.Event()
+        async def slow_style(route):
+            requested.set();await release.wait();await route.continue_()
+        await self.context.route('**/static/css/assignment-config-v2.css*',slow_style)
+        try:
+            await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=logistics-config&case_id={self.case["id"]}&node_id=logistics_assignment',wait_until='domcontentloaded')
+            await asyncio.wait_for(requested.wait(),6)
+            self.assertEqual(await self.page.locator('[data-config-review]').count(),0)
+        finally:release.set()
+        await self.page.locator('[data-config-review]').wait_for(state='visible')
+        audit=(Path(__file__).parent/'theme_audit.js').read_text()
+        self.assertEqual((await self.page.evaluate(audit))['failures'],[])
+        await self.nav('logistics-map')
+        await self.page.evaluate('window.DationDispatch.openCase('+json.dumps(self.case['id'])+',"logistics-config","logistics_assignment")')
+        await self.page.locator('[data-config-review]').wait_for(state='visible')
+        count=await self.page.evaluate("[...document.querySelectorAll('link[rel=stylesheet]')].filter(x=>new URL(x.href).pathname==='/static/css/assignment-config-v2.css').length")
+        self.assertEqual(count,1)
+
     async def test_phase4_weight_edits_refresh_validation_and_review_without_losing_focus(self):
         await self.open('logistics-config','logistics_assignment')
         await self.page.locator('[data-objective=custom]').click()

@@ -39,11 +39,13 @@ let observer=null;
 let mounting=false;
 
 function ensureStyles(){
-  ensureDecisionConfigStyle(STYLE_IDS.case,"/static/css/decision-map-case-v2.css","dark-data-pack-phase3-v1");
-  ensureDecisionConfigStyle(STYLE_IDS.assignment,"/static/css/assignment-config-v2.css");
-  ensureDecisionConfigStyle(STYLE_IDS.own,"/static/css/scheduling-config-v2.css");
-  ensureDecisionConfigStyle(STYLE_IDS.shared,"/static/css/scheduling-config-shared-phase2.css");
-  ensureDecisionConfigStyle(STYLE_IDS.rules,"/static/css/scheduling-rule-editor-phase3.css");
+  return Promise.all([
+    ensureDecisionConfigStyle(STYLE_IDS.case,"/static/css/decision-map-case-v2.css","dark-data-pack-phase3-v1"),
+    ensureDecisionConfigStyle(STYLE_IDS.assignment,"/static/css/assignment-config-v2.css"),
+    ensureDecisionConfigStyle(STYLE_IDS.own,"/static/css/scheduling-config-v2.css"),
+    ensureDecisionConfigStyle(STYLE_IDS.shared,"/static/css/scheduling-config-shared-phase2.css"),
+    ensureDecisionConfigStyle(STYLE_IDS.rules,"/static/css/scheduling-rule-editor-phase3.css")
+  ]);
 }
 
 function readJson(key,fallback={}){
@@ -602,7 +604,9 @@ function bind(root,context){
 }
 
 export async function mount(root,context={}){
-  ensureStyles();const scope=createScope(root),state=context.state||workspace();
+  const scope=createScope(root),state=context.state||workspace();
+  await ensureStyles();
+  if(!scope.active||context.isCurrent?.()===false)return;
   const sourceRunId=currentSourceRunId(state);if(!sourceRunId)return;
   root.className="dispatch dispatch-upload-pro assignment-config-root scheduling-config-root";
   root.innerHTML='<section class="dispatch-panel"><p role="status">Preparando la configuración temporal…</p></section>';

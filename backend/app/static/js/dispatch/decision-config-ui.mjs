@@ -233,7 +233,16 @@ export function decisionRuleCard({index,title,summary="",body="",expanded=true,c
 
 export function ensureDecisionConfigStyle(id,path,version="dark-config-phase4-v1"){
   const existing=[...document.querySelectorAll('link[rel="stylesheet"]')].find(link=>new URL(link.href,location.href).pathname===path);
+  const href=new URL(path+'?v='+version,location.href).href;
+  if(existing?.href===href&&existing.sheet)return Promise.resolve();
   const link=existing||document.createElement('link');
-  if(!existing){link.id=id;link.rel='stylesheet';document.head.append(link);}
-  link.href=path+'?v='+version;
+  return new Promise((resolve,reject)=>{
+    const cleanup=()=>{link.removeEventListener('load',loaded);link.removeEventListener('error',failed);};
+    const loaded=()=>{cleanup();resolve();};
+    const failed=()=>{cleanup();reject(new Error('No pudimos cargar el estilo de configuración. Reintentá.'));};
+    link.addEventListener('load',loaded);link.addEventListener('error',failed);
+    if(!existing){link.id=id;link.rel='stylesheet';}
+    if(link.href!==href)link.href=href;
+    if(!existing)document.head.append(link);
+  });
 }
