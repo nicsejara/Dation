@@ -24,7 +24,7 @@ def test_decision_panel_copy_wraps_instead_of_overflowing():
     assert ".assignment-config-root .assignment-decision-panel .dispatch-pro-how-node small" in CSS
     assert "white-space:normal!important" in CSS
     assert "overflow-wrap:anywhere" in CSS
-    assert "grid-template-columns:38px minmax(0,1fr)" in CSS
+    assert "grid-template-columns:32px minmax(0,1fr)" in CSS
 
 
 def test_mobile_case_summary_stacks_cleanly():

@@ -39,7 +39,7 @@ export function decisionSectionHeader({number,eyebrow,title,copy,icon,current}){
 }
 
 export function decisionHero({step,decisionIndex,totalDecisions=3,title,description,panelItems=[]}){
-  return '<section class="decision-config-hero dispatch-pro-hero assignment-config-hero">'
+  return '<section class="decision-config-hero dispatch-pro-hero assignment-config-hero d-page-hero">'
     +'<div class="dispatch-pro-hero-copy">'
       +'<div class="assignment-config-hero__badges">'
         +'<span class="dispatch-pro-hero-badge is-step">PASO '+esc(step?.number??3)+': '+esc(String(step?.label||"Configurar decisión").toUpperCase())+'</span>'

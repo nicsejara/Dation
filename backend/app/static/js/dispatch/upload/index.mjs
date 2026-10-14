@@ -103,7 +103,7 @@ function workflowStep(id, fallback) {
 }
 
 function makeHero() {
-  const hero = el("section", null, "dispatch-pro-hero");
+  const hero = el("section", null, "dispatch-pro-hero d-page-hero");
   hero.dataset.reveal = "";
 
   const copy = el("div", null, "dispatch-pro-hero-copy");

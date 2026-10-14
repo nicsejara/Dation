@@ -78,7 +78,20 @@ jobs:
 
       - name: Run browser regression tests with synthetic API data
         working-directory: backend
-        run: .browser-venv/bin/python -m unittest discover -s tests/browser -p 'test_*.py' -v
+        run: |
+          python - <<'PY'
+          import subprocess, sys
+          result = subprocess.run(
+              [".browser-venv/bin/python", "-m", "unittest", "discover", "-s", "tests/browser", "-p", "test_*.py", "-v"],
+              capture_output=True, text=True,
+          )
+          output = result.stdout + result.stderr
+          print(output)
+          if result.returncode:
+              detail = output[-12000:].replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+              print("::error title=Chromium regression failure::" + detail)
+          sys.exit(result.returncode)
+          PY
 
       - name: Verify schema, history, approvals and durable jobs on PostgreSQL 17
         working-directory: backend

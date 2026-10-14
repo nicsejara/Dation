@@ -375,6 +375,10 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(await map_button.is_visible());self.assertTrue(await map_button.is_disabled())
         self.assertEqual(await map_button.get_attribute('aria-disabled'),'true')
         self.assertEqual(await map_button.evaluate('(x)=>getComputedStyle(x).cursor'),'not-allowed')
+        self.assertEqual(await map_button.evaluate('(x)=>getComputedStyle(x).opacity'),'1')
+        bg=await map_button.evaluate('(x)=>getComputedStyle(x).backgroundColor')
+        await map_button.hover(force=True)
+        self.assertEqual(bg,await map_button.evaluate('(x)=>getComputedStyle(x).backgroundColor'))
         initial=self.page.url;await map_button.dispatch_event('click');self.assertEqual(self.page.url,initial)
         self.assertEqual(await self.page.locator('[data-go-data],[data-go-map],[data-go-home],.dda-landing__mobile-primary').count(),0)
         await self.page.set_viewport_size({'width':390,'height':844})
@@ -1079,6 +1083,113 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.page.evaluate("id=>window.DationDispatch.openRun(id,'logistics_assignment')",self.f["ids"]["assignment"])
         await self.page.wait_for_selector(".assignment-dashboard-v2")
         self.assertFalse(await self.page.evaluate("document.documentElement.scrollWidth>innerWidth"))
+
+
+    async def test_dark_shell_and_heroes_survive_responsive_and_warm_navigation(self):
+        await self.page.emulate_media(reduced_motion="reduce", color_scheme="light")
+        for width in (1440,1280,1024,768,390):
+            await self.page.set_viewport_size({"width":width,"height":1000})
+            for view,node in (("inicio",None),("logistics-overview",None),("logistics-data",None),
+                              ("logistics-map",None),("logistics-config","logistics_scheduling"),
+                              ("logistics-config","logistics_assignment")):
+                if view in ("inicio","logistics-overview","logistics-data"):
+                    await self.page.goto(f"http://127.0.0.1:{self.port}/app?view={view}")
+                else:
+                    await self.open(view,node)
+                hero=self.page.locator(".view.is-active .d-page-hero")
+                await hero.wait_for(state="visible")
+                metrics=await hero.evaluate("""el=>{
+                    const s=getComputedStyle(el), h=el.querySelector('h1'), r=el.getBoundingClientRect();
+                    return {scheme:getComputedStyle(document.documentElement).colorScheme,
+                        body:getComputedStyle(document.body).backgroundColor, topbar:getComputedStyle(document.querySelector('.topbar')).backgroundColor,
+                        minHeight:parseFloat(s.minHeight),padding:parseFloat(s.paddingTop),radius:parseFloat(s.borderRadius),
+                        title:parseFloat(getComputedStyle(h).fontSize),height:r.height,
+                        overflow:document.documentElement.scrollWidth>innerWidth,
+                        childrenFit:[...el.children].every(x=>x.getBoundingClientRect().right<=r.right+1),
+                        workspace:document.querySelector('.dda-workspace-nav-shell[hidden]')?null:getComputedStyle(document.querySelector('.dda-workspace-nav')).backgroundColor};
+                }""")
+                with self.subTest(width=width,view=view,node=node):
+                    self.assertEqual(metrics["scheme"],"dark")
+                    self.assertEqual(metrics["body"],"rgb(7, 16, 21)")
+                    self.assertEqual(metrics["topbar"],"rgba(10, 20, 27, 0.96)")
+                    self.assertFalse(metrics["overflow"])
+                    self.assertTrue(metrics["childrenFit"])
+                    self.assertGreaterEqual(metrics["minHeight"],210)
+                    self.assertTrue(20<=metrics["padding"]<=28)
+                    self.assertEqual(metrics["radius"],24)
+                    self.assertTrue(28<=metrics["title"]<=40)
+                    if metrics["workspace"]:self.assertEqual(metrics["workspace"],"rgb(15, 27, 36)")
+            # The real SPA path retains dynamically loaded styles across decisions.
+            await self.page.evaluate("id=>window.DationDispatch.openCase(id,'logistics-config','logistics_scheduling')",self.case["id"])
+            await self.page.locator(".scheduling-config-v2 .d-page-hero").wait_for(state="visible")
+            await self.page.evaluate("id=>window.DationDispatch.openCase(id,'logistics-config','logistics_assignment')",self.case["id"])
+            await self.page.locator(".assignment-config-v2 .d-page-hero").wait_for(state="visible")
+            self.assertFalse(await self.page.evaluate("document.documentElement.scrollWidth>innerWidth"))
+
+    async def test_dark_buttons_have_keyboard_focus_contrast_and_stable_disabled_state(self):
+        # Isolate control states from the decorative page entrance animation.
+        await self.page.emulate_media(reduced_motion="reduce")
+        await self.page.goto(f"http://127.0.0.1:{self.port}/app?view=logistics-overview")
+        primary=self.page.locator("[data-start-new-decision]")
+        await primary.wait_for(state="visible")
+        await self.page.mouse.move(0,0)
+        await primary.focus()
+        self.assertTrue(await primary.evaluate("el=>el.matches(':focus-visible')"))
+        self.assertEqual(await primary.evaluate("el=>getComputedStyle(el).outlineStyle"),"solid")
+        self.assertEqual(await primary.evaluate("el=>parseFloat(getComputedStyle(el).outlineWidth)"),3)
+        normal=await primary.evaluate("el=>getComputedStyle(el).backgroundImage")
+        await primary.hover();await self.page.wait_for_timeout(180)
+        hover=await primary.evaluate("el=>getComputedStyle(el).backgroundImage")
+        self.assertNotEqual(normal,hover)
+        # Actual computed colors, including every point of the action gradient.
+        contrast=await primary.evaluate("""(el,gradients)=>{
+            const rgb=s=>(s.match(/[\\d.]+/g)||[]).map(Number).slice(0,3);
+            const lum=c=>c.map(x=>x/255).map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4).reduce((a,x,i)=>a+x*[.2126,.7152,.0722][i],0);
+            const ratio=(a,b)=>(Math.max(lum(a),lum(b))+.05)/(Math.min(lum(a),lum(b))+.05);
+            const fg=rgb(getComputedStyle(el).color);
+            return Math.min(...gradients.map(gradient=>{
+            const stops=gradient.match(/rgb\\([^)]+\\)/g).map(rgb);
+            return Math.min(...stops.slice(1).flatMap((b,i)=>Array.from({length:257},(_,k)=>ratio(fg,b.map((v,j)=>stops[i][j]+(v-stops[i][j])*k/256)))));
+            }));
+        }""",[normal,hover])
+        self.assertGreaterEqual(contrast,4.5)
+        await self.page.evaluate("""()=>{
+            const region=document.createElement('div');region.id='theme-control-fixture';
+            for(const variant of ['secondary','ghost','danger','icon','menu']) {
+                const button=document.createElement('button');button.className='d-button d-button--'+variant;
+                button.type='button';button.textContent=variant;button.dataset.variant=variant;region.append(button);
+            }
+            const disabled=document.createElement('button');disabled.className='d-button d-button--primary';disabled.disabled=true;
+            disabled.textContent='Disabled';region.append(disabled);document.querySelector('.topbar').append(region);
+        }""")
+        disabled=self.page.locator("#theme-control-fixture button:disabled")
+        before=await disabled.evaluate("el=>[getComputedStyle(el).backgroundImage,getComputedStyle(el).backgroundColor,getComputedStyle(el).transform]")
+        await disabled.hover(force=True);await self.page.wait_for_timeout(180)
+        self.assertEqual(before,await disabled.evaluate("el=>[getComputedStyle(el).backgroundImage,getComputedStyle(el).backgroundColor,getComputedStyle(el).transform]"))
+        self.assertEqual(await disabled.evaluate("el=>getComputedStyle(el).opacity"),"1")
+        await self.page.locator("#theme-control-fixture [data-variant=secondary]").focus()
+        await self.page.keyboard.press("Tab")
+        self.assertTrue(await self.page.locator("#theme-control-fixture [data-variant=ghost]").evaluate("el=>el===document.activeElement && el.matches(':focus-visible')"))
+        await self.page.emulate_media(reduced_motion="reduce")
+        await primary.hover()
+        self.assertEqual(await primary.evaluate("el=>getComputedStyle(el).transform"),"none")
+
+    async def test_legacy_controls_and_review_keep_native_light_boundary(self):
+        await self.open("logistics-config","logistics_assignment")
+        panel=self.page.locator(".view.is-active")
+        self.assertEqual(await panel.evaluate("el=>getComputedStyle(el).colorScheme"),"light")
+        self.assertEqual(await panel.locator(".d-page-hero").evaluate("el=>getComputedStyle(el).colorScheme"),"dark")
+        await self.page.locator("[data-config-review]").click()
+        dialog=self.page.locator("dialog[open]")
+        await dialog.wait_for(state="visible")
+        self.assertEqual(await dialog.evaluate("el=>getComputedStyle(el).colorScheme"),"light")
+        execute=self.page.locator("[data-config-execute]")
+        await self.page.keyboard.press("Tab")
+        await execute.focus()
+        self.assertTrue(await execute.evaluate("el=>el.matches(':focus-visible')"))
+        await self.page.keyboard.press("Escape")
+        self.assertFalse(await dialog.is_visible())
+        self.assertEqual(self.execution_bodies,[])
 
 
 if __name__ == "__main__":
