@@ -27,7 +27,6 @@ function kpiMarkup(item){
   return '<article data-executive-kpi="'+esc(item.key)+'" class="assignment-essential__kpi '+(item.objective?'is-objective':'is-descriptive')+'">'
     +'<div class="assignment-essential__kpi-top">'
       +'<span'+(item.description?' title="'+esc(item.description)+'" aria-label="'+esc(item.label+' · '+item.description)+'"':'')+'>'+esc(item.label)+'</span>'
-      +'<em>'+(item.objective?'Parte del objetivo':'KPI del resultado')+'</em>'
     +'</div>'
     +'<strong>'+esc(formatKpi(item))+'</strong>'
   +'</article>';
@@ -52,6 +51,5 @@ export function render(root,result){
     +'</div>'
     +'<div class="assignment-essential__kpi-strip" aria-label="Métricas de la asignación">'
       +kpis.map(kpiMarkup).join('')
-    +'</div>'
-    +'<p class="assignment-essential__metric-note">Las etiquetas <strong>Parte del objetivo</strong> indican métricas con ponderación activa en esta corrida. El resto describe el resultado y no se presenta como causa de la recomendación.</p>';
+    +'</div>';
 }

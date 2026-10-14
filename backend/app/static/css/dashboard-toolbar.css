@@ -30,6 +30,7 @@
 .dashboard-toolbar .dashboard-toolbar__approve:not(:disabled):hover{background:#0b646a!important;}
 .dashboard-toolbar .dashboard-toolbar__approve:disabled{opacity:.7;cursor:wait;}
 .dashboard-toolbar .dashboard-toolbar__continue{border-color:#bdd9d9!important;background:#eff8f7!important;color:#156d72!important;}
+.dashboard-toolbar .dashboard-toolbar__map{min-height:38px;padding:9px 12px;border:1px solid #d2dde1;border-radius:10px;background:#fff;color:#29444e;font-size:12px;font-weight:750;}
 .dashboard-toolbar .dashboard-toolbar__status,.dashboard-toolbar .dashboard-toolbar__error{flex:1 0 100%;margin:0;font-size:12px;line-height:1.4;}
 .dashboard-toolbar__status{color:#617984;}
 .dashboard-toolbar__status:empty{display:none;}

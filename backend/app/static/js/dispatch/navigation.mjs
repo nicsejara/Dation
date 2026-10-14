@@ -28,3 +28,17 @@ export function runDecisionState(run,decisionCase,nodeId){
   if(String(node.approved_run_id||'')===String(run.id))return 'approved';
   return 'review';
 }
+
+// Persisted run lineage takes precedence over the currently selected workspace.
+export function runContext(run,fallbackNodeId=null){
+  const result=run?.result_json||{},stored=run?.configuration_json||{};
+  const meta=result.decision_case||stored.decision_case||{};
+  const schema=result.schema_version||run?.schema_version;
+  return {
+    caseId:result.decision_case?.case_id||run?.decision_case_id||stored.decision_case?.case_id||null,
+    nodeId:run?.node_id||meta.node_id||(schema==='scheduling_v1'?'logistics_scheduling':fallbackNodeId||'logistics_assignment'),
+    configuration:result.configuration||stored,
+    ordersId:result.inputs?.orders?.dataset_id||run?.orders_dataset_id||run?.dataset_id||null,
+    fleetId:result.inputs?.fleet?.dataset_id||run?.fleet_dataset_id||null,
+  };
+}

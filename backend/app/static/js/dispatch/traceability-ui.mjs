@@ -87,8 +87,9 @@ function makeDialog(className,label,scope){
   return dialog;
 }
 
-export function openCaseSelector(cases,{currentCaseId=null,onSelect,scope}={}){
+export function openCaseSelector(cases,{currentCaseId=null,onSelect,scope,trigger=null}={}){
   const dialog=makeDialog('dispatch-trace-dialog dispatch-case-selector','Seleccionar Decision Case',scope);
+  dialog.addEventListener('close',()=>{if(trigger?.isConnected)trigger.focus({preventScroll:true});},{once:true});
   dialog.innerHTML='<div class="dispatch-trace-shell">'
     +'<header class="dispatch-trace-header">'
       +'<div><span class="dispatch-trace-eyebrow">TRAZABILIDAD</span><h2>Elegí el Decision Case que querés abrir.</h2>'

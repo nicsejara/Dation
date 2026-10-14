@@ -11,14 +11,30 @@ export function render(root,run,{onEvidenceReady}={}){
   let runningRequest=false;
   let notified=false;
   let needsRefresh=false;
+  const visibilityKey='dation.comparative.collapsed.'+run.id;
+  let collapsed=false;
+  try{collapsed=sessionStorage.getItem(visibilityKey)==='true';}catch{}
   scope.own(()=>clearTimeout(timer));
   const endpoint='/api/runs/'+run.id+'/comparative';
 
   function completed(){
-    root.innerHTML='<div data-comparative-summary></div><div data-comparative-content></div>';
-    summary.render(root.querySelector('[data-comparative-summary]'),artifact.result_json);
-    comparison.render(root.querySelector('[data-comparative-content]'),artifact.result_json);
+    const contentId='comparative-content-'+run.id;
+    if(collapsed){
+      root.innerHTML='<div class="assignment-comparative-layer__collapsed"><strong>Análisis comparativo disponible</strong><button type="button" data-open-comparative aria-expanded="false" aria-controls="'+esc(contentId)+'">Ver análisis</button></div><div id="'+esc(contentId)+'" hidden></div>';
+      root.querySelector('[data-open-comparative]').onclick=()=>setCollapsed(false);
+    }else{
+      root.innerHTML='<div class="assignment-comparative-layer__header"><div data-comparative-summary></div><button type="button" data-close-comparative aria-label="Cerrar análisis comparativo" aria-expanded="true" aria-controls="'+esc(contentId)+'">Cerrar ×</button></div><div id="'+esc(contentId)+'" data-comparative-content></div>';
+      summary.render(root.querySelector('[data-comparative-summary]'),artifact.result_json);
+      comparison.render(root.querySelector('[data-comparative-content]'),artifact.result_json);
+      root.querySelector('[data-close-comparative]').onclick=()=>setCollapsed(true);
+    }
     if(needsRefresh&&!notified){notified=true;onEvidenceReady?.(artifact);}
+  }
+  function setCollapsed(value){
+    if(!scope.active)return;
+    collapsed=value;
+    try{sessionStorage.setItem(visibilityKey,String(value));}catch{}
+    completed();root.querySelector(value?'[data-open-comparative]':'[data-close-comparative]')?.focus({preventScroll:true});
   }
 
   function draw(){

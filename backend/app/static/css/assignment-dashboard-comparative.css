@@ -1,4 +1,10 @@
 /* The advanced layer compares the same four executive metrics as Essential. */
+.assignment-comparative-layer__header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
+.assignment-comparative-layer__header>div{min-width:0;}
+.assignment-comparative-layer__header [data-close-comparative],.assignment-comparative-layer__collapsed button{flex:0 0 auto;min-height:38px;padding:9px 12px;border:1px solid #d2dde1;border-radius:10px;background:#fff;color:#29444e;font-size:12px;font-weight:750;}
+.assignment-comparative-layer__collapsed{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;color:#29444e;font-size:13px;}
+.assignment-comparative-layer__header button:focus-visible,.assignment-comparative-layer__collapsed button:focus-visible{outline:3px solid #67aaa8;outline-offset:3px;}
+@media(max-width:520px){.assignment-comparative-layer__header{flex-wrap:wrap;}.assignment-comparative-layer__header [data-close-comparative]{margin-left:auto;}}
 .assignment-dashboard-v2 .assignment-comparative-layer{container-type:inline-size;--cmp-ink:#17313d;--cmp-muted:#687b85;--cmp-border:#dce6e8;--cmp-green:#287a5d;--cmp-green-soft:#edf8f3;--cmp-amber:#9a6a16;--cmp-amber-soft:#fff8e9;--cmp-gray:#647680;--cmp-gray-soft:#f1f4f5;}
 .assignment-comparative-summary__copy h2{margin:5px 0 7px;color:var(--cmp-ink);font-size:23px;letter-spacing:-.025em;}
 .assignment-comparative-summary__copy>p{margin:0;color:var(--cmp-muted);font-size:13px;line-height:1.5;}

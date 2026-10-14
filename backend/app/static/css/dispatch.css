@@ -5039,3 +5039,6 @@ body.dispatch-result #chat-panel{
     transition:none!important;
   }
 }
+.dispatch-run-error__actions{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:18px;}
+.dispatch-run-error [data-reconfigure-run]{background:#137d83;color:#fff;border-color:#137d83;}
+.dispatch-run-error [data-reconfigure-error]{color:#99412f;}

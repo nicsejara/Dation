@@ -51,8 +51,11 @@ async def journey():
                 assert (await upload.value).status==200
             await page.locator('.dispatch-pro-next-button').click()
             await page.wait_for_selector('[data-map-node="logistics_assignment"][data-map-action]')
+            assert not await page.locator('[data-map-context]').get_attribute('open')
+            assert await page.locator('.dispatch-map-progress [role=progressbar]').is_visible()
             await page.locator('[data-map-node="logistics_assignment"][data-map-action]').first.click()
             await page.wait_for_selector('[data-config-review]')
+            assert not await page.locator('[data-config-context]').get_attribute('open')
             await page.locator('[data-depth="essential"]').click()
             for select in await page.locator('[data-config-anomaly]').all():await select.select_option('include')
             await page.locator('[data-config-review]').click()
@@ -78,6 +81,12 @@ async def journey():
             assert await page.locator('[data-trip-detail]').count()==0
             await page.locator('[data-generate-comparative]').click()
             await page.wait_for_selector('[data-comparative-state=completed]')
+            comparative_posts=sum(method=='POST' and path.endswith('/comparative') for method,path in requests)
+            await page.locator('[data-close-comparative]').click()
+            await page.reload(wait_until='domcontentloaded')
+            await page.locator('[data-open-comparative]').wait_for(state='visible')
+            await page.locator('[data-open-comparative]').click()
+            assert sum(method=='POST' and path.endswith('/comparative') for method,path in requests)==comparative_posts
             await page.reload(wait_until='domcontentloaded')
             await page.wait_for_selector('[data-comparative-state=completed]')
             assert await page.locator('[data-generate-comparative]').count()==0
@@ -89,12 +98,35 @@ async def journey():
             await page.go_back();await page.wait_for_selector('.assignment-dashboard-v2')
             await page.go_forward();await page.wait_for_selector('[data-scheduling-review]')
             await page.reload(wait_until='domcontentloaded');await page.wait_for_selector('[data-scheduling-review]')
+            assert not await page.locator('[data-config-context]').get_attribute('open')
+            assert await page.get_by_text('ASIGNACIÓN APROBADA',exact=True).is_visible()
+            await page.locator('[data-scheduling-window-mode=custom]').click()
+            await page.locator('[data-scheduling-window-start]').fill('2026-09-01')
+            await page.locator('[data-scheduling-window-start]').dispatch_event('change')
+            await page.locator('[data-scheduling-window-end]').fill('2026-09-02')
+            await page.locator('[data-scheduling-window-end]').dispatch_event('change')
+            await page.locator('[data-scheduling-review]').click()
+            async with page.expect_response(lambda response:
+                urlparse(response.url).path=='/api/runs' and response.request.method=='POST') as failed_admission:
+                await page.locator('[data-scheduling-execute]').click()
+            assert (await failed_admission.value).status==202
+            failed_scheduling=(await (await failed_admission.value).json())['id']
+            await page.locator('[data-run-terminal-error]').wait_for(state='visible')
+            failed_snapshot=await (await context.request.get(base+'/api/runs/'+failed_scheduling)).json()
+            assert failed_snapshot['status']=='error' and failed_snapshot['upstream_run_id']==assignment
+            await page.locator('[data-reconfigure-run]').click()
+            await page.locator('[data-scheduling-review]').wait_for(state='visible')
+            assert await page.locator('[data-scheduling-window-start]').input_value()=='2026-09-01'
+            assert await page.locator('[data-scheduling-window-end]').input_value()=='2026-09-02'
+            assert 'run_id=' not in page.url and 'case_id='+case in page.url
+            await page.locator('[data-scheduling-window-mode=auto]').click()
             await page.locator('[data-scheduling-review]').click()
             async with page.expect_response(lambda response:
                 urlparse(response.url).path=='/api/runs' and response.request.method=='POST') as accepted:
                 await page.locator('[data-scheduling-execute]').click()
             assert (await accepted.value).status==202
             scheduling=(await (await accepted.value).json())['id']
+            assert scheduling!=failed_scheduling
             await page.wait_for_selector('.dispatch-scheduling-dashboard')
             await page.locator('[data-approve-toolbar]').click()
             await page.wait_for_function("window.DationDispatch.getWorkspace().decisionCase.nodes.logistics_scheduling.status==='approved'")
@@ -105,7 +137,8 @@ async def journey():
             await cold.wait_for_selector('.dispatch-scheduling-dashboard')
             assert await cold.evaluate("window.DationDispatch.getWorkspace().decisionCase.nodes.logistics_assignment.approved_run_id")==assignment
             await cold.close()
-            await page.evaluate("window.dationNavigate('logistics-map')")
+            assert await (await context.request.get(base+'/api/runs/'+failed_scheduling)).json()==failed_snapshot
+            await page.locator('[data-dashboard-map]').click()
             await page.wait_for_selector('[data-map-node="logistics_assignment"]')
             await page.wait_for_timeout(500)
             before=sum(path.startswith('/api/') for _,path in requests)
@@ -114,7 +147,7 @@ async def journey():
             await page.set_viewport_size({'width':390,'height':844})
             await page.evaluate("window.DationDispatch.openRunHistory('logistics_scheduling')")
             await page.wait_for_selector('[data-history-range]')
-            assert await page.locator('[data-history-range]').inner_text()=='1–1 de 1'
+            assert await page.locator('[data-history-range]').inner_text()=='1–2 de 2'
             assert 'Aprobación · acceso compartido' in await page.locator('.dispatch-run-history__list').inner_text()
             assert not await page.evaluate('document.documentElement.scrollWidth>innerWidth')
             await page.locator('[data-close]').click()
@@ -131,6 +164,8 @@ async def journey():
                 'assignment_and_scheduling_approved':True,'cold_link':True,'back_forward_refresh':True,
                 'idle_request_budget':True,'mobile_history':True,'export_has_records':True,
                 'comparative_reused_and_restored':True,'trip_detail_keyboard':True,'direct_next_configuration':True,
+                'comparative_close_reopen_without_post':True,'terminal_scheduling_reconfigured_as_new_run':True,
+                'failed_run_retained_unchanged':True,'map_toolbar_and_closed_contexts':True,
                 'javascript_errors':errors,'unexpected_http_errors':failed,
                 'expected_draft_hydration_misses':len(expected_draft_misses),'requests':len(requests)}
             if artifact:

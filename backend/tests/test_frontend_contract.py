@@ -656,7 +656,7 @@ class FrontendContractTests(
             scheduling,
         )
         self.assertIn(
-            "exportDecision",
+            "bindDashboardToolbar",
             scheduling,
         )
         self.assertIn(
@@ -1478,7 +1478,7 @@ class FrontendContractTests(
             "TU DECISION CASE",
             "DATA PACK ACTIVO",
             "Datos validados",
-            "Tu cadena de decisiones.",
+            "¿Qué decisión querés revisar o ejecutar?",
             "SIGUIENTE DECISIÓN",
             "canonical_filename",
         ):
@@ -2056,8 +2056,7 @@ class FrontendContractTests(
             "Decidí tus despachos más rápido y con mejor análisis.",
             "Dation compara alternativas de asignación, planificación y ejecución",
             "Menos tiempo armando análisis, más tiempo para decidir.",
-            "Iniciar nueva decisión",
-            "Ver Decision Map",
+            "Iniciar proceso de decisión",
             "VOS APORTÁS",
             "Tus órdenes y tu flota",
             "DATION ANALIZA",
@@ -2120,7 +2119,7 @@ class FrontendContractTests(
             )
 
         self.assertIn(
-            'data-scroll-decision-map',
+            'data-primary-decision',
             overview,
         )
         self.assertIn(
@@ -2199,11 +2198,11 @@ class FrontendContractTests(
             self.dda_landing_js,
         )
         self.assertIn(
-            "dationScrollToDecisionMap",
+            "resolvePrimaryAction",
             self.dda_landing_js,
         )
         self.assertIn(
-            "[data-scroll-decision-map]",
+            "[data-primary-decision]",
             self.dda_landing_js,
         )
         self.assertNotIn(
@@ -2222,19 +2221,19 @@ class FrontendContractTests(
             "downloadExampleCsv",
             self.dda_landing_js,
         )
-        self.assertIn(
+        self.assertNotIn(
             "deriveMapStates",
             self.dda_landing_js,
         )
-        self.assertIn(
+        self.assertNotIn(
             'logistics_assignment:"pending"',
             self.dda_landing_js,
         )
-        self.assertIn(
+        self.assertNotIn(
             'logistics_scheduling:"locked"',
             self.dda_landing_js,
         )
-        self.assertIn(
+        self.assertNotIn(
             'logistics_final_assignment:"locked"',
             self.dda_landing_js,
         )

@@ -114,7 +114,7 @@ class RunRequest(BaseModel):
             self.configuration = (
                 SchedulingConfig.model_validate(
                     self.configuration
-                ).model_dump()
+                ).model_dump(mode="json")
             )
             self.options = (
                 SchedulingOptions.model_validate(

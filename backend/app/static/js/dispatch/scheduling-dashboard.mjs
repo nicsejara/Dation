@@ -1,13 +1,9 @@
 import {renderDashboardToolbar,bindDashboardToolbar} from './dashboard-toolbar.mjs';
 import {scopeFor,disposeScope} from "./lifecycle.mjs";
 import {esc,num,pct,date,chart,dispose,errorBox} from './shared.mjs';
-import {exportDecision} from './export.mjs';
 import * as explanation from './explanation.mjs';
 import {decisionRail,bindDecisionRail} from './decision-nav.mjs';
 
-function exportSchedule(result){
-  return exportDecision(result);
-}
 
 function dayDiff(from,to){
   const a=new Date(from+'T00:00:00Z');
@@ -54,7 +50,6 @@ function renderTimeline(root,result){
     '<div class="dispatch-section-heading">'
       +'<div><span class="dispatch-kicker">CALENDARIO OPERATIVO</span><h2>Secuencia por vehículo</h2>'
       +'<p>Cada barra representa el período en que el vehículo queda ocupado por un viaje, incluyendo su retorno a base.</p></div>'
-      +'<button data-export-schedule>Exportar planificación</button>'
     +'</div>'
     +'<div class="dispatch-schedule-chart dispatch-chart" role="img" aria-label="Calendario por vehículo"></div>'
     +'<div class="dispatch-schedule-vehicles">'
@@ -141,7 +136,6 @@ function renderTimeline(root,result){
     ],
   });
 
-  root.querySelector('[data-export-schedule]').onclick=()=>exportSchedule(result);
 }
 
 function renderService(root,result){

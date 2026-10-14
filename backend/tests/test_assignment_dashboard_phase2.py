@@ -99,8 +99,8 @@ class AssignmentDashboardPhase2Tests(unittest.TestCase):
         self.assertNotIn("data-depth-toggle", self.dashboard)
 
     def test_summary_separates_objective_metrics_from_descriptive_kpis(self):
-        self.assertIn("Parte del objetivo", self.summary)
-        self.assertIn("KPI del resultado", self.summary)
+        self.assertNotIn("Parte del objetivo", self.summary)
+        self.assertNotIn("KPI del resultado", self.summary)
         self.assertIn("Objetivo de la corrida", self.summary)
         self.assertIn("objectiveWeights", self.summary)
         self.assertNotIn("variables activas", self.summary.lower())
