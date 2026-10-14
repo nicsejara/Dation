@@ -79,7 +79,7 @@ function presetWeights(objective,dimensions){
   return out;
 }
 
-import {readResource,resourceUrl,runDecisionState} from './navigation.mjs';
+import {readResource,resourceUrl,runDecisionState,runContext} from './navigation.mjs';
 import {createScope,disposeScope} from './lifecycle.mjs';
 import {runPolling} from './run-polling.mjs';
 import {restoreRunConfiguration,mount as mountSchedulingConfig} from './scheduling-config-v2.mjs';
@@ -341,6 +341,7 @@ async function loadDecisionMap(){
       },
       onOpenResult:openCaseResult,
       onData:()=>navigate('logistics-data'),
+      onSelectCase:trigger=>window.DationDispatch.openDecisionMap({trigger}),
     });
     decorateDecisionMap(node);
   }catch(error){
@@ -431,7 +432,7 @@ function poll(id,generation,nodeId=state.activeNode,{delay=0,graceUntil=0}={}){
     onRun:async run=>{
       if(generation!==pollGeneration)return;
       if(run.status==='completed'){try{await show(run);}catch(error){if(generation===pollGeneration)errorBox(roots.dashboard,error,()=>openRun(id,nodeId));}return;}
-      if(run.status==='error'){errorBox(roots.dashboard,new Error(run.error_message||'La ejecución terminó con error.'),()=>openRun(id,nodeId));return;}
+      if(run.status==='error'){try{await showTerminalRun(run,nodeId);}catch(error){if(generation===pollGeneration)errorBox(roots.dashboard,error,()=>openRun(id,nodeId));}return;}
       pending('Etapa: '+(run.progress_json?.stage||run.status||'queued'));
     },onError:error=>{if(generation===pollGeneration)errorBox(roots.dashboard,error,()=>openRun(id,nodeId));},
   });
@@ -514,6 +515,89 @@ async function executeScheduling(sourceRunId){
   }
 }
 
+async function reconfigureRun(run,nodeId){
+  const generation=routeGeneration,context=runContext(run,nodeId);
+  if(context.caseId)await hydrateCase(context.caseId,generation);
+  if(generation!==routeGeneration)return;
+  const config=context.configuration;
+  const options=config.options||{};
+  if(context.nodeId==='logistics_scheduling'){
+    state.activeNode='logistics_scheduling';
+    restoreRunConfiguration(state.decisionCase.id,config);
+    state.schedulingUseDueDates=config.use_delivery_due_dates??true;
+  }else if(context.nodeId==='logistics_assignment'){
+    state.activeNode='logistics_assignment';
+    state.customWeights=null;
+    const dims=Array.isArray(config.dimensions)
+      ?PRIORITY_KEYS.filter(key=>config.dimensions.includes(key))
+      :[...CORE_DIMENSIONS];
+    state.dimensions=dims.length?dims:[...CORE_DIMENSIONS];
+    state.objective=validObjectives.includes(config.objective)
+      ?config.objective
+      :'balanced';
+    const weights=config.weights||{};
+    if(PRIORITY_KEYS.every(key=>Number.isFinite(+weights[key]))){
+      const restored=Object.fromEntries(
+        PRIORITY_KEYS.map(key=>[key,Math.round(+weights[key]*100)])
+      );
+      state.weights=normalizeWeights(restored,state.dimensions);
+      if(state.objective==='custom')state.customWeights={...restored};
+    }else{
+      state.weights=presetWeights(state.objective,state.dimensions);
+    }
+    state.scopeFilters=Array.isArray(config.scope?.filters)
+      ?config.scope.filters.map(item=>({...item,preset:'custom'}))
+      :[];
+    state.analysisDepth=['essential','comparative'].includes(options.analysis_depth)
+      ?options.analysis_depth
+      :'comparative';
+    state.resourceMode=['own','mixed','outsourced'].includes(options.resource_mode)
+      ?options.resource_mode
+      :(options.allow_third_party===false?'own':'mixed');
+    state.allow=state.resourceMode!=='own';
+    state.decisions=options.anomaly_decisions||{};
+    if(state.objective!=='custom')state.lastPreset=state.objective;
+    state.configured=true;
+  }else{
+    state.activeNode='logistics_assignment';
+    resetAssignmentConfiguration();
+  }
+
+  const ordersId=context.ordersId||state.orders?.id,fleetId=context.fleetId||state.fleet?.id;
+  if(!ordersId||!fleetId)throw new Error('No se encontró el Data Pack de esta corrida.');
+  const [orders,fleet]=await Promise.all([
+    api('/api/datasets/'+ordersId+'/profile',{signal:routeController?.signal}),
+    api('/api/datasets/'+fleetId+'/profile',{signal:routeController?.signal}),
+  ]);
+  if(generation!==routeGeneration)return;
+  state.orders=orders.dataset;state.fleet=fleet.dataset;state.preflight=null;state.configPreview=null;
+  ensureDecisionCase();decisionContext(state.activeNode);persist();
+  return navigateResource('logistics-config',{caseId:context.caseId||state.decisionCase?.id,nodeId:context.nodeId,runId:null});
+}
+
+async function showTerminalRun(run,nodeId){
+  const generation=routeGeneration,context=runContext(run,nodeId);
+  if(context.caseId)await hydrateCase(context.caseId,generation);
+  if(generation!==routeGeneration)return;
+  state.run=run;state.activeNode=context.nodeId;decisionContext(state.activeNode);persist();
+  urlRun(run.id,context.nodeId==='logistics_scheduling'?'scheduling_v1':'assignment_v1');
+  const root=roots.dashboard,scope=createScope(root),scheduling=context.nodeId==='logistics_scheduling';
+  root.innerHTML='<section class="dispatch-panel dispatch-run-error" data-run-terminal-error>'
+    +'<span class="dispatch-kicker">CORRIDA FINALIZADA CON ERROR</span><h1>No se pudo completar '+(scheduling?'la planificación':'la asignación')+'</h1>'
+    +'<p class="dispatch-alert">'+esc(run.error_message||'La ejecución terminó con error.')+'</p>'
+    +'<p>Ajustá la configuración para ejecutar una nueva corrida. Esta ejecución se conserva en el historial.</p>'
+    +'<div class="dispatch-run-error__actions"><button type="button" data-reconfigure-run>Volver a configurar '+(scheduling?'planificación':'asignación')+'</button>'
+      +(context.caseId?'<button type="button" data-error-map>Decision Map</button>':'')+'</div><p role="alert" data-reconfigure-error hidden></p></section>';
+  const button=root.querySelector('[data-reconfigure-run]'),errorBox=root.querySelector('[data-reconfigure-error]');
+  scope.listen(button,'click',async()=>{
+    if(button.disabled)return;button.disabled=true;errorBox.hidden=true;
+    try{await reconfigureRun(run,context.nodeId);}
+    catch(error){if(scope.active){button.disabled=false;errorBox.hidden=false;errorBox.textContent=error.message;}}
+  });
+  const map=root.querySelector('[data-error-map]');
+  if(map)scope.listen(map,'click',()=>navigateResource('logistics-map',{caseId:context.caseId,nodeId:null,runId:null}));
+}
+
 export async function show(run){
   if(run.status!=='completed'||!run.result_json)return openRun(run.id);
   const generation=routeGeneration;
@@ -523,7 +607,7 @@ export async function show(run){
   const schema=r?.schema_version;
   const isAssignmentRun=schema==='assignment_v1';
   const isSchedulingRun=schema==='scheduling_v1';
-  const caseMeta=r?.decision_case;
+  const caseMeta=r?.decision_case||{case_id:runContext(run).caseId};
   const nodeId=isSchedulingRun
     ?'logistics_scheduling'
     :(isAssignmentRun?'logistics_assignment':null);
@@ -543,68 +627,7 @@ export async function show(run){
   dashboard(
     roots.dashboard,
     run,
-    async()=>{
-      const config=r.configuration||{};
-      const options=config.options||{};
-      if(isSchedulingRun){
-        state.activeNode='logistics_scheduling';
-        restoreRunConfiguration(state.decisionCase.id,config);
-        state.schedulingUseDueDates=config.use_delivery_due_dates??true;
-      }else if(isAssignmentRun){
-        state.activeNode='logistics_assignment';
-        const dims=Array.isArray(config.dimensions)
-          ?PRIORITY_KEYS.filter(key=>config.dimensions.includes(key))
-          :[...CORE_DIMENSIONS];
-        state.dimensions=dims.length?dims:[...CORE_DIMENSIONS];
-        state.objective=validObjectives.includes(config.objective)
-          ?config.objective
-          :'balanced';
-        const weights=config.weights||{};
-        if(PRIORITY_KEYS.every(key=>Number.isFinite(+weights[key]))){
-          const restored=Object.fromEntries(
-            PRIORITY_KEYS.map(key=>[key,Math.round(+weights[key]*100)])
-          );
-          state.weights=normalizeWeights(restored,state.dimensions);
-          if(state.objective==='custom')state.customWeights={...restored};
-        }else{
-          state.weights=presetWeights(state.objective,state.dimensions);
-        }
-        state.scopeFilters=Array.isArray(config.scope?.filters)
-          ?config.scope.filters.map(item=>({...item,preset:'custom'}))
-          :[];
-        state.analysisDepth=['essential','comparative'].includes(options.analysis_depth)
-          ?options.analysis_depth
-          :'comparative';
-        state.resourceMode=['own','mixed','outsourced'].includes(options.resource_mode)
-          ?options.resource_mode
-          :(options.allow_third_party===false?'own':'mixed');
-        state.allow=state.resourceMode!=='own';
-        state.decisions=options.anomaly_decisions||{};
-        if(state.objective!=='custom')state.lastPreset=state.objective;
-        state.configured=true;
-      }else{
-        state.activeNode='logistics_assignment';
-        resetAssignmentConfiguration();
-      }
-
-      try{
-        const [o,f]=await Promise.all([
-          api('/api/datasets/'+r.inputs.orders.dataset_id+'/profile',{signal:routeController?.signal}),
-          api('/api/datasets/'+r.inputs.fleet.dataset_id+'/profile',{signal:routeController?.signal}),
-        ]);
-        if(generation!==routeGeneration)return;
-        state.orders=o.dataset;
-        state.fleet=f.dataset;
-        state.preflight=null;
-        state.configPreview=null;
-        ensureDecisionCase();
-        decisionContext(state.activeNode);
-        persist();
-        navigate('logistics-config');
-      }catch(e){
-        alert(e.message);
-      }
-    },
+    ()=>reconfigureRun(run,nodeId),
     {
       status:(nodeId&&caseMeta?.case_id&&state.decisionCase?.id===caseMeta.case_id)
         ?runDecisionState(run,state.decisionCase,nodeId)
@@ -612,6 +635,7 @@ export async function show(run){
       decisionCase:state.decisionCase,
       activeNode:nodeId,
       onNewDecision:startNewDecision,
+      onMap:caseMeta?.case_id?()=>navigateResource('logistics-map',{caseId:caseMeta.case_id,nodeId:null,runId:null}):null,
       getContinuation:()=>dashboardContinuation(run,nodeId,generation),
       onContinue:async()=>{
         await hydrateCase(caseMeta.case_id,generation);

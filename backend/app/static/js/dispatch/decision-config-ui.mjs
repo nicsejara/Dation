@@ -92,7 +92,9 @@ export function decisionCaseCard({
   extraClass="",
 }){
   const rawId=String(caseId||"");
-  return '<section class="decision-config-case dispatch-case-card assignment-case-strip '+esc(extraClass)+'" aria-label="Decision Case y Data Pack en uso">'
+  return '<details data-config-context class="decision-config-case dispatch-case-card assignment-case-strip '+esc(extraClass)+'" aria-label="Decision Case y Data Pack en uso">'
+    +'<summary class="decision-config-case__summary"><span>Decision Case <strong>'+esc(displayDecisionCaseId(rawId))+'</strong></span><small>Data Pack en uso</small><span class="decision-context-chevron" aria-hidden="true">⌄</span></summary>'
+    +'<div class="decision-config-case__body">'
     +'<div class="assignment-case-strip__identity">'
       +'<span class="dispatch-case-identity__icon">'+iconSvg("folderOpen","dispatch-map-icon")+'</span>'
       +'<div><small class="assignment-case-strip__eyebrow">DECISION CASE</small>'
@@ -112,7 +114,7 @@ export function decisionCaseCard({
     +'<button class="assignment-change-data" type="button" '+changeHook+'>'
       +iconSvg("refresh","assignment-icon")+'<span>Cambiar datos</span>'
     +'</button>'
-  +'</section>';
+  +'</div></details>';
 }
 
 export function decisionChoiceCard({

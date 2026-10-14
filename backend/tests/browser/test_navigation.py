@@ -70,6 +70,9 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.saved_explanation=None
         self.approval_calls=0
         self.approval_fail_once=False
+        self.other_cases={}
+        self.execution_bodies=[]
+        self.run_fetch_failures=0
         self.pw = await async_playwright().start()
         executable = os.getenv("CHROMIUM_EXECUTABLE")
         if not executable and Path("/usr/bin/chromium").exists():
@@ -112,13 +115,17 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         elif path.endswith("/profile"):
             kind = "orders" if self.f["ids"]["orders"] in path else "fleet"
             data = {"dataset":self.f["datasets"][kind]}
+            for item in self.other_cases.values():
+                for name in ('orders','fleet'):
+                    if item[name]['id'] in path:data={'dataset':item[name]}
         elif path in {"/api/runs/preflight", "/api/runs/assignment-preview"}:
             data = self.f["preflight" if path.endswith("preflight") else "preview"]
         elif path == "/api/decision-cases":
             self.selector_queries.append(query)
             items=[self.hydrated() for _ in range(self.selector_size)]
+            if self.other_cases:items=[self.hydrated(),*copy.deepcopy(list(self.other_cases.values()))]
             for i,item in enumerate(items):
-                if i:item['case']['id']=f'00000000-0000-4000-9000-{i:012d}'
+                if i and not self.other_cases:item['case']['id']=f'00000000-0000-4000-9000-{i:012d}'
                 if query.get('summary') == ['true']:
                     for kind in ('orders','fleet'):
                         item[kind]={k:v for k,v in item[kind].items() if k in
@@ -134,11 +141,14 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             if self.history_failure and offset:
                 status,data=503,{'detail':'Historial temporalmente no disponible'}
         elif path.startswith("/api/decision-cases/"):
-            if path.split("/")[-1] != self.case["id"]:
+            if path.split("/")[-1] in self.other_cases:
+                data=self.other_cases[path.split("/")[-1]]
+            elif path.split("/")[-1] != self.case["id"]:
                 status, data = 404, {"detail":"No se encontró el Decision Case."}
             else: data = self.hydrated()
         elif path == "/api/runs" and method == "POST":
             body = request.post_data_json
+            self.execution_bodies.append(body)
             kind = "scheduling" if body.get("decision_case",{}).get("node_id") == "logistics_scheduling" else "assignment"
             rid = query["run_id"][0]
             row = copy.deepcopy(self.f["runs"][kind])
@@ -189,6 +199,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         elif path.startswith("/api/runs/"):
             data = self.runs.get(path.split("/")[3])
             if not data or self.missing_run: status, data = 404, {"detail":"No se encontró la corrida."}
+            elif self.run_fetch_failures:
+                self.run_fetch_failures-=1;status,data=503,{'detail':'Red temporalmente no disponible'}
         else:
             status, data = 501, {"detail":"Unmocked QA endpoint: "+path}
         await route.fulfill(status=status,content_type="application/json",body=json.dumps(data))
@@ -328,6 +340,184 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         row['result_json']['decision_case'].update(status='review',approved_at=None)
         self.case['nodes']['logistics_assignment'].update(status='review',approved_run_id=None,approved_at=None)
         self.case['nodes']['logistics_scheduling'].update(status='locked',run_id=None,latest_run_id=None,run_count=0)
+
+    def second_case(self):
+        item=copy.deepcopy(self.hydrated());case=copy.deepcopy(self.f['initial_case'])
+        cid='00000000-0000-4000-9000-000000000010'
+        case['id']=cid
+        for i,kind in enumerate(('orders','fleet'),11):
+            item[kind]['id']=f'00000000-0000-4000-9000-{i:012d}'
+            item[kind]['canonical_filename']='Caso-B-'+kind+'.csv'
+            case['inputs'][kind+'_dataset_id']=item[kind]['id']
+            item['case'][kind+'_dataset_id']=item[kind]['id']
+        case['signature']=item['orders']['id']+':'+item['fleet']['id']
+        item['decision_case']=case;item['case'].update(id=cid,state_json=case)
+        self.other_cases[cid]=item
+        return item
+
+    def failed_run(self,kind):
+        run=copy.deepcopy(self.f['runs'][kind]);node='logistics_'+kind
+        run.update(status='error',result_json=None,approved_at=None,decision_case_id=self.case['id'],node_id=node,
+            error_message='No existe una programación temporal factible dentro de la ventana configurada.')
+        run['configuration_json']=copy.deepcopy(self.f['runs'][kind]['result_json']['configuration'])
+        if kind=='scheduling':run['configuration_json'].update(strategy='service_first',planning_window_start='2026-10-01',planning_window_end='2026-10-02')
+        self.runs[run['id']]=run
+        self.case['nodes'][node].update(status='error',approved_run_id=None,approved_at=None,latest_execution_status='error')
+        return run
+
+    async def test_overview_has_one_contextual_cta_and_no_mobile_duplicate_without_cases(self):
+        self.selector_size=0
+        await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=overview')
+        await self.page.locator('[data-primary-decision]').wait_for(state='visible')
+        self.assertEqual(await self.page.locator('.dda-landing button').count(),1)
+        self.assertIn('Iniciar proceso de decisión',await self.page.locator('[data-primary-decision]').inner_text())
+        self.assertEqual(await self.page.locator('[data-go-data],[data-go-map],[data-go-home],.dda-landing__mobile-primary').count(),0)
+        await self.page.set_viewport_size({'width':390,'height':844})
+        self.assertTrue(await self.page.locator('[data-primary-decision]').is_visible())
+        await self.page.locator('[data-primary-decision]').click()
+        await self.page.locator('[data-kind=orders] input[type=file]').wait_for(state='attached')
+        self.assertIn('view=logistics-data',self.page.url)
+
+    async def test_overview_active_case_continues_directly_even_with_multiple_cases(self):
+        self.second_case();await self.open();await self.nav('logistics-overview')
+        await self.page.locator('[data-primary-decision]').click()
+        await self.page.locator('[data-select-case]').wait_for(state='visible')
+        self.assertIn('case_id='+self.case['id'],self.page.url)
+        self.assertEqual(await self.page.locator('.dispatch-case-selector').count(),0)
+
+    async def test_overview_multiple_cases_without_selection_uses_existing_selector(self):
+        other=self.second_case()
+        await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=overview')
+        await self.page.wait_for_function("document.querySelector('[data-primary-decision]')?.dataset.primaryDestination==='map'")
+        await self.page.locator('[data-primary-decision]').click()
+        await self.page.locator('[data-open-case="'+other['case']['id']+'"]').click()
+        await self.page.locator('[data-select-case]').wait_for(state='visible')
+        self.assertIn('case_id='+other['case']['id'],self.page.url)
+
+    async def test_map_disclosure_keeps_progress_visible_and_preserves_columns_and_change_data(self):
+        await self.open();details=self.page.locator('[data-map-context]')
+        self.assertFalse(await details.get_attribute('open'))
+        self.assertTrue(await self.page.locator('.dispatch-map-progress [role=progressbar]').is_visible())
+        self.assertEqual(await details.locator('[role=progressbar]').count(),0)
+        self.assertFalse(await details.locator('[data-map-columns]').first.is_visible())
+        await details.locator('summary').click()
+        self.assertTrue(await details.locator('[data-map-columns]').first.is_visible())
+        await details.locator('[data-map-columns=orders]').click()
+        await self.page.locator('.dispatch-guide [aria-label=Cerrar]').wait_for(state='visible')
+        await self.page.locator('.dispatch-guide [aria-label=Cerrar]').click()
+        await details.locator('[data-map-action=data]').click()
+        await self.page.locator('[data-confirm-change]').click()
+        await self.page.locator('[data-kind=orders] input[type=file]').wait_for(state='attached')
+
+    async def test_both_configuration_contexts_are_closed_and_scheduling_source_stays_visible(self):
+        for kind in ('assignment','scheduling'):
+            await self.open('logistics-config','logistics_'+kind)
+            details=self.page.locator('[data-config-context]')
+            self.assertFalse(await details.get_attribute('open'))
+            self.assertFalse(await details.locator('button').first.is_visible())
+            if kind=='scheduling':self.assertTrue(await self.page.get_by_text('ASIGNACIÓN APROBADA',exact=True).is_visible())
+            await details.locator('summary').click()
+            self.assertTrue(await details.locator('button').first.is_visible())
+            self.assertIn('Cambiar datos',await details.inner_text())
+
+    async def test_comparative_can_close_reopen_reload_without_mutation_or_another_post(self):
+        self.essential();await self.dashboard();before=copy.deepcopy(self.case)
+        await self.page.locator('[data-generate-comparative]').click()
+        await self.page.wait_for_function("document.querySelector('[data-comparative-state]')?.dataset.comparativeState==='queued'")
+        self.comparative['status']='completed'
+        await self.page.locator('[data-close-comparative]').wait_for(state='visible')
+        artifact=copy.deepcopy(self.comparative)
+        await self.page.locator('[data-close-comparative]').click()
+        self.assertEqual(await self.page.locator('[data-comparison-kpi]').count(),0)
+        await self.page.reload();await self.page.locator('[data-open-comparative]').wait_for(state='visible')
+        await self.page.locator('[data-open-comparative]').click()
+        self.assertEqual(await self.page.locator('[data-comparison-kpi]').count(),4)
+        self.assertEqual(self.comparative_posts,1);self.assertEqual(self.comparative,artifact);self.assertEqual(self.case,before)
+        self.assertEqual(await self.page.locator('[data-generate-comparative]').count(),0)
+
+    async def test_terminal_scheduling_error_restores_window_and_executes_new_run(self):
+        failed=self.failed_run('scheduling');before=copy.deepcopy(failed)
+        await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=decision-dashboard&case_id={self.case["id"]}&node_id=logistics_scheduling&run_id={failed["id"]}')
+        await self.page.locator('[data-reconfigure-run]').wait_for(state='visible')
+        self.assertEqual(await self.page.locator('[data-error-map]').inner_text(),'Decision Map')
+        self.assertNotIn('Reintentar',await self.page.locator('[data-run-terminal-error]').inner_text())
+        await self.page.locator('[data-reconfigure-run]').click()
+        await self.page.locator('[data-scheduling-review]').wait_for(state='visible')
+        self.assertNotIn('run_id=',self.page.url)
+        self.assertEqual(await self.page.locator('[data-scheduling-window-start]').input_value(),'2026-10-01')
+        self.assertEqual(await self.page.locator('[data-scheduling-window-end]').input_value(),'2026-10-02')
+        await self.page.locator('[data-scheduling-window-end]').fill('2026-12-31')
+        await self.page.locator('[data-scheduling-window-end]').dispatch_event('change')
+        await self.page.locator('[data-scheduling-review]').click();await self.page.locator('[data-scheduling-execute]').click()
+        await self.page.locator('.dispatch-scheduling-dashboard').wait_for(state='visible')
+        self.assertNotIn('run_id='+failed['id'],self.page.url)
+        self.assertEqual(self.execution_bodies[-1]['source_run_id'],self.f['ids']['assignment'])
+        self.assertEqual(self.execution_bodies[-1]['configuration']['planning_window_end'],'2026-12-31')
+        self.assertEqual(self.runs[failed['id']],before)
+        await self.page.locator('[data-dashboard-map]').click()
+        await self.page.locator('[data-select-case]').wait_for(state='visible')
+        await self.page.evaluate("window.DationDispatch.openRunHistory('logistics_scheduling')")
+        await self.page.locator('[data-history-range]').wait_for(state='visible')
+        self.assertIn('de 2',await self.page.locator('[data-history-range]').inner_text())
+
+    async def test_terminal_assignment_error_restores_objective_and_retains_failed_run(self):
+        failed=self.failed_run('assignment');failed['configuration_json'].update(objective='min_cost',dimensions=['trips','cost','own_fleet'])
+        failed['configuration_json']['options'].update(analysis_depth='essential',resource_mode='own')
+        before=copy.deepcopy(failed)
+        await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=decision-dashboard&case_id={self.case["id"]}&node_id=logistics_assignment&run_id={failed["id"]}')
+        await self.page.locator('[data-reconfigure-run]').click()
+        await self.page.locator('[data-config-review]').wait_for(state='visible')
+        state=await self.page.evaluate('window.DationDispatch.getWorkspace()')
+        self.assertEqual((state['objective'],state['analysisDepth'],state['resourceMode']),('min_cost','essential','own'))
+        self.assertEqual(self.runs[failed['id']],before)
+
+    async def test_transient_run_fetch_error_retries_without_showing_terminal_actions(self):
+        self.run_fetch_failures=1
+        await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=decision-dashboard&case_id={self.case["id"]}&node_id=logistics_assignment&run_id={self.f["ids"]["assignment"]}')
+        await self.page.get_by_role('button',name='Reintentar',exact=True).click()
+        await self.page.locator('.assignment-dashboard-v2').wait_for(state='visible')
+        self.assertEqual(await self.page.locator('[data-reconfigure-run]').count(),0)
+        self.assertFalse(any(m=='POST' and p=='/api/runs' for m,p in self.requests))
+
+    async def test_map_selector_switches_case_data_progress_url_and_restores_cancel_focus(self):
+        other=self.second_case();await self.open()
+        await self.page.locator('[data-select-case]').click();await self.page.locator('[data-open-case]').first.wait_for(state='visible')
+        await self.page.keyboard.press('Escape')
+        self.assertTrue(await self.page.locator('[data-select-case]').evaluate('(x)=>x===document.activeElement'))
+        await self.page.locator('[data-select-case]').click()
+        await self.page.locator('[data-open-case="'+other['case']['id']+'"]').click()
+        await self.page.wait_for_function('id=>window.DationDispatch.getWorkspace().decisionCase.id===id',arg=other['case']['id'])
+        await self.page.locator('[data-map-context]').wait_for(state='visible')
+        state=await self.page.evaluate('window.DationDispatch.getWorkspace()')
+        self.assertEqual(state['orders']['id'],other['orders']['id']);self.assertEqual(state['fleet']['id'],other['fleet']['id'])
+        self.assertEqual(await self.page.locator('.dispatch-map-progress [role=progressbar]').get_attribute('aria-valuenow'),'0')
+        self.assertIn('case_id='+other['case']['id'],self.page.url);self.assertNotIn('run_id=',self.page.url)
+        await self.page.go_back();await self.page.wait_for_function('id=>window.DationDispatch.getWorkspace().decisionCase.id===id',arg=self.case['id'])
+
+    async def test_both_toolbar_map_buttons_use_run_case_and_preserve_business_state(self):
+        other=self.second_case();before=copy.deepcopy(self.case)
+        for kind in ('assignment','scheduling'):
+            await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=decision-dashboard&case_id={other["case"]["id"]}&node_id=logistics_{kind}&run_id={self.f["ids"][kind]}')
+            await self.page.locator('[data-dashboard-map]').click()
+            await self.page.locator('[data-select-case]').wait_for(state='visible')
+            self.assertIn('case_id='+self.case['id'],self.page.url)
+            self.assertNotIn('run_id=',self.page.url);self.assertNotIn('node_id=',self.page.url)
+        self.assertEqual(self.case,before)
+        self.assertFalse(any(m=='POST' and p.endswith('/approve') for m,p in self.requests))
+
+    async def test_map_config_and_toolbar_fit_mobile_without_obsolete_kpi_or_calendar_actions(self):
+        await self.page.set_viewport_size({'width':390,'height':844})
+        await self.open();self.assertFalse(await self.page.evaluate('document.documentElement.scrollWidth>innerWidth'))
+        await self.open('logistics-config','logistics_scheduling');self.assertFalse(await self.page.evaluate('document.documentElement.scrollWidth>innerWidth'))
+        await self.dashboard()
+        self.assertTrue(await self.page.locator('[data-dashboard-map]').is_visible())
+        for text in ('KPI del resultado','Parte del objetivo'):
+            self.assertNotIn(text,await self.page.locator('#dispatch-hero').inner_text())
+        self.assertEqual(await self.page.locator('.assignment-essential__metric-note').count(),0)
+        await self.open('decision-dashboard','logistics_scheduling',self.f['ids']['scheduling'])
+        self.assertEqual(await self.page.locator('[data-export-schedule]').count(),0)
+        self.assertEqual(await self.page.locator('[data-export-menu] button').count(),2)
+        self.assertFalse(await self.page.evaluate('document.documentElement.scrollWidth>innerWidth'))
 
     async def test_four_kpis_and_comparator_use_independent_scenario_averages_and_pp(self):
         result=self.f['runs']['assignment']['result_json']

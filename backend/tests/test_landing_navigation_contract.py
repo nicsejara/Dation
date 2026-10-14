@@ -41,17 +41,17 @@ class LandingNavigationContractTests(unittest.TestCase):
 
     def test_active_case_cta_goes_to_real_decision_map(self):
         for marker in (
-            "hasActiveDecisionCase",
-            "data-go-map",
-            "Ir a mi Decision Map",
-            "openActiveMap",
-            'navigate("logistics-map")',
-            "Iniciá una decisión para crear tu Decision Map",
+            "activeCase",
+            "data-primary-decision",
+            "Continuar en Decision Map",
+            "resolvePrimaryAction",
+            "navigate('logistics-map')",
+            "Iniciar proceso de decisión",
         ):
             self.assertIn(marker, self.landing)
 
-        self.assertIn("Iniciar nueva decisión", self.html)
-        self.assertIn("data-scroll-decision-map", self.html)
+        self.assertIn("Iniciar proceso de decisión", self.html)
+        self.assertNotIn("data-scroll-decision-map", self.html)
 
     def test_state_legend_and_card_actions_are_removed_at_runtime(self):
         self.assertIn(".dda-landing__state-legend", self.landing)
@@ -60,7 +60,7 @@ class LandingNavigationContractTests(unittest.TestCase):
         self.assertIn("footer&&footer.remove()", self.landing)
 
     def test_landing_keeps_only_case_existence_as_dynamic_state(self):
-        self.assertIn("saved.decisionCase.id", self.landing)
+        self.assertIn("decisionCase?.id", self.landing)
         self.assertNotIn("decisionCase.nodes", self.landing)
         self.assertNotIn('status==="approved"', self.landing)
         self.assertNotIn('status==="review"', self.landing)

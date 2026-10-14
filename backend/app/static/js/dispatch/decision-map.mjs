@@ -452,12 +452,13 @@ function datasetCard(kind,dataset){
   +'</article>';
 }
 
-function caseCardMarkup(decisionCase,presentations,orders,fleet,approved,activeNodeId){
+function caseCardMarkup(decisionCase,presentations,orders,fleet,approved){
   const fullId=String(decisionCase?.id||"");
   const caseId=displayCaseId(fullId);
   const created=dateTime(decisionCase?.created_at);
   const pack=dataPackHealth(orders,fleet);
-  return '<section class="dispatch-map-casebar dispatch-case-card" aria-label="Decision Case y Data Pack activo">'
+  return '<details data-map-context class="dispatch-map-casebar dispatch-case-card" aria-label="Decision Case y Data Pack activo">'
+    +'<summary class="dispatch-map-context-summary"><span>Decision Case <strong>'+esc(caseId)+'</strong></span><small>Data Pack activo · '+esc(pack.label)+'</small><span class="decision-context-chevron" aria-hidden="true">⌄</span></summary>'
     +'<div class="dispatch-case-card__top">'
       +'<div class="dispatch-case-identity">'
         +'<span class="dispatch-case-identity__icon">'+iconSvg("folderOpen","dispatch-map-icon")+'</span>'
@@ -469,11 +470,11 @@ function caseCardMarkup(decisionCase,presentations,orders,fleet,approved,activeN
             +caseStatusChip(approved,presentations)
           +'</div>'
           +(created?'<span class="dispatch-case-identity__created">Creado el '+esc(created)+'</span>':'')
+          +'<span class="dispatch-case-identity__full-id">'+esc(fullId)+'</span>'
           +'<span class="dispatch-case-identity__trust">Todo lo que decidas queda registrado en este caso.</span>'
           +'<span class="dispatch-case-identity__feedback" data-case-copy-feedback aria-live="polite"></span>'
         +'</div>'
       +'</div>'
-      +progressMarkup(presentations,approved,activeNodeId)
     +'</div>'
     +'<div class="dispatch-case-card__divider" aria-hidden="true"></div>'
     +'<div class="dispatch-datapack-panel">'
@@ -493,7 +494,7 @@ function caseCardMarkup(decisionCase,presentations,orders,fleet,approved,activeN
         +datasetCard("fleet",fleet)
       +'</div>'
     +'</div>'
-  +'</section>';
+  +'</details>';
 }
 
 function legendMarkup(){
@@ -563,7 +564,7 @@ async function openDatasetColumns(kind,source,orders,fleet){
 
 export function renderDecisionMap(
   root,
-  {decisionCase,readiness,orders,fleet,onConfigure,onOpenResult,onData},
+  {decisionCase,readiness,orders,fleet,onConfigure,onOpenResult,onData,onSelectCase},
 ){
   const scope=createScope(root);scope.own(()=>{root._guideDrawer=null;});
   ensureDecisionMapStyles();
@@ -592,17 +593,20 @@ export function renderDecisionMap(
   root.className="dispatch dispatch-upload-pro dispatch-decision-map dispatch-decision-map--premium dispatch-decision-map--case-v2";
   root.innerHTML=
     heroMarkup()
+    +'<div class="dispatch-map-case-selector"><span>DECISION CASE</span>'
+      +'<button type="button" data-select-case aria-haspopup="dialog" title="Seleccionar Decision Case">'+esc(displayCaseId(decisionCase?.id))+' <span aria-hidden="true">⌄</span></button></div>'
     +(decisionCase?.stale_predecessor
       ?'<section class="dispatch-map-stale dispatch-map-stale--premium">'
         +iconSvg("alertTriangle","dispatch-map-icon")
         +'<div><strong>Los datos cambiaron</strong><p>Este es un nuevo Decision Case. El caso anterior se conserva para mantener la trazabilidad.</p></div>'
       +'</section>'
       :'')
-    +caseCardMarkup(decisionCase,presentations,orders,fleet,approved,activeNodeId)
+    +'<section class="dispatch-map-progress" aria-label="Progreso del caso">'+progressMarkup(presentations,approved,activeNodeId)+'</section>'
+    +caseCardMarkup(decisionCase,presentations,orders,fleet,approved)
     +'<section class="dispatch-map-chain-section dispatch-map-chain-section--open" aria-labelledby="decision-chain-title">'
       +'<header class="dispatch-map-chain-heading">'
         +'<div><span class="dispatch-map-eyebrow">DECISIONES DEL CASO</span>'
-          +'<h2 id="decision-chain-title">Tu cadena de decisiones.</h2>'
+          +'<h2 id="decision-chain-title">¿Qué decisión querés revisar o ejecutar?</h2>'
           +'<p>Cada decisión se aprueba antes de habilitar la siguiente.</p></div>'
         +legendMarkup()
       +'</header>'
@@ -618,6 +622,8 @@ export function renderDecisionMap(
     +changeDataDialog(presentations);
 
   const fullCaseId=String(decisionCase?.id||"");
+  const selector=root.querySelector('[data-select-case]');
+  scope.listen(selector,'click',()=>onSelectCase?.(selector));
   const copyButton=root.querySelector("[data-copy-case-id]");
   const feedback=root.querySelector("[data-case-copy-feedback]");
   if(copyButton){

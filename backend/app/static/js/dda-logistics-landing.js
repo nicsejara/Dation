@@ -2,16 +2,6 @@
   var revealObserver=null;
   "use strict";
 
-  /*
-   * Legacy source-contract markers kept only for compatibility with the
-   * historical frontend suite. They are intentionally non-executable:
-   * dationScrollToDecisionMap
-   * deriveMapStates
-   * logistics_assignment:"pending"
-   * logistics_scheduling:"locked"
-   * logistics_final_assignment:"locked"
-   */
-
   var ROOT_SELECTOR=".dda-landing";
   var WORKSPACE_KEY="dation.dispatch.workspace.v5";
 
@@ -52,14 +42,6 @@
     }
   }
 
-  function hasData(saved){
-    return Boolean(saved&&saved.orders&&saved.fleet);
-  }
-
-  function hasActiveDecisionCase(saved){
-    return Boolean(hasData(saved)&&saved.decisionCase&&saved.decisionCase.id);
-  }
-
   function iconMarkup(symbol){
     return '<svg class="dda-icon" aria-hidden="true"><use href="#'+symbol+'"></use></svg>';
   }
@@ -78,14 +60,6 @@
         +'<span class="dda-landing__variable-pill-icon">'+iconMarkup(active?"dda-i-check-circle":"dda-i-clock")+'</span>'
         +'<strong>'+item.label+'</strong></span>';
     }).join("");
-  }
-
-  function prepareHeroNavigation(container){
-    var button=container.querySelector("[data-scroll-decision-map]");
-    if(!button)return;
-    button.removeAttribute("data-scroll-decision-map");
-    button.setAttribute("data-go-map","");
-    button.innerHTML='Ir a mi Decision Map <span aria-hidden="true">→</span>';
   }
 
   function makeDecisionChainInformational(container){
@@ -126,23 +100,25 @@
     }
   }
 
-  async function syncMapAccess(container){
-    var active=hasActiveDecisionCase(savedWorkspace());
-    var count=active?1:0;
-    if(window.DationDispatch&&typeof window.DationDispatch.listDecisionCases==="function"){
-      try{
-        var cases=await window.DationDispatch.listDecisionCases();
-        count=cases.length;
-        active=count>0||active;
-      }catch(error){}
-    }
-    container.querySelectorAll("[data-go-map]").forEach(function(button){
-      button.disabled=!active;
-      button.setAttribute("aria-disabled",active?"false":"true");
-      button.title=active
-        ?(count>1?"Elegí qué Decision Case querés abrir":"Abrir tu Decision Map")
-        :"Iniciá una decisión para crear tu Decision Map";
-    });
+  var refreshGeneration=0;
+  function activeCase(){
+    var current=window.DationDispatch?.getWorkspace?.();
+    return Boolean((current||savedWorkspace()).decisionCase?.id);
+  }
+  function updatePrimary(container,hasCases){
+    var button=container.querySelector('[data-primary-decision]');
+    if(!button)return;
+    button.dataset.primaryDestination=activeCase()||hasCases?'map':'data';
+    button.innerHTML=(button.dataset.primaryDestination==='map'?'Continuar en Decision Map':'Iniciar proceso de decisión')+' <span aria-hidden="true">→</span>';
+  }
+  async function syncPrimaryAction(container){
+    var generation=++refreshGeneration;
+    updatePrimary(container,false);
+    if(activeCase())return;
+    try{
+      var cases=await window.DationDispatch?.listDecisionCases?.();
+      if(generation===refreshGeneration)updatePrimary(container,Boolean(cases?.length));
+    }catch(error){}
   }
 
   function enhanceReveal(container){
@@ -164,48 +140,31 @@
     nodes.forEach(function(node){observer.observe(node);});
   }
 
-  async function openActiveMap(){
-    if(window.DationDispatch&&typeof window.DationDispatch.openDecisionMap==="function"){
-      try{
-        await window.DationDispatch.openDecisionMap();
-        return;
-      }catch(error){}
-    }
-    var saved=savedWorkspace();
-    if(!hasActiveDecisionCase(saved)){
-      navigate("logistics-data");
-      return;
-    }
-    navigate("logistics-map");
+  async function resolvePrimaryAction(button){
+    if(button.disabled)return;
+    button.disabled=true;
+    try{
+      if(activeCase()||button.dataset.primaryDestination==='map'){
+        if(window.DationDispatch?.openDecisionMap)await window.DationDispatch.openDecisionMap({preferActiveCase:true,trigger:button});
+        else navigate('logistics-map');
+      }else navigate('logistics-data');
+    }finally{button.disabled=false;}
   }
-
   function bindActions(container){
-    container.querySelectorAll("[data-go-data]").forEach(function(button){
-      button.addEventListener("click",function(){navigate("logistics-data");});
-    });
-    container.querySelectorAll("[data-go-map]").forEach(function(button){
-      button.addEventListener("click",function(){
-        if(button.disabled)return;
-        openActiveMap();
-      });
-    });
-    container.querySelectorAll("[data-go-home]").forEach(function(button){
-      button.addEventListener("click",function(){navigate("inicio");});
-    });
+    var button=container.querySelector('[data-primary-decision]');
+    if(button)button.addEventListener('click',function(){resolvePrimaryAction(button);});
   }
 
   function refresh(container){
     renderVariables(container);
-    prepareHeroNavigation(container);
     makeDecisionChainInformational(container);
-    syncMapAccess(container);
+    syncPrimaryAction(container);
   }
 
   function boot(){
     var container=root();
     if(!container)return;
     makeDecisionChainInformational(container);
-    prepareHeroNavigation(container);
     bindActions(container);
     if(window.dationGetCurrentView?.()==="logistics-overview"){refresh(container);enhanceReveal(container);}
   }
@@ -220,6 +179,7 @@
 
   window.addEventListener("dation:view",function(event){
     revealObserver&&revealObserver.disconnect();
+    refreshGeneration++;
     if(event.detail&&event.detail.view==="logistics-overview"){
       var container=root();
       if(container){refresh(container);enhanceReveal(container);}
@@ -228,7 +188,7 @@
 
   window.addEventListener("dation:cases-ready",function(){
     var container=root();
-    if(container&&window.dationGetCurrentView?.()==="logistics-overview")syncMapAccess(container);
+    if(container&&window.dationGetCurrentView?.()==="logistics-overview")syncPrimaryAction(container);
   });
   window.addEventListener("pagehide",function(){revealObserver&&revealObserver.disconnect();});
   window.addEventListener("pageshow",function(event){

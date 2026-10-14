@@ -5,13 +5,15 @@ import {DECISION_ORDER} from './decision-ui.mjs';
 let scope=null;
 function interaction(){scope?.dispose();scope=createScope(document.createElement('div'));return scope;}
 export async function listDecisionCases(signal){const payload=await api('/api/decision-cases?status=active&limit=100&offset=0&summary=true',{signal});return Array.isArray(payload.cases)?payload.cases:[];}
-export async function openDecisionMap(){
+export async function openDecisionMap({preferActiveCase=false,trigger=null}={}){
   const owner=interaction();
+  const activeCaseId=window.DationDispatch.getWorkspace().decisionCase?.id;
+  if(preferActiveCase&&activeCaseId)return window.DationDispatch.openCase(activeCaseId,'logistics-map',null);
   try{
     const cases=await listDecisionCases(owner.signal);if(!owner.active)return;
     if(!cases.length)return window.dationNavigate('logistics-map');
     if(cases.length===1)return window.DationDispatch.openCase(cases[0].case.id);
-    openCaseSelector(cases,{scope:owner,currentCaseId:window.DationDispatch.getWorkspace().decisionCase?.id,onSelect:caseId=>window.DationDispatch.openCase(caseId)});
+    openCaseSelector(cases,{scope:owner,trigger,currentCaseId:activeCaseId,onSelect:caseId=>window.DationDispatch.openCase(caseId,'logistics-map',null)});
   }catch(error){if(owner.active)window.dationNavigate('logistics-map');}
 }
 export async function showHistory(nodeId){

@@ -127,22 +127,9 @@
   font-weight:750;
 }
 
-.assignment-essential__kpi-top em{
-  padding:3px 6px;
-  border-radius:999px;
-  background:#f0f3f4;
-  color:#76878f;
-  font-size:8px;
-  font-style:normal;
-  font-weight:850;
-  line-height:1;
-  white-space:nowrap;
-}
 
-.assignment-essential__kpi.is-objective .assignment-essential__kpi-top em{
-  background:#e4f3f1;
-  color:#14696d;
-}
+
+
 
 .assignment-essential__kpi>strong{
   display:block;
@@ -152,12 +139,7 @@
   letter-spacing:-.025em;
 }
 
-.assignment-essential__metric-note{
-  margin:11px 1px 0;
-  color:#75868e;
-  font-size:10px;
-  line-height:1.5;
-}
+
 
 .assignment-dashboard-v2 .assignment-dashboard-v2__assignment{
   padding:22px!important;

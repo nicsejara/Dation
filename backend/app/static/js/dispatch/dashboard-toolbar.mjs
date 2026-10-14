@@ -44,6 +44,7 @@ export function renderDashboardToolbar(run,caseActions={}){
     +'<div class="dashboard-toolbar__tools" aria-label="Herramientas de la decisión">'
       +(caseActions.onApprove?'<button type="button" data-approve-toolbar class="dashboard-toolbar__approve" '+(caseActions.status==='approved'?'hidden':'')+'>'+approveLabel+'</button>':'')
       +'<button type="button" data-after-approve class="dashboard-toolbar__continue" hidden>Continuar con la siguiente decisión →</button>'
+      +(caseActions.onMap?'<button type="button" data-dashboard-map class="dashboard-toolbar__map">Decision Map</button>':'')
       +'<details class="dashboard-toolbar__menu" data-export-menu><summary>Exportar <span aria-hidden="true">⌄</span></summary>'
         +'<div class="dashboard-toolbar__menu-panel">'
           +'<button type="button" data-export-csv><span aria-hidden="true">↓</span><div><strong>'+(scheduling?'Planificación CSV':'Asignación CSV')+'</strong><small>'+(scheduling?'Viajes, fechas y cargas':'Viajes, vehículos, órdenes y cargas')+'</small></div></button>'
@@ -94,7 +95,15 @@ export function bindDashboardToolbar(root,run,{onRerun,caseActions={}}={}){
     }
   });
   scope.listen(root.querySelector('[data-run-details]'),'click',event=>openDrawer(event.currentTarget));
-  scope.listen(root.querySelector('[data-rerun]'),'click',()=>{closeMenus();onRerun?.();});
+  scope.listen(root.querySelector('[data-rerun]'),'click',async event=>{
+    closeMenus();const button=event.currentTarget;if(button.disabled)return;button.disabled=true;
+    const feedback=root.querySelector('[data-approval-error]');feedback.hidden=true;
+    try{await onRerun?.();}
+    catch(error){if(scope.active){feedback.hidden=false;feedback.textContent=error.message||'No se pudo recuperar la configuración.';}}
+    finally{if(scope.active)button.disabled=false;}
+  });
+  const mapButton=root.querySelector('[data-dashboard-map]');
+  if(mapButton)scope.listen(mapButton,'click',()=>{closeMenus();caseActions.onMap();});
 
   function exportFile(event,handler){
     const button=event.currentTarget,original=button.innerHTML;
