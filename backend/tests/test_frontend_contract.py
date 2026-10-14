@@ -2056,7 +2056,7 @@ class FrontendContractTests(
             "Decidí tus despachos más rápido y con mejor análisis.",
             "Dation compara alternativas de asignación, planificación y ejecución",
             "Menos tiempo armando análisis, más tiempo para decidir.",
-            "Iniciar proceso de decisión",
+            "Iniciar nueva decisión",
             "VOS APORTÁS",
             "Tus órdenes y tu flota",
             "DATION ANALIZA",
@@ -2119,7 +2119,7 @@ class FrontendContractTests(
             )
 
         self.assertIn(
-            'data-primary-decision',
+            'data-start-new-decision',
             overview,
         )
         self.assertIn(
@@ -2198,11 +2198,11 @@ class FrontendContractTests(
             self.dda_landing_js,
         )
         self.assertIn(
-            "resolvePrimaryAction",
+            "syncHeroActions",
             self.dda_landing_js,
         )
         self.assertIn(
-            "[data-primary-decision]",
+            "[data-start-new-decision]",
             self.dda_landing_js,
         )
         self.assertNotIn(

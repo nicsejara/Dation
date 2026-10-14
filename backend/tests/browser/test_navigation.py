@@ -365,22 +365,29 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.case['nodes'][node].update(status='error',approved_run_id=None,approved_at=None,latest_execution_status='error')
         return run
 
-    async def test_overview_has_one_contextual_cta_and_no_mobile_duplicate_without_cases(self):
+    async def test_overview_has_two_hero_actions_and_disabled_visible_map_without_cases(self):
         self.selector_size=0
         await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=overview')
-        await self.page.locator('[data-primary-decision]').wait_for(state='visible')
-        self.assertEqual(await self.page.locator('.dda-landing button').count(),1)
-        self.assertIn('Iniciar proceso de decisión',await self.page.locator('[data-primary-decision]').inner_text())
+        await self.page.locator('[data-start-new-decision]').wait_for(state='visible')
+        self.assertEqual(await self.page.locator('.dda-landing button').count(),2)
+        self.assertFalse(await self.page.locator('[data-start-new-decision]').is_disabled())
+        map_button=self.page.locator('[data-open-decision-map]')
+        self.assertTrue(await map_button.is_visible());self.assertTrue(await map_button.is_disabled())
+        self.assertEqual(await map_button.get_attribute('aria-disabled'),'true')
+        self.assertEqual(await map_button.evaluate('(x)=>getComputedStyle(x).cursor'),'not-allowed')
+        initial=self.page.url;await map_button.dispatch_event('click');self.assertEqual(self.page.url,initial)
         self.assertEqual(await self.page.locator('[data-go-data],[data-go-map],[data-go-home],.dda-landing__mobile-primary').count(),0)
         await self.page.set_viewport_size({'width':390,'height':844})
-        self.assertTrue(await self.page.locator('[data-primary-decision]').is_visible())
-        await self.page.locator('[data-primary-decision]').click()
+        self.assertTrue(await self.page.locator('[data-start-new-decision]').is_visible())
+        self.assertTrue(await map_button.is_visible())
+        await self.page.locator('[data-start-new-decision]').click()
         await self.page.locator('[data-kind=orders] input[type=file]').wait_for(state='attached')
         self.assertIn('view=logistics-data',self.page.url)
 
-    async def test_overview_active_case_continues_directly_even_with_multiple_cases(self):
+    async def test_overview_map_with_active_case_and_multiple_cases_uses_existing_selector(self):
         self.second_case();await self.open();await self.nav('logistics-overview')
-        await self.page.locator('[data-primary-decision]').click()
+        await self.page.locator('[data-open-decision-map]').click()
+        await self.page.locator('[data-open-case="'+self.case['id']+'"]').click()
         await self.page.locator('[data-select-case]').wait_for(state='visible')
         self.assertIn('case_id='+self.case['id'],self.page.url)
         self.assertEqual(await self.page.locator('.dispatch-case-selector').count(),0)
@@ -388,11 +395,142 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
     async def test_overview_multiple_cases_without_selection_uses_existing_selector(self):
         other=self.second_case()
         await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=overview')
-        await self.page.wait_for_function("document.querySelector('[data-primary-decision]')?.dataset.primaryDestination==='map'")
-        await self.page.locator('[data-primary-decision]').click()
+        await self.page.wait_for_function("document.querySelector('[data-open-decision-map]')?.disabled===false")
+        await self.page.locator('[data-open-decision-map]').click()
         await self.page.locator('[data-open-case="'+other['case']['id']+'"]').click()
         await self.page.locator('[data-select-case]').wait_for(state='visible')
         self.assertIn('case_id='+other['case']['id'],self.page.url)
+
+    async def test_overview_single_case_map_opens_directly_and_new_decision_clears_active_context(self):
+        await self.open();await self.nav('logistics-overview')
+        self.assertFalse(await self.page.locator('[data-start-new-decision]').is_disabled())
+        self.assertFalse(await self.page.locator('[data-open-decision-map]').is_disabled())
+        await self.page.locator('[data-open-decision-map]').click()
+        await self.page.locator('[data-select-case]').wait_for(state='visible')
+        self.assertEqual(await self.page.locator('.dispatch-case-selector').count(),0)
+        await self.nav('logistics-overview');before=copy.deepcopy(self.case)
+        await self.page.evaluate('''()=>{const start=window.DationDispatch.startNewDecision;window.__starts=0;
+          window.DationDispatch.startNewDecision=()=>{window.__starts++;return start();};}''')
+        await self.page.locator('[data-start-new-decision]').click()
+        await self.page.locator('[data-kind=orders] input[type=file]').wait_for(state='attached')
+        state=await self.page.evaluate('window.DationDispatch.getWorkspace()')
+        self.assertEqual(await self.page.evaluate('window.__starts'),1)
+        for key in ('orders','decisionCase','run','activeNode'):self.assertIsNone(state[key])
+        self.assertNotIn('case_id=',self.page.url);self.assertIn('view=logistics-data',self.page.url)
+        self.assertEqual(self.case,before)
+        self.assertFalse(any(m=='POST' and p=='/api/runs' for m,p in self.requests))
+        drafts=await self.page.evaluate("JSON.parse(sessionStorage.getItem('dation.dispatch.drafts.v1'))")
+        self.assertIn(self.case['id'],drafts)
+        await self.page.go_back();await self.page.locator('[data-open-decision-map]').click()
+        await self.page.locator('[data-select-case]').wait_for(state='visible')
+        self.assertEqual(await self.page.evaluate('window.DationDispatch.getWorkspace().decisionCase.id'),self.case['id'])
+
+    async def test_overview_availability_ignores_stale_responses_and_refreshes_on_bfcache(self):
+        self.selector_size=0
+        await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=overview')
+        await self.page.locator('[data-start-new-decision]').wait_for(state='visible')
+        await self.page.wait_for_timeout(100)
+        await self.page.evaluate('''()=>{window.__caseResolvers=[];
+          window.DationDispatch.listDecisionCases=()=>new Promise(resolve=>window.__caseResolvers.push(resolve));
+          window.dispatchEvent(new CustomEvent('dation:cases-ready'));
+          window.dispatchEvent(new CustomEvent('dation:cases-ready'));}''')
+        await self.page.evaluate('window.__caseResolvers[1]([{}])')
+        self.assertFalse(await self.page.locator('[data-open-decision-map]').is_disabled())
+        await self.page.evaluate('window.__caseResolvers[0]([])')
+        self.assertFalse(await self.page.locator('[data-open-decision-map]').is_disabled())
+        await self.page.evaluate("window.dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true}))")
+        await self.page.evaluate('window.__caseResolvers[2]([])')
+        self.assertTrue(await self.page.locator('[data-open-decision-map]').is_disabled())
+        self.assertFalse(await self.page.locator('[data-start-new-decision]').is_disabled())
+
+    async def check_context_layout(self,kind):
+        details=self.page.locator('[data-config-context]');summary=details.locator('summary')
+        self.assertFalse(await details.get_attribute('open'))
+        before=await summary.bounding_box();root=await details.bounding_box()
+        self.assertLess(abs(before['width']-(root['width']-2)),2)
+        await summary.focus();await self.page.keyboard.press('Enter')
+        self.assertTrue(await details.evaluate('(x)=>x.open'))
+        after=await summary.bounding_box();self.assertAlmostEqual(before['height'],after['height'],delta=1)
+        geometry=await details.evaluate('''el=>{const rect=x=>{const r=x.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height,right:r.right,bottom:r.bottom}};
+          const body=el.querySelector('.decision-config-case__body'),files=el.querySelector('.decision-config-case__files');
+          return {root:rect(el),body:rect(body),identity:rect(el.querySelector('.assignment-case-strip__identity')),
+            header:rect(el.querySelector('.decision-config-case__pack-header')),button:rect(el.querySelector('.assignment-change-data')),
+            columns:getComputedStyle(files).gridTemplateColumns.split(' ').length,
+            cards:[...files.children].map(rect),wrapperDisplay:getComputedStyle(el).display,
+            names:[...files.querySelectorAll('.dispatch-datapack-file__name')].map(x=>({title:x.title,overflow:getComputedStyle(x).textOverflow}))};}''')
+        self.assertEqual(geometry['wrapperDisplay'],'block')
+        self.assertLess(abs(geometry['body']['w']-(geometry['root']['w']-2)),2)
+        self.assertEqual(geometry['columns'],1 if self.page.viewport_size['width']<=720 else 2)
+        self.assertGreaterEqual(geometry['header']['y'],geometry['identity']['bottom']-1)
+        self.assertGreaterEqual(min(card['y'] for card in geometry['cards']),geometry['header']['bottom']-1)
+        for card in geometry['cards']:
+            self.assertGreaterEqual(card['w'],180)
+            self.assertGreaterEqual(card['x'],geometry['body']['x']);self.assertLessEqual(card['right'],geometry['body']['right']+1)
+        self.assertTrue(all(name['title'].endswith('.csv') and name['overflow']=='ellipsis' for name in geometry['names']))
+        self.assertFalse(await self.page.evaluate('document.documentElement.scrollWidth>innerWidth'))
+        await summary.focus();await self.page.keyboard.press('Space')
+        self.assertFalse(await details.evaluate('(x)=>x.open'))
+        self.assertAlmostEqual((await details.bounding_box())['height'],root['height'],delta=1)
+
+    async def test_shared_config_disclosures_are_full_width_without_overlap_at_all_five_breakpoints(self):
+        for dataset in self.f['datasets'].values():dataset['canonical_filename']='Nombre_con_muchos_caracteres_'+('W'*180)+'.csv'
+        for width in (1440,1280,1024,768,390):
+            await self.page.set_viewport_size({'width':width,'height':1000 if width>390 else 844})
+            for kind in ('assignment','scheduling'):
+                with self.subTest(width=width,kind=kind):
+                    await self.open('logistics-config','logistics_'+kind)
+                    await self.check_context_layout(kind)
+
+    async def test_overview_two_actions_use_rows_on_desktop_and_stack_on_mobile(self):
+        self.selector_size=0
+        await self.page.emulate_media(reduced_motion='reduce')
+        await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=overview')
+        await self.page.locator('[data-start-new-decision]').wait_for(state='visible')
+        for width in (1440,1280,1024,768,390):
+            await self.page.set_viewport_size({'width':width,'height':1000})
+            await self.page.wait_for_timeout(450)
+            start=await self.page.locator('[data-start-new-decision]').bounding_box()
+            map_box=await self.page.locator('[data-open-decision-map]').bounding_box()
+            if width==390:
+                self.assertGreaterEqual(map_box['y'],start['y']+start['height'])
+                self.assertAlmostEqual(start['width'],map_box['width'],delta=1)
+            elif width>=1280:self.assertAlmostEqual(start['y'],map_box['y'],delta=1)
+            self.assertFalse(await self.page.evaluate('document.documentElement.scrollWidth>innerWidth'))
+            self.assertEqual(await self.page.locator('.dda-landing button').count(),2)
+
+    async def test_config_disclosure_preserves_copy_id_change_data_and_real_validation_labels(self):
+        await self.context.grant_permissions(['clipboard-read','clipboard-write'])
+        for kind in ('assignment','scheduling'):
+            await self.open('logistics-config','logistics_'+kind)
+            details=self.page.locator('[data-config-context]');await details.locator('summary').click()
+            self.assertEqual(await details.locator('.decision-config-data-file__validated').count(),2)
+            await details.locator('[data-'+('config' if kind=='assignment' else 'scheduling')+'-copy-case]').click()
+            self.assertEqual(await self.page.evaluate('navigator.clipboard.readText()'),self.case['id'])
+            self.assertTrue(await details.evaluate('(x)=>x.open'))
+            await details.locator('.assignment-change-data').click()
+            if kind=='assignment':await self.page.locator('[data-change-confirm]').click()
+            await self.page.locator('[data-kind=orders] input[type=file]').wait_for(state='attached')
+
+    async def test_config_disclosures_do_not_claim_validation_for_profiles_with_errors(self):
+        for dataset in self.f['datasets'].values():dataset['profile_json']['counts']['errors']=1
+        for kind in ('assignment','scheduling'):
+            await self.open('logistics-config','logistics_'+kind)
+            details=self.page.locator('[data-config-context]');await details.locator('summary').click()
+            self.assertEqual(await details.locator('.decision-config-data-file__validated').count(),0)
+            self.assertTrue(await details.locator('.assignment-case-file').evaluate_all(
+                "cards=>cards.every(card=>getComputedStyle(card,'::after').content==='none')"))
+
+    async def test_map_disclosure_layout_remains_readable_at_all_five_breakpoints(self):
+        for width in (1440,1280,1024,768,390):
+            await self.page.set_viewport_size({'width':width,'height':1000})
+            await self.open();details=self.page.locator('[data-map-context]')
+            await details.locator('summary').click()
+            cards=await details.locator('.dispatch-datapack-file').all()
+            rectangles=[await card.bounding_box() for card in cards]
+            self.assertTrue(all(card['width']>=180 for card in rectangles))
+            a,b=rectangles
+            self.assertTrue(a['y']+a['height']<=b['y']+1 or a['x']+a['width']<=b['x']+1)
+            self.assertFalse(await self.page.evaluate('document.documentElement.scrollWidth>innerWidth'))
 
     async def test_map_disclosure_keeps_progress_visible_and_preserves_columns_and_change_data(self):
         await self.open();details=self.page.locator('[data-map-context]')

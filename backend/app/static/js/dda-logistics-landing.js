@@ -105,20 +105,27 @@
     var current=window.DationDispatch?.getWorkspace?.();
     return Boolean((current||savedWorkspace()).decisionCase?.id);
   }
-  function updatePrimary(container,hasCases){
-    var button=container.querySelector('[data-primary-decision]');
+  function setMapAvailability(container,available){
+    var button=container.querySelector('[data-open-decision-map]');
     if(!button)return;
-    button.dataset.primaryDestination=activeCase()||hasCases?'map':'data';
-    button.innerHTML=(button.dataset.primaryDestination==='map'?'Continuar en Decision Map':'Iniciar proceso de decisión')+' <span aria-hidden="true">→</span>';
+    button.disabled=!available;
+    button.setAttribute('aria-disabled',String(!available));
+    button.title=available?'Abrir un Decision Case existente':'Todavía no hay Decision Cases para revisar';
   }
-  async function syncPrimaryAction(container){
+  async function syncHeroActions(container){
     var generation=++refreshGeneration;
-    updatePrimary(container,false);
-    if(activeCase())return;
+    setMapAvailability(container,activeCase());
+    var listCases=window.DationDispatch?.listDecisionCases;
+    if(typeof listCases!=='function')return;
     try{
-      var cases=await window.DationDispatch?.listDecisionCases?.();
-      if(generation===refreshGeneration)updatePrimary(container,Boolean(cases?.length));
-    }catch(error){}
+      var cases=await listCases();
+      if(generation===refreshGeneration)setMapAvailability(container,activeCase()||Boolean(cases?.length));
+    }catch(error){
+      if(generation===refreshGeneration&&!activeCase()){
+        setMapAvailability(container,false);
+        container.querySelector('[data-open-decision-map]').title='No se pudo comprobar la disponibilidad de casos';
+      }
+    }
   }
 
   function enhanceReveal(container){
@@ -140,25 +147,24 @@
     nodes.forEach(function(node){observer.observe(node);});
   }
 
-  async function resolvePrimaryAction(button){
-    if(button.disabled)return;
-    button.disabled=true;
-    try{
-      if(activeCase()||button.dataset.primaryDestination==='map'){
-        if(window.DationDispatch?.openDecisionMap)await window.DationDispatch.openDecisionMap({preferActiveCase:true,trigger:button});
-        else navigate('logistics-map');
-      }else navigate('logistics-data');
-    }finally{button.disabled=false;}
-  }
   function bindActions(container){
-    var button=container.querySelector('[data-primary-decision]');
-    if(button)button.addEventListener('click',function(){resolvePrimaryAction(button);});
+    var start=container.querySelector('[data-start-new-decision]');
+    var map=container.querySelector('[data-open-decision-map]');
+    if(start)start.addEventListener('click',function(){
+      if(typeof window.DationDispatch?.startNewDecision==='function')window.DationDispatch.startNewDecision();
+      else navigate('logistics-data');
+    });
+    if(map)map.addEventListener('click',function(){
+      if(map.disabled)return;
+      if(typeof window.DationDispatch?.openDecisionMap==='function')window.DationDispatch.openDecisionMap({trigger:map});
+      else navigate('logistics-map');
+    });
   }
 
   function refresh(container){
     renderVariables(container);
     makeDecisionChainInformational(container);
-    syncPrimaryAction(container);
+    syncHeroActions(container);
   }
 
   function boot(){
@@ -166,6 +172,7 @@
     if(!container)return;
     makeDecisionChainInformational(container);
     bindActions(container);
+    syncHeroActions(container);
     if(window.dationGetCurrentView?.()==="logistics-overview"){refresh(container);enhanceReveal(container);}
   }
 
@@ -188,12 +195,12 @@
 
   window.addEventListener("dation:cases-ready",function(){
     var container=root();
-    if(container&&window.dationGetCurrentView?.()==="logistics-overview")syncPrimaryAction(container);
+    if(container&&window.dationGetCurrentView?.()==="logistics-overview")syncHeroActions(container);
   });
-  window.addEventListener("pagehide",function(){revealObserver&&revealObserver.disconnect();});
+  window.addEventListener("pagehide",function(){refreshGeneration++;revealObserver&&revealObserver.disconnect();});
   window.addEventListener("pageshow",function(event){
     if(event.persisted&&window.dationGetCurrentView?.()==="logistics-overview"){
-      var container=root();if(container)enhanceReveal(container);
+      var container=root();if(container){syncHeroActions(container);enhanceReveal(container);}
     }
   });
 })();

@@ -12,7 +12,7 @@ class TraceabilityPhase3Contracts(unittest.TestCase):
         self.assertIn("listDecisionCases", source)
         self.assertIn("openDecisionMap", source)
         self.assertIn("dation:cases-ready", source)
-        self.assertIn("preferActiveCase:true", source)
+        self.assertIn("openDecisionMap({trigger:map})", source)
 
     def test_controller_restores_data_pack_before_guarded_views(self):
         source = (ROOT / "js" / "dispatch" / "traceability-controller.mjs").read_text(encoding="utf-8")

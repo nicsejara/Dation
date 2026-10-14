@@ -63,7 +63,7 @@ export function decisionHero({step,decisionIndex,totalDecisions=3,title,descript
   +'</section>';
 }
 
-export function decisionDataFileCard({kind,dataset,countText,filtered=false,validated=false,extraClass=""}){
+export function decisionDataFileCard({kind,dataset,countText,filtered=false,validated=dataset?.profile_json?.counts?.errors===0,extraClass=""}){
   const orders=kind==="orders";
   const fullName=dataset?.canonical_filename||dataset?.label||dataset?.original_filename||"Archivo sin nombre";
   return '<article class="decision-config-data-file dispatch-datapack-file is-'+esc(kind)+' assignment-case-file '+esc(extraClass)+'">'
@@ -107,13 +107,15 @@ export function decisionCaseCard({
         +'<span class="assignment-case-strip__feedback" '+feedbackHook+' aria-live="polite"></span>'
       +'</div>'
     +'</div>'
-    +'<div class="assignment-case-strip__pack">'
-      +'<div class="assignment-case-strip__pack-title"><span>'+esc(dataPackLabel)+'</span>'+(validationSummary?'<em>'+esc(validationSummary)+'</em>':'')+'</div>'
-      +files.join("")
+    +'<div class="decision-config-case__pack">'
+      +'<div class="decision-config-case__pack-header">'
+        +'<div class="assignment-case-strip__pack-title"><span>'+esc(dataPackLabel)+'</span>'+(validationSummary?'<em>'+esc(validationSummary)+'</em>':'')+'</div>'
+        +'<button class="assignment-change-data" type="button" '+changeHook+'>'
+          +iconSvg("refresh","assignment-icon")+'<span>Cambiar datos</span>'
+        +'</button>'
+      +'</div>'
+      +'<div class="decision-config-case__files">'+files.join("")+'</div>'
     +'</div>'
-    +'<button class="assignment-change-data" type="button" '+changeHook+'>'
-      +iconSvg("refresh","assignment-icon")+'<span>Cambiar datos</span>'
-    +'</button>'
   +'</div></details>';
 }
 
