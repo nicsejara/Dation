@@ -2,6 +2,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 FILTER_JS = (ROOT / "app" / "static" / "js" / "dispatch" / "assignment-filter-collapse.mjs").read_text(encoding="utf-8")
+FILTER_CSS = (ROOT / "app" / "static" / "css" / "assignment-config-v2.css").read_text(encoding="utf-8")
 VARIABLE_BOOTSTRAP = (ROOT / "app" / "static" / "js" / "dda-variable-config.js").read_text(encoding="utf-8")
 
 
@@ -31,13 +32,13 @@ def test_collapsed_filter_keeps_a_compact_summary():
     assert 'categorySummary(row)' in FILTER_JS
     assert 'dateSummary(row)' in FILTER_JS
     assert 'numberSummary(row)' in FILTER_JS
-    assert 'is-collapsed>:not(.assignment-filter-row__head)' in FILTER_JS
+    assert 'is-collapsed>:not(.assignment-filter-row__head)' in FILTER_CSS
 
 
 def test_filter_toggle_has_responsive_and_reduced_motion_styles():
-    assert '@media(max-width:560px)' in FILTER_JS
-    assert '@media(prefers-reduced-motion:reduce)' in FILTER_JS
-    assert 'assignment-filter-toggle svg' in FILTER_JS
+    assert '@media(max-width:560px)' in FILTER_CSS
+    assert '@media(prefers-reduced-motion:reduce)' in FILTER_CSS
+    assert 'assignment-filter-toggle svg' in FILTER_CSS
 
 
 def load_tests(loader, tests, pattern):

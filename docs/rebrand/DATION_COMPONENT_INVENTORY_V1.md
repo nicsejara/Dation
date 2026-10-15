@@ -1,5 +1,7 @@
 # Dation — Component Inventory y Migration Map V1
 
+**Estado final de la saga:** consultar [Design System vigente](DATION_DESIGN_SYSTEM_V1.md) y [limpieza Fase 7](DATION_DARK_PHASE7_IMPLEMENTATION.md). Las tablas siguientes conservan el inventario de Fase 0 como baseline histórico; sus columnas «actual», «objetivo» y «fase» describen aquel momento. El grafo publicado ya no incluye los siete módulos retirados ni el bridge light; Map/Config comparten loader y los filtros tienen propietario CSS. `analysisDepthUi` y los renderers históricos con consumidores permanecen.
+
 **Fase 0, 14 de octubre de 2026.** Auditoría sobre `main` remoto/local `bcda3e55f80ec216711e428c9451ac6ef8d86756`. Sólo documentación; las columnas «objetivo» y «fase» describen trabajo futuro.
 
 Referencias: [wireframes y baseline](DATION_DARK_WIREFRAME_V1.md), [contratos y contraste](DATION_DESIGN_SYSTEM_V1.md).

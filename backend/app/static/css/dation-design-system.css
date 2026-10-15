@@ -63,7 +63,7 @@
 .d-page-hero :is(.dispatch-pro-hero-lead,.dda-landing__hero-lead) { color: var(--d-text-secondary); font-size: var(--hero-lead-size); line-height: 1.55; }
 .d-page-hero :is(.dispatch-pro-hero-copy,.dda-landing__hero-copy,.d-home__hero-copy) { min-width: 0; }
 @media(prefers-reduced-motion:reduce) {
-  .d-button, .d-page-hero, .view.is-active { animation: none; transition: none; }
+  .d-button, .d-page-hero, .view.is-active, .trace-panel.is-active { animation: none; transition: none; }
   .d-button:hover:not(:disabled):not([aria-disabled="true"]) { transform: none; }
 }
 

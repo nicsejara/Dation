@@ -322,7 +322,7 @@ async function loadDecisionMap(){
       ),
     };
     persist();
-    renderDecisionMap(node,{
+    await renderDecisionMap(node,{
       decisionCase:state.decisionCase,
       readiness:state.preflight?.decision_readiness,
       orders:state.orders,
@@ -337,7 +337,7 @@ async function loadDecisionMap(){
       onData:()=>navigate('logistics-data'),
       onSelectCase:trigger=>window.DationDispatch.openDecisionMap({trigger}),
     });
-    decorateDecisionMap(node);
+    if(generation===routeGeneration)decorateDecisionMap(node);
   }catch(error){
     if(generation!==routeGeneration)return;
     errorBox(node,error,loadDecisionMap);

@@ -1,4 +1,5 @@
 import {createScope,scopeFor} from "./lifecycle.mjs";
+import {ensureDecisionCaseStyles} from "./styles.mjs";
 import {api,esc,num} from "./shared.mjs";
 import {STATUS,deriveDecisionNodes} from "./decision-case.mjs";
 import {createGuideDrawer} from "./upload/guide-drawer.mjs";
@@ -9,19 +10,7 @@ import {
   statusUi,
 } from "./decision-ui.mjs";
 
-// Legacy source-only contract wording: "TU DECISION CASE". Visible UI now uses "DECISION CASE".
-const STYLE_ID="decision-map-case-v2-styles";
-const STYLE_HREF="/static/css/decision-map-case-v2.css?v=dark-map-phase6-v1";
 let guideDrawer=null;
-
-function ensureDecisionMapStyles(){
-  if(document.getElementById(STYLE_ID))return;
-  const link=document.createElement("link");
-  link.id=STYLE_ID;
-  link.rel="stylesheet";
-  link.href=STYLE_HREF;
-  document.head.append(link);
-}
 
 function workflowStep(id,fallback){
   const steps=(window.DationDdaFlow&&Array.isArray(window.DationDdaFlow.steps))
@@ -562,12 +551,13 @@ async function openDatasetColumns(kind,source,orders,fleet){
   }
 }
 
-export function renderDecisionMap(
+export async function renderDecisionMap(
   root,
   {decisionCase,readiness,orders,fleet,onConfigure,onOpenResult,onData,onSelectCase},
 ){
   const scope=createScope(root);scope.own(()=>{root._guideDrawer=null;});
-  ensureDecisionMapStyles();
+  await ensureDecisionCaseStyles();
+  if(!scope.active)return;
   const nodes=deriveDecisionNodes(decisionCase,readiness);
   const evidence=readinessById(readiness);
   const presentations=Object.fromEntries(
