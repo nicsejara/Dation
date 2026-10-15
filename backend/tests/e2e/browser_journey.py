@@ -28,7 +28,7 @@ async def journey():
         def response_seen(response):
             path=urlparse(response.url).path
             if path.startswith('/api/') and response.status>=400:
-                # The case remains a session draft until its first run is admitted.
+                # URL hydration may race the initial case registration on Map.
                 # Only that draft's hydration misses are expected; later 404s fail.
                 route_case=parse_qs(urlparse(response.request.frame.url).query).get('case_id',[None])[0]
                 if not admitted and response.status==404 and path=='/api/decision-cases/'+str(route_case):
@@ -58,12 +58,36 @@ async def journey():
             await page.wait_for_selector('[data-map-node="logistics_assignment"][data-map-action]')
             assert not await page.locator('[data-map-context]').get_attribute('open')
             assert await page.locator('.dispatch-map-progress [role=progressbar]').is_visible()
+            # A validated case is durable and selectable before its first run.
+            initial=await page.evaluate('window.DationDispatch.getWorkspace().decisionCase')
+            assert initial['persisted']
+            persisted=await context.request.get(base+'/api/decision-cases/'+initial['id'])
+            assert persisted.status==200
+            assert (await persisted.json())['decision_case']['inputs']==initial['inputs']
+            map_url=page.url
+            await page.locator('[data-select-case]').click()
+            await page.get_by_role('dialog',name='Seleccionar Decision Case').wait_for()
+            assert await page.get_by_role('button',name='Caso actual',exact=True).is_disabled()
+            assert await page.get_by_text('No hay otros Decision Cases disponibles todavía.').is_visible()
+            await page.keyboard.press('Escape')
+            assert page.url==map_url
+            assert await page.locator('[data-select-case]').evaluate('el=>el===document.activeElement')
+            assert await page.locator('[data-case-transition]').count()==0
             await page.locator('[data-map-node="logistics_assignment"][data-map-action]').first.click()
             await page.wait_for_selector('[data-config-review]')
             assert not await page.locator('[data-config-context]').get_attribute('open')
             assert await page.locator("[data-depth]").count()==0
             assert await page.locator(".decision-advanced-option:disabled").count()==3
             for select in await page.locator('[data-config-anomaly]').all():await select.select_option('include')
+            config_url=page.url
+            before_review=sum(method=='POST' and path=='/api/runs' for method,path in requests)
+            await page.locator('[data-config-review]').click()
+            assert page.url==config_url
+            assert await page.evaluate('window.dationGetCurrentView()')=='logistics-config'
+            assert await page.locator('[data-assignment-review-dialog]').evaluate("el=>el.matches(':modal')")
+            assert sum(method=='POST' and path=='/api/runs' for method,path in requests)==before_review
+            await page.locator('[data-assignment-review-dialog]').get_by_role('button',name='Volver',exact=True).click()
+            assert page.url==config_url
             await page.locator('[data-config-review]').click()
             gate.touch()
             async with page.expect_response(lambda response:
@@ -107,6 +131,17 @@ async def journey():
             await page.reload(wait_until='domcontentloaded');await page.wait_for_selector('[data-scheduling-review]')
             assert not await page.locator('[data-config-context]').get_attribute('open')
             assert await page.get_by_text('ASIGNACIÓN APROBADA',exact=True).is_visible()
+            config_url=page.url
+            before_review=sum(method=='POST' and path=='/api/runs' for method,path in requests)
+            await page.locator('[data-scheduling-review]').click()
+            assert page.url==config_url
+            assert await page.evaluate('window.dationGetCurrentView()')=='logistics-config'
+            dialog=page.locator('[data-scheduling-review-dialog]')
+            assert await dialog.evaluate("el=>el.matches(':modal')")
+            assert await dialog.evaluate("el=>getComputedStyle(el,'::backdrop').backgroundColor")=='rgba(0, 0, 0, 0.64)'
+            assert sum(method=='POST' and path=='/api/runs' for method,path in requests)==before_review
+            await page.keyboard.press('Escape')
+            assert page.url==config_url
             await page.locator('[data-scheduling-window-mode=custom]').click()
             await page.locator('[data-scheduling-window-start]').fill('2026-09-01')
             await page.locator('[data-scheduling-window-start]').dispatch_event('change')

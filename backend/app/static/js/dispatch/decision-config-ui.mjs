@@ -1,6 +1,6 @@
 import {ensureStylesheet} from "./styles.mjs";
 import {createWorkflowActionBar} from "./workflow-action-bar.mjs";
-import {scopeFor,trapFocus} from "./lifecycle.mjs";
+import {createScope,scopeFor,trapFocus} from "./lifecycle.mjs";
 import {esc} from "./shared.mjs";
 import {iconSvg} from "./decision-ui.mjs";
 
@@ -192,7 +192,7 @@ export function mountConfigActionBar(root){
   const {ready=true,reason="",chips=[],reviewHook="data-config-review"}=JSON.parse(placeholder.dataset.configSummary);
   const {bar,button,update}=createWorkflowActionBar({label:"Tu configuración",variant:"configuration",onSelect:id=>{
     const section=root.querySelector('#'+CSS.escape(id));
-    section?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:"center"});
+    attentionToConfig(section);
   }});
   bar.classList.add("d-workflow-action-bar--config");
   button.setAttribute(reviewHook,"");
@@ -205,6 +205,51 @@ export function mountConfigActionBar(root){
   const dispose=()=>{observer?.disconnect();release?.();root.style.removeProperty('--config-action-height');actionBars.delete(root);};
   release=scopeFor(root)?.own(dispose);
   actionBars.set(root,{dispose,update,items:chips});
+}
+
+export function attentionToConfig(target){
+  if(!target)return;
+  const scope=scopeFor(target);
+  target.classList.remove('is-attention');
+  void target.offsetWidth;
+  target.classList.add('d-attention-target','is-attention');
+  target.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'});
+  scope?.timeout(()=>target.classList.remove('is-attention'),1800);
+}
+
+/** Decisions own their summaries and validation; opening review never routes. */
+export function bindConfigReview({dialog,trigger,executeSelector,prepare,validate,onExecute}){
+  if(!dialog||!trigger)return;
+  const scope=createScope(dialog);
+  let executing=false;
+  scope.own(()=>{if(dialog.open)dialog.close();});
+  scope.listen(dialog,'close',()=>{if(scope.active&&trigger.isConnected)trigger.focus({preventScroll:true});});
+  scope.listen(trigger,'click',()=>{
+    if(executing||!scope.active||validate?.())return;
+    prepare?.();
+    dialog.querySelector('[data-config-review-error]')?.replaceChildren();
+    dialog.showModal();
+  });
+  scope.listen(dialog,'click',async event=>{
+    const button=event.target.closest(executeSelector);
+    if(!button)return;
+    event.preventDefault();
+    if(executing||!scope.active||validate?.())return;
+    executing=true;
+    button.disabled=true;
+    button.setAttribute('aria-busy','true');
+    dialog.close();
+    try{await onExecute?.(button);}
+    catch(error){
+      if(!scope.active||!dialog.isConnected)return;
+      executing=false;
+      button.disabled=false;
+      button.removeAttribute('aria-busy');
+      const feedback=dialog.querySelector('[data-config-review-error]');
+      if(feedback)feedback.textContent=error?.message||'No pudimos iniciar la ejecución. Volvé a intentar.';
+      dialog.showModal();
+    }
+  });
 }
 
 export function updateConfigActionBar(root,{ready,reason=""}){

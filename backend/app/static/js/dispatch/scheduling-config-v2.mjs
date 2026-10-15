@@ -8,6 +8,9 @@ import {
   decisionDataFileCard,
   decisionAdvancedOptionsSection,
   mountConfigActionBar,
+  attentionToConfig,
+  bindConfigReview,
+  displayDecisionCaseId,
   ensureDecisionConfigStyle,
   decisionHero,
   decisionInfoNote,
@@ -352,18 +355,19 @@ function summaryBar(config,stats,slaAvailable){
   });
 }
 
-function reviewDialog(config,stats,sourceRun){
+function reviewDialog(config,stats,sourceRun,caseId){
   return '<dialog class="dispatch dispatch-review d-config-dialog assignment-review-dialog scheduling-review" data-scheduling-review-dialog aria-label="Revisar Scheduling antes de ejecutar"><form method="dialog">'
     +'<span class="assignment-section__eyebrow">ANTES DE EJECUTAR</span><h2>Revisar planificación</h2>'
     +'<div class="dispatch-review-summary scheduling-review-grid">'
+      +'<p><strong>Decision Case</strong><span>'+esc(displayDecisionCaseId(caseId))+'</span></p>'
       +'<p><strong>Entrada</strong><span>'+num(stats.totalTrips)+' viajes de Assignment · Run '+esc(formatRunId(sourceRun.id))+'</span></p>'
       +'<p><strong>Ventana</strong><span>'+esc(windowLabel(config))+'</span></p>'
       +'<p><strong>Reglas por foco</strong><span>'+esc(rulesLabel(config,stats.trips))+'</span></p>'
       +'<p><strong>Objetivo</strong><span>'+esc(objectiveLabel(config))+'</span></p>'
       +'<p><strong>Recursos</strong><span>Heredados de la asignación aprobada</span></p>'
     +'</div>'
-    +'<div data-scheduling-review-error></div>'
-    +'<div class="dispatch-actions scheduling-review-actions"><button value="cancel">Volver</button><button class="scheduling-primary" type="button" data-scheduling-execute>Generar planificación</button></div>'
+    +'<div role="alert" data-config-review-error data-scheduling-review-error></div>'
+    +'<div class="dispatch-actions scheduling-review-actions"><button value="cancel">Volver</button><button class="scheduling-primary" type="button" data-scheduling-execute>Ejecutar decisión</button></div>'
   +'</form></dialog>';
 }
 
@@ -379,7 +383,7 @@ function markup({state,sourceRun,slaAvailable,config}){
       +decisionAdvancedOptionsSection({kind:"scheduling"})
     +'</main>'
     +summaryBar(config,stats,slaAvailable)
-    +reviewDialog(config,stats,sourceRun)
+    +reviewDialog(config,stats,sourceRun,state.decisionCase?.id)
   +'</div>';
 }
 
@@ -505,12 +509,7 @@ async function execute({state,sourceRun,slaAvailable,config,button,dialog,errorN
 
 function scrollToProblem(problem){
   const target=document.getElementById(problem.section);
-  if(!target)return;
-  target.classList.remove("is-attention");
-  void target.offsetWidth;
-  target.classList.add("is-attention");
-  target.scrollIntoView({behavior:"smooth",block:"center"});
-  scopeFor(document.getElementById(ROOT_ID))?.timeout(()=>target.classList.remove("is-attention"),1800);
+  attentionToConfig(target);
 }
 
 function bind(root,context){
@@ -577,28 +576,20 @@ function bind(root,context){
 
 
   const dialog=root.querySelector("[data-scheduling-review-dialog]");
-  root.querySelector("[data-scheduling-review]")?.addEventListener("click",()=>{
-    const problem=configProblem(config,slaAvailable,trips);
-    if(problem){
-      if(problem.section==="scheduling-scope")config={...config,focusRulesOpen:true};
-      writeConfig(caseId,config);
-      rerender();
-      queueMicrotask(()=>scrollToProblem(problem));
-      return;
-    }
-    dialog?.showModal();
-  });
-  root.querySelector("[data-scheduling-execute]")?.addEventListener("click",event=>{
-    if(context.onExecute){const problem=validateConfig(config,slaAvailable,trips);if(problem){root.querySelector("[data-scheduling-review-error]").textContent=problem;return;}dialog?.close();context.onExecute({sourceRun,configuration:executionConfiguration(config),options:executionOptions(config)});return;}
-    execute({
-      state,
-      sourceRun,
-      slaAvailable,
-      config,
-      button:event.currentTarget,
-      dialog,
-      errorNode:root.querySelector("[data-scheduling-review-error]"),
-    });
+  bindConfigReview({
+    dialog,trigger:root.querySelector('[data-scheduling-review]'),executeSelector:'[data-scheduling-execute]',
+    validate:()=>{
+      const problem=configProblem(config,slaAvailable,trips);
+      if(problem){
+        if(problem.section==='scheduling-scope')config={...config,focusRulesOpen:true};
+        writeConfig(caseId,config);rerender();
+        queueMicrotask(()=>scrollToProblem(problem));
+      }
+      return problem;
+    },
+    onExecute:button=>context.onExecute
+      ?context.onExecute({sourceRun,configuration:executionConfiguration(config),options:executionOptions(config)})
+      :execute({state,sourceRun,slaAvailable,config,button,dialog,errorNode:root.querySelector('[data-scheduling-review-error]')}),
   });
 }
 

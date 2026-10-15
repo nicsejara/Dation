@@ -325,7 +325,7 @@ function heroMarkup(){
         +[
           ["1 · ELEGÍ","La decisión que está disponible.","mousePointer"],
           ["2 · CONFIGURÁ","Definí tu prioridad y compará escenarios.","sliders"],
-          ["3 · APROBÁ","El resultado desbloquea la siguiente decisión.","checkCircle"],
+          ["3 · APROBÁ","Aprobá y habilitá la siguiente decisión.","checkCircle"],
         ].map(([label,description,icon],index)=>(
           '<div class="dispatch-pro-how-node">'
             +'<span class="dispatch-pro-how-icon">'+iconSvg(icon,"dispatch-pro-icon dispatch-map-icon")+'</span>'
@@ -335,7 +335,7 @@ function heroMarkup(){
         )).join("")
         +'<div class="dispatch-pro-how-history">'
           +iconSvg("history","dispatch-pro-icon dispatch-map-icon")
-          +'<span>Podés reabrir una decisión aprobada desde su tarjeta.</span>'
+          +'<span>Reabrí cada decisión desde su tarjeta.</span>'
         +'</div>'
       +'</div>'
     +'</div>'
@@ -553,7 +553,7 @@ async function openDatasetColumns(kind,source,orders,fleet){
 
 export async function renderDecisionMap(
   root,
-  {decisionCase,readiness,orders,fleet,onConfigure,onOpenResult,onData,onSelectCase},
+  {decisionCase,readiness,orders,fleet,onConfigure,onOpenResult,onData,onSelectCase,transitionNotice=null},
 ){
   const scope=createScope(root);scope.own(()=>{root._guideDrawer=null;});
   await ensureDecisionCaseStyles();
@@ -585,10 +585,10 @@ export async function renderDecisionMap(
     heroMarkup()
     +'<div class="dispatch-map-case-selector"><span>DECISION CASE</span>'
       +'<button type="button" data-select-case aria-haspopup="dialog" title="Seleccionar Decision Case">'+esc(displayCaseId(decisionCase?.id))+' <span aria-hidden="true">⌄</span></button></div>'
-    +(decisionCase?.stale_predecessor
-      ?'<section class="dispatch-map-stale dispatch-map-stale--premium">'
-        +iconSvg("alertTriangle","dispatch-map-icon")
-        +'<div><strong>Los datos cambiaron</strong><p>Este es un nuevo Decision Case. El caso anterior se conserva para mantener la trazabilidad.</p></div>'
+    +(transitionNotice
+      ?'<section class="dispatch-map-stale dispatch-map-stale--premium" role="status" data-case-transition>'
+        +iconSvg("info","dispatch-map-icon")
+        +'<div><strong>Nuevo Decision Case por cambio de datos</strong><p>El Data Pack cambió. Dation creó '+esc(displayCaseId(transitionNotice.caseId))+' y conservó '+esc(displayCaseId(transitionNotice.predecessorId))+' para mantener la trazabilidad.</p></div>'
       +'</section>'
       :'')
     +'<section class="dispatch-map-progress" aria-label="Progreso del caso">'+progressMarkup(presentations,approved,activeNodeId)+'</section>'

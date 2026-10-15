@@ -60,7 +60,8 @@ function caseCard(item,currentCaseId){
   return '<article class="dispatch-case-option '+(current?'is-current':'')+'">'
     +'<div class="dispatch-case-option__top">'
       +'<div><small>DECISION CASE</small><strong>'+esc(shortCaseId(row.id))+'</strong></div>'
-      +(current?'<span class="dispatch-case-option__current">Abierto ahora</span>':'<span class="dispatch-case-option__state">Activo</span>')
+      +(current?'<span class="dispatch-case-option__current">Abierto ahora</span>':'')
+      +'<span class="dispatch-case-option__state">'+(row.status==='completed'?'Completado':'Activo')+'</span>'
     +'</div>'
     +'<div class="dispatch-case-option__pack">'
       +'<span><small>ÓRDENES</small><strong title="'+esc(datasetName(item.orders))+'">'+esc(datasetName(item.orders))+'</strong></span>'
@@ -72,7 +73,7 @@ function caseCard(item,currentCaseId){
     +'</div>'
     +'<div class="dispatch-case-option__footer">'
       +'<span>Última actividad · '+esc(dateTime(row.last_activity_at||row.updated_at))+'</span>'
-      +'<button type="button" data-open-case="'+esc(row.id)+'">Abrir caso →</button>'
+      +(current?'<button type="button" disabled>Caso actual</button>':'<button type="button" data-open-case="'+esc(row.id)+'">Abrir caso →</button>')
     +'</div>'
   +'</article>';
 }
@@ -87,8 +88,8 @@ function makeDialog(className,label,scope){
   return dialog;
 }
 
-export function openCaseSelector(cases,{currentCaseId=null,onSelect,scope,trigger=null}={}){
-  const dialog=makeDialog('dispatch-trace-dialog dispatch-case-selector','Seleccionar Decision Case',scope);
+export function openCaseSelector(cases,{currentCaseId=null,onSelect,scope,trigger=null,error=null}={}){
+  const dialog=makeDialog('dispatch-trace-dialog dispatch-case-selector'+(cases.length<=1?' dispatch-case-selector--single':''),'Seleccionar Decision Case',scope);
   dialog.addEventListener('close',()=>{if(trigger?.isConnected)trigger.focus({preventScroll:true});},{once:true});
   dialog.innerHTML='<div class="dispatch-trace-shell">'
     +'<header class="dispatch-trace-header">'
@@ -96,7 +97,7 @@ export function openCaseSelector(cases,{currentCaseId=null,onSelect,scope,trigge
       +'<p>Cada caso conserva su Data Pack y todas las corridas realizadas sobre esos datos.</p></div>'
       +'<button type="button" class="dispatch-trace-close" data-close aria-label="Cerrar">×</button>'
     +'</header>'
-    +'<div class="dispatch-case-selector__summary"><strong>'+num(cases.length)+' casos activos</strong><span>Seleccionar un caso restaura automáticamente sus datos y su mapa de decisiones.</span></div>'
+    +'<div class="dispatch-case-selector__summary"><strong>'+num(cases.length)+' '+(cases.length===1?'caso disponible':'casos disponibles')+'</strong><span role="status">'+esc(error||(!cases.some(item=>item.case.id!==currentCaseId)?'No hay otros Decision Cases disponibles todavía.':'Seleccionar un caso restaura automáticamente sus datos y su mapa de decisiones.'))+'</span></div>'
     +'<div class="dispatch-case-selector__grid">'+cases.map(item=>caseCard(item,currentCaseId)).join('')+'</div>'
   +'</div>';
 
@@ -109,7 +110,7 @@ export function openCaseSelector(cases,{currentCaseId=null,onSelect,scope,trigge
         await onSelect?.(button.dataset.openCase);
         dialog.close();
       }catch(error){
-        dialog.querySelectorAll('button').forEach(item=>item.disabled=false);
+        dialog.querySelectorAll('[data-close],[data-open-case]').forEach(item=>item.disabled=false);
         button.textContent='Abrir caso →';
         const summary=dialog.querySelector('.dispatch-case-selector__summary span');
         if(summary)summary.textContent=error?.message||'No pudimos abrir el Decision Case.';

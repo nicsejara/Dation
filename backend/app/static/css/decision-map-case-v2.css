@@ -11,6 +11,9 @@
 .decision-context-chevron{margin-left:auto;font-size:18px;transition:transform .15s ease;}
 details[open]>summary .decision-context-chevron{transform:rotate(180deg);}
 .dispatch-map-case-selector button:focus-visible{outline:3px solid var(--d-brand-teal-bright);outline-offset:3px;}
+.dispatch-decision-map--case-v2 [data-case-transition]{border-color:var(--d-border-control);background:var(--d-surface-2);color:var(--d-text-primary);}
+.dispatch-decision-map--case-v2 [data-case-transition] p{color:var(--d-text-secondary);}
+.dispatch-decision-map--case-v2 [data-case-transition]>.dispatch-map-icon{color:var(--d-brand-teal-bright);}
 .dispatch-map-context-summary:focus-visible{outline:3px solid var(--d-brand-teal-bright);outline-offset:3px;}
 .dispatch-decision-map--case-v2 details.dispatch-map-casebar{border-radius:16px;}
 .dispatch-decision-map--case-v2 details.dispatch-map-casebar .dispatch-case-card__top{grid-template-columns:1fr;padding:16px 20px;}

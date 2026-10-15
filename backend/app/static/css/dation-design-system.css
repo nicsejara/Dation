@@ -68,6 +68,14 @@
 }
 
 /* One shared, content-sized footer. State and action ownership stays with the caller. */
+.d-attention-target { position:relative; }
+.d-attention-target.is-attention::after {
+  content:""; position:absolute; inset:0; border:2px solid var(--d-brand-teal-bright);
+  border-radius:inherit; pointer-events:none; animation:d-config-attention .6s ease-in-out 3;
+}
+@keyframes d-config-attention { 50% { opacity:.45; } }
+@media(prefers-reduced-motion:reduce) { .d-attention-target.is-attention::after { animation:none; } }
+
 .d-workflow-action-bar {
   position:sticky; bottom:16px; z-index:35; display:grid;
   grid-template-columns:minmax(0,1fr) auto auto; align-items:center; gap:16px;
