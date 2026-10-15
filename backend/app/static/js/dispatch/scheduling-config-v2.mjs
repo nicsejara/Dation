@@ -1,4 +1,5 @@
 import {createScope,scopeFor} from "./lifecycle.mjs";
+import {ensureDecisionCaseStyles} from "./styles.mjs";
 import {api,esc,num,post} from "./shared.mjs";
 import {
   configSummaryBar,
@@ -28,7 +29,6 @@ const WORKSPACE_KEY="dation.dispatch.workspace.v5";
 const CONFIG_KEY="dation.scheduling.config.v1";
 const ROOT_ID="dispatch-config-root";
 const STYLE_IDS={
-  case:"scheduling-case-language",
   assignment:"scheduling-assignment-language",
   own:"scheduling-config-v2-styles",
   shared:"scheduling-shared-phase2-styles",
@@ -40,7 +40,7 @@ let mounting=false;
 
 function ensureStyles(){
   return Promise.all([
-    ensureDecisionConfigStyle(STYLE_IDS.case,"/static/css/decision-map-case-v2.css","dark-data-pack-phase3-v1"),
+    ensureDecisionCaseStyles(),
     ensureDecisionConfigStyle(STYLE_IDS.assignment,"/static/css/assignment-config-v2.css"),
     ensureDecisionConfigStyle(STYLE_IDS.own,"/static/css/scheduling-config-v2.css"),
     ensureDecisionConfigStyle(STYLE_IDS.shared,"/static/css/scheduling-config-shared-phase2.css"),
@@ -344,7 +344,6 @@ function summaryBar(config,stats,slaAvailable){
     reason:problem?.reason||"",
     ctaLabel:"Revisar y ejecutar",
     reviewHook:"data-scheduling-review",
-    extraClass:"scheduling-summary-bar",
     chips:[
       {target:"scheduling-scope",icon:"calendarRange",label:"Ventana",value:scopeCurrent(config,stats.trips)},
       {target:"scheduling-objective",icon:"target",label:"Objetivo",value:objectiveLabel(config)},

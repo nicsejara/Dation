@@ -507,13 +507,13 @@ class FrontendContractTests(
             / "dispatch"
             / "assignment.mjs"
         ).read_text(encoding="utf-8")
-        plan = (
+        actions = (
             BACKEND_ROOT
             / "app"
             / "static"
             / "js"
             / "dispatch"
-            / "plan.mjs"
+            / "dashboard-toolbar.mjs"
         ).read_text(encoding="utf-8")
         exporter = (
             BACKEND_ROOT
@@ -554,7 +554,7 @@ class FrontendContractTests(
         )
         self.assertIn(
             "exportDecision",
-            plan,
+            actions,
         )
         self.assertIn(
             "assignment-recomendada.csv",
@@ -1442,7 +1442,7 @@ class FrontendContractTests(
         for copy in (
             "Elegí la decisión que tus datos ya pueden resolver.",
             "CÓMO AVANZA EL CASO",
-            "TU DECISION CASE",
+            "DECISION CASE",
             "DATA PACK ACTIVO",
             "Datos validados",
             "¿Qué decisión querés revisar o ejecutar?",

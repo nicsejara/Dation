@@ -1907,5 +1907,85 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.execution_bodies, [])
 
 
+    async def test_phase7_library_and_settings_share_the_dark_roles(self):
+        audit=(Path(__file__).parent/'theme_audit.js').read_text()
+        await self.page.emulate_media(reduced_motion='reduce',color_scheme='light')
+        for width in (1440,1280,1024,768,390):
+            await self.page.set_viewport_size({'width':width,'height':1000})
+            for view in ('traceability','settings'):
+                await self.page.goto(f'http://127.0.0.1:{self.port}/app?view={view}',wait_until='networkidle')
+                if view=='traceability':
+                    await self.page.locator('#datasets-table-body tr').first.wait_for(state='visible')
+                    for tab in ('datasets','history','evidence'):
+                        button=self.page.locator('[data-trace-tab='+tab+']')
+                        await button.focus();await self.page.keyboard.press('Enter')
+                        self.assertTrue(await self.page.locator('[data-trace-panel='+tab+']').evaluate("el=>el.classList.contains('is-active')"))
+                        await self.page.locator('[data-trace-panel='+tab+']').wait_for(state='visible')
+                        self.assertEqual(await self.page.locator('[data-trace-panel='+tab+']').evaluate('el=>getComputedStyle(el).animationName'),'none')
+                        result=await self.page.evaluate(audit)
+                        self.assertEqual(result['failures'],[],(width,tab,result))
+                    await self.page.evaluate("async run=>{const ui=await import('/static/js/ui.js');ui.renderTechnicalEvidence(run);}",self.f['runs']['assignment'])
+                    self.assertTrue(await self.page.locator('#configuration-json').inner_text())
+                    self.assertEqual(await self.page.locator('#runs-table-body [data-open-run]').count(),2)
+                else:
+                    self.assertNotEqual(await self.page.locator('#settings-ai-status').inner_text(),'Verificando…')
+                result=await self.page.evaluate(audit)
+                self.assertEqual(result['failures'],[],(width,view,result))
+                self.assertFalse(result['overflow']);self.assertFalse(result['legacyBoundary'])
+                self.assertEqual(result['scheme'],'dark')
+            await self.page.evaluate("window.dationNavigate('library')")
+            await self.page.locator('[data-view-panel=traceability].is-active').wait_for(state='visible')
+        self.assertEqual(await self.page.locator('link[href*=dation-legacy-surfaces]').count(),0)
+        self.assertEqual(self.execution_bodies,[])
+
+    async def test_phase7_map_styles_retry_and_remain_shared_with_config_and_filters(self):
+        calls=[]
+        async def sheet(route):
+            calls.append(route.request.url)
+            if len(calls)==1:await route.abort('failed')
+            else:await route.continue_()
+        await self.context.route('**/static/css/decision-map-case-v2.css*',sheet)
+        await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=logistics-map&case_id={self.case["id"]}',wait_until='domcontentloaded')
+        await self.page.get_by_role('button',name='Reintentar',exact=True).click()
+        await self.page.locator('[data-select-case]').wait_for(state='visible')
+        for view,node in [('logistics-config','logistics_scheduling'),('logistics-config','logistics_assignment'),('logistics-map',None),('logistics-config','logistics_assignment')]:
+            await self.page.evaluate('args=>window.DationDispatch.openCase(...args)',[self.case['id'],view,node])
+            ready='[data-select-case]' if view=='logistics-map' else '[data-scheduling-review]' if node=='logistics_scheduling' else '[data-config-review]'
+            await self.page.locator(ready).wait_for(state='visible')
+        await self.page.locator('[data-filter-dialog-open]').click()
+        await self.page.locator('[data-filter-add=destination]').click()
+        await self.page.locator('[data-filter-category]').first.check()
+        row=self.page.locator('.assignment-filter-row.is-collapsible').first
+        toggle=row.locator('[data-filter-collapse-toggle]')
+        await toggle.click()
+        self.assertEqual(await toggle.get_attribute('aria-expanded'),'false')
+        self.assertTrue(await row.locator('.assignment-filter-row__summary').is_visible())
+        self.assertFalse(await row.locator('.assignment-filter-options').is_visible())
+        await toggle.focus();await self.page.keyboard.press('Enter')
+        self.assertTrue(await row.locator('.assignment-filter-options').is_visible())
+        self.assertEqual(len(calls),2,'Only failed load and successful retry; warm routes reuse the sheet')
+        self.assertEqual(await self.page.locator('link[href*="/static/css/decision-map-case-v2.css"]').count(),1)
+        self.assertEqual(await self.page.locator('#assignment-filter-collapse-styles').count(),0)
+        result=await self.page.evaluate((Path(__file__).parent/'theme_audit.js').read_text())
+        self.assertEqual(result['failures'],[]);self.assertFalse(result['overflow'])
+        self.assertEqual(self.execution_bodies,[])
+
+    async def test_phase7_delayed_map_styles_do_not_restore_an_abandoned_route(self):
+        requested,release=asyncio.Event(),asyncio.Event()
+        async def slow_sheet(route):
+            requested.set();await release.wait();await route.continue_()
+        await self.context.route('**/static/css/decision-map-case-v2.css*',slow_sheet)
+        try:
+            await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=logistics-map&case_id={self.case["id"]}',wait_until='domcontentloaded')
+            await asyncio.wait_for(requested.wait(),6)
+            await self.nav('logistics-overview')
+        finally:release.set()
+        await self.page.locator('[data-start-new-decision]').wait_for(state='visible')
+        await self.page.wait_for_load_state('networkidle')
+        self.assertEqual(await self.page.locator('.view.is-active').get_attribute('data-view-panel'),'logistics-overview')
+        self.assertEqual(await self.page.locator('#dispatch-map-root [data-select-case]').count(),0)
+        self.assertEqual(self.execution_bodies,[])
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

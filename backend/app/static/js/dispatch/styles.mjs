@@ -1,6 +1,10 @@
 /** Shared stylesheet identity, readiness and retry; no duplicate link nodes. */
 const pendingStyles=new WeakMap();
 const failedStyles=new WeakSet();
+/** Map and both configuration screens share the same sheet and version. */
+export function ensureDecisionCaseStyles(){
+  return ensureStylesheet('decision-map-case-v2-styles','/static/css/decision-map-case-v2.css','dark-map-phase6-v1');
+}
 export function ensureStylesheet(id,path,version="dark-dashboard-phase5-v1"){
   const existing=[...document.querySelectorAll('link[rel="stylesheet"]')].find(link=>new URL(link.href,location.href).pathname===path);
   if(existing&&failedStyles.has(existing)){

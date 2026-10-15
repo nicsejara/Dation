@@ -27,7 +27,7 @@ def test_phase2_exposes_selected_disabled_and_locked_states():
 
 def test_phase2_summary_reuses_shared_assignment_bar():
     assert 'configSummaryBar({' in UI
-    assert 'scheduling-summary-bar' in UI
+    assert 'configSummaryBar(' in UI
     assert 'ready:!problem' in UI
     assert 'reason:problem?.reason||""' in UI
 

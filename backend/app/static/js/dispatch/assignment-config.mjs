@@ -1,5 +1,6 @@
 import {createScope} from "./lifecycle.mjs";
 import {mountFilterCollapse} from "./assignment-filter-collapse.mjs";
+import {ensureDecisionCaseStyles} from "./styles.mjs";
 import {esc,num,post,api} from "./shared.mjs";
 import {iconSvg} from "./decision-ui.mjs";
 import {
@@ -45,7 +46,7 @@ const RESOURCE_MODES={
 
 function ensureStyles(){
   return Promise.all([
-    ensureDecisionConfigStyle("assignment-config-case-styles","/static/css/decision-map-case-v2.css","dark-data-pack-phase3-v1"),
+    ensureDecisionCaseStyles(),
     ensureDecisionConfigStyle("assignment-config-v2-styles","/static/css/assignment-config-v2.css")
   ]);
 }

@@ -1,4 +1,3 @@
-const STYLE_ID="assignment-filter-collapse-styles";
 const ROW_SELECTOR=".assignment-config-root .assignment-filter-row:not(.is-invalid)";
 
 
@@ -46,40 +45,10 @@ function chevronSvg(){
   return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>';
 }
 
-function ensureStyles(){
-  if(document.getElementById(STYLE_ID))return;
-  const style=document.createElement("style");
-  style.id=STYLE_ID;
-  style.textContent=`
-.assignment-config-root .assignment-filter-row.is-collapsible{padding:0;overflow:hidden;transition:border-color .18s ease,box-shadow .18s ease,background .18s ease}
-.assignment-config-root .assignment-filter-row.is-collapsible:hover{border-color:var(--d-border-control)}
-.assignment-config-root .assignment-filter-row.is-collapsible .assignment-filter-row__head{margin:0;padding:13px 14px;gap:8px;background:var(--d-surface-2)}
-.assignment-config-root .assignment-filter-row.is-collapsible:not(.is-collapsed) .assignment-filter-row__head{border-bottom:1px solid var(--d-border)}
-.assignment-config-root .assignment-filter-row.is-collapsible .assignment-filter-row__head>div:first-child{display:grid;grid-template-columns:auto auto;gap:2px 8px;align-items:baseline;min-width:0}
-.assignment-config-root .assignment-filter-row.is-collapsible .assignment-filter-row__summary{grid-column:1/-1;display:none;min-width:0;overflow:hidden;color:var(--d-text-secondary);font-size:12px;font-weight:650;line-height:1.35;text-overflow:ellipsis;white-space:nowrap}
-.assignment-config-root .assignment-filter-row.is-collapsible.is-collapsed .assignment-filter-row__summary{display:block}
-.assignment-config-root .assignment-filter-row.is-collapsible>.assignment-filter-search{margin:12px 14px 8px!important;width:calc(100% - 28px)}
-.assignment-config-root .assignment-filter-row.is-collapsible>.assignment-filter-options{margin:0 14px}
-.assignment-config-root .assignment-filter-row.is-collapsible>.assignment-filter-inline-actions{margin:8px 14px 12px}
-.assignment-config-root .assignment-filter-row.is-collapsible>.assignment-filter-range,
-.assignment-config-root .assignment-filter-row.is-collapsible>.assignment-filter-date{margin:12px 14px 14px}
-.assignment-config-root .assignment-filter-row.is-collapsible>.assignment-filter-reference{margin:0 14px 14px}
-.assignment-config-root .assignment-filter-row.is-collapsible.is-collapsed>:not(.assignment-filter-row__head){display:none!important}
-.assignment-config-root .assignment-filter-toggle{display:grid!important;width:32px!important;height:32px!important;min-height:32px!important;flex:0 0 32px;place-items:center;margin-left:auto;padding:0!important;border:1px solid var(--d-border-control)!important;border-radius:9px!important;color:var(--d-text-secondary)!important;background:var(--d-surface-1)!important;cursor:pointer;transition:border-color .16s ease,background .16s ease,color .16s ease!important}
-.assignment-config-root .assignment-filter-toggle:hover{border-color:var(--d-brand-teal-bright)!important;color:var(--d-text-primary)!important;background:var(--d-surface-hover)!important}
-.assignment-config-root .assignment-filter-toggle svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .18s ease}
-.assignment-config-root .assignment-filter-row:not(.is-collapsed) .assignment-filter-toggle svg{transform:rotate(180deg)}
-.assignment-config-root .assignment-filter-row.is-collapsed .assignment-filter-toggle svg{transform:rotate(0deg)}
-.assignment-config-root .assignment-filter-row.is-collapsed{background:var(--d-surface-1)}
-.assignment-config-root .assignment-filter-row.is-collapsed .assignment-filter-row__head{background:var(--d-surface-1)}
-@media(max-width:560px){.assignment-config-root .assignment-filter-row.is-collapsible .assignment-filter-row__head>div:first-child{grid-template-columns:1fr}.assignment-config-root .assignment-filter-row.is-collapsible .assignment-filter-row__head>div:first-child small{grid-column:1}}
-@media(prefers-reduced-motion:reduce){.assignment-config-root .assignment-filter-row.is-collapsible,.assignment-config-root .assignment-filter-toggle,.assignment-config-root .assignment-filter-toggle svg{transition:none!important}}
-`;
-  document.head.append(style);
-}
+
 
 export function mountFilterCollapse(root){
-  ensureStyles();const expandedKeys=new Set();const knownKeys=new Set();
+  const expandedKeys=new Set();const knownKeys=new Set();
 function setExpanded(row,key,expanded){
   row.classList.toggle("is-collapsed",!expanded);
   if(expanded)expandedKeys.add(key);else expandedKeys.delete(key);
