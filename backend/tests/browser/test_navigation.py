@@ -2167,5 +2167,95 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                 self.assertIn('view=decision-dashboard',self.page.url)
                 self.assertEqual(await self.page.locator('dialog[open]').count(),0)
 
+    async def test_workflow_primitives_preserve_action_identity_states_and_token_overrides(self):
+        await self.open('logistics-data')
+        await self.page.locator('.d-workflow-action-bar').wait_for()
+        for width in (1440,1280,1024,768,390):
+            await self.page.set_viewport_size({'width':width,'height':1000})
+            result=await self.page.evaluate('''async()=>{
+                const {createWorkflowActionBar}=await import('/static/js/dispatch/workflow-action-bar.mjs');
+                let continued=0,corrected=0;
+                const {bar,button,update}=createWorkflowActionBar({label:'Prueba',
+                    onContinue:()=>continued++,onProblem:()=>corrected++});
+                bar.style.setProperty('--workflow-action-height','58px');
+                bar.style.setProperty('--workflow-action-radius','18px');
+                bar.style.setProperty('--workflow-action-padding-x','24px');
+                bar.style.setProperty('--workflow-context-control-min-width','160px');
+                document.querySelector('#dispatch-data-root').append(bar);
+                const snapshots=[];
+                for(const [kind,enabled,options] of [
+                    ['pending',false,{missingCount:2}],['ready',true,{}],
+                    ['ready',true,{busy:true}],['error',false,{}],['ready',true,{}]]){
+                    update({kind,enabled,message:'Estado de prueba'},options);
+                    const s=getComputedStyle(button);
+                    snapshots.push({sameNode:bar.lastElementChild===button,
+                        height:button.getBoundingClientRect().height,radius:s.borderRadius,
+                        padding:s.paddingInlineStart,minWidth:s.minWidth,
+                        disabled:button.disabled,busy:button.getAttribute('aria-busy'),
+                        primary:s.backgroundImage!=='none',
+                        described:document.getElementById(button.getAttribute('aria-describedby'))?.textContent});
+                    button.click();
+                }
+                button.querySelector('span').textContent='Continuar con la revisión de esta decisión y sus recursos disponibles';
+                const wrapsWithoutClipping=button.scrollWidth<=button.clientWidth&&button.scrollHeight<=button.clientHeight;
+                button.focus();
+                const focused=document.activeElement===button;
+                const fits=bar.getBoundingClientRect().right<=innerWidth;
+                bar.remove();
+                return {snapshots,continued,corrected,wrapsWithoutClipping,focused,fits};
+            }''')
+            self.assertEqual(result['continued'],2)
+            self.assertEqual(result['corrected'],1)
+            self.assertTrue(result['wrapsWithoutClipping'])
+            self.assertTrue(result['focused'])
+            self.assertTrue(result['fits'])
+            self.assertEqual([s['disabled'] for s in result['snapshots']],[True,False,True,False,False])
+            self.assertEqual([s['busy'] for s in result['snapshots']],['false','false','true','false','false'])
+            self.assertFalse(result['snapshots'][3]['primary'],'Corrective actions keep their secondary role')
+            self.assertTrue(result['snapshots'][1]['primary'])
+            for snapshot in result['snapshots']:
+                self.assertTrue(snapshot['sameNode'])
+                self.assertEqual(snapshot['height'],58)
+                self.assertEqual(snapshot['radius'],'18px')
+                self.assertEqual(snapshot['padding'],'24px')
+                self.assertEqual(snapshot['described'],'Estado de prueba')
+        self.assertEqual(self.execution_bodies,[])
+
+    async def test_workflow_primitives_hero_supports_optional_metadata_and_panel(self):
+        await self.open('logistics-config','logistics_assignment')
+        await self.page.locator('.assignment-config-hero').wait_for()
+        for width in (1440,390):
+            await self.page.set_viewport_size({'width':width,'height':1000})
+            result=await self.page.evaluate('''async()=>{
+                const {decisionHero}=await import('/static/js/dispatch/decision-config-ui.mjs');
+                const owner=document.createElement('div');
+                document.querySelector('#dispatch-config-root').append(owner);
+                const variants=[];
+                for(const decisionIndex of [undefined,null,'',1,'02']){
+                    owner.innerHTML=decisionHero({title:'<img src=x onerror=alert(1)>',
+                        description:'Descripción',step:{number:3,label:'Configurar decisión'},decisionIndex});
+                    const hero=owner.firstElementChild;
+                    variants.push({decision:hero.querySelector('.assignment-decision-chip')?.textContent??null,
+                        panel:!!hero.querySelector('.dispatch-pro-hero-visual'),
+                        columns:getComputedStyle(hero).gridTemplateColumns.split(' ').length,
+                        title:hero.querySelector('h1').textContent,images:hero.querySelectorAll('img').length,
+                        overflow:hero.scrollWidth>hero.clientWidth});
+                }
+                owner.innerHTML=decisionHero({title:'Decisión',description:'Descripción',decisionIndex:1,
+                    panelItems:[{icon:'truck',label:'Recursos',description:'Flota disponible'}]});
+                const hasPanel=owner.querySelectorAll('.dispatch-pro-hero-visual .dispatch-pro-how-node').length===1;
+                owner.remove();return {variants,hasPanel};
+            }''')
+            self.assertEqual([v['decision'] for v in result['variants']],
+                             [None,None,None,'DECISIÓN 01 DE 3','DECISIÓN 02 DE 3'])
+            self.assertTrue(result['hasPanel'])
+            for variant in result['variants']:
+                self.assertFalse(variant['panel'])
+                self.assertEqual(variant['columns'],1)
+                self.assertEqual(variant['title'],'<img src=x onerror=alert(1)>')
+                self.assertEqual(variant['images'],0)
+                self.assertFalse(variant['overflow'])
+        self.assertEqual(self.execution_bodies,[])
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

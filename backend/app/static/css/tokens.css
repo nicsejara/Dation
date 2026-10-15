@@ -113,11 +113,21 @@
   --control-height-sm: 36px;
   --control-height-md: 40px;
   --control-height-lg: 46px;
+  /* Workflow roles reuse the existing size scale. Group widths stay content-driven. */
+  --workflow-action-height: var(--control-height-lg);
+  --workflow-action-radius: var(--radius-control);
+  --workflow-action-padding-x: var(--space-5);
+  --workflow-context-control-height: var(--control-height-lg);
+  --workflow-context-control-min-width: 12ch;
+  --workflow-action-min-width: calc(var(--workflow-context-control-min-width) + 2 * var(--workflow-action-padding-x));
   --hero-min-height: 220px;
   --hero-padding: 26px;
   --hero-gap: 24px;
   --hero-title-size: clamp(28px,3vw,40px);
   --hero-lead-size: 14px;
+  --hero-panel-width: clamp(20rem,30vw,25rem);
+  --hero-panel-gap: var(--space-3);
+  --hero-meta-gap: var(--space-1);
   --hero-background: radial-gradient(ellipse at top right,rgba(67,166,199,.09),transparent 50%),var(--d-surface-1);
   --sidebar-width: 252px;
   --topbar-height: 58px;

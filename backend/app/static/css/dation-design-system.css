@@ -24,6 +24,17 @@
 .d-button--icon { width: var(--control-height-md); padding: 0; flex: 0 0 var(--control-height-md); }
 .d-button--sm { min-height: var(--control-height-sm); padding: 0 var(--space-3); font-size: 12px; }
 .d-button--lg { min-height: var(--control-height-lg); }
+/* Workflow sizing composes with primary/secondary roles and their existing states. */
+.d-button--workflow {
+  box-sizing: border-box;
+  min-height: var(--workflow-action-height);
+  min-width: min(100%,var(--workflow-action-min-width));
+  max-width: 100%;
+  padding-inline: var(--workflow-action-padding-x);
+  border-radius: var(--workflow-action-radius);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
 .d-button svg { width: 18px; height: 18px; flex: 0 0 18px; }
 .d-button:focus-visible { outline: 3px solid var(--d-brand-teal-bright); outline-offset: 3px; box-shadow: 0 0 0 3px var(--d-bg-0); }
 .d-button:active:not(:disabled):not([aria-disabled="true"]) { transform: none; }
@@ -62,6 +73,7 @@
 .d-page-hero h1 { font-size: var(--hero-title-size); line-height: 1.14; letter-spacing: -.035em; color: var(--d-text-primary); }
 .d-page-hero :is(.dispatch-pro-hero-lead,.dda-landing__hero-lead) { color: var(--d-text-secondary); font-size: var(--hero-lead-size); line-height: 1.55; }
 .d-page-hero :is(.dispatch-pro-hero-copy,.dda-landing__hero-copy,.d-home__hero-copy) { min-width: 0; }
+.d-page-hero--copy-only { grid-template-columns: minmax(0,1fr); }
 @media(prefers-reduced-motion:reduce) {
   .d-button, .d-page-hero, .view.is-active, .trace-panel.is-active { animation: none; transition: none; }
   .d-button:hover:not(:disabled):not([aria-disabled="true"]) { transform: none; }
