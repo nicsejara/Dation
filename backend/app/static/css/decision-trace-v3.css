@@ -269,3 +269,7 @@
 
 .dispatch-decision-node__tracebar>button{padding:6px 8px;border:1px solid var(--color-border-strong);border-radius:8px;background:var(--color-surface-raised);color:var(--color-text-secondary);font:inherit;font-size:11px;cursor:pointer;}
 .dispatch-decision-node__tracebar>button:hover{background:var(--color-surface-hover);color:var(--color-text);}
+
+/* An explicit one-case picker remains a compact modal, including load errors. */
+.dispatch-case-selector--single .dispatch-trace-shell { width:min(720px,calc(100vw - 32px)); }
+.dispatch-case-selector--single .dispatch-case-selector__grid { grid-template-columns:minmax(0,1fr); }

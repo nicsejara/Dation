@@ -4,17 +4,33 @@ import {openCaseSelector,openRunHistory} from './traceability-ui.mjs';
 import {DECISION_ORDER} from './decision-ui.mjs';
 let scope=null;
 function interaction(){scope?.dispose();scope=createScope(document.createElement('div'));return scope;}
-export async function listDecisionCases(signal){const payload=await api('/api/decision-cases?status=active&limit=100&offset=0&summary=true',{signal});return Array.isArray(payload.cases)?payload.cases:[];}
-export async function openDecisionMap({preferActiveCase=false,trigger=null}={}){
+export async function listDecisionCases(signal){
+  const pages=await Promise.all(['active','completed'].map(async status=>{
+    const items=[];
+    for(let offset=0;;offset+=100){
+      const payload=await api('/api/decision-cases?status='+status+'&limit=100&offset='+offset+'&summary=true',{signal});
+      const page=Array.isArray(payload.cases)?payload.cases:[];
+      items.push(...page);
+      if(page.length<100)return items;
+    }
+  }));
+  const unique=new Map(pages.flat().filter(item=>item.case?.id&&item.case.status!=='archived').map(item=>[item.case.id,item]));
+  return [...unique.values()].sort((a,b)=>String(b.case.last_activity_at||b.case.updated_at||'').localeCompare(String(a.case.last_activity_at||a.case.updated_at||'')));
+}
+export async function openDecisionMap({preferActiveCase=false,trigger=null,forceSelector=false}={}){
   const owner=interaction();
   const activeCaseId=window.DationDispatch.getWorkspace().decisionCase?.id;
-  if(preferActiveCase&&activeCaseId)return window.DationDispatch.openCase(activeCaseId,'logistics-map',null);
+  if(!forceSelector&&preferActiveCase&&activeCaseId)return window.DationDispatch.openCase(activeCaseId,'logistics-map',null);
   try{
     const cases=await listDecisionCases(owner.signal);if(!owner.active)return;
-    if(!cases.length)return window.dationNavigate('logistics-map');
-    if(cases.length===1)return window.DationDispatch.openCase(cases[0].case.id);
+    if(!forceSelector&&!cases.length)return window.dationNavigate('logistics-map');
+    if(!forceSelector&&cases.length===1)return window.DationDispatch.openCase(cases[0].case.id);
     openCaseSelector(cases,{scope:owner,trigger,currentCaseId:activeCaseId,onSelect:caseId=>window.DationDispatch.openCase(caseId,'logistics-map',null)});
-  }catch(error){if(owner.active)window.dationNavigate('logistics-map');}
+  }catch(error){
+    if(!owner.active)return;
+    if(forceSelector)openCaseSelector([],{scope:owner,trigger,currentCaseId:activeCaseId,error:'No pudimos cargar los casos. Cerrá el selector y volvé a intentar.'});
+    else window.dationNavigate('logistics-map');
+  }
 }
 export async function showHistory(nodeId){
   const owner=interaction(),caseId=window.DationDispatch.getWorkspace().decisionCase?.id;if(!caseId)return;

@@ -3,7 +3,7 @@ import {render as dashboard} from './dashboard.mjs';
 import {mountUploadScreen} from './upload/index.mjs';
 import {renderDecisionMap} from './decision-map.mjs';
 import {mountAssignmentConfig,filterPayload,normalizeRawWeights} from './assignment-config.mjs';
-import {STATUS,createDecisionCase,replaceInputs,transitionNode,inputSignature,caseRef,deriveDecisionNodes,continuationState} from './decision-case.mjs';
+import {STATUS,createDecisionCase,replaceInputs,transitionNode,inputSignature,caseRef,deriveDecisionNodes,continuationState,getCaseTransitionNotice} from './decision-case.mjs';
 import {DECISION_META} from './decision-ui.mjs';
 
 const KEY='dation.dispatch.workspace.v5';
@@ -114,7 +114,7 @@ if(OBJECTIVE_DIMENSION[state.objective]&&!state.dimensions.includes(OBJECTIVE_DI
 state.weights=state.objective==='custom'
   ?normalizeWeights(state.weights,state.dimensions)
   :presetWeights(state.objective,state.dimensions);
-let pollGeneration=0,routeGeneration=0,routeController=null,resource=null;const roots={};
+let pollGeneration=0,routeGeneration=0,routeController=null,resource=null,transitionCaseId=null;const roots={};
 const renderView=window.dationNavigate;
 const DRAFT_KEY='dation.dispatch.drafts.v1';
 let drafts={};try{drafts=JSON.parse(sessionStorage.getItem(DRAFT_KEY)||'{}');}catch{}
@@ -220,10 +220,12 @@ function ensureDecisionCase(){
   }
   if(!state.decisionCase){
     state.decisionCase=createDecisionCase(crypto.randomUUID(),state.orders,state.fleet);
+    transitionCaseId=null;
     state.activeNode=null;
     window.dationSetDecisionContext?.(null);
   }else if(state.decisionCase.signature!==signature){
     state.decisionCase=replaceInputs(state.decisionCase,crypto.randomUUID(),state.orders,state.fleet);
+    transitionCaseId=state.decisionCase.id;
     state.run=null;
     resetAssignmentConfiguration();
     state.activeNode=null;
@@ -249,6 +251,7 @@ function decisionContext(nodeId){
 }
 function navigate(view,options={}){persist();window.dationSetDataReady(ready());return navigateResource(view,options);}
 async function startNewDecision(){
+  transitionCaseId=null;
   saveDraft();
   resetAssignmentConfiguration();
   Object.assign(state,{orders:null,fleet:null,decisionCase:null,run:null,activeNode:null,
@@ -314,6 +317,26 @@ async function loadDecisionMap(){
     if(!state.preflight)await preflight();
     if(generation!==routeGeneration)return;
     ensureDecisionCase();
+    // Register the case before execution so the API picker and deep links also
+    // work for a freshly validated Data Pack. The endpoint is idempotent by ID.
+    if(!state.decisionCase.persisted){
+      const current=state.decisionCase;
+      await post('/api/decision-cases',{
+        id:current.id,orders_dataset_id:state.orders.id,fleet_dataset_id:state.fleet.id,state:current,
+      },{signal:routeController?.signal});
+      if(generation!==routeGeneration)return;
+      state.decisionCase={...current,persisted:true};
+      resource={...resource,caseId:current.id,nodeId:null,runId:null};
+      history.replaceState(null,'',resourceUrl(location.href,resource));
+      persist();
+    }
+    let predecessor=null;
+    if(transitionCaseId===state.decisionCase.id&&state.decisionCase.stale_predecessor?.id){
+      try{predecessor=await api('/api/decision-cases/'+state.decisionCase.stale_predecessor.id,{signal:routeController?.signal});}
+      catch(error){if(error.status!==404)throw error;}
+      if(generation!==routeGeneration)return;
+    }
+    const transitionNotice=getCaseTransitionNotice({decisionCase:state.decisionCase,predecessor,transitionCaseId});
     state.decisionCase={
       ...state.decisionCase,
       nodes:deriveDecisionNodes(
@@ -327,6 +350,7 @@ async function loadDecisionMap(){
       readiness:state.preflight?.decision_readiness,
       orders:state.orders,
       fleet:state.fleet,
+      transitionNotice,
       onConfigure:(nodeId)=>{
         state.activeNode=nodeId||'logistics_assignment';
         decisionContext(state.activeNode);
@@ -335,7 +359,7 @@ async function loadDecisionMap(){
       },
       onOpenResult:openCaseResult,
       onData:()=>navigate('logistics-data'),
-      onSelectCase:trigger=>window.DationDispatch.openDecisionMap({trigger}),
+      onSelectCase:trigger=>window.DationDispatch.openDecisionMap({trigger,forceSelector:true}),
     });
     if(generation===routeGeneration)decorateDecisionMap(node);
   }catch(error){
@@ -669,6 +693,7 @@ async function hydrateCase(caseId,generation=routeGeneration){
   if(generation!==routeGeneration)return;
   if(String(item.decision_case?.id)!==String(caseId)||String(item.orders?.id)!==String(item.decision_case?.inputs?.orders_dataset_id||item.case?.orders_dataset_id)||String(item.fleet?.id)!==String(item.decision_case?.inputs?.fleet_dataset_id||item.case?.fleet_dataset_id))throw new Error('El Decision Case no coincide con su Data Pack.');
   if(state.decisionCase?.id!==caseId){saveDraft();resetAssignmentConfiguration();Object.assign(state,cleanDraft(drafts[caseId]));state.preflight=null;state.configPreview=null;state.run=null;}
+  transitionCaseId=null;
   state.orders=item.orders;state.fleet=item.fleet;state.decisionCase={...item.decision_case,persisted:true};persist();return item;
 }
 async function navigateResource(view,options={}){

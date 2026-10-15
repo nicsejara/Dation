@@ -16,7 +16,8 @@ class TraceabilityPhase3Contracts(unittest.TestCase):
 
     def test_controller_restores_data_pack_before_guarded_views(self):
         source = (ROOT / "js" / "dispatch" / "traceability-controller.mjs").read_text(encoding="utf-8")
-        self.assertIn("/api/decision-cases?status=active", source)
+        self.assertIn("['active','completed']", source)
+        self.assertIn("/api/decision-cases?status=", source)
         self.assertIn("window.DationDispatch.openCase", source)
         self.assertNotIn("location.reload", source)
         self.assertNotIn("sessionStorage", source)

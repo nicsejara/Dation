@@ -10,6 +10,9 @@ import {
   decisionDataFileCard,
   decisionAdvancedOptionsSection,
   mountConfigActionBar,
+  attentionToConfig,
+  bindConfigReview,
+  displayDecisionCaseId,
   updateConfigActionBar,
   ensureDecisionConfigStyle,
   decisionHero,
@@ -401,13 +404,15 @@ function reviewDialog(state,preview,capabilities){
   return '<dialog class="dispatch dispatch-review d-config-dialog assignment-review-dialog" data-assignment-review-dialog aria-label="Revisar Assignment antes de ejecutar"><form method="dialog">'
     +'<span class="assignment-section__eyebrow">ANTES DE EJECUTAR</span><h2>Revisá tu configuración</h2>'
     +'<div class="dispatch-review-summary">'
+      +'<p><strong>Decision Case</strong><span>'+esc(displayDecisionCaseId(state.decisionCase?.id))+'</span></p>'
       +'<p><strong>Alcance</strong><span>'+esc(scopeSummary(preview,state.scopeFilters||[]))+'</span></p>'
       +'<p><strong>Objetivo</strong><span>'+esc(OBJECTIVE_LABELS[state.objective]||"Balanceado")+'</span></p>'
       +'<p><strong>Prioridades</strong><span>'+esc(priority)+'</span></p>'
       +'<p><strong>Recursos</strong><span>'+esc(RESOURCE_MODES[state.resourceMode]?.label||"Mixta")+'</span></p>'
     +'</div>'
     +'<p class="assignment-review-note">La decisión distribuirá la carga entre los recursos habilitados. Las fechas y el calendario se resolverán después en Planificación de despachos.</p>'
-    +'<div class="dispatch-actions"><button value="cancel">Volver</button><button type="button" data-config-execute>Generar asignación</button></div>'
+    +'<p role="alert" data-config-review-error></p>'
+    +'<div class="dispatch-actions"><button value="cancel">Volver</button><button type="button" data-config-execute>Ejecutar decisión</button></div>'
   +'</form></dialog>';
 }
 
@@ -516,12 +521,7 @@ export async function mountAssignmentConfig(root,context){
 
   function scrollToProblem(item){
     const target=document.getElementById(item.section);
-    if(!target)return;
-    target.classList.remove("is-attention");
-    void target.offsetWidth;
-    target.classList.add("is-attention");
-    target.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"center"});
-    scope.timeout(()=>target.classList.remove("is-attention"),1800);
+    attentionToConfig(target);
   }
 
   async function rerender({previewFirst=false}={}){
@@ -703,17 +703,15 @@ export async function mountAssignmentConfig(root,context){
     });
 
     const reviewDialogNode=root.querySelector("[data-assignment-review-dialog]");
-    root.querySelector("[data-config-review]")?.addEventListener("click",()=>{
-      const problem=blocker(state,preview,capabilities);
-      if(problem){scrollToProblem(problem);return;}
-      const template=document.createElement("template");
-      template.innerHTML=reviewDialog(state,preview,capabilities);
-      reviewDialogNode.replaceChildren(...template.content.firstElementChild.childNodes);
-      reviewDialogNode.showModal();
-    });
-    reviewDialogNode?.addEventListener("click",event=>{
-      if(!event.target.closest("[data-config-execute]"))return;
-      event.preventDefault();reviewDialogNode.close();onExecute?.();
+    bindConfigReview({
+      dialog:reviewDialogNode,trigger:root.querySelector('[data-config-review]'),executeSelector:'[data-config-execute]',
+      validate:()=>{const problem=blocker(state,preview,capabilities);if(problem)scrollToProblem(problem);return problem;},
+      prepare:()=>{
+        const template=document.createElement('template');
+        template.innerHTML=reviewDialog(state,preview,capabilities);
+        reviewDialogNode.replaceChildren(...template.content.firstElementChild.childNodes);
+      },
+      onExecute:()=>onExecute?.(),
     });
   }
 

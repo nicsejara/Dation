@@ -64,6 +64,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.chat_history = None
         self.selector_size = 1
         self.selector_queries = []
+        self.selector_failure = False
         self.comparative=None
         self.comparative_posts=0
         self.comparative_fail_once=False
@@ -121,16 +122,32 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         elif path in {"/api/runs/preflight", "/api/runs/assignment-preview"}:
             data = self.f["preflight" if path.endswith("preflight") else "preview"]
         elif path == "/api/decision-cases":
-            self.selector_queries.append(query)
-            items=[self.hydrated() for _ in range(self.selector_size)]
-            if self.other_cases:items=[self.hydrated(),*copy.deepcopy(list(self.other_cases.values()))]
-            for i,item in enumerate(items):
-                if i and not self.other_cases:item['case']['id']=f'00000000-0000-4000-9000-{i:012d}'
-                if query.get('summary') == ['true']:
-                    for kind in ('orders','fleet'):
-                        item[kind]={k:v for k,v in item[kind].items() if k in
-                            ('id','dataset_type','canonical_filename','label','original_filename')}
-            data = {"cases":items}
+            if method == 'POST':
+                body=request.post_data_json
+                datasets={d['id']:d for d in self.f['datasets'].values()}
+                for item in self.other_cases.values():
+                    datasets.update({item[k]['id']:item[k] for k in ('orders','fleet')})
+                row={'id':body['id'],'status':'active','state_json':body['state'],
+                     'orders_dataset_id':body['orders_dataset_id'],'fleet_dataset_id':body['fleet_dataset_id']}
+                self.other_cases[body['id']]={'case':row,'decision_case':body['state'],
+                    'orders':datasets[body['orders_dataset_id']],'fleet':datasets[body['fleet_dataset_id']]}
+                data={'case':row}
+            else:
+                self.selector_queries.append(query)
+                items=[copy.deepcopy(self.hydrated()) for _ in range(self.selector_size)]
+                for i,item in enumerate(items):
+                    if i:item['case']['id']=f'00000000-0000-4000-9000-{i:012d}'
+                if self.other_cases:items=([copy.deepcopy(self.hydrated())] if self.selector_size else [])+copy.deepcopy(list(self.other_cases.values()))
+                items=[item for item in items if item['case'].get('status','active')==query.get('status',['active'])[0]]
+                offset,limit=int(query.get('offset',['0'])[0]),int(query.get('limit',['100'])[0])
+                items=items[offset:offset+limit]
+                for item in items:
+                    if query.get('summary') == ['true']:
+                        for kind in ('orders','fleet'):
+                            item[kind]={k:v for k,v in item[kind].items() if k in
+                                ('id','dataset_type','canonical_filename','label','original_filename')}
+                data = {"cases":items}
+                if self.selector_failure:status,data=503,{'detail':'Synthetic case list unavailable'}
         elif path.startswith("/api/decision-cases/") and path.endswith("/runs"):
             node = query.get("node_id", ["logistics_assignment"])[0]
             runs = self.history_rows if self.history_rows is not None else [r for r in self.runs.values() if r.get("node_id") == node]
@@ -389,11 +406,12 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn('view=logistics-data',self.page.url)
 
     async def test_overview_map_with_active_case_and_multiple_cases_uses_existing_selector(self):
-        self.second_case();await self.open();await self.nav('logistics-overview')
+        other=self.second_case();await self.open();await self.nav('logistics-overview')
         await self.page.locator('[data-open-decision-map]').click()
-        await self.page.locator('[data-open-case="'+self.case['id']+'"]').click()
+        await self.page.locator('.is-current').get_by_role('button',name='Caso actual').wait_for()
+        await self.page.locator('[data-open-case="'+other['case']['id']+'"]').click()
         await self.page.locator('[data-select-case]').wait_for(state='visible')
-        self.assertIn('case_id='+self.case['id'],self.page.url)
+        self.assertIn('case_id='+other['case']['id'],self.page.url)
         self.assertEqual(await self.page.locator('.dispatch-case-selector').count(),0)
 
     async def test_overview_multiple_cases_without_selection_uses_existing_selector(self):
@@ -798,15 +816,16 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn('interpretación de la corrida original',(await self.page.locator('[data-messages]').inner_text()).lower())
         self.assertIn('Ya hay nueva evidencia comparativa',await self.page.locator('#dispatch-explanation').inner_text())
 
-    async def test_case_selector_requests_one_compact_page_and_hydrates_only_selection(self):
+    async def test_case_selector_paginates_compact_active_and_completed_and_hydrates_only_selection(self):
         self.selector_size=100
-        await self.open()
+        await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=overview')
+        await self.page.wait_for_function("document.querySelector('[data-open-decision-map]')?.disabled===false")
         before=len(self.requests)
         await self.page.evaluate('window.DationDispatch.openDecisionMap()')
         await self.page.wait_for_selector('[data-open-case]')
         self.assertEqual(await self.page.locator('[data-open-case]').count(),100)
         self.assertEqual(self.selector_queries[-1].get('summary'),['true'])
-        self.assertEqual(self.requests[before:],[('GET','/api/decision-cases')])
+        self.assertEqual(self.requests[before:],[('GET','/api/decision-cases')]*3)
         await self.page.locator('[data-open-case="'+self.case['id']+'"]').click()
         await self.page.wait_for_selector('[data-map-node=logistics_assignment]')
         self.assertEqual(await self.page.locator('[data-open-case]').count(),0)
@@ -1986,6 +2005,167 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(await self.page.locator('#dispatch-map-root [data-select-case]').count(),0)
         self.assertEqual(self.execution_bodies,[])
 
+
+    async def test_case_ux_single_current_picker_never_navigates_and_restores_keyboard_focus(self):
+        await self.open()
+        url=self.page.url
+        before=len(self.requests)
+        await self.page.evaluate('''()=>{window.__caseCalls=[];const original=window.DationDispatch.openCase;
+          window.DationDispatch.openCase=(...args)=>{window.__caseCalls.push(args);return original(...args);};}''')
+        trigger=self.page.locator('[data-select-case]')
+        await trigger.focus();await self.page.keyboard.press('Enter')
+        dialog=self.page.get_by_role('dialog',name='Seleccionar Decision Case')
+        await dialog.wait_for()
+        self.assertTrue(await dialog.get_by_role('button',name='Caso actual',exact=True).is_disabled())
+        self.assertIn('Abierto ahora',await dialog.inner_text())
+        self.assertIn('No hay otros Decision Cases disponibles todavía.',await dialog.inner_text())
+        self.assertEqual(self.page.url,url)
+        self.assertEqual(await self.page.evaluate('window.__caseCalls'),[])
+        self.assertFalse(any(p.startswith('/api/decision-cases/') for _,p in self.requests[before:]))
+        await self.page.keyboard.press('Escape')
+        self.assertTrue(await trigger.evaluate('(el)=>el===document.activeElement'))
+        self.assertEqual(self.page.url,url)
+
+    async def test_case_ux_completed_picker_switches_once_without_reload_and_preserves_drafts(self):
+        other=self.second_case();other['case']['status']='completed'
+        await self.open('logistics-config','logistics_assignment')
+        await self.page.locator('[data-objective=min_cost]').click()
+        await self.nav('logistics-map')
+        await self.page.evaluate('''()=>{window.__documentIdentity='kept';window.__caseCalls=[];
+          const original=window.DationDispatch.openCase;
+          window.DationDispatch.openCase=(...args)=>{window.__caseCalls.push(args);return original(...args);};}''')
+        await self.page.locator('[data-select-case]').click()
+        await self.page.get_by_role('dialog',name='Seleccionar Decision Case').wait_for()
+        self.assertTrue(await self.page.get_by_text('Completado',exact=True).is_visible())
+        await self.page.locator('[data-open-case="'+other['case']['id']+'"]').click()
+        await self.page.wait_for_function('id=>window.DationDispatch.getWorkspace().decisionCase.id===id',arg=other['case']['id'])
+        await self.page.locator('[data-select-case]').wait_for()
+        self.assertEqual(await self.page.evaluate('window.__caseCalls'),[[other['case']['id'],'logistics-map',None]])
+        self.assertEqual(await self.page.evaluate('window.__documentIdentity'),'kept')
+        self.assertEqual(await self.page.locator('dialog[open]').count(),0)
+        self.assertEqual(await self.page.evaluate('window.DationDispatch.getWorkspace().orders.id'),other['orders']['id'])
+        await self.page.go_back()
+        await self.page.wait_for_function('id=>window.DationDispatch.getWorkspace().decisionCase.id===id',arg=self.case['id'])
+        await self.page.go_forward()
+        await self.page.wait_for_function('id=>window.DationDispatch.getWorkspace().decisionCase.id===id',arg=other['case']['id'])
+        await self.page.evaluate("id=>window.DationDispatch.openCase(id,'logistics-config','logistics_assignment')",self.case['id'])
+        self.assertEqual(await self.page.evaluate('window.DationDispatch.getWorkspace().objective'),'min_cost')
+
+    async def test_case_ux_picker_load_error_keeps_map_and_archived_cases_are_excluded(self):
+        other=self.second_case();other['case']['status']='archived'
+        await self.open();url=self.page.url
+        await self.page.locator('[data-select-case]').click()
+        await self.page.get_by_role('dialog',name='Seleccionar Decision Case').wait_for()
+        self.assertEqual(await self.page.locator('.dispatch-case-option').count(),1)
+        await self.page.keyboard.press('Escape')
+        self.selector_failure=True
+        await self.page.locator('[data-select-case]').click()
+        await self.page.get_by_text('No pudimos cargar los casos.',exact=False).wait_for()
+        self.assertEqual(self.page.url,url)
+        await self.page.keyboard.press('Escape')
+        self.assertTrue(await self.page.locator('[data-select-case]').evaluate('(el)=>el===document.activeElement'))
+
+    async def test_case_ux_first_pack_is_persisted_before_execution_without_transition_notice(self):
+        self.selector_size=0
+        saved={'orders':self.f['datasets']['orders'],'fleet':self.f['datasets']['fleet']}
+        await self.page.add_init_script('sessionStorage.setItem('+json.dumps(KEY)+','+json.dumps(json.dumps(saved))+');')
+        await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=logistics-map')
+        await self.page.locator('[data-select-case]').wait_for()
+        state=await self.page.evaluate('window.DationDispatch.getWorkspace()')
+        cid=state['decisionCase']['id']
+        self.assertTrue(state['decisionCase']['persisted'])
+        self.assertIn('case_id='+cid,self.page.url)
+        self.assertEqual(await self.page.locator('[data-case-transition]').count(),0)
+        self.assertEqual(self.requests.count(('POST','/api/decision-cases')),1)
+        self.assertEqual(self.execution_bodies,[])
+        await self.page.locator('[data-select-case]').click()
+        await self.page.get_by_text('No hay otros Decision Cases disponibles todavía.').wait_for()
+        self.assertTrue(await self.page.get_by_role('button',name='Caso actual').is_disabled())
+
+    async def test_case_ux_real_data_change_retains_lineage_but_reopening_history_has_no_new_notice(self):
+        other=self.second_case()
+        saved={'decisionCase':{**self.case,'persisted':True},'orders':other['orders'],'fleet':other['fleet']}
+        await self.page.add_init_script('sessionStorage.setItem('+json.dumps(KEY)+','+json.dumps(json.dumps(saved))+');')
+        await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=logistics-map')
+        notice=self.page.locator('[data-case-transition]');await notice.wait_for()
+        state=await self.page.evaluate('window.DationDispatch.getWorkspace()');cid=state['decisionCase']['id']
+        copy_text=await notice.inner_text()
+        self.assertIn('Nuevo Decision Case por cambio de datos',copy_text)
+        self.assertIn('DC-'+cid[:8].upper(),copy_text)
+        self.assertIn('DC-'+self.case['id'][:8].upper(),copy_text)
+        audit=(Path(__file__).parent/'theme_audit.js').read_text()
+        self.assertEqual((await self.page.evaluate(audit,'[data-case-transition]'))['failures'],[])
+        self.assertEqual(self.other_cases[cid]['decision_case']['stale_predecessor']['id'],self.case['id'])
+        await self.page.evaluate("id=>window.DationDispatch.openCase(id)",self.case['id'])
+        await self.page.locator('[data-select-case]').wait_for()
+        self.assertEqual(await self.page.locator('[data-case-transition]').count(),0)
+        await self.page.evaluate("id=>window.DationDispatch.openCase(id)",cid)
+        await self.page.locator('[data-select-case]').wait_for()
+        self.assertEqual(await self.page.locator('[data-case-transition]').count(),0)
+        self.assertEqual(await self.page.evaluate('window.DationDispatch.getWorkspace().orders.id'),other['orders']['id'])
+
+    async def test_case_ux_stale_local_lineage_cannot_show_a_transition_notice(self):
+        self.case['stale_predecessor']={'id':'00000000-0000-4000-9000-000000000099','signature':'missing:pack'}
+        await self.open()
+        self.assertEqual(await self.page.locator('[data-case-transition]').count(),0)
+
+    async def test_case_ux_hero_contract_and_attention_contours_at_desktop_mobile_and_reflow(self):
+        style="""el=>{const s=getComputedStyle(el),h=getComputedStyle(el.querySelector('h1')),l=getComputedStyle(el.querySelector('.dispatch-pro-hero-lead'));return {minHeight:s.minHeight,padding:s.padding,gap:s.gap,radius:s.borderRadius,heading:h.fontSize,lead:l.fontSize,line:l.lineHeight}}"""
+        for width,height in ((1440,1000),(390,844),(360,250)):
+            await self.page.set_viewport_size({'width':width,'height':height})
+            await self.open('logistics-data');await self.page.locator('#dispatch-data-root .d-page-hero').wait_for()
+            data=await self.page.locator('#dispatch-data-root .d-page-hero').evaluate(style)
+            data_height=(await self.page.locator('#dispatch-data-root .d-page-hero').bounding_box())['height']
+            await self.open();map_style=await self.page.locator('#dispatch-map-root .d-page-hero').evaluate(style)
+            self.assertEqual(data,map_style)
+            if width==1440:self.assertLess(abs((await self.page.locator('#dispatch-map-root .d-page-hero').bounding_box())['height']-data_height),32)
+            self.assertFalse(await self.page.evaluate('document.documentElement.scrollWidth>innerWidth'))
+        for reduced in ('no-preference','reduce'):
+            await self.page.emulate_media(reduced_motion=reduced)
+            for kind in ('assignment','scheduling'):
+                await self.open('logistics-config','logistics_'+kind)
+                context=self.page.locator('[data-config-context]')
+                geometry=await context.evaluate("el=>({outer:getComputedStyle(el).borderRadius,inner:getComputedStyle(el.querySelector('summary')).borderRadius})")
+                self.assertEqual(geometry['outer'],geometry['inner'])
+                chip=self.page.locator('[data-summary-target]').first
+                target='#'+await chip.get_attribute('data-summary-target')
+                initial=await self.page.locator(target).bounding_box()
+                await chip.click()
+                result=await self.page.locator(target).evaluate("el=>({radius:getComputedStyle(el).borderRadius,overlay:getComputedStyle(el,'::after').borderRadius,animation:getComputedStyle(el,'::after').animationName,pointer:getComputedStyle(el,'::after').pointerEvents,transform:getComputedStyle(el).transform,width:el.getBoundingClientRect().width})")
+                self.assertEqual(result['radius'],result['overlay'])
+                self.assertEqual(result['pointer'],'none');self.assertEqual(result['transform'],'none')
+                self.assertEqual(result['width'],initial['width'])
+                if reduced=='reduce':self.assertEqual(result['animation'],'none')
+
+    async def test_case_ux_both_reviews_keep_config_and_only_confirm_executes_once(self):
+        for width,height in ((1440,1000),(390,844)):
+            await self.page.set_viewport_size({'width':width,'height':height})
+            for kind in ('assignment','scheduling'):
+                await self.open('logistics-config','logistics_'+kind)
+                trigger=self.page.locator('[data-config-review]' if kind=='assignment' else '[data-scheduling-review]')
+                confirm='[data-config-execute]' if kind=='assignment' else '[data-scheduling-execute]'
+                url=self.page.url;before=len(self.execution_bodies)
+                await trigger.focus();await self.page.keyboard.press('Enter')
+                dialog=self.page.locator('dialog[open]');await dialog.wait_for()
+                self.assertEqual(self.page.url,url)
+                self.assertEqual(await self.page.evaluate('window.dationGetCurrentView()'),'logistics-config')
+                self.assertEqual(len(self.execution_bodies),before)
+                self.assertTrue(await dialog.evaluate("el=>el.matches(':modal')"))
+                self.assertIn('Decision Case',await dialog.inner_text())
+                backdrop=await dialog.evaluate("el=>getComputedStyle(el,'::backdrop').backgroundColor")
+                self.assertEqual(backdrop,'rgba(0, 0, 0, 0.64)')
+                self.assertFalse(await dialog.evaluate('el=>el.scrollWidth>el.clientWidth'))
+                await self.page.keyboard.press('Escape')
+                self.assertTrue(await trigger.evaluate('(el)=>el===document.activeElement'))
+                self.assertEqual(self.page.url,url)
+                await trigger.click();await dialog.get_by_role('button',name='Volver',exact=True).click()
+                self.assertEqual(len(self.execution_bodies),before)
+                await trigger.click()
+                await self.page.locator(confirm).evaluate("el=>{el.click();el.dispatchEvent(new MouseEvent('click',{bubbles:true}));}")
+                await self.page.locator('.assignment-dashboard-v2' if kind=='assignment' else '.dispatch-scheduling-dashboard').wait_for()
+                self.assertEqual(len(self.execution_bodies),before+1)
+                self.assertIn('view=decision-dashboard',self.page.url)
+                self.assertEqual(await self.page.locator('dialog[open]').count(),0)
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

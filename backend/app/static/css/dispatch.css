@@ -3719,53 +3719,6 @@ body.dispatch-result #chat-panel{
   stroke-linejoin:round;
 }
 
-.dispatch-map-premium__hero .dispatch-pro-hero-copy{
-  padding:0;
-  justify-content:center;
-}
-
-.dispatch-map-premium__hero .dispatch-pro-how-panel{
-  width:min(100%,430px);
-  padding:16px;
-}
-
-.dispatch-map-premium__hero .dispatch-pro-how-title{
-  height:26px;
-  margin-bottom:9px;
-}
-
-.dispatch-map-premium__hero .dispatch-pro-how-node{
-  height:auto;
-  min-height:48px;
-  grid-template-columns:32px minmax(0,1fr);
-  gap:10px;
-  padding:7px 10px;
-}
-
-.dispatch-map-premium__hero .dispatch-pro-how-icon{
-  width:32px;
-  height:32px;
-}
-
-.dispatch-map-premium__hero .dispatch-pro-how-connector{
-  height:10px;
-  margin:3px auto;
-}
-
-.dispatch-map-premium__hero .dispatch-pro-how-connector::after{
-  animation-duration:1.8s;
-}
-
-.dispatch-map-premium__hero .dispatch-pro-how-node strong{
-  white-space:normal;
-}
-
-.dispatch-map-premium__hero .dispatch-pro-how-history{
-  margin-top:10px;
-  padding-top:10px;
-  color:var(--d-text-muted);
-}
-
 .dispatch-map-stale--premium{
   margin:0;
   border-radius:16px;
@@ -4770,10 +4723,6 @@ body.dispatch-result #chat-panel{
   .dispatch-map-premium__hero .dispatch-pro-hero h1,
   .dispatch-map-premium__hero h1{
     font-size:var(--hero-title-size);
-  }
-
-  .dispatch-map-premium__hero .dispatch-pro-how-panel{
-    padding:14px;
   }
 
   .dispatch-map-casebar__file{

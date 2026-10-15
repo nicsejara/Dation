@@ -41,7 +41,6 @@
 
 .assignment-config-sections{display:grid;gap:24px}
 .assignment-section{scroll-margin-top:150px;padding:26px;border:1px solid var(--ac-line);border-radius:var(--ac-radius);background:var(--d-surface-1);box-shadow:var(--shadow-sm-dark);transition:border-color .2s ease,box-shadow .2s ease,transform .2s ease}
-.assignment-section.is-attention{border-color:var(--d-warning);box-shadow:var(--shadow-sm-dark);transform:translateY(-2px)}
 .assignment-section__head{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:14px;align-items:start;margin-bottom:22px}
 .assignment-section__icon{display:grid;width:48px;height:48px;place-items:center;border-radius:14px;color:var(--d-brand-teal-bright);background:var(--d-surface-2);}
 .assignment-section__copy{min-width:0}
@@ -96,8 +95,9 @@
 @media(max-width:480px){.assignment-section{padding:17px}.assignment-choice-card{min-height:140px!important}.assignment-decision-chip{font-size:11px}.assignment-config-hero__badges{gap:6px}}
 @media(prefers-reduced-motion:reduce){.assignment-config-root *,.assignment-config-root *::before,.assignment-config-root *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 /* Dedicated native disclosure layout; legacy card grids remain unchanged. */
-.assignment-config-root details.decision-config-case.assignment-case-strip{display:block;grid-template-columns:none;grid-template-areas:none;gap:0;padding:0;min-width:0;width:100%;box-sizing:border-box;overflow:visible;}
-.decision-config-case__summary{display:grid;grid-template-columns:auto minmax(0,1fr) 20px;align-items:center;gap:12px 18px;width:100%;box-sizing:border-box;padding:16px 20px;list-style:none;cursor:pointer;color:var(--d-text-primary);font-size:12px;}
+.assignment-config-root details.decision-config-case.assignment-case-strip{--config-context-radius:var(--radius-hero);display:block;grid-template-columns:none;grid-template-areas:none;gap:0;padding:0;min-width:0;width:100%;box-sizing:border-box;border-radius:var(--config-context-radius);overflow:visible;}
+/* Explicit component property crosses the native details summary slot. */
+.decision-config-case__summary{display:grid;grid-template-columns:auto minmax(0,1fr) 20px;align-items:center;gap:12px 18px;width:100%;box-sizing:border-box;padding:16px 20px;border-radius:var(--config-context-radius);list-style:none;cursor:pointer;color:var(--d-text-primary);font-size:12px;}
 .decision-config-case__summary::-webkit-details-marker{display:none;}
 .decision-config-case__summary>span:first-child{min-width:0;overflow-wrap:anywhere;}
 .decision-config-case__summary small{min-width:0;color:var(--d-text-muted);font-size:11px;font-weight:600;text-transform:none;letter-spacing:normal;}
@@ -122,6 +122,11 @@
 /* Native dialogs keep the Config dark roles in the top layer. */
 .d-config-dialog { color-scheme:dark; color:var(--d-text-primary); background:var(--d-surface-1); border:1px solid var(--d-border-control); }
 .d-config-dialog::backdrop { background:rgba(0,0,0,.64); }
+.d-config-dialog.dispatch-review { width:min(650px,calc(100vw - 32px)); max-height:calc(100dvh - 32px); margin:auto; box-sizing:border-box; overflow:auto; padding:26px; }
+.d-config-dialog.dispatch-review .dispatch-review-summary span { min-width:0; overflow-wrap:anywhere; }
+.d-config-dialog [data-config-review-error]:empty { display:none; }
+.d-config-dialog [data-config-review-error] { color:var(--d-danger); }
+@media(max-width:520px) { .d-config-dialog.dispatch-review { padding:18px; } }
 .assignment-config-root .assignment-config-sections :is(button,input,select,textarea,summary,[tabindex]) { scroll-margin-block:160px calc(var(--config-action-height,180px) + 32px); }
 .d-config-dialog .dispatch-review-summary { border-color:var(--d-border); }
 .d-config-dialog .dispatch-review-summary p { border-color:var(--d-border); }

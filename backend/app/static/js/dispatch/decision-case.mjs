@@ -78,7 +78,9 @@ export function replaceInputs(
   if (!next) return null;
 
   if (current?.signature && current.signature !== next.signature) {
-    next.stale_predecessor = {
+    // Replacing both files can create intermediate local cases before the map is
+    // opened. Keep the last durable predecessor, not an unpersisted intermediate.
+    next.stale_predecessor = (!current.persisted && current.stale_predecessor) || {
       id: current.id,
       status: STATUS.STALE,
       signature: current.signature,
@@ -94,6 +96,16 @@ export function replaceInputs(
     };
   }
   return next;
+}
+
+export function getCaseTransitionNotice({decisionCase,predecessor,transitionCaseId}={}){
+  const previous=decisionCase?.stale_predecessor;
+  const verified=predecessor?.decision_case;
+  if(!decisionCase?.id||transitionCaseId!==decisionCase.id||!previous?.id
+    ||previous.id===decisionCase.id||verified?.id!==previous.id
+    ||!previous.signature||verified.signature!==previous.signature
+    ||decisionCase.signature===previous.signature)return null;
+  return {caseId:decisionCase.id,predecessorId:previous.id};
 }
 
 export function transitionNode(

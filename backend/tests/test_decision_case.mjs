@@ -9,10 +9,34 @@ import {
   transitionNode,
   continuationState,
   nextDecisionId,
+  getCaseTransitionNotice,
 } from "../app/static/js/dispatch/decision-case.mjs";
 
 const orders = {id: "orders-1"};
 const fleet = {id: "fleet-1"};
+
+test('transition notice requires a fresh, verified lineage with a different Data Pack',()=>{
+  const previous={...createDecisionCase('previous',orders,fleet),persisted:true};
+  const current=replaceInputs(previous,'current',{id:'orders-2'},fleet);
+  const context={decisionCase:current,predecessor:{decision_case:previous},transitionCaseId:current.id};
+  assert.deepEqual(getCaseTransitionNotice(context),{caseId:'current',predecessorId:'previous'});
+  assert.equal(getCaseTransitionNotice({...context,transitionCaseId:null}),null,'opening history is not a new transition');
+  assert.equal(getCaseTransitionNotice({...context,decisionCase:previous}),null,'first case');
+  assert.equal(getCaseTransitionNotice({...context,predecessor:null}),null,'deleted predecessor');
+  assert.equal(getCaseTransitionNotice({...context,predecessor:{decision_case:{...previous,signature:'wrong'}}}),null);
+  assert.equal(getCaseTransitionNotice({...context,decisionCase:{...current,stale_predecessor:{...current.stale_predecessor,id:current.id}}}),null);
+  assert.equal(getCaseTransitionNotice({...context,decisionCase:{...current,signature:previous.signature}}),null);
+  assert.equal(getCaseTransitionNotice(),null);
+});
+
+test('replacing both files preserves the last persisted predecessor through local intermediate cases',()=>{
+  const previous={...createDecisionCase('previous',orders,fleet),persisted:true};
+  const intermediate=replaceInputs(previous,'intermediate',{id:'orders-2'},fleet);
+  const current=replaceInputs(intermediate,'current',{id:'orders-2'},{id:'fleet-2'});
+  assert.equal(current.stale_predecessor.id,previous.id);
+  assert.equal(current.stale_predecessor.signature,previous.signature);
+  assert.equal(previous.stale_predecessor,null);
+});
 
 const fullReadiness = {
   decisions: [
