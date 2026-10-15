@@ -43,7 +43,7 @@ export function createWorkflowActionBar({label, onContinue, onProblem, onSelect,
     if (control.right > viewport.right - 6) files.scrollLeft += control.right - viewport.right + 6;
     else if (control.left < viewport.left + 6) files.scrollLeft -= viewport.left + 6 - control.left;
   });
-  const button = node("button", null, "d-button d-button--primary dispatch-pro-next-button");
+  const button = node("button", null, "d-button d-button--workflow");
   button.type = "button";
   button.disabled = true;
   button.setAttribute("aria-describedby", message.id);
@@ -72,7 +72,7 @@ export function createWorkflowActionBar({label, onContinue, onProblem, onSelect,
     message.textContent = result.message;
     action = null;
     button.disabled = true;
-    button.className = `d-button d-button--secondary ${variant === "data" ? "dispatch-pro-next-button" : ""}`;
+    button.className = `d-button d-button--workflow d-button--secondary ${variant === "data" ? "dispatch-pro-next-button" : ""}`;
     let title;
     if (variant === "configuration") {
       title = "Revisar y ejecutar";
