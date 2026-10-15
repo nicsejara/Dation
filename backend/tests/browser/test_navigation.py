@@ -858,6 +858,165 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.page.wait_for_timeout(1700)
         self.assertEqual(len(self.requests),count)
 
+    async def phase6_open(self,view,node=None):
+        if view in ('inicio','logistics-overview','logistics-data'):
+            await self.page.goto(f'http://127.0.0.1:{self.port}/app?view={view}')
+            await self.page.locator('.view.is-active').wait_for()
+        else:
+            run=self.f['ids']['scheduling' if node=='logistics_scheduling' else 'assignment'] if view=='decision-dashboard' else None
+            await self.open(view,node,run)
+
+    async def test_phase6_all_pages_have_dark_contrast_accessible_names_and_no_overflow(self):
+        audit=(Path(__file__).parent/'theme_audit.js').read_text()
+        await self.page.emulate_media(reduced_motion='reduce',color_scheme='light')
+        session=await self.context.new_cdp_session(self.page)
+        for width in (1440,1280,1024,768,390):
+            await self.page.set_viewport_size({'width':width,'height':900})
+            for view,node in [('inicio',None),('logistics-overview',None),('logistics-data',None),('logistics-map',None),('logistics-config','logistics_assignment'),('logistics-config','logistics_scheduling'),('decision-dashboard','logistics_assignment'),('decision-dashboard','logistics_scheduling')]:
+                await self.phase6_open(view,node)
+                result=await self.page.evaluate(audit)
+                self.assertEqual(result['failures'],[],(view,node,width,result['failures']))
+                self.assertFalse(result['overflow']);self.assertEqual(result['scheme'],'dark');self.assertFalse(result['legacyBoundary'])
+                tree=await session.send('Accessibility.getFullAXTree')
+                controls=[item for item in tree['nodes'] if not item.get('ignored') and item.get('role',{}).get('value') in ('button','link','textbox','searchbox','combobox','slider','checkbox','radio','tab')]
+                self.assertTrue(controls)
+                missing=[item.get('role') for item in controls if not item.get('name',{}).get('value','').strip()]
+                self.assertEqual(missing,[],(view,node,width,missing))
+        self.assertFalse(any(m=='POST' and p=='/api/runs' for m,p in self.requests))
+
+    async def test_phase6_tab_and_reverse_tab_keep_focus_visible_below_sticky_layers(self):
+        audit=(Path(__file__).parent/'focus_audit.js').read_text()
+        await self.page.emulate_media(reduced_motion='reduce')
+        for width in (1440,390):
+            await self.page.set_viewport_size({'width':width,'height':900})
+            for view,node in [('inicio',None),('logistics-overview',None),('logistics-data',None),('logistics-map',None),('logistics-config','logistics_assignment'),('logistics-config','logistics_scheduling'),('decision-dashboard','logistics_assignment'),('decision-dashboard','logistics_scheduling')]:
+                await self.phase6_open(view,node);seen=set()
+                for index in range(120):
+                    await self.page.keyboard.press('Tab');state=await self.page.evaluate(audit)
+                    if state.get('skip'):continue
+                    if state['identity'] in seen:break
+                    seen.add(state['identity'])
+                    self.assertTrue(state['visibleFocus'] and state['outline']=='solid' and state['width']>=2,(view,node,width,state))
+                    self.assertFalse(state['occluded'] or state['outside'],(view,node,width,state))
+                self.assertTrue(seen)
+                for _ in range(5):
+                    await self.page.keyboard.press('Shift+Tab');state=await self.page.evaluate(audit)
+                    if not state.get('skip'):self.assertFalse(state['occluded'] or state['outside'],(view,node,width,state))
+
+    async def test_phase6_mobile_footer_chips_scroll_locally_without_losing_focus_or_state(self):
+        await self.page.emulate_media(reduced_motion='reduce');await self.page.set_viewport_size({'width':390,'height':844})
+        await self.open('logistics-config','logistics_assignment')
+        await self.page.keyboard.press('Tab')
+        chips=self.page.locator('.d-workflow-action-bar__chip');self.assertEqual(await chips.count(),3)
+        for index in (0,1,2,1,0):
+            await chips.nth(index).focus()
+            fit=await chips.nth(index).evaluate('el=>{const r=el.getBoundingClientRect(),p=el.parentElement.getBoundingClientRect();return r.left>=p.left+5&&r.right<=p.right-5;}')
+            self.assertTrue(fit)
+        state=await self.page.evaluate('window.DationDispatch.getWorkspace()')
+        await chips.first.press('Enter');await chips.nth(2).press('Space')
+        self.assertEqual((await self.page.evaluate('window.DationDispatch.getWorkspace()'))['resourceMode'],state['resourceMode'])
+        self.assertFalse(any(m=='POST' and p=='/api/runs' for m,p in self.requests))
+
+    async def test_phase6_native_search_number_checkbox_range_and_autofill_keep_dark_roles(self):
+        await self.page.emulate_media(reduced_motion='reduce')
+        await self.open('logistics-config','logistics_assignment')
+        await self.page.locator('[data-objective=custom]').click()
+        slider=self.page.locator('[data-custom-weight]:not(:disabled)').first
+        await slider.focus();before=await slider.input_value();await slider.press('ArrowRight')
+        self.assertNotEqual(await slider.input_value(),before)
+        await self.page.locator('[data-filter-dialog-open]').click()
+        search=self.page.locator('[data-filter-field-search]');await search.fill('dest')
+        session=await self.context.new_cdp_session(self.page);await session.send('DOM.enable');await session.send('CSS.enable')
+        document=await session.send('DOM.getDocument');node=await session.send('DOM.querySelector',{'nodeId':document['root']['nodeId'],'selector':'[data-filter-field-search]'})
+        await session.send('CSS.forcePseudoState',{'nodeId':node['nodeId'],'forcedPseudoClasses':['autofill']})
+        style=await search.evaluate('el=>({autofill:el.matches(":autofill"),fill:getComputedStyle(el).webkitTextFillColor,shadow:getComputedStyle(el).boxShadow,scheme:getComputedStyle(el).colorScheme,value:el.value})')
+        self.assertTrue(style['autofill']);self.assertEqual(style['fill'],'rgb(243, 248, 250)');self.assertIn('inset',style['shadow']);self.assertEqual(style['scheme'],'dark');self.assertEqual(style['value'],'dest')
+        await session.send('CSS.forcePseudoState',{'nodeId':node['nodeId'],'forcedPseudoClasses':[]})
+        await self.page.locator('[data-filter-add=destination]').click()
+        checkbox=self.page.locator('[data-filter-category]').first;await checkbox.focus();before=await checkbox.is_checked();await checkbox.press('Space')
+        self.assertNotEqual(await self.page.locator('[data-filter-category]').first.is_checked(),before)
+        await self.page.locator('[data-filter-dialog-open]').click();await self.page.locator('[data-filter-add=quantity_units]').click()
+        number=self.page.locator('[data-filter-number-min]');await number.fill('-1')
+        self.assertFalse(await number.evaluate('el=>el.checkValidity()'))
+        await number.hover();await number.focus()
+        audit=await self.page.evaluate((Path(__file__).parent/'theme_audit.js').read_text())
+        self.assertEqual(audit['failures'],[])
+        self.assertEqual(await self.page.locator('.decision-advanced-option:disabled').count(),3)
+        self.assertFalse(any(m=='POST' and p=='/api/runs' for m,p in self.requests))
+
+    async def test_phase6_native_date_picker_and_select_preserve_the_scheduling_contract(self):
+        await self.page.emulate_media(reduced_motion='reduce')
+        await self.open('logistics-config','logistics_scheduling')
+        await self.page.locator('[data-scheduling-window-mode=custom]').click()
+        field=self.page.locator('[data-scheduling-window-start]');await field.fill('2026-10-01');await field.focus()
+        result=await field.evaluate('el=>{el.showPicker();return {scheme:getComputedStyle(el).colorScheme,indicator:getComputedStyle(el,"::-webkit-calendar-picker-indicator").opacity,value:el.value};}')
+        self.assertEqual(result['scheme'],'dark');self.assertNotEqual(result['indicator'],'0');self.assertEqual(result['value'],'2026-10-01')
+        await self.page.keyboard.press('Escape')
+        await self.page.locator('[data-scheduling-window-end]').fill('2026-09-30')
+        await self.page.locator('[data-scheduling-window-end]').blur()
+        await self.page.locator('[data-scheduling-review]').click()
+        self.assertIn('anterior',await self.page.locator('.view.is-active').inner_text())
+        await self.page.locator('[data-scheduling-window-end]').fill('2026-10-10')
+        await self.page.locator('[data-scheduling-window-end]').blur()
+        selects=self.page.locator('select[data-config-anomaly]')
+        for el in await selects.all():await el.select_option('include')
+        await self.page.locator('[data-scheduling-review]').click();await self.page.locator('dialog[open]').wait_for()
+        self.assertNotIn('Profundidad',await self.page.locator('dialog[open]').inner_text())
+        await self.page.keyboard.press('Escape')
+        self.assertFalse(any(m=='POST' and p=='/api/runs' for m,p in self.requests))
+
+    async def test_phase6_reduced_motion_updates_real_chart_and_cleans_up_on_departure(self):
+        await self.page.emulate_media(reduced_motion='reduce')
+        await self.open('decision-dashboard','logistics_scheduling',self.f['ids']['scheduling'])
+        await self.page.evaluate('window.__qaChart=window.DationCharts.getInstanceByDom(document.querySelector(".dispatch-schedule-chart"))')
+        self.assertFalse(await self.page.evaluate('window.__qaChart.getOption().animation'))
+        self.assertEqual(await self.page.evaluate('getComputedStyle(document.documentElement).scrollBehavior'),'auto')
+        await self.page.emulate_media(reduced_motion='no-preference')
+        await self.page.wait_for_function('window.__qaChart.getOption().animation===true')
+        await self.page.emulate_media(reduced_motion='reduce')
+        await self.page.wait_for_function('window.__qaChart.getOption().animation===false')
+        await self.nav('logistics-map');await self.page.locator('[data-map-node=logistics_assignment]').first.wait_for()
+        self.assertTrue(await self.page.evaluate('window.__qaChart.isDisposed()'))
+        await self.page.emulate_media(reduced_motion='no-preference')
+        self.assertEqual(self.errors,[])
+
+    async def test_phase6_reflow_at_200_and_400_percent_keeps_pages_dialog_and_chat_reachable(self):
+        audit=(Path(__file__).parent/'theme_audit.js').read_text();focus=(Path(__file__).parent/'focus_audit.js').read_text()
+        await self.page.emulate_media(reduced_motion='reduce')
+        session=await self.context.new_cdp_session(self.page)
+        for zoom in (2,4):
+            await session.send('Emulation.setDeviceMetricsOverride',{'width':1440//zoom,'height':1000//zoom,'deviceScaleFactor':zoom,'mobile':False})
+            self.assertEqual(await self.page.evaluate('devicePixelRatio'),zoom)
+            for view,node in [('inicio',None),('logistics-overview',None),('logistics-data',None),('logistics-map',None),('logistics-config','logistics_assignment'),('logistics-config','logistics_scheduling'),('decision-dashboard','logistics_assignment'),('decision-dashboard','logistics_scheduling')]:
+                await self.phase6_open(view,node);result=await self.page.evaluate(audit)
+                self.assertFalse(result['overflow'],(zoom,view,node));self.assertEqual(result['failures'],[],(zoom,view,node,result['failures']))
+                if view=='logistics-config':
+                    await self.page.locator('[data-scheduling-review]' if node=='logistics_scheduling' else '[data-config-review]').focus()
+                    self.assertFalse((await self.page.evaluate(focus))['occluded'])
+                if view=='decision-dashboard':
+                    await self.page.locator('[data-chat]').click()
+                    field=self.page.locator('.dispatch-chat textarea');await field.focus();await self.page.keyboard.press('Tab')
+                    result=await self.page.evaluate(focus);self.assertFalse(result['occluded'] or result['outside'],(zoom,node,result))
+                    await self.page.keyboard.press('Escape')
+        await session.send('Emulation.clearDeviceMetricsOverride')
+
+    async def test_phase6_chat_composer_and_modal_keyboard_remain_visible_on_mobile(self):
+        await self.page.emulate_media(reduced_motion='reduce');await self.page.set_viewport_size({'width':390,'height':844})
+        focus=(Path(__file__).parent/'focus_audit.js').read_text()
+        for kind in ('assignment','scheduling'):
+            await self.open('decision-dashboard','logistics_'+kind,self.f['ids'][kind]);await self.page.locator('[data-chat]').click()
+            await self.page.locator('.dispatch-chat textarea').focus()
+            state=await self.page.evaluate(focus);self.assertFalse(state['occluded'] or state['outside'],(kind,state))
+            await self.page.keyboard.press('Tab');state=await self.page.evaluate(focus);self.assertFalse(state['occluded'] or state['outside'],(kind,state))
+            await self.page.keyboard.press('Escape');self.assertTrue(await self.page.locator('[data-chat]').evaluate('el=>el===document.activeElement'))
+            more=self.page.locator('[data-more-menu] summary');await more.focus();await more.press('Space');await self.page.locator('[data-run-details]').click()
+            drawer=self.page.locator('[data-run-drawer]');await self.page.keyboard.press('Shift+Tab');self.assertTrue(await drawer.evaluate('el=>el.contains(document.activeElement)'))
+            await self.page.keyboard.press('Tab');self.assertTrue(await drawer.evaluate('el=>el.contains(document.activeElement)'))
+            await self.page.keyboard.press('Escape');self.assertTrue(await more.evaluate('el=>el===document.activeElement'))
+        await self.open('logistics-config','logistics_assignment');trigger=self.page.locator('[data-filter-dialog-open]');await trigger.focus();await trigger.press('Enter')
+        dialog=self.page.locator('dialog[open]');await self.page.keyboard.press('Shift+Tab');self.assertTrue(await dialog.evaluate('el=>el.contains(document.activeElement)'))
+        await self.page.keyboard.press('Escape');await self.page.wait_for_function("document.activeElement?.hasAttribute('data-filter-dialog-open')")
+
     async def test_phase5_toolbar_menus_are_exclusive_outside_escape_and_viewport_safe(self):
         for width in (1440,1280,1024,768,390):
             await self.page.set_viewport_size({'width':width,'height':844});await self.page.wait_for_timeout(250)

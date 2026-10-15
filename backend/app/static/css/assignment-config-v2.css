@@ -122,6 +122,7 @@
 /* Native dialogs keep the Config dark roles in the top layer. */
 .d-config-dialog { color-scheme:dark; color:var(--d-text-primary); background:var(--d-surface-1); border:1px solid var(--d-border-control); }
 .d-config-dialog::backdrop { background:rgba(0,0,0,.64); }
+.assignment-config-root .assignment-config-sections :is(button,input,select,textarea,summary,[tabindex]) { scroll-margin-block:160px calc(var(--config-action-height,180px) + 32px); }
 .d-config-dialog .dispatch-review-summary { border-color:var(--d-border); }
 .d-config-dialog .dispatch-review-summary p { border-color:var(--d-border); }
 .d-config-dialog .dispatch-review-summary span { color:var(--d-text-secondary); }

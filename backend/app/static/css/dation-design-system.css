@@ -135,7 +135,21 @@
 @media (max-width:700px) {
   .decision-advanced-options__grid { grid-template-columns:minmax(0,1fr); }
   .d-workflow-action-bar--config { grid-template-columns:minmax(0,1fr); gap:8px; }
-  .d-workflow-action-bar--config .d-workflow-action-bar__items { display:flex; flex-wrap:nowrap; overflow-x:auto; padding:3px; }
+  .d-workflow-action-bar--config .d-workflow-action-bar__items { display:flex; flex-wrap:nowrap; overflow-x:auto; padding:6px; }
   .d-workflow-action-bar--config .d-workflow-action-bar__chip { flex:0 0 auto; max-width:190px; }
   .d-workflow-action-bar--config .d-button { width:100%; }
+}
+
+/* Keyboard and browser-owned control states share the same visible role. */
+:where(a[href],summary,[tabindex]):focus-visible { outline:3px solid var(--color-focus); outline-offset:3px; }
+:is(input,textarea,select):autofill {
+  -webkit-text-fill-color:var(--color-text);
+  caret-color:var(--color-text);
+  box-shadow:inset 0 0 0 1000px var(--color-surface);
+}
+.d-workflow-action-bar__items { scroll-padding-inline:6px; }
+.d-workflow-action-bar__chip { scroll-margin-inline:6px; }
+/* Short viewports, including desktop zoom, must leave the content reachable. */
+@media(max-height:540px) {
+  .topbar, .d-workflow-action-bar { position:static; }
 }

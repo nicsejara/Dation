@@ -32,8 +32,11 @@ export function chart(root,options){
   if(!window.DationCharts){root.textContent='El gráfico no está disponible. Consultá la tabla de esta sección.';return null;}
   root._dispose?.();
   const palette=chartPalette(root);
+  const motion=window.matchMedia('(prefers-reduced-motion: reduce)');
   const c=window.DationCharts.init(root,{color:palette.series,textStyle:{color:palette.text}},{renderer:'svg'});
-  c.setOption(themedChartOptions(options,palette,root.clientWidth));
+  c.setOption({...themedChartOptions(options,palette,root.clientWidth),...(motion.matches?{animation:false}:{})});
+  const updateMotion=()=>c.setOption({animation:!motion.matches&&options.animation!==false});
+  motion.addEventListener('change',updateMotion);
   let disposed=false,release,compact=root.clientWidth<480;
   const observer=new ResizeObserver(()=>{
     if(disposed)return;
@@ -45,7 +48,7 @@ export function chart(root,options){
     }
     c.resize();
   });observer.observe(root);
-  root._dispose=()=>{if(disposed)return;disposed=true;observer.disconnect();c.dispose();release?.();};
+  root._dispose=()=>{if(disposed)return;disposed=true;observer.disconnect();motion.removeEventListener('change',updateMotion);c.dispose();release?.();};
   release=scopeFor(root)?.own(root._dispose);
   return c;
 }

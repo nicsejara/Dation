@@ -1,6 +1,6 @@
 import {ensureStylesheet} from "./styles.mjs";
 import {createWorkflowActionBar} from "./workflow-action-bar.mjs";
-import {scopeFor} from "./lifecycle.mjs";
+import {scopeFor,trapFocus} from "./lifecycle.mjs";
 import {esc} from "./shared.mjs";
 import {iconSvg} from "./decision-ui.mjs";
 
@@ -183,6 +183,7 @@ const actionBars=new WeakMap();
 export function mountConfigActionBar(root){
   actionBars.get(root)?.dispose();
   root.querySelectorAll('dialog.d-config-dialog').forEach(dialog=>dialog.addEventListener('keydown',event=>{
+    trapFocus(event,dialog);
     if(event.key!=="Escape"||!dialog.open)return;
     event.preventDefault();event.stopPropagation();dialog.close();
   }));

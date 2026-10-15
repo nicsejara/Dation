@@ -69,3 +69,16 @@ body.dashboard-drawer-open{overflow:hidden;}
 .dashboard-toolbar__menu-panel button>.dashboard-toolbar__icon { width:22px; height:22px; padding:3px; box-sizing:content-box; }
 .dashboard-toolbar__drawer :is(button,input,select) { color-scheme:dark; }
 @media(max-width:520px) { .dashboard-toolbar__menu-panel { max-width:calc(100vw - 32px); } }
+
+.d-decision-dashboard :is(.assignment-dashboard-v2__main,.dispatch-focus-main,.assignment-dashboard-v2__rail,.dispatch-decision-rail) :is(button,a,summary,input,select,textarea,[tabindex]) {
+  scroll-margin-block:calc(var(--dashboard-toolbar-top,76px) + var(--dashboard-toolbar-height,120px) + 24px) 96px;
+}
+.d-decision-dashboard :is(.dispatch-table-wrap,.dispatch-schedule-chart-scroll) {
+  max-height:min(480px,max(120px,calc(100dvh - var(--dashboard-toolbar-top,76px) - var(--dashboard-toolbar-height,120px) - 64px)));
+  scroll-margin-block:calc(var(--dashboard-toolbar-top,76px) + var(--dashboard-toolbar-height,120px) + 24px) 96px;
+}
+@media(max-height:540px) {
+  .d-decision-dashboard>.dashboard-toolbar { position:static; }
+  .d-decision-dashboard :is(.assignment-dashboard-v2__main,.dispatch-focus-main,.assignment-dashboard-v2__rail,.dispatch-decision-rail) :is(button,a,summary,input,select,textarea,[tabindex]) { scroll-margin-block:16px 80px; }
+  .d-decision-dashboard :is(.dispatch-table-wrap,.dispatch-schedule-chart-scroll) { max-height:calc(100dvh - 32px); scroll-margin-block:16px; }
+}

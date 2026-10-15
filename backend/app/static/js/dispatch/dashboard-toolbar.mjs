@@ -99,8 +99,9 @@ export function bindDashboardToolbar(root,run,{onRerun,caseActions={}}={}){
   scope.listen(window,'resize',positionOpen);
   scope.listen(window,'scroll',positionOpen,{passive:true});
   const topbar=document.querySelector('.topbar');
-  const measure=()=>{toolbar.style.setProperty('--dashboard-toolbar-top',Math.ceil(topbar?.getBoundingClientRect().height||76)+'px');positionOpen();};
-  if(topbar&&typeof ResizeObserver!=='undefined')scope.observe(new ResizeObserver(measure),topbar);
+  const measure=()=>{root.style.setProperty('--dashboard-toolbar-top',Math.ceil(topbar?.getBoundingClientRect().height||76)+'px');root.style.setProperty('--dashboard-toolbar-height',Math.ceil(toolbar.getBoundingClientRect().height)+'px');positionOpen();};
+  if(typeof ResizeObserver!=='undefined'){const observer=scope.observe(new ResizeObserver(measure),toolbar);if(topbar)observer.observe(topbar);}
+  scope.own(()=>{root.style.removeProperty('--dashboard-toolbar-top');root.style.removeProperty('--dashboard-toolbar-height');});
   measure();
   function closeDrawer({focus=true}={}){
     if(drawer.hidden)return;

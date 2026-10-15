@@ -397,7 +397,7 @@ function reviewDialog(state,preview,capabilities){
   const priority=state.objective==="custom"
     ?dims.map(key=>DIMENSION_LABELS[key]+' '+(effective?.[key]||0)+' %').join(' · ')
     :"Definido por el objetivo seleccionado";
-  return '<dialog class="dispatch dispatch-review d-config-dialog assignment-review-dialog" data-assignment-review-dialog><form method="dialog">'
+  return '<dialog class="dispatch dispatch-review d-config-dialog assignment-review-dialog" data-assignment-review-dialog aria-label="Revisar Assignment antes de ejecutar"><form method="dialog">'
     +'<span class="assignment-section__eyebrow">ANTES DE EJECUTAR</span><h2>Revisá tu configuración</h2>'
     +'<div class="dispatch-review-summary">'
       +'<p><strong>Alcance</strong><span>'+esc(scopeSummary(preview,state.scopeFilters||[]))+'</span></p>'
@@ -412,7 +412,7 @@ function reviewDialog(state,preview,capabilities){
 
 function filterDialog(preview){
   const fields=preview?.fields||[];
-  return '<dialog class="assignment-filter-dialog d-config-dialog" data-filter-dialog><form method="dialog">'
+  return '<dialog class="assignment-filter-dialog d-config-dialog" data-filter-dialog aria-label="Agregar filtro"><form method="dialog">'
     +'<div class="assignment-filter-dialog__head"><div><span class="assignment-section__eyebrow">ALCANCE</span><h3>Agregar filtro</h3><p>Elegí una columna disponible en el archivo de Órdenes.</p></div><button value="cancel" aria-label="Cerrar">×</button></div>'
     +'<input type="search" placeholder="Buscar columna…" data-filter-field-search aria-label="Buscar columna para filtrar">'
     +'<div class="assignment-filter-field-list" data-filter-field-list>'
@@ -425,7 +425,7 @@ function changeDataDialog(hasFilters,hasApproved){
   const impact=[];
   if(hasFilters)impact.push("Los filtros actuales dependen de columnas del Data Pack en uso.");
   if(hasApproved)impact.push("Hay decisiones aprobadas vinculadas a los archivos actuales.");
-  return '<dialog class="assignment-change-dialog d-config-dialog" data-assignment-change-dialog><form method="dialog">'
+  return '<dialog class="assignment-change-dialog d-config-dialog" data-assignment-change-dialog aria-label="Cambiar los datos"><form method="dialog">'
     +'<span class="assignment-section__icon">'+iconSvg("refresh","assignment-icon")+'</span><h3>¿Cambiar los datos?</h3>'
     +'<p>Al seleccionar otros archivos, Dation crea un nuevo Decision Case y conserva el historial del actual.</p>'
     +(impact.length?'<ul>'+impact.map(item=>'<li>'+esc(item)+'</li>').join("")+'</ul>':'')
@@ -519,7 +519,7 @@ export async function mountAssignmentConfig(root,context){
     target.classList.remove("is-attention");
     void target.offsetWidth;
     target.classList.add("is-attention");
-    target.scrollIntoView({behavior:"smooth",block:"center"});
+    target.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"center"});
     scope.timeout(()=>target.classList.remove("is-attention"),1800);
   }
 

@@ -30,7 +30,7 @@
       </div>
 
       <nav class="nav" aria-label="Navegación principal">
-        <button class="nav-item is-active" data-view="inicio" type="button" onclick="window.dationNavigate && window.dationNavigate('inicio', null, event)">
+        <button class="nav-item is-active" data-view="inicio" type="button" aria-label="Inicio" onclick="window.dationNavigate && window.dationNavigate('inicio', null, event)">
           <span class="nav-icon" aria-hidden="true">⌂</span>
           <span>Inicio</span>
         </button>
@@ -38,7 +38,7 @@
 
       <div class="sidebar-section">
         <p class="sidebar-label">Decision Data Assets</p>
-        <button class="asset-item" data-view="logistics-overview" type="button" onclick="window.dationNavigate && window.dationNavigate('logistics-overview', 'dda', event)">
+        <button class="asset-item" data-view="logistics-overview" type="button" aria-label="DDA Logística" onclick="window.dationNavigate && window.dationNavigate('logistics-overview', 'dda', event)">
           <span class="asset-icon asset-icon--route" aria-hidden="true">
             <img src="/static/assets/dda-logistics.svg?v=home-dda-selector-v2" alt="">
           </span>
@@ -511,7 +511,7 @@
         <!-- MAPA DE DECISIONES: el contenido se monta desde dispatch/workspace.mjs -->
         <section
           class="view"
-          data-view-panel="logistics-map" data-dation-surface="legacy-light"
+          data-view-panel="logistics-map"
           aria-live="polite"
         ></section>
 
