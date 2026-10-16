@@ -1,4 +1,5 @@
 import {createScope} from "./dispatch/lifecycle.mjs";
+import {mountHomeCatalog} from "./home-dda-catalog.mjs";
 import {
   getDatasetProfile,
   getDatasets,
@@ -635,6 +636,7 @@ function bindGlobalErrors() {
 }
 
 
+mountHomeCatalog(document.querySelector('[data-home-dda-catalog]'));
 bindNavigation();
 bindDatasetActions();
 bindDecisionStageBridge();
