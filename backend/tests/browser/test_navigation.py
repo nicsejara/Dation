@@ -1803,10 +1803,12 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_home_catalog_responsive_accessible_and_honest_states(self):
         theme=(Path(__file__).parent/'theme_audit.js').read_text()
+        focus=(Path(__file__).parent/'focus_audit.js').read_text()
+        await self.page.emulate_media(reduced_motion='reduce')
         await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=inicio')
         await self.page.locator('[data-dda-filter=all]').wait_for()
         root=self.page.locator('[data-home-dda-catalog]')
-        for width,height in ((1680,1050),(1440,1000),(1280,1000),(1024,1000),(768,1000),(699,1000),(390,844),(320,568),(568,320)):
+        for width,height in ((1680,1050),(1440,1000),(1280,1000),(1024,1000),(768,1000),(699,1000),(390,844),(360,250),(320,568),(320,256),(568,320)):
             await self.page.set_viewport_size({'width':width,'height':height})
             audit=await self.page.evaluate(theme)
             self.assertFalse(audit['overflow'],(width,audit));self.assertEqual(audit['failures'],[],width)
@@ -1820,6 +1822,13 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             for button in await root.locator('[data-dda-filter],#home-open-logistics').all():
                 await button.focus()
                 self.assertEqual(await button.evaluate('el=>getComputedStyle(el).outlineWidth'),'3px')
+            await root.locator('[data-dda-filter=all]').focus()
+            for key in ['Tab']*15+['Shift+Tab']*15:
+                await self.page.keyboard.press(key)
+                probe=await self.page.evaluate(focus)
+                if not probe.get('skip'):
+                    self.assertTrue(probe['visibleFocus'],(width,height,probe))
+                    self.assertFalse(probe['occluded'] or probe['outside'],(width,height,probe))
         await self.page.set_viewport_size({'width':1440,'height':1000})
         await self.page.emulate_media(reduced_motion='no-preference')
         await self.page.mouse.move(0,0)
@@ -1834,6 +1843,16 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(await upcoming.evaluate('el=>getComputedStyle(el).opacity'),'1')
         await self.page.emulate_media(reduced_motion='reduce');await available.hover()
         self.assertEqual(await available.evaluate('el=>getComputedStyle(el).transform'),'none')
+
+        # Normal motion may animate native scrolling; verify the settled target too.
+        await self.page.emulate_media(reduced_motion='no-preference')
+        await self.page.set_viewport_size({'width':390,'height':844})
+        await root.locator('[data-dda-filter=all]').focus()
+        settled='()=>{const p=('+focus+')();return p.skip||(!p.occluded&&!p.outside);}'
+        await self.page.wait_for_function(settled)
+        for key in ['Tab']*8+['Shift+Tab']*8:
+            await self.page.keyboard.press(key)
+            await self.page.wait_for_function(settled)
 
     async def test_home_catalog_keeps_a_usable_fallback_without_its_module(self):
         await self.context.route('**/home-dda-catalog.mjs',lambda route:route.abort())
