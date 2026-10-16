@@ -21,36 +21,6 @@
   stroke-linecap:round;
   stroke-linejoin:round;
 }
-.assignment-config-root .assignment-decision-panel{
-  min-width:0;
-}
-.assignment-config-root .assignment-decision-panel .dispatch-pro-how-node{
-  grid-template-columns:32px minmax(0,1fr);
-  min-width:0;
-  min-height:48px;
-  height:auto;
-  align-items:center;
-}
-.assignment-config-root .assignment-decision-panel .dispatch-pro-how-node>div{
-  min-width:0;
-  overflow:hidden;
-}
-.assignment-config-root .assignment-decision-panel .dispatch-pro-how-node small,
-.assignment-config-root .assignment-decision-panel .dispatch-pro-how-node strong{
-  display:block;
-  width:100%;
-  max-width:100%;
-  white-space:normal!important;
-  overflow-wrap:anywhere;
-  word-break:normal;
-}
-.assignment-config-root .assignment-decision-panel .dispatch-pro-how-node small{
-  line-height:1.16;
-}
-.assignment-config-root .assignment-decision-panel .dispatch-pro-how-node strong{
-  line-height:1.35;
-}
-
 .assignment-config-root .assignment-case-strip{
   display:grid;
   grid-template-columns:minmax(0,1fr) auto;

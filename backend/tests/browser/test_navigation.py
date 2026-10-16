@@ -2335,6 +2335,93 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.approval_calls,5)
         self.assertEqual(self.execution_bodies,[])
 
+    async def test_workflow_heroes_share_metadata_panel_and_stable_desktop_height(self):
+        await self.page.emulate_media(reduced_motion='reduce')
+        for width,height in ((1440,1000),(1280,1000),(1024,1000),(768,1000),(390,1000),(360,1000),(360,250)):
+            await self.page.set_viewport_size({'width':width,'height':height})
+            records=[]
+            for view,node in (('logistics-data',None),('logistics-map',None),
+                              ('logistics-config','logistics_assignment'),('logistics-config','logistics_scheduling')):
+                await self.open(view,node)
+                hero=self.page.locator('.view.is-active .d-page-hero--workflow');await hero.wait_for()
+                metrics=await hero.evaluate('''el=>{
+                    const rect=x=>{const r=x.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,height:r.height,width:r.width};};
+                    const style=x=>{const s=getComputedStyle(x);return {size:parseFloat(s.fontSize),weight:parseFloat(s.fontWeight),border:s.borderColor,color:s.color};};
+                    const s=getComputedStyle(el),copy=el.querySelector('.dispatch-pro-hero-copy'),panel=el.querySelector('.dispatch-pro-hero-visual');
+                    const step=el.querySelector('.d-hero-meta__step'),decision=el.querySelector('.d-hero-meta__decision');
+                    const items=[...panel.querySelectorAll('.dispatch-pro-how-node')];
+                    return {hero:rect(el),copy:rect(copy),panel:rect(panel),columns:s.gridTemplateColumns,
+                        padding:s.padding,gap:parseFloat(s.gap),animation:s.animationName,metaTop:rect(step).top-rect(el).top,
+                        step:{...rect(step),...style(step)},decision:decision?{...rect(decision),...style(decision)}:null,
+                        items:items.map(x=>{const text=x.querySelector('strong'),range=document.createRange();range.selectNodeContents(text);
+                            return {...rect(x),lines:new Set([...range.getClientRects()].map(r=>Math.round(r.y))).size,font:style(text).size,
+                                clipped:x.scrollWidth>x.clientWidth||text.scrollWidth>text.clientWidth};}),
+                        overflow:el.scrollWidth>el.clientWidth||document.documentElement.scrollWidth>innerWidth};
+                }''')
+                with self.subTest(width=width,height=height,view=view,node=node):
+                    self.assertFalse(metrics['overflow']);self.assertEqual(metrics['animation'],'none')
+                    self.assertEqual(len(metrics['items']),3)
+                    self.assertAlmostEqual(metrics['metaTop'],float(metrics['padding'].split()[0].removesuffix('px'))+1,delta=.25)
+                    for item in metrics['items']:
+                        self.assertFalse(item['clipped']);self.assertGreater(item['height'],0)
+                        self.assertGreaterEqual(item['font'],12)
+                        self.assertGreaterEqual(item['left'],metrics['hero']['left'])
+                        self.assertLessEqual(item['right'],metrics['hero']['right'])
+                    if node:
+                        step,decision=metrics['step'],metrics['decision']
+                        self.assertIsNotNone(decision)
+                        self.assertGreaterEqual(decision['top'],step['bottom']+3.5)
+                        self.assertAlmostEqual(step['left'],decision['left'],delta=.25)
+                        self.assertGreater(step['size'],decision['size']);self.assertGreater(step['weight'],decision['weight'])
+                        self.assertNotEqual(step['border'],decision['border']);self.assertNotEqual(step['color'],decision['color'])
+                    else:self.assertIsNone(metrics['decision'])
+                    if width>=1280:
+                        self.assertGreaterEqual(metrics['panel']['width'],320)
+                        self.assertTrue(all(item['lines']==1 for item in metrics['items']))
+                    else:self.assertGreaterEqual(metrics['panel']['top'],metrics['copy']['bottom']+metrics['gap']-.5)
+                    if height==250:
+                        positions=await self.page.locator('.topbar,.dda-workspace-nav-shell,.d-workflow-action-bar').evaluate_all('els=>els.map(el=>getComputedStyle(el).position)')
+                        self.assertTrue(all(position=='static' for position in positions),positions)
+                        if node:
+                            await self.page.keyboard.press('Tab')
+                            await self.page.locator('[data-config-review]' if node=='logistics_assignment' else '[data-scheduling-review]').focus()
+                            await self.page.locator('[data-config-context] summary').focus()
+                            focus=await self.page.evaluate((Path(__file__).parent/'focus_audit.js').read_text())
+                            self.assertTrue(focus['visibleFocus'],focus)
+                            self.assertFalse(focus['occluded'] or focus['outside'],focus)
+                records.append(metrics)
+            if width>=1280:
+                self.assertLessEqual(max(r['hero']['height'] for r in records)-min(r['hero']['height'] for r in records),1)
+                self.assertEqual(len({r['columns'] for r in records}),1)
+                self.assertTrue(all(r['hero']['height']<=266 for r in records))
+        self.assertFalse(any(m=='POST' and p=='/api/runs' for m,p in self.requests))
+
+    async def test_workflow_hero_future_content_wraps_without_clipping_or_html_injection(self):
+        await self.open('logistics-config','logistics_assignment')
+        for width in (1440,390):
+            await self.page.set_viewport_size({'width':width,'height':1000})
+            result=await self.page.evaluate('''async()=>{
+                const {decisionHero}=await import('/static/js/dispatch/decision-config-ui.mjs');
+                const owner=document.createElement('div');document.querySelector('#dispatch-config-root').append(owner);
+                owner.style.setProperty('--hero-meta-gap','10px');
+                owner.innerHTML=decisionHero({step:{number:7,label:'Nueva decisión '+ 'Contenido'.repeat(35)},decisionIndex:4,totalDecisions:20,
+                    title:'Título'+ 'Largo'.repeat(60),description:'Descripción'+ 'Extendida'.repeat(90),
+                    panelTitle:'<img src=x onerror=alert(1)>',panelFootnote:'Nota '+ 'Prolongada'.repeat(60),
+                    panelItems:Array.from({length:5},()=>({icon:'truck',label:'Campo'+ 'Extendido'.repeat(30),description:'Valor'+ 'Largo'.repeat(90)}))});
+                const hero=owner.firstElementChild,texts=[...hero.querySelectorAll('h1,p,small,strong,.d-hero-meta>span,.dispatch-pro-how-history>span')];
+                const result={overflow:hero.scrollWidth>hero.clientWidth||document.documentElement.scrollWidth>innerWidth,
+                    clipped:texts.some(el=>el.scrollWidth>el.clientWidth+1||el.scrollHeight>el.clientHeight+1),
+                    decision:hero.querySelector('.d-hero-meta__decision').textContent,
+                    panelItems:hero.querySelectorAll('.dispatch-pro-how-node').length,
+                    images:hero.querySelectorAll('img:not(.dispatch-pro-hero-watermark)').length,
+                    title:hero.querySelector('.dispatch-pro-how-title').textContent,gap:getComputedStyle(hero.querySelector('.d-hero-meta')).gap};
+                owner.remove();return result;
+            }''')
+            self.assertFalse(result['overflow'],result);self.assertFalse(result['clipped'],result)
+            self.assertEqual(result['decision'],'DECISIÓN 04 DE 20');self.assertEqual(result['panelItems'],5)
+            self.assertEqual(result['images'],0);self.assertEqual(result['title'],'<img src=x onerror=alert(1)>')
+            self.assertEqual(result['gap'],'10px')
+
     async def test_workflow_primitives_hero_supports_optional_metadata_and_panel(self):
         await self.open('logistics-config','logistics_assignment')
         await self.page.locator('.assignment-config-hero').wait_for()

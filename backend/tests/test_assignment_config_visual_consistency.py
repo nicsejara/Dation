@@ -2,6 +2,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CSS = (ROOT / "app" / "static" / "css" / "decision-trace-v3.css").read_text(encoding="utf-8")
+DESIGN_SYSTEM = (ROOT / "app" / "static" / "css" / "dation-design-system.css").read_text(encoding="utf-8")
 
 
 def test_decision_summary_reuses_case_visual_language():
@@ -21,10 +22,11 @@ def test_config_map_icons_keep_outline_svg_contract():
 
 
 def test_decision_panel_copy_wraps_instead_of_overflowing():
-    assert ".assignment-config-root .assignment-decision-panel .dispatch-pro-how-node small" in CSS
-    assert "white-space:normal!important" in CSS
-    assert "overflow-wrap:anywhere" in CSS
-    assert "grid-template-columns:32px minmax(0,1fr)" in CSS
+    assert ".d-page-hero--workflow .dispatch-pro-how-node :is(small,strong)" in DESIGN_SYSTEM
+    assert "white-space:normal" in DESIGN_SYSTEM
+    assert "overflow-wrap:anywhere" in DESIGN_SYSTEM
+    assert "grid-template-columns:24px minmax(0,1fr)" in DESIGN_SYSTEM
+    assert ".assignment-decision-panel" not in CSS
 
 
 def test_mobile_case_summary_stacks_cleanly():

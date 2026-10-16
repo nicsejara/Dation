@@ -4626,19 +4626,6 @@ body.dispatch-result #chat-panel{
 }
 
 @media(max-width:820px){
-  .dispatch-map-premium__hero{
-    grid-template-columns:1fr;
-  }
-
-  .dispatch-map-premium__hero .dispatch-pro-hero-copy{
-    max-width:none;
-    padding:0;
-  }
-
-  .dispatch-map-premium__hero .dispatch-pro-hero-visual{
-    width:100%;
-  }
-
   .dispatch-map-casebar{
     grid-template-columns:1fr;
     gap:16px;
@@ -4683,11 +4670,6 @@ body.dispatch-result #chat-panel{
     gap:18px;
   }
 
-
-  .dispatch-map-premium__hero .dispatch-pro-hero h1,
-  .dispatch-map-premium__hero h1{
-    font-size:var(--hero-title-size);
-  }
 
   .dispatch-map-casebar__file{
     grid-template-columns:34px minmax(0,1fr);

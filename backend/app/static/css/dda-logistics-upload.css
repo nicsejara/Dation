@@ -1,33 +1,14 @@
 /* Data Pack: page composition, validation and its three owned drawers. */
 .dispatch-upload-pro { display:flex; flex-direction:column; gap:24px; min-width:0; max-width:1320px; margin:0 auto; padding:0 0 16px; color:var(--color-text); }
 .dispatch-upload-pro [hidden], .dispatch-upload-overlay[hidden] { display:none; }
-.dispatch-upload-pro :is(button,a,summary,input,select,textarea,[tabindex]), .dispatch-pro-file-card { scroll-margin-block:160px var(--workflow-bar-space,180px); }
 .dispatch-upload-pro :focus-visible, .dispatch-upload-overlay :focus-visible { outline:3px solid var(--color-focus); outline-offset:3px; }
 .dispatch-upload-pro .dispatch-pro-icon, .dispatch-upload-overlay .dispatch-pro-icon { width:20px; height:20px; flex:0 0 auto; fill:none; stroke:currentColor; stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round; }
 .dispatch-pro-eyebrow { display:block; color:var(--color-text-muted); font-size:10px; font-weight:750; letter-spacing:.08em; text-transform:uppercase; }
-/* Shared hero aliases remain available to Config until its own migration. */
-.dispatch-pro-hero { grid-template-columns:minmax(0,1fr) 280px; }
-.dispatch-pro-hero-copy, .dispatch-pro-hero-visual { position:relative; min-width:0; }
-.dispatch-pro-hero-badge { display:inline-flex; align-items:center; min-height:23px; padding:0 8px; border:1px solid var(--d-border-strong); border-radius:var(--radius-pill); color:var(--d-text-secondary); background:var(--d-surface-2); font-size:10px; font-weight:750; letter-spacing:.04em; text-transform:uppercase; }
-.dispatch-upload-pro .dispatch-pro-hero h1 { margin:12px 0; }
-.dispatch-upload-pro .dispatch-pro-hero-lead { margin:0; }
-.dispatch-upload-pro .dispatch-pro-hero-lead strong { color:var(--color-text); }
-.dispatch-pro-hero-file-chips { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:16px; font-size:11px; }
+/* Data Pack owns contextual chips; the Design System owns the workflow Hero. */
+.dispatch-pro-hero-file-chips { display:flex; flex-wrap:wrap; align-items:center; gap:8px; font-size:11px; }
 .dispatch-pro-hero-chip-prefix { color:var(--color-text-muted); }
 .dispatch-pro-hero-file-chip { display:inline-flex; gap:6px; align-items:center; padding:6px 8px; border:1px solid var(--color-border); border-radius:var(--radius-sm); color:var(--color-text-secondary); background:var(--color-surface-raised); }
 .dispatch-pro-hero-file-chip .dispatch-pro-icon { width:16px; height:16px; }
-.dispatch-pro-hero-watermark { position:absolute; top:0; right:0; width:120px; height:120px; opacity:.04; pointer-events:none; }
-.dispatch-pro-how-panel { position:relative; display:grid; gap:8px; }
-.dispatch-pro-how-title { color:var(--d-text-muted); font-size:9px; font-weight:750; letter-spacing:.08em; }
-.dispatch-pro-how-node { display:grid; grid-template-columns:24px minmax(0,1fr); gap:8px; align-items:center; padding:8px; border:1px solid var(--d-border); border-radius:var(--radius-control); background:var(--d-surface-2); }
-.dispatch-upload-pro .dispatch-pro-how-node { padding:6px; }
-.dispatch-pro-how-icon { display:grid; place-items:center; color:var(--d-brand-teal-bright); }
-.dispatch-pro-how-node small { display:block; font-size:9px; color:var(--d-text-muted); }
-.dispatch-pro-how-node strong { display:block; margin-top:3px; font-size:11px; line-height:1.4; color:var(--d-text-primary); }
-.dispatch-pro-how-connector { display:none; }
-.dispatch-pro-how-history { display:flex; flex-wrap:wrap; gap:6px; align-items:center; color:var(--d-text-secondary); font-size:11px; line-height:1.5; }
-.dispatch-pro-how-history>.dispatch-pro-icon { width:14px; height:14px; }
-.dispatch-upload-pro .dispatch-pro-how-reuse-link { padding:3px 0; border:0; color:var(--d-brand-teal-bright); background:transparent; cursor:pointer; font:700 11px/1.5 var(--font-sans); }
 .dispatch-pro-data-pack { min-width:0; }
 .dispatch-pro-section-head { margin-bottom:20px; max-width:840px; }
 .dispatch-pro-section-head h2 { margin:8px 0; font-size:22px; line-height:1.25; color:var(--color-text); }
@@ -169,8 +150,6 @@
 @keyframes upload-content-in { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:none; } }
 @keyframes upload-progress { to { transform:translateX(150%); } }
 @media(max-width:1100px) {
-  .dispatch-pro-hero { grid-template-columns:minmax(0,1fr); }
-  .dispatch-upload-pro .dispatch-pro-hero-visual { display:none; }
   .dispatch-pro-file-grid { grid-template-columns:minmax(0,1fr); }
 }
 @media(max-width:620px) {

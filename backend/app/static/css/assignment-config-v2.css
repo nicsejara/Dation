@@ -11,6 +11,7 @@
   --ac-warning:var(--d-warning);
   --ac-danger:var(--d-danger);
   --ac-radius:22px;
+  --workflow-bar-space:calc(var(--config-action-height,180px) + 32px);
   max-width:1180px;
   margin:0 auto;
   padding-bottom:calc(var(--config-action-height, 180px) + 32px + env(safe-area-inset-bottom));
@@ -18,10 +19,6 @@
 }
 .assignment-config-root .assignment-icon{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
 .assignment-config-v2{display:grid;gap:24px;max-width:none;margin:0;padding:0}
-.assignment-config-hero__badges{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
-.assignment-decision-chip{display:inline-flex;min-height:30px;align-items:center;padding:0 10px;border:1px solid var(--d-border);border-radius:999px;color:var(--d-text-primary);background:var(--d-surface-1);font-size:12px;font-weight:850;letter-spacing:.055em}
-.assignment-decision-panel .dispatch-pro-how-node strong{font-size:12px;line-height:1.35}
-.assignment-decision-panel .dispatch-pro-how-title{margin-bottom:4px}
 
 .assignment-case-strip{display:grid;grid-template-columns:minmax(230px,.62fr) minmax(0,1.55fr) auto;gap:18px;align-items:center;padding:18px 20px;border-radius:22px}
 .assignment-case-strip__identity{display:flex;gap:12px;align-items:flex-start;min-width:0}
@@ -92,7 +89,7 @@
 @media(max-width:760px){
   .assignment-case-strip{grid-template-columns:1fr;padding:16px}.assignment-case-strip__pack{grid-column:auto;grid-row:auto;grid-template-columns:1fr}.assignment-case-strip__pack-title{padding-top:0}.assignment-change-data{width:100%;justify-content:center}.assignment-section{padding:20px;border-radius:18px}.assignment-section__head{grid-template-columns:42px minmax(0,1fr);gap:11px}.assignment-section__icon{width:42px;height:42px}.assignment-section__current{grid-column:2;margin-top:2px;width:max-content}.assignment-scope-counters,.assignment-objective-grid,.assignment-resource-grid{grid-template-columns:1fr}.assignment-filter-options{grid-template-columns:1fr}.assignment-filter-range,.assignment-filter-date{grid-template-columns:1fr}.assignment-custom-panel__head{align-items:stretch;flex-direction:column}.assignment-custom-panel__head label{min-width:0}.assignment-weight-row{grid-template-columns:36px minmax(0,1fr) 52px}.assignment-weight-row input{grid-column:2/-1}.assignment-resource-rule{grid-template-columns:1fr}.assignment-anomaly-review>label{grid-template-columns:1fr}.assignment-filter-field-list{grid-template-columns:1fr}
 }
-@media(max-width:480px){.assignment-section{padding:17px}.assignment-choice-card{min-height:140px!important}.assignment-decision-chip{font-size:11px}.assignment-config-hero__badges{gap:6px}}
+@media(max-width:480px){.assignment-section{padding:17px}.assignment-choice-card{min-height:140px!important}}
 @media(prefers-reduced-motion:reduce){.assignment-config-root *,.assignment-config-root *::before,.assignment-config-root *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 /* Dedicated native disclosure layout; legacy card grids remain unchanged. */
 .assignment-config-root details.decision-config-case.assignment-case-strip{--config-context-radius:var(--radius-hero);display:block;grid-template-columns:none;grid-template-areas:none;gap:0;padding:0;min-width:0;width:100%;box-sizing:border-box;border-radius:var(--config-context-radius);overflow:visible;}
@@ -127,7 +124,6 @@
 .d-config-dialog [data-config-review-error]:empty { display:none; }
 .d-config-dialog [data-config-review-error] { color:var(--d-danger); }
 @media(max-width:520px) { .d-config-dialog.dispatch-review { padding:18px; } }
-.assignment-config-root .assignment-config-sections :is(button,input,select,textarea,summary,[tabindex]) { scroll-margin-block:160px calc(var(--config-action-height,180px) + 32px); }
 .d-config-dialog .dispatch-review-summary { border-color:var(--d-border); }
 .d-config-dialog .dispatch-review-summary p { border-color:var(--d-border); }
 .d-config-dialog .dispatch-review-summary span { color:var(--d-text-secondary); }
@@ -135,10 +131,7 @@
 .d-config-dialog :is(input,select) { color:var(--d-text-primary); background:var(--d-surface-2); border:1px solid var(--d-border-control); color-scheme:dark; }
 .assignment-config-root input::placeholder,.d-config-dialog input::placeholder { color:var(--d-text-muted); opacity:1; }
 .assignment-config-root :is(button:where(:not(.d-button)),input,select):focus-visible,.d-config-dialog :is(button:where(:not(.d-button)),input,select):focus-visible { outline:3px solid var(--d-brand-teal-bright); outline-offset:2px; }
-.assignment-config-root .assignment-config-hero { min-height:220px; padding:26px; border-radius:24px; }
-.assignment-config-root .assignment-config-hero h1 { font-size:clamp(28px,3vw,40px); }
 .assignment-config-root .assignment-resource-rule { grid-template-columns:auto auto; }
-@media(max-width:700px) { .assignment-config-root .assignment-config-hero { padding:20px; } }
 
 .assignment-config-root :where(button:not(.d-button,.d-workflow-action-bar__item)) { min-height:36px; padding:8px 12px; border:1px solid var(--d-border-control); border-radius:var(--radius-sm); background:var(--d-surface-2); color:var(--d-text-primary); font:inherit; cursor:pointer; }
 .assignment-config-root .assignment-choice-card.is-selected { border-color:var(--d-brand-teal-bright)!important; }
