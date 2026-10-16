@@ -364,6 +364,7 @@ function reviewDialog(config,stats,sourceRun,caseId){
     dialogAttributes:{"data-scheduling-review-dialog":true},
     executeAttributes:{"data-scheduling-execute":true},
     errorAttributes:{"data-scheduling-review-error":true},
+    note:"La planificación conserva los viajes y recursos aprobados en Assignment. Esta decisión sólo define fechas y secuencia.",
     rows:[
       {label:"Decision Case",value:displayDecisionCaseId(caseId)},
       {label:"Entrada",value:num(stats.totalTrips)+' viajes de Assignment · Run '+formatRunId(sourceRun.id)},
