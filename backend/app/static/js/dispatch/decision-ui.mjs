@@ -91,6 +91,12 @@ export const STATUS_UI = Object.freeze({
 });
 
 const ICONS = Object.freeze({
+  eye:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',
+  chartBar:'<path d="M3 3v18h18M7 17v-4M12 17V9M17 17V5"/>',
+  weight:'<path d="M5 9h14l3 12H2Z"/><circle cx="12" cy="6" r="3"/>',
+  mapPin:'<path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/>',
+  gauge:'<path d="M4 19a10 10 0 1 1 16 0M12 12l5-5M5 12h1M12 5v1M18 12h1"/><circle cx="12" cy="12" r="1.5"/>',
+  balance:'<path d="M12 3v18M7 21h10M3 7h18M5 7l-3 8h6ZM19 7l-3 8h6Z"/>',
   map:'<path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3Z"/><path d="M9 3v15M15 6v15"/>',
   download:'<path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/>',
   fileJson:'<path d="M14 2H5v20h14V7Z"/><path d="M14 2v6h5M9 11H7v7h2M15 11h2v7h-2"/>',

@@ -154,6 +154,9 @@ async def journey():
             await ui.checkpoint('assignment-dashboard')
             assert sum(method=='POST' and path=='/api/runs' for method,path in requests)==before_review+1
             assert await page.locator('[data-trip-detail]').count()==0
+            assert not await page.locator('#dispatch-assignment').is_visible()
+            assert not await page.locator('[data-ai-summary-body]').is_visible()
+            await page.locator('[data-assignment-full-plan]').click()
             await page.locator('[data-trip-detail-button]').first.click()
             assert await page.locator('[data-trip-detail]').count()==1
             await page.keyboard.press('Escape')
@@ -161,10 +164,11 @@ async def journey():
             await page.locator('[data-generate-comparative]').click()
             await page.wait_for_selector('[data-comparative-state=completed]')
             comparative_posts=sum(method=='POST' and path.endswith('/comparative') for method,path in requests)
-            await page.locator('[data-close-comparative]').click()
+            await page.locator('[data-assignment-view=essential]').click()
             await page.reload(wait_until='domcontentloaded')
-            await page.locator('[data-open-comparative]').wait_for(state='visible')
-            await page.locator('[data-open-comparative]').click()
+            await page.locator('[data-assignment-view=essential]').wait_for(state='visible')
+            assert not await page.locator('#dispatch-assignment').is_visible()
+            await page.locator('[data-assignment-view=advanced]').click()
             assert sum(method=='POST' and path.endswith('/comparative') for method,path in requests)==comparative_posts
             await page.reload(wait_until='domcontentloaded')
             await page.wait_for_selector('[data-comparative-state=completed]')
@@ -174,6 +178,7 @@ async def journey():
             await page.locator('[data-after-approve]').wait_for(state='visible')
             await ui.action('assignment-continue',page.locator('[data-after-approve]'))
             await ui.checkpoint('assignment-approved')
+            await page.locator('[data-more-menu] summary').click()
             await page.locator('[data-dashboard-map]').click()
             await page.wait_for_selector('[data-map-node="logistics_scheduling"][data-map-action="configure"]')
             assert await page.get_by_role('progressbar',name='Decisiones aprobadas',exact=True).get_attribute('aria-valuenow')=='1'

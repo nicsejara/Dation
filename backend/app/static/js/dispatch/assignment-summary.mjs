@@ -1,55 +1,28 @@
-import {esc,num,money,pct} from './shared.mjs';
-import {
-  getAssignmentSummary,
-  getOperationalKpis,
-} from './assignment-dashboard-selectors.mjs';
+import {esc,num,pct} from './shared.mjs';
+import {iconSvg} from './decision-ui.mjs';
+import {getAssignmentSummary,getAssignmentContext,getEssentialKpis,getDecisionNarrative,getApprovalWarnings} from './assignment-dashboard-selectors.mjs';
 
-function formatKpi(item){
-  if(item.value==null)return '—';
-  if(item.format==='percent')return pct(item.value);
-  if(item.format==='money')return money(item.value);
-  return num(item.value);
-}
+export const formatWeight=(value,compact=false)=>value==null?'—':value>=1000?num(value/1000,1)+(compact?' t':' toneladas'):num(value,1)+' kg';
 
-function weightsMarkup(summary){
-  if(!summary.objectiveWeights.length){
-    return '<span class="assignment-essential__objective-chip">Sin ponderaciones publicadas</span>';
-  }
-  return summary.objectiveWeights.map(item=>
-    '<span class="assignment-essential__objective-chip">'
-      +'<strong>'+esc(item.label)+'</strong>'
-      +'<small>'+pct(item.weight)+'</small>'
-    +'</span>'
-  ).join('');
-}
-
-function kpiMarkup(item){
-  return '<article data-executive-kpi="'+esc(item.key)+'" class="assignment-essential__kpi '+(item.objective?'is-objective':'is-descriptive')+'">'
-    +'<div class="assignment-essential__kpi-top">'
-      +'<span'+(item.description?' title="'+esc(item.description)+'" aria-label="'+esc(item.label+' · '+item.description)+'"':'')+'>'+esc(item.label)+'</span>'
-    +'</div>'
-    +'<strong>'+esc(formatKpi(item))+'</strong>'
-  +'</article>';
-}
-
-export function render(root,result){
-  const summary=getAssignmentSummary(result);
-  const kpis=getOperationalKpis(result);
-
-  root.innerHTML=
-    '<div class="assignment-essential__summary">'
-      +'<div class="assignment-essential__summary-copy">'
-        +'<span class="dispatch-kicker">DECISIÓN 01 · ASIGNACIÓN DE CARGA</span>'
-        +'<h1>'+num(summary.trips)+' viaje'+(summary.trips===1?'':'s')+' propuesto'+(summary.trips===1?'':'s')+' para distribuir '+num(summary.orders)+' orden'+(summary.orders===1?'':'es')+'</h1>'
-        +'<p>Dation priorizó <strong>'+esc(summary.objectiveLabel)+'</strong> bajo la configuración persistida de esta corrida.</p>'
-      +'</div>'
-      +'<aside class="assignment-essential__objective" aria-label="Objetivo de la corrida">'
-        +'<span>Objetivo de la corrida</span>'
-        +'<strong>'+esc(summary.objectiveLabel)+'</strong>'
-        +'<div class="assignment-essential__objective-chips">'+weightsMarkup(summary)+'</div>'
-      +'</aside>'
-    +'</div>'
-    +'<div class="assignment-essential__kpi-strip" aria-label="Métricas de la asignación">'
-      +kpis.map(kpiMarkup).join('')
-    +'</div>';
+export function render(root,result,{status}={}){
+  const summary=getAssignmentSummary(result),context=getAssignmentContext(result);
+  const own=getEssentialKpis(result).find(item=>item.key==='own_weight_share').value;
+  const warnings=getApprovalWarnings(result),stale=['stale','superseded'].includes(status);
+  const infeasible=warnings.some(item=>item.key==='infeasible');
+  const attention=stale||infeasible||status!=='approved'&&warnings.length>0;
+  const label=stale?'Requiere revisión: la corrida perdió vigencia':infeasible?'Escenario no factible':status==='approved'?'Decisión aprobada'
+    :warnings.length?'Asignación para revisar':summary.feasible?'Decisión consistente':'Factibilidad no informada';
+  root.innerHTML='<div class="assignment-hero__art" aria-hidden="true"><img src="/static/assets/assignment-hero-truck.webp" width="1659" height="948" alt="" decoding="async"></div>'
+    +'<div class="assignment-hero__content"><span class="dispatch-kicker">DECISIÓN 01 · ASIGNACIÓN DE FLOTA</span>'
+    +'<h1>Asignación recomendada</h1><span class="assignment-hero__status '+(infeasible?'is-error':attention?'is-review':'is-consistent')+'" data-assignment-hero-status>'
+      +iconSvg(attention?'alertTriangle':'checkCircle','assignment-v2__icon')+'<span>'+esc(label)+'</span></span>'
+    +'<p class="assignment-hero__headline">Mover <strong>'+esc(formatWeight(context.totalWeightKg))+'</strong> en <strong>'+num(summary.trips)+' viajes</strong>'
+      +(own===null?'.':' utilizando <strong>'+pct(own).replace(' ','\u00a0')+' de flota propia</strong>.')+'</p>'
+    +'<p class="assignment-hero__lead">'+esc(getDecisionNarrative(result))+'</p>'
+    +'<details class="assignment-essential__objective"><summary>Objetivo de la corrida · '+esc(summary.objectiveLabel)+'</summary>'
+      +'<div class="assignment-essential__objective-chips">'+(summary.objectiveWeights.length?summary.objectiveWeights.map(item=>
+        '<span class="assignment-essential__objective-chip"><strong>'+esc(item.label)+'</strong><small>'+pct(item.weight)+'</small></span>'
+      ).join(''):'<span>Sin ponderaciones publicadas</span>')+'</div></details></div>';
+  const image=root.querySelector('img');
+  image.onerror=()=>{image.hidden=true;root.querySelector('.assignment-hero__art').dataset.fallback='true';};
 }

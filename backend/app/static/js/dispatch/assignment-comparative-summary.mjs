@@ -1,6 +1,3 @@
 export function render(root){
-  root.innerHTML='<div class="assignment-comparative-summary__copy">'
-    +'<span class="dispatch-kicker">ANÁLISIS COMPARATIVO</span>'
-    +'<h2>Compará la decisión con otros escenarios</h2>'
-    +'<p>Seleccioná una alternativa para ver cómo cambian los cuatro indicadores principales.</p></div>';
+  root.innerHTML='<span class="dispatch-kicker">COMPARACIÓN DETALLADA</span><h2>Compará la decisión con otros escenarios</h2><p>Revisá los indicadores principales, CO₂ y costo por viaje frente a una referencia publicada.</p>';
 }

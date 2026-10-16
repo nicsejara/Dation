@@ -104,14 +104,15 @@ class AssignmentDashboardPhase1Tests(unittest.TestCase):
         self.assertNotIn("data-analysis-depth-select", self.shell)
         self.assertNotIn("analysis_depth=", self.shell)
 
-    def test_toolbar_is_shared_and_approval_lives_only_there(self):
-        self.assertIn('renderDashboardToolbar(run,caseActions)',self.shell)
+    def test_hero_and_final_actions_share_the_existing_approval_controller(self):
+        self.assertIn("renderDashboardToolbar(run,caseActions,{placement:'hero'})",self.shell)
         self.assertIn('renderDashboardToolbar(run,caseActions)',self.scheduling)
         self.assertIn('data-export-menu',self.toolbar)
         self.assertIn('data-more-menu',self.toolbar)
         self.assertIn('data-approve-toolbar',self.toolbar)
         self.assertNotIn('approvalMarkup',self.shell)
-        self.assertNotIn('data-approve',self.shell)
+        self.assertIn('data-approve-final',self.shell)
+        self.assertNotIn('caseActions.onApprove()',self.shell)
         self.assertNotIn('data-rerun-validation',self.shell)
         self.assertIn('await caseActions.onApprove()',self.toolbar)
         self.assertNotIn('approveButton?.click()',self.toolbar)
@@ -164,14 +165,14 @@ class AssignmentDashboardPhase1Tests(unittest.TestCase):
         self.assertIn("disabled", self.rail)
 
     def test_existing_assignment_content_modules_are_preserved(self):
-        self.assertIn("renderModule(nodes.hero,assignmentSummary,result)", self.dashboard)
+        self.assertIn("assignmentSummary.render(nodes.hero,result,caseActions)", self.dashboard)
         self.assertIn(
             "renderModule(nodes.assignment,assignmentEvidence,result)",
             self.dashboard,
         )
         self.assertIn("renderModule(nodes.review,assignmentValidation,result)", self.dashboard)
         self.assertIn(
-            "renderModule(nodes.explanation,explanation,run)",
+            "assignmentAiSummary.render(nodes.explanation,run)",
             self.dashboard,
         )
 

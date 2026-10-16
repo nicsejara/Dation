@@ -1,20 +1,21 @@
 import {iconSvg} from "./decision-ui.mjs";
 import {createScope} from './lifecycle.mjs';
 import {api,post,esc} from './shared.mjs';
-import {getAnalysisDepth} from './assignment-dashboard-selectors.mjs';
+import {getAnalysisDepth,getComparableScenarios} from './assignment-dashboard-selectors.mjs';
 import * as summary from './assignment-comparative-summary.mjs';
 import * as comparison from './assignment-comparison.mjs';
 
-export function render(root,run,{onEvidenceReady}={}){
+export function render(root,run,{onEvidenceReady,onReady,onStateChange,inline=false}={}){
   const scope=createScope(root);
   let artifact={status:'available'};
   let timer=null;
   let runningRequest=false;
   let notified=false;
   let needsRefresh=false;
+  let deferredGenerate=false,lastReady=null;
   const visibilityKey='dation.comparative.collapsed.'+run.id;
   let collapsed=false;
-  try{collapsed=sessionStorage.getItem(visibilityKey)==='true';}catch{}
+  try{collapsed=!inline&&sessionStorage.getItem(visibilityKey)==='true';}catch{}
   scope.own(()=>clearTimeout(timer));
   const endpoint='/api/runs/'+run.id+'/comparative';
 
@@ -24,11 +25,12 @@ export function render(root,run,{onEvidenceReady}={}){
       root.innerHTML='<div class="assignment-comparative-layer__collapsed"><strong>Análisis comparativo disponible</strong><button type="button" data-open-comparative aria-expanded="false" aria-controls="'+esc(contentId)+'">Ver análisis</button></div><div id="'+esc(contentId)+'" hidden></div>';
       root.querySelector('[data-open-comparative]').onclick=()=>setCollapsed(false);
     }else{
-      root.innerHTML='<div class="assignment-comparative-layer__header"><div data-comparative-summary></div><button type="button" data-close-comparative aria-label="Cerrar análisis comparativo" aria-expanded="true" aria-controls="'+esc(contentId)+'">Cerrar '+iconSvg("x","dispatch-action-icon")+'</button></div><div id="'+esc(contentId)+'" data-comparative-content></div>';
+      root.innerHTML='<div class="assignment-comparative-layer__header"><div data-comparative-summary></div>'+(inline?'':'<button type="button" data-close-comparative aria-label="Cerrar análisis comparativo" aria-expanded="true" aria-controls="'+esc(contentId)+'">Cerrar '+iconSvg("x","dispatch-action-icon")+'</button>')+'</div><div id="'+esc(contentId)+'" data-comparative-content></div>';
       summary.render(root.querySelector('[data-comparative-summary]'),artifact.result_json);
       comparison.render(root.querySelector('[data-comparative-content]'),artifact.result_json);
-      root.querySelector('[data-close-comparative]').onclick=()=>setCollapsed(true);
+      const close=root.querySelector('[data-close-comparative]');if(close)close.onclick=()=>setCollapsed(true);
     }
+    if(lastReady!==artifact.result_json){lastReady=artifact.result_json;onReady?.(artifact);}
     if(needsRefresh&&!notified){notified=true;onEvidenceReady?.(artifact);}
   }
   function setCollapsed(value){
@@ -41,6 +43,7 @@ export function render(root,run,{onEvidenceReady}={}){
   function draw(){
     if(!scope.active)return;
     root.dataset.comparativeState=artifact.status;
+    onStateChange?.(artifact.status);
     if(artifact.status==='completed')return completed();
     const busy=['queued','running','submitting'].includes(artifact.status);
     root.innerHTML='<div class="assignment-comparative-layer__intro">'
@@ -67,11 +70,11 @@ export function render(root,run,{onEvidenceReady}={}){
       artifact=data;draw();schedule();
     }catch(error){
       if(scope.active){artifact={status:'error',error_message:error.message};draw();}
-    }finally{runningRequest=false;}
+    }finally{runningRequest=false;if(deferredGenerate&&scope.active&&!['completed','queued','running'].includes(artifact.status)){deferredGenerate=false;generate();}}
   }
 
   async function generate(){
-    if(runningRequest)return;
+    if(runningRequest){if(['available','error'].includes(artifact.status))deferredGenerate=true;return;}
     runningRequest=true;
     needsRefresh=true;
     const retry=artifact.status==='error';
@@ -85,9 +88,10 @@ export function render(root,run,{onEvidenceReady}={}){
     }finally{runningRequest=false;}
   }
 
-  if(getAnalysisDepth(run)!=='essential'){
+  if(getAnalysisDepth(run)!=='essential'&&getComparableScenarios(run.result_json).length){
     artifact={status:'completed',source_mode:'original',result_json:run.result_json};draw();
   }else{
     draw();restore();
   }
+  return {generate,restore};
 }

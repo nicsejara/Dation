@@ -20,3 +20,24 @@ def csv_input(kind):
     writer=csv.DictWriter(output,fieldnames=rows[0].keys(),delimiter=';',lineterminator='\n')
     writer.writeheader();writer.writerows(rows)
     return output.getvalue().encode()
+
+
+def assignment_matrix_inputs():
+    """Reproducible QA tradeoffs; not the unavailable Golden Pallets v2 pack."""
+    order_template=next(csv.DictReader(io.StringIO(csv_input('orders').decode()),delimiter=';'))
+    fleet_template=next(csv.DictReader(io.StringIO(csv_input('fleet').decode()),delimiter=';'))
+    orders=[{**order_template,'order_id':'QA-'+str(i+1),'product':'Carga QA '+str(i+1),
+        'quantity_units':'6','unit_weight_kg':'500','origin':'Cordoba','destination':'Rosario','distance_km':'400'} for i in range(4)]
+    fleet=[]
+    for identifier,ownership,capacity,cost,fixed,co2 in (
+        ('QA-OWN-L','own',8000,2.8,220,1.6),('QA-OWN-S','own',5000,1.1,70,.65),
+        ('QA-EXTERNAL','third_party',12000,4.5,220,2.1)):
+        fleet.append({**fleet_template,'vehicle_id':identifier,'license_plate':'','ownership':ownership,
+            'provider_name':'Proveedor QA' if ownership=='third_party' else '',
+            'base_site':'*' if ownership=='third_party' else 'Cordoba','capacity_kg':str(capacity),
+            'cost_per_km':str(cost),'fixed_trip_cost':str(fixed),'co2_kg_per_km':str(co2)})
+    result={}
+    for kind,rows in (('orders',orders),('fleet',fleet)):
+        stream=io.StringIO();writer=csv.DictWriter(stream,fieldnames=rows[0].keys(),delimiter=';',lineterminator='\n')
+        writer.writeheader();writer.writerows(rows);result[kind]=stream.getvalue().encode()
+    return result

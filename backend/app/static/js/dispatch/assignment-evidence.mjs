@@ -138,7 +138,7 @@ export function render(root,result){
 
   root.innerHTML=
     '<div class="dispatch-section-heading assignment-evidence__heading">'
-      +'<div><span class="dispatch-kicker">EVIDENCIA OPERATIVA</span><h2>Asignación propuesta</h2><p>Inspeccioná la recomendación desde el viaje, el vehículo o la orden. La evidencia corresponde únicamente al escenario seleccionado.</p></div>'
+      +'<div><span class="dispatch-kicker">EVIDENCIA OPERATIVA</span><h2>Plan completo de asignación</h2><p>Inspeccioná la recomendación desde el viaje, el vehículo o la orden. La evidencia corresponde únicamente al escenario seleccionado.</p></div>'
       +'<div class="assignment-evidence__tabs" role="tablist" aria-label="Vistas de evidencia">'
         +'<button type="button" role="tab" aria-selected="true" data-evidence-tab="trips">Viajes</button>'
         +'<button type="button" role="tab" aria-selected="false" data-evidence-tab="vehicles">Vehículos</button>'
