@@ -25,7 +25,8 @@ async def journey():
         if not executable and Path('/usr/bin/chromium').exists():executable='/usr/bin/chromium'
         browser=await pw.chromium.launch(executable_path=executable,headless=True,
             args=['--no-sandbox','--disable-dev-shm-usage'])
-        context=await browser.new_context(http_credentials={'username':'dation','password':os.environ['DATION_ACCESS_PASSWORD']},
+        context=await browser.new_context(http_credentials={'username':'dation','password':os.environ['DATION_ACCESS_PASSWORD'],
+            'origin':base,'send':'always'},
             viewport=viewport,accept_downloads=True,reduced_motion='reduce')
         await context.tracing.start(screenshots=True,snapshots=True,sources=True)
         page=await context.new_page();page.set_default_timeout(30000)
@@ -95,7 +96,7 @@ async def journey():
             initial=await page.evaluate('window.DationDispatch.getWorkspace().decisionCase')
             assert initial['persisted']
             persisted=await context.request.get(base+'/api/decision-cases/'+initial['id'])
-            assert persisted.status==200
+            assert persisted.status==200,{'status':persisted.status,'body':(await persisted.text())[:2000],'case_id':initial['id']}
             assert (await persisted.json())['decision_case']['inputs']==initial['inputs']
             map_url=page.url
             await page.locator('[data-select-case]').click()
