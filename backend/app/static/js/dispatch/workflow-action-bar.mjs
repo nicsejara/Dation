@@ -48,13 +48,6 @@ export function createWorkflowActionBar({label, onContinue, onProblem, onSelect,
   meta.append(node("strong", label), message);
   const files = node(variant === "configuration" ? "nav" : "div", null, "d-workflow-action-bar__items");
   if (variant === "configuration") files.setAttribute("aria-label", "Resumen de configuración");
-  files.addEventListener("focusin", event => {
-    const item = event.target.closest(".d-workflow-action-bar__chip");
-    if (!item) return;
-    const control = item.getBoundingClientRect(), viewport = files.getBoundingClientRect();
-    if (control.right > viewport.right - 6) files.scrollLeft += control.right - viewport.right + 6;
-    else if (control.left < viewport.left + 6) files.scrollLeft -= viewport.left + 6 - control.left;
-  });
   const button = node("button", null, WORKFLOW_ACTION_CLASS);
   button.type = "button";
   button.disabled = true;

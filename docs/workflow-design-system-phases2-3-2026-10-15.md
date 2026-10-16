@@ -12,6 +12,8 @@ A 1100 px o menos, la metadata ocupa su propia fila. A 620 px o menos, los contr
 
 El estilo genérico de botones de Assignment deja de aplicarse a las primitivas compartidas. Así D1 y D2 recuperan el CTA primario sin sobrescrituras adicionales ni nuevos `!important`. Los botones de contexto conservan `data-summary-target`, foco y callbacks; el CTA conserva su nodo y atributos de revisión al cambiar de estado. La prueba de identidad comprueba el mismo nodo dentro de la nueva agrupación.
 
+Se retiran el listener de desplazamiento y los márgenes de scroll del carrusel anterior. Su regresión móvil pasa a verificar la cuadrícula actual en D1 y D2 a 360 y 390 px: Tab y Shift+Tab recorren los tres controles, el contorno de foco completo queda dentro de la barra y no hay scroll horizontal ni cambios de estado al consultar el resumen.
+
 Validación de esta fase antes de continuar:
 
 - 21 pruebas existentes de contratos e imports aprobadas.

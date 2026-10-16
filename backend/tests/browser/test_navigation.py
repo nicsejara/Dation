@@ -925,18 +925,34 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                     await self.page.keyboard.press('Shift+Tab');state=await self.page.evaluate(audit)
                     if not state.get('skip'):self.assertFalse(state['occluded'] or state['outside'],(view,node,width,state))
 
-    async def test_phase6_mobile_footer_chips_scroll_locally_without_losing_focus_or_state(self):
-        await self.page.emulate_media(reduced_motion='reduce');await self.page.set_viewport_size({'width':390,'height':844})
-        await self.open('logistics-config','logistics_assignment')
-        await self.page.keyboard.press('Tab')
-        chips=self.page.locator('.d-workflow-action-bar__chip');self.assertEqual(await chips.count(),3)
-        for index in (0,1,2,1,0):
-            await chips.nth(index).focus()
-            fit=await chips.nth(index).evaluate('el=>{const r=el.getBoundingClientRect(),p=el.parentElement.getBoundingClientRect();return r.left>=p.left+5&&r.right<=p.right-5;}')
-            self.assertTrue(fit)
-        state=await self.page.evaluate('window.DationDispatch.getWorkspace()')
-        await chips.first.press('Enter');await chips.nth(2).press('Space')
-        self.assertEqual((await self.page.evaluate('window.DationDispatch.getWorkspace()'))['resourceMode'],state['resourceMode'])
+    async def test_phase6_mobile_footer_grid_keeps_keyboard_focus_visible_without_scroll_or_state_changes(self):
+        audit=(Path(__file__).parent/'focus_audit.js').read_text()
+        await self.page.emulate_media(reduced_motion='reduce')
+        for width in (360,390):
+            await self.page.set_viewport_size({'width':width,'height':844})
+            for node in ('logistics_assignment','logistics_scheduling'):
+                await self.open('logistics-config',node)
+                await self.page.keyboard.press('Tab')
+                chips=self.page.locator('.d-workflow-action-bar__chip');self.assertEqual(await chips.count(),3)
+                await chips.first.focus()
+                for index,key in ((0,None),(1,'Tab'),(2,'Tab'),(1,'Shift+Tab'),(0,'Shift+Tab')):
+                    if key:await self.page.keyboard.press(key)
+                    self.assertTrue(await chips.nth(index).evaluate('el=>el===document.activeElement'))
+                    focus=await self.page.evaluate(audit)
+                    self.assertTrue(focus['visibleFocus'] and focus['outline']=='solid' and focus['width']>=2,(width,node,focus))
+                    self.assertFalse(focus['outside'] or focus['occluded'],(width,node,focus))
+                    fit=await chips.nth(index).evaluate('''el=>{
+                      const r=el.getBoundingClientRect(),bar=el.closest('.d-workflow-action-bar').getBoundingClientRect();
+                      const style=getComputedStyle(el),ring=parseFloat(style.outlineWidth)+parseFloat(style.outlineOffset);
+                      const grid=el.parentElement;
+                      return r.left-ring>=bar.left&&r.right+ring<=bar.right&&r.top-ring>=bar.top&&r.bottom+ring<=bar.bottom
+                        &&grid.scrollLeft===0&&grid.scrollWidth<=grid.clientWidth
+                        &&document.documentElement.scrollWidth<=innerWidth;
+                    }''')
+                    self.assertTrue(fit,(width,node,index))
+                state=await self.page.evaluate('window.DationDispatch.getWorkspace()')
+                await chips.first.press('Enter');await chips.nth(2).press('Space')
+                self.assertEqual((await self.page.evaluate('window.DationDispatch.getWorkspace()'))['resourceMode'],state['resourceMode'])
         self.assertFalse(any(m=='POST' and p=='/api/runs' for m,p in self.requests))
 
     async def test_phase6_native_search_number_checkbox_range_and_autofill_keep_dark_roles(self):

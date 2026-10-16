@@ -171,8 +171,6 @@
   caret-color:var(--color-text);
   box-shadow:inset 0 0 0 1000px var(--color-surface);
 }
-.d-workflow-action-bar__items { scroll-padding-inline:6px; }
-.d-workflow-action-bar__chip { scroll-margin-inline:6px; }
 /* Short viewports, including desktop zoom, must leave the content reachable. */
 @media(max-height:540px) {
   .topbar, .d-workflow-action-bar { position:static; }
