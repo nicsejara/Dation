@@ -128,7 +128,7 @@ function heroMarkup(){
     description:"Partí de la asignación aprobada y definí ventana y prioridad del calendario. Cargas, cantidades y recursos mantienen su trazabilidad.",
     panelItems:[
       {label:"1 · PREGUNTA",description:"¿Cuándo despachar los viajes definidos?",icon:"messageCircleQuestion"},
-      {label:"2 · ENTREGA",description:"Calendario operativo + secuencia de despachos.",icon:"calendarClock"},
+      {label:"2 · ENTREGA",description:"Calendario operativo + secuencia",icon:"calendarClock"},
       {label:"3 · QUEDA PARA DESPUÉS",description:"Asignación de vehículos: decisión final.",icon:"truck"},
     ],
   });
