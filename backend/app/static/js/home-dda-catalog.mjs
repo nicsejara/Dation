@@ -41,7 +41,7 @@ const ICONS=Object.freeze({
   pricing:'<path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
 });
 const arrow='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"/></svg>';
-const ASSET_ICONS=Object.freeze({logistics:'/static/assets/dda-logistics.svg',production:'/static/assets/dda-production.svg'});
+const ASSET_ICONS=Object.freeze({logistics:'/static/assets/dda-logistics.svg'});
 
 export function catalogCounts(catalog=DDA_CATALOG){
   return {available:catalog.filter(item=>item.status==='available').length,
@@ -53,6 +53,7 @@ export function filterCatalog(category='all',catalog=DDA_CATALOG){
 }
 
 function assetIcon(item){
+  if(item.icon==='production')return '<span class="d-home__production-icon"></span>';
   if(ASSET_ICONS[item.icon]){
     return '<img src="'+ASSET_ICONS[item.icon]+'" alt="">';
   }
