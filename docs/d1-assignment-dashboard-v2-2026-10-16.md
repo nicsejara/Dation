@@ -112,7 +112,7 @@ python tests/e2e/run_suite.py
 
 Resultados locales: **350 pruebas Python, 60 Node y 9 E2E aprobadas**, sin omisiones. Compilación Python y sintaxis de todos los módulos JavaScript comprobadas. Auditoría visual aprobada en 12 estados (seis anchos × dos niveles), con contraste y ausencia de overflow.
 
-La suite completa de Chromium incluye 134 pruebas, entre ellas nueve nuevas para D1 V2; PostgreSQL 17 añade 46 pruebas de esquema, historial, aprobación y jobs. Ambas son puertas obligatorias de CI, junto con las suites anteriores y auditoría de dependencias. La publicación exige CI verde del commit exacto y su merge, y registra los resultados en los informes de entrega. La comprobación de producción abre D1 y D2, verifica assets idénticos al código, contraste, teclado, exportación y ausencia de escrituras.
+La suite completa de Chromium incluye 135 pruebas, entre ellas diez nuevas para D1 V2; PostgreSQL 17 añade 46 pruebas de esquema, historial, aprobación y jobs. Ambas son puertas obligatorias de CI, junto con las suites anteriores y auditoría de dependencias. La publicación exige CI verde del commit exacto y su merge, y registra los resultados en los informes de entrega. La comprobación de producción abre D1 y D2, verifica assets idénticos al código, contraste, teclado, exportación y ausencia de escrituras.
 
 ### E2E de los cinco objetivos
 
@@ -125,3 +125,7 @@ Las cinco ejecuciones aprobaron la verificación del escenario seleccionado, fin
 ### Evidencia y publicación
 
 Capturas antes/después, controles de contraste y overflow, navegación con teclado, resultados de suites y pruebas de producción en `/workspace/dation-audit/d1-dashboard-v2-2026-10-16/`. La publicación se valida contra el commit exacto, CI de rama/main, Cloud Build, hashes de assets y pruebas del navegador de solo lectura, conservando fingerprints de casos y corridas existentes.
+
+### Ajuste detectado en producción
+
+La comprobación de teclado sobre una corrida real detectó que el scroll nativo podía dejar parcialmente recortado el botón de detalle de un viaje. `assignment-evidence.mjs` ajusta únicamente el desplazamiento horizontal del contenedor al recibir foco, con margen para el anillo visible. Conserva la posición vertical, el estado de la corrida y el ciclo de vida de los listeners. Se agrega una regresión de Chromium que reproduce el recorte parcial en distintos tamaños y verifica que el control y su foco quedan dentro del contenedor.

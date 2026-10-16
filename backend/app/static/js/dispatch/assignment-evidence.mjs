@@ -159,6 +159,17 @@ export function render(root,result){
   let selectedButton=null,detailRow=null;
   controls.forEach(button=>button.setAttribute('aria-controls',panelId));
 
+  // Native focus can leave a partially visible table control clipped horizontally.
+  // Keep its focus ring inside this scroll region without moving the page vertically.
+  scope.listen(root,'focusin',event=>{
+    const control=event.target.closest('button,a,input,select,textarea');
+    const wrap=control?.closest('.assignment-evidence__table-wrap');
+    if(!wrap)return;
+    const bounds=wrap.getBoundingClientRect(),rect=control.getBoundingClientRect(),inset=8;
+    if(rect.right>bounds.right-inset)wrap.scrollLeft+=rect.right-bounds.right+inset;
+    else if(rect.left<bounds.left+inset)wrap.scrollLeft-=bounds.left+inset-rect.left;
+  });
+
   function closeDetail({focus=true}={}){
     const old=selectedButton;
     selectedButton=null;
