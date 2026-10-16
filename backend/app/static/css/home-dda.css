@@ -23,6 +23,7 @@
 .d-home__tile strong { display:block; font-size:13px; line-height:1.35; }
 .d-home__tile small { display:block; margin-top:var(--space-1); color:var(--color-text-muted); font-size:11px; line-height:1.4; }
 .d-home__assets { display:grid; gap:var(--space-4); }
+.d-home :is(button,[tabindex]) { scroll-margin-block:calc(var(--topbar-height,58px) + var(--space-4)) var(--space-4); }
 .d-home__catalog-head { display:flex; flex-wrap:wrap; align-items:start; justify-content:space-between; gap:var(--space-4); }
 .d-home__section-head { flex:1 1 580px; max-width:800px; min-width:0; }
 .d-home__section-kicker { color:var(--color-brand-hover); font-size:10px; font-weight:750; letter-spacing:.08em; }

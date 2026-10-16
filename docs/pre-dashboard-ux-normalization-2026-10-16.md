@@ -45,7 +45,7 @@ Se mantiene el Hero principal de Inicio, sidebar, topbar, DDA landing, Data Pack
 
 ## Fases 5–6 — Accesibilidad y regresión
 
-- Filtros por teclado, selección textual/visual, foco visible y anuncio de resultados.
+- Filtros por teclado, selección textual/visual, foco visible y anuncio de resultados. Los controles de Inicio reservan margen para la topbar al recibir foco; Tab y Shift+Tab se comprueban en todos los tamaños, también con movimiento normal una vez finalizado el desplazamiento.
 - Hover y contraste diferenciados; movimiento reducido conserva cambios de color sin desplazamiento.
 - Grid adaptable con alturas homogéneas por fila, filtros con wrap y estado de portfolio que puede bajar de línea.
 - Revisión de tamaños desde 1680 px hasta 320 px, incluyendo pantallas bajas y orientación horizontal.
