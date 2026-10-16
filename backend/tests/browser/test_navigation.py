@@ -3033,7 +3033,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
     async def test_d1_v2_table_focus_reveals_partially_clipped_trip_control(self):
         reproduced=0
         await self.dashboard();await self.open_advanced()
-        for width,height in ((1280,800),(800,800),(390,844)):
+        clipped_rows=0
+        for width,height in ((1280,800),(800,800),(390,844),(390,300)):
             await self.page.set_viewport_size({'width':width,'height':height})
             button=self.page.locator('[data-trip-detail-button]').first
             await button.scroll_into_view_if_needed()
@@ -3053,7 +3054,21 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             self.assertTrue(result['focused']);self.assertLessEqual(result['right'],result['edge']-5,result)
             self.assertEqual(result['top'],result['before']['top']);self.assertEqual(result['pageY'],result['before']['pageY'])
             if result['clipped']:self.assertGreater(result['left'],result['before']['left'])
+            later=self.page.locator('[data-trip-detail-button]').nth(3)
+            await later.scroll_into_view_if_needed()
+            vertical=await later.evaluate('''button=>{
+                button.blur();const wrap=button.closest('.assignment-evidence__table-wrap');wrap.scrollTop=0;
+                const before=button.getBoundingClientRect(),edge=wrap.getBoundingClientRect(),pageY=scrollY;
+                const clipped=before.bottom>edge.bottom;
+                button.focus({preventScroll:true});const rect=button.getBoundingClientRect();
+                return {clipped,pageY,afterY:scrollY,top:rect.top,bottom:rect.bottom,edgeTop:edge.top,edgeBottom:edge.bottom,
+                    visible:[[.2,.2],[.5,.5],[.8,.8]].every(([x,y])=>button.contains(document.elementFromPoint(rect.x+rect.width*x,rect.y+rect.height*y)))};
+            }''')
+            clipped_rows+=int(vertical['clipped'])
+            self.assertTrue(vertical['visible'],vertical);self.assertGreaterEqual(vertical['top'],vertical['edgeTop'])
+            self.assertLessEqual(vertical['bottom'],vertical['edgeBottom']);self.assertEqual(vertical['afterY'],vertical['pageY'])
         self.assertGreater(reproduced,0)
+        self.assertGreater(clipped_rows,0)
         self.assertEqual(self.explain_calls,0);self.assertEqual(self.comparative_posts,0);self.assertEqual(self.execution_bodies,[])
 
 if __name__ == "__main__":

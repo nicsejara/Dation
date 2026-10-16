@@ -159,8 +159,8 @@ export function render(root,result){
   let selectedButton=null,detailRow=null;
   controls.forEach(button=>button.setAttribute('aria-controls',panelId));
 
-  // Native focus can leave a partially visible table control clipped horizontally.
-  // Keep its focus ring inside this scroll region without moving the page vertically.
+  // Reveal controls that native focus leaves clipped by either scroll axis.
+  // Keep the focused row below the heading and above the floating chat control.
   scope.listen(root,'focusin',event=>{
     const control=event.target.closest('button,a,input,select,textarea');
     const wrap=control?.closest('.assignment-evidence__table-wrap');
@@ -168,6 +168,13 @@ export function render(root,result){
     const bounds=wrap.getBoundingClientRect(),rect=control.getBoundingClientRect(),inset=8;
     if(rect.right>bounds.right-inset)wrap.scrollLeft+=rect.right-bounds.right+inset;
     else if(rect.left<bounds.left+inset)wrap.scrollLeft-=bounds.left+inset-rect.left;
+    const heading=wrap.querySelector('thead')?.getBoundingClientRect().height||0;
+    const top=Math.max(bounds.top+heading+inset,76);
+    const bottom=Math.min(bounds.bottom-inset,innerHeight-96);
+    if(bottom-top>=rect.height){
+      if(rect.bottom>bottom)wrap.scrollTop+=rect.bottom-bottom;
+      else if(rect.top<top)wrap.scrollTop-=top-rect.top;
+    }
   });
 
   function closeDetail({focus=true}={}){
