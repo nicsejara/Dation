@@ -3,6 +3,7 @@ import {ensureDecisionCaseStyles} from "./styles.mjs";
 import {api,esc,num} from "./shared.mjs";
 import {STATUS,deriveDecisionNodes} from "./decision-case.mjs";
 import {WORKFLOW_ACTION_CLASS,workflowActionLabel} from "./workflow-action-bar.mjs";
+import {decisionHero} from "./decision-config-ui.mjs";
 import {createGuideDrawer} from "./upload/guide-drawer.mjs";
 import {
   DECISION_ORDER,
@@ -313,34 +314,20 @@ function connector(fromId,toId,presentations,nextNodeId){
 
 function heroMarkup(){
   const mapStep=workflowStep("map",{number:2,label:"Mapa de decisiones"});
-  return '<section class="dispatch-pro-hero dispatch-map-premium__hero d-page-hero" data-reveal>'
-    +'<div class="dispatch-pro-hero-copy">'
-      +'<span class="dispatch-pro-hero-badge is-step">Paso '+esc(mapStep.number)+': '+esc(mapStep.label)+'</span>'
-      +'<h1>Elegí la decisión que tus datos ya pueden resolver.</h1>'
-      +'<p class="dispatch-pro-hero-lead">Según los datos que cargaste, Dation te muestra qué decisiones podés resolver ahora y cuáles se habilitan después. Elegí una, configurala y aprobala para desbloquear la siguiente.</p>'
-    +'</div>'
-    +'<div class="dispatch-pro-hero-visual">'
-      +'<img class="dispatch-pro-hero-watermark" src="/static/assets/dda-logistics.svg?v=decision-map-case-v2" alt="">'
-      +'<div class="dispatch-pro-how-panel">'
-        +'<div class="dispatch-pro-how-title"><span>CÓMO AVANZA EL CASO</span></div>'
-        +[
-          ["1 · ELEGÍ","La decisión que está disponible.","mousePointer"],
-          ["2 · CONFIGURÁ","Definí tu prioridad y compará escenarios.","sliders"],
-          ["3 · APROBÁ","Aprobá y habilitá la siguiente decisión.","checkCircle"],
-        ].map(([label,description,icon],index)=>(
-          '<div class="dispatch-pro-how-node">'
-            +'<span class="dispatch-pro-how-icon">'+iconSvg(icon,"dispatch-pro-icon dispatch-map-icon")+'</span>'
-            +'<div><small>'+esc(label)+'</small><strong>'+esc(description)+'</strong></div>'
-          +'</div>'
-          +(index<2?'<span class="dispatch-pro-how-connector" aria-hidden="true"></span>':'')
-        )).join("")
-        +'<div class="dispatch-pro-how-history">'
-          +iconSvg("history","dispatch-pro-icon dispatch-map-icon")
-          +'<span>Reabrí cada decisión desde su tarjeta.</span>'
-        +'</div>'
-      +'</div>'
-    +'</div>'
-  +'</section>';
+  return decisionHero({
+    className:"dispatch-pro-hero dispatch-map-premium__hero",
+    reveal:true,
+    step:mapStep,
+    title:"Elegí la decisión que tus datos ya pueden resolver.",
+    description:"Dation muestra qué decisiones podés resolver con tus datos y cuáles se habilitan después. Elegí, configurá y aprobá para avanzar.",
+    panelTitle:"CÓMO AVANZA EL CASO",
+    panelItems:[
+      {label:"1 · ELEGÍ",description:"La decisión que está disponible.",icon:"mousePointer"},
+      {label:"2 · CONFIGURÁ",description:"Definí tu prioridad y compará escenarios.",icon:"sliders"},
+      {label:"3 · APROBÁ",description:"Aprobá y habilitá la siguiente decisión.",icon:"checkCircle"},
+    ],
+    panelFootnote:"Reabrí cada decisión desde su tarjeta.",
+  });
 }
 
 function caseState(approved,presentations){

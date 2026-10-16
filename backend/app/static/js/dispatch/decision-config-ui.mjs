@@ -41,21 +41,22 @@ export function decisionSectionHeader({number,eyebrow,title,copy,icon,current}){
   +'</header>';
 }
 
-export function decisionHero({step,decisionIndex,totalDecisions=3,title,description,panelItems=[]}){
+export function decisionHero({step,decisionIndex,totalDecisions=3,title,description,panelItems=[],panelTitle="ESTA DECISIÓN",panelFootnote="",className="decision-config-hero dispatch-pro-hero assignment-config-hero",reveal=false}){
   const hasDecision=decisionIndex!==undefined&&decisionIndex!==null&&decisionIndex!=="";
   const hasPanel=panelItems.length>0;
-  return '<section class="decision-config-hero dispatch-pro-hero assignment-config-hero d-page-hero'+(hasPanel?'':' d-page-hero--copy-only')+'">'
+  return '<section class="'+esc(className)+' d-page-hero d-page-hero--workflow'+(hasPanel?'':' d-page-hero--copy-only')+'"'+attr("data-reveal",reveal)+'>'
     +'<div class="dispatch-pro-hero-copy">'
-      +'<div class="assignment-config-hero__badges">'
-        +'<span class="dispatch-pro-hero-badge is-step">PASO '+esc(step?.number??3)+': '+esc(String(step?.label||"Configurar decisión").toUpperCase())+'</span>'
-        +(hasDecision?'<span class="assignment-decision-chip">DECISIÓN '+esc(String(decisionIndex).padStart(2,"0"))+' DE '+esc(totalDecisions)+'</span>':'')
+      +'<div class="d-hero-meta assignment-config-hero__badges">'
+        +'<span class="d-hero-meta__step dispatch-pro-hero-badge is-step">PASO '+esc(step?.number??3)+': '+esc(String(step?.label||"Configurar decisión").toUpperCase())+'</span>'
+        +(hasDecision?'<span class="d-hero-meta__decision assignment-decision-chip">DECISIÓN '+esc(String(decisionIndex).padStart(2,"0"))+' DE '+esc(totalDecisions)+'</span>':'')
       +'</div>'
       +'<h1>'+esc(title)+'</h1>'
       +'<p class="dispatch-pro-hero-lead">'+esc(description)+'</p>'
     +'</div>'
     +(hasPanel?'<div class="dispatch-pro-hero-visual">'
+      +'<img class="dispatch-pro-hero-watermark" src="/static/assets/dda-logistics.svg?v=workflow-hero" alt="">'
       +'<div class="decision-config-decision-panel dispatch-pro-how-panel assignment-decision-panel">'
-        +'<div class="dispatch-pro-how-title"><span>ESTA DECISIÓN</span></div>'
+        +'<div class="dispatch-pro-how-title"><span>'+esc(panelTitle)+'</span></div>'
         +panelItems.map((item,index)=>(
           '<div class="decision-config-panel-item dispatch-pro-how-node">'
             +'<span class="dispatch-pro-how-icon">'+iconSvg(item.icon,"dispatch-pro-icon assignment-icon")+'</span>'
@@ -63,6 +64,7 @@ export function decisionHero({step,decisionIndex,totalDecisions=3,title,descript
           +'</div>'
           +(index<panelItems.length-1?'<span class="dispatch-pro-how-connector" aria-hidden="true"></span>':'')
         )).join("")
+        +(panelFootnote?'<div class="dispatch-pro-how-history">'+iconSvg("history","dispatch-pro-icon")+'<span>'+esc(panelFootnote)+'</span></div>':'')
       +'</div>'
     +'</div>':'')
   +'</section>';

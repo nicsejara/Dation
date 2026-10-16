@@ -124,11 +124,11 @@ function heroMarkup(){
     decisionIndex:2,
     totalDecisions:3,
     title:"Definí cuándo querés despachar los viajes.",
-    description:"Partí de la asignación aprobada, fijá la ventana temporal y elegí qué criterio debe ordenar el calendario. Cargas, cantidades y recursos quedan trazados desde la decisión anterior.",
+    description:"Partí de la asignación aprobada y definí ventana y prioridad del calendario. Cargas, cantidades y recursos mantienen su trazabilidad.",
     panelItems:[
-      {label:"1 · PREGUNTA",description:"¿Cuándo conviene ejecutar los viajes ya definidos?",icon:"messageCircleQuestion"},
+      {label:"1 · PREGUNTA",description:"¿Cuándo despachar los viajes definidos?",icon:"messageCircleQuestion"},
       {label:"2 · ENTREGA",description:"Calendario operativo + secuencia de despachos.",icon:"calendarClock"},
-      {label:"3 · QUEDA PARA DESPUÉS",description:"La ejecución final se consolida en Asignación de vehículos.",icon:"truck"},
+      {label:"3 · QUEDA PARA DESPUÉS",description:"Asignación de vehículos: decisión final.",icon:"truck"},
     ],
   });
 }

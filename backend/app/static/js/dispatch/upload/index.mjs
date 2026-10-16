@@ -1,5 +1,6 @@
 import {createScope,scopeFor} from "../lifecycle.mjs";
 import {createWorkflowActionBar} from "../workflow-action-bar.mjs";
+import {decisionHero} from "../decision-config-ui.mjs";
 import {api, date, num} from "../shared.mjs";
 import {createDropCard} from "./dropcard.mjs";
 import {createGuideDrawer} from "./guide-drawer.mjs";
@@ -104,34 +105,24 @@ function workflowStep(id, fallback) {
 }
 
 function makeHero() {
-  const hero = el("section", null, "dispatch-pro-hero d-page-hero");
-  hero.dataset.reveal = "";
-
-  const copy = el("div", null, "dispatch-pro-hero-copy");
-  const dataStep = workflowStep(
-    "data",
-    {number: 1, label: "Carga de datos"},
-  );
-
-  const badge = el(
-    "span",
-    `Paso ${dataStep.number}: ${dataStep.label}`,
-    "dispatch-pro-hero-badge is-step",
-  );
-
-  const title = el(
-    "h1",
-    "Prepará tu Data Pack.",
-  );
-
-  const lead = el("p", null, "dispatch-pro-hero-lead");
-  lead.append(
-    document.createTextNode("Tu "),
-    el("strong", "Data Pack"),
-    document.createTextNode(
-      " reúne Órdenes y Flota. Subí archivos nuevos o reutilizá una carga anterior; Dation valida su estructura y compatibilidad.",
-    ),
-  );
+  const dataStep = workflowStep("data", {number: 1, label: "Carga de datos"});
+  const template = document.createElement("template");
+  template.innerHTML = decisionHero({
+    className: "dispatch-pro-hero",
+    reveal: true,
+    step: dataStep,
+    title: "Prepará tu Data Pack.",
+    description: "Tu Data Pack reúne Órdenes y Flota. Subí archivos nuevos o reutilizá una carga anterior; Dation valida su estructura y compatibilidad.",
+    panelTitle: "CÓMO FUNCIONA",
+    panelItems: [
+      {label: "1 · DESCARGÁ", description: "La plantilla con el formato correcto.", icon: "download"},
+      {label: "2 · COMPLETÁ", description: "Solo lo mínimo. Lo opcional puede esperar.", icon: "clipboardList"},
+      {label: "3 · SUBÍ", description: "Validación automática de archivos.", icon: "clipboardCheck"},
+    ],
+  });
+  const hero = template.content.firstElementChild;
+  const copy = hero.querySelector(".dispatch-pro-hero-copy");
+  const panel = hero.querySelector(".dispatch-pro-how-panel");
 
   const fileChips = el("div", null, "dispatch-pro-hero-file-chips");
   const prefix = el(
@@ -153,40 +144,7 @@ function makeHero() {
   );
 
   fileChips.append(prefix, ordersChip, fleetChip);
-  copy.append(badge, title, lead, fileChips);
-
-  const visual = el("div", null, "dispatch-pro-hero-visual");
-  const watermark = document.createElement("img");
-  watermark.src = "/static/assets/dda-logistics.svg?v=hero-upload-v1";
-  watermark.alt = "";
-  watermark.className = "dispatch-pro-hero-watermark";
-
-  const panel = el("div", null, "dispatch-pro-how-panel");
-  const panelTitle = el("div", null, "dispatch-pro-how-title");
-  panelTitle.append(
-    el("span", "CÓMO FUNCIONA"),
-  );
-  panel.append(panelTitle);
-
-  [
-    ["1", "DESCARGÁ", "La plantilla con el formato correcto.", "download"],
-    ["2", "COMPLETÁ", "Solo lo mínimo. Lo opcional puede esperar.", "table"],
-    ["3", "SUBÍ", "Validación automática de archivos.", "shield"],
-  ].forEach(([number, label, description, iconName], index) => {
-    const node = el("div", null, "dispatch-pro-how-node");
-    const iconWrap = el("span", null, "dispatch-pro-how-icon");
-    iconWrap.append(icon(iconName));
-    const text = el("div");
-    text.append(
-      el("small", `${number} · ${label}`),
-      el("strong", description),
-    );
-    node.append(iconWrap, text);
-    panel.append(node);
-    if (index < 2) {
-      panel.append(el("span", "", "dispatch-pro-how-connector"));
-    }
-  });
+  copy.append(fileChips);
 
   const history = el("div", null, "dispatch-pro-how-history");
   const historyCopy = el("span", "¿Ya cargaste datos antes? ");
@@ -197,8 +155,6 @@ function makeHero() {
   history.append(icon("history"), historyCopy, reuseLink);
 
   panel.append(history);
-  visual.append(watermark, panel);
-  hero.append(copy, visual);
 
   return {hero, reuseLink};
 }

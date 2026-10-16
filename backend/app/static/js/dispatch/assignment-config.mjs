@@ -129,11 +129,11 @@ function heroMarkup(){
     decisionIndex:1,
     totalDecisions:3,
     title:"Definí cómo querés distribuir tu carga.",
-    description:"Elegí qué datos analizar, qué querés optimizar y qué recursos usar. Esta decisión reparte la carga entre tu flota; las fechas se definen después.",
+    description:"Elegí datos, objetivo y recursos para repartir la carga entre tu flota. Las fechas se definen en Planificación de despachos.",
     panelItems:[
-      {label:"1 · PREGUNTA",description:"¿Cómo conviene armar los viajes y repartir la carga?",icon:"messageCircleQuestion"},
+      {label:"1 · PREGUNTA",description:"¿Cómo armar viajes y repartir la carga?",icon:"messageCircleQuestion"},
       {label:"2 · ENTREGA",description:"Viajes propuestos + distribución de carga.",icon:"packageCheck"},
-      {label:"3 · QUEDA PARA DESPUÉS",description:"Fechas y calendario: se definen en Planificación de despachos.",icon:"calendarClock"},
+      {label:"3 · QUEDA PARA DESPUÉS",description:"Fechas en Planificación de despachos.",icon:"calendarClock"},
     ],
   });
 }

@@ -126,8 +126,10 @@
   --hero-gap: 24px;
   --hero-title-size: clamp(28px,3vw,40px);
   --hero-lead-size: 14px;
-  --hero-panel-width: clamp(20rem,30vw,25rem);
-  --hero-panel-gap: var(--space-3);
+  --hero-workflow-min-height: 260px;
+  --hero-copy-gap: var(--space-2);
+  --hero-panel-width: clamp(20rem,32vw,25rem);
+  --hero-panel-gap: var(--space-2);
   --hero-meta-gap: var(--space-1);
   --hero-background: radial-gradient(ellipse at top right,rgba(67,166,199,.09),transparent 50%),var(--d-surface-1);
   --sidebar-width: 252px;
