@@ -3030,5 +3030,31 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                         self.assertFalse(probe['occluded'] or probe['outside'],(width,height,mode,probe))
         self.assertEqual(self.explain_calls,0);self.assertEqual(self.comparative_posts,0)
 
+    async def test_d1_v2_table_focus_reveals_partially_clipped_trip_control(self):
+        reproduced=0
+        await self.dashboard();await self.open_advanced()
+        for width,height in ((1280,800),(800,800),(390,844)):
+            await self.page.set_viewport_size({'width':width,'height':height})
+            button=self.page.locator('[data-trip-detail-button]').first
+            await button.scroll_into_view_if_needed()
+            result=await button.evaluate('''button=>{
+                const wrap=button.closest('.assignment-evidence__table-wrap');
+                button.blur();wrap.scrollLeft=0;
+                const initial=button.getBoundingClientRect(),bounds=wrap.getBoundingClientRect();
+                wrap.scrollLeft=Math.max(0,initial.right-bounds.right-10);
+                const clipped=button.getBoundingClientRect().right>bounds.right+1;
+                const before={top:wrap.scrollTop,pageY:scrollY,left:wrap.scrollLeft};
+                button.focus({preventScroll:true});
+                const rect=button.getBoundingClientRect(),after=wrap.getBoundingClientRect();
+                return {clipped,before,focused:document.activeElement===button,
+                    right:rect.right,edge:after.right,left:wrap.scrollLeft,top:wrap.scrollTop,pageY:scrollY};
+            }''')
+            reproduced+=int(result['clipped'])
+            self.assertTrue(result['focused']);self.assertLessEqual(result['right'],result['edge']-5,result)
+            self.assertEqual(result['top'],result['before']['top']);self.assertEqual(result['pageY'],result['before']['pageY'])
+            if result['clipped']:self.assertGreater(result['left'],result['before']['left'])
+        self.assertGreater(reproduced,0)
+        self.assertEqual(self.explain_calls,0);self.assertEqual(self.comparative_posts,0);self.assertEqual(self.execution_bodies,[])
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
