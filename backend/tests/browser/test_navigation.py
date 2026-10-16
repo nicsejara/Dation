@@ -2188,7 +2188,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                     ['ready',true,{busy:true}],['error',false,{}],['ready',true,{}]]){
                     update({kind,enabled,message:'Estado de prueba'},options);
                     const s=getComputedStyle(button);
-                    snapshots.push({sameNode:bar.lastElementChild===button,
+                    snapshots.push({sameNode:bar.querySelector('.d-button')===button,
                         height:button.getBoundingClientRect().height,radius:s.borderRadius,
                         padding:s.paddingInlineStart,minWidth:s.minWidth,
                         disabled:button.disabled,busy:button.getAttribute('aria-busy'),
@@ -2219,6 +2219,37 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(snapshot['radius'],'18px')
                 self.assertEqual(snapshot['padding'],'24px')
                 self.assertEqual(snapshot['described'],'Estado de prueba')
+        self.assertEqual(self.execution_bodies,[])
+
+    async def test_workflow_bars_equalize_context_and_keep_a_wider_primary_action(self):
+        geometry='''bar=>{
+            const items=[...bar.querySelectorAll('.d-workflow-action-bar__item')];
+            const action=bar.querySelector('.d-button'),r=action.getBoundingClientRect();
+            return {items:items.map(el=>{const r=el.getBoundingClientRect();return {
+                width:r.width,height:r.height,clipped:el.scrollWidth>el.clientWidth||el.scrollHeight>el.clientHeight};}),
+                actionWidth:r.width,primary:getComputedStyle(action).backgroundImage!=='none',
+                overflow:document.documentElement.scrollWidth>innerWidth};
+        }'''
+        for width in (1440,1280,1024,768,390):
+            await self.page.set_viewport_size({'width':width,'height':1000})
+            for view,node in (('logistics-data',None),('logistics-config','logistics_assignment'),
+                              ('logistics-config','logistics_scheduling')):
+                await self.open(view,node)
+                bar=self.page.locator('.d-workflow-action-bar');await bar.wait_for()
+                if node is None:
+                    await self.page.locator('.d-workflow-action-bar[data-state="ready"]').wait_for()
+                for long_copy in (False,True):
+                    if long_copy:
+                        await bar.locator('.d-workflow-action-bar__item strong,.d-workflow-action-bar__item span').first.evaluate(
+                            "el=>el.textContent='Recursos disponibles para todas las operaciones seleccionadas y sus prioridades'")
+                    sizes=await bar.evaluate(geometry)
+                    self.assertEqual(len(sizes['items']),2 if node is None else 3)
+                    self.assertLess(max(x['width'] for x in sizes['items'])-min(x['width'] for x in sizes['items']),.25)
+                    self.assertLess(max(x['height'] for x in sizes['items'])-min(x['height'] for x in sizes['items']),.25)
+                    self.assertGreater(sizes['actionWidth'],max(x['width'] for x in sizes['items']))
+                    self.assertFalse(sizes['overflow'])
+                    self.assertTrue(sizes['primary'],(width,node,long_copy,sizes))
+                    self.assertTrue(all(not x['clipped'] for x in sizes['items']))
         self.assertEqual(self.execution_bodies,[])
 
     async def test_workflow_primitives_hero_supports_optional_metadata_and_panel(self):

@@ -49,11 +49,16 @@ export function createWorkflowActionBar({label, onContinue, onProblem, onSelect,
   button.setAttribute("aria-describedby", message.id);
   let action = null;
   button.addEventListener("click", () => { if (!button.disabled) action?.(); });
-  bar.append(meta, files, button);
+  const actions = node("div", null, "d-workflow-action-bar__actions");
+  actions.append(files, button);
+  bar.append(meta, actions);
 
   function update(result, {items = [], missingCount = 0, busy = false, storageAvailable = true} = {}) {
     const state = busy ? "validating" : result.enabled ? "ready" : result.kind;
     bar.dataset.state = state;
+    actions.dataset.contextCount = String(items.length);
+    actions.style.setProperty("--workflow-context-count", String(Math.max(1, items.length)));
+    files.hidden = items.length === 0;
     button.setAttribute("aria-busy", String(busy));
     files.replaceChildren(...items.map(({key, label: title, tone, value, target}) => {
       if (variant === "configuration") {

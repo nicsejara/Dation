@@ -118,7 +118,7 @@
   --workflow-action-radius: var(--radius-control);
   --workflow-action-padding-x: var(--space-5);
   --workflow-context-control-height: var(--control-height-lg);
-  --workflow-context-control-min-width: 12ch;
+  --workflow-context-control-min-width: 14ch;
   --workflow-action-min-width: calc(var(--workflow-context-control-min-width) + 2 * var(--workflow-action-padding-x));
   --hero-min-height: 220px;
   --hero-padding: 26px;

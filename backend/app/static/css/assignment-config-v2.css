@@ -140,7 +140,7 @@
 .assignment-config-root .assignment-resource-rule { grid-template-columns:auto auto; }
 @media(max-width:700px) { .assignment-config-root .assignment-config-hero { padding:20px; } }
 
-.assignment-config-root :where(button) { min-height:36px; padding:8px 12px; border:1px solid var(--d-border-control); border-radius:var(--radius-sm); background:var(--d-surface-2); color:var(--d-text-primary); font:inherit; cursor:pointer; }
+.assignment-config-root :where(button:not(.d-button,.d-workflow-action-bar__item)) { min-height:36px; padding:8px 12px; border:1px solid var(--d-border-control); border-radius:var(--radius-sm); background:var(--d-surface-2); color:var(--d-text-primary); font:inherit; cursor:pointer; }
 .assignment-config-root .assignment-choice-card.is-selected { border-color:var(--d-brand-teal-bright)!important; }
 .assignment-config-root .decision-advanced-option { cursor:not-allowed; color:var(--d-text-secondary); }
 .d-config-dialog .dispatch-actions button { min-height:40px; padding:8px 14px; border:1px solid var(--d-border-control); border-radius:var(--radius-sm); background:var(--d-surface-2); color:var(--d-text-primary); font:inherit; cursor:pointer; }
