@@ -1,5 +1,5 @@
 import {ensureStylesheet} from "./styles.mjs";
-import {createWorkflowActionBar} from "./workflow-action-bar.mjs";
+import {createWorkflowActionBar,WORKFLOW_ACTION_CLASS,workflowActionLabel} from "./workflow-action-bar.mjs";
 import {createScope,scopeFor,trapFocus} from "./lifecycle.mjs";
 import {esc} from "./shared.mjs";
 import {iconSvg} from "./decision-ui.mjs";
@@ -17,6 +17,20 @@ function attrs(values={}){
 export function displayDecisionCaseId(value){
   if(!value)return "—";
   return "DC-"+String(value).slice(0,8).toUpperCase();
+}
+
+/** Native review shell; callers own the rows, hooks, validation and execution. */
+export function executionReviewDialog({title,accessibleLabel=title,rows=[],note="",dialogAttributes={},executeAttributes={},errorAttributes={}}){
+  return '<dialog class="d-config-dialog d-execution-review" aria-label="'+esc(accessibleLabel)+'"'+attrs(dialogAttributes)+'><form method="dialog" class="d-execution-review__form">'
+    +'<header class="d-execution-review__header"><span class="d-execution-review__eyebrow">ANTES DE EJECUTAR</span><h2>'+esc(title)+'</h2></header>'
+    +'<div class="d-execution-review__rows dispatch-review-summary">'
+      +rows.map(({label,value})=>'<p class="d-execution-review__row"><strong>'+esc(label)+'</strong><span>'+esc(value??"—")+'</span></p>').join("")
+    +'</div>'
+    +(note?'<p class="d-execution-review__note">'+esc(note)+'</p>':'')
+    +'<p class="d-execution-review__error" role="alert"'+attrs({...errorAttributes,"data-config-review-error":true})+'></p>'
+    +'<footer class="d-execution-review__actions"><button class="d-button d-button--secondary d-button--lg" value="cancel">Volver</button>'
+      +'<button class="'+WORKFLOW_ACTION_CLASS+' d-button--primary" type="button"'+attrs(executeAttributes)+'>'+workflowActionLabel("Ejecutar decisión")+'</button></footer>'
+  +'</form></dialog>';
 }
 
 export function middleEllipsis(value,max=36){

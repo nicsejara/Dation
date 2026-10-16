@@ -2186,6 +2186,128 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                 self.assertIn('view=decision-dashboard',self.page.url)
                 self.assertEqual(await self.page.locator('dialog[open]').count(),0)
 
+    async def test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports(self):
+        theme=(Path(__file__).parent/'theme_audit.js').read_text()
+        focus=(Path(__file__).parent/'focus_audit.js').read_text()
+        await self.page.emulate_media(reduced_motion='reduce')
+        for width,height in ((1440,1000),(1280,1000),(1024,1000),(768,1000),(390,844),(360,250)):
+            await self.page.set_viewport_size({'width':width,'height':height})
+            reference=None
+            for kind in ('assignment','scheduling'):
+                with self.subTest(width=width,height=height,kind=kind):
+                    await self.open('logistics-config','logistics_'+kind)
+                    trigger=self.page.locator('[data-config-review]' if kind=='assignment' else '[data-scheduling-review]')
+                    before=len(self.requests);url=self.page.url
+                    await trigger.focus();await self.page.keyboard.press('Enter')
+                    dialog=self.page.locator('dialog.d-execution-review[open]');await dialog.wait_for()
+                    labels=await dialog.locator('.d-execution-review__row strong').all_text_contents()
+                    self.assertEqual(labels,['Decision Case','Alcance','Objetivo','Prioridades','Recursos'] if kind=='assignment'
+                        else ['Decision Case','Entrada','Ventana','Reglas por foco','Objetivo','Recursos'])
+                    self.assertEqual(await dialog.locator('.d-execution-review__note').count(),int(kind=='assignment'))
+                    self.assertEqual(await dialog.locator('form').get_attribute('method'),'dialog')
+                    self.assertTrue(await dialog.evaluate("el=>el.matches(':modal')"))
+                    self.assertEqual(await dialog.locator('[data-config-review-error]').inner_text(),'')
+                    styles=await dialog.evaluate('''el=>{
+                        const style=node=>{const s=getComputedStyle(node);return Object.fromEntries(
+                            ['padding','borderRadius','borderColor','boxShadow','background','color','font','gap','display',
+                             'maxWidth','maxHeight','gridTemplateColumns','animationName','minHeight'].map(k=>[k,s[k]]));};
+                        return {shell:style(el),width:el.getBoundingClientRect().width,
+                            header:style(el.querySelector('header')),heading:style(el.querySelector('h2')),
+                            eyebrow:style(el.querySelector('.d-execution-review__eyebrow')),
+                            rows:style(el.querySelector('.d-execution-review__rows')),
+                            row:style(el.querySelector('.d-execution-review__row')),
+                            label:style(el.querySelector('.d-execution-review__row strong')),
+                            value:style(el.querySelector('.d-execution-review__row span')),
+                            footer:style(el.querySelector('footer')),
+                            buttons:[...el.querySelectorAll('button')].map(style)};
+                    }''')
+                    if reference is None:reference=styles
+                    self.assertEqual(styles,reference)
+                    self.assertEqual(styles['width'],min(650,width-32))
+                    self.assertEqual(styles['shell']['animationName'],'none')
+                    audit=await self.page.evaluate(theme,'dialog[open]')
+                    self.assertFalse(audit['overflow']);self.assertEqual(audit['failures'],[])
+                    buttons=dialog.get_by_role('button')
+                    await buttons.last.focus();await self.page.keyboard.press('Tab')
+                    self.assertTrue(await buttons.first.evaluate('el=>el===document.activeElement'))
+                    await self.page.keyboard.press('Shift+Tab')
+                    self.assertTrue(await buttons.last.evaluate('el=>el===document.activeElement'))
+                    for button in await buttons.all():
+                        await button.focus()
+                        probe=await self.page.evaluate(focus)
+                        self.assertTrue(probe['visibleFocus']);self.assertGreaterEqual(probe['width'],3)
+                        self.assertFalse(probe['outside']);self.assertFalse(probe['occluded'])
+                    await self.page.keyboard.press('Escape')
+                    self.assertEqual(await self.page.locator('dialog[open]').count(),0)
+                    self.assertTrue(await trigger.evaluate('el=>el===document.activeElement'))
+                    self.assertEqual(self.page.url,url)
+                    self.assertEqual(self.requests[before:],[])
+        self.assertEqual(self.execution_bodies,[])
+
+    async def test_workflow_review_escapes_content_and_wraps_long_values(self):
+        await self.open('logistics-config','logistics_assignment')
+        for width,height in ((1440,1000),(390,844),(360,250)):
+            await self.page.set_viewport_size({'width':width,'height':height})
+            result=await self.page.evaluate('''async()=>{
+                const {executionReviewDialog}=await import('/static/js/dispatch/decision-config-ui.mjs');
+                const owner=document.createElement('div'),text='<img src=x onerror=alert(1)>',long='Prioridad'.repeat(80);
+                owner.innerHTML=executionReviewDialog({title:text,accessibleLabel:'Revisar "prueba"',
+                    dialogAttributes:{'data-owner':'<unsafe>"'},executeAttributes:{'data-test-confirm':true},
+                    rows:[{label:text,value:long},{label:'Cero',value:0},{label:'Sin valor',value:null}],note:text});
+                document.body.append(owner);const dialog=owner.querySelector('dialog');dialog.showModal();
+                const result={title:dialog.querySelector('h2').textContent,label:dialog.getAttribute('aria-label'),
+                    hook:dialog.dataset.owner,images:dialog.querySelectorAll('img').length,
+                    values:[...dialog.querySelectorAll('.d-execution-review__row span')].map(el=>el.textContent),
+                    note:dialog.querySelector('.d-execution-review__note').textContent,
+                    overflow:[dialog,...dialog.querySelectorAll('p,h2,span,strong')].some(el=>el.scrollWidth>el.clientWidth),
+                    bounded:dialog.getBoundingClientRect().height<=innerHeight-32,
+                    execute:dialog.querySelector('[data-test-confirm]').type};
+                dialog.close();owner.remove();return result;
+            }''')
+            self.assertEqual(result['title'],'<img src=x onerror=alert(1)>')
+            self.assertEqual(result['label'],'Revisar "prueba"');self.assertEqual(result['hook'],'<unsafe>"')
+            self.assertEqual(result['images'],0);self.assertEqual(result['note'],result['title'])
+            self.assertEqual(result['values'],['Prioridad'*80,'0','—'])
+            self.assertFalse(result['overflow']);self.assertTrue(result['bounded']);self.assertEqual(result['execute'],'button')
+
+    async def test_workflow_review_retry_preserves_feedback_and_guards_execution(self):
+        await self.open('logistics-config','logistics_assignment')
+        await self.page.evaluate('''async()=>{
+            const {executionReviewDialog,bindConfigReview,mountConfigActionBar}=await import('/static/js/dispatch/decision-config-ui.mjs');
+            const {createScope}=await import('/static/js/dispatch/lifecycle.mjs');
+            const owner=document.createElement('div');owner.id='review-retry-fixture';
+            owner.style.cssText='position:fixed;top:16px;right:16px;z-index:10000';
+            owner.innerHTML='<button data-retry-trigger>Revisar prueba</button>'+executionReviewDialog({title:'Reintento',
+                rows:[{label:'Objetivo',value:'Balanceado'}],executeAttributes:{'data-retry-execute':true}});
+            document.body.append(owner);const scope=createScope(owner);mountConfigActionBar(owner);
+            window.__reviewRetry={calls:0,scope,owner};
+            bindConfigReview({dialog:owner.querySelector('dialog'),trigger:owner.querySelector('[data-retry-trigger]'),
+                executeSelector:'[data-retry-execute]',onExecute:()=>{
+                    window.__reviewRetry.calls++;
+                    return new Promise((resolve,reject)=>Object.assign(window.__reviewRetry,{resolve,reject}));
+                }});
+        }''')
+        trigger=self.page.locator('[data-retry-trigger]');dialog=self.page.locator('#review-retry-fixture dialog')
+        execute=self.page.locator('[data-retry-execute]')
+        await trigger.click();await execute.click()
+        self.assertFalse(await dialog.is_visible());self.assertTrue(await execute.is_disabled())
+        self.assertEqual(await execute.get_attribute('aria-busy'),'true')
+        await self.page.evaluate("document.querySelector('[data-retry-trigger]').click();document.querySelector('[data-retry-execute]').dispatchEvent(new MouseEvent('click',{bubbles:true}))")
+        self.assertEqual(await self.page.evaluate('window.__reviewRetry.calls'),1)
+        await self.page.evaluate("window.__reviewRetry.reject(new Error('No se pudo iniciar. Volvé a intentar.'))")
+        await dialog.wait_for(state='visible')
+        self.assertIn('Volvé a intentar',await dialog.locator('[role=alert]').inner_text())
+        self.assertFalse(await execute.is_disabled());self.assertIsNone(await execute.get_attribute('aria-busy'))
+        await self.page.keyboard.press('Escape')
+        self.assertTrue(await trigger.evaluate('el=>el===document.activeElement'))
+        await trigger.click();self.assertEqual(await dialog.locator('[role=alert]').inner_text(),'')
+        self.assertIn('Balanceado',await dialog.inner_text())
+        await execute.click();self.assertEqual(await self.page.evaluate('window.__reviewRetry.calls'),2)
+        await self.page.evaluate('window.__reviewRetry.scope.dispose();window.__reviewRetry.reject(new Error("Respuesta tardía"))')
+        self.assertFalse(await dialog.is_visible())
+        await self.page.evaluate('window.__reviewRetry.owner.remove();delete window.__reviewRetry')
+        self.assertEqual(self.execution_bodies,[])
+
     async def test_workflow_primitives_preserve_action_identity_states_and_token_overrides(self):
         await self.open('logistics-data')
         await self.page.locator('.d-workflow-action-bar').wait_for()

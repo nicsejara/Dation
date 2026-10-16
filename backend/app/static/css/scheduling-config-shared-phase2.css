@@ -323,14 +323,6 @@
   text-transform:uppercase;
 }
 
-.scheduling-config-v2 .scheduling-review .dispatch-review-summary{
-  margin-top:16px;
-}
-
-.scheduling-config-v2 .scheduling-review-actions{
-  margin-top:17px;
-}
-
 @media(max-width:820px){.scheduling-config-v2 .scheduling-source,
   .scheduling-config-v2 .scheduling-resource-policy{
     grid-template-columns:1fr;

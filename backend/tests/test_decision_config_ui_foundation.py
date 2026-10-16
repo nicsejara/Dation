@@ -14,6 +14,7 @@ class DecisionConfigUiFoundationTests(unittest.TestCase):
     def test_shared_module_exposes_canonical_primitives(self):
         for name in (
             "decisionHero",
+            "executionReviewDialog",
             "decisionCaseCard",
             "decisionDataFileCard",
             "decisionSectionHeader",
@@ -48,6 +49,7 @@ class DecisionConfigUiFoundationTests(unittest.TestCase):
         self.assertIn('from "./decision-config-ui.mjs"', self.assignment)
         for name in (
             "decisionHero(",
+            "executionReviewDialog(",
             "decisionCaseCard(",
             "decisionDataFileCard(",
             "decisionSectionHeader(",
@@ -64,6 +66,7 @@ class DecisionConfigUiFoundationTests(unittest.TestCase):
         self.assertIn('from "./decision-config-ui.mjs"', self.scheduling)
         for name in (
             "decisionHero(",
+            "executionReviewDialog(",
             "decisionCaseCard(",
             "decisionDataFileCard(",
             "decisionSectionHeader(",
