@@ -2069,12 +2069,12 @@ body.dispatch-drawer-open {
 .dispatch-review-row:last-child{border-bottom:0}
 .dispatch-review-row strong{display:block}
 .dispatch-review-row select{margin:0}
-.dispatch-review-summary{display:grid;gap:0;border:1px solid var(--d-border-control);border-radius:12px;overflow:hidden;margin:16px 0}
-.dispatch-review-summary p{display:grid;grid-template-columns:145px minmax(0,1fr);gap:16px;margin:0;padding:11px 13px;border-bottom:1px solid var(--d-border-control);}
-.dispatch-review-summary p:last-child{border-bottom:0}
-.dispatch-review-summary span{color:var(--color-text);}
+.dispatch-review-summary:where(:not(.d-execution-review__rows)){display:grid;gap:0;border:1px solid var(--d-border-control);border-radius:12px;overflow:hidden;margin:16px 0}
+.dispatch-review-summary:where(:not(.d-execution-review__rows)) p{display:grid;grid-template-columns:145px minmax(0,1fr);gap:16px;margin:0;padding:11px 13px;border-bottom:1px solid var(--d-border-control);}
+.dispatch-review-summary:where(:not(.d-execution-review__rows)) p:last-child{border-bottom:0}
+.dispatch-review-summary:where(:not(.d-execution-review__rows)) span{color:var(--color-text);}
 @media(max-width:1000px){.dispatch-objective-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:760px){.dispatch-evidence-card,.dispatch-dimensions{grid-template-columns:minmax(0,1fr)}.dispatch-evidence-card button{width:100%}.dispatch-objective-grid{grid-template-columns:minmax(0,1fr)}.dispatch-config-section{padding:20px}.dispatch-locked-model{align-items:flex-start;flex-direction:column}.dispatch-review-row{grid-template-columns:minmax(0,1fr)}.dispatch-review-summary p{grid-template-columns:minmax(0,1fr);gap:4px}}
+@media(max-width:760px){.dispatch-evidence-card,.dispatch-dimensions{grid-template-columns:minmax(0,1fr)}.dispatch-evidence-card button{width:100%}.dispatch-objective-grid{grid-template-columns:minmax(0,1fr)}.dispatch-config-section{padding:20px}.dispatch-locked-model{align-items:flex-start;flex-direction:column}.dispatch-review-row{grid-template-columns:minmax(0,1fr)}.dispatch-review-summary:where(:not(.d-execution-review__rows)) p{grid-template-columns:minmax(0,1fr);gap:4px}}
 
 
 /* Focused decision dashboard */

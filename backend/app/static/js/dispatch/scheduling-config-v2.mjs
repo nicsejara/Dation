@@ -1,7 +1,7 @@
 import {createScope,scopeFor} from "./lifecycle.mjs";
 import {ensureDecisionCaseStyles} from "./styles.mjs";
 import {api,esc,num,post} from "./shared.mjs";
-import {WORKFLOW_ACTION_CLASS,workflowActionLabel} from "./workflow-action-bar.mjs";
+import {workflowActionLabel} from "./workflow-action-bar.mjs";
 import {
   configSummaryBar,
   decisionCaseCard,
@@ -11,6 +11,7 @@ import {
   mountConfigActionBar,
   attentionToConfig,
   bindConfigReview,
+  executionReviewDialog,
   displayDecisionCaseId,
   ensureDecisionConfigStyle,
   decisionHero,
@@ -357,19 +358,21 @@ function summaryBar(config,stats,slaAvailable){
 }
 
 function reviewDialog(config,stats,sourceRun,caseId){
-  return '<dialog class="dispatch dispatch-review d-config-dialog assignment-review-dialog scheduling-review" data-scheduling-review-dialog aria-label="Revisar Scheduling antes de ejecutar"><form method="dialog">'
-    +'<span class="assignment-section__eyebrow">ANTES DE EJECUTAR</span><h2>Revisar planificación</h2>'
-    +'<div class="dispatch-review-summary scheduling-review-grid">'
-      +'<p><strong>Decision Case</strong><span>'+esc(displayDecisionCaseId(caseId))+'</span></p>'
-      +'<p><strong>Entrada</strong><span>'+num(stats.totalTrips)+' viajes de Assignment · Run '+esc(formatRunId(sourceRun.id))+'</span></p>'
-      +'<p><strong>Ventana</strong><span>'+esc(windowLabel(config))+'</span></p>'
-      +'<p><strong>Reglas por foco</strong><span>'+esc(rulesLabel(config,stats.trips))+'</span></p>'
-      +'<p><strong>Objetivo</strong><span>'+esc(objectiveLabel(config))+'</span></p>'
-      +'<p><strong>Recursos</strong><span>Heredados de la asignación aprobada</span></p>'
-    +'</div>'
-    +'<div role="alert" data-config-review-error data-scheduling-review-error></div>'
-    +'<div class="dispatch-actions scheduling-review-actions"><button value="cancel">Volver</button><button class="'+WORKFLOW_ACTION_CLASS+' d-button--primary" type="button" data-scheduling-execute>'+workflowActionLabel("Ejecutar decisión")+'</button></div>'
-  +'</form></dialog>';
+  return executionReviewDialog({
+    title:"Revisar planificación",
+    accessibleLabel:"Revisar Scheduling antes de ejecutar",
+    dialogAttributes:{"data-scheduling-review-dialog":true},
+    executeAttributes:{"data-scheduling-execute":true},
+    errorAttributes:{"data-scheduling-review-error":true},
+    rows:[
+      {label:"Decision Case",value:displayDecisionCaseId(caseId)},
+      {label:"Entrada",value:num(stats.totalTrips)+' viajes de Assignment · Run '+formatRunId(sourceRun.id)},
+      {label:"Ventana",value:windowLabel(config)},
+      {label:"Reglas por foco",value:rulesLabel(config,stats.trips)},
+      {label:"Objetivo",value:objectiveLabel(config)},
+      {label:"Recursos",value:"Heredados de la asignación aprobada"},
+    ],
+  });
 }
 
 function markup({state,sourceRun,slaAvailable,config}){

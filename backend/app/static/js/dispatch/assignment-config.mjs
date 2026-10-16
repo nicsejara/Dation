@@ -3,7 +3,6 @@ import {mountFilterCollapse} from "./assignment-filter-collapse.mjs";
 import {ensureDecisionCaseStyles} from "./styles.mjs";
 import {esc,num,post,api} from "./shared.mjs";
 import {iconSvg} from "./decision-ui.mjs";
-import {WORKFLOW_ACTION_CLASS,workflowActionLabel} from "./workflow-action-bar.mjs";
 import {
   configSummaryBar,
   decisionCaseCard,
@@ -13,6 +12,7 @@ import {
   mountConfigActionBar,
   attentionToConfig,
   bindConfigReview,
+  executionReviewDialog,
   displayDecisionCaseId,
   updateConfigActionBar,
   ensureDecisionConfigStyle,
@@ -402,19 +402,20 @@ function reviewDialog(state,preview,capabilities){
   const priority=state.objective==="custom"
     ?dims.map(key=>DIMENSION_LABELS[key]+' '+(effective?.[key]||0)+' %').join(' · ')
     :"Definido por el objetivo seleccionado";
-  return '<dialog class="dispatch dispatch-review d-config-dialog assignment-review-dialog" data-assignment-review-dialog aria-label="Revisar Assignment antes de ejecutar"><form method="dialog">'
-    +'<span class="assignment-section__eyebrow">ANTES DE EJECUTAR</span><h2>Revisá tu configuración</h2>'
-    +'<div class="dispatch-review-summary">'
-      +'<p><strong>Decision Case</strong><span>'+esc(displayDecisionCaseId(state.decisionCase?.id))+'</span></p>'
-      +'<p><strong>Alcance</strong><span>'+esc(scopeSummary(preview,state.scopeFilters||[]))+'</span></p>'
-      +'<p><strong>Objetivo</strong><span>'+esc(OBJECTIVE_LABELS[state.objective]||"Balanceado")+'</span></p>'
-      +'<p><strong>Prioridades</strong><span>'+esc(priority)+'</span></p>'
-      +'<p><strong>Recursos</strong><span>'+esc(RESOURCE_MODES[state.resourceMode]?.label||"Mixta")+'</span></p>'
-    +'</div>'
-    +'<p class="assignment-review-note">La decisión distribuirá la carga entre los recursos habilitados. Las fechas y el calendario se resolverán después en Planificación de despachos.</p>'
-    +'<p role="alert" data-config-review-error></p>'
-    +'<div class="dispatch-actions"><button value="cancel">Volver</button><button class="'+WORKFLOW_ACTION_CLASS+' d-button--primary" type="button" data-config-execute>'+workflowActionLabel("Ejecutar decisión")+'</button></div>'
-  +'</form></dialog>';
+  return executionReviewDialog({
+    title:"Revisá tu configuración",
+    accessibleLabel:"Revisar Assignment antes de ejecutar",
+    dialogAttributes:{"data-assignment-review-dialog":true},
+    executeAttributes:{"data-config-execute":true},
+    rows:[
+      {label:"Decision Case",value:displayDecisionCaseId(state.decisionCase?.id)},
+      {label:"Alcance",value:scopeSummary(preview,state.scopeFilters||[])},
+      {label:"Objetivo",value:OBJECTIVE_LABELS[state.objective]||"Balanceado"},
+      {label:"Prioridades",value:priority},
+      {label:"Recursos",value:RESOURCE_MODES[state.resourceMode]?.label||"Mixta"},
+    ],
+    note:"La decisión distribuirá la carga entre los recursos habilitados. Las fechas y el calendario se resolverán después en Planificación de despachos.",
+  });
 }
 
 function filterDialog(preview){
