@@ -1810,6 +1810,22 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         root=self.page.locator('[data-home-dda-catalog]')
         for width,height in ((1680,1050),(1440,1000),(1280,1000),(1024,1000),(768,1000),(699,1000),(390,844),(360,250),(320,568),(320,256),(568,320)):
             await self.page.set_viewport_size({'width':width,'height':height})
+            # Every selection keeps equally sized pills filling each complete row.
+            for category in ('all','supply-chain','operations','production','commercial','assets'):
+                await root.locator('[data-dda-filter='+category+']').evaluate('el=>el.click()')
+                pills=await root.locator('[data-dda-filter]').evaluate_all('''els=>els.map(el=>{
+                    const r=el.getBoundingClientRect(),s=getComputedStyle(el),p=el.parentElement.getBoundingClientRect();
+                    return {x:r.x,right:r.right,y:r.y,width:r.width,height:r.height,left:p.x,end:p.right,
+                        overflow:el.scrollWidth>el.clientWidth+1,radius:parseFloat(s.borderRadius)};})''')
+                self.assertLess(max(p['width'] for p in pills)-min(p['width'] for p in pills),1,(width,category,pills))
+                self.assertLess(max(p['height'] for p in pills)-min(p['height'] for p in pills),1,(width,category,pills))
+                for pill in pills:
+                    peers=[p for p in pills if abs(p['y']-pill['y'])<1]
+                    self.assertAlmostEqual(min(p['x'] for p in peers),pill['left'],delta=1)
+                    self.assertAlmostEqual(max(p['right'] for p in peers),pill['end'],delta=1)
+                    self.assertFalse(pill['overflow'],(width,category,pills))
+                    self.assertGreaterEqual(pill['radius'],pill['height']/2)
+            await root.locator('[data-dda-filter=all]').evaluate('el=>el.click()')
             audit=await self.page.evaluate(theme)
             self.assertFalse(audit['overflow'],(width,audit));self.assertEqual(audit['failures'],[],width)
             rows=await root.locator('.d-home__asset').evaluate_all('''els=>els.map(el=>{
@@ -1819,6 +1835,12 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                 self.assertLess(max(peer['height'] for peer in peers)-min(peer['height'] for peer in peers),1)
             columns=await root.locator('.d-home__asset-grid').evaluate('el=>getComputedStyle(el).gridTemplateColumns.split(" ").length')
             self.assertEqual(columns,1 if width<700 else 2 if width<=1100 else 2 if width==1280 else 3)
+            production=root.locator('.d-home__production-icon')
+            icon=await production.evaluate('el=>({color:getComputedStyle(el).backgroundColor,mask:getComputedStyle(el).maskImage,filter:getComputedStyle(el).filter})')
+            self.assertIn('/static/assets/dda-production.svg',icon['mask'])
+            self.assertEqual(icon['filter'],'none')
+            for other in await root.locator('.d-home__asset--coming-soon .d-home__asset-icon svg').all():
+                self.assertEqual(icon['color'],await other.evaluate('el=>getComputedStyle(el).stroke'))
             for button in await root.locator('[data-dda-filter],#home-open-logistics').all():
                 await button.focus()
                 self.assertEqual(await button.evaluate('el=>getComputedStyle(el).outlineWidth'),'3px')
