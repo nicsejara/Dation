@@ -732,6 +732,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         button=self.page.locator('[data-dashboard-toolbar] [data-approve-toolbar]')
         await button.click()
         self.assertTrue(await button.is_disabled());self.assertEqual(await button.inner_text(),'Aprobando…')
+        self.assertEqual(await button.get_attribute('aria-busy'),'true')
+        self.assertEqual(await button.evaluate("el=>getComputedStyle(el,'::after').animationName"),'d-workflow-spin')
         await button.dispatch_event('click')
         await self.page.wait_for_function("document.querySelector('[data-status-badge]').textContent==='Aprobada'")
         self.assertEqual(self.approval_calls,1);self.assertFalse(await button.is_visible())
@@ -743,6 +745,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         button=self.page.locator('[data-approve-toolbar]');await button.click()
         await self.page.locator('[data-approval-error]').wait_for(state='visible')
         self.assertFalse(await button.is_disabled());self.assertEqual(await button.inner_text(),'Aprobar asignación')
+        self.assertIsNone(await button.get_attribute('aria-busy'))
         self.assertIn('Fallo sintético',await self.page.locator('[data-approval-error]').inner_text())
         self.assertIsNone(self.case['nodes']['logistics_assignment']['approved_run_id'])
         self.assertEqual(await self.page.locator('[data-status-badge]').inner_text(),'En revisión')
@@ -2172,6 +2175,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.page.locator('.d-workflow-action-bar').wait_for()
         for width in (1440,1280,1024,768,390):
             await self.page.set_viewport_size({'width':width,'height':1000})
+            await self.page.emulate_media(reduced_motion='reduce' if width==390 else 'no-preference')
             result=await self.page.evaluate('''async()=>{
                 const {createWorkflowActionBar}=await import('/static/js/dispatch/workflow-action-bar.mjs');
                 let continued=0,corrected=0;
@@ -2192,6 +2196,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                         height:button.getBoundingClientRect().height,radius:s.borderRadius,
                         padding:s.paddingInlineStart,minWidth:s.minWidth,
                         disabled:button.disabled,busy:button.getAttribute('aria-busy'),
+                        spinner:getComputedStyle(button,'::after').animationName,
+                        iconDisplay:getComputedStyle(button.querySelector('svg')).display,
                         primary:s.backgroundImage!=='none',
                         described:document.getElementById(button.getAttribute('aria-describedby'))?.textContent});
                     button.click();
@@ -2213,6 +2219,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual([s['busy'] for s in result['snapshots']],['false','false','true','false','false'])
             self.assertFalse(result['snapshots'][3]['primary'],'Corrective actions keep their secondary role')
             self.assertTrue(result['snapshots'][1]['primary'])
+            self.assertEqual(result['snapshots'][2]['spinner'],'none' if width==390 else 'd-workflow-spin')
+            self.assertEqual(result['snapshots'][2]['iconDisplay'],'none')
             for snapshot in result['snapshots']:
                 self.assertTrue(snapshot['sameNode'])
                 self.assertEqual(snapshot['height'],58)
@@ -2250,6 +2258,65 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                     self.assertFalse(sizes['overflow'])
                     self.assertTrue(sizes['primary'],(width,node,long_copy,sizes))
                     self.assertTrue(all(not x['clipped'] for x in sizes['items']))
+        self.assertEqual(self.execution_bodies,[])
+
+    async def test_workflow_progressive_actions_share_styles_arrow_and_keyboard_focus(self):
+        original_case=copy.deepcopy(self.case)
+        original_run=copy.deepcopy(self.f['runs']['assignment'])
+        await self.page.emulate_media(reduced_motion='reduce')
+        reference=None
+        async def check(button,label):
+            nonlocal reference
+            await button.wait_for(state='visible')
+            await self.page.mouse.move(0,0)
+            await self.page.keyboard.press('Tab')
+            await button.focus()
+            actual=await button.evaluate('''el=>{
+                const s=getComputedStyle(el),icon=el.querySelector('svg'),i=getComputedStyle(icon);
+                return {minHeight:s.minHeight,padding:s.padding,radius:s.borderRadius,
+                    font:s.font,fontWeight:s.fontWeight,gap:s.gap,background:s.backgroundImage,color:s.color,
+                    outline:s.outline,offset:s.outlineOffset,iconWidth:i.width,iconHeight:i.height,
+                    iconCount:el.querySelectorAll('svg').length,decorative:icon.getAttribute('aria-hidden'),
+                    textArrow:el.textContent.includes('→'),focused:document.activeElement===el,
+                    clipped:el.scrollWidth>el.clientWidth||el.scrollHeight>el.clientHeight,
+                    workflow:el.classList.contains('d-button--workflow')};
+            }''')
+            self.assertTrue(actual.pop('focused'),label)
+            self.assertFalse(actual.pop('clipped'),label)
+            self.assertTrue(actual.pop('workflow'),label)
+            self.assertEqual(actual['iconCount'],1,label)
+            self.assertEqual(actual['decorative'],'true',label)
+            self.assertFalse(actual['textArrow'],label)
+            self.assertIn('linear-gradient',actual['background'],label)
+            if reference is None:reference=actual
+            self.assertEqual(actual,reference,label)
+        for width in (1440,1280,1024,768,390):
+            await self.page.set_viewport_size({'width':width,'height':1000})
+            self.case.clear();self.case.update(copy.deepcopy(original_case))
+            self.f['runs']['assignment'].clear();self.f['runs']['assignment'].update(copy.deepcopy(original_run))
+            await self.open('logistics-data')
+            await self.page.locator('.d-workflow-action-bar[data-state="ready"]').wait_for()
+            await check(self.page.locator('.d-workflow-action-bar .d-button'),'data')
+            self.case['nodes']=copy.deepcopy(self.f['initial_case']['nodes'])
+            await self.open('logistics-map')
+            await check(self.page.locator('[data-map-action="configure"]'),'map')
+            self.case.clear();self.case.update(copy.deepcopy(original_case))
+            for kind in ('assignment','scheduling'):
+                await self.open('logistics-config','logistics_'+kind)
+                trigger=self.page.locator('[data-config-review]' if kind=='assignment' else '[data-scheduling-review]')
+                await check(trigger,kind+'-review')
+                await trigger.click()
+                await check(self.page.locator('[data-config-execute]' if kind=='assignment' else '[data-scheduling-execute]'),kind+'-execute')
+                self.assertFalse(await self.page.locator('dialog[open] button[value="cancel"]').evaluate("el=>el.classList.contains('d-button--primary')"))
+                await self.page.keyboard.press('Escape')
+            await self.open('decision-dashboard','logistics_scheduling',self.f['ids']['scheduling'])
+            await check(self.page.locator('[data-approve-toolbar]'),'scheduling-approve')
+            self.review_assignment();await self.dashboard()
+            await check(self.page.locator('[data-approve-toolbar]'),'assignment-approve')
+            await self.page.locator('[data-approve-toolbar]').click()
+            await check(self.page.locator('[data-after-approve]'),'continue')
+            self.assertFalse(await self.page.locator('[data-dashboard-map]').evaluate("el=>el.classList.contains('d-button--primary')"))
+        self.assertEqual(self.approval_calls,5)
         self.assertEqual(self.execution_bodies,[])
 
     async def test_workflow_primitives_hero_supports_optional_metadata_and_panel(self):

@@ -35,7 +35,15 @@
   white-space: normal;
   overflow-wrap: anywhere;
 }
-.d-button svg { width: 18px; height: 18px; flex: 0 0 18px; }
+.d-button svg { width: var(--control-icon-size); height: var(--control-icon-size); flex: 0 0 var(--control-icon-size); }
+.d-button--workflow>span { min-width:0; }
+.d-button--workflow[aria-busy="true"]>svg { display:none; }
+.d-button--workflow[aria-busy="true"]::after {
+  content:""; box-sizing:border-box; inline-size:var(--control-icon-size); block-size:var(--control-icon-size);
+  flex:0 0 var(--control-icon-size); border:2px solid currentColor; border-right-color:transparent;
+  border-radius:var(--radius-pill); animation:d-workflow-spin .8s linear infinite;
+}
+@keyframes d-workflow-spin { to { transform:rotate(360deg); } }
 .d-button:focus-visible { outline: 3px solid var(--d-brand-teal-bright); outline-offset: 3px; box-shadow: 0 0 0 3px var(--d-bg-0); }
 .d-button:active:not(:disabled):not([aria-disabled="true"]) { transform: none; }
 .d-button:disabled, .d-button[aria-disabled="true"] {
@@ -77,6 +85,7 @@
 @media(prefers-reduced-motion:reduce) {
   .d-button, .d-page-hero, .view.is-active, .trace-panel.is-active { animation: none; transition: none; }
   .d-button:hover:not(:disabled):not([aria-disabled="true"]) { transform: none; }
+  .d-button--workflow[aria-busy="true"]::after { animation:none; }
 }
 
 /* One shared, content-sized footer. State and action ownership stays with the caller. */
@@ -108,7 +117,7 @@
 .d-workflow-action-bar__items[hidden] { display:none; }
 .d-workflow-action-bar__item { display:inline-flex; gap:6px; align-items:center; min-width:0; min-height:var(--workflow-context-control-height); box-sizing:border-box; padding:6px 8px; border:1px solid var(--d-border); border-radius:var(--radius-control); background:var(--d-surface-2); font:600 11px/1.35 var(--font-sans); color:var(--d-text-secondary); overflow-wrap:anywhere; }
 .d-workflow-action-bar__item span { min-width:0; }
-.d-workflow-action-bar svg { width:16px; height:16px; flex:0 0 16px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.d-workflow-action-bar__item svg { width:16px; height:16px; flex:0 0 16px; }
 .d-workflow-action-bar__item.is-success { color:var(--d-success); }
 .d-workflow-action-bar__item.is-warning { color:var(--d-warning); }
 .d-workflow-action-bar__item.is-error { color:var(--d-danger); }

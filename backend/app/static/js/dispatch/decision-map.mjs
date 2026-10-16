@@ -2,6 +2,7 @@ import {createScope,scopeFor} from "./lifecycle.mjs";
 import {ensureDecisionCaseStyles} from "./styles.mjs";
 import {api,esc,num} from "./shared.mjs";
 import {STATUS,deriveDecisionNodes} from "./decision-case.mjs";
+import {WORKFLOW_ACTION_CLASS,workflowActionLabel} from "./workflow-action-bar.mjs";
 import {createGuideDrawer} from "./upload/guide-drawer.mjs";
 import {
   DECISION_ORDER,
@@ -220,10 +221,10 @@ function nodeActionMarkup(nodeId,presentation){
     +'</div>';
   }
   if(action?.action){
-    return '<button type="button" class="dispatch-decision-node__action" '
+    const primary=action.action!=="open-result"||presentation.status===STATUS.REVIEW;
+    return '<button type="button" class="dispatch-decision-node__action '+(primary?WORKFLOW_ACTION_CLASS+' d-button--primary':'d-button')+'" '
       +'data-map-action="'+esc(action.action)+'" data-map-node="'+esc(nodeId)+'">'
-      +esc(action.label||"Continuar →")
-      +iconSvg("arrowRight","dispatch-map-icon")
+      +workflowActionLabel(action.label||"Continuar")
     +'</button>';
   }
   if(waiting&&presentation.waitingFor){

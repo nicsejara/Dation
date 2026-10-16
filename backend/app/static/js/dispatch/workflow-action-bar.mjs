@@ -1,4 +1,28 @@
+import {esc} from "./shared.mjs";
+
+export const WORKFLOW_ACTION_CLASS = "d-button d-button--workflow";
 let sequence = 0;
+
+const paths = {
+  orders: '<path d="M9 4h6v4H9zM9 6H5v15h14V6h-4M9 12h6M9 16h6"/>',
+  fleet: '<path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/>',
+  success: '<path d="m5 12 4 4L19 6"/>',
+  warning: '<path d="M12 3 2 21h20ZM12 9v5M12 17v1"/>',
+  error: '<circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16v1"/>',
+  pending: '<circle cx="12" cy="12" r="8"/>',
+  validating: '<path d="M21 12a9 9 0 1 1-3-6.7"/>',
+  arrow: '<path d="M4 12h16m-6-6 6 6-6 6"/>',
+};
+
+function iconMarkup(name) {
+  return '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'
+    +(paths[name]||paths.pending)+'</svg>';
+}
+
+/** Shared label and trailing decorative arrow; action owners retain their hooks. */
+export function workflowActionLabel(label) {
+  return '<span>'+esc(String(label??"").replace(/\s*→\s*$/u,""))+'</span>'+iconMarkup("arrow");
+}
 
 function node(tag, text, className = "") {
   const element = document.createElement(tag);
@@ -8,21 +32,9 @@ function node(tag, text, className = "") {
 }
 
 function icon(name) {
-  const paths = {
-    orders: '<path d="M9 4h6v4H9zM9 6H5v15h14V6h-4M9 12h6M9 16h6"/>',
-    fleet: '<path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/>',
-    success: '<path d="m5 12 4 4L19 6"/>',
-    warning: '<path d="M12 3 2 21h20ZM12 9v5M12 17v1"/>',
-    error: '<circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16v1"/>',
-    pending: '<circle cx="12" cy="12" r="8"/>',
-    validating: '<path d="M21 12a9 9 0 1 1-3-6.7"/>',
-    arrow: '<path d="M4 12h16m-6-6 6 6-6 6"/>',
-  };
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("viewBox", "0 0 24 24");
-  svg.setAttribute("aria-hidden", "true");
-  svg.innerHTML = paths[name] || paths.pending;
-  return svg;
+  const template = document.createElement("template");
+  template.innerHTML = iconMarkup(name);
+  return template.content.firstElementChild;
 }
 
 /** One stable action node; callers retain validation and continuation ownership. */
@@ -43,7 +55,7 @@ export function createWorkflowActionBar({label, onContinue, onProblem, onSelect,
     if (control.right > viewport.right - 6) files.scrollLeft += control.right - viewport.right + 6;
     else if (control.left < viewport.left + 6) files.scrollLeft -= viewport.left + 6 - control.left;
   });
-  const button = node("button", null, "d-button d-button--workflow");
+  const button = node("button", null, WORKFLOW_ACTION_CLASS);
   button.type = "button";
   button.disabled = true;
   button.setAttribute("aria-describedby", message.id);
@@ -77,7 +89,7 @@ export function createWorkflowActionBar({label, onContinue, onProblem, onSelect,
     message.textContent = result.message;
     action = null;
     button.disabled = true;
-    button.className = `d-button d-button--workflow d-button--secondary ${variant === "data" ? "dispatch-pro-next-button" : ""}`;
+    button.className = `${WORKFLOW_ACTION_CLASS} d-button--secondary ${variant === "data" ? "dispatch-pro-next-button" : ""}`;
     let title;
     if (variant === "configuration") {
       title = "Revisar y ejecutar";

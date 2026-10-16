@@ -113,6 +113,7 @@
   --control-height-sm: 36px;
   --control-height-md: 40px;
   --control-height-lg: 46px;
+  --control-icon-size: 18px;
   /* Workflow roles reuse the existing size scale. Group widths stay content-driven. */
   --workflow-action-height: var(--control-height-lg);
   --workflow-action-radius: var(--radius-control);

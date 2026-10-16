@@ -1,5 +1,4 @@
-import {esc} from "./shared.mjs";
-import {iconSvg} from "./decision-ui.mjs";
+import {workflowActionLabel} from "./workflow-action-bar.mjs";
 import {scopeFor} from './lifecycle.mjs';
 
 // Resolve again after approval and immediately before navigating; state is owned by the workspace.
@@ -21,7 +20,7 @@ export function bindDashboardActions(root,caseActions={}){
       const next=await caseActions.getContinuation?.();
       if(!scope?.active)return;
       if(next?.state==='available'){
-        if(button.closest('[data-dashboard-toolbar]'))button.innerHTML=iconSvg('arrowRight','dashboard-toolbar__icon')+'<span>'+esc(next.label)+'</span>';
+        if(button.closest('[data-dashboard-toolbar]'))button.innerHTML=workflowActionLabel(next.label);
         else button.textContent=next.label;
         button.hidden=false;
       }else if(message&&next?.message){
@@ -33,6 +32,7 @@ export function bindDashboardActions(root,caseActions={}){
   }
   if(button)button.onclick=async()=>{
     button.disabled=true;
+    button.setAttribute('aria-busy','true');
     let failure=null;
     try{
       await caseActions.onContinue?.();
@@ -40,7 +40,7 @@ export function bindDashboardActions(root,caseActions={}){
       failure=error;
     }finally{
       if(scope?.active){
-        button.disabled=false;await refresh();
+        button.disabled=false;button.removeAttribute('aria-busy');await refresh();
         if(failure&&scope.active&&message){message.textContent=failure.message;retry.hidden=false;}
       }
     }
