@@ -292,6 +292,7 @@ class WorkflowTests(unittest.TestCase):
         self.assertTrue(report['shared_workflow_visual_contract']);self.assertTrue(report['review_keyboard_cancel_and_confirmation'])
         self.assertEqual(report['ui']['viewport'],viewport)
         self.assertEqual(len(report['ui']['reviews']),2)
+        self.assertEqual(len(report['ui']['toolbars']),2)
         self.assertGreaterEqual(len(report['ui']['checkpoints']),18)
         self.assertEqual(report['source_sha'],subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip())
         pending=next(row for row in report['ui']['checkpoints'] if row['name']=='assignment-pending')

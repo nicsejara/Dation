@@ -116,69 +116,36 @@
               </div>
             </section>
 
-            <section class="d-home__assets" aria-labelledby="dation-dda-title">
-              <div class="d-home__section-head">
-                <div>
-                  <span class="d-home__section-kicker">Decision Data Assets</span>
+            <section class="d-home__assets" data-home-dda-catalog aria-labelledby="dation-dda-title">
+              <header class="d-home__catalog-head">
+                <div class="d-home__section-head">
+                  <span class="d-home__section-kicker">DECISION DATA ASSETS</span>
                   <h2 id="dation-dda-title">Elegí el Decision Data Asset que querés utilizar</h2>
-                  <p>
-                    Un sistema para cada familia de decisiones: datos, lógica analítica y evidencia en un mismo lugar.
-                  </p>
+                  <p>Un sistema de decisión para cada área de tu operación. Cada DDA combina datos, lógica analítica y evidencia en un mismo lugar.</p>
                 </div>
-              </div>
-
-              <div class="d-home__asset-grid">
-                <button
-                  id="home-open-logistics"
-                  class="d-home__asset d-home__asset--active"
-                  data-view-target="logistics-overview"
-                  type="button"
-                  aria-label="Abrir DDA Logística"
-                  onclick="window.dationNavigate && window.dationNavigate('logistics-overview', 'dda', event)"
-                >
-                  <div class="d-home__asset-icon d-home__asset-icon--logistics" aria-hidden="true">
-                    <img src="/static/assets/dda-logistics.svg?v=home-dda-selector-v2" alt="">
+                <p class="d-home__catalog-status" data-dda-counts>Logística disponible hoy</p>
+              </header>
+              <p class="d-home__catalog-growth">Una plataforma en crecimiento para potenciar distintas familias de decisiones.</p>
+              <div class="d-home__filters" data-dda-filters role="group" aria-label="Filtrar Decision Data Assets por área" hidden></div>
+              <p class="d-home__filter-status" data-dda-filter-status role="status" aria-live="polite" aria-atomic="true" hidden></p>
+              <div class="d-home__asset-grid" data-dda-grid>
+                <!-- Usable fallback when the catalog enhancement is unavailable. -->
+                <article class="d-home__asset d-home__asset--available">
+                  <div class="d-home__asset-top">
+                    <span class="d-home__asset-icon" aria-hidden="true"><img src="/static/assets/dda-logistics.svg" alt=""></span>
+                    <span class="d-home__badge">Disponible</span>
                   </div>
-
                   <div class="d-home__asset-copy">
-                    <div class="d-home__asset-meta">
-                      <span class="d-home__badge">Activo</span>
-                      <span class="d-home__asset-version">Motor 0.2.0</span>
-                    </div>
-
+                    <span class="d-home__asset-category">Supply Chain</span>
                     <h3>DDA Logística</h3>
-                    <p>
-                      Convertí Orders y Fleet en decisiones logísticas trazables:
-                      configurá prioridades, compará alternativas y revisá la evidencia antes de aprobar.
-                    </p>
-
-                    <span class="d-home__asset-action">
-                      Abrir DDA Logística
-                      <span aria-hidden="true">→</span>
-                    </span>
+                    <p>Optimizá cómo asignar, planificar y ejecutar tus despachos.</p>
                   </div>
-                </button>
-
-                <article class="d-home__asset d-home__asset--disabled" aria-disabled="true">
-                  <div class="d-home__asset-icon d-home__asset-icon--production" aria-hidden="true">
-                    <img src="/static/assets/dda-production.svg?v=home-dda-selector-v2" alt="">
-                  </div>
-
-                  <div class="d-home__asset-copy">
-                    <div class="d-home__asset-meta">
-                      <span class="d-home__badge d-home__badge--muted">Próximamente</span>
-                    </div>
-
-                    <h3>DDA Producción</h3>
-                    <p>
-                      Decision Data Asset en desarrollo para decisiones de capacidad,
-                      secuenciación y performance de producción.
-                    </p>
-
-                    <span class="d-home__asset-action">
-                      Disponible próximamente
-                    </span>
-                  </div>
+                  <p class="d-home__asset-capabilities">Asignación · Planificación · Ejecución</p>
+                  <footer class="d-home__asset-footer">
+                    <button id="home-open-logistics" class="d-home__asset-action" data-view-target="logistics-overview" type="button" aria-label="Abrir DDA Logística" onclick="window.dationNavigate && window.dationNavigate('logistics-overview', 'dda', event)">
+                      Abrir DDA Logística <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"/></svg>
+                    </button>
+                  </footer>
                 </article>
               </div>
             </section>

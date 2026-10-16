@@ -1067,6 +1067,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                 await self.page.wait_for_function("document.querySelectorAll('.dashboard-toolbar__menu[open]').length===1")
                 self.assertEqual(await more.get_attribute('aria-expanded'),'true')
                 self.assertEqual(await export.get_attribute('aria-expanded'),'false')
+                await export.click();await more.click()
+                self.assertEqual(await more.get_attribute('aria-expanded'),'true')
                 box=await self.page.locator('[data-more-menu] .dashboard-toolbar__menu-panel').bounding_box()
                 self.assertGreaterEqual(box['x'],15);self.assertLessEqual(box['x']+box['width'],width-15)
                 self.assertGreaterEqual(box['y'],0);self.assertLessEqual(box['y']+box['height'],845)
@@ -1753,16 +1755,152 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                 self.assertLessEqual(heights["inicio"], 250)
         self.assertEqual(self.execution_bodies, [])
 
+    async def test_home_catalog_filters_preserve_navigation_and_workspace(self):
+        await self.open('logistics-map')
+        await self.nav('inicio')
+        await self.page.locator('[data-dda-filter=all]').wait_for()
+        await self.page.wait_for_load_state('networkidle')
+        root=self.page.locator('[data-home-dda-catalog]')
+        self.assertEqual(await root.locator('[data-dda-id]').count(),7)
+        self.assertEqual(await root.locator('[data-dda-status=available]').count(),1)
+        self.assertEqual(await root.locator('[data-dda-status=coming-soon]').count(),6)
+        self.assertEqual(await root.locator('[data-dda-counts]').inner_text(),'1 disponible · 6 próximos')
+        before=await self.page.evaluate('JSON.stringify(window.DationDispatch.getWorkspace())')
+        await self.page.evaluate("window.__homeButton=document.getElementById('home-open-logistics')")
+        requests=len(self.requests)
+        expected={'all':['logistics','production','inventory','demand','procurement','maintenance','pricing'],
+            'supply-chain':['logistics','inventory'],'production':['production'],'operations':['procurement'],
+            'commercial':['demand','pricing'],'assets':['maintenance']}
+        for category,ids in expected.items():
+            button=root.locator('[data-dda-filter="'+category+'"]')
+            await button.focus();await self.page.keyboard.press('Enter')
+            self.assertEqual(await button.get_attribute('aria-pressed'),'true')
+            self.assertEqual(await root.locator('[data-dda-filter][aria-pressed=true]').count(),1)
+            self.assertEqual(await root.locator('[data-dda-id]:not([hidden])').evaluate_all('els=>els.map(el=>el.dataset.ddaId)'),ids)
+            self.assertIn(str(len(ids)),await root.locator('[data-dda-filter-status]').inner_text())
+        await root.locator('[data-dda-filter=all]').click()
+        await self.page.evaluate('''async()=>{
+            const {mountHomeCatalog}=await import('/static/js/home-dda-catalog.mjs');
+            const root=document.querySelector('[data-home-dda-catalog]');mountHomeCatalog(root);mountHomeCatalog(root);
+        }''')
+        self.assertTrue(await self.page.evaluate("window.__homeButton===document.getElementById('home-open-logistics')"))
+        self.assertEqual(await root.locator('[data-dda-filter]').count(),6)
+        for card in await root.locator('[data-dda-status=coming-soon]').all():
+            self.assertEqual(await card.locator('button,a,[tabindex]').count(),0)
+            url=self.page.url;await card.click()
+            self.assertEqual(self.page.url,url)
+        self.assertEqual(await self.page.evaluate('JSON.stringify(window.DationDispatch.getWorkspace())'),before)
+        self.assertEqual(self.requests[requests:],[],'Filtering the catalog must not call APIs')
+        await self.page.evaluate('''()=>{
+            window.__homeNavigation=[];const navigate=window.dationNavigate;
+            window.dationNavigate=(...args)=>{window.__homeNavigation.push(args.slice(0,2));return navigate(...args);};
+        }''')
+        # The stretched semantic button makes the entire available card actionable.
+        await root.locator('[data-dda-id=logistics]').click(position={'x':16,'y':16})
+        await self.page.locator('.dda-landing__hero').wait_for()
+        self.assertEqual(await self.page.evaluate('window.__homeNavigation'),[['logistics-overview','dda']])
+        self.assertEqual(self.execution_bodies,[])
+
+    async def test_home_catalog_responsive_accessible_and_honest_states(self):
+        theme=(Path(__file__).parent/'theme_audit.js').read_text()
+        await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=inicio')
+        await self.page.locator('[data-dda-filter=all]').wait_for()
+        root=self.page.locator('[data-home-dda-catalog]')
+        for width,height in ((1680,1050),(1440,1000),(1280,1000),(1024,1000),(768,1000),(699,1000),(390,844),(320,568),(568,320)):
+            await self.page.set_viewport_size({'width':width,'height':height})
+            audit=await self.page.evaluate(theme)
+            self.assertFalse(audit['overflow'],(width,audit));self.assertEqual(audit['failures'],[],width)
+            rows=await root.locator('.d-home__asset').evaluate_all('''els=>els.map(el=>{
+                const r=el.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};})''')
+            for row in rows:
+                peers=[peer for peer in rows if abs(peer['y']-row['y'])<1]
+                self.assertLess(max(peer['height'] for peer in peers)-min(peer['height'] for peer in peers),1)
+            columns=await root.locator('.d-home__asset-grid').evaluate('el=>getComputedStyle(el).gridTemplateColumns.split(" ").length')
+            self.assertEqual(columns,1 if width<700 else 2 if width<=1100 else 2 if width==1280 else 3)
+            for button in await root.locator('[data-dda-filter],#home-open-logistics').all():
+                await button.focus()
+                self.assertEqual(await button.evaluate('el=>getComputedStyle(el).outlineWidth'),'3px')
+        await self.page.set_viewport_size({'width':1440,'height':1000})
+        await self.page.emulate_media(reduced_motion='no-preference')
+        await self.page.mouse.move(0,0)
+        available=root.locator('[data-dda-id=logistics]');upcoming=root.locator('[data-dda-id=production]')
+        initial=await available.evaluate('el=>getComputedStyle(el).borderColor')
+        await available.hover();await self.page.wait_for_timeout(250)
+        hover=await available.evaluate('el=>({border:getComputedStyle(el).borderColor,transform:getComputedStyle(el).transform})')
+        self.assertNotEqual(hover['border'],initial);self.assertIn('-2',hover['transform'])
+        await upcoming.hover()
+        self.assertEqual(await upcoming.evaluate('el=>getComputedStyle(el).transform'),'none')
+        self.assertEqual(await upcoming.evaluate('el=>getComputedStyle(el).cursor'),'default')
+        self.assertEqual(await upcoming.evaluate('el=>getComputedStyle(el).opacity'),'1')
+        await self.page.emulate_media(reduced_motion='reduce');await available.hover()
+        self.assertEqual(await available.evaluate('el=>getComputedStyle(el).transform'),'none')
+
+    async def test_home_catalog_keeps_a_usable_fallback_without_its_module(self):
+        await self.context.route('**/home-dda-catalog.mjs',lambda route:route.abort())
+        await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=inicio')
+        fallback=self.page.locator('#home-open-logistics');await fallback.wait_for()
+        self.assertEqual(await self.page.locator('.d-home__asset--available').count(),1)
+        self.assertEqual(await self.page.locator('[data-dda-filters]').is_visible(),False)
+        await fallback.click()
+        await self.page.locator('.dda-landing__hero').wait_for()
+        self.assertEqual(await self.page.evaluate('window.dationGetCurrentView()'),'logistics-overview')
+
+    async def test_dashboard_toolbars_share_controls_and_symmetric_bleed(self):
+        theme=(Path(__file__).parent/'theme_audit.js').read_text()
+        for width,height in ((1680,1050),(1440,1000),(1280,1000),(1024,1000),(768,1000),(390,844),(320,568),(568,320)):
+            await self.page.set_viewport_size({'width':width,'height':height})
+            reference=None
+            for kind in ('assignment','scheduling'):
+                await self.open('decision-dashboard','logistics_'+kind,self.f['ids'][kind])
+                toolbar=self.page.locator('[data-dashboard-toolbar]')
+                sizes=await toolbar.evaluate('''el=>{
+                    const root=el.parentElement,main=root.querySelector('main'),r=el.getBoundingClientRect(),m=main.getBoundingClientRect();
+                    const tools=[...el.querySelectorAll('[data-dashboard-map],.dashboard-toolbar__menu>summary')].map(button=>{
+                        const b=button.getBoundingClientRect(),s=getComputedStyle(button);
+                        return {width:b.width,height:b.height,padding:s.padding,radius:s.borderRadius,fontSize:s.fontSize,
+                            fontWeight:s.fontWeight,lineHeight:s.lineHeight,gap:s.gap,icon:button.querySelector('svg').getBoundingClientRect().width};});
+                    return {width:r.width,content:m.width,left:m.x-r.x,right:r.right-m.right,tools,position:getComputedStyle(el).position};
+                }''')
+                expected=24 if width>1100 else 12 if width>760 else 0
+                self.assertAlmostEqual(sizes['left'],expected,delta=.25);self.assertAlmostEqual(sizes['right'],expected,delta=.25)
+                for tool in sizes['tools'][1:]:
+                    for key in ('width','height'):self.assertAlmostEqual(tool[key],sizes['tools'][0][key],delta=.25)
+                    self.assertEqual({k:v for k,v in tool.items() if k not in ('width','height')},
+                        {k:v for k,v in sizes['tools'][0].items() if k not in ('width','height')})
+                if reference is None:reference=sizes
+                self.assertEqual({k:v for k,v in sizes.items() if k!='tools'},{k:v for k,v in reference.items() if k!='tools'},(width,kind))
+                for actual,expected_tool in zip(sizes['tools'],reference['tools']):
+                    self.assertAlmostEqual(actual['width'],expected_tool['width'],delta=.25)
+                    self.assertAlmostEqual(actual['height'],expected_tool['height'],delta=.25)
+                self.assertEqual(sizes['position'],'static' if height<=540 else 'sticky')
+                audit=await self.page.evaluate(theme)
+                self.assertFalse(audit['overflow']);self.assertEqual(audit['failures'],[])
+                for menu in ('export','more'):
+                    summary=toolbar.locator('[data-'+menu+'-menu]>summary')
+                    await summary.click()
+                    panel=toolbar.locator('[data-'+menu+'-menu] .dashboard-toolbar__menu-panel')
+                    box=await panel.bounding_box()
+                    self.assertGreaterEqual(box['x'],15.5);self.assertLessEqual(box['x']+box['width'],width-15.5)
+                    self.assertGreaterEqual(box['y'],0);self.assertLessEqual(box['y']+box['height'],height)
+                    self.assertEqual(await summary.get_attribute('aria-expanded'),'true')
+                    await self.page.keyboard.press('Escape')
+                    self.assertEqual(await summary.get_attribute('aria-expanded'),'false')
+                    self.assertTrue(await summary.evaluate('el=>el===document.activeElement'))
+        self.assertEqual(self.execution_bodies,[])
+
+
     async def test_home_card_keyboard_and_informational_overview_with_native_faq(self):
         await self.page.emulate_media(reduced_motion="reduce")
         await self.page.goto(f"http://127.0.0.1:{self.port}/app?view=inicio")
         active = self.page.locator("#home-open-logistics")
         await active.wait_for(state="visible")
-        inactive = self.page.locator(".d-home__asset--disabled")
-        self.assertEqual(await inactive.get_attribute("aria-disabled"), "true")
-        self.assertEqual(await inactive.evaluate("el=>el.tagName"), "ARTICLE")
-        self.assertEqual(await inactive.locator("button,a,[tabindex]").count(), 0)
-        self.assertEqual(await inactive.evaluate("el=>getComputedStyle(el).opacity"), "1")
+        inactive = self.page.locator(".d-home__asset--coming-soon")
+        self.assertEqual(await inactive.count(), 6)
+        for card in await inactive.all():
+            self.assertEqual(await card.get_attribute("aria-disabled"), "true")
+            self.assertEqual(await card.evaluate("el=>el.tagName"), "ARTICLE")
+            self.assertEqual(await card.locator("button,a,[tabindex]").count(), 0)
+            self.assertEqual(await card.evaluate("el=>getComputedStyle(el).opacity"), "1")
         await active.focus()
         self.assertTrue(await active.evaluate("el=>el.matches(':focus-visible')"))
         self.assertEqual(await active.evaluate("el=>getComputedStyle(el).outlineWidth"), "3px")
@@ -2307,7 +2445,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                     labels=await dialog.locator('.d-execution-review__row strong').all_text_contents()
                     self.assertEqual(labels,['Decision Case','Alcance','Objetivo','Prioridades','Recursos'] if kind=='assignment'
                         else ['Decision Case','Entrada','Ventana','Reglas por foco','Objetivo','Recursos'])
-                    self.assertEqual(await dialog.locator('.d-execution-review__note').count(),int(kind=='assignment'))
+                    self.assertEqual(await dialog.locator('.d-execution-review__note').count(),1)
                     self.assertEqual(await dialog.locator('form').get_attribute('method'),'dialog')
                     self.assertTrue(await dialog.evaluate("el=>el.matches(':modal')"))
                     self.assertEqual(await dialog.locator('[data-config-review-error]').inner_text(),'')
@@ -2328,6 +2466,13 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                     if reference is None:reference=styles
                     self.assertEqual(styles,reference)
                     self.assertEqual(styles['width'],min(650,width-32))
+                    if width>=1024:
+                        box=await dialog.bounding_box()
+                        self.assertAlmostEqual(box['height'],544,delta=.25)
+                        footer=await dialog.locator('footer').bounding_box()
+                        execute=await dialog.get_by_role('button',name='Ejecutar decisión',exact=True).bounding_box()
+                        self.assertAlmostEqual(execute['x']+execute['width'],footer['x']+footer['width'],delta=.25)
+                        self.assertAlmostEqual(execute['y']+execute['height'],box['y']+box['height']-25,delta=.25)
                     self.assertEqual(styles['shell']['animationName'],'none')
                     audit=await self.page.evaluate(theme,'dialog[open]')
                     self.assertFalse(audit['overflow']);self.assertEqual(audit['failures'],[])
@@ -2570,6 +2715,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                               ('logistics-config','logistics_assignment'),('logistics-config','logistics_scheduling')):
                 await self.open(view,node)
                 hero=self.page.locator('.view.is-active .d-page-hero--workflow');await hero.wait_for()
+                if node=='logistics_scheduling':
+                    self.assertEqual(await hero.locator('.dispatch-pro-how-node strong').nth(1).inner_text(),'Calendario operativo + secuencia')
                 metrics=await hero.evaluate('''el=>{
                     const rect=x=>{const r=x.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,height:r.height,width:r.width};};
                     const style=x=>{const s=getComputedStyle(x);return {size:parseFloat(s.fontSize),weight:parseFloat(s.fontWeight),border:s.borderColor,color:s.color};};

@@ -797,7 +797,7 @@ class FrontendContractTests(
         )
         self.assertIn(
             "/static/assets/dda-production.svg",
-            self.html,
+            (BACKEND_ROOT / "app/static/js/home-dda-catalog.mjs").read_text(),
         )
         self.assertIn(
             "/static/assets/dation-logo.png",
@@ -2001,11 +2001,11 @@ class FrontendContractTests(
         )
         self.assertIn(
             "DDA Producción",
-            self.html,
+            (BACKEND_ROOT / "app/static/js/home-dda-catalog.mjs").read_text(),
         )
         self.assertIn(
             "Próximamente",
-            self.html,
+            (BACKEND_ROOT / "app/static/js/home-dda-catalog.mjs").read_text(),
         )
 
 

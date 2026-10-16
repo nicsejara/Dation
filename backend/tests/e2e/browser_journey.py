@@ -49,6 +49,12 @@ async def journey():
         try:
             await page.goto(base+'/app?view=inicio',wait_until='domcontentloaded')
             await page.locator('#home-open-logistics').wait_for(state='visible')
+            await page.locator('[data-dda-filter=all]').wait_for()
+            assert await page.locator('[data-dda-id]').count()==7
+            assert await page.locator('[data-dda-status=coming-soon] button,[data-dda-status=coming-soon] a').count()==0
+            await page.locator('[data-dda-filter=supply-chain]').click()
+            assert await page.locator('[data-dda-id]:not([hidden])').count()==2
+            await page.locator('[data-dda-filter=all]').click()
             await ui.checkpoint('inicio')
             await page.locator('#home-open-logistics').click()
             await page.wait_for_selector('[data-start-new-decision]')
@@ -144,6 +150,7 @@ async def journey():
             await ui.checkpoint('assignment-pending')
             gate.unlink()
             await page.wait_for_selector('.assignment-dashboard-v2')
+            await ui.toolbar('assignment')
             await ui.checkpoint('assignment-dashboard')
             assert sum(method=='POST' and path=='/api/runs' for method,path in requests)==before_review+1
             assert await page.locator('[data-trip-detail]').count()==0
@@ -237,6 +244,7 @@ async def journey():
             scheduling=(await (await accepted.value).json())['id']
             assert scheduling!=failed_scheduling
             await page.wait_for_selector('.dispatch-scheduling-dashboard')
+            await ui.toolbar('scheduling')
             await ui.checkpoint('scheduling-dashboard')
             await page.locator('[data-approve-toolbar]').click()
             await page.wait_for_function("window.DationDispatch.getWorkspace().decisionCase.nodes.logistics_scheduling.status==='approved'")

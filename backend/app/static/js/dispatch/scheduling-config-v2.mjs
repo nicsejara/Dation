@@ -128,7 +128,7 @@ function heroMarkup(){
     description:"Partí de la asignación aprobada y definí ventana y prioridad del calendario. Cargas, cantidades y recursos mantienen su trazabilidad.",
     panelItems:[
       {label:"1 · PREGUNTA",description:"¿Cuándo despachar los viajes definidos?",icon:"messageCircleQuestion"},
-      {label:"2 · ENTREGA",description:"Calendario operativo + secuencia de despachos.",icon:"calendarClock"},
+      {label:"2 · ENTREGA",description:"Calendario operativo + secuencia",icon:"calendarClock"},
       {label:"3 · QUEDA PARA DESPUÉS",description:"Asignación de vehículos: decisión final.",icon:"truck"},
     ],
   });
@@ -364,6 +364,7 @@ function reviewDialog(config,stats,sourceRun,caseId){
     dialogAttributes:{"data-scheduling-review-dialog":true},
     executeAttributes:{"data-scheduling-execute":true},
     errorAttributes:{"data-scheduling-review-error":true},
+    note:"La planificación conserva los viajes y recursos aprobados en Assignment. Esta decisión sólo define fechas y secuencia.",
     rows:[
       {label:"Decision Case",value:displayDecisionCaseId(caseId)},
       {label:"Entrada",value:num(stats.totalTrips)+' viajes de Assignment · Run '+formatRunId(sourceRun.id)},
