@@ -267,17 +267,35 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(len(self.checked(self.s.db.get('decision_runs'))),2)
 
     def test_browser_creation_execution_approval_navigation_and_mobile_history(self):
+        self.browser_journey('desktop',{'width':1440,'height':1000})
+
+    def test_browser_complete_workflow_at_mobile_width(self):
+        self.browser_journey('mobile',{'width':390,'height':844})
+
+    def browser_journey(self,scenario,viewport):
         self.s.start_worker()
         browser_python=os.getenv('DATION_BROWSER_PYTHON',str(ROOT/'.browser-venv/bin/python'))
-        inputs=self.s.directory/'inputs';inputs.mkdir()
+        inputs=self.s.directory/'inputs';inputs.mkdir(exist_ok=True)
         for kind in ('orders','fleet'):(inputs/(kind+'.csv')).write_bytes(csv_input(kind))
+        env={**self.s.env,'DATION_E2E_URL':self.s.api_url,'DATION_E2E_INPUTS':str(inputs),
+             'DATION_E2E_VIEWPORT':json.dumps(viewport)}
+        if artifacts:=os.getenv('DATION_E2E_ARTIFACTS'):
+            env['DATION_E2E_ARTIFACTS']=str(Path(artifacts)/scenario)
         result=subprocess.run([browser_python,str(ROOT/'tests/e2e/browser_journey.py')],cwd=ROOT,
-            env={**self.s.env,'DATION_E2E_URL':self.s.api_url,'DATION_E2E_INPUTS':str(inputs)},
+            env=env,
             text=True,capture_output=True,timeout=180)
         self.assertEqual(result.returncode,0,result.stdout+result.stderr)
         report=json.loads(result.stdout.strip().splitlines()[-1])
         self.assertTrue(report['passed']);self.assertEqual(report['javascript_errors'],[])
         self.assertTrue(report['creation_from_files']);self.assertTrue(report['refresh_during_queue'])
+        self.assertTrue(report['inicio_to_overview']);self.assertTrue(report['approval_map_scheduling_configuration'])
+        self.assertTrue(report['shared_workflow_visual_contract']);self.assertTrue(report['review_keyboard_cancel_and_confirmation'])
+        self.assertEqual(report['ui']['viewport'],viewport)
+        self.assertEqual(len(report['ui']['reviews']),2)
+        self.assertGreaterEqual(len(report['ui']['checkpoints']),18)
+        self.assertEqual(report['source_sha'],subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip())
+        pending=next(row for row in report['ui']['checkpoints'] if row['name']=='assignment-pending')
+        self.assertEqual(pending['view'],'decision-dashboard')
         rows=self.checked(self.s.db.get('decision_runs',params={'order':'created_at.asc'}))
         self.assertEqual(len(rows),3)
         self.assertEqual([r['node_id'] for r in rows],['logistics_assignment','logistics_scheduling','logistics_scheduling'])
@@ -290,6 +308,14 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual({r['decision_case_id'] for r in rows},{rows[0]['decision_case_id']})
         self.assertEqual([r['upstream_run_id'] for r in rows[1:]],[rows[0]['id'],rows[0]['id']])
         self.assertEqual(len({r['id'] for r in rows}),3)
+        case=self.checked(self.s.api_client.get('/api/decision-cases/'+rows[0]['decision_case_id']))['decision_case']
+        self.assertEqual(case['nodes']['logistics_assignment']['approved_run_id'],rows[0]['id'])
+        self.assertEqual(case['nodes']['logistics_scheduling']['approved_run_id'],rows[2]['id'])
+        jobs=self.checked(self.s.db.get('dispatch_run_jobs',params={'order':'created_at.asc'}))
+        self.assertEqual([row['state'] for row in jobs],['completed','error','completed'])
+        self.assertEqual({row['run_id'] for row in jobs},{row['id'] for row in rows})
+        events=self.checked(self.s.db.get('decision_approval_events'))
+        self.assertEqual(len(events),2)
 
 
 if __name__=='__main__':unittest.main(verbosity=2)
