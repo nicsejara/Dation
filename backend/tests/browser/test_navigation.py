@@ -1811,6 +1811,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         for width,height in ((1680,1050),(1440,1000),(1280,1000),(1024,1000),(768,1000),(699,1000),(390,844),(360,250),(320,568),(320,256),(568,320)):
             await self.page.set_viewport_size({'width':width,'height':height})
             # Every selection keeps equally sized pills filling each complete row.
+            pill_height=None
             for category in ('all','supply-chain','operations','production','commercial','assets'):
                 await root.locator('[data-dda-filter='+category+']').evaluate('el=>el.click()')
                 pills=await root.locator('[data-dda-filter]').evaluate_all('''els=>els.map(el=>{
@@ -1819,6 +1820,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                         overflow:el.scrollWidth>el.clientWidth+1,radius:parseFloat(s.borderRadius)};})''')
                 self.assertLess(max(p['width'] for p in pills)-min(p['width'] for p in pills),1,(width,category,pills))
                 self.assertLess(max(p['height'] for p in pills)-min(p['height'] for p in pills),1,(width,category,pills))
+                if pill_height is None:pill_height=pills[0]['height']
+                self.assertAlmostEqual(pills[0]['height'],pill_height,delta=1,msg=(width,category,pills))
                 for pill in pills:
                     peers=[p for p in pills if abs(p['y']-pill['y'])<1]
                     self.assertAlmostEqual(min(p['x'] for p in peers),pill['left'],delta=1)

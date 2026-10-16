@@ -85,7 +85,7 @@
 @media(max-width:620px) {
   .d-home { gap:var(--space-6); }
   .d-home__filters { grid-template-columns:repeat(2,minmax(0,1fr)); }
-  .d-home__filter { padding-inline:var(--space-2); }
+  .d-home__filter { padding:var(--space-1) var(--space-2); }
   .d-home__asset { padding:var(--space-4); }
   .d-home__section-head h2 { font-size:20px; }
 }
