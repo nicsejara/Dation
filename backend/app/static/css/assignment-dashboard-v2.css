@@ -10,7 +10,6 @@
   --assignment-shadow:var(--shadow-md);
   display:block!important;
   width:100%;
-  max-width:1220px;
   margin:0 auto;
   color:var(--assignment-ink);
 }
