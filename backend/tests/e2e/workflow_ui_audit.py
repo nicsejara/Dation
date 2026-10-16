@@ -118,17 +118,18 @@ class WorkflowUIAudit:
     async def toolbar(self, name):
         toolbar = self.page.locator('.view.is-active [data-dashboard-toolbar]')
         actual = await toolbar.evaluate('''el=>{
-            const r=el.getBoundingClientRect(),m=el.parentElement.querySelector('main').getBoundingClientRect();
-            const tools=[...el.querySelectorAll('[data-dashboard-map],.dashboard-toolbar__menu>summary')].map(button=>{
+            const r=el.getBoundingClientRect(),m=el.closest('.d-decision-dashboard').querySelector('main').getBoundingClientRect(),h=el.closest('#dispatch-hero')?.getBoundingClientRect();
+            const tools=[...el.querySelectorAll(el.dataset.toolbarPlacement==='hero'?'.dashboard-toolbar__menu>summary':'[data-dashboard-map],.dashboard-toolbar__menu>summary')].filter(button=>button.getClientRects().length).map(button=>{
                 const r=button.getBoundingClientRect(),s=getComputedStyle(button);
                 return {width:r.width,height:r.height,padding:s.padding,radius:s.borderRadius,font:s.font,gap:s.gap};});
             const primary=[...el.querySelectorAll('.d-button')].find(button=>button.getClientRects().length)?.getBoundingClientRect();
-            return {left:m.left-r.left,right:r.right-m.right,tools,
+            return {hero:el.dataset.toolbarPlacement==='hero',insideHero:h?r.left>=h.left&&r.right<=h.right:false,left:m.left-r.left,right:r.right-m.right,tools,
                 primary:primary?{width:primary.width,height:primary.height}:null};
         }''')
         bleed = 24 if self.viewport['width'] > 1100 else 12 if self.viewport['width'] > 760 else 0
-        assert abs(actual['left'] - bleed) < .25 and abs(actual['right'] - bleed) < .25, actual
-        assert len(actual['tools']) == 3
+        if actual['hero']:assert actual['insideHero'],actual
+        else:assert abs(actual['left'] - bleed) < .25 and abs(actual['right'] - bleed) < .25, actual
+        assert len(actual['tools']) == (2 if actual['hero'] else 3)
         reference = actual['tools'][0]
         for tool in actual['tools'][1:]:
             assert abs(tool['width'] - reference['width']) < .25 and abs(tool['height'] - reference['height']) < .25, actual

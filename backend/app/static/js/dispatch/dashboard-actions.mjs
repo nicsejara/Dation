@@ -20,7 +20,8 @@ export function bindDashboardActions(root,caseActions={}){
       const next=await caseActions.getContinuation?.();
       if(!scope?.active)return;
       if(next?.state==='available'){
-        if(button.closest('[data-dashboard-toolbar]'))button.innerHTML=workflowActionLabel(next.label);
+        if(button.closest('.assignment-dashboard-v2'))button.innerHTML=workflowActionLabel('Continuar a Planificación');
+        else if(button.closest('[data-dashboard-toolbar]'))button.innerHTML=workflowActionLabel(next.label);
         else button.textContent=next.label;
         button.hidden=false;
       }else if(message&&next?.message){

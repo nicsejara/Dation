@@ -10,6 +10,9 @@ import * as explanation from './explanation.mjs';
 import * as assignmentSummary from './assignment-summary.mjs';
 import * as assignmentEvidence from './assignment-evidence.mjs';
 import * as assignmentValidation from './assignment-validation.mjs';
+import * as assignmentEssential from './assignment-essential.mjs';
+import * as assignmentAiSummary from './assignment-ai-summary.mjs';
+import * as assignmentAdvanced from './assignment-advanced.mjs';
 import * as comparativeUpgrade from './comparative-upgrade.mjs';
 import {exportDecision} from './export.mjs';
 import * as schedulingDashboard from './scheduling-dashboard.mjs';
@@ -29,6 +32,7 @@ function ensureDashboardStyles(schema){
     ensureStylesheet(ASSIGNMENT_STYLE_ID,'/static/css/assignment-dashboard-v2.css'),
     ensureStylesheet(ASSIGNMENT_ESSENTIAL_STYLE_ID,'/static/css/assignment-dashboard-essential.css'),
     ensureStylesheet(ASSIGNMENT_COMPARATIVE_STYLE_ID,'/static/css/assignment-dashboard-comparative.css'),
+    ensureStylesheet('assignment-dashboard-decision-styles','/static/css/assignment-dashboard-decision.css','assignment-dashboard-v2-20261016'),
   );
   return Promise.all(styles);
 }
@@ -75,25 +79,48 @@ function renderAssignmentDashboard(root,run,onRerun,caseActions={}){
   const result=run.result_json;
   const nodes=renderAssignmentShell(root,run,caseActions);
 
-  renderModule(nodes.hero,assignmentSummary,result);
+  assignmentSummary.render(nodes.hero,result,caseActions);
+  renderModule(nodes.context,{render:assignmentEssential.context},result);
+  renderModule(nodes.kpis,{render:assignmentEssential.kpis},result);
+  renderModule(nodes.insights,{render:assignmentEssential.insights},result);
+  renderModule(nodes.resources,{render:assignmentEssential.resources},result);
   renderModule(nodes.assignment,assignmentEvidence,result);
   renderModule(nodes.review,assignmentValidation,result);
-  comparativeUpgrade.render(nodes.comparative,run,{
-    onEvidenceReady:artifact=>{
-      renderModule(nodes.explanation,explanation,run);
-      nodes.chat.dispatchEvent(new CustomEvent('dispatch:evidence-changed',{detail:{id:artifact.id}}));
-    },
-  });
-  renderModule(nodes.explanation,explanation,run);
+  const summary=assignmentAiSummary.render(nodes.explanation,run);
+  let shell,comparative,evidence=result,drawnEvidence=null,advanced=null,comparativeState='available';
+  function drawAdvanced(){
+    if(root.dataset.visualDepth!=='advanced'||drawnEvidence===evidence)return;
+    advanced=assignmentAdvanced.render(nodes.advanced,evidence);drawnEvidence=evidence;
+  }
+  function drawScenarios(){
+    assignmentEssential.scenarios(nodes.scenarios,evidence,{state:comparativeState,onGenerate:()=>{
+      shell.openAdvanced();comparative.generate();
+    }});
+  }
 
   const chatButton=root.querySelector('[data-chat]');
   const chat=installDecisionChat(root,run,nodes.chat,chatButton);
 
-  bindAssignmentShell(root,run,{
+  shell=bindAssignmentShell(root,run,{
     onRerun,
     caseActions,
     onOpenChat:chat.toggleChat,
+    onAdvancedOpen:()=>{if(comparative)drawAdvanced();},
   });
+  assignmentEssential.preview(nodes.preview,result,{onOpen:()=>shell.openAdvanced(nodes.assignment)});
+  comparative=comparativeUpgrade.render(nodes.comparative,run,{inline:true,
+    onStateChange:status=>{comparativeState=status;drawScenarios();},
+    onReady:artifact=>{
+      evidence={...result,scenarios:{...artifact.result_json.scenarios,selected:result.scenarios.selected}};
+      drawScenarios();drawAdvanced();summary.evidenceChanged(artifact);
+    },
+    onEvidenceReady:artifact=>{
+      summary.evidenceChanged(artifact);
+      nodes.chat.dispatchEvent(new CustomEvent('dispatch:evidence-changed',{detail:{id:artifact.id}}));
+    },
+  });
+  drawAdvanced();
+  scopeFor(root).listen(nodes.comparative,'assignment:reference-changed',event=>advanced?.setReference(event.detail.key));
 }
 
 function renderLegacyDashboard(root,run,onRerun,caseActions={}){

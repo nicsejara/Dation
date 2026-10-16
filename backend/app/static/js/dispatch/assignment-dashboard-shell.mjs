@@ -1,34 +1,86 @@
-import {iconSvg} from "./decision-ui.mjs";
+import {iconSvg} from './decision-ui.mjs';
+import {esc} from './shared.mjs';
 import {scopeFor} from './lifecycle.mjs';
 import {decisionRail,bindDecisionRail} from './decision-nav.mjs';
 import {analysisDepthUi} from './assignment-dashboard-selectors.mjs';
 import {renderDashboardToolbar,bindDashboardToolbar} from './dashboard-toolbar.mjs';
+import {WORKFLOW_ACTION_CLASS} from './workflow-action-bar.mjs';
+const icon=name=>iconSvg(name,'assignment-v2__icon');
 
 export function renderAssignmentShell(root,run,caseActions={}){
-  const depth=analysisDepthUi(run);
-  const {toolbar,drawer}=renderDashboardToolbar(run,caseActions);
+  const depth=analysisDepthUi(run),id='assignment-presentation-'+run.id;
+  const {toolbar,drawer}=renderDashboardToolbar(run,caseActions,{placement:'hero'});
   root.className='dispatch assignment-dashboard-v2 d-decision-dashboard';root.dataset.analysisDepth=depth.depth;
-  root.innerHTML=toolbar
-    +'<div class="assignment-dashboard-v2__rail">'+decisionRail(caseActions)+'</div>'
-    +'<main class="assignment-dashboard-v2__main">'
-      +'<section class="dispatch-panel assignment-dashboard-v2__section assignment-dashboard-v2__hero" id="dispatch-hero"></section>'
-      +'<section class="dispatch-panel assignment-dashboard-v2__section assignment-dashboard-v2__assignment" id="dispatch-assignment"></section>'
+  root.innerHTML='<div class="assignment-dashboard-v2__rail">'+decisionRail(caseActions)+'</div>'
+    +'<div class="assignment-view-control" role="tablist" aria-label="Nivel de análisis">'
+      +'<button type="button" role="tab" id="'+esc(id)+'-essential" data-assignment-view="essential" aria-selected="true" aria-controls="'+esc(id)+'">'+icon('eye')+'Vista esencial</button>'
+      +'<button type="button" role="tab" id="'+esc(id)+'-advanced" data-assignment-view="advanced" aria-selected="false" aria-controls="'+esc(id)+'" tabindex="-1">'+icon('chartBar')+'Análisis avanzado</button></div>'
+    +'<main class="assignment-dashboard-v2__main" id="'+esc(id)+'" role="tabpanel" aria-labelledby="'+esc(id)+'-essential">'
+      +'<section class="dispatch-panel assignment-dashboard-v2__section assignment-dashboard-v2__hero" id="dispatch-hero"><div data-assignment-hero-copy></div>'+toolbar+'</section>'
+      +'<section id="assignment-context" class="assignment-context"></section>'
+      +'<section id="assignment-kpis"></section>'
+      +'<section id="assignment-insights" class="assignment-v2__panel"></section>'
+      +'<section id="assignment-scenarios" class="assignment-v2__panel"></section>'
+      +'<div class="assignment-essential__execution"><section id="assignment-resources" class="assignment-v2__panel"></section>'
+        +'<section id="assignment-preview" class="assignment-v2__panel"></section></div>'
+      +'<section class="assignment-v2__panel assignment-ai-summary" id="dispatch-explanation"></section>'
+      +'<section class="assignment-v2__panel assignment-advanced" data-assignment-advanced>'
+        +'<button type="button" class="assignment-advanced__toggle" data-assignment-advanced-toggle aria-expanded="false" aria-controls="'+esc(id)+'-advanced-content"><span>'+icon('chartBar')+'<strong>Mostrar análisis avanzado</strong></span>'+icon('chevronDown')+'</button><p class="assignment-advanced__description">Compará escenarios en detalle, revisá utilización por viaje, corredores y la evidencia completa.</p>'
+        +'<div class="assignment-advanced__chips" aria-hidden="true"><span>Frontera de decisión</span><span>Comparación detallada</span><span>Utilización por viaje</span><span>Corredores</span><span>Plan completo</span></div>'
+        +'<div id="'+esc(id)+'-advanced-content" data-assignment-advanced-content hidden>'
+          +'<section class="assignment-comparative-layer" id="dispatch-comparative"></section>'
+          +'<div data-assignment-advanced-analysis></div>'
+          +'<section class="assignment-dashboard-v2__assignment" id="dispatch-assignment" tabindex="-1"></section>'
+        +'</div></section>'
       +'<section class="dispatch-panel assignment-dashboard-v2__section assignment-dashboard-v2__review" id="dispatch-review"><div data-review-content></div></section>'
-      +'<section class="dispatch-panel assignment-dashboard-v2__section assignment-comparative-layer" id="dispatch-comparative"></section>'
-      +'<section class="dispatch-panel assignment-dashboard-v2__section assignment-dashboard-v2__ai" id="dispatch-explanation"></section>'
+      +'<section class="assignment-v2__panel assignment-final-actions" aria-label="Acciones finales">'
+        +(caseActions.onApprove?'<button type="button" class="'+WORKFLOW_ACTION_CLASS+' d-button--primary" data-approve-final>'+icon('checkCircle')+'<span>'+(caseActions.status==='approved'?'Decisión aprobada':'Aprobar decisión')+'</span></button>':'')
+        +'<button type="button" class="'+WORKFLOW_ACTION_CLASS+' d-button--primary" data-after-approve hidden>Continuar a Planificación</button>'
+        +'<p data-next-decision-status role="status"></p></section>'
     +'</main>'
-    +'<button type="button" class="dispatch-ai-fab assignment-dashboard-v2__ai-fab" data-chat aria-expanded="false" aria-label="Abrir Dation IA">'+iconSvg("sparkles","dispatch-action-icon")+'<strong>Dation IA</strong></button>'
-    +'<aside class="dispatch-chat dispatch-panel assignment-dashboard-v2__chat" hidden aria-label="Chat de la decisión"></aside>'
-    +drawer;
-  return {
-    hero:root.querySelector('#dispatch-hero'),assignment:root.querySelector('#dispatch-assignment'),
-    review:root.querySelector('[data-review-content]'),comparative:root.querySelector('#dispatch-comparative'),
-    explanation:root.querySelector('#dispatch-explanation'),chat:root.querySelector('.assignment-dashboard-v2__chat'),
-  };
+    +'<button type="button" class="dispatch-ai-fab assignment-dashboard-v2__ai-fab" data-chat aria-expanded="false" aria-label="Abrir Dation IA">'+icon('sparkles')+'<strong>Dation IA</strong></button>'
+    +'<aside class="dispatch-chat dispatch-panel assignment-dashboard-v2__chat" hidden aria-label="Chat de la decisión"></aside>'+drawer;
+  const find=selector=>root.querySelector(selector);
+  return {hero:find('[data-assignment-hero-copy]'),context:find('#assignment-context'),kpis:find('#assignment-kpis'),insights:find('#assignment-insights'),
+    scenarios:find('#assignment-scenarios'),resources:find('#assignment-resources'),preview:find('#assignment-preview'),assignment:find('#dispatch-assignment'),
+    review:find('[data-review-content]'),comparative:find('#dispatch-comparative'),advanced:find('[data-assignment-advanced-analysis]'),
+    explanation:find('#dispatch-explanation'),chat:find('.assignment-dashboard-v2__chat')};
 }
 
-export function bindAssignmentShell(root,run,{onRerun,caseActions={},onOpenChat}={}){
+export function bindAssignmentShell(root,run,{onRerun,caseActions={},onOpenChat,onAdvancedOpen}={}){
   bindDecisionRail(root,caseActions);
-  scopeFor(root).listen(root.querySelector('[data-chat]'),'click',()=>onOpenChat?.());
-  return bindDashboardToolbar(root,run,{onRerun,caseActions});
+  const scope=scopeFor(root),advanced=root.querySelector('[data-assignment-advanced]'),tabs=[...root.querySelectorAll('[data-assignment-view]')];
+  const storage='dation.assignment.presentation.'+run.id;
+  const toggle=advanced.querySelector('[data-assignment-advanced-toggle]'),content=advanced.querySelector('[data-assignment-advanced-content]');
+  let previous=false,open=false;
+  function sync(){
+    root.dataset.visualDepth=open?'advanced':'essential';
+    tabs.forEach(tab=>{const active=(tab.dataset.assignmentView==='advanced')===open;tab.setAttribute('aria-selected',String(active));tab.tabIndex=active?0:-1;});
+    root.querySelector('main').setAttribute('aria-labelledby',tabs[open?1:0].id);
+    toggle.setAttribute('aria-expanded',String(open));content.hidden=!open;advanced.classList.toggle('is-open',open);
+    try{sessionStorage.setItem(storage,open?'advanced':'essential');}catch{}
+    if(open&&!previous)onAdvancedOpen?.();
+    previous=open;
+  }
+  function setAdvanced(value,{scroll=false,target}={}){
+    open=Boolean(value);sync();
+    if(open&&scroll)scope.timeout(()=>{
+      const node=target||advanced;
+      node.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
+      if(target)target.focus({preventScroll:true});
+    },0);
+  }
+  tabs.forEach((tab,index)=>{
+    scope.listen(tab,'click',()=>setAdvanced(index===1,{scroll:index===1}));
+    scope.listen(tab,'keydown',event=>{
+      if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
+      event.preventDefault();const next=event.key==='Home'?0:event.key==='End'?1:1-index;
+      setAdvanced(next===1);tabs[next].focus();
+    });
+  });
+  scope.listen(toggle,'click',()=>setAdvanced(!open));
+  scope.listen(root.querySelector('[data-chat]'),'click',()=>onOpenChat?.());
+  let restored=false;try{restored=sessionStorage.getItem(storage)==='advanced';}catch{}
+  setAdvanced(restored);
+  return {...bindDashboardToolbar(root,run,{onRerun,caseActions}),openAdvanced:target=>setAdvanced(true,{scroll:true,target})};
 }

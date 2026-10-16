@@ -57,8 +57,8 @@ class AssignmentDashboardPhase2Tests(unittest.TestCase):
             if (kpis.find(item => item.key === 'load_utilization').objective) {{
               throw new Error('utilization must stay descriptive');
             }}
-            if (kpis.find(item => item.key === 'avg_cost_per_trip').objective) {{
-              throw new Error('average cost must stay descriptive');
+            if (kpis.some(item => item.key === 'avg_cost_per_trip')) {{
+              throw new Error('average cost belongs in Advanced, not Essential');
             }}
 
             const trips = getAssignmentTrips(result);
@@ -91,11 +91,11 @@ class AssignmentDashboardPhase2Tests(unittest.TestCase):
         self.assertEqual(completed.returncode, 0, completed.stderr)
 
     def test_essential_is_always_base_and_comparative_is_insertable(self):
-        self.assertIn("renderModule(nodes.hero,assignmentSummary,result)", self.dashboard)
+        self.assertIn("assignmentSummary.render(nodes.hero,result,caseActions)", self.dashboard)
         self.assertIn("renderModule(nodes.assignment,assignmentEvidence,result)", self.dashboard)
         self.assertIn("renderModule(nodes.review,assignmentValidation,result)", self.dashboard)
         self.assertIn("comparativeUpgrade.render(nodes.comparative,run",self.dashboard)
-        self.assertLess(self.dashboard.index('comparativeUpgrade.render'),self.dashboard.index('renderModule(nodes.explanation'))
+        self.assertLess(self.dashboard.index('assignmentAiSummary.render'),self.dashboard.index('comparativeUpgrade.render'))
         self.assertNotIn("data-depth-toggle", self.dashboard)
 
     def test_summary_separates_objective_metrics_from_descriptive_kpis(self):
@@ -148,7 +148,7 @@ class AssignmentDashboardPhase2Tests(unittest.TestCase):
 
     def test_validation_keeps_real_warnings_and_has_a_single_empty_state(self):
         self.assertIn('getApprovalWarnings(result)',self.validation)
-        self.assertIn('No se detectaron controles u observaciones pendientes',self.validation)
+        self.assertIn('No se detectaron asignaciones que requieran controles u observaciones adicionales.',self.validation)
         self.assertNotIn('engineEvidence',self.validation)
         self.assertNotIn('Evidencia del motor',self.validation)
         self.assertNotIn('.filter(',self.validation)

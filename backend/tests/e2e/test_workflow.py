@@ -9,7 +9,7 @@ import subprocess
 import unittest
 from uuid import uuid4
 
-from fixtures import csv_input
+from fixtures import csv_input,assignment_matrix_inputs
 from sandbox import Sandbox, ROOT, wait_for
 
 
@@ -77,6 +77,39 @@ class WorkflowTests(unittest.TestCase):
 
     def approve(self,run,case,node='logistics_assignment'):
         return self.checked(self.s.api_client.post('/api/runs/'+run+'/approve',json={'case_id':case,'node_id':node}))
+
+    def test_assignment_dashboard_all_objectives_use_actual_worker_evidence(self):
+        datasets={}
+        for kind,content in assignment_matrix_inputs().items():
+            datasets[kind]=self.checked(self.s.api_client.post('/api/datasets/upload',params={'dataset_type':kind},
+                data={'is_sample':'true'},files={'file':('qa-'+kind+'.csv',content,'text/csv')}))['dataset']
+        case=str(uuid4());orders,fleet=datasets['orders'],datasets['fleet']
+        self.checked(self.s.api_client.post('/api/decision-cases',json={'id':case,'orders_dataset_id':orders['id'],'fleet_dataset_id':fleet['id']}))
+        self.s.start_worker();runs=[]
+        for objective in ('min_trips','min_cost','max_own_fleet','balanced','min_co2'):
+            body=self.body(case,orders,fleet);body['configuration']={'mode':'preset','objective':objective,'dimensions':['trips','cost','own_fleet','co2']}
+            body['options'].update(analysis_depth='comparative',allow_third_party=True)
+            run=self.finish(self.admit(body));result=run['result_json'];selected=result['scenarios']['selected']
+            self.assertEqual(result['configuration']['objective'],objective)
+            self.assertEqual(selected['plan_fingerprint'],result['scenarios'][objective]['plan_fingerprint'])
+            self.assertTrue(selected['feasible'])
+            runs.append({'id':run['id'],'objective':objective,'plan_fingerprint':selected['plan_fingerprint'],
+                'result_fingerprint':run['result_fingerprint'],'metrics':selected['metrics'],'trips':selected['trips']})
+        shares=[run['metrics']['own_weight_share'] for run in runs]
+        self.assertIn(1,shares);self.assertTrue(any(share<1 for share in shares),shares)
+        path=self.s.directory/'assignment-matrix.json';path.write_text(json.dumps({'case_id':case,'runs':runs},indent=2))
+        browser_python=os.getenv('DATION_BROWSER_PYTHON',str(ROOT/'.browser-venv/bin/python'))
+        outcome=subprocess.run([browser_python,str(ROOT/'tests/e2e/assignment_matrix_journey.py')],
+            cwd=ROOT,env={**self.s.env,'DATION_E2E_URL':self.s.api_url,'DATION_E2E_MATRIX':str(path)},capture_output=True,text=True,timeout=120)
+        self.assertEqual(outcome.returncode,0,(outcome.stdout+outcome.stderr)[-8000:])
+        report=json.loads(path.with_name('assignment-matrix-browser-report.json').read_text());self.assertTrue(report['passed'])
+        artifact=os.getenv('DATION_E2E_ARTIFACTS')
+        if artifact:
+            output=Path(artifact);output.mkdir(parents=True,exist_ok=True)
+            (output/'assignment-matrix-browser-report.json').write_text(json.dumps(report,indent=2))
+        for row in runs:self.assertEqual(self.checked(self.s.api_client.get('/api/runs/'+row['id']))['result_fingerprint'],row['result_fingerprint'])
+        self.assertEqual(len(self.checked(self.s.db.get('decision_runs',params={'select':'id'}))),5)
+        self.assertEqual(self.checked(self.s.db.get('decision_approval_events',params={'select':'id'})),[])
 
     def test_private_operations_trace_worker_readiness_and_cluster_metrics(self):
         for path in ['/ready','/metrics','/api/system/operations']:

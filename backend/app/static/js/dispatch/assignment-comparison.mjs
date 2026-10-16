@@ -1,4 +1,5 @@
 import {esc,num,money,pct} from './shared.mjs';
+import {createScope} from './lifecycle.mjs';
 import {
   getComparisonContext,
   getDefaultComparisonKey,
@@ -88,6 +89,7 @@ function comparisonBody(context){
 }
 
 export function render(root,result){
+  const scope=createScope(root);
   const initialKey=getDefaultComparisonKey(result);
   const initial=getComparisonContext(result,initialKey);
 
@@ -107,8 +109,9 @@ export function render(root,result){
   if(!select||!body||!initial.alternatives.length)return;
   if(initial.key)select.value=initial.key;
 
-  select.addEventListener('change',()=>{
+  scope.listen(select,'change',()=>{
     const context=getComparisonContext(result,select.value);
     body.innerHTML=comparisonBody(context);
+    root.dispatchEvent(new CustomEvent('assignment:reference-changed',{bubbles:true,detail:{key:context.key}}));
   });
 }

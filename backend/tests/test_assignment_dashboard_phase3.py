@@ -76,7 +76,7 @@ class AssignmentDashboardPhase3Tests(unittest.TestCase):
         self.assertEqual(completed.returncode, 0, completed.stderr)
 
     def test_comparative_composition_extends_essential_in_the_same_dashboard(self):
-        self.assertIn("renderModule(nodes.hero,assignmentSummary,result)", self.dashboard)
+        self.assertIn("assignmentSummary.render(nodes.hero,result,caseActions)", self.dashboard)
         self.assertIn("renderModule(nodes.assignment,assignmentEvidence,result)", self.dashboard)
         widget=(JS/'comparative-upgrade.mjs').read_text()
         self.assertIn("assignment-comparative-summary.mjs",widget)
@@ -92,9 +92,9 @@ class AssignmentDashboardPhase3Tests(unittest.TestCase):
             self.assertNotIn(forbidden,self.comparison)
         self.assertIn('data-comparison-select',self.comparison)
 
-    def test_comparative_summary_focuses_on_the_four_indicators(self):
+    def test_comparative_summary_includes_main_and_secondary_metrics(self):
         self.assertIn('Compará la decisión con otros escenarios',self.summary)
-        self.assertIn('cuatro indicadores principales',self.summary)
+        self.assertIn('indicadores principales, CO₂ y costo por viaje',self.summary)
         for forbidden in ('Estado del solver','Objetivo original','solverStatusLabel','escenarios de referencia'):
             self.assertNotIn(forbidden,self.summary)
         widget=(JS/'comparative-upgrade.mjs').read_text()

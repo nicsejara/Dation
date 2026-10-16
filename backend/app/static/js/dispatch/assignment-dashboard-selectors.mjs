@@ -54,12 +54,18 @@ const COMPARISON_SCENARIO_LABELS={
 
 // Both executive cards and comparisons use these definitions. Ownership is by weight.
 export const EXECUTIVE_KPIS=Object.freeze([
-  {key:'total_trips',dimension:'trips',label:'Cantidad de viajes',format:'integer',fallbackDirection:'lower_better'},
-  {key:'load_utilization',dimension:null,label:'Utilización media',format:'percent',fallbackDirection:'higher_better',
+  {key:'total_cost',dimension:'cost',label:'Costo total',icon:'dollarSign',format:'money',fallbackDirection:'lower_better',
+    description:'Costo estimado de ejecutar toda la asignación.'},
+  {key:'total_trips',dimension:'trips',label:'Viajes',icon:'route',format:'integer',fallbackDirection:'lower_better',
+    description:'Viajes requeridos para transportar la carga.'},
+  {key:'load_utilization',dimension:null,label:'Utilización',icon:'gauge',format:'percent',fallbackDirection:'higher_better',
     description:'Carga transportada dividida por la capacidad total de los viajes utilizados.'},
-  {key:'avg_cost_per_trip',dimension:'cost',label:'Costo promedio por viaje',format:'money',fallbackDirection:'lower_better'},
-  {key:'own_weight_share',dimension:'own_fleet',label:'% flota propia',format:'percent',fallbackDirection:'higher_better',
+  {key:'own_weight_share',dimension:'own_fleet',label:'Flota propia',icon:'truck',format:'percent',fallbackDirection:'higher_better',
     description:'Participación de la carga transportada con flota propia, medida por peso.'},
+].map(Object.freeze));
+const COMPARISON_KPIS=Object.freeze([...EXECUTIVE_KPIS,
+  {key:'co2_kg',dimension:'co2',label:'CO₂ estimado',format:'number',fallbackDirection:'lower_better'},
+  {key:'avg_cost_per_trip',dimension:null,label:'Costo promedio por viaje',format:'money',fallbackDirection:'lower_better'},
 ].map(Object.freeze));
 
 function selected(result){
@@ -175,12 +181,12 @@ export function getAssignmentSummary(result){
   const scenario=selected(result);
   const metrics=scenario.metrics||{};
   const configuration=result?.configuration||{};
-  const objective=configuration.objective||result?.decision?.objective||'balanced';
+  const objective=configuration.objective||result?.decision?.objective||'unknown';
   return {
-    orders:metrics.orders??0,
-    trips:metrics.total_trips??0,
-    totalWeightKg:metrics.total_weight_kg??null,
-    vehiclesUsed:metrics.vehicles_used??null,
+    orders:finiteMetric(metrics.orders),
+    trips:finiteMetric(metrics.total_trips),
+    totalWeightKg:finiteMetric(metrics.total_weight_kg),
+    vehiclesUsed:finiteMetric(metrics.vehicles_used),
     objective,
     objectiveLabel:OBJECTIVES[objective]||'Objetivo configurado',
     objectiveWeights:getObjectiveWeights(result),
@@ -225,19 +231,15 @@ export function getAssignmentVehicles(result){
         provider_name:trip.provider_name||null,
         base_site:trip.base_site||trip.base_location||null,
         trips:0,
-        load_kg:0,
-        utilization_sum:0,
-        utilization_count:0,
+        weights:[],
+        capacities:[],
         orders:new Set(),
       });
     }
     const group=groups.get(id);
     group.trips+=1;
-    group.load_kg+=Number(trip.load_kg||0);
-    if(Number.isFinite(Number(trip.utilization))){
-      group.utilization_sum+=Number(trip.utilization);
-      group.utilization_count+=1;
-    }
+    group.weights.push(trip.load_kg);
+    group.capacities.push(trip.capacity_kg);
     for(const orderId of trip.order_ids)group.orders.add(orderId);
   }
 
@@ -248,10 +250,11 @@ export function getAssignmentVehicles(result){
     provider_name:group.provider_name,
     base_site:group.base_site,
     trips:group.trips,
-    load_kg:group.load_kg,
-    utilization:group.utilization_count?group.utilization_sum/group.utilization_count:null,
+    load_kg:completeSum(group.weights),
+    utilization:completeSum(group.weights)!==null&&completeSum(group.capacities)>0
+      ?completeSum(group.weights)/completeSum(group.capacities):null,
     orders:group.orders.size,
-    load_share:totalWeight?group.load_kg/totalWeight:null,
+    load_share:totalWeight>0&&completeSum(group.weights)!==null?completeSum(group.weights)/totalWeight:null,
   })).sort((a,b)=>b.load_kg-a.load_kg||a.id.localeCompare(b.id));
 }
 
@@ -354,7 +357,7 @@ export function getComparableScenarios(result){
     const item={
       key,
       label:getScenarioLabel(key,scenario),
-      feasible:scenario.feasible!==false,
+      feasible:scenario.feasible!==false&&scenario.solver?.status!=='infeasible',
       samePlan:sameAssignmentPlan(selectedScenario,scenario),
       solverStatus:scenario.solver?.status||null,
       scenario,
@@ -392,11 +395,11 @@ export function getDefaultComparisonKey(result){
 }
 
 export function getComparisonMetricDefinitions(){
-  return EXECUTIVE_KPIS.map(item=>({...item}));
+  return COMPARISON_KPIS.map(item=>({...item}));
 }
 
 export function compareScenarioMetric(result,referenceKey,metricKey){
-  const definition=EXECUTIVE_KPIS.find(item=>item.key===metricKey);
+  const definition=COMPARISON_KPIS.find(item=>item.key===metricKey);
   const selectedScenario=selected(result);
   const reference=result?.scenarios?.[referenceKey];
   const selectedValue=getScenarioMetric(selectedScenario,metricKey);
@@ -418,10 +421,10 @@ export function compareScenarioMetric(result,referenceKey,metricKey){
   if(selectedValue===null||referenceValue===null){
     return {...base,reason:'Métrica no publicada en ambos escenarios'};
   }
-  if(reference.feasible===false){
+  if(reference.feasible===false||reference.solver?.status==='infeasible'){
     return {...base,reason:'La referencia está marcada como no factible'};
   }
-  if(selectedScenario.feasible===false){
+  if(selectedScenario.feasible===false||selectedScenario.solver?.status==='infeasible'||result?.engine?.solver?.status==='infeasible'){
     return {...base,reason:'La recomendación está marcada como no factible'};
   }
 
@@ -452,7 +455,7 @@ export function compareScenarioMetric(result,referenceKey,metricKey){
 }
 
 export function getComparisonRows(result,referenceKey){
-  return EXECUTIVE_KPIS.map(metric=>compareScenarioMetric(result,referenceKey,metric.key));
+  return COMPARISON_KPIS.map(metric=>compareScenarioMetric(result,referenceKey,metric.key));
 }
 
 export function getComparisonContext(result,referenceKey){
@@ -472,4 +475,139 @@ export function getComparisonContext(result,referenceKey){
     feasible:reference?.feasible!==false,
     rows:key?getComparisonRows(result,key):[],
   };
+}
+
+// Presentation models never write to the persisted run or infer absent metrics as zero.
+export const getEssentialKpis=getOperationalKpis;
+
+export function getAssignmentContext(result){
+  const metrics=selected(result).metrics||{},trips=getAssignmentTrips(result);
+  const destinations=new Set(trips.map(t=>t.destination).filter(v=>typeof v==='string'&&v.trim()));
+  const resources=Array.isArray(result?.resources)?result.resources:null;
+  const metadata=result?.inputs?.orders||{};
+  const unit=metadata.quantity_unit||metadata.unit_of_measure;
+  return {
+    orders:finiteMetric(metrics.orders),totalWeightKg:finiteMetric(metrics.total_weight_kg),
+    destinations:trips.length&&trips.every(t=>typeof t.destination==='string'&&t.destination.trim())?destinations.size:null,
+    evaluatedVehicles:resources?resources.length:null,
+    unitsLabel:typeof unit==='string'&&unit.trim()?unit.trim().slice(0,40):'unidades',
+  };
+}
+
+export function getScenarioTable(result){
+  const scenario=selected(result),objective=result?.configuration?.objective||result?.decision?.objective;
+  const alternatives=getComparableScenarios(result);
+  const published=alternatives.find(item=>item.key===objective&&sameAssignmentPlan(scenario,item.scenario));
+  const rows=alternatives.map(item=>({...item,selected:item===published,
+    values:Object.fromEntries(EXECUTIVE_KPIS.map(k=>[k.key,getScenarioMetric(item.scenario,k.key)])),
+  }));
+  if(published){
+    const row=rows.find(item=>item.selected);
+    row.scenario=scenario;
+    row.values=Object.fromEntries(EXECUTIVE_KPIS.map(k=>[k.key,getScenarioMetric(scenario,k.key)]));
+  }else{
+    rows.unshift({key:'selected',label:scenario.name||COMPARISON_SCENARIO_LABELS[objective]||'Recomendación',scenario,selected:true,
+      feasible:scenario.feasible!==false&&scenario.solver?.status!=='infeasible',samePlan:false,
+      values:Object.fromEntries(EXECUTIVE_KPIS.map(k=>[k.key,getScenarioMetric(scenario,k.key)]))});
+  }
+  return rows;
+}
+
+export function getDecisionInsights(result){
+  const scenario=selected(result),summary=getAssignmentSummary(result),rows=[];
+  const utilization=getScenarioMetric(scenario,'load_utilization'),own=getScenarioMetric(scenario,'own_weight_share');
+  if(utilization!==null)rows.push({key:'utilization',icon:'gauge',title:'Aprovechamiento de capacidad',
+    metric:utilization,format:'percent',detail:'de la capacidad agregada de los viajes publicados está ocupada por carga.'});
+  if(own!==null)rows.push({key:'ownership',icon:'truck',title:own===1?'Sin tercerización':own===0?'Ejecución tercerizada':'Combinación de recursos',
+    metric:own,format:'percent',detail:'del peso transportado queda asignado a flota propia.'});
+  const co2=getScenarioMetric(scenario,'co2_kg');
+  const reference=getComparableScenarios(result).find(item=>item.feasible&&!item.samePlan
+    &&['min_cost','min_trips'].includes(item.key)&&co2!==null
+    &&getScenarioMetric(item.scenario,'co2_kg')!==null&&co2<getScenarioMetric(item.scenario,'co2_kg'));
+  if(reference&&summary.feasible)rows.push({key:'emissions',icon:'leaf',title:'Menor impacto ambiental',
+    detail:'La recomendación publica menos CO₂ que '+reference.label+'. La estimación corresponde a los factores del motor.'});
+  if(rows.length<3)rows.push({key:'objective',icon:summary.objective==='balanced'?'balance':'target',title:'Prioridad aplicada',
+    detail:summary.objectiveLabel+'. Se respetan las ponderaciones persistidas de esta corrida.'});
+  return rows.slice(0,3);
+}
+
+export function getDecisionNarrative(result){
+  const summary=getAssignmentSummary(result);
+  const copy={
+    min_cost:'Dation priorizó el menor costo total según la configuración de la corrida y los recursos elegibles.',
+    min_trips:'Dation priorizó reducir la cantidad de viajes necesarios para distribuir la carga.',
+    max_own_fleet:'Dation priorizó transportar la mayor proporción de carga con recursos propios.',
+    min_co2:'Dation priorizó reducir las emisiones estimadas con los factores publicados de los recursos.',
+    balanced:'Dation ponderó las prioridades configuradas para distribuir la carga sin optimizar una única dimensión de forma aislada.',
+    custom:'Dation aplicó las ponderaciones personalizadas de esta corrida para construir la recomendación.',
+  };
+  return copy[summary.objective]||'Dation aplicó el objetivo y las restricciones persistidas de esta corrida.';
+}
+
+export function getResourceParticipation(result){
+  const trips=getAssignmentTrips(result),total=trips.length;
+  return getAssignmentVehicles(result).map(item=>({...item,tripShare:total?item.trips/total:null,totalTrips:total,
+    concentrated:total>1&&item.trips/total>=.4,
+  })).sort((a,b)=>b.trips-a.trips||a.id.localeCompare(b.id));
+}
+
+export function getAssignmentPreview(result,limit=5){
+  return getAssignmentTrips(result).slice(0,Math.max(0,Math.min(5,Math.floor(finiteMetric(limit)??5))));
+}
+
+export function getDecisionTradeoffs(result,referenceKey=getDefaultComparisonKey(result)){
+  const context=getComparisonContext(result,referenceKey);
+  const rows=context.samePlan?[]:context.rows.filter(row=>row.absolute!==null&&Math.abs(row.absolute)>1e-10);
+  return {...context,gains:rows.filter(row=>row.semantic==='improvement'),
+    concessions:rows.filter(row=>row.semantic==='tradeoff')};
+}
+
+export function getTripUtilization(result,sort='utilization'){
+  return getAssignmentTrips(result).map(trip=>({...trip,utilization:finiteMetric(trip.utilization)})).sort((a,b)=>
+    sort==='route'?String(a.destination||'').localeCompare(String(b.destination||''),'es')||a.trip_id.localeCompare(b.trip_id)
+      :sort==='trip'?a.trip_id.localeCompare(b.trip_id)
+      :(b.utilization??-Infinity)-(a.utilization??-Infinity)||a.trip_id.localeCompare(b.trip_id));
+}
+
+function completeSum(values){
+  const numbers=values.map(finiteMetric);
+  return numbers.length&&numbers.every(n=>n!==null)?numbers.reduce((sum,n)=>sum+n,0):null;
+}
+
+export function getCorridorSummary(result){
+  const groups=new Map();
+  for(const trip of getAssignmentTrips(result)){
+    const key=JSON.stringify([trip.origin||null,trip.destination||null]);
+    if(!groups.has(key))groups.set(key,[]);
+    groups.get(key).push(trip);
+  }
+  return [...groups.values()].map(trips=>{
+    const load=completeSum(trips.map(t=>t.load_kg)),capacity=completeSum(trips.map(t=>t.capacity_kg));
+    const loads=trips.flatMap(t=>Array.isArray(t.loads)?t.loads:[]);
+    const knownOwnership=trips.every(t=>['own','third_party'].includes(t.ownership));
+    const own=knownOwnership?completeSum(trips.map(t=>t.ownership==='own'?t.load_kg:0)):null;
+    return {origin:trips[0].origin||null,destination:trips[0].destination||null,loadKg:load,
+      units:completeSum(loads.map(l=>l.units)),trips:trips.length,
+      vehicles:trips.every(t=>t.vehicle_id||t.fleet_pool_id)?new Set(trips.map(t=>t.resource_id)).size:null,
+      utilization:load!==null&&capacity>0?load/capacity:null,
+      ownWeightShare:own!==null&&load>0?own/load:null,
+      cost:completeSum(trips.map(t=>t.estimated_cost??t.cost)),
+    };
+  }).sort((a,b)=>String(a.origin).localeCompare(String(b.origin),'es')||String(a.destination).localeCompare(String(b.destination),'es'));
+}
+
+const briefString=value=>typeof value==='string'?value.trim():'';
+const briefList=value=>(Array.isArray(value)?value:[value]).map(briefString).filter(Boolean);
+
+export function getExecutiveBrief(data){
+  const payload=data?.explanation?.response_json||data?.explanation||data?.response_json||data||{};
+  const lead=briefString(payload.executive_summary)||briefString(payload.summary)||briefString(payload.title)||briefString(payload.recommendation);
+  const impact=payload.business_impact||{};
+  return {lead:lead||['cost','trips','distance'].map(key=>briefString(impact[key])).filter(Boolean).join(' '),
+    why:briefString(payload.why_recommended)||briefString(payload.why),drivers:briefList(payload.key_drivers||payload.events).slice(0,3),
+    tradeoffs:briefList(payload.tradeoffs||payload.trade_offs).slice(0,3),
+    review:[...new Set([briefString(payload.recommendation||payload.next_step),...briefList(payload.caveats||payload.risks)].filter(Boolean))].slice(0,3)};
+}
+export function briefText(brief){
+  return [brief.lead,brief.why,...['drivers','tradeoffs','review'].flatMap(key=>brief[key])].filter(Boolean).join('\n\n');
 }

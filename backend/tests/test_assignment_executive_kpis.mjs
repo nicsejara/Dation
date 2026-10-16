@@ -5,7 +5,7 @@ import {
   getComparisonMetricDefinitions,getComparisonRows,getApprovalWarnings,sameAssignmentPlan,
 } from '../app/static/js/dispatch/assignment-dashboard-selectors.mjs';
 
-const keys=['total_trips','load_utilization','avg_cost_per_trip','own_weight_share'];
+const keys=['total_cost','total_trips','load_utilization','own_weight_share'];
 function result(){
   return {configuration:{objective:'min_cost'},scenarios:{
     selected:{feasible:true,plan_fingerprint:'original',metrics:{total_cost:1000,total_trips:4,load_utilization:.82,own_weight_share:.78}},
@@ -13,11 +13,11 @@ function result(){
   }};
 }
 
-test('main and comparator share exactly four definitions, including absent historical values',()=>{
+test('Essential keeps four canonical metrics and Advanced adds CO2 and average cost',()=>{
   assert.deepEqual(getOperationalKpis(result()).map(k=>k.key),keys);
-  assert.deepEqual(getComparisonMetricDefinitions().map(k=>k.key),keys);
+  assert.deepEqual(getComparisonMetricDefinitions().map(k=>k.key),[...keys,'co2_kg','avg_cost_per_trip']);
   assert.deepEqual(getOperationalKpis({}).map(k=>k.value),[null,null,null,null]);
-  assert.deepEqual(getOperationalKpis(result()).map(k=>k.label),['Cantidad de viajes','Utilización media','Costo promedio por viaje','% flota propia']);
+  assert.deepEqual(getOperationalKpis(result()).map(k=>k.label),['Costo total','Viajes','Utilización','Flota propia']);
   assert.deepEqual(getExecutiveKpisForScenario(result().scenarios.balanced).map(k=>k.key),keys);
   assert.ok(Object.isFrozen(EXECUTIVE_KPIS)&&EXECUTIVE_KPIS.every(Object.isFrozen));
 });
@@ -53,20 +53,22 @@ test('own fleet share remains the persisted weight share, never a trip or vehicl
 test('utilization is the persisted canonical metric and both percent metrics compare in fractions',()=>{
   const r=result();r.kpi_directions={load_utilization:'lower_better'};
   const rows=getComparisonRows(r,'balanced');
-  assert.ok(Math.abs(rows[1].absolute*100-7)<1e-10);assert.equal(rows[1].semantic,'improvement');
+  assert.ok(Math.abs(rows.find(x=>x.key==='load_utilization').absolute*100-7)<1e-10);assert.equal(rows.find(x=>x.key==='load_utilization').semantic,'improvement');
   assert.ok(Math.abs(rows[3].absolute*100-14)<1e-10);assert.equal(rows[3].semantic,'improvement');
   r.scenarios.selected.trips=[{load_kg:1,capacity_kg:100}];
-  assert.equal(getOperationalKpis(r)[1].value,.82);
+  assert.equal(getOperationalKpis(r).find(x=>x.key==='load_utilization').value,.82);
 });
 test('average cost is descriptive even when the engine minimizes total cost',()=>{
   const r=result();r.configuration={objective:'min_cost',dimensions:['cost'],weights:{cost:1}};
-  assert.equal(getOperationalKpis(r).find(x=>x.key==='avg_cost_per_trip').objective,false);
+  assert.equal(getOperationalKpis(r).some(x=>x.key==='avg_cost_per_trip'),false);
+  assert.equal(getComparisonMetricDefinitions().find(x=>x.key==='avg_cost_per_trip').dimension,null);
+  assert.equal(getOperationalKpis(r).find(x=>x.key==='total_cost').objective,true);
 });
 test('missing historical reference values stay visible and noncomparable',()=>{
   const r=result();delete r.scenarios.balanced.metrics.load_utilization;delete r.scenarios.balanced.metrics.total_cost;
-  const rows=getComparisonRows(r,'balanced');assert.equal(rows.length,4);
-  assert.equal(rows[1].referenceValue,null);assert.equal(rows[1].semantic,'no_comparable');
-  assert.equal(rows[2].referenceValue,null);assert.equal(rows[2].semantic,'no_comparable');
+  const rows=getComparisonRows(r,'balanced');assert.equal(rows.length,6);
+  assert.equal(rows.find(x=>x.key==='load_utilization').referenceValue,null);assert.equal(rows.find(x=>x.key==='load_utilization').semantic,'no_comparable');
+  assert.equal(rows.find(x=>x.key==='avg_cost_per_trip').referenceValue,null);assert.equal(rows.find(x=>x.key==='avg_cost_per_trip').semantic,'no_comparable');
 });
 test('infeasible selected or reference scenarios never claim improvements',()=>{
   const r=result();r.scenarios.balanced.feasible=false;
@@ -76,9 +78,9 @@ test('infeasible selected or reference scenarios never claim improvements',()=>{
 });
 test('relative deltas require a nonzero reference and same-plan fingerprints remain intact',()=>{
   const r=result();r.scenarios.balanced.metrics.total_trips=0;
-  assert.equal(getComparisonRows(r,'balanced')[0].percent,null);
+  assert.equal(getComparisonRows(r,'balanced').find(x=>x.key==='total_trips').percent,null);
   r.scenarios.selected.metrics.total_trips=0;
-  assert.equal(getComparisonRows(r,'balanced')[0].semantic,'same');assert.equal(getComparisonRows(r,'balanced')[0].percent,null);
+  assert.equal(getComparisonRows(r,'balanced').find(x=>x.key==='total_trips').semantic,'same');assert.equal(getComparisonRows(r,'balanced').find(x=>x.key==='total_trips').percent,null);
   r.scenarios.balanced.plan_fingerprint='original';assert.equal(sameAssignmentPlan(r.scenarios.selected,r.scenarios.balanced),true);
 });
 test('empty review has no invented solver checklist; genuine controls remain',()=>{

@@ -15,6 +15,6 @@ export function render(root,result){
       ?'<h2>'+num(warnings.length)+' observación'+(warnings.length===1?' requiere':'es requieren')+' revisión</h2>'
         +'<div class="assignment-validation__cards">'+warnings.map(card).join('')+'</div>'
       :'<div class="assignment-validation__empty"><span aria-hidden="true">✓</span><div>'
-        +'<h2>No se detectaron controles u observaciones pendientes</h2>'
-        +'<p>La corrida no presenta valores que requieran revisión manual antes de aprobar.</p></div></div>');
+        +'<h2>Sin observaciones adicionales</h2><p>No se detectaron asignaciones que requieran controles u observaciones adicionales.</p>'
+        +'</div></div>');
 }

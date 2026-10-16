@@ -26,22 +26,23 @@ function detailRows(run,caseActions,scheduling){
   ];
 }
 
-export function renderDashboardToolbar(run,caseActions={}){
+export function renderDashboardToolbar(run,caseActions={},options={}){
   const scheduling=run.result_json?.schema_version==='scheduling_v1';
+  const hero=options.placement==='hero'&&!scheduling;
   const status=decisionStatusUi(caseActions.status);
   const title=scheduling?'Planificación de despachos':'Asignación de carga';
-  const approveLabel=scheduling?'Aprobar planificación':'Aprobar asignación';
+  const approveLabel=scheduling?'Aprobar planificación':hero?'Aprobar decisión':'Aprobar asignación';
   const drawerId='dashboard-run-details-'+crypto.randomUUID();
   const rows=detailRows(run,caseActions,scheduling);
-  const toolbar='<header class="dashboard-toolbar" data-dashboard-toolbar>'
+  const toolbar='<header class="dashboard-toolbar'+(hero?' assignment-hero__actions':'')+'" data-dashboard-toolbar'+(hero?' data-toolbar-placement="hero"':'')+'>'
     +'<div class="dashboard-toolbar__identity"><span class="dashboard-toolbar__eyebrow">DDA LOGÍSTICA · DECISIÓN '+(scheduling?'02':'01')+'</span>'
       +'<div class="dashboard-toolbar__title"><strong>'+title+'</strong>'
         +'<span class="dashboard-toolbar__badge '+esc(status.className)+'" data-status-badge>'+esc(status.label)+'</span></div>'
       +'<small>Corrida '+esc(shortRunId(run.id))+'</small></div>'
     +'<div class="dashboard-toolbar__tools" aria-label="Herramientas de la decisión">'
-      +(caseActions.onApprove?'<button type="button" data-approve-toolbar class="dashboard-toolbar__approve '+WORKFLOW_ACTION_CLASS+' d-button--primary" '+(caseActions.status==='approved'?'hidden':'')+'>'+workflowActionLabel(approveLabel)+'</button>':'')
-      +'<button type="button" data-after-approve class="dashboard-toolbar__continue '+WORKFLOW_ACTION_CLASS+' d-button--primary" hidden>'+workflowActionLabel("Continuar con la siguiente decisión")+'</button>'
-      +(caseActions.onMap?'<button type="button" data-dashboard-map class="dashboard-toolbar__map">'+actionLabel("Decision Map","map")+'</button>':'')
+      +(caseActions.onApprove?'<button type="button" data-approve-toolbar class="dashboard-toolbar__approve '+WORKFLOW_ACTION_CLASS+' d-button--primary" '+(caseActions.status==='approved'?(hero?'disabled':'hidden'):'')+'>'+(hero?actionLabel(caseActions.status==='approved'?'Decisión aprobada':approveLabel,'checkCircle'):workflowActionLabel(approveLabel))+'</button>':'')
+      +(hero?'<button type="button" class="d-button d-button--secondary" data-rerun>'+actionLabel('Reconfigurar','refresh')+'</button>':'<button type="button" data-after-approve class="dashboard-toolbar__continue '+WORKFLOW_ACTION_CLASS+' d-button--primary" hidden>'+workflowActionLabel("Continuar con la siguiente decisión")+'</button>')
+      +(!hero&&caseActions.onMap?'<button type="button" data-dashboard-map class="dashboard-toolbar__map">'+actionLabel("Decision Map","map")+'</button>':'')
       +'<details class="dashboard-toolbar__menu" data-export-menu><summary aria-expanded="false">'+icon("download")+'<span>Exportar</span>'+icon("chevronDown")+'</summary>'
         +'<div class="dashboard-toolbar__menu-panel">'
           +'<button type="button" data-export-csv>'+icon("download")+'<div><strong>'+(scheduling?'Planificación CSV':'Asignación CSV')+'</strong><small>'+(scheduling?'Viajes, fechas y cargas':'Viajes, vehículos, órdenes y cargas')+'</small></div></button>'
@@ -49,11 +50,12 @@ export function renderDashboardToolbar(run,caseActions={}){
         +'</div></details>'
       +'<details class="dashboard-toolbar__menu" data-more-menu><summary aria-expanded="false">'+icon("moreHorizontal")+'<span>Más</span>'+icon("chevronDown")+'</summary>'
         +'<div class="dashboard-toolbar__menu-panel">'
-          +'<button type="button" data-rerun>'+icon("refresh")+'<div><strong>Nueva corrida</strong><small>'+(scheduling?'Misma Assignment aprobada, otra configuración temporal':'Mismos datos, otra configuración')+'</small></div></button>'
+          +(hero?'':'<button type="button" data-rerun>'+icon("refresh")+'<div><strong>Nueva corrida</strong><small>'+(scheduling?'Misma Assignment aprobada, otra configuración temporal':'Mismos datos, otra configuración')+'</small></div></button>')
+          +(hero&&caseActions.onMap?'<button type="button" data-dashboard-map>'+icon('map')+'<div><strong>Decision Map</strong><small>Volver a las decisiones del caso</small></div></button>':'')
           +'<button type="button" data-new-decision>'+icon("plus")+'<div><strong>Nueva decisión</strong><small>Cargar otros datos y crear un nuevo Decision Case</small></div></button>'
           +'<button type="button" data-run-details aria-haspopup="dialog" aria-controls="'+drawerId+'">'+icon("info")+'<div><strong>Detalles de ejecución</strong><small>Motor, solver, archivos y huella</small></div></button>'
         +'</div></details>'
-    +'</div><p class="dashboard-toolbar__status" data-next-decision-status role="status"></p>'
+    +'</div>'+(hero?'':'<p class="dashboard-toolbar__status" data-next-decision-status role="status"></p>')
     +'<p class="dashboard-toolbar__error" data-approval-error role="alert" hidden></p></header>';
   const drawer='<div class="dashboard-toolbar__backdrop" data-run-drawer-backdrop hidden></div>'
     +'<aside class="dashboard-toolbar__drawer" data-run-drawer id="'+drawerId+'" hidden role="dialog" aria-modal="true" aria-labelledby="'+drawerId+'-title">'
@@ -154,22 +156,31 @@ export function bindDashboardToolbar(root,run,{onRerun,caseActions={}}={}){
 
   const actions=bindDashboardActions(root,{...caseActions,onNewDecision:()=>{closeMenus();return caseActions.onNewDecision?.();}});
   const approveButton=root.querySelector('[data-approve-toolbar]'),errorBox=root.querySelector('[data-approval-error]');
+  const hero=toolbar.dataset.toolbarPlacement==='hero';
+  const approveButtons=[...root.querySelectorAll('[data-approve-toolbar],[data-approve-final]')];
+  const infeasible=hero&&(run.result_json?.scenarios?.selected?.feasible===false||run.result_json?.scenarios?.selected?.solver?.status==='infeasible');
+  if(hero)approveButtons.forEach(button=>{button.disabled=caseActions.status==='approved'||infeasible;});
   async function approve(){
-    if(pendingApproval||!caseActions.onApprove||!scope.active)return;
-    pendingApproval=true;approveButton.disabled=true;errorBox.hidden=true;
+    if(pendingApproval||!caseActions.onApprove||!scope.active||infeasible||hero&&caseActions.status==='approved')return;
+    pendingApproval=true;approveButtons.forEach(button=>button.disabled=true);errorBox.hidden=true;
     approveButton.setAttribute('aria-busy','true');
     const label=approveButton.innerHTML;approveButton.innerHTML=workflowActionLabel('Aprobando…');
     try{
       await caseActions.onApprove();
       if(!scope.active)return;
       const badge=root.querySelector('[data-status-badge]');badge.className='dashboard-toolbar__badge is-approved';badge.textContent='Aprobada';
-      approveButton.hidden=true;
+      if(hero){
+        caseActions.status='approved';
+        approveButtons.forEach(button=>{button.disabled=true;button.innerHTML=actionLabel('Decisión aprobada','checkCircle');});
+        const status=root.querySelector('[data-assignment-hero-status]');
+        if(status){status.className='assignment-hero__status is-consistent';status.innerHTML=actionLabel('Decisión aprobada','checkCircle');}
+      }else approveButton.hidden=true;
       caseActions.onApprovalComplete?.();await actions.refresh();
     }catch(error){
-      if(scope.active){approveButton.innerHTML=label;approveButton.disabled=false;errorBox.textContent=error.message||'No se pudo aprobar la decisión.';errorBox.hidden=false;}
+      if(scope.active){approveButton.innerHTML=label;approveButtons.forEach(button=>button.disabled=false);errorBox.textContent=error.message||'No se pudo aprobar la decisión.';errorBox.hidden=false;}
     }finally{pendingApproval=false;approveButton.removeAttribute('aria-busy');}
   }
-  if(approveButton)scope.listen(approveButton,'click',approve);
+  approveButtons.forEach(button=>scope.listen(button,'click',approve));
   api('/api/system/llm-status',{signal:scope.signal}).then(data=>{
     if(scope.active)root.querySelector('[data-ai-details]').textContent=data.configured?[data.provider,data.model].filter(Boolean).join(' · '):'Sin configurar';
   }).catch(()=>{if(scope.active)root.querySelector('[data-ai-details]').textContent='No disponible';});
