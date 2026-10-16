@@ -82,6 +82,7 @@
 .d-page-hero :is(.dispatch-pro-hero-lead,.dda-landing__hero-lead) { color: var(--d-text-secondary); font-size: var(--hero-lead-size); line-height: 1.55; }
 .d-page-hero :is(.dispatch-pro-hero-copy,.dda-landing__hero-copy,.d-home__hero-copy) { min-width: 0; }
 /* Workflow composition belongs here; pages supply copy and contextual content. */
+.dispatch-upload-pro :is(button,a,summary,input,select,textarea,[tabindex]), .dispatch-pro-file-card { scroll-margin-block:160px var(--workflow-bar-space,180px); }
 .d-page-hero--workflow {
   grid-template-columns:minmax(0,1fr) minmax(0,var(--hero-panel-width));
   min-height:var(--hero-workflow-min-height);

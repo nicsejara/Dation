@@ -11,6 +11,7 @@
   --ac-warning:var(--d-warning);
   --ac-danger:var(--d-danger);
   --ac-radius:22px;
+  --workflow-bar-space:calc(var(--config-action-height,180px) + 32px);
   max-width:1180px;
   margin:0 auto;
   padding-bottom:calc(var(--config-action-height, 180px) + 32px + env(safe-area-inset-bottom));
@@ -123,7 +124,6 @@
 .d-config-dialog [data-config-review-error]:empty { display:none; }
 .d-config-dialog [data-config-review-error] { color:var(--d-danger); }
 @media(max-width:520px) { .d-config-dialog.dispatch-review { padding:18px; } }
-.assignment-config-root .assignment-config-sections :is(button,input,select,textarea,summary,[tabindex]) { scroll-margin-block:160px calc(var(--config-action-height,180px) + 32px); }
 .d-config-dialog .dispatch-review-summary { border-color:var(--d-border); }
 .d-config-dialog .dispatch-review-summary p { border-color:var(--d-border); }
 .d-config-dialog .dispatch-review-summary span { color:var(--d-text-secondary); }

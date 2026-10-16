@@ -20,6 +20,8 @@ En escritorio, el panel usa `--hero-panel-width: clamp(20rem,32vw,25rem)`, frent
 
 La altura usa un mínimo compartido de 260 px, sin `height`, límite máximo ni recorte. En 1440 y 1280 px, los cuatro Heroes miden 260 px y las doce descripciones de panel quedan en una línea. Assignment y Scheduling medían aproximadamente 275 px; Data Pack 261 px y mapa 255 px. La metadata vertical no aumenta la altura de configuración.
 
+El margen de scroll para controles del workflow pasa al Design System. Configuración expone `--workflow-bar-space` a partir de la altura real ya medida de su barra; también protege el foco del resumen de Decision Case, que está fuera de las secciones. Se reutiliza el observador existente, sin listeners ni observadores nuevos.
+
 A 1100 px o menos, el panel pasa debajo del texto, con tres columnas de tarjetas. A 700 px o menos, las tarjetas pasan a una columna. Antes, la clase compartida de carga ocultaba el panel de las cuatro pantallas; ahora su contenido permanece accesible en tablet y móvil. El Hero puede crecer verticalmente. Los textos largos y sin espacios pueden envolver, incluso en metadata, título y nota final.
 
 ## Verificación
