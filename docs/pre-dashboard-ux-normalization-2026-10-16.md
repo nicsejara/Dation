@@ -27,7 +27,7 @@ Scheduling añade la nota: «La planificación conserva los viajes y recursos ap
 
 Map, Exportar y Más usan un selector común para button/summary: mínimo 136 px, alto 38 px, padding, radio, fuente, iconos y gap iguales. El primario conserva su gradiente, alto mínimo de 46 px y padding mayor. La cuadrícula móvil ajusta sus columnas al ancho disponible. No cambian labels, menús ni callbacks.
 
-Sticky, ResizeObserver, variables de altura/top, scroll-margin, cálculo de posición de menús y drawer conservan sus owners. El modo de flujo normal existente en pantallas bajas sigue activo.
+Sticky, ResizeObserver, variables de altura/top, scroll-margin, cálculo de posición de menús y drawer conservan sus owners. Al apilar herramientas, los menús despejan el grupo completo cuando hay espacio; en pantallas bajas conservan el anclaje al control. Se mantienen el clamp lateral, altura disponible y elección arriba/abajo. Esta extensión geométrica evita que Exportar tape Más y permite cambiar entre ambos sin cerrar primero. El modo de flujo normal existente en pantallas bajas sigue activo.
 
 ## Fase 3 — Hero D2
 

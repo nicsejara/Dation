@@ -79,13 +79,16 @@ export function bindDashboardToolbar(root,run,{onRerun,caseActions={}}={}){
     if(!menu.open)return;
     const panel=menu.querySelector('.dashboard-toolbar__menu-panel');
     const anchor=menu.getBoundingClientRect(),width=Math.min(300,innerWidth-32);
+    const tools=toolbar.querySelector('.dashboard-toolbar__tools').getBoundingClientRect();
+    // Wrapped tools must remain reachable while either menu is open.
+    const bounds=Math.max(innerHeight-tools.bottom-24,tools.top-24)>=80?tools:anchor;
     const left=Math.max(16,Math.min(innerWidth-width-16,anchor.right-width));
-    const below=innerHeight-anchor.bottom-24,above=anchor.top-24;
+    const below=innerHeight-bounds.bottom-24,above=bounds.top-24;
     const up=below<180&&above>below,space=Math.max(80,up?above:below);
     panel.style.width=width+'px';panel.style.maxHeight=space+'px';
     panel.style.left=(left-anchor.left)+'px';panel.style.right='auto';
     const height=Math.min(panel.scrollHeight,space);
-    panel.style.top=(up?-height-8:anchor.height+8)+'px';
+    panel.style.top=((up?bounds.top-height-8:bounds.bottom+8)-anchor.top)+'px';
   }
   for(const menu of menus){
     const summary=menu.querySelector('summary');

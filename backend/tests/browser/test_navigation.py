@@ -1067,6 +1067,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                 await self.page.wait_for_function("document.querySelectorAll('.dashboard-toolbar__menu[open]').length===1")
                 self.assertEqual(await more.get_attribute('aria-expanded'),'true')
                 self.assertEqual(await export.get_attribute('aria-expanded'),'false')
+                await export.click();await more.click()
+                self.assertEqual(await more.get_attribute('aria-expanded'),'true')
                 box=await self.page.locator('[data-more-menu] .dashboard-toolbar__menu-panel').bounding_box()
                 self.assertGreaterEqual(box['x'],15);self.assertLessEqual(box['x']+box['width'],width-15)
                 self.assertGreaterEqual(box['y'],0);self.assertLessEqual(box['y']+box['height'],845)
