@@ -12,18 +12,18 @@ body.dispatch-result .dation-chat-launcher,body.dispatch-result .dashboard-chat-
 .dispatch:where(:not(.dispatch-upload-pro):not(.d-config-dialog)) p{color:var(--color-text);margin:8px 0 16px}.dispatch:where(:not(.dispatch-upload-pro):not(.d-config-dialog)) small,
 .dispatch:where(:not(.dispatch-upload-pro):not(.d-config-dialog)) summary,
 .dispatch:where(:not(.dispatch-upload-pro):not(.d-config-dialog)) label,
-.dispatch:where(:not(.dispatch-upload-pro):not(.d-config-dialog)) button,
+.dispatch:where(:not(.dispatch-upload-pro):not(.d-config-dialog)) button:where(:not(.d-button)),
 .dispatch:where(:not(.dispatch-upload-pro):not(.d-config-dialog)) input,
 .dispatch:where(:not(.dispatch-upload-pro):not(.d-config-dialog)) select,
 .dispatch:where(:not(.dispatch-upload-pro):not(.d-config-dialog)) textarea{font-size:13px}
 .dispatch:where(:not(.dispatch-upload-pro):not(.d-config-dialog)) small{color:var(--color-text-muted);display:block}.dispatch:where(:not(.dispatch-upload-pro):not(.d-config-dialog)) a{color:var(--color-text);text-decoration:underline}
-.dispatch:where(:not(.dispatch-upload-pro):not(.d-config-dialog)) button,
-.dispatch:where(:not(.dispatch-upload-pro):not(.d-config-dialog)) summary{cursor:pointer}.dispatch:where(:not(.dispatch-upload-pro):not(.d-config-dialog)) button{border:1px solid var(--d-border-control);background:var(--color-surface-raised);color:var(--color-text);padding:10px 14px;border-radius:9px;font-weight:650;line-height:1.3;min-height:40px}
-.dispatch:where(:not(.dispatch-upload-pro):not(.d-config-dialog)) button:hover{background:var(--color-surface-hover);border-color:var(--d-border-control);}.dispatch:where(:not(.dispatch-upload-pro):not(.d-config-dialog)) button:disabled{opacity:.5;cursor:not-allowed}
-.dispatch:where(:not(.dispatch-upload-pro):not(.d-config-dialog)) button[data-next],
-.dispatch:where(:not(.dispatch-upload-pro):not(.d-config-dialog)) button[data-review],
-.dispatch:where(:not(.dispatch-upload-pro):not(.d-config-dialog)) button[data-execute],
-.dispatch:where(:not(.dispatch-upload-pro):not(.d-config-dialog)) button[data-chat]{background:var(--color-surface-raised);border-color:var(--d-border-control);color:var(--color-text);}
+.dispatch:where(:not(.dispatch-upload-pro):not(.d-config-dialog)) button:where(:not(.d-button)),
+.dispatch:where(:not(.dispatch-upload-pro):not(.d-config-dialog)) summary{cursor:pointer}.dispatch:where(:not(.dispatch-upload-pro):not(.d-config-dialog)) button:where(:not(.d-button)){border:1px solid var(--d-border-control);background:var(--color-surface-raised);color:var(--color-text);padding:10px 14px;border-radius:9px;font-weight:650;line-height:1.3;min-height:40px}
+.dispatch:where(:not(.dispatch-upload-pro):not(.d-config-dialog)) button:where(:not(.d-button)):hover{background:var(--color-surface-hover);border-color:var(--d-border-control);}.dispatch:where(:not(.dispatch-upload-pro):not(.d-config-dialog)) button:where(:not(.d-button)):disabled{opacity:.5;cursor:not-allowed}
+.dispatch:where(:not(.dispatch-upload-pro):not(.d-config-dialog)) button:where(:not(.d-button))[data-next],
+.dispatch:where(:not(.dispatch-upload-pro):not(.d-config-dialog)) button:where(:not(.d-button))[data-review],
+.dispatch:where(:not(.dispatch-upload-pro):not(.d-config-dialog)) button:where(:not(.d-button))[data-execute],
+.dispatch:where(:not(.dispatch-upload-pro):not(.d-config-dialog)) button:where(:not(.d-button))[data-chat]{background:var(--color-surface-raised);border-color:var(--d-border-control);color:var(--color-text);}
 .dispatch:where(:not(.dispatch-upload-pro):not(.d-config-dialog)) input:not([type=checkbox]):not([type=range]),
 .dispatch:where(:not(.dispatch-upload-pro):not(.d-config-dialog)) select,
 .dispatch:where(:not(.dispatch-upload-pro):not(.d-config-dialog)) textarea{max-width:100%;width:100%;padding:10px;border:1px solid var(--d-border-control);border-radius:7px;background:var(--color-surface-raised);color:var(--color-text);}
@@ -3500,35 +3500,6 @@ body.dispatch-result #chat-panel{
 }
 .dispatch-decision-node__action{
   width:100%;
-  min-height:41px!important;
-  margin-top:10px;
-  justify-content:center!important;
-  border-color:#d8dde7!important;
-  background:#fff!important;
-  color:#48556c!important;
-  font-size:10.5px!important;
-  font-weight:800!important;
-}
-.dispatch-decision-node.is-available .dispatch-decision-node__action:not(:disabled),
-.dispatch-decision-node.is-error .dispatch-decision-node__action:not(:disabled){
-  border-color:#137d83!important;
-  background:#137d83!important;
-  color:#fff!important;
-}
-.dispatch-decision-node.is-approved .dispatch-decision-node__action:not(:disabled){
-  border-color:var(--color-success-border)!important;
-  background:var(--color-surface-raised)!important;
-  color:var(--color-text)!important;
-}
-.dispatch-decision-node.is-review .dispatch-decision-node__action:not(:disabled),
-.dispatch-decision-node.is-running .dispatch-decision-node__action:not(:disabled){
-  border-color:var(--d-border-control)!important;
-  background:var(--color-action-primary-bg)!important;
-  color:var(--color-action-primary-text)!important;
-}
-.dispatch-decision-node__action:disabled{
-  cursor:default!important;
-  opacity:.68;
 }
 .dispatch-decision-edge{
   position:relative;
@@ -4324,7 +4295,6 @@ body.dispatch-result #chat-panel{
   padding-top:16px;
 }
 
-.dispatch-decision-node__action,
 .dispatch-map-primary-action{
   display:inline-flex;
   width:100%;
@@ -4340,12 +4310,6 @@ body.dispatch-result #chat-panel{
   font-size:13px;
   font-weight:850;
   cursor:pointer;
-}
-
-.dispatch-decision-node.is-next .dispatch-decision-node__action{
-  color:var(--d-text-muted);
-  background:var(--d-surface-2);
-  box-shadow:var(--shadow-sm-dark);
 }
 
 .dispatch-decision-node__actions{

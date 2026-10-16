@@ -9,18 +9,21 @@ CSS = (
     / "css"
     / "decision-map-case-v2.css"
 ).read_text(encoding="utf-8")
+DESIGN_SYSTEM = (BACKEND_ROOT / "app/static/css/dation-design-system.css").read_text(encoding="utf-8")
+MAP_UI = (BACKEND_ROOT / "app/static/js/dispatch/decision-map.mjs").read_text(encoding="utf-8")
 
 
 class DecisionMapMicroPolishTests(unittest.TestCase):
-    def test_active_cta_is_larger_and_has_clear_hover_feedback(self):
+    def test_active_cta_uses_shared_sizing_and_hover_feedback(self):
         for marker in (
-            "font-size:16px",
-            "font-weight:800",
-            "transform:translateY(-2px)",
-            "box-shadow:var(--shadow-sm-dark)",
-            "transform:translateX(3px)",
+            ".d-button--workflow",
+            "min-height: var(--workflow-action-height)",
+            "transform: translateY(-1px)",
+            "box-shadow: var(--shadow-sm-dark)",
         ):
-            self.assertIn(marker, CSS)
+            self.assertIn(marker, DESIGN_SYSTEM)
+        self.assertIn('WORKFLOW_ACTION_CLASS',MAP_UI)
+        self.assertNotRegex(CSS,r'\.dispatch-decision-node__action\b[^{}]*\{')
 
     def test_global_state_legend_is_hidden(self):
         self.assertIn(
@@ -43,8 +46,8 @@ class DecisionMapMicroPolishTests(unittest.TestCase):
             self.assertIn(marker, CSS)
 
     def test_reduced_motion_removes_cta_translation(self):
-        self.assertIn("@media(prefers-reduced-motion:reduce)", CSS)
-        self.assertIn("transform:none", CSS)
+        self.assertIn("@media(prefers-reduced-motion:reduce)", DESIGN_SYSTEM)
+        self.assertIn("transform: none", DESIGN_SYSTEM)
 
 
 if __name__ == "__main__":

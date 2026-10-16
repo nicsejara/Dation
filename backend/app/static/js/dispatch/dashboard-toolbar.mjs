@@ -4,6 +4,7 @@ import {api,esc,download} from './shared.mjs';
 import {bindDashboardActions} from './dashboard-actions.mjs';
 import {decisionStatusUi,shortRunId,solverStatusLabel} from './assignment-dashboard-selectors.mjs';
 import {exportDecision,exportDecisionJson} from './export.mjs';
+import {WORKFLOW_ACTION_CLASS,workflowActionLabel} from './workflow-action-bar.mjs';
 
 const icon=name=>iconSvg(name,"dashboard-toolbar__icon");
 const actionLabel=(text,name)=>icon(name)+'<span>'+esc(text)+'</span>';
@@ -38,8 +39,8 @@ export function renderDashboardToolbar(run,caseActions={}){
         +'<span class="dashboard-toolbar__badge '+esc(status.className)+'" data-status-badge>'+esc(status.label)+'</span></div>'
       +'<small>Corrida '+esc(shortRunId(run.id))+'</small></div>'
     +'<div class="dashboard-toolbar__tools" aria-label="Herramientas de la decisión">'
-      +(caseActions.onApprove?'<button type="button" data-approve-toolbar class="dashboard-toolbar__approve" '+(caseActions.status==='approved'?'hidden':'')+'>'+actionLabel(approveLabel,'check')+'</button>':'')
-      +'<button type="button" data-after-approve class="dashboard-toolbar__continue" hidden>'+actionLabel("Continuar con la siguiente decisión","arrowRight")+'</button>'
+      +(caseActions.onApprove?'<button type="button" data-approve-toolbar class="dashboard-toolbar__approve '+WORKFLOW_ACTION_CLASS+' d-button--primary" '+(caseActions.status==='approved'?'hidden':'')+'>'+workflowActionLabel(approveLabel)+'</button>':'')
+      +'<button type="button" data-after-approve class="dashboard-toolbar__continue '+WORKFLOW_ACTION_CLASS+' d-button--primary" hidden>'+workflowActionLabel("Continuar con la siguiente decisión")+'</button>'
       +(caseActions.onMap?'<button type="button" data-dashboard-map class="dashboard-toolbar__map">'+actionLabel("Decision Map","map")+'</button>':'')
       +'<details class="dashboard-toolbar__menu" data-export-menu><summary aria-expanded="false">'+icon("download")+'<span>Exportar</span>'+icon("chevronDown")+'</summary>'
         +'<div class="dashboard-toolbar__menu-panel">'
@@ -153,7 +154,8 @@ export function bindDashboardToolbar(root,run,{onRerun,caseActions={}}={}){
   async function approve(){
     if(pendingApproval||!caseActions.onApprove||!scope.active)return;
     pendingApproval=true;approveButton.disabled=true;errorBox.hidden=true;
-    const label=approveButton.innerHTML;approveButton.innerHTML=actionLabel('Aprobando…','clock');
+    approveButton.setAttribute('aria-busy','true');
+    const label=approveButton.innerHTML;approveButton.innerHTML=workflowActionLabel('Aprobando…');
     try{
       await caseActions.onApprove();
       if(!scope.active)return;
@@ -162,7 +164,7 @@ export function bindDashboardToolbar(root,run,{onRerun,caseActions={}}={}){
       caseActions.onApprovalComplete?.();await actions.refresh();
     }catch(error){
       if(scope.active){approveButton.innerHTML=label;approveButton.disabled=false;errorBox.textContent=error.message||'No se pudo aprobar la decisión.';errorBox.hidden=false;}
-    }finally{pendingApproval=false;}
+    }finally{pendingApproval=false;approveButton.removeAttribute('aria-busy');}
   }
   if(approveButton)scope.listen(approveButton,'click',approve);
   api('/api/system/llm-status',{signal:scope.signal}).then(data=>{

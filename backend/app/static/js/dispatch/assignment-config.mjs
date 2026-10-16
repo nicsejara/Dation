@@ -3,6 +3,7 @@ import {mountFilterCollapse} from "./assignment-filter-collapse.mjs";
 import {ensureDecisionCaseStyles} from "./styles.mjs";
 import {esc,num,post,api} from "./shared.mjs";
 import {iconSvg} from "./decision-ui.mjs";
+import {WORKFLOW_ACTION_CLASS,workflowActionLabel} from "./workflow-action-bar.mjs";
 import {
   configSummaryBar,
   decisionCaseCard,
@@ -412,7 +413,7 @@ function reviewDialog(state,preview,capabilities){
     +'</div>'
     +'<p class="assignment-review-note">La decisión distribuirá la carga entre los recursos habilitados. Las fechas y el calendario se resolverán después en Planificación de despachos.</p>'
     +'<p role="alert" data-config-review-error></p>'
-    +'<div class="dispatch-actions"><button value="cancel">Volver</button><button type="button" data-config-execute>Ejecutar decisión</button></div>'
+    +'<div class="dispatch-actions"><button value="cancel">Volver</button><button class="'+WORKFLOW_ACTION_CLASS+' d-button--primary" type="button" data-config-execute>'+workflowActionLabel("Ejecutar decisión")+'</button></div>'
   +'</form></dialog>';
 }
 

@@ -1,6 +1,7 @@
 import {createScope,scopeFor} from "./lifecycle.mjs";
 import {ensureDecisionCaseStyles} from "./styles.mjs";
 import {api,esc,num,post} from "./shared.mjs";
+import {WORKFLOW_ACTION_CLASS,workflowActionLabel} from "./workflow-action-bar.mjs";
 import {
   configSummaryBar,
   decisionCaseCard,
@@ -367,7 +368,7 @@ function reviewDialog(config,stats,sourceRun,caseId){
       +'<p><strong>Recursos</strong><span>Heredados de la asignación aprobada</span></p>'
     +'</div>'
     +'<div role="alert" data-config-review-error data-scheduling-review-error></div>'
-    +'<div class="dispatch-actions scheduling-review-actions"><button value="cancel">Volver</button><button class="scheduling-primary" type="button" data-scheduling-execute>Ejecutar decisión</button></div>'
+    +'<div class="dispatch-actions scheduling-review-actions"><button value="cancel">Volver</button><button class="'+WORKFLOW_ACTION_CLASS+' d-button--primary" type="button" data-scheduling-execute>'+workflowActionLabel("Ejecutar decisión")+'</button></div>'
   +'</form></dialog>';
 }
 
@@ -481,7 +482,7 @@ async function execute({state,sourceRun,slaAvailable,config,button,dialog,errorN
   }
   const runId=crypto.randomUUID();
   button.disabled=true;
-  button.textContent="Generando…";
+  button.innerHTML=workflowActionLabel("Generando…");
   dialog?.close();
   showPending(runId);
   try{

@@ -732,6 +732,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         button=self.page.locator('[data-dashboard-toolbar] [data-approve-toolbar]')
         await button.click()
         self.assertTrue(await button.is_disabled());self.assertEqual(await button.inner_text(),'Aprobando…')
+        self.assertEqual(await button.get_attribute('aria-busy'),'true')
+        self.assertEqual(await button.evaluate("el=>getComputedStyle(el,'::after').animationName"),'d-workflow-spin')
         await button.dispatch_event('click')
         await self.page.wait_for_function("document.querySelector('[data-status-badge]').textContent==='Aprobada'")
         self.assertEqual(self.approval_calls,1);self.assertFalse(await button.is_visible())
@@ -743,6 +745,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         button=self.page.locator('[data-approve-toolbar]');await button.click()
         await self.page.locator('[data-approval-error]').wait_for(state='visible')
         self.assertFalse(await button.is_disabled());self.assertEqual(await button.inner_text(),'Aprobar asignación')
+        self.assertIsNone(await button.get_attribute('aria-busy'))
         self.assertIn('Fallo sintético',await self.page.locator('[data-approval-error]').inner_text())
         self.assertIsNone(self.case['nodes']['logistics_assignment']['approved_run_id'])
         self.assertEqual(await self.page.locator('[data-status-badge]').inner_text(),'En revisión')
@@ -922,18 +925,34 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                     await self.page.keyboard.press('Shift+Tab');state=await self.page.evaluate(audit)
                     if not state.get('skip'):self.assertFalse(state['occluded'] or state['outside'],(view,node,width,state))
 
-    async def test_phase6_mobile_footer_chips_scroll_locally_without_losing_focus_or_state(self):
-        await self.page.emulate_media(reduced_motion='reduce');await self.page.set_viewport_size({'width':390,'height':844})
-        await self.open('logistics-config','logistics_assignment')
-        await self.page.keyboard.press('Tab')
-        chips=self.page.locator('.d-workflow-action-bar__chip');self.assertEqual(await chips.count(),3)
-        for index in (0,1,2,1,0):
-            await chips.nth(index).focus()
-            fit=await chips.nth(index).evaluate('el=>{const r=el.getBoundingClientRect(),p=el.parentElement.getBoundingClientRect();return r.left>=p.left+5&&r.right<=p.right-5;}')
-            self.assertTrue(fit)
-        state=await self.page.evaluate('window.DationDispatch.getWorkspace()')
-        await chips.first.press('Enter');await chips.nth(2).press('Space')
-        self.assertEqual((await self.page.evaluate('window.DationDispatch.getWorkspace()'))['resourceMode'],state['resourceMode'])
+    async def test_phase6_mobile_footer_grid_keeps_keyboard_focus_visible_without_scroll_or_state_changes(self):
+        audit=(Path(__file__).parent/'focus_audit.js').read_text()
+        await self.page.emulate_media(reduced_motion='reduce')
+        for width in (360,390):
+            await self.page.set_viewport_size({'width':width,'height':844})
+            for node in ('logistics_assignment','logistics_scheduling'):
+                await self.open('logistics-config',node)
+                await self.page.keyboard.press('Tab')
+                chips=self.page.locator('.d-workflow-action-bar__chip');self.assertEqual(await chips.count(),3)
+                await chips.first.focus()
+                for index,key in ((0,None),(1,'Tab'),(2,'Tab'),(1,'Shift+Tab'),(0,'Shift+Tab')):
+                    if key:await self.page.keyboard.press(key)
+                    self.assertTrue(await chips.nth(index).evaluate('el=>el===document.activeElement'))
+                    focus=await self.page.evaluate(audit)
+                    self.assertTrue(focus['visibleFocus'] and focus['outline']=='solid' and focus['width']>=2,(width,node,focus))
+                    self.assertFalse(focus['outside'] or focus['occluded'],(width,node,focus))
+                    fit=await chips.nth(index).evaluate('''el=>{
+                      const r=el.getBoundingClientRect(),bar=el.closest('.d-workflow-action-bar').getBoundingClientRect();
+                      const style=getComputedStyle(el),ring=parseFloat(style.outlineWidth)+parseFloat(style.outlineOffset);
+                      const grid=el.parentElement;
+                      return r.left-ring>=bar.left&&r.right+ring<=bar.right&&r.top-ring>=bar.top&&r.bottom+ring<=bar.bottom
+                        &&grid.scrollLeft===0&&grid.scrollWidth<=grid.clientWidth
+                        &&document.documentElement.scrollWidth<=innerWidth;
+                    }''')
+                    self.assertTrue(fit,(width,node,index))
+                state=await self.page.evaluate('window.DationDispatch.getWorkspace()')
+                await chips.first.press('Enter');await chips.nth(2).press('Space')
+                self.assertEqual((await self.page.evaluate('window.DationDispatch.getWorkspace()'))['resourceMode'],state['resourceMode'])
         self.assertFalse(any(m=='POST' and p=='/api/runs' for m,p in self.requests))
 
     async def test_phase6_native_search_number_checkbox_range_and_autofill_keep_dark_roles(self):
@@ -2172,6 +2191,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.page.locator('.d-workflow-action-bar').wait_for()
         for width in (1440,1280,1024,768,390):
             await self.page.set_viewport_size({'width':width,'height':1000})
+            await self.page.emulate_media(reduced_motion='reduce' if width==390 else 'no-preference')
             result=await self.page.evaluate('''async()=>{
                 const {createWorkflowActionBar}=await import('/static/js/dispatch/workflow-action-bar.mjs');
                 let continued=0,corrected=0;
@@ -2188,10 +2208,12 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                     ['ready',true,{busy:true}],['error',false,{}],['ready',true,{}]]){
                     update({kind,enabled,message:'Estado de prueba'},options);
                     const s=getComputedStyle(button);
-                    snapshots.push({sameNode:bar.lastElementChild===button,
+                    snapshots.push({sameNode:bar.querySelector('.d-button')===button,
                         height:button.getBoundingClientRect().height,radius:s.borderRadius,
                         padding:s.paddingInlineStart,minWidth:s.minWidth,
                         disabled:button.disabled,busy:button.getAttribute('aria-busy'),
+                        spinner:getComputedStyle(button,'::after').animationName,
+                        iconDisplay:getComputedStyle(button.querySelector('svg')).display,
                         primary:s.backgroundImage!=='none',
                         described:document.getElementById(button.getAttribute('aria-describedby'))?.textContent});
                     button.click();
@@ -2213,12 +2235,104 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual([s['busy'] for s in result['snapshots']],['false','false','true','false','false'])
             self.assertFalse(result['snapshots'][3]['primary'],'Corrective actions keep their secondary role')
             self.assertTrue(result['snapshots'][1]['primary'])
+            self.assertEqual(result['snapshots'][2]['spinner'],'none' if width==390 else 'd-workflow-spin')
+            self.assertEqual(result['snapshots'][2]['iconDisplay'],'none')
             for snapshot in result['snapshots']:
                 self.assertTrue(snapshot['sameNode'])
                 self.assertEqual(snapshot['height'],58)
                 self.assertEqual(snapshot['radius'],'18px')
                 self.assertEqual(snapshot['padding'],'24px')
                 self.assertEqual(snapshot['described'],'Estado de prueba')
+        self.assertEqual(self.execution_bodies,[])
+
+    async def test_workflow_bars_equalize_context_and_keep_a_wider_primary_action(self):
+        geometry='''bar=>{
+            const items=[...bar.querySelectorAll('.d-workflow-action-bar__item')];
+            const action=bar.querySelector('.d-button'),r=action.getBoundingClientRect();
+            return {items:items.map(el=>{const r=el.getBoundingClientRect();return {
+                width:r.width,height:r.height,clipped:el.scrollWidth>el.clientWidth||el.scrollHeight>el.clientHeight};}),
+                actionWidth:r.width,primary:getComputedStyle(action).backgroundImage!=='none',
+                overflow:document.documentElement.scrollWidth>innerWidth};
+        }'''
+        for width in (1440,1280,1024,768,390):
+            await self.page.set_viewport_size({'width':width,'height':1000})
+            for view,node in (('logistics-data',None),('logistics-config','logistics_assignment'),
+                              ('logistics-config','logistics_scheduling')):
+                await self.open(view,node)
+                bar=self.page.locator('.d-workflow-action-bar');await bar.wait_for()
+                if node is None:
+                    await self.page.locator('.d-workflow-action-bar[data-state="ready"]').wait_for()
+                for long_copy in (False,True):
+                    if long_copy:
+                        await bar.locator('.d-workflow-action-bar__item strong,.d-workflow-action-bar__item span').first.evaluate(
+                            "el=>el.textContent='Recursos disponibles para todas las operaciones seleccionadas y sus prioridades'")
+                    sizes=await bar.evaluate(geometry)
+                    self.assertEqual(len(sizes['items']),2 if node is None else 3)
+                    self.assertLess(max(x['width'] for x in sizes['items'])-min(x['width'] for x in sizes['items']),.25)
+                    self.assertLess(max(x['height'] for x in sizes['items'])-min(x['height'] for x in sizes['items']),.25)
+                    self.assertGreater(sizes['actionWidth'],max(x['width'] for x in sizes['items']))
+                    self.assertFalse(sizes['overflow'])
+                    self.assertTrue(sizes['primary'],(width,node,long_copy,sizes))
+                    self.assertTrue(all(not x['clipped'] for x in sizes['items']))
+        self.assertEqual(self.execution_bodies,[])
+
+    async def test_workflow_progressive_actions_share_styles_arrow_and_keyboard_focus(self):
+        original_case=copy.deepcopy(self.case)
+        original_run=copy.deepcopy(self.f['runs']['assignment'])
+        await self.page.emulate_media(reduced_motion='reduce')
+        reference=None
+        async def check(button,label):
+            nonlocal reference
+            await button.wait_for(state='visible')
+            await self.page.mouse.move(0,0)
+            await self.page.keyboard.press('Tab')
+            await button.focus()
+            actual=await button.evaluate('''el=>{
+                const s=getComputedStyle(el),icon=el.querySelector('svg'),i=getComputedStyle(icon);
+                return {minHeight:s.minHeight,padding:s.padding,radius:s.borderRadius,
+                    font:s.font,fontWeight:s.fontWeight,gap:s.gap,background:s.backgroundImage,color:s.color,
+                    outline:s.outline,offset:s.outlineOffset,iconWidth:i.width,iconHeight:i.height,
+                    iconCount:el.querySelectorAll('svg').length,decorative:icon.getAttribute('aria-hidden'),
+                    textArrow:el.textContent.includes('→'),focused:document.activeElement===el,
+                    clipped:el.scrollWidth>el.clientWidth||el.scrollHeight>el.clientHeight,
+                    workflow:el.classList.contains('d-button--workflow')};
+            }''')
+            self.assertTrue(actual.pop('focused'),label)
+            self.assertFalse(actual.pop('clipped'),label)
+            self.assertTrue(actual.pop('workflow'),label)
+            self.assertEqual(actual['iconCount'],1,label)
+            self.assertEqual(actual['decorative'],'true',label)
+            self.assertFalse(actual['textArrow'],label)
+            self.assertIn('linear-gradient',actual['background'],label)
+            if reference is None:reference=actual
+            self.assertEqual(actual,reference,label)
+        for width in (1440,1280,1024,768,390):
+            await self.page.set_viewport_size({'width':width,'height':1000})
+            self.case.clear();self.case.update(copy.deepcopy(original_case))
+            self.f['runs']['assignment'].clear();self.f['runs']['assignment'].update(copy.deepcopy(original_run))
+            await self.open('logistics-data')
+            await self.page.locator('.d-workflow-action-bar[data-state="ready"]').wait_for()
+            await check(self.page.locator('.d-workflow-action-bar .d-button'),'data')
+            self.case['nodes']=copy.deepcopy(self.f['initial_case']['nodes'])
+            await self.open('logistics-map')
+            await check(self.page.locator('[data-map-action="configure"]'),'map')
+            self.case.clear();self.case.update(copy.deepcopy(original_case))
+            for kind in ('assignment','scheduling'):
+                await self.open('logistics-config','logistics_'+kind)
+                trigger=self.page.locator('[data-config-review]' if kind=='assignment' else '[data-scheduling-review]')
+                await check(trigger,kind+'-review')
+                await trigger.click()
+                await check(self.page.locator('[data-config-execute]' if kind=='assignment' else '[data-scheduling-execute]'),kind+'-execute')
+                self.assertFalse(await self.page.locator('dialog[open] button[value="cancel"]').evaluate("el=>el.classList.contains('d-button--primary')"))
+                await self.page.keyboard.press('Escape')
+            await self.open('decision-dashboard','logistics_scheduling',self.f['ids']['scheduling'])
+            await check(self.page.locator('[data-approve-toolbar]'),'scheduling-approve')
+            self.review_assignment();await self.dashboard()
+            await check(self.page.locator('[data-approve-toolbar]'),'assignment-approve')
+            await self.page.locator('[data-approve-toolbar]').click()
+            await check(self.page.locator('[data-after-approve]'),'continue')
+            self.assertFalse(await self.page.locator('[data-dashboard-map]').evaluate("el=>el.classList.contains('d-button--primary')"))
+        self.assertEqual(self.approval_calls,5)
         self.assertEqual(self.execution_bodies,[])
 
     async def test_workflow_primitives_hero_supports_optional_metadata_and_panel(self):

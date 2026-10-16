@@ -84,7 +84,7 @@
 .assignment-filter-dialog,.assignment-change-dialog{width:min(620px,calc(100% - 28px));border:1px solid var(--d-border);border-radius:18px;padding:22px;box-shadow:var(--shadow-sm-dark);}.assignment-filter-dialog::backdrop,.assignment-change-dialog::backdrop{background:var(--d-surface-1);}.assignment-filter-dialog form,.assignment-change-dialog form{display:grid;gap:14px}.assignment-filter-dialog__head{display:flex;justify-content:space-between;gap:12px}.assignment-filter-dialog__head h3,.assignment-change-dialog h3{margin:2px 0 4px;font-size:20px}.assignment-filter-dialog__head p,.assignment-change-dialog p{margin:0;font-size:13px}.assignment-filter-dialog__head>button{width:34px;height:34px;min-height:34px!important;padding:0!important}.assignment-filter-field-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-height:360px;overflow:auto}.assignment-filter-field-list button{display:flex!important;justify-content:space-between;gap:10px!important;text-align:left!important;background:var(--d-surface-2)!important;}.assignment-filter-field-list span{font-size:13px;font-weight:750}.assignment-filter-field-list small{font-size:11px!important}.assignment-change-dialog ul{margin:0;padding:11px 14px 11px 30px;border-radius:11px;background:var(--color-warning-bg);color:var(--d-text-primary);font-size:13px}
 .assignment-review-dialog{border-radius:18px!important}.assignment-review-note{padding:12px;border-radius:11px;background:var(--d-surface-2);font-size:13px!important}
 
-.assignment-config-root button:focus-visible,.assignment-config-root input:focus-visible,.assignment-config-root select:focus-visible{outline:3px solid var(--color-focus);outline-offset:2px}
+.assignment-config-root button:where(:not(.d-button)):focus-visible,.assignment-config-root input:focus-visible,.assignment-config-root select:focus-visible{outline:3px solid var(--color-focus);outline-offset:2px}
 
 @media(max-width:1099px){
   .assignment-case-strip{grid-template-columns:1fr auto}.assignment-case-strip__pack{grid-column:1/-1;grid-row:2}.assignment-objective-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.assignment-resource-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.assignment-weight-row{grid-template-columns:38px minmax(160px,1fr) minmax(190px,1fr) 50px}
@@ -134,17 +134,17 @@
 .assignment-config-root :is(input:not([type=range]):not([type=checkbox]):not([type=radio]),select),
 .d-config-dialog :is(input,select) { color:var(--d-text-primary); background:var(--d-surface-2); border:1px solid var(--d-border-control); color-scheme:dark; }
 .assignment-config-root input::placeholder,.d-config-dialog input::placeholder { color:var(--d-text-muted); opacity:1; }
-.assignment-config-root :is(button,input,select):focus-visible,.d-config-dialog :is(button,input,select):focus-visible { outline:3px solid var(--d-brand-teal-bright); outline-offset:2px; }
+.assignment-config-root :is(button:where(:not(.d-button)),input,select):focus-visible,.d-config-dialog :is(button:where(:not(.d-button)),input,select):focus-visible { outline:3px solid var(--d-brand-teal-bright); outline-offset:2px; }
 .assignment-config-root .assignment-config-hero { min-height:220px; padding:26px; border-radius:24px; }
 .assignment-config-root .assignment-config-hero h1 { font-size:clamp(28px,3vw,40px); }
 .assignment-config-root .assignment-resource-rule { grid-template-columns:auto auto; }
 @media(max-width:700px) { .assignment-config-root .assignment-config-hero { padding:20px; } }
 
-.assignment-config-root :where(button) { min-height:36px; padding:8px 12px; border:1px solid var(--d-border-control); border-radius:var(--radius-sm); background:var(--d-surface-2); color:var(--d-text-primary); font:inherit; cursor:pointer; }
+.assignment-config-root :where(button:not(.d-button,.d-workflow-action-bar__item)) { min-height:36px; padding:8px 12px; border:1px solid var(--d-border-control); border-radius:var(--radius-sm); background:var(--d-surface-2); color:var(--d-text-primary); font:inherit; cursor:pointer; }
 .assignment-config-root .assignment-choice-card.is-selected { border-color:var(--d-brand-teal-bright)!important; }
 .assignment-config-root .decision-advanced-option { cursor:not-allowed; color:var(--d-text-secondary); }
-.d-config-dialog .dispatch-actions button { min-height:40px; padding:8px 14px; border:1px solid var(--d-border-control); border-radius:var(--radius-sm); background:var(--d-surface-2); color:var(--d-text-primary); font:inherit; cursor:pointer; }
-.d-config-dialog :is([data-config-execute],[data-scheduling-execute],[data-change-confirm]) { color:var(--d-text-primary); background:var(--color-brand-gradient); border-color:transparent; }
+.d-config-dialog .dispatch-actions button:where(:not(.d-button)) { min-height:40px; padding:8px 14px; border:1px solid var(--d-border-control); border-radius:var(--radius-sm); background:var(--d-surface-2); color:var(--d-text-primary); font:inherit; cursor:pointer; }
+.d-config-dialog [data-change-confirm] { color:var(--d-text-primary); background:var(--color-brand-gradient); border-color:transparent; }
 
 /* Applied-filter disclosure; behavior stays in assignment-filter-collapse.mjs. */
 .assignment-config-root .assignment-filter-row.is-collapsible{padding:0;overflow:hidden;transition:border-color .18s ease,box-shadow .18s ease,background .18s ease}

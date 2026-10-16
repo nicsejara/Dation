@@ -24,7 +24,7 @@
   letter-spacing:.11em;
 }
 
-.assignment-dashboard-v2 button:focus-visible{
+.assignment-dashboard-v2 button:where(:not(.d-button)):focus-visible{
   outline:3px solid var(--d-brand-teal-bright);
   outline-offset:2px;
 }
