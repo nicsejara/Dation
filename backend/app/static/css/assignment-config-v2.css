@@ -44,7 +44,7 @@
 .assignment-section__eyebrow{display:block;margin:0 0 4px;color:var(--d-brand-teal-bright);font-size:12px;font-weight:850;letter-spacing:.085em;text-transform:uppercase}
 .assignment-section__head h2{margin:0 0 5px;font-size:21px;line-height:1.2;color:var(--ac-ink)}
 .assignment-section__head p{margin:0;max-width:720px;color:var(--ac-muted);font-size:13px;line-height:1.5}
-.assignment-section__current{display:inline-flex;min-height:31px;align-items:center;padding:0 10px;border:1px solid var(--d-border);border-radius:999px;color:var(--d-text-primary);background:var(--d-surface-2);font-size:13px;font-weight:800;white-space:nowrap}
+.assignment-section__current{display:inline-flex;min-width:0;max-width:100%;box-sizing:border-box;min-height:31px;align-items:center;padding:0 10px;border:1px solid var(--d-border);border-radius:999px;color:var(--d-text-primary);background:var(--d-surface-2);font-size:13px;font-weight:800;white-space:normal;overflow-wrap:anywhere}
 
 .assignment-scope-counters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:16px}
 .assignment-scope-counters>div{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 14px;padding:14px 16px;border:1px solid var(--d-border);border-radius:14px;background:var(--d-surface-1);}

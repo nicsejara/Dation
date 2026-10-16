@@ -8248,7 +8248,12 @@ select:focus-visible{
     gap:7px;
     overflow-x:auto;
     scroll-snap-type:x proximity;
+    scroll-padding-inline:8px;
     scrollbar-width:thin;
+  }
+
+  .dda-workspace-nav:focus-within{
+    scroll-snap-type:none;
   }
 
   .dda-workspace-nav__connector{
@@ -8277,7 +8282,7 @@ select:focus-visible{
 
   .dda-workspace-nav{
     grid-template-columns:repeat(4,minmax(132px,1fr));
-    padding:6px;
+    padding:8px;
   }
 
   .dda-workspace-step{

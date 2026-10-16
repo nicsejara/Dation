@@ -256,8 +256,8 @@ function scopeSection(state,preview){
   return '<section class="assignment-section" id="config-scope" data-config-section="scope">'
     +decisionSectionHeader({number:"01",eyebrow:"ALCANCE",title:"Alcance de los datos",copy:"Elegí qué parte de tus datos querés analizar. Tus archivos no se modifican.",icon:"filter",current:scopeSummary(preview,filters)})
     +'<div class="assignment-scope-counters" aria-live="polite">'
-      +'<div><span>Órdenes en el análisis</span><strong>'+num(ordersIncluded)+' de '+num(ordersTotal)+'</strong><progress max="'+Math.max(ordersTotal,1)+'" value="'+ordersIncluded+'"></progress></div>'
-      +'<div><span>Flota habilitada</span><strong>'+num(fleetIncluded)+' de '+num(fleetTotal)+' vehículos</strong><progress max="'+Math.max(fleetTotal,1)+'" value="'+fleetIncluded+'"></progress></div>'
+      +'<div><span>Órdenes en el análisis</span><strong>'+num(ordersIncluded)+' de '+num(ordersTotal)+'</strong><progress aria-label="Órdenes en el análisis" aria-valuetext="'+esc(num(ordersIncluded)+' de '+num(ordersTotal)+' órdenes incluidas')+'" max="'+Math.max(ordersTotal,1)+'" value="'+ordersIncluded+'"></progress></div>'
+      +'<div><span>Flota habilitada</span><strong>'+num(fleetIncluded)+' de '+num(fleetTotal)+' vehículos</strong><progress aria-label="Flota habilitada" aria-valuetext="'+esc(num(fleetIncluded)+' de '+num(fleetTotal)+' vehículos habilitados')+'" max="'+Math.max(fleetTotal,1)+'" value="'+fleetIncluded+'"></progress></div>'
     +'</div>'
     +(filters.length
       ?'<div class="assignment-filter-list">'+filters.map((filter,index)=>filterControl(filter,fieldMap[filter.column],index)).join("")+'</div>'

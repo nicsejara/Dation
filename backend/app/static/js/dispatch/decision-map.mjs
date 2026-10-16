@@ -358,7 +358,7 @@ function progressMarkup(presentations,approved,activeNodeId){
     +'<div class="dispatch-case-progress__heading">'
       +'<small>PROGRESO</small><strong>'+num(approved)+' de 3 aprobadas</strong>'
     +'</div>'
-    +'<div class="dispatch-case-progress__grid" role="progressbar" aria-valuemin="0" aria-valuemax="3" aria-valuenow="'+approved+'">'
+    +'<div class="dispatch-case-progress__grid" role="progressbar" aria-label="Decisiones aprobadas" aria-valuetext="'+approved+' de 3 decisiones aprobadas" aria-valuemin="0" aria-valuemax="3" aria-valuenow="'+approved+'">'
       +DECISION_ORDER.map(nodeId=>{
         const meta=DECISION_META[nodeId];
         const approvedNode=presentations[nodeId].status===STATUS.APPROVED;
