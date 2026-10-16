@@ -211,5 +211,6 @@
 }
 /* Short viewports, including desktop zoom, must leave the content reachable. */
 @media(max-height:540px) {
-  .topbar, .d-workflow-action-bar { position:static; }
+  .topbar, .dda-workspace-nav-shell, .d-workflow-action-bar { position:static; }
+  .dispatch-upload-pro :is(button,a,summary,input,select,textarea,[tabindex]), .dispatch-pro-file-card { scroll-margin-block:16px; }
 }

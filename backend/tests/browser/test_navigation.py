@@ -2337,8 +2337,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_workflow_heroes_share_metadata_panel_and_stable_desktop_height(self):
         await self.page.emulate_media(reduced_motion='reduce')
-        for width in (1440,1280,1024,768,390,360):
-            await self.page.set_viewport_size({'width':width,'height':1000})
+        for width,height in ((1440,1000),(1280,1000),(1024,1000),(768,1000),(390,1000),(360,1000),(360,250)):
+            await self.page.set_viewport_size({'width':width,'height':height})
             records=[]
             for view,node in (('logistics-data',None),('logistics-map',None),
                               ('logistics-config','logistics_assignment'),('logistics-config','logistics_scheduling')):
@@ -2358,7 +2358,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                                 clipped:x.scrollWidth>x.clientWidth||text.scrollWidth>text.clientWidth};}),
                         overflow:el.scrollWidth>el.clientWidth||document.documentElement.scrollWidth>innerWidth};
                 }''')
-                with self.subTest(width=width,view=view,node=node):
+                with self.subTest(width=width,height=height,view=view,node=node):
                     self.assertFalse(metrics['overflow']);self.assertEqual(metrics['animation'],'none')
                     self.assertEqual(len(metrics['items']),3)
                     self.assertAlmostEqual(metrics['metaTop'],float(metrics['padding'].split()[0].removesuffix('px'))+1,delta=.25)
@@ -2379,6 +2379,16 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                         self.assertGreaterEqual(metrics['panel']['width'],320)
                         self.assertTrue(all(item['lines']==1 for item in metrics['items']))
                     else:self.assertGreaterEqual(metrics['panel']['top'],metrics['copy']['bottom']+metrics['gap']-.5)
+                    if height==250:
+                        positions=await self.page.locator('.topbar,.dda-workspace-nav-shell,.d-workflow-action-bar').evaluate_all('els=>els.map(el=>getComputedStyle(el).position)')
+                        self.assertTrue(all(position=='static' for position in positions),positions)
+                        if node:
+                            await self.page.keyboard.press('Tab')
+                            await self.page.locator('[data-config-review]' if node=='logistics_assignment' else '[data-scheduling-review]').focus()
+                            await self.page.locator('[data-config-context] summary').focus()
+                            focus=await self.page.evaluate((Path(__file__).parent/'focus_audit.js').read_text())
+                            self.assertTrue(focus['visibleFocus'],focus)
+                            self.assertFalse(focus['occluded'] or focus['outside'],focus)
                 records.append(metrics)
             if width>=1280:
                 self.assertLessEqual(max(r['hero']['height'] for r in records)-min(r['hero']['height'] for r in records),1)

@@ -22,13 +22,15 @@ La altura usa un mínimo compartido de 260 px, sin `height`, límite máximo ni 
 
 El margen de scroll para controles del workflow pasa al Design System. Configuración expone `--workflow-bar-space` a partir de la altura real ya medida de su barra; también protege el foco del resumen de Decision Case, que está fuera de las secciones. Se reutiliza el observador existente, sin listeners ni observadores nuevos.
 
+En viewports de 540 px de alto o menos, cabecera, navegación del workflow y barra inferior pasan al flujo normal. El margen de scroll se reduce en ese modo, donde ya no existen esas capas fijas. La comprobación de foco incluye 360 × 250.
+
 A 1100 px o menos, el panel pasa debajo del texto, con tres columnas de tarjetas. A 700 px o menos, las tarjetas pasan a una columna. Antes, la clase compartida de carga ocultaba el panel de las cuatro pantallas; ahora su contenido permanece accesible en tablet y móvil. El Hero puede crecer verticalmente. Los textos largos y sin espacios pueden envolver, incluso en metadata, título y nota final.
 
 ## Verificación
 
 Se añaden dos regresiones de Chromium:
 
-- Veinticuatro combinaciones de pantalla/ancho: las cuatro pantallas en 1440, 1280, 1024, 768, 390 y 360 px. Comprueban altura y columnas de escritorio, panel visible y debajo del texto en responsive, metadata vertical y jerarquía, alineación, tamaño de texto, wrapping, ausencia de recortes y movimiento reducido. No ejecutan runs.
+- Veintiocho combinaciones de pantalla/viewport: las cuatro pantallas en 1440, 1280, 1024, 768, 390 y 360 px, más 360 × 250. Comprueban altura y columnas de escritorio, panel visible y debajo del texto en responsive, metadata vertical y jerarquía, alineación, tamaño de texto, wrapping, ausencia de recortes, foco sin capas superpuestas y movimiento reducido. No ejecutan runs.
 - Renderer con una decisión futura, cinco elementos de panel, títulos/metadata/notas extensos sin espacios y texto HTML literal. Comprueba crecimiento sin desbordamiento, escape del contenido y uso del token de separación. Se mantienen las regresiones de índice opcional y panel opcional de Fase 1.
 
 El contrato Python de wrapping se actualiza para apuntar al Design System; la hoja de trazabilidad ya no controla el Hero. Se conservan las regresiones de barras y CTA de las Fases 2 y 3.
