@@ -1250,6 +1250,22 @@
         return button;
       }
 
+      var workspaceNav = document.getElementById('dda-workspace-nav');
+      if (workspaceNav) {
+        workspaceNav.addEventListener('focusin', function (event) {
+          var step = event.target.closest('.dda-workspace-step');
+          if (!step || step.parentElement !== workspaceNav) return;
+          var item = step.getBoundingClientRect();
+          var viewport = workspaceNav.getBoundingClientRect();
+          var delta = item.left < viewport.left + 8
+            ? item.left - viewport.left - 8
+            : item.right > viewport.right - 8
+              ? item.right - viewport.right + 8
+              : 0;
+          if (delta) workspaceNav.scrollBy({left: delta, behavior: 'instant'});
+        });
+      }
+
       window.dationRenderJourney = function (view) {
         var container = document.getElementById('journey-nav');
 

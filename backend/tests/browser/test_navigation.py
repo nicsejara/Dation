@@ -900,7 +900,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(result['failures'],[],(view,node,width,result['failures']))
                 self.assertFalse(result['overflow']);self.assertEqual(result['scheme'],'dark');self.assertFalse(result['legacyBoundary'])
                 tree=await session.send('Accessibility.getFullAXTree')
-                controls=[item for item in tree['nodes'] if not item.get('ignored') and item.get('role',{}).get('value') in ('button','link','textbox','searchbox','combobox','slider','checkbox','radio','tab')]
+                controls=[item for item in tree['nodes'] if not item.get('ignored') and item.get('role',{}).get('value') in ('button','link','textbox','searchbox','combobox','slider','checkbox','radio','tab','progressbar')]
                 self.assertTrue(controls)
                 missing=[item.get('role') for item in controls if not item.get('name',{}).get('value','').strip()]
                 self.assertEqual(missing,[],(view,node,width,missing))
@@ -2185,6 +2185,110 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(len(self.execution_bodies),before+1)
                 self.assertIn('view=decision-dashboard',self.page.url)
                 self.assertEqual(await self.page.locator('dialog[open]').count(),0)
+
+    async def test_workflow_keyboard_and_text_spacing_at_320_and_landscape(self):
+        focus=(Path(__file__).parent/'focus_audit.js').read_text()
+        theme=(Path(__file__).parent/'theme_audit.js').read_text()
+        await self.page.emulate_media(reduced_motion='reduce')
+        async def check_focus():
+            probe=await self.page.evaluate(focus)
+            if probe.get('skip'):return probe
+            self.assertTrue(probe['visibleFocus']);self.assertGreaterEqual(probe['width'],2)
+            if probe['tag']=='ARTICLE' and probe['rect']['height']>self.page.viewport_size['height']-160:
+                # A read-only card can exceed the viewport. Its visible focus segment must be clear.
+                visible=await self.page.evaluate('''()=>{
+                    const el=document.activeElement,r=el.getBoundingClientRect(),top=Math.max(0,r.top),bottom=Math.min(innerHeight,r.bottom);
+                    return bottom-top>=24&&[.1,.5,.9].every(t=>el.contains(document.elementFromPoint(r.x+r.width*.5,top+(bottom-top)*t)));
+                }''')
+                self.assertTrue(visible,probe)
+            else:
+                self.assertFalse(probe['outside'] or probe['occluded'],probe)
+            if 'dda-workspace-step' in probe['identity']:
+                self.assertTrue(await self.page.evaluate('''()=>{
+                    const el=document.activeElement,r=el.getBoundingClientRect(),nav=el.closest('nav').getBoundingClientRect();
+                    return r.left-5>=nav.left&&r.right+5<=nav.right;
+                }'''),probe)
+            return probe
+        for width,height in ((320,568),(320,256),(568,320)):
+            await self.page.set_viewport_size({'width':width,'height':height})
+            for kind,view,node in (('data','logistics-data',None),('map','logistics-map',None),
+                                  ('assignment','logistics-config','logistics_assignment'),('scheduling','logistics-config','logistics_scheduling')):
+                with self.subTest(width=width,height=height,screen=kind):
+                    saved=copy.deepcopy(self.case)
+                    if kind=='map':self.case['nodes']=copy.deepcopy(self.f['initial_case']['nodes'])
+                    await self.open(view,node)
+                    if kind=='data':await self.page.locator('.d-workflow-action-bar[data-state=ready]').wait_for()
+                    if kind=='map':
+                        progress=self.page.get_by_role('progressbar',name='Decisiones aprobadas',exact=True)
+                        self.assertEqual(await progress.get_attribute('aria-valuenow'),'0')
+                        self.assertEqual(await progress.get_attribute('aria-valuetext'),'0 de 3 decisiones aprobadas')
+                    if kind=='assignment':
+                        for name in ('Órdenes en el análisis','Flota habilitada'):
+                            progress=self.page.get_by_role('progressbar',name=name,exact=True)
+                            self.assertTrue(await progress.get_attribute('aria-valuetext'))
+                    layers=await self.page.locator('.topbar,.dda-workspace-nav-shell,.d-workflow-action-bar').evaluate_all('els=>els.map(el=>getComputedStyle(el).position)')
+                    self.assertTrue(all(value=='static' for value in layers),layers)
+                    seen=set()
+                    for _ in range(120):
+                        await self.page.keyboard.press('Tab');probe=await check_focus()
+                        if probe.get('skip'):continue
+                        if probe['identity'] in seen:break
+                        seen.add(probe['identity'])
+                    self.assertTrue(seen)
+                    for _ in range(len(seen)):
+                        await self.page.keyboard.press('Shift+Tab');await check_focus()
+                    await self.page.locator('.view.is-active').evaluate('''root=>{
+                        for(const el of [root,...root.querySelectorAll('*')]){
+                            if(el.closest('svg,script,style,[aria-hidden=true]'))continue;
+                            el.style.lineHeight='1.5';el.style.letterSpacing='.12em';el.style.wordSpacing='.16em';
+                            if(el.tagName==='P')el.style.marginBottom='2em';
+                        }
+                    }''')
+                    result=await self.page.evaluate(theme)
+                    self.assertFalse(result['overflow']);self.assertEqual(result['failures'],[])
+                    badges=await self.page.locator('.decision-config-section__current').evaluate_all('''els=>els.map(el=>{
+                        const r=el.getBoundingClientRect(),parent=el.parentElement.getBoundingClientRect();
+                        return r.right<=parent.right+.5&&el.scrollWidth<=el.clientWidth;
+                    })''')
+                    self.assertTrue(all(badges),badges)
+                    if kind=='map':self.case.clear();self.case.update(saved)
+                    if kind in ('assignment','scheduling'):
+                        await self.open(view,node)
+                        trigger=self.page.locator('[data-config-review]' if kind=='assignment' else '[data-scheduling-review]')
+                        url=self.page.url;before=len(self.requests)
+                        await trigger.focus();await self.page.keyboard.press('Enter')
+                        dialog=self.page.locator('dialog[open]');await dialog.wait_for()
+                        buttons=dialog.get_by_role('button')
+                        await buttons.last.focus();await self.page.keyboard.press('Tab');await check_focus()
+                        self.assertTrue(await buttons.first.evaluate('el=>el===document.activeElement'))
+                        await self.page.keyboard.press('Shift+Tab');await check_focus()
+                        self.assertTrue(await buttons.last.evaluate('el=>el===document.activeElement'))
+                        await self.page.keyboard.press('Escape')
+                        self.assertTrue(await trigger.evaluate('el=>el===document.activeElement'))
+                        self.assertEqual(self.page.url,url);self.assertEqual(self.requests[before:],[])
+        self.assertEqual(self.execution_bodies,[]);self.assertEqual(self.approval_calls,0)
+
+    async def test_workflow_review_respects_motion_preference_changes_while_open(self):
+        await self.page.set_viewport_size({'width':390,'height':568})
+        for kind in ('assignment','scheduling'):
+            await self.page.emulate_media(reduced_motion='no-preference')
+            await self.open('logistics-config','logistics_'+kind)
+            trigger=self.page.locator('[data-config-review]' if kind=='assignment' else '[data-scheduling-review]')
+            url=self.page.url;before=len(self.requests)
+            await trigger.focus();await self.page.keyboard.press('Enter')
+            dialog=self.page.locator('dialog[open]');await dialog.wait_for()
+            self.assertEqual(await dialog.evaluate('el=>getComputedStyle(el).animationName'),'d-execution-review-in')
+            await self.page.emulate_media(reduced_motion='reduce')
+            self.assertEqual(await dialog.evaluate('el=>getComputedStyle(el).animationName'),'none')
+            self.assertEqual(await dialog.evaluate('el=>el.getAnimations().filter(a=>a.playState==="running").length'),0)
+            await self.page.keyboard.press('Escape')
+            self.assertTrue(await trigger.evaluate('el=>el===document.activeElement'))
+            await trigger.press('Enter');await dialog.wait_for()
+            self.assertEqual(await dialog.evaluate('el=>getComputedStyle(el).animationName'),'none')
+            await dialog.get_by_role('button',name='Volver',exact=True).press('Space')
+            self.assertTrue(await trigger.evaluate('el=>el===document.activeElement'))
+            self.assertEqual(self.page.url,url);self.assertEqual(self.requests[before:],[])
+        self.assertEqual(self.execution_bodies,[])
 
     async def test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports(self):
         theme=(Path(__file__).parent/'theme_audit.js').read_text()
