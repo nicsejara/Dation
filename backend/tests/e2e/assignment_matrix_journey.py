@@ -29,12 +29,12 @@ async def main():
    assert await page.locator('[data-executive-kpi=total_cost]>strong').inner_text()==expected['cost']
    actual_own=await page.locator('[data-executive-kpi=own_weight_share]>strong').inner_text()
    assert actual_own==expected['own'],(run['objective'],actual_own,expected['own'],run['metrics'])
-   url=page.url;await page.locator('[data-assignment-view=advanced]').click()
+   url=page.url;await page.locator('[data-assignment-advanced-toggle]').click()
    await page.locator('.assignment-frontier__chart svg').wait_for()
    assert await page.locator('[data-comparison-kpi]').count()==6
    assert await page.locator('[data-assignment-corridors] tbody tr').count()>0
    assert page.url==url
-   await page.locator('[data-assignment-view=essential]').click()
+   await page.locator('[data-assignment-advanced-toggle]').click()
    assert not await page.locator('#dispatch-assignment').is_visible()
    assert await page.evaluate('window.DationDispatch.getWorkspace().run.result_json.scenarios.selected.plan_fingerprint')==run['plan_fingerprint']
    assert not await page.evaluate('document.documentElement.scrollWidth>innerWidth')

@@ -264,7 +264,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertLess(order.index('dispatch-explanation'),order.index('dispatch-comparative'))
         self.assertLess(order.index('dispatch-comparative'),order.index('dispatch-review'))
         self.assertFalse(await self.page.locator('#dispatch-assignment').is_visible())
-        self.assertEqual(await self.page.locator('[data-assignment-view=essential]').get_attribute('aria-selected'),'true')
+        self.assertEqual(await self.page.locator('[data-assignment-advanced-toggle]').get_attribute('aria-expanded'),'false')
         self.assertEqual(await self.page.locator('[data-flow],[data-case-flow],.dispatch-dashboard-map-back').count(),0)
         self.assertFalse(await self.page.locator('#dda-workspace-nav-shell').is_visible())
 
@@ -599,9 +599,9 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.comparative['status']='completed'
         await self.page.wait_for_selector('[data-comparative-state=completed]')
         artifact=copy.deepcopy(self.comparative)
-        await self.page.locator('[data-assignment-view=essential]').click()
+        await self.page.locator('[data-assignment-advanced-toggle]').click()
         self.assertFalse(await self.page.locator('[data-comparison-kpi]').first.is_visible())
-        await self.page.reload();await self.page.locator('[data-assignment-view=essential]').wait_for(state='visible')
+        await self.page.reload();await self.page.locator('[data-assignment-advanced-toggle]').wait_for(state='visible')
         await self.open_advanced()
         self.assertEqual(await self.page.locator('[data-comparison-kpi]').count(),6)
         self.assertEqual(self.comparative_posts,1);self.assertEqual(self.comparative,artifact);self.assertEqual(self.case,before)
@@ -1200,7 +1200,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.page.wait_for_selector('[data-comparative-state=completed]')
         self.assertEqual((await self.page.evaluate(audit,'#dispatch-comparative'))['failures'],[])
         artifact=copy.deepcopy(self.comparative)
-        await self.page.locator('[data-assignment-view=essential]').click();await self.open_advanced()
+        await self.page.locator('[data-assignment-advanced-toggle]').click();await self.open_advanced()
         self.assertEqual(self.comparative_posts,2);self.assertEqual(self.comparative,artifact)
         self.assertEqual(self.f['runs']['assignment'],base);self.assertEqual(self.case,case)
 
@@ -2893,26 +2893,74 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.execution_bodies,[])
 
     async def open_advanced(self):
-        await self.page.locator('[data-assignment-view=advanced]').click()
+        toggle=self.page.locator('[data-assignment-advanced-toggle]')
+        if await toggle.get_attribute('aria-expanded')=='false':await toggle.click()
         await self.page.locator('#dispatch-assignment').wait_for(state='visible')
 
     async def test_d1_v2_view_modes_preserve_evidence_and_restore_without_reexecution(self):
         self.essential();before=copy.deepcopy(self.f['runs']['assignment']);await self.dashboard();url=self.page.url
-        self.assertEqual(await self.page.locator('[data-assignment-view=essential]').get_attribute('aria-selected'),'true')
+        self.assertEqual(await self.page.locator('.assignment-view-control,[data-assignment-view]').count(),0)
+        main=self.page.locator('main.assignment-dashboard-v2__main')
+        self.assertIsNone(await main.get_attribute('role'));self.assertIsNone(await main.get_attribute('aria-labelledby'))
+        self.assertTrue(await main.evaluate('el=>el.previousElementSibling.classList.contains("assignment-dashboard-v2__rail")'))
+        self.assertEqual(await self.page.locator('[data-assignment-advanced-toggle]').get_attribute('aria-expanded'),'false')
         self.assertFalse(await self.page.locator('#dispatch-assignment').is_visible())
         self.assertFalse(await self.page.locator('[data-ai-summary-body]').is_visible())
         self.assertEqual(await self.page.locator('#assignment-preview tbody tr').count(),5)
         await self.page.locator('[data-assignment-full-plan]').click()
         self.assertTrue(await self.page.locator('#dispatch-assignment').is_visible())
-        await self.page.locator('#dispatch-assignment').evaluate('el=>window.savedEvidence=el')
-        await self.page.locator('[data-assignment-view=essential]').click()
+        self.assertTrue(await self.page.locator('#dispatch-assignment').evaluate('el=>el===document.activeElement'))
+        await self.page.locator('#dispatch-assignment').evaluate('el=>{window.savedEvidence=el;window.savedFrontier=document.querySelector(".assignment-frontier__chart svg");}')
+        await self.page.locator('[data-assignment-advanced-toggle]').click()
         self.assertFalse(await self.page.locator('#dispatch-assignment').is_visible())
         await self.open_advanced()
         self.assertTrue(await self.page.locator('#dispatch-assignment').evaluate('el=>el===window.savedEvidence'))
+        self.assertTrue(await self.page.evaluate('window.savedFrontier===document.querySelector(".assignment-frontier__chart svg")'))
         await self.page.reload();await self.page.locator('#dispatch-assignment').wait_for(state='visible')
+        self.assertEqual(await self.page.locator('[data-assignment-advanced-label]').inner_text(),'Ocultar análisis avanzado')
+        self.assertEqual(await self.page.locator('[data-assignment-advanced-toggle]').get_attribute('aria-expanded'),'true')
+        self.assertEqual(await self.page.evaluate('sessionStorage.getItem("dation.assignment.presentation."+window.DationDispatch.getWorkspace().run.id)'),'advanced')
         self.assertEqual(await self.page.locator('.assignment-dashboard-v2').get_attribute('data-analysis-depth'),'essential')
         self.assertEqual(self.page.url,url);self.assertEqual(self.f['runs']['assignment'],before)
         self.assertEqual(self.comparative_posts,0);self.assertEqual(self.explain_calls,0);self.assertEqual(self.execution_bodies,[])
+
+    async def test_d1_v2_disclosure_keyboard_feedback_and_manual_scroll(self):
+        await self.page.emulate_media(reduced_motion='reduce');await self.dashboard();url=self.page.url
+        toggle=self.page.locator('[data-assignment-advanced-toggle]')
+        content=self.page.locator('[data-assignment-advanced-content]')
+        self.assertEqual(await toggle.get_attribute('type'),'button')
+        self.assertEqual(await toggle.get_attribute('aria-controls'),await content.get_attribute('id'))
+        self.assertEqual(await content.get_attribute('id'),'assignment-presentation-'+self.f['ids']['assignment']+'-advanced-content')
+        self.assertEqual(await self.page.locator('[data-assignment-advanced-chevron]').get_attribute('aria-hidden'),'true')
+        self.assertEqual(await self.page.locator('.assignment-view-control,[data-assignment-view]').count(),0)
+        for width,height in ((1440,1000),(768,1024),(390,844),(320,568)):
+            await self.page.set_viewport_size({'width':width,'height':height})
+            await toggle.evaluate('el=>el.scrollIntoView({block:"center"})');await toggle.focus()
+            before=await toggle.evaluate('''el=>({y:scrollY,background:getComputedStyle(el).backgroundColor,
+                border:getComputedStyle(el).borderColor,leading:getComputedStyle(el.querySelector('.assignment-advanced__copy svg')).transform})''')
+            self.assertEqual(await toggle.get_attribute('aria-expanded'),'false');self.assertTrue(await content.evaluate('el=>el.hidden'))
+            self.assertEqual(await self.page.locator('[data-assignment-advanced-label]').inner_text(),'Mostrar análisis avanzado')
+            await self.page.keyboard.press('Enter')
+            self.assertEqual(await toggle.get_attribute('aria-expanded'),'true');self.assertFalse(await content.evaluate('el=>el.hidden'))
+            self.assertTrue(await self.page.locator('[data-assignment-advanced]').evaluate('el=>el.classList.contains("is-open")'))
+            self.assertEqual(await self.page.locator('[data-assignment-advanced-label]').inner_text(),'Ocultar análisis avanzado')
+            after=await toggle.evaluate('''el=>{const s=getComputedStyle(el),c=el.querySelector('[data-assignment-advanced-chevron]'),a=el.querySelector('.assignment-advanced__copy'),r=el.getBoundingClientRect(),cr=c.getBoundingClientRect();return {
+                y:scrollY,background:s.backgroundColor,border:s.borderColor,rotation:getComputedStyle(c).transform,
+                leading:getComputedStyle(a.querySelector('svg')).transform,transition:getComputedStyle(c).transitionDuration,
+                fits:cr.right<=r.right&&a.getBoundingClientRect().right<=cr.left&&el.scrollWidth<=el.clientWidth,
+                focus:el===document.activeElement&&el.matches(':focus-visible'),outline:parseFloat(s.outlineWidth)};}''')
+            self.assertEqual(after['y'],before['y']);self.assertNotEqual(after['background'],before['background'])
+            self.assertNotEqual(after['border'],before['border']);self.assertEqual(after['leading'],before['leading'])
+            self.assertEqual(after['rotation'],'matrix(-1, 0, 0, -1, 0, 0)');self.assertEqual(after['transition'],'0s')
+            self.assertTrue(after['fits']);self.assertTrue(after['focus']);self.assertGreaterEqual(after['outline'],2)
+            await self.page.keyboard.press('Space')
+            self.assertEqual(await toggle.get_attribute('aria-expanded'),'false');self.assertTrue(await content.evaluate('el=>el.hidden'))
+            self.assertFalse(await self.page.locator('[data-assignment-advanced]').evaluate('el=>el.classList.contains("is-open")'))
+            self.assertEqual(await self.page.locator('[data-assignment-advanced-label]').inner_text(),'Mostrar análisis avanzado')
+            self.assertEqual(await self.page.evaluate('scrollY'),before['y']);self.assertEqual(self.page.url,url)
+            self.assertEqual(await self.page.locator('[data-assignment-advanced-chevron]').evaluate('el=>getComputedStyle(el).transform'),'none')
+            self.assertTrue(await toggle.evaluate('el=>el===document.activeElement'))
+        self.assertEqual(self.explain_calls,0);self.assertEqual(self.comparative_posts,0);self.assertEqual(self.execution_bodies,[])
 
     async def test_d1_v2_all_objectives_highlight_the_actual_selected_scenario(self):
         original=copy.deepcopy(self.f['runs']['assignment']['result_json']);copy_values=[]
@@ -3020,9 +3068,10 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         for width,height in ((1440,1000),(1280,1000),(1024,1000),(768,1000),(390,844),(360,250),(320,568),(320,256),(568,320)):
             await self.page.set_viewport_size({'width':width,'height':height})
             for mode in ('essential','advanced'):
-                await self.page.locator('[data-assignment-view='+mode+']').click()
+                toggle=self.page.locator('[data-assignment-advanced-toggle]')
+                if (await toggle.get_attribute('aria-expanded')=='true')!=(mode=='advanced'):await toggle.click()
                 audit=await self.page.evaluate(theme);self.assertFalse(audit['overflow'],(width,height,mode));self.assertEqual(audit['failures'],[],(width,height,mode))
-                await self.page.locator('[data-assignment-view='+mode+']').focus()
+                await self.page.locator('#dispatch-hero .assignment-essential__objective>summary').focus()
                 for key in ['Tab']*14+['Shift+Tab']*14:
                     await self.page.keyboard.press(key);probe=await self.page.evaluate(focus)
                     if not probe.get('skip'):

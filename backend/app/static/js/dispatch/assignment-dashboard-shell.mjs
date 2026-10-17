@@ -12,10 +12,7 @@ export function renderAssignmentShell(root,run,caseActions={}){
   const {toolbar,drawer}=renderDashboardToolbar(run,caseActions,{placement:'hero'});
   root.className='dispatch assignment-dashboard-v2 d-decision-dashboard';root.dataset.analysisDepth=depth.depth;
   root.innerHTML='<div class="assignment-dashboard-v2__rail">'+decisionRail(caseActions)+'</div>'
-    +'<div class="assignment-view-control" role="tablist" aria-label="Nivel de análisis">'
-      +'<button type="button" role="tab" id="'+esc(id)+'-essential" data-assignment-view="essential" aria-selected="true" aria-controls="'+esc(id)+'">'+icon('eye')+'Vista esencial</button>'
-      +'<button type="button" role="tab" id="'+esc(id)+'-advanced" data-assignment-view="advanced" aria-selected="false" aria-controls="'+esc(id)+'" tabindex="-1">'+icon('chartBar')+'Análisis avanzado</button></div>'
-    +'<main class="assignment-dashboard-v2__main" id="'+esc(id)+'" role="tabpanel" aria-labelledby="'+esc(id)+'-essential">'
+    +'<main class="assignment-dashboard-v2__main">'
       +'<section class="dispatch-panel assignment-dashboard-v2__section assignment-dashboard-v2__hero" id="dispatch-hero"><div data-assignment-hero-copy></div>'+toolbar+'</section>'
       +'<section id="assignment-context" class="assignment-context"></section>'
       +'<section id="assignment-kpis"></section>'
@@ -25,7 +22,7 @@ export function renderAssignmentShell(root,run,caseActions={}){
         +'<section id="assignment-preview" class="assignment-v2__panel"></section></div>'
       +'<section class="assignment-v2__panel assignment-ai-summary" id="dispatch-explanation"></section>'
       +'<section class="assignment-v2__panel assignment-advanced" data-assignment-advanced>'
-        +'<button type="button" class="assignment-advanced__toggle" data-assignment-advanced-toggle aria-expanded="false" aria-controls="'+esc(id)+'-advanced-content"><span>'+icon('chartBar')+'<strong>Mostrar análisis avanzado</strong></span>'+icon('chevronDown')+'</button><p class="assignment-advanced__description">Compará escenarios en detalle, revisá utilización por viaje, corredores y la evidencia completa.</p>'
+        +'<button type="button" class="assignment-advanced__toggle" data-assignment-advanced-toggle aria-expanded="false" aria-controls="'+esc(id)+'-advanced-content"><span class="assignment-advanced__copy">'+icon('chartBar')+'<strong data-assignment-advanced-label>Mostrar análisis avanzado</strong></span><span class="assignment-advanced__chevron" data-assignment-advanced-chevron aria-hidden="true">'+icon('chevronDown')+'</span></button><p class="assignment-advanced__description">Compará escenarios en detalle, revisá utilización por viaje, corredores y la evidencia completa.</p>'
         +'<div class="assignment-advanced__chips" aria-hidden="true"><span>Frontera de decisión</span><span>Comparación detallada</span><span>Utilización por viaje</span><span>Corredores</span><span>Plan completo</span></div>'
         +'<div id="'+esc(id)+'-advanced-content" data-assignment-advanced-content hidden>'
           +'<section class="assignment-comparative-layer" id="dispatch-comparative"></section>'
@@ -49,15 +46,15 @@ export function renderAssignmentShell(root,run,caseActions={}){
 
 export function bindAssignmentShell(root,run,{onRerun,caseActions={},onOpenChat,onAdvancedOpen}={}){
   bindDecisionRail(root,caseActions);
-  const scope=scopeFor(root),advanced=root.querySelector('[data-assignment-advanced]'),tabs=[...root.querySelectorAll('[data-assignment-view]')];
+  const scope=scopeFor(root),advanced=root.querySelector('[data-assignment-advanced]');
   const storage='dation.assignment.presentation.'+run.id;
   const toggle=advanced.querySelector('[data-assignment-advanced-toggle]'),content=advanced.querySelector('[data-assignment-advanced-content]');
+  const toggleLabel=toggle.querySelector('[data-assignment-advanced-label]');
   let previous=false,open=false;
   function sync(){
     root.dataset.visualDepth=open?'advanced':'essential';
-    tabs.forEach(tab=>{const active=(tab.dataset.assignmentView==='advanced')===open;tab.setAttribute('aria-selected',String(active));tab.tabIndex=active?0:-1;});
-    root.querySelector('main').setAttribute('aria-labelledby',tabs[open?1:0].id);
     toggle.setAttribute('aria-expanded',String(open));content.hidden=!open;advanced.classList.toggle('is-open',open);
+    toggleLabel.textContent=open?'Ocultar análisis avanzado':'Mostrar análisis avanzado';
     try{sessionStorage.setItem(storage,open?'advanced':'essential');}catch{}
     if(open&&!previous)onAdvancedOpen?.();
     previous=open;
@@ -70,14 +67,6 @@ export function bindAssignmentShell(root,run,{onRerun,caseActions={},onOpenChat,
       if(target)target.focus({preventScroll:true});
     },0);
   }
-  tabs.forEach((tab,index)=>{
-    scope.listen(tab,'click',()=>setAdvanced(index===1,{scroll:index===1}));
-    scope.listen(tab,'keydown',event=>{
-      if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
-      event.preventDefault();const next=event.key==='Home'?0:event.key==='End'?1:1-index;
-      setAdvanced(next===1);tabs[next].focus();
-    });
-  });
   scope.listen(toggle,'click',()=>setAdvanced(!open));
   scope.listen(root.querySelector('[data-chat]'),'click',()=>onOpenChat?.());
   let restored=false;try{restored=sessionStorage.getItem(storage)==='advanced';}catch{}
