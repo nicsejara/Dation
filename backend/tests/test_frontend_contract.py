@@ -602,14 +602,10 @@ class FrontendContractTests(
             / "dispatch"
             / "dashboard.mjs"
         ).read_text(encoding="utf-8")
-        scheduling = (
-            BACKEND_ROOT
-            / "app"
-            / "static"
-            / "js"
-            / "dispatch"
-            / "scheduling-dashboard.mjs"
-        ).read_text(encoding="utf-8")
+        scheduling = "\n".join(
+            (BACKEND_ROOT / "app/static/js/dispatch" / name).read_text(encoding="utf-8")
+            for name in ("scheduling-dashboard.mjs", "scheduling-dashboard-shell.mjs", "scheduling-timeline.mjs")
+        )
         exporter = (
             BACKEND_ROOT
             / "app"
@@ -652,7 +648,7 @@ class FrontendContractTests(
             dashboard,
         )
         self.assertIn(
-            "renderDashboardToolbar(run,caseActions)",
+            "renderDashboardToolbar(run,caseActions,{placement:'hero'})",
             scheduling,
         )
         self.assertIn(
@@ -668,7 +664,7 @@ class FrontendContractTests(
             scheduling,
         )
         self.assertIn(
-            "CALENDARIO OPERATIVO",
+            "Timeline completo",
             scheduling,
         )
         self.assertIn(
@@ -705,10 +701,10 @@ class FrontendContractTests(
         dashboard = (
             dispatch_root / "dashboard.mjs"
         ).read_text(encoding="utf-8")
-        scheduling = (
-            dispatch_root
-            / "scheduling-dashboard.mjs"
-        ).read_text(encoding="utf-8")
+        scheduling = "\n".join(
+            (BACKEND_ROOT / "app/static/js/dispatch" / name).read_text(encoding="utf-8")
+            for name in ("scheduling-dashboard.mjs", "scheduling-dashboard-shell.mjs", "scheduling-timeline.mjs")
+        )
         explanation = (
             dispatch_root / "explanation.mjs"
         ).read_text(encoding="utf-8")
@@ -1286,10 +1282,10 @@ class FrontendContractTests(
         dashboard = (
             dispatch_root / "dashboard.mjs"
         ).read_text(encoding="utf-8")
-        scheduling = (
-            dispatch_root
-            / "scheduling-dashboard.mjs"
-        ).read_text(encoding="utf-8")
+        scheduling = "\n".join(
+            (BACKEND_ROOT / "app/static/js/dispatch" / name).read_text(encoding="utf-8")
+            for name in ("scheduling-dashboard.mjs", "scheduling-dashboard-shell.mjs", "scheduling-timeline.mjs")
+        )
 
         self.assertIn(
             "dashboardContinuation(run,nodeId,generation)",

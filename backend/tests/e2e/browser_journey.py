@@ -263,6 +263,7 @@ async def journey():
             assert await cold.evaluate("window.DationDispatch.getWorkspace().decisionCase.nodes.logistics_assignment.approved_run_id")==assignment
             await cold.close()
             assert await (await context.request.get(base+'/api/runs/'+failed_scheduling)).json()==failed_snapshot
+            await page.locator('[data-more-menu] summary').click()
             await page.locator('[data-dashboard-map]').click()
             await page.wait_for_selector('[data-map-node="logistics_assignment"]')
             assert await page.get_by_role('progressbar',name='Decisiones aprobadas',exact=True).get_attribute('aria-valuenow')=='2'

@@ -34,6 +34,7 @@ function ensureDashboardStyles(schema){
     ensureStylesheet(ASSIGNMENT_COMPARATIVE_STYLE_ID,'/static/css/assignment-dashboard-comparative.css'),
     ensureStylesheet('assignment-dashboard-decision-styles','/static/css/assignment-dashboard-decision.css','assignment-dashboard-v2-20261016'),
   );
+  if(schema==='scheduling_v1')styles.push(ensureStylesheet('scheduling-dashboard-v21-styles','/static/css/scheduling-dashboard-v21.css','scheduling-v21-20261017'));
   return Promise.all(styles);
 }
 

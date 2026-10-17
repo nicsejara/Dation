@@ -41,3 +41,25 @@ def assignment_matrix_inputs():
         stream=io.StringIO();writer=csv.DictWriter(stream,fieldnames=rows[0].keys(),delimiter=';',lineterminator='\n')
         writer.writeheader();writer.writerows(rows);result[kind]=stream.getvalue().encode()
     return result
+
+
+def scheduling_dashboard_inputs():
+    """QA temporal reproducible: dos bases, secuencias paralelas y cargas en pallets.
+
+    No sustituye ni se presenta como el paquete externo Golden Pallets v2.
+    """
+    order_template=next(csv.DictReader(io.StringIO(csv_input('orders').decode()),delimiter=';'))
+    fleet_template=next(csv.DictReader(io.StringIO(csv_input('fleet').decode()),delimiter=';'))
+    orders=[];fleet=[]
+    for site,index in (('Cordoba',1),('Rosario',2)):
+        for ordinal,due,priority in ((1,'2026-10-04','High'),(2,'2026-10-20','Normal')):
+            orders.append({**order_template,'order_id':f'D2-{index}-{ordinal}','product':'Pallet QA',
+                'quantity_units':'20','unit_weight_kg':'500','origin':site,'destination':'Destino '+str(index),
+                'distance_km':'600','priority':priority,'estimated_dispatch_date':'2026-10-01','delivery_due_date':due})
+        fleet.append({**fleet_template,'vehicle_id':'QA-TIME-'+str(index),'license_plate':'','ownership':'own',
+            'base_site':site,'capacity_kg':'8000' if index==1 else '5000','available_from':'2026-10-01','available_until':'2026-10-31'})
+    result={}
+    for kind,rows in (('orders',orders),('fleet',fleet)):
+        output=io.StringIO();writer=csv.DictWriter(output,fieldnames=rows[0].keys(),delimiter=';',lineterminator='\n')
+        writer.writeheader();writer.writerows(rows);result[kind]=output.getvalue().encode()
+    return result

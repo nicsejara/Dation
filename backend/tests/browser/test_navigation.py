@@ -626,6 +626,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.execution_bodies[-1]['source_run_id'],self.f['ids']['assignment'])
         self.assertEqual(self.execution_bodies[-1]['configuration']['planning_window_end'],'2026-12-31')
         self.assertEqual(self.runs[failed['id']],before)
+        await self.page.locator('[data-more-menu] summary').click()
         await self.page.locator('[data-dashboard-map]').click()
         await self.page.locator('[data-select-case]').wait_for(state='visible')
         await self.page.evaluate("window.DationDispatch.openRunHistory('logistics_scheduling')")
@@ -671,7 +672,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         other=self.second_case();before=copy.deepcopy(self.case)
         for kind in ('assignment','scheduling'):
             await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=decision-dashboard&case_id={other["case"]["id"]}&node_id=logistics_{kind}&run_id={self.f["ids"][kind]}')
-            if kind=='assignment':await self.page.locator('[data-more-menu] summary').click()
+            await self.page.locator('[data-more-menu] summary').click()
             await self.page.locator('[data-dashboard-map]').click()
             await self.page.locator('[data-select-case]').wait_for(state='visible')
             self.assertIn('case_id='+self.case['id'],self.page.url)
@@ -803,7 +804,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.page.evaluate("id=>window.DationDispatch.openRun(id,'logistics_scheduling')",self.f['ids']['scheduling'])
         await self.page.wait_for_selector('.dispatch-scheduling-dashboard')
         before=sum(p.endswith('/interpretation') for _,p in self.requests)
-        await self.page.locator('#dispatch-explanation [data-question]').first.click()
+        await self.page.locator('[data-chat]').click()
+        await self.page.locator('.dispatch-chat [data-starter]').first.click()
         await self.page.wait_for_selector('.dispatch-chat textarea')
         await self.page.wait_for_timeout(150)
         self.assertEqual(sum(p.endswith('/interpretation') for _,p in self.requests)-before,1)
@@ -1023,6 +1025,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
     async def test_phase6_reduced_motion_updates_real_chart_and_cleans_up_on_departure(self):
         await self.page.emulate_media(reduced_motion='reduce')
         await self.open('decision-dashboard','logistics_scheduling',self.f['ids']['scheduling'])
+        await self.page.locator('[data-scheduling-advanced-toggle]').click()
         await self.page.evaluate('window.__qaChart=window.DationCharts.getInstanceByDom(document.querySelector(".dispatch-schedule-chart"))')
         self.assertFalse(await self.page.evaluate('window.__qaChart.getOption().animation'))
         self.assertEqual(await self.page.evaluate('getComputedStyle(document.documentElement).scrollBehavior'),'auto')
@@ -1138,6 +1141,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.page.set_viewport_size({'width':390,'height':844})
         before=copy.deepcopy(self.f['runs']['scheduling'])
         await self.open('decision-dashboard','logistics_scheduling',self.f['ids']['scheduling'])
+        await self.page.locator('[data-scheduling-advanced-toggle]').click()
         chart=self.page.locator('.dispatch-schedule-chart')
         actual=await chart.evaluate('''el=>{
             const instance=window.DationCharts.getInstanceByDom(el),o=instance.getOption();
@@ -1923,13 +1927,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                     return {width:r.width,content:m.width,left:m.x-r.x,right:r.right-m.right,tools,insideHero:h?r.left>=h.left&&r.right<=h.right:false,position:getComputedStyle(el).position};
                 }''')
                 expected=24 if width>1100 else 12 if width>760 else 0
-                if kind=='scheduling':
-                    self.assertAlmostEqual(sizes['left'],expected,delta=.25);self.assertAlmostEqual(sizes['right'],expected,delta=.25)
-                    self.assertEqual(sizes['position'],'static' if height<=540 else 'sticky')
-                    self.assertEqual(len(sizes['tools']),3)
-                else:
-                    self.assertTrue(sizes['insideHero']);self.assertEqual(sizes['position'],'relative')
-                    self.assertEqual(len(sizes['tools']),2)
+                self.assertTrue(sizes['insideHero']);self.assertEqual(sizes['position'],'relative')
+                self.assertEqual(len(sizes['tools']),2)
                 for tool in sizes['tools'][1:]:
                     for key in ('width','height'):self.assertAlmostEqual(tool[key],sizes['tools'][0][key],delta=.25)
                     self.assertEqual({k:v for k,v in tool.items() if k not in ('width','height')},
@@ -3119,6 +3118,130 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertGreater(reproduced,0)
         self.assertGreater(clipped_rows,0)
         self.assertEqual(self.explain_calls,0);self.assertEqual(self.comparative_posts,0);self.assertEqual(self.execution_bodies,[])
+
+    async def test_d2_v21_disclosure_keyboard_persistence_preview_and_evidence(self):
+        original=copy.deepcopy(self.f['runs']['scheduling'])
+        await self.open('decision-dashboard','logistics_scheduling',self.f['ids']['scheduling'])
+        root=self.page.locator('.scheduling-dashboard-v2')
+        self.assertEqual(await root.locator('[role=tablist],[role=tab],[role=tabpanel],.scheduling-view-control').count(),0)
+        self.assertEqual(await self.page.locator('[data-scheduling-kpi]').count(),4)
+        self.assertLessEqual(await self.page.locator('#scheduling-preview tbody tr').count(),5)
+        self.assertEqual(await self.page.locator('.dispatch-schedule-chart').count(),0)
+        self.assertIn('Assignment bloqueada',await root.inner_text())
+        self.assertIn('Plan con excepciones',await self.page.locator('#dispatch-hero').inner_text())
+        button=self.page.locator('[data-scheduling-advanced-toggle]')
+        for width,height in [(1440,1000),(768,1024),(390,844),(320,568)]:
+            await self.page.set_viewport_size({'width':width,'height':height})
+            await self.page.emulate_media(reduced_motion='reduce')
+            await button.scroll_into_view_if_needed();await button.focus()
+            before=await self.page.evaluate('({url:location.href,y:scrollY})')
+            await button.press('Enter')
+            self.assertEqual(await button.get_attribute('aria-expanded'),'true')
+            self.assertIn('Ocultar análisis avanzado',await button.inner_text())
+            state=await self.page.evaluate('''()=>{const a=document.querySelector('[data-scheduling-advanced]'),b=a.querySelector('button'),c=a.querySelector('[data-scheduling-advanced-content]'),s=getComputedStyle(a.querySelector('.scheduling-advanced__chevron'));return {hidden:c.hidden,active:a.classList.contains('is-open'),controls:b.getAttribute('aria-controls')===c.id,rotation:s.transform,transition:s.transitionDuration,width:document.documentElement.scrollWidth,viewport:innerWidth,y:scrollY,url:location.href};}''')
+            self.assertFalse(state['hidden']);self.assertTrue(state['active']);self.assertTrue(state['controls'])
+            self.assertNotEqual(state['rotation'],'none');self.assertEqual(state['transition'],'0s')
+            self.assertLessEqual(state['width'],state['viewport']+1)
+            self.assertEqual(state['url'],before['url']);self.assertLessEqual(abs(state['y']-before['y']),2)
+            await button.press('Space')
+            self.assertEqual(await button.get_attribute('aria-expanded'),'false')
+            self.assertIn('Mostrar análisis avanzado',await button.inner_text())
+        await self.page.locator('[data-scheduling-full-plan]').click()
+        await self.page.wait_for_function("document.activeElement?.id==='scheduling-full-plan'")
+        self.assertEqual(await self.page.locator('#scheduling-full-plan tbody tr').count(),len(original['result_json']['scenarios']['selected']['trips']))
+        await self.page.reload();await button.wait_for()
+        self.assertEqual(await button.get_attribute('aria-expanded'),'true')
+        self.assertIn('Ocultar análisis avanzado',await button.inner_text())
+        self.assertEqual(self.f['runs']['scheduling'],original)
+        self.assertEqual(self.execution_bodies,[]);self.assertEqual(self.comparative_posts,0);self.assertEqual(self.explain_calls,0)
+
+    async def test_d2_v21_timeline_vehicle_rows_sla_and_release_dates(self):
+        await self.open('decision-dashboard','logistics_scheduling',self.f['ids']['scheduling'])
+        option=await self.page.locator('.scheduling-timeline-chart').evaluate('''el=>{const o=window.DationCharts.getInstanceByDom(el).getOption();return {rows:o.yAxis[0].data,data:o.series.filter((_,i)=>i%2).flatMap(s=>s.data).filter(d=>d.trip_id),detail:o.tooltip[0].formatter({data:o.series[1].data[0]}),type:o.series[1].type};}''')
+        trips=self.f['runs']['scheduling']['result_json']['scenarios']['selected']['trips']
+        self.assertEqual(set(option['rows']),{t['vehicle_id'] for t in trips});self.assertEqual(len(option['data']),len(trips));self.assertEqual(option['type'],'bar')
+        self.assertIn('Disponible:',option['detail']);self.assertIn('Llegada:',option['detail']);self.assertIn('Espera:',option['detail'])
+        await self.page.locator('[data-scheduling-advanced-toggle]').click()
+        self.assertEqual(await self.page.locator('#scheduling-service tbody tr').count(),len(self.f['runs']['scheduling']['result_json']['scenarios']['selected']['order_outcomes']))
+        await self.page.locator('[data-scheduling-wait-sort]').select_option('resource')
+        ids=await self.page.locator('#scheduling-waits tbody tr td:first-of-type').all_text_contents()
+        self.assertEqual(ids,sorted(ids));self.assertEqual(await self.page.locator('#scheduling-rules').count(),0)
+        await self.page.locator('#scheduling-full-plan summary').first.click()
+        self.assertIn(trips[0]['loads'][0]['order_id'],await self.page.locator('#scheduling-full-plan').inner_text())
+        self.assertEqual(self.execution_bodies,[])
+
+    async def test_d2_v21_no_sla_null_dates_custom_window_and_rules(self):
+        r=self.f['runs']['scheduling']['result_json'];r['analysis']['sla_enabled']=False
+        r['scenarios']['selected']['metrics']['on_time_rate']=None
+        r['analysis']['planning_window'].update(start='2026-10-01',end='2026-12-31')
+        r['analysis']['focus_rules']=[{'id':'R1','field':'vehicle_id','values':['VEH-005'],'action':'prioritize','planning_window_start':'2026-10-01','planning_window_end':None,'matched_trip_count':1,'matched_trip_ids':['A-00018']}]
+        r['analysis']['focused_trip_count']=1
+        r['scenarios']['selected']['order_outcomes'][0]['delivery_due_date']=None
+        await self.open('decision-dashboard','logistics_scheduling',self.f['ids']['scheduling'])
+        self.assertIn('Sin SLA',await self.page.locator('[data-scheduling-kpi="0"]').inner_text())
+        self.assertNotIn('100%',await self.page.locator('#dispatch-hero').inner_text())
+        self.assertIn('1 viajes',await self.page.locator('#dispatch-hero').inner_text())
+        await self.page.locator('[data-scheduling-advanced-toggle]').click()
+        self.assertIn('Sin SLA',await self.page.locator('#scheduling-service').inner_text())
+        self.assertIn('VEH-005',await self.page.locator('#scheduling-rules').inner_text())
+        self.assertIn('1 de oct de 2026',await self.page.locator('#scheduling-rules').inner_text())
+        self.assertEqual(await self.page.locator('#scheduling-validation .is-warning').count(),0)
+
+    async def test_d2_v21_ai_cache_generation_freshness_and_chat(self):
+        self.saved_explanation={'id':'cached-D2','response_json':{'executive_summary':'Plan temporal cacheado','key_drivers':['Assignment bloqueada'],'caveats':['Revisar márgenes']}}
+        await self.open('decision-dashboard','logistics_scheduling',self.f['ids']['scheduling'])
+        button=self.page.locator('[data-explain]');self.assertEqual(self.explain_calls,0)
+        await button.click();await self.page.get_by_text('Plan temporal cacheado',exact=True).wait_for()
+        self.assertEqual(self.explain_calls,0)
+        await self.page.locator('[data-ai-collapse]').click()
+        self.assertEqual(await button.get_attribute('aria-expanded'),'false')
+        self.saved_explanation_evidence='previous-evidence'
+        await self.page.reload();await button.wait_for();await self.page.get_by_text('Hay evidencia más reciente',exact=True).wait_for()
+        await button.click();await self.page.get_by_text('Synthetic explanation',exact=True).wait_for()
+        self.assertEqual(self.explain_calls,1)
+        await self.page.locator('[data-ai-ask]').click();await self.page.locator('.dispatch-chat:not([hidden])').wait_for()
+        await self.page.keyboard.press('Escape');self.assertEqual(await self.page.locator('[data-chat]').get_attribute('aria-expanded'),'false')
+        self.assertEqual(self.execution_bodies,[]);self.assertEqual(self.comparative_posts,0)
+
+    async def test_d2_v21_ai_retry_approval_and_approved_state(self):
+        self.explain_fail_once=True;self.approval_fail_once=True
+        self.case['nodes']['logistics_scheduling']['status']='review'
+        self.case['nodes']['logistics_scheduling']['approved_run_id']=None
+        r=self.f['runs']['scheduling'];r['approved_at']=None;r['result_json']['decision_case']['status']='review'
+        await self.open('decision-dashboard','logistics_scheduling',self.f['ids']['scheduling'])
+        await self.page.locator('[data-explain]').click();await self.page.get_by_role('button',name='Reintentar resumen',exact=True).click()
+        await self.page.get_by_text('Synthetic explanation',exact=True).wait_for();self.assertEqual(self.explain_calls,2)
+        approve=self.page.locator('[data-approve-final]');await approve.click();await self.page.locator('[data-approval-error]:not([hidden])').wait_for()
+        self.assertFalse(await approve.is_disabled());await approve.click()
+        await self.page.wait_for_function("document.querySelector('[data-approve-final]').disabled")
+        await self.page.locator('[data-scheduling-hero-status]').filter(has_text='Planificación aprobada').wait_for()
+        self.assertEqual(self.approval_calls,2);self.assertTrue(await self.page.locator('[data-approve-toolbar]').is_disabled())
+        await self.page.reload();await self.page.locator('.scheduling-dashboard-v2').wait_for()
+        self.assertTrue(await self.page.locator('[data-approve-final]').is_disabled());self.assertEqual(self.execution_bodies,[])
+
+    async def test_d2_v21_stale_assignment_preserves_evidence_and_blocks_approval(self):
+        self.case['nodes']['logistics_scheduling']['status']='stale'
+        await self.open('decision-dashboard','logistics_scheduling',self.f['ids']['scheduling'])
+        self.assertIn('Evidencia desactualizada',await self.page.locator('[data-scheduling-hero-status]').inner_text())
+        for selector in ('[data-approve-toolbar]','[data-approve-final]'):
+            button=self.page.locator(selector)
+            self.assertTrue(await button.count()==0 or await button.is_disabled())
+        self.assertTrue(await self.page.locator('#scheduling-kpis').is_visible())
+        await self.page.locator('[data-scheduling-advanced-toggle]').click()
+        self.assertTrue(await self.page.locator('#scheduling-full-plan').is_visible())
+        self.assertEqual(self.approval_calls,0)
+
+    async def test_d2_v21_infeasible_never_recommends_or_approves(self):
+        r=self.f['runs']['scheduling']['result_json'];r['scenarios']['selected']['feasible']=False
+        r['engine']['solver']['status']='infeasible';r['scenarios']['selected']['solver']['status']='infeasible'
+        await self.open('decision-dashboard','logistics_scheduling',self.f['ids']['scheduling'])
+        await self.page.get_by_role('heading',level=1,name='No existe una planificación factible',exact=True).wait_for()
+        self.assertTrue(await self.page.locator('[data-approve-toolbar]').is_disabled());self.assertTrue(await self.page.locator('[data-approve-final]').is_disabled())
+        self.assertFalse(await self.page.locator('[data-scheduling-advanced]').is_visible())
+        self.assertFalse(await self.page.locator('#scheduling-kpis').is_visible())
+        self.assertEqual(await self.page.locator('.dispatch-chart').count(),0)
+        self.assertEqual(self.approval_calls,0);self.assertEqual(self.execution_bodies,[]);self.assertEqual(self.explain_calls,0)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

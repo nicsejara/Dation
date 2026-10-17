@@ -28,19 +28,19 @@ function detailRows(run,caseActions,scheduling){
 
 export function renderDashboardToolbar(run,caseActions={},options={}){
   const scheduling=run.result_json?.schema_version==='scheduling_v1';
-  const hero=options.placement==='hero'&&!scheduling;
+  const hero=options.placement==='hero';
   const status=decisionStatusUi(caseActions.status);
   const title=scheduling?'Planificación de despachos':'Asignación de carga';
   const approveLabel=scheduling?'Aprobar planificación':hero?'Aprobar decisión':'Aprobar asignación';
   const drawerId='dashboard-run-details-'+crypto.randomUUID();
   const rows=detailRows(run,caseActions,scheduling);
-  const toolbar='<header class="dashboard-toolbar'+(hero?' assignment-hero__actions':'')+'" data-dashboard-toolbar'+(hero?' data-toolbar-placement="hero"':'')+'>'
+  const toolbar='<header class="dashboard-toolbar'+(hero?(scheduling?' scheduling-hero__actions':' assignment-hero__actions'):'')+'" data-dashboard-toolbar'+(hero?' data-toolbar-placement="hero"':'')+'>'
     +'<div class="dashboard-toolbar__identity"><span class="dashboard-toolbar__eyebrow">DDA LOGÍSTICA · DECISIÓN '+(scheduling?'02':'01')+'</span>'
       +'<div class="dashboard-toolbar__title"><strong>'+title+'</strong>'
         +'<span class="dashboard-toolbar__badge '+esc(status.className)+'" data-status-badge>'+esc(status.label)+'</span></div>'
       +'<small>Corrida '+esc(shortRunId(run.id))+'</small></div>'
     +'<div class="dashboard-toolbar__tools" aria-label="Herramientas de la decisión">'
-      +(caseActions.onApprove?'<button type="button" data-approve-toolbar class="dashboard-toolbar__approve '+WORKFLOW_ACTION_CLASS+' d-button--primary" '+(caseActions.status==='approved'?(hero?'disabled':'hidden'):'')+'>'+(hero?actionLabel(caseActions.status==='approved'?'Decisión aprobada':approveLabel,'checkCircle'):workflowActionLabel(approveLabel))+'</button>':'')
+      +(caseActions.onApprove?'<button type="button" data-approve-toolbar class="dashboard-toolbar__approve '+WORKFLOW_ACTION_CLASS+' d-button--primary" '+(caseActions.status==='approved'?(hero?'disabled':'hidden'):'')+'>'+(hero?actionLabel(caseActions.status==='approved'?(scheduling?'Planificación aprobada':'Decisión aprobada'):approveLabel,'checkCircle'):workflowActionLabel(approveLabel))+'</button>':'')
       +(hero?'<button type="button" class="d-button d-button--secondary" data-rerun>'+actionLabel('Reconfigurar','refresh')+'</button>':'<button type="button" data-after-approve class="dashboard-toolbar__continue '+WORKFLOW_ACTION_CLASS+' d-button--primary" hidden>'+workflowActionLabel("Continuar con la siguiente decisión")+'</button>')
       +(!hero&&caseActions.onMap?'<button type="button" data-dashboard-map class="dashboard-toolbar__map">'+actionLabel("Decision Map","map")+'</button>':'')
       +'<details class="dashboard-toolbar__menu" data-export-menu><summary aria-expanded="false">'+icon("download")+'<span>Exportar</span>'+icon("chevronDown")+'</summary>'
@@ -158,7 +158,7 @@ export function bindDashboardToolbar(root,run,{onRerun,caseActions={}}={}){
   const approveButton=root.querySelector('[data-approve-toolbar]'),errorBox=root.querySelector('[data-approval-error]');
   const hero=toolbar.dataset.toolbarPlacement==='hero';
   const approveButtons=[...root.querySelectorAll('[data-approve-toolbar],[data-approve-final]')];
-  const infeasible=hero&&(run.result_json?.scenarios?.selected?.feasible===false||run.result_json?.scenarios?.selected?.solver?.status==='infeasible');
+  const infeasible=Boolean(caseActions.approvalBlocked)||hero&&(run.result_json?.scenarios?.selected?.feasible===false||run.result_json?.scenarios?.selected?.solver?.status==='infeasible');
   if(hero)approveButtons.forEach(button=>{button.disabled=caseActions.status==='approved'||infeasible;});
   async function approve(){
     if(pendingApproval||!caseActions.onApprove||!scope.active||infeasible||hero&&caseActions.status==='approved')return;
@@ -171,7 +171,7 @@ export function bindDashboardToolbar(root,run,{onRerun,caseActions={}}={}){
       const badge=root.querySelector('[data-status-badge]');badge.className='dashboard-toolbar__badge is-approved';badge.textContent='Aprobada';
       if(hero){
         caseActions.status='approved';
-        approveButtons.forEach(button=>{button.disabled=true;button.innerHTML=actionLabel('Decisión aprobada','checkCircle');});
+        approveButtons.forEach(button=>{button.disabled=true;button.innerHTML=actionLabel(run.result_json?.schema_version==='scheduling_v1'?'Planificación aprobada':'Decisión aprobada','checkCircle');});
         const status=root.querySelector('[data-assignment-hero-status]');
         if(status){status.className='assignment-hero__status is-consistent';status.innerHTML=actionLabel('Decisión aprobada','checkCircle');}
       }else approveButton.hidden=true;
