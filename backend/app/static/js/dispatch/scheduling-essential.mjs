@@ -17,8 +17,8 @@ export function hero(root,result,caseActions={}){
 }
 export function context(root,result){
   const c=getSchedulingContext(result);
-  root.innerHTML=heading('Contexto heredado')+'<div class="scheduling-context__grid">'
-    +[['route','Viajes asignados',num(c.trips),'Heredados de Assignment'],['weight','Carga total',num(c.load_kg)+' kg','Carga aprobada'],['truck','Vehículos utilizados',num(c.vehicles),'Recursos aprobados'],['clipboardList','Órdenes',num(c.orders),'Órdenes heredadas']]
+  root.innerHTML=heading('Contexto')+'<div class="scheduling-context__grid">'
+    +[['route','Viajes asignados',num(c.trips),'Viajes del plan'],['weight','Carga total',num(c.load_kg)+' kg','Carga del plan'],['truck','Vehículos utilizados',num(c.vehicles),'Recursos del plan'],['clipboardList','Órdenes',num(c.orders),'Órdenes incluidas']]
       .map(([glyph,label,value,copy])=>'<article>'+icon(glyph)+'<div><small>'+label+'</small><strong>'+value+'</strong><span>'+copy+'</span></div></article>').join('')+'</div>'
     +'<p class="scheduling-lock">'+icon('lock')+'<span><strong>Assignment bloqueada.</strong> Los viajes y recursos ya fueron aprobados. Scheduling sólo define fecha y secuencia. Viajes, cargas y vehículos no cambian en esta decisión.'
     +(c.source_run_id?' <span class="scheduling-source">Corrida fuente: '+esc(c.source_run_id)+'</span>':'')+'</span></p>';

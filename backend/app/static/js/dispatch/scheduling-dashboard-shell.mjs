@@ -13,7 +13,7 @@ export function renderSchedulingShell(root,run,caseActions={}){
   root.innerHTML='<div class="scheduling-v2__rail">'+decisionRail(caseActions)+'</div>'
     +'<main class="scheduling-v2__main">'
       +'<section class="dispatch-panel scheduling-v2__panel scheduling-hero" id="dispatch-hero"><div data-scheduling-hero></div>'+toolbar+'</section>'
-      +'<section id="scheduling-context" aria-label="Contexto heredado"></section>'
+      +'<section id="scheduling-context" aria-label="Contexto"></section>'
       +'<section id="scheduling-kpis" aria-label="Indicadores de la planificación"></section>'
       +'<section class="dispatch-panel scheduling-v2__panel" id="scheduling-insights"></section>'
       +'<section class="dispatch-panel scheduling-v2__panel" id="scheduling-timeline"></section>'

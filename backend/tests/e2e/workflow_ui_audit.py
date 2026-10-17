@@ -134,7 +134,11 @@ class WorkflowUIAudit:
         for tool in actual['tools'][1:]:
             assert abs(tool['width'] - reference['width']) < .25 and abs(tool['height'] - reference['height']) < .25, actual
             assert all(tool[key] == reference[key] for key in ('padding', 'radius', 'font', 'gap')), actual
-        assert actual['primary'] and actual['primary']['height'] > reference['height'], actual
+        assert actual['primary'], actual
+        if self.viewport['width'] <= 760:
+            assert abs(actual['primary']['height'] - reference['height']) < .25, actual
+        else:
+            assert actual['primary']['height'] > reference['height'], actual
         if self.viewport['width'] > 760:
             assert actual['primary']['width'] > reference['width'], actual
         self.toolbars.append({'name': name, **actual})

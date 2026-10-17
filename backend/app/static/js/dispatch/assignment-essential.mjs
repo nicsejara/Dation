@@ -8,13 +8,13 @@ const heading=(title,copy='')=>'<div class="assignment-v2__heading"><h2>'+esc(ti
 
 export function context(root,result){
   const ctx=getAssignmentContext(result);
-  const cards=[['clipboardList','Órdenes',num(ctx.orders)],['weight','Carga total',formatWeight(ctx.totalWeightKg)],
-    ['mapPin','Destinos',num(ctx.destinations)],['truck','Vehículos evaluados',num(ctx.evaluatedVehicles)]];
-  root.innerHTML='<h2 class="sr-only">Contexto de la decisión</h2><div class="assignment-context__grid">'+cards.map(([name,label,value])=>
-    '<article>'+icon(name)+'<div><span>'+esc(label)+'</span><strong>'+esc(value)+'</strong></div></article>').join('')+'</div>';
+  const cards=[['clipboardList','Órdenes',num(ctx.orders),'Órdenes incluidas'],['weight','Carga total',formatWeight(ctx.totalWeightKg),'Volumen total asignado'],
+    ['mapPin','Destinos',num(ctx.destinations),'Destinos incluidos'],['truck','Vehículos evaluados',num(ctx.evaluatedVehicles),'Recursos considerados']];
+  root.innerHTML=heading('Contexto')+'<div class="assignment-context__grid">'+cards.map(([name,label,value,copy])=>
+    '<article>'+icon(name)+'<div><small>'+esc(label)+'</small><strong>'+esc(value)+'</strong><span>'+esc(copy)+'</span></div></article>').join('')+'</div>';
 }
 export function kpis(root,result){
-  root.innerHTML='<h2 class="sr-only">KPI principales</h2><div class="assignment-essential__kpi-strip">'+getEssentialKpis(result).map(item=>
+  root.innerHTML=heading('Indicadores de la asignación')+'<div class="assignment-essential__kpi-strip">'+getEssentialKpis(result).map(item=>
     '<article data-executive-kpi="'+esc(item.key)+'" class="assignment-essential__kpi '+(item.objective?'is-objective':'is-descriptive')+'">'
       +'<div class="assignment-essential__kpi-top">'+icon(item.icon)+'<span>'+esc(item.label)+'</span></div>'
       +'<strong>'+esc(formatMetric(item))+'</strong><p>'+esc(item.description)+'</p></article>').join('')+'</div>';

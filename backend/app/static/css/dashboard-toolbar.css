@@ -91,3 +91,45 @@ body.dashboard-drawer-open{overflow:hidden;}
   .d-decision-dashboard :is(.assignment-dashboard-v2__main,.dispatch-focus-main,.assignment-dashboard-v2__rail,.dispatch-decision-rail) :is(button,a,summary,input,select,textarea,[tabindex]) { scroll-margin-block:16px 80px; }
   .d-decision-dashboard :is(.dispatch-table-wrap,.dispatch-schedule-chart-scroll) { max-height:calc(100dvh - 32px); scroll-margin-block:16px; }
 }
+
+/* The current D1/D2 heroes share geometry; legacy dashboards keep their layout. */
+.d-decision-dashboard:is(.assignment-dashboard-v2,.scheduling-dashboard-v2) {
+  --decision-hero-min-height:480px;
+  --decision-hero-padding:var(--space-8);
+  --decision-hero-copy-width:70%;
+}
+.d-decision-dashboard:is(.assignment-dashboard-v2,.scheduling-dashboard-v2) #dispatch-hero {
+  display:flex; flex-direction:column; box-sizing:border-box; min-height:var(--decision-hero-min-height);
+  padding:var(--decision-hero-padding)!important; margin:0;
+}
+.d-decision-dashboard:is(.assignment-dashboard-v2,.scheduling-dashboard-v2) #dispatch-hero>:is([data-assignment-hero-copy],[data-scheduling-hero]) { flex:1 0 auto; }
+.d-decision-dashboard:is(.assignment-dashboard-v2,.scheduling-dashboard-v2) [data-toolbar-placement="hero"] {
+  position:relative; top:auto; z-index:3; box-sizing:border-box; width:100%;
+  margin:var(--space-5) 0 0; padding:var(--space-4) 0 0; border:0;
+  border-top:1px solid var(--color-border); border-radius:0; box-shadow:none; background:transparent; backdrop-filter:none;
+}
+.d-decision-dashboard:is(.assignment-dashboard-v2,.scheduling-dashboard-v2) [data-toolbar-placement="hero"] .dashboard-toolbar__identity { display:none; }
+.d-decision-dashboard:is(.assignment-dashboard-v2,.scheduling-dashboard-v2) [data-toolbar-placement="hero"] .dashboard-toolbar__tools { display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; width:100%; gap:var(--space-2); }
+.d-decision-dashboard:is(.assignment-dashboard-v2,.scheduling-dashboard-v2) [data-toolbar-placement="hero"] .dashboard-toolbar__approve { margin-right:auto; min-width:min(100%,var(--workflow-action-min-width))!important; min-height:var(--workflow-action-height)!important; }
+.d-decision-dashboard:is(.assignment-dashboard-v2,.scheduling-dashboard-v2) [data-toolbar-placement="hero"] [data-rerun] { margin-left:auto; }
+.d-decision-dashboard:is(.assignment-dashboard-v2,.scheduling-dashboard-v2) [data-toolbar-placement="hero"] :is([data-rerun],.dashboard-toolbar__menu>summary) {
+  display:inline-flex; align-items:center; justify-content:center; box-sizing:border-box;
+  min-height:44px; height:auto; min-width:136px; padding:var(--space-2) var(--space-3);
+  border:1px solid var(--color-control-border); border-radius:var(--radius-control);
+  background:var(--color-surface); color:var(--color-text); font:700 12px/1.4 var(--font-sans); gap:var(--space-2);
+}
+.d-decision-dashboard:is(.assignment-dashboard-v2,.scheduling-dashboard-v2) [data-toolbar-placement="hero"] .dashboard-toolbar__menu { flex:0 0 136px; min-width:0; }
+.d-decision-dashboard:is(.assignment-dashboard-v2,.scheduling-dashboard-v2) [data-toolbar-placement="hero"] .dashboard-toolbar__menu>summary { width:100%; }
+.d-decision-dashboard:is(.assignment-dashboard-v2,.scheduling-dashboard-v2) [data-toolbar-placement="hero"] .dashboard-toolbar__icon { width:var(--control-icon-size); height:var(--control-icon-size); flex-basis:var(--control-icon-size); }
+.d-decision-dashboard:is(.assignment-dashboard-v2,.scheduling-dashboard-v2) [data-toolbar-placement="hero"] :is([data-rerun],.dashboard-toolbar__menu>summary):hover { border-color:var(--color-brand-hover); background:var(--color-surface-hover); }
+.d-decision-dashboard:is(.assignment-dashboard-v2,.scheduling-dashboard-v2) [data-toolbar-placement="hero"] :focus-visible { outline:3px solid var(--color-focus); outline-offset:3px; }
+.d-decision-dashboard:is(.assignment-dashboard-v2,.scheduling-dashboard-v2) [data-toolbar-placement="hero"] .dashboard-toolbar__error { width:100%; margin:var(--space-2) 0 0; }
+@media(max-width:1100px) {
+  .d-decision-dashboard:is(.assignment-dashboard-v2,.scheduling-dashboard-v2) { --decision-hero-min-height:520px; --decision-hero-copy-width:85%; }
+}
+@media(max-width:760px) {
+  .d-decision-dashboard:is(.assignment-dashboard-v2,.scheduling-dashboard-v2) { --decision-hero-min-height:0px; --decision-hero-padding:var(--space-5); --decision-hero-copy-width:100%; }
+  .d-decision-dashboard:is(.assignment-dashboard-v2,.scheduling-dashboard-v2) [data-toolbar-placement="hero"] .dashboard-toolbar__tools { display:grid; grid-template-columns:minmax(0,1fr); }
+  .d-decision-dashboard:is(.assignment-dashboard-v2,.scheduling-dashboard-v2) [data-toolbar-placement="hero"] .dashboard-toolbar__tools>* { width:100%; margin-inline:0; min-width:0!important; }
+  .d-decision-dashboard:is(.assignment-dashboard-v2,.scheduling-dashboard-v2) [data-toolbar-placement="hero"] :is([data-rerun],.dashboard-toolbar__menu>summary) { width:100%; min-width:0; min-height:var(--workflow-action-height); }
+}
