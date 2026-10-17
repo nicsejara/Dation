@@ -106,7 +106,8 @@ class AssignmentDashboardPhase1Tests(unittest.TestCase):
 
     def test_hero_and_final_actions_share_the_existing_approval_controller(self):
         self.assertIn("renderDashboardToolbar(run,caseActions,{placement:'hero'})",self.shell)
-        self.assertIn('renderDashboardToolbar(run,caseActions)',self.scheduling)
+        self.assertIn('renderSchedulingShell(root,run,actions)',self.scheduling)
+        self.assertIn("renderDashboardToolbar(run,caseActions,{placement:'hero'})",(JS/'scheduling-dashboard-shell.mjs').read_text())
         self.assertIn('data-export-menu',self.toolbar)
         self.assertIn('data-more-menu',self.toolbar)
         self.assertIn('data-approve-toolbar',self.toolbar)

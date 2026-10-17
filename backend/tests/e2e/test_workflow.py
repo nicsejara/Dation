@@ -305,6 +305,47 @@ class WorkflowTests(unittest.TestCase):
     def test_browser_complete_workflow_at_mobile_width(self):
         self.browser_journey('mobile',{'width':390,'height':844})
 
+    def test_scheduling_dashboard_v21_preserves_assignment_and_temporal_relations(self):
+        from datetime import date
+        from fixtures import scheduling_dashboard_inputs
+        datasets={}
+        for kind,content in scheduling_dashboard_inputs().items():
+            datasets[kind]=self.checked(self.s.api_client.post('/api/datasets/upload',params={'dataset_type':kind},data={'is_sample':'true'},files={'file':('d2-qa-'+kind+'.csv',content,'text/csv')}))['dataset']
+        case=str(uuid4());orders,fleet=datasets['orders'],datasets['fleet']
+        self.checked(self.s.api_client.post('/api/decision-cases',json={'id':case,'orders_dataset_id':orders['id'],'fleet_dataset_id':fleet['id']}))
+        self.s.start_worker();assignment=self.finish(self.admit(self.body(case,orders,fleet)));self.approve(assignment['id'],case)
+        run=self.finish(self.admit(self.body(case,orders,fleet,'logistics_scheduling',assignment['id'])))
+        source={t['trip_id']:t for t in assignment['result_json']['scenarios']['selected']['trips']}
+        plan=run['result_json']['scenarios']['selected'];trips=plan['trips'];by_vehicle={}
+        self.assertEqual(set(source),{t['trip_id'] for t in trips})
+        for trip in trips:
+            for key in ('trip_id','vehicle_id','origin','destination','loads','load_kg','capacity_kg','ownership','utilization'):
+                self.assertEqual(trip[key],source[trip['trip_id']][key],key)
+            dispatch=date.fromisoformat(trip['dispatch_date']);arrival=date.fromisoformat(trip['arrival_date']);free=date.fromisoformat(trip['resource_available_again'])
+            self.assertGreaterEqual(dispatch,date.fromisoformat(trip['ready_date']))
+            self.assertEqual((arrival-dispatch).days,trip['transit_days']);self.assertEqual((free-dispatch).days,trip['cycle_days'])
+            by_vehicle.setdefault(trip['vehicle_id'],[]).append(trip)
+        self.assertGreaterEqual(len(by_vehicle),2);self.assertTrue(any(t['wait_days']>0 for t in trips))
+        for sequence in by_vehicle.values():
+            sequence.sort(key=lambda t:(t['dispatch_date'],t['trip_id']))
+            for previous,next_trip in zip(sequence,sequence[1:]):self.assertGreaterEqual(next_trip['dispatch_date'],previous['resource_available_again'])
+        self.assertTrue(any(a['vehicle_id']!=b['vehicle_id'] and a['dispatch_date']<b['resource_available_again'] and b['dispatch_date']<a['resource_available_again'] for a in trips for b in trips))
+        outcomes=plan['order_outcomes'];metrics=plan['metrics']
+        self.assertEqual(metrics['late_orders'],sum(o['on_time'] is False for o in outcomes))
+        self.assertEqual(metrics['on_time_orders'],sum(o['on_time'] is True for o in outcomes))
+        self.assertEqual(metrics['total_busy_days'],sum(t['cycle_days'] for t in trips))
+        critical=sorted(by_vehicle,key=lambda vehicle:(-sum(t['cycle_days'] for t in by_vehicle[vehicle]),-len(by_vehicle[vehicle]),
+            (date.fromisoformat(max(t['resource_available_again'] for t in by_vehicle[vehicle]))-date.fromisoformat(min(t['dispatch_date'] for t in by_vehicle[vehicle]))).days-sum(t['cycle_days'] for t in by_vehicle[vehicle]),vehicle))[0]
+        path=self.s.directory/'scheduling-dashboard-manifest.json';path.write_text(json.dumps({'case_id':case,'run':run,'critical_resource':critical,'source_sha':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()},indent=2))
+        env={**self.s.env,'DATION_E2E_URL':self.s.api_url,'DATION_E2E_SCHEDULING':str(path)}
+        result=subprocess.run([os.getenv('DATION_BROWSER_PYTHON',str(ROOT/'.browser-venv/bin/python')),str(ROOT/'tests/e2e/scheduling_dashboard_journey.py')],cwd=ROOT,env=env,text=True,capture_output=True,timeout=120)
+        self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+        report=json.loads(result.stdout.strip().splitlines()[-1]);self.assertTrue(report['passed']);self.assertEqual(len(report['states']),6)
+        self.assertEqual(self.checked(self.s.api_client.get('/api/runs/'+assignment['id']))['result_fingerprint'],assignment['result_fingerprint'])
+        if artifacts:=os.getenv('DATION_E2E_ARTIFACTS'):
+            folder=Path(artifacts);folder.mkdir(parents=True,exist_ok=True)
+            for item in self.s.directory.glob('scheduling-dashboard*.json'):shutil.copy2(item,folder/item.name)
+
     def browser_journey(self,scenario,viewport):
         self.s.start_worker()
         browser_python=os.getenv('DATION_BROWSER_PYTHON',str(ROOT/'.browser-venv/bin/python'))
