@@ -16,29 +16,25 @@
 .scheduling-hero { position:relative; isolation:isolate; overflow:visible; border-color:var(--color-border-strong); background:var(--color-surface-subtle); }
 .scheduling-dashboard-v2 #dispatch-hero { background:var(--color-surface-subtle); }
 .scheduling-hero::before { content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; background:linear-gradient(90deg,var(--color-surface-subtle) 35%,color-mix(in srgb,var(--color-surface-subtle) 92%,transparent) 57%,color-mix(in srgb,var(--color-surface-subtle) 20%,transparent)),url('/static/assets/scheduling-hero-road.webp') right center/cover no-repeat; }
-.scheduling-hero [data-scheduling-hero] { max-width:68%; }
-.scheduling-hero .scheduling-hero__headline { color:var(--color-text); font-size:clamp(16px,1.8vw,20px); line-height:1.65; margin-block:var(--space-5) var(--space-3); }
+.scheduling-hero [data-scheduling-hero] { width:var(--decision-hero-copy-width); max-width:780px; min-width:0; }
+.scheduling-hero .scheduling-hero__headline { color:var(--color-text); font-size:clamp(22px,2.2vw,30px); line-height:1.35; margin:var(--space-5) 0 var(--space-3); }
 .scheduling-hero__badges { display:flex; flex-wrap:wrap; gap:var(--space-2); }
-.scheduling-status { display:inline-flex; align-items:center; gap:var(--space-2); padding:var(--space-2) var(--space-3); border:1px solid var(--color-border-strong); border-radius:var(--radius-pill); background:var(--color-surface); color:var(--color-text-secondary); font-size:11px; font-weight:650; }
+.scheduling-status { display:inline-flex; align-items:center; gap:var(--space-2); box-sizing:border-box; min-height:32px; padding:var(--space-1) var(--space-2); border:1px solid var(--color-border-strong); border-radius:var(--radius-pill); background:var(--color-surface); color:var(--color-text-secondary); font-size:12px; font-weight:700; line-height:1.5; }
 .scheduling-status.is-good { color:var(--color-success); border-color:var(--color-success-border); background:var(--color-success-bg); }
 .scheduling-status.is-warning { color:var(--color-warning); border-color:var(--color-warning-border); background:var(--color-warning-bg); }
-.scheduling-hero .dashboard-toolbar { position:relative; top:auto; z-index:3; margin:var(--space-5) 0 0; padding:var(--space-4) 0 0; border:0; border-top:1px solid var(--color-border); border-radius:0; box-shadow:none; backdrop-filter:none; background:transparent; }
-.scheduling-hero .dashboard-toolbar__identity { display:none; }
-.scheduling-hero .dashboard-toolbar__tools { width:100%; justify-content:flex-start; }
-.scheduling-hero .dashboard-toolbar__tools>:first-child { margin-right:auto; }
 .scheduling-context__grid,.scheduling-kpis { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:var(--space-4); }
-.scheduling-context__grid article { display:flex; align-items:flex-start; gap:var(--space-3); padding:var(--space-4); min-width:0; border:1px solid var(--color-border); border-radius:var(--radius-md); background:var(--color-surface-subtle); }
+.scheduling-context__grid article { display:flex; align-items:flex-start; gap:var(--space-3); padding:var(--space-4); min-width:0; min-height:112px; border:1px solid var(--color-border); border-radius:var(--radius-md); background:var(--color-surface-subtle); }
 .scheduling-context__grid article>.scheduling-v2__icon { color:var(--color-brand-hover); margin-top:var(--space-1); }
 .scheduling-context__grid article>div { min-width:0; }
 .scheduling-context__grid :is(small,strong,span) { display:block; }
-.scheduling-context__grid strong { font-size:20px; margin-block:var(--space-1); overflow-wrap:anywhere; }
+.scheduling-context__grid strong { line-height:1.4; font-size:20px; margin-block:var(--space-1); overflow-wrap:anywhere; }
 .scheduling-context__grid :is(small,span) { color:var(--color-text-muted); font-size:11px; line-height:1.5; }
 .scheduling-lock { display:flex; align-items:flex-start; gap:var(--space-2); margin:var(--space-4) 0 0; }
 .scheduling-source { display:block; margin-top:var(--space-1); overflow-wrap:anywhere; font-size:11px; color:var(--color-text-muted); }
-.scheduling-kpis article { position:relative; min-width:0; padding:var(--space-5); border:1px solid var(--color-border-strong); border-radius:var(--radius-md); background:var(--color-surface); }
+.scheduling-kpis article { position:relative; min-width:0; min-height:240px; padding:var(--space-5); border:1px solid var(--color-border-strong); border-radius:var(--radius-md); background:var(--color-surface); }
 .scheduling-kpis article>.scheduling-v2__icon { color:var(--color-brand-hover); margin-bottom:var(--space-3); }
 .scheduling-kpis :is(small,strong) { display:block; }
-.scheduling-kpis small { color:var(--color-text-secondary); font-size:12px; }
+.scheduling-kpis small { color:var(--color-text-secondary); font-size:12px; font-weight:400; line-height:1.5; }
 .scheduling-kpis strong { font-size:clamp(22px,2.7vw,32px); line-height:1.4; margin-top:var(--space-2); overflow-wrap:anywhere; }
 .scheduling-kpis p { margin:var(--space-2) 0 0; font-size:11px; }
 .scheduling-insights { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:var(--space-5); }
@@ -121,7 +117,13 @@
 .scheduling-ai-summary :is(.scheduling-ai-summary__controls button,[data-ai-collapse],[data-response]>button) { display:inline-flex; align-items:center; gap:var(--space-2); min-height:40px; padding:var(--space-2) var(--space-3); border:1px solid var(--color-control-border); border-radius:var(--radius-control); color:var(--color-text); background:var(--color-surface-raised); font:600 12px/1.4 var(--font-sans); cursor:pointer; }
 .scheduling-ai-summary__loading { display:flex; gap:var(--space-3); align-items:flex-start; padding-block:var(--space-4); }
 .scheduling-ai-summary [data-ai-summary-freshness] { padding:var(--space-3); color:var(--color-warning); background:var(--color-warning-bg); border-radius:var(--radius-sm); font-size:13px; line-height:1.6; }
-@media(max-width:1000px) { .scheduling-context__grid,.scheduling-kpis { grid-template-columns:repeat(2,minmax(0,1fr)); } .scheduling-insights,.scheduling-v2__execution { grid-template-columns:minmax(0,1fr); } .scheduling-hero [data-scheduling-hero] { max-width:78%; } }
-@media(max-width:600px) { .scheduling-v2__panel { padding:var(--space-4); } .scheduling-context__grid,.scheduling-kpis { grid-template-columns:minmax(0,1fr); } .scheduling-hero [data-scheduling-hero] { max-width:100%; } .scheduling-hero::before { opacity:.16; } .scheduling-hero .dashboard-toolbar__tools { display:grid; grid-template-columns:minmax(0,1fr); } .scheduling-hero .dashboard-toolbar__tools>:first-child { margin:0; } .scheduling-final-actions>button { width:100%; } .scheduling-advanced__toggle strong { font-size:16px; } .scheduling-ai-summary__heading>button { width:100%; } }
+@media(max-width:1100px) { .scheduling-context__grid,.scheduling-kpis { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:1000px) { .scheduling-insights,.scheduling-v2__execution { grid-template-columns:minmax(0,1fr); } }
+@media(max-width:600px) { .scheduling-v2__panel { padding:var(--space-4); } .scheduling-context__grid,.scheduling-kpis { grid-template-columns:minmax(0,1fr); } .scheduling-hero::before { opacity:.16; } .scheduling-final-actions>button { width:100%; } .scheduling-advanced__toggle strong { font-size:16px; } .scheduling-ai-summary__heading>button { width:100%; } }
 @media(max-height:540px) { .scheduling-dashboard-v2>.dispatch-chat { top:8px!important; bottom:8px!important; max-height:calc(100dvh - 16px)!important; } .scheduling-dashboard-v2 .dispatch-chat-heading { position:static; } }
 @media(prefers-reduced-motion:reduce) { .scheduling-dashboard-v2 * { scroll-behavior:auto!important; } .scheduling-advanced__toggle,.scheduling-advanced__chevron { transition:none; } }
+
+.scheduling-dashboard-v2 #dispatch-hero h1 { margin:var(--space-2) 0 var(--space-3); font-size:clamp(26px,2.7vw,38px); font-weight:700; line-height:1.15; letter-spacing:-.025em; }
+.scheduling-hero [data-scheduling-hero]>p:not(.scheduling-hero__headline) { margin:0; font-size:14px; line-height:1.7; }
+.scheduling-hero [data-scheduling-hero]>p:not(.scheduling-hero__headline)+p:not(.scheduling-hero__headline) { margin-top:var(--space-2); }
+.scheduling-dashboard-v2 :is(#scheduling-context,#scheduling-kpis,#scheduling-insights) .scheduling-v2__heading h2 { margin:0 0 var(--space-2); color:var(--color-text); font-size:20px; font-weight:700; line-height:1.4; letter-spacing:normal; }

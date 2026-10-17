@@ -3243,5 +3243,119 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.approval_calls,0);self.assertEqual(self.execution_bodies,[]);self.assertEqual(self.explain_calls,0)
 
 
+    async def test_d1_d2_upper_geometry_and_visible_headings_are_normalized(self):
+        original_case=copy.deepcopy(self.case);original_runs=copy.deepcopy(self.f['runs'])
+        for width in (1440,1280,1024,768,390):
+            await self.page.set_viewport_size({'width':width,'height':1000})
+            for state in ('review','approved'):
+                reference=None
+                for kind in ('assignment','scheduling'):
+                    self.case.clear();self.case.update(copy.deepcopy(original_case))
+                    for key in self.f['runs']:
+                        self.f['runs'][key].clear();self.f['runs'][key].update(copy.deepcopy(original_runs[key]))
+                    run=self.f['runs'][kind];node=self.case['nodes']['logistics_'+kind]
+                    node.update(status=state,approved_run_id=run['id'] if state=='approved' else None)
+                    run['approved_at']='2026-10-10T12:00:00Z' if state=='approved' else None
+                    run['result_json']['decision_case']['status']=state
+                    metrics=copy.deepcopy(run['result_json']['scenarios']['selected']['metrics'])
+                    await self.open('decision-dashboard','logistics_'+kind,run['id'])
+                    await self.page.locator('#'+kind+'-context').get_by_role('heading',name='Contexto',exact=True).wait_for()
+                    await self.page.get_by_role('heading',name='Indicadores de la '+('asignación' if kind=='assignment' else 'planificación'),exact=True).wait_for()
+                    self.assertEqual(await self.page.locator('.'+('assignment-context__grid' if kind=='assignment' else 'scheduling-context__grid')+' article').count(),4)
+                    self.assertEqual(await self.page.locator('[data-executive-kpi]' if kind=='assignment' else '[data-scheduling-kpi]').count(),4)
+                    if kind=='scheduling':
+                        context=await self.page.locator('#scheduling-context').inner_text()
+                        for redundant in ('Contexto heredado','Heredados de Assignment','Órdenes heredadas'):self.assertNotIn(redundant,context)
+                        self.assertIn('Assignment bloqueada',context)
+                    else:self.assertIn('Objetivo de la corrida',await self.page.locator('#dispatch-hero').inner_text())
+                    geometry=await self.page.evaluate('''()=>{
+                      const hero=document.querySelector('#dispatch-hero'),h=hero.getBoundingClientRect(),toolbar=hero.querySelector('[data-toolbar-placement="hero"]'),t=toolbar.getBoundingClientRect();
+                      const style=(n,keys)=>Object.fromEntries(keys.map(k=>[k,getComputedStyle(n)[k]]));
+                      const type=n=>style(n,['fontSize','fontWeight','lineHeight','letterSpacing','marginTop','marginBottom']);
+                      const card=q=>{const n=document.querySelector(q),r=n.getBoundingClientRect();return {width:r.width,height:r.height,...style(n,['minHeight','padding','border','borderRadius','backgroundColor'])};};
+                      const control=q=>{const n=toolbar.querySelector(q),r=n.getBoundingClientRect(),i=n.querySelector('svg').getBoundingClientRect();return {width:r.width,height:r.height,padding:getComputedStyle(n).padding,border:getComputedStyle(n).border,radius:getComputedStyle(n).borderRadius,font:type(n),gap:getComputedStyle(n).gap,icon:[i.width,i.height]};};
+                      const grid=document.querySelector('.assignment-context__grid,.scheduling-context__grid'),kpi=document.querySelector('.assignment-essential__kpi-strip,.scheduling-kpis');
+                      const status=hero.querySelector('[data-assignment-hero-status],[data-scheduling-hero-status]'),sr=status.getBoundingClientRect();
+                      const primary=toolbar.querySelector('[data-approve-toolbar]'),pr=primary?.getBoundingClientRect(),rerun=toolbar.querySelector('[data-rerun]').getBoundingClientRect(),last=toolbar.querySelector('[data-more-menu]').getBoundingClientRect();
+                      return {heroHeight:h.height,heroMin:getComputedStyle(hero).minHeight,padding:getComputedStyle(hero).padding,toolbarY:t.y-h.y,toolbarHeight:t.height,divider:getComputedStyle(toolbar).borderTopWidth,
+                        title:type(hero.querySelector('h1')),headline:type(hero.querySelector('.assignment-hero__headline,.scheduling-hero__headline')),
+                        status:{height:sr.height,...style(status,['padding','borderRadius','fontSize','fontWeight','lineHeight','gap'])},copy:hero.querySelector('.assignment-hero__content,[data-scheduling-hero]').getBoundingClientRect().width,
+                        controls:['[data-rerun]','[data-export-menu]>summary','[data-more-menu]>summary'].map(control),primaryHeight:pr?.height,
+                        primaryLeft:pr?pr.left-t.left:null,toolsRight:t.right-last.right,grouped:rerun.right<=last.left+1,
+                        context:card('.assignment-context__grid article,.scheduling-context__grid article'),kpi:card('[data-executive-kpi],[data-scheduling-kpi]'),
+                        columns:getComputedStyle(grid).gridTemplateColumns.split(' ').length,kpiColumns:getComputedStyle(kpi).gridTemplateColumns.split(' ').length,
+                        overflow:document.documentElement.scrollWidth>innerWidth};
+                    }''')
+                    self.assertFalse(geometry['overflow'],(width,state,kind,geometry))
+                    expected_columns=4 if width>1100 else 1 if width<=600 else 2
+                    self.assertEqual(geometry['columns'],expected_columns);self.assertEqual(geometry['kpiColumns'],expected_columns)
+                    self.assertEqual(geometry['divider'],'1px')
+                    if width>1100:
+                        self.assertAlmostEqual(geometry['primaryLeft'],0,delta=1);self.assertAlmostEqual(geometry['toolsRight'],0,delta=1);self.assertTrue(geometry['grouped'])
+                    if width<=760:self.assertTrue(all(abs(c['height']-geometry['primaryHeight'])<.25 for c in geometry['controls']))
+                    if reference:
+                        for key in ('heroMin','padding','title','headline','status','controls','context','kpi'):
+                            self.assertEqual(geometry[key],reference[key],(width,state,key,geometry[key],reference[key]))
+                        self.assertAlmostEqual(geometry['copy'],reference['copy'],delta=.25)
+                        if width>=768:
+                            self.assertAlmostEqual(geometry['heroHeight'],reference['heroHeight'],delta=.5)
+                            self.assertAlmostEqual(geometry['toolbarY'],reference['toolbarY'],delta=.5)
+                    reference=geometry
+                    actual=await self.page.evaluate('window.DationDispatch.getWorkspace().run.result_json.scenarios.selected.metrics')
+                    self.assertEqual(actual,metrics)
+        self.assertEqual(self.execution_bodies,[]);self.assertEqual(self.explain_calls,0);self.assertEqual(self.comparative_posts,0);self.assertEqual(self.approval_calls,0)
+
+    async def test_d1_d2_hero_grows_for_objective_and_tools_align_without_approval(self):
+        await self.page.set_viewport_size({'width':1440,'height':1000});await self.dashboard()
+        hero=self.page.locator('#dispatch-hero');original=await hero.bounding_box()
+        details=hero.locator('.assignment-essential__objective');await details.locator('summary').click()
+        self.assertTrue(await details.evaluate('el=>el.open'))
+        await details.evaluate('''el=>{const p=document.createElement('p');p.textContent=('Detalle de las prioridades publicadas de esta corrida. ').repeat(40);el.append(p)}''')
+        expanded=await hero.bounding_box();self.assertGreater(expanded['height'],original['height'])
+        self.assertTrue(await details.evaluate('el=>el.getBoundingClientRect().bottom<=el.closest("#dispatch-hero").getBoundingClientRect().bottom'))
+        self.assertFalse(await self.page.evaluate('document.documentElement.scrollWidth>innerWidth'))
+        for kind in ('assignment','scheduling'):
+            self.case['nodes']['logistics_'+kind]['status']='stale'
+            await self.open('decision-dashboard','logistics_'+kind,self.f['ids'][kind])
+            toolbar=self.page.locator('[data-toolbar-placement=hero]')
+            self.assertEqual(await toolbar.locator('[data-approve-toolbar]').count(),0)
+            aligned=await toolbar.evaluate('''el=>Math.abs(el.getBoundingClientRect().right-el.querySelector('[data-more-menu]').getBoundingClientRect().right)<1''')
+            self.assertTrue(aligned)
+        self.assertEqual(self.approval_calls,0);self.assertEqual(self.execution_bodies,[])
+
+
+    async def test_d1_d2_normalized_hero_keeps_approval_reconfigure_export_and_details(self):
+        original_case=copy.deepcopy(self.case);original_runs=copy.deepcopy(self.f['runs'])
+        for kind in ('assignment','scheduling'):
+            self.case.clear();self.case.update(copy.deepcopy(original_case))
+            for key in self.f['runs']:
+                self.f['runs'][key].clear();self.f['runs'][key].update(copy.deepcopy(original_runs[key]))
+            run=self.f['runs'][kind];node=self.case['nodes']['logistics_'+kind]
+            node.update(status='review',approved_run_id=None);run['approved_at']=None;run['result_json']['decision_case']['status']='review'
+            selected=copy.deepcopy(run['result_json']['scenarios']['selected'])
+            await self.open('decision-dashboard','logistics_'+kind,run['id'])
+            await self.page.locator('[data-export-menu] summary').click()
+            async with self.page.expect_download() as output:await self.page.locator('[data-export-csv]').click()
+            download=await output.value;self.assertIn('planificacion' if kind=='scheduling' else 'assignment',download.suggested_filename)
+            csv=Path(await download.path()).read_text();self.assertIn(selected['trips'][0]['trip_id'],csv)
+            await self.page.locator('[data-export-menu] summary').click()
+            async with self.page.expect_download() as output:await self.page.locator('[data-export-json]').click()
+            self.assertEqual(json.loads(Path(await (await output.value).path()).read_text())['scenarios']['selected'],selected)
+            more=self.page.locator('[data-more-menu] summary');await more.click();await self.page.locator('[data-run-details]').click()
+            drawer=self.page.locator('[data-run-drawer]');await drawer.wait_for(state='visible')
+            self.assertIn(run['id'],await drawer.inner_text());await self.page.keyboard.press('Escape')
+            self.assertFalse(await drawer.is_visible());self.assertTrue(await more.evaluate('el=>el===document.activeElement'))
+            await self.page.locator('[data-rerun]').click()
+            await self.page.locator('[data-scheduling-review]' if kind=='scheduling' else '[data-config-review]').wait_for(state='visible')
+            self.assertEqual(self.execution_bodies,[])
+            await self.open('decision-dashboard','logistics_'+kind,run['id'])
+            approve=self.page.locator('[data-approve-toolbar]');await approve.click()
+            await self.page.wait_for_function("label=>{const b=document.querySelector('[data-approve-toolbar]');return b?.disabled&&b.textContent.includes(label)}",arg='Planificación aprobada' if kind=='scheduling' else 'Decisión aprobada')
+            self.assertIn('Planificación aprobada' if kind=='scheduling' else 'Decisión aprobada',await approve.inner_text())
+            actual=await self.page.evaluate('window.DationDispatch.getWorkspace().run.result_json.scenarios.selected')
+            self.assertEqual(actual,selected)
+        self.assertEqual(self.approval_calls,2);self.assertEqual(self.execution_bodies,[]);self.assertEqual(self.explain_calls,0);self.assertEqual(self.comparative_posts,0)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
