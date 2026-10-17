@@ -5,9 +5,6 @@
 .assignment-dashboard-v2 .assignment-v2__icon { width:20px; height:20px; flex:0 0 20px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
 .assignment-dashboard-v2__main { display:grid; gap:var(--space-6); }
 .assignment-dashboard-v2__main>section,.assignment-dashboard-v2__main>details { margin:0!important; min-width:0; }
-.assignment-view-control { display:flex; flex-wrap:wrap; gap:var(--space-2); width:calc(100% - var(--dashboard-toolbar-bleed)*2); max-width:var(--decision-content-max); margin:0 auto var(--space-5); }
-.assignment-view-control button { display:inline-flex; align-items:center; justify-content:center; gap:var(--space-2); min-height:44px; padding:var(--space-2) var(--space-4); border:1px solid var(--color-control-border); border-radius:var(--radius-pill); color:var(--color-text-secondary); background:var(--color-surface); font:700 13px/1.4 var(--font-sans); cursor:pointer; }
-.assignment-view-control [aria-selected=true] { color:var(--color-text); border-color:var(--color-brand-hover); background:var(--color-brand-soft); }
 .assignment-dashboard-v2 .assignment-dashboard-v2__hero { position:relative; isolation:isolate; padding:var(--space-8)!important; background:var(--color-surface)!important; }
 .assignment-hero__art { position:absolute; z-index:-1; inset:0; overflow:hidden; border-radius:var(--radius-lg); background:var(--color-surface) url('/static/assets/dda-logistics.svg') right var(--space-8) center / 180px auto no-repeat; pointer-events:none; }
 .assignment-hero__art img { width:100%; height:100%; object-fit:cover; object-position:right center; }
@@ -86,12 +83,12 @@
 .assignment-ai-summary__controls button,.assignment-ai-summary [data-ai-collapse],.assignment-ai-summary [data-response]>button { display:inline-flex; align-items:center; gap:var(--space-2); min-height:40px; padding:var(--space-2) var(--space-3); border:1px solid var(--color-control-border); border-radius:var(--radius-control); color:var(--color-text); background:var(--color-surface-raised); font:600 12px/1.4 var(--font-sans); cursor:pointer; }
 .assignment-ai-summary__loading { display:flex; gap:var(--space-3); align-items:flex-start; padding-block:var(--space-4); }
 .assignment-ai-summary [data-ai-summary-freshness] { padding:var(--space-3); color:var(--color-warning); background:var(--color-warning-bg); border-radius:var(--radius-sm); font-size:13px; line-height:1.6; }
-.assignment-advanced__toggle { display:flex; justify-content:space-between; align-items:center; gap:var(--space-4); cursor:pointer; list-style:none; }
-.assignment-advanced__toggle::-webkit-details-marker { display:none; }
-.assignment-advanced__toggle>span { display:grid; grid-template-columns:24px minmax(0,1fr); gap:var(--space-2); }
-.assignment-advanced__toggle strong { font-size:18px; line-height:1.5; }
-.assignment-advanced__toggle small { grid-column:2; font-size:13px; line-height:1.65; color:var(--color-text-secondary); }
-.assignment-advanced.is-open>.assignment-advanced__toggle>.assignment-v2__icon { transform:rotate(180deg); }
+.assignment-dashboard-v2 .assignment-advanced__toggle { display:flex; justify-content:space-between; align-items:center; gap:var(--space-4); width:100%; min-height:44px; box-sizing:border-box; padding:var(--space-3) var(--space-4); border:1px solid var(--color-control-border); border-radius:var(--radius-control); color:var(--color-text); background:var(--color-surface); font-family:var(--font-sans); text-align:left; cursor:pointer; transition:background-color 180ms ease,border-color 180ms ease; }
+.assignment-advanced__copy { display:grid; grid-template-columns:24px minmax(0,1fr); align-items:center; gap:var(--space-2); min-width:0; }
+.assignment-advanced__toggle strong { font-size:18px; line-height:1.5; overflow-wrap:anywhere; }
+.assignment-advanced__chevron { display:inline-flex; flex:0 0 auto; transition:transform 180ms ease; }
+.assignment-advanced.is-open .assignment-advanced__chevron { transform:rotate(180deg); }
+.assignment-dashboard-v2 .assignment-advanced.is-open .assignment-advanced__toggle { border-color:var(--color-brand-hover); background:var(--color-brand-soft); }
 .assignment-advanced__chips { display:flex; flex-wrap:wrap; gap:var(--space-2); margin-top:var(--space-4); }
 .assignment-advanced__chips>span { padding:var(--space-1) var(--space-2); border:1px solid var(--color-border); border-radius:var(--radius-pill); color:var(--color-text-muted); font-size:11px; }
 .assignment-advanced [data-assignment-advanced-content] { display:grid; grid-template-columns:minmax(0,1fr); gap:var(--space-8); margin-top:var(--space-6); }
@@ -127,7 +124,6 @@
   .assignment-insights__grid { grid-template-columns:minmax(0,1fr); }
   .assignment-dashboard-v2 .assignment-comparison__metrics { grid-template-columns:repeat(2,minmax(0,1fr)); }
   .assignment-tradeoffs__grid { grid-template-columns:minmax(0,1fr); }
-  .assignment-view-control button { flex:1 1 180px; }
 }
 @media(max-width:520px) {
   .assignment-context__grid,.assignment-dashboard-v2 .assignment-essential__kpi-strip { grid-template-columns:minmax(0,1fr); }
@@ -141,6 +137,7 @@
 }
 @media(prefers-reduced-motion:reduce) {
   .assignment-dashboard-v2 *, .assignment-dashboard-v2 *::before,.assignment-dashboard-v2 *::after { scroll-behavior:auto!important; }
+  .assignment-dashboard-v2 .assignment-advanced__toggle,.assignment-advanced__chevron { transition:none; }
 }
 
 .assignment-advanced [data-assignment-advanced-content]>section { min-width:0; }
@@ -164,7 +161,6 @@
   .assignment-dashboard-v2 :is(.dispatch-table-wrap,.assignment-resources__list,.assignment-utilization__list) { scroll-margin-block:16px 96px; }
 }
 
-.assignment-advanced__toggle { width:100%; min-height:44px; padding:0; border:0; color:var(--color-text); background:transparent; font-family:var(--font-sans); text-align:left; }
 .assignment-advanced__description { margin:var(--space-2) 0 0; color:var(--color-text-secondary); font-size:13px; line-height:1.65; }
 .assignment-hero__actions .dashboard-toolbar__menu { flex:0 1 136px; min-width:min(100%,136px); }
 .assignment-hero__actions .dashboard-toolbar__menu>summary { width:100%; min-width:0; }
