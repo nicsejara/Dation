@@ -6,3 +6,5 @@
 @media(max-width:620px){.platform-global-page .d-card{padding:18px}.platform-actions{gap:10px}.platform-actions .d-button{width:100%;justify-content:center}.platform-breadcrumb{font-size:10px;gap:5px}.platform-account__status{position:fixed;bottom:8px;left:80px;right:8px;background:#17252c;padding:8px;border-radius:8px}}
 
 .sidebar{overflow-y:auto;overscroll-behavior:contain}
+
+.platform-breadcrumb[hidden]{display:none}

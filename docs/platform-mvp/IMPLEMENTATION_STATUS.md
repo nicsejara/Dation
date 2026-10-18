@@ -1,6 +1,6 @@
 # Estado de implementación · Platform MVP v1
 
-Fecha de referencia: 2026-10-17 (`America/Buenos_Aires`). Fuente de requisitos: `PROMPT_MAESTRO_SUPER_PRO_Dation_Platform_MVP_v1.md` adjunto por el usuario. El roadmap contiene Fases 0–12; este registro pertenece a esa saga, no a las anteriores sagas UX/D1/D2.
+Fecha de referencia: 2026-10-18 (`America/Buenos_Aires`). Fuente de requisitos: `PROMPT_MAESTRO_SUPER_PRO_Dation_Platform_MVP_v1.md` adjunto por el usuario. El roadmap contiene Fases 0–12; este registro pertenece a esa saga, no a las anteriores sagas UX/D1/D2.
 
 ## Estado vigente
 
@@ -8,7 +8,7 @@ Fases 2 y 3 implementadas; publicación bajo verificación en esta entrega. La F
 
 - [Auth, identidad y migración](10-phase2-auth-tenancy.md).
 - [Shell y navegación](11-phase3-shell-navigation.md).
-- Validación local: 357 unittest, 13 funciones Python, 78 Node, 46 SQL históricos y 18 E2E del esquema final sin skips. La suite Chromium completa se confirma en CI antes de publicar.
+- Validación local: 357 unittest, 13 funciones Python, 78 Node, 154 Chromium, 46 SQL históricos y 18 E2E del esquema final sin skips. CI del SHA exacto se exige antes de publicar.
 - Backup/restauración previa: 91 registros y seis archivos, evidencia existente sin cambios; artifacts privados fuera del repo.
 - Configuración reutilizable de entorno: install_script y start_skill actualizados para Auth/Bearer, smoke sin escrituras y QA aislado. No se agregaron secretos nuevos.
 - Límite: la fixture Auth no certifica entrega real de correo. Primer acceso requiere registro y confirmación del administrador autorizado; no se envían correos desde scripts de release.
