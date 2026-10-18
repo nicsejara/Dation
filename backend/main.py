@@ -71,6 +71,8 @@ from app.routes.dispatch import router as dispatch_router
 from app.services import dispatch_service
 
 app.add_middleware(RequestTelemetry)
+from app.platform.http import PrivateResponses
+app.add_middleware(PrivateResponses)
 app.include_router(dispatch_router)
 from app.platform.auth_routes import router as auth_router, ACCESS
 from app.platform.jwt import verify

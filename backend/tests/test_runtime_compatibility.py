@@ -24,7 +24,9 @@ class RuntimeCompatibilityTests(unittest.IsolatedAsyncioTestCase):
     async def test_protected_html_and_multipart_auth(self):
         self.assertEqual((await self.client.get("/app")).status_code,303)
         for path in ["/api/dispatch/status"]:
-            self.assertEqual((await self.client.get(path)).status_code,401)
+            response=await self.client.get(path)
+            self.assertEqual(response.status_code,401)
+            self.assertEqual(response.headers["cache-control"],"no-store")
         response = await self.client.post("/api/datasets/validate?dataset_type=orders",
             files={"file":("orders.csv",b"wrong", "text/csv")})
         self.assertEqual(response.status_code,401)
