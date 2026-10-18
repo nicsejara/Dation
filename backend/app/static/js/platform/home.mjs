@@ -82,7 +82,7 @@ export function mountWorkspaceHome(root,getIdentity){
    render(data);
   }catch(error){
    if(version!==generation||ownController.signal.aborted)return;
-   const panel=section('No se pudo cargar el inicio','home-error-title'),message=el('p',error.message,'d-body');message.role='alert';
+   const panel=section('No se pudo cargar el inicio','home-error-title'),message=el('p','Revisá tu conexión y reintentá en unos instantes.','d-body');message.role='alert';
    const retry=el('button','Reintentar','d-button d-button--secondary');retry.type='button';retry.dataset.homeRetry='';panel.append(message,retry);content.replaceChildren(panel);
   }finally{if(version===generation)content.removeAttribute('aria-busy');}
  }

@@ -185,8 +185,13 @@ class TenancyTests(unittest.TestCase):
         # A new candidate does not revoke the earlier approved version, but it
         # still appears for review when the actual new run finishes.
         newer=self.checked(self.a.post('/api/runs',json=self.body(ca,oa,fa)),202)
+        recent=self.checked(self.a.get('/api/platform/home'))['recent_cases'][0]
+        self.assertEqual((recent['case_id'],recent['run_id'],recent['node_id']),(ca,newer['id'],'logistics_assignment'))
+        self.assertIn(recent['status'],('running','review'))
         wait_for(lambda:completed(newer['id']),'Home replacement candidate',timeout=60)
-        self.assertEqual(self.checked(self.a.get('/api/platform/home'))['attention']['items'][0]['run_id'],newer['id'])
+        home=self.checked(self.a.get('/api/platform/home'))
+        self.assertEqual(home['attention']['items'][0]['run_id'],newer['id'])
+        self.assertEqual((home['recent_cases'][0]['run_id'],home['recent_cases'][0]['status']),(newer['id'],'review'))
         self.checked(self.a.patch('/api/decision-cases/'+ca,json={'status':'archived'}))
         home=self.checked(self.a.get('/api/platform/home'))
         self.assertEqual(home['attention']['total'],0);self.assertNotIn(ca,[row['case_id'] for row in home['recent_cases']])
