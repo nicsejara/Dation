@@ -348,7 +348,8 @@ class WorkflowTests(unittest.TestCase):
             for item in self.s.directory.glob('scheduling-dashboard*.json'):shutil.copy2(item,folder/item.name)
 
     def test_platform_auth_navigation_profile_and_logout(self):
-        outcome=subprocess.run([os.getenv('DATION_BROWSER_PYTHON',str(ROOT/'.browser-venv/bin/python')),str(ROOT/'tests/e2e/platform_journey.py')],cwd=ROOT,env={**self.s.env,'DATION_E2E_URL':self.s.api_url},capture_output=True,text=True,timeout=120)
+        case,orders,fleet=self.case();self.s.start_worker();run=self.finish(self.admit(self.body(case,orders,fleet)))
+        outcome=subprocess.run([os.getenv('DATION_BROWSER_PYTHON',str(ROOT/'.browser-venv/bin/python')),str(ROOT/'tests/e2e/platform_journey.py')],cwd=ROOT,env={**self.s.env,'DATION_E2E_URL':self.s.api_url,'DATION_HOME_CASE':case,'DATION_HOME_RUN':run['id']},capture_output=True,text=True,timeout=120)
         self.assertEqual(outcome.returncode,0,outcome.stdout+outcome.stderr)
 
     def browser_journey(self,scenario,viewport):

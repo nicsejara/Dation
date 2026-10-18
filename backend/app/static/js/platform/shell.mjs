@@ -1,6 +1,7 @@
 import {mountDropdown} from './components.mjs';
 import {createScope} from '../dispatch/lifecycle.mjs';
 import {PLATFORM_PATHS,readResource} from '../dispatch/navigation.mjs';
+import {mountWorkspaceHome} from './home.mjs';
 
 const labels={'platform-home':'Inicio',inicio:'Decision Data Assets','platform-decisions':'Decision Center','platform-data':'Datos','platform-team':'Equipo',settings:'Configuración',profile:'Mi perfil'};
 const roles={admin:'Administrador',operator:'Operador',viewer:'Solo lectura'};
@@ -24,8 +25,7 @@ export function mountPlatformShell(){
   if(!link||event.button!==0||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
   event.preventDefault();menu.close({restoreFocus:false});window.dationNavigate(link.dataset.platformView);
  });
- const home=document.querySelector('[data-platform-home]');
- home.append(node('h1','Tu workspace, '+identity.workspace.name,'d-page-title'),node('p','Accedé a los datos, criterios y evidencia de tus decisiones.','d-page-description'),card('Decision Data Assets','Elegí un sistema de decisión para tu operación.',[['Explorar DDAs','inicio'],['Abrir Logística','logistics-overview']]));
+ const home=mountWorkspaceHome(document.querySelector('[data-platform-home]'),()=>identity);scope.own(()=>home.dispose());
  document.querySelector('[data-platform-decisions]').append(card('Tus decisiones','Consultá las corridas y la evidencia guardada en el historial actual. El centro unificado de decisiones estará disponible próximamente.',[['Abrir historial','traceability'],['Mapa de decisiones de Logística','logistics-map']]));
  document.querySelector('[data-platform-data]').append(card('Datos del workspace','Consultá los archivos existentes o prepará un Data Pack para Logística. La gestión unificada de Data Hub estará disponible próximamente.',[['Ver biblioteca','traceability'],['Preparar Data Pack','logistics-data']]));
  document.querySelector('[data-platform-team]').append(card(identity.workspace.name,'Tu acceso actual: '+roles[identity.membership.access_role]+'. La administración de invitaciones y responsabilidades del equipo estará disponible próximamente.'));

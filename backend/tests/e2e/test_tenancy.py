@@ -26,7 +26,8 @@ class TenancyTests(unittest.TestCase):
         self.assertEqual(response.status_code,status,response.text[:1200]);return response.json()
 
     def upload(self,client,kind):
-        return self.checked(client.post('/api/datasets/upload',params={'dataset_type':kind},files={'file':(kind+'.csv',csv_input(kind),'text/csv')}))['dataset']
+        data=self.checked(client.post('/api/datasets/upload',params={'dataset_type':kind},files={'file':(kind+'.csv',csv_input(kind),'text/csv')}))
+        return data.get('dataset') or data['existing_dataset']
 
     def case(self,client):
         orders,fleet=self.upload(client,'orders'),self.upload(client,'fleet');case=str(uuid4())
@@ -136,3 +137,56 @@ class TenancyTests(unittest.TestCase):
             session=self.checked(client.post('/auth/session',headers={'Origin':self.s.api_url}))
             self.assertEqual(session['membership']['workspace_id'],self.s.workspace_a);self.assertIn('access_token',session);self.assertNotIn('refresh_token',session)
             self.checked(client.post('/auth/logout',headers={'Origin':self.s.api_url}));self.assertEqual(client.get('/app').status_code,303)
+
+    def test_08_home_snapshot_is_bounded_tenant_scoped_and_read_only(self):
+        empty=self.checked(self.a.get('/api/platform/home'))
+        self.assertEqual(empty['recent_cases'],[]);self.assertEqual(empty['attention']['items'],[])
+        self.assertEqual(empty['activity'],{'available':False,'items':[]})
+        cases=[self.case(self.a)[0] for _ in range(5)]
+        other,_,_=self.case(self.b)
+        self.s.sql(f"UPDATE decision_cases SET last_activity_at='2026-01-01'::timestamptz+(array_position(ARRAY{cases!r}::uuid[],id)||' days')::interval WHERE workspace_id='{self.s.workspace_a}';")
+        snapshot=lambda:self.s.sql("SELECT md5(string_agg(row_to_json(c)::text,'' ORDER BY id)) FROM decision_cases c;")
+        before=snapshot();home=self.checked(self.a.get('/api/platform/home',params={'workspace_id':self.s.workspace_b}))
+        self.assertEqual([item['case_id'] for item in home['recent_cases']],list(reversed(cases))[:3])
+        self.assertNotIn(other,json.dumps(home));self.assertEqual(snapshot(),before)
+        self.assertNotIn('state_json',json.dumps(home));self.assertNotIn('orders_dataset_id',json.dumps(home))
+        self.assertEqual(self.checked(self.b.get('/api/platform/home'))['recent_cases'][0]['case_id'],other)
+        for user,expected in ((VIEWER,200),(DISABLED,403)):
+            with httpx.Client(base_url=self.s.api_url,headers={'Authorization':'Bearer '+self.s.user_tokens[user]},trust_env=False) as client:
+                response=client.get('/api/platform/home');self.assertEqual(response.status_code,expected)
+                if user==VIEWER:self.assertEqual(response.json()['attention']['items'],[])
+        self.assertEqual(self.s.http.get(self.s.api_url+'/api/platform/home').status_code,401)
+        for token in (self.s.anon_token,self.s.user_tokens[USER_B]):
+            result=self.s.http.post(self.s.rest_url+'/rpc/platform_home',headers={'Authorization':'Bearer '+token},json={'target_workspace_id':self.s.workspace_a,'actor_user_id':USER_A})
+            self.assertIn(result.status_code,(401,403))
+        denied=self.s.db.post('rpc/platform_home',json={'target_workspace_id':self.s.workspace_a,'actor_user_id':USER_B})
+        self.assertEqual(denied.status_code,403)
+
+    def test_09_home_attention_tracks_real_versions_and_removes_approved_or_archived(self):
+        ca,oa,fa=self.case(self.a);cb,_,_=self.case(self.b)
+        # Pending work can be older than the three recently active cases.
+        for _ in range(4):self.case(self.a)
+        run=self.checked(self.a.post('/api/runs',json=self.body(ca,oa,fa)),202)
+        self.assertEqual(self.checked(self.a.get('/api/platform/home'))['attention']['total'],0)
+        self.s.start_worker()
+        def completed(rid):
+            row=self.checked(self.a.get('/api/runs/'+rid))
+            return row['status']=='completed'
+        wait_for(lambda:completed(run['id']),'Home candidate completion',timeout=60)
+        self.s.sql(f"UPDATE decision_cases SET last_activity_at='2020-01-01' WHERE id='{ca}';")
+        home=self.checked(self.a.get('/api/platform/home'))
+        self.assertEqual(home['attention']['total'],1);self.assertEqual(home['attention']['items'][0]['run_id'],run['id'])
+        self.assertNotIn(ca,[row['case_id'] for row in home['recent_cases']])
+        self.assertEqual(self.checked(self.b.get('/api/platform/home'))['attention']['total'],0)
+        with httpx.Client(base_url=self.s.api_url,headers={'Authorization':'Bearer '+self.s.user_tokens[VIEWER]},trust_env=False) as viewer:
+            self.assertEqual(self.checked(viewer.get('/api/platform/home'))['attention']['total'],0)
+        self.checked(self.a.post('/api/runs/'+run['id']+'/approve',json={'case_id':ca,'node_id':'logistics_assignment'}))
+        self.assertEqual(self.checked(self.a.get('/api/platform/home'))['attention']['total'],0)
+        # A new candidate does not revoke the earlier approved version, but it
+        # still appears for review when the actual new run finishes.
+        newer=self.checked(self.a.post('/api/runs',json=self.body(ca,oa,fa)),202)
+        wait_for(lambda:completed(newer['id']),'Home replacement candidate',timeout=60)
+        self.assertEqual(self.checked(self.a.get('/api/platform/home'))['attention']['items'][0]['run_id'],newer['id'])
+        self.checked(self.a.patch('/api/decision-cases/'+ca,json={'status':'archived'}))
+        home=self.checked(self.a.get('/api/platform/home'))
+        self.assertEqual(home['attention']['total'],0);self.assertNotIn(ca,[row['case_id'] for row in home['recent_cases']])
