@@ -1,5 +1,6 @@
 import {createScope} from "./dispatch/lifecycle.mjs";
 import {mountHomeCatalog} from "./home-dda-catalog.mjs";
+import {mountDropdown} from "./platform/components.mjs";
 import {
   getDatasetProfile,
   getDatasets,
@@ -651,6 +652,11 @@ function mountLibraryView(view){
   if(!['traceability','settings','inicio'].includes(view))return;
   const panel=document.querySelector('[data-view-panel="'+view+'"]');if(!panel)return;
   const scope=libraryScope=createScope(panel);
+  if(view==='settings'){
+    const trigger=panel.querySelector('[data-settings-help]');
+    const help=panel.querySelector('#settings-status-help');
+    if(trigger&&help)mountDropdown({trigger,panel:help});
+  }
   const work=view==='settings'?refreshInterpreter(scope).then(()=>scope.active&&refreshSystemStatus(scope)):Promise.all([refreshDatasets(scope),refreshRuns(scope),refreshSummary(scope)]);
   work.catch(error=>{if(scope.active)toast(error.message,'error');});
 }

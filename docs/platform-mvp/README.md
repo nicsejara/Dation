@@ -1,10 +1,12 @@
-# Dation Platform MVP v1 · Fase 0
+# Dation Platform MVP v1
 
-Auditoría y preparación del roadmap SaaS, **sin implementar fases futuras**. Fecha de referencia del usuario: 2026-10-17, `America/Buenos_Aires`. El catálogo conserva su timestamp UTC de captura. Base real: `22f1187451429c8e98dfcb9874f89b974500cb35` (`main`, PR #72).
+Fase 0 auditada y Fase 1 implementada. Fecha de referencia del usuario: 2026-10-17, `America/Buenos_Aires`. El catálogo conserva su timestamp UTC de captura. Base funcional auditada: `22f1187451429c8e98dfcb9874f89b974500cb35` (`main`, PR #72). Fase 0: commit `2f82015`, PR #73 integrada con CI verde. No se implementan fases futuras.
+
+La [Fase 1](09-phase1-foundation.md) añade foundation visual optativa y un primer consumidor en el panel técnico de Configuración. Contratos y ejemplos: [Design System Platform](DESIGN_SYSTEM.md). El resto de este índice conserva la evidencia histórica de Fase 0.
 
 ## Resultado
 
-Logistics sigue funcional. Se preservan motores, configuración, dashboards, aprobaciones, lineage, IA, exports y datos. La entrega sólo añade documentación, un snapshot de metadata y dos helpers de auditoría/QA; no cambia app, dependencias, workflow, SQL productivo, Storage ni Auth. No se despliega una nueva revisión de Cloud Run.
+Logistics sigue funcional. Se preservan motores, configuración, dashboards, aprobaciones, lineage, IA, exports y datos. La entrega de Fase 0 sólo añadió documentación, un snapshot de metadata y dos helpers de auditoría/QA; no cambió app, dependencias, workflow, SQL productivo, Storage ni Auth y no desplegó una revisión nueva durante aquella ejecución. Fase 1 cambia únicamente presentación e interacción compartida de frontend, con scope y regresión verificados.
 
 El producto actual es un workspace privado con Basic compartido. No está preparado todavía para aislar empresas: falta identidad, membresías y autorización explícita en API/servicios/RPC. El roadmap conserva esa funcionalidad y añade la frontera SaaS durante Fase 2, después de la foundation visual de Fase 1.
 
@@ -34,8 +36,8 @@ Helpers durables:
 - [`scripts/audit_platform_schema.py`](../../scripts/audit_platform_schema.py): captura metadata y agregados de Supabase en transacciones de lectura; no migra ni devuelve filas de negocio.
 - [`scripts/qa/platform_baseline_ai.py`](../../scripts/qa/platform_baseline_ai.py): sandbox propio PostgreSQL/PostgREST/Storage/API/worker con proveedor IA loopback; comprueba persistencia y replay tras reiniciar API.
 
-## Próxima fase
+## Foundation y próxima fase
 
-Fase 1: evolucionar tokens/primitives y contratos visuales existentes, con estados, accesibilidad y responsive. Preservar el catálogo y la normalización D1/D2 recién aprobada. Alcance exacto y gate en [04](04-design-system.md) y [08](08-risk-register-and-phase-gates.md). No incluye Auth, nuevas tablas, sidebar, Home, Data Hub ni Decision Center.
+Fase 1 implementa tokens/primitives y componentes visuales, con estados, accesibilidad y responsive, preservando catálogo y D1/D2. Detalle: [09](09-phase1-foundation.md). No incluye Auth, nuevas tablas, sidebar, Home, Data Hub ni Decision Center.
 
-**La ejecución se detiene al cerrar Fase 0.** Continuar sólo con una nueva instrucción del usuario.
+Siguiente fase: **Fase 2**, Auth + identidad + workspace + tenancy. Se detiene la ejecución al cerrar Fase 1 y se espera una nueva instrucción del usuario.

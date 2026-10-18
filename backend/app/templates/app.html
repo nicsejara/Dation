@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="/static/css/dda-logistics-upload.css?v=dark-data-pack-v1">
   <link rel="stylesheet" href="/static/css/dispatch-lifecycle.css?v=dark-foundation-v1">
   <link rel="stylesheet" href="/static/css/dation-design-system.css?v=dark-data-pack-v1">
+  <link rel="stylesheet" href="/static/css/platform-components.css?v=platform-foundation-v1">
 </head>
 <body>
   <div class="app-shell">
@@ -1023,42 +1024,54 @@
         </section>
 
         <!-- CONFIGURACIÓN -->
-        <section class="view" data-view-panel="settings">
-          <div class="page-heading">
-            <div>
-              <span class="section-kicker">Plataforma</span>
-              <h1>Configuración</h1>
-              <p>Estado de las capacidades técnicas que componen el MVP actual.</p>
+        <section class="view d-platform" data-view-panel="settings">
+          <div class="d-page">
+          <header class="d-page-header">
+            <div class="d-page-header__copy">
+              <span class="d-eyebrow">Plataforma</span>
+              <h1 class="d-page-title">Configuración</h1>
+              <p class="d-page-description">Estado de las capacidades técnicas que componen el MVP actual.</p>
             </div>
-          </div>
+            <div class="d-page-header__actions">
+              <button class="d-button d-button--ghost" type="button" data-settings-help aria-expanded="false" aria-controls="settings-status-help">Acerca de estos estados</button>
+            </div>
+            <section class="d-popover" id="settings-status-help" aria-labelledby="settings-status-help-title" hidden>
+              <div class="d-popover__body">
+                <h2 class="d-card-title" id="settings-status-help-title">Estado de las capacidades</h2>
+                <p class="d-body">La disponibilidad se consulta al abrir esta vista. Esta información describe la configuración técnica actual.</p>
+                <button class="d-button d-button--secondary" type="button">Cerrar</button>
+              </div>
+            </section>
+          </header>
 
           <div class="settings-grid">
-            <article class="panel settings-card">
-              <span class="section-kicker">Motor analítico</span>
-              <h2>DDA Logística</h2>
-              <div class="settings-row"><span>Ejecución</span><strong>Cloud Run</strong></div>
-              <div class="settings-row"><span>Motor</span><strong>logistics-simple-engine</strong></div>
-              <div class="settings-row"><span>Versión</span><strong>0.2.0</strong></div>
-              <div class="settings-row"><span>API</span><strong>0.7.0</strong></div>
+            <article class="d-card">
+              <span class="d-eyebrow">Motor analítico</span>
+              <h2 class="d-card-title">DDA Logística</h2>
+              <div class="settings-row d-metadata"><span>Ejecución</span><strong>Cloud Run</strong></div>
+              <div class="settings-row d-metadata"><span>Motor</span><strong>logistics-simple-engine</strong></div>
+              <div class="settings-row d-metadata"><span>Versión</span><strong>0.2.0</strong></div>
+              <div class="settings-row d-metadata"><span>API</span><strong>0.7.0</strong></div>
             </article>
 
-            <article class="panel settings-card">
-              <span class="section-kicker">Intérprete IA</span>
-              <h2>Explicación de decisiones</h2>
-              <div class="settings-row"><span>Estado</span><strong id="settings-ai-status">Verificando…</strong></div>
-              <div class="settings-row"><span>Proveedor</span><strong id="settings-ai-provider">—</strong></div>
-              <div class="settings-row"><span>Modelo</span><strong id="settings-ai-model">—</strong></div>
-              <div class="settings-row"><span>Knowledge</span><strong id="settings-ai-knowledge">—</strong></div>
+            <article class="d-card">
+              <span class="d-eyebrow">Intérprete IA</span>
+              <h2 class="d-card-title">Explicación de decisiones</h2>
+              <div class="settings-row d-metadata"><span>Estado</span><strong class="d-status d-status--neutral" id="settings-ai-status" role="status" aria-live="polite" aria-atomic="true">Verificando…</strong></div>
+              <div class="settings-row d-metadata"><span>Proveedor</span><strong id="settings-ai-provider">—</strong></div>
+              <div class="settings-row d-metadata"><span>Modelo</span><strong id="settings-ai-model">—</strong></div>
+              <div class="settings-row d-metadata"><span>Knowledge</span><strong id="settings-ai-knowledge">—</strong></div>
             </article>
 
-            <article class="panel settings-card">
-              <span class="section-kicker">Capa de datos</span>
-              <h2>Supabase</h2>
-              <div class="settings-row"><span>Base de datos</span><strong>PostgreSQL</strong></div>
-              <div class="settings-row"><span>Storage</span><strong>Bucket privado</strong></div>
-              <div class="settings-row"><span>Trazabilidad</span><strong>Activa</strong></div>
-              <div class="settings-row"><span>Persistencia de decisiones</span><strong>Activa</strong></div>
+            <article class="d-card">
+              <span class="d-eyebrow">Capa de datos</span>
+              <h2 class="d-card-title">Supabase</h2>
+              <div class="settings-row d-metadata"><span>Base de datos</span><strong>PostgreSQL</strong></div>
+              <div class="settings-row d-metadata"><span>Storage</span><strong>Bucket privado</strong></div>
+              <div class="settings-row d-metadata"><span>Trazabilidad</span><strong>Activa</strong></div>
+              <div class="settings-row d-metadata"><span>Persistencia de decisiones</span><strong>Activa</strong></div>
             </article>
+          </div>
           </div>
         </section>
       </div>
