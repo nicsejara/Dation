@@ -19,6 +19,8 @@ async def main():
   await page.go_back();await page.locator('[data-home-dda-catalog]').wait_for(state='visible');await page.go_forward();await page.locator('[data-workspace-settings]').wait_for(state='visible')
   await context.clear_cookies(name='dation_access')
   await page.reload();await page.locator('[data-workspace-settings]').wait_for(state='visible');assert urlsplit(page.url).path=='/app/settings'
+  await page.evaluate("dispatchEvent(new PageTransitionEvent('pagehide',{persisted:true}));dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true}))")
+  await page.wait_for_function("!document.documentElement.classList.contains('d-session-loading')")
   for width in [1440,1024,768,390]:
    await page.set_viewport_size({'width':width,'height':1000});assert await page.evaluate('document.documentElement.scrollWidth<=innerWidth+1')
    menu=page.get_by_role('button',name='Abrir menú de usuario');await menu.focus();await page.keyboard.press('ArrowDown');assert await page.locator('[data-user-menu-panel]').is_visible();await page.keyboard.press('Escape');assert not await page.locator('[data-user-menu-panel]').is_visible();assert await menu.evaluate('n=>n===document.activeElement')

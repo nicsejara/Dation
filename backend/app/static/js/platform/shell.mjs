@@ -26,9 +26,9 @@ export function mountPlatformShell(){
  });
  const home=document.querySelector('[data-platform-home]');
  home.append(node('h1','Tu workspace, '+identity.workspace.name,'d-page-title'),node('p','Accedé a los datos, criterios y evidencia de tus decisiones.','d-page-description'),card('Decision Data Assets','Elegí un sistema de decisión para tu operación.',[['Explorar DDAs','inicio'],['Abrir Logística','logistics-overview']]));
- document.querySelector('[data-platform-decisions]').append(card('Tus decisiones','Consultá las corridas y la evidencia guardada en el historial actual. El centro unificado de decisiones se incorporará en la fase dedicada a Decision Center.',[['Abrir historial','traceability'],['Mapa de decisiones de Logística','logistics-map']]));
- document.querySelector('[data-platform-data]').append(card('Datos del workspace','Consultá los archivos existentes o prepará un Data Pack para Logística. La gestión unificada de Data Hub se incorporará en su fase dedicada.',[['Ver biblioteca','traceability'],['Preparar Data Pack','logistics-data']]));
- document.querySelector('[data-platform-team]').append(card(identity.workspace.name,'Tu acceso actual: '+roles[identity.membership.access_role]+'. La administración de invitaciones y responsabilidades del equipo se incorporará en la fase de colaboración.'));
+ document.querySelector('[data-platform-decisions]').append(card('Tus decisiones','Consultá las corridas y la evidencia guardada en el historial actual. El centro unificado de decisiones estará disponible próximamente.',[['Abrir historial','traceability'],['Mapa de decisiones de Logística','logistics-map']]));
+ document.querySelector('[data-platform-data]').append(card('Datos del workspace','Consultá los archivos existentes o prepará un Data Pack para Logística. La gestión unificada de Data Hub estará disponible próximamente.',[['Ver biblioteca','traceability'],['Preparar Data Pack','logistics-data']]));
+ document.querySelector('[data-platform-team]').append(card(identity.workspace.name,'Tu acceso actual: '+roles[identity.membership.access_role]+'. La administración de invitaciones y responsabilidades del equipo estará disponible próximamente.'));
  const settings=document.querySelector('[data-workspace-settings]');
  for(const [title,values]of [['Workspace',[['Nombre',identity.workspace.name],['País',identity.workspace.country],['Zona horaria',identity.workspace.timezone]]],['Preferencias',[['Idioma',identity.workspace.language],['Moneda',identity.workspace.currency],['Unidades',[identity.workspace.weight_unit,identity.workspace.distance_unit].filter(Boolean).join(' · ')]]],['Mi acceso',[['Rol',roles[identity.membership.access_role]],['Responsabilidad',identity.membership.business_role||'Sin asignar'],['Workspace','Activo']]]]){
   const item=node('article',undefined,'d-card');item.append(node('h2',title,'d-card-title'));
@@ -70,6 +70,6 @@ export function mountPlatformShell(){
   }
  }
  scope.listen(window,'dation:view',updateNavigation);updateNavigation();
- scope.listen(window,'pagehide',()=>scope.dispose(),{once:true});
+ scope.listen(window,'pagehide',event=>{if(!event.persisted)scope.dispose();});
  return {dispose:()=>scope.dispose()};
 }

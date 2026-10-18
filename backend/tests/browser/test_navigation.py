@@ -1535,6 +1535,19 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             await self.page.locator("[data-export-csv]").click()
         self.assertTrue((await download.value).suggested_filename.endswith('.csv'))
 
+    async def test_bfcache_denied_session_hides_private_content_and_offers_recovery(self):
+        await self.open()
+        async def denied(route):
+            await route.fulfill(status=403,content_type="application/json",body=json.dumps({"detail":"Tu acceso al workspace fue deshabilitado."}))
+        await self.context.route("**/auth/session",denied)
+        await self.page.evaluate("dispatchEvent(new PageTransitionEvent('pagehide',{persisted:true}));dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true}))")
+        await self.page.get_by_role('heading',name='No se pudo abrir el workspace').wait_for()
+        self.assertTrue(await self.page.locator('.app-shell').evaluate('node=>node.hidden'))
+        self.assertFalse(await self.page.evaluate("document.documentElement.classList.contains('d-session-loading')"))
+        self.assertTrue(await self.page.get_by_role('button',name='Reintentar',exact=True).is_visible())
+        self.assertTrue(await self.page.get_by_role('button',name='Cerrar sesión',exact=True).is_visible())
+        self.assertEqual(await self.page.locator('[data-session-error]').count(),1)
+
     async def test_assignment_draft_is_restored_per_case(self):
         await self.open("logistics-config","logistics_assignment")
         await self.page.locator('[data-objective="min_cost"]').click()
