@@ -3,8 +3,13 @@ from fastapi import APIRouter,Depends
 from pydantic import BaseModel,ConfigDict,Field,field_validator
 from app.auth import require_upload_access
 from app.platform.identity import platform_call
+from app.platform.home import home_snapshot
 
 router=APIRouter(prefix='/api/platform')
+
+@router.get('/home')
+async def get_home(ctx=Depends(require_upload_access)):
+    return await home_snapshot(ctx)
 
 class ProfileUpdate(BaseModel):
     model_config=ConfigDict(extra='forbid')

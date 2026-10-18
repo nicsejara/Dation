@@ -78,6 +78,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.other_cases={}
         self.execution_bodies=[]
         self.run_fetch_failures=0
+        self.home_data={'recent_cases':[],'attention':{'items':[],'total':0},'activity':{'available':False,'items':[]}}
+        self.home_failure=False
         self.pw = await async_playwright().start()
         executable = os.getenv("CHROMIUM_EXECUTABLE")
         if not executable and Path("/usr/bin/chromium").exists():
@@ -118,7 +120,9 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         captured_evidence=self.comparative['id'] if self.comparative and self.comparative['status']=='completed' else None
         await asyncio.sleep(self.delay.get(path, .01))
         data, status = {}, 200
-        if path == "/api/dispatch/status":
+        if path == "/api/platform/home":
+            status,data=(503,{'detail':'Home unavailable'}) if self.home_failure else (200,copy.deepcopy(self.home_data))
+        elif path == "/api/dispatch/status":
             data = {"available":True,"checks":[],"engine_version":"1.0.0"}
         elif path == "/api/dispatch/contracts": data = self.f["contracts"]
         elif path == "/api/system/llm-status": data = {"configured":False,"provider":"qa","model":"qa"}
@@ -3386,6 +3390,63 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             actual=await self.page.evaluate('window.DationDispatch.getWorkspace().run.result_json.scenarios.selected')
             self.assertEqual(actual,selected)
         self.assertEqual(self.approval_calls,2);self.assertEqual(self.execution_bodies,[]);self.assertEqual(self.explain_calls,0);self.assertEqual(self.comparative_posts,0)
+
+
+    async def test_workspace_home_empty_state_and_catalog_access(self):
+        await self.page.goto(f'http://127.0.0.1:{self.port}/app')
+        root=self.page.locator('[data-platform-home]')
+        await root.get_by_role('heading',name='Todavía no hay actividad.').wait_for()
+        self.assertEqual(await root.locator('.platform-home__attention').count(),0)
+        self.assertEqual(await root.locator('.platform-home__quick-link').count(),3)
+        self.assertIn('Synthetic',await root.locator('h1').inner_text())
+        await root.get_by_role('link',name='Ver Decision Data Assets',exact=True).click()
+        await self.page.locator('[data-home-dda-catalog]').wait_for(state='visible')
+        self.assertEqual(urlparse(self.page.url).path,'/app/ddas')
+
+    async def test_workspace_home_real_context_links_responsive_and_safe_labels(self):
+        rid=self.f['runs']['assignment']['id'] if 'assignment' in self.f['runs'] else next(iter(self.runs))
+        run=self.runs[rid];node=run.get('node_id','logistics_assignment')
+        self.home_data={'recent_cases':[{'case_id':self.case['id'],'label':'<img src=x onerror=alert(1)>','dda':'DDA Logística','node_label':'Assignment','node_id':node,'status':'review','last_activity_at':'2026-10-18T12:00:00Z','run_id':rid}],
+            'attention':{'items':[{'case_id':self.case['id'],'node_id':node,'node_label':'Assignment','run_id':rid}],'total':1},'activity':{'available':False,'items':[]}}
+        await self.page.goto(f'http://127.0.0.1:{self.port}/app')
+        root=self.page.locator('[data-platform-home]')
+        await root.locator('.platform-home__case').wait_for()
+        self.assertEqual(await root.locator('.platform-home__case-title img').count(),0)
+        self.assertIn('<img',await root.locator('.platform-home__case-title').inner_text())
+        for width in (1440,1024,768,390):
+            await self.page.set_viewport_size({'width':width,'height':1000})
+            await self.page.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))')
+            self.assertTrue(await self.page.evaluate('document.documentElement.scrollWidth<=innerWidth+1'))
+        before=await self.page.evaluate('history.length')
+        await root.get_by_role('link',name='Revisar',exact=True).click()
+        await self.page.locator('.assignment-dashboard-v2').wait_for()
+        q=parse_qs(urlparse(self.page.url).query)
+        self.assertEqual(q['case_id'],[self.case['id']]);self.assertEqual(q['run_id'],[rid])
+        self.assertEqual(await self.page.evaluate('history.length'),before+1)
+        await self.page.go_back();await root.locator('.platform-home__case').wait_for()
+        await root.get_by_role('link',name='Continuar DC-'+self.case['id'][:8],exact=True).click()
+        self.assertEqual(parse_qs(urlparse(self.page.url).query)['case_id'],[self.case['id']])
+
+    async def test_workspace_home_loading_failure_retry_and_reentry_refresh(self):
+        self.home_failure=True;self.delay['/api/platform/home']=.2
+        await self.page.goto(f'http://127.0.0.1:{self.port}/app')
+        root=self.page.locator('[data-platform-home]')
+        await root.get_by_role('heading',name='No se pudo cargar el inicio').wait_for()
+        self.assertEqual(await root.get_by_role('heading',name='Todavía no hay actividad.').count(),0)
+        self.home_failure=False
+        await root.get_by_role('button',name='Reintentar',exact=True).click()
+        await root.get_by_role('heading',name='Todavía no hay actividad.').wait_for()
+        count=lambda:sum(path=='/api/platform/home' for _,path in self.requests)
+        before=count()
+        await self.page.locator('.nav [data-platform-view="settings"]').click()
+        await self.page.locator('.nav [data-platform-view="platform-home"]').click()
+        await root.get_by_role('heading',name='Todavía no hay actividad.').wait_for()
+        self.assertEqual(count(),before+1)
+        await self.page.evaluate("dispatchEvent(new PageTransitionEvent('pagehide',{persisted:true}));dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true}))")
+        await self.page.wait_for_function("!document.documentElement.classList.contains('d-session-loading')")
+        await root.get_by_role('heading',name='Todavía no hay actividad.').wait_for()
+        self.assertEqual(count(),before+2)
+
 
 
 if __name__ == "__main__":

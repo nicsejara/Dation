@@ -1,0 +1,39 @@
+.platform-home{display:grid;gap:28px;min-width:0}
+.platform-home__header{display:grid;gap:10px;padding:8px 0 4px}
+.platform-home__workspace{margin:0;color:var(--color-text-accent);font-size:12px;font-weight:600;letter-spacing:.02em;overflow-wrap:anywhere}
+.platform-home__header .d-page-title{margin:0;font-size:clamp(24px,3vw,34px);line-height:1.2;overflow-wrap:anywhere}
+.platform-home__header .d-page-description{margin:0}
+.platform-home__content{display:grid;gap:24px;min-width:0}
+.platform-home__grid{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(250px,1fr);gap:24px;align-items:start;min-width:0}
+.platform-home__side{display:grid;gap:24px;min-width:0}
+.platform-home__section{min-width:0}
+.platform-home__section .d-section-title{margin:0 0 12px;font-size:17px;line-height:1.4}
+.platform-home__section .d-body{margin:0;line-height:1.65}
+.platform-home__attention{border-left:3px solid var(--color-text-accent)}
+.platform-home__reviews,.platform-home__cases,.platform-home__quick,.platform-home__activity{list-style:none;padding:0;margin:0}
+.platform-home__reviews{margin-top:16px}
+.platform-home__reviews li{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0;border-top:1px solid var(--color-border)}
+.platform-home__reviews li>div{display:grid;gap:4px;min-width:0}
+.platform-home__reviews strong{font-size:13px}
+.platform-home__cases{display:grid}
+.platform-home__case{display:grid;gap:8px;padding:20px 0;min-width:0}
+.platform-home__case+.platform-home__case{border-top:1px solid var(--color-border)}
+.platform-home__case:first-child{padding-top:8px}.platform-home__case:last-child{padding-bottom:0}
+.platform-home__kicker{margin:0;font-size:11px;color:var(--color-text-muted)}
+.platform-home__case-title{margin:0;font-size:15px;font-weight:600;line-height:1.45;overflow-wrap:anywhere}
+.platform-home__case>.d-metadata{margin:0}
+.platform-home__case-meta{display:flex;gap:8px 12px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--color-text-secondary)}
+.platform-home__case-meta time{flex-basis:100%}
+.platform-home__status{border:1px solid var(--color-border);border-radius:999px;padding:3px 9px;font-size:11px;line-height:1.4;color:var(--color-text-secondary)}
+.platform-home__status[data-state=review],.platform-home__status[data-state=running]{color:var(--color-text-accent);border-color:var(--color-text-accent)}
+.platform-home__case .d-button{justify-self:start;margin-top:6px}
+.platform-home__quick li{padding:14px 0;border-bottom:1px solid var(--color-border)}
+.platform-home__quick li:last-child{border-bottom:0;padding-bottom:0}.platform-home__quick li:first-child{padding-top:4px}
+.platform-home__quick-link{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:5px 0;color:var(--color-text);font-size:13px;font-weight:600;text-decoration:none}
+.platform-home__quick-link:hover{color:var(--color-text-accent)}.platform-home__quick-link:focus-visible{outline:2px solid var(--color-text-accent);outline-offset:4px;border-radius:4px}
+.platform-home__arrow{color:var(--color-text-accent);font-size:18px}.platform-home__quick p{margin:4px 0 0;line-height:1.5}
+.platform-home__empty{display:flex;flex-direction:column;align-items:flex-start;gap:16px;min-height:285px;justify-content:center}
+.platform-home__empty .d-section-title{margin:0}.platform-home__empty img{padding:12px;border:1px solid var(--color-border);border-radius:14px;box-sizing:content-box}
+.platform-home__loading{display:grid;gap:20px;min-height:300px}.platform-home__skeleton{height:220px;border:1px solid var(--color-border);border-radius:var(--radius-lg,16px);background:var(--color-surface)}
+@media(max-width:1050px){.platform-home__grid{grid-template-columns:minmax(0,1fr)}.platform-home__side{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.platform-home{gap:22px}.platform-home__content,.platform-home__grid,.platform-home__side{gap:18px}.platform-home__side{grid-template-columns:minmax(0,1fr)}.platform-home__reviews li{align-items:flex-start}.platform-home__reviews .d-button{padding-inline:12px}.platform-home__empty{min-height:260px}.platform-home__case .d-button{justify-self:stretch;justify-content:center}}
