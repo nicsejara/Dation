@@ -80,6 +80,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.run_fetch_failures=0
         self.home_data={'recent_cases':[],'attention':{'items':[],'total':0},'activity':{'available':False,'items':[]}}
         self.home_failure=False
+        self.ddas=[{'workspace_id':'00000000-0000-4000-8000-00000000da71','dda_id':'logistics','status':'enabled'}]
         self.pw = await async_playwright().start()
         executable = os.getenv("CHROMIUM_EXECUTABLE")
         if not executable and Path("/usr/bin/chromium").exists():
@@ -95,7 +96,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                 "access_token":"browser-layout-fixture","expires_at":int(time.time())+3600,
                 "profile":{"id":"10000000-0000-4000-8000-000000000001","first_name":"Synthetic","last_name":"User","email":"fixture@example.test"},
                 "membership":{"workspace_id":"00000000-0000-4000-8000-00000000da71","access_role":"admin"},
-                "workspace":{"id":"00000000-0000-4000-8000-00000000da71","name":"Synthetic workspace"},"ddas":[]}))
+                "workspace":{"id":"00000000-0000-4000-8000-00000000da71","name":"Synthetic workspace"},"ddas":self.ddas}))
         await self.context.route("**/auth/session",session_fixture)
         await self.context.add_init_script("sessionStorage.setItem('_dation_identity','10000000-0000-4000-8000-000000000001:00000000-0000-4000-8000-00000000da71');")
         await self.context.route("**/api/**", self.route_api)
@@ -3448,6 +3449,45 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(count(),before+2)
 
 
+
+    async def test_catalog_entitlements_cover_deep_links_revocation_and_reenable(self):
+        self.ddas=[]
+        await self.page.goto(f'http://127.0.0.1:{self.port}/app/ddas/logistics/dashboard?run_id={self.f["runs"]["assignment"]["id"]}')
+        root=self.page.locator('[data-home-dda-catalog]')
+        await root.locator('[data-dda-id=logistics][data-dda-entitlement=disabled]').wait_for()
+        self.assertEqual(urlparse(self.page.url).path,'/app/ddas')
+        self.assertEqual(await root.locator('[data-dda-id=logistics] button,a').count(),0)
+        self.assertTrue(await self.page.locator('.asset-item').is_disabled())
+        self.assertEqual(self.requests,[])
+        for width in (1440,1024,768,390):
+            await self.page.set_viewport_size({'width':width,'height':1000})
+            self.assertTrue(await self.page.evaluate('document.documentElement.scrollWidth<=innerWidth+1'))
+        await root.locator('[data-dda-filter=supply-chain]').click()
+        self.ddas=[{'workspace_id':'00000000-0000-4000-8000-00000000da71','dda_id':'logistics','status':'enabled'}]
+        await self.page.evaluate('window.dationSession.refresh()')
+        await root.locator('#home-open-logistics').wait_for()
+        self.assertEqual(await root.locator('[data-dda-filter=supply-chain]').get_attribute('aria-pressed'),'true')
+        await root.locator('#home-open-logistics').click();await self.page.locator('.dda-landing__hero').wait_for()
+        self.ddas[0]['status']='disabled'
+        await self.page.evaluate('window.dationSession.refresh()')
+        await root.locator('[data-dda-id=logistics][data-dda-entitlement=disabled]').wait_for()
+        await self.page.go_back();await root.wait_for(state='visible')
+        await self.page.reload();await root.locator('[data-dda-entitlement=disabled]').wait_for()
+        await self.page.locator('.nav [data-platform-view="platform-home"]').click()
+        await self.page.locator('[data-platform-home] .platform-home__quick-link').first.wait_for()
+        self.assertEqual(await self.page.get_by_role('link',name='Abrir DDA Logística',exact=True).count(),0)
+        self.assertEqual(self.errors,[])
+
+    async def test_catalog_fallback_keeps_disabled_entitlement_closed(self):
+        self.ddas=[]
+        await self.context.route('**/home-dda-catalog.mjs',lambda route:route.abort())
+        await self.page.goto(f'http://127.0.0.1:{self.port}/app/ddas')
+        await self.page.wait_for_function("!document.documentElement.classList.contains('d-session-loading')")
+        self.assertTrue(await self.page.locator('#home-open-logistics').is_disabled())
+        self.assertTrue(await self.page.locator('.asset-item').is_disabled())
+        await self.page.evaluate("window.dationNavigate('logistics-data')")
+        self.assertEqual(await self.page.evaluate('window.dationGetCurrentView()'),'inicio')
+        self.assertEqual(self.requests,[])
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -1,5 +1,6 @@
 import {createScope} from '../dispatch/lifecycle.mjs';
 import {readResource, resourceUrl} from '../dispatch/navigation.mjs';
+import {ddaEnabled} from './entitlements.mjs';
 
 const states={available:'Listo para continuar',running:'En ejecución',review:'Para revisar',approved:'Aprobado',error:'Requiere revisión',stale:'Requiere actualizar',locked:'Pendiente',needs_data:'Faltan datos',completed:'Completado'};
 function el(tag,text,className){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(className)n.className=className;return n;}
@@ -56,10 +57,11 @@ export function mountWorkspaceHome(root,getIdentity){
   }else{
    const empty=section('Todavía no hay actividad.','home-empty-title');empty.classList.add('platform-home__empty');
    const image=el('img');image.src='/static/assets/dda-logistics.svg';image.alt='';image.width=48;image.height=48;
-   empty.prepend(image);empty.append(el('p','Empezá explorando DDA Logística. Conectá tus datos y prepará una decisión.','d-body'),link('Ver Decision Data Assets','inicio','d-button d-button--primary'));grid.append(empty);
+   empty.prepend(image);empty.append(el('p',ddaEnabled(identity,'logistics')?'Empezá explorando DDA Logística. Conectá tus datos y prepará una decisión.':'Explorá las capacidades de Dation y su disponibilidad para tu workspace.','d-body'),link('Ver Decision Data Assets','inicio','d-button d-button--primary'));grid.append(empty);
   }
   const side=el('div',undefined,'platform-home__side'),quick=section('Accesos rápidos','home-actions-title'),links=el('ul',undefined,'platform-home__quick');
   for(const [text,view,copy] of [['Abrir DDA Logística','logistics-overview','Datos, criterios y evidencia.'],['Ver Decision Center','platform-decisions','Consultá tus decisiones.'],['Ver datos','platform-data','Archivos de tu workspace.']]){
+   if(view==='logistics-overview'&&!ddaEnabled(identity,'logistics'))continue;
    const row=el('li'),a=link(text,view,'platform-home__quick-link');a.append(el('span','→','platform-home__arrow'));row.append(a,el('p',copy,'d-metadata'));links.append(row);
   }
   quick.append(links);side.append(quick);
@@ -96,6 +98,6 @@ export function mountWorkspaceHome(root,getIdentity){
   else if(route.caseId)window.DationDispatch.openCase(route.caseId,route.view,route.nodeId);
   else window.dationNavigate(route.view);
  });
- scope.listen(window,'dation:view',onView);scope.listen(window,'pagehide',stop);onView();
+ scope.listen(window,'dation:view',onView);scope.listen(window,'dation:identity',onView);scope.listen(window,'pagehide',stop);onView();
  return {dispose(){stop();scope.dispose();}};
 }

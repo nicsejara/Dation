@@ -43,6 +43,9 @@ def _item(row, bundle, key, status, run_id):
 
 
 async def home_snapshot(ctx):
+    if 'logistics' not in ctx.enabled_ddas:
+        return {'recent_cases': [], 'attention': {'items': [], 'total': 0, 'scope': 'workspace_review'},
+                'activity': {'available': False, 'items': []}}
     data = await platform_call('platform_home', {'actor_user_id': ctx.user_id,
                                                'target_workspace_id': ctx.workspace_id})
     return {'recent_cases': [recent_case(bundle) for bundle in data['recent_cases']],

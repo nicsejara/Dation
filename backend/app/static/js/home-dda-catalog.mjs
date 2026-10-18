@@ -1,4 +1,5 @@
 import {esc} from './dispatch/shared.mjs';
+import {ddaEnabled} from './platform/entitlements.mjs';
 
 export const DDA_CATEGORIES=Object.freeze([
   {id:'all',label:'Todos'},
@@ -22,7 +23,7 @@ export const DDA_CATALOG=Object.freeze([
   {id:'demand',title:'DDA Demanda',status:'coming-soon',category:'commercial',
     description:'Forecast y decisiones de planificación de demanda.',
     capabilities:['Pronóstico','Planificación','Escenarios'],icon:'demand'},
-  {id:'procurement',title:'DDA Compras',status:'coming-soon',category:'operations',
+  {id:'procurement',entitlementId:'purchasing',title:'DDA Compras',status:'coming-soon',category:'operations',
     description:'Abastecimiento, evaluación y decisión de compra.',
     capabilities:['Abastecimiento','Evaluación','Decisión'],icon:'procurement'},
   {id:'maintenance',title:'DDA Mantenimiento',status:'coming-soon',category:'assets',
@@ -60,20 +61,26 @@ function assetIcon(item){
   return '<svg viewBox="0 0 24 24" aria-hidden="true">'+ICONS[item.icon]+'</svg>';
 }
 
-function assetCard(item){
+export function catalogAccess(item,identity){
+  if(item.status!=='available')return 'coming_soon';
+  return ddaEnabled(identity,item.entitlementId||item.id)?'enabled':'disabled';
+}
+
+function assetCard(item,identity){
   const available=item.status==='available';
+  const access=catalogAccess(item,identity),enabled=access==='enabled';
   const category=DDA_CATEGORIES.find(category=>category.id===item.category);
-  return '<article class="d-home__asset d-home__asset--'+(available?'available':'coming-soon')+'"'
-    +' data-dda-id="'+esc(item.id)+'" data-dda-status="'+esc(item.status)+'"'+(available?'':' aria-disabled="true"')+'>'
+  return '<article class="d-home__asset d-home__asset--'+(enabled?'available':'coming-soon')+'"'
+    +' data-dda-id="'+esc(item.id)+'" data-dda-status="'+esc(item.status)+'" data-dda-entitlement="'+access+'"'+(enabled?'':' aria-disabled="true"')+'>'
     +'<div class="d-home__asset-top"><span class="d-home__asset-icon" aria-hidden="true">'+assetIcon(item)+'</span>'
-      +'<span class="d-home__badge'+(available?'':' d-home__badge--muted')+'">'+(available?'Disponible':'Próximamente')+'</span></div>'
+      +'<span class="d-home__badge'+(enabled?'':' d-home__badge--muted')+'">'+(enabled?'Disponible':available?'No habilitado':'Próximamente')+'</span></div>'
     +'<div class="d-home__asset-copy"><span class="d-home__asset-category">'+esc(category.label)+'</span>'
       +'<h3>'+esc(item.title)+'</h3><p>'+esc(item.description)+'</p></div>'
     +'<p class="d-home__asset-capabilities">'+item.capabilities.map(esc).join(' · ')+'</p>'
-    +'<footer class="d-home__asset-footer">'+(available
+    +'<footer class="d-home__asset-footer">'+(enabled
       ?'<button type="button" id="'+(item.id==='logistics'?'home-open-logistics':'home-open-dda-'+esc(item.id))+'" class="d-home__asset-action"'
         +' data-view-target="'+esc(item.targetView)+'" aria-label="Abrir '+esc(item.title)+'">Abrir '+esc(item.title)+arrow+'</button>'
-      :'<span class="d-home__asset-state">En desarrollo</span>')+'</footer></article>';
+      :'<span class="d-home__asset-state">'+(available?'No habilitado en este workspace':'En desarrollo')+'</span>')+'</footer></article>';
 }
 
 const mounted=new WeakSet();
@@ -85,16 +92,21 @@ export function mountHomeCatalog(root){
   const counts=root.querySelector('[data-dda-counts]'),feedback=root.querySelector('[data-dda-filter-status]');
   if(!grid||!filters||!counts||!feedback)return;
   // Build first so an unavailable enhancement leaves the fallback usable.
-  const template=document.createElement('template');
-  template.innerHTML=DDA_CATALOG.map(assetCard).join('');
   const filterTemplate=document.createElement('template');
   filterTemplate.innerHTML=DDA_CATEGORIES.map(({id,label})=>
     '<button type="button" class="d-home__filter" data-dda-filter="'+esc(id)+'" aria-pressed="'+(id==='all')+'">'
       +'<span class="d-home__filter-check" aria-hidden="true">✓</span>'+esc(label)+'</button>').join('');
-  grid.replaceChildren(template.content);filters.replaceChildren(filterTemplate.content);
-  const {available,comingSoon}=catalogCounts();
-  counts.textContent=available+' '+(available===1?'disponible':'disponibles')+' · '+comingSoon+' '+(comingSoon===1?'próximo':'próximos');
+  filters.replaceChildren(filterTemplate.content);
+  let selected='all';
+  function render(){
+    const identity=window.dationSession?.identity,template=document.createElement('template');
+    template.innerHTML=DDA_CATALOG.map(item=>assetCard(item,identity)).join('');grid.replaceChildren(template.content);
+    const {available,comingSoon}=catalogCounts(),enabled=DDA_CATALOG.filter(item=>catalogAccess(item,identity)==='enabled').length;
+    counts.textContent=enabled+' '+(enabled===1?'disponible':'disponibles')+' · '+comingSoon+' '+(comingSoon===1?'próximo':'próximos')+(available>enabled?' · '+(available-enabled)+' no habilitado':'');
+    select(selected);
+  }
   function select(category){
+    selected=category;
     const visible=new Set(filterCatalog(category).map(item=>item.id));
     for(const card of grid.children)card.hidden=!visible.has(card.dataset.ddaId);
     for(const button of filters.querySelectorAll('[data-dda-filter]')){
@@ -106,5 +118,6 @@ export function mountHomeCatalog(root){
     const button=event.target.closest('[data-dda-filter]');
     if(button&&filters.contains(button))select(button.dataset.ddaFilter);
   });
-  filters.hidden=false;feedback.hidden=false;select('all');mounted.add(root);
+  window.addEventListener('dation:identity',render);
+  filters.hidden=false;feedback.hidden=false;render();mounted.add(root);
 }

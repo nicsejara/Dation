@@ -1,6 +1,7 @@
 import {createScope} from "./dispatch/lifecycle.mjs";
 import {mountHomeCatalog} from "./home-dda-catalog.mjs";
 import {mountDropdown} from "./platform/components.mjs";
+import {currentLogisticsEnabled} from "./platform/entitlements.mjs";
 import {
   getDatasetProfile,
   getDatasets,
@@ -650,6 +651,7 @@ bootstrap();
 function mountLibraryView(view){
   libraryScope?.dispose();libraryScope=null;
   if(!['traceability','settings','inicio'].includes(view))return;
+  if(view==='inicio'||(view==='traceability'&&!currentLogisticsEnabled()))return;
   const panel=document.querySelector('[data-view-panel="'+view+'"]');if(!panel)return;
   const scope=libraryScope=createScope(panel);
   if(view==='settings'){

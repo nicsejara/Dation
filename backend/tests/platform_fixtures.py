@@ -5,7 +5,7 @@ from app.platform.context import RequestContext, bind
 
 WORKSPACE='00000000-0000-4000-8000-00000000da71'
 USER='10000000-0000-4000-8000-000000000001'
-CONTEXT=RequestContext(USER,WORKSPACE,'admin')
+CONTEXT=RequestContext(USER,WORKSPACE,'admin',enabled_ddas=frozenset({'logistics'}))
 
 class TenantTestCase(unittest.IsolatedAsyncioTestCase):
     def setUp(self):

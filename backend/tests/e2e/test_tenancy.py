@@ -1,6 +1,9 @@
 """Release gate: actual API + PostgreSQL/RLS + RPC + private Storage + worker."""
 import copy
 import json
+import os
+from pathlib import Path
+import subprocess
 from uuid import uuid4
 import unittest
 import httpx
@@ -18,6 +21,7 @@ class TenancyTests(unittest.TestCase):
     def setUp(self):
         self.s.stop(self.s.worker)
         self.s.sql('TRUNCATE datasets,decision_runs,decision_cases,decision_approval_events CASCADE;')
+        self.s.sql("UPDATE workspace_ddas SET status='enabled' WHERE dda_id='logistics';")
         self.a=self.s.api_client
         self.b=httpx.Client(base_url=self.s.api_url,headers={'Authorization':'Bearer '+self.s.user_tokens[USER_B]},trust_env=False,timeout=30)
         self.addCleanup(self.b.close)
@@ -195,3 +199,43 @@ class TenancyTests(unittest.TestCase):
         self.checked(self.a.patch('/api/decision-cases/'+ca,json={'status':'archived'}))
         home=self.checked(self.a.get('/api/platform/home'))
         self.assertEqual(home['attention']['total'],0);self.assertNotIn(ca,[row['case_id'] for row in home['recent_cases']])
+
+    def test_10_entitlements_are_rechecked_per_request_without_affecting_other_workspaces_or_accepted_jobs(self):
+        ca,oa,fa=self.case(self.a);self.case(self.b)
+        run=self.checked(self.a.post('/api/runs',json=self.body(ca,oa,fa)),202)
+        before=self.s.sql('SELECT count(*) FROM datasets;')
+        try:
+            for credential in (self.s.anon_token,self.s.user_tokens[USER_A]):
+                response=self.s.http.patch(self.s.rest_url+'/workspace_ddas',
+                    headers={'Authorization':'Bearer '+credential},
+                    params={'workspace_id':'eq.'+self.s.workspace_a},json={'status':'enabled'})
+                self.assertIn(response.status_code,(401,403))
+            for status in ('disabled','coming_soon'):
+                self.s.sql(f"UPDATE workspace_ddas SET status='{status}' WHERE workspace_id='{self.s.workspace_a}' AND dda_id='logistics';")
+                for method,path in [('GET','/api/decision-cases'),('GET','/api/datasets'),('GET','/api/runs/'+run['id']),('POST','/api/runs'),('POST','/api/datasets/upload'),('GET','/api/dispatch/contracts')]:
+                    response=self.a.request(method,path,json=self.body(ca,oa,fa) if method=='POST' else None)
+                    self.assertEqual(response.status_code,403,(status,path,response.text))
+                    self.assertEqual(response.headers['X-Dation-Entitlement'],'disabled')
+                home=self.checked(self.a.get('/api/platform/home'))
+                self.assertEqual(home['recent_cases'],[]);self.assertEqual(home['attention']['total'],0)
+                self.assertEqual(self.b.get('/api/decision-cases').status_code,200)
+            # A previously accepted durable job retains its tenant and completes.
+            self.s.start_worker()
+            def completed():
+                row=self.checked(self.s.db.get('decision_runs',params={'id':'eq.'+run['id']}))[0]
+                if row['status'] not in ('completed','error'):return False
+                self.assertEqual(row['status'],'completed',row.get('error_message'));return True
+            wait_for(completed,'accepted job after grant revocation',timeout=60)
+            self.assertEqual(self.s.sql('SELECT count(*) FROM datasets;'),before)
+            self.s.sql(f"DELETE FROM workspace_ddas WHERE workspace_id='{self.s.workspace_a}' AND dda_id='logistics';")
+            self.assertEqual(self.a.get('/api/decision-cases').status_code,403)
+        finally:
+            self.s.sql(f"INSERT INTO workspace_ddas(workspace_id,dda_id,status) VALUES('{self.s.workspace_a}','logistics','enabled') ON CONFLICT(workspace_id,dda_id) DO UPDATE SET status='enabled';")
+        self.assertEqual(self.a.get('/api/decision-cases').status_code,200)
+        self.assertEqual(self.checked(self.a.get('/api/platform/home'))['recent_cases'][0]['case_id'],ca)
+
+    def test_11_real_browser_catalog_revocation_and_reenable(self):
+        root=Path(__file__).resolve().parents[2]
+        result=subprocess.run([os.getenv('DATION_BROWSER_PYTHON',str(root/'.browser-venv/bin/python')),str(root/'tests/e2e/entitlements_journey.py')],cwd=root,
+            env={**self.s.env,'DATION_E2E_URL':self.s.api_url,'DATION_E2E_WORKSPACE':self.s.workspace_a,'DATION_E2E_REST':self.s.rest_url},capture_output=True,text=True,timeout=120)
+        self.assertEqual(result.returncode,0,result.stdout+result.stderr)
