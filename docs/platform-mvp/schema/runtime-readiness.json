@@ -1,0 +1,46 @@
+{
+  "read_only": true,
+  "requests": [
+    {
+      "target": "api",
+      "path": "/health",
+      "authenticated": false,
+      "status": 200
+    },
+    {
+      "target": "api",
+      "path": "/ready",
+      "authenticated": false,
+      "status": 401
+    },
+    {
+      "target": "api",
+      "path": "/app",
+      "authenticated": false,
+      "status": 401
+    },
+    {
+      "target": "api",
+      "path": "/openapi.json",
+      "authenticated": false,
+      "status": 200
+    },
+    {
+      "target": "worker",
+      "path": "/health",
+      "authenticated": false,
+      "transport_error": "ProxyError"
+    },
+    {
+      "target": "api",
+      "path": "/app",
+      "authenticated": true,
+      "status": 200
+    }
+  ],
+  "gcp_management_get": {
+    "status": 401,
+    "fresh_config_verified": false
+  },
+  "no_production_writes": true
+}

@@ -1,0 +1,141 @@
+{
+  "baseline_ci": {
+    "conclusion": "success",
+    "id": 39050288728,
+    "jobs": [
+      {
+        "conclusion": "success",
+        "name": "tests",
+        "steps": [
+          {
+            "conclusion": "success",
+            "name": "Set up job"
+          },
+          {
+            "conclusion": "success",
+            "name": "Checkout"
+          },
+          {
+            "conclusion": "success",
+            "name": "Set up Python"
+          },
+          {
+            "conclusion": "success",
+            "name": "Set up Node"
+          },
+          {
+            "conclusion": "success",
+            "name": "Install backend dependencies"
+          },
+          {
+            "conclusion": "success",
+            "name": "Compile backend"
+          },
+          {
+            "conclusion": "success",
+            "name": "Check frontend JavaScript syntax"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run automated tests"
+          },
+          {
+            "conclusion": "success",
+            "name": "Run browser regression tests with synthetic API data"
+          },
+          {
+            "conclusion": "success",
+            "name": "Verify schema, history, approvals and durable jobs on PostgreSQL 17"
+          },
+          {
+            "conclusion": "success",
+            "name": "Exercise real API, worker, database and browser workflow"
+          },
+          {
+            "conclusion": "success",
+            "name": "Save synthetic E2E traces and diagnostics"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Set up Node"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Set up Python"
+          },
+          {
+            "conclusion": "success",
+            "name": "Post Checkout"
+          },
+          {
+            "conclusion": "success",
+            "name": "Complete job"
+          }
+        ]
+      }
+    ],
+    "sha": "22f1187451429c8e98dfcb9874f89b974500cb35",
+    "status": "completed",
+    "url": "https://github.com/nicsejara/Dation/actions/runs/39050288728"
+  },
+  "catalog_comparison": {
+    "compared": [
+      "table names and qualified names",
+      "column order, types, defaults and nullability",
+      "constraints and definitions",
+      "indexes",
+      "triggers",
+      "RLS and FORCE RLS flags",
+      "table and function role grants",
+      "function signatures and definitions",
+      "public policies"
+    ],
+    "excluded": "Managed auth/storage schemas, aggregate row counts, version number, and extra metadata not returned by the existing public-catalog query.",
+    "functions": 33,
+    "live_postgres_version": 170006,
+    "live_snapshot": "docs/platform-mvp/schema/live-catalog.json",
+    "local_postgres_version": 170011,
+    "local_query_read_only": true,
+    "normalization": "Whitespace outside SQL quoted strings; deterministic collection and ACL ordering; column order preserved.",
+    "normalized_diff_empty": true,
+    "passed": true,
+    "policies": 0,
+    "production_query_reused_existing_snapshot": true,
+    "rebuild_source": "supabase/baseline/20261010100000_public_schema.sql plus subsequent supabase/migrations/*.sql",
+    "sections": [
+      "tables",
+      "functions",
+      "policies"
+    ],
+    "tables": 12
+  },
+  "e2e_tests": 10,
+  "external_golden_pallets_v2_tested": false,
+  "focused_browser_ia_tests": 6,
+  "ia_restore_probe": {
+    "api_restart_restore": true,
+    "approved_decisions": 2,
+    "business_state_unchanged": true,
+    "datasets_uploaded": 2,
+    "idempotent_chat_replay_without_inference": true,
+    "passed": true,
+    "provider": "deterministic HTTP loopback; no real inference",
+    "provider_calls": 4,
+    "saved_chat_turns": 2,
+    "saved_explanations": 2,
+    "scope": "owned loopback PostgreSQL/PostgREST/Storage/API/worker only; no production writes",
+    "source_sha": "22f1187451429c8e98dfcb9874f89b974500cb35",
+    "unconfigured_llm_returns_503": true
+  },
+  "javascript_syntax_files": 67,
+  "node_tests": 77,
+  "passed": true,
+  "pip_check": true,
+  "postgres_tests": 46,
+  "production_business_writes": false,
+  "python_compile": true,
+  "python_function_tests": 13,
+  "python_unittest": 350,
+  "real_llm_provider_inference": false,
+  "source_sha": "22f1187451429c8e98dfcb9874f89b974500cb35"
+}

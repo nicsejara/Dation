@@ -1,0 +1,27 @@
+{
+  "passed": true,
+  "live_snapshot": "docs/platform-mvp/schema/live-catalog.json",
+  "rebuild_source": "supabase/baseline/20261010100000_public_schema.sql plus subsequent supabase/migrations/*.sql",
+  "sections": ["tables", "functions", "policies"],
+  "tables": 12,
+  "functions": 33,
+  "policies": 0,
+  "live_postgres_version": 170006,
+  "local_postgres_version": 170011,
+  "normalization": "Whitespace outside SQL quoted strings; deterministic collection and ACL ordering; column order preserved.",
+  "compared": [
+    "table names and qualified names",
+    "column order, types, defaults and nullability",
+    "constraints and definitions",
+    "indexes",
+    "triggers",
+    "RLS and FORCE RLS flags",
+    "table and function role grants",
+    "function signatures and definitions",
+    "public policies"
+  ],
+  "excluded": "Managed auth/storage schemas, aggregate row counts, version number, and extra metadata not returned by the existing public-catalog query.",
+  "normalized_diff_empty": true,
+  "local_query_read_only": true,
+  "production_query_reused_existing_snapshot": true
+}

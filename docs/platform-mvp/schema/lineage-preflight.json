@@ -1,0 +1,16 @@
+{
+  "business_rows_included": false,
+  "checks": {
+    "case_missing_dataset": 0,
+    "case_state_invalid_run_refs": 0,
+    "dataset_storage_missing": 0,
+    "pending_jobs": 0,
+    "pending_reconciliations": 0,
+    "public_workspace_columns": 0,
+    "run_pack_differs_from_case": 0,
+    "runs_without_case": 0,
+    "storage_unreferenced": 0,
+    "upstream_cross_case": 0
+  },
+  "read_only": true
+}
