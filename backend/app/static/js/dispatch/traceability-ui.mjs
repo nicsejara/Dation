@@ -154,7 +154,7 @@ function runCard(run){
       +'<strong>'+esc(config.title)+'</strong>'
       +(config.meta.length?'<p>'+config.meta.map(esc).join(' · ')+'</p>':'')
       +'<small>'+esc(dateTime(run.finished_at||run.created_at))+'</small>'
-      +(run.approved_at?'<small>'+esc(run.approved_by==='shared_workspace:dation'?'Aprobación · acceso compartido':'Aprobación histórica · autor no registrado')+'</small>':'')
+      +(run.approved_at?'<small>'+esc(run.approved_by==='shared_workspace:dation'?'Aprobación · acceso compartido':String(run.approved_by||'').startsWith('user:')?'Aprobación · usuario identificado':'Aprobación histórica · autor no registrado')+'</small>':'')
     +'</div>'
     +'<div class="dispatch-run-history__flags">'
       +(run.is_latest?'<span>Última corrida</span>':'')

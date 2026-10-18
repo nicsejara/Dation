@@ -1,4 +1,5 @@
-import base64
+from unittest.mock import AsyncMock
+from platform_fixtures import CONTEXT
 from pathlib import Path
 import unittest
 from unittest.mock import patch
@@ -12,15 +13,17 @@ from app import auth
 class RuntimeCompatibilityTests(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
         self.client = httpx.AsyncClient(transport=httpx.ASGITransport(app=app),base_url="http://qa")
-        self.password = patch.object(auth,"DATION_ACCESS_PASSWORD","runtime-qa").start()
-        self.headers = {"Authorization":"Basic "+base64.b64encode(b"dation:runtime-qa").decode()}
+        patch.object(auth,"verify",AsyncMock(return_value={"sub":CONTEXT.user_id})).start()
+        patch.object(auth,"resolve",AsyncMock(return_value=CONTEXT)).start()
+        self.headers = {"Authorization":"Bearer fixture-signed-token"}
 
     async def asyncTearDown(self):
         patch.stopall()
         await self.client.aclose()
 
     async def test_protected_html_and_multipart_auth(self):
-        for path in ["/app","/api/dispatch/status"]:
+        self.assertEqual((await self.client.get("/app")).status_code,303)
+        for path in ["/api/dispatch/status"]:
             self.assertEqual((await self.client.get(path)).status_code,401)
         response = await self.client.post("/api/datasets/validate?dataset_type=orders",
             files={"file":("orders.csv",b"wrong", "text/csv")})

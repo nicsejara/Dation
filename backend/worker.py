@@ -10,6 +10,7 @@ from app.observability import configure_logging, event, metrics
 from app.services.dispatch_job_service import worker_loop
 from app.services import dispatch_service
 from app.services.http_service import http_pool
+from app.platform.context import worker_infrastructure
 
 ready = False
 
@@ -30,7 +31,8 @@ async def health_handler(reader, writer):
 
 async def main():
     async with http_pool():
-        await run_worker()
+        with worker_infrastructure():
+            await run_worker()
 
 
 async def run_worker():

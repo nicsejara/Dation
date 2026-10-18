@@ -67,3 +67,28 @@ async def storage(path: str, request: Request):
         return {'Key':relative}
     target.unlink(missing_ok=True)
     return {'deleted':True}
+
+
+@app.get('/auth/v1/.well-known/jwks.json')
+async def jwks():
+    import json
+    return json.loads((Path(os.environ['DATION_E2E_AUTH'])/'auth-fixture-jwks.json').read_text())
+
+@app.post('/auth/v1/token')
+async def auth_token(request: Request):
+    from auth_fixture import token, USER_A, USER_B
+    if not authorized(request):return JSONResponse({'error':'Unauthorized'},status_code=401)
+    body=await request.json()
+    if request.query_params.get('grant_type')=='password':
+        user={'user-1@example.test':USER_A,'user-2@example.test':USER_B}.get(body.get('email'))
+        if user is None or body.get('password')!='dispatch-e2e-private':return JSONResponse({'error':'Invalid credentials'},status_code=400)
+    elif request.query_params.get('grant_type')=='refresh_token':
+        user={'fixture-refresh-a':USER_A,'fixture-refresh-b':USER_B}.get(body.get('refresh_token'))
+        if not user:return JSONResponse({'error':'Invalid refresh'},status_code=400)
+    else:return JSONResponse({'error':'Unsupported grant'},status_code=400)
+    access=token((Path(os.environ['DATION_E2E_AUTH'])/'auth-fixture-key.pem').read_bytes(),os.environ['SUPABASE_URL'],user)
+    return {'access_token':access,'refresh_token':'fixture-refresh-'+('a' if user==USER_A else 'b'),'expires_in':3600,'token_type':'bearer'}
+
+@app.post('/auth/v1/logout')
+async def auth_logout():
+    return Response(status_code=204)

@@ -31,7 +31,7 @@ class SQLSandbox:
     @classmethod
     def upgrade(cls, database=None):
         for migration in sorted((REPO/'supabase/migrations').glob('*.sql')):
-            if migration.name[:14] > BASELINE_VERSION:
+            if BASELINE_VERSION < migration.name[:14] < '20261018090000':
                 cls.command(migration.read_text(),database=database)
 
     @classmethod

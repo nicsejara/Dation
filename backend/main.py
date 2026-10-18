@@ -15,7 +15,7 @@ from fastapi import (
     UploadFile,
 )
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse
+from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, ValidationError, field_validator
 
@@ -71,6 +71,11 @@ from app.services import dispatch_service
 
 app.add_middleware(RequestTelemetry)
 app.include_router(dispatch_router)
+from app.platform.auth_routes import router as auth_router, ACCESS
+from app.platform.jwt import verify
+app.include_router(auth_router)
+from app.platform.routes import router as platform_router
+app.include_router(platform_router)
 class RevalidatedStaticFiles(StaticFiles):
     async def get_response(self, path, scope):
         response = await super().get_response(path, scope)
@@ -124,11 +129,7 @@ async def validation_exception_handler(
 
 @app.get("/")
 def root():
-    return {
-        "service": "Dation Core",
-        "version": "1.0.0",
-        "status": "running",
-    }
+    return RedirectResponse("/app",status_code=303,headers={"Cache-Control":"no-store"})
 
 
 @app.get("/health")
@@ -157,17 +158,19 @@ async def prometheus_metrics(_: str = Depends(require_upload_access)):
 
 
 @app.get("/app", response_class=HTMLResponse)
-def decision_workspace(
-    _: str = Depends(require_upload_access),
-):
-    return APP_PAGE.read_text(encoding="utf-8")
-
-
 @app.get("/upload", response_class=HTMLResponse)
-def upload_compatibility(
-    _: str = Depends(require_upload_access),
-):
-    return APP_PAGE.read_text(encoding="utf-8")
+@app.get("/app/{platform_path:path}", response_class=HTMLResponse)
+async def decision_workspace(request: Request):
+    token = request.cookies.get(ACCESS)
+    if not token:
+        return RedirectResponse("/login", status_code=303, headers={"Cache-Control": "no-store"})
+    try:
+        await verify(token)
+    except HTTPException as exc:
+        if exc.status_code == 401:
+            return RedirectResponse("/login", status_code=303, headers={"Cache-Control": "no-store"})
+        raise
+    return HTMLResponse(APP_PAGE.read_text(encoding="utf-8"), headers={"Cache-Control": "no-store"})
 
 
 @app.get("/api/system/supabase-check")

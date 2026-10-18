@@ -1,6 +1,6 @@
 import httpx
 
-from app.services.http_service import http_client
+from app.platform.repository import http_client
 
 from app.config import SUPABASE_SECRET_KEY, SUPABASE_URL, supabase_configured
 

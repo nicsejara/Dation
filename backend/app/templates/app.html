@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="es" class="d-session-loading">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -15,6 +15,9 @@
   <link rel="stylesheet" href="/static/css/dispatch-lifecycle.css?v=dark-foundation-v1">
   <link rel="stylesheet" href="/static/css/dation-design-system.css?v=dark-data-pack-v1">
   <link rel="stylesheet" href="/static/css/platform-components.css?v=platform-foundation-v1">
+  <link rel="stylesheet" href="/static/css/platform-auth.css">
+  <link rel="stylesheet" href="/static/css/platform-shell.css">
+  <script src="/static/js/platform/session.js"></script>
 </head>
 <body>
   <div class="app-shell">
@@ -29,11 +32,16 @@
         </div>
       </div>
 
-      <nav class="nav" aria-label="Navegación principal">
-        <button class="nav-item is-active" data-view="inicio" type="button" aria-label="Inicio" onclick="window.dationNavigate && window.dationNavigate('inicio', null, event)">
-          <span class="nav-icon" aria-hidden="true">⌂</span>
-          <span>Inicio</span>
-        </button>
+      <nav class="nav platform-global-nav" aria-label="Navegación principal">
+        <a class="nav-item" href="/app" data-platform-view="platform-home" aria-label="Inicio"><span class="nav-icon" aria-hidden="true">⌂</span><span class="platform-nav-label">Inicio</span></a>
+        <span class="sidebar-label">Decision Intelligence</span>
+        <a class="nav-item" href="/app/ddas" data-platform-view="inicio" aria-label="Decision Data Assets"><span class="nav-icon" aria-hidden="true">▦</span><span class="platform-nav-label">Decision Data Assets</span></a>
+        <a class="nav-item" href="/app/decisions" data-platform-view="platform-decisions" aria-label="Decision Center"><span class="nav-icon" aria-hidden="true">◎</span><span class="platform-nav-label">Decision Center</span></a>
+        <span class="sidebar-label">Datos</span>
+        <a class="nav-item" href="/app/data" data-platform-view="platform-data" aria-label="Datos"><span class="nav-icon" aria-hidden="true">▤</span><span class="platform-nav-label">Datos</span></a>
+        <span class="sidebar-label">Workspace</span>
+        <a class="nav-item" href="/app/team" data-platform-view="platform-team" aria-label="Equipo"><span class="nav-icon" aria-hidden="true">♙</span><span class="platform-nav-label">Equipo</span></a>
+        <a class="nav-item" href="/app/settings" data-platform-view="settings" aria-label="Configuración"><span class="nav-icon" aria-hidden="true">⚙</span><span class="platform-nav-label">Configuración</span></a>
       </nav>
 
       <div class="sidebar-section">
@@ -50,14 +58,14 @@
         </button>
       </div>
 
-      <div class="sidebar-footer">
-        <div class="environment-card">
-          <div>
-            <span class="status-dot status-dot--live"></span>
-            <strong>Entorno MVP</strong>
-          </div>
-          <small>Cloud Run · Supabase · Groq</small>
+      <div class="sidebar-footer d-platform platform-account">
+        <button class="platform-account__trigger" type="button" data-user-menu aria-label="Abrir menú de usuario" aria-expanded="false"><span class="platform-account__avatar" data-user-avatar aria-hidden="true"></span><span class="platform-account__copy"><strong data-user-name></strong><small data-workspace-name></small></span></button>
+        <div class="d-popover platform-account-menu" data-user-menu-panel role="menu" aria-label="Mi cuenta" hidden>
+          <a href="/app/profile" data-platform-view="profile" role="menuitem">Mi perfil</a>
+          <a href="/app/settings" data-platform-view="settings" role="menuitem">Configuración</a>
+          <button type="button" data-logout role="menuitem">Cerrar sesión</button>
         </div>
+        <p class="platform-account__status" data-account-status role="status" aria-live="polite"></p>
       </div>
     </aside>
 
@@ -92,7 +100,13 @@
         ></nav>
       </section>
 
+      <nav class="platform-breadcrumb d-platform" data-platform-breadcrumb aria-label="Ubicación actual"></nav>
       <div class="content">
+        <section class="view d-platform" data-view-panel="platform-home"><div class="d-page platform-global-page"><div class="platform-global-page" data-platform-home></div></div></section>
+        <section class="view d-platform" data-view-panel="platform-decisions"><div class="d-page platform-global-page"><header class="d-page-header"><div class="d-page-header__copy"><span class="d-eyebrow">Workspace</span><h1 class="d-page-title">Decision Center</h1></div></header><div class="platform-global-page" data-platform-decisions></div></div></section>
+        <section class="view d-platform" data-view-panel="platform-data"><div class="d-page platform-global-page"><header class="d-page-header"><div class="d-page-header__copy"><span class="d-eyebrow">Workspace</span><h1 class="d-page-title">Datos</h1></div></header><div class="platform-global-page" data-platform-data></div></div></section>
+        <section class="view d-platform" data-view-panel="platform-team"><div class="d-page platform-global-page"><header class="d-page-header"><div class="d-page-header__copy"><span class="d-eyebrow">Workspace</span><h1 class="d-page-title">Equipo</h1></div></header><div class="platform-global-page" data-platform-team></div></div></section>
+        <section class="view d-platform" data-view-panel="profile"><div class="d-page platform-global-page"><header class="d-page-header"><div class="d-page-header__copy"><span class="d-eyebrow">Workspace</span><h1 class="d-page-title">Mi perfil</h1></div></header><div class="platform-global-page" data-profile-form></div></div></section>
         <!-- INICIO -->
         <section class="view is-active" data-view-panel="inicio">
           <div class="d-home">
@@ -1030,7 +1044,7 @@
             <div class="d-page-header__copy">
               <span class="d-eyebrow">Plataforma</span>
               <h1 class="d-page-title">Configuración</h1>
-              <p class="d-page-description">Estado de las capacidades técnicas que componen el MVP actual.</p>
+              <p class="d-page-description">Información y preferencias de tu workspace.</p>
             </div>
             <div class="d-page-header__actions">
               <button class="d-button d-button--ghost" type="button" data-settings-help aria-expanded="false" aria-controls="settings-status-help">Acerca de estos estados</button>
@@ -1044,6 +1058,8 @@
             </section>
           </header>
 
+          <div class="settings-grid" data-workspace-settings></div>
+          <details class="platform-diagnostics" data-platform-diagnostics hidden><summary>Diagnóstico interno · Administrador</summary>
           <div class="settings-grid">
             <article class="d-card">
               <span class="d-eyebrow">Motor analítico</span>
@@ -1072,6 +1088,7 @@
               <div class="settings-row d-metadata"><span>Persistencia de decisiones</span><strong>Activa</strong></div>
             </article>
           </div>
+          </details>
           </div>
         </section>
       </div>
@@ -1524,13 +1541,16 @@
       window.dationRenderWorkspaceNav('inicio');
     })();
   </script>
-  <script src="/static/js/dashboard-formatters.js?v=dispatch-v1"></script>
-  <script src="/static/js/dashboard-selectors.js?v=dispatch-v1"></script>
-  <script src="/static/js/dashboard-stage.js?v=dda-logistics-landing-v7"></script>
-  <script src="/static/js/dda-logistics-landing.js?v=dark-home-overview-v1"></script>
-  <script src="/static/js/interpreter-stage.js?v=dispatch-v1"></script>
-  <script src="/static/vendor/echarts-dispatch-6.0.0.min.js"></script>
-  <script type="module" src="/static/js/dispatch/workspace.mjs"></script>
-  <script type="module" src="/static/js/app.js?v=dispatch-v1"></script>
+  <template id="dation-app-scripts">
+    <script src="/static/js/dashboard-formatters.js"></script>
+    <script src="/static/js/dashboard-selectors.js"></script>
+    <script src="/static/js/dashboard-stage.js"></script>
+    <script src="/static/js/dda-logistics-landing.js"></script>
+    <script src="/static/js/interpreter-stage.js"></script>
+    <script src="/static/vendor/echarts-dispatch-6.0.0.min.js"></script>
+    <script type="module" src="/static/js/dispatch/workspace.mjs"></script>
+    <script type="module" src="/static/js/app.js"></script>
+  </template>
+  <script type="module" src="/static/js/platform/boot.mjs"></script>
 </body>
 </html>

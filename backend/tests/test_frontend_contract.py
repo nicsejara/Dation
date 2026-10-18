@@ -1540,7 +1540,7 @@ class FrontendContractTests(
         )
 
 
-    def test_sidebar_keeps_only_home_primary_nav(
+    def test_sidebar_exposes_platform_navigation_and_contextual_logistics(
         self,
     ):
         sidebar = self.html.split(
@@ -1551,34 +1551,15 @@ class FrontendContractTests(
             1,
         )[0]
 
-        primary_nav = sidebar.split(
-            '<nav class="nav"',
-            1,
-        )[1].split(
-            "</nav>",
-            1,
-        )[0]
-
-        self.assertIn(
-            ">Inicio<",
-            primary_nav,
-        )
-        self.assertNotIn(
-            ">Trazabilidad<",
-            primary_nav,
-        )
-        self.assertNotIn(
-            ">Configuración<",
-            primary_nav,
-        )
-        self.assertNotIn(
-            ">DDA Logística<",
-            primary_nav,
-        )
-        self.assertIn(
-            "Decision Data Assets",
-            sidebar,
-        )
+        primary_nav = sidebar.split('<nav class="nav platform-global-nav"',1)[1].split('</nav>',1)[0]
+        for label in ['Inicio','Decision Data Assets','Decision Center','Datos','Equipo','Configuración']:
+            self.assertIn('>'+label+'<',primary_nav)
+        self.assertNotIn('>DDA Logística<',primary_nav)
+        self.assertNotIn('Cloud Run',sidebar)
+        self.assertNotIn('Supabase',sidebar)
+        self.assertNotIn('Groq',sidebar)
+        self.assertIn('data-user-menu',sidebar)
+        self.assertIn('data-logout',sidebar)
 
     def test_dda_internal_navigation_contract(
         self,

@@ -149,11 +149,12 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(self.checked(self.s.api_client.get('/health')),{'status':'healthy'})
 
     def test_private_ingestion_deduplication_and_tampered_storage_fail_closed(self):
-        for path in ['/app','/api/decision-cases']:
+        self.assertEqual(self.s.http.get(self.s.api_url+'/app').status_code,303)
+        for path in ['/api/decision-cases']:
             self.assertEqual(self.s.http.get(self.s.api_url+path).status_code,401)
         # Exercise actual PostgREST privilege enforcement; no fake success response.
-        forbidden=self.s.http.post(self.s.rest_url+'/rpc/list_decision_cases',
-            headers={'Authorization':'Bearer '+self.s.anon_token},json={})
+        forbidden=self.s.http.post(self.s.rest_url+'/rpc/platform_rpc',
+            headers={'Authorization':'Bearer '+self.s.anon_token},json={'target_workspace_id':self.s.workspace_a,'actor_user_id':'10000000-0000-4000-8000-000000000001','operation':'list_decision_cases'})
         self.assertIn(forbidden.status_code,(401,403))
         self.assertEqual(forbidden.json()['code'],'42501')
         invalid=self.s.api_client.post('/api/datasets/upload',params={'dataset_type':'orders'},
@@ -192,9 +193,9 @@ class WorkflowTests(unittest.TestCase):
         job=self.job(identifier)
         self.assertEqual(job['attempts'],2);self.assertEqual(job['state'],'completed')
         self.assertIsNone(job['lease_token']);self.assertTrue(run['result_fingerprint'])
-        fenced=self.checked(self.s.db.post('rpc/finish_dispatch_job',json={
+        fenced=self.checked(self.s.db.post('rpc/platform_rpc',json={'target_workspace_id':self.s.workspace_a,'actor_user_id':None,'operation':'finish_dispatch_job','worker_call':True,'arguments':{
             'target_run_id':identifier,'worker_token':first['lease_token'],
-            'terminal_values':{'status':'error','error_message':'obsolete worker'}}))
+            'terminal_values':{'status':'error','error_message':'obsolete worker'}}}))
         self.assertEqual(fenced,[])
         after=self.checked(self.s.api_client.get('/api/runs/'+identifier))
         self.assertEqual(after['result_fingerprint'],run['result_fingerprint'])
@@ -206,7 +207,7 @@ class WorkflowTests(unittest.TestCase):
         approved=self.approve(assignment['id'],case)
         retry=self.approve(assignment['id'],case)
         self.assertEqual(retry['approved_at'],approved['approved_at'])
-        self.assertEqual(retry['approved_by'],'shared_workspace:dation')
+        self.assertEqual(retry['approved_by'],'user:10000000-0000-4000-8000-000000000001')
         scheduling=self.finish(self.admit(self.body(case,orders,fleet,'logistics_scheduling',assignment['id'])))
         self.assertEqual(scheduling['upstream_run_id'],assignment['id'])
         self.approve(scheduling['id'],case,'logistics_scheduling')
@@ -274,8 +275,8 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(artifact['attempts'],2);self.assertEqual(artifact['id'],accepted['id'])
         self.assertEqual(artifact['result_json']['scenarios']['selected'],assignment['result_json']['scenarios']['selected'])
         self.assertGreater(len(artifact['result_json']['scenarios']),len(assignment['result_json']['scenarios']))
-        fenced=self.checked(self.s.db.post('rpc/finish_comparative_analysis',json={'target_analysis_id':accepted['id'],
-            'worker_token':first['lease_token'],'terminal_values':{'status':'error','error_message':'old worker'}}))
+        fenced=self.checked(self.s.db.post('rpc/platform_rpc',json={'target_workspace_id':self.s.workspace_a,'actor_user_id':None,'operation':'finish_comparative_analysis','worker_call':True,'arguments':{'target_analysis_id':accepted['id'],
+            'worker_token':first['lease_token'],'terminal_values':{'status':'error','error_message':'old worker'}}}))
         self.assertEqual(fenced,[]);self.assertEqual(business(),before)
         self.assertEqual(self.checked(self.s.api_client.post(path))['id'],artifact['id'])
         metrics=self.s.api_client.get('/metrics')
@@ -345,6 +346,10 @@ class WorkflowTests(unittest.TestCase):
         if artifacts:=os.getenv('DATION_E2E_ARTIFACTS'):
             folder=Path(artifacts);folder.mkdir(parents=True,exist_ok=True)
             for item in self.s.directory.glob('scheduling-dashboard*.json'):shutil.copy2(item,folder/item.name)
+
+    def test_platform_auth_navigation_profile_and_logout(self):
+        outcome=subprocess.run([os.getenv('DATION_BROWSER_PYTHON',str(ROOT/'.browser-venv/bin/python')),str(ROOT/'tests/e2e/platform_journey.py')],cwd=ROOT,env={**self.s.env,'DATION_E2E_URL':self.s.api_url},capture_output=True,text=True,timeout=120)
+        self.assertEqual(outcome.returncode,0,outcome.stdout+outcome.stderr)
 
     def browser_journey(self,scenario,viewport):
         self.s.start_worker()

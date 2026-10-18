@@ -25,9 +25,9 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             sock.bind(("127.0.0.1", 0))
             cls.port = sock.getsockname()[1]
         env = {**os.environ, "DATION_ACCESS_PASSWORD": "dispatch-qa",
-               "SUPABASE_URL": "", "SUPABASE_SECRET_KEY": "", "LLM_API_KEY": ""}
+               "PYTHONPATH": str(ROOT / "tests/browser"), "SUPABASE_URL": "", "SUPABASE_SECRET_KEY": "", "LLM_API_KEY": ""}
         cls.server = subprocess.Popen(
-            [os.getenv("DATION_RUNTIME_PYTHON") or (str(ROOT.parent / ".venv/bin/python") if (ROOT.parent / ".venv/bin/python").exists() else shutil.which("python")), "-m", "uvicorn", "main:app",
+            [os.getenv("DATION_RUNTIME_PYTHON") or (str(ROOT.parent / ".venv/bin/python") if (ROOT.parent / ".venv/bin/python").exists() else shutil.which("python")), "-m", "uvicorn", "fixture_server:app",
              "--host", "127.0.0.1", "--port", str(cls.port)],
             cwd=ROOT, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
         )
@@ -86,6 +86,16 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             args=["--no-sandbox", "--disable-dev-shm-usage"])
         self.context = await self.browser.new_context(viewport={"width":1440,"height":1000},
             http_credentials={"username":"dation","password":"dispatch-qa"})
+        await self.context.add_cookies([{"name":"dation_access","value":"browser-layout-fixture","url":f"http://127.0.0.1:{self.port}"}])
+        async def session_fixture(route):
+            import time
+            await route.fulfill(content_type="application/json",body=json.dumps({
+                "access_token":"browser-layout-fixture","expires_at":int(time.time())+3600,
+                "profile":{"id":"10000000-0000-4000-8000-000000000001","first_name":"Synthetic","last_name":"User","email":"fixture@example.test"},
+                "membership":{"workspace_id":"00000000-0000-4000-8000-00000000da71","access_role":"admin"},
+                "workspace":{"id":"00000000-0000-4000-8000-00000000da71","name":"Synthetic workspace"},"ddas":[]}))
+        await self.context.route("**/auth/session",session_fixture)
+        await self.context.add_init_script("sessionStorage.setItem('_dation_identity','10000000-0000-4000-8000-000000000001:00000000-0000-4000-8000-00000000da71');")
         await self.context.route("**/api/**", self.route_api)
         self.page = await self.context.new_page()
         self.page.set_default_timeout(6000)
@@ -237,7 +247,11 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         if node: query += "&node_id="+node
         if run: query += "&run_id="+run
         await self.page.goto(f"http://127.0.0.1:{self.port}/app?{query}")
-        await self.page.wait_for_function("window.DationDispatch && window.DationDispatch.getWorkspace().decisionCase?.persisted")
+        try:
+            await self.page.wait_for_function("window.DationDispatch && window.DationDispatch.getWorkspace().decisionCase?.persisted")
+        except Exception:
+            print("UI_BOOT_DIAGNOSTIC="+json.dumps({"url":self.page.url,"errors":self.errors,"requests":self.requests,"state":await self.page.evaluate("({loading:document.documentElement.classList.contains('d-session-loading'),workspace:window.DationDispatch?.getWorkspace(),text:document.body.innerText.slice(-500)})")}))
+            raise
         if view == "logistics-map": await self.page.wait_for_selector("[data-map-node=logistics_assignment]")
         if view == "logistics-config": await self.page.wait_for_selector("[data-scheduling-review]" if node == "logistics_scheduling" else "[data-config-review]")
         if view == "decision-dashboard": await self.page.wait_for_selector(".dispatch-scheduling-dashboard" if node == "logistics_scheduling" else ".assignment-dashboard-v2")
@@ -906,6 +920,10 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         else:
             run=self.f['ids']['scheduling' if node=='logistics_scheduling' else 'assignment'] if view=='decision-dashboard' else None
             await self.open(view,node,run)
+        # Auth now gates asynchronous module mounting. Inspect the committed AX tree
+        # after the browser has painted the resolved shell and its controls.
+        await self.page.wait_for_function("!document.documentElement.classList.contains('d-session-loading')")
+        await self.page.evaluate("new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))")
 
     async def test_phase6_all_pages_have_dark_contrast_accessible_names_and_no_overflow(self):
         audit=(Path(__file__).parent/'theme_audit.js').read_text()
@@ -922,7 +940,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                 controls=[item for item in tree['nodes'] if not item.get('ignored') and item.get('role',{}).get('value') in ('button','link','textbox','searchbox','combobox','slider','checkbox','radio','tab','progressbar')]
                 self.assertTrue(controls)
                 missing=[item.get('role') for item in controls if not item.get('name',{}).get('value','').strip()]
-                self.assertEqual(missing,[],(view,node,width,missing))
+                self.assertEqual(missing,[],(view,node,width,missing,await self.page.evaluate("[...document.querySelectorAll('button,[role=button]')].filter(n=>n.getClientRects().length&&!n.textContent.trim()&&!n.getAttribute('aria-label')).map(n=>n.outerHTML.slice(0,400))")))
         self.assertFalse(any(m=='POST' and p=='/api/runs' for m,p in self.requests))
 
     async def test_phase6_tab_and_reverse_tab_keep_focus_visible_below_sticky_layers(self):

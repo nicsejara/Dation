@@ -1,6 +1,7 @@
 """Application contract: full summaries, pure history and explicit approval conflicts."""
 from unittest.mock import AsyncMock, patch
 import unittest
+from platform_fixtures import TenantTestCase, WORKSPACE
 import httpx
 from app.services import decision_case_service as cases
 from app.services.dispatch_job_service import RunConflict
@@ -9,7 +10,7 @@ from main import app
 from test_decision_run_history_v2 import CASE_ID,ORDERS_ID,FLEET_ID,ASSIGNMENT_1,ASSIGNMENT_2,SCHEDULING_1,run_row
 
 
-class PersistenceTests(unittest.IsolatedAsyncioTestCase):
+class PersistenceTests(TenantTestCase):
     async def test_history_rpc_uses_only_a_read_request_and_omits_null_node(self):
         requests=[]
         def respond(request):
@@ -19,8 +20,9 @@ class PersistenceTests(unittest.IsolatedAsyncioTestCase):
         with patch.object(cases.httpx,'AsyncClient',return_value=client), \
              patch.object(cases,'SUPABASE_URL','https://qa.invalid'):
             snapshot=await cases.history_snapshot(CASE_ID)
-        self.assertEqual([r.method for r in requests],['GET'])
-        self.assertNotIn('target_node_id',requests[0].url.params)
+        self.assertEqual([r.method for r in requests],['POST'])
+        import json
+        self.assertNotIn('target_node_id',json.loads(requests[0].content)['arguments'])
         self.assertEqual(snapshot['summaries']['logistics_assignment']['run_count'],1501)
 
     async def test_private_api_requires_credentials(self):
