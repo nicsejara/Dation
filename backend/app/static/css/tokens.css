@@ -141,3 +141,30 @@
 @media(max-width:620px) {
   :root { --topbar-height: 54px; --hero-padding: 20px; --hero-gap: 20px; }
 }
+
+/* Platform foundation roles. Existing workflow, dashboard and shell values stay intact. */
+:root {
+  --platform-type-page-title: clamp(24px,2.4vw,32px);
+  --platform-type-section-title: 20px;
+  --platform-type-card-title: 16px;
+  --platform-type-description: 14px;
+  --platform-type-body: 14px;
+  --platform-type-label: 13px;
+  --platform-type-metadata: 12px;
+  --platform-type-caption: 11px;
+  --platform-type-eyebrow: 11px;
+  --platform-line-heading: 1.25;
+  --platform-line-body: 1.6;
+  --platform-page-gutter: var(--space-8);
+  --platform-section-gap: var(--space-6);
+  --platform-form-width: 40rem;
+  --platform-table-cell-padding-block: var(--space-3);
+  --platform-table-cell-padding-inline: var(--space-4);
+  --platform-table-row-height: var(--control-height-lg);
+  --platform-control-height: var(--control-height-md);
+  --platform-control-border: var(--color-control-border);
+  --platform-control-bg: var(--color-surface-subtle);
+  --platform-control-bg-hover: var(--color-surface-raised);
+  --platform-control-fg: var(--color-text);
+  --platform-control-placeholder: var(--color-text-muted);
+}

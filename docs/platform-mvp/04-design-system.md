@@ -2,6 +2,8 @@
 
 Estado: Fase 0, documentación. Base inspeccionada: `22f1187451429c8e98dfcb9874f89b974500cb35`. Fecha de referencia del cliente: 2026-10-17. Este documento no implementa la Fase 1 ni cambia la apariencia productiva.
 
+La auditoría siguiente se conserva como baseline histórico. Implementación posterior de Fase 1: [09-phase1-foundation.md](09-phase1-foundation.md); contrato vigente: [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md).
+
 ## Conclusión
 
 La base dark actual es reutilizable: Inter, superficies navy, teal/cyan, violet secundario y estados semánticos ya tienen tokens. Existen primitives opt-in y componentes de workflow compartidos. El riesgo está en la cascada histórica y en la coexistencia de tres contratos de controles (`.button`, botones genéricos bajo `.dispatch` y `.d-button`), no en la ausencia de un sistema visual.

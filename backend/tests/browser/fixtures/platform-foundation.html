@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Foundation · fixture interna</title>
+  <!-- runtime-styles -->
+  <style>
+    /* Fixture composition only. Component appearance belongs to runtime CSS. */
+    .fixture { width:min(1180px,100%); margin-inline:auto; padding:24px; }
+    .fixture-section { min-width:0; margin-block:32px; }
+    .fixture-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; }
+    .fixture-row { display:flex; flex-wrap:wrap; align-items:center; gap:12px; }
+    .fixture-stack { display:grid; gap:16px; min-width:0; }
+    .fixture-nav { width:min(100%,340px); }
+    .fixture-result { min-height:24px; }
+    @media(max-width:700px) { .fixture { padding:16px; } .fixture-grid { grid-template-columns:minmax(0,1fr); } }
+  </style>
+</head>
+<body>
+  <main class="d-platform fixture" id="foundation">
+    <header class="d-page-header" data-family="header">
+      <nav class="d-page-header__breadcrumbs" aria-label="Ubicación">
+        <a href="#foundation">Plataforma</a><span aria-hidden="true">/</span><span aria-current="page">Foundation</span>
+      </nav>
+      <div class="d-page-header__copy">
+        <p class="d-eyebrow">Fixture interna · datos sintéticos</p>
+        <h1 class="d-page-header__title">Componentes compartidos para decisiones con contexto</h1>
+        <p class="d-page-header__subtitle">Validación visual y de interacción. Los nombres de archivos muy extensos como pedidos_del_centro_de_distribución_regional_2026_10_15.csv deben poder leerse sin desbordar la pantalla.</p>
+      </div>
+      <div class="d-page-header__actions">
+        <button id="open-modal" class="d-button d-button--primary" type="button">Crear espacio de trabajo</button>
+        <button id="menu-trigger" class="d-button d-button--secondary" type="button">Más acciones</button>
+      </div>
+    </header>
+
+    <section class="fixture-section fixture-stack" aria-labelledby="buttons-title" data-family="button">
+      <h2 id="buttons-title" class="d-section-title">Acciones</h2>
+      <div class="fixture-row">
+        <button id="primary-action" class="d-button d-button--primary" type="button">Acción principal</button>
+        <button class="d-button d-button--secondary" type="button">Secundaria</button>
+        <button class="d-button d-button--ghost" type="button">Acción discreta</button>
+        <button class="d-button d-button--danger" type="button">Eliminar borrador</button>
+        <button class="d-button d-button--sm" type="button">Pequeña</button>
+        <button class="d-button d-button--lg" type="button">Grande</button>
+        <button class="d-button d-button--icon" type="button" aria-label="Ayuda">?</button>
+        <button class="d-button" type="button" disabled>No disponible</button>
+        <button class="d-button d-button--primary" type="button" aria-busy="true" disabled>Guardando cambios</button>
+      </div>
+      <p class="d-metadata">Las acciones deshabilitadas conservan su texto y no pueden ejecutarse.</p>
+    </section>
+
+    <section class="fixture-section fixture-stack" aria-labelledby="form-title" data-family="form">
+      <h2 id="form-title" class="d-section-title">Formulario</h2>
+      <form id="foundation-form" class="fixture-grid" novalidate>
+        <div class="d-field">
+          <label class="d-field__label" for="workspace-name">Nombre del espacio <span class="d-field__required" aria-hidden="true">*</span></label>
+          <input class="d-input" id="workspace-name" name="workspace" value="Operaciones regionales" required aria-describedby="workspace-help">
+          <p id="workspace-help" class="d-field__help">Un nombre reconocible para tu equipo.</p>
+        </div>
+        <div class="d-field">
+          <label class="d-field__label" for="contact-email">Correo de contacto</label>
+          <input class="d-input" id="contact-email" name="email" type="email" value="correo-incompleto" aria-invalid="true" aria-describedby="email-help email-error">
+          <p id="email-help" class="d-field__help">Usaremos esta dirección para las notificaciones.</p>
+          <p id="email-error" class="d-field__error">Ingresá un correo válido, por ejemplo equipo@empresa.com.</p>
+        </div>
+        <div class="d-field">
+          <label class="d-field__label" for="foundation-password">Contraseña</label>
+          <input class="d-input" id="foundation-password" type="password" value="synthetic-password" autocomplete="new-password" aria-describedby="password-help">
+          <p id="password-help" class="d-field__help">Ejemplo sintético: no ingresar credenciales reales.</p>
+        </div>
+        <div class="d-field">
+          <label class="d-field__label" for="foundation-search">Buscar archivos</label>
+          <input class="d-input" id="foundation-search" type="search" placeholder="Nombre o identificador">
+        </div>
+        <div class="d-field">
+          <label class="d-field__label" for="foundation-date">Fecha de referencia</label>
+          <input class="d-input" id="foundation-date" type="date" value="2026-10-15">
+        </div>
+        <div class="d-field">
+          <label class="d-field__label" for="foundation-select">Formato</label>
+          <select class="d-select" id="foundation-select"><option>CSV</option><option>XLSX</option></select>
+        </div>
+        <div class="d-field">
+          <label class="d-field__label" for="foundation-notes">Descripción <span class="d-field__optional">opcional</span></label>
+          <textarea class="d-textarea" id="foundation-notes" rows="3">Contexto adicional para reconocer el conjunto de datos y su procedencia.</textarea>
+        </div>
+        <div class="fixture-stack">
+          <div class="d-field"><label class="d-field__label" for="foundation-readonly">Identificador</label><input class="d-input d-id" id="foundation-readonly" value="ws_synthetic_2026" readonly></div>
+          <div class="d-field"><label class="d-field__label" for="foundation-disabled">Fuente administrada</label><input class="d-input" id="foundation-disabled" value="Integración no disponible" disabled></div>
+        </div>
+        <fieldset class="fixture-stack">
+          <legend class="d-field__label">Preferencias</legend>
+          <label class="d-choice"><input id="foundation-check" class="d-check" type="checkbox" checked><span class="d-choice__copy">Recibir novedades del espacio</span></label>
+          <label class="d-choice"><input id="foundation-indeterminate" class="d-check" type="checkbox"><span class="d-choice__copy">Seleccionar grupos de archivos</span></label>
+          <label class="d-choice"><input class="d-check" type="checkbox" disabled><span class="d-choice__copy">Permiso administrado</span></label>
+          <label class="d-choice"><input id="foundation-switch" class="d-switch" type="checkbox" role="switch" checked><span class="d-choice__copy">Activar avisos</span></label>
+        </fieldset>
+        <fieldset class="fixture-stack">
+          <legend class="d-field__label">Densidad</legend>
+          <label class="d-choice"><input class="d-radio" type="radio" name="density" value="comfortable" checked><span class="d-choice__copy">Cómoda</span></label>
+          <label class="d-choice"><input class="d-radio" type="radio" name="density" value="compact"><span class="d-choice__copy">Compacta</span></label>
+          <button class="d-button d-button--primary" type="submit">Validar formulario</button>
+          <output id="form-result" class="d-field__help fixture-result" aria-live="polite"></output>
+        </fieldset>
+      </form>
+    </section>
+
+    <section class="fixture-section fixture-stack" aria-labelledby="status-title" data-family="status">
+      <h2 id="status-title" class="d-section-title">Estados</h2>
+      <div class="fixture-row">
+        <span class="d-status d-status--neutral">Borrador</span><span class="d-status d-status--info">Procesando</span>
+        <span class="d-status d-status--success">Actualizado</span><span class="d-status d-status--warning">Requiere revisión</span>
+        <span class="d-status d-status--danger">Error de validación</span><span class="d-status d-status--brand">Disponible</span>
+      </div>
+      <div class="fixture-stack" role="status" aria-label="Cargando vista">
+        <span class="d-skeleton d-skeleton--line" aria-hidden="true"></span>
+        <span class="d-skeleton d-skeleton--circle" aria-hidden="true"></span>
+        <span class="d-caption">Cargando datos de ejemplo…</span>
+      </div>
+    </section>
+
+    <section class="fixture-section fixture-stack" aria-labelledby="table-title" data-family="table">
+      <h2 id="table-title" class="d-section-title">Datos tabulares</h2>
+      <div class="d-filter-bar">
+        <div class="d-filter-bar__search d-field"><label for="table-search" class="d-field__label">Filtrar tabla</label><input id="table-search" class="d-input" type="search" placeholder="Archivo o categoría"></div>
+        <div class="d-filter-bar__controls"><button class="d-button" type="button">Limpiar filtros</button></div>
+      </div>
+      <div class="d-table-container" tabindex="0" role="region" aria-label="Archivos de ejemplo desplazables">
+        <table class="d-table">
+          <caption class="d-caption">Datos sintéticos · tres archivos</caption>
+          <thead><tr><th scope="col" aria-sort="ascending"><button class="d-table__sort" type="button">Archivo ↑</button></th><th scope="col">Categoría</th><th scope="col">Actualización</th><th scope="col">Filas</th><th scope="col">Estado</th></tr></thead>
+          <tbody>
+            <tr><th scope="row" class="d-table__nowrap">pedidos_del_centro_de_distribución_regional_2026_10_15.csv</th><td>Pedidos</td><td class="d-table__nowrap">15 oct 2026</td><td class="d-table__number">12.480</td><td><span class="d-status d-status--success">Validado</span></td></tr>
+            <tr><th scope="row">flota.csv</th><td>Recursos</td><td class="d-table__nowrap">14 oct 2026</td><td class="d-table__number">184</td><td><span class="d-status d-status--warning">Revisión</span></td></tr>
+            <tr><th scope="row">centros.xlsx</th><td>Ubicaciones</td><td class="d-table__nowrap">13 oct 2026</td><td class="d-table__number">38</td><td><span class="d-status d-status--neutral">Borrador</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="fixture-section fixture-grid" aria-label="Estados de contenido" data-family="empty">
+      <article class="d-empty-state">
+        <h2 class="d-empty-state__title">Todavía no hay archivos</h2>
+        <p class="d-empty-state__description">Agregá el primer conjunto de datos para comenzar. La información de tus decisiones existentes permanece disponible.</p>
+        <div class="d-empty-state__actions"><button class="d-button d-button--primary" type="button">Agregar archivo</button></div>
+      </article>
+      <article class="d-error-state" role="alert">
+        <h2 class="d-error-state__title">No pudimos cargar esta vista</h2>
+        <p class="d-error-state__description">Revisá tu conexión y volvé a intentar. Este ejemplo no realiza solicitudes a servicios externos.</p>
+        <div class="d-error-state__actions"><button class="d-button" type="button">Reintentar</button></div>
+      </article>
+    </section>
+
+    <section class="fixture-section fixture-stack" aria-labelledby="sidebar-title" data-family="sidebar">
+      <h2 id="sidebar-title" class="d-section-title">Navegación</h2>
+      <nav class="fixture-stack fixture-nav" aria-label="Secciones de ejemplo">
+        <a class="d-sidebar-item" href="#foundation" aria-current="page"><span class="d-sidebar-item__label">Inicio del espacio de trabajo</span></a>
+        <a class="d-sidebar-item" href="#table-title"><span class="d-sidebar-item__label">Datos operativos y archivos con nombres extensos</span></a>
+        <button class="d-sidebar-item" type="button" disabled><span class="d-sidebar-item__label">Próximamente</span></button>
+      </nav>
+    </section>
+
+    <div id="foundation-menu" class="d-dropdown" role="menu" aria-label="Más acciones" hidden data-family="dropdown">
+      <button id="menu-first" class="d-dropdown__item" type="button" role="menuitem">Duplicar ejemplo</button>
+      <button class="d-dropdown__item" type="button" role="menuitem" disabled>Acción no disponible</button>
+      <button id="menu-last" class="d-dropdown__item" type="button" role="menuitem">Ver detalles del espacio con un nombre suficientemente extenso</button>
+    </div>
+
+    <dialog id="foundation-modal" class="d-modal" aria-labelledby="modal-title" aria-describedby="modal-description" data-family="modal">
+      <div class="d-modal__header"><h2 id="modal-title" class="d-modal__title">Nuevo espacio de trabajo</h2></div>
+      <div class="d-modal__body fixture-stack">
+        <p id="modal-description" class="d-body">Ejemplo de revisión local. No se guardarán cambios ni se crearán recursos.</p>
+        <div class="d-field"><label for="modal-name" class="d-field__label">Nombre del nuevo espacio</label><input id="modal-name" class="d-input" value="Equipo de operaciones" autofocus></div>
+        <p class="d-metadata">La ventana debe conservar el foco y permitir volver a la acción que la abrió.</p>
+      </div>
+      <div class="d-modal__actions"><button id="modal-cancel" class="d-button" type="button" data-dialog-close>Cancelar</button><button class="d-button d-button--primary" type="button" data-dialog-close>Confirmar ejemplo</button></div>
+    </dialog>
+  </main>
+  <script type="module">
+    import { mountDialog, mountDropdown } from '/static/js/platform/components.mjs';
+    const byId = id => document.getElementById(id);
+    const dropdown = mountDropdown({ trigger:byId('menu-trigger'), panel:byId('foundation-menu') });
+    const dialog = mountDialog({ dialog:byId('foundation-modal'), trigger:byId('open-modal'), initialFocus:byId('modal-name') });
+    // Internal fixture hooks exercise disposal/remount on the same DOM, never app routes.
+    window.foundationQA = { dropdown, dialog, mountDropdown, mountDialog };
+    byId('foundation-indeterminate').indeterminate = true;
+    byId('foundation-form').addEventListener('submit', event => {
+      event.preventDefault();
+      const email=byId('contact-email'), invalid=!email.validity.valid;
+      email.setAttribute('aria-invalid', String(invalid));
+      byId('email-error').hidden=!invalid;
+      byId('form-result').textContent=invalid ? 'Revisá el correo de contacto.' : 'Formulario válido. No se guardaron datos.';
+      if (invalid) email.focus();
+    });
+    document.documentElement.dataset.foundationReady='true';
+  </script>
+</body>
+</html>
