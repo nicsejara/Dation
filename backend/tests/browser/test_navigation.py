@@ -3476,6 +3476,12 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.page.locator('.nav [data-platform-view="platform-home"]').click()
         await self.page.locator('[data-platform-home] .platform-home__quick-link').first.wait_for()
         self.assertEqual(await self.page.get_by_role('link',name='Abrir DDA Logística',exact=True).count(),0)
+        self.ddas[0]['status']='enabled'
+        await self.page.evaluate('window.dationSession.refresh()')
+        await self.page.get_by_role('link',name='Abrir DDA Logística',exact=True).wait_for()
+        self.ddas[0]['status']='disabled'
+        await self.page.evaluate('window.dationSession.refresh()')
+        await self.page.get_by_role('link',name='Abrir DDA Logística',exact=True).wait_for(state='hidden')
         self.assertEqual(self.errors,[])
 
     async def test_catalog_fallback_keeps_disabled_entitlement_closed(self):

@@ -20,6 +20,7 @@ function section(title,id){const n=el('section',undefined,'d-card platform-home_
 
 export function mountWorkspaceHome(root,getIdentity){
  const scope=createScope(root);let controller=null,generation=0;
+ let logisticsEnabled=ddaEnabled(getIdentity(),'logistics');
  const header=el('header',undefined,'platform-home__header');
  const workspace=el('p',undefined,'platform-home__workspace'),title=el('h1',undefined,'d-page-title');
  header.append(workspace,title,el('p','Tu espacio de decisiones y actividad operativa.','d-page-description'));
@@ -98,6 +99,12 @@ export function mountWorkspaceHome(root,getIdentity){
   else if(route.caseId)window.DationDispatch.openCase(route.caseId,route.view,route.nodeId);
   else window.dationNavigate(route.view);
  });
- scope.listen(window,'dation:view',onView);scope.listen(window,'dation:identity',onView);scope.listen(window,'pagehide',stop);onView();
+ scope.listen(window,'dation:view',onView);
+ scope.listen(window,'dation:identity',()=>{
+  const enabled=ddaEnabled(window.dationSession.identity,'logistics');
+  // BFCache already reloads the view. Refresh again only if access changed.
+  if(enabled!==logisticsEnabled){logisticsEnabled=enabled;onView();}
+ });
+ scope.listen(window,'pagehide',stop);onView();
  return {dispose(){stop();scope.dispose();}};
 }
