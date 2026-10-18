@@ -12,7 +12,12 @@ export function currentLogisticsEnabled(){return ddaEnabled(window.dationSession
 export function syncEntitlementFallback(){
  const enabled=currentLogisticsEnabled();
  const sidebar=document.querySelector('.asset-item[data-view="logistics-overview"]');
- if(sidebar){sidebar.disabled=!enabled;sidebar.setAttribute('aria-disabled',String(!enabled));sidebar.querySelector('small').textContent=enabled?'Planificación de despachos':'No habilitado en este workspace';sidebar.querySelector('.status-dot').hidden=!enabled;}
+ if(sidebar){
+  sidebar.disabled=!enabled;sidebar.setAttribute('aria-disabled',String(!enabled));
+  sidebar.querySelector('small').textContent=enabled?'Planificación de despachos':'No habilitado en este workspace';
+  const dot=sidebar.querySelector('.status-dot');dot.hidden=!enabled;dot.style.display=enabled?'':'none';
+  dot.setAttribute('aria-label',enabled?'Activo':'No habilitado');
+ }
  const fallback=document.querySelector('[data-dda-fallback]');
  if(fallback){
   const button=fallback.querySelector('button');button.disabled=!enabled;

@@ -3458,6 +3458,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(urlparse(self.page.url).path,'/app/ddas')
         self.assertEqual(await root.locator('[data-dda-id=logistics] button,a').count(),0)
         self.assertTrue(await self.page.locator('.asset-item').is_disabled())
+        self.assertFalse(await self.page.locator('.asset-item .status-dot').is_visible())
         self.assertEqual(self.requests,[])
         for width in (1440,1024,768,390):
             await self.page.set_viewport_size({'width':width,'height':1000})
