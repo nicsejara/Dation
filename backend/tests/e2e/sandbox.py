@@ -13,6 +13,7 @@ import sys
 import tempfile
 import time
 from uuid import uuid4
+from auth_fixture import generate, token as user_token, USER_A, USER_B, VIEWER, DISABLED
 
 import httpx
 
@@ -80,31 +81,44 @@ class Sandbox:
             return result.returncode==0
         wait_for(pg_ready,'final PostgreSQL TCP server')
         self.sql((ROOT/'tests/integration/infrastructure.sql').read_text())
+        self.sql("CREATE SCHEMA auth; CREATE TABLE auth.users(id uuid PRIMARY KEY,email text,email_confirmed_at timestamptz); CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $$ SELECT (nullif(current_setting('request.jwt.claims',true),'')::jsonb->>'sub')::uuid $$; GRANT USAGE ON SCHEMA auth TO authenticated; GRANT EXECUTE ON FUNCTION auth.uid() TO authenticated;")
         self.sql((REPO/'supabase/baseline/20261010100000_public_schema.sql').read_text())
         for migration in sorted((REPO/'supabase/migrations').glob('*.sql')):
             if migration.name[:14]>'20261010100000':self.sql(migration.read_text())
+        self.sql("UPDATE dation_private.platform_release SET admissions_open=true;")
+        for uid in (USER_A,USER_B,VIEWER,DISABLED):
+            self.sql(f"INSERT INTO auth.users VALUES('{uid}','user-{uid[-1]}@example.test',now());")
+        self.sql(f"INSERT INTO dation_private.legacy_owners(email,workspace_id) VALUES('user-1@example.test','00000000-0000-4000-8000-00000000da71'); SELECT platform_identity('{USER_A}'); SELECT platform_identity('{USER_B}');")
+        self.workspace_a='00000000-0000-4000-8000-00000000da71'
+        self.workspace_b=json.loads(self.sql(f"SELECT platform_create_workspace('{USER_B}','Workspace B','AR','UTC','ARS');"))['workspace_id']
+        self.sql(f"INSERT INTO workspace_members(workspace_id,user_id,access_role,status) VALUES('{self.workspace_a}','{VIEWER}','viewer','active'),('{self.workspace_a}','{DISABLED}','operator','disabled');")
         self.sql("CREATE ROLE dation_e2e_authenticator LOGIN NOINHERIT; GRANT anon,authenticated,service_role TO dation_e2e_authenticator;")
         secret=secrets.token_urlsafe(48)
+        fixture_url='http://127.0.0.1:'+str(port())
+        self.auth_key=generate(self.directory,fixture_url)
+        public=json.loads((self.directory/'auth-fixture-jwks.json').read_text())
+        public['keys'].append({'kty':'oct','alg':'HS256','k':base64.urlsafe_b64encode(secret.encode()).rstrip(b'=').decode()})
         self.token=jwt(secret,'service_role');self.anon_token=jwt(secret,'anon')
         self.rest_container=self.identifier+'-rest'
         self.docker('run','-d','--name',self.rest_container,'--network',self.network,
             '-p','127.0.0.1::3000','-e','PGRST_DB_URI=postgres://dation_e2e_authenticator@postgres:5432/'+self.database,
-            '-e','PGRST_DB_ANON_ROLE=anon','-e','PGRST_JWT_SECRET='+secret,POSTGREST)
+            '-e','PGRST_DB_ANON_ROLE=anon','-e','PGRST_JWT_SECRET='+json.dumps(public),POSTGREST)
         self.containers.append(self.rest_container)
         binding=self.docker('port',self.rest_container,'3000/tcp')
         self.rest_url='http://'+binding
-        self.env={**os.environ,'SUPABASE_URL':'http://127.0.0.1:'+str(port()),
+        self.env={**os.environ,'SUPABASE_URL':fixture_url,
             'SUPABASE_SECRET_KEY':self.token,'SUPABASE_INPUT_BUCKET':'dda-inputs',
             'DATION_ACCESS_PASSWORD':PASSWORD,'LLM_API_KEY':'','LLM_BASE_URL':'','GCP_ACCESS_TOKEN':'',
             'SUPABASE_ACCESS_TOKEN':'','NO_PROXY':'127.0.0.1,localhost',
-            'DATION_E2E_STORAGE':str(self.storage),'DATION_E2E_REST':self.rest_url,'DATION_MAX_QUEUED_RUNS':'32'}
+            'DATION_E2E_AUTH':str(self.directory),'DATION_E2E_STORAGE':str(self.storage),'DATION_E2E_REST':self.rest_url,'DATION_MAX_QUEUED_RUNS':'32'}
+        self.user_tokens={uid:user_token(self.auth_key,self.env['SUPABASE_URL'],uid) for uid in (USER_A,USER_B,VIEWER,DISABLED)}
         self.http=httpx.Client(trust_env=False,timeout=30)
         wait_for(lambda:self.reachable(self.rest_url+'/',{'Authorization':'Bearer '+self.token}), 'authorized PostgREST catalog')
         self.start_process('storage',['-m','uvicorn','storage_gateway:app','--host','127.0.0.1',
             '--port',self.env['SUPABASE_URL'].rsplit(':',1)[1]],cwd=ROOT/'tests/e2e')
         wait_for(lambda:self.reachable(self.env['SUPABASE_URL']+'/rest/v1/',{'Authorization':'Bearer '+self.token}), 'Storage/REST gateway')
         self.api_port=port();self.api_url='http://127.0.0.1:'+str(self.api_port)
-        self.api_client=httpx.Client(base_url=self.api_url,auth=('dation',PASSWORD),trust_env=False,timeout=30)
+        self.api_client=httpx.Client(base_url=self.api_url,headers={'Authorization':'Bearer '+self.user_tokens[USER_A]},trust_env=False,timeout=30)
         self.db=httpx.Client(base_url=self.env['SUPABASE_URL']+'/rest/v1/',headers={
             'Authorization':'Bearer '+self.token,'apikey':self.token},trust_env=False,timeout=30)
         self.start_api()

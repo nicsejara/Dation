@@ -1,10 +1,11 @@
 import hashlib
 from urllib.parse import quote
 from uuid import uuid4
+from app.platform.context import current
 
 import httpx
 
-from app.services.http_service import http_client
+from app.platform.repository import http_client
 
 from app.config import (
     SUPABASE_INPUT_BUCKET,
@@ -46,7 +47,7 @@ async def upload_dataset(
 ) -> dict:
     dataset_id = str(uuid4())
     file_hash = hashlib.sha256(contents).hexdigest()
-    storage_path = f"{dataset_id}/input.csv"
+    storage_path = f"{current().workspace_id}/{dataset_id}/input.csv"
 
     existing = await find_dataset_by_hash(file_hash)
     if existing:

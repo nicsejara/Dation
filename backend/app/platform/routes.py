@@ -1,0 +1,22 @@
+"""Authenticated platform profile endpoints. Workspace authority is resolved server-side."""
+from fastapi import APIRouter,Depends
+from pydantic import BaseModel,ConfigDict,Field,field_validator
+from app.auth import require_upload_access
+from app.platform.identity import platform_call
+
+router=APIRouter(prefix='/api/platform')
+
+class ProfileUpdate(BaseModel):
+    model_config=ConfigDict(extra='forbid')
+    first_name:str=Field(min_length=1,max_length=100)
+    last_name:str=Field(min_length=1,max_length=100)
+
+    @field_validator('first_name','last_name')
+    @classmethod
+    def trim_name(cls,value):
+        if not value.strip():raise ValueError('Completá el nombre y apellido.')
+        return value.strip()
+
+@router.patch('/profile')
+async def update_profile(payload:ProfileUpdate,ctx=Depends(require_upload_access)):
+    return await platform_call('platform_update_profile',{'actor_user_id':ctx.user_id,**payload.model_dump()})

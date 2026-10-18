@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 
 import httpx
 
-from app.services.http_service import http_client
+from app.platform.repository import http_client
 
 from app.config import SUPABASE_URL
 from app.services.run_service import _headers, get_dataset, get_run
@@ -601,9 +601,10 @@ async def approve_run_version(
     if not expected_schema:
         raise ValueError("Ese nodo todavía no admite aprobación persistida.")
     run = await get_run(run_id)
+    if not run:
+        raise LookupError("No se encontró la corrida solicitada.")
     if (
-        not run
-        or run.get("status") != "completed"
+        run.get("status") != "completed"
         or run.get("schema_version") != expected_schema
         or str(run.get("decision_case_id")) != str(case_id)
         or run.get("node_id") != node_id

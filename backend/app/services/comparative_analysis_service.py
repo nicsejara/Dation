@@ -5,6 +5,7 @@ import hashlib
 from time import perf_counter
 from uuid import uuid4
 import httpx
+from app.platform.context import bind, job_context
 from app.observability import bind_context, context, event, identify, metrics
 from app.services import dispatch_service as dispatch
 from app.services.run_service import get_run
@@ -106,7 +107,7 @@ async def process_analysis_job(job):
     from app.services.dispatch_job_service import _process_job
     request = job['request_json']
     started = perf_counter()
-    with bind_context(request.get('_observability'),run_id=job['base_run_id'],case_id=request['decision_case'].get('case_id'),analysis_id=job['id']):
+    with bind(job_context(job)), bind_context(request.get('_observability'),run_id=job['base_run_id'],case_id=request['decision_case'].get('case_id'),analysis_id=job['id']):
         event('comparative_claimed',attempt=job['attempts'])
         async def execute(request, writer, progress):
             base = await base_run(request['base_run_id'])

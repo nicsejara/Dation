@@ -1,26 +1,19 @@
 # Estado de implementación · Platform MVP v1
 
-Fecha de referencia: 2026-10-17 (`America/Buenos_Aires`). Fuente de requisitos: `PROMPT_MAESTRO_SUPER_PRO_Dation_Platform_MVP_v1.md` adjunto por el usuario. El roadmap contiene Fases 0–12; este registro pertenece a esa saga, no a las anteriores sagas UX/D1/D2.
+Fecha de referencia: 2026-10-18 (`America/Buenos_Aires`). Fuente de requisitos: `PROMPT_MAESTRO_SUPER_PRO_Dation_Platform_MVP_v1.md` adjunto por el usuario. El roadmap contiene Fases 0–12; este registro pertenece a esa saga, no a las anteriores sagas UX/D1/D2.
 
-## Fase actual
+## Estado vigente
 
-| Campo | Valor |
-|---|---|
-| Phase | 1 · Identidad visual + Design System Platform Foundation |
-| Status | Implementada y validada localmente: foundation optativa, componentes accesibles, consumidor Settings y regresiones DDA. Fase 2 no iniciada. |
-| Commit | Fase 0 `2f82015c1477fb0c8f247c94b18637ccc19a6c71`, integrada en `ebe82937960fdd9198417459f0e1fb807450f843`. Entrega actual: consultar `git log -1 --format=%H -- docs/platform-mvp/IMPLEMENTATION_STATUS.md`; no se inventa un SHA propio dentro del commit. |
-| Date | 2026-10-17, America/Buenos_Aires; timestamp UTC de captura en el snapshot |
-| Tests | Fase 1: 350 unittest + 13 funciones Python; 59 Node focalizados; 7 Chromium foundation + 1 Settings + 16 regresiones. 45 estados antes/después y 310 elementos DDA/catalog comparados sin diferencias. Comandos y límites en [09](09-phase1-foundation.md). Workflow habitual preservado; CI del commit actual en su PR/checks. |
-| Known issues | No tenancy/usuarios de producto aún; Auth con redirect a localhost y correo por validar; 13 funciones Python fuera de discover CI; Golden externo ausente; LLM real no probado; GCP admin GET 401 y worker host bloqueado por proxy. Detalle y gates en [08](08-risk-register-and-phase-gates.md). |
-| Next gate | Instrucción para Fase 2: JWT, membership, workspace, migración no destructiva, autorización API/RPC/Storage y aislamiento A/B. No comenzar automáticamente. |
+Fases 2 y 3 implementadas; publicación bajo verificación en esta entrega. La Fase 2 pasó el gate A/B con API/RLS/RPC/Storage/worker reales y preservación de evidencia. La Fase 3 incorpora shell, rutas, menú y perfil. No se inicia Fase 4 automáticamente.
 
-## Evidencia y límites
+- [Auth, identidad y migración](10-phase2-auth-tenancy.md).
+- [Shell y navegación](11-phase3-shell-navigation.md).
+- Validación local: 357 unittest, 13 funciones Python, 78 Node, 154 Chromium, 46 SQL históricos y 18 E2E del esquema final sin skips. CI del SHA exacto se exige antes de publicar.
+- Backup/restauración previa: 91 registros y seis archivos, evidencia existente sin cambios; artifacts privados fuera del repo.
+- Configuración reutilizable de entorno: install_script y start_skill actualizados para Auth/Bearer, smoke sin escrituras y QA aislado. No se agregaron secretos nuevos.
+- Límite: la fixture Auth no certifica entrega real de correo. Primer acceso requiere registro y confirmación del administrador autorizado; no se envían correos desde scripts de release.
 
-El catálogo real y la base reconstruida concuerdan: 12 tablas, 33 funciones, ninguna policy pública, RLS habilitado, sin columnas workspace. Conteos de integridad sin huérfanos ni lineage roto en la captura. Snapshot y checksums en [schema](schema/README.md).
-
-La CI de `main` [39050288728](https://github.com/nicsejara/Dation/actions/runs/39050288728) pasó sobre el **SHA base**, incluida la etapa de 146 pruebas browser. No se atribuye esa ejecución al commit nuevo de documentación. Las verificaciones locales enumeradas se ejecutaron durante esta Fase 0; el helper IA versionado también fue ejecutado exitosamente. Ver [comandos y resultados](05-baseline-and-ci.md).
-
-Fase 0 no modificó código productivo, migrations, dependencias, workflow, secrets, registros, objetos Storage o configuración Auth. Su [PR #73](https://github.com/nicsejara/Dation/pull/73) terminó CI verde antes de integrarse como base de Fase 1. Fase 1 modifica sólo frontend y tests/documentación; datos/motores/API/Auth permanecen sin cambios. Seguridad por usuario/empresa queda por implementar y probar en Fase 2.
+Los snapshots de auditoría anteriores describen deliberadamente el esquema previo a tenancy. No deben interpretarse como estado actual tras migrar. Commit/checks/revisiones exactos se agregan al PR y al informe de publicación; no se inventa el SHA del propio commit.
 
 ## Roadmap
 
@@ -28,8 +21,8 @@ Fase 0 no modificó código productivo, migrations, dependencias, workflow, secr
 |---:|---|---|
 | 0 | Completada | Auditoría y baseline entregados |
 | 1 | Implementada y validada | Foundation optativa, interacción/QA y consumidor real; [detalle](09-phase1-foundation.md) |
-| 2 | Pendiente | Auth + identity + workspace + tenancy/security A/B |
-| 3 | Pendiente | Platform shell + navegación/routing |
+| 2 | Implementada · gate A/B validado | Auth + identity + workspace + tenancy/security A/B |
+| 3 | Implementada · release en verificación | Platform shell + navegación/routing |
 | 4 | Pendiente | Workspace Home real |
 | 5 | Pendiente | Catálogo + entitlements |
 | 6 | Pendiente | Data Hub |

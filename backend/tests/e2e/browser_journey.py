@@ -7,6 +7,7 @@ import subprocess
 from urllib.parse import parse_qs, urlparse
 
 from playwright.async_api import async_playwright
+from browser_auth import authenticate, api_get
 from workflow_ui_audit import WorkflowUIAudit
 
 
@@ -25,10 +26,9 @@ async def journey():
         if not executable and Path('/usr/bin/chromium').exists():executable='/usr/bin/chromium'
         browser=await pw.chromium.launch(executable_path=executable,headless=True,
             args=['--no-sandbox','--disable-dev-shm-usage'])
-        context=await browser.new_context(http_credentials={'username':'dation','password':os.environ['DATION_ACCESS_PASSWORD'],
-            'origin':base,'send':'always'},
-            viewport=viewport,accept_downloads=True,reduced_motion='reduce')
+        context=await browser.new_context(viewport=viewport,accept_downloads=True,reduced_motion='reduce')
         await context.tracing.start(screenshots=True,snapshots=True,sources=True)
+        await authenticate(context,base)
         page=await context.new_page();page.set_default_timeout(30000)
         def response_seen(response):
             path=urlparse(response.url).path
@@ -95,7 +95,7 @@ async def journey():
             # A validated case is durable and selectable before its first run.
             initial=await page.evaluate('window.DationDispatch.getWorkspace().decisionCase')
             assert initial['persisted']
-            persisted=await context.request.get(base+'/api/decision-cases/'+initial['id'])
+            persisted=await api_get(context,base+'/api/decision-cases/'+initial['id'])
             assert persisted.status==200,{'status':persisted.status,'body':(await persisted.text())[:2000],'case_id':initial['id']}
             assert (await persisted.json())['decision_case']['inputs']==initial['inputs']
             map_url=page.url
@@ -145,7 +145,7 @@ async def journey():
             case=(await response.json())['decision_case_id']
             await page.reload(wait_until='domcontentloaded')
             assert parse_qs(urlparse(page.url).query)['run_id']==[assignment]
-            pending=await context.request.get(base+'/api/runs/'+assignment)
+            pending=await api_get(context,base+'/api/runs/'+assignment)
             assert (await pending.json())['status'] in ('queued','running')
             await page.get_by_role('heading',name='Preparando tu decisión',exact=True).wait_for()
             await ui.checkpoint('assignment-pending')
@@ -233,7 +233,7 @@ async def journey():
             failed_scheduling=(await (await failed_admission.value).json())['id']
             await page.locator('[data-run-terminal-error]').wait_for(state='visible')
             await ui.checkpoint('scheduling-error')
-            failed_snapshot=await (await context.request.get(base+'/api/runs/'+failed_scheduling)).json()
+            failed_snapshot=await (await api_get(context,base+'/api/runs/'+failed_scheduling)).json()
             assert failed_snapshot['status']=='error' and failed_snapshot['upstream_run_id']==assignment
             await page.locator('[data-reconfigure-run]').click()
             await page.locator('[data-scheduling-review]').wait_for(state='visible')
@@ -262,7 +262,7 @@ async def journey():
             await cold.wait_for_selector('.dispatch-scheduling-dashboard')
             assert await cold.evaluate("window.DationDispatch.getWorkspace().decisionCase.nodes.logistics_assignment.approved_run_id")==assignment
             await cold.close()
-            assert await (await context.request.get(base+'/api/runs/'+failed_scheduling)).json()==failed_snapshot
+            assert await (await api_get(context,base+'/api/runs/'+failed_scheduling)).json()==failed_snapshot
             await page.locator('[data-more-menu] summary').click()
             await page.locator('[data-dashboard-map]').click()
             await page.wait_for_selector('[data-map-node="logistics_assignment"]')
@@ -276,7 +276,7 @@ async def journey():
             await page.evaluate("window.DationDispatch.openRunHistory('logistics_scheduling')")
             await page.wait_for_selector('[data-history-range]')
             assert await page.locator('[data-history-range]').inner_text()=='1–2 de 2'
-            assert 'Aprobación · acceso compartido' in await page.locator('.dispatch-run-history__list').inner_text()
+            assert 'Aprobación · usuario identificado' in await page.locator('.dispatch-run-history__list').inner_text()
             assert not await page.evaluate('document.documentElement.scrollWidth>innerWidth')
             await page.locator('[data-close]').click()
             await page.evaluate("id=>window.DationDispatch.openRun(id,'logistics_assignment')",assignment)
@@ -286,7 +286,7 @@ async def journey():
             download=await downloaded.value
             contents=Path(await download.path()).read_text()
             assert contents and len(contents.splitlines())>=2
-            retained_case=await (await context.request.get(base+'/api/decision-cases/'+case)).json()
+            retained_case=await (await api_get(context,base+'/api/decision-cases/'+case)).json()
             runs_before=sum(method=='POST' and path=='/api/runs' for method,path in requests)
             await page.evaluate("window.dationNavigate('logistics-overview')")
             await page.wait_for_selector('[data-start-new-decision]')
@@ -301,7 +301,7 @@ async def journey():
             assert all(workspace[key] is None for key in ('orders','decisionCase','run','activeNode'))
             assert 'case_id=' not in page.url
             assert sum(method=='POST' and path=='/api/runs' for method,path in requests)==runs_before
-            assert await (await context.request.get(base+'/api/decision-cases/'+case)).json()==retained_case
+            assert await (await api_get(context,base+'/api/decision-cases/'+case)).json()==retained_case
             assert case in await page.evaluate("JSON.parse(sessionStorage.getItem('dation.dispatch.drafts.v1'))")
             await ui.checkpoint('new-decision-after-mobile-history')
             assert not errors

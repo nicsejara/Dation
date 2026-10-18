@@ -2,6 +2,7 @@
 import asyncio
 import copy
 import unittest
+from platform_fixtures import TenantTestCase, WORKSPACE
 from unittest.mock import AsyncMock, patch
 
 import httpx
@@ -9,7 +10,7 @@ from app.services import decision_case_service as cases, http_service, run_servi
 from main import app
 
 
-class CaseListTests(unittest.IsolatedAsyncioTestCase):
+class CaseListTests(TenantTestCase):
     def bundle(self, identifier=0):
         return {'case_row':{'id':str(identifier),'orders_dataset_id':'orders',
                 'fleet_dataset_id':'fleet','state_json':{}},
@@ -57,7 +58,7 @@ class CaseListTests(unittest.IsolatedAsyncioTestCase):
             with self.assertRaises(ValueError):await cases.list_cases()
 
 
-class PoolTests(unittest.IsolatedAsyncioTestCase):
+class PoolTests(TenantTestCase):
     async def test_lifespan_shares_client_with_parallel_tasks_and_closes_on_shutdown(self):
         requests=[]
         async def respond(request):

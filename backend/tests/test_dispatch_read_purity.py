@@ -1,11 +1,12 @@
 import unittest
+from platform_fixtures import TenantTestCase, WORKSPACE
 from unittest.mock import AsyncMock, patch
 import httpx
 from app.services import dispatch_service as dispatch
 from app.services import run_service
 
 
-class ReadPurityTests(unittest.IsolatedAsyncioTestCase):
+class ReadPurityTests(TenantTestCase):
     async def test_get_stale_run_never_writes(self):
         methods=[]
         async def handler(request):
@@ -49,7 +50,7 @@ class ReadPurityTests(unittest.IsolatedAsyncioTestCase):
             with self.subTest(status=status):self.assertFalse((await self.probe(status))[0])
 
     async def test_rpc_diagnostics_use_authorized_catalog_without_execution(self):
-        self.assertTrue((await self.probe(200,{'/rpc/set_default_fleet':{'post':{}}}))[0])
+        self.assertTrue((await self.probe(200,{'/rpc/platform_rpc':{'post':{}}}))[0])
         self.assertFalse((await self.probe(200))[0])
 
     async def test_missing_queue_schema_blocks_execution_availability(self):

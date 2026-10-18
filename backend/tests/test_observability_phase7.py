@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 import json
 import logging
 import unittest
+from platform_fixtures import TenantTestCase, WORKSPACE
 from unittest.mock import AsyncMock, patch
 from uuid import uuid4
 import httpx
@@ -15,7 +16,7 @@ from app.services import llm_service as llm, decision_interpreter_service as int
 from app.services import dispatch_job_service as jobs, operations_service as operations
 
 
-class TelemetryTests(unittest.IsolatedAsyncioTestCase):
+class TelemetryTests(TenantTestCase):
     async def test_parallel_requests_keep_correlation_and_registered_route_labels(self):
         api=FastAPI();api.add_middleware(telemetry.RequestTelemetry)
         @api.get('/things/{identifier}')
@@ -96,7 +97,7 @@ class TelemetryTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.body['intent_fingerprint'],hashlib.sha256(json.dumps(request,sort_keys=True,separators=(',',':')).encode()).hexdigest())
 
 
-class LLMTests(unittest.IsolatedAsyncioTestCase):
+class LLMTests(TenantTestCase):
     @asynccontextmanager
     async def client(self,handler):
         async with httpx.AsyncClient(transport=httpx.MockTransport(handler), base_url='https://synthetic.local') as client:
@@ -167,7 +168,7 @@ class LLMTests(unittest.IsolatedAsyncioTestCase):
             with self.assertRaises(TimeoutError):await interpreter.answer_question(run_id=str(uuid4()),question='Why?')
 
 
-class OperationsTests(unittest.IsolatedAsyncioTestCase):
+class OperationsTests(TenantTestCase):
     async def test_probe_failure_and_healthy_database_without_worker_are_distinct(self):
         with patch.object(operations.dispatch,'db',side_effect=httpx.ConnectError('secret host')):
             result=await operations.operational_snapshot()

@@ -734,7 +734,7 @@ async function executeConfiguredScheduling({sourceRun,configuration,options}){
   catch(error){if(generation===pollGeneration){poll(id,generation,'logistics_scheduling',{graceUntil:Date.now()+10000});await runPolling.refresh();}}
 }
 window.DationDispatch={show,openRun,isReady:ready,getWorkspace:()=>state,startNewDecision,openCase:(caseId,view='logistics-map',nodeId=null)=>navigateResource(view,{caseId,nodeId}),openActiveDecisionResult:()=>openCaseResult(state.activeNode),getActiveDecision:()=>({id:state.activeNode,label:DECISION_LABELS[state.activeNode],hasRun:Boolean(state.decisionCase?.nodes?.[state.activeNode]?.run_id),status:state.decisionCase?.nodes?.[state.activeNode]?.status})};
-window.dationNavigate=(view,stage,event)=>{event?.preventDefault();return navigateResource(view);};
+window.dationNavigate=(view,stage,event)=>{event?.preventDefault();event?.stopPropagation();return navigateResource(view);};
 document.body.classList.add('dispatch-enabled');
 mountTraceability();
 async function restoreResource(){try{const target=readResource(location.href);await navigateResource(target.view,{...target,history:false});}catch(error){document.body.classList.add('dispatch-result');renderView('decision-dashboard');roots.dashboard.hidden=false;errorBox(roots.dashboard,error,()=>navigate('logistics-data'));}}

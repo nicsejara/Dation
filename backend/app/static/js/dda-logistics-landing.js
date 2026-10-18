@@ -36,7 +36,8 @@
 
   function savedWorkspace(){
     try{
-      return JSON.parse(sessionStorage.getItem(WORKSPACE_KEY)||"{}");
+      var saved=JSON.parse(sessionStorage.getItem(WORKSPACE_KEY)||"{}");
+      return saved&&typeof saved==="object"&&!Array.isArray(saved)?saved:{};
     }catch(error){
       return {};
     }

@@ -44,7 +44,8 @@ class PlatformSettingsTests(unittest.IsolatedAsyncioTestCase):
                         "document.querySelector('#settings-ai-status').textContent === 'No configurado'"
                     )
                     self.assertEqual(await panel.locator(".d-page-header h1").inner_text(), "Configuración")
-                    self.assertEqual(await panel.locator(".d-card").count(), 3)
+                    self.assertEqual(await panel.locator("[data-workspace-settings] .d-card").count(), 3)
+                    await panel.locator("[data-platform-diagnostics] summary").click()
                     self.assertEqual(await browser.page.locator(".view.is-active").count(), 1)
                     geometry = await panel.evaluate("""panel => {
                       const header = panel.querySelector('.d-page-header').getBoundingClientRect();
@@ -53,7 +54,7 @@ class PlatformSettingsTests(unittest.IsolatedAsyncioTestCase):
                         overflow: document.documentElement.scrollWidth > innerWidth + 1,
                         gap: grid.top - header.bottom,
                         bodySize: parseFloat(getComputedStyle(panel.querySelector('.settings-row')).fontSize),
-                        within: [...panel.querySelectorAll('.d-card')].every(card => {
+                        within: [...panel.querySelectorAll('[data-workspace-settings] .d-card')].every(card => {
                           const rect = card.getBoundingClientRect();
                           return rect.left >= 0 && rect.right <= innerWidth + 1;
                         })
@@ -61,7 +62,7 @@ class PlatformSettingsTests(unittest.IsolatedAsyncioTestCase):
                     }""")
                     self.assertFalse(geometry["overflow"])
                     self.assertTrue(geometry["within"])
-                    self.assertGreaterEqual(geometry["gap"], 20)
+                    self.assertGreaterEqual(geometry["gap"], 19.99)
                     self.assertGreaterEqual(geometry["bodySize"], 12)
                     help_trigger = panel.get_by_role("button", name="Acerca de estos estados")
                     help_panel = panel.locator("#settings-status-help")

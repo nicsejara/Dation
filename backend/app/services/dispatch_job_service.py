@@ -8,6 +8,7 @@ import os
 from threading import Event, Lock
 from uuid import uuid4
 from time import perf_counter
+from app.platform.context import bind, current, job_context, worker_infrastructure
 from app.observability import bind_context, context, event, identify, metrics
 
 import httpx
@@ -43,14 +44,19 @@ async def enqueue(orders_id, fleet_id, configuration, options, run_id, decision_
     node = (decision_case or {}).get("node_id")
     identify(run_id=run_id, case_id=(decision_case or {}).get("case_id"))
     engine_name, engine_version, schema = engine_identity(node)
-    request = {"orders_id":orders_id,"fleet_id":fleet_id,"configuration":configuration,
+    request = {"workspace_id":current().workspace_id,"orders_id":orders_id,"fleet_id":fleet_id,"configuration":configuration,
                "options":options,"decision_case":decision_case,"source_run_id":source_run_id,
                "engine_name":engine_name,"engine_version":engine_version,"schema_version":schema}
     fingerprint = hashlib.sha256(json.dumps(request,sort_keys=True,separators=(",",":"),allow_nan=False).encode()).hexdigest()
     # Replays resolve the SAME intention before checking mutable upstream approval.
-    existing = await dispatch.db("GET","dispatch_run_jobs",params={"run_id":f"eq.{run_id}","select":"request_fingerprint","limit":"1"})
+    existing = await dispatch.db("GET","dispatch_run_jobs",params={"run_id":f"eq.{run_id}","select":"request_fingerprint,request_json","limit":"1"})
     if existing:
-        if existing[0]["request_fingerprint"] != fingerprint:
+        compatible = {fingerprint}
+        if not (existing[0].get("request_json") or {}).get("workspace_id"):
+            # Completed pre-migration jobs keep their original intention hash.
+            legacy_request = {key:value for key,value in request.items() if key != "workspace_id"}
+            compatible.add(hashlib.sha256(json.dumps(legacy_request,sort_keys=True,separators=(",",":"),allow_nan=False).encode()).hexdigest())
+        if existing[0]["request_fingerprint"] not in compatible:
             raise RunConflict("Ese run_id ya identifica una configuración diferente.")
         run = await get_run(run_id)
         if not run:
@@ -106,14 +112,17 @@ async def reconcile_cases(limit=10):
     for task in tasks:
         case_id, version = task["case_id"], task["version"]
         try:
-            await cases.sync_case_history(case_id)
-            await dispatch.db("POST","rpc/ack_case_reconciliation",body={"target_case_id":case_id,"observed_version":version})
+            with bind(job_context(task)):
+                await cases.sync_case_history(case_id)
+            with bind(job_context(task)):
+                await dispatch.db("POST","rpc/ack_case_reconciliation",body={"target_case_id":case_id,"observed_version":version})
             event("case_reconciled", case_id=case_id, version=version)
         except (httpx.HTTPError,ValueError,LookupError):
             attempts = task["attempts"] + 1
             # Conditional write: never delay a newer completion or approval.
             try:
-                await dispatch.db("PATCH","decision_case_reconciliations",params={"case_id":f"eq.{case_id}","version":f"eq.{version}"},
+                with bind(job_context(task)):
+                    await dispatch.db("PATCH","decision_case_reconciliations",params={"case_id":f"eq.{case_id}","version":f"eq.{version}"},
                     body={"attempts":attempts,"available_at":(now+timedelta(seconds=min(300,2**min(attempts,8)))).isoformat()})
             except httpx.HTTPError:
                 pass
@@ -123,7 +132,7 @@ async def reconcile_cases(limit=10):
 async def process_job(job):
     request = job['request_json']
     case = request.get('decision_case') or {}
-    with bind_context(request.get('_observability'), run_id=job['run_id'], case_id=case.get('case_id')):
+    with bind(job_context(job)), bind_context(request.get('_observability'), run_id=job['run_id'], case_id=case.get('case_id')):
         started = perf_counter()
         event('dispatch_claimed', node_id=case.get('node_id'), attempt=job['attempts'],
               wait_ms=max(0, (datetime.now(timezone.utc)-datetime.fromisoformat(job['created_at'].replace('Z','+00:00'))).total_seconds()*1000) if job.get('created_at') else None)

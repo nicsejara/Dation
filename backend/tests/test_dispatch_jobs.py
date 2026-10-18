@@ -3,6 +3,7 @@ import hashlib
 import json
 from pathlib import Path
 import unittest
+from platform_fixtures import TenantTestCase, WORKSPACE
 from unittest.mock import AsyncMock, patch
 
 import httpx
@@ -20,7 +21,7 @@ C = '00000000-0000-4000-8000-000000000004'
 
 def request_data(case=None):
     name, version, schema = jobs.engine_identity((case or {}).get('node_id'))
-    return dict(orders_id=O, fleet_id=F, configuration={'objective':'balanced'}, options={},
+    return dict(workspace_id=WORKSPACE,orders_id=O, fleet_id=F, configuration={'objective':'balanced'}, options={},
                 decision_case=case, source_run_id=None, engine_name=name, engine_version=version, schema_version=schema)
 
 
@@ -33,7 +34,7 @@ def http_error(code, status=400):
     return httpx.HTTPStatusError('QA provider error',request=response.request,response=response)
 
 
-class JobAdmissionTests(unittest.IsolatedAsyncioTestCase):
+class JobAdmissionTests(TenantTestCase):
     async def test_same_intention_replays_before_mutable_upstream_validation(self):
         case = {'case_id':C,'node_id':'logistics_scheduling'}
         request = request_data(case)
@@ -78,9 +79,9 @@ class JobAdmissionTests(unittest.IsolatedAsyncioTestCase):
                     await jobs.enqueue(O,F,{}, {},R,{'case_id':C,'node_id':'logistics_assignment'})
 
 
-class WorkerTests(unittest.IsolatedAsyncioTestCase):
+class WorkerTests(TenantTestCase):
     def job(self):
-        return {'run_id':R,'lease_token':C,'attempts':1,'request_json':request_data()}
+        return {'workspace_id':WORKSPACE,'run_id':R,'lease_token':C,'attempts':1,'request_json':request_data()}
 
     async def test_completed_result_is_written_once_with_lease_and_progress_is_nonblocking(self):
         async def execute(*args,execution_writer,progress_handler):
@@ -116,7 +117,7 @@ class WorkerTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(db.await_args.kwargs['body']['terminal_values']['status'],'error')
 
     async def test_projection_failure_only_reschedules_observed_outbox_version(self):
-        with patch.object(dispatch,'db',AsyncMock(side_effect=[[{'case_id':C,'version':7,'attempts':2}],[]])) as db, \
+        with patch.object(dispatch,'db',AsyncMock(side_effect=[[{'workspace_id':WORKSPACE,'case_id':C,'version':7,'attempts':2}],[]])) as db, \
              patch.object(jobs.cases,'sync_case_history',AsyncMock(side_effect=httpx.ConnectError('offline'))):
             await jobs.reconcile_cases()
         command=db.await_args_list[-1]
@@ -126,7 +127,7 @@ class WorkerTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(any(call.args[1]=='decision_runs' for call in db.await_args_list))
 
     async def test_projection_acknowledges_only_observed_version(self):
-        with patch.object(dispatch,'db',AsyncMock(side_effect=[[{'case_id':C,'version':8,'attempts':0}],None])) as db, \
+        with patch.object(dispatch,'db',AsyncMock(side_effect=[[{'workspace_id':WORKSPACE,'case_id':C,'version':8,'attempts':0}],None])) as db, \
              patch.object(jobs.cases,'sync_case_history',AsyncMock()):
             await jobs.reconcile_cases()
         self.assertEqual(db.await_args.kwargs['body'],{'target_case_id':C,'observed_version':8})
@@ -148,7 +149,7 @@ class WorkerTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(payload['input_fingerprint'])
 
 
-class DurableHTTPTests(unittest.IsolatedAsyncioTestCase):
+class DurableHTTPTests(TenantTestCase):
     async def asyncSetUp(self):
         app.dependency_overrides[require_upload_access]=lambda:'dation'
         self.client=httpx.AsyncClient(transport=httpx.ASGITransport(app=app),base_url='http://qa')

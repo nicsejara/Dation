@@ -1,4 +1,5 @@
 import unittest
+from platform_fixtures import TenantTestCase, WORKSPACE
 from datetime import datetime
 from pathlib import Path
 from unittest.mock import AsyncMock, patch
@@ -324,7 +325,7 @@ class DataPackValidationTests(unittest.TestCase):
         )
 
 
-class DataPackHTTPTests(unittest.IsolatedAsyncioTestCase):
+class DataPackHTTPTests(TenantTestCase):
     async def asyncSetUp(self):
         self.client = httpx.AsyncClient(
             transport=httpx.ASGITransport(app=app),

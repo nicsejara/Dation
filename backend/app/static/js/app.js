@@ -657,6 +657,7 @@ function mountLibraryView(view){
     const help=panel.querySelector('#settings-status-help');
     if(trigger&&help)mountDropdown({trigger,panel:help});
   }
+  if(view==='settings'&&window.dationSession?.identity?.membership?.access_role!=='admin')return;
   const work=view==='settings'?refreshInterpreter(scope).then(()=>scope.active&&refreshSystemStatus(scope)):Promise.all([refreshDatasets(scope),refreshRuns(scope),refreshSummary(scope)]);
   work.catch(error=>{if(scope.active)toast(error.message,'error');});
 }

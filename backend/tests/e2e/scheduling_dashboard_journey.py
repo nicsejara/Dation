@@ -3,6 +3,7 @@ import asyncio,csv,io,json,os
 from pathlib import Path
 from urllib.parse import urlparse
 from playwright.async_api import async_playwright
+from browser_auth import authenticate, api_get
 
 MANIFEST=Path(os.environ['DATION_E2E_SCHEDULING']);DATA=json.loads(MANIFEST.read_text());BASE=os.environ['DATION_E2E_URL']
 assert urlparse(BASE).hostname=='127.0.0.1'
@@ -10,7 +11,8 @@ async def main():
     errors=[];writes=[];states=[]
     async with async_playwright() as pw:
         browser=await pw.chromium.launch(executable_path=os.getenv('CHROMIUM_EXECUTABLE') or '/usr/bin/chromium',headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
-        context=await browser.new_context(http_credentials={'username':'dation','password':os.environ['DATION_ACCESS_PASSWORD']},reduced_motion='reduce')
+        context=await browser.new_context(reduced_motion='reduce')
+        await authenticate(context,BASE)
         page=await context.new_page();page.set_default_timeout(20000)
         page.on('pageerror',lambda e:errors.append(str(e)))
         page.on('request',lambda r:writes.append((r.method,urlparse(r.url).path)) if r.method!='GET' and '/api/' in r.url else None)
@@ -57,7 +59,7 @@ async def main():
         assert await page.locator('[data-approve-final]').is_disabled()
         assert all(path.endswith('/approve') or path=='/api/runs/preflight' for _,path in writes),writes
         assert sum(path.endswith('/approve') for _,path in writes)==1,writes
-        persisted=await (await context.request.get(BASE+'/api/runs/'+DATA['run']['id'])).json()
+        persisted=await (await api_get(context,BASE+'/api/runs/'+DATA['run']['id'])).json()
         assert persisted['approved_at'] and persisted['result_fingerprint']==DATA['run']['result_fingerprint']
         await page.locator('[data-more-menu] summary').click();await page.locator('[data-dashboard-map]').click()
         await page.locator('[data-map-node=logistics_scheduling][data-map-action=open-result]').first.wait_for()

@@ -3,13 +3,15 @@ import asyncio,json,os
 from pathlib import Path
 from urllib.parse import urlparse
 from playwright.async_api import async_playwright
+from browser_auth import authenticate
 A=Path(os.environ['DATION_E2E_MATRIX']);matrix=json.loads(A.read_text());BASE=os.environ['DATION_E2E_URL']
 assert urlparse(BASE).hostname=='127.0.0.1'
 async def main():
  errors=[];writes=[];results=[]
  async with async_playwright() as pw:
   browser=await pw.chromium.launch(executable_path=os.getenv('CHROMIUM_EXECUTABLE') or '/usr/bin/chromium',headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
-  context=await browser.new_context(http_credentials={'username':'dation','password':os.environ['DATION_ACCESS_PASSWORD']},viewport={'width':1440,'height':1000},reduced_motion='reduce')
+  context=await browser.new_context(viewport={'width':1440,'height':1000},reduced_motion='reduce')
+  await authenticate(context,BASE)
   page=await context.new_page();page.set_default_timeout(30000)
   page.on('pageerror',lambda error:errors.append(str(error)))
   page.on('request',lambda request:writes.append((request.method,urlparse(request.url).path)) if request.method!='GET' and '/api/' in request.url else None)

@@ -5,6 +5,12 @@ Dation is an experimental **Decision Intelligence** platform built around
 that combine structured data, deterministic analytics, configurable priorities
 and human validation.
 
+## Access and workspaces
+
+The platform uses Supabase Auth (email/password, confirmation and recovery), workspace memberships and Bearer-protected business APIs. Shared HTTP Basic credentials are retired. Sign in at `/login`; new users create a workspace after confirmation. Existing data belongs only to the explicitly authorized legacy administrator. See [Auth and migration](docs/platform-mvp/10-phase2-auth-tenancy.md) and [platform navigation](docs/platform-mvp/11-phase3-shell-navigation.md).
+
+The backend keeps refresh tokens HttpOnly, validates asymmetric JWTs and scopes service-key queries/RPCs/Storage by workspace. Browser code never receives the service key. Production migrations require the controlled backup/drain/deploy/admissions sequence; do not run them during normal setup.
+
 ## Current MVP
 
 The first active domain is **DDA Logística**. Its data layer is now organized as a progressive **Logistics Data Pack**:

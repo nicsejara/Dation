@@ -8,10 +8,11 @@ import json
 from time import perf_counter
 from urllib.parse import quote
 from uuid import uuid4
+from app.platform.context import current
 
 import httpx
 
-from app.services.http_service import http_client
+from app.platform.repository import http_client
 
 from app.config import (
     SUPABASE_INPUT_BUCKET,
@@ -148,6 +149,7 @@ async def _probe_rpc_catalog(required):
         if not response.is_success:
             return False, f"No se pudo verificar la función (HTTP {response.status_code})."
         paths = response.json().get("paths", {})
+        required = [name if name in {"claim_dispatch_job", "claim_comparative_analysis", "report_dispatch_worker"} else "platform_rpc" for name in required]
         missing = [name for name in required if "post" not in paths.get("/rpc/" + name, {})]
         if missing:
             return False, "Funciones ausentes en el catálogo autorizado: " + ", ".join(missing)
@@ -500,7 +502,7 @@ async def store_input(
 
     dataset_id = str(uuid4())
     canonical_name = canonical_filename(kind)
-    storage_path = f"{dataset_id}/{canonical_name}"
+    storage_path = f"{current().workspace_id}/{dataset_id}/{canonical_name}"
     url = (
         f"{SUPABASE_URL}/storage/v1/object/"
         f"{SUPABASE_INPUT_BUCKET}/{quote(storage_path, safe='/')}"
