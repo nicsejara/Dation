@@ -1,0 +1,28 @@
+{
+  "auth_flows_exercised": false,
+  "configuration": {
+    "custom_smtp_configured": false,
+    "observed": {
+      "disable_signup": false,
+      "external_email_enabled": true,
+      "jwt_exp": 3600,
+      "mailer_autoconfirm": false,
+      "password_min_length": 6,
+      "security_captcha_enabled": false,
+      "site_url": "http://localhost:3000",
+      "uri_allow_list": ""
+    },
+    "status": 200
+  },
+  "jwks": {
+    "algorithms": [
+      "ES256"
+    ],
+    "key_types": [
+      "EC"
+    ],
+    "keys": 1,
+    "status": 200
+  },
+  "read_only": true
+}
