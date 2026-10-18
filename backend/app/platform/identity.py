@@ -4,6 +4,7 @@ from fastapi import HTTPException
 from app.config import SUPABASE_SECRET_KEY, SUPABASE_URL
 from app.platform.context import RequestContext
 from app.services.http_service import http_client
+from app.platform.entitlements import enabled_ddas
 
 
 def headers():
@@ -42,4 +43,5 @@ async def resolve(claims) -> RequestContext:
     if not membership:
         raise HTTPException(409, "Creá tu workspace para continuar.", headers={"X-Dation-Setup": "required"})
     return RequestContext(claims["sub"], membership["workspace_id"], membership["access_role"],
-                          membership.get("business_role"))
+                          membership.get("business_role"),
+                          enabled_ddas=enabled_ddas(data, membership["workspace_id"]))

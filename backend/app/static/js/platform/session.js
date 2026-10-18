@@ -12,7 +12,7 @@
   const next=body.profile.id+':'+body.membership.workspace_id;
   if(owner&&owner!==next){clearPrivateState();location.replace('/app');throw new Error('La sesión cambió.');}
   if(sessionStorage.getItem('_dation_identity')!==next){clearPrivateState();sessionStorage.setItem('_dation_identity',next);}
-  owner=next;session=body;return body;
+  owner=next;session=body;window.dispatchEvent(new CustomEvent('dation:identity'));return body;
  }
  async function refresh(){if(!pending)pending=load().finally(()=>{pending=null;});return pending;}
  const ready=refresh();
@@ -25,6 +25,7 @@
   const response=await nativeFetch(input,{...options,headers,credentials:'same-origin'});
   // A failed mutation is never replayed implicitly. Let the user retry deliberately.
   if(response.status===401){await refresh();}
+  if(response.status===403&&response.headers.get('X-Dation-Entitlement')==='disabled'){await refresh();}
   return response;
  };
  // Native links cannot attach a Bearer header; download protected templates via fetch.

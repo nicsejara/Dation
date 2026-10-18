@@ -3,6 +3,7 @@ from fastapi import HTTPException, Request
 from app.platform.context import bind
 from app.platform.identity import resolve
 from app.platform.jwt import verify
+from app.platform.entitlements import logistics_api, require_dda
 
 READ_POSTS = {"/api/runs/preflight", "/api/runs/assignment-preview", "/api/datasets/validate"}
 ADMIN_PATHS = {"/ready", "/metrics", "/api/system/operations", "/api/system/supabase-check"}
@@ -21,5 +22,7 @@ async def require_upload_access(request: Request):
             raise HTTPException(403, "Tu rol permite consultar, pero no modificar datos o decisiones.")
     if request.headers.get("x-dation-workspace-id") not in {None, ctx.workspace_id}:
         raise HTTPException(403, "El workspace solicitado no coincide con tu acceso activo.")
+    if logistics_api(request.url.path):
+        require_dda(ctx, "logistics")
     with bind(ctx):
         yield ctx

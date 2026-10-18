@@ -2,6 +2,7 @@ import {mountDropdown} from './components.mjs';
 import {createScope} from '../dispatch/lifecycle.mjs';
 import {PLATFORM_PATHS,readResource} from '../dispatch/navigation.mjs';
 import {mountWorkspaceHome} from './home.mjs';
+import {ddaEnabled} from './entitlements.mjs';
 
 const labels={'platform-home':'Inicio',inicio:'Decision Data Assets','platform-decisions':'Decision Center','platform-data':'Datos','platform-team':'Equipo',settings:'Configuración',profile:'Mi perfil'};
 const roles={admin:'Administrador',operator:'Operador',viewer:'Solo lectura'};
@@ -26,8 +27,13 @@ export function mountPlatformShell(){
   event.preventDefault();menu.close({restoreFocus:false});window.dationNavigate(link.dataset.platformView);
  });
  const home=mountWorkspaceHome(document.querySelector('[data-platform-home]'),()=>identity);scope.own(()=>home.dispose());
- document.querySelector('[data-platform-decisions]').append(card('Tus decisiones','Consultá las corridas y la evidencia guardada en el historial actual. El centro unificado de decisiones estará disponible próximamente.',[['Abrir historial','traceability'],['Mapa de decisiones de Logística','logistics-map']]));
- document.querySelector('[data-platform-data]').append(card('Datos del workspace','Consultá los archivos existentes o prepará un Data Pack para Logística. La gestión unificada de Data Hub estará disponible próximamente.',[['Ver biblioteca','traceability'],['Preparar Data Pack','logistics-data']]));
+ function renderBusinessAccess(){
+  const enabled=ddaEnabled(identity,'logistics');
+  document.querySelector('[data-platform-decisions]').replaceChildren(card('Tus decisiones',enabled?'Consultá las corridas y la evidencia guardada en el historial actual. El centro unificado de decisiones estará disponible próximamente.':'DDA Logística no está habilitado en este workspace.',enabled?[['Abrir historial','traceability'],['Mapa de decisiones de Logística','logistics-map']]:[['Ver Decision Data Assets','inicio']]));
+  document.querySelector('[data-platform-data]').replaceChildren(card('Datos del workspace',enabled?'Consultá los archivos existentes o prepará un Data Pack para Logística. La gestión unificada de Data Hub estará disponible próximamente.':'Explorá los Decision Data Assets disponibles para tu workspace.',enabled?[['Ver biblioteca','traceability'],['Preparar Data Pack','logistics-data']]:[['Ver Decision Data Assets','inicio']]));
+ }
+ renderBusinessAccess();
+ scope.listen(window,'dation:identity',()=>{identity={...window.dationSession.identity,profile:identity.profile};renderIdentity();renderBusinessAccess();});
  document.querySelector('[data-platform-team]').append(card(identity.workspace.name,'Tu acceso actual: '+roles[identity.membership.access_role]+'. La administración de invitaciones y responsabilidades del equipo estará disponible próximamente.'));
  const settings=document.querySelector('[data-workspace-settings]');
  for(const [title,values]of [['Workspace',[['Nombre',identity.workspace.name],['País',identity.workspace.country],['Zona horaria',identity.workspace.timezone]]],['Preferencias',[['Idioma',identity.workspace.language],['Moneda',identity.workspace.currency],['Unidades',[identity.workspace.weight_unit,identity.workspace.distance_unit].filter(Boolean).join(' · ')]]],['Mi acceso',[['Rol',roles[identity.membership.access_role]],['Responsabilidad',identity.membership.business_role||'Sin asignar'],['Workspace','Activo']]]]){

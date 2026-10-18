@@ -1198,6 +1198,7 @@
   async function boot() {
     bindControls();
     setControlsEnabled(false);
+    if(window.dationDdaEnabled?.('logistics')===false)return;
 
     state.runId = currentRunId();
 

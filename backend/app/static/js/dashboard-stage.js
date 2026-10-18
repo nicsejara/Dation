@@ -3406,6 +3406,7 @@
 
   function boot() {
     bindControls();
+    if(window.dationDdaEnabled?.('logistics')===false)return;
     refreshLatestDecisionCta();
     restoreExecution();
   }

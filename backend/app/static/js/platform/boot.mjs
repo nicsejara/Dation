@@ -1,6 +1,9 @@
 // Load existing DDA modules once, after identity and tab caches are isolated.
 async function start(){
  try{await window.dationSession.ready;}catch{return;}
+ const {syncEntitlementFallback,ddaEnabled}=await import('./entitlements.mjs');
+ window.dationDdaEnabled=id=>ddaEnabled(window.dationSession.identity,id);syncEntitlementFallback();
+ window.addEventListener('dation:identity',syncEntitlementFallback);
  for(const element of document.querySelector('#dation-app-scripts').content.querySelectorAll('script')){
   if(element.type==='module')continue;
   await new Promise((resolve,reject)=>{const script=document.createElement('script');script.src=element.src;script.onload=resolve;script.onerror=()=>reject(new Error('No se pudo cargar la aplicación.'));document.body.append(script);});

@@ -5,6 +5,7 @@ import {renderDecisionMap} from './decision-map.mjs';
 import {mountAssignmentConfig,filterPayload,normalizeRawWeights} from './assignment-config.mjs';
 import {STATUS,createDecisionCase,replaceInputs,transitionNode,inputSignature,caseRef,deriveDecisionNodes,continuationState,getCaseTransitionNotice} from './decision-case.mjs';
 import {DECISION_META} from './decision-ui.mjs';
+import {currentLogisticsEnabled,logisticsView} from '../platform/entitlements.mjs';
 
 const KEY='dation.dispatch.workspace.v5';
 const NAV_VERSION='workspace-nav-v1';
@@ -697,6 +698,9 @@ async function hydrateCase(caseId,generation=routeGeneration){
   state.orders=item.orders;state.fleet=item.fleet;state.decisionCase={...item.decision_case,persisted:true};persist();return item;
 }
 async function navigateResource(view,options={}){
+  if(logisticsView(view)&&!currentLogisticsEnabled()){
+    return navigateResource('inicio',{replace:true,caseId:null,nodeId:null});
+  }
   const aliases={overview:'logistics-overview',library:'traceability'};
   const publicView=Object.entries(aliases).find(([,value])=>value===view)?.[0]||view;
   const next={view:publicView,caseId:options.caseId===undefined?state.decisionCase?.id||null:options.caseId,nodeId:options.nodeId===undefined?state.activeNode:options.nodeId,runId:options.runId||(publicView==='decision-dashboard'?state.run?.id||resource?.runId:null)};
@@ -739,6 +743,7 @@ document.body.classList.add('dispatch-enabled');
 mountTraceability();
 async function restoreResource(){try{const target=readResource(location.href);await navigateResource(target.view,{...target,history:false});}catch(error){document.body.classList.add('dispatch-result');renderView('decision-dashboard');roots.dashboard.hidden=false;errorBox(roots.dashboard,error,()=>navigate('logistics-data'));}}
 window.addEventListener('popstate',restoreResource);
+window.addEventListener('dation:identity',()=>{if(!currentLogisticsEnabled()&&logisticsView(window.dationGetCurrentView?.()))navigateResource('inicio',{replace:true,caseId:null,nodeId:null});});
 window.addEventListener('pagehide',()=>{routeController?.abort();routeGeneration++;pollGeneration++;runPolling.stop();for(const root of Object.values(roots))disposeScope(root);});
 window.addEventListener('pageshow',event=>{if(event.persisted)restoreResource();});
 restoreResource();

@@ -12,6 +12,7 @@ class RequestContext:
     access_role: str
     business_role: str | None = None
     worker: bool = False
+    enabled_ddas: frozenset[str] = frozenset()
 
     def __post_init__(self):
         UUID(self.workspace_id)
