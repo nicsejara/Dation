@@ -21,6 +21,11 @@ async def main():
   for width in [1440,1024,768,390]:
    await page.set_viewport_size({'width':width,'height':1000});assert await page.evaluate('document.documentElement.scrollWidth<=innerWidth+1')
    menu=page.get_by_role('button',name='Abrir menú de usuario');await menu.focus();await page.keyboard.press('ArrowDown');assert await page.locator('[data-user-menu-panel]').is_visible();await page.keyboard.press('Escape');assert not await page.locator('[data-user-menu-panel]').is_visible();assert await menu.evaluate('n=>n===document.activeElement')
+  await page.evaluate("window.dationNavigate('logistics-data')")
+  async with page.expect_download() as download:
+   await page.locator('a[download="orders.csv"]').first.click()
+  saved=await download.value;assert saved.suggested_filename=='orders.csv'
+  assert 'order_id' in Path(await saved.path()).read_text().splitlines()[0]
   await page.get_by_role('button',name='Abrir menú de usuario').click();await page.get_by_role('menuitem',name='Mi perfil').click();await page.get_by_label('Nombre',exact=True).fill('Perfil actualizado');await page.get_by_label('Apellido',exact=True).fill('User');await page.get_by_role('button',name='Guardar perfil').click();await page.get_by_text('Perfil actualizado.',exact=True).wait_for()
   assert await page.get_by_label('Email',exact=True).get_attribute('readonly') is not None
   assert await page.locator('[data-user-name]').inner_text()=='Perfil actualizado User'

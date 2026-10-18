@@ -27,6 +27,18 @@
   if(response.status===401){await refresh();}
   return response;
  };
+ // Native links cannot attach a Bearer header; download protected templates via fetch.
+ document.addEventListener('click',async event=>{
+  const anchor=event.target.closest?.('a[download]');if(!anchor)return;
+  const url=new URL(anchor.href,location.href);if(url.origin!==location.origin||!url.pathname.startsWith('/api/'))return;
+  event.preventDefault();event.stopPropagation();if(anchor.dataset.downloading==='true')return;
+  anchor.dataset.downloading='true';anchor.setAttribute('aria-busy','true');
+  try{
+   const response=await window.fetch(url.href);if(!response.ok)throw new Error('No se pudo descargar el archivo. Reintentá.');
+   const objectUrl=URL.createObjectURL(await response.blob()),link=document.createElement('a');link.href=objectUrl;link.download=anchor.download||'datos.csv';link.hidden=true;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(objectUrl),5000);
+  }catch(error){const notice=document.querySelector('#toast');if(notice){notice.textContent=error.message;notice.classList.add('is-visible');}}
+  finally{delete anchor.dataset.downloading;anchor.removeAttribute('aria-busy');}
+ },true);
  async function logout(){
   const response=await nativeFetch('/auth/logout',{method:'POST',credentials:'same-origin'});
   if(!response.ok)throw new Error('No se pudo cerrar la sesión. Reintentá.');
