@@ -57,7 +57,10 @@ export function mountPlatformShell(){
    const active=link.dataset.platformView===view;link.classList.toggle('is-active',active);if(active)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current');
   }
   const breadcrumb=document.querySelector('[data-platform-breadcrumb]');breadcrumb.replaceChildren();
-  if(view?.startsWith('logistics-')||view==='decision-dashboard'){
+  const ddaView=view?.startsWith('logistics-')||view==='decision-dashboard';
+  breadcrumb.hidden=!ddaView;
+  if(!ddaView){const title=node('span',labels[view]||(view==='traceability'?'Historial y evidencia':'Dation'),'journey-step journey-step--title is-current');document.querySelector('#journey-nav').replaceChildren(title);}
+  if(ddaView){
    breadcrumb.append(action('Decision Data Assets','inicio'),node('span','/'),action('DDA Logística','logistics-overview'));
    try{const route=readResource(location.href);if(route.caseId)breadcrumb.append(node('span','/'),node('span','DC-'+route.caseId.slice(0,8)));if(route.nodeId)breadcrumb.append(node('span','/'),node('span',route.nodeId==='logistics_scheduling'?'Scheduling':'Assignment'));}catch{}
   }else{breadcrumb.append(node('span',labels[view]||(view==='traceability'?'Historial y evidencia':'Dation')));}
