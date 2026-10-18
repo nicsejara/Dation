@@ -4,11 +4,12 @@ Fecha de referencia: 2026-10-18 (`America/Buenos_Aires`). Fuente de requisitos: 
 
 ## Estado vigente
 
-Fases 2 y 3 implementadas; publicación bajo verificación en esta entrega. La Fase 2 pasó el gate A/B con API/RLS/RPC/Storage/worker reales y preservación de evidencia. La Fase 3 incorpora shell, rutas, menú y perfil. No se inicia Fase 4 automáticamente.
+Fases 2 y 3 implementadas y publicadas en el [PR #75](https://github.com/nicsejara/Dation/pull/75); el cierre de esta entrega incluye retorno seguro de BFCache. La Fase 2 pasó el gate A/B con API/RLS/RPC/Storage/worker reales y preservación de evidencia. La Fase 3 incorpora shell, rutas, menú y perfil. No se inicia Fase 4 automáticamente.
 
 - [Auth, identidad y migración](10-phase2-auth-tenancy.md).
 - [Shell y navegación](11-phase3-shell-navigation.md).
-- Validación local: 357 unittest, 13 funciones Python, 78 Node, 154 Chromium, 46 SQL históricos y 18 E2E del esquema final sin skips. CI del SHA exacto se exige antes de publicar.
+- Validación local: 357 unittest, 13 funciones Python, 78 Node, 155 Chromium, 46 SQL históricos y 18 E2E del esquema final sin skips. CI del SHA exacto se exige antes de publicar.
+- Verificación productiva: ingreso, refresh y logout reales de Supabase; cuenta temporal sin membresía bloqueada y luego eliminada; template y diez assets exactos. Evidencia de negocio sin cambios.
 - Backup/restauración previa: 91 registros y seis archivos, evidencia existente sin cambios; artifacts privados fuera del repo.
 - Configuración reutilizable de entorno: install_script y start_skill actualizados para Auth/Bearer, smoke sin escrituras y QA aislado. No se agregaron secretos nuevos.
 - Límite: la fixture Auth no certifica entrega real de correo. Primer acceso requiere registro y confirmación del administrador autorizado; no se envían correos desde scripts de release.
@@ -22,7 +23,7 @@ Los snapshots de auditoría anteriores describen deliberadamente el esquema prev
 | 0 | Completada | Auditoría y baseline entregados |
 | 1 | Implementada y validada | Foundation optativa, interacción/QA y consumidor real; [detalle](09-phase1-foundation.md) |
 | 2 | Implementada · gate A/B validado | Auth + identity + workspace + tenancy/security A/B |
-| 3 | Implementada · release en verificación | Platform shell + navegación/routing |
+| 3 | Implementada y publicada | Platform shell + navegación/routing |
 | 4 | Pendiente | Workspace Home real |
 | 5 | Pendiente | Catálogo + entitlements |
 | 6 | Pendiente | Data Hub |

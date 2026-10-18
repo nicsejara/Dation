@@ -47,17 +47,20 @@
  channel?.addEventListener('message',event=>{if(event.data==='logout'){clearPrivateState();location.replace('/login');}});
  window.dationSession=Object.freeze({ready,refresh,logout,get identity(){return session;}});
  window.addEventListener('pagehide',()=>document.documentElement.classList.add('d-session-loading'));
- window.addEventListener('pageshow',event=>{if(event.persisted)refresh().then(()=>document.documentElement.classList.remove('d-session-loading')).catch(()=>{});});
- ready.catch(error=>{
+ window.addEventListener('pageshow',event=>{if(event.persisted)refresh().then(()=>document.documentElement.classList.remove('d-session-loading')).catch(showSessionFailure);});
+ function showSessionFailure(error){
   if(error.status===401)return;
   document.documentElement.classList.remove('d-session-loading');
   const shell=document.querySelector('.app-shell');if(shell)shell.hidden=true;
-  const panel=document.createElement('main');panel.className='d-platform d-auth';
+  document.querySelector('[data-session-error]')?.remove();
+  const panel=document.createElement('main');panel.className='d-platform d-auth';panel.dataset.sessionError='true';
   const card=document.createElement('section');card.className='d-card d-auth__card';
   const title=document.createElement('h1');title.textContent='No se pudo abrir el workspace';
   const text=document.createElement('p');text.textContent=error.message;
   const retry=document.createElement('button');retry.className='d-button d-button--primary';retry.textContent='Reintentar';retry.onclick=()=>location.reload();
   const exit=document.createElement('button');exit.className='d-button d-button--secondary';exit.textContent='Cerrar sesión';exit.onclick=()=>logout().catch(exc=>{text.textContent=exc.message;});
   card.append(title,text,retry,exit);panel.append(card);document.body.append(panel);
- });
+  title.tabIndex=-1;title.focus({preventScroll:true});
+ }
+ ready.catch(showSessionFailure);
 })();
