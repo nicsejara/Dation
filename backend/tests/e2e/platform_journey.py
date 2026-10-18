@@ -17,6 +17,7 @@ async def main():
   before=await page.evaluate('history.length');await page.locator('.nav [data-platform-view="settings"]').click();await page.locator('[data-workspace-settings] .d-card').first.wait_for();assert await page.evaluate('history.length')==before+1
   assert not await page.locator('[data-platform-diagnostics]').evaluate('n=>n.open')
   await page.go_back();await page.locator('[data-home-dda-catalog]').wait_for(state='visible');await page.go_forward();await page.locator('[data-workspace-settings]').wait_for(state='visible')
+  await context.clear_cookies(name='dation_access')
   await page.reload();await page.locator('[data-workspace-settings]').wait_for(state='visible');assert urlsplit(page.url).path=='/app/settings'
   for width in [1440,1024,768,390]:
    await page.set_viewport_size({'width':width,'height':1000});assert await page.evaluate('document.documentElement.scrollWidth<=innerWidth+1')
@@ -31,7 +32,7 @@ async def main():
   assert await page.locator('[data-user-name]').inner_text()=='Perfil actualizado User'
   await page.reload();await page.get_by_label('Nombre',exact=True).wait_for();assert await page.get_by_label('Nombre',exact=True).input_value()=='Perfil actualizado'
   await page.locator('.nav [data-platform-view="platform-team"]').click();await page.get_by_role('heading',name='Equipo',exact=True).wait_for();assert await page.evaluate('document.documentElement.scrollWidth<=innerWidth+1')
-  await page.get_by_role('button',name='Abrir menú de usuario').click();await page.get_by_role('menuitem',name='Cerrar sesión').click();await page.wait_for_url('**/login');await page.goto(BASE+'/app/profile');await page.wait_for_url('**/login')
+  await page.get_by_role('button',name='Abrir menú de usuario').click();await page.get_by_role('menuitem',name='Cerrar sesión').click();await page.wait_for_url('**/login*');await page.goto(BASE+'/app/profile');await page.wait_for_url('**/login*')
   assert errors==[],errors
   await browser.close()
  print(json.dumps({'passed':True,'login':True,'history':True,'profile':True,'keyboard':True,'viewports':[1440,1024,768,390],'logout':True}))

@@ -19,7 +19,7 @@ Rutas canónicas mediante History API:
 | Data Pack / Map / Config / Dashboard | Subrutas `data`, `decisions`, `configure`, `dashboard` |
 | Historial existente | `/app/history` |
 
-Los enlaces anteriores `?view=...&case_id=...&node_id=...&run_id=...` siguen válidos. URLs de negocio conservan lineage; las globales omiten IDs de caso/corrida sin borrar el contexto guardado. Reload y atrás/adelante usan el mismo owner de navegación. Los eventos inline paran propagación para evitar dos entradas de historial por un click.
+Los enlaces anteriores `?view=...&case_id=...&node_id=...&run_id=...` siguen válidos. URLs de negocio conservan lineage; las globales omiten IDs de caso/corrida sin borrar el contexto guardado. Reload y atrás/adelante usan el mismo owner de navegación. Si vence la cookie de acceso, el refresh conserva el destino privado validado; no admite redirects a otros orígenes. Los eventos inline paran propagación para evitar dos entradas de historial por un click.
 
 El shell espera Auth/profile/membership/workspace antes de cargar módulos y exponer contenido privado. El estado de navegador se limpia al cambiar cuenta/workspace; logout llega a otras pestañas. BFCache oculta y revalida sesión antes de restablecer contenido. No se duplican listeners al navegar. Fallos del módulo opcional de catálogo conservan el fallback utilizable, sin mostrar datos antes de resolver Auth.
 

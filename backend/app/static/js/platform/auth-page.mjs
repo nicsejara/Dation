@@ -1,5 +1,11 @@
 const root=document.querySelector('#auth-root');
 const path=location.pathname;
+function returnPath(){
+ try{const url=new URL(new URLSearchParams(location.search).get('next')||'/app',location.origin);if(url.origin===location.origin&&(url.pathname==='/app'||url.pathname.startsWith('/app/')||url.pathname==='/upload'))return url.pathname+url.search;}catch{}
+ return '/app';
+}
+const destination=returnPath();
+const setupPath='/workspace-setup'+(destination==='/app'?'':'?next='+encodeURIComponent(destination));
 const reset=path==='/recover'&&new URLSearchParams(location.search).get('step')==='password';
 const mode=path==='/register'?'register':path==='/workspace-setup'?'workspace':path==='/recover'?(reset?'password':'recover'):'login';
 const titles={login:'Ingresá a tu workspace',register:'Creá tu cuenta',recover:'Recuperá tu acceso',password:'Elegí una nueva contraseña',workspace:'Creá tu workspace'};
@@ -39,17 +45,17 @@ form.addEventListener('submit',async event=>{
  try{
   if('confirm_password'in body&&body.password!==body.confirm_password)throw new Error('Las contraseñas no coinciden.');
   const data=await call('/auth/'+(mode==='workspace'?'workspace':mode),body);
-  if(['login','workspace','password'].includes(mode)){location.replace('/app');return;}
+  if(['login','workspace','password'].includes(mode)){location.replace(destination);return;}
   status.textContent=data.message;
   if(mode==='register'){
-   try{const session=await call('/auth/session');if(session.access_token){location.replace(session.membership?'/app':'/workspace-setup');return;}}catch{}
+   try{const session=await call('/auth/session');if(session.access_token){location.replace(session.membership?destination:setupPath);return;}}catch{}
   }
  }catch(exc){error.textContent=exc.message;error.focus();}finally{submit.disabled=false;submit.removeAttribute('aria-busy');}
 });
 if(mode==='login'||mode==='workspace'){
  try{
   const session=await call('/auth/session');
-  if(mode==='login')location.replace(session.membership?'/app':'/workspace-setup');
-  else if(session.membership)location.replace('/app');
+  if(mode==='login')location.replace(session.membership?destination:setupPath);
+  else if(session.membership)location.replace(destination);
  }catch(exc){if(mode==='workspace'){if(exc.status===401)location.replace('/login');else{error.textContent=exc.message;submit.disabled=true;}}else if(exc.status!==401)error.textContent=exc.message;}
 }

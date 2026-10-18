@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 from pathlib import Path
 from uuid import UUID
+from urllib.parse import quote
 
 import httpx
 from fastapi import (
@@ -161,14 +162,16 @@ async def prometheus_metrics(_: str = Depends(require_upload_access)):
 @app.get("/upload", response_class=HTMLResponse)
 @app.get("/app/{platform_path:path}", response_class=HTMLResponse)
 async def decision_workspace(request: Request):
+    return_to=request.url.path+(('?' + request.url.query) if request.url.query else '')
+    login_url='/login' if return_to=='/app' else '/login?next='+quote(return_to,safe='')
     token = request.cookies.get(ACCESS)
     if not token:
-        return RedirectResponse("/login", status_code=303, headers={"Cache-Control": "no-store"})
+        return RedirectResponse(login_url, status_code=303, headers={"Cache-Control": "no-store"})
     try:
         await verify(token)
     except HTTPException as exc:
         if exc.status_code == 401:
-            return RedirectResponse("/login", status_code=303, headers={"Cache-Control": "no-store"})
+            return RedirectResponse(login_url, status_code=303, headers={"Cache-Control": "no-store"})
         raise
     return HTMLResponse(APP_PAGE.read_text(encoding="utf-8"), headers={"Cache-Control": "no-store"})
 
