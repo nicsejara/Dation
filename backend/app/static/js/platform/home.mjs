@@ -63,7 +63,7 @@ export function mountWorkspaceHome(root,getIdentity){
   const side=el('div',undefined,'platform-home__side'),quick=section('Accesos rápidos','home-actions-title'),links=el('ul',undefined,'platform-home__quick');
   for(const [text,view,copy] of [['Abrir DDA Logística','logistics-overview','Datos, criterios y evidencia.'],['Ver Decision Center','platform-decisions','Consultá tus decisiones.'],['Ver datos','platform-data','Archivos de tu workspace.']]){
    if(view==='logistics-overview'&&!ddaEnabled(identity,'logistics'))continue;
-   const row=el('li'),a=link(text,view,'platform-home__quick-link');a.append(el('span','→','platform-home__arrow'));row.append(a,el('p',copy,'d-metadata'));links.append(row);
+   const row=el('li'),a=link(text,view,'platform-home__quick-link'),arrow=el('span','→','platform-home__arrow');arrow.setAttribute('aria-hidden','true');a.append(arrow);row.append(a,el('p',copy,'d-metadata'));links.append(row);
   }
   quick.append(links);side.append(quick);
   const activity=section('Actividad reciente','home-activity-title');
