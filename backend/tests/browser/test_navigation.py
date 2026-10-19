@@ -145,6 +145,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             await route.fulfill(status=200,headers={'Content-Disposition':'attachment; filename="'+name+'"'},content_type=media,body=content)
             return
         if path=='/api/platform/activity':
+            if getattr(self,'activity_gate',None):await self.activity_gate.wait()
             await asyncio.sleep(self.delay.get(path,.01))
             await route.fulfill(status=200,content_type='application/json',body=json.dumps({'available':True,'items':[],'next_cursor':None}))
             return
@@ -3834,12 +3835,17 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
     async def test_activity_case_late_response_is_disposed_after_navigation(self):
         await self.page.goto(f"http://127.0.0.1:{self.port}/app/decisions?center_case_id={self.case['id']}")
         root=self.page.locator('[data-platform-decisions]');panel=root.locator('[data-case-activity]')
-        await panel.locator('summary').first.wait_for();self.delay['/api/platform/activity']=.5
+        await panel.locator('summary').first.wait_for();self.activity_gate=asyncio.Event()
         await panel.locator('summary').first.click()
-        await self.page.wait_for_function("document.querySelector('[data-case-activity] .platform-activity').getAttribute('aria-busy')==='true'")
-        await self.nav('settings');await self.page.locator('[data-workspace-settings]').get_by_label('Nombre del workspace').wait_for();await self.page.wait_for_timeout(600)
+        await self.page.wait_for_function("document.querySelector('[data-case-activity] .platform-activity')?.getAttribute('aria-busy')==='true'")
+        for _ in range(100):
+            if ('GET','/api/platform/activity') in self.requests:break
+            await asyncio.sleep(.01)
+        self.assertIn(('GET','/api/platform/activity'),self.requests)
+        await self.nav('settings');await self.page.locator('[data-workspace-settings]').get_by_label('Nombre del workspace').wait_for()
+        self.activity_gate.set();self.activity_gate=None;await self.page.wait_for_timeout(100)
         self.assertEqual(await self.page.evaluate('window.dationGetCurrentView()'),'settings')
-        self.assertTrue(await panel.locator('.platform-activity [role=status]').count()>0)
+        self.assertEqual(await panel.locator('.platform-activity [role=status]').inner_text(),'Cargando actividad…')
         self.delay['/api/platform/activity']=.01
         await self.page.evaluate("id=>window.DationDispatch.openDecisionCenter({caseId:id})",self.case['id'])
         await panel.locator('summary').first.wait_for();await panel.locator('summary').first.click();await panel.get_by_text('Todavía no hay eventos registrados. Las nuevas acciones aparecerán acá.',exact=True).wait_for()
