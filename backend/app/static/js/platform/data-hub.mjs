@@ -1,3 +1,5 @@
+import {describeFailure} from '../dispatch/recovery.mjs';
+import {demoBadge,mountDemoAction} from './onboarding.mjs';
 import {workspaceDate} from './workspace-format.mjs';
 import {api} from '../dispatch/shared.mjs';
 import {createScope} from '../dispatch/lifecycle.mjs';
@@ -27,7 +29,7 @@ function table(headers){const wrap=el('div',undefined,'hub-table-scroll');wrap.t
 function cell(row,content){const td=el('td');td.append(typeof content==='string'?document.createTextNode(content):content);row.append(td);return td;}
 
 export function mountDataHub(root,getIdentity){
- const scope=createScope(root);let controller=null,generation=0,route={},modal=null,notice='',access='';
+ const scope=createScope(root);let controller=null,generation=0,route={},modal=null,notice='',access='',demoViews=[];
  root.classList.add('data-hub');
  const writable=()=>getIdentity().membership.access_role!=='viewer';
  const logistics=()=>ddaEnabled(getIdentity(),'logistics');
@@ -37,7 +39,7 @@ export function mountDataHub(root,getIdentity){
  function link(text,value,className='hub-text-link'){
   const a=el('a',text,className);a.href=href(value);a.addEventListener('click',event=>{if(event.button||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;event.preventDefault();open(value);});return a;
  }
- function datasetLink(row){return link(name(row),{tab:'datasets',datasetId:row.id});}
+ function datasetLink(row){const a=link(name(row),{tab:'datasets',datasetId:row.id});if(row.is_demo)a.append(' ',demoBadge());return a;}
  function flash(text,error=false){const node=el('p',text,'hub-message');node.role=error?'alert':'status';return node;}
  function closeModal(){if(modal){const own=modal;modal=null;own.dispose();own.element.remove();}}
  function showModal(title,copy){
@@ -116,13 +118,14 @@ export function mountDataHub(root,getIdentity){
    const empty=card(route.q||route.filter!=='all'?'No encontramos resultados':'Tu biblioteca está lista para empezar');
    empty.append(el('p',route.tab==='packs'?'Los Data Packs reúnen los pares de Órdenes y Flota usados por tus Decision Cases.':route.q||route.filter!=='all'?'Probá otro nombre o filtro.':'Cargá Órdenes o Flota. Dation validará el archivo antes de guardarlo.','d-body'));
    if(route.q||route.filter!=='all')empty.append(button('Limpiar filtros',()=>open({tab:route.tab})));else if(writable())empty.append(button('Cargar datos',upload,'primary'));
+   if(!route.q&&route.filter==='all'&&route.tab==='datasets'&&writable()&&logistics()){const demo=el('div');empty.append(demo);demoViews.push(mountDemoAction(demo,getIdentity));}
    fragment.append(empty);
   }else{
    const packs=route.tab==='packs',grid=table(packs?['Data Pack','Órdenes','Flota','Validación','Decision Cases','Creado','Acciones']:['Dataset','Tipo','Registros','Validación','Subido por','Creado','Uso','Acciones']);
    for(const item of data.items){
     const row=el('tr');
     if(packs){
-     cell(row,link(item.label,{tab:'packs',ordersId:item.orders_dataset_id,fleetId:item.fleet_dataset_id}));cell(row,datasetLink(item.orders));cell(row,datasetLink(item.fleet));cell(row,item.validated?'Validado':'Revisar validación');cell(row,number(item.case_count));cell(row,date(item.created_at,getIdentity().workspace));cell(row,reuseButton(item,true));
+     const title=link(item.label,{tab:'packs',ordersId:item.orders_dataset_id,fleetId:item.fleet_dataset_id});if(item.orders.is_demo||item.fleet.is_demo)title.append(' ',demoBadge());cell(row,title);cell(row,datasetLink(item.orders));cell(row,datasetLink(item.fleet));cell(row,item.validated?'Validado':'Revisar validación');cell(row,number(item.case_count));cell(row,date(item.created_at,getIdentity().workspace));cell(row,reuseButton(item,true));
     }else{
      const copy=el('div',undefined,'hub-file-name');copy.append(datasetLink(item),el('span',item.canonical_filename||item.original_filename,'d-metadata'));
      cell(row,copy);cell(row,types[item.dataset_type]||'Anterior');cell(row,number(item.row_count));cell(row,status(item));cell(row,item.uploaded_by?.name||'Sin registro');cell(row,date(item.created_at,getIdentity().workspace));cell(row,`${number(item.case_count)} casos · ${number(item.run_count)} corridas`);cell(row,reuseButton(item));
@@ -130,6 +133,10 @@ export function mountDataHub(root,getIdentity){
     grid.body.append(row);
    }
    fragment.append(grid.wrap);
+  }
+  if(data.items.length&&writable()&&logistics()){
+   const details=el('details',undefined,'d-card hub-card'),summary=el('summary','Probar con datos de ejemplo'),demo=el('div');details.append(summary,demo);let view;
+   details.addEventListener('toggle',()=>{view?.dispose();view=null;if(details.open){view=mountDemoAction(demo,getIdentity);demoViews.push(view);}});fragment.append(details);
   }
   fragment.append(pager(data.total,route.offset,offset=>open({...route,offset})));return fragment;
  }
@@ -164,7 +171,7 @@ export function mountDataHub(root,getIdentity){
   return {panel,read};
  }
  function dataset(data,version){
-  const row=data.dataset,fragment=document.createDocumentFragment(),header=card(name(row));header.append(el('p',row.canonical_filename||row.original_filename,'d-body'));
+  const row=data.dataset,fragment=document.createDocumentFragment(),header=card(name(row));header.append(el('p',row.canonical_filename||row.original_filename,'d-body'));if(row.is_demo)header.append(demoBadge());
   const actions=el('div',undefined,'hub-actions');actions.append(reuseButton(row));
   if(!row.deletion_pending){const a=el('a','Descargar CSV','d-button d-button--secondary');a.href=BASE+'/datasets/'+row.id+'/download';a.download=row.original_filename;actions.append(a);}
   if(data.can_archive)actions.append(button(row.archived_at?'Restaurar':'Archivar',()=>mutation(row,row.archived_at?'unarchive':'archive')));
@@ -183,7 +190,7 @@ export function mountDataHub(root,getIdentity){
   return {fragment,after:()=>preview?.read()};
  }
  function pack(data){
-  const item=data.pack,fragment=document.createDocumentFragment(),header=card(item.label);header.append(el('p','Data Pack · Órdenes y Flota','d-metadata'),reuseButton(item,true));fragment.append(header);
+  const item=data.pack,fragment=document.createDocumentFragment(),header=card(item.label);header.append(el('p','Data Pack · Órdenes y Flota','d-metadata'),reuseButton(item,true));if(item.orders.is_demo||item.fleet.is_demo)header.append(demoBadge());fragment.append(header);
   const inputs=card('Datasets del Data Pack');inputs.append(el('h3','Órdenes','hub-subtitle'),datasetLink(item.orders),el('h3','Flota','hub-subtitle'),datasetLink(item.fleet));fragment.append(inputs);
   const compatibility=card('Validación y compatibilidad');compatibility.append(el('p',item.validated?'Ambos datasets tienen validación registrada.':'Revisá la validación de los datasets.','d-body'),el('p','DDA compatible: Logística'+(logistics()?'':' · No habilitado en este workspace'),'d-body'),el('p','La compatibilidad operativa se comprueba al preparar la decisión.','d-metadata'));fragment.append(compatibility,cases(data.used_in,item.case_count));return fragment;
  }
@@ -219,7 +226,7 @@ export function mountDataHub(root,getIdentity){
   own.listen(select,'change',draw);draw();select.focus();
  }
  async function load(){
-  controller?.abort();controller=new AbortController();closeModal();const version=++generation;
+  for(const demo of demoViews)demo.dispose();demoViews=[];controller?.abort();controller=new AbortController();closeModal();const version=++generation;
   root.setAttribute('aria-busy','true');const loading=el('p','Cargando biblioteca de datos…','d-body');loading.role='status';root.replaceChildren(loading);
   try{
    route=readHubResource(location.href);
@@ -233,10 +240,10 @@ export function mountDataHub(root,getIdentity){
    let after;
    if(route.datasetId){const result=dataset(data,version);fragment.append(result.fragment);after=result.after;}
    else fragment.append(route.ordersId?pack(data):list(data));root.replaceChildren(fragment);after?.();
-  }catch(error){if(version!==generation||controller.signal.aborted)return;const panel=card('No se pudo abrir Data Hub');panel.append(flash(error.message,true),button('Reintentar',load),link('Volver a la biblioteca',{}));root.replaceChildren(panel);}
+  }catch(error){if(version!==generation||controller.signal.aborted)return;const panel=card('No se pudo abrir Data Hub');panel.append(flash(describeFailure(error).message,true),button('Reintentar',load),link('Volver a la biblioteca',{}));root.replaceChildren(panel);}
   finally{if(version===generation)root.removeAttribute('aria-busy');}
  }
- function stop(){generation++;controller?.abort();closeModal();root.removeAttribute('aria-busy');}
+ function stop(){generation++;for(const demo of demoViews)demo.dispose();demoViews=[];controller?.abort();closeModal();root.removeAttribute('aria-busy');}
  function onView(){if(window.dationGetCurrentView?.()==='platform-data')load();else stop();}
  scope.listen(window,'dation:view',onView);scope.listen(window,'pagehide',stop);
  scope.listen(window,'dation:identity',()=>{const next=getIdentity().membership.access_role+':'+logistics();if(next!==access){access=next;onView();}});

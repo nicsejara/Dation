@@ -1,0 +1,3 @@
+vehicle_id;license_plate;vehicle_type;ownership;provider_name;base_site;capacity_kg;capacity_m3;cost_per_km;fixed_trip_cost;fuel_l_per_100km;co2_kg_per_km;avg_speed_kmh;driving_hours_per_day;status;available_from;available_until
+DEMO-OWN;DEMO001;Truck_L;own;;Cordoba;3000;20;1000;5000;38;1.02;70;10;available;2026-10-01;2026-10-31
+DEMO-EXT;DEMO002;Truck_L;third_party;Transportista de ejemplo;Cordoba;4000;25;1300;6000;38;1.02;70;10;available;2026-10-01;2026-10-31

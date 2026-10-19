@@ -1,3 +1,4 @@
+import {describeFailure,responseFailure} from '../dispatch/recovery.mjs';
 import {mountReceivedInvitations} from './invitations.mjs';
 const root=document.querySelector('#auth-root');
 const path=location.pathname;
@@ -28,7 +29,7 @@ if(mode==='workspace'){
  form.append(field('name','Nombre de la empresa o workspace','text','organization'),field('country','País (código de dos letras)','text','country','AR'),field('timezone','Zona horaria','text','',Intl.DateTimeFormat().resolvedOptions().timeZone||'America/Argentina/Buenos_Aires'),field('currency','Moneda (código de tres letras)','text','','ARS'));
  form.elements.country.pattern='[A-Z]{2}';form.elements.currency.pattern='[A-Z]{3}';
 }
-const error=document.createElement('p');error.role='alert';error.id='auth-error';
+const error=document.createElement('p');error.role='alert';error.id='auth-error';error.tabIndex=-1;
 const status=document.createElement('p');status.role='status';status.setAttribute('aria-live','polite');
 const submit=document.createElement('button');submit.type='submit';submit.className='d-button d-button--primary';submit.textContent={login:'Ingresar',register:'Crear cuenta',recover:'Enviar enlace',password:'Guardar contraseña',workspace:'Crear workspace'}[mode];
 form.append(error,status,submit);
@@ -40,10 +41,11 @@ if(mode==='workspace'){
  const invites=mountReceivedInvitations(incoming,{onCount:count=>{if(count){form.hidden=true;intro.textContent='Tenés una invitación para sumarte a un equipo.';}}});
  window.addEventListener('pagehide',()=>invites.dispose(),{once:true});
 }
+if(new URLSearchParams(location.search).get('reason')==='session')status.textContent='Tu sesión venció. Volvé a ingresar; el trabajo guardado se conserva.';
 if(new URLSearchParams(location.search).has('error'))error.textContent='El enlace venció o se abrió en otro navegador. Solicitá uno nuevo desde este dispositivo.';
 async function call(url,body={}){
  const response=await fetch(url,{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
- const data=await response.json();if(!response.ok)throw Object.assign(new Error(typeof data.detail==='string'?data.detail:'Revisá los datos e intentá nuevamente.'),{status:response.status});return data;
+ let data;try{data=await response.json();}catch{throw Object.assign(new Error('El servicio de acceso no está disponible. Reintentá en unos instantes.'),{status:response.status});}if(!response.ok)throw responseFailure(response,data,{auth:mode==='login'});return data;
 }
 form.addEventListener('submit',async event=>{
  event.preventDefault();if(!form.reportValidity())return;
@@ -56,7 +58,7 @@ form.addEventListener('submit',async event=>{
   if(mode==='register'){
    try{const session=await call('/auth/session');if(session.access_token){location.replace(session.membership?destination:setupPath);return;}}catch{}
   }
- }catch(exc){error.textContent=exc.message;error.focus();}finally{submit.disabled=false;submit.removeAttribute('aria-busy');}
+ }catch(exc){const state=describeFailure(exc,{auth:mode==='login'});error.textContent=['auth','disconnected','timeout','permission'].includes(state.kind)?state.message:exc.message;error.focus();}finally{submit.disabled=false;submit.removeAttribute('aria-busy');}
 });
 if(mode==='login'||mode==='workspace'){
  try{

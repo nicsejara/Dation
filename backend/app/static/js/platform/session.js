@@ -7,7 +7,7 @@
  async function load(){
   const response=await nativeFetch('/auth/session',{method:'POST',credentials:'same-origin'});
   const body=await response.json();
-  if(!response.ok){if(response.status===401)location.replace('/login');throw Object.assign(new Error(body.detail||'No se pudo resolver tu acceso.'),{status:response.status});}
+  if(!response.ok){if(response.status===401)location.replace('/login?reason=session');throw Object.assign(new Error(body.detail||'No se pudo resolver tu acceso.'),{status:response.status});}
   if(!body.membership){location.replace('/workspace-setup');throw new Error('Configurá tu workspace para continuar.');}
   const next=body.profile.id+':'+body.membership.workspace_id;
   if(owner&&owner!==next){clearPrivateState();location.replace('/app');throw new Error('La sesión cambió.');}

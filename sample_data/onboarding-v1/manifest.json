@@ -1,0 +1,14 @@
+{
+  "version": "logistics-onboarding-v1",
+  "name": "Golden Dation \u00b7 Primeros pasos",
+  "files": {
+    "orders": {
+      "sha256": "3cf586b0baab0acad73c5f38df62ac528f303de56e02da6b7a8d087ab2a53cdc",
+      "rows": 4
+    },
+    "fleet": {
+      "sha256": "0cd6c10df2131a02d2f5e578cc06cb2ecc83e70682acbd36cddedd0940912394",
+      "rows": 2
+    }
+  }
+}

@@ -1,3 +1,4 @@
+import {demoBadge} from './onboarding.mjs';
 import {api} from '../dispatch/shared.mjs';
 import {createScope} from '../dispatch/lifecycle.mjs';
 import {workspaceDate} from './workspace-format.mjs';
@@ -8,7 +9,7 @@ export function mountActivity(root,{getIdentity,caseId=null,initial=null,limit=1
  const list=el('ol',undefined,'platform-activity__list'),status=el('p',undefined,'d-body'),actions=el('div',undefined,'platform-activity__actions');status.role='status';root.classList.add('platform-activity');root.replaceChildren(list,status,actions);
  function button(text,fn){const b=el('button',text,'d-button d-button--secondary');b.type='button';b.addEventListener('click',fn);return b;}
  function render(){list.replaceChildren();
-  for(const event of items){const row=el('li',undefined,'platform-activity__event');row.dataset.activityId=event.id;row.append(el('p',event.label,'d-body'));const stamp=el('time',workspaceDate(event.created_at,getIdentity().workspace),'d-metadata');stamp.dateTime=event.created_at;row.append(stamp);
+  for(const event of items){const row=el('li',undefined,'platform-activity__event');row.dataset.activityId=event.id;row.append(el('p',event.label,'d-body'));if(event.is_demo)row.append(demoBadge());const stamp=el('time',workspaceDate(event.created_at,getIdentity().workspace),'d-metadata');stamp.dateTime=event.created_at;row.append(stamp);
    if(event.case_id&&!caseId){const a=el('a','Ver caso','platform-activity__case');a.href=resourceUrl(location.href,{view:'platform-decisions',center:{caseId:event.case_id}});a.dataset.activityCase=event.case_id;row.append(a);}
    const details=el('details',undefined,'platform-activity__technical');details.append(el('summary','Detalles del evento'));for(const [label,value]of [['Evento',event.event_type],['ID',event.id],['Actor',event.actor?.id],['Objeto',event.object_id],['Decisión',event.node_id]])if(value)details.append(el('p',label+': '+value,'d-metadata'));const meta=el('pre',JSON.stringify(event.metadata||{},null,2));details.append(meta);row.append(details);list.append(row);
   }

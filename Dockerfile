@@ -6,6 +6,7 @@ RUN python -m pip install --no-cache-dir --require-hashes -r requirements.txt &&
 COPY --chown=65532:65532 backend/app ./app
 COPY --chown=65532:65532 backend/*.py ./
 COPY --chown=65532:65532 sample_data/v3 /app/sample_data/v3
+COPY --chown=65532:65532 sample_data/onboarding-v1 /app/sample_data/onboarding-v1
 USER 65532:65532
 EXPOSE 8080
 CMD ["sh", "-c", "exec python -m uvicorn main:app --host 0.0.0.0 --port ${PORT:-8080}"]

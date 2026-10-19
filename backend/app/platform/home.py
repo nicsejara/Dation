@@ -2,6 +2,7 @@
 from app.platform.identity import platform_call
 from app.services.decision_case_service import _state_with_history
 from app.platform.activity import home_activity
+from app.platform.onboarding import home_progress
 
 NODE_LABELS = {'logistics_assignment': 'Assignment', 'logistics_scheduling': 'Scheduling'}
 
@@ -40,18 +41,19 @@ def _item(row, bundle, key, status, run_id):
     return {'case_id': str(row['id']), 'label': bundle.get('label'), 'dda': 'DDA Logística',
             'node_id': key, 'node_label': NODE_LABELS[key],
             'status': 'completed' if row['status'] == 'completed' else status,
-            'last_activity_at': row['last_activity_at'], 'run_id': run_id}
+            'last_activity_at': row['last_activity_at'], 'run_id': run_id,'is_demo':bool(row.get('is_demo'))}
 
 
 async def home_snapshot(ctx):
     activity = await home_activity(ctx)
+    onboarding = await home_progress(ctx)
     if 'logistics' not in ctx.enabled_ddas:
         return {'recent_cases': [], 'attention': {'items': [], 'total': 0, 'scope': 'workspace_review'},
-                'activity': activity}
+                'activity': activity,'onboarding':onboarding}
     data = await platform_call('platform_home', {'actor_user_id': ctx.user_id,
                                                'target_workspace_id': ctx.workspace_id})
     return {'recent_cases': [recent_case(bundle) for bundle in data['recent_cases']],
             'attention': {**data['attention'], 'scope': 'assigned_work',
                           'items': [{**item, 'node_label': NODE_LABELS[item['node_id']]}
                                     for item in data['attention']['items']]},
-            'activity': activity}
+            'activity': activity,'onboarding':onboarding}
