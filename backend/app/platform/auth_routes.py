@@ -7,6 +7,7 @@ import base64
 import hashlib
 import secrets
 from pathlib import Path
+from uuid import UUID
 
 import httpx
 from fastapi import APIRouter, HTTPException, Request
@@ -287,3 +288,22 @@ async def create_workspace(request: Request, payload: Workspace):
         'workspace_name': payload.name, 'workspace_country': payload.country,
         'workspace_timezone': payload.timezone, 'workspace_currency': payload.currency})
     return set_json(response, result)
+
+
+@router.post('/auth/invitations')
+async def received_invitations(request: Request):
+    """Confirmed identity can inspect invitations before it has a workspace."""
+    csrf(request)
+    response = JSONResponse({})
+    _, claims = await cookie_session(request, response)
+    return set_json(response, await platform_call('platform_received_invitations',
+        {'actor_user_id': claims['sub']}))
+
+
+@router.post('/auth/invitations/{invitation_id}/accept')
+async def accept_invitation(request: Request, invitation_id: UUID):
+    csrf(request)
+    response = JSONResponse({})
+    _, claims = await cookie_session(request, response)
+    return set_json(response, await platform_call('platform_received_invitations',
+        {'actor_user_id': claims['sub'], 'invitation_id': str(invitation_id)}))

@@ -5,6 +5,7 @@ import httpx
 
 from main import app
 from app.auth import require_upload_access
+from app.platform.context import RequestContext, bind
 from app.services import decision_case_service as cases
 
 
@@ -115,7 +116,11 @@ class DecisionCaseHTTPTests(unittest.IsolatedAsyncioTestCase):
             transport=httpx.ASGITransport(app=app),
             base_url="http://test",
         )
-        app.dependency_overrides[require_upload_access] = lambda: "dation"
+        async def authorized_context():
+            ctx = RequestContext(ORDERS_ID, FLEET_ID, 'admin', enabled_ddas=frozenset({'logistics'}))
+            with bind(ctx):
+                yield ctx
+        app.dependency_overrides[require_upload_access] = authorized_context
 
     async def asyncTearDown(self):
         app.dependency_overrides.clear()
@@ -145,7 +150,7 @@ class DecisionCaseHTTPTests(unittest.IsolatedAsyncioTestCase):
             cases,
             "get_case",
             AsyncMock(return_value=hydrated),
-        ):
+        ), patch('app.platform.identity.platform_call', AsyncMock(return_value={})) as collaboration:
             response = await self.client.get("/api/decision-cases")
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.json()["cases"][0]["case"]["id"], CASE_ID)
@@ -162,6 +167,8 @@ class DecisionCaseHTTPTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(restored.status_code, 200)
             self.assertEqual(restored.json()["orders"]["id"], ORDERS_ID)
             self.assertEqual(restored.json()["fleet"]["id"], FLEET_ID)
+            collaboration.assert_awaited_once_with('platform_case_collaboration', {
+                'target_workspace_id': FLEET_ID, 'actor_user_id': ORDERS_ID, 'target_case_id': CASE_ID})
 
     async def test_create_case_accepts_client_case_id_and_data_pack(self):
         with patch.object(

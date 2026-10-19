@@ -49,7 +49,7 @@ async def home_snapshot(ctx):
     data = await platform_call('platform_home', {'actor_user_id': ctx.user_id,
                                                'target_workspace_id': ctx.workspace_id})
     return {'recent_cases': [recent_case(bundle) for bundle in data['recent_cases']],
-            'attention': {**data['attention'], 'scope': 'workspace_review',
+            'attention': {**data['attention'], 'scope': 'assigned_work',
                           'items': [{**item, 'node_label': NODE_LABELS[item['node_id']]}
                                     for item in data['attention']['items']]},
             # Phase 10 owns the full audit feed. No synthetic activity or inferred actors.

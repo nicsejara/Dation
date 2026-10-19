@@ -665,7 +665,7 @@ export async function show(run){
         return navigateResource('logistics-config',{caseId:caseMeta.case_id,nodeId:next.nodeId,runId:null});
       },
       onOpenNode:state.decisionCase?openCaseResult:null,
-      onApprove:(nodeId&&caseMeta?.case_id&&state.decisionCase?.id===caseMeta.case_id&&!['stale','superseded'].includes(runDecisionState(run,state.decisionCase,nodeId)))
+      onApprove:(nodeId&&caseMeta?.case_id&&state.decisionCase?.id===caseMeta.case_id&&state.decisionCase.collaboration?.[nodeId]?.can_approve!==false&&!['stale','superseded'].includes(runDecisionState(run,state.decisionCase,nodeId)))
         ?async()=>{
           const approved=await post('/api/runs/'+run.id+'/approve',{
             case_id:state.decisionCase.id,
@@ -686,6 +686,12 @@ export async function show(run){
     },
   );
   if(generation!==routeGeneration)return;
+  const policy=state.decisionCase?.collaboration?.[nodeId];
+  if(policy?.approver){
+    const note=document.createElement('p');note.className='d-metadata';note.dataset.approvalPolicy='';
+    note.textContent='Aprobador asignado: '+policy.approver.name+(policy.approver.active?'':' (inactivo)')+'. '+(policy.admin_override?'Tu rol Admin permite intervenir; la aprobación quedará auditada.':policy.can_approve?'Podés aprobar esta decisión.':'La aprobación requiere al aprobador asignado o a un Admin.');
+    roots.dashboard.querySelector('.dashboard-toolbar')?.append(note);
+  }
   renderView('decision-dashboard');
 }
 
@@ -697,7 +703,7 @@ async function hydrateCase(caseId,generation=routeGeneration){
   if(String(item.decision_case?.id)!==String(caseId)||String(item.orders?.id)!==String(item.decision_case?.inputs?.orders_dataset_id||item.case?.orders_dataset_id)||String(item.fleet?.id)!==String(item.decision_case?.inputs?.fleet_dataset_id||item.case?.fleet_dataset_id))throw new Error('El Decision Case no coincide con su Data Pack.');
   if(state.decisionCase?.id!==caseId){saveDraft();resetAssignmentConfiguration();Object.assign(state,cleanDraft(drafts[caseId]));state.preflight=null;state.configPreview=null;state.run=null;}
   transitionCaseId=null;
-  state.orders=item.orders;state.fleet=item.fleet;state.decisionCase={...item.decision_case,persisted:true};persist();return item;
+  state.orders=item.orders;state.fleet=item.fleet;state.decisionCase={...item.decision_case,collaboration:item.collaboration,persisted:true};persist();return item;
 }
 async function navigateResource(view,options={}){
   if(logisticsView(view)&&!currentLogisticsEnabled()){

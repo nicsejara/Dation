@@ -1,0 +1,67 @@
+"""Workspace collaboration. SQL rechecks membership, role and optimistic versions."""
+from typing import Literal
+from uuid import UUID
+from fastapi import APIRouter, Depends, Query
+from pydantic import AwareDatetime, BaseModel, ConfigDict
+from app.auth import require_upload_access
+from app.platform.auth_routes import Email
+from app.platform.identity import platform_call
+
+Role = Literal['admin', 'operator', 'viewer']
+Responsibility = Literal['data_owner', 'data_steward', 'decision_owner', 'approver']
+Node = Literal['logistics_assignment', 'logistics_scheduling', 'logistics_final_assignment']
+router = APIRouter()
+
+@router.get('/team')
+async def team(q: str = Query('', max_length=120), limit: int = Query(25, ge=1, le=50),
+               offset: int = Query(0, ge=0, le=1000000), candidates: bool = False,
+               ctx=Depends(require_upload_access)):
+    return await platform_call('platform_team', {'target_workspace_id': ctx.workspace_id,
+        'actor_user_id': ctx.user_id, 'search_text': q.strip(), 'page_limit': limit,
+        'page_offset': offset, 'candidates_only': candidates})
+
+class Invitation(Email):
+    access_role: Role
+    business_role: Responsibility | None = None
+
+@router.post('/team/invitations', status_code=201)
+async def invite(payload: Invitation, ctx=Depends(require_upload_access)):
+    return await platform_call('platform_invite_member', {'target_workspace_id': ctx.workspace_id,
+        'actor_user_id': ctx.user_id, 'invite_email': payload.email, 'invite_role': payload.access_role,
+        'invite_business_role': payload.business_role})
+
+class Version(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    expected_updated_at: AwareDatetime
+
+@router.post('/team/invitations/{invitation_id}/revoke')
+async def revoke(invitation_id: UUID, payload: Version, ctx=Depends(require_upload_access)):
+    return await platform_call('platform_revoke_invitation', {'target_workspace_id': ctx.workspace_id,
+        'actor_user_id': ctx.user_id, 'invitation_id': str(invitation_id),
+        'expected_updated_at': payload.expected_updated_at.isoformat()})
+
+class MemberUpdate(Version):
+    access_role: Role
+    business_role: Responsibility | None
+    status: Literal['active', 'disabled']
+
+@router.patch('/team/members/{user_id}')
+async def update_member(user_id: UUID, payload: MemberUpdate, ctx=Depends(require_upload_access)):
+    return await platform_call('platform_update_member', {'target_workspace_id': ctx.workspace_id,
+        'actor_user_id': ctx.user_id, 'member_user_id': str(user_id),
+        'expected_updated_at': payload.expected_updated_at.isoformat(), 'new_role': payload.access_role,
+        'new_business_role': payload.business_role, 'new_status': payload.status})
+
+class AssignmentUpdate(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    expected_updated_at: AwareDatetime | None
+    owner_user_id: UUID | None
+    approver_user_id: UUID | None
+
+@router.put('/decisions/{case_id}/assignments/{node_id}')
+async def assign(case_id: UUID, node_id: Node, payload: AssignmentUpdate, ctx=Depends(require_upload_access)):
+    return await platform_call('platform_assign_decision', {'target_workspace_id': ctx.workspace_id,
+        'actor_user_id': ctx.user_id, 'target_case_id': str(case_id), 'target_node_id': node_id,
+        'expected_updated_at': payload.expected_updated_at.isoformat() if payload.expected_updated_at else None,
+        'new_owner_user_id': str(payload.owner_user_id) if payload.owner_user_id else None,
+        'new_approver_user_id': str(payload.approver_user_id) if payload.approver_user_id else None})
