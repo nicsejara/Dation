@@ -2,6 +2,7 @@ export const PLATFORM_PATHS=Object.freeze({'platform-home':'/app',inicio:'/app/d
 export const VIEWS=['platform-home','platform-decisions','platform-data','platform-team','profile','inicio','logistics-overview','traceability','overview','logistics-data','logistics-map','logistics-config','decision-dashboard','library','settings'];
 export const NODES=['logistics_assignment','logistics_scheduling','logistics_final_assignment'];
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+import {HUB_KEYS,readHubResource,writeHubResource} from '../platform/data-resource.mjs';
 export function readResource(url){
   const parsed=new URL(url,'http://localhost');
   const q=parsed.searchParams;
@@ -14,16 +15,18 @@ export function readResource(url){
   if(resource.nodeId&&!NODES.includes(resource.nodeId))throw new Error('La decisión solicitada no existe.');
   for(const id of [resource.caseId,resource.runId])if(id&&!UUID.test(id))throw new Error('El enlace contiene un identificador inválido.');
   if(resource.view!=='decision-dashboard')resource.runId=null;
+  if(resource.view==='platform-data')resource.hub=readHubResource(parsed);
   return resource;
 }
 export function resourceUrl(url,resource){
   const next=new URL(url,'http://localhost');
-  for(const key of ['view','case_id','node_id','run_id','dda'])next.searchParams.delete(key);
+  for(const key of ['view','case_id','node_id','run_id','dda',...HUB_KEYS])next.searchParams.delete(key);
   next.pathname=PLATFORM_PATHS[resource.view]||'/app';
   next.searchParams.set('view',resource.view);
   if(resource.caseId&&['overview','logistics-overview','logistics-data','logistics-map','logistics-config','decision-dashboard','traceability','library'].includes(resource.view))next.searchParams.set('case_id',resource.caseId);
   if(['logistics-config','decision-dashboard'].includes(resource.view)&&resource.nodeId)next.searchParams.set('node_id',resource.nodeId);
   if(resource.view==='decision-dashboard'&&resource.runId)next.searchParams.set('run_id',resource.runId);
+  if(resource.view==='platform-data')writeHubResource(next,resource.hub);
   return next;
 }
 export function runDecisionState(run,decisionCase,nodeId){

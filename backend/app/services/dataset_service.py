@@ -88,6 +88,7 @@ async def upload_dataset(
             "status": "uploaded",
             "row_count": row_count,
             "column_count": column_count,
+            "uploaded_by_user_id": current().user_id,
         }
 
         db_response = await client.post(

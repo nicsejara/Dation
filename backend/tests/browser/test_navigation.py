@@ -81,6 +81,13 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.home_data={'recent_cases':[],'attention':{'items':[],'total':0},'activity':{'available':False,'items':[]}}
         self.home_failure=False
         self.ddas=[{'workspace_id':'00000000-0000-4000-8000-00000000da71','dda_id':'logistics','status':'enabled'}]
+        self.access_role='admin'
+        self.hub_rows={row['id']:copy.deepcopy(row) for row in self.f['datasets'].values()}
+        self.hub_cases=[]
+        self.hub_failure=False
+        self.hub_validation_fail=False
+        self.hub_delete_failure=False
+        self.hub_incomplete=[]
         self.pw = await async_playwright().start()
         executable = os.getenv("CHROMIUM_EXECUTABLE")
         if not executable and Path("/usr/bin/chromium").exists():
@@ -95,7 +102,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             await route.fulfill(content_type="application/json",body=json.dumps({
                 "access_token":"browser-layout-fixture","expires_at":int(time.time())+3600,
                 "profile":{"id":"10000000-0000-4000-8000-000000000001","first_name":"Synthetic","last_name":"User","email":"fixture@example.test"},
-                "membership":{"workspace_id":"00000000-0000-4000-8000-00000000da71","access_role":"admin"},
+                "membership":{"workspace_id":"00000000-0000-4000-8000-00000000da71","access_role":self.access_role},
                 "workspace":{"id":"00000000-0000-4000-8000-00000000da71","name":"Synthetic workspace"},"ddas":self.ddas}))
         await self.context.route("**/auth/session",session_fixture)
         await self.context.add_init_script("sessionStorage.setItem('_dation_identity','10000000-0000-4000-8000-000000000001:00000000-0000-4000-8000-00000000da71');")
@@ -121,6 +128,9 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         captured_evidence=self.comparative['id'] if self.comparative and self.comparative['status']=='completed' else None
         await asyncio.sleep(self.delay.get(path, .01))
         data, status = {}, 200
+        if path.startswith('/api/platform/data/'):
+            await self.route_hub(route,path,query,method)
+            return
         if path == "/api/platform/home":
             status,data=(503,{'detail':'Home unavailable'}) if self.home_failure else (200,copy.deepcopy(self.home_data))
         elif path == "/api/dispatch/status":
@@ -246,6 +256,46 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         else:
             status, data = 501, {"detail":"Unmocked QA endpoint: "+path}
         await route.fulfill(status=status,content_type="application/json",body=json.dumps(data))
+
+    async def route_hub(self,route,path,query,method):
+        await asyncio.sleep(self.delay.get(path,.01))
+        prefix='/api/platform/data';status=200;data={}
+        def public(row):
+            result={k:copy.deepcopy(v) for k,v in row.items() if k not in ('profile_json','storage_path','storage_bucket')}
+            result.update(validation='validated' if (row.get('profile_json') or {}).get('valid') else 'unknown',uploaded_by=row.get('uploaded_by'),case_count=len(self.hub_cases),run_count=0,deletion_pending=row.get('deletion_pending',False))
+            return result
+        rows=list(self.hub_rows.values());limit=int(query.get('limit',['25'])[0]);offset=int(query.get('offset',['0'])[0])
+        if self.hub_failure:status,data=503,{'detail':'La biblioteca no está disponible.'}
+        elif path==prefix+'/contracts':data=self.f['contracts']
+        elif path==prefix+'/datasets':
+            term=query.get('q',[''])[0].lower();kind=query.get('filter',['all'])[0]
+            rows=[r for r in rows if bool(r.get('archived_at'))==(kind=='archived') and (kind not in ('orders','fleet') or r['dataset_type']==kind) and (not term or term in str(r.get('canonical_filename','')).lower() or term in str(r.get('label','')).lower())]
+            data={'items':[public(r) for r in rows[offset:offset+limit]],'total':len(rows),'limit':limit,'offset':offset,'incomplete_uploads':copy.deepcopy(self.hub_incomplete)}
+        elif path==prefix+'/datasets/validate':
+            data={'valid':not self.hub_validation_fail,'errors':[{'message':'Revisá las columnas obligatorias.'}] if self.hub_validation_fail else [],'counts':{'errors':int(self.hub_validation_fail)}}
+        elif path==prefix+'/datasets/upload':
+            row=rows[0];data={'dataset':row,'duplicate':False}
+        elif path.startswith(prefix+'/uploads/') and path.endswith('/discard'):
+            self.hub_incomplete=[];data={'cleared':True}
+        elif path.startswith(prefix+'/datasets/'):
+            parts=path.removeprefix(prefix+'/datasets/').split('/');row=self.hub_rows.get(parts[0]);action=parts[1] if len(parts)>1 else None
+            if not row:status,data=404,{'detail':'No se encontró el dataset.'}
+            elif action=='preview':data={'columns':['order_id','product'],'rows':[[str(i),'Synthetic '+str(i)] for i in range(offset,min(offset+limit,30))],'has_more':offset+limit<30,'limit':limit,'offset':offset}
+            elif action=='reuse':data={'datasets':[row]}
+            elif action in ('archive','unarchive'):
+                row['archived_at']='2026-10-18T12:00:00Z' if action=='archive' else None;data={'archived':action=='archive'}
+            elif method=='DELETE':
+                if self.hub_delete_failure:
+                    self.hub_delete_failure=False;row['deletion_pending']=True;status,data=503,{'detail':'La eliminación quedó pendiente. Reintentá para completarla.'}
+                else:self.hub_rows.pop(row['id']);data={'deleted':True}
+            else:data={'dataset':public(row),'validation_report':row.get('profile_json') or {},'used_in':copy.deepcopy(self.hub_cases),'can_archive':self.access_role!='viewer' and not row.get('is_default') and not row.get('deletion_pending'),'can_delete':self.access_role!='viewer' and bool(row.get('archived_at')) and not self.hub_cases,'referenced':bool(self.hub_cases)}
+        elif path in (prefix+'/packs',prefix+'/pack',prefix+'/pack/reuse') and rows:
+            orders=next(r for r in rows if r['dataset_type']=='orders');fleet=next(r for r in rows if r['dataset_type']=='fleet')
+            pack={'orders_dataset_id':orders['id'],'fleet_dataset_id':fleet['id'],'orders':public(orders),'fleet':public(fleet),'label':'Data Pack sintético','validated':True,'case_count':len(self.hub_cases),'created_at':orders['created_at']}
+            data={'datasets':[orders,fleet]} if path.endswith('/reuse') else {'pack':pack,'used_in':self.hub_cases} if path.endswith('/pack') else {'items':[pack] if self.hub_cases else [],'total':int(bool(self.hub_cases))}
+        elif path==prefix+'/packs':data={'items':[],'total':0}
+        else:status,data=501,{'detail':'Unmocked Data Hub endpoint: '+path}
+        await route.fulfill(status=status,content_type='application/json',body=json.dumps(data))
 
     async def open(self, view="logistics-map", node=None, run=None):
         query = f"view={view}&case_id={self.case['id']}"
@@ -3495,6 +3545,134 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.page.evaluate("window.dationNavigate('logistics-data')")
         self.assertEqual(await self.page.evaluate('window.dationGetCurrentView()'),'inicio')
         self.assertEqual(self.requests,[])
+
+    async def test_data_hub_library_details_preview_history_and_responsive(self):
+        self.hub_cases=[{'id':self.case['id'],'status':'active','created_at':'2026-10-18T12:00:00Z'}]
+        await self.page.goto(f'http://127.0.0.1:{self.port}/app/data')
+        root=self.page.locator('[data-platform-data]')
+        await root.get_by_role('table').wait_for()
+        self.assertEqual(await self.page.locator('[data-view-panel=platform-data] h1').inner_text(),'Data Hub')
+        self.assertEqual(await root.get_by_role('columnheader').count(),8)
+        theme=(Path(__file__).parent/'theme_audit.js').read_text()
+        for width in (1440,1024,768,390):
+            await self.page.set_viewport_size({'width':width,'height':1000})
+            probe=await self.page.evaluate(theme);self.assertFalse(probe['overflow']);self.assertEqual(probe['failures'],[])
+        await root.get_by_label('Filtrar datasets').select_option('fleet')
+        await self.page.wait_for_url('**data_filter=fleet*')
+        await self.page.wait_for_function("document.querySelector('[data-platform-data] tbody')?.children.length===1")
+        self.assertIn('Flota',await root.get_by_role('table').inner_text())
+        await root.get_by_label('Buscar por nombre de archivo').fill('missing-file')
+        await root.get_by_role('button',name='Buscar',exact=True).click()
+        await root.get_by_role('heading',name='No encontramos resultados').wait_for()
+        await root.get_by_role('button',name='Limpiar filtros').click()
+        name=self.f['datasets']['orders']['label']
+        await root.get_by_role('link',name=name,exact=True).click()
+        await root.get_by_role('heading',name='Vista previa',exact=True).wait_for()
+        self.assertEqual(await self.page.locator('#journey-nav').inner_text(),'Data Hub')
+        await root.get_by_role('button',name='Más filas',exact=True).click()
+        await root.get_by_text('Filas 26–30',exact=True).wait_for()
+        self.assertTrue(await root.get_by_role('button',name='Más filas',exact=True).is_disabled())
+        await self.page.go_back();await root.get_by_label('Buscar por nombre de archivo').wait_for()
+        await self.page.reload();await root.get_by_role('table').wait_for()
+        await root.get_by_role('button',name='Data Packs',exact=True).click()
+        await root.get_by_role('link',name='Data Pack sintético').click()
+        await root.get_by_role('heading',name='Datasets del Data Pack').wait_for()
+        await root.get_by_role('link',name='DC-'+self.case['id'][:8]).click()
+        await self.page.locator('[data-map-node=logistics_assignment]').first.wait_for()
+        self.assertIn(self.case['id'],self.page.url)
+        await self.page.go_back();await root.get_by_role('heading',name='Datasets del Data Pack').wait_for()
+        self.assertEqual(self.errors,[])
+
+    async def test_data_hub_empty_failure_readonly_and_upload_dialog(self):
+        self.hub_failure=True
+        await self.page.goto(f'http://127.0.0.1:{self.port}/app/data')
+        root=self.page.locator('[data-platform-data]')
+        await root.get_by_role('heading',name='No se pudo abrir Data Hub').wait_for()
+        self.hub_failure=False;self.hub_rows={}
+        await root.get_by_role('button',name='Reintentar',exact=True).click()
+        await root.get_by_role('heading',name='Tu biblioteca está lista para empezar').wait_for()
+        self.ddas=[]
+        await self.page.evaluate('window.dationSession.refresh()')
+        trigger=root.get_by_role('button',name='Cargar datos',exact=True).first
+        await trigger.click();dialog=self.page.get_by_role('dialog',name='Cargar datos',exact=True)
+        await dialog.get_by_label('Tipo de dataset').select_option('fleet')
+        self.hub_validation_fail=True
+        await dialog.locator('input[type=file]').set_input_files({'name':'fleet.csv','mimeType':'text/csv','buffer':b'vehicle_id\nx'})
+        await dialog.get_by_text('Revisá las columnas obligatorias.',exact=True).wait_for()
+        theme=(Path(__file__).parent/'theme_audit.js').read_text()
+        for width in (390,320):
+            await self.page.set_viewport_size({'width':width,'height':1000})
+            probe=await self.page.evaluate(theme);self.assertFalse(probe['overflow']);self.assertEqual(probe['failures'],[])
+        self.assertEqual(sum(path=='/api/platform/data/datasets/upload' for _,path in self.requests),0)
+        await self.page.keyboard.press('Escape');await dialog.wait_for(state='hidden')
+        self.assertTrue(await trigger.evaluate('el=>el===document.activeElement'))
+        self.access_role='viewer'
+        await self.page.evaluate('window.dationSession.refresh()')
+        await root.get_by_role('heading',name='Tu biblioteca está lista para empezar').wait_for()
+        self.assertEqual(await root.get_by_role('button',name='Cargar datos',exact=True).count(),0)
+        self.assertEqual(self.errors,[])
+
+    async def test_data_hub_archive_delete_retry_and_text_safety(self):
+        orders=self.f['ids']['orders'];self.hub_rows[orders]['label']='<img src=x onerror=alert(1)>'
+        await self.page.goto(f'http://127.0.0.1:{self.port}/app/data?dataset_id={orders}')
+        root=self.page.locator('[data-platform-data]')
+        await root.get_by_role('heading',name='<img src=x onerror=alert(1)>',exact=True).wait_for()
+        self.assertEqual(await root.locator('img').count(),0)
+        await root.get_by_role('button',name='Archivar',exact=True).click()
+        await self.page.get_by_role('dialog').get_by_role('button',name='Archivar dataset',exact=True).click()
+        await root.get_by_role('button',name='Restaurar',exact=True).wait_for()
+        self.hub_delete_failure=True
+        await root.get_by_role('button',name='Eliminar definitivamente',exact=True).click()
+        await self.page.get_by_role('dialog').get_by_role('button',name='Eliminar definitivamente',exact=True).click()
+        await root.get_by_role('button',name='Completar eliminación',exact=True).wait_for()
+        await root.get_by_role('button',name='Completar eliminación',exact=True).click()
+        await self.page.get_by_role('dialog').get_by_role('button',name='Completar eliminación',exact=True).click()
+        await root.get_by_role('heading',name='No encontramos resultados').wait_for()
+        self.assertEqual(sum(method=='DELETE' for method,path in self.requests if path.startswith('/api/platform/data/')),2)
+        self.assertEqual(self.errors,[])
+
+    async def test_data_hub_incomplete_upload_cleanup_is_explicit_and_text_safe(self):
+        self.hub_incomplete=[{'id':'00000000-0000-4000-8000-000000000089','filename':'<img src=x onerror=alert(1)>.csv','created_at':'2026-10-18T12:00:00Z','status':'failed'}]
+        await self.page.goto(f'http://127.0.0.1:{self.port}/app/data')
+        root=self.page.locator('[data-platform-data]')
+        await root.get_by_role('heading',name='Cargas interrumpidas').wait_for()
+        self.assertEqual(await root.locator('img').count(),0)
+        self.assertFalse(any(method=='POST' and '/uploads/' in path for method,path in self.requests))
+        await root.get_by_role('button',name='Descartar carga',exact=True).click()
+        await self.page.get_by_role('dialog').get_by_role('button',name='Descartar carga',exact=True).click()
+        await root.get_by_role('heading',name='Cargas interrumpidas').wait_for(state='hidden')
+        self.assertEqual(len(self.hub_rows),2)
+        self.assertEqual(sum(method=='POST' and '/uploads/' in path for method,path in self.requests),1)
+        self.assertEqual(self.errors,[])
+
+    async def test_data_hub_reuse_opens_existing_upload_without_creating_a_case(self):
+        self.hub_cases=[{'id':self.case['id'],'status':'active','created_at':'2026-10-18T12:00:00Z'}]
+        await self.open('logistics-map')
+        original=copy.deepcopy(self.case)
+        await self.nav('platform-data')
+        root=self.page.locator('[data-platform-data]')
+        await root.get_by_role('button',name='Data Packs',exact=True).click()
+        await root.get_by_role('button',name='Reutilizar Data Pack',exact=True).click()
+        await self.page.locator('.dispatch-upload-screen').wait_for()
+        data=await self.page.evaluate('window.DationDispatch.getWorkspace()')
+        self.assertEqual(data['orders']['id'],self.f['ids']['orders']);self.assertEqual(data['fleet']['id'],self.f['ids']['fleet'])
+        self.assertNotEqual((data.get('decisionCase') or {}).get('id'),original['id'])
+        self.assertFalse((data.get('decisionCase') or {}).get('persisted',False))
+        self.assertEqual(self.case,original)
+        self.assertFalse(any(method=='POST' and path=='/api/decision-cases' for method,path in self.requests))
+        # A response from a page we left must not hijack a later Hub visit.
+        await self.nav('platform-data')
+        path='/api/platform/data/datasets/'+self.f['ids']['orders']+'/reuse'
+        self.delay[path]=2
+        async with self.page.expect_response(lambda response:urlparse(response.url).path==path) as pending:
+            await root.get_by_role('button',name='Reutilizar',exact=True).nth(0).click()
+            await self.nav('platform-home')
+            await self.nav('platform-data')
+        self.assertIn('datasets',await (await pending.value).json())
+        await self.page.wait_for_timeout(100)
+        self.assertEqual(urlparse(self.page.url).path,'/app/data')
+        await root.get_by_role('button',name='Cargar datos',exact=True).wait_for()
+        self.assertEqual(self.errors,[])
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

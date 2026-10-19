@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="/static/css/platform-auth.css">
   <link rel="stylesheet" href="/static/css/platform-shell.css">
   <link rel="stylesheet" href="/static/css/platform-home.css">
+  <link rel="stylesheet" href="/static/css/platform-data-hub.css">
   <script src="/static/js/platform/session.js"></script>
 </head>
 <body>
@@ -105,7 +106,7 @@
       <div class="content">
         <section class="view d-platform" data-view-panel="platform-home"><div class="d-page platform-global-page"><div class="platform-home" data-platform-home></div></div></section>
         <section class="view d-platform" data-view-panel="platform-decisions"><div class="d-page platform-global-page"><header class="d-page-header"><div class="d-page-header__copy"><span class="d-eyebrow">Workspace</span><h1 class="d-page-title">Decision Center</h1></div></header><div class="platform-global-page" data-platform-decisions></div></div></section>
-        <section class="view d-platform" data-view-panel="platform-data"><div class="d-page platform-global-page"><header class="d-page-header"><div class="d-page-header__copy"><span class="d-eyebrow">Workspace</span><h1 class="d-page-title">Datos</h1></div></header><div class="platform-global-page" data-platform-data></div></div></section>
+        <section class="view d-platform" data-view-panel="platform-data"><div class="d-page platform-global-page"><header class="d-page-header"><div class="d-page-header__copy"><span class="d-eyebrow">Workspace</span><h1 class="d-page-title">Data Hub</h1><p class="d-page-description">Tus archivos, sus validaciones y los Data Packs que usan tus decisiones.</p></div></header><div data-platform-data></div></div></section>
         <section class="view d-platform" data-view-panel="platform-team"><div class="d-page platform-global-page"><header class="d-page-header"><div class="d-page-header__copy"><span class="d-eyebrow">Workspace</span><h1 class="d-page-title">Equipo</h1></div></header><div class="platform-global-page" data-platform-team></div></div></section>
         <section class="view d-platform" data-view-panel="profile"><div class="d-page platform-global-page"><header class="d-page-header"><div class="d-page-header__copy"><span class="d-eyebrow">Workspace</span><h1 class="d-page-title">Mi perfil</h1></div></header><div class="platform-global-page" data-profile-form></div></div></section>
         <!-- INICIO -->
@@ -1295,20 +1296,20 @@
           return;
         }
 
+        var platformTitles = {
+          'platform-home': 'Inicio', 'inicio': 'Decision Data Assets',
+          'platform-data': 'Data Hub', 'platform-decisions': 'Decision Center',
+          'platform-team': 'Equipo', 'profile': 'Mi perfil',
+          'traceability': 'Trazabilidad', 'settings': 'Configuración'
+        };
         container.appendChild(
           journeyButton(
-            currentView === 'traceability'
-              ? 'Trazabilidad'
-              : currentView === 'settings'
-                ? 'Configuración'
-                : 'Inicio',
+            platformTitles[currentView] || 'Inicio',
             {
               current: true,
               onClick: function () {
                 window.dationNavigate(
-                  currentView === 'traceability' || currentView === 'settings'
-                    ? currentView
-                    : 'inicio'
+                  platformTitles[currentView] ? currentView : 'platform-home'
                 );
               }
             }

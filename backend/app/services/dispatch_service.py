@@ -5,12 +5,15 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 import hashlib
 import json
+import logging
 from time import perf_counter
 from urllib.parse import quote
 from uuid import uuid4
 from app.platform.context import current
+from app.platform.identity import platform_call
 
 import httpx
+from fastapi import HTTPException
 
 from app.platform.repository import http_client
 
@@ -458,6 +461,7 @@ async def store_input(
     parent=None,
     *,
     is_sample=False,
+    track_upload=False,
 ):
     if kind not in VALIDATORS:
         raise ValueError("Tipo de dataset inválido.")
@@ -503,6 +507,21 @@ async def store_input(
     dataset_id = str(uuid4())
     canonical_name = canonical_filename(kind)
     storage_path = f"{current().workspace_id}/{dataset_id}/{canonical_name}"
+    upload_operation=None
+    if track_upload:
+        upload_operation=(await platform_call('platform_dataset_upload',{
+            'target_workspace_id':current().workspace_id,'actor_user_id':current().user_id,
+            'operation':'prepare','target_dataset_id':dataset_id,'object_bucket':SUPABASE_INPUT_BUCKET,
+            'object_path':storage_path,'filename':filename}))['operation_id']
+    async def note_upload(operation):
+        if not upload_operation:return
+        try:
+            await platform_call('platform_dataset_upload',{'target_workspace_id':current().workspace_id,
+                'actor_user_id':current().user_id,'operation':operation,'operation_id':upload_operation})
+        except (httpx.HTTPError,HTTPException):
+            # The pre-upload journal already exists. A later explicit recovery
+            # resolves it; never remove a successfully stored dataset here.
+            logging.getLogger(__name__).warning('dataset_upload_recovery_pending',extra={'dataset_id':dataset_id})
     url = (
         f"{SUPABASE_URL}/storage/v1/object/"
         f"{SUPABASE_INPUT_BUCKET}/{quote(storage_path, safe='/')}"
@@ -545,10 +564,33 @@ async def store_input(
                     "parent_dataset_id": parent,
                     "profile_json": public,
                     "is_sample": bool(is_sample),
+                    "uploaded_by_user_id": current().user_id,
                 },
             )
         except Exception as exc:
-            await client.delete(url, headers=_headers(), timeout=30)
+            cleaned=False
+            try:
+                if upload_operation:
+                    # An INSERT timeout can hide a committed row. The journal
+                    # checks for it under the workspace lock before authorizing
+                    # compensation; discarding also blocks a late INSERT.
+                    recovery={'target_workspace_id':current().workspace_id,
+                        'actor_user_id':current().user_id,'operation_id':upload_operation}
+                    await platform_call('platform_dataset_upload',{**recovery,'operation':'failed'})
+                    permit=await platform_call('platform_dataset_upload',{**recovery,'operation':'discard'})
+                    if not permit.get('cleared'):
+                        if permit['storage_bucket']!=SUPABASE_INPUT_BUCKET or permit['storage_path']!=storage_path:
+                            raise HTTPException(409,'La identidad de la carga requiere revisión.')
+                        cleanup=await client.delete(url, headers=_headers(), timeout=30)
+                        if cleanup.status_code not in (200,204,404):cleanup.raise_for_status()
+                        cleaned=True
+                else:
+                    cleanup=await client.delete(url, headers=_headers(), timeout=30)
+                    if cleanup.status_code not in (200,204,404):cleanup.raise_for_status()
+                    cleaned=True
+            except (httpx.HTTPError,HTTPException):
+                logging.getLogger(__name__).warning('dataset_upload_cleanup_pending',extra={'dataset_id':dataset_id})
+            if cleaned:await note_upload('finish')
             if (
                 isinstance(exc, httpx.HTTPStatusError)
                 and exc.response.status_code == 409
@@ -570,6 +612,8 @@ async def store_input(
                         "validation": public,
                     }
             raise
+
+    await note_upload('stored')
 
     return {
         "duplicate": False,

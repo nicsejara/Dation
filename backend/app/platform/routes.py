@@ -4,8 +4,10 @@ from pydantic import BaseModel,ConfigDict,Field,field_validator
 from app.auth import require_upload_access
 from app.platform.identity import platform_call
 from app.platform.home import home_snapshot
+from app.platform.data_routes import router as data_router
 
 router=APIRouter(prefix='/api/platform')
+router.include_router(data_router)
 
 @router.get('/home')
 async def get_home(ctx=Depends(require_upload_access)):

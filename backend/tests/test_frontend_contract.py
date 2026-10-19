@@ -1005,7 +1005,7 @@ class FrontendContractTests(
             upload_index,
         )
         self.assertIn(
-            "/api/datasets/validate",
+            "validateCsvFile",
             upload_index,
         )
         self.assertIn(

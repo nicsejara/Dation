@@ -71,6 +71,8 @@ class TenantClient:
             if "workspace_id" in params and params["workspace_id"] != "eq." + ctx.workspace_id:
                 raise RuntimeError("Conflicting workspace filter")
             options["params"] = params.set("workspace_id", "eq." + ctx.workspace_id)
+            if table == "datasets" and method in {"GET", "HEAD"}:
+                options["params"] = options["params"].set("deletion_requested_at", "is.null")
             if method not in {"GET", "HEAD"}:
                 if ctx.access_role == "viewer":
                     raise HTTPException(403, "Tu rol no permite modificar datos.")

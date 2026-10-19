@@ -13,6 +13,7 @@ import {
 } from "./selectors.mjs";
 import {renderSystemBanner} from "./system-banner.mjs";
 import {createValidationDrawer} from "./validation-report.mjs";
+import {validateCsvFile,storeCsvFile} from './file-api.mjs';
 
 const MAX_BYTES = 10 * 1024 * 1024;
 
@@ -743,16 +744,10 @@ export async function mountUploadScreen(
     local.phases[kind] = "uploading";
     renderCard(kind);
 
-    const form = new FormData();
-    form.append("file", file);
-
     try {
       const controller = new AbortController();
       local.controllers[kind] = controller;
-      const stored = await api(
-        `/api/datasets/upload?dataset_type=${kind}`,
-        {method: "POST", body: form, signal: controller.signal},
-      );
+      const stored = await storeCsvFile(kind,file,{signal:controller.signal});
       local.controllers[kind] = null;
 
       const dataset = stored.dataset || stored.existing_dataset;
@@ -850,14 +845,9 @@ export async function mountUploadScreen(
     renderCard(kind);
 
     try {
-      const form = new FormData();
-      form.append("file", file);
       const controller = new AbortController();
       local.controllers[kind] = controller;
-      const report = await api(
-        `/api/datasets/validate?dataset_type=${kind}`,
-        {method: "POST", body: form, signal: controller.signal},
-      );
+      const report = await validateCsvFile(kind,file,{signal:controller.signal});
       local.controllers[kind] = null;
 
       if(!current())return;

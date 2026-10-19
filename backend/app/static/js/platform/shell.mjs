@@ -3,8 +3,9 @@ import {createScope} from '../dispatch/lifecycle.mjs';
 import {PLATFORM_PATHS,readResource} from '../dispatch/navigation.mjs';
 import {mountWorkspaceHome} from './home.mjs';
 import {ddaEnabled} from './entitlements.mjs';
+import {mountDataHub} from './data-hub.mjs';
 
-const labels={'platform-home':'Inicio',inicio:'Decision Data Assets','platform-decisions':'Decision Center','platform-data':'Datos','platform-team':'Equipo',settings:'Configuración',profile:'Mi perfil'};
+const labels={'platform-home':'Inicio',inicio:'Decision Data Assets','platform-decisions':'Decision Center','platform-data':'Data Hub','platform-team':'Equipo',settings:'Configuración',profile:'Mi perfil'};
 const roles={admin:'Administrador',operator:'Operador',viewer:'Solo lectura'};
 function node(tag,text,className){const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(className)el.className=className;return el;}
 function action(text,view){const a=node('a',text,'d-button d-button--secondary');a.href=PLATFORM_PATHS[view]||'/app/history';a.dataset.platformView=view;return a;}
@@ -30,10 +31,10 @@ export function mountPlatformShell(){
  function renderBusinessAccess(){
   const enabled=ddaEnabled(identity,'logistics');
   document.querySelector('[data-platform-decisions]').replaceChildren(card('Tus decisiones',enabled?'Consultá las corridas y la evidencia guardada en el historial actual. El centro unificado de decisiones estará disponible próximamente.':'DDA Logística no está habilitado en este workspace.',enabled?[['Abrir historial','traceability'],['Mapa de decisiones de Logística','logistics-map']]:[['Ver Decision Data Assets','inicio']]));
-  document.querySelector('[data-platform-data]').replaceChildren(card('Datos del workspace',enabled?'Consultá los archivos existentes o prepará un Data Pack para Logística. La gestión unificada de Data Hub estará disponible próximamente.':'Explorá los Decision Data Assets disponibles para tu workspace.',enabled?[['Ver biblioteca','traceability'],['Preparar Data Pack','logistics-data']]:[['Ver Decision Data Assets','inicio']]));
  }
  renderBusinessAccess();
  scope.listen(window,'dation:identity',()=>{identity={...window.dationSession.identity,profile:identity.profile};renderIdentity();renderBusinessAccess();});
+ const dataHub=mountDataHub(document.querySelector('[data-platform-data]'),()=>window.dationSession.identity);scope.own(()=>dataHub.dispose());
  document.querySelector('[data-platform-team]').append(card(identity.workspace.name,'Tu acceso actual: '+roles[identity.membership.access_role]+'. La administración de invitaciones y responsabilidades del equipo estará disponible próximamente.'));
  const settings=document.querySelector('[data-workspace-settings]');
  for(const [title,values]of [['Workspace',[['Nombre',identity.workspace.name],['País',identity.workspace.country],['Zona horaria',identity.workspace.timezone]]],['Preferencias',[['Idioma',identity.workspace.language],['Moneda',identity.workspace.currency],['Unidades',[identity.workspace.weight_unit,identity.workspace.distance_unit].filter(Boolean).join(' · ')]]],['Mi acceso',[['Rol',roles[identity.membership.access_role]],['Responsabilidad',identity.membership.business_role||'Sin asignar'],['Workspace','Activo']]]]){
@@ -70,7 +71,7 @@ export function mountPlatformShell(){
    breadcrumb.append(action('Decision Data Assets','inicio'),node('span','/'),action('DDA Logística','logistics-overview'));
    try{const route=readResource(location.href);if(route.caseId)breadcrumb.append(node('span','/'),node('span','DC-'+route.caseId.slice(0,8)));if(route.nodeId)breadcrumb.append(node('span','/'),node('span',route.nodeId==='logistics_scheduling'?'Scheduling':'Assignment'));}catch{}
   }else{breadcrumb.append(node('span',labels[view]||(view==='traceability'?'Historial y evidencia':'Dation')));}
-  if(['platform-decisions','platform-data'].includes(view)){
+  if(view==='platform-decisions'){
    // Preserve the chosen tab on the subsequent legacy history view.
    document.querySelector('[data-trace-tab="'+(view==='platform-decisions'?'history':'datasets')+'"]').click();
   }

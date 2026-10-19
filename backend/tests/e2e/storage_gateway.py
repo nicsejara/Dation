@@ -28,10 +28,18 @@ app = FastAPI(lifespan=lifespan)
 
 @app.api_route('/rest/v1/{path:path}', methods=['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'])
 async def rest(path: str, request: Request):
+    failure=ROOT/'fail-next-dataset-insert'
+    if path=='datasets' and request.method=='POST' and failure.exists():
+        failure.unlink()
+        return JSONResponse({'error':'Synthetic metadata outage'},status_code=503)
     headers = {k:v for k,v in request.headers.items() if k.lower() not in
                {'host','content-length','connection','accept-encoding'}}
     response = await request.app.state.rest.request(request.method, '/'+path,
         params=request.query_params.multi_items(), headers=headers, content=await request.body())
+    uncertain=ROOT/'fail-next-dataset-response'
+    if path=='datasets' and request.method=='POST' and response.is_success and uncertain.exists():
+        uncertain.unlink()
+        return JSONResponse({'error':'Synthetic lost committed response'},status_code=503)
     return Response(response.content, status_code=response.status_code,
         headers={k:v for k,v in response.headers.items() if k.lower() not in
                  {'content-length','connection','transfer-encoding','content-encoding'}})
@@ -65,6 +73,10 @@ async def storage(path: str, request: Request):
         target.parent.mkdir(parents=True,exist_ok=True)
         target.write_bytes(await request.body())
         return {'Key':relative}
+    failure=ROOT/'fail-next-delete'
+    if failure.exists():
+        failure.unlink()
+        return JSONResponse({'error':'Synthetic storage outage'},status_code=503)
     target.unlink(missing_ok=True)
     return {'deleted':True}
 
