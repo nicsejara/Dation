@@ -1978,7 +1978,7 @@ class FrontendContractTests(
         )
         self.assertIn(
             "DDA Producción",
-            (BACKEND_ROOT / "app/static/js/home-dda-catalog.mjs").read_text(),
+            (BACKEND_ROOT / "app/static/js/platform/dda-catalog.mjs").read_text(),
         )
         self.assertIn(
             "Próximamente",

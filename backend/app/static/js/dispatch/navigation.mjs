@@ -4,6 +4,7 @@ export const NODES=['logistics_assignment','logistics_scheduling','logistics_fin
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 import {HUB_KEYS,readHubResource,writeHubResource} from '../platform/data-resource.mjs';
 import {CENTER_KEYS,readCenterResource,writeCenterResource} from '../platform/center-resource.mjs';
+import {readSettingsTab,writeSettingsTab} from '../platform/settings-resource.mjs';
 export function readResource(url){
   const parsed=new URL(url,'http://localhost');
   const q=parsed.searchParams;
@@ -18,11 +19,12 @@ export function readResource(url){
   if(resource.view!=='decision-dashboard')resource.runId=null;
   if(resource.view==='platform-data')resource.hub=readHubResource(parsed);
   if(resource.view==='platform-decisions')resource.center=readCenterResource(parsed);
+  if(resource.view==='settings')resource.settingsTab=readSettingsTab(parsed);
   return resource;
 }
 export function resourceUrl(url,resource){
   const next=new URL(url,'http://localhost');
-  for(const key of ['view','case_id','node_id','run_id','dda',...HUB_KEYS,...CENTER_KEYS])next.searchParams.delete(key);
+  for(const key of ['view','case_id','node_id','run_id','dda','settings_tab',...HUB_KEYS,...CENTER_KEYS])next.searchParams.delete(key);
   next.pathname=PLATFORM_PATHS[resource.view]||'/app';
   next.searchParams.set('view',resource.view);
   if(resource.caseId&&['overview','logistics-overview','logistics-data','logistics-map','logistics-config','decision-dashboard','traceability','library'].includes(resource.view))next.searchParams.set('case_id',resource.caseId);
@@ -30,6 +32,7 @@ export function resourceUrl(url,resource){
   if(resource.view==='decision-dashboard'&&resource.runId)next.searchParams.set('run_id',resource.runId);
   if(resource.view==='platform-data')writeHubResource(next,resource.hub);
   if(resource.view==='platform-decisions')writeCenterResource(next,resource.center);
+  if(resource.view==='settings')writeSettingsTab(next,resource.settingsTab);
   return next;
 }
 export function runDecisionState(run,decisionCase,nodeId){

@@ -44,12 +44,14 @@ class PlatformSettingsTests(unittest.IsolatedAsyncioTestCase):
                         "document.querySelector('#settings-ai-status').textContent === 'No configurado'"
                     )
                     self.assertEqual(await panel.locator(".d-page-header h1").inner_text(), "Configuración")
-                    self.assertEqual(await panel.locator("[data-workspace-settings] .d-card").count(), 3)
+                    await panel.get_by_label('Nombre del workspace').wait_for()
+                    self.assertEqual(await panel.locator('[data-workspace-settings] [role=tab]').count(), 4)
+                    self.assertEqual(await panel.locator("[data-workspace-settings] .d-card").count(), 1)
                     await panel.locator("[data-platform-diagnostics] summary").click()
                     self.assertEqual(await browser.page.locator(".view.is-active").count(), 1)
                     geometry = await panel.evaluate("""panel => {
                       const header = panel.querySelector('.d-page-header').getBoundingClientRect();
-                      const grid = panel.querySelector('.settings-grid').getBoundingClientRect();
+                      const grid = panel.querySelector('[data-workspace-settings]').getBoundingClientRect();
                       return {
                         overflow: document.documentElement.scrollWidth > innerWidth + 1,
                         gap: grid.top - header.bottom,

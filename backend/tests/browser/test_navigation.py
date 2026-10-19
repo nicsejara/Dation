@@ -93,6 +93,11 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.center_label=None
         self.center_archived=False
         self.center_edits=0
+        self.settings_failure=False
+        self.settings_conflict=False
+        self.workspace_settings={'workspace':{'id':'00000000-0000-4000-8000-00000000da71','name':'Synthetic workspace','country':'AR','language':'es','timezone':'UTC','currency':'ARS','weight_unit':'kg','distance_unit':'km','logistics_unit':'units','updated_at':'2026-10-19T00:00:00Z'},'ddas':self.ddas,
+            'plan':{'code':'free','name':'Free','status':'active','price_amount':0,'billing_mode':'free','requires_payment_method':False,'trial_ends_at':None,'member_limit':None},'members':{'active':2,'total':3},
+            'options':{'countries':['AR','CL','US'],'languages':{'es':'Español','en':'English','pt':'Português'},'timezones':['UTC','America/Santiago'],'currencies':{'ARS':'Peso argentino','CLP':'Peso chileno','USD':'Dólar estadounidense'},'weight_units':{'kg':'Kilogramos (kg)','t':'Toneladas (t)'},'distance_units':{'km':'Kilómetros (km)','mi':'Millas (mi)'},'logistics_units':{'units':'Unidades','pallets':'Pallets','cases':'Cajas'}}}
         self.pw = await async_playwright().start()
         executable = os.getenv("CHROMIUM_EXECUTABLE")
         if not executable and Path("/usr/bin/chromium").exists():
@@ -108,7 +113,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                 "access_token":"browser-layout-fixture","expires_at":int(time.time())+3600,
                 "profile":{"id":"10000000-0000-4000-8000-000000000001","first_name":"Synthetic","last_name":"User","email":"fixture@example.test"},
                 "membership":{"workspace_id":"00000000-0000-4000-8000-00000000da71","access_role":self.access_role},
-                "workspace":{"id":"00000000-0000-4000-8000-00000000da71","name":"Synthetic workspace"},"ddas":self.ddas}))
+                "workspace":self.workspace_settings['workspace'],"ddas":self.ddas}))
         await self.context.route("**/auth/session",session_fixture)
         await self.context.add_init_script("sessionStorage.setItem('_dation_identity','10000000-0000-4000-8000-000000000001:00000000-0000-4000-8000-00000000da71');")
         await self.context.route("**/api/**", self.route_api)
@@ -139,7 +144,10 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         if path.startswith('/api/platform/data/'):
             await self.route_hub(route,path,query,method)
             return
-        if path == "/api/platform/home":
+        if path == '/api/platform/settings':
+            if method=='PATCH':status,data=(409,{'detail':'Settings changed'}) if self.settings_conflict else (403,{'detail':'Admin required'})
+            else:status,data=(503,{'detail':'Settings unavailable'}) if self.settings_failure else (200,copy.deepcopy(self.workspace_settings))
+        elif path == "/api/platform/home":
             status,data=(503,{'detail':'Home unavailable'}) if self.home_failure else (200,copy.deepcopy(self.home_data))
         elif path == "/api/dispatch/status":
             data = {"available":True,"checks":[],"engine_version":"1.0.0"}
@@ -2028,6 +2036,16 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await fallback.click()
         await self.page.locator('.dda-landing__hero').wait_for()
         self.assertEqual(await self.page.evaluate('window.dationGetCurrentView()'),'logistics-overview')
+        await self.nav('settings')
+        settings=self.page.locator('[data-workspace-settings]')
+        await settings.get_by_label('Nombre del workspace').wait_for()
+        await settings.get_by_role('tab',name='Decision Data Assets',exact=True).click()
+        await settings.get_by_role('heading',name='Decision Data Assets',exact=True).wait_for()
+        self.assertEqual(await settings.locator('dt').count(),7)
+        self.assertEqual(await settings.get_by_text('Próximamente',exact=True).count(),6)
+        await settings.get_by_role('tab',name='Plan y facturación',exact=True).click()
+        await settings.get_by_role('heading',name='Plan Free',exact=True).wait_for()
+        self.assertTrue(await self.page.locator('.app-shell').is_visible())
 
     async def test_dashboard_toolbars_share_controls_and_symmetric_bleed(self):
         theme=(Path(__file__).parent/'theme_audit.js').read_text()
@@ -3475,6 +3493,34 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(actual,selected)
         self.assertEqual(self.approval_calls,2);self.assertEqual(self.execution_bodies,[]);self.assertEqual(self.explain_calls,0);self.assertEqual(self.comparative_posts,0)
 
+
+    async def test_workspace_settings_retry_conflict_readonly_and_tab_history(self):
+        self.settings_failure=True
+        await self.open('logistics-map')
+        await self.nav('settings')
+        root=self.page.locator('[data-workspace-settings]')
+        await root.get_by_text('Settings unavailable',exact=True).wait_for()
+        self.settings_failure=False
+        await root.get_by_role('button',name='Reintentar',exact=True).click()
+        await root.get_by_label('Nombre del workspace').fill('Cambio sin aplicar')
+        self.settings_conflict=True
+        await root.get_by_role('button',name='Guardar datos generales',exact=True).click()
+        await root.get_by_role('button',name='Actualizar configuración',exact=True).wait_for()
+        self.assertTrue(await root.get_by_role('button',name='Guardar datos generales',exact=True).is_disabled())
+        self.assertEqual(len([r for r in self.requests if r==('PATCH','/api/platform/settings')]),1)
+        await root.get_by_role('button',name='Actualizar configuración',exact=True).click()
+        await root.get_by_label('Nombre del workspace').wait_for()
+        self.assertEqual(await root.get_by_label('Nombre del workspace').input_value(),'Synthetic workspace')
+        self.access_role='viewer'
+        await self.page.evaluate('window.dationSession.refresh()')
+        await self.page.wait_for_function("document.querySelector('#workspace-name')?.disabled===true")
+        self.assertEqual(await root.get_by_role('button',name='Guardar datos generales',exact=True).count(),0)
+        await root.get_by_role('tab',name='Plan y facturación',exact=True).click()
+        await root.get_by_role('heading',name='Plan Free',exact=True).wait_for()
+        self.assertIn('No hay cobros',await root.inner_text())
+        await self.page.reload()
+        await root.get_by_role('heading',name='Plan Free',exact=True).wait_for()
+        self.assertIn('settings_tab=plan',self.page.url)
 
     async def test_workspace_home_empty_state_and_catalog_access(self):
         await self.page.goto(f'http://127.0.0.1:{self.port}/app')

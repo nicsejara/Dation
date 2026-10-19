@@ -1,3 +1,4 @@
+import {workspaceDate} from './workspace-format.mjs';
 import {api} from '../dispatch/shared.mjs';
 import {createScope} from '../dispatch/lifecycle.mjs';
 import {resourceUrl} from '../dispatch/navigation.mjs';
@@ -19,7 +20,7 @@ function issue(value){return typeof value==='string'?value:value?.message||value
 function card(title){const node=el('section',undefined,'d-card hub-card');node.append(el('h2',title,'d-card-title'));return node;}
 function number(value){return value===null||value===undefined?'—':new Intl.NumberFormat('es').format(value);}
 function bytes(value){return value===null||value===undefined?'—':value<1024?value+' B':value<1048576?(value/1024).toFixed(1)+' KB':(value/1048576).toFixed(1)+' MB';}
-function date(value,timezone){if(!value)return 'Sin registro';try{return new Intl.DateTimeFormat('es',{dateStyle:'medium',timeStyle:'short',timeZone:timezone||'UTC'}).format(new Date(value));}catch{return 'Sin registro';}}
+function date(value,workspace){return workspaceDate(value,workspace);}
 function field(label,value){const row=el('div',undefined,'hub-field');row.append(el('dt',label),el('dd',value??'—'));return row;}
 function status(row){const node=el('span',row.deletion_pending?'Eliminación pendiente':validations[row.validation]||'Sin registro','hub-status');node.dataset.state=row.deletion_pending?'issues':row.validation||'unknown';return node;}
 function table(headers){const wrap=el('div',undefined,'hub-table-scroll');wrap.tabIndex=0;wrap.setAttribute('role','region');wrap.setAttribute('aria-label','Tabla de '+headers[0]);const grid=el('table',undefined,'hub-table'),head=el('thead'),row=el('tr'),body=el('tbody');for(const label of headers){const th=el('th',label);th.scope='col';row.append(th);}head.append(row);grid.append(head,body);wrap.append(grid);return {wrap,body};}
@@ -121,10 +122,10 @@ export function mountDataHub(root,getIdentity){
    for(const item of data.items){
     const row=el('tr');
     if(packs){
-     cell(row,link(item.label,{tab:'packs',ordersId:item.orders_dataset_id,fleetId:item.fleet_dataset_id}));cell(row,datasetLink(item.orders));cell(row,datasetLink(item.fleet));cell(row,item.validated?'Validado':'Revisar validación');cell(row,number(item.case_count));cell(row,date(item.created_at,getIdentity().workspace.timezone));cell(row,reuseButton(item,true));
+     cell(row,link(item.label,{tab:'packs',ordersId:item.orders_dataset_id,fleetId:item.fleet_dataset_id}));cell(row,datasetLink(item.orders));cell(row,datasetLink(item.fleet));cell(row,item.validated?'Validado':'Revisar validación');cell(row,number(item.case_count));cell(row,date(item.created_at,getIdentity().workspace));cell(row,reuseButton(item,true));
     }else{
      const copy=el('div',undefined,'hub-file-name');copy.append(datasetLink(item),el('span',item.canonical_filename||item.original_filename,'d-metadata'));
-     cell(row,copy);cell(row,types[item.dataset_type]||'Anterior');cell(row,number(item.row_count));cell(row,status(item));cell(row,item.uploaded_by?.name||'Sin registro');cell(row,date(item.created_at,getIdentity().workspace.timezone));cell(row,`${number(item.case_count)} casos · ${number(item.run_count)} corridas`);cell(row,reuseButton(item));
+     cell(row,copy);cell(row,types[item.dataset_type]||'Anterior');cell(row,number(item.row_count));cell(row,status(item));cell(row,item.uploaded_by?.name||'Sin registro');cell(row,date(item.created_at,getIdentity().workspace));cell(row,`${number(item.case_count)} casos · ${number(item.run_count)} corridas`);cell(row,reuseButton(item));
     }
     grid.body.append(row);
    }
@@ -173,7 +174,7 @@ export function mountDataHub(root,getIdentity){
   if(row.deletion_pending)header.append(flash('Eliminación pendiente. Reintentá para completarla. El dataset no se puede reutilizar.'));
   fragment.append(header);
   const metadata=card('Información del dataset'),values=el('dl',undefined,'hub-fields');
-  for(const [label,value]of [['Tipo',types[row.dataset_type]||'Anterior'],['Registros',number(row.row_count)],['Tamaño',bytes(row.size_bytes)],['Subido por',row.uploaded_by?.name||'Sin registro'],['Creado',date(row.created_at,getIdentity().workspace.timezone)],['Estado',row.archived_at?'Archivado':'Activo']])values.append(field(label,value));metadata.append(values);fragment.append(metadata,validation(row,data.validation_report));
+  for(const [label,value]of [['Tipo',types[row.dataset_type]||'Anterior'],['Registros',number(row.row_count)],['Tamaño',bytes(row.size_bytes)],['Subido por',row.uploaded_by?.name||'Sin registro'],['Creado',date(row.created_at,getIdentity().workspace)],['Estado',row.archived_at?'Archivado':'Activo']])values.append(field(label,value));metadata.append(values);fragment.append(metadata,validation(row,data.validation_report));
   let preview;
   if(!row.deletion_pending){preview=previewPanel(row,version);fragment.append(preview.panel);}
   fragment.append(cases(data.used_in,row.case_count));

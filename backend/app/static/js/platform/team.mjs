@@ -2,16 +2,17 @@ import {api} from '../dispatch/shared.mjs';
 import {createScope} from '../dispatch/lifecycle.mjs';
 import {mountDialog} from './components.mjs';
 import {ACCESS_ROLES,RESPONSIBILITIES,mountReceivedInvitations} from './invitations.mjs';
+import {workspaceDate} from './workspace-format.mjs';
 
 const BASE='/api/platform/team',size=25;
 function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;}
 function button(text,handler,kind='secondary'){const b=el('button',text,'d-button d-button--'+kind);b.type='button';b.addEventListener('click',handler);return b;}
 function select(label,name,values,value){const field=el('div',undefined,'d-field'),title=el('label',label,'d-label'),input=el('select',undefined,'d-input');input.id='team-'+name;input.name=name;title.htmlFor=input.id;for(const [value,text]of Object.entries(values)){const option=el('option',text);option.value=value;input.append(option);}input.value=value||'';field.append(title,input);return field;}
-function stamp(value){try{return new Intl.DateTimeFormat('es',{dateStyle:'medium'}).format(new Date(value));}catch{return 'Sin registro';}}
 
 export function mountTeam(root,getIdentity){
  const scope=createScope(root);root.classList.add('platform-team');let controller,generation=0,offset=0,query='',notice='',modal,received;
  const admin=()=>getIdentity().membership.access_role==='admin';
+ const stamp=value=>workspaceDate(value,getIdentity().workspace,{dateStyle:'medium'});
  function close(){if(!modal)return;const own=modal;modal=null;own.view.dispose();own.dialog.remove();}
  function edit(title,content,saveAction){
   close();const dialog=el('dialog',undefined,'d-platform team-dialog'),form=el('form'),heading=el('h2',title,'d-card-title');heading.id='team-dialog-title';dialog.setAttribute('aria-labelledby',heading.id);

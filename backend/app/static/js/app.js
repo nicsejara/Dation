@@ -653,11 +653,11 @@ function mountLibraryView(view){
   if(!['traceability','settings','inicio'].includes(view))return;
   if(view==='inicio'||(view==='traceability'&&!currentLogisticsEnabled()))return;
   const panel=document.querySelector('[data-view-panel="'+view+'"]');if(!panel)return;
-  const scope=libraryScope=createScope(panel);
+  const scope=libraryScope=createScope(view==='settings'?panel.querySelector('[data-platform-diagnostics]'):panel);
   if(view==='settings'){
     const trigger=panel.querySelector('[data-settings-help]');
     const help=panel.querySelector('#settings-status-help');
-    if(trigger&&help)mountDropdown({trigger,panel:help});
+    if(trigger&&help){const dropdown=mountDropdown({trigger,panel:help});scope.own(()=>dropdown.dispose());}
   }
   if(view==='settings'&&window.dationSession?.identity?.membership?.access_role!=='admin')return;
   const work=view==='settings'?refreshInterpreter(scope).then(()=>scope.active&&refreshSystemStatus(scope)):Promise.all([refreshDatasets(scope),refreshRuns(scope),refreshSummary(scope)]);
