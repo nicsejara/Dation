@@ -718,6 +718,7 @@ async function navigateResource(view,options={}){
   resource=next;
   if(publicView==='platform-data')next.hub=options.hub||{};
   if(publicView==='platform-decisions')next.center=options.center||{};
+  if(publicView==='settings')next.settingsTab=options.settingsTab||'general';
   if(options.history!==false){const url=resourceUrl(location.href,next);history[options.replace?'replaceState':'pushState'](null,'',url);}
   state.activeNode=next.nodeId||null;decisionContext(state.activeNode);persist();
   document.body.classList.toggle('dispatch-result',publicView==='decision-dashboard');
@@ -751,10 +752,11 @@ window.DationDispatch={show,openRun,isReady:ready,getWorkspace:()=>state,startNe
 window.dationNavigate=(view,stage,event)=>{event?.preventDefault();event?.stopPropagation();return navigateResource(view);};
 window.DationDispatch.openDataHub=(hub={},options={})=>navigateResource('platform-data',{...options,hub,caseId:null,nodeId:null});
 window.DationDispatch.openDecisionCenter=(center={},options={})=>navigateResource('platform-decisions',{...options,center,caseId:null,nodeId:null});
+window.DationDispatch.openWorkspaceSettings=settingsTab=>navigateResource('settings',{settingsTab,caseId:null,nodeId:null});
 window.DationDispatch.reuseHubData=inputs=>startNewDecision(inputs);
 document.body.classList.add('dispatch-enabled');
 mountTraceability();
-async function restoreResource(){try{const target=readResource(location.href);await navigateResource(target.view,{...target,history:false});}catch(error){if(location.pathname.replace(/\/$/,'')==='/app/data')return navigateResource('platform-data',{history:false,caseId:null,nodeId:null});if(location.pathname.replace(/\/$/,'')==='/app/decisions')return navigateResource('platform-decisions',{history:false,caseId:null,nodeId:null});document.body.classList.add('dispatch-result');renderView('decision-dashboard');roots.dashboard.hidden=false;errorBox(roots.dashboard,error,()=>navigate('logistics-data'));}}
+async function restoreResource(){try{const target=readResource(location.href);await navigateResource(target.view,{...target,history:false});}catch(error){if(location.pathname.replace(/\/$/,'')==='/app/settings')return navigateResource('settings',{history:false,settingsTab:'general',caseId:null,nodeId:null});if(location.pathname.replace(/\/$/,'')==='/app/data')return navigateResource('platform-data',{history:false,caseId:null,nodeId:null});if(location.pathname.replace(/\/$/,'')==='/app/decisions')return navigateResource('platform-decisions',{history:false,caseId:null,nodeId:null});document.body.classList.add('dispatch-result');renderView('decision-dashboard');roots.dashboard.hidden=false;errorBox(roots.dashboard,error,()=>navigate('logistics-data'));}}
 window.addEventListener('popstate',restoreResource);
 window.addEventListener('dation:identity',()=>{if(!currentLogisticsEnabled()&&logisticsView(window.dationGetCurrentView?.()))navigateResource('inicio',{replace:true,caseId:null,nodeId:null});});
 window.addEventListener('pagehide',()=>{routeController?.abort();routeGeneration++;pollGeneration++;runPolling.stop();for(const root of Object.values(roots))disposeScope(root);});

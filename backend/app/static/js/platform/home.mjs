@@ -1,16 +1,14 @@
 import {createScope} from '../dispatch/lifecycle.mjs';
 import {readResource, resourceUrl} from '../dispatch/navigation.mjs';
 import {ddaEnabled} from './entitlements.mjs';
+import {workspaceDate} from './workspace-format.mjs';
 
 const states={available:'Listo para continuar',running:'En ejecución',review:'Para revisar',approved:'Aprobado',error:'Requiere revisión',stale:'Requiere actualizar',locked:'Pendiente',needs_data:'Faltan datos',completed:'Completado'};
 function el(tag,text,className){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(className)n.className=className;return n;}
 function link(text,view,className='d-button d-button--secondary',resource={}){
  const a=el('a',text,className);a.href=resourceUrl(location.href,{view,...resource});a.dataset.homeResource='';return a;
 }
-function dateLabel(value,timezone){
- const date=new Date(value);if(!Number.isFinite(date.getTime()))return '';
- try{return new Intl.DateTimeFormat('es',{day:'numeric',month:'short',timeZone:timezone||'UTC'}).format(date);}catch{return new Intl.DateTimeFormat('es',{day:'numeric',month:'short',timeZone:'UTC'}).format(date);}
-}
+function dateLabel(value,workspace){return workspaceDate(value,workspace,{day:'numeric',month:'short'});}
 function greeting(identity){
  let hour;try{hour=Number(new Intl.DateTimeFormat('en',{hour:'numeric',hourCycle:'h23',timeZone:identity.workspace.timezone||'UTC'}).format(new Date()));}catch{hour=new Date().getUTCHours();}
  const hello=hour<12?'Buenos días':hour<19?'Buenas tardes':'Buenas noches';
@@ -48,7 +46,7 @@ export function mountWorkspaceHome(root,getIdentity){
     row.append(el('h3',item.label||'Decision Case','platform-home__case-title'),el('p','DC-'+item.case_id.slice(0,8),'d-metadata'));
     const meta=el('div',undefined,'platform-home__case-meta'),status=el('span',states[item.status]||'En progreso','platform-home__status');status.dataset.state=item.status;
     meta.append(el('span',item.node_label),status);
-    const formatted=dateLabel(item.last_activity_at,identity.workspace.timezone);if(formatted){const time=el('time','Actividad: '+formatted,'d-metadata');time.dateTime=item.last_activity_at;meta.append(time);}
+    const formatted=dateLabel(item.last_activity_at,identity.workspace);if(formatted){const time=el('time','Actividad: '+formatted,'d-metadata');time.dateTime=item.last_activity_at;meta.append(time);}
     const view=item.run_id?'decision-dashboard':'logistics-map';
     const next=link(item.status==='completed'?'Ver caso':'Continuar',view,'d-button d-button--secondary',{caseId:item.case_id,nodeId:item.node_id,runId:item.run_id});
     next.setAttribute('aria-label',`${item.status==='completed'?'Ver caso':'Continuar'} DC-${item.case_id.slice(0,8)}`);

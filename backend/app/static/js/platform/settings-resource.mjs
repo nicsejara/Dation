@@ -1,0 +1,3 @@
+export const SETTINGS_TABS=Object.freeze({general:'General',operation:'Operación',ddas:'Decision Data Assets',plan:'Plan y facturación'});
+export function readSettingsTab(url){const value=new URL(url,'http://localhost').searchParams.get('settings_tab')||'general';if(!Object.hasOwn(SETTINGS_TABS,value))throw new Error('La pestaña de configuración no existe.');return value;}
+export function writeSettingsTab(url,value='general'){if(!Object.hasOwn(SETTINGS_TABS,value))throw new Error('La pestaña de configuración no existe.');url.searchParams.delete('settings_tab');if(value!=='general')url.searchParams.set('settings_tab',value);return url;}

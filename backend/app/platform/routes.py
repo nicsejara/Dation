@@ -7,11 +7,13 @@ from app.platform.home import home_snapshot
 from app.platform.data_routes import router as data_router
 from app.platform.decision_routes import router as decision_router
 from app.platform.team_routes import router as team_router
+from app.platform.settings_routes import router as settings_router
 
 router=APIRouter(prefix='/api/platform')
 router.include_router(data_router)
 router.include_router(decision_router)
 router.include_router(team_router)
+router.include_router(settings_router)
 
 @router.get('/home')
 async def get_home(ctx=Depends(require_upload_access)):

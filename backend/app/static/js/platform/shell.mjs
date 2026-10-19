@@ -6,6 +6,7 @@ import {ddaEnabled} from './entitlements.mjs';
 import {mountDataHub} from './data-hub.mjs';
 import {mountDecisionCenter} from './decision-center.mjs';
 import {mountTeam} from './team.mjs';
+import {mountWorkspaceSettings} from './workspace-settings.mjs';
 
 const labels={'platform-home':'Inicio',inicio:'Decision Data Assets','platform-decisions':'Decision Center','platform-data':'Data Hub','platform-team':'Equipo',settings:'Configuración',profile:'Mi perfil'};
 const roles={admin:'Administrador',operator:'Operador',viewer:'Solo lectura'};
@@ -39,11 +40,7 @@ export function mountPlatformShell(){
  const center=mountDecisionCenter(document.querySelector('[data-platform-decisions]'),()=>window.dationSession.identity);scope.own(()=>center.dispose());
  const dataHub=mountDataHub(document.querySelector('[data-platform-data]'),()=>window.dationSession.identity);scope.own(()=>dataHub.dispose());
  const team=mountTeam(document.querySelector('[data-platform-team]'),()=>window.dationSession.identity);scope.own(()=>team.dispose());
- const settings=document.querySelector('[data-workspace-settings]');
- for(const [title,values]of [['Workspace',[['Nombre',identity.workspace.name],['País',identity.workspace.country],['Zona horaria',identity.workspace.timezone]]],['Preferencias',[['Idioma',identity.workspace.language],['Moneda',identity.workspace.currency],['Unidades',[identity.workspace.weight_unit,identity.workspace.distance_unit].filter(Boolean).join(' · ')]]],['Mi acceso',[['Rol',roles[identity.membership.access_role]],['Responsabilidad',identity.membership.business_role||'Sin asignar'],['Workspace','Activo']]]]){
-  const item=node('article',undefined,'d-card');item.append(node('h2',title,'d-card-title'));
-  for(const [label,value]of values){const row=node('div',undefined,'settings-row d-metadata');row.append(node('span',label),node('strong',value||'—'));item.append(row);}settings.append(item);
- }
+ const settings=mountWorkspaceSettings(document.querySelector('[data-workspace-settings]'),()=>window.dationSession.identity);scope.own(()=>settings.dispose());
  const diagnostics=document.querySelector('[data-platform-diagnostics]');diagnostics.hidden=identity.membership.access_role!=='admin';
  const profileRoot=document.querySelector('[data-profile-form]');const form=node('form');form.className='platform-profile-form';
  for(const [key,label,value,readonly]of [['first_name','Nombre',profile().first_name,false],['last_name','Apellido',profile().last_name,false],['email','Email',profile().email,true],['access_role','Rol de acceso',roles[identity.membership.access_role],true],['business_role','Responsabilidad',identity.membership.business_role||'Sin asignar',true]]){

@@ -5,6 +5,7 @@ import {DECISION_META} from '../dispatch/decision-ui.mjs';
 import {mountDialog} from './components.mjs';
 import {ddaEnabled} from './entitlements.mjs';
 import {CENTER_FILTERS,readCenterResource} from './center-resource.mjs';
+import {workspaceDate} from './workspace-format.mjs';
 
 const BASE='/api/platform/decisions',size=25;
 const statusNames={active:'En progreso',completed:'Completado',archived:'Archivado',review:'En revisión',approved:'Aprobado',running:'En ejecución',error:'Requiere revisión',stale:'Requiere actualizar',available:'Disponible',locked:'Bloqueado',needs_data:'Faltan datos',coming_soon:'Próximamente'};
@@ -14,14 +15,14 @@ function button(text,handler,kind='secondary'){const n=el('button',text,'d-butto
 function card(title){const n=el('section',undefined,'d-card center-card');n.append(el('h2',title,'d-card-title'));return n;}
 function pill(status){const n=el('span',statusNames[status]||status,'center-status');n.dataset.state=status;return n;}
 function person(value,fallback='Sin registro'){return value?.name?value.name+(value.active===false?' (inactivo)':''):fallback;}
-function stamp(value,zone){if(!value)return 'Sin registro';try{return new Intl.DateTimeFormat('es',{dateStyle:'medium',timeStyle:'short',timeZone:zone||'UTC'}).format(new Date(value));}catch{return 'Sin registro';}}
+function stamp(value,workspace){return workspaceDate(value,workspace);}
 function field(label,value){const n=el('div',undefined,'center-field');n.append(el('dt',label),el('dd',value??'—'));return n;}
 function table(headers){const wrap=el('div',undefined,'center-table-scroll');wrap.tabIndex=0;wrap.role='region';wrap.setAttribute('aria-label','Tabla de '+headers[0]);const t=el('table',undefined,'center-table'),head=el('thead'),r=el('tr'),body=el('tbody');for(const title of headers){const h=el('th',title);h.scope='col';r.append(h);}head.append(r);t.append(head,body);wrap.append(t);return {wrap,body};}
 function cell(row,value){const n=el('td');n.append(typeof value==='string'?document.createTextNode(value):value);row.append(n);}
 
 export function mountDecisionCenter(root,getIdentity){
  const scope=createScope(root);root.classList.add('decision-center');let controller,generation=0,route={},notice='',modal,access='';
- const writable=()=>getIdentity().membership.access_role!=='viewer',enabled=()=>ddaEnabled(getIdentity(),'logistics'),zone=()=>getIdentity().workspace.timezone;
+ const writable=()=>getIdentity().membership.access_role!=='viewer',enabled=()=>ddaEnabled(getIdentity(),'logistics'),zone=()=>getIdentity().workspace;
  function open(value){window.DationDispatch.openDecisionCenter(value);}
  function link(text,value){const a=el('a',text,'center-link');a.href=resourceUrl(location.href,{view:'platform-decisions',center:value});a.addEventListener('click',event=>{if(event.button||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;event.preventDefault();open(value);});return a;}
  function external(text,target,disabled=false){
