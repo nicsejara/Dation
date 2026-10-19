@@ -258,6 +258,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await route.fulfill(status=status,content_type="application/json",body=json.dumps(data))
 
     async def route_hub(self,route,path,query,method):
+        await asyncio.sleep(self.delay.get(path,.01))
         prefix='/api/platform/data';status=200;data={}
         def public(row):
             result={k:copy.deepcopy(v) for k,v in row.items() if k not in ('profile_json','storage_path','storage_bucket')}
@@ -3659,6 +3660,18 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse((data.get('decisionCase') or {}).get('persisted',False))
         self.assertEqual(self.case,original)
         self.assertFalse(any(method=='POST' and path=='/api/decision-cases' for method,path in self.requests))
+        # A response from a page we left must not hijack a later Hub visit.
+        await self.nav('platform-data')
+        path='/api/platform/data/datasets/'+self.f['ids']['orders']+'/reuse'
+        self.delay[path]=2
+        async with self.page.expect_response(lambda response:urlparse(response.url).path==path) as pending:
+            await root.get_by_role('button',name='Reutilizar',exact=True).nth(0).click()
+            await self.nav('platform-home')
+            await self.nav('platform-data')
+        self.assertIn('datasets',await (await pending.value).json())
+        await self.page.wait_for_timeout(100)
+        self.assertEqual(urlparse(self.page.url).path,'/app/data')
+        await root.get_by_role('button',name='Cargar datos',exact=True).wait_for()
         self.assertEqual(self.errors,[])
 
 if __name__ == "__main__":

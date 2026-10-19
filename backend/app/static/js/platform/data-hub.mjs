@@ -67,11 +67,12 @@ export function mountDataHub(root,getIdentity){
    ()=>api(BASE+'/datasets/'+row.id+'/'+(archive?'archive':'unarchive'),{method:'POST'}),()=>{notice=archive?'Dataset archivado.':'Dataset restaurado.';load();});
  }
  async function reuse(row,pack=false,trigger){
+  const version=generation;
   if(trigger)trigger.disabled=true;
   try{
    const result=await api(BASE+(pack?'/pack/reuse':'/datasets/'+row.id+'/reuse'),{method:'POST',headers:{'Content-Type':'application/json'},...(pack?{body:JSON.stringify({orders_id:row.orders_dataset_id,fleet_id:row.fleet_dataset_id})}:{})});
-   if(window.dationGetCurrentView?.()==='platform-data')window.DationDispatch.reuseHubData(result.datasets);
-  }catch(error){notice=error.message;load();}finally{if(trigger?.isConnected)trigger.disabled=false;}
+   if(version===generation&&window.dationGetCurrentView?.()==='platform-data')window.DationDispatch.reuseHubData(result.datasets);
+  }catch(error){if(version===generation){notice=error.message;load();}}finally{if(trigger?.isConnected)trigger.disabled=false;}
  }
  function reuseButton(row,pack=false){
   let node;node=button(pack?'Reutilizar Data Pack':'Reutilizar',()=>reuse(row,pack,node));
