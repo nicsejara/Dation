@@ -84,6 +84,9 @@ class TenantClient:
                             raise RuntimeError("Invalid tenant payload")
                     options["json"] = ([{**row, "workspace_id": ctx.workspace_id} for row in rows]
                                        if isinstance(body, list) else {**body, "workspace_id": ctx.workspace_id})
+                    if method=='POST' and table in {'decision_cases','decision_runs'} and not ctx.worker:
+                        options['json']=([{**row,'created_by_user_id':ctx.user_id} for row in options['json']]
+                            if isinstance(body,list) else {**options['json'],'created_by_user_id':ctx.user_id})
             response = await self.client.request(method, url, **options)
             if response.status_code >= 400:
                 try: code = response.json().get("code")

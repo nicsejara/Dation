@@ -4,6 +4,7 @@ import {PLATFORM_PATHS,readResource} from '../dispatch/navigation.mjs';
 import {mountWorkspaceHome} from './home.mjs';
 import {ddaEnabled} from './entitlements.mjs';
 import {mountDataHub} from './data-hub.mjs';
+import {mountDecisionCenter} from './decision-center.mjs';
 
 const labels={'platform-home':'Inicio',inicio:'Decision Data Assets','platform-decisions':'Decision Center','platform-data':'Data Hub','platform-team':'Equipo',settings:'Configuración',profile:'Mi perfil'};
 const roles={admin:'Administrador',operator:'Operador',viewer:'Solo lectura'};
@@ -28,12 +29,8 @@ export function mountPlatformShell(){
   event.preventDefault();menu.close({restoreFocus:false});window.dationNavigate(link.dataset.platformView);
  });
  const home=mountWorkspaceHome(document.querySelector('[data-platform-home]'),()=>identity);scope.own(()=>home.dispose());
- function renderBusinessAccess(){
-  const enabled=ddaEnabled(identity,'logistics');
-  document.querySelector('[data-platform-decisions]').replaceChildren(card('Tus decisiones',enabled?'Consultá las corridas y la evidencia guardada en el historial actual. El centro unificado de decisiones estará disponible próximamente.':'DDA Logística no está habilitado en este workspace.',enabled?[['Abrir historial','traceability'],['Mapa de decisiones de Logística','logistics-map']]:[['Ver Decision Data Assets','inicio']]));
- }
- renderBusinessAccess();
- scope.listen(window,'dation:identity',()=>{identity={...window.dationSession.identity,profile:identity.profile};renderIdentity();renderBusinessAccess();});
+ scope.listen(window,'dation:identity',()=>{identity={...window.dationSession.identity,profile:identity.profile};renderIdentity();});
+ const center=mountDecisionCenter(document.querySelector('[data-platform-decisions]'),()=>window.dationSession.identity);scope.own(()=>center.dispose());
  const dataHub=mountDataHub(document.querySelector('[data-platform-data]'),()=>window.dationSession.identity);scope.own(()=>dataHub.dispose());
  document.querySelector('[data-platform-team]').append(card(identity.workspace.name,'Tu acceso actual: '+roles[identity.membership.access_role]+'. La administración de invitaciones y responsabilidades del equipo estará disponible próximamente.'));
  const settings=document.querySelector('[data-workspace-settings]');
@@ -71,10 +68,6 @@ export function mountPlatformShell(){
    breadcrumb.append(action('Decision Data Assets','inicio'),node('span','/'),action('DDA Logística','logistics-overview'));
    try{const route=readResource(location.href);if(route.caseId)breadcrumb.append(node('span','/'),node('span','DC-'+route.caseId.slice(0,8)));if(route.nodeId)breadcrumb.append(node('span','/'),node('span',route.nodeId==='logistics_scheduling'?'Scheduling':'Assignment'));}catch{}
   }else{breadcrumb.append(node('span',labels[view]||(view==='traceability'?'Historial y evidencia':'Dation')));}
-  if(view==='platform-decisions'){
-   // Preserve the chosen tab on the subsequent legacy history view.
-   document.querySelector('[data-trace-tab="'+(view==='platform-decisions'?'history':'datasets')+'"]').click();
-  }
  }
  scope.listen(window,'dation:view',updateNavigation);updateNavigation();
  scope.listen(window,'pagehide',event=>{if(!event.persisted)scope.dispose();});
