@@ -16,6 +16,8 @@ Los helpers de presentación usan idioma, país y zona horaria del workspace en 
 
 Decision Data Assets reutiliza el catálogo y los grants actuales. Logística muestra Habilitado/No habilitado según acceso; las seis familias futuras siguen Próximamente aunque un grant esté mal configurado como enabled. No hay configuración de motores por cliente ni compra de acceso.
 
+Las definiciones de productos viven en `platform/dda-catalog.mjs`, sin depender del renderizador opcional del catálogo. Si falla ese renderizador, el shell, el acceso de respaldo a Logística y las pestañas de Configuración siguen disponibles. La regresión de navegador bloquea explícitamente su descarga y verifica ambos recorridos.
+
 `platform_workspace_settings` devuelve la política universal Free desde el servidor para el workspace heredado y los creados después: activo, importe cero, sin método de pago, sin trial y sin límite comercial de miembros. No hacen falta columnas comerciales ni una tabla de suscripción mientras todos comparten esa política. Plan y facturación muestra Free/Gratis, miembros activos reales y DDAs habilitados. No inventa facturas, pagos, fecha de renovación, límites de uso ni automatizaciones comerciales. No se envían datos a proveedores de cobro.
 
 ## Persistencia y verificación

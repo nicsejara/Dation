@@ -2036,6 +2036,16 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await fallback.click()
         await self.page.locator('.dda-landing__hero').wait_for()
         self.assertEqual(await self.page.evaluate('window.dationGetCurrentView()'),'logistics-overview')
+        await self.nav('settings')
+        settings=self.page.locator('[data-workspace-settings]')
+        await settings.get_by_label('Nombre del workspace').wait_for()
+        await settings.get_by_role('tab',name='Decision Data Assets',exact=True).click()
+        await settings.get_by_role('heading',name='Decision Data Assets',exact=True).wait_for()
+        self.assertEqual(await settings.locator('dt').count(),7)
+        self.assertEqual(await settings.get_by_text('Próximamente',exact=True).count(),6)
+        await settings.get_by_role('tab',name='Plan y facturación',exact=True).click()
+        await settings.get_by_role('heading',name='Plan Free',exact=True).wait_for()
+        self.assertTrue(await self.page.locator('.app-shell').is_visible())
 
     async def test_dashboard_toolbars_share_controls_and_symmetric_bleed(self):
         theme=(Path(__file__).parent/'theme_audit.js').read_text()

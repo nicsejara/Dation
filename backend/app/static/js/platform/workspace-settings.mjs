@@ -2,7 +2,7 @@ import {api} from '../dispatch/shared.mjs';
 import {createScope} from '../dispatch/lifecycle.mjs';
 import {SETTINGS_TABS,readSettingsTab} from './settings-resource.mjs';
 import {workspaceDate,workspaceNumber,workspaceLocale} from './workspace-format.mjs';
-import {DDA_CATALOG} from '../home-dda-catalog.mjs';
+import {DDA_CATALOG} from './dda-catalog.mjs';
 
 const BASE='/api/platform/settings';
 function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;}
