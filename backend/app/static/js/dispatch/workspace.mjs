@@ -251,12 +251,14 @@ function decisionContext(nodeId){
   });
 }
 function navigate(view,options={}){persist();window.dationSetDataReady(ready());return navigateResource(view,options);}
-async function startNewDecision(){
+async function startNewDecision(inputs=[]){
+  if(!currentLogisticsEnabled())return navigateResource('inicio');
   transitionCaseId=null;
   saveDraft();
   resetAssignmentConfiguration();
   Object.assign(state,{orders:null,fleet:null,decisionCase:null,run:null,activeNode:null,
     preflight:null,configPreview:null,configured:false,decisions:{},schedulingUseDueDates:true});
+  if(Array.isArray(inputs))for(const dataset of inputs){if(['orders','fleet'].includes(dataset?.dataset_type))state[dataset.dataset_type]=dataset;}
   decisionContext(null);
   window.dationSetDataReady(false);
   persist();
@@ -708,6 +710,7 @@ async function navigateResource(view,options={}){
   runPolling.stop();pollGeneration++;
   for(const root of Object.values(roots)){disposeScope(root);root.replaceChildren();root.className='dispatch';}
   resource=next;
+  if(publicView==='platform-data')next.hub=options.hub||{};
   if(options.history!==false){const url=resourceUrl(location.href,next);history[options.replace?'replaceState':'pushState'](null,'',url);}
   state.activeNode=next.nodeId||null;decisionContext(state.activeNode);persist();
   document.body.classList.toggle('dispatch-result',publicView==='decision-dashboard');
@@ -739,9 +742,11 @@ async function executeConfiguredScheduling({sourceRun,configuration,options}){
 }
 window.DationDispatch={show,openRun,isReady:ready,getWorkspace:()=>state,startNewDecision,openCase:(caseId,view='logistics-map',nodeId=null)=>navigateResource(view,{caseId,nodeId}),openActiveDecisionResult:()=>openCaseResult(state.activeNode),getActiveDecision:()=>({id:state.activeNode,label:DECISION_LABELS[state.activeNode],hasRun:Boolean(state.decisionCase?.nodes?.[state.activeNode]?.run_id),status:state.decisionCase?.nodes?.[state.activeNode]?.status})};
 window.dationNavigate=(view,stage,event)=>{event?.preventDefault();event?.stopPropagation();return navigateResource(view);};
+window.DationDispatch.openDataHub=(hub={},options={})=>navigateResource('platform-data',{...options,hub,caseId:null,nodeId:null});
+window.DationDispatch.reuseHubData=inputs=>startNewDecision(inputs);
 document.body.classList.add('dispatch-enabled');
 mountTraceability();
-async function restoreResource(){try{const target=readResource(location.href);await navigateResource(target.view,{...target,history:false});}catch(error){document.body.classList.add('dispatch-result');renderView('decision-dashboard');roots.dashboard.hidden=false;errorBox(roots.dashboard,error,()=>navigate('logistics-data'));}}
+async function restoreResource(){try{const target=readResource(location.href);await navigateResource(target.view,{...target,history:false});}catch(error){if(location.pathname.replace(/\/$/,'')==='/app/data')return navigateResource('platform-data',{history:false,caseId:null,nodeId:null});document.body.classList.add('dispatch-result');renderView('decision-dashboard');roots.dashboard.hidden=false;errorBox(roots.dashboard,error,()=>navigate('logistics-data'));}}
 window.addEventListener('popstate',restoreResource);
 window.addEventListener('dation:identity',()=>{if(!currentLogisticsEnabled()&&logisticsView(window.dationGetCurrentView?.()))navigateResource('inicio',{replace:true,caseId:null,nodeId:null});});
 window.addEventListener('pagehide',()=>{routeController?.abort();routeGeneration++;pollGeneration++;runPolling.stop();for(const root of Object.values(roots))disposeScope(root);});

@@ -25,6 +25,11 @@ async def platform_call(name, body):
                 raise HTTPException(403, "No tenés acceso activo a este workspace.")
             if code == "22023":
                 raise HTTPException(409, "Ya existe una membresía o la configuración es inválida.")
+            if code == "P0002":
+                raise HTTPException(404, "No se encontró el recurso solicitado.")
+            if code in {"55006", "55P03"}:
+                raise HTTPException(409, "Hay otra operación de datos en curso. Reintentá en unos instantes.",
+                                    headers={"X-Dation-Retryable":"true"})
         response.raise_for_status()
         return response.json()
     except httpx.HTTPError:
