@@ -88,7 +88,8 @@ jobs:
           output = result.stdout + result.stderr
           print(output)
           if result.returncode:
-              detail = output[-12000:].replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+              # GitHub truncates long annotations; retain the final traceback.
+              detail = output[-3500:].replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
               print("::error title=Chromium regression failure::" + detail)
           sys.exit(result.returncode)
           PY
