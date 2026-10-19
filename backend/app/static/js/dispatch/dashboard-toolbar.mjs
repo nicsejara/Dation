@@ -1,9 +1,9 @@
 import {iconSvg} from "./decision-ui.mjs";
 import {createScope,trapFocus} from './lifecycle.mjs';
-import {api,esc,download} from './shared.mjs';
+import {api,esc} from './shared.mjs';
 import {bindDashboardActions} from './dashboard-actions.mjs';
 import {decisionStatusUi,shortRunId,solverStatusLabel} from './assignment-dashboard-selectors.mjs';
-import {exportDecision,exportDecisionJson} from './export.mjs';
+import {downloadRunExport} from './export.mjs';
 import {WORKFLOW_ACTION_CLASS,workflowActionLabel} from './workflow-action-bar.mjs';
 
 const icon=name=>iconSvg(name,"dashboard-toolbar__icon");
@@ -141,18 +141,15 @@ export function bindDashboardToolbar(root,run,{onRerun,caseActions={}}={}){
   const mapButton=root.querySelector('[data-dashboard-map]');
   if(mapButton)scope.listen(mapButton,'click',()=>{closeMenus();caseActions.onMap();});
 
-  function exportFile(event,handler){
+  async function exportFile(event,handler){
     const button=event.currentTarget,original=button.innerHTML;
     closeMenus();button.disabled=true;button.textContent='Preparando archivo…';
-    try{handler();button.innerHTML=actionLabel('Exportado','check');}
-    catch{button.textContent='No se pudo exportar';}
+    try{await handler();if(!scope.active)return;button.innerHTML=actionLabel('Exportado','check');}
+    catch{if(scope.active)button.textContent='No se pudo exportar';}
     scope.timeout(()=>{button.innerHTML=original;button.disabled=false;},1200);
   }
-  scope.listen(root.querySelector('[data-export-csv]'),'click',event=>exportFile(event,()=>exportDecision(run.result_json)));
-  scope.listen(root.querySelector('[data-export-json]'),'click',event=>exportFile(event,()=>{
-    if(run.result_json?.schema_version==='scheduling_v1')download('planificacion-'+run.id+'.json',JSON.stringify(run.result_json,null,2));
-    else exportDecisionJson(run.result_json,run.id);
-  }));
+  scope.listen(root.querySelector('[data-export-csv]'),'click',event=>exportFile(event,()=>downloadRunExport(run,'csv',{signal:scope.signal})));
+  scope.listen(root.querySelector('[data-export-json]'),'click',event=>exportFile(event,()=>downloadRunExport(run,'json',{signal:scope.signal})));
 
   const actions=bindDashboardActions(root,{...caseActions,onNewDecision:()=>{closeMenus();return caseActions.onNewDecision?.();}});
   const approveButton=root.querySelector('[data-approve-toolbar]'),errorBox=root.querySelector('[data-approval-error]');

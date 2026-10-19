@@ -553,7 +553,7 @@ class FrontendContractTests(
             hero,
         )
         self.assertIn(
-            "exportDecision",
+            "downloadRunExport",
             actions,
         )
         self.assertIn(

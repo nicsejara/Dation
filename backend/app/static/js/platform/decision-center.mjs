@@ -5,6 +5,7 @@ import {DECISION_META} from '../dispatch/decision-ui.mjs';
 import {mountDialog} from './components.mjs';
 import {ddaEnabled} from './entitlements.mjs';
 import {CENTER_FILTERS,readCenterResource} from './center-resource.mjs';
+import {mountActivity} from './activity.mjs';
 import {workspaceDate} from './workspace-format.mjs';
 
 const BASE='/api/platform/decisions',size=25;
@@ -21,6 +22,7 @@ function table(headers){const wrap=el('div',undefined,'center-table-scroll');wra
 function cell(row,value){const n=el('td');n.append(typeof value==='string'?document.createTextNode(value):value);row.append(n);}
 
 export function mountDecisionCenter(root,getIdentity){
+ let activityView=null;
  const scope=createScope(root);root.classList.add('decision-center');let controller,generation=0,route={},notice='',modal,access='';
  const writable=()=>getIdentity().membership.access_role!=='viewer',enabled=()=>ddaEnabled(getIdentity(),'logistics'),zone=()=>getIdentity().workspace;
  function open(value){window.DationDispatch.openDecisionCenter(value);}
@@ -110,16 +112,16 @@ export function mountDecisionCenter(root,getIdentity){
    const bar=el('div',undefined,'center-actions');if(getIdentity().membership.access_role==='admin'&&c.status!=='archived')bar.append(button('Asignar responsables',()=>assign(c,node)));if(node.target){bar.append(runtime('Continuar decisión',c,node.target,true));if(approved)bar.append(runtime('Abrir dashboard aprobado',c,{view:'decision-dashboard',node_id:node.id,run_id:approved.id}));if(node.latest_run&&node.latest_run.id!==approved?.id)bar.append(runtime('Abrir último dashboard',c,{view:'decision-dashboard',node_id:node.id,run_id:node.latest_run.id}));}else item.append(el('p','Este paso todavía no está disponible para ejecutar.','d-metadata'));item.append(bar);
    const h=history(node,c,version);item.append(h.details);afters.push(h.after);list.append(item);
   }
-  flow.append(list);frag.append(flow);const technical=el('details',undefined,'d-card center-card');technical.append(el('summary','Información técnica'),el('code',c.id));frag.append(technical);return {frag,after:()=>afters.forEach(fn=>fn())};
+  flow.append(list);frag.append(flow);const activity=el('details',undefined,'d-card center-card');activity.dataset.caseActivity='';activity.append(el('summary','Actividad del caso'));const feed=el('div');activity.append(feed);activity.addEventListener('toggle',()=>{activityView?.dispose();activityView=null;if(activity.open)activityView=mountActivity(feed,{getIdentity,caseId:c.id});});frag.append(activity);const technical=el('details',undefined,'d-card center-card');technical.append(el('summary','Información técnica'),el('code',c.id));frag.append(technical);return {frag,after:()=>afters.forEach(fn=>fn())};
  }
  async function load(){
-  controller?.abort();controller=new AbortController();close();const version=++generation;root.setAttribute('aria-busy','true');root.replaceChildren(el('p','Cargando Decision Center…','d-body'));
+  activityView?.dispose();activityView=null;controller?.abort();controller=new AbortController();close();const version=++generation;root.setAttribute('aria-busy','true');root.replaceChildren(el('p','Cargando Decision Center…','d-body'));
   try{route=readCenterResource(location.href);const params=new URLSearchParams({filter:route.filter,q:route.q,dda:route.dda,limit:size,offset:route.offset});const data=await api(BASE+(route.caseId?'/'+route.caseId:'?'+params),{signal:controller.signal});if(version!==generation||controller.signal.aborted)return;
    const frag=document.createDocumentFragment();if(notice){const message=el('p',notice,'center-message');message.role='status';frag.append(message);notice='';}let after;if(route.caseId){const result=detail(data,version);frag.append(result.frag);after=result.after;}else frag.append(listing(data));root.replaceChildren(frag);after?.();
   }catch(error){if(version!==generation||controller.signal.aborted)return;const panel=card('No se pudo abrir Decision Center'),message=el('p',error.message,'d-body');message.role='alert';panel.append(message,button('Reintentar',load),link('Volver al listado',{}));root.replaceChildren(panel);}
   finally{if(version===generation)root.removeAttribute('aria-busy');}
  }
- function stop(){generation++;controller?.abort();close();root.removeAttribute('aria-busy');}
+ function stop(){activityView?.dispose();activityView=null;generation++;controller?.abort();close();root.removeAttribute('aria-busy');}
  function onView(){if(window.dationGetCurrentView?.()==='platform-decisions')load();else stop();}
  scope.listen(window,'dation:view',onView);scope.listen(window,'pagehide',stop);scope.listen(window,'dation:identity',()=>{const next=getIdentity().membership.access_role+':'+enabled();if(next!==access){access=next;onView();}});access=getIdentity().membership.access_role+':'+enabled();onView();
  return {dispose(){stop();scope.dispose();}};

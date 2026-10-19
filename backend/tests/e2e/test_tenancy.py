@@ -145,7 +145,7 @@ class TenancyTests(unittest.TestCase):
     def test_08_home_snapshot_is_bounded_tenant_scoped_and_read_only(self):
         empty=self.checked(self.a.get('/api/platform/home'))
         self.assertEqual(empty['recent_cases'],[]);self.assertEqual(empty['attention']['items'],[])
-        self.assertEqual(empty['activity'],{'available':False,'items':[]})
+        self.assertTrue(empty['activity']['available']);self.assertLessEqual(len(empty['activity']['items']),5)
         cases=[self.case(self.a)[0] for _ in range(5)]
         other,_,_=self.case(self.b)
         self.s.sql(f"UPDATE decision_cases SET last_activity_at='2026-01-01'::timestamptz+(array_position(ARRAY{cases!r}::uuid[],id)||' days')::interval WHERE workspace_id='{self.s.workspace_a}';")

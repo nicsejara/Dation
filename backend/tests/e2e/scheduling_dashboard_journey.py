@@ -53,11 +53,11 @@ async def main():
         download=await downloaded.value;path=MANIFEST.with_name('d2-export.csv');await download.save_as(path)
         rows=list(csv.reader(io.StringIO(path.read_text(encoding='utf-8-sig')),delimiter=';'))
         assert 'Recurso disponible' in rows[0] and {t['trip_id'] for t in DATA['run']['result_json']['scenarios']['selected']['trips']}=={r[0] for r in rows[1:]}
-        assert not writes and not errors,(writes,errors)
+        assert all(path=='/api/platform/activity/exports' for _,path in writes) and not errors,(writes,errors)
         await page.locator('[data-approve-final]').click()
         await page.wait_for_function("window.DationDispatch.getWorkspace().decisionCase.nodes.logistics_scheduling.status==='approved'")
         assert await page.locator('[data-approve-final]').is_disabled()
-        assert all(path.endswith('/approve') or path=='/api/runs/preflight' for _,path in writes),writes
+        assert all(path.endswith('/approve') or path in ('/api/runs/preflight','/api/platform/activity/exports') for _,path in writes),writes
         assert sum(path.endswith('/approve') for _,path in writes)==1,writes
         persisted=await (await api_get(context,BASE+'/api/runs/'+DATA['run']['id'])).json()
         assert persisted['approved_at'] and persisted['result_fingerprint']==DATA['run']['result_fingerprint']
