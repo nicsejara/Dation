@@ -1,3 +1,4 @@
+import {trackExploration} from './onboarding.mjs';
 import {mountDropdown} from './components.mjs';
 import {createScope} from '../dispatch/lifecycle.mjs';
 import {PLATFORM_PATHS,readResource} from '../dispatch/navigation.mjs';
@@ -30,6 +31,7 @@ export function mountPlatformShell(){
   if(!link||event.button!==0||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
   event.preventDefault();menu.close({restoreFocus:false});window.dationNavigate(link.dataset.platformView);
  });
+ const exploration=trackExploration(()=>identity);scope.own(()=>exploration.dispose());
  const home=mountWorkspaceHome(document.querySelector('[data-platform-home]'),()=>identity);scope.own(()=>home.dispose());
  function renderAccess(){
   const access=document.querySelector('#profile-access_role'),business=document.querySelector('#profile-business_role');
@@ -73,6 +75,8 @@ export function mountPlatformShell(){
   }else{breadcrumb.append(node('span',labels[view]||(view==='traceability'?'Historial y evidencia':'Dation')));}
  }
  scope.listen(window,'dation:view',updateNavigation);updateNavigation();
+ function renderDemo(){const panel=document.querySelector('[data-demo-context]');if(!panel)return;const state=window.DationDispatch?.getWorkspace?.()||{},route=readResource(location.href);const own=!route.caseId||route.caseId===state.decisionCase?.id;panel.hidden=!(own&&['logistics-data','logistics-map','logistics-config','decision-dashboard'].includes(window.dationGetCurrentView?.())&&(state.orders?.is_sample||state.fleet?.is_sample));}
+ scope.listen(window,'dation:view',renderDemo);scope.listen(window,'dation:workspace',renderDemo);renderDemo();
  scope.listen(window,'pagehide',event=>{if(!event.persisted)scope.dispose();});
  return {dispose:()=>scope.dispose()};
 }

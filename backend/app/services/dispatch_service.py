@@ -650,27 +650,36 @@ async def download_input(dataset_id: str):
 
 async def load_sample_inputs():
     root = Path(__file__).resolve().parents[3]
-    sample_dir = root / "sample_data" / "v3"
+    sample_dir = root / "sample_data" / "onboarding-v1"
 
-    orders_bytes = (sample_dir / "orders.csv").read_bytes()
-    fleet_bytes = (sample_dir / "fleet.csv").read_bytes()
+    try:
+        orders_bytes = (sample_dir / "orders.csv").read_bytes()
+        fleet_bytes = (sample_dir / "fleet.csv").read_bytes()
+        manifest = json.loads((sample_dir / "manifest.json").read_text())
+        if manifest["version"] != "logistics-onboarding-v1":raise ValueError("Unknown sample version")
+        for kind, content in (("orders", orders_bytes), ("fleet", fleet_bytes)):
+            if hashlib.sha256(content).hexdigest() != manifest["files"][kind]["sha256"]:raise ValueError("Sample checksum mismatch")
+    except (OSError,ValueError,KeyError,TypeError):
+        raise HTTPException(503, "Los datos de ejemplo requieren revisión. Podés continuar con tus propios archivos.") from None
 
     orders_report = validate_orders_report(orders_bytes)
     fleet_report = validate_fleet_report(fleet_bytes)
 
     orders_result = await store_input(
-        "orders.csv",
+        "demo-logistics-onboarding-v1-orders.csv",
         orders_bytes,
         "orders",
-        orders_report.get("suggested_label"),
+        "Demo · Órdenes",
         is_sample=True,
+        track_upload=True,
     )
     fleet_result = await store_input(
-        "fleet.csv",
+        "demo-logistics-onboarding-v1-fleet.csv",
         fleet_bytes,
         "fleet",
-        fleet_report.get("suggested_label"),
+        "Demo · Flota",
         is_sample=True,
+        track_upload=True,
     )
 
     orders_dataset = (
@@ -682,33 +691,14 @@ async def load_sample_inputs():
         or fleet_result["existing_dataset"]
     )
 
-    await db(
-        "PATCH",
-        "datasets",
-        params={
-            "id": (
-                f"in.({orders_dataset['id']},{fleet_dataset['id']})"
-            )
-        },
-        body={"is_sample": True},
-    )
-    await db(
-        "POST",
-        "rpc/set_default_fleet",
-        body={"target_id": fleet_dataset["id"]},
-    )
-
-    fleet_dataset = {
-        **fleet_dataset,
-        "is_default": True,
-        "is_sample": True,
-    }
-    orders_dataset = {
-        **orders_dataset,
-        "is_sample": True,
-    }
+    if any(row.get("archived_at") or row.get("deletion_requested_at") for row in (orders_dataset,fleet_dataset)):
+        raise HTTPException(409, "Un archivo del ejemplo está archivado o en eliminación. Revisalo en Data Hub antes de continuar.")
+    # Duplicate bytes retain the existing identity, label, provenance and default.
+    # In particular, a sample must never replace the workspace's default fleet.
 
     return {
+        "demo_version": manifest["version"],
+        "contains_demo_data": bool(orders_dataset.get("is_sample") or fleet_dataset.get("is_sample")),
         "orders": orders_dataset,
         "fleet": fleet_dataset,
         "orders_validation": {

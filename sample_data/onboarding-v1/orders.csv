@@ -1,0 +1,5 @@
+order_id;product;quantity_units;unit_weight_kg;origin;destination;distance_km;estimated_dispatch_date;priority;delivery_due_date
+DEMO-001;Producto de ejemplo;2;500;Cordoba;Rosario;400;2026-10-01;High;2026-10-12
+DEMO-002;Producto de ejemplo;2;500;Cordoba;Rosario;400;2026-10-02;Normal;2026-10-12
+DEMO-003;Producto de ejemplo;2;500;Cordoba;Santa Fe;450;2026-10-02;Normal;2026-10-12
+DEMO-004;Producto de ejemplo;2;500;Cordoba;Santa Fe;450;2026-10-03;Normal;2026-10-12

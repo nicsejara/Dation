@@ -148,6 +148,7 @@ function persist(){
       navigationVersion:NAV_VERSION,
     }));
   }catch{}
+  window.dispatchEvent(new CustomEvent('dation:workspace'));
 }
 function root(view,id){const parent=document.querySelector('[data-view-panel="'+view+'"]');let node=document.getElementById(id);if(!node){node=document.createElement('div');node.id=id;node.className='dispatch';parent.append(node);}return node;}
 function assignmentEvidence(){
@@ -402,10 +403,10 @@ async function ensurePersistedApproval(nodeId){
 async function loadSchedulingConfig(){
   const node=roots.config,generation=routeGeneration;
   if(!state.orders||!state.fleet||state.decisionCase?.nodes?.logistics_assignment?.status!=='approved'){
-    errorBox(node,new Error('Primero aprobá Asignación de carga.'),()=>navigate('logistics-map'));return;
+    errorBox(node,Object.assign(new Error('Primero aprobá Asignación de carga.'),{kind:'source',actionLabel:'Revisar Assignment'}),()=>navigate('logistics-map'));return;
   }
   if(!state.preflight)await preflight();if(generation!==routeGeneration)return;
-  if(!schedulingEvidence()?.data_ready){errorBox(node,new Error('Faltan datos temporales para Planificación.'),()=>navigate('logistics-data'));return;}
+  if(!schedulingEvidence()?.data_ready){errorBox(node,Object.assign(new Error('Faltan datos temporales para Planificación.'),{kind:'validation',actionLabel:'Revisar datos'}),()=>navigate('logistics-data'));return;}
   return mountSchedulingConfig(node,{state,preflight:state.preflight,isCurrent:()=>generation===routeGeneration,onExecute:executeConfiguredScheduling});
 }
 
@@ -603,6 +604,7 @@ async function showTerminalRun(run,nodeId){
   root.innerHTML='<section class="dispatch-panel dispatch-run-error" data-run-terminal-error>'
     +'<span class="dispatch-kicker">CORRIDA FINALIZADA CON ERROR</span><h1>No se pudo completar '+(scheduling?'la planificación':'la asignación')+'</h1>'
     +'<p class="dispatch-alert">'+esc(run.error_message||'La ejecución terminó con error.')+'</p>'
+    +'<p>La evidencia anterior se conserva. Revisá los datos y volvé a configurar la decisión.</p>'
     +'<p>Ajustá la configuración para ejecutar una nueva corrida. Esta ejecución se conserva en el historial.</p>'
     +'<div class="dispatch-run-error__actions"><button type="button" data-reconfigure-run>Volver a configurar '+(scheduling?'planificación':'asignación')+'</button>'
       +(context.caseId?'<button type="button" data-error-map>Decision Map</button>':'')+'</div><p role="alert" data-reconfigure-error hidden></p></section>';

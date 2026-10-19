@@ -5,7 +5,7 @@ from app.platform.identity import resolve
 from app.platform.jwt import verify
 from app.platform.entitlements import logistics_api, require_dda
 
-READ_POSTS = {"/api/runs/preflight", "/api/runs/assignment-preview", "/api/datasets/validate", "/api/platform/activity/exports"}
+READ_POSTS = {"/api/runs/preflight", "/api/runs/assignment-preview", "/api/datasets/validate", "/api/platform/activity/exports", "/api/platform/onboarding/explore"}
 ADMIN_PATHS = {"/ready", "/metrics", "/api/system/operations", "/api/system/supabase-check"}
 
 

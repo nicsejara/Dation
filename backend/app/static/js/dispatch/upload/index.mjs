@@ -1,3 +1,4 @@
+import {mountDemoAction} from '../../platform/onboarding.mjs';
 import {createScope,scopeFor} from "../lifecycle.mjs";
 import {createWorkflowActionBar} from "../workflow-action-bar.mjs";
 import {decisionHero} from "../decision-config-ui.mjs";
@@ -255,6 +256,7 @@ export async function mountUploadScreen(
   root.className = "dispatch dispatch-upload-screen dispatch-upload-pro";
 
   const hero = makeHero();
+  const demoRoot=el('div');const demoView=mountDemoAction(demoRoot,()=>window.dationSession?.identity||{membership:{access_role:'viewer'}});scope.own(()=>demoView.dispose());
   const banner = el("section");
   banner.hidden = true;
 
@@ -332,6 +334,7 @@ export async function mountUploadScreen(
 
   root.append(
     hero.hero,
+    demoRoot,
     banner,
     dataPack,
     compatibilityRoot,

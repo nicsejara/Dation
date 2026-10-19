@@ -23,7 +23,7 @@ class EntitlementTests(IsolatedAsyncioTestCase):
 
  async def test_business_api_blocks_before_provider_while_home_remains_available(self):
   from main import app
-  with patch('app.auth.verify',AsyncMock(return_value={'sub':U})),patch('app.auth.resolve',AsyncMock(return_value=RequestContext(U,W,'admin'))),patch('app.platform.activity.snapshot',AsyncMock(return_value={'available':True,'items':[],'next_cursor':None})),patch('app.platform.home.platform_call',AsyncMock()) as provider:
+  with patch('app.auth.verify',AsyncMock(return_value={'sub':U})),patch('app.auth.resolve',AsyncMock(return_value=RequestContext(U,W,'admin'))),patch('app.platform.onboarding.snapshot',AsyncMock(return_value={'available':True})),patch('app.platform.activity.snapshot',AsyncMock(return_value={'available':True,'items':[],'next_cursor':None})),patch('app.platform.home.platform_call',AsyncMock()) as provider:
    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app),base_url='https://qa.invalid',headers={'Authorization':'Bearer verified'}) as client:
     for method,path in [('GET','/api/decision-cases'),('GET','/api/datasets'),('GET','/api/runs'),('POST','/api/runs'),('GET','/api/workspace/summary')]:
      result=await client.request(method,path,json={} if method=='POST' else None)
@@ -33,6 +33,6 @@ class EntitlementTests(IsolatedAsyncioTestCase):
    provider.assert_not_awaited()
 
  async def test_disabled_home_never_queries_business_data(self):
-  with patch('app.platform.activity.snapshot',AsyncMock(return_value={'available':True,'items':[],'next_cursor':None})),patch('app.platform.home.platform_call',AsyncMock()) as provider:
+  with patch('app.platform.onboarding.snapshot',AsyncMock(return_value={'available':True})),patch('app.platform.activity.snapshot',AsyncMock(return_value={'available':True,'items':[],'next_cursor':None})),patch('app.platform.home.platform_call',AsyncMock()) as provider:
    result=await home_snapshot(RequestContext(U,W,'viewer'))
   self.assertEqual(result['attention']['total'],0);provider.assert_not_awaited()

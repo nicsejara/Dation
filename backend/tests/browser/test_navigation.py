@@ -84,6 +84,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.run_fetch_failures=0
         self.home_data={'recent_cases':[],'attention':{'items':[],'total':0},'activity':{'available':False,'items':[]}}
         self.home_failure=False
+        self.onboarding_data=None
         self.ddas=[{'workspace_id':'00000000-0000-4000-8000-00000000da71','dda_id':'logistics','status':'enabled'}]
         self.access_role='admin'
         self.hub_rows={row['id']:copy.deepcopy(row) for row in self.f['datasets'].values()}
@@ -149,6 +150,15 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             await asyncio.sleep(self.delay.get(path,.01))
             await route.fulfill(status=200,content_type='application/json',body=json.dumps({'available':True,'items':[],'next_cursor':None}))
             return
+        if path.startswith('/api/platform/onboarding'):
+            if path.endswith('/demo'):
+                if getattr(self,'onboarding_gate',None):await self.onboarding_gate.wait()
+                data={'contains_demo_data':True,**{kind:{**copy.deepcopy(row),'is_sample':True} for kind,row in self.f['datasets'].items()}}
+            elif path.endswith('/explore'):
+                self.onboarding_data['explored_at']='2026-10-19T12:00:00Z'
+                self.home_data['onboarding']=copy.deepcopy(self.onboarding_data);data=self.onboarding_data
+            else:data=self.onboarding_data or {'available':False}
+            await route.fulfill(status=200,content_type='application/json',body=json.dumps(data));return
         if path.startswith('/api/platform/decisions'):
             await self.route_center(route,path,query,method)
             return
@@ -3850,6 +3860,41 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.page.evaluate("id=>window.DationDispatch.openDecisionCenter({caseId:id})",self.case['id'])
         await panel.locator('summary').first.wait_for();await panel.locator('summary').first.click();await panel.get_by_text('Todavía no hay eventos registrados. Las nuevas acciones aparecerán acá.',exact=True).wait_for()
         self.assertEqual(len([r for r in self.requests if r==('GET','/api/platform/activity')]),2)
+
+    async def test_onboarding_guide_is_personal_and_viewer_cannot_prepare_demo(self):
+        self.access_role='viewer'
+        self.onboarding_data={'available':True,'workspace_created':True,'explored_at':None,'data_ready':False,'first_decision_completed':False,'logistics_enabled':True}
+        self.home_data['onboarding']=copy.deepcopy(self.onboarding_data)
+        await self.page.goto(f'http://127.0.0.1:{self.port}/app')
+        root=self.page.locator('[data-platform-home]');await root.get_by_text('Bienvenido a Dation',exact=True).wait_for()
+        sample=root.get_by_role('button',name='Usar datos de ejemplo',exact=True);self.assertTrue(await sample.is_disabled())
+        self.assertEqual(await root.get_by_role('button',name='Abrir Logística',exact=True).count(),0)
+        await sample.evaluate("n=>n.dispatchEvent(new MouseEvent('click',{bubbles:true}))")
+        await root.get_by_role('button',name='Explorar DDA Logística',exact=True).click()
+        for _ in range(100):
+            if self.onboarding_data['explored_at']:break
+            await asyncio.sleep(.01)
+        self.assertIsNotNone(self.onboarding_data['explored_at'])
+        await self.nav('platform-home');await root.locator('[data-onboarding-step=explore][data-complete=true]').wait_for()
+        await self.page.reload();await root.locator('[data-onboarding-step=explore][data-complete=true]').wait_for()
+        self.assertEqual(sum(path.endswith('/onboarding/explore') and method=='POST' for method,path in self.requests),1)
+        self.assertFalse(any(path.endswith('/onboarding/demo') for _,path in self.requests))
+
+    async def test_onboarding_demo_late_response_does_not_leave_settings(self):
+        self.onboarding_data={'available':True,'workspace_created':True,'explored_at':None,'data_ready':False,'first_decision_completed':False,'logistics_enabled':True}
+        self.home_data['onboarding']=copy.deepcopy(self.onboarding_data);self.onboarding_gate=asyncio.Event()
+        await self.page.goto(f'http://127.0.0.1:{self.port}/app')
+        root=self.page.locator('[data-platform-home]');await root.get_by_role('button',name='Usar datos de ejemplo',exact=True).click()
+        for _ in range(100):
+            if ('POST','/api/platform/onboarding/demo') in self.requests:break
+            await asyncio.sleep(.01)
+        self.assertIn(('POST','/api/platform/onboarding/demo'),self.requests)
+        await self.nav('settings');await self.page.locator('[data-workspace-settings]').get_by_label('Nombre del workspace').wait_for()
+        self.onboarding_gate.set();self.onboarding_gate=None;await self.page.wait_for_timeout(100)
+        self.assertEqual(await self.page.evaluate('window.dationGetCurrentView()'),'settings')
+        await self.nav('platform-home');await root.get_by_role('button',name='Usar datos de ejemplo',exact=True).wait_for()
+        self.assertFalse(await root.get_by_role('button',name='Usar datos de ejemplo',exact=True).is_disabled())
+        self.assertEqual(sum(method=='POST' and path.endswith('/onboarding/demo') for method,path in self.requests),1)
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

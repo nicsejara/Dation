@@ -23,7 +23,7 @@ def project(bundle,detail=False):
     # A closed/archived database cache is not an approval. Completion uses both
     # implemented nodes and their current lineage, computed in the SQL snapshot.
     result={'id':row['id'],'friendly_id':'DC-'+row['id'][:8].upper(),'label':row.get('label'),
-        'dda':'logistics','status':bundle['status'],'in_review':bundle['in_review'],
+        'dda':'logistics','status':bundle['status'],'in_review':bundle['in_review'],'is_demo':bool(bundle.get('is_demo')),
         'current_step':resume['node_id'],'current_step_label':LABELS[resume['node_id']],
         'progress':{'approved':sum(state['nodes'][k]['status']=='approved' for k in NODE_IDS[:2]),'total':2},
         'owner':(collaboration.get(resume['node_id']) or {}).get('owner'),'created_by':bundle.get('created_by'),'created_at':row['created_at'],
