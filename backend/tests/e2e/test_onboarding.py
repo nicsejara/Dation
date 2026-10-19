@@ -39,6 +39,9 @@ class OnboardingTests(unittest.TestCase):
   for name in ['platform_onboarding','platform_onboarding_explore']:
    for token in [self.s.anon_token,self.s.user_tokens[USER_A]]:self.assertIn(self.s.http.post(self.s.rest_url+'/rpc/'+name,headers={'Authorization':'Bearer '+token},json={}).status_code,(401,403,404))
   self.assertEqual(self.s.sql("SELECT has_table_privilege('service_role','dation_private.workspace_onboarding','SELECT');"),'f')
+  self.s.sql(f"UPDATE workspace_ddas SET status='disabled' WHERE workspace_id='{self.s.workspace_a}' AND dda_id='logistics';")
+  self.assertFalse(self.progress()['logistics_enabled']);self.checked(self.a.post('/api/platform/onboarding/explore',json={}))
+  self.assertEqual(self.a.post('/api/platform/onboarding/demo',json={}).status_code,403)
  def test_02_sample_concurrency_preserves_default_and_existing_file_origin(self):
   default=self.upload('fleet');self.checked(self.a.post('/api/datasets/'+default['id']+'/default'))
   root=Path(__file__).resolve().parents[3];raw=(root/'sample_data/onboarding-v1/orders.csv').read_bytes()

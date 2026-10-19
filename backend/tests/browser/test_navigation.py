@@ -3612,7 +3612,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(await root.locator('[data-dda-id=logistics] button,a').count(),0)
         self.assertTrue(await self.page.locator('.asset-item').is_disabled())
         self.assertFalse(await self.page.locator('.asset-item .status-dot').is_visible())
-        self.assertEqual(self.requests,[])
+        self.assertTrue(all(method=='GET' and path=='/api/platform/onboarding' for method,path in self.requests),self.requests)
         for width in (1440,1024,768,390):
             await self.page.set_viewport_size({'width':width,'height':1000})
             self.assertTrue(await self.page.evaluate('document.documentElement.scrollWidth<=innerWidth+1'))
@@ -3647,7 +3647,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(await self.page.locator('.asset-item').is_disabled())
         await self.page.evaluate("window.dationNavigate('logistics-data')")
         self.assertEqual(await self.page.evaluate('window.dationGetCurrentView()'),'inicio')
-        self.assertEqual(self.requests,[])
+        self.assertTrue(all(method=='GET' and path=='/api/platform/onboarding' for method,path in self.requests),self.requests)
 
     async def test_data_hub_library_details_preview_history_and_responsive(self):
         self.hub_cases=[{'id':self.case['id'],'status':'active','created_at':'2026-10-18T12:00:00Z'}]

@@ -2,6 +2,7 @@
 export function describeFailure(error,{kind,auth=false}={}){
  kind=kind||error?.kind||(error?.status===401?(auth?'auth':'session'):error?.status===403?'permission':error?.status===422?'validation':[408,504].includes(error?.status)||error?.name==='TimeoutError'?'timeout':error instanceof TypeError?'disconnected':'unavailable');
  const patterns={
+  navigation:['El enlace no está disponible','La pantalla solicitada no existe o el enlace está incompleto. Volvé al Data Pack para continuar.'],
   auth:['No pudimos iniciar sesión','Revisá tu email y contraseña. Si no la recordás, solicitá un enlace para recuperarla.'],
   session:['Tu sesión venció','Ingresá nuevamente para continuar. El trabajo guardado se conserva.'],
   permission:['Tu acceso no permite esta acción','Consultá con un administrador del workspace para revisar tu rol o la disponibilidad del DDA.'],
