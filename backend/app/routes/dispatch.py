@@ -224,7 +224,14 @@ async def create_decision_case(payload: DecisionCaseCreate):
 
 @router.get("/api/decision-cases/{case_id}")
 async def get_decision_case(case_id: UUID):
-    return await guarded(case_service.get_case(str(case_id)))
+    from app.platform.context import current
+    from app.platform.identity import platform_call
+    result = await guarded(case_service.get_case(str(case_id)))
+    ctx = current()
+    collaboration = await platform_call('platform_case_collaboration', {
+        'target_workspace_id': ctx.workspace_id, 'actor_user_id': ctx.user_id,
+        'target_case_id': str(case_id)})
+    return {**result, 'collaboration': collaboration}
 
 
 @router.get("/api/decision-cases/{case_id}/runs")

@@ -1,3 +1,4 @@
+import {mountReceivedInvitations} from './invitations.mjs';
 const root=document.querySelector('#auth-root');
 const path=location.pathname;
 function returnPath(){
@@ -34,6 +35,11 @@ form.append(error,status,submit);
 const links=document.createElement('nav');links.className='d-auth__links';links.setAttribute('aria-label','Opciones de acceso');
 for(const [text,url] of mode==='login'?[['¿Olvidaste tu contraseña?','/recover'],['Crear cuenta','/register']]:[['Volver al ingreso','/login']]){const a=document.createElement('a');a.textContent=text;a.href=url;links.append(a);}
 root.replaceChildren(h,intro,form,links);root.setAttribute('aria-busy','false');
+if(mode==='workspace'){
+ const incoming=document.createElement('section');incoming.className='team-incoming';incoming.hidden=true;form.before(incoming);
+ const invites=mountReceivedInvitations(incoming,{onCount:count=>{if(count){form.hidden=true;intro.textContent='Tenés una invitación para sumarte a un equipo.';}}});
+ window.addEventListener('pagehide',()=>invites.dispose(),{once:true});
+}
 if(new URLSearchParams(location.search).has('error'))error.textContent='El enlace venció o se abrió en otro navegador. Solicitá uno nuevo desde este dispositivo.';
 async function call(url,body={}){
  const response=await fetch(url,{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});

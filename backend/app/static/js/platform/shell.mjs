@@ -5,6 +5,7 @@ import {mountWorkspaceHome} from './home.mjs';
 import {ddaEnabled} from './entitlements.mjs';
 import {mountDataHub} from './data-hub.mjs';
 import {mountDecisionCenter} from './decision-center.mjs';
+import {mountTeam} from './team.mjs';
 
 const labels={'platform-home':'Inicio',inicio:'Decision Data Assets','platform-decisions':'Decision Center','platform-data':'Data Hub','platform-team':'Equipo',settings:'Configuración',profile:'Mi perfil'};
 const roles={admin:'Administrador',operator:'Operador',viewer:'Solo lectura'};
@@ -29,10 +30,15 @@ export function mountPlatformShell(){
   event.preventDefault();menu.close({restoreFocus:false});window.dationNavigate(link.dataset.platformView);
  });
  const home=mountWorkspaceHome(document.querySelector('[data-platform-home]'),()=>identity);scope.own(()=>home.dispose());
- scope.listen(window,'dation:identity',()=>{identity={...window.dationSession.identity,profile:identity.profile};renderIdentity();});
+ function renderAccess(){
+  const access=document.querySelector('#profile-access_role'),business=document.querySelector('#profile-business_role');
+  if(access)access.value=roles[identity.membership.access_role];if(business)business.value=identity.membership.business_role||'Sin asignar';
+  document.querySelector('[data-platform-diagnostics]').hidden=identity.membership.access_role!=='admin';
+ }
+ scope.listen(window,'dation:identity',()=>{identity={...window.dationSession.identity,profile:identity.profile};renderIdentity();renderAccess();});
  const center=mountDecisionCenter(document.querySelector('[data-platform-decisions]'),()=>window.dationSession.identity);scope.own(()=>center.dispose());
  const dataHub=mountDataHub(document.querySelector('[data-platform-data]'),()=>window.dationSession.identity);scope.own(()=>dataHub.dispose());
- document.querySelector('[data-platform-team]').append(card(identity.workspace.name,'Tu acceso actual: '+roles[identity.membership.access_role]+'. La administración de invitaciones y responsabilidades del equipo estará disponible próximamente.'));
+ const team=mountTeam(document.querySelector('[data-platform-team]'),()=>window.dationSession.identity);scope.own(()=>team.dispose());
  const settings=document.querySelector('[data-workspace-settings]');
  for(const [title,values]of [['Workspace',[['Nombre',identity.workspace.name],['País',identity.workspace.country],['Zona horaria',identity.workspace.timezone]]],['Preferencias',[['Idioma',identity.workspace.language],['Moneda',identity.workspace.currency],['Unidades',[identity.workspace.weight_unit,identity.workspace.distance_unit].filter(Boolean).join(' · ')]]],['Mi acceso',[['Rol',roles[identity.membership.access_role]],['Responsabilidad',identity.membership.business_role||'Sin asignar'],['Workspace','Activo']]]]){
   const item=node('article',undefined,'d-card');item.append(node('h2',title,'d-card-title'));

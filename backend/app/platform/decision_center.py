@@ -19,13 +19,14 @@ def project(bundle,detail=False):
     row=bundle['case'];summaries=bundle['summaries']
     state=canonical(bundle)
     resume=recent_case({'case':{**row,'status':bundle['status'],'state_json':state},'summaries':summaries})
+    collaboration=bundle.get('collaboration') or {}
     # A closed/archived database cache is not an approval. Completion uses both
     # implemented nodes and their current lineage, computed in the SQL snapshot.
     result={'id':row['id'],'friendly_id':'DC-'+row['id'][:8].upper(),'label':row.get('label'),
         'dda':'logistics','status':bundle['status'],'in_review':bundle['in_review'],
         'current_step':resume['node_id'],'current_step_label':LABELS[resume['node_id']],
         'progress':{'approved':sum(state['nodes'][k]['status']=='approved' for k in NODE_IDS[:2]),'total':2},
-        'owner':None,'created_by':bundle.get('created_by'),'created_at':row['created_at'],
+        'owner':(collaboration.get(resume['node_id']) or {}).get('owner'),'created_by':bundle.get('created_by'),'created_at':row['created_at'],
         'last_activity_at':row['last_activity_at'],'updated_at':row['updated_at'],
         'resume':target(resume['node_id'],resume['status'],resume.get('run_id'),state['nodes'][resume['node_id']])}
     if detail:
@@ -39,7 +40,9 @@ def project(bundle,detail=False):
                 source=summaries['logistics_assignment'].get('approved')
                 if key=='logistics_scheduling' and (not source or latest.get('upstream_run_id')!=source['id']):status='stale'
             if key==NODE_IDS[2]:status='coming_soon'
-            nodes.append({'id':key,'label':LABELS[key],'status':status,'owner':None,'approver':None,
+            assignment=collaboration.get(key) or {}
+            nodes.append({'id':key,'label':LABELS[key],'status':status,'owner':assignment.get('owner'),'approver':assignment.get('approver'),
+                'assignment_updated_at':assignment.get('updated_at'),'can_approve':assignment.get('can_approve',False),'admin_override':assignment.get('admin_override',False),
                 'run_count':node['run_count'],'latest_run':people.get((latest or {}).get('id')),
                 'approved_run':people.get((approved or {}).get('id')),
                 'approval_current':node['status']=='approved',

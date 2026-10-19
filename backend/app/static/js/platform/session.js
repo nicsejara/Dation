@@ -60,7 +60,9 @@
   const text=document.createElement('p');text.textContent=error.message;
   const retry=document.createElement('button');retry.className='d-button d-button--primary';retry.textContent='Reintentar';retry.onclick=()=>location.reload();
   const exit=document.createElement('button');exit.className='d-button d-button--secondary';exit.textContent='Cerrar sesión';exit.onclick=()=>logout().catch(exc=>{text.textContent=exc.message;});
-  card.append(title,text,retry,exit);panel.append(card);document.body.append(panel);
+  card.append(title,text,retry,exit);
+  if(error.status===403){const invitations=document.createElement('a');invitations.href='/workspace-setup';invitations.className='d-button d-button--secondary';invitations.textContent='Ver invitaciones recibidas';card.append(invitations);}
+  panel.append(card);document.body.append(panel);
   title.tabIndex=-1;title.focus({preventScroll:true});
  }
  ready.catch(showSessionFailure);

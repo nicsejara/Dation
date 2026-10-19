@@ -31,11 +31,11 @@ export function mountWorkspaceHome(root,getIdentity){
   if(data.attention.items.length){
    const attention=section('Requiere tu atención','home-attention-title');attention.classList.add('platform-home__attention');
    const total=data.attention.total;
-   attention.append(el('p',total===1?'Hay una versión lista para revisar en tu workspace.':`Hay ${total} versiones listas para revisar en tu workspace.`,'d-body'));
+   attention.append(el('p',total===1?'Tenés una decisión para revisar o continuar.':`Tenés ${total} decisiones para revisar o continuar.`,'d-body'));
    const list=el('ul',undefined,'platform-home__reviews');
    for(const item of data.attention.items){
     const row=el('li'),copy=el('div');copy.append(el('strong',item.node_label),el('span','DC-'+item.case_id.slice(0,8),'d-metadata'));
-    row.append(copy,link('Revisar','decision-dashboard','d-button d-button--secondary',{caseId:item.case_id,nodeId:item.node_id,runId:item.run_id}));list.append(row);
+    row.append(copy,link(item.kind==='handoff'?'Continuar':'Revisar',item.kind==='handoff'?'logistics-config':'decision-dashboard','d-button d-button--secondary',{caseId:item.case_id,nodeId:item.node_id,runId:item.run_id}));list.append(row);
    }
    attention.append(list);if(total>data.attention.items.length)attention.append(el('p',`Mostrando ${data.attention.items.length} de ${total}.`,'d-metadata'));
    fragment.append(attention);

@@ -24,11 +24,19 @@ async def platform_call(name, body):
             if code == "42501":
                 raise HTTPException(403, "No tenés acceso activo a este workspace.")
             if code == "22023":
+                collaboration_errors = {
+                    'platform_invite_member': 'Ya existe una membresía o invitación pendiente para ese email. Revisá el equipo antes de reintentar.',
+                    'platform_update_member': 'Revisá los roles y conservá al menos un administrador activo en el workspace.',
+                    'platform_assign_decision': 'Elegí miembros activos con rol Admin u Operator para este workspace.',
+                    'platform_received_invitations': 'La invitación venció, fue revocada o ya existe una membresía. Consultá al administrador.',
+                }
+                if name in collaboration_errors:
+                    raise HTTPException(409, collaboration_errors[name])
                 raise HTTPException(409, "Ya existe una membresía o la configuración es inválida.")
             if code == "P0002":
                 raise HTTPException(404, "No se encontró el recurso solicitado.")
             if code in {"55006", "55P03"}:
-                raise HTTPException(409, "Hay otra operación de datos en curso. Reintentá en unos instantes.",
+                raise HTTPException(409, "El recurso cambió o hay otra operación en curso. Actualizá antes de reintentar.",
                                     headers={"X-Dation-Retryable":"true"})
         response.raise_for_status()
         return response.json()
