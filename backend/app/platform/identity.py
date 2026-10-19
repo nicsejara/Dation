@@ -16,9 +16,14 @@ async def platform_call(name, body):
     if not SUPABASE_URL or not SUPABASE_SECRET_KEY:
         raise HTTPException(503, "El acceso a la plataforma todavía no está configurado.")
     try:
+        request_headers = headers()
+        if body.get('actor_user_id'):
+            request_headers['X-Dation-Actor-Id'] = str(body['actor_user_id'])
+        if body.get('target_workspace_id'):
+            request_headers['X-Dation-Workspace-Id'] = str(body['target_workspace_id'])
         async with http_client() as client:
             response = await client.post(SUPABASE_URL + "/rest/v1/rpc/" + name,
-                                         headers=headers(), json=body, timeout=15)
+                                         headers=request_headers, json=body, timeout=15)
         if response.status_code >= 400:
             code = response.json().get("code")
             if code == "42501":

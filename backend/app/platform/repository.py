@@ -67,6 +67,14 @@ class TenantClient:
             ctx = current()
             if table not in TABLES:
                 raise RuntimeError("Unregistered tenant relation")
+            # Service-only audit context, derived from verified authority.
+            audit_headers = httpx.Headers(options.get("headers") or {})
+            audit_headers["X-Dation-Workspace-Id"] = ctx.workspace_id
+            if ctx.user_id:
+                audit_headers["X-Dation-Actor-Id"] = ctx.user_id
+            else:
+                audit_headers.pop("X-Dation-Actor-Id", None)
+            options["headers"] = audit_headers
             params = httpx.QueryParams(options.get("params") or {})
             if "workspace_id" in params and params["workspace_id"] != "eq." + ctx.workspace_id:
                 raise RuntimeError("Conflicting workspace filter")

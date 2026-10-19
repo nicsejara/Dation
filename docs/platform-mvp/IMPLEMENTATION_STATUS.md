@@ -4,7 +4,7 @@ Fecha de referencia: 2026-10-18 (`America/Buenos_Aires`). Fuente de requisitos: 
 
 ## Estado vigente
 
-Fases 2 y 3 publicadas en el [PR #75](https://github.com/nicsejara/Dation/pull/75), con cierre de BFCache en [#76](https://github.com/nicsejara/Dation/pull/76). Fases 4 y 5 publicadas en [#77](https://github.com/nicsejara/Dation/pull/77) y [#78](https://github.com/nicsejara/Dation/pull/78), con CI de head/main verdes y API/worker al 100%. Fase 6 publicada en [#79](https://github.com/nicsejara/Dation/pull/79) y Fase 7 en [#80](https://github.com/nicsejara/Dation/pull/80). Fase 8 publicada en [#81](https://github.com/nicsejara/Dation/pull/81). Fase 9 implementa configuración por workspace y el plan Free gratuito para todos durante esta etapa del MVP, por instrucción del usuario; su publicación exacta se registra en el PR tras validar CI y despliegue. No se inicia Fase 10 automáticamente. La prueba manual completa del usuario queda para terminar todas las fases.
+Fases 2 y 3 publicadas en el [PR #75](https://github.com/nicsejara/Dation/pull/75), con cierre de BFCache en [#76](https://github.com/nicsejara/Dation/pull/76). Fases 4 y 5 publicadas en [#77](https://github.com/nicsejara/Dation/pull/77) y [#78](https://github.com/nicsejara/Dation/pull/78), con CI de head/main verdes y API/worker al 100%. Fase 6 publicada en [#79](https://github.com/nicsejara/Dation/pull/79) y Fase 7 en [#80](https://github.com/nicsejara/Dation/pull/80). Fase 8 publicada en [#81](https://github.com/nicsejara/Dation/pull/81). Fase 9 publicada en [#82](https://github.com/nicsejara/Dation/pull/82), con configuración por workspace y Free gratuito para todos. Fase 10 implementa auditoría transaccional y actividad en Inicio/casos; su publicación exacta se registra en el PR tras validar CI y despliegue. No se inicia Fase 11 automáticamente. La prueba manual completa del usuario queda para terminar todas las fases.
 
 - [Auth, identidad y migración](10-phase2-auth-tenancy.md).
 - [Shell y navegación](11-phase3-shell-navigation.md).
@@ -14,6 +14,7 @@ Fases 2 y 3 publicadas en el [PR #75](https://github.com/nicsejara/Dation/pull/7
 - [Decision Center](15-phase7-decision-center.md): biblioteca de casos, detalle por nodo, etiquetas, historial secundario y recuperación directa de D1/D2.
 - [Equipo y colaboración](16-phase8-team-collaboration.md): aceptación con email confirmado, roles, asignaciones por nodo, atribución, intervención Admin auditada y handoff D1/D2.
 - [Configuración y Free](17-phase9-workspace-settings.md): General, Operación, DDAs y plan gratuito, con guardado Admin/CAS y formatos del workspace. Sin cobros, trial, tarjetas ni límites comerciales inventados.
+- [Auditoría y actividad](18-phase10-audit-activity.md): eventos reales, consulta por caso, cursor estable, autoría y exportaciones auditadas sin copiar datos completos.
 - Baseline de CI de Fase 8: 360 unittest, 85 Node, 167 Chromium, 46 SQL históricos y 38 E2E del esquema final sin skips. Fase 9 añade tres Node, un Chromium y tres E2E reales; CI del SHA exacto se exige antes de publicar.
 - Verificación productiva: ingreso, refresh y logout reales de Supabase; cuenta temporal sin membresía bloqueada y luego eliminada; template y diez assets exactos. Evidencia de negocio sin cambios.
 - Backup/restauración previa: 91 registros y seis archivos, evidencia existente sin cambios; artifacts privados fuera del repo.
@@ -35,8 +36,8 @@ Los snapshots de auditoría anteriores describen deliberadamente el esquema prev
 | 6 | Implementada y publicada | Data Hub, Data Packs y recuperación; PR #79 |
 | 7 | Implementada y publicada | Decision Center y memoria de casos; PR #80 |
 | 8 | Implementada y publicada | Equipo + colaboración + atribución y handoff; PR #81 |
-| 9 | Implementada · publicación verificable en PR | Configuración y plan Free gratuito, sin cobros ni trial |
-| 10 | Pendiente | Audit trail + actividad |
+| 9 | Implementada y publicada | Configuración y plan Free gratuito; PR #82 |
+| 10 | Implementada · publicación verificable en PR | Auditoría append-only + actividad + exportaciones auditadas |
 | 11 | Pendiente | Onboarding/demo/estados |
 | 12 | Pendiente | Hardening + seguridad + E2E + release comercial |
 

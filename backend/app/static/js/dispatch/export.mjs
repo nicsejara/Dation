@@ -136,3 +136,13 @@ export function exportDecisionJson(result,runId='decision'){
   );
   return name;
 }
+
+// Authenticated generation from persisted evidence, with a committed audit event.
+export async function downloadRunExport(run,format,{signal,filename}={}){
+  const response=await fetch('/api/platform/activity/exports',{method:'POST',headers:{'Content-Type':'application/json'},signal,
+    body:JSON.stringify({run_id:run.id,format,operation_id:crypto.randomUUID()})});
+  if(!response.ok)throw new Error('No se pudo generar la exportación. Reintentá.');
+  const name=filename||response.headers.get('Content-Disposition')?.match(/filename="([^"]+)"/)?.[1];
+  if(!name)throw new Error('La exportación no tiene un nombre válido.');
+  download(name,await response.blob(),response.headers.get('Content-Type')||'application/octet-stream');return name;
+}

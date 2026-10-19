@@ -30,7 +30,9 @@ async def main():
    for path in ['/app/ddas/logistics','/app/ddas/logistics/data','/app/ddas/logistics/dashboard','/app/history']:
     await page.goto(BASE+path);await root.locator('[data-dda-entitlement=disabled]').wait_for();assert urlsplit(page.url).path=='/app/ddas'
    for width in (1440,1024,768,390):
-    await page.set_viewport_size({'width':width,'height':1000});assert await page.evaluate('document.documentElement.scrollWidth<=innerWidth+1')
+    await page.set_viewport_size({'width':width,'height':1000})
+    await page.evaluate('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))')
+    probe=await page.evaluate("""() => ({width:innerWidth,scroll:document.documentElement.scrollWidth,nodes:[...document.body.querySelectorAll('*')].filter(n=>n.getClientRects().length&&n.getBoundingClientRect().right>innerWidth+1).slice(0,12).map(n=>({tag:n.tagName,class:n.className,right:n.getBoundingClientRect().right,text:n.textContent.slice(0,80)}))})""");assert probe['scroll']<=width+1,probe
    await page.locator('.nav [data-platform-view=platform-home]').click();await page.locator('[data-platform-home] .platform-home__quick-link').first.wait_for();assert await page.get_by_role('link',name='Abrir DDA Logística',exact=True).count()==0
    await grant('enabled');await page.evaluate('window.dationSession.refresh()')
    await page.locator('.nav [data-platform-view=inicio]').click();await root.locator('#home-open-logistics').click();await page.locator('.dda-landing__hero').wait_for()

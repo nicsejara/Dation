@@ -1,6 +1,7 @@
 import {createScope} from '../dispatch/lifecycle.mjs';
 import {readResource, resourceUrl} from '../dispatch/navigation.mjs';
 import {ddaEnabled} from './entitlements.mjs';
+import {mountActivity} from './activity.mjs';
 import {workspaceDate} from './workspace-format.mjs';
 
 const states={available:'Listo para continuar',running:'En ejecución',review:'Para revisar',approved:'Aprobado',error:'Requiere revisión',stale:'Requiere actualizar',locked:'Pendiente',needs_data:'Faltan datos',completed:'Completado'};
@@ -17,7 +18,7 @@ function greeting(identity){
 function section(title,id){const n=el('section',undefined,'d-card platform-home__section');n.setAttribute('aria-labelledby',id);n.append(el('h2',title,'d-section-title'));n.firstChild.id=id;return n;}
 
 export function mountWorkspaceHome(root,getIdentity){
- const scope=createScope(root);let controller=null,generation=0;
+ const scope=createScope(root);let controller=null,generation=0,activityView=null;
  let logisticsEnabled=ddaEnabled(getIdentity(),'logistics');
  const header=el('header',undefined,'platform-home__header');
  const workspace=el('p',undefined,'platform-home__workspace'),title=el('h1',undefined,'d-page-title');
@@ -65,14 +66,11 @@ export function mountWorkspaceHome(root,getIdentity){
   }
   quick.append(links);side.append(quick);
   const activity=section('Actividad reciente','home-activity-title');
-  // Only render persisted audit items when that contract becomes available.
-  const items=data.activity.available?data.activity.items.slice(0,5):[];
-  if(items.length){const list=el('ul',undefined,'platform-home__activity');for(const item of items){const row=el('li',item.label);list.append(row);}activity.append(list);}
-  else activity.append(el('p','No hay actividad reciente para mostrar.','d-body'));
-  side.append(activity);grid.append(side);fragment.append(grid);content.replaceChildren(fragment);
+  const feed=el('div');activity.append(feed);
+  side.append(activity);grid.append(side);fragment.append(grid);content.replaceChildren(fragment);activityView=mountActivity(feed,{getIdentity,initial:data.activity,limit:5,compact:true});
  }
  async function load(){
-  controller?.abort();controller=new AbortController();const ownController=controller,version=++generation;
+  activityView?.dispose();activityView=null;controller?.abort();controller=new AbortController();const ownController=controller,version=++generation;
   renderHeader();content.setAttribute('aria-busy','true');
   const pending=el('div',undefined,'platform-home__loading');pending.role='status';pending.append(el('span','Cargando tu workspace…','d-body'));
   const skeleton=el('div',undefined,'platform-home__skeleton');skeleton.setAttribute('aria-hidden','true');pending.append(skeleton);content.replaceChildren(pending);
@@ -87,7 +85,7 @@ export function mountWorkspaceHome(root,getIdentity){
    const retry=el('button','Reintentar','d-button d-button--secondary');retry.type='button';retry.dataset.homeRetry='';panel.append(message,retry);content.replaceChildren(panel);
   }finally{if(version===generation)content.removeAttribute('aria-busy');}
  }
- function stop(){generation++;controller?.abort();content.removeAttribute('aria-busy');}
+ function stop(){activityView?.dispose();activityView=null;generation++;controller?.abort();content.removeAttribute('aria-busy');}
  function onView(){if(window.dationGetCurrentView?.()==='platform-home')load();else stop();}
  scope.listen(root,'click',event=>{
   if(event.target.closest('[data-home-retry]')){load();return;}

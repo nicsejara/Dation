@@ -118,14 +118,14 @@ class AssignmentDashboardPhase1Tests(unittest.TestCase):
         self.assertIn('await caseActions.onApprove()',self.toolbar)
         self.assertNotIn('approveButton?.click()',self.toolbar)
 
-    def test_export_reuses_existing_csv_and_json_helpers(self):
+    def test_export_downloads_audited_csv_and_json_artifacts(self):
         self.assertIn(
-            "exportDecision,exportDecisionJson",
+            "downloadRunExport",
             self.toolbar,
         )
-        self.assertIn("exportDecision(run.result_json)", self.toolbar)
+        self.assertIn("downloadRunExport(run,'csv'", self.toolbar)
         self.assertIn(
-            "exportDecisionJson(run.result_json,run.id)",
+            "downloadRunExport(run,'json'",
             self.toolbar,
         )
         export_source = (JS / "export.mjs").read_text()

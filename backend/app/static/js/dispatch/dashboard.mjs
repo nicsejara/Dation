@@ -14,7 +14,7 @@ import * as assignmentEssential from './assignment-essential.mjs';
 import * as assignmentAiSummary from './assignment-ai-summary.mjs';
 import * as assignmentAdvanced from './assignment-advanced.mjs';
 import * as comparativeUpgrade from './comparative-upgrade.mjs';
-import {exportDecision} from './export.mjs';
+import {downloadRunExport} from './export.mjs';
 import * as schedulingDashboard from './scheduling-dashboard.mjs';
 import {decisionRail,bindDecisionRail} from './decision-nav.mjs';
 import {
@@ -214,16 +214,17 @@ function renderLegacyDashboard(root,run,onRerun,caseActions={}){
     },120);
   }
 
-  root.querySelector('[data-export-decision]').onclick=event=>{
+  root.querySelector('[data-export-decision]').onclick=async event=>{
+    const exportButton=event.currentTarget;exportButton.disabled=true;
     try{
-      exportDecision(result);
-      feedback(event.currentTarget,'Preparando archivo…','✓ Exportado');
+      await downloadRunExport(run,'csv');
+      feedback(exportButton,'Preparando archivo…','✓ Exportado');
     }catch(error){
-      event.currentTarget.textContent='No se pudo exportar';
+      exportButton.textContent='No se pudo exportar';
       window.setTimeout(()=>{
-        event.currentTarget.textContent=event.currentTarget.dataset.originalLabel||('↓ '+exportButtonLabel);
+        exportButton.textContent=exportButton.dataset.originalLabel||('↓ '+exportButtonLabel);
       },1500);
-    }
+    }finally{exportButton.disabled=false;}
   };
   root.querySelector('[data-rerun]').onclick=onRerun;
   bindDecisionRail(root,caseActions);
@@ -244,7 +245,7 @@ function renderLegacyDashboard(root,run,onRerun,caseActions={}){
     }
   };
   chatButton.onclick=chat.toggleChat;
-  root.querySelector('[data-json]').onclick=()=>download('decision-'+run.id+'.json',JSON.stringify(result,null,2));
+  root.querySelector('[data-json]').onclick=async event=>{const b=event.currentTarget;b.disabled=true;try{await downloadRunExport(run,'json',{filename:'decision-'+run.id+'.json'});}catch{b.textContent='No se pudo exportar';}finally{b.disabled=false;}};
   root.querySelector('[data-copy]').onclick=async event=>{
     try{
       await navigator.clipboard.writeText(JSON.stringify({

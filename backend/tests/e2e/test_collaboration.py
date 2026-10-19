@@ -62,6 +62,8 @@ class CollaborationTests(unittest.TestCase):
   self.assertEqual(self.a.get('/api/platform/team?limit=51').status_code,422)
   self.assertEqual(self.a.post('/api/platform/team/invitations',json={'email':'valid@example.test','access_role':'owner'}).status_code,422)
   self.assertEqual(self.s.sql("SELECT count(*) FROM audit_events WHERE event_type='team.invitation_accepted';"),'1')
+  activity=self.checked(self.a.get('/api/platform/activity?limit=50'))['items'];kinds=[e['event_type'] for e in activity]
+  for kind in ['member.invited','member.joined','member.role_changed']:self.assertIn(kind,kinds)
 
  def test_02_assigned_approval_handoff_attribution_override_and_retry(self):
   self.join();self.checked(self.update(VIEWER,'operator'));case,orders,fleet=self.case()

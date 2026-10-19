@@ -1,6 +1,7 @@
 """Compact Home presentation over the existing, tenant-authorized case history."""
 from app.platform.identity import platform_call
 from app.services.decision_case_service import _state_with_history
+from app.platform.activity import home_activity
 
 NODE_LABELS = {'logistics_assignment': 'Assignment', 'logistics_scheduling': 'Scheduling'}
 
@@ -43,14 +44,14 @@ def _item(row, bundle, key, status, run_id):
 
 
 async def home_snapshot(ctx):
+    activity = await home_activity(ctx)
     if 'logistics' not in ctx.enabled_ddas:
         return {'recent_cases': [], 'attention': {'items': [], 'total': 0, 'scope': 'workspace_review'},
-                'activity': {'available': False, 'items': []}}
+                'activity': activity}
     data = await platform_call('platform_home', {'actor_user_id': ctx.user_id,
                                                'target_workspace_id': ctx.workspace_id})
     return {'recent_cases': [recent_case(bundle) for bundle in data['recent_cases']],
             'attention': {**data['attention'], 'scope': 'assigned_work',
                           'items': [{**item, 'node_label': NODE_LABELS[item['node_id']]}
                                     for item in data['attention']['items']]},
-            # Phase 10 owns the full audit feed. No synthetic activity or inferred actors.
-            'activity': {'available': False, 'items': []}}
+            'activity': activity}

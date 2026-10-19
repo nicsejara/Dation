@@ -9,6 +9,7 @@ import subprocess
 import shutil
 import time
 import unittest
+import importlib.util
 from urllib.parse import parse_qs, urlparse
 
 from playwright.async_api import async_playwright
@@ -16,6 +17,9 @@ from playwright.async_api import async_playwright
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = json.loads((Path(__file__).parent / "fixtures.json").read_text())
 KEY = "dation.dispatch.workspace.v5"
+_export_spec=importlib.util.spec_from_file_location('synthetic_export_format',ROOT/'app/platform/exports.py')
+_export_module=importlib.util.module_from_spec(_export_spec);_export_spec.loader.exec_module(_export_module)
+generate_export=_export_module.generate
 
 
 class NavigationTests(unittest.IsolatedAsyncioTestCase):
@@ -135,6 +139,16 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         u = urlparse(request.url)
         path, query, method = u.path, parse_qs(u.query), request.method
         self.requests.append((method, path))
+        if path=='/api/platform/activity/exports':
+            body=json.loads(request.post_data);run=self.runs.get(body['run_id'])
+            name,content,media=generate_export(run,body['format'])
+            await route.fulfill(status=200,headers={'Content-Disposition':'attachment; filename="'+name+'"'},content_type=media,body=content)
+            return
+        if path=='/api/platform/activity':
+            if getattr(self,'activity_gate',None):await self.activity_gate.wait()
+            await asyncio.sleep(self.delay.get(path,.01))
+            await route.fulfill(status=200,content_type='application/json',body=json.dumps({'available':True,'items':[],'next_cursor':None}))
+            return
         if path.startswith('/api/platform/decisions'):
             await self.route_center(route,path,query,method)
             return
@@ -3815,6 +3829,27 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await root.get_by_role('link',name='Volver al listado',exact=True).click()
         await root.get_by_role('table').wait_for()
         self.assertEqual(sum(method=='PATCH' and path.startswith('/api/platform/decisions') for method,path in self.requests),1)
+
+
+
+    async def test_activity_case_late_response_is_disposed_after_navigation(self):
+        await self.page.goto(f"http://127.0.0.1:{self.port}/app/decisions?center_case_id={self.case['id']}")
+        root=self.page.locator('[data-platform-decisions]');panel=root.locator('[data-case-activity]')
+        await panel.locator('summary').first.wait_for();self.activity_gate=asyncio.Event()
+        await panel.locator('summary').first.click()
+        await self.page.wait_for_function("document.querySelector('[data-case-activity] .platform-activity')?.getAttribute('aria-busy')==='true'")
+        for _ in range(100):
+            if ('GET','/api/platform/activity') in self.requests:break
+            await asyncio.sleep(.01)
+        self.assertIn(('GET','/api/platform/activity'),self.requests)
+        await self.nav('settings');await self.page.locator('[data-workspace-settings]').get_by_label('Nombre del workspace').wait_for()
+        self.activity_gate.set();self.activity_gate=None;await self.page.wait_for_timeout(100)
+        self.assertEqual(await self.page.evaluate('window.dationGetCurrentView()'),'settings')
+        self.assertEqual(await panel.locator('.platform-activity [role=status]').inner_text(),'Cargando actividad…')
+        self.delay['/api/platform/activity']=.01
+        await self.page.evaluate("id=>window.DationDispatch.openDecisionCenter({caseId:id})",self.case['id'])
+        await panel.locator('summary').first.wait_for();await panel.locator('summary').first.click();await panel.get_by_text('Todavía no hay eventos registrados. Las nuevas acciones aparecerán acá.',exact=True).wait_for()
+        self.assertEqual(len([r for r in self.requests if r==('GET','/api/platform/activity')]),2)
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
