@@ -354,6 +354,7 @@ async def upload_logistics_dataset(
                 if parent_dataset_id
                 else None,
                 is_sample=is_sample,
+                track_upload=True,
             )
         except ValueError as exc:
             raise HTTPException(422, str(exc)) from exc

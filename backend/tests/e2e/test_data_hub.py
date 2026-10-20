@@ -207,3 +207,16 @@ class DataHubTests(unittest.TestCase):
   self.assertEqual(self.file(row).read_bytes(),csv_input('orders'))
   self.assertEqual(self.a.get('/api/platform/data/datasets/'+row['id']+'/download').content,csv_input('orders'))
   self.assertEqual(self.s.sql("SELECT count(*) FROM dation_private.dataset_uploads WHERE status='stored';"),'1')
+
+ def test_11_dda_interrupted_upload_is_visible_and_recoverable_in_hub(self):
+  (self.s.storage/'fail-next-dataset-insert').touch();(self.s.storage/'fail-next-delete').touch()
+  self.checked(self.a.post('/api/datasets/upload',params={'dataset_type':'orders'},
+   files={'file':('dda-interrumpida.csv',csv_input('orders'),'text/csv')}),502)
+  listing=self.checked(self.a.get('/api/platform/data/datasets'))
+  self.assertEqual(listing['total'],0);self.assertEqual(len(listing['incomplete_uploads']),1)
+  operation=listing['incomplete_uploads'][0]
+  self.assertEqual(operation['filename'],'dda-interrumpida.csv')
+  self.assertEqual(self.b.post('/api/platform/data/uploads/'+operation['id']+'/discard').status_code,404)
+  self.checked(self.a.post('/api/platform/data/uploads/'+operation['id']+'/discard'))
+  self.assertEqual(self.checked(self.a.get('/api/platform/data/datasets'))['incomplete_uploads'],[])
+  self.assertEqual(self.s.sql("SELECT count(*) FROM dation_private.dataset_uploads WHERE status='discarded';"),'1')

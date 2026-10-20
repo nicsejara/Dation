@@ -30,6 +30,8 @@ Hero de gobernanza; cuatro KPIs; búsqueda literal y filtros compuestos; tabla s
 
 Archivado/restauración y eliminación requieren confirmación. El delete sólo se ofrece con permiso real del detalle: archivado, sin referencias/evidencia y sin ser flota vigente. Fallos conservan intent y permiten completar eliminación. Las cargas interrumpidas se revisan/descartan desde un banner discreto; aquí no se inicia ninguna carga.
 
+La carga de Órdenes/Flota desde `/api/datasets/upload` también utiliza ahora el journal existente (`track_upload=True`). Antes sólo se registraban las cargas del endpoint transversal y demo. Esto conserva la recuperación global al retirar la carga de Data Hub, sin modificar la interfaz ni el flujo de incorporación del DDA.
+
 ## Seguridad
 
 TenantClient ya filtra cada operación REST y valida ownership antes de leer Storage. Se conserva y añade comprobación explícita `ctx.workspace_id` en lookup previo a preview, download, reuse y archivado/restauración. El RPC comprueba membresía activa y workspace. Viewer conserva lectura/preview/download según política actual y no obtiene mutaciones. Se mantienen locks, journals y guards de evidencia.
