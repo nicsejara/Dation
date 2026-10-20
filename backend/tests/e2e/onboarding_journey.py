@@ -13,7 +13,7 @@ async def main():
   browser=await pw.chromium.launch(executable_path=os.getenv('CHROMIUM_EXECUTABLE') or '/usr/bin/chromium',headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
   context=await browser.new_context(viewport={'width':1440,'height':1000},reduced_motion='reduce');page=await context.new_page();page.set_default_timeout(15000);page.on('pageerror',lambda error:errors.append(str(error)))
   await page.goto(BASE+'/login');await page.get_by_label('Email',exact=True).fill('user-2@example.test');await page.get_by_label('Contraseña',exact=True).fill('dispatch-e2e-private');await page.get_by_role('button',name='Ingresar',exact=True).click()
-  home=page.locator('[data-platform-home]');await home.get_by_text('Bienvenido a Dation',exact=True).wait_for();await home.locator('[data-onboarding-step=workspace][data-complete=true]').wait_for();assert await home.locator('[data-onboarding-step=data]').get_attribute('data-complete')=='false'
+  home=page.locator('[data-platform-home]');await home.get_by_role('heading',name='Continuar trabajando').wait_for();assert await home.locator('[data-onboarding-step],.d-onboarding').count()==0;assert await home.locator('.platform-home__hero-actions a').count()==2;assert await home.get_by_role('button',name='Usar datos de ejemplo',exact=True).count()==0
   for width in (1440,1024,768,390):
    await page.set_viewport_size({'width':width,'height':1000});await page.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))');audit=await page.evaluate(theme);assert not audit['overflow'] and not audit['failures'],audit
    if artifacts:await page.screenshot(path=str(artifacts/f'welcome-{width}.png'),full_page=True)
@@ -33,10 +33,9 @@ async def main():
   await hub.get_by_role('button',name='Explorar DDAs',exact=True).first.click();await page.locator('#home-open-logistics').click();await page.locator('[data-start-new-decision]').click();await page.locator('#dispatch-data-root').get_by_role('button',name='Usar datos de ejemplo',exact=True).click();await page.wait_for_function("window.DationDispatch.getWorkspace().orders?.is_sample&&window.DationDispatch.getWorkspace().fleet?.is_sample")
   await page.locator('[data-demo-context]').wait_for();assert await page.evaluate('window.dationGetCurrentView()')=='logistics-data'
   await page.locator('#dispatch-data-root .d-workflow-action-bar button').first.wait_for()
-  await page.locator('.nav [data-platform-view=platform-home]').click();await home.locator('[data-onboarding-step=data][data-complete=true]').wait_for();assert await home.locator('[data-onboarding-step=decision]').get_attribute('data-complete')=='false'
-  await home.get_by_role('button',name='Explorar DDA Logística',exact=True).click()
-  await page.wait_for_function("window.dationGetCurrentView()==='logistics-overview'")
-  await page.locator('.nav [data-platform-view=platform-home]').click();await home.locator('[data-onboarding-step=explore][data-complete=true]').wait_for();await page.reload();await home.locator('[data-onboarding-step=explore][data-complete=true]').wait_for()
+  await page.locator('.nav [data-platform-view=platform-home]').click();await home.get_by_role('heading',name='Continuar trabajando').wait_for();assert await home.locator('[data-onboarding-step]').count()==0
+  await home.get_by_role('link',name='Explorar catálogo de DDAs',exact=True).click();await page.wait_for_url('**/app/ddas*')
+  await page.locator('.nav [data-platform-view=platform-home]').click();await page.reload();await home.get_by_role('heading',name='Continuar trabajando').wait_for();assert await home.locator('.d-onboarding').count()==0
   await page.locator('.nav [data-platform-view=platform-data]').click();await hub.locator('.d-demo-badge').first.wait_for();assert await hub.locator('.d-demo-badge').count()==2
   for width in (1440,1024,768,390):
    await page.set_viewport_size({'width':width,'height':1000});await page.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))');audit=await page.evaluate(theme);assert not audit['overflow'] and not audit['failures'],audit

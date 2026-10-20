@@ -3,19 +3,23 @@ from app.platform.identity import platform_call
 from app.services.decision_case_service import _state_with_history
 from app.platform.activity import home_activity
 from app.platform.onboarding import home_progress
+from app.platform.foundation import REGISTRY, case_context, resolve_node_destination
 
-NODE_LABELS = {'logistics_assignment': 'Assignment', 'logistics_scheduling': 'Scheduling'}
+NODE_LABELS = {key: value['label'] for key, value in REGISTRY['decisions'].items() if value['implemented']}
 
 
 def recent_case(bundle):
     row = bundle['case']
-    state = _state_with_history(row.get('state_json') or {}, [], case_id=str(row['id']),
+    options = dict(case_id=str(row['id']),
         orders_dataset_id=str(row['orders_dataset_id']), fleet_dataset_id=str(row['fleet_dataset_id']),
         summaries=bundle['summaries'])
+    try:
+        state = _state_with_history(row.get('state_json') or {}, [], **options)
+    except (ValueError, TypeError, AttributeError):
+        state = _state_with_history({}, [], **options)
     nodes = [(key, state['nodes'][key]) for key in NODE_LABELS]
-    # Canonical workflow state retains an existing approval while a replacement
-    # executes. Resume that newer work, rather than silently selecting the next
-    # step that was unlocked by the older approved version.
+    # Retain the replacement as current work instead of silently presenting the
+    # next unlocked step. Ordinary navigation still prefers its official result.
     pending = [(key, summary['latest']) for key, summary in bundle['summaries'].items()
                if key in NODE_LABELS and summary.get('latest')
                and not summary['latest'].get('approved_at')
@@ -26,7 +30,7 @@ def recent_case(bundle):
         source = bundle['summaries']['logistics_assignment'].get('approved')
         if key == 'logistics_scheduling' and (not source or latest.get('upstream_run_id') != source['id']):
             status = 'stale'
-        return _item(row, bundle, key, status, latest['id'])
+        return _item(row, bundle, key, status, latest['id'], state['nodes'][key])
     # Prefer work needing intervention, then the next available step, then the
     # furthest approved step. Final Assignment is not an executable MVP node.
     chosen = next(((key, node) for status in ('running', 'review', 'error', 'stale', 'available')
@@ -34,14 +38,24 @@ def recent_case(bundle):
     key, node = chosen or next(((key, node) for key, node in reversed(nodes)
                                if node['status'] == 'approved'), nodes[0])
     run_id = node.get('latest_run_id') if node['status'] in {'running', 'review', 'error'} else None
-    return _item(row, bundle, key, node['status'], run_id)
+    return _item(row, bundle, key, node['status'], run_id, node,
+                 completed=all(n['status'] == 'approved' for _, n in nodes))
 
 
-def _item(row, bundle, key, status, run_id):
-    return {'case_id': str(row['id']), 'label': bundle.get('label'), 'dda': 'DDA Logística',
+def _item(row, bundle, key, status, run_id, node, completed=False):
+    # Keep candidate IDs/status for explicit review. The shared resolver selects
+    # the official approval for ordinary resume, just as Center and Map do.
+    resume = resolve_node_destination(key, {**node, 'status': status,
+        'latest_run_id': run_id or node.get('latest_run_id'),
+        'approval_current': node['status'] == 'approved'})
+    item = {'case_id': str(row['id']), 'label': bundle.get('label'), 'dda': 'DDA Logística',
             'node_id': key, 'node_label': NODE_LABELS[key],
-            'status': 'completed' if row['status'] == 'completed' else status,
-            'last_activity_at': row['last_activity_at'], 'run_id': run_id,'is_demo':bool(row.get('is_demo'))}
+            'status': 'completed' if completed else status,
+            'last_activity_at': row['last_activity_at'], 'run_id': run_id, 'is_demo': bool(row.get('is_demo')),
+            'resume': resume or {'view': 'logistics-map', 'node_id': key, 'run_id': None},
+            'approval_current': node['status'] == 'approved'}
+    item['context'] = case_context({**item, 'dda': 'logistics'})
+    return item
 
 
 async def home_snapshot(ctx):
