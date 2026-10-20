@@ -4,6 +4,7 @@ import {mountUploadScreen} from './upload/index.mjs';
 import {renderDecisionMap} from './decision-map.mjs';
 import {mountAssignmentConfig,filterPayload,normalizeRawWeights} from './assignment-config.mjs';
 import {STATUS,createDecisionCase,replaceInputs,transitionNode,inputSignature,caseRef,deriveDecisionNodes,continuationState,getCaseTransitionNotice} from './decision-case.mjs';
+import {resolveNodeDestination} from './decision-target.mjs';
 import {DECISION_META} from './decision-ui.mjs';
 import {currentLogisticsEnabled,logisticsView} from '../platform/entitlements.mjs';
 
@@ -307,7 +308,10 @@ async function loadData(){
     },
   );
 }
-async function openCaseResult(nodeId='logistics_assignment'){const runId=state.decisionCase?.nodes?.[nodeId]?.run_id;if(runId)return openRun(runId,nodeId);}
+async function openCaseResult(nodeId='logistics_assignment'){
+ const target=resolveNodeDestination(nodeId,state.decisionCase?.nodes?.[nodeId]);
+ if(target)return navigateResource(target.view,{caseId:state.decisionCase.id,nodeId,runId:target.run_id});
+}
 
 async function loadDecisionMap(){
   const generation=routeGeneration;
@@ -754,6 +758,8 @@ window.DationDispatch={show,openRun,isReady:ready,getWorkspace:()=>state,startNe
 window.dationNavigate=(view,stage,event)=>{event?.preventDefault();event?.stopPropagation();return navigateResource(view);};
 window.DationDispatch.openDataHub=(hub={},options={})=>navigateResource('platform-data',{...options,hub,caseId:null,nodeId:null});
 window.DationDispatch.openDecisionCenter=(center={},options={})=>navigateResource('platform-decisions',{...options,center,caseId:null,nodeId:null});
+window.DationDispatch.openCaseInDecisionCenter=caseId=>window.DationDispatch.openDecisionCenter({caseId});
+window.DationDispatch.openDashboard=(caseId,nodeId,runId)=>openRun(runId,nodeId,caseId);
 window.DationDispatch.openWorkspaceSettings=settingsTab=>navigateResource('settings',{settingsTab,caseId:null,nodeId:null});
 window.DationDispatch.reuseHubData=inputs=>startNewDecision(inputs);
 document.body.classList.add('dispatch-enabled');

@@ -1,0 +1,165 @@
+[
+  {
+    "name": "approved beats later review",
+    "node_id": "logistics_assignment",
+    "node": {
+      "status": "review",
+      "approved_run_id": "20000000-0000-4000-8000-000000000001",
+      "latest_run_id": "20000000-0000-4000-8000-000000000002",
+      "approval_current": true
+    },
+    "expected": {
+      "view": "decision-dashboard",
+      "node_id": "logistics_assignment",
+      "run_id": "20000000-0000-4000-8000-000000000001"
+    }
+  },
+  {
+    "name": "approved beats replacement running",
+    "node_id": "logistics_assignment",
+    "node": {
+      "status": "running",
+      "approved_run_id": "20000000-0000-4000-8000-000000000001",
+      "latest_run_id": "20000000-0000-4000-8000-000000000002"
+    },
+    "expected": {
+      "view": "decision-dashboard",
+      "node_id": "logistics_assignment",
+      "run_id": "20000000-0000-4000-8000-000000000001"
+    }
+  },
+  {
+    "name": "review opens latest",
+    "node_id": "logistics_assignment",
+    "node": {
+      "status": "review",
+      "latest_run_id": "20000000-0000-4000-8000-000000000002"
+    },
+    "expected": {
+      "view": "decision-dashboard",
+      "node_id": "logistics_assignment",
+      "run_id": "20000000-0000-4000-8000-000000000002"
+    }
+  },
+  {
+    "name": "running opens current execution",
+    "node_id": "logistics_assignment",
+    "node": {
+      "status": "running",
+      "run_id": "20000000-0000-4000-8000-000000000002"
+    },
+    "expected": {
+      "view": "decision-dashboard",
+      "node_id": "logistics_assignment",
+      "run_id": "20000000-0000-4000-8000-000000000002"
+    }
+  },
+  {
+    "name": "stale never certifies approval",
+    "node_id": "logistics_assignment",
+    "node": {
+      "status": "stale",
+      "approved_run_id": "20000000-0000-4000-8000-000000000001",
+      "latest_run_id": "20000000-0000-4000-8000-000000000002",
+      "approval_current": true
+    },
+    "expected": {
+      "view": "decision-dashboard",
+      "node_id": "logistics_assignment",
+      "run_id": "20000000-0000-4000-8000-000000000002"
+    }
+  },
+  {
+    "name": "revoked approval is not selected",
+    "node_id": "logistics_assignment",
+    "node": {
+      "status": "review",
+      "approved_run_id": "20000000-0000-4000-8000-000000000001",
+      "latest_run_id": "20000000-0000-4000-8000-000000000002",
+      "approval_current": false
+    },
+    "expected": {
+      "view": "decision-dashboard",
+      "node_id": "logistics_assignment",
+      "run_id": "20000000-0000-4000-8000-000000000002"
+    }
+  },
+  {
+    "name": "available config",
+    "node_id": "logistics_assignment",
+    "node": {
+      "status": "available"
+    },
+    "expected": {
+      "view": "logistics-config",
+      "node_id": "logistics_assignment",
+      "run_id": null
+    }
+  },
+  {
+    "name": "locked blocks even malformed cached approval",
+    "node_id": "logistics_assignment",
+    "node": {
+      "status": "locked",
+      "approved_run_id": "20000000-0000-4000-8000-000000000001"
+    },
+    "expected": null
+  },
+  {
+    "name": "needs data blocks",
+    "node_id": "logistics_assignment",
+    "node": {
+      "status": "needs_data",
+      "run_id": "20000000-0000-4000-8000-000000000002"
+    },
+    "expected": null
+  },
+  {
+    "name": "coming soon blocks",
+    "node_id": "logistics_assignment",
+    "node": {
+      "status": "coming_soon",
+      "run_id": "20000000-0000-4000-8000-000000000002"
+    },
+    "expected": null
+  },
+  {
+    "name": "error keeps failed execution readable",
+    "node_id": "logistics_assignment",
+    "node": {
+      "status": "error",
+      "run_id": "20000000-0000-4000-8000-000000000002"
+    },
+    "expected": {
+      "view": "decision-dashboard",
+      "node_id": "logistics_assignment",
+      "run_id": "20000000-0000-4000-8000-000000000002"
+    }
+  },
+  {
+    "name": "missing run blocks review",
+    "node_id": "logistics_assignment",
+    "node": {
+      "status": "review"
+    },
+    "expected": null
+  },
+  {
+    "name": "unknown status fails closed",
+    "node_id": "logistics_assignment",
+    "node": {
+      "status": "invented",
+      "approved_run_id": "20000000-0000-4000-8000-000000000001"
+    },
+    "expected": null
+  },
+  {
+    "name": "future node has no engine",
+    "node_id": "logistics_final_assignment",
+    "node": {
+      "status": "available",
+      "run_id": "20000000-0000-4000-8000-000000000001"
+    },
+    "expected": null
+  }
+]

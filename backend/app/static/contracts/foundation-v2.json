@@ -1,0 +1,227 @@
+{
+  "version": 1,
+  "ddas": [
+    {
+      "id": "logistics",
+      "title": "DDA Logística",
+      "status": "available",
+      "category": "supply-chain",
+      "description": "Optimizá cómo asignar, planificar y ejecutar tus despachos.",
+      "capabilities": [
+        "Asignación",
+        "Planificación",
+        "Ejecución"
+      ],
+      "icon": "logistics",
+      "targetView": "logistics-overview"
+    },
+    {
+      "id": "production",
+      "title": "DDA Producción",
+      "status": "coming-soon",
+      "category": "production",
+      "description": "Capacidad, secuenciación y planificación productiva.",
+      "capabilities": [
+        "Capacidad",
+        "Secuenciación",
+        "Planificación"
+      ],
+      "icon": "production"
+    },
+    {
+      "id": "inventory",
+      "title": "DDA Inventarios",
+      "status": "coming-soon",
+      "category": "supply-chain",
+      "description": "Stock, cobertura y reposición inteligente.",
+      "capabilities": [
+        "Stock",
+        "Cobertura",
+        "Reposición"
+      ],
+      "icon": "inventory"
+    },
+    {
+      "id": "demand",
+      "title": "DDA Demanda",
+      "status": "coming-soon",
+      "category": "commercial",
+      "description": "Forecast y decisiones de planificación de demanda.",
+      "capabilities": [
+        "Pronóstico",
+        "Planificación",
+        "Escenarios"
+      ],
+      "icon": "demand"
+    },
+    {
+      "id": "procurement",
+      "entitlementId": "purchasing",
+      "title": "DDA Compras",
+      "status": "coming-soon",
+      "category": "operations",
+      "description": "Abastecimiento, evaluación y decisión de compra.",
+      "capabilities": [
+        "Abastecimiento",
+        "Evaluación",
+        "Decisión"
+      ],
+      "icon": "procurement"
+    },
+    {
+      "id": "maintenance",
+      "title": "DDA Mantenimiento",
+      "status": "coming-soon",
+      "category": "assets",
+      "description": "Priorización de intervenciones y mantenimiento.",
+      "capabilities": [
+        "Intervenciones",
+        "Confiabilidad",
+        "Disponibilidad"
+      ],
+      "icon": "maintenance"
+    },
+    {
+      "id": "pricing",
+      "title": "DDA Pricing & Comercial",
+      "status": "coming-soon",
+      "category": "commercial",
+      "description": "Pricing, margen y decisiones comerciales.",
+      "capabilities": [
+        "Pricing",
+        "Margen",
+        "Mix"
+      ],
+      "icon": "pricing"
+    }
+  ],
+  "categories": [
+    {
+      "id": "all",
+      "label": "Todos"
+    },
+    {
+      "id": "supply-chain",
+      "label": "Supply Chain"
+    },
+    {
+      "id": "operations",
+      "label": "Operaciones"
+    },
+    {
+      "id": "production",
+      "label": "Producción"
+    },
+    {
+      "id": "commercial",
+      "label": "Comercial"
+    },
+    {
+      "id": "assets",
+      "label": "Activos"
+    }
+  ],
+  "decisions": {
+    "logistics_assignment": {
+      "index": "01",
+      "label": "Asignación de carga",
+      "short": "Asignación de carga",
+      "progressLabel": "Asignación de carga",
+      "icon": "packageCheck",
+      "question": "¿Cómo conviene armar los viajes y repartir la carga?",
+      "output": "Viajes propuestos + distribución de carga",
+      "configureLabel": "Configurar asignación →",
+      "implemented": true
+    },
+    "logistics_scheduling": {
+      "index": "02",
+      "label": "Planificación de despachos",
+      "short": "Planificación de despachos",
+      "progressLabel": "Planificación",
+      "icon": "calendarRange",
+      "question": "¿Cuándo conviene ejecutar los viajes ya definidos?",
+      "output": "Calendario operativo + secuencia",
+      "configureLabel": "Configurar planificación →",
+      "implemented": true
+    },
+    "logistics_final_assignment": {
+      "index": "03",
+      "label": "Asignación de vehículos",
+      "short": "Asignación de vehículos",
+      "progressLabel": "Vehículos",
+      "icon": "truck",
+      "question": "¿Qué vehículo ejecuta cada viaje programado?",
+      "output": "Vehículo asignado a cada viaje, listo para ejecutar",
+      "configureLabel": "Configurar asignación de vehículos →",
+      "implemented": false
+    }
+  },
+  "objectives": {
+    "balanced": "Balanceado",
+    "min_trips": "Menor cantidad de viajes",
+    "min_cost": "Costo mínimo",
+    "max_own_fleet": "Mayor uso de flota propia",
+    "min_co2": "CO₂ mínimo",
+    "custom": "Personalizado",
+    "service_first": "Servicio primero",
+    "cost_first": "Costo primero"
+  },
+  "objectiveAliases": {
+    "cost_min": "min_cost",
+    "co2_min": "min_co2"
+  },
+  "datasetTypes": {
+    "orders": "Órdenes",
+    "fleet": "Flota",
+    "logistics_legacy": "Logística anterior"
+  },
+  "responsibilities": {
+    "data_owner": "Data Owner",
+    "data_steward": "Data Steward",
+    "decision_owner": "Decision Owner",
+    "approver": "Approver"
+  },
+  "responsibilityGroups": {
+    "data": [
+      "data_owner",
+      "data_steward"
+    ],
+    "decision_owner": [
+      "decision_owner"
+    ],
+    "approver": [
+      "approver"
+    ]
+  },
+  "statusTones": {
+    "approved": "success",
+    "completed": "success",
+    "review": "warning",
+    "stale": "warning",
+    "running": "info",
+    "error": "danger",
+    "available": "neutral",
+    "archived": "neutral",
+    "locked": "neutral",
+    "needs_data": "neutral",
+    "coming_soon": "neutral"
+  },
+  "selectionTone": "accent",
+  "destinationRules": [
+    {
+      "when": "approved",
+      "view": "decision-dashboard",
+      "run": "approved"
+    },
+    {
+      "when": "candidate",
+      "view": "decision-dashboard",
+      "run": "latest"
+    },
+    {
+      "when": "available",
+      "view": "logistics-config",
+      "run": null
+    }
+  ]
+}

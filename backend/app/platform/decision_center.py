@@ -2,8 +2,9 @@
 from app.platform.identity import platform_call
 from app.platform.home import recent_case
 from app.services.decision_case_service import _state_with_history, _history_item, NODE_IDS
+from app.platform.foundation import REGISTRY,resolve_node_destination,case_context
 
-LABELS={'logistics_assignment':'Asignación de carga','logistics_scheduling':'Planificación de despachos','logistics_final_assignment':'Asignación de vehículos'}
+LABELS={key:value['label'] for key,value in REGISTRY['decisions'].items()}
 
 def canonical(bundle):
     row=bundle['case']
@@ -28,7 +29,8 @@ def project(bundle,detail=False):
         'progress':{'approved':sum(state['nodes'][k]['status']=='approved' for k in NODE_IDS[:2]),'total':2},
         'owner':(collaboration.get(resume['node_id']) or {}).get('owner'),'created_by':bundle.get('created_by'),'created_at':row['created_at'],
         'last_activity_at':row['last_activity_at'],'updated_at':row['updated_at'],
-        'resume':target(resume['node_id'],resume['status'],resume.get('run_id'),state['nodes'][resume['node_id']])}
+        'resume':target(resume['node_id'],resume['status'],resume.get('run_id'),state['nodes'][resume['node_id']]) or {'view':'logistics-map','node_id':resume['node_id'],'run_id':None}}
+    result['context']=case_context(result)
     if detail:
         people=bundle.get('run_people') or {};nodes=[]
         for key in NODE_IDS:
@@ -51,9 +53,8 @@ def project(bundle,detail=False):
     return result
 
 def target(node_id,status,run_id,node):
-    selected=run_id or node.get('approved_run_id') or node.get('run_id')
-    if selected:return {'view':'decision-dashboard','node_id':node_id,'run_id':selected}
-    return {'view':'logistics-config' if status=='available' else 'logistics-map','node_id':node_id,'run_id':None}
+    return resolve_node_destination(node_id,{**node,'status':status,'latest_run_id':run_id or node.get('latest_run_id'),
+        'approval_current':node.get('status')=='approved'})
 
 async def read(ctx,**options):
     return await platform_call('platform_decision_center',{'actor_user_id':ctx.user_id,'target_workspace_id':ctx.workspace_id,**options})

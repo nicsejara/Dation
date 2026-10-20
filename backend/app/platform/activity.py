@@ -3,6 +3,10 @@ from fastapi import HTTPException
 from app.platform.identity import platform_call
 
 ACTIONS={'workspace.created':'creó el workspace','workspace.legacy_claimed':'recuperó el acceso al workspace',
+ 'member.responsibilities_changed':'actualizó responsabilidades de negocio',
+ 'stage.responsible_assigned':'asignó al responsable de datos','stage.responsible_changed':'cambió al responsable de datos',
+ 'decision.owner_assigned':'asignó al responsable de la decisión','decision.owner_changed':'cambió al responsable de la decisión',
+ 'decision.approver_assigned':'asignó al aprobador de la decisión','decision.approver_changed':'cambió al aprobador de la decisión',
  'workspace.settings_updated':'actualizó la configuración del workspace','member.invited':'invitó a una persona al workspace',
  'member.joined':'se unió al workspace','member.invitation_revoked':'revocó una invitación',
  'member.role_changed':'cambió un rol de acceso','member.disabled':'deshabilitó una membresía',

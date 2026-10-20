@@ -3896,5 +3896,20 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(await root.get_by_role('button',name='Usar datos de ejemplo',exact=True).is_disabled())
         self.assertEqual(sum(method=='POST' and path.endswith('/onboarding/demo') for method,path in self.requests),1)
 
+    async def test_foundation_dashboard_navigation_prefers_approved_over_later_candidate(self):
+        from uuid import uuid4
+        official=self.f['runs']['assignment'];candidate=copy.deepcopy(official);candidate['id']=str(uuid4());candidate['approved_at']=None
+        candidate['result_json']['decision_case']['status']='review';self.runs[candidate['id']]=candidate
+        node=self.case['nodes']['logistics_assignment']
+        node.update(status='approved',approved_run_id=official['id'],latest_run_id=candidate['id'],run_id=candidate['id'])
+        await self.open('decision-dashboard','logistics_scheduling',self.f['runs']['scheduling']['id'])
+        await self.page.locator('button[data-decision-node=logistics_assignment]').click()
+        await self.page.locator('.assignment-dashboard-v2').wait_for()
+        self.assertEqual(parse_qs(urlparse(self.page.url).query)['run_id'],[official['id']])
+        selected=self.page.locator('button[data-decision-node=logistics_assignment]')
+        self.assertEqual(await selected.get_attribute('aria-current'),'page')
+        self.assertEqual(await selected.get_attribute('data-status-tone'),'success')
+        self.assertEqual(self.execution_bodies,[])
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

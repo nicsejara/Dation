@@ -82,7 +82,7 @@ app.include_router(platform_router)
 class RevalidatedStaticFiles(StaticFiles):
     async def get_response(self, path, scope):
         response = await super().get_response(path, scope)
-        if Path(path).suffix in {".js", ".mjs", ".css"}:
+        if Path(path).suffix in {".js", ".mjs", ".css", ".json"}:
             response.headers["Cache-Control"] = "no-cache"
         return response
 

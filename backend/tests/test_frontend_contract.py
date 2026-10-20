@@ -1316,7 +1316,7 @@ class FrontendContractTests(
             decision_map,
         )
         self.assertIn(
-            "state.decisionCase?.nodes?.[nodeId]?.run_id",
+            "resolveNodeDestination(nodeId,state.decisionCase?.nodes?.[nodeId])",
             workspace,
         )
         self.assertIn(
@@ -1448,15 +1448,18 @@ class FrontendContractTests(
             self.assertIn(copy, decision_map)
 
         for copy in (
-            'label: "Asignación de carga"',
-            'label: "Planificación de despachos"',
-            'label: "Asignación de vehículos"',
             'label: "Disponible"',
             'label: "Requiere revisión"',
             'label: "Aprobada"',
             'label: "En espera"',
         ):
             self.assertIn(copy, decision_ui)
+
+        import json
+        registry=json.loads((BACKEND_ROOT / "app/static/contracts/foundation-v2.json").read_text())
+        self.assertEqual([node['label'] for node in registry['decisions'].values()],
+                         ['Asignación de carga','Planificación de despachos','Asignación de vehículos'])
+        self.assertIn('DECISION_META = FOUNDATION.decisions',decision_ui)
 
         self.assertNotIn(
             "Bloqueada por jerarquía",
@@ -1978,7 +1981,7 @@ class FrontendContractTests(
         )
         self.assertIn(
             "DDA Producción",
-            (BACKEND_ROOT / "app/static/js/platform/dda-catalog.mjs").read_text(),
+            (BACKEND_ROOT / "app/static/contracts/foundation-v2.json").read_text(),
         )
         self.assertIn(
             "Próximamente",

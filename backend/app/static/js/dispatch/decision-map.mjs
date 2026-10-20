@@ -1,4 +1,5 @@
 import {createScope,scopeFor} from "./lifecycle.mjs";
+import {resolveNodeDestination} from './decision-target.mjs';
 import {ensureDecisionCaseStyles} from "./styles.mjs";
 import {api,esc,num} from "./shared.mjs";
 import {STATUS,deriveDecisionNodes} from "./decision-case.mjs";
@@ -100,6 +101,8 @@ function dataIssueText(decision){
 
 function actionFor(nodeId,status,node,dataReady){
   const meta=DECISION_META[nodeId];
+  const target=resolveNodeDestination(nodeId,{...node,status});
+  if(target?.view==='decision-dashboard'&&node?.approved_run_id&&status!=='stale')return {action:'open-result',label:'Ver resultado',disabled:false};
   if(status===STATUS.APPROVED){
     return node?.run_id
       ?{action:"open-result",label:"Ver resultado",disabled:false}

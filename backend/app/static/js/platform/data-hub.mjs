@@ -1,3 +1,4 @@
+import {FOUNDATION} from './foundation.mjs';
 import {describeFailure} from '../dispatch/recovery.mjs';
 import {demoBadge,mountDemoAction} from './onboarding.mjs';
 import {workspaceDate} from './workspace-format.mjs';
@@ -11,7 +12,7 @@ import {createDropCard} from '../dispatch/upload/dropcard.mjs';
 import {validateCsvFile,storeCsvFile} from '../dispatch/upload/file-api.mjs';
 
 const BASE='/api/platform/data';
-const types={orders:'Órdenes',fleet:'Flota',logistics_legacy:'Logística anterior'};
+const types=FOUNDATION.datasetTypes;
 const validations={validated:'Validado',issues:'Con problemas',unknown:'Sin registro'};
 const states={active:'En progreso',completed:'Completado',archived:'Archivado'};
 const pageSize=25;
