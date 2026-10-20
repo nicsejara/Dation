@@ -60,6 +60,7 @@ class FoundationDomainTests(unittest.TestCase):
         self.assertEqual(self.roles(USER_A,['approver','approver']).status_code,422)
         self.checked(self.roles(VIEWER,['data_owner','decision_owner','approver']))
         self.checked(self.roles(DISABLED,['data_owner','decision_owner','approver']))
+        self.s.sql(f"UPDATE workspace_members SET status='active' WHERE user_id='{DISABLED}'; UPDATE auth.users SET email_confirmed_at=NULL WHERE id='{DISABLED}';")
         for group in ('data','decision_owner','approver'):
             response=self.checked(self.a.get('/api/platform/team',params={'candidates':'true','responsibility':group,'limit':1}))
             self.assertEqual(response['total'],1);self.assertEqual(response['members'][0]['user_id'],USER_A)
@@ -100,6 +101,9 @@ class FoundationDomainTests(unittest.TestCase):
         self.assertFalse(self.read(case)['stages']['data_preparation']['owner_eligible'])
         self.assertEqual(self.read(case)['stages']['data_preparation']['owner']['id'],USER_A)
         self.assertEqual(self.client(USER_B).get(f'/api/platform/decisions/{case}/responsibilities').status_code,404)
+        detail=self.checked(self.a.get('/api/platform/decisions/'+case))
+        self.checked(self.a.patch('/api/platform/decisions/'+case,json={'expected_updated_at':detail['updated_at'],'archived':True}))
+        self.assertEqual(self.assign(case,'data_preparation',None,version=stage['updated_at']).status_code,409)
 
     def test_approved_precedence_actual_actor_and_explicit_candidate_access(self):
         row=self.member(VIEWER)

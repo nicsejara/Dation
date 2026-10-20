@@ -96,7 +96,11 @@ BEGIN
  IF operation NOT IN('read','write') OR operation IS NULL THEN RAISE EXCEPTION 'Invalid operation' USING ERRCODE='22023'; END IF;
  IF operation='write' THEN PERFORM 1 FROM public.workspaces WHERE id=target_workspace_id FOR UPDATE; END IF;
  role_name=dation_private.team_actor(target_workspace_id,actor_user_id,operation='write');
- SELECT * INTO c FROM public.decision_cases WHERE workspace_id=target_workspace_id AND id=target_case_id;
+ IF operation='write' THEN
+  SELECT * INTO c FROM public.decision_cases WHERE workspace_id=target_workspace_id AND id=target_case_id FOR UPDATE;
+ ELSE
+  SELECT * INTO c FROM public.decision_cases WHERE workspace_id=target_workspace_id AND id=target_case_id;
+ END IF;
  IF NOT FOUND THEN RAISE EXCEPTION 'Case not found' USING ERRCODE='P0002'; END IF;
  IF operation='write' THEN
   IF c.status='archived' THEN RAISE EXCEPTION 'Restore case before assigning' USING ERRCODE='22023'; END IF;

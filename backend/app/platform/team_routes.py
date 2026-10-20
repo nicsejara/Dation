@@ -2,7 +2,7 @@
 from typing import Literal
 from uuid import UUID
 from fastapi import APIRouter, Depends, Query
-from pydantic import AwareDatetime, BaseModel, ConfigDict
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
 from app.auth import require_upload_access
 from app.platform.auth_routes import Email
 from app.platform.identity import platform_call
@@ -39,7 +39,7 @@ class Version(BaseModel):
     expected_updated_at: AwareDatetime
 
 class Responsibilities(Version):
-    business_roles: list[Responsibility]
+    business_roles: list[Responsibility] = Field(max_length=4)
 
 @router.patch('/team/members/{user_id}/responsibilities')
 async def responsibilities(user_id: UUID,payload: Responsibilities,ctx=Depends(require_upload_access)):
