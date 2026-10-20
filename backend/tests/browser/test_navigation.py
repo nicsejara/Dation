@@ -3676,6 +3676,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await root.get_by_role('link',name='Ver Decision Case',exact=True).wait_for()
         count=sum(path=='/api/platform/data/datasets' for _,path in self.requests)
         self.assertEqual(await root.locator('tr[aria-selected=true]').count(),1)
+        icons=await root.locator('.hub-icon svg').evaluate_all('els=>els.map(el=>({stroke:getComputedStyle(el).stroke,fill:getComputedStyle(el).fill}))')
+        self.assertTrue(icons);self.assertTrue(all(i['stroke']!='none' and i['fill']=='none' for i in icons),icons)
         theme=(Path(__file__).parent/'theme_audit.js').read_text()
         for width in (1440,1280,1024,768,390):
             await self.page.set_viewport_size({'width':width,'height':1000});await self.page.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))')
