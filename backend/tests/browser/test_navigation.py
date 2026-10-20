@@ -3671,13 +3671,19 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.page.reload();await root.locator('[data-dda-entitlement=disabled]').wait_for()
         await self.page.locator('.nav [data-platform-view="platform-home"]').click()
         await self.page.locator('[data-platform-home] .platform-home__quick-link').first.wait_for()
-        self.assertEqual(await self.page.get_by_role('link',name='Abrir DDA Logística',exact=True).count(),0)
+        home=self.page.locator('[data-platform-home]')
+        await home.get_by_role('link',name='Explorar catálogo de DDAs',exact=True).wait_for()
+        self.assertTrue(await self.page.locator('.asset-item').is_disabled())
         self.ddas[0]['status']='enabled'
         await self.page.evaluate('window.dationSession.refresh()')
-        await self.page.get_by_role('link',name='Abrir DDA Logística',exact=True).wait_for()
+        await self.page.wait_for_function("document.querySelector('.asset-item')?.disabled===false")
+        await home.get_by_role('link',name='Explorar catálogo de DDAs',exact=True).click()
+        await root.locator('#home-open-logistics').wait_for()
         self.ddas[0]['status']='disabled'
         await self.page.evaluate('window.dationSession.refresh()')
-        await self.page.get_by_role('link',name='Abrir DDA Logística',exact=True).wait_for(state='hidden')
+        await root.locator('[data-dda-id=logistics][data-dda-entitlement=disabled]').wait_for()
+        self.assertTrue(await self.page.locator('.asset-item').is_disabled())
+        await self.nav('platform-home');await home.get_by_role('link',name='Explorar catálogo de DDAs',exact=True).wait_for()
         self.assertEqual(self.errors,[])
 
     async def test_catalog_fallback_keeps_disabled_entitlement_closed(self):

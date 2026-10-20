@@ -21,7 +21,8 @@ async def main():
   await page.locator('.nav [data-platform-view=platform-decisions]').click();center=page.locator('[data-platform-decisions]');await center.get_by_role('heading',name='Todavía no hay decisiones en este Workspace.',exact=True).wait_for()
   async with page.expect_response(lambda response:'/api/platform/onboarding/explore' in response.url and response.status==200):
    await center.locator('.center-empty').get_by_role('button',name='Explorar DDAs',exact=True).click()
-  await page.wait_for_url('**/app/ddas*');await page.locator('.nav [data-platform-view=platform-data]').click()
+  await page.wait_for_url('**/app/ddas*');progress=await page.evaluate("async()=>{const {api}=await import('/static/js/dispatch/shared.mjs');return await api('/api/platform/onboarding');}");explored_at=progress['explored_at'];assert explored_at
+  await page.locator('.nav [data-platform-view=platform-data]').click()
   hub=page.locator('[data-platform-data]');await hub.get_by_role('heading',name='Todavía no hay datos en este Workspace.',exact=True).wait_for();assert await hub.get_by_role('button',name='Usar datos de ejemplo',exact=True).count()==0
   failed=False
   async def offline_once(route):
@@ -36,6 +37,7 @@ async def main():
   await page.locator('.nav [data-platform-view=platform-home]').click();await home.get_by_role('heading',name='Continuar trabajando').wait_for();assert await home.locator('[data-onboarding-step]').count()==0
   await home.get_by_role('link',name='Explorar catálogo de DDAs',exact=True).click();await page.wait_for_url('**/app/ddas*')
   await page.locator('.nav [data-platform-view=platform-home]').click();await page.reload();await home.get_by_role('heading',name='Continuar trabajando').wait_for();assert await home.locator('.d-onboarding').count()==0
+  progress=await page.evaluate("async()=>{const {api}=await import('/static/js/dispatch/shared.mjs');return await api('/api/platform/onboarding');}");assert progress['explored_at']==explored_at and progress['data_ready'] and not progress['first_decision_completed']
   await page.locator('.nav [data-platform-view=platform-data]').click();await hub.locator('.d-demo-badge').first.wait_for();assert await hub.locator('.d-demo-badge').count()==2
   for width in (1440,1024,768,390):
    await page.set_viewport_size({'width':width,'height':1000});await page.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))');audit=await page.evaluate(theme);assert not audit['overflow'] and not audit['failures'],audit

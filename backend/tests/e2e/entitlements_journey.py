@@ -33,7 +33,7 @@ async def main():
     await page.set_viewport_size({'width':width,'height':1000})
     await page.evaluate('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))')
     probe=await page.evaluate("""() => ({width:innerWidth,scroll:document.documentElement.scrollWidth,nodes:[...document.body.querySelectorAll('*')].filter(n=>n.getClientRects().length&&n.getBoundingClientRect().right>innerWidth+1).slice(0,12).map(n=>({tag:n.tagName,class:n.className,right:n.getBoundingClientRect().right,text:n.textContent.slice(0,80)}))})""");assert probe['scroll']<=width+1,probe
-   await page.locator('.nav [data-platform-view=platform-home]').click();await page.locator('[data-platform-home] .platform-home__quick-link').first.wait_for();assert await page.get_by_role('link',name='Abrir DDA Logística',exact=True).count()==0
+   await page.locator('.nav [data-platform-view=platform-home]').click();await page.locator('[data-platform-home] .platform-home__quick-link').first.wait_for();assert await page.locator('[data-platform-home]').get_by_role('link',name='Explorar catálogo de DDAs',exact=True).is_visible();assert await page.locator('.asset-item').is_disabled()
    await grant('enabled');await page.evaluate('window.dationSession.refresh()')
    await page.locator('.nav [data-platform-view=inicio]').click();await root.locator('#home-open-logistics').click();await page.locator('.dda-landing__hero').wait_for()
    assert errors==[],errors
