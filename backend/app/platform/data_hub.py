@@ -18,8 +18,13 @@ async def snapshot(ctx,**options):
         'target_workspace_id':ctx.workspace_id,**options})
 
 
+async def library(ctx,**options):
+    return await platform_call('platform_dataset_library',{'actor_user_id':ctx.user_id,
+        'target_workspace_id':ctx.workspace_id,**options})
+
+
 async def dataset_detail(ctx,dataset_id,limit=25,offset=0):
-    data=await snapshot(ctx,resource='dataset',target_dataset_id=str(dataset_id),page_limit=limit,page_offset=offset)
+    data=await library(ctx,target_dataset_id=str(dataset_id),page_limit=limit,page_offset=offset)
     raw=data.pop('validation_report') or {}
     if not isinstance(raw,dict):raw={}
     data['validation_report']={key:raw.get(key) for key in ('valid','schema','counts')}
@@ -31,14 +36,17 @@ async def dataset_detail(ctx,dataset_id,limit=25,offset=0):
     return data
 
 
-async def active_dataset(dataset_id):
+async def active_dataset(ctx,dataset_id):
     row=await get_dataset(str(dataset_id))
-    if not row:raise HTTPException(404,'No se encontró el dataset.')
+    # TenantClient already scopes this lookup and excludes pending deletions.
+    # Check the projection again before passing a service-backed object to Storage.
+    if not row or str(row.get('workspace_id'))!=str(ctx.workspace_id):
+        raise HTTPException(404,'No se encontró el dataset.')
     return row
 
 
-async def preview(dataset_id,limit=25,offset=0):
-    row=await active_dataset(dataset_id)
+async def preview(ctx,dataset_id,limit=25,offset=0):
+    row=await active_dataset(ctx,dataset_id)
     contents=await download_dataset(row)
     if len(contents)>10*1024*1024:raise HTTPException(413,'La vista previa admite archivos de hasta 10 MB.')
     try:
@@ -62,7 +70,7 @@ async def preview(dataset_id,limit=25,offset=0):
 
 async def reuse(ctx,dataset_id=None,orders_id=None,fleet_id=None):
     require_dda(ctx,'logistics')
-    rows=[await active_dataset(dataset_id)] if dataset_id else [await active_dataset(orders_id),await active_dataset(fleet_id)]
+    rows=[await active_dataset(ctx,dataset_id)] if dataset_id else [await active_dataset(ctx,orders_id),await active_dataset(ctx,fleet_id)]
     if any(row.get('archived_at') or row.get('dataset_type') not in {'orders','fleet'} for row in rows):
         raise HTTPException(409,'Elegí datos activos de Órdenes o Flota para reutilizar.')
     # Revalidate older profiles in memory, without rewriting historical metadata.

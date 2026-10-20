@@ -22,15 +22,15 @@ async def main():
   async with page.expect_response(lambda response:'/api/platform/onboarding/explore' in response.url and response.status==200):
    await center.locator('.center-empty').get_by_role('button',name='Explorar DDAs',exact=True).click()
   await page.wait_for_url('**/app/ddas*');await page.locator('.nav [data-platform-view=platform-data]').click()
-  hub=page.locator('[data-platform-data]');await hub.get_by_role('button',name='Usar datos de ejemplo',exact=True).wait_for()
+  hub=page.locator('[data-platform-data]');await hub.get_by_role('heading',name='Todavía no hay datos en este Workspace.',exact=True).wait_for();assert await hub.get_by_role('button',name='Usar datos de ejemplo',exact=True).count()==0
   failed=False
   async def offline_once(route):
    nonlocal failed
    if not failed:failed=True;await route.abort('internetdisconnected')
    else:await route.continue_()
   await context.route('**/api/platform/data/datasets?**',offline_once)
-  await page.evaluate("window.DationDispatch.openDataHub({})");await hub.get_by_text('Revisá tu conexión y reintentá. Los datos ya guardados se conservan.',exact=True).wait_for();await hub.get_by_role('button',name='Reintentar',exact=True).click();await hub.get_by_role('button',name='Usar datos de ejemplo',exact=True).wait_for()
-  await hub.get_by_role('button',name='Usar datos de ejemplo',exact=True).click();await page.wait_for_function("window.DationDispatch.getWorkspace().orders?.is_sample&&window.DationDispatch.getWorkspace().fleet?.is_sample")
+  await page.locator('.nav [data-platform-view=platform-home]').click();await page.locator('.nav [data-platform-view=platform-data]').click();await hub.get_by_text('Revisá tu conexión y reintentá. Los datos ya guardados se conservan.',exact=True).wait_for();await hub.get_by_role('button',name='Reintentar',exact=True).click();await hub.get_by_role('heading',name='Todavía no hay datos en este Workspace.',exact=True).wait_for()
+  await hub.get_by_role('button',name='Explorar DDAs',exact=True).first.click();await page.locator('#home-open-logistics').click();await page.locator('[data-start-new-decision]').click();await page.locator('#dispatch-data-root').get_by_role('button',name='Usar datos de ejemplo',exact=True).click();await page.wait_for_function("window.DationDispatch.getWorkspace().orders?.is_sample&&window.DationDispatch.getWorkspace().fleet?.is_sample")
   await page.locator('[data-demo-context]').wait_for();assert await page.evaluate('window.dationGetCurrentView()')=='logistics-data'
   await page.locator('#dispatch-data-root .d-workflow-action-bar button').first.wait_for()
   await page.locator('.nav [data-platform-view=platform-home]').click();await home.locator('[data-onboarding-step=data][data-complete=true]').wait_for();assert await home.locator('[data-onboarding-step=decision]').get_attribute('data-complete')=='false'

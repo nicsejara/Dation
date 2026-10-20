@@ -5,17 +5,20 @@ import {readHubResource} from '../app/static/js/platform/data-resource.mjs';
 import {validateCsvFile,storeCsvFile} from '../app/static/js/dispatch/upload/file-api.mjs';
 const id='00000000-0000-4000-8000-000000000001',other='00000000-0000-4000-8000-000000000002';
 
-test('Data Hub links retain filters and selected resources without decision context',()=>{
- const hub={tab:'packs',filter:'all',q:'Órdenes + 1',offset:25,ordersId:id,fleetId:other};
- const url=resourceUrl('https://qa/app?case_id='+id+'&run_id='+other,{view:'platform-data',hub,caseId:id,runId:other});
+test('Data Hub links retain independent filters, pagination and selected dataset',()=>{
+ const hub={q:'Órdenes + 1',type:'orders',validation:'validated',state:'all',offset:25,datasetId:id,casesOffset:25};
+ const url=resourceUrl('https://qa/app?case_id='+id+'&run_id='+other,{view:'platform-data',hub});
  assert.equal(url.pathname,'/app/data');assert.equal(url.searchParams.get('case_id'),null);
- const parsed=readResource(url);assert.equal(parsed.view,'platform-data');assert.deepEqual(parsed.hub,{...hub,datasetId:null});
- const away=resourceUrl(url,{view:'logistics-map',caseId:id});assert.equal(away.searchParams.get('pack_orders_id'),null);assert.equal(away.searchParams.get('data_q'),null);
+ assert.deepEqual(readResource(url).hub,hub);
+ const away=resourceUrl(url,{view:'platform-decisions',center:{caseId:other}});assert.equal(away.searchParams.get('dataset_id'),null);assert.equal(away.searchParams.get('data_q'),null);
 });
-
-test('invalid data identifiers, pair links, offsets and filters fail before provider calls',()=>{
- for(const query of ['dataset_id=bad','pack_orders_id='+id,'pack_orders_id='+id+'&pack_fleet_id='+other+'&dataset_id='+id,'data_offset=-1','data_offset=1.5','data_offset=1000001','data_filter=unknown','data_tab=unknown'])assert.throws(()=>readHubResource('https://qa/app/data?'+query),query);
- assert.equal(readHubResource('https://qa/app/data').tab,'datasets');
+test('legacy pack links open dataset library and combined filters migrate',()=>{
+ for(const query of ['data_tab=packs','pack_orders_id='+id+'&pack_fleet_id='+other])assert.equal(readHubResource('https://qa/app/data?'+query).datasetId,null);
+ assert.equal(readHubResource('https://qa/app/data?data_filter=orders').type,'orders');
+ assert.equal(readHubResource('https://qa/app/data?data_filter=archived').state,'archived');
+});
+test('invalid dataset identifiers, dimensions and bounded offsets fail before provider calls',()=>{
+ for(const query of ['dataset_id=bad','data_offset=-1','data_offset=1.5','data_offset=1000001','data_cases_offset=-1','data_type=bad','data_validation=bad','data_state=bad','data_filter=unknown','data_tab=unknown'])assert.throws(()=>readHubResource('https://qa/app/data?'+query),query);
 });
 
 test('DDA and Data Hub share multipart validation/upload while retaining their authorization namespaces',async()=>{

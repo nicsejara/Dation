@@ -46,12 +46,12 @@ class DataHubTests(unittest.TestCase):
    self.assertEqual(self.checked(self.a.get('/api/platform/data/datasets',params={'q':query}))['total'],0)
   self.assertEqual(self.checked(self.a.get('/api/platform/data/datasets',params={'q':orders['canonical_filename'],'workspace_id':self.s.workspace_b}))['items'][0]['id'],orders['id'])
   self.assertEqual(self.checked(self.a.get('/api/platform/data/datasets',params={'filter':'orders'}))['total'],1)
-  for suffix in ['', '/preview','/download']:
-   self.assertEqual(self.b.get('/api/platform/data/datasets/'+orders['id']+suffix,timeout=3).status_code,404)
+  for method,suffix in [('GET',''),('GET','/preview'),('GET','/download'),('POST','/archive'),('POST','/unarchive'),('DELETE','')]:
+   self.assertEqual(self.b.request(method,'/api/platform/data/datasets/'+orders['id']+suffix,timeout=3).status_code,404)
   for body in [{'target_workspace_id':self.s.workspace_a,'actor_user_id':USER_B}]:
    self.assertEqual(self.s.db.post('rpc/platform_data_hub',json=body).status_code,403)
   for credential in (self.s.anon_token,self.s.user_tokens[USER_A]):
-   for function,extra in [('platform_data_hub',{}),('platform_dataset_delete',{'target_dataset_id':orders['id']}),('platform_dataset_upload',{'operation':'discard','operation_id':str(uuid4())})]:
+   for function,extra in [('platform_dataset_library',{}),('platform_data_hub',{}),('platform_dataset_delete',{'target_dataset_id':orders['id']}),('platform_dataset_upload',{'operation':'discard','operation_id':str(uuid4())})]:
     self.assertIn(self.s.http.post(self.s.rest_url+'/rpc/'+function,headers={'Authorization':'Bearer '+credential},json={'target_workspace_id':self.s.workspace_a,'actor_user_id':USER_A,**extra}).status_code,(401,403))
   self.assertEqual(self.a.get('/api/platform/data/datasets?limit=51').status_code,422)
   immutable=self.s.db.patch('datasets',params={'id':'eq.'+orders['id']},json={'uploaded_by_user_id':USER_B})
@@ -90,6 +90,8 @@ class DataHubTests(unittest.TestCase):
   self.assertEqual(self.a.post('/api/platform/data/datasets/upload',params={'dataset_type':'orders'},files={'file':('orders.csv',csv_input('orders'),'text/csv')}).status_code,200)
   with httpx.Client(base_url=self.s.api_url,headers={'Authorization':'Bearer '+self.s.user_tokens[VIEWER]},trust_env=False) as viewer:
    self.assertEqual(viewer.get('/api/platform/data/datasets').status_code,200)
+   for suffix in ['', '/preview','/download']:
+    self.assertEqual(viewer.get('/api/platform/data/datasets/'+orders['id']+suffix).status_code,200)
    self.assertFalse(self.checked(viewer.get('/api/platform/data/datasets/'+orders['id']))['can_archive'])
    for method,path in [('POST','/archive'),('POST','/unarchive'),('POST','/reuse'),('DELETE','')]:
     self.assertEqual(viewer.request(method,'/api/platform/data/datasets/'+orders['id']+path).status_code,403)
@@ -128,7 +130,7 @@ class DataHubTests(unittest.TestCase):
    self.assertTrue(self.file(orders).is_file());self.assertFalse(self.detail(orders)['dataset']['deletion_pending'])
   finally:process.wait(timeout=10);process.stderr.close()
 
- def test_06_real_browser_upload_pack_reuse_download_and_safe_delete(self):
+ def test_06_real_browser_dda_upload_library_lineage_download_and_safe_delete(self):
   orders,fleet=self.upload(),self.upload('fleet');case=self.case(orders,fleet);self.s.start_worker()
   reader=csv.DictReader(io.StringIO(csv_input('orders').decode()),delimiter=';');rows=list(reader)
   rows[0]['order_id']='HUB-UPLOAD-'+str(uuid4());rows[0]['product']='<img src=x onerror=window.__bad=1>'
@@ -170,7 +172,32 @@ class DataHubTests(unittest.TestCase):
   self.assertEqual(self.checked(self.a.get('/api/platform/data/datasets?filter=issues'))['total'],0)
   self.assertEqual(len(self.checked(self.a.get('/api/platform/data/datasets/'+identifier+'/preview'))['rows']),2)
 
- def test_09_lost_committed_upload_response_preserves_metadata_and_bytes(self):
+ def test_09_v2_summary_composed_filters_historical_lineage_and_read_purity(self):
+  orders,fleet=self.upload(),self.upload('fleet');other=self.upload(client=self.b)
+  case=self.case(orders,fleet)
+  self.s.sql(f"UPDATE decision_cases SET label='Semana 43' WHERE id='{case}';")
+  before=self.s.sql("SELECT md5(string_agg(to_jsonb(d)::text,'' ORDER BY id)) FROM datasets d;")
+  response=self.checked(self.a.get('/api/platform/data/datasets?limit=1&type=orders&validation=validated&state=all'))
+  self.assertEqual(response['summary'],{'total':2,'validated':2,'issues':0,'archived':0});self.assertEqual(response['total'],1)
+  detail=self.detail(orders);self.assertEqual(detail['case_total'],1);self.assertEqual(detail['used_in'][0]['label'],'Semana 43');self.assertEqual(detail['used_in'][0]['dda'],'logistics')
+  self.assertEqual(self.s.sql("SELECT md5(string_agg(to_jsonb(d)::text,'' ORDER BY id)) FROM datasets d;"),before)
+  self.checked(self.a.post('/api/platform/data/datasets/'+orders['id']+'/archive'))
+  result=self.checked(self.a.get('/api/platform/data/datasets?state=active&type=fleet&limit=1&offset=1'))
+  self.assertEqual(result['summary'],{'total':2,'validated':2,'issues':0,'archived':1});self.assertEqual(result['items'],[])
+  self.assertEqual(self.checked(self.a.get('/api/platform/data/datasets?state=all'))['total'],2)
+  self.assertEqual(self.checked(self.a.get('/api/platform/data/datasets?type=fleet&state=archived'))['total'],0)
+  for query in ['type=bad','validation=bad','state=bad']:
+   self.assertEqual(self.a.get('/api/platform/data/datasets?'+query).status_code,422)
+
+  historical=self.checked(self.a.post('/api/platform/data/datasets/upload',params={'dataset_type':'orders'},files={'file':('historico.csv',csv_input('orders')+b'\n','text/csv')}))['dataset']
+  # Historical run input is a canonical relation independent of the immutable Case pack.
+  self.s.sql(f"INSERT INTO decision_runs(id,workspace_id,dataset_id,orders_dataset_id,fleet_dataset_id,decision_case_id,node_id,status,engine_name,engine_version,result_json) VALUES('{uuid4()}','{self.s.workspace_a}','{historical['id']}','{orders['id']}','{fleet['id']}','{case}','logistics_assignment','completed','historical-test','1','{{}}');")
+  self.assertEqual(self.detail(historical)['case_total'],1)
+  self.assertEqual(self.detail(historical)['used_in'][0]['id'],case)
+  page=self.checked(self.a.get('/api/platform/data/datasets?state=all&type=orders'))
+  self.assertEqual(next(d for d in page['items'] if d['id']==historical['id'])['case_count'],1)
+
+ def test_10_lost_committed_upload_response_preserves_metadata_and_bytes(self):
   (self.s.storage/'fail-next-dataset-response').touch()
   self.checked(self.a.post('/api/platform/data/datasets/upload',params={'dataset_type':'orders'},files={'file':('confirmada.csv',csv_input('orders'),'text/csv')}),503)
   listing=self.checked(self.a.get('/api/platform/data/datasets'))
@@ -180,3 +207,16 @@ class DataHubTests(unittest.TestCase):
   self.assertEqual(self.file(row).read_bytes(),csv_input('orders'))
   self.assertEqual(self.a.get('/api/platform/data/datasets/'+row['id']+'/download').content,csv_input('orders'))
   self.assertEqual(self.s.sql("SELECT count(*) FROM dation_private.dataset_uploads WHERE status='stored';"),'1')
+
+ def test_11_dda_interrupted_upload_is_visible_and_recoverable_in_hub(self):
+  (self.s.storage/'fail-next-dataset-insert').touch();(self.s.storage/'fail-next-delete').touch()
+  self.checked(self.a.post('/api/datasets/upload',params={'dataset_type':'orders'},
+   files={'file':('dda-interrumpida.csv',csv_input('orders'),'text/csv')}),502)
+  listing=self.checked(self.a.get('/api/platform/data/datasets'))
+  self.assertEqual(listing['total'],0);self.assertEqual(len(listing['incomplete_uploads']),1)
+  operation=listing['incomplete_uploads'][0]
+  self.assertEqual(operation['filename'],'dda-interrumpida.csv')
+  self.assertEqual(self.b.post('/api/platform/data/uploads/'+operation['id']+'/discard').status_code,404)
+  self.checked(self.a.post('/api/platform/data/uploads/'+operation['id']+'/discard'))
+  self.assertEqual(self.checked(self.a.get('/api/platform/data/datasets'))['incomplete_uploads'],[])
+  self.assertEqual(self.s.sql("SELECT count(*) FROM dation_private.dataset_uploads WHERE status='discarded';"),'1')

@@ -1,253 +1,100 @@
-import {FOUNDATION} from './foundation.mjs';
 import {describeFailure} from '../dispatch/recovery.mjs';
-import {demoBadge,mountDemoAction} from './onboarding.mjs';
+import {demoBadge} from './onboarding.mjs';
 import {workspaceDate} from './workspace-format.mjs';
 import {api} from '../dispatch/shared.mjs';
 import {createScope} from '../dispatch/lifecycle.mjs';
 import {resourceUrl} from '../dispatch/navigation.mjs';
-import {mountDialog} from './components.mjs';
-import {ddaEnabled} from './entitlements.mjs';
-import {HUB_FILTERS,readHubResource} from './data-resource.mjs';
-import {createDropCard} from '../dispatch/upload/dropcard.mjs';
-import {validateCsvFile,storeCsvFile} from '../dispatch/upload/file-api.mjs';
+import {mountDialog,mountDropdown} from './components.mjs';
+import {iconSvg} from '../dispatch/decision-ui.mjs';
+import {DDA_CATALOG} from './dda-catalog.mjs';
+import {caseContext} from './foundation.mjs';
+import {HUB_TYPES,HUB_VALIDATIONS,HUB_STATES,readHubResource} from './data-resource.mjs';
+import {getDatasetDisplayName as name,getDatasetTypePresentation as typeName,getValidationPresentation as validation,getLifecyclePresentation as lifecycle,getUsagePresentation as usage,datasetNumber as number,datasetBytes as bytes} from './data-presentation.mjs';
 
-const BASE='/api/platform/data';
-const types=FOUNDATION.datasetTypes;
-const validations={validated:'Validado',issues:'Con problemas',unknown:'Sin registro'};
-const states={active:'En progreso',completed:'Completado',archived:'Archivado'};
-const pageSize=25;
-function el(tag,text,className){const node=document.createElement(tag);if(text!==undefined)node.textContent=text;if(className)node.className=className;return node;}
-function button(text,handler,kind='secondary'){const node=el('button',text,'d-button d-button--'+kind);node.type='button';node.addEventListener('click',handler);return node;}
-function name(row){return row.label||row.canonical_filename||row.original_filename||'Dataset';}
+const BASE='/api/platform/data',pageSize=25;
+function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;}
+function button(text,handler,kind='secondary'){const n=el('button',text,'d-button d-button--'+kind);n.type='button';n.addEventListener('click',handler);return n;}
+function icon(name){const n=el('span',undefined,'hub-icon');n.innerHTML=iconSvg(name);return n;}
+function pill(value){const n=el('span',value.label,'hub-status');n.dataset.tone=value.tone;return n;}
+function section(title){const n=el('section',undefined,'hub-card');n.append(el('h3',title,'d-card-title'));return n;}
 function issue(value){return typeof value==='string'?value:value?.message||value?.detail||value?.description||'Revisá el formato del archivo.';}
-function card(title){const node=el('section',undefined,'d-card hub-card');node.append(el('h2',title,'d-card-title'));return node;}
-function number(value){return value===null||value===undefined?'—':new Intl.NumberFormat('es').format(value);}
-function bytes(value){return value===null||value===undefined?'—':value<1024?value+' B':value<1048576?(value/1024).toFixed(1)+' KB':(value/1048576).toFixed(1)+' MB';}
-function date(value,workspace){return workspaceDate(value,workspace);}
-function field(label,value){const row=el('div',undefined,'hub-field');row.append(el('dt',label),el('dd',value??'—'));return row;}
-function status(row){const node=el('span',row.deletion_pending?'Eliminación pendiente':validations[row.validation]||'Sin registro','hub-status');node.dataset.state=row.deletion_pending?'issues':row.validation||'unknown';return node;}
-function table(headers){const wrap=el('div',undefined,'hub-table-scroll');wrap.tabIndex=0;wrap.setAttribute('role','region');wrap.setAttribute('aria-label','Tabla de '+headers[0]);const grid=el('table',undefined,'hub-table'),head=el('thead'),row=el('tr'),body=el('tbody');for(const label of headers){const th=el('th',label);th.scope='col';row.append(th);}head.append(row);grid.append(head,body);wrap.append(grid);return {wrap,body};}
-function cell(row,content){const td=el('td');td.append(typeof content==='string'?document.createTextNode(content):content);row.append(td);return td;}
 
 export function mountDataHub(root,getIdentity){
- const scope=createScope(root);let controller=null,generation=0,route={},modal=null,notice='',access='',demoViews=[];
- root.classList.add('data-hub');
- const writable=()=>getIdentity().membership.access_role!=='viewer';
- const logistics=()=>ddaEnabled(getIdentity(),'logistics');
- const reusable=row=>writable()&&logistics()&&!row.archived_at&&!row.deletion_pending&&['orders','fleet'].includes(row.dataset_type)&&row.validation==='validated';
- function open(value,replace=false){window.DationDispatch.openDataHub(value,{replace});}
- function href(value){return resourceUrl(location.href,{view:'platform-data',hub:value}).href;}
- function link(text,value,className='hub-text-link'){
-  const a=el('a',text,className);a.href=href(value);a.addEventListener('click',event=>{if(event.button||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;event.preventDefault();open(value);});return a;
- }
- function datasetLink(row){const a=link(name(row),{tab:'datasets',datasetId:row.id});if(row.is_demo)a.append(' ',demoBadge());return a;}
- function flash(text,error=false){const node=el('p',text,'hub-message');node.role=error?'alert':'status';return node;}
- function closeModal(){if(modal){const own=modal;modal=null;own.dispose();own.element.remove();}}
- function showModal(title,copy){
-  closeModal();const dialog=el('dialog',undefined,'d-platform hub-dialog'),titleId='hub-dialog-title';
-  const header=el('header',undefined,'hub-dialog__header'),h=el('h2',title,'d-card-title');h.id=titleId;dialog.setAttribute('aria-labelledby',titleId);
-  header.append(h,button('Cerrar',()=>view.close()));dialog.append(header);if(copy)dialog.append(el('p',copy,'d-body'));
-  root.append(dialog);const view=mountDialog({dialog}),own=createScope(header);
-  // Dialog and network work have the same owner. Leaving Data Hub disposes both.
-  modal={element:dialog,dispose:()=>view.dispose()};
-  own.listen(dialog,'close',()=>{if(modal?.element===dialog){modal=null;view.dispose();dialog.remove();}});
-  view.open();return {dialog,scope:own,view};
- }
+ const scope=createScope(root),wide=matchMedia('(min-width:1100px)');root.classList.add('data-hub');
+ let active=false,route={},data,listKey=null,detailKey=null,listVersion=0,detailVersion=0,listController,detailController,returnFocus,notice='',modal=null,drawerCleanups=[],portfolioCleanups=[];
+ const writable=()=>getIdentity().membership.access_role!=='viewer',zone=()=>getIdentity().workspace;
+ const hero=el('header',undefined,'hub-hero'),copy=el('div',undefined,'hub-hero__copy'),ctas=el('div',undefined,'hub-actions');
+ copy.append(el('p','DATA GOVERNANCE','d-eyebrow'),el('h1','Data Hub','d-page-title'),el('p','Consultá, trazá y administrá los datos que alimentan las decisiones de tu Workspace.','d-page-description'));
+ ctas.append(button('Explorar DDAs',()=>window.dationNavigate('inicio'),'primary'),button('Ir a Decision Center',()=>window.DationDispatch.openDecisionCenter({})));copy.append(ctas);
+ const image=el('img');image.src='/static/assets/data-hub-hero.svg';image.alt='';image.width=400;image.height=240;hero.append(copy,image);
+ const message=el('p',undefined,'hub-message');message.role='status';message.hidden=true;
+ const layout=el('div',undefined,'hub-layout'),portfolio=el('div',undefined,'hub-portfolio'),aside=el('aside',undefined,'hub-drawer'),sheet=el('dialog',undefined,'d-platform hub-drawer hub-drawer--sheet'),body=el('div',undefined,'hub-drawer__body');
+ aside.dataset.hubDrawer='';sheet.dataset.hubSheet='';aside.hidden=true;for(const n of [aside,sheet])n.setAttribute('aria-labelledby','hub-drawer-title');layout.append(portfolio,aside);root.replaceChildren(hero,message,layout,sheet);
+ const sheetView=mountDialog({dialog:sheet,initialFocus:'[data-hub-close]',closeOnBackdrop:true});
+ function open(value,replace=false){window.DationDispatch.openDataHub({...route,...value},{replace});}
+ function filter(value){open({...value,offset:0,datasetId:null,casesOffset:0});}
+ function select(row){if(!route.datasetId)returnFocus=document.activeElement;open({datasetId:row.id,casesOffset:0});}
+ function close(){const target=returnFocus;open({datasetId:null,casesOffset:0});requestAnimationFrame(()=>{if(target?.isConnected)target.focus({preventScroll:true});else portfolio.querySelector('[data-dataset-open]')?.focus({preventScroll:true});});}
+ function link(text,row,cls='hub-text-link'){const a=el('a',text,cls);a.href=resourceUrl(location.href,{view:'platform-data',hub:{...route,datasetId:row.id,casesOffset:0}});a.addEventListener('click',e=>{if(e.button||e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault();returnFocus=a;select(row);});return a;}
+ function download(row){const a=el('a','Descargar','d-button d-button--secondary');a.href=BASE+'/datasets/'+row.id+'/download';a.download=row.original_filename||'datos.csv';a.prepend(icon('download'));return a;}
+ function pager(total,offset,change,label='Paginación de datasets'){const n=el('nav',undefined,'hub-pagination');n.setAttribute('aria-label',label);const prev=button('Anterior',()=>change(Math.max(0,offset-pageSize))),next=button('Siguiente',()=>change(offset+pageSize));prev.disabled=!offset;next.disabled=offset+pageSize>=total;n.append(prev,el('span',total?`${Math.min(offset+1,total)}–${Math.min(offset+pageSize,total)} de ${total}`:'0 resultados','d-metadata'),next);return n;}
+ function showNotice(){message.textContent=notice;message.hidden=!notice;}
+ function cleanup(list){list.splice(0).forEach(fn=>fn());}
+ function closeModal(){if(modal){const m=modal;modal=null;m.view.dispose();m.scope.dispose();m.dialog.remove();}}
  function confirm(title,copy,action,done){
-  const {dialog,scope:own}=showModal(title,copy),message=el('p');message.role='alert';
-  const submit=button(title,async()=>{
-   submit.disabled=true;submit.setAttribute('aria-busy','true');
-   try{await action();if(!own.active)return;closeModal();done();}
-   catch(error){if(own.active){notice=error.message;closeModal();load();}}
-   finally{if(own.active){submit.disabled=false;submit.removeAttribute('aria-busy');}}
-  },title.startsWith('Eliminar')?'danger':'primary');dialog.append(message,submit);submit.focus();
+  closeModal();const dialog=el('dialog',undefined,'d-platform hub-dialog'),header=el('header',undefined,'hub-dialog__header'),h=el('h2',title,'d-card-title');h.id='hub-confirm-title';dialog.setAttribute('aria-labelledby',h.id);header.append(h,button('Cancelar',closeModal));const status=el('p');status.role='alert';dialog.append(header,el('p',copy,'d-body'),status);root.append(dialog);const own=createScope(header),controller=new AbortController();own.own(()=>controller.abort());const view=mountDialog({dialog});modal={dialog,scope:own,view};
+  const submit=button(title,async()=>{submit.disabled=true;try{await action(controller.signal);if(!own.active)return;closeModal();done();}catch(error){if(own.active){notice=error.message;closeModal();refresh();}}finally{if(own.active)submit.disabled=false;}},title.includes('elimina')||title.startsWith('Eliminar')?'danger':'primary');dialog.append(submit);own.listen(dialog,'close',()=>{if(modal?.dialog===dialog)closeModal();});view.open();submit.focus();
  }
- function mutation(row,kind){
-  if(kind==='delete')return confirm(row.deletion_pending?'Completar eliminación':'Eliminar definitivamente',
-   'Se eliminarán el archivo y sus metadatos. Sólo se permite si está archivado, no es la flota vigente y no tiene referencias ni evidencia.',
-   ()=>api(BASE+'/datasets/'+row.id,{method:'DELETE'}),()=>{notice='Dataset eliminado.';open({tab:'datasets',filter:'archived'});});
-  const archive=kind==='archive';
-  return confirm(archive?'Archivar dataset':'Restaurar dataset',archive?'Se conserva el archivo y la evidencia de los casos que lo usan. Podés restaurarlo después.':'El dataset volverá a estar disponible en la biblioteca.',
-   ()=>api(BASE+'/datasets/'+row.id+'/'+(archive?'archive':'unarchive'),{method:'POST'}),()=>{notice=archive?'Dataset archivado.':'Dataset restaurado.';load();});
+ function mutation(row,kind){const deleting=kind==='delete',title=deleting?(row.deletion_pending?'Completar eliminación':'Eliminar definitivamente'):kind==='archive'?'Archivar dataset':'Restaurar dataset';
+  confirm(title,deleting?'Sólo se elimina un dataset archivado, sin referencias ni evidencia y que no sea la flota vigente. Esta acción es definitiva.':kind==='archive'?'El dataset dejará de aparecer entre los datos activos, pero conservará su evidencia y relaciones históricas.':'El dataset volverá a estar disponible entre los datos activos.',signal=>api(BASE+'/datasets/'+row.id+(deleting?'':'/'+kind),{method:deleting?'DELETE':'POST',signal}),()=>{notice=deleting?'Dataset eliminado.':kind==='archive'?'Dataset archivado.':'Dataset restaurado.';if(deleting){open({datasetId:null,casesOffset:0});}refresh();});
  }
- async function reuse(row,pack=false,trigger){
-  const version=generation;
-  if(trigger)trigger.disabled=true;
-  try{
-   const result=await api(BASE+(pack?'/pack/reuse':'/datasets/'+row.id+'/reuse'),{method:'POST',headers:{'Content-Type':'application/json'},...(pack?{body:JSON.stringify({orders_id:row.orders_dataset_id,fleet_id:row.fleet_dataset_id})}:{})});
-   if(version===generation&&window.dationGetCurrentView?.()==='platform-data')window.DationDispatch.reuseHubData(result.datasets);
-  }catch(error){if(version===generation){notice=error.message;load();}}finally{if(trigger?.isConnected)trigger.disabled=false;}
+ function maintenance(row,permits){const wrap=el('div',undefined,'hub-maintenance'),trigger=button('',()=>{},'ghost'),panel=el('div',undefined,'hub-maintenance__menu');trigger.append(icon('moreHorizontal'));trigger.classList.add('hub-icon-button');trigger.setAttribute('aria-label','Acciones de '+name(row));panel.role='menu';
+  const add=(label,fn)=>{const b=button(label,fn);b.role='menuitem';panel.append(b);};
+  if(!row.deletion_pending){const a=download(row);a.role='menuitem';panel.append(a);}
+  const canArchive=permits?.can_archive??(writable()&&['orders','fleet'].includes(row.dataset_type)&&!row.is_default&&!row.deletion_pending);
+  if(canArchive)add(row.archived_at?'Restaurar':'Archivar',()=>mutation(row,row.archived_at?'unarchive':'archive'));
+  if(permits?.can_delete&&writable())add(row.deletion_pending?'Completar eliminación':'Eliminar definitivamente',()=>mutation(row,'delete'));
+  if(!panel.childElementCount)return {node:el('span'),dispose:()=>{}};wrap.append(trigger,panel);const menu=mountDropdown({trigger,panel});return {node:wrap,dispose:()=>menu.dispose()};
  }
- function reuseButton(row,pack=false){
-  let node;node=button(pack?'Reutilizar Data Pack':'Reutilizar',()=>reuse(row,pack,node));
-  node.disabled=pack?!(reusable(row.orders)&&reusable(row.fleet)):!reusable(row);
-  if(node.disabled)node.title=!writable()?'Tu rol permite consultar datos.':!logistics()?'DDA Logística no está habilitado.':'Requiere datos activos y validados.';
-  return node;
+ function loading(target,text){target.setAttribute('aria-busy','true');const n=el('p',text,'hub-message');n.role='status';target.replaceChildren(n);}
+ function failure(target,title,error,retry){target.removeAttribute('aria-busy');const n=section(title),p=el('p',describeFailure(error).message,'d-body');p.role='alert';n.append(p,button('Reintentar',retry));target.replaceChildren(n);}
+ function renderPortfolio(){
+  cleanup(portfolioCleanups);const frag=document.createDocumentFragment(),kpis=el('div',undefined,'hub-kpis');kpis.setAttribute('aria-label','Resumen global de datasets');
+  for(const [key,label,filters,name]of [['total','Total datasets',{type:'all',validation:'all',state:'all',q:''},'database'],['validated','Validados',{validation:'validated',state:'all'},'checkCircle'],['issues','Con observaciones',{validation:'issues',state:'all'},'alertTriangle'],['archived','Archivados',{state:'archived'},'history']]){const b=button('',()=>filter(filters),'ghost');b.className='hub-kpi';b.dataset.kpi=key;b.append(icon(name),el('span',label),el('strong',number(data.summary?.[key])));kpis.append(b);}frag.append(kpis);
+  const form=el('form',undefined,'hub-search'),controls={};function control(key,label,options){const wrap=el('div',undefined,'d-field'),l=el('label',label),input=el(options?'select':'input',undefined,'d-input');input.id='hub-'+key;l.htmlFor=input.id;if(options)for(const [value,text]of Object.entries(options)){const o=el('option',text);o.value=value;input.append(o);}else{input.type='search';input.maxLength=120;input.placeholder='Buscar por nombre de dataset o archivo…';}input.value=route[key];controls[key]=input;wrap.append(l,input);form.append(wrap);return input;}
+  control('q','Buscar por nombre de dataset o archivo');control('type','Tipo',HUB_TYPES);control('validation','Validación',HUB_VALIDATIONS);control('state','Estado',HUB_STATES);
+  const apply=()=>filter(Object.fromEntries(Object.entries(controls).map(([key,n])=>[key,n.value.trim()])));for(const key of ['type','validation','state'])controls[key].addEventListener('change',apply);const submit=button('Buscar',apply);submit.type='submit';form.addEventListener('submit',e=>{e.preventDefault();apply();});form.append(submit);
+  const filtered=route.q||route.type!=='all'||route.validation!=='all'||route.state!=='active';if(filtered)form.append(button('Limpiar filtros',()=>filter({q:'',type:'all',validation:'all',state:'active'}),'ghost'));frag.append(form);
+  if(data.incomplete_uploads?.length){const banner=el('details',undefined,'hub-recovery');banner.append(el('summary',`${data.incomplete_uploads.length} ${data.incomplete_uploads.length===1?'carga interrumpida requiere':'cargas interrumpidas requieren'} limpieza · Revisar`));for(const item of data.incomplete_uploads){const row=el('div');row.append(el('span',item.filename));if(writable())row.append(button('Descartar archivo incompleto',()=>confirm('Descartar archivo incompleto','Se retirará únicamente el archivo incompleto. Los datasets guardados y sus decisiones se conservan.',signal=>api(BASE+'/uploads/'+item.id+'/discard',{method:'POST',signal}),()=>{notice='Archivo incompleto descartado.';refresh();})));banner.append(row);}frag.append(banner);}
+  if(!data.items.length){const empty=section(!data.summary?.total?'Todavía no hay datos en este Workspace.':route.state==='archived'&&!route.q&&route.type==='all'&&route.validation==='all'?'No hay datasets archivados.':'No encontramos datasets con estos filtros.');
+   if(!data.summary?.total)empty.append(el('p','Los datasets aparecen acá cuando son cargados desde un Decision Data Asset.','d-body'),button('Explorar DDAs',()=>window.dationNavigate('inicio')));else if(filtered)empty.append(button('Limpiar filtros',()=>filter({q:'',type:'all',validation:'all',state:'active'})));frag.append(empty);
+  }else{const wrap=el('div',undefined,'hub-table-scroll'),table=el('table',undefined,'hub-table'),head=el('thead'),tr=el('tr'),tbody=el('tbody'),titles=['Dataset','Tipo','Registros','Validación','Subido por','Creado','Uso','Estado','Acción'];wrap.tabIndex=0;wrap.role='region';wrap.setAttribute('aria-label','Biblioteca de datasets');for(const [i,title]of titles.entries()){const th=el('th',title);th.scope='col';th.dataset.column=i;tr.append(th);}head.append(tr);table.append(head,tbody);
+   for(const row of data.items){const tr=el('tr');tr.dataset.dataset=row.id;tr.tabIndex=0;tr.setAttribute('aria-selected',String(route.datasetId===row.id));tr.setAttribute('aria-label','Inspeccionar '+name(row));const add=(i,value)=>{const td=el('td');td.dataset.column=i;td.dataset.label=titles[i];td.append(typeof value==='string'?document.createTextNode(value):value);tr.append(td);};const file=el('div',undefined,'hub-file-name');file.append(link(name(row),row));if(row.original_filename&&row.original_filename!==name(row))file.append(el('span',row.original_filename,'d-metadata'));if(row.is_demo)file.append(demoBadge());add(0,file);add(1,typeName(row));add(2,number(row.row_count));add(3,pill(validation(row)));const person=el('span',row.uploaded_by?.name||'Sin registro','hub-person');add(4,person);add(5,workspaceDate(row.created_at,zone()));const used=el('span',usage(row));used.title=number(row.run_count||0)+' ejecuciones';add(6,used);add(7,pill(lifecycle(row)));const actions=el('div',undefined,'hub-actions'),a=link('Abrir',row,'d-button d-button--secondary');a.dataset.datasetOpen=row.id;const menu=maintenance(row);portfolioCleanups.push(menu.dispose);actions.append(a,menu.node);add(8,actions);tr.addEventListener('click',e=>{if(!e.target.closest('a,button,summary,[role=menu]'))select(row);});tr.addEventListener('keydown',e=>{if(e.target===tr&&['Enter',' '].includes(e.key)){e.preventDefault();select(row);}});tbody.append(tr);}wrap.append(table);frag.append(wrap);
+  }frag.append(pager(data.total,route.offset,offset=>open({offset,datasetId:null,casesOffset:0})));portfolio.replaceChildren(frag);portfolio.removeAttribute('aria-busy');
  }
- function pager(total,offset,onPage){
-  const row=el('nav',undefined,'hub-pagination');row.setAttribute('aria-label','Paginación');
-  const previous=button('Anterior',()=>onPage(Math.max(0,offset-pageSize))),next=button('Siguiente',()=>onPage(offset+pageSize));
-  previous.disabled=offset===0;next.disabled=offset+pageSize>=total;
-  row.append(previous,el('span',total?`${Math.min(offset+1,total)}–${Math.min(offset+pageSize,total)} de ${number(total)}`:'0 resultados','d-metadata'),next);return row;
+ function syncSelection(){for(const row of portfolio.querySelectorAll('[data-dataset]'))row.setAttribute('aria-selected',String(row.dataset.dataset===route.datasetId));}
+ function drawerLayout(){const focus=document.activeElement,hadFocus=body.contains(focus);if(!active||!route.datasetId){sheetView.close();aside.hidden=true;layout.classList.remove('has-selection');}else if(wide.matches){sheetView.close();aside.append(body);aside.hidden=false;layout.classList.add('has-selection');}else{aside.hidden=true;layout.classList.remove('has-selection');sheet.append(body);sheetView.open();}if(hadFocus&&focus?.isConnected)focus.focus({preventScroll:true});}
+ function drawerFrame(row){const head=el('header',undefined,'hub-drawer__header'),text=el('div');text.append(el('span','Dataset seleccionado','d-eyebrow'));const title=el('h2',row?name(row):'Cargando dataset…','d-section-title');title.id='hub-drawer-title';text.append(title);const b=button('',close,'ghost');b.classList.add('hub-icon-button');b.dataset.hubClose='';b.setAttribute('aria-label','Cerrar detalle del dataset');b.append(icon('x'));head.append(text,b);return head;}
+ function preview(row){const details=el('details',undefined,'hub-preview'),content=el('div');details.append(el('summary','Vista previa'),content);let controller,version=0,offset=0,loaded=false;drawerCleanups.push(()=>{version++;controller?.abort();});
+  async function load(){const own=++version;controller?.abort();controller=new AbortController();loading(content,'Cargando vista previa…');try{const result=await api(BASE+'/datasets/'+row.id+'/preview?'+new URLSearchParams({limit:5,offset}),{signal:controller.signal});if(own!==version)return;const wrap=el('div',undefined,'hub-preview-scroll'),table=el('table',undefined,'hub-preview-table'),head=el('thead'),tr=el('tr'),tbody=el('tbody');wrap.tabIndex=0;wrap.role='region';wrap.setAttribute('aria-label','Vista previa del CSV');for(const column of result.columns){const th=el('th',column);th.scope='col';tr.append(th);}head.append(tr);for(const values of result.rows){const tr=el('tr');for(const value of values)tr.append(el('td',value));tbody.append(tr);}table.append(head,tbody);wrap.append(table);const nav=el('div',undefined,'hub-pagination'),prev=button('Filas anteriores',()=>{offset=Math.max(0,offset-5);load();}),next=button('Más filas',()=>{offset+=5;load();});prev.disabled=!offset;next.disabled=!result.has_more;nav.append(prev,el('span',result.rows.length?`Filas ${offset+1}–${offset+result.rows.length}`:'Sin filas','d-metadata'),next);content.replaceChildren(el('p','Hasta 5 filas por página · 500 caracteres por celda.','d-metadata'),wrap,nav);content.removeAttribute('aria-busy');loaded=true;}catch(error){if(own===version&&!controller.signal.aborted)failure(content,'No se pudo abrir la vista previa',error,load);}}
+  details.addEventListener('toggle',()=>{if(details.open&&!loaded)load();});return details;
  }
- function list(data){
-  const fragment=document.createDocumentFragment(),bar=el('div',undefined,'hub-toolbar'),tabs=el('div',undefined,'hub-tabs');tabs.setAttribute('role','group');tabs.setAttribute('aria-label','Tipo de biblioteca');
-  for(const [id,label]of [['datasets','Datasets'],['packs','Data Packs']]){const node=button(label,()=>open({tab:id}));node.setAttribute('aria-pressed',String(route.tab===id));tabs.append(node);}
-  bar.append(tabs);if(writable())bar.append(button('Cargar datos',upload,'primary'));fragment.append(bar);
-  const form=el('form',undefined,'hub-search'),label=el('label','Buscar por nombre de archivo','d-label'),input=el('input',undefined,'d-input');
-  input.id='hub-search';input.name='q';input.type='search';input.maxLength=120;input.value=route.q;label.htmlFor=input.id;
-  const field=el('div',undefined,'d-field');field.append(label,input);form.append(field);
-  let filter;
-  if(route.tab==='datasets'){
-   const wrap=el('div',undefined,'d-field'),label=el('label','Filtrar datasets','d-label');filter=el('select',undefined,'d-input');filter.id='hub-filter';label.htmlFor=filter.id;
-   for(const [value,text]of Object.entries(HUB_FILTERS)){const option=el('option',text);option.value=value;filter.append(option);}filter.value=route.filter;wrap.append(label,filter);form.append(wrap);
-  }
-  const submit=el('button','Buscar','d-button d-button--secondary');submit.type='submit';form.append(submit);
-  form.addEventListener('submit',event=>{event.preventDefault();open({tab:route.tab,filter:filter?.value||'all',q:input.value.trim(),offset:0});});
-  filter?.addEventListener('change',()=>open({tab:route.tab,filter:filter.value,q:input.value.trim(),offset:0}));fragment.append(form);
-  if(data.incomplete_uploads?.length){
-   const pending=card('Cargas interrumpidas');pending.append(el('p','Estas cargas no se guardaron como datasets. Podés descartar sus archivos para limpiar la biblioteca.','d-body'));
-   for(const item of data.incomplete_uploads){
-    const row=el('div',undefined,'hub-actions');row.append(el('span',item.filename,'d-body'));
-    if(writable())row.append(button('Descartar carga',()=>confirm('Descartar carga','Se retirará el archivo de esta carga interrumpida. Los datasets guardados se conservan.',
-     ()=>api(BASE+'/uploads/'+item.id+'/discard',{method:'POST'}),()=>{notice='Carga interrumpida descartada.';load();})));
-    pending.append(row);
-   }
-   fragment.append(pending);
-  }
-  if(!data.items.length){
-   const empty=card(route.q||route.filter!=='all'?'No encontramos resultados':'Tu biblioteca está lista para empezar');
-   empty.append(el('p',route.tab==='packs'?'Los Data Packs reúnen los pares de Órdenes y Flota usados por tus Decision Cases.':route.q||route.filter!=='all'?'Probá otro nombre o filtro.':'Cargá Órdenes o Flota. Dation validará el archivo antes de guardarlo.','d-body'));
-   if(route.q||route.filter!=='all')empty.append(button('Limpiar filtros',()=>open({tab:route.tab})));else if(writable())empty.append(button('Cargar datos',upload,'primary'));
-   if(!route.q&&route.filter==='all'&&route.tab==='datasets'&&writable()&&logistics()){const demo=el('div');empty.append(demo);demoViews.push(mountDemoAction(demo,getIdentity));}
-   fragment.append(empty);
-  }else{
-   const packs=route.tab==='packs',grid=table(packs?['Data Pack','Órdenes','Flota','Validación','Decision Cases','Creado','Acciones']:['Dataset','Tipo','Registros','Validación','Subido por','Creado','Uso','Acciones']);
-   for(const item of data.items){
-    const row=el('tr');
-    if(packs){
-     const title=link(item.label,{tab:'packs',ordersId:item.orders_dataset_id,fleetId:item.fleet_dataset_id});if(item.orders.is_demo||item.fleet.is_demo)title.append(' ',demoBadge());cell(row,title);cell(row,datasetLink(item.orders));cell(row,datasetLink(item.fleet));cell(row,item.validated?'Validado':'Revisar validación');cell(row,number(item.case_count));cell(row,date(item.created_at,getIdentity().workspace));cell(row,reuseButton(item,true));
-    }else{
-     const copy=el('div',undefined,'hub-file-name');copy.append(datasetLink(item),el('span',item.canonical_filename||item.original_filename,'d-metadata'));
-     cell(row,copy);cell(row,types[item.dataset_type]||'Anterior');cell(row,number(item.row_count));cell(row,status(item));cell(row,item.uploaded_by?.name||'Sin registro');cell(row,date(item.created_at,getIdentity().workspace));cell(row,`${number(item.case_count)} casos · ${number(item.run_count)} corridas`);cell(row,reuseButton(item));
-    }
-    grid.body.append(row);
-   }
-   fragment.append(grid.wrap);
-  }
-  if(data.items.length&&writable()&&logistics()){
-   const details=el('details',undefined,'d-card hub-card'),summary=el('summary','Probar con datos de ejemplo'),demo=el('div');details.append(summary,demo);let view;
-   details.addEventListener('toggle',()=>{view?.dispose();view=null;if(details.open){view=mountDemoAction(demo,getIdentity);demoViews.push(view);}});fragment.append(details);
-  }
-  fragment.append(pager(data.total,route.offset,offset=>open({...route,offset})));return fragment;
+ function renderDrawer(result){cleanup(drawerCleanups);const row=result.dataset,content=el('div',undefined,'hub-drawer__content'),tags=el('div',undefined,'hub-actions');tags.append(pill({label:typeName(row),tone:'neutral'}),pill(validation(row)),pill(lifecycle(row)));if(row.is_demo)tags.append(demoBadge());body.replaceChildren(drawerFrame(row),content);content.append(tags);const actions=el('div',undefined,'hub-actions');if(!row.deletion_pending)actions.append(download(row));const menu=maintenance(row,result);actions.append(menu.node);drawerCleanups.push(menu.dispose);content.append(actions);
+  if(row.deletion_pending)content.append(el('p','La eliminación quedó pendiente. Completala para retirar el archivo y su registro.','hub-message'));if(result.referenced)content.append(el('p','Este dataset forma parte de decisiones o evidencia y debe conservarse para mantener la trazabilidad.','d-metadata'));if(row.is_default)content.append(el('p','Flota vigente. Elegí otra versión como vigente antes de archivarla.','d-metadata'));
+  const info=section('Información del dataset'),fields=el('dl',undefined,'hub-fields');for(const [label,value]of [['Registros',number(row.row_count)],['Tamaño',bytes(row.size_bytes)],['Subido por',row.uploaded_by?.name||'Sin registro'],['Fecha',workspaceDate(row.created_at,zone())],['Schema',row.schema_version||'Sin registro'],['Estado',lifecycle(row).label]]){const f=el('div',undefined,'hub-field');f.append(el('dt',label),el('dd',value));fields.append(f);}info.append(fields);content.append(info);
+  const quality=section('Calidad y validación'),report=result.validation_report||{};quality.append(pill(validation(row)),el('p',`${report.errors_total??report.errors?.length??0} errores · ${report.warnings_total??report.warnings?.length??0} avisos`,'d-metadata'));if(report.errors?.length||report.warnings?.length){const details=el('details');details.append(el('summary','Ver avisos'));for(const key of ['errors','warnings'])for(const item of report[key]||[])details.append(el('p',issue(item),'d-body'));if((report.errors_total||0)>50||(report.warnings_total||0)>50)details.append(el('p','Se muestran hasta 50 errores y 50 avisos.','d-metadata'));quality.append(details);}content.append(quality);if(!row.deletion_pending)content.append(preview(row));
+  const used=section('Utilizado en');if(!result.used_in?.length){const total=result.case_total??row.case_count??0;used.append(el('p',total?'No hay Decision Cases en esta página.':'Todavía no fue utilizado en ningún Decision Case.','d-body'));if(total)used.append(pager(total,route.casesOffset,casesOffset=>open({casesOffset}),'Paginación de Decision Cases vinculados'));}else{const list=el('ul',undefined,'hub-cases');for(const c of result.used_in){const context=caseContext(c),item=el('li'),dda=DDA_CATALOG.find(d=>d.id===context.dda)?.title||context.dda;item.append(el('strong',c.friendly_id||context.friendlyId));if(c.label)item.append(el('span',c.label));item.append(el('span',dda,'d-metadata'));const a=el('a','Ver Decision Case','hub-text-link');a.href=resourceUrl(location.href,{view:'platform-decisions',center:{caseId:c.id}});a.addEventListener('click',e=>{if(e.button||e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault();window.DationDispatch.openDecisionCenter({caseId:c.id});});item.append(a);list.append(item);}used.append(list,pager(result.case_total??row.case_count,route.casesOffset,casesOffset=>open({casesOffset}),'Paginación de Decision Cases vinculados'));}content.append(used);
+  const technical=el('details',undefined,'hub-technical');technical.append(el('summary','Detalles técnicos'));for(const [label,value]of [['Dataset ID',row.id],['Archivo original',row.original_filename],['Archivo canónico',row.canonical_filename],['Schema',row.schema_version],['Creado',row.created_at]])if(value)technical.append(el('p',label+': '+value,'d-metadata'));content.append(technical);body.removeAttribute('aria-busy');drawerLayout();if(!wide.matches&&!sheet.contains(document.activeElement))body.querySelector('[data-hub-close]')?.focus({preventScroll:true});
  }
- function cases(items,total){
-  const section=card('Decision Cases que lo usan');
-  if(!items.length)section.append(el('p','No hay Decision Cases en esta página.','d-body'));
-  else{const list=el('ul',undefined,'hub-cases');for(const item of items){const row=el('li'),title='DC-'+item.id.slice(0,8);
-   if(logistics()){const a=el('a',title,'hub-text-link');a.href=resourceUrl(location.href,{view:'logistics-map',caseId:item.id});a.addEventListener('click',event=>{if(event.button||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;event.preventDefault();window.DationDispatch.openCase(item.id);});row.append(a);}else row.append(el('span',title));
-   row.append(el('span',states[item.status]||'En progreso','d-metadata'));list.append(row);}section.append(list);}
-  if(total>pageSize)section.append(pager(total,route.offset,offset=>open({...route,offset})));return section;
+ async function loadPortfolio(){const own=++listVersion;listController?.abort();listController=new AbortController();loading(portfolio,'Cargando biblioteca de datos…');try{const result=await api(BASE+'/datasets?'+new URLSearchParams({q:route.q,type:route.type,validation:route.validation,state:route.state,limit:pageSize,offset:route.offset}),{signal:listController.signal});if(own!==listVersion||!active)return;data=result;renderPortfolio();syncSelection();}catch(error){if(own===listVersion&&!listController.signal.aborted)failure(portfolio,'No se pudo abrir Data Hub',error,()=>{listKey=null;load();});}}
+ async function loadDetail(){const own=++detailVersion;detailController?.abort();detailController=new AbortController();cleanup(drawerCleanups);body.replaceChildren(drawerFrame());const pending=el('div');body.append(pending);loading(pending,'Cargando detalle…');drawerLayout();try{const result=await api(BASE+'/datasets/'+route.datasetId+'?'+new URLSearchParams({limit:pageSize,offset:route.casesOffset}),{signal:detailController.signal});if(own!==detailVersion||!active)return;if(result.dataset.id.toLowerCase()!==route.datasetId.toLowerCase())throw new Error('El dataset recibido no coincide con el seleccionado.');renderDrawer(result);}catch(error){if(own===detailVersion&&!detailController.signal.aborted)failure(pending,'No se pudo abrir el dataset',error,()=>{detailKey=null;load();});}}
+ function refresh(){listKey=detailKey=null;load();}
+ function load(){if(!active)return;try{route=readHubResource(location.href);}catch(error){listVersion++;detailVersion++;listController?.abort();detailController?.abort();listKey=detailKey=null;cleanup(drawerCleanups);failure(portfolio,'No se pudo abrir Data Hub',error,()=>window.DationDispatch.openDataHub({}));route={};drawerLayout();return;}
+  if(['data_tab','data_filter','pack_orders_id','pack_fleet_id'].some(key=>new URL(location.href).searchParams.has(key))){open({},true);return;}showNotice();const key=JSON.stringify([route.q,route.type,route.validation,route.state,route.offset]);if(listKey!==key){listKey=key;loadPortfolio();}else syncSelection();const selected=JSON.stringify([route.datasetId,route.casesOffset]);if(!route.datasetId){detailVersion++;detailController?.abort();detailKey=null;cleanup(drawerCleanups);drawerLayout();}else if(detailKey!==selected){detailKey=selected;loadDetail();}else drawerLayout();
  }
- function validation(row,report){
-  const section=card('Validación');section.append(status(row));const schema=el('p','Esquema: '+(row.schema_version||report?.schema||'Sin registro'),'d-metadata');section.append(schema);
-  for(const [key,label]of [['errors','Errores'],['warnings','Avisos']]){
-   const values=report?.[key]||[],total=report?.[key+'_total']??values.length;section.append(el('h3',`${label}: ${number(total)}`,'hub-subtitle'));
-   if(values.length){const list=el('ul');for(const value of values)list.append(el('li',issue(value)));section.append(list);if(total>values.length)section.append(el('p',`Mostrando ${values.length} de ${total}.`,'d-metadata'));}
-  }
-  return section;
- }
- function previewPanel(row,version){
-  const panel=card('Vista previa'),content=el('div'),message=el('p','Hasta 25 filas por página y 500 caracteres por celda.','d-metadata');panel.append(message,content);let offset=0,previewGeneration=0;
-  async function read(){
-   const request=++previewGeneration;content.replaceChildren(el('p','Cargando vista previa…','d-body'));content.setAttribute('aria-busy','true');
-   try{const data=await api(BASE+'/datasets/'+row.id+'/preview?limit=25&offset='+offset,{signal:controller.signal});if(version!==generation||request!==previewGeneration)return;
-    const grid=table(data.columns.length?data.columns:['Archivo']);for(const values of data.rows){const tr=el('tr');for(let i=0;i<data.columns.length;i++)cell(tr,values[i]??'');grid.body.append(tr);}
-    const nav=el('nav',undefined,'hub-pagination');nav.setAttribute('aria-label','Paginación de vista previa');
-    const previous=button('Filas anteriores',()=>{offset=Math.max(0,offset-25);read();}),next=button('Más filas',()=>{offset+=25;read();});previous.disabled=offset===0;next.disabled=!data.has_more;
-    nav.append(previous,el('span',data.rows.length?`Filas ${offset+1}–${offset+data.rows.length}`:'Sin filas','d-metadata'),next);content.replaceChildren(grid.wrap,nav);
-   }catch(error){if(version===generation&&!controller.signal.aborted)content.replaceChildren(flash('No se pudo cargar la vista previa.',true),button('Reintentar vista previa',read));}
-   finally{if(version===generation&&request===previewGeneration)content.removeAttribute('aria-busy');}
-  }
-  return {panel,read};
- }
- function dataset(data,version){
-  const row=data.dataset,fragment=document.createDocumentFragment(),header=card(name(row));header.append(el('p',row.canonical_filename||row.original_filename,'d-body'));if(row.is_demo)header.append(demoBadge());
-  const actions=el('div',undefined,'hub-actions');actions.append(reuseButton(row));
-  if(!row.deletion_pending){const a=el('a','Descargar CSV','d-button d-button--secondary');a.href=BASE+'/datasets/'+row.id+'/download';a.download=row.original_filename;actions.append(a);}
-  if(data.can_archive)actions.append(button(row.archived_at?'Restaurar':'Archivar',()=>mutation(row,row.archived_at?'unarchive':'archive')));
-  if(data.can_delete)actions.append(button(row.deletion_pending?'Completar eliminación':'Eliminar definitivamente',()=>mutation(row,'delete'),'danger'));
-  header.append(actions);if(row.is_default)header.append(el('p','Esta es la flota vigente. Elegí otra versión como vigente antes de archivarla.','d-metadata'));
-  if(data.referenced)header.append(el('p','Este dataset tiene referencias o evidencia. Se conserva el archivo; podés archivarlo.','d-metadata'));
-  if(row.deletion_pending)header.append(flash('Eliminación pendiente. Reintentá para completarla. El dataset no se puede reutilizar.'));
-  fragment.append(header);
-  const metadata=card('Información del dataset'),values=el('dl',undefined,'hub-fields');
-  for(const [label,value]of [['Tipo',types[row.dataset_type]||'Anterior'],['Registros',number(row.row_count)],['Tamaño',bytes(row.size_bytes)],['Subido por',row.uploaded_by?.name||'Sin registro'],['Creado',date(row.created_at,getIdentity().workspace)],['Estado',row.archived_at?'Archivado':'Activo']])values.append(field(label,value));metadata.append(values);fragment.append(metadata,validation(row,data.validation_report));
-  let preview;
-  if(!row.deletion_pending){preview=previewPanel(row,version);fragment.append(preview.panel);}
-  fragment.append(cases(data.used_in,row.case_count));
-  const technical=el('details',undefined,'d-card hub-technical');technical.append(el('summary','Información técnica'),el('code',row.id));
-  technical.append(button('Copiar ID',async()=>{try{await navigator.clipboard.writeText(row.id);technical.append(flash('ID copiado.'));}catch{technical.append(flash('Seleccioná el ID para copiarlo.',true));}}));fragment.append(technical);
-  return {fragment,after:()=>preview?.read()};
- }
- function pack(data){
-  const item=data.pack,fragment=document.createDocumentFragment(),header=card(item.label);header.append(el('p','Data Pack · Órdenes y Flota','d-metadata'),reuseButton(item,true));if(item.orders.is_demo||item.fleet.is_demo)header.append(demoBadge());fragment.append(header);
-  const inputs=card('Datasets del Data Pack');inputs.append(el('h3','Órdenes','hub-subtitle'),datasetLink(item.orders),el('h3','Flota','hub-subtitle'),datasetLink(item.fleet));fragment.append(inputs);
-  const compatibility=card('Validación y compatibilidad');compatibility.append(el('p',item.validated?'Ambos datasets tienen validación registrada.':'Revisá la validación de los datasets.','d-body'),el('p','DDA compatible: Logística'+(logistics()?'':' · No habilitado en este workspace'),'d-body'),el('p','La compatibilidad operativa se comprueba al preparar la decisión.','d-metadata'));fragment.append(compatibility,cases(data.used_in,item.case_count));return fragment;
- }
- async function upload(){
-  if(!writable())return;
-  const {dialog,scope:own}=showModal('Cargar datos','Elegí Órdenes o Flota. Se valida el formato antes de guardar el archivo en tu workspace.'),label=el('label','Tipo de dataset','d-label'),select=el('select',undefined,'d-input'),content=el('div',undefined,'dispatch hub-upload'),message=el('p');
-  select.id='hub-upload-type';label.htmlFor=select.id;for(const [value,text]of [['orders','Órdenes'],['fleet','Flota']]){const option=el('option',text);option.value=value;select.append(option);}dialog.append(label,select,content,message);message.role='status';
-  let formats,uploadController;
-  own.own(()=>uploadController?.abort());
-  try{formats=(await api(BASE+'/contracts',{signal:own.signal})).formats;if(!own.active)return;}catch(error){if(own.active)message.textContent='No se pudo cargar el formato. Cerrá y reintentá.';return;}
-  function draw(){
-   message.textContent='';
-   const kind=select.value,ref=createDropCard(kind,formats[kind]);content.replaceChildren(ref.card);
-   ref.reuseTab.hidden=true;ref.uploadTab.hidden=true;ref.previousView.hidden=true;ref.actions.hidden=true;ref.template.href=BASE+'/templates/'+kind;
-   ref.reviewColumns.onclick=()=>{ref.validationBody.replaceChildren(el('p',formats[kind].columns.map(column=>column.name+(column.required?' (obligatoria)':'')).join(' · '),'d-metadata'));};
-   const choose=()=>ref.file.click();ref.choose.onclick=choose;ref.drop.onclick=event=>{if(!event.target.closest('a,button'))choose();};ref.drop.onkeydown=event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();choose();}};
-   ref.drop.ondragover=event=>event.preventDefault();ref.drop.ondrop=event=>{event.preventDefault();if(event.dataTransfer.files[0])send(event.dataTransfer.files[0]);};
-   ref.file.onchange=()=>{const file=ref.file.files[0];if(file)send(file);ref.file.value='';};
-   async function send(file){
-    if(select.disabled)return;
-    if(!file.name.toLowerCase().endsWith('.csv')||!file.size||file.size>10*1024*1024){message.textContent='Elegí un archivo CSV de hasta 10 MB que contenga datos.';return;}
-    select.disabled=true;ref.choose.disabled=true;ref.drop.setAttribute('aria-disabled','true');content.setAttribute('aria-busy','true');message.textContent='Validando '+file.name+'…';
-    uploadController=new AbortController();
-    try{
-     const report=await validateCsvFile(kind,file,{base:BASE,signal:uploadController.signal});if(!own.active)return;
-     if(!report.valid){message.textContent='El archivo tiene problemas. Revisalos y volvé a cargarlo.';ref.validationBody.replaceChildren(...(report.errors||[]).slice(0,20).map(value=>el('p',issue(value),'d-body')));return;}
-     message.textContent='Guardando '+file.name+'…';const result=await storeCsvFile(kind,file,{base:BASE,signal:uploadController.signal});if(!own.active)return;
-     const dataset=result.dataset||result.existing_dataset;notice=result.duplicate?'El archivo ya estaba en la biblioteca. Se conservó la versión existente.':'Dataset validado y guardado.';closeModal();open({tab:'datasets',datasetId:dataset.id});
-    }catch(error){if(own.active)message.textContent=error.message;}
-    finally{if(own.active){select.disabled=false;ref.choose.disabled=false;ref.drop.removeAttribute('aria-disabled');content.removeAttribute('aria-busy');}}
-   }
-  }
-  own.listen(select,'change',draw);draw();select.focus();
- }
- async function load(){
-  for(const demo of demoViews)demo.dispose();demoViews=[];controller?.abort();controller=new AbortController();closeModal();const version=++generation;
-  root.setAttribute('aria-busy','true');const loading=el('p','Cargando biblioteca de datos…','d-body');loading.role='status';root.replaceChildren(loading);
-  try{
-   route=readHubResource(location.href);
-   const qs=new URLSearchParams({limit:String(pageSize),offset:String(route.offset)});let path;
-   if(route.datasetId)path='/datasets/'+route.datasetId;
-   else if(route.ordersId){path='/pack';qs.set('orders_id',route.ordersId);qs.set('fleet_id',route.fleetId);}
-   else{path=route.tab==='packs'?'/packs':'/datasets';qs.set('q',route.q);if(route.tab==='datasets')qs.set('filter',route.filter);}
-   const data=await api(BASE+path+'?'+qs,{signal:controller.signal});if(version!==generation||controller.signal.aborted)return;
-   const fragment=document.createDocumentFragment();if(notice){fragment.append(flash(notice));notice='';}
-   if(route.datasetId||route.ordersId)fragment.append(link('← Volver a la biblioteca',{tab:route.ordersId?'packs':'datasets',filter:route.filter,q:route.q},'hub-text-link'));
-   let after;
-   if(route.datasetId){const result=dataset(data,version);fragment.append(result.fragment);after=result.after;}
-   else fragment.append(route.ordersId?pack(data):list(data));root.replaceChildren(fragment);after?.();
-  }catch(error){if(version!==generation||controller.signal.aborted)return;const panel=card('No se pudo abrir Data Hub');panel.append(flash(describeFailure(error).message,true),button('Reintentar',load),link('Volver a la biblioteca',{}));root.replaceChildren(panel);}
-  finally{if(version===generation)root.removeAttribute('aria-busy');}
- }
- function stop(){generation++;for(const demo of demoViews)demo.dispose();demoViews=[];controller?.abort();closeModal();root.removeAttribute('aria-busy');}
- function onView(){if(window.dationGetCurrentView?.()==='platform-data')load();else stop();}
- scope.listen(window,'dation:view',onView);scope.listen(window,'pagehide',stop);
- scope.listen(window,'dation:identity',()=>{const next=getIdentity().membership.access_role+':'+logistics();if(next!==access){access=next;onView();}});
- access=getIdentity().membership.access_role+':'+logistics();onView();
- return {dispose(){stop();scope.dispose();}};
+ function stop(){active=false;listVersion++;detailVersion++;listController?.abort();detailController?.abort();listKey=detailKey=null;closeModal();cleanup(portfolioCleanups);cleanup(drawerCleanups);drawerLayout();}
+ function onView(){if(window.dationGetCurrentView?.()==='platform-data'){active=true;load();}else stop();}
+ scope.listen(window,'dation:view',onView);scope.listen(window,'pagehide',stop);scope.listen(window,'dation:identity',()=>{if(active){closeModal();refresh();}});scope.listen(wide,'change',drawerLayout);
+ scope.listen(sheet,'cancel',e=>{e.preventDefault();if(active&&route.datasetId)close();});scope.listen(sheet,'click',e=>{if(e.target!==sheet)return;const r=sheet.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)close();});scope.listen(root,'keydown',e=>{if(e.key==='Escape'&&wide.matches&&route.datasetId&&!modal&&!e.target.closest('[role=menu]')){e.preventDefault();close();}});
+ onView();return {dispose(){stop();sheetView.dispose();scope.dispose();}};
 }
