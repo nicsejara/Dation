@@ -21,3 +21,12 @@ test('workspace formats honor locale/timezone without converting stored quantiti
  assert.equal(workspaceDate('bad',{}),'Sin registro');assert.equal(workspaceDate('2026-01-15T02:30:00Z',{timezone:'invalid'},{day:'numeric'}),'15');
  assert.deepEqual(values,{amount:1234.5,weight:1000});
 });
+
+test('relative workspace dates retain readable human timing, including future and invalid events',async()=>{
+ const {workspaceRelativeDate}=await import('../app/static/js/platform/workspace-format.mjs');
+ const now=Date.parse('2026-10-20T12:00:00Z'),zone={language:'es',country:'AR',timezone:'America/Argentina/Buenos_Aires'};
+ assert.equal(workspaceRelativeDate('2026-10-20T11:58:00Z',zone,now),'hace 2 minutos');
+ assert.equal(workspaceRelativeDate('2026-10-20T14:00:00Z',zone,now),'dentro de 2 horas');
+ assert.equal(workspaceRelativeDate('2026-10-19T12:00:00Z',zone,now),'ayer');
+ assert.equal(workspaceRelativeDate('bad',zone,now),'Sin registro');assert.equal(workspaceRelativeDate(null,zone,now),'Sin registro');
+});

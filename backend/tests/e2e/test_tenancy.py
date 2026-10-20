@@ -192,10 +192,16 @@ class TenancyTests(unittest.TestCase):
         recent=self.checked(self.a.get('/api/platform/home'))['recent_cases'][0]
         self.assertEqual((recent['case_id'],recent['run_id'],recent['node_id']),(ca,newer['id'],'logistics_assignment'))
         self.assertIn(recent['status'],('running','review'))
+        self.assertEqual(recent['resume']['run_id'],run['id']);self.assertTrue(recent['approval_current'])
         wait_for(lambda:completed(newer['id']),'Home replacement candidate',timeout=60)
         home=self.checked(self.a.get('/api/platform/home'))
         self.assertEqual(home['attention']['items'][0]['run_id'],newer['id'])
         self.assertEqual((home['recent_cases'][0]['run_id'],home['recent_cases'][0]['status']),(newer['id'],'review'))
+        self.assertEqual(home['recent_cases'][0]['resume']['run_id'],run['id'])
+        stamp=lambda:self.s.sql("SELECT (SELECT count(*) FROM decision_runs)||':'||(SELECT count(*) FROM decision_approval_events)||':'||(SELECT count(*) FROM audit_events);")
+        before=stamp();root=Path(__file__).resolve().parents[2]
+        browser=subprocess.run([str(root/'.browser-venv/bin/python'),str(root/'tests/e2e/home_resume_journey.py')],cwd=root,env={**self.s.env,'DATION_E2E_URL':self.s.api_url,'DATION_HOME_CASE':ca,'DATION_HOME_OFFICIAL':run['id'],'DATION_HOME_CANDIDATE':newer['id']},capture_output=True,text=True,timeout=120)
+        self.assertEqual(browser.returncode,0,browser.stdout+browser.stderr);self.assertEqual(stamp(),before)
         self.checked(self.a.patch('/api/decision-cases/'+ca,json={'status':'archived'}))
         home=self.checked(self.a.get('/api/platform/home'))
         self.assertEqual(home['attention']['total'],0);self.assertNotIn(ca,[row['case_id'] for row in home['recent_cases']])

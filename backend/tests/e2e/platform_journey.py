@@ -15,10 +15,10 @@ async def main():
   home=page.locator('[data-platform-home]');await home.locator('.platform-home__case').wait_for()
   assert await home.locator('.platform-home__attention').count()==1
   assert await home.locator('.platform-home__quick-link').count()==3
-  await home.get_by_role('link',name='Revisar',exact=True).click();await page.locator('.assignment-dashboard-v2').wait_for()
+  await home.get_by_role('link',name='Revisar Asignación de carga · DC-'+os.environ['DATION_HOME_CASE'][:8].upper(),exact=True).click();await page.locator('.assignment-dashboard-v2').wait_for()
   assert os.environ['DATION_HOME_CASE'] in page.url and os.environ['DATION_HOME_RUN'] in page.url
   await page.go_back();await home.locator('.platform-home__case').wait_for()
-  await home.get_by_role('link',name='Continuar DC-'+os.environ['DATION_HOME_CASE'][:8],exact=True).click();await page.locator('.assignment-dashboard-v2').wait_for()
+  await home.get_by_role('link',name='Continuar DC-'+os.environ['DATION_HOME_CASE'][:8].upper(),exact=True).click();await page.locator('.assignment-dashboard-v2').wait_for()
   await page.locator('.nav [data-platform-view="platform-home"]').click();await home.locator('.platform-home__case').wait_for()
   assert not await page.locator('.sidebar').get_by_text('Cloud Run',exact=True).count()
   await page.locator('.nav [data-platform-view="inicio"]').click();await page.locator('[data-dda-id]').first.wait_for();assert urlsplit(page.url).path=='/app/ddas'
