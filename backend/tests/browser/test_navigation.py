@@ -3912,6 +3912,38 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertGreaterEqual(sum(r==('GET','/api/platform/decisions') for r in self.requests),requests_before)
         self.assertFalse(any(method in ('POST','PUT','PATCH','DELETE') and path.startswith('/api/platform/decisions') for method,path in self.requests))
 
+    async def test_center_assignment_search_preserves_both_selections_and_explicit_clear(self):
+        alice='10000000-0000-4000-8000-000000000011'
+        bruno='10000000-0000-4000-8000-000000000012'
+        people=[{'user_id':alice,'name':'Alice','active':True},{'user_id':bruno,'name':'Bruno','active':True}]
+        writes=[]
+        async def candidates(route):
+            q=parse_qs(urlparse(route.request.url).query).get('q',[''])[0].lower()
+            await route.fulfill(content_type='application/json',body=json.dumps({'members':[p for p in people if q in p['name'].lower()]}))
+        async def assign(route):
+            writes.append(json.loads(route.request.post_data))
+            await route.fulfill(content_type='application/json',body='{}')
+        await self.context.route('**/api/platform/team?**',candidates)
+        await self.context.route('**/api/platform/decisions/*/responsibilities/logistics_assignment',assign)
+        await self.open('logistics-map');await self.nav('platform-decisions')
+        root=self.page.locator('[data-platform-decisions]')
+        await root.get_by_role('link',name='Abrir',exact=True).click()
+        await root.locator('.center-drawer:visible .center-drawer__content>.center-responsibilities').get_by_role('button',name='Asignar responsable · Asignación de carga',exact=True).click()
+        dialog=self.page.get_by_role('dialog');owner=dialog.get_by_label('Responsable',exact=True);approver=dialog.get_by_label('Aprobador asignado',exact=True)
+        async def ready():
+            await self.page.wait_for_function("!document.querySelector('#center-owner_user_id').closest('form').querySelector('button[type=submit]').disabled")
+        async def search(q):
+            await dialog.get_by_label('Buscar personas por nombre o email').fill(q)
+            await dialog.get_by_role('button',name='Buscar personas',exact=True).click();await ready()
+        await ready();await owner.select_option(alice);await approver.select_option(bruno)
+        await search('Bruno');self.assertEqual(await owner.input_value(),alice);self.assertEqual(await approver.input_value(),bruno)
+        await search('Alice');self.assertEqual(await owner.input_value(),alice);self.assertEqual(await approver.input_value(),bruno)
+        await owner.select_option('');await search('Bruno');self.assertEqual(await owner.input_value(),'')
+        await search('Alice');await owner.select_option(alice)
+        await dialog.get_by_role('button',name='Guardar responsables',exact=True).click()
+        await root.get_by_text('Responsables actualizados.',exact=True).wait_for()
+        self.assertEqual(writes,[{'expected_updated_at':None,'owner_user_id':alice,'approver_user_id':bruno}])
+
     async def test_center_v2_late_detail_does_not_reopen_closed_drawer(self):
         await self.open('logistics-map');await self.nav('platform-decisions')
         root=self.page.locator('[data-platform-decisions]');await root.get_by_role('table').wait_for()
