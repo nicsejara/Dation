@@ -453,6 +453,18 @@ async def archive_dataset(dataset_id: str, archived: bool):
     return rows[0]
 
 
+async def _upload_journal_call(body):
+    # These transitions are idempotent. SQL explicitly marks lock contention
+    # as retryable; intent creation and uncertain network outcomes are excluded.
+    for attempt,delay in enumerate((0,.05,.1,.2,.4)):
+        if delay:await asyncio.sleep(delay)
+        try:return await platform_call('platform_dataset_upload',body)
+        except HTTPException as error:
+            if (attempt==4 or error.status_code!=409 or
+                (error.headers or {}).get('X-Dation-Retryable')!='true'):
+                raise
+
+
 async def store_input(
     filename,
     contents,
@@ -516,7 +528,7 @@ async def store_input(
     async def note_upload(operation):
         if not upload_operation:return
         try:
-            await platform_call('platform_dataset_upload',{'target_workspace_id':current().workspace_id,
+            await _upload_journal_call({'target_workspace_id':current().workspace_id,
                 'actor_user_id':current().user_id,'operation':operation,'operation_id':upload_operation})
         except (httpx.HTTPError,HTTPException):
             # The pre-upload journal already exists. A later explicit recovery
@@ -576,8 +588,8 @@ async def store_input(
                     # compensation; discarding also blocks a late INSERT.
                     recovery={'target_workspace_id':current().workspace_id,
                         'actor_user_id':current().user_id,'operation_id':upload_operation}
-                    await platform_call('platform_dataset_upload',{**recovery,'operation':'failed'})
-                    permit=await platform_call('platform_dataset_upload',{**recovery,'operation':'discard'})
+                    await _upload_journal_call({**recovery,'operation':'failed'})
+                    permit=await _upload_journal_call({**recovery,'operation':'discard'})
                     if not permit.get('cleared'):
                         if permit['storage_bucket']!=SUPABASE_INPUT_BUCKET or permit['storage_path']!=storage_path:
                             raise HTTPException(409,'La identidad de la carga requiere revisión.')

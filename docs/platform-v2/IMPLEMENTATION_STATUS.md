@@ -5,7 +5,7 @@ Fuentes: MASTER_PLAN_DATION_V2.md, CAMBIOS_HOME.md, CAMBIOS_DESICION_CENTER.md (
 | Fase | Estado | Alcance |
 |---:|---|---|
 | 0 | Completada | Context reconciliation + delta audit sobre main `9f9a558`; CI verde y 24 contratos Node aprobados |
-| 1 | Implementada; cierre de publicación en PR | [Shared Foundation](01-shared-foundation.md): navegación, metadata, contexto y responsabilidades múltiples compatibles |
+| 1 | Implementada; evidencia de publicación en [PR #86](https://github.com/nicsejara/Dation/pull/86) | [Shared Foundation](01-shared-foundation.md): navegación, metadata, contexto y responsabilidades múltiples compatibles |
 | 2 | Pendiente | Decision Center V2 |
 | 3 | Pendiente | Data Hub V2 |
 | 4 | Pendiente | Home V2 |
