@@ -194,6 +194,7 @@
     ]
   },
   "statusTones": {
+    "active": "info",
     "approved": "success",
     "completed": "success",
     "review": "warning",

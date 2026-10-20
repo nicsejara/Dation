@@ -1,132 +1,163 @@
-import {objectivePresentation,caseContext} from './foundation.mjs';
+import {caseContext,statePresentation,objectivePresentation} from './foundation.mjs';
+import {DDA_CATALOG} from './dda-catalog.mjs';
 import {describeFailure} from '../dispatch/recovery.mjs';
 import {demoBadge} from './onboarding.mjs';
 import {api} from '../dispatch/shared.mjs';
 import {createScope} from '../dispatch/lifecycle.mjs';
 import {resourceUrl} from '../dispatch/navigation.mjs';
-import {DECISION_META} from '../dispatch/decision-ui.mjs';
-import {mountDialog} from './components.mjs';
+import {DECISION_META,iconSvg} from '../dispatch/decision-ui.mjs';
+import {mountDialog,mountDropdown} from './components.mjs';
+import {mountCenterActions} from './decision-center-actions.mjs';
 import {ddaEnabled} from './entitlements.mjs';
 import {CENTER_FILTERS,readCenterResource} from './center-resource.mjs';
 import {mountActivity} from './activity.mjs';
 import {workspaceDate} from './workspace-format.mjs';
 
 const BASE='/api/platform/decisions',size=25;
-const statusNames={active:'En progreso',completed:'Completado',archived:'Archivado',review:'En revisión',approved:'Aprobado',running:'En ejecución',error:'Requiere revisión',stale:'Requiere actualizar',available:'Disponible',locked:'Bloqueado',needs_data:'Faltan datos',coming_soon:'Próximamente'};
+const statusNames={active:'En progreso',completed:'Completado',archived:'Archivado',review:'En revisión',pending_approval:'Pendiente de aprobación',approved:'Aprobada',running:'En ejecución',error:'Requiere revisión',stale:'Requiere actualizar',available:'Disponible',locked:'Bloqueado',needs_data:'Faltan datos',coming_soon:'Próximamente'};
 function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;}
+function icon(name){const box=el('span',undefined,'center-icon');box.innerHTML=iconSvg(name);return box;}
 function button(text,handler,kind='secondary'){const n=el('button',text,'d-button d-button--'+kind);n.type='button';n.addEventListener('click',handler);return n;}
-function card(title){const n=el('section',undefined,'d-card center-card');n.append(el('h2',title,'d-card-title'));return n;}
-function pill(status){const n=el('span',statusNames[status]||status,'center-status');n.dataset.state=status;return n;}
-function person(value,fallback='Sin registro'){return value?.name?value.name+(value.active===false?' (inactivo)':''):fallback;}
-function stamp(value,workspace){return workspaceDate(value,workspace);}
-function field(label,value){const n=el('div',undefined,'center-field');n.append(el('dt',label),el('dd',value??'—'));return n;}
-function table(headers){const wrap=el('div',undefined,'center-table-scroll');wrap.tabIndex=0;wrap.role='region';wrap.setAttribute('aria-label','Tabla de '+headers[0]);const t=el('table',undefined,'center-table'),head=el('thead'),r=el('tr'),body=el('tbody');for(const title of headers){const h=el('th',title);h.scope='col';r.append(h);}head.append(r);t.append(head,body);wrap.append(t);return {wrap,body};}
-function cell(row,value){const n=el('td');n.append(typeof value==='string'?document.createTextNode(value):value);row.append(n);}
+function pill(status){const n=el('span',statusNames[status]||status,'center-status');n.dataset.state=status;n.dataset.tone=statePresentation(status==='pending_approval'?'review':status).tone;return n;}
+function person(value,fallback='Sin asignar'){return value?.name?value.name+(value.active===false?' (inactivo)':''):fallback;}
+function ddaLabel(id){return DDA_CATALOG.find(d=>d.id===id)?.title||id||'DDA';}
+function namedPerson(value){const wrap=el('span',undefined,'center-person'),initials=(value?.name||'').split(/\s+/).filter(Boolean).slice(0,2).map(s=>s[0]).join('').toUpperCase()||'—',avatar=el('span',initials,'center-avatar');avatar.setAttribute('aria-hidden','true');wrap.append(avatar,el('span',person(value)));return wrap;}
 
 export function mountDecisionCenter(root,getIdentity){
- let activityView=null;
- const scope=createScope(root);root.classList.add('decision-center');let controller,generation=0,route={},notice='',modal,access='';
- const writable=()=>getIdentity().membership.access_role!=='viewer',enabled=()=>ddaEnabled(getIdentity(),'logistics'),zone=()=>getIdentity().workspace;
- function open(value){window.DationDispatch.openDecisionCenter(value);}
- function link(text,value){const a=el('a',text,'center-link');a.href=resourceUrl(location.href,{view:'platform-decisions',center:value});a.addEventListener('click',event=>{if(event.button||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;event.preventDefault();open(value);});return a;}
- function external(text,target,disabled=false){
-  const a=el('a',text,'d-button d-button--secondary');
-  if(disabled){a.removeAttribute('href');a.setAttribute('role','link');a.setAttribute('aria-disabled','true');a.tabIndex=-1;a.title='Restaurá el caso y verificá que Logística esté habilitada.';return a;}
-  a.href=resourceUrl(location.href,target);a.addEventListener('click',event=>{if(event.button||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;event.preventDefault();
-   if(target.view==='platform-data')window.DationDispatch.openDataHub(target.hub);
-   else if(target.runId)window.DationDispatch.openRun(target.runId,target.nodeId,target.caseId);
-   else if(target.caseId)window.DationDispatch.openCase(target.caseId,target.view,target.nodeId);
-   else window.dationNavigate(target.view);
-  });return a;
+ const scope=createScope(root),wide=matchMedia('(min-width:1100px)');root.classList.add('decision-center');
+ let route={},listKey=null,detailKey=null,listController,detailController,listVersion=0,detailVersion=0,data=null,active=false,returnFocus=null,notice='';
+ let activityView=null,historySync=()=>{},drawerCleanups=[],portfolioCleanups=[];
+ const writable=()=>getIdentity().membership.access_role!=='viewer',admin=()=>getIdentity().membership.access_role==='admin',zone=()=>getIdentity().workspace;
+ const hero=el('header',undefined,'center-hero'),copy=el('div',undefined,'center-hero__copy');copy.append(el('p','DECISION INTELLIGENCE','d-eyebrow'),el('h1','Decision Center','d-page-title'),el('p','Gestioná, revisá y recuperá todas las decisiones de tu Workspace desde un único lugar.','d-page-description'));
+ copy.append(button('Explorar DDAs',()=>window.dationNavigate('inicio')));const illustration=el('img');illustration.src='/static/assets/decision-center-hero.svg';illustration.alt='';illustration.width=400;illustration.height=240;hero.append(copy,illustration);
+ const message=el('p',undefined,'center-message');message.role='status';message.hidden=true;
+ const layout=el('div',undefined,'center-layout'),portfolio=el('div',undefined,'center-portfolio'),aside=el('aside',undefined,'center-drawer'),sheet=el('dialog',undefined,'d-platform center-drawer center-drawer--sheet'),body=el('div',undefined,'center-drawer__body');
+ aside.dataset.centerDrawer='';sheet.dataset.centerSheet='';for(const panel of [aside,sheet])panel.setAttribute('aria-labelledby','center-drawer-title');aside.hidden=true;
+ const actionsRoot=el('div');layout.append(portfolio,aside);root.replaceChildren(hero,message,layout,sheet,actionsRoot);
+ const actions=mountCenterActions(actionsRoot,{onChanged:refresh,notify:text=>{notice=text;showNotice();}}),sheetView=mountDialog({dialog:sheet,initialFocus:'[data-center-close]',closeOnBackdrop:true});
+ function showNotice(){message.hidden=!notice;message.textContent=notice;}
+ function open(value){window.DationDispatch.openDecisionCenter({...route,...value});}
+ function selectCase(c){if(!route.caseId)returnFocus=document.activeElement;open({caseId:c.id,nodeId:null,runsOffset:0});}
+ function closeCase(){const target=returnFocus;open({caseId:null,nodeId:null,runsOffset:0});requestAnimationFrame(()=>{if(target?.isConnected)target.focus({preventScroll:true});else portfolio.querySelector('[data-case-open]')?.focus({preventScroll:true});});}
+ function link(text,value,cls='center-link'){
+  const a=el('a',text,cls);a.href=resourceUrl(location.href,{view:'platform-decisions',center:{...route,...value}});
+  a.addEventListener('click',event=>{if(event.button||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;event.preventDefault();if(value.caseId&&!route.caseId)returnFocus=a;open(value);});return a;
  }
- function runtime(text,c,target,continuation=false){return external(text,{view:target.view,caseId:c.id,nodeId:target.node_id,runId:target.run_id},!enabled()||target.view==='logistics-config'&&!writable()||c.status==='archived'&&(continuation||target.view!=='decision-dashboard'));}
+ function destination(text,target,c,{primary=false,continuation=false}={}){
+  const a=el('a',text,'d-button d-button--'+(primary?'primary':'secondary'));
+  const disabled=!target||!ddaEnabled(getIdentity(),c.dda)||target.view==='logistics-config'&&!writable()||c.status==='archived'&&(continuation||target.view!=='decision-dashboard');
+  if(disabled){a.setAttribute('role','link');a.setAttribute('aria-disabled','true');a.tabIndex=-1;return a;}
+  const value={view:target.view,caseId:c.id,nodeId:target.node_id,runId:target.run_id};a.href=resourceUrl(location.href,value);
+  a.addEventListener('click',event=>{if(event.button||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;event.preventDefault();if(value.runId)window.DationDispatch.openDashboard(c.id,value.nodeId,value.runId);else window.DationDispatch.openCase(c.id,value.view,value.nodeId);});return a;
+ }
+ function cleanupPortfolio(){portfolioCleanups.forEach(fn=>fn());portfolioCleanups=[];}
+ function cleanupDrawer(){drawerCleanups.forEach(fn=>fn());drawerCleanups=[];activityView?.dispose();activityView=null;historySync=()=>{};}
+ function maintenance(c){
+  const wrap=el('div',undefined,'center-maintenance'),trigger=button('',()=>{}),panel=el('div',undefined,'center-maintenance__menu');trigger.className='d-button d-button--ghost center-icon-button';trigger.append(icon('moreHorizontal'));trigger.setAttribute('aria-label','Acciones de '+c.friendly_id);panel.role='menu';
+  const add=(text,fn)=>{const b=button(text,fn);b.role='menuitem';panel.append(b);};
+  if(writable())add('Editar nombre',()=>actions.edit(c));
+  add('Copiar ID',async()=>{try{await navigator.clipboard.writeText(c.friendly_id);notice='ID copiado.';}catch{notice='No se pudo copiar el ID. Podés seleccionarlo en el detalle.';}showNotice();});
+  if(writable())add(c.status==='archived'?'Restaurar':'Archivar',()=>actions.edit(c,true));
+  wrap.append(trigger,panel);const menu=mountDropdown({trigger,panel});return {node:wrap,dispose:()=>menu.dispose()};
+ }
  function pager(total,offset,change){const nav=el('nav',undefined,'center-pagination');nav.setAttribute('aria-label','Paginación');const prev=button('Anterior',()=>change(Math.max(0,offset-size))),next=button('Siguiente',()=>change(offset+size));prev.disabled=offset===0;next.disabled=offset+size>=total;nav.append(prev,el('span',total?`${Math.min(offset+1,total)}–${Math.min(offset+size,total)} de ${total}`:'0 resultados','d-metadata'),next);return nav;}
- function close(){if(modal){const own=modal;modal=null;own.controller?.abort();own.view.dispose();own.dialog.remove();}}
- function assign(c,node){
-  close();const dialog=el('dialog',undefined,'d-platform center-dialog'),form=el('form'),title=el('h2','Responsables · '+node.label,'d-card-title');title.id='center-assignment-title';dialog.setAttribute('aria-labelledby',title.id);
-  const searchLabel=el('label','Buscar personas por nombre o email','d-label'),search=el('input',undefined,'d-input');search.type='search';search.maxLength=120;search.id='center-people-search';searchLabel.htmlFor=search.id;
-  const count=el('p',undefined,'d-metadata'),message=el('p');message.role='alert';const inputs={},known=new Map();for(const p of [node.owner,node.approver])if(p)known.set(p.id,p);
-  form.append(title,el('p','Sólo Admin puede asignar. El responsable coordina el trabajo; el aprobador asignado limita quién puede aprobar. Admin puede intervenir con auditoría. Sin aprobador asignado, pueden aprobar Admin y Operator.','d-body'),searchLabel,search);
-  const lookup=button('Buscar personas',()=>loadPeople());form.append(lookup,count);
-  for(const [key,label,value]of [['owner_user_id','Responsable',node.owner],['approver_user_id','Aprobador asignado',node.approver]]){const l=el('label',label,'d-label'),select=el('select',undefined,'d-input');select.id='center-'+key;l.htmlFor=select.id;select.name=key;inputs[key]=select;form.append(l,select);select.dataset.initial=value?.id||'';}
-  const actions=el('div',undefined,'center-actions'),save=el('button','Guardar responsables','d-button d-button--primary');save.type='submit';actions.append(button('Cancelar',()=>close()),save);form.append(message,actions);dialog.append(form);root.append(dialog);
-  const view=mountDialog({dialog}),controller=new AbortController(),own={dialog,view,controller};modal=own;dialog.addEventListener('close',()=>{if(modal===own)close();});let peopleVersion=0;
-  function options(members){for(const select of Object.values(inputs)){const value=select.value||select.dataset.initial||'';delete select.dataset.initial;select.replaceChildren();const none=el('option','Sin asignar');none.value='';select.append(none);const rows=new Map(members.map(p=>[p.user_id,{id:p.user_id,name:p.name,active:p.status==='active'}]));if(value&&known.has(value)&&!rows.has(value))rows.set(value,known.get(value));for(const p of rows.values()){known.set(p.id,p);const option=el('option',person(p));option.value=p.id;select.append(option);}select.value=value;}}
-  async function loadPeople(){const version=++peopleVersion;lookup.disabled=true;save.disabled=true;message.textContent='';try{const data=await api('/api/platform/team?'+new URLSearchParams({candidates:'true',q:search.value.trim(),limit:50}),{signal:controller.signal});if(modal!==own||version!==peopleVersion)return;options(data.members);count.textContent=`${data.members.length} de ${data.total} personas disponibles. Si falta alguien, refiná la búsqueda.`;save.disabled=false;}catch(error){if(modal===own&&!controller.signal.aborted)message.textContent=error.message;}finally{if(modal===own&&version===peopleVersion)lookup.disabled=false;}}
-  search.addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();loadPeople();}});
-  form.addEventListener('submit',async event=>{event.preventDefault();save.disabled=true;message.textContent='';try{await api(BASE+'/'+c.id+'/assignments/'+node.id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({expected_updated_at:node.assignment_updated_at,owner_user_id:inputs.owner_user_id.value||null,approver_user_id:inputs.approver_user_id.value||null})});if(modal!==own)return;close();notice='Responsables actualizados.';load();}catch(error){if(modal===own){message.textContent=error.status===409?'La asignación cambió o la persona ya no está disponible. Actualizá el detalle antes de guardar.':error.message;save.disabled=error.status===409;if(error.status===409)actions.append(button('Actualizar detalle',()=>{close();load();}));}}});
-  view.open();search.focus();loadPeople();
- }
- function edit(c,archive=false){
-  close();const dialog=el('dialog',undefined,'d-platform center-dialog'),title=el('h2',archive?(c.status==='archived'?'Restaurar caso':'Archivar caso'):'Nombre del Decision Case','d-card-title');title.id='center-dialog-title';dialog.setAttribute('aria-labelledby',title.id);
-  const form=el('form'),actions=el('div',undefined,'center-actions'),message=el('p');message.role='alert';let input;
-  form.append(title);
-  if(archive)form.append(el('p',c.status==='archived'?'El caso volverá a estar disponible.':'Se conservarán datos, aprobaciones y corridas. Los trabajos ya aceptados pueden terminar.','d-body'));
-  else{const label=el('label','Etiqueta opcional','d-label');input=el('input',undefined,'d-input');input.id='center-case-label';label.htmlFor=input.id;input.value=c.label||'';input.maxLength=120;form.append(label,input,el('p','Dejá el campo vacío para mostrar sólo el ID del caso.','d-metadata'));}
-  const cancel=button('Cancelar',()=>view.close()),save=el('button',archive?(c.status==='archived'?'Restaurar':'Archivar'):'Guardar','d-button d-button--primary');save.type='submit';actions.append(cancel,save);form.append(message,actions);dialog.append(form);root.append(dialog);
-  const view=mountDialog({dialog});modal={dialog,view};const own=createScope(form);own.listen(dialog,'close',()=>{if(modal?.dialog===dialog){modal=null;view.dispose();dialog.remove();}});
-  own.listen(form,'submit',async event=>{event.preventDefault();save.disabled=true;save.setAttribute('aria-busy','true');
-   try{await api(BASE+'/'+c.id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({expected_updated_at:c.updated_at,...(archive?{archived:c.status!=='archived'}:{label:input.value.trim()||null})})});if(!own.active)return;close();notice='Caso actualizado.';load();}
-   catch(error){if(own.active){message.textContent=error.status===409?'El caso cambió. Actualizá el detalle antes de guardar.':error.message;save.disabled=error.status===409;save.removeAttribute('aria-busy');if(error.status===409)actions.append(button('Actualizar detalle',()=>{close();load();}));}}
-  });view.open();(input||save).focus();
- }
- function listing(data){
-  const frag=document.createDocumentFragment(),form=el('form',undefined,'center-search');let input,filter,dda;
-  for(const [key,label]of [['q','Buscar por ID o etiqueta'],['filter','Estado'],['dda','DDA']]){
-   const wrap=el('div',undefined,'d-field'),title=el('label',label,'d-label'),control=el(key==='q'?'input':'select',undefined,'d-input');control.id='center-'+key;title.htmlFor=control.id;
-   if(key==='q'){input=control;control.type='search';control.maxLength=120;control.value=route.q;}
-   else{const values=key==='filter'?CENTER_FILTERS:{all:'Todos los DDAs',logistics:'DDA Logística'};for(const [value,label]of Object.entries(values)){const option=el('option',label);option.value=value;control.append(option);}control.value=route[key];if(key==='filter')filter=control;else dda=control;}
-   wrap.append(title,control);form.append(wrap);
+ function loading(target,drawer=false){target.setAttribute('aria-busy','true');const block=el('div',undefined,drawer?'center-loading center-loading--drawer':'center-loading');block.setAttribute('aria-label',drawer?'Cargando caso':'Cargando Decision Center');block.role='status';block.append(el('span',drawer?'Cargando caso…':'Cargando Decision Center…','d-metadata'));for(let i=0;i<(drawer?4:6);i++)block.append(el('div',undefined,'center-skeleton'));target.replaceChildren(block);}
+ function failure(target,title,error,retry){target.removeAttribute('aria-busy');const card=el('section',undefined,'d-card center-error');card.append(el('h2',title,'d-card-title'));const text=el('p',describeFailure(error).message,'d-body');text.role='alert';card.append(text,button('Reintentar',retry));target.replaceChildren(card);}
+ function renderPortfolio(){
+  cleanupPortfolio();const frag=document.createDocumentFragment(),summary=data.summary||{},kpis=el('div',undefined,'center-kpis');kpis.setAttribute('aria-label','Resumen del workspace');
+  for(const [key,label,filter,name]of [['active_cases','Cases activos','in_progress','folderOpen'],['in_review','En revisión','review','eye'],['pending_approval','Pendientes de aprobación','pending_approval','clock'],['approved','Aprobadas','approved','checkCircle']]){
+   const card=button('',()=>open({filter,offset:0}), 'ghost');card.className='center-kpi';card.dataset.kpi=key;card.setAttribute('aria-pressed',String(route.filter===filter));card.append(icon(name),el('span',label,'center-kpi__label'),el('strong',String(summary[key]??'—'),'center-kpi__value'),el('span','›','center-kpi__arrow'));kpis.append(card);
+  }frag.append(kpis);
+  if(summary.pending_approval>0){const attention=el('section',undefined,'center-attention'),text=el('div');text.append(el('h2','Requiere tu atención'),el('p',summary.pending_approval===1?'1 decisión espera tu aprobación.':`${summary.pending_approval} decisiones esperan tu aprobación.`));attention.append(icon('clock'),text,button('Ver pendientes',()=>open({filter:'pending_approval',offset:0})));frag.append(attention);}
+  const form=el('form',undefined,'center-search'),controls={};
+  function control(key,label,options){const wrap=el('div',undefined,'center-filter'),l=el('label',label,'center-sr-only'),input=el(options?'select':'input',undefined,'d-input');input.id='center-'+key;l.htmlFor=input.id;input.name=key;
+   if(options)for(const [value,text]of Object.entries(options)){const o=el('option',text);o.value=value;input.append(o);}else{input.type='search';input.maxLength=120;input.placeholder='Buscar por Decision Case, ID o nombre…';}
+   input.value=route[key]||'all';controls[key]=input;wrap.append(l,input);form.append(wrap);return input;
   }
-  const submit=el('button','Buscar','d-button d-button--secondary');submit.type='submit';form.append(submit);form.addEventListener('submit',event=>{event.preventDefault();open({filter:filter.value,dda:dda.value,q:input.value.trim()});});
-  for(const select of [filter,dda])select.addEventListener('change',()=>open({filter:filter.value,dda:dda.value,q:input.value.trim()}));frag.append(form);
-  if(!data.items.length){const empty=card(route.q||route.filter!=='all'?'No encontramos casos':'Tu memoria de decisiones empieza acá');empty.append(el('p',writable()?'Prepará Órdenes y Flota y abrí DDA Logística para crear tu primer caso.':'Los casos que prepare tu equipo aparecerán acá. Podés consultar los datos mientras tanto.','d-body'));if(route.q||route.filter!=='all')empty.append(button('Limpiar filtros',()=>open({})));else{empty.append(external('Ver datos',{view:'platform-data'}));if(enabled())empty.append(external('Abrir DDA Logística',{view:'logistics-overview'}));}frag.append(empty);}
-  else{const grid=table(['Decision Case','DDA','Paso actual','Progreso','Responsable','Estado','Última actividad','Acciones']);
-   for(const c of data.items){const context=caseContext(c);const row=el('tr'),name=el('div',undefined,'center-name');name.append(link(context.label||(c.is_demo?'Demo · DDA Logística':context.friendlyId),{...route,caseId:c.id,nodeId:null,runsOffset:0}));if(c.is_demo)name.append(demoBadge());if(c.label||c.is_demo)name.append(el('span',c.friendly_id,'d-metadata'));cell(row,name);cell(row,'DDA Logística');cell(row,c.current_step_label);cell(row,`${c.progress.approved}/${c.progress.total} aprobadas`);cell(row,person(c.owner,'Sin asignar'));const status=el('div',undefined,'center-statuses');status.append(pill(c.status));if(c.in_review)status.append(pill('review'));cell(row,status);cell(row,stamp(c.last_activity_at,zone()));cell(row,link('Abrir',{...route,caseId:c.id,nodeId:null,runsOffset:0}));grid.body.append(row);}frag.append(grid.wrap);
+  control('q','Buscar por ID o etiqueta');controls.q.value=route.q;control('filter','Estado',CENTER_FILTERS);
+  const ddas={all:'Todos los DDAs'};for(const id of new Set([...(data.dda_options||[]),...(route.dda!=='all'?[route.dda]:[])]))ddas[id]=ddaLabel(id);control('dda','DDA',ddas);
+  const owners={all:'Todos los responsables',me:'Mis casos',unassigned:'Sin asignar'};for(const p of data.owner_options||[])if(p)owners[p.id]=person(p);if(!owners[route.owner||'all'])owners[route.owner]='Responsable seleccionado';control('owner','Responsable',owners);
+  const submit=el('button','Buscar','d-button d-button--secondary');submit.type='submit';form.append(submit,button('Limpiar filtros',()=>open({filter:'all',q:'',dda:'all',owner:'all',offset:0}),'ghost'));
+  function filter(){open({q:controls.q.value.trim(),filter:controls.filter.value,dda:controls.dda.value,owner:controls.owner.value,offset:0});}
+  form.addEventListener('submit',event=>{event.preventDefault();filter();});for(const key of ['filter','dda','owner'])controls[key].addEventListener('change',filter);frag.append(form);
+  if(!data.items.length){const empty=el('section',undefined,'d-card center-empty'),filtered=route.q||route.filter!=='all'||route.dda!=='all'||route.owner!=='all';empty.append(icon('folderOpen'),el('h2',filtered?'No encontramos Decision Cases con estos filtros.':'Todavía no hay decisiones en este Workspace.','d-section-title'));
+   if(filtered)empty.append(button('Limpiar filtros',()=>open({filter:'all',q:'',dda:'all',owner:'all',offset:0})));else empty.append(el('p','Explorá un DDA para iniciar tu primer Decision Case.','d-body'),button('Explorar DDAs',()=>window.dationNavigate('inicio')));frag.append(empty);
+  }else{
+   const wrap=el('div',undefined,'center-table-scroll'),table=el('table',undefined,'center-table'),head=el('thead'),header=el('tr'),tbody=el('tbody');wrap.tabIndex=0;wrap.role='region';wrap.setAttribute('aria-label','Portfolio de Decision Cases');
+   const titles=['Case','DDA','Objetivo actual','Paso actual','Progreso','Responsable','Estado','Última actividad','Acción'];for(const [i,text]of titles.entries()){const th=el('th',text);th.scope='col';th.dataset.column=i;header.append(th);}head.append(header);table.append(head,tbody);
+   for(const c of data.items){const context=caseContext(c),row=el('tr');row.dataset.centerCase=c.id;row.tabIndex=0;row.setAttribute('aria-label','Inspeccionar '+(context.label||context.friendlyId));row.setAttribute('aria-selected',String(c.id===route.caseId));
+    const add=(i,value)=>{const td=el('td');td.dataset.column=i;td.dataset.label=titles[i];td.append(typeof value==='string'?document.createTextNode(value):value);row.append(td);};
+    const name=el('div',undefined,'center-name');name.append(link(context.label||(c.is_demo?'Demo · '+ddaLabel(c.dda):context.friendlyId),{caseId:c.id,nodeId:null,runsOffset:0}),el('span',context.friendlyId,'d-metadata'));if(c.is_demo)name.append(demoBadge());add(0,name);
+    add(1,el('span',ddaLabel(c.dda),'center-dda-tag'));add(2,c.current_objective?.label||'Por definir');add(3,c.current_step_label||'Por definir');
+    const progress=el('div',undefined,'center-progress'),bar=el('progress');bar.max=c.progress.total||1;bar.value=c.progress.approved;bar.setAttribute('aria-label',`${c.progress.approved} de ${c.progress.total} aprobadas`);progress.append(el('span',`${c.progress.approved} de ${c.progress.total} aprobadas`),bar);add(4,progress);
+    add(5,namedPerson(c.owner));add(6,pill(c.display_status||c.status));add(7,workspaceDate(c.last_activity_at,zone()));const action=el('div',undefined,'center-row-actions'),a=link('Abrir',{caseId:c.id,nodeId:null,runsOffset:0},'d-button d-button--secondary');a.dataset.caseOpen=c.id;const menu=maintenance(c);action.append(a,menu.node);portfolioCleanups.push(menu.dispose);add(8,action);
+    row.addEventListener('click',event=>{if(!event.target.closest('a,button,input,select,summary,[role=menu]'))selectCase(c);});row.addEventListener('keydown',event=>{if(event.target===row&&['Enter',' '].includes(event.key)){event.preventDefault();selectCase(c);}});tbody.append(row);
+   }wrap.append(table);frag.append(wrap);
   }
-  frag.append(pager(data.total,route.offset,offset=>open({...route,offset})));return frag;
+  frag.append(pager(data.total,route.offset,offset=>open({offset})));portfolio.replaceChildren(frag);portfolio.removeAttribute('aria-busy');
  }
- function approval(run,current=true){return !run.approved_at?'Sin aprobar':run.superseded_at?'Reemplazada':!current?'Requiere actualizar':'Aprobada';}
- function history(node,c,version){
-  const details=el('details',undefined,'center-history');details.append(el('summary',`Historial de corridas (${node.run_count})`));const body=el('div');details.append(body);
-  async function read(){
-   body.replaceChildren(el('p','Cargando historial…','d-body'));
-   try{const data=await api(BASE+'/'+c.id+'/runs?'+new URLSearchParams({node_id:node.id,limit:size,offset:route.runsOffset}),{signal:controller.signal});if(version!==generation)return;
-    if(!data.items.length){body.replaceChildren(el('p','No hay corridas en esta página.','d-body'));return;}
-    const grid=table(['Corrida','Creada por','Creación','Estado','Duración','Objetivo','Aprobación']);
-    for(const r of data.items){const row=el('tr'),run=el('div',undefined,'center-run');run.append(runtime('RUN-'+r.id.slice(0,8),c,{view:'decision-dashboard',node_id:node.id,run_id:r.id}));
-     const technical=el('details');technical.append(el('summary','Datos técnicos'));for(const [label,value]of [['ID',r.id],['Motor',[r.engine_name,r.engine_version].filter(Boolean).join(' ')],['Input fingerprint',r.input_fingerprint],['Result fingerprint',r.result_fingerprint]])technical.append(el('p',label+': '+(value||'Sin registro'),'d-metadata'));run.append(technical);cell(row,run);cell(row,person(r.created_by));cell(row,stamp(r.created_at,zone()));cell(row,{queued:'En cola',running:'En ejecución',completed:'Completada',error:'Error'}[r.status]||'Sin registro');cell(row,r.duration_ms==null?'—':(r.duration_ms/1000).toFixed(1)+' s');cell(row,objectivePresentation(r.objective)?.label||'Sin registro');cell(row,approval(r,r.decision_state!=='stale'));grid.body.append(row);}
-    body.replaceChildren(grid.wrap,pager(data.total,route.runsOffset,runsOffset=>open({...route,nodeId:node.id,runsOffset})));
-   }catch(error){if(version===generation&&!controller.signal.aborted)body.replaceChildren(el('p',error.message,'d-body'),button('Reintentar historial',read));}
+ function syncSelection(){for(const row of portfolio.querySelectorAll('[data-center-case]'))row.setAttribute('aria-selected',String(row.dataset.centerCase===route.caseId));}
+ function drawerLayout(){const focus=document.activeElement,hadFocus=body.contains(focus);
+  if(!active||!route.caseId){sheetView.close();aside.hidden=true;layout.classList.remove('has-selection');}
+  else if(wide.matches){sheetView.close();aside.append(body);aside.hidden=false;layout.classList.add('has-selection');}
+  else{aside.hidden=true;layout.classList.remove('has-selection');sheet.append(body);sheetView.open();}
+  if(hadFocus&&focus?.isConnected)focus.focus({preventScroll:true});
+ }
+ function drawerFrame(c){const header=el('header',undefined,'center-drawer__header'),copy=el('div');copy.append(el('span','DECISION CASE','d-eyebrow'));const title=el('h2',c?.label||c?.friendly_id||'Caso seleccionado','d-section-title');title.id='center-drawer-title';copy.append(title);if(c)copy.append(el('p',c.friendly_id,'d-metadata'));
+  const close=button('',closeCase,'ghost');close.dataset.centerClose='';close.className='d-button d-button--ghost center-icon-button';close.setAttribute('aria-label','Cerrar detalle del caso');close.append(icon('x'));header.append(copy,close);return header;}
+ function personField(c,stageKey,key,label,value){const field=el('div',undefined,'center-responsibility');field.append(el('span',label,'d-metadata'),namedPerson(value));
+  if(admin()&&c.status!=='archived'&&(stageKey==='data_preparation'||DECISION_META[stageKey]?.implemented)){const assign=button(value?'Cambiar':'Asignar',()=>actions.assign(c,stageKey,key),'ghost');assign.className='center-inline-action';assign.setAttribute('aria-label',`${value?'Cambiar':'Asignar'} ${label.toLowerCase()} · ${stageKey==='data_preparation'?'datos':DECISION_META[stageKey]?.label||stageKey}`);field.append(assign);}return field;}
+ function renderDrawer(c){
+  cleanupDrawer();const content=el('div',undefined,'center-drawer__content');body.replaceChildren(drawerFrame(c),content);const top=el('div',undefined,'center-case-meta');top.append(el('span',ddaLabel(c.dda),'center-dda-tag'),pill(c.display_status||c.status));if(c.is_demo)top.append(demoBadge());const menu=maintenance(c);top.append(menu.node);drawerCleanups.push(menu.dispose);content.append(top);
+  const ctas=el('div',undefined,'center-drawer__ctas'),relevant=c.nodes?.find(n=>n.id===c.current_step),official=c.resume?.run_id&&relevant?.approval_current&&c.resume.run_id===relevant.approved_run?.id;ctas.append(destination(official?'Ver resultado aprobado':c.status==='completed'?'Ver resultado':relevant?.status==='review'?'Revisar':'Continuar',c.resume,c,{primary:true,continuation:true}),destination('Ir al Decision Map',c.dda==='logistics'?{view:'logistics-map',node_id:c.current_step,run_id:null}:null,c,{continuation:true}));content.append(ctas);
+  const objective=el('div',undefined,'center-objective');objective.append(icon('target'),el('div','Objetivo actual','d-metadata'),el('strong',c.current_objective?.label||'Por definir'));content.append(objective);
+  const responsibility=el('section',undefined,'center-responsibilities');if(c.current_step&&relevant)responsibility.append(personField(c,c.current_step,'owner','Responsable',relevant.owner),personField(c,c.current_step,'approver','Aprobador asignado',relevant.approver));content.append(responsibility);
+  const linked=el('section',undefined,'center-linked-data');linked.append(el('h3','Datos vinculados','d-card-title'));
+  for(const dataset of [c.orders,c.fleet].filter(Boolean)){const row=el('div',undefined,'center-linked-file'),text=el('div');text.append(el('strong',dataset.original_filename||dataset.canonical_filename||dataset.label||'Archivo'),el('span',`${dataset.row_count??'—'} registros · ${dataset.validation==='validated'?'Validado':'Revisar validación'}`,'d-metadata'));row.append(icon('fileJson'),text);
+   if(!dataset.deletion_pending){const a=el('a',undefined,'d-button d-button--ghost center-icon-button');a.href='/api/platform/data/datasets/'+dataset.id+'/download';a.download=dataset.original_filename||'datos.csv';a.setAttribute('aria-label','Descargar '+(dataset.original_filename||dataset.canonical_filename||'archivo'));a.append(icon('download'));row.append(a);}linked.append(row);
   }
-  details.addEventListener('toggle',()=>{if(details.open&&route.nodeId!==node.id)open({...route,nodeId:node.id,runsOffset:0});});
-  if(route.nodeId===node.id){details.open=true;return {details,after:read};}return {details,after:()=>{}};
- }
- function detail(c,version){
-  const frag=document.createDocumentFragment();frag.append(link('← Volver a Decision Center',{...route,caseId:null,nodeId:null,runsOffset:0}));
-  const header=card(c.label||(c.is_demo?'Demo · DDA Logística':c.friendly_id)),actions=el('div',undefined,'center-actions');header.append(el('p',c.friendly_id+' · DDA Logística','d-metadata'),pill(c.status));if(c.in_review)header.append(pill('review'));
-  actions.append(runtime(c.status==='completed'?'Ver resultado':'Continuar',c,c.resume,true));if(writable())actions.append(button('Editar nombre',()=>edit(c)),button(c.status==='archived'?'Restaurar':'Archivar',()=>edit(c,true)));if(c.is_demo)header.append(demoBadge(),el('p','Este caso usa datos de ejemplo. Sus resultados son demostrativos.','d-body'));header.append(actions);frag.append(header);
-  const data=card('Contexto de datos'),fields=el('dl',undefined,'center-fields');for(const [label,value]of [['Órdenes',c.orders?.label||c.orders?.canonical_filename],['Flota',c.fleet?.label||c.fleet?.canonical_filename],['Validación',c.orders?.validation==='validated'&&c.fleet?.validation==='validated'?'Ambos datasets validados':'Revisar validación de los datasets'],['Creado por',person(c.created_by)],['Creado',stamp(c.created_at,zone())]])fields.append(field(label,value));data.append(fields,external('Ver datos',{view:'platform-data',hub:{tab:'packs',ordersId:c.orders.id,fleetId:c.fleet.id}}));frag.append(data);
-  const flow=card('Decisiones del caso'),list=el('ol',undefined,'center-timeline'),afters=[];
-  for(const node of c.nodes){const item=el('li',undefined,'center-node'),meta=DECISION_META[node.id];item.dataset.centerNode=node.id;item.append(el('h3',meta.index+' · '+meta.label,'center-node-title'),pill(node.status));
-   const info=el('dl',undefined,'center-fields'),approved=node.approved_run;
-   for(const [label,value]of [['Responsable',person(node.owner,'Sin asignar')],['Aprobador asignado',person(node.approver,'Sin asignar')],['Última corrida',node.latest_run?'RUN-'+node.latest_run.id.slice(0,8):'Sin corridas'],['Corrida aprobada',approved?'RUN-'+approved.id.slice(0,8):'Sin aprobación'],['Aprobada por',approved?.legacy_approval?'Workspace compartido (histórico)':person(approved?.approved_by)],['Aprobada',stamp(approved?.approved_at,zone())],['Corridas',String(node.run_count)]])info.append(field(label,value));item.append(info);
-   if(['stale','error'].includes(node.status))item.append(el('p',describeFailure(null,{kind:node.status==='stale'?'stale':'run'}).message,'d-body'));
-   if(node.id==='logistics_scheduling'&&node.status==='locked')item.append(el('p',describeFailure(null,{kind:'source'}).message,'d-body'));
-   const bar=el('div',undefined,'center-actions');if(getIdentity().membership.access_role==='admin'&&c.status!=='archived')bar.append(button('Asignar responsables',()=>assign(c,node)));if(node.target){bar.append(runtime('Continuar decisión',c,node.target,true));if(approved)bar.append(runtime('Abrir dashboard aprobado',c,{view:'decision-dashboard',node_id:node.id,run_id:approved.id}));if(node.latest_run&&node.latest_run.id!==approved?.id)bar.append(runtime('Abrir último dashboard',c,{view:'decision-dashboard',node_id:node.id,run_id:node.latest_run.id}));}else item.append(el('p','Este paso todavía no está disponible para ejecutar.','d-metadata'));item.append(bar);
-   const h=history(node,c,version);item.append(h.details);afters.push(h.after);list.append(item);
+  const dataStage=c.responsibilities?.stages?.data_preparation;if(dataStage)linked.append(personField(c,'data_preparation','owner','Responsable de datos',dataStage.owner));content.append(linked);
+  const chain=el('section',undefined,'center-chain');chain.append(el('h3','Cadena de decisiones','d-card-title'));const list=el('ol',undefined,'center-timeline');chain.append(list);content.append(chain);const histories=[];
+  for(const [index,node]of (c.nodes||[]).entries()){
+   const meta=DECISION_META[node.id]||{label:node.label},item=el('li',undefined,'center-node');item.dataset.centerNode=node.id;const header=el('div',undefined,'center-node__header');header.append(el('span',String(index+1).padStart(2,'0'),'center-node__number'),el('h4',meta.label,'center-node-title'),pill(node.status));item.append(header,el('p','Objetivo · '+(node.objective?.label||'Por definir'),'center-node__objective'));
+   if(node.target&&!['locked','needs_data','coming_soon'].includes(node.status)){const label={approved:'Ver dashboard',review:'Revisar',available:'Configurar',running:'Ver ejecución'}[node.status]||'Ver decisión',candidate=['review','running','error'].includes(node.status)&&node.latest_run&&!node.latest_run.approved_at;
+    item.append(destination(label,candidate?{view:'decision-dashboard',node_id:node.id,run_id:node.latest_run.id}:node.target,c,{continuation:true}));
+    if(candidate&&node.latest_objective?.id!==node.objective?.id)item.append(el('p','Objetivo de la candidata · '+(node.latest_objective?.label||'Por definir'),'d-metadata'));
+   }
+   const details=el('details',undefined,'center-node-details');details.append(el('summary','Responsables y aprobación'));const fields=el('div',undefined,'center-responsibilities');fields.append(personField(c,node.id,'owner','Responsable',node.owner),personField(c,node.id,'approver','Aprobador asignado',node.approver));details.append(fields);
+   const approved=node.approved_run;if(approved)details.append(el('p','Aprobada por · '+(approved.legacy_approval?'Workspace compartido (histórico)':person(approved.approved_by,'Sin registro')),'d-metadata'),el('p',workspaceDate(approved.approved_at,zone()),'d-metadata'),el('p','RUN-'+approved.id.slice(0,8),'d-metadata'),destination('Abrir dashboard aprobado',{view:'decision-dashboard',node_id:node.id,run_id:approved.id},c));
+   if(node.latest_run&&node.latest_run.id!==approved?.id)details.append(destination('Abrir último dashboard',{view:'decision-dashboard',node_id:node.id,run_id:node.latest_run.id},c));if(['stale','error'].includes(node.status))details.append(el('p',describeFailure(null,{kind:node.status==='stale'?'stale':'run'}).message,'d-metadata'));
+   item.append(details);const history=el('details',undefined,'center-history'),historyBody=el('div');history.dataset.nodeHistory=node.id;history.append(el('summary',`Historial de corridas (${node.run_count})`),historyBody);item.append(history);list.append(item);let requestKey=null,version=0,controller;
+   async function loadHistory(){const key=route.runsOffset;if(requestKey===key)return;requestKey=key;const own=++version;controller?.abort();controller=new AbortController();historyBody.replaceChildren(el('p','Cargando historial…','d-metadata'));
+    try{const data=await api(BASE+'/'+c.id+'/runs?'+new URLSearchParams({node_id:node.id,limit:size,offset:key}),{signal:controller.signal});if(own!==version)return;const rows=el('ol',undefined,'center-run-list');
+     for(const r of data.items){const row=el('li',undefined,'center-run');row.append(destination('RUN-'+r.id.slice(0,8),{view:'decision-dashboard',node_id:node.id,run_id:r.id},c),el('p',`${workspaceDate(r.created_at,zone())} · ${objectivePresentation(r.objective)?.label||'Por definir'}`,'d-metadata'),el('p',`${{queued:'En cola',running:'En ejecución',completed:'Completada',error:'Error'}[r.status]||r.status} · ${r.approved_at?(r.superseded_at?'Reemplazada':r.decision_state==='stale'?'Requiere actualizar':'Aprobada'):'Sin aprobar'}`,'d-metadata'));
+      const technical=el('details');technical.append(el('summary','Datos técnicos'));for(const [label,value]of [['ID',r.id],['Creada por',person(r.created_by,'Sin registro')],['Aprobada por',person(r.approved_by,'Sin registro')],['Duración',r.duration_ms==null?'—':r.duration_ms+' ms'],['Motor',[r.engine_name,r.engine_version].filter(Boolean).join(' ')],['Input fingerprint',r.input_fingerprint],['Result fingerprint',r.result_fingerprint]])technical.append(el('p',label+': '+(value||'Sin registro'),'d-metadata'));row.append(technical);rows.append(row);
+     }historyBody.replaceChildren(data.items.length?rows:el('p','No hay corridas en esta página.','d-metadata'),pager(data.total,key,runsOffset=>open({nodeId:node.id,runsOffset})));
+    }catch(error){if(own===version&&!controller.signal.aborted){requestKey=null;historyBody.replaceChildren(el('p',error.message,'d-metadata'),button('Reintentar historial',loadHistory));}}
+   }
+   history.addEventListener('toggle',()=>{if(history.open&&route.nodeId!==node.id)open({nodeId:node.id,runsOffset:0});else if(!history.open&&route.nodeId===node.id)open({nodeId:null,runsOffset:0});});histories.push(()=>{history.open=route.nodeId===node.id;if(history.open)loadHistory();});drawerCleanups.push(()=>{version++;controller?.abort();});
   }
-  flow.append(list);frag.append(flow);const activity=el('details',undefined,'d-card center-card');activity.dataset.caseActivity='';activity.append(el('summary','Actividad del caso'));const feed=el('div');activity.append(feed);activity.addEventListener('toggle',()=>{activityView?.dispose();activityView=null;if(activity.open)activityView=mountActivity(feed,{getIdentity,caseId:c.id});});frag.append(activity);const technical=el('details',undefined,'d-card center-card');technical.append(el('summary','Información técnica'),el('code',c.id));frag.append(technical);return {frag,after:()=>afters.forEach(fn=>fn())};
+  historySync=()=>histories.forEach(fn=>fn());historySync();const activity=el('section',undefined,'center-case-activity');activity.dataset.caseActivity='';activity.append(el('h3','Actividad reciente','d-card-title'));const feed=el('div');activity.append(feed);content.append(activity);activityView=mountActivity(feed,{getIdentity,caseId:c.id,limit:5,compact:true});activity.append(button('Ver toda la actividad',()=>{activityView?.dispose();activityView=mountActivity(feed,{getIdentity,caseId:c.id,limit:10});}));
+  const technical=el('details',undefined,'center-technical');technical.append(el('summary','Información técnica'),el('code',c.id),el('p','Creado por · '+person(c.created_by,'Sin registro'),'d-metadata'),el('p',workspaceDate(c.created_at,zone()),'d-metadata'));content.append(technical);body.removeAttribute('aria-busy');drawerLayout();if(!wide.matches&&!sheet.contains(document.activeElement))body.querySelector('[data-center-close]')?.focus({preventScroll:true});
  }
- async function load(){
-  activityView?.dispose();activityView=null;controller?.abort();controller=new AbortController();close();const version=++generation;root.setAttribute('aria-busy','true');root.replaceChildren(el('p','Cargando Decision Center…','d-body'));
-  try{route=readCenterResource(location.href);const params=new URLSearchParams({filter:route.filter,q:route.q,dda:route.dda,limit:size,offset:route.offset});const data=await api(BASE+(route.caseId?'/'+route.caseId:'?'+params),{signal:controller.signal});if(version!==generation||controller.signal.aborted)return;
-   const frag=document.createDocumentFragment();if(notice){const message=el('p',notice,'center-message');message.role='status';frag.append(message);notice='';}let after;if(route.caseId){const result=detail(data,version);frag.append(result.frag);after=result.after;}else frag.append(listing(data));root.replaceChildren(frag);after?.();
-  }catch(error){if(version!==generation||controller.signal.aborted)return;const panel=card('No se pudo abrir Decision Center'),message=el('p',describeFailure(error).message,'d-body');message.role='alert';panel.append(message,button('Reintentar',load),link('Volver al listado',{}));root.replaceChildren(panel);}
-  finally{if(version===generation)root.removeAttribute('aria-busy');}
+ async function loadPortfolio(){const own=++listVersion;listController?.abort();listController=new AbortController();loading(portfolio);
+  try{const params=new URLSearchParams({filter:route.filter,q:route.q,dda:route.dda,owner:route.owner,limit:size,offset:route.offset});const result=await api(BASE+'?'+params,{signal:listController.signal});if(own!==listVersion||!active)return;data=result;renderPortfolio();syncSelection();}
+  catch(error){if(own===listVersion&&!listController.signal.aborted)failure(portfolio,'No pudimos cargar Decision Center.',error,()=>{listKey=null;load();});}
  }
- function stop(){activityView?.dispose();activityView=null;generation++;controller?.abort();close();root.removeAttribute('aria-busy');}
- function onView(){if(window.dationGetCurrentView?.()==='platform-decisions')load();else stop();}
- scope.listen(window,'dation:view',onView);scope.listen(window,'pagehide',stop);scope.listen(window,'dation:identity',()=>{const next=getIdentity().membership.access_role+':'+enabled();if(next!==access){access=next;onView();}});access=getIdentity().membership.access_role+':'+enabled();onView();
- return {dispose(){stop();scope.dispose();}};
+ async function loadDetail(){const own=++detailVersion;detailController?.abort();detailController=new AbortController();cleanupDrawer();body.replaceChildren(drawerFrame());const pending=el('div');body.append(pending);loading(pending,true);drawerLayout();
+  try{const result=await api(BASE+'/'+route.caseId,{signal:detailController.signal});if(own!==detailVersion||!active)return;if(String(result.id).toLowerCase()!==String(route.caseId).toLowerCase())throw new Error('El Decision Case recibido no coincide con el seleccionado.');renderDrawer(result);}
+  catch(error){if(own===detailVersion&&!detailController.signal.aborted)failure(pending,'No pudimos recuperar este Decision Case.',error,()=>{detailKey=null;load();});}
+ }
+ function refresh(){listKey=null;detailKey=null;load();}
+ function load(){if(!active)return;let next;try{next=readCenterResource(location.href);}catch(error){failure(portfolio,'No pudimos cargar Decision Center.',error,()=>window.DationDispatch.openDecisionCenter({}));cleanupDrawer();route={};drawerLayout();return;}
+  route=next;showNotice();const key=JSON.stringify([route.q,route.filter,route.dda,route.owner,route.offset]);if(listKey!==key){listKey=key;loadPortfolio();}else syncSelection();
+  if(!route.caseId){detailVersion++;detailController?.abort();detailKey=null;cleanupDrawer();drawerLayout();}else if(detailKey!==route.caseId){detailKey=route.caseId;loadDetail();}else{drawerLayout();historySync();}
+ }
+ function stop(){active=false;listVersion++;detailVersion++;listController?.abort();detailController?.abort();listKey=detailKey=null;actions.close();cleanupPortfolio();cleanupDrawer();drawerLayout();}
+ function onView(){if(window.dationGetCurrentView?.()==='platform-decisions'){active=true;load();}else stop();}
+ scope.listen(window,'dation:view',onView);scope.listen(window,'pagehide',stop);scope.listen(window,'dation:identity',()=>{if(active){actions.close();refresh();}});scope.listen(wide,'change',drawerLayout);
+ scope.listen(sheet,'cancel',event=>{event.preventDefault();if(active&&route.caseId)closeCase();});
+ scope.listen(sheet,'click',event=>{if(event.target!==sheet)return;const rect=sheet.getBoundingClientRect();if(event.clientX<rect.left||event.clientX>rect.right||event.clientY<rect.top||event.clientY>rect.bottom)closeCase();});
+ scope.listen(root,'keydown',event=>{if(event.key==='Escape'&&wide.matches&&route.caseId&&!actions.isOpen&&!event.target.closest('[role=menu]')){event.preventDefault();closeCase();}});
+ onView();return {dispose(){stop();sheetView.dispose();actions.dispose();scope.dispose();}};
 }
