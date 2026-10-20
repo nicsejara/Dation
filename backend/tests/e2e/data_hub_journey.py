@@ -17,29 +17,44 @@ async def main():
   await page.goto(BASE+'/login');await page.get_by_label('Email',exact=True).fill('user-1@example.test');await page.get_by_label('Contraseña',exact=True).fill('dispatch-e2e-private');await page.get_by_role('button',name='Ingresar',exact=True).click()
   await page.locator('[data-platform-home] h1').wait_for()
   await page.locator('.nav [data-platform-view=platform-data]').click();root=page.locator('[data-platform-data]');await root.get_by_role('table').wait_for()
-  for width in (1440,1024,768,390):
-   await page.set_viewport_size({'width':width,'height':1000});probe=await page.evaluate(theme);assert not probe['overflow'] and not probe['failures'],probe
-   if artifacts:await page.screenshot(path=str(artifacts/f'library-{width}.png'),full_page=True)
-  await root.get_by_role('button',name='Data Packs',exact=True).click();await root.locator('a[href*="pack_orders_id="]').first.click();await root.get_by_role('heading',name='Datasets del Data Pack').wait_for()
-  await root.get_by_role('link',name='DC-'+os.environ['DATION_HUB_CASE'][:8]).click();await page.wait_for_function('window.DationDispatch?.getWorkspace().decisionCase?.persisted')
-  assert os.environ['DATION_HUB_CASE'] in page.url
-  await page.go_back();await root.get_by_role('heading',name='Datasets del Data Pack').wait_for()
-  await root.get_by_role('button',name='Reutilizar Data Pack',exact=True).click();await page.locator('.dispatch-upload-screen').wait_for()
-  state=await page.evaluate('window.DationDispatch.getWorkspace()');assert state['orders']['id']==os.environ['DATION_HUB_ORDERS'];assert not (state.get('decisionCase') or {}).get('persisted')
-  await page.locator('.nav [data-platform-view=platform-data]').click();await root.get_by_role('table').wait_for()
-  await root.get_by_role('button',name='Cargar datos',exact=True).first.click();dialog=page.get_by_role('dialog',name='Cargar datos',exact=True)
-  await dialog.locator('input[type=file]').set_input_files(str(INPUT))
-  await page.wait_for_url('**dataset_id=*');await root.get_by_role('heading',name='Información del dataset',exact=True).wait_for()
-  dataset=parse_qs(urlsplit(page.url).query)['dataset_id'][0];assert dataset!=os.environ['DATION_HUB_ORDERS']
-  await root.get_by_text('<img src=x onerror=window.__bad=1>',exact=True).wait_for();assert await root.locator('img').count()==0;assert await page.evaluate('window.__bad===undefined')
-  for width in (1440,1024,768,390):
-   await page.set_viewport_size({'width':width,'height':1000});probe=await page.evaluate(theme);assert not probe['overflow'] and not probe['failures'],probe
+  assert await root.get_by_role('button',name='Data Packs',exact=True).count()==0
+  assert await root.get_by_role('button',name='Cargar datos',exact=True).count()==0
+  await root.locator('[data-dataset-open="'+os.environ['DATION_HUB_ORDERS']+'"]').click()
+  await root.get_by_role('heading',name='Información del dataset',exact=True).wait_for()
+  await root.get_by_role('link',name='Ver Decision Case',exact=True).click()
+  await page.locator('[data-platform-decisions] .center-drawer:visible').get_by_role('heading',name='Cadena de decisiones').wait_for()
+  assert 'center_case_id='+os.environ['DATION_HUB_CASE'] in page.url
+  await page.go_back();await root.get_by_role('heading',name='Información del dataset',exact=True).wait_for()
+  await page.evaluate("window.dationNavigate('logistics-overview')")
+  await page.locator('[data-start-new-decision]').click()
+  await page.locator('[data-kind=orders] input[type=file]').set_input_files(str(INPUT))
+  await page.wait_for_function("window.DationDispatch.getWorkspace().orders?.original_filename==='datos ñ.csv'")
+  dataset=await page.evaluate('window.DationDispatch.getWorkspace().orders.id')
+  assert dataset!=os.environ['DATION_HUB_ORDERS']
+  await page.locator('.nav [data-platform-view=platform-data]').click()
+  await root.locator('[data-dataset-open="'+dataset+'"]').click()
+  await root.get_by_role('heading',name='Información del dataset',exact=True).wait_for()
+  for width in (1440,1280,1024,768,390):
+   await page.set_viewport_size({'width':width,'height':1000});await page.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))')
+   probe=await page.evaluate(theme);assert not probe['overflow'] and not probe['failures'],probe
    if artifacts:await page.screenshot(path=str(artifacts/f'dataset-{width}.png'),full_page=True)
-  async with page.expect_download() as pending:await root.get_by_role('link',name='Descargar CSV',exact=True).click()
+  await root.locator('summary',has_text='Vista previa').click()
+  await root.get_by_text('<img src=x onerror=window.__bad=1>',exact=True).wait_for();assert await root.locator('img[src=x]').count()==0;assert await page.evaluate('window.__bad===undefined')
+  drawer=root.locator('.hub-drawer:visible')
+  async with page.expect_download() as pending:await drawer.get_by_role('link',name='Descargar',exact=True).click()
   saved=await pending.value;assert Path(await saved.path()).read_bytes()==INPUT.read_bytes()
-  await root.get_by_role('button',name='Archivar',exact=True).click();await page.get_by_role('dialog').get_by_role('button',name='Archivar dataset',exact=True).click();await root.get_by_role('button',name='Restaurar',exact=True).wait_for()
-  await root.get_by_role('button',name='Eliminar definitivamente',exact=True).click();await page.get_by_role('dialog').get_by_role('button',name='Eliminar definitivamente',exact=True).click();await root.get_by_role('heading',name='No encontramos resultados').wait_for()
-  await page.reload();await root.get_by_role('heading',name='No encontramos resultados').wait_for();assert errors==[],errors
+  async def menu(label):
+   await drawer.get_by_role('button',name='Acciones de ',exact=False).click()
+   await drawer.get_by_role('menuitem',name=label,exact=True).click()
+  await menu('Archivar');await page.get_by_role('dialog',name='Archivar dataset',exact=True).get_by_role('button',name='Archivar dataset',exact=True).click()
+  await drawer.get_by_text('Archivado',exact=True).first.wait_for()
+  await menu('Restaurar');await page.get_by_role('dialog',name='Restaurar dataset',exact=True).get_by_role('button',name='Restaurar dataset',exact=True).click()
+  await drawer.get_by_text('Activo',exact=True).first.wait_for()
+  await menu('Archivar');await page.get_by_role('dialog',name='Archivar dataset',exact=True).get_by_role('button',name='Archivar dataset',exact=True).click()
+  await drawer.get_by_text('Archivado',exact=True).first.wait_for()
+  await menu('Eliminar definitivamente');await page.get_by_role('dialog',name='Eliminar definitivamente',exact=True).get_by_role('button',name='Eliminar definitivamente',exact=True).click()
+  await page.wait_for_function("!new URL(location.href).searchParams.has('dataset_id')")
+  await page.reload();await root.get_by_role('table').wait_for();assert errors==[],errors
   await browser.close()
- print(json.dumps({'passed':True,'upload':True,'preview':True,'download_bytes':True,'pack_reuse':True,'safe_delete':True,'viewports':[1440,1024,768,390]}))
+ print(json.dumps({'passed':True,'dda_upload':True,'preview':True,'download_bytes':True,'decision_center_lineage':True,'safe_delete':True,'restore':True,'viewports':[1440,1280,1024,768,390]}))
 asyncio.run(main())

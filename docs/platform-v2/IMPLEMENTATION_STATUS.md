@@ -7,7 +7,7 @@ Fuentes: MASTER_PLAN_DATION_V2.md, CAMBIOS_HOME.md, CAMBIOS_DESICION_CENTER.md (
 | 0 | Completada | Context reconciliation + delta audit sobre main `9f9a558`; CI verde y 24 contratos Node aprobados |
 | 1 | Implementada; evidencia de publicación en [PR #86](https://github.com/nicsejara/Dation/pull/86) | [Shared Foundation](01-shared-foundation.md): navegación, metadata, contexto y responsabilidades múltiples compatibles |
 | 2 | Implementada | [Decision Center V2](02-decision-center.md): portfolio global, drawer contextual, responsabilidades y navegación exacta |
-| 3 | Pendiente | Data Hub V2 |
+| 3 | Implementada | [Data Hub V2](03-data-hub.md): biblioteca de datasets, resumen global, drawer, trazabilidad y gobierno |
 | 4 | Pendiente | Home V2 |
 | 5 | Pendiente | Integración transversal, selectores/gates, switcher, handoff y Team/Auth |
 | 6 | Pendiente | Golden E2E + regresión |

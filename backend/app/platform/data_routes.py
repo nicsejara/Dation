@@ -30,8 +30,15 @@ async def csv_contents(file):
 
 @router.get('/datasets')
 async def datasets(filter:Literal['all','orders','fleet','validated','issues','archived']='all',
+ type:Literal['all','orders','fleet','logistics_legacy']='all',
+ validation:Literal['all','validated','issues','unknown']='all',state:Literal['active','archived','all']='active',
  q:str=Query('',max_length=120),limit:int=Query(25,ge=1,le=50),offset:int=Query(0,ge=0,le=1000000),ctx=Depends(require_upload_access)):
-    return await hub.snapshot(ctx,filter_name=filter,search_text=q.strip(),page_limit=limit,page_offset=offset)
+    # Preserve legacy filter callers; explicit dimensions compose in V2.
+    if filter in ('orders','fleet') and type=='all':type=filter
+    if filter in ('validated','issues') and validation=='all':validation=filter
+    if filter=='archived':state='archived'
+    return await hub.library(ctx,dataset_type=type,validation_state=validation,lifecycle_state=state,
+        search_text=q.strip(),page_limit=limit,page_offset=offset)
 
 @router.get('/contracts')
 async def contracts():return {'formats':public_contracts()}
@@ -57,12 +64,12 @@ async def discard_upload(operation_id:UUID,ctx=Depends(require_upload_access)):
     return await hub.discard_upload(ctx,operation_id)
 
 @router.get('/datasets/{dataset_id}/preview')
-async def preview(dataset_id:UUID,limit:int=Query(25,ge=1,le=50),offset:int=Query(0,ge=0,le=1000000)):
-    return await guarded(hub.preview(dataset_id,limit,offset))
+async def preview(dataset_id:UUID,limit:int=Query(25,ge=1,le=50),offset:int=Query(0,ge=0,le=1000000),ctx=Depends(require_upload_access)):
+    return await guarded(hub.preview(ctx,dataset_id,limit,offset))
 
 @router.get('/datasets/{dataset_id}/download')
-async def download(dataset_id:UUID):
-    row=await hub.active_dataset(dataset_id)
+async def download(dataset_id:UUID,ctx=Depends(require_upload_access)):
+    row=await hub.active_dataset(ctx,dataset_id)
     contents=await guarded(download_dataset(row))
     filename=PurePosixPath((row.get('original_filename') or 'datos.csv').replace('\\','/')).name
     return Response(contents,media_type='text/csv; charset=utf-8',headers={
@@ -73,11 +80,13 @@ async def reuse(dataset_id:UUID,ctx=Depends(require_upload_access)):
     return await guarded(hub.reuse(ctx,dataset_id=dataset_id))
 
 @router.post('/datasets/{dataset_id}/archive')
-async def archive(dataset_id:UUID):
+async def archive(dataset_id:UUID,ctx=Depends(require_upload_access)):
+    await hub.active_dataset(ctx,dataset_id)
     await guarded(dispatch.archive_dataset(str(dataset_id),True));return {'archived':True}
 
 @router.post('/datasets/{dataset_id}/unarchive')
-async def unarchive(dataset_id:UUID):
+async def unarchive(dataset_id:UUID,ctx=Depends(require_upload_access)):
+    await hub.active_dataset(ctx,dataset_id)
     await guarded(dispatch.archive_dataset(str(dataset_id),False));return {'archived':False}
 
 @router.delete('/datasets/{dataset_id}')
