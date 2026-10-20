@@ -189,12 +189,13 @@ class DataHubTests(unittest.TestCase):
   for query in ['type=bad','validation=bad','state=bad']:
    self.assertEqual(self.a.get('/api/platform/data/datasets?'+query).status_code,422)
 
-  replacement=self.checked(self.a.post('/api/platform/data/datasets/upload',params={'dataset_type':'orders'},files={'file':('version.csv',csv_input('orders')+b'\n','text/csv')}))['dataset']
-  self.s.sql(f"INSERT INTO decision_runs(id,workspace_id,dataset_id,orders_dataset_id,fleet_dataset_id,decision_case_id,node_id,status,engine_name,engine_version,result_json) VALUES('{uuid4()}','{self.s.workspace_a}','{orders['id']}','{orders['id']}','{fleet['id']}','{case}','logistics_assignment','completed','historical-test','1','{{}}'); UPDATE decision_cases SET orders_dataset_id='{replacement['id']}' WHERE id='{case}';")
-  self.assertEqual(self.detail(orders)['case_total'],1)
-  self.assertEqual(self.detail(orders)['used_in'][0]['id'],case)
+  historical=self.checked(self.a.post('/api/platform/data/datasets/upload',params={'dataset_type':'orders'},files={'file':('historico.csv',csv_input('orders')+b'\n','text/csv')}))['dataset']
+  # Historical run input is a canonical relation independent of the immutable Case pack.
+  self.s.sql(f"INSERT INTO decision_runs(id,workspace_id,dataset_id,orders_dataset_id,fleet_dataset_id,decision_case_id,node_id,status,engine_name,engine_version,result_json) VALUES('{uuid4()}','{self.s.workspace_a}','{historical['id']}','{orders['id']}','{fleet['id']}','{case}','logistics_assignment','completed','historical-test','1','{{}}');")
+  self.assertEqual(self.detail(historical)['case_total'],1)
+  self.assertEqual(self.detail(historical)['used_in'][0]['id'],case)
   page=self.checked(self.a.get('/api/platform/data/datasets?state=all&type=orders'))
-  self.assertEqual(next(d for d in page['items'] if d['id']==orders['id'])['case_count'],1)
+  self.assertEqual(next(d for d in page['items'] if d['id']==historical['id'])['case_count'],1)
 
  def test_10_lost_committed_upload_response_preserves_metadata_and_bytes(self):
   (self.s.storage/'fail-next-dataset-response').touch()
