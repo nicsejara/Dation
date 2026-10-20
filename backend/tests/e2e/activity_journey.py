@@ -16,15 +16,19 @@ async def main():
   home=page.locator('[data-platform-home]');await home.locator('.platform-activity__event').first.wait_for();assert await home.locator('.platform-activity__event').count()==5
   assert await home.locator('.platform-activity__event img').count()==0;assert '<img' in await home.locator('.platform-activity__event').first.inner_text();assert await page.evaluate('window.__bad===undefined')
   for width in (1440,1024,768,390):
-   await page.set_viewport_size({'width':width,'height':1000});audit=await page.evaluate(theme);assert not audit['overflow'] and not audit['failures'],audit
+   await page.set_viewport_size({'width':width,'height':1000});await page.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))');audit=await page.evaluate(theme);audit['width']=width
+   if audit['overflow']:audit['outside']=await page.evaluate("[...document.querySelectorAll('body *')].filter(n=>n.getClientRects().length&&n.getBoundingClientRect().right>innerWidth+1).slice(0,20).map(n=>({tag:n.tagName,cls:n.className,right:n.getBoundingClientRect().right,width:n.getBoundingClientRect().width}))")
+   assert not audit['overflow'] and not audit['failures'],audit
    if artifacts:await page.screenshot(path=str(artifacts/f'home-{width}.png'),full_page=True)
-  await home.get_by_role('link',name='Ver caso',exact=True).first.click();root=page.locator('[data-platform-decisions]');await root.get_by_role('heading',name='Decisiones del caso',exact=True).wait_for();assert 'center_case_id='+CASE in page.url
-  panel=root.locator('[data-case-activity]');await panel.locator('summary').first.focus();await page.keyboard.press('Enter');await panel.locator('.platform-activity__event').first.wait_for();assert await panel.locator('.platform-activity__event').count()==10
+  await home.get_by_role('link',name='Ver caso',exact=True).first.click();root=page.locator('[data-platform-decisions]');await root.get_by_role('heading',name='Cadena de decisiones',exact=True).wait_for();assert 'center_case_id='+CASE in page.url
+  panel=root.locator('[data-case-activity]');await panel.locator('.platform-activity__event').first.wait_for();assert await panel.locator('.platform-activity__event').count()==5;await panel.get_by_role('button',name='Ver toda la actividad',exact=True).click();await page.wait_for_function("document.querySelectorAll('[data-case-activity] [data-activity-id]').length===10")
   await panel.get_by_role('button',name='Ver más actividad',exact=True).click();await page.wait_for_function("document.querySelectorAll('[data-case-activity] [data-activity-id]').length>10")
   ids=await panel.locator('[data-activity-id]').evaluate_all('nodes=>nodes.map(n=>n.dataset.activityId)');assert len(ids)==len(set(ids))
   await panel.get_by_text('Detalles del evento',exact=True).first.click();assert await panel.locator('pre').first.is_visible()
   for width in (1440,1024,768,390):
-   await page.set_viewport_size({'width':width,'height':1000});audit=await page.evaluate(theme);assert not audit['overflow'] and not audit['failures'],audit
+   await page.set_viewport_size({'width':width,'height':1000});await page.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))');audit=await page.evaluate(theme);audit['width']=width
+   if audit['overflow']:audit['outside']=await page.evaluate("[...document.querySelectorAll('body *')].filter(n=>n.getClientRects().length&&n.getBoundingClientRect().right>innerWidth+1).slice(0,20).map(n=>({tag:n.tagName,cls:n.className,right:n.getBoundingClientRect().right,width:n.getBoundingClientRect().width}))")
+   assert not audit['overflow'] and not audit['failures'],audit
    if artifacts:await page.screenshot(path=str(artifacts/f'case-{width}.png'),full_page=True)
   failed=False
   async def fail_once(route):
@@ -32,7 +36,7 @@ async def main():
    if not failed:failed=True;await route.fulfill(status=503,content_type='application/json',body='{"detail":"Network fault"}')
    else:await route.continue_()
   await context.route('**/api/platform/activity?**',fail_once)
-  await panel.locator('summary').first.click();await panel.locator('summary').first.click();await panel.get_by_role('button',name='Reintentar actividad',exact=True).click();await panel.locator('.platform-activity__event').first.wait_for();assert failed
+  await panel.get_by_role('button',name='Ver toda la actividad',exact=True).click();await panel.get_by_role('button',name='Reintentar actividad',exact=True).click();await panel.locator('.platform-activity__event').first.wait_for();assert failed
   await page.evaluate("p=>window.DationDispatch.openRun(p.run,'logistics_assignment',p.case)",{'run':RUN,'case':CASE});await page.locator('.assignment-dashboard-v2').wait_for()
   for format in ('csv','json'):
    await page.locator('[data-export-menu] summary').click()

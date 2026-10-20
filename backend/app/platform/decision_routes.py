@@ -5,6 +5,7 @@ from pydantic import AwareDatetime,BaseModel,ConfigDict,Field,field_validator,mo
 from app.auth import require_upload_access
 from app.platform import decision_center as center
 from app.platform.identity import platform_call
+from app.platform.foundation import REGISTRY
 
 router=APIRouter(prefix='/decisions')
 Node=Literal['logistics_assignment','logistics_scheduling','logistics_final_assignment']
@@ -30,9 +31,12 @@ async def assign_responsibility(case_id:UUID,stage_key:Stage,payload:StageAssign
         'new_approver_user_id':str(payload.approver_user_id) if payload.approver_user_id else None})
 
 @router.get('')
-async def cases(filter:Literal['all','in_progress','review','completed','archived']='all',q:str=Query('',max_length=120),
- dda:Literal['all','logistics']='all',limit:int=Query(25,ge=1,le=50),offset:int=Query(0,ge=0,le=1000000),ctx=Depends(require_upload_access)):
-    return await center.listing(ctx,filter_name=filter,search_text=q.strip(),dda=dda,page_limit=limit,page_offset=offset)
+async def cases(filter:Literal['all','in_progress','review','pending_approval','approved','completed','archived']='all',q:str=Query('',max_length=120),
+ dda:str=Query('all',max_length=48),owner:UUID|Literal['all','me','unassigned']='all',limit:int=Query(25,ge=1,le=50),offset:int=Query(0,ge=0,le=1000000),ctx=Depends(require_upload_access)):
+    if dda not in {'all',*(d['id'] for d in REGISTRY['ddas'])}:
+        from fastapi import HTTPException
+        raise HTTPException(422,'El DDA del filtro no es válido.')
+    return await center.listing(ctx,filter_name=filter,search_text=q.strip(),dda=dda,owner_filter=str(owner),page_limit=limit,page_offset=offset)
 
 @router.get('/{case_id}')
 async def detail(case_id:UUID,ctx=Depends(require_upload_access)):return await center.detail(ctx,case_id)

@@ -304,6 +304,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         nodes=[]
         for key,label,flag in [('logistics_assignment','Asignación de carga','available'),('logistics_scheduling','Planificación de despachos','locked'),('logistics_final_assignment','Asignación de vehículos','coming_soon')]:
             nodes.append({'id':key,'label':label,'status':flag,'owner':None,'approver':None,'run_count':1 if key=='logistics_assignment' else 0,'latest_run':None,'approved_run':None,'approval_current':False,'target':None if key=='logistics_final_assignment' else {'view':'logistics-config' if flag=='available' else 'logistics-map','node_id':key,'run_id':None}})
+        row.update(current_objective=None,display_status=row['status'])
         detail={**row,'orders':self.f['datasets']['orders'],'fleet':self.f['datasets']['fleet'],'nodes':nodes}
         if self.center_failure:status,data=503,{'detail':'Decision Center no está disponible.'}
         elif method=='PATCH':
@@ -318,7 +319,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         elif path==prefix:
             term=query.get('q',[''])[0].lower();kind=query.get('filter',['all'])[0]
             match=bool(self.center_archived)==(kind=='archived') and kind not in ('completed','review') and (not term or term in (self.center_label or '').lower() or term in row['id'].lower())
-            data={'items':[row] if match else [],'total':int(match),'limit':25,'offset':0}
+            data={'items':[row] if match else [],'total':int(match),'limit':25,'offset':0,'summary':getattr(self,'center_summary',{'active_cases':int(not self.center_archived),'in_review':0,'pending_approval':0,'approved':0}),'dda_options':['logistics'],'owner_options':[]}
         else:data=detail
         await route.fulfill(status=status,content_type='application/json',body=json.dumps(data))
 
@@ -3789,64 +3790,68 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await root.get_by_role('button',name='Buscar',exact=True).click()
         await self.page.wait_for_url('**center_q=Semana+43*')
         await root.get_by_role('link',name='Abrir',exact=True).click()
-        await root.get_by_role('heading',name='Decisiones del caso',exact=True).wait_for()
-        self.assertEqual(await root.locator('img').count(),0)
+        await root.get_by_role('heading',name='Cadena de decisiones',exact=True).wait_for()
+        self.assertEqual(await root.locator('img[src=x]').count(),0)
         self.assertTrue(await self.page.evaluate('window.__bad===undefined'))
         node=root.locator('[data-center-node=logistics_assignment]')
         await node.locator('summary',has_text='Historial de corridas').click()
-        await node.get_by_role('table').wait_for()
-        await self.page.reload();await node.get_by_role('table').wait_for()
-        await root.get_by_role('button',name='Editar nombre',exact=True).click()
+        await node.locator('.center-run-list').wait_for()
+        await self.page.reload();await node.locator('.center-run-list').wait_for()
+        await root.locator('.center-drawer:visible').get_by_role('button',name='Acciones de '+('DC-'+self.case['id'][:8].upper()),exact=True).click()
+        await root.get_by_role('menuitem',name='Editar nombre',exact=True).click()
         dialog=self.page.get_by_role('dialog');await dialog.get_by_label('Etiqueta opcional').fill('Semana 44')
         await dialog.get_by_role('button',name='Guardar',exact=True).click()
         await root.get_by_role('heading',name='Semana 44',exact=True).wait_for()
-        await root.get_by_role('button',name='Archivar',exact=True).click()
+        await root.locator('.center-drawer:visible').get_by_role('button',name='Acciones de '+('DC-'+self.case['id'][:8].upper()),exact=True).click()
+        await root.get_by_role('menuitem',name='Archivar',exact=True).click()
         await self.page.get_by_role('dialog').get_by_role('button',name='Archivar',exact=True).click()
-        await root.get_by_role('button',name='Restaurar',exact=True).wait_for()
+        await root.locator('.center-drawer:visible .center-status[data-state=archived]').wait_for()
+        await root.locator('.center-drawer:visible').get_by_role('button',name='Acciones de '+('DC-'+self.case['id'][:8].upper()),exact=True).wait_for()
         self.assertEqual(await root.get_by_role('link',name='Continuar',exact=True).get_attribute('aria-disabled'),'true')
-        await root.get_by_role('button',name='Restaurar',exact=True).click()
+        await root.locator('.center-drawer:visible').get_by_role('button',name='Acciones de '+('DC-'+self.case['id'][:8].upper()),exact=True).click()
+        await root.get_by_role('menuitem',name='Restaurar',exact=True).click()
         await self.page.get_by_role('dialog').get_by_role('button',name='Restaurar',exact=True).click()
-        await root.get_by_role('button',name='Archivar',exact=True).wait_for()
-        await root.get_by_role('link',name='← Volver a Decision Center',exact=True).click()
+        await root.locator('.center-drawer:visible').get_by_role('button',name='Acciones de '+('DC-'+self.case['id'][:8].upper()),exact=True).wait_for()
+        await root.get_by_role('button',name='Cerrar detalle del caso',exact=True).click()
         self.assertIn('center_q=Semana+43',self.page.url)
-        await root.get_by_role('heading',name='No encontramos casos',exact=True).wait_for()
+        await root.get_by_role('heading',name='No encontramos Decision Cases con estos filtros.',exact=True).wait_for()
         self.assertEqual(self.center_edits,3)
 
     async def test_decision_center_failures_readonly_conflict_and_global_recovery(self):
         self.center_failure=True
         await self.open('logistics-map');await self.nav('platform-decisions')
         root=self.page.locator('[data-platform-decisions]')
-        await root.get_by_role('heading',name='No se pudo abrir Decision Center',exact=True).wait_for()
+        await root.get_by_role('heading',name='No pudimos cargar Decision Center.',exact=True).wait_for()
         self.center_failure=False;await root.get_by_role('button',name='Reintentar',exact=True).click()
         await root.get_by_role('link',name='Abrir',exact=True).click()
-        await root.get_by_role('heading',name='Decisiones del caso',exact=True).wait_for()
+        await root.get_by_role('heading',name='Cadena de decisiones',exact=True).wait_for()
         self.center_conflict=True
-        await root.get_by_role('button',name='Editar nombre',exact=True).click()
+        await root.locator('.center-drawer:visible').get_by_role('button',name='Acciones de '+('DC-'+self.case['id'][:8].upper()),exact=True).click()
+        await root.get_by_role('menuitem',name='Editar nombre',exact=True).click()
         dialog=self.page.get_by_role('dialog');await dialog.get_by_label('Etiqueta opcional').fill('Nuevo')
         await dialog.get_by_role('button',name='Guardar',exact=True).click()
         await dialog.get_by_role('alert').filter(has_text='El caso cambió').wait_for()
         self.assertEqual(self.center_edits,0)
         await self.page.keyboard.press('Escape')
-        await root.get_by_role('button',name='Editar nombre',exact=True).focus()
+        await root.get_by_role('button',name='Cerrar detalle del caso',exact=True).focus()
         await self.nav('platform-home');self.access_role='viewer';self.ddas[0]['status']='disabled'
         await self.page.reload();await self.page.locator('[data-platform-home] h1').wait_for()
         await self.nav('platform-decisions');await root.get_by_role('link',name='Abrir',exact=True).click()
-        await root.get_by_role('heading',name='Decisiones del caso',exact=True).wait_for()
+        await root.get_by_role('heading',name='Cadena de decisiones',exact=True).wait_for()
         self.assertEqual(await root.get_by_role('button',name='Editar nombre',exact=True).count(),0)
         self.assertEqual(await root.get_by_role('link',name='Continuar',exact=True).get_attribute('aria-disabled'),'true')
         await self.page.goto(f'http://127.0.0.1:{self.port}/app/decisions?center_case_id=broken')
-        await root.get_by_role('heading',name='No se pudo abrir Decision Center',exact=True).wait_for()
-        await root.get_by_role('link',name='Volver al listado',exact=True).click()
+        await root.get_by_role('heading',name='No pudimos cargar Decision Center.',exact=True).wait_for()
+        await root.get_by_role('button',name='Reintentar',exact=True).click()
         await root.get_by_role('table').wait_for()
         self.assertEqual(sum(method=='PATCH' and path.startswith('/api/platform/decisions') for method,path in self.requests),1)
 
 
 
     async def test_activity_case_late_response_is_disposed_after_navigation(self):
+        self.activity_gate=asyncio.Event()
         await self.page.goto(f"http://127.0.0.1:{self.port}/app/decisions?center_case_id={self.case['id']}")
         root=self.page.locator('[data-platform-decisions]');panel=root.locator('[data-case-activity]')
-        await panel.locator('summary').first.wait_for();self.activity_gate=asyncio.Event()
-        await panel.locator('summary').first.click()
         await self.page.wait_for_function("document.querySelector('[data-case-activity] .platform-activity')?.getAttribute('aria-busy')==='true'")
         for _ in range(100):
             if ('GET','/api/platform/activity') in self.requests:break
@@ -3858,8 +3863,66 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(await panel.locator('.platform-activity [role=status]').inner_text(),'Cargando actividad…')
         self.delay['/api/platform/activity']=.01
         await self.page.evaluate("id=>window.DationDispatch.openDecisionCenter({caseId:id})",self.case['id'])
-        await panel.locator('summary').first.wait_for();await panel.locator('summary').first.click();await panel.get_by_text('Todavía no hay eventos registrados. Las nuevas acciones aparecerán acá.',exact=True).wait_for()
+        await panel.get_by_text('Todavía no hay eventos registrados. Las nuevas acciones aparecerán acá.',exact=True).wait_for()
         self.assertEqual(len([r for r in self.requests if r==('GET','/api/platform/activity')]),2)
+
+    async def test_center_v2_kpis_and_docked_or_modal_drawer_preserve_portfolio(self):
+        self.center_label='Semana 43 · Centro'
+        self.center_summary={'active_cases':42,'in_review':8,'pending_approval':3,'approved':17}
+        await self.open('logistics-map');await self.nav('platform-decisions')
+        root=self.page.locator('[data-platform-decisions]')
+        await root.get_by_role('table').wait_for()
+        self.assertEqual(await root.get_by_role('heading',name='Decision Center',exact=True).count(),1)
+        self.assertEqual(await root.locator('[data-kpi=active_cases] strong').inner_text(),'42')
+        await root.get_by_role('button',name='Ver pendientes',exact=True).click()
+        await self.page.wait_for_url('**center_filter=pending_approval*')
+        await root.get_by_role('button',name='Limpiar filtros',exact=True).click()
+        await self.page.wait_for_url('**center_filter=all*')
+        await root.get_by_role('link',name='Abrir',exact=True).click()
+        await root.get_by_role('heading',name='Cadena de decisiones',exact=True).wait_for()
+        self.assertEqual(await root.locator('tr[aria-selected=true]').count(),1)
+        requests_before=sum(r==('GET','/api/platform/decisions') for r in self.requests)
+        artifacts=Path('/workspace/dation-audit/platform-v2-phase2/visual') if Path('/workspace/dation-audit/platform-v2-phase2').exists() else None
+        if artifacts:artifacts.mkdir(exist_ok=True)
+        for width in (1440,1280,1024,768,390):
+            await self.page.set_viewport_size({'width':width,'height':1000})
+            await self.page.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))')
+            panel=root.locator('[data-center-drawer]' if width>=1100 else '[data-center-sheet]')
+            await panel.wait_for()
+            audit=await self.page.evaluate((ROOT/'tests/browser/theme_audit.js').read_text())
+            self.assertFalse(audit['overflow']);self.assertEqual(audit['failures'],[])
+            self.assertEqual(await root.get_by_role('table').count(),1)
+            if width>=1100:self.assertFalse(await root.locator('[data-center-sheet]').evaluate('n=>n.open'))
+            else:
+                self.assertTrue(await panel.evaluate('n=>n.open'))
+                await panel.get_by_role('button',name='Cerrar detalle del caso').focus()
+                await self.page.keyboard.press('Shift+Tab')
+                self.assertTrue(await panel.evaluate('n=>n.contains(document.activeElement)'))
+            if artifacts:
+                await panel.get_by_role('button',name='Cerrar detalle del caso').focus()
+                await panel.evaluate('n=>n.scrollTop=0')
+                await self.page.screenshot(path=str(artifacts/f'drawer-{width}.png'),full_page=True)
+        await self.page.keyboard.press('Escape')
+        await self.page.wait_for_function("!new URL(location.href).searchParams.has('center_case_id')")
+        await self.page.go_back()
+        await root.get_by_role('heading',name='Cadena de decisiones',exact=True).wait_for()
+        await self.page.reload()
+        await root.get_by_role('heading',name='Cadena de decisiones',exact=True).wait_for()
+        self.assertIn('center_case_id='+self.case['id'],self.page.url)
+        self.assertGreaterEqual(sum(r==('GET','/api/platform/decisions') for r in self.requests),requests_before)
+        self.assertFalse(any(method in ('POST','PUT','PATCH','DELETE') and path.startswith('/api/platform/decisions') for method,path in self.requests))
+
+    async def test_center_v2_late_detail_does_not_reopen_closed_drawer(self):
+        await self.open('logistics-map');await self.nav('platform-decisions')
+        root=self.page.locator('[data-platform-decisions]');await root.get_by_role('table').wait_for()
+        self.delay['/api/platform/decisions/'+self.case['id']]=.5
+        await root.get_by_role('link',name='Abrir',exact=True).click()
+        await root.get_by_role('button',name='Cerrar detalle del caso').click()
+        await self.page.wait_for_timeout(700)
+        self.assertNotIn('center_case_id',self.page.url)
+        self.assertFalse(await root.locator('[data-center-drawer]').is_visible())
+        self.assertEqual(await root.get_by_role('heading',name='Cadena de decisiones',exact=True).count(),0)
+        self.assertEqual(await root.get_by_role('table').count(),1)
 
     async def test_onboarding_guide_is_personal_and_viewer_cannot_prepare_demo(self):
         self.access_role='viewer'

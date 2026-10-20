@@ -114,3 +114,52 @@ class DecisionCenterTests(unittest.TestCase):
   result=subprocess.run([str(root/'.browser-venv/bin/python'),str(root/'tests/e2e/decision_center_journey.py')],cwd=root,
    env={**self.s.env,'DATION_E2E_URL':self.s.api_url,'DATION_CENTER_CASE':case,'DATION_CENTER_ASSIGNMENT':assignment,'DATION_CENTER_SCHEDULING':scheduling},capture_output=True,text=True,timeout=150)
   self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+
+ def test_04_portfolio_summary_is_global_actionable_and_read_only(self):
+  case,orders,fleet=self.case()
+  for _ in range(26):self.checked(self.a.post('/api/decision-cases',json={'id':str(uuid4()),'orders_dataset_id':orders['id'],'fleet_dataset_id':fleet['id']}))
+  def portfolio(client=None,**params):return self.checked((client or self.a).get('/api/platform/decisions',params={'limit':1,**params}))
+  initial=portfolio();self.assertEqual(initial['summary'],{'active_cases':27,'in_review':0,'pending_approval':0,'approved':0});self.assertEqual(len(initial['items']),1)
+  self.s.start_worker();run=self.admit(self.body(case,orders,fleet));self.finish(run)
+  summary=portfolio()['summary'];self.assertEqual(summary,{'active_cases':27,'in_review':1,'pending_approval':1,'approved':0})
+  self.assertEqual(portfolio(q='does-not-exist')['summary'],summary);self.assertEqual(portfolio(offset=27)['summary'],summary)
+  self.assertEqual(portfolio(dda='production')['total'],0);self.assertEqual(portfolio(dda='production')['summary'],summary)
+  self.assertEqual(portfolio(filter='pending_approval')['total'],1)
+  with httpx.Client(base_url=self.s.api_url,headers={'Authorization':'Bearer '+self.s.user_tokens[VIEWER]},trust_env=False) as viewer:
+   result=portfolio(viewer);self.assertEqual(result['summary']['in_review'],1);self.assertEqual(result['summary']['pending_approval'],0);self.assertEqual(portfolio(viewer,filter='pending_approval')['total'],0)
+  member=next(m for m in self.checked(self.a.get('/api/platform/team'))['members'] if m['user_id']==USER_A)
+  self.checked(self.a.patch('/api/platform/team/members/'+USER_A+'/responsibilities',json={'expected_updated_at':member['updated_at'],'business_roles':['data_owner','decision_owner','approver']}))
+  self.checked(self.a.put('/api/platform/decisions/'+case+'/responsibilities/data_preparation',json={'expected_updated_at':None,'owner_user_id':USER_A}))
+  self.assertEqual(portfolio(owner='me')['total'],1);self.assertEqual(portfolio(owner=USER_A)['total'],1);self.assertEqual(portfolio(owner='unassigned')['total'],26);self.assertEqual(portfolio(owner=USER_B)['total'],0)
+  detail=self.center(case);self.assertEqual(detail['responsibilities']['stages']['data_preparation']['owner']['id'],USER_A)
+  self.assertEqual(detail['current_objective']['id'],'balanced');self.assertEqual(detail['current_objective']['source'],'latest_run')
+  download=self.a.get('/api/platform/data/datasets/'+orders['id']+'/download');self.assertEqual(download.status_code,200);self.assertIn('attachment;',download.headers['content-disposition'])
+  before=self.s.sql("SELECT md5(string_agg(to_jsonb(t)::text,'' ORDER BY id)) FROM audit_events t;")
+  portfolio();self.center(case);self.assertEqual(self.s.sql("SELECT md5(string_agg(to_jsonb(t)::text,'' ORDER BY id)) FROM audit_events t;"),before)
+  self.s.sql(f"UPDATE workspace_ddas SET status='disabled' WHERE workspace_id='{self.s.workspace_a}' AND dda_id='logistics';")
+  try:self.assertEqual(portfolio()['summary']['pending_approval'],0);self.assertEqual(portfolio()['summary']['in_review'],1)
+  finally:self.s.sql(f"UPDATE workspace_ddas SET status='enabled' WHERE workspace_id='{self.s.workspace_a}' AND dda_id='logistics';")
+  self.approve(run,case);self.assertEqual(portfolio()['summary']['approved'],1)
+  d2=self.admit(self.body(case,orders,fleet,'logistics_scheduling',run));self.finish(d2);self.approve(d2,case,'logistics_scheduling')
+  result=portfolio();self.assertEqual(result['summary']['active_cases'],26);self.assertEqual(result['summary']['approved'],2)
+  replacement_body=self.body(case,orders,fleet);replacement_body['configuration']={'mode':'preset','objective':'min_cost','dimensions':['trips','cost','own_fleet','co2']}
+  replacement=self.admit(replacement_body);self.finish(replacement);detail=self.center(case)
+  self.assertEqual(detail['current_objective']['id'],'balanced');self.assertEqual(detail['current_objective']['run_id'],run)
+  self.assertEqual(detail['nodes'][0]['latest_objective']['id'],'min_cost');self.assertEqual(detail['nodes'][0]['latest_run']['id'],replacement)
+  result=portfolio();self.assertEqual(result['summary'],{'active_cases':27,'in_review':1,'pending_approval':1,'approved':2})
+  self.approve(replacement,case);self.assertEqual(portfolio()['summary']['approved'],1);self.assertFalse(self.center(case)['nodes'][1]['approval_current'])
+  self.checked(self.a.patch('/api/platform/decisions/'+case,json={'expected_updated_at':self.center(case)['updated_at'],'archived':True}))
+  self.assertEqual(portfolio()['summary'],{'active_cases':26,'in_review':0,'pending_approval':0,'approved':0})
+  for credential in [self.s.anon_token,self.s.user_tokens[USER_A]]:
+   self.assertIn(self.s.http.post(self.s.rest_url+'/rpc/platform_decision_portfolio',headers={'Authorization':'Bearer '+credential},json={'target_workspace_id':self.s.workspace_a,'actor_user_id':USER_A}).status_code,(401,403))
+  self.assertEqual(self.s.db.post('rpc/platform_decision_portfolio',json={'target_workspace_id':self.s.workspace_a,'actor_user_id':USER_B}).status_code,403)
+
+ def test_05_portfolio_five_thousand_cases_remains_bounded(self):
+  case,orders,fleet=self.case()
+  # Synthetic rows exist only in the owned disposable stack; preserve real foreign keys and triggers.
+  self.s.sql(f"INSERT INTO decision_cases(id,workspace_id,domain,orders_dataset_id,fleet_dataset_id,input_signature,state_json,status) SELECT gen_random_uuid(),workspace_id,domain,orders_dataset_id,fleet_dataset_id,input_signature,'{{}}'::jsonb,'active' FROM decision_cases c CROSS JOIN generate_series(1,4999) WHERE c.id='{case}';")
+  import time
+  started=time.monotonic();result=self.checked(self.a.get('/api/platform/decisions?limit=25'));elapsed=time.monotonic()-started
+  self.assertEqual(result['total'],5000);self.assertEqual(result['summary']['active_cases'],5000);self.assertEqual(len(result['items']),25)
+  self.assertLess(len(json.dumps(result)),100000);self.assertLess(elapsed,12,'Portfolio exceeded the existing service timeout budget')
+  second=self.checked(self.a.get('/api/platform/decisions?limit=25&offset=25'));self.assertTrue(set(x['id'] for x in result['items']).isdisjoint(x['id'] for x in second['items']))

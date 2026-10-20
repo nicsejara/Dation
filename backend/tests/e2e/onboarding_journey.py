@@ -18,7 +18,10 @@ async def main():
    await page.set_viewport_size({'width':width,'height':1000});await page.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))');audit=await page.evaluate(theme);assert not audit['overflow'] and not audit['failures'],audit
    if artifacts:await page.screenshot(path=str(artifacts/f'welcome-{width}.png'),full_page=True)
   await page.set_viewport_size({'width':1440,'height':1000});await page.locator('.nav [data-platform-view=platform-team]').click();await page.locator('[data-team-empty]').get_by_role('button',name='Invitar a alguien',exact=True).wait_for()
-  await page.locator('.nav [data-platform-view=platform-decisions]').click();center=page.locator('[data-platform-decisions]');await center.get_by_role('heading',name='Tu memoria de decisiones empieza acá',exact=True).wait_for();await center.get_by_role('link',name='Ver datos',exact=True).click()
+  await page.locator('.nav [data-platform-view=platform-decisions]').click();center=page.locator('[data-platform-decisions]');await center.get_by_role('heading',name='Todavía no hay decisiones en este Workspace.',exact=True).wait_for()
+  async with page.expect_response(lambda response:'/api/platform/onboarding/explore' in response.url and response.status==200):
+   await center.locator('.center-empty').get_by_role('button',name='Explorar DDAs',exact=True).click()
+  await page.wait_for_url('**/app/ddas*');await page.locator('.nav [data-platform-view=platform-data]').click()
   hub=page.locator('[data-platform-data]');await hub.get_by_role('button',name='Usar datos de ejemplo',exact=True).wait_for()
   failed=False
   async def offline_once(route):
@@ -31,8 +34,7 @@ async def main():
   await page.locator('[data-demo-context]').wait_for();assert await page.evaluate('window.dationGetCurrentView()')=='logistics-data'
   await page.locator('#dispatch-data-root .d-workflow-action-bar button').first.wait_for()
   await page.locator('.nav [data-platform-view=platform-home]').click();await home.locator('[data-onboarding-step=data][data-complete=true]').wait_for();assert await home.locator('[data-onboarding-step=decision]').get_attribute('data-complete')=='false'
-  async with page.expect_response(lambda response:'/api/platform/onboarding/explore' in response.url and response.status==200):
-   await home.get_by_role('button',name='Explorar DDA Logística',exact=True).click()
+  await home.get_by_role('button',name='Explorar DDA Logística',exact=True).click()
   await page.wait_for_function("window.dationGetCurrentView()==='logistics-overview'")
   await page.locator('.nav [data-platform-view=platform-home]').click();await home.locator('[data-onboarding-step=explore][data-complete=true]').wait_for();await page.reload();await home.locator('[data-onboarding-step=explore][data-complete=true]').wait_for()
   await page.locator('.nav [data-platform-view=platform-data]').click();await hub.locator('.d-demo-badge').first.wait_for();assert await hub.locator('.d-demo-badge').count()==2
