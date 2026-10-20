@@ -45,6 +45,9 @@ def wait_for(predicate,description,timeout=30):
 
 
 class Sandbox:
+    def __init__(self, *, migration_hook=None):
+        self.migration_hook=migration_hook
+
     def __enter__(self):
         self.identifier='dation-e2e-'+uuid4().hex[:12]
         self.database='dation_e2e'
@@ -84,7 +87,9 @@ class Sandbox:
         self.sql("CREATE SCHEMA auth; CREATE TABLE auth.users(id uuid PRIMARY KEY,email text,email_confirmed_at timestamptz); CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $$ SELECT (nullif(current_setting('request.jwt.claims',true),'')::jsonb->>'sub')::uuid $$; GRANT USAGE ON SCHEMA auth TO authenticated; GRANT EXECUTE ON FUNCTION auth.uid() TO authenticated;")
         self.sql((REPO/'supabase/baseline/20261010100000_public_schema.sql').read_text())
         for migration in sorted((REPO/'supabase/migrations').glob('*.sql')):
-            if migration.name[:14]>'20261010100000':self.sql(migration.read_text())
+            if migration.name[:14]>'20261010100000':
+                if self.migration_hook:self.migration_hook(self,migration.name)
+                self.sql(migration.read_text())
         self.sql("UPDATE dation_private.platform_release SET admissions_open=true;")
         for uid in (USER_A,USER_B,VIEWER,DISABLED):
             self.sql(f"INSERT INTO auth.users VALUES('{uid}','user-{uid[-1]}@example.test',now());")

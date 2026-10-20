@@ -1,4 +1,6 @@
 import {esc} from './shared.mjs';
+import {resolveNodeDestination} from './decision-target.mjs';
+import {statePresentation} from '../platform/foundation.mjs';
 import {
   DECISION_ORDER,
   DECISION_META,
@@ -15,12 +17,14 @@ export function decisionRail(caseActions={}){
       const meta=DECISION_META[nodeId];
       const node=decisionCase.nodes[nodeId]||{};
       const ui=statusUi(node.status);
-      const hasResult=Boolean(node.run_id);
-      const canOpen=hasResult&&['review','approved','running','stale','error'].includes(node.status);
+      const target=resolveNodeDestination(nodeId,node);
+      const canOpen=Boolean(target);
+      const presentation=statePresentation(node.status,nodeId===activeNode);
       return '<button type="button" class="dispatch-decision-tab'
         +(nodeId===activeNode?' is-active':'')
         +(node.status==='approved'?' is-approved':'')
         +'" data-decision-node="'+esc(nodeId)+'" '
+        +'data-status-tone="'+presentation.tone+'" '+(presentation.selected?'aria-current="page" ':'')
         +(canOpen?'':'disabled')
         +'>'
           +'<span>'+esc(meta.index)+'</span>'

@@ -30,6 +30,8 @@ async def platform_call(name, body):
                 raise HTTPException(403, "No tenés acceso activo a este workspace.")
             if code == "22023":
                 collaboration_errors = {
+                    'platform_set_member_responsibilities': 'Revisá las responsabilidades y actualizá la membresía antes de reintentar.',
+                    'platform_workflow_responsibilities': 'Elegí personas activas con la responsabilidad requerida y permisos operativos en este workspace.',
                     'platform_update_workspace': 'Revisá el país, idioma, zona horaria, moneda y unidades elegidos antes de guardar.',
                     'platform_invite_member': 'Ya existe una membresía o invitación pendiente para ese email. Revisá el equipo antes de reintentar.',
                     'platform_update_member': 'Revisá los roles y conservá al menos un administrador activo en el workspace.',

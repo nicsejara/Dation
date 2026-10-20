@@ -15,10 +15,14 @@ router = APIRouter()
 @router.get('/team')
 async def team(q: str = Query('', max_length=120), limit: int = Query(25, ge=1, le=50),
                offset: int = Query(0, ge=0, le=1000000), candidates: bool = False,
+               responsibility: Literal['data','decision_owner','approver'] | None = None,
                ctx=Depends(require_upload_access)):
-    return await platform_call('platform_team', {'target_workspace_id': ctx.workspace_id,
+    if responsibility and not candidates:
+        from fastapi import HTTPException
+        raise HTTPException(422,'El filtro de responsabilidad requiere candidates=true.')
+    return await platform_call('platform_team_foundation', {'target_workspace_id': ctx.workspace_id,
         'actor_user_id': ctx.user_id, 'search_text': q.strip(), 'page_limit': limit,
-        'page_offset': offset, 'candidates_only': candidates})
+        'page_offset': offset, 'candidates_only': candidates,'responsibility_group':responsibility})
 
 class Invitation(Email):
     access_role: Role
@@ -33,6 +37,18 @@ async def invite(payload: Invitation, ctx=Depends(require_upload_access)):
 class Version(BaseModel):
     model_config = ConfigDict(extra='forbid')
     expected_updated_at: AwareDatetime
+
+class Responsibilities(Version):
+    business_roles: list[Responsibility]
+
+@router.patch('/team/members/{user_id}/responsibilities')
+async def responsibilities(user_id: UUID,payload: Responsibilities,ctx=Depends(require_upload_access)):
+    from fastapi import HTTPException
+    if len(payload.business_roles)>4 or len(set(payload.business_roles))!=len(payload.business_roles):
+        raise HTTPException(422,'Elegí responsabilidades distintas y válidas.')
+    return await platform_call('platform_set_member_responsibilities',{'target_workspace_id':ctx.workspace_id,
+        'actor_user_id':ctx.user_id,'member_user_id':str(user_id),'expected_updated_at':payload.expected_updated_at.isoformat(),
+        'new_responsibilities':payload.business_roles})
 
 @router.post('/team/invitations/{invitation_id}/revoke')
 async def revoke(invitation_id: UUID, payload: Version, ctx=Depends(require_upload_access)):

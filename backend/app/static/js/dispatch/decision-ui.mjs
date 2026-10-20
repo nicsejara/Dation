@@ -1,43 +1,10 @@
+import {FOUNDATION} from '../platform/foundation.mjs';
 import "../dda-variable-config.js";
 
 import {NODE_IDS} from './decision-case.mjs';
 export const DECISION_ORDER = NODE_IDS;
 
-export const DECISION_META = Object.freeze({
-  logistics_assignment: Object.freeze({
-    index: "01",
-    label: "Asignación de carga",
-    short: "Asignación de carga",
-    progressLabel: "Asignación de carga",
-    icon: "packageCheck",
-    question: "¿Cómo conviene armar los viajes y repartir la carga?",
-    output: "Viajes propuestos + distribución de carga",
-    configureLabel: "Configurar asignación →",
-    implemented: true,
-  }),
-  logistics_scheduling: Object.freeze({
-    index: "02",
-    label: "Planificación de despachos",
-    short: "Planificación de despachos",
-    progressLabel: "Planificación",
-    icon: "calendarRange",
-    question: "¿Cuándo conviene ejecutar los viajes ya definidos?",
-    output: "Calendario operativo + secuencia",
-    configureLabel: "Configurar planificación →",
-    implemented: true,
-  }),
-  logistics_final_assignment: Object.freeze({
-    index: "03",
-    label: "Asignación de vehículos",
-    short: "Asignación de vehículos",
-    progressLabel: "Vehículos",
-    icon: "truck",
-    question: "¿Qué vehículo ejecuta cada viaje programado?",
-    output: "Vehículo asignado a cada viaje, listo para ejecutar",
-    configureLabel: "Configurar asignación de vehículos →",
-    implemented: false,
-  }),
-});
+export const DECISION_META = FOUNDATION.decisions;
 
 export const STATUS_UI = Object.freeze({
   available: Object.freeze({
