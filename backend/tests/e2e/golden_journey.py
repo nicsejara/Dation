@@ -64,17 +64,18 @@ async def main():
 
         async def open_stage(page,view,node=None,run=None):
             await page.goto(target(view,node,run))
-            selector='[data-workflow-responsibility]' if view=='logistics-config' else '.d-decision-dashboard' if view=='decision-dashboard' else '[data-map-node]'
+            selector='[data-config-review],[data-scheduling-review]' if view=='logistics-config' else '.d-decision-dashboard' if view=='decision-dashboard' else '[data-map-node]'
             await page.locator(selector).first.wait_for()
 
         async def assign(stage,uid,field='owner',audit_editor=False):
-            root=admin.locator('[data-workflow-responsibility="'+stage+'"]')
+            root=admin.locator('[data-workflow-responsibility="'+stage+'"][data-responsibility-field="'+field+'"]')
             await root.get_by_role('button',name=re.compile('^(Seleccionar responsable|Cambiar)$')).click()
             select=root.locator('select');await select.locator('option[value="'+uid+'"]').wait_for(state='attached')
             options=await select.locator('option').evaluate_all('nodes=>nodes.map(n=>n.value).filter(Boolean)')
             assert options==[uid],(stage,field,options)
             if audit_editor:await matrix(admin,'responsibility')
             await select.select_option(uid);await root.get_by_role('button',name='Guardar',exact=True).click()
+            await admin.wait_for_function('(args)=>window.DationDispatch.getWorkspace().workflow.stages[args[0]][args[1]+"_eligible"]',arg=[stage,field])
             await root.get_by_role('button',name='Cambiar',exact=True).wait_for()
 
         async def execute(node):
@@ -92,8 +93,7 @@ async def main():
 
         async def approve(node,run):
             await open_stage(admin,'decision-dashboard',node,run)
-            for button in await admin.locator('[data-approve-toolbar],[data-approve-final]').all():assert await button.is_disabled()
-            await assign(node,APPROVER,'approver')
+            assert await admin.locator('[data-workflow-responsibility]').count()==0
             await open_stage(owner,'decision-dashboard',node,run)
             assert await owner.locator('[data-approve-toolbar],[data-approve-final]').count()==0
             await open_stage(approver,'decision-dashboard',node,run)
@@ -103,6 +103,8 @@ async def main():
             saved=await response.json()
             evidence[node]={key:saved[key] for key in ('id','result_fingerprint','configuration_json','created_by_user_id','approved_by_user_id','upstream_run_id')}
             await approver.wait_for_function('node=>window.DationDispatch.getWorkspace().decisionCase.nodes[node].status==="approved"',arg=node)
+            await approver.locator('[data-run-trace]').get_by_text('Configurado por: Golden Owner',exact=True).wait_for()
+            await approver.locator('[data-run-trace]').get_by_text('Aprobado por: Golden Approver',exact=True).wait_for()
             assert parse_qs(urlsplit(approver.url).query)['run_id']==[run]
 
         try:
@@ -121,15 +123,17 @@ async def main():
             await data.get_by_role('button',name='Actualizar responsabilidad',exact=True).wait_for()
             case=await steward.evaluate('window.DationDispatch.getWorkspace().decisionCase.id')
             await admin.goto(target('logistics-data'))
-            await assign('data_preparation',STEWARD)
+            await assign('data_steward',STEWARD)
             await data.get_by_role('button',name='Actualizar responsabilidad',exact=True).click()
             await steward.wait_for_function('!document.querySelector("#dispatch-data-root .d-workflow-action-bar button").disabled')
             await matrix(steward,'data')
             await next_button.click();await steward.locator('[data-map-node=logistics_assignment]').first.wait_for()
             await matrix(steward,'map')
-            await open_stage(admin,'logistics-config','logistics_assignment')
-            assert await admin.locator('[data-config-review]').is_disabled()
+            await open_stage(admin,'logistics-map')
             await assign('logistics_assignment',OWNER,audit_editor=True)
+            await assign('logistics_assignment',APPROVER,'approver')
+            await assign('logistics_scheduling',OWNER)
+            await assign('logistics_scheduling',APPROVER,'approver')
             await open_stage(owner,'logistics-config','logistics_assignment')
             await owner.locator('[data-objective=min_cost]').click()
             await matrix(owner,'config')
@@ -140,7 +144,7 @@ async def main():
             await approver.locator('[data-scheduling-review]').wait_for()
             assert 'run_id=' not in approver.url
             await open_stage(admin,'logistics-config','logistics_scheduling')
-            await assign('logistics_scheduling',OWNER)
+            assert await admin.locator('[data-workflow-responsibility]').count()==0
             await open_stage(owner,'logistics-config','logistics_scheduling')
             d2=await execute('logistics_scheduling')
             await approve('logistics_scheduling',d2)
@@ -170,8 +174,9 @@ async def main():
                 assert 'Objetivo · Por definir' not in text
             await center.locator('[data-case-activity] .platform-activity__event').first.wait_for()
             assert await center.locator('.center-linked-file').count()==2
-            assert not any(r['path'].endswith('/runs') and '/api/platform/decisions/' in r['path'] for r in requests)
+            assert not any(r['path'].endswith('/runs') and '/api/platform/decisions/' in r['path'] and not (r['query'].get('run_id') and r['query'].get('limit')==['1']) for r in requests)
             await matrix(approver,'decision_center')
+            await center.get_by_role('button',name='Cerrar detalle del caso',exact=True).click()
 
             await approver.locator('.nav [data-platform-view=platform-data]').click()
             hub=approver.locator('[data-platform-data]');await hub.get_by_role('table').wait_for()

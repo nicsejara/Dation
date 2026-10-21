@@ -1,3 +1,4 @@
+import {renderDdaNavigation} from './dda-navigation.mjs';
 import {trackExploration} from './onboarding.mjs';
 import {mountDropdown} from './components.mjs';
 import {createScope} from '../dispatch/lifecycle.mjs';
@@ -65,16 +66,15 @@ export function mountPlatformShell(){
   for(const link of document.querySelectorAll('.nav [data-platform-view]')){
    const active=link.dataset.platformView===view;link.classList.toggle('is-active',active);if(active)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current');
   }
-  const breadcrumb=document.querySelector('[data-platform-breadcrumb]');breadcrumb.replaceChildren();
+  const breadcrumb=document.querySelector('[data-platform-breadcrumb]');
   const ddaView=view?.startsWith('logistics-')||view==='decision-dashboard';
   breadcrumb.hidden=!ddaView;
   if(!ddaView){const title=node('span',labels[view]||(view==='traceability'?'Historial y evidencia':'Dation'),'journey-step journey-step--title is-current');document.querySelector('#journey-nav').replaceChildren(title);}
   if(ddaView){
-   breadcrumb.append(action('Decision Data Assets','inicio'),node('span','/'),action('DDA Logística','logistics-overview'));
-   try{const route=readResource(location.href);if(route.caseId)breadcrumb.append(node('span','/'),node('span','DC-'+route.caseId.slice(0,8)));if(route.nodeId)breadcrumb.append(node('span','/'),node('span',route.nodeId==='logistics_scheduling'?'Scheduling':'Assignment'));}catch{}
-  }else{breadcrumb.append(node('span',labels[view]||(view==='traceability'?'Historial y evidencia':'Dation')));}
+   try{renderDdaNavigation(breadcrumb,{view,route:readResource(location.href),workspace:window.DationDispatch?.getWorkspace?.()});}catch{}
+  }else{breadcrumb.replaceChildren(node('span',labels[view]||(view==='traceability'?'Historial y evidencia':'Dation')));}
  }
- scope.listen(window,'dation:view',updateNavigation);updateNavigation();
+ scope.listen(window,'dation:view',updateNavigation);scope.listen(window,'dation:workspace',updateNavigation);updateNavigation();
  function renderDemo(){const panel=document.querySelector('[data-demo-context]');if(!panel)return;const state=window.DationDispatch?.getWorkspace?.()||{};let route;try{route=readResource(location.href);}catch{panel.hidden=true;return;}const own=!route.caseId||route.caseId===state.decisionCase?.id;panel.hidden=!(own&&['logistics-data','logistics-map','logistics-config','decision-dashboard'].includes(window.dationGetCurrentView?.())&&(state.orders?.is_sample||state.fleet?.is_sample));}
  scope.listen(window,'dation:view',renderDemo);scope.listen(window,'dation:workspace',renderDemo);renderDemo();
  scope.listen(window,'pagehide',event=>{if(!event.persisted)scope.dispose();});

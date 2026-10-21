@@ -9,7 +9,7 @@ from app.platform.foundation import REGISTRY
 
 router=APIRouter(prefix='/decisions')
 Node=Literal['logistics_assignment','logistics_scheduling','logistics_final_assignment']
-Stage=Literal['data_preparation','logistics_assignment','logistics_scheduling']
+Stage=Literal['data_preparation','data_owner','data_steward','logistics_assignment','logistics_scheduling']
 
 @router.get('/{case_id}/workflow-readiness')
 async def workflow_readiness(case_id:UUID,ctx=Depends(require_upload_access)):
@@ -56,8 +56,8 @@ async def cases(filter:Literal['all','in_progress','review','pending_approval','
 async def detail(case_id:UUID,ctx=Depends(require_upload_access)):return await center.detail(ctx,case_id)
 
 @router.get('/{case_id}/runs')
-async def history(case_id:UUID,node_id:Node,limit:int=Query(25,ge=1,le=50),offset:int=Query(0,ge=0,le=1000000),ctx=Depends(require_upload_access)):
-    return await center.history(ctx,case_id,node_id,limit,offset)
+async def history(case_id:UUID,node_id:Node,limit:int=Query(25,ge=1,le=50),offset:int=Query(0,ge=0,le=1000000),run_id:UUID|None=None,ctx=Depends(require_upload_access)):
+    return await center.history(ctx,case_id,node_id,limit,offset,run_id)
 
 class CaseUpdate(BaseModel):
     model_config=ConfigDict(extra='forbid')

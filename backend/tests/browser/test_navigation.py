@@ -328,7 +328,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                 body=json.loads(route.request.post_data);self.center_edits+=1
                 if 'label' in body:self.center_label=body['label']
                 if 'archived' in body:self.center_archived=body['archived']
-                data={'id':row['id']}
+                data={**row,'label':self.center_label,'status':'archived' if self.center_archived else 'active'}
         elif path.endswith('/runs'):
             run=self.f['runs']['assignment'];data={'items':[{**run,'created_by':None,'approved_by':None,'objective':'balanced','decision_state':'candidate'}],'total':1,'limit':25,'offset':0}
         elif path==prefix:
@@ -3605,7 +3605,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(await root.locator('.platform-home__attention').count(),0)
         self.assertEqual(await root.locator('.platform-home__quick-link').count(),3)
         self.assertIn('Synthetic',await root.locator('h1').inner_text())
-        await root.get_by_role('link',name='Explorar catálogo de DDAs',exact=True).click()
+        await root.get_by_role('link',name='Explorar DDA',exact=True).click()
         await self.page.locator('[data-home-dda-catalog]').wait_for(state='visible')
         self.assertEqual(urlparse(self.page.url).path,'/app/ddas')
 
@@ -3669,9 +3669,9 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await root.get_by_role('link',name='Ir a Decision Center',exact=True).focus();await self.page.keyboard.press('Enter');await self.page.locator('[data-platform-decisions]').get_by_role('heading',name='Decision Center',exact=True).wait_for()
         self.assertEqual(urlparse(self.page.url).path,'/app/decisions');self.assertNotIn('center_case_id',self.page.url)
         await self.page.go_back();await root.locator('.platform-home__case').first.wait_for()
-        await root.locator('.platform-activity__case').first.click();await self.page.locator('[data-center-drawer]').get_by_role('heading',name='Cadena de decisiones',exact=True).wait_for()
+        await root.locator('.platform-activity__case').first.click();await self.page.locator('[data-center-sheet]').get_by_role('heading',name='Cadena de decisiones',exact=True).wait_for()
         self.assertEqual(parse_qs(urlparse(self.page.url).query)['center_case_id'],[cid])
-        await self.page.go_back();await root.get_by_role('link',name='Explorar catálogo de DDAs',exact=True).click();await self.page.locator('[data-home-dda-catalog]').wait_for(state='visible')
+        await self.page.go_back();await root.get_by_role('link',name='Explorar DDA',exact=True).click();await self.page.locator('[data-home-dda-catalog]').wait_for(state='visible')
 
     async def test_workspace_home_loading_failure_retry_and_reentry_refresh(self):
         self.home_failure=True;self.delay['/api/platform/home']=.2
@@ -3722,18 +3722,18 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.page.locator('.nav [data-platform-view="platform-home"]').click()
         await self.page.locator('[data-platform-home] .platform-home__quick-link').first.wait_for()
         home=self.page.locator('[data-platform-home]')
-        await home.get_by_role('link',name='Explorar catálogo de DDAs',exact=True).wait_for()
+        await home.get_by_role('link',name='Explorar DDA',exact=True).wait_for()
         self.assertTrue(await self.page.locator('.asset-item').is_disabled())
         self.ddas[0]['status']='enabled'
         await self.page.evaluate('window.dationSession.refresh()')
         await self.page.wait_for_function("document.querySelector('.asset-item')?.disabled===false")
-        await home.get_by_role('link',name='Explorar catálogo de DDAs',exact=True).click()
+        await home.get_by_role('link',name='Explorar DDA',exact=True).click()
         await root.locator('#home-open-logistics').wait_for()
         self.ddas[0]['status']='disabled'
         await self.page.evaluate('window.dationSession.refresh()')
         await root.locator('[data-dda-id=logistics][data-dda-entitlement=disabled]').wait_for()
         self.assertTrue(await self.page.locator('.asset-item').is_disabled())
-        await self.nav('platform-home');await home.get_by_role('link',name='Explorar catálogo de DDAs',exact=True).wait_for()
+        await self.nav('platform-home');await home.get_by_role('link',name='Explorar DDA',exact=True).wait_for()
         self.assertEqual(self.errors,[])
 
     async def test_catalog_fallback_keeps_disabled_entitlement_closed(self):
@@ -3918,16 +3918,17 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await root.locator('.center-drawer:visible').get_by_role('button',name='Acciones de '+('DC-'+self.case['id'][:8].upper()),exact=True).click()
         await root.get_by_role('menuitem',name='Archivar',exact=True).click()
         await self.page.get_by_role('dialog').get_by_role('button',name='Archivar',exact=True).click()
+        await self.page.wait_for_url('**center_filter=archived*')
+        self.assertEqual(await root.locator('dialog[open]').count(),0)
+        await self.page.reload();await root.get_by_role('link',name='Abrir',exact=True).click()
         await root.locator('.center-drawer:visible .center-status[data-state=archived]').wait_for()
-        await root.locator('.center-drawer:visible').get_by_role('button',name='Acciones de '+('DC-'+self.case['id'][:8].upper()),exact=True).wait_for()
         self.assertEqual(await root.get_by_role('link',name='Continuar',exact=True).get_attribute('aria-disabled'),'true')
         await root.locator('.center-drawer:visible').get_by_role('button',name='Acciones de '+('DC-'+self.case['id'][:8].upper()),exact=True).click()
         await root.get_by_role('menuitem',name='Restaurar',exact=True).click()
-        await self.page.get_by_role('dialog').get_by_role('button',name='Restaurar',exact=True).click()
-        await root.locator('.center-drawer:visible').get_by_role('button',name='Acciones de '+('DC-'+self.case['id'][:8].upper()),exact=True).wait_for()
-        await root.get_by_role('button',name='Cerrar detalle del caso',exact=True).click()
-        self.assertIn('center_q=Semana+43',self.page.url)
-        await root.get_by_role('heading',name='No encontramos Decision Cases con estos filtros.',exact=True).wait_for()
+        await self.page.get_by_role('dialog',name='Restaurar caso').get_by_role('button',name='Restaurar',exact=True).click()
+        await self.page.wait_for_url('**center_filter=all*')
+        self.assertNotIn('center_q=',self.page.url)
+        await root.get_by_role('table').wait_for()
         self.assertEqual(self.center_edits,3)
 
     async def test_decision_center_failures_readonly_conflict_and_global_recovery(self):
@@ -3991,26 +3992,26 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.page.wait_for_url('**center_filter=pending_approval*')
         await root.get_by_role('button',name='Limpiar filtros',exact=True).click()
         await self.page.wait_for_url('**center_filter=all*')
+        before=await root.locator('.center-table-scroll').bounding_box()
         await root.get_by_role('link',name='Abrir',exact=True).click()
         await root.get_by_role('heading',name='Cadena de decisiones',exact=True).wait_for()
         self.assertEqual(await root.locator('tr[aria-selected=true]').count(),1)
+        self.assertEqual(await root.locator('.center-table-scroll').bounding_box(),before)
         requests_before=sum(r==('GET','/api/platform/decisions') for r in self.requests)
         artifacts=Path('/workspace/dation-audit/platform-v2-phase2/visual') if Path('/workspace/dation-audit/platform-v2-phase2').exists() else None
         if artifacts:artifacts.mkdir(exist_ok=True)
         for width in (1440,1280,1024,768,390):
             await self.page.set_viewport_size({'width':width,'height':1000})
             await self.page.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))')
-            panel=root.locator('[data-center-drawer]' if width>=1100 else '[data-center-sheet]')
+            panel=root.locator('[data-center-sheet]')
             await panel.wait_for()
             audit=await self.page.evaluate((ROOT/'tests/browser/theme_audit.js').read_text())
             self.assertFalse(audit['overflow']);self.assertEqual(audit['failures'],[])
             self.assertEqual(await root.get_by_role('table').count(),1)
-            if width>=1100:self.assertFalse(await root.locator('[data-center-sheet]').evaluate('n=>n.open'))
-            else:
-                self.assertTrue(await panel.evaluate('n=>n.open'))
-                await panel.get_by_role('button',name='Cerrar detalle del caso').focus()
-                await self.page.keyboard.press('Shift+Tab')
-                self.assertTrue(await panel.evaluate('n=>n.contains(document.activeElement)'))
+            self.assertTrue(await panel.evaluate('n=>n.open'))
+            await panel.get_by_role('button',name='Cerrar detalle del caso').focus()
+            await self.page.keyboard.press('Shift+Tab')
+            self.assertTrue(await panel.evaluate('n=>n.contains(document.activeElement)'))
             if artifacts:
                 await panel.get_by_role('button',name='Cerrar detalle del caso').focus()
                 await panel.evaluate('n=>n.scrollTop=0')
@@ -4078,7 +4079,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(await root.locator('[data-onboarding-step],.d-onboarding').count(),0)
         self.assertEqual(await root.get_by_role('button',name='Usar datos de ejemplo',exact=True).count(),0)
         self.assertEqual(await root.locator('.platform-home__hero-actions a').count(),2)
-        await root.get_by_role('link',name='Explorar catálogo de DDAs',exact=True).click()
+        await root.get_by_role('link',name='Explorar DDA',exact=True).click()
         for _ in range(100):
             if self.onboarding_data['explored_at']:break
             await asyncio.sleep(.01)
