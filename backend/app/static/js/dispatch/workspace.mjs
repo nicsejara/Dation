@@ -6,6 +6,9 @@ import {mountAssignmentConfig,filterPayload,normalizeRawWeights} from './assignm
 import {STATUS,createDecisionCase,replaceInputs,transitionNode,inputSignature,caseRef,deriveDecisionNodes,continuationState,getCaseTransitionNotice} from './decision-case.mjs';
 import {resolveNodeDestination} from './decision-target.mjs';
 import {DECISION_META} from './decision-ui.mjs';
+import {caseContext} from '../platform/foundation.mjs';
+import {mountWorkflowContext} from './workflow-context.mjs';
+import {responsibilityProblem} from './workflow-responsibility.mjs';
 import {currentLogisticsEnabled,logisticsView} from '../platform/entitlements.mjs';
 
 const KEY='dation.dispatch.workspace.v5';
@@ -198,7 +201,11 @@ function syncDimensionsToEvidence({initialize=false}={}){
     ?normalizeWeights(state.weights,state.dimensions)
     :presetWeights(state.objective,state.dimensions);
 }
-function ready(){return !!(state.available&&state.orders&&state.fleet&&state.preflight?.valid);}
+function ready(){return !!(state.available&&state.orders&&state.fleet&&state.preflight?.valid&&!responsibilityProblem(state.workflow,'data_preparation','data'));}
+function pendingWorkflow(){
+  const role=window.dationSession?.identity?.membership?.access_role;
+  return {gates_enforced:true,stages:{},pending:true,can_assign:role==='admin',can_prepare:['admin','operator'].includes(role)};
+}
 function resetAssignmentConfiguration(){
   state.configured=false;
   state.decisions={};
@@ -223,12 +230,14 @@ function ensureDecisionCase(){
   }
   if(!state.decisionCase){
     state.decisionCase=createDecisionCase(crypto.randomUUID(),state.orders,state.fleet);
+    state.workflow=pendingWorkflow();state.caseContext=null;
     transitionCaseId=null;
     state.activeNode=null;
     window.dationSetDecisionContext?.(null);
   }else if(state.decisionCase.signature!==signature){
     state.decisionCase=replaceInputs(state.decisionCase,crypto.randomUUID(),state.orders,state.fleet);
     transitionCaseId=state.decisionCase.id;
+    state.workflow=pendingWorkflow();state.caseContext=null;
     state.run=null;
     resetAssignmentConfiguration();
     state.activeNode=null;
@@ -258,7 +267,7 @@ async function startNewDecision(inputs=[]){
   transitionCaseId=null;
   saveDraft();
   resetAssignmentConfiguration();
-  Object.assign(state,{orders:null,fleet:null,decisionCase:null,run:null,activeNode:null,
+  Object.assign(state,{orders:null,fleet:null,decisionCase:null,workflow:null,caseContext:null,run:null,activeNode:null,
     preflight:null,configPreview:null,configured:false,decisions:{},schedulingUseDueDates:true});
   if(Array.isArray(inputs))for(const dataset of inputs){if(['orders','fleet'].includes(dataset?.dataset_type))state[dataset.dataset_type]=dataset;}
   decisionContext(null);
@@ -275,22 +284,25 @@ async function dashboardContinuation(run,nodeId,generation){
   return continuationState(state.decisionCase,nodeId,run.id,state.preflight?.decision_readiness,DECISION_META);
 }
 
-function urlRun(id,schema='assignment_v1'){resource={view:'decision-dashboard',caseId:state.decisionCase?.id||null,nodeId:schema==='scheduling_v1'?'logistics_scheduling':'logistics_assignment',runId:id};history.replaceState(null,'',resourceUrl(location.href,resource));}
+function urlRun(id,schema='assignment_v1',caseId=state.decisionCase?.id||null){resource={view:'decision-dashboard',caseId,nodeId:schema==='scheduling_v1'?'logistics_scheduling':'logistics_assignment',runId:id};history.replaceState(null,'',resourceUrl(location.href,resource));}
 
 async function preflight(){
   const generation=routeGeneration;
   state.preflight=null;
   window.dationSetDataReady(false);
   if(!state.orders||!state.fleet)return;
+  const ordersId=state.orders.id,fleetId=state.fleet.id,allow=state.resourceMode!=='own';
   const result=await post('/api/runs/preflight',{
-    orders_dataset_id:state.orders.id,
-    fleet_dataset_id:state.fleet.id,
-    allow_third_party:state.resourceMode!=='own',
+    orders_dataset_id:ordersId,
+    fleet_dataset_id:fleetId,
+    allow_third_party:allow,
   },{signal:routeController?.signal});
-  if(generation!==routeGeneration)return;
+  if(generation!==routeGeneration||state.orders?.id!==ordersId||state.fleet?.id!==fleetId||allow!==(state.resourceMode!=='own'))return;
   state.preflight=result;
   state.allow=state.resourceMode!=='own';
   ensureDecisionCase();
+  if(result.valid&&state.decisionCase.persisted&&!state.workflow)await hydrateCase(state.decisionCase.id,generation);
+  if(generation!==routeGeneration)return;
   window.dationSetDataReady(ready());
   persist();
 }
@@ -302,7 +314,18 @@ async function loadData(){
       state,
       persist,
       runPreflight:preflight,
-      onNext:()=>{ensureDecisionCase();navigate('logistics-map');},
+      onNext:async()=>{
+        try{await api('/api/platform/decisions/'+state.decisionCase.id+'/workflow-readiness',{signal:routeController?.signal});if(generation===routeGeneration)await navigate('logistics-map');}
+        catch(error){if(generation!==routeGeneration)return;const note=document.createElement('p');note.role='alert';note.textContent=error.message;roots.data.querySelector('[data-workflow-data-error]')?.remove();note.dataset.workflowDataError='';roots.data.append(note);}
+      },
+      mountWorkflow:(node,onSaved)=>{
+        const caseId=state.decisionCase?.id,signature=state.decisionCase?.signature;
+        return mountWorkflowContext(node,{state,stageKey:'data_preparation',showCase:false,onSaved,onPrepare:async()=>{
+          if(state.decisionCase?.id!==caseId||inputSignature(state.orders,state.fleet)!==signature)throw new Error('El Data Pack cambió.');
+          if(!state.decisionCase.persisted)await ensurePersistedCase(generation);else await hydrateCase(caseId,generation,signature);
+          if(generation!==routeGeneration||state.decisionCase?.id!==caseId||inputSignature(state.orders,state.fleet)!==signature)throw new Error('La etapa cambió.');return state.workflow;
+        }});
+      },
       isReady:ready,
       isCurrent:()=>generation===routeGeneration,
     },
@@ -327,16 +350,12 @@ async function loadDecisionMap(){
     ensureDecisionCase();
     // Register the case before execution so the API picker and deep links also
     // work for a freshly validated Data Pack. The endpoint is idempotent by ID.
-    if(!state.decisionCase.persisted){
-      const current=state.decisionCase;
-      await post('/api/decision-cases',{
-        id:current.id,orders_dataset_id:state.orders.id,fleet_dataset_id:state.fleet.id,state:current,
-      },{signal:routeController?.signal});
+    await ensurePersistedCase(generation);
+    if(generation!==routeGeneration)return;
+    const hasHistory=Object.values(state.decisionCase.nodes||{}).some(item=>item.run_id||item.latest_run_id||item.approved_run_id||item.run_count>0);
+    if(state.workflow?.gates_enforced&&!hasHistory&&state.caseContext?.status!=='archived'&&window.dationSession?.identity?.membership?.access_role!=='viewer'){
+      await api('/api/platform/decisions/'+state.decisionCase.id+'/workflow-readiness',{signal:routeController?.signal});
       if(generation!==routeGeneration)return;
-      state.decisionCase={...current,persisted:true};
-      resource={...resource,caseId:current.id,nodeId:null,runId:null};
-      history.replaceState(null,'',resourceUrl(location.href,resource));
-      persist();
     }
     let predecessor=null;
     if(transitionCaseId===state.decisionCase.id&&state.decisionCase.stale_predecessor?.id){
@@ -345,6 +364,7 @@ async function loadDecisionMap(){
       if(generation!==routeGeneration)return;
     }
     const transitionNotice=getCaseTransitionNotice({decisionCase:state.decisionCase,predecessor,transitionCaseId});
+    transitionCaseId=null;
     state.decisionCase={
       ...state.decisionCase,
       nodes:deriveDecisionNodes(
@@ -367,11 +387,14 @@ async function loadDecisionMap(){
       },
       onOpenResult:openCaseResult,
       onData:()=>navigate('logistics-data'),
-      onSelectCase:trigger=>window.DationDispatch.openDecisionMap({trigger,forceSelector:true}),
+      onSelectCase:()=>{const trigger=node.querySelector('[data-case-switcher] button');trigger?.focus();trigger?.click();},
     });
-    if(generation===routeGeneration)decorateDecisionMap(node);
+    if(generation===routeGeneration){decorateDecisionMap(node);mountWorkflowContext(node,{state});}
   }catch(error){
     if(generation!==routeGeneration)return;
+    if(error.workflowGate==='data'){
+      errorBox(node,Object.assign(error,{actionLabel:'Ir a Datos'}),()=>navigate('logistics-data'));return;
+    }
     errorBox(node,error,loadDecisionMap);
   }
 }
@@ -464,6 +487,14 @@ function poll(id,generation,nodeId=state.activeNode,{delay=0,graceUntil=0}={}){
   });
 }
 
+async function returnToConfiguration(error,nodeId,caseId){
+  const nextGeneration=routeGeneration+1;
+  await navigateResource('logistics-config',{caseId,nodeId,runId:null,replace:true});
+  if(routeGeneration!==nextGeneration)return;
+  const note=document.createElement('p');note.role='alert';note.className='workflow-gate-reason';note.textContent=error.message;
+  roots.config.prepend(note);
+}
+
 async function execute(){
   const decisionCase=ensureDecisionCase();
   const id=crypto.randomUUID();
@@ -499,6 +530,7 @@ async function execute(){
     if(generation===pollGeneration){if(run.status==='completed')await show(run);else {poll(id,generation,'logistics_assignment');await runPolling.refresh();}}
   }catch(e){
     if(generation!==pollGeneration)return;
+    if(e.workflowGate){await returnToConfiguration(e,'logistics_assignment',decisionCase.id);return;}
     poll(id,generation,'logistics_assignment',{graceUntil:Date.now()+10000});
     await runPolling.refresh();
   }
@@ -536,6 +568,7 @@ async function executeScheduling(sourceRunId){
     if(generation===pollGeneration){if(run.status==='completed')await show(run);else {poll(id,generation,'logistics_scheduling');await runPolling.refresh();}}
   }catch(e){
     if(generation!==pollGeneration)return;
+    if(e.workflowGate){await returnToConfiguration(e,'logistics_scheduling',decisionCase.id);return;}
     poll(id,generation,'logistics_scheduling',{graceUntil:Date.now()+10000});
     await runPolling.refresh();
   }
@@ -603,7 +636,7 @@ async function showTerminalRun(run,nodeId){
   if(context.caseId)await hydrateCase(context.caseId,generation);
   if(generation!==routeGeneration)return;
   state.run=run;state.activeNode=context.nodeId;decisionContext(state.activeNode);persist();
-  urlRun(run.id,context.nodeId==='logistics_scheduling'?'scheduling_v1':'assignment_v1');
+  urlRun(run.id,context.nodeId==='logistics_scheduling'?'scheduling_v1':'assignment_v1',context.caseId||null);
   const root=roots.dashboard,scope=createScope(root),scheduling=context.nodeId==='logistics_scheduling';
   root.innerHTML='<section class="dispatch-panel dispatch-run-error" data-run-terminal-error>'
     +'<span class="dispatch-kicker">CORRIDA FINALIZADA CON ERROR</span><h1>No se pudo completar '+(scheduling?'la planificación':'la asignación')+'</h1>'
@@ -645,7 +678,7 @@ export async function show(run){
   state.run=run;
   persist();
   document.body.classList.add('dispatch-result');
-  urlRun(run.id,schema||'assignment_v1');
+  urlRun(run.id,schema||'assignment_v1',caseMeta.case_id||null);
   window.dationSetDashboardReady(true);
 
   await dashboard(
@@ -656,10 +689,11 @@ export async function show(run){
       status:(nodeId&&caseMeta?.case_id&&state.decisionCase?.id===caseMeta.case_id)
         ?runDecisionState(run,state.decisionCase,nodeId)
         :null,
-      decisionCase:state.decisionCase,
+      decisionCase:caseMeta.case_id&&state.decisionCase?.id===caseMeta.case_id?state.decisionCase:null,
       activeNode:nodeId,
       onNewDecision:startNewDecision,
       onMap:caseMeta?.case_id?()=>navigateResource('logistics-map',{caseId:caseMeta.case_id,nodeId:null,runId:null}):null,
+      onCase:caseMeta?.case_id?()=>window.DationDispatch.openCaseInDecisionCenter(caseMeta.case_id):null,
       getContinuation:()=>dashboardContinuation(run,nodeId,generation),
       onContinue:async()=>{
         await hydrateCase(caseMeta.case_id,generation);
@@ -667,10 +701,13 @@ export async function show(run){
         state.preflight=null;
         const next=await dashboardContinuation(run,nodeId,generation);
         if(generation!==routeGeneration)return;
-        if(next?.state!=='available')throw new Error(next?.message||'La siguiente decisión todavía no está disponible.');
-        return navigateResource('logistics-config',{caseId:caseMeta.case_id,nodeId:next.nodeId,runId:null});
+        const target=next?.target;
+        if(!target)throw new Error(next?.message||'La siguiente decisión todavía no está disponible.');
+        return navigateResource(target.view,{caseId:caseMeta.case_id,nodeId:next.nodeId,runId:target.run_id});
       },
       onOpenNode:state.decisionCase?openCaseResult:null,
+      onRefresh:async()=>{const fresh=await api('/api/runs/'+run.id,{signal:routeController?.signal});if(generation===routeGeneration)await show(fresh);},
+      approvalBlocked:Boolean(caseMeta.case_id&&responsibilityProblem(state.workflow,nodeId,'approve')),
       onApprove:(nodeId&&caseMeta?.case_id&&state.decisionCase?.id===caseMeta.case_id&&state.decisionCase.collaboration?.[nodeId]?.can_approve!==false&&!['stale','superseded'].includes(runDecisionState(run,state.decisionCase,nodeId)))
         ?async()=>{
           const approved=await post('/api/runs/'+run.id+'/approve',{
@@ -687,11 +724,18 @@ export async function show(run){
         }
         :null,
       onApprovalComplete:(nodeId&&state.decisionCase)
-        ?()=>{persist();}
+        ?async()=>{persist();await show(state.run);}
         :null,
     },
   );
   if(generation!==routeGeneration)return;
+  if(caseMeta.case_id&&state.decisionCase?.id===caseMeta.case_id)mountWorkflowContext(roots.dashboard,{state,stageKey:nodeId,field:'approver',onSaved:()=>show(state.run)});
+  const approvalReason=responsibilityProblem(state.workflow,nodeId,'approve');
+  if(approvalReason&&runDecisionState(run,state.decisionCase,nodeId)!=='approved'){
+    const note=document.createElement('p');note.className='workflow-gate-reason';note.id='workflow-approval-reason';note.textContent=approvalReason;
+    roots.dashboard.querySelector('[data-workflow-responsibility]')?.append(note);
+    roots.dashboard.querySelectorAll('[data-approve-toolbar],[data-approve-final]').forEach(button=>button.setAttribute('aria-describedby',note.id));
+  }
   const policy=state.decisionCase?.collaboration?.[nodeId];
   if(policy?.approver){
     const note=document.createElement('p');note.className='d-metadata';note.dataset.approvalPolicy='';
@@ -703,13 +747,25 @@ export async function show(run){
 
 for(const [key,view]of [['data','logistics-data'],['map','logistics-map'],['config','logistics-config'],['dashboard','decision-dashboard']])roots[key]=root(view,'dispatch-'+key+'-root');
 
-async function hydrateCase(caseId,generation=routeGeneration){
+async function ensurePersistedCase(generation=routeGeneration){
+  const current=state.decisionCase;if(!current)return;
+  if(!current.persisted){
+    await post('/api/decision-cases',{id:current.id,orders_dataset_id:state.orders.id,fleet_dataset_id:state.fleet.id,state:current},{signal:routeController?.signal});
+    if(generation!==routeGeneration||state.decisionCase?.id!==current.id||inputSignature(state.orders,state.fleet)!==current.signature)return;
+    await hydrateCase(current.id,generation,current.signature);
+    if(generation!==routeGeneration||state.decisionCase?.id!==current.id||inputSignature(state.orders,state.fleet)!==current.signature)return;
+    resource={...resource,caseId:current.id};history.replaceState(null,'',resourceUrl(location.href,resource));
+  }else if(!state.workflow||state.workflow.case_id!==current.id){
+    await hydrateCase(current.id,generation);
+  }
+}
+async function hydrateCase(caseId,generation=routeGeneration,expectedInputs=null){
   const item=await api('/api/decision-cases/'+caseId,{signal:routeController?.signal});
   if(generation!==routeGeneration)return;
+  if(expectedInputs&&(state.decisionCase?.id!==caseId||inputSignature(state.orders,state.fleet)!==expectedInputs))return;
   if(String(item.decision_case?.id)!==String(caseId)||String(item.orders?.id)!==String(item.decision_case?.inputs?.orders_dataset_id||item.case?.orders_dataset_id)||String(item.fleet?.id)!==String(item.decision_case?.inputs?.fleet_dataset_id||item.case?.fleet_dataset_id))throw new Error('El Decision Case no coincide con su Data Pack.');
-  if(state.decisionCase?.id!==caseId){saveDraft();resetAssignmentConfiguration();Object.assign(state,cleanDraft(drafts[caseId]));state.preflight=null;state.configPreview=null;state.run=null;}
-  transitionCaseId=null;
-  state.orders=item.orders;state.fleet=item.fleet;state.decisionCase={...item.decision_case,collaboration:item.collaboration,persisted:true};persist();return item;
+  if(state.decisionCase?.id!==caseId){saveDraft();resetAssignmentConfiguration();Object.assign(state,cleanDraft(drafts[caseId]));state.preflight=null;state.configPreview=null;state.run=null;transitionCaseId=null;}
+  state.orders=item.orders;state.fleet=item.fleet;state.decisionCase={...item.decision_case,collaboration:item.collaboration,persisted:true};state.workflow=item.workflow_responsibilities||null;state.caseContext=caseContext({...item.case,context:item.context});persist();return item;
 }
 async function navigateResource(view,options={}){
   if(logisticsView(view)&&!currentLogisticsEnabled()){
@@ -752,7 +808,7 @@ async function executeConfiguredScheduling({sourceRun,configuration,options}){
   await navigateResource('decision-dashboard',{runId:id,nodeId:'logistics_scheduling',render:false});pending('Registrando la planificación…');
   const generation=pollGeneration;
   try{const run=await post('/api/runs?run_id='+id,{orders_dataset_id:state.orders.id,fleet_dataset_id:state.fleet.id,source_run_id:sourceRun.id,configuration,options,decision_case:{case_id:caseId,node_id:'logistics_scheduling'}});if(generation===pollGeneration){if(run.status==='completed')await show(run);else {poll(id,generation,'logistics_scheduling');await runPolling.refresh();}}}
-  catch(error){if(generation===pollGeneration){poll(id,generation,'logistics_scheduling',{graceUntil:Date.now()+10000});await runPolling.refresh();}}
+  catch(error){if(generation===pollGeneration){if(error.workflowGate){await returnToConfiguration(error,'logistics_scheduling',caseId);return;}poll(id,generation,'logistics_scheduling',{graceUntil:Date.now()+10000});await runPolling.refresh();}}
 }
 window.DationDispatch={show,openRun,isReady:ready,getWorkspace:()=>state,startNewDecision,openCase:(caseId,view='logistics-map',nodeId=null)=>navigateResource(view,{caseId,nodeId}),openActiveDecisionResult:()=>openCaseResult(state.activeNode),getActiveDecision:()=>({id:state.activeNode,label:DECISION_LABELS[state.activeNode],hasRun:Boolean(state.decisionCase?.nodes?.[state.activeNode]?.run_id),status:state.decisionCase?.nodes?.[state.activeNode]?.status})};
 window.dationNavigate=(view,stage,event)=>{event?.preventDefault();event?.stopPropagation();return navigateResource(view);};

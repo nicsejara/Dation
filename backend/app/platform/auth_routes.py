@@ -187,8 +187,12 @@ async def register(request: Request, payload: Signup):
 async def recover(request: Request, payload: Email):
     csrf(request)
     response = JSONResponse({'message': 'Si la cuenta existe, recibirás un enlace para cambiar la contraseña.'})
-    await gotrue('recover', {'email': payload.email, **pkce(response, request)},
-                 redirect=origin(request) + '/auth/callback/recovery')
+    try:
+        await gotrue('recover', {'email': payload.email, **pkce(response, request)},
+                     redirect=origin(request) + '/auth/callback/recovery')
+    except HTTPException as exc:
+        if exc.status_code != 401:
+            raise
     response.headers['Cache-Control'] = 'no-store'
     return response
 
@@ -275,8 +279,16 @@ async def password(request: Request, payload: Password):
     response = JSONResponse({'ok': True})
     token, _ = await cookie_session(request, response)
     await gotrue('user', {'password': payload.password}, token=token, method='PUT')
-    response.delete_cookie(RECOVERY, path='/auth', httponly=True)
-    return set_json(response, {'ok': True})
+    # Complete the recovery flow with a fresh login. Revoke this browser's
+    # session without affecting sessions on other devices.
+    try:
+        await gotrue('logout?scope=local', token=token)
+    except HTTPException:
+        # The password has already changed. Always clear this browser's tokens
+        # rather than reporting a failed password change after it committed.
+        pass
+    clear_cookies(response)
+    return set_json(response, {'ok': True, 'redirect': '/login?password=updated'})
 
 
 @router.post('/auth/workspace')

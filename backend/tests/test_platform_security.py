@@ -88,3 +88,23 @@ class AuthFlowTests(IsolatedAsyncioTestCase):
   self.client.cookies.set('dation_refresh','revoked')
   with patch.object(auth_routes,'gotrue',AsyncMock(side_effect=HTTPException(401,'Invalid refresh'))):response=await self.client.post('/auth/session',headers={'Origin':'https://qa.invalid'})
   self.assertEqual(response.status_code,401);self.assertIn('Max-Age=0',response.headers['set-cookie']);self.assertEqual((await self.client.post('/auth/logout',headers={'Origin':'https://evil.invalid'})).status_code,403)
+
+ async def test_recovery_does_not_expose_provider_account_existence_errors(self):
+  responses=[]
+  for result in ({},HTTPException(401,'Account missing')):
+   with patch.object(auth_routes,'gotrue',AsyncMock(side_effect=result if isinstance(result,Exception) else None,return_value={} )):
+    responses.append(await self.client.post('/auth/recover',headers={'Origin':'https://qa.invalid'},json={'email':'unknown@example.test'}))
+  self.assertTrue(all(r.status_code==200 for r in responses));self.assertEqual(responses[0].json(),responses[1].json())
+  self.assertNotIn('Account missing',responses[1].text)
+
+ async def test_password_change_clears_recovery_session_and_requests_fresh_login(self):
+  for logout_error in (None,HTTPException(503,'Provider unavailable')):
+   self.client.cookies.set(auth_routes.RECOVERY,'1',domain='qa.invalid',path='/auth')
+   with patch.object(auth_routes,'cookie_session',AsyncMock(return_value=('synthetic-recovery-token',{'sub':U}))),patch.object(auth_routes,'gotrue',AsyncMock(side_effect=[{},logout_error] if logout_error else [{},{}])) as provider:
+    result=await self.client.post('/auth/password',headers={'Origin':'https://qa.invalid'},json={'password':'synthetic-new-password','confirm_password':'synthetic-new-password'})
+   self.assertEqual(result.status_code,200,result.text);self.assertEqual(result.json()['redirect'],'/login?password=updated')
+   self.assertEqual(provider.await_args_list[0].args[0],'user');self.assertEqual(provider.await_args_list[1].args[0],'logout?scope=local')
+   self.assertNotIn('synthetic-new-password',result.text)
+   cookies=';'.join(result.headers.get_list('set-cookie'))
+   for name in (auth_routes.ACCESS,auth_routes.REFRESH,auth_routes.RECOVERY):self.assertIn(name+'=""',cookies)
+   self.assertNotIn(auth_routes.RECOVERY,self.client.cookies)

@@ -11,16 +11,26 @@ export function bindDashboardActions(root,caseActions={}){
   const message=root.querySelector('[data-next-decision-status]');
   const retry=document.createElement('button');retry.type='button';retry.hidden=true;retry.textContent='Reintentar comprobación';
   message?.after(retry);retry.onclick=()=>refresh();
+  const handoff=document.createElement('section');handoff.className='workflow-handoff';handoff.dataset.approvalHandoff='';handoff.hidden=true;
+  const heading=document.createElement('strong');heading.textContent='Decisión aprobada';
+  const links=document.createElement('div');links.className='workflow-context-actions';
+  for(const [label,handler]of [['Volver al Decision Map',caseActions.onMap],['Ver Decision Case',caseActions.onCase]]){
+    if(!handler)continue;const link=document.createElement('button');link.type='button';link.className='d-button d-button--secondary';link.textContent=label;scope?.listen(link,'click',handler);links.append(link);
+  }
+  handoff.append(heading,links);message?.after(handoff);
+  let generation=0;
   async function refresh(){
+    const own=++generation;
     retry.hidden=true;
     if(!button)return;
     button.hidden=true;
     if(message)message.textContent='';
     try{
       const next=await caseActions.getContinuation?.();
-      if(!scope?.active)return;
-      if(next?.state==='available'){
-        if(button.closest('.assignment-dashboard-v2'))button.innerHTML=workflowActionLabel('Continuar a Planificación');
+      if(!scope?.active||own!==generation)return;
+      handoff.hidden=!next;
+      if(next?.target||next?.state==='available'){
+        if(button.closest('.assignment-dashboard-v2'))button.innerHTML=workflowActionLabel('Continuar con Planificación');
         else if(button.closest('[data-dashboard-toolbar]'))button.innerHTML=workflowActionLabel(next.label);
         else button.textContent=next.label;
         button.hidden=false;

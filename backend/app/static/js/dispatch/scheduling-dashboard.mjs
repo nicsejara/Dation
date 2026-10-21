@@ -12,10 +12,10 @@ import {getSchedulingWarnings} from './scheduling-dashboard-selectors.mjs';
 export function render(root,run,onRerun,caseActions={}){
   dispose(root);
   const result=run.result_json,warnings=getSchedulingWarnings(result),blocked=warnings.some(w=>w.severity==='critical');
-  const actions={...caseActions,approvalBlocked:blocked||caseActions.status==='stale',onApprovalComplete:()=>{
+  const actions={...caseActions,approvalBlocked:Boolean(caseActions.approvalBlocked)||blocked||caseActions.status==='stale',onApprovalComplete:async()=>{
     const status=root.querySelector('[data-scheduling-hero-status]');
     if(status){status.className='scheduling-status is-good';status.textContent='Planificación aprobada';}
-    caseActions.onApprovalComplete?.();
+    await caseActions.onApprovalComplete?.();
   }};
   const nodes=renderSchedulingShell(root,run,actions),scope=scopeFor(root);
   const safe=(node,draw)=>{try{draw();}catch(error){errorBox(node,error,()=>safe(node,draw));}};

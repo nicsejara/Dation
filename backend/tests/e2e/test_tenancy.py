@@ -36,6 +36,10 @@ class TenancyTests(unittest.TestCase):
     def case(self,client):
         orders,fleet=self.upload(client,'orders'),self.upload(client,'fleet');case=str(uuid4())
         self.checked(client.post('/api/decision-cases',json={'id':case,'orders_dataset_id':orders['id'],'fleet_dataset_id':fleet['id']}))
+        from workflow_fixture import prepare_stage
+        uid=USER_A if client is self.a else USER_B
+        prepare_stage(client,case,'logistics_assignment',uid=uid)
+        prepare_stage(client,case,'logistics_assignment',approval=True,uid=uid)
         return case,orders,fleet
 
     def body(self,case,orders,fleet):

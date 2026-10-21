@@ -17,7 +17,7 @@ async def main():
   for width in (1440,1024,768,390):
    await page.set_viewport_size({'width':width,'height':1000});await page.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))');audit=await page.evaluate(theme);assert not audit['overflow'] and not audit['failures'],audit
    if artifacts:await page.screenshot(path=str(artifacts/f'welcome-{width}.png'),full_page=True)
-  await page.set_viewport_size({'width':1440,'height':1000});await page.locator('.nav [data-platform-view=platform-team]').click();await page.locator('[data-team-empty]').get_by_role('button',name='Invitar a alguien',exact=True).wait_for()
+  await page.set_viewport_size({'width':1440,'height':1000});await page.locator('.nav [data-platform-view=platform-team]').click();await page.locator('[data-team-empty]').get_by_role('heading',name='Tu equipo empieza con vos',exact=True).wait_for();assert await page.locator('[data-platform-team]').get_by_role('button',name='Invitar',exact=True).count()==1;assert await page.locator('[data-team-empty] button').count()==0
   await page.locator('.nav [data-platform-view=platform-decisions]').click();center=page.locator('[data-platform-decisions]');await center.get_by_role('heading',name='Todavía no hay decisiones en este Workspace.',exact=True).wait_for()
   async with page.expect_response(lambda response:'/api/platform/onboarding/explore' in response.url and response.status==200):
    await center.locator('.center-empty').get_by_role('button',name='Explorar DDAs',exact=True).click()

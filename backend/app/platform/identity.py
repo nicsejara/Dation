@@ -6,6 +6,20 @@ from app.platform.context import RequestContext
 from app.services.http_service import http_client
 from app.platform.entitlements import enabled_ddas
 
+WORKFLOW_CONFLICTS = {
+    'Seleccioná un responsable de datos activo y elegible antes de continuar.':'data',
+    'Seleccioná un responsable de la decisión activo y elegible antes de ejecutar.':'decision_owner',
+    'Seleccioná un aprobador asignado activo y elegible antes de aprobar.':'approver',
+}
+
+def raise_workflow_conflict(response):
+    try:
+        data=response.json()
+    except ValueError:
+        return
+    if isinstance(data,dict) and data.get('code')=='P0001' and data.get('message') in WORKFLOW_CONFLICTS:
+        raise HTTPException(409,data['message'],headers={'X-Dation-Workflow-Gate':WORKFLOW_CONFLICTS[data['message']]})
+
 
 def headers():
     return {"apikey": SUPABASE_SECRET_KEY, "Authorization": "Bearer " + SUPABASE_SECRET_KEY,
@@ -25,6 +39,7 @@ async def platform_call(name, body):
             response = await client.post(SUPABASE_URL + "/rest/v1/rpc/" + name,
                                          headers=request_headers, json=body, timeout=15)
         if response.status_code >= 400:
+            raise_workflow_conflict(response)
             code = response.json().get("code")
             if code == "42501":
                 raise HTTPException(403, "No tenés acceso activo a este workspace.")
@@ -35,6 +50,7 @@ async def platform_call(name, body):
                     'platform_update_workspace': 'Revisá el país, idioma, zona horaria, moneda y unidades elegidos antes de guardar.',
                     'platform_invite_member': 'Ya existe una membresía o invitación pendiente para ese email. Revisá el equipo antes de reintentar.',
                     'platform_update_member': 'Revisá los roles y conservá al menos un administrador activo en el workspace.',
+                    'platform_update_member_foundation': 'Revisá las responsabilidades y conservá al menos un administrador activo en el workspace.',
                     'platform_assign_decision': 'Elegí miembros activos con rol Admin u Operator para este workspace.',
                     'platform_received_invitations': 'La invitación venció, fue revocada o ya existe una membresía. Consultá al administrador.',
                 }

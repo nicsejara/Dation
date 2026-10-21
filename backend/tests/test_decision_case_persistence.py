@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, call, patch
 
 import httpx
 
@@ -167,8 +167,10 @@ class DecisionCaseHTTPTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(restored.status_code, 200)
             self.assertEqual(restored.json()["orders"]["id"], ORDERS_ID)
             self.assertEqual(restored.json()["fleet"]["id"], FLEET_ID)
-            collaboration.assert_awaited_once_with('platform_case_collaboration', {
-                'target_workspace_id': FLEET_ID, 'actor_user_id': ORDERS_ID, 'target_case_id': CASE_ID})
+            context={'target_workspace_id':FLEET_ID,'actor_user_id':ORDERS_ID,'target_case_id':CASE_ID}
+            collaboration.assert_has_awaits([call('platform_case_collaboration',context),call('platform_workflow_responsibilities',context)])
+            self.assertEqual(collaboration.await_count,2)
+            self.assertEqual(restored.json()['workflow_responsibilities'],{})
 
     async def test_create_case_accepts_client_case_id_and_data_pack(self):
         with patch.object(

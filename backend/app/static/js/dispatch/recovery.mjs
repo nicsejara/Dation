@@ -6,6 +6,7 @@ export function describeFailure(error,{kind,auth=false}={}){
   auth:['No pudimos iniciar sesión','Revisá tu email y contraseña. Si no la recordás, solicitá un enlace para recuperarla.'],
   session:['Tu sesión venció','Ingresá nuevamente para continuar. El trabajo guardado se conserva.'],
   permission:['Tu acceso no permite esta acción','Consultá con un administrador del workspace para revisar tu rol o la disponibilidad del DDA.'],
+  responsibility:['Revisá la responsabilidad asignada',error?.message||'Un administrador debe asignar una persona activa y elegible antes de continuar.'],
   upload:['No se pudo guardar el archivo','Conservá el CSV y reintentá. Si la carga quedó interrumpida, revisala en Data Hub antes de descartarla.'],
   run:['La ejecución terminó con error','La evidencia anterior se conserva. Revisá los datos y volvé a configurar la decisión.'],
   timeout:['La respuesta está demorando','Reintentá consultar el estado. Una demora no confirma que una carga o ejecución haya fallado.'],
@@ -20,6 +21,8 @@ export function describeFailure(error,{kind,auth=false}={}){
 export function responseFailure(response,data,{auth=false}={}){
  const detail=typeof data?.detail==='string'?data.detail:null;
  const e=Object.assign(new Error(detail||'Revisá los datos ingresados e intentá nuevamente.'),{status:response.status});
+ const gate=response.headers?.get?.('X-Dation-Workflow-Gate');
+ if(response.status===409&&['data','decision_owner','approver'].includes(gate)){e.workflowGate=gate;e.kind='responsibility';}
  if(auth&&response.status===401)e.kind='auth';
  if(response.status===413)e.kind='upload';
  return e;

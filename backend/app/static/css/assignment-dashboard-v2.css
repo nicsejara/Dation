@@ -84,7 +84,7 @@
 }
 
 .assignment-dashboard-v2__rail .dispatch-decision-tab.is-active{
-  border-color:var(--d-border-control)!important;
+  border-color:var(--color-text-accent)!important;
   background:var(--color-brand-soft)!important;
   box-shadow:var(--shadow-sm);
 }

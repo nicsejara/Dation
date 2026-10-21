@@ -42,6 +42,8 @@ if(mode==='workspace'){
  window.addEventListener('pagehide',()=>invites.dispose(),{once:true});
 }
 if(new URLSearchParams(location.search).get('reason')==='session')status.textContent='Tu sesión venció. Volvé a ingresar; el trabajo guardado se conserva.';
+if(mode==='login'&&new URLSearchParams(location.search).get('recovery')==='sent')status.textContent='Si la cuenta existe, recibirás un enlace para cambiar tu contraseña. Revisá tu correo y seguí las instrucciones.';
+if(mode==='login'&&new URLSearchParams(location.search).get('password')==='updated')status.textContent='Tu contraseña fue actualizada. Ingresá con tu nueva contraseña.';
 if(new URLSearchParams(location.search).has('error'))error.textContent='El enlace venció o se abrió en otro navegador. Solicitá uno nuevo desde este dispositivo.';
 async function call(url,body={}){
  const response=await fetch(url,{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
@@ -53,14 +55,16 @@ form.addEventListener('submit',async event=>{
  try{
   if('confirm_password'in body&&body.password!==body.confirm_password)throw new Error('Las contraseñas no coinciden.');
   const data=await call('/auth/'+(mode==='workspace'?'workspace':mode),body);
-  if(['login','workspace','password'].includes(mode)){location.replace(destination);return;}
+  if(mode==='recover'){location.replace('/login?recovery=sent');return;}
+  if(mode==='password'){location.replace('/login?password=updated');return;}
+  if(['login','workspace'].includes(mode)){location.replace(destination);return;}
   status.textContent=data.message;
   if(mode==='register'){
    try{const session=await call('/auth/session');if(session.access_token){location.replace(session.membership?destination:setupPath);return;}}catch{}
   }
  }catch(exc){const state=describeFailure(exc,{auth:mode==='login'});error.textContent=['auth','disconnected','timeout','permission'].includes(state.kind)?state.message:exc.message;error.focus();}finally{submit.disabled=false;submit.removeAttribute('aria-busy');}
 });
-if(mode==='login'||mode==='workspace'){
+if((mode==='login'&&!new URLSearchParams(location.search).has('recovery')&&!new URLSearchParams(location.search).has('password'))||mode==='workspace'){
  try{
   const session=await call('/auth/session');
   if(mode==='login')location.replace(session.membership?destination:setupPath);
