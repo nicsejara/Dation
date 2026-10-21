@@ -2,7 +2,7 @@
 from typing import Literal
 from uuid import UUID
 from fastapi import APIRouter, Depends, Query
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, model_validator
 from app.auth import require_upload_access
 from app.platform.auth_routes import Email
 from app.platform.identity import platform_call
@@ -58,11 +58,24 @@ async def revoke(invitation_id: UUID, payload: Version, ctx=Depends(require_uplo
 
 class MemberUpdate(Version):
     access_role: Role
-    business_role: Responsibility | None
+    business_role: Responsibility | None = None
+    business_roles: list[Responsibility] | None = Field(None,max_length=4)
     status: Literal['active', 'disabled']
+    @model_validator(mode='after')
+    def responsibility_contract(self):
+        if self.business_roles is None:
+            if 'business_role' not in self.model_fields_set:
+                raise ValueError('Indicá las responsabilidades que querés conservar o modificar.')
+        elif 'business_role' in self.model_fields_set or len(set(self.business_roles))!=len(self.business_roles):
+            raise ValueError('Usá una única lista de responsabilidades distintas.')
+        return self
 
 @router.patch('/team/members/{user_id}')
 async def update_member(user_id: UUID, payload: MemberUpdate, ctx=Depends(require_upload_access)):
+    if payload.business_roles is not None:
+        return await platform_call('platform_update_member_foundation', {'target_workspace_id':ctx.workspace_id,
+            'actor_user_id':ctx.user_id,'member_user_id':str(user_id),'expected_updated_at':payload.expected_updated_at.isoformat(),
+            'new_role':payload.access_role,'new_status':payload.status,'new_business_roles':payload.business_roles})
     return await platform_call('platform_update_member', {'target_workspace_id': ctx.workspace_id,
         'actor_user_id': ctx.user_id, 'member_user_id': str(user_id),
         'expected_updated_at': payload.expected_updated_at.isoformat(), 'new_role': payload.access_role,

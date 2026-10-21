@@ -3,7 +3,7 @@ import asyncio,csv,io,json,os
 from pathlib import Path
 from urllib.parse import urlparse
 from playwright.async_api import async_playwright
-from browser_auth import authenticate, api_get
+from browser_auth import authenticate, api_get,assign_workflow_person
 
 MANIFEST=Path(os.environ['DATION_E2E_SCHEDULING']);DATA=json.loads(MANIFEST.read_text());BASE=os.environ['DATION_E2E_URL']
 assert urlparse(BASE).hostname=='127.0.0.1'
@@ -54,10 +54,11 @@ async def main():
         rows=list(csv.reader(io.StringIO(path.read_text(encoding='utf-8-sig')),delimiter=';'))
         assert 'Recurso disponible' in rows[0] and {t['trip_id'] for t in DATA['run']['result_json']['scenarios']['selected']['trips']}=={r[0] for r in rows[1:]}
         assert all(path=='/api/platform/activity/exports' for _,path in writes) and not errors,(writes,errors)
+        await assign_workflow_person(page,'logistics_scheduling','approver')
         await page.locator('[data-approve-final]').click()
         await page.wait_for_function("window.DationDispatch.getWorkspace().decisionCase.nodes.logistics_scheduling.status==='approved'")
         assert await page.locator('[data-approve-final]').is_disabled()
-        assert all(path.endswith('/approve') or path in ('/api/runs/preflight','/api/platform/activity/exports') for _,path in writes),writes
+        assert all(path.endswith('/approve') or path.endswith('/responsibilities/logistics_scheduling') or path in ('/api/runs/preflight','/api/platform/activity/exports') for _,path in writes),writes
         assert sum(path.endswith('/approve') for _,path in writes)==1,writes
         persisted=await (await api_get(context,BASE+'/api/runs/'+DATA['run']['id'])).json()
         assert persisted['approved_at'] and persisted['result_fingerprint']==DATA['run']['result_fingerprint']

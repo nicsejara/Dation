@@ -1,3 +1,4 @@
+import {responsibilityProblem} from '../workflow-responsibility.mjs';
 import {mountDemoAction} from '../../platform/onboarding.mjs';
 import {createScope,scopeFor} from "../lifecycle.mjs";
 import {createWorkflowActionBar} from "../workflow-action-bar.mjs";
@@ -233,6 +234,7 @@ export async function mountUploadScreen(
     runPreflight,
     onNext,
     isCurrent=()=>true,
+    mountWorkflow,
   },
 ) {
   const scope=createScope(root),current=()=>scope.active&&isCurrent();
@@ -385,7 +387,10 @@ export async function mountUploadScreen(
       storageAvailable: Boolean(local.status?.available),
     };
 
+    const responsibility=responsibilityProblem(state.workflow,'data_preparation','data');
+    if(result.enabled&&responsibility){result.enabled=false;result.kind='responsibility';result.message=responsibility;}
     actionBar.update(result, context);
+    if(responsibility&&state.preflight?.valid){actionBar.button.firstElementChild.textContent='Seleccioná tu decisión';}
 
     window.dationSetDataReady(Boolean(result.enabled));
     return result;
@@ -666,6 +671,7 @@ export async function mountUploadScreen(
 
   async function refreshPreflight() {
     state.preflight = null;
+    mountWorkflow?.(root,()=>finalState());
     renderValidation();
 
     if (
@@ -680,6 +686,7 @@ export async function mountUploadScreen(
 
     try {
       await runPreflight();
+      if(current())mountWorkflow?.(root,()=>finalState());
     } catch (error) {
       state.preflight = {
         valid: false,

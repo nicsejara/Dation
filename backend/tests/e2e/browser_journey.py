@@ -7,7 +7,7 @@ import subprocess
 from urllib.parse import parse_qs, urlparse
 
 from playwright.async_api import async_playwright
-from browser_auth import authenticate, api_get
+from browser_auth import authenticate, api_get,assign_workflow_person
 from workflow_ui_audit import WorkflowUIAudit
 
 
@@ -80,6 +80,7 @@ async def journey():
                     await page.locator('[data-kind="'+kind+'"] input[type=file]').set_input_files(inputs/(kind+'.csv'))
                 assert (await upload.value).status==200
                 if kind=='orders':assert await next_button.is_disabled()
+            await assign_workflow_person(page,'data_preparation')
             await page.locator('.d-workflow-action-bar[data-state=ready]').wait_for()
             await ui.hero('data-ready')
             await ui.bar('data',2)
@@ -100,15 +101,17 @@ async def journey():
             assert (await persisted.json())['decision_case']['inputs']==initial['inputs']
             map_url=page.url
             await page.locator('[data-select-case]').click()
-            await page.get_by_role('dialog',name='Seleccionar Decision Case').wait_for()
-            assert await page.get_by_role('button',name='Caso actual',exact=True).is_disabled()
-            assert await page.get_by_text('No hay otros Decision Cases disponibles todavía.').is_visible()
+            switcher=page.locator('[data-case-switcher]')
+            await switcher.get_by_role('navigation',name='Decision Cases recientes').wait_for()
+            assert await switcher.locator('nav [aria-current=true]').count()==1
+            assert await switcher.get_by_role('button',name='Abrir este caso en Decision Center',exact=True).is_visible()
             await page.keyboard.press('Escape')
             assert page.url==map_url
-            assert await page.locator('[data-select-case]').evaluate('el=>el===document.activeElement')
+            assert await switcher.locator('button').first.evaluate('el=>el===document.activeElement')
             assert await page.locator('[data-case-transition]').count()==0
             await page.locator('[data-map-node="logistics_assignment"][data-map-action]').first.click()
             await page.wait_for_selector('[data-config-review]')
+            await assign_workflow_person(page,'logistics_assignment')
             await ui.hero('assignment','DECISIÓN 01 DE 3')
             assert not await page.locator('[data-config-context]').get_attribute('open')
             assert await page.locator("[data-depth]").count()==0
@@ -174,6 +177,7 @@ async def journey():
             await page.reload(wait_until='domcontentloaded')
             await page.wait_for_selector('[data-comparative-state=completed]')
             assert await page.locator('[data-generate-comparative]').count()==0
+            await assign_workflow_person(page,'logistics_assignment','approver')
             await page.locator('[data-approve-toolbar]').click()
             await page.wait_for_function("window.DationDispatch.getWorkspace().decisionCase.nodes.logistics_assignment.status==='approved'")
             await page.locator('[data-after-approve]').wait_for(state='visible')
@@ -200,6 +204,7 @@ async def journey():
             assert not await page.locator('[data-config-context]').get_attribute('open')
             assert await page.get_by_text('ASIGNACIÓN APROBADA',exact=True).is_visible()
             await ui.hero('scheduling','DECISIÓN 02 DE 3')
+            await assign_workflow_person(page,'logistics_scheduling')
             await ui.bar('scheduling',3)
             await ui.action('scheduling-review',page.locator('[data-scheduling-review]'))
             await ui.checkpoint('scheduling-config')
@@ -252,6 +257,7 @@ async def journey():
             await page.wait_for_selector('.dispatch-scheduling-dashboard')
             await ui.toolbar('scheduling')
             await ui.checkpoint('scheduling-dashboard')
+            await assign_workflow_person(page,'logistics_scheduling','approver')
             await page.locator('[data-approve-toolbar]').click()
             await page.wait_for_function("window.DationDispatch.getWorkspace().decisionCase.nodes.logistics_scheduling.status==='approved'")
             await ui.checkpoint('scheduling-approved')

@@ -156,7 +156,7 @@ export function bindDashboardToolbar(root,run,{onRerun,caseActions={}}={}){
   const hero=toolbar.dataset.toolbarPlacement==='hero';
   const approveButtons=[...root.querySelectorAll('[data-approve-toolbar],[data-approve-final]')];
   const infeasible=Boolean(caseActions.approvalBlocked)||hero&&(run.result_json?.scenarios?.selected?.feasible===false||run.result_json?.scenarios?.selected?.solver?.status==='infeasible');
-  if(hero)approveButtons.forEach(button=>{button.disabled=caseActions.status==='approved'||infeasible;});
+  approveButtons.forEach(button=>{button.disabled=caseActions.status==='approved'||infeasible;});
   async function approve(){
     if(pendingApproval||!caseActions.onApprove||!scope.active||infeasible||hero&&caseActions.status==='approved')return;
     pendingApproval=true;approveButtons.forEach(button=>button.disabled=true);errorBox.hidden=true;
@@ -172,9 +172,15 @@ export function bindDashboardToolbar(root,run,{onRerun,caseActions={}}={}){
         const status=root.querySelector('[data-assignment-hero-status]');
         if(status){status.className='assignment-hero__status is-consistent';status.innerHTML=actionLabel('Decisión aprobada','checkCircle');}
       }else approveButton.hidden=true;
-      caseActions.onApprovalComplete?.();await actions.refresh();
+      await caseActions.onApprovalComplete?.();if(scope.active)await actions.refresh();
     }catch(error){
-      if(scope.active){approveButton.innerHTML=label;approveButtons.forEach(button=>button.disabled=false);errorBox.textContent=error.message||'No se pudo aprobar la decisión.';errorBox.hidden=false;}
+      if(scope.active){
+        approveButton.innerHTML=label;approveButtons.forEach(button=>button.disabled=Boolean(error.workflowGate));errorBox.textContent=error.message||'No se pudo aprobar la decisión.';errorBox.hidden=false;
+        if(error.workflowGate&&caseActions.onRefresh){
+          const refresh=document.createElement('button');refresh.type='button';refresh.className='d-button d-button--secondary';refresh.textContent='Actualizar decisión';
+          scope.listen(refresh,'click',async()=>{refresh.disabled=true;try{await caseActions.onRefresh();}catch{if(scope.active){refresh.disabled=false;refresh.textContent='Reintentar actualización';}}});errorBox.append(refresh);
+        }
+      }
     }finally{pendingApproval=false;approveButton.removeAttribute('aria-busy');}
   }
   approveButtons.forEach(button=>scope.listen(button,'click',approve));

@@ -163,6 +163,9 @@ async def guarded(call):
     except ValueError as exc:
         raise HTTPException(422, str(exc)) from exc
     except httpx.HTTPError as exc:
+        if isinstance(exc,httpx.HTTPStatusError):
+            from app.platform.identity import raise_workflow_conflict
+            raise_workflow_conflict(exc.response)
         raise HTTPException(
             502,
             "No se pudo guardar o recuperar la información de despacho.",
@@ -231,7 +234,10 @@ async def get_decision_case(case_id: UUID):
     collaboration = await platform_call('platform_case_collaboration', {
         'target_workspace_id': ctx.workspace_id, 'actor_user_id': ctx.user_id,
         'target_case_id': str(case_id)})
-    return {**result, 'collaboration': collaboration}
+    responsibilities = await platform_call('platform_workflow_responsibilities', {
+        'target_workspace_id': ctx.workspace_id, 'actor_user_id': ctx.user_id,
+        'target_case_id': str(case_id)})
+    return {**result, 'collaboration': collaboration, 'workflow_responsibilities': responsibilities}
 
 
 @router.get("/api/decision-cases/{case_id}/runs")

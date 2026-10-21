@@ -60,13 +60,14 @@ test('continuation uses actual approval and readiness without changing the case'
   const before=structuredClone(current);
   assert.equal(continuationState(current,'logistics_assignment','candidate',fullReadiness,metadata),null);
   assert.equal(continuationState(current,'logistics_assignment','approved',partialReadiness,metadata).state,'needs_data');
-  assert.deepEqual(continuationState(current,'logistics_assignment','approved',fullReadiness,metadata),{state:'available',nodeId:'logistics_scheduling',label:'Continuar con Planificación →'});
+  assert.deepEqual(continuationState(current,'logistics_assignment','approved',fullReadiness,metadata),{state:'available',nodeId:'logistics_scheduling',label:'Continuar con Planificación →',target:{view:'logistics-config',node_id:'logistics_scheduling',run_id:null}});
   assert.deepEqual(current,before);
 });
 test('approved downstream and unimplemented decisions do not open an empty configuration',()=>{
   let current=transitionNode(createDecisionCase('case',orders,fleet),'logistics_assignment',STATUS.APPROVED,{run_id:'a',approved_run_id:'a'});
   current=transitionNode(current,'logistics_scheduling',STATUS.APPROVED,{run_id:'s',approved_run_id:'s'});
   assert.equal(continuationState(current,'logistics_assignment','a',fullReadiness,metadata).state,'finished');
+  assert.equal(continuationState(current,'logistics_assignment','a',fullReadiness,metadata).target.run_id,'s');
   assert.equal(continuationState(current,'logistics_scheduling','s',fullReadiness,metadata).state,'unavailable');
   assert.equal(nextDecisionId('unknown'),null);assert.equal(nextDecisionId('logistics_final_assignment'),null);
 });
@@ -75,6 +76,8 @@ test('running or review next nodes open through the existing-run rail, never thr
   for(const status of [STATUS.RUNNING,STATUS.REVIEW,STATUS.STALE]){
     current=transitionNode(current,'logistics_scheduling',status,{run_id:'s'});
     assert.equal(continuationState(current,'logistics_assignment','a',fullReadiness,metadata).state,status);
+    assert.equal(continuationState(current,'logistics_assignment','a',fullReadiness,metadata).target.view,'decision-dashboard');
+    assert.equal(continuationState(current,'logistics_assignment','a',fullReadiness,metadata).target.run_id,'s');
   }
 });
 

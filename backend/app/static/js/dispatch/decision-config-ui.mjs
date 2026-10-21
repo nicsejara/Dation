@@ -207,7 +207,7 @@ export function mountConfigActionBar(root){
   }));
   const placeholder=root.querySelector('[data-config-summary]');
   if(!placeholder)return;
-  const {ready=true,reason="",chips=[],reviewHook="data-config-review"}=JSON.parse(placeholder.dataset.configSummary);
+  const {ready=true,blocked=false,reason="",chips=[],reviewHook="data-config-review"}=JSON.parse(placeholder.dataset.configSummary);
   const {bar,button,update}=createWorkflowActionBar({label:"Tu configuración",variant:"configuration",onSelect:id=>{
     const section=root.querySelector('#'+CSS.escape(id));
     attentionToConfig(section);
@@ -215,6 +215,7 @@ export function mountConfigActionBar(root){
   bar.classList.add("d-workflow-action-bar--config");
   button.setAttribute(reviewHook,"");
   update({kind:ready?"ready":"error",enabled:ready,message:ready?"Lista para revisar. Cambios guardados en esta sesión.":reason},{items:chips});
+  button.disabled=blocked;
   placeholder.replaceWith(bar);
   const measure=()=>root.style.setProperty('--config-action-height',Math.ceil(bar.getBoundingClientRect().height)+'px');
   const observer=typeof ResizeObserver==='undefined'?null:new ResizeObserver(measure);
@@ -222,7 +223,7 @@ export function mountConfigActionBar(root){
   let release;
   const dispose=()=>{observer?.disconnect();release?.();root.style.removeProperty('--config-action-height');actionBars.delete(root);};
   release=scopeFor(root)?.own(dispose);
-  actionBars.set(root,{dispose,update,items:chips});
+  actionBars.set(root,{dispose,update,button,items:chips});
 }
 
 export function attentionToConfig(target){
@@ -270,9 +271,11 @@ export function bindConfigReview({dialog,trigger,executeSelector,prepare,validat
   });
 }
 
-export function updateConfigActionBar(root,{ready,reason=""}){
+export function updateConfigActionBar(root,{ready,reason="",blocked=false}){
   const mounted=actionBars.get(root);
+  if(mounted)mounted.button.disabled=blocked;
   mounted?.update({kind:ready?"ready":"error",enabled:ready,message:ready?"Lista para revisar. Cambios guardados en esta sesión.":reason},{items:mounted.items});
+  if(mounted)mounted.button.disabled=blocked;
 }
 
 export function decisionInfoNote({icon="info",title="",copy="",className=""}){

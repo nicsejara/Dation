@@ -22,3 +22,8 @@ test('source and stale decisions preserve evidence and direct to the upstream ap
  assert.match(describeFailure(null,{kind:'stale'}).message,/evidencia anterior/);
  assert.match(describeFailure(null,{kind:'run'}).message,/configurar/);
 });
+test('only a typed workflow rejection is definitive; uncertain transport failures keep their intention',()=>{
+ const response=(status,gate)=>({status,headers:{get:()=>gate}});
+ assert.equal(responseFailure(response(409,'decision_owner'),{detail:'Falta responsable'}).workflowGate,'decision_owner');
+ for(const [status,gate]of [[503,'decision_owner'],[409,null],[409,'unknown']])assert.equal(responseFailure(response(status,gate),{}).workflowGate,undefined);
+});

@@ -1,3 +1,5 @@
+import {mountWorkflowContext} from './workflow-context.mjs';
+import {responsibilityProblem,executionPermission} from './workflow-responsibility.mjs';
 import {createScope,scopeFor} from "./lifecycle.mjs";
 import {ensureDecisionCaseStyles} from "./styles.mjs";
 import {api,esc,num,post} from "./shared.mjs";
@@ -342,10 +344,12 @@ function resourceSection(stats){
   +'</section>';
 }
 
-function summaryBar(config,stats,slaAvailable){
-  const problem=configProblem(config,slaAvailable,stats.trips);
+function summaryBar(config,stats,slaAvailable,state){
+  const reason=executionPermission()||responsibilityProblem(state.workflow,'logistics_scheduling');
+  const problem=reason?{section:'workflow-responsibility',reason}:configProblem(config,slaAvailable,stats.trips);
   return configSummaryBar({
     ready:!problem,
+    blocked:problem?.section==='workflow-responsibility',
     reason:problem?.reason||"",
     ctaLabel:"Revisar y ejecutar",
     reviewHook:"data-scheduling-review",
@@ -357,7 +361,7 @@ function summaryBar(config,stats,slaAvailable){
   });
 }
 
-function reviewDialog(config,stats,sourceRun,caseId){
+function reviewDialog(config,stats,sourceRun,caseId,owner){
   return executionReviewDialog({
     title:"Revisar planificación",
     accessibleLabel:"Revisar Scheduling antes de ejecutar",
@@ -367,6 +371,7 @@ function reviewDialog(config,stats,sourceRun,caseId){
     note:"La planificación conserva los viajes y recursos aprobados en Assignment. Esta decisión sólo define fechas y secuencia.",
     rows:[
       {label:"Decision Case",value:displayDecisionCaseId(caseId)},
+      {label:"Responsable",value:owner?.name||"Sin asignar"},
       {label:"Entrada",value:num(stats.totalTrips)+' viajes de Assignment · Run '+formatRunId(sourceRun.id)},
       {label:"Ventana",value:windowLabel(config)},
       {label:"Reglas por foco",value:rulesLabel(config,stats.trips)},
@@ -387,8 +392,8 @@ function markup({state,sourceRun,slaAvailable,config}){
       +resourceSection(stats)
       +decisionAdvancedOptionsSection({kind:"scheduling"})
     +'</main>'
-    +summaryBar(config,stats,slaAvailable)
-    +reviewDialog(config,stats,sourceRun,state.decisionCase?.id)
+    +summaryBar(config,stats,slaAvailable,state)
+    +reviewDialog(config,stats,sourceRun,state.decisionCase?.id,state.workflow?.stages?.logistics_scheduling?.owner)
   +'</div>';
 }
 
@@ -531,6 +536,8 @@ function bind(root,context){
     bind(root,{...context,config});
   };
 
+  mountWorkflowContext(root,{state,stageKey:'logistics_scheduling',onSaved:rerender});
+
   root.querySelector("[data-scheduling-copy-case]")?.addEventListener("click",async()=>{
     try{
       await navigator.clipboard.writeText(String(caseId));
@@ -584,7 +591,8 @@ function bind(root,context){
   bindConfigReview({
     dialog,trigger:root.querySelector('[data-scheduling-review]'),executeSelector:'[data-scheduling-execute]',
     validate:()=>{
-      const problem=configProblem(config,slaAvailable,trips);
+      const reason=executionPermission()||responsibilityProblem(state.workflow,'logistics_scheduling');
+      const problem=reason?{section:'workflow-responsibility',reason}:configProblem(config,slaAvailable,trips);
       if(problem){
         if(problem.section==='scheduling-scope')config={...config,focusRulesOpen:true};
         writeConfig(caseId,config);rerender();

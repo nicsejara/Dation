@@ -88,8 +88,8 @@ class WorkflowUIAudit:
         await dialog.wait_for()
         assert await dialog.evaluate("el=>el.matches(':modal')")
         labels = await dialog.locator('.d-execution-review__row strong').all_text_contents()
-        assert labels == (['Decision Case', 'Alcance', 'Objetivo', 'Prioridades', 'Recursos'] if kind == 'assignment'
-                          else ['Decision Case', 'Entrada', 'Ventana', 'Reglas por foco', 'Objetivo', 'Recursos']), labels
+        assert labels == (['Decision Case', 'Responsable', 'Alcance', 'Objetivo', 'Prioridades', 'Recursos'] if kind == 'assignment'
+                          else ['Decision Case', 'Responsable', 'Entrada', 'Ventana', 'Reglas por foco', 'Objetivo', 'Recursos']), labels
         actual = await dialog.evaluate('''el=>{
             const style=node=>{const s=getComputedStyle(node);return Object.fromEntries(
                 ['padding','borderRadius','font','color','background','gap','maxWidth','maxHeight'].map(k=>[k,s[k]]));};

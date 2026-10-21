@@ -6,9 +6,11 @@ from uuid import uuid4
 import httpx
 from auth_fixture import USER_A, USER_B, VIEWER, DISABLED, token
 from sandbox import Sandbox
+from workflow_fixture import set_roles,prepare_stage
 import test_workflow as workflow
 
 class CollaborationTests(unittest.TestCase):
+ auto_assign_workflow=False
  checked=workflow.WorkflowTests.checked
  upload=workflow.WorkflowTests.upload
  case=workflow.WorkflowTests.case
@@ -24,6 +26,7 @@ class CollaborationTests(unittest.TestCase):
   self.s.sql('TRUNCATE datasets,decision_runs,decision_cases,decision_approval_events,workspace_invitations CASCADE;')
   self.s.sql(f"DELETE FROM workspace_members WHERE workspace_id='{self.s.workspace_a}' AND user_id='{USER_B}'; UPDATE workspace_members SET access_role=CASE WHEN user_id='{USER_A}' THEN 'admin' WHEN user_id='{VIEWER}' THEN 'viewer' ELSE 'operator' END,status=CASE WHEN user_id='{DISABLED}' THEN 'disabled' ELSE 'active' END,business_role=NULL,updated_at=clock_timestamp() WHERE workspace_id='{self.s.workspace_a}'; UPDATE profiles SET active_workspace_id='{self.s.workspace_b}' WHERE id='{USER_B}'; UPDATE auth.users SET email_confirmed_at=now();")
   self.a=self.s.api_client
+  set_roles(self.a,USER_A,['data_steward','decision_owner','approver'])
   self.b=httpx.Client(base_url=self.s.api_url,headers={'Authorization':'Bearer '+self.s.user_tokens[USER_B]},trust_env=False,timeout=30);self.addCleanup(self.b.close)
  def team(self):return self.checked(self.a.get('/api/platform/team'))
  def row(self,uid):return next(row for row in self.team()['members'] if row['user_id']==uid)
@@ -36,7 +39,7 @@ class CollaborationTests(unittest.TestCase):
   c=httpx.Client(base_url=self.s.api_url,headers={'Origin':self.s.api_url},trust_env=False,timeout=30)
   c.cookies.set('dation_access',self.s.user_tokens[uid]);self.addCleanup(c.close);return c
  def join(self):
-  invitation=self.invite();self.checked(self.bff().post('/auth/invitations/'+invitation['id']+'/accept'));return invitation
+  invitation=self.invite();self.checked(self.bff().post('/auth/invitations/'+invitation['id']+'/accept'));set_roles(self.a,USER_B,['decision_owner','approver']);return invitation
  def assign(self,case,node='logistics_assignment',owner=USER_B,approver=USER_B,version=None):
   return self.a.put('/api/platform/decisions/'+case+'/assignments/'+node,json={'expected_updated_at':version,'owner_user_id':owner,'approver_user_id':approver})
 
@@ -67,6 +70,7 @@ class CollaborationTests(unittest.TestCase):
 
  def test_02_assigned_approval_handoff_attribution_override_and_retry(self):
   self.join();self.checked(self.update(VIEWER,'operator'));case,orders,fleet=self.case()
+  prepare_stage(self.a,case,'data_preparation')
   first=self.checked(self.assign(case));second=self.checked(self.assign(case,'logistics_scheduling',owner=USER_B,approver=USER_B))
   self.assertEqual(self.assign(case,version=None).status_code,409)
   with httpx.Client(base_url=self.s.api_url,headers={'Authorization':'Bearer '+self.s.user_tokens[VIEWER]},trust_env=False) as operator:
@@ -138,5 +142,6 @@ class CollaborationTests(unittest.TestCase):
   self.assertEqual(sorted(results),[200,409]);self.assertEqual(self.s.sql(f"SELECT count(*) FROM workspace_members WHERE workspace_id='{self.s.workspace_a}' AND access_role='admin' AND status='active';"),'1')
   self.s.sql(f"UPDATE workspace_members SET access_role='admin' WHERE user_id='{USER_A}' AND workspace_id='{self.s.workspace_a}';")
   case,_,_=self.case()
+  set_roles(self.a,USER_B,['decision_owner','approver'])
   with ThreadPoolExecutor(max_workers=2) as pool:results=list(pool.map(lambda _:self.assign(case).status_code,range(2)))
   self.assertEqual(sorted(results),[200,409]);self.assertEqual(self.s.sql(f"SELECT count(*) FROM decision_assignments WHERE decision_case_id='{case}';"),'1')

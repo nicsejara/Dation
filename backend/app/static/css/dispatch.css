@@ -3055,16 +3055,18 @@ body.dispatch-result #chat-panel{
   font-size:9.5px;
 }
 .dispatch-decision-tab i{
-  color:var(--color-text);
+  color:var(--color-success);
   font-style:normal;
   font-weight:900;
 }
-.dispatch-decision-tab.is-approved:not(:disabled){
-  border-color:var(--color-success-border)!important;
-  background:var(--color-success-bg)!important;
+.dispatch-decision-tab.is-approved:not(.is-active):not(:disabled){
+  border-color:var(--color-border)!important;
+  background:var(--color-surface)!important;
 }
+.dispatch-decision-tab[data-status-tone="success"] small{color:var(--color-success)}
+.dispatch-decision-tab[data-status-tone="warning"] small{color:var(--color-warning)}
 .dispatch-decision-tab.is-active{
-  border-color:var(--d-border-control)!important;
+  border-color:var(--color-text-accent)!important;
   box-shadow:var(--shadow-sm);
   background:var(--color-brand-soft)!important;
 }

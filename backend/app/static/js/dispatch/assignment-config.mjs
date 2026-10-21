@@ -1,3 +1,5 @@
+import {mountWorkflowContext} from './workflow-context.mjs';
+import {responsibilityProblem,executionPermission} from './workflow-responsibility.mjs';
 import {createScope} from "./lifecycle.mjs";
 import {mountFilterCollapse} from "./assignment-filter-collapse.mjs";
 import {ensureDecisionCaseStyles} from "./styles.mjs";
@@ -365,6 +367,10 @@ function resourceSection(state,preview){
 }
 
 function blocker(state,preview,capabilities){
+  const permission=executionPermission();
+  if(permission)return {section:'workflow-permission',reason:permission};
+  const responsibility=responsibilityProblem(state.workflow,'logistics_assignment');
+  if(responsibility)return {section:'workflow-responsibility',reason:responsibility};
   if(Number(preview?.orders?.included??0)<=0)return {section:"config-scope",reason:"Los filtros no dejan órdenes para analizar."};
   if(preview&&preview.valid===false&&preview.errors?.length)return {section:"config-scope",reason:preview.errors[0].detail||"Revisá el alcance de los datos."};
   const dims=activeDimensions(capabilities);
@@ -387,6 +393,7 @@ function summaryFooter(state,preview,capabilities){
   const error=blocker(state,preview,capabilities);
   return configSummaryBar({
     ready:!error,
+    blocked:Boolean(error?.section?.startsWith('workflow-')),
     reason:error?.reason||"",
     chips:[
       {target:"config-scope",icon:"filter",label:"Alcance",value:scopeSummary(preview,state.scopeFilters||[])},
@@ -409,6 +416,7 @@ function reviewDialog(state,preview,capabilities){
     executeAttributes:{"data-config-execute":true},
     rows:[
       {label:"Decision Case",value:displayDecisionCaseId(state.decisionCase?.id)},
+      {label:"Responsable",value:state.workflow?.stages?.logistics_assignment?.owner?.name||"Sin asignar"},
       {label:"Alcance",value:scopeSummary(preview,state.scopeFilters||[])},
       {label:"Objetivo",value:OBJECTIVE_LABELS[state.objective]||"Balanceado"},
       {label:"Prioridades",value:priority},
@@ -614,6 +622,7 @@ export async function mountAssignmentConfig(root,context){
 
   function bind(){
     mountConfigActionBar(root);
+    mountWorkflowContext(root,{state,stageKey:'logistics_assignment',onSaved:()=>rerender()});
     const copy=root.querySelector("[data-config-copy-case]");
     if(copy)copy.onclick=async()=>{
       const feedback=root.querySelector("[data-config-copy-feedback]");
@@ -675,7 +684,7 @@ export async function mountAssignmentConfig(root,context){
         if(segmentKey)segment.style.setProperty("--weight",(effective[segmentKey]||0)+'%');
       });
       const problem=blocker(state,preview,capabilities);
-      updateConfigActionBar(root,{ready:!problem,reason:problem?.reason});
+      updateConfigActionBar(root,{ready:!problem,reason:problem?.reason,blocked:Boolean(problem?.section?.startsWith('workflow-'))});
       slider.setAttribute("aria-valuetext",DIMENSION_LABELS[key]+', '+slider.value+' de 100, equivale al '+effective[key]+' %');
     });
     root.querySelector("[data-custom-base]")?.addEventListener("change",async event=>{

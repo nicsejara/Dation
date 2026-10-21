@@ -19,6 +19,7 @@ class MigrationCompatibilityTests(unittest.TestCase):
             self.assertEqual(s.sql(f"SELECT responsibility FROM dation_private.member_responsibilities WHERE user_id='{legacy}';"),'data_steward')
 
 class FoundationDomainTests(unittest.TestCase):
+    auto_assign_workflow=False
     checked=workflow.WorkflowTests.checked
     upload=workflow.WorkflowTests.upload
     case=workflow.WorkflowTests.case
@@ -79,7 +80,7 @@ class FoundationDomainTests(unittest.TestCase):
     def test_stage_assignments_enforce_eligibility_and_keep_get_read_only(self):
         case,_,_=self.case();self.checked(self.roles(USER_A,['data_owner','decision_owner','approver']))
         self.checked(self.roles(VIEWER,['approver']))
-        original=self.read(case);self.assertFalse(original['gates_enforced'])
+        original=self.read(case);self.assertTrue(original['gates_enforced'])
         self.assertTrue(all(s['owner'] is None for s in original['stages'].values()))
         self.assertEqual(self.assign(case,'data_preparation',VIEWER).status_code,409)
         self.assertEqual(self.assign(case,'logistics_assignment',USER_B).status_code,409)
@@ -108,8 +109,8 @@ class FoundationDomainTests(unittest.TestCase):
     def test_approved_precedence_actual_actor_and_explicit_candidate_access(self):
         row=self.member(VIEWER)
         self.checked(self.a.patch('/api/platform/team/members/'+VIEWER,json={'expected_updated_at':row['updated_at'],'access_role':'operator','business_role':'approver','status':'active'}))
-        self.checked(self.roles(USER_A,['decision_owner']))
-        case,orders,fleet=self.case();self.checked(self.assign(case,'logistics_assignment',USER_A,VIEWER))
+        self.checked(self.roles(USER_A,['data_steward','decision_owner']))
+        case,orders,fleet=self.case();self.checked(self.assign(case,'data_preparation',USER_A));self.checked(self.assign(case,'logistics_assignment',USER_A,VIEWER))
         self.s.start_worker();first=self.finish(self.admit(self.body(case,orders,fleet)));approved=self.approve(first['id'],case)
         self.assertEqual(approved['approved_by_user_id'],USER_A)
         self.assertEqual(self.read(case)['stages']['logistics_assignment']['approver']['id'],VIEWER)

@@ -1,3 +1,4 @@
+import {resolveNodeDestination} from './decision-target.mjs';
 export const NODE_IDS = [
   "logistics_assignment",
   "logistics_scheduling",
@@ -220,9 +221,10 @@ export function continuationState(current,nodeId,runId,readiness,metadata){
   const next=nextDecisionId(nodeId);
   if(!next)return {state:'finished',message:'No hay otra decisión pendiente en este caso.'};
   const meta=metadata[next];
-  if(!meta?.implemented)return {state:'unavailable',nodeId:next,message:'La siguiente decisión todavía no está disponible en Dation.'};
+  if(!meta?.implemented)return {state:'unavailable',nodeId:next,message:'Decisión aprobada. La siguiente etapa todavía no está disponible.'};
   const nextNode=deriveDecisionNodes(current,readiness)[next];
-  if(nextNode?.status===STATUS.APPROVED)return {state:'finished',message:meta.label+' ya está aprobada. Podés abrir su análisis en la barra de decisiones.'};
+  const target=resolveNodeDestination(next,nextNode);
+  if(target)return {state:nextNode.status===STATUS.APPROVED?'finished':nextNode.status,nodeId:next,label:'Continuar con '+(next==='logistics_scheduling'?'Planificación':meta.short)+' →',target};
   const evidence=readinessById(readiness)[next];
   if(!evidence?.data_ready)return {state:'needs_data',nodeId:next,message:'Faltan datos para '+meta.label+': '+(evidence?.missing||[]).map(item=>item.label||item.column).filter(Boolean).join(', ')+'. Podés iniciar una nueva decisión con un Data Pack completo.'};
   if(nextNode?.status!==STATUS.AVAILABLE)return {state:nextNode?.status||'unavailable',nodeId:next,message:meta.label+(nextNode?.status===STATUS.RUNNING?' se está ejecutando.':nextNode?.status===STATUS.REVIEW?' tiene una corrida para revisar.':' requiere una nueva corrida.')+' Abrí su análisis en la barra de decisiones.'};

@@ -14,6 +14,7 @@ from sandbox import Sandbox, ROOT, wait_for
 
 
 class WorkflowTests(unittest.TestCase):
+    prepare_case_workflow=True
     @classmethod
     def setUpClass(cls):
         cls.s=Sandbox().__enter__()
@@ -42,6 +43,9 @@ class WorkflowTests(unittest.TestCase):
         identifier=str(uuid4())
         self.checked(self.s.api_client.post('/api/decision-cases',json={
             'id':identifier,'orders_dataset_id':orders['id'],'fleet_dataset_id':fleet['id']}))
+        if getattr(self,'prepare_case_workflow',False):
+            from workflow_fixture import prepare_stage
+            prepare_stage(self.s.api_client,identifier,'logistics_assignment')
         return identifier,orders,fleet
 
     def body(self,case,orders,fleet,node='logistics_assignment',source=None):
@@ -54,6 +58,9 @@ class WorkflowTests(unittest.TestCase):
         return result
 
     def admit(self,body,identifier=None):
+        if getattr(self,'auto_assign_workflow',True) and (case:=body.get('decision_case')):
+            from workflow_fixture import prepare_stage
+            prepare_stage(self.s.api_client,case['case_id'],case['node_id'])
         identifier=identifier or str(uuid4())
         response=self.s.api_client.post('/api/runs',params={'run_id':identifier},json=body)
         run=self.checked(response,202)
@@ -76,6 +83,9 @@ class WorkflowTests(unittest.TestCase):
         return self.checked(self.s.db.get('dispatch_run_jobs',params={'run_id':'eq.'+identifier}))[0]
 
     def approve(self,run,case,node='logistics_assignment'):
+        if getattr(self,'auto_assign_workflow',True):
+            from workflow_fixture import prepare_stage
+            prepare_stage(self.s.api_client,case,node,approval=True)
         return self.checked(self.s.api_client.post('/api/runs/'+run+'/approve',json={'case_id':case,'node_id':node}))
 
     def test_assignment_dashboard_all_objectives_use_actual_worker_evidence(self):

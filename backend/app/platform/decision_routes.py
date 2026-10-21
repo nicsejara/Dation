@@ -11,6 +11,20 @@ router=APIRouter(prefix='/decisions')
 Node=Literal['logistics_assignment','logistics_scheduling','logistics_final_assignment']
 Stage=Literal['data_preparation','logistics_assignment','logistics_scheduling']
 
+@router.get('/{case_id}/workflow-readiness')
+async def workflow_readiness(case_id:UUID,ctx=Depends(require_upload_access)):
+    from fastapi import HTTPException
+    from app.platform.entitlements import require_dda
+    from app.services import decision_case_service,dispatch_service
+    from app.routes.dispatch import guarded
+    require_dda(ctx,'logistics')
+    case=await guarded(decision_case_service.get_case(str(case_id)))
+    inputs=await guarded(dispatch_service.check_inputs(case['orders']['id'],case['fleet']['id'],True))
+    if not inputs.get('valid'):
+        raise HTTPException(409,'Validá y corregí el Data Pack antes de continuar.')
+    return await platform_call('platform_validate_data_stage',{'target_workspace_id':ctx.workspace_id,
+        'actor_user_id':ctx.user_id,'target_case_id':str(case_id)})
+
 @router.get('/{case_id}/responsibilities')
 async def responsibilities(case_id:UUID,ctx=Depends(require_upload_access)):
     return await platform_call('platform_workflow_responsibilities',{'target_workspace_id':ctx.workspace_id,

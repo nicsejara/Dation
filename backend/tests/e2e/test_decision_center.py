@@ -129,7 +129,8 @@ class DecisionCenterTests(unittest.TestCase):
    result=portfolio(viewer);self.assertEqual(result['summary']['in_review'],1);self.assertEqual(result['summary']['pending_approval'],0);self.assertEqual(portfolio(viewer,filter='pending_approval')['total'],0)
   member=next(m for m in self.checked(self.a.get('/api/platform/team'))['members'] if m['user_id']==USER_A)
   self.checked(self.a.patch('/api/platform/team/members/'+USER_A+'/responsibilities',json={'expected_updated_at':member['updated_at'],'business_roles':['data_owner','decision_owner','approver']}))
-  self.checked(self.a.put('/api/platform/decisions/'+case+'/responsibilities/data_preparation',json={'expected_updated_at':None,'owner_user_id':USER_A}))
+  stage=self.center(case)['responsibilities']['stages']['data_preparation']
+  self.checked(self.a.put('/api/platform/decisions/'+case+'/responsibilities/data_preparation',json={'expected_updated_at':stage['updated_at'],'owner_user_id':USER_A}))
   self.assertEqual(portfolio(owner='me')['total'],1);self.assertEqual(portfolio(owner=USER_A)['total'],1);self.assertEqual(portfolio(owner='unassigned')['total'],26);self.assertEqual(portfolio(owner=USER_B)['total'],0)
   detail=self.center(case);self.assertEqual(detail['responsibilities']['stages']['data_preparation']['owner']['id'],USER_A)
   self.assertEqual(detail['current_objective']['id'],'balanced');self.assertEqual(detail['current_objective']['source'],'latest_run')

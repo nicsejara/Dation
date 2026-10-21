@@ -90,13 +90,17 @@ class Sandbox:
             if migration.name[:14]>'20261010100000':
                 if self.migration_hook:self.migration_hook(self,migration.name)
                 self.sql(migration.read_text())
-        self.sql("UPDATE dation_private.platform_release SET admissions_open=true;")
+        self.sql("UPDATE dation_private.platform_release SET admissions_open=true,workflow_gates_enabled=true;")
         for uid in (USER_A,USER_B,VIEWER,DISABLED):
             self.sql(f"INSERT INTO auth.users VALUES('{uid}','user-{uid[-1]}@example.test',now());")
         self.sql(f"INSERT INTO dation_private.legacy_owners(email,workspace_id) VALUES('user-1@example.test','00000000-0000-4000-8000-00000000da71'); SELECT platform_identity('{USER_A}'); SELECT platform_identity('{USER_B}');")
         self.workspace_a='00000000-0000-4000-8000-00000000da71'
         self.workspace_b=json.loads(self.sql(f"SELECT platform_create_workspace('{USER_B}','Workspace B','AR','UTC','ARS');"))['workspace_id']
         self.sql(f"INSERT INTO workspace_members(workspace_id,user_id,access_role,status) VALUES('{self.workspace_a}','{VIEWER}','viewer','active'),('{self.workspace_a}','{DISABLED}','operator','disabled');")
+        # Engine/evidence scenarios start with eligible synthetic operators.
+        # Ownership gate and role tests explicitly reset this fixture state.
+        for wid,uid in ((self.workspace_a,USER_A),(self.workspace_b,USER_B)):
+            self.sql(f"SELECT platform_set_member_responsibilities('{wid}','{uid}','{uid}',(SELECT updated_at FROM workspace_members WHERE workspace_id='{wid}' AND user_id='{uid}'),ARRAY['data_steward','decision_owner','approver']);")
         self.sql("CREATE ROLE dation_e2e_authenticator LOGIN NOINHERIT; GRANT anon,authenticated,service_role TO dation_e2e_authenticator;")
         secret=secrets.token_urlsafe(48)
         fixture_url='http://127.0.0.1:'+str(port())

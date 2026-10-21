@@ -80,6 +80,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.approval_calls=0
         self.approval_fail_once=False
         self.other_cases={}
+        self.workflows={}
         self.execution_bodies=[]
         self.run_fetch_failures=0
         self.home_data={'recent_cases':[],'attention':{'items':[],'total':0},'activity':{'available':False,'items':[]}}
@@ -140,6 +141,18 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         u = urlparse(request.url)
         path, query, method = u.path, parse_qs(u.query), request.method
         self.requests.append((method, path))
+        if path=='/api/platform/team' and query.get('candidates')==['true']:
+            await route.fulfill(json={'members':[{'user_id':'10000000-0000-4000-8000-000000000001','name':'Synthetic owner','email':'fixture@example.test'}],'total':1,'limit':25,'offset':0});return
+        if '/responsibilities' in path and path.startswith('/api/platform/decisions/'):
+            cid=path.split('/')[4];snapshot=self.workflows[cid]
+            if method=='PUT':
+                stage=snapshot['stages'][path.split('/')[-1]]
+                for field in ('owner','approver'):
+                    uid=request.post_data_json[field+'_user_id'];stage[field]={'id':uid,'name':'Synthetic owner','active':True,'access_role':'admin'} if uid else None;stage[field+'_eligible']=bool(uid)
+                stage['updated_at']='2026-10-21T01:00:00Z'
+            await route.fulfill(json=snapshot);return
+        if path.endswith('/workflow-readiness'):
+            await route.fulfill(json={'ready':True});return
         if path=='/api/platform/activity/exports':
             body=json.loads(request.post_data);run=self.runs.get(body['run_id'])
             name,content,media=generate_export(run,body['format'])
@@ -200,6 +213,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                      'orders_dataset_id':body['orders_dataset_id'],'fleet_dataset_id':body['fleet_dataset_id']}
                 self.other_cases[body['id']]={'case':row,'decision_case':body['state'],
                     'orders':datasets[body['orders_dataset_id']],'fleet':datasets[body['fleet_dataset_id']]}
+                self.workflows[body['id']]={'case_id':body['id'],'can_assign':True,'gates_enforced':True,'policy_version':1,'stages':{stage:{'owner':None,'approver':None,'owner_eligible':False,'approver_eligible':False,'updated_at':None} for stage in ('data_preparation','logistics_assignment','logistics_scheduling')}}
+                self.other_cases[body['id']]['workflow_responsibilities']=self.workflows[body['id']]
                 data={'case':row}
             else:
                 self.selector_queries.append(query)
@@ -483,12 +498,13 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.page.go_back();await self.page.wait_for_selector('.assignment-dashboard-v2')
         await self.page.go_forward();await self.page.wait_for_selector('[data-scheduling-review]')
 
-    async def test_existing_review_does_not_offer_another_next_configuration(self):
+    async def test_existing_review_continues_to_its_dashboard_without_another_configuration(self):
         await self.dashboard()
-        await self.page.wait_for_function("document.querySelector('[data-next-decision-status]')?.textContent.includes('para revisar')")
-        self.assertFalse(await self.page.locator('[data-after-approve]').is_visible())
-        await self.page.locator('.dispatch-decision-rail [data-decision-node=logistics_scheduling]').click()
+        await self.page.locator('[data-after-approve]').wait_for(state='visible')
+        await self.page.locator('[data-after-approve]').click()
         await self.page.wait_for_selector('.dispatch-scheduling-dashboard')
+        self.assertIn('run_id='+self.f['ids']['scheduling'],self.page.url)
+        self.assertEqual(self.execution_bodies,[])
 
     async def test_mobile_trip_detail_has_no_document_overflow(self):
         await self.page.set_viewport_size({'width':390,'height':844});await self.dashboard();await self.open_advanced()
@@ -2157,6 +2173,13 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             await card.locator("[data-mode=reuse]").click()
             await card.get_by_role("button", name="Usar esta carga", exact=True).click()
 
+    async def assign_data_responsible(self):
+        root=self.page.locator('[data-workflow-responsibility=data_preparation]')
+        await root.get_by_role('button',name='Seleccionar responsable',exact=True).click()
+        await root.get_by_label('Responsable de datos',exact=True).select_option('10000000-0000-4000-8000-000000000001')
+        await root.get_by_role('button',name='Guardar',exact=True).click()
+        await root.get_by_role('button',name='Cambiar',exact=True).wait_for()
+
     async def test_data_pack_has_one_stable_dark_bar_across_responsive_reuse(self):
         audit = (Path(__file__).parent / "theme_audit.js").read_text()
         await self.page.emulate_media(reduced_motion="reduce", color_scheme="light")
@@ -2173,6 +2196,9 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             for ready in (False, True):
                 if ready:
                     await self.upload_reuse_pair()
+                    await self.page.locator('[data-workflow-responsibility]').wait_for()
+                    self.assertTrue(await bar.locator('button').is_disabled())
+                    await self.assign_data_responsible()
                     await self.page.locator(".d-workflow-action-bar[data-state=ready]").wait_for(state="visible")
                     self.assertFalse(await bar.locator("button").is_disabled())
                     self.assertTrue(await bar.evaluate("el=>el===window.__originalActionBar"))
@@ -2193,7 +2219,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                     await last.focus()
                     control, footer = await last.bounding_box(), await bar.bounding_box()
                     self.assertLessEqual(control["y"] + control["height"], footer["y"])
-            self.assertNotIn(("POST", "/api/decision-cases"), self.requests)
+            self.assertGreaterEqual(self.requests.count(("POST", "/api/decision-cases")),1)
         self.assertEqual(self.execution_bodies, [])
 
     async def test_data_pack_invalid_file_focus_busy_cancel_and_service_unavailable(self):
@@ -2262,6 +2288,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         fleet = self.page.locator("[data-kind=fleet]")
         await fleet.locator("[data-mode=reuse]").click()
         await fleet.get_by_role("button", name="Usar esta carga", exact=True).click()
+        await self.assign_data_responsible()
         await self.page.locator(".d-workflow-action-bar[data-state=ready]").wait_for(state="visible")
         self.assertFalse(await self.page.locator(".dispatch-pro-next-button").is_disabled())
         self.assertIn("con avisos", await self.page.locator(".d-workflow-action-bar").inner_text())
@@ -2274,7 +2301,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(await drawer.get_attribute("aria-labelledby"), "dispatch-previous-title")
         await self.page.keyboard.press("Escape")
         self.assertTrue(await fleet.locator(".dispatch-pro-view-all").evaluate("el=>el===document.activeElement"))
-        self.assertNotIn(("POST", "/api/decision-cases"), self.requests)
+        self.assertEqual(self.requests.count(("POST", "/api/decision-cases")),1)
 
     async def test_data_pack_context_is_dark_with_native_disclosure_in_map_and_configs(self):
         audit = (Path(__file__).parent / "theme_audit.js").read_text()
