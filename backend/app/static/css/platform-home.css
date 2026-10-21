@@ -5,9 +5,6 @@
 .platform-home__header .d-page-title{margin:0;font-size:clamp(25px,3vw,36px);line-height:1.2;overflow-wrap:anywhere}
 .platform-home__header .d-page-description{max-width:60ch;margin:0;line-height:1.65;text-wrap:pretty}
 .platform-home__hero-art{position:absolute;right:0;top:0;height:100%;width:40%;object-fit:cover;opacity:.42;pointer-events:none;z-index:0;mask-image:linear-gradient(to right,transparent,#000 50%)}
-.platform-home__hero-actions{--color-action-primary-bg:var(--d-brand-teal-bright);--color-action-primary-text:var(--d-bg-0);--color-action-primary-hover:var(--d-brand-cyan);display:flex;flex-wrap:wrap;gap:12px;margin-top:10px}
-.platform-home .platform-home__hero-actions .d-button{min-height:48px;padding:12px 18px;gap:10px;transition:transform 200ms,border-color 200ms,box-shadow 200ms}
-.platform-home__hero-actions .d-button--primary:hover{transform:translateY(-1px);box-shadow:0 3px 16px var(--color-info-bg)}
 .platform-home__icon{display:inline-flex;flex:0 0 20px;width:20px;height:20px;color:inherit}
 .platform-home__icon svg,.platform-home__activity-icon svg{display:block;width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .platform-home__content,.platform-home__main,.platform-home__side{display:grid;gap:24px;min-width:0}

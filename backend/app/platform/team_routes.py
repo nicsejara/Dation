@@ -15,7 +15,7 @@ router = APIRouter()
 @router.get('/team')
 async def team(q: str = Query('', max_length=120), limit: int = Query(25, ge=1, le=50),
                offset: int = Query(0, ge=0, le=1000000), candidates: bool = False,
-               responsibility: Literal['data','decision_owner','approver'] | None = None,
+               responsibility: Literal['data','data_owner','data_steward','decision_owner','approver'] | None = None,
                ctx=Depends(require_upload_access)):
     if responsibility and not candidates:
         from fastapi import HTTPException

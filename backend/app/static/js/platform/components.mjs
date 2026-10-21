@@ -1,4 +1,12 @@
 import {createScope,trapFocus} from '../dispatch/lifecycle.mjs';
+import {iconSvg} from '../dispatch/decision-ui.mjs';
+
+/** Shared hero CTA presentation; callers retain their existing navigation. */
+export function heroCta(node,iconName='database'){
+  node.classList.add('platform-hero-cta');
+  const icon=document.createElement('span');icon.className='platform-hero-cta__icon';icon.setAttribute('aria-hidden','true');icon.innerHTML=iconSvg(iconName);node.prepend(icon);
+  return node;
+}
 
 let nextId=0;
 const focusableSelector='button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex="0"]';

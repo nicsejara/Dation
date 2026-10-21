@@ -1,3 +1,4 @@
+import {mountResponsibilitySelector} from '../dispatch/workflow-responsibility.mjs';
 import {api} from '../dispatch/shared.mjs';
 import {mountDialog} from './components.mjs';
 const BASE='/api/platform/decisions';
@@ -15,12 +16,19 @@ export function mountCenterActions(root,{onChanged,notify}){
   const save=el('button',archive?(c.status==='archived'?'Restaurar':'Archivar'):'Guardar','d-button d-button--primary');save.type='submit';actions.append(button('Cancelar',close),save);form.append(message,actions);dialog.append(form);root.append(dialog);
   const view=mountDialog({dialog}),controller=new AbortController(),own={dialog,view,controller};modal=own;dialog.addEventListener('close',()=>{if(modal===own)close();});
   form.addEventListener('submit',async event=>{event.preventDefault();save.disabled=true;save.setAttribute('aria-busy','true');
-   try{await api(BASE+'/'+c.id,{method:'PATCH',signal:controller.signal,headers:{'Content-Type':'application/json'},body:JSON.stringify({expected_updated_at:c.updated_at,...(archive?{archived:c.status!=='archived'}:{label:input.value.trim()||null})})});if(modal!==own)return;close();notify('Caso actualizado.');onChanged();}
+   try{const result=await api(BASE+'/'+c.id,{method:'PATCH',signal:controller.signal,headers:{'Content-Type':'application/json'},body:JSON.stringify({expected_updated_at:c.updated_at,...(archive?{archived:c.status!=='archived'}:{label:input.value.trim()||null})})});if(modal!==own)return;close();notify(archive?(result.status==='archived'?'Caso archivado. Podés recuperarlo en Archivados.':'Caso restaurado.'):'Caso actualizado.');onChanged(archive?{archived:result.status==='archived',caseId:c.id}:undefined);}
    catch(error){if(modal===own&&!controller.signal.aborted){message.textContent=error.status===409?'El caso cambió. Actualizá el detalle antes de guardar.':error.message;save.disabled=error.status===409;save.removeAttribute('aria-busy');if(error.status===409)actions.append(button('Actualizar detalle',()=>{close();onChanged();}));}}
   });view.open();(input||save).focus();
  }
  function assign(c,stageKey){
-  close();const stage=c.responsibilities?.stages?.[stageKey]||c.nodes?.find(n=>n.id===stageKey)||{},dataStage=stageKey==='data_preparation';
+  close();
+  if(['data_preparation','data_owner','data_steward'].includes(stageKey)){
+   const dialog=el('dialog',undefined,'d-platform center-dialog'),selector=el('div');dialog.setAttribute('aria-label','Responsable de datos');dialog.append(selector);root.append(dialog);
+   const view=mountDialog({dialog}),controller=new AbortController(),own={dialog,view,controller};modal=own;
+   const editor=mountResponsibilitySelector(selector,{caseId:c.id,stageKey,snapshot:c.responsibilities,onCancel:close,onSaved:()=>{if(modal===own){close();notify('Responsables actualizados.');onChanged();}}});
+   controller.signal.addEventListener('abort',()=>editor.dispose(),{once:true});dialog.addEventListener('close',()=>{if(modal===own)close();});view.open();selector.querySelector('button')?.click();return;
+  }
+const stage=c.responsibilities?.stages?.[stageKey]||c.nodes?.find(n=>n.id===stageKey)||{},dataStage=stageKey==='data_preparation';
   const dialog=el('dialog',undefined,'d-platform center-dialog'),form=el('form'),title=el('h2',dataStage?'Responsable de los datos':'Responsables de la decisión','d-card-title');title.id='center-assignment-title';dialog.setAttribute('aria-labelledby',title.id);
   const label=el('label','Buscar personas por nombre o email','d-label'),search=el('input',undefined,'d-input');search.type='search';search.maxLength=120;search.id='center-people-search';label.htmlFor=search.id;
   const count=el('p',undefined,'d-metadata'),message=el('p');message.role='alert';const fields={};

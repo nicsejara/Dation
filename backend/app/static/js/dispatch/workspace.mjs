@@ -7,7 +7,7 @@ import {STATUS,createDecisionCase,replaceInputs,transitionNode,inputSignature,ca
 import {resolveNodeDestination} from './decision-target.mjs';
 import {DECISION_META} from './decision-ui.mjs';
 import {caseContext} from '../platform/foundation.mjs';
-import {mountWorkflowContext} from './workflow-context.mjs';
+import {mountWorkflowContext,mountMapResponsibilities,mountDashboardTrace} from './workflow-context.mjs';
 import {responsibilityProblem} from './workflow-responsibility.mjs';
 import {currentLogisticsEnabled,logisticsView} from '../platform/entitlements.mjs';
 
@@ -321,6 +321,7 @@ async function loadData(){
       mountWorkflow:(node,onSaved)=>{
         const caseId=state.decisionCase?.id,signature=state.decisionCase?.signature;
         return mountWorkflowContext(node,{state,stageKey:'data_preparation',showCase:false,onSaved,onPrepare:async()=>{
+          if(!state.preflight?.valid||!caseId)throw new Error('Cargá y validá Órdenes y Flota antes de guardar.');
           if(state.decisionCase?.id!==caseId||inputSignature(state.orders,state.fleet)!==signature)throw new Error('El Data Pack cambió.');
           if(!state.decisionCase.persisted)await ensurePersistedCase(generation);else await hydrateCase(caseId,generation,signature);
           if(generation!==routeGeneration||state.decisionCase?.id!==caseId||inputSignature(state.orders,state.fleet)!==signature)throw new Error('La etapa cambió.');return state.workflow;
@@ -389,7 +390,7 @@ async function loadDecisionMap(){
       onData:()=>navigate('logistics-data'),
       onSelectCase:()=>{const trigger=node.querySelector('[data-case-switcher] button');trigger?.focus();trigger?.click();},
     });
-    if(generation===routeGeneration){decorateDecisionMap(node);mountWorkflowContext(node,{state});}
+    if(generation===routeGeneration){decorateDecisionMap(node);mountWorkflowContext(node,{state});mountMapResponsibilities(node,{state,onSaved:()=>{persist();loadDecisionMap();}});}
   }catch(error){
     if(generation!==routeGeneration)return;
     if(error.workflowGate==='data'){
@@ -729,11 +730,11 @@ export async function show(run){
     },
   );
   if(generation!==routeGeneration)return;
-  if(caseMeta.case_id&&state.decisionCase?.id===caseMeta.case_id)mountWorkflowContext(roots.dashboard,{state,stageKey:nodeId,field:'approver',onSaved:()=>show(state.run)});
+  if(caseMeta.case_id&&state.decisionCase?.id===caseMeta.case_id)mountDashboardTrace(roots.dashboard,{state,run,nodeId});
   const approvalReason=responsibilityProblem(state.workflow,nodeId,'approve');
   if(approvalReason&&runDecisionState(run,state.decisionCase,nodeId)!=='approved'){
     const note=document.createElement('p');note.className='workflow-gate-reason';note.id='workflow-approval-reason';note.textContent=approvalReason;
-    roots.dashboard.querySelector('[data-workflow-responsibility]')?.append(note);
+    roots.dashboard.querySelector('.workflow-context')?.append(note);
     roots.dashboard.querySelectorAll('[data-approve-toolbar],[data-approve-final]').forEach(button=>button.setAttribute('aria-describedby',note.id));
   }
   const policy=state.decisionCase?.collaboration?.[nodeId];

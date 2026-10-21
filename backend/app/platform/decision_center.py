@@ -90,8 +90,10 @@ async def listing(ctx,**options):
 
 async def detail(ctx,case_id):return project(await read(ctx,target_case_id=str(case_id)),True)
 
-async def history(ctx,case_id,node_id,limit,offset):
-    data=await read(ctx,target_case_id=str(case_id),target_node_id=node_id,page_limit=limit,page_offset=offset)
+async def history(ctx,case_id,node_id,limit,offset,run_id=None):
+    if run_id:limit,offset=1,0
+    options={'search_text':str(run_id)} if run_id else {}
+    data=await read(ctx,target_case_id=str(case_id),target_node_id=node_id,page_limit=limit,page_offset=offset,**options)
     state=canonical(data)
     return {'items':[_history_item(run,state) for run in data['runs']],
-        'total':data['summaries'][node_id]['run_count'],'limit':limit,'offset':offset}
+        'total':len(data['runs']) if run_id else data['summaries'][node_id]['run_count'],'limit':limit,'offset':offset}

@@ -18,6 +18,8 @@ class WorkflowContextTests(unittest.IsolatedAsyncioTestCase):
         self.person={'id':'10000000-0000-4000-8000-000000000001','name':'Persona elegible','active':True,'access_role':'admin'}
         self.snapshot={'case_id':self.b.case['id'],'gates_enforced':True,'can_assign':True,'policy_version':1,'stages':{
             'data_preparation':{'owner':self.person,'owner_eligible':True,'approver':None,'approver_eligible':False,'updated_at':'2026-10-21T00:00:00Z'},
+            'data_owner':{'owner':None,'owner_eligible':False,'approver':None,'updated_at':None},
+            'data_steward':{'owner':None,'owner_eligible':False,'approver':None,'updated_at':None},
             'logistics_assignment':{'owner':None,'owner_eligible':False,'approver':None,'approver_eligible':False,'updated_at':None},
             'logistics_scheduling':{'owner':None,'owner_eligible':False,'approver':None,'approver_eligible':False,'updated_at':None}}}
         original=self.b.hydrated
@@ -34,11 +36,12 @@ class WorkflowContextTests(unittest.IsolatedAsyncioTestCase):
             request=route.request;parts=urlparse(request.url).path.split('/');cid=parts[4]
             if request.method=='PUT':
                 body=request.post_data_json;self.writes.append(body)
-                if self.assignment_conflict:await route.fulfill(status=409,json={'detail':'Assignment changed'});return
                 stage=self.snapshot['stages'][parts[-1]]
+                if self.assignment_conflict or body['expected_updated_at']!=stage['updated_at']:await route.fulfill(status=409,json={'detail':'Assignment changed'});return
                 for field in ('owner','approver'):
                     stage[field]=copy.deepcopy(self.person) if body[field+'_user_id'] else None;stage[field+'_eligible']=bool(stage[field])
                 stage['updated_at']='2026-10-21T01:00:00Z'
+                if parts[-1] in ('data_owner','data_steward'):self.snapshot['stages']['data_preparation']=copy.deepcopy(stage)
             if parts[-1]=='workflow-readiness':
                 self.readiness_calls+=1
                 ready=self.snapshot['stages']['data_preparation']['owner_eligible']
@@ -56,37 +59,43 @@ class WorkflowContextTests(unittest.IsolatedAsyncioTestCase):
 
     async def asyncTearDown(self):await self.b.asyncTearDown()
 
-    async def select_person(self):
-        root=self.page.locator('[data-workflow-responsibility]')
-        await root.get_by_role('button',name='Seleccionar responsable',exact=True).click()
-        await root.get_by_label('Responsable de la decisión',exact=True).select_option(self.person['id'])
-        await root.get_by_role('button',name='Guardar',exact=True).click()
-        await root.get_by_role('button',name='Cambiar',exact=True).wait_for()
+    def decision_selector(self,node='logistics_assignment',field='owner'):
+        return self.page.locator('[data-workflow-responsibility="'+node+'"][data-responsibility-field="'+field+'"]')
 
-    async def test_config_gate_inline_assignment_and_review_preserve_the_case(self):
+    async def select_person(self,node='logistics_assignment',field='owner'):
+        root=self.decision_selector(node,field)
+        await root.get_by_role('button',name='Seleccionar responsable',exact=True).click()
+        await root.locator('select').select_option(self.person['id'])
+        await root.get_by_role('button',name='Guardar',exact=True).click()
+        await self.page.wait_for_function('(args)=>window.DationDispatch.getWorkspace().workflow.stages[args[0]][args[1]+"_eligible"]',arg=[node,field])
+
+    async def test_map_assignment_is_consumed_readonly_by_config_and_review(self):
         await self.b.open('logistics-config','logistics_assignment')
-        review=self.page.locator('[data-config-review]');self.assertTrue(await review.is_disabled())
-        await self.select_person();self.assertFalse(await review.is_disabled())
+        self.assertTrue(await self.page.locator('[data-config-review]').is_disabled())
+        self.assertEqual(await self.page.locator('[data-workflow-responsibility]').count(),0)
+        await self.b.open('logistics-map');await self.select_person()
         self.assertEqual(self.people_queries[0]['responsibility'],['decision_owner'])
         self.assertEqual(self.writes[0],{'expected_updated_at':None,'owner_user_id':self.person['id'],'approver_user_id':None})
+        await self.b.open('logistics-config','logistics_assignment')
+        review=self.page.locator('[data-config-review]');self.assertFalse(await review.is_disabled())
         await review.click();dialog=self.page.get_by_role('dialog',name='Revisar Assignment antes de ejecutar')
         await dialog.get_by_text('Persona elegible',exact=True).wait_for()
-        self.assertIn('case_id='+self.b.case['id'],self.page.url)
-        self.assertEqual(self.b.execution_bodies,[])
+        self.assertIn('case_id='+self.b.case['id'],self.page.url);self.assertEqual(self.b.execution_bodies,[])
 
-    async def test_empty_candidates_and_conflict_explain_the_block_and_keep_review_disabled(self):
-        self.no_candidates=True;await self.b.open('logistics-config','logistics_assignment')
-        root=self.page.locator('[data-workflow-responsibility]');await root.get_by_role('button',name='Seleccionar responsable').click()
-        await root.get_by_text('No hay personas con responsabilidad',exact=False).wait_for()
+    async def test_empty_candidates_and_conflict_preserve_the_map_assignment(self):
+        self.no_candidates=True;await self.b.open('logistics-map')
+        root=self.decision_selector();await root.get_by_role('button',name='Seleccionar responsable').click()
+        await root.get_by_text('No hay personas elegibles.',exact=False).wait_for()
         self.assertTrue(await root.get_by_role('button',name='Guardar',exact=True).is_disabled())
-        await root.get_by_role('button',name='Ir a Equipo',exact=True).wait_for()
+        self.assertEqual(await root.get_by_role('searchbox').count(),0)
+        self.assertEqual(await root.get_by_role('button',name='Siguiente',exact=True).count(),0)
         await root.get_by_role('button',name='Cancelar',exact=True).click()
         self.no_candidates=False;self.assignment_conflict=True
         await root.get_by_role('button',name='Seleccionar responsable').click()
-        await root.get_by_label('Responsable de la decisión',exact=True).select_option(self.person['id'])
+        await root.locator('select').select_option(self.person['id'])
         await root.get_by_role('button',name='Guardar',exact=True).click()
         await root.get_by_role('button',name='Actualizar etapa',exact=True).wait_for()
-        self.assertTrue(await self.page.locator('[data-config-review]').is_disabled())
+        self.assertFalse(self.snapshot['stages']['logistics_assignment']['owner_eligible'])
 
     async def test_case_switcher_is_bounded_keyboard_accessible_and_clears_foreign_run(self):
         other='00000000-0000-4000-8000-000000000088';bundle=copy.deepcopy(self.b.hydrated())
@@ -118,7 +127,7 @@ class WorkflowContextTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(await self.page.locator('[data-workflow-responsibility] button').count(),0)
         self.assertTrue(await self.page.locator('[data-config-review]').is_disabled())
         self.b.access_role='admin';self.snapshot['can_assign']=True;self.candidate_gate=asyncio.Event()
-        await self.page.reload();await self.page.locator('[data-workflow-responsibility]').get_by_role('button',name='Seleccionar responsable').click()
+        await self.b.open('logistics-map');await self.decision_selector().get_by_role('button',name='Seleccionar responsable').click()
         await self.page.locator('.nav [data-platform-view=platform-home]').click();self.candidate_gate.set()
         await self.page.locator('[data-platform-home] .platform-home__header').wait_for()
         self.assertEqual(await self.page.locator('[data-workflow-responsibility]').count(),0);self.assertEqual(self.writes,[])
@@ -152,14 +161,14 @@ class WorkflowContextTests(unittest.IsolatedAsyncioTestCase):
         await self.page.goto(f'http://127.0.0.1:{navigation.NavigationTests.port}/app?view=logistics-data')
         await self.page.wait_for_function('Boolean(window.DationDispatch)')
         await self.page.evaluate('inputs=>window.DationDispatch.startNewDecision(inputs)',list(self.b.f['datasets'].values()))
-        root=self.page.locator('#dispatch-data-root');await root.locator('[data-workflow-responsibility]').wait_for()
+        root=self.page.locator('#dispatch-data-root');await root.locator('[data-workflow-responsibility]').first.wait_for()
         next_button=root.get_by_role('button',name='Seleccioná tu decisión',exact=True)
         self.assertTrue(await next_button.is_disabled())
         self.assertEqual(sum(method=='POST' and path=='/api/decision-cases' for method,path in self.b.requests),0)
-        selector=root.locator('[data-workflow-responsibility]');await selector.get_by_role('button',name='Seleccionar responsable').click()
-        await selector.get_by_label('Responsable de datos',exact=True).select_option(self.person['id'])
+        selector=root.locator('[data-workflow-responsibility=data_owner]');await selector.get_by_role('button',name='Seleccionar responsable').click()
+        await selector.get_by_label('Data Owner',exact=True).select_option(self.person['id'])
         await selector.get_by_role('button',name='Guardar',exact=True).click();await selector.get_by_role('button',name='Cambiar',exact=True).wait_for()
-        self.assertFalse(await next_button.is_disabled());self.assertEqual(self.people_queries[0]['responsibility'],['data'])
+        self.assertFalse(await next_button.is_disabled());self.assertEqual(self.people_queries[0]['responsibility'],['data_owner'])
         self.assertEqual(sum(method=='POST' and path=='/api/decision-cases' for method,path in self.b.requests),1)
         cid=await self.page.evaluate('window.DationDispatch.getWorkspace().decisionCase.id')
         await next_button.click();await self.page.locator('[data-map-node=logistics_assignment]').wait_for()
@@ -214,11 +223,10 @@ class WorkflowContextTests(unittest.IsolatedAsyncioTestCase):
                     assignment['approved_at']=None;assignment['result_json']['decision_case'].update(status='review',approved_at=None)
                 self.snapshot['stages'][node].update(owner=self.person,owner_eligible=True,approver=None,approver_eligible=False)
                 await self.b.open('decision-dashboard',node,self.b.f['ids'][kind])
-                root=self.page.locator('[data-workflow-responsibility]');await root.get_by_role('button',name='Seleccionar responsable').wait_for()
+                self.assertEqual(await self.page.locator('[data-workflow-responsibility]').count(),0)
                 for button in await self.page.locator('[data-approve-toolbar],[data-approve-final]').all():self.assertTrue(await button.is_disabled())
-                await root.get_by_role('button',name='Seleccionar responsable').click()
-                await root.get_by_label('Aprobador asignado',exact=True).select_option(self.person['id'])
-                await root.get_by_role('button',name='Guardar',exact=True).click()
+                await self.b.open('logistics-map');await self.select_person(node,'approver')
+                await self.b.open('decision-dashboard',node,self.b.f['ids'][kind])
                 await self.page.wait_for_function("[...document.querySelectorAll('[data-approve-toolbar],[data-approve-final]')].length>0&&[...document.querySelectorAll('[data-approve-toolbar],[data-approve-final]')].every(b=>!b.disabled)")
 
     async def test_owner_revoked_at_admission_returns_to_config_without_polling_a_phantom_run(self):
@@ -257,3 +265,46 @@ class WorkflowContextTests(unittest.IsolatedAsyncioTestCase):
             self.assertTrue(await self.page.locator('[data-config-review],[data-scheduling-review]').is_disabled())
             await self.page.get_by_text('Tu rol permite consultar, pero no ejecutar decisiones.',exact=True).first.wait_for()
         self.assertEqual(self.b.execution_bodies,[])
+
+    async def test_data_roles_exist_before_csv_and_stay_below_compatibility(self):
+        await self.page.goto(f'http://127.0.0.1:{navigation.NavigationTests.port}/app?view=logistics-data')
+        root=self.page.locator('#dispatch-data-root')
+        await root.locator('[data-workflow-responsibility=data_owner]').wait_for()
+        self.assertEqual(await root.locator('[data-workflow-responsibility=data_steward]').count(),1)
+        self.assertTrue(await root.evaluate('n=>n.querySelector(".dispatch-pro-compatibility").nextElementSibling.classList.contains("workflow-context")'))
+        owner=root.locator('[data-workflow-responsibility=data_owner]');await owner.get_by_role('button',name='Seleccionar responsable').click()
+        await owner.locator('select').select_option(self.person['id'])
+        self.assertTrue(await owner.get_by_role('button',name='Guardar',exact=True).is_disabled())
+        self.assertEqual(await owner.get_by_role('searchbox').count(),0)
+        self.assertEqual(sum(m=='POST' and p=='/api/decision-cases' for m,p in self.b.requests),0)
+
+        await self.page.evaluate('inputs=>window.DationDispatch.startNewDecision(inputs)',list(self.b.f['datasets'].values()))
+        await self.page.wait_for_function('id=>document.querySelector("[data-workflow-responsibility=data_owner] select")?.value===id&&!document.querySelector("[data-workflow-responsibility=data_owner] .d-button--primary").disabled',arg=self.person['id'])
+        self.assertEqual(sum(m=='POST' and p=='/api/decision-cases' for m,p in self.b.requests),0)
+
+    async def test_dda_navigation_resolves_canonical_runs_without_losing_context(self):
+        await self.b.open('logistics-map')
+        nav=self.page.locator('.dda-navigation');await nav.get_by_role('link',name='DC-'+self.b.case['id'][:8].upper(),exact=True).wait_for()
+        self.assertEqual(await nav.locator('[aria-current=step]').count(),1)
+        approved=nav.locator('a[data-state=completed]').first
+        await approved.focus()
+        await self.page.evaluate("window.dispatchEvent(new CustomEvent('dation:workspace'))")
+        self.assertTrue(await approved.evaluate('n=>document.activeElement===n'))
+        self.assertIn('run_id='+self.b.f['ids']['assignment'],await approved.get_attribute('href'))
+        await self.b.nav('platform-home');await self.page.locator('[data-platform-home] h1').wait_for()
+        await self.b.nav('logistics-map');await nav.locator('ol').wait_for()
+        await approved.click();await self.page.locator('.assignment-dashboard-v2').wait_for()
+        self.assertIn('case_id='+self.b.case['id'],self.page.url)
+        self.assertIn('run_id='+self.b.f['ids']['assignment'],self.page.url)
+
+    async def test_data_save_does_not_overwrite_assignment_changed_while_editing(self):
+        old={'id':'10000000-0000-4000-8000-000000000009','name':'Anterior'}
+        stage=self.snapshot['stages']['data_owner'];stage.update(owner=old,owner_eligible=True,updated_at='2026-10-21T00:00:00Z')
+        await self.b.open('logistics-data')
+        root=self.page.locator('[data-workflow-responsibility=data_owner]');await root.get_by_role('button',name='Cambiar',exact=True).click()
+        await root.locator('select').select_option(self.person['id'])
+        stage['updated_at']='2026-10-21T02:00:00Z'
+        await root.get_by_role('button',name='Guardar',exact=True).click()
+        await root.get_by_role('button',name='Actualizar etapa',exact=True).wait_for()
+        self.assertEqual(self.writes[-1]['expected_updated_at'],'2026-10-21T00:00:00Z')
+        self.assertEqual(stage['owner'],old)

@@ -342,6 +342,7 @@ export async function mountUploadScreen(
     compatibilityRoot,
     actionBar.bar,
   );
+  mountWorkflow?.(root,()=>finalState());
 
   function reportFor(kind) {
     return local.reports[kind] || state[kind]?.profile_json || null;

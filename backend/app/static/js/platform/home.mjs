@@ -8,6 +8,7 @@ import {workspaceDate,workspaceRelativeDate} from './workspace-format.mjs';
 import {caseContext,statePresentation} from './foundation.mjs';
 import {DDA_CATALOG} from './dda-catalog.mjs';
 import {DECISION_META,iconSvg} from '../dispatch/decision-ui.mjs';
+import {heroCta} from './components.mjs';
 
 const states={available:'Listo para continuar',running:'En ejecución',review:'En revisión',approved:'Aprobada',error:'Error de ejecución',stale:'Requiere actualizar',locked:'Pendiente',needs_data:'Faltan datos',completed:'Completado'};
 function el(tag,text,className){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(className)n.className=className;return n;}
@@ -31,9 +32,9 @@ export function mountWorkspaceHome(root,getIdentity){
  const scope=createScope(root);let controller=null,generation=0,activityView=null;
  const identityKey=()=>JSON.stringify([getIdentity().workspace,getIdentity().membership.access_role,getIdentity().ddas]);let currentIdentityKey=identityKey();
  const header=el('header',undefined,'platform-home__header'),copy=el('div',undefined,'platform-home__hero-copy');
- const workspace=el('p',undefined,'platform-home__workspace'),title=el('h1',undefined,'d-page-title'),ctas=el('div',undefined,'platform-home__hero-actions');
- const catalog=link('Explorar catálogo de DDAs','inicio','d-button d-button--primary');catalog.prepend(icon('database'));
- const center=link('Ir a Decision Center','platform-decisions');center.prepend(icon('link'));ctas.append(catalog,center);
+ const workspace=el('p',undefined,'platform-home__workspace'),title=el('h1',undefined,'d-page-title'),ctas=el('div',undefined,'platform-home__hero-actions platform-hero-actions');
+ const catalog=heroCta(link('Explorar DDA','inicio','d-button d-button--primary'));
+ const center=heroCta(link('Ir a Decision Center','platform-decisions'),'link');ctas.append(catalog,center);
  copy.append(workspace,title,el('p','Explorá los Decision Data Assets disponibles y convertí tus datos en decisiones trazables.','d-page-description'),ctas);
  const art=el('img',undefined,'platform-home__hero-art');art.src='/static/assets/workspace-home-hero.svg';art.alt='';art.width=420;art.height=280;header.append(copy,art);
  const content=el('div',undefined,'platform-home__content');root.replaceChildren(header,content);

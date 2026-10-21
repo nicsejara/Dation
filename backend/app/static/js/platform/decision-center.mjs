@@ -6,7 +6,7 @@ import {api} from '../dispatch/shared.mjs';
 import {createScope} from '../dispatch/lifecycle.mjs';
 import {resourceUrl} from '../dispatch/navigation.mjs';
 import {DECISION_META,iconSvg} from '../dispatch/decision-ui.mjs';
-import {mountDialog,mountDropdown} from './components.mjs';
+import {mountDialog,mountDropdown,heroCta} from './components.mjs';
 import {mountCenterActions} from './decision-center-actions.mjs';
 import {ddaEnabled} from './entitlements.mjs';
 import {CENTER_FILTERS,readCenterResource} from './center-resource.mjs';
@@ -29,12 +29,12 @@ export function mountDecisionCenter(root,getIdentity){
  let activityView=null,historySync=()=>{},drawerCleanups=[],portfolioCleanups=[];
  const writable=()=>getIdentity().membership.access_role!=='viewer',admin=()=>getIdentity().membership.access_role==='admin',zone=()=>getIdentity().workspace;
  const hero=el('header',undefined,'center-hero'),copy=el('div',undefined,'center-hero__copy');copy.append(el('p','DECISION INTELLIGENCE','d-eyebrow'),el('h1','Decision Center','d-page-title'),el('p','Gestioná, revisá y recuperá todas las decisiones de tu Workspace desde un único lugar.','d-page-description'));
- copy.append(button('Explorar DDAs',()=>window.dationNavigate('inicio')));const illustration=el('img');illustration.src='/static/assets/decision-center-hero.svg';illustration.alt='';illustration.width=400;illustration.height=240;hero.append(copy,illustration);
+ copy.append(heroCta(button('Explorar DDA',()=>window.dationNavigate('inicio'),'primary')));const illustration=el('img');illustration.src='/static/assets/decision-center-hero.svg';illustration.alt='';illustration.width=400;illustration.height=240;hero.append(copy,illustration);
  const message=el('p',undefined,'center-message');message.role='status';message.hidden=true;
  const layout=el('div',undefined,'center-layout'),portfolio=el('div',undefined,'center-portfolio'),aside=el('aside',undefined,'center-drawer'),sheet=el('dialog',undefined,'d-platform center-drawer center-drawer--sheet'),body=el('div',undefined,'center-drawer__body');
  aside.dataset.centerDrawer='';sheet.dataset.centerSheet='';for(const panel of [aside,sheet])panel.setAttribute('aria-labelledby','center-drawer-title');aside.hidden=true;
  const actionsRoot=el('div');layout.append(portfolio,aside);root.replaceChildren(hero,message,layout,sheet,actionsRoot);
- const actions=mountCenterActions(actionsRoot,{onChanged:refresh,notify:text=>{notice=text;showNotice();}}),sheetView=mountDialog({dialog:sheet,initialFocus:'[data-center-close]',closeOnBackdrop:true});
+ const actions=mountCenterActions(actionsRoot,{onChanged:result=>{if(result?.archived!==undefined){listKey=detailKey=null;open({filter:result.archived?'archived':'all',q:'',dda:'all',owner:'all',offset:0,caseId:null,nodeId:null,runsOffset:0});}else refresh();},notify:text=>{notice=text;showNotice();}}),sheetView=mountDialog({dialog:sheet,initialFocus:'[data-center-close]',closeOnBackdrop:true});
  function showNotice(){message.hidden=!notice;message.textContent=notice;}
  function open(value){window.DationDispatch.openDecisionCenter({...route,...value});}
  function selectCase(c){if(!route.caseId)returnFocus=document.activeElement;open({caseId:c.id,nodeId:null,runsOffset:0});}
@@ -81,7 +81,7 @@ export function mountDecisionCenter(root,getIdentity){
   function filter(){open({q:controls.q.value.trim(),filter:controls.filter.value,dda:controls.dda.value,owner:controls.owner.value,offset:0});}
   form.addEventListener('submit',event=>{event.preventDefault();filter();});for(const key of ['filter','dda','owner'])controls[key].addEventListener('change',filter);frag.append(form);
   if(!data.items.length){const empty=el('section',undefined,'d-card center-empty'),filtered=route.q||route.filter!=='all'||route.dda!=='all'||route.owner!=='all';empty.append(icon('folderOpen'),el('h2',filtered?'No encontramos Decision Cases con estos filtros.':'Todavía no hay decisiones en este Workspace.','d-section-title'));
-   if(filtered)empty.append(button('Limpiar filtros',()=>open({filter:'all',q:'',dda:'all',owner:'all',offset:0})));else empty.append(el('p','Explorá un DDA para iniciar tu primer Decision Case.','d-body'),button('Explorar DDAs',()=>window.dationNavigate('inicio')));frag.append(empty);
+   if(filtered)empty.append(button('Limpiar filtros',()=>open({filter:'all',q:'',dda:'all',owner:'all',offset:0})));else empty.append(el('p','Explorá un DDA para iniciar tu primer Decision Case.','d-body'),heroCta(button('Explorar DDA',()=>window.dationNavigate('inicio'),'primary')));frag.append(empty);
   }else{
    const wrap=el('div',undefined,'center-table-scroll'),table=el('table',undefined,'center-table'),head=el('thead'),header=el('tr'),tbody=el('tbody');wrap.tabIndex=0;wrap.role='region';wrap.setAttribute('aria-label','Portfolio de Decision Cases');
    const titles=['Case','DDA','Objetivo actual','Paso actual','Progreso','Responsable','Estado','Última actividad','Acción'];for(const [i,text]of titles.entries()){const th=el('th',text);th.scope='col';th.dataset.column=i;header.append(th);}head.append(header);table.append(head,tbody);
@@ -99,14 +99,13 @@ export function mountDecisionCenter(root,getIdentity){
  function syncSelection(){for(const row of portfolio.querySelectorAll('[data-center-case]'))row.setAttribute('aria-selected',String(row.dataset.centerCase===route.caseId));}
  function drawerLayout(){const focus=document.activeElement,hadFocus=body.contains(focus);
   if(!active||!route.caseId){sheetView.close();aside.hidden=true;layout.classList.remove('has-selection');}
-  else if(wide.matches){sheetView.close();aside.append(body);aside.hidden=false;layout.classList.add('has-selection');}
-  else{aside.hidden=true;layout.classList.remove('has-selection');sheet.append(body);sheetView.open();}
+  else{aside.hidden=true;layout.classList.remove('has-selection');if(body.parentNode!==sheet)sheet.append(body);sheetView.open();}
   if(hadFocus&&focus?.isConnected)focus.focus({preventScroll:true});
  }
  function drawerFrame(c){const header=el('header',undefined,'center-drawer__header'),copy=el('div');copy.append(el('span','DECISION CASE','d-eyebrow'));const title=el('h2',c?.label||c?.friendly_id||'Caso seleccionado','d-section-title');title.id='center-drawer-title';copy.append(title);if(c)copy.append(el('p',c.friendly_id,'d-metadata'));
   const close=button('',closeCase,'ghost');close.dataset.centerClose='';close.className='d-button d-button--ghost center-icon-button';close.setAttribute('aria-label','Cerrar detalle del caso');close.append(icon('x'));header.append(copy,close);return header;}
  function personField(c,stageKey,key,label,value){const field=el('div',undefined,'center-responsibility');field.append(el('span',label,'d-metadata'),namedPerson(value));
-  if(admin()&&c.status!=='archived'&&(stageKey==='data_preparation'||DECISION_META[stageKey]?.implemented)){const assign=button(value?'Cambiar':'Asignar',()=>actions.assign(c,stageKey,key),'ghost');assign.className='center-inline-action';assign.setAttribute('aria-label',`${value?'Cambiar':'Asignar'} ${label.toLowerCase()} · ${stageKey==='data_preparation'?'datos':DECISION_META[stageKey]?.label||stageKey}`);field.append(assign);}return field;}
+  if(admin()&&c.status!=='archived'&&(['data_preparation','data_owner','data_steward'].includes(stageKey)||DECISION_META[stageKey]?.implemented)){const assign=button(value?'Cambiar':'Asignar',()=>actions.assign(c,stageKey,key),'ghost');assign.className='center-inline-action';assign.setAttribute('aria-label',`${value?'Cambiar':'Asignar'} ${label.toLowerCase()} · ${stageKey==='data_preparation'?'datos':DECISION_META[stageKey]?.label||stageKey}`);field.append(assign);}return field;}
  function renderDrawer(c){
   cleanupDrawer();const content=el('div',undefined,'center-drawer__content');body.replaceChildren(drawerFrame(c),content);const top=el('div',undefined,'center-case-meta');top.append(el('span',ddaLabel(c.dda),'center-dda-tag'),pill(c.display_status||c.status));if(c.is_demo)top.append(demoBadge());const menu=maintenance(c);top.append(menu.node);drawerCleanups.push(menu.dispose);content.append(top);
   const ctas=el('div',undefined,'center-drawer__ctas'),relevant=c.nodes?.find(n=>n.id===c.current_step),official=c.resume?.run_id&&relevant?.approval_current&&c.resume.run_id===relevant.approved_run?.id;ctas.append(destination(official?'Ver resultado aprobado':c.status==='completed'?'Ver resultado':relevant?.status==='review'?'Revisar':'Continuar',c.resume,c,{primary:true,continuation:true}),destination('Ir al Decision Map',c.dda==='logistics'?{view:'logistics-map',node_id:c.current_step,run_id:null}:null,c,{continuation:true}));content.append(ctas);
@@ -116,7 +115,7 @@ export function mountDecisionCenter(root,getIdentity){
   for(const dataset of [c.orders,c.fleet].filter(Boolean)){const row=el('div',undefined,'center-linked-file'),text=el('div');text.append(el('strong',dataset.original_filename||dataset.canonical_filename||dataset.label||'Archivo'),el('span',`${dataset.row_count??'—'} registros · ${dataset.validation==='validated'?'Validado':'Revisar validación'}`,'d-metadata'));row.append(icon('fileJson'),text);
    if(!dataset.deletion_pending){const a=el('a',undefined,'d-button d-button--ghost center-icon-button');a.href='/api/platform/data/datasets/'+dataset.id+'/download';a.download=dataset.original_filename||'datos.csv';a.setAttribute('aria-label','Descargar '+(dataset.original_filename||dataset.canonical_filename||'archivo'));a.append(icon('download'));row.append(a);}linked.append(row);
   }
-  const dataStage=c.responsibilities?.stages?.data_preparation;if(dataStage)linked.append(personField(c,'data_preparation','owner','Responsable de datos',dataStage.owner));content.append(linked);
+  const stages=c.responsibilities?.stages||{};for(const [key,label]of [['data_owner','Data Owner'],['data_steward','Data Steward']])if(stages[key])linked.append(personField(c,key,'owner',label,stages[key].owner));if(!stages.data_owner&&stages.data_preparation)linked.append(personField(c,'data_preparation','owner','Responsable de datos',stages.data_preparation.owner));content.append(linked);
   const chain=el('section',undefined,'center-chain');chain.append(el('h3','Cadena de decisiones','d-card-title'));const list=el('ol',undefined,'center-timeline');chain.append(list);content.append(chain);const histories=[];
   for(const [index,node]of (c.nodes||[]).entries()){
    const meta=DECISION_META[node.id]||{label:node.label},item=el('li',undefined,'center-node');item.dataset.centerNode=node.id;const header=el('div',undefined,'center-node__header');header.append(el('span',String(index+1).padStart(2,'0'),'center-node__number'),el('h4',meta.label,'center-node-title'),pill(node.status));item.append(header,el('p','Objetivo · '+(node.objective?.label||'Por definir'),'center-node__objective'));
