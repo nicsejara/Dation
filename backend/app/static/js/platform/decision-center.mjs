@@ -38,7 +38,7 @@ export function mountDecisionCenter(root,getIdentity){
  function showNotice(){message.hidden=!notice;message.textContent=notice;}
  function open(value){window.DationDispatch.openDecisionCenter({...route,...value});}
  function selectCase(c){if(!route.caseId)returnFocus=document.activeElement;open({caseId:c.id,nodeId:null,runsOffset:0});}
- function closeCase(){const target=returnFocus;open({caseId:null,nodeId:null,runsOffset:0});requestAnimationFrame(()=>{if(target?.isConnected)target.focus({preventScroll:true});else portfolio.querySelector('[data-case-open]')?.focus({preventScroll:true});});}
+ function closeCase(){const target=returnFocus,selected=route.caseId;open({caseId:null,nodeId:null,runsOffset:0});requestAnimationFrame(()=>{if(target?.isConnected)target.focus({preventScroll:true});else (portfolio.querySelector('[data-case-open="'+selected+'"]')||portfolio.querySelector('[data-case-open]'))?.focus({preventScroll:true});});}
  function link(text,value,cls='center-link'){
   const a=el('a',text,cls);a.href=resourceUrl(location.href,{view:'platform-decisions',center:{...route,...value}});
   a.addEventListener('click',event=>{if(event.button||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;event.preventDefault();if(value.caseId&&!route.caseId)returnFocus=a;open(value);});return a;

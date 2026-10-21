@@ -91,15 +91,24 @@ async def auth_token(request: Request):
     from auth_fixture import token, USER_A, USER_B
     if not authorized(request):return JSONResponse({'error':'Unauthorized'},status_code=401)
     body=await request.json()
+    users={'user-1@example.test':{'id':USER_A,'refresh':'fixture-refresh-a'},
+           'user-2@example.test':{'id':USER_B,'refresh':'fixture-refresh-b'}}
+    # Optional identities belong only to this owned, loopback fixture. Golden
+    # workflows exercise distinct people without changing other scenarios.
+    identities=Path(os.environ['DATION_E2E_AUTH'])/'auth-fixture-users.json'
+    if identities.exists():
+        import json
+        users.update(json.loads(identities.read_text()))
     if request.query_params.get('grant_type')=='password':
-        user={'user-1@example.test':USER_A,'user-2@example.test':USER_B}.get(body.get('email'))
+        user=(users.get(body.get('email')) or {}).get('id')
         if user is None or body.get('password')!='dispatch-e2e-private':return JSONResponse({'error':'Invalid credentials'},status_code=400)
     elif request.query_params.get('grant_type')=='refresh_token':
-        user={'fixture-refresh-a':USER_A,'fixture-refresh-b':USER_B}.get(body.get('refresh_token'))
+        user=next((value['id'] for value in users.values() if value['refresh']==body.get('refresh_token')),None)
         if not user:return JSONResponse({'error':'Invalid refresh'},status_code=400)
     else:return JSONResponse({'error':'Unsupported grant'},status_code=400)
     access=token((Path(os.environ['DATION_E2E_AUTH'])/'auth-fixture-key.pem').read_bytes(),os.environ['SUPABASE_URL'],user)
-    return {'access_token':access,'refresh_token':'fixture-refresh-'+('a' if user==USER_A else 'b'),'expires_in':3600,'token_type':'bearer'}
+    refresh=next(value['refresh'] for value in users.values() if value['id']==user)
+    return {'access_token':access,'refresh_token':refresh,'expires_in':3600,'token_type':'bearer'}
 
 @app.post('/auth/v1/logout')
 async def auth_logout():
