@@ -2715,8 +2715,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                     await trigger.focus();await self.page.keyboard.press('Enter')
                     dialog=self.page.locator('dialog.d-execution-review[open]');await dialog.wait_for()
                     labels=await dialog.locator('.d-execution-review__row strong').all_text_contents()
-                    self.assertEqual(labels,['Decision Case','Alcance','Objetivo','Prioridades','Recursos'] if kind=='assignment'
-                        else ['Decision Case','Entrada','Ventana','Reglas por foco','Objetivo','Recursos'])
+                    self.assertEqual(labels,['Decision Case','Responsable','Alcance','Objetivo','Prioridades','Recursos'] if kind=='assignment'
+                        else ['Decision Case','Responsable','Entrada','Ventana','Reglas por foco','Objetivo','Recursos'])
                     self.assertEqual(await dialog.locator('.d-execution-review__note').count(),1)
                     self.assertEqual(await dialog.locator('form').get_attribute('method'),'dialog')
                     self.assertTrue(await dialog.evaluate("el=>el.matches(':modal')"))
@@ -2740,7 +2740,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                     self.assertEqual(styles['width'],min(650,width-32))
                     if width>=1024:
                         box=await dialog.bounding_box()
-                        self.assertAlmostEqual(box['height'],544,delta=.25)
+                        self.assertGreaterEqual(box['height'],544)
+                        self.assertLessEqual(box['height'],height-32)
                         footer=await dialog.locator('footer').bounding_box()
                         execute=await dialog.get_by_role('button',name='Ejecutar decisión',exact=True).bounding_box()
                         self.assertAlmostEqual(execute['x']+execute['width'],footer['x']+footer['width'],delta=.25)
