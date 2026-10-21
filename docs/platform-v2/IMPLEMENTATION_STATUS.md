@@ -10,7 +10,7 @@ Fuentes: MASTER_PLAN_DATION_V2.md, CAMBIOS_HOME.md, CAMBIOS_DESICION_CENTER.md (
 | 3 | Implementada | [Data Hub V2](03-data-hub.md): biblioteca de datasets, resumen global, drawer, trazabilidad y gobierno |
 | 4 | Implementada | [Home V2](04-home.md): hero, atención, reanudación canónica, accesos y actividad sin onboarding global |
 | 5 | Implementada | [Integración transversal](05-transversal-integration.md): selectores/gates por caso, switcher, handoff y Team/Auth |
-| 6 | Pendiente | Golden E2E + regresión |
+| 6 | Implementada | [Golden E2E + regresión](06-golden-regression.md): actores distintos, matrices compartidas, aislamiento y restauración de foco tras reload |
 | 7 | Pendiente | Release audit |
 
 Decisiones conservadas: Free universal, autoridad tenant-aware, datos/evidencia existentes, motores D1/D2 y permisos técnicos. Decisiones V2: aprobación vigente tiene prioridad al navegar; Data no es un nodo decisional; una persona puede reunir responsabilidades de negocio; Admin conserva asignación. Los gates de Fase 5 son obligatorios para casos nuevos cuando se activa el switch privado después de publicar la aplicación compatible; no invalidan históricos sin responsables.
