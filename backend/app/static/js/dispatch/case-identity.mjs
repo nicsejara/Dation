@@ -2,7 +2,15 @@ import {scopeFor} from './lifecycle.mjs';
 export const CASE_CATEGORIES=[['weekly','Semanal'],['monthly','Mensual'],['extraordinary','Extraordinario'],['simulation','Simulación'],['live_operation','Operación real']];
 export function hasCaseExecutions(current){return Object.values(current?.nodes||{}).some(n=>n.run_count>0||n.run_id||n.latest_run_id||n.approved_run_id);}
 export function caseAttributesReady(state={}){const value=state.caseIdentity||state.decisionCase||{};return Boolean(value.label?.trim()&&value.category&&!state.identityDirty&&(state.attributesApplied||state.decisionCase?.attributes_applied_at));}
-export function caseDataOwnerReady(state={}){return Boolean(state.workflow?.stages?.data_owner?.owner_eligible&&!state.dataOwnerDraft?.dirty);}
+const identityKeys=['label','category','description'];
+const identityValue=(identity,key)=>String(identity?.[key]||'').trim();
+export function caseIdentityDirty(state={}){
+ const applied=state.appliedPreparation?.identity||(state.decisionCase?.persisted?state.decisionCase:null);
+ return !applied||identityKeys.some(key=>identityValue(state.caseIdentity,key)!==identityValue(applied,key));
+}
+export function caseIdentityValid(state={}){const value=state.caseIdentity||{};return Boolean(value.label?.trim()&&value.label.trim().length<=120&&CASE_CATEGORIES.some(([key])=>key===value.category)&&String(value.description||'').length<=1000);}
+export function caseAttributesDirty(state={}){return caseIdentityDirty(state)||Boolean(state.dataOwnerDraft?.dirty);}
+export function caseDataOwnerReady(state={}){return Boolean((state.appliedPreparation?.ownerEligible??state.workflow?.stages?.data_owner?.owner_eligible)&&!state.dataOwnerDraft?.dirty);}
 export function mountCaseIdentity(root,{state,persist,onSave,onChanged}){
  const scope=scopeFor(root),viewer=window.dationSession?.identity?.membership?.access_role==='viewer';
  const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text)n.textContent=text;if(cls)n.className=cls;return n;};
@@ -17,13 +25,13 @@ export function mountCaseIdentity(root,{state,persist,onSave,onChanged}){
   if(key==='category')for(const [value,text] of [['','Elegí una categoría'],...CASE_CATEGORIES]){const option=el('option',text);option.value=value;input.append(option);}
   else input.maxLength=key==='label'?120:1000;
   input.required=key!=='description';input.value=state.caseIdentity[key]||'';
-  scope.listen(input,'input',()=>{state.caseIdentity={...state.caseIdentity,[key]:input.value.trim()||null};state.identityDirty=true;feedback.textContent='Cambios sin aplicar.';persist();onChanged?.();});field.append(caption,input);identity.append(field);
+  scope.listen(input,'input',()=>{state.caseIdentity={...state.caseIdentity,[key]:input.value.trim()||null};state.identityDirty=caseIdentityDirty(state);feedback.textContent='Cambios sin aplicar.';persist();onChanged?.();});field.append(caption,input);identity.append(field);
  }
  const owner=el('section',null,'case-identity__owner');owner.append(el('h3','Responsable de datos'));const ownerHost=el('div');ownerHost.dataset.caseDataOwner='';owner.append(ownerHost);body.append(identity,owner);form.append(body);
  const footer=el('footer',null,'case-identity__footer'),feedback=el('p',null,'d-metadata');feedback.role='status';feedback.dataset.caseIdentityFeedback='';
  const save=el('button','Aplicar','d-button d-button--primary');save.type='submit';footer.append(feedback,save);form.append(footer);
  let applying=false;
- function refresh(){save.disabled=viewer||applying||!state.preflight?.valid;body.disabled=viewer||applying;if(!state.preflight?.valid&&!applying&&!feedback.textContent)feedback.textContent='Cargá y validá Órdenes y Flota para aplicar.';else if(state.preflight?.valid&&feedback.textContent==='Cargá y validá Órdenes y Flota para aplicar.')feedback.textContent='';}
+ function refresh(){save.disabled=viewer||applying||!form.checkValidity()||!caseIdentityValid(state)||!caseAttributesDirty(state);body.disabled=viewer||applying;}
  scope.listen(form,'submit',async event=>{
   event.preventDefault();if(applying||save.disabled||!form.reportValidity())return;applying=true;feedback.setAttribute('role','status');save.setAttribute('aria-busy','true');feedback.textContent='Aplicando atributos y Data Owner…';refresh();
   try{await onSave();if(scope.active)feedback.textContent='Atributos y Data Owner aplicados.';}

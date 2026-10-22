@@ -16,13 +16,14 @@ export function mountWorkflowContext(root,{state,stageKey,field='owner',showCase
  const scope=createScope(host);mounted.set(root,scope);scope.own(()=>{host.remove();if(mounted.get(root)===scope)mounted.delete(root);});
  if(showCase&&current?.id){const switcher=el('div');host.append(switcher);const view=mountCaseSwitcher(switcher,{decisionCase:current,context:state.caseContext});scope.own(()=>view?.dispose());}
  if(data){
-  const snapshot=state.workflow||{stages:{},pending:true,can_assign:window.dationSession?.identity?.membership?.access_role==='admin',can_prepare:window.dationSession?.identity?.membership?.access_role!=='viewer'};
+  let snapshot=state.workflow||{stages:{},pending:true,can_assign:window.dationSession?.identity?.membership?.access_role==='admin',can_prepare:window.dationSession?.identity?.membership?.access_role!=='viewer'};
+  if(state.appliedPreparation)snapshot={...snapshot,stages:{...snapshot.stages,data_owner:{owner:state.appliedPreparation.owner,owner_eligible:state.appliedPreparation.ownerEligible}}};
   const currentId=current?.id||null;
   if(!state.dataOwnerDraft||state.dataOwnerDraft.caseId&&state.dataOwnerDraft.caseId!==currentId)state.dataOwnerDraft={caseId:currentId};
   state.dataOwnerDraft.caseId=currentId;
   const draft=state.dataOwnerDraft;
   const selector=el('div');host.append(selector);
-  const child=mountResponsibilitySelector(selector,{caseId:currentId,stageKey:'data_owner',snapshot,draft,deferSave:true,onChanged:()=>onSaved?.()});scope.own(()=>child.dispose());
+  const child=mountResponsibilitySelector(selector,{caseId:currentId,stageKey:'data_owner',snapshot,draft,deferSave:true,onChanged:()=>{if(state.appliedPreparation&&!draft.dirty)state.appliedPreparation.ownerEligible=draft.ownerEligible;onSaved?.();}});scope.own(()=>child.dispose());
  }else if(stageKey){
   const stage=state.workflow?.stages?.[stageKey]||{},info=el('div',undefined,'workflow-responsibility workflow-responsibility--readonly');
   if(field==='owner'){
