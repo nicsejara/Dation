@@ -4,6 +4,8 @@ globalThis.window={};
 const {caseFlowSteps}=await import('../app/static/js/dispatch/case-navigation.mjs');
 import {hasCaseExecutions} from '../app/static/js/dispatch/case-identity.mjs';
 import {resolveDecisionDestination} from '../app/static/js/dispatch/decision-target.mjs';
+import {configurationAvailable} from '../app/static/js/dispatch/decision-target.mjs';
+import {caseAttributesReady} from '../app/static/js/dispatch/case-identity.mjs';
 const {decisionRail}=await import('../app/static/js/dispatch/decision-nav.mjs');
 
 const cid='00000000-0000-4000-8000-000000000001';
@@ -54,4 +56,21 @@ test('available decisions can open Config, never an absent Dashboard; locked dec
  const html=decisionRail({decisionCase:state.decisionCase,activeNode:'logistics_assignment',view:'decision-dashboard'});
  assert.match(html,/data-decision-node="logistics_scheduling"[^>]*disabled/);
  assert.doesNotMatch(html,/data-back-map|dispatch-decision-rail__head|decision-view-tabs/);
+});
+test('configuration requires its canonical owners and an approved upstream; historical Dashboards remain readable',()=>{
+ const current={...state.decisionCase,nodes:{...state.decisionCase.nodes,logistics_scheduling:{status:'stale',latest_run_id:'old-d2'}}};
+ const workflow={gates_enforced:true,attributes_applied:true,stages:{data_owner:{owner_eligible:true},logistics_assignment:{owner_eligible:true},logistics_scheduling:{owner_eligible:false}}};
+ assert.equal(configurationAvailable('logistics_scheduling',current,workflow),false);
+ assert.equal(resolveDecisionDestination('logistics_scheduling',current.nodes.logistics_scheduling,'logistics-config',{decisionCase:current,workflow}),null);
+ assert.equal(resolveDecisionDestination('logistics_scheduling',current.nodes.logistics_scheduling,'decision-dashboard',{decisionCase:current,workflow}).run_id,'old-d2');
+ workflow.stages.logistics_scheduling.owner_eligible=true;
+ assert.equal(configurationAvailable('logistics_scheduling',current,workflow),true);
+ current.nodes.logistics_assignment={status:'review',latest_run_id:'new-d1'};
+ assert.equal(configurationAvailable('logistics_scheduling',current,workflow),false);
+});
+test('attributes are ready only after Apply; editing a previously applied draft blocks readiness again',()=>{
+ const value={caseIdentity:{label:'SEMANA 43',category:'weekly'},attributesApplied:false};
+ assert.equal(caseAttributesReady(value),false);
+ value.attributesApplied=true;assert.equal(caseAttributesReady(value),true);
+ value.identityDirty=true;assert.equal(caseAttributesReady(value),false);
 });

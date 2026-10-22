@@ -45,6 +45,20 @@ las versiones revisadas; no reescribe fechas históricas.
 
 ## Prueba reproducible
 
+### Upgrade de Saga 3
+
+Sobre la instalación con `20261022010000_case_identity_preparation.sql` aplicada,
+ejecutar una sola vez `20261022020000_decision_run_reopening.sql` y después
+`20261022030000_case_ownership_readiness.sql`, antes de publicar la API/UI de Saga 3.
+El arranque de la aplicación no ejecuta estas migraciones.
+
+La primera retira la aprobación vigente al admitir otra Run e invalida las Runs
+posteriores conservando resultados, actores y aprobaciones históricas. También
+reconcilia alternativas existentes admitidas después de una aprobación. Un cambio
+de Data Pack crea otro Case; sus atributos permanecen editables en el mismo Case.
+La segunda consolida Data Owner/Decision Owner, conserva las asignaciones y roles
+históricos y exige atributos aplicados y owners elegibles para avanzar.
+
 CI crea PostgreSQL 17 efímero sin publicar puertos; sólo los roles de infraestructura
 se simulan. Todos los tests SQL usan el DDL real capturado, en lugar del fixture
 parcial de tablas antiguas. Se verifica la equivalencia del catálogo reconstruido,

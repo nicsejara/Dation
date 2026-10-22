@@ -142,7 +142,7 @@ function runConfiguration(run){
 }
 
 function runCard(run){
-  const state=RUN_STATES[run.decision_state]||RUN_STATES.error;
+  const state=run.decision_state==='superseded'&&!run.approved_at?{label:'Corrida invalidada',tone:'superseded'}:RUN_STATES[run.decision_state]||RUN_STATES.error;
   const config=runConfiguration(run);
   const openable=['approved','candidate','superseded','stale'].includes(run.decision_state);
   return '<article class="dispatch-run-history__item is-'+esc(state.tone)+'">'

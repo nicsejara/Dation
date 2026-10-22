@@ -1,4 +1,4 @@
-import {mountCaseIdentity,hasCaseExecutions} from '../case-identity.mjs';
+import {mountCaseIdentity,caseAttributesReady} from '../case-identity.mjs';
 import {responsibilityProblem} from '../workflow-responsibility.mjs';
 import {mountDemoAction} from '../../platform/onboarding.mjs';
 import {createScope,scopeFor} from "../lifecycle.mjs";
@@ -116,7 +116,7 @@ function makeHero() {
     reveal: true,
     step: dataStep,
     title: "Preparar Decision Case",
-    description: "Tu Data Pack reúne Órdenes y Flota. Subí archivos nuevos o reutilizá una carga anterior; Dation valida su estructura y compatibilidad.",
+    description: "Definí el contexto y prepará una base confiable para tus decisiones.",
     panelTitle: "CÓMO FUNCIONA",
     panelItems: [
       {label: "1 · DESCARGÁ", description: "La plantilla con el formato correcto.", icon: "download"},
@@ -274,11 +274,7 @@ export async function mountUploadScreen(
   compatibilityRoot.hidden = true;
   compatibilityRoot.dataset.reveal = "";
 
-  function allowInputChange(){
-    if(!hasCaseExecutions(state.decisionCase)&&state.caseContext?.status!=='archived')return true;
-    const note=root.querySelector('[data-input-guard]');
-    if(note){note.hidden=false;note.focus();}return false;
-  }
+  function allowInputChange(){return true;}
   const refs = {};
   let guide = null;
   let previousDrawer = null;
@@ -349,10 +345,10 @@ export async function mountUploadScreen(
     compatibilityRoot,
     actionBar.bar,
   );
-  mountCaseIdentity(root,{state,persist,onSave:saveIdentity});
+  mountCaseIdentity(root,{state,persist,onSave:async()=>{await saveIdentity();mountWorkflow?.(root,()=>finalState());},onChanged:()=>finalState()});
   const guard=el('section',null,'d-card case-input-guard');guard.dataset.inputGuard='';guard.tabIndex=-1;
-  guard.hidden=!hasCaseExecutions(state.decisionCase)&&state.caseContext?.status!=='archived';
-  guard.append(el('p','Este Data Pack tiene ejecuciones o está archivado. Podés consultarlo. Para usar otros inputs, iniciá otro Case y conservá estos resultados.'));
+  guard.hidden=!state.decisionCase?.persisted;
+  guard.append(el('p','Si reemplazás Órdenes o Flota por datos distintos, se creará otro Decision Case. Este Case y sus resultados se conservan.'));
   const newCase=el('button','Iniciar otro Decision Case','d-button d-button--secondary');newCase.type='button';scope.listen(newCase,'click',()=>window.DationDispatch.startNewDecision());guard.append(newCase);dataPack.before(guard);
   mountWorkflow?.(root,()=>finalState());
 
@@ -395,11 +391,14 @@ export async function mountUploadScreen(
 
     const context = {
       missingCount: missingCount(),
-      items: ["orders", "fleet"].map(key => ({key, label:key === "orders" ? "Órdenes" : "Flota", tone:fileTone(key)})),
+      items: [...["orders", "fleet"].map(key => ({key, label:key === "orders" ? "Órdenes" : "Flota", tone:fileTone(key)})),
+        {key:'attributes',label:'Atributos',tone:caseAttributesReady(state)?'success':'pending'},
+        {key:'owner',label:'Data Owner',tone:state.workflow?.stages?.data_owner?.owner_eligible?'success':'pending'}],
       busy: Object.values(local.phases).some(phase => phase !== "idle"),
       storageAvailable: Boolean(local.status?.available),
     };
 
+    if(result.enabled&&!caseAttributesReady(state)){result.enabled=false;result.kind='attributes';result.message='Aplicá los atributos del Case antes de continuar.';}
     const responsibility=responsibilityProblem(state.workflow,'data_preparation','data');
     if(result.enabled&&responsibility){result.enabled=false;result.kind='responsibility';result.message=responsibility;}
     actionBar.update(result, context);

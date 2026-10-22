@@ -1,7 +1,8 @@
 import {resolveNodeDestination,resolveDecisionDestination} from './decision-target.mjs';
 import {DECISION_META} from './decision-ui.mjs';
 import {decisionRail,bindDecisionRail} from './decision-nav.mjs';
-import {hasCaseExecutions} from './case-identity.mjs';
+import {hasCaseExecutions,caseAttributesReady} from './case-identity.mjs';
+import {configurationAvailable} from './decision-target.mjs';
 
 const views=['logistics-data','logistics-map','logistics-config','decision-dashboard'];
 const signatures=new WeakMap();
@@ -9,10 +10,10 @@ export function caseFlowSteps(view,route,state={}){
  const own=state.decisionCase?.id===route.caseId?state.decisionCase:null;
  const node=own?.nodes?.[route.nodeId],target=node&&resolveNodeDestination(route.nodeId,node);
  const hasRun=target?.view==='decision-dashboard',selected=Boolean(node&&target);
- const mapAvailable=own?.persisted&&(hasCaseExecutions(own)||state.preflight?.valid&&(!state.workflow?.gates_enforced||state.workflow?.stages?.data_preparation?.owner_eligible));
+ const mapAvailable=own?.persisted&&(hasCaseExecutions(own)||state.preflight?.valid&&caseAttributesReady(state)&&(!state.workflow?.gates_enforced||state.workflow?.stages?.data_owner?.owner_eligible));
  return ['Datos del Case','Mapa de decisiones','Configurar decisión','Dashboard'].map((label,index)=>({
   label,view:views[index],current:views[index]===view,
-  disabled:index===1?!mapAvailable:index===2?!selected:index===3?!hasRun:false,
+  disabled:index===1?!mapAvailable:index===2?!configurationAvailable(route.nodeId,own,state.workflow):index===3?!hasRun:false,
   completed:index===0?Boolean(own?.persisted):index===1?selected:index===2?hasRun:false,
   context:index>=2&&views[index]===view?DECISION_META[route.nodeId]?.label:null,
   target:{view:views[index],caseId:route.caseId,nodeId:index>=2?route.nodeId:null,runId:index===3?target?.run_id:null},
@@ -41,7 +42,7 @@ export function renderCaseFlow(root,{view,route,state={}}){
 }
 export function mountDecisionViews(root,{state,nodeId,view}){
  const current=state.decisionCase;if(!current?.id||!DECISION_META[nodeId]?.implemented)return;
- if(!root.querySelector('.dispatch-decision-rail')){const host=document.createElement('div');host.innerHTML=decisionRail({decisionCase:current,activeNode:nodeId,view});root.prepend(host);
-  bindDecisionRail(host,{onOpenNode:id=>{const target=resolveDecisionDestination(id,current.nodes[id],view);if(target)open({...target,caseId:current.id,nodeId:id,runId:target.run_id});}});
+ if(!root.querySelector('.dispatch-decision-rail')){const host=document.createElement('div');host.innerHTML=decisionRail({decisionCase:current,workflow:state.workflow,activeNode:nodeId,view});root.prepend(host);
+  bindDecisionRail(host,{onOpenNode:id=>{const target=resolveDecisionDestination(id,current.nodes[id],view,{decisionCase:current,workflow:state.workflow});if(target)open({...target,caseId:current.id,nodeId:id,runId:target.run_id});}});
  }
 }

@@ -426,7 +426,7 @@ def _state_with_history(
             node["error"] = None
         elif latest:
             node["run_id"] = latest["id"]
-            node["status"] = _execution_node_status(latest)
+            node["status"] = "stale" if latest.get("superseded_at") else _execution_node_status(latest)
             node["error"] = (
                 latest.get("error_message")
                 if latest.get("status") == "error"
@@ -448,7 +448,11 @@ def _state_with_history(
     final_assignment = current_approved["logistics_final_assignment"]
 
     scheduling_node = canonical["nodes"]["logistics_scheduling"]
-    if scheduling:
+    if grouped["logistics_scheduling"] and (
+        not assignment or str(grouped["logistics_scheduling"][0].get("upstream_run_id")) != str(assignment.get("id"))
+    ):
+        scheduling_node["status"] = "stale"
+    elif scheduling:
         if (
             not assignment
             or str(scheduling.get("upstream_run_id")) != str(assignment.get("id"))
@@ -513,61 +517,9 @@ async def record_node_state(
     if status not in NODE_STATUS:
         raise ValueError("Estado de nodo inválido.")
 
-    row = await get_case_row(case_id)
-    if not row:
-        raise LookupError("No se encontró el Decision Case.")
-    state = _validate_state(
-        row.get("state_json") or {},
-        case_id=case_id,
-        orders_dataset_id=str(row["orders_dataset_id"]),
-        fleet_dataset_id=str(row["fleet_dataset_id"]),
-    )
-    node = state["nodes"][node_id]
-
-    if status == "approved":
-        node.update(
-            {
-                "status": "approved",
-                "run_id": run_id,
-                "latest_run_id": run_id,
-                "approved_run_id": run_id,
-                "latest_execution_status": "completed",
-                "approved_at": approved_at,
-                "error": None,
-            }
-        )
-    else:
-        if run_id:
-            node["latest_run_id"] = run_id
-        node["latest_execution_status"] = {
-            "running": "running",
-            "review": "completed",
-            "error": "error",
-        }.get(status, node.get("latest_execution_status"))
-        if node.get("approved_run_id"):
-            node["run_id"] = node["approved_run_id"]
-            if node.get("status") != "stale":
-                node["status"] = "approved"
-            node["error"] = None
-        else:
-            node["status"] = status
-            node["run_id"] = run_id
-            node["approved_at"] = None
-            node["error"] = error if status == "error" else None
-
-    if status == "approved":
-        next_node = {
-            "logistics_assignment": "logistics_scheduling",
-            "logistics_scheduling": "logistics_final_assignment",
-        }.get(node_id)
-        if next_node and state["nodes"][next_node]["status"] in {
-            "locked",
-            "needs_data",
-        }:
-            state["nodes"][next_node]["status"] = "available"
-            state["nodes"][next_node]["error"] = None
-
-    return await update_case(case_id, state=state)
+    # Runs and their supersession markers are authoritative; never resurrect an
+    # approval from the eventually consistent Case cache after a new admission.
+    return await sync_case_history(case_id)
 
 
 async def validate_upstream_run(
@@ -587,7 +539,8 @@ async def validate_upstream_run(
         or not source.get("approved_at")
         or source.get("superseded_at") is not None
     ):
-        raise ValueError(
+        from app.services.dispatch_job_service import RunConflict
+        raise RunConflict(
             "La corrida upstream ya no es la decisión aprobada vigente del caso."
         )
     return source

@@ -18,7 +18,7 @@ export function decisionRail(caseActions={}){
       const node=decisionCase.nodes[nodeId]||{};
       const ui=statusUi(node.status);
       const phase=!meta.implemented||node.status==='locked'||node.status==='needs_data'?'LOCKED':node.status==='approved'?'APPROVED':node.status==='review'?'WAITING_APPROVAL':node.run_id?'EXECUTED':nodeId===activeNode&&caseActions.view==='logistics-config'?'CONFIGURING':'AVAILABLE';
-      const target=resolveDecisionDestination(nodeId,node,caseActions.view);
+      const target=resolveDecisionDestination(nodeId,node,caseActions.view,caseActions);
       const canOpen=Boolean(target);
       const presentation=statePresentation(node.status,nodeId===activeNode);
       return '<button type="button" class="dispatch-decision-tab'

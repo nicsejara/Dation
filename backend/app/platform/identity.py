@@ -7,6 +7,10 @@ from app.services.http_service import http_client
 from app.platform.entitlements import enabled_ddas
 
 WORKFLOW_CONFLICTS = {
+    'Aprobá la decisión anterior antes de configurar.':'upstream',
+    'Aplicá los atributos del Case antes de continuar.':'attributes',
+    'Asigná un Data Owner activo y elegible antes de continuar.':'data',
+    'Asigná un Decision Owner activo y elegible antes de continuar.':'decision_owner',
     'Seleccioná un responsable de datos activo y elegible antes de continuar.':'data',
     'Seleccioná un responsable de la decisión activo y elegible antes de ejecutar.':'decision_owner',
     'Seleccioná un aprobador asignado activo y elegible antes de aprobar.':'approver',

@@ -10,10 +10,10 @@ from app.models.case_identity import CaseIdentity
 
 router=APIRouter(prefix='/decisions')
 Node=Literal['logistics_assignment','logistics_scheduling','logistics_final_assignment']
-Stage=Literal['data_preparation','data_owner','data_steward','logistics_assignment','logistics_scheduling']
+Stage=Literal['data_preparation','data_owner','logistics_assignment','logistics_scheduling']
 
 @router.get('/{case_id}/workflow-readiness')
-async def workflow_readiness(case_id:UUID,ctx=Depends(require_upload_access)):
+async def workflow_readiness(case_id:UUID,node_id:Literal['logistics_assignment','logistics_scheduling']|None=None,ctx=Depends(require_upload_access)):
     from fastapi import HTTPException
     from app.platform.entitlements import require_dda
     from app.services import decision_case_service,dispatch_service
@@ -23,8 +23,8 @@ async def workflow_readiness(case_id:UUID,ctx=Depends(require_upload_access)):
     inputs=await guarded(dispatch_service.check_inputs(case['orders']['id'],case['fleet']['id'],True))
     if not inputs.get('valid'):
         raise HTTPException(409,'Validá y corregí el Data Pack antes de continuar.')
-    return await platform_call('platform_validate_data_stage',{'target_workspace_id':ctx.workspace_id,
-        'actor_user_id':ctx.user_id,'target_case_id':str(case_id)})
+    return await platform_call('platform_validate_decision_stage' if node_id else 'platform_validate_data_stage',{'target_workspace_id':ctx.workspace_id,
+        'actor_user_id':ctx.user_id,'target_case_id':str(case_id),**({'target_node_id':node_id} if node_id else {})})
 
 @router.get('/{case_id}/responsibilities')
 async def responsibilities(case_id:UUID,ctx=Depends(require_upload_access)):

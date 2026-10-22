@@ -20,7 +20,7 @@ export function mountWorkspaceHome(root,getIdentity){
  const header=el('header',undefined,'platform-home__header platform-entry-hero'),copy=el('div',undefined,'platform-home__hero-copy');
  const workspace=el('p',undefined,'platform-home__workspace'),title=el('h1',undefined,'d-page-title'),ctas=el('div',undefined,'platform-home__hero-actions platform-hero-actions');
  const catalog=heroCta(link('Explorar DDA','platform-home','d-button d-button--primary'));
- const center=heroCta(link('Ir a Decision Center','platform-decisions'),'link');ctas.append(catalog,center);
+ ctas.append(catalog);
  copy.append(workspace,title,el('p','Explorá los Decision Data Assets disponibles y convertí tus datos en decisiones trazables.','d-page-description'),ctas);
  const art=el('img',undefined,'platform-home__hero-art');art.src='/static/assets/workspace-home-hero.svg';art.alt='';art.width=420;art.height=280;header.append(copy,art);
  const quick=el('section',undefined,'d-card platform-home__section platform-home__access'),heading=el('h2','Accesos rápidos','d-section-title'),links=el('ul',undefined,'platform-home__quick');

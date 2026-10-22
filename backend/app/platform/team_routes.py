@@ -8,7 +8,7 @@ from app.platform.auth_routes import Email
 from app.platform.identity import platform_call
 
 Role = Literal['admin', 'operator', 'viewer']
-Responsibility = Literal['data_owner', 'data_steward', 'decision_owner', 'approver']
+Responsibility = Literal['data_owner', 'decision_owner']
 Node = Literal['logistics_assignment', 'logistics_scheduling', 'logistics_final_assignment']
 router = APIRouter()
 
