@@ -39,27 +39,23 @@ class CasePreparationTests(unittest.TestCase):
         new=self.checked(self.a.post('/api/decision-cases',json={'id':str(uuid4()),'orders_dataset_id':orders['id'],'fleet_dataset_id':fleet['id'],'label':'SEMANA 44','category':'weekly'}))['case']
         self.assertEqual(new['label'],'SEMANA 44');self.assertEqual(new['category'],'weekly')
 
-    def test_data_pack_changes_keep_case_and_people_until_first_admitted_run(self):
+    def test_data_pack_changes_fork_while_preserving_original_people_and_runs(self):
         cid,orders,fleet=self.case();self.roles(USER_A,['data_owner','decision_owner'])
+        before=self.checked(self.a.get('/api/platform/decisions/'+cid))
+        self.checked(self.a.patch('/api/platform/decisions/'+cid,json={'expected_updated_at':before['updated_at'],'label':'Case original','category':'weekly'}))
         self.assign(cid,'data_owner',USER_A);self.assign(cid,'logistics_assignment',USER_A)
         people=self.snapshot(cid)['stages']
-        replacement=self.checked(self.a.post('/api/datasets/upload',params={'dataset_type':'orders'},data={'is_sample':'true'},
-            files={'file':('replacement.csv',csv_input('orders')+b'\n','text/csv')}))['dataset']
-        new_id=replacement['id']
+        replacement=self.checked(self.a.post('/api/datasets/upload',params={'dataset_type':'orders'},data={'is_sample':'true'},files={'file':('replacement.csv',csv_input('orders')+b'\n','text/csv')}))['dataset']
         before=self.checked(self.a.get('/api/platform/decisions/'+cid))
-        body={'expected_updated_at':before['updated_at'],'orders_dataset_id':new_id,'fleet_dataset_id':fleet['id']}
-        self.checked(self.a.put('/api/platform/decisions/'+cid+'/data-pack',json=body))
-        self.assertEqual(self.a.put('/api/platform/decisions/'+cid+'/data-pack',json=body).status_code,409)
+        body={'expected_updated_at':before['updated_at'],'orders_dataset_id':replacement['id'],'fleet_dataset_id':fleet['id']}
+        fork=self.checked(self.a.put('/api/platform/decisions/'+cid+'/data-pack',json=body))
+        self.assertNotEqual(fork['id'],cid)
+        self.assertEqual(self.checked(self.a.put('/api/platform/decisions/'+cid+'/data-pack',json=body))['id'],fork['id'])
         hydrated=self.checked(self.a.get('/api/decision-cases/'+cid))
-        self.assertEqual(hydrated['decision_case']['id'],cid)
-        self.assertEqual(hydrated['orders']['id'],new_id)
+        self.assertEqual(hydrated['orders']['id'],orders['id'])
         self.assertEqual(hydrated['workflow_responsibilities']['stages'],people)
-        # Restore usable stored bytes before admission, then prove queued runs lock inputs too.
-        body.update(expected_updated_at=hydrated['case']['updated_at'],orders_dataset_id=orders['id'])
-        self.checked(self.a.put('/api/platform/decisions/'+cid+'/data-pack',json=body))
         run=self.admit(self.body(cid,orders,fleet))
-        current=self.checked(self.a.get('/api/platform/decisions/'+cid))
-        body.update(expected_updated_at=current['updated_at'],orders_dataset_id=new_id)
-        self.assertEqual(self.a.put('/api/platform/decisions/'+cid+'/data-pack',json=body).status_code,409)
-        self.assertEqual(self.checked(self.a.get('/api/decision-cases/'+cid))['orders']['id'],orders['id'])
+        current=self.checked(self.a.get('/api/platform/decisions/'+cid));body['expected_updated_at']=current['updated_at']
+        self.assertEqual(self.checked(self.a.put('/api/platform/decisions/'+cid+'/data-pack',json=body))['id'],fork['id'])
         self.assertEqual(self.checked(self.a.get('/api/runs/'+run))['id'],run)
+        self.assertEqual(self.checked(self.a.get('/api/decision-cases/'+cid))['orders']['id'],orders['id'])

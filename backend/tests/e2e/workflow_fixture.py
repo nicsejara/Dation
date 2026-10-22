@@ -17,10 +17,10 @@ def set_roles(client,uid,roles):
 def prepare_stage(client,cid,node,*,approval=False,uid=USER_A):
     snapshot=checked(client.get(f'/api/platform/decisions/{cid}/responsibilities'))
     if not snapshot['gates_enforced']:return
-    for stage,field in ([(node,'approver')] if approval else [('data_preparation','owner'),(node,'owner')]):
+    if not snapshot.get('attributes_applied'):
+        case=checked(client.get(f'/api/platform/decisions/{cid}'))
+        checked(client.patch(f'/api/platform/decisions/{cid}',json={'expected_updated_at':case['updated_at'],'label':case.get('label') or 'Synthetic Case','category':case.get('category') or 'simulation'}))
+    for stage in ([node] if approval else ['data_owner',node]):
         value=snapshot['stages'][stage]
-        if value[field]:continue
-        payload={'expected_updated_at':value['updated_at'],'owner_user_id':value['owner']['id'] if value['owner'] else None,
-                 'approver_user_id':value['approver']['id'] if value['approver'] else None}
-        payload[field+'_user_id']=uid
-        snapshot=checked(client.put(f'/api/platform/decisions/{cid}/responsibilities/{stage}',json=payload))
+        if value['owner']:continue
+        snapshot=checked(client.put(f'/api/platform/decisions/{cid}/responsibilities/{stage}',json={'expected_updated_at':value['updated_at'],'owner_user_id':uid}))

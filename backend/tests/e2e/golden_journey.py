@@ -23,7 +23,7 @@ THEME=(Path(__file__).parents[1]/'browser/theme_audit.js').read_text()
 
 
 async def main():
-    errors=[];requests=[];surfaces=set();probes=[];runs={};evidence={};case=None
+    errors=[];requests=[];surfaces=set();probes=[];runs={};evidence={};run_history=[];case=None
     if ARTIFACT:ARTIFACT.mkdir(parents=True,exist_ok=True)
     async with async_playwright() as pw:
         browser=await pw.chromium.launch(executable_path=os.getenv('CHROMIUM_EXECUTABLE') or '/usr/bin/chromium',headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
@@ -39,7 +39,7 @@ async def main():
             await page.get_by_role('button',name='Ingresar',exact=True).click()
             await page.locator('[data-platform-home] h1').wait_for()
             pages[actor]=page;contexts[actor]=context
-        admin,steward,owner,approver,viewer=[pages[key] for key in ('admin','steward','owner','approver','viewer')]
+        admin,steward,owner,outsider,viewer=[pages[key] for key in ('admin','steward','owner','approver','viewer')];approver=owner
 
         def collections():
             return Counter((r['actor'],r['path']) for r in requests if r['method']=='GET' and r['path'] in ('/api/platform/home','/api/platform/decisions','/api/platform/data/datasets'))
@@ -79,6 +79,13 @@ async def main():
             await root.get_by_role('button',name='Cambiar',exact=True).wait_for()
 
         async def execute(node):
+            context=owner.locator('[data-config-context]')
+            await context.locator('summary').click()
+            context_text=await context.inner_text()
+            assert 'Contexto del Case' in context_text and 'Golden DataOwner' in context_text
+            assert 'Decision Owner' not in context_text and 'Data Steward' not in context_text
+            assert 'DC-' not in await context.locator('summary').inner_text()
+            await context.locator('summary').click()
             review='[data-config-review]' if node=='logistics_assignment' else '[data-scheduling-review]'
             confirm='[data-config-execute]' if node=='logistics_assignment' else '[data-scheduling-execute]'
             await owner.locator(review).click();dialog=owner.locator('dialog[open]')
@@ -86,7 +93,7 @@ async def main():
             async with owner.expect_response(lambda r:urlsplit(r.url).path=='/api/runs' and r.request.method=='POST') as pending:
                 await owner.locator(confirm).click()
             response=await pending.value;assert response.status==202,await response.text()
-            run=(await response.json())['id'];runs[node]=run
+            run=(await response.json())['id'];runs[node]=run;run_history.append({'node':node,'id':run})
             await owner.locator('.d-decision-dashboard').wait_for()
             assert parse_qs(urlsplit(owner.url).query)['run_id']==[run]
             return run
@@ -94,8 +101,8 @@ async def main():
         async def approve(node,run):
             await open_stage(admin,'decision-dashboard',node,run)
             assert await admin.locator('[data-workflow-responsibility]').count()==0
-            await open_stage(owner,'decision-dashboard',node,run)
-            assert await owner.locator('[data-approve-toolbar],[data-approve-final]').count()==0
+            await open_stage(outsider,'decision-dashboard',node,run)
+            assert await outsider.locator('[data-approve-toolbar],[data-approve-final]').count()==0
             await open_stage(approver,'decision-dashboard',node,run)
             async with approver.expect_response(lambda r:urlsplit(r.url).path=='/api/runs/'+run+'/approve' and r.request.method=='POST') as pending:
                 await approver.locator('[data-approve-toolbar]').click()
@@ -104,7 +111,8 @@ async def main():
             evidence[node]={key:saved[key] for key in ('id','result_fingerprint','configuration_json','created_by_user_id','approved_by_user_id','upstream_run_id')}
             await approver.wait_for_function('node=>window.DationDispatch.getWorkspace().decisionCase.nodes[node].status==="approved"',arg=node)
             await approver.locator('#dispatch-hero [data-run-trace] dd').get_by_text('Golden Owner',exact=True).wait_for()
-            await approver.locator('#dispatch-hero [data-run-trace] dd').get_by_text('Golden Approver',exact=True).wait_for()
+            assert await approver.locator('#dispatch-hero').get_by_text('Configurado por',exact=True).count()==0
+            await approver.locator('#dispatch-hero [data-run-trace] dt').get_by_text('Aprobado por',exact=True).wait_for()
             assert parse_qs(urlsplit(approver.url).query)['run_id']==[run]
 
         try:
@@ -121,28 +129,20 @@ async def main():
                 assert (await pending.value).status==200
             data=steward.locator('#dispatch-data-root');next_button=data.get_by_role('button',name='Seleccioná tu decisión',exact=True)
             assert await next_button.is_disabled()
-            await data.get_by_role('button',name='Registrar caso para asignar responsable',exact=True).click()
+            await data.get_by_role('button',name='Aplicar',exact=True).click()
+            await data.locator('[data-case-identity-feedback]').get_by_text('Atributos aplicados.',exact=True).wait_for()
             await data.get_by_role('button',name='Actualizar responsabilidad',exact=True).wait_for()
             case=await steward.evaluate('window.DationDispatch.getWorkspace().decisionCase.id')
             await admin.goto(target('logistics-data'))
-            await assign('data_steward',STEWARD)
+            await assign('data_owner',STEWARD)
             await data.get_by_role('button',name='Actualizar responsabilidad',exact=True).click()
             await steward.wait_for_function('!document.querySelector("#dispatch-data-root .d-workflow-action-bar button").disabled')
             await matrix(steward,'data')
-            previous_orders=await steward.evaluate('window.DationDispatch.getWorkspace().orders.id')
-            async with steward.expect_response(lambda r:urlsplit(r.url).path=='/api/datasets/upload' and r.request.method=='POST') as replacement:
-                await steward.locator('[data-kind="orders"] input[type=file]').set_input_files({'name':'replacement-orders.csv','mimeType':'text/csv','buffer':(INPUTS/'orders.csv').read_bytes()+b'\n'})
-            assert (await replacement.value).status==200
-            await steward.wait_for_function('window.DationDispatch.getWorkspace().preflight?.valid')
-            assert await steward.evaluate('window.DationDispatch.getWorkspace().decisionCase.id')==case
-            assert await steward.evaluate('window.DationDispatch.getWorkspace().orders.id')!=previous_orders
             await next_button.click();await steward.locator('[data-map-node=logistics_assignment]').first.wait_for()
             await matrix(steward,'map')
             await open_stage(admin,'logistics-map')
             await assign('logistics_assignment',OWNER,audit_editor=True)
-            await assign('logistics_assignment',APPROVER,'approver')
             await assign('logistics_scheduling',OWNER)
-            await assign('logistics_scheduling',APPROVER,'approver')
             await open_stage(owner,'logistics-config','logistics_assignment')
             await owner.locator('[data-objective=min_cost]').click()
             assert await owner.locator('.dda-navigation li').count()==3
@@ -153,16 +153,11 @@ async def main():
             await owner.locator('[data-map-action=configure][data-map-node=logistics_assignment]').click()
             await owner.locator('[data-config-review]').wait_for()
             await matrix(owner,'config')
+            await execute('logistics_assignment')
+            await owner.locator('#dda-workspace-nav [data-step="3"]').click()
+            await owner.locator('[data-config-review]').wait_for()
             d1=await execute('logistics_assignment')
             await matrix(owner,'dashboard')
-            await owner.goto(target('logistics-data'))
-            await owner.locator('[data-case-identity]').wait_for()
-            assert await owner.locator('[data-input-guard]').is_visible()
-            uploads_before=sum(r['method']=='POST' and r['path']=='/api/datasets/upload' for r in requests)
-            protected_orders=await owner.evaluate('window.DationDispatch.getWorkspace().orders.id')
-            await owner.locator('[data-kind="orders"] input[type=file]').set_input_files(INPUTS/'orders.csv')
-            assert await owner.evaluate('window.DationDispatch.getWorkspace().orders.id')==protected_orders
-            assert sum(r['method']=='POST' and r['path']=='/api/datasets/upload' for r in requests)==uploads_before
             await approve('logistics_assignment',d1)
             final=approver.locator('.assignment-final-actions')
             await final.get_by_role('button',name='Configurar siguiente decisión',exact=True).wait_for()
@@ -174,6 +169,9 @@ async def main():
             await open_stage(admin,'logistics-config','logistics_scheduling')
             assert await admin.locator('[data-workflow-responsibility]').count()==0
             await open_stage(owner,'logistics-config','logistics_scheduling')
+            await execute('logistics_scheduling')
+            await owner.locator('#dda-workspace-nav [data-step="3"]').click()
+            await owner.locator('[data-scheduling-review]').wait_for()
             d2=await execute('logistics_scheduling')
 
             # Navigation is a matrix: horizontal changes the decision, vertical changes the level.
@@ -207,6 +205,19 @@ async def main():
             assert await final.get_by_role('button',name='Ver mapa del Case',exact=True).is_visible()
             assert await final.get_by_role('button',name='Configurar siguiente decisión',exact=True).count()==0
 
+            await owner.locator('.dispatch-decision-tab[data-decision-node=logistics_assignment]').click()
+            await owner.locator('.assignment-dashboard-v2').wait_for()
+            await owner.locator('#dda-workspace-nav [data-step="3"]').click()
+            await owner.locator('[data-config-review]').wait_for()
+            d1=await execute('logistics_assignment')
+            assert await owner.evaluate('window.DationDispatch.getWorkspace().decisionCase.nodes.logistics_scheduling.status')=='stale'
+            await approve('logistics_assignment',d1)
+            await owner.locator('.assignment-final-actions [data-approved-map]').click()
+            await owner.locator('[data-map-action=configure][data-map-node=logistics_scheduling]').click()
+            await owner.locator('[data-scheduling-review]').wait_for()
+            d2=await execute('logistics_scheduling')
+            await approve('logistics_scheduling',d2)
+
             # Both rails use their canonical run, with no configuration bounce.
             for node,run in (('logistics_assignment',d1),('logistics_scheduling',d2)):
                 await approver.locator('.view.is-active .dispatch-decision-tab[data-decision-node="'+node+'"]').first.click()
@@ -222,12 +233,12 @@ async def main():
             center=approver.locator('[data-platform-decisions]');await center.get_by_role('heading',name='Cadena de decisiones',exact=True).wait_for()
             assert parse_qs(urlsplit(approver.url).query)['center_case_id']==[case]
             assert await center.locator('[data-center-case="'+case+'"]').get_attribute('aria-selected')=='true'
-            assert 'Golden Steward' in await center.locator('.center-linked-data').inner_text()
+            assert 'Golden DataOwner' in await center.locator('.center-linked-data').inner_text()
             for node in ('logistics_assignment','logistics_scheduling'):
                 detail=center.locator('[data-center-node="'+node+'"]')
                 await detail.locator('summary',has_text='Responsables y aprobación').click()
-                text=await detail.inner_text();assert 'Golden Owner' in text and 'Golden Approver' in text
-                assert 'Aprobada por · Golden Approver' in text
+                text=await detail.inner_text();assert 'Golden Owner' in text and 'Aprobador asignado' not in text
+                assert 'Aprobada por · Golden Owner' in text
                 assert 'Objetivo · Por definir' not in text
             await center.locator('[data-case-activity] .platform-activity__event').first.wait_for()
             assert await center.locator('.center-linked-file').count()==2
@@ -259,13 +270,28 @@ async def main():
             switch_queries=[r for r in requests if r['path']=='/api/platform/decisions' and r['query'].get('limit')==['8']]
             assert switch_queries==[], 'The Case flow must never query an internal Case picker.'
             assert not any(r['method']=='GET' and r['path']=='/api/decision-cases' for r in requests[switch_start:])
-            assert sum(r['method']=='POST' and r['path']=='/api/runs' for r in requests)==2
-            assert sum(r['method']=='POST' and r['path'].endswith('/approve') for r in requests)==2
+            assert sum(r['method']=='POST' and r['path']=='/api/runs' for r in requests)==6
+            assert sum(r['method']=='POST' and r['path'].endswith('/approve') for r in requests)==4
             for node,rid in runs.items():
                 final=await (await api_get(contexts['approver'],BASE+'/api/runs/'+rid)).json()
                 assert all(final[key]==value for key,value in evidence[node].items()),(node,'Navigation changed persisted execution evidence.')
+            # Attribute edits preserve the completed Case; a changed file creates another Case.
+            await owner.goto(target('logistics-data'))
+            await owner.locator('[data-case-identity]').wait_for()
+            await owner.get_by_label('Nombre del Case',exact=True).fill('SEMANA 44')
+            await owner.get_by_role('button',name='Aplicar',exact=True).click()
+            await owner.locator('[data-case-identity-feedback]').get_by_text('Atributos aplicados.',exact=True).wait_for()
+            assert await owner.evaluate('window.DationDispatch.getWorkspace().decisionCase.id')==case
+            assert await owner.locator('.d-workflow-action-bar__item').count()==4
+            assert 'Data Steward' not in await owner.locator('#dispatch-data-root').inner_text()
+            await owner.locator('[data-kind="orders"] input[type=file]').set_input_files({'name':'next-pack-orders.csv','mimeType':'text/csv','buffer':(INPUTS/'orders.csv').read_bytes()+b'\n'})
+            await owner.wait_for_function('id=>window.DationDispatch.getWorkspace().decisionCase?.persisted&&window.DationDispatch.getWorkspace().decisionCase.id!==id',arg=case)
+            fork=await owner.evaluate('window.DationDispatch.getWorkspace().decisionCase.id')
+            assert await owner.locator('.d-workflow-action-bar button').is_disabled()
+            preserved=await (await api_get(contexts['owner'],BASE+'/api/decision-cases/'+case)).json()
+            assert all(preserved['decision_case']['nodes'][node]['status']=='approved' for node in runs)
             assert errors==[],errors
-            report={'passed':True,'case_id':case,'runs':runs,'viewports':WIDTHS,'surfaces':sorted(surfaces),'responsive_probes':probes,'distinct_actor_sessions':5,'source_sha':subprocess.check_output(['git','rev-parse','HEAD'],cwd=Path(__file__).parents[2],text=True).strip(),'javascript_errors':errors,'requests':requests}
+            report={'passed':True,'case_id':case,'runs':runs,'run_history':run_history,'forked_case_id':fork,'viewports':WIDTHS,'surfaces':sorted(surfaces),'responsive_probes':probes,'distinct_actor_sessions':5,'source_sha':subprocess.check_output(['git','rev-parse','HEAD'],cwd=Path(__file__).parents[2],text=True).strip(),'javascript_errors':errors,'requests':requests}
             if ARTIFACT:(ARTIFACT/'report.json').write_text(json.dumps(report,indent=2))
             print(json.dumps(report))
         except BaseException:

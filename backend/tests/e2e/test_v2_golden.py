@@ -30,7 +30,7 @@ class GoldenWorkflowTests(unittest.TestCase):
             client=httpx.Client(base_url=cls.s.api_url,headers={'Authorization':'Bearer '+cls.s.user_tokens[uid]},trust_env=False,timeout=30)
             cls.clients[uid]=client;cls.addClassCleanup(client.close)
         identities={'user-3@example.test':{'id':VIEWER,'refresh':'fixture-refresh-viewer'}}
-        for uid,role,name in ((STEWARD,'data_steward','Steward'),(OWNER,'decision_owner','Owner'),(APPROVER,'approver','Approver')):
+        for uid,role,name in ((STEWARD,'data_owner','DataOwner'),(OWNER,'decision_owner','Owner'),(APPROVER,None,'Other')):
             email='user-'+uid[-1]+'@example.test'
             identities[email]={'id':uid,'refresh':'fixture-refresh-'+uid[-1]}
             invitation=cls.s.api_client.post('/api/platform/team/invitations',json={'email':email,'access_role':'operator','business_role':role})
@@ -43,7 +43,7 @@ class GoldenWorkflowTests(unittest.TestCase):
             assert result.status_code==200,result.text
         (cls.s.directory/'auth-fixture-users.json').write_text(json.dumps(identities))
         set_roles(cls.s.api_client,USER_A,[])
-        set_roles(cls.s.api_client,VIEWER,['data_owner','data_steward','decision_owner','approver'])
+        set_roles(cls.s.api_client,VIEWER,['data_owner','decision_owner'])
 
     def setUp(self):
         self.s.stop(self.s.worker)
@@ -72,22 +72,21 @@ class GoldenWorkflowTests(unittest.TestCase):
         report=json.loads(result.stdout.strip().splitlines()[-1]);self.assertTrue(report['passed'])
         case=report['case_id'];ids=report['runs']
         snapshot=self.checked(self.s.api_client.get(f'/api/platform/decisions/{case}/responsibilities'))
-        self.assertEqual(snapshot['stages']['data_preparation']['owner']['id'],STEWARD)
+        self.assertEqual(snapshot['stages']['data_owner']['owner']['id'],STEWARD)
         detail=self.checked(self.s.api_client.get(f'/api/platform/decisions/{case}'))
         self.assertEqual(detail['display_status'],'completed')
         for node,rid in ids.items():
             self.assertEqual(snapshot['stages'][node]['owner']['id'],OWNER)
-            self.assertEqual(snapshot['stages'][node]['approver']['id'],APPROVER)
             run=self.checked(self.s.api_client.get('/api/runs/'+rid))
-            self.assertEqual(run['created_by_user_id'],OWNER);self.assertEqual(run['approved_by_user_id'],APPROVER)
+            self.assertEqual(run['created_by_user_id'],OWNER);self.assertEqual(run['approved_by_user_id'],OWNER)
             if node=='logistics_scheduling':self.assertEqual(run['upstream_run_id'],ids['logistics_assignment'])
             projected=next(value for value in detail['nodes'] if value['id']==node)
             self.assertEqual(projected['status'],'approved');self.assertIsNotNone(projected['objective'])
-            self.assertEqual(projected['approved_run']['approved_by']['id'],APPROVER)
+            self.assertEqual(projected['approved_run']['approved_by']['id'],OWNER)
             metadata=json.loads(self.s.sql(f"SELECT metadata_json FROM audit_events WHERE event_type='run.queued' AND object_id='{rid}';"))
             self.assertEqual(metadata['data_responsible_user_id'],STEWARD);self.assertEqual(metadata['decision_owner_user_id'],OWNER)
-        self.assertEqual(self.s.sql('SELECT count(*) FROM decision_runs;'),'2')
-        self.assertEqual(self.s.sql("SELECT count(*) FROM decision_approval_events WHERE action='approved';"),'2')
+        self.assertEqual(self.s.sql('SELECT count(*) FROM decision_runs;'),'6')
+        self.assertEqual(self.s.sql("SELECT count(*) FROM decision_approval_events WHERE action='approved';"),'4')
         self.assertEqual(report['source_sha'],subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip())
         self.assertEqual(report['viewports'],[1440,1280,1024,768,390])
         self.assertEqual(set(report['surfaces']),{'home','data','map','config','dashboard','responsibility','completed','decision_center','data_hub'})
@@ -104,7 +103,7 @@ class GoldenWorkflowTests(unittest.TestCase):
             self.assertEqual(client.delete(f'/api/platform/data/datasets/{dataset}').status_code,404)
             self.assertEqual(client.patch(f'/api/platform/decisions/{cid}',json={'expected_updated_at':'2026-10-21T00:00:00Z','archived':True}).status_code,404)
             self.assertEqual(client.put(f'/api/platform/decisions/{cid}/responsibilities/data_preparation',json={'expected_updated_at':None,'owner_user_id':foreign_member}).status_code,404)
-        for group,expected in (('data',STEWARD),('decision_owner',OWNER),('approver',APPROVER)):
+        for group,expected in (('data_owner',STEWARD),('decision_owner',OWNER)):
             candidates=self.checked(admin.get('/api/platform/team',params={'candidates':'true','responsibility':group}))
             self.assertEqual([m['user_id'] for m in candidates['members']],[expected])
         self.assertEqual(admin.put(f'/api/platform/decisions/{ca}/responsibilities/logistics_assignment',json={'expected_updated_at':None,'owner_user_id':USER_B}).status_code,409)

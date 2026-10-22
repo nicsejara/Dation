@@ -3,24 +3,22 @@ import {createScope} from './lifecycle.mjs';
 import {ensureStylesheet} from './styles.mjs';
 
 const TYPES={
- data_preparation:{group:'data',label:'Responsable de datos',role:'Data Owner o Data Steward'},
+ data_preparation:{group:'data_owner',label:'Data Owner',role:'Data Owner'},
  data_owner:{group:'data_owner',label:'Data Owner',role:'Data Owner'},
- data_steward:{group:'data_steward',label:'Data Steward',role:'Data Steward'},
- owner:{group:'decision_owner',label:'Responsable de la decisión',role:'Decision Owner'},
- approver:{group:'approver',label:'Aprobador asignado',role:'Approver'},
+ owner:{group:'decision_owner',label:'Decision Owner',role:'Decision Owner'},
 };
 export function executionPermission(identity=globalThis.window?.dationSession?.identity){
  return identity?.membership?.access_role==='viewer'?'Tu rol permite consultar, pero no ejecutar decisiones.':null;
 }
 export function responsibilityProblem(snapshot,stageKey,kind='execute'){
  if(!snapshot?.gates_enforced)return null;
- const stages=snapshot.stages||{},data=stages.data_preparation;
- if(kind!=='approve'&&!data?.owner_eligible)return 'Seleccioná un responsable de datos activo y elegible antes de continuar.';
+ const stages=snapshot.stages||{},data=stages.data_owner;
+ if(kind!=='approve'&&!data?.owner_eligible)return 'Asigná un Data Owner activo y elegible antes de continuar.';
  if(kind==='data')return null;
- const stage=stages[stageKey],field=kind==='approve'?'approver':'owner';
- return stage?.[field+'_eligible']?null:kind==='approve'
-  ?'Seleccioná un aprobador asignado activo y elegible antes de aprobar.'
-  :'Seleccioná un responsable de la decisión activo y elegible antes de ejecutar.';
+ const stage=stages[stageKey];
+ if(!stage?.owner_eligible)return 'Asigná un Decision Owner activo y elegible antes de continuar.';
+ if(kind!=='configure'&&stage?.[kind==='approve'?'can_approve':'can_execute']===false)return 'Esta acción requiere al Decision Owner o a un Admin.';
+ return null;
 }
 function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;}
 function button(text,handler){const b=el('button',text,'d-button d-button--secondary');b.type='button';b.addEventListener('click',handler);return b;}
@@ -81,7 +79,7 @@ export function mountResponsibilitySelector(root,{caseId,stageKey,field='owner',
    const selected=select.value;saving=true;save.disabled=cancel.disabled=select.disabled=true;save.setAttribute('aria-busy','true');error.replaceChildren();
    try{
     if(onPrepare){const prepared=await onPrepare();if(!scope.active||own!==generation)return;current=prepared;}
-    const stage=current.stages?.[stageKey]||{},payload={expected_updated_at:editVersion,owner_user_id:stage.owner?.id||null,approver_user_id:stage.approver?.id||null};payload[field+'_user_id']=selected||null;
+    const stage=current.stages?.[stageKey]||{},payload={expected_updated_at:editVersion,owner_user_id:stage.owner?.id||null};payload[field+'_user_id']=selected||null;
     const result=await api('/api/platform/decisions/'+(current.case_id||caseId)+'/responsibilities/'+stageKey,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal});
     if(!scope.active||own!==generation)return;draft.open=false;delete draft.value;current=result;render();onSaved?.(result);root.querySelector('button')?.focus({preventScroll:true});
    }catch(exc){

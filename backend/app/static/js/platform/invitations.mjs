@@ -1,6 +1,6 @@
 // Invitations are associated with the confirmed Auth email, never a supplied user ID.
 export const ACCESS_ROLES={admin:'Admin',operator:'Operator',viewer:'Viewer'};
-export const RESPONSIBILITIES={data_owner:'Data Owner',data_steward:'Data Steward',decision_owner:'Decision Owner',approver:'Approver'};
+export const RESPONSIBILITIES={data_owner:'Data Owner',decision_owner:'Decision Owner'};
 function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;}
 export function mountReceivedInvitations(root,{onCount=()=>{}}={}){
  const controller=new AbortController();let active=true;

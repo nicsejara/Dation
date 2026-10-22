@@ -13,10 +13,17 @@ export function resolveNodeDestination(nodeId,node={}){
 }
 
 // Horizontal navigation keeps the workflow level; the canonical run still wins.
-export function resolveDecisionDestination(nodeId,node={},view){
+export function configurationAvailable(nodeId,decisionCase,workflow){
+ if(!decisionCase?.nodes)return false;
+ const order=Object.keys(FOUNDATION.decisions),index=order.indexOf(nodeId);
+ if(index<0||!FOUNDATION.decisions[nodeId].implemented||!resolveNodeDestination(nodeId,decisionCase.nodes[nodeId]))return false;
+ if(order.slice(0,index).some(id=>FOUNDATION.decisions[id].implemented&&decisionCase.nodes[id]?.status!=='approved'))return false;
+ return !workflow?.gates_enforced||Boolean(workflow.stages?.data_owner?.owner_eligible&&workflow.stages?.[nodeId]?.owner_eligible&&workflow.attributes_applied!==false);
+}
+export function resolveDecisionDestination(nodeId,node={},view,context={}){
  const target=resolveNodeDestination(nodeId,node);
  if(!target)return null;
- if(view==='logistics-config')return {...target,view,run_id:null};
+ if(view==='logistics-config')return context.decisionCase&&!configurationAvailable(nodeId,context.decisionCase,context.workflow)?null:{...target,view,run_id:null};
  if(view==='decision-dashboard')return target.view===view&&target.run_id?target:null;
  return target;
 }

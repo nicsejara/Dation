@@ -167,6 +167,8 @@ function caseStrip(state,preview){
   const hasFilters=Boolean(state.scopeFilters?.length);
   return decisionCaseCard({
     caseId:state.decisionCase?.id,
+    caseLabel:state.caseContext?.label||state.decisionCase?.label,
+    dataOwner:state.workflow?.stages?.data_owner?.owner?.name,
     files:[
       datasetFile("orders",state.orders,preview,hasFilters),
       datasetFile("fleet",state.fleet,preview,hasFilters),
@@ -416,7 +418,7 @@ function reviewDialog(state,preview,capabilities){
     executeAttributes:{"data-config-execute":true},
     rows:[
       {label:"Decision Case",value:displayDecisionCaseId(state.decisionCase?.id)},
-      {label:"Responsable",value:state.workflow?.stages?.logistics_assignment?.owner?.name||"Sin asignar"},
+      {label:"Decision Owner",value:state.workflow?.stages?.logistics_assignment?.owner?.name||"Sin asignar"},
       {label:"Alcance",value:scopeSummary(preview,state.scopeFilters||[])},
       {label:"Objetivo",value:OBJECTIVE_LABELS[state.objective]||"Balanceado"},
       {label:"Prioridades",value:priority},

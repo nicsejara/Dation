@@ -5,6 +5,8 @@ let sequence = 0;
 
 const paths = {
   orders: '<path d="M9 4h6v4H9zM9 6H5v15h14V6h-4M9 12h6M9 16h6"/>',
+  attributes: '<path d="M5 4h14v17H5zM8 8h8M8 12h8M8 16h5"/>',
+  owner: '<circle cx="12" cy="7" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/>',
   fleet: '<path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/>',
   success: '<path d="m5 12 4 4L19 6"/>',
   warning: '<path d="M12 3 2 21h20ZM12 9v5M12 17v1"/>',

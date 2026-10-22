@@ -18,3 +18,13 @@
 .case-identity :focus-visible{outline:2px solid var(--color-focus);outline-offset:3px}
 @media(max-width:900px){.d-decision-dashboard:is(.assignment-dashboard-v2,.scheduling-dashboard-v2) #dispatch-hero.has-decision-trace{grid-template-columns:minmax(0,1fr);grid-template-areas:'copy' 'trace' 'toolbar';row-gap:var(--space-4)}.dashboard-hero-trace{justify-self:start;max-width:100%}.dashboard-hero-trace dl{display:flex;flex-wrap:wrap;gap:16px}}
 @media(max-width:600px){.case-identity{grid-template-columns:minmax(0,1fr);padding:16px}}
+
+/* Saga 3: one Case context and one responsible person, shared by D1 and D2. */
+.case-context-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:0 0 20px;min-width:0}
+.case-context-fields>div{min-width:0}.case-context-fields dt{font-size:11px;color:var(--color-text-secondary)}.case-context-fields dd{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:6px 0 0;font-size:13px;overflow-wrap:anywhere}.case-context-fields dd button{display:inline-flex;align-items:center;justify-content:center;min-width:40px;min-height:40px;padding:8px}.case-context-fields dd button svg{width:18px;height:18px}
+.dispatch-map-secondary-action{cursor:pointer;min-height:44px;padding:10px 16px;border:1px solid var(--color-text-accent);border-radius:var(--radius-control);background:var(--color-surface-raised);color:var(--color-text-accent);font:600 13px/1.5 var(--font-sans);transition:background .18s,border-color .18s,box-shadow .18s}
+.dispatch-map-secondary-action:hover{background:var(--color-surface-hover);border-color:var(--color-focus);box-shadow:0 0 0 1px var(--color-focus)}.dispatch-map-secondary-action:focus-visible{outline:3px solid var(--color-focus);outline-offset:3px}
+.d-workflow-action-bar__actions[data-context-count="4"]{width:100%;inline-size:100%}.d-workflow-action-bar__actions[data-context-count="4"] .d-workflow-action-bar__item{justify-content:center;text-align:center;min-height:48px}
+@media(max-width:900px){.d-workflow-action-bar__actions[data-context-count="4"]{grid-template-columns:minmax(0,1fr)}.d-workflow-action-bar__actions[data-context-count="4"] .d-workflow-action-bar__items{grid-column:1/-1;grid-template-columns:repeat(4,minmax(0,1fr))}.d-workflow-action-bar__actions[data-context-count="4"]>.d-button{width:100%}}
+@media(max-width:600px){.case-context-fields{grid-template-columns:minmax(0,1fr)}.d-workflow-action-bar__actions[data-context-count="4"] .d-workflow-action-bar__items{grid-template-columns:repeat(2,minmax(0,1fr))}.d-workflow-action-bar__actions[data-context-count="4"] .d-workflow-action-bar__item{font-size:10px}}
+@media(prefers-reduced-motion:reduce){.dispatch-map-secondary-action{transition:none}}

@@ -3,6 +3,7 @@ import {api} from './shared.mjs';
 import {DECISION_META} from './decision-ui.mjs';
 import {mountCaseSwitcher} from './case-switcher.mjs';
 import {mountResponsibilitySelector,executionPermission} from './workflow-responsibility.mjs';
+import {configurationAvailable} from './decision-target.mjs';
 
 const mounted=new WeakMap(),actors=new Map(),dataDrafts=new WeakMap();
 function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;}
@@ -11,9 +12,9 @@ export function mountWorkflowContext(root,{state,stageKey,field='owner',showCase
  let drafts;
  if(data){
   drafts=dataDrafts.get(state);
-  if(!drafts||drafts.caseId&&drafts.caseId!==current?.id){drafts={caseId:current?.id,roles:{data_owner:{},data_steward:{}}};dataDrafts.set(state,drafts);}
+  if(!drafts||drafts.caseId&&drafts.caseId!==current?.id){drafts={caseId:current?.id,roles:{data_owner:{}}};dataDrafts.set(state,drafts);}
   drafts.caseId=current?.id;
-  for(const key of ['data_owner','data_steward'])drafts.roles[key].restoreFocus=Boolean(root.querySelector('[data-workflow-responsibility="'+key+'"]')?.contains(document.activeElement));
+  for(const key of ['data_owner'])drafts.roles[key].restoreFocus=Boolean(root.querySelector('[data-workflow-responsibility="'+key+'"]')?.contains(document.activeElement));
  }
  mounted.get(root)?.dispose();
  if(!data&&!current?.id)return;
@@ -23,19 +24,19 @@ export function mountWorkflowContext(root,{state,stageKey,field='owner',showCase
  if(showCase&&current?.id){const switcher=el('div');host.append(switcher);const view=mountCaseSwitcher(switcher,{decisionCase:current,context:state.caseContext});scope.own(()=>view?.dispose());}
  if(data){
   const snapshot=state.workflow||{stages:{},pending:true,can_assign:window.dationSession?.identity?.membership?.access_role==='admin',can_prepare:window.dationSession?.identity?.membership?.access_role!=='viewer'};
-  host.append(el('h2','Asignar responsables de datos','d-card-title'));
+  host.append(el('h2','Data Owner del Case','d-card-title'));
   if(!state.preflight?.valid)host.append(el('p','Las asignaciones se guardan en el Decision Case después de validar Órdenes y Flota.','d-metadata'));
   function dataSaved(key,result){
    if(!scope.active)return;state.workflow=result;onSaved?.(result);
    mountWorkflowContext(root,{state,stageKey,field,showCase,onSaved,onPrepare});
    root.querySelector('[data-workflow-responsibility="'+key+'"] button')?.focus({preventScroll:true});
   }
-  for(const key of ['data_owner','data_steward']){const selector=el('div');host.append(selector);const child=mountResponsibilitySelector(selector,{caseId:current?.id,stageKey:key,snapshot,draft:drafts.roles[key],onPrepare:key==='data_owner'||snapshot.can_assign?onPrepare:null,canSave:()=>Boolean(state.preflight?.valid),onSaved:result=>dataSaved(key,result)});scope.own(()=>child.dispose());}
+  for(const key of ['data_owner']){const selector=el('div');host.append(selector);const child=mountResponsibilitySelector(selector,{caseId:current?.id,stageKey:key,snapshot,draft:drafts.roles[key],onPrepare:key==='data_owner'||snapshot.can_assign?onPrepare:null,canSave:()=>Boolean(state.preflight?.valid),onSaved:result=>dataSaved(key,result)});scope.own(()=>child.dispose());}
  }else if(stageKey){
   const stage=state.workflow?.stages?.[stageKey]||{},info=el('div',undefined,'workflow-responsibility workflow-responsibility--readonly');
   if(field==='owner'){
    info.id='workflow-responsibility';
-   info.append(el('p','Responsable de ejecución/configuración: '+(stage.owner?.name||'Sin asignar'),'d-body'));
+   info.append(el('p','Decision Owner: '+(stage.owner?.name||'Sin asignar'),'d-body'));
    if(executionPermission())info.append(el('p',executionPermission(),'d-metadata'));
    if(!stage.owner_eligible){const link=el('button','Ir al Mapa para asignar responsables','d-button d-button--secondary');link.type='button';link.addEventListener('click',()=>window.DationDispatch.openCase(current.id));info.append(link);}
   }
@@ -48,9 +49,13 @@ export function mountMapResponsibilities(root,{state,onSaved}){
  const scope=scopeFor(root)||createScope(root);
  for(const stageKey of Object.keys(DECISION_META).filter(key=>DECISION_META[key].implemented)){
   const card=root.querySelector('article[data-decision-node="'+stageKey+'"]');if(!card)continue;
+  for(const action of card.querySelectorAll('[data-map-action="configure"]')){
+   action.disabled=!configurationAvailable(stageKey,state.decisionCase,state.workflow);
+   if(action.disabled)action.title='Asigná el Decision Owner y completá las decisiones anteriores para configurar.';
+  }
   card.removeAttribute('aria-disabled');
   const group=el('section',undefined,'workflow-map-responsibilities');group.setAttribute('aria-label','Responsables de '+DECISION_META[stageKey].label);card.append(group);
-  for(const field of ['owner','approver']){const selector=el('div');group.append(selector);const child=mountResponsibilitySelector(selector,{caseId:state.decisionCase.id,stageKey,field,snapshot:state.workflow,onSaved:result=>{if(scope.active){state.workflow=result;onSaved?.(result);}}});scope.own(()=>child.dispose());}
+  for(const field of ['owner']){const selector=el('div');group.append(selector);const child=mountResponsibilitySelector(selector,{caseId:state.decisionCase.id,stageKey,field,snapshot:state.workflow,onSaved:result=>{if(scope.active){state.workflow=result;onSaved?.(result);}}});scope.own(()=>child.dispose());}
  }
  return scope;
 }
@@ -60,12 +65,11 @@ export function mountDashboardTrace(root,{state,run,nodeId}){
  hero.classList.add('has-decision-trace');
  const host=el('aside',undefined,'dashboard-hero-trace');host.setAttribute('aria-label','Trazabilidad de la decisión');hero.append(host);
  const scope=createScope(host),context={host,scope,dispose:()=>scope.dispose()},trace=el('dl');trace.dataset.runTrace='';host.append(trace);
- const assigned=state.workflow?.stages?.[nodeId]?.approver;
+ const assigned=state.workflow?.stages?.[nodeId]?.owner;
  const key=[state.decisionCase.id,run.id,run.approved_by_user_id,run.approved_at].join(':');
  const draw=people=>{if(!scope.active)return;trace.replaceChildren();
   for(const [label,value] of [
-   ['Configurado por',people?.created_by?.name||'Sin registro de autor'],
-   [run.approved_at?'Aprobado por':'Esperando aprobación de',run.approved_at?(people?.approved_by?.name||(run.approved_by==='shared_workspace:dation'?'Workspace compartido (histórico)':'Sin registro de aprobación')):assigned?.name||'Sin asignar'],
+   [run.approved_at?'Aprobado por':'Pendiente de aprobación',run.approved_at?(people?.approved_by?.name||(run.approved_by==='shared_workspace:dation'?'Workspace compartido (histórico)':'Sin registro de aprobación')):assigned?.name||'Sin asignar'],
   ]){const row=el('div');row.append(el('dt',label),el('dd',value));trace.append(row);}
  };
  draw(actors.get(key));

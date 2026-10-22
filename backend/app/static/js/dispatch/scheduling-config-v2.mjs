@@ -110,6 +110,8 @@ function datasetFile(kind,dataset){
 function caseStrip(state){
   return decisionCaseCard({
     caseId:state.decisionCase?.id,
+    caseLabel:state.caseContext?.label||state.decisionCase?.label,
+    dataOwner:state.workflow?.stages?.data_owner?.owner?.name,
     files:[
       datasetFile("orders",state.orders),
       datasetFile("fleet",state.fleet),
@@ -371,7 +373,7 @@ function reviewDialog(config,stats,sourceRun,caseId,owner){
     note:"La planificación conserva los viajes y recursos aprobados en Assignment. Esta decisión sólo define fechas y secuencia.",
     rows:[
       {label:"Decision Case",value:displayDecisionCaseId(caseId)},
-      {label:"Responsable",value:owner?.name||"Sin asignar"},
+      {label:"Decision Owner",value:owner?.name||"Sin asignar"},
       {label:"Entrada",value:num(stats.totalTrips)+' viajes de Assignment · Run '+formatRunId(sourceRun.id)},
       {label:"Ventana",value:windowLabel(config)},
       {label:"Reglas por foco",value:rulesLabel(config,stats.trips)},

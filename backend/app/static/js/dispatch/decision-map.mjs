@@ -113,7 +113,8 @@ function actionFor(nodeId,status,node,dataReady){
       ?{action:"open-result",label:"Ver ejecución →",disabled:false}
       :{action:null,label:"Ejecución en curso",disabled:true};
   }
-  if([STATUS.REVIEW,STATUS.STALE].includes(status)){
+  if(status===STATUS.STALE)return {action:'configure',label:'Volver a configurar →',disabled:false};
+  if(status===STATUS.REVIEW){
     return node?.run_id
       ?{action:"open-result",label:"Revisar →",disabled:false}
       :{action:"configure",label:"Revisar configuración →",disabled:false};
