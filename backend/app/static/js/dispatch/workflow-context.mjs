@@ -5,33 +5,24 @@ import {mountCaseSwitcher} from './case-switcher.mjs';
 import {mountResponsibilitySelector,executionPermission} from './workflow-responsibility.mjs';
 import {configurationAvailable} from './decision-target.mjs';
 
-const mounted=new WeakMap(),actors=new Map(),dataDrafts=new WeakMap();
+const mounted=new WeakMap(),actors=new Map();
 function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;}
 export function mountWorkflowContext(root,{state,stageKey,field='owner',showCase=true,onSaved,onPrepare}){
  const data=stageKey==='data_preparation',current=state.decisionCase;
- let drafts;
- if(data){
-  drafts=dataDrafts.get(state);
-  if(!drafts||drafts.caseId&&drafts.caseId!==current?.id){drafts={caseId:current?.id,roles:{data_owner:{}}};dataDrafts.set(state,drafts);}
-  drafts.caseId=current?.id;
-  for(const key of ['data_owner'])drafts.roles[key].restoreFocus=Boolean(root.querySelector('[data-workflow-responsibility="'+key+'"]')?.contains(document.activeElement));
- }
  mounted.get(root)?.dispose();
  if(!data&&!current?.id)return;
  const host=el('section',undefined,'workflow-context');host.setAttribute('aria-label',data?'Responsables del Data Pack':'Contexto del Decision Case');
- const anchor=data?root.querySelector('.dispatch-pro-compatibility'):root.querySelector('.d-page-hero');if(anchor)anchor.after(host);else root.prepend(host);
+ const anchor=data?root.querySelector('[data-case-data-owner]'):root.querySelector('.d-page-hero');if(data){if(!anchor)return;anchor.append(host);}else if(anchor)anchor.after(host);else root.prepend(host);
  const scope=createScope(host);mounted.set(root,scope);scope.own(()=>{host.remove();if(mounted.get(root)===scope)mounted.delete(root);});
  if(showCase&&current?.id){const switcher=el('div');host.append(switcher);const view=mountCaseSwitcher(switcher,{decisionCase:current,context:state.caseContext});scope.own(()=>view?.dispose());}
  if(data){
   const snapshot=state.workflow||{stages:{},pending:true,can_assign:window.dationSession?.identity?.membership?.access_role==='admin',can_prepare:window.dationSession?.identity?.membership?.access_role!=='viewer'};
-  host.append(el('h2','Data Owner del Case','d-card-title'));
-  if(!state.preflight?.valid)host.append(el('p','Las asignaciones se guardan en el Decision Case después de validar Órdenes y Flota.','d-metadata'));
-  function dataSaved(key,result){
-   if(!scope.active)return;state.workflow=result;onSaved?.(result);
-   mountWorkflowContext(root,{state,stageKey,field,showCase,onSaved,onPrepare});
-   root.querySelector('[data-workflow-responsibility="'+key+'"] button')?.focus({preventScroll:true});
-  }
-  for(const key of ['data_owner']){const selector=el('div');host.append(selector);const child=mountResponsibilitySelector(selector,{caseId:current?.id,stageKey:key,snapshot,draft:drafts.roles[key],onPrepare:key==='data_owner'||snapshot.can_assign?onPrepare:null,canSave:()=>Boolean(state.preflight?.valid),onSaved:result=>dataSaved(key,result)});scope.own(()=>child.dispose());}
+  const currentId=current?.id||null;
+  if(!state.dataOwnerDraft||state.dataOwnerDraft.caseId&&state.dataOwnerDraft.caseId!==currentId)state.dataOwnerDraft={caseId:currentId};
+  state.dataOwnerDraft.caseId=currentId;
+  const draft=state.dataOwnerDraft;
+  const selector=el('div');host.append(selector);
+  const child=mountResponsibilitySelector(selector,{caseId:currentId,stageKey:'data_owner',snapshot,draft,deferSave:true,onChanged:()=>onSaved?.()});scope.own(()=>child.dispose());
  }else if(stageKey){
   const stage=state.workflow?.stages?.[stageKey]||{},info=el('div',undefined,'workflow-responsibility workflow-responsibility--readonly');
   if(field==='owner'){

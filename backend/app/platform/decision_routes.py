@@ -87,6 +87,26 @@ async def update(case_id:UUID,payload:CaseUpdate,ctx=Depends(require_upload_acce
         'target_case_id':str(case_id),'expected_updated_at':payload.expected_updated_at.isoformat(),
         'change_label':'label' in payload.model_fields_set,'new_label':payload.label,'archive':payload.archived})
 
+class CaseAttributesApply(CaseIdentity):
+    model_config=ConfigDict(extra='forbid')
+    expected_updated_at:AwareDatetime
+    expected_owner_updated_at:AwareDatetime|None
+    data_owner_user_id:UUID|None=None
+
+    @model_validator(mode='after')
+    def complete_identity(self):
+        if not self.label or not self.category:raise ValueError('Completá el nombre y la categoría del Case.')
+        return self
+
+@router.put('/{case_id}/attributes')
+async def apply_attributes(case_id:UUID,payload:CaseAttributesApply,ctx=Depends(require_upload_access)):
+    return await platform_call('platform_apply_case_attributes',{'actor_user_id':ctx.user_id,'target_workspace_id':ctx.workspace_id,
+        'target_case_id':str(case_id),'expected_updated_at':payload.expected_updated_at.isoformat(),
+        'identity_changes':payload.model_dump(mode='json',include={'label','category','description'}),
+        'expected_owner_updated_at':payload.expected_owner_updated_at.isoformat() if payload.expected_owner_updated_at else None,
+        'change_data_owner':'data_owner_user_id' in payload.model_fields_set,
+        'new_data_owner_user_id':str(payload.data_owner_user_id) if payload.data_owner_user_id else None})
+
 class CaseDataPack(BaseModel):
     model_config=ConfigDict(extra='forbid')
     expected_updated_at:AwareDatetime

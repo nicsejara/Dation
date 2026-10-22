@@ -1,3 +1,4 @@
+import {decisionResultSummary} from './decision-config-ui.mjs';
 import {esc,num,pct} from './shared.mjs';
 import {iconSvg} from './decision-ui.mjs';
 import {getAssignmentSummary,getAssignmentContext,getEssentialKpis,getDecisionNarrative,getApprovalWarnings} from './assignment-dashboard-selectors.mjs';
@@ -16,9 +17,7 @@ export function render(root,result,{status}={}){
     +'<div class="assignment-hero__content"><span class="dispatch-kicker">DECISIÓN 01 · ASIGNACIÓN DE FLOTA</span>'
     +'<h1>Asignación recomendada</h1><span class="assignment-hero__status '+(infeasible?'is-error':attention?'is-review':'is-consistent')+'" data-assignment-hero-status>'
       +iconSvg(attention?'alertTriangle':'checkCircle','assignment-v2__icon')+'<span>'+esc(label)+'</span></span>'
-    +'<p class="assignment-hero__headline">Mover <strong>'+esc(formatWeight(context.totalWeightKg))+'</strong> en <strong>'+num(summary.trips)+' viajes</strong>'
-      +(own===null?'.':' utilizando <strong>'+pct(own).replace(' ','\u00a0')+' de flota propia</strong>.')+'</p>'
-    +'<p class="assignment-hero__lead">'+esc(getDecisionNarrative(result))+'</p>'
+    +decisionResultSummary({headlineClass:'assignment-hero__headline',supportClass:'assignment-hero__lead',parts:['Mover ',{value:formatWeight(context.totalWeightKg)},' en ',{value:num(summary.trips)+' viajes'},...(own===null?['.']:[' utilizando ',{value:pct(own).replace(' ','\u00a0')+' de flota propia'},'.'])],supportingText:getDecisionNarrative(result)})
     +'<details class="assignment-essential__objective"><summary>Objetivo de la corrida · '+esc(summary.objectiveLabel)+'</summary>'
       +'<div class="assignment-essential__objective-chips">'+(summary.objectiveWeights.length?summary.objectiveWeights.map(item=>
         '<span class="assignment-essential__objective-chip"><strong>'+esc(item.label)+'</strong><small>'+pct(item.weight)+'</small></span>'

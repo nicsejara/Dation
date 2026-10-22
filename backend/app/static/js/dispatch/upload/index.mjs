@@ -1,4 +1,4 @@
-import {mountCaseIdentity,caseAttributesReady} from '../case-identity.mjs';
+import {mountCaseIdentity,caseAttributesReady,caseDataOwnerReady} from '../case-identity.mjs';
 import {responsibilityProblem} from '../workflow-responsibility.mjs';
 import {mountDemoAction} from '../../platform/onboarding.mjs';
 import {createScope,scopeFor} from "../lifecycle.mjs";
@@ -117,50 +117,11 @@ function makeHero() {
     step: dataStep,
     title: "Preparar Decision Case",
     description: "Definí el contexto y prepará una base confiable para tus decisiones.",
-    panelTitle: "CÓMO FUNCIONA",
-    panelItems: [
-      {label: "1 · DESCARGÁ", description: "La plantilla con el formato correcto.", icon: "download"},
-      {label: "2 · COMPLETÁ", description: "Solo lo mínimo. Lo opcional puede esperar.", icon: "clipboardList"},
-      {label: "3 · SUBÍ", description: "Validación automática de archivos.", icon: "clipboardCheck"},
-    ],
+
   });
   const hero = template.content.firstElementChild;
-  const copy = hero.querySelector(".dispatch-pro-hero-copy");
-  const panel = hero.querySelector(".dispatch-pro-how-panel");
 
-  const fileChips = el("div", null, "dispatch-pro-hero-file-chips");
-  const prefix = el(
-    "span",
-    "Vas a cargar",
-    "dispatch-pro-hero-chip-prefix",
-  );
-
-  const ordersChip = el("span", null, "dispatch-pro-hero-file-chip is-orders");
-  ordersChip.append(
-    icon("orders"),
-    document.createTextNode("Órdenes"),
-  );
-
-  const fleetChip = el("span", null, "dispatch-pro-hero-file-chip is-fleet");
-  fleetChip.append(
-    icon("fleet"),
-    document.createTextNode("Flota"),
-  );
-
-  fileChips.append(prefix, ordersChip, fleetChip);
-  copy.append(fileChips);
-
-  const history = el("div", null, "dispatch-pro-how-history");
-  const historyCopy = el("span", "¿Ya cargaste datos antes? ");
-  const reuseLink = document.createElement("button");
-  reuseLink.type = "button";
-  reuseLink.className = "dispatch-pro-how-reuse-link";
-  reuseLink.textContent = "Reutilizalos →";
-  history.append(icon("history"), historyCopy, reuseLink);
-
-  panel.append(history);
-
-  return {hero, reuseLink};
+  return {hero};
 }
 
 function makeDataPackHeader() {
@@ -293,7 +254,6 @@ export async function mountUploadScreen(
     scrollToData();
   }
 
-  hero.reuseLink.addEventListener("click", openReuseMode);
 
   function firstProblemKind() {
     for (const kind of ["orders", "fleet"]) {
@@ -345,7 +305,7 @@ export async function mountUploadScreen(
     compatibilityRoot,
     actionBar.bar,
   );
-  mountCaseIdentity(root,{state,persist,onSave:async()=>{await saveIdentity();mountWorkflow?.(root,()=>finalState());},onChanged:()=>finalState()});
+  const identity=mountCaseIdentity(root,{state,persist,onSave:async()=>{await saveIdentity();mountWorkflow?.(root,()=>finalState());},onChanged:()=>{persist();finalState();}});
   const guard=el('section',null,'d-card case-input-guard');guard.dataset.inputGuard='';guard.tabIndex=-1;
   guard.hidden=!state.decisionCase?.persisted;
   guard.append(el('p','Si reemplazás Órdenes o Flota por datos distintos, se creará otro Decision Case. Este Case y sus resultados se conservan.'));
@@ -376,6 +336,7 @@ export async function mountUploadScreen(
   }
 
   function finalState() {
+    identity.refresh();
     const result = continueState({
       storageAvailable: Boolean(local.status?.available),
       orders: state.orders,
@@ -393,16 +354,17 @@ export async function mountUploadScreen(
       missingCount: missingCount(),
       items: [...["orders", "fleet"].map(key => ({key, label:key === "orders" ? "Órdenes" : "Flota", tone:fileTone(key)})),
         {key:'attributes',label:'Atributos',tone:caseAttributesReady(state)?'success':'pending'},
-        {key:'owner',label:'Data Owner',tone:state.workflow?.stages?.data_owner?.owner_eligible?'success':'pending'}],
+        {key:'owner',label:'Data Owner',tone:caseDataOwnerReady(state)?'success':'pending'}],
       busy: Object.values(local.phases).some(phase => phase !== "idle"),
       storageAvailable: Boolean(local.status?.available),
     };
 
     if(result.enabled&&!caseAttributesReady(state)){result.enabled=false;result.kind='attributes';result.message='Aplicá los atributos del Case antes de continuar.';}
+    if(result.enabled&&!caseDataOwnerReady(state)){result.enabled=false;result.kind='responsibility';result.message='Aplicá la asignación de Data Owner antes de continuar.';}
     const responsibility=responsibilityProblem(state.workflow,'data_preparation','data');
     if(result.enabled&&responsibility){result.enabled=false;result.kind='responsibility';result.message=responsibility;}
     actionBar.update(result, context);
-    if(responsibility&&state.preflight?.valid){actionBar.button.firstElementChild.textContent='Seleccioná tu decisión';}
+    if((responsibility||['attributes','responsibility'].includes(result.kind))&&state.preflight?.valid){actionBar.button.firstElementChild.textContent='Seleccioná tu decisión';}
 
     window.dationSetDataReady(Boolean(result.enabled));
     return result;

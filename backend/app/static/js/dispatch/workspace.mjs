@@ -1,4 +1,4 @@
-import {caseAttributesReady} from './case-identity.mjs';
+import {caseAttributesReady,caseDataOwnerReady} from './case-identity.mjs';
 import {esc,num,api,post,errorBox} from './shared.mjs';
 import {render as dashboard} from './dashboard.mjs';
 import {mountUploadScreen} from './upload/index.mjs';
@@ -96,6 +96,7 @@ const savedResourceMode=['own','mixed','outsourced'].includes(saved.resourceMode
 const state={
   caseIdentity:saved.caseIdentity||null,
   identityDirty:Boolean(saved.identityDirty),
+  dataOwnerDraft:saved.dataOwnerDraft?{...saved.dataOwnerDraft,open:false}:null,
   attributesApplied:Boolean(saved.attributesApplied),
   orders:saved.orders||null,
   fleet:saved.fleet||null,
@@ -140,6 +141,7 @@ function persist(){
     sessionStorage.setItem(KEY,JSON.stringify({
       caseIdentity:state.caseIdentity,
       identityDirty:state.identityDirty,
+      dataOwnerDraft:state.dataOwnerDraft,
       attributesApplied:state.attributesApplied,
       orders:state.orders,
       fleet:state.fleet,
@@ -208,7 +210,7 @@ function syncDimensionsToEvidence({initialize=false}={}){
     ?normalizeWeights(state.weights,state.dimensions)
     :presetWeights(state.objective,state.dimensions);
 }
-function ready(){return !!(state.available&&state.orders&&state.fleet&&state.preflight?.valid&&caseAttributesReady(state)&&!responsibilityProblem(state.workflow,'data_preparation','data'));}
+function ready(){return !!(state.available&&state.orders&&state.fleet&&state.preflight?.valid&&caseAttributesReady(state)&&caseDataOwnerReady(state)&&!responsibilityProblem(state.workflow,'data_preparation','data'));}
 function pendingWorkflow(){
   const role=window.dationSession?.identity?.membership?.access_role;
   return {gates_enforced:true,stages:{},pending:true,can_assign:role==='admin',can_prepare:['admin','operator'].includes(role)};
@@ -247,6 +249,7 @@ function ensureDecisionCase(){
     state.decisionCase=replaceInputs(previous,crypto.randomUUID(),state.orders,state.fleet);
     if(previous.persisted)state.forkedFrom=previous.id;
     transitionCaseId=state.decisionCase.id;
+    state.dataOwnerDraft=null;
     state.workflow=pendingWorkflow();state.caseContext=null;
     state.run=null;
     resetAssignmentConfiguration();
@@ -277,7 +280,7 @@ async function startNewDecision(inputs=[]){
   transitionCaseId=null;
   saveDraft();
   resetAssignmentConfiguration();
-  Object.assign(state,{caseIdentity:null,identityDirty:false,attributesApplied:false,forkedFrom:null,orders:null,fleet:null,decisionCase:null,workflow:null,caseContext:null,run:null,activeNode:null,
+  Object.assign(state,{caseIdentity:null,identityDirty:false,dataOwnerDraft:null,attributesApplied:false,forkedFrom:null,orders:null,fleet:null,decisionCase:null,workflow:null,caseContext:null,run:null,activeNode:null,
     preflight:null,configPreview:null,configured:false,decisions:{},schedulingUseDueDates:true});
   if(Array.isArray(inputs))for(const dataset of inputs){if(['orders','fleet'].includes(dataset?.dataset_type))state[dataset.dataset_type]=dataset;}
   decisionContext(null);
@@ -326,25 +329,25 @@ async function loadData(){
       persist,
       runPreflight:preflight,
       saveIdentity:async()=>{
-        if(state.preflight?.valid||state.decisionCase?.persisted)await ensurePersistedCase(generation,true);
-        else{state.attributesApplied=true;state.identityDirty=false;persist();}
+        if(!state.preflight?.valid)throw new Error('Cargá y validá Órdenes y Flota antes de aplicar.');
+        const identity={...state.caseIdentity},draft=state.dataOwnerDraft,expectedCase=state.decisionCase?.id,expectedSignature=inputSignature(state.orders,state.fleet);
+        await ensurePersistedCase(generation,false,true);
+        const current=state.decisionCase,signature=current?.signature;
+        if(generation!==routeGeneration||!current?.persisted||current.id!==expectedCase||current.signature!==expectedSignature)throw new Error('La etapa cambió. Volvé a aplicar los atributos.');
+        await api('/api/platform/decisions/'+current.id+'/attributes',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({expected_updated_at:state.caseVersion,...identity,
+          expected_owner_updated_at:draft&&Object.hasOwn(draft,'version')?draft.version:state.workflow?.stages?.data_owner?.updated_at??null,
+          ...(draft?.dirty?{data_owner_user_id:draft.value||null}:{})}),signal:routeController?.signal});
+        if(generation!==routeGeneration||state.decisionCase?.id!==current.id||inputSignature(state.orders,state.fleet)!==signature)throw new Error('El Data Pack cambió. Aplicá los atributos del nuevo Case.');
+        state.identityDirty=false;state.dataOwnerDraft=null;
+        await hydrateCase(current.id,generation,signature);persist();
       },
       onNext:async()=>{
         const identityForm=roots.data.querySelector('[data-case-identity]');
         if(identityForm&&!identityForm.reportValidity())return;
-        try{if(!caseAttributesReady(state))throw new Error('Aplicá los atributos del Case antes de continuar.');await ensurePersistedCase(generation);await api('/api/platform/decisions/'+state.decisionCase.id+'/workflow-readiness',{signal:routeController?.signal});if(generation===routeGeneration)await navigate('logistics-map');}
+        try{if(!caseAttributesReady(state)||!caseDataOwnerReady(state))throw new Error('Aplicá los atributos y el Data Owner del Case antes de continuar.');await ensurePersistedCase(generation);await api('/api/platform/decisions/'+state.decisionCase.id+'/workflow-readiness',{signal:routeController?.signal});if(generation===routeGeneration)await navigate('logistics-map');}
         catch(error){if(generation!==routeGeneration)return;const note=document.createElement('p');note.role='alert';note.textContent=error.message;roots.data.querySelector('[data-workflow-data-error]')?.remove();note.dataset.workflowDataError='';roots.data.append(note);}
       },
-      mountWorkflow:(node,onSaved)=>{
-        const caseId=state.decisionCase?.id,signature=state.decisionCase?.signature;
-        return mountWorkflowContext(node,{state,stageKey:'data_preparation',showCase:false,onSaved,onPrepare:async()=>{
-          const form=roots.data.querySelector('[data-case-identity]');if(form&&!form.reportValidity())throw new Error('Completá el nombre y la categoría del Case.');
-          if(!state.preflight?.valid||!caseId)throw new Error('Cargá y validá Órdenes y Flota antes de guardar.');
-          if(state.decisionCase?.id!==caseId||inputSignature(state.orders,state.fleet)!==signature)throw new Error('El Data Pack cambió.');
-          if(!state.decisionCase.persisted)await ensurePersistedCase(generation);else await hydrateCase(caseId,generation,signature);
-          if(generation!==routeGeneration||state.decisionCase?.id!==caseId||inputSignature(state.orders,state.fleet)!==signature)throw new Error('La etapa cambió.');return state.workflow;
-        }});
-      },
+      mountWorkflow:(node,onSaved)=>mountWorkflowContext(node,{state,stageKey:'data_preparation',showCase:false,onSaved:()=>{persist();onSaved?.();}}),
       isReady:ready,
       isCurrent:()=>generation===routeGeneration,
     },
@@ -768,10 +771,10 @@ export async function show(run){
 
 for(const [key,view]of [['data','logistics-data'],['map','logistics-map'],['config','logistics-config'],['dashboard','decision-dashboard']])roots[key]=root(view,'dispatch-'+key+'-root');
 
-async function ensurePersistedCase(generation=routeGeneration,applyIdentity=false){
+async function ensurePersistedCase(generation=routeGeneration,applyIdentity=false,deferIdentity=false){
   const current=state.decisionCase;if(!current)return;
   if(!current.persisted){
-    await post('/api/decision-cases',{id:current.id,orders_dataset_id:state.orders.id,fleet_dataset_id:state.fleet.id,state:current,...((applyIdentity||caseAttributesReady(state))?state.caseIdentity||{}:{})},{signal:routeController?.signal});
+    await post('/api/decision-cases',{id:current.id,orders_dataset_id:state.orders.id,fleet_dataset_id:state.fleet.id,state:current,...((!deferIdentity&&(applyIdentity||caseAttributesReady(state)))?state.caseIdentity||{}:{})},{signal:routeController?.signal});
     if(generation!==routeGeneration||state.decisionCase?.id!==current.id||inputSignature(state.orders,state.fleet)!==current.signature)return;
     await hydrateCase(current.id,generation,current.signature);
     if(generation!==routeGeneration||state.decisionCase?.id!==current.id||inputSignature(state.orders,state.fleet)!==current.signature)return;

@@ -1,3 +1,4 @@
+import {decisionResultSummary} from './decision-config-ui.mjs';
 import {esc,num,pct,date} from './shared.mjs';
 import {schedulingIcon as icon} from './scheduling-dashboard-shell.mjs';
 import {getSchedulingContext,getSchedulingEssentialKpis,getSchedulingInsights,getVehicleScheduleSummary,getDispatchPreview} from './scheduling-dashboard-selectors.mjs';
@@ -7,11 +8,10 @@ export function hero(root,result,caseActions={}){
   const k=getSchedulingEssentialKpis(result),m=result.scenarios?.selected?.metrics||{},solver=result.scenarios?.selected?.solver||result.engine?.solver||{},rules=result.analysis?.focus_rules||[];
   const exceptions=k.sla_enabled&&Number(m.late_orders)>0;
   const status=caseActions.status==='stale'?'Evidencia desactualizada':caseActions.status==='approved'?'Planificación aprobada':exceptions?'Plan con excepciones':solver.status==='feasible'?'Plan factible':'Plan ejecutable';
-  const service=!k.sla_enabled?'utilizando la secuencia temporal recomendada':exceptions?'con '+num(m.late_orders)+' órdenes fuera de fecha objetivo':k.on_time_rate===1?'manteniendo el 100% de las órdenes con SLA dentro de fecha':'con el nivel de servicio publicado por el motor';
+  const service=!k.sla_enabled?[' utilizando la secuencia temporal recomendada']:exceptions?[' con ',{value:num(m.late_orders)+(Number(m.late_orders)===1?' orden fuera de fecha objetivo':' órdenes fuera de fecha objetivo')}]:k.on_time_rate===1?[' manteniendo ',{value:'el 100% de las órdenes con SLA dentro de fecha'}]:[' con el nivel de servicio publicado por el motor'];
   root.innerHTML='<span class="dispatch-kicker">DECISIÓN 02 · PLANIFICACIÓN DE DESPACHOS</span><h1>Planificación recomendada</h1>'
     +'<div class="scheduling-hero__badges"><span class="scheduling-status '+(exceptions||caseActions.status==='stale'?'is-warning':'is-good')+'" data-scheduling-hero-status>'+icon(exceptions||caseActions.status==='stale'?'alertTriangle':'checkCircle')+esc(status)+'</span><span class="scheduling-status">'+icon('lock')+'Assignment bloqueada</span></div>'
-    +'<p class="scheduling-hero__headline">Ejecutar '+num(m.total_trips)+' viajes entre '+date(k.schedule_start)+' y '+date(k.schedule_end)+' '+esc(service)+'.</p>'
-    +'<p>'+(result.decision?.strategy==='earliest_dispatch'?'Dation prioriza despachar cada viaje tan pronto como carga y recurso están disponibles, compactando el calendario.':'Dation prioriza el cumplimiento de fechas objetivo y luego reduce esperas y duración total del calendario.')+'</p>'
+    +decisionResultSummary({headlineClass:'scheduling-hero__headline',parts:['Ejecutar ',{value:num(m.total_trips)+' viajes'},' entre ',{value:date(k.schedule_start)},' y ',{value:date(k.schedule_end)},...service,'.'],supportingText:result.decision?.strategy==='earliest_dispatch'?'Dation prioriza despachar cada viaje tan pronto como carga y recurso están disponibles, compactando el calendario.':'Dation prioriza el cumplimiento de fechas objetivo y luego reduce esperas y duración total del calendario.'})
     +(rules.length?'<p>El plan incorpora reglas temporales específicas sobre '+num(result.analysis?.focused_trip_count)+' viajes.</p>':'')
     +(caseActions.status==='stale'?'<p role="status">La Assignment o los datos del caso cambiaron. Reconfigurá la planificación antes de aprobar.</p>':'');
 }
