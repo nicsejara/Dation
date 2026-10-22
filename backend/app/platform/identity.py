@@ -50,6 +50,7 @@ async def platform_call(name, body):
             if code == "22023":
                 collaboration_errors = {
                     'platform_set_member_responsibilities': 'Revisá las responsabilidades y actualizá la membresía antes de reintentar.',
+                    'platform_apply_case_attributes': 'Revisá los atributos y elegí un Data Owner activo y elegible en este workspace.',
                     'platform_workflow_responsibilities': 'Elegí personas activas con la responsabilidad requerida y permisos operativos en este workspace.',
                     'platform_update_workspace': 'Revisá el país, idioma, zona horaria, moneda y unidades elegidos antes de guardar.',
                     'platform_invite_member': 'Ya existe una membresía o invitación pendiente para ese email. Revisá el equipo antes de reintentar.',

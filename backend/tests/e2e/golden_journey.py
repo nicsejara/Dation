@@ -132,13 +132,20 @@ async def main():
             data=steward.locator('#dispatch-data-root');next_button=data.get_by_role('button',name='Seleccioná tu decisión',exact=True)
             assert await next_button.is_disabled()
             await data.get_by_role('button',name='Aplicar',exact=True).click()
-            await data.locator('[data-case-identity-feedback]').get_by_text('Atributos aplicados.',exact=True).wait_for()
-            await data.get_by_role('button',name='Actualizar responsabilidad',exact=True).wait_for()
+            await data.locator('[data-case-identity-feedback]').get_by_text('Atributos y Data Owner aplicados.',exact=True).wait_for()
             case=await steward.evaluate('window.DationDispatch.getWorkspace().decisionCase.id')
             await admin.goto(target('logistics-data'))
-            await assign('data_owner',STEWARD)
-            await data.get_by_role('button',name='Actualizar responsabilidad',exact=True).click()
-            await steward.wait_for_function('!document.querySelector("#dispatch-data-root .d-workflow-action-bar button").disabled')
+            owner_select=admin.locator('[data-case-identity]').get_by_label('Data Owner',exact=True)
+            await owner_select.locator('option[value="'+STEWARD+'"]').wait_for(state='attached')
+            await owner_select.select_option(STEWARD)
+            async with admin.expect_response(lambda r:urlsplit(r.url).path.endswith('/attributes') and r.request.method=='PUT') as joint:
+                await admin.locator('[data-case-identity]').get_by_role('button',name='Aplicar',exact=True).click()
+            assert (await joint.value).status==200
+            await admin.locator('[data-case-identity-feedback]').get_by_text('Atributos y Data Owner aplicados.',exact=True).wait_for()
+            assert await admin.locator('[data-case-identity] [data-workflow-responsibility=data_owner]').count()==1
+            assert await admin.locator('[data-case-identity]').get_by_role('button',name='Guardar',exact=True).count()==0
+            await steward.reload()
+            await steward.wait_for_function('(()=>{const button=document.querySelector("#dispatch-data-root .d-workflow-action-bar button");return button&&!button.disabled;})()')
             await matrix(steward,'data')
             await next_button.click();await steward.locator('[data-map-node=logistics_assignment]').first.wait_for()
             await matrix(steward,'map')
@@ -285,7 +292,7 @@ async def main():
             await owner.locator('[data-case-identity]').wait_for()
             await owner.get_by_label('Nombre del Case',exact=True).fill('SEMANA 44')
             await owner.get_by_role('button',name='Aplicar',exact=True).click()
-            await owner.locator('[data-case-identity-feedback]').get_by_text('Atributos aplicados.',exact=True).wait_for()
+            await owner.locator('[data-case-identity-feedback]').get_by_text('Atributos y Data Owner aplicados.',exact=True).wait_for()
             assert await owner.evaluate('window.DationDispatch.getWorkspace().decisionCase.id')==case
             assert await owner.locator('.d-workflow-action-bar__item').count()==4
             assert 'Data Steward' not in await owner.locator('#dispatch-data-root').inner_text()

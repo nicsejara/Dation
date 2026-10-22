@@ -76,6 +76,15 @@ docker rm -f dation-qa-postgres
 se limita al esquema de Fase 3 para evitar sobrescribir este baseline con otro
 estado. Para capturas futuras se debe versionar un baseline nuevo.
 
+### Upgrade de Saga 5
+
+Sobre Sagas 1–4, aplicar una vez
+`20261022040000_case_attributes_apply.sql` antes de publicar la API/UI de Saga 5.
+Agrega únicamente la RPC de servicio `platform_apply_case_attributes`: coordina
+identidad y Data Owner en una transacción, reutilizando permisos y versiones de
+las RPC existentes. No modifica filas, tablas, Runs ni aprobaciones históricas.
+
+
 ## Fase 5: listas agrupadas
 
 Sobre Fase 4, aplicar `20261010220000_case_list_performance.sql` con
