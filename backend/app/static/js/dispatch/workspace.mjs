@@ -1,12 +1,11 @@
 import {hasCaseExecutions} from './case-identity.mjs';
-import {mountDecisionViews} from './case-navigation.mjs';
 import {esc,num,api,post,errorBox} from './shared.mjs';
 import {render as dashboard} from './dashboard.mjs';
 import {mountUploadScreen} from './upload/index.mjs';
 import {renderDecisionMap} from './decision-map.mjs';
 import {mountAssignmentConfig,filterPayload,normalizeRawWeights} from './assignment-config.mjs';
 import {STATUS,createDecisionCase,replaceInputs,transitionNode,inputSignature,caseRef,deriveDecisionNodes,continuationState,getCaseTransitionNotice} from './decision-case.mjs';
-import {resolveNodeDestination} from './decision-target.mjs';
+import {resolveNodeDestination,resolveDecisionDestination} from './decision-target.mjs';
 import {DECISION_META} from './decision-ui.mjs';
 import {caseContext} from '../platform/foundation.mjs';
 import {mountWorkflowContext,mountMapResponsibilities,mountDashboardTrace} from './workflow-context.mjs';
@@ -708,6 +707,7 @@ export async function show(run){
         :null,
       decisionCase:caseMeta.case_id&&state.decisionCase?.id===caseMeta.case_id?state.decisionCase:null,
       activeNode:nodeId,
+      view:'decision-dashboard',
       onNewDecision:startNewDecision,
       onMap:caseMeta?.case_id?()=>navigateResource('logistics-map',{caseId:caseMeta.case_id,nodeId:null,runId:null}):null,
       onCase:caseMeta?.case_id?()=>window.DationDispatch.openCaseInDecisionCenter(caseMeta.case_id):null,
@@ -715,10 +715,16 @@ export async function show(run){
       onContinue:async()=>{
         await hydrateCase(caseMeta.case_id,generation);
         if(generation!==routeGeneration)return;
-        const completed=['logistics_assignment','logistics_scheduling'].every(id=>state.decisionCase.nodes[id]?.status==='approved');
-        return completed?window.DationDispatch.openDecisionCenter({filter:'completed'}):navigateResource('logistics-map',{caseId:caseMeta.case_id,nodeId:null,runId:null});
+        const next=await dashboardContinuation(run,nodeId,generation);
+        if(generation!==routeGeneration)return;
+        if(next?.state==='completed')return window.DationDispatch.openDecisionCenter({filter:'completed'});
+        if(next?.target?.view==='logistics-config')return navigateResource('logistics-config',{caseId:caseMeta.case_id,nodeId:next.nodeId,runId:null});
+        return navigateResource('logistics-map',{caseId:caseMeta.case_id,nodeId:null,runId:null});
       },
-      onOpenNode:state.decisionCase?openCaseResult:null,
+      onOpenNode:state.decisionCase?id=>{
+        const target=resolveDecisionDestination(id,state.decisionCase.nodes[id],'decision-dashboard');
+        if(target)return navigateResource(target.view,{caseId:state.decisionCase.id,nodeId:id,runId:target.run_id});
+      }:null,
       onRefresh:async()=>{const fresh=await api('/api/runs/'+run.id,{signal:routeController?.signal});if(generation===routeGeneration)await show(fresh);},
       approvalBlocked:Boolean(caseMeta.case_id&&responsibilityProblem(state.workflow,nodeId,'approve')),
       onApprove:(nodeId&&caseMeta?.case_id&&state.decisionCase?.id===caseMeta.case_id&&state.decisionCase.collaboration?.[nodeId]?.can_approve!==false&&!['stale','superseded'].includes(runDecisionState(run,state.decisionCase,nodeId)))
@@ -742,7 +748,7 @@ export async function show(run){
     },
   );
   if(generation!==routeGeneration)return;
-  if(caseMeta.case_id&&state.decisionCase?.id===caseMeta.case_id){mountDashboardTrace(roots.dashboard,{state,run,nodeId});mountDecisionViews(roots.dashboard,{state,nodeId,view:'decision-dashboard',onConfigure:()=>reconfigureRun(run,nodeId)});}
+  if(caseMeta.case_id&&state.decisionCase?.id===caseMeta.case_id)mountDashboardTrace(roots.dashboard,{state,run,nodeId});
   const approvalReason=responsibilityProblem(state.workflow,nodeId,'approve');
   if(approvalReason&&runDecisionState(run,state.decisionCase,nodeId)!=='approved'){
     const note=document.createElement('p');note.className='workflow-gate-reason';note.id='workflow-approval-reason';note.textContent=approvalReason;

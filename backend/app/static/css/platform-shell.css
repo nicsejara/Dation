@@ -11,4 +11,13 @@
 
 .dda-navigation{min-width:0}.dda-navigation ol{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px;margin:0;padding:0;list-style:none;width:100%}.dda-navigation li{display:flex;min-width:0}.dda-navigation__step{display:flex;align-items:center;justify-content:center;box-sizing:border-box;min-height:44px;max-width:100%;padding:10px 14px;border:1px solid var(--color-border);border-radius:var(--radius-control);background:var(--color-surface);color:var(--color-text-secondary);font:600 12px/1.5 var(--font-sans);text-decoration:none;overflow-wrap:anywhere}.dda-navigation__step[data-state=current]{border-color:var(--color-text-accent);color:var(--color-text);box-shadow:inset 0 0 0 1px var(--color-text-accent)}.dda-navigation__step[data-state=completed]{color:var(--color-success)}.dda-navigation__step[data-state=locked]{color:var(--color-text-muted);border-style:dashed}.dda-navigation a:hover{background:var(--color-surface-raised)}.dda-navigation a:focus-visible{outline:3px solid var(--color-focus);outline-offset:3px}
 
-.dda-navigation__step,.dda-workspace-step,.dispatch-decision-tab,.decision-view-tabs>.d-button{min-height:48px;border-radius:var(--radius-control);box-sizing:border-box}
+.dda-navigation__step,.dda-workspace-step,.dispatch-decision-tab{min-height:48px;border-radius:var(--radius-control);box-sizing:border-box}
+
+/* Three equal context levels; separators convey depth without changing pill width. */
+.journey-nav.dda-navigation{width:100%;box-sizing:border-box;overflow:visible}
+.dda-navigation ol{display:grid;grid-template-columns:repeat(var(--context-levels,3),minmax(0,1fr));gap:24px}
+.dda-navigation li{position:relative}
+.dda-navigation li:not(:last-child)::after{content:'›';position:absolute;right:-17px;top:50%;transform:translateY(-50%);color:var(--color-text-muted);font-size:20px;pointer-events:none}
+.dda-navigation__step{width:100%;height:48px;min-width:0;gap:8px}
+.dda-navigation__step>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:600px){.dda-navigation ol{gap:16px}.dda-navigation li:not(:last-child)::after{right:-12px;font-size:16px}.dda-navigation__step{padding:8px;font-size:10px}}

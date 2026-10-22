@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 globalThis.window={};
 const {caseFlowSteps}=await import('../app/static/js/dispatch/case-navigation.mjs');
 import {hasCaseExecutions} from '../app/static/js/dispatch/case-identity.mjs';
+import {resolveDecisionDestination} from '../app/static/js/dispatch/decision-target.mjs';
+const {decisionRail}=await import('../app/static/js/dispatch/decision-nav.mjs');
 
 const cid='00000000-0000-4000-8000-000000000001';
 const state={decisionCase:{id:cid,persisted:true,nodes:{
@@ -29,4 +31,27 @@ test('new Cases cannot skip preparation and queued or failed executions protect 
  assert.equal(hasCaseExecutions({nodes:{a:{status:'available',run_count:0}}}),false);
  assert.equal(hasCaseExecutions({nodes:{a:{status:'running',latest_run_id:'queued'}}}),true);
  assert.equal(hasCaseExecutions({nodes:{a:{status:'error',run_count:1}}}),true);
+});
+test('horizontal navigation keeps its level and vertical navigation keeps D2',()=>{
+ const nodes={...state.decisionCase.nodes,logistics_scheduling:{status:'review',latest_run_id:'d2-result'}};
+ for(const id of Object.keys(nodes)){
+  assert.deepEqual(resolveDecisionDestination(id,nodes[id],'logistics-config'),{view:'logistics-config',node_id:id,run_id:null});
+  assert.equal(resolveDecisionDestination(id,nodes[id],'decision-dashboard').run_id,id==='logistics_assignment'?'approved-d1':'d2-result');
+ }
+ for(const view of ['logistics-config','decision-dashboard']){
+  const steps=caseFlowSteps(view,{caseId:cid,nodeId:'logistics_scheduling'},{...state,decisionCase:{...state.decisionCase,nodes}});
+  assert.equal(steps[2].target.nodeId,'logistics_scheduling');assert.equal(steps[3].target.nodeId,'logistics_scheduling');
+  assert.equal(steps[3].target.runId,'d2-result');assert.equal(steps[3].disabled,false);
+ }
+});
+test('available decisions can open Config, never an absent Dashboard; locked decisions stay disabled',()=>{
+ assert.equal(resolveDecisionDestination('logistics_scheduling',{status:'available'},'decision-dashboard'),null);
+ assert.equal(resolveDecisionDestination('logistics_scheduling',{status:'available'},'logistics-config').view,'logistics-config');
+ for(const view of ['logistics-config','decision-dashboard']){
+  assert.equal(resolveDecisionDestination('logistics_scheduling',{status:'locked'},view),null);
+  assert.equal(resolveDecisionDestination('logistics_final_assignment',{status:'available'},view),null);
+ }
+ const html=decisionRail({decisionCase:state.decisionCase,activeNode:'logistics_assignment',view:'decision-dashboard'});
+ assert.match(html,/data-decision-node="logistics_scheduling"[^>]*disabled/);
+ assert.doesNotMatch(html,/data-back-map|dispatch-decision-rail__head|decision-view-tabs/);
 });

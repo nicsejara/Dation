@@ -1,7 +1,6 @@
-import {resolveNodeDestination} from './decision-target.mjs';
+import {resolveNodeDestination,resolveDecisionDestination} from './decision-target.mjs';
 import {DECISION_META} from './decision-ui.mjs';
 import {decisionRail,bindDecisionRail} from './decision-nav.mjs';
-import {scopeFor} from './lifecycle.mjs';
 import {hasCaseExecutions} from './case-identity.mjs';
 
 const views=['logistics-data','logistics-map','logistics-config','decision-dashboard'];
@@ -40,20 +39,9 @@ export function renderCaseFlow(root,{view,route,state={}}){
   if(index<steps.length-1){const connector=document.createElement('span');connector.className='dda-workspace-nav__connector';connector.setAttribute('aria-hidden','true');root.append(connector);}
  }
 }
-export function mountDecisionViews(root,{state,nodeId,view,onConfigure}){
+export function mountDecisionViews(root,{state,nodeId,view}){
  const current=state.decisionCase;if(!current?.id||!DECISION_META[nodeId]?.implemented)return;
- const scope=scopeFor(root);if(!scope)return;
- let rail=root.querySelector('.dispatch-decision-rail');
- if(!rail){const host=document.createElement('div');host.innerHTML=decisionRail({decisionCase:current,activeNode:nodeId,view});root.prepend(host);rail=host.firstElementChild;
-  bindDecisionRail(host,{onOpenNode:id=>{const target=resolveNodeDestination(id,current.nodes[id]);if(target)open({...target,caseId:current.id,nodeId:id,runId:target.run_id});}});
+ if(!root.querySelector('.dispatch-decision-rail')){const host=document.createElement('div');host.innerHTML=decisionRail({decisionCase:current,activeNode:nodeId,view});root.prepend(host);
+  bindDecisionRail(host,{onOpenNode:id=>{const target=resolveDecisionDestination(id,current.nodes[id],view);if(target)open({...target,caseId:current.id,nodeId:id,runId:target.run_id});}});
  }
- if(rail&&!rail.querySelector('[data-back-map]')){const back=document.createElement('button');back.type='button';back.dataset.backMap='';back.className='case-back-map';back.textContent='← Mapa de decisiones';scope.listen(back,'click',()=>window.DationDispatch.openCase(current.id));rail.prepend(back);}
- const hero=root.querySelector('#dispatch-hero,.d-page-hero');if(!hero)return;
- const tabs=document.createElement('nav');tabs.className='decision-view-tabs';tabs.setAttribute('aria-label','Vistas de la decisión');
- const target=resolveNodeDestination(nodeId,current.nodes[nodeId]);
- for(const [label,selected,enabled,callback] of [
-  ['Configuración',view==='logistics-config',true,onConfigure],
-  ['Resultado',view==='decision-dashboard',target?.view==='decision-dashboard',()=>open({...target,caseId:current.id,nodeId,runId:target?.run_id})],
- ]){const button=document.createElement('button');button.type='button';button.textContent=label;button.disabled=!enabled;button.className='d-button d-button--secondary';if(selected)button.setAttribute('aria-current','page');scope.listen(button,'click',()=>{if(!selected)callback?.();});tabs.append(button);}
- hero.append(tabs);
 }

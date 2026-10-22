@@ -883,7 +883,7 @@ class FrontendContractTests(
             )
 
         for copy in (
-            "Prepará tu Data Pack.",
+            "Preparar Decision Case",
             "Elegí cómo cargar tus datos.",
             "Subí archivos nuevos o reutilizá una carga anterior.",
             "las columnas opcionales no bloquean este paso.",
@@ -1320,7 +1320,7 @@ class FrontendContractTests(
             workspace,
         )
         self.assertIn(
-            "Decisiones del análisis",
+            'aria-label="Decisiones del caso"',
             decision_nav,
         )
         self.assertIn(
@@ -1436,7 +1436,7 @@ class FrontendContractTests(
         ).read_text(encoding="utf-8")
 
         for copy in (
-            "Elegí la decisión que tus datos ya pueden resolver.",
+            'title:decisionCase?.label||"Decision Case"',
             "CÓMO AVANZA EL CASO",
             "DECISION CASE",
             "DATA PACK ACTIVO",
@@ -1555,8 +1555,9 @@ class FrontendContractTests(
         )[0]
 
         primary_nav = sidebar.split('<nav class="nav platform-global-nav"',1)[1].split('</nav>',1)[0]
-        for label in ['Inicio','Decision Data Assets','Decision Center','Datos','Equipo','Configuración']:
+        for label in ['Inicio','Decision Center','Datos','Equipo','Configuración']:
             self.assertIn('>'+label+'<',primary_nav)
+        self.assertNotIn('>Decision Data Assets<',primary_nav)
         self.assertNotIn('>DDA Logística<',primary_nav)
         self.assertNotIn('Cloud Run',sidebar)
         self.assertNotIn('Supabase',sidebar)
@@ -1564,154 +1565,28 @@ class FrontendContractTests(
         self.assertIn('data-user-menu',sidebar)
         self.assertIn('data-logout',sidebar)
 
-    def test_dda_internal_navigation_contract(
-        self,
-    ):
-        workspace = (
-            BACKEND_ROOT
-            / "app"
-            / "static"
-            / "js"
-            / "dispatch"
-            / "workspace.mjs"
-        ).read_text(encoding="utf-8")
-        upload = (
-            BACKEND_ROOT
-            / "app"
-            / "static"
-            / "js"
-            / "dispatch"
-            / "upload"
-            / "index.mjs"
-        ).read_text(encoding="utf-8")
-        app_css = (
-            BACKEND_ROOT
-            / "app"
-            / "static"
-            / "css"
-            / "app.css"
-        ).read_text(encoding="utf-8")
-
-        self.assertIn(
-            'aria-label="Navegación global"',
-            self.html,
-        )
-        self.assertIn(
-            'id="dda-workspace-nav-shell"',
-            self.html,
-        )
-        self.assertIn(
-            'id="dda-workspace-nav"',
-            self.html,
-        )
-        self.assertIn(
-            "window.dationRenderWorkspaceNav",
-            self.html,
-        )
-        self.assertIn(
-            "/static/js/dda-workflow-config.js",
-            self.html,
-        )
-        self.assertIn(
-            "workflowStep('data'",
-            self.html,
-        )
-
-        for label in (
-            "Carga de datos",
-            "Mapa de decisiones",
-            "Configurar decisión",
-            "Dashboard",
-        ):
-            self.assertIn(
-                label,
-                self.html,
-            )
-
-        self.assertIn(
-            "journeyButton('Inicio'",
-            self.html,
-        )
-        self.assertIn(
-            "journeySeparator()",
-            self.html,
-        )
-        self.assertIn(
-            "journeyButton('DDA Logística'",
-            self.html,
-        )
-        self.assertIn(
-            "configContext",
-            self.html,
-        )
-        self.assertIn(
-            "dashboardContext",
-            self.html,
-        )
-        self.assertIn(
-            "currentView === 'logistics-config'",
-            self.html,
-        )
-        self.assertIn(
-            "currentView === 'decision-dashboard'",
-            self.html,
-        )
-        self.assertIn(
-            "window.DationDispatch.openActiveDecisionResult",
-            self.html,
-        )
-
-        for css_class in (
-            ".dda-workspace-nav-shell",
-            ".dda-workspace-nav",
-            ".dda-workspace-step",
-            ".dda-workspace-step__context",
-        ):
-            self.assertIn(
-                css_class,
-                app_css,
-            )
-
-        self.assertIn(
-            "const NAV_VERSION='workspace-nav-v1'",
-            workspace,
-        )
-        self.assertIn(
-            "saved.navigationVersion===NAV_VERSION",
-            workspace,
-        )
-        self.assertIn(
-            "?(saved.activeNode||null)",
-            workspace,
-        )
-        self.assertIn(
-            "window.dationSetDecisionContext?.({",
-            workspace,
-        )
-        self.assertIn(
-            "openActiveDecisionResult",
-            workspace,
-        )
-        self.assertIn(
-            "Primero elegí una decisión.",
-            workspace,
-        )
-        self.assertIn(
-            "state.activeNode=null",
-            workspace,
-        )
-        self.assertNotIn(
-            "makeStepper",
-            upload,
-        )
-        self.assertIn(
-            "/static/css/app.css?v=dark-home-overview-v1",
-            self.html,
-        )
-        self.assertIn(
-            "/static/js/dispatch/workspace.mjs",
-            self.html,
-        )
+    def test_dda_internal_navigation_contract(self):
+        dispatch_root = BACKEND_ROOT / "app/static/js/dispatch"
+        workspace = (dispatch_root / "workspace.mjs").read_text()
+        flow = (dispatch_root / "case-navigation.mjs").read_text()
+        context = (BACKEND_ROOT / "app/static/js/platform/dda-navigation.mjs").read_text()
+        shell = (BACKEND_ROOT / "app/static/js/platform/shell.mjs").read_text()
+        for marker in ('id="dda-workspace-nav-shell"', 'id="dda-workspace-nav"', 'window.dationRenderCaseFlow?.(currentView)'):
+            self.assertIn(marker, self.html)
+        for label in ('Datos del Case', 'Mapa de decisiones', 'Configurar decisión', 'Dashboard'):
+            self.assertIn(label, flow)
+        self.assertIn('renderCaseFlow', shell)
+        self.assertIn('renderDdaNavigation', shell)
+        self.assertIn("label:'Decision Data Assets'", context)
+        self.assertIn("label:'DDA Logística'", context)
+        self.assertIn("view:'logistics-map',caseId:route.caseId", context)
+        self.assertNotIn('mountCaseSwitcher', flow)
+        self.assertNotIn('decision-view-tabs', flow)
+        self.assertIn("const NAV_VERSION='workspace-nav-v1'", workspace)
+        self.assertIn('saved.navigationVersion===NAV_VERSION', workspace)
+        self.assertIn('window.dationSetDecisionContext?.({', workspace)
+        self.assertIn('Primero elegí una decisión.', workspace)
+        self.assertIn('/static/js/dispatch/workspace.mjs', self.html)
 
     def test_latest_decision_access_contract(
         self,
@@ -2002,7 +1877,7 @@ class FrontendContractTests(
             "DDA LOGÍSTICA · PLANIFICACIÓN DE DESPACHOS",
             "Tus despachos, con mejor análisis.",
             "Compará alternativas y revisá la evidencia antes de aprobar.",
-            "Iniciar nueva decisión",
+            "Iniciar nuevo Decision Case",
             "VOS APORTÁS",
             "Tus órdenes y tu flota",
             "DATION ANALIZA",
