@@ -104,6 +104,8 @@ async def main():
             await open_stage(outsider,'decision-dashboard',node,run)
             assert await outsider.locator('[data-approve-toolbar],[data-approve-final]').count()==0
             await open_stage(approver,'decision-dashboard',node,run)
+            assert await approver.locator('[data-approve-toolbar]').count()==1
+            assert await approver.locator('[data-approve-final],[data-approved-map]').count()==0
             async with approver.expect_response(lambda r:urlsplit(r.url).path=='/api/runs/'+run+'/approve' and r.request.method=='POST') as pending:
                 await approver.locator('[data-approve-toolbar]').click()
             response=await pending.value;assert response.status==200
@@ -142,7 +144,6 @@ async def main():
             await matrix(steward,'map')
             await open_stage(admin,'logistics-map')
             await assign('logistics_assignment',OWNER,audit_editor=True)
-            await assign('logistics_scheduling',OWNER)
             await open_stage(owner,'logistics-config','logistics_assignment')
             await owner.locator('[data-objective=min_cost]').click()
             assert await owner.locator('.dda-navigation li').count()==3
@@ -159,11 +160,16 @@ async def main():
             d1=await execute('logistics_assignment')
             await matrix(owner,'dashboard')
             await approve('logistics_assignment',d1)
-            final=approver.locator('.assignment-final-actions')
-            await final.get_by_role('button',name='Configurar siguiente decisión',exact=True).wait_for()
-            assert await final.get_by_role('button',name='Ver mapa de decisiones',exact=True).is_visible()
-            assert await approver.locator('[data-approval-handoff]').count()==0
-            await final.get_by_role('button',name='Configurar siguiente decisión',exact=True).click()
+            hero=approver.locator('#dispatch-hero')
+            next_action=hero.get_by_role('button',name='Asignar Decision Owner · D2 Planificación de despachos',exact=True)
+            await next_action.wait_for();assert await approver.locator('[data-approve-final],[data-approved-map],[data-approval-handoff]').count()==0
+            await next_action.click()
+            await approver.locator('#dispatch-map-root article[data-decision-node=logistics_scheduling]').wait_for()
+            assert parse_qs(urlsplit(approver.url).query)['case_id']==[case]
+            await open_stage(admin,'logistics-map','logistics_scheduling')
+            await assign('logistics_scheduling',OWNER)
+            await open_stage(approver,'decision-dashboard','logistics_assignment',d1)
+            await hero.get_by_role('button',name='Configurar D2 · Planificación de despachos',exact=True).click()
             await approver.locator('[data-scheduling-review]').wait_for()
             assert 'run_id=' not in approver.url
             await open_stage(admin,'logistics-config','logistics_scheduling')
@@ -199,21 +205,20 @@ async def main():
             await owner.locator('.scheduling-dashboard-v2').wait_for()
             assert await owner.locator('.decision-view-tabs,[data-back-map],[data-approval-handoff]').count()==0
             await approve('logistics_scheduling',d2)
-            final=approver.locator('.scheduling-final-actions')
+            final=approver.locator('#dispatch-hero')
             await final.get_by_role('button',name='Volver a Decision Center',exact=True).wait_for()
-            assert 'Case completado' in await final.inner_text()
-            assert await final.get_by_role('button',name='Ver mapa del Case',exact=True).is_visible()
-            assert await final.get_by_role('button',name='Configurar siguiente decisión',exact=True).count()==0
+            assert 'CASE COMPLETADO' in await final.inner_text()
+            assert await approver.locator('[data-approve-final],[data-approved-map],[data-dashboard-map]').count()==0
+            assert await final.get_by_role('button',name='Configurar D2 · Planificación de despachos',exact=True).count()==0
 
             await owner.locator('.dispatch-decision-tab[data-decision-node=logistics_assignment]').click()
             await owner.locator('.assignment-dashboard-v2').wait_for()
-            await owner.locator('#dda-workspace-nav [data-step="3"]').click()
+            await owner.get_by_role('button',name='Nueva corrida',exact=True).click()
             await owner.locator('[data-config-review]').wait_for()
             d1=await execute('logistics_assignment')
             assert await owner.evaluate('window.DationDispatch.getWorkspace().decisionCase.nodes.logistics_scheduling.status')=='stale'
             await approve('logistics_assignment',d1)
-            await owner.locator('.assignment-final-actions [data-approved-map]').click()
-            await owner.locator('[data-map-action=configure][data-map-node=logistics_scheduling]').click()
+            await owner.locator('#dispatch-hero [data-after-approve]').click()
             await owner.locator('[data-scheduling-review]').wait_for()
             d2=await execute('logistics_scheduling')
             await approve('logistics_scheduling',d2)

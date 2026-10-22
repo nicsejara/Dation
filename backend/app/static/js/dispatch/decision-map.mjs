@@ -1,11 +1,10 @@
 import {createScope,scopeFor} from "./lifecycle.mjs";
 import {resolveNodeDestination} from './decision-target.mjs';
 import {ensureDecisionCaseStyles} from "./styles.mjs";
-import {api,esc,num} from "./shared.mjs";
+import {esc,num} from "./shared.mjs";
 import {STATUS,deriveDecisionNodes} from "./decision-case.mjs";
 import {WORKFLOW_ACTION_CLASS,workflowActionLabel} from "./workflow-action-bar.mjs";
-import {decisionHero} from "./decision-config-ui.mjs";
-import {createGuideDrawer} from "./upload/guide-drawer.mjs";
+import {decisionHero,decisionCaseCard,decisionDataFileCard,bindCaseContext} from "./decision-config-ui.mjs";
 import {
   DECISION_ORDER,
   DECISION_META,
@@ -13,7 +12,6 @@ import {
   statusUi,
 } from "./decision-ui.mjs";
 
-let guideDrawer=null;
 
 function workflowStep(id,fallback){
   const steps=(window.DationDdaFlow&&Array.isArray(window.DationDdaFlow.steps))
@@ -26,19 +24,6 @@ function readinessById(readiness){
   return Object.fromEntries(
     (readiness?.decisions||[]).map(item=>[item.id,item]),
   );
-}
-
-function dateTime(value){
-  if(!value)return null;
-  const parsed=new Date(value);
-  if(Number.isNaN(parsed.getTime()))return null;
-  return new Intl.DateTimeFormat("es-AR",{
-    day:"2-digit",
-    month:"short",
-    year:"numeric",
-    hour:"2-digit",
-    minute:"2-digit",
-  }).format(parsed);
 }
 
 function compactDateTime(value){
@@ -56,16 +41,6 @@ function compactDateTime(value){
 function displayCaseId(value){
   if(!value)return "—";
   return "DC-"+String(value).slice(0,8).toUpperCase();
-}
-
-function middleEllipsis(value,max=34){
-  const text=String(value||"—");
-  if(text.length<=max)return text;
-  const extension=text.toLowerCase().endsWith(".csv")?".csv":"";
-  const stem=extension?text.slice(0,-4):text;
-  const tailLength=Math.min(12,Math.max(8,Math.floor(max*.32)));
-  const headLength=Math.max(10,max-tailLength-extension.length-1);
-  return stem.slice(0,headLength)+"…"+stem.slice(-tailLength)+extension;
 }
 
 function dependencyState(nodeId,nodes){
@@ -218,11 +193,6 @@ function nodeActionMarkup(nodeId,presentation){
     return '<div class="dispatch-decision-node__actions">'
       +'<button type="button" class="dispatch-map-secondary-action" '
         +'data-map-action="'+esc(action.action)+'" data-map-node="'+esc(nodeId)+'">Ver resultado</button>'
-      +'<button type="button" class="dispatch-map-icon-action" '
-        +'data-map-action="'+esc(action.action)+'" data-map-node="'+esc(nodeId)+'" '
-        +'title="Reabrir análisis" aria-label="Reabrir análisis">'
-        +iconSvg("rotate","dispatch-map-icon")
-      +'</button>'
     +'</div>';
   }
   if(action?.action){
@@ -334,148 +304,27 @@ function heroMarkup(decisionCase){
   });
 }
 
-function caseState(approved,presentations){
-  if(approved===DECISION_ORDER.filter(id=>DECISION_META[id].implemented).length){
-    return {label:"Completo",tone:"complete",icon:"checkCircle"};
-  }
-  const needsReview=DECISION_ORDER.some(nodeId=>[
-    STATUS.REVIEW,
-    STATUS.STALE,
-    STATUS.ERROR,
-  ].includes(presentations[nodeId]?.status));
-  if(needsReview){
-    return {label:"Con revisión pendiente",tone:"review",icon:"alertTriangle"};
-  }
-  return {label:"En curso",tone:"active",icon:"clock"};
+export function progressMarkup(presentations,approved,activeNodeId){
+  const implemented=DECISION_ORDER.filter(id=>DECISION_META[id].implemented);
+  const reached=Math.max(0,...DECISION_ORDER.map((id,index)=>DECISION_META[id].implemented&&(
+    id===activeNodeId||!['locked','needs_data'].includes(presentations[id]?.status))?index:0));
+  return '<div class="dispatch-case-progress"><div class="dispatch-case-progress__heading"><small>PROGRESO</small><strong>'+num(approved)+' de '+implemented.length+' aprobadas</strong></div>'
+    +'<ol class="dispatch-case-progress__grid" aria-label="Progreso por decisión" style="--decision-count:'+DECISION_ORDER.length+'">'
+    +DECISION_ORDER.map((id,index)=>{
+      const meta=DECISION_META[id],locked=!meta.implemented||index>reached;
+      const status=locked?'No disponible':presentations[id]?.status===STATUS.APPROVED?'Aprobada':'Alcanzada';
+      return '<li class="dispatch-case-progress__item '+(locked?'is-waiting':'is-reached')+(index===reached?' is-active':'')+'"'+(!meta.implemented?' aria-disabled="true"':'')+(index===reached?' aria-current="step"':'')+' title="'+esc(meta.label+': '+status)+'">'
+        +'<span class="dispatch-case-progress__segment" aria-hidden="true">'+(index+1)+'</span><span class="dispatch-case-progress__label">'+esc(meta.label+': '+status)+'</span></li>';
+    }).join('')+'</ol></div>';
 }
 
-function caseStatusChip(approved,presentations){
-  const item=caseState(approved,presentations);
-  return '<span class="dispatch-case-state is-'+item.tone+'">'
-    +iconSvg(item.icon,"dispatch-map-icon")
-    +'<span>'+esc(item.label)+'</span>'
-  +'</span>';
-}
-
-function progressMarkup(presentations,approved,activeNodeId){
-  return '<div class="dispatch-case-progress">'
-    +'<div class="dispatch-case-progress__heading">'
-      +'<small>PROGRESO</small><strong>'+num(approved)+' de 2 aprobadas</strong>'
-    +'</div>'
-    +'<div class="dispatch-case-progress__grid" role="progressbar" aria-label="Decisiones aprobadas" aria-valuetext="'+approved+' de 2 decisiones aprobadas" aria-valuemin="0" aria-valuemax="2" aria-valuenow="'+approved+'">'
-      +DECISION_ORDER.filter(id=>DECISION_META[id].implemented).map(nodeId=>{
-        const meta=DECISION_META[nodeId];
-        const approvedNode=presentations[nodeId].status===STATUS.APPROVED;
-        const active=nodeId===activeNodeId&&!approvedNode;
-        const tooltip=approvedNode
-          ?meta.short+": aprobada"
-          :active
-            ?meta.short+": decisión actual"
-            :meta.short+": en espera";
-        return '<div class="dispatch-case-progress__item '+(approvedNode?'is-approved':active?'is-active':'is-waiting')+'" title="'+esc(tooltip)+'">'
-          +'<span class="dispatch-case-progress__segment">'
-            +(approvedNode?iconSvg("check","dispatch-map-icon"):'')
-          +'</span>'
-          +'<span class="dispatch-case-progress__label">'+esc(meta.progressLabel)+'</span>'
-        +'</div>';
-      }).join("")
-    +'</div>'
-  +'</div>';
-}
-
-function datasetHealth(dataset){
-  const report=dataset?.profile_json||null;
-  const errors=Number(report?.counts?.errors||0);
-  return errors>0
-    ?{tone:"review",label:"Revisar",icon:"alertTriangle"}
-    :{tone:"valid",label:"Validado",icon:"checkCircle"};
-}
-
-function dataPackHealth(orders,fleet){
-  if(!orders||!fleet){
-    return {tone:"waiting",label:"Datos pendientes",icon:"clock"};
-  }
-  const hasIssues=[orders,fleet].some(dataset=>Number(dataset?.profile_json?.counts?.errors||0)>0);
-  return hasIssues
-    ?{tone:"review",label:"Revisar datos",icon:"alertTriangle"}
-    :{tone:"valid",label:"Datos validados",icon:"checkCircle"};
-}
-
-function datasetCard(kind,dataset){
-  const isOrders=kind==="orders";
-  const label=isOrders?"ÓRDENES":"FLOTA";
-  const rows=Number(dataset?.row_count||0);
-  const rowLabel=isOrders
-    ?num(rows)+" "+(rows===1?"orden":"órdenes")
-    :num(rows)+" "+(rows===1?"vehículo":"vehículos");
-  const fullName=dataset?.canonical_filename||dataset?.label||dataset?.original_filename||"Archivo sin nombre";
-  const shownName=middleEllipsis(fullName);
-  const uploaded=compactDateTime(dataset?.created_at);
-  const health=datasetHealth(dataset);
-  return '<article class="dispatch-datapack-file is-'+kind+'">'
-    +'<span class="dispatch-datapack-file__accent" aria-hidden="true"></span>'
-    +'<span class="dispatch-datapack-file__icon">'+iconSvg(isOrders?"clipboardList":"truck","dispatch-map-icon")+'</span>'
-    +'<div class="dispatch-datapack-file__body">'
-      +'<div class="dispatch-datapack-file__topline">'
-        +'<small>'+label+'</small>'
-        +'<span class="dispatch-file-state is-'+health.tone+'">'+iconSvg(health.icon,"dispatch-map-icon")+esc(health.label)+'</span>'
-      +'</div>'
-      +'<strong class="dispatch-datapack-file__name" title="'+esc(fullName)+'">'+esc(shownName)+'</strong>'
-      +'<div class="dispatch-datapack-file__meta">'
-        +'<span class="is-count">'+esc(rowLabel)+'</span>'
-        +(uploaded?'<span>Cargado '+esc(uploaded)+'</span>':'')
-      +'</div>'
-    +'</div>'
-    +'<button type="button" class="dispatch-datapack-file__columns" data-map-columns="'+kind+'" '
-      +'title="Ver columnas" aria-label="Ver columnas de '+esc(label.toLowerCase())+'">'
-      +iconSvg("columns","dispatch-map-icon")
-    +'</button>'
-  +'</article>';
-}
-
-function caseCardMarkup(decisionCase,presentations,orders,fleet,approved){
-  const fullId=String(decisionCase?.id||"");
-  const caseId=displayCaseId(fullId);
-  const created=dateTime(decisionCase?.created_at);
-  const pack=dataPackHealth(orders,fleet);
-  return '<details data-map-context class="d-data-context dispatch-map-casebar dispatch-case-card" aria-label="Decision Case y Data Pack activo">'
-    +'<summary class="dispatch-map-context-summary"><span>Decision Case <strong>'+esc(caseId)+'</strong></span><small>Data Pack activo · '+esc(pack.label)+'</small>'+(decisionCase?.status==='archived'?'<span class="dispatch-map-state-chip">Archivado</span>':'')+'<span class="decision-context-chevron" aria-hidden="true">⌄</span></summary>'
-    +'<div class="dispatch-case-card__top">'
-      +'<div class="dispatch-case-identity">'
-        +'<span class="dispatch-case-identity__icon">'+iconSvg("folderOpen","dispatch-map-icon")+'</span>'
-        +'<div class="dispatch-case-identity__copy">'
-          +'<small>DECISION CASE</small>'
-          +'<div class="dispatch-case-identity__idrow">'
-            +'<strong title="'+esc(fullId||caseId)+'">Decision Case · '+esc(caseId)+'</strong>'
-            +'<button type="button" data-copy-case-id title="Copiar ID" aria-label="Copiar ID completo del caso">'+iconSvg("copy","dispatch-map-icon")+'</button>'
-            +(decisionCase?.status==='archived'?'':caseStatusChip(approved,presentations))
-          +'</div>'
-          +(created?'<span class="dispatch-case-identity__created">Creado el '+esc(created)+'</span>':'')
-
-          +'<span class="dispatch-case-identity__trust">Todo lo que decidas queda registrado en este caso.</span>'
-          +'<span class="dispatch-case-identity__feedback" data-case-copy-feedback aria-live="polite"></span>'
-        +'</div>'
-      +'</div>'
-    +'</div>'
-    +'<div class="dispatch-case-card__divider" aria-hidden="true"></div>'
-    +'<div class="dispatch-datapack-panel">'
-      +'<div class="dispatch-datapack-panel__head">'
-        +'<div class="dispatch-datapack-panel__title">'
-          +'<span class="dispatch-datapack-panel__icon">'+iconSvg("database","dispatch-map-icon")+'</span>'
-          +'<div><small>DATA PACK ACTIVO</small><span class="dispatch-datapack-panel__support">2 archivos</span></div>'
-          +'<span class="dispatch-datapack-status is-'+pack.tone+'">'+iconSvg(pack.icon,"dispatch-map-icon")+esc(pack.label)+'</span>'
-        +'</div>'
-        +'<button type="button" class="dispatch-map-change-data" data-map-action="data" '
-          +'>'
-          +iconSvg("refresh","dispatch-map-icon")+'<span>Consultar / preparar datos</span>'
-        +'</button>'
-      +'</div>'
-      +'<div class="dispatch-datapack-grid">'
-        +datasetCard("orders",orders)
-        +datasetCard("fleet",fleet)
-      +'</div>'
-    +'</div>'
-  +'</details>';
+function caseCardMarkup(decisionCase,orders,fleet,dataOwner){
+  return decisionCaseCard({caseId:decisionCase?.id,caseLabel:decisionCase?.label,dataOwner,
+    copyHook:'data-copy-case-id',feedbackHook:'data-case-copy-feedback',changeHook:'data-map-change-data',
+    files:[['orders',orders],['fleet',fleet]].map(([kind,dataset])=>{
+      const count=Number(dataset?.row_count||0);
+      return decisionDataFileCard({kind,dataset,countText:num(count)+' '+(kind==='orders'?(count===1?'orden':'órdenes'):(count===1?'vehículo':'vehículos'))});
+    })});
 }
 
 function legendMarkup(){
@@ -524,28 +373,9 @@ function changeDataDialog(presentations){
   +'</dialog>';
 }
 
-async function openDatasetColumns(kind,source,orders,fleet){
-  const scope=scopeFor(source),owner=source.closest(".dispatch");
-  try{
-    if(!owner._guideDrawer){
-      const contracts=await api("/api/dispatch/contracts",{signal:scope?.signal});
-      if(!scope?.active)return;
-      owner._guideDrawer=createGuideDrawer(contracts,scope);
-    }
-    if(!scope?.active)return;
-    owner._guideDrawer.open(kind,source,{
-      orders:orders?.profile_json||null,
-      fleet:fleet?.profile_json||null,
-    });
-  }catch(error){
-    source.setAttribute("title","No pudimos abrir las columnas");
-    source.setAttribute("aria-label","No pudimos abrir las columnas");
-  }
-}
-
 export async function renderDecisionMap(
   root,
-  {decisionCase,readiness,orders,fleet,onConfigure,onOpenResult,onData,onSelectCase,transitionNotice=null},
+  {decisionCase,readiness,orders,fleet,onConfigure,onOpenResult,onData,onSelectCase,transitionNotice=null,dataOwner},
 ){
   const scope=createScope(root);scope.own(()=>{root._guideDrawer=null;});
   await ensureDecisionCaseStyles();
@@ -582,7 +412,7 @@ export async function renderDecisionMap(
       +'</section>'
       :'')
     +'<section class="dispatch-map-progress" aria-label="Progreso del caso">'+progressMarkup(presentations,approved,activeNodeId)+'</section>'
-    +caseCardMarkup(decisionCase,presentations,orders,fleet,approved)
+    +caseCardMarkup(decisionCase,orders,fleet,dataOwner)
     +'<section class="dispatch-map-chain-section dispatch-map-chain-section--open" aria-labelledby="decision-chain-title">'
       +'<header class="dispatch-map-chain-heading">'
         +'<div><span class="dispatch-map-eyebrow">DECISIONES DEL CASO</span>'
@@ -624,9 +454,8 @@ export async function renderDecisionMap(
     };
   }
 
-  root.querySelectorAll("[data-map-columns]").forEach(button=>{
-    button.onclick=()=>openDatasetColumns(button.dataset.mapColumns,button,orders,fleet);
-  });
+  bindCaseContext(root);
+  scope.listen(root.querySelector('[data-map-change-data]'),'click',()=>onData?.());
 
   const changeDialog=root.querySelector("[data-change-data-dialog]");
   const confirmChange=root.querySelector("[data-confirm-change]");

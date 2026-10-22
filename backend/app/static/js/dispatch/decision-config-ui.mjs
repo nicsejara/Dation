@@ -103,7 +103,7 @@ export function decisionDataFileCard({kind,dataset,countText,filtered=false,vali
 export function decisionCaseCard({caseId,caseLabel='Decision Case',dataOwner='Sin asignar',files=[],copyHook="data-config-copy-case",feedbackHook="data-config-copy-feedback",changeHook="data-config-change-data",extraClass=""}){
  const rawId=String(caseId||'');
  return '<details data-config-context class="d-data-context decision-config-case dispatch-case-card assignment-case-strip '+esc(extraClass)+'" aria-label="Contexto del Case">'
-  +'<summary class="decision-config-case__summary"><span>Contexto del Case</span><strong>'+esc(caseLabel||'Decision Case')+'</strong><span class="decision-context-chevron" aria-hidden="true">⌄</span></summary>'
+  +'<summary class="decision-config-case__summary" title="Abrir contexto del Case" aria-label="Abrir contexto del Case"><span>Contexto del Case</span><span class="decision-context-chevron" aria-hidden="true">⌄</span></summary>'
   +'<div class="decision-config-case__body"><dl class="case-context-fields">'
   +'<div><dt>ID</dt><dd>'+esc(displayDecisionCaseId(rawId))+' <button type="button" '+copyHook+' aria-label="Copiar ID completo del caso">'+iconSvg('copy')+'</button><span '+feedbackHook+' aria-live="polite"></span></dd></div>'
   +'<div><dt>Nombre</dt><dd>'+esc(caseLabel||'Decision Case')+'</dd></div>'
@@ -111,6 +111,17 @@ export function decisionCaseCard({caseId,caseLabel='Decision Case',dataOwner='Si
   +'<div><dt>Data Owner</dt><dd>'+esc(dataOwner||'Sin asignar')+'</dd></div></dl>'
   +'<div class="decision-config-case__pack"><div class="decision-config-case__pack-header"><button class="assignment-change-data d-button d-button--secondary" type="button" '+changeHook+' title="Un Data Pack distinto inicia otro Case">'+iconSvg('refresh')+'<span>Cambiar Data Pack</span></button></div>'
   +'<div class="decision-config-case__files">'+files.join('')+'</div></div></div></details>';
+}
+
+/** Native disclosure, including keyboard interaction, shared by Map and Config. */
+export function bindCaseContext(root){
+  root.querySelectorAll('[data-config-context]').forEach(details=>{
+    const sync=()=>{
+      const label=(details.open?'Cerrar':'Abrir')+' contexto del Case';
+      const summary=details.querySelector('summary');summary.title=label;summary.setAttribute('aria-label',label);
+    };
+    scopeFor(root)?.listen(details,'toggle',sync);sync();
+  });
 }
 
 export function decisionChoiceCard({
@@ -172,6 +183,7 @@ export function configSummaryBar(options){
 
 const actionBars=new WeakMap();
 export function mountConfigActionBar(root){
+  bindCaseContext(root);
   actionBars.get(root)?.dispose();
   root.querySelectorAll('dialog.d-config-dialog').forEach(dialog=>dialog.addEventListener('keydown',event=>{
     trapFocus(event,dialog);

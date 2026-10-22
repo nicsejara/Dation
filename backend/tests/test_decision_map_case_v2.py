@@ -19,29 +19,22 @@ class DecisionMapCaseV2ContractTests(unittest.TestCase):
         )
 
     def test_case_identity_and_progress(self):
-        for marker in (
-            'return "DC-"+String(value).slice(0,8).toUpperCase()',
-            "Todo lo que decidas queda registrado en este caso.",
-            "data-copy-case-id",
-            "aria-live=\"polite\"",
-            "dispatch-case-progress__label",
-            "progressLabel",
-            "Con revisión pendiente",
-            "Completo",
-        ):
-            self.assertIn(marker, self.decision_map + self.decision_ui)
+        shared=(DISPATCH_JS/'decision-config-ui.mjs').read_text()
+        self.assertIn('decisionCaseCard',self.decision_map)
+        self.assertIn('Contexto del Case',shared)
+        self.assertIn('data-copy-case-id',self.decision_map)
+        self.assertIn('aria-live="polite"',shared)
+        self.assertIn('dispatch-case-progress__label',self.decision_map)
+        self.assertIn('DECISION_ORDER.map',self.decision_map)
+        self.assertIn('aria-disabled="true"',self.decision_map)
 
     def test_data_pack_reuses_real_dataset_metadata(self):
-        for marker in (
-            "canonical_filename",
-            "created_at",
-            "middleEllipsis",
-            "data-map-columns",
-            "createGuideDrawer",
-            "Datos validados",
-            "Cargado ",
-        ):
-            self.assertIn(marker, self.decision_map)
+        shared=(DISPATCH_JS/'decision-config-ui.mjs').read_text()
+        self.assertIn('decisionDataFileCard',self.decision_map)
+        for marker in ('canonical_filename','middleEllipsis','Validado'):
+            self.assertIn(marker,shared)
+        self.assertNotIn('createGuideDrawer',self.decision_map)
+        self.assertNotIn('data-map-columns',self.decision_map)
 
     def test_decision_cards_and_connectors_are_clean(self):
         self.assertIn("DECISIÓN ", self.decision_map)

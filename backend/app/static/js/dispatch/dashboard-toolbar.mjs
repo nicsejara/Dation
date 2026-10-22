@@ -1,6 +1,6 @@
 import {iconSvg} from "./decision-ui.mjs";
 import {createScope,trapFocus} from './lifecycle.mjs';
-import {api,esc} from './shared.mjs';
+import {esc} from './shared.mjs';
 import {bindDashboardActions} from './dashboard-actions.mjs';
 import {decisionStatusUi,shortRunId,solverStatusLabel} from './assignment-dashboard-selectors.mjs';
 import {downloadRunExport} from './export.mjs';
@@ -9,12 +9,12 @@ import {WORKFLOW_ACTION_CLASS,workflowActionLabel} from './workflow-action-bar.m
 const icon=name=>iconSvg(name,"dashboard-toolbar__icon");
 const actionLabel=(text,name)=>icon(name)+'<span>'+esc(text)+'</span>';
 
-function detailRows(run,caseActions,scheduling){
+function detailRows(run,scheduling){
   const result=run.result_json||{},metrics=result.scenarios?.selected?.metrics||{},solver=result.engine?.solver||{};
   return [
-    ['Corrida',run.id],['Decision Case',caseActions.decisionCase?.id||result.decision_case?.case_id],
+    ['Run ID',run.id],['Estado',run.status],['Creada',run.created_at],['Inicio de ejecución',run.started_at],['Finalizada',run.completed_at],
     ['Motor',[result.engine?.name||run.engine_name,result.engine?.version||run.engine_version].filter(Boolean).join(' ')],
-    ['Solver',solver.name||solver.method],['Estado solver',solverStatusLabel(solver.status)],
+    ['Solver',solver.name||solver.method],['Estado solver',solver.status?solverStatusLabel(solver.status):null],
     ...(scheduling?[
       ['Assignment fuente',result.inputs?.assignment?.run_id||run.upstream_run_id],
       ['Viajes',metrics.total_trips],['Vehículos',metrics.vehicles_used],
@@ -23,7 +23,7 @@ function detailRows(run,caseActions,scheduling){
     ['Huella',run.result_fingerprint||result.result_fingerprint],
     ['Órdenes',result.inputs?.orders?.filename||result.inputs?.orders?.label],
     ['Flota',result.inputs?.fleet?.label||result.inputs?.fleet?.filename],
-  ];
+  ].filter(([,value])=>value!==null&&value!==undefined&&value!=='');
 }
 
 export function renderDashboardToolbar(run,caseActions={},options={}){
@@ -31,18 +31,18 @@ export function renderDashboardToolbar(run,caseActions={},options={}){
   const hero=options.placement==='hero';
   const status=decisionStatusUi(caseActions.status);
   const title=scheduling?'Planificación de despachos':'Asignación de carga';
-  const approveLabel=scheduling?'Aprobar planificación':hero?'Aprobar decisión':'Aprobar asignación';
+  const approveLabel='Aprobar decisión';
   const drawerId='dashboard-run-details-'+crypto.randomUUID();
-  const rows=detailRows(run,caseActions,scheduling);
+  const rows=detailRows(run,scheduling);
   const toolbar='<header class="dashboard-toolbar'+(hero?(scheduling?' scheduling-hero__actions':' assignment-hero__actions'):'')+'" data-dashboard-toolbar'+(hero?' data-toolbar-placement="hero"':'')+'>'
     +'<div class="dashboard-toolbar__identity"><span class="dashboard-toolbar__eyebrow">DDA LOGÍSTICA · DECISIÓN '+(scheduling?'02':'01')+'</span>'
       +'<div class="dashboard-toolbar__title"><strong>'+title+'</strong>'
         +'<span class="dashboard-toolbar__badge '+esc(status.className)+'" data-status-badge>'+esc(status.label)+'</span></div>'
       +'<small>Corrida '+esc(shortRunId(run.id))+'</small></div>'
     +'<div class="dashboard-toolbar__tools" aria-label="Herramientas de la decisión">'
-      +(caseActions.onApprove?'<button type="button" data-approve-toolbar class="dashboard-toolbar__approve '+WORKFLOW_ACTION_CLASS+' d-button--primary" '+(caseActions.status==='approved'?(hero?'disabled':'hidden'):'')+'>'+(hero?actionLabel(caseActions.status==='approved'?(scheduling?'Planificación aprobada':'Decisión aprobada'):approveLabel,'checkCircle'):workflowActionLabel(approveLabel))+'</button>':'')
-      +(hero?'<button type="button" class="d-button d-button--secondary" data-rerun>'+actionLabel('Reconfigurar','refresh')+'</button>':'<button type="button" data-after-approve class="dashboard-toolbar__continue '+WORKFLOW_ACTION_CLASS+' d-button--primary" hidden>'+workflowActionLabel("Continuar con la siguiente decisión")+'</button>')
-      +(!hero&&caseActions.onMap?'<button type="button" data-dashboard-map class="dashboard-toolbar__map">'+actionLabel("Decision Map","map")+'</button>':'')
+      +(caseActions.onApprove&&caseActions.status!=='approved'?'<button type="button" data-approve-toolbar class="dashboard-toolbar__approve '+WORKFLOW_ACTION_CLASS+' d-button--primary">'+actionLabel(approveLabel,'checkCircle')+'</button>':'')
+      +'<button type="button" data-after-approve class="dashboard-toolbar__continue '+WORKFLOW_ACTION_CLASS+' d-button--primary" hidden></button>'
+      +'<button type="button" class="d-button d-button--secondary" data-rerun>'+actionLabel('Nueva corrida','refresh')+'</button>'
       +'<details class="dashboard-toolbar__menu" data-export-menu><summary aria-expanded="false">'+icon("download")+'<span>Exportar</span>'+icon("chevronDown")+'</summary>'
         +'<div class="dashboard-toolbar__menu-panel">'
           +'<button type="button" data-export-csv>'+icon("download")+'<div><strong>'+(scheduling?'Planificación CSV':'Asignación CSV')+'</strong><small>'+(scheduling?'Viajes, fechas y cargas':'Viajes, vehículos, órdenes y cargas')+'</small></div></button>'
@@ -50,19 +50,16 @@ export function renderDashboardToolbar(run,caseActions={},options={}){
         +'</div></details>'
       +'<details class="dashboard-toolbar__menu" data-more-menu><summary aria-expanded="false">'+icon("moreHorizontal")+'<span>Más</span>'+icon("chevronDown")+'</summary>'
         +'<div class="dashboard-toolbar__menu-panel">'
-          +(hero?'':'<button type="button" data-rerun>'+icon("refresh")+'<div><strong>Nueva corrida</strong><small>'+(scheduling?'Misma Assignment aprobada, otra configuración temporal':'Mismos datos, otra configuración')+'</small></div></button>')
-          +(hero&&caseActions.onMap?'<button type="button" data-dashboard-map>'+icon('map')+'<div><strong>Decision Map</strong><small>Volver a las decisiones del caso</small></div></button>':'')
-          +'<button type="button" data-new-decision>'+icon("plus")+'<div><strong>Nueva decisión</strong><small>Cargar otros datos y crear un nuevo Decision Case</small></div></button>'
           +'<button type="button" data-run-details aria-haspopup="dialog" aria-controls="'+drawerId+'">'+icon("info")+'<div><strong>Detalles de ejecución</strong><small>Motor, solver, archivos y huella</small></div></button>'
         +'</div></details>'
-    +'</div>'+(hero?'':'<p class="dashboard-toolbar__status" data-next-decision-status role="status"></p>')
+    +'</div><p class="dashboard-toolbar__status" data-next-decision-status role="status"></p>'
     +'<p class="dashboard-toolbar__error" data-approval-error role="alert" hidden></p></header>';
   const drawer='<div class="dashboard-toolbar__backdrop" data-run-drawer-backdrop hidden></div>'
     +'<aside class="dashboard-toolbar__drawer" data-run-drawer id="'+drawerId+'" hidden role="dialog" aria-modal="true" aria-labelledby="'+drawerId+'-title">'
       +'<header><div><span class="dashboard-toolbar__eyebrow">TRAZABILIDAD TÉCNICA</span><h2 id="'+drawerId+'-title">Detalles de ejecución</h2>'
         +'<p>Información persistida de esta corrida.</p></div><button type="button" data-close-drawer aria-label="Cerrar detalles de ejecución">'+icon("x")+'</button></header>'
       +'<dl class="dashboard-toolbar__details">'+rows.map(([key,value])=>'<div><dt>'+esc(key)+'</dt><dd>'+esc(value??'—')+'</dd></div>').join('')+'</dl>'
-      +'<div class="dashboard-toolbar__ai-runtime"><span>Servicio de IA</span><strong data-ai-details>Consultando…</strong></div></aside>';
+      +'</aside>';
   return {toolbar,drawer};
 }
 
@@ -138,8 +135,6 @@ export function bindDashboardToolbar(root,run,{onRerun,caseActions={}}={}){
     catch(error){if(scope.active){feedback.hidden=false;feedback.textContent=error.message||'No se pudo recuperar la configuración.';}}
     finally{if(scope.active)button.disabled=false;}
   });
-  const mapButton=root.querySelector('[data-dashboard-map]');
-  if(mapButton)scope.listen(mapButton,'click',()=>{closeMenus();caseActions.onMap();});
 
   async function exportFile(event,handler){
     const button=event.currentTarget,original=button.innerHTML;
@@ -151,14 +146,14 @@ export function bindDashboardToolbar(root,run,{onRerun,caseActions={}}={}){
   scope.listen(root.querySelector('[data-export-csv]'),'click',event=>exportFile(event,()=>downloadRunExport(run,'csv',{signal:scope.signal})));
   scope.listen(root.querySelector('[data-export-json]'),'click',event=>exportFile(event,()=>downloadRunExport(run,'json',{signal:scope.signal})));
 
-  const actions=bindDashboardActions(root,{...caseActions,onNewDecision:()=>{closeMenus();return caseActions.onNewDecision?.();}});
+  const actions=bindDashboardActions(root,caseActions);
   const approveButton=root.querySelector('[data-approve-toolbar]'),errorBox=root.querySelector('[data-approval-error]');
   const hero=toolbar.dataset.toolbarPlacement==='hero';
-  const approveButtons=[...root.querySelectorAll('[data-approve-toolbar],[data-approve-final]')];
+  const approveButtons=[...root.querySelectorAll('[data-approve-toolbar]')];
   const infeasible=Boolean(caseActions.approvalBlocked)||hero&&(run.result_json?.scenarios?.selected?.feasible===false||run.result_json?.scenarios?.selected?.solver?.status==='infeasible');
   approveButtons.forEach(button=>{button.disabled=caseActions.status==='approved'||infeasible;});
   async function approve(){
-    if(pendingApproval||!caseActions.onApprove||!scope.active||infeasible||hero&&caseActions.status==='approved')return;
+    if(!approveButton||pendingApproval||!caseActions.onApprove||!scope.active||infeasible||hero&&caseActions.status==='approved')return;
     pendingApproval=true;approveButtons.forEach(button=>button.disabled=true);errorBox.hidden=true;
     approveButton.setAttribute('aria-busy','true');
     const label=approveButton.innerHTML;approveButton.innerHTML=workflowActionLabel('Aprobando…');
@@ -184,8 +179,5 @@ export function bindDashboardToolbar(root,run,{onRerun,caseActions={}}={}){
     }finally{pendingApproval=false;approveButton.removeAttribute('aria-busy');}
   }
   approveButtons.forEach(button=>scope.listen(button,'click',approve));
-  api('/api/system/llm-status',{signal:scope.signal}).then(data=>{
-    if(scope.active)root.querySelector('[data-ai-details]').textContent=data.configured?[data.provider,data.model].filter(Boolean).join(' · '):'Sin configurar';
-  }).catch(()=>{if(scope.active)root.querySelector('[data-ai-details]').textContent='No disponible';});
   return {openDrawer,closeDrawer};
 }

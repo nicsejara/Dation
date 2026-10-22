@@ -157,7 +157,7 @@ class AssignmentDashboardPhase2Tests(unittest.TestCase):
 
     def test_approval_is_only_in_toolbar_and_approved_state_has_no_dead_disabled_cta(self):
         self.assertIn('Nueva corrida',self.toolbar)
-        self.assertIn('Aprobar asignación',self.toolbar)
+        self.assertIn('Aprobar decisión',self.toolbar)
         self.assertIn('approveButton.hidden=true',self.toolbar)
         self.assertIn('await actions.refresh()',self.toolbar)
         self.assertIn('caseActions.onApprovalComplete?.()',self.toolbar)

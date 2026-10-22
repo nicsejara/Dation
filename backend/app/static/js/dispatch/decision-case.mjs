@@ -1,4 +1,4 @@
-import {resolveNodeDestination} from './decision-target.mjs';
+import {configurationAvailable} from './decision-target.mjs';
 export const NODE_IDS = [
   "logistics_assignment",
   "logistics_scheduling",
@@ -215,20 +215,19 @@ export function nextDecisionId(nodeId){
   return index>=0?NODE_IDS[index+1]||null:null;
 }
 
-export function continuationState(current,nodeId,runId,readiness,metadata){
+/** Continuation uses current approval, existing data readiness and the next Owner. */
+export function continuationState(current,nodeId,runId,readiness,metadata,workflow){
   const node=current?.nodes?.[nodeId];
   if(node?.status!==STATUS.APPROVED||String(node.approved_run_id||node.run_id)!==String(runId))return null;
-  const implemented=NODE_IDS.filter(id=>metadata[id]?.implemented);
-  if(nodeId===implemented.at(-1)&&implemented.every(id=>current.nodes[id]?.status===STATUS.APPROVED))return {state:'completed',label:'Volver a Decision Center',message:`Decisión aprobada · Case completado · ${implemented.length}/${implemented.length} aprobadas`};
-  const next=implemented[implemented.indexOf(nodeId)+1];
-  if(!next)return {state:'finished',message:'No hay otra decisión pendiente en este caso.'};
-  const meta=metadata[next];
-  if(!meta?.implemented)return {state:'unavailable',nodeId:next,message:'Decisión aprobada. La siguiente etapa todavía no está disponible.'};
-  const nextNode=deriveDecisionNodes(current,readiness)[next];
-  const target=resolveNodeDestination(next,nextNode);
-  if(target)return {state:nextNode.status===STATUS.APPROVED?'finished':nextNode.status,nodeId:next,label:'Configurar siguiente decisión',target};
-  const evidence=readinessById(readiness)[next];
-  if(!evidence?.data_ready)return {state:'needs_data',nodeId:next,message:'Faltan datos para '+meta.label+': '+(evidence?.missing||[]).map(item=>item.label||item.column).filter(Boolean).join(', ')+'. Podés iniciar una nueva decisión con un Data Pack completo.'};
-  if(nextNode?.status!==STATUS.AVAILABLE)return {state:nextNode?.status||'unavailable',nodeId:next,message:meta.label+(nextNode?.status===STATUS.RUNNING?' se está ejecutando.':nextNode?.status===STATUS.REVIEW?' tiene una corrida para revisar.':' requiere una nueva corrida.')+' Abrí su análisis en la barra de decisiones.'};
-  return {state:'available',nodeId:next,label:'Continuar con '+(next==='logistics_scheduling'?'Planificación':meta.short)+' →'};
+  const implemented=NODE_IDS.filter(id=>metadata[id]?.implemented),index=implemented.indexOf(nodeId);
+  if(index<0)return null;
+  if(index===implemented.length-1&&implemented.every(id=>current.nodes[id]?.status===STATUS.APPROVED))return {state:'completed',label:'Volver a Decision Center',message:'✓ DECISIÓN APROBADA · ✓ CASE COMPLETADO'};
+  const next=implemented[index+1];if(!next)return null;
+  const meta=metadata[next],sequence=Number(meta.index)||NODE_IDS.indexOf(next)+1;
+  const owner=workflow?.stages?.[next],hasOwner=Boolean(owner?.owner&&owner.owner_eligible!==false);
+  const derived={...current,nodes:deriveDecisionNodes(current,readiness)};
+  const canConfigure=hasOwner&&configurationAvailable(next,derived,workflow);
+  return {state:!hasOwner?'needs_owner':canConfigure?'available':'needs_data',nodeId:next,
+    label:!hasOwner?'Asignar Decision Owner · D'+sequence+' '+meta.label:canConfigure?'Configurar D'+sequence+' · '+meta.label:'Revisar requisitos · D'+sequence+' '+meta.label,
+    target:{view:canConfigure?'logistics-config':'logistics-map',node_id:next,run_id:null}};
 }
