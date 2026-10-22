@@ -6,13 +6,13 @@ ROOT = Path(__file__).resolve().parents[1] / "app" / "static"
 
 
 class TraceabilityPhase3Contracts(unittest.TestCase):
-    def test_landing_uses_persisted_case_selector(self):
+    def test_landing_opens_global_center_filtered_to_logistics(self):
         source = (ROOT / "js" / "dda-logistics-landing.js").read_text(encoding="utf-8")
         self.assertIn("traceability-controller.mjs", source)
-        self.assertIn("listDecisionCases", source)
-        self.assertIn("openDecisionMap", source)
-        self.assertIn("dation:cases-ready", source)
-        self.assertIn("openDecisionMap({trigger:map})", source)
+        self.assertIn("openDecisionCenter({dda:'logistics'})", source)
+        self.assertIn("startNewDecision", source)
+        self.assertNotIn("listDecisionCases", source)
+        self.assertNotIn("openDecisionMap({trigger:map})", source)
 
     def test_controller_restores_data_pack_before_guarded_views(self):
         source = (ROOT / "js" / "dispatch" / "traceability-controller.mjs").read_text(encoding="utf-8")
