@@ -361,7 +361,7 @@ export async function mountUploadScreen(
 
     if(result.enabled&&!caseAttributesReady(state)){result.enabled=false;result.kind='attributes';result.message='Aplicá los atributos del Case antes de continuar.';}
     if(result.enabled&&!caseDataOwnerReady(state)){result.enabled=false;result.kind='responsibility';result.message='Aplicá la asignación de Data Owner antes de continuar.';}
-    const responsibility=responsibilityProblem(state.workflow,'data_preparation','data');
+    const responsibility=state.appliedPreparation?(caseDataOwnerReady(state)?null:'Aplicá un Data Owner activo y elegible antes de continuar.'):responsibilityProblem(state.workflow,'data_preparation','data');
     if(result.enabled&&responsibility){result.enabled=false;result.kind='responsibility';result.message=responsibility;}
     actionBar.update(result, context);
     if((responsibility||['attributes','responsibility'].includes(result.kind))&&state.preflight?.valid){actionBar.button.firstElementChild.textContent='Seleccioná tu decisión';}

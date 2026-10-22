@@ -98,6 +98,7 @@ const state={
   identityDirty:Boolean(saved.identityDirty),
   dataOwnerDraft:saved.dataOwnerDraft?{...saved.dataOwnerDraft,open:false}:null,
   attributesApplied:Boolean(saved.attributesApplied),
+  appliedPreparation:saved.appliedPreparation||null,
   orders:saved.orders||null,
   fleet:saved.fleet||null,
   dimensions:restoredDimensions.length?restoredDimensions:[...CORE_DIMENSIONS],
@@ -143,6 +144,7 @@ function persist(){
       identityDirty:state.identityDirty,
       dataOwnerDraft:state.dataOwnerDraft,
       attributesApplied:state.attributesApplied,
+      appliedPreparation:state.appliedPreparation,
       orders:state.orders,
       fleet:state.fleet,
       dimensions:state.dimensions,
@@ -210,7 +212,7 @@ function syncDimensionsToEvidence({initialize=false}={}){
     ?normalizeWeights(state.weights,state.dimensions)
     :presetWeights(state.objective,state.dimensions);
 }
-function ready(){return !!(state.available&&state.orders&&state.fleet&&state.preflight?.valid&&caseAttributesReady(state)&&caseDataOwnerReady(state)&&!responsibilityProblem(state.workflow,'data_preparation','data'));}
+function ready(){return !!(state.available&&state.orders&&state.fleet&&state.preflight?.valid&&caseAttributesReady(state)&&caseDataOwnerReady(state)&&(state.appliedPreparation||!responsibilityProblem(state.workflow,'data_preparation','data')));}
 function pendingWorkflow(){
   const role=window.dationSession?.identity?.membership?.access_role;
   return {gates_enforced:true,stages:{},pending:true,can_assign:role==='admin',can_prepare:['admin','operator'].includes(role)};
@@ -250,6 +252,7 @@ function ensureDecisionCase(){
     if(previous.persisted)state.forkedFrom=previous.id;
     transitionCaseId=state.decisionCase.id;
     state.dataOwnerDraft=null;
+    if(previous.persisted)state.appliedPreparation=null;
     state.workflow=pendingWorkflow();state.caseContext=null;
     state.run=null;
     resetAssignmentConfiguration();
@@ -280,7 +283,7 @@ async function startNewDecision(inputs=[]){
   transitionCaseId=null;
   saveDraft();
   resetAssignmentConfiguration();
-  Object.assign(state,{caseIdentity:null,identityDirty:false,dataOwnerDraft:null,attributesApplied:false,forkedFrom:null,orders:null,fleet:null,decisionCase:null,workflow:null,caseContext:null,run:null,activeNode:null,
+  Object.assign(state,{caseIdentity:null,identityDirty:false,dataOwnerDraft:null,attributesApplied:false,appliedPreparation:null,forkedFrom:null,orders:null,fleet:null,decisionCase:null,workflow:null,caseContext:null,run:null,activeNode:null,
     preflight:null,configPreview:null,configured:false,decisions:{},schedulingUseDueDates:true});
   if(Array.isArray(inputs))for(const dataset of inputs){if(['orders','fleet'].includes(dataset?.dataset_type))state[dataset.dataset_type]=dataset;}
   decisionContext(null);
@@ -299,6 +302,7 @@ async function dashboardContinuation(run,nodeId,generation){
 
 function urlRun(id,schema='assignment_v1',caseId=state.decisionCase?.id||null){resource={view:'decision-dashboard',caseId,nodeId:schema==='scheduling_v1'?'logistics_scheduling':'logistics_assignment',runId:id};history.replaceState(null,'',resourceUrl(location.href,resource));}
 
+let preparationPromotion=null;
 async function preflight(){
   const generation=routeGeneration;
   state.preflight=null;
@@ -316,6 +320,10 @@ async function preflight(){
   ensureDecisionCase();
   if(result.valid&&state.forkedFrom&&!state.decisionCase.persisted)await ensurePersistedCase(generation);
   if(result.valid&&state.decisionCase.persisted&&!state.workflow)await hydrateCase(state.decisionCase.id,generation);
+  if(result.valid&&state.appliedPreparation){
+    preparationPromotion ||= ensurePersistedCase(generation).finally(()=>{preparationPromotion=null;});
+    await preparationPromotion;
+  }
   if(generation!==routeGeneration)return;
   window.dationSetDataReady(ready());
   persist();
@@ -329,16 +337,20 @@ async function loadData(){
       persist,
       runPreflight:preflight,
       saveIdentity:async()=>{
-        if(!state.preflight?.valid)throw new Error('Cargá y validá Órdenes y Flota antes de aplicar.');
+        if(!state.decisionCase?.persisted&&!state.preflight?.valid){
+          const draft=state.dataOwnerDraft,previous=state.appliedPreparation;
+          state.appliedPreparation={identity:{...state.caseIdentity},owner:draft?.dirty?draft.owner:previous?.owner||null,ownerEligible:draft?.dirty?Boolean(draft.ownerEligible):Boolean(previous?.ownerEligible)};
+          state.attributesApplied=true;state.identityDirty=false;state.dataOwnerDraft=null;persist();return;
+        }
         const identity={...state.caseIdentity},draft=state.dataOwnerDraft,expectedCase=state.decisionCase?.id,expectedSignature=inputSignature(state.orders,state.fleet);
         await ensurePersistedCase(generation,false,true);
         const current=state.decisionCase,signature=current?.signature;
-        if(generation!==routeGeneration||!current?.persisted||current.id!==expectedCase||current.signature!==expectedSignature)throw new Error('La etapa cambió. Volvé a aplicar los atributos.');
+        if(generation!==routeGeneration||!current?.persisted||current.id!==expectedCase||inputSignature(state.orders,state.fleet)!==expectedSignature)throw new Error('La etapa cambió. Volvé a aplicar los atributos.');
         await api('/api/platform/decisions/'+current.id+'/attributes',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({expected_updated_at:state.caseVersion,...identity,
           expected_owner_updated_at:draft&&Object.hasOwn(draft,'version')?draft.version:state.workflow?.stages?.data_owner?.updated_at??null,
           ...(draft?.dirty?{data_owner_user_id:draft.value||null}:{})}),signal:routeController?.signal});
         if(generation!==routeGeneration||state.decisionCase?.id!==current.id||inputSignature(state.orders,state.fleet)!==signature)throw new Error('El Data Pack cambió. Aplicá los atributos del nuevo Case.');
-        state.identityDirty=false;state.dataOwnerDraft=null;
+        state.identityDirty=false;state.dataOwnerDraft=null;state.appliedPreparation=null;
         await hydrateCase(current.id,generation,signature);persist();
       },
       onNext:async()=>{
@@ -774,7 +786,7 @@ for(const [key,view]of [['data','logistics-data'],['map','logistics-map'],['conf
 async function ensurePersistedCase(generation=routeGeneration,applyIdentity=false,deferIdentity=false){
   const current=state.decisionCase;if(!current)return;
   if(!current.persisted){
-    await post('/api/decision-cases',{id:current.id,orders_dataset_id:state.orders.id,fleet_dataset_id:state.fleet.id,state:current,...((!deferIdentity&&(applyIdentity||caseAttributesReady(state)))?state.caseIdentity||{}:{})},{signal:routeController?.signal});
+    await post('/api/decision-cases',{id:current.id,orders_dataset_id:state.orders.id,fleet_dataset_id:state.fleet.id,state:current,...((!deferIdentity&&!state.appliedPreparation&&(applyIdentity||caseAttributesReady(state)))?state.caseIdentity||{}:{})},{signal:routeController?.signal});
     if(generation!==routeGeneration||state.decisionCase?.id!==current.id||inputSignature(state.orders,state.fleet)!==current.signature)return;
     await hydrateCase(current.id,generation,current.signature);
     if(generation!==routeGeneration||state.decisionCase?.id!==current.id||inputSignature(state.orders,state.fleet)!==current.signature)return;
@@ -782,6 +794,15 @@ async function ensurePersistedCase(generation=routeGeneration,applyIdentity=fals
     resource={...resource,caseId:current.id};history.replaceState(null,'',resourceUrl(location.href,resource));
   }else if(!state.workflow||state.workflow.case_id!==current.id){
     await hydrateCase(current.id,generation);
+  }
+  const prepared=state.appliedPreparation;
+  if(prepared&&generation===routeGeneration&&state.decisionCase?.id===current.id){
+    const ownerId=prepared.owner?.id||null,previousOwner=state.workflow?.stages?.data_owner;
+    await api('/api/platform/decisions/'+current.id+'/attributes',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({expected_updated_at:state.caseVersion,...prepared.identity,
+      expected_owner_updated_at:previousOwner?.updated_at||null,...(ownerId!==(previousOwner?.owner?.id||null)?{data_owner_user_id:ownerId}:{})}),signal:routeController?.signal});
+    if(generation!==routeGeneration||state.decisionCase?.id!==current.id||state.appliedPreparation!==prepared)return;
+    state.appliedPreparation=null;
+    await hydrateCase(current.id,generation,current.signature);
   }
   if(applyIdentity&&state.caseIdentity&&generation===routeGeneration){
     const identity={...state.caseIdentity};
@@ -796,9 +817,9 @@ async function hydrateCase(caseId,generation=routeGeneration,expectedInputs=null
   if(expectedInputs&&(state.decisionCase?.id!==caseId||inputSignature(state.orders,state.fleet)!==expectedInputs))return;
   if(String(item.decision_case?.id)!==String(caseId)||String(item.orders?.id)!==String(item.decision_case?.inputs?.orders_dataset_id||item.case?.orders_dataset_id)||String(item.fleet?.id)!==String(item.decision_case?.inputs?.fleet_dataset_id||item.case?.fleet_dataset_id))throw new Error('El Decision Case no coincide con su Data Pack.');
   if(state.decisionCase?.id!==caseId){saveDraft();resetAssignmentConfiguration();Object.assign(state,cleanDraft(drafts[caseId]));state.preflight=null;state.configPreview=null;state.run=null;transitionCaseId=null;}
-  if(state.decisionCase?.id!==caseId)state.identityDirty=false;
-  state.attributesApplied=Boolean(item.case.attributes_applied_at);
-  if(!state.identityDirty)state.caseIdentity={label:item.case.label||'',category:item.case.category||null,description:item.case.description||null};
+  if(state.decisionCase?.id!==caseId){state.identityDirty=false;state.appliedPreparation=null;}
+  state.attributesApplied=Boolean(state.appliedPreparation||item.case.attributes_applied_at);
+  if(!state.identityDirty&&!state.appliedPreparation)state.caseIdentity={label:item.case.label||'',category:item.case.category||null,description:item.case.description||null};
   state.caseVersion=item.case.updated_at;
   state.orders=item.orders;state.fleet=item.fleet;state.decisionCase={...item.decision_case,status:item.case.status,label:item.case.label,category:item.case.category,description:item.case.description,attributes_applied_at:item.case.attributes_applied_at,collaboration:item.collaboration,persisted:true};state.workflow=item.workflow_responsibilities||null;state.caseContext=caseContext({...item.case,context:item.context});persist();return item;
 }

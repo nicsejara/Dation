@@ -50,12 +50,13 @@ export function mountResponsibilitySelector(root,{caseId,stageKey,field='owner',
   if(!draft.open)draft.version=current?.stages?.[stageKey]?.updated_at||null;
   draft.open=true;
   controller?.abort();controller=new AbortController();const own=++generation,signal=controller.signal;
-  let saving=false,loaded=false;const initial=current?.stages?.[stageKey]?.[field]?.id||'',editVersion=draft.version;
+  let saving=false,loaded=false,candidates=[];const initial=current?.stages?.[stageKey]?.[field]?.id||'',editVersion=draft.version;
   const panel=el('div',undefined,'workflow-responsibility__editor'),label=el('label',type.label,'d-label'),select=el('select',undefined,'d-input');select.id=id+'-choice';label.htmlFor=select.id;
   const message=el('p','Cargando personas del Equipo…','d-metadata'),error=el('p');message.id=id+'-status';message.role='status';error.role='alert';select.setAttribute('aria-describedby',message.id);
   const actions=el('div',undefined,'workflow-context-actions workflow-responsibility__actions'),save=button('Guardar',commit),cancel=button('Cancelar',()=>{if(!saving){draft.open=false;delete draft.value;if(onCancel)onCancel();else{render();root.querySelector('button')?.focus();}}});save.classList.replace('d-button--secondary','d-button--primary');save.disabled=true;actions.append(cancel,save);panel.append(label,select,message,error);if(!deferSave)panel.append(actions);root.append(panel);const trigger=root.querySelector('button');if(trigger)trigger.hidden=true;
   function ready(){save.disabled=!loaded||saving||!canSave()||select.value===initial;}
-  select.addEventListener('change',()=>{draft.value=select.value;if(deferSave){draft.dirty=select.value!==initial;onChanged?.();}ready();});
+  function selection(){draft.value=select.value;if(deferSave){const person=candidates.find(p=>p.user_id===select.value);draft.owner=person?{...person,id:person.user_id}:null;draft.ownerEligible=Boolean(person);draft.dirty=select.value!==initial;onChanged?.();}ready();}
+  select.addEventListener('change',selection);
   async function load(){
    loaded=false;select.disabled=true;save.disabled=true;error.replaceChildren();
    try{
@@ -70,7 +71,7 @@ export function mountResponsibilitySelector(root,{caseId,stageKey,field='owner',
     select.replaceChildren();const empty=el('option','Sin asignar');empty.value='';select.append(empty);
     for(const person of people){const option=el('option',person.name+' · '+person.email);option.value=person.user_id;select.append(option);}
     if(initial&&!people.some(p=>p.user_id===initial)){const previous=el('option',(current.stages[stageKey][field].name||'Asignación anterior')+' (no elegible)');previous.value=initial;previous.disabled=true;select.append(previous);}
-    select.value=draft.value??initial;loaded=true;select.disabled=false;ready();
+    select.value=draft.value??initial;candidates=people;loaded=true;select.disabled=false;if(deferSave)selection();else ready();
     message.textContent=deferSave?(people.length?'Se guarda junto con los atributos al aplicar.':'No hay personas elegibles. Revisá las responsabilidades en Equipo.'):!canSave()?'Cargá y validá Órdenes y Flota antes de guardar esta asignación.':people.length?'Personas activas del Equipo con responsabilidad '+type.role+'.':'No hay personas elegibles. Revisá las responsabilidades en Equipo.';
     if(focus||draft.restoreFocus)select.focus();draft.restoreFocus=false;
    }catch(exc){if(scope.active&&own===generation&&!signal.aborted){message.textContent='';error.append(document.createTextNode(exc.message),button('Reintentar',load));}}
