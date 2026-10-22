@@ -11,6 +11,7 @@ export function readResource(url){
   const pathView=Object.entries(PLATFORM_PATHS).find(([,path])=>path===parsed.pathname.replace(/\/$/,''))?.[0];
   if(!q.has('view')&&!pathView&&parsed.pathname.startsWith('/app/'))throw new Error('La pantalla solicitada no existe.');
   const resource={view:q.get('view')||(q.has('run_id')?'decision-dashboard':pathView||'overview'),caseId:q.get('case_id'),nodeId:q.get('node_id'),runId:q.get('run_id')};
+  if(resource.view==='inicio')resource.view='platform-home';
   if(!resource.nodeId&&q.get('dda')==='scheduling_v1')resource.nodeId='logistics_scheduling';
   if(!resource.nodeId&&resource.runId)resource.nodeId='logistics_assignment';
   if(!VIEWS.includes(resource.view))throw new Error('La pantalla solicitada no existe.');

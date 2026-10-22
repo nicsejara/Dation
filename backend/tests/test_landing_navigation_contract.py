@@ -39,15 +39,13 @@ class LandingNavigationContractTests(unittest.TestCase):
         ):
             self.assertNotIn(executable_legacy, self.landing)
 
-    def test_active_case_cta_goes_to_real_decision_map(self):
+    def test_overview_ctas_start_case_or_open_filtered_global_center(self):
         for marker in (
-            "activeCase",
             "data-start-new-decision",
             "data-open-decision-map",
             "syncHeroActions",
             "startNewDecision",
-            "navigate('logistics-map')",
-            "setMapAvailability",
+            "openDecisionCenter({dda:'logistics'})",
         ):
             self.assertIn(marker, self.landing)
 

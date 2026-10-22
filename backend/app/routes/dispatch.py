@@ -58,7 +58,9 @@ class DecisionCaseRef(BaseModel):
     node_id: Literal["logistics_assignment", "logistics_scheduling"]
 
 
-class DecisionCaseCreate(BaseModel):
+from app.models.case_identity import CaseIdentity
+
+class DecisionCaseCreate(CaseIdentity):
     model_config = ConfigDict(extra="forbid")
 
     id: UUID
@@ -220,6 +222,8 @@ async def create_decision_case(payload: DecisionCaseCreate):
             str(payload.orders_dataset_id),
             str(payload.fleet_dataset_id),
             state=payload.state,
+            **({'identity':payload.model_dump(include={'label','category','description'},exclude_unset=True)}
+               if payload.model_fields_set.intersection({'label','category','description'}) else {}),
         )
     )
     return {"case": case}

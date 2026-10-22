@@ -37,7 +37,10 @@ export function mountWorkspaceHome(root,getIdentity){
  const center=heroCta(link('Ir a Decision Center','platform-decisions'),'link');ctas.append(catalog,center);
  copy.append(workspace,title,el('p','Explorá los Decision Data Assets disponibles y convertí tus datos en decisiones trazables.','d-page-description'),ctas);
  const art=el('img',undefined,'platform-home__hero-art');art.src='/static/assets/workspace-home-hero.svg';art.alt='';art.width=420;art.height=280;header.append(copy,art);
- const content=el('div',undefined,'platform-home__content');root.replaceChildren(header,content);
+ const content=el('div',undefined,'platform-home__content');const ddaCatalog=document.querySelector('[data-home-dda-catalog]');
+ root.replaceChildren(header,...(ddaCatalog?[ddaCatalog]:[]),content);
+ catalog.href='#dation-dda-title';catalog.removeAttribute('data-home-resource');
+ scope.listen(catalog,'click',event=>{event.preventDefault();ddaCatalog?.scrollIntoView({block:'start',behavior:'smooth'});});
  function renderHeader(){const identity=getIdentity();workspace.textContent=identity.workspace.name;title.textContent=greeting(identity);}
  function render(data){
   const identity=getIdentity(),grid=el('div',undefined,'platform-home__grid'),main=el('div',undefined,'platform-home__main'),side=el('div',undefined,'platform-home__side');

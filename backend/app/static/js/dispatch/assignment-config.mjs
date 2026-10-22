@@ -1,4 +1,4 @@
-import {mountWorkflowContext} from './workflow-context.mjs';
+import {mountDecisionViews} from './case-navigation.mjs';
 import {responsibilityProblem,executionPermission} from './workflow-responsibility.mjs';
 import {createScope} from "./lifecycle.mjs";
 import {mountFilterCollapse} from "./assignment-filter-collapse.mjs";
@@ -622,7 +622,7 @@ export async function mountAssignmentConfig(root,context){
 
   function bind(){
     mountConfigActionBar(root);
-    mountWorkflowContext(root,{state,stageKey:'logistics_assignment',onSaved:()=>rerender()});
+    mountDecisionViews(root,{state,nodeId:'logistics_assignment',view:'logistics-config'});
     const copy=root.querySelector("[data-config-copy-case]");
     if(copy)copy.onclick=async()=>{
       const feedback=root.querySelector("[data-config-copy-feedback]");

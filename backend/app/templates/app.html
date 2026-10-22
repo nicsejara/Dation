@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="/static/css/dispatch.css?v=dark-data-pack-v1">
   <link rel="stylesheet" href="/static/css/dda-logistics-upload.css?v=dark-data-pack-v1">
   <link rel="stylesheet" href="/static/css/dispatch-lifecycle.css?v=dark-foundation-v1">
+  <link rel="stylesheet" href="/static/css/workflow-context.css?v=optimized-responsibilities">
   <link rel="stylesheet" href="/static/css/dation-design-system.css?v=dark-data-pack-v1">
   <link rel="stylesheet" href="/static/css/platform-components.css?v=platform-foundation-v1">
   <link rel="stylesheet" href="/static/css/platform-auth.css">
@@ -42,7 +43,6 @@
       <nav class="nav platform-global-nav" aria-label="Navegación principal">
         <a class="nav-item" href="/app" data-platform-view="platform-home" aria-label="Inicio"><span class="nav-icon" aria-hidden="true">⌂</span><span class="platform-nav-label">Inicio</span></a>
         <span class="sidebar-label">Decision Intelligence</span>
-        <a class="nav-item" href="/app/ddas" data-platform-view="inicio" aria-label="Decision Data Assets"><span class="nav-icon" aria-hidden="true">▦</span><span class="platform-nav-label">Decision Data Assets</span></a>
         <a class="nav-item" href="/app/decisions" data-platform-view="platform-decisions" aria-label="Decision Center"><span class="nav-icon" aria-hidden="true">◎</span><span class="platform-nav-label">Decision Center</span></a>
         <span class="sidebar-label">Datos</span>
         <a class="nav-item" href="/app/data" data-platform-view="platform-data" aria-label="Datos"><span class="nav-icon" aria-hidden="true">▤</span><span class="platform-nav-label">Datos</span></a>
@@ -218,7 +218,7 @@
                     type="button"
                     data-start-new-decision
                   >
-                    Iniciar nueva decisión <span aria-hidden="true">→</span>
+                    Iniciar nuevo Decision Case <span aria-hidden="true">→</span>
                   </button>
                   <button
                     class="button d-button d-button--secondary button--landing-secondary"
@@ -228,7 +228,7 @@
                     aria-disabled="true"
                     title="Todavía no hay Decision Cases para revisar"
                   >
-                    Ir al Decision Map <span aria-hidden="true">→</span>
+                    Ver mis casos de Logística <span aria-hidden="true">→</span>
                   </button>
                 </div>
               </div>
@@ -1272,6 +1272,7 @@
       }
 
       window.dationRenderJourney = function (view) {
+        if (window.dationRenderContextNavigation) return window.dationRenderContextNavigation();
         var container = document.getElementById('journey-nav');
 
         if (!container) {
@@ -1324,137 +1325,8 @@
       };
 
       window.dationRenderWorkspaceNav = function (view) {
-        var shell = document.getElementById('dda-workspace-nav-shell');
-        var container = document.getElementById('dda-workspace-nav');
-
-        if (!shell || !container) {
-          return;
-        }
-
         currentView = view || currentView;
-        var visible = isDdaFlowView(currentView) && currentView !== 'decision-dashboard';
-        shell.hidden = !visible;
-        container.innerHTML = '';
-
-        if (!visible) {
-          return;
-        }
-
-        var selected = Boolean(decisionSelection.id);
-        var runReady = Boolean(selected && decisionSelection.hasRun);
-        var configContext = (
-          selected && currentView === 'logistics-config'
-        )
-          ? decisionSelection.label
-          : null;
-        var dashboardContext = (
-          selected && currentView === 'decision-dashboard'
-        )
-          ? decisionSelection.label
-          : null;
-
-        var dataStep = workflowStep('data', {
-          id: 'data',
-          number: 1,
-          label: 'Carga de datos',
-          view: 'logistics-data'
-        });
-        var mapStep = workflowStep('map', {
-          id: 'map',
-          number: 2,
-          label: 'Mapa de decisiones',
-          view: 'logistics-map'
-        });
-        var configStep = workflowStep('config', {
-          id: 'config',
-          number: 3,
-          label: 'Configurar decisión',
-          view: 'logistics-config'
-        });
-        var dashboardStep = workflowStep('dashboard', {
-          id: 'dashboard',
-          number: 4,
-          label: 'Dashboard',
-          view: 'decision-dashboard'
-        });
-
-        var steps = [
-          {
-            number: dataStep.number,
-            label: dataStep.label,
-            view: dataStep.view,
-            disabled: false,
-            completed: dataReady,
-            tooltip: currentView === 'logistics-map'
-              ? 'Volver a Carga de datos'
-              : null,
-            onClick: function () {
-              window.dationNavigate(dataStep.view);
-            }
-          },
-          {
-            number: mapStep.number,
-            label: mapStep.label,
-            view: mapStep.view,
-            disabled: !dataReady,
-            completed: selected,
-            onClick: function () {
-              window.dationNavigate(mapStep.view);
-            }
-          },
-          {
-            number: configStep.number,
-            label: configStep.label,
-            view: configStep.view,
-            disabled: !dataReady || !selected,
-            completed: runReady,
-            context: configContext,
-            tooltip: !selected
-              ? 'Elegí una decisión para configurarla'
-              : null,
-            onClick: function () {
-              window.dationNavigate(configStep.view);
-            }
-          },
-          {
-            number: dashboardStep.number,
-            label: dashboardStep.label,
-            view: dashboardStep.view,
-            disabled: !runReady,
-            completed: false,
-            context: dashboardContext,
-            onClick: function () {
-              if (
-                window.DationDispatch
-                && typeof window.DationDispatch.openActiveDecisionResult === 'function'
-              ) {
-                window.DationDispatch.openActiveDecisionResult();
-                return;
-              }
-              window.dationNavigate(dashboardStep.view);
-            }
-          }
-        ];
-
-        steps.forEach(function (step, index) {
-          container.appendChild(
-            workspaceStep(step.number, step.label, {
-              current: currentView === step.view,
-              completed: step.completed,
-              disabled: step.disabled,
-              context: step.context,
-              tooltip: step.tooltip,
-              onClick: step.onClick
-            })
-          );
-
-          if (index < steps.length - 1) {
-            var connector = document.createElement('span');
-            connector.className = 'dda-workspace-nav__connector';
-            connector.setAttribute('aria-hidden', 'true');
-            container.appendChild(connector);
-          }
-        });
+        window.dationRenderCaseFlow?.(currentView);
       };
 
       window.dationSetDataReady = function (ready) {

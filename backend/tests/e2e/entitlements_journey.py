@@ -19,7 +19,7 @@ async def main():
    page=await browser.new_page(viewport={'width':1440,'height':1000},reduced_motion='reduce');page.set_default_timeout(15000);page.on('pageerror',lambda error:errors.append(str(error)))
    await page.goto(BASE+'/login');await page.get_by_label('Email',exact=True).fill('user-1@example.test');await page.get_by_label('Contraseña',exact=True).fill('dispatch-e2e-private');await page.get_by_role('button',name='Ingresar',exact=True).click()
    await page.locator('[data-platform-home] h1').wait_for()
-   await page.locator('.nav [data-platform-view=inicio]').click();await page.locator('[data-dda-id=logistics] button').click();await page.locator('.dda-landing__hero').wait_for()
+   await page.locator('.nav [data-platform-view=platform-home]').click();await page.locator('[data-dda-id=logistics] button').click();await page.locator('.dda-landing__hero').wait_for()
    await grant('disabled')
    # The server denies the still-valid JWT; fetch refreshes identity without replay.
    status=await page.evaluate("async()=> (await fetch('/api/decision-cases')).status");assert status==403
@@ -35,7 +35,7 @@ async def main():
     probe=await page.evaluate("""() => ({width:innerWidth,scroll:document.documentElement.scrollWidth,nodes:[...document.body.querySelectorAll('*')].filter(n=>n.getClientRects().length&&n.getBoundingClientRect().right>innerWidth+1).slice(0,12).map(n=>({tag:n.tagName,class:n.className,right:n.getBoundingClientRect().right,text:n.textContent.slice(0,80)}))})""");assert probe['scroll']<=width+1,probe
    await page.locator('.nav [data-platform-view=platform-home]').click();await page.locator('[data-platform-home] .platform-home__quick-link').first.wait_for();assert await page.locator('[data-platform-home]').get_by_role('link',name='Explorar DDA',exact=True).is_visible();assert await page.locator('.asset-item').is_disabled()
    await grant('enabled');await page.evaluate('window.dationSession.refresh()')
-   await page.locator('.nav [data-platform-view=inicio]').click();await root.locator('#home-open-logistics').click();await page.locator('.dda-landing__hero').wait_for()
+   await page.locator('.nav [data-platform-view=platform-home]').click();await root.locator('#home-open-logistics').click();await page.locator('.dda-landing__hero').wait_for()
    assert errors==[],errors
    await browser.close()
  finally:await grant('enabled')

@@ -54,7 +54,7 @@ const partialReadiness = {
   ],
 };
 
-const metadata={logistics_scheduling:{implemented:true,label:'Planificación',short:'Planificación'},logistics_final_assignment:{implemented:false,label:'Asignación final'}};
+const metadata={logistics_assignment:{implemented:true},logistics_scheduling:{implemented:true,label:'Planificación',short:'Planificación'},logistics_final_assignment:{implemented:false,label:'Asignación final'}};
 test('continuation uses actual approval and readiness without changing the case',()=>{
   const current=transitionNode(createDecisionCase('case',orders,fleet),'logistics_assignment',STATUS.APPROVED,{run_id:'approved',approved_run_id:'approved'});
   const before=structuredClone(current);
@@ -68,7 +68,7 @@ test('approved downstream and unimplemented decisions do not open an empty confi
   current=transitionNode(current,'logistics_scheduling',STATUS.APPROVED,{run_id:'s',approved_run_id:'s'});
   assert.equal(continuationState(current,'logistics_assignment','a',fullReadiness,metadata).state,'finished');
   assert.equal(continuationState(current,'logistics_assignment','a',fullReadiness,metadata).target.run_id,'s');
-  assert.equal(continuationState(current,'logistics_scheduling','s',fullReadiness,metadata).state,'unavailable');
+  assert.equal(continuationState(current,'logistics_scheduling','s',fullReadiness,metadata).state,'completed');
   assert.equal(nextDecisionId('unknown'),null);assert.equal(nextDecisionId('logistics_final_assignment'),null);
 });
 test('running or review next nodes open through the existing-run rail, never through a new config',()=>{

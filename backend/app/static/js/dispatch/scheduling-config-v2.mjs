@@ -1,4 +1,4 @@
-import {mountWorkflowContext} from './workflow-context.mjs';
+import {mountDecisionViews} from './case-navigation.mjs';
 import {responsibilityProblem,executionPermission} from './workflow-responsibility.mjs';
 import {createScope,scopeFor} from "./lifecycle.mjs";
 import {ensureDecisionCaseStyles} from "./styles.mjs";
@@ -536,7 +536,7 @@ function bind(root,context){
     bind(root,{...context,config});
   };
 
-  mountWorkflowContext(root,{state,stageKey:'logistics_scheduling',onSaved:rerender});
+  mountDecisionViews(root,{state,nodeId:'logistics_scheduling',view:'logistics-config'});
 
   root.querySelector("[data-scheduling-copy-case]")?.addEventListener("click",async()=>{
     try{

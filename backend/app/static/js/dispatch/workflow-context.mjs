@@ -56,11 +56,17 @@ export function mountMapResponsibilities(root,{state,onSaved}){
 }
 
 export function mountDashboardTrace(root,{state,run,nodeId}){
- const context=mountWorkflowContext(root,{state});if(!context)return;
- const {host,scope}=context,trace=el('div',undefined,'workflow-responsibility workflow-responsibility--readonly');trace.dataset.runTrace='';host.append(trace);
+ const hero=root.querySelector('#dispatch-hero,.d-page-hero');if(!hero)return;
+ const host=el('aside',undefined,'dashboard-hero-trace');host.setAttribute('aria-label','Trazabilidad de la decisión');hero.prepend(host);
+ const scope=createScope(host),context={host,scope,dispose:()=>scope.dispose()},trace=el('dl');trace.dataset.runTrace='';host.append(trace);
  const assigned=state.workflow?.stages?.[nodeId]?.approver;
  const key=[state.decisionCase.id,run.id,run.approved_by_user_id,run.approved_at].join(':');
- const draw=people=>{if(!scope.active)return;trace.replaceChildren(el('p','Configurado por: '+(people?.created_by?.name||'Sin registro de autor'),'d-body'),el('p',run.approved_at?'Aprobado por: '+(people?.approved_by?.name||(run.approved_by==='shared_workspace:dation'?'Workspace compartido (histórico)':'Sin registro de aprobación')):'Esperando aprobación de: '+(assigned?.name||'Sin asignar'),'d-body'));};
+ const draw=people=>{if(!scope.active)return;trace.replaceChildren();
+  for(const [label,value] of [
+   ['Configurado por',people?.created_by?.name||'Sin registro de autor'],
+   [run.approved_at?'Aprobado por':'Esperando aprobación de',run.approved_at?(people?.approved_by?.name||(run.approved_by==='shared_workspace:dation'?'Workspace compartido (histórico)':'Sin registro de aprobación')):assigned?.name||'Sin asignar'],
+  ]){const row=el('div');row.append(el('dt',label),el('dd',value));trace.append(row);}
+ };
  draw(actors.get(key));
  if(actors.has(key))return context;
  api('/api/platform/decisions/'+state.decisionCase.id+'/runs?'+new URLSearchParams({node_id:nodeId,run_id:run.id,limit:1}),{signal:scope.signal}).then(detail=>{

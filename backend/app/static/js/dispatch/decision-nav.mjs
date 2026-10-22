@@ -17,6 +17,7 @@ export function decisionRail(caseActions={}){
       const meta=DECISION_META[nodeId];
       const node=decisionCase.nodes[nodeId]||{};
       const ui=statusUi(node.status);
+      const phase=!meta.implemented||node.status==='locked'||node.status==='needs_data'?'LOCKED':node.status==='approved'?'APPROVED':node.status==='review'?'WAITING_APPROVAL':node.run_id?'EXECUTED':nodeId===activeNode&&caseActions.view==='logistics-config'?'CONFIGURING':'AVAILABLE';
       const target=resolveNodeDestination(nodeId,node);
       const canOpen=Boolean(target);
       const presentation=statePresentation(node.status,nodeId===activeNode);
@@ -24,12 +25,12 @@ export function decisionRail(caseActions={}){
         +(nodeId===activeNode?' is-active':'')
         +(node.status==='approved'?' is-approved':'')
         +'" data-decision-node="'+esc(nodeId)+'" '
-        +'data-status-tone="'+presentation.tone+'" '+(presentation.selected?'aria-current="page" ':'')
+        +'data-decision-state="'+phase+'" data-status-tone="'+presentation.tone+'" '+(presentation.selected?'aria-current="page" ':'')
         +(canOpen?'':'disabled')
         +'>'
           +'<span>'+esc(meta.index)+'</span>'
           +'<div><strong>'+esc(meta.label)+'</strong>'
-          +'<small>'+esc(ui.label)+'</small></div>'
+          +'<small>'+esc(phase==='CONFIGURING'?'En configuración':phase==='WAITING_APPROVAL'?'Esperando aprobación':ui.label)+'</small></div>'
           +(node.status==='approved'?'<i aria-hidden="true">✓</i>':'')
         +'</button>';
     })

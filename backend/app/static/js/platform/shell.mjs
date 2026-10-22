@@ -1,3 +1,4 @@
+import {renderCaseFlow} from '../dispatch/case-navigation.mjs';
 import {renderDdaNavigation} from './dda-navigation.mjs';
 import {trackExploration} from './onboarding.mjs';
 import {mountDropdown} from './components.mjs';
@@ -68,13 +69,18 @@ export function mountPlatformShell(){
   }
   const breadcrumb=document.querySelector('[data-platform-breadcrumb]');
   const ddaView=view?.startsWith('logistics-')||view==='decision-dashboard';
-  breadcrumb.hidden=!ddaView;
+  breadcrumb.hidden=true;
+  const contextNav=document.querySelector('#journey-nav');
   if(!ddaView){const title=node('span',labels[view]||(view==='traceability'?'Historial y evidencia':'Dation'),'journey-step journey-step--title is-current');document.querySelector('#journey-nav').replaceChildren(title);}
   if(ddaView){
-   try{renderDdaNavigation(breadcrumb,{view,route:readResource(location.href),workspace:window.DationDispatch?.getWorkspace?.()});}catch{}
+   try{renderDdaNavigation(contextNav,{view,route:readResource(location.href),workspace:window.DationDispatch?.getWorkspace?.()});}catch{}
   }else{breadcrumb.replaceChildren(node('span',labels[view]||(view==='traceability'?'Historial y evidencia':'Dation')));}
  }
- scope.listen(window,'dation:view',updateNavigation);scope.listen(window,'dation:workspace',updateNavigation);updateNavigation();
+ window.dationRenderContextNavigation=updateNavigation;
+ window.dationRenderCaseFlow=view=>{try{renderCaseFlow(document.querySelector('#dda-workspace-nav'),{view,route:readResource(location.href),state:window.DationDispatch?.getWorkspace?.()});}catch{}};
+ const updateAll=()=>{updateNavigation();window.dationRenderCaseFlow(window.dationGetCurrentView?.());};
+ scope.listen(window,'dation:workspace',()=>window.dationRenderCaseFlow(window.dationGetCurrentView?.()));
+ scope.listen(window,'dation:view',updateAll);scope.listen(window,'dation:workspace',updateNavigation);updateAll();
  function renderDemo(){const panel=document.querySelector('[data-demo-context]');if(!panel)return;const state=window.DationDispatch?.getWorkspace?.()||{};let route;try{route=readResource(location.href);}catch{panel.hidden=true;return;}const own=!route.caseId||route.caseId===state.decisionCase?.id;panel.hidden=!(own&&['logistics-data','logistics-map','logistics-config','decision-dashboard'].includes(window.dationGetCurrentView?.())&&(state.orders?.is_sample||state.fleet?.is_sample));}
  scope.listen(window,'dation:view',renderDemo);scope.listen(window,'dation:workspace',renderDemo);renderDemo();
  scope.listen(window,'pagehide',event=>{if(!event.persisted)scope.dispose();});

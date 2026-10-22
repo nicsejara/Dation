@@ -90,7 +90,7 @@ class GoldenWorkflowTests(unittest.TestCase):
         self.assertEqual(self.s.sql("SELECT count(*) FROM decision_approval_events WHERE action='approved';"),'2')
         self.assertEqual(report['source_sha'],subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip())
         self.assertEqual(report['viewports'],[1440,1280,1024,768,390])
-        self.assertEqual(set(report['surfaces']),{'home','data','map','config','dashboard','responsibility','switcher','decision_center','data_hub'})
+        self.assertEqual(set(report['surfaces']),{'home','data','map','config','dashboard','responsibility','completed','decision_center','data_hub'})
 
     def test_workspace_boundaries_and_viewer_responsibilities_do_not_grant_writes(self):
         ca,da=self.create_case(STEWARD);cb,db=self.create_case(USER_B)
