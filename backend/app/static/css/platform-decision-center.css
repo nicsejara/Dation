@@ -34,3 +34,4 @@
 /* Reuse the DDA overview's responsive hero geometry. */
 .center-hero{min-height:var(--hero-min-height);padding:var(--hero-padding);gap:var(--hero-gap);grid-template-columns:minmax(0,1fr) 260px}
 @media(max-width:767px){.center-hero{grid-template-columns:minmax(0,1fr)}}
+.center-workspace-activity{display:grid;gap:16px;min-width:0}

@@ -280,18 +280,56 @@ class WorkflowContextTests(unittest.IsolatedAsyncioTestCase):
         await self.b.open('logistics-config','logistics_scheduling')
         await self.page.locator('.dispatch-decision-rail').wait_for()
         self.assertEqual(await self.page.locator('#dda-workspace-nav [aria-current=step]').get_attribute('data-step'),'3')
-        self.assertEqual(await self.page.locator('.decision-view-tabs [aria-current=page]').inner_text(),'Configuración')
-        approved=self.page.locator('.dispatch-decision-tab[data-decision-node=logistics_assignment]')
-        await approved.click();await self.page.locator('.assignment-dashboard-v2').wait_for()
+        self.assertEqual(await self.page.locator('.decision-view-tabs,[data-back-map]').count(),0)
+        await self.page.locator('.dispatch-decision-tab[data-decision-node=logistics_assignment]').click()
+        await self.page.locator('[data-config-review]').wait_for()
+        self.assertNotIn('run_id=',self.page.url)
+        await self.page.locator('.dispatch-decision-tab[data-decision-node=logistics_scheduling]').click()
+        await self.page.locator('[data-scheduling-review]').wait_for()
+        await self.page.locator('#dda-workspace-nav [data-step="4"]').click()
+        await self.page.locator('.scheduling-dashboard-v2').wait_for()
+        self.assertIn('run_id='+self.b.f['ids']['scheduling'],self.page.url)
+        await self.page.locator('.dispatch-decision-tab[data-decision-node=logistics_assignment]').click()
+        await self.page.locator('.assignment-dashboard-v2').wait_for()
         self.assertIn('case_id='+self.b.case['id'],self.page.url)
         self.assertIn('run_id='+self.b.f['ids']['assignment'],self.page.url)
         await self.page.wait_for_load_state('networkidle')
         self.assertEqual(await self.page.locator('.dda-navigation li').count(),3)
         self.assertEqual(await self.page.locator('#dda-workspace-nav [aria-current=step]').get_attribute('data-step'),'4')
+        await self.page.locator('.dispatch-decision-tab[data-decision-node=logistics_scheduling]').click()
+        await self.page.locator('.scheduling-dashboard-v2').wait_for()
+        await self.page.locator('#dda-workspace-nav [data-step="3"]').click()
+        await self.page.locator('[data-scheduling-review]').wait_for()
+        self.assertIn('node_id=logistics_scheduling',self.page.url)
+        self.assertEqual(await self.page.locator('.decision-view-tabs,[data-back-map]').count(),0)
         await self.page.locator('#dda-workspace-nav [data-step="1"]').click()
         await self.page.locator('[data-case-identity]').wait_for()
         self.assertIn('case_id='+self.b.case['id'],self.page.url)
         self.assertEqual(await self.page.get_by_label('Nombre del Case',exact=True).input_value(),'SEMANA 43')
+        self.assertEqual(self.b.execution_bodies,[])
+
+    async def test_dashboard_trace_shares_the_copy_row_and_context_pills_are_equal(self):
+        self.b.f['case_row']['label']='Planning Semana 43 con un nombre largo'
+        for node,kind in [('logistics_assignment','assignment'),('logistics_scheduling','scheduling')]:
+            await self.b.open('decision-dashboard',node,self.b.f['ids'][kind])
+            await self.page.locator('#dispatch-hero .dashboard-hero-trace').wait_for()
+            for width in (1440,1024,768,390):
+                await self.page.set_viewport_size({'width':width,'height':1000})
+                await self.page.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))')
+                geometry=await self.page.evaluate('''()=>{
+                  const hero=document.querySelector('#dispatch-hero'),copy=hero.querySelector('[data-assignment-hero-copy],[data-scheduling-hero]');
+                  const trace=hero.querySelector('.dashboard-hero-trace'),pills=[...document.querySelectorAll('.dda-navigation__step')].map(n=>n.getBoundingClientRect());
+                  return {copy:copy.getBoundingClientRect().toJSON(),trace:trace.getBoundingClientRect().toJSON(),pills:pills.map(r=>({width:r.width,height:r.height})),overflow:document.documentElement.scrollWidth>innerWidth+1};
+                }''')
+                self.assertFalse(geometry['overflow'],(node,width,geometry))
+                pills=geometry['pills'];self.assertEqual(len(pills),3)
+                self.assertLess(max(p['width'] for p in pills)-min(p['width'] for p in pills),1)
+                self.assertEqual({p['height'] for p in pills},{48})
+                if width>900:
+                    self.assertAlmostEqual(geometry['copy']['top'],geometry['trace']['top'],delta=1)
+                    self.assertGreater(geometry['trace']['left'],geometry['copy']['right'])
+                else:self.assertGreaterEqual(geometry['trace']['top'],geometry['copy']['bottom'])
+            self.assertEqual(await self.page.locator('.decision-view-tabs,[data-back-map],[data-approval-handoff]').count(),0)
 
     async def test_data_save_does_not_overwrite_assignment_changed_while_editing(self):
         old={'id':'10000000-0000-4000-8000-000000000009','name':'Anterior'}

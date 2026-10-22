@@ -1,5 +1,5 @@
 import {esc} from './shared.mjs';
-import {resolveNodeDestination} from './decision-target.mjs';
+import {resolveDecisionDestination} from './decision-target.mjs';
 import {statePresentation} from '../platform/foundation.mjs';
 import {
   DECISION_ORDER,
@@ -18,7 +18,7 @@ export function decisionRail(caseActions={}){
       const node=decisionCase.nodes[nodeId]||{};
       const ui=statusUi(node.status);
       const phase=!meta.implemented||node.status==='locked'||node.status==='needs_data'?'LOCKED':node.status==='approved'?'APPROVED':node.status==='review'?'WAITING_APPROVAL':node.run_id?'EXECUTED':nodeId===activeNode&&caseActions.view==='logistics-config'?'CONFIGURING':'AVAILABLE';
-      const target=resolveNodeDestination(nodeId,node);
+      const target=resolveDecisionDestination(nodeId,node,caseActions.view);
       const canOpen=Boolean(target);
       const presentation=statePresentation(node.status,nodeId===activeNode);
       return '<button type="button" class="dispatch-decision-tab'
@@ -37,9 +37,6 @@ export function decisionRail(caseActions={}){
     .join('');
 
   return '<section class="dispatch-decision-rail" aria-label="Decisiones del caso">'
-    +'<div class="dispatch-decision-rail__head">'
-      +'<div><span class="dispatch-kicker">DECISION CASE</span><strong>Decisiones del análisis</strong></div>'
-    +'</div>'
     +'<nav>'+nodes+'</nav>'
     +'</section>';
 }

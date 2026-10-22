@@ -60,7 +60,7 @@ test('continuation uses actual approval and readiness without changing the case'
   const before=structuredClone(current);
   assert.equal(continuationState(current,'logistics_assignment','candidate',fullReadiness,metadata),null);
   assert.equal(continuationState(current,'logistics_assignment','approved',partialReadiness,metadata).state,'needs_data');
-  assert.deepEqual(continuationState(current,'logistics_assignment','approved',fullReadiness,metadata),{state:'available',nodeId:'logistics_scheduling',label:'Continuar con Planificación →',target:{view:'logistics-config',node_id:'logistics_scheduling',run_id:null}});
+  assert.deepEqual(continuationState(current,'logistics_assignment','approved',fullReadiness,metadata),{state:'available',nodeId:'logistics_scheduling',label:'Configurar siguiente decisión',target:{view:'logistics-config',node_id:'logistics_scheduling',run_id:null}});
   assert.deepEqual(current,before);
 });
 test('approved downstream and unimplemented decisions do not open an empty configuration',()=>{

@@ -164,15 +164,48 @@ async def main():
             assert await owner.evaluate('window.DationDispatch.getWorkspace().orders.id')==protected_orders
             assert sum(r['method']=='POST' and r['path']=='/api/datasets/upload' for r in requests)==uploads_before
             await approve('logistics_assignment',d1)
-            await approver.get_by_role('button',name='Volver al mapa de decisiones',exact=True).click()
-            await approver.locator('[data-map-action=configure][data-map-node=logistics_scheduling]').click()
+            final=approver.locator('.assignment-final-actions')
+            await final.get_by_role('button',name='Configurar siguiente decisión',exact=True).wait_for()
+            assert await final.get_by_role('button',name='Ver mapa de decisiones',exact=True).is_visible()
+            assert await approver.locator('[data-approval-handoff]').count()==0
+            await final.get_by_role('button',name='Configurar siguiente decisión',exact=True).click()
             await approver.locator('[data-scheduling-review]').wait_for()
             assert 'run_id=' not in approver.url
             await open_stage(admin,'logistics-config','logistics_scheduling')
             assert await admin.locator('[data-workflow-responsibility]').count()==0
             await open_stage(owner,'logistics-config','logistics_scheduling')
             d2=await execute('logistics_scheduling')
+
+            # Navigation is a matrix: horizontal changes the decision, vertical changes the level.
+            await owner.locator('.dda-navigation a').last.click()
+            await owner.locator('[data-map-action=open-result][data-map-node=logistics_scheduling]').click()
+            await owner.locator('.scheduling-dashboard-v2').wait_for()
+            await owner.locator('#dda-workspace-nav [data-step="3"]').click()
+            await owner.locator('[data-scheduling-review]').wait_for()
+            for node,selector in [('logistics_assignment','[data-config-review]'),('logistics_scheduling','[data-scheduling-review]')]:
+                await owner.locator('.dispatch-decision-tab[data-decision-node="'+node+'"]').click()
+                await owner.locator(selector).wait_for()
+                query=parse_qs(urlsplit(owner.url).query)
+                assert query['case_id']==[case] and query['node_id']==[node] and 'run_id' not in query
+            await owner.locator('#dda-workspace-nav [data-step="4"]').click()
+            await owner.locator('.scheduling-dashboard-v2').wait_for()
+            for node,rid,selector in [('logistics_assignment',d1,'.assignment-dashboard-v2'),('logistics_scheduling',d2,'.scheduling-dashboard-v2')]:
+                await owner.locator('.dispatch-decision-tab[data-decision-node="'+node+'"]').click()
+                await owner.locator(selector).wait_for()
+                query=parse_qs(urlsplit(owner.url).query)
+                assert query['case_id']==[case] and query['node_id']==[node] and query['run_id']==[rid]
+            await owner.locator('#dda-workspace-nav [data-step="3"]').click()
+            await owner.locator('[data-scheduling-review]').wait_for()
+            assert parse_qs(urlsplit(owner.url).query)['node_id']==['logistics_scheduling']
+            await owner.locator('#dda-workspace-nav [data-step="4"]').click()
+            await owner.locator('.scheduling-dashboard-v2').wait_for()
+            assert await owner.locator('.decision-view-tabs,[data-back-map],[data-approval-handoff]').count()==0
             await approve('logistics_scheduling',d2)
+            final=approver.locator('.scheduling-final-actions')
+            await final.get_by_role('button',name='Volver a Decision Center',exact=True).wait_for()
+            assert 'Case completado' in await final.inner_text()
+            assert await final.get_by_role('button',name='Ver mapa del Case',exact=True).is_visible()
+            assert await final.get_by_role('button',name='Configurar siguiente decisión',exact=True).count()==0
 
             # Both rails use their canonical run, with no configuration bounce.
             for node,run in (('logistics_assignment',d1),('logistics_scheduling',d2)):

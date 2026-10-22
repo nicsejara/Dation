@@ -1,4 +1,12 @@
 /* Platform foundation: opt in with .d-platform; workflow heroes keep their own contracts. */
+.d-platform .platform-entry-hero{position:relative;display:grid;grid-template-columns:minmax(0,1fr);align-items:center;box-sizing:border-box;min-height:var(--hero-min-height);padding:var(--hero-padding);gap:var(--hero-gap);overflow:hidden;border:1px solid var(--color-border);border-radius:var(--radius-lg)}
+.d-platform .platform-entry-hero>:is(.platform-home__hero-copy,.center-hero__copy){position:relative;z-index:1;display:grid;gap:12px;min-width:0;max-width:none}
+.d-platform .platform-entry-hero .d-page-title{margin:0;font-size:clamp(25px,3vw,36px);line-height:1.2;overflow-wrap:anywhere}
+.d-platform .platform-entry-hero .d-page-description{margin:0;max-width:none;line-height:1.6;text-wrap:wrap}
+.d-platform .platform-entry-hero>img{position:absolute;right:0;top:0;width:30%;height:100%;max-height:none;object-fit:contain;opacity:.35;pointer-events:none;mask-image:linear-gradient(to right,transparent,#000)}
+.d-platform .platform-entry-hero .platform-hero-actions{margin:0}
+.d-platform .platform-entry-hero .platform-hero-cta{margin:0;justify-self:stretch}
+@media(max-width:767px){.d-platform .platform-entry-hero>img{display:none}}
 .d-platform .platform-hero-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:1fr;gap:12px;width:100%;max-width:600px;margin-top:10px}
 .d-platform .platform-hero-cta{--color-action-primary-bg:var(--d-brand-teal-bright);--color-action-primary-text:var(--d-bg-0);--color-action-primary-hover:var(--d-brand-cyan);box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-width:0;min-height:48px;padding:12px 18px;border-radius:var(--radius-control);font:600 14px/1.5 var(--font-sans);text-align:center;text-decoration:none;white-space:normal;transition:transform 200ms,border-color 200ms,box-shadow 200ms}
 .d-platform .platform-hero-cta__icon{display:inline-flex;width:20px;height:20px;flex:0 0 20px}

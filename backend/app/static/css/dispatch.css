@@ -2983,7 +2983,7 @@ body.dispatch-result #chat-panel{
   max-width:1220px;
   width:100%;
   margin:-8px auto 20px;
-  padding:13px 14px;
+  padding:10px;
   border:1px solid var(--color-border);
   border-radius:14px;
   background:var(--color-surface);

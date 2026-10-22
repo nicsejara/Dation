@@ -11,3 +11,12 @@ export function resolveNodeDestination(nodeId,node={}){
  const rule=FOUNDATION.destinationRules.find(rule=>matches[rule.when]);
  return rule?{view:rule.view,node_id:nodeId,run_id:rule.run==='approved'?approved:rule.run==='latest'?latest:null}:null;
 }
+
+// Horizontal navigation keeps the workflow level; the canonical run still wins.
+export function resolveDecisionDestination(nodeId,node={},view){
+ const target=resolveNodeDestination(nodeId,node);
+ if(!target)return null;
+ if(view==='logistics-config')return {...target,view,run_id:null};
+ if(view==='decision-dashboard')return target.view===view&&target.run_id?target:null;
+ return target;
+}
