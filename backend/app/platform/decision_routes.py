@@ -6,6 +6,7 @@ from app.auth import require_upload_access
 from app.platform import decision_center as center
 from app.platform.identity import platform_call
 from app.platform.foundation import REGISTRY
+from app.models.case_identity import CaseIdentity
 
 router=APIRouter(prefix='/decisions')
 Node=Literal['logistics_assignment','logistics_scheduling','logistics_final_assignment']
@@ -59,10 +60,9 @@ async def detail(case_id:UUID,ctx=Depends(require_upload_access)):return await c
 async def history(case_id:UUID,node_id:Node,limit:int=Query(25,ge=1,le=50),offset:int=Query(0,ge=0,le=1000000),run_id:UUID|None=None,ctx=Depends(require_upload_access)):
     return await center.history(ctx,case_id,node_id,limit,offset,run_id)
 
-class CaseUpdate(BaseModel):
+class CaseUpdate(CaseIdentity):
     model_config=ConfigDict(extra='forbid')
     expected_updated_at:AwareDatetime
-    label:str|None=Field(None,max_length=120)
     archived:bool|None=None
     @field_validator('label')
     @classmethod
@@ -71,11 +71,33 @@ class CaseUpdate(BaseModel):
         return value.strip() if value is not None else None
     @model_validator(mode='after')
     def action(self):
-        if 'label' not in self.model_fields_set and self.archived is None:raise ValueError('Elegí un cambio para el caso.')
+        if not self.model_fields_set.intersection({'label','category','description'}) and self.archived is None:raise ValueError('Elegí un cambio para el caso.')
         return self
 
 @router.patch('/{case_id}')
 async def update(case_id:UUID,payload:CaseUpdate,ctx=Depends(require_upload_access)):
+    if payload.model_fields_set.intersection({'category','description'}):
+        if payload.archived is not None:
+            from fastapi import HTTPException
+            raise HTTPException(422,'Guardá la identidad y el archivo como acciones separadas.')
+        return await platform_call('platform_update_case_identity',{'actor_user_id':ctx.user_id,'target_workspace_id':ctx.workspace_id,
+            'target_case_id':str(case_id),'expected_updated_at':payload.expected_updated_at.isoformat(),
+            'identity_changes':payload.model_dump(mode='json',include={'label','category','description'},exclude_unset=True)})
     return await platform_call('platform_update_case',{'actor_user_id':ctx.user_id,'target_workspace_id':ctx.workspace_id,
         'target_case_id':str(case_id),'expected_updated_at':payload.expected_updated_at.isoformat(),
         'change_label':'label' in payload.model_fields_set,'new_label':payload.label,'archive':payload.archived})
+
+class CaseDataPack(BaseModel):
+    model_config=ConfigDict(extra='forbid')
+    expected_updated_at:AwareDatetime
+    orders_dataset_id:UUID
+    fleet_dataset_id:UUID
+
+@router.put('/{case_id}/data-pack')
+async def replace_data_pack(case_id:UUID,payload:CaseDataPack,ctx=Depends(require_upload_access)):
+    from app.services import decision_case_service
+    from app.routes.dispatch import guarded
+    await guarded(decision_case_service._validate_data_pack(str(payload.orders_dataset_id),str(payload.fleet_dataset_id)))
+    return await platform_call('platform_replace_case_data_pack',{'actor_user_id':ctx.user_id,'target_workspace_id':ctx.workspace_id,
+        'target_case_id':str(case_id),'expected_updated_at':payload.expected_updated_at.isoformat(),
+        'orders_id':str(payload.orders_dataset_id),'fleet_id':str(payload.fleet_dataset_id)})

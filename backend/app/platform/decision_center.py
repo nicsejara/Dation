@@ -24,6 +24,7 @@ def project(bundle,detail=False):
             'current_step':None,'current_step_label':'Por definir','current_objective':None,'progress':{'approved':0,'total':0},
             'owner':None,'approver':None,'created_by':bundle.get('created_by'),'created_at':row['created_at'],
             'updated_at':row['updated_at'],'last_activity_at':row['last_activity_at'],'resume':None}
+        result.update(category=row.get('category'),description=row.get('description'))
         result['context']=case_context(result)
         if detail:result.update(nodes=[],orders=bundle.get('orders'),fleet=bundle.get('fleet'),responsibilities=bundle.get('responsibilities'))
         return result
@@ -39,6 +40,7 @@ def project(bundle,detail=False):
         'owner':(collaboration.get(resume['node_id']) or {}).get('owner'),'created_by':bundle.get('created_by'),'created_at':row['created_at'],
         'last_activity_at':row['last_activity_at'],'updated_at':row['updated_at'],
         'resume':target(resume['node_id'],resume['status'],resume.get('run_id'),state['nodes'][resume['node_id']]) or {'view':'logistics-map','node_id':resume['node_id'],'run_id':None}}
+    result.update(category=row.get('category'),description=row.get('description'))
     result['context']=case_context(result)
     relevant=resume['node_id'];assignment=collaboration.get(relevant) or {}
     result['approver']=assignment.get('approver')

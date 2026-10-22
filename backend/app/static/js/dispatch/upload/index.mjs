@@ -1,3 +1,4 @@
+import {mountCaseIdentity,hasCaseExecutions} from '../case-identity.mjs';
 import {responsibilityProblem} from '../workflow-responsibility.mjs';
 import {mountDemoAction} from '../../platform/onboarding.mjs';
 import {createScope,scopeFor} from "../lifecycle.mjs";
@@ -114,7 +115,7 @@ function makeHero() {
     className: "dispatch-pro-hero",
     reveal: true,
     step: dataStep,
-    title: "Prepará tu Data Pack.",
+    title: "Preparar Decision Case",
     description: "Tu Data Pack reúne Órdenes y Flota. Subí archivos nuevos o reutilizá una carga anterior; Dation valida su estructura y compatibilidad.",
     panelTitle: "CÓMO FUNCIONA",
     panelItems: [
@@ -235,6 +236,7 @@ export async function mountUploadScreen(
     onNext,
     isCurrent=()=>true,
     mountWorkflow,
+    saveIdentity,
   },
 ) {
   const scope=createScope(root),current=()=>scope.active&&isCurrent();
@@ -272,6 +274,11 @@ export async function mountUploadScreen(
   compatibilityRoot.hidden = true;
   compatibilityRoot.dataset.reveal = "";
 
+  function allowInputChange(){
+    if(!hasCaseExecutions(state.decisionCase)&&state.caseContext?.status!=='archived')return true;
+    const note=root.querySelector('[data-input-guard]');
+    if(note){note.hidden=false;note.focus();}return false;
+  }
   const refs = {};
   let guide = null;
   let previousDrawer = null;
@@ -342,6 +349,11 @@ export async function mountUploadScreen(
     compatibilityRoot,
     actionBar.bar,
   );
+  mountCaseIdentity(root,{state,persist,onSave:saveIdentity});
+  const guard=el('section',null,'d-card case-input-guard');guard.dataset.inputGuard='';guard.tabIndex=-1;
+  guard.hidden=!hasCaseExecutions(state.decisionCase)&&state.caseContext?.status!=='archived';
+  guard.append(el('p','Este Data Pack tiene ejecuciones o está archivado. Podés consultarlo. Para usar otros inputs, iniciá otro Case y conservá estos resultados.'));
+  const newCase=el('button','Iniciar otro Decision Case','d-button d-button--secondary');newCase.type='button';scope.listen(newCase,'click',()=>window.DationDispatch.startNewDecision());guard.append(newCase);dataPack.before(guard);
   mountWorkflow?.(root,()=>finalState());
 
   function reportFor(kind) {
@@ -434,6 +446,7 @@ export async function mountUploadScreen(
   }
 
   function triggerReplace(kind) {
+    if(!allowInputChange())return;
     const ref = refs[kind];
     if (!ref) return;
     local.replacing[kind] = true;
@@ -703,6 +716,7 @@ export async function mountUploadScreen(
   }
 
   async function selectPrevious(kind, dataset) {
+    if(!allowInputChange())return;
     state[kind] = dataset;
     local.reports[kind] = dataset.profile_json || null;
     local.pendingFiles[kind] = null;
@@ -817,6 +831,7 @@ export async function mountUploadScreen(
   }
 
   async function handleFile(kind, file) {
+    if(!allowInputChange())return;
     const problem = clientFileProblem(file);
     local.pendingFiles[kind] = file;
     local.saveErrors[kind] = null;
@@ -906,6 +921,7 @@ export async function mountUploadScreen(
   }
 
   async function removeFile(kind) {
+    if(!allowInputChange())return;
     local.controllers[kind]?.abort();
     local.controllers[kind] = null;
     state[kind] = null;

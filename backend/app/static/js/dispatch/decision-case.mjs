@@ -218,6 +218,8 @@ export function nextDecisionId(nodeId){
 export function continuationState(current,nodeId,runId,readiness,metadata){
   const node=current?.nodes?.[nodeId];
   if(node?.status!==STATUS.APPROVED||String(node.approved_run_id||node.run_id)!==String(runId))return null;
+  const implemented=NODE_IDS.filter(id=>metadata[id]?.implemented);
+  if(nodeId===implemented.at(-1)&&implemented.every(id=>current.nodes[id]?.status===STATUS.APPROVED))return {state:'completed',label:'Volver a Decision Center',message:'Case completado · 2/2 aprobadas'};
   const next=nextDecisionId(nodeId);
   if(!next)return {state:'finished',message:'No hay otra decisión pendiente en este caso.'};
   const meta=metadata[next];

@@ -30,3 +30,7 @@
 @media(prefers-reduced-motion:reduce){.center-kpi,.center-table tr{transition:none}.center-kpi:hover{transform:none}.center-drawer--sheet{animation:none}}
 .center-drawer--sheet{max-width:100vw}.center-row-actions .d-button{white-space:nowrap;flex-shrink:0}
 @media(max-width:767px){.decision-center .center-icon-button{width:44px;height:44px;min-height:44px;flex-basis:44px}}
+
+/* Reuse the DDA overview's responsive hero geometry. */
+.center-hero{min-height:var(--hero-min-height);padding:var(--hero-padding);gap:var(--hero-gap);grid-template-columns:minmax(0,1fr) 260px}
+@media(max-width:767px){.center-hero{grid-template-columns:minmax(0,1fr)}}

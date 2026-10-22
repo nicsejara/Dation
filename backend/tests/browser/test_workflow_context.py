@@ -97,29 +97,16 @@ class WorkflowContextTests(unittest.IsolatedAsyncioTestCase):
         await root.get_by_role('button',name='Actualizar etapa',exact=True).wait_for()
         self.assertFalse(self.snapshot['stages']['logistics_assignment']['owner_eligible'])
 
-    async def test_case_switcher_is_bounded_keyboard_accessible_and_clears_foreign_run(self):
-        other='00000000-0000-4000-8000-000000000088';bundle=copy.deepcopy(self.b.hydrated())
-        bundle['case']['id']=other;bundle['decision_case']['id']=other
-        for key,node in bundle['decision_case']['nodes'].items():
-            node.update(status='available' if key=='logistics_assignment' else 'locked',run_id=None,latest_run_id=None,approved_run_id=None,run_count=0)
-        bundle['workflow_responsibilities']=copy.deepcopy(self.snapshot);bundle['workflow_responsibilities']['case_id']=other
-        self.b.other_cases[other]=bundle;queries=[]
-        async def listing(route):
-            queries.append(parse_qs(urlparse(route.request.url).query))
-            await route.fulfill(json={'items':[{'id':self.b.case['id'],'status':'active','dda':'logistics'},{'id':other,'label':'Otro caso','status':'active','dda':'logistics'}],'total':2})
-        await self.b.context.route('**/api/platform/decisions?**',listing)
+    async def test_case_context_is_fixed_and_keyboard_navigation_returns_to_its_map(self):
         await self.b.open('decision-dashboard','logistics_assignment',self.b.f['ids']['assignment'])
-        switcher=self.page.locator('[data-case-switcher]');trigger=switcher.locator('button').first
-        await trigger.focus();await self.page.keyboard.press('Enter');await switcher.get_by_role('button',name='Otro caso',exact=False).wait_for()
-        self.assertEqual(await trigger.get_attribute('aria-expanded'),'true');await self.page.keyboard.press('Escape')
-        self.assertEqual(await trigger.get_attribute('aria-expanded'),'false');self.assertTrue(await trigger.evaluate('n=>n===document.activeElement'))
-        await trigger.click();await switcher.get_by_role('button',name='Otro caso',exact=False).click()
-        await self.page.locator('[data-map-node=logistics_assignment]').wait_for()
-        self.assertIn('case_id='+other,self.page.url);self.assertNotIn('run_id=',self.page.url);self.assertNotIn('node_id=',self.page.url)
-        self.assertEqual(queries,[{'dda':['logistics'],'limit':['8'],'offset':['0']}]*2)
-        switcher=self.page.locator('[data-case-switcher]');await switcher.locator('button').first.click()
-        await switcher.get_by_role('button',name='Abrir este caso en Decision Center',exact=True).click()
-        self.assertIn('center_case_id='+other,self.page.url)
+        self.assertEqual(await self.page.locator('[data-case-switcher],[data-select-case]').count(),0)
+        before=len(self.b.requests)
+        link=self.page.locator('.dda-navigation a').last
+        await link.focus();await self.page.keyboard.press('Enter')
+        await self.page.locator('[data-map-node=logistics_assignment]').first.wait_for()
+        self.assertIn('case_id='+self.b.case['id'],self.page.url)
+        self.assertNotIn('run_id=',self.page.url)
+        self.assertFalse(any(path=='/api/platform/decisions' for _,path in self.b.requests[before:]))
 
     async def test_viewer_and_late_candidates_do_not_gain_mutation_controls(self):
         self.b.access_role='viewer';self.snapshot['can_assign']=False
@@ -255,7 +242,7 @@ class WorkflowContextTests(unittest.IsolatedAsyncioTestCase):
             await self.b.open('logistics-map')
             await self.page.locator('[data-map-node=logistics_assignment]').first.wait_for()
             self.assertEqual(self.readiness_calls,0)
-        await self.page.locator('[data-case-switcher]').get_by_text('Archivado',exact=False).wait_for()
+        await self.page.locator('.dispatch-case-card').get_by_text('Archivado',exact=True).wait_for()
 
     async def test_viewer_cannot_execute_even_when_all_business_responsibilities_are_eligible(self):
         self.b.access_role='viewer';self.snapshot['can_assign']=False
@@ -283,19 +270,28 @@ class WorkflowContextTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(sum(m=='POST' and p=='/api/decision-cases' for m,p in self.b.requests),0)
 
     async def test_dda_navigation_resolves_canonical_runs_without_losing_context(self):
+        self.b.f['case_row']['label']='SEMANA 43'
         await self.b.open('logistics-map')
-        nav=self.page.locator('.dda-navigation');await nav.get_by_role('link',name='DC-'+self.b.case['id'][:8].upper(),exact=True).wait_for()
-        self.assertEqual(await nav.locator('[aria-current=step]').count(),1)
-        approved=nav.locator('a[data-state=completed]').first
-        await approved.focus()
-        await self.page.evaluate("window.dispatchEvent(new CustomEvent('dation:workspace'))")
-        self.assertTrue(await approved.evaluate('n=>document.activeElement===n'))
-        self.assertIn('run_id='+self.b.f['ids']['assignment'],await approved.get_attribute('href'))
-        await self.b.nav('platform-home');await self.page.locator('[data-platform-home] h1').wait_for()
-        await self.b.nav('logistics-map');await nav.locator('ol').wait_for()
+        nav=self.page.locator('.dda-navigation')
+        await nav.get_by_role('link',name='SEMANA 43',exact=True).wait_for()
+        self.assertEqual(await nav.locator('li').count(),3)
+        self.assertEqual(await self.page.locator('[data-case-switcher],[data-select-case]').count(),0)
+        self.assertEqual(await self.page.locator('#dispatch-map-root .dispatch-decision-rail').count(),0)
+        await self.b.open('logistics-config','logistics_scheduling')
+        await self.page.locator('.dispatch-decision-rail').wait_for()
+        self.assertEqual(await self.page.locator('#dda-workspace-nav [aria-current=step]').get_attribute('data-step'),'3')
+        self.assertEqual(await self.page.locator('.decision-view-tabs [aria-current=page]').inner_text(),'Configuración')
+        approved=self.page.locator('.dispatch-decision-tab[data-decision-node=logistics_assignment]')
         await approved.click();await self.page.locator('.assignment-dashboard-v2').wait_for()
         self.assertIn('case_id='+self.b.case['id'],self.page.url)
         self.assertIn('run_id='+self.b.f['ids']['assignment'],self.page.url)
+        await self.page.wait_for_load_state('networkidle')
+        self.assertEqual(await self.page.locator('.dda-navigation li').count(),3)
+        self.assertEqual(await self.page.locator('#dda-workspace-nav [aria-current=step]').get_attribute('data-step'),'4')
+        await self.page.locator('#dda-workspace-nav [data-step="1"]').click()
+        await self.page.locator('[data-case-identity]').wait_for()
+        self.assertIn('case_id='+self.b.case['id'],self.page.url)
+        self.assertEqual(await self.page.get_by_label('Nombre del Case',exact=True).input_value(),'SEMANA 43')
 
     async def test_data_save_does_not_overwrite_assignment_changed_while_editing(self):
         old={'id':'10000000-0000-4000-8000-000000000009','name':'Anterior'}

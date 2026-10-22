@@ -113,20 +113,9 @@
     button.setAttribute('aria-disabled',String(!available));
     button.title=available?'Abrir un Decision Case existente':'Todavía no hay Decision Cases para revisar';
   }
-  async function syncHeroActions(container){
-    var generation=++refreshGeneration;
-    setMapAvailability(container,activeCase());
-    var listCases=window.DationDispatch?.listDecisionCases;
-    if(typeof listCases!=='function')return;
-    try{
-      var cases=await listCases();
-      if(generation===refreshGeneration)setMapAvailability(container,activeCase()||Boolean(cases?.length));
-    }catch(error){
-      if(generation===refreshGeneration&&!activeCase()){
-        setMapAvailability(container,false);
-        container.querySelector('[data-open-decision-map]').title='No se pudo comprobar la disponibilidad de casos';
-      }
-    }
+  function syncHeroActions(container){
+    var button=container.querySelector('[data-open-decision-map]');
+    if(button){button.disabled=false;button.removeAttribute('aria-disabled');button.title='Abrir Decision Center filtrado por Logística';}
   }
 
   function enhanceReveal(container){
@@ -157,8 +146,7 @@
     });
     if(map)map.addEventListener('click',function(){
       if(map.disabled)return;
-      if(typeof window.DationDispatch?.openDecisionMap==='function')window.DationDispatch.openDecisionMap({trigger:map});
-      else navigate('logistics-map');
+      window.DationDispatch?.openDecisionCenter({dda:'logistics'});
     });
   }
 

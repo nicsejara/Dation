@@ -29,13 +29,11 @@ export function bindDashboardActions(root,caseActions={}){
       const next=await caseActions.getContinuation?.();
       if(!scope?.active||own!==generation)return;
       handoff.hidden=!next;
-      if(next?.target||next?.state==='available'){
-        if(button.closest('.assignment-dashboard-v2'))button.innerHTML=workflowActionLabel('Continuar con Planificación');
-        else if(button.closest('[data-dashboard-toolbar]'))button.innerHTML=workflowActionLabel(next.label);
-        else button.textContent=next.label;
+      if(next){
+        const completed=next.state==='completed';
+        button.innerHTML=workflowActionLabel(completed?'Volver a Decision Center':'Volver al mapa de decisiones');
         button.hidden=false;
-      }else if(message&&next?.message){
-        message.textContent=next.message;
+        if(message&&completed)message.textContent='Case completado · 2/2 aprobadas';
       }
     }catch{
       if(scope?.active&&message){message.textContent='No se pudo comprobar la siguiente decisión.';retry.hidden=false;}

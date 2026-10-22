@@ -103,8 +103,8 @@ async def main():
             saved=await response.json()
             evidence[node]={key:saved[key] for key in ('id','result_fingerprint','configuration_json','created_by_user_id','approved_by_user_id','upstream_run_id')}
             await approver.wait_for_function('node=>window.DationDispatch.getWorkspace().decisionCase.nodes[node].status==="approved"',arg=node)
-            await approver.locator('[data-run-trace]').get_by_text('Configurado por: Golden Owner',exact=True).wait_for()
-            await approver.locator('[data-run-trace]').get_by_text('Aprobado por: Golden Approver',exact=True).wait_for()
+            await approver.locator('#dispatch-hero [data-run-trace] dd').get_by_text('Golden Owner',exact=True).wait_for()
+            await approver.locator('#dispatch-hero [data-run-trace] dd').get_by_text('Golden Approver',exact=True).wait_for()
             assert parse_qs(urlsplit(approver.url).query)['run_id']==[run]
 
         try:
@@ -113,6 +113,8 @@ async def main():
             await steward.locator('[data-dda-id=logistics]').wait_for()
             await steward.locator('#home-open-logistics').click()
             await steward.locator('[data-start-new-decision]').click()
+            await steward.get_by_label('Nombre del Case',exact=True).fill('SEMANA 43')
+            await steward.get_by_label('Categoría',exact=True).select_option('weekly')
             for kind in ('orders','fleet'):
                 async with steward.expect_response(lambda r:urlsplit(r.url).path=='/api/datasets/upload' and r.request.method=='POST') as pending:
                     await steward.locator('[data-kind="'+kind+'"] input[type=file]').set_input_files(INPUTS/(kind+'.csv'))
@@ -127,6 +129,13 @@ async def main():
             await data.get_by_role('button',name='Actualizar responsabilidad',exact=True).click()
             await steward.wait_for_function('!document.querySelector("#dispatch-data-root .d-workflow-action-bar button").disabled')
             await matrix(steward,'data')
+            previous_orders=await steward.evaluate('window.DationDispatch.getWorkspace().orders.id')
+            async with steward.expect_response(lambda r:urlsplit(r.url).path=='/api/datasets/upload' and r.request.method=='POST') as replacement:
+                await steward.locator('[data-kind="orders"] input[type=file]').set_input_files({'name':'replacement-orders.csv','mimeType':'text/csv','buffer':(INPUTS/'orders.csv').read_bytes()+b'\n'})
+            assert (await replacement.value).status==200
+            await steward.wait_for_function('window.DationDispatch.getWorkspace().preflight?.valid')
+            assert await steward.evaluate('window.DationDispatch.getWorkspace().decisionCase.id')==case
+            assert await steward.evaluate('window.DationDispatch.getWorkspace().orders.id')!=previous_orders
             await next_button.click();await steward.locator('[data-map-node=logistics_assignment]').first.wait_for()
             await matrix(steward,'map')
             await open_stage(admin,'logistics-map')
@@ -136,11 +145,27 @@ async def main():
             await assign('logistics_scheduling',APPROVER,'approver')
             await open_stage(owner,'logistics-config','logistics_assignment')
             await owner.locator('[data-objective=min_cost]').click()
+            assert await owner.locator('.dda-navigation li').count()==3
+            await owner.locator('#dda-workspace-nav [data-step="1"]').click()
+            await owner.locator('[data-case-identity]').wait_for()
+            assert parse_qs(urlsplit(owner.url).query)['case_id']==[case]
+            await owner.locator('#dda-workspace-nav [data-step="2"]').click()
+            await owner.locator('[data-map-action=configure][data-map-node=logistics_assignment]').click()
+            await owner.locator('[data-config-review]').wait_for()
             await matrix(owner,'config')
             d1=await execute('logistics_assignment')
             await matrix(owner,'dashboard')
+            await owner.goto(target('logistics-data'))
+            await owner.locator('[data-case-identity]').wait_for()
+            assert await owner.locator('[data-input-guard]').is_visible()
+            uploads_before=sum(r['method']=='POST' and r['path']=='/api/datasets/upload' for r in requests)
+            protected_orders=await owner.evaluate('window.DationDispatch.getWorkspace().orders.id')
+            await owner.locator('[data-kind="orders"] input[type=file]').set_input_files(INPUTS/'orders.csv')
+            assert await owner.evaluate('window.DationDispatch.getWorkspace().orders.id')==protected_orders
+            assert sum(r['method']=='POST' and r['path']=='/api/datasets/upload' for r in requests)==uploads_before
             await approve('logistics_assignment',d1)
-            await approver.get_by_role('button',name='Continuar con Planificación',exact=True).click()
+            await approver.get_by_role('button',name='Volver al mapa de decisiones',exact=True).click()
+            await approver.locator('[data-map-action=configure][data-map-node=logistics_scheduling]').click()
             await approver.locator('[data-scheduling-review]').wait_for()
             assert 'run_id=' not in approver.url
             await open_stage(admin,'logistics-config','logistics_scheduling')
@@ -156,12 +181,11 @@ async def main():
                 await approver.locator('.d-decision-dashboard').wait_for()
                 query=parse_qs(urlsplit(approver.url).query);assert query['case_id']==[case] and query['node_id']==[node]
             switch_start=len(requests)
-            switcher=approver.locator('[data-case-switcher]');trigger=switcher.locator('button').first
-            await trigger.click();await switcher.locator('nav [aria-current=true]').wait_for()
-            await switcher.get_by_text('Completado · 2 de 2 aprobadas',exact=True).wait_for()
-            await matrix(approver,'switcher')
-            await approver.keyboard.press('Escape');assert await trigger.evaluate('n=>n===document.activeElement')
-            await trigger.click();await switcher.get_by_role('button',name='Abrir este caso en Decision Center',exact=True).click()
+            assert await approver.locator('[data-case-switcher],[data-select-case]').count()==0
+            await approver.get_by_role('button',name='Volver a Decision Center',exact=True).click()
+            await approver.locator('[data-center-case="'+case+'"]').wait_for()
+            await matrix(approver,'completed')
+            await approver.locator('[data-case-open="'+case+'"]').click()
             center=approver.locator('[data-platform-decisions]');await center.get_by_role('heading',name='Cadena de decisiones',exact=True).wait_for()
             assert parse_qs(urlsplit(approver.url).query)['center_case_id']==[case]
             assert await center.locator('[data-center-case="'+case+'"]').get_attribute('aria-selected')=='true'
@@ -200,7 +224,7 @@ async def main():
             await open_stage(viewer,'decision-dashboard','logistics_scheduling',d2)
             assert await viewer.locator('[data-approve-toolbar],[data-approve-final]').count()==0
             switch_queries=[r for r in requests if r['path']=='/api/platform/decisions' and r['query'].get('limit')==['8']]
-            assert len(switch_queries)==2 and all(r['query'].get('dda')==['logistics'] and r['query'].get('offset')==['0'] for r in switch_queries)
+            assert switch_queries==[], 'The Case flow must never query an internal Case picker.'
             assert not any(r['method']=='GET' and r['path']=='/api/decision-cases' for r in requests[switch_start:])
             assert sum(r['method']=='POST' and r['path']=='/api/runs' for r in requests)==2
             assert sum(r['method']=='POST' and r['path'].endswith('/approve') for r in requests)==2

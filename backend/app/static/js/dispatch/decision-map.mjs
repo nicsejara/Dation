@@ -315,13 +315,13 @@ function connector(fromId,toId,presentations,nextNodeId){
   +'</div>';
 }
 
-function heroMarkup(){
+function heroMarkup(decisionCase){
   const mapStep=workflowStep("map",{number:2,label:"Mapa de decisiones"});
   return decisionHero({
     className:"dispatch-pro-hero dispatch-map-premium__hero",
     reveal:true,
     step:mapStep,
-    title:"Elegí la decisión que tus datos ya pueden resolver.",
+    title:decisionCase?.label||"Decision Case",
     description:"Dation muestra qué decisiones podés resolver con tus datos y cuáles se habilitan después. Elegí, configurá y aprobá para avanzar.",
     panelTitle:"CÓMO AVANZA EL CASO",
     panelItems:[
@@ -334,7 +334,7 @@ function heroMarkup(){
 }
 
 function caseState(approved,presentations){
-  if(approved===DECISION_ORDER.length){
+  if(approved===DECISION_ORDER.filter(id=>DECISION_META[id].implemented).length){
     return {label:"Completo",tone:"complete",icon:"checkCircle"};
   }
   const needsReview=DECISION_ORDER.some(nodeId=>[
@@ -359,10 +359,10 @@ function caseStatusChip(approved,presentations){
 function progressMarkup(presentations,approved,activeNodeId){
   return '<div class="dispatch-case-progress">'
     +'<div class="dispatch-case-progress__heading">'
-      +'<small>PROGRESO</small><strong>'+num(approved)+' de 3 aprobadas</strong>'
+      +'<small>PROGRESO</small><strong>'+num(approved)+' de 2 aprobadas</strong>'
     +'</div>'
-    +'<div class="dispatch-case-progress__grid" role="progressbar" aria-label="Decisiones aprobadas" aria-valuetext="'+approved+' de 3 decisiones aprobadas" aria-valuemin="0" aria-valuemax="3" aria-valuenow="'+approved+'">'
-      +DECISION_ORDER.map(nodeId=>{
+    +'<div class="dispatch-case-progress__grid" role="progressbar" aria-label="Decisiones aprobadas" aria-valuetext="'+approved+' de 2 decisiones aprobadas" aria-valuemin="0" aria-valuemax="2" aria-valuenow="'+approved+'">'
+      +DECISION_ORDER.filter(id=>DECISION_META[id].implemented).map(nodeId=>{
         const meta=DECISION_META[nodeId];
         const approvedNode=presentations[nodeId].status===STATUS.APPROVED;
         const active=nodeId===activeNodeId&&!approvedNode;
@@ -438,19 +438,19 @@ function caseCardMarkup(decisionCase,presentations,orders,fleet,approved){
   const created=dateTime(decisionCase?.created_at);
   const pack=dataPackHealth(orders,fleet);
   return '<details data-map-context class="d-data-context dispatch-map-casebar dispatch-case-card" aria-label="Decision Case y Data Pack activo">'
-    +'<summary class="dispatch-map-context-summary"><span>Decision Case <strong>'+esc(caseId)+'</strong></span><small>Data Pack activo · '+esc(pack.label)+'</small><span class="decision-context-chevron" aria-hidden="true">⌄</span></summary>'
+    +'<summary class="dispatch-map-context-summary"><span>Decision Case <strong>'+esc(caseId)+'</strong></span><small>Data Pack activo · '+esc(pack.label)+'</small>'+(decisionCase?.status==='archived'?'<span class="dispatch-map-state-chip">Archivado</span>':'')+'<span class="decision-context-chevron" aria-hidden="true">⌄</span></summary>'
     +'<div class="dispatch-case-card__top">'
       +'<div class="dispatch-case-identity">'
         +'<span class="dispatch-case-identity__icon">'+iconSvg("folderOpen","dispatch-map-icon")+'</span>'
         +'<div class="dispatch-case-identity__copy">'
           +'<small>DECISION CASE</small>'
           +'<div class="dispatch-case-identity__idrow">'
-            +'<strong title="'+esc(fullId||caseId)+'">'+esc(caseId)+'</strong>'
+            +'<strong title="'+esc(fullId||caseId)+'">Decision Case · '+esc(caseId)+'</strong>'
             +'<button type="button" data-copy-case-id title="Copiar ID" aria-label="Copiar ID completo del caso">'+iconSvg("copy","dispatch-map-icon")+'</button>'
-            +caseStatusChip(approved,presentations)
+            +(decisionCase?.status==='archived'?'':caseStatusChip(approved,presentations))
           +'</div>'
           +(created?'<span class="dispatch-case-identity__created">Creado el '+esc(created)+'</span>':'')
-          +'<span class="dispatch-case-identity__full-id">'+esc(fullId)+'</span>'
+
           +'<span class="dispatch-case-identity__trust">Todo lo que decidas queda registrado en este caso.</span>'
           +'<span class="dispatch-case-identity__feedback" data-case-copy-feedback aria-live="polite"></span>'
         +'</div>'
@@ -465,8 +465,8 @@ function caseCardMarkup(decisionCase,presentations,orders,fleet,approved){
           +'<span class="dispatch-datapack-status is-'+pack.tone+'">'+iconSvg(pack.icon,"dispatch-map-icon")+esc(pack.label)+'</span>'
         +'</div>'
         +'<button type="button" class="dispatch-map-change-data" data-map-action="data" '
-          +(approved>0?'data-confirm-data-change="true" ':'')+'>'
-          +iconSvg("refresh","dispatch-map-icon")+'<span>Cambiar datos</span>'
+          +'>'
+          +iconSvg("refresh","dispatch-map-icon")+'<span>Consultar / preparar datos</span>'
         +'</button>'
       +'</div>'
       +'<div class="dispatch-datapack-grid">'
@@ -493,12 +493,12 @@ function legendMarkup(){
 }
 
 function completeBanner(approved,lastRunId){
-  if(approved!==3||!lastRunId)return "";
+  if(approved!==2)return "";
   return '<section class="dispatch-map-complete">'
     +'<span>'+iconSvg("checkCircle","dispatch-map-icon")+'</span>'
-    +'<div><small>CASO COMPLETO</small><strong>Las tres decisiones están aprobadas.</strong>'
+    +'<div><small>CASO COMPLETO</small><strong>Case completado · 2/2 aprobadas.</strong>'
       +'<p>Podés volver al resultado final o reabrir cualquier decisión desde su tarjeta.</p></div>'
-    +'<button type="button" data-map-action="open-result" data-map-node="logistics_final_assignment">Ir al dashboard →</button>'
+    +'<button type="button" data-map-action="center">Volver a Decision Center →</button>'
   +'</section>';
 }
 
@@ -573,9 +573,7 @@ export async function renderDecisionMap(
 
   root.className="dispatch dispatch-upload-pro dispatch-decision-map dispatch-decision-map--premium dispatch-decision-map--case-v2";
   root.innerHTML=
-    heroMarkup()
-    +'<div class="dispatch-map-case-selector"><span>DECISION CASE</span>'
-      +'<button type="button" data-select-case aria-haspopup="dialog" title="Seleccionar Decision Case">'+esc(displayCaseId(decisionCase?.id))+' <span aria-hidden="true">⌄</span></button></div>'
+    heroMarkup(decisionCase)
     +(transitionNotice
       ?'<section class="dispatch-map-stale dispatch-map-stale--premium" role="status" data-case-transition>'
         +iconSvg("info","dispatch-map-icon")
@@ -604,7 +602,7 @@ export async function renderDecisionMap(
 
   const fullCaseId=String(decisionCase?.id||"");
   const selector=root.querySelector('[data-select-case]');
-  scope.listen(selector,'click',()=>onSelectCase?.(selector));
+
   const copyButton=root.querySelector("[data-copy-case-id]");
   const feedback=root.querySelector("[data-case-copy-feedback]");
   if(copyButton){
@@ -651,6 +649,7 @@ export async function renderDecisionMap(
         onOpenResult?.(nodeId);
         return;
       }
+      if(action==="center"){window.DationDispatch.openDecisionCenter();return;}
       if(action==="data"){
         if(button.dataset.confirmDataChange==="true"){
           if(changeDialog?.showModal){

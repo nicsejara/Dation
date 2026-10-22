@@ -204,6 +204,7 @@ async def ensure_case(
     fleet_dataset_id: str,
     *,
     state: dict | None = None,
+    identity: dict | None = None,
 ) -> dict:
     existing = await get_case_row(case_id)
     if existing:
@@ -254,6 +255,7 @@ async def ensure_case(
                     fleet_dataset_id,
                 ),
                 "state_json": canonical_state,
+                **(identity or {}),
                 "created_at": canonical_state["created_at"],
                 "updated_at": now,
                 "last_activity_at": now,

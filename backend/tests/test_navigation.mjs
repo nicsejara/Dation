@@ -25,7 +25,7 @@ test('older failed scheduling metadata and schema still identify the correct cas
 });
 
 test('platform deep links resolve and global navigation omits decision context',()=>{
- for(const [path,view] of [['/app','platform-home'],['/app/ddas','inicio'],['/app/decisions','platform-decisions'],['/app/data','platform-data'],['/app/team','platform-team'],['/app/settings','settings'],['/app/profile','profile'],['/app/ddas/logistics','logistics-overview']])assert.equal(readResource('https://qa'+path).view,view);
+ for(const [path,view] of [['/app','platform-home'],['/app/ddas','platform-home'],['/app/decisions','platform-decisions'],['/app/data','platform-data'],['/app/team','platform-team'],['/app/settings','settings'],['/app/profile','profile'],['/app/ddas/logistics','logistics-overview']])assert.equal(readResource('https://qa'+path).view,view);
  const global=resourceUrl('https://qa/app?case_id='+id+'&node_id=logistics_scheduling&run_id='+id,{view:'settings',caseId:id,nodeId:'logistics_scheduling',runId:id});
  assert.equal(global.pathname,'/app/settings');assert.equal(global.searchParams.get('case_id'),null);assert.equal(global.searchParams.get('run_id'),null);
  assert.throws(()=>readResource('https://qa/app/missing'));

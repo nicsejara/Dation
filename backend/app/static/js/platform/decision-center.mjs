@@ -1,5 +1,6 @@
 import {caseContext,statePresentation,objectivePresentation} from './foundation.mjs';
 import {DDA_CATALOG} from './dda-catalog.mjs';
+import {CASE_CATEGORIES} from '../dispatch/case-identity.mjs';
 import {describeFailure} from '../dispatch/recovery.mjs';
 import {demoBadge} from './onboarding.mjs';
 import {api} from '../dispatch/shared.mjs';
@@ -108,6 +109,8 @@ export function mountDecisionCenter(root,getIdentity){
   if(admin()&&c.status!=='archived'&&(['data_preparation','data_owner','data_steward'].includes(stageKey)||DECISION_META[stageKey]?.implemented)){const assign=button(value?'Cambiar':'Asignar',()=>actions.assign(c,stageKey,key),'ghost');assign.className='center-inline-action';assign.setAttribute('aria-label',`${value?'Cambiar':'Asignar'} ${label.toLowerCase()} · ${stageKey==='data_preparation'?'datos':DECISION_META[stageKey]?.label||stageKey}`);field.append(assign);}return field;}
  function renderDrawer(c){
   cleanupDrawer();const content=el('div',undefined,'center-drawer__content');body.replaceChildren(drawerFrame(c),content);const top=el('div',undefined,'center-case-meta');top.append(el('span',ddaLabel(c.dda),'center-dda-tag'),pill(c.display_status||c.status));if(c.is_demo)top.append(demoBadge());const menu=maintenance(c);top.append(menu.node);drawerCleanups.push(menu.dispose);content.append(top);
+  if(c.category)content.append(el('p','Categoría · '+(CASE_CATEGORIES.find(([id])=>id===c.category)?.[1]||c.category),'d-metadata'));
+  if(c.description)content.append(el('p',c.description,'d-body'));
   const ctas=el('div',undefined,'center-drawer__ctas'),relevant=c.nodes?.find(n=>n.id===c.current_step),official=c.resume?.run_id&&relevant?.approval_current&&c.resume.run_id===relevant.approved_run?.id;ctas.append(destination(official?'Ver resultado aprobado':c.status==='completed'?'Ver resultado':relevant?.status==='review'?'Revisar':'Continuar',c.resume,c,{primary:true,continuation:true}),destination('Ir al Decision Map',c.dda==='logistics'?{view:'logistics-map',node_id:c.current_step,run_id:null}:null,c,{continuation:true}));content.append(ctas);
   const objective=el('div',undefined,'center-objective');objective.append(icon('target'),el('div','Objetivo actual','d-metadata'),el('strong',c.current_objective?.label||'Por definir'));content.append(objective);
   const responsibility=el('section',undefined,'center-responsibilities');if(c.current_step&&relevant)responsibility.append(personField(c,c.current_step,'owner','Responsable',relevant.owner),personField(c,c.current_step,'approver','Aprobador asignado',relevant.approver));content.append(responsibility);
