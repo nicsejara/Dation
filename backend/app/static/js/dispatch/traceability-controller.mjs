@@ -46,8 +46,8 @@ export function decorateDecisionMap(root){
     const card=root.querySelector('[data-decision-node="'+nodeId+'"]');if(!card)continue;
     const node=workspace.decisionCase?.nodes?.[nodeId];if(!node?.run_count)continue;
     const bar=document.createElement('div');bar.className='dispatch-decision-node__tracebar';
-    const history=document.createElement('button');history.type='button';history.textContent='Historial · '+node.run_count;history.onclick=()=>showHistory(nodeId);bar.append(history);
-    if(['approved','review','stale','error'].includes(node.status)&&['logistics_assignment','logistics_scheduling'].includes(nodeId)){const fresh=document.createElement('button');fresh.type='button';fresh.dataset.traceNew=nodeId;fresh.textContent='+ Nueva corrida';fresh.onclick=()=>window.DationDispatch.openCase(workspace.decisionCase.id,'logistics-config',nodeId);bar.append(fresh);}
+    const history=document.createElement('button');history.type='button';history.className='d-button d-button--secondary';history.textContent='Historial · '+node.run_count;history.onclick=()=>showHistory(nodeId);bar.append(history);
+    if(['approved','review','stale','error'].includes(node.status)&&['logistics_assignment','logistics_scheduling'].includes(nodeId)){const fresh=document.createElement('button');fresh.type='button';fresh.className='d-button d-button--secondary';fresh.dataset.traceNew=nodeId;fresh.textContent='Nueva corrida';fresh.onclick=()=>window.DationDispatch.openCase(workspace.decisionCase.id,'logistics-config',nodeId);bar.append(fresh);}
     card.append(bar);
   }
 }

@@ -941,106 +941,15 @@ details[open]>summary .decision-context-chevron{transform:rotate(180deg);}
   }
 }
 
-/* Decision Map micro-polish: CTA, local state-only chips, milestone progress */
-.dispatch-decision-map--case-v2 .dispatch-map-chain-heading .dispatch-map-legend{
-  display:none!important;
-}
-
-.dispatch-decision-map--case-v2 .dispatch-case-progress__grid{
-  position:relative;
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:0;
-  min-height:34px;
-  padding:2px 0;
-  isolation:isolate;
-}
-
-.dispatch-decision-map--case-v2 .dispatch-case-progress__grid::before{
-  content:"";
-  position:absolute;
-  top:50%;
-  right:16.666%;
-  left:16.666%;
-  z-index:0;
-  height:6px;
-  transform:translateY(-50%);
-  border-radius:999px;
-  background:var(--d-surface-2);
-}
-
-.dispatch-decision-map--case-v2 .dispatch-case-progress__item{
-  position:relative;
-  z-index:1;
-  display:flex;
-  min-width:0;
-  align-items:center;
-  justify-content:center;
-  gap:0;
-}
-
-.dispatch-decision-map--case-v2 .dispatch-case-progress__item.is-approved:not(:last-child)::before{
-  content:"";
-  position:absolute;
-  top:50%;
-  left:50%;
-  z-index:0;
-  width:100%;
-  height:6px;
-  transform:translateY(-50%);
-  background:var(--color-action-primary-bg);
-}
-
-.dispatch-decision-map--case-v2 .dispatch-case-progress__segment{
-  position:relative;
-  z-index:2;
-  display:grid;
-  width:28px;
-  height:28px!important;
-  flex:0 0 28px;
-  place-items:center;
-  margin-top:0!important;
-  overflow:visible;
-  border:2px solid var(--d-border-control);
-  border-radius:50%;
-  color:var(--d-text-muted);
-  background:var(--d-surface-2);
-  box-shadow:var(--shadow-sm-dark);
-  font-size:12px;
-  font-weight:900;
-  line-height:1;
-}
-
-.dispatch-decision-map--case-v2 .dispatch-case-progress__segment .dispatch-map-icon{
-  display:none;
-}
-
-.dispatch-decision-map--case-v2 .dispatch-case-progress__item:nth-child(1) .dispatch-case-progress__segment::after{content:"1";}
-.dispatch-decision-map--case-v2 .dispatch-case-progress__item:nth-child(2) .dispatch-case-progress__segment::after{content:"2";}
-.dispatch-decision-map--case-v2 .dispatch-case-progress__item:nth-child(3) .dispatch-case-progress__segment::after{content:"3";}
-
-.dispatch-decision-map--case-v2 .dispatch-case-progress__item.is-active .dispatch-case-progress__segment{
-  width:30px;
-  height:30px!important;
-  flex-basis:30px;
-  border-color:var(--d-border-control);
-  color:var(--d-text-primary);
-  background:var(--color-action-primary-bg);
-  box-shadow:var(--shadow-sm-dark);
-}
-
-.dispatch-decision-map--case-v2 .dispatch-case-progress__item.is-approved .dispatch-case-progress__segment{
-  border-color:var(--case-fleet);
-  color:var(--d-bg-0);
-  background:var(--case-fleet);
-}
-
-.dispatch-decision-map--case-v2 .dispatch-case-progress__label{
-  display:none!important;
-}
-
-@media(max-width:560px){
-  .dispatch-decision-map--case-v2 .dispatch-case-progress__grid{
-    gap:0;
-  }
-}
+/* Compact, ordered milestones: reached decisions are distinct from approvals. */
+.dispatch-decision-map--case-v2 .dispatch-map-chain-heading .dispatch-map-legend{display:none!important}
+.dispatch-decision-map--case-v2 .dispatch-map-progress{padding:10px 16px}
+.dispatch-decision-map--case-v2 .dispatch-case-progress{gap:8px}
+.dispatch-decision-map--case-v2 .dispatch-case-progress__grid{display:grid;grid-template-columns:repeat(var(--decision-count),minmax(0,1fr));gap:0;min-height:22px;list-style:none;margin:0;padding:0}
+.dispatch-decision-map--case-v2 .dispatch-case-progress__item{position:relative;display:flex;align-items:center;justify-content:center;min-width:0}
+.dispatch-decision-map--case-v2 .dispatch-case-progress__item:not(:first-child)::before{content:"";position:absolute;right:50%;width:100%;height:2px;background:var(--d-border-control)}
+.dispatch-decision-map--case-v2 .dispatch-case-progress__item.is-reached::before{background:var(--d-brand-teal-bright)}
+.dispatch-decision-map--case-v2 .dispatch-case-progress__segment{position:relative;z-index:1;display:grid;place-items:center;flex:0 0 22px;width:22px;height:22px!important;margin:0!important;border:1px solid var(--d-border-control);border-radius:50%;background:var(--d-surface-2);color:var(--d-text-muted);font-size:10px;line-height:1;font-weight:700;box-shadow:none}
+.dispatch-decision-map--case-v2 .dispatch-case-progress__item.is-reached .dispatch-case-progress__segment{background:var(--d-brand-teal-bright);border-color:var(--d-brand-teal-bright);color:var(--d-bg-0)}
+.dispatch-decision-map--case-v2 .dispatch-case-progress__item[aria-disabled] .dispatch-case-progress__segment{background:var(--d-surface-2);color:var(--d-text-muted)}
+.dispatch-decision-map--case-v2 .dispatch-case-progress__label{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}

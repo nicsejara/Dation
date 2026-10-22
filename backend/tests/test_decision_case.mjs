@@ -55,29 +55,37 @@ const partialReadiness = {
 };
 
 const metadata={logistics_assignment:{implemented:true},logistics_scheduling:{implemented:true,label:'Planificación',short:'Planificación'},logistics_final_assignment:{implemented:false,label:'Asignación final'}};
-test('continuation uses actual approval and readiness without changing the case',()=>{
+const person={id:'owner',name:'Owner'},workflow={gates_enforced:true,attributes_applied:true,stages:{data_owner:{owner:person,owner_eligible:true},logistics_assignment:{owner:person,owner_eligible:true},logistics_scheduling:{owner:person,owner_eligible:true}}};
+test('continuation checks current Run approval and real data readiness without mutations',()=>{
   const current=transitionNode(createDecisionCase('case',orders,fleet),'logistics_assignment',STATUS.APPROVED,{run_id:'approved',approved_run_id:'approved'});
   const before=structuredClone(current);
-  assert.equal(continuationState(current,'logistics_assignment','candidate',fullReadiness,metadata),null);
-  assert.equal(continuationState(current,'logistics_assignment','approved',partialReadiness,metadata).state,'needs_data');
-  assert.deepEqual(continuationState(current,'logistics_assignment','approved',fullReadiness,metadata),{state:'available',nodeId:'logistics_scheduling',label:'Configurar siguiente decisión',target:{view:'logistics-config',node_id:'logistics_scheduling',run_id:null}});
+  assert.equal(continuationState(current,'logistics_assignment','candidate',fullReadiness,metadata,workflow),null);
+  assert.equal(continuationState(current,'logistics_assignment','approved',partialReadiness,metadata,workflow).target.view,'logistics-map');
+  assert.deepEqual(continuationState(current,'logistics_assignment','approved',fullReadiness,metadata,workflow),{state:'available',nodeId:'logistics_scheduling',label:'Configurar D2 · Planificación',target:{view:'logistics-config',node_id:'logistics_scheduling',run_id:null}});
   assert.deepEqual(current,before);
 });
-test('approved downstream and unimplemented decisions do not open an empty configuration',()=>{
+test('missing or ineligible next Owner routes to the same Case Map using dynamic metadata',()=>{
+  const current=transitionNode(createDecisionCase('case',orders,fleet),'logistics_assignment',STATUS.APPROVED,{run_id:'a',approved_run_id:'a'});
+  const dynamic={...metadata,logistics_scheduling:{...metadata.logistics_scheduling,label:'Scheduling',index:'02'}};
+  for(const owner of [null,{id:'inactive'}]){
+    const roles=structuredClone(workflow);roles.stages.logistics_scheduling={owner,owner_eligible:false};
+    const next=continuationState(current,'logistics_assignment','a',fullReadiness,dynamic,roles);
+    assert.equal(next.label,'Asignar Decision Owner · D2 Scheduling');assert.equal(next.target.view,'logistics-map');assert.equal(next.nodeId,'logistics_scheduling');
+  }
+});
+test('last implemented approved Decision completes the Case with no future Decision CTA',()=>{
   let current=transitionNode(createDecisionCase('case',orders,fleet),'logistics_assignment',STATUS.APPROVED,{run_id:'a',approved_run_id:'a'});
   current=transitionNode(current,'logistics_scheduling',STATUS.APPROVED,{run_id:'s',approved_run_id:'s'});
-  assert.equal(continuationState(current,'logistics_assignment','a',fullReadiness,metadata).state,'finished');
-  assert.equal(continuationState(current,'logistics_assignment','a',fullReadiness,metadata).target.run_id,'s');
-  assert.equal(continuationState(current,'logistics_scheduling','s',fullReadiness,metadata).state,'completed');
+  const next=continuationState(current,'logistics_scheduling','s',fullReadiness,metadata,workflow);
+  assert.equal(next.state,'completed');assert.equal(next.target,undefined);assert.match(next.message,/CASE COMPLETADO/);
   assert.equal(nextDecisionId('unknown'),null);assert.equal(nextDecisionId('logistics_final_assignment'),null);
 });
-test('running or review next nodes open through the existing-run rail, never through a new config',()=>{
+test('new-run continuation retains current Case, node and historical evidence',()=>{
   let current=transitionNode(createDecisionCase('case',orders,fleet),'logistics_assignment',STATUS.APPROVED,{run_id:'a',approved_run_id:'a'});
-  for(const status of [STATUS.RUNNING,STATUS.REVIEW,STATUS.STALE]){
-    current=transitionNode(current,'logistics_scheduling',status,{run_id:'s'});
-    assert.equal(continuationState(current,'logistics_assignment','a',fullReadiness,metadata).state,status);
-    assert.equal(continuationState(current,'logistics_assignment','a',fullReadiness,metadata).target.view,'decision-dashboard');
-    assert.equal(continuationState(current,'logistics_assignment','a',fullReadiness,metadata).target.run_id,'s');
+  for(const status of [STATUS.RUNNING,STATUS.REVIEW,STATUS.STALE,STATUS.APPROVED]){
+    current=transitionNode(current,'logistics_scheduling',status,{run_id:'s'});const before=structuredClone(current);
+    const next=continuationState(current,'logistics_assignment','a',fullReadiness,metadata,workflow);
+    assert.equal(next.target.view,'logistics-config');assert.equal(next.target.node_id,'logistics_scheduling');assert.equal(next.target.run_id,null);assert.deepEqual(current,before);
   }
 });
 

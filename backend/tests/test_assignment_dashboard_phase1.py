@@ -104,7 +104,7 @@ class AssignmentDashboardPhase1Tests(unittest.TestCase):
         self.assertNotIn("data-analysis-depth-select", self.shell)
         self.assertNotIn("analysis_depth=", self.shell)
 
-    def test_hero_and_final_actions_share_the_existing_approval_controller(self):
+    def test_hero_is_the_only_approval_entry_using_the_existing_controller(self):
         self.assertIn("renderDashboardToolbar(run,caseActions,{placement:'hero'})",self.shell)
         self.assertIn('renderSchedulingShell(root,run,actions)',self.scheduling)
         self.assertIn("renderDashboardToolbar(run,caseActions,{placement:'hero'})",(JS/'scheduling-dashboard-shell.mjs').read_text())
@@ -112,7 +112,8 @@ class AssignmentDashboardPhase1Tests(unittest.TestCase):
         self.assertIn('data-more-menu',self.toolbar)
         self.assertIn('data-approve-toolbar',self.toolbar)
         self.assertNotIn('approvalMarkup',self.shell)
-        self.assertIn('data-approve-final',self.shell)
+        self.assertNotIn('data-approve-final',self.shell)
+        self.assertNotIn('data-approve-final',(JS/'scheduling-dashboard-shell.mjs').read_text())
         self.assertNotIn('caseActions.onApprove()',self.shell)
         self.assertNotIn('data-rerun-validation',self.shell)
         self.assertIn('await caseActions.onApprove()',self.toolbar)

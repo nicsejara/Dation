@@ -3,7 +3,6 @@ import {esc} from './shared.mjs';
 import {scopeFor} from './lifecycle.mjs';
 import {decisionRail,bindDecisionRail} from './decision-nav.mjs';
 import {renderDashboardToolbar,bindDashboardToolbar} from './dashboard-toolbar.mjs';
-import {WORKFLOW_ACTION_CLASS} from './workflow-action-bar.mjs';
 export const schedulingIcon=name=>iconSvg(name,'scheduling-v2__icon');
 
 export function renderSchedulingShell(root,run,caseActions={}){
@@ -26,9 +25,6 @@ export function renderSchedulingShell(root,run,caseActions={}){
         +'<div id="'+esc(id)+'-content" data-scheduling-advanced-content hidden></div>'
       +'</section>'
       +'<section class="dispatch-panel scheduling-v2__panel" id="scheduling-validation"></section>'
-      +'<section class="dispatch-panel scheduling-v2__panel scheduling-final-actions" aria-label="Acciones finales">'
-        +(caseActions.onApprove?'<button type="button" class="'+WORKFLOW_ACTION_CLASS+' d-button--primary" data-approve-final>'+schedulingIcon('checkCircle')+'<span>'+(caseActions.status==='approved'?'Planificación aprobada':'Aprobar planificación')+'</span></button>':'')
-        +'<button type="button" class="'+WORKFLOW_ACTION_CLASS+' d-button--primary" data-after-approve hidden>Continuar a la siguiente decisión</button><p data-next-decision-status role="status"></p></section>'
     +'</main><button type="button" class="dispatch-ai-fab" data-chat aria-expanded="false" aria-label="Abrir Dation IA">'+schedulingIcon('sparkles')+'<strong>Dation IA</strong></button>'
     +'<aside class="dispatch-chat dispatch-panel" hidden aria-label="Chat de la planificación"></aside>'+drawer;
   const find=selector=>root.querySelector(selector);

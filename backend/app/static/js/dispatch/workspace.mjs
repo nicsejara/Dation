@@ -8,7 +8,7 @@ import {STATUS,createDecisionCase,replaceInputs,transitionNode,inputSignature,ca
 import {resolveNodeDestination,resolveDecisionDestination,configurationAvailable} from './decision-target.mjs';
 import {DECISION_META} from './decision-ui.mjs';
 import {caseContext} from '../platform/foundation.mjs';
-import {mountWorkflowContext,mountMapResponsibilities,mountDashboardTrace} from './workflow-context.mjs';
+import {mountWorkflowContext,mountMapResponsibilities,mountDashboardTrace,renderExecutionProgress} from './workflow-context.mjs';
 import {responsibilityProblem} from './workflow-responsibility.mjs';
 import {currentLogisticsEnabled,logisticsView} from '../platform/entitlements.mjs';
 
@@ -79,7 +79,7 @@ function presetWeights(objective,dimensions){
 }
 
 import {readResource,resourceUrl,runDecisionState,runContext} from './navigation.mjs';
-import {createScope,disposeScope} from './lifecycle.mjs';
+import {createScope,disposeScope,scopeFor} from './lifecycle.mjs';
 import {runPolling} from './run-polling.mjs';
 import {restoreRunConfiguration,mount as mountSchedulingConfig} from './scheduling-config-v2.mjs';
 import {decorateDecisionMap,mountTraceability} from './traceability-controller.mjs';
@@ -291,9 +291,7 @@ async function dashboardContinuation(run,nodeId,generation){
   if(runDecisionState(run,state.decisionCase,nodeId)!=='approved')return null;
   if(!state.preflight)await preflight();
   if(generation!==routeGeneration)return null;
-  const next=continuationState(state.decisionCase,nodeId,run.id,state.preflight?.decision_readiness,DECISION_META);
-  if(next?.target?.view==='logistics-config'&&!configurationAvailable(next.nodeId,state.decisionCase,state.workflow))return {...next,target:null,message:'Asigná el Decision Owner desde el mapa para continuar.'};
-  return next;
+  return continuationState(state.decisionCase,nodeId,run.id,state.preflight?.decision_readiness,DECISION_META,state.workflow);
 }
 
 function urlRun(id,schema='assignment_v1',caseId=state.decisionCase?.id||null){resource={view:'decision-dashboard',caseId,nodeId:schema==='scheduling_v1'?'logistics_scheduling':'logistics_assignment',runId:id};history.replaceState(null,'',resourceUrl(location.href,resource));}
@@ -401,6 +399,7 @@ async function loadDecisionMap(){
       orders:state.orders,
       fleet:state.fleet,
       transitionNotice,
+      dataOwner:state.workflow?.stages?.data_owner?.owner?.name,
       onConfigure:(nodeId)=>{
         state.activeNode=nodeId||'logistics_assignment';
         decisionContext(state.activeNode);
@@ -411,7 +410,10 @@ async function loadDecisionMap(){
       onData:()=>navigate('logistics-data'),
       onSelectCase:()=>{const trigger=node.querySelector('[data-case-switcher] button');trigger?.focus();trigger?.click();},
     });
-    if(generation===routeGeneration){decorateDecisionMap(node);mountMapResponsibilities(node,{state,onSaved:()=>{persist();loadDecisionMap();}});}
+    if(generation===routeGeneration){decorateDecisionMap(node);mountMapResponsibilities(node,{state,onSaved:()=>{persist();loadDecisionMap();}});
+      const target=resource.nodeId&&node.querySelector('article[data-decision-node="'+CSS.escape(resource.nodeId)+'"]');
+      if(target&&!state.workflow?.stages?.[resource.nodeId]?.owner_eligible){target.classList.add('d-attention-target','is-attention');scopeFor(node)?.timeout(()=>{target.scrollIntoView({block:'center',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});target.querySelector('.workflow-responsibility button')?.focus({preventScroll:true});},0);}
+    }
   }catch(error){
     if(generation!==routeGeneration)return;
     if(error.workflowGate==='data'){
@@ -497,14 +499,14 @@ async function loadConfig(){
   }
 }
 
-function pending(message){document.body.classList.add('dispatch-result');roots.dashboard.innerHTML=`<section class="dispatch-panel"><h1>Preparando tu decisión</h1><p role="status">${esc(message)}</p><div class="dispatch-loading" aria-label="Procesando"></div><p>El Decision Case conserva el estado real de esta ejecución.</p><button data-return>Volver al mapa</button></section>`;roots.dashboard.querySelector('[data-return]').onclick=()=>navigate('logistics-map');}
+function pending(stage){document.body.classList.add('dispatch-result');window.dationSetDashboardReady(false);renderExecutionProgress(roots.dashboard,stage);}
 function poll(id,generation,nodeId=state.activeNode,{delay=0,graceUntil=0}={}){
   return runPolling.start({runId:id,delay,graceUntil,read:(runId,signal)=>api('/api/runs/'+runId,{signal}),
     onRun:async run=>{
       if(generation!==pollGeneration)return;
       if(run.status==='completed'){try{await show(run);}catch(error){if(generation===pollGeneration)errorBox(roots.dashboard,error,()=>openRun(id,nodeId));}return;}
       if(run.status==='error'){try{await showTerminalRun(run,nodeId);}catch(error){if(generation===pollGeneration)errorBox(roots.dashboard,error,()=>openRun(id,nodeId));}return;}
-      pending('Etapa: '+(run.progress_json?.stage||run.status||'queued'));
+      pending(run.progress_json?.stage||run.status||'queued');
     },onError:error=>{if(generation===pollGeneration)errorBox(roots.dashboard,error,()=>openRun(id,nodeId));},
   });
 }
@@ -531,7 +533,7 @@ async function execute(){
   persist();
   urlRun(id);
   await navigate('decision-dashboard',{runId:id,nodeId:'logistics_assignment',render:false});
-  pending('Registrando la corrida…');
+  pending('registering');
   const generation=++pollGeneration;
   runPolling.stop();
   try{
@@ -572,7 +574,7 @@ async function executeScheduling(sourceRunId){
   persist();
   urlRun(id,'scheduling_v1');
   await navigate('decision-dashboard',{runId:id,nodeId:'logistics_scheduling',render:false});
-  pending('Registrando la planificación…');
+  pending('registering');
   const generation=++pollGeneration;
   runPolling.stop();
   try{
@@ -724,7 +726,7 @@ export async function show(run){
         const next=await dashboardContinuation(run,nodeId,generation);
         if(generation!==routeGeneration)return;
         if(next?.state==='completed')return window.DationDispatch.openDecisionCenter({filter:'completed'});
-        if(next?.target?.view==='logistics-config')return navigateResource('logistics-config',{caseId:caseMeta.case_id,nodeId:next.nodeId,runId:null});
+        if(next?.target)return navigateResource(next.target.view,{caseId:caseMeta.case_id,nodeId:next.nodeId,runId:null});
         return navigateResource('logistics-map',{caseId:caseMeta.case_id,nodeId:null,runId:null});
       },
       onOpenNode:state.decisionCase?id=>{
@@ -759,7 +761,7 @@ export async function show(run){
   if(approvalReason&&runDecisionState(run,state.decisionCase,nodeId)!=='approved'){
     const note=document.createElement('p');note.className='workflow-gate-reason';note.id='workflow-approval-reason';note.textContent=approvalReason;
     roots.dashboard.querySelector('[data-run-trace]')?.after(note);
-    roots.dashboard.querySelectorAll('[data-approve-toolbar],[data-approve-final]').forEach(button=>button.setAttribute('aria-describedby',note.id));
+    roots.dashboard.querySelectorAll('[data-approve-toolbar]').forEach(button=>button.setAttribute('aria-describedby',note.id));
   }
   renderView('decision-dashboard');
 }
@@ -835,14 +837,14 @@ async function navigateResource(view,options={}){
     }
     if(publicView==='decision-dashboard'){
       if(!next.runId)throw new Error('Seleccioná una corrida para abrir su resultado.');
-      pending('Recuperando la corrida…');poll(next.runId,pollGeneration,next.nodeId);
+      pending('recovering');poll(next.runId,pollGeneration,next.nodeId);
     }
   }catch(error){if(generation===routeGeneration&&!routeController.signal.aborted)errorBox(root,error,()=>navigateResource(view,{...options,replace:true}));}
 }
 async function openRun(id,nodeId=state.activeNode,caseId=state.decisionCase?.id){return navigateResource('decision-dashboard',{runId:id,nodeId,caseId});}
 async function executeConfiguredScheduling({sourceRun,configuration,options}){
   const id=crypto.randomUUID(),caseId=state.decisionCase.id;
-  await navigateResource('decision-dashboard',{runId:id,nodeId:'logistics_scheduling',render:false});pending('Registrando la planificación…');
+  await navigateResource('decision-dashboard',{runId:id,nodeId:'logistics_scheduling',render:false});pending('registering');
   const generation=pollGeneration;
   try{const run=await post('/api/runs?run_id='+id,{orders_dataset_id:state.orders.id,fleet_dataset_id:state.fleet.id,source_run_id:sourceRun.id,configuration,options,decision_case:{case_id:caseId,node_id:'logistics_scheduling'}});if(generation===pollGeneration){if(run.status==='completed')await show(run);else {poll(id,generation,'logistics_scheduling');await runPolling.refresh();}}}
   catch(error){if(generation===pollGeneration){if(error.workflowGate){await returnToConfiguration(error,'logistics_scheduling',caseId);return;}poll(id,generation,'logistics_scheduling',{graceUntil:Date.now()+10000});await runPolling.refresh();}}

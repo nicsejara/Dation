@@ -4,7 +4,6 @@ import {scopeFor} from './lifecycle.mjs';
 import {decisionRail,bindDecisionRail} from './decision-nav.mjs';
 import {analysisDepthUi} from './assignment-dashboard-selectors.mjs';
 import {renderDashboardToolbar,bindDashboardToolbar} from './dashboard-toolbar.mjs';
-import {WORKFLOW_ACTION_CLASS} from './workflow-action-bar.mjs';
 const icon=name=>iconSvg(name,'assignment-v2__icon');
 
 export function renderAssignmentShell(root,run,caseActions={}){
@@ -30,10 +29,6 @@ export function renderAssignmentShell(root,run,caseActions={}){
           +'<section class="assignment-dashboard-v2__assignment" id="dispatch-assignment" tabindex="-1"></section>'
         +'</div></section>'
       +'<section class="dispatch-panel assignment-dashboard-v2__section assignment-dashboard-v2__review" id="dispatch-review"><div data-review-content></div></section>'
-      +'<section class="assignment-v2__panel assignment-final-actions" aria-label="Acciones finales">'
-        +(caseActions.onApprove?'<button type="button" class="'+WORKFLOW_ACTION_CLASS+' d-button--primary" data-approve-final>'+icon('checkCircle')+'<span>'+(caseActions.status==='approved'?'Decisión aprobada':'Aprobar decisión')+'</span></button>':'')
-        +'<button type="button" class="'+WORKFLOW_ACTION_CLASS+' d-button--primary" data-after-approve hidden>Continuar a Planificación</button>'
-        +'<p data-next-decision-status role="status"></p></section>'
     +'</main>'
     +'<button type="button" class="dispatch-ai-fab assignment-dashboard-v2__ai-fab" data-chat aria-expanded="false" aria-label="Abrir Dation IA">'+icon('sparkles')+'<strong>Dation IA</strong></button>'
     +'<aside class="dispatch-chat dispatch-panel assignment-dashboard-v2__chat" hidden aria-label="Chat de la decisión"></aside>'+drawer;

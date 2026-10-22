@@ -133,3 +133,7 @@ body.dashboard-drawer-open{overflow:hidden;}
   .d-decision-dashboard:is(.assignment-dashboard-v2,.scheduling-dashboard-v2) [data-toolbar-placement="hero"] .dashboard-toolbar__tools>* { width:100%; margin-inline:0; min-width:0!important; }
   .d-decision-dashboard:is(.assignment-dashboard-v2,.scheduling-dashboard-v2) [data-toolbar-placement="hero"] :is([data-rerun],.dashboard-toolbar__menu>summary) { width:100%; min-width:0; min-height:var(--workflow-action-height); }
 }
+
+/* Contextual continuation stays in Hero and wraps naturally on small viewports. */
+.d-decision-dashboard [data-after-approve]{min-width:0;max-width:100%;white-space:normal;height:auto;min-height:var(--workflow-action-height);text-align:center;line-height:1.4}
+.d-decision-dashboard [data-after-approve]>span{white-space:normal;overflow-wrap:anywhere}
