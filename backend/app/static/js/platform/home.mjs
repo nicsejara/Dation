@@ -22,7 +22,11 @@ export function mountWorkspaceHome(root,getIdentity){
  const catalog=heroCta(link('Explorar DDA','platform-home','d-button d-button--primary'));
  ctas.append(catalog);
  copy.append(workspace,title,el('p','Explorá los Decision Data Assets disponibles y convertí tus datos en decisiones trazables.','d-page-description'),ctas);
- const art=el('img',undefined,'platform-home__hero-art');art.src='/static/assets/workspace-home-hero.svg';art.alt='';art.width=420;art.height=280;header.append(copy,art);
+ const chain=el('ol',undefined,'platform-home__chain');chain.setAttribute('aria-label','De los datos a la decisión');
+ for(const [index,label,detail] of [['01','Data Pack','Orders + Fleet'],['02','Decision Case','Criterios y responsables'],['03','Decision Run','Evidencia y aprobación']]){
+  const step=el('li'),number=el('span',index,'platform-home__chain-index'),body=el('div');number.setAttribute('aria-hidden','true');body.append(el('strong',label),el('span',detail));step.append(number,body);chain.append(step);
+ }
+ header.append(copy,chain);
  const quick=el('section',undefined,'d-card platform-home__section platform-home__access'),heading=el('h2','Accesos rápidos','d-section-title'),links=el('ul',undefined,'platform-home__quick');
  heading.id='home-actions-title';quick.setAttribute('aria-labelledby',heading.id);
  for(const [text,view,iconName] of [['Decision Center','platform-decisions','link'],['Datos / Data Hub','platform-data','database'],['Equipo','platform-team','clipboardList'],['Configuración','settings','sliders']]){

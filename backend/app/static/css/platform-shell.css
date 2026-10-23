@@ -23,5 +23,26 @@
 @media(max-width:600px){.dda-navigation ol{gap:16px}.dda-navigation li:not(:last-child)::after{right:-12px;font-size:16px}.dda-navigation__step{padding:8px;font-size:12px}}
 
 .d-skip-link{position:fixed;inset:8px auto auto 8px;z-index:11000;transform:translateY(-160%);padding:12px 16px;border-radius:var(--radius-control);background:var(--color-action-primary-bg);color:var(--color-action-primary-text);font:600 14px/1.4 var(--font-sans)}
+.d-skip-link{transition:none!important}
 .d-skip-link:focus{transform:none}
 .sidebar .nav-icon svg{display:block;width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+
+/* Dation Precision shell: labelled navigation remains the same resource hierarchy. */
+.sidebar{padding:28px 14px 16px;background:var(--color-bg-raised)}
+.sidebar .brand{gap:10px;padding:0 8px 34px}
+.sidebar .brand strong{font-size:23px;font-weight:650;letter-spacing:-.04em}
+.sidebar .brand small{font-size:11px;text-transform:none;letter-spacing:0}
+.platform-global-nav{gap:4px}
+.platform-global-nav .sidebar-label,.sidebar-section .sidebar-label{margin:22px 12px 8px;font-size:11px;font-weight:500;letter-spacing:.02em;text-transform:none}
+.platform-global-nav .nav-item{position:relative;min-height:44px;padding:0 12px;border-radius:var(--radius-control);font-weight:500;color:var(--color-text-muted)}
+.platform-global-nav .nav-item.is-active{color:var(--color-text);background:var(--color-surface);box-shadow:none}
+.platform-global-nav .nav-item.is-active::after{content:'';position:absolute;inset:auto 12px 0;height:1px;background:var(--color-text-accent)}
+.sidebar-section{margin-top:24px;padding-top:0;border-top:1px solid var(--color-border)}
+.sidebar .asset-item{border:0;border-radius:var(--radius-control);background:transparent}
+.sidebar .asset-item.is-active{background:var(--color-surface)}
+.sidebar .asset-icon{background:transparent;border:0;box-shadow:none}
+.platform-account__trigger{border:0;border-top:1px solid var(--color-border);border-radius:0;padding:16px 6px 4px}
+.platform-account__avatar{background:var(--color-surface-strong);color:var(--color-text);font-family:var(--font-sans)}
+.topbar{background:var(--color-bg-raised);backdrop-filter:none}
+@media(max-width:860px){.sidebar{padding:24px 8px 12px}.sidebar .brand{padding:0 0 24px}.platform-global-nav .nav-item{padding:0;justify-content:center}.platform-global-nav .nav-item.is-active::after{inset:auto 8px 0}.platform-account__trigger{padding:14px 0 0}}
+@media(max-width:620px){:root{--sidebar-width:60px}.sidebar .brand-mark,.sidebar .brand-mark img{width:34px;height:34px;flex-basis:34px}.sidebar .asset-item{padding:8px 0}.content{padding-inline:16px}}

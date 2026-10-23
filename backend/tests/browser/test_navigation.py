@@ -2001,7 +2001,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         root=self.page.locator('[data-home-dda-catalog]')
         for width,height in ((1680,1050),(1440,1000),(1280,1000),(1024,1000),(768,1000),(699,1000),(390,844),(360,250),(320,568),(320,256),(568,320)):
             await self.page.set_viewport_size({'width':width,'height':height})
-            # Every selection keeps equally sized pills filling each complete row.
+            # Every selection keeps complete labels, stable target heights and local reflow.
             pill_height=None
             for category in ('all','supply-chain','operations','production','commercial','assets'):
                 await root.locator('[data-dda-filter='+category+']').evaluate('el=>el.click()')
@@ -2009,16 +2009,15 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                     const r=el.getBoundingClientRect(),s=getComputedStyle(el),p=el.parentElement.getBoundingClientRect();
                     return {x:r.x,right:r.right,y:r.y,width:r.width,height:r.height,left:p.x,end:p.right,
                         overflow:el.scrollWidth>el.clientWidth+1,radius:parseFloat(s.borderRadius)};})''')
-                self.assertLess(max(p['width'] for p in pills)-min(p['width'] for p in pills),1,(width,category,pills))
                 self.assertLess(max(p['height'] for p in pills)-min(p['height'] for p in pills),1,(width,category,pills))
                 if pill_height is None:pill_height=pills[0]['height']
                 self.assertAlmostEqual(pills[0]['height'],pill_height,delta=1,msg=(width,category,pills))
                 for pill in pills:
                     peers=[p for p in pills if abs(p['y']-pill['y'])<1]
-                    self.assertAlmostEqual(min(p['x'] for p in peers),pill['left'],delta=1)
-                    self.assertAlmostEqual(max(p['right'] for p in peers),pill['end'],delta=1)
+                    self.assertGreaterEqual(pill['x'],pill['left']-1)
+                    self.assertLessEqual(pill['right'],pill['end']+1)
+                    self.assertGreaterEqual(pill['height'],40)
                     self.assertFalse(pill['overflow'],(width,category,pills))
-                    self.assertGreaterEqual(pill['radius'],pill['height']/2)
             await root.locator('[data-dda-filter=all]').evaluate('el=>el.click()')
             audit=await self.page.evaluate(theme)
             self.assertFalse(audit['overflow'],(width,audit));self.assertEqual(audit['failures'],[],width)
@@ -2028,7 +2027,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                 peers=[peer for peer in rows if abs(peer['y']-row['y'])<1]
                 self.assertLess(max(peer['height'] for peer in peers)-min(peer['height'] for peer in peers),1)
             columns=await root.locator('.d-home__asset-grid').evaluate('el=>getComputedStyle(el).gridTemplateColumns.split(" ").length')
-            self.assertEqual(columns,1 if width<700 else 2 if width<=1100 else 2 if width==1280 else 3)
+            self.assertEqual(columns,1 if width<=620 else 2 if width<=1100 else 3)
             production=root.locator('.d-home__production-icon')
             icon=await production.evaluate('el=>({color:getComputedStyle(el).backgroundColor,mask:getComputedStyle(el).maskImage,filter:getComputedStyle(el).filter})')
             self.assertIn('/static/assets/dda-production.svg',icon['mask'])
@@ -2052,7 +2051,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         initial=await available.evaluate('el=>getComputedStyle(el).borderColor')
         await available.hover();await self.page.wait_for_timeout(250)
         hover=await available.evaluate('el=>({border:getComputedStyle(el).borderColor,transform:getComputedStyle(el).transform})')
-        self.assertNotEqual(hover['border'],initial);self.assertIn('-2',hover['transform'])
+        self.assertNotEqual(hover['border'],initial);self.assertEqual(hover['transform'],'none')
         await upcoming.hover()
         self.assertEqual(await upcoming.evaluate('el=>getComputedStyle(el).transform'),'none')
         self.assertEqual(await upcoming.evaluate('el=>getComputedStyle(el).cursor'),'default')
@@ -4031,7 +4030,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         root=self.page.locator('[data-platform-home]');await root.get_by_role('heading',name='Accesos rápidos').wait_for()
         self.assertEqual(await root.locator('[data-onboarding-step],.d-onboarding').count(),0)
         self.assertEqual(await root.get_by_role('button',name='Usar datos de ejemplo',exact=True).count(),0)
-        self.assertEqual(await root.locator('.platform-home__hero-actions a').count(),2)
+        self.assertEqual(await root.locator('.platform-home__hero-actions a').count(),1)
         await root.get_by_role('link',name='Explorar DDA',exact=True).click()
         await self.page.locator('#home-open-logistics').click()
         for _ in range(100):

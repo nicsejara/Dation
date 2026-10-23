@@ -37,4 +37,6 @@ DDA → Case → Decision → Run; Data Pack inmutable; cuatro requisitos indepe
 
 ## Ejecución
 
-Phase 1: sistema de planos, jerarquía y geometría en tokens/primitivas existentes. Resto pendiente.
+Phase 1: sistema de planos, jerarquía y geometría en tokens/primitivas existentes. QA: 7 browser de primitivas pasan. Commit `33b11dc`.
+
+Phase 2: shell con marca y selección lineal; Home editorial con cadena Data Pack/Case/Run, accesos en una banda y Logística como capacidad protagonista. 6 browser pasan (filtros, 11 viewports, teclado, fallback, Viewer e historia); 22 checks Node pasan. Cinco capturas de Home sin overflow ni fallos de contraste muestreado. La prueba anterior exigía píldoras iguales/hover translate y dos CTAs aunque el baseline ya tenía uno; se actualiza la expectativa visual manteniendo verificaciones de labels, guards, navegación y foco. Se corrigió el skip instantáneo y scroll-margin de accesos para no quedar bajo el topbar.
