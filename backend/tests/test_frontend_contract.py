@@ -1284,7 +1284,7 @@ class FrontendContractTests(
         ).read_text(encoding="utf-8")
         scheduling = "\n".join(
             (BACKEND_ROOT / "app/static/js/dispatch" / name).read_text(encoding="utf-8")
-            for name in ("scheduling/scheduling-dashboard.mjs", "scheduling/scheduling-dashboard-shell.mjs", "scheduling/scheduling-timeline.mjs", "runs/dashboard-toolbar.mjs")
+            for name in ("scheduling/scheduling-dashboard.mjs", "scheduling/scheduling-dashboard-shell.mjs", "scheduling/scheduling-timeline.mjs", "runs/dashboard-toolbar.mjs", "runs/contextual-assistant.mjs")
         )
 
         self.assertIn(
@@ -1874,15 +1874,15 @@ class FrontendContractTests(
 
         for copy in (
             "DDA LOGÍSTICA · PLANIFICACIÓN DE DESPACHOS",
-            "Tus despachos, con mejor análisis.",
+            "Tus despachos,<span>con mejor análisis.</span>",
             "Compará alternativas y revisá la evidencia antes de aprobar.",
             "Iniciar nuevo Decision Case",
-            "VOS APORTÁS",
+            "ENTRADA",
             "Tus órdenes y tu flota",
-            "DATION ANALIZA",
-            "Compara alternativas y optimiza",
-            "VOS DECIDÍS",
-            "Con recomendación y evidencia",
+            "INTELIGENCIA",
+            "Dation compara alternativas y optimiza.",
+            "DECISIÓN",
+            "Aprobás con recomendación y evidencia.",
             "De tus datos a una decisión, en 4 pasos.",
             "Cada decisión se arma en un",
             "Dation valida y arma el caso",

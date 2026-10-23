@@ -6,6 +6,7 @@ STATIC = ROOT / "app" / "static"
 DISPATCH = STATIC / "js" / "dispatch"
 
 LIFECYCLE = (DISPATCH / "scheduling/scheduling-execution-phase4.mjs").read_text(encoding="utf-8")
+PROGRESS = (DISPATCH / "runs/execution-progress.mjs").read_text(encoding="utf-8")
 CONFIG = (DISPATCH / "scheduling/scheduling-config-v2.mjs").read_text(encoding="utf-8")
 FOCUS = (DISPATCH / "scheduling/scheduling-focus-rules.mjs").read_text(encoding="utf-8")
 BOOTSTRAP = (STATIC / "js" / "dda-variable-config.js").read_text(encoding="utf-8")
@@ -65,7 +66,7 @@ class SchedulingConfigPhase4LifecycleTests(unittest.TestCase):
         self.assertIn('run?.status==="completed"', LIFECYCLE)
         self.assertIn('run?.status==="error"', LIFECYCLE)
         self.assertIn('run?.status==="running"', LIFECYCLE)
-        self.assertIn("El Run ID permite recuperar esta misma corrida", LIFECYCLE)
+        self.assertIn("Podés recuperar esta misma corrida desde el Case", PROGRESS)
 
     def test_error_state_preserves_config_and_offers_retry(self):
         self.assertIn("Reintentar ejecución", LIFECYCLE)
@@ -76,13 +77,11 @@ class SchedulingConfigPhase4LifecycleTests(unittest.TestCase):
         self.assertNotIn("sessionStorage.removeItem(CONFIG_KEY)", LIFECYCLE)
 
     def test_pending_state_does_not_fake_percentage(self):
-        self.assertIn('role=\"progressbar\"', LIFECYCLE)
-        self.assertIn("La barra es indeterminada", LIFECYCLE)
-        self.assertNotIn("aria-valuenow", LIFECYCLE)
-        self.assertIn("Validar", LIFECYCLE)
-        self.assertIn("Secuenciar", LIFECYCLE)
-        self.assertIn("Consolidar", LIFECYCLE)
-        self.assertIn("Persistir", LIFECYCLE)
+        self.assertIn("renderExecutionProgress(root,stage,{runId})", LIFECYCLE)
+        self.assertNotIn("aria-valuenow", PROGRESS)
+        self.assertNotIn("aria-valuemax", PROGRESS)
+        self.assertIn("['Datos','Motor','Evidencia','Resultado']", PROGRESS)
+        self.assertIn("executionStageIndex", PROGRESS)
 
     def test_dashboard_exposes_persisted_configuration_evidence(self):
         self.assertIn("CONFIGURACIÓN EJECUTADA", LIFECYCLE)

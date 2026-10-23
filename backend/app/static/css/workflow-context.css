@@ -51,7 +51,7 @@
 .decision-engine-flow strong{font-size:14px;font-weight:600;overflow-wrap:anywhere}
 .decision-engine-flow small{font-size:12px;color:var(--color-text-muted)}
 .decision-engine-flow [data-state=complete] .decision-engine-flow__marker{background:var(--color-text-accent);border-color:var(--color-text-accent)}
-.decision-engine-flow [data-state=complete] .decision-engine-flow__marker::after{content:"✓";display:block;text-align:center;color:var(--color-action-primary-text);font-size:12px;line-height:16px}
+.decision-engine-flow [data-state=complete] .decision-engine-flow__marker::after{content:"";position:absolute;left:5px;top:2px;width:5px;height:9px;border:solid var(--color-action-primary-text);border-width:0 2px 2px 0;transform:rotate(45deg)}
 .decision-engine-flow [data-state=active] .decision-engine-flow__marker{border-color:var(--color-text-accent)}
 .decision-engine-flow [data-state=active] .decision-engine-flow__marker::after{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--color-text-accent);animation:decision-engine-pulse 1.6s ease-in-out infinite}
 .decision-engine-flow [data-state=active] small{color:var(--color-text-accent)}

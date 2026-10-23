@@ -1,0 +1,9 @@
+{
+  "case_label": "Reposición semanal Córdoba y región centro · distribución farmacéutica · semana 43 · revisión de operaciones",
+  "owner": "Aleksandra Wiśniewska-Kowalczyk",
+  "email": "bartholomew.fitzgerald@northwind-industries-holdings.example.test",
+  "explanation": "Revisá la utilización de flota y la distribución de viajes antes de aprobar. Contrastá la recomendación con los corredores y la evidencia persistida del Run. ",
+  "question": "¿Qué viajes requieren revisar la utilización, los riesgos y los supuestos de esta recomendación? ",
+  "total_cost": 123456789012.9,
+  "waiting_days": 1284
+}

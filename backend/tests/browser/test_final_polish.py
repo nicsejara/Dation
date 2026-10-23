@@ -183,3 +183,46 @@ class FinalPolishTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result['states'][7]['nodes'],['complete','complete','active','pending'])
         self.assertEqual(result['states'][8]['nodes'],['complete']*4)
         self.assertEqual(self.b.execution_bodies,[])
+
+    async def test_final_polish_stress_at_data_boundary_with_dev_only_toggle(self):
+        import copy,json,os
+        from pathlib import Path
+        fixture=json.loads((Path(__file__).parent/'fixtures/final-polish-stress.json').read_text())
+        original=copy.deepcopy(self.b.runs)
+        async def mode_changed(mode):
+            self.b.runs=copy.deepcopy(original)
+            self.b.saved_explanation=None
+            self.b.chat_history=[]
+            if mode=='worst':
+                for run in self.b.runs.values():
+                    m=run['result_json']['scenarios']['selected']['metrics']
+                    if 'total_cost' in m:m['total_cost']=fixture['total_cost']
+                    if 'makespan_days' in m:m['makespan_days']=fixture['waiting_days']
+                text=(fixture['explanation']*15)[:2000]
+                self.b.saved_explanation={'id':'stress','response_json':{'executive_summary':text,'key_drivers':[fixture['owner'],fixture['email']],'caveats':['<script>literal evidence</script>']}}
+                self.b.chat_history=[{'id':'stress-message','role':'assistant','content':text}]
+        await self.page.expose_function('uxStressSetMode',mode_changed)
+        await self.b.context.add_init_script((Path(__file__).parent/'fixtures/ux-upgrade-stress-toggle.js').read_text())
+        for kind in ('assignment','scheduling'):
+            await self.b.open('decision-dashboard','logistics_'+kind,self.b.f['ids'][kind])
+            await self.page.get_by_role('button',name='Worst case',exact=True).click()
+            for width,height in WIDTHS:
+                await self.page.set_viewport_size({'width':width,'height':height})
+                await self.page.locator('.decision-intelligence').wait_for()
+                self.assertFalse(await self.page.evaluate('document.documentElement.scrollWidth>innerWidth'),(kind,width))
+                await self.page.locator('[data-insight-toggle]').click()
+                await self.page.locator('[data-ai-summary-controls]').wait_for(state='visible')
+                self.assertEqual(await self.page.locator('[data-response] script').count(),0)
+                await self.page.locator('[data-ai-ask]').click()
+                field=self.page.locator('.dispatch-chat textarea');await field.fill((fixture['question']*30)[:2000])
+                await field.focus()
+                self.assertEqual(len(await field.input_value()),2000)
+                self.assertTrue(await field.evaluate('e=>{const r=e.getBoundingClientRect();return r.top>=0&&r.bottom<=innerHeight&&e.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2))}'),(kind,width))
+                directory=os.getenv('DATION_UX_STRESS_ARTIFACTS')
+                if directory and width in (375,1440):
+                    Path(directory).mkdir(parents=True,exist_ok=True)
+                    await self.page.screenshot(path=str(Path(directory)/f'polish-{kind}-{width}-worst.png'))
+                await self.page.keyboard.press('Escape')
+                await self.page.locator('[data-ai-collapse]').click()
+            await self.page.get_by_role('button',name='Demo data',exact=True).click()
+        self.assertEqual(self.b.execution_bodies,[])

@@ -1,6 +1,13 @@
 (selector = '.view.is-active') => {
   const view = document.querySelector(selector || '.view.is-active');
   const rgb = value => {
+    const srgb = value.match(/^color\(srgb ([^)]+)\)$/);
+    if (srgb) {
+      const [channels, alpha] = srgb[1].split('/');
+      const values = channels.trim().split(/\s+/).map(Number);
+      if (values.length !== 3 || values.some(v=>!Number.isFinite(v))) throw Error('Unsupported computed color: '+value);
+      return [...values.map(v=>v*255), alpha===undefined?1:Number(alpha.trim())];
+    }
     const found = value.match(/^rgba?\(([^)]+)\)$/);
     if (!found) throw Error('Unsupported computed color: '+value);
     const values = found[1].split(',').map(Number);
@@ -17,7 +24,7 @@
       const style=getComputedStyle(current);
       const solid=rgb(style.backgroundColor);
       candidates=candidates.map(bg=>over(solid,bg));
-      const stops=(style.backgroundImage.match(/rgba?\([^)]+\)/g)||[]).map(rgb);
+      const stops=(style.backgroundImage.match(/(?:rgba?|color)\([^)]+\)/g)||[]).map(rgb);
       if(!stops.length)continue;
       if(style.backgroundImage.startsWith('linear-gradient') && stops.length>1) {
         const samples=stops.slice(1).flatMap((last,i)=>Array.from({length:257},(_,k)=>last.map((v,j)=>stops[i][j]+(v-stops[i][j])*k/256)));

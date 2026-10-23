@@ -1,6 +1,6 @@
 # Dation — Final UX/UI Polish Saga
 
-Estado: en implementación. Baseline real de main/origin/main: `ff8134c6a19fc98c7e6a81029d830b4ab5285560`. Rama: `ux-ui/final-polish-saga`.
+Estado: C1–C9 implementados y validados. Baseline real de main/origin/main: `ff8134c6a19fc98c7e6a81029d830b4ab5285560`. Rama: `ux-ui/final-polish-saga`.
 
 El master definitivo se leyó completo antes de editar. Se conservan Dation Precision, navegación, dominio y contratos; no se realiza una auditoría transversal nueva. Baseline: 813 archivos con SHA-256 y 14 capturas de Overview, Datos, Config D1/D2, Dashboard D1/D2 y ejecución a 1440×900 y 375×812. Evidencia local: `/workspace/work/final-polish/`.
 
@@ -33,3 +33,52 @@ Phase 5 QA: C6/C9 pasan en ambos dashboards y seis tamaños; resultados persisti
 6. Decision Engine Flow: renderer compartido de cuatro nodos, labels de stages reales y actualización estable durante polling. `validating` → Datos; `constructing` / `optimizing:*` → Motor; `summarizing` → Evidencia; `completed` → todos completos / Decisión lista. Admisión, recovery, cola y running sin stage no acreditan etapas completadas. Sin porcentajes, barras ficticias ni demoras. Pulso sólo de opacidad en nodo activo, estático con reduced-motion. Se conserva polling/reload/error; el adapter legacy usa la misma presentación y mantiene su export pendingMarkup.
 
 Phase 6 QA: C8 pasa; test Node del mapping y browser de todos los stages/reduced-motion; polling real de ambos dashboards hasta éxito/error pasa después de adaptar el selector visual de barra a flujo. Seis capturas responsive sin overflow ni errores JS. review-animations: Approve, sin hallazgos nuevos. Un test histórico de contexto espera el primer summary del root y está pendiente de contraste baseline; la ejecución y sus contratos no se modifican.
+
+7. Estabilización y QA: normalización mobile de los valores KPI; check del flujo dibujado con CSS; encabezado del chat desplazable en viewport bajo para que no tape Enviar al 400%. El parser de contraste de QA ahora entiende `color(srgb … / alpha)` y compone su alpha; no descarta muestras. Las únicas excepciones del lint de CSS corresponden al scrim neutro sobre las imágenes locales (permitido por la Skill), documentadas en las dos reglas.
+
+## Aceptación
+
+| Cambio | Estado | Evidencia |
+| --- | --- | --- |
+| C1 | PASS | Hero, arte local, proceso y CTA intactos; seis resoluciones |
+| C2 | PASS | Procedencia estricta y correlación Case/Run; real/sample y caché ajena |
+| C3 | PASS | Launcher fuera de toolbar, contexto, busy, chat existente, foco y sheet |
+| C4 | PASS | Paso y decisión independientes, sin ceros iniciales |
+| C5 | PASS | Command bars canónicas, foco visible y zona reservada |
+| C6 | PASS | KPIs estáticos equivalentes; métricas y advertencias conservadas |
+| C7 | PASS | Dos capacidades, evidencia full-width, cache y lazy/per-Run intactos |
+| C8 | PASS | Stages reales, sin porcentaje, polling/éxito/error y reduced-motion |
+| C9 | PASS | Arte distinto D1/D2, narrativa/approval/actions legibles |
+
+## QA final y limitaciones
+
+- Python: 383/383 PASS (`final-python-accepted.log`). Cuatro aserciones estáticas de la presentación anterior se adaptaron al hero, componente extraído de launcher y flujo compartido; contratos funcionales siguen cubiertos. La primera ejecución sin acceso loopback se interrumpió y se repitió con la red del sandbox de pruebas habilitada.
+- Node: 20 archivos de tests PASS, incluidos procedencia y mapping nuevos (`final-node.log`). Sintaxis de los 18 módulos de aplicación modificados comprobada con Node.
+- Browser principal: 41 casos distintos; 40 PASS en la corrida conjunta y un fallo de bootstrap transitorio antes de montar la app. Ese caso de foco se repitió aislado y pasó (`final-keyboard.log`). Los ocho nuevos casos C1–C9 pasan; stress específico adicional PASS, así como retry/history de chat, descarte al navegar, limpieza de listeners, menús, drawer y foco. No se presenta el primer log como una suite completamente verde.
+- E2E: 11/11 PASS, API/worker/PostgreSQL desechables: personas distintas, permisos/tenancy, atributos/Data Owner, aprobación, múltiples Runs, invalidación downstream y conservación de evidencia (`final-e2e.log`). Ningún acceso mutante a producción.
+- Responsive: 42 capturas finales, siete superficies × 1440×900, 1280×800, 1024×768, 768×1024, 375×812 y 320×640. Las 42 muestras de contraste pasan y no hay overflow ni errores JS (`accepted/`). Se suman capturas de Insight/avanzado/chat y datos extremos.
+- Teclado/zoom: focus, Escape, Tab y retorno al origen PASS. Reflow al 200% y 400% PASS (`final-zoom-fixed.log`); el problema real de Enviar detrás del header sticky se corrigió, sin animar el cambio. Viewports bajos y barras se verificaron también por sus pruebas específicas.
+- Motion: review-animations Approve en fases 4, 6 y estabilización; pulse sólo de opacidad, sin geometría animada ni demoras, alternativa estática con reduced-motion. No se reivindica prueba en un teléfono físico.
+- Taste: inspector sin FAIL en las 42 observaciones; WARN de densidad/metadata, bordes/radios y composición heredados no reabren la dirección cerrada. Headline editorial responde al master; estados SLA conservan colores semánticos, y los iconos de Config pertenecen a elecciones reales. Los huecos de pares de evidencia y secciones bajo el fold mantienen la composición ya aprobada. Lint del CSS añadido en modo app: 0 FAIL y 2 WARN por sombras del panel/launcher, overlays explícitos requeridos. Los scrims son exclusivamente de legibilidad sobre arte real; no una nueva paleta.
+- Limitaciones previas comprobadas contra `ff8134c`: test Navigation de Map sin Cases espera disabled; test Saga4 de contexto espera el primer summary genérico del root. Ambos fallan igual en el baseline; no se modificó su lógica ni se declara la suite monolítica Navigation en PASS.
+- Preservación: los 120 archivos protegidos conservan su SHA-256. Cambios limitados a presentación frontend, pruebas y este documento; sin backend, motor, SQL, API, persistencia ni infraestructura.
+
+## break-ui
+
+Invocación focalizada con fix autorizado por el master; no auditoría nueva. Toggle exclusivamente de fixtures browser (`ux-upgrade-stress-toggle.js`), nunca importado por el producto. Fixture durable nueva: `tests/browser/fixtures/final-polish-stress.json`.
+
+| Valor dinámico | Fuente / límite | Caso probado |
+| --- | --- | --- |
+| Label/description del Case, archivos | metadata actual; label 120, descripción 1000, filename sin límite UI | nombres largos plausibles, 1000 caracteres, filenames regionales |
+| Workspace/actor/identificadores | contexto actual; nombre/email sin límite en el renderer | nombres con diacríticos, multilingües, cortos y email largo; IDs actuales |
+| Valores/fechas de ambos heroes y KPIs | métricas persistidas del Run; sin límite de ancho UI | cero/uno, importe 123456789012.9, 1284 días, signos y decimales de fixtures |
+| Insight: resumen, drivers, caveats | interpretación existente; texto/listas sin límite UI | 2000 caracteres, email largo y texto literal con markup escapado |
+| Conversación / pregunta | historial existente; pregunta maxlength 2000 | historial largo, compositor al límite, busy/error/retry y cierre |
+| Capacidades y flujo | labels fijos / stages del worker | pendientes, completed, error y stage desconocido neutral |
+| Colecciones existentes | API con paginación; preview limitado por su módulo | Demo/Worst/Empty/One, 25 filas de 1284 miembros, planes y tablas con scroll |
+
+El único break nuevo verificable fue el foco de Enviar al 400%; causa: header sticky en un panel de altura insuficiente; solución: header en el flujo del scroll bajo 540px. Repetición PASS. Los importes no se truncan; las preguntas largas permanecen editables y la evidencia se escapa. No hubo decisiones de diseño pendientes. RTL no se anuncia como capability del producto; no se implementó internacionalización nueva. No se probaron 1000 filas simultáneas donde la API ya pagina o el preview limita la cantidad.
+
+## Integración autorizada
+
+Fases 1–6: `656d3b4`, `e19e9a9`, `5498449`, `8e202bc`, `31ff3fc`, `628a659`. Fase 7: este commit. Sin STOP funcional. El gate requiere árbol limpio y comprobar otra vez origin/main antes de fast-forward; conservar los siete commits y publicar por el pipeline existente, sin cambios de infraestructura ni despliegue manual. El resultado exacto del push y la observación del pipeline se informan al finalizar, fuera del árbol ya validado.

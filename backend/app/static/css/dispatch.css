@@ -4724,6 +4724,7 @@ body.dispatch-result #chat-panel{
 .dispatch-chat-starters button { scroll-margin-inline:8px; }
 @media(max-height:540px) {
   .d-decision-dashboard>.dispatch-chat { top:8px; max-height:calc(var(--assistant-height,100dvh) - 100px)!important; }
+  .d-decision-dashboard>.dispatch-chat .dispatch-chat-heading { position:static; }
 }
 
 /* Keep densely populated timelines readable and keyboard-scrollable. */
