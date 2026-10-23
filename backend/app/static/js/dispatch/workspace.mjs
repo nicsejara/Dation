@@ -520,7 +520,7 @@ function poll(id,generation,nodeId=state.activeNode,{delay=0,graceUntil=0}={}){
   return runPolling.start({runId:id,delay,graceUntil,read:(runId,signal)=>api('/api/runs/'+runId,{signal}),
     onRun:async run=>{
       if(generation!==pollGeneration)return;
-      if(run.status==='completed'){try{await show(run);}catch(error){if(generation===pollGeneration)errorBox(roots.dashboard,error,()=>openRun(id,nodeId));}return;}
+      if(run.status==='completed'){renderExecutionProgress(roots.dashboard,'completed');try{await show(run);}catch(error){if(generation===pollGeneration)errorBox(roots.dashboard,error,()=>openRun(id,nodeId));}return;}
       if(run.status==='error'){try{await showTerminalRun(run,nodeId);}catch(error){if(generation===pollGeneration)errorBox(roots.dashboard,error,()=>openRun(id,nodeId));}return;}
       pending(run.progress_json?.stage||run.status||'queued');
     },onError:error=>{if(generation===pollGeneration)errorBox(roots.dashboard,error,()=>openRun(id,nodeId));},

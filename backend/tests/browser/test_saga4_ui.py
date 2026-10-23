@@ -63,10 +63,10 @@ class Saga4UITests(unittest.IsolatedAsyncioTestCase):
             run.update(status='running',result_json=None,approved_at=None,progress_json={'stage':'validating'})
             await self.page.goto(f'http://127.0.0.1:{self.b.port}/app?view=decision-dashboard&case_id={self.b.case["id"]}&node_id={node}&run_id={run["id"]}')
             status=self.page.locator('[data-run-stage]');await status.get_by_text('VALIDANDO DATOS Y CONFIGURACIÓN',exact=True).wait_for()
-            bar=self.page.locator('[data-execution-progress] [role=progressbar]')
+            bar=self.page.locator('[data-execution-progress] .decision-engine-flow')
             self.assertIsNone(await bar.get_attribute('aria-valuenow'));self.assertIsNone(await bar.get_attribute('aria-valuemax'))
             self.assertNotIn('%',await self.page.locator('[data-execution-progress]').inner_text())
-            self.assertNotEqual(await bar.locator('span').evaluate('n=>getComputedStyle(n).animationName'),'none')
+            self.assertNotEqual(await bar.locator('[data-state=active] .decision-engine-flow__marker').evaluate('n=>getComputedStyle(n,"::after").animationName'),'none')
             run['progress_json']['stage']='optimizing:service'
             await status.get_by_text('EJECUTANDO MOTOR',exact=True).wait_for()
             directory=os.getenv('DATION_SAGA4_ARTIFACTS')

@@ -159,3 +159,27 @@ class FinalPolishTests(unittest.IsolatedAsyncioTestCase):
             self.assertTrue(await self.page.locator('[data-rerun]').is_visible())
         self.assertEqual(self.b.runs,before)
         self.assertEqual(self.b.execution_bodies,[])
+
+    async def test_c8_flow_tracks_real_stages_without_percentage_or_motion_when_reduced(self):
+        await self.b.open('decision-dashboard','logistics_assignment',self.b.f['ids']['assignment'])
+        result=await self.page.evaluate('''async()=>{
+          const {renderExecutionProgress}=await import('/static/js/dispatch/runs/execution-progress.mjs');
+          const host=document.createElement('div');host.className='dispatch';document.body.append(host);
+          const states=[];
+          for(const stage of ['registering','recovering','queued','running','validating','constructing','optimizing:cost','summarizing','completed','unknown']){
+            renderExecutionProgress(host,stage);
+            states.push({stage,nodes:[...host.querySelectorAll('[data-engine-node]')].map(n=>n.dataset.state),label:host.querySelector('[data-run-stage]').textContent});
+          }
+          renderExecutionProgress(host,'constructing');
+          const pulse=getComputedStyle(host.querySelector('[data-state=active] .decision-engine-flow__marker'),'::after').animationName;
+          const numeric=host.querySelector('[aria-valuenow],[role=progressbar]')!==null;
+          host.remove();return {states,pulse,numeric};
+        }''')
+        self.assertFalse(result['numeric']);self.assertEqual(result['pulse'],'none')
+        for item in result['states']:
+            if item['stage'] in ('registering','recovering','queued','running','unknown'):self.assertEqual(item['nodes'],['pending']*4)
+        self.assertEqual(result['states'][4]['nodes'],['active','pending','pending','pending'])
+        self.assertEqual(result['states'][5]['nodes'],['complete','active','pending','pending'])
+        self.assertEqual(result['states'][7]['nodes'],['complete','complete','active','pending'])
+        self.assertEqual(result['states'][8]['nodes'],['complete']*4)
+        self.assertEqual(self.b.execution_bodies,[])

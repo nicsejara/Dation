@@ -43,9 +43,23 @@
 @media(prefers-reduced-motion:reduce){.decision-config-case__summary,.decision-config-case__summary .decision-context-chevron{transition:none}}
 
 .decision-execution{display:grid;gap:20px;padding:clamp(24px,4vw,48px)}.decision-execution h1,.decision-execution p{margin:0}.decision-execution__stage{font-size:clamp(15px,2vw,20px);font-weight:700;letter-spacing:.04em;line-height:1.5;color:var(--color-text-accent)}
-.decision-execution__progress{height:5px;border-radius:999px;overflow:hidden;background:var(--color-border)}.decision-execution__progress>span{display:block;width:35%;height:100%;border-radius:inherit;background:var(--color-text-accent);animation:decision-execution-active 1.6s ease-in-out infinite}
-@keyframes decision-execution-active{from{transform:translateX(-100%)}to{transform:translateX(386%)}}
-@media(prefers-reduced-motion:reduce){.decision-execution__progress>span{animation:none;transform:translateX(95%)}}
+/* A pulse indicates the active backend stage; no travel or numeric progress. */
+.decision-engine-flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));list-style:none;margin:8px 0;padding:0;gap:0}
+.decision-engine-flow li{display:grid;position:relative;justify-items:start;gap:10px;min-width:0;padding-right:12px}
+.decision-engine-flow li:not(:last-child)::after{content:"";position:absolute;top:9px;left:20px;right:0;height:1px;background:var(--color-border-strong)}
+.decision-engine-flow__marker{position:relative;z-index:1;box-sizing:border-box;width:20px;height:20px;border:2px solid var(--color-border-strong);border-radius:50%;background:var(--color-surface)}
+.decision-engine-flow strong{font-size:14px;font-weight:600;overflow-wrap:anywhere}
+.decision-engine-flow small{font-size:12px;color:var(--color-text-muted)}
+.decision-engine-flow [data-state=complete] .decision-engine-flow__marker{background:var(--color-text-accent);border-color:var(--color-text-accent)}
+.decision-engine-flow [data-state=complete] .decision-engine-flow__marker::after{content:"✓";display:block;text-align:center;color:var(--color-action-primary-text);font-size:12px;line-height:16px}
+.decision-engine-flow [data-state=active] .decision-engine-flow__marker{border-color:var(--color-text-accent)}
+.decision-engine-flow [data-state=active] .decision-engine-flow__marker::after{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--color-text-accent);animation:decision-engine-pulse 1.6s ease-in-out infinite}
+.decision-engine-flow [data-state=active] small{color:var(--color-text-accent)}
+.decision-execution__support{font-size:14px;line-height:1.7;color:var(--color-text-secondary)}
+@keyframes decision-engine-pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@media(max-width:520px){.decision-engine-flow{grid-template-columns:minmax(0,1fr);gap:20px}.decision-engine-flow li{grid-template-columns:20px minmax(0,1fr);column-gap:16px}.decision-engine-flow li>small{grid-column:2}.decision-engine-flow li:not(:last-child)::after{top:20px;left:9px;bottom:-20px;right:auto;width:1px;height:auto}.decision-engine-flow__marker{grid-row:1/3}}
+@media(prefers-reduced-motion:reduce){.decision-engine-flow [data-state=active] .decision-engine-flow__marker::after{animation:none}}
+
 
 /* Saga 5: one attributes form, with identity and responsibility grouped internally. */
 .dispatch .case-identity{display:grid;grid-template-columns:minmax(0,1fr);gap:20px;padding:0;overflow:hidden}

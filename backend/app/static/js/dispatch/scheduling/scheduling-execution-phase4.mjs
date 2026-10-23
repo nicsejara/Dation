@@ -1,3 +1,4 @@
+import {renderExecutionProgress} from '../runs/execution-progress.mjs';
 import {api,esc,post} from "../shared.mjs";
 import {STATUS,transitionNode} from "../cases/decision-case.mjs";
 import {
@@ -98,61 +99,17 @@ function dashboardRoot(){
   return document.getElementById("dispatch-dashboard-root");
 }
 
-function stageCopy(stage){
-  if(String(stage||"").startsWith("optimizing:")){
-    return {
-      title:"Optimizando la secuencia",
-      copy:"Dation está ordenando los viajes y resolviendo la disponibilidad temporal de cada vehículo.",
-    };
-  }
-  const labels={
-    validating:{
-      title:"Validando la evidencia",
-      copy:"Verificando la asignación aprobada, la ventana temporal y las reglas por foco.",
-    },
-    constructing:{
-      title:"Construyendo el calendario",
-      copy:"Aplicando restricciones temporales sin modificar vehículos, cargas ni cantidades aprobadas.",
-    },
-    summarizing:{
-      title:"Preparando la recomendación",
-      copy:"Consolidando calendario, nivel de servicio, excepciones y trazabilidad de la corrida.",
-    },
-    registering:{
-      title:"Registrando la planificación",
-      copy:"Creando la corrida y vinculándola con el Decision Case antes de ejecutar el motor.",
-    },
-  };
-  return labels[stage]||{
-    title:"Generando la planificación",
-    copy:"La corrida sigue activa y Dation está esperando el resultado persistido por el motor.",
-  };
-}
-
 function pendingMarkup(runId,stage="registering"){
-  const copy=stageCopy(stage);
-  return '<section class="scheduling-run-phase4" aria-live="polite">'
-    +'<div class="scheduling-run-phase4__hero">'
-      +'<div class="scheduling-run-phase4__spinner" aria-hidden="true"></div>'
-      +'<div><span>DECISIÓN 02 · PLANIFICACIÓN</span><h1>'+esc(copy.title)+'</h1><p>'+esc(copy.copy)+'</p></div>'
-      +'<code>'+esc(String(runId).slice(0,8).toUpperCase())+'</code>'
-    +'</div>'
-    +'<div class="scheduling-run-phase4__progress" role="progressbar" aria-label="Ejecución de la planificación" aria-valuetext="'+esc(copy.title)+'"><i></i></div>'
-    +'<div class="scheduling-run-phase4__steps">'
-      +'<span class="'+(stage==="validating"?"is-active":"")+'">Validar</span>'
-      +'<span class="'+(stage==="constructing"||String(stage).startsWith("optimizing:")?"is-active":"")+'">Secuenciar</span>'
-      +'<span class="'+(stage==="summarizing"?"is-active":"")+'">Consolidar</span>'
-      +'<span>Persistir</span>'
-    +'</div>'
-    +'<p class="scheduling-run-phase4__trust">La barra es indeterminada: el backend no expone un porcentaje real de avance. El Run ID permite recuperar esta misma corrida si recargás la página.</p>'
-  +'</section>';
+  const host=document.createElement('div');
+  renderExecutionProgress(host,stage,{runId});
+  return host.innerHTML;
 }
 
 function renderPending(runId,stage="registering"){
   document.body.classList.add("dispatch-result");
   window.dationSetDashboardReady?.(false);
   const root=dashboardRoot();
-  if(root)root.innerHTML=pendingMarkup(runId,stage);
+  if(root)renderExecutionProgress(root,stage,{runId});
 }
 
 function errorMarkup(message,runId){
