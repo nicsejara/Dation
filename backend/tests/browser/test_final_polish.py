@@ -47,3 +47,29 @@ class FinalPolishTests(unittest.IsolatedAsyncioTestCase):
                     }'''),(view,node,width,await field.get_attribute('name')))
                 self.assertFalse(await self.page.evaluate('document.documentElement.scrollWidth>innerWidth'))
         self.assertEqual(self.b.execution_bodies,[])
+
+    async def test_c1_overview_hero_has_local_art_process_and_unchanged_actions(self):
+        for width,height in WIDTHS:
+            await self.page.set_viewport_size({'width':width,'height':height})
+            await self.page.goto(f'http://127.0.0.1:{self.b.port}/app/ddas/logistics')
+            hero=self.page.locator('.dda-landing__hero');await hero.wait_for()
+            self.assertEqual(await hero.locator('.dda-landing__emblem').count(),0)
+            self.assertEqual(await hero.locator('h1>span').inner_text(),'con mejor análisis.')
+            self.assertEqual(await hero.locator('.dda-landing__flow-node small').all_inner_texts(),['ENTRADA','INTELIGENCIA','DECISIÓN'])
+            self.assertEqual(await hero.get_by_role('button').count(),2)
+            self.assertTrue(await hero.get_by_role('button',name='Iniciar nuevo Decision Case',exact=False).is_visible())
+            self.assertTrue(await hero.get_by_role('button',name='Ver mis casos de Logística',exact=False).is_visible())
+            if width>700:
+                await self.page.wait_for_function('document.querySelector(".dda-landing__hero-art")?.naturalWidth>0')
+            self.assertFalse(await self.page.evaluate('document.documentElement.scrollWidth>innerWidth'))
+
+    async def test_c2_demo_tracks_actual_pack_provenance_across_case_surfaces(self):
+        for sample in (False,True):
+            for dataset in self.b.f['datasets'].values():dataset['is_sample']=sample
+            for view,node,run in [('logistics-data',None,None),('logistics-map',None,None),('logistics-config','logistics_assignment',None),('decision-dashboard','logistics_assignment',self.b.f['ids']['assignment'])]:
+                await self.b.open(view,node,run)
+                await self.page.locator('.view.is-active h1:visible').first.wait_for()
+                await self.page.wait_for_function('window.DationDispatch.getWorkspace().caseContext?.caseId===window.DationDispatch.getWorkspace().decisionCase?.id')
+                self.assertEqual(await self.page.locator('[data-demo-context]').is_visible(),sample,(sample,view))
+                self.assertEqual(await self.page.locator('[data-demo-context]').inner_text(),'Modo demo · Estás trabajando con datos de ejemplo.')
+        self.assertEqual(self.b.execution_bodies,[])

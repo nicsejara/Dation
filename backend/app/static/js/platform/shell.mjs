@@ -12,6 +12,7 @@ import {mountDataHub} from './data-hub.mjs';
 import {mountDecisionCenter} from './decision-center.mjs';
 import {mountTeam} from './team.mjs';
 import {mountWorkspaceSettings} from './workspace-settings.mjs';
+import {hasDemoData} from '../dispatch/cases/data-provenance.mjs';
 
 const labels={'platform-home':'Inicio',inicio:'Decision Data Assets','platform-decisions':'Decision Center','platform-data':'Data Hub','platform-team':'Equipo',settings:'Configuración',profile:'Mi perfil'};
 const roles={admin:'Administrador',operator:'Operador',viewer:'Solo lectura'};
@@ -104,7 +105,7 @@ export function mountPlatformShell(){
  };
  scope.listen(window,'dation:workspace',()=>window.dationRenderCaseFlow(window.dationGetCurrentView?.()));
  scope.listen(window,'dation:view',updateAll);scope.listen(window,'dation:workspace',updateNavigation);updateAll();
- function renderDemo(){const panel=document.querySelector('[data-demo-context]');if(!panel)return;const state=window.DationDispatch?.getWorkspace?.()||{};let route;try{route=readResource(location.href);}catch{panel.hidden=true;return;}const own=!route.caseId||route.caseId===state.decisionCase?.id;panel.hidden=!(own&&['logistics-data','logistics-map','logistics-config','decision-dashboard'].includes(window.dationGetCurrentView?.())&&(state.orders?.is_sample||state.fleet?.is_sample));}
+ function renderDemo(){const panel=document.querySelector('[data-demo-context]');if(!panel)return;let route;try{route=readResource(location.href);}catch{panel.hidden=true;return;}panel.hidden=!hasDemoData(window.DationDispatch?.getWorkspace?.()||{},route,window.dationGetCurrentView?.());}
  scope.listen(window,'dation:view',renderDemo);scope.listen(window,'dation:workspace',renderDemo);renderDemo();
  scope.listen(window,'pagehide',event=>{if(!event.persisted)scope.dispose();});
  return {dispose:()=>scope.dispose()};
