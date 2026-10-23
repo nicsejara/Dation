@@ -171,4 +171,3 @@ class UXUpgradeTests(unittest.IsolatedAsyncioTestCase):
         await self.page.keyboard.press('ArrowRight')
         await self.page.wait_for_timeout(150)
         self.assertGreater(await region.evaluate('e=>e.scrollLeft'), 0)
-

@@ -90,7 +90,7 @@
 .dispatch-pro-validation-success, .dispatch-upload-pro .dispatch-pro-optional-note { display:flex; gap:8px; align-items:start; padding:10px 0; color:var(--color-success); font-size:12px; line-height:1.5; }
 .dispatch-upload-pro .dispatch-pro-optional-note { color:var(--color-text-muted); }
 .dispatch-pro-validation-success summary { display:flex; align-items:center; gap:8px; flex-wrap:wrap; color:var(--color-success); }
-.dispatch-pro-validation-success summary small { color:var(--color-text-muted); }
+.dispatch-pro-validation-success summary small { color:var(--color-text-muted); font-size:12px; }
 .dispatch-pro-validation-success-body { display:grid; gap:8px; margin-top:12px; width:100%; }
 .dispatch-pro-validation-success .dispatch-pro-icon, .dispatch-pro-optional-note .dispatch-pro-icon { width:16px; height:16px; }
 .dispatch-pro-compatibility { display:flex; flex-wrap:wrap; align-items:center; gap:12px; padding:16px; border:1px solid var(--color-border); border-radius:var(--radius-md); color:var(--color-text-secondary); background:var(--color-surface-raised); }

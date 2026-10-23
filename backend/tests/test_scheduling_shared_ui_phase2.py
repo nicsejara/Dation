@@ -59,11 +59,11 @@ class SchedulingSharedUiPhase2Tests(unittest.TestCase):
 
     def test_resources_are_inherited_and_locked(self):
         for marker in (
-            'current:"Heredada y bloqueada"',
+            'current:"Aprobada y fija"',
             'data-scheduling-resource-policy',
             'selected:true',
             'locked:true',
-            'tags:["Bloqueada"]',
+            'tags:["Viajes y vehículos fijos"]',
         ):
             self.assertIn(marker, self.ui)
         self.assertIn('locked?"is-locked":""', self.shared)

@@ -175,3 +175,11 @@ export function loadingState(label,{rows=4}={}){
  for(let i=0;i<rows;i++){const row=document.createElement('div');row.className='d-skeleton';row.setAttribute('aria-hidden','true');block.append(row);}
  return block;
 }
+
+/** Initials are presentation only; preserve multi-codepoint names and emoji. */
+export function personInitials(...parts){
+ const words=parts.flatMap(value=>String(value||'').trim().split(/\s+/)).filter(Boolean);
+ const selected=words.length>1?[words[0],words.at(-1)]:words;
+ const segmenter=typeof Intl.Segmenter==='function'?new Intl.Segmenter(undefined,{granularity:'grapheme'}):null;
+ return selected.map(word=>segmenter?[...segmenter.segment(word)][0].segment:Array.from(word)[0]).join('').toLocaleUpperCase()||'—';
+}

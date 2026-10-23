@@ -76,7 +76,7 @@
 .scheduling-config-v2 .scheduling-rule-window span{color:var(--d-text-primary);font-size:12px;font-weight:800}
 .scheduling-config-v2 .scheduling-rule-window input{width:100%;height:38px;padding:0 9px;border:1px solid var(--d-border-control);border-radius:9px;background:var(--d-surface-2);font:inherit;font-size:11px}
 .scheduling-config-v2 .scheduling-rule-preview{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 13px;border:1px solid var(--d-border);border-radius:12px;background:var(--d-surface-1);}
-.scheduling-config-v2 .scheduling-rule-preview small{display:block;margin-bottom:2px;color:var(--d-text-secondary);font-size:8px;font-weight:900;letter-spacing:.07em}
+.scheduling-config-v2 .scheduling-rule-preview small{display:block;margin-bottom:2px;color:var(--d-text-secondary);font-size:12px;font-weight:900;letter-spacing:.07em}
 .scheduling-config-v2 .scheduling-rule-preview strong{display:block;font-size:15px}
 .scheduling-config-v2 .scheduling-rule-preview span{display:block;margin-top:2px;color:var(--d-text-primary);font-size:12px}
 .scheduling-config-v2 .scheduling-rule-preview button{min-height:38px;padding:0 13px;border:1px solid var(--d-border-control);border-radius:10px;color:var(--d-text-primary);background:var(--d-surface-2);font-weight:850;cursor:pointer}
@@ -90,7 +90,7 @@
 .scheduling-config-v2 .scheduling-rule-card{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 11px;border:1px solid var(--d-border-control);border-radius:11px;background:var(--d-surface-1);}
 .scheduling-config-v2 .scheduling-rule-card__index{display:grid;width:30px;height:30px;place-items:center;border-radius:9px;color:var(--d-text-primary);background:var(--d-surface-1);font-size:12px;font-weight:900}
 .scheduling-config-v2 .scheduling-rule-card__body{min-width:0}
-.scheduling-config-v2 .scheduling-rule-card__body small{display:block;color:var(--d-text-secondary);font-size:8px;font-weight:900;letter-spacing:.06em}
+.scheduling-config-v2 .scheduling-rule-card__body small{display:block;color:var(--d-text-secondary);font-size:12px;font-weight:900;letter-spacing:.06em}
 .scheduling-config-v2 .scheduling-rule-card__body strong{display:block;overflow:hidden;margin:2px 0;color:var(--d-text-primary);font-size:11px;text-overflow:ellipsis;white-space:nowrap}
 .scheduling-config-v2 .scheduling-rule-card__body span{display:block;color:var(--d-text-primary);font-size:12px;line-height:1.35}
 .scheduling-config-v2 .scheduling-rule-remove{min-height:31px;padding:0 9px;border:1px solid var(--d-border);border-radius:8px;color:var(--d-text-primary);background:var(--d-surface-2);font-size:12px;font-weight:800;cursor:pointer}

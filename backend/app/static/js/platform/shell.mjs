@@ -3,7 +3,7 @@ import {iconSvg} from '../dispatch/decision-ui.mjs';
 import {renderCaseFlow,revealCurrentStep} from '../dispatch/navigation/case-flow.mjs';
 import {renderDdaNavigation} from './dda-navigation.mjs';
 import {trackExploration} from './onboarding.mjs';
-import {mountDropdown} from './components.mjs';
+import {mountDropdown,personInitials} from './components.mjs';
 import {createScope} from '../dispatch/lifecycle.mjs';
 import {PLATFORM_PATHS,readResource} from '../dispatch/navigation/resource.mjs';
 import {mountWorkspaceHome} from './home.mjs';
@@ -40,7 +40,7 @@ export function mountPlatformShell(){
  const profile=()=>identity.profile;
  const display=()=>profile().display_name||[profile().first_name,profile().last_name].filter(Boolean).join(' ')||'Mi cuenta';
  const name=document.querySelector('[data-user-name]'),workspaceName=document.querySelector('[data-workspace-name]'),avatar=document.querySelector('[data-user-avatar]');
- function renderIdentity(){name.textContent=display();workspaceName.textContent=identity.workspace.name;avatar.textContent=(profile().first_name?.[0]||display()[0]||'D')+(profile().last_name?.[0]||'');}
+ function renderIdentity(){name.textContent=display();workspaceName.textContent=identity.workspace.name;avatar.textContent=personInitials(profile().first_name||display(),profile().last_name);}
  renderIdentity();
  const menu=mountDropdown({trigger:document.querySelector('[data-user-menu]'),panel:document.querySelector('[data-user-menu-panel]')});scope.own(()=>menu.dispose());
  const logout=document.querySelector('[data-logout]');
@@ -95,8 +95,13 @@ export function mountPlatformShell(){
  }
  window.dationRenderContextNavigation=updateNavigation;
  window.dationRenderCaseFlow=view=>{try{renderCaseFlow(document.querySelector('#dda-workspace-nav'),{view,route:readResource(location.href),state:window.DationDispatch?.getWorkspace?.()});}catch{}};
- if(typeof ResizeObserver==='function'){const flow=document.querySelector('#dda-workspace-nav');scope.observe(new ResizeObserver(()=>revealCurrentStep(flow)),flow);}
- const updateAll=()=>{updateNavigation();window.dationRenderCaseFlow(window.dationGetCurrentView?.());};
+ const flow=document.querySelector('#dda-workspace-nav');
+ const flowResize=typeof ResizeObserver==='function'?new ResizeObserver(()=>revealCurrentStep(flow)):null;
+ scope.own(()=>flowResize?.disconnect());
+ const updateAll=()=>{
+  updateNavigation();window.dationRenderCaseFlow(window.dationGetCurrentView?.());
+  flowResize?.disconnect();if(!flow.parentElement.hidden)flowResize?.observe(flow);
+ };
  scope.listen(window,'dation:workspace',()=>window.dationRenderCaseFlow(window.dationGetCurrentView?.()));
  scope.listen(window,'dation:view',updateAll);scope.listen(window,'dation:workspace',updateNavigation);updateAll();
  function renderDemo(){const panel=document.querySelector('[data-demo-context]');if(!panel)return;const state=window.DationDispatch?.getWorkspace?.()||{};let route;try{route=readResource(location.href);}catch{panel.hidden=true;return;}const own=!route.caseId||route.caseId===state.decisionCase?.id;panel.hidden=!(own&&['logistics-data','logistics-map','logistics-config','decision-dashboard'].includes(window.dationGetCurrentView?.())&&(state.orders?.is_sample||state.fleet?.is_sample));}

@@ -1284,7 +1284,7 @@ class FrontendContractTests(
         ).read_text(encoding="utf-8")
         scheduling = "\n".join(
             (BACKEND_ROOT / "app/static/js/dispatch" / name).read_text(encoding="utf-8")
-            for name in ("scheduling/scheduling-dashboard.mjs", "scheduling/scheduling-dashboard-shell.mjs", "scheduling/scheduling-timeline.mjs")
+            for name in ("scheduling/scheduling-dashboard.mjs", "scheduling/scheduling-dashboard-shell.mjs", "scheduling/scheduling-timeline.mjs", "runs/dashboard-toolbar.mjs")
         )
 
         self.assertIn(
@@ -1891,7 +1891,7 @@ class FrontendContractTests(
             "Lo hacés vos",
             "Lo hace Dation",
             "Empezás con el núcleo mínimo de datos.",
-            "Qué variables optimiza el motor hoy.",
+            "Objetivos según la decisión y los datos.",
             "Tu mapa de decisiones, desbloqueado paso a paso.",
             "Un DDA no resuelve una sola decisión: resuelve una cadena.",
             "Lo que necesitás y lo que obtenés.",
@@ -2004,10 +2004,9 @@ class FrontendContractTests(
         for variable in (
             'label:"Costo"',
             'label:"Viajes"',
-            'label:"Tiempo"',
+            'label:"Carga en flota propia"',
             'label:"CO₂"',
-            'label:"Riesgo"',
-            'label:"Servicio"',
+            'label:"Secuencia y SLA"',
         ):
             self.assertIn(
                 variable,

@@ -7,12 +7,12 @@ import {api} from '../dispatch/shared.mjs';
 import {createScope} from '../dispatch/lifecycle.mjs';
 import {resourceUrl} from '../dispatch/navigation/resource.mjs';
 import {DECISION_META,iconSvg} from '../dispatch/decision-ui.mjs';
-import {mountDialog,mountDropdown,heroCta,loadingState} from './components.mjs';
+import {mountDialog,mountDropdown,heroCta,loadingState,personInitials} from './components.mjs';
 import {mountCenterActions} from './decision-center-actions.mjs';
 import {ddaEnabled} from './entitlements.mjs';
 import {CENTER_FILTERS,readCenterResource} from './center-resource.mjs';
 import {mountActivity} from './activity.mjs';
-import {workspaceDate} from './workspace-format.mjs';
+import {workspaceDate,workspaceNumber} from './workspace-format.mjs';
 
 const BASE='/api/platform/decisions',size=25;
 const statusNames={active:'En progreso',completed:'Completado',archived:'Archivado',review:'En revisión',pending_approval:'Pendiente de aprobación',approved:'Aprobada',running:'En ejecución',error:'Requiere revisión',stale:'Requiere actualizar',available:'Disponible',locked:'Bloqueado',needs_data:'Faltan datos',coming_soon:'Próximamente'};
@@ -22,7 +22,7 @@ function button(text,handler,kind='secondary'){const n=el('button',text,'d-butto
 function pill(status){const n=el('span',statusNames[status]||status,'center-status');n.dataset.state=status;n.dataset.tone=statePresentation(status==='pending_approval'?'review':status).tone;return n;}
 function person(value,fallback='Sin asignar'){return value?.name?value.name+(value.active===false?' (inactivo)':''):fallback;}
 function ddaLabel(id){return DDA_CATALOG.find(d=>d.id===id)?.title||id||'DDA';}
-function namedPerson(value){const wrap=el('span',undefined,'center-person'),initials=(value?.name||'').split(/\s+/).filter(Boolean).slice(0,2).map(s=>s[0]).join('').toUpperCase()||'—',avatar=el('span',initials,'center-avatar');avatar.setAttribute('aria-hidden','true');wrap.append(avatar,el('span',person(value)));return wrap;}
+function namedPerson(value){const wrap=el('span',undefined,'center-person'),initials=personInitials(value?.name),avatar=el('span',initials,'center-avatar');avatar.setAttribute('aria-hidden','true');wrap.append(avatar,el('span',person(value)));return wrap;}
 
 export function mountDecisionCenter(root,getIdentity){
  const scope=createScope(root),wide=matchMedia('(min-width:1100px)');root.classList.add('decision-center');
@@ -68,7 +68,7 @@ export function mountDecisionCenter(root,getIdentity){
  function renderPortfolio(){
   cleanupPortfolio();const frag=document.createDocumentFragment(),summary=data.summary||{},kpis=el('div',undefined,'center-kpis');kpis.setAttribute('aria-label','Resumen del workspace');
   for(const [key,label,filter,name]of [['active_cases','Cases activos','in_progress','folderOpen'],['in_review','En revisión','review','eye'],['pending_approval','Pendientes de aprobación','pending_approval','clock'],['approved','Aprobadas','approved','checkCircle']]){
-   const card=button('',()=>open({filter,offset:0}), 'ghost');card.className='center-kpi';card.dataset.kpi=key;card.setAttribute('aria-pressed',String(route.filter===filter));card.append(icon(name),el('span',label,'center-kpi__label'),el('strong',String(summary[key]??'—'),'center-kpi__value'),el('span','›','center-kpi__arrow'));kpis.append(card);
+   const card=button('',()=>open({filter,offset:0}), 'ghost');card.className='center-kpi';card.dataset.kpi=key;card.setAttribute('aria-pressed',String(route.filter===filter));const text=summary[key]==null?'—':workspaceNumber(summary[key],getIdentity().workspace);const value=el('strong',text,'center-kpi__value');if(text.length>6)value.classList.add('center-kpi__value--long');card.append(icon(name),el('span',label,'center-kpi__label'),value,el('span','›','center-kpi__arrow'));kpis.append(card);
   }frag.append(kpis);
   if(summary.pending_approval>0){const attention=el('section',undefined,'center-attention'),text=el('div');text.append(el('h2','Requiere tu atención'),el('p',summary.pending_approval===1?'1 decisión espera tu aprobación.':`${summary.pending_approval} decisiones esperan tu aprobación.`));attention.append(icon('clock'),text,button('Ver pendientes',()=>open({filter:'pending_approval',offset:0})));frag.append(attention);}
   const form=el('form',undefined,'center-search'),controls={};

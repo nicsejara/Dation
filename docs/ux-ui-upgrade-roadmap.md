@@ -1,7 +1,7 @@
 # Dation · UX/UI upgrade roadmap
 
 Fecha: 2026-10-23 · Base de planificación: `1477b41`.
-Estado: **en ejecución autorizada** por el master prompt del 2026-10-23. Base de implementación: `ee404b1`; rama local `ux-ui/commercial-mvp-upgrade`. No incluye publicación.
+Estado: **completado — fases 0 a 8** según el master prompt del 2026-10-23. Base de implementación: `ee404b1`; rama local `ux-ui/commercial-mvp-upgrade`. No incluye publicación.
 
 Fuentes: [auditoría](ux-ui-upgrade-audit.md), [propuesta](ux-ui-upgrade-proposal.md) y contratos funcionales actuales de `/docs`.
 
@@ -229,5 +229,7 @@ La auditoría y la propuesta originales se conservan. Este registro documenta la
 | 4 | Complete | UX-007/008/009/010/016/017/018: números, launcher en toolbar, copy fiel y unidades de presentación; fotografías conservadas; QA: 38 unitarios OK; 6 browser existentes y 2 nuevas de exportación/aprobación OK; 2 tests históricos incompatibles con controles ya retirados; 9 observaciones sin overflow | 6017263 |
 | 5 | Complete | UX-006/011/014/015/016: KPI móvil, errores presentables, carga compartida, filtros y áreas inline; Hub numérico; QA: 4 browser relevantes verificados (invitaciones repetida con fixture Team); 18 Node OK; 24 observaciones sin overflow; permisos y contratos preservados | 9aa532c |
 | 6 | Complete | improve-animations + review-animations: retirar entradas repetidas, traslaciones y width animado; feedback inmediato conservado; review Approve; QA: 11 browser OK; dialog 375 px estable y foco restaurado con ambas preferencias; sin motion añadido ni dependencia | c0fd0fb |
-| 7 | Complete | Cierre responsive/a11y: Map fluido a 320 px, regiones de tablas D1 accesibles, scroll de ruta inmediato y foco estable; QA: 15 browser verificadas (14 más 1 repetida con pantalla visible), 9 unitarios OK; 57 muestras principales + 44 reflow sin overflow ni fallos de contraste muestreado; landscape y teclado simulado; E2E 11 OK | incluido en este commit |
-| 8 | Pending | — | — |
+| 7 | Complete | Cierre responsive/a11y: Map fluido a 320 px, regiones de tablas D1 accesibles, scroll de ruta inmediato y foco estable; QA: 15 browser verificadas (14 más 1 repetida con pantalla visible), 9 unitarios OK; 57 muestras principales + 44 reflow sin overflow ni fallos de contraste muestreado; landscape y teclado simulado; E2E 11 OK | 42c0703 |
+| 8 | Complete | break-ui: cifras grandes, grafemas y disposal corregidos; tipografía operativa cerrada; fixtures dev-only y resumen final; QA: 383 Python, 18 Node, 33 browser, 11 E2E OK; estrés adicional y Config 5 anchos OK; 3 fallos legacy reproducidos en ee404b1; sin regresiones nuevas conocidas | incluido en este commit |
+
+Resultado y QA detallados: [ux-ui-upgrade-implementation-summary.md](ux-ui-upgrade-implementation-summary.md).

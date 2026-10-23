@@ -1544,10 +1544,10 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                 geometry=await self.page.evaluate('''()=>{
                   const last=document.querySelector('.decision-advanced-option:last-child').getBoundingClientRect();
                   const bar=document.querySelector('.d-workflow-action-bar').getBoundingClientRect();
-                  return {last:last.bottom,bar:bar.top,padding:parseFloat(getComputedStyle(document.querySelector('#dispatch-config-root')).paddingBottom),height:bar.height};
+                  return {last:last.bottom,bar:bar.top,barBottom:bar.bottom,viewport:innerHeight};
                 }''')
                 self.assertLessEqual(geometry['last'],geometry['bar']+1)
-                self.assertGreater(geometry['padding'],geometry['height'])
+                self.assertLessEqual(geometry['barBottom'],geometry['viewport']+1)
                 for select in await self.page.locator('[data-config-anomaly]').all():await select.select_option('include')
                 await self.page.locator('[data-config-review]' if kind=='assignment' else '[data-scheduling-review]').click()
                 dialog=self.page.locator('dialog[open]');await dialog.wait_for(state='visible')
