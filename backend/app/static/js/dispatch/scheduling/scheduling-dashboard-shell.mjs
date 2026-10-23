@@ -26,7 +26,7 @@ export function renderSchedulingShell(root,run,caseActions={}){
         +'<div id="'+esc(id)+'-content" data-scheduling-advanced-content hidden></div>'
       +'</section>'
       +'<section class="dispatch-panel scheduling-v2__panel" id="scheduling-validation"></section>'
-    +'</main><button type="button" class="dispatch-ai-fab" data-chat aria-expanded="false" aria-label="Abrir Dation IA">'+schedulingIcon('sparkles')+'<strong>Dation IA</strong></button>'
+    +'</main>'
     +'<aside class="dispatch-chat dispatch-panel" hidden aria-label="Chat de la planificación"></aside>'+drawer;
   const find=selector=>root.querySelector(selector);
   return {hero:find('[data-scheduling-hero]'),context:find('#scheduling-context'),kpis:find('#scheduling-kpis'),insights:find('#scheduling-insights'),timeline:find('#scheduling-timeline'),resources:find('#scheduling-resources'),preview:find('#scheduling-preview'),ai:find('#dispatch-explanation'),advanced:find('[data-scheduling-advanced-content]'),validation:find('#scheduling-validation'),chat:find('.dispatch-chat')};

@@ -1,12 +1,14 @@
-import {esc,num,pct,date} from '../shared.mjs';
+import {esc,num,pct,date,weight} from '../shared.mjs';
 import {getSlaDistribution,getWaitAnalysis,getVehicleScheduleSummary,getCorridorScheduleSummary,getTripSla} from './scheduling-dashboard-selectors.mjs';
 import {heading,slaBadge} from './scheduling-essential.mjs';
 import {renderDetailedTimeline} from './scheduling-timeline.mjs';
-const cell=value=>'<td>'+value+'</td>';
+const cell=(value,numeric=false)=>'<td'+(numeric?' class="d-number"':'')+'>'+value+'</td>';
+const numericHeaders=new Set(['Viajes','Órdenes','Carga','Espera media','Margen mínimo','Margen','Ocupación','Participación','Huecos','Espera','Ciclo','Viajes alcanzados']);
 function table(labels,rows,label){
-  return '<div class="scheduling-table-scroll" role="region" tabindex="0" aria-label="'+esc(label)+'"><table class="scheduling-table"><thead><tr>'+labels.map(x=>'<th scope="col">'+esc(x)+'</th>').join('')+'</tr></thead><tbody>'+rows.join('')+'</tbody></table></div>';
+  rows=rows.map(html=>{let index=0;return html.replace(/<td>/g,()=>'<td'+(numericHeaders.has(labels[++index])?' class="d-number"':'')+'>');});
+  return '<div class="scheduling-table-scroll" role="region" tabindex="0" aria-label="'+esc(label)+'"><table class="scheduling-table"><thead><tr>'+labels.map(x=>'<th scope="col"'+(numericHeaders.has(x)?' class="d-number"':'')+'>'+esc(x)+'</th>').join('')+'</tr></thead><tbody>'+rows.join('')+'</tbody></table></div>';
 }
-const row=(key,values)=>'<tr><th scope="row">'+esc(key)+'</th>'+values.map(cell).join('')+'</tr>';
+const row=(key,values)=>'<tr><th scope="row">'+esc(key)+'</th>'+values.map(value=>cell(value)).join('')+'</tr>';
 const section=(id,title,copy,body)=>'<section class="scheduling-advanced__section" id="'+id+'" tabindex="-1">'+heading(title,copy)+body+'</section>';
 const slack=value=>value===null?'—':num(value)+' d';
 const waitLabels={none:'Sin espera',unassessed:'Sin evaluación SLA',late:'Espera con tardanza; causalidad no demostrada',sensitive:'Espera sensible',controlled:'Espera controlada'};
@@ -23,11 +25,11 @@ export function renderSchedulingAdvanced(root,result){
       table(['Vehículo','Viajes','Ocupación','Participación','Primera salida','Libre nuevamente','Huecos','Propiedad'],resources.map(r=>row(r.id,[num(r.trip_count),num(r.busy_days)+' d',pct(r.busy_share)+'<div class="scheduling-bar"><span style="width:'+Math.round(r.busy_share*100)+'%"></span></div>',date(r.first_dispatch),date(r.last_free),slack(r.idle_days),r.ownership==='own'?'Propio':'Tercerizado'])),'Ocupación por vehículo')
       +(resources[0]?'<p class="scheduling-summary-strip"><strong>Recurso condicionante: '+esc(resources[0].id)+'.</strong> Acumula '+num(resources[0].busy_days)+' días ocupados y '+num(resources[0].trip_count)+' de '+num(trips.length)+' viajes. '+(waits.some(t=>t.vehicle_id===resources[0].id&&t.wait_days>0&&['critical','low'].includes(t.sla.category))?'Su secuencia contiene entregas posteriores con poco margen.':'La concentración temporal por sí sola no implica un riesgo.')+'</p>':''))
     +section('scheduling-corridors','Análisis por corredor','Viajes agrupados por origen y destino; órdenes únicas dentro de cada corredor.',
-      table(['Corredor','Viajes','Órdenes','Carga','Primera salida','Última llegada','Espera media','SLA','Margen mínimo','Vehículos'],corridors.map(c=>row(c.origin+' → '+c.destination,[num(c.trip_count),num(c.orders),num(c.kg)+' kg',date(c.first_dispatch),date(c.last_arrival),num(c.avg_wait_days,2)+' d',sla.enabled?(c.on_time_rate===null?'Sin fecha objetivo':pct(c.on_time_rate)+' · '+num(c.on_time_orders)+' de '+num(c.due_orders)):'Sin SLA',slack(c.min_slack),esc(c.vehicles.join(', '))])),'Corredores programados'))
+      table(['Corredor','Viajes','Órdenes','Carga','Primera salida','Última llegada','Espera media','SLA','Margen mínimo','Vehículos'],corridors.map(c=>row(c.origin+' → '+c.destination,[num(c.trip_count),num(c.orders),weight(c.kg,{unit:'kg'}),date(c.first_dispatch),date(c.last_arrival),num(c.avg_wait_days,2)+' d',sla.enabled?(c.on_time_rate===null?'Sin fecha objetivo':pct(c.on_time_rate)+' · '+num(c.on_time_orders)+' de '+num(c.due_orders)):'Sin SLA',slack(c.min_slack),esc(c.vehicles.join(', '))])),'Corredores programados'))
     +section('scheduling-full-plan','Plan completo de despachos','Expandí cada viaje para consultar las cargas heredadas de Assignment. Ready, llegada y disponibilidad del recurso se muestran por separado.',
       table(['Viaje','Vehículo','Ruta','Carga','Ready','Despacho','Llegada','Libre nuevamente','Espera','Ciclo','Objetivo','Margen','SLA'],[...trips].sort((a,b)=>String(a.dispatch_date).localeCompare(String(b.dispatch_date))||String(a.trip_id).localeCompare(String(b.trip_id))).map(t=>{
         const loads='<details><summary>'+esc(t.trip_id)+'</summary><ul class="scheduling-loads">'+(t.loads||[]).map(l=>'<li><strong>'+esc(l.order_id)+'</strong> · '+esc(l.product)+' · '+num(l.units)+' unidades · '+num(l.kg)+' kg</li>').join('')+'</ul></details>',s=getTripSla(result,t);
-        return '<tr><th scope="row">'+loads+'</th>'+[esc(t.vehicle_id),esc(t.origin+' → '+t.destination),num(t.load_kg)+' kg',date(t.ready_date),date(t.dispatch_date),date(t.arrival_date),date(t.resource_available_again),num(t.wait_days)+' d',num(t.cycle_days)+' d',date(t.delivery_due_date),slack(s.slack_days),slaBadge(s)].map(cell).join('')+'</tr>';
+        return '<tr><th scope="row">'+loads+'</th>'+[esc(t.vehicle_id),esc(t.origin+' → '+t.destination),weight(t.load_kg,{unit:'kg'}),date(t.ready_date),date(t.dispatch_date),date(t.arrival_date),date(t.resource_available_again),num(t.wait_days)+' d',num(t.cycle_days)+' d',date(t.delivery_due_date),slack(s.slack_days),slaBadge(s)].map(value=>cell(value)).join('')+'</tr>';
       }),'Plan completo desplazable'))
     +(rules.length?section('scheduling-rules','Reglas aplicadas','Evidencia temporal publicada por el motor.',table(['Campo','Valores','Acción','Desde','Hasta','Viajes alcanzados'],rules.map((r,i)=>row(r.field||r.match?.field||'Regla '+(i+1),[esc((r.values||r.match?.values||[]).join(', ')),esc(r.action),date(r.planning_window_start),date(r.planning_window_end),num(r.matched_trip_count??r.matched_trip_ids?.length)+' · '+esc((r.matched_trip_ids||[]).join(', '))])),'Reglas temporales')):'')
     +'<p class="scheduling-v2__note">Comparación temporal no incluida porque el contrato actual publica un único escenario Scheduling.</p>';

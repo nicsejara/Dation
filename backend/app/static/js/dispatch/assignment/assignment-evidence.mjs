@@ -1,5 +1,5 @@
 import {createScope} from '../lifecycle.mjs';
-import {esc,num,money,pct,vehicle} from '../shared.mjs';
+import {esc,num,money,pct,vehicle,weight} from '../shared.mjs';
 import {
   getAssignmentTrips,
   getAssignmentVehicles,
@@ -28,10 +28,10 @@ function tripRows(trips){
       +'<td><strong>'+esc(trip.trip_id)+'</strong></td>'
       +'<td><strong>'+esc(trip.resource_id)+'</strong><small>'+esc(vehicle(trip.vehicle_type||''))+'</small></td>'
       +'<td>'+esc(trip.origin||'—')+' → '+esc(trip.destination||'—')+'</td>'
-      +'<td>'+num(trip.load_kg,0)+' kg</td>'
-      +'<td>'+num(trip.capacity_kg,0)+' kg</td>'
-      +'<td>'+utilizationCell(trip.utilization)+'</td>'
-      +'<td>'+num(trip.order_count)+'</td>'
+      +'<td class="d-number">'+num(trip.load_kg,0)+' kg</td>'
+      +'<td class="d-number">'+num(trip.capacity_kg,0)+' kg</td>'
+      +'<td class="d-number">'+utilizationCell(trip.utilization)+'</td>'
+      +'<td class="d-number">'+num(trip.order_count)+'</td>'
       +'<td>'+ownershipBadge(trip.ownership)+'</td>'
       +'<td><button type="button" class="assignment-evidence__trip-link" data-trip-detail-button="'+esc(trip.trip_id)+'" aria-expanded="false" aria-label="Ver detalle del viaje '+esc(trip.trip_id)+'">Ver detalle</button></td>'
     +'</tr>'
@@ -54,15 +54,15 @@ function vehicleView(vehicles){
     +'</article>';
   }
   return '<div class="dispatch-table-wrap assignment-evidence__table-wrap">'
-    +'<table class="assignment-evidence__table"><thead><tr><th>Vehículo</th><th>Viajes</th><th>Carga total</th><th>Utilización media</th><th>Órdenes</th><th>% de carga</th><th>Flota</th></tr></thead><tbody>'
+    +'<table class="assignment-evidence__table"><thead><tr><th>Vehículo</th><th class="d-number">Viajes</th><th class="d-number">Carga total</th><th class="d-number">Utilización media</th><th class="d-number">Órdenes</th><th class="d-number">% de carga</th><th>Flota</th></tr></thead><tbody>'
     +vehicles.map(item=>
       '<tr>'
         +'<td><strong>'+esc(item.id)+'</strong><small>'+esc(vehicle(item.vehicle_type||''))+'</small></td>'
-        +'<td>'+num(item.trips)+'</td>'
-        +'<td>'+num(item.load_kg,0)+' kg</td>'
-        +'<td>'+(item.utilization==null?'—':pct(item.utilization))+'</td>'
-        +'<td>'+num(item.orders)+'</td>'
-        +'<td>'+(item.load_share==null?'—':pct(item.load_share))+'</td>'
+        +'<td class="d-number">'+num(item.trips)+'</td>'
+        +'<td class="d-number">'+num(item.load_kg,0)+' kg</td>'
+        +'<td class="d-number">'+(item.utilization==null?'—':pct(item.utilization))+'</td>'
+        +'<td class="d-number">'+num(item.orders)+'</td>'
+        +'<td class="d-number">'+(item.load_share==null?'—':pct(item.load_share))+'</td>'
         +'<td>'+ownershipBadge(item.ownership)+'</td>'
       +'</tr>'
     ).join('')
@@ -80,13 +80,13 @@ function orderFlags(order){
 function orderView(orders){
   if(!orders.length)return '<p class="assignment-evidence__empty">No hay detalle por orden disponible en esta corrida.</p>';
   return '<div class="dispatch-table-wrap assignment-evidence__table-wrap">'
-    +'<table class="assignment-evidence__table"><thead><tr><th>Orden</th><th>Producto</th><th>Unidades</th><th>Kg</th><th>Viaje/s</th><th>Vehículo/s</th><th>Estado</th></tr></thead><tbody>'
+    +'<table class="assignment-evidence__table"><thead><tr><th>Orden</th><th>Producto</th><th class="d-number">Unidades</th><th class="d-number">Kg</th><th>Viaje/s</th><th>Vehículo/s</th><th>Estado</th></tr></thead><tbody>'
     +orders.map(order=>
       '<tr>'
         +'<td><strong>'+esc(order.order_id)+'</strong></td>'
         +'<td>'+esc(order.product)+'</td>'
-        +'<td>'+num(order.units)+'</td>'
-        +'<td>'+num(order.kg,0)+' kg</td>'
+        +'<td class="d-number">'+num(order.units)+'</td>'
+        +'<td class="d-number">'+num(order.kg,0)+' kg</td>'
         +'<td>'+order.trip_ids.map(esc).join('<br>')+'</td>'
         +'<td>'+order.vehicle_ids.map(esc).join('<br>')+'</td>'
         +'<td><div class="assignment-evidence__order-flags">'+orderFlags(order)+'</div></td>'
@@ -115,8 +115,8 @@ function renderTripDetail(root,trip){
     +'<div class="assignment-evidence__detail-grid">'
       +detailMetric('Vehículo',trip.resource_id)
       +detailMetric('Tipo',vehicle(trip.vehicle_type||''))
-      +detailMetric('Carga total',num(trip.load_kg,0)+' kg')
-      +detailMetric('Capacidad',num(trip.capacity_kg,0)+' kg')
+      +detailMetric('Carga total',weight(trip.load_kg,{unit:'kg'}))
+      +detailMetric('Capacidad',weight(trip.capacity_kg,{unit:'kg'}))
       +detailMetric('Utilización',pct(trip.utilization))
       +detailMetric('Órdenes',num(trip.order_count))
       +cost+co2
@@ -147,7 +147,7 @@ export function render(root,result){
     +'</div>'
     +'<section role="tabpanel" data-evidence-panel="trips">'
       +(trips.length
-        ?'<div class="dispatch-table-wrap assignment-evidence__table-wrap"><table class="assignment-evidence__table"><thead><tr><th>Viaje</th><th>Vehículo</th><th>Ruta</th><th>Carga</th><th>Capacidad</th><th>Utilización</th><th>Órdenes</th><th>Flota</th><th>Detalle</th></tr></thead><tbody>'+tripRows(trips)+'</tbody></table></div>'
+        ?'<div class="dispatch-table-wrap assignment-evidence__table-wrap"><table class="assignment-evidence__table"><thead><tr><th>Viaje</th><th>Vehículo</th><th>Ruta</th><th class="d-number">Carga</th><th class="d-number">Capacidad</th><th class="d-number">Utilización</th><th class="d-number">Órdenes</th><th>Flota</th><th>Detalle</th></tr></thead><tbody>'+tripRows(trips)+'</tbody></table></div>'
         :'<p class="assignment-evidence__empty">No hay viajes para mostrar.</p>')
     +'</section>'
     +'<section role="tabpanel" data-evidence-panel="vehicles" hidden>'+vehicleView(vehicles)+'</section>'

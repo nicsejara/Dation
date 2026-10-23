@@ -31,7 +31,7 @@ export function renderAssignmentShell(root,run,caseActions={}){
         +'</div></section>'
       +'<section class="dispatch-panel assignment-dashboard-v2__section assignment-dashboard-v2__review" id="dispatch-review"><div data-review-content></div></section>'
     +'</main>'
-    +'<button type="button" class="dispatch-ai-fab assignment-dashboard-v2__ai-fab" data-chat aria-expanded="false" aria-label="Abrir Dation IA">'+icon('sparkles')+'<strong>Dation IA</strong></button>'
+    +''
     +'<aside class="dispatch-chat dispatch-panel assignment-dashboard-v2__chat" hidden aria-label="Chat de la decisión"></aside>'+drawer;
   const find=selector=>root.querySelector(selector);
   return {hero:find('[data-assignment-hero-copy]'),context:find('#assignment-context'),kpis:find('#assignment-kpis'),insights:find('#assignment-insights'),

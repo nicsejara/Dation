@@ -18,7 +18,7 @@
   display:block;
   margin-bottom:2px;
   color:var(--color-text-accent);
-  font-size:10px;
+  font-size:12px;
   font-weight:850;
   letter-spacing:.11em;
 }
@@ -47,13 +47,13 @@
 }
 
 .assignment-dashboard-v2__rail .dispatch-decision-rail__head .dispatch-kicker{
-  font-size:9px;
+  font-size:12px;
   letter-spacing:.1em;
 }
 
 .assignment-dashboard-v2__rail .dispatch-decision-rail__head strong{
   color:var(--color-text);
-  font-size:10px;
+  font-size:12px;
 }
 
 .assignment-dashboard-v2__rail .dispatch-decision-rail nav{
@@ -72,7 +72,7 @@
   width:25px;
   min-width:25px;
   height:25px;
-  font-size:10px;
+  font-size:12px;
 }
 
 .assignment-dashboard-v2__rail .dispatch-decision-tab strong{
@@ -80,7 +80,7 @@
 }
 
 .assignment-dashboard-v2__rail .dispatch-decision-tab small{
-  font-size:9px;
+  font-size:12px;
 }
 
 .assignment-dashboard-v2__rail .dispatch-decision-tab.is-active{
@@ -114,11 +114,6 @@
   overflow:visible;
 }
 
-.assignment-dashboard-v2 .assignment-dashboard-v2__ai-fab{
-  right:28px;
-  bottom:24px;
-  z-index:70;
-}
 
 .assignment-dashboard-v2 .assignment-dashboard-v2__chat{
   position:fixed!important;
@@ -158,10 +153,6 @@
 @media(max-width:520px){
 .assignment-dashboard-v2__rail .dispatch-decision-rail__head>div strong{display:none}
 
-.assignment-dashboard-v2 .assignment-dashboard-v2__ai-fab{
-    right:16px;
-    bottom:16px;
-  }
 
 .assignment-dashboard-v2 .assignment-dashboard-v2__chat{
     right:12px;

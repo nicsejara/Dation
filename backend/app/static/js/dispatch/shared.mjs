@@ -3,6 +3,8 @@ import {chartPalette,themedChartOptions} from "./chart-theme.mjs";
 import {scopeFor} from "./lifecycle.mjs";
 export const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const num=(v,d=0)=>v==null?'—':new Intl.NumberFormat('es-AR',{maximumFractionDigits:d}).format(v);
+// Display only: persisted weights remain kilograms; detailed tables can retain kg.
+export const weight=(v,{unit='auto'}={})=>v==null?'—':unit==='auto'&&Math.abs(v)>=1000?num(v/1000,1)+' t':num(v,1)+' kg';
 export const money=v=>v==null?'—':'$ '+num(v,2);
 export const pct=v=>v==null?'—':num(v*100,1)+' %';
 export const date=v=>v?new Intl.DateTimeFormat('es-AR',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}).format(new Date(v+'T00:00:00Z')):'—';

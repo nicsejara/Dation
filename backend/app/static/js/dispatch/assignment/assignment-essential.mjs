@@ -28,11 +28,11 @@ export function scenarios(root,result,{onGenerate,state='available'}={}){
   const rows=getScenarioTable(result),busy=['queued','running','submitting'].includes(state);
   root.innerHTML=heading('Comparación de escenarios','La selección corresponde a la decisión del motor. Las alternativas se muestran como referencia.')
     +'<div class="dispatch-table-wrap assignment-scenarios__scroll"><table class="assignment-v2__table"><caption class="sr-only">Escenarios publicados de esta corrida</caption>'
-    +'<thead><tr><th scope="col">Escenario</th><th scope="col">Costo total</th><th scope="col">Viajes</th><th scope="col">Utilización</th><th scope="col">Flota propia</th></tr></thead><tbody>'
+    +'<thead><tr><th scope="col">Escenario</th><th scope="col" class="d-number">Costo total</th><th scope="col" class="d-number">Viajes</th><th scope="col" class="d-number">Utilización</th><th scope="col" class="d-number">Flota propia</th></tr></thead><tbody>'
     +rows.map(row=>'<tr data-scenario-row="'+esc(row.key)+'"'+(row.selected?' class="is-selected" aria-current="true"':'')+'><th scope="row">'
       +(row.selected?icon('checkCircle'):'')+esc(row.label)+'<span class="assignment-scenarios__badge">'+(row.selected?'Seleccionado':!row.feasible?'No factible':row.samePlan?'Misma distribución':'Referencia')+'</span>'
       +(row.selected&&!row.feasible?'<span class="assignment-scenarios__badge is-warning">No factible</span>':'')+'</th>'
-      +['total_cost','total_trips','load_utilization','own_weight_share'].map(key=>'<td>'+esc(formatMetric({value:row.values[key],format:key==='total_cost'?'money':['load_utilization','own_weight_share'].includes(key)?'percent':'number'}))+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>'
+      +['total_cost','total_trips','load_utilization','own_weight_share'].map(key=>'<td class="d-number">'+esc(formatMetric({value:row.values[key],format:key==='total_cost'?'money':['load_utilization','own_weight_share'].includes(key)?'percent':'number'}))+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>'
     +(rows.length===1?'<div class="assignment-scenarios__available"><p>'+(busy?'Generando evidencia comparativa…':'Podés generar escenarios adicionales sin modificar la recomendación.')+'</p>'
       +'<button type="button" class="d-button d-button--secondary" data-essential-comparative '+(busy?'disabled aria-busy="true"':'')+'>'+icon('chartBar')+(state==='error'?'Reintentar comparación':'Generar comparación')+'</button></div>':'');
   root.querySelector('[data-essential-comparative]')?.addEventListener('click',()=>onGenerate?.());
@@ -48,8 +48,8 @@ export function resources(root,result){
 export function preview(root,result,{onOpen}={}){
   const rows=getAssignmentPreview(result);
   root.innerHTML=heading('Vista rápida de asignaciones','Hasta cinco viajes de la recomendación seleccionada.')
-    +'<div class="dispatch-table-wrap"><table class="assignment-v2__table"><thead><tr><th scope="col">Viaje</th><th scope="col">Destino</th><th scope="col">Vehículo</th><th scope="col">Carga</th><th scope="col">Utilización</th></tr></thead><tbody>'
-    +rows.map(row=>'<tr><th scope="row">'+esc(row.trip_id)+'</th><td>'+esc(row.destination||'—')+'</td><td>'+esc(row.resource_id)+'</td><td>'+esc(formatWeight(row.load_kg,true))+'</td><td>'+pct(row.utilization)+'</td></tr>').join('')
+    +'<div class="dispatch-table-wrap"><table class="assignment-v2__table"><thead><tr><th scope="col">Viaje</th><th scope="col">Destino</th><th scope="col">Vehículo</th><th scope="col" class="d-number">Carga</th><th scope="col" class="d-number">Utilización</th></tr></thead><tbody>'
+    +rows.map(row=>'<tr><th scope="row">'+esc(row.trip_id)+'</th><td>'+esc(row.destination||'—')+'</td><td>'+esc(row.resource_id)+'</td><td class="d-number">'+esc(formatWeight(row.load_kg,true))+'</td><td class="d-number">'+pct(row.utilization)+'</td></tr>').join('')
     +'</tbody></table></div>'+(rows.length?'':'<p>No hay viajes publicados.</p>')
     +'<button type="button" class="d-button d-button--secondary" data-assignment-full-plan>Ver detalle completo '+icon('arrowRight')+'</button>';
   root.querySelector('[data-assignment-full-plan]').onclick=()=>onOpen?.();

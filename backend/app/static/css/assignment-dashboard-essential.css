@@ -51,7 +51,7 @@
   display:block;
   margin-bottom:4px;
   color:var(--color-text);
-  font-size:10px;
+  font-size:12px;
   font-weight:850;
   letter-spacing:.08em;
   text-transform:uppercase;
@@ -81,16 +81,16 @@
   border-radius:999px;
   background:var(--color-surface-raised);
   color:var(--color-text);
-  font-size:10px;
+  font-size:12px;
 }
 
 .assignment-essential__objective-chip strong{
-  font-size:10px;
+  font-size:12px;
 }
 
 .assignment-essential__objective-chip small{
   color:var(--color-text-muted);
-  font-size:10px;
+  font-size:12px;
   font-weight:850;
 }
 
@@ -123,7 +123,7 @@
 
 .assignment-essential__kpi-top>span{
   color:var(--color-text);
-  font-size:10px;
+  font-size:12px;
   font-weight:750;
 }
 
@@ -209,7 +209,7 @@
   border-bottom:1px solid var(--d-border-control);
   background:var(--color-surface-raised);
   color:var(--color-text);
-  font-size:9px;
+  font-size:12px;
   font-weight:850;
   letter-spacing:.045em;
   text-align:left;
@@ -221,7 +221,7 @@
   padding:11px;
   border-bottom:1px solid var(--d-border-control);
   color:var(--color-text);
-  font-size:10px;
+  font-size:12px;
   vertical-align:middle;
 }
 
@@ -236,24 +236,25 @@
 .assignment-evidence__table td>strong{
   display:block;
   color:var(--color-text);
-  font-size:10px;
+  font-size:12px;
 }
 
 .assignment-evidence__table td>small{
   display:block;
   margin-top:2px;
   color:var(--color-text-muted);
-  font-size:9px;
+  font-size:12px;
 }
 
 .assignment-evidence__trip-link{
-  min-height:0!important;
-  padding:0!important;
+  min-height:40px;
+  min-width:44px;
+  padding:8px;
   border:0!important;
   background:transparent!important;
   color:var(--color-text)!important;
-  font-size:10px!important;
-  font-weight:850!important;
+  font-size:12px;
+  font-weight:650;
   text-decoration:underline;
   text-decoration-color:#9bc7c9;
   text-underline-offset:3px;
@@ -274,7 +275,7 @@
   border-radius:999px;
   background:var(--color-surface-raised);
   color:var(--color-text);
-  font-size:9px;
+  font-size:12px;
   font-weight:850;
   white-space:nowrap;
 }
@@ -310,7 +311,7 @@
 
 .assignment-evidence__util strong{
   color:var(--color-text);
-  font-size:9px;
+  font-size:12px;
   font-weight:800;
 }
 
@@ -334,7 +335,7 @@
 .assignment-evidence__detail-empty p{
   margin:3px 0 0;
   color:var(--color-text);
-  font-size:10px;
+  font-size:12px;
 }
 
 .assignment-evidence__detail-head{
@@ -353,7 +354,7 @@
 .assignment-evidence__detail-head p{
   margin:0;
   color:var(--color-text);
-  font-size:10px;
+  font-size:12px;
 }
 
 .assignment-evidence__detail-grid{
@@ -382,14 +383,14 @@
   display:block;
   margin-top:3px;
   color:var(--color-text);
-  font-size:10px;
+  font-size:12px;
   overflow-wrap:anywhere;
 }
 
 .assignment-evidence__provider{
   margin:11px 0 0;
   color:var(--color-text);
-  font-size:10px;
+  font-size:12px;
 }
 
 .assignment-evidence__loads{
@@ -423,14 +424,14 @@
 
 .assignment-evidence__loads article strong{
   color:var(--color-text);
-  font-size:10px;
+  font-size:12px;
 }
 
 .assignment-evidence__loads article span,
 .assignment-evidence__loads article small{
   margin-top:2px;
   color:var(--color-text-muted);
-  font-size:9px;
+  font-size:12px;
 }
 
 .assignment-evidence__single-vehicle{
@@ -482,7 +483,7 @@
 .assignment-evidence__single-meta strong{
   margin-top:3px;
   color:var(--color-text);
-  font-size:10px;
+  font-size:12px;
 }
 
 .assignment-evidence__order-flags{
@@ -518,7 +519,7 @@
   border:1px dashed var(--color-border);
   border-radius:10px;
   color:var(--color-text);
-  font-size:10px;
+  font-size:12px;
 }
 
 .assignment-evidence__boundary{
@@ -541,14 +542,14 @@
   border-radius:50%;
   background:var(--color-surface);
   color:var(--color-text);
-  font-size:10px;
+  font-size:12px;
   font-weight:900;
 }
 
 .assignment-evidence__boundary p{
   margin:1px 0 0;
   color:var(--color-text);
-  font-size:9px;
+  font-size:12px;
   line-height:1.5;
 }
 
@@ -617,14 +618,14 @@
 
 .assignment-validation__card-top strong{
   color:var(--color-text);
-  font-size:10px;
+  font-size:12px;
   line-height:1.35;
 }
 
 .assignment-validation__card>p{
   margin:6px 0 0;
   color:var(--color-text);
-  font-size:9px;
+  font-size:12px;
   line-height:1.5;
 }
 

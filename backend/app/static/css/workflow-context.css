@@ -63,3 +63,7 @@
 .d-decision-dashboard #dispatch-hero .decision-result-summary__headline strong{font-weight:700}
 .d-decision-dashboard #dispatch-hero .decision-result-summary__support{max-width:64ch;margin:0;color:var(--color-text-secondary);font-size:14px;font-weight:400;line-height:1.7}
 @media(max-width:600px){.d-decision-dashboard #dispatch-hero .decision-result-summary__headline{max-width:100%;font-size:22px}}
+
+/* Explicit presentation metadata; identifiers and narrative columns keep their alignment. */
+.d-decision-dashboard :is(th,td).d-number{text-align:right;font-variant-numeric:tabular-nums;}
+.d-decision-dashboard .assignment-evidence__util{justify-content:flex-end;}

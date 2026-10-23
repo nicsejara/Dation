@@ -1,5 +1,8 @@
 """Product-level UX regressions, using the existing isolated API fixtures."""
 import unittest
+import copy
+import json
+from pathlib import Path
 import test_saga3_ui as saga3
 
 
@@ -41,6 +44,42 @@ class UXUpgradeTests(unittest.IsolatedAsyncioTestCase):
             await self.page.keyboard.press('Tab')
             self.assertEqual(await self.page.evaluate('document.activeElement.name'), 'category')
         self.assertEqual(self.b.execution_bodies, [])
+
+    async def test_dashboard_launcher_and_exports_preserve_persisted_evidence(self):
+        before = copy.deepcopy(self.b.runs)
+        for kind in ('assignment', 'scheduling'):
+            run_id = self.b.f['ids'][kind]
+            await self.b.open('decision-dashboard', 'logistics_' + kind, run_id)
+            for width, height in [(1440, 900), (1024, 768), (768, 1024), (375, 812)]:
+                await self.page.set_viewport_size({'width': width, 'height': height})
+                launcher = self.page.locator('.view.is-active [data-chat]')
+                self.assertEqual(await launcher.count(), 1)
+                self.assertTrue(await launcher.evaluate('e=>e.closest("[data-dashboard-toolbar]")!==null'))
+                self.assertEqual(await launcher.evaluate('e=>getComputedStyle(e).position'), 'static')
+                await launcher.click()
+                await self.page.locator('.view.is-active .dispatch-chat:not([hidden])').wait_for()
+                await self.page.keyboard.press('Escape')
+                self.assertTrue(await launcher.evaluate('e=>e===document.activeElement'))
+            await self.page.locator('[data-export-menu] summary').click()
+            async with self.page.expect_download() as output:
+                await self.page.locator('[data-export-json]').click()
+            download = await output.value
+            self.assertEqual(json.loads(Path(await download.path()).read_text()), before[run_id]['result_json'])
+        self.assertEqual(self.b.runs, before)
+        self.assertEqual(self.b.execution_bodies, [])
+
+    async def test_human_approval_stays_run_specific_and_duplicate_clicks_are_guarded(self):
+        self.b.review_assignment()
+        run_id = self.b.f['ids']['assignment']
+        self.b.delay[f'/api/runs/{run_id}/approve'] = .3
+        await self.b.open('decision-dashboard', 'logistics_assignment', run_id)
+        self.assertEqual(self.b.approval_calls, 0)
+        button = self.page.locator('[data-approve-toolbar]')
+        await button.click()
+        await button.dispatch_event('click')
+        await self.page.wait_for_function("document.querySelector('[data-status-badge]').textContent==='Aprobada'")
+        self.assertEqual(self.b.approval_calls, 1)
+        self.assertEqual(self.b.case['nodes']['logistics_assignment']['approved_run_id'], run_id)
 
     async def test_skip_and_keyboard_navigation_do_not_follow_workspace_updates(self):
         await self.b.open('logistics-map')
