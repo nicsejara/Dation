@@ -28,6 +28,7 @@
   <script src="/static/js/platform/session.js"></script>
 </head>
 <body>
+  <a class="d-skip-link" href="#main-content">Saltar al contenido principal</a>
   <div class="app-shell">
     <aside class="sidebar">
       <div class="brand">
@@ -41,14 +42,14 @@
       </div>
 
       <nav class="nav platform-global-nav" aria-label="Navegación principal">
-        <a class="nav-item" href="/app" data-platform-view="platform-home" aria-label="Inicio"><span class="nav-icon" aria-hidden="true">⌂</span><span class="platform-nav-label">Inicio</span></a>
+        <a class="nav-item" href="/app" data-platform-view="platform-home" aria-label="Inicio"><span class="nav-icon" data-nav-icon="home" aria-hidden="true"></span><span class="platform-nav-label">Inicio</span></a>
         <span class="sidebar-label">Decision Intelligence</span>
-        <a class="nav-item" href="/app/decisions" data-platform-view="platform-decisions" aria-label="Decision Center"><span class="nav-icon" aria-hidden="true">◎</span><span class="platform-nav-label">Decision Center</span></a>
+        <a class="nav-item" href="/app/decisions" data-platform-view="platform-decisions" aria-label="Decision Center"><span class="nav-icon" data-nav-icon="target" aria-hidden="true"></span><span class="platform-nav-label">Decision Center</span></a>
         <span class="sidebar-label">Datos</span>
-        <a class="nav-item" href="/app/data" data-platform-view="platform-data" aria-label="Datos"><span class="nav-icon" aria-hidden="true">▤</span><span class="platform-nav-label">Datos</span></a>
+        <a class="nav-item" href="/app/data" data-platform-view="platform-data" aria-label="Datos"><span class="nav-icon" data-nav-icon="database" aria-hidden="true"></span><span class="platform-nav-label">Datos</span></a>
         <span class="sidebar-label">Workspace</span>
-        <a class="nav-item" href="/app/team" data-platform-view="platform-team" aria-label="Equipo"><span class="nav-icon" aria-hidden="true">♙</span><span class="platform-nav-label">Equipo</span></a>
-        <a class="nav-item" href="/app/settings" data-platform-view="settings" aria-label="Configuración"><span class="nav-icon" aria-hidden="true">⚙</span><span class="platform-nav-label">Configuración</span></a>
+        <a class="nav-item" href="/app/team" data-platform-view="platform-team" aria-label="Equipo"><span class="nav-icon" data-nav-icon="users" aria-hidden="true"></span><span class="platform-nav-label">Equipo</span></a>
+        <a class="nav-item" href="/app/settings" data-platform-view="settings" aria-label="Configuración"><span class="nav-icon" data-nav-icon="settings" aria-hidden="true"></span><span class="platform-nav-label">Configuración</span></a>
       </nav>
 
       <div class="sidebar-section">
@@ -75,7 +76,7 @@
       </div>
     </aside>
 
-    <main class="main">
+    <main class="main" id="main-content" tabindex="-1">
       <header class="topbar topbar--journey">
         <nav
           id="journey-nav"
@@ -304,7 +305,7 @@
                   </div>
                   <small class="dda-landing__step-phase">Paso 3</small>
                   <h3>Elegí tu prioridad</h3>
-                  <p>Costo, viajes o tiempo: compará escenarios antes de decidir.</p>
+                  <p>Primero distribuí cargas y recursos; después planificá los viajes aprobados.</p>
                   <span class="dda-landing__step-role is-user">
                     <svg class="dda-icon" aria-hidden="true"><use href="#dda-i-sliders"></use></svg>
                     Lo hacés vos
@@ -334,8 +335,8 @@
             <section class="dda-landing__section dda-landing__section--plain" data-reveal>
               <div class="dda-landing__section-head">
                 <span class="dda-landing__section-eyebrow">Motor de cálculo</span>
-                <h2>Qué variables optimiza el motor hoy.</h2>
-                <p>Elegís la prioridad y el motor busca la mejor asignación. Hoy trabaja con tres variables; el resto se está consolidando.</p>
+                <h2>Objetivos según la decisión y los datos.</h2>
+                <p>Assignment distribuye cargas sin calendario. Scheduling agrega secuencia temporal al Assignment aprobado del mismo Case. Cada Config muestra sólo las capacidades disponibles en tus datos.</p>
               </div>
 
               <div
@@ -422,13 +423,13 @@
                     <code class="dda-landing__file-chip">Orders</code>
                     <p>
                       Órdenes identificadas, unidades y peso por unidad, origen, destino,
-                      distancia, fecha de disponibilidad y plazo máximo de entrega.
+                      distancia. Las fechas de disponibilidad y los plazos se agregan para Scheduling.
                     </p>
                   </div>
 
                   <div class="dda-landing__file-block">
                     <code class="dda-landing__file-chip">Fleet</code>
-                    <p>Capacidad, disponibilidad diaria, costos y velocidad de la flota.</p>
+                    <p>Un vehículo físico por fila: identificador, tipo, capacidad, origen y destino. Costos y CO₂ habilitan objetivos adicionales cuando los datos los permiten.</p>
                   </div>
 
                   <div class="dda-landing__datapack-callout">
@@ -462,8 +463,8 @@
                   <h3>Lo que conviene saber</h3>
                   <ul class="dda-landing__checklist">
                     <li>Cada viaje conecta un origen y un destino, sin multiparada.</li>
-                    <li>La flota propia limita las salidas por día; no se modela su ocupación durante el retorno.</li>
-                    <li>CO₂ y combustible son estimaciones informativas.</li>
+                    <li>Assignment no usa fechas ni SLA. Scheduling conserva viajes, vehículos y cargas aprobados, y evita solapamientos incluyendo el retorno.</li>
+                    <li>Costos y CO₂ dependen de los datos disponibles; la Config indica qué se puede optimizar.</li>
                   </ul>
                   <p class="dda-landing__trust-copy">
                     Conocer los límites del modelo también es parte de una decisión trazable.
@@ -480,7 +481,7 @@
               </div>
               <div class="dda-landing__faq-grid">
                 <details><summary>¿Necesito todos los datos desde el principio?</summary><p>No. El Data Pack es progresivo: empezás con el núcleo mínimo y sumás información para desbloquear decisiones posteriores.</p></details>
-                <details><summary>¿Puedo comparar distintos objetivos?</summary><p>Sí. Podés evaluar prioridades como costo, viajes o tiempo y compararlas contra despacho directo.</p></details>
+                <details><summary>¿Puedo comparar distintos objetivos?</summary><p>Sí. Assignment ofrece viajes y carga transportada en flota propia; costo y CO₂ dependen de tus datos. Scheduling tiene objetivos temporales y SLA propios.</p></details>
                 <details><summary>¿Qué pasa con mis resultados anteriores?</summary><p>Cada decisión queda guardada con su evidencia, así podés volver a analizarla cuando quieras.</p></details>
                 <details><summary>¿Qué formatos puedo exportar?</summary><p>Asignaciones y resultados operativos en CSV, y el DecisionResult completo en JSON.</p></details>
               </div>

@@ -59,9 +59,9 @@
   --color-brand-violet: var(--d-brand-violet);
   /* Decorative brand gradient; actions use the AA pair below. */
   --color-brand-gradient: linear-gradient(135deg,#137d83 0%,#43a6c7 52%,#5c4aa5 100%);
-  --color-action-primary-bg: linear-gradient(135deg,#0d5d63 0%,#1c6482 52%,#50418a 100%);
-  --color-action-primary-hover: linear-gradient(135deg,#146c72 0%,#267491 52%,#5c4aa5 100%);
-  --color-action-primary-text: var(--d-text-primary);
+  --color-action-primary-bg: var(--d-brand-teal-bright);
+  --color-action-primary-hover: var(--d-brand-cyan);
+  --color-action-primary-text: var(--d-bg-0);
   --color-success: var(--d-success);
   --color-success-bg: #102d26;
   --color-success-border: #28654e;

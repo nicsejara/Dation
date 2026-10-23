@@ -5,16 +5,16 @@
   var ROOT_SELECTOR=".dda-landing";
   var WORKSPACE_KEY="dation.dispatch.workspace.v5";
 
+  // Informational copy only. Capability gates remain in each decision's Config.
   var ENGINE_VARIABLES={
     active:[
-      {id:"cost",label:"Costo",description:"Costo total de los viajes según tu flota.",icon:"dda-i-dollar"},
-      {id:"trips",label:"Viajes",description:"Cantidad de viajes necesarios para entregar todo.",icon:"dda-i-route"},
-      {id:"time",label:"Tiempo",description:"Plazo total hasta completar las entregas.",icon:"dda-i-clock"}
+      {id:"trips",label:"Viajes",description:"Assignment · distribución sin calendario",icon:"dda-i-route"},
+      {id:"own_weight_share",label:"Carga en flota propia",description:"Assignment · proporción de carga transportada",icon:"dda-i-route"}
     ],
     consolidating:[
-      {id:"co2",label:"CO₂",description:"Hoy se informa como estimación; todavía no se optimiza.",icon:"dda-i-clock"},
-      {id:"risk",label:"Riesgo",description:"Se suma a medida que se consolide el modelo.",icon:"dda-i-clock"},
-      {id:"service",label:"Servicio",description:"Se suma a medida que se consolide el modelo.",icon:"dda-i-clock"}
+      {id:"cost",label:"Costo",description:"Assignment · según datos",icon:"dda-i-dollar"},
+      {id:"co2",label:"CO₂",description:"Assignment · según datos",icon:"dda-i-clock"},
+      {id:"time",label:"Secuencia y SLA",description:"Scheduling · viajes aprobados y datos temporales",icon:"dda-i-clock"}
     ]
   };
 
@@ -59,7 +59,7 @@
       var active=item.state==="active";
       return '<span class="dda-landing__variable-pill '+(active?"is-active":"is-inactive")+'" title="'+item.description+'">'
         +'<span class="dda-landing__variable-pill-icon">'+iconMarkup(active?"dda-i-check-circle":"dda-i-clock")+'</span>'
-        +'<strong>'+item.label+'</strong><small class="dda-landing__variable-status">'+(active?'Optimiza hoy':'En consolidación')+'</small></span>';
+        +'<strong>'+item.label+'</strong><small class="dda-landing__variable-status">'+item.description+'</small></span>';
     }).join("");
   }
 
@@ -90,7 +90,7 @@
         var index=document.createElement("span");
         index.className="dda-landing__section-eyebrow";
         index.setAttribute("data-concept-index","");
-        index.textContent="DECISIÓN "+(DECISION_STEPS[nodeId]||"—");
+        index.textContent="DECISIÓN "+(DECISION_STEPS[nodeId]||"—")+(nodeId==="logistics_final_assignment"?" · FUTURA":"");
         top.appendChild(index);
       }
     });

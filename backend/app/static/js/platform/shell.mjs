@@ -1,3 +1,4 @@
+import {iconSvg} from '../dispatch/decision-ui.mjs';
 import {renderCaseFlow} from '../dispatch/navigation/case-flow.mjs';
 import {renderDdaNavigation} from './dda-navigation.mjs';
 import {trackExploration} from './onboarding.mjs';
@@ -19,6 +20,21 @@ function card(title,copy,links=[]){const el=node('article',undefined,'d-card');e
 
 export function mountPlatformShell(){
  const scope=createScope(document.querySelector('.sidebar'));
+ for(const icon of document.querySelectorAll('[data-nav-icon]'))icon.innerHTML=iconSvg(icon.dataset.navIcon);
+ // Focus moves only after an explicit keyboard navigation action. Polling,
+ // history restoration and dialog dismissal do not request this policy.
+ let keyboardNavigation=false;
+ scope.listen(document,'keydown',event=>{
+  keyboardNavigation=(event.key==='Enter'||event.key===' ')&&Boolean(event.target.closest('nav,.sidebar'));
+ });
+ scope.listen(window,'dation:view',()=>{
+  if(!keyboardNavigation)return;
+  keyboardNavigation=false;
+  scope.timeout(()=>{
+   const modal=[...document.querySelectorAll('dialog[open],[aria-modal="true"]')].some(node=>node.getClientRects().length);
+   if(!modal)document.querySelector('#main-content')?.focus({preventScroll:true});
+  },0);
+ });
  let identity=window.dationSession.identity;
  const profile=()=>identity.profile;
  const display=()=>profile().display_name||[profile().first_name,profile().last_name].filter(Boolean).join(' ')||'Mi cuenta';

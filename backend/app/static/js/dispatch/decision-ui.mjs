@@ -58,6 +58,10 @@ export const STATUS_UI = Object.freeze({
 });
 
 const ICONS = Object.freeze({
+  home:'<path d="m3 10 9-7 9 7v11h-7v-7h-4v7H3Z"/>',
+  users:'<circle cx="9" cy="8" r="3"/><path d="M3 21v-3a6 6 0 0 1 12 0v3M16 5a3 3 0 0 1 0 6M21 21v-3a6 6 0 0 0-3-5"/>',
+  settings:'<path d="m10 3-1 3-3 1-3-1-1 4 2 2-1 3 3 3 3-1 3 2 3-2 3 1 3-3-1-3 2-2-1-4-3 1-3-1-1-3Z"/><circle cx="12" cy="12" r="3"/>',
+
   eye:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',
   chartBar:'<path d="M3 3v18h18M7 17v-4M12 17V9M17 17V5"/>',
   weight:'<path d="M5 9h14l3 12H2Z"/><circle cx="12" cy="6" r="3"/>',

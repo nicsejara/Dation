@@ -13,13 +13,13 @@
   font: 700 var(--platform-type-label)/1.35 var(--font-sans);
   text-decoration: none;
   cursor: pointer;
-  transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 .d-button:hover:not(:disabled):not([aria-disabled="true"]) { background: var(--d-surface-hover); border-color: var(--d-brand-teal-bright); }
 .d-button--primary { color: var(--color-action-primary-text); background: var(--color-action-primary-bg); border-color: var(--d-border-control); }
-.d-button--primary:hover:not(:disabled):not([aria-disabled="true"]) { background: var(--color-action-primary-hover); transform: translateY(-1px); box-shadow: var(--shadow-sm-dark); }
+.d-button--primary:hover:not(:disabled):not([aria-disabled="true"]) { background: var(--color-action-primary-hover); box-shadow: var(--shadow-sm-dark); }
 .d-button--ghost { color: var(--d-text-secondary); background: transparent; border-color: transparent; }
-.d-button--danger { color: var(--d-danger); background: var(--d-surface-2); }
+.d-button--danger { color: var(--d-danger); background: var(--color-danger-bg); border-color:var(--d-danger); }
 .d-button--menu { justify-content: flex-start; width: 100%; border-color: transparent; }
 .d-button--icon { width: var(--control-height-md); padding: 0; flex: 0 0 var(--control-height-md); }
 .d-button--sm { min-height: var(--control-height-sm); padding: 0 var(--space-3); font-size: 12px; }
@@ -45,7 +45,7 @@
 }
 @keyframes d-workflow-spin { to { transform:rotate(360deg); } }
 .d-button:focus-visible { outline: 3px solid var(--d-brand-teal-bright); outline-offset: 3px; box-shadow: 0 0 0 3px var(--d-bg-0); }
-.d-button:active:not(:disabled):not([aria-disabled="true"]) { transform: none; }
+.d-button:active:not(:disabled):not([aria-disabled="true"]) { box-shadow:inset 0 0 0 1px currentColor; }
 .d-button:disabled, .d-button[aria-disabled="true"] {
   opacity: 1;
   color: var(--d-text-disabled);
@@ -258,6 +258,12 @@
   -webkit-text-fill-color:var(--color-text);
   caret-color:var(--color-text);
   box-shadow:inset 0 0 0 1000px var(--color-surface);
+}
+/* A form control must never share the viewport with an overlapping action bar.
+   All readiness items and the CTA remain in normal document order. */
+.view:has(:is(input,textarea,select):focus) .d-workflow-action-bar { position:static; }
+@media(max-width:1100px) {
+  .d-workflow-action-bar { position:static; }
 }
 /* Short viewports and narrow mobile screens must leave focused content reachable. */
 @media(max-height:540px), (max-width:620px) and (max-height:700px) {

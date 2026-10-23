@@ -222,8 +222,8 @@ La auditoría y la propuesta originales se conservan. Este registro documenta la
 
 | Phase | Estado | Alcance / evidencia | Commit |
 | --- | --- | --- | --- |
-| 0 | Complete | Roles de tipografía, superficies y radios del sistema existente; Inter y paleta preservadas; QA: 6 tests unitarios de primitives y 7 browser de plataforma; diff check limpio | incluido en este commit |
-| 1 | Pending | — | — |
+| 0 | Complete | Roles de tipografía, superficies y radios del sistema existente; Inter y paleta preservadas; QA: 6 tests unitarios de primitives y 7 browser de plataforma; diff check limpio | ebd4089 |
+| 1 | Complete | UX-001/002/019/020: Overview vigente, foco sin oclusión, SVG y skip; familia de acciones compartida; QA: 21 browser existentes y 2 regresiones nuevas pasan; 57 observaciones de 4 resoluciones sin overflow ni errores JS; Python baseline 383 OK | incluido en este commit |
 | 2 | Pending | — | — |
 | 3 | Pending | — | — |
 | 4 | Pending | — | — |
