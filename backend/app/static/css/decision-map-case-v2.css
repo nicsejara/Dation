@@ -987,3 +987,6 @@ details[open]>summary .decision-context-chevron{transform:rotate(180deg);}
 @media(max-width:620px){.dispatch-decision-map--case-v2 .dispatch-decision-node{display:flex;flex-direction:column;gap:14px;padding:20px}.dispatch-decision-map--case-v2 .dispatch-decision-node>*{width:100%;min-width:0}.dispatch-decision-map--case-v2 .dispatch-decision-node__head{display:flex;flex-wrap:wrap;gap:8px}.dispatch-decision-map--case-v2 .dispatch-decision-node__head .dispatch-map-state-chip{margin-left:auto}.dispatch-decision-map--case-v2 .dispatch-decision-node__icon{width:22px;flex:0 0 22px}.dispatch-decision-node>.workflow-map-responsibilities{padding-top:16px;margin-top:0}}
 
 @media(min-width:621px){.dispatch-decision-map--case-v2 .dispatch-decision-node__actionrow{display:flex;justify-content:flex-start;max-width:var(--workflow-action-min-width)}}
+
+/* The next-decision marker keeps its intrinsic width above the mobile lane. */
+.dispatch-decision-map--case-v2 .dispatch-decision-node__next{width:auto;max-width:calc(100% - 40px);box-shadow:none;font-weight:600;letter-spacing:.02em}

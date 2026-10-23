@@ -138,6 +138,12 @@ class UXUpgradeTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(fits)
         for label in ('Buscar por ID o etiqueta', 'Estado', 'DDA', 'Responsable'):
             self.assertTrue(await self.page.locator('.center-filter label').get_by_text(label, exact=True).is_visible())
+        audit = (Path(__file__).parent / 'theme_audit.js').read_text()
+        for width in (1024, 1440):
+            await self.page.set_viewport_size({'width': width, 'height': 900})
+            await self.page.locator('.center-table tbody tr').first.hover()
+            await self.page.wait_for_timeout(220)
+            self.assertEqual((await self.page.evaluate(audit))['failures'], [], (width, 'hovered case metadata contrast'))
 
     async def test_invitation_errors_preserve_status_handling_without_exposing_parser_text(self):
         scenario = {'status': 503, 'body': '<html>gateway unavailable</html>'}

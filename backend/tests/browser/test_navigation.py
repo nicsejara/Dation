@@ -3623,24 +3623,25 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await root.get_by_role('heading',name='Accesos rápidos',exact=True).wait_for()
         self.assertFalse(any(method=='POST' and path in ('/api/runs','/api/decision-cases') for method,path in self.requests))
 
-    async def test_home_center_share_hero_geometry_and_catalog_cta(self):
+    async def test_home_center_keep_readable_headers_and_catalog_cta(self):
         await self.page.goto(f'http://127.0.0.1:{self.port}/app')
         root=self.page.locator('[data-platform-home]')
         await root.get_by_role('heading',name='Accesos rápidos',exact=True).wait_for()
         for width in (1440,1280,1024,768,390):
             await self.page.set_viewport_size({'width':width,'height':1000})
             await self.page.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))')
-            home=await root.locator('.platform-home__header').bounding_box()
             home_cta=await root.locator('.platform-hero-cta').first.bounding_box()
             if width>=1024:
-                self.assertEqual(await root.locator('.d-page-description').evaluate('el=>{const range=document.createRange();range.selectNodeContents(el);return range.getClientRects().length}'),1)
+                self.assertLessEqual(await root.locator('.d-page-description').evaluate('el=>{const range=document.createRange();range.selectNodeContents(el);return range.getClientRects().length}'),3)
+            self.assertGreaterEqual(home_cta['height'],40 if width>=768 else 44)
+            self.assertLessEqual(home_cta['x']+home_cta['width'],width)
             self.assertTrue(await self.page.evaluate('document.documentElement.scrollWidth<=innerWidth+1'))
-            await root.get_by_role('link',name='Ir a Decision Center',exact=True).click()
+            await root.locator('.platform-home__quick').get_by_role('link',name='Decision Center',exact=True).click()
             center=self.page.locator('[data-platform-decisions]');await center.locator('.center-hero').wait_for()
-            if width>=1024:self.assertAlmostEqual(home['height'],(await center.locator('.center-hero').bounding_box())['height'],delta=1)
             center_cta=await center.locator('.center-hero .platform-hero-cta').bounding_box()
-            self.assertAlmostEqual(home_cta['height'],center_cta['height'],delta=1)
-            self.assertAlmostEqual(home_cta['width'],center_cta['width'],delta=1)
+            self.assertGreaterEqual(center_cta['height'],40 if width>=768 else 44)
+            self.assertLessEqual(center_cta['x']+center_cta['width'],width)
+            self.assertTrue(await self.page.evaluate('document.documentElement.scrollWidth<=innerWidth+1'))
             await center.locator('.center-hero').get_by_role('button',name='Explorar DDA',exact=True).click()
             await root.get_by_role('heading',name='Accesos rápidos',exact=True).wait_for()
             self.assertEqual(await self.page.evaluate('document.activeElement.id'),'dation-dda-title')

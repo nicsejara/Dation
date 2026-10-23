@@ -82,7 +82,9 @@ class UXStressTests(unittest.IsolatedAsyncioTestCase):
         description = (WORST['description']*8)[:1000]
         self.b.hydrated = lambda: {**old(),'case':{**old()['case'],'label':WORST['case_label'],'description':description}}
         for row in self.b.hub_rows.values(): row['original_filename']=WORST['filename'];row['row_count']=1284
-        for width in (320,1440):
+        self.b.case['nodes'] = copy.deepcopy(self.b.f['initial_case']['nodes'])
+        self.b.runs.clear()
+        for width in (320,375,390,1440):
             await self.page.set_viewport_size({'width':width,'height':900})
             await self.b.open('logistics-data')
             field = self.page.locator('[name=description]')
@@ -92,6 +94,12 @@ class UXStressTests(unittest.IsolatedAsyncioTestCase):
             self.assertTrue(await self.page.evaluate('document.documentElement.scrollWidth<=innerWidth'))
             await self.page.screenshot(path=str(self.out/f'data-long-{width}.png'),full_page=True)
             await self.b.open('logistics-map')
+            marker = self.page.locator('.dispatch-decision-node__next')
+            await marker.wait_for(state='visible')
+            self.assertTrue(await marker.evaluate('''e=>{
+                const r=e.getBoundingClientRect(),p=e.parentElement.getBoundingClientRect();
+                return r.left>=p.left&&r.right<=p.right&&e.scrollWidth<=e.clientWidth;
+            }'''), (width, 'next-decision marker stays inside the lane'))
             self.assertTrue(await self.page.evaluate('document.documentElement.scrollWidth<=innerWidth'))
             await self.page.screenshot(path=str(self.out/f'map-long-{width}.png'),full_page=True)
             await self.page.goto(f'http://127.0.0.1:{self.b.port}/app/data')
