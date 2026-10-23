@@ -444,3 +444,12 @@
 .d-page-hero--workflow .d-hero-meta>span{padding:0;border:0;border-radius:0;background:transparent;text-transform:none;letter-spacing:.01em;font-size:12px;font-weight:500}
 .d-page-hero--workflow .dispatch-pro-hero-visual{border-top:0}
 .d-page-hero--workflow .dispatch-pro-hero-visual>summary{min-height:36px;font-weight:500;text-transform:none;color:var(--color-text-muted)}
+
+/* Review and action frame keep native focus/submit contracts. */
+.d-execution-review{border-color:var(--color-border-strong);background:var(--color-surface)}
+.d-execution-review__eyebrow{font-weight:500;letter-spacing:.02em}
+.d-execution-review .d-execution-review__rows{border-inline:0;border-radius:0;border-color:var(--color-border)}
+.d-execution-review .d-execution-review__row{padding:16px 0;border-color:var(--color-border)}
+.d-execution-review__row strong{font-weight:500;color:var(--color-text-muted)}
+.d-execution-review__row span{color:var(--color-text)}
+.d-workflow-action-bar{border-color:var(--color-border-strong);border-radius:var(--radius-md);box-shadow:var(--shadow-sm-dark);backdrop-filter:none}

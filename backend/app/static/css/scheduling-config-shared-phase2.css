@@ -379,3 +379,16 @@
     transform:none;
   }
 }
+
+/* Scheduling keeps the shared working-section anatomy and its own temporal controls. */
+.assignment-config-root .scheduling-config-v2 .assignment-section.scheduling-section{padding:24px 0;border:0;border-top:1px solid var(--color-border-strong);border-radius:0;background:transparent;box-shadow:none;transition:none}
+.scheduling-config-v2 .scheduling-source{gap:0;border-block:1px solid var(--color-border)}
+.scheduling-config-v2 .scheduling-source article{min-height:0;padding:16px;border:0;border-radius:0;background:transparent}
+.scheduling-config-v2 .scheduling-source article+article{border-left:1px solid var(--color-border)}
+.scheduling-config-v2 .scheduling-source small{text-transform:none;letter-spacing:0;font-weight:500}
+.scheduling-config-v2 .scheduling-source strong{font-size:24px;font-weight:500;font-variant-numeric:tabular-nums}
+.scheduling-config-v2 .scheduling-focus-disclosure{border-radius:var(--radius-md)}
+.scheduling-config-v2 .scheduling-focus-disclosure__icon{background:none;border-radius:0}
+.scheduling-config-v2 .scheduling-focus-disclosure__copy small{letter-spacing:0;font-weight:500}
+.scheduling-config-v2 .scheduling-window-editor{border:0;border-radius:var(--radius-md);background:var(--color-surface);padding:20px}
+@media(max-width:600px){.scheduling-config-v2 .scheduling-source article{padding:12px 8px}.scheduling-config-v2 .scheduling-source strong{font-size:20px}}

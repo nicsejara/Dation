@@ -44,3 +44,7 @@ Phase 2: shell con marca y selección lineal; Home editorial con cadena Data Pac
 Phase 2 commit: `e1ebb98`.
 
 Phase 3: Overview editorial, preparación en dos zonas (atributos/Owner) y archivos tipados, Map en carriles conectados con evidencia y Owner separados. Encabezado y contexto del workflow abiertos. CTA de Datos en flujo normal para no cubrir Aplicar. Misma semántica nodal y todos los controles. QA: 11 browser + 5 unitarios pasan; refuerzo posterior de foco (incluye Aplicar dirty) y paso actual: 2 pasan; 15 observaciones en cinco anchos sin overflow/contraste muestreado fallido.
+
+Phase 3 commit: `f89b4d3`.
+
+Phase 4: Config en secciones abiertas con columna de criterio y controles; selección lineal en presets, fuente D2 como banda de evidencia y revisión nativa refinada. 7 archivos JS de configuración/reglas idénticos al baseline. QA: 73 unitarios y 6 browser pasan (pesos/foco, cinco anchos, reglas D2, review y doble envío); 10 observaciones visuales sin overflow/contraste muestreado fallido.

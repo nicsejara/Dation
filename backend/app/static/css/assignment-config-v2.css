@@ -129,3 +129,27 @@
 .assignment-config-root .assignment-filter-row.is-collapsed .assignment-filter-row__head{background:var(--d-surface-1)}
 @media(max-width:560px){.assignment-config-root .assignment-filter-row.is-collapsible .assignment-filter-row__head>div:first-child{grid-template-columns:1fr}.assignment-config-root .assignment-filter-row.is-collapsible .assignment-filter-row__head>div:first-child small{grid-column:1}}
 @media(prefers-reduced-motion:reduce){.assignment-config-root .assignment-filter-row.is-collapsible,.assignment-config-root .assignment-filter-toggle,.assignment-config-root .assignment-filter-toggle svg{transition:none!important}}
+
+/* Precision configuration: a criterion column beside the controls at working widths. */
+.assignment-config-root .assignment-config-sections{gap:32px}
+.assignment-config-root .assignment-section{padding:24px 0;border:0;border-top:1px solid var(--color-border-strong);border-radius:0;background:transparent;box-shadow:none;transition:none}
+.assignment-config-root .assignment-section__head{grid-template-columns:28px minmax(0,1fr) auto;gap:12px;margin-bottom:24px}
+.assignment-config-root .assignment-section__icon{width:28px;height:28px;border-radius:0;background:none;color:var(--color-text-muted)}
+.assignment-config-root .assignment-section__eyebrow{text-transform:none;letter-spacing:.02em;font-size:12px;font-weight:500;color:var(--color-text-muted)}
+.assignment-config-root .assignment-section__head h2{font-size:23px;font-weight:600;line-height:1.25}
+.assignment-config-root .assignment-section__current{border:0;border-radius:0;padding:4px 0;background:transparent;font-size:12px;font-weight:500;color:var(--color-text-accent)}
+.assignment-config-root .assignment-choice-card{border:1px solid var(--color-border-strong)!important;border-radius:var(--radius-md)!important;background:var(--color-surface)!important;box-shadow:none;gap:10px;padding:20px!important}
+.assignment-config-root .assignment-choice-card:hover:not(:disabled){background:var(--color-surface-raised)!important;box-shadow:none}
+.assignment-config-root .assignment-choice-card.is-selected{border:1px solid var(--color-text-accent)!important;background:var(--color-surface-raised)!important;box-shadow:inset 0 2px 0 var(--color-text-accent)}
+.assignment-config-root .assignment-choice-card__icon{width:24px;height:24px;background:none;border-radius:0;color:var(--color-text-muted)}
+.assignment-config-root .assignment-choice-card.is-selected .assignment-choice-card__icon{color:var(--color-text-accent)}
+.assignment-config-root .assignment-choice-card strong{font-size:16px;font-weight:600}
+.assignment-config-root .assignment-choice-card em{text-transform:none;letter-spacing:0;font-weight:500;font-size:12px}
+.assignment-config-root .assignment-scope-counters{gap:0;border-block:1px solid var(--color-border)}
+.assignment-config-root .assignment-scope-counters>div{border:0;border-radius:0;background:transparent;padding:16px}
+.assignment-config-root .assignment-scope-counters strong{font-size:24px;font-weight:500;font-variant-numeric:tabular-nums}
+.assignment-config-root .assignment-custom-panel{padding:24px;border-radius:var(--radius-md);background:var(--color-surface)}
+.assignment-config-root .assignment-weight-row__icon{background:none;border-radius:0}
+.assignment-config-root .assignment-resource-rule{border:0;border-top:1px solid var(--color-border);border-radius:0;background:transparent;padding:16px 0}
+@media(min-width:1200px){.assignment-config-root .assignment-section{display:grid;grid-template-columns:220px minmax(0,1fr);column-gap:28px;align-items:start}.assignment-config-root .assignment-section>.assignment-section__head{grid-column:1;grid-row:1/30;display:flex;flex-wrap:wrap;align-content:flex-start;gap:12px;margin:0}.assignment-config-root .assignment-section__copy{flex-basis:100%}.assignment-config-root .assignment-section>:not(.assignment-section__head){grid-column:2}.assignment-config-root .assignment-objective-grid,.assignment-config-root .assignment-resource-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.assignment-config-root .assignment-weight-row{grid-template-columns:28px minmax(0,1fr) 48px}.assignment-config-root .assignment-weight-row input{grid-column:2/-1}}
+@media(max-width:600px){.assignment-config-root .assignment-section__head{grid-template-columns:24px minmax(0,1fr)}.assignment-config-root .assignment-section__current{grid-column:2}.assignment-config-root .assignment-choice-card{padding:18px!important}.assignment-config-root .assignment-section__head h2{font-size:21px}}
