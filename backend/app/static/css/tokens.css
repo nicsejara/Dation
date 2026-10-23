@@ -3,14 +3,14 @@
   --font-sans: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 
-  --d-bg-0: #071015;
-  --d-bg-1: #0a141b;
-  --d-bg-2: #0d1820;
-  --d-surface-1: #0f1b24;
-  --d-surface-2: #13222c;
-  --d-surface-3: #182a35;
-  --d-surface-hover: #1b303b;
-  --d-surface-overlay: #172731;
+  --d-bg-0: #10161c;
+  --d-bg-1: #131b22;
+  --d-bg-2: #161f27;
+  --d-surface-1: #19242d;
+  --d-surface-2: #202e39;
+  --d-surface-3: #293b47;
+  --d-surface-hover: #2b3d48;
+  --d-surface-overlay: #22323e;
   --d-text-primary: #f3f8fa;
   --d-text-secondary: #b8c8cf;
   --d-text-muted: #91a5af;
@@ -18,9 +18,9 @@
   --d-border-subtle: rgba(145,189,199,.12);
   --d-border: rgba(145,189,199,.18);
   --d-border-strong: rgba(145,189,199,.28);
-  --d-border-control: #67838f;
+  --d-border-control: #78949f;
   --d-brand-teal: #1c9499;
-  --d-brand-teal-bright: #39bcc0;
+  --d-brand-teal-bright: #50c8c4;
   --d-brand-cyan: #43a6c7;
   --d-brand-violet: #6556b3;
   --d-brand-deep-violet: #3b2b78;
@@ -31,7 +31,7 @@
 
   --color-bg: var(--d-bg-0);
   --color-bg-raised: var(--d-bg-1);
-  --color-shell-overlay: rgba(10,20,27,.96);
+  --color-shell-overlay: #131b22;
   --color-surface: var(--d-surface-1);
   --color-surface-raised: var(--d-surface-2);
   --color-surface-overlay: var(--d-surface-overlay);
@@ -94,12 +94,12 @@
   --shadow-sm: var(--shadow-sm-dark);
   --shadow-md: var(--shadow-md-dark);
   --shadow-lg: var(--shadow-overlay-dark);
-  --radius-sm: 8px;
-  --radius-control: 10px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
-  --radius-hero: 24px;
+  --radius-sm: 4px;
+  --radius-control: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-hero: 16px;
   --radius-pill: 999px;
   --space-1: 4px;
   --space-2: 8px;
@@ -124,15 +124,15 @@
   --hero-min-height: 220px;
   --hero-padding: var(--space-6);
   --hero-gap: var(--space-6);
-  --hero-title-size: clamp(24px,2.4vw,32px);
+  --hero-title-size: clamp(28px,2.8vw,36px);
   --hero-lead-size: 14px;
   --hero-workflow-min-height: 260px;
   --hero-copy-gap: var(--space-2);
   --hero-panel-width: clamp(20rem,32vw,25rem);
   --hero-panel-gap: var(--space-2);
   --hero-meta-gap: var(--space-1);
-  --hero-background: radial-gradient(ellipse at top right,rgba(67,166,199,.09),transparent 50%),var(--d-surface-1);
-  --sidebar-width: 252px;
+  --hero-background: var(--d-surface-1);
+  --sidebar-width: 232px;
   --topbar-height: 58px;
   --content-width: 1320px;
   --transition-fast: 140ms ease;
@@ -144,7 +144,7 @@
 
 /* Shared product type roles. Platform and workflow consumers use the same scale. */
 :root {
-  --platform-type-page-title: clamp(24px,2.4vw,32px);
+  --platform-type-page-title: clamp(28px,2.8vw,36px);
   --platform-type-section-title: 20px;
   --platform-type-card-title: 16px;
   --platform-type-description: 14px;
@@ -156,7 +156,7 @@
   --platform-line-heading: 1.25;
   --platform-line-body: 1.6;
   --platform-page-gutter: var(--space-8);
-  --platform-section-gap: var(--space-6);
+  --platform-section-gap: var(--space-8);
   --platform-form-width: 40rem;
   --platform-table-cell-padding-block: var(--space-3);
   --platform-table-cell-padding-inline: var(--space-4);

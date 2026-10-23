@@ -85,7 +85,7 @@
   padding:var(--platform-table-cell-padding-block) var(--platform-table-cell-padding-inline);
   border:0; border-bottom:1px solid var(--color-border); text-align:start; vertical-align:middle;
 }
-.d-platform .d-table th { color:var(--color-text-secondary); background:var(--color-surface-raised); font-weight:600; }
+.d-platform .d-table th { color:var(--color-text-secondary); background:var(--color-surface); font-weight:500; }
 .d-platform .d-table thead th { position:sticky; top:0; z-index:1; }
 .d-platform .d-table tbody tr:last-child :is(th,td) { border-bottom:0; }
 .d-platform .d-table tbody tr:hover > :is(th,td) { background:var(--color-surface-hover); }
