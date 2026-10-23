@@ -58,8 +58,13 @@ class UXUpgradeTests(unittest.IsolatedAsyncioTestCase):
         for kind in ('assignment', 'scheduling'):
             run_id = self.b.f['ids'][kind]
             await self.b.open('decision-dashboard', 'logistics_' + kind, run_id)
-            for width, height in [(1440, 900), (1024, 768), (768, 1024), (375, 812)]:
+            for width, height in [(1440, 900), (1280, 800), (1024, 768), (768, 1024), (375, 812)]:
                 await self.page.set_viewport_size({'width': width, 'height': height})
+                self.assertTrue(await self.page.locator('.assignment-essential__kpi>strong,.scheduling-kpis article>strong').evaluate_all('''nodes=>nodes.every(e=>{
+                    const text=document.createRange();text.selectNodeContents(e);
+                    const t=text.getBoundingClientRect(),p=e.closest('article,.assignment-essential__kpi').getBoundingClientRect();
+                    return t.left>=p.left-1&&t.right<=p.right+1;
+                })'''), (kind,width,'metric text stays inside its cell'))
                 launcher = self.page.locator('.view.is-active [data-chat]')
                 self.assertEqual(await launcher.count(), 1)
                 self.assertTrue(await launcher.evaluate('e=>e.closest("[data-dashboard-toolbar]")!==null'))

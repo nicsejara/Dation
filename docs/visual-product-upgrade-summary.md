@@ -48,3 +48,7 @@ Phase 3: Overview editorial, preparación en dos zonas (atributos/Owner) y archi
 Phase 3 commit: `f89b4d3`.
 
 Phase 4: Config en secciones abiertas con columna de criterio y controles; selección lineal en presets, fuente D2 como banda de evidencia y revisión nativa refinada. 7 archivos JS de configuración/reglas idénticos al baseline. QA: 73 unitarios y 6 browser pasan (pesos/foco, cinco anchos, reglas D2, review y doble envío); 10 observaciones visuales sin overflow/contraste muestreado fallido.
+
+Phase 4 commit: `11d9e43`.
+
+Phase 5: hero analítico sin fotografía en las superficies de trabajo (assets conservados), KPI como bandas tipográficas, D1 comparación junto a explicación y D2 calendario junto a excepciones. Se mueve sólo el markup de timeline/insights de D2; todos los hooks/binders y contenido se conservan. Cifras monetarias ajustadas al ancho de la celda, con regresión browser de límites pintados en cinco anchos. QA: 7 browser distintos verificados, 29 checks Node y 11 observaciones visuales sin overflow/contraste muestreado fallido. La aserción histórica “Assignment bloqueada” ya contradice el baseline y se actualiza al copy aprobado/fijo vigente. Exportación JSON exacta y aprobación por Run pasan.

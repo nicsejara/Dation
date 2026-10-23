@@ -3339,7 +3339,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(await self.page.locator('[data-scheduling-kpi]').count(),4)
         self.assertLessEqual(await self.page.locator('#scheduling-preview tbody tr').count(),5)
         self.assertEqual(await self.page.locator('.dispatch-schedule-chart').count(),0)
-        self.assertIn('Assignment bloqueada',await root.inner_text())
+        self.assertIn('Asignación aprobada · viajes y vehículos fijos',await root.inner_text())
         self.assertIn('Plan con excepciones',await self.page.locator('#dispatch-hero').inner_text())
         button=self.page.locator('[data-scheduling-advanced-toggle]')
         for width,height in [(1440,1000),(768,1024),(390,844),(320,568)]:

@@ -156,3 +156,34 @@
 .assignment-dashboard-v2 #dispatch-hero .assignment-hero__headline { margin:var(--space-5) 0 var(--space-3); }
 .assignment-dashboard-v2 #dispatch-hero .assignment-hero__lead { margin:0; color:var(--color-text-secondary); font-size:14px; line-height:1.7; }
 @media(max-width:600px) { .assignment-context__grid,.assignment-dashboard-v2 .assignment-essential__kpi-strip { grid-template-columns:minmax(0,1fr); } }
+
+/* D1: allocation is read through the objective and scenario comparison. */
+.assignment-hero__art{display:none}
+.assignment-dashboard-v2 .assignment-v2__panel{box-shadow:none;border-radius:var(--radius-md)}
+.assignment-dashboard-v2__main{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:28px}
+.assignment-dashboard-v2__main>*{grid-column:1/-1}
+.assignment-dashboard-v2__main>#assignment-insights{grid-column:1;background:transparent;border:0;border-top:1px solid var(--color-border);border-radius:0;padding:24px 0}
+.assignment-dashboard-v2__main>#assignment-scenarios{grid-column:2}
+.assignment-insights__grid{grid-template-columns:minmax(0,1fr);gap:20px}
+.assignment-insights__grid article>.assignment-v2__icon{display:none}
+.assignment-context__grid{gap:0;border-block:1px solid var(--color-border)}
+.assignment-context__grid article{min-height:88px;padding:16px;border:0;border-right:1px solid var(--color-border);border-radius:0;background:transparent}
+.assignment-context__grid article:last-child{border-right:0}
+.assignment-context__grid article>.assignment-v2__icon{color:var(--color-text-muted);width:16px;height:16px;flex-basis:16px}
+.assignment-context__grid strong{font-size:24px;font-weight:500;font-variant-numeric:tabular-nums}
+.assignment-dashboard-v2 .assignment-essential__kpi-strip{grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border-block:1px solid var(--color-border)}
+.assignment-dashboard-v2 .assignment-essential__kpi{min-height:160px;padding:20px;border:0;border-right:1px solid var(--color-border);border-radius:0;background:transparent}
+.assignment-dashboard-v2 .assignment-essential__kpi:last-child{border-right:0}
+.assignment-dashboard-v2 .assignment-essential__kpi.is-objective{background:var(--color-surface);box-shadow:inset 0 2px 0 var(--color-text-accent)}
+.assignment-essential__kpi-top>.assignment-v2__icon{display:none}
+.assignment-dashboard-v2 .assignment-essential__kpi>strong{font-size:28px;font-weight:500;font-variant-numeric:tabular-nums}
+.assignment-dashboard-v2 .assignment-essential__kpi.is-objective>strong{font-size:36px}
+.assignment-v2__table thead th{background:var(--color-surface);font-size:12px;font-weight:500}
+.assignment-v2__table tbody tr:hover{background:var(--color-surface-raised)}
+@media(max-width:1100px){.assignment-dashboard-v2__main{grid-template-columns:minmax(0,1fr)}.assignment-dashboard-v2__main>#assignment-insights,.assignment-dashboard-v2__main>#assignment-scenarios{grid-column:1}}
+@media(max-width:900px){.assignment-context__grid,.assignment-dashboard-v2 .assignment-essential__kpi-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.assignment-context__grid article:nth-child(2n),.assignment-dashboard-v2 .assignment-essential__kpi:nth-child(2n){border-right:0}.assignment-context__grid article:nth-child(n+3),.assignment-dashboard-v2 .assignment-essential__kpi:nth-child(n+3){border-top:1px solid var(--color-border)}}
+@media(max-width:600px){.assignment-dashboard-v2 .assignment-essential__kpi{padding:16px;min-height:140px}.assignment-dashboard-v2 .assignment-essential__kpi>strong{font-size:24px}.assignment-dashboard-v2 .assignment-essential__kpi.is-objective>strong{font-size:30px}}
+
+.assignment-dashboard-v2 .assignment-essential__kpi{container-type:inline-size}
+.assignment-dashboard-v2 .assignment-essential__kpi.is-objective>strong{font-size:clamp(22px,13cqi,36px)}
+@media(max-width:600px){.assignment-dashboard-v2 .assignment-essential__kpi-strip{grid-template-columns:minmax(0,1fr)}.assignment-dashboard-v2 .assignment-essential__kpi{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 12px;min-height:0;border-right:0;border-bottom:1px solid var(--color-border)}.assignment-dashboard-v2 .assignment-essential__kpi>strong,.assignment-dashboard-v2 .assignment-essential__kpi.is-objective>strong{margin:0;font-size:26px;text-align:right}.assignment-dashboard-v2 .assignment-essential__kpi>p{grid-column:1/-1;margin:0}.assignment-essential__kpi-top{align-self:center}}
