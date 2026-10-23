@@ -170,3 +170,16 @@
 .dispatch-upload-overlay .dispatch-validation-group { padding:14px; margin-bottom:16px; border:1px solid var(--color-border); border-radius:var(--radius-md); background:var(--color-surface); }
 .dispatch-upload-overlay .dispatch-validation-group h3 { margin:0 0 12px; padding:0; color:var(--color-danger); background:transparent; font-size:13px; line-height:1.5; }
 .dispatch-upload-overlay .dispatch-validation-group.is-warning h3 { color:var(--color-warning); }
+
+/* Two typed inputs retain their own upload/validation controls and independent readiness. */
+.dispatch-pro-section-head{margin-bottom:24px}
+.dispatch-pro-file-grid{gap:24px}
+.dispatch-pro-file-card{border:0;border-top:2px solid var(--file-accent);border-radius:0 0 var(--radius-md) var(--radius-md);padding:24px;background:var(--color-surface)}
+.dispatch-pro-file-card.is-error{border-top-color:var(--color-danger)}
+.dispatch-pro-file-accent{display:none}
+.dispatch-pro-entity-icon{background:transparent;border-radius:0}
+.dispatch-pro-file-copy h3{font-size:24px;font-weight:600}
+.dispatch-pro-compatibility{border-inline:0;border-radius:0;background:transparent}
+@media(max-width:620px){.dispatch-pro-file-card{padding:20px}}
+
+.dispatch-upload-pro .d-workflow-action-bar{position:static}

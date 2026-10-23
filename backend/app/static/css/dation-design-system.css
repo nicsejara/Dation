@@ -437,3 +437,10 @@
   .d-platform :is(.d-check,.d-radio,.d-switch) { appearance:auto; }
   .d-platform :is(.d-check,.d-radio,.d-switch)::before { display:none; }
 }
+
+/* Precision workflow heading: context is a masthead, help remains native disclosure. */
+.d-page-hero--workflow{padding:20px 0 24px;border:0;border-bottom:1px solid var(--color-border-strong);border-radius:0;background:transparent;box-shadow:none;gap:16px}
+.d-page-hero--workflow .dispatch-pro-hero-lead{max-width:76ch}
+.d-page-hero--workflow .d-hero-meta>span{padding:0;border:0;border-radius:0;background:transparent;text-transform:none;letter-spacing:.01em;font-size:12px;font-weight:500}
+.d-page-hero--workflow .dispatch-pro-hero-visual{border-top:0}
+.d-page-hero--workflow .dispatch-pro-hero-visual>summary{min-height:36px;font-weight:500;text-transform:none;color:var(--color-text-muted)}

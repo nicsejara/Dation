@@ -46,3 +46,11 @@
 .topbar{background:var(--color-bg-raised);backdrop-filter:none}
 @media(max-width:860px){.sidebar{padding:24px 8px 12px}.sidebar .brand{padding:0 0 24px}.platform-global-nav .nav-item{padding:0;justify-content:center}.platform-global-nav .nav-item.is-active::after{inset:auto 8px 0}.platform-account__trigger{padding:14px 0 0}}
 @media(max-width:620px){:root{--sidebar-width:60px}.sidebar .brand-mark,.sidebar .brand-mark img{width:34px;height:34px;flex-basis:34px}.sidebar .asset-item{padding:8px 0}.content{padding-inline:16px}}
+
+/* Same context destinations and Case Flow, expressed as a connected working sequence. */
+.dda-navigation__step{justify-content:flex-start;border:0;border-bottom:1px solid transparent;border-radius:0;background:transparent;box-shadow:none;font-weight:500}
+.dda-navigation__step[data-state=current]{border-color:var(--color-text-accent);box-shadow:none}
+.dda-navigation ol{grid-template-columns:minmax(0,.85fr) minmax(0,.85fr) minmax(0,1.3fr)}
+.dda-workspace-nav-shell{backdrop-filter:none}
+.dda-workspace-step,.dda-workspace-step.is-current{border-radius:0;background:transparent;box-shadow:none;border-bottom:2px solid transparent}
+.dda-workspace-step.is-current{border-bottom-color:var(--color-text-accent)}

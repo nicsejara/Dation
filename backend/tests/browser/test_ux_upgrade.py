@@ -43,6 +43,14 @@ class UXUpgradeTests(unittest.IsolatedAsyncioTestCase):
             await self.page.locator('[name=label]').focus()
             await self.page.keyboard.press('Tab')
             self.assertEqual(await self.page.evaluate('document.activeElement.name'), 'category')
+            await self.page.locator('[name=label]').fill('SEMANA 43 · edición')
+            apply = self.page.locator('.case-identity__footer button[type=submit]')
+            await self.page.wait_for_function("!document.querySelector('.case-identity__footer button[type=submit]').disabled")
+            await apply.focus()
+            self.assertTrue(await apply.evaluate('''e=>{
+                const r=e.getBoundingClientRect();
+                return [.1,.5,.9].every(x=>[.1,.5,.9].every(y=>e.contains(document.elementFromPoint(r.x+r.width*x,r.y+r.height*y))));
+            }'''), (width, height, 'Aplicar'))
         self.assertEqual(self.b.execution_bodies, [])
 
     async def test_dashboard_launcher_and_exports_preserve_persisted_evidence(self):
