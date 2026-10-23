@@ -102,3 +102,36 @@ class FinalPolishTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(await launcher.inner_text(),'Dation IA')
             await self.page.keyboard.press('Escape')
         self.assertEqual(self.b.execution_bodies,[])
+
+    async def test_c7_capabilities_share_full_width_evidence_without_extra_inference(self):
+        self.b.saved_explanation={'id':'cached-polish','response_json':{'executive_summary':'Evidencia persistida de esta corrida','key_drivers':['Dato verificable'],'caveats':['Revisar evidencia']}}
+        for kind in ('assignment','scheduling'):
+            run=self.b.f['ids'][kind]
+            await self.b.open('decision-dashboard','logistics_'+kind,run)
+            section=self.page.locator('.decision-intelligence')
+            insight=section.locator('[data-insight-toggle]')
+            advanced=section.locator(f'[data-{kind}-advanced-toggle]')
+            for width,height in WIDTHS:
+                await self.page.set_viewport_size({'width':width,'height':height})
+                self.assertEqual(await section.locator('.is-selected').count(),0)
+                await insight.click()
+                await section.get_by_text('Evidencia persistida de esta corrida',exact=True).wait_for()
+                self.assertEqual(self.b.explain_calls,0)
+                self.assertTrue(await section.locator('#dispatch-explanation').evaluate('e=>Math.abs(e.getBoundingClientRect().width-e.parentElement.getBoundingClientRect().width)<2'))
+                await section.locator('[data-ai-ask]').click()
+                await self.page.locator('.dispatch-chat textarea').wait_for(state='visible')
+                await self.page.keyboard.press('Escape')
+                await section.locator('[data-ai-collapse]').click()
+                self.assertFalse(await section.locator('#dispatch-explanation').is_visible())
+                self.assertTrue(await insight.evaluate('e=>e===document.activeElement'))
+                await advanced.focus();await self.page.keyboard.press('Enter')
+                self.assertEqual(await advanced.get_attribute('aria-expanded'),'true')
+                self.assertFalse(await section.locator('#dispatch-explanation').is_visible())
+                self.assertTrue(await section.locator(f'[data-{kind}-advanced]').evaluate('e=>Math.abs(e.getBoundingClientRect().width-e.parentElement.getBoundingClientRect().width)<2'))
+                await self.page.keyboard.press('Space')
+                self.assertEqual(await advanced.get_attribute('aria-expanded'),'false')
+                self.assertFalse(await self.page.evaluate('document.documentElement.scrollWidth>innerWidth'))
+            await advanced.click();await self.page.reload()
+            await self.page.locator(f'[data-{kind}-advanced-content]:visible').wait_for()
+            self.assertEqual(self.b.explain_calls,0)
+        self.assertEqual(self.b.execution_bodies,[])

@@ -1,12 +1,8 @@
 import {renderAssistantLauncher,bindAssistantLauncher} from '../runs/contextual-assistant.mjs';
-import {iconSvg} from '../decision-ui.mjs';
-import {esc} from '../shared.mjs';
-import {scopeFor} from '../lifecycle.mjs';
-import {bindDashboardPresentation} from '../dashboard-presentation.mjs';
+import {bindDashboardPresentation,renderDecisionIntelligence} from '../dashboard-presentation.mjs';
 import {decisionRail,bindDecisionRail} from '../navigation/decision-nav.mjs';
 import {analysisDepthUi} from './assignment-dashboard-selectors.mjs';
 import {renderDashboardToolbar,bindDashboardToolbar} from '../runs/dashboard-toolbar.mjs';
-const icon=name=>iconSvg(name,'assignment-v2__icon');
 
 export function renderAssignmentShell(root,run,caseActions={}){
   const depth=analysisDepthUi(run),id='assignment-presentation-'+run.id;
@@ -21,15 +17,7 @@ export function renderAssignmentShell(root,run,caseActions={}){
       +'<section id="assignment-scenarios" class="assignment-v2__panel"></section>'
       +'<div class="assignment-essential__execution"><section id="assignment-resources" class="assignment-v2__panel"></section>'
         +'<section id="assignment-preview" class="assignment-v2__panel"></section></div>'
-      +'<section class="assignment-v2__panel assignment-ai-summary" id="dispatch-explanation"></section>'
-      +'<section class="assignment-v2__panel assignment-advanced" data-assignment-advanced>'
-        +'<button type="button" class="assignment-advanced__toggle" data-assignment-advanced-toggle aria-expanded="false" aria-controls="'+esc(id)+'-advanced-content"><span class="assignment-advanced__copy">'+icon('chartBar')+'<strong data-assignment-advanced-label>Mostrar análisis avanzado</strong></span><span class="assignment-advanced__chevron" data-assignment-advanced-chevron aria-hidden="true">'+icon('chevronDown')+'</span></button><p class="assignment-advanced__description">Compará escenarios en detalle, revisá utilización por viaje, corredores y la evidencia completa.</p>'
-        +'<div class="assignment-advanced__chips" aria-hidden="true"><span>Frontera de decisión</span><span>Comparación detallada</span><span>Utilización por viaje</span><span>Corredores</span><span>Plan completo</span></div>'
-        +'<div id="'+esc(id)+'-advanced-content" data-assignment-advanced-content hidden>'
-          +'<section class="assignment-comparative-layer" id="dispatch-comparative"></section>'
-          +'<div data-assignment-advanced-analysis></div>'
-          +'<section class="assignment-dashboard-v2__assignment" id="dispatch-assignment" tabindex="-1"></section>'
-        +'</div></section>'
+      +renderDecisionIntelligence({kind:'assignment',id,advancedMarkup:'<section class="assignment-comparative-layer" id="dispatch-comparative"></section><div data-assignment-advanced-analysis></div><section class="assignment-dashboard-v2__assignment" id="dispatch-assignment" tabindex="-1"></section>'})
       +'<section class="dispatch-panel assignment-dashboard-v2__section assignment-dashboard-v2__review" id="dispatch-review"><div data-review-content></div></section>'
     +'</main>'
     +''
@@ -45,9 +33,8 @@ export function bindAssignmentShell(root,run,{onRerun,caseActions={},onOpenChat,
   bindDecisionRail(root,caseActions);
   const advanced=root.querySelector('[data-assignment-advanced]');
   const presentation=bindDashboardPresentation(root,{
-    advanced,toggle:advanced.querySelector('[data-assignment-advanced-toggle]'),
+    advanced,toggle:root.querySelector('[data-assignment-advanced-toggle]'),
     content:advanced.querySelector('[data-assignment-advanced-content]'),
-    label:advanced.querySelector('[data-assignment-advanced-label]'),
     storageKey:'dation.assignment.presentation.'+run.id,onAdvancedOpen,
   });
   bindAssistantLauncher(root,()=>onOpenChat?.());

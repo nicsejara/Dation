@@ -17,14 +17,14 @@ export function render(root,run){
   const scope=createScope(root),id='scheduling-ai-'+run.id;
   let cached=null,isCurrent=true,expanded=false,busy=false,brief=null,evidenceId=null,epoch=0,cacheVersion=0;
   root.dataset.aiSummaryState='empty';
-  root.innerHTML='<div class="scheduling-ai-summary__heading"><div><span class="dispatch-kicker">DATION IA</span><h2>Resumen ejecutivo de la planificación</h2>'
+  root.innerHTML='<div class="scheduling-ai-summary__heading"><div><span class="dispatch-kicker">DATION IA</span><h2>Insight IA</h2>'
     +'<p>Generá una lectura ejecutiva de la secuencia, el nivel de servicio y los principales condicionantes del calendario.</p><span data-ai-summary-availability role="status"></span></div>'
     +'<button type="button" class="d-button d-button--secondary" data-explain aria-expanded="false" aria-controls="'+esc(id)+'">'+icon('sparkles')+'Analizar con Dation IA</button></div>'
     +'<div id="'+esc(id)+'" data-ai-summary-body hidden><p data-ai-summary-freshness role="status" hidden>Hay evidencia más reciente. Actualizá el resumen para incluirla.</p>'
       +'<div data-response class="scheduling-ai-summary__narrative" aria-live="polite"></div>'
       +'<div class="scheduling-ai-summary__controls" data-ai-summary-controls hidden>'
         +'<button type="button" data-ai-regenerate>'+icon('refresh')+'Regenerar</button><button type="button" data-ai-copy>'+icon('copy')+'Copiar</button>'
-        +'<button type="button" data-ai-ask>'+icon('sparkles')+'Preguntar sobre este análisis</button></div>'
+        +'<button type="button" data-ai-ask>'+icon('sparkles')+'Seguir analizando con Dation IA →</button></div>'
       +'<p data-ai-summary-feedback role="status"></p><button type="button" data-ai-collapse>Contraer resumen '+icon('chevronDown')+'</button></div>';
   const button=root.querySelector('[data-explain]'),body=root.querySelector('[data-ai-summary-body]'),response=root.querySelector('[data-response]');
   const controls=root.querySelector('[data-ai-summary-controls]'),availability=root.querySelector('[data-ai-summary-availability]');
@@ -80,7 +80,7 @@ export function render(root,run){
     catch{if(scope.active)feedback.textContent='No se pudo copiar el resumen. Podés seleccionar el texto y copiarlo.';}
   };
   root.querySelector('[data-ai-ask]').onclick=()=>root.dispatchEvent(new CustomEvent('dispatch:open-chat',{bubbles:true,detail:{question:''}}));
-  root.querySelector('[data-ai-collapse]').onclick=()=>{expanded=false;sync();button.focus({preventScroll:true});};
+  root.querySelector('[data-ai-collapse]').onclick=()=>{expanded=false;sync();root.dispatchEvent(new CustomEvent('dispatch:close-insight',{bubbles:true}));};
   return {async evidenceChanged(artifact){
     await restored;
     if(!scope.active||!artifact?.id||artifact.id===evidenceId)return;

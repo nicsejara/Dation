@@ -51,8 +51,8 @@ class FoundationComponentTests(unittest.IsolatedAsyncioTestCase):
                   restored.scope.dispose();restored.root.remove();another.scope.dispose();another.root.remove();
                   return {initial,expanded,repeated,closed,sameRun,otherRun};
                 }''', kind)
-                self.assertEqual(probe['initial'], {'depth':'essential','expanded':'false','hidden':True,'opened':0,'label':'Mostrar análisis avanzado'})
-                self.assertEqual(probe['expanded'], {'depth':'advanced','expanded':'true','hidden':False,'opened':1,'label':'Ocultar análisis avanzado'})
+                self.assertEqual(probe['initial'], {'depth':'essential','expanded':'false','hidden':True,'opened':0,'label':'Análisis avanzado'})
+                self.assertEqual(probe['expanded'], {'depth':'advanced','expanded':'true','hidden':False,'opened':1,'label':'Análisis avanzado'})
                 self.assertEqual(probe['repeated'], 1, 'Already-open analysis must not redraw on repeated commands')
                 self.assertEqual(probe['closed']['depth'], 'essential')
                 self.assertEqual(probe['closed']['opened'], 1)

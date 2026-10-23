@@ -22,7 +22,7 @@ export function render(root,run,onRerun,caseActions={}){
   if(blocked){
     root.dataset.schedulingState='infeasible';validation.renderUnavailable(nodes.hero,result);
     for(const name of ['context','kpis','insights','timeline','resources','preview','ai'])nodes[name].hidden=true;
-    nodes.resources.parentElement.hidden=true;root.querySelector('[data-scheduling-advanced]').hidden=true;
+    nodes.ai.closest('.decision-intelligence').hidden=true;nodes.resources.parentElement.hidden=true;root.querySelector('[data-scheduling-advanced]').hidden=true;
   }else{
     root.dataset.schedulingState=caseActions.status||'completed';
     safe(nodes.hero,()=>essential.hero(nodes.hero,result,caseActions));
