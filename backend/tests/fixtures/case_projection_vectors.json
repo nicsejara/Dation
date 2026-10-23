@@ -1,0 +1,643 @@
+{
+  "baseline_commit": "a8ebde935abaa28b6eb677a2e0e9c63a383dd9d8",
+  "state": {
+    "schema_version": "decision_case_v2",
+    "id": "00000000-0000-4000-8000-000000000090",
+    "domain": "logistics",
+    "signature": "00000000-0000-4000-8000-000000000001:00000000-0000-4000-8000-000000000002",
+    "created_at": "2026-10-22T00:00:00Z",
+    "updated_at": "2026-10-22T00:00:00Z",
+    "inputs": {
+      "orders_dataset_id": "00000000-0000-4000-8000-000000000001",
+      "fleet_dataset_id": "00000000-0000-4000-8000-000000000002"
+    },
+    "stale_predecessor": null,
+    "nodes": {
+      "logistics_assignment": {
+        "status": "available",
+        "run_id": null,
+        "latest_run_id": null,
+        "approved_run_id": null,
+        "run_count": 0,
+        "latest_execution_status": null,
+        "approved_at": null,
+        "error": null
+      },
+      "logistics_scheduling": {
+        "status": "locked",
+        "run_id": null,
+        "latest_run_id": null,
+        "approved_run_id": null,
+        "run_count": 0,
+        "latest_execution_status": null,
+        "approved_at": null,
+        "error": null
+      },
+      "logistics_final_assignment": {
+        "status": "locked",
+        "run_id": null,
+        "latest_run_id": null,
+        "approved_run_id": null,
+        "run_count": 0,
+        "latest_execution_status": null,
+        "approved_at": null,
+        "error": null
+      }
+    }
+  },
+  "context": {
+    "case_id": "00000000-0000-4000-8000-000000000090",
+    "orders_dataset_id": "00000000-0000-4000-8000-000000000001",
+    "fleet_dataset_id": "00000000-0000-4000-8000-000000000002"
+  },
+  "scenarios": [
+    {
+      "name": "empty",
+      "runs": [],
+      "expected_nodes": {
+        "logistics_assignment": {
+          "status": "available",
+          "run_id": null,
+          "latest_run_id": null,
+          "approved_run_id": null,
+          "run_count": 0,
+          "latest_execution_status": null,
+          "approved_at": null,
+          "error": null
+        },
+        "logistics_scheduling": {
+          "status": "locked",
+          "run_id": null,
+          "latest_run_id": null,
+          "approved_run_id": null,
+          "run_count": 0,
+          "latest_execution_status": null,
+          "approved_at": null,
+          "error": null
+        },
+        "logistics_final_assignment": {
+          "status": "locked",
+          "run_id": null,
+          "latest_run_id": null,
+          "approved_run_id": null,
+          "run_count": 0,
+          "latest_execution_status": null,
+          "approved_at": null,
+          "error": null
+        }
+      }
+    },
+    {
+      "name": "queued",
+      "runs": [
+        {
+          "id": "1",
+          "node_id": "logistics_assignment",
+          "status": "queued",
+          "approved_at": null,
+          "superseded_at": null
+        }
+      ],
+      "expected_nodes": {
+        "logistics_assignment": {
+          "status": "running",
+          "run_id": "1",
+          "latest_run_id": "1",
+          "approved_run_id": null,
+          "run_count": 1,
+          "latest_execution_status": "queued",
+          "approved_at": null,
+          "error": null
+        },
+        "logistics_scheduling": {
+          "status": "locked",
+          "run_id": null,
+          "latest_run_id": null,
+          "approved_run_id": null,
+          "run_count": 0,
+          "latest_execution_status": null,
+          "approved_at": null,
+          "error": null
+        },
+        "logistics_final_assignment": {
+          "status": "locked",
+          "run_id": null,
+          "latest_run_id": null,
+          "approved_run_id": null,
+          "run_count": 0,
+          "latest_execution_status": null,
+          "approved_at": null,
+          "error": null
+        }
+      }
+    },
+    {
+      "name": "running",
+      "runs": [
+        {
+          "id": "1",
+          "node_id": "logistics_assignment",
+          "status": "running",
+          "approved_at": null,
+          "superseded_at": null
+        }
+      ],
+      "expected_nodes": {
+        "logistics_assignment": {
+          "status": "running",
+          "run_id": "1",
+          "latest_run_id": "1",
+          "approved_run_id": null,
+          "run_count": 1,
+          "latest_execution_status": "running",
+          "approved_at": null,
+          "error": null
+        },
+        "logistics_scheduling": {
+          "status": "locked",
+          "run_id": null,
+          "latest_run_id": null,
+          "approved_run_id": null,
+          "run_count": 0,
+          "latest_execution_status": null,
+          "approved_at": null,
+          "error": null
+        },
+        "logistics_final_assignment": {
+          "status": "locked",
+          "run_id": null,
+          "latest_run_id": null,
+          "approved_run_id": null,
+          "run_count": 0,
+          "latest_execution_status": null,
+          "approved_at": null,
+          "error": null
+        }
+      }
+    },
+    {
+      "name": "error",
+      "runs": [
+        {
+          "id": "1",
+          "node_id": "logistics_assignment",
+          "status": "error",
+          "approved_at": null,
+          "superseded_at": null,
+          "error_message": "synthetic"
+        }
+      ],
+      "expected_nodes": {
+        "logistics_assignment": {
+          "status": "error",
+          "run_id": "1",
+          "latest_run_id": "1",
+          "approved_run_id": null,
+          "run_count": 1,
+          "latest_execution_status": "error",
+          "approved_at": null,
+          "error": "synthetic"
+        },
+        "logistics_scheduling": {
+          "status": "locked",
+          "run_id": null,
+          "latest_run_id": null,
+          "approved_run_id": null,
+          "run_count": 0,
+          "latest_execution_status": null,
+          "approved_at": null,
+          "error": null
+        },
+        "logistics_final_assignment": {
+          "status": "locked",
+          "run_id": null,
+          "latest_run_id": null,
+          "approved_run_id": null,
+          "run_count": 0,
+          "latest_execution_status": null,
+          "approved_at": null,
+          "error": null
+        }
+      }
+    },
+    {
+      "name": "candidate",
+      "runs": [
+        {
+          "id": "1",
+          "node_id": "logistics_assignment",
+          "status": "completed",
+          "approved_at": null,
+          "superseded_at": null
+        }
+      ],
+      "expected_nodes": {
+        "logistics_assignment": {
+          "status": "review",
+          "run_id": "1",
+          "latest_run_id": "1",
+          "approved_run_id": null,
+          "run_count": 1,
+          "latest_execution_status": "completed",
+          "approved_at": null,
+          "error": null
+        },
+        "logistics_scheduling": {
+          "status": "locked",
+          "run_id": null,
+          "latest_run_id": null,
+          "approved_run_id": null,
+          "run_count": 0,
+          "latest_execution_status": null,
+          "approved_at": null,
+          "error": null
+        },
+        "logistics_final_assignment": {
+          "status": "locked",
+          "run_id": null,
+          "latest_run_id": null,
+          "approved_run_id": null,
+          "run_count": 0,
+          "latest_execution_status": null,
+          "approved_at": null,
+          "error": null
+        }
+      }
+    },
+    {
+      "name": "approved",
+      "runs": [
+        {
+          "id": "1",
+          "node_id": "logistics_assignment",
+          "status": "completed",
+          "approved_at": "2026-10-22T01:00:00Z",
+          "superseded_at": null
+        }
+      ],
+      "expected_nodes": {
+        "logistics_assignment": {
+          "status": "approved",
+          "run_id": "1",
+          "latest_run_id": "1",
+          "approved_run_id": "1",
+          "run_count": 1,
+          "latest_execution_status": "completed",
+          "approved_at": "2026-10-22T01:00:00Z",
+          "error": null
+        },
+        "logistics_scheduling": {
+          "status": "available",
+          "run_id": null,
+          "latest_run_id": null,
+          "approved_run_id": null,
+          "run_count": 0,
+          "latest_execution_status": null,
+          "approved_at": null,
+          "error": null
+        },
+        "logistics_final_assignment": {
+          "status": "locked",
+          "run_id": null,
+          "latest_run_id": null,
+          "approved_run_id": null,
+          "run_count": 0,
+          "latest_execution_status": null,
+          "approved_at": null,
+          "error": null
+        }
+      }
+    },
+    {
+      "name": "both_approved",
+      "runs": [
+        {
+          "id": "2",
+          "node_id": "logistics_scheduling",
+          "status": "completed",
+          "approved_at": "2026-10-22T02:00:00Z",
+          "superseded_at": null,
+          "upstream_run_id": "1"
+        },
+        {
+          "id": "1",
+          "node_id": "logistics_assignment",
+          "status": "completed",
+          "approved_at": "2026-10-22T01:00:00Z",
+          "superseded_at": null
+        }
+      ],
+      "expected_nodes": {
+        "logistics_assignment": {
+          "status": "approved",
+          "run_id": "1",
+          "latest_run_id": "1",
+          "approved_run_id": "1",
+          "run_count": 1,
+          "latest_execution_status": "completed",
+          "approved_at": "2026-10-22T01:00:00Z",
+          "error": null
+        },
+        "logistics_scheduling": {
+          "status": "approved",
+          "run_id": "2",
+          "latest_run_id": "2",
+          "approved_run_id": "2",
+          "run_count": 1,
+          "latest_execution_status": "completed",
+          "approved_at": "2026-10-22T02:00:00Z",
+          "error": null
+        },
+        "logistics_final_assignment": {
+          "status": "available",
+          "run_id": null,
+          "latest_run_id": null,
+          "approved_run_id": null,
+          "run_count": 0,
+          "latest_execution_status": null,
+          "approved_at": null,
+          "error": null
+        }
+      }
+    },
+    {
+      "name": "superseded",
+      "runs": [
+        {
+          "id": "2",
+          "node_id": "logistics_scheduling",
+          "status": "completed",
+          "approved_at": "2026-10-22T02:00:00Z",
+          "superseded_at": "now",
+          "upstream_run_id": "1"
+        },
+        {
+          "id": "1",
+          "node_id": "logistics_assignment",
+          "status": "completed",
+          "approved_at": "2026-10-22T01:00:00Z",
+          "superseded_at": "now"
+        },
+        {
+          "id": "3",
+          "node_id": "logistics_assignment",
+          "status": "queued",
+          "approved_at": null,
+          "superseded_at": null
+        }
+      ],
+      "expected_nodes": {
+        "logistics_assignment": {
+          "status": "stale",
+          "run_id": "1",
+          "latest_run_id": "1",
+          "approved_run_id": null,
+          "run_count": 2,
+          "latest_execution_status": "completed",
+          "approved_at": null,
+          "error": null
+        },
+        "logistics_scheduling": {
+          "status": "stale",
+          "run_id": "2",
+          "latest_run_id": "2",
+          "approved_run_id": null,
+          "run_count": 1,
+          "latest_execution_status": "completed",
+          "approved_at": null,
+          "error": null
+        },
+        "logistics_final_assignment": {
+          "status": "locked",
+          "run_id": null,
+          "latest_run_id": null,
+          "approved_run_id": null,
+          "run_count": 0,
+          "latest_execution_status": null,
+          "approved_at": null,
+          "error": null
+        }
+      }
+    },
+    {
+      "name": "wrong_upstream",
+      "runs": [
+        {
+          "id": "2",
+          "node_id": "logistics_scheduling",
+          "status": "completed",
+          "approved_at": "2026-10-22T02:00:00Z",
+          "superseded_at": null,
+          "upstream_run_id": "1"
+        },
+        {
+          "id": "3",
+          "node_id": "logistics_assignment",
+          "status": "completed",
+          "approved_at": "2026-10-22T01:00:00Z",
+          "superseded_at": null
+        }
+      ],
+      "expected_nodes": {
+        "logistics_assignment": {
+          "status": "approved",
+          "run_id": "3",
+          "latest_run_id": "3",
+          "approved_run_id": "3",
+          "run_count": 1,
+          "latest_execution_status": "completed",
+          "approved_at": "2026-10-22T01:00:00Z",
+          "error": null
+        },
+        "logistics_scheduling": {
+          "status": "stale",
+          "run_id": "2",
+          "latest_run_id": "2",
+          "approved_run_id": "2",
+          "run_count": 1,
+          "latest_execution_status": "completed",
+          "approved_at": "2026-10-22T02:00:00Z",
+          "error": null
+        },
+        "logistics_final_assignment": {
+          "status": "locked",
+          "run_id": null,
+          "latest_run_id": null,
+          "approved_run_id": null,
+          "run_count": 0,
+          "latest_execution_status": null,
+          "approved_at": null,
+          "error": null
+        }
+      }
+    },
+    {
+      "name": "unapproved_downstream_stale",
+      "runs": [
+        {
+          "id": "2",
+          "node_id": "logistics_scheduling",
+          "status": "completed",
+          "approved_at": null,
+          "superseded_at": null,
+          "upstream_run_id": "1"
+        },
+        {
+          "id": "3",
+          "node_id": "logistics_assignment",
+          "status": "completed",
+          "approved_at": null,
+          "superseded_at": null
+        }
+      ],
+      "expected_nodes": {
+        "logistics_assignment": {
+          "status": "review",
+          "run_id": "3",
+          "latest_run_id": "3",
+          "approved_run_id": null,
+          "run_count": 1,
+          "latest_execution_status": "completed",
+          "approved_at": null,
+          "error": null
+        },
+        "logistics_scheduling": {
+          "status": "stale",
+          "run_id": "2",
+          "latest_run_id": "2",
+          "approved_run_id": null,
+          "run_count": 1,
+          "latest_execution_status": "completed",
+          "approved_at": null,
+          "error": null
+        },
+        "logistics_final_assignment": {
+          "status": "locked",
+          "run_id": null,
+          "latest_run_id": null,
+          "approved_run_id": null,
+          "run_count": 0,
+          "latest_execution_status": null,
+          "approved_at": null,
+          "error": null
+        }
+      }
+    },
+    {
+      "name": "historical_candidate_after_approval",
+      "runs": [
+        {
+          "id": "3",
+          "node_id": "logistics_assignment",
+          "status": "completed",
+          "approved_at": null,
+          "superseded_at": null
+        },
+        {
+          "id": "1",
+          "node_id": "logistics_assignment",
+          "status": "completed",
+          "approved_at": "2026-10-22T01:00:00Z",
+          "superseded_at": null
+        }
+      ],
+      "expected_nodes": {
+        "logistics_assignment": {
+          "status": "approved",
+          "run_id": "1",
+          "latest_run_id": "3",
+          "approved_run_id": "1",
+          "run_count": 2,
+          "latest_execution_status": "completed",
+          "approved_at": "2026-10-22T01:00:00Z",
+          "error": null
+        },
+        "logistics_scheduling": {
+          "status": "available",
+          "run_id": null,
+          "latest_run_id": null,
+          "approved_run_id": null,
+          "run_count": 0,
+          "latest_execution_status": null,
+          "approved_at": null,
+          "error": null
+        },
+        "logistics_final_assignment": {
+          "status": "locked",
+          "run_id": null,
+          "latest_run_id": null,
+          "approved_run_id": null,
+          "run_count": 0,
+          "latest_execution_status": null,
+          "approved_at": null,
+          "error": null
+        }
+      }
+    },
+    {
+      "name": "bounded_summary_keeps_old_current_approval",
+      "runs": [],
+      "summaries": {
+        "logistics_assignment": {
+          "latest": {
+            "id": "5000",
+            "node_id": "logistics_assignment",
+            "status": "completed",
+            "approved_at": null,
+            "superseded_at": null
+          },
+          "approved": {
+            "id": "1",
+            "node_id": "logistics_assignment",
+            "status": "completed",
+            "approved_at": "2026-10-22T01:00:00Z",
+            "superseded_at": null
+          },
+          "run_count": 5000
+        },
+        "logistics_scheduling": {
+          "latest": null,
+          "approved": null,
+          "run_count": 0
+        },
+        "logistics_final_assignment": {
+          "latest": null,
+          "approved": null,
+          "run_count": 0
+        }
+      },
+      "expected_nodes": {
+        "logistics_assignment": {
+          "status": "approved",
+          "run_id": "1",
+          "latest_run_id": "5000",
+          "approved_run_id": "1",
+          "run_count": 5000,
+          "latest_execution_status": "completed",
+          "approved_at": "2026-10-22T01:00:00Z",
+          "error": null
+        },
+        "logistics_scheduling": {
+          "status": "available",
+          "run_id": null,
+          "latest_run_id": null,
+          "approved_run_id": null,
+          "run_count": 0,
+          "latest_execution_status": null,
+          "approved_at": null,
+          "error": null
+        },
+        "logistics_final_assignment": {
+          "status": "locked",
+          "run_id": null,
+          "latest_run_id": null,
+          "approved_run_id": null,
+          "run_count": 0,
+          "latest_execution_status": null,
+          "approved_at": null,
+          "error": null
+        }
+      }
+    }
+  ]
+}

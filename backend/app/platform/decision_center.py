@@ -1,7 +1,7 @@
 """A read-only case projection over the canonical history, never a state repair."""
 from app.platform.identity import platform_call
 from app.platform.home import recent_case
-from app.services.decision_case_service import _state_with_history, _history_item, NODE_IDS
+from app.domain.decision_cases import project_case_history, run_history_item, NODE_IDS
 from app.platform.foundation import REGISTRY,resolve_node_destination,case_context,objective_presentation
 
 LABELS={key:value['label'] for key,value in REGISTRY['decisions'].items()}
@@ -10,11 +10,11 @@ def canonical(bundle):
     row=bundle['case']
     options={'case_id':row['id'],'orders_dataset_id':row['orders_dataset_id'],
         'fleet_dataset_id':row['fleet_dataset_id'],'summaries':bundle['summaries']}
-    try:return _state_with_history(bundle.get('state_json') or {},[],**options)
+    try:return project_case_history(bundle.get('state_json') or {},[],**options)
     except (ValueError,TypeError,AttributeError):
         # A historical cache cannot hide persisted evidence or break the entire
         # library. Reconstruct in memory, without repairing the stored row.
-        return _state_with_history({},[],**options)
+        return project_case_history({},[],**options)
 
 def project(bundle,detail=False):
     row=bundle['case'];summaries=bundle['summaries']
@@ -97,5 +97,5 @@ async def history(ctx,case_id,node_id,limit,offset,run_id=None):
     options={'search_text':str(run_id)} if run_id else {}
     data=await read(ctx,target_case_id=str(case_id),target_node_id=node_id,page_limit=limit,page_offset=offset,**options)
     state=canonical(data)
-    return {'items':[_history_item(run,state) for run in data['runs']],
+    return {'items':[run_history_item(run,state) for run in data['runs']],
         'total':len(data['runs']) if run_id else data['summaries'][node_id]['run_count'],'limit':limit,'offset':offset}
