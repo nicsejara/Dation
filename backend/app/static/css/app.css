@@ -3,7 +3,7 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
 }
 
 body {
@@ -407,19 +407,8 @@ small {
 
 .view.is-active {
   display: block;
-  animation: view-in .22s ease both;
 }
 
-@keyframes view-in {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
 
 .page-heading {
   display: flex;
@@ -3141,7 +3130,6 @@ small {
 
 .trace-panel.is-active {
   display: block;
-  animation: view-in .18s ease both;
 }
 
 .technical-evidence {
@@ -4951,15 +4939,7 @@ button.home-dda-logo:active {
    DECISION CONFIGURATION STAGE v2
    ========================================================= */
 
-/* Keep the fixed execution bar anchored to the viewport during and after entry. */
-.view[data-view-panel="logistics-config"].is-active {
-  animation-name: decision-config-in;
-}
-
-@keyframes decision-config-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
+/* Route and trace switches are immediate, including keyboard navigation. */
 
 
 .decision-modal-open {
