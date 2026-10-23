@@ -221,3 +221,6 @@
 
 .d-platform .platform-hero-cta.d-button--primary:hover{box-shadow:var(--shadow-sm-dark)}
 @media(prefers-reduced-motion:reduce){.d-platform .platform-hero-cta{transition:none}.d-platform .platform-hero-cta.d-button--primary:hover{transform:none}}
+
+.d-platform .d-loading{display:grid;gap:var(--space-4);min-height:320px;align-content:start;}
+.d-platform .d-loading>.d-skeleton{height:58px;}

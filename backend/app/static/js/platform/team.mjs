@@ -1,7 +1,7 @@
 import {describeFailure} from '../dispatch/recovery.mjs';
 import {api} from '../dispatch/shared.mjs';
 import {createScope} from '../dispatch/lifecycle.mjs';
-import {mountDialog} from './components.mjs';
+import {mountDialog,loadingState} from './components.mjs';
 import {ACCESS_ROLES,RESPONSIBILITIES,mountReceivedInvitations} from './invitations.mjs';
 import {workspaceDate} from './workspace-format.mjs';
 
@@ -44,14 +44,14 @@ export function mountTeam(root,getIdentity){
 
   if(admin()&&!query&&data.total===1&&!data.invitation_total){const empty=el('section',undefined,'d-card');empty.dataset.teamEmpty='';empty.append(el('h2','Tu equipo empieza con vos','d-card-title'),el('p','Invitá a otra persona para preparar datos, operar decisiones o consultar resultados. Elegí su rol según el acceso que necesite.','d-body'));frag.append(empty);}
   const search=el('form',undefined,'team-search'),label=el('label','Buscar miembro o invitación','d-label'),input=el('input',undefined,'d-input');input.id='team-search';input.type='search';input.maxLength=120;input.value=query;label.htmlFor=input.id;const submit=el('button','Buscar','d-button d-button--secondary');submit.type='submit';search.append(label,input,submit);search.addEventListener('submit',event=>{event.preventDefault();query=input.value.trim();offset=0;load();});frag.append(search);
-  const wrap=el('div',undefined,'team-table-scroll');wrap.tabIndex=0;wrap.role='region';wrap.setAttribute('aria-label','Miembros del equipo');const table=el('table',undefined,'team-table'),thead=el('thead'),tr=el('tr'),body=el('tbody');for(const title of ['Miembro','Rol de acceso','Responsabilidad','Estado','Acciones']){const th=el('th',title);th.scope='col';tr.append(th);}thead.append(tr);table.append(thead,body);wrap.append(table);
+  const wrap=el('div',undefined,'team-table-scroll');wrap.tabIndex=0;wrap.role='region';wrap.setAttribute('aria-label','Miembros del equipo');const table=el('table',undefined,'team-table'),thead=el('thead'),tr=el('tr'),body=el('tbody');for(const title of ['Miembro','Rol de acceso','Responsabilidad','Estado','Acciones']){const th=el('th',title);th.scope='col';tr.append(th);}thead.append(tr);const caption=el('caption','Acceso y responsabilidades · desplazá la tabla para ver todas las columnas');table.append(caption,thead,body);wrap.append(table);
   function row(item,invitation=false){const r=el('tr'),name=el('td'),strong=el('strong',invitation?item.email:item.name);name.append(strong);if(!invitation)name.append(el('span',item.email,'d-metadata'));r.append(name,el('td',ACCESS_ROLES[item.access_role]),el('td',(item.business_roles||[item.business_role]).map(role=>RESPONSIBILITIES[role]).filter(Boolean).join(' · ')||'Sin asignar'),el('td',invitation?(item.status==='expired'?'Invitación vencida':'Invitación pendiente · vence '+stamp(item.expires_at)):({active:'Activo',disabled:'Deshabilitado',invited:'Invitado'}[item.status]||item.status)));const actions=el('td');if(admin())actions.append(button(invitation?'Revocar':'Editar acceso',()=>invitation?revoke(item):member(item)));else actions.textContent='Solo consulta';r.append(actions);body.append(r);}
   data.members.forEach(item=>row(item));data.invitations.forEach(item=>row(item,true));if(data.members.length||data.invitations.length)frag.append(wrap);else frag.append(el('p','No encontramos personas con esa búsqueda.','d-body'));
   const total=Math.max(data.total,data.invitation_total),pager=el('nav',undefined,'team-actions');pager.setAttribute('aria-label','Paginación del equipo');const prev=button('Anterior',()=>{offset=Math.max(0,offset-size);load();}),next=button('Siguiente',()=>{offset+=size;load();});prev.disabled=!offset;next.disabled=offset+size>=total;pager.append(prev,el('span',`${data.total} miembros · ${data.invitation_total} invitaciones pendientes`,'d-metadata'),next);frag.append(pager);
   const incoming=el('section',undefined,'d-card team-incoming');incoming.hidden=true;frag.append(incoming);return {frag,incoming};
  }
  async function load(){
-  controller?.abort();received?.dispose();controller=new AbortController();close();const version=++generation;root.setAttribute('aria-busy','true');root.replaceChildren(el('p','Cargando equipo…','d-body'));
+  controller?.abort();received?.dispose();controller=new AbortController();close();const version=++generation;root.setAttribute('aria-busy','true');root.replaceChildren(loadingState('Cargando equipo…'));
   try{const data=await api(BASE+'?'+new URLSearchParams({q:query,limit:size,offset}),{signal:controller.signal});if(version!==generation||controller.signal.aborted)return;const {frag,incoming}=render(data);if(notice){const message=el('p',notice,'team-notice');message.role='status';frag.prepend(message);notice='';}root.replaceChildren(frag);received=mountReceivedInvitations(incoming);}
   catch(error){if(version===generation&&!controller.signal.aborted){const message=el('p',describeFailure(error).message,'d-body');message.role='alert';root.replaceChildren(message,button('Reintentar',load));}}
   finally{if(version===generation)root.removeAttribute('aria-busy');}

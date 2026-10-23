@@ -167,3 +167,11 @@ export function mountDialog({dialog,trigger,initialFocus,closeSelector='[data-di
   });
   return {open,close,dispose:()=>scope.dispose(),get isOpen(){return dialog.open;}};
 }
+
+/** Shared loading geometry; the caller retains request, abort and stale-response ownership. */
+export function loadingState(label,{rows=4}={}){
+ const block=document.createElement('div');block.className='d-loading';block.role='status';
+ const text=document.createElement('span');text.className='d-metadata';text.textContent=label;block.append(text);
+ for(let i=0;i<rows;i++){const row=document.createElement('div');row.className='d-skeleton';row.setAttribute('aria-hidden','true');block.append(row);}
+ return block;
+}

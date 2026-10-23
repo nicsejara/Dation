@@ -1,3 +1,4 @@
+import {describeFailure,responseFailure} from '../dispatch/recovery.mjs';
 import {iconSvg} from '../dispatch/decision-ui.mjs';
 import {renderCaseFlow,revealCurrentStep} from '../dispatch/navigation/case-flow.mjs';
 import {renderDdaNavigation} from './dda-navigation.mjs';
@@ -74,9 +75,9 @@ export function mountPlatformShell(){
   event.preventDefault();save.disabled=true;save.setAttribute('aria-busy','true');message.textContent='';
   try{
    const response=await fetch('/api/platform/profile',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({first_name:form.elements.first_name.value,last_name:form.elements.last_name.value})});
-   const data=await response.json();if(!response.ok)throw new Error(typeof data.detail==='string'?data.detail:'No se pudo guardar el perfil.');
+   let data;try{data=await response.json();}catch{throw responseFailure(response,null);}if(!response.ok)throw responseFailure(response,data);
    identity={...identity,profile:{...identity.profile,...data}};renderIdentity();message.textContent='Perfil actualizado.';
-  }catch(error){message.textContent=error.message;}finally{save.disabled=false;save.removeAttribute('aria-busy');}
+  }catch(error){message.textContent=[409,422].includes(error.status)?error.message:describeFailure(error).message;}finally{save.disabled=false;save.removeAttribute('aria-busy');}
  });
  function updateNavigation(){
   const view=window.dationGetCurrentView?.();

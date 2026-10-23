@@ -226,8 +226,8 @@ La auditoría y la propuesta originales se conservan. Este registro documenta la
 | 1 | Complete | UX-001/002/019/020: Overview vigente, foco sin oclusión, SVG y skip; familia de acciones compartida; QA: 21 browser existentes y 2 regresiones nuevas pasan; 57 observaciones de 4 resoluciones sin overflow ni errores JS; Python baseline 383 OK | 5b0c717 |
 | 2 | Complete | UX-003/004/005/013: contexto compacto, ayuda desplegable, paso actual visible y metadatos legibles; QA: 13 browser del flujo OK; 9 unitarios del Map y 18 Node OK; 8 capturas finales sin overflow; entrada a decisiones 207 px antes en móvil | c4afce0 |
 | 3 | Complete | Config D1/D2 compacta; UX-010 en Config: fuente aprobada y fija; mismos builders, defaults y capacidades; QA: 73 unitarios OK; 7 de 8 browser OK (1 aserción preexistente Cambiar datos/Data Pack); 8 capturas sin overflow; ejecución D2 y review/pesos verificadas | 93af44b |
-| 4 | Complete | UX-007/008/009/010/016/017/018: números, launcher en toolbar, copy fiel y unidades de presentación; fotografías conservadas; QA: 38 unitarios OK; 6 browser existentes y 2 nuevas de exportación/aprobación OK; 2 tests históricos incompatibles con controles ya retirados; 9 observaciones sin overflow | incluido en este commit |
-| 5 | Pending | — | — |
+| 4 | Complete | UX-007/008/009/010/016/017/018: números, launcher en toolbar, copy fiel y unidades de presentación; fotografías conservadas; QA: 38 unitarios OK; 6 browser existentes y 2 nuevas de exportación/aprobación OK; 2 tests históricos incompatibles con controles ya retirados; 9 observaciones sin overflow | 6017263 |
+| 5 | Complete | UX-006/011/014/015/016: KPI móvil, errores presentables, carga compartida, filtros y áreas inline; Hub numérico; QA: 4 browser relevantes verificados (invitaciones repetida con fixture Team); 18 Node OK; 24 observaciones sin overflow; permisos y contratos preservados | incluido en este commit |
 | 6 | Pending | — | — |
 | 7 | Pending | — | — |
 | 8 | Pending | — | — |

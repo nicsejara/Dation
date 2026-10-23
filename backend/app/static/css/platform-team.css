@@ -3,3 +3,6 @@
 .team-incoming[hidden],.d-auth form[hidden]{display:none}
 
 .team-responsibilities{display:grid;gap:8px;margin:0;padding:12px;border:1px solid var(--color-border);border-radius:var(--radius-md)}.team-responsibilities>label{display:flex;align-items:center;gap:10px;min-height:44px}.team-responsibilities input{width:20px;height:20px;accent-color:var(--color-text-accent)}
+
+.team-table td:not(:first-child){min-width:120px;overflow-wrap:anywhere;}
+.team-table caption{text-align:left;padding:12px 16px;color:var(--color-text-secondary);font-size:12px;}

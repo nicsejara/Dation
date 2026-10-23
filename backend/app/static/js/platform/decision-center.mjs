@@ -7,7 +7,7 @@ import {api} from '../dispatch/shared.mjs';
 import {createScope} from '../dispatch/lifecycle.mjs';
 import {resourceUrl} from '../dispatch/navigation/resource.mjs';
 import {DECISION_META,iconSvg} from '../dispatch/decision-ui.mjs';
-import {mountDialog,mountDropdown,heroCta} from './components.mjs';
+import {mountDialog,mountDropdown,heroCta,loadingState} from './components.mjs';
 import {mountCenterActions} from './decision-center-actions.mjs';
 import {ddaEnabled} from './entitlements.mjs';
 import {CENTER_FILTERS,readCenterResource} from './center-resource.mjs';
@@ -63,7 +63,7 @@ export function mountDecisionCenter(root,getIdentity){
   wrap.append(trigger,panel);const menu=mountDropdown({trigger,panel});return {node:wrap,dispose:()=>menu.dispose()};
  }
  function pager(total,offset,change){const nav=el('nav',undefined,'center-pagination');nav.setAttribute('aria-label','Paginación');const prev=button('Anterior',()=>change(Math.max(0,offset-size))),next=button('Siguiente',()=>change(offset+size));prev.disabled=offset===0;next.disabled=offset+size>=total;nav.append(prev,el('span',total?`${Math.min(offset+1,total)}–${Math.min(offset+size,total)} de ${total}`:'0 resultados','d-metadata'),next);return nav;}
- function loading(target,drawer=false){target.setAttribute('aria-busy','true');const block=el('div',undefined,drawer?'center-loading center-loading--drawer':'center-loading');block.setAttribute('aria-label',drawer?'Cargando caso':'Cargando Decision Center');block.role='status';block.append(el('span',drawer?'Cargando caso…':'Cargando Decision Center…','d-metadata'));for(let i=0;i<(drawer?4:6);i++)block.append(el('div',undefined,'center-skeleton'));target.replaceChildren(block);}
+ function loading(target,drawer=false){target.setAttribute('aria-busy','true');const block=loadingState(drawer?'Cargando caso…':'Cargando Decision Center…',{rows:drawer?4:6});block.classList.add('center-loading');if(drawer)block.classList.add('center-loading--drawer');target.replaceChildren(block);}
  function failure(target,title,error,retry){target.removeAttribute('aria-busy');const card=el('section',undefined,'d-card center-error');card.append(el('h2',title,'d-card-title'));const text=el('p',describeFailure(error).message,'d-body');text.role='alert';card.append(text,button('Reintentar',retry));target.replaceChildren(card);}
  function renderPortfolio(){
   cleanupPortfolio();const frag=document.createDocumentFragment(),summary=data.summary||{},kpis=el('div',undefined,'center-kpis');kpis.setAttribute('aria-label','Resumen del workspace');
@@ -72,7 +72,7 @@ export function mountDecisionCenter(root,getIdentity){
   }frag.append(kpis);
   if(summary.pending_approval>0){const attention=el('section',undefined,'center-attention'),text=el('div');text.append(el('h2','Requiere tu atención'),el('p',summary.pending_approval===1?'1 decisión espera tu aprobación.':`${summary.pending_approval} decisiones esperan tu aprobación.`));attention.append(icon('clock'),text,button('Ver pendientes',()=>open({filter:'pending_approval',offset:0})));frag.append(attention);}
   const form=el('form',undefined,'center-search'),controls={};
-  function control(key,label,options){const wrap=el('div',undefined,'center-filter'),l=el('label',label,'center-sr-only'),input=el(options?'select':'input',undefined,'d-input');input.id='center-'+key;l.htmlFor=input.id;input.name=key;
+  function control(key,label,options){const wrap=el('div',undefined,'center-filter'),l=el('label',label,'d-label'),input=el(options?'select':'input',undefined,'d-input');input.id='center-'+key;l.htmlFor=input.id;input.name=key;
    if(options)for(const [value,text]of Object.entries(options)){const o=el('option',text);o.value=value;input.append(o);}else{input.type='search';input.maxLength=120;input.placeholder='Buscar por Decision Case, ID o nombre…';}
    input.value=route[key]||'all';controls[key]=input;wrap.append(l,input);form.append(wrap);return input;
   }

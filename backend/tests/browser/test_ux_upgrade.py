@@ -110,3 +110,43 @@ class UXUpgradeTests(unittest.IsolatedAsyncioTestCase):
                 }'''), (view, width))
         self.assertEqual(self.b.execution_bodies, [])
 
+    async def test_mobile_center_words_fit_and_filter_labels_remain_visible(self):
+        await self.page.set_viewport_size({'width': 375, 'height': 812})
+        await self.page.goto(f'http://127.0.0.1:{self.b.port}/app/decisions')
+        await self.page.locator('.center-kpi').first.wait_for()
+        fits = await self.page.locator('.center-kpi__label').evaluate_all(r'''labels=>labels.every(e=>{
+            const text=e.firstChild;
+            return [...e.textContent.matchAll(/\S+/g)].every(match=>{
+                const r=document.createRange();r.setStart(text,match.index);
+                r.setEnd(text,match.index+match[0].length);
+                return r.getClientRects().length===1;
+            });
+        })''')
+        self.assertTrue(fits)
+        for label in ('Buscar por ID o etiqueta', 'Estado', 'DDA', 'Responsable'):
+            self.assertTrue(await self.page.locator('.center-filter label').get_by_text(label, exact=True).is_visible())
+
+    async def test_invitation_errors_preserve_status_handling_without_exposing_parser_text(self):
+        scenario = {'status': 503, 'body': '<html>gateway unavailable</html>'}
+        async def invitations(route):
+            await route.fulfill(status=scenario['status'], content_type='text/html', body=scenario['body'])
+        await self.b.context.route('**/auth/invitations', invitations)
+        async def team(route):
+            await route.fulfill(json={'members': [], 'invitations': [], 'total': 0, 'invitation_total': 0})
+        await self.b.context.route('**/api/platform/team?**', team)
+        base = f'http://127.0.0.1:{self.b.port}/app/team'
+        for status in (503, 403, 401):
+            scenario['status'] = status
+            await self.page.goto(base)
+            incoming = self.page.locator('.team-incoming')
+            await incoming.wait_for(state='attached')
+            await self.page.wait_for_function('!document.querySelector(".team-incoming").hasAttribute("aria-busy")')
+            if status == 401:
+                self.assertTrue(await incoming.is_hidden())
+            else:
+                text = await incoming.inner_text()
+                self.assertNotIn('JSON', text)
+                self.assertNotIn('Unexpected', text)
+                self.assertNotIn('<html>', text)
+                self.assertIn('administrador' if status == 403 else 'guardado', text)
+

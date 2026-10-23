@@ -1,3 +1,4 @@
+import {loadingState} from './components.mjs';
 import {api} from '../dispatch/shared.mjs';
 import {createScope} from '../dispatch/lifecycle.mjs';
 import {SETTINGS_TABS,readSettingsTab} from './settings-resource.mjs';
@@ -45,7 +46,7 @@ export function mountWorkspaceSettings(root,getIdentity){
   const rows=el('dl',undefined,'workspace-settings__rows');for(const [label,value]of [['Plan',data.plan.name],['Estado','Activo'],['Costo','Gratis'],['Miembros activos',workspaceNumber(data.members.active,data.workspace)],['DDAs habilitados',ddaRows(data).filter(item=>item.enabled).map(item=>item.title).join(', ')||'Ninguno habilitado']])rows.append(pair(label,value));c.append(rows);return c;
  }
  async function load(){
-  controller?.abort();controller=new AbortController();const version=++generation,restoreFocus=root.contains(document.activeElement)&&document.activeElement?.getAttribute('role')==='tab';root.setAttribute('aria-busy','true');root.replaceChildren(el('p','Cargando configuración…','d-body'));
+  controller?.abort();controller=new AbortController();const version=++generation,restoreFocus=root.contains(document.activeElement)&&document.activeElement?.getAttribute('role')==='tab';root.setAttribute('aria-busy','true');root.replaceChildren(loadingState('Cargando configuración…'));
   try{const tab=readSettingsTab(location.href),data=await api(BASE,{signal:controller.signal});if(version!==generation||controller.signal.aborted)return;
    const fragment=document.createDocumentFragment();if(notice){const message=el('p',notice,'workspace-settings__notice');message.role='status';fragment.append(message);notice='';}
    const tabs=el('div',undefined,'workspace-settings__tabs');tabs.role='tablist';tabs.setAttribute('aria-label','Configuración del workspace');
