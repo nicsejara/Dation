@@ -135,3 +135,27 @@ class FinalPolishTests(unittest.IsolatedAsyncioTestCase):
             await self.page.locator(f'[data-{kind}-advanced-content]:visible').wait_for()
             self.assertEqual(self.b.explain_calls,0)
         self.assertEqual(self.b.execution_bodies,[])
+
+    async def test_c6_c9_static_metrics_and_distinct_hero_art_preserve_results(self):
+        import copy
+        before=copy.deepcopy(self.b.runs)
+        for kind in ('assignment','scheduling'):
+            await self.b.open('decision-dashboard','logistics_'+kind,self.b.f['ids'][kind])
+            for width,height in WIDTHS:
+                await self.page.set_viewport_size({'width':width,'height':height})
+                metrics=self.page.locator('.assignment-essential__kpi,.scheduling-kpis article')
+                styles=await metrics.evaluate_all('''nodes=>nodes.map(e=>{const s=getComputedStyle(e),v=getComputedStyle(e.querySelector('strong'));return [s.backgroundColor,s.boxShadow,v.fontWeight,v.fontSize]})''')
+                self.assertEqual(len(styles),4)
+                self.assertTrue(all(s==styles[0] for s in styles),(kind,width,styles))
+                self.assertEqual(await metrics.locator('button,[role=button],[aria-selected]').count(),0)
+                hero=self.page.locator('#dispatch-hero')
+                if width>760:
+                    if kind=='assignment':
+                        self.assertTrue(await hero.locator('.assignment-hero__art').is_visible())
+                        await self.page.wait_for_function('document.querySelector(".assignment-hero__art img").naturalWidth>0')
+                        self.assertIn('assignment-hero-3d.png',await hero.locator('img').get_attribute('src'))
+                    else:self.assertIn('scheduling-hero-3d.png',await hero.evaluate('e=>getComputedStyle(e,"::before").backgroundImage'))
+                self.assertFalse(await self.page.evaluate('document.documentElement.scrollWidth>innerWidth'))
+            self.assertTrue(await self.page.locator('[data-rerun]').is_visible())
+        self.assertEqual(self.b.runs,before)
+        self.assertEqual(self.b.execution_bodies,[])

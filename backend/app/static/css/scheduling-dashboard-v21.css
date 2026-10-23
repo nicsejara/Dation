@@ -15,7 +15,7 @@
 .scheduling-v2__icon { width:20px; height:20px; min-width:20px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; vertical-align:middle; }
 .scheduling-hero { position:relative; isolation:isolate; overflow:visible; border-color:var(--color-border-strong); background:var(--color-surface-subtle); }
 .scheduling-dashboard-v2 #dispatch-hero { background:var(--color-surface-subtle); }
-.scheduling-hero::before { content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; background:linear-gradient(90deg,var(--color-surface-subtle) 35%,color-mix(in srgb,var(--color-surface-subtle) 92%,transparent) 57%,color-mix(in srgb,var(--color-surface-subtle) 20%,transparent)),url('/static/assets/scheduling-hero-road.webp') right center/cover no-repeat; }
+.scheduling-hero::before { content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; background:linear-gradient(90deg,var(--color-surface-subtle) 35%,color-mix(in srgb,var(--color-surface-subtle) 92%,transparent) 57%,color-mix(in srgb,var(--color-surface-subtle) 20%,transparent)),url('/static/assets/scheduling-hero-3d.png') right center/cover no-repeat; }
 .scheduling-hero [data-scheduling-hero] { width:var(--decision-hero-copy-width); max-width:780px; min-width:0; }
 .scheduling-hero .scheduling-hero__headline { color:var(--color-text); font-size:clamp(22px,2.2vw,30px); line-height:1.35; margin:var(--space-5) 0 var(--space-3); }
 .scheduling-hero__badges { display:flex; flex-wrap:wrap; gap:var(--space-2); }
@@ -127,7 +127,7 @@
 .scheduling-dashboard-v2 :is(#scheduling-context,#scheduling-kpis,#scheduling-insights) .scheduling-v2__heading h2 { margin:0 0 var(--space-2); color:var(--color-text); font-size:20px; font-weight:700; line-height:1.4; letter-spacing:normal; }
 
 /* D2: calendar is the lead evidence; exceptions sit alongside it. */
-.scheduling-hero::before{display:none}
+@media(max-width:760px){.scheduling-hero::before{display:none}}
 .scheduling-v2__main{grid-template-columns:minmax(0,1.4fr) minmax(0,.8fr);gap:28px}
 .scheduling-v2__main>*{grid-column:1/-1}
 .scheduling-v2__main>#scheduling-timeline{grid-column:1}
@@ -140,17 +140,17 @@
 .scheduling-context__grid article>.scheduling-v2__icon{width:16px;height:16px;min-width:16px;color:var(--color-text-muted)}
 .scheduling-context__grid strong{font-size:24px;font-weight:500;font-variant-numeric:tabular-nums}
 .scheduling-kpis{gap:0;border-block:1px solid var(--color-border)}
-.scheduling-kpis article{min-height:160px;padding:20px;border:0;border-right:1px solid var(--color-border);border-radius:0;background:transparent}
-.scheduling-kpis article:first-child{background:var(--color-surface);box-shadow:inset 0 2px 0 var(--color-text-accent)}
+.scheduling-kpis article{container-type:inline-size;box-shadow:none;min-height:160px;padding:20px;border:0;border-right:1px solid var(--color-border);border-radius:0;background:transparent}
+
 .scheduling-kpis article:last-child{border-right:0}
 .scheduling-kpis article>.scheduling-v2__icon{display:none}
 .scheduling-kpis strong{font-size:28px;font-weight:500;font-variant-numeric:tabular-nums}
-.scheduling-kpis article:first-child strong{font-size:36px}
+
 .scheduling-summary-strip{padding:16px 0 0;border:0;border-top:1px solid var(--color-border);border-radius:0;background:transparent}
 .scheduling-table thead th{background:var(--color-surface);font-size:12px;font-weight:500}
 .scheduling-table tbody tr:hover{background:var(--color-surface-raised)}
 @media(max-width:1100px){.scheduling-v2__main{grid-template-columns:minmax(0,1fr)}.scheduling-v2__main>#scheduling-timeline,.scheduling-v2__main>#scheduling-insights{grid-column:1}}
 @media(max-width:900px){.scheduling-context__grid,.scheduling-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.scheduling-context__grid article:nth-child(2n),.scheduling-kpis article:nth-child(2n){border-right:0}.scheduling-context__grid article:nth-child(n+3),.scheduling-kpis article:nth-child(n+3){border-top:1px solid var(--color-border)}}
-@media(max-width:600px){.scheduling-kpis article{min-height:140px;padding:16px}.scheduling-kpis strong{font-size:24px}.scheduling-kpis article:first-child strong{font-size:30px}}
+@media(max-width:600px){.scheduling-kpis article{min-height:140px;padding:16px}.scheduling-kpis strong{font-size:24px}}
 
-@media(max-width:600px){.scheduling-kpis{grid-template-columns:minmax(0,1fr)}.scheduling-kpis article{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 12px;min-height:0;border-right:0;border-bottom:1px solid var(--color-border)}.scheduling-kpis article strong,.scheduling-kpis article:first-child strong{margin:0;font-size:26px;text-align:right}.scheduling-kpis article>small{align-self:center}.scheduling-kpis article>p{grid-column:1/-1;margin:0}}
+@media(max-width:600px){.scheduling-kpis{grid-template-columns:minmax(0,1fr)}.scheduling-kpis article{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 12px;min-height:0;border-right:0;border-bottom:1px solid var(--color-border)}.scheduling-kpis article strong,.scheduling-kpis article>small{align-self:center}.scheduling-kpis article>p{grid-column:1/-1;margin:0}}

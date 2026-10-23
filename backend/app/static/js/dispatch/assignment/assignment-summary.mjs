@@ -13,7 +13,7 @@ export function render(root,result,{status}={}){
   const attention=stale||infeasible||status!=='approved'&&warnings.length>0;
   const label=stale?'Requiere revisión: la corrida perdió vigencia':infeasible?'Escenario no factible':status==='approved'?'Decisión aprobada'
     :warnings.length?'Asignación para revisar':summary.feasible?'Decisión consistente':'Factibilidad no informada';
-  root.innerHTML='<div class="assignment-hero__art" aria-hidden="true"><img src="/static/assets/assignment-hero-truck.webp" width="1659" height="948" alt="" decoding="async"></div>'
+  root.innerHTML='<div class="assignment-hero__art" aria-hidden="true"><img src="/static/assets/assignment-hero-3d.png" width="1672" height="941" alt="" decoding="async"></div>'
     +'<div class="assignment-hero__content"><span class="dispatch-kicker">DECISIÓN 01 · ASIGNACIÓN DE FLOTA</span>'
     +'<h1>Asignación recomendada</h1><span class="assignment-hero__status '+(infeasible?'is-error':attention?'is-review':'is-consistent')+'" data-assignment-hero-status>'
       +iconSvg(attention?'alertTriangle':'checkCircle','assignment-v2__icon')+'<span>'+esc(label)+'</span></span>'
