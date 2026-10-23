@@ -15,16 +15,16 @@ class AssignmentDashboardPhase1Tests(unittest.TestCase):
     def setUpClass(cls):
         cls.dashboard = (JS / "dashboard.mjs").read_text()
         cls.shell = (
-            JS / "assignment-dashboard-shell.mjs"
+            JS / "assignment/assignment-dashboard-shell.mjs"
         ).read_text()
         cls.selectors = (
-            JS / "assignment-dashboard-selectors.mjs"
+            JS / "assignment/assignment-dashboard-selectors.mjs"
         ).read_text()
-        cls.toolbar = (JS / "dashboard-toolbar.mjs").read_text()
+        cls.toolbar = (JS / "runs/dashboard-toolbar.mjs").read_text()
         cls.toolbar_styles = (CSS / "dashboard-toolbar.css").read_text()
-        cls.rail = (JS / "decision-nav.mjs").read_text()
+        cls.rail = (JS / "navigation/decision-nav.mjs").read_text()
         cls.scheduling = (
-            JS / "scheduling-dashboard.mjs"
+            JS / "scheduling/scheduling-dashboard.mjs"
         ).read_text()
         cls.styles = (
             CSS / "assignment-dashboard-v2.css"
@@ -36,7 +36,7 @@ class AssignmentDashboardPhase1Tests(unittest.TestCase):
             import {
               getAnalysisDepth,
               analysisDepthUi,
-            } from './app/static/js/dispatch/assignment-dashboard-selectors.mjs';
+            } from './app/static/js/dispatch/assignment/assignment-dashboard-selectors.mjs';
 
             const cases = [
               [{result_json:{analysis:{depth:'essential'}}}, 'essential'],
@@ -107,13 +107,13 @@ class AssignmentDashboardPhase1Tests(unittest.TestCase):
     def test_hero_is_the_only_approval_entry_using_the_existing_controller(self):
         self.assertIn("renderDashboardToolbar(run,caseActions,{placement:'hero'})",self.shell)
         self.assertIn('renderSchedulingShell(root,run,actions)',self.scheduling)
-        self.assertIn("renderDashboardToolbar(run,caseActions,{placement:'hero'})",(JS/'scheduling-dashboard-shell.mjs').read_text())
+        self.assertIn("renderDashboardToolbar(run,caseActions,{placement:'hero'})",(JS/'scheduling/scheduling-dashboard-shell.mjs').read_text())
         self.assertIn('data-export-menu',self.toolbar)
         self.assertIn('data-more-menu',self.toolbar)
         self.assertIn('data-approve-toolbar',self.toolbar)
         self.assertNotIn('approvalMarkup',self.shell)
         self.assertNotIn('data-approve-final',self.shell)
-        self.assertNotIn('data-approve-final',(JS/'scheduling-dashboard-shell.mjs').read_text())
+        self.assertNotIn('data-approve-final',(JS/'scheduling/scheduling-dashboard-shell.mjs').read_text())
         self.assertNotIn('caseActions.onApprove()',self.shell)
         self.assertNotIn('data-rerun-validation',self.shell)
         self.assertIn('await caseActions.onApprove()',self.toolbar)
@@ -129,7 +129,7 @@ class AssignmentDashboardPhase1Tests(unittest.TestCase):
             "downloadRunExport(run,'json'",
             self.toolbar,
         )
-        export_source = (JS / "export.mjs").read_text()
+        export_source = (JS / "runs/export.mjs").read_text()
         self.assertIn(
             "filename:'assignment-recomendada.csv'",
             export_source,

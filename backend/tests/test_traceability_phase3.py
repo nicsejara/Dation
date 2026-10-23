@@ -28,7 +28,7 @@ class TraceabilityPhase3Contracts(unittest.TestCase):
     def test_map_exposes_run_history_and_new_run_flow(self):
         source = (ROOT / "js" / "dispatch" / "traceability-controller.mjs").read_text(encoding="utf-8")
         self.assertIn("/runs?node_id=", source)
-        self.assertIn("+ Nueva corrida", source)
+        self.assertIn("Nueva corrida", source)
         self.assertIn("Historial · ", source)
         ui = (ROOT / "js" / "dispatch" / "traceability-ui.mjs").read_text()
         self.assertIn("Alternativa", ui)

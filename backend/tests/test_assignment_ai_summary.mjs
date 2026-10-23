@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {getExecutiveBrief,briefText} from '../app/static/js/dispatch/assignment-dashboard-selectors.mjs';
+import {getExecutiveBrief,briefText} from '../app/static/js/dispatch/assignment/assignment-dashboard-selectors.mjs';
 const explanation={executive_summary:'La recomendación conserva el resultado publicado.',why_recommended:'Las prioridades pertenecen a la corrida.',
  key_drivers:['Carga propia publicada','Utilización publicada'],tradeoffs:['El costo se compara con una referencia factible.'],
  recommendation:'Revisar la disponibilidad en Planificación.',caveats:['Assignment no calcula fechas.']};

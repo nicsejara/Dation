@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readResource,resourceUrl} from '../app/static/js/dispatch/navigation.mjs';
+import {readResource,resourceUrl} from '../app/static/js/dispatch/navigation/resource.mjs';
 import {readCenterResource} from '../app/static/js/platform/center-resource.mjs';
 const id='11111111-2222-4333-8444-555555555555';
 test('Decision Center retains list/detail/history state and clears DDA/Data Hub context',()=>{

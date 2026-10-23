@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readResource,resourceUrl} from '../app/static/js/dispatch/navigation.mjs';
+import {readResource,resourceUrl} from '../app/static/js/dispatch/navigation/resource.mjs';
 import {readHubResource} from '../app/static/js/platform/data-resource.mjs';
 import {validateCsvFile,storeCsvFile} from '../app/static/js/dispatch/upload/file-api.mjs';
 const id='00000000-0000-4000-8000-000000000001',other='00000000-0000-4000-8000-000000000002';

@@ -2,7 +2,7 @@ import {demoBadge} from './onboarding.mjs';
 import {api} from '../dispatch/shared.mjs';
 import {createScope} from '../dispatch/lifecycle.mjs';
 import {workspaceDate,workspaceRelativeDate} from './workspace-format.mjs';
-import {resourceUrl} from '../dispatch/navigation.mjs';
+import {resourceUrl} from '../dispatch/navigation/resource.mjs';
 import {iconSvg} from '../dispatch/decision-ui.mjs';
 function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;}
 export function mountActivity(root,{getIdentity,caseId=null,initial=null,limit=10,compact=false,presentation='default'}){

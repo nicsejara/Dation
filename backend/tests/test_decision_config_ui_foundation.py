@@ -8,8 +8,8 @@ DISPATCH = ROOT / "app" / "static" / "js" / "dispatch"
 class DecisionConfigUiFoundationTests(unittest.TestCase):
     def setUp(self):
         self.shared = (DISPATCH / "decision-config-ui.mjs").read_text(encoding="utf-8")
-        self.assignment = (DISPATCH / "assignment-config.mjs").read_text(encoding="utf-8")
-        self.scheduling = (DISPATCH / "scheduling-config-v2.mjs").read_text(encoding="utf-8")
+        self.assignment = (DISPATCH / "assignment/assignment-config.mjs").read_text(encoding="utf-8")
+        self.scheduling = (DISPATCH / "scheduling/scheduling-config-v2.mjs").read_text(encoding="utf-8")
 
     def test_shared_module_exposes_canonical_primitives(self):
         for name in (
@@ -46,7 +46,7 @@ class DecisionConfigUiFoundationTests(unittest.TestCase):
         self.assertIn('disabled aria-disabled="true"', self.shared)
 
     def test_assignment_consumes_shared_primitives(self):
-        self.assertIn('from "./decision-config-ui.mjs"', self.assignment)
+        self.assertIn('from "../decision-config-ui.mjs"', self.assignment)
         for name in (
             "decisionHero(",
             "executionReviewDialog(",
@@ -63,7 +63,7 @@ class DecisionConfigUiFoundationTests(unittest.TestCase):
         self.assertNotIn("function sectionHeader(", self.assignment)
 
     def test_scheduling_now_consumes_shared_primitives(self):
-        self.assertIn('from "./decision-config-ui.mjs"', self.scheduling)
+        self.assertIn('from "../decision-config-ui.mjs"', self.scheduling)
         for name in (
             "decisionHero(",
             "executionReviewDialog(",

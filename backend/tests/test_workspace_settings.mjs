@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readSettingsTab,writeSettingsTab} from '../app/static/js/platform/settings-resource.mjs';
-import {readResource,resourceUrl} from '../app/static/js/dispatch/navigation.mjs';
+import {readResource,resourceUrl} from '../app/static/js/dispatch/navigation/resource.mjs';
 import {workspaceDate,workspaceNumber} from '../app/static/js/platform/workspace-format.mjs';
 
 test('settings tabs validate links and restore the selected resource',()=>{

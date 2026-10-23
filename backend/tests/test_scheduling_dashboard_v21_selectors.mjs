@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {daysBetween,getSchedulingContext,getSchedulingEssentialKpis,getSchedulingInsights,getVehicleScheduleSummary,getCriticalResource,getDispatchPreview,getOrderSlack,getSlaDistribution,getWaitAnalysis,getCorridorScheduleSummary,getSchedulingWarnings,getTripSla} from '../app/static/js/dispatch/scheduling-dashboard-selectors.mjs';
+import {daysBetween,getSchedulingContext,getSchedulingEssentialKpis,getSchedulingInsights,getVehicleScheduleSummary,getCriticalResource,getDispatchPreview,getOrderSlack,getSlaDistribution,getWaitAnalysis,getCorridorScheduleSummary,getSchedulingWarnings,getTripSla} from '../app/static/js/dispatch/scheduling/scheduling-dashboard-selectors.mjs';
 function fixture(){
   const trip=(id,vehicle,ready,dispatch,free,cycle,wait)=>({trip_id:id,vehicle_id:vehicle,origin:'Base',destination:'Norte',ownership:'own',load_kg:100,cycle_days:cycle,transit_days:1,ready_date:'2026-10-'+ready,dispatch_date:'2026-10-'+dispatch,arrival_date:'2026-10-'+String(Number(dispatch)+1).padStart(2,'0'),resource_available_again:'2026-10-'+free,wait_days:wait,loads:[{order_id:id,product:'P',units:2,kg:100}]});
   return {analysis:{assignment_locked:true,sla_enabled:true,focus_rules:[]},inputs:{assignment:{run_id:'approved-D1',trip_count:3}},decision:{strategy:'service_first'},

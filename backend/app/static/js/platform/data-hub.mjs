@@ -3,7 +3,7 @@ import {demoBadge} from './onboarding.mjs';
 import {workspaceDate} from './workspace-format.mjs';
 import {api} from '../dispatch/shared.mjs';
 import {createScope} from '../dispatch/lifecycle.mjs';
-import {resourceUrl} from '../dispatch/navigation.mjs';
+import {resourceUrl} from '../dispatch/navigation/resource.mjs';
 import {mountDialog,mountDropdown,heroCta} from './components.mjs';
 import {iconSvg} from '../dispatch/decision-ui.mjs';
 import {DDA_CATALOG} from './dda-catalog.mjs';

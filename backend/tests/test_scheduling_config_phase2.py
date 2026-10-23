@@ -223,7 +223,7 @@ class SchedulingPhase2FrontendContractTests(unittest.TestCase):
             / "static"
             / "js"
             / "dispatch"
-            / "scheduling-config-v2.mjs"
+            / "scheduling/scheduling-config-v2.mjs"
         ).read_text(encoding="utf-8")
         focus_ui = (
             ROOT
@@ -231,7 +231,7 @@ class SchedulingPhase2FrontendContractTests(unittest.TestCase):
             / "static"
             / "js"
             / "dispatch"
-            / "scheduling-focus-rules.mjs"
+            / "scheduling/scheduling-focus-rules.mjs"
         ).read_text(encoding="utf-8")
         cls.ui = main_ui + "\n" + focus_ui
         cls.css = (

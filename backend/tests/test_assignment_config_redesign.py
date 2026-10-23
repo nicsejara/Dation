@@ -8,7 +8,7 @@ CSS_ROOT = BACKEND_ROOT / "app" / "static" / "css"
 
 class AssignmentConfigRedesignContractTests(unittest.TestCase):
     def setUp(self):
-        self.config = (DISPATCH_JS / "assignment-config.mjs").read_text(encoding="utf-8")
+        self.config = (DISPATCH_JS / "assignment/assignment-config.mjs").read_text(encoding="utf-8")
         self.shared_ui = (DISPATCH_JS / "decision-config-ui.mjs").read_text(encoding="utf-8")
         self.surface = self.config + self.shared_ui
         self.workspace = (DISPATCH_JS / "workspace.mjs").read_text(encoding="utf-8")
@@ -18,8 +18,9 @@ class AssignmentConfigRedesignContractTests(unittest.TestCase):
         for marker in (
             "Definí cómo querés distribuir tu carga.",
             "ESTA DECISIÓN",
-            "DECISION CASE",
-            "DATA PACK EN USO",
+            "Contexto del Case",
+            "Data Owner",
+            "Órdenes + Flota",
             'number:"01",eyebrow:"ALCANCE"',
             'number:"02",eyebrow:"OBJETIVO"',
             'number:"03",eyebrow:"RECURSOS"',

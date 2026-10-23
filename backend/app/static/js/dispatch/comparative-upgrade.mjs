@@ -1,9 +1,9 @@
 import {iconSvg} from "./decision-ui.mjs";
 import {createScope} from './lifecycle.mjs';
 import {api,post,esc} from './shared.mjs';
-import {getAnalysisDepth,getComparableScenarios} from './assignment-dashboard-selectors.mjs';
-import * as summary from './assignment-comparative-summary.mjs';
-import * as comparison from './assignment-comparison.mjs';
+import {getAnalysisDepth,getComparableScenarios} from './assignment/assignment-dashboard-selectors.mjs';
+import * as summary from './assignment/assignment-comparative-summary.mjs';
+import * as comparison from './assignment/assignment-comparison.mjs';
 
 export function render(root,run,{onEvidenceReady,onReady,onStateChange,inline=false}={}){
   const scope=createScope(root);

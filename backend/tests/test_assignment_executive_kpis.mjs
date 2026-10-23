@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   EXECUTIVE_KPIS,getOperationalKpis,getExecutiveKpisForScenario,getScenarioMetric,
   getComparisonMetricDefinitions,getComparisonRows,getApprovalWarnings,sameAssignmentPlan,
-} from '../app/static/js/dispatch/assignment-dashboard-selectors.mjs';
+} from '../app/static/js/dispatch/assignment/assignment-dashboard-selectors.mjs';
 
 const keys=['total_cost','total_trips','load_utilization','own_weight_share'];
 function result(){

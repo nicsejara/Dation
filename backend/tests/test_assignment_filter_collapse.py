@@ -1,7 +1,7 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-FILTER_JS = (ROOT / "app" / "static" / "js" / "dispatch" / "assignment-filter-collapse.mjs").read_text(encoding="utf-8")
+FILTER_JS = (ROOT / "app" / "static" / "js" / "dispatch" / "assignment/assignment-filter-collapse.mjs").read_text(encoding="utf-8")
 FILTER_CSS = (ROOT / "app" / "static" / "css" / "assignment-config-v2.css").read_text(encoding="utf-8")
 VARIABLE_BOOTSTRAP = (ROOT / "app" / "static" / "js" / "dda-variable-config.js").read_text(encoding="utf-8")
 

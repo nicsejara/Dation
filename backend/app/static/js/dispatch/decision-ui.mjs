@@ -1,7 +1,7 @@
 import {FOUNDATION} from '../platform/foundation.mjs';
 import "../dda-variable-config.js";
 
-import {NODE_IDS} from './decision-case.mjs';
+import {NODE_IDS} from './cases/decision-case.mjs';
 export const DECISION_ORDER = NODE_IDS;
 
 export const DECISION_META = FOUNDATION.decisions;

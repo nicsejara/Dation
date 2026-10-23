@@ -2919,7 +2919,7 @@
         )
       ) {
         var exporter = await import(
-          "/static/js/dispatch/export.mjs"
+          "/static/js/dispatch/runs/export.mjs"
         );
         exporter.exportDecision(
           run.result_json

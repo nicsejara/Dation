@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+import json
 from pathlib import Path
 from uuid import UUID
 from urllib.parse import quote
@@ -51,6 +52,7 @@ from app.validators.logistics_schema import (
 BASE_DIR = Path(__file__).resolve().parent
 APP_PAGE = BASE_DIR / "app" / "templates" / "app.html"
 STATIC_DIR = BASE_DIR / "app" / "static"
+MODULE_REDIRECTS = json.loads((STATIC_DIR / 'contracts/foundation-module-redirects.json').read_text())
 
 
 @asynccontextmanager
@@ -81,6 +83,11 @@ from app.platform.routes import router as platform_router
 app.include_router(platform_router)
 class RevalidatedStaticFiles(StaticFiles):
     async def get_response(self, path, scope):
+        # Existing tabs can still request lazy modules by their pre-refactor URL.
+        # Redirect to the actual module so its relative imports use the new base.
+        if path in MODULE_REDIRECTS:
+            return RedirectResponse('/static/' + MODULE_REDIRECTS[path], status_code=307,
+                                    headers={'Cache-Control': 'no-cache'})
         response = await super().get_response(path, scope)
         if Path(path).suffix in {".js", ".mjs", ".css", ".json"}:
             response.headers["Cache-Control"] = "no-cache"

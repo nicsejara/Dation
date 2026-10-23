@@ -8,8 +8,8 @@ CSS_ROOT = ROOT / "app" / "static" / "css"
 
 class SchedulingSharedUiPhase2Tests(unittest.TestCase):
     def setUp(self):
-        self.ui = (DISPATCH / "scheduling-config-v2.mjs").read_text(encoding="utf-8")
-        self.focus = (DISPATCH / "scheduling-focus-rules.mjs").read_text(encoding="utf-8")
+        self.ui = (DISPATCH / "scheduling/scheduling-config-v2.mjs").read_text(encoding="utf-8")
+        self.focus = (DISPATCH / "scheduling/scheduling-focus-rules.mjs").read_text(encoding="utf-8")
         self.shared = (DISPATCH / "decision-config-ui.mjs").read_text(encoding="utf-8")
         self.css = (CSS_ROOT / "scheduling-config-shared-phase2.css").read_text(encoding="utf-8")
 

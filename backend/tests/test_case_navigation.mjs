@@ -1,12 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 globalThis.window={};
-const {caseFlowSteps}=await import('../app/static/js/dispatch/case-navigation.mjs');
-import {hasCaseExecutions} from '../app/static/js/dispatch/case-identity.mjs';
-import {resolveDecisionDestination} from '../app/static/js/dispatch/decision-target.mjs';
-import {configurationAvailable} from '../app/static/js/dispatch/decision-target.mjs';
-import {caseAttributesReady} from '../app/static/js/dispatch/case-identity.mjs';
-const {decisionRail}=await import('../app/static/js/dispatch/decision-nav.mjs');
+const {caseFlowSteps}=await import('../app/static/js/dispatch/navigation/case-flow.mjs');
+import {hasCaseExecutions} from '../app/static/js/dispatch/cases/case-identity.mjs';
+import {resolveDecisionDestination} from '../app/static/js/dispatch/navigation/decision-target.mjs';
+import {configurationAvailable} from '../app/static/js/dispatch/navigation/decision-target.mjs';
+import {caseAttributesReady} from '../app/static/js/dispatch/cases/case-identity.mjs';
+const {decisionRail}=await import('../app/static/js/dispatch/navigation/decision-nav.mjs');
 
 const cid='00000000-0000-4000-8000-000000000001';
 const state={decisionCase:{id:cid,persisted:true,nodes:{
