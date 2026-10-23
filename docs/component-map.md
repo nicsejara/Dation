@@ -35,6 +35,54 @@ under `scheduling/`: source handoff, calendar/SLA rules, timeline and validation
 Their shell markup stays domain-specific; shared stateful behavior belongs to the
 components above. Historical renderer/engines remain compatibility consumers.
 
+## Feature-local inventory
+
+These components deliberately retain domain responsibility. The shell/primitive
+column above identifies what they reuse instead of recreating it.
+
+| Feature / component | Location | Purpose and main inputs | Consumers / boundary |
+|---|---|---|---|
+| D1 configuration | `assignment/assignment-config.mjs` | scope filters, priorities, resource policy; state + execution callbacks | Config D1; domain rules stay local |
+| D1 shell | `assignment/assignment-dashboard-shell.mjs` | exact D1 section markup; Run + Case actions | dashboard router; shared presentation/toolbar/navigation |
+| D1 result Hero | `assignment/assignment-summary.mjs` | persisted load/trips/own-fleet values and narrative | D1; shared result summary |
+| D1 essential | `assignment/assignment-essential.mjs` | operational KPIs, insights, resources, preview/scenarios | D1 result; persisted evidence |
+| D1 advanced | `assignment/assignment-advanced.mjs` | frontier/comparison/utilization/corridors | D1 disclosure; lazy domain charts |
+| D1 evidence | `assignment/assignment-evidence.mjs` | vehicle/trip/load evidence and full plan | D1; schema-specific rows |
+| D1 filters | `assignment/assignment-filter-collapse.mjs` | native filter disclosure/focus | Config D1 |
+| D1 validation | `assignment/assignment-validation.mjs` | consistency/warnings from result | D1 result |
+| D1 AI summary | `assignment/assignment-ai-summary.mjs` | saved explanation/evidence and retry | D1 result; shared chat/explanation infrastructure |
+| D2 configuration | `scheduling/scheduling-config-v2.mjs` | approved Assignment, window, temporal rules, options | Config D2; scheduling-specific validation |
+| D2 rule editor | `scheduling/scheduling-focus-rules.mjs` | rule draft, overlaps/impact, save/cancel | Config D2; shared rule-card primitive |
+| D2 shell | `scheduling/scheduling-dashboard-shell.mjs` | exact D2 section markup; Run + Case actions | D2 result; shared presentation/toolbar/navigation |
+| D2 essential | `scheduling/scheduling-essential.mjs` | persisted dates/service/KPIs/resources/preview | D2 result; shared result summary |
+| D2 timeline | `scheduling/scheduling-timeline.mjs` | dated trips, vehicle occupancy | D2 result; domain calendar |
+| D2 advanced | `scheduling/scheduling-advanced.mjs` | full timeline, SLA margins, waits and evidence | D2 disclosure; lazy domain content |
+| D2 validation | `scheduling/scheduling-validation.mjs` | unavailable/infeasible/consistency evidence | D2 result |
+| D2 AI summary | `scheduling/scheduling-ai-summary.mjs` | persisted explanation and unavailable/retry state | D2 result |
+| Data Pack screen | `upload/index.mjs` | typed files, preparation state, four checks, actions | Datos del Case; owner/attributes mounted inside form |
+| Dropcard | `upload/dropcard.mjs` | file selection/reuse/upload state | Orders and Fleet; shared typed upload presentation |
+| File library | `upload/library.mjs` | typed rows, paging/search, selected file | Orders and Fleet reuse |
+| Validation report | `upload/validation-report.mjs` | actual validator findings and downloadable report | Data screen; not engine optimization |
+| Preflight | `upload/preflight-panel.mjs` | server readiness, relations and warnings | Data screen |
+| CSV guide | `upload/guide-drawer.mjs` | backend contracts/templates and focus lifecycle | Data screen |
+| Availability banner | `upload/system-banner.mjs` | actual backend activation/connectivity state | Data screen |
+| Traceability dialogs | `traceability-ui.mjs` | bounded Run history and legacy Case chooser data/callbacks | history/compatibility; distinct from removed recent-Case dropdown |
+| Historical dashboard | `dashboard.mjs`, `hero.mjs`, `assignment/assignment.mjs`, `review.mjs` | dispatch/logistics historical result schemas | retained compatibility, not new D1/D2 shells |
+| Home | `../platform/home.mjs` | authorized recent work, attention and catalog | platform Home |
+| Decision Center | `../platform/decision-center.mjs`, `decision-center-actions.mjs` | resource filters, detail, owner/archive actions | global portfolio; checked platform API |
+| Data Hub | `../platform/data-hub.mjs`, `data-resource.mjs` | typed library, detail, packs, persisted resource | global data management |
+| Team | `../platform/team.mjs`, `invitations.mjs` | membership/roles/invitations and optimistic versions | Team/settings/Auth invitation entry |
+| Workspace settings | `../platform/workspace-settings.mjs`, `settings-resource.mjs` | workspace preferences, free plan, resource tab | workspace settings |
+| Profile | `../platform/shell.mjs` | current identity form, version-independent profile API, identity refresh | authenticated profile view |
+| Activity | `../platform/activity.mjs` | actual audited events and exports | activity surfaces / Case detail |
+| Onboarding | `../platform/onboarding.mjs` | real exploration/demo state and callbacks | Home/settings; existing workflow entry |
+| Auth/session/shell | `../platform/auth-page.mjs`, `session.js`, `shell.mjs` | verified identity, refresh/session isolation and route mounting | application boundary; never feature-owned auth |
+
+The baseline machine inventory also records every named module export, Python
+definition and file size in `dation-audit/foundation/baseline/inventory.json` in the
+execution artifacts. The table maps those technical modules to product concepts;
+it does not promote every exported selector/helper into a shared UI component.
+
 UI colors, spacing, radii, typography, action heights and status tokens remain in
 `static/css/tokens.css`; action/card patterns in `dation-design-system.css`;
 Case Context/execution/result text patterns in `workflow-context.css`. Preserve

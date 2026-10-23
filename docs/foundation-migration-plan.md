@@ -10,7 +10,7 @@ scripts with fixed PR/source SHAs.
 | 1 Audit | real references/components/routes/SQL → `foundation-audit.md` | do not infer dead code from age | source/caller inventory, migration and contract inspection | docs-only revert |
 | 2 Target | existing toolchain → documented feature boundaries | preserve runtime/model invariance | review `target-architecture.md` against actual call graph | docs-only revert |
 | 3 Plan | explicit small batches, rename table, regression gates | no blanket string renames | this plan + baseline failure ledger | docs-only revert |
-| 4a Structure | flat dispatch modules → cases/navigation/assignment/scheduling/runs directories | import/lazy path breakage; no implementation changes in moved files | resolver, complete JS syntax, all Node/unit tests; browser critical routes | revert whole move/import batch |
+| 4a Structure | flat dispatch modules → cases/navigation/assignment/scheduling/runs directories; explicit static redirects for already-open tabs | import/lazy path breakage; no implementation changes in moved files | resolver, complete JS syntax, all Node/unit tests; old URLs return canonical source; browser critical routes | revert whole move/import batch |
 | 4b Backend boundary | pure Case state/projection in service → `app/domain/decision_cases.py` | authoritative history and error semantics | parity vectors incl stale lineage, actual Case/Run API and SQL | revert extraction; SQL untouched |
 | 5 Naming | imprecise internal navigation/preparation names → domain names | do not rename public URL/JSON/SQL/DOM/storage keys | OpenAPI equality, unit routing/ownership checks | revert local names/imports |
 | 6 Consolidation | duplicate advanced-disclosure lifecycle → shared binder; result summary/status/trace separated by responsibility | lazy charts, storage restore, scope disposal | D1/D2 expanded/restored/closed states, chat/actions/export, responsive parity | revert binder/extraction and caller changes |
@@ -43,3 +43,13 @@ Cases or invitations. Full local equivalent of CI is required; remote CI need no
 be polled for duplicate evidence. Retry tests only for a diagnosed fixture/timing
 problem or after a correction. Build networking limits require an explicit recorded
 alternative, not a claim that the production image was built when it was not.
+
+An exhaustive run exposed anonymous PostgreSQL volumes retained by test teardown.
+The additional infrastructure batch changes only owned-fixture cleanup (`rm -f -v`)
+and registers attempted containers before startup. Its regression test covers normal
+and failed startup. The disk-exhausted attempt is retained and the complete E2E gate
+is repeated after verified disposable-volume cleanup; browser/product code is unchanged.
+
+Rolling back to the pre-refactor image requires reloading open tabs to restore that
+image's native module graph. URL resources and session draft formats remain compatible;
+no database rollback or user-data restoration is required.

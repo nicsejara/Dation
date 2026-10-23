@@ -28,6 +28,9 @@ Retain filenames for feature content where already precise. Rename only ambiguou
 navigation/run entry names (`navigation` → `resource`, `case-navigation` →
 `case-flow`, `run-polling` → `polling`). Update imports by resolving real source
 paths, including lazy imports and browser tests. Do not leave forwarding modules.
+An explicit static redirect manifest preserves old lazy-import URLs for tabs opened
+before rollout. This compatibility lives at the static HTTP boundary, never as
+duplicate source modules; redirects resolve directly to the canonical source.
 
 Shared D1/D2 UI already exists: `decisionHero`, `decisionCaseCard`, `decisionRail`,
 `renderDashboardToolbar`, `bindDashboardActions`. Preserve those boundaries.

@@ -46,6 +46,12 @@ tests. Docker is the production build, not a frontend bundle.
 Python: 378 tests, 6 failures and 1 error before edits. Node: 124 tests, 122 pass,
 2 fail before edits. Compilation, all JS syntax, `pip check`, and SQL integration
 pass. Browser/E2E results are retained independently, including preexisting failures.
+The full baseline browser run has 210 tests, 28 failures and 65 errors (including
+subcases), across 63 distinct methods. The full baseline real-API E2E run has 81
+tests, 26 failures and 1 error. Many older fixtures still request retired independent
+Steward/approver assignments, old navigation or old approval markup. Current Saga
+3/5 and golden E2E scenarios pass at baseline. Keep the old failures visible and
+compare final failure identities rather than claiming an originally green CI.
 An initial Docker build could not create its default configuration directory;
 using a writable `DOCKER_CONFIG` solved that. The subsequent build exposed Docker
 network DNS failure for PyPI. This is an environment limitation, not a source error.
@@ -191,18 +197,34 @@ palette, spacing scale or chart theme is needed.
 * **P3:** historical monoliths and broad CSS cascade cleanup. Keep where active;
   future work requires historical-renderer parity, not deletion by age/size.
 
+### Validation-discovered infrastructure issue
+
+The exhaustive runs exposed a preexisting test-fixture leak: removing PostgreSQL
+containers without `-v` retained their anonymous volumes. Accumulation exhausted
+the local disk and invalidated the tail of one final E2E attempt (`No space left
+on device` during SQL). That attempt is preserved separately as infrastructure
+failure evidence, not classified as a product regression.
+
+Cleanup now releases owned anonymous volumes on normal and failed startup exits;
+containers are registered before attempted creation so failed starts can also be
+cleaned. The CI SQL container has the same ownership-scoped cleanup. A real Docker
+regression test verifies containers, networks, processes and volumes disappear after
+both success and injected startup failure. Only 35 unused volumes created during
+this task and proven to contain synthetic `dation_e2e` / `dation_qa_` databases were
+removed. Existing active containers and unrelated volumes were preserved.
+
 ## Functional regression checklist
 
-- [ ] Home, Center, DDA Overview and direct authenticated routes
-- [ ] New preparation; Apply before CSV; edit/revert; reload; four readiness checks
-- [ ] Both CSVs → one persisted Case; atomic attributes/Owner; Map and Owner edits
-- [ ] D1 configuration → Run → result → approval → D2 configuration
-- [ ] D2 Run → result → approval → Case complete
-- [ ] New D1 Run retires approval and invalidates D2, with history/evidence intact
-- [ ] Same Data Pack retains Case; changed Data Pack creates another Case
-- [ ] Decision Navigator, Case Flow, Config ↔ Dashboard, browser back/forward
-- [ ] Error/retry/loading, archived Case, viewer/admin/operator/tenant boundaries
-- [ ] Heroes/disclosures/actions, exports, AI fallback, responsive/reduced motion
+- [x] Home, Center, DDA Overview and direct authenticated routes
+- [x] New preparation; Apply before CSV; edit/revert; reload; four readiness checks
+- [x] Both CSVs → one persisted Case; atomic attributes/Owner; Map and Owner edits
+- [x] D1 configuration → Run → result → approval → D2 configuration
+- [x] D2 Run → result → approval → Case complete
+- [x] New D1 Run retires approval and invalidates D2, with history/evidence intact
+- [x] Same Data Pack retains Case; changed Data Pack creates another Case
+- [x] Decision Navigator, Case Flow, Config ↔ Dashboard, browser back/forward
+- [x] Error/retry/loading, archived Case, viewer/admin/operator/tenant boundaries
+- [x] Heroes/disclosures/actions, exports, AI fallback, responsive/reduced motion
 
 Completion evidence is linked from `foundation-refactor-summary.md` rather than
 rewriting this baseline as if preexisting failures had never happened.

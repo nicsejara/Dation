@@ -3,6 +3,7 @@ import ast
 import copy
 import json
 from pathlib import Path
+import sys
 import unittest
 
 from app.domain import decision_cases as domain
@@ -43,4 +44,7 @@ class CaseDomainTests(unittest.TestCase):
         tree = ast.parse(Path(domain.__file__).read_text())
         imports = [node.module for node in ast.walk(tree) if isinstance(node, ast.ImportFrom)]
         imports += [alias.name for node in ast.walk(tree) if isinstance(node, ast.Import) for alias in node.names]
-        self.assertEqual(set(imports), {'__future__', 'datetime'})
+        self.assertEqual([name for name in imports
+                          if name.split('.')[0] not in sys.stdlib_module_names
+                          and not name.startswith('app.domain')], [],
+                         'The Case domain must not depend on HTTP, routes, services or platform infrastructure')
