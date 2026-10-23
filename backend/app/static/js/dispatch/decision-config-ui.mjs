@@ -1,5 +1,5 @@
 import {ensureStylesheet} from "./styles.mjs";
-import {createWorkflowActionBar,WORKFLOW_ACTION_CLASS,workflowActionLabel} from "./workflow-action-bar.mjs";
+import {createWorkflowActionBar,bindWorkflowActionBarLayout,WORKFLOW_ACTION_CLASS,workflowActionLabel} from "./workflow-action-bar.mjs";
 import {createScope,scopeFor,trapFocus} from "./lifecycle.mjs";
 import {esc} from "./shared.mjs";
 import {iconSvg} from "./decision-ui.mjs";
@@ -61,8 +61,8 @@ export function decisionHero({step,decisionIndex,totalDecisions=3,title,descript
   return '<section class="'+esc(className)+' d-page-hero d-page-hero--workflow'+(hasPanel?'':' d-page-hero--copy-only')+'"'+attr("data-reveal",reveal)+'>'
     +'<div class="dispatch-pro-hero-copy">'
       +'<div class="d-hero-meta assignment-config-hero__badges">'
-        +'<span class="d-hero-meta__step dispatch-pro-hero-badge is-step">PASO '+esc(step?.number??3)+': '+esc(String(step?.label||"Configurar decisión").toUpperCase())+'</span>'
-        +(hasDecision?'<span class="d-hero-meta__decision assignment-decision-chip">DECISIÓN '+esc(String(decisionIndex).padStart(2,"0"))+' DE '+esc(totalDecisions)+'</span>':'')
+        +'<span class="d-hero-meta__step dispatch-pro-hero-badge is-step">PASO '+esc(step?.number??3)+' · '+esc(String(step?.label||"Configurar decisión").toUpperCase())+'</span>'
+        +(hasDecision?'<span class="d-hero-meta__decision assignment-decision-chip">DECISIÓN '+esc(Number(decisionIndex))+' DE '+esc(totalDecisions)+'</span>':'')
       +'</div>'
       +'<h1>'+esc(title)+'</h1>'
       +'<p class="dispatch-pro-hero-lead">'+esc(description)+'</p>'
@@ -202,11 +202,12 @@ export function mountConfigActionBar(root){
   update({kind:ready?"ready":"error",enabled:ready,message:ready?"Lista para revisar. Cambios guardados en esta sesión.":reason},{items:chips});
   button.disabled=blocked;
   placeholder.replaceWith(bar);
+  const disposeLayout=bindWorkflowActionBarLayout(root,bar);
   const measure=()=>root.style.setProperty('--config-action-height',Math.ceil(bar.getBoundingClientRect().height)+'px');
   const observer=typeof ResizeObserver==='undefined'?null:new ResizeObserver(measure);
   observer?.observe(bar);measure();
   let release;
-  const dispose=()=>{observer?.disconnect();release?.();root.style.removeProperty('--config-action-height');actionBars.delete(root);};
+  const dispose=()=>{disposeLayout();observer?.disconnect();release?.();root.style.removeProperty('--config-action-height');actionBars.delete(root);};
   release=scopeFor(root)?.own(dispose);
   actionBars.set(root,{dispose,update,button,items:chips});
 }

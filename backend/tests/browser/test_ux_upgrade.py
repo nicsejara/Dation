@@ -30,7 +30,9 @@ class UXUpgradeTests(unittest.IsolatedAsyncioTestCase):
             await self.b.open('logistics-data')
             for name in ('label', 'category', 'description'):
                 field = self.page.locator(f'[name="{name}"]')
+                await field.wait_for(state='visible')
                 await field.focus()
+                self.assertTrue(await field.evaluate('e=>e===document.activeElement'))
                 await self.page.wait_for_timeout(450)
                 visible = await field.evaluate('''e => {
                     const r=e.getBoundingClientRect();

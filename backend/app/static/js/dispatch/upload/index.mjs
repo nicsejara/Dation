@@ -2,7 +2,7 @@ import {mountCaseIdentity,caseAttributesReady,caseDataOwnerReady} from '../cases
 import {responsibilityProblem} from '../cases/workflow-responsibility.mjs';
 import {mountDemoAction} from '../../platform/onboarding.mjs';
 import {createScope,scopeFor} from "../lifecycle.mjs";
-import {createWorkflowActionBar} from "../workflow-action-bar.mjs";
+import {createWorkflowActionBar,bindWorkflowActionBarLayout} from "../workflow-action-bar.mjs";
 import {decisionHero} from "../decision-config-ui.mjs";
 import {api, date, num} from "../shared.mjs";
 import {createDropCard} from "./dropcard.mjs";
@@ -291,12 +291,6 @@ export async function mountUploadScreen(
   }
 
   const actionBar = createWorkflowActionBar({label:"Data Pack", onContinue:onNext, onProblem:scrollToProblem});
-  if (typeof ResizeObserver !== "undefined") {
-    scope.observe(new ResizeObserver(() => {
-      root.style.setProperty("--workflow-bar-space", `${actionBar.bar.getBoundingClientRect().height + 32}px`);
-    }), actionBar.bar);
-  }
-
   root.append(
     hero.hero,
     demoRoot,
@@ -305,6 +299,7 @@ export async function mountUploadScreen(
     compatibilityRoot,
     actionBar.bar,
   );
+  bindWorkflowActionBarLayout(root,actionBar.bar);
   const identity=mountCaseIdentity(root,{state,persist,onSave:async()=>{await saveIdentity();mountWorkflow?.(root,()=>finalState());},onChanged:()=>{persist();finalState();}});
   const guard=el('section',null,'d-card case-input-guard');guard.dataset.inputGuard='';guard.tabIndex=-1;
   guard.hidden=!state.decisionCase?.persisted;

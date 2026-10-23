@@ -141,7 +141,7 @@
 .d-page-hero--workflow .dispatch-pro-hero-copy { display:grid; align-content:start; gap:var(--hero-copy-gap); }
 .d-page-hero--workflow :is(h1,.dispatch-pro-hero-lead) { margin:0; }
 .d-page-hero--workflow .dispatch-pro-hero-lead strong { color:var(--d-text-primary); }
-.d-hero-meta { display:flex; flex-wrap:wrap; align-items:center; gap:var(--hero-meta-gap); min-width:0; }
+.d-hero-meta { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px 32px; min-width:0; width:100%; }
 .d-hero-meta>:where(span) { box-sizing:border-box; max-width:100%; border:1px solid var(--d-border); border-radius:var(--radius-pill); overflow-wrap:anywhere; text-transform:uppercase; letter-spacing:.04em; }
 .d-hero-meta__step { display:inline-flex; align-items:center; min-height:26px; padding:4px 9px; font:750 11px/1.35 var(--font-sans); color:var(--d-brand-teal-bright); border-color:var(--d-border-control); background:var(--d-surface-2); }
 .d-hero-meta__decision { min-height:20px; padding:2px 8px; font:600 12px/1.35 var(--font-sans); color:var(--d-text-muted); background:var(--d-surface-1); }
@@ -187,9 +187,9 @@
 @media(prefers-reduced-motion:reduce) { .d-attention-target.is-attention::after { animation:none; } }
 
 .d-workflow-action-bar {
-  position:sticky; bottom:16px; z-index:35; display:grid;
+  position:fixed; bottom:calc(16px + env(safe-area-inset-bottom,0px) + var(--workflow-keyboard-inset,0px)); left:var(--workflow-bar-left); z-index:35; display:grid;
   grid-template-columns:minmax(min(100%,20ch),1fr) minmax(0,max-content); align-items:center; gap:16px;
-  width:100%; min-width:0; min-height:80px; padding:12px 16px; box-sizing:border-box;
+  width:var(--workflow-bar-width,100%); min-width:0; min-height:80px; padding:12px 16px; box-sizing:border-box;
   border:1px solid var(--d-border-control); border-radius:var(--radius-panel);
   color:var(--d-text-primary); background:var(--color-shell-overlay);
   box-shadow:var(--shadow-overlay-dark); backdrop-filter:blur(14px);
@@ -220,6 +220,11 @@
   .d-workflow-action-bar__actions { inline-size:100%; grid-template-columns:minmax(0,1fr); gap:12px; }
   .d-workflow-action-bar__items { grid-column:1/-1; grid-template-columns:repeat(auto-fit,minmax(min(100%,var(--workflow-context-control-min-width)),1fr)); grid-auto-rows:1fr; font-size:11px; }
   .d-workflow-action-bar__actions>.d-button { grid-column:1/-1; width:100%; }
+  .d-workflow-action-bar__items { grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; }
+  .d-workflow-action-bar__item { min-height:32px; padding:5px 6px; font-size:11px; gap:4px; }
+  .d-workflow-action-bar__item>svg:last-child { display:none; }
+  .d-workflow-action-bar__meta>span { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+  .d-workflow-action-bar__actions { gap:8px; }
 }
 
 /* A migrated Data Pack context nested in pages awaiting Phase 4/6. */
@@ -260,15 +265,27 @@
   caret-color:var(--color-text);
   box-shadow:inset 0 0 0 1000px var(--color-surface);
 }
-/* A form control must never share the viewport with an overlapping action bar.
-   All readiness items and the CTA remain in normal document order. */
-.view:has(:is(input,textarea,select):focus) .d-workflow-action-bar { position:static; }
-@media(max-width:1100px) {
-  .d-workflow-action-bar { position:static; }
+/* Reserve a separate scroll viewport above commands: controls never sit behind them. */
+.main.has-workflow-commands{min-height:0;height:calc(var(--workflow-viewport-height,100dvh) - var(--workflow-command-space,220px));overflow-y:auto;overscroll-behavior-y:contain;scroll-padding-block:150px 16px}
+.main.has-compact-workflow-commands :is(.topbar,.dda-workspace-nav-shell){position:static}
+.d-workflow-action-bar[data-compact=true]{padding:8px;gap:6px;min-height:0;grid-template-columns:minmax(0,1fr)}
+.d-workflow-action-bar[data-compact=true] .d-workflow-action-bar__meta{display:none}
+.d-workflow-action-bar[data-compact=true] .d-workflow-action-bar__actions{inline-size:100%;grid-template-columns:minmax(0,1fr) minmax(140px,.4fr)}
+.d-workflow-action-bar[data-compact=true] .d-workflow-action-bar__items{grid-column:1;grid-template-columns:repeat(var(--workflow-context-count,4),minmax(0,1fr));gap:4px}
+.d-workflow-action-bar[data-compact=true] .d-workflow-action-bar__item{font-size:11px;padding:4px;min-height:28px}
+.d-workflow-action-bar[data-compact=true] .d-workflow-action-bar__item svg{display:none}
+.d-workflow-action-bar[data-compact=true] .d-workflow-action-bar__actions>.d-button{grid-column:2;min-width:0}
+@media(max-width:620px){.d-workflow-action-bar[data-compact=true] .d-workflow-action-bar__actions{grid-template-columns:minmax(0,1fr)}.d-workflow-action-bar[data-compact=true] .d-workflow-action-bar__actions>.d-button{grid-column:1}}
+@media(max-height:360px){
+  .d-workflow-action-bar{padding:8px;gap:6px;bottom:calc(8px + var(--workflow-keyboard-inset,0px))}
+  .d-workflow-action-bar__meta{display:none}
+  .d-workflow-action-bar__items{grid-template-columns:repeat(var(--workflow-context-count,4),minmax(0,1fr));gap:4px}
+  .d-workflow-action-bar__item{font-size:11px;padding:4px;min-height:28px}
+  .d-workflow-action-bar__item svg{display:none}
 }
 /* Short viewports and narrow mobile screens must leave focused content reachable. */
 @media(max-height:540px), (max-width:620px) and (max-height:700px) {
-  .topbar, .dda-workspace-nav-shell, .d-workflow-action-bar { position:static; }
+  .topbar, .dda-workspace-nav-shell { position:static; }
   .dispatch-upload-pro :is(button,a,summary,input,select,textarea,[tabindex]), .dispatch-pro-file-card { scroll-margin-block:16px; }
 }
 

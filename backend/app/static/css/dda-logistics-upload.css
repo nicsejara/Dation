@@ -181,5 +181,3 @@
 .dispatch-pro-file-copy h3{font-size:24px;font-weight:600}
 .dispatch-pro-compatibility{border-inline:0;border-radius:0;background:transparent}
 @media(max-width:620px){.dispatch-pro-file-card{padding:20px}}
-
-.dispatch-upload-pro .d-workflow-action-bar{position:static}

@@ -1,4 +1,5 @@
 import {esc} from "./shared.mjs";
+import {scopeFor} from "./lifecycle.mjs";
 
 export const WORKFLOW_ACTION_CLASS = "d-button d-button--workflow";
 let sequence = 0;
@@ -37,6 +38,51 @@ function icon(name) {
   const template = document.createElement("template");
   template.innerHTML = iconMarkup(name);
   return template.content.firstElementChild;
+}
+
+/** Layout only: one floating command surface, owned by the current view scope.
+ * z-index 35 sits below menus (80), native dialogs and assistant overlays. */
+export function bindWorkflowActionBarLayout(root,bar){
+  const scope=scopeFor(root),viewport=window.visualViewport,frame=root.closest('.main');
+  const properties=['--workflow-bar-space','--workflow-bar-left','--workflow-bar-width','--workflow-keyboard-inset'];
+  function exposeFocus(){
+    const field=document.activeElement;
+    if(!root.contains(field)||bar.contains(field)||!field?.getBoundingClientRect)return;
+    const r=field.getBoundingClientRect(),b=bar.getBoundingClientRect();
+    if(!r.width||!b.width)return;
+    let scroll=field.parentElement;
+    while(scroll&&!(scroll.scrollHeight>scroll.clientHeight&&/(auto|scroll)/.test(getComputedStyle(scroll).overflowY)))scroll=scroll.parentElement;
+    scroll ||= document.scrollingElement;
+    const header=[...document.querySelectorAll('.topbar,.dda-workspace-nav-shell')].reduce((bottom,e)=>{
+      const style=getComputedStyle(e),rect=e.getBoundingClientRect();
+      return ['fixed','sticky'].includes(style.position)&&rect.top>=0?Math.max(bottom,rect.bottom):bottom;
+    },0)+12;
+    const bottom=Math.min(b.top-12,(frame?.getBoundingClientRect().bottom??b.top)-12);
+    if(r.bottom>bottom)scroll.scrollTop+=r.bottom-bottom;
+    else if(r.top<header)scroll.scrollTop-=header-r.top;
+  }
+  function measure(){
+    const r=root.getBoundingClientRect();if(!r.width)return;
+    const inset=Math.max(0,innerHeight-(viewport?.height||innerHeight)-(viewport?.offsetTop||0));
+    const space=Math.ceil(bar.getBoundingClientRect().height)+40;
+    frame?.classList.add('has-workflow-commands');
+    frame?.classList.toggle('has-compact-workflow-commands',(viewport?.height||innerHeight)<540);
+    bar.dataset.compact=String((viewport?.height||innerHeight)<540);
+    frame?.style.setProperty('--workflow-command-space',space+'px');
+    frame?.style.setProperty('--workflow-viewport-height',(viewport?.height||innerHeight)+'px');
+    root.style.setProperty('--workflow-bar-left',r.left+'px');
+    root.style.setProperty('--workflow-bar-width',r.width+'px');
+    root.style.setProperty('--workflow-keyboard-inset',inset+'px');
+    root.style.setProperty('--workflow-bar-space',space+'px');
+    exposeFocus();
+  }
+  const observer=typeof ResizeObserver==='function'?new ResizeObserver(measure):null;
+  observer?.observe(bar);observer?.observe(root);
+  root.addEventListener('focusin',exposeFocus);window.addEventListener('resize',measure);
+  viewport?.addEventListener('resize',measure);viewport?.addEventListener('scroll',measure);
+  measure();
+  const dispose=()=>{observer?.disconnect();root.removeEventListener('focusin',exposeFocus);window.removeEventListener('resize',measure);viewport?.removeEventListener('resize',measure);viewport?.removeEventListener('scroll',measure);properties.forEach(p=>root.style.removeProperty(p));frame?.classList.remove('has-workflow-commands','has-compact-workflow-commands');frame?.style.removeProperty('--workflow-command-space');frame?.style.removeProperty('--workflow-viewport-height');};
+  scope?.own(dispose);return dispose;
 }
 
 /** One stable action node; callers retain validation and continuation ownership. */
