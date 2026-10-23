@@ -10,7 +10,7 @@ import {
   continuationState,
   nextDecisionId,
   getCaseTransitionNotice,
-} from "../app/static/js/dispatch/decision-case.mjs";
+} from "../app/static/js/dispatch/cases/decision-case.mjs";
 
 const orders = {id: "orders-1"};
 const fleet = {id: "fleet-1"};

@@ -8,7 +8,7 @@ CSS_ROOT = BACKEND_ROOT / "app" / "static" / "css"
 
 class DecisionMapCaseV2ContractTests(unittest.TestCase):
     def setUp(self):
-        self.decision_map = (DISPATCH_JS / "decision-map.mjs").read_text(
+        self.decision_map = (DISPATCH_JS / "cases/decision-map.mjs").read_text(
             encoding="utf-8"
         )
         self.decision_ui = (DISPATCH_JS / "decision-ui.mjs").read_text(

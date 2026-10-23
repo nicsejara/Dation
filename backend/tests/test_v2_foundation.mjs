@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {resolveNodeDestination} from '../app/static/js/dispatch/decision-target.mjs';
+import {resolveNodeDestination} from '../app/static/js/dispatch/navigation/decision-target.mjs';
 import {FOUNDATION,objectivePresentation,statePresentation,caseContext} from '../app/static/js/platform/foundation.mjs';
 for(const v of JSON.parse(fs.readFileSync(new URL('./foundation_vectors.json',import.meta.url)))){
  test(v.name,()=>assert.deepEqual(resolveNodeDestination(v.node_id,v.node),v.expected));

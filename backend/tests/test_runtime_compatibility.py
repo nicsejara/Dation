@@ -54,7 +54,7 @@ class RuntimeCompatibilityTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual((await self.client.get(path,headers={"Range":"bytes=9999999-"})).status_code,416)
 
     async def test_module_assets_revalidate_without_losing_etags(self):
-        path = "/static/js/dispatch/navigation.mjs"
+        path = "/static/js/dispatch/navigation/resource.mjs"
         response = await self.client.get(path)
         self.assertEqual(response.status_code,200)
         self.assertEqual(response.headers["cache-control"],"no-cache")

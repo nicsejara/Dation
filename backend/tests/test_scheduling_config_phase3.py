@@ -3,8 +3,8 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 DISPATCH = ROOT / "app" / "static" / "js" / "dispatch"
-FOCUS = (DISPATCH / "scheduling-focus-rules.mjs").read_text(encoding="utf-8")
-CONFIG = (DISPATCH / "scheduling-config-v2.mjs").read_text(encoding="utf-8")
+FOCUS = (DISPATCH / "scheduling/scheduling-focus-rules.mjs").read_text(encoding="utf-8")
+CONFIG = (DISPATCH / "scheduling/scheduling-config-v2.mjs").read_text(encoding="utf-8")
 SHARED = (DISPATCH / "decision-config-ui.mjs").read_text(encoding="utf-8")
 CSS = (
     ROOT
@@ -39,7 +39,7 @@ class SchedulingConfigPhase3RuleEditorTests(unittest.TestCase):
 
     def test_rule_list_reuses_shared_rule_card_primitive(self):
         self.assertIn(
-            'decisionRuleCard} from "./decision-config-ui.mjs"',
+            'decisionRuleCard} from "../decision-config-ui.mjs"',
             FOCUS,
         )
         self.assertIn("decisionRuleCard({", FOCUS)

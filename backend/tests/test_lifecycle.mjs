@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {createScope} from '../app/static/js/dispatch/lifecycle.mjs';
-import {RunPolling} from '../app/static/js/dispatch/run-polling.mjs';
+import {RunPolling} from '../app/static/js/dispatch/runs/polling.mjs';
 const tick=()=>new Promise(resolve=>setImmediate(resolve));
 test('disposing aborts IO and removes global event handlers exactly once',()=>{const root={},target=new EventTarget();let calls=0,cleanups=0;const scope=createScope(root);scope.listen(target,'qa',()=>calls++);scope.own(()=>cleanups++);scope.dispose();scope.dispose();target.dispatchEvent(new Event('qa'));assert.equal(calls,0);assert.equal(cleanups,1);assert.equal(scope.signal.aborted,true);});
 test('remount disposes the previous scope and its children',()=>{const root={},child={parentElement:root};const first=createScope(root),nested=createScope(child);createScope(root);assert.equal(first.active,false);assert.equal(nested.active,false);});

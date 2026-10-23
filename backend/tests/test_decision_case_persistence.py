@@ -7,6 +7,7 @@ from main import app
 from app.auth import require_upload_access
 from app.platform.context import RequestContext, bind
 from app.services import decision_case_service as cases
+from app.domain import decision_cases as case_state
 
 
 CASE_ID = "00000000-0000-4000-8000-000000000090"
@@ -18,7 +19,7 @@ RUN_ID = "00000000-0000-4000-8000-000000000010"
 
 class DecisionCaseServiceTests(unittest.IsolatedAsyncioTestCase):
     def test_base_state_is_bound_to_immutable_data_pack(self):
-        state = cases._base_state(CASE_ID, ORDERS_ID, FLEET_ID)
+        state = case_state.create_case_state(CASE_ID, ORDERS_ID, FLEET_ID)
         self.assertEqual(state["id"], CASE_ID)
         self.assertEqual(
             state["signature"],
@@ -41,10 +42,10 @@ class DecisionCaseServiceTests(unittest.IsolatedAsyncioTestCase):
         )
 
     def test_state_cannot_move_to_another_data_pack(self):
-        state = cases._base_state(CASE_ID, ORDERS_ID, FLEET_ID)
+        state = case_state.create_case_state(CASE_ID, ORDERS_ID, FLEET_ID)
         state["inputs"]["fleet_dataset_id"] = OTHER_FLEET_ID
         with self.assertRaisesRegex(ValueError, "otro dataset de Flota"):
-            cases._validate_state(
+            case_state.validate_case_state(
                 state,
                 case_id=CASE_ID,
                 orders_dataset_id=ORDERS_ID,
@@ -70,7 +71,7 @@ class DecisionCaseServiceTests(unittest.IsolatedAsyncioTestCase):
                 )
 
     async def test_approval_unlocks_next_node_without_losing_case_identity(self):
-        state = cases._base_state(CASE_ID, ORDERS_ID, FLEET_ID)
+        state = case_state.create_case_state(CASE_ID, ORDERS_ID, FLEET_ID)
         row = {
             "id": CASE_ID,
             "orders_dataset_id": ORDERS_ID,
@@ -78,6 +79,11 @@ class DecisionCaseServiceTests(unittest.IsolatedAsyncioTestCase):
             "created_at": "2026-10-05T00:00:00+00:00",
             "state_json": state,
         }
+        approved = {"id": RUN_ID, "node_id": "logistics_assignment", "status": "completed",
+                    "approved_at": "2026-10-05T01:00:00+00:00"}
+        summaries = {node: {"latest": None, "approved": None, "run_count": 0}
+                     for node in case_state.NODE_IDS}
+        summaries['logistics_assignment'] = {"latest": approved, "approved": approved, "run_count": 1}
         with patch.object(
             cases,
             "get_case_row",
@@ -86,7 +92,7 @@ class DecisionCaseServiceTests(unittest.IsolatedAsyncioTestCase):
             cases,
             "update_case",
             AsyncMock(return_value={"id": CASE_ID}),
-        ) as update_case:
+        ) as update_case, patch.object(cases, 'history_snapshot', AsyncMock(return_value={'summaries': summaries})):
             await cases.record_node_state(
                 CASE_ID,
                 "logistics_assignment",
@@ -134,7 +140,7 @@ class DecisionCaseHTTPTests(unittest.IsolatedAsyncioTestCase):
                 "orders_dataset_id": ORDERS_ID,
                 "fleet_dataset_id": FLEET_ID,
             },
-            "decision_case": cases._base_state(
+            "decision_case": case_state.create_case_state(
                 CASE_ID,
                 ORDERS_ID,
                 FLEET_ID,

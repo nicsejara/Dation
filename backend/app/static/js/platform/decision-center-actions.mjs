@@ -1,4 +1,4 @@
-import {mountResponsibilitySelector} from '../dispatch/workflow-responsibility.mjs';
+import {mountResponsibilitySelector} from '../dispatch/cases/workflow-responsibility.mjs';
 import {api} from '../dispatch/shared.mjs';
 import {mountDialog} from './components.mjs';
 const BASE='/api/platform/decisions';

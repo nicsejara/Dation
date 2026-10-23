@@ -76,9 +76,9 @@ class Sandbox:
     def start(self):
         self.network=self.identifier+'-net';self.docker('network','create',self.network)
         self.pg=self.identifier+'-pg'
+        self.containers.append(self.pg)
         self.docker('run','-d','--name',self.pg,'--network',self.network,'--network-alias','postgres',
             '-e','POSTGRES_HOST_AUTH_METHOD=trust','-e','POSTGRES_DB='+self.database,'postgres:17-alpine')
-        self.containers.append(self.pg)
         def pg_ready():
             result=subprocess.run(['docker','exec',self.pg,'pg_isready','-h','127.0.0.1','-U','postgres'],capture_output=True)
             return result.returncode==0
@@ -109,10 +109,10 @@ class Sandbox:
         public['keys'].append({'kty':'oct','alg':'HS256','k':base64.urlsafe_b64encode(secret.encode()).rstrip(b'=').decode()})
         self.token=jwt(secret,'service_role');self.anon_token=jwt(secret,'anon')
         self.rest_container=self.identifier+'-rest'
+        self.containers.append(self.rest_container)
         self.docker('run','-d','--name',self.rest_container,'--network',self.network,
             '-p','127.0.0.1::3000','-e','PGRST_DB_URI=postgres://dation_e2e_authenticator@postgres:5432/'+self.database,
             '-e','PGRST_DB_ANON_ROLE=anon','-e','PGRST_JWT_SECRET='+json.dumps(public),POSTGREST)
-        self.containers.append(self.rest_container)
         binding=self.docker('port',self.rest_container,'3000/tcp')
         self.rest_url='http://'+binding
         self.env={**os.environ,'SUPABASE_URL':fixture_url,
@@ -173,7 +173,7 @@ class Sandbox:
     def __exit__(self,exc_type,exc,tb):
         for process in reversed(self.processes):self.stop(process)
         for name in reversed(self.containers):
-            subprocess.run(['docker','rm','-f',name],capture_output=True,timeout=30)
+            subprocess.run(['docker','rm','-f','-v',name],capture_output=True,timeout=30)
         if hasattr(self,'network'):subprocess.run(['docker','network','rm',self.network],capture_output=True,timeout=30)
         for name in ('http','api_client','db'):
             if hasattr(self,name):getattr(self,name).close()

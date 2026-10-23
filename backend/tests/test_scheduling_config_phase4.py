@@ -5,9 +5,9 @@ ROOT = Path(__file__).resolve().parents[1]
 STATIC = ROOT / "app" / "static"
 DISPATCH = STATIC / "js" / "dispatch"
 
-LIFECYCLE = (DISPATCH / "scheduling-execution-phase4.mjs").read_text(encoding="utf-8")
-CONFIG = (DISPATCH / "scheduling-config-v2.mjs").read_text(encoding="utf-8")
-FOCUS = (DISPATCH / "scheduling-focus-rules.mjs").read_text(encoding="utf-8")
+LIFECYCLE = (DISPATCH / "scheduling/scheduling-execution-phase4.mjs").read_text(encoding="utf-8")
+CONFIG = (DISPATCH / "scheduling/scheduling-config-v2.mjs").read_text(encoding="utf-8")
+FOCUS = (DISPATCH / "scheduling/scheduling-focus-rules.mjs").read_text(encoding="utf-8")
 BOOTSTRAP = (STATIC / "js" / "dda-variable-config.js").read_text(encoding="utf-8")
 SHELL = (STATIC / "js" / "dda-workflow-config.js").read_text(encoding="utf-8")
 CSS = (STATIC / "css" / "scheduling-execution-phase4.css").read_text(encoding="utf-8")

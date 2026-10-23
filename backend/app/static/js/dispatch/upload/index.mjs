@@ -1,5 +1,5 @@
-import {mountCaseIdentity,caseAttributesReady,caseDataOwnerReady} from '../case-identity.mjs';
-import {responsibilityProblem} from '../workflow-responsibility.mjs';
+import {mountCaseIdentity,caseAttributesReady,caseDataOwnerReady} from '../cases/case-identity.mjs';
+import {responsibilityProblem} from '../cases/workflow-responsibility.mjs';
 import {mountDemoAction} from '../../platform/onboarding.mjs';
 import {createScope,scopeFor} from "../lifecycle.mjs";
 import {createWorkflowActionBar} from "../workflow-action-bar.mjs";

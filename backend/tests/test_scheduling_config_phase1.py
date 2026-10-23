@@ -22,7 +22,7 @@ UI = (
     / "static"
     / "js"
     / "dispatch"
-    / "scheduling-config-v2.mjs"
+    / "scheduling/scheduling-config-v2.mjs"
 ).read_text(encoding="utf-8")
 SHARED_UI = (
     ROOT
@@ -168,7 +168,7 @@ class SchedulingConfigPhase1Tests(unittest.TestCase):
 
     def test_phase1_scheduling_ui_matches_assignment_configuration_language(self):
         self.assertIn("DECISIÓN ", SURFACE)
-        self.assertIn("Decision Case y Data Pack en uso", SURFACE)
+        self.assertIn("Contexto del Case", SURFACE)
         self.assertIn("Alcance temporal", UI)
         self.assertIn("Objetivo del calendario", UI)
         self.assertIn("Política de recursos", UI)

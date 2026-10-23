@@ -6,6 +6,7 @@ import httpx
 from main import app
 from app.auth import require_upload_access
 from app.services import decision_case_service as cases
+from app.domain import decision_cases as case_state
 from app.services import run_service
 
 
@@ -76,7 +77,7 @@ class DecisionRunHistoryModelTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(payload["upstream_run_id"], ASSIGNMENT_1)
 
     def test_candidate_run_does_not_replace_current_approval(self):
-        state = cases._base_state(CASE_ID, ORDERS_ID, FLEET_ID)
+        state = case_state.create_case_state(CASE_ID, ORDERS_ID, FLEET_ID)
         history = [
             run_row(
                 ASSIGNMENT_2,
@@ -90,7 +91,7 @@ class DecisionRunHistoryModelTests(unittest.IsolatedAsyncioTestCase):
                 approved_at="2026-10-05T01:02:00+00:00",
             ),
         ]
-        snapshot = cases._state_with_history(
+        snapshot = case_state.project_case_history(
             state,
             history,
             case_id=CASE_ID,
@@ -106,7 +107,7 @@ class DecisionRunHistoryModelTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(node["latest_execution_status"], "completed")
 
     def test_new_assignment_approval_marks_old_scheduling_stale(self):
-        state = cases._base_state(CASE_ID, ORDERS_ID, FLEET_ID)
+        state = case_state.create_case_state(CASE_ID, ORDERS_ID, FLEET_ID)
         history = [
             run_row(
                 ASSIGNMENT_2,
@@ -130,7 +131,7 @@ class DecisionRunHistoryModelTests(unittest.IsolatedAsyncioTestCase):
                 superseded_by=ASSIGNMENT_2,
             ),
         ]
-        snapshot = cases._state_with_history(
+        snapshot = case_state.project_case_history(
             state,
             history,
             case_id=CASE_ID,

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {getAssignmentContext,getEssentialKpis,getDecisionInsights,getScenarioTable,getResourceParticipation,
   getAssignmentPreview,getDecisionTradeoffs,getCorridorSummary,getTripUtilization,getDecisionNarrative,
-  getAssignmentSummary,getAssignmentVehicles} from '../app/static/js/dispatch/assignment-dashboard-selectors.mjs';
+  getAssignmentSummary,getAssignmentVehicles} from '../app/static/js/dispatch/assignment/assignment-dashboard-selectors.mjs';
 const fixture=JSON.parse(readFileSync(new URL('./fixtures/assignment_dashboard/assignment_comparative_run.json',import.meta.url))).result_json;
 const result=()=>structuredClone(fixture);
 test('context counts destinations and evaluated resources independently from vehicles used',()=>{

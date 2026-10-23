@@ -1,6 +1,6 @@
 """Compact Home presentation over the existing, tenant-authorized case history."""
 from app.platform.identity import platform_call
-from app.services.decision_case_service import _state_with_history
+from app.domain.decision_cases import project_case_history
 from app.platform.activity import home_activity
 from app.platform.onboarding import home_progress
 from app.platform.foundation import REGISTRY, case_context, resolve_node_destination
@@ -14,9 +14,9 @@ def recent_case(bundle):
         orders_dataset_id=str(row['orders_dataset_id']), fleet_dataset_id=str(row['fleet_dataset_id']),
         summaries=bundle['summaries'])
     try:
-        state = _state_with_history(row.get('state_json') or {}, [], **options)
+        state = project_case_history(row.get('state_json') or {}, [], **options)
     except (ValueError, TypeError, AttributeError):
-        state = _state_with_history({}, [], **options)
+        state = project_case_history({}, [], **options)
     nodes = [(key, state['nodes'][key]) for key in NODE_LABELS]
     # Retain the replacement as current work instead of silently presenting the
     # next unlocked step. Ordinary navigation still prefers its official result.

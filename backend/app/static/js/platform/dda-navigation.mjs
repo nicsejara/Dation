@@ -1,4 +1,4 @@
-import {resourceUrl} from '../dispatch/navigation.mjs';
+import {resourceUrl} from '../dispatch/navigation/resource.mjs';
 import {openDdaCatalog} from './dda-catalog.mjs';
 const rendered=new WeakMap();
 

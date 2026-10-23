@@ -16,7 +16,7 @@ class ActivityProjectionTests(unittest.TestCase):
   for run in runs:
    t=run['result_json']['scenarios']['selected']['trips'][0];t['estimated_cost']=None;t['cost']=7.5;t['provider_name']='=untrusted;"value"\nsecond line';t['loads'][0]['product']='+formula'
   js="""
-import {exportDecision} from './app/static/js/dispatch/export.mjs';
+import {exportDecision} from './app/static/js/dispatch/runs/export.mjs';
 import {readFileSync} from 'node:fs';
 let blob;globalThis.window={setTimeout:()=>{}};globalThis.document={body:{append:()=>{}},createElement:()=>({click:()=>{},remove:()=>{},style:{}})};URL.createObjectURL=b=>{blob=b;return 'blob:synthetic'};
 const runs=JSON.parse(readFileSync(0,'utf8')),out=[];

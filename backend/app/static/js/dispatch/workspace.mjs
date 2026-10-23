@@ -1,15 +1,17 @@
-import {caseAttributesReady,caseDataOwnerReady} from './case-identity.mjs';
+import {caseAttributesReady,caseDataOwnerReady} from './cases/case-identity.mjs';
 import {esc,num,api,post,errorBox} from './shared.mjs';
 import {render as dashboard} from './dashboard.mjs';
 import {mountUploadScreen} from './upload/index.mjs';
-import {renderDecisionMap} from './decision-map.mjs';
-import {mountAssignmentConfig,filterPayload,normalizeRawWeights} from './assignment-config.mjs';
-import {STATUS,createDecisionCase,replaceInputs,transitionNode,inputSignature,caseRef,deriveDecisionNodes,continuationState,getCaseTransitionNotice} from './decision-case.mjs';
-import {resolveNodeDestination,resolveDecisionDestination,configurationAvailable} from './decision-target.mjs';
+import {renderDecisionMap} from './cases/decision-map.mjs';
+import {mountAssignmentConfig,filterPayload,normalizeRawWeights} from './assignment/assignment-config.mjs';
+import {STATUS,createDecisionCase,replaceInputs,transitionNode,inputSignature,caseRef,deriveDecisionNodes,continuationState,getCaseTransitionNotice} from './cases/decision-case.mjs';
+import {resolveNodeDestination,resolveDecisionDestination,configurationAvailable} from './navigation/decision-target.mjs';
 import {DECISION_META} from './decision-ui.mjs';
 import {caseContext} from '../platform/foundation.mjs';
-import {mountWorkflowContext,mountMapResponsibilities,mountDashboardTrace,renderExecutionProgress} from './workflow-context.mjs';
-import {responsibilityProblem} from './workflow-responsibility.mjs';
+import {mountCasePreparation,mountMapResponsibilities} from './cases/workflow-context.mjs';
+import {mountDashboardTrace} from './runs/approval-trace.mjs';
+import {renderExecutionProgress} from './runs/execution-progress.mjs';
+import {responsibilityProblem} from './cases/workflow-responsibility.mjs';
 import {currentLogisticsEnabled,logisticsView} from '../platform/entitlements.mjs';
 
 const KEY='dation.dispatch.workspace.v5';
@@ -78,10 +80,10 @@ function presetWeights(objective,dimensions){
   return out;
 }
 
-import {readResource,resourceUrl,runDecisionState,runContext} from './navigation.mjs';
+import {readResource,resourceUrl,runDecisionState,runContext} from './navigation/resource.mjs';
 import {createScope,disposeScope,scopeFor} from './lifecycle.mjs';
-import {runPolling} from './run-polling.mjs';
-import {restoreRunConfiguration,mount as mountSchedulingConfig} from './scheduling-config-v2.mjs';
+import {runPolling} from './runs/polling.mjs';
+import {restoreRunConfiguration,mount as mountSchedulingConfig} from './scheduling/scheduling-config-v2.mjs';
 import {decorateDecisionMap,mountTraceability} from './traceability-controller.mjs';
 let saved={};
 try{saved=JSON.parse(sessionStorage.getItem(KEY)||'{}');}catch{}
@@ -359,7 +361,7 @@ async function loadData(){
         try{if(!caseAttributesReady(state)||!caseDataOwnerReady(state))throw new Error('Aplicá los atributos y el Data Owner del Case antes de continuar.');await ensurePersistedCase(generation);await api('/api/platform/decisions/'+state.decisionCase.id+'/workflow-readiness',{signal:routeController?.signal});if(generation===routeGeneration)await navigate('logistics-map');}
         catch(error){if(generation!==routeGeneration)return;const note=document.createElement('p');note.role='alert';note.textContent=error.message;roots.data.querySelector('[data-workflow-data-error]')?.remove();note.dataset.workflowDataError='';roots.data.append(note);}
       },
-      mountWorkflow:(node,onSaved)=>mountWorkflowContext(node,{state,stageKey:'data_preparation',showCase:false,onSaved:()=>{persist();onSaved?.();}}),
+      mountWorkflow:(node,onSaved)=>mountCasePreparation(node,{state,onSaved:()=>{persist();onSaved?.();}}),
       isReady:ready,
       isCurrent:()=>generation===routeGeneration,
     },
@@ -423,7 +425,6 @@ async function loadDecisionMap(){
       },
       onOpenResult:openCaseResult,
       onData:()=>navigate('logistics-data'),
-      onSelectCase:()=>{const trigger=node.querySelector('[data-case-switcher] button');trigger?.focus();trigger?.click();},
     });
     if(generation===routeGeneration){decorateDecisionMap(node);mountMapResponsibilities(node,{state,onSaved:()=>{persist();loadDecisionMap();}});
       const target=resource.nodeId&&node.querySelector('article[data-decision-node="'+CSS.escape(resource.nodeId)+'"]');

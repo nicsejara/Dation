@@ -1,144 +1,120 @@
-# Arquitectura vigente — Dispatch 1.0.0
+# Dation architecture
 
-Dation ejecuta decisiones de logística a partir de **órdenes + una versión de flota + configuración**. FastAPI sirve la SPA y una API autenticada; Supabase almacena CSV privados, perfiles, corridas, explicaciones y mensajes. La IA explica resultados persistidos y no participa del cálculo.
+Dation serves native HTML/CSS/ES modules from FastAPI, backed by Supabase Auth,
+tenant-scoped Postgres/Storage and a durable Cloud Run worker. The deterministic
+engines produce immutable results; dashboards and AI explain that evidence.
 
-## Flujo de ingesta y decisión
+## Find a responsibility
 
-La carga continúa siendo una sola pantalla, pero ya no navega directamente al configurador:
+Paths are relative to `backend/`.
 
-```text
-Órdenes V3 ──┐
-             ├─> validación + persistencia ─> Decision Readiness
-Fleet V3 ────┘                                   ↓
-                                           Decision Case
-                                                ↓
-                                           Decision Map
-                                                ↓
-                                      Assignment disponible
-                                                ↓
-                                  configurar → ejecutar → revisar
-                                                ↓
-                                           aprobación humana
-                                                ↓
-                                   Scheduling se desbloquea si
-                                   además tiene datos suficientes
-```
-
-La validación y la persistencia están desacopladas. Si Supabase o las migraciones todavía no están listos, el usuario puede validar ambos CSV y revisar sus problemas; sólo quedan bloqueados guardar y continuar.
-
-`backend/app/validators/contracts.py` es la fuente única del contrato visible. Los validadores, `GET /api/dispatch/contracts` y las plantillas generadas consumen esa definición.
-
-## Componentes
-
-| Componente | Responsabilidad |
+| Question | Canonical location |
 |---|---|
-| `validators/contracts.py` | Columnas, obligatoriedad, reglas, ejemplos, alias y plantillas |
-| `validators/*_schema.py` | Informe acumulativo + wrappers estrictos para el motor |
-| `services/dispatch_service.py` | Estado, biblioteca, versionado, deduplicación, preflight y ejecución |
-| `routes/dispatch.py` | Contratos, validación, plantillas, ejemplos, status y API Dispatch |
-| `static/js/dispatch/upload/*` | Pantalla única de ingesta, errores, biblioteca, preflight y banner |
-| `static/js/dispatch/workspace.mjs` | Orquestación de ingesta, configuración y corrida |
-| `engines/assignment/*` | Motor activo de Assignment: packing, CP-SAT no temporal, invariantes y handoff |
-| `engines/scheduling/*` | Motor activo de Scheduling: secuencia temporal con Assignment inmutable |
-| `engines/dispatch/*` | Motor temporal Dispatch 2.2 conservado para corridas históricas |
-
-## Persistencia y compatibilidad
-
-La migración Dispatch agrega el modelo `orders/fleet`. La migración de biblioteca agrega archivado lógico y marca de datos de ejemplo. Ambas son aditivas. Los datasets previos siguen siendo `logistics_legacy`; las corridas históricas mantienen sus endpoints y renderer.
-
-Se retiró **la pantalla legacy de carga**, no la compatibilidad histórica. Permanecen el upload sin tipo, `POST /api/runs/{dataset_id}`, el motor/renderer histórico y la apertura de corridas previas. El archivo estático de plantilla histórica puede seguir existiendo como compatibilidad, pero ya no se ofrece en la UI nueva.
-
-La clase `dispatch-enabled` todavía se conserva para aislar la configuración Dispatch v1 del configurador histórico; retirarla requiere desacoplar también esa segunda etapa.
-
-## Estado del sistema
-
-`GET /api/dispatch/status` comprueba conexión, columnas visibles por PostgREST, RPC de flota y bucket privado. Si las columnas no están visibles, el endpoint no puede demostrar si faltó ejecutar SQL o sólo falta refrescar el schema cache; la UI lo expresa como diagnóstico verificable y remite a SQL Editor.
-
-`validate_dispatch_run` es una función trigger y no se considera verificable de forma fiable por la API REST; su existencia se confirma manualmente con `pg_proc`.
-
-## Ejecución y límites
-
-El request de ejecución permanece abierto mientras `asyncio.to_thread` ejecuta el motor y el navegador consulta progreso persistido. CP-SAT usa un hilo, seed 0 y presupuestos acotados. Cada candidato se valida antes de compararse; no se publican resultados parciales ni se etiqueta como óptimo un resultado no certificado.
-
-Para un Decision Case nuevo, `logistics_assignment` enruta a Assignment Engine 1.0.0. El modelo genera viajes abstractos respetando unidades enteras, capacidad, origen/site y ruta. Un mismo `vehicle_id` puede recibir varios viajes porque todavía no existe un calendario.
-
-Fechas, transit time, SLA, tardanzas, velocidad, horas de conducción y ocupación temporal quedan fuera de Assignment y pertenecen a Scheduling. El resultado expone `handoff.schema_version=scheduling_input_v1` y `scenarios.selected.trips` como input versionado de la siguiente decisión.
-
-Scheduling Engine 1.0.0 sólo acepta una corrida `assignment_v1` aprobada del mismo Decision Case y del mismo Data Pack. Conserva exactamente viajes, `vehicle_id`, rutas, órdenes, productos, unidades y kg. CP-SAT decide únicamente fechas de salida con `NoOverlap` por vehículo físico. Cuando `delivery_due_date` está completo y habilitado, la jerarquía es: órdenes tardías → días de tardanza → espera → makespan. Sin SLA: espera → makespan.
-
-La aprobación humana de Assignment y Scheduling se persiste dentro de la metadata `decision_case` del run, de modo que el siguiente motor no dependa sólo de `sessionStorage`. La aprobación no altera el fingerprint matemático del resultado.
-
-Dispatch 2.2 permanece disponible únicamente para recuperar y explicar corridas históricas.
+| Where is Decision Case state? | `app/domain/decision_cases.py`; browser `app/static/js/dispatch/cases/decision-case.mjs` |
+| Where is Case persistence? | `app/services/decision_case_service.py` |
+| Where is Data Pack ingestion? | `app/static/js/dispatch/upload/`, `app/services/dispatch_service.py`, `app/validators/contracts.py` |
+| Where are Case Attributes / Data Owner? | `dispatch/cases/case-identity.mjs`, `cases/workflow-context.mjs`, atomic attributes API/RPC |
+| Where is Decision Owner? | `dispatch/cases/workflow-responsibility.mjs`, Map mounting in `cases/workflow-context.mjs`; SQL eligibility/authority |
+| Where is a Run admitted/executed? | `app/routes/dispatch.py` → `app/services/dispatch_job_service.py` → `worker.py` |
+| Where is a Run approved? | `POST /api/runs/{run_id}/approve` → Case service → `approve_decision_run_version` |
+| Where is downstream invalidation? | SQL `decision_runs_reopen` / `dation_private.invalidate_run_lineage` |
+| Where is Case Context? | `dispatch/decision-config-ui.mjs::decisionCaseCard`; global `workflow-context.css` |
+| Where is dashboard shell behavior? | `dispatch/dashboard-presentation.mjs`, `dispatch/runs/dashboard-{toolbar,actions}.mjs`; feature shell markup stays in D1/D2 |
+| Where is Assignment? | `dispatch/assignment/`, `app/engines/assignment/`, `app/models/assignment_config.py` |
+| Where is Scheduling? | `dispatch/scheduling/`, `app/engines/scheduling/`, `app/models/scheduling_config.py` |
 
 ## Frontend
 
-La pantalla de ingesta usa módulos ES legibles bajo `static/js/dispatch/upload/`. Los valores provenientes de archivos se insertan con nodos de texto; el informe CSV utiliza la protección contra fórmulas existente. La pantalla es de dos columnas en escritorio y una en móvil; la barra final siempre comunica por qué el siguiente paso está bloqueado.
+```text
+app/templates/app.html
+  → platform/session.js (verified identity, isolated tab caches, authenticated fetch)
+  → platform/boot.mjs (classic prerequisites, native module boot)
+  → dispatch/workspace.mjs + platform/shell.mjs
 
-El dashboard sigue usando ECharts 6.0.0 empaquetado localmente y mantiene su renderer histórico para resultados anteriores.
+static/js/platform/           Home, Center, Data Hub, Team, settings, onboarding
+static/js/dispatch/
+  cases/                     Case state, attributes, Map, ownership
+  navigation/                URL resource, Case Flow, Decision Navigator, targets
+  assignment/                D1 configuration/content/selectors/evidence
+  scheduling/                D2 configuration/content/calendar/rules
+  runs/                      polling, toolbar, approval actions, trace, export/status
+  upload/                    typed Orders/Fleet ingestion
+  workspace.mjs              one route/preparation/execution coordinator
+  decision-config-ui.mjs      shared config/context/review primitives
+  dashboard-presentation.mjs  shared advanced-analysis disclosure lifecycle
+  result-summary.mjs         escaped persisted-value presentation
+  lifecycle.mjs              scopes, abort/cleanup, focus
+  styles.mjs                 stylesheet readiness and retry
+  shared.mjs                 current API errors/recovery/format/charts
+```
 
-## IA
+No bundler, npm package build, React or TypeScript toolchain is introduced. Classic
+UI and historical renderers remain because old result schemas are supported.
+Styles retain their current order, selectors and tokens. Feature files own business
+interpretation and charts; shared components own actual repeated behavior.
 
-El intérprete recibe un contexto derivado del `DecisionResult`. No recalcula ni selecciona el plan. La guardia numérica sigue siendo conservadora y la indisponibilidad del LLM no invalida una decisión persistida.
+The URL identifies Case → Decision → Run. Persisted Run lineage overrides cached
+selection. The workspace owns route generations, AbortSignals and session drafts;
+late responses cannot replace another route. Applied preparation before valid CSV
+is a session snapshot, promoted through the existing atomic API once inputs exist.
 
-## Deuda registrada
+Moved native modules have explicit redirects in
+`app/static/contracts/foundation-module-redirects.json`. FastAPI resolves old lazy
+URLs directly to canonical source with revalidation. Compatibility named exports
+in Case context/config UI delegate to the same implementation, preserving imports
+from already-open tabs without duplicate components.
 
-- Crear un baseline SQL reproducible cuando se disponga del DDL completo de las tablas originales.
-- Desacoplar y retirar el configurador legacy cuando las corridas históricas estén cubiertas por pruebas de navegador.
-- Incorporar horas intradía, descansos regulatorios detallados, tiempos de carga/descarga, volumen y multiparada en una versión posterior.
-- Evaluar colas y aislamiento al aumentar concurrencia.
+## Backend and authority
 
+```text
+browser → authenticated route/model → service/platform operation
+        → tenant repository or checked platform RPC
+        → Supabase database / private Storage / durable job queue
+        → worker → deterministic engine → persisted result
+```
 
-## UX de carga 2026-10-02
+`app/domain/decision_cases.py` is pure creation/validation/history projection. It
+has no HTTP, tenant context or database dependency. Home, Center and the Case service
+reuse this projection. Services own persistence and orchestration. Transport models
+and the 91-path OpenAPI contract remain compatible.
 
-La pantalla de carga funciona como asistente de ingesta: stepper Órdenes → Flota →
-Revisión, resumen sticky en escritorio y barra inferior en móvil. La flota vigente se
-reutiliza automáticamente, la carga se compacta una vez validada y el frontend muestra
-qué interpretó del CSV antes de avanzar.
+`platform/context.py` binds verified user/workspace authority. `platform/repository.py`
+scopes REST/Storage operations and checked RPC allowlists. `platform/identity.py`
+handles platform RPCs and SQL error translation. A browser-provided owner/workspace
+ID is not authority. SQL revalidates membership, eligibility, archive state, object
+ownership and optimistic versions in the transaction.
 
-Los avisos del preflight llegan agrupados desde backend; la UI no traduce códigos del
-motor. El gráfico de demanda versus capacidad propia usa ECharts vendorizado y tiene
-alternativa tabular. La guía de formato usa el contrato servido por backend.
+`dispatch_job_service.py` owns admission/idempotency, job leases and reconciliation.
+`worker.py` is deployed independently from the API. Admission and approval share
+locks; new Runs retire current approvals and invalidate downstream lineage without
+deleting results or historical actors. Case state JSON is an eventually consistent
+projection, never an independent approval source.
 
+Assignment stays non-temporal. Scheduling consumes the current approved Assignment
+handoff, preserving trips, loads and vehicles. Historical Dispatch/Logistics engines
+remain available for old Runs. AI does not optimize, recalculate or select the plan.
 
-## Decision Chain — Fase 2
+## Persistence and compatibility
 
-`static/js/dispatch/decision-case.mjs` implementa la máquina de estados del caso y `decision-map.mjs` su representación. El estado operativo de un nodo es distinto de su Data Readiness.
+Case → immutable Orders/Fleet; Run → Case/node/upstream Run; approval events → Run;
+assignment → Case/node/member; durable job → Run. Private responsibility aliases
+and older engine/JSON fields remain for upgrade/history compatibility. The partial
+approval index, locks, tenant constraints and RLS remain unchanged. Foundation
+stabilization adds no SQL migration and performs no business-data rewrite.
 
-Estados soportados: `AVAILABLE`, `RUNNING`, `REVIEW`, `APPROVED`, `LOCKED`, `NEEDS_DATA`, `ERROR` y `STALE`.
+## Verification and related documents
 
-Sólo Assignment tiene motor ejecutable en esta fase. Scheduling puede aparecer como `AVAILABLE` después de aprobar Assignment cuando sus datos están completos, pero el CTA informa que su motor llega en la siguiente fase. Final Assignment permanece bloqueado hasta disponer de una Scheduling aprobada.
+The configured static gates are Python compilation, JS syntax and import/contract
+checks. There is no configured TypeScript/Python static typechecker or standalone
+linter; do not describe compilation as type inference. Docker is the production
+build. Hash-locked offline wheels can validate the same container when local Docker
+cannot resolve PyPI; the production Dockerfile is unchanged.
 
-El caso vive en `sessionStorage` para preservar navegación y recarga dentro de la sesión. Las corridas sí conservan lineage durable mediante `decision_case` dentro de JSON existente. No se agregó tabla ni migración.
-
-
-## Decision Chain — Fase 3
-
-Assignment y Scheduling dejan de compartir motor.
-
-**Assignment 1.0.0**
-- schema: `assignment_v1`;
-- objetivos: viajes, costo, uso de flota propia y CO₂;
-- no usa fechas ni SLA;
-- salida principal: viajes + vehículo + cargas;
-- handoff: `scheduling_input_v1`.
-
-El preflight activo también es específico de Assignment y ya no genera hallazgos de tardanza o capacidad diaria. Decision Readiness conserva las columnas temporales para indicar si Scheduling tendrá datos suficientes una vez aprobado Assignment.
-
-Las corridas `dispatch_v1/dispatch_v2` permanecen visibles, pero no pueden aprobar un nodo Assignment nuevo.
-
-
-## Decision Chain — Fase 4
-
-Scheduling pasa a ser un motor ejecutable.
-
-**Scheduling 1.0.0**
-- schema: `scheduling_v1`;
-- input obligatorio: Assignment V1 aprobada + `scheduling_input_v1`;
-- Assignment queda inmutable;
-- usa `estimated_dispatch_date`, `available_from`, `available_until`, velocidad y horas de conducción;
-- bloquea superposición de viajes del mismo `vehicle_id`;
-- calcula salida, llegada, ciclo y próxima disponibilidad;
-- puede proteger `delivery_due_date` de forma jerárquica cuando el dato está completo;
-- handoff: `final_assignment_input_v1`.
-
-El Decision Map permite configurar, ejecutar, revisar y aprobar Scheduling. Sólo después de una Scheduling aprobada puede desbloquearse Final Assignment si su Data Readiness está completo.
+See [domain](domain-model.md), [navigation](navigation.md),
+[components](component-map.md), [Runs](decision-runs.md),
+[naming](naming-conventions.md), [audit](foundation-audit.md),
+[migration/rollback](foundation-migration-plan.md) and
+[verification/debt](foundation-refactor-summary.md).
+The former incremental architecture notes are preserved in
+[the historical archive](archive/architecture-dispatch-evolution.md); they describe
+earlier phases and do not override current code or these canonical contracts.

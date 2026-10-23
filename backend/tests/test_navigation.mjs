@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {readResource,resourceUrl,runDecisionState,runContext} from '../app/static/js/dispatch/navigation.mjs';
+import {readResource,resourceUrl,runDecisionState,runContext} from '../app/static/js/dispatch/navigation/resource.mjs';
 const id='00000000-0000-4000-8000-000000000004';
 test('legacy scheduling links preserve decision identity',()=>{assert.equal(readResource('http://qa/app?dda=scheduling_v1&run_id='+id).nodeId,'logistics_scheduling');});
 test('map transitions remove run and legacy schema parameters',()=>{const url=resourceUrl('http://qa/app?dda=scheduling_v1&run_id='+id,{view:'logistics-map',caseId:id});assert.equal(url.searchParams.get('run_id'),null);assert.equal(url.searchParams.get('dda'),null);});

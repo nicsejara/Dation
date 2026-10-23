@@ -16,10 +16,10 @@ class AssignmentDashboardPhase3Tests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.dashboard = (JS / "dashboard.mjs").read_text()
-        cls.selectors = (JS / "assignment-dashboard-selectors.mjs").read_text()
-        cls.summary = (JS / "assignment-comparative-summary.mjs").read_text()
-        cls.comparison = (JS / "assignment-comparison.mjs").read_text()
-        cls.validation = (JS / "assignment-validation.mjs").read_text()
+        cls.selectors = (JS / "assignment/assignment-dashboard-selectors.mjs").read_text()
+        cls.summary = (JS / "assignment/assignment-comparative-summary.mjs").read_text()
+        cls.comparison = (JS / "assignment/assignment-comparison.mjs").read_text()
+        cls.validation = (JS / "assignment/assignment-validation.mjs").read_text()
         cls.styles = (CSS / "assignment-dashboard-comparative.css").read_text()
         cls.fixture = json.loads(FIXTURE.read_text())
 
@@ -32,7 +32,7 @@ class AssignmentDashboardPhase3Tests(unittest.TestCase):
               getDefaultComparisonKey,
               getComparisonContext,
               compareScenarioMetric,
-            }} from './app/static/js/dispatch/assignment-dashboard-selectors.mjs';
+            }} from './app/static/js/dispatch/assignment/assignment-dashboard-selectors.mjs';
 
             const run = {json.dumps(self.fixture)};
             const result = run.result_json;
@@ -116,7 +116,7 @@ class AssignmentDashboardPhase3Tests(unittest.TestCase):
         self.assertIn('@container(max-width:480px)',self.styles)
         for orphan in ('implications','priorities','outcomes','layer__trace'):
             self.assertNotIn(orphan,self.styles)
-        scheduling=(JS/'scheduling-dashboard.mjs').read_text()
+        scheduling=(JS/'scheduling/scheduling-dashboard.mjs').read_text()
         self.assertNotIn('assignment-comparison.mjs',scheduling)
         self.assertNotIn('assignment-comparative-summary.mjs',scheduling)
 

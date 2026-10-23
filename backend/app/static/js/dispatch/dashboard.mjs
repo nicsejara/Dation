@@ -1,26 +1,26 @@
 import {iconSvg} from "./decision-ui.mjs";
 import {ensureStylesheet} from "./styles.mjs";
-import {bindDashboardActions} from './dashboard-actions.mjs';
+import {bindDashboardActions} from './runs/dashboard-actions.mjs';
 import {createScope,disposeScope,scopeFor} from "./lifecycle.mjs";
 import {esc,num,download,dispose,errorBox,api} from './shared.mjs';
 import * as hero from './hero.mjs';
-import * as assignment from './assignment.mjs';
+import * as assignment from './assignment/assignment.mjs';
 import * as review from './review.mjs';
 import * as explanation from './explanation.mjs';
-import * as assignmentSummary from './assignment-summary.mjs';
-import * as assignmentEvidence from './assignment-evidence.mjs';
-import * as assignmentValidation from './assignment-validation.mjs';
-import * as assignmentEssential from './assignment-essential.mjs';
-import * as assignmentAiSummary from './assignment-ai-summary.mjs';
-import * as assignmentAdvanced from './assignment-advanced.mjs';
+import * as assignmentSummary from './assignment/assignment-summary.mjs';
+import * as assignmentEvidence from './assignment/assignment-evidence.mjs';
+import * as assignmentValidation from './assignment/assignment-validation.mjs';
+import * as assignmentEssential from './assignment/assignment-essential.mjs';
+import * as assignmentAiSummary from './assignment/assignment-ai-summary.mjs';
+import * as assignmentAdvanced from './assignment/assignment-advanced.mjs';
 import * as comparativeUpgrade from './comparative-upgrade.mjs';
-import {downloadRunExport} from './export.mjs';
-import * as schedulingDashboard from './scheduling-dashboard.mjs';
-import {decisionRail,bindDecisionRail} from './decision-nav.mjs';
+import {downloadRunExport} from './runs/export.mjs';
+import * as schedulingDashboard from './scheduling/scheduling-dashboard.mjs';
+import {decisionRail,bindDecisionRail} from './navigation/decision-nav.mjs';
 import {
   renderAssignmentShell,
   bindAssignmentShell,
-} from './assignment-dashboard-shell.mjs';
+} from './assignment/assignment-dashboard-shell.mjs';
 
 const ASSIGNMENT_STYLE_ID='assignment-dashboard-v2-styles';
 const ASSIGNMENT_ESSENTIAL_STYLE_ID='assignment-dashboard-essential-styles';

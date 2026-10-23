@@ -1,5 +1,5 @@
 import {createScope} from '../dispatch/lifecycle.mjs';
-import {readResource,resourceUrl} from '../dispatch/navigation.mjs';
+import {readResource,resourceUrl} from '../dispatch/navigation/resource.mjs';
 import {focusDdaCatalog} from './dda-catalog.mjs';
 import {iconSvg} from '../dispatch/decision-ui.mjs';
 import {heroCta} from './components.mjs';

@@ -16,12 +16,12 @@ class AssignmentDashboardPhase2Tests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.dashboard = (JS / "dashboard.mjs").read_text()
-        cls.shell = (JS / "assignment-dashboard-shell.mjs").read_text()
-        cls.toolbar = (JS / "dashboard-toolbar.mjs").read_text()
-        cls.selectors = (JS / "assignment-dashboard-selectors.mjs").read_text()
-        cls.summary = (JS / "assignment-summary.mjs").read_text()
-        cls.evidence = (JS / "assignment-evidence.mjs").read_text()
-        cls.validation = (JS / "assignment-validation.mjs").read_text()
+        cls.shell = (JS / "assignment/assignment-dashboard-shell.mjs").read_text()
+        cls.toolbar = (JS / "runs/dashboard-toolbar.mjs").read_text()
+        cls.selectors = (JS / "assignment/assignment-dashboard-selectors.mjs").read_text()
+        cls.summary = (JS / "assignment/assignment-summary.mjs").read_text()
+        cls.evidence = (JS / "assignment/assignment-evidence.mjs").read_text()
+        cls.validation = (JS / "assignment/assignment-validation.mjs").read_text()
         cls.styles = (CSS / "assignment-dashboard-essential.css").read_text()
         cls.fixture = json.loads(FIXTURE.read_text())
 
@@ -36,7 +36,7 @@ class AssignmentDashboardPhase2Tests(unittest.TestCase):
               getAssignmentVehicles,
               getAssignmentOrders,
               getApprovalWarnings,
-            }} from './app/static/js/dispatch/assignment-dashboard-selectors.mjs';
+            }} from './app/static/js/dispatch/assignment/assignment-dashboard-selectors.mjs';
 
             const run = {json.dumps(self.fixture)};
             const result = run.result_json;
@@ -174,7 +174,7 @@ class AssignmentDashboardPhase2Tests(unittest.TestCase):
         self.assertIn("@media(max-width:520px)", self.styles)
         self.assertIn("prefers-reduced-motion", self.styles)
         self.assertIn("ensureStylesheet(ASSIGNMENT_ESSENTIAL_STYLE_ID,'/static/css/assignment-dashboard-essential.css')", self.dashboard)
-        scheduling = (JS / "scheduling-dashboard.mjs").read_text()
+        scheduling = (JS / "scheduling/scheduling-dashboard.mjs").read_text()
         self.assertNotIn("assignment-summary.mjs", scheduling)
         self.assertNotIn("assignment-evidence.mjs", scheduling)
         self.assertNotIn("assignment-validation.mjs", scheduling)

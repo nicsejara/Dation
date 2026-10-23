@@ -409,7 +409,7 @@ class FrontendContractTests(
             / "static"
             / "js"
             / "dispatch"
-            / "assignment.mjs"
+            / "assignment/assignment.mjs"
         ).read_text(encoding="utf-8")
         review = (
             BACKEND_ROOT
@@ -505,7 +505,7 @@ class FrontendContractTests(
             / "static"
             / "js"
             / "dispatch"
-            / "assignment.mjs"
+            / "assignment/assignment.mjs"
         ).read_text(encoding="utf-8")
         actions = (
             BACKEND_ROOT
@@ -513,7 +513,7 @@ class FrontendContractTests(
             / "static"
             / "js"
             / "dispatch"
-            / "dashboard-toolbar.mjs"
+            / "runs/dashboard-toolbar.mjs"
         ).read_text(encoding="utf-8")
         exporter = (
             BACKEND_ROOT
@@ -521,7 +521,7 @@ class FrontendContractTests(
             / "static"
             / "js"
             / "dispatch"
-            / "export.mjs"
+            / "runs/export.mjs"
         ).read_text(encoding="utf-8")
 
         config_render = workspace.split(
@@ -584,7 +584,7 @@ class FrontendContractTests(
             / "static"
             / "js"
             / "dispatch"
-            / "decision-map.mjs"
+            / "cases/decision-map.mjs"
         ).read_text(encoding="utf-8")
         decision_case = (
             BACKEND_ROOT
@@ -592,7 +592,7 @@ class FrontendContractTests(
             / "static"
             / "js"
             / "dispatch"
-            / "decision-case.mjs"
+            / "cases/decision-case.mjs"
         ).read_text(encoding="utf-8")
         dashboard = (
             BACKEND_ROOT
@@ -604,7 +604,7 @@ class FrontendContractTests(
         ).read_text(encoding="utf-8")
         scheduling = "\n".join(
             (BACKEND_ROOT / "app/static/js/dispatch" / name).read_text(encoding="utf-8")
-            for name in ("scheduling-dashboard.mjs", "scheduling-dashboard-shell.mjs", "scheduling-timeline.mjs")
+            for name in ("scheduling/scheduling-dashboard.mjs", "scheduling/scheduling-dashboard-shell.mjs", "scheduling/scheduling-timeline.mjs")
         )
         exporter = (
             BACKEND_ROOT
@@ -612,7 +612,7 @@ class FrontendContractTests(
             / "static"
             / "js"
             / "dispatch"
-            / "export.mjs"
+            / "runs/export.mjs"
         ).read_text(encoding="utf-8")
 
         self.assertIn(
@@ -696,14 +696,14 @@ class FrontendContractTests(
             dispatch_root / "shared.mjs"
         ).read_text(encoding="utf-8")
         exporter = (
-            dispatch_root / "export.mjs"
+            dispatch_root / "runs/export.mjs"
         ).read_text(encoding="utf-8")
         dashboard = (
             dispatch_root / "dashboard.mjs"
         ).read_text(encoding="utf-8")
         scheduling = "\n".join(
             (BACKEND_ROOT / "app/static/js/dispatch" / name).read_text(encoding="utf-8")
-            for name in ("scheduling-dashboard.mjs", "scheduling-dashboard-shell.mjs", "scheduling-timeline.mjs")
+            for name in ("scheduling/scheduling-dashboard.mjs", "scheduling/scheduling-dashboard-shell.mjs", "scheduling/scheduling-timeline.mjs")
         )
         explanation = (
             dispatch_root / "explanation.mjs"
@@ -1148,7 +1148,7 @@ class FrontendContractTests(
             / "static"
             / "js"
             / "dispatch"
-            / "decision-map.mjs"
+            / "cases/decision-map.mjs"
         ).read_text(encoding="utf-8")
         decision_case = (
             BACKEND_ROOT
@@ -1156,7 +1156,7 @@ class FrontendContractTests(
             / "static"
             / "js"
             / "dispatch"
-            / "decision-case.mjs"
+            / "cases/decision-case.mjs"
         ).read_text(encoding="utf-8")
         dashboard = (
             BACKEND_ROOT
@@ -1274,17 +1274,17 @@ class FrontendContractTests(
             dispatch_root / "workspace.mjs"
         ).read_text(encoding="utf-8")
         decision_map = (
-            dispatch_root / "decision-map.mjs"
+            dispatch_root / "cases/decision-map.mjs"
         ).read_text(encoding="utf-8")
         decision_nav = (
-            dispatch_root / "decision-nav.mjs"
+            dispatch_root / "navigation/decision-nav.mjs"
         ).read_text(encoding="utf-8")
         dashboard = (
             dispatch_root / "dashboard.mjs"
         ).read_text(encoding="utf-8")
         scheduling = "\n".join(
             (BACKEND_ROOT / "app/static/js/dispatch" / name).read_text(encoding="utf-8")
-            for name in ("scheduling-dashboard.mjs", "scheduling-dashboard-shell.mjs", "scheduling-timeline.mjs")
+            for name in ("scheduling/scheduling-dashboard.mjs", "scheduling/scheduling-dashboard-shell.mjs", "scheduling/scheduling-timeline.mjs")
         )
 
         self.assertIn(
@@ -1371,7 +1371,7 @@ class FrontendContractTests(
             / "static"
             / "js"
             / "dispatch"
-            / "decision-map.mjs"
+            / "cases/decision-map.mjs"
         ).read_text(encoding="utf-8")
         css = (
             BACKEND_ROOT
@@ -1384,7 +1384,7 @@ class FrontendContractTests(
         for marker in (
             "dispatch-decision-node__statusline",
             "dispatch-decision-edge",
-            "dispatch-map-casebar",
+            "decisionCaseCard(",
             "dependencyReady",
             "dataReady",
             "missingData",
@@ -1422,7 +1422,7 @@ class FrontendContractTests(
             / "dispatch"
         )
         decision_map = (
-            dispatch_root / "decision-map.mjs"
+            dispatch_root / "cases/decision-map.mjs"
         ).read_text(encoding="utf-8")
         decision_ui = (
             dispatch_root / "decision-ui.mjs"
@@ -1438,14 +1438,13 @@ class FrontendContractTests(
         for copy in (
             'title:decisionCase?.label||"Decision Case"',
             "CÓMO AVANZA EL CASO",
-            "DECISION CASE",
-            "DATA PACK ACTIVO",
-            "Datos validados",
             "¿Qué decisión querés revisar o ejecutar?",
             "SIGUIENTE DECISIÓN",
-            "canonical_filename",
         ):
             self.assertIn(copy, decision_map)
+        shared = (dispatch_root / 'decision-config-ui.mjs').read_text(encoding='utf-8')
+        for marker in ('Contexto del Case', 'Data Owner', 'Órdenes + Flota', 'canonical_filename'):
+            self.assertIn(marker, shared)
 
         for copy in (
             'label: "Disponible"',
@@ -1568,7 +1567,7 @@ class FrontendContractTests(
     def test_dda_internal_navigation_contract(self):
         dispatch_root = BACKEND_ROOT / "app/static/js/dispatch"
         workspace = (dispatch_root / "workspace.mjs").read_text()
-        flow = (dispatch_root / "case-navigation.mjs").read_text()
+        flow = (dispatch_root / "navigation/case-flow.mjs").read_text()
         context = (BACKEND_ROOT / "app/static/js/platform/dda-navigation.mjs").read_text()
         shell = (BACKEND_ROOT / "app/static/js/platform/shell.mjs").read_text()
         for marker in ('id="dda-workspace-nav-shell"', 'id="dda-workspace-nav"', 'window.dationRenderCaseFlow?.(currentView)'):

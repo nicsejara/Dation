@@ -1,7 +1,7 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-UI = (ROOT / "app" / "static" / "js" / "dispatch" / "scheduling-config-v2.mjs").read_text(encoding="utf-8")
+UI = (ROOT / "app" / "static" / "js" / "dispatch" / "scheduling/scheduling-config-v2.mjs").read_text(encoding="utf-8")
 CSS = (ROOT / "app" / "static" / "css" / "scheduling-config-shared-phase2.css").read_text(encoding="utf-8")
 
 

@@ -52,6 +52,7 @@ Phase 4 activates the second engine in the chain. Assignment 1.0.0 still decides
 Dation/
 ├── backend/
 │   ├── app/
+│   │   ├── domain/        pure Case state and authoritative history projection
 │   │   ├── engines/       deterministic DDA engines
 │   │   ├── knowledge/     interpreter knowledge base
 │   │   ├── models/        typed decision configuration
@@ -81,10 +82,26 @@ Real credentials and `.env` files must never be committed.
 Runtime secrets remain in Google Secret Manager / Cloud Run.
 
 
-## Dispatch 1.0 activation
+## Architecture and verification
 
-The new flow requires the additive Supabase migration applied manually by the owner.
-Until then the UI reports the missing activation and offers the legacy workflow.
-See [deployment](backend/DEPLOYMENT.md), [architecture](docs/architecture.md),
-[data contracts](docs/data-contracts.md), [model ADR](docs/adr/0001-dispatch-decision-model.md),
-[validation](docs/validation-dispatch-v1.md) and [CSV test guide](sample_data/v1/README.md).
+Start with [the current architecture](docs/architecture.md),
+[domain model](docs/domain-model.md), [component map](docs/component-map.md),
+[navigation](docs/navigation.md) and [Decision Runs](docs/decision-runs.md).
+[Foundation stabilization](docs/foundation-refactor-summary.md) records the baseline,
+validation commands, compatibility boundaries and intentionally retained debt.
+
+Run Python and Node regressions from `backend/`:
+
+```sh
+python -m unittest discover -s tests -v
+node --test tests/test_*.js tests/test_*.mjs
+.browser-venv/bin/python -m unittest discover -s tests/browser -v
+python tests/e2e/run_suite.py
+```
+
+Browser tests use synthetic APIs; E2E uses owned disposable PostgreSQL 17,
+PostgREST, Storage/Auth fixtures, actual API/worker and engines. Never target those
+fixtures at production. SQL integration also requires an owned PostgreSQL container
+via `DATION_SQL_TEST_CONTAINER`. Production packaging uses `docker build .`.
+See [deployment](backend/DEPLOYMENT.md) for operational prerequisites; normal setup
+must not replay already-applied production migrations.

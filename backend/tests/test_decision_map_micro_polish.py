@@ -10,7 +10,7 @@ CSS = (
     / "decision-map-case-v2.css"
 ).read_text(encoding="utf-8")
 DESIGN_SYSTEM = (BACKEND_ROOT / "app/static/css/dation-design-system.css").read_text(encoding="utf-8")
-MAP_UI = (BACKEND_ROOT / "app/static/js/dispatch/decision-map.mjs").read_text(encoding="utf-8")
+MAP_UI = (BACKEND_ROOT / "app/static/js/dispatch/cases/decision-map.mjs").read_text(encoding="utf-8")
 
 
 class DecisionMapMicroPolishTests(unittest.TestCase):
@@ -34,16 +34,16 @@ class DecisionMapMicroPolishTests(unittest.TestCase):
 
     def test_progress_uses_numbered_milestones_without_labels(self):
         for marker in (
-            'content:"1"',
-            'content:"2"',
-            'content:"3"',
-            ".dispatch-case-progress__grid::before",
-            ".dispatch-case-progress__item.is-approved:not(:last-child)::before",
-            "height:30px!important",
+            "repeat(var(--decision-count),minmax(0,1fr))",
+            ".dispatch-case-progress__item:not(:first-child)::before",
+            ".dispatch-case-progress__item.is-reached::before",
+            "height:22px!important",
             ".dispatch-case-progress__label",
-            "display:none!important",
+            "clip-path:inset(50%)",
         ):
             self.assertIn(marker, CSS)
+        self.assertIn("(index+1)", MAP_UI)
+        self.assertIn("DECISION_ORDER.length", MAP_UI)
 
     def test_reduced_motion_removes_cta_translation(self):
         self.assertIn("@media(prefers-reduced-motion:reduce)", DESIGN_SYSTEM)
