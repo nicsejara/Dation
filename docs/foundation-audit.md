@@ -125,7 +125,7 @@ intentionally. Share their repeated lifecycle, not a configurable mega-template.
 | Change Data Pack | `PUT /api/platform/decisions/{id}/data-pack` → validate typed inputs → `platform_replace_case_data_pack` (immutable fork) |
 | Owner assignment | responsibility selector → `PUT …/responsibilities/{stage}` → `platform_workflow_responsibilities` |
 | Configuration gates | `GET …/workflow-readiness?node_id=…` → typed preflight + `platform_validate_decision_stage` |
-| Create Run | config → `POST /api/dispatch/run` → queue enqueue → `platform_rpc` → admission trigger |
+| Create Run | config → `POST /api/runs?run_id=…` → queue enqueue → `platform_rpc` → admission trigger |
 | Read result/history | `GET /api/runs/{id}`, Case/run history endpoints → bounded reads + authoritative SQL summaries |
 | Approve Run | `POST /api/runs/{id}/approve` → validation + `approve_decision_run_version` |
 | Downstream invalidation | new admission → `decision_runs_reopen` → `invalidate_run_lineage`; history retained |
