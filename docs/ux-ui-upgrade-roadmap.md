@@ -1,7 +1,7 @@
 # Dation · UX/UI upgrade roadmap
 
 Fecha: 2026-10-23 · Base de planificación: `1477b41`.
-Estado: **no iniciado**. Este documento no autoriza implementación ni despliegue.
+Estado: **en ejecución autorizada** por el master prompt del 2026-10-23. Base de implementación: `ee404b1`; rama local `ux-ui/commercial-mvp-upgrade`. No incluye publicación.
 
 Fuentes: [auditoría](ux-ui-upgrade-audit.md), [propuesta](ux-ui-upgrade-proposal.md) y contratos funcionales actuales de `/docs`.
 
@@ -215,3 +215,19 @@ La publicación es una acción posterior con su propio resultado revisable; este
 ## Próximo lote recomendado
 
 Aprobar la dirección y un primer lote acotado de UX-001/UX-002, con criterios de aceptación por texto funcional y foco visible; después ampliar a densidad, tipografía y componentes compartidos. No iniciar implementación hasta recibir esa aprobación.
+
+## Registro de ejecución
+
+La auditoría y la propuesta originales se conservan. Este registro documenta la implementación autorizada posterior.
+
+| Phase | Estado | Alcance / evidencia | Commit |
+| --- | --- | --- | --- |
+| 0 | Complete | Roles de tipografía, superficies y radios del sistema existente; Inter y paleta preservadas; QA: 6 tests unitarios de primitives y 7 browser de plataforma; diff check limpio | incluido en este commit |
+| 1 | Pending | — | — |
+| 2 | Pending | — | — |
+| 3 | Pending | — | — |
+| 4 | Pending | — | — |
+| 5 | Pending | — | — |
+| 6 | Pending | — | — |
+| 7 | Pending | — | — |
+| 8 | Pending | — | — |

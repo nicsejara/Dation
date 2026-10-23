@@ -122,9 +122,9 @@
   --workflow-context-control-min-width: 14ch;
   --workflow-action-min-width: calc(var(--workflow-context-control-min-width) + 2 * var(--workflow-action-padding-x));
   --hero-min-height: 220px;
-  --hero-padding: 26px;
-  --hero-gap: 24px;
-  --hero-title-size: clamp(28px,3vw,40px);
+  --hero-padding: var(--space-6);
+  --hero-gap: var(--space-6);
+  --hero-title-size: clamp(24px,2.4vw,32px);
   --hero-lead-size: 14px;
   --hero-workflow-min-height: 260px;
   --hero-copy-gap: var(--space-2);
@@ -142,7 +142,7 @@
   :root { --topbar-height: 54px; --hero-padding: 20px; --hero-gap: 20px; }
 }
 
-/* Platform foundation roles. Existing workflow, dashboard and shell values stay intact. */
+/* Shared product type roles. Platform and workflow consumers use the same scale. */
 :root {
   --platform-type-page-title: clamp(24px,2.4vw,32px);
   --platform-type-section-title: 20px;
@@ -167,4 +167,9 @@
   --platform-control-bg-hover: var(--color-surface-raised);
   --platform-control-fg: var(--color-text);
   --platform-control-placeholder: var(--color-text-muted);
+  /* Surface and geometry roles reuse the existing mineral palette and scale. */
+  --color-surface-group: var(--color-surface-raised);
+  --radius-panel: var(--radius-lg);
+  --radius-overlay: var(--radius-xl);
+  --number-weight: 600;
 }

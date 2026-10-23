@@ -134,7 +134,7 @@
   box-sizing:border-box; width:min(40rem,calc(100vw - 32px)); max-width:calc(100vw - 32px);
   max-height:calc(100dvh - 32px); margin:auto; padding:var(--space-6);
   overflow:auto; overscroll-behavior:contain; scroll-padding:var(--space-4);
-  border:1px solid var(--color-control-border); border-radius:var(--radius-xl);
+  border:1px solid var(--color-control-border); border-radius:var(--radius-overlay);
   color:var(--color-text); background:var(--color-surface); box-shadow:var(--shadow-lg);
   font:400 var(--platform-type-body)/var(--platform-line-body) var(--font-sans);
 }
