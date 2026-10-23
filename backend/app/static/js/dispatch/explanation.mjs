@@ -1,5 +1,5 @@
 import {iconSvg} from "./decision-ui.mjs";
-import {createScope} from "./lifecycle.mjs";
+import {createScope,trapFocus} from "./lifecycle.mjs";
 import {esc,api,post,errorBox} from './shared.mjs';
 
 function textBlock(value){
@@ -196,11 +196,21 @@ export function chat(root,run,initialQuestion=''){
   const result=run.result_json;
   const meta=schemaMeta(result);
   const questions=starterQuestions(result).slice(0,4);
+  const dashboard=root.closest('.d-decision-dashboard');
+  const launcher=dashboard?.querySelector('[data-chat]');
+  root.id=launcher?.getAttribute('aria-controls')||'decision-assistant';
+  root.setAttribute('role','dialog');root.setAttribute('aria-label','Dation IA · '+meta.label);
+  const workspace=window.dationSession?.identity?.workspace?.name;
+  const context=[workspace,'DDA Logística',run.decision_case_id?'Case '+String(run.decision_case_id).slice(0,8):null,meta.label,'Run '+String(run.id).slice(0,8)].filter(Boolean).join(' · ');
+  const busy=value=>{root.setAttribute('aria-busy',String(value));dashboard?.dispatchEvent(new CustomEvent('dispatch:assistant-busy',{detail:{busy:value}}));};
+  scope.own(()=>busy(false));
+  const modal=()=>root.setAttribute('aria-modal',String(matchMedia('(max-width:700px)').matches));
+  scope.listen(window,'resize',modal);modal();
 
   root.innerHTML=
     '<div class="dispatch-chat-heading">'
       +'<div><span class="dispatch-kicker">DATION IA</span><h2>'+esc(meta.title)+'</h2>'
-      +'<small class="dispatch-chat-context">Contexto · '+esc(meta.label)+' · corrida '+esc(String(run.id).slice(0,8))+'…</small></div>'
+      +'<small class="dispatch-chat-context">'+esc(context)+'</small></div>'
       +'<button data-close class="dispatch-chat-close" aria-label="Cerrar chat">'+iconSvg("x","dispatch-action-icon")+'</button>'
     +'</div>'
     +'<div class="dispatch-chat-boundary">'+iconSvg("sparkles","dispatch-action-icon")+'<p>'+esc(meta.description)+' Si una causa no está demostrada por la evidencia, Dation lo indica explícitamente.</p></div>'
@@ -223,7 +233,7 @@ export function chat(root,run,initialQuestion=''){
     toggle?.setAttribute('aria-expanded','false');toggle?.focus({preventScroll:true});
   };
   root.querySelector('[data-close]').onclick=closeChat;
-  scope.listen(root,'keydown',event=>{if(event.key==='Escape'){event.preventDefault();event.stopPropagation();closeChat();}});
+  scope.listen(root,'keydown',event=>{if(root.getAttribute('aria-modal')==='true')trapFocus(event,root);if(event.key==='Escape'){event.preventDefault();event.stopPropagation();closeChat();}});
 
   const messages=root.querySelector('[data-messages]');
   const field=root.querySelector('textarea');
@@ -256,7 +266,7 @@ export function chat(root,run,initialQuestion=''){
     const question=String(raw||'').trim();
     if(question.length<2||sending)return;
     const turn=retryTurn?.question===question?retryTurn:{question,id:crypto.randomUUID()};
-    sending=true;
+    sending=true;busy(true);
     submit.disabled=true;
     add('user',question);
     field.value='';
@@ -276,7 +286,7 @@ export function chat(root,run,initialQuestion=''){
       field.value=question;
     }finally{
       if(!scope.active)return;
-      sending=false;
+      sending=false;busy(false);
       submit.disabled=false;
       field.focus();
     }

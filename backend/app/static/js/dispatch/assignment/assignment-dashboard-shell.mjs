@@ -1,3 +1,4 @@
+import {renderAssistantLauncher,bindAssistantLauncher} from '../runs/contextual-assistant.mjs';
 import {iconSvg} from '../decision-ui.mjs';
 import {esc} from '../shared.mjs';
 import {scopeFor} from '../lifecycle.mjs';
@@ -32,7 +33,7 @@ export function renderAssignmentShell(root,run,caseActions={}){
       +'<section class="dispatch-panel assignment-dashboard-v2__section assignment-dashboard-v2__review" id="dispatch-review"><div data-review-content></div></section>'
     +'</main>'
     +''
-    +'<aside class="dispatch-chat dispatch-panel assignment-dashboard-v2__chat" hidden aria-label="Chat de la decisión"></aside>'+drawer;
+    +'<aside class="dispatch-chat dispatch-panel assignment-dashboard-v2__chat" hidden aria-label="Chat de la decisión"></aside>'+drawer+renderAssistantLauncher(run);
   const find=selector=>root.querySelector(selector);
   return {hero:find('[data-assignment-hero-copy]'),context:find('#assignment-context'),kpis:find('#assignment-kpis'),insights:find('#assignment-insights'),
     scenarios:find('#assignment-scenarios'),resources:find('#assignment-resources'),preview:find('#assignment-preview'),assignment:find('#dispatch-assignment'),
@@ -49,6 +50,6 @@ export function bindAssignmentShell(root,run,{onRerun,caseActions={},onOpenChat,
     label:advanced.querySelector('[data-assignment-advanced-label]'),
     storageKey:'dation.assignment.presentation.'+run.id,onAdvancedOpen,
   });
-  scopeFor(root).listen(root.querySelector('[data-chat]'),'click',()=>onOpenChat?.());
+  bindAssistantLauncher(root,()=>onOpenChat?.());
   return {...bindDashboardToolbar(root,run,{onRerun,caseActions}),...presentation};
 }

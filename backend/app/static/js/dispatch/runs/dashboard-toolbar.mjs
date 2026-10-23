@@ -43,7 +43,6 @@ export function renderDashboardToolbar(run,caseActions={},options={}){
       +(caseActions.onApprove&&caseActions.status!=='approved'?'<button type="button" data-approve-toolbar class="dashboard-toolbar__approve '+WORKFLOW_ACTION_CLASS+' d-button--primary">'+actionLabel(approveLabel,'checkCircle')+'</button>':'')
       +'<button type="button" data-after-approve class="dashboard-toolbar__continue '+WORKFLOW_ACTION_CLASS+' d-button--primary" hidden></button>'
       +'<button type="button" class="d-button d-button--secondary" data-rerun>'+actionLabel('Nueva corrida','refresh')+'</button>'
-      +'<button type="button" class="d-button d-button--secondary dispatch-ai-fab" data-chat aria-expanded="false" aria-label="Abrir Dation IA">'+actionLabel('Dation IA','sparkles')+'</button>'
       +'<details class="dashboard-toolbar__menu" data-export-menu><summary aria-expanded="false">'+icon("download")+'<span>Exportar</span>'+icon("chevronDown")+'</summary>'
         +'<div class="dashboard-toolbar__menu-panel">'
           +'<button type="button" data-export-csv>'+icon("download")+'<div><strong>'+(scheduling?'Planificación CSV':'Asignación CSV')+'</strong><small>'+(scheduling?'Viajes, fechas y cargas':'Viajes, vehículos, órdenes y cargas')+'</small></div></button>'

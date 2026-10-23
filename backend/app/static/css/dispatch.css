@@ -4690,17 +4690,40 @@ body.dispatch-result #chat-panel{
 .d-decision-dashboard .dispatch-chat { color:var(--color-text); background:var(--color-surface-overlay); }
 .d-decision-dashboard>.dispatch-chat {
   display:flex; flex-direction:column; overflow-y:auto!important; z-index:90;
-  max-height:calc(100dvh - 108px)!important;
+  position:fixed; box-sizing:border-box; right:24px; top:auto;
+  bottom:calc(88px + var(--assistant-keyboard,0px) + env(safe-area-inset-bottom,0px));
+  width:min(440px,calc(100vw - 48px));
+  max-height:calc(var(--assistant-height,100dvh) - 116px)!important;
+  margin:0; border-radius:var(--radius-lg); box-shadow:var(--shadow-sm);
   overscroll-behavior:contain;
 }
-.d-decision-dashboard>.dispatch-ai-fab { z-index:70; }
+.d-decision-dashboard { padding-bottom:96px; }
+/* Launcher 70 < toolbar menus 80 < assistant/details 90; native dialogs remain above. */
+.d-decision-dashboard>.dispatch-ai-fab {
+  position:fixed; z-index:70; right:max(24px,env(safe-area-inset-right,0px));
+  bottom:calc(var(--assistant-bottom,24px) + env(safe-area-inset-bottom,0px));
+  min-height:48px; padding:12px 18px; border:1px solid var(--color-action-primary-bg);
+  border-radius:var(--radius-md); color:var(--color-action-primary-text); background:var(--color-action-primary-bg);
+  box-shadow:var(--shadow-sm); white-space:nowrap;
+}
+.d-decision-dashboard>.dispatch-ai-fab:hover { background:var(--color-action-primary-hover); }
+.d-decision-dashboard:has(.dashboard-toolbar__menu[open], [data-run-drawer]:not([hidden]))>.dispatch-ai-fab { visibility:hidden; }
+.d-decision-dashboard>.dispatch-chat[hidden] { display:none; }
+@media(max-width:700px) {
+  .d-decision-dashboard>.dispatch-ai-fab { right:max(12px,env(safe-area-inset-right,0px)); min-height:44px; padding:10px 14px; }
+  .d-decision-dashboard>.dispatch-chat {
+    right:8px; top:8px; width:calc(100vw - 16px);
+    bottom:calc(84px + var(--assistant-keyboard,0px) + env(safe-area-inset-bottom,0px));
+    max-height:calc(var(--assistant-height,100dvh) - 92px)!important;
+  }
+}
 .d-decision-dashboard>.dispatch-chat>:not(.dispatch-chat-thread) { flex-shrink:0; }
 .d-decision-dashboard>.dispatch-chat .dispatch-chat-thread { flex:1 1 180px; min-height:100px; height:auto; }
 .d-decision-dashboard>.dispatch-chat .dispatch-chat-heading { position:sticky; top:0; z-index:1; }
 .dispatch-chat-starters { scroll-padding-inline:8px; }
 .dispatch-chat-starters button { scroll-margin-inline:8px; }
 @media(max-height:540px) {
-  .d-decision-dashboard>.dispatch-chat { top:8px!important; bottom:8px!important; max-height:calc(100dvh - 16px)!important; }
+  .d-decision-dashboard>.dispatch-chat { top:8px; max-height:calc(var(--assistant-height,100dvh) - 100px)!important; }
 }
 
 /* Keep densely populated timelines readable and keyboard-scrollable. */

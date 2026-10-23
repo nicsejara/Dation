@@ -115,18 +115,7 @@
 }
 
 
-.assignment-dashboard-v2 .assignment-dashboard-v2__chat{
-  position:fixed!important;
-  right:24px;
-  bottom:82px;
-  z-index:90;
-  width:min(370px,calc(100vw - 48px));
-  max-height:min(620px,calc(100vh - 130px));
-  margin:0!important;
-  overflow:auto;
-  border-radius:16px!important;
-  box-shadow:var(--shadow-sm)!important;
-}
+
 
 .assignment-dashboard-v2 .assignment-dashboard-v2__chat[hidden]{display:none!important}
 
@@ -154,11 +143,7 @@
 .assignment-dashboard-v2__rail .dispatch-decision-rail__head>div strong{display:none}
 
 
-.assignment-dashboard-v2 .assignment-dashboard-v2__chat{
-    right:12px;
-    bottom:72px;
-    width:calc(100vw - 24px);
-  }
+
 }
 
 /* Narrow rails keep every decision and status readable without overlapping. */

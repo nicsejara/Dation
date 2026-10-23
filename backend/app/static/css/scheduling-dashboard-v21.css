@@ -100,7 +100,7 @@
 .scheduling-dashboard-v2 pre { max-height:400px; overflow:auto; white-space:pre-wrap; overflow-wrap:anywhere; color:var(--color-text-secondary); font-size:12px; }
 .scheduling-dashboard-v2 :is(button,summary,select,[tabindex]):focus-visible { outline:2px solid var(--color-focus); outline-offset:3px; }
 .scheduling-v2__main :is(button,summary,select,[tabindex]) { scroll-margin-block:calc(var(--dashboard-toolbar-top,76px) + var(--space-5)) 96px; }
-.scheduling-dashboard-v2>.dispatch-chat { position:fixed!important; box-sizing:border-box; right:24px!important; bottom:82px!important; top:auto!important; width:min(410px,calc(100vw - 32px))!important; max-height:calc(100dvh - 108px)!important; overflow:auto!important; margin:0!important; border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); }
+
 .scheduling-dashboard-v2 .dispatch-chat h2 { font-size:16px; line-height:1.4; }
 .scheduling-ai-summary { background:linear-gradient(135deg,color-mix(in srgb,var(--color-brand-violet) 12%,var(--color-surface)),var(--color-surface)); }
 .scheduling-ai-summary__heading { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:var(--space-4); }
@@ -118,7 +118,7 @@
 @media(max-width:1100px) { .scheduling-context__grid,.scheduling-kpis { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media(max-width:1000px) { .scheduling-insights,.scheduling-v2__execution { grid-template-columns:minmax(0,1fr); } }
 @media(max-width:600px) { .scheduling-v2__panel { padding:var(--space-4); } .scheduling-context__grid,.scheduling-kpis { grid-template-columns:minmax(0,1fr); } .scheduling-hero::before { opacity:.16; } .scheduling-advanced__toggle strong { font-size:16px; } .scheduling-ai-summary__heading>button { width:100%; } }
-@media(max-height:540px) { .scheduling-dashboard-v2>.dispatch-chat { top:8px!important; bottom:8px!important; max-height:calc(100dvh - 16px)!important; } .scheduling-dashboard-v2 .dispatch-chat-heading { position:static; } }
+@media(max-height:540px) {  .scheduling-dashboard-v2 .dispatch-chat-heading { position:static; } }
 @media(prefers-reduced-motion:reduce) { .scheduling-dashboard-v2 * { scroll-behavior:auto!important; } .scheduling-advanced__toggle,.scheduling-advanced__chevron { transition:none; } }
 
 .scheduling-dashboard-v2 #dispatch-hero h1 { margin:var(--space-2) 0 var(--space-3); font-size:clamp(26px,2.7vw,38px); font-weight:700; line-height:1.15; letter-spacing:-.025em; }

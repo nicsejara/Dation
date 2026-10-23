@@ -73,3 +73,32 @@ class FinalPolishTests(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(await self.page.locator('[data-demo-context]').is_visible(),sample,(sample,view))
                 self.assertEqual(await self.page.locator('[data-demo-context]').inner_text(),'Modo demo · Estás trabajando con datos de ejemplo.')
         self.assertEqual(self.b.execution_bodies,[])
+
+    async def test_c3_contextual_launcher_sheet_busy_and_keyboard_preserve_chat(self):
+        for kind in ('assignment','scheduling'):
+            run=self.b.f['ids'][kind]
+            await self.b.open('decision-dashboard','logistics_'+kind,run)
+            launcher=self.page.locator('.view.is-active [data-chat]')
+            for width,height in WIDTHS:
+                await self.page.set_viewport_size({'width':width,'height':height})
+                await launcher.click()
+                panel=self.page.locator('.dispatch-chat:not([hidden])')
+                self.assertIn(run[:8],await panel.locator('.dispatch-chat-context').inner_text())
+                self.assertTrue(await panel.evaluate('e=>{const r=e.getBoundingClientRect();return r.top>=0&&r.left>=0&&r.right<=innerWidth&&r.bottom<=innerHeight}'),(kind,width))
+                if width<=700:
+                    self.assertEqual(await panel.get_attribute('aria-modal'),'true')
+                    await panel.locator('button[type=submit]').focus();await self.page.keyboard.press('Tab')
+                    self.assertTrue(await panel.locator('[data-close]').evaluate('e=>e===document.activeElement'))
+                await self.page.keyboard.press('Escape')
+                self.assertTrue(await launcher.evaluate('e=>e===document.activeElement'))
+                self.assertEqual(await launcher.get_attribute('aria-expanded'),'false')
+            await self.page.set_viewport_size({'width':375,'height':812})
+            self.b.delay[f'/api/runs/{run}/chat']=.5
+            await launcher.click()
+            await self.page.locator('.dispatch-chat textarea').fill('¿Qué debo revisar?')
+            await self.page.locator('.dispatch-chat button[type=submit]').click()
+            await self.page.get_by_text('Analizando…',exact=True).wait_for()
+            await self.page.get_by_text('Synthetic answer',exact=True).wait_for()
+            self.assertEqual(await launcher.inner_text(),'Dation IA')
+            await self.page.keyboard.press('Escape')
+        self.assertEqual(self.b.execution_bodies,[])

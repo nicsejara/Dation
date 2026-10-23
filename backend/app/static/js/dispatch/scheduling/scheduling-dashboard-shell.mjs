@@ -1,3 +1,4 @@
+import {renderAssistantLauncher,bindAssistantLauncher} from '../runs/contextual-assistant.mjs';
 import {iconSvg} from '../decision-ui.mjs';
 import {esc} from '../shared.mjs';
 import {scopeFor} from '../lifecycle.mjs';
@@ -27,7 +28,7 @@ export function renderSchedulingShell(root,run,caseActions={}){
       +'</section>'
       +'<section class="dispatch-panel scheduling-v2__panel" id="scheduling-validation"></section>'
     +'</main>'
-    +'<aside class="dispatch-chat dispatch-panel" hidden aria-label="Chat de la planificación"></aside>'+drawer;
+    +'<aside class="dispatch-chat dispatch-panel" hidden aria-label="Chat de la planificación"></aside>'+drawer+renderAssistantLauncher(run);
   const find=selector=>root.querySelector(selector);
   return {hero:find('[data-scheduling-hero]'),context:find('#scheduling-context'),kpis:find('#scheduling-kpis'),insights:find('#scheduling-insights'),timeline:find('#scheduling-timeline'),resources:find('#scheduling-resources'),preview:find('#scheduling-preview'),ai:find('#dispatch-explanation'),advanced:find('[data-scheduling-advanced-content]'),validation:find('#scheduling-validation'),chat:find('.dispatch-chat')};
 }
@@ -40,6 +41,6 @@ export function bindSchedulingShell(root,run,{onRerun,caseActions={},onOpenChat,
     label:advanced.querySelector('[data-scheduling-advanced-label]'),
     storageKey:'dation.scheduling.presentation.'+run.id,onAdvancedOpen,
   });
-  scopeFor(root).listen(root.querySelector('[data-chat]'),'click',()=>onOpenChat?.());
+  bindAssistantLauncher(root,()=>onOpenChat?.());
   return {...bindDashboardToolbar(root,run,{onRerun,caseActions}),...presentation};
 }
