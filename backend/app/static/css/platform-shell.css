@@ -54,3 +54,8 @@
 .dda-workspace-nav-shell{backdrop-filter:none}
 .dda-workspace-step,.dda-workspace-step.is-current{border-radius:0;background:transparent;box-shadow:none;border-bottom:2px solid transparent}
 .dda-workspace-step.is-current{border-bottom-color:var(--color-text-accent)}
+
+/* Profile uses the same form plane while keeping its existing save/session contract. */
+.platform-profile-form{max-width:680px;padding:24px;background:var(--color-surface);border-radius:var(--radius-md)}
+.platform-profile-form .d-field{gap:8px}
+.platform-profile-form .d-button{margin-top:8px}

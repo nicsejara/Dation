@@ -2,3 +2,16 @@
 @media(max-width:800px){.workspace-settings__tabs{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.workspace-settings__fields{grid-template-columns:1fr}.workspace-settings__card{padding:18px}.workspace-settings__actions>.d-button{width:100%;justify-content:center}.workspace-settings__rows .settings-row{display:grid;gap:8px}.workspace-settings__rows dd{text-align:left}}
 .d-platform .workspace-settings .workspace-settings__tabs [aria-selected=true]{border-color:var(--color-text-accent);color:var(--color-text-accent);box-shadow:inset 0 0 0 1px var(--color-text-accent)}
+
+/* Settings: section rationale sits beside the form, without nesting another full card. */
+.workspace-settings__tabs{display:flex;flex-wrap:wrap;gap:0;border-bottom:1px solid var(--color-border)}
+.workspace-settings .workspace-settings__tabs .d-button{min-width:0;padding:12px 20px;border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;font-weight:500}
+.d-platform .workspace-settings .workspace-settings__tabs [aria-selected=true]{border-color:var(--color-text-accent);color:var(--color-text);background:transparent;box-shadow:none}
+.d-platform .workspace-settings__card{grid-template-columns:220px minmax(0,1fr);gap:16px 28px;padding:24px 0;border:0;border-radius:0;background:transparent}
+.workspace-settings__card>h2{grid-column:1;grid-row:1;font-size:20px;font-weight:600}
+.workspace-settings__card>p{grid-column:1;grid-row:2;align-self:start}
+.workspace-settings__card>.workspace-settings__form,.workspace-settings__card>.workspace-settings__rows{grid-column:2;grid-row:1/8;padding:24px;border-radius:var(--radius-md);background:var(--color-surface)}
+.workspace-settings__preview{padding:16px 0 0;border:0;border-top:1px solid var(--color-border);border-radius:0;background:transparent}
+.workspace-settings__actions{padding-top:16px;border-top:1px solid var(--color-border)}
+.workspace-settings__rows .settings-row{padding-block:12px;border-bottom:1px solid var(--color-border)}
+@media(max-width:850px){.d-platform .workspace-settings__card{grid-template-columns:minmax(0,1fr)}.workspace-settings .workspace-settings__card>*{grid-column:1;grid-row:auto}.workspace-settings__card>.workspace-settings__form,.workspace-settings__card>.workspace-settings__rows{padding:20px}}

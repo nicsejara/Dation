@@ -52,3 +52,7 @@ Phase 4: Config en secciones abiertas con columna de criterio y controles; selec
 Phase 4 commit: `11d9e43`.
 
 Phase 5: hero analítico sin fotografía en las superficies de trabajo (assets conservados), KPI como bandas tipográficas, D1 comparación junto a explicación y D2 calendario junto a excepciones. Se mueve sólo el markup de timeline/insights de D2; todos los hooks/binders y contenido se conservan. Cifras monetarias ajustadas al ancho de la celda, con regresión browser de límites pintados en cinco anchos. QA: 7 browser distintos verificados, 29 checks Node y 11 observaciones visuales sin overflow/contraste muestreado fallido. La aserción histórica “Assignment bloqueada” ya contradice el baseline y se actualiza al copy aprobado/fijo vigente. Exportación JSON exacta y aprobación por Run pasan.
+
+Phase 5 commit: `9c64b2f`.
+
+Phase 6: headers operativos de Center/Hub, métricas en bandas compartidas, filtros/inventarios con bordes de lectura comunes, Team y Settings/Profile integrados al mismo sistema. Settings separa explicación y formulario. Se preservan filtros, totales globales, paginación, drawers, read-only y save/CAS. QA: 9 browser, 383 Python y 124 checks Node (18 archivos) pasan; 25 observaciones sin overflow/contraste muestreado fallido. Se actualiza la expectativa de sombra del CTA y se mantiene el sizing en la primitive compartida, limitando sólo su contenedor del Map.

@@ -224,3 +224,8 @@
 
 .d-platform .d-loading{display:grid;gap:var(--space-4);min-height:320px;align-content:start;}
 .d-platform .d-loading>.d-skeleton{height:58px;}
+
+/* Precision platform headings and inventories share edges, not identical hero cards. */
+.d-platform .d-page-header{padding:16px 0 24px;border-bottom:1px solid var(--color-border-strong)}
+.d-platform .d-eyebrow{text-transform:none;letter-spacing:.02em;font-weight:500;color:var(--color-text-muted)}
+.d-platform .d-table th{font-weight:500;background:var(--color-surface)}

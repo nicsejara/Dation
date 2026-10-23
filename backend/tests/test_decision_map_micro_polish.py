@@ -19,7 +19,7 @@ class DecisionMapMicroPolishTests(unittest.TestCase):
             ".d-button--workflow",
             "min-height: var(--workflow-action-height)",
             "background: var(--color-action-primary-hover)",
-            "box-shadow: var(--shadow-sm-dark)",
+            "box-shadow: none",
         ):
             self.assertIn(marker, DESIGN_SYSTEM)
         self.assertIn('WORKFLOW_ACTION_CLASS',MAP_UI)
