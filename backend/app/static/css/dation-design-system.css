@@ -453,3 +453,7 @@
 .d-execution-review__row strong{font-weight:500;color:var(--color-text-muted)}
 .d-execution-review__row span{color:var(--color-text)}
 .d-workflow-action-bar{border-color:var(--color-border-strong);border-radius:var(--radius-md);box-shadow:var(--shadow-sm-dark);backdrop-filter:none}
+
+/* Keyboard work is immediate; native overlay focus and busy feedback stay intact. */
+:is(a,button,summary,input,select,textarea,[tabindex]):focus-visible,:is(a,button,summary,input,select,textarea,[tabindex]):focus-visible *{transition:none!important}
+.platform-home__quick-link:active{background:var(--color-surface-raised)}

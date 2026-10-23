@@ -75,8 +75,6 @@
 .dda-landing__faq-grid summary:hover { background:var(--color-surface-hover); }
 .dda-landing__faq-grid summary:focus-visible { outline:3px solid var(--color-focus); outline-offset:3px; }
 .dda-landing__faq-grid p { margin:0; padding:0 14px 14px; color:var(--color-text-secondary); font-size:13px; line-height:1.6; }
-.dda-landing.is-enhanced [data-reveal].is-visible { animation:dda-content-in var(--transition-base) both; }
-@keyframes dda-content-in { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:none; } }
 @media(max-width:1199px) {
   .dda-landing__steps { grid-template-columns:repeat(2,minmax(0,1fr)); }
   .dda-landing__summary-grid { grid-template-columns:minmax(0,1fr); }
@@ -96,7 +94,6 @@
   .dda-landing__hero-actions .d-button { width:100%; }
   .dda-landing__summary-card { padding:var(--space-4); }
 }
-@media(prefers-reduced-motion:reduce) { .dda-landing.is-enhanced [data-reveal] { animation:none; } }
 
 /* DDA cover: editorial explanation beside the real decision chain. */
 .dda-landing{gap:40px}

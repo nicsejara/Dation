@@ -56,3 +56,7 @@ Phase 5: hero analítico sin fotografía en las superficies de trabajo (assets c
 Phase 5 commit: `9c64b2f`.
 
 Phase 6: headers operativos de Center/Hub, métricas en bandas compartidas, filtros/inventarios con bordes de lectura comunes, Team y Settings/Profile integrados al mismo sistema. Settings separa explicación y formulario. Se preservan filtros, totales globales, paginación, drawers, read-only y save/CAS. QA: 9 browser, 383 Python y 124 checks Node (18 archivos) pasan; 25 observaciones sin overflow/contraste muestreado fallido. Se actualiza la expectativa de sombra del CTA y se mantiene el sizing en la primitive compartida, limitando sólo su contenedor del Map.
+
+Phase 6 commit: `9bd5577`.
+
+Phase 7: se eliminan las entradas decorativas de Overview y el desplazamiento hover de los filtros KPI del Hub; Map declara propiedades explícitas y foco por teclado responde sin transición. Busy/ejecución y cleanup permanecen intactos. improve-animations produjo un plan acotado y una auditoría delegada read-only; review-animations: **Approve**, sin hallazgos pendientes en el diff. QA: 7 browser pasan; feel check con preferencia normal/reduce, 12 ciclos de revisión/Escape con foco restaurado, seis secciones sin animación, KPI sin desplazamiento y reproducción a 0.2×. Se actualizan dos expectativas históricas: el baseline ya tenía diálogos instantáneos y no contenía data-select-case; se preservan asserts de teclado, preferencia, navegación y exclusividad.

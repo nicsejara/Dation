@@ -131,7 +131,7 @@ details[open]>summary .decision-context-chevron{transform:rotate(180deg);}
   color:var(--d-text-primary);
   background:var(--d-surface-2);
   cursor:pointer;
-  transition:var(--transition-fast);
+  transition:border-color var(--transition-fast),background-color var(--transition-fast),color var(--transition-fast);
 }
 
 .dispatch-case-identity__idrow>button:hover,
@@ -477,7 +477,7 @@ details[open]>summary .decision-context-chevron{transform:rotate(180deg);}
   color:var(--d-brand-teal-bright);
   background:var(--d-surface-2);
   cursor:pointer;
-  transition:var(--transition-fast);
+  transition:border-color var(--transition-fast),background-color var(--transition-fast),color var(--transition-fast);
 }
 
 .dispatch-datapack-file__columns:hover{
