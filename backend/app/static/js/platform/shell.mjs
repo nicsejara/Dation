@@ -1,5 +1,5 @@
 import {iconSvg} from '../dispatch/decision-ui.mjs';
-import {renderCaseFlow} from '../dispatch/navigation/case-flow.mjs';
+import {renderCaseFlow,revealCurrentStep} from '../dispatch/navigation/case-flow.mjs';
 import {renderDdaNavigation} from './dda-navigation.mjs';
 import {trackExploration} from './onboarding.mjs';
 import {mountDropdown} from './components.mjs';
@@ -94,6 +94,7 @@ export function mountPlatformShell(){
  }
  window.dationRenderContextNavigation=updateNavigation;
  window.dationRenderCaseFlow=view=>{try{renderCaseFlow(document.querySelector('#dda-workspace-nav'),{view,route:readResource(location.href),state:window.DationDispatch?.getWorkspace?.()});}catch{}};
+ if(typeof ResizeObserver==='function'){const flow=document.querySelector('#dda-workspace-nav');scope.observe(new ResizeObserver(()=>revealCurrentStep(flow)),flow);}
  const updateAll=()=>{updateNavigation();window.dationRenderCaseFlow(window.dationGetCurrentView?.());};
  scope.listen(window,'dation:workspace',()=>window.dationRenderCaseFlow(window.dationGetCurrentView?.()));
  scope.listen(window,'dation:view',updateAll);scope.listen(window,'dation:workspace',updateNavigation);updateAll();

@@ -18,9 +18,9 @@
 .dda-navigation ol{display:grid;grid-template-columns:repeat(var(--context-levels,3),minmax(0,1fr));gap:24px}
 .dda-navigation li{position:relative}
 .dda-navigation li:not(:last-child)::after{content:'›';position:absolute;right:-17px;top:50%;transform:translateY(-50%);color:var(--color-text-muted);font-size:20px;pointer-events:none}
-.dda-navigation__step{width:100%;height:48px;min-width:0;gap:8px}
+.dda-navigation__step{width:100%;height:44px;min-width:0;gap:8px}
 .dda-navigation__step>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-@media(max-width:600px){.dda-navigation ol{gap:16px}.dda-navigation li:not(:last-child)::after{right:-12px;font-size:16px}.dda-navigation__step{padding:8px;font-size:10px}}
+@media(max-width:600px){.dda-navigation ol{gap:16px}.dda-navigation li:not(:last-child)::after{right:-12px;font-size:16px}.dda-navigation__step{padding:8px;font-size:12px}}
 
 .d-skip-link{position:fixed;inset:8px auto auto 8px;z-index:11000;transform:translateY(-160%);padding:12px 16px;border-radius:var(--radius-control);background:var(--color-action-primary-bg);color:var(--color-action-primary-text);font:600 14px/1.4 var(--font-sans)}
 .d-skip-link:focus{transform:none}

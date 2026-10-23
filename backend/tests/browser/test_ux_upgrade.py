@@ -56,3 +56,18 @@ class UXUpgradeTests(unittest.IsolatedAsyncioTestCase):
         await self.page.evaluate('window.dispatchEvent(new CustomEvent("dation:workspace"))')
         self.assertEqual(await self.page.evaluate('document.activeElement.dataset.platformView'), 'platform-team')
 
+    async def test_current_case_flow_step_is_visible_on_entry_and_resize(self):
+        for view, node in [('logistics-map', None), ('logistics-config', 'logistics_assignment'),
+                           ('decision-dashboard', 'logistics_scheduling')]:
+            await self.page.set_viewport_size({'width': 1440, 'height': 900})
+            await self.b.open(view, node=node, run=self.b.f['ids']['scheduling'] if view == 'decision-dashboard' else None)
+            for width, height in [(375, 812), (768, 1024), (1024, 768)]:
+                await self.page.set_viewport_size({'width': width, 'height': height})
+                await self.page.wait_for_timeout(100)
+                self.assertTrue(await self.page.locator('#dda-workspace-nav').evaluate('''root=>{
+                    const current=root.querySelector('[aria-current="step"]');
+                    const r=current.getBoundingClientRect(), p=root.getBoundingClientRect();
+                    return r.left>=p.left-1&&r.right<=p.right+1;
+                }'''), (view, width))
+        self.assertEqual(self.b.execution_bodies, [])
+

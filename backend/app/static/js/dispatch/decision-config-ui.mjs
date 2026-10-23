@@ -67,10 +67,10 @@ export function decisionHero({step,decisionIndex,totalDecisions=3,title,descript
       +'<h1>'+esc(title)+'</h1>'
       +'<p class="dispatch-pro-hero-lead">'+esc(description)+'</p>'
     +'</div>'
-    +(hasPanel?'<div class="dispatch-pro-hero-visual">'
+    +(hasPanel?'<details class="dispatch-pro-hero-visual"><summary>'+esc(panelTitle)+'</summary>'
       +'<img class="dispatch-pro-hero-watermark" src="/static/assets/dda-logistics.svg?v=workflow-hero" alt="">'
       +'<div class="decision-config-decision-panel dispatch-pro-how-panel assignment-decision-panel">'
-        +'<div class="dispatch-pro-how-title"><span>'+esc(panelTitle)+'</span></div>'
+
         +panelItems.map((item,index)=>(
           '<div class="decision-config-panel-item dispatch-pro-how-node">'
             +'<span class="dispatch-pro-how-icon">'+iconSvg(item.icon,"dispatch-pro-icon assignment-icon")+'</span>'
@@ -80,7 +80,7 @@ export function decisionHero({step,decisionIndex,totalDecisions=3,title,descript
         )).join("")
         +(panelFootnote?'<div class="dispatch-pro-how-history">'+iconSvg("history","dispatch-pro-icon")+'<span>'+esc(panelFootnote)+'</span></div>':'')
       +'</div>'
-    +'</div>':'')
+    +'</details>':'')
   +'</section>';
 }
 

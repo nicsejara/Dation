@@ -18,7 +18,7 @@ class DecisionMapMicroPolishTests(unittest.TestCase):
         for marker in (
             ".d-button--workflow",
             "min-height: var(--workflow-action-height)",
-            "transform: translateY(-1px)",
+            "background: var(--color-action-primary-hover)",
             "box-shadow: var(--shadow-sm-dark)",
         ):
             self.assertIn(marker, DESIGN_SYSTEM)

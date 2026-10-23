@@ -23,6 +23,13 @@ function open(target){
  if(target.view==='decision-dashboard')window.DationDispatch.openDashboard(target.caseId,target.nodeId,target.runId);
  else window.DationDispatch.openCase(target.caseId,target.view,target.nodeId);
 }
+/** Horizontal scroll only: never move page focus or scroll position. */
+export function revealCurrentStep(root){
+ const step=root.querySelector('[aria-current="step"]');
+ if(!step||root.scrollWidth<=root.clientWidth)return;
+ const offset=step.getBoundingClientRect().left-root.getBoundingClientRect().left;
+ root.scrollLeft+=offset-(root.clientWidth-step.offsetWidth)/2;
+}
 export function renderCaseFlow(root,{view,route,state={}}){
  root.parentElement.hidden=!views.includes(view);
  if(!views.includes(view)){root.replaceChildren();signatures.delete(root);return;}
@@ -39,6 +46,7 @@ export function renderCaseFlow(root,{view,route,state={}}){
   button.append(marker,copy);button.addEventListener('click',()=>open(step.target));root.append(button);
   if(index<steps.length-1){const connector=document.createElement('span');connector.className='dda-workspace-nav__connector';connector.setAttribute('aria-hidden','true');root.append(connector);}
  }
+ revealCurrentStep(root);
 }
 export function mountDecisionViews(root,{state,nodeId,view}){
  const current=state.decisionCase;if(!current?.id||!DECISION_META[nodeId]?.implemented)return;
