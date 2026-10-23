@@ -179,7 +179,7 @@ class SchedulingConfigPhase1Tests(unittest.TestCase):
         self.assertIn('type=\"date\"', UI)
         self.assertIn("Servicio primero", UI)
         self.assertIn("Salida más temprana", UI)
-        self.assertIn("Heredada y bloqueada", UI)
+        self.assertIn("Aprobada y fija", UI)
 
     def test_phase1_ui_is_loaded_and_responsive(self):
         self.assertIn('scheduling-config-v2.mjs', BOOTSTRAP)

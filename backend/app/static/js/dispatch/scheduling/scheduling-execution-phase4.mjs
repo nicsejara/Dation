@@ -236,7 +236,7 @@ function evidenceMarkup(run){
     +(rules.length?'<div class="scheduling-execution-evidence__rules">'
       +rules.map(rule=>'<span title="'+esc(rule.id||"")+'"><b>'+esc(ruleLabel(rule))+'</b><em>'+Number(rule.matched_trip_count||0)+' '+(Number(rule.matched_trip_count||0)===1?'viaje':'viajes')+'</em></span>').join("")
       +'</div>':'')
-    +'<p class="scheduling-execution-evidence__note">Assignment permanece bloqueada: esta configuración sólo modifica fechas, secuencia y prioridad temporal.</p>';
+    +'<p class="scheduling-execution-evidence__note">La asignación aprobada permanece fija: esta configuración sólo modifica fechas, secuencia y prioridad temporal.</p>';
 }
 
 function injectExecutionEvidence(run){

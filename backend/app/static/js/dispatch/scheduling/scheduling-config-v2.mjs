@@ -129,11 +129,11 @@ function heroMarkup(){
     decisionIndex:2,
     totalDecisions:3,
     title:"Definí cuándo querés despachar los viajes.",
-    description:"Partí de la asignación aprobada y definí ventana y prioridad del calendario. Cargas, cantidades y recursos mantienen su trazabilidad.",
+    description:"Definí ventana, reglas y prioridad sobre la asignación aprobada del Case. Viajes, cargas y vehículos se conservan.",
     panelItems:[
       {label:"1 · PREGUNTA",description:"¿Cuándo despachar los viajes definidos?",icon:"messageCircleQuestion"},
       {label:"2 · ENTREGA",description:"Calendario operativo + secuencia",icon:"calendarClock"},
-      {label:"3 · QUEDA PARA DESPUÉS",description:"Asignación de vehículos: decisión final.",icon:"truck"},
+      {label:"3 · QUEDA PARA DESPUÉS",description:"D3 futura: todavía no disponible.",icon:"truck"},
     ],
   });
 }
@@ -272,7 +272,7 @@ function scopeSection(config,stats,sourceRun){
     +focusDisclosure(config,stats.trips)
     +decisionInfoNote({
       icon:"lock",
-      title:"Asignación congelada.",
+      title:"Asignación aprobada · viajes y vehículos fijos.",
       copy:"Los filtros y reglas sólo priorizan o restringen fechas. Ninguna regla puede eliminar viajes, cambiar cargas ni reasignar vehículos.",
       className:"scheduling-boundary-note",
     })
@@ -325,7 +325,7 @@ function resourceSection(stats){
       title:"Política de recursos",
       copy:"Planificación no vuelve a decidir la flota: respeta exactamente los vehículos aprobados en Asignación de carga.",
       icon:"truck",
-      current:"Heredada y bloqueada",
+      current:"Aprobada y fija",
     })
     +'<div class="scheduling-resource-policy">'
       +decisionChoiceCard({
@@ -335,7 +335,7 @@ function resourceSection(stats){
         copy:"Vehículo, órdenes, producto y cantidades permanecen inmutables. Esta decisión sólo agrega fecha, secuencia y reglas temporales.",
         selected:true,
         locked:true,
-        tags:["Bloqueada"],
+        tags:["Viajes y vehículos fijos"],
         attributes:{"data-scheduling-resource-policy":"inherited"},
       })
       +'<div class="scheduling-resource-stats" aria-label="Composición de recursos heredados">'

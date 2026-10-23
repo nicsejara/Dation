@@ -131,7 +131,7 @@ function heroMarkup(){
     decisionIndex:1,
     totalDecisions:3,
     title:"Definí cómo querés distribuir tu carga.",
-    description:"Elegí datos, objetivo y recursos para repartir la carga entre tu flota. Las fechas se definen en Planificación de despachos.",
+    description:"Elegí alcance, objetivo y recursos. Assignment distribuye cargas y vehículos sin fechas ni SLA.",
     panelItems:[
       {label:"1 · PREGUNTA",description:"¿Cómo armar viajes y repartir la carga?",icon:"messageCircleQuestion"},
       {label:"2 · ENTREGA",description:"Viajes propuestos + distribución de carga.",icon:"packageCheck"},

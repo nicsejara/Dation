@@ -90,7 +90,7 @@ class SchedulingConfigPhase4LifecycleTests(unittest.TestCase):
         self.assertIn("analysis.focus_rules", LIFECYCLE)
         self.assertIn("analysis.focused_trip_count", LIFECYCLE)
         self.assertIn("result.inputs?.assignment?.run_id", LIFECYCLE)
-        self.assertIn("Assignment permanece bloqueada", LIFECYCLE)
+        self.assertIn("La asignación aprobada permanece fija", LIFECYCLE)
         self.assertIn("injectExecutionEvidence", LIFECYCLE)
         self.assertIn("enhanceHistoricalDashboard", LIFECYCLE)
 
