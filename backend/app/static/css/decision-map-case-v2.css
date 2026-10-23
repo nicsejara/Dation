@@ -534,8 +534,9 @@ details[open]>summary .decision-context-chevron{transform:rotate(180deg);}
 
 .dispatch-decision-map--case-v2 .dispatch-decision-node{
   display:grid;
-  grid-template-rows:54px 58px 58px 86px 62px 20px 48px;
-  min-height:448px;
+  grid-template-rows:auto;
+  min-width:0;
+  min-height:0;
   padding:22px;
   overflow:visible;
   border-radius:22px;
@@ -909,14 +910,17 @@ details[open]>summary .decision-context-chevron{transform:rotate(180deg);}
     height:40px;
   }
 
+  .dispatch-decision-node__head{grid-template-columns:36px minmax(0,1fr);gap:8px;min-width:0;}
+  .dispatch-decision-node__head .dispatch-map-state-chip{grid-column:1/-1;justify-self:start;max-width:100%;white-space:normal;padding:6px 8px;}
+
   .dispatch-file-state{
     min-height:27px;
     font-size:12px;
   }
 
   .dispatch-decision-map--case-v2 .dispatch-decision-node{
-    grid-template-rows:52px 56px 60px 86px 64px 18px 48px;
-    min-height:438px;
+    grid-template-rows:auto;
+    min-height:0;
     padding:20px;
   }
 

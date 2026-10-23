@@ -50,7 +50,7 @@ class DecisionMapCaseV2ContractTests(unittest.TestCase):
     def test_visual_alignment_and_responsive_contract(self):
         for marker in (
             "grid-template-columns:minmax(0,1fr) 64px",
-            "grid-template-rows:54px 58px 58px 86px 62px 20px 48px",
+            "grid-template-rows:auto",
             "background:transparent",
             "top:-14px",
             "font-size:14px",

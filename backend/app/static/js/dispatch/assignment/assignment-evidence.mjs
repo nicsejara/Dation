@@ -53,7 +53,7 @@ function vehicleView(vehicles){
       +'</div>'
     +'</article>';
   }
-  return '<div class="dispatch-table-wrap assignment-evidence__table-wrap">'
+  return '<div class="dispatch-table-wrap assignment-evidence__table-wrap" role="region" tabindex="0" aria-label="Evidencia de asignación desplazable">'
     +'<table class="assignment-evidence__table"><thead><tr><th>Vehículo</th><th class="d-number">Viajes</th><th class="d-number">Carga total</th><th class="d-number">Utilización media</th><th class="d-number">Órdenes</th><th class="d-number">% de carga</th><th>Flota</th></tr></thead><tbody>'
     +vehicles.map(item=>
       '<tr>'
@@ -79,7 +79,7 @@ function orderFlags(order){
 
 function orderView(orders){
   if(!orders.length)return '<p class="assignment-evidence__empty">No hay detalle por orden disponible en esta corrida.</p>';
-  return '<div class="dispatch-table-wrap assignment-evidence__table-wrap">'
+  return '<div class="dispatch-table-wrap assignment-evidence__table-wrap" role="region" tabindex="0" aria-label="Evidencia de asignación desplazable">'
     +'<table class="assignment-evidence__table"><thead><tr><th>Orden</th><th>Producto</th><th class="d-number">Unidades</th><th class="d-number">Kg</th><th>Viaje/s</th><th>Vehículo/s</th><th>Estado</th></tr></thead><tbody>'
     +orders.map(order=>
       '<tr>'
@@ -147,7 +147,7 @@ export function render(root,result){
     +'</div>'
     +'<section role="tabpanel" data-evidence-panel="trips">'
       +(trips.length
-        ?'<div class="dispatch-table-wrap assignment-evidence__table-wrap"><table class="assignment-evidence__table"><thead><tr><th>Viaje</th><th>Vehículo</th><th>Ruta</th><th class="d-number">Carga</th><th class="d-number">Capacidad</th><th class="d-number">Utilización</th><th class="d-number">Órdenes</th><th>Flota</th><th>Detalle</th></tr></thead><tbody>'+tripRows(trips)+'</tbody></table></div>'
+        ?'<div class="dispatch-table-wrap assignment-evidence__table-wrap" role="region" tabindex="0" aria-label="Evidencia de asignación desplazable"><table class="assignment-evidence__table"><thead><tr><th>Viaje</th><th>Vehículo</th><th>Ruta</th><th class="d-number">Carga</th><th class="d-number">Capacidad</th><th class="d-number">Utilización</th><th class="d-number">Órdenes</th><th>Flota</th><th>Detalle</th></tr></thead><tbody>'+tripRows(trips)+'</tbody></table></div>'
         :'<p class="assignment-evidence__empty">No hay viajes para mostrar.</p>')
     +'</section>'
     +'<section role="tabpanel" data-evidence-panel="vehicles" hidden>'+vehicleView(vehicles)+'</section>'

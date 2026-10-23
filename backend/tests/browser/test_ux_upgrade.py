@@ -150,3 +150,25 @@ class UXUpgradeTests(unittest.IsolatedAsyncioTestCase):
                 self.assertNotIn('<html>', text)
                 self.assertIn('administrador' if status == 403 else 'guardado', text)
 
+    async def test_constrained_viewports_keep_forms_and_table_scrollers_reachable(self):
+        for width, height in [(320, 640), (812, 375), (720, 450), (375, 420)]:
+            await self.page.set_viewport_size({'width': width, 'height': height})
+            await self.b.open('logistics-data')
+            # Inspect the hydrated Case, after the initial local form is replaced.
+            await self.page.wait_for_function("document.querySelector('[name=label]')?.value==='SEMANA 43'")
+            field = self.page.locator('[name=description]')
+            await field.wait_for(state='visible')
+            await field.focus()
+            await self.page.wait_for_timeout(150)
+            self.assertTrue(await field.evaluate('''e=>{
+                const r=e.getBoundingClientRect();
+                return [.1,.5,.9].every(dy=>document.elementFromPoint(r.x+r.width/2,r.y+r.height*dy)===e);
+            }'''), (width, height))
+            self.assertTrue(await self.page.evaluate('document.documentElement.scrollWidth<=innerWidth'))
+        await self.b.open('decision-dashboard', 'logistics_assignment', self.b.f['ids']['assignment'])
+        region = self.page.get_by_role('region', name='Comparación de escenarios desplazable')
+        await region.focus()
+        await self.page.keyboard.press('ArrowRight')
+        await self.page.wait_for_timeout(150)
+        self.assertGreater(await region.evaluate('e=>e.scrollLeft'), 0)
+

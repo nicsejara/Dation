@@ -26,7 +26,7 @@ export function mountPlatformShell(){
  // history restoration and dialog dismissal do not request this policy.
  let keyboardNavigation=false;
  scope.listen(document,'keydown',event=>{
-  keyboardNavigation=(event.key==='Enter'||event.key===' ')&&Boolean(event.target.closest('nav,.sidebar'));
+  keyboardNavigation=(event.key==='Enter'||event.key===' ')&&Boolean(event.target.closest?.('nav,.sidebar'));
  });
  scope.listen(window,'dation:view',()=>{
   if(!keyboardNavigation)return;

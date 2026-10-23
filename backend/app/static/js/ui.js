@@ -321,7 +321,8 @@ export function activateView(
 
   window.scrollTo({
     top: 0,
-    behavior: "smooth",
+    // A route switch must settle before a user focuses a newly rendered field.
+    behavior: "instant",
   });
 }
 
