@@ -98,7 +98,7 @@ jobs:
         working-directory: backend
         run: |
           docker run -d --name dation-ci-postgres -e POSTGRES_HOST_AUTH_METHOD=trust postgres:17-alpine
-          trap 'docker rm -f dation-ci-postgres' EXIT
+          trap 'docker rm -f -v dation-ci-postgres' EXIT
           ready=false
           for attempt in {1..30}; do
             # initdb briefly starts a Unix-socket-only server. Wait for final TCP.
