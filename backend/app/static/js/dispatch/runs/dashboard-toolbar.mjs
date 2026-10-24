@@ -133,7 +133,7 @@ export function bindDashboardToolbar(root,run,{onRerun,caseActions={}}={}){
     const feedback=root.querySelector('[data-approval-error]');feedback.hidden=true;
     try{await onRerun?.();}
     catch(error){if(scope.active){feedback.hidden=false;feedback.textContent=error.message||'No se pudo recuperar la configuración.';}}
-    finally{if(scope.active)button.disabled=false;}
+    finally{if(scope.active){button.disabled=false;button.focus({preventScroll:true});}}
   });
 
   async function exportFile(event,handler){

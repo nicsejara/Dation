@@ -12,6 +12,7 @@ import {mountCasePreparation,mountMapResponsibilities} from './cases/workflow-co
 import {mountDashboardTrace} from './runs/approval-trace.mjs';
 import {renderExecutionProgress} from './runs/execution-progress.mjs';
 import {responsibilityProblem} from './cases/workflow-responsibility.mjs';
+import {confirmNewRun} from './runs/new-run-warning.mjs';
 import {currentLogisticsEnabled,logisticsView} from '../platform/entitlements.mjs';
 
 const KEY='dation.dispatch.workspace.v5';
@@ -614,10 +615,16 @@ async function executeScheduling(sourceRunId){
   }
 }
 
-async function reconfigureRun(run,nodeId){
+async function reconfigureRun(run,nodeId,{confirmReopening=false}={}){
   const generation=routeGeneration,context=runContext(run,nodeId);
   if(context.caseId)await hydrateCase(context.caseId,generation);
   if(generation!==routeGeneration)return;
+  // Confirm the current approval, even when the user opened an older historical Run.
+  // Opening Configuration never retires approval; SQL admission owns that transition.
+  const current=state.decisionCase?.nodes?.[context.nodeId];
+  if(confirmReopening&&(current?.approved_run_id||current?.status===STATUS.APPROVED)){
+    if(!await confirmNewRun(roots.dashboard)||generation!==routeGeneration)return;
+  }
   const config=context.configuration;
   const options=config.options||{};
   if(context.nodeId==='logistics_scheduling'){
@@ -666,8 +673,16 @@ async function reconfigureRun(run,nodeId){
     api('/api/datasets/'+fleetId+'/profile',{signal:routeController?.signal}),
   ]);
   if(generation!==routeGeneration)return;
+  if(context.caseId){
+    const inputs=state.decisionCase?.inputs;
+    const expected=state.decisionCase?.signature||inputSignature({id:inputs?.orders_dataset_id},{id:inputs?.fleet_dataset_id});
+    if(state.decisionCase?.id!==context.caseId||expected!==inputSignature(orders.dataset,fleet.dataset)){
+      throw new Error('El Data Pack no coincide con el Case de esta corrida. Actualizá el Case antes de continuar.');
+    }
+  }
   state.orders=orders.dataset;state.fleet=fleet.dataset;state.preflight=null;state.configPreview=null;
-  ensureDecisionCase();decisionContext(state.activeNode);persist();
+  if(!context.caseId)ensureDecisionCase();
+  state.activeNode=context.nodeId;decisionContext(context.nodeId);persist();
   return navigateResource('logistics-config',{caseId:context.caseId||state.decisionCase?.id,nodeId:context.nodeId,runId:null});
 }
 
@@ -723,7 +738,7 @@ export async function show(run){
   await dashboard(
     roots.dashboard,
     run,
-    ()=>reconfigureRun(run,nodeId),
+    ()=>reconfigureRun(run,nodeId,{confirmReopening:true}),
     {
       status:(nodeId&&caseMeta?.case_id&&state.decisionCase?.id===caseMeta.case_id)
         ?runDecisionState(run,state.decisionCase,nodeId)

@@ -1,5 +1,6 @@
 """Final controls, dashboard media and contextual reruns using isolated API fixtures."""
 import unittest
+import copy
 from pathlib import Path
 from playwright.async_api import expect
 import test_saga3_ui as fixture
@@ -87,3 +88,50 @@ class RunLineagePolishTests(unittest.IsolatedAsyncioTestCase):
                 self.assertAlmostEqual(snapshots[0][key],snapshots[1][key],delta=.5,msg=(w,key))
             if w>900:self.assertAlmostEqual(snapshots[0]['y'],snapshots[1]['y'],delta=.5)
             for key in ('padding','minHeight','fit','position','maxWidth','font'):self.assertEqual(snapshots[0][key],snapshots[1][key],(w,key))
+
+    def approved_fixture(self):
+        for kind in ('assignment','scheduling'):
+            run=self.b.runs[self.b.f['ids'][kind]];run['approved_at']='2026-10-24T00:00:00Z';run['result_json']['decision_case']['status']='approved'
+            self.b.case['nodes']['logistics_'+kind].update(status='approved',run_id=run['id'],approved_run_id=run['id'])
+
+    async def test_f6_pending_d1_opens_its_configuration_without_warning_or_admission(self):
+        self.b.review_assignment()
+        await self.b.open('decision-dashboard','logistics_assignment',self.b.f['ids']['assignment'])
+        before=copy.deepcopy(self.b.case)
+        await self.page.locator('[data-rerun]').click();await self.page.locator('[data-config-review]').wait_for()
+        self.assertEqual(await self.page.locator('[data-new-run-warning]').count(),0)
+        self.assertEqual(await self.page.evaluate('window.DationDispatch.getWorkspace().activeNode'),'logistics_assignment')
+        self.assertIn('node_id=logistics_assignment',self.page.url);self.assertNotIn('run_id=',self.page.url)
+        self.assertEqual(self.b.case,before);self.assertEqual(self.b.execution_bodies,[])
+
+    async def test_f7_f8_approved_reruns_cancel_or_open_only_the_current_decision(self):
+        self.approved_fixture();before=copy.deepcopy(self.b.case)
+        for kind in ('assignment','scheduling'):
+            await self.b.open('decision-dashboard','logistics_'+kind,self.b.f['ids'][kind])
+            url=self.page.url;button=self.page.locator('[data-rerun]');await button.click()
+            dialog=self.page.locator('[data-new-run-warning][open]');await dialog.wait_for();await self.page.keyboard.press('Escape')
+            await expect(button).to_be_enabled();self.assertEqual(self.page.url,url);self.assertTrue(await button.evaluate('e=>e===document.activeElement'))
+            await button.click();await dialog.get_by_role('button',name='Confirmar nueva corrida',exact=True).click()
+            await self.page.locator('[data-config-review]' if kind=='assignment' else '[data-scheduling-review]').wait_for()
+            self.assertIn('node_id=logistics_'+kind,self.page.url);self.assertNotIn('run_id=',self.page.url)
+            self.assertEqual(await self.page.evaluate('window.DationDispatch.getWorkspace().decisionCase.id'),self.b.case['id'])
+            self.assertEqual(self.b.case,before);self.assertEqual(self.b.execution_bodies,[])
+
+    async def test_f9_reconfiguration_cannot_fork_a_persisted_case_on_mismatched_profiles(self):
+        self.approved_fixture();await self.b.open('decision-dashboard','logistics_assignment',self.b.f['ids']['assignment'])
+        wrong={**self.b.f['datasets']['orders'],'id':'00000000-0000-4000-8000-000000000099'}
+        await self.b.context.route('**/api/datasets/'+self.b.f['ids']['orders']+'/profile',lambda route:route.fulfill(json={'dataset':wrong}))
+        await self.page.locator('[data-rerun]').click()
+        await self.page.locator('[data-new-run-warning]').get_by_role('button',name='Confirmar nueva corrida',exact=True).click()
+        await self.page.get_by_text('El Data Pack no coincide con el Case de esta corrida. Actualizá el Case antes de continuar.',exact=True).wait_for()
+        self.assertEqual(await self.page.evaluate('window.DationDispatch.getWorkspace().decisionCase.id'),self.b.case['id'])
+        self.assertFalse(any(m=='POST' and p=='/api/decision-cases' for m,p in self.b.requests));self.assertEqual(self.b.execution_bodies,[])
+
+    async def test_f12_warning_is_disposed_when_navigation_changes_before_confirmation(self):
+        self.approved_fixture();await self.b.open('decision-dashboard','logistics_scheduling',self.b.f['ids']['scheduling'])
+        await self.page.locator('[data-rerun]').click();await self.page.locator('[data-new-run-warning][open]').wait_for()
+        await self.page.evaluate("window.dationNavigate('platform-home')")
+        await self.page.locator('.platform-home__greeting').wait_for()
+        self.assertEqual(await self.page.locator('[data-new-run-warning]').count(),0)
+        self.assertEqual(await self.page.evaluate('window.dationGetCurrentView()'),'platform-home')
+        self.assertEqual(self.b.execution_bodies,[]);self.assertEqual(self.b.errors,[])
