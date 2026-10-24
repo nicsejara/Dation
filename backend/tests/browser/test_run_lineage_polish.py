@@ -64,6 +64,7 @@ class RunLineagePolishTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(buttons[0],buttons[1],w);self.assertGreaterEqual(buttons[0]['height'],44)
             self.assertTrue(await confirm.evaluate('e=>e.classList.contains("d-button--primary")'))
             await confirm.focus();await self.page.keyboard.press('Tab');self.assertTrue(await cancel.evaluate('e=>e===document.activeElement'))
+            self.assertTrue(await cancel.evaluate('''e=>{const s=getComputedStyle(e),r=e.getBoundingClientRect();return e.matches(':focus-visible')&&s.outlineStyle==='solid'&&parseFloat(s.outlineWidth)>=2&&r.left>=0&&r.right<=innerWidth&&r.top>=0&&r.bottom<=innerHeight}'''))
             await self.page.keyboard.press('Escape');await dialog.wait_for(state='detached')
             self.assertFalse(await self.page.evaluate('window.__warningResult'));self.assertTrue(await trigger.evaluate('e=>e===document.activeElement'))
         self.assertEqual(self.b.execution_bodies,[]);self.assertEqual(self.b.errors,[])
