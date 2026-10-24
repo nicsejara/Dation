@@ -137,3 +137,29 @@ body.dashboard-drawer-open{overflow:hidden;}
 /* Contextual continuation stays in Hero and wraps naturally on small viewports. */
 .d-decision-dashboard [data-after-approve]{min-width:0;max-width:100%;white-space:normal;height:auto;min-height:var(--workflow-action-height);text-align:center;line-height:1.4}
 .d-decision-dashboard [data-after-approve]>span{white-space:normal;overflow-wrap:anywhere}
+
+/* D1/D2 share physical content/visual zones; narrative length never resizes the artwork. */
+.d-decision-dashboard:is(.assignment-dashboard-v2,.scheduling-dashboard-v2) #dispatch-hero.d-dashboard-hero{
+  --decision-hero-media-height:300px;
+  display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);
+  grid-template-rows:minmax(min-content,1fr) auto;grid-template-areas:'copy visual' 'toolbar toolbar';
+  align-items:start;gap:var(--space-6);min-height:600px;padding:var(--space-8)!important;
+}
+.d-decision-dashboard #dispatch-hero.d-dashboard-hero>.dashboard-hero__content{grid-area:copy;inline-size:100%;min-width:0;max-width:none}
+.d-dashboard-hero .assignment-hero__content{inline-size:100%;max-width:none}
+.d-dashboard-hero>.dashboard-hero__visual{grid-area:visual;align-self:start;justify-self:end;display:grid;grid-template-rows:minmax(72px,auto) var(--decision-hero-media-height);gap:var(--space-4);inline-size:100%;max-inline-size:440px;min-width:0}
+.dashboard-hero__visual>.dashboard-hero-trace{grid-area:auto;grid-row:1;grid-column:1;justify-self:stretch;inline-size:100%;max-width:none;box-sizing:border-box}
+.dashboard-hero__visual>.dashboard-hero__media{position:relative;inset:auto;grid-row:2;grid-column:1;display:block;inline-size:100%;block-size:var(--decision-hero-media-height);max-inline-size:440px;max-block-size:var(--decision-hero-media-height);min-width:0;pointer-events:none}
+.dashboard-hero__media img{display:block;inline-size:100%;block-size:100%;max-inline-size:100%;max-block-size:100%;object-fit:contain;object-position:center}
+.dashboard-hero__media img[hidden]{display:none}
+.d-decision-dashboard #dispatch-hero.d-dashboard-hero>[data-toolbar-placement=hero]{grid-area:toolbar;align-self:end;margin:0}
+@media(max-width:1100px){
+  .d-decision-dashboard:is(.assignment-dashboard-v2,.scheduling-dashboard-v2) #dispatch-hero.d-dashboard-hero{--decision-hero-media-height:240px}
+}
+@media(max-width:900px){
+  .d-decision-dashboard:is(.assignment-dashboard-v2,.scheduling-dashboard-v2) #dispatch-hero.d-dashboard-hero{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto;grid-template-areas:'copy' 'visual' 'toolbar';min-height:0;padding:var(--space-6)!important}
+  .d-dashboard-hero>.dashboard-hero__visual{justify-self:center;grid-template-rows:auto var(--decision-hero-media-height)}
+}
+@media(max-width:600px){
+  .d-decision-dashboard:is(.assignment-dashboard-v2,.scheduling-dashboard-v2) #dispatch-hero.d-dashboard-hero{--decision-hero-media-height:clamp(180px,60vw,240px);padding:var(--space-5)!important}
+}

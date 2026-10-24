@@ -61,17 +61,14 @@ class UnifiedHeroTests(unittest.IsolatedAsyncioTestCase):
                 await self.page.set_viewport_size({'width':width,'height':height})
                 metrics=await hero.evaluate('''(e,kind)=>{
                     const r=e.getBoundingClientRect(),copy=e.querySelector(kind==='assignment'?'.assignment-hero__content':'[data-scheduling-hero]').getBoundingClientRect();
-                    if(kind==='assignment'){
-                        const art=e.querySelector('.assignment-hero__art'),a=art.getBoundingClientRect();
-                        return {visible:getComputedStyle(art).display!=='none',left:a.left,right:a.right,copyRight:copy.right,heroRight:r.right};
-                    }
-                    const s=getComputedStyle(e,'::before');
-                    return {visible:s.display!=='none',left:r.left+parseFloat(s.left),right:r.right-parseFloat(s.right),copyRight:copy.right,heroRight:r.right};
+                    const art=e.querySelector('.dashboard-hero__media'),a=art.getBoundingClientRect();
+                    return {visible:getComputedStyle(art).display!=='none',left:a.left,right:a.right,top:a.top,copyBottom:copy.bottom,copyRight:copy.right,heroRight:r.right};
                 }''',kind)
-                self.assertEqual(metrics['visible'],width>900,(kind,width))
+                self.assertTrue(metrics['visible'],(kind,width))
                 if width>900:
                     self.assertGreaterEqual(metrics['left'],metrics['copyRight'],(kind,width,metrics))
                     self.assertLess(metrics['right'],metrics['heroRight'],(kind,width,metrics))
+                else:self.assertGreaterEqual(metrics['top'],metrics['copyBottom'],(kind,width,metrics))
                 self.assertTrue(await hero.locator('[data-rerun]').is_visible())
                 self.assertFalse(await self.page.evaluate('document.documentElement.scrollWidth>innerWidth'))
         self.assertEqual(self.b.execution_bodies,[]);self.assertEqual(self.b.errors,[])

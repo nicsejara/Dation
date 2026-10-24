@@ -3,6 +3,7 @@ import {bindDashboardPresentation,renderDecisionIntelligence} from '../dashboard
 import {decisionRail,bindDecisionRail} from '../navigation/decision-nav.mjs';
 import {analysisDepthUi} from './assignment-dashboard-selectors.mjs';
 import {renderDashboardToolbar,bindDashboardToolbar} from '../runs/dashboard-toolbar.mjs';
+import {dashboardHeroVisual,bindDashboardHeroVisual} from '../runs/dashboard-hero.mjs';
 
 export function renderAssignmentShell(root,run,caseActions={}){
   const depth=analysisDepthUi(run),id='assignment-presentation-'+run.id;
@@ -10,7 +11,7 @@ export function renderAssignmentShell(root,run,caseActions={}){
   root.className='dispatch assignment-dashboard-v2 d-decision-dashboard';root.dataset.analysisDepth=depth.depth;
   root.innerHTML='<div class="assignment-dashboard-v2__rail">'+decisionRail(caseActions)+'</div>'
     +'<main class="assignment-dashboard-v2__main">'
-      +'<section class="dispatch-panel assignment-dashboard-v2__section assignment-dashboard-v2__hero" id="dispatch-hero"><div data-assignment-hero-copy></div>'+toolbar+'</section>'
+      +'<section class="dispatch-panel assignment-dashboard-v2__section assignment-dashboard-v2__hero d-dashboard-hero" id="dispatch-hero"><div class="dashboard-hero__content" data-assignment-hero-copy></div>'+dashboardHeroVisual('assignment')+toolbar+'</section>'
       +'<section id="assignment-context" class="assignment-context"></section>'
       +'<section id="assignment-kpis"></section>'
       +'<section id="assignment-insights" class="assignment-v2__panel"></section>'
@@ -30,6 +31,7 @@ export function renderAssignmentShell(root,run,caseActions={}){
 }
 
 export function bindAssignmentShell(root,run,{onRerun,caseActions={},onOpenChat,onAdvancedOpen}={}){
+  bindDashboardHeroVisual(root);
   bindDecisionRail(root,caseActions);
   const advanced=root.querySelector('[data-assignment-advanced]');
   const presentation=bindDashboardPresentation(root,{

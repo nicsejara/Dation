@@ -66,3 +66,24 @@ class RunLineagePolishTests(unittest.IsolatedAsyncioTestCase):
             await self.page.keyboard.press('Escape');await dialog.wait_for(state='detached')
             self.assertFalse(await self.page.evaluate('window.__warningResult'));self.assertTrue(await trigger.evaluate('e=>e===document.activeElement'))
         self.assertEqual(self.b.execution_bodies,[]);self.assertEqual(self.b.errors,[])
+
+    async def test_f5_shared_media_slot_is_stable_when_narrative_grows(self):
+        for w,h in WIDTHS:
+            await self.page.set_viewport_size({'width':w,'height':h});snapshots=[]
+            for kind in ('assignment','scheduling'):
+                await self.b.open('decision-dashboard','logistics_'+kind,self.b.f['ids'][kind])
+                hero=self.page.locator('#dispatch-hero');await self.page.evaluate('document.fonts.ready')
+                measure='''e=>{const r=e.getBoundingClientRect(),m=e.querySelector('.dashboard-hero__media').getBoundingClientRect(),i=e.querySelector('.dashboard-hero__media img'),s=getComputedStyle(e),v=getComputedStyle(i);return {x:m.x-r.x,y:m.y-r.y,width:m.width,height:m.height,padding:s.padding,minHeight:s.minHeight,fit:v.objectFit,position:v.objectPosition,maxWidth:getComputedStyle(i.parentElement).maxWidth,font:getComputedStyle(e.querySelector('h1')).fontSize}}'''
+                baseline=await hero.evaluate(measure);snapshots.append(baseline)
+                self.assertTrue(await hero.locator('.dashboard-hero__media img').is_visible())
+                self.assertEqual(await hero.locator('.dashboard-hero__media').get_attribute('aria-hidden'),'true')
+                for text in ('48 viajes con recursos aprobados.','Ejecutar 48 viajes entre las fechas aprobadas y conservar todos los recursos y cargas del plan.',' '.join(['El resultado publicado conserva recursos, cargas, evidencia y trazabilidad de esta corrida.']*5)):
+                    await hero.locator('.decision-result-summary__headline').evaluate('(e,text)=>e.textContent=text',text)
+                    actual=await hero.evaluate(measure)
+                    for key in ('width','height','x','fit','position','maxWidth','font'):self.assertEqual(actual[key],baseline[key],(kind,w,key))
+                    if w>900:self.assertEqual(actual['y'],baseline['y'],(kind,w))
+                    self.assertFalse(await self.page.evaluate('document.documentElement.scrollWidth>innerWidth'))
+            for key in ('width','height','x'):
+                self.assertAlmostEqual(snapshots[0][key],snapshots[1][key],delta=.5,msg=(w,key))
+            if w>900:self.assertAlmostEqual(snapshots[0]['y'],snapshots[1]['y'],delta=.5)
+            for key in ('padding','minHeight','fit','position','maxWidth','font'):self.assertEqual(snapshots[0][key],snapshots[1][key],(w,key))

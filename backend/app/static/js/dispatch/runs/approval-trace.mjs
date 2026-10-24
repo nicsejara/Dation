@@ -7,7 +7,8 @@ function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefine
 export function mountDashboardTrace(root,{state,run,nodeId}){
  const hero=root.querySelector('#dispatch-hero,.d-page-hero');if(!hero)return;
  hero.classList.add('has-decision-trace');
- const host=el('aside',undefined,'dashboard-hero-trace');host.setAttribute('aria-label','Trazabilidad de la decisión');hero.append(host);
+ const host=el('aside',undefined,'dashboard-hero-trace');host.setAttribute('aria-label','Trazabilidad de la decisión');
+ const visual=hero.querySelector('[data-dashboard-visual]');if(visual)visual.prepend(host);else hero.append(host);
  const scope=createScope(host),context={host,scope,dispose:()=>scope.dispose()},trace=el('dl');trace.dataset.runTrace='';host.append(trace);
  const assigned=state.workflow?.stages?.[nodeId]?.owner;
  const key=[state.decisionCase.id,run.id,run.approved_by_user_id,run.approved_at].join(':');

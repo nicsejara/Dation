@@ -6,8 +6,6 @@
 .assignment-dashboard-v2__main { display:grid; gap:var(--space-6); }
 .assignment-dashboard-v2__main>section,.assignment-dashboard-v2__main>details { margin:0!important; min-width:0; }
 .assignment-dashboard-v2 .assignment-dashboard-v2__hero { position:relative; isolation:isolate; padding:var(--space-8)!important; background:var(--color-surface)!important; }
-.assignment-hero__art { position:absolute; z-index:-1; inset:100px var(--space-6) 100px 60%; overflow:hidden; pointer-events:none; }
-.assignment-hero__art img { display:block; width:100%; height:100%; object-fit:contain; object-position:center; }
 .assignment-hero__content { width:var(--decision-hero-copy-width); max-width:780px; min-width:0; }
 .assignment-hero__content h1 { margin:var(--space-2) 0 var(--space-3); font-size:clamp(26px,2.7vw,38px); line-height:1.15; letter-spacing:-.025em; color:var(--color-text); }
 .assignment-hero__status { display:inline-flex; align-items:center; gap:var(--space-2); max-width:100%; padding:var(--space-1) var(--space-2); border:1px solid var(--color-success-border); border-radius:var(--radius-pill); color:var(--color-success); background:var(--color-success-bg); font-size:12px; font-weight:700; line-height:1.5; }
@@ -155,7 +153,6 @@
 @media(max-width:600px) { .assignment-context__grid,.assignment-dashboard-v2 .assignment-essential__kpi-strip { grid-template-columns:minmax(0,1fr); } }
 
 /* D1: allocation is read through the objective and scenario comparison. */
-@media(max-width:900px){.assignment-hero__art{display:none}}
 .assignment-dashboard-v2 .assignment-v2__panel{box-shadow:none;border-radius:var(--radius-md)}
 .assignment-dashboard-v2__main{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:28px}
 .assignment-dashboard-v2__main>*{grid-column:1/-1}
