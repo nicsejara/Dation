@@ -55,7 +55,7 @@ export function decisionSectionHeader({number,eyebrow,title,copy,icon,current}){
   +'</header>';
 }
 
-export function decisionHero({step,decisionIndex,totalDecisions=3,title,description,panelItems=[],panelTitle="ESTA DECISIÓN",panelFootnote="",className="decision-config-hero dispatch-pro-hero assignment-config-hero",reveal=false}){
+export function decisionHero({step,decisionIndex,totalDecisions=3,title,description,panelItems=[],panelTitle="ESTA DECISIÓN",panelFootnote="",panelArtwork=true,className="decision-config-hero dispatch-pro-hero assignment-config-hero",reveal=false}){
   const hasDecision=decisionIndex!==undefined&&decisionIndex!==null&&decisionIndex!=="";
   const hasPanel=panelItems.length>0;
   return '<section class="'+esc(className)+' d-page-hero d-page-hero--workflow'+(hasPanel?'':' d-page-hero--copy-only')+'"'+attr("data-reveal",reveal)+'>'
@@ -68,7 +68,7 @@ export function decisionHero({step,decisionIndex,totalDecisions=3,title,descript
       +'<p class="dispatch-pro-hero-lead">'+esc(description)+'</p>'
     +'</div>'
     +(hasPanel?'<details class="dispatch-pro-hero-visual"><summary>'+esc(panelTitle)+'</summary>'
-      +'<img class="dispatch-pro-hero-watermark" src="/static/assets/dda-logistics.svg?v=workflow-hero" alt="">'
+      +(panelArtwork?'<img class="dispatch-pro-hero-watermark" src="/static/assets/dda-logistics.svg?v=workflow-hero" alt="">':'')
       +'<div class="decision-config-decision-panel dispatch-pro-how-panel assignment-decision-panel">'
 
         +panelItems.map((item,index)=>(

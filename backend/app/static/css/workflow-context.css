@@ -3,6 +3,25 @@
 
 .workflow-responsibility{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}.workflow-responsibility>div:first-child{flex:1;min-width:160px}.workflow-responsibility :is(h2,p){margin:0}.workflow-responsibility h2{margin-bottom:8px}.workflow-responsibility p+p{margin-top:6px}.workflow-responsibility__editor{display:grid;gap:12px;flex-basis:100%;min-width:0}.workflow-responsibility .d-input{width:100%;box-sizing:border-box;min-width:0;min-height:44px}.workflow-context-actions{display:flex;gap:12px;flex-wrap:wrap}.workflow-context-actions>.d-button{min-height:44px}.workflow-responsibility :focus-visible{outline:2px solid var(--color-focus);outline-offset:3px}
 .workflow-responsibility [hidden]{display:none}.workflow-gate-reason{color:var(--color-text-secondary);overflow-wrap:anywhere}
+/* Data Owner's native control is the shared source for every responsibility editor. */
+.workflow-responsibility .d-responsibility-select{box-sizing:border-box;inline-size:100%;min-inline-size:0;min-block-size:44px;padding:10px;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-surface-raised);color:var(--color-text);font-family:var(--font-sans);font-size:14px;font-weight:400;line-height:normal;appearance:auto}
+.workflow-responsibility .d-responsibility-select:hover:not(:disabled){border-color:var(--color-focus);background:var(--color-surface-hover)}
+.workflow-responsibility .d-responsibility-select:focus-visible{outline:2px solid var(--color-focus);outline-offset:3px}
+.workflow-responsibility .d-responsibility-select:disabled{color:var(--color-text-disabled);background:var(--color-surface);cursor:not-allowed}
+.workflow-responsibility .d-responsibility-select option{background:var(--color-surface-raised);color:var(--color-text)}
+
+.new-run-warning{box-sizing:border-box;inline-size:min(560px,calc(100vw - 32px));max-block-size:calc(100dvh - 32px);margin:auto;padding:var(--space-6);overflow:auto;border:1px solid var(--color-border);border-radius:var(--radius-lg);background:var(--color-surface);color:var(--color-text)}
+.new-run-warning[open]{display:grid;gap:var(--space-4)}
+.new-run-warning::backdrop{background:var(--color-backdrop,rgba(0,0,0,.65))}
+.new-run-warning h2{margin:0;font-size:20px;line-height:1.4}
+.new-run-warning p{margin:0;color:var(--color-text-secondary);font-size:14px;line-height:1.6;overflow-wrap:anywhere}
+.new-run-warning__actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:1fr;gap:var(--space-3);margin-top:var(--space-2)}
+.new-run-warning.d-platform .new-run-warning__actions .d-button:not(.d-button--workflow){--platform-button-height:var(--control-height-lg);inline-size:100%;min-inline-size:0;min-block-size:44px;padding:10px 16px;border-radius:var(--radius-control);font:600 13px/1.35 var(--font-sans);white-space:normal;text-align:center;justify-content:center}
+.new-run-warning__actions .d-button--secondary{color:var(--color-text);border-color:var(--color-control-border);background:var(--color-surface-raised)}
+.new-run-warning__actions .d-button--secondary:hover{border-color:var(--color-focus);background:var(--color-surface-hover)}
+.new-run-warning__actions .d-button:active{filter:brightness(.94)}
+.new-run-warning__actions .d-button:focus-visible{outline:3px solid var(--color-focus);outline-offset:3px}
+@media(max-width:520px){.new-run-warning{padding:var(--space-5)}.new-run-warning__actions{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:600px){.workflow-responsibility{align-items:stretch}.workflow-responsibility>.d-button,.workflow-context-actions>.d-button{width:100%;justify-content:center}}
 
 .workflow-responsibility__actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.workflow-responsibility__actions>.d-button{width:100%;min-width:0;min-height:44px;box-sizing:border-box;padding:10px 16px;justify-content:center}.workflow-map-responsibilities{min-width:0;margin-top:16px}.workflow-map-responsibilities .workflow-responsibility{padding:12px}.workflow-responsibility--readonly{display:grid;gap:10px}.workflow-context>h2{margin-top:24px}

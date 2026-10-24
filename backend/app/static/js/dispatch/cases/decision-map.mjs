@@ -295,6 +295,7 @@ function heroMarkup(decisionCase){
     title:decisionCase?.label||"Decision Case",
     description:"Dation muestra qué decisiones podés resolver con tus datos y cuáles se habilitan después. Elegí, configurá y aprobá para avanzar.",
     panelTitle:"CÓMO AVANZA EL CASO",
+    panelArtwork:false,
     panelItems:[
       {label:"1 · ELEGÍ",description:"La decisión que está disponible.",icon:"mousePointer"},
       {label:"2 · CONFIGURÁ",description:"Definí tu prioridad y compará escenarios.",icon:"sliders"},

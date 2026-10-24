@@ -51,7 +51,7 @@ export function mountResponsibilitySelector(root,{caseId,stageKey,field='owner',
   draft.open=true;
   controller?.abort();controller=new AbortController();const own=++generation,signal=controller.signal;
   let saving=false,loaded=false,candidates=[];const initial=current?.stages?.[stageKey]?.[field]?.id||'',editVersion=draft.version;
-  const panel=el('div',undefined,'workflow-responsibility__editor'),label=el('label',type.label,'d-label'),select=el('select',undefined,'d-input');select.id=id+'-choice';label.htmlFor=select.id;
+  const panel=el('div',undefined,'workflow-responsibility__editor'),label=el('label',type.label,'d-label'),select=el('select',undefined,'d-input d-responsibility-select');select.id=id+'-choice';label.htmlFor=select.id;
   const message=el('p','Cargando personas del Equipo…','d-metadata'),error=el('p');message.id=id+'-status';message.role='status';error.role='alert';select.setAttribute('aria-describedby',message.id);
   const actions=el('div',undefined,'workflow-context-actions workflow-responsibility__actions'),save=button('Guardar',commit),cancel=button('Cancelar',()=>{if(!saving){draft.open=false;delete draft.value;if(onCancel)onCancel();else{render();root.querySelector('button')?.focus();}}});save.classList.replace('d-button--secondary','d-button--primary');save.disabled=true;actions.append(cancel,save);panel.append(label,select,message,error);if(!deferSave)panel.append(actions);root.append(panel);const trigger=root.querySelector('button');if(trigger)trigger.hidden=true;
   function ready(){save.disabled=!loaded||saving||!canSave()||select.value===initial;}
