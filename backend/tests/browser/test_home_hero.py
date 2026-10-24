@@ -106,3 +106,31 @@ class HomeHeroTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(await hero.locator('h1').is_visible())
         self.assertEqual(await self.page.locator('.platform-home__quick-link').count(),4)
         self.assertEqual(self.b.errors,[])
+
+    async def test_alignment_matches_logistics_frame_and_control_geometry(self):
+        for width,height in WIDTHS+((1920,1080),):
+            await self.page.set_viewport_size({'width':width,'height':height})
+            measured=[]
+            for path,hero_selector,actions in [('/app','.platform-home__header','.platform-home__hero-actions a'),('/app/ddas/logistics','.dda-landing__hero','.dda-landing__hero-actions button')]:
+                await self.page.goto(f'http://127.0.0.1:{self.b.port}'+path)
+                hero=self.page.locator(hero_selector);await hero.wait_for()
+                await self.page.evaluate('document.fonts.ready')
+                measured.append(await hero.evaluate('''(hero,selector)=>{
+                    const rect=e=>{const r=e.getBoundingClientRect();return {x:r.x,width:r.width,height:r.height}};
+                    return {hero:rect(hero),buttons:[...hero.querySelectorAll(selector)].map(e=>{
+                        const s=getComputedStyle(e);return {...rect(e),padding:s.padding,radius:s.borderRadius,font:s.fontSize,weight:s.fontWeight,line:s.lineHeight};
+                    })};
+                }''',actions))
+            home,logistics=measured
+            self.assertAlmostEqual(home['hero']['x'],logistics['hero']['x'],delta=.5)
+            self.assertAlmostEqual(home['hero']['width'],logistics['hero']['width'],delta=.5)
+            primary,secondary=home['buttons'];reference=logistics['buttons'][0]
+            self.assertAlmostEqual(primary['width'],secondary['width'],delta=.1)
+            self.assertAlmostEqual(primary['height'],secondary['height'],delta=.1)
+            self.assertAlmostEqual(primary['width'],reference['width'],delta=1)
+            self.assertAlmostEqual(primary['height'],reference['height'],delta=.1)
+            for key in ('padding','radius','font','weight','line'):
+                self.assertEqual(primary[key],secondary[key],(width,key))
+                self.assertEqual(primary[key],reference[key],(width,key))
+            self.assertFalse(await self.page.evaluate('document.documentElement.scrollWidth>innerWidth'))
+        self.assertEqual(self.b.errors,[]);self.assertEqual(self.b.execution_bodies,[])

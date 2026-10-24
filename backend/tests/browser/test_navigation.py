@@ -3628,7 +3628,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             home_cta=await root.locator('.platform-hero-cta').first.bounding_box()
             if width>=1024:
                 self.assertLessEqual(await root.locator('.d-page-description').evaluate('el=>{const range=document.createRange();range.selectNodeContents(el);return range.getClientRects().length}'),3)
-            self.assertGreaterEqual(home_cta['height'],40 if width>=768 else 44)
+            self.assertGreaterEqual(home_cta['height'],40)
             self.assertLessEqual(home_cta['x']+home_cta['width'],width)
             self.assertTrue(await self.page.evaluate('document.documentElement.scrollWidth<=innerWidth+1'))
             await root.locator('.platform-home__quick').get_by_role('link',name='Decision Center',exact=True).click()
