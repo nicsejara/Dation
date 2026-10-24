@@ -25,7 +25,7 @@ export function mountWorkspaceHome(root,getIdentity){
  ctas.append(catalog,center);
  copy.append(el('p','DATION · DECISION INTELLIGENCE','platform-home__eyebrow'),salutation,title,el('p','Dation combina datos, reglas y motores de decisión para que cada análisis tenga contexto, evidencia y trazabilidad.','d-page-description'),ctas);
  const visual=el('div',undefined,'platform-home__network d-product-hero__art');visual.setAttribute('aria-hidden','true');
- const image=el('img');image.src='/static/assets/home-decision-network-placeholder.svg';image.alt='';image.width=640;image.height=480;image.decoding='async';image.loading='eager';visual.append(image);
+ const image=el('img');image.src='/static/assets/home-isometric.webp';image.alt='';image.width=724;image.height=543;image.decoding='async';image.loading='eager';visual.append(image);
  const chain=el('ol',undefined,'platform-home__chain d-product-hero__panel');chain.setAttribute('aria-label','Modelo de decisiones de Dation');
  for(const [label,detail] of [['Data Pack','Datos y contexto de la decisión'],['Decision Case','Objetivo, reglas y responsables'],['Decision Run','Alternativas, evidencia y aprobación']]){
   const step=el('li',undefined,'d-product-hero__step');step.append(el('strong',label,'d-product-hero__label'),el('span',detail,'d-product-hero__detail'));chain.append(step);

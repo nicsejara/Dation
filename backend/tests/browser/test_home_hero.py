@@ -33,9 +33,9 @@ class HomeHeroTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(await hero.locator('.platform-home__chain li>span').all_inner_texts(),['Datos y contexto de la decisión','Objetivo, reglas y responsables','Alternativas, evidencia y aprobación'])
             self.assertEqual(await hero.locator('.platform-home__chain a,.platform-home__chain button').count(),0)
             image=hero.locator('img');self.assertEqual(await image.get_attribute('alt'),'')
-            self.assertEqual(await image.get_attribute('width'),'640');self.assertEqual(await image.get_attribute('height'),'480')
+            self.assertEqual(await image.get_attribute('width'),'724');self.assertEqual(await image.get_attribute('height'),'543')
             if width>700:
-                await self.page.wait_for_function('document.querySelector(".platform-home__network img").naturalWidth===640')
+                await self.page.wait_for_function('document.querySelector(".platform-home__network img").naturalWidth===724')
                 self.assertTrue(await image.is_visible())
             else:self.assertFalse(await image.is_visible())
             self.assertEqual(await self.page.locator('.view.is-active h1').count(),1)
@@ -88,19 +88,19 @@ class HomeHeroTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_art_is_small_and_reserves_geometry_and_content_survives_failure(self):
         import asyncio
-        asset=nav.ROOT/'app/static/assets/home-decision-network-placeholder.svg'
-        self.assertLess(asset.stat().st_size,10_000)
+        asset=nav.ROOT/'app/static/assets/home-isometric.webp'
+        self.assertLess(asset.stat().st_size,110_000)
         async def slow_art(route):
             await asyncio.sleep(.5)
-            await route.fulfill(path=asset,content_type='image/svg+xml')
-        await self.b.context.route('**/home-decision-network-placeholder.svg',slow_art)
+            await route.fulfill(path=asset,content_type='image/webp')
+        await self.b.context.route('**/home-isometric.webp',slow_art)
         await self.open_home()
         hero=self.page.locator('.platform-home__header')
         before=await hero.bounding_box()
         await self.page.wait_for_function('document.querySelector(".platform-home__network img").naturalWidth>0')
         self.assertEqual(await hero.bounding_box(),before)
-        await self.b.context.unroute('**/home-decision-network-placeholder.svg',slow_art)
-        await self.b.context.route('**/home-decision-network-placeholder.svg',lambda route:route.abort())
+        await self.b.context.unroute('**/home-isometric.webp',slow_art)
+        await self.b.context.route('**/home-isometric.webp',lambda route:route.abort())
         await self.open_home()
         self.assertEqual(await hero.get_by_role('link').count(),2)
         self.assertTrue(await hero.locator('h1').is_visible())

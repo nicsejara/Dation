@@ -149,12 +149,14 @@ class FinalPolishTests(unittest.IsolatedAsyncioTestCase):
                 self.assertTrue(all(s==styles[0] for s in styles),(kind,width,styles))
                 self.assertEqual(await metrics.locator('button,[role=button],[aria-selected]').count(),0)
                 hero=self.page.locator('#dispatch-hero')
-                if width>760:
+                if width>900:
                     if kind=='assignment':
                         self.assertTrue(await hero.locator('.assignment-hero__art').is_visible())
                         await self.page.wait_for_function('document.querySelector(".assignment-hero__art img").naturalWidth>0')
-                        self.assertIn('assignment-hero-3d.png',await hero.locator('img').get_attribute('src'))
-                    else:self.assertIn('scheduling-hero-3d.png',await hero.evaluate('e=>getComputedStyle(e,"::before").backgroundImage'))
+                        self.assertIn('assignment-isometric.webp',await hero.locator('img').get_attribute('src'))
+                    else:self.assertIn('scheduling-isometric.webp',await hero.evaluate('e=>getComputedStyle(e,"::before").backgroundImage'))
+                elif kind=='assignment':self.assertFalse(await hero.locator('.assignment-hero__art').is_visible())
+                else:self.assertEqual(await hero.evaluate('e=>getComputedStyle(e,"::before").display'),'none')
                 self.assertFalse(await self.page.evaluate('document.documentElement.scrollWidth>innerWidth'))
             self.assertTrue(await self.page.locator('[data-rerun]').is_visible())
         self.assertEqual(self.b.runs,before)
