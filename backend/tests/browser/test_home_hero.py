@@ -116,14 +116,19 @@ class HomeHeroTests(unittest.IsolatedAsyncioTestCase):
                 hero=self.page.locator(hero_selector);await hero.wait_for()
                 await self.page.evaluate('document.fonts.ready')
                 measured.append(await hero.evaluate('''(hero,selector)=>{
-                    const rect=e=>{const r=e.getBoundingClientRect();return {x:r.x,width:r.width,height:r.height}};
-                    return {hero:rect(hero),buttons:[...hero.querySelectorAll(selector)].map(e=>{
+                    const rect=e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height}};
+                    const s=getComputedStyle(hero),copy=hero.querySelector('.d-product-hero__copy'),panel=hero.querySelector('.d-product-hero__panel'),p=getComputedStyle(panel);
+                    return {hero:rect(hero),padding:s.padding,radius:s.borderRadius,copy:rect(copy),panel:{background:p.backgroundColor,border:p.border,radius:p.borderRadius,padding:p.padding},buttons:[...hero.querySelectorAll(selector)].map(e=>{
                         const s=getComputedStyle(e);return {...rect(e),padding:s.padding,radius:s.borderRadius,font:s.fontSize,weight:s.fontWeight,line:s.lineHeight};
                     })};
                 }''',actions))
             home,logistics=measured
             self.assertAlmostEqual(home['hero']['x'],logistics['hero']['x'],delta=.5)
             self.assertAlmostEqual(home['hero']['width'],logistics['hero']['width'],delta=.5)
+            if width>700:self.assertAlmostEqual(home['hero']['height'],logistics['hero']['height'],delta=.5)
+            for key in ('padding','radius','panel'):self.assertEqual(home[key],logistics[key],(width,key))
+            self.assertAlmostEqual(home['copy']['y']-home['hero']['y'],21 if width<=700 else 25,delta=.1)
+            self.assertAlmostEqual(home['copy']['x']-home['hero']['x'],21 if width<=700 else 25,delta=.1)
             primary,secondary=home['buttons'];reference=logistics['buttons'][0]
             self.assertAlmostEqual(primary['width'],secondary['width'],delta=.1)
             self.assertAlmostEqual(primary['height'],secondary['height'],delta=.1)

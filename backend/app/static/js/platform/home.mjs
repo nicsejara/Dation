@@ -17,18 +17,18 @@ function greeting(identity){
 
 export function mountWorkspaceHome(root,getIdentity){
  const scope=createScope(root);
- const header=el('header',undefined,'platform-home__header platform-entry-hero'),copy=el('div',undefined,'platform-home__hero-copy');
+ const header=el('header',undefined,'platform-home__header platform-entry-hero d-product-hero'),copy=el('div',undefined,'platform-home__hero-copy d-product-hero__copy');
  const salutation=el('p',undefined,'platform-home__greeting'),title=el('h1','De tus datos a decisiones que podés ','d-page-title'),ctas=el('div',undefined,'platform-home__hero-actions platform-hero-actions');
  title.append(el('span','explicar y repetir.','platform-home__emphasis'));
  const catalog=heroCta(link('Explorar DDA','platform-home','d-button d-button--primary'));
  const center=heroCta(link('Ir a Decision Center','platform-decisions'),'arrowRight');
  ctas.append(catalog,center);
  copy.append(el('p','DATION · DECISION INTELLIGENCE','platform-home__eyebrow'),salutation,title,el('p','Dation combina datos, reglas y motores de decisión para que cada análisis tenga contexto, evidencia y trazabilidad.','d-page-description'),ctas);
- const visual=el('div',undefined,'platform-home__network');visual.setAttribute('aria-hidden','true');
+ const visual=el('div',undefined,'platform-home__network d-product-hero__art');visual.setAttribute('aria-hidden','true');
  const image=el('img');image.src='/static/assets/home-decision-network-placeholder.svg';image.alt='';image.width=640;image.height=480;image.decoding='async';image.loading='eager';visual.append(image);
- const chain=el('ol',undefined,'platform-home__chain');chain.setAttribute('aria-label','Modelo de decisiones de Dation');
+ const chain=el('ol',undefined,'platform-home__chain d-product-hero__panel');chain.setAttribute('aria-label','Modelo de decisiones de Dation');
  for(const [label,detail] of [['Data Pack','Datos y contexto de la decisión'],['Decision Case','Objetivo, reglas y responsables'],['Decision Run','Alternativas, evidencia y aprobación']]){
-  const step=el('li');step.append(el('strong',label),el('span',detail));chain.append(step);
+  const step=el('li',undefined,'d-product-hero__step');step.append(el('strong',label,'d-product-hero__label'),el('span',detail,'d-product-hero__detail'));chain.append(step);
  }
  header.append(copy,visual,chain);
  const quick=el('section',undefined,'d-card platform-home__section platform-home__access'),heading=el('h2','Accesos rápidos','d-section-title'),links=el('ul',undefined,'platform-home__quick');

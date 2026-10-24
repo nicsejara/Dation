@@ -122,6 +122,10 @@
   --workflow-context-control-min-width: 14ch;
   --workflow-action-min-width: calc(var(--workflow-context-control-min-width) + 2 * var(--workflow-action-padding-x));
   --hero-min-height: 220px;
+  /* Home and the Logistics entry share one structural frame. */
+  --product-hero-height: 480px;
+  --product-hero-padding: var(--space-6);
+  --product-hero-radius: var(--radius-hero);
   --hero-padding: var(--space-6);
   --hero-gap: var(--space-6);
   --hero-title-size: clamp(28px,2.8vw,36px);
