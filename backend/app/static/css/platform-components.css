@@ -257,6 +257,7 @@
   .d-product-hero{--product-hero-height:0px;--product-hero-padding:var(--space-5)}
   .d-product-hero.d-page-hero,.d-platform .platform-entry-hero.d-product-hero{grid-template-columns:minmax(0,1fr)}
   .d-product-hero>.d-product-hero__art{display:none}
+  .d-product-hero__copy .dda-landing__hero-actions .d-button{min-inline-size:0;white-space:normal;text-align:center}
   .d-product-hero>.d-product-hero__panel{grid-template-columns:minmax(0,1fr)}
   .d-product-hero__panel>.d-product-hero__step{padding:var(--space-3) var(--space-4);border-inline-end:0;border-bottom:1px solid var(--color-border)}
 }

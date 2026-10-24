@@ -41,6 +41,11 @@
 .sidebar .asset-item{border:0;border-radius:var(--radius-control);background:transparent}
 .sidebar .asset-item.is-active{background:var(--color-surface)}
 .sidebar .asset-icon{background:transparent;border:0;box-shadow:none}
+/* The row owns interaction feedback; the shared Logistics glyph stays unpainted. */
+.sidebar .asset-item .asset-icon--route,.sidebar .asset-item:is(:hover,:active,:focus-visible,.is-active) .asset-icon--route{background:transparent;border:0;box-shadow:none}
+.sidebar .asset-icon--route img{display:block;background:transparent;box-shadow:none}
+.sidebar .asset-item:focus-visible{outline:3px solid var(--color-focus);outline-offset:2px;background:var(--color-surface)}
+.sidebar .asset-item:active:not(:disabled){background:var(--color-surface-hover)}
 .platform-account__trigger{border:0;border-top:1px solid var(--color-border);border-radius:0;padding:16px 6px 4px}
 .platform-account__avatar{background:var(--color-surface-strong);color:var(--color-text);font-family:var(--font-sans)}
 .topbar{background:var(--color-bg-raised);backdrop-filter:none}

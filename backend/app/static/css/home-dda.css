@@ -56,7 +56,7 @@
 .d-home__asset-top { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:var(--space-3); }
 .d-home__asset-icon { display:grid; width:52px; height:52px; flex:0 0 52px; place-items:center; border:1px solid var(--color-border); border-radius:var(--radius-md); color:var(--color-text-muted); background:var(--color-surface-strong); }
 .d-home__asset-icon img { width:40px; height:40px; object-fit:contain; }
-.d-home__production-icon { width:40px; height:40px; background:currentColor; mask:url('/static/assets/dda-production.svg') center / contain no-repeat; }
+.d-home__production-icon { width:28px; height:28px; background:currentColor; mask:url('/static/assets/dda-production.svg') center / contain no-repeat; }
 .d-home__asset-icon svg { width:28px; height:28px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
 .d-home__asset--available .d-home__asset-icon { color:var(--d-brand-teal-bright); border-color:var(--color-brand); background:var(--color-brand-soft); transition:border-color var(--transition-base),background var(--transition-base); }
 .d-home__asset--available:hover .d-home__asset-icon { border-color:var(--d-brand-teal-bright); background:var(--color-surface-hover); }
@@ -116,7 +116,7 @@
 .d-home__asset-icon{width:32px;height:32px;flex-basis:32px;border:0;border-radius:0;background:transparent}
 .d-home__asset-icon :is(img,svg){width:28px;height:28px}
 .d-home__asset--available .d-home__asset-icon{width:64px;height:64px;border:0;background:transparent}
-.d-home__asset--available .d-home__asset-icon img{width:64px;height:64px}
+.d-home__asset--available .d-home__asset-icon img{width:48px;height:48px}
 .d-home__asset--coming-soon h3{font-size:17px;font-weight:600}
 .d-home__asset--coming-soon .d-home__asset-footer{padding-top:8px}
 .d-home__badge{border-radius:4px;font-weight:500;font-size:11px}

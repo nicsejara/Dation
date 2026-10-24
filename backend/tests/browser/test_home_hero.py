@@ -119,7 +119,9 @@ class HomeHeroTests(unittest.IsolatedAsyncioTestCase):
                     const rect=e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height}};
                     const s=getComputedStyle(hero),copy=hero.querySelector('.d-product-hero__copy'),panel=hero.querySelector('.d-product-hero__panel'),p=getComputedStyle(panel);
                     return {hero:rect(hero),padding:s.padding,radius:s.borderRadius,copy:rect(copy),panel:{background:p.backgroundColor,border:p.border,radius:p.borderRadius,padding:p.padding},buttons:[...hero.querySelectorAll(selector)].map(e=>{
-                        const s=getComputedStyle(e);return {...rect(e),padding:s.padding,radius:s.borderRadius,font:s.fontSize,weight:s.fontWeight,line:s.lineHeight};
+                        const s=getComputedStyle(e),r=e.getBoundingClientRect(),walker=document.createTreeWalker(e,NodeFilter.SHOW_TEXT),range=document.createRange();let n,inkFits=true;
+                        while(n=walker.nextNode()){if(!n.textContent.trim()||n.parentElement.closest('svg'))continue;range.selectNodeContents(n);for(const b of range.getClientRects())if(b.left<r.left+1||b.right>r.right-1||b.top<r.top||b.bottom>r.bottom)inkFits=false;}
+                        return {...rect(e),inkFits,padding:s.padding,radius:s.borderRadius,font:s.fontSize,weight:s.fontWeight,line:s.lineHeight};
                     })};
                 }''',actions))
             home,logistics=measured
@@ -130,6 +132,7 @@ class HomeHeroTests(unittest.IsolatedAsyncioTestCase):
             self.assertAlmostEqual(home['copy']['y']-home['hero']['y'],21 if width<=700 else 25,delta=.1)
             self.assertAlmostEqual(home['copy']['x']-home['hero']['x'],21 if width<=700 else 25,delta=.1)
             primary,secondary=home['buttons'];reference=logistics['buttons'][0]
+            self.assertTrue(all(button['inkFits'] for page in measured for button in page['buttons']),(width,measured))
             self.assertAlmostEqual(primary['width'],secondary['width'],delta=.1)
             self.assertAlmostEqual(primary['height'],secondary['height'],delta=.1)
             self.assertAlmostEqual(primary['width'],reference['width'],delta=1)
