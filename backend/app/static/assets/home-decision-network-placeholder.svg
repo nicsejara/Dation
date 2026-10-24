@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480" viewBox="0 0 640 480" fill="none">
+<!-- Local interim artwork: Dation Decision Network. Replace with approved final render; no UI or data is encoded here. -->
+<defs>
+  <linearGradient id="top" x1="210" y1="110" x2="430" y2="350" gradientUnits="userSpaceOnUse"><stop stop-color="#344b58"/><stop offset="1" stop-color="#192a34"/></linearGradient>
+  <linearGradient id="hub" x1="260" y1="175" x2="385" y2="280" gradientUnits="userSpaceOnUse"><stop stop-color="#2c6265"/><stop offset="1" stop-color="#1b343f"/></linearGradient>
+  <linearGradient id="edge" x1="250" y1="245" x2="375" y2="315" gradientUnits="userSpaceOnUse"><stop stop-color="#369497"/><stop offset="1" stop-color="#1b414b"/></linearGradient>
+  <g id="base"><path d="m-48 0 48-27 48 27v18L0 45l-48-27z" fill="#101b23"/><path d="M0 27v18l48-27V0z" fill="#192b35"/><path d="m-48 0 48-27 48 27L0 27z" fill="url(#top)" stroke="#425c67" stroke-width="1.2"/></g>
+</defs>
+<!-- Structured ground, with five typed modules around one orchestration hub. -->
+<path d="m66 253 266-153 260 150v36L326 439 66 289z" fill="#101b23"/>
+<path d="m66 253 266-153 260 150-266 153z" fill="#17262f" stroke="#2c424d"/>
+<path d="M326 403v36l266-153v-36z" fill="#14222c"/>
+<path d="m93 254 239-138 234 135-240 138z" stroke="#253b45"/>
+<g stroke="#3c7278" stroke-width="2" stroke-linejoin="round">
+  <path d="m184 203 58 33 72-42"/><path d="m325 225 88-51 51 29"/>
+  <path d="m338 264 84 48 69-40"/><path d="m291 274-36 21v47"/>
+  <path d="m281 248-74 43-56-32"/>
+</g>
+<g stroke="#50c8c4" stroke-width="2.5" stroke-linecap="round"><path d="m212 219 30 17 32-19"/><path d="m378 194 35-20 20 11"/><path d="m388 293 34 19 30-17"/><path d="m255 316 0 26"/><path d="m230 278-23 13-24-14"/></g>
+<!-- Data: a physical stack of three input layers. -->
+<g transform="translate(167 161)">
+ <use href="#base"/>
+ <path d="m-27-5 27-15 27 15v27L0 38l-27-16z" fill="#223b46"/>
+ <path d="M0 11v27l27-16V-5z" fill="#1c303b"/>
+ <path d="m-27-5 27-15 27 15L0 11z" fill="#3c5861" stroke="#617b82"/>
+ <path d="m-27 4 27 16 27-16M-27 13 0 29l27-16" stroke="#61b1b0" stroke-width="1.5"/>
+</g>
+<!-- Case: a folder holds the criteria and context. -->
+<g transform="translate(431 145)">
+ <use href="#base"/>
+ <path d="m-27-24 18-10 12 7 22-13 17 10v44L0 38l-27-16z" fill="#233e49"/>
+ <path d="m-27-24 27 16 42-22-17-10L3-27l-12-7z" fill="#45616b"/>
+ <path d="M0-8v46l42-24v-44z" fill="#2d4c56"/>
+ <path d="m9 5 23-13M9 14l17-10" stroke="#87acae" stroke-width="2"/>
+</g>
+<!-- Run: a sequence of executed alternatives, represented as stacked plates. -->
+<g transform="translate(492 260)">
+ <use href="#base"/>
+ <path d="m-29-4 29-17L29-4v11L0 24-29 7z" fill="#2a444f"/>
+ <path d="m-29-4 29-17L29-4 0 13z" fill="#3b5b65" stroke="#5e858c"/>
+ <path d="m-22-18 29-17 29 17v9L7 8-22-9z" fill="#28434f"/>
+ <path d="m-22-18 29-17 29 17L7-1z" fill="#43626c" stroke="#70959a"/>
+ <path d="m-5-20 12 7 14-8m-5-3 5 3-1 5" stroke="#6bd0c9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<!-- Evidence: a retained document with a verification mark. -->
+<g transform="translate(255 334)">
+ <use href="#base"/>
+ <path d="m-25-32 35-20 18 10v49L-7 27-25 17z" fill="#213740"/>
+ <path d="m-25-32 18 10 35-20-18-10z" fill="#68838b"/>
+ <path d="M-7-22 28-42V7L-7 27z" fill="#405e68" stroke="#6a8992"/>
+ <path d="m1-11 19-11M1-2l19-11M1 11l6 3 13-20" stroke="#7cd2ca" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<!-- Governance: a protected, accountable decision. -->
+<g transform="translate(139 258)">
+ <use href="#base"/>
+ <path d="m-24-27 25-15 25 14v23c0 12-10 23-25 32-15-8-25-8-25-22z" fill="#233c47"/>
+ <path d="m1-12 25-16V-5C26 7 16 18 1 27z" fill="#365b63" stroke="#62868c"/>
+ <path d="m8-5 4 2 8-13" stroke="#6cd2ca" stroke-width="2" stroke-linecap="round"/>
+</g>
+<!-- Central orchestration platform; solid, restrained teal, with no fake controls. -->
+<g>
+ <path d="m250 243 77-44 77 44v35l-77 45-77-45z" fill="#122a34"/>
+ <path d="M327 288v35l77-45v-35z" fill="#1c3c47"/>
+ <path d="m250 243 77-44 77 44-77 45z" fill="url(#hub)" stroke="#4f999d" stroke-width="1.5"/>
+ <path d="m270 234 57-33 57 33v24l-57 33-57-33z" fill="#1d3c47"/>
+ <path d="M327 267v24l57-33v-24z" fill="url(#edge)"/>
+ <path d="m270 234 57-33 57 33-57 33z" fill="url(#hub)" stroke="#68c9c4" stroke-width="1.5"/>
+ <path d="m292 222 35-20 35 20v19l-35 20-35-20z" fill="#20434c"/>
+ <path d="M327 242v19l35-20v-19z" fill="#2c646a"/>
+ <path d="m292 222 35-20 35 20-35 20z" fill="#3a8586" stroke="#7eddd3" stroke-width="1.5"/>
+ <path d="m314 220 13-7 13 7-13 8z" fill="#9ce1d8"/>
+ <path d="M327 301v8m10-14v8m10-14v8" stroke="#70c9c5" stroke-width="2" stroke-linecap="round"/>
+</g>
+</svg>

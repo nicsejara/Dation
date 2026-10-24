@@ -1910,12 +1910,11 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.execution_bodies,[])
 
 
-    async def test_home_overview_dark_contrast_compact_heroes_and_responsive_actions(self):
+    async def test_home_overview_dark_contrast_and_responsive_actions(self):
         audit = (Path(__file__).parent / "theme_audit.js").read_text()
         await self.page.emulate_media(reduced_motion="reduce", color_scheme="light")
         for width in (1440, 1280, 1024, 768, 390):
             await self.page.set_viewport_size({"width": width, "height": 844})
-            heights = {}
             for view in ("inicio", "logistics-overview"):
                 with self.subTest(width=width, view=view):
                     await self.page.goto(f"http://127.0.0.1:{self.port}/app?view={view}")
@@ -1931,7 +1930,6 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                         # Transparent sections inherit the dark canvas; solid cards must stay dark.
                         channels = card["background"].removeprefix("rgba(").removeprefix("rgb(").rstrip(")").split(",")
                         self.assertLess(max(float(x) for x in channels[:3]), 80)
-                    heights[view] = metrics["hero"]["height"]
                     if view == "logistics-overview":
                         self.assertEqual(await self.page.locator(".dda-landing__final").count(), 0)
                         actions = self.page.locator(".dda-landing__hero-actions button")
@@ -1941,9 +1939,6 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                             self.assertLess(boxes[1]["y"] + boxes[1]["height"], 844)
                             self.assertGreaterEqual(boxes[1]["y"], boxes[0]["y"] + boxes[0]["height"])
                             self.assertAlmostEqual(boxes[0]["width"], boxes[1]["width"], delta=1)
-            if width >= 1280:
-                self.assertLessEqual(heights["inicio"], heights["logistics-overview"] * 1.1 + 1)
-                self.assertLessEqual(heights["inicio"], 250)
         self.assertEqual(self.execution_bodies, [])
 
     async def test_home_catalog_filters_preserve_navigation_and_workspace(self):
@@ -3604,7 +3599,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(await root.evaluate("el=>[...el.children].map(n=>n.tagName)"),['HEADER','SECTION','SECTION'])
         self.assertEqual(await root.locator('.platform-home__quick-link').count(),4)
         self.assertEqual(await root.locator('.platform-home__attention,.platform-home__case,.platform-activity').count(),0)
-        self.assertIn('Synthetic',await root.locator('h1').inner_text())
+        self.assertIn('Synthetic',await root.locator('.platform-home__greeting').inner_text())
         await root.get_by_role('link',name='Explorar DDA',exact=True).click()
         await self.page.locator('[data-home-dda-catalog]').wait_for(state='visible')
         self.assertEqual(await self.page.evaluate('document.activeElement.id'),'dation-dda-title')
@@ -4031,7 +4026,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         root=self.page.locator('[data-platform-home]');await root.get_by_role('heading',name='Accesos rápidos').wait_for()
         self.assertEqual(await root.locator('[data-onboarding-step],.d-onboarding').count(),0)
         self.assertEqual(await root.get_by_role('button',name='Usar datos de ejemplo',exact=True).count(),0)
-        self.assertEqual(await root.locator('.platform-home__hero-actions a').count(),1)
+        self.assertEqual(await root.locator('.platform-home__hero-actions a').count(),2)
         await root.get_by_role('link',name='Explorar DDA',exact=True).click()
         await self.page.locator('#home-open-logistics').click()
         for _ in range(100):

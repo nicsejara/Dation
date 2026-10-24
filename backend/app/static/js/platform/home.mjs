@@ -18,15 +18,19 @@ function greeting(identity){
 export function mountWorkspaceHome(root,getIdentity){
  const scope=createScope(root);
  const header=el('header',undefined,'platform-home__header platform-entry-hero'),copy=el('div',undefined,'platform-home__hero-copy');
- const workspace=el('p',undefined,'platform-home__workspace'),title=el('h1',undefined,'d-page-title'),ctas=el('div',undefined,'platform-home__hero-actions platform-hero-actions');
+ const salutation=el('p',undefined,'platform-home__greeting'),title=el('h1','De tus datos a decisiones que podés ','d-page-title'),ctas=el('div',undefined,'platform-home__hero-actions platform-hero-actions');
+ title.append(el('span','explicar y repetir.','platform-home__emphasis'));
  const catalog=heroCta(link('Explorar DDA','platform-home','d-button d-button--primary'));
- ctas.append(catalog);
- copy.append(workspace,title,el('p','Explorá los Decision Data Assets disponibles y convertí tus datos en decisiones trazables.','d-page-description'),ctas);
- const chain=el('ol',undefined,'platform-home__chain');chain.setAttribute('aria-label','De los datos a la decisión');
- for(const [index,label,detail] of [['01','Data Pack','Orders + Fleet'],['02','Decision Case','Criterios y responsables'],['03','Decision Run','Evidencia y aprobación']]){
-  const step=el('li'),number=el('span',index,'platform-home__chain-index'),body=el('div');number.setAttribute('aria-hidden','true');body.append(el('strong',label),el('span',detail));step.append(number,body);chain.append(step);
+ const center=heroCta(link('Ir a Decision Center','platform-decisions'),'arrowRight');
+ ctas.append(catalog,center);
+ copy.append(el('p','DATION · DECISION INTELLIGENCE','platform-home__eyebrow'),salutation,title,el('p','Dation combina datos, reglas y motores de decisión para que cada análisis tenga contexto, evidencia y trazabilidad.','d-page-description'),ctas);
+ const visual=el('div',undefined,'platform-home__network');visual.setAttribute('aria-hidden','true');
+ const image=el('img');image.src='/static/assets/home-decision-network-placeholder.svg';image.alt='';image.width=640;image.height=480;image.decoding='async';image.loading='eager';visual.append(image);
+ const chain=el('ol',undefined,'platform-home__chain');chain.setAttribute('aria-label','Modelo de decisiones de Dation');
+ for(const [label,detail] of [['Data Pack','Datos y contexto de la decisión'],['Decision Case','Objetivo, reglas y responsables'],['Decision Run','Alternativas, evidencia y aprobación']]){
+  const step=el('li');step.append(el('strong',label),el('span',detail));chain.append(step);
  }
- header.append(copy,chain);
+ header.append(copy,visual,chain);
  const quick=el('section',undefined,'d-card platform-home__section platform-home__access'),heading=el('h2','Accesos rápidos','d-section-title'),links=el('ul',undefined,'platform-home__quick');
  heading.id='home-actions-title';quick.setAttribute('aria-labelledby',heading.id);
  for(const [text,view,iconName] of [['Decision Center','platform-decisions','link'],['Datos / Data Hub','platform-data','database'],['Equipo','platform-team','clipboardList'],['Configuración','settings','sliders']]){
@@ -35,7 +39,7 @@ export function mountWorkspaceHome(root,getIdentity){
  quick.append(heading,links);
  const ddaCatalog=document.querySelector('[data-home-dda-catalog]');root.replaceChildren(header,quick,...(ddaCatalog?[ddaCatalog]:[]));
  catalog.href='#dation-dda-title';catalog.removeAttribute('data-home-resource');scope.listen(catalog,'click',event=>{event.preventDefault();focusDdaCatalog();});
- function renderHeader(){const identity=getIdentity();workspace.textContent=identity.workspace.name;title.textContent=greeting(identity);}
+ function renderHeader(){const identity=getIdentity();salutation.textContent=greeting(identity);}
  scope.listen(root,'click',event=>{
   const a=event.target.closest('a[data-home-resource]');if(!a||event.button!==0||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
   const route=readResource(a.href);event.preventDefault();window.dationNavigate(route.view);
