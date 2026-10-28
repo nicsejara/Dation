@@ -1,0 +1,8 @@
+test_03_history_new_run_back_forward_reload_keep_case_node_and_run (test_ultimate_navigation.UltimateNavigationTests.test_03_history_new_run_back_forward_reload_keep_case_node_and_run) ... ok
+test_05_viewer_touch_and_archived_preserve_read_only_state (test_ultimate_navigation.UltimateNavigationTests.test_05_viewer_touch_and_archived_preserve_read_only_state) ... ok
+test_decision_center_reload_closes_back_to_selected_second_case_without_refetch (test_v2_regression.SelectedDrawerRegressionTests.test_decision_center_reload_closes_back_to_selected_second_case_without_refetch) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 91.002s
+
+OK

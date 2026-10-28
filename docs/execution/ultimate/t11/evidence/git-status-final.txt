@@ -1,0 +1,28 @@
+## main...origin/main [ahead 1]
+ M backend/app/engines/assignment/transport_contracts.py
+ M backend/app/engines/assignment/transport_plan.py
+ M backend/app/engines/assignment/transport_policy_result.py
+ M backend/app/engines/common/day_resource_feasibility.py
+ M backend/app/results/assembler.py
+ M backend/app/results/canonical.py
+ M backend/app/results/validation.py
+ M backend/app/static/js/dispatch/cases/ultimate-decision-map.mjs
+ M backend/tests/browser/test_navigation.py
+ M backend/tests/browser/test_ultimate_case_data.py
+ M backend/tests/browser/test_ultimate_case_setup.py
+ M backend/tests/browser/test_ultimate_navigation.py
+ M backend/tests/e2e/run_suite.py
+ M backend/tests/e2e/test_workflow_gates.py
+ M backend/tests/integration/test_ultimate_case_models.py
+ M backend/tests/integration/test_ultimate_graph.py
+?? backend/tests/browser/test_ultimate_certification.py
+?? backend/tests/e2e/test_ultimate_consistency.py
+?? backend/tests/e2e/ultimate_certification_fixture.py
+?? backend/tests/e2e/ultimate_certification_support.py
+?? backend/tests/e2e/ultimate_release_smoke.py
+?? backend/tests/fixtures/ultimate/t11-serialization-vectors.json
+?? backend/tests/integration/test_ultimate_restore.py
+?? backend/tests/test_ultimate_performance.py
+?? backend/tests/test_ultimate_serialization.py
+?? backend/tests/ultimate_serialization_vectors.py
+?? docs/execution/ultimate/t11/

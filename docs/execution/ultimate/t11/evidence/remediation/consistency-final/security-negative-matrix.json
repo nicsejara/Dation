@@ -1,0 +1,62 @@
+{
+  "checks": [
+    {
+      "path": "/api/platform/logistics-models/f9d92c9a-4fb7-4823-9aa8-2986d2623c49",
+      "own": 200,
+      "foreign": 404
+    },
+    {
+      "path": "/api/platform/logistics-cases/23126fab-5ed2-4d54-a208-de87d4e1e460/context",
+      "own": 200,
+      "foreign": 404
+    },
+    {
+      "path": "/api/platform/logistics-cases/23126fab-5ed2-4d54-a208-de87d4e1e460/data",
+      "own": 200,
+      "foreign": 404
+    },
+    {
+      "path": "/api/runs/e9de2743-86b3-462e-a93f-a31bb344b8d4",
+      "own": 200,
+      "foreign": 404
+    },
+    {
+      "path": "/api/runs/e9de2743-86b3-462e-a93f-a31bb344b8d4/result",
+      "own": 200,
+      "foreign": 404
+    },
+    {
+      "path": "/api/runs/e9de2743-86b3-462e-a93f-a31bb344b8d4/artifacts/7d69f453-103d-52bf-87fb-7a2f6a2d19bc",
+      "own": 200,
+      "foreign": 404
+    },
+    {
+      "path": "/api/runs/e9de2743-86b3-462e-a93f-a31bb344b8d4/entities/TRIP/TP-2887fddb9c277f81681bee40-1",
+      "own": 200,
+      "foreign": 404
+    },
+    {
+      "path": "/api/runs/e9de2743-86b3-462e-a93f-a31bb344b8d4/decision-context",
+      "own": 200,
+      "foreign": 404
+    },
+    {
+      "path": "/api/runs/e9de2743-86b3-462e-a93f-a31bb344b8d4/decision-export",
+      "own": 200,
+      "foreign": 404
+    },
+    {
+      "path": "/api/runs/e9de2743-86b3-462e-a93f-a31bb344b8d4/approval-review",
+      "own": 200,
+      "foreign": 404
+    },
+    {
+      "path": "/api/runs/e9de2743-86b3-462e-a93f-a31bb344b8d4/copilot-history",
+      "own": 200,
+      "foreign": 404
+    }
+  ],
+  "wrong_fingerprint_denied": true,
+  "private_storage_direct_user_denied": true,
+  "signed_url_surface": "No signed URL is issued for result artifacts; each API read reauthorizes and verifies bytes."
+}

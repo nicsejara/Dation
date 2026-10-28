@@ -8,13 +8,13 @@ from typing import Literal, Annotated
 from pydantic import Field, model_validator, BeforeValidator, StrictInt, StrictBool
 
 from app.domain.logistics.base import (ContractModel, EntityType, Identifier, decimal_value, DecimalValue)
+from .canonical import canonical_tree
 
 REASON_CATALOG_VERSION = "DATION_REASONS_V1"
 CertifiedFactValue = str | StrictInt | StrictBool | DecimalValue | date | tuple[str, ...] | None
 
 
 def _wire_fact(value):
-    from .canonical import canonical_tree
     return canonical_tree(value)
 
 

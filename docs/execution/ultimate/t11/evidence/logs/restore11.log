@@ -1,0 +1,137 @@
+test_clean_slate_upgrade_restore_and_dual_compatible_image (test_ultimate_restore.UltimateRestoreTests.test_clean_slate_upgrade_restore_and_dual_compatible_image) ... storage-0.log
+/entity_evidence/evidence-000/f0b21d0830d2908db56a37a678f25a7057da1ecc479414efcddc24765ca936ed.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46264 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/runs/559b8f4a-5173-468f-9dc6-9b5b63f78dd6/evidence/reason-emissions-000/589c0d25a05923c3799d0f0cf2af6b934f75f0daf259881551d3de2034d1c911.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46264 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/runs/559b8f4a-5173-468f-9dc6-9b5b63f78dd6/detail_dataset/exceptions-000/ffb275d27313781a30965d11e99c5bfd027ee24bd3205982a731796ae84fdafe.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46264 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/runs/559b8f4a-5173-468f-9dc6-9b5b63f78dd6/export_rows/day-schedule-export-000/ed035d812fa5738d5a26788acffa93fadb735ca3e42e246e8b909fd99ad5a925.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46264 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/runs/559b8f4a-5173-468f-9dc6-9b5b63f78dd6/ai_base/decision-context-base-000/d0fdd2347589263f3a0dcd4c15c2f6d955c043eb4008097dd34dc789119d94fe.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46264 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46264 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/runs/b10fd464-a214-4d62-8ed4-b2d0a17bc488/ai_base/decision-context-base-000/66ae24370361618b5c470b2dcc49fe34a8b2f0a489b6daf5d4c1db7454748c6b.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46264 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/runs/b10fd464-a214-4d62-8ed4-b2d0a17bc488/core/core-000/a26a5c8b249b6e12f91a272d0ff231ca2f2bcd54a8d61e2dab1578cd4d11ade6.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46264 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/runs/b10fd464-a214-4d62-8ed4-b2d0a17bc488/detail_dataset/alternatives-000/fdfa04a8d91fba8811cebb4b4506967a89d1bb52354a78a644b93f183ac7fdb9.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46264 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/runs/b10fd464-a214-4d62-8ed4-b2d0a17bc488/detail_dataset/demand-000/46dec7ec2554d13b32b94894ce53769b19a257a3c372efac526c15d26f817a17.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46264 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/runs/b10fd464-a214-4d62-8ed4-b2d0a17bc488/detail_dataset/exceptions-000/f76cc3f7a65399fefdd8b0ef210eb0cdb7d86335bd3ce0bc64bf5744dad46736.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46264 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/runs/b10fd464-a214-4d62-8ed4-b2d0a17bc488/detail_dataset/plan-000/ef05b4e71f4f53ddbeb802efbd91ee8137520b19accafe9b1a1aaccdb4ce997b.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46264 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/runs/b10fd464-a214-4d62-8ed4-b2d0a17bc488/detail_dataset/resources-000/e5000d9de186caf9697261420a569e5eaaf2895c7dd79759f4b098592d6ad693.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46264 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/runs/b10fd464-a214-4d62-8ed4-b2d0a17bc488/detail_dataset/unassigned-000/0ca5e49f6ca4b9633728f3caef88c6903f1e82e7b80a4a30fa915e27726f1474.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46264 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/runs/b10fd464-a214-4d62-8ed4-b2d0a17bc488/entity_evidence/evidence-000/110bafcf7690e4b801c0e77668f812a2ff6def0ec363c3ec26227d8f8c0b01a3.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46264 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/runs/b10fd464-a214-4d62-8ed4-b2d0a17bc488/entity_evidence/sankey-entity-index-000/9aaba003efc527692f3d18997fda0a34e8cb8900ab7cdf49b96e80b284dd80a6.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46264 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/runs/b10fd464-a214-4d62-8ed4-b2d0a17bc488/evidence/analysis-status-000/cfa4d7234f2e5d753169b25a5fe19bb467491be1d7048bdff39cf006b1296c11.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46264 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/runs/b10fd464-a214-4d62-8ed4-b2d0a17bc488/evidence/engine-evidence-000/431377cf6fca0029824374abc9960fabcfb5ca945e606eaa3733a75e6370375d.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46264 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/runs/b10fd464-a214-4d62-8ed4-b2d0a17bc488/evidence/reasons-000/2ba99fbedb39d9b6f0f26540b0aaec0916b26bf9bd7c332cab91b6aa106e6d50.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46264 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/runs/b10fd464-a214-4d62-8ed4-b2d0a17bc488/export_rows/transport-plan-export-000/5ec04fc1dd31f8743200d937cf61d1b554487a8f64070ea2b88ba07c9d93dad8.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58632 - "POST /rest/v1/rpc/claim_dispatch_job_v2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58632 - "POST /rest/v1/rpc/claim_comparative_analysis HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58632 - "GET /rest/v1/decision_case_reconciliations?select=%2A&available_at=lte.2026-10-28T13%3A20%3A42.714459%2B00%3A00&order=available_at.asc&limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46264 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46264 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46264 - "POST /rest/v1/rpc/platform_ultimate_copilot HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46264 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46264 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46264 - "POST /rest/v1/rpc/platform_ultimate_copilot HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58632 - "POST /rest/v1/rpc/report_dispatch_worker HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [341419]
+
+api-1.log
+46a5"}
+{"timestamp":"2026-10-28T13:20:42.632301+00:00","severity":"INFO","component":"api","event":"dependency_finished","logger":"dation","revision":"local","request_id":"01d69234-cc40-47e9-8d2d-9715f04fbd55","trace_id":"736092758ba242fc9b22fdaf7405dd6c","span_id":"2faf6f5ab11b46a5","dependency":"supabase_storage","method":"GET","outcome":"ok","duration_ms":4.741,"status_code":200,"logging.googleapis.com/trace":"projects/dation-510100/traces/736092758ba242fc9b22fdaf7405dd6c","logging.googleapis.com/spanId":"2faf6f5ab11b46a5"}
+{"timestamp":"2026-10-28T13:20:42.678547+00:00","severity":"INFO","component":"api","event":"request_finished","logger":"dation","revision":"local","request_id":"01d69234-cc40-47e9-8d2d-9715f04fbd55","trace_id":"736092758ba242fc9b22fdaf7405dd6c","span_id":"2faf6f5ab11b46a5","run_id":"559b8f4a-5173-468f-9dc6-9b5b63f78dd6","route":"/api/runs/{run_id}/decision-export","method":"GET","status_code":200,"duration_ms":488.802,"logging.googleapis.com/trace":"projects/dation-510100/traces/736092758ba242fc9b22fdaf7405dd6c","logging.googleapis.com/spanId":"2faf6f5ab11b46a5"}
+{"timestamp":"2026-10-28T13:20:43.099265+00:00","severity":"INFO","component":"api","event":"dependency_finished","logger":"dation","revision":"local","request_id":"304ac00d-203d-4f10-8434-94641e38c57b","trace_id":"c207a4c0af45400293c36ed585639ca8","span_id":"edd451cfa2bc46b1","dependency":"supabase_rest","method":"POST","outcome":"ok","duration_ms":19.612,"status_code":200,"logging.googleapis.com/trace":"projects/dation-510100/traces/c207a4c0af45400293c36ed585639ca8","logging.googleapis.com/spanId":"edd451cfa2bc46b1"}
+{"timestamp":"2026-10-28T13:20:43.177707+00:00","severity":"INFO","component":"api","event":"dependency_finished","logger":"dation","revision":"local","request_id":"304ac00d-203d-4f10-8434-94641e38c57b","trace_id":"c207a4c0af45400293c36ed585639ca8","span_id":"edd451cfa2bc46b1","dependency":"supabase_rest","method":"POST","outcome":"ok","duration_ms":75.062,"status_code":200,"logging.googleapis.com/trace":"projects/dation-510100/traces/c207a4c0af45400293c36ed585639ca8","logging.googleapis.com/spanId":"edd451cfa2bc46b1"}
+{"timestamp":"2026-10-28T13:20:43.231335+00:00","severity":"INFO","component":"api","event":"dependency_finished","logger":"dation","revision":"local","request_id":"304ac00d-203d-4f10-8434-94641e38c57b","trace_id":"c207a4c0af45400293c36ed585639ca8","span_id":"edd451cfa2bc46b1","dependency":"supabase_rest","method":"POST","outcome":"ok","duration_ms":33.155,"status_code":200,"logging.googleapis.com/trace":"projects/dation-510100/traces/c207a4c0af45400293c36ed585639ca8","logging.googleapis.com/spanId":"edd451cfa2bc46b1"}
+{"timestamp":"2026-10-28T13:20:43.233808+00:00","severity":"INFO","component":"api","event":"request_finished","logger":"dation","revision":"local","request_id":"304ac00d-203d-4f10-8434-94641e38c57b","trace_id":"c207a4c0af45400293c36ed585639ca8","span_id":"edd451cfa2bc46b1","run_id":"b10fd464-a214-4d62-8ed4-b2d0a17bc488","route":"/api/runs/{run_id}/copilot-history","method":"GET","status_code":200,"duration_ms":167.329,"logging.googleapis.com/trace":"projects/dation-510100/traces/c207a4c0af45400293c36ed585639ca8","logging.googleapis.com/spanId":"edd451cfa2bc46b1"}
+{"timestamp":"2026-10-28T13:20:43.506845+00:00","severity":"INFO","component":"api","event":"dependency_finished","logger":"dation","revision":"local","request_id":"a20335b9-34cb-46f0-a3ff-22c2a37c19d0","trace_id":"6f41c08f490b49b2a18c44b863bca3fe","span_id":"87848c0560e547b0","dependency":"supabase_rest","method":"POST","outcome":"ok","duration_ms":18.732,"status_code":200,"logging.googleapis.com/trace":"projects/dation-510100/traces/6f41c08f490b49b2a18c44b863bca3fe","logging.googleapis.com/spanId":"87848c0560e547b0"}
+{"timestamp":"2026-10-28T13:20:43.575799+00:00","severity":"INFO","component":"api","event":"dependency_finished","logger":"dation","revision":"local","request_id":"a20335b9-34cb-46f0-a3ff-22c2a37c19d0","trace_id":"6f41c08f490b49b2a18c44b863bca3fe","span_id":"87848c0560e547b0","dependency":"supabase_rest","method":"POST","outcome":"ok","duration_ms":67.393,"status_code":200,"logging.googleapis.com/trace":"projects/dation-510100/traces/6f41c08f490b49b2a18c44b863bca3fe","logging.googleapis.com/spanId":"87848c0560e547b0"}
+{"timestamp":"2026-10-28T13:20:43.605459+00:00","severity":"INFO","component":"api","event":"dependency_finished","logger":"dation","revision":"local","request_id":"a20335b9-34cb-46f0-a3ff-22c2a37c19d0","trace_id":"6f41c08f490b49b2a18c44b863bca3fe","span_id":"87848c0560e547b0","dependency":"supabase_rest","method":"POST","outcome":"ok","duration_ms":16.862,"status_code":200,"logging.googleapis.com/trace":"projects/dation-510100/traces/6f41c08f490b49b2a18c44b863bca3fe","logging.googleapis.com/spanId":"87848c0560e547b0"}
+{"timestamp":"2026-10-28T13:20:43.606227+00:00","severity":"INFO","component":"api","event":"request_finished","logger":"dation","revision":"local","request_id":"a20335b9-34cb-46f0-a3ff-22c2a37c19d0","trace_id":"6f41c08f490b49b2a18c44b863bca3fe","span_id":"87848c0560e547b0","run_id":"559b8f4a-5173-468f-9dc6-9b5b63f78dd6","route":"/api/runs/{run_id}/copilot-history","method":"GET","status_code":200,"duration_ms":121.061,"logging.googleapis.com/trace":"projects/dation-510100/traces/6f41c08f490b49b2a18c44b863bca3fe","logging.googleapis.com/spanId":"87848c0560e547b0"}
+{"timestamp":"2026-10-28T13:20:44.396179+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+{"timestamp":"2026-10-28T13:20:44.497427+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+{"timestamp":"2026-10-28T13:20:44.498626+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+{"timestamp":"2026-10-28T13:20:44.498916+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+
+worker-2.log
+O","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","request_id":"c258ab32-cdf7-43a9-b830-b91995941a40","trace_id":"f797a15b55cf44fa847a8a7b7fea482b","span_id":"87388f143f6f454d","run_id":"11a6050c-fb94-4888-8938-dca42a15a9a1","dependency":"supabase_storage","method":"GET","outcome":"ok","duration_ms":6.916,"status_code":200,"logging.googleapis.com/trace":"projects/dation-510100/traces/f797a15b55cf44fa847a8a7b7fea482b","logging.googleapis.com/spanId":"87388f143f6f454d"}
+{"timestamp":"2026-10-28T13:19:42.737655+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","request_id":"c258ab32-cdf7-43a9-b830-b91995941a40","trace_id":"f797a15b55cf44fa847a8a7b7fea482b","span_id":"87388f143f6f454d","run_id":"11a6050c-fb94-4888-8938-dca42a15a9a1","dependency":"supabase_storage","method":"GET","outcome":"ok","duration_ms":2.258,"status_code":200,"logging.googleapis.com/trace":"projects/dation-510100/traces/f797a15b55cf44fa847a8a7b7fea482b","logging.googleapis.com/spanId":"87388f143f6f454d"}
+{"timestamp":"2026-10-28T13:19:42.746029+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","request_id":"c258ab32-cdf7-43a9-b830-b91995941a40","trace_id":"f797a15b55cf44fa847a8a7b7fea482b","span_id":"87388f143f6f454d","run_id":"11a6050c-fb94-4888-8938-dca42a15a9a1","dependency":"supabase_storage","method":"GET","outcome":"ok","duration_ms":6.151,"status_code":200,"logging.googleapis.com/trace":"projects/dation-510100/traces/f797a15b55cf44fa847a8a7b7fea482b","logging.googleapis.com/spanId":"87388f143f6f454d"}
+{"timestamp":"2026-10-28T13:19:42.784175+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","request_id":"c258ab32-cdf7-43a9-b830-b91995941a40","trace_id":"f797a15b55cf44fa847a8a7b7fea482b","span_id":"87388f143f6f454d","run_id":"11a6050c-fb94-4888-8938-dca42a15a9a1","dependency":"supabase_storage","method":"GET","outcome":"ok","duration_ms":7.943,"status_code":200,"logging.googleapis.com/trace":"projects/dation-510100/traces/f797a15b55cf44fa847a8a7b7fea482b","logging.googleapis.com/spanId":"87388f143f6f454d"}
+{"timestamp":"2026-10-28T13:19:42.896808+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","request_id":"c258ab32-cdf7-43a9-b830-b91995941a40","trace_id":"f797a15b55cf44fa847a8a7b7fea482b","span_id":"87388f143f6f454d","run_id":"11a6050c-fb94-4888-8938-dca42a15a9a1","dependency":"supabase_rest","method":"POST","outcome":"ok","duration_ms":102.352,"status_code":200,"logging.googleapis.com/trace":"projects/dation-510100/traces/f797a15b55cf44fa847a8a7b7fea482b","logging.googleapis.com/spanId":"87388f143f6f454d"}
+{"timestamp":"2026-10-28T13:19:42.915993+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","dependency":"supabase_rest","method":"POST","outcome":"ok","duration_ms":17.519,"status_code":200}
+{"timestamp":"2026-10-28T13:19:42.930042+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","dependency":"supabase_rest","method":"GET","outcome":"ok","duration_ms":13.508,"status_code":200}
+{"timestamp":"2026-10-28T13:19:42.977558+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","dependency":"supabase_rest","method":"GET","outcome":"ok","duration_ms":46.919,"status_code":200}
+{"timestamp":"2026-10-28T13:19:42.996043+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","dependency":"supabase_rest","method":"POST","outcome":"ok","duration_ms":18.092,"status_code":200}
+{"timestamp":"2026-10-28T13:19:42.996194+00:00","severity":"INFO","component":"worker","event":"case_reconciled","logger":"dation","revision":"local","case_id":"82ef798f-75bb-4a58-9d2c-4e24a7c4f911","version":4}
+{"timestamp":"2026-10-28T13:19:43.016488+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","dependency":"supabase_rest","method":"POST","outcome":"ok","duration_ms":19.826,"status_code":200}
+{"timestamp":"2026-10-28T13:19:43.029108+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","dependency":"supabase_rest","method":"POST","outcome":"ok","duration_ms":12.075,"status_code":200}
+{"timestamp":"2026-10-28T13:19:43.044255+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","dependency":"supabase_rest","method":"GET","outcome":"ok","duration_ms":14.711,"status_code":200}
+{"timestamp":"2026-10-28T13:19:45.114620+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","dependency":"supabase_rest","method":"POST","outcome":"ok","duration_ms":37.329,"status_code":200}
+{"timestamp":"2026-10-28T13:19:45.141939+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","dependency":"supabase_rest","method":"POST","outcome":"ok","duration_ms":24.196,"status_code":200}
+{"timestamp":"2026-10-28T13:19:45.200480+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","dependency":"supabase_rest","method":"GET","outcome":"ok","duration_ms":21.225,"status_code":200}
+{"timestamp":"2026-10-28T13:19:46.526407+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","dependency":"supabase_rest","method":"POST","outcome":"ok","duration_ms":34.292,"status_code":200}
+{"timestamp":"2026-10-28T13:19:46.526557+00:00","severity":"INFO","component":"worker","event":"worker_readiness","logger":"dation","revision":"local","outcome":"unavailable"}
+
+worker-3.log
+f"}
+{"timestamp":"2026-10-28T13:20:35.642244+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","request_id":"7b7ac1ef-fb44-4552-b48a-5d0125d7f3ef","trace_id":"afb4e4c580594c189024d21863828624","span_id":"f0b32e4a82b84ebf","run_id":"559b8f4a-5173-468f-9dc6-9b5b63f78dd6","dependency":"supabase_rest","method":"POST","outcome":"ok","duration_ms":335.209,"status_code":200,"logging.googleapis.com/trace":"projects/dation-510100/traces/afb4e4c580594c189024d21863828624","logging.googleapis.com/spanId":"f0b32e4a82b84ebf"}
+{"timestamp":"2026-10-28T13:20:35.691255+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","dependency":"supabase_rest","method":"POST","outcome":"ok","duration_ms":13.544,"status_code":200}
+{"timestamp":"2026-10-28T13:20:35.780226+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","dependency":"supabase_rest","method":"GET","outcome":"ok","duration_ms":88.371,"status_code":200}
+{"timestamp":"2026-10-28T13:20:35.885326+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","dependency":"supabase_rest","method":"GET","outcome":"ok","duration_ms":57.471,"status_code":200}
+{"timestamp":"2026-10-28T13:20:35.904027+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","dependency":"supabase_rest","method":"POST","outcome":"ok","duration_ms":18.118,"status_code":200}
+{"timestamp":"2026-10-28T13:20:35.904299+00:00","severity":"INFO","component":"worker","event":"case_reconciled","logger":"dation","revision":"local","case_id":"5c7226fb-dab5-4f4b-97e0-797802a31f61","version":2}
+{"timestamp":"2026-10-28T13:20:35.926586+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","dependency":"supabase_rest","method":"POST","outcome":"ok","duration_ms":21.246,"status_code":200}
+{"timestamp":"2026-10-28T13:20:35.975254+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","dependency":"supabase_rest","method":"POST","outcome":"ok","duration_ms":16.689,"status_code":200}
+{"timestamp":"2026-10-28T13:20:35.990479+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","dependency":"supabase_rest","method":"GET","outcome":"ok","duration_ms":13.719,"status_code":200}
+{"timestamp":"2026-10-28T13:20:38.004400+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","dependency":"supabase_rest","method":"POST","outcome":"ok","duration_ms":12.28,"status_code":200}
+{"timestamp":"2026-10-28T13:20:38.040188+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","dependency":"supabase_rest","method":"POST","outcome":"ok","duration_ms":34.384,"status_code":200}
+{"timestamp":"2026-10-28T13:20:38.086851+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","dependency":"supabase_rest","method":"GET","outcome":"ok","duration_ms":46.091,"status_code":200}
+{"timestamp":"2026-10-28T13:20:40.231212+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","dependency":"supabase_rest","method":"POST","outcome":"ok","duration_ms":94.562,"status_code":200}
+{"timestamp":"2026-10-28T13:20:40.406978+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","dependency":"supabase_rest","method":"POST","outcome":"ok","duration_ms":175.197,"status_code":200}
+{"timestamp":"2026-10-28T13:20:40.509168+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","dependency":"supabase_rest","method":"GET","outcome":"ok","duration_ms":27.776,"status_code":200}
+{"timestamp":"2026-10-28T13:20:40.533941+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","dependency":"supabase_rest","method":"GET","outcome":"ok","duration_ms":23.818,"status_code":200}
+{"timestamp":"2026-10-28T13:20:40.600966+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","dependency":"supabase_rest","method":"POST","outcome":"ok","duration_ms":64.148,"status_code":200}
+{"timestamp":"2026-10-28T13:20:40.601237+00:00","severity":"INFO","component":"worker","event":"case_reconciled","logger":"dation","revision":"local","case_id":"5c7226fb-dab5-4f4b-97e0-797802a31f61","version":1}
+{"timestamp":"2026-10-28T13:20:42.637505+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","dependency":"supabase_rest","method":"POST","outcome":"ok","duration_ms":33.815,"status_code":200}
+{"timestamp":"2026-10-28T13:20:42.714256+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","dependency":"supabase_rest","method":"POST","outcome":"ok","duration_ms":75.909,"status_code":200}
+{"timestamp":"2026-10-28T13:20:42.730125+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","dependency":"supabase_rest","method":"GET","outcome":"ok","duration_ms":15.102,"status_code":200}
+{"timestamp":"2026-10-28T13:20:43.707933+00:00","severity":"INFO","component":"worker","event":"dependency_finished","logger":"dation","revision":"local","dependency":"supabase_rest","method":"POST","outcome":"ok","duration_ms":23.026,"status_code":200}
+{"timestamp":"2026-10-28T13:20:43.708220+00:00","severity":"INFO","component":"worker","event":"worker_readiness","logger":"dation","revision":"local","outcome":"unavailable"}
+
+storage-4.log
+INFO:     Started server process [353900]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:51365 (Press CTRL+C to quit)
+INFO:     127.0.0.1:60156 - "GET /rest/v1/ HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [353900]
+
+api-5.log
+INFO:     Started server process [354363]
+INFO:     Waiting for application startup.
+{"timestamp":"2026-10-28T13:21:32.279428+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+{"timestamp":"2026-10-28T13:21:32.282308+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+{"timestamp":"2026-10-28T13:21:32.503231+00:00","severity":"INFO","component":"api","event":"request_finished","logger":"dation","revision":"local","request_id":"1497896f-1a72-47dd-9cc9-ddf5356fbd1e","trace_id":"e09184af72c8432f8effca2e154930b6","span_id":"6d03dc3407884fff","route":"/health","method":"GET","status_code":200,"duration_ms":182.763,"logging.googleapis.com/trace":"projects/dation-510100/traces/e09184af72c8432f8effca2e154930b6","logging.googleapis.com/spanId":"6d03dc3407884fff"}
+{"timestamp":"2026-10-28T13:21:34.416999+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+{"timestamp":"2026-10-28T13:21:34.517821+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+{"timestamp":"2026-10-28T13:21:34.518785+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+{"timestamp":"2026-10-28T13:21:34.518911+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+
+FAIL
+
+======================================================================
+FAIL: test_clean_slate_upgrade_restore_and_dual_compatible_image (test_ultimate_restore.UltimateRestoreTests.test_clean_slate_upgrade_restore_and_dual_compatible_image)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Dation/backend/tests/integration/test_ultimate_restore.py", line 88, in test_clean_slate_upgrade_restore_and_dual_compatible_image
+    self.assertEqual(catalog_before,effective_catalog(s,CATALOG_SQL))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'str[521706 chars]OR (((length(label) >= 1) AND (length(label) <[207469 chars]one}} != {'str[521706 chars]OR ((length(label) >= 1) AND (length(label) <=[207467 chars]one}}
+Diff is 1845999 characters long. Set self.maxDiff to None to see it.
+
+----------------------------------------------------------------------
+Ran 1 test in 200.587s
+
+FAILED (failures=1)

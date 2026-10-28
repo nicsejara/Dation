@@ -1,0 +1,17 @@
+{
+  "python": "3.13.5",
+  "architecture": "x86_64",
+  "system": "Linux",
+  "ortools": "9.15.6755",
+  "pydantic": "2.14.0",
+  "cpu_max": "200000 100000",
+  "memory_max": "8589934592",
+  "qa_docker_socket": "unix:///var/run/docker.sock",
+  "performance_execution": "Serial cold subprocesses; no concurrent heavy QA tasks",
+  "full_worker_limits": {
+    "memory_bytes": 1073741824,
+    "cpus": 2
+  },
+  "production_limit_observed": false,
+  "production_modified": false
+}

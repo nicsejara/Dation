@@ -1,0 +1,117 @@
+test_atomic_team_edit_keeps_multiple_roles_and_rolls_back_invalid_access (test_workflow_gates.WorkflowGateTests.test_atomic_team_edit_keeps_multiple_roles_and_rolls_back_invalid_access) ... ok
+test_d1_d2_gates_are_independent_and_assigned_approver_is_not_actual_actor (test_workflow_gates.WorkflowGateTests.test_d1_d2_gates_are_independent_and_assigned_approver_is_not_actual_actor) ... ok
+test_new_cases_require_data_owner_and_approver_but_replays_keep_their_result (test_workflow_gates.WorkflowGateTests.test_new_cases_require_data_owner_and_approver_but_replays_keep_their_result) ... ok
+test_role_loss_cross_workspace_forgery_and_policy_changes_do_not_bypass_gates (test_workflow_gates.WorkflowGateTests.test_role_loss_cross_workspace_forgery_and_policy_changes_do_not_bypass_gates) ... ok
+test_existing_case_is_unchanged_and_legacy_actions_remain_available (test_workflow_gates.WorkflowMigrationCompatibilityTests.test_existing_case_is_unchanged_and_legacy_actions_remain_available) ... ok
+test_01_all_rows_entities_exports_context_and_review_share_facts (test_ultimate_consistency.UltimateConsistencyTests.test_01_all_rows_entities_exports_context_and_review_share_facts) ... ok
+test_02_positive_then_foreign_cache_entity_export_context_and_storage_are_denied (test_ultimate_consistency.UltimateConsistencyTests.test_02_positive_then_foreign_cache_entity_export_context_and_storage_are_denied) ... ERROR
+test_03_context_privacy_and_prompt_injection_remain_data (test_ultimate_consistency.UltimateConsistencyTests.test_03_context_privacy_and_prompt_injection_remain_data) ... ok
+test_04_http_retrieval_payloads_and_latency_are_measured (test_ultimate_consistency.UltimateConsistencyTests.test_04_http_retrieval_payloads_and_latency_are_measured) ... ok
+test_01_all_consumers_share_certified_facts_fingerprint_and_complete_export (test_ultimate_consumers.UltimateConsumerTests.test_01_all_consumers_share_certified_facts_fingerprint_and_complete_export) ... ok
+test_02_entity_uses_exact_parent_and_never_another_run (test_ultimate_consumers.UltimateConsumerTests.test_02_entity_uses_exact_parent_and_never_another_run) ... ok
+test_03_context_guard_and_turn_replay_are_immutable (test_ultimate_consumers.UltimateConsumerTests.test_03_context_guard_and_turn_replay_are_immutable) ... ok
+test_04_human_approval_is_separate_and_replay_has_current_awareness (test_ultimate_consumers.UltimateConsumerTests.test_04_human_approval_is_separate_and_replay_has_current_awareness) ... ok
+test_05_viewer_and_tenant_denied_and_no_mutation_tools (test_ultimate_consumers.UltimateConsumerTests.test_05_viewer_and_tenant_denied_and_no_mutation_tools) ... ok
+test_06_stale_review_text_cannot_authorize (test_ultimate_consumers.UltimateConsumerTests.test_06_stale_review_text_cannot_authorize) ... ok
+test_07_full_json_missing_corrupt_artifact_is_explicit_failure (test_ultimate_consumers.UltimateConsumerTests.test_07_full_json_missing_corrupt_artifact_is_explicit_failure) ... ok
+test_08_history_preserves_original_context_provider_and_tenant (test_ultimate_consumers.UltimateConsumerTests.test_08_history_preserves_original_context_provider_and_tenant) ... ok
+test_09_historical_d2_drawer_keeps_original_source_after_new_d1_approval (test_ultimate_consumers.UltimateConsumerTests.test_09_historical_d2_drawer_keeps_original_source_after_new_d1_approval) ... ok
+test_01_complete_publication_retrieval_review_human_approval (test_ultimate_d1_result.UltimateResultE2E.test_01_complete_publication_retrieval_review_human_approval) ... ok
+test_02_duplicate_concurrent_submit_and_intention_conflict (test_ultimate_d1_result.UltimateResultE2E.test_02_duplicate_concurrent_submit_and_intention_conflict) ... ok
+test_03_crash_before_upload_and_after_upload_reclaim_immutable_prepared (test_ultimate_d1_result.UltimateResultE2E.test_03_crash_before_upload_and_after_upload_reclaim_immutable_prepared) ... ok
+test_04_partial_upload_and_lost_prepare_response_recover (test_ultimate_d1_result.UltimateResultE2E.test_04_partial_upload_and_lost_prepare_response_recover) ... ok
+test_05_lost_finish_response_and_duplicate_finish (test_ultimate_d1_result.UltimateResultE2E.test_05_lost_finish_response_and_duplicate_finish) ... ok
+test_06_corrupt_missing_wrong_fingerprint_and_foreign_access_fail_closed (test_ultimate_d1_result.UltimateResultE2E.test_06_corrupt_missing_wrong_fingerprint_and_foreign_access_fail_closed) ... ok
+test_07_pack_changes_while_running_publish_frozen_history_deny_approval (test_ultimate_d1_result.UltimateResultE2E.test_07_pack_changes_while_running_publish_frozen_history_deny_approval) ... ok
+test_08_old_intention_after_new_run_preserves_history_and_actor (test_ultimate_d1_result.UltimateResultE2E.test_08_old_intention_after_new_run_preserves_history_and_actor) ... ok
+test_01_d2_publication_all_consumers_and_review_use_exact_source (test_ultimate_d2_lineage.UltimateDayLineageTests.test_01_d2_publication_all_consumers_and_review_use_exact_source) ... ok
+test_02_A_B_stay_on_D1_A_then_C_uses_approved_D1_B (test_ultimate_d2_lineage.UltimateDayLineageTests.test_02_A_B_stay_on_D1_A_then_C_uses_approved_D1_B) ... ok
+test_03_wrong_source_fingerprint_case_or_pending_D1_cannot_be_admitted (test_ultimate_d2_lineage.UltimateDayLineageTests.test_03_wrong_source_fingerprint_case_or_pending_D1_cannot_be_admitted) ... ok
+test_04_two_concurrent_submits_one_D2_intention_preserve_D1 (test_ultimate_d2_lineage.UltimateDayLineageTests.test_04_two_concurrent_submits_one_D2_intention_preserve_D1) ... ok
+test_05_lease_recovery_and_finish_response_loss_use_T8_protocol (test_ultimate_d2_lineage.UltimateDayLineageTests.test_05_lease_recovery_and_finish_response_loss_use_T8_protocol) ... ok
+test_06_upstream_replaced_during_D2_execution_keeps_history_and_denies_approval (test_ultimate_d2_lineage.UltimateDayLineageTests.test_06_upstream_replaced_during_D2_execution_keeps_history_and_denies_approval) ... ok
+test_07_tenant_viewer_and_expected_result_fingerprint_boundaries (test_ultimate_d2_lineage.UltimateDayLineageTests.test_07_tenant_viewer_and_expected_result_fingerprint_boundaries) ... ok
+test_08_service_role_cannot_forge_source_allocations_availability_or_certificate (test_ultimate_d2_lineage.UltimateDayLineageTests.test_08_service_role_cannot_forge_source_allocations_availability_or_certificate) ... ok
+
+======================================================================
+ERROR: test_02_positive_then_foreign_cache_entity_export_context_and_storage_are_denied (test_ultimate_consistency.UltimateConsistencyTests.test_02_positive_then_foreign_cache_entity_export_context_and_storage_are_denied)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Dation/.venv/lib/python3.13/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
+    yield
+  File "/workspace/Dation/.venv/lib/python3.13/site-packages/httpx/_transports/default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+  File "/workspace/Dation/.venv/lib/python3.13/site-packages/httpcore/_sync/connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "/workspace/Dation/.venv/lib/python3.13/site-packages/httpcore/_sync/connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+        pool_request.request
+    )
+  File "/workspace/Dation/.venv/lib/python3.13/site-packages/httpcore/_sync/connection.py", line 103, in handle_request
+    return self._connection.handle_request(request)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/workspace/Dation/.venv/lib/python3.13/site-packages/httpcore/_sync/http11.py", line 136, in handle_request
+    raise exc
+  File "/workspace/Dation/.venv/lib/python3.13/site-packages/httpcore/_sync/http11.py", line 86, in handle_request
+    self._send_request_headers(**kwargs)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/workspace/Dation/.venv/lib/python3.13/site-packages/httpcore/_sync/http11.py", line 144, in _send_request_headers
+    with map_exceptions({h11.LocalProtocolError: LocalProtocolError}):
+         ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "/workspace/Dation/.venv/lib/python3.13/site-packages/httpcore/_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.LocalProtocolError: Illegal header value b'Bearer '
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/Dation/backend/tests/e2e/test_ultimate_consistency.py", line 97, in test_02_positive_then_foreign_cache_entity_export_context_and_storage_are_denied
+    self.assertIn(self.s.http.get(raw,headers={'Authorization':'Bearer '+token}).status_code,[401,403])
+                  ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/Dation/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1053, in get
+    return self.request(
+           ~~~~~~~~~~~~^
+        "GET",
+        ^^^^^^
+    ...<7 lines>...
+        extensions=extensions,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/workspace/Dation/.venv/lib/python3.13/site-packages/httpx/_client.py", line 825, in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/Dation/.venv/lib/python3.13/site-packages/httpx/_client.py", line 914, in send
+    response = self._send_handling_auth(
+        request,
+    ...<2 lines>...
+        history=[],
+    )
+  File "/workspace/Dation/.venv/lib/python3.13/site-packages/httpx/_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+        request,
+        follow_redirects=follow_redirects,
+        history=history,
+    )
+  File "/workspace/Dation/.venv/lib/python3.13/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+  File "/workspace/Dation/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+  File "/workspace/Dation/.venv/lib/python3.13/site-packages/httpx/_transports/default.py", line 249, in handle_request
+    with map_httpcore_exceptions():
+         ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.13/contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "/workspace/Dation/.venv/lib/python3.13/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.LocalProtocolError: Illegal header value b'Bearer '
+
+----------------------------------------------------------------------
+Ran 34 tests in 477.416s
+
+FAILED (errors=1)
+DATION_E2E_RESULT={"passed": false, "tests": 34, "failures": [], "errors": ["test_ultimate_consistency.UltimateConsistencyTests.test_02_positive_then_foreign_cache_entity_export_context_and_storage_are_denied"], "skipped": [], "passed_ids": ["test_workflow_gates.WorkflowGateTests.test_atomic_team_edit_keeps_multiple_roles_and_rolls_back_invalid_access", "test_workflow_gates.WorkflowGateTests.test_d1_d2_gates_are_independent_and_assigned_approver_is_not_actual_actor", "test_workflow_gates.WorkflowGateTests.test_new_cases_require_data_owner_and_approver_but_replays_keep_their_result", "test_workflow_gates.WorkflowGateTests.test_role_loss_cross_workspace_forgery_and_policy_changes_do_not_bypass_gates", "test_workflow_gates.WorkflowMigrationCompatibilityTests.test_existing_case_is_unchanged_and_legacy_actions_remain_available", "test_ultimate_consistency.UltimateConsistencyTests.test_01_all_rows_entities_exports_context_and_review_share_facts", "test_ultimate_consistency.UltimateConsistencyTests.test_03_context_privacy_and_prompt_injection_remain_data", "test_ultimate_consistency.UltimateConsistencyTests.test_04_http_retrieval_payloads_and_latency_are_measured", "test_ultimate_consumers.UltimateConsumerTests.test_01_all_consumers_share_certified_facts_fingerprint_and_complete_export", "test_ultimate_consumers.UltimateConsumerTests.test_02_entity_uses_exact_parent_and_never_another_run", "test_ultimate_consumers.UltimateConsumerTests.test_03_context_guard_and_turn_replay_are_immutable", "test_ultimate_consumers.UltimateConsumerTests.test_04_human_approval_is_separate_and_replay_has_current_awareness", "test_ultimate_consumers.UltimateConsumerTests.test_05_viewer_and_tenant_denied_and_no_mutation_tools", "test_ultimate_consumers.UltimateConsumerTests.test_06_stale_review_text_cannot_authorize", "test_ultimate_consumers.UltimateConsumerTests.test_07_full_json_missing_corrupt_artifact_is_explicit_failure", "test_ultimate_consumers.UltimateConsumerTests.test_08_history_preserves_original_context_provider_and_tenant", "test_ultimate_consumers.UltimateConsumerTests.test_09_historical_d2_drawer_keeps_original_source_after_new_d1_approval", "test_ultimate_d1_result.UltimateResultE2E.test_01_complete_publication_retrieval_review_human_approval", "test_ultimate_d1_result.UltimateResultE2E.test_02_duplicate_concurrent_submit_and_intention_conflict", "test_ultimate_d1_result.UltimateResultE2E.test_03_crash_before_upload_and_after_upload_reclaim_immutable_prepared", "test_ultimate_d1_result.UltimateResultE2E.test_04_partial_upload_and_lost_prepare_response_recover", "test_ultimate_d1_result.UltimateResultE2E.test_05_lost_finish_response_and_duplicate_finish", "test_ultimate_d1_result.UltimateResultE2E.test_06_corrupt_missing_wrong_fingerprint_and_foreign_access_fail_closed", "test_ultimate_d1_result.UltimateResultE2E.test_07_pack_changes_while_running_publish_frozen_history_deny_approval", "test_ultimate_d1_result.UltimateResultE2E.test_08_old_intention_after_new_run_preserves_history_and_actor", "test_ultimate_d2_lineage.UltimateDayLineageTests.test_01_d2_publication_all_consumers_and_review_use_exact_source", "test_ultimate_d2_lineage.UltimateDayLineageTests.test_02_A_B_stay_on_D1_A_then_C_uses_approved_D1_B", "test_ultimate_d2_lineage.UltimateDayLineageTests.test_03_wrong_source_fingerprint_case_or_pending_D1_cannot_be_admitted", "test_ultimate_d2_lineage.UltimateDayLineageTests.test_04_two_concurrent_submits_one_D2_intention_preserve_D1", "test_ultimate_d2_lineage.UltimateDayLineageTests.test_05_lease_recovery_and_finish_response_loss_use_T8_protocol", "test_ultimate_d2_lineage.UltimateDayLineageTests.test_06_upstream_replaced_during_D2_execution_keeps_history_and_denies_approval", "test_ultimate_d2_lineage.UltimateDayLineageTests.test_07_tenant_viewer_and_expected_result_fingerprint_boundaries", "test_ultimate_d2_lineage.UltimateDayLineageTests.test_08_service_role_cannot_forge_source_allocations_availability_or_certificate"], "scope": "FOCUSED_RECHECK", "selected_modules": ["test_workflow_gates", "test_ultimate_consistency", "test_ultimate_consumers", "test_ultimate_d1_result", "test_ultimate_d2_lineage"], "failure_details": [{"test": "test_ultimate_consistency.UltimateConsistencyTests.test_02_positive_then_foreign_cache_entity_export_context_and_storage_are_denied", "traceback": "line 86, in handle_request\n    self._send_request_headers(**kwargs)\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^\n  File \"/workspace/Dation/.venv/lib/python3.13/site-packages/httpcore/_sync/http11.py\", line 144, in _send_request_headers\n    with map_exceptions({h11.LocalProtocolError: LocalProtocolError}):\n         ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/contextlib.py\", line 162, in __exit__\n    self.gen.throw(value)\n    ~~~~~~~~~~~~~~^^^^^^^\n  File \"/workspace/Dation/.venv/lib/python3.13/site-packages/httpcore/_exceptions.py\", line 14, in map_exceptions\n    raise to_exc(exc) from exc\nhttpcore.LocalProtocolError: Illegal header value b'Bearer '\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"/workspace/Dation/backend/tests/e2e/test_ultimate_consistency.py\", line 97, in test_02_positive_then_foreign_cache_entity_export_context_and_storage_are_denied\n    self.assertIn(self.s.http.get(raw,headers={'Authorization':'Bearer '+token}).status_code,[401,403])\n                  ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/Dation/.venv/lib/python3.13/site-packages/httpx/_client.py\", line 1053, in get\n    return self.request(\n           ~~~~~~~~~~~~^\n        \"GET\",\n        ^^^^^^\n    ...<7 lines>...\n        extensions=extensions,\n        ^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/workspace/Dation/.venv/lib/python3.13/site-packages/httpx/_client.py\", line 825, in request\n    return self.send(request, auth=auth, follow_redirects=follow_redirects)\n           ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/Dation/.venv/lib/python3.13/site-packages/httpx/_client.py\", line 914, in send\n    response = self._send_handling_auth(\n        request,\n    ...<2 lines>...\n        history=[],\n    )\n  File \"/workspace/Dation/.venv/lib/python3.13/site-packages/httpx/_client.py\", line 942, in _send_handling_auth\n    response = self._send_handling_redirects(\n        request,\n        follow_redirects=follow_redirects,\n        history=history,\n    )\n  File \"/workspace/Dation/.venv/lib/python3.13/site-packages/httpx/_client.py\", line 979, in _send_handling_redirects\n    response = self._send_single_request(request)\n  File \"/workspace/Dation/.venv/lib/python3.13/site-packages/httpx/_client.py\", line 1014, in _send_single_request\n    response = transport.handle_request(request)\n  File \"/workspace/Dation/.venv/lib/python3.13/site-packages/httpx/_transports/default.py\", line 249, in handle_request\n    with map_httpcore_exceptions():\n         ~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"/usr/lib/python3.13/contextlib.py\", line 162, in __exit__\n    self.gen.throw(value)\n    ~~~~~~~~~~~~~~^^^^^^^\n  File \"/workspace/Dation/.venv/lib/python3.13/site-packages/httpx/_transports/default.py\", line 118, in map_httpcore_exceptions\n    raise mapped_exc(message) from exc\nhttpx.LocalProtocolError: Illegal header value b'Bearer '\n"}]}

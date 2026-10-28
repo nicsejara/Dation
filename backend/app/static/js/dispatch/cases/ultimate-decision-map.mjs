@@ -1,5 +1,5 @@
 // T5 presents server graph/actions. No readiness or dependency resolver in JS.
-import {api,errorBox} from '../shared.mjs';
+import {api,post,errorBox} from '../shared.mjs';
 import {scopeFor,createScope} from '../lifecycle.mjs';
 import {ensureStylesheet,ensureDecisionCaseStyles} from '../styles.mjs';
 import {loadingState} from '../../platform/components.mjs';
@@ -52,7 +52,6 @@ export async function mountUltimateGraph(root,{route,navigate,onContext}){
     mountResponsibilitySelector(owner,{caseId:route.caseId,stageKey:node.id,snapshot:data.responsibilities,onSaved:map});
     for(const b of host.querySelectorAll('[data-map-action]'))scope.listen(b,'click',()=>follow(node.primary_action.target));
     const extra=el('div',undefined,'t5-node-extra');
-    if(!node.runtime_available)extra.append(el('p','La ejecución de esta decisión todavía no está disponible.','d-metadata'));
     const reasons=node.actions.configure.reasons||[];if(reasons.length)extra.append(el('p',reasons.includes('DATA_OWNER_REQUIRED')?'Asigná un Data Owner activo en este Map.':reasons.includes('DECISION_OWNER_REQUIRED')?'Asigná un Decision Owner activo en este Map.':'Acceso de sólo lectura para esta decisión.','d-metadata'));
     extra.append(button('Historial de '+node.label,()=>history(node,extra,0)));host.append(extra);
     if(index<data.graph.nodes.length-1){const edge=el('div','↓','t5-edge');edge.setAttribute('aria-hidden','true');list.append(edge);}
@@ -62,7 +61,41 @@ export async function mountUltimateGraph(root,{route,navigate,onContext}){
    const panel=el('section',undefined,'d-card t5-context');panel.dataset.graphConfig=node.id;panel.append(el('h2','Configurar '+node.label,'d-card-title'),el('p',graphStateUi(node.node_state).label,'d-body'));
    if(data.configuration_context){panel.append(el('p','Objetivo y reglas: los del contexto guardado del Case.','d-body'));if(data.configuration_context.upstream_run_id)panel.append(el('p','Upstream aprobado: '+data.configuration_context.upstream_run_id,'d-metadata'));}
    else panel.append(el('p','La configuración no está habilitada para este acceso o contexto. Revisá el Map y los responsables.','d-body'));
-   panel.append(el('p','La ejecución de esta decisión todavía no está disponible.','d-body'));const execute=button('Ejecutar decisión',()=>{},'primary');execute.disabled=true;panel.append(execute);root.append(panel);
+   const status=el('p','La ejecución de esta decisión todavía no está disponible.','d-body');status.setAttribute('role','status');
+   const execute=button('Ejecutar decisión',null,'primary');execute.disabled=true;panel.append(status,execute);root.append(panel);
+   // Graph readiness permits configuration. T8/T9 run-context is the checked
+   // authority for admission; the earlier graph capability projection is not.
+   if(node.actions.configure.allowed){
+    status.textContent='Recuperando el contexto publicado para ejecutar…';
+    try{
+     const configured=await api(base+'/run-context?'+new URLSearchParams({node_id:node.id}),{signal:scope.signal});
+     if(!scope.active)return;
+     execute.disabled=!configured.admission_available;
+     status.textContent=configured.admission_available?'La ejecución usará el Model, Pack y reglas publicados de este Case.':'La admisión de nuevas corridas no está habilitada.';
+     let intention=null,pending=false;
+     scope.listen(execute,'click',async()=>{
+      if(pending||execute.disabled)return;
+      if(!intention){
+       const request={request_schema:'ultimate_run_request_v1',workflow_version:2,case_id:route.caseId,node_id:node.id,
+        expected_context_hash:configured.expected_context_hash,model_version_id:configured.model_version_id,
+        data_pack_version_id:configured.data_pack_version_id,node_policy:configured.node_policy};
+       if(node.id==='logistics_scheduling')request.source_transport_plan=configured.source_transport_plan;
+       intention={runId:crypto.randomUUID(),request};
+      }
+      const restoreFocus=document.activeElement===execute;let failed=false;
+      pending=true;execute.disabled=true;execute.setAttribute('aria-busy','true');status.setAttribute('role','status');status.textContent='Creando la corrida con el contexto guardado…';
+      try{
+       // A retry after a lost response keeps the exact UUID and frozen body.
+       // All permissions/freshness/lineage rules remain in checked admission.
+       const run=await post('/api/runs?'+new URLSearchParams({run_id:intention.runId}),intention.request,{signal:scope.signal});
+       if(scope.active)navigate('decision-dashboard',{caseId:route.caseId,nodeId:node.id,runId:run.id});
+      }catch(error){
+       failed=true;
+       if(scope.active){status.textContent=error.message||'No se pudo confirmar la corrida. Reintentá la misma intención.';status.setAttribute('role','alert');}
+      }finally{pending=false;if(scope.active){execute.disabled=!configured.admission_available;execute.removeAttribute('aria-busy');if(failed&&restoreFocus&&(document.activeElement===document.body||document.activeElement===execute))execute.focus({preventScroll:true});}}
+     });
+    }catch(error){if(scope.active){status.textContent=error.message;status.setAttribute('role','alert');}}
+   }
   }else if(route.view==='decision-dashboard'){
    const run=data.selected_run;if(!run||run.id!==route.runId)throw new Error('La corrida solicitada no pertenece a este contexto.');
    const node=selected(),panel=el('section',undefined,'d-card t5-context');panel.dataset.graphHistoricalRun=run.id;

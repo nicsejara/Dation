@@ -38,20 +38,27 @@ class ArtifactBuilder:
     def dataset(self,dataset_id,schema,rows,kind='DETAIL_DATASET',row_semantics='TYPED_ROWS_V1'):
         # Every descriptor is FULL and every chunk is numbered. No top-N or
         # empty substitute for unavailable rows. T8 may publish these bytes later.
-        chunks=[];current=[]
+        chunks=[];current=[];current_size=0
         def payload(items,index):return {'delivery_version':1,'dataset_id':dataset_id,'row_schema':schema,'row_semantics':row_semantics,'scope':'FULL',
             'chunk_index':index,'core_binding':{'run_id':self.core.decision.run_id,'core_result_fingerprint':self.fingerprint},'rows':items}
+        empty_size=len(artifact_bytes(payload([],0)))
         for row in rows:
-            prospective=artifact_bytes(payload([*current,row],len(chunks)))
-            if current and (len(current)>=100 or len(prospective)>c.EVIDENCE_CHUNK_MAX_BYTES):chunks.append(current);current=[]
-            current.append(row)
-            if len(artifact_bytes(payload(current,len(chunks))))>c.EVIDENCE_CHUNK_MAX_BYTES:
+            # Validate/canonicalize each immutable row once. Rewalking the whole
+            # growing chunk for every row made evidence assembly quadratic.
+            encoded=artifact_bytes(row)
+            prospective=empty_size+current_size+len(encoded)+len(current)
+            if current and (len(current)>=100 or prospective>c.EVIDENCE_CHUNK_MAX_BYTES):
+                chunks.append(current);current=[];current_size=0
+                empty_size=len(artifact_bytes(payload([],len(chunks))))
+            current.append(encoded);current_size+=len(encoded)
+            if empty_size+current_size+len(current)-1>c.EVIDENCE_CHUNK_MAX_BYTES:
                 raise AssemblyError('A single typed row exceeds the artifact budget')
         if current or not chunks:chunks.append(current)
         refs=[]
         for index,items in enumerate(chunks):
-            body=payload(items,index);body['chunk_count']=len(chunks);body['total_rows']=len(rows)
-            content=artifact_bytes(body)
+            body=payload([],index);body['chunk_count']=len(chunks);body['total_rows']=len(rows)
+            prefix,suffix=artifact_bytes(body).split(b'"rows":[]',1)
+            content=prefix+b'"rows":['+b','.join(items)+b']'+suffix
             if len(content)>c.EVIDENCE_CHUNK_MAX_BYTES:raise AssemblyError('Artifact chunk exceeds budget')
             digest=content_sha256(content);part=f'{dataset_id}-{index:03}'
             ref=c.ResultArtifactReference(artifact_id=uuid5(self.core.decision.run_id,kind+':'+part+':'+digest),workspace_id=self.core.context.workspace_id,
@@ -77,8 +84,10 @@ def _assemble(result,frozen_context,versions):
     schema=resolve_schema(core.result_schema,core.result_schema_version)
     if schema.name!='transport_plan_v1' or versions!=ASSEMBLER_VERSION:raise AssemblyError('Unsupported assembler/schema/version')
     if frozen_context is not None and frozen_context!=core.context:raise AssemblyError('Frozen context mismatch')
-    from .validation import validate_certified_plan,validate_bundle
-    validate_certified_plan(plan)
+    from .validation import validate_bundle
+    # The final independent bundle certifier validates every plan and artifact
+    # before returning any prepared bytes. Do not certify the same plan again
+    # here and once more at that boundary.
     builder=ArtifactBuilder(core)
     builder.dataset('core','engine_core_v1',(core,),'CORE')
     proof=builder.dataset('engine-evidence','engine_evidence_v1',evidence_shards(evidence),'EVIDENCE','PARTITIONED_ENGINE_EVIDENCE_V1')
@@ -108,7 +117,6 @@ def _assemble(result,frozen_context,versions):
     alternatives=[];alternative_rows=[]
     from app.engines.assignment.transport_policy_result import plan_signature
     for alt in result.alternatives:
-        validate_certified_plan(alt)
         ac=alt.output.core;signature=plan_signature(alt);aid='ALT-'+signature[:24]
         alt_plan=builder.dataset(aid+'-plan','transport_trip_v1',tuple(sorted(ac.transport_plan.trips,key=lambda t:t.trip_id)),'ALTERNATIVE_PLAN')
         alt_entities=builder.dataset(aid+'-entities','entity_evidence_v1',alt.output.evidence.entities,'EVIDENCE')

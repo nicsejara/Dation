@@ -1,0 +1,10 @@
+{
+  "report_links": "PASS",
+  "report_terminal_decision": "STOP",
+  "pending_python_parse": "PASS",
+  "scope_paths": "PASS",
+  "historical_reports_unchanged": 15,
+  "raw_db_dumps_committed": false,
+  "source_diff_check": "PASS",
+  "candidate_frozen": false
+}

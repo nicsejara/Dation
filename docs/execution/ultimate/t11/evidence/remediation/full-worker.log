@@ -1,0 +1,167 @@
+test_complete_cold_job_matches_envelope_and_existing_budget (test_ultimate_scale.UltimateScaleRehearsalTests.test_complete_cold_job_matches_envelope_and_existing_budget) ... storage-0.log
+f1-b7ad-e44810075707/export_rows/transport-plan-export-001/9730eff2f49cdf2049c19ca17e88e7f90d4603a6e060dd59dbed30358aa62e4e.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39928 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39928 - "POST /rest/v1/rpc/claim_comparative_analysis HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39928 - "GET /rest/v1/decision_case_reconciliations?select=%2A&available_at=lte.2026-10-28T19%3A45%3A15.394912%2B00%3A00&order=available_at.asc&limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39928 - "GET /rest/v1/decision_cases?select=%2A&id=eq.1af1f332-1a94-4d24-9709-4854a81c5717&limit=1&workspace_id=eq.00000000-0000-4000-8000-00000000da71 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39928 - "POST /rest/v1/rpc/platform_rpc HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39928 - "POST /rest/v1/rpc/claim_dispatch_job_v2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39928 - "POST /rest/v1/rpc/claim_comparative_analysis HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39928 - "GET /rest/v1/decision_case_reconciliations?select=%2A&available_at=lte.2026-10-28T19%3A45%3A15.429916%2B00%3A00&order=available_at.asc&limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39928 - "POST /rest/v1/rpc/report_dispatch_worker HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39928 - "POST /rest/v1/rpc/claim_dispatch_job_v2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39928 - "POST /rest/v1/rpc/claim_comparative_analysis HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39928 - "GET /rest/v1/decision_case_reconciliations?select=%2A&available_at=lte.2026-10-28T19%3A45%3A17.480656%2B00%3A00&order=available_at.asc&limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39928 - "POST /rest/v1/rpc/claim_dispatch_job_v2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39928 - "POST /rest/v1/rpc/claim_comparative_analysis HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39928 - "GET /rest/v1/decision_case_reconciliations?select=%2A&available_at=lte.2026-10-28T19%3A45%3A19.513149%2B00%3A00&order=available_at.asc&limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/runs/f4256e0c-1c3f-4ff1-b7ad-e44810075707/detail_dataset/plan-000/44d607ed90094556c388b574c6097c8baed79fe773ec2742ee6fa9d547873c8c.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/runs/f4256e0c-1c3f-4ff1-b7ad-e44810075707/detail_dataset/plan-000/44d607ed90094556c388b574c6097c8baed79fe773ec2742ee6fa9d547873c8c.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/runs/f4256e0c-1c3f-4ff1-b7ad-e44810075707/detail_dataset/plan-000/44d607ed90094556c388b574c6097c8baed79fe773ec2742ee6fa9d547873c8c.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/runs/f4256e0c-1c3f-4ff1-b7ad-e44810075707/detail_dataset/plan-000/44d607ed90094556c388b574c6097c8baed79fe773ec2742ee6fa9d547873c8c.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43466 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/runs/f4256e0c-1c3f-4ff1-b7ad-e44810075707/detail_dataset/plan-000/44d607ed90094556c388b574c6097c8baed79fe773ec2742ee6fa9d547873c8c.json HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [508239]
+
+api-1.log
+INFO:     Started server process [508244]
+INFO:     Waiting for application startup.
+{"timestamp":"2026-10-28T19:43:07.594255+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+{"timestamp":"2026-10-28T19:43:07.597190+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+{"timestamp":"2026-10-28T19:43:07.857530+00:00","severity":"INFO","component":"api","event":"request_finished","logger":"dation","revision":"local","request_id":"e13d4f8c-67c8-4a83-9d08-6f287ed5e0fe","trace_id":"4108658a416a49c6beb2e1358f55f525","span_id":"c349d8e17e6f4a38","route":"/health","method":"GET","status_code":200,"duration_ms":166.796,"logging.googleapis.com/trace":"projects/dation-510100/traces/4108658a416a49c6beb2e1358f55f525","logging.googleapis.com/spanId":"c349d8e17e6f4a38"}
+{"timestamp":"2026-10-28T19:45:20.737239+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+{"timestamp":"2026-10-28T19:45:20.837942+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+{"timestamp":"2026-10-28T19:45:20.839282+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+{"timestamp":"2026-10-28T19:45:20.839421+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+
+
+  test_complete_cold_job_matches_envelope_and_existing_budget (test_ultimate_scale.UltimateScaleRehearsalTests.test_complete_cold_job_matches_envelope_and_existing_budget) (cold_first_job=1) ... FAIL
+storage-0.log
+storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/runs/76d0eff2-192e-46a6-9013-cf45a6171031/export_rows/transport-plan-export-001/85c24dc0bbb11e488884f1fe4acc76811834939949738cac53335dc013e3e2e2.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44200 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44200 - "POST /rest/v1/rpc/claim_comparative_analysis HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44200 - "GET /rest/v1/decision_case_reconciliations?select=%2A&available_at=lte.2026-10-28T19%3A47%3A42.133391%2B00%3A00&order=available_at.asc&limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44200 - "GET /rest/v1/decision_cases?select=%2A&id=eq.01eea136-aeaa-4417-8ea1-441d21bb6bb7&limit=1&workspace_id=eq.00000000-0000-4000-8000-00000000da71 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44200 - "POST /rest/v1/rpc/platform_rpc HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44200 - "POST /rest/v1/rpc/claim_dispatch_job_v2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44200 - "POST /rest/v1/rpc/claim_comparative_analysis HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44200 - "GET /rest/v1/decision_case_reconciliations?select=%2A&available_at=lte.2026-10-28T19%3A47%3A42.187893%2B00%3A00&order=available_at.asc&limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44200 - "POST /rest/v1/rpc/claim_dispatch_job_v2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44200 - "POST /rest/v1/rpc/claim_comparative_analysis HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44200 - "GET /rest/v1/decision_case_reconciliations?select=%2A&available_at=lte.2026-10-28T19%3A47%3A44.214301%2B00%3A00&order=available_at.asc&limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/runs/76d0eff2-192e-46a6-9013-cf45a6171031/detail_dataset/plan-000/68f6f0521355380eba1e811e2d9684dbb9bc0e1f4e867cf4623784398c24f1b8.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/runs/76d0eff2-192e-46a6-9013-cf45a6171031/detail_dataset/plan-000/68f6f0521355380eba1e811e2d9684dbb9bc0e1f4e867cf4623784398c24f1b8.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/runs/76d0eff2-192e-46a6-9013-cf45a6171031/detail_dataset/plan-000/68f6f0521355380eba1e811e2d9684dbb9bc0e1f4e867cf4623784398c24f1b8.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44200 - "POST /rest/v1/rpc/claim_dispatch_job_v2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44200 - "POST /rest/v1/rpc/claim_comparative_analysis HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44200 - "GET /rest/v1/decision_case_reconciliations?select=%2A&available_at=lte.2026-10-28T19%3A47%3A46.246874%2B00%3A00&order=available_at.asc&limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/runs/76d0eff2-192e-46a6-9013-cf45a6171031/detail_dataset/plan-000/68f6f0521355380eba1e811e2d9684dbb9bc0e1f4e867cf4623784398c24f1b8.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "POST /rest/v1/rpc/platform_ultimate_execution HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53288 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/runs/76d0eff2-192e-46a6-9013-cf45a6171031/detail_dataset/plan-000/68f6f0521355380eba1e811e2d9684dbb9bc0e1f4e867cf4623784398c24f1b8.json HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [517479]
+
+api-1.log
+INFO:     Started server process [517484]
+INFO:     Waiting for application startup.
+{"timestamp":"2026-10-28T19:45:41.677210+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+{"timestamp":"2026-10-28T19:45:41.679386+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+{"timestamp":"2026-10-28T19:45:41.867533+00:00","severity":"INFO","component":"api","event":"request_finished","logger":"dation","revision":"local","request_id":"1071249a-7071-4a16-931f-957d9d36e2d9","trace_id":"4c8c03bd74f84e9a8c8043f9377cae85","span_id":"baf8f6bedd0b4b74","route":"/health","method":"GET","status_code":200,"duration_ms":124.573,"logging.googleapis.com/trace":"projects/dation-510100/traces/4c8c03bd74f84e9a8c8043f9377cae85","logging.googleapis.com/spanId":"baf8f6bedd0b4b74"}
+{"timestamp":"2026-10-28T19:47:46.601603+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+{"timestamp":"2026-10-28T19:47:46.705897+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+{"timestamp":"2026-10-28T19:47:46.715306+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+{"timestamp":"2026-10-28T19:47:46.715832+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+
+  test_complete_cold_job_matches_envelope_and_existing_budget (test_ultimate_scale.UltimateScaleRehearsalTests.test_complete_cold_job_matches_envelope_and_existing_budget) (cold_first_job=2) ... FAIL
+
+======================================================================
+FAIL: test_complete_cold_job_matches_envelope_and_existing_budget (test_ultimate_scale.UltimateScaleRehearsalTests.test_complete_cold_job_matches_envelope_and_existing_budget) (cold_first_job=1)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Dation/backend/tests/e2e/test_ultimate_scale.py", line 32, in test_complete_cold_job_matches_envelope_and_existing_budget
+    with self.subTest(cold_first_job=repetition):self.measure_complete_cold_job(repetition)
+                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/workspace/Dation/backend/tests/e2e/test_ultimate_scale.py", line 112, in measure_complete_cold_job
+    self.assertLessEqual(observed_seconds,90)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 105.77326765301405 not less than or equal to 90
+
+======================================================================
+FAIL: test_complete_cold_job_matches_envelope_and_existing_budget (test_ultimate_scale.UltimateScaleRehearsalTests.test_complete_cold_job_matches_envelope_and_existing_budget) (cold_first_job=2)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Dation/backend/tests/e2e/test_ultimate_scale.py", line 32, in test_complete_cold_job_matches_envelope_and_existing_budget
+    with self.subTest(cold_first_job=repetition):self.measure_complete_cold_job(repetition)
+                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/workspace/Dation/backend/tests/e2e/test_ultimate_scale.py", line 112, in measure_complete_cold_job
+    self.assertLessEqual(observed_seconds,90)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 95.86930875299731 not less than or equal to 90
+
+----------------------------------------------------------------------
+Ran 1 test in 299.894s
+
+FAILED (failures=2)

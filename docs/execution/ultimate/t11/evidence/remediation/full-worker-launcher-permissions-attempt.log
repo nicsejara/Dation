@@ -1,0 +1,168 @@
+test_complete_cold_job_matches_envelope_and_existing_budget (test_ultimate_scale.UltimateScaleRehearsalTests.test_complete_cold_job_matches_envelope_and_existing_budget) ... storage-0.log
+.0.1:49612 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "GET /storage/v1/bucket/dda-inputs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "POST /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/e78fc1f5-4397-466b-8983-dace2ef817ba/input.csv HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "GET /storage/v1/bucket/dda-inputs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/e78fc1f5-4397-466b-8983-dace2ef817ba/input.csv HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "POST /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/normalized/e78fc1f5-4397-466b-8983-dace2ef817ba/9b1c772a041da93ff202b86ceb1da2bfa3e8f0ad23605b36be4c579a300f8ba5.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/normalized/e78fc1f5-4397-466b-8983-dace2ef817ba/9b1c772a041da93ff202b86ceb1da2bfa3e8f0ad23605b36be4c579a300f8ba5.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "GET /storage/v1/bucket/dda-inputs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/e78fc1f5-4397-466b-8983-dace2ef817ba/input.csv HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/normalized/e78fc1f5-4397-466b-8983-dace2ef817ba/9b1c772a041da93ff202b86ceb1da2bfa3e8f0ad23605b36be4c579a300f8ba5.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "GET /storage/v1/bucket/dda-inputs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "POST /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/01792fe3-a42d-4f35-a4c2-49428d0f7e2b/input.csv HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "GET /storage/v1/bucket/dda-inputs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/01792fe3-a42d-4f35-a4c2-49428d0f7e2b/input.csv HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "POST /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/normalized/01792fe3-a42d-4f35-a4c2-49428d0f7e2b/7bef657a53692a0c5079dcba73c9d2c79b5ffb7385f0f392b2e1c2474ad5c045.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/normalized/01792fe3-a42d-4f35-a4c2-49428d0f7e2b/7bef657a53692a0c5079dcba73c9d2c79b5ffb7385f0f392b2e1c2474ad5c045.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "GET /storage/v1/bucket/dda-inputs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/e78fc1f5-4397-466b-8983-dace2ef817ba/input.csv HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/normalized/e78fc1f5-4397-466b-8983-dace2ef817ba/9b1c772a041da93ff202b86ceb1da2bfa3e8f0ad23605b36be4c579a300f8ba5.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "GET /storage/v1/bucket/dda-inputs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/01792fe3-a42d-4f35-a4c2-49428d0f7e2b/input.csv HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/normalized/01792fe3-a42d-4f35-a4c2-49428d0f7e2b/7bef657a53692a0c5079dcba73c9d2c79b5ffb7385f0f392b2e1c2474ad5c045.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49612 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [498685]
+
+api-1.log
+INFO:     Started server process [498690]
+INFO:     Waiting for application startup.
+{"timestamp":"2026-10-28T19:27:30.750323+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+{"timestamp":"2026-10-28T19:27:30.752893+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+{"timestamp":"2026-10-28T19:27:30.983167+00:00","severity":"INFO","component":"api","event":"request_finished","logger":"dation","revision":"local","request_id":"50e62aaf-c552-42a8-a618-015253614983","trace_id":"2a8c3c2d507b498a8669e4e32c359899","span_id":"d7af2195d6484eee","route":"/health","method":"GET","status_code":200,"duration_ms":146.349,"logging.googleapis.com/trace":"projects/dation-510100/traces/2a8c3c2d507b498a8669e4e32c359899","logging.googleapis.com/spanId":"d7af2195d6484eee"}
+{"timestamp":"2026-10-28T19:28:37.423290+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+{"timestamp":"2026-10-28T19:28:37.525976+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+{"timestamp":"2026-10-28T19:28:37.530557+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+{"timestamp":"2026-10-28T19:28:37.530905+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+
+
+  test_complete_cold_job_matches_envelope_and_existing_budget (test_ultimate_scale.UltimateScaleRehearsalTests.test_complete_cold_job_matches_envelope_and_existing_budget) (cold_first_job=1) ... FAIL
+storage-0.log
+.0.1:34942 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "GET /storage/v1/bucket/dda-inputs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "POST /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/87c003d3-1608-4971-a674-a89a607a3989/input.csv HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "GET /storage/v1/bucket/dda-inputs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/87c003d3-1608-4971-a674-a89a607a3989/input.csv HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "POST /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/normalized/87c003d3-1608-4971-a674-a89a607a3989/1c816dae0ea6a44fb52311f0686fd74c33685b94ad2aa357925f18972e7cdb0d.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/normalized/87c003d3-1608-4971-a674-a89a607a3989/1c816dae0ea6a44fb52311f0686fd74c33685b94ad2aa357925f18972e7cdb0d.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "GET /storage/v1/bucket/dda-inputs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/87c003d3-1608-4971-a674-a89a607a3989/input.csv HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/normalized/87c003d3-1608-4971-a674-a89a607a3989/1c816dae0ea6a44fb52311f0686fd74c33685b94ad2aa357925f18972e7cdb0d.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "GET /storage/v1/bucket/dda-inputs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "POST /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/48741f48-5515-45c1-a59a-6d1b97305057/input.csv HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "GET /storage/v1/bucket/dda-inputs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/48741f48-5515-45c1-a59a-6d1b97305057/input.csv HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "POST /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/normalized/48741f48-5515-45c1-a59a-6d1b97305057/006c5ec9be61b9ce72b67c9d36da1c9cd032c4709e3cbcf650baf959c518143b.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/normalized/48741f48-5515-45c1-a59a-6d1b97305057/006c5ec9be61b9ce72b67c9d36da1c9cd032c4709e3cbcf650baf959c518143b.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "POST /rest/v1/rpc/platform_identity HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "GET /storage/v1/bucket/dda-inputs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/87c003d3-1608-4971-a674-a89a607a3989/input.csv HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/normalized/87c003d3-1608-4971-a674-a89a607a3989/1c816dae0ea6a44fb52311f0686fd74c33685b94ad2aa357925f18972e7cdb0d.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "GET /storage/v1/bucket/dda-inputs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/48741f48-5515-45c1-a59a-6d1b97305057/input.csv HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "GET /storage/v1/object/dda-inputs/00000000-0000-4000-8000-00000000da71/normalized/48741f48-5515-45c1-a59a-6d1b97305057/006c5ec9be61b9ce72b67c9d36da1c9cd032c4709e3cbcf650baf959c518143b.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34942 - "POST /rest/v1/rpc/platform_ultimate_data_pack HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [501037]
+
+api-1.log
+INFO:     Started server process [501042]
+INFO:     Waiting for application startup.
+{"timestamp":"2026-10-28T19:28:55.928261+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+{"timestamp":"2026-10-28T19:28:55.930294+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+{"timestamp":"2026-10-28T19:28:56.062924+00:00","severity":"INFO","component":"api","event":"request_finished","logger":"dation","revision":"local","request_id":"7c92048a-af39-464f-bd49-7348dca9a41e","trace_id":"5635f04c4aea4daf8a698593d480abef","span_id":"4f2a59c6fde5438e","route":"/health","method":"GET","status_code":200,"duration_ms":117.093,"logging.googleapis.com/trace":"projects/dation-510100/traces/5635f04c4aea4daf8a698593d480abef","logging.googleapis.com/spanId":"4f2a59c6fde5438e"}
+{"timestamp":"2026-10-28T19:29:53.648803+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+{"timestamp":"2026-10-28T19:29:53.751816+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+{"timestamp":"2026-10-28T19:29:53.756831+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+{"timestamp":"2026-10-28T19:29:53.757235+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+
+  test_complete_cold_job_matches_envelope_and_existing_budget (test_ultimate_scale.UltimateScaleRehearsalTests.test_complete_cold_job_matches_envelope_and_existing_budget) (cold_first_job=2) ... FAIL
+
+======================================================================
+FAIL: test_complete_cold_job_matches_envelope_and_existing_budget (test_ultimate_scale.UltimateScaleRehearsalTests.test_complete_cold_job_matches_envelope_and_existing_budget) (cold_first_job=1)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Dation/backend/tests/e2e/test_ultimate_scale.py", line 32, in test_complete_cold_job_matches_envelope_and_existing_budget
+    with self.subTest(cold_first_job=repetition):self.measure_complete_cold_job(repetition)
+                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/workspace/Dation/backend/tests/e2e/test_ultimate_scale.py", line 77, in measure_complete_cold_job
+    wait_for(lambda:s.reachable('http://127.0.0.1:'+str(worker_port)+'/'),'cold owned image worker',timeout=45)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/Dation/backend/tests/e2e/sandbox.py", line 44, in wait_for
+    raise AssertionError('Timed out: '+description)
+AssertionError: Timed out: cold owned image worker
+
+======================================================================
+FAIL: test_complete_cold_job_matches_envelope_and_existing_budget (test_ultimate_scale.UltimateScaleRehearsalTests.test_complete_cold_job_matches_envelope_and_existing_budget) (cold_first_job=2)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Dation/backend/tests/e2e/test_ultimate_scale.py", line 32, in test_complete_cold_job_matches_envelope_and_existing_budget
+    with self.subTest(cold_first_job=repetition):self.measure_complete_cold_job(repetition)
+                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/workspace/Dation/backend/tests/e2e/test_ultimate_scale.py", line 77, in measure_complete_cold_job
+    wait_for(lambda:s.reachable('http://127.0.0.1:'+str(worker_port)+'/'),'cold owned image worker',timeout=45)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/Dation/backend/tests/e2e/sandbox.py", line 44, in wait_for
+    raise AssertionError('Timed out: '+description)
+AssertionError: Timed out: cold owned image worker
+
+----------------------------------------------------------------------
+Ran 1 test in 161.250s
+
+FAILED (failures=2)

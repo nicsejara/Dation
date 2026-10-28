@@ -1,0 +1,16 @@
+{
+  "image": "dation-certification:rollback-dual-compatible-t11",
+  "image_id": "sha256:610a317cbde6fe000d034bdb9dce28ad9f7309a948b13eb804d4483e6dd48041",
+  "actual_container_readers": [
+    "assignment_v1",
+    "transport_plan_v1",
+    "day_scheduling_v1"
+  ],
+  "actual_container_worker_jobs": [
+    "cd04e8d4-8bdc-40cb-9594-7d9c656a10f0",
+    "bd463a16-902d-4894-8580-8d95b8909d9d"
+  ],
+  "schema_downgrade": false,
+  "read_only_and_pilot_smoke": "PASS",
+  "deployment": "owned local containers only"
+}

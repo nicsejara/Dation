@@ -1,0 +1,98 @@
+[
+  {
+    "run_id": "72975f7f-82c8-46b2-9d49-f7bd5aa55b68",
+    "schema": "transport_plan_v1",
+    "path": "result",
+    "n": 7,
+    "requests": 7,
+    "p50_seconds": 0.3122969850082882,
+    "p95_nearest_rank_seconds": 0.5725874670024496,
+    "bytes_min": 26335,
+    "bytes_max": 26335,
+    "scope": "real owned HTTP+SQL+private Storage, small certified chain; no general latency SLO inferred"
+  },
+  {
+    "run_id": "72975f7f-82c8-46b2-9d49-f7bd5aa55b68",
+    "schema": "transport_plan_v1",
+    "path": "primary-visual",
+    "n": 7,
+    "requests": 7,
+    "p50_seconds": 0.2626644039992243,
+    "p95_nearest_rank_seconds": 0.4637747739907354,
+    "bytes_min": 741,
+    "bytes_max": 741,
+    "scope": "real owned HTTP+SQL+private Storage, small certified chain; no general latency SLO inferred"
+  },
+  {
+    "run_id": "72975f7f-82c8-46b2-9d49-f7bd5aa55b68",
+    "schema": "transport_plan_v1",
+    "path": "details/plan",
+    "n": 7,
+    "requests": 7,
+    "p50_seconds": 0.182465236983262,
+    "p95_nearest_rank_seconds": 0.21217325498582795,
+    "bytes_min": 1021,
+    "bytes_max": 1021,
+    "scope": "real owned HTTP+SQL+private Storage, small certified chain; no general latency SLO inferred"
+  },
+  {
+    "run_id": "72975f7f-82c8-46b2-9d49-f7bd5aa55b68",
+    "schema": "transport_plan_v1",
+    "path": "entities/TRIP/TP-2887fddb9c277f81681bee40-1",
+    "n": 7,
+    "requests": 7,
+    "p50_seconds": 0.2498223680013325,
+    "p95_nearest_rank_seconds": 0.3576798439898994,
+    "bytes_min": 2716,
+    "bytes_max": 2716,
+    "scope": "real owned HTTP+SQL+private Storage, small certified chain; no general latency SLO inferred"
+  },
+  {
+    "run_id": "e9de2743-86b3-462e-a93f-a31bb344b8d4",
+    "schema": "day_scheduling_v1",
+    "path": "result",
+    "n": 7,
+    "requests": 7,
+    "p50_seconds": 0.1557399499870371,
+    "p95_nearest_rank_seconds": 0.20943560800515115,
+    "bytes_min": 22408,
+    "bytes_max": 22408,
+    "scope": "real owned HTTP+SQL+private Storage, small certified chain; no general latency SLO inferred"
+  },
+  {
+    "run_id": "e9de2743-86b3-462e-a93f-a31bb344b8d4",
+    "schema": "day_scheduling_v1",
+    "path": "primary-visual",
+    "n": 7,
+    "requests": 7,
+    "p50_seconds": 0.13870260698604397,
+    "p95_nearest_rank_seconds": 0.21336369300843216,
+    "bytes_min": 526,
+    "bytes_max": 526,
+    "scope": "real owned HTTP+SQL+private Storage, small certified chain; no general latency SLO inferred"
+  },
+  {
+    "run_id": "e9de2743-86b3-462e-a93f-a31bb344b8d4",
+    "schema": "day_scheduling_v1",
+    "path": "details/schedule",
+    "n": 7,
+    "requests": 7,
+    "p50_seconds": 0.14375617299810983,
+    "p95_nearest_rank_seconds": 0.15851099698920734,
+    "bytes_min": 691,
+    "bytes_max": 691,
+    "scope": "real owned HTTP+SQL+private Storage, small certified chain; no general latency SLO inferred"
+  },
+  {
+    "run_id": "e9de2743-86b3-462e-a93f-a31bb344b8d4",
+    "schema": "day_scheduling_v1",
+    "path": "entities/TRIP/TP-2887fddb9c277f81681bee40-1",
+    "n": 7,
+    "requests": 7,
+    "p50_seconds": 0.19540431999485008,
+    "p95_nearest_rank_seconds": 0.21870319001027383,
+    "bytes_min": 3799,
+    "bytes_max": 3799,
+    "scope": "real owned HTTP+SQL+private Storage, small certified chain; no general latency SLO inferred"
+  }
+]

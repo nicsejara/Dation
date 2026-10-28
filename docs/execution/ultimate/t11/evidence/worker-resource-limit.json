@@ -1,0 +1,5 @@
+{
+  "source": "read-only Cloud Run v2 GET",
+  "error_type": "HTTPError",
+  "error": "HTTP Error 401: Unauthorized"
+}

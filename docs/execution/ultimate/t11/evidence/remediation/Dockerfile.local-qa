@@ -1,0 +1,6 @@
+FROM dation-foundation:final
+COPY --chown=65532:65532 backend/app ./app
+COPY --chown=65532:65532 backend/*.py ./
+COPY --chown=65532:65532 sample_data/v3 /app/sample_data/v3
+COPY --chown=65532:65532 sample_data/onboarding-v1 /app/sample_data/onboarding-v1
+USER 65532:65532

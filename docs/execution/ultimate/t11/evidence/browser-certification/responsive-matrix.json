@@ -1,0 +1,652 @@
+[
+  {
+    "surface": "case-setup",
+    "viewport": [
+      1440,
+      900
+    ],
+    "body_width": 1440,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "decision-map",
+    "viewport": [
+      1440,
+      900
+    ],
+    "body_width": 1440,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "case-data",
+    "viewport": [
+      1440,
+      900
+    ],
+    "body_width": 1440,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "config-d1",
+    "viewport": [
+      1440,
+      900
+    ],
+    "body_width": 1440,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "config-d2",
+    "viewport": [
+      1440,
+      900
+    ],
+    "body_width": 1440,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "dashboard-d1",
+    "viewport": [
+      1440,
+      900
+    ],
+    "body_width": 1440,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "detailed-analysis-d1",
+    "viewport": [
+      1440,
+      900
+    ],
+    "body_width": 1440,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "dation-ia-d1",
+    "viewport": [
+      1440,
+      900
+    ],
+    "body_width": 1440,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "approval-review-d1",
+    "viewport": [
+      1440,
+      900
+    ],
+    "body_width": 1440,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "dashboard-d2",
+    "viewport": [
+      1440,
+      900
+    ],
+    "body_width": 1440,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "detailed-analysis-d2",
+    "viewport": [
+      1440,
+      900
+    ],
+    "body_width": 1440,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "dation-ia-d2",
+    "viewport": [
+      1440,
+      900
+    ],
+    "body_width": 1440,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "approval-review-d2",
+    "viewport": [
+      1440,
+      900
+    ],
+    "body_width": 1440,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "case-setup",
+    "viewport": [
+      1024,
+      768
+    ],
+    "body_width": 1024,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "decision-map",
+    "viewport": [
+      1024,
+      768
+    ],
+    "body_width": 1024,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "case-data",
+    "viewport": [
+      1024,
+      768
+    ],
+    "body_width": 1024,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "config-d1",
+    "viewport": [
+      1024,
+      768
+    ],
+    "body_width": 1024,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "config-d2",
+    "viewport": [
+      1024,
+      768
+    ],
+    "body_width": 1024,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "dashboard-d1",
+    "viewport": [
+      1024,
+      768
+    ],
+    "body_width": 1024,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "detailed-analysis-d1",
+    "viewport": [
+      1024,
+      768
+    ],
+    "body_width": 1024,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "dation-ia-d1",
+    "viewport": [
+      1024,
+      768
+    ],
+    "body_width": 1024,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "approval-review-d1",
+    "viewport": [
+      1024,
+      768
+    ],
+    "body_width": 1024,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "dashboard-d2",
+    "viewport": [
+      1024,
+      768
+    ],
+    "body_width": 1024,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "detailed-analysis-d2",
+    "viewport": [
+      1024,
+      768
+    ],
+    "body_width": 1024,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "dation-ia-d2",
+    "viewport": [
+      1024,
+      768
+    ],
+    "body_width": 1024,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "approval-review-d2",
+    "viewport": [
+      1024,
+      768
+    ],
+    "body_width": 1024,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "case-setup",
+    "viewport": [
+      768,
+      1024
+    ],
+    "body_width": 768,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "decision-map",
+    "viewport": [
+      768,
+      1024
+    ],
+    "body_width": 768,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "case-data",
+    "viewport": [
+      768,
+      1024
+    ],
+    "body_width": 768,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "config-d1",
+    "viewport": [
+      768,
+      1024
+    ],
+    "body_width": 768,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "config-d2",
+    "viewport": [
+      768,
+      1024
+    ],
+    "body_width": 768,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "dashboard-d1",
+    "viewport": [
+      768,
+      1024
+    ],
+    "body_width": 768,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "detailed-analysis-d1",
+    "viewport": [
+      768,
+      1024
+    ],
+    "body_width": 768,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "dation-ia-d1",
+    "viewport": [
+      768,
+      1024
+    ],
+    "body_width": 768,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "approval-review-d1",
+    "viewport": [
+      768,
+      1024
+    ],
+    "body_width": 768,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "dashboard-d2",
+    "viewport": [
+      768,
+      1024
+    ],
+    "body_width": 768,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "detailed-analysis-d2",
+    "viewport": [
+      768,
+      1024
+    ],
+    "body_width": 768,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "dation-ia-d2",
+    "viewport": [
+      768,
+      1024
+    ],
+    "body_width": 768,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "approval-review-d2",
+    "viewport": [
+      768,
+      1024
+    ],
+    "body_width": 768,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "case-setup",
+    "viewport": [
+      375,
+      812
+    ],
+    "body_width": 375,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "decision-map",
+    "viewport": [
+      375,
+      812
+    ],
+    "body_width": 375,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "case-data",
+    "viewport": [
+      375,
+      812
+    ],
+    "body_width": 375,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "config-d1",
+    "viewport": [
+      375,
+      812
+    ],
+    "body_width": 375,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "config-d2",
+    "viewport": [
+      375,
+      812
+    ],
+    "body_width": 375,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "dashboard-d1",
+    "viewport": [
+      375,
+      812
+    ],
+    "body_width": 375,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "detailed-analysis-d1",
+    "viewport": [
+      375,
+      812
+    ],
+    "body_width": 375,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "dation-ia-d1",
+    "viewport": [
+      375,
+      812
+    ],
+    "body_width": 375,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "approval-review-d1",
+    "viewport": [
+      375,
+      812
+    ],
+    "body_width": 375,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "dashboard-d2",
+    "viewport": [
+      375,
+      812
+    ],
+    "body_width": 375,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "detailed-analysis-d2",
+    "viewport": [
+      375,
+      812
+    ],
+    "body_width": 375,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "dation-ia-d2",
+    "viewport": [
+      375,
+      812
+    ],
+    "body_width": 375,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "approval-review-d2",
+    "viewport": [
+      375,
+      812
+    ],
+    "body_width": 375,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "case-setup",
+    "viewport": [
+      320,
+      640
+    ],
+    "body_width": 320,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "decision-map",
+    "viewport": [
+      320,
+      640
+    ],
+    "body_width": 320,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "case-data",
+    "viewport": [
+      320,
+      640
+    ],
+    "body_width": 320,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "config-d1",
+    "viewport": [
+      320,
+      640
+    ],
+    "body_width": 320,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "config-d2",
+    "viewport": [
+      320,
+      640
+    ],
+    "body_width": 320,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "dashboard-d1",
+    "viewport": [
+      320,
+      640
+    ],
+    "body_width": 320,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "detailed-analysis-d1",
+    "viewport": [
+      320,
+      640
+    ],
+    "body_width": 320,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "dation-ia-d1",
+    "viewport": [
+      320,
+      640
+    ],
+    "body_width": 320,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "approval-review-d1",
+    "viewport": [
+      320,
+      640
+    ],
+    "body_width": 320,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "dashboard-d2",
+    "viewport": [
+      320,
+      640
+    ],
+    "body_width": 320,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "detailed-analysis-d2",
+    "viewport": [
+      320,
+      640
+    ],
+    "body_width": 320,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "dation-ia-d2",
+    "viewport": [
+      320,
+      640
+    ],
+    "body_width": 320,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  },
+  {
+    "surface": "approval-review-d2",
+    "viewport": [
+      320,
+      640
+    ],
+    "body_width": 320,
+    "result": "PASS",
+    "keyboard_and_focus": "full B-BROWSER/W10 and first-user controls"
+  }
+]

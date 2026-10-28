@@ -1,0 +1,58 @@
+test_01_empty_business_login_model_pack_execute_and_approve_d1_d2 (test_ultimate_certification.UltimateCertificationTests.test_01_empty_business_login_model_pack_execute_and_approve_d1_d2) ... ERROR
+test_02_required_surface_responsive_accessibility_matrix (test_ultimate_certification.UltimateCertificationTests.test_02_required_surface_responsive_accessibility_matrix) ... FAIL
+
+======================================================================
+ERROR: test_01_empty_business_login_model_pack_execute_and_approve_d1_d2 (test_ultimate_certification.UltimateCertificationTests.test_01_empty_business_login_model_pack_execute_and_approve_d1_d2)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/usr/lib/python3.13/asyncio/base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/workspace/Dation/backend/tests/browser/test_ultimate_certification.py", line 86, in test_01_empty_business_login_model_pack_execute_and_approve_d1_d2
+    await self.page.get_by_role('button',name='Crear Case',exact=True).click();await self.page.locator('[data-graph-ready=true]').wait_for()
+                                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_generated.py", line 20672, in wait_for
+    await self._impl_obj.wait_for(timeout=to_milliseconds(timeout), state=state)
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_locator.py", line 752, in wait_for
+    await self._frame.wait_for_selector(
+        self._selector, strict=True, timeout=timeout, state=state
+    )
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_frame.py", line 395, in wait_for_selector
+    await self._channel.send(
+        "waitForSelector", self._timeout, locals_to_params(locals())
+    )
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py", line 76, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py", line 632, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.TimeoutError: Locator.wait_for: Timeout 20000ms exceeded.
+Call log:
+  - waiting for locator("[data-graph-ready=true]") to be visible
+
+
+======================================================================
+FAIL: test_02_required_surface_responsive_accessibility_matrix (test_ultimate_certification.UltimateCertificationTests.test_02_required_surface_responsive_accessibility_matrix)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/usr/lib/python3.13/asyncio/base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/workspace/Dation/backend/tests/browser/test_ultimate_certification.py", line 139, in test_02_required_surface_responsive_accessibility_matrix
+    self.assertIn('case_id',self.f,'Run the complete T11 browser scenario, not only its second step')
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'case_id' not found in {'api_url': 'http://127.0.0.1:35869', 'baseline_url': 'http://127.0.0.1:40653', 'pg_container': 'dation-e2e-5a353f31e82f-pg', 'workspace_id': '00000000-0000-4000-8000-00000000da71', 'business_counts': {'runs': 0, 'cases': 0, 'models': 0, 'datasets': 0}} : Run the complete T11 browser scenario, not only its second step
+
+----------------------------------------------------------------------
+Ran 2 tests in 69.696s
+
+FAILED (failures=1, errors=1)

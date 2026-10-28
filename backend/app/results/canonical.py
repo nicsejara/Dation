@@ -27,6 +27,22 @@ def _decimal_text(value):
 def canonical_tree(value, *, _depth=0):
     if _depth > 64:
         raise ValueError("Canonical structure is too deep")
+    # Evidence contains millions of scalar facts. Resolve exact scalar types
+    # before the Pydantic model/ABC checks, keeping the same numeric and Unicode
+    # guards. Subclasses (including Enum) still use the original path below.
+    kind = type(value)
+    if value is None or kind is bool:
+        return value
+    if kind is str:
+        value = unicodedata.normalize('NFC', value)
+        value.encode('utf-8')
+        return value
+    if kind is int:
+        if abs(value) > MAX_SCALED_INTEGER:
+            raise ValueError("Canonical integer exceeds the signed 64-bit contract")
+        return value
+    if kind is float:
+        raise ValueError("Binary floats, NaN and Infinity are not canonical inputs")
     value = _data(value)
     if value is None or type(value) is bool:
         return value
@@ -139,9 +155,11 @@ def core_result_fingerprint(core):
 
 def artifact_bytes(payload):
     """Artifacts may bind to past upstream/core, never to their future package."""
-    value = _data(payload)
+    # Normalize once, then inspect the exact tree that will be serialized.
+    # Walking a model once for forbidden fields and dumping it again for JSON
+    # doubled the cost of large evidence rows without adding a distinct check.
+    value = canonical_tree(payload)
     def check(item, path=()):
-        item = _data(item)
         if isinstance(item, Mapping):
             for key, child in item.items():
                 if key in ('signed_url', 'signed_urls', 'current_permissions', 'approval_allowed', 'approval_overlay'):
@@ -153,7 +171,8 @@ def artifact_bytes(payload):
             for child in item:
                 check(child, path)
     check(value)
-    return canonical_bytes(value)
+    return json.dumps(value, sort_keys=True, ensure_ascii=False,
+                      separators=(',', ':'), allow_nan=False).encode('utf-8')
 
 
 def package_projection(package):

@@ -1,0 +1,18 @@
+{
+  "forbidden_context_keys": [
+    "cuit",
+    "customer_id",
+    "customer_identity",
+    "customer_name",
+    "invoice",
+    "invoice_number",
+    "profit_margin",
+    "raw_commercial_csv",
+    "raw_csv",
+    "revenue",
+    "sku"
+  ],
+  "raw_commercial_data_absent": true,
+  "injection_cannot_mutate_or_invent": true,
+  "live_provider_used": false
+}

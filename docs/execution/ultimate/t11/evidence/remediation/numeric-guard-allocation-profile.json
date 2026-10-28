@@ -1,0 +1,26 @@
+{
+  "scope": "diagnostic pure numeric guard only; all predicates/outputs preserved",
+  "calls": 50000,
+  "current_inner_freevars": [
+    "check"
+  ],
+  "recursive_self_cycle": true,
+  "measurement": {
+    "recursive_closure_per_model": {
+      "seconds": 0.23039518899167888,
+      "collections": [
+        46,
+        4,
+        0
+      ]
+    },
+    "shared_pure_checker": {
+      "seconds": 0.24700973299331963,
+      "collections": [
+        0,
+        0,
+        0
+      ]
+    }
+  }
+}

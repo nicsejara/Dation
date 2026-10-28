@@ -65,12 +65,41 @@ class UltimateNavigationTests(unittest.IsolatedAsyncioTestCase):
         await expect(self.page.locator('[data-graph-node="'+D2+'"]')).to_have_attribute('data-node-state','READY');await self.page.get_by_role('button',name='Configurar Day Scheduling',exact=False).click();await self.page.locator('[data-graph-config="'+D2+'"]').wait_for();await self.page.get_by_text('Upstream aprobado: '+rid,exact=True).wait_for();self.assertEqual(await self.page.locator('input[type=file]').count(),0)
         await self.page.reload();await self.page.locator('[data-graph-config="'+D2+'"]').wait_for();self.assertIn('node_id='+D2,self.page.url)
     async def test_03_history_new_run_back_forward_reload_keep_case_node_and_run(self):
-        _,_,c=await self.case();cid=c['case']['id'];await self.full(cid);up=await self.install(cid,approved=True);child=await self.install(cid,D2,approved=True);await self.open_map(cid)
-        self.assertEqual(await self.page.locator('.ultimate-graph-view .dispatch-decision-node__next').count(),0)
-        await self.page.get_by_role('button',name='Historial de Day Scheduling',exact=True).click();await self.page.get_by_role('button',name='Abrir corrida '+child[:8],exact=True).click();await self.page.locator('[data-graph-historical-run="'+child+'"]').wait_for()
-        await self.page.get_by_role('button',name='Nueva corrida · Day Scheduling',exact=True).click();await self.page.locator('[data-graph-config="'+D2+'"]').wait_for();await self.page.get_by_text('Upstream aprobado: '+up,exact=True).wait_for()
-        await self.page.go_back();await self.page.locator('[data-graph-historical-run="'+child+'"]').wait_for();await self.page.reload();await self.page.locator('[data-graph-historical-run="'+child+'"]').wait_for();await self.page.go_forward();await self.page.locator('[data-graph-config="'+D2+'"]').wait_for()
-        await self.page.goto(self.base+'/app/ddas/logistics/dashboard?case_id='+cid+'&node_id='+D1+'&run_id='+up);await self.page.locator('[data-graph-historical-run="'+up+'"]').wait_for();await self.page.get_by_role('button',name='Nueva corrida · Transport Plan',exact=True).click();await self.page.locator('[data-graph-config="'+D1+'"]').wait_for();self.assertEqual(await self.page.locator('input[type=file]').count(),0)
+        # T10 renders real published packages; T5's two-byte metadata artifacts
+        # intentionally are not valid Dashboard inputs. Keep these navigation
+        # assertions, now over the actual API/SQL/worker publication fixture.
+        previous_base=self.base;env=os.environ.copy()
+        for k in ['SUPABASE_URL','SUPABASE_SECRET_KEY','SUPABASE_ACCESS_TOKEN','LLM_API_KEY','LLM_BASE_URL','GCP_ACCESS_TOKEN']:env[k]=''
+        for k in ['DOCKER_CONTEXT','DOCKER_TLS','DOCKER_TLS_VERIFY','DOCKER_CERT_PATH']:env.pop(k,None)
+        env.update(DOCKER_HOST='unix:///var/run/docker.sock',PYTHONDONTWRITEBYTECODE='1',PYTHONPATH=str(ROOT))
+        log=(OUT/'history-published-fixture.log').open('w')
+        fixture=subprocess.Popen([str(REPO/'.venv/bin/python'),'-B',str(ROOT/'tests/e2e/ultimate_consumer_fixture.py')],cwd=ROOT,env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=log,text=True)
+        try:
+            if not await asyncio.to_thread(lambda:select.select([fixture.stdout],[],[],60)[0]):raise RuntimeError('Published history fixture timeout')
+            value=json.loads(fixture.stdout.readline());self.base=value['api_url'];await self.login(self.context)
+            cid=value['case_id'];up=value['d1']['id'];child=value['d2']['id']
+            await self.api('POST','/api/runs/'+child+'/approve',{'case_id':cid,'node_id':D2,'expected_result_fingerprint':value['d2']['result_fingerprint']})
+            await self.open_map(cid)
+            self.assertEqual(await self.page.locator('.ultimate-graph-view .dispatch-decision-node__next').count(),0)
+            dashboard=lambda rid:self.page.locator('.ultimate-results[data-run-id="'+rid+'"] [data-chart] svg')
+            await self.page.get_by_role('button',name='Historial de Day Scheduling',exact=True).click()
+            await self.page.get_by_role('button',name='Abrir corrida '+child[:8],exact=True).click();await dashboard(child).wait_for()
+            await self.page.get_by_role('button',name='Nueva corrida',exact=True).click();await self.page.locator('[data-graph-config="'+D2+'"]').wait_for()
+            await self.page.get_by_text('Upstream aprobado: '+up,exact=True).wait_for()
+            await self.page.go_back();await dashboard(child).wait_for();await self.page.reload();await dashboard(child).wait_for()
+            await self.page.go_forward();await self.page.locator('[data-graph-config="'+D2+'"]').wait_for()
+            await self.page.goto(self.base+'/app/ddas/logistics/dashboard?case_id='+cid+'&node_id='+D1+'&run_id='+up);await dashboard(up).wait_for()
+            await self.page.get_by_role('button',name='Nueva corrida',exact=True).click();await self.page.locator('[data-graph-config="'+D1+'"]').wait_for()
+            self.assertEqual(await self.page.locator('input[type=file]').count(),0)
+            source=await self.api('GET','/api/runs/'+child)
+            self.assertEqual(source['upstream_run_id'],up);self.assertEqual(source['result_fingerprint'],value['d2']['result_fingerprint'])
+            await self.page.screenshot(path=str(OUT/'history-real-publications.png'),full_page=True,animations='disabled')
+        finally:
+            self.base=previous_base
+            if fixture.poll() is None:
+                fixture.stdin.write('stop\n');fixture.stdin.flush();fixture.stdin.close()
+                await asyncio.to_thread(fixture.wait,45)
+            fixture.stdout.close();log.close()
     async def test_04_case_selector_escape_switch_and_history_navigation(self):
         _,_,a=await self.case();_,_,b=await self.case();ca=a['case']['id'];cb=b['case']['id'];await self.open_map(ca)
         trigger=self.page.get_by_role('button',name='Seleccionar Decision Case',exact=True);await trigger.click();dialog=self.page.get_by_role('dialog',name='Seleccionar Decision Case');await dialog.wait_for();await self.page.keyboard.press('Escape');await dialog.wait_for(state='hidden');self.assertTrue(await trigger.evaluate('n=>n===document.activeElement'))

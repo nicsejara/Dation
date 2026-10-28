@@ -13,9 +13,14 @@ def rounded(n,d):return None if not d else (Decimal(n)/Decimal(d)).quantize(Deci
 
 
 def validate_certified_plan(plan):
-    with localcontext() as ctx:
-        ctx.prec=60;_validate_plan(plan)
+    _validated_plan_output(plan)
     return True
+
+
+def _validated_plan_output(plan):
+    with localcontext() as ctx:
+        ctx.prec=60
+        return _validate_plan(plan)
 
 
 def _validate_plan(plan):
@@ -73,17 +78,26 @@ def _validate_plan(plan):
             else:n,d=sum(t.resource_source=='OWN' for t in trips),len(trips)
             require(d==0 or (n<=guard.limit*d if guard.kind=='MAXIMUM_EXTERNAL_SHARE' else n>=guard.limit*d),'Assembler input violates guardrail')
     require(output.evidence.core_result_fingerprint==core_result_fingerprint(core),'Core evidence hash mismatch')
+    return output
 
 
 def read_delivery(delivery,artifacts):
-    if isinstance(delivery,c.InlineDataset):return list(delivery.rows)
-    lookup={a.reference.artifact_id:a for a in artifacts};rows=[]
-    for index,ref in enumerate(delivery.artifacts):
+    lookup={a.reference.artifact_id:a for a in artifacts}
+    def fetch(ref):
         require(ref.artifact_id in lookup,'Missing artifact')
         prepared=lookup[ref.artifact_id]
         require(prepared.reference==ref and content_sha256(prepared.content)==ref.content_sha256 and len(prepared.content)==ref.size_bytes,'Artifact integrity mismatch')
         body=json.loads(prepared.content)
         require(artifact_bytes(body)==prepared.content,'Noncanonical/unsafe artifact')
+        return body
+    return _bound_delivery_rows(delivery,fetch)
+
+
+def _bound_delivery_rows(delivery,fetch):
+    if isinstance(delivery,c.InlineDataset):return list(delivery.rows)
+    rows=[]
+    for index,ref in enumerate(delivery.artifacts):
+        body=fetch(ref)
         require(body['dataset_id']==delivery.dataset_id and body['row_schema']==delivery.row_schema and body['scope']=='FULL','Wrong artifact dataset/schema/scope')
         require(body['row_semantics'] in ('TYPED_ROWS_V1','PARTITIONED_ENGINE_EVIDENCE_V1','DECISION_CONTEXT_BASE_V1'),'Unknown artifact row semantics')
         require(body['chunk_index']==index and body['chunk_count']==len(delivery.artifacts) and body['total_rows']==delivery.row_count,'Incomplete chunk set')
@@ -96,7 +110,12 @@ def read_delivery(delivery,artifacts):
 def reassemble_evidence(rows):
     """Explicit adapter for complete partitioned evidence; no missing-row fallback."""
     require(bool(rows),'Missing evidence partitions')
-    parts=[c.EngineEvidence.model_validate(row) for row in rows]
+    return _reassemble_validated_evidence([c.EngineEvidence.model_validate(row) for row in rows])
+
+
+def _reassemble_validated_evidence(parts):
+    """Merge locally validated partitions, retaining whole-evidence validation."""
+    require(bool(parts),'Missing evidence partitions')
     header=parts[0].model_dump(exclude={'constraints','entities','reasons'})
     collections={'constraints':{},'entities':{},'reasons':{}}
     for part in parts:
@@ -121,12 +140,14 @@ def validate_bundle(bundle):
 
 def _validate_bundle(bundle):
     package=c.DecisionResultPackageV1.model_validate(bundle.package)
-    plan=bundle.result.recommended;core,evidence=plan.output.core,plan.output.evidence
-    validate_certified_plan(plan)
-    c.ResultContractBundle(core=core,evidence=evidence,package=package)
+    plan=bundle.result.recommended
+    checked_output=_validated_plan_output(plan)
+    core,evidence=checked_output.core,checked_output.evidence
+    c.validate_result_binding(core,evidence,package)
     lookup={a.reference.artifact_id:a for a in bundle.artifacts}
     require(len(lookup)==len(bundle.artifacts),'Duplicate prepared artifact')
     require({a.artifact_id for a in package.artifact_manifest.artifacts}==set(lookup),'Manifest differs from prepared artifacts')
+    verified_bodies={};datasets={};verified_evidence={}
     for ref in package.artifact_manifest.artifacts:
         a=lookup[ref.artifact_id]
         require(ref==a.reference and len(a.content)==ref.size_bytes and content_sha256(a.content)==ref.content_sha256,'Prepared bytes corrupt')
@@ -142,15 +163,36 @@ def _validate_bundle(bundle):
         else:
             if semantics=='PARTITIONED_ENGINE_EVIDENCE_V1':require(ref.artifact_schema=='engine_evidence_v1' and ref.kind=='EVIDENCE','Wrong evidence-partition schema/role')
             row_type=c._row_schema_type(ref.artifact_schema)
-        for row in body['rows']:
-            if row_type is not dict:row_type.model_validate(row)
-    def rows(delivery):return read_delivery(delivery,bundle.artifacts)
+        if row_type is c.EngineEvidence:
+            # Keep the typed result of the mandatory row validation. Repeating
+            # that same conversion when reconstructing the proof dominated
+            # large D1 bundles. These objects never leave this validation call.
+            verified_evidence[ref.artifact_id]=tuple(row_type.model_validate(row) for row in body['rows'])
+        else:
+            for row in body['rows']:
+                if row_type is not dict:row_type.model_validate(row)
+        verified_bodies[ref.artifact_id]=body
+        datasets.setdefault(body['dataset_id'],[]).append(a)
+    def verified(ref):
+        # Invocation-local: these immutable bytes were hash/schema checked above.
+        # Recheck reference identity and delivery bindings for every use. No
+        # authorization/cache state survives this single bundle validation.
+        require(ref.artifact_id in verified_bodies and lookup[ref.artifact_id].reference==ref,'Artifact integrity mismatch')
+        return verified_bodies[ref.artifact_id]
+    def rows(delivery):return _bound_delivery_rows(delivery,verified)
+    def evidence_rows(delivery):
+        # Delivery cardinality/schema/chunk/core/Run binding checks still run.
+        bound=rows(delivery)
+        require(all(ref.artifact_id in verified_evidence for ref in delivery.artifacts),'Evidence row schema differs')
+        parts=[part for ref in delivery.artifacts for part in verified_evidence.pop(ref.artifact_id)]
+        require(len(parts)==len(bound),'Evidence partition cardinality differs')
+        return _reassemble_validated_evidence(parts)
     def same(a,b,message):require(canonical_bytes(a)==canonical_bytes(b),message)
     def dataset(dataset_id):
-        prepared=[p for p in bundle.artifacts if json.loads(p.content)['dataset_id']==dataset_id]
+        prepared=list(datasets.get(dataset_id,()))
         require(bool(prepared),'Missing named artifact dataset')
-        prepared.sort(key=lambda p:json.loads(p.content)['chunk_index'])
-        head=json.loads(prepared[0].content)
+        prepared.sort(key=lambda p:verified_bodies[p.reference.artifact_id]['chunk_index'])
+        head=verified_bodies[prepared[0].reference.artifact_id]
         return c.ReferenceDataset(dataset_id=dataset_id,row_schema=head['row_schema'],row_count=head['total_rows'],artifacts=tuple(p.reference for p in prepared))
     same(rows(dataset('core')),(core,),'Prepared Core differs')
     same(rows(package.transport_plan.trips),sorted(core.transport_plan.trips,key=lambda t:t.trip_id),'Published Trips differ')
@@ -164,7 +206,7 @@ def _validate_bundle(bundle):
     same(rows(package.evidence.reason_emissions),evidence.reasons,'Reasons differ')
     proof=next(d for d in package.evidence.parts if d.dataset_id=='engine-evidence')
     # Compare semantic evidence sets independently of the partition/display order.
-    restored=reassemble_evidence(rows(proof))
+    restored=evidence_rows(proof)
     require(len(restored.constraints)==len(evidence.constraints) and len(restored.entities)==len(evidence.entities) and len(restored.reasons)==len(evidence.reasons),'Incomplete restored evidence')
     same({v.evidence_id:v for v in restored.constraints},{v.evidence_id:v for v in evidence.constraints},'Restored constraint facts differ')
     same({(v.entity_type+':'+v.entity_id):v for v in restored.entities},{(v.entity_type+':'+v.entity_id):v for v in evidence.entities},'Restored entity facts differ')
@@ -233,7 +275,7 @@ def _validate_bundle(bundle):
         same(rows(descriptor.plan),sorted(ac.transport_plan.trips,key=lambda t:t.trip_id),'Alternative plan lost')
         same(rows(descriptor.evidence),candidate.output.evidence.entities,'Alternative evidence lost')
         same(rows(dataset(descriptor.alternative_id+'-core')),(ac,),'Alternative Core bytes differ')
-        restored_alt=reassemble_evidence(rows(dataset(descriptor.alternative_id+'-proof')))
+        restored_alt=evidence_rows(dataset(descriptor.alternative_id+'-proof'))
         same({v.evidence_id:v for v in restored_alt.constraints},{v.evidence_id:v for v in candidate.output.evidence.constraints},'Alternative constraint bytes differ')
         same({v.emission_id:v for v in restored_alt.reasons},{v.emission_id:v for v in candidate.output.evidence.reasons},'Alternative reason bytes differ')
         require(descriptor.metrics.trip_count==ac.metrics.trip_count and descriptor.metrics.total_cost==(ac.metrics.total_cost.amount if ac.metrics.total_cost else None),'Alternative metrics differ')

@@ -1,0 +1,9 @@
+{
+  "scope": "diagnostic only, not the PERF11 gate",
+  "calls": 420000,
+  "equal_outputs": true,
+  "seconds": {
+    "current_import_per_fact": 0.6009661440039054,
+    "bound_pure_function": 0.3515718409908004
+  }
+}

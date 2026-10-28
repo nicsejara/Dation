@@ -1,0 +1,38 @@
+[
+  {
+    "provenance": {
+      "run_id": "1d2f92c2-6449-4fb8-9d49-d4fe1d6034ed",
+      "result_fingerprint": "48de3b2b089cf2806061849cf189eef712e879c23b633cb13cd3b529ea8b8e71"
+    },
+    "datasets": {
+      "plan": 1,
+      "demand": 1,
+      "resources": 1,
+      "alternatives": 0,
+      "exceptions": 0,
+      "evidence": 3
+    },
+    "entities_checked": 1,
+    "full_json_artifacts": 14,
+    "seven_consumer_API_facts": "PASS",
+    "visible_browser_facts": "covered by T11 browser matrix + W10"
+  },
+  {
+    "provenance": {
+      "run_id": "b0cd62ac-ad15-43eb-a0ba-a202eb9d572b",
+      "result_fingerprint": "763a932b54bb3bd23b3e5b9b86ba0aadabaabae6f0acff8dcef68d80441e3c8a"
+    },
+    "datasets": {
+      "schedule": 1,
+      "trips": 1,
+      "resources": 1,
+      "service": 1,
+      "exceptions": 0,
+      "evidence": 3
+    },
+    "entities_checked": 1,
+    "full_json_artifacts": 11,
+    "seven_consumer_API_facts": "PASS",
+    "visible_browser_facts": "covered by T11 browser matrix + W10"
+  }
+]

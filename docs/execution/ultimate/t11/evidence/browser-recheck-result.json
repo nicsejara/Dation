@@ -1,0 +1,69 @@
+{
+  "scope": "failed26 + full W5/W10; deduplicated",
+  "tests": 45,
+  "passed_ids": [
+    "test_final_polish.FinalPolishTests.test_c4_metadata_has_independent_unpadded_decision_label",
+    "test_final_polish.FinalPolishTests.test_c5_command_bars_remain_visible_without_obscuring_controls",
+    "test_final_polish.FinalPolishTests.test_final_polish_stress_at_data_boundary_with_dev_only_toggle",
+    "test_home_hero.HomeHeroTests.test_h6_greeting_keeps_workspace_timezone_identity_updates_and_fallback",
+    "test_navigation.NavigationTests.test_assignment_draft_is_restored_per_case",
+    "test_navigation.NavigationTests.test_catalog_entitlements_cover_deep_links_revocation_and_reenable",
+    "test_navigation.NavigationTests.test_catalog_fallback_keeps_disabled_entitlement_closed",
+    "test_navigation.NavigationTests.test_d1_d2_upper_geometry_and_visible_headings_are_normalized",
+    "test_navigation.NavigationTests.test_d1_v2_all_objectives_highlight_the_actual_selected_scenario",
+    "test_navigation.NavigationTests.test_phase6_tab_and_reverse_tab_keep_focus_visible_below_sticky_layers",
+    "test_navigation.NavigationTests.test_phase7_library_and_settings_share_the_dark_roles",
+    "test_navigation.NavigationTests.test_workflow_progressive_actions_share_styles_arrow_and_keyboard_focus",
+    "test_navigation.NavigationTests.test_workspace_settings_retry_conflict_readonly_and_tab_history",
+    "test_saga3_ui.Saga3UITests.test_both_terminal_runs_offer_one_same_case_same_decision_configuration_cta",
+    "test_saga4_ui.Saga4UITests.test_last_decision_completes_case_and_technical_menu_keeps_exports",
+    "test_saga4_ui.Saga4UITests.test_shared_case_context_and_compact_map_milestones",
+    "test_ultimate_case_data.UltimateCaseDataTests.test_06_responsive_long_filename_zoom_touch_contrast_and_focus",
+    "test_ultimate_case_setup.UltimateCaseSetupTests.test_05_legacy_navigation_and_home_recover_empty_case",
+    "test_ultimate_navigation.UltimateNavigationTests.test_01_empty_map_data_publish_ready_and_config_d1",
+    "test_ultimate_navigation.UltimateNavigationTests.test_02_approved_d1_opens_d2_config_with_exact_upstream",
+    "test_ultimate_navigation.UltimateNavigationTests.test_04_case_selector_escape_switch_and_history_navigation",
+    "test_ultimate_navigation.UltimateNavigationTests.test_06_responsive_native_states_keyboard_zoom_and_contrast",
+    "test_ultimate_navigation.UltimateNavigationTests.test_07_navigation_race_disposes_old_case_projection",
+    "test_ultimate_navigation.UltimateNavigationTests.test_08_cross_document_return_and_persisted_pageshow_restore_context",
+    "test_ultimate_navigation.UltimateNavigationTests.test_09_native_owner_selector_unlocks_configuration_without_changing_pack",
+    "test_ultimate_navigation.UltimateNavigationTests.test_10_center_renders_shared_graph_and_routes_to_case_data_and_config",
+    "test_ultimate_result_consumers.UltimateResultConsumerTests.test_01_actual_dashboard_details_exports_ia_review_same_run_and_lazy",
+    "test_ultimate_result_consumers.UltimateResultConsumerTests.test_02_five_viewports_preserve_shell_tokens_and_controlled_overflow",
+    "test_ultimate_result_consumers.UltimateResultConsumerTests.test_03_keyboard_chart_alternative_tabs_drawer_and_assistant_return_focus",
+    "test_ultimate_result_consumers.UltimateResultConsumerTests.test_04_unknown_schema_and_recovery_are_safe",
+    "test_ultimate_result_consumers.UltimateResultConsumerTests.test_05_late_entity_after_run_change_never_opens_wrong_drawer",
+    "test_ultimate_result_consumers.UltimateResultConsumerTests.test_06_zoom_reduced_motion_focus_and_long_fields",
+    "test_ultimate_result_consumers.UltimateResultConsumerTests.test_07_contrast_focus_visibility_and_native_tokens",
+    "test_ultimate_result_consumers.UltimateResultConsumerTests.test_08_saved_conversation_is_lazy_and_keeps_original_context",
+    "test_ultimate_result_consumers.UltimateResultConsumerTests.test_09_waits_for_atomic_publication_without_prefetching_details",
+    "test_ultimate_result_consumers.UltimateResultConsumerTests.test_10_copilot_keeps_mode_and_question_bound_while_waiting",
+    "test_ux_upgrade.UXUpgradeTests.test_constrained_viewports_keep_forms_and_table_scrollers_reachable",
+    "test_ux_upgrade.UXUpgradeTests.test_focused_attributes_are_unobscured_at_every_breakpoint",
+    "test_ux_upgrade_stress.UXStressTests.test_long_case_and_filenames_and_numeric_extremes",
+    "test_ux_upgrade_stress.UXStressTests.test_multilingual_identity_and_large_paginated_team",
+    "test_workflow_context.WorkflowContextTests.test_map_assignment_is_consumed_readonly_by_config_and_review",
+    "test_workflow_context.WorkflowContextTests.test_operator_registers_a_pending_data_case_and_refreshes_admin_assignment"
+  ],
+  "failures": [],
+  "errors": [
+    "test_ultimate_navigation.UltimateNavigationTests.test_03_history_new_run_back_forward_reload_keep_case_node_and_run",
+    "test_ultimate_navigation.UltimateNavigationTests.test_05_viewer_touch_and_archived_preserve_read_only_state",
+    "unittest.loader._FailedTest.width=390"
+  ],
+  "skipped": [],
+  "failure_details": [
+    {
+      "id": "test_ultimate_navigation.UltimateNavigationTests.test_03_history_new_run_back_forward_reload_keep_case_node_and_run",
+      "traceback": "Traceback (most recent call last):\n  File \"/usr/lib/python3.13/asyncio/runners.py\", line 118, in run\n    return self._loop.run_until_complete(task)\n           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^\n  File \"/usr/lib/python3.13/asyncio/base_events.py\", line 725, in run_until_complete\n    return future.result()\n           ~~~~~~~~~~~~~^^\n  File \"/workspace/Dation/backend/tests/browser/test_ultimate_navigation.py\", line 79, in test_03_history_new_run_back_forward_reload_keep_case_node_and_run\n    value=json.loads(fixture.stdout.readline());self.base=value['api_url'];await self.login(self.context)\n  File \"/usr/lib/python3.13/json/__init__.py\", line 346, in loads\n    return _default_decoder.decode(s)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^\n  File \"/usr/lib/python3.13/json/decoder.py\", line 345, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/json/decoder.py\", line 363, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)\n"
+    },
+    {
+      "id": "test_ultimate_navigation.UltimateNavigationTests.test_05_viewer_touch_and_archived_preserve_read_only_state",
+      "traceback": "Traceback (most recent call last):\n  File \"/usr/lib/python3.13/asyncio/runners.py\", line 118, in run\n    return self._loop.run_until_complete(task)\n           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^\n  File \"/usr/lib/python3.13/asyncio/base_events.py\", line 725, in run_until_complete\n    return future.result()\n           ~~~~~~~~~~~~~^^\n  File \"/workspace/Dation/backend/tests/browser/test_ultimate_navigation.py\", line 111, in test_05_viewer_touch_and_archived_preserve_read_only_state\n    viewer=await self.browser.new_context(viewport={'width':390,'height':844},is_mobile=True,has_touch=True);await self.login(viewer,3);page=await viewer.new_page();await page.goto(self.base+'/app/ddas/logistics/decisions?case_id='+cid);await page.locator('[data-graph-ready=\"true\"]').wait_for();await expect(page.locator('[data-graph-node=\"'+D1+'\"]')).to_have_attribute('data-node-state','READY');self.assertEqual(await page.get_by_role('button',name='Configurar Transport Plan',exact=False).count(),0);await page.get_by_role('button',name='Datos del Case',exact=True).tap();await page.locator('[data-ultimate-ready=\"true\"]').wait_for();self.assertTrue(await page.get_by_role('button',name='Guardar candidato de Demanda',exact=True).is_disabled());await viewer.close()\n                                                                                                                                                                                                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_generated.py\", line 20672, in wait_for\n    await self._impl_obj.wait_for(timeout=to_milliseconds(timeout), state=state)\n  File \"/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_locator.py\", line 752, in wait_for\n    await self._frame.wait_for_selector(\n        self._selector, strict=True, timeout=timeout, state=state\n    )\n  File \"/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_frame.py\", line 395, in wait_for_selector\n    await self._channel.send(\n        \"waitForSelector\", self._timeout, locals_to_params(locals())\n    )\n  File \"/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py\", line 76, in send\n    return await self._connection.wrap_api_call(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    ...<3 lines>...\n    )\n    ^\n  File \"/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py\", line 632, in wrap_api_call\n    raise rewrite_error(error, f\"{parsed_st['apiName']}: {error}\") from None\nplaywright._impl._errors.TimeoutError: Locator.wait_for: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator(\"[data-graph-ready=\\\"true\\\"]\") to be visible\n\n"
+    },
+    {
+      "id": "unittest.loader._FailedTest.width=390",
+      "traceback": "ImportError: Failed to import test module: width=390\nTraceback (most recent call last):\n  File \"/usr/lib/python3.13/unittest/loader.py\", line 137, in loadTestsFromName\n    module = __import__(module_name)\nModuleNotFoundError: No module named 'width=390'\n\n"
+    }
+  ]
+}

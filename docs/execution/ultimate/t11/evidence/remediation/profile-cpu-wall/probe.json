@@ -1,0 +1,1008 @@
+{
+  "orders": 500,
+  "resources": 50,
+  "horizon_days": 31,
+  "trips_required_for_full_coverage": 1000,
+  "point_type": "REAL_ENGINE_REQUEST_WITH_EXISTING_BOUNDS",
+  "options": {
+    "seed": 0,
+    "max_slots": 128,
+    "max_variables": 20000,
+    "deterministic_budget": 5,
+    "kernel_budget": 2
+  },
+  "native_solves": [
+    {
+      "phase": "D1_SCALE_500",
+      "variables": 2816,
+      "constraints": 6733,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.24488395798834972,
+      "deterministic_seconds": 0.01542224260000038
+    },
+    {
+      "phase": "D1_SCALE_500",
+      "variables": 2816,
+      "constraints": 6734,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.37497774200164713,
+      "deterministic_seconds": 0.08746828092372502
+    },
+    {
+      "phase": "D1_SCALE_500",
+      "variables": 2816,
+      "constraints": 6735,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.3522231160022784,
+      "deterministic_seconds": 0.06113594400043963
+    },
+    {
+      "phase": "D1_SCALE_500",
+      "variables": 128,
+      "constraints": 0,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0005167289928067476,
+      "deterministic_seconds": 0.0
+    },
+    {
+      "phase": "D1_SCALE_500",
+      "variables": 2816,
+      "constraints": 6733,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.34844881598837674,
+      "deterministic_seconds": 0.01542224260000038
+    },
+    {
+      "phase": "D1_SCALE_500",
+      "variables": 2816,
+      "constraints": 6734,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.37007054101559334,
+      "deterministic_seconds": 0.06688875733160904
+    },
+    {
+      "phase": "D1_SCALE_500",
+      "variables": 2816,
+      "constraints": 6734,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.28423707900219597,
+      "deterministic_seconds": 0.0706813907548195
+    },
+    {
+      "phase": "D1_SCALE_500",
+      "variables": 128,
+      "constraints": 0,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.000615633005509153,
+      "deterministic_seconds": 0.0
+    },
+    {
+      "phase": "D1_SCALE_500",
+      "variables": 2816,
+      "constraints": 6733,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.25277133300551213,
+      "deterministic_seconds": 0.01542224260000038
+    },
+    {
+      "phase": "D1_SCALE_500",
+      "variables": 2816,
+      "constraints": 6734,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.4016627640230581,
+      "deterministic_seconds": 0.08746828092372501
+    },
+    {
+      "phase": "D1_SCALE_500",
+      "variables": 2816,
+      "constraints": 6735,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.3863439889973961,
+      "deterministic_seconds": 0.06113594400043963
+    },
+    {
+      "phase": "D1_SCALE_500",
+      "variables": 128,
+      "constraints": 0,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0007175920181907713,
+      "deterministic_seconds": 0.0
+    },
+    {
+      "phase": "D1_SCALE_500",
+      "variables": 2816,
+      "constraints": 6733,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.32158292800886557,
+      "deterministic_seconds": 0.01542224260000038
+    },
+    {
+      "phase": "D1_SCALE_500",
+      "variables": 2816,
+      "constraints": 6734,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.33366418798686936,
+      "deterministic_seconds": 0.0588578520924468
+    },
+    {
+      "phase": "D1_SCALE_500",
+      "variables": 2816,
+      "constraints": 6735,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.3049493849975988,
+      "deterministic_seconds": 0.0706813907548195
+    },
+    {
+      "phase": "D1_SCALE_500",
+      "variables": 128,
+      "constraints": 0,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0011385320103727281,
+      "deterministic_seconds": 0.0
+    },
+    {
+      "phase": "D2_SOURCE_D1_100",
+      "variables": 600,
+      "constraints": 1150,
+      "status": "FEASIBLE",
+      "wall_seconds": 4.021989403001498,
+      "deterministic_seconds": 1.6666793248231941
+    },
+    {
+      "phase": "D2_SOURCE_D1_100",
+      "variables": 100,
+      "constraints": 0,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0008283590141218156,
+      "deterministic_seconds": 0.0
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 0,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0013494809973053634,
+      "deterministic_seconds": 0.0
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 0,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0004439189797267318,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 1,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0005930420011281967,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 2,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00031194399343803525,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 3,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0007650099869351834,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 4,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00027066501206718385,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 5,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00037883600452914834,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 6,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00023465498816221952,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 7,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0002540340065024793,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 8,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0003364269796293229,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 9,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00033867202000692487,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 10,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0005531850038096309,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 11,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.000285096000880003,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 12,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0002744550001807511,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 13,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00023847000556997955,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 14,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00021512599778361619,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 15,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00018658701446838677,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 16,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.000261706009041518,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 17,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0003028139763046056,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 18,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00023756001610308886,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 19,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0002849430020432919,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 20,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00021980999736115336,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 21,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00019815299310721457,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 22,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0001882700016722083,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 23,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00024019001284614205,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 24,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0002061569830402732,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 25,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0001881929929368198,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 26,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.000181332987267524,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 27,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0004415230068843812,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 28,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00024601799668744206,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 29,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0002938190009444952,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 30,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0005045960133429617,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 31,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0003796930250246078,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 32,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00029917299980297685,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 33,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00022603498655371368,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 34,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0005297360185068101,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 35,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0003150929987896234,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 36,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00022069198894314468,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 37,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00045785901602357626,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 38,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0002447540173307061,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 39,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0005246369983069599,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 40,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0005465729918796569,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 41,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0003305510035715997,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 42,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0011041529942303896,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 43,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00046811901847831905,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 44,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0005169079813640565,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 45,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0004116919881198555,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 46,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0005784199747722596,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 47,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0005920460098423064,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 48,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.000302211003145203,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 49,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00038964400300756097,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 50,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0003646169789135456,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 51,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0002546879986766726,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 52,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00021932300296612084,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 53,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0006977729790378362,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 54,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00031298899557441473,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 55,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0003577659954316914,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 56,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0003785479930229485,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 57,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00026590298512019217,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 58,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00022456201259046793,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 59,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0006037749990355223,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 60,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00026545400032773614,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 61,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00028106998070143163,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 62,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0002558850101195276,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 63,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0003524589992593974,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 64,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0002813889877870679,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 65,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.000607410998782143,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 66,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0004017229948658496,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 67,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0002982430160045624,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 68,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0003578200121410191,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 69,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00039286797982640564,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 70,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00023746900842525065,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 71,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00020892999600619078,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 72,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00026143499417230487,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 73,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0010383180051576346,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 74,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00034449301892891526,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 75,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00023957100347615778,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 76,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0005568880005739629,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 77,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0004904109810013324,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 78,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0002988039923366159,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 79,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00023029500152915716,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 80,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0002102710132021457,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 81,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0002709559921640903,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 82,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00026727301883511245,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 83,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00021300098160281777,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 84,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00019992198213003576,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 85,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0006782129930797964,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 86,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0003168949915561825,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 87,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00027759498334489763,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 88,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0002288169926032424,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 89,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0003847219923045486,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 90,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0009995400032494217,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 91,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0011138780100736767,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 92,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0007301239820662886,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 93,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00033972697565332055,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 94,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0007694420055486262,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 95,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0004637939855456352,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 96,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0004226249875500798,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 97,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0010944390087388456,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 98,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.00047614300274290144,
+      "deterministic_seconds": 1e-08
+    },
+    {
+      "phase": "D2_SCALE_100",
+      "variables": 100,
+      "constraints": 99,
+      "status": "OPTIMAL",
+      "wall_seconds": 0.0005764810193795711,
+      "deterministic_seconds": 1e-08
+    }
+  ],
+  "d1_engine_seconds": 44.94472458501696,
+  "d1_assembler_seconds": 31.454641533986432,
+  "d2_engine_seconds": 0.680622765008593,
+  "d2_assembler_seconds": 0.6139216629962903,
+  "peak_rss_kib": 727280,
+  "candidate_slots": 128,
+  "declared_variable_count": 2816,
+  "limits": [
+    "CANDIDATE_MODEL_BUDGET"
+  ],
+  "d1_status": "FEASIBLE",
+  "d1_full_coverage": false,
+  "d1_solution_found": true,
+  "d1_review_ready": true,
+  "d1_trips": 128,
+  "d2_trips": 100,
+  "d2_source_trips": 100,
+  "d2_source_engine_seconds": 6.748781747010071,
+  "d2_source_assembler_seconds": 4.16411576102837,
+  "d2_source_scope": "separate real certified 100-trip D1; never fabricate a parent for empty D1",
+  "alternatives": 1,
+  "alternatives_state": "COMPUTED",
+  "d1": {
+    "package_bytes": 343055,
+    "visual_bytes": 45693,
+    "artifact_count": 83,
+    "artifact_bytes": 43500169,
+    "max_chunk_bytes": 1047272,
+    "max_chunk_rows": 100,
+    "fingerprint": "6de1eeb6b9c20c9a4c9ac5bd07db035bbebed972cba7ef3bb84e34848f858014"
+  },
+  "d2": {
+    "package_bytes": 49103,
+    "visual_bytes": 23697,
+    "artifact_count": 14,
+    "artifact_bytes": 931008,
+    "max_chunk_bytes": 394392,
+    "max_chunk_rows": 100,
+    "fingerprint": "ffab2ab4189c27c643e11f80a0a8cb0cf6eef7fcd199735433b5d9091b7b0040"
+  }
+}

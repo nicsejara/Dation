@@ -1,0 +1,45 @@
+{
+  "checkpoint": "32b85681907a8d7b7811a9e16ae1988941b3d3d1",
+  "historical_reports": {
+    "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/docs/execution/ultimate/t0/t0-remediation-report.md": true,
+    "docs/execution/ultimate/t0/remediation/evidence/original-metadata/t0-execution-report.md": true,
+    "docs/execution/ultimate/t0/t0-execution-report.md": true,
+    "docs/execution/ultimate/t0/t0-remediation-r2-report.md": true,
+    "docs/execution/ultimate/t0/t0-remediation-report.md": true,
+    "docs/execution/ultimate/t1/t1-execution-report.md": true,
+    "docs/execution/ultimate/t10/t10-execution-report.md": true,
+    "docs/execution/ultimate/t2/t2-execution-report.md": true,
+    "docs/execution/ultimate/t3/t3-execution-report.md": true,
+    "docs/execution/ultimate/t4/t4-execution-report.md": true,
+    "docs/execution/ultimate/t5/t5-execution-report.md": true,
+    "docs/execution/ultimate/t6/t6-execution-report.md": true,
+    "docs/execution/ultimate/t7/t7-execution-report.md": true,
+    "docs/execution/ultimate/t8/t8-execution-report.md": true,
+    "docs/execution/ultimate/t9/t9-execution-report.md": true
+  },
+  "all_historical_reports_unchanged": true,
+  "unchanged_paths": {
+    "backend/app/static/css/": true,
+    "backend/app/static/assets/": true,
+    "supabase/": true,
+    ".agents/": true
+  },
+  "pending_tracked_paths": [
+    "backend/app/engines/assignment/transport_contracts.py",
+    "backend/app/engines/assignment/transport_plan.py",
+    "backend/app/engines/assignment/transport_policy_result.py",
+    "backend/app/engines/common/day_resource_feasibility.py",
+    "backend/app/results/assembler.py",
+    "backend/app/results/canonical.py",
+    "backend/app/results/validation.py",
+    "backend/app/static/js/dispatch/cases/ultimate-decision-map.mjs",
+    "backend/tests/browser/test_navigation.py",
+    "backend/tests/browser/test_ultimate_case_data.py",
+    "backend/tests/browser/test_ultimate_case_setup.py",
+    "backend/tests/browser/test_ultimate_navigation.py",
+    "backend/tests/e2e/run_suite.py",
+    "backend/tests/e2e/test_workflow_gates.py",
+    "backend/tests/integration/test_ultimate_case_models.py",
+    "backend/tests/integration/test_ultimate_graph.py"
+  ]
+}

@@ -1,0 +1,43 @@
+[
+  {
+    "failure": "native_model_counts",
+    "category": "C",
+    "root_cause": "Harness requires every native subproblem to have constraints>0. Existing lexicographic subproblems legally have128variables,zero explicit constraints and OPTIMAL status. Main result stays FEASIBLE; no false global optimum.",
+    "evidence": [
+      {
+        "phase": "D1_SCALE_500",
+        "variables": 128,
+        "constraints": 0,
+        "status": "OPTIMAL",
+        "wall_seconds": 0.0005979620036669075,
+        "deterministic_seconds": 0.0
+      },
+      {
+        "phase": "D1_SCALE_500",
+        "variables": 128,
+        "constraints": 0,
+        "status": "OPTIMAL",
+        "wall_seconds": 0.0007414179854094982,
+        "deterministic_seconds": 0.0
+      }
+    ]
+  },
+  {
+    "failure": "D1 execution sample 1",
+    "category": "A",
+    "root_cause": "Real motor+assembler subtotal exceeds90s, before publication; deterministic evidence/validation work dominates previous native solve duration. Exact hotspot still requires profiling.",
+    "seconds": 100.11313889696612
+  },
+  {
+    "failure": "D1 execution sample 2",
+    "category": "A",
+    "root_cause": "Real motor+assembler subtotal exceeds90s, before publication; deterministic evidence/validation work dominates previous native solve duration. Exact hotspot still requires profiling.",
+    "seconds": 92.1297076960036
+  },
+  {
+    "failure": "D1 execution sample 3",
+    "category": "A",
+    "root_cause": "Real motor+assembler subtotal exceeds90s, before publication; deterministic evidence/validation work dominates previous native solve duration. Exact hotspot still requires profiling.",
+    "seconds": 98.00669147798908
+  }
+]

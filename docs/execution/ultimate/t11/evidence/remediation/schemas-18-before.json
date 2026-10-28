@@ -1,0 +1,20 @@
+{
+  "EngineOutput": "19464288ed193c8ceda9fe79c89fa1cc3d36e3a54b350f266431f61e9ac67250",
+  "ResultContractBundle": "f67302c4227704da0f0b234de44fca51741a746530b91bbf5c54d956cbf85dd9",
+  "ConstraintEvidence": "0d0791c2146037877261f5c32fecd66621843a57279b063a649e00d5cfbc3a74",
+  "EntityEvidence": "d647de4e729ed66e985d3ad52d3afb1457a49371c639233726b2eed195244259",
+  "CandidateSummary": "91d23951189c5307ccc1708209442a37dd6d248444cd0539dea74d111b1921d8",
+  "SolverEvidence": "0a8345199fea9669d51f42eb806ec5134775c0920c7785c06a07f201e0db5d8f",
+  "EngineCoreResult": "8d9e50b6d24f1b9d8b6e52f06e4a810d15e8cc33be3f0ef2b677a46661b340a6",
+  "EngineEvidence": "8fa59cff649b186fbe11a595c1c3323c48e809cdac76decded9ef8c9e741704f",
+  "DecisionResultPackageV1": "a094ecf6cb2bed854677685f0bace3456b0f77468f765b2b2cad81d4b0a18c28",
+  "DecisionContextV1": "ac9092d88e98c9ddf64b9fc6ed546d7d67dc55162b08097db36fc398484c1ed0",
+  "FrozenCaseContext": "b2c5debe5c867bf4267c1f04aadcf081d5617e520fcfcc4afe50785cae5cee57",
+  "LogisticsModelVersion": "295626061963ee77124d84fa55faa3563d9a8ffcfbb0f21677ddeb17b215361a",
+  "Demand": "73ccdca72974f49432e9ad6ef68a05ecc834931e0f147b207b6bcf5a03c53839",
+  "TransportResource": "2b1672a1ddf36da6b71e9b571c540a00f6aa9138278e1db49927653d8a596ba3",
+  "CasePolicy": "32f4cf09d913497ebf408767df44e95a6d768e232bbe41d94a7a805ef0d69f93",
+  "NodePolicy": "1fd3aff6810c67fbb438855f4cbed661be1acf844bff53df45df5db779746990",
+  "TransportPlanInput": "90d983a3d20bc0f59a3943f1555859874b55cfa69b96cbabac109f32da461869",
+  "LogisticsModelConfigurationV1": "d26fa0a8bf60937e8981d5e8d1e1091a81c9dc7790f1e7e41a93eadfbbf5d200"
+}

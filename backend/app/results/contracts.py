@@ -1051,18 +1051,28 @@ class ResultContractBundle(EngineOutput):
 
     @model_validator(mode='after')
     def same_certified_result(self):
-        from .canonical import core_result_fingerprint
-        p, c, e = self.package, self.core, self.evidence
-        if (p.result_schema,p.decision,p.context,p.engine,p.feasibility,p.metrics,p.source_transport_plan,p.fingerprints.core_result_fingerprint) != (
-            c.result_schema,c.decision,c.context,c.engine,c.feasibility,c.metrics,c.source_transport_plan,core_result_fingerprint(c)):
-            raise ValueError("Package diverges from its supplied certified Core")
-        trip_data=p.transport_plan.trips if p.transport_plan else p.schedule.trips
-        core_trips=c.transport_plan.trips if c.transport_plan else c.schedule.trips
-        if isinstance(trip_data,InlineDataset) and trip_data.rows != core_trips:
-            raise ValueError("Package changed canonical trips/timing")
-        if isinstance(p.evidence.reason_emissions,InlineDataset) and p.evidence.reason_emissions.rows != e.reasons:
-            raise ValueError("Package replaced certified reason facts")
+        validate_result_binding(self.core,self.evidence,self.package)
         return self
+
+
+def validate_result_binding(core: EngineCoreResult, evidence: EngineEvidence, package: DecisionResultPackageV1):
+    """Cross-bind already schema-validated Core/Evidence/Package snapshots.
+
+    ResultContractBundle still validates all its fields and EngineOutput guards
+    before calling this predicate. D1's independent bundle validator can reuse
+    its checked EngineOutput and Package instead of reconstructing that graph.
+    """
+    from .canonical import core_result_fingerprint
+    p,c,e=package,core,evidence
+    if (p.result_schema,p.decision,p.context,p.engine,p.feasibility,p.metrics,p.source_transport_plan,p.fingerprints.core_result_fingerprint) != (
+        c.result_schema,c.decision,c.context,c.engine,c.feasibility,c.metrics,c.source_transport_plan,core_result_fingerprint(c)):
+        raise ValueError("Package diverges from its supplied certified Core")
+    trip_data=p.transport_plan.trips if p.transport_plan else p.schedule.trips
+    core_trips=c.transport_plan.trips if c.transport_plan else c.schedule.trips
+    if isinstance(trip_data,InlineDataset) and trip_data.rows != core_trips:
+        raise ValueError("Package changed canonical trips/timing")
+    if isinstance(p.evidence.reason_emissions,InlineDataset) and p.evidence.reason_emissions.rows != e.reasons:
+        raise ValueError("Package replaced certified reason facts")
 
 
 def _row_schema_type(schema):

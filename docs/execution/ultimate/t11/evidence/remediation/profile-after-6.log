@@ -1,0 +1,7 @@
+policy_candidate:RECOMMENDED wall 7.505 CPU 7.499
+policy_candidate:MAXIMIZE_OWN_CAPACITY wall 8.261 CPU 8.259
+policy_candidate:MINIMIZE_TRIPS wall 8.041 CPU 8.039
+policy_candidate:MAXIMIZE_SERVICE wall 11.141 CPU 11.124
+recommended_and_alternatives wall 35.093 CPU 35.073
+result_assembly wall 30.032 CPU 29.333
+{"status": "PROFILE_COMPLETE", "d1_seconds": 65.1254754110123, "fingerprint": "6de1eeb6b9c20c9a4c9ac5bd07db035bbebed972cba7ef3bb84e34848f858014"}

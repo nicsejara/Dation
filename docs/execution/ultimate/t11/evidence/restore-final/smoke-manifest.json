@@ -1,0 +1,54 @@
+{
+  "workspace_id": "00000000-0000-4000-8000-00000000da71",
+  "candidate_image_id": "sha256:610a317cbde6fe000d034bdb9dce28ad9f7309a948b13eb804d4483e6dd48041",
+  "engine_version": "2.0.0",
+  "deployment_observation": {
+    "source": "owned Docker inspect and actual image API/worker",
+    "image_id": "sha256:610a317cbde6fe000d034bdb9dce28ad9f7309a948b13eb804d4483e6dd48041"
+  },
+  "chain": [
+    {
+      "run_id": "d5aaf26b-267b-4cdb-9d08-d5924b73a195",
+      "result_fingerprint": "a1ca33f69566bf64cce1492641cd0bd4a7db677a39e1ce435a1a7ddf4ed23d2f"
+    },
+    {
+      "run_id": "bd463a16-902d-4894-8580-8d95b8909d9d",
+      "result_fingerprint": "b3acfd07b88ec016b036e006a826fd6a60f51bca533523c5405305fc71687019"
+    }
+  ],
+  "pilot_write_authorized": true,
+  "pilot": {
+    "actor_user_id": "10000000-0000-4000-8000-000000000001",
+    "configuration": {
+      "version": 1,
+      "operating_role": "SHIPPER",
+      "transport_pattern": "DIRECT",
+      "allowed_sources": [
+        "OWN",
+        "EXTERNAL"
+      ],
+      "active_dimensions": [
+        "pallets"
+      ],
+      "primary_dimension": "pallets",
+      "split_permitted": false,
+      "homogeneous_loads_declared": false,
+      "currency_policy": {
+        "currency": "ARS",
+        "minor_units": 2,
+        "rounding": "ROUND_HALF_UP"
+      },
+      "own_cost_model": "OWN_OPERATING_CYCLE",
+      "external_cost_models": [
+        "PER_TRIP",
+        "PER_KM"
+      ],
+      "per_km_billing_bases": [
+        "ONE_WAY",
+        "ROUND_TRIP"
+      ]
+    },
+    "planning_start": "2026-11-02",
+    "planning_end": "2026-11-08"
+  }
+}

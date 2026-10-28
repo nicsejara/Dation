@@ -1,0 +1,37 @@
+{
+  "before": {
+    "n": 3,
+    "p50": 98.00669147798908,
+    "p95_nearest_rank": 100.11313889696612,
+    "worst": 100.11313889696612,
+    "min": 92.1297076960036
+  },
+  "after_stricter_including_fixture_contract": {
+    "n": 5,
+    "p50": 61.63234056599322,
+    "p95_nearest_rank": 64.24082706400077,
+    "worst": 64.24082706400077,
+    "min": 59.72420929200598
+  },
+  "delta_p50_seconds": -36.37435091199586,
+  "delta_p50_percent": -37.11415043549861,
+  "complete_job": {
+    "n": 2,
+    "p50": 87.48624991450924,
+    "p95_nearest_rank": 88.1741237170063,
+    "worst": 88.1741237170063,
+    "min": 86.79837611201219
+  },
+  "full_worker_peak_bytes": 762765312,
+  "probe_peak_rss_kib": 755756,
+  "options": {
+    "seed": 0,
+    "max_slots": 128,
+    "max_variables": 20000,
+    "deterministic_budget": 5,
+    "kernel_budget": 2
+  },
+  "actual_image": "sha256:b26cfedb7e7a70927171801dd89b44429b568b719528328cc5b99e78cf781ddb",
+  "image_source_files": 327,
+  "image_source_match": true
+}

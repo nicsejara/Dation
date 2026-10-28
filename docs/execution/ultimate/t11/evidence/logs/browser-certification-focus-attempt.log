@@ -1,0 +1,63 @@
+test_01_empty_business_login_model_pack_execute_and_approve_d1_d2 (test_ultimate_certification.UltimateCertificationTests.test_01_empty_business_login_model_pack_execute_and_approve_d1_d2) ... FAIL
+test_02_required_surface_responsive_accessibility_matrix (test_ultimate_certification.UltimateCertificationTests.test_02_required_surface_responsive_accessibility_matrix) ... FAIL
+
+======================================================================
+FAIL: test_01_empty_business_login_model_pack_execute_and_approve_d1_d2 (test_ultimate_certification.UltimateCertificationTests.test_01_empty_business_login_model_pack_execute_and_approve_d1_d2)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/usr/lib/python3.13/asyncio/base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/workspace/Dation/backend/tests/browser/test_ultimate_certification.py", line 117, in test_01_empty_business_login_model_pack_execute_and_approve_d1_d2
+    await expect(trigger).to_be_focused()
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_generated.py", line 23423, in to_be_focused
+    await self._impl_obj.to_be_focused(timeout=to_milliseconds(timeout))
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_assertions.py", line 873, in to_be_focused
+    await self._expect_impl(
+    ...<5 lines>...
+    )
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_assertions.py", line 128, in _expect_impl
+    _record_soft_or_raise(
+    ~~~~~~~~~~~~~~~~~~~~~^
+        AssertionError(
+        ^^^^^^^^^^^^^^^
+    ...<2 lines>...
+        self._is_soft,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_assertions.py", line 60, in _record_soft_or_raise
+    raise error
+AssertionError: Locator expected to be focused
+Actual value: inactive 
+Call log:
+  - Expect "to_be_focused" get_by_role("button", name="Ejecutar decisión", exact=True) with timeout 5000ms
+  - waiting for get_by_role("button", name="Ejecutar decisión", exact=True)
+    14 × locator resolved to <button type="button" class="d-button d-button--primary">Ejecutar decisión</button>
+       - unexpected value "inactive"
+
+Aria snapshot:
+- button "Ejecutar decisión"
+
+======================================================================
+FAIL: test_02_required_surface_responsive_accessibility_matrix (test_ultimate_certification.UltimateCertificationTests.test_02_required_surface_responsive_accessibility_matrix)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/usr/lib/python3.13/asyncio/base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/workspace/Dation/backend/tests/browser/test_ultimate_certification.py", line 140, in test_02_required_surface_responsive_accessibility_matrix
+    self.assertIn('case_id',self.f,'Run the complete T11 browser scenario, not only its second step')
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'case_id' not found in {'api_url': 'http://127.0.0.1:37695', 'baseline_url': 'http://127.0.0.1:47887', 'pg_container': 'dation-e2e-430d835d00f5-pg', 'workspace_id': '00000000-0000-4000-8000-00000000da71', 'business_counts': {'runs': 0, 'cases': 0, 'models': 0, 'datasets': 0}} : Run the complete T11 browser scenario, not only its second step
+
+----------------------------------------------------------------------
+Ran 2 tests in 42.352s
+
+FAILED (failures=2)

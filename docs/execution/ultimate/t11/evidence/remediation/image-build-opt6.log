@@ -1,0 +1,41 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile.certification
+#1 transferring dockerfile: 325B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/dation-foundation:final
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 212B done
+#3 DONE 0.0s
+
+#4 [1/5] FROM docker.io/library/dation-foundation:final
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 59.67kB 0.1s done
+#5 DONE 0.1s
+
+#4 [1/5] FROM docker.io/library/dation-foundation:final
+#4 CACHED
+
+#6 [2/5] COPY --chown=65532:65532 backend/app ./app
+#6 DONE 3.1s
+
+#7 [3/5] COPY --chown=65532:65532 backend/*.py ./
+#7 DONE 2.3s
+
+#8 [4/5] COPY --chown=65532:65532 sample_data/v3 /app/sample_data/v3
+#8 DONE 2.3s
+
+#9 [5/5] COPY --chown=65532:65532 sample_data/onboarding-v1 /app/sample_data/onboarding-v1
+#9 DONE 1.2s
+
+#10 exporting to image
+#10 exporting layers
+#10 exporting layers 1.0s done
+#10 writing image sha256:b26cfedb7e7a70927171801dd89b44429b568b719528328cc5b99e78cf781ddb done
+#10 naming to docker.io/library/dation-certification:t11-r-under-test done
+#10 DONE 1.0s

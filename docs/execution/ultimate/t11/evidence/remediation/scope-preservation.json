@@ -1,0 +1,22 @@
+{
+  "head": "32b85681907a8d7b7811a9e16ae1988941b3d3d1",
+  "original_dossier_files_verified": 311,
+  "original_dossier_unchanged": true,
+  "original_pending_non_remediation_files_unchanged": true,
+  "source_files": 380,
+  "changed_application_files": [
+    "backend/app/domain/logistics/base.py",
+    "backend/app/engines/assignment/transport_plan.py",
+    "backend/app/engines/assignment/transport_policy_result.py",
+    "backend/app/results/assembler.py",
+    "backend/app/results/contracts.py",
+    "backend/app/results/reason_codes.py",
+    "backend/app/results/validation.py"
+  ],
+  "unchanged_other_source_files": 373,
+  "image_backend_asset_files_verified": 327,
+  "schemas_identical": 18,
+  "no_push": true,
+  "no_deploy": true,
+  "T12_executed": false
+}

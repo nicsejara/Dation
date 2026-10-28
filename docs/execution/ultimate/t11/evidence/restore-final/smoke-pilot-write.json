@@ -1,0 +1,495 @@
+{
+  "result": "PASS",
+  "workspace_id": "00000000-0000-4000-8000-00000000da71",
+  "chain": [
+    {
+      "run_id": "50fc641d-3219-4239-bdf1-791ed71cd8d0",
+      "result_fingerprint": "61f1e1a59858aa1ede6c009efb87dd760d5e4162738684f832529dcd9a9f7893"
+    },
+    {
+      "run_id": "cef4929d-b82f-4635-b842-849396586736",
+      "result_fingerprint": "be43bc69a89ca7ccfdb51e14d9edf2fe77326016957c89589c1024c37eeefe01"
+    }
+  ],
+  "calls": [
+    {
+      "method": "POST",
+      "path": "/api/platform/logistics-models",
+      "status": 200,
+      "bytes": 999,
+      "seconds": 0.0379421119869221
+    },
+    {
+      "method": "POST",
+      "path": "/api/platform/logistics-models/27aec1a6-2853-48e4-afba-3dc9b9f14b5d/versions",
+      "status": 200,
+      "bytes": 1511,
+      "seconds": 0.04591522199916653
+    },
+    {
+      "method": "POST",
+      "path": "/api/platform/logistics-cases",
+      "status": 200,
+      "bytes": 6986,
+      "seconds": 0.0529752440052107
+    },
+    {
+      "method": "PUT",
+      "path": "/api/platform/decisions/6cd6ae2b-0311-4a7b-a083-a363e016b3a4/responsibilities/data_owner",
+      "status": 200,
+      "bytes": 1531,
+      "seconds": 0.028881442005513236
+    },
+    {
+      "method": "GET",
+      "path": "/api/platform/logistics-cases/6cd6ae2b-0311-4a7b-a083-a363e016b3a4/data",
+      "status": 200,
+      "bytes": 14342,
+      "seconds": 0.040025159978540614
+    },
+    {
+      "method": "GET",
+      "path": "/api/platform/logistics-cases/6cd6ae2b-0311-4a7b-a083-a363e016b3a4/data/templates/transport_demand",
+      "status": 200,
+      "bytes": 494,
+      "seconds": 0.019332227995619178
+    },
+    {
+      "method": "POST",
+      "path": "/api/platform/logistics-cases/6cd6ae2b-0311-4a7b-a083-a363e016b3a4/data/uploads/transport_demand",
+      "status": 200,
+      "bytes": 605,
+      "seconds": 0.10069681497407146
+    },
+    {
+      "method": "POST",
+      "path": "/api/platform/logistics-cases/6cd6ae2b-0311-4a7b-a083-a363e016b3a4/data/publish",
+      "status": 200,
+      "bytes": 1315,
+      "seconds": 0.0820210850215517
+    },
+    {
+      "method": "GET",
+      "path": "/api/platform/logistics-cases/6cd6ae2b-0311-4a7b-a083-a363e016b3a4/data",
+      "status": 200,
+      "bytes": 16133,
+      "seconds": 0.04883437298121862
+    },
+    {
+      "method": "GET",
+      "path": "/api/platform/logistics-cases/6cd6ae2b-0311-4a7b-a083-a363e016b3a4/data/templates/transport_resources",
+      "status": 200,
+      "bytes": 616,
+      "seconds": 0.027477733994601294
+    },
+    {
+      "method": "POST",
+      "path": "/api/platform/logistics-cases/6cd6ae2b-0311-4a7b-a083-a363e016b3a4/data/uploads/transport_resources",
+      "status": 200,
+      "bytes": 607,
+      "seconds": 0.09021495500928722
+    },
+    {
+      "method": "POST",
+      "path": "/api/platform/logistics-cases/6cd6ae2b-0311-4a7b-a083-a363e016b3a4/data/publish",
+      "status": 200,
+      "bytes": 1318,
+      "seconds": 0.06856236202293076
+    },
+    {
+      "method": "GET",
+      "path": "/api/platform/logistics-cases/6cd6ae2b-0311-4a7b-a083-a363e016b3a4/run-context",
+      "status": 200,
+      "bytes": 2140,
+      "seconds": 0.029793336987495422
+    },
+    {
+      "method": "POST",
+      "path": "/api/runs",
+      "status": 202,
+      "bytes": 1631,
+      "seconds": 0.19184378802310675
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/50fc641d-3219-4239-bdf1-791ed71cd8d0",
+      "status": 200,
+      "bytes": 4333,
+      "seconds": 0.028257694008061662
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/50fc641d-3219-4239-bdf1-791ed71cd8d0",
+      "status": 200,
+      "bytes": 4333,
+      "seconds": 0.02129473100649193
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/50fc641d-3219-4239-bdf1-791ed71cd8d0",
+      "status": 200,
+      "bytes": 4333,
+      "seconds": 0.01922284800093621
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/50fc641d-3219-4239-bdf1-791ed71cd8d0",
+      "status": 200,
+      "bytes": 4333,
+      "seconds": 0.018331520986976102
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/50fc641d-3219-4239-bdf1-791ed71cd8d0",
+      "status": 200,
+      "bytes": 4333,
+      "seconds": 0.021076830016681924
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/50fc641d-3219-4239-bdf1-791ed71cd8d0",
+      "status": 200,
+      "bytes": 4368,
+      "seconds": 0.025099126010900363
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/50fc641d-3219-4239-bdf1-791ed71cd8d0",
+      "status": 200,
+      "bytes": 4368,
+      "seconds": 0.023009341006400064
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/50fc641d-3219-4239-bdf1-791ed71cd8d0",
+      "status": 200,
+      "bytes": 4368,
+      "seconds": 0.02310310400207527
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/50fc641d-3219-4239-bdf1-791ed71cd8d0",
+      "status": 200,
+      "bytes": 30800,
+      "seconds": 0.023909898998681456
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/50fc641d-3219-4239-bdf1-791ed71cd8d0/approval-review",
+      "status": 200,
+      "bytes": 710,
+      "seconds": 0.14648421597667038
+    },
+    {
+      "method": "POST",
+      "path": "/api/runs/50fc641d-3219-4239-bdf1-791ed71cd8d0/approve",
+      "status": 200,
+      "bytes": 301,
+      "seconds": 0.15641363599570468
+    },
+    {
+      "method": "GET",
+      "path": "/api/platform/logistics-cases/6cd6ae2b-0311-4a7b-a083-a363e016b3a4/run-context",
+      "status": 200,
+      "bytes": 2273,
+      "seconds": 0.05038222100120038
+    },
+    {
+      "method": "POST",
+      "path": "/api/runs",
+      "status": 202,
+      "bytes": 1665,
+      "seconds": 0.3088721919921227
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/cef4929d-b82f-4635-b842-849396586736",
+      "status": 200,
+      "bytes": 3827,
+      "seconds": 0.02264069498050958
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/cef4929d-b82f-4635-b842-849396586736",
+      "status": 200,
+      "bytes": 3827,
+      "seconds": 0.05902639898704365
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/cef4929d-b82f-4635-b842-849396586736",
+      "status": 200,
+      "bytes": 3827,
+      "seconds": 0.019515522988513112
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/cef4929d-b82f-4635-b842-849396586736",
+      "status": 200,
+      "bytes": 3827,
+      "seconds": 0.018633976025739685
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/cef4929d-b82f-4635-b842-849396586736",
+      "status": 200,
+      "bytes": 3827,
+      "seconds": 0.0227489160024561
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/cef4929d-b82f-4635-b842-849396586736",
+      "status": 200,
+      "bytes": 3827,
+      "seconds": 0.01780523097841069
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/cef4929d-b82f-4635-b842-849396586736",
+      "status": 200,
+      "bytes": 3827,
+      "seconds": 0.02858286999980919
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/cef4929d-b82f-4635-b842-849396586736",
+      "status": 200,
+      "bytes": 3827,
+      "seconds": 0.021098673983942717
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/cef4929d-b82f-4635-b842-849396586736",
+      "status": 200,
+      "bytes": 3862,
+      "seconds": 0.04031833499902859
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/cef4929d-b82f-4635-b842-849396586736",
+      "status": 200,
+      "bytes": 3862,
+      "seconds": 0.03398241801187396
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/cef4929d-b82f-4635-b842-849396586736",
+      "status": 200,
+      "bytes": 26719,
+      "seconds": 0.023663128988118842
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/cef4929d-b82f-4635-b842-849396586736/approval-review",
+      "status": 200,
+      "bytes": 699,
+      "seconds": 0.1297935990151018
+    },
+    {
+      "method": "POST",
+      "path": "/api/runs/cef4929d-b82f-4635-b842-849396586736/approve",
+      "status": 200,
+      "bytes": 301,
+      "seconds": 0.1122794020047877
+    },
+    {
+      "method": "GET",
+      "path": "/health",
+      "status": 200,
+      "bytes": 20,
+      "seconds": 0.0033105629845522344
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/50fc641d-3219-4239-bdf1-791ed71cd8d0/result",
+      "status": 200,
+      "bytes": 26355,
+      "seconds": 0.05459039501147345
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/50fc641d-3219-4239-bdf1-791ed71cd8d0",
+      "status": 200,
+      "bytes": 30903,
+      "seconds": 0.024851448979461566
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/50fc641d-3219-4239-bdf1-791ed71cd8d0/primary-visual",
+      "status": 200,
+      "bytes": 741,
+      "seconds": 0.035676024010172114
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/50fc641d-3219-4239-bdf1-791ed71cd8d0/details/plan",
+      "status": 200,
+      "bytes": 1021,
+      "seconds": 0.03503736198763363
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/50fc641d-3219-4239-bdf1-791ed71cd8d0/details/demand",
+      "status": 200,
+      "bytes": 621,
+      "seconds": 0.047751564998179674
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/50fc641d-3219-4239-bdf1-791ed71cd8d0/details/resources",
+      "status": 200,
+      "bytes": 687,
+      "seconds": 0.04722481299540959
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/50fc641d-3219-4239-bdf1-791ed71cd8d0/details/alternatives",
+      "status": 200,
+      "bytes": 222,
+      "seconds": 0.04157056301482953
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/50fc641d-3219-4239-bdf1-791ed71cd8d0/details/exceptions",
+      "status": 200,
+      "bytes": 220,
+      "seconds": 0.03387416500481777
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/50fc641d-3219-4239-bdf1-791ed71cd8d0/details/evidence",
+      "status": 200,
+      "bytes": 1244,
+      "seconds": 0.040839836990926415
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/50fc641d-3219-4239-bdf1-791ed71cd8d0/decision-export",
+      "status": 200,
+      "bytes": 627,
+      "seconds": 0.05020245900959708
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/50fc641d-3219-4239-bdf1-791ed71cd8d0/decision-export",
+      "status": 200,
+      "bytes": 57751,
+      "seconds": 0.08688844999414869
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/50fc641d-3219-4239-bdf1-791ed71cd8d0/copilot-history",
+      "status": 200,
+      "bytes": 192,
+      "seconds": 0.04487938800593838
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/50fc641d-3219-4239-bdf1-791ed71cd8d0/approval-review",
+      "status": 200,
+      "bytes": 710,
+      "seconds": 0.11076510598650202
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/cef4929d-b82f-4635-b842-849396586736/result",
+      "status": 200,
+      "bytes": 22428,
+      "seconds": 0.043216143996687606
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/cef4929d-b82f-4635-b842-849396586736",
+      "status": 200,
+      "bytes": 26822,
+      "seconds": 0.019403673999477178
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/cef4929d-b82f-4635-b842-849396586736/primary-visual",
+      "status": 200,
+      "bytes": 526,
+      "seconds": 0.035719178995350376
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/cef4929d-b82f-4635-b842-849396586736/details/schedule",
+      "status": 200,
+      "bytes": 691,
+      "seconds": 0.040331393014639616
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/cef4929d-b82f-4635-b842-849396586736/details/trips",
+      "status": 200,
+      "bytes": 1198,
+      "seconds": 0.03768149798270315
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/cef4929d-b82f-4635-b842-849396586736/details/resources",
+      "status": 200,
+      "bytes": 522,
+      "seconds": 0.03413150098640472
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/cef4929d-b82f-4635-b842-849396586736/details/service",
+      "status": 200,
+      "bytes": 385,
+      "seconds": 0.037718388019129634
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/cef4929d-b82f-4635-b842-849396586736/details/exceptions",
+      "status": 200,
+      "bytes": 220,
+      "seconds": 0.033695855003315955
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/cef4929d-b82f-4635-b842-849396586736/details/evidence",
+      "status": 200,
+      "bytes": 1630,
+      "seconds": 0.03730647699558176
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/cef4929d-b82f-4635-b842-849396586736/decision-export",
+      "status": 200,
+      "bytes": 709,
+      "seconds": 0.1267993889923673
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/cef4929d-b82f-4635-b842-849396586736/decision-export",
+      "status": 200,
+      "bytes": 106704,
+      "seconds": 0.15540455500013195
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/cef4929d-b82f-4635-b842-849396586736/copilot-history",
+      "status": 200,
+      "bytes": 192,
+      "seconds": 0.05128043700824492
+    },
+    {
+      "method": "GET",
+      "path": "/api/runs/cef4929d-b82f-4635-b842-849396586736/approval-review",
+      "status": 200,
+      "bytes": 699,
+      "seconds": 0.10185206201276742
+    }
+  ],
+  "candidate_image_id": "sha256:610a317cbde6fe000d034bdb9dce28ad9f7309a948b13eb804d4483e6dd48041",
+  "deployment_observation": {
+    "source": "owned Docker inspect and actual image API/worker",
+    "image_id": "sha256:610a317cbde6fe000d034bdb9dce28ad9f7309a948b13eb804d4483e6dd48041"
+  },
+  "saved_copilot_turn_counts": {
+    "50fc641d-3219-4239-bdf1-791ed71cd8d0": 0,
+    "cef4929d-b82f-4635-b842-849396586736": 0
+  },
+  "mode": "pilot-write"
+}

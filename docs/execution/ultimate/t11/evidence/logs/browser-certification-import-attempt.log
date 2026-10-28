@@ -1,0 +1,23 @@
+setUpClass (test_ultimate_certification.UltimateCertificationTests) ... ERROR
+
+======================================================================
+ERROR: setUpClass (test_ultimate_certification.UltimateCertificationTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Dation/backend/tests/browser/test_ultimate_certification.py", line 39, in setUpClass
+    if not line:raise RuntimeError((OUT/'fixture.log').read_text()[-4000:])
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: Traceback (most recent call last):
+  File "/workspace/Dation/backend/tests/e2e/ultimate_certification_fixture.py", line 5, in <module>
+    from ultimate_certification_support import CertificationSandbox
+  File "/workspace/Dation/backend/tests/e2e/ultimate_certification_support.py", line 18, in <module>
+    from ultimate_result_helpers import ok,row,submit,wait_run,approval,publish
+  File "/workspace/Dation/backend/tests/e2e/ultimate_result_helpers.py", line 5, in <module>
+    from tests.test_ultimate_data_contracts import model
+ModuleNotFoundError: No module named 'tests'
+
+
+----------------------------------------------------------------------
+Ran 0 tests in 0.407s
+
+FAILED (errors=1)

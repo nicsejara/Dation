@@ -1,0 +1,21 @@
+{
+  "scope": "actual ConstraintEvidence row validation,25000live models,defaultGC;diagnostic only",
+  "results": {
+    "before_recursive_closure": {
+      "seconds": 0.8879011909884866,
+      "gc_collections": [
+        103,
+        9,
+        0
+      ]
+    },
+    "shared_pure_guard": {
+      "seconds": 0.8657950269989669,
+      "gc_collections": [
+        80,
+        7,
+        0
+      ]
+    }
+  }
+}

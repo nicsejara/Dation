@@ -1,0 +1,210 @@
+{
+  "reference": "Frozen post-T10 ArtifactBuilder, checkpoint32b8568",
+  "source_sha256": "c9b55d686ce5c1bc5965b1a52f5ca91d4006ae68095ecc8e2ec37ced0ae82074",
+  "scope": "serialization only, no synthetic decision publication",
+  "cases": {
+    "empty": {
+      "descriptor": {
+        "mode": "REFERENCE",
+        "delivery_version": 1,
+        "dataset_id": "compatibility",
+        "row_schema": "entity_evidence_v1",
+        "schema_version": 1,
+        "row_count": 0,
+        "artifacts": [
+          {
+            "artifact_id": "19f20e59-1bef-5f76-b531-8ee1e8e128a2",
+            "workspace_id": "00000000-0000-0000-0000-000000000001",
+            "run_id": "00000000-0000-0000-0000-000000000065",
+            "kind": "DETAIL_DATASET",
+            "part_key": "compatibility-000",
+            "artifact_schema": "entity_evidence_v1",
+            "schema_version": 1,
+            "content_sha256": "470c9fbb523ee44346cea196be9b4b579d701d85b86fd99944386cec5846f5c9",
+            "size_bytes": 347,
+            "media_type": "application/json",
+            "core_fingerprint": "70d62b6c6b44d2aa2dcb906ab990f7cc1304aaa5ccb7e79cc2339eeed3aab35c",
+            "assembler_version": "RESULT_ASSEMBLER_D1_V1"
+          }
+        ]
+      },
+      "parts": [
+        {
+          "sha256": "470c9fbb523ee44346cea196be9b4b579d701d85b86fd99944386cec5846f5c9",
+          "bytes": 347,
+          "row_count": 0
+        }
+      ]
+    },
+    "nullable_decimal_unicode": {
+      "descriptor": {
+        "mode": "REFERENCE",
+        "delivery_version": 1,
+        "dataset_id": "compatibility",
+        "row_schema": "entity_evidence_v1",
+        "schema_version": 1,
+        "row_count": 1,
+        "artifacts": [
+          {
+            "artifact_id": "c1c58e87-434b-5414-9759-1963eec145fb",
+            "workspace_id": "00000000-0000-0000-0000-000000000001",
+            "run_id": "00000000-0000-0000-0000-000000000065",
+            "kind": "DETAIL_DATASET",
+            "part_key": "compatibility-000",
+            "artifact_schema": "entity_evidence_v1",
+            "schema_version": 1,
+            "content_sha256": "40871a700876541ebfb0ccc1c96a447bfd40b57825322eeb091f38c76910a606",
+            "size_bytes": 517,
+            "media_type": "application/json",
+            "core_fingerprint": "70d62b6c6b44d2aa2dcb906ab990f7cc1304aaa5ccb7e79cc2339eeed3aab35c",
+            "assembler_version": "RESULT_ASSEMBLER_D1_V1"
+          }
+        ]
+      },
+      "parts": [
+        {
+          "sha256": "40871a700876541ebfb0ccc1c96a447bfd40b57825322eeb091f38c76910a606",
+          "bytes": 517,
+          "row_count": 1
+        }
+      ]
+    },
+    "row_boundary_101": {
+      "descriptor": {
+        "mode": "REFERENCE",
+        "delivery_version": 1,
+        "dataset_id": "compatibility",
+        "row_schema": "entity_evidence_v1",
+        "schema_version": 1,
+        "row_count": 101,
+        "artifacts": [
+          {
+            "artifact_id": "1a0ef4fc-f055-5dff-87e5-2fcbdc1f3769",
+            "workspace_id": "00000000-0000-0000-0000-000000000001",
+            "run_id": "00000000-0000-0000-0000-000000000065",
+            "kind": "DETAIL_DATASET",
+            "part_key": "compatibility-000",
+            "artifact_schema": "entity_evidence_v1",
+            "schema_version": 1,
+            "content_sha256": "da9d50bda78635afe76a633ca09ac8d4a99654ef957b4165506ef974f805979c",
+            "size_bytes": 11938,
+            "media_type": "application/json",
+            "core_fingerprint": "70d62b6c6b44d2aa2dcb906ab990f7cc1304aaa5ccb7e79cc2339eeed3aab35c",
+            "assembler_version": "RESULT_ASSEMBLER_D1_V1"
+          },
+          {
+            "artifact_id": "3bb3f9fe-d83b-5923-8358-d62044d5a1f1",
+            "workspace_id": "00000000-0000-0000-0000-000000000001",
+            "run_id": "00000000-0000-0000-0000-000000000065",
+            "kind": "DETAIL_DATASET",
+            "part_key": "compatibility-001",
+            "artifact_schema": "entity_evidence_v1",
+            "schema_version": 1,
+            "content_sha256": "dfdb8605f63614af79553dcc5cb1b6cda5acb298e2cb78fb4efe9a7013e0e0e2",
+            "size_bytes": 465,
+            "media_type": "application/json",
+            "core_fingerprint": "70d62b6c6b44d2aa2dcb906ab990f7cc1304aaa5ccb7e79cc2339eeed3aab35c",
+            "assembler_version": "RESULT_ASSEMBLER_D1_V1"
+          }
+        ]
+      },
+      "parts": [
+        {
+          "sha256": "da9d50bda78635afe76a633ca09ac8d4a99654ef957b4165506ef974f805979c",
+          "bytes": 11938,
+          "row_count": 100
+        },
+        {
+          "sha256": "dfdb8605f63614af79553dcc5cb1b6cda5acb298e2cb78fb4efe9a7013e0e0e2",
+          "bytes": 465,
+          "row_count": 1
+        }
+      ]
+    },
+    "utf8_byte_boundary": {
+      "descriptor": {
+        "mode": "REFERENCE",
+        "delivery_version": 1,
+        "dataset_id": "compatibility",
+        "row_schema": "entity_evidence_v1",
+        "schema_version": 1,
+        "row_count": 3,
+        "artifacts": [
+          {
+            "artifact_id": "39da7e94-2828-5c3f-9e5c-09961cd64590",
+            "workspace_id": "00000000-0000-0000-0000-000000000001",
+            "run_id": "00000000-0000-0000-0000-000000000065",
+            "kind": "DETAIL_DATASET",
+            "part_key": "compatibility-000",
+            "artifact_schema": "entity_evidence_v1",
+            "schema_version": 1,
+            "content_sha256": "7243cfe9c96175f4f5fe04811cd6f29e1b1c5ad5d0bc281e0f0f11783bed9965",
+            "size_bytes": 720582,
+            "media_type": "application/json",
+            "core_fingerprint": "70d62b6c6b44d2aa2dcb906ab990f7cc1304aaa5ccb7e79cc2339eeed3aab35c",
+            "assembler_version": "RESULT_ASSEMBLER_D1_V1"
+          },
+          {
+            "artifact_id": "96771e33-29ef-5fdb-9b0b-5734dd93805f",
+            "workspace_id": "00000000-0000-0000-0000-000000000001",
+            "run_id": "00000000-0000-0000-0000-000000000065",
+            "kind": "DETAIL_DATASET",
+            "part_key": "compatibility-001",
+            "artifact_schema": "entity_evidence_v1",
+            "schema_version": 1,
+            "content_sha256": "854ab2d84c371e7f7ee7f009ca924929e5b81e39893f0de5258bc20244123329",
+            "size_bytes": 360464,
+            "media_type": "application/json",
+            "core_fingerprint": "70d62b6c6b44d2aa2dcb906ab990f7cc1304aaa5ccb7e79cc2339eeed3aab35c",
+            "assembler_version": "RESULT_ASSEMBLER_D1_V1"
+          }
+        ]
+      },
+      "parts": [
+        {
+          "sha256": "7243cfe9c96175f4f5fe04811cd6f29e1b1c5ad5d0bc281e0f0f11783bed9965",
+          "bytes": 720582,
+          "row_count": 2
+        },
+        {
+          "sha256": "854ab2d84c371e7f7ee7f009ca924929e5b81e39893f0de5258bc20244123329",
+          "bytes": 360464,
+          "row_count": 1
+        }
+      ]
+    },
+    "upstream_binding": {
+      "descriptor": {
+        "mode": "REFERENCE",
+        "delivery_version": 1,
+        "dataset_id": "compatibility",
+        "row_schema": "engine_core_v1",
+        "schema_version": 1,
+        "row_count": 1,
+        "artifacts": [
+          {
+            "artifact_id": "23b0d5eb-ecfe-561a-8121-f1d3f4b88b6d",
+            "workspace_id": "00000000-0000-0000-0000-000000000001",
+            "run_id": "00000000-0000-0000-0000-000000000066",
+            "kind": "DETAIL_DATASET",
+            "part_key": "compatibility-000",
+            "artifact_schema": "engine_core_v1",
+            "schema_version": 1,
+            "content_sha256": "f9c8d972ebbb697347f06b203f59891219824e5ca1a2784e2b10ab3d4129bdcf",
+            "size_bytes": 3531,
+            "media_type": "application/json",
+            "core_fingerprint": "0c6c9f064b9178a3514f2f0eb61e002dec3fd396d6628ff09ee7b37ac6467659",
+            "assembler_version": "RESULT_ASSEMBLER_D1_V1"
+          }
+        ]
+      },
+      "parts": [
+        {
+          "sha256": "f9c8d972ebbb697347f06b203f59891219824e5ca1a2784e2b10ab3d4129bdcf",
+          "bytes": 3531,
+          "row_count": 1
+        }
+      ]
+    }
+  }
+}

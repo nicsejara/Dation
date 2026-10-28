@@ -1,0 +1,180 @@
+{
+  "UI_P6": "PASS",
+  "dependencies": {
+    "browser": "Playwright installed",
+    "chromium": "/usr/bin/chromium",
+    "local_skills": "available",
+    "node": "24.19.0",
+    "postgres": "owned PostgreSQL 17-alpine",
+    "python": "3.13.5",
+    "supabase_cli": "2.122.0",
+    "unavailable_blocking_dependencies": []
+  },
+  "focused_lookup": {
+    "command": "python .agents/skills/ui-ux-pro-max/scripts/search.py \"chart keyboard accessibility\" --domain ux -n 3",
+    "result": "Relevant UX domain; existing skip link reused, keyboard/unobscured focus implemented.",
+    "verified_results": [
+      "Skip Links",
+      "Keyboard Navigation",
+      "Focus Not Obscured Enhanced"
+    ],
+    "T11": "Reuse prior relevant query results; no new broad visual audit, palette or framework generation."
+  },
+  "not_applied": {
+    "browser/testing skills": "No dedicated skill found; Playwright, unittest and Node are tools, not invented skill names.",
+    "design-taste-frontend": "Optional additional critique not needed after four mandated local skills; no general audit.",
+    "improve-animations": "Excluded by plan; no motion audit.",
+    "review-animations": "Not explicitly invoked, no new animation need.",
+    "ui-styling/brand/design/banner-design/slides": "No framework, branding, creative or presentation scope."
+  },
+  "phase": "T11",
+  "precedence": "User T11 authorization > Final Master Plan > current functional/visual baseline > skills",
+  "skills": [
+    {
+      "applied": "Existing Dation CSS variables, Hero/card/button shells and component states; additive scoped result layout only.",
+      "name": "design-system",
+      "omitted": "No token generator, starter palette, Tailwind, slides or framework.",
+      "read": [
+        {
+          "path": ".agents/skills/design-system/SKILL.md",
+          "sha256": "655468bb723a6bc9d17fcb09a6a005e10e313d63b879f4d74fb2abdc3041ae3f"
+        },
+        {
+          "path": ".agents/skills/design-system/references/token-architecture.md",
+          "sha256": "925f4049c4c4313d9fd5df98cdfd52004112aca49fba1664ad85e76bc9dce4d3"
+        },
+        {
+          "path": ".agents/skills/design-system/references/component-specs.md",
+          "sha256": "b265d979a741dd748d4e595e6898ae430faeef4f6d13d7a634fa6241b91d2da4"
+        }
+      ],
+      "result": "APPLIED_AND_VERIFIED",
+      "verified_by": [
+        "backend/app/static/css/ultimate-results.css",
+        "evidence/w10/measurements.json"
+      ],
+      "version": "1.0.0",
+      "baseline_guidance": "Reused T10 instructions with unchanged local source hashes; current runtime/Supabase/Postgres skill sources reread.",
+      "T11_application": "Preserve current shells/tokens/styles; only repair demonstrated Config admission/retry/focus defects. Five viewports, native states, stress and keyboard coverage; no new visual design or motion audit."
+    },
+    {
+      "applied": "Focused hierarchy, native controls, one disclosure, loading/empty/error, focus/return and no decorative motion.",
+      "name": "emil-design-eng",
+      "omitted": "No general critique or new visual direction; required Before/After/Why table in report.",
+      "read": [
+        {
+          "path": ".agents/skills/emil-design-eng/SKILL.md",
+          "sha256": "ffbe68e6007fb42cb8149f089b400a1ca007d59ba23e8948e2be4476f3175939"
+        }
+      ],
+      "result": "APPLIED_AND_VERIFIED",
+      "verified_by": [
+        "backend/app/static/js/dispatch/results/dashboard.mjs",
+        "evidence/w10.log"
+      ],
+      "version": "not declared",
+      "baseline_guidance": "Reused T10 instructions with unchanged local source hashes; current runtime/Supabase/Postgres skill sources reread.",
+      "T11_application": "Preserve current shells/tokens/styles; only repair demonstrated Config admission/retry/focus defects. Five viewports, native states, stress and keyboard coverage; no new visual design or motion audit."
+    },
+    {
+      "applied": "Focused verified UX lookup: keyboard navigation, skip link and focus not obscured; accessible chart equivalent and unobscured actions.",
+      "name": "ui-ux-pro-max",
+      "omitted": "No design-system generation/persistence, fonts, palettes, examples or stack replacement.",
+      "read": [
+        {
+          "path": ".agents/skills/ui-ux-pro-max/SKILL.md",
+          "sha256": "e5baf9400d4347e5ed3eb1f6b99cd0b9ba545b8b0e507aabb2b87397bbf73ea1"
+        }
+      ],
+      "result": "APPLIED_AND_VERIFIED",
+      "verified_by": [
+        "evidence/w10/contrast-focus.json",
+        "evidence/w10.log"
+      ],
+      "version": "not declared",
+      "baseline_guidance": "Reused T10 instructions with unchanged local source hashes; current runtime/Supabase/Postgres skill sources reread.",
+      "T11_application": "Preserve current shells/tokens/styles; only repair demonstrated Config admission/retry/focus defects. Five viewports, native states, stress and keyboard coverage; no new visual design or motion audit."
+    },
+    {
+      "applied": "Harness-only schema-backed long Case/Order/Resource, null/zero/one/dense/error and numeric precision checks.",
+      "name": "break-ui",
+      "omitted": "No stress toggle in product. Report-before-fix pause superseded by explicit end-to-end implementation authorization; only in-scope breaks repaired.",
+      "read": [
+        {
+          "path": ".agents/skills/break-ui/SKILL.md",
+          "sha256": "e7eec1d70ac56a04255e9c0dbe98084ea3d544cc04aaad34f32c95d6fa9dff5e"
+        },
+        {
+          "path": ".agents/skills/break-ui/CATALOG.md",
+          "sha256": "7358efcc6bb48e35187be1c064cf60022dcb18c72c18fab58b606dfc5f421f15"
+        }
+      ],
+      "result": "APPLIED_AND_VERIFIED",
+      "verified_by": [
+        "backend/tests/test_ultimate_result_consumers.mjs",
+        "backend/tests/browser/test_ultimate_result_consumers.py"
+      ],
+      "version": "not declared",
+      "baseline_guidance": "Reused T10 instructions with unchanged local source hashes; current runtime/Supabase/Postgres skill sources reread.",
+      "T11_application": "Preserve current shells/tokens/styles; only repair demonstrated Config admission/retry/focus defects. Five viewports, native states, stress and keyboard coverage; no new visual design or motion audit."
+    },
+    {
+      "applied": "Additive checked RPC; immutable original provenance/history; active member and Run/Case authorization.",
+      "name": "supabase:supabase",
+      "omitted": "No production access, infra changes, historical migration rewrite, new table or deployment.",
+      "package": "c0/supabase",
+      "read": [
+        {
+          "path": "evidence/skills/supabase-skill.txt",
+          "sha256": "d2f7ca35f2292dc711037506ef64b7a03da6adf96d30abd60c5d856b875dda8c"
+        }
+      ],
+      "result": "APPLIED_AND_VERIFIED",
+      "verified_by": [
+        "evidence/e10.log",
+        "evidence/advisors.json"
+      ],
+      "version": "snapshot SHA256",
+      "baseline_guidance": "Reused T10 instructions with unchanged local source hashes; current runtime/Supabase/Postgres skill sources reread."
+    },
+    {
+      "applied": "Qualified SECURITY DEFINER function with fixed search_path, service-only execute and per-turn advisory lock.",
+      "name": "supabase:supabase-postgres-best-practices",
+      "omitted": "No production access, infra changes, historical migration rewrite, new table or deployment.",
+      "package": "c0/supabase-postgres-best-practices",
+      "read": [
+        {
+          "path": "evidence/skills/postgres-skill.txt",
+          "sha256": "f5939ff6703520881ec40204deb519771cd8d597934932ececa8af4a622443c7"
+        }
+      ],
+      "result": "APPLIED_AND_VERIFIED",
+      "verified_by": [
+        "evidence/e10.log",
+        "evidence/advisors-command.json"
+      ],
+      "version": "snapshot SHA256",
+      "baseline_guidance": "Reused T10 instructions with unchanged local source hashes; current runtime/Supabase/Postgres skill sources reread."
+    },
+    {
+      "applied": "Owned loopback Docker/Postgres/API/worker, proxy/CA-compatible environment, recovery and isolated cleared credentials.",
+      "name": "cloud-environment:cloud-environment-runtime",
+      "omitted": "No production access, infra changes, historical migration rewrite, new table or deployment.",
+      "package": "c5/cloud-environment-runtime",
+      "read": [
+        {
+          "path": "evidence/skills/runtime-skill.txt",
+          "sha256": "de2ea16a5a8727be2a6cbf6a57d60c3eac1082119dd9685e69a2b8e83db120bc"
+        }
+      ],
+      "result": "APPLIED_AND_VERIFIED",
+      "verified_by": [
+        "evidence/environment-recovery.json",
+        "evidence/w10/owned-fixture.json"
+      ],
+      "version": "snapshot SHA256",
+      "baseline_guidance": "Reused T10 instructions with unchanged local source hashes; current runtime/Supabase/Postgres skill sources reread."
+    }
+  ],
+  "overall_T11": "STOP_PERF11"
+}

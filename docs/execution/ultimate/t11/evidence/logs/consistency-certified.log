@@ -1,0 +1,10 @@
+test_01_all_rows_entities_exports_context_and_review_share_facts (test_ultimate_consistency.UltimateConsistencyTests.test_01_all_rows_entities_exports_context_and_review_share_facts) ... ok
+test_02_positive_then_foreign_cache_entity_export_context_and_storage_are_denied (test_ultimate_consistency.UltimateConsistencyTests.test_02_positive_then_foreign_cache_entity_export_context_and_storage_are_denied) ... ok
+test_03_context_privacy_and_prompt_injection_remain_data (test_ultimate_consistency.UltimateConsistencyTests.test_03_context_privacy_and_prompt_injection_remain_data) ... ok
+test_04_http_retrieval_payloads_and_latency_are_measured (test_ultimate_consistency.UltimateConsistencyTests.test_04_http_retrieval_payloads_and_latency_are_measured) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 58.695s
+
+OK
+DATION_E2E_RESULT={"passed": true, "tests": 4, "failures": [], "errors": [], "skipped": [], "passed_ids": ["test_ultimate_consistency.UltimateConsistencyTests.test_01_all_rows_entities_exports_context_and_review_share_facts", "test_ultimate_consistency.UltimateConsistencyTests.test_02_positive_then_foreign_cache_entity_export_context_and_storage_are_denied", "test_ultimate_consistency.UltimateConsistencyTests.test_03_context_privacy_and_prompt_injection_remain_data", "test_ultimate_consistency.UltimateConsistencyTests.test_04_http_retrieval_payloads_and_latency_are_measured"], "scope": "FOCUSED_RECHECK", "selected_modules": ["test_ultimate_consistency"], "failure_details": []}

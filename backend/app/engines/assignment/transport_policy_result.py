@@ -11,7 +11,7 @@ from app.results.canonical import canonical_bytes,core_result_fingerprint
 from app.results.reason_codes import ReasonEmission,reason_definition
 from app.engines.common.day_resource_feasibility import FixedTrip,day_resource_feasibility
 from .transport_contracts import TransportPlanInput,TransportPlanComputation,EngineCertificationError
-from .transport_plan import _run,ratio
+from .transport_plan import _build_structural_plan,ratio
 from .transport_policies import PolicySearch,PolicyRequirementsError
 
 
@@ -68,7 +68,9 @@ def run_transport_policy(request, *, alternative_budget=3):
 
 def _produce(request,goal=None,model_budget=None,kernel_budget=Decimal(1),comparison_budget=Decimal('.01')):
     search=PolicySearch(request,goal,model_budget=float(model_budget) if model_budget is not None else None,kernel_budget=float(kernel_budget))
-    structural=_run(request,search)
+    # certify_policy_result below independently checks the entire structure and
+    # economic result before this proposal can leave the private builder.
+    structural=_build_structural_plan(request,search)
     old=structural.output
     usable=old.core.feasibility.solution_found
     complete=structural.search.candidate_set_complete
@@ -165,7 +167,8 @@ def _produce(request,goal=None,model_budget=None,kernel_budget=Decimal(1),compar
         if e.entity_type=='RESOURCE':
             u=next(u for u in usages if u.resource_id==e.entity_id)
             facts.update(total_cost=u.total_cost.amount if u.total_cost else None)
-        entities.append(c.EntityEvidence.model_validate({**e.model_dump(),'facts':facts,'reason_refs':tuple(r.emission_id for r in reasons if (r.entity_type,r.entity_id)==(e.entity_type,e.entity_id))}))
+        # EngineOutput below validates the complete nested entity graph once.
+        entities.append({**e.model_dump(),'facts':facts,'reason_refs':tuple(r.emission_id for r in reasons if (r.entity_type,r.entity_id)==(e.entity_type,e.entity_id))})
     core=c.EngineCoreResult.model_validate({**old.core.model_dump(),'engine':{**old.core.engine.model_dump(),'solver_status':status},
         'feasibility':dict(solution_found=usable,policy_feasible=True if usable else False if infeasible else None,
             hard_constraints_satisfied=True if usable else False if infeasible else None,full_demand_coverage=old.core.feasibility.full_demand_coverage),
@@ -173,9 +176,9 @@ def _produce(request,goal=None,model_budget=None,kernel_budget=Decimal(1),compar
     goal_stage=next(((value,bound) for label,_,value,bound in search.stages if label==(goal or request.context.node_policy.primary_goal)),(None,None))
     solver=c.SolverEvidence(status=status,objective_value=Decimal(goal_stage[0]) if goal_stage[0] is not None else None,best_bound=Decimal(goal_stage[1]) if optimal and goal_stage[1] is not None else None,
         certificate=c.SolverCertificate(kind='GLOBAL_OPTIMUM' if optimal else 'FEASIBILITY' if usable else 'INFEASIBILITY',evidence_ref=proof_id) if optimal or usable or infeasible else None)
-    evidence=c.EngineEvidence.model_validate({**old.evidence.model_dump(),'core_result_fingerprint':core_result_fingerprint(core),
+    evidence={**old.evidence.model_dump(exclude={'core_result_fingerprint','policy','constraints','solver','reasons','entities'}),'core_result_fingerprint':core_result_fingerprint(core),
         'policy':c.PolicyEvidence.model_validate({**old.evidence.policy.model_dump(),'evidence_id':proof_id}),
-        'constraints':constraints,'solver':solver,'reasons':reasons,'entities':entities})
+        'constraints':constraints,'solver':solver,'reasons':reasons,'entities':entities}
     summary=c.InputSummary(orders=len(request.demands),demand={d:sum((getattr(o.requested,d) for o in request.demands),Decimal(0)) for d in request.model.active_dimensions},
         priority_distribution={p:sum(o.priority==p for o in request.demands) for p in Priority},own_resources=sum(r.source=='OWN' for r in request.resources),external_resources=sum(r.source=='EXTERNAL' for r in request.resources))
     result=CertifiedPlan(structural,c.EngineOutput(core=core,evidence=evidence),resolutions,structural.residuals,tuple(usages),summary,goal or request.context.node_policy.primary_goal,comparison_budget)

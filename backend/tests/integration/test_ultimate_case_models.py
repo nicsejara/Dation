@@ -28,8 +28,13 @@ def literal(value):return "'"+json.dumps(value,separators=(',',':')).replace("'"
 class UltimateCaseSQLTests(UltimateSQLSandbox,unittest.TestCase):
     @classmethod
     def verify_owner(cls):
-        result=subprocess.run([*DOCKER,'inspect','--format','{{index .Config.Labels "dation.qa.phase"}}|{{index .Config.Labels "dation.qa.owner"}}',CONTAINER or ''],capture_output=True,text=True,timeout=10)
-        if result.returncode or result.stdout.strip()!='T3|codex-dation':raise RuntimeError('S3 requires its labelled owned T3 sandbox')
+        result=subprocess.run([*DOCKER,'inspect','--format','{{index .Config.Labels "dation.qa.phase"}}|{{index .Config.Labels "dation.qa.owner"}}|{{index .Config.Labels "dation.qa.execution"}}',CONTAINER or ''],capture_output=True,text=True,timeout=10)
+        labels=result.stdout.strip().split('|')
+        # The full B-SQL runner shares its explicitly owned T2 catalog fixture
+        # with S3 during T11. Keep foreign/unlabelled containers rejected.
+        if result.returncode or len(labels)!=3 or labels[1]!='codex-dation' or not (
+                labels[0]=='T3' or (labels[0]=='T2' and labels[2]=='T11')):
+            raise RuntimeError('S3 requires an owned T3 or explicitly marked T11 SQL sandbox')
         if not 170000<=int(cls.command('SHOW server_version_num;',database='postgres').stdout)<180000:raise RuntimeError('PostgreSQL 17 required')
 
     @classmethod

@@ -1,0 +1,195 @@
+test_admission_bound_and_no_orphan_run (test_durable_queue_sql.DurableQueueSQLTests.test_admission_bound_and_no_orphan_run) ... ok
+test_anonymous_role_cannot_claim_or_read_jobs (test_durable_queue_sql.DurableQueueSQLTests.test_anonymous_role_cannot_claim_or_read_jobs) ... ok
+test_cancel_fences_worker_and_does_not_overwrite_completion (test_durable_queue_sql.DurableQueueSQLTests.test_cancel_fences_worker_and_does_not_overwrite_completion) ... ok
+test_completed_run_survives_failed_projection (test_durable_queue_sql.DurableQueueSQLTests.test_completed_run_survives_failed_projection) ... ok
+test_concurrent_workers_claim_different_jobs (test_durable_queue_sql.DurableQueueSQLTests.test_concurrent_workers_claim_different_jobs) ... ok
+test_crashed_worker_recovers_same_id_and_fences_old_writer (test_durable_queue_sql.DurableQueueSQLTests.test_crashed_worker_recovers_same_id_and_fences_old_writer) ... ok
+test_deadline_expires_queued_work_without_get_side_effects (test_durable_queue_sql.DurableQueueSQLTests.test_deadline_expires_queued_work_without_get_side_effects) ... ok
+test_enqueue_is_atomic_and_queued (test_durable_queue_sql.DurableQueueSQLTests.test_enqueue_is_atomic_and_queued) ... ok
+test_heartbeat_cannot_revive_expired_lease (test_durable_queue_sql.DurableQueueSQLTests.test_heartbeat_cannot_revive_expired_lease) ... ok
+test_idempotent_replay_and_conflicting_intention (test_durable_queue_sql.DurableQueueSQLTests.test_idempotent_replay_and_conflicting_intention) ... ok
+test_maintenance_bounds_restart_attempts (test_durable_queue_sql.DurableQueueSQLTests.test_maintenance_bounds_restart_attempts) ... ok
+test_projection_ack_does_not_lose_concurrent_approval (test_durable_queue_sql.DurableQueueSQLTests.test_projection_ack_does_not_lose_concurrent_approval) ... ok
+test_catalog_matches_reviewed_manifest_and_detects_definition_drift (test_observability_sql.ObservabilitySQLTests.test_catalog_matches_reviewed_manifest_and_detects_definition_drift) ... ok
+test_concurrent_same_turn_commits_once (test_observability_sql.ObservabilitySQLTests.test_concurrent_same_turn_commits_once) ... ok
+test_failed_validation_and_message_insert_roll_back_entire_turn (test_observability_sql.ObservabilitySQLTests.test_failed_validation_and_message_insert_roll_back_entire_turn) ... ok
+test_historical_message_remains_unattributed_and_completed_run_required (test_observability_sql.ObservabilitySQLTests.test_historical_message_remains_unattributed_and_completed_run_required) ... ok
+test_private_roles_cannot_read_or_invoke_operations_and_chat (test_observability_sql.ObservabilitySQLTests.test_private_roles_cannot_read_or_invoke_operations_and_chat) ... ok
+test_replay_returns_first_answer_and_conflict_does_not_duplicate (test_observability_sql.ObservabilitySQLTests.test_replay_returns_first_answer_and_conflict_does_not_duplicate) ... ok
+test_snapshot_is_read_only_has_actual_percentile_and_fresh_worker_counts (test_observability_sql.ObservabilitySQLTests.test_snapshot_is_read_only_has_actual_percentile_and_fresh_worker_counts) ... ok
+test_turn_commits_both_messages_and_sanitized_audit_metadata (test_observability_sql.ObservabilitySQLTests.test_turn_commits_both_messages_and_sanitized_audit_metadata) ... ok
+test_worker_shutdown_and_old_registry_cleanup (test_observability_sql.ObservabilitySQLTests.test_worker_shutdown_and_old_registry_cleanup) ... ok
+test_counts_old_approval_latest_and_replacements_are_live_without_heavy_artifacts (test_performance_sql.CaseListSQLTests.test_counts_old_approval_latest_and_replacements_are_live_without_heavy_artifacts) ... ok
+test_invalid_bounds_and_untrusted_roles_cannot_execute (test_performance_sql.CaseListSQLTests.test_invalid_bounds_and_untrusted_roles_cannot_execute) ... ok
+test_page_bounds_stable_ties_all_statuses_and_full_metadata_compatibility (test_performance_sql.CaseListSQLTests.test_page_bounds_stable_ties_all_statuses_and_full_metadata_compatibility) ... ok
+test_summary_uses_bounded_page_and_existing_history_indexes (test_performance_sql.CaseListSQLTests.test_summary_uses_bounded_page_and_existing_history_indexes) ... ok
+test_admitted_child_can_finish_after_parent_replacement (test_persistence_sql.PersistenceSQLTests.test_admitted_child_can_finish_after_parent_replacement) ... ok
+test_approval_timestamp_is_taken_after_waiting_for_case_lock (test_persistence_sql.PersistenceSQLTests.test_approval_timestamp_is_taken_after_waiting_for_case_lock) ... ok
+test_captured_catalog_rebuild_and_upgrade_preserve_historical_evidence (test_persistence_sql.PersistenceSQLTests.test_captured_catalog_rebuild_and_upgrade_preserve_historical_evidence) ... ok
+test_concurrent_approvals_are_serialized_and_audited (test_persistence_sql.PersistenceSQLTests.test_concurrent_approvals_are_serialized_and_audited) ... ok
+test_history_counts_and_approval_survive_beyond_1000_and_tied_dates (test_persistence_sql.PersistenceSQLTests.test_history_counts_and_approval_survive_beyond_1000_and_tied_dates) ... ok
+test_identity_result_and_event_mutation_are_rejected (test_persistence_sql.PersistenceSQLTests.test_identity_result_and_event_mutation_are_rejected) ... ok
+test_node_page_preserves_upstream_summary (test_persistence_sql.PersistenceSQLTests.test_node_page_preserves_upstream_summary) ... ok
+test_old_upstream_cannot_admit_or_approve_new_children (test_persistence_sql.PersistenceSQLTests.test_old_upstream_cannot_admit_or_approve_new_children) ... ok
+test_parent_child_race_never_accepts_stale_approval (test_persistence_sql.PersistenceSQLTests.test_parent_child_race_never_accepts_stale_approval) ... ok
+test_retry_preserves_approval_and_previous_cannot_resurrect (test_persistence_sql.PersistenceSQLTests.test_retry_preserves_approval_and_previous_cannot_resurrect) ... ok
+test_untrusted_roles_cannot_read_private_data_or_call_rpc (test_persistence_sql.PersistenceSQLTests.test_untrusted_roles_cannot_read_private_data_or_call_rpc) ... ok
+test_catalog_install_is_idempotent_and_rejects_drift (test_progressive_comparative_sql.ProgressiveSQLTests.test_catalog_install_is_idempotent_and_rejects_drift) ... ok
+test_chat_provenance_is_atomic_and_idempotent (test_progressive_comparative_sql.ProgressiveSQLTests.test_chat_provenance_is_atomic_and_idempotent) ... ok
+test_concurrent_admission_is_one_artifact_and_no_business_write (test_progressive_comparative_sql.ProgressiveSQLTests.test_concurrent_admission_is_one_artifact_and_no_business_write) ... ok
+test_exhaustion_deadline_and_explicit_retry_keep_same_identity (test_progressive_comparative_sql.ProgressiveSQLTests.test_exhaustion_deadline_and_explicit_retry_keep_same_identity) ... ok
+test_explanation_scope_prefers_enriched_evidence_over_late_original (test_progressive_comparative_sql.ProgressiveSQLTests.test_explanation_scope_prefers_enriched_evidence_over_late_original) ... ok
+test_finish_rejects_changed_selection_business_configuration_or_options (test_progressive_comparative_sql.ProgressiveSQLTests.test_finish_rejects_changed_selection_business_configuration_or_options) ... ok
+test_invalid_intention_and_unfinished_base_cannot_enter_queue (test_progressive_comparative_sql.ProgressiveSQLTests.test_invalid_intention_and_unfinished_base_cannot_enter_queue) ... ok
+test_private_roles_and_least_privilege (test_progressive_comparative_sql.ProgressiveSQLTests.test_private_roles_and_least_privilege) ... ok
+test_restart_fences_old_worker_and_heartbeat_cannot_revive_it (test_progressive_comparative_sql.ProgressiveSQLTests.test_restart_fences_old_worker_and_heartbeat_cannot_revive_it) ... ok
+test_reuse_is_completed_without_worker_and_completed_artifact_is_immutable (test_progressive_comparative_sql.ProgressiveSQLTests.test_reuse_is_completed_without_worker_and_completed_artifact_is_immutable) ... ok
+setUpClass (test_ultimate_case_models.UltimateCaseSQLTests) ... ERROR
+test_01_empty_case_contracts_and_flag_keep_execution_closed (test_ultimate_data_pack.UltimateDataPackTests.test_01_empty_case_contracts_and_flag_keep_execution_closed) ... ok
+test_02_template_validate_and_snapshot_identity_agree (test_ultimate_data_pack.UltimateDataPackTests.test_02_template_validate_and_snapshot_identity_agree) ... ok
+test_03_upload_is_candidate_not_published_and_reloads (test_ultimate_data_pack.UltimateDataPackTests.test_03_upload_is_candidate_not_published_and_reloads) ... ok
+test_04_demand_publish_is_immutable_complete_manifest (test_ultimate_data_pack.UltimateDataPackTests.test_04_demand_publish_is_immutable_complete_manifest) ... ok
+test_05_resources_publication_carries_demand_forward (test_ultimate_data_pack.UltimateDataPackTests.test_05_resources_publication_carries_demand_forward) ... ok
+test_06_storage_yes_database_no_recovers_without_pointer_move (test_ultimate_data_pack.UltimateDataPackTests.test_06_storage_yes_database_no_recovers_without_pointer_move) ... ok
+test_07_metadata_commit_lost_response_recovers_same_dataset (test_ultimate_data_pack.UltimateDataPackTests.test_07_metadata_commit_lost_response_recovers_same_dataset) ... ok
+test_08_publish_commit_lost_response_replays_exact_version (test_ultimate_data_pack.UltimateDataPackTests.test_08_publish_commit_lost_response_replays_exact_version) ... ok
+test_09_interrupted_raw_can_retry_same_upload_identity (test_ultimate_data_pack.UltimateDataPackTests.test_09_interrupted_raw_can_retry_same_upload_identity) ... ok
+test_10_interrupted_normalized_object_recovers_from_raw (test_ultimate_data_pack.UltimateDataPackTests.test_10_interrupted_normalized_object_recovers_from_raw) ... ok
+test_11_cas_conflict_preserves_candidate_and_current (test_ultimate_data_pack.UltimateDataPackTests.test_11_cas_conflict_preserves_candidate_and_current) ... ok
+test_12_same_raw_and_contract_deduplicate_without_replacing_bytes (test_ultimate_data_pack.UltimateDataPackTests.test_12_same_raw_and_contract_deduplicate_without_replacing_bytes) ... ok
+test_13_reuse_same_version_across_cases_is_explicit (test_ultimate_data_pack.UltimateDataPackTests.test_13_reuse_same_version_across_cases_is_explicit) ... ok
+test_14_same_raw_different_contract_is_a_distinct_logical_dataset (test_ultimate_data_pack.UltimateDataPackTests.test_14_same_raw_different_contract_is_a_distinct_logical_dataset) ... ok
+test_15_cross_workspace_case_dataset_and_storage_are_denied (test_ultimate_data_pack.UltimateDataPackTests.test_15_cross_workspace_case_dataset_and_storage_are_denied) ... ok
+test_16_viewer_reads_but_cannot_upload_or_publish (test_ultimate_data_pack.UltimateDataPackTests.test_16_viewer_reads_but_cannot_upload_or_publish) ... ok
+test_17_default_closed_flag_and_read_only_rollback (test_ultimate_data_pack.UltimateDataPackTests.test_17_default_closed_flag_and_read_only_rollback) ... ok
+test_18_version_metadata_and_objects_are_immutable (test_ultimate_data_pack.UltimateDataPackTests.test_18_version_metadata_and_objects_are_immutable) ... ok
+test_19_referenced_input_cannot_be_deleted_by_legacy_hub (test_ultimate_data_pack.UltimateDataPackTests.test_19_referenced_input_cannot_be_deleted_by_legacy_hub) ... ok
+test_20_no_pointer_to_missing_or_wrong_bytes (test_ultimate_data_pack.UltimateDataPackTests.test_20_no_pointer_to_missing_or_wrong_bytes) ... ok
+test_21_schema_extra_pii_never_enters_journal_or_storage (test_ultimate_data_pack.UltimateDataPackTests.test_21_schema_extra_pii_never_enters_journal_or_storage) ... ok
+test_22_client_paths_and_contract_forgery_are_rejected (test_ultimate_data_pack.UltimateDataPackTests.test_22_client_paths_and_contract_forgery_are_rejected) ... ok
+test_23_concurrent_publications_have_one_cas_winner (test_ultimate_data_pack.UltimateDataPackTests.test_23_concurrent_publications_have_one_cas_winner) ... ok
+test_24_replay_precedes_mutable_flag_and_revision (test_ultimate_data_pack.UltimateDataPackTests.test_24_replay_precedes_mutable_flag_and_revision) ... ok
+test_25_discard_interrupted_candidate_is_safe_and_idempotent (test_ultimate_data_pack.UltimateDataPackTests.test_25_discard_interrupted_candidate_is_safe_and_idempotent) ... ok
+test_26_normalized_preview_and_hub_use_same_hash (test_ultimate_data_pack.UltimateDataPackTests.test_26_normalized_preview_and_hub_use_same_hash) ... ok
+test_27_upload_intent_cannot_be_rebound_to_changed_bytes (test_ultimate_data_pack.UltimateDataPackTests.test_27_upload_intent_cannot_be_rebound_to_changed_bytes) ... ok
+test_28_private_catalog_and_case_context_ownership_stay_intact (test_ultimate_data_pack.UltimateDataPackTests.test_28_private_catalog_and_case_context_ownership_stay_intact) ... ok
+test_29_missing_normalized_bytes_cannot_publish_a_partial_pack (test_ultimate_data_pack.UltimateDataPackTests.test_29_missing_normalized_bytes_cannot_publish_a_partial_pack) ... ok
+test_30_concurrent_equal_uploads_reuse_one_dataset_and_clean_only_orphans (test_ultimate_data_pack.UltimateDataPackTests.test_30_concurrent_equal_uploads_reuse_one_dataset_and_clean_only_orphans) ... ok
+test_01_empty_case_snapshot_and_versioned_definitions (test_ultimate_graph.UltimateGraphTests.test_01_empty_case_snapshot_and_versioned_definitions) ... ok
+test_02_demand_then_full_pack_and_contextual_config (test_ultimate_graph.UltimateGraphTests.test_02_demand_then_full_pack_and_contextual_config) ... ok
+test_03_candidates_are_not_ready (test_ultimate_graph.UltimateGraphTests.test_03_candidates_are_not_ready) ... ok
+test_04_cross_tenant_and_forged_nodes_denied (test_ultimate_graph.UltimateGraphTests.test_04_cross_tenant_and_forged_nodes_denied) ... ok
+test_05_viewer_and_missing_owners_do_not_change_ready_state (test_ultimate_graph.UltimateGraphTests.test_05_viewer_and_missing_owners_do_not_change_ready_state) ... ok
+test_06_sql_rpc_not_publicly_executable (test_ultimate_graph.UltimateGraphTests.test_06_sql_rpc_not_publicly_executable) ... ok
+test_07_in_progress_completed_approved_are_controlled_metadata (test_ultimate_graph.UltimateGraphTests.test_07_in_progress_completed_approved_are_controlled_metadata) ... ok
+test_08_approved_upstream_unlocks_d2_without_extra_csv (test_ultimate_graph.UltimateGraphTests.test_08_approved_upstream_unlocks_d2_without_extra_csv) ... ok
+test_09_historical_run_selection_does_not_move_graph (test_ultimate_graph.UltimateGraphTests.test_09_historical_run_selection_does_not_move_graph) ... FAIL
+test_10_freshness_changes_do_not_delete_history (test_ultimate_graph.UltimateGraphTests.test_10_freshness_changes_do_not_delete_history) ... FAIL
+test_11_zero_trips_not_applicable_and_history_is_paged (test_ultimate_graph.UltimateGraphTests.test_11_zero_trips_not_applicable_and_history_is_paged) ... ok
+test_12_new_d2_preserves_upstream_and_config_read_is_pure (test_ultimate_graph.UltimateGraphTests.test_12_new_d2_preserves_upstream_and_config_read_is_pure) ... ok
+test_13_map_center_context_home_share_one_projection (test_ultimate_graph.UltimateGraphTests.test_13_map_center_context_home_share_one_projection) ... ok
+test_14_archived_case_is_readable_but_not_configurable (test_ultimate_graph.UltimateGraphTests.test_14_archived_case_is_readable_but_not_configurable) ... ok
+test_15_wrong_case_or_node_run_binding_is_not_selected (test_ultimate_graph.UltimateGraphTests.test_15_wrong_case_or_node_run_binding_is_not_selected) ... ok
+test_16_approval_and_snapshot_definitions_are_not_mutated_by_reads (test_ultimate_graph.UltimateGraphTests.test_16_approval_and_snapshot_definitions_are_not_mutated_by_reads) ... ok
+test_17_runtime_and_admission_stay_closed_with_complete_inputs (test_ultimate_graph.UltimateGraphTests.test_17_runtime_and_admission_stay_closed_with_complete_inputs) ... ok
+test_18_superseded_downstream_keeps_count_history_actors_and_upstream (test_ultimate_graph.UltimateGraphTests.test_18_superseded_downstream_keeps_count_history_actors_and_upstream) ... FAIL
+test_19_home_attention_outside_recent_cases_uses_current_graph (test_ultimate_graph.UltimateGraphTests.test_19_home_attention_outside_recent_cases_uses_current_graph) ... ok
+test_01_empty_preparation_is_null_and_old_worker_cannot_claim_ultimate (test_ultimate_publication.UltimatePublicationTests.test_01_empty_preparation_is_null_and_old_worker_cannot_claim_ultimate) ... ok
+test_02_sql_canonical_hashes_equal_t1_for_real_package_and_context (test_ultimate_publication.UltimatePublicationTests.test_02_sql_canonical_hashes_equal_t1_for_real_package_and_context) ... ok
+test_03_expired_lease_wrong_worker_and_late_worker_cannot_publish (test_ultimate_publication.UltimatePublicationTests.test_03_expired_lease_wrong_worker_and_late_worker_cannot_publish) ... ok
+test_04_claim_race_only_one_worker_owns_run (test_ultimate_publication.UltimatePublicationTests.test_04_claim_race_only_one_worker_owns_run) ... ok
+test_05_wrong_manifest_finish_rolls_back_all_terminal_fields (test_ultimate_publication.UltimatePublicationTests.test_05_wrong_manifest_finish_rolls_back_all_terminal_fields) ... ok
+test_06_package_foreign_artifact_runtime_schema_and_context_rejected (test_ultimate_publication.UltimatePublicationTests.test_06_package_foreign_artifact_runtime_schema_and_context_rejected) ... ok
+test_07_owner_change_after_get_review_is_rechecked_at_post (test_ultimate_publication.UltimatePublicationTests.test_07_owner_change_after_get_review_is_rechecked_at_post) ... ok
+test_08_published_ready_bytes_and_actor_identity_are_immutable (test_ultimate_publication.UltimatePublicationTests.test_08_published_ready_bytes_and_actor_identity_are_immutable) ... ok
+test_09_metadata_same_semantic_pack_version_preserve_d1_then_consumed_change_invalidates (test_ultimate_publication.UltimatePublicationTests.test_09_metadata_same_semantic_pack_version_preserve_d1_then_consumed_change_invalidates) ... ok
+test_10_lineage_conceptual_d2_sources_and_new_d1_closure_preserve_history (test_ultimate_publication.UltimatePublicationTests.test_10_lineage_conceptual_d2_sources_and_new_d1_closure_preserve_history) ... ok
+test_11_checked_functions_are_service_only_and_read_checks_membership (test_ultimate_publication.UltimatePublicationTests.test_11_checked_functions_are_service_only_and_read_checks_membership) ... ok
+test_12_d2_only_enrichment_metadata_does_not_invalidate_nonconsumer_d1 (test_ultimate_publication.UltimatePublicationTests.test_12_d2_only_enrichment_metadata_does_not_invalidate_nonconsumer_d1) ... ok
+test_13_service_role_cannot_admit_unbound_storage_model_or_readset (test_ultimate_publication.UltimatePublicationTests.test_13_service_role_cannot_admit_unbound_storage_model_or_readset) ... ok
+test_L_A_D_F_pending_replacement_history_selection_and_replay_are_pure (test_ultimate_run_lineage.UltimateRunLineageTests.test_L_A_D_F_pending_replacement_history_selection_and_replay_are_pure) ... ok
+test_L_B_C_E_two_historical_d2_sources_remain_on_A_after_approved_B (test_ultimate_run_lineage.UltimateRunLineageTests.test_L_B_C_E_two_historical_d2_sources_remain_on_A_after_approved_B) ... ok
+test_01_fresh_and_upgrade_catalog_match_without_rewriting_legacy (test_ultimate_schema.UltimateSchemaTests.test_01_fresh_and_upgrade_catalog_match_without_rewriting_legacy) ... ok
+test_02_empty_case_initial_pack_is_atomic_and_legacy_pair_stays_required (test_ultimate_schema.UltimateSchemaTests.test_02_empty_case_initial_pack_is_atomic_and_legacy_pair_stays_required) ... ok
+test_03_model_version_fk_is_tenant_safe (test_ultimate_schema.UltimateSchemaTests.test_03_model_version_fk_is_tenant_safe) ... ok
+test_04_case_model_fk_is_tenant_safe (test_ultimate_schema.UltimateSchemaTests.test_04_case_model_fk_is_tenant_safe) ... ok
+test_05_pack_case_fk_is_tenant_safe (test_ultimate_schema.UltimateSchemaTests.test_05_pack_case_fk_is_tenant_safe) ... ok
+test_06_pack_version_and_current_pointer_cannot_cross_case (test_ultimate_schema.UltimateSchemaTests.test_06_pack_version_and_current_pointer_cannot_cross_case) ... ok
+test_07_entry_dataset_fk_rejects_cross_tenant (test_ultimate_schema.UltimateSchemaTests.test_07_entry_dataset_fk_rejects_cross_tenant) ... ok
+test_08_published_versions_and_entries_are_immutable (test_ultimate_schema.UltimateSchemaTests.test_08_published_versions_and_entries_are_immutable) ... ok
+test_09_case_binding_and_frozen_policy_cannot_be_rewritten (test_ultimate_schema.UltimateSchemaTests.test_09_case_binding_and_frozen_policy_cannot_be_rewritten) ... ok
+test_10_dataset_interpretation_is_required_immutable_and_dedup_is_versioned (test_ultimate_schema.UltimateSchemaTests.test_10_dataset_interpretation_is_required_immutable_and_dedup_is_versioned) ... ok
+test_11_run_pins_case_model_pack_and_is_immutable (test_ultimate_schema.UltimateSchemaTests.test_11_run_pins_case_model_pack_and_is_immutable) ... ok
+test_12_run_cannot_use_another_cases_pack_or_unpinned_primary_dataset (test_ultimate_schema.UltimateSchemaTests.test_12_run_cannot_use_another_cases_pack_or_unpinned_primary_dataset) ... ok
+test_13_prepared_metadata_does_not_mean_ready (test_ultimate_schema.UltimateSchemaTests.test_13_prepared_metadata_does_not_mean_ready) ... ok
+test_14_ready_requires_exact_run_manifest_and_fingerprint (test_ultimate_schema.UltimateSchemaTests.test_14_ready_requires_exact_run_manifest_and_fingerprint) ... ok
+test_15_artifact_tenant_path_schema_and_size_are_closed (test_ultimate_schema.UltimateSchemaTests.test_15_artifact_tenant_path_schema_and_size_are_closed) ... ok
+test_16_legacy_null_provenance_remains_valid (test_ultimate_schema.UltimateSchemaTests.test_16_legacy_null_provenance_remains_valid) ... ok
+test_17_provenance_uses_same_run_fingerprint_and_ready_artifact (test_ultimate_schema.UltimateSchemaTests.test_17_provenance_uses_same_run_fingerprint_and_ready_artifact) ... ok
+test_18_rls_membership_read_positives_and_negatives (test_ultimate_schema.UltimateSchemaTests.test_18_rls_membership_read_positives_and_negatives) ... ok
+test_19_no_client_or_service_direct_writes_and_private_registry_is_release_only (test_ultimate_schema.UltimateSchemaTests.test_19_no_client_or_service_direct_writes_and_private_registry_is_release_only) ... ok
+test_20_no_public_grants_new_functions_or_tables_and_defaults_preserved (test_ultimate_schema.UltimateSchemaTests.test_20_no_public_grants_new_functions_or_tables_and_defaults_preserved) ... ok
+test_21_empty_case_home_center_and_legacy_case_list_are_read_only (test_ultimate_schema.UltimateSchemaTests.test_21_empty_case_home_center_and_legacy_case_list_are_read_only) ... ok
+test_22_data_hub_tracks_pack_usage_and_prevents_object_deletion (test_ultimate_schema.UltimateSchemaTests.test_22_data_hub_tracks_pack_usage_and_prevents_object_deletion) ... ok
+test_23_catalog_has_composite_fks_for_all_required_edges (test_ultimate_schema.UltimateSchemaTests.test_23_catalog_has_composite_fks_for_all_required_edges) ... ok
+test_24_terminal_publication_metadata_and_history_cannot_be_rewritten (test_ultimate_schema.UltimateSchemaTests.test_24_terminal_publication_metadata_and_history_cannot_be_rewritten) ... ok
+test_25_entry_version_fk_cannot_cross_case (test_ultimate_schema.UltimateSchemaTests.test_25_entry_version_fk_cannot_cross_case) ... ok
+test_26_prepared_to_ready_binding_can_commit_without_rewriting_identity (test_ultimate_schema.UltimateSchemaTests.test_26_prepared_to_ready_binding_can_commit_without_rewriting_identity) ... ok
+
+======================================================================
+ERROR: setUpClass (test_ultimate_case_models.UltimateCaseSQLTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Dation/backend/tests/integration/test_ultimate_case_models.py", line 37, in setUpClass
+    super().setUpClass()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "/workspace/Dation/backend/tests/integration/ultimate_sql_support.py", line 138, in setUpClass
+    cls.verify_owner()
+    ~~~~~~~~~~~~~~~~^^
+  File "/workspace/Dation/backend/tests/integration/test_ultimate_case_models.py", line 32, in verify_owner
+    if result.returncode or result.stdout.strip()!='T3|codex-dation':raise RuntimeError('S3 requires its labelled owned T3 sandbox')
+                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: S3 requires its labelled owned T3 sandbox
+
+======================================================================
+FAIL: test_09_historical_run_selection_does_not_move_graph (test_ultimate_graph.UltimateGraphTests.test_09_historical_run_selection_does_not_move_graph)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Dation/backend/tests/integration/test_ultimate_graph.py", line 60, in test_09_historical_run_selection_does_not_move_graph
+    self.full();old=install_run(self.s,self.a,self.cid,approved=True);new=install_run(self.s,self.a,self.cid,status='queued');before=self.graph()['graph'];selected=self.ok(self.a.get(self.base+'/graph',params={'node_id':D1,'run_id':old}));self.assertEqual(selected['selected_run']['id'],old);self.assertEqual(selected['graph'],before);self.assertEqual(self.nodes()[D1]['run_id'],new)
+                                                                                                                                                                                                                                                                                                                                               ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '6b716d0f-20fd-4156-bf9f-4ed5ca7264d1' != 'e762155c-ced6-45d0-9d59-414156b97b89'
+- 6b716d0f-20fd-4156-bf9f-4ed5ca7264d1
++ e762155c-ced6-45d0-9d59-414156b97b89
+
+
+======================================================================
+FAIL: test_10_freshness_changes_do_not_delete_history (test_ultimate_graph.UltimateGraphTests.test_10_freshness_changes_do_not_delete_history)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Dation/backend/tests/integration/test_ultimate_graph.py", line 62, in test_10_freshness_changes_do_not_delete_history
+    self.full();rid=install_run(self.s,self.a,self.cid,approved=True);raw=self.a.get(self.base+'/data/templates/transport_demand').content.replace(b'ORD-001',b'ORD-999');self.publish(raw=raw);n=self.nodes();self.assertEqual(n[D1]['freshness'],'STALE');self.assertEqual(n[D2]['node_state'],'LOCKED');self.assertEqual(self.s.sql(f"SELECT count(*) FROM decision_runs WHERE id='{rid}' AND approved_at IS NOT NULL;"),'1')
+                                                                                                                                                                                                               ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'NOT_EVALUATED' != 'STALE'
+- NOT_EVALUATED
++ STALE
+
+
+======================================================================
+FAIL: test_18_superseded_downstream_keeps_count_history_actors_and_upstream (test_ultimate_graph.UltimateGraphTests.test_18_superseded_downstream_keeps_count_history_actors_and_upstream)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Dation/backend/tests/integration/test_ultimate_graph.py", line 91, in test_18_superseded_downstream_keeps_count_history_actors_and_upstream
+    n=self.nodes()[D2];self.assertEqual(n['node_state'],'LOCKED');self.assertEqual(n['history_count'],1)
+                       ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'APPROVED' != 'LOCKED'
+- APPROVED
++ LOCKED
+
+
+----------------------------------------------------------------------
+Ran 136 tests in 392.213s
+
+FAILED (failures=3, errors=1)
+Progressive evidence verified: exact functions, tables, columns, constraints, indexes, triggers, RLS and privileges.
+Progressive evidence verified: exact functions, tables, columns, constraints, indexes, triggers, RLS and privileges.

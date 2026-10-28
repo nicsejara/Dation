@@ -1,0 +1,461 @@
+{
+  "scope": "unchanged exact T11 PERF11 D1 fixture; observations only, no decisions altered",
+  "total_probe_wall_seconds_including_separate_D2": 103.08531435698387,
+  "d1_engine_assembler_seconds": 90.29307470898493,
+  "stages": {
+    "native_solver": {
+      "calls": 16,
+      "inclusive_seconds": 4.169674683013,
+      "exclusive_seconds": 4.169674683013
+    },
+    "optimization_formulation_and_solves": {
+      "calls": 4,
+      "inclusive_seconds": 4.339407609018963,
+      "exclusive_seconds": 0.17293475300539285
+    },
+    "candidate_generation_and_optimization": {
+      "calls": 4,
+      "inclusive_seconds": 4.841408095002407,
+      "exclusive_seconds": 0.5020004859834444
+    },
+    "temporal_kernel": {
+      "calls": 4,
+      "inclusive_seconds": 0.04447539002285339,
+      "exclusive_seconds": 0.041273563023423776
+    },
+    "independent_structural_certification": {
+      "calls": 8,
+      "inclusive_seconds": 18.545423565024976,
+      "exclusive_seconds": 18.545423565024976
+    },
+    "structural_plan_evidence": {
+      "calls": 4,
+      "inclusive_seconds": 35.15451862095506,
+      "exclusive_seconds": 21.066619466932025
+    },
+    "independent_policy_certification": {
+      "calls": 4,
+      "inclusive_seconds": 9.468675859010546,
+      "exclusive_seconds": 0.12526796298334375
+    },
+    "policy_candidate:RECOMMENDED": {
+      "calls": 1,
+      "inclusive_seconds": 15.40240938300849,
+      "exclusive_seconds": 2.107740152045153
+    },
+    "policy_candidate:MAXIMIZE_OWN_CAPACITY": {
+      "calls": 1,
+      "inclusive_seconds": 11.318655145994853,
+      "exclusive_seconds": 1.8517658969794866
+    },
+    "policy_candidate:MINIMIZE_TRIPS": {
+      "calls": 1,
+      "inclusive_seconds": 11.557749697996769,
+      "exclusive_seconds": 2.035095775005175
+    },
+    "policy_candidate:MAXIMIZE_SERVICE": {
+      "calls": 1,
+      "inclusive_seconds": 14.013345087994821,
+      "exclusive_seconds": 1.6743630109995138
+    },
+    "recommended_and_alternatives": {
+      "calls": 1,
+      "inclusive_seconds": 52.45254917998682,
+      "exclusive_seconds": 0.16038986499188468
+    },
+    "independent_assembly_plan_certification": {
+      "calls": 4,
+      "inclusive_seconds": 5.464479675021721,
+      "exclusive_seconds": 5.464479675021721
+    },
+    "artifact_canonical_serialization": {
+      "calls": 4719,
+      "inclusive_seconds": 7.396168406296056,
+      "exclusive_seconds": 7.396168406296056
+    },
+    "dataset_artifact_preparation": {
+      "calls": 18,
+      "inclusive_seconds": 3.426237431995105,
+      "exclusive_seconds": 0.17048604777664877
+    },
+    "evidence_partition_construction": {
+      "calls": 2,
+      "inclusive_seconds": 2.9084169660054613,
+      "exclusive_seconds": 2.9084169660054613
+    },
+    "whole_evidence_merge": {
+      "calls": 2,
+      "inclusive_seconds": 3.519326313980855,
+      "exclusive_seconds": 3.519326313980855
+    },
+    "independent_bundle_certification": {
+      "calls": 1,
+      "inclusive_seconds": 28.032871964998776,
+      "exclusive_seconds": 17.513016619952396
+    },
+    "result_assembly": {
+      "calls": 1,
+      "inclusive_seconds": 37.8400951679796,
+      "exclusive_seconds": 0.8682011389464606
+    }
+  },
+  "sample_count": 2937,
+  "sample_interval_cpu_seconds": 0.02,
+  "top_sampled_leaf_locations": [
+    {
+      "location": "app/results/canonical.py:27:canonical_tree",
+      "samples": 247,
+      "percent": 8.409942117807287
+    },
+    {
+      "location": "app/results/reason_codes.py:16:_wire_fact",
+      "samples": 218,
+      "percent": 7.42254000680967
+    },
+    {
+      "location": "app/domain/logistics/base.py:46:check",
+      "samples": 173,
+      "percent": 5.89036431733061
+    },
+    {
+      "location": "app/domain/logistics/base.py:39:check",
+      "samples": 159,
+      "percent": 5.413687436159346
+    },
+    {
+      "location": "app/domain/logistics/base.py:56:immutable_maps",
+      "samples": 158,
+      "percent": 5.379639087504256
+    },
+    {
+      "location": "app/results/canonical.py:71:canonical_tree",
+      "samples": 152,
+      "percent": 5.175348995573715
+    },
+    {
+      "location": "app/domain/logistics/base.py:53:immutable_maps",
+      "samples": 146,
+      "percent": 4.971058903643173
+    },
+    {
+      "location": "app/results/canonical.py:87:canonical_bytes",
+      "samples": 111,
+      "percent": 3.7793667007150153
+    },
+    {
+      "location": "app/domain/logistics/base.py:25:freeze",
+      "samples": 105,
+      "percent": 3.575076608784474
+    },
+    {
+      "location": "app/domain/logistics/base.py:23:freeze",
+      "samples": 95,
+      "percent": 3.2345931222335715
+    },
+    {
+      "location": "app/results/reason_codes.py:17:_wire_fact",
+      "samples": 82,
+      "percent": 2.7919645897173986
+    },
+    {
+      "location": "app/domain/logistics/base.py:55:immutable_maps",
+      "samples": 77,
+      "percent": 2.6217228464419478
+    },
+    {
+      "location": "app/results/canonical.py:20:_data",
+      "samples": 65,
+      "percent": 2.213142662580865
+    },
+    {
+      "location": "app/results/canonical.py:37:canonical_tree",
+      "samples": 64,
+      "percent": 2.179094313925775
+    },
+    {
+      "location": "app/domain/logistics/base.py:27:<genexpr>",
+      "samples": 58,
+      "percent": 1.9748042219952333
+    },
+    {
+      "location": "app/domain/logistics/base.py:36:exact_numeric_input",
+      "samples": 55,
+      "percent": 1.8726591760299625
+    },
+    {
+      "location": "app/engines/assignment/transport_validator.py:238:<genexpr>",
+      "samples": 50,
+      "percent": 1.7024174327545114
+    },
+    {
+      "location": "app/results/canonical.py:174:artifact_bytes",
+      "samples": 49,
+      "percent": 1.6683690840994212
+    },
+    {
+      "location": "app/domain/logistics/base.py:27:freeze",
+      "samples": 47,
+      "percent": 1.6002723867892408
+    },
+    {
+      "location": "app/results/canonical.py:79:canonical_tree",
+      "samples": 46,
+      "percent": 1.5662240381341506
+    },
+    {
+      "location": "app/results/canonical.py:76:canonical_tree",
+      "samples": 42,
+      "percent": 1.4300306435137895
+    },
+    {
+      "location": "app/engines/assignment/transport_plan.py:202:<genexpr>",
+      "samples": 40,
+      "percent": 1.361933946203609
+    },
+    {
+      "location": "app/results/canonical.py:38:canonical_tree",
+      "samples": 33,
+      "percent": 1.1235955056179776
+    },
+    {
+      "location": "app/domain/logistics/base.py:49:check",
+      "samples": 33,
+      "percent": 1.1235955056179776
+    },
+    {
+      "location": "app/results/validation.py:148:_validate_bundle",
+      "samples": 32,
+      "percent": 1.0895471569628874
+    },
+    {
+      "location": "app/results/canonical.py:19:_data",
+      "samples": 31,
+      "percent": 1.055498808307797
+    },
+    {
+      "location": "app/results/canonical.py:162:check",
+      "samples": 31,
+      "percent": 1.055498808307797
+    },
+    {
+      "location": "app/results/canonical.py:163:check",
+      "samples": 27,
+      "percent": 0.9193054136874361
+    },
+    {
+      "location": "app/engines/assignment/transport_validator.py:29:check",
+      "samples": 24,
+      "percent": 0.8171603677221655
+    },
+    {
+      "location": "app/domain/logistics/base.py:43:check",
+      "samples": 22,
+      "percent": 0.7490636704119851
+    },
+    {
+      "location": "app/results/canonical.py:41:canonical_tree",
+      "samples": 16,
+      "percent": 0.5447735784814437
+    },
+    {
+      "location": "app/domain/logistics/transit.py:38:estimate",
+      "samples": 15,
+      "percent": 0.5107252298263534
+    },
+    {
+      "location": "app/engines/assignment/transport_policies.py:111:optimize",
+      "samples": 14,
+      "percent": 0.47667688117126317
+    },
+    {
+      "location": "app/domain/logistics/base.py:44:check",
+      "samples": 14,
+      "percent": 0.47667688117126317
+    },
+    {
+      "location": "app/domain/logistics/transit.py:33:estimate",
+      "samples": 13,
+      "percent": 0.44262853251617296
+    }
+  ],
+  "top_sampled_inclusive_locations": [
+    {
+      "location": "app/engines/assignment/transport_policy_result.py:58:run_transport_policy",
+      "samples": 1279,
+      "percent": 43.5478379298604
+    },
+    {
+      "location": "app/results/assembler.py:76:assemble",
+      "samples": 1195,
+      "percent": 40.68777664283282
+    },
+    {
+      "location": "app/engines/assignment/transport_policy_result.py:71:_produce",
+      "samples": 1108,
+      "percent": 37.72557030983997
+    },
+    {
+      "location": "app/results/assembler.py:177:_assemble",
+      "samples": 823,
+      "percent": 28.02179094313926
+    },
+    {
+      "location": "app/results/validation.py:131:validate_bundle",
+      "samples": 822,
+      "percent": 27.987742594484168
+    },
+    {
+      "location": "app/domain/logistics/base.py:46:check",
+      "samples": 748,
+      "percent": 25.46816479400749
+    },
+    {
+      "location": "app/results/canonical.py:79:canonical_tree",
+      "samples": 648,
+      "percent": 22.06332992849847
+    },
+    {
+      "location": "app/engines/assignment/transport_validator.py:19:certify_transport_plan",
+      "samples": 466,
+      "percent": 15.866530473272046
+    },
+    {
+      "location": "app/domain/logistics/base.py:56:immutable_maps",
+      "samples": 463,
+      "percent": 15.764385427306776
+    },
+    {
+      "location": "app/engines/assignment/transport_policy_result.py:52:run_transport_policy",
+      "samples": 453,
+      "percent": 15.423901940755874
+    },
+    {
+      "location": "app/domain/logistics/base.py:50:exact_numeric_input",
+      "samples": 401,
+      "percent": 13.653387810691182
+    },
+    {
+      "location": "app/results/canonical.py:82:canonical_tree",
+      "samples": 396,
+      "percent": 13.48314606741573
+    },
+    {
+      "location": "app/results/reason_codes.py:18:_wire_fact",
+      "samples": 372,
+      "percent": 12.665985699693564
+    },
+    {
+      "location": "app/results/canonical.py:87:canonical_bytes",
+      "samples": 350,
+      "percent": 11.91692202928158
+    },
+    {
+      "location": "app/engines/assignment/transport_plan.py:239:_run",
+      "samples": 329,
+      "percent": 11.201906707524685
+    },
+    {
+      "location": "app/engines/assignment/transport_policy_result.py:183:_produce",
+      "samples": 329,
+      "percent": 11.201906707524685
+    },
+    {
+      "location": "app/engines/assignment/transport_policy_validator.py:12:certify_policy_result",
+      "samples": 323,
+      "percent": 10.997616615594143
+    },
+    {
+      "location": "app/engines/assignment/transport_plan.py:237:_run",
+      "samples": 315,
+      "percent": 10.725229826353422
+    },
+    {
+      "location": "app/results/canonical.py:27:canonical_tree",
+      "samples": 247,
+      "percent": 8.409942117807287
+    },
+    {
+      "location": "app/results/canonical.py:169:check",
+      "samples": 226,
+      "percent": 7.6949267960503915
+    },
+    {
+      "location": "app/domain/logistics/base.py:25:freeze",
+      "samples": 225,
+      "percent": 7.6608784473953015
+    },
+    {
+      "location": "app/results/validation.py:17:validate_certified_plan",
+      "samples": 225,
+      "percent": 7.6608784473953015
+    },
+    {
+      "location": "app/results/validation.py:22:_validate_plan",
+      "samples": 219,
+      "percent": 7.45658835546476
+    },
+    {
+      "location": "app/results/reason_codes.py:16:_wire_fact",
+      "samples": 218,
+      "percent": 7.42254000680967
+    },
+    {
+      "location": "app/engines/assignment/transport_policy_result.py:181:_produce",
+      "samples": 217,
+      "percent": 7.38849165815458
+    },
+    {
+      "location": "app/results/validation.py:182:same",
+      "samples": 187,
+      "percent": 6.367041198501872
+    },
+    {
+      "location": "app/engines/assignment/transport_validator.py:22:certify_transport_plan",
+      "samples": 169,
+      "percent": 5.754170922710249
+    },
+    {
+      "location": "app/domain/logistics/base.py:49:check",
+      "samples": 161,
+      "percent": 5.481784133469526
+    },
+    {
+      "location": "app/domain/logistics/base.py:39:check",
+      "samples": 159,
+      "percent": 5.413687436159346
+    },
+    {
+      "location": "app/results/canonical.py:71:canonical_tree",
+      "samples": 152,
+      "percent": 5.175348995573715
+    },
+    {
+      "location": "app/engines/assignment/transport_plan.py:201:_run",
+      "samples": 148,
+      "percent": 5.039155600953354
+    },
+    {
+      "location": "app/domain/logistics/base.py:27:freeze",
+      "samples": 148,
+      "percent": 5.039155600953354
+    },
+    {
+      "location": "app/engines/assignment/transport_plan.py:118:constraint",
+      "samples": 147,
+      "percent": 5.005107252298264
+    },
+    {
+      "location": "app/domain/logistics/base.py:53:immutable_maps",
+      "samples": 146,
+      "percent": 4.971058903643173
+    },
+    {
+      "location": "app/results/validation.py:163:<genexpr>",
+      "samples": 129,
+      "percent": 4.39223697650664
+    }
+  ],
+  "input_context_loading": "Existing PERF11 is in-memory typed fixtures; no DB/Storage loading in these two recorded stages. Full worker coverage must be measured separately.",
+  "contract_normalization": "Frozen normalized DTO input; no CSV normalization inside engine/assembler. Request schema checks remain in measured engine.",
+  "snapshot_evidence_overhead": "Golden full-publication descriptors written at outer assembly boundary; counted in diagnostic wrapper inclusive time, not benchmark engine/assembler timer."
+}

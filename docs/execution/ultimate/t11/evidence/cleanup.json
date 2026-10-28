@@ -1,0 +1,12 @@
+{
+  "removed_owned_sql_container": "dation-t11-sql-e1061e5ceb",
+  "verified_labels": {
+    "dation.qa.execution": "T11",
+    "dation.qa.owner": "codex-dation",
+    "dation.qa.phase": "T2"
+  },
+  "running_containers_after": [],
+  "db_and_object_backups_preserved": "/workspace/work/dation-t11/restore-final",
+  "images_preserved_locally": true,
+  "remote_actions": false
+}

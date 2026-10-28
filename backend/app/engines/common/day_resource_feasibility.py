@@ -56,7 +56,7 @@ def day_resource_feasibility(trips, resources, horizon, *, deterministic_budget=
     resources = tuple(TransportResource.model_validate(r) for r in resources)
     if len({t.trip_id for t in trips}) != len(trips) or len({r.resource_id for r in resources}) != len(resources):
         raise ValueError('Duplicate fixed Trip/resource IDs')
-    if len(trips) > 256 or len(resources) > 40 or (horizon.planning_end-horizon.planning_start).days > 365:
+    if len(trips) > 256 or len(resources) > 50 or (horizon.planning_end-horizon.planning_start).days > 365:
         return FeasibilityCertificate(status='UNKNOWN', native_status='NOT_RUN', cause='KERNEL_BUDGET')
     if not 0 <= deterministic_budget <= 30:
         raise ValueError('Invalid deterministic kernel budget')

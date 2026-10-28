@@ -141,8 +141,11 @@ class UltimateCaseSetupTests(unittest.IsolatedAsyncioTestCase):
         (OUT/'responsive-measurements.json').write_text(json.dumps(measurements,indent=2))
     async def test_05_legacy_navigation_and_home_recover_empty_case(self):
         _,_,c=await self.case();cid=c['case']['id']
-        await self.open('/app/ddas/logistics/decisions?case_id='+cid)
-        self.assertIn('/app/ddas/logistics/case',self.page.url);self.assertIn('case_id='+cid,self.page.url)
+        # T5 implements the Map that T3 originally recovered through Setup.
+        await self.page.goto(self.base+'/app/ddas/logistics/decisions?case_id='+cid)
+        await self.page.locator('[data-graph-ready=true]').wait_for()
+        self.assertIn('/app/ddas/logistics/decisions',self.page.url);self.assertIn('case_id='+cid,self.page.url)
+        self.assertEqual(await self.page.locator('[data-graph-node=logistics_assignment]').get_attribute('data-node-state'),'DATA_REQUIRED')
         response=await self.request('PUT','/api/platform/decisions/'+cid+'/data-pack',{'expected_updated_at':c['case']['updated_at'],'orders_dataset_id':str(uuid4()),'fleet_dataset_id':str(uuid4())})
         self.assertEqual(response.status,409)
         readiness=await self.request('GET','/api/platform/decisions/'+cid+'/workflow-readiness');self.assertEqual(readiness.status,409)

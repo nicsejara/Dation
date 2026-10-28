@@ -1,0 +1,211 @@
+test_01_committed_data_events_immutable_isolated_and_keyset (test_activity.ActivityTests.test_01_committed_data_events_immutable_isolated_and_keyset) ... ok
+test_02_real_worker_approval_and_generated_exports (test_activity.ActivityTests.test_02_real_worker_approval_and_generated_exports) ... ok
+test_03_browser_real_home_case_events_and_exports (test_activity.ActivityTests.test_03_browser_real_home_case_events_and_exports) ... ok
+test_04_failed_execution_is_system_event_without_error_contents (test_activity.ActivityTests.test_04_failed_execution_is_system_event_without_error_contents) ... ok
+test_05_deletion_and_new_workspace_are_real_audited_actions (test_activity.ActivityTests.test_05_deletion_and_new_workspace_are_real_audited_actions) ... ok
+test_data_pack_changes_fork_while_preserving_original_people_and_runs (test_case_preparation.CasePreparationTests.test_data_pack_changes_fork_while_preserving_original_people_and_runs) ... ok
+test_identity_survives_reload_and_respects_cas_and_workspace_access (test_case_preparation.CasePreparationTests.test_identity_survives_reload_and_respects_cas_and_workspace_access) ... ok
+test_01_team_browser_invitation_acceptance_assignments_and_access (test_collaboration.CollaborationTests.test_01_team_browser_invitation_acceptance_assignments_and_access) ... ok
+test_02_assigned_approval_handoff_attribution_override_and_retry (test_collaboration.CollaborationTests.test_02_assigned_approval_handoff_attribution_override_and_retry) ... ok
+test_03_invitation_confirmation_expiry_revocation_recipient_and_idempotency (test_collaboration.CollaborationTests.test_03_invitation_confirmation_expiry_revocation_recipient_and_idempotency) ... ok
+test_04_last_admin_concurrency_and_assignment_races (test_collaboration.CollaborationTests.test_04_last_admin_concurrency_and_assignment_races) ... ok
+test_01_library_attribution_pagination_literal_search_and_workspace_boundary (test_data_hub.DataHubTests.test_01_library_attribution_pagination_literal_search_and_workspace_boundary) ... ok
+test_02_detail_preview_filters_and_derived_packs_preserve_case_history (test_data_hub.DataHubTests.test_02_detail_preview_filters_and_derived_packs_preserve_case_history) ... ok
+test_03_data_hub_survives_disabled_dda_but_reuse_and_viewer_writes_are_denied (test_data_hub.DataHubTests.test_03_data_hub_survives_disabled_dda_but_reuse_and_viewer_writes_are_denied) ... ok
+test_04_deletion_is_recoverable_and_prevents_new_references (test_data_hub.DataHubTests.test_04_deletion_is_recoverable_and_prevents_new_references) ... ok
+test_05_row_lock_conflict_returns_retryable_error_without_deleting_storage (test_data_hub.DataHubTests.test_05_row_lock_conflict_returns_retryable_error_without_deleting_storage) ... ok
+test_06_real_browser_dda_upload_library_lineage_download_and_safe_delete (test_data_hub.DataHubTests.test_06_real_browser_dda_upload_library_lineage_download_and_safe_delete) ... ok
+test_07_failed_upload_cleanup_is_tracked_and_workspace_authorized (test_data_hub.DataHubTests.test_07_failed_upload_cleanup_is_tracked_and_workspace_authorized) ... ok
+test_08_historical_unknown_attribution_and_validation_are_not_invented (test_data_hub.DataHubTests.test_08_historical_unknown_attribution_and_validation_are_not_invented) ... ok
+test_09_v2_summary_composed_filters_historical_lineage_and_read_purity (test_data_hub.DataHubTests.test_09_v2_summary_composed_filters_historical_lineage_and_read_purity) ... ok
+test_10_lost_committed_upload_response_preserves_metadata_and_bytes (test_data_hub.DataHubTests.test_10_lost_committed_upload_response_preserves_metadata_and_bytes) ... ok
+test_11_dda_interrupted_upload_is_visible_and_recoverable_in_hub (test_data_hub.DataHubTests.test_11_dda_interrupted_upload_is_visible_and_recoverable_in_hub) ... ok
+test_01_case_library_labels_pagination_identity_and_isolation (test_decision_center.DecisionCenterTests.test_01_case_library_labels_pagination_identity_and_isolation) ... ok
+test_02_live_workflow_completion_review_lineage_history_and_read_purity (test_decision_center.DecisionCenterTests.test_02_live_workflow_completion_review_lineage_history_and_read_purity) ... ok
+test_03_historical_attribution_is_unknown_and_inactive_members_cannot_read (test_decision_center.DecisionCenterTests.test_03_historical_attribution_is_unknown_and_inactive_members_cannot_read) ... ok
+test_04_portfolio_summary_is_global_actionable_and_read_only (test_decision_center.DecisionCenterTests.test_04_portfolio_summary_is_global_actionable_and_read_only) ... ok
+test_05_portfolio_five_thousand_cases_remains_bounded (test_decision_center.DecisionCenterTests.test_05_portfolio_five_thousand_cases_remains_bounded) ... ok
+test_actual_rerun_routing_and_lineage_scenarios_a_through_f (test_final_polish_lineage.FinalPolishLineageTests.test_actual_rerun_routing_and_lineage_scenarios_a_through_f) ... ok
+test_fresh_schema_owner_nonowner_viewer_and_tenant_boundaries (test_home_owner_attention.HomeOwnerAttentionTests.test_fresh_schema_owner_nonowner_viewer_and_tenant_boundaries) ... ok
+test_operator_owner_admin_override_role_loss_and_handoff (test_home_owner_attention.HomeOwnerAttentionTests.test_operator_owner_admin_override_role_loss_and_handoff) ... ok
+test_upgrade_preserves_history_rows_function_identity_and_execute_acl (test_home_owner_attention.HomeOwnerAttentionTests.test_upgrade_preserves_history_rows_function_identity_and_execute_acl) ... ok
+test_01_personal_exploration_is_idempotent_and_tenant_authorized (test_onboarding.OnboardingTests.test_01_personal_exploration_is_idempotent_and_tenant_authorized) ... ok
+test_02_sample_concurrency_preserves_default_and_existing_file_origin (test_onboarding.OnboardingTests.test_02_sample_concurrency_preserves_default_and_existing_file_origin) ... ok
+test_03_golden_pack_runs_both_real_decisions_and_remains_demo (test_onboarding.OnboardingTests.test_03_golden_pack_runs_both_real_decisions_and_remains_demo) ... ok
+test_04_browser_first_run_empty_states_demo_and_recovery (test_onboarding.OnboardingTests.test_04_browser_first_run_empty_states_demo_and_recovery) ... ok
+test_existing_steward_assignment_keeps_person_actor_and_version (test_optimized_responsibilities.DataRoleMigrationTests.test_existing_steward_assignment_keeps_person_actor_and_version) ... ok
+test_archive_persists_reloads_and_preserves_case_history_and_assignments (test_optimized_responsibilities.OptimizedResponsibilityTests.test_archive_persists_reloads_and_preserves_case_history_and_assignments) ... ok
+test_legacy_assignment_projects_to_its_explicit_role_without_ambiguous_overwrite (test_optimized_responsibilities.OptimizedResponsibilityTests.test_legacy_assignment_projects_to_its_explicit_role_without_ambiguous_overwrite) ... ok
+test_split_roles_reload_independent_node_assignments_and_actual_approval (test_optimized_responsibilities.OptimizedResponsibilityTests.test_split_roles_reload_independent_node_assignments_and_actual_approval) ... ok
+test_another_operator_cannot_execute_or_approve_the_assigned_owners_decision (test_saga3.Saga3Tests.test_another_operator_cannot_execute_or_approve_the_assigned_owners_decision) ... ok
+test_attributes_keep_case_but_different_data_pack_forks_idempotently (test_saga3.Saga3Tests.test_attributes_keep_case_but_different_data_pack_forks_idempotently) ... ok
+test_legacy_steward_remains_historical_but_is_operationally_a_data_owner (test_saga3.Saga3Tests.test_legacy_steward_remains_historical_but_is_operationally_a_data_owner) ... ok
+test_multiple_runs_reopen_current_and_downstream_without_destroying_evidence (test_saga3.Saga3Tests.test_multiple_runs_reopen_current_and_downstream_without_destroying_evidence) ... ok
+test_readiness_requires_applied_attributes_and_each_canonical_owner (test_saga3.Saga3Tests.test_readiness_requires_applied_attributes_and_each_canonical_owner) ... ok
+test_upgrade_reopening_preserves_a_run_selected_after_other_candidates (test_saga3.Saga3Tests.test_upgrade_reopening_preserves_a_run_selected_after_other_candidates) ... ok
+test_joint_apply_and_metadata_or_owner_edits_keep_case_and_four_part_readiness (test_saga5_attributes.Saga5AttributesTests.test_joint_apply_and_metadata_or_owner_edits_keep_case_and_four_part_readiness) ... ok
+test_joint_submit_preserves_tenant_viewer_and_admin_only_owner_permissions (test_saga5_attributes.Saga5AttributesTests.test_joint_submit_preserves_tenant_viewer_and_admin_only_owner_permissions) ... ok
+test_owner_conflicts_and_ineligible_people_roll_back_all_attributes_and_audit (test_saga5_attributes.Saga5AttributesTests.test_owner_conflicts_and_ineligible_people_roll_back_all_attributes_and_audit) ... ok
+test_owned_resources_are_released_after_success_and_startup_failure (test_sandbox_cleanup.SandboxCleanupTests.test_owned_resources_are_released_after_success_and_startup_failure) ... storage-0.log
+INFO:     Started server process [388270]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:37007 (Press CTRL+C to quit)
+INFO:     127.0.0.1:39476 - "GET /rest/v1/ HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [388270]
+
+ok
+test_01_identical_bytes_are_separate_and_all_cross_object_reads_fail (test_tenancy.TenancyTests.test_01_identical_bytes_are_separate_and_all_cross_object_reads_fail) ... ok
+test_02_defaults_and_parent_case_injections_cannot_cross_workspaces (test_tenancy.TenancyTests.test_02_defaults_and_parent_case_injections_cannot_cross_workspaces) ... ok
+test_03_roles_disabled_members_and_identity_forgery (test_tenancy.TenancyTests.test_03_roles_disabled_members_and_identity_forgery) ... ok
+test_04_invalid_and_expired_jwt_and_basic_are_rejected (test_tenancy.TenancyTests.test_04_invalid_and_expired_jwt_and_basic_are_rejected) ... /workspace/Dation/.venv/lib/python3.13/site-packages/jwt/api_jwt.py:149: InsecureKeyLengthWarning: The HMAC key is 13 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+  return self._jws.encode(
+ok
+test_05_direct_rest_rls_rpc_and_storage_deny_cross_access (test_tenancy.TenancyTests.test_05_direct_rest_rls_rpc_and_storage_deny_cross_access) ... ok
+test_06_worker_preserves_tenant_and_cross_runs_evidence_are_blocked (test_tenancy.TenancyTests.test_06_worker_preserves_tenant_and_cross_runs_evidence_are_blocked) ... ok
+test_07_login_refresh_logout_cookie_security_and_csrf (test_tenancy.TenancyTests.test_07_login_refresh_logout_cookie_security_and_csrf) ... ok
+test_08_home_snapshot_is_bounded_tenant_scoped_and_read_only (test_tenancy.TenancyTests.test_08_home_snapshot_is_bounded_tenant_scoped_and_read_only) ... ok
+test_09_home_attention_tracks_real_versions_and_removes_approved_or_archived (test_tenancy.TenancyTests.test_09_home_attention_tracks_real_versions_and_removes_approved_or_archived) ... ok
+test_10_entitlements_are_rechecked_per_request_without_affecting_other_workspaces_or_accepted_jobs (test_tenancy.TenancyTests.test_10_entitlements_are_rechecked_per_request_without_affecting_other_workspaces_or_accepted_jobs) ... ok
+test_11_real_browser_catalog_revocation_and_reenable (test_tenancy.TenancyTests.test_11_real_browser_catalog_revocation_and_reenable) ... ok
+test_ultimate_consistency (unittest.loader._FailedTest.test_ultimate_consistency) ... ERROR
+test_ultimate_consumers (unittest.loader._FailedTest.test_ultimate_consumers) ... ERROR
+test_ultimate_d1_result (unittest.loader._FailedTest.test_ultimate_d1_result) ... ERROR
+test_ultimate_d2_lineage (unittest.loader._FailedTest.test_ultimate_d2_lineage) ... ERROR
+test_approved_precedence_actual_actor_and_explicit_candidate_access (test_v2_foundation.FoundationDomainTests.test_approved_precedence_actual_actor_and_explicit_candidate_access) ... ok
+test_multi_responsibility_candidates_cas_and_legacy_compatibility (test_v2_foundation.FoundationDomainTests.test_multi_responsibility_candidates_cas_and_legacy_compatibility) ... ok
+test_private_relations_and_new_rpcs_are_not_direct_client_capabilities (test_v2_foundation.FoundationDomainTests.test_private_relations_and_new_rpcs_are_not_direct_client_capabilities) ... ok
+test_stage_assignments_enforce_eligibility_and_keep_get_read_only (test_v2_foundation.FoundationDomainTests.test_stage_assignments_enforce_eligibility_and_keep_get_read_only) ... ok
+test_legacy_member_is_backfilled_without_rewriting_the_membership (test_v2_foundation.MigrationCompatibilityTests.test_legacy_member_is_backfilled_without_rewriting_the_membership) ... ok
+test_distinct_people_complete_the_golden_workflow_and_cross_surface_matrix (test_v2_golden.GoldenWorkflowTests.test_distinct_people_complete_the_golden_workflow_and_cross_surface_matrix) ... ok
+test_workspace_boundaries_and_viewer_responsibilities_do_not_grant_writes (test_v2_golden.GoldenWorkflowTests.test_workspace_boundaries_and_viewer_responsibilities_do_not_grant_writes) ... ok
+test_accepted_job_survives_api_restart_and_crashed_worker_lease (test_workflow.WorkflowTests.test_accepted_job_survives_api_restart_and_crashed_worker_lease) ... ok
+test_assignment_dashboard_all_objectives_use_actual_worker_evidence (test_workflow.WorkflowTests.test_assignment_dashboard_all_objectives_use_actual_worker_evidence) ... ok
+test_assignment_scheduling_and_replacement_update_history_and_compact_list (test_workflow.WorkflowTests.test_assignment_scheduling_and_replacement_update_history_and_compact_list) ... ok
+test_browser_complete_workflow_at_mobile_width (test_workflow.WorkflowTests.test_browser_complete_workflow_at_mobile_width) ... ok
+test_browser_creation_execution_approval_navigation_and_mobile_history (test_workflow.WorkflowTests.test_browser_creation_execution_approval_navigation_and_mobile_history) ... ok
+test_comparative_error_retry_and_existing_reference_reuse (test_workflow.WorkflowTests.test_comparative_error_retry_and_existing_reference_reuse) ... ok
+test_platform_auth_navigation_profile_and_logout (test_workflow.WorkflowTests.test_platform_auth_navigation_profile_and_logout) ... ok
+test_private_ingestion_deduplication_and_tampered_storage_fail_closed (test_workflow.WorkflowTests.test_private_ingestion_deduplication_and_tampered_storage_fail_closed) ... ok
+test_private_operations_trace_worker_readiness_and_cluster_metrics (test_workflow.WorkflowTests.test_private_operations_trace_worker_readiness_and_cluster_metrics) ... ok
+test_progressive_comparative_recovers_real_worker_without_changing_case_or_history (test_workflow.WorkflowTests.test_progressive_comparative_recovers_real_worker_without_changing_case_or_history) ... ok
+test_scheduling_dashboard_v21_preserves_assignment_and_temporal_relations (test_workflow.WorkflowTests.test_scheduling_dashboard_v21_preserves_assignment_and_temporal_relations) ... ok
+test_atomic_team_edit_keeps_multiple_roles_and_rolls_back_invalid_access (test_workflow_gates.WorkflowGateTests.test_atomic_team_edit_keeps_multiple_roles_and_rolls_back_invalid_access) ... ok
+test_d1_d2_gates_are_independent_and_assigned_approver_is_not_actual_actor (test_workflow_gates.WorkflowGateTests.test_d1_d2_gates_are_independent_and_assigned_approver_is_not_actual_actor) ... ok
+test_new_cases_require_data_owner_and_approver_but_replays_keep_their_result (test_workflow_gates.WorkflowGateTests.test_new_cases_require_data_owner_and_approver_but_replays_keep_their_result) ... ok
+test_role_loss_cross_workspace_forgery_and_policy_changes_do_not_bypass_gates (test_workflow_gates.WorkflowGateTests.test_role_loss_cross_workspace_forgery_and_policy_changes_do_not_bypass_gates) ... ok
+test_existing_case_is_unchanged_and_legacy_actions_remain_available (test_workflow_gates.WorkflowMigrationCompatibilityTests.test_existing_case_is_unchanged_and_legacy_actions_remain_available) ... storage-0.log
+INFO:     Started server process [407334]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:44763 (Press CTRL+C to quit)
+INFO:     127.0.0.1:35188 - "GET /rest/v1/ HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [407334]
+
+api-1.log
+INFO:     Started server process [407339]
+INFO:     Waiting for application startup.
+{"timestamp":"2026-10-28T13:43:27.859147+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+{"timestamp":"2026-10-28T13:43:27.863122+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+{"timestamp":"2026-10-28T13:43:28.086899+00:00","severity":"INFO","component":"api","event":"request_finished","logger":"dation","revision":"local","request_id":"4059978b-ca8a-4fe3-9d64-27a92f1c87c2","trace_id":"ab8184d6870d4bc4a3749f4a5cb75a82","span_id":"57afa7fc38e2484a","route":"/health","method":"GET","status_code":200,"duration_ms":132.394,"logging.googleapis.com/trace":"projects/dation-510100/traces/ab8184d6870d4bc4a3749f4a5cb75a82","logging.googleapis.com/spanId":"57afa7fc38e2484a"}
+{"timestamp":"2026-10-28T13:43:28.284843+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+{"timestamp":"2026-10-28T13:43:28.385641+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+{"timestamp":"2026-10-28T13:43:28.386353+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+{"timestamp":"2026-10-28T13:43:28.386471+00:00","severity":"INFO","component":"api","event":"runtime_log","logger":"uvicorn.error","revision":"local"}
+
+FAIL
+test_01_free_for_existing_and_new_workspaces_secure_validation_and_reads (test_workspace_settings.WorkspaceSettingsTests.test_01_free_for_existing_and_new_workspaces_secure_validation_and_reads) ... ok
+test_02_admin_browser_preferences_free_plan_and_historical_evidence (test_workspace_settings.WorkspaceSettingsTests.test_02_admin_browser_preferences_free_plan_and_historical_evidence) ... ok
+test_03_roles_concurrency_and_dda_status_are_independent_of_free (test_workspace_settings.WorkspaceSettingsTests.test_03_roles_concurrency_and_dda_status_are_independent_of_free) ... ok
+
+======================================================================
+ERROR: test_ultimate_consistency (unittest.loader._FailedTest.test_ultimate_consistency)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_ultimate_consistency
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/unittest/loader.py", line 396, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/usr/lib/python3.13/unittest/loader.py", line 339, in _get_module_from_name
+    __import__(name)
+    ~~~~~~~~~~^^^^^^
+  File "/workspace/Dation/backend/tests/e2e/test_ultimate_consistency.py", line 17, in <module>
+    from ultimate_certification_support import CertificationSandbox
+  File "/workspace/Dation/backend/tests/e2e/ultimate_certification_support.py", line 18, in <module>
+    from ultimate_result_helpers import ok,row,submit,wait_run,approval,publish
+  File "/workspace/Dation/backend/tests/e2e/ultimate_result_helpers.py", line 5, in <module>
+    from tests.test_ultimate_data_contracts import model
+ModuleNotFoundError: No module named 'tests'
+
+
+======================================================================
+ERROR: test_ultimate_consumers (unittest.loader._FailedTest.test_ultimate_consumers)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_ultimate_consumers
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/unittest/loader.py", line 396, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/usr/lib/python3.13/unittest/loader.py", line 339, in _get_module_from_name
+    __import__(name)
+    ~~~~~~~~~~^^^^^^
+  File "/workspace/Dation/backend/tests/e2e/test_ultimate_consumers.py", line 7, in <module>
+    from ultimate_result_helpers import *
+  File "/workspace/Dation/backend/tests/e2e/ultimate_result_helpers.py", line 5, in <module>
+    from tests.test_ultimate_data_contracts import model
+ModuleNotFoundError: No module named 'tests'
+
+
+======================================================================
+ERROR: test_ultimate_d1_result (unittest.loader._FailedTest.test_ultimate_d1_result)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_ultimate_d1_result
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/unittest/loader.py", line 396, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/usr/lib/python3.13/unittest/loader.py", line 339, in _get_module_from_name
+    __import__(name)
+    ~~~~~~~~~~^^^^^^
+  File "/workspace/Dation/backend/tests/e2e/test_ultimate_d1_result.py", line 8, in <module>
+    from ultimate_result_helpers import *
+  File "/workspace/Dation/backend/tests/e2e/ultimate_result_helpers.py", line 5, in <module>
+    from tests.test_ultimate_data_contracts import model
+ModuleNotFoundError: No module named 'tests'
+
+
+======================================================================
+ERROR: test_ultimate_d2_lineage (unittest.loader._FailedTest.test_ultimate_d2_lineage)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_ultimate_d2_lineage
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/unittest/loader.py", line 396, in _find_test_path
+    module = self._get_module_from_name(name)
+  File "/usr/lib/python3.13/unittest/loader.py", line 339, in _get_module_from_name
+    __import__(name)
+    ~~~~~~~~~~^^^^^^
+  File "/workspace/Dation/backend/tests/e2e/test_ultimate_d2_lineage.py", line 8, in <module>
+    from ultimate_result_helpers import *
+  File "/workspace/Dation/backend/tests/e2e/ultimate_result_helpers.py", line 5, in <module>
+    from tests.test_ultimate_data_contracts import model
+ModuleNotFoundError: No module named 'tests'
+
+
+======================================================================
+FAIL: test_existing_case_is_unchanged_and_legacy_actions_remain_available (test_workflow_gates.WorkflowMigrationCompatibilityTests.test_existing_case_is_unchanged_and_legacy_actions_remain_available)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Dation/backend/tests/e2e/test_workflow_gates.py", line 23, in test_existing_case_is_unchanged_and_legacy_actions_remain_available
+    self.assertEqual(s.sql(f"SELECT (to_jsonb(c)-'workflow_policy_version'-'category'-'description'-'attributes_applied_at')::text FROM decision_cases c WHERE id='{cid}';"),captured['case'])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '{"id[236 chars]ll, "horizon_type": null, "planning_end": null[679 chars]ull}' != '{"id[236 chars]ll, "workspace_id": "00000000-0000-4000-8000-0[348 chars]ull}'
+Diff is 1614 characters long. Set self.maxDiff to None to see it.
+
+----------------------------------------------------------------------
+Ran 90 tests in 1552.588s
+
+FAILED (failures=1, errors=4)
+DATION_E2E_RESULT={"passed": false, "tests": 90, "failures": ["test_workflow_gates.WorkflowMigrationCompatibilityTests.test_existing_case_is_unchanged_and_legacy_actions_remain_available"], "errors": ["unittest.loader._FailedTest.test_ultimate_consistency", "unittest.loader._FailedTest.test_ultimate_consumers", "unittest.loader._FailedTest.test_ultimate_d1_result", "unittest.loader._FailedTest.test_ultimate_d2_lineage"], "skipped": [], "failure_details": [{"test": "test_workflow_gates.WorkflowMigrationCompatibilityTests.test_existing_case_is_unchanged_and_legacy_actions_remain_available", "traceback": "Traceback (most recent call last):\n  File \"/workspace/Dation/backend/tests/e2e/test_workflow_gates.py\", line 23, in test_existing_case_is_unchanged_and_legacy_actions_remain_available\n    self.assertEqual(s.sql(f\"SELECT (to_jsonb(c)-'workflow_policy_version'-'category'-'description'-'attributes_applied_at')::text FROM decision_cases c WHERE id='{cid}';\"),captured['case'])\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: '{\"id[236 chars]ll, \"horizon_type\": null, \"planning_end\": null[679 chars]ull}' != '{\"id[236 chars]ll, \"workspace_id\": \"00000000-0000-4000-8000-0[348 chars]ull}'\nDiff is 1614 characters long. Set self.maxDiff to None to see it.\n"}, {"test": "unittest.loader._FailedTest.test_ultimate_consistency", "traceback": "ImportError: Failed to import test module: test_ultimate_consistency\nTraceback (most recent call last):\n  File \"/usr/lib/python3.13/unittest/loader.py\", line 396, in _find_test_path\n    module = self._get_module_from_name(name)\n  File \"/usr/lib/python3.13/unittest/loader.py\", line 339, in _get_module_from_name\n    __import__(name)\n    ~~~~~~~~~~^^^^^^\n  File \"/workspace/Dation/backend/tests/e2e/test_ultimate_consistency.py\", line 17, in <module>\n    from ultimate_certification_support import CertificationSandbox\n  File \"/workspace/Dation/backend/tests/e2e/ultimate_certification_support.py\", line 18, in <module>\n    from ultimate_result_helpers import ok,row,submit,wait_run,approval,publish\n  File \"/workspace/Dation/backend/tests/e2e/ultimate_result_helpers.py\", line 5, in <module>\n    from tests.test_ultimate_data_contracts import model\nModuleNotFoundError: No module named 'tests'\n\n"}, {"test": "unittest.loader._FailedTest.test_ultimate_consumers", "traceback": "ImportError: Failed to import test module: test_ultimate_consumers\nTraceback (most recent call last):\n  File \"/usr/lib/python3.13/unittest/loader.py\", line 396, in _find_test_path\n    module = self._get_module_from_name(name)\n  File \"/usr/lib/python3.13/unittest/loader.py\", line 339, in _get_module_from_name\n    __import__(name)\n    ~~~~~~~~~~^^^^^^\n  File \"/workspace/Dation/backend/tests/e2e/test_ultimate_consumers.py\", line 7, in <module>\n    from ultimate_result_helpers import *\n  File \"/workspace/Dation/backend/tests/e2e/ultimate_result_helpers.py\", line 5, in <module>\n    from tests.test_ultimate_data_contracts import model\nModuleNotFoundError: No module named 'tests'\n\n"}, {"test": "unittest.loader._FailedTest.test_ultimate_d1_result", "traceback": "ImportError: Failed to import test module: test_ultimate_d1_result\nTraceback (most recent call last):\n  File \"/usr/lib/python3.13/unittest/loader.py\", line 396, in _find_test_path\n    module = self._get_module_from_name(name)\n  File \"/usr/lib/python3.13/unittest/loader.py\", line 339, in _get_module_from_name\n    __import__(name)\n    ~~~~~~~~~~^^^^^^\n  File \"/workspace/Dation/backend/tests/e2e/test_ultimate_d1_result.py\", line 8, in <module>\n    from ultimate_result_helpers import *\n  File \"/workspace/Dation/backend/tests/e2e/ultimate_result_helpers.py\", line 5, in <module>\n    from tests.test_ultimate_data_contracts import model\nModuleNotFoundError: No module named 'tests'\n\n"}, {"test": "unittest.loader._FailedTest.test_ultimate_d2_lineage", "traceback": "ImportError: Failed to import test module: test_ultimate_d2_lineage\nTraceback (most recent call last):\n  File \"/usr/lib/python3.13/unittest/loader.py\", line 396, in _find_test_path\n    module = self._get_module_from_name(name)\n  File \"/usr/lib/python3.13/unittest/loader.py\", line 339, in _get_module_from_name\n    __import__(name)\n    ~~~~~~~~~~^^^^^^\n  File \"/workspace/Dation/backend/tests/e2e/test_ultimate_d2_lineage.py\", line 8, in <module>\n    from ultimate_result_helpers import *\n  File \"/workspace/Dation/backend/tests/e2e/ultimate_result_helpers.py\", line 5, in <module>\n    from tests.test_ultimate_data_contracts import model\nModuleNotFoundError: No module named 'tests'\n\n"}]}

@@ -1,0 +1,147 @@
+{
+  "scope": "Diagnostic exact fixture, disjoint exclusive timings; total includes profiled stages only, actual complete Run separately measured",
+  "before_total": 96.27561370798503,
+  "after_total": 65.1254754110123,
+  "stages": [
+    {
+      "stage": "artifact_canonical_serialization",
+      "before_seconds": 7.719657341716811,
+      "before_percent": 8.018289413486801,
+      "after_seconds": 8.138387568411417,
+      "after_percent": 12.496473180501754
+    },
+    {
+      "stage": "candidate_generation_and_optimization",
+      "before_seconds": 0.575515161966905,
+      "before_percent": 0.5977787518576703,
+      "after_seconds": 0.3794183209829498,
+      "after_percent": 0.582595856058492
+    },
+    {
+      "stage": "complete_evidence_reassembly",
+      "before_seconds": 7.620633823011303,
+      "before_percent": 7.915435206806948,
+      "after_seconds": 0,
+      "after_percent": 0.0
+    },
+    {
+      "stage": "dataset_artifact_preparation",
+      "before_seconds": 0.1387541102594696,
+      "before_percent": 0.1441217613842761,
+      "after_seconds": 0.09810966771328822,
+      "after_percent": 0.15064714244941774
+    },
+    {
+      "stage": "evidence_partition_construction",
+      "before_seconds": 2.8615603579964954,
+      "before_percent": 2.9722587556553375,
+      "after_seconds": 1.9763219119922724,
+      "after_percent": 3.034637213040734
+    },
+    {
+      "stage": "independent_assembly_plan_certification",
+      "before_seconds": 7.05947161198128,
+      "before_percent": 7.332564644452401,
+      "after_seconds": 2.7601286220015027,
+      "after_percent": 4.238170400418731
+    },
+    {
+      "stage": "independent_bundle_certification",
+      "before_seconds": 14.972191161039518,
+      "before_percent": 15.551384804932939,
+      "after_seconds": 13.539191739022499,
+      "after_percent": 20.789394094362507
+    },
+    {
+      "stage": "independent_policy_certification",
+      "before_seconds": 0.1406971219694242,
+      "before_percent": 0.14613993777923315,
+      "after_seconds": 0.38898204802535474,
+      "after_percent": 0.5972809343355371
+    },
+    {
+      "stage": "independent_structural_certification",
+      "before_seconds": 19.698905335069867,
+      "before_percent": 20.46095015796929,
+      "after_seconds": 8.41813379796804,
+      "after_percent": 12.926022796517792
+    },
+    {
+      "stage": "native_solver",
+      "before_seconds": 4.025553579005646,
+      "before_percent": 4.181280621295867,
+      "after_seconds": 3.5327235340082552,
+      "after_percent": 5.4244879007991
+    },
+    {
+      "stage": "optimization_formulation_and_solves",
+      "before_seconds": 0.2466178240138106,
+      "before_percent": 0.2561581427689786,
+      "after_seconds": 0.15261731098871678,
+      "after_percent": 0.23434348851280734
+    },
+    {
+      "stage": "policy_candidate:MAXIMIZE_OWN_CAPACITY",
+      "before_seconds": 2.3557385629974306,
+      "before_percent": 2.4468694327336675,
+      "after_seconds": 1.4203034559905063,
+      "after_percent": 2.1808723038516846
+    },
+    {
+      "stage": "policy_candidate:MAXIMIZE_SERVICE",
+      "before_seconds": 1.7709698580147233,
+      "before_percent": 1.839479167991884,
+      "after_seconds": 3.196340158028761,
+      "after_percent": 4.907972092113558
+    },
+    {
+      "stage": "policy_candidate:MINIMIZE_TRIPS",
+      "before_seconds": 2.0095778279937804,
+      "before_percent": 2.0873175985032515,
+      "after_seconds": 2.0125834259961266,
+      "after_percent": 3.0903166745341126
+    },
+    {
+      "stage": "policy_candidate:RECOMMENDED",
+      "before_seconds": 2.3541476679965854,
+      "before_percent": 2.445216994551689,
+      "after_seconds": 1.3357724660309032,
+      "after_percent": 2.0510751861705914
+    },
+    {
+      "stage": "recommended_and_alternatives",
+      "before_seconds": 0.18428332702023908,
+      "before_percent": 0.19141225895395644,
+      "after_seconds": 0.14533055000356399,
+      "after_percent": 0.2231546857606348
+    },
+    {
+      "stage": "result_assembly",
+      "before_seconds": 1.0410230749985203,
+      "before_percent": 1.0812946652888265,
+      "after_seconds": 0.6048869598307647,
+      "after_percent": 0.9288023711355237
+    },
+    {
+      "stage": "structural_plan_evidence",
+      "before_seconds": 21.448859768919647,
+      "before_percent": 22.278600927932278,
+      "after_seconds": 14.079007982974872,
+      "after_percent": 21.618280548619538
+    },
+    {
+      "stage": "temporal_kernel",
+      "before_seconds": 0.050579823029693216,
+      "before_percent": 0.05253648466278035,
+      "after_seconds": 0.03178912401199341,
+      "after_percent": 0.04881211816323735
+    },
+    {
+      "stage": "whole_evidence_merge",
+      "before_seconds": 0,
+      "before_percent": 0.0,
+      "after_seconds": 2.9151098820148036,
+      "after_percent": 4.476143726579042
+    }
+  ]
+}

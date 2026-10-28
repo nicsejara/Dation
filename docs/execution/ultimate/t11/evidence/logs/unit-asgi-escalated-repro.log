@@ -1,0 +1,6 @@
+test_history_endpoint_is_scoped_by_case_and_node (tests.test_decision_run_history_v2.DecisionRunHistoryHTTPTests.test_history_endpoint_is_scoped_by_case_and_node) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.069s
+
+OK

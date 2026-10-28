@@ -29,6 +29,15 @@ class UltimateGraphTests(unittest.TestCase):
     def full(self):self.publish();self.publish('transport_resources')
     def owner(self):
         return self.ok(self.a.put('/api/platform/decisions/'+self.cid+'/responsibilities/data_owner',json={'expected_updated_at':None,'owner_user_id':USER_A}))
+    def admit_current_d1(self):
+        # T8 moved Ultimate invalidation from raw INSERT to checked admission.
+        # Exercise that real boundary; metadata fixtures remain projection-only.
+        from ultimate_result_helpers import submit
+        self.owner()
+        self.s.sql('UPDATE dation_private.platform_release SET ultimate_admissions_enabled=true;')
+        rid,_,response=submit(self.s,self.cid)
+        self.ok(response)
+        return rid
     def test_01_empty_case_snapshot_and_versioned_definitions(self):
         g=self.graph();self.assertEqual([n['node_state'] for n in g['graph']['nodes']],['DATA_REQUIRED','LOCKED']);self.assertFalse(g['graph']['runtime_execution_available']);self.assertEqual(g['case']['id'],self.cid)
     def test_02_demand_then_full_pack_and_contextual_config(self):
@@ -57,9 +66,14 @@ class UltimateGraphTests(unittest.TestCase):
     def test_08_approved_upstream_unlocks_d2_without_extra_csv(self):
         self.full();self.owner();rid=install_run(self.s,self.a,self.cid,approved=True);n=self.nodes();self.assertEqual(n[D1]['node_state'],'APPROVED');self.assertEqual(n[D2]['node_state'],'READY');self.assertEqual(n[D2]['requirements'],[]);self.assertEqual(n[D2]['upstream_run_id'],rid);self.assertEqual(self.ok(self.a.get(self.base+'/graph/config/'+D2))['configuration_context']['upstream_run_id'],rid)
     def test_09_historical_run_selection_does_not_move_graph(self):
-        self.full();old=install_run(self.s,self.a,self.cid,approved=True);new=install_run(self.s,self.a,self.cid,status='queued');before=self.graph()['graph'];selected=self.ok(self.a.get(self.base+'/graph',params={'node_id':D1,'run_id':old}));self.assertEqual(selected['selected_run']['id'],old);self.assertEqual(selected['graph'],before);self.assertEqual(self.nodes()[D1]['run_id'],new)
+        self.full();old=install_run(self.s,self.a,self.cid,approved=True);new=self.admit_current_d1();before=self.graph()['graph'];selected=self.ok(self.a.get(self.base+'/graph',params={'node_id':D1,'run_id':old}));self.assertEqual(selected['selected_run']['id'],old);self.assertEqual(selected['graph'],before);self.assertEqual(self.nodes()[D1]['run_id'],new)
     def test_10_freshness_changes_do_not_delete_history(self):
-        self.full();rid=install_run(self.s,self.a,self.cid,approved=True);raw=self.a.get(self.base+'/data/templates/transport_demand').content.replace(b'ORD-001',b'ORD-999');self.publish(raw=raw);n=self.nodes();self.assertEqual(n[D1]['freshness'],'STALE');self.assertEqual(n[D2]['node_state'],'LOCKED');self.assertEqual(self.s.sql(f"SELECT count(*) FROM decision_runs WHERE id='{rid}' AND approved_at IS NOT NULL;"),'1')
+        self.full();rid=install_run(self.s,self.a,self.cid,approved=True);raw=self.a.get(self.base+'/data/templates/transport_demand').content.replace(b'ORD-001',b'ORD-999');self.publish(raw=raw);n=self.nodes()
+        # T8 retires the old current row; stale history remains immutable rather
+        # than being returned as the current recommendation after Pack change.
+        self.assertEqual(n[D1]['freshness'],'NOT_EVALUATED');self.assertIsNone(n[D1]['run_id']);self.assertEqual(n[D2]['node_state'],'LOCKED')
+        self.assertEqual(self.s.sql(f"SELECT count(*) FROM decision_runs WHERE id='{rid}' AND approved_at IS NOT NULL AND superseded_at IS NOT NULL AND NOT dation_private.t8_fresh(decision_runs);"),'1')
+        self.assertEqual(self.ok(self.a.get(self.base+'/graph/history/'+D1))['items'][0]['id'],rid)
     def test_11_zero_trips_not_applicable_and_history_is_paged(self):
         self.full();rid=install_run(self.s,self.a,self.cid,approved=True,trip_count=0);self.assertEqual(self.nodes()[D2]['node_state'],'NOT_APPLICABLE');h=self.ok(self.a.get(self.base+'/graph/history/'+D1));self.assertEqual(h['total'],1);self.assertEqual(h['items'][0]['id'],rid);self.assertEqual(self.a.get(self.base+'/graph/history/'+D1+'?limit=0').status_code,422)
     def test_12_new_d2_preserves_upstream_and_config_read_is_pure(self):
@@ -87,7 +101,7 @@ class UltimateGraphTests(unittest.TestCase):
         for node in [D1,D2]:self.assertFalse(self.nodes()[node]['actions']['execute']['allowed']);self.assertFalse(self.nodes()[node]['runtime_available'])
         self.ok(self.a.get(self.base+'/graph/config/'+D1));self.assertEqual(before,self.s.sql(f"SELECT count(*) FROM decision_runs WHERE decision_case_id='{self.cid}';"))
     def test_18_superseded_downstream_keeps_count_history_actors_and_upstream(self):
-        self.full();up=install_run(self.s,self.a,self.cid,approved=True);child=install_run(self.s,self.a,self.cid,D2,approved=True);install_run(self.s,self.a,self.cid,status='queued')
+        self.full();up=install_run(self.s,self.a,self.cid,approved=True);child=install_run(self.s,self.a,self.cid,D2,approved=True);self.admit_current_d1()
         n=self.nodes()[D2];self.assertEqual(n['node_state'],'LOCKED');self.assertEqual(n['history_count'],1)
         h=self.ok(self.a.get(self.base+'/graph/history/'+D2));self.assertEqual(h['items'][0]['id'],child);self.assertEqual(h['items'][0]['upstream_run_id'],up);self.assertTrue(h['items'][0]['superseded_at']);self.assertTrue(h['items'][0]['approval_actor'])
     def test_19_home_attention_outside_recent_cases_uses_current_graph(self):

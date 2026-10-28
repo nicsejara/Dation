@@ -1,0 +1,146 @@
+test_c4_metadata_has_independent_unpadded_decision_label (test_final_polish.FinalPolishTests.test_c4_metadata_has_independent_unpadded_decision_label) ... Executing <Task pending name='Task-1' coro=<FinalPolishTests.asyncSetUp() running at /workspace/Dation/backend/tests/browser/test_final_polish.py:13> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.181 seconds
+Executing <Task finished name='Task-135' coro=<BrowserContext._on_route() done, defined at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_browser_context.py:252> result=None created at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_browser_context.py:150> took 0.134 seconds
+ok
+test_c5_command_bars_remain_visible_without_obscuring_controls (test_final_polish.FinalPolishTests.test_c5_command_bars_remain_visible_without_obscuring_controls) ... ok
+test_final_polish_stress_at_data_boundary_with_dev_only_toggle (test_final_polish.FinalPolishTests.test_final_polish_stress_at_data_boundary_with_dev_only_toggle) ... ok
+test_h6_greeting_keeps_workspace_timezone_identity_updates_and_fallback (test_home_hero.HomeHeroTests.test_h6_greeting_keeps_workspace_timezone_identity_updates_and_fallback) ... ok
+test_assignment_draft_is_restored_per_case (test_navigation.NavigationTests.test_assignment_draft_is_restored_per_case) ... ok
+test_catalog_entitlements_cover_deep_links_revocation_and_reenable (test_navigation.NavigationTests.test_catalog_entitlements_cover_deep_links_revocation_and_reenable) ... ok
+test_catalog_fallback_keeps_disabled_entitlement_closed (test_navigation.NavigationTests.test_catalog_fallback_keeps_disabled_entitlement_closed) ... ok
+test_d1_d2_upper_geometry_and_visible_headings_are_normalized (test_navigation.NavigationTests.test_d1_d2_upper_geometry_and_visible_headings_are_normalized) ... Executing <Task pending name='Task-1201' coro=<Connection.run() running at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:356> created at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_context_manager.py:37> took 0.708 seconds
+Executing <Task pending name='Task-1201' coro=<Connection.run() running at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:356> created at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_context_manager.py:37> took 0.631 seconds
+ok
+test_d1_v2_all_objectives_highlight_the_actual_selected_scenario (test_navigation.NavigationTests.test_d1_v2_all_objectives_highlight_the_actual_selected_scenario) ... ok
+test_phase6_tab_and_reverse_tab_keep_focus_visible_below_sticky_layers (test_navigation.NavigationTests.test_phase6_tab_and_reverse_tab_keep_focus_visible_below_sticky_layers) ... ok
+test_phase7_library_and_settings_share_the_dark_roles (test_navigation.NavigationTests.test_phase7_library_and_settings_share_the_dark_roles) ... Executing <Handle _UnixReadPipeTransport._read_ready() created at /usr/lib/python3.13/asyncio/selector_events.py:276> took 0.128 seconds
+ok
+test_workflow_progressive_actions_share_styles_arrow_and_keyboard_focus (test_navigation.NavigationTests.test_workflow_progressive_actions_share_styles_arrow_and_keyboard_focus) ... Executing <Task pending name='Task-2597' coro=<Connection.run() running at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:356> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> created at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_context_manager.py:37> took 0.194 seconds
+Executing <Task pending name='Task-2597' coro=<Connection.run() running at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:356> created at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_context_manager.py:37> took 0.111 seconds
+Executing <Task pending name='Task-2597' coro=<Connection.run() running at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:356> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> created at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_context_manager.py:37> took 0.175 seconds
+ok
+test_workspace_settings_retry_conflict_readonly_and_tab_history (test_navigation.NavigationTests.test_workspace_settings_retry_conflict_readonly_and_tab_history) ... ok
+test_both_terminal_runs_offer_one_same_case_same_decision_configuration_cta (test_saga3_ui.Saga3UITests.test_both_terminal_runs_offer_one_same_case_same_decision_configuration_cta) ... ok
+test_last_decision_completes_case_and_technical_menu_keeps_exports (test_saga4_ui.Saga4UITests.test_last_decision_completes_case_and_technical_menu_keeps_exports) ... ok
+test_shared_case_context_and_compact_map_milestones (test_saga4_ui.Saga4UITests.test_shared_case_context_and_compact_map_milestones) ... ok
+test_06_responsive_long_filename_zoom_touch_contrast_and_focus (test_ultimate_case_data.UltimateCaseDataTests.test_06_responsive_long_filename_zoom_touch_contrast_and_focus) ... ok
+test_05_legacy_navigation_and_home_recover_empty_case (test_ultimate_case_setup.UltimateCaseSetupTests.test_05_legacy_navigation_and_home_recover_empty_case) ... ok
+test_01_empty_map_data_publish_ready_and_config_d1 (test_ultimate_navigation.UltimateNavigationTests.test_01_empty_map_data_publish_ready_and_config_d1) ... ok
+test_02_approved_d1_opens_d2_config_with_exact_upstream (test_ultimate_navigation.UltimateNavigationTests.test_02_approved_d1_opens_d2_config_with_exact_upstream) ... ok
+test_03_history_new_run_back_forward_reload_keep_case_node_and_run (test_ultimate_navigation.UltimateNavigationTests.test_03_history_new_run_back_forward_reload_keep_case_node_and_run) ... ERROR
+test_04_case_selector_escape_switch_and_history_navigation (test_ultimate_navigation.UltimateNavigationTests.test_04_case_selector_escape_switch_and_history_navigation) ... ok
+test_05_viewer_touch_and_archived_preserve_read_only_state (test_ultimate_navigation.UltimateNavigationTests.test_05_viewer_touch_and_archived_preserve_read_only_state) ... ERROR
+test_06_responsive_native_states_keyboard_zoom_and_contrast (test_ultimate_navigation.UltimateNavigationTests.test_06_responsive_native_states_keyboard_zoom_and_contrast) ... ok
+test_07_navigation_race_disposes_old_case_projection (test_ultimate_navigation.UltimateNavigationTests.test_07_navigation_race_disposes_old_case_projection) ... ok
+test_08_cross_document_return_and_persisted_pageshow_restore_context (test_ultimate_navigation.UltimateNavigationTests.test_08_cross_document_return_and_persisted_pageshow_restore_context) ... ok
+test_09_native_owner_selector_unlocks_configuration_without_changing_pack (test_ultimate_navigation.UltimateNavigationTests.test_09_native_owner_selector_unlocks_configuration_without_changing_pack) ... Executing <Handle _UnixReadPipeTransport._read_ready() created at /usr/lib/python3.13/asyncio/selector_events.py:276> took 0.128 seconds
+ok
+test_10_center_renders_shared_graph_and_routes_to_case_data_and_config (test_ultimate_navigation.UltimateNavigationTests.test_10_center_renders_shared_graph_and_routes_to_case_data_and_config) ... ok
+test_01_actual_dashboard_details_exports_ia_review_same_run_and_lazy (test_ultimate_result_consumers.UltimateResultConsumerTests.test_01_actual_dashboard_details_exports_ia_review_same_run_and_lazy) ... ok
+test_02_five_viewports_preserve_shell_tokens_and_controlled_overflow (test_ultimate_result_consumers.UltimateResultConsumerTests.test_02_five_viewports_preserve_shell_tokens_and_controlled_overflow) ... Executing <Task pending name='Task-4010' coro=<Connection.run() running at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:356> created at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_context_manager.py:37> took 0.575 seconds
+Executing <Task pending name='Task-4010' coro=<Connection.run() running at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:356> created at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_context_manager.py:37> took 0.110 seconds
+Executing <Task pending name='Task-4010' coro=<Connection.run() running at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:356> created at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_context_manager.py:37> took 0.104 seconds
+Executing <Task pending name='Task-4010' coro=<Connection.run() running at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:356> created at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_context_manager.py:37> took 0.497 seconds
+Executing <Task pending name='Task-4010' coro=<Connection.run() running at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:356> created at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_context_manager.py:37> took 0.122 seconds
+ok
+test_03_keyboard_chart_alternative_tabs_drawer_and_assistant_return_focus (test_ultimate_result_consumers.UltimateResultConsumerTests.test_03_keyboard_chart_alternative_tabs_drawer_and_assistant_return_focus) ... ok
+test_04_unknown_schema_and_recovery_are_safe (test_ultimate_result_consumers.UltimateResultConsumerTests.test_04_unknown_schema_and_recovery_are_safe) ... ok
+test_05_late_entity_after_run_change_never_opens_wrong_drawer (test_ultimate_result_consumers.UltimateResultConsumerTests.test_05_late_entity_after_run_change_never_opens_wrong_drawer) ... Executing <Task pending name='Task-4049' coro=<Connection.run() running at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:356> created at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_context_manager.py:37> took 0.518 seconds
+Executing <Task pending name='Task-4049' coro=<Connection.run() running at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:356> created at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_context_manager.py:37> took 0.546 seconds
+ok
+test_06_zoom_reduced_motion_focus_and_long_fields (test_ultimate_result_consumers.UltimateResultConsumerTests.test_06_zoom_reduced_motion_focus_and_long_fields) ... Executing <Task pending name='Task-4064' coro=<Connection.run() running at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:356> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> created at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_context_manager.py:37> took 0.127 seconds
+ok
+test_07_contrast_focus_visibility_and_native_tokens (test_ultimate_result_consumers.UltimateResultConsumerTests.test_07_contrast_focus_visibility_and_native_tokens) ... ok
+test_08_saved_conversation_is_lazy_and_keeps_original_context (test_ultimate_result_consumers.UltimateResultConsumerTests.test_08_saved_conversation_is_lazy_and_keeps_original_context) ... Executing <Task pending name='Task-4086' coro=<Connection.run() running at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:356> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> created at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_context_manager.py:37> took 0.203 seconds
+Executing <Task pending name='Task-4086' coro=<Connection.run() running at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:356> created at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_context_manager.py:37> took 0.236 seconds
+Executing <Task pending name='Task-4086' coro=<Connection.run() running at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:356> created at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_context_manager.py:37> took 0.233 seconds
+Executing <Task pending name='Task-4086' coro=<Connection.run() running at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:356> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> created at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_context_manager.py:37> took 0.180 seconds
+ok
+test_09_waits_for_atomic_publication_without_prefetching_details (test_ultimate_result_consumers.UltimateResultConsumerTests.test_09_waits_for_atomic_publication_without_prefetching_details) ... ok
+test_10_copilot_keeps_mode_and_question_bound_while_waiting (test_ultimate_result_consumers.UltimateResultConsumerTests.test_10_copilot_keeps_mode_and_question_bound_while_waiting) ... ok
+test_constrained_viewports_keep_forms_and_table_scrollers_reachable (test_ux_upgrade.UXUpgradeTests.test_constrained_viewports_keep_forms_and_table_scrollers_reachable) ... Executing <Handle _UnixReadPipeTransport._read_ready() created at /usr/lib/python3.13/asyncio/selector_events.py:276> took 0.150 seconds
+Executing <Task pending name='Task-4123' coro=<Connection.run() running at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:356> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> created at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_context_manager.py:37> took 0.115 seconds
+ok
+test_focused_attributes_are_unobscured_at_every_breakpoint (test_ux_upgrade.UXUpgradeTests.test_focused_attributes_are_unobscured_at_every_breakpoint) ... ok
+test_long_case_and_filenames_and_numeric_extremes (test_ux_upgrade_stress.UXStressTests.test_long_case_and_filenames_and_numeric_extremes) ... Executing <Task pending name='Task-4491' coro=<Connection.run() running at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:356> created at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_context_manager.py:37> took 0.360 seconds
+Executing <Handle _UnixReadPipeTransport._read_ready() created at /usr/lib/python3.13/asyncio/selector_events.py:276> took 0.107 seconds
+ok
+test_multilingual_identity_and_large_paginated_team (test_ux_upgrade_stress.UXStressTests.test_multilingual_identity_and_large_paginated_team) ... ok
+test_map_assignment_is_consumed_readonly_by_config_and_review (test_workflow_context.WorkflowContextTests.test_map_assignment_is_consumed_readonly_by_config_and_review) ... Executing <Task pending name='Task-4874' coro=<Connection.run() running at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:356> created at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_context_manager.py:37> took 0.147 seconds
+Executing <Task pending name='Task-4874' coro=<Connection.run() running at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:356> created at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_context_manager.py:37> took 0.102 seconds
+Executing <Task pending name='Task-4874' coro=<Connection.run() running at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:356> created at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_context_manager.py:37> took 0.201 seconds
+ok
+test_operator_registers_a_pending_data_case_and_refreshes_admin_assignment (test_workflow_context.WorkflowContextTests.test_operator_registers_a_pending_data_case_and_refreshes_admin_assignment) ... ok
+width=390 (unittest.loader._FailedTest.width=390) ... ERROR
+
+======================================================================
+ERROR: test_03_history_new_run_back_forward_reload_keep_case_node_and_run (test_ultimate_navigation.UltimateNavigationTests.test_03_history_new_run_back_forward_reload_keep_case_node_and_run)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/usr/lib/python3.13/asyncio/base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/workspace/Dation/backend/tests/browser/test_ultimate_navigation.py", line 79, in test_03_history_new_run_back_forward_reload_keep_case_node_and_run
+    value=json.loads(fixture.stdout.readline());self.base=value['api_url'];await self.login(self.context)
+  File "/usr/lib/python3.13/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "/usr/lib/python3.13/json/decoder.py", line 345, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/json/decoder.py", line 363, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+======================================================================
+ERROR: test_05_viewer_touch_and_archived_preserve_read_only_state (test_ultimate_navigation.UltimateNavigationTests.test_05_viewer_touch_and_archived_preserve_read_only_state)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/usr/lib/python3.13/asyncio/base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/workspace/Dation/backend/tests/browser/test_ultimate_navigation.py", line 111, in test_05_viewer_touch_and_archived_preserve_read_only_state
+    viewer=await self.browser.new_context(viewport={'width':390,'height':844},is_mobile=True,has_touch=True);await self.login(viewer,3);page=await viewer.new_page();await page.goto(self.base+'/app/ddas/logistics/decisions?case_id='+cid);await page.locator('[data-graph-ready="true"]').wait_for();await expect(page.locator('[data-graph-node="'+D1+'"]')).to_have_attribute('data-node-state','READY');self.assertEqual(await page.get_by_role('button',name='Configurar Transport Plan',exact=False).count(),0);await page.get_by_role('button',name='Datos del Case',exact=True).tap();await page.locator('[data-ultimate-ready="true"]').wait_for();self.assertTrue(await page.get_by_role('button',name='Guardar candidato de Demanda',exact=True).is_disabled());await viewer.close()
+                                                                                                                                                                                                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_generated.py", line 20672, in wait_for
+    await self._impl_obj.wait_for(timeout=to_milliseconds(timeout), state=state)
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_locator.py", line 752, in wait_for
+    await self._frame.wait_for_selector(
+        self._selector, strict=True, timeout=timeout, state=state
+    )
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_frame.py", line 395, in wait_for_selector
+    await self._channel.send(
+        "waitForSelector", self._timeout, locals_to_params(locals())
+    )
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py", line 76, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py", line 632, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.TimeoutError: Locator.wait_for: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("[data-graph-ready=\"true\"]") to be visible
+
+
+======================================================================
+ERROR: width=390 (unittest.loader._FailedTest.width=390)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: width=390
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/unittest/loader.py", line 137, in loadTestsFromName
+    module = __import__(module_name)
+ModuleNotFoundError: No module named 'width=390'
+
+
+----------------------------------------------------------------------
+Ran 45 tests in 702.233s
+
+FAILED (errors=3)

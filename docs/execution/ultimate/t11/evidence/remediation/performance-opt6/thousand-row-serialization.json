@@ -1,0 +1,8 @@
+{
+  "scope": "TYPED_SERIALIZATION_ONLY_NOT_ENGINE_OUTPUT",
+  "rows": 1000,
+  "chunks": 10,
+  "bytes": 770470,
+  "seconds": 0.10697325100773014,
+  "no_rows_omitted": true
+}

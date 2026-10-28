@@ -24,8 +24,11 @@ class TransportPlanOptions(ContractModel):
 class TransportPlanInput(ContractModel):
     model: LogisticsModelVersion
     context: FrozenCaseContext
-    demands: tuple[Demand, ...] = Field(max_length=100)
-    resources: tuple[TransportResource, ...] = Field(max_length=40)
+    # Agreed MVP input envelope. Search remains bounded independently by slots,
+    # variables and deterministic budgets; larger input never implies a claim
+    # of exhaustive candidates or full coverage.
+    demands: tuple[Demand, ...] = Field(max_length=500)
+    resources: tuple[TransportResource, ...] = Field(max_length=50)
     run_id: UUID
     result_generated_at: AwareDatetime
     options: TransportPlanOptions = Field(default_factory=TransportPlanOptions)

@@ -1,0 +1,18 @@
+test_01_all_rows_entities_exports_context_and_review_share_facts (test_ultimate_consistency.UltimateConsistencyTests.test_01_all_rows_entities_exports_context_and_review_share_facts) ... ok
+test_02_positive_then_foreign_cache_entity_export_context_and_storage_are_denied (test_ultimate_consistency.UltimateConsistencyTests.test_02_positive_then_foreign_cache_entity_export_context_and_storage_are_denied) ... FAIL
+test_03_context_privacy_and_prompt_injection_remain_data (test_ultimate_consistency.UltimateConsistencyTests.test_03_context_privacy_and_prompt_injection_remain_data) ... ok
+test_04_http_retrieval_payloads_and_latency_are_measured (test_ultimate_consistency.UltimateConsistencyTests.test_04_http_retrieval_payloads_and_latency_are_measured) ... ok
+
+======================================================================
+FAIL: test_02_positive_then_foreign_cache_entity_export_context_and_storage_are_denied (test_ultimate_consistency.UltimateConsistencyTests.test_02_positive_then_foreign_cache_entity_export_context_and_storage_are_denied)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/Dation/backend/tests/e2e/test_ultimate_consistency.py", line 95, in test_02_positive_then_foreign_cache_entity_export_context_and_storage_are_denied
+    self.assertEqual(self.s.http.get(raw,headers={'Authorization':'Bearer '+self.s.token}).status_code,200)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 401 != 200
+
+----------------------------------------------------------------------
+Ran 4 tests in 92.026s
+
+FAILED (failures=1)

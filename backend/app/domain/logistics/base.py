@@ -52,8 +52,13 @@ class ContractModel(BaseModel):
 
     @model_validator(mode="after")
     def immutable_maps(self):
-        for key in type(self).model_fields:
-            object.__setattr__(self, key, freeze(getattr(self, key)))
+        # Pydantic has already populated every validated field in __dict__.
+        # Freeze those same values directly: per-field descriptor reads and
+        # object.__setattr__ dominated repeated large evidence validation.
+        # No schema/numeric/immutability check is bypassed; freeze is unchanged.
+        values = self.__dict__
+        for key, value in values.items():
+            values[key] = freeze(value)
         return self
 
 

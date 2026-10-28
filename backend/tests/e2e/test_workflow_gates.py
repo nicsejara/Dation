@@ -20,7 +20,12 @@ class WorkflowMigrationCompatibilityTests(unittest.TestCase):
             captured['case']=s.sql(f"SELECT to_jsonb(c)::text FROM decision_cases c WHERE id='{cid}';")
             captured['events']=s.sql(f"SELECT count(*) FROM audit_events WHERE decision_case_id='{cid}';")
         with Sandbox(migration_hook=seed) as s:
-            self.assertEqual(s.sql(f"SELECT (to_jsonb(c)-'workflow_policy_version'-'category'-'description'-'attributes_applied_at')::text FROM decision_cases c WHERE id='{cid}';"),captured['case'])
+            original=json.loads(captured['case'])
+            current=json.loads(s.sql(f"SELECT to_jsonb(c)::text FROM decision_cases c WHERE id='{cid}';"))
+            # Expand migrations add nullable Ultimate columns/default cohort.
+            # Every column that existed at the checkpoint must remain exact.
+            self.assertEqual({key:current[key] for key in original},original)
+            self.assertEqual(current['workflow_version'],1)
             self.assertIsNone(json.loads(s.sql(f"SELECT to_jsonb(c)::text FROM decision_cases c WHERE id='{cid}';"))['attributes_applied_at'])
             self.assertEqual(s.sql(f"SELECT workflow_policy_version FROM decision_cases WHERE id='{cid}';"),'0')
             self.assertEqual(s.sql(f"SELECT count(*) FROM audit_events WHERE decision_case_id='{cid}';"),captured['events'])

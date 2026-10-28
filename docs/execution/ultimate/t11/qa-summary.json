@@ -1,0 +1,46 @@
+{
+  "decision": "STOP",
+  "head": "32b85681907a8d7b7811a9e16ae1988941b3d3d1",
+  "branch": "main",
+  "B_PY": {
+    "tests": 687,
+    "failures_recorded": 4,
+    "failing_parent_methods": 2,
+    "errors": 0,
+    "skips": 0,
+    "seconds": 366.575
+  },
+  "B_NODE": {
+    "passed": 153,
+    "failures": 0,
+    "skips": 0
+  },
+  "B_BROWSER": {
+    "active_unique_cases_covered": 290,
+    "unresolved_failures": 0,
+    "skips": 0
+  },
+  "B_SQL": {
+    "active_unique_cases_covered": 162,
+    "unresolved_failures": 0,
+    "skips": 0
+  },
+  "B_E2E": {
+    "active_unique_cases_covered": 115,
+    "unresolved_failures": 0,
+    "skips": 0
+  },
+  "RESTORE11": "PASS",
+  "CONSISTENCY11": "PASS4",
+  "PERF11": "FAIL",
+  "ALL_U": "FAIL",
+  "d1_engine_plus_assembler_seconds": [
+    100.11313889696612,
+    92.1297076960036,
+    98.00669147798908
+  ],
+  "T12": false,
+  "push": false,
+  "deploy": false,
+  "release_candidate_frozen": false
+}

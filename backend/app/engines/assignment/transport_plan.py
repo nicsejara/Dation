@@ -41,6 +41,19 @@ def run_transport_plan(request):
 
 
 def _run(request, policy_search=None):
+    computation = _build_structural_plan(request, policy_search)
+    from .transport_validator import certify_transport_plan
+    certify_transport_plan(request, computation)
+    return computation
+
+
+def _build_structural_plan(request, policy_search=None):
+    """Build internally; the owning T6/T7 runner must certify before returning.
+
+    T7's independent policy certifier includes the entire structural certifier.
+    Keeping construction separate avoids certifying the same immutable T6
+    result twice per economic proposal. No public runner returns unchecked data.
+    """
     orders, denominators, slots, selected, trace = solve_structural(request,policy_search)
     dims, context = request.model.active_dimensions, request.context
     staged = []
@@ -116,7 +129,7 @@ def _run(request, policy_search=None):
     reasons, constraints = [], []
     def constraint(code, facts, *, entity='global', satisfied=True, hard=True):
         eid = 'E-'+hashlib.sha256(canonical_bytes([code,entity,facts])).hexdigest()[:24]
-        constraints.append(c.ConstraintEvidence(evidence_id=eid,code=code,
+        constraints.append(dict(evidence_id=eid,code=code,
             status='SATISFIED' if satisfied else 'VIOLATED',hard=hard,facts=facts))
         return eid
     def reason(code,kind,entity,facts,reference):
@@ -174,6 +187,7 @@ def _run(request, policy_search=None):
     trips=[c.Trip.model_validate({**t.model_dump(), 'reason_codes':tuple(sorted({r.code for r in reasons if r.entity_type=='TRIP' and r.entity_id==t.trip_id}))}) for t in trips]
     resolutions=[c.DemandResolution.model_validate({**o.model_dump(),'reason_codes':tuple(sorted({r.code for r in reasons if r.entity_type=='ORDER' and r.entity_id==o.order_id}))}) for o in resolutions]
     entities=[]
+    selected_pairs={(allocation.order_id,trip.resource_id) for trip in trips for allocation in trip.orders}
     for order,resolution in zip(orders,resolutions):
         facts={'priority':order.priority,'trip_ids':resolution.trip_ids,'split_allowed':order.split_allowed and request.model.split_permitted}
         for d in dims:
@@ -199,17 +213,19 @@ def _run(request, policy_search=None):
             for d in dims:
                 candidate_facts.update({f'requested_{d}':getattr(order.requested,d),f'guaranteed_{d}':getattr(resource.guaranteed_capacity,d)})
             constraint('CANDIDATE_ELIGIBILITY',candidate_facts,entity=order.order_id+':'+resource.resource_id,satisfied=not rejected,hard=False)
-            chosen=any(t.resource_id==resource.resource_id and any(a.order_id==order.order_id for a in t.orders) for t in trips)
-            candidates.append(c.CandidateSummary(resource_id=resource.resource_id,status='SELECTED' if chosen else 'INFEASIBLE' if rejected else 'UNKNOWN',estimated_cost=None,reason_refs=()))
-        entities.append(c.EntityEvidence(entity_type='ORDER',entity_id=order.order_id,facts=facts,reason_refs=refs('ORDER',order.order_id),candidate_summary=tuple(candidates)))
+            chosen=(order.order_id,resource.resource_id) in selected_pairs
+            candidates.append(dict(resource_id=resource.resource_id,status='SELECTED' if chosen else 'INFEASIBLE' if rejected else 'UNKNOWN',estimated_cost=None,reason_refs=()))
+        # The enclosing TransportPlanComputation validates these nested rows
+        # with the same EntityEvidence/CandidateSummary schemas before use.
+        entities.append(dict(entity_type='ORDER',entity_id=order.order_id,facts=facts,reason_refs=refs('ORDER',order.order_id),candidate_summary=tuple(candidates)))
     for resource,usage in zip(sorted(request.resources,key=lambda r:r.resource_id),usages):
         facts={'source':resource.source,'trip_ids':usage.trip_ids,'services_available':resource.services_available,
             'services_used':usage.services_used,'units_available':resource.units_available,'availability_source':resource.availability_source,
             'operating_cost_per_km':resource.operating_cost_per_km,'external_cost_model':resource.external_cost.cost_model if resource.external_cost else None,
             'external_rate':resource.external_cost.rate if resource.external_cost else None,
             'billing_basis':resource.external_cost.billing_basis if resource.external_cost else None}
-        entities.append(c.EntityEvidence(entity_type='RESOURCE',entity_id=resource.resource_id,facts=facts,reason_refs=refs('RESOURCE',resource.resource_id)))
-    entities.extend(c.EntityEvidence(entity_type='TRIP',entity_id=t.trip_id,facts={'resource_id':t.resource_id,'order_ids':tuple(a.order_id for a in t.orders)},reason_refs=refs('TRIP',t.trip_id)) for t in trips)
+        entities.append(dict(entity_type='RESOURCE',entity_id=resource.resource_id,facts=facts,reason_refs=refs('RESOURCE',resource.resource_id)))
+    entities.extend(dict(entity_type='TRIP',entity_id=t.trip_id,facts={'resource_id':t.resource_id,'order_ids':tuple(a.order_id for a in t.orders)},reason_refs=refs('TRIP',t.trip_id)) for t in trips)
     primary=request.model.primary_dimension
     requested=sum((getattr(o.requested,primary) for o in orders),Decimal(0))
     total_assigned=sum((getattr(o.assigned,primary) for o in resolutions),Decimal(0))
@@ -228,11 +244,11 @@ def _run(request, policy_search=None):
             full_demand_coverage=not any(getattr(gap,d)>0 for d in dims) if usable else None),metrics=metrics,
         transport_plan=c.TransportPlan(trips=tuple(trips),unassigned_demand=tuple(o for o in resolutions if o.status!='COVERED'),capacity_gap=gap if any(getattr(gap,d)>0 for d in dims) else None))
     solver=dict(status=status,objective_value=None,best_bound=None,certificate=c.SolverCertificate(kind='FEASIBILITY' if usable else 'INFEASIBILITY',evidence_ref=cert_ref) if usable or status=='INFEASIBLE' else None)
-    evidence=c.EngineEvidence(result_schema='transport_plan_v1',workspace_id=context.workspace_id,run_id=request.run_id,input_context_hash=core.input_context_hash,
+    evidence=dict(result_schema='transport_plan_v1',workspace_id=context.workspace_id,run_id=request.run_id,input_context_hash=core.input_context_hash,
         core_result_fingerprint=core_result_fingerprint(core),policy=c.PolicyEvidence(case_goal=context.case_policy.primary_goal,effective_node_policy=context.node_policy.primary_goal,
             override=context.node_policy.override,override_reason=context.node_policy.override_reason,evidence_id=cert_ref),constraints=tuple(constraints),solver=c.SolverEvidence(**solver),
         reasons=tuple(reasons),entities=tuple(entities))
-    computation=TransportPlanComputation(output=c.EngineOutput(core=core,evidence=evidence),demand_resolution=tuple(resolutions),residuals=residuals,resource_usage=tuple(usages),temporal_certificate=temporal,search=trace)
-    from .transport_validator import certify_transport_plan
-    certify_transport_plan(request,computation)
+    # The final typed boundary validates all nested evidence and bindings. Avoid
+    # constructing/revalidating that same large graph three times on the way in.
+    computation=TransportPlanComputation(output={'core':core,'evidence':evidence},demand_resolution=tuple(resolutions),residuals=residuals,resource_usage=tuple(usages),temporal_certificate=temporal,search=trace)
     return computation

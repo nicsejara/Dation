@@ -1,0 +1,4 @@
+{"operation": "read", "status": 400, "body": "{\"code\":\"22023\",\"details\":null,\"hint\":null,\"message\":\"Published result not found/mismatched\"}"}
+{"operation": "read", "status": 400, "body": "{\"code\":\"22023\",\"details\":null,\"hint\":null,\"message\":\"Published result not found/mismatched\"}"}
+{"operation": "approve", "status": 400, "body": "{\"code\":\"22023\",\"details\":null,\"hint\":null,\"message\":\"Approval binding invalid\"}"}
+{"operation": "read", "status": 500, "body": "{\"code\":\"P0002\",\"details\":null,\"hint\":null,\"message\":\"Case not found\"}"}

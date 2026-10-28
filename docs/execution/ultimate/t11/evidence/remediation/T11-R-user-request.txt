@@ -1,0 +1,525 @@
+T11 finalizó con:
+
+# STOP — T11 NO AUTORIZA T12
+
+Reporte oficial:
+
+`docs/execution/ultimate/t11/t11-execution-report.md`
+
+Estado conocido:
+
+- HEAD local: `32b8568`
+- Node: PASS
+- Browser: PASS
+- SQL: PASS
+- E2E: PASS
+- Consistency: PASS
+- Restore/Rollback: PASS
+- Python: 687 tests / 4 FAIL
+- PERF blocker D1: 92.13–100.11 s before publication
+- Budget: <= 90 s
+- T12 NO ejecutado
+- candidato NO congelado
+
+Autorizo exclusivamente:
+
+# T11-R — TARGETED D1 PERFORMANCE REMEDIATION + PYTHON FAILURE CLOSURE
+
+NO ejecutes T12.
+
+---
+
+# 1. NO NUEVA AUDITORÍA
+
+NO realices una auditoría end-to-end.
+
+NO repitas T0–T10.
+
+Usá:
+
+- `DATION_FINAL_MASTER_EXECUTION_PLAN.md`
+- `docs/execution/ultimate/t11/t11-execution-report.md`
+- evidencia PERF11
+- los 4 Python failures
+- HEAD `32b8568`
+
+como baseline.
+
+Inspeccioná únicamente los componentes que participen realmente en los 4 failures o en el critical path D1.
+
+---
+
+# 2. OBJETIVO
+
+Cerrar exclusivamente:
+
+```text
+Python: 4 FAIL → 0 FAIL
+
+D1 pre-publication:
+92.13–100.11 s
+→ <= 90 s
+```
+
+sin:
+
+- relajar correctness;
+- reducir cobertura;
+- eliminar validaciones;
+- cambiar matemática;
+- bajar calidad de Evidence;
+- eliminar Result Package fields;
+- ocultar trabajo fuera de la medición;
+- aumentar el budget.
+
+---
+
+# 3. NO CAMBIAR EL PERFORMANCE BUDGET
+
+El límite de 90 s permanece.
+
+NO resolver el gate mediante:
+
+- aumentar timeout;
+- cambiar 90 → 120;
+- excluir etapas del cronómetro;
+- reducir artificialmente el fixture;
+- marcar test slow/skip;
+- aceptar sólo warm cache si el contrato exige cold execution.
+
+El objetivo es mejorar el producto.
+
+---
+
+# 4. PRIMERO: CLASIFICAR LOS 4 PYTHON FAILURES
+
+Antes de modificar código, determinar para cada failure:
+
+A. consecuencia directa del performance test;
+
+B. regression funcional real;
+
+C. test expectation desactualizada;
+
+D. aislamiento/flakiness;
+
+E. problema de infraestructura.
+
+No corregir assertions para esconder un defecto.
+
+Registrar causa raíz de los 4.
+
+---
+
+# 5. PERFILAR EL CRITICAL PATH D1
+
+Instrumentar/perfilar el escenario exacto que supera 90 s.
+
+Descomponer como mínimo:
+
+```text
+Input/context loading
+Contract / normalization if applicable
+Candidate generation
+Optimization / solver
+Independent certification
+Evidence generation
+Alternatives
+Result assembly
+Serialization
+Artifact preparation
+Other pre-publication work
+```
+
+Registrar tiempos absolutos y porcentaje.
+
+NO optimizar por intuición antes de conocer el cuello de botella.
+
+---
+
+# 6. DETERMINAR P50 / P95 / WORST OBSERVED
+
+Repetir el benchmark de forma controlada suficiente para distinguir:
+
+- regression determinística;
+- variación del solver;
+- cold-start;
+- filesystem/DB overhead;
+- CPU contention;
+- test harness overhead.
+
+Registrar:
+
+- p50;
+- p95 cuando la muestra lo permita;
+- máximo observado;
+- solver status;
+- candidate count;
+- variables;
+- constraints;
+- alternatives generated;
+- memory.
+
+El gate debe cumplirse de manera reproducible, no sólo una ejecución afortunada.
+
+---
+
+# 7. PRIORIDAD DE OPTIMIZACIÓN
+
+Buscar primero optimizaciones que preserven exactamente el resultado.
+
+Ejemplos válidos si el profiling los justifica:
+
+- eliminar recomputaciones;
+- reutilizar estructuras canónicas ya calculadas;
+- evitar N× repeated scans;
+- pre-indexar demand/resources;
+- reducir conversiones DataFrame ↔ DTO;
+- evitar repeated serialization;
+- reutilizar Transit facts;
+- evitar recalcular metrics/evidence;
+- candidate generation más eficiente pero matemáticamente equivalente;
+- batch operations;
+- eliminar joins repetidos;
+- evitar copies profundas innecesarias;
+- optimizar construction de evidence;
+- optimizar alternative evaluation manteniendo contract;
+- solver hints/configuration determinística si no cambia semantics.
+
+No implementar una optimización sólo porque “parece más rápida”.
+
+---
+
+# 8. CANDIDATE GENERATION
+
+Si candidate generation domina el tiempo:
+
+analizá:
+
+- candidates generados;
+- candidates realmente utilizables;
+- duplicados;
+- combinaciones dominadas;
+- grouping;
+- compatibility pruning;
+- date-window pruning;
+- guaranteed-capacity pruning.
+
+Se permite eliminar candidatos que puedan demostrarse matemáticamente imposibles o dominados bajo las reglas congeladas.
+
+NO aplicar heuristic pruning que pueda eliminar el óptimo.
+
+---
+
+# 9. SOLVER
+
+Si OR-Tools domina:
+
+registrar:
+
+- variable count;
+- constraint count;
+- solve time;
+- solver status;
+- gap si corresponde;
+- deterministic seed/config.
+
+Optimizar formulation antes que bajar garantías.
+
+Posibles cambios únicamente si preservan semantics:
+
+- tighter bounds;
+- redundant-variable removal;
+- stronger valid constraints;
+- symmetry breaking;
+- deterministic ordering;
+- elimination de impossible assignments;
+- precomputed compatibility matrices.
+
+NO convertir un problema exacto en greedy silenciosamente.
+
+NO aceptar FEASIBLE donde el contrato exige OPTIMAL sin documentar/cambiar arquitectura.
+
+---
+
+# 10. ALTERNATIVES
+
+Si alternatives son el cuello:
+
+recordá el contrato:
+
+```text
+Recommended
++
+0–3 material alternatives
+```
+
+Optimizar su generación dentro del budget aprobado.
+
+Es válido devolver:
+
+```text
+BUDGET_LIMIT
+```
+
+si esa semántica ya está prevista por T7 y se activa de forma determinística y honesta.
+
+NO fabricar alternatives más baratas computacionalmente pero semánticamente inválidas.
+
+El Recommended Plan mantiene prioridad.
+
+---
+
+# 11. CERTIFIER / EVIDENCE
+
+NO eliminar el Independent Validator.
+
+NO saltar:
+
+- conservation;
+- active dimensions;
+- guaranteed capacity;
+- non-split;
+- compatibility;
+- resource limits;
+- temporal witness.
+
+Se puede hacer más eficiente:
+
+- reutilizando índices;
+- vectorizando;
+- evitando rereads;
+- evitando duplicate traversal.
+
+El certifier sigue siendo independiente conceptualmente del solver.
+
+---
+
+# 12. ASSEMBLER
+
+El assembler sigue sin poder hacer matemática nueva.
+
+Si domina runtime:
+
+optimizar:
+
+- joins;
+- ordering;
+- projections;
+- serialization;
+- hashes;
+- repeated traversals.
+
+Debe conservar byte/semantic consistency donde el contrato lo requiera.
+
+---
+
+# 13. CACHE
+
+No introducir una cache global que altere correctness o tenant isolation.
+
+Caches sólo si:
+
+- key completa incluye versiones/fingerprints necesarios;
+- no hay cross-tenant leakage;
+- cold path sigue dentro del contrato exigido o el Master Plan explícitamente permite warm path;
+- invalidation es demostrable.
+
+No usar cache para maquillar PERF11.
+
+---
+
+# 14. PARALLELISM
+
+No introducir concurrency por defecto salvo que el profiling justifique claramente el beneficio.
+
+Si se utiliza:
+
+- determinism preservado;
+- resource bounds;
+- no race conditions;
+- mismo Result Package;
+- mismo evidence;
+- mismos fingerprints.
+
+---
+
+# 15. CORRECTNESS LOCK
+
+Después de cada optimización verificar que para los fixtures certificados:
+
+```text
+Assignments identical where required
+Trips identical
+Costs identical
+Coverage identical
+Metrics identical
+Reasons/evidence semantically identical
+Alternatives contract preserved
+Result fingerprints follow canonical rules
+```
+
+Si cambia un resultado de negocio sin una causa previamente aprobada:
+
+STOP.
+
+---
+
+# 16. LEGACY
+
+No tocar:
+
+- assignment_v1 behavior;
+- scheduling_v1;
+- dispatch_v2;
+- legacy exports;
+- historical results.
+
+No usar legacy shortcut para acelerar Ultimate.
+
+---
+
+# 17. NO PRODUCT CHANGES
+
+NO:
+
+- agregar features;
+- cambiar dashboard;
+- modificar UX;
+- cambiar D2;
+- cambiar policy semantics;
+- cambiar Transit;
+- cambiar Data Contracts;
+- modificar approval;
+- cambiar schema salvo necesidad absolutamente demostrada.
+
+T11-R es performance/hardening.
+
+---
+
+# 18. REQUIRED TESTS AFTER FIX
+
+Primero ejecutar focales de los componentes modificados.
+
+Luego obligatoriamente:
+
+```text
+B-PY
+PERF11
+CONSISTENCY11
+```
+
+Si tocás solver/core/assembler:
+
+repetir también los U6/U7 relevantes.
+
+Si tocás publication path:
+
+repetir focales T8.
+
+Si tocás shared kernel:
+
+repetir U9 relevante.
+
+No repetir Browser/SQL/etc. si no fueron afectados, salvo requisito explícito del Master Plan.
+
+---
+
+# 19. FINAL T11 REGATE
+
+Una vez solucionado el blocker, ejecutar los gates T11 necesarios para convertir STOP → GO.
+
+No asumir que el PASS anterior sustituye indefinidamente la validación si archivos de esa frontera fueron modificados.
+
+El reporte debe distinguir:
+
+```text
+Previously certified and unaffected
+Re-executed because affected
+```
+
+---
+
+# 20. PERFORMANCE ACCEPTANCE
+
+Para GO:
+
+- D1 debe cumplir <= 90 s;
+- de manera reproducible;
+- con el fixture y entorno definidos;
+- sin skips;
+- sin timeout inflation;
+- sin modificar el oracle;
+- sin degradar correctness.
+
+Documentar:
+
+```text
+Before
+After
+Delta absolute
+Delta %
+Primary optimization(s)
+Solver status
+Result equivalence
+```
+
+---
+
+# 21. REPORT
+
+Actualizar/crear:
+
+`docs/execution/ultimate/t11/t11-remediation-report.md`
+
+e incorporar la conclusión al dossier T11.
+
+Incluir:
+
+## Baseline
+
+## Python failures root cause
+
+## Performance profile
+
+## Bottleneck
+
+## Changes
+
+## Before / After
+
+## Correctness equivalence
+
+## Tests
+
+## Previously-certified unaffected gates
+
+## Re-executed gates
+
+## Risks
+
+## Gate evaluation
+
+---
+
+# 22. FINAL DECISION
+
+Terminar exclusivamente con:
+
+**GO — T11 completado. T12 puede ser solicitado.**
+
+o
+
+**STOP — T11 continúa bloqueando T12.**
+
+Si vuelve a fallar infraestructura:
+
+**STOP ENV.**
+
+Aunque resulte GO:
+
+# NO EJECUTES T12.
+
+No push.
+No deploy.
+No cambios productivos.

@@ -1,0 +1,12 @@
+{
+  "api_url": "http://127.0.0.1:60937",
+  "baseline_url": "http://127.0.0.1:46159",
+  "pg_container": "dation-e2e-c2ed8eef4ef0-pg",
+  "workspace_id": "00000000-0000-4000-8000-00000000da71",
+  "business_counts": {
+    "runs": 0,
+    "cases": 0,
+    "models": 0,
+    "datasets": 0
+  }
+}
