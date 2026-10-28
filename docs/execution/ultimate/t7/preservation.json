@@ -1,0 +1,186 @@
+{
+  "phase": "T7",
+  "baseline_inventory_files": 786,
+  "baseline_inventory_bytes": 41092786,
+  "checkpoint_kind": "Equivalent immutable copies + SHA256 inventory + tracked binary patch; .git read-only",
+  "checkpoint_sha256": "ccd39855e9a82c9f44e0a70fe7d5ff368e0d959e85da8dc4e30ec7c3222a104c",
+  "copies_verified": 786,
+  "current_files_unchanged": 782,
+  "intentionally_extended": [
+    "backend/app/engines/assignment/transport_contracts.py",
+    "backend/app/engines/assignment/transport_model.py",
+    "backend/app/engines/assignment/transport_plan.py",
+    "backend/app/results/registry.py"
+  ],
+  "T6_manifest_unchanged": true,
+  "T6_entries_verified": 33,
+  "T6_resolution": [
+    {
+      "path": "backend/app/engines/assignment/transport_contracts.py",
+      "resolved_from": "docs/execution/ultimate/t7/evidence/post-t6/backend/app/engines/assignment/transport_contracts.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/app/engines/assignment/transport_model.py",
+      "resolved_from": "docs/execution/ultimate/t7/evidence/post-t6/backend/app/engines/assignment/transport_model.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/app/engines/assignment/transport_plan.py",
+      "resolved_from": "docs/execution/ultimate/t7/evidence/post-t6/backend/app/engines/assignment/transport_plan.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/app/engines/assignment/transport_validator.py",
+      "resolved_from": "backend/app/engines/assignment/transport_validator.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/app/engines/common/__init__.py",
+      "resolved_from": "backend/app/engines/common/__init__.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/app/engines/common/day_resource_feasibility.py",
+      "resolved_from": "backend/app/engines/common/day_resource_feasibility.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/app/results/registry.py",
+      "resolved_from": "docs/execution/ultimate/t7/evidence/post-t6/backend/app/results/registry.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/tests/test_transport_plan_core.py",
+      "resolved_from": "backend/tests/test_transport_plan_core.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t6/command-ledger.json",
+      "resolved_from": "docs/execution/ultimate/t6/command-ledger.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/B-NODE.log",
+      "resolved_from": "docs/execution/ultimate/t6/evidence/B-NODE.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/B-NODE.result.json",
+      "resolved_from": "docs/execution/ultimate/t6/evidence/B-NODE.result.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/B-PY.log",
+      "resolved_from": "docs/execution/ultimate/t6/evidence/B-PY.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/B-PY.result.json",
+      "resolved_from": "docs/execution/ultimate/t6/evidence/B-PY.result.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/T6-user-request.txt",
+      "resolved_from": "docs/execution/ultimate/t6/evidence/T6-user-request.txt",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/U6.log",
+      "resolved_from": "docs/execution/ultimate/t6/evidence/U6.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/U6.result.json",
+      "resolved_from": "docs/execution/ultimate/t6/evidence/U6.result.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/attempts/U6-first.log",
+      "resolved_from": "docs/execution/ultimate/t6/evidence/attempts/U6-first.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/attempts/U6-second.log",
+      "resolved_from": "docs/execution/ultimate/t6/evidence/attempts/U6-second.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/candidate.json",
+      "resolved_from": "docs/execution/ultimate/t6/evidence/candidate.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/drivers/finalize.py",
+      "resolved_from": "docs/execution/ultimate/t6/evidence/drivers/finalize.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/drivers/qa.py",
+      "resolved_from": "docs/execution/ultimate/t6/evidence/drivers/qa.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/final-state.json",
+      "resolved_from": "docs/execution/ultimate/t6/evidence/final-state.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/initial-state.json",
+      "resolved_from": "docs/execution/ultimate/t6/evidence/initial-state.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/post-t5-tracked.patch",
+      "resolved_from": "docs/execution/ultimate/t6/evidence/post-t5-tracked.patch",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/post-t5/backend/app/results/registry.py",
+      "resolved_from": "docs/execution/ultimate/t6/evidence/post-t5/backend/app/results/registry.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/qa-final-batch.log",
+      "resolved_from": "docs/execution/ultimate/t6/evidence/qa-final-batch.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/skills/runtime-skill.txt",
+      "resolved_from": "docs/execution/ultimate/t6/evidence/skills/runtime-skill.txt",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/t6-changes.patch",
+      "resolved_from": "docs/execution/ultimate/t6/evidence/t6-changes.patch",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t6/preservation.json",
+      "resolved_from": "docs/execution/ultimate/t6/preservation.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t6/scope-diff.json",
+      "resolved_from": "docs/execution/ultimate/t6/scope-diff.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t6/skills-ledger.json",
+      "resolved_from": "docs/execution/ultimate/t6/skills-ledger.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t6/t6-execution-report.md",
+      "resolved_from": "docs/execution/ultimate/t6/t6-execution-report.md",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t6/test-ledger.json",
+      "resolved_from": "docs/execution/ultimate/t6/test-ledger.json",
+      "sha256_verified": true
+    }
+  ],
+  "legacy_assignment_scheduling_dispatch_exports_comparative_and_frontend_unchanged": true,
+  "no_reset_clean_discard_checkout_staging_commit_or_history_change": true
+}

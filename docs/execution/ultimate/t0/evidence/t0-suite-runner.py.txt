@@ -1,0 +1,88 @@
+"""T0 evidence capture only; invokes existing suites without changing tests."""
+import argparse
+from datetime import datetime, timezone
+import glob
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import time
+
+ROOT = Path('/workspace/Dation')
+BACKEND = ROOT / 'backend'
+EVIDENCE = ROOT / 'docs/execution/ultimate/t0/evidence'
+PY = str(ROOT / '.venv/bin/python')
+BROWSER_PY = str(BACKEND / '.browser-venv/bin/python')
+
+parser = argparse.ArgumentParser()
+parser.add_argument('suite', choices=['B-PY', 'B-NODE', 'B-BROWSER', 'B-FOCUS', 'B-SQL', 'B-E2E'])
+parser.add_argument('--sql-container')
+args = parser.parse_args()
+env = os.environ.copy()
+for key in ['SUPABASE_URL', 'SUPABASE_SECRET_KEY', 'SUPABASE_ACCESS_TOKEN',
+            'LLM_API_KEY', 'LLM_BASE_URL', 'GCP_ACCESS_TOKEN']:
+    env[key] = ''
+for key in ['DOCKER_CONTEXT', 'DOCKER_TLS', 'DOCKER_TLS_VERIFY', 'DOCKER_CERT_PATH']:
+    env.pop(key, None)
+env.update(PYTHONDONTWRITEBYTECODE='1', DOCKER_HOST='unix:///var/run/docker.sock',
+           NO_PROXY='127.0.0.1,localhost', DATION_BROWSER_PYTHON=BROWSER_PY,
+           DATION_E2E_ARTIFACTS='/workspace/work/dation-t0/e2e')
+if args.sql_container:
+    env['DATION_SQL_TEST_CONTAINER'] = args.sql_container
+else:
+    env.pop('DATION_SQL_TEST_CONTAINER', None)
+
+commands = {
+    'B-PY': [PY, '-B', '-m', 'unittest', 'discover', '-s', 'tests', '-v'],
+    'B-NODE': ['node', '--test', *sorted(glob.glob('tests/test_*.js', root_dir=BACKEND)),
+               *sorted(glob.glob('tests/test_*.mjs', root_dir=BACKEND))],
+    'B-BROWSER': [BROWSER_PY, '-B', '-m', 'unittest', 'discover', '-s', 'tests/browser', '-p', 'test_*.py', '-v'],
+    'B-FOCUS': [BROWSER_PY, '-B', '-m', 'unittest', 'test_run_lineage_polish',
+                'test_navigation.NavigationTests.test_foundation_dashboard_navigation_prefers_approved_over_later_candidate', '-v'],
+    'B-SQL': [PY, '-B', '-m', 'unittest', 'discover', '-s', 'tests/integration', '-p', 'test_*.py', '-v'],
+    'B-E2E': [PY, '-B', 'tests/e2e/run_suite.py'],
+}
+if args.suite in ['B-BROWSER', 'B-FOCUS']:
+    env['PYTHONPATH'] = 'tests/browser'
+command = commands[args.suite]
+started = datetime.now(timezone.utc).isoformat()
+begin = time.monotonic()
+print(json.dumps({'suite': args.suite, 'state': 'RUNNING', 'started_at': started, 'command': command}), flush=True)
+with (EVIDENCE / (args.suite + '.log')).open('w') as output:
+    completed = subprocess.run(command, cwd=BACKEND, env=env, stdout=output, stderr=subprocess.STDOUT)
+elapsed = round(time.monotonic() - begin, 3)
+logpath = EVIDENCE / (args.suite + '.log')
+text = logpath.read_text()
+ran = re.findall(r'^Ran (\d+) tests? in ([\d.]+)s', text, re.M)
+failures = [{'kind': kind, 'test': test.strip()} for kind, test in re.findall(r'^(FAIL|ERROR): (.+)$', text, re.M)]
+skips = re.findall(r'^test[^\n]* \.\.\. skipped[^\n]*$', text, re.M)
+if args.suite == 'B-NODE':
+    def tap(label):
+        match = re.search(r'^(?:# |ℹ )' + label + r' (\d+)$', text, re.M)
+        return int(match.group(1)) if match else None
+    count, failed, skipped = tap('tests'), tap('fail'), tap('skipped')
+    failures = re.findall(r'^not ok [^\n]+$', text, re.M)
+    duration = None
+else:
+    count = int(ran[-1][0]) if ran else 0
+    failed = len(failures)
+    duration = float(ran[-1][1]) if ran else None
+    match = re.search(r'^OK \(skipped=(\d+)\)', text, re.M)
+    skipped = int(match.group(1)) if match else len(skips)
+status = 'PASS' if completed.returncode == 0 and count and not skipped else 'FAIL'
+if not count or (completed.returncode == 0 and skipped):
+    status = 'BLOCKED'
+record = {'suite': args.suite, 'status': status, 'started_at': started,
+          'finished_at': datetime.now(timezone.utc).isoformat(), 'command': command,
+          'cwd': str(BACKEND), 'exit_code': completed.returncode, 'tests': count,
+          'failures_count': failed, 'skipped': skipped, 'failures': failures,
+          'wall_seconds': elapsed, 'suite_reported_seconds': duration,
+          'log_path': str(logpath.relative_to(ROOT)),
+          'log_sha256': hashlib.sha256(logpath.read_bytes()).hexdigest(),
+          'production_credentials_cleared': True, 'docker_target': 'local unix socket',
+          'sql_container': args.sql_container}
+(EVIDENCE / (args.suite + '.result.json')).write_text(json.dumps(record, ensure_ascii=False, indent=2) + '\n')
+print(json.dumps(record, ensure_ascii=False), flush=True)
+raise SystemExit(0 if status == 'PASS' else 1)

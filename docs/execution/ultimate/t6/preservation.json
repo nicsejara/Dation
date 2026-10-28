@@ -1,0 +1,18 @@
+{
+  "phase": "T6",
+  "baseline_pending_and_manifest_files": 791,
+  "checkpoint_bytes": 40360059,
+  "checkpoint_sha256": "411c7c2e49cbd7428aa5471e571b572dd39b4a7ab23a902fb8a1158f0ea0e95e",
+  "checkpoint_kind": "Equivalent content hash + immutable copies + tracked binary patch; .git read-only per filesystem policy",
+  "checkpoint_copies_verified": 791,
+  "current_baseline_files_unchanged": 790,
+  "intentionally_extended": [
+    "backend/app/results/registry.py"
+  ],
+  "registry_preimage": "evidence/post-t5/backend/app/results/registry.py",
+  "T5_manifest_unchanged": true,
+  "T5_manifest_entries_verified": 172,
+  "legacy_assignment_dispatch_scheduling_files_unchanged": true,
+  "baseline_work_discarded": false,
+  "git_history_changed": false
+}

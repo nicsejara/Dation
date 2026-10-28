@@ -1,0 +1,79 @@
+[
+  {
+    "inside": true,
+    "name": "Mapa de decisiones",
+    "hit": true,
+    "top": 581.5,
+    "bottom": 621.5
+  },
+  {
+    "inside": true,
+    "name": "Datos del Case",
+    "hit": true,
+    "top": 581.5,
+    "bottom": 621.5
+  },
+  {
+    "inside": true,
+    "name": "Contexto del Case",
+    "hit": true,
+    "top": 633.5,
+    "bottom": 673.5
+  },
+  {
+    "inside": true,
+    "name": "Seleccionar Decision Case",
+    "hit": true,
+    "top": 685.5,
+    "bottom": 725.5
+  },
+  {
+    "inside": true,
+    "name": "Cambiar",
+    "hit": true,
+    "top": 470.453125,
+    "bottom": 510.453125
+  },
+  {
+    "inside": true,
+    "name": "Configurar Transport Plan",
+    "hit": true,
+    "top": 774.125,
+    "bottom": 820.125
+  },
+  {
+    "inside": true,
+    "name": "Cambiar",
+    "hit": true,
+    "top": 779.703125,
+    "bottom": 819.703125
+  },
+  {
+    "inside": true,
+    "name": "Historial de Transport Plan",
+    "hit": true,
+    "top": 779.890625,
+    "bottom": 819.890625
+  },
+  {
+    "inside": true,
+    "name": "DECISI\u00d3N 2En esperaDay Scheduling\u00bfQu\u00e9 d\u00eda debe despacharse c",
+    "hit": true,
+    "top": 281.578125,
+    "bottom": 819.515625
+  },
+  {
+    "inside": true,
+    "name": "Cambiar",
+    "hit": true,
+    "top": 758.515625,
+    "bottom": 798.515625
+  },
+  {
+    "inside": true,
+    "name": "Historial de Day Scheduling",
+    "hit": true,
+    "top": 865.703125,
+    "bottom": 905.703125
+  }
+]

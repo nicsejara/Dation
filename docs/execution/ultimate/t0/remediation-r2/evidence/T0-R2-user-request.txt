@@ -1,0 +1,360 @@
+T0-R finalizó correctamente con estado STOP.
+
+NO ejecutes T1.
+
+Autorizo una segunda acción correctiva acotada de T0:
+
+# T0-R2 — TARGETED BASELINE REMEDIATION
+
+El objetivo es resolver exclusivamente los blockers residuales documentados en:
+
+- `docs/execution/ultimate/t0/t0-remediation-report.md`
+- `docs/execution/ultimate/t0/debt-register.md`
+- `docs/execution/ultimate/t0/debt-register.json`
+- `docs/execution/ultimate/t0/baseline-test-ledger.json`
+
+No realices una nueva auditoría end-to-end.
+
+Utilizá como baseline todo lo ya producido en T0 y T0-R.
+
+---
+
+# 1. SCOPE EXCLUSIVO
+
+T0-R2 debe limitarse a:
+
+## A. SQL Home / Decision Owner
+
+Corregir el defecto confirmado en `platform_home` por el cual Home sigue utilizando el modelo retirado de Approver para determinar trabajo de atención, mientras el contrato vigente utiliza Decision Owner.
+
+El objetivo es que:
+
+```text
+Home attention eligibility
+=
+current approval authority / Decision Owner rules
+```
+
+sin ampliar permisos.
+
+El operador no asignado:
+
+- NO debe ver una tarea de aprobación como propia;
+- NO debe adquirir permiso para aprobar;
+- no debe modificarse el actor histórico;
+- no deben alterarse approvals existentes.
+
+### AUTORIZACIÓN ESPECÍFICA
+
+Para este blocker queda autorizada una **migración SQL aditiva y mínima**, exclusivamente necesaria para corregir esta inconsistencia.
+
+NO se autoriza:
+
+- refactor general de SQL;
+- cambios globales de roles;
+- modificaciones de RLS no necesarias;
+- cambios de grants no necesarios;
+- baseline replay;
+- repair del migration history;
+- modificación destructiva de historia o datos;
+- cambios productivos remotos durante esta fase.
+
+La migración debe:
+
+1. tener timestamp nuevo;
+2. ser compatible con upgrade;
+3. preservar legacy;
+4. ser probada primero en sandbox owned;
+5. incluir tests de permisos/attention positivos y negativos;
+6. no aplicarse a producción en T0-R2.
+
+---
+
+## B. Browser fixture introducida durante T0-R
+
+Resolver el error de fixture que provoca:
+
+- cambio de Case ID;
+- snapshot de responsabilidades desactualizado;
+- `KeyError`;
+- teardown bloqueado.
+
+Primero demostrar la causa.
+
+Corregir únicamente:
+
+- fixture;
+- setup/teardown;
+- snapshot lifecycle;
+- harness relacionado.
+
+No modificar comportamiento de producto para acomodar una fixture incorrecta.
+
+Después ejecutar focalmente todos los tests afectados.
+
+---
+
+## C. Foco residual / viewport
+
+Resolver el blocker residual de foco fuera de vista en viewports bajos.
+
+Aplicar las Skills UI pertinentes conforme a `Execution Skills Policy`.
+
+Preservar:
+
+- design system actual;
+- geometría aprobada;
+- tokens;
+- navegación por teclado;
+- comportamiento desktop;
+- comportamiento mobile.
+
+No realizar redesign.
+
+La corrección debe ser mínima y demostrar:
+
+```text
+focus visible
++
+no clipping
++
+no overflow regression
++
+keyboard navigation preserved
+```
+
+en los viewports definidos por el Master Plan.
+
+---
+
+## D. Cinco fallos E2E restantes
+
+Reanalizar exclusivamente los cinco tests todavía en FAIL.
+
+Para cada uno:
+
+1. reproducir;
+2. clasificar;
+3. comprobar si está relacionado con A/B/C;
+4. aplicar cambio mínimo sólo si existe causa demostrada;
+5. ejecutar focal;
+6. registrar resultado.
+
+No abrir nuevos frentes salvo que uno de estos cinco fallos demuestre una regresión real.
+
+Si aparece una incompatibilidad de arquitectura no documentada:
+
+**STOP CONTRACT.**
+
+---
+
+# 2. SKILLS
+
+Usá solamente Skills pertinentes.
+
+Esperadas según el problema:
+
+- Supabase/Postgres para la migración y validación SQL;
+- `emil-design-eng`, `design-system` u otra Skill UI pertinente para el foco/responsive;
+- cloud/runtime únicamente para runners/sandbox cuando corresponda.
+
+Registrá:
+
+- Skill;
+- objetivo;
+- archivo/frontera;
+- decisión que ayudó a validar.
+
+Las Skills NO autorizan rediseño ni ampliación de scope.
+
+---
+
+# 3. CAMBIOS PROHIBIDOS
+
+NO ejecutar T1.
+
+NO crear DTOs Ultimate.
+
+NO crear engines nuevos.
+
+NO modificar D1/D2 matemáticamente.
+
+NO implementar DecisionResultPackage.
+
+NO modificar Decision Graph.
+
+NO alterar Data Pack.
+
+NO hacer refactors generales.
+
+NO limpiar datasets/product data.
+
+NO modificar Supabase productivo.
+
+NO deploy.
+
+NO Cloud Run.
+
+NO cambiar secrets.
+
+NO agregar skips.
+
+NO borrar tests.
+
+NO debilitar assertions para obtener verde.
+
+NO aumentar timeouts indiscriminadamente.
+
+---
+
+# 4. SQL TESTING
+
+Para la corrección `platform_home`:
+
+Ejecutar en sandbox owned:
+
+- upgrade path;
+- fresh schema cuando corresponda;
+- positive owner attention;
+- negative non-owner attention;
+- Owner/Admin/Viewer boundaries;
+- current approval;
+- historical approval;
+- workspace isolation;
+- existing Home regression tests.
+
+Confirmar que:
+
+```text
+Home visibility
+```
+
+y:
+
+```text
+POST approval authority
+```
+
+son coherentes, sin convertir Home en autoridad de aprobación.
+
+---
+
+# 5. ORDEN RECOMENDADO
+
+1. Resolver fixture/harness para recuperar una suite Browser confiable.
+2. Resolver SQL Home.
+3. Resolver foco responsive.
+4. Resolver los cinco E2E restantes.
+5. Ejecutar focales.
+6. Ejecutar suites completas.
+
+No acumular cambios sin validación intermedia.
+
+---
+
+# 6. SUITES FINALES OBLIGATORIAS
+
+Al finalizar T0-R2 ejecutar completas:
+
+- B-PY
+- B-NODE
+- B-BROWSER
+- B-SQL
+- B-E2E
+- B-FOCUS
+
+Todas deben tener:
+
+- cero failures;
+- cero errors;
+- cero skips;
+- tests > 0.
+
+Si una suite no puede ejecutarse:
+
+`STOP ENV`.
+
+No declarar GO parcial.
+
+---
+
+# 7. MASTER PLAN
+
+No modificar `DATION_FINAL_MASTER_EXECUTION_PLAN.md` salvo que una incompatibilidad contractual real exija STOP CONTRACT.
+
+T0-R2 es remediación del baseline.
+
+No es una nueva fase de arquitectura.
+
+---
+
+# 8. ENTREGABLE
+
+Crear:
+
+`docs/execution/ultimate/t0/t0-remediation-r2-report.md`
+
+Actualizar:
+
+- debt register;
+- baseline test ledger;
+- command ledger;
+- integrity manifest;
+
+si corresponde.
+
+El reporte debe separar explícitamente:
+
+## Product fixes
+Cambios donde el producto estaba incorrecto.
+
+## Test / Fixture fixes
+Cambios donde la expectativa o fixture estaba desactualizada.
+
+## Harness / Environment fixes
+Cambios de aislamiento/lifecycle/red.
+
+## UI / Responsive fixes
+Cambios estrictamente visuales o de accesibilidad.
+
+## SQL migration
+- nombre;
+- motivo;
+- objetos afectados;
+- tests;
+- rollback;
+- confirmación de que NO fue aplicada a producción.
+
+---
+
+# 9. GATE REEVALUATION
+
+Reevaluar:
+
+- G-B
+- G-C
+- G-D
+- G-R
+- G-L
+- G-S
+- G-ENV
+
+y cualquier otro gate afectado directamente.
+
+---
+
+# 10. FINAL DECISION
+
+Una sola salida:
+
+**GO — T0 baseline estabilizado. T1 puede ser solicitado.**
+
+o
+
+**STOP — persisten blockers. T1 continúa prohibido.**
+
+Aunque resulte GO:
+
+NO ejecutes T1.
+
+Finalizá después del reporte.

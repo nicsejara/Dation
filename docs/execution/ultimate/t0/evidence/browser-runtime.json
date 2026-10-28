@@ -1,0 +1,8 @@
+{
+  "python": "3.13.5",
+  "playwright": "1.63.0",
+  "chromium_executable": "/home/agent/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome",
+  "executable_present": false,
+  "actual_selected_executable": "/usr/bin/chromium",
+  "actual_chromium_version": "Chromium 151.0.7922.173 built on Debian GNU/Linux 13 (trixie)"
+}

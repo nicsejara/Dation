@@ -1,0 +1,39 @@
+[
+  {
+    "name": "production-health",
+    "url": "https://dation-core-469052310590.us-west1.run.app/health",
+    "method": "GET",
+    "at": "2026-10-25T18:06:33.323579+00:00",
+    "http_status": 200,
+    "body": "{\"status\":\"healthy\"}",
+    "elapsed_seconds": 9.048
+  },
+  {
+    "name": "production-openapi",
+    "url": "https://dation-core-469052310590.us-west1.run.app/openapi.json",
+    "method": "GET",
+    "at": "2026-10-25T18:06:42.371913+00:00",
+    "http_status": 200,
+    "paths": 91,
+    "operations": 98,
+    "identical_to_local_baseline": true,
+    "elapsed_seconds": 0.394
+  },
+  {
+    "name": "cloud-run-metadata",
+    "url": "https://run.googleapis.com/v1/projects/dation-510100/locations/us-west1/services/dation-core",
+    "method": "GET",
+    "at": "2026-10-25T18:06:42.765880+00:00",
+    "http_status": 401,
+    "elapsed_seconds": 0.349
+  },
+  {
+    "name": "supabase-changelog",
+    "url": "https://supabase.com/changelog.md",
+    "method": "GET",
+    "at": "2026-10-25T18:06:43.114489+00:00",
+    "error_type": "URLError",
+    "error": "<urlopen error Tunnel connection failed: 403 Forbidden>",
+    "elapsed_seconds": 0.008
+  }
+]

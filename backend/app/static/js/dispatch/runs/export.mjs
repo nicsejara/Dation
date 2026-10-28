@@ -102,7 +102,7 @@ function legacyRows(result){
 }
 
 export function exportDecision(result){
-  if(!result||!result.schema_version){
+  if(!result||result.result_schema||!['assignment_v1','scheduling_v1','dispatch_v1','dispatch_v2'].includes(result.schema_version)){
     throw new Error('La corrida no contiene un resultado exportable.');
   }
 
@@ -128,6 +128,7 @@ export function exportDecisionJson(result,runId='decision'){
   if(!result){
     throw new Error('La corrida no contiene un resultado exportable.');
   }
+  if(result.result_schema||(result.schema_version&&!['assignment_v1','scheduling_v1','dispatch_v1','dispatch_v2'].includes(result.schema_version)))throw new Error('UNSUPPORTED_RESULT_SCHEMA: se requiere la exportación completa con referencias verificadas.');
   const name='dation-'+String(runId).slice(0,8)+'.json';
   download(
     name,
@@ -139,6 +140,15 @@ export function exportDecisionJson(result,runId='decision'){
 
 // Authenticated generation from persisted evidence, with a committed audit event.
 export async function downloadRunExport(run,format,{signal,filename}={}){
+  if(['transport_plan_v1','day_scheduling_v1'].includes(run.result_json?.result_schema)){
+    const response=await fetch('/api/runs/'+encodeURIComponent(run.id)+'/decision-export?'+new URLSearchParams({format,expected_result_fingerprint:run.result_fingerprint}),{signal});
+    if(!response.ok){let code;try{code=(await response.json()).detail;}catch{}
+      throw new Error(code==='ARTIFACT_MISSING'?'Falta un artifact requerido. No se generó el archivo completo.':code==='ARTIFACT_INTEGRITY_ERROR'?'Falló la integridad de un artifact. No se generó el archivo completo.':'La exportación está incompleta o no está disponible.');}
+    if(response.headers.get('X-Run-Id')!==run.id||response.headers.get('X-Result-Fingerprint')!==run.result_fingerprint)throw new Error('RESULT_FINGERPRINT_MISMATCH');
+    const name=response.headers.get('Content-Disposition')?.match(/filename="([^"]+)"/)?.[1];
+    if(!name)throw new Error('Nombre de exportación no disponible');
+    download(name,await response.blob(),response.headers.get('Content-Type'));return name;
+  }
   const response=await fetch('/api/platform/activity/exports',{method:'POST',headers:{'Content-Type':'application/json'},signal,
     body:JSON.stringify({run_id:run.id,format,operation_id:crypto.randomUUID()})});
   if(!response.ok)throw new Error('No se pudo generar la exportación. Reintentá.');

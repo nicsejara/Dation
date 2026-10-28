@@ -1,0 +1,14 @@
+{
+  "owned_sql_container": "dation-t4-20261026-inputs",
+  "labels_verified": {
+    "dation.qa.owner": "codex-dation",
+    "dation.qa.phase": "T4"
+  },
+  "network": "none",
+  "owned_container_volume_removed": true,
+  "remaining_labelled_T4_containers": [],
+  "no_global_daemon_or_unowned_resource_stopped": true,
+  "final_W4_fixture_cleanup_verified": true,
+  "final_owned_qa_containers_remaining": [],
+  "final_check": "docker local ps -a --filter label=dation.qa.owner=codex-dation returned no rows after final W4"
+}

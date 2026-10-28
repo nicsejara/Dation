@@ -1,0 +1,1276 @@
+[
+  {
+    "path": "/api/dispatch/status",
+    "method": "GET",
+    "operation_id": "status_api_dispatch_status_get",
+    "request_body": null,
+    "responses": [
+      "200"
+    ]
+  },
+  {
+    "path": "/api/dispatch/contracts",
+    "method": "GET",
+    "operation_id": "contracts_api_dispatch_contracts_get",
+    "request_body": null,
+    "responses": [
+      "200"
+    ]
+  },
+  {
+    "path": "/api/decision-cases",
+    "method": "GET",
+    "operation_id": "list_decision_cases_api_decision_cases_get",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/decision-cases",
+    "method": "POST",
+    "operation_id": "create_decision_case_api_decision_cases_post",
+    "request_body": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/DecisionCaseCreate"
+          }
+        }
+      }
+    },
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/decision-cases/{case_id}",
+    "method": "GET",
+    "operation_id": "get_decision_case_api_decision_cases__case_id__get",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/decision-cases/{case_id}",
+    "method": "PATCH",
+    "operation_id": "update_decision_case_api_decision_cases__case_id__patch",
+    "request_body": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/DecisionCaseUpdate"
+          }
+        }
+      }
+    },
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/decision-cases/{case_id}/runs",
+    "method": "GET",
+    "operation_id": "get_decision_case_runs_api_decision_cases__case_id__runs_get",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/datasets/validate",
+    "method": "POST",
+    "operation_id": "validate_dataset_api_datasets_validate_post",
+    "request_body": {
+      "required": true,
+      "content": {
+        "multipart/form-data": {
+          "schema": {
+            "$ref": "#/components/schemas/Body_validate_dataset_api_datasets_validate_post"
+          }
+        }
+      }
+    },
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/datasets/load-sample",
+    "method": "POST",
+    "operation_id": "load_sample_api_datasets_load_sample_post",
+    "request_body": null,
+    "responses": [
+      "200"
+    ]
+  },
+  {
+    "path": "/api/datasets/{dataset_id}",
+    "method": "PATCH",
+    "operation_id": "update_dataset_api_datasets__dataset_id__patch",
+    "request_body": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/LabelUpdate"
+          }
+        }
+      }
+    },
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/datasets/{dataset_id}/download",
+    "method": "GET",
+    "operation_id": "download_dataset_api_datasets__dataset_id__download_get",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/runs/preflight",
+    "method": "POST",
+    "operation_id": "preflight_api_runs_preflight_post",
+    "request_body": {
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/Inputs"
+          }
+        }
+      },
+      "required": true
+    },
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/runs/assignment-preview",
+    "method": "POST",
+    "operation_id": "assignment_preview_api_runs_assignment_preview_post",
+    "request_body": {
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/AssignmentPreviewRequest"
+          }
+        }
+      },
+      "required": true
+    },
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/runs",
+    "method": "POST",
+    "operation_id": "run_api_runs_post",
+    "request_body": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/RunRequest"
+          }
+        }
+      }
+    },
+    "responses": [
+      "202",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/runs",
+    "method": "GET",
+    "operation_id": "get_runs_api_runs_get",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/runs/{run_id}/cancel",
+    "method": "POST",
+    "operation_id": "cancel_run_api_runs__run_id__cancel_post",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/runs/{run_id}/approve",
+    "method": "POST",
+    "operation_id": "approve_run_api_runs__run_id__approve_post",
+    "request_body": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ApprovalRequest"
+          }
+        }
+      }
+    },
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/datasets/{dataset_id}/default",
+    "method": "POST",
+    "operation_id": "default_api_datasets__dataset_id__default_post",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/datasets/{dataset_id}/archive",
+    "method": "POST",
+    "operation_id": "archive_api_datasets__dataset_id__archive_post",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/datasets/{dataset_id}/unarchive",
+    "method": "POST",
+    "operation_id": "unarchive_api_datasets__dataset_id__unarchive_post",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/dispatch/templates/{kind}",
+    "method": "GET",
+    "operation_id": "template_api_dispatch_templates__kind__get",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/datasets/{dataset_id}/refresh-profile",
+    "method": "POST",
+    "operation_id": "refresh_dataset_profile_api_datasets__dataset_id__refresh_profile_post",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/runs/{run_id}/comparative",
+    "method": "GET",
+    "operation_id": "comparative_state_api_runs__run_id__comparative_get",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/runs/{run_id}/comparative",
+    "method": "POST",
+    "operation_id": "comparative_generate_api_runs__run_id__comparative_post",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/workspace-setup",
+    "method": "GET",
+    "operation_id": "auth_page_workspace_setup_get",
+    "request_body": null,
+    "responses": [
+      "200"
+    ]
+  },
+  {
+    "path": "/recover",
+    "method": "GET",
+    "operation_id": "auth_page_recover_get",
+    "request_body": null,
+    "responses": [
+      "200"
+    ]
+  },
+  {
+    "path": "/register",
+    "method": "GET",
+    "operation_id": "auth_page_register_get",
+    "request_body": null,
+    "responses": [
+      "200"
+    ]
+  },
+  {
+    "path": "/login",
+    "method": "GET",
+    "operation_id": "auth_page_login_get",
+    "request_body": null,
+    "responses": [
+      "200"
+    ]
+  },
+  {
+    "path": "/auth/login",
+    "method": "POST",
+    "operation_id": "login_auth_login_post",
+    "request_body": {
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/Login"
+          }
+        }
+      },
+      "required": true
+    },
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/auth/register",
+    "method": "POST",
+    "operation_id": "register_auth_register_post",
+    "request_body": {
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/Signup"
+          }
+        }
+      },
+      "required": true
+    },
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/auth/recover",
+    "method": "POST",
+    "operation_id": "recover_auth_recover_post",
+    "request_body": {
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/Email"
+          }
+        }
+      },
+      "required": true
+    },
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/auth/callback/recovery",
+    "method": "GET",
+    "operation_id": "callback_auth_callback_recovery_get",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/auth/callback",
+    "method": "GET",
+    "operation_id": "callback_auth_callback_get",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/auth/session",
+    "method": "POST",
+    "operation_id": "session_auth_session_post",
+    "request_body": null,
+    "responses": [
+      "200"
+    ]
+  },
+  {
+    "path": "/auth/logout",
+    "method": "POST",
+    "operation_id": "logout_auth_logout_post",
+    "request_body": null,
+    "responses": [
+      "200"
+    ]
+  },
+  {
+    "path": "/auth/password",
+    "method": "POST",
+    "operation_id": "password_auth_password_post",
+    "request_body": {
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/Password"
+          }
+        }
+      },
+      "required": true
+    },
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/auth/workspace",
+    "method": "POST",
+    "operation_id": "create_workspace_auth_workspace_post",
+    "request_body": {
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/Workspace"
+          }
+        }
+      },
+      "required": true
+    },
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/auth/invitations",
+    "method": "POST",
+    "operation_id": "received_invitations_auth_invitations_post",
+    "request_body": null,
+    "responses": [
+      "200"
+    ]
+  },
+  {
+    "path": "/auth/invitations/{invitation_id}/accept",
+    "method": "POST",
+    "operation_id": "accept_invitation_auth_invitations__invitation_id__accept_post",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/data/datasets",
+    "method": "GET",
+    "operation_id": "datasets_api_platform_data_datasets_get",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/data/contracts",
+    "method": "GET",
+    "operation_id": "contracts_api_platform_data_contracts_get",
+    "request_body": null,
+    "responses": [
+      "200"
+    ]
+  },
+  {
+    "path": "/api/platform/data/templates/{kind}",
+    "method": "GET",
+    "operation_id": "template_api_platform_data_templates__kind__get",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/data/datasets/validate",
+    "method": "POST",
+    "operation_id": "validate_api_platform_data_datasets_validate_post",
+    "request_body": {
+      "required": true,
+      "content": {
+        "multipart/form-data": {
+          "schema": {
+            "$ref": "#/components/schemas/Body_validate_api_platform_data_datasets_validate_post"
+          }
+        }
+      }
+    },
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/data/datasets/upload",
+    "method": "POST",
+    "operation_id": "upload_api_platform_data_datasets_upload_post",
+    "request_body": {
+      "required": true,
+      "content": {
+        "multipart/form-data": {
+          "schema": {
+            "$ref": "#/components/schemas/Body_upload_api_platform_data_datasets_upload_post"
+          }
+        }
+      }
+    },
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/data/datasets/{dataset_id}",
+    "method": "GET",
+    "operation_id": "dataset_api_platform_data_datasets__dataset_id__get",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/data/datasets/{dataset_id}",
+    "method": "DELETE",
+    "operation_id": "delete_api_platform_data_datasets__dataset_id__delete",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/data/uploads/{operation_id}/discard",
+    "method": "POST",
+    "operation_id": "discard_upload_api_platform_data_uploads__operation_id__discard_post",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/data/datasets/{dataset_id}/preview",
+    "method": "GET",
+    "operation_id": "preview_api_platform_data_datasets__dataset_id__preview_get",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/data/datasets/{dataset_id}/download",
+    "method": "GET",
+    "operation_id": "download_api_platform_data_datasets__dataset_id__download_get",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/data/datasets/{dataset_id}/reuse",
+    "method": "POST",
+    "operation_id": "reuse_api_platform_data_datasets__dataset_id__reuse_post",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/data/datasets/{dataset_id}/archive",
+    "method": "POST",
+    "operation_id": "archive_api_platform_data_datasets__dataset_id__archive_post",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/data/datasets/{dataset_id}/unarchive",
+    "method": "POST",
+    "operation_id": "unarchive_api_platform_data_datasets__dataset_id__unarchive_post",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/data/packs",
+    "method": "GET",
+    "operation_id": "packs_api_platform_data_packs_get",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/data/pack",
+    "method": "GET",
+    "operation_id": "pack_api_platform_data_pack_get",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/data/pack/reuse",
+    "method": "POST",
+    "operation_id": "reuse_pack_api_platform_data_pack_reuse_post",
+    "request_body": {
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/PackRef"
+          }
+        }
+      },
+      "required": true
+    },
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/decisions/{case_id}/workflow-readiness",
+    "method": "GET",
+    "operation_id": "workflow_readiness_api_platform_decisions__case_id__workflow_readiness_get",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/decisions/{case_id}/responsibilities",
+    "method": "GET",
+    "operation_id": "responsibilities_api_platform_decisions__case_id__responsibilities_get",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/decisions/{case_id}/responsibilities/{stage_key}",
+    "method": "PUT",
+    "operation_id": "assign_responsibility_api_platform_decisions__case_id__responsibilities__stage_key__put",
+    "request_body": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/StageAssignment"
+          }
+        }
+      }
+    },
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/decisions",
+    "method": "GET",
+    "operation_id": "cases_api_platform_decisions_get",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/decisions/{case_id}",
+    "method": "GET",
+    "operation_id": "detail_api_platform_decisions__case_id__get",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/decisions/{case_id}",
+    "method": "PATCH",
+    "operation_id": "update_api_platform_decisions__case_id__patch",
+    "request_body": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/CaseUpdate"
+          }
+        }
+      }
+    },
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/decisions/{case_id}/runs",
+    "method": "GET",
+    "operation_id": "history_api_platform_decisions__case_id__runs_get",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/decisions/{case_id}/attributes",
+    "method": "PUT",
+    "operation_id": "apply_attributes_api_platform_decisions__case_id__attributes_put",
+    "request_body": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/CaseAttributesApply"
+          }
+        }
+      }
+    },
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/decisions/{case_id}/data-pack",
+    "method": "PUT",
+    "operation_id": "replace_data_pack_api_platform_decisions__case_id__data_pack_put",
+    "request_body": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/CaseDataPack"
+          }
+        }
+      }
+    },
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/team",
+    "method": "GET",
+    "operation_id": "team_api_platform_team_get",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/team/invitations",
+    "method": "POST",
+    "operation_id": "invite_api_platform_team_invitations_post",
+    "request_body": {
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/Invitation"
+          }
+        }
+      },
+      "required": true
+    },
+    "responses": [
+      "201",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/team/members/{user_id}/responsibilities",
+    "method": "PATCH",
+    "operation_id": "responsibilities_api_platform_team_members__user_id__responsibilities_patch",
+    "request_body": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/Responsibilities"
+          }
+        }
+      }
+    },
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/team/invitations/{invitation_id}/revoke",
+    "method": "POST",
+    "operation_id": "revoke_api_platform_team_invitations__invitation_id__revoke_post",
+    "request_body": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/Version"
+          }
+        }
+      }
+    },
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/team/members/{user_id}",
+    "method": "PATCH",
+    "operation_id": "update_member_api_platform_team_members__user_id__patch",
+    "request_body": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/MemberUpdate"
+          }
+        }
+      }
+    },
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/decisions/{case_id}/assignments/{node_id}",
+    "method": "PUT",
+    "operation_id": "assign_api_platform_decisions__case_id__assignments__node_id__put",
+    "request_body": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/AssignmentUpdate"
+          }
+        }
+      }
+    },
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/settings",
+    "method": "GET",
+    "operation_id": "settings_api_platform_settings_get",
+    "request_body": null,
+    "responses": [
+      "200"
+    ]
+  },
+  {
+    "path": "/api/platform/settings",
+    "method": "PATCH",
+    "operation_id": "update_settings_api_platform_settings_patch",
+    "request_body": {
+      "content": {
+        "application/json": {
+          "schema": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/General"
+              },
+              {
+                "$ref": "#/components/schemas/Operation"
+              }
+            ],
+            "title": "Payload",
+            "discriminator": {
+              "propertyName": "section",
+              "mapping": {
+                "general": "#/components/schemas/General",
+                "operation": "#/components/schemas/Operation"
+              }
+            }
+          }
+        }
+      },
+      "required": true
+    },
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/activity",
+    "method": "GET",
+    "operation_id": "feed_api_platform_activity_get",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/activity/exports",
+    "method": "POST",
+    "operation_id": "export_api_platform_activity_exports_post",
+    "request_body": {
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ExportRequest"
+          }
+        }
+      },
+      "required": true
+    },
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/onboarding",
+    "method": "GET",
+    "operation_id": "progress_api_platform_onboarding_get",
+    "request_body": null,
+    "responses": [
+      "200"
+    ]
+  },
+  {
+    "path": "/api/platform/onboarding/explore",
+    "method": "POST",
+    "operation_id": "explore_api_platform_onboarding_explore_post",
+    "request_body": {
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/EmptyRequest"
+          }
+        }
+      },
+      "required": true
+    },
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/onboarding/demo",
+    "method": "POST",
+    "operation_id": "demo_api_platform_onboarding_demo_post",
+    "request_body": {
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/EmptyRequest"
+          }
+        }
+      },
+      "required": true
+    },
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/platform/home",
+    "method": "GET",
+    "operation_id": "get_home_api_platform_home_get",
+    "request_body": null,
+    "responses": [
+      "200"
+    ]
+  },
+  {
+    "path": "/api/platform/profile",
+    "method": "PATCH",
+    "operation_id": "update_profile_api_platform_profile_patch",
+    "request_body": {
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ProfileUpdate"
+          }
+        }
+      },
+      "required": true
+    },
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/",
+    "method": "GET",
+    "operation_id": "root__get",
+    "request_body": null,
+    "responses": [
+      "200"
+    ]
+  },
+  {
+    "path": "/health",
+    "method": "GET",
+    "operation_id": "health_health_get",
+    "request_body": null,
+    "responses": [
+      "200"
+    ]
+  },
+  {
+    "path": "/ready",
+    "method": "GET",
+    "operation_id": "ready_ready_get",
+    "request_body": null,
+    "responses": [
+      "200"
+    ]
+  },
+  {
+    "path": "/api/system/operations",
+    "method": "GET",
+    "operation_id": "operations_api_system_operations_get",
+    "request_body": null,
+    "responses": [
+      "200"
+    ]
+  },
+  {
+    "path": "/metrics",
+    "method": "GET",
+    "operation_id": "prometheus_metrics_metrics_get",
+    "request_body": null,
+    "responses": [
+      "200"
+    ]
+  },
+  {
+    "path": "/app/{platform_path}",
+    "method": "GET",
+    "operation_id": "decision_workspace_app__platform_path__get",
+    "request_body": null,
+    "responses": [
+      "200"
+    ]
+  },
+  {
+    "path": "/upload",
+    "method": "GET",
+    "operation_id": "decision_workspace_upload_get",
+    "request_body": null,
+    "responses": [
+      "200"
+    ]
+  },
+  {
+    "path": "/app",
+    "method": "GET",
+    "operation_id": "decision_workspace_app_get",
+    "request_body": null,
+    "responses": [
+      "200"
+    ]
+  },
+  {
+    "path": "/api/system/supabase-check",
+    "method": "GET",
+    "operation_id": "supabase_check_api_system_supabase_check_get",
+    "request_body": null,
+    "responses": [
+      "200"
+    ]
+  },
+  {
+    "path": "/api/system/llm-status",
+    "method": "GET",
+    "operation_id": "llm_status_api_system_llm_status_get",
+    "request_body": null,
+    "responses": [
+      "200"
+    ]
+  },
+  {
+    "path": "/api/workspace/summary",
+    "method": "GET",
+    "operation_id": "get_workspace_summary_api_workspace_summary_get",
+    "request_body": null,
+    "responses": [
+      "200"
+    ]
+  },
+  {
+    "path": "/api/datasets",
+    "method": "GET",
+    "operation_id": "get_datasets_api_datasets_get",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/datasets/{dataset_id}/profile",
+    "method": "GET",
+    "operation_id": "dataset_profile_api_datasets__dataset_id__profile_get",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/datasets/upload",
+    "method": "POST",
+    "operation_id": "upload_logistics_dataset_api_datasets_upload_post",
+    "request_body": {
+      "required": true,
+      "content": {
+        "multipart/form-data": {
+          "schema": {
+            "$ref": "#/components/schemas/Body_upload_logistics_dataset_api_datasets_upload_post"
+          }
+        }
+      }
+    },
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/runs/{dataset_id}",
+    "method": "POST",
+    "operation_id": "run_logistics_decision_api_runs__dataset_id__post",
+    "request_body": {
+      "content": {
+        "application/json": {
+          "schema": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DecisionRunConfig"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Config"
+          }
+        }
+      }
+    },
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/runs/{run_id}",
+    "method": "GET",
+    "operation_id": "read_decision_run_api_runs__run_id__get",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/runs/{run_id}/interpretation",
+    "method": "GET",
+    "operation_id": "read_run_interpretation_api_runs__run_id__interpretation_get",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/runs/{run_id}/explain",
+    "method": "POST",
+    "operation_id": "explain_decision_run_api_runs__run_id__explain_post",
+    "request_body": null,
+    "responses": [
+      "200",
+      "422"
+    ]
+  },
+  {
+    "path": "/api/runs/{run_id}/chat",
+    "method": "POST",
+    "operation_id": "chat_about_decision_api_runs__run_id__chat_post",
+    "request_body": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/DecisionQuestion"
+          }
+        }
+      }
+    },
+    "responses": [
+      "200",
+      "422"
+    ]
+  }
+]

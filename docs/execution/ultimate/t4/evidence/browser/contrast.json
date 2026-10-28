@@ -1,0 +1,29 @@
+{
+  "textCount": 117,
+  "minimumContrast": 5.429139914708745,
+  "failures": [],
+  "hero": null,
+  "overflow": false,
+  "legacyBoundary": false,
+  "scheme": "dark",
+  "cards": [
+    {
+      "background": "rgb(25, 36, 45)",
+      "x": 288,
+      "y": 543.5625,
+      "width": 538,
+      "height": 1186.390625,
+      "right": 826,
+      "bottom": 1729.953125
+    },
+    {
+      "background": "rgb(25, 36, 45)",
+      "x": 846,
+      "y": 543.5625,
+      "width": 538,
+      "height": 764.96875,
+      "right": 1384,
+      "bottom": 1308.53125
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "changed_files": [
+    "backend/app/static/js/dispatch/cases/ultimate-case-setup.mjs",
+    "backend/app/static/js/dispatch/models/forms.mjs",
+    "backend/app/static/js/dispatch/models/policy.mjs",
+    "backend/app/static/js/dispatch/models/setup-values.mjs",
+    "backend/tests/browser/test_ultimate_case_setup.py",
+    "backend/tests/test_ultimate_case_navigation.mjs"
+  ],
+  "reused_unchanged_consumers": [
+    "B-PY",
+    "S3",
+    "FOCAL-LEGACY-API",
+    "FOCAL-LEGACY-BROWSER",
+    "visual parity CSS/gallery/Hero checks"
+  ],
+  "rerun": [
+    "B-NODE",
+    "W3"
+  ],
+  "change": "T3-only draft signatures and no-op draft handling; no Python, SQL, legacy router, CSS, Hero or global token changes"
+}

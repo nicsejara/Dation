@@ -1,0 +1,179 @@
+{
+  "phase": "T1",
+  "captured_at": "2026-10-26T13:24:53.093446+00:00",
+  "scope": "Exact required runner argv and focal verification; no claim to be a transcript of every file read",
+  "runtime": "evidence/runtime.json",
+  "commands": [
+    {
+      "kind": "required_final_suite",
+      "suite": "U1",
+      "argv": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "tests.test_ultimate_contracts",
+        "tests.test_ultimate_transit",
+        "-v"
+      ],
+      "cwd": "/workspace/Dation/backend",
+      "exit_code": 0,
+      "result": "evidence/U1.result.json",
+      "log": "evidence/U1.log"
+    },
+    {
+      "kind": "required_final_suite",
+      "suite": "B-PY",
+      "argv": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "cwd": "/workspace/Dation/backend",
+      "exit_code": 0,
+      "result": "evidence/B-PY.result.json",
+      "log": "evidence/B-PY.log"
+    },
+    {
+      "kind": "required_final_suite",
+      "suite": "B-NODE",
+      "argv": [
+        "node",
+        "--test",
+        "tests/test_dashboard_selectors.js",
+        "tests/test_assignment_ai_summary.mjs",
+        "tests/test_assignment_dashboard_v2_selectors.mjs",
+        "tests/test_assignment_executive_kpis.mjs",
+        "tests/test_case_navigation.mjs",
+        "tests/test_center_resource.mjs",
+        "tests/test_chart_theme.mjs",
+        "tests/test_data_provenance.mjs",
+        "tests/test_data_resource.mjs",
+        "tests/test_decision_case.mjs",
+        "tests/test_dispatch_upload_selectors.mjs",
+        "tests/test_execution_progress.mjs",
+        "tests/test_home_dda_catalog.mjs",
+        "tests/test_lifecycle.mjs",
+        "tests/test_navigation.mjs",
+        "tests/test_platform_recovery.mjs",
+        "tests/test_scheduling_dashboard_v21_selectors.mjs",
+        "tests/test_v2_foundation.mjs",
+        "tests/test_workflow_gates.mjs",
+        "tests/test_workspace_settings.mjs"
+      ],
+      "cwd": "/workspace/Dation/backend",
+      "exit_code": 0,
+      "result": "evidence/B-NODE.result.json",
+      "log": "evidence/B-NODE.log"
+    },
+    {
+      "kind": "suite_orchestration",
+      "argv": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "/tmp/dation-t1-qa.py"
+      ],
+      "cwd": "/workspace/Dation",
+      "exit_code": 0,
+      "script": "evidence/dation-t1-qa.py",
+      "log": "evidence/qa-batch-final.log"
+    },
+    {
+      "kind": "focal_preservation_and_budgets",
+      "argv": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "/tmp/dation-t1-final-evidence.py"
+      ],
+      "cwd": "/workspace/Dation",
+      "exit_code": 0,
+      "script": "evidence/dation-t1-final-evidence.py",
+      "results": [
+        "evidence/legacy-preservation.json",
+        "evidence/api-preservation.json",
+        "evidence/payload-budgets.json"
+      ]
+    },
+    {
+      "kind": "cross_process_determinism",
+      "argv": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "-c",
+        "import json; from tests.ultimate_fixtures import core,package,ai_context; from app.results.canonical import core_result_fingerprint; print(json.dumps([core_result_fingerprint(core()),package().fingerprints.result_fingerprint,package(\"d2\").fingerprints.result_fingerprint,ai_context().context_hash]))"
+      ],
+      "cwd": "/workspace/Dation/backend",
+      "environment_overrides": [
+        {
+          "PYTHONHASHSEED": "1"
+        },
+        {
+          "PYTHONHASHSEED": "2701"
+        }
+      ],
+      "exit_codes": [
+        0,
+        0
+      ],
+      "result": "evidence/cross-process-vectors.json"
+    },
+    {
+      "kind": "documentation_consolidation",
+      "argv": [
+        "python",
+        "/tmp/dation-t1-consolidate.py"
+      ],
+      "cwd": "/workspace/Dation",
+      "script": "evidence/dation-t1-consolidate.py"
+    },
+    {
+      "kind": "workspace_readonly",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "cwd": "/workspace/Dation",
+      "exit_code": 0
+    },
+    {
+      "kind": "workspace_readonly",
+      "argv": [
+        "git",
+        "status",
+        "--short",
+        "--branch"
+      ],
+      "cwd": "/workspace/Dation"
+    },
+    {
+      "kind": "workspace_readonly",
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/workspace/Dation"
+    }
+  ],
+  "credential_environment": {
+    "cleared_in_children": [
+      "SUPABASE_URL",
+      "SUPABASE_SECRET_KEY",
+      "SUPABASE_ACCESS_TOKEN",
+      "LLM_API_KEY",
+      "LLM_BASE_URL",
+      "GCP_ACCESS_TOKEN"
+    ],
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  "network_database_browser_docker_operations": false,
+  "new_dependencies_installed": false,
+  "commit_push_deploy": false,
+  "T2_executed": false
+}

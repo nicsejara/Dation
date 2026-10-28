@@ -1,0 +1,654 @@
+T2 queda formalmente aprobado con estado:
+
+# GO — T2 COMPLETADO
+
+El reporte oficial es:
+
+`docs/execution/ultimate/t2/t2-execution-report.md`
+
+Autorizo ahora exclusivamente:
+
+# T3 — LOGISTICS MODELS + DECISION CASE FOUNDATION
+
+Seguí estrictamente:
+
+`DATION_FINAL_MASTER_EXECUTION_PLAN.md`
+
+Utilizá como baseline inmediato:
+
+`docs/execution/ultimate/t2/t2-execution-report.md`
+
+y consultá T0/T1 únicamente si una decisión histórica lo requiere.
+
+---
+
+# REGLA DE EFICIENCIA
+
+NO realices una nueva auditoría end-to-end.
+
+T0, T1 y T2 constituyen el baseline validado.
+
+Para T3:
+
+1. leé la sección T3 del Master Plan;
+2. revisá únicamente F01–F23 relevantes;
+3. inspeccioná solamente componentes, callers, SQL/RPC y tests afectados;
+4. ampliá la inspección sólo ante una incompatibilidad concreta;
+5. no vuelvas a recorrer engines, Result Architecture o toda Supabase por precaución.
+
+---
+
+# OBJETIVO T3
+
+Implementar la foundation funcional de:
+
+```text
+Logistics Model
+↓
+Published Logistics Model Version
+↓
+Decision Case
+↓
+Planning Context
+↓
+Empty Progressive Data Pack
+```
+
+Al finalizar T3 debe ser posible crear un Case Ultimate durable:
+
+- sin Orders/Fleet cargados;
+- ligado a una Model Version publicada;
+- con horizonte;
+- con operating mode;
+- con Case Policy;
+- con Decision Owner;
+- con Pack vacío inicial;
+- con contexto reproducible.
+
+NO debe ser necesario cargar CSV para que el Case exista.
+
+---
+
+# SKILLS
+
+Aplicá la `Execution Skills Policy`.
+
+Para T3 son especialmente pertinentes:
+
+- `design-system`
+- `emil-design-eng`
+- `ui-ux-pro-max`
+- `break-ui`
+
+sólo donde realmente aporten a la UI de Model/Case Setup.
+
+Para backend/SQL, utilizar Skills Supabase/Postgres únicamente si corresponde.
+
+## REGLA VISUAL
+
+Las Skills deben ayudar a extender el producto actual.
+
+NO deben:
+
+- crear un nuevo design system;
+- cambiar typography global;
+- redefinir spacing/tokens;
+- rediseñar Home/Decision Center/Data Hub;
+- introducir patrones visuales ajenos;
+- reemplazar componentes existentes innecesariamente.
+
+Primero inspeccioná los componentes y patrones actuales afectados.
+
+Después implementá la nueva funcionalidad dentro de ese lenguaje visual.
+
+---
+
+# 1. LOGISTICS MODEL
+
+Implementá el concepto durable y reusable definido en el Master Plan.
+
+Un Logistics Model representa:
+
+> una configuración reusable de una operación logística.
+
+NO una semana ni una ejecución.
+
+Debe soportar:
+
+```text
+Operating Role
+Transport Pattern
+Resource Sources
+Capacity Dimensions
+Primary Reporting Dimension
+Split behavior
+Cost model configuration
+Compatibility assumptions
+Network assumptions
+Currency / units
+```
+
+según los contratos ya definidos en T1.
+
+---
+
+# 2. OPERATING ROLE
+
+Soportar:
+
+```text
+SHIPPER
+LOGISTICS_PROVIDER
+HYBRID
+```
+
+Importante:
+
+Operating Role puede modificar:
+
+- copy;
+- defaults;
+- labels;
+- UX contextual.
+
+NO puede modificar:
+
+- permisos;
+- engine identity;
+- solver;
+- autorización.
+
+No crear engines diferentes por Role.
+
+---
+
+# 3. MODEL VERSIONING
+
+Logistics Model debe tener versiones publicadas append-only.
+
+Debe poder existir:
+
+```text
+Model
+ ├── Version 1
+ ├── Version 2
+ └── Version 3
+```
+
+Una Model Version publicada:
+
+- es inmutable;
+- puede ser reutilizada por múltiples Cases;
+- no cambia Cases históricos;
+- conserva contract/config hashes;
+- no se sobreescribe.
+
+Editar un Model publicado debe generar una nueva versión cuando corresponda.
+
+---
+
+# 4. DECISION CASE
+
+Implementá el nuevo Case Ultimate.
+
+Debe existir antes de cargar datos.
+
+Campos funcionales principales:
+
+```text
+Case Name
+Description
+Operating Mode
+Planning Start
+Planning End
+Horizon Type
+Logistics Model Version
+Case Policy / Global Goal
+Decision Owner
+```
+
+Mode:
+
+```text
+OPERATIONAL
+SIMULATION
+```
+
+No implementar todavía comportamiento Simulation avanzado.
+
+Sólo persistir/contextualizar correctamente.
+
+---
+
+# 5. PLANNING HORIZON
+
+Debe soportar:
+
+```text
+Daily
+Weekly
+Monthly
+Custom
+```
+
+pero persistir siempre:
+
+```text
+planning_start
+planning_end
+```
+
+como fechas concretas.
+
+Validar:
+
+```text
+planning_start <= planning_end
+```
+
+El horizonte representa la ventana de decisión de dispatch.
+
+No implementar todavía Scheduling D2.
+
+---
+
+# 6. CASE POLICY / GLOBAL GOAL
+
+Soportar:
+
+```text
+MINIMIZE_COST
+MAXIMIZE_SERVICE
+MAXIMIZE_OWN_CAPACITY
+MINIMIZE_TRIPS
+BALANCED
+CUSTOM
+```
+
+Mantener separación:
+
+```text
+Goal
+≠
+Guardrail
+≠
+Preference
+```
+
+T3 persiste y gobierna contexto.
+
+NO implementa todavía la matemática de T7.
+
+---
+
+# 7. FREEZE RULES
+
+Implementar las reglas congeladas del Master Plan.
+
+Antes de la primera admission:
+
+pueden editarse los campos matemáticos permitidos.
+
+Después de la primera admission Ultimate:
+
+deben quedar congelados, según contrato:
+
+- Model Version;
+- Planning Horizon;
+- Case Policy / Global Goal;
+- cualquier otro campo matemático definido como frozen.
+
+Metadata no matemática debe poder seguir editándose cuando corresponda:
+
+- Name;
+- Description;
+- Owner, según reglas vigentes y audit trail.
+
+No inventar nuevas freeze rules.
+
+---
+
+# 8. DECISION OWNER
+
+Reutilizar las reglas actuales de responsabilidades.
+
+NO volver al concepto retirado de Approver.
+
+Debe respetarse:
+
+```text
+Decision Owner
+```
+
+como rol de negocio para decisión/aprobación según contrato vigente.
+
+No alterar Admin/Viewer/Workspace permissions.
+
+No reconstruir actor histórico al cambiar Owner.
+
+---
+
+# 9. EMPTY DATA PACK
+
+Al crear un Ultimate Decision Case:
+
+crear atómicamente:
+
+```text
+Case
++
+stable Data Pack
++
+initial empty Data Pack Version
+```
+
+según la estructura preparada en T2.
+
+El Case debe poder abrirse y persistir aunque todavía no tenga:
+
+```text
+transport_demand
+transport_resources
+```
+
+No inventar placeholders.
+
+No crear fake dataset IDs.
+
+---
+
+# 10. API / BACKEND
+
+Implementar únicamente servicios/routes necesarios para:
+
+- Model library;
+- Model create/edit;
+- publish Model Version;
+- retrieve Models/Versions;
+- create Ultimate Case;
+- edit permitted Case fields;
+- retrieve Case context;
+- owner validation;
+- freeze behavior;
+- empty Pack creation.
+
+Mantener tenant safety y checked RPCs definidos en T2.
+
+No implementar todavía T4 Data Pack ingestion.
+
+---
+
+# 11. FRONTEND
+
+Implementar únicamente las superficies necesarias para T3.
+
+Debe poder existir una experiencia coherente de:
+
+```text
+Logistics Models
+↓
+Create / configure Model
+↓
+Publish Version
+
+Decision Case
+↓
+Create Case
+↓
+Select Model Version
+↓
+Define Horizon
+↓
+Select Global Goal
+↓
+Assign Owner
+↓
+Create
+```
+
+## UI PRESERVATION
+
+Antes de crear componentes:
+
+1. inspeccioná forms/cards/dropdowns/modals existentes;
+2. reutilizá tokens/componentes/patterns actuales;
+3. mantené Hero/shell/navigation actuales;
+4. no hagas redesign transversal;
+5. no cambies Home/Decision Center salvo integración mínima requerida.
+
+La nueva UI debe sentirse nativa de Dation.
+
+---
+
+# 12. NAVIGATION
+
+T3 NO implementa todavía el Decision Graph completo de T5.
+
+Pero sí debe permitir:
+
+```text
+Create Case
+↓
+Case exists
+↓
+Case context is recoverable
+```
+
+y dejar preparado el flujo para:
+
+```text
+Case
+→ Map
+```
+
+sin forzar Upload primero.
+
+No simular estados del graph que pertenecen a T5.
+
+---
+
+# 13. LEGACY
+
+Preservar totalmente:
+
+- legacy Case creation;
+- Orders/Fleet pair;
+- legacy routes;
+- legacy Home/Center behavior;
+- historical Runs;
+- approvals;
+- history;
+- existing owners/responsibilities;
+- archive/restore.
+
+No convertir automáticamente Cases legacy a Ultimate.
+
+---
+
+# 14. PROHIBIDO EN T3
+
+NO ejecutar T4.
+
+NO implementar CSV dynamic contracts.
+
+NO implementar Pack publish.
+
+NO implementar Decision Graph.
+
+NO implementar D1.
+
+NO implementar D2.
+
+NO implementar Result Assembler.
+
+NO crear Sankey/Gantt.
+
+NO modificar Dation IA.
+
+NO implementar alternatives.
+
+NO aplicar deploy.
+
+NO modificar producción.
+
+NO push.
+
+NO refactor transversal.
+
+---
+
+# 15. DATABASE / RPC
+
+Podés utilizar las estructuras creadas/probadas en T2.
+
+T3 puede implementar los RPC/services funcionales previstos para:
+
+- publish Model;
+- create Ultimate Case;
+- create empty Pack;
+- freeze;
+- ownership/context updates.
+
+Cualquier nueva migración debe estar estrictamente justificada por T3 y probada sólo en sandbox.
+
+No aplicar nada a producción.
+
+Si T3 revela que el schema T2 es insuficiente de forma contractual:
+
+documentar → STOP si implica rediseño significativo.
+
+No improvisar.
+
+---
+
+# 16. TESTING
+
+Ejecutá lo definido por T3:
+
+- B-PY
+- B-NODE
+- U3
+- S3
+- W3
+
+y focales necesarios.
+
+No vuelvas a ejecutar toda la suite E2E/Browser salvo necesidad demostrada.
+
+## Debe probarse como mínimo:
+
+### Model Versioning
+- Model create;
+- publish;
+- immutability;
+- new version;
+- reuse por múltiples Cases.
+
+### Case
+- creación sin CSV;
+- persistence/reload;
+- Model Version binding;
+- horizon validation;
+- Case Policy;
+- Decision Owner.
+
+### Freeze
+- editable pre-admission;
+- frozen post-admission;
+- metadata permitida sigue editable.
+
+### Pack
+- stable Pack creado;
+- Version inicial vacía;
+- tenant binding correcto.
+
+### Permissions
+- Owner/Admin/Viewer;
+- cross-workspace negatives.
+
+### UI
+- reload;
+- dirty state;
+- validation;
+- CAS conflict;
+- keyboard;
+- responsive básico;
+- visual consistency con Dation actual.
+
+---
+
+# 17. STOP CONDITIONS
+
+STOP si:
+
+- Case necesita CSV para existir;
+- Model Version publicada puede editarse;
+- Operating Role cambia permisos o runtime;
+- Case puede cambiar Model Version después del binding;
+- freeze depende sólo del frontend;
+- Case se crea sin Pack inicial coherente;
+- cross-tenant binding es posible;
+- legacy Case flow se rompe;
+- T3 requiere implementar Pack ingestion T4 para funcionar;
+- UI requiere redesign global;
+- una Skill propone cambiar arquitectura congelada.
+
+---
+
+# 18. REPORTING
+
+Crear:
+
+`docs/execution/ultimate/t3/t3-execution-report.md`
+
+Incluir:
+
+## Baseline utilizado
+
+## Skills utilizadas
+
+## Files Created
+
+## Files Modified
+
+## Logistics Model implementation
+
+## Model Versioning
+
+## Decision Case implementation
+
+## Case Policy / Horizon
+
+## Owner / Permissions
+
+## Freeze behavior
+
+## Empty Data Pack
+
+## UI integration
+
+## Tests executed
+
+## Legacy regression assessment
+
+## Deviations
+
+## Risks
+
+## Gate Evaluation
+
+## FINAL DECISION
+
+Una sola:
+
+**GO — T3 completado. T4 puede ser solicitado.**
+
+o
+
+**STOP — T3 no cumple condiciones para autorizar T4.**
+
+Aunque resulte GO:
+
+# NO EJECUTES T4.
+
+Finalizá después del reporte.

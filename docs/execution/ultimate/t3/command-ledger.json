@@ -1,0 +1,159 @@
+{
+  "phase": "T3",
+  "suites": [
+    {
+      "suite": "B-PY",
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "PYTHONPATH": null,
+      "started_at": "2026-10-26T18:05:40.290772+00:00",
+      "finished_at": "2026-10-26T18:05:59.070336+00:00",
+      "seconds": 18.78,
+      "exit_code": 0
+    },
+    {
+      "suite": "B-NODE",
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "node",
+        "--test",
+        "tests/test_dashboard_selectors.js",
+        "tests/test_assignment_ai_summary.mjs",
+        "tests/test_assignment_dashboard_v2_selectors.mjs",
+        "tests/test_assignment_executive_kpis.mjs",
+        "tests/test_case_navigation.mjs",
+        "tests/test_center_resource.mjs",
+        "tests/test_chart_theme.mjs",
+        "tests/test_data_provenance.mjs",
+        "tests/test_data_resource.mjs",
+        "tests/test_decision_case.mjs",
+        "tests/test_dispatch_upload_selectors.mjs",
+        "tests/test_execution_progress.mjs",
+        "tests/test_home_dda_catalog.mjs",
+        "tests/test_lifecycle.mjs",
+        "tests/test_navigation.mjs",
+        "tests/test_platform_recovery.mjs",
+        "tests/test_scheduling_dashboard_v21_selectors.mjs",
+        "tests/test_ultimate_case_navigation.mjs",
+        "tests/test_v2_foundation.mjs",
+        "tests/test_workflow_gates.mjs",
+        "tests/test_workspace_settings.mjs"
+      ],
+      "PYTHONPATH": null,
+      "started_at": "2026-10-26T18:21:06.391881+00:00",
+      "finished_at": "2026-10-26T18:21:08.344173+00:00",
+      "seconds": 1.952,
+      "exit_code": 0
+    },
+    {
+      "suite": "S3",
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "test_ultimate_case_models",
+        "-v"
+      ],
+      "PYTHONPATH": "tests/integration",
+      "started_at": "2026-10-26T18:06:00.770611+00:00",
+      "finished_at": "2026-10-26T18:06:35.606909+00:00",
+      "seconds": 34.836,
+      "exit_code": 0
+    },
+    {
+      "suite": "W3",
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "/workspace/Dation/backend/.browser-venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "test_ultimate_case_setup",
+        "-v"
+      ],
+      "PYTHONPATH": "tests/browser",
+      "started_at": "2026-10-26T18:23:49.550581+00:00",
+      "finished_at": "2026-10-26T18:25:10.055913+00:00",
+      "seconds": 80.506,
+      "exit_code": 0
+    },
+    {
+      "suite": "FOCAL-LEGACY-API",
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "test_decision_center.DecisionCenterTests.test_01_case_library_labels_pagination_identity_and_isolation",
+        "test_optimized_responsibilities.OptimizedResponsibilityTests.test_split_roles_reload_independent_node_assignments_and_actual_approval",
+        "test_optimized_responsibilities.OptimizedResponsibilityTests.test_archive_persists_reloads_and_preserves_case_history_and_assignments",
+        "-v"
+      ],
+      "PYTHONPATH": "tests/e2e",
+      "started_at": "2026-10-26T18:11:19.266398+00:00",
+      "finished_at": "2026-10-26T18:12:27.091485+00:00",
+      "seconds": 67.825,
+      "exit_code": 0
+    },
+    {
+      "suite": "FOCAL-LEGACY-BROWSER",
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "/workspace/Dation/backend/.browser-venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "test_navigation.NavigationTests.test_new_decision_goes_to_empty_data_without_losing_existing_case",
+        "test_navigation.NavigationTests.test_approved_assignment_continues_directly_to_scheduling_configuration",
+        "test_navigation.NavigationTests.test_map_selector_switches_case_data_progress_url_and_restores_cancel_focus",
+        "-v"
+      ],
+      "PYTHONPATH": "tests/browser",
+      "started_at": "2026-10-26T18:12:27.092812+00:00",
+      "finished_at": "2026-10-26T18:12:44.296996+00:00",
+      "seconds": 17.204,
+      "exit_code": 0
+    }
+  ],
+  "additional_commands": [
+    {
+      "command": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "/tmp/dation-t3-schema-evidence.py"
+      ],
+      "evidence": "evidence/attempts/schema-boundary.log"
+    },
+    {
+      "command": [
+        "/workspace/Dation/backend/.browser-venv/bin/python",
+        "-B",
+        "/tmp/dation-t3-visual-parity.py"
+      ],
+      "evidence": "evidence/attempts/visual-parity.log"
+    },
+    {
+      "command": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "/tmp/dation-t3-dda-parity.py"
+      ],
+      "evidence": "evidence/attempts/dda-parity-final.log"
+    }
+  ],
+  "U3_alias": "Executed within B-PY; 17 module cases verified in ledger.",
+  "production_credentials_cleared": true,
+  "no_remote_writes": true
+}

@@ -1,0 +1,48 @@
+{
+  "phase": "T0",
+  "skills": [
+    {
+      "name": "supabase:supabase",
+      "version": "0.1.2",
+      "activity": "Inspección de catálogo/RLS/grants/RPC/Storage y reconciliation, sólo lectura; changelog intentado y bloqueado por proxy.",
+      "resource": "skill://plugin_asdk_app_69d3e5ee6a708191baa733f7b8931995/supabase/SKILL.md",
+      "sha256": "1171386737b231610fa42485707272765c3516a9bbc0bd2c6c161a8cee3d7d33",
+      "references_read": [
+        "SKILL.md",
+        "supabase.com/changelog.md attempted, blocked by proxy403"
+      ]
+    },
+    {
+      "name": "supabase:supabase-postgres-best-practices",
+      "version": "1.1.1",
+      "activity": "Verificación de RLS/aislamiento, privilegios y lectura del catálogo; comparación controlada con schema Git, sin optimizar ni cambiar SQL productivo.",
+      "resource": "skill://plugin_asdk_app_69d3e5ee6a708191baa733f7b8931995/supabase-postgres-best-practices/SKILL.md",
+      "sha256": "ccd6e4596bd51cf344fe76c464867c541ccc16b6d90ae7a9db449fb17588613b",
+      "references_read": [
+        "references/security-rls-basics.md"
+      ]
+    },
+    {
+      "name": "cloud-environment:cloud-environment-runtime",
+      "version": null,
+      "activity": "Diagnóstico de sandbox/proxy, runtime readiness, Docker local y ejecución de tests sólo en recursos owned.",
+      "resource": "skill://plugin_connector_1p_c5b7d5df5d7081918f2c4be5a633ed5d/cloud-environment-runtime/SKILL.md",
+      "sha256": "c23513e361a6f9dbe1c28e5c41de635f355469b4ec1740ae1cd2de1d38a91bd3",
+      "references_read": [
+        "references/docker.md",
+        "references/networking.md"
+      ]
+    }
+  ],
+  "ui_skills_activated": false,
+  "omitted_guidance": [
+    "No aplicación de example user_id-only RLS/force-RLS: Dation membership/checked RPC congelados.",
+    "No migraciones/repair/writes remotos autorizados por Skills.",
+    "No auditoría UI, rediseño, instalaciones o deployment derivados de Skills."
+  ],
+  "availability_revalidated": {
+    "cloud_catalog": true,
+    "executor_catalog_entries": 0,
+    "local_skill_files": 12
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "phase": "T0-R2",
+  "files": {
+    "backend/app/static/css/dation-design-system.css": {
+      "r2_change": "modified",
+      "before_sha256": "a3faf946c344f85c1e52d120d30565310e8f71b8b6a79a774ed81883c6fe75b0",
+      "after_sha256": "3e160520a613ff04fa0d845bd072c0a50d4a3dd4fcc96e9a2f6a44411b248f95"
+    },
+    "backend/tests/browser/test_navigation.py": {
+      "r2_change": "modified",
+      "before_sha256": "0f0660dd24f5ebdc376d02911d37f9583930ecd02936ebeb64d9999841b1295a",
+      "after_sha256": "f49a997de32b383bc0eced5a024333c37bbcff2b0c25c70fa01cb874ee80b537"
+    },
+    "backend/tests/browser/test_saga4_ui.py": {
+      "r2_change": "modified",
+      "before_sha256": "915cf603eb564c7bf2a78a062f87b2f85a56b5fe69fa675d6a0242634d173dcf",
+      "after_sha256": "d1ea7452f61673478b9ca4ca187605094ab70b35031c024ec9adc2e0560145ce"
+    },
+    "backend/tests/e2e/browser_auth.py": {
+      "r2_change": "modified",
+      "before_sha256": "801a5305331ea57f419cac7191101c0dab910dc544392913dbcc6a4a87c63ef6",
+      "after_sha256": "495f40c2515e9ecde358e1c7fdba3cbc1504459822c1343a3fcd782ea9f31bf4"
+    },
+    "backend/tests/e2e/browser_journey.py": {
+      "r2_change": "modified",
+      "before_sha256": "ce6dd6f1bb300de83b18a98e46886c709d49f1b13bd7e7b2956096123574f207",
+      "after_sha256": "790ff6dd5dcba7bebb4f74116cb27ceb761c28c470d5cf71489e0526ce1c7bc1"
+    },
+    "backend/tests/e2e/collaboration_approval_journey.py": {
+      "r2_change": "modified",
+      "before_sha256": "aed190227f06b506b5a0c468001d2149fc2698a27a9badb6bdd58a7bec904604",
+      "after_sha256": "266c80149522d7737fa86cc440eb4aa7aaa60e115339944629de286ae4d21ea9"
+    },
+    "backend/tests/e2e/home_resume_journey.py": {
+      "r2_change": "modified",
+      "before_sha256": "8eb1b890a419d650c0848a27b0ad8b4e116ae037e2dd63270aac21f4b44facee",
+      "after_sha256": "9d581cc3b58e8502c43faf237011fb5a2eb53b76bc6a38acb94e3ec49effbbb4"
+    },
+    "backend/tests/e2e/scheduling_dashboard_journey.py": {
+      "r2_change": "modified",
+      "before_sha256": "98bca66759072b53ff40aaa9d1ea5fc09ded665c89285ae9fcc375dd48af8fe9",
+      "after_sha256": "edb5ef733f9d8ec0c96c114de65b02ab46c0384b50914337090596a7ea91b8db"
+    },
+    "backend/tests/e2e/test_collaboration.py": {
+      "r2_change": "modified",
+      "before_sha256": "1c42329466b1d89836c988bd2a791a4619aad82cfd09b5272c76314d899ff04b",
+      "after_sha256": "fde7ae735eddfd52b4ed2c6ca11273372359c69137dfce5005b4f22a19d70c1c"
+    },
+    "backend/tests/e2e/test_workflow.py": {
+      "r2_change": "modified",
+      "before_sha256": "f678e949d41e4a992b00227962f061bf3f0e365126003561ae4a214034e2acde",
+      "after_sha256": "51e0323137631a931406157e0e9a7e9b113a8ce406a1f32e021d0426729ed281"
+    },
+    "backend/tests/e2e/workflow_ui_audit.py": {
+      "r2_change": "modified",
+      "before_sha256": "f55c179e048e49751e431e982c40a0876cb109a5ef4f9ee197ebae8901504f82",
+      "after_sha256": "8ca23ddff62365ad56080793d51e000a347f19e86fac48efec65491fc1913229"
+    },
+    "backend/tests/e2e/test_home_owner_attention.py": {
+      "r2_change": "created",
+      "before_sha256": null,
+      "after_sha256": "80ddba3e0e3431e0dd2b59b9cb346581cd9903837f0330052db0ee1de5fb3468"
+    },
+    "supabase/migrations/20261026010000_home_decision_owner_attention.sql": {
+      "r2_change": "created",
+      "before_sha256": null,
+      "after_sha256": "e9ea4bbdb66def0e668cfb93f2eccd2dd797c12d1247617d4cf763564135ccae"
+    }
+  },
+  "unchanged_R1_product_fixes": [
+    "dda-logistics-upload.css",
+    "dispatch.css",
+    "scheduling-dashboard-v21.css",
+    "workflow-context.css"
+  ],
+  "T1_executed": false
+}

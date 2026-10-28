@@ -1,0 +1,53 @@
+{
+  "passed": true,
+  "states": [
+    {
+      "width": 1440,
+      "advanced": false,
+      "passed": true
+    },
+    {
+      "width": 1440,
+      "advanced": true,
+      "passed": true
+    },
+    {
+      "width": 768,
+      "advanced": false,
+      "passed": true
+    },
+    {
+      "width": 768,
+      "advanced": true,
+      "passed": true
+    },
+    {
+      "width": 390,
+      "advanced": false,
+      "passed": true
+    },
+    {
+      "width": 390,
+      "advanced": true,
+      "passed": true
+    }
+  ],
+  "javascript_errors": [],
+  "writes": [
+    [
+      "POST",
+      "/api/platform/activity/exports"
+    ],
+    [
+      "POST",
+      "/api/runs/30aef302-6b1c-4752-9d08-b210c5e1614e/approve"
+    ],
+    [
+      "POST",
+      "/api/runs/preflight"
+    ]
+  ],
+  "dataset": "QA temporal reproducible (no Golden Pallets v2)",
+  "assignment_frozen": true,
+  "source_sha": "ef997235a30251fbf7ae53690ed738092ee973d8"
+}

@@ -1,0 +1,15 @@
+{
+  "scope": "owned loopback T8 final schema only",
+  "command": [
+    "/home/agent/.npm/_npx/91eb58246759989d/node_modules/@supabase/cli-linux-x64/bin/supabase",
+    "db",
+    "advisors",
+    "--db-url",
+    "postgresql://postgres@127.0.0.1:32803/dation_e2e?sslmode=disable",
+    "--type",
+    "all",
+    "--output",
+    "json"
+  ],
+  "exit_code": 0
+}

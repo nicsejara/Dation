@@ -1,0 +1,3043 @@
+{
+  "columns": {
+    "before_count": 269,
+    "after_count": 384,
+    "added": [
+      {
+        "udt_name": "timestamptz",
+        "data_type": "timestamp with time zone",
+        "table_name": "decision_definition_versions",
+        "column_name": "created_at",
+        "is_nullable": "NO",
+        "table_schema": "dation_private",
+        "column_default": "now()",
+        "ordinal_position": 4
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "decision_definition_versions",
+        "column_name": "definition_hash",
+        "is_nullable": "NO",
+        "table_schema": "dation_private",
+        "column_default": null,
+        "ordinal_position": 2
+      },
+      {
+        "udt_name": "jsonb",
+        "data_type": "jsonb",
+        "table_name": "decision_definition_versions",
+        "column_name": "definition_jsonb",
+        "is_nullable": "NO",
+        "table_schema": "dation_private",
+        "column_default": null,
+        "ordinal_position": 3
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "decision_definition_versions",
+        "column_name": "version",
+        "is_nullable": "NO",
+        "table_schema": "dation_private",
+        "column_default": null,
+        "ordinal_position": 1
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "case_data_pack_entries",
+        "column_name": "canonical_sha256",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 9
+      },
+      {
+        "udt_name": "uuid",
+        "data_type": "uuid",
+        "table_name": "case_data_pack_entries",
+        "column_name": "case_id",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 4
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "case_data_pack_entries",
+        "column_name": "contract_hash",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 7
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "case_data_pack_entries",
+        "column_name": "contract_id",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 6
+      },
+      {
+        "udt_name": "uuid",
+        "data_type": "uuid",
+        "table_name": "case_data_pack_entries",
+        "column_name": "dataset_id",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 5
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "case_data_pack_entries",
+        "column_name": "normalized_bucket",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 11
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "case_data_pack_entries",
+        "column_name": "normalized_path",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 12
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "case_data_pack_entries",
+        "column_name": "normalizer_version",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 10
+      },
+      {
+        "udt_name": "uuid",
+        "data_type": "uuid",
+        "table_name": "case_data_pack_entries",
+        "column_name": "pack_version_id",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 1
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "case_data_pack_entries",
+        "column_name": "raw_sha256",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 8
+      },
+      {
+        "udt_name": "int8",
+        "data_type": "bigint",
+        "table_name": "case_data_pack_entries",
+        "column_name": "record_count",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 13
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "case_data_pack_entries",
+        "column_name": "slot_key",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 2
+      },
+      {
+        "udt_name": "uuid",
+        "data_type": "uuid",
+        "table_name": "case_data_pack_entries",
+        "column_name": "workspace_id",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 3
+      },
+      {
+        "udt_name": "uuid",
+        "data_type": "uuid",
+        "table_name": "case_data_pack_versions",
+        "column_name": "case_id",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 3
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "case_data_pack_versions",
+        "column_name": "contract_set_hash",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 7
+      },
+      {
+        "udt_name": "timestamptz",
+        "data_type": "timestamp with time zone",
+        "table_name": "case_data_pack_versions",
+        "column_name": "created_at",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": "now()",
+        "ordinal_position": 9
+      },
+      {
+        "udt_name": "uuid",
+        "data_type": "uuid",
+        "table_name": "case_data_pack_versions",
+        "column_name": "created_by",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 8
+      },
+      {
+        "udt_name": "xid8",
+        "data_type": "xid8",
+        "table_name": "case_data_pack_versions",
+        "column_name": "created_xid",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": "pg_current_xact_id()",
+        "ordinal_position": 10
+      },
+      {
+        "udt_name": "uuid",
+        "data_type": "uuid",
+        "table_name": "case_data_pack_versions",
+        "column_name": "id",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": "gen_random_uuid()",
+        "ordinal_position": 1
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "case_data_pack_versions",
+        "column_name": "manifest_hash",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 6
+      },
+      {
+        "udt_name": "uuid",
+        "data_type": "uuid",
+        "table_name": "case_data_pack_versions",
+        "column_name": "pack_id",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 4
+      },
+      {
+        "udt_name": "int4",
+        "data_type": "integer",
+        "table_name": "case_data_pack_versions",
+        "column_name": "version",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 5
+      },
+      {
+        "udt_name": "uuid",
+        "data_type": "uuid",
+        "table_name": "case_data_pack_versions",
+        "column_name": "workspace_id",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 2
+      },
+      {
+        "udt_name": "uuid",
+        "data_type": "uuid",
+        "table_name": "case_data_packs",
+        "column_name": "case_id",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 3
+      },
+      {
+        "udt_name": "timestamptz",
+        "data_type": "timestamp with time zone",
+        "table_name": "case_data_packs",
+        "column_name": "created_at",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": "now()",
+        "ordinal_position": 6
+      },
+      {
+        "udt_name": "uuid",
+        "data_type": "uuid",
+        "table_name": "case_data_packs",
+        "column_name": "current_version_id",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 4
+      },
+      {
+        "udt_name": "uuid",
+        "data_type": "uuid",
+        "table_name": "case_data_packs",
+        "column_name": "id",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": "gen_random_uuid()",
+        "ordinal_position": 1
+      },
+      {
+        "udt_name": "int8",
+        "data_type": "bigint",
+        "table_name": "case_data_packs",
+        "column_name": "revision",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": "1",
+        "ordinal_position": 5
+      },
+      {
+        "udt_name": "uuid",
+        "data_type": "uuid",
+        "table_name": "case_data_packs",
+        "column_name": "workspace_id",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 2
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "datasets",
+        "column_name": "canonical_sha256",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 28
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "datasets",
+        "column_name": "data_contract_hash",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 26
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "datasets",
+        "column_name": "data_contract_id",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 25
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "datasets",
+        "column_name": "normalizer_version",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 27
+      },
+      {
+        "udt_name": "uuid",
+        "data_type": "uuid",
+        "table_name": "decision_approval_events",
+        "column_name": "caused_by_pack_version_id",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 12
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "decision_approval_events",
+        "column_name": "reason_code",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 11
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "decision_cases",
+        "column_name": "case_policy_hash",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 27
+      },
+      {
+        "udt_name": "jsonb",
+        "data_type": "jsonb",
+        "table_name": "decision_cases",
+        "column_name": "case_policy_jsonb",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 26
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "decision_cases",
+        "column_name": "case_policy_schema_version",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 25
+      },
+      {
+        "udt_name": "timestamptz",
+        "data_type": "timestamp with time zone",
+        "table_name": "decision_cases",
+        "column_name": "context_frozen_at",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 28
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "decision_cases",
+        "column_name": "graph_definition_version",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 29
+      },
+      {
+        "udt_name": "uuid",
+        "data_type": "uuid",
+        "table_name": "decision_cases",
+        "column_name": "logistics_model_version_id",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 21
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "decision_cases",
+        "column_name": "operating_mode",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 24
+      },
+      {
+        "udt_name": "date",
+        "data_type": "date",
+        "table_name": "decision_cases",
+        "column_name": "planning_end",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 23
+      },
+      {
+        "udt_name": "date",
+        "data_type": "date",
+        "table_name": "decision_cases",
+        "column_name": "planning_start",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 22
+      },
+      {
+        "udt_name": "int2",
+        "data_type": "smallint",
+        "table_name": "decision_cases",
+        "column_name": "workflow_version",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": "1",
+        "ordinal_position": 20
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "decision_interpretation_sources",
+        "column_name": "decision_context_hash",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 11
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "decision_interpretation_sources",
+        "column_name": "decision_context_schema",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 10
+      },
+      {
+        "udt_name": "jsonb",
+        "data_type": "jsonb",
+        "table_name": "decision_interpretation_sources",
+        "column_name": "evidence_refs",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 14
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "decision_interpretation_sources",
+        "column_name": "mode",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 12
+      },
+      {
+        "udt_name": "int4",
+        "data_type": "integer",
+        "table_name": "decision_interpretation_sources",
+        "column_name": "provenance_version",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 8
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "decision_interpretation_sources",
+        "column_name": "result_fingerprint",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 9
+      },
+      {
+        "udt_name": "jsonb",
+        "data_type": "jsonb",
+        "table_name": "decision_interpretation_sources",
+        "column_name": "selected_entity",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 13
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "decision_result_artifacts",
+        "column_name": "artifact_schema",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 6
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "decision_result_artifacts",
+        "column_name": "assembler_version",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 13
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "decision_result_artifacts",
+        "column_name": "content_sha256",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 8
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "decision_result_artifacts",
+        "column_name": "core_fingerprint",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 14
+      },
+      {
+        "udt_name": "timestamptz",
+        "data_type": "timestamp with time zone",
+        "table_name": "decision_result_artifacts",
+        "column_name": "created_at",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": "now()",
+        "ordinal_position": 21
+      },
+      {
+        "udt_name": "uuid",
+        "data_type": "uuid",
+        "table_name": "decision_result_artifacts",
+        "column_name": "id",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": "gen_random_uuid()",
+        "ordinal_position": 1
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "decision_result_artifacts",
+        "column_name": "kind",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 4
+      },
+      {
+        "udt_name": "_text",
+        "data_type": "ARRAY",
+        "table_name": "decision_result_artifacts",
+        "column_name": "lookup_keys",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": "'{}'::text[]",
+        "ordinal_position": 17
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "decision_result_artifacts",
+        "column_name": "media_type",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 10
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "decision_result_artifacts",
+        "column_name": "part_key",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 5
+      },
+      {
+        "udt_name": "int8",
+        "data_type": "bigint",
+        "table_name": "decision_result_artifacts",
+        "column_name": "producer_generation",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 19
+      },
+      {
+        "udt_name": "uuid",
+        "data_type": "uuid",
+        "table_name": "decision_result_artifacts",
+        "column_name": "producer_lease_token",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 18
+      },
+      {
+        "udt_name": "jsonb",
+        "data_type": "jsonb",
+        "table_name": "decision_result_artifacts",
+        "column_name": "producer_metadata",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 20
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "decision_result_artifacts",
+        "column_name": "publication_state",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": "'PREPARED'::text",
+        "ordinal_position": 16
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "decision_result_artifacts",
+        "column_name": "result_fingerprint",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 15
+      },
+      {
+        "udt_name": "uuid",
+        "data_type": "uuid",
+        "table_name": "decision_result_artifacts",
+        "column_name": "run_id",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 3
+      },
+      {
+        "udt_name": "int4",
+        "data_type": "integer",
+        "table_name": "decision_result_artifacts",
+        "column_name": "schema_version",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 7
+      },
+      {
+        "udt_name": "int8",
+        "data_type": "bigint",
+        "table_name": "decision_result_artifacts",
+        "column_name": "size_bytes",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 9
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "decision_result_artifacts",
+        "column_name": "storage_bucket",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 11
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "decision_result_artifacts",
+        "column_name": "storage_path",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 12
+      },
+      {
+        "udt_name": "uuid",
+        "data_type": "uuid",
+        "table_name": "decision_result_artifacts",
+        "column_name": "workspace_id",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 2
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "decision_runs",
+        "column_name": "artifact_manifest_hash",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 44
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "decision_runs",
+        "column_name": "assembler_version",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 43
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "decision_runs",
+        "column_name": "case_policy_hash",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 34
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "decision_runs",
+        "column_name": "contract_hash",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 36
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "decision_runs",
+        "column_name": "core_fingerprint",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 45
+      },
+      {
+        "udt_name": "uuid",
+        "data_type": "uuid",
+        "table_name": "decision_runs",
+        "column_name": "data_pack_version_id",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 32
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "decision_runs",
+        "column_name": "graph_definition_version",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 33
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "decision_runs",
+        "column_name": "input_context_hash",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 37
+      },
+      {
+        "udt_name": "uuid",
+        "data_type": "uuid",
+        "table_name": "decision_runs",
+        "column_name": "invalidated_by_pack_version_id",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 41
+      },
+      {
+        "udt_name": "uuid",
+        "data_type": "uuid",
+        "table_name": "decision_runs",
+        "column_name": "logistics_model_version_id",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 31
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "decision_runs",
+        "column_name": "node_policy_hash",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 35
+      },
+      {
+        "udt_name": "int4",
+        "data_type": "integer",
+        "table_name": "decision_runs",
+        "column_name": "result_package_version",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 42
+      },
+      {
+        "udt_name": "int4",
+        "data_type": "integer",
+        "table_name": "decision_runs",
+        "column_name": "result_schema_version",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 40
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "decision_runs",
+        "column_name": "runtime_profile",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 39
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "decision_runs",
+        "column_name": "transit_model_version",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 38
+      },
+      {
+        "udt_name": "int2",
+        "data_type": "smallint",
+        "table_name": "decision_runs",
+        "column_name": "workflow_version",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": "1",
+        "ordinal_position": 30
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "logistics_model_versions",
+        "column_name": "config_hash",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 9
+      },
+      {
+        "udt_name": "jsonb",
+        "data_type": "jsonb",
+        "table_name": "logistics_model_versions",
+        "column_name": "config_jsonb",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 7
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "logistics_model_versions",
+        "column_name": "config_schema_version",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 6
+      },
+      {
+        "udt_name": "jsonb",
+        "data_type": "jsonb",
+        "table_name": "logistics_model_versions",
+        "column_name": "contract_descriptor_jsonb",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 8
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "logistics_model_versions",
+        "column_name": "contract_hash",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 10
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "logistics_model_versions",
+        "column_name": "contract_registry_version",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 11
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "logistics_model_versions",
+        "column_name": "graph_definition_version",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 5
+      },
+      {
+        "udt_name": "uuid",
+        "data_type": "uuid",
+        "table_name": "logistics_model_versions",
+        "column_name": "id",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": "gen_random_uuid()",
+        "ordinal_position": 1
+      },
+      {
+        "udt_name": "uuid",
+        "data_type": "uuid",
+        "table_name": "logistics_model_versions",
+        "column_name": "model_id",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 3
+      },
+      {
+        "udt_name": "timestamptz",
+        "data_type": "timestamp with time zone",
+        "table_name": "logistics_model_versions",
+        "column_name": "published_at",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": "now()",
+        "ordinal_position": 13
+      },
+      {
+        "udt_name": "uuid",
+        "data_type": "uuid",
+        "table_name": "logistics_model_versions",
+        "column_name": "published_by",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 12
+      },
+      {
+        "udt_name": "int4",
+        "data_type": "integer",
+        "table_name": "logistics_model_versions",
+        "column_name": "version",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 4
+      },
+      {
+        "udt_name": "uuid",
+        "data_type": "uuid",
+        "table_name": "logistics_model_versions",
+        "column_name": "workspace_id",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 2
+      },
+      {
+        "udt_name": "timestamptz",
+        "data_type": "timestamp with time zone",
+        "table_name": "logistics_models",
+        "column_name": "created_at",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": "now()",
+        "ordinal_position": 8
+      },
+      {
+        "udt_name": "uuid",
+        "data_type": "uuid",
+        "table_name": "logistics_models",
+        "column_name": "created_by",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 7
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "logistics_models",
+        "column_name": "description",
+        "is_nullable": "YES",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 4
+      },
+      {
+        "udt_name": "uuid",
+        "data_type": "uuid",
+        "table_name": "logistics_models",
+        "column_name": "id",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": "gen_random_uuid()",
+        "ordinal_position": 1
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "logistics_models",
+        "column_name": "name",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 3
+      },
+      {
+        "udt_name": "int8",
+        "data_type": "bigint",
+        "table_name": "logistics_models",
+        "column_name": "revision",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": "1",
+        "ordinal_position": 6
+      },
+      {
+        "udt_name": "text",
+        "data_type": "text",
+        "table_name": "logistics_models",
+        "column_name": "status",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": "'active'::text",
+        "ordinal_position": 5
+      },
+      {
+        "udt_name": "timestamptz",
+        "data_type": "timestamp with time zone",
+        "table_name": "logistics_models",
+        "column_name": "updated_at",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": "now()",
+        "ordinal_position": 9
+      },
+      {
+        "udt_name": "uuid",
+        "data_type": "uuid",
+        "table_name": "logistics_models",
+        "column_name": "workspace_id",
+        "is_nullable": "NO",
+        "table_schema": "public",
+        "column_default": null,
+        "ordinal_position": 2
+      }
+    ],
+    "removed": [],
+    "changed": [
+      {
+        "before": {
+          "udt_name": "uuid",
+          "data_type": "uuid",
+          "table_name": "decision_cases",
+          "column_name": "fleet_dataset_id",
+          "is_nullable": "NO",
+          "table_schema": "public",
+          "column_default": null,
+          "ordinal_position": 6
+        },
+        "after": {
+          "udt_name": "uuid",
+          "data_type": "uuid",
+          "table_name": "decision_cases",
+          "column_name": "fleet_dataset_id",
+          "is_nullable": "YES",
+          "table_schema": "public",
+          "column_default": null,
+          "ordinal_position": 6
+        }
+      },
+      {
+        "before": {
+          "udt_name": "text",
+          "data_type": "text",
+          "table_name": "decision_cases",
+          "column_name": "input_signature",
+          "is_nullable": "NO",
+          "table_schema": "public",
+          "column_default": null,
+          "ordinal_position": 7
+        },
+        "after": {
+          "udt_name": "text",
+          "data_type": "text",
+          "table_name": "decision_cases",
+          "column_name": "input_signature",
+          "is_nullable": "YES",
+          "table_schema": "public",
+          "column_default": null,
+          "ordinal_position": 7
+        }
+      },
+      {
+        "before": {
+          "udt_name": "uuid",
+          "data_type": "uuid",
+          "table_name": "decision_cases",
+          "column_name": "orders_dataset_id",
+          "is_nullable": "NO",
+          "table_schema": "public",
+          "column_default": null,
+          "ordinal_position": 5
+        },
+        "after": {
+          "udt_name": "uuid",
+          "data_type": "uuid",
+          "table_name": "decision_cases",
+          "column_name": "orders_dataset_id",
+          "is_nullable": "YES",
+          "table_schema": "public",
+          "column_default": null,
+          "ordinal_position": 5
+        }
+      }
+    ]
+  },
+  "indexes": {
+    "before_count": 90,
+    "after_count": 135,
+    "added": [
+      {
+        "indexdef": "CREATE UNIQUE INDEX decision_definition_versions_pkey ON dation_private.decision_definition_versions USING btree (version)",
+        "indexname": "decision_definition_versions_pkey",
+        "tablename": "decision_definition_versions",
+        "schemaname": "dation_private"
+      },
+      {
+        "indexdef": "CREATE INDEX case_data_pack_entries_case ON public.case_data_pack_entries USING btree (workspace_id, case_id, pack_version_id)",
+        "indexname": "case_data_pack_entries_case",
+        "tablename": "case_data_pack_entries",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE INDEX case_data_pack_entries_dataset ON public.case_data_pack_entries USING btree (workspace_id, dataset_id)",
+        "indexname": "case_data_pack_entries_dataset",
+        "tablename": "case_data_pack_entries",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX case_data_pack_entries_pkey ON public.case_data_pack_entries USING btree (pack_version_id, slot_key)",
+        "indexname": "case_data_pack_entries_pkey",
+        "tablename": "case_data_pack_entries",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE INDEX case_data_pack_versions_creator ON public.case_data_pack_versions USING btree (workspace_id, created_by)",
+        "indexname": "case_data_pack_versions_creator",
+        "tablename": "case_data_pack_versions",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE INDEX case_data_pack_versions_history ON public.case_data_pack_versions USING btree (workspace_id, case_id, version DESC)",
+        "indexname": "case_data_pack_versions_history",
+        "tablename": "case_data_pack_versions",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX case_data_pack_versions_pack_id_version_key ON public.case_data_pack_versions USING btree (pack_id, version)",
+        "indexname": "case_data_pack_versions_pack_id_version_key",
+        "tablename": "case_data_pack_versions",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX case_data_pack_versions_pkey ON public.case_data_pack_versions USING btree (id)",
+        "indexname": "case_data_pack_versions_pkey",
+        "tablename": "case_data_pack_versions",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX case_data_pack_versions_workspace_id_case_id_id_key ON public.case_data_pack_versions USING btree (workspace_id, case_id, id)",
+        "indexname": "case_data_pack_versions_workspace_id_case_id_id_key",
+        "tablename": "case_data_pack_versions",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX case_data_pack_versions_workspace_id_case_id_pack_id_id_key ON public.case_data_pack_versions USING btree (workspace_id, case_id, pack_id, id)",
+        "indexname": "case_data_pack_versions_workspace_id_case_id_pack_id_id_key",
+        "tablename": "case_data_pack_versions",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX case_data_pack_versions_workspace_id_id_key ON public.case_data_pack_versions USING btree (workspace_id, id)",
+        "indexname": "case_data_pack_versions_workspace_id_id_key",
+        "tablename": "case_data_pack_versions",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE INDEX case_data_packs_current ON public.case_data_packs USING btree (workspace_id, case_id, id, current_version_id)",
+        "indexname": "case_data_packs_current",
+        "tablename": "case_data_packs",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX case_data_packs_pkey ON public.case_data_packs USING btree (id)",
+        "indexname": "case_data_packs_pkey",
+        "tablename": "case_data_packs",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX case_data_packs_workspace_id_case_id_id_key ON public.case_data_packs USING btree (workspace_id, case_id, id)",
+        "indexname": "case_data_packs_workspace_id_case_id_id_key",
+        "tablename": "case_data_packs",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX case_data_packs_workspace_id_case_id_key ON public.case_data_packs USING btree (workspace_id, case_id)",
+        "indexname": "case_data_packs_workspace_id_case_id_key",
+        "tablename": "case_data_packs",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX case_data_packs_workspace_id_id_key ON public.case_data_packs USING btree (workspace_id, id)",
+        "indexname": "case_data_packs_workspace_id_id_key",
+        "tablename": "case_data_packs",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX datasets_ultimate_interpretation ON public.datasets USING btree (workspace_id, dataset_type, sha256, data_contract_hash) WHERE ((dataset_type = ANY (ARRAY['transport_demand'::text, 'transport_resources'::text])) AND (sha256 IS NOT NULL))",
+        "indexname": "datasets_ultimate_interpretation",
+        "tablename": "datasets",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX ultimate_dataset_interpretation_identity ON public.datasets USING btree (workspace_id, id, data_contract_id, data_contract_hash, sha256, canonical_sha256, normalizer_version)",
+        "indexname": "ultimate_dataset_interpretation_identity",
+        "tablename": "datasets",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE INDEX ultimate_approval_cause ON public.decision_approval_events USING btree (workspace_id, case_id, caused_by_pack_version_id) WHERE (caused_by_pack_version_id IS NOT NULL)",
+        "indexname": "ultimate_approval_cause",
+        "tablename": "decision_approval_events",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX ultimate_case_model_identity ON public.decision_cases USING btree (workspace_id, id, logistics_model_version_id)",
+        "indexname": "ultimate_case_model_identity",
+        "tablename": "decision_cases",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE INDEX ultimate_cases_model ON public.decision_cases USING btree (workspace_id, logistics_model_version_id, graph_definition_version) WHERE (workflow_version = 2)",
+        "indexname": "ultimate_cases_model",
+        "tablename": "decision_cases",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE INDEX ultimate_interpretation_context ON public.decision_interpretation_sources USING btree (workspace_id, run_id, result_fingerprint, decision_context_hash) WHERE (provenance_version IS NOT NULL)",
+        "indexname": "ultimate_interpretation_context",
+        "tablename": "decision_interpretation_sources",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE INDEX decision_result_artifacts_binding ON public.decision_result_artifacts USING btree (workspace_id, run_id, result_fingerprint)",
+        "indexname": "decision_result_artifacts_binding",
+        "tablename": "decision_result_artifacts",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE INDEX decision_result_artifacts_entities ON public.decision_result_artifacts USING gin (lookup_keys)",
+        "indexname": "decision_result_artifacts_entities",
+        "tablename": "decision_result_artifacts",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE INDEX decision_result_artifacts_lookup ON public.decision_result_artifacts USING btree (workspace_id, run_id, kind, part_key)",
+        "indexname": "decision_result_artifacts_lookup",
+        "tablename": "decision_result_artifacts",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX decision_result_artifacts_pkey ON public.decision_result_artifacts USING btree (id)",
+        "indexname": "decision_result_artifacts_pkey",
+        "tablename": "decision_result_artifacts",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX decision_result_artifacts_storage_bucket_storage_path_key ON public.decision_result_artifacts USING btree (storage_bucket, storage_path)",
+        "indexname": "decision_result_artifacts_storage_bucket_storage_path_key",
+        "tablename": "decision_result_artifacts",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX decision_result_artifacts_workspace_id_id_key ON public.decision_result_artifacts USING btree (workspace_id, id)",
+        "indexname": "decision_result_artifacts_workspace_id_id_key",
+        "tablename": "decision_result_artifacts",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX decision_result_artifacts_workspace_id_run_id_kind_part_key_key ON public.decision_result_artifacts USING btree (workspace_id, run_id, kind, part_key, content_sha256)",
+        "indexname": "decision_result_artifacts_workspace_id_run_id_kind_part_key_key",
+        "tablename": "decision_result_artifacts",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX ultimate_run_result_identity ON public.decision_runs USING btree (workspace_id, id, result_fingerprint)",
+        "indexname": "ultimate_run_result_identity",
+        "tablename": "decision_runs",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE INDEX ultimate_runs_context ON public.decision_runs USING btree (workspace_id, decision_case_id, data_pack_version_id)",
+        "indexname": "ultimate_runs_context",
+        "tablename": "decision_runs",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE INDEX ultimate_runs_graph ON public.decision_runs USING btree (graph_definition_version)",
+        "indexname": "ultimate_runs_graph",
+        "tablename": "decision_runs",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE INDEX ultimate_runs_invalidated ON public.decision_runs USING btree (workspace_id, decision_case_id, invalidated_by_pack_version_id) WHERE (invalidated_by_pack_version_id IS NOT NULL)",
+        "indexname": "ultimate_runs_invalidated",
+        "tablename": "decision_runs",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE INDEX ultimate_runs_model ON public.decision_runs USING btree (workspace_id, decision_case_id, logistics_model_version_id)",
+        "indexname": "ultimate_runs_model",
+        "tablename": "decision_runs",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE INDEX logistics_model_versions_graph ON public.logistics_model_versions USING btree (graph_definition_version)",
+        "indexname": "logistics_model_versions_graph",
+        "tablename": "logistics_model_versions",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX logistics_model_versions_model_id_version_key ON public.logistics_model_versions USING btree (model_id, version)",
+        "indexname": "logistics_model_versions_model_id_version_key",
+        "tablename": "logistics_model_versions",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX logistics_model_versions_pkey ON public.logistics_model_versions USING btree (id)",
+        "indexname": "logistics_model_versions_pkey",
+        "tablename": "logistics_model_versions",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE INDEX logistics_model_versions_publisher ON public.logistics_model_versions USING btree (workspace_id, published_by)",
+        "indexname": "logistics_model_versions_publisher",
+        "tablename": "logistics_model_versions",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX logistics_model_versions_workspace_id_id_graph_definition_v_key ON public.logistics_model_versions USING btree (workspace_id, id, graph_definition_version)",
+        "indexname": "logistics_model_versions_workspace_id_id_graph_definition_v_key",
+        "tablename": "logistics_model_versions",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX logistics_model_versions_workspace_id_id_key ON public.logistics_model_versions USING btree (workspace_id, id)",
+        "indexname": "logistics_model_versions_workspace_id_id_key",
+        "tablename": "logistics_model_versions",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX logistics_model_versions_workspace_id_model_id_id_key ON public.logistics_model_versions USING btree (workspace_id, model_id, id)",
+        "indexname": "logistics_model_versions_workspace_id_model_id_id_key",
+        "tablename": "logistics_model_versions",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE INDEX logistics_models_creator ON public.logistics_models USING btree (workspace_id, created_by)",
+        "indexname": "logistics_models_creator",
+        "tablename": "logistics_models",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE INDEX logistics_models_listing ON public.logistics_models USING btree (workspace_id, status, updated_at DESC, id)",
+        "indexname": "logistics_models_listing",
+        "tablename": "logistics_models",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX logistics_models_pkey ON public.logistics_models USING btree (id)",
+        "indexname": "logistics_models_pkey",
+        "tablename": "logistics_models",
+        "schemaname": "public"
+      },
+      {
+        "indexdef": "CREATE UNIQUE INDEX logistics_models_workspace_id_id_key ON public.logistics_models USING btree (workspace_id, id)",
+        "indexname": "logistics_models_workspace_id_id_key",
+        "tablename": "logistics_models",
+        "schemaname": "public"
+      }
+    ],
+    "removed": [],
+    "changed": []
+  },
+  "defaults": {
+    "before_count": 6,
+    "after_count": 6,
+    "added": [],
+    "removed": [],
+    "changed": []
+  },
+  "policies": {
+    "before_count": 17,
+    "after_count": 22,
+    "added": [
+      {
+        "cmd": "SELECT",
+        "qual": "dation_private.is_member(workspace_id)",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "case_data_pack_entries",
+        "permissive": "PERMISSIVE",
+        "policyname": "tenant_read",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "dation_private.is_member(workspace_id)",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "case_data_pack_versions",
+        "permissive": "PERMISSIVE",
+        "policyname": "tenant_read",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "dation_private.is_member(workspace_id)",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "case_data_packs",
+        "permissive": "PERMISSIVE",
+        "policyname": "tenant_read",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "dation_private.is_member(workspace_id)",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "logistics_model_versions",
+        "permissive": "PERMISSIVE",
+        "policyname": "tenant_read",
+        "schemaname": "public",
+        "with_check": null
+      },
+      {
+        "cmd": "SELECT",
+        "qual": "dation_private.is_member(workspace_id)",
+        "roles": [
+          "authenticated"
+        ],
+        "tablename": "logistics_models",
+        "permissive": "PERMISSIVE",
+        "policyname": "tenant_read",
+        "schemaname": "public",
+        "with_check": null
+      }
+    ],
+    "removed": [],
+    "changed": []
+  },
+  "triggers": {
+    "before_count": 46,
+    "after_count": 63,
+    "added": [
+      {
+        "name": "ultimate_definition_immutable",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER ultimate_definition_immutable BEFORE DELETE OR UPDATE ON dation_private.decision_definition_versions FOR EACH ROW EXECUTE FUNCTION dation_private.ultimate_immutable()",
+        "table_name": "decision_definition_versions",
+        "schema_name": "dation_private"
+      },
+      {
+        "name": "ultimate_pack_entry_creation",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER ultimate_pack_entry_creation BEFORE INSERT ON public.case_data_pack_entries FOR EACH ROW EXECUTE FUNCTION dation_private.ultimate_pack_guard()",
+        "table_name": "case_data_pack_entries",
+        "schema_name": "public"
+      },
+      {
+        "name": "ultimate_pack_entry_immutable",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER ultimate_pack_entry_immutable BEFORE DELETE OR UPDATE ON public.case_data_pack_entries FOR EACH ROW EXECUTE FUNCTION dation_private.ultimate_immutable()",
+        "table_name": "case_data_pack_entries",
+        "schema_name": "public"
+      },
+      {
+        "name": "ultimate_pack_version_creation",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER ultimate_pack_version_creation BEFORE INSERT ON public.case_data_pack_versions FOR EACH ROW EXECUTE FUNCTION dation_private.ultimate_pack_guard()",
+        "table_name": "case_data_pack_versions",
+        "schema_name": "public"
+      },
+      {
+        "name": "ultimate_pack_version_immutable",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER ultimate_pack_version_immutable BEFORE DELETE OR UPDATE ON public.case_data_pack_versions FOR EACH ROW EXECUTE FUNCTION dation_private.ultimate_immutable()",
+        "table_name": "case_data_pack_versions",
+        "schema_name": "public"
+      },
+      {
+        "name": "ultimate_pack_complete",
+        "tgenabled": "O",
+        "definition": "CREATE CONSTRAINT TRIGGER ultimate_pack_complete AFTER INSERT OR UPDATE ON public.case_data_packs DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION dation_private.ultimate_case_pack_complete()",
+        "table_name": "case_data_packs",
+        "schema_name": "public"
+      },
+      {
+        "name": "ultimate_pack_guard",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER ultimate_pack_guard BEFORE INSERT OR UPDATE ON public.case_data_packs FOR EACH ROW EXECUTE FUNCTION dation_private.ultimate_pack_guard()",
+        "table_name": "case_data_packs",
+        "schema_name": "public"
+      },
+      {
+        "name": "ultimate_dataset_identity",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER ultimate_dataset_identity BEFORE UPDATE ON public.datasets FOR EACH ROW EXECUTE FUNCTION dation_private.ultimate_dataset_identity()",
+        "table_name": "datasets",
+        "schema_name": "public"
+      },
+      {
+        "name": "ultimate_case_context_guard",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER ultimate_case_context_guard BEFORE UPDATE ON public.decision_cases FOR EACH ROW EXECUTE FUNCTION dation_private.ultimate_case_guard()",
+        "table_name": "decision_cases",
+        "schema_name": "public"
+      },
+      {
+        "name": "ultimate_case_pack_complete",
+        "tgenabled": "O",
+        "definition": "CREATE CONSTRAINT TRIGGER ultimate_case_pack_complete AFTER INSERT ON public.decision_cases DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION dation_private.ultimate_case_pack_complete()",
+        "table_name": "decision_cases",
+        "schema_name": "public"
+      },
+      {
+        "name": "ultimate_interpretation_guard",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER ultimate_interpretation_guard BEFORE INSERT OR UPDATE ON public.decision_interpretation_sources FOR EACH ROW EXECUTE FUNCTION dation_private.ultimate_interpretation_guard()",
+        "table_name": "decision_interpretation_sources",
+        "schema_name": "public"
+      },
+      {
+        "name": "ultimate_artifact_identity",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER ultimate_artifact_identity BEFORE INSERT OR DELETE OR UPDATE ON public.decision_result_artifacts FOR EACH ROW EXECUTE FUNCTION dation_private.ultimate_artifact_guard()",
+        "table_name": "decision_result_artifacts",
+        "schema_name": "public"
+      },
+      {
+        "name": "ultimate_artifact_ready",
+        "tgenabled": "O",
+        "definition": "CREATE CONSTRAINT TRIGGER ultimate_artifact_ready AFTER INSERT OR UPDATE ON public.decision_result_artifacts DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION dation_private.ultimate_artifact_ready()",
+        "table_name": "decision_result_artifacts",
+        "schema_name": "public"
+      },
+      {
+        "name": "ultimate_publication_identity",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER ultimate_publication_identity BEFORE UPDATE ON public.decision_runs FOR EACH ROW EXECUTE FUNCTION dation_private.ultimate_publication_identity()",
+        "table_name": "decision_runs",
+        "schema_name": "public"
+      },
+      {
+        "name": "ultimate_run_context_guard",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER ultimate_run_context_guard BEFORE INSERT OR UPDATE ON public.decision_runs FOR EACH ROW EXECUTE FUNCTION dation_private.ultimate_run_guard()",
+        "table_name": "decision_runs",
+        "schema_name": "public"
+      },
+      {
+        "name": "ultimate_model_version_immutable",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER ultimate_model_version_immutable BEFORE DELETE OR UPDATE ON public.logistics_model_versions FOR EACH ROW EXECUTE FUNCTION dation_private.ultimate_immutable()",
+        "table_name": "logistics_model_versions",
+        "schema_name": "public"
+      },
+      {
+        "name": "ultimate_model_workspace",
+        "tgenabled": "O",
+        "definition": "CREATE TRIGGER ultimate_model_workspace BEFORE UPDATE ON public.logistics_models FOR EACH ROW EXECUTE FUNCTION dation_private.protect_workspace()",
+        "table_name": "logistics_models",
+        "schema_name": "public"
+      }
+    ],
+    "removed": [],
+    "changed": []
+  },
+  "functions": {
+    "before_count": 101,
+    "after_count": 111,
+    "added": [
+      {
+        "acl": "{postgres=X/postgres}",
+        "args": "",
+        "name": "ultimate_artifact_guard",
+        "proconfig": [
+          "search_path=pg_catalog"
+        ],
+        "prosecdef": false,
+        "definition": "CREATE OR REPLACE FUNCTION dation_private.ultimate_artifact_guard()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO 'pg_catalog'\nAS $function$\nDECLARE key text;\nBEGIN\n IF TG_OP<>'INSERT' THEN\n  IF OLD.publication_state='READY' THEN RAISE EXCEPTION 'READY artifact is immutable' USING ERRCODE='22023'; END IF;\n  IF TG_OP='DELETE' THEN RETURN OLD; END IF;\n  IF (to_jsonb(NEW)-'publication_state'-'result_fingerprint') IS DISTINCT FROM\n     (to_jsonb(OLD)-'publication_state'-'result_fingerprint') THEN\n   RAISE EXCEPTION 'Prepared artifact identity is immutable' USING ERRCODE='22023'; END IF;\n END IF;\n FOREACH key IN ARRAY NEW.lookup_keys LOOP\n  IF key !~ '^(ORDER|TRIP|RESOURCE|ALTERNATIVE|EXCEPTION)/[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$' THEN\n   RAISE EXCEPTION 'Invalid entity lookup key' USING ERRCODE='22023'; END IF;\n END LOOP;\n IF NOT EXISTS(SELECT 1 FROM public.decision_runs WHERE workspace_id=NEW.workspace_id AND id=NEW.run_id AND workflow_version=2) THEN\n  RAISE EXCEPTION 'Artifacts require an Ultimate Run' USING ERRCODE='22023'; END IF;\n RETURN NEW;\nEND; $function$\n",
+        "schema_name": "dation_private"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "args": "",
+        "name": "ultimate_artifact_ready",
+        "proconfig": [
+          "search_path=pg_catalog"
+        ],
+        "prosecdef": false,
+        "definition": "CREATE OR REPLACE FUNCTION dation_private.ultimate_artifact_ready()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO 'pg_catalog'\nAS $function$\nDECLARE a public.decision_result_artifacts; r public.decision_runs; descriptor jsonb;\nBEGIN\n SELECT * INTO a FROM public.decision_result_artifacts WHERE id=NEW.id;\n IF NOT FOUND OR a.publication_state<>'READY' THEN RETURN NULL; END IF;\n SELECT * INTO r FROM public.decision_runs WHERE workspace_id=a.workspace_id AND id=a.run_id;\n descriptor=jsonb_build_object('artifact_id',a.id,'workspace_id',a.workspace_id,'run_id',a.run_id,\n  'kind',a.kind,'part_key',a.part_key,'artifact_schema',a.artifact_schema,'schema_version',a.schema_version,\n  'content_sha256',a.content_sha256,'size_bytes',a.size_bytes,'media_type',a.media_type,\n  'core_fingerprint',a.core_fingerprint,'assembler_version',a.assembler_version);\n IF r.status<>'completed' OR r.result_package_version IS DISTINCT FROM 1\n  OR r.result_fingerprint IS DISTINCT FROM a.result_fingerprint OR r.core_fingerprint IS DISTINCT FROM a.core_fingerprint\n  OR r.assembler_version IS DISTINCT FROM a.assembler_version OR r.artifact_manifest_hash IS NULL\n  OR NOT EXISTS(SELECT 1 FROM jsonb_array_elements(coalesce(r.result_json#>'{artifact_manifest,artifacts}','[]')) item\n    WHERE item @> descriptor) THEN\n  RAISE EXCEPTION 'READY artifact requires its exact published Run/manifest binding' USING ERRCODE='23514'; END IF;\n RETURN NULL;\nEND; $function$\n",
+        "schema_name": "dation_private"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "args": "",
+        "name": "ultimate_case_guard",
+        "proconfig": [
+          "search_path=pg_catalog"
+        ],
+        "prosecdef": false,
+        "definition": "CREATE OR REPLACE FUNCTION dation_private.ultimate_case_guard()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO 'pg_catalog'\nAS $function$\nBEGIN\n IF TG_OP='UPDATE' THEN\n  IF NEW.workflow_version<>OLD.workflow_version OR NEW.logistics_model_version_id IS DISTINCT FROM OLD.logistics_model_version_id\n    OR NEW.graph_definition_version IS DISTINCT FROM OLD.graph_definition_version THEN\n   RAISE EXCEPTION 'Case cohort/model binding is immutable' USING ERRCODE='22023'; END IF;\n  IF OLD.workflow_version=2 AND (NEW.state_json IS DISTINCT FROM OLD.state_json OR\n   (OLD.context_frozen_at IS NOT NULL AND ROW(NEW.planning_start,NEW.planning_end,NEW.operating_mode,\n     NEW.case_policy_schema_version,NEW.case_policy_jsonb,NEW.case_policy_hash,NEW.context_frozen_at)\n    IS DISTINCT FROM ROW(OLD.planning_start,OLD.planning_end,OLD.operating_mode,\n     OLD.case_policy_schema_version,OLD.case_policy_jsonb,OLD.case_policy_hash,OLD.context_frozen_at))) THEN\n   RAISE EXCEPTION 'Ultimate context cannot be overwritten by a legacy write' USING ERRCODE='22023'; END IF;\n END IF;\n RETURN NEW;\nEND; $function$\n",
+        "schema_name": "dation_private"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "args": "",
+        "name": "ultimate_case_pack_complete",
+        "proconfig": [
+          "search_path=pg_catalog"
+        ],
+        "prosecdef": false,
+        "definition": "CREATE OR REPLACE FUNCTION dation_private.ultimate_case_pack_complete()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO 'pg_catalog'\nAS $function$\nBEGIN\n IF TG_TABLE_NAME='decision_cases' THEN\n  IF NEW.workflow_version=2 AND NOT EXISTS(SELECT 1 FROM public.case_data_packs\n   WHERE workspace_id=NEW.workspace_id AND case_id=NEW.id AND current_version_id IS NOT NULL) THEN\n   RAISE EXCEPTION 'Ultimate Case and initial Pack/version must commit together' USING ERRCODE='23514'; END IF;\n ELSE\n  IF EXISTS(SELECT 1 FROM public.case_data_packs WHERE id=NEW.id AND current_version_id IS NULL) THEN\n   RAISE EXCEPTION 'Stable Pack must commit with a current version' USING ERRCODE='23514'; END IF;\n END IF;\n RETURN NULL;\nEND; $function$\n",
+        "schema_name": "dation_private"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "args": "",
+        "name": "ultimate_dataset_identity",
+        "proconfig": [
+          "search_path=pg_catalog"
+        ],
+        "prosecdef": false,
+        "definition": "CREATE OR REPLACE FUNCTION dation_private.ultimate_dataset_identity()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO 'pg_catalog'\nAS $function$\nBEGIN\n IF ROW(NEW.data_contract_id,NEW.data_contract_hash,NEW.normalizer_version,NEW.canonical_sha256)\n IS DISTINCT FROM ROW(OLD.data_contract_id,OLD.data_contract_hash,OLD.normalizer_version,OLD.canonical_sha256) THEN\n  RAISE EXCEPTION 'Dataset interpretation is immutable; create a new version' USING ERRCODE='22023'; END IF;\n RETURN NEW;\nEND; $function$\n",
+        "schema_name": "dation_private"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "args": "",
+        "name": "ultimate_immutable",
+        "proconfig": [
+          "search_path=pg_catalog"
+        ],
+        "prosecdef": false,
+        "definition": "CREATE OR REPLACE FUNCTION dation_private.ultimate_immutable()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO 'pg_catalog'\nAS $function$\nBEGIN RAISE EXCEPTION 'Published Ultimate snapshot is immutable' USING ERRCODE='22023'; END; $function$\n",
+        "schema_name": "dation_private"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "args": "",
+        "name": "ultimate_interpretation_guard",
+        "proconfig": [
+          "search_path=pg_catalog"
+        ],
+        "prosecdef": false,
+        "definition": "CREATE OR REPLACE FUNCTION dation_private.ultimate_interpretation_guard()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO 'pg_catalog'\nAS $function$\nDECLARE ref jsonb;\nBEGIN\n IF TG_OP='UPDATE' THEN\n  IF NEW IS DISTINCT FROM OLD THEN RAISE EXCEPTION 'Interpretation provenance is immutable' USING ERRCODE='22023'; END IF;\n  RETURN NEW;\n END IF;\n IF NEW.provenance_version IS NOT NULL THEN\n  IF NOT EXISTS(SELECT 1 FROM public.decision_runs WHERE workspace_id=NEW.workspace_id AND id=NEW.run_id\n    AND result_fingerprint=NEW.result_fingerprint AND workflow_version=2 AND status='completed' AND result_package_version=1) THEN\n   RAISE EXCEPTION 'Interpretation requires the published Ultimate result' USING ERRCODE='22023'; END IF;\n  FOR ref IN SELECT value FROM jsonb_array_elements(NEW.evidence_refs) LOOP\n   IF NOT EXISTS(SELECT 1 FROM public.decision_result_artifacts WHERE workspace_id=NEW.workspace_id AND run_id=NEW.run_id\n     AND result_fingerprint=NEW.result_fingerprint AND publication_state='READY'\n     AND id::text=ref->>'artifact_id' AND content_sha256=ref->>'content_sha256') THEN\n    RAISE EXCEPTION 'Interpretation evidence must belong to the same published Run' USING ERRCODE='22023'; END IF;\n  END LOOP;\n END IF;\n RETURN NEW;\nEND; $function$\n",
+        "schema_name": "dation_private"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "args": "",
+        "name": "ultimate_pack_guard",
+        "proconfig": [
+          "search_path=pg_catalog"
+        ],
+        "prosecdef": false,
+        "definition": "CREATE OR REPLACE FUNCTION dation_private.ultimate_pack_guard()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO 'pg_catalog'\nAS $function$\nDECLARE cohort smallint; version_xid xid8; actual_type text;\nBEGIN\n IF TG_TABLE_NAME='case_data_packs' THEN\n  SELECT workflow_version INTO cohort FROM public.decision_cases WHERE workspace_id=NEW.workspace_id AND id=NEW.case_id;\n  IF cohort IS NOT NULL AND cohort<>2 THEN RAISE EXCEPTION 'Progressive Pack requires an Ultimate Case' USING ERRCODE='22023'; END IF;\n  IF TG_OP='UPDATE' AND ROW(NEW.id,NEW.workspace_id,NEW.case_id,NEW.created_at)\n    IS DISTINCT FROM ROW(OLD.id,OLD.workspace_id,OLD.case_id,OLD.created_at) THEN\n   RAISE EXCEPTION 'Pack identity is immutable' USING ERRCODE='22023'; END IF;\n ELSIF TG_TABLE_NAME='case_data_pack_versions' THEN NEW.created_xid=pg_current_xact_id();\n ELSE\n  SELECT created_xid INTO version_xid FROM public.case_data_pack_versions\n   WHERE workspace_id=NEW.workspace_id AND case_id=NEW.case_id AND id=NEW.pack_version_id;\n  IF NOT FOUND THEN RETURN NEW; END IF; -- The composite FK rejects an absent/cross-tenant version.\n  IF version_xid IS DISTINCT FROM pg_current_xact_id() THEN\n   RAISE EXCEPTION 'Entries belong to the immutable version creation transaction' USING ERRCODE='22023'; END IF;\n  SELECT dataset_type INTO actual_type FROM public.datasets WHERE workspace_id=NEW.workspace_id AND id=NEW.dataset_id;\n  IF NOT FOUND THEN RETURN NEW; END IF; -- The interpretation FK is authoritative.\n  IF NEW.slot_key IN('transport_demand','transport_resources') AND actual_type IS DISTINCT FROM NEW.slot_key THEN\n   RAISE EXCEPTION 'Pack slot conflicts with dataset contract' USING ERRCODE='22023'; END IF;\n END IF;\n RETURN NEW;\nEND; $function$\n",
+        "schema_name": "dation_private"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "args": "",
+        "name": "ultimate_publication_identity",
+        "proconfig": [
+          "search_path=pg_catalog"
+        ],
+        "prosecdef": false,
+        "definition": "CREATE OR REPLACE FUNCTION dation_private.ultimate_publication_identity()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO 'pg_catalog'\nAS $function$\nBEGIN\n IF OLD.status IN('completed','error') AND ROW(NEW.result_package_version,NEW.assembler_version,NEW.artifact_manifest_hash,NEW.core_fingerprint)\n IS DISTINCT FROM ROW(OLD.result_package_version,OLD.assembler_version,OLD.artifact_manifest_hash,OLD.core_fingerprint) THEN\n  RAISE EXCEPTION 'Terminal publication metadata is immutable' USING ERRCODE='22023'; END IF;\n RETURN NEW;\nEND; $function$\n",
+        "schema_name": "dation_private"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "args": "",
+        "name": "ultimate_run_guard",
+        "proconfig": [
+          "search_path=pg_catalog"
+        ],
+        "prosecdef": false,
+        "definition": "CREATE OR REPLACE FUNCTION dation_private.ultimate_run_guard()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO 'pg_catalog'\nAS $function$\nDECLARE c public.decision_cases;\nBEGIN\n IF NEW.decision_case_id IS NOT NULL THEN\n  SELECT * INTO c FROM public.decision_cases WHERE workspace_id=NEW.workspace_id AND id=NEW.decision_case_id;\n  IF FOUND AND c.workflow_version<>NEW.workflow_version THEN\n   RAISE EXCEPTION 'Run/Case cohorts differ' USING ERRCODE='22023'; END IF;\n END IF;\n IF TG_OP='UPDATE' AND ROW(NEW.workflow_version,NEW.logistics_model_version_id,NEW.data_pack_version_id,\n  NEW.graph_definition_version,NEW.case_policy_hash,NEW.node_policy_hash,NEW.contract_hash,NEW.input_context_hash,\n  NEW.transit_model_version,NEW.runtime_profile,NEW.result_schema_version)\n IS DISTINCT FROM ROW(OLD.workflow_version,OLD.logistics_model_version_id,OLD.data_pack_version_id,\n  OLD.graph_definition_version,OLD.case_policy_hash,OLD.node_policy_hash,OLD.contract_hash,OLD.input_context_hash,\n  OLD.transit_model_version,OLD.runtime_profile,OLD.result_schema_version) THEN\n  RAISE EXCEPTION 'Run context pinning is immutable' USING ERRCODE='22023'; END IF;\n IF NEW.workflow_version=2 THEN\n  IF c.context_frozen_at IS NULL OR NEW.case_policy_hash IS DISTINCT FROM c.case_policy_hash\n    OR NEW.graph_definition_version IS DISTINCT FROM c.graph_definition_version THEN\n   RAISE EXCEPTION 'Run requires the frozen Case policy/graph' USING ERRCODE='22023'; END IF;\n  IF NOT EXISTS(SELECT 1 FROM public.case_data_pack_entries WHERE workspace_id=NEW.workspace_id\n    AND case_id=NEW.decision_case_id AND pack_version_id=NEW.data_pack_version_id\n    AND slot_key='transport_demand' AND dataset_id=NEW.dataset_id) THEN\n   RAISE EXCEPTION 'Run primary raw Demand must belong to its Pack' USING ERRCODE='22023'; END IF;\n  IF NEW.status='completed' AND (NEW.result_json->>'result_schema' IS DISTINCT FROM NEW.schema_version\n    OR NEW.result_json->>'result_schema_version' IS DISTINCT FROM NEW.result_schema_version::text) THEN\n   RAISE EXCEPTION 'Run/package schema mismatch' USING ERRCODE='22023'; END IF;\n END IF;\n RETURN NEW;\nEND; $function$\n",
+        "schema_name": "dation_private"
+      }
+    ],
+    "removed": [],
+    "changed": [
+      {
+        "before": {
+          "acl": "{postgres=X/postgres}",
+          "args": "wid uuid, did uuid",
+          "name": "dataset_case_usage",
+          "proconfig": [
+            "search_path=public, pg_temp"
+          ],
+          "prosecdef": false,
+          "definition": "CREATE OR REPLACE FUNCTION dation_private.dataset_case_usage(wid uuid, did uuid)\n RETURNS SETOF decision_cases\n LANGUAGE sql\n STABLE\n SET search_path TO 'public', 'pg_temp'\nAS $function$\n SELECT c.* FROM decision_cases c WHERE c.workspace_id=wid AND\n (c.orders_dataset_id=did OR c.fleet_dataset_id=did OR EXISTS(\n  SELECT 1 FROM decision_runs r WHERE r.workspace_id=wid AND r.decision_case_id=c.id\n  AND did IN(r.dataset_id,r.orders_dataset_id,r.fleet_dataset_id)))\n$function$\n",
+          "schema_name": "dation_private"
+        },
+        "after": {
+          "acl": "{postgres=X/postgres}",
+          "args": "wid uuid, did uuid",
+          "name": "dataset_case_usage",
+          "proconfig": [
+            "search_path=public, pg_temp"
+          ],
+          "prosecdef": false,
+          "definition": "CREATE OR REPLACE FUNCTION dation_private.dataset_case_usage(wid uuid, did uuid)\n RETURNS SETOF decision_cases\n LANGUAGE sql\n STABLE\n SET search_path TO 'public', 'pg_temp'\nAS $function$\n SELECT c.* FROM decision_cases c WHERE c.workspace_id=wid AND\n (c.orders_dataset_id=did OR c.fleet_dataset_id=did OR EXISTS(SELECT 1 FROM public.case_data_pack_entries e WHERE e.workspace_id=wid AND e.case_id=c.id AND e.dataset_id=did) OR EXISTS(\n  SELECT 1 FROM decision_runs r WHERE r.workspace_id=wid AND r.decision_case_id=c.id\n  AND did IN(r.dataset_id,r.orders_dataset_id,r.fleet_dataset_id)))\n$function$\n",
+          "schema_name": "dation_private"
+        }
+      },
+      {
+        "before": {
+          "acl": "{postgres=X/postgres}",
+          "args": "wid uuid, did uuid",
+          "name": "dataset_referenced",
+          "proconfig": [
+            "search_path=public, pg_temp"
+          ],
+          "prosecdef": false,
+          "definition": "CREATE OR REPLACE FUNCTION dation_private.dataset_referenced(wid uuid, did uuid)\n RETURNS boolean\n LANGUAGE plpgsql\n STABLE\n SET search_path TO 'public', 'pg_temp'\nAS $function$\nDECLARE relation_name text; used boolean;\nBEGIN\n -- Conservative: include JSON evidence and indirect/version references, even in\n -- archived cases and terminal runs. This rare destructive action may scan.\n FOR relation_name IN SELECT unnest(ARRAY['datasets','decision_cases','decision_runs','dispatch_run_jobs',\n 'decision_case_reconciliations','decision_approval_events','decision_comparative_analyses',\n 'decision_explanations','decision_messages','decision_chat_turns','decision_interpretation_sources']) LOOP\n  EXECUTE format('SELECT EXISTS(SELECT 1 FROM public.%I t WHERE workspace_id=$1 %s AND jsonb_path_exists(to_jsonb(t),''$.** ? (@ == $id)'',jsonb_build_object(''id'',$2::text)))',\n   relation_name,CASE WHEN relation_name='datasets' THEN 'AND id<>$2' ELSE '' END) INTO used USING wid,did;\n  IF used THEN RETURN true; END IF;\n END LOOP;\n RETURN false;\nEND; $function$\n",
+          "schema_name": "dation_private"
+        },
+        "after": {
+          "acl": "{postgres=X/postgres}",
+          "args": "wid uuid, did uuid",
+          "name": "dataset_referenced",
+          "proconfig": [
+            "search_path=public, pg_temp"
+          ],
+          "prosecdef": false,
+          "definition": "CREATE OR REPLACE FUNCTION dation_private.dataset_referenced(wid uuid, did uuid)\n RETURNS boolean\n LANGUAGE plpgsql\n STABLE\n SET search_path TO 'public', 'pg_temp'\nAS $function$\nDECLARE relation_name text; used boolean;\nBEGIN\n IF EXISTS(SELECT 1 FROM public.case_data_pack_entries WHERE workspace_id=wid AND dataset_id=did) THEN RETURN true; END IF;\n -- Conservative: include JSON evidence and indirect/version references, even in\n -- archived cases and terminal runs. This rare destructive action may scan.\n FOR relation_name IN SELECT unnest(ARRAY['datasets','decision_cases','decision_runs','dispatch_run_jobs',\n 'decision_case_reconciliations','decision_approval_events','decision_comparative_analyses',\n 'decision_explanations','decision_messages','decision_chat_turns','decision_interpretation_sources']) LOOP\n  EXECUTE format('SELECT EXISTS(SELECT 1 FROM public.%I t WHERE workspace_id=$1 %s AND jsonb_path_exists(to_jsonb(t),''$.** ? (@ == $id)'',jsonb_build_object(''id'',$2::text)))',\n   relation_name,CASE WHEN relation_name='datasets' THEN 'AND id<>$2' ELSE '' END) INTO used USING wid,did;\n  IF used THEN RETURN true; END IF;\n END LOOP;\n RETURN false;\nEND; $function$\n",
+          "schema_name": "dation_private"
+        }
+      },
+      {
+        "before": {
+          "acl": "{postgres=X/postgres}",
+          "args": "case_status text, page_limit integer, page_offset integer, summary_only boolean",
+          "name": "list_decision_cases",
+          "proconfig": [
+            "search_path=dation_private, public, pg_temp"
+          ],
+          "prosecdef": false,
+          "definition": "CREATE OR REPLACE FUNCTION dation_private.list_decision_cases(case_status text DEFAULT 'active'::text, page_limit integer DEFAULT 50, page_offset integer DEFAULT 0, summary_only boolean DEFAULT false)\n RETURNS TABLE(case_row jsonb, orders jsonb, fleet jsonb, summaries jsonb)\n LANGUAGE plpgsql\n STABLE\n SET search_path TO 'dation_private', 'public', 'pg_temp'\nAS $function$\nBEGIN\n IF case_status IS NOT NULL AND case_status NOT IN ('active','completed','archived')\n    OR page_limit IS NULL OR page_limit < 1 OR page_limit > 100\n    OR page_offset IS NULL OR page_offset < 0 OR summary_only IS NULL THEN\n   RAISE EXCEPTION USING ERRCODE='22023', MESSAGE='Paginaci\u00f3n de casos inv\u00e1lida';\n END IF;\n RETURN QUERY\n WITH page AS MATERIALIZED (\n   SELECT c.* FROM public.decision_cases c\n   WHERE c.workspace_id=dation_private.workspace_id() AND (case_status IS NULL OR c.status=case_status)\n   ORDER BY c.last_activity_at DESC,c.id DESC LIMIT page_limit OFFSET page_offset\n ), nodes(node_id) AS (VALUES\n   ('logistics_assignment'::text),('logistics_scheduling'),('logistics_final_assignment'))\n SELECT to_jsonb(c),\n   CASE WHEN summary_only THEN jsonb_build_object(\n     'id',o.id,'dataset_type',o.dataset_type,'canonical_filename',o.canonical_filename,\n     'label',o.label,'original_filename',o.original_filename)\n     ELSE to_jsonb(o) END,\n   CASE WHEN summary_only THEN jsonb_build_object(\n     'id',f.id,'dataset_type',f.dataset_type,'canonical_filename',f.canonical_filename,\n     'label',f.label,'original_filename',f.original_filename)\n     ELSE to_jsonb(f) END,\n   (SELECT jsonb_object_agg(n.node_id,jsonb_build_object(\n     'run_count',(SELECT count(*) FROM public.decision_runs r\n       WHERE r.decision_case_id=c.id AND r.node_id=n.node_id),\n     'latest',(SELECT to_jsonb(compact) FROM (\n       SELECT r.id,r.node_id,r.upstream_run_id,r.status,r.error_message,\n              r.approved_at,r.superseded_at\n       FROM public.decision_runs r WHERE r.decision_case_id=c.id AND r.node_id=n.node_id\n       ORDER BY r.created_at DESC,r.id DESC LIMIT 1) compact),\n     'approved',(SELECT to_jsonb(compact) FROM (\n       SELECT r.id,r.node_id,r.upstream_run_id,r.status,r.error_message,\n              r.approved_at,r.superseded_at\n       FROM public.decision_runs r WHERE r.decision_case_id=c.id AND r.node_id=n.node_id\n       AND r.approved_at IS NOT NULL AND r.superseded_at IS NULL LIMIT 1) compact)\n   )) FROM nodes n)\n FROM page c JOIN public.datasets o ON o.id=c.orders_dataset_id\n             JOIN public.datasets f ON f.id=c.fleet_dataset_id\n ORDER BY c.last_activity_at DESC,c.id DESC;\nEND;\n$function$\n",
+          "schema_name": "dation_private"
+        },
+        "after": {
+          "acl": "{postgres=X/postgres}",
+          "args": "case_status text, page_limit integer, page_offset integer, summary_only boolean",
+          "name": "list_decision_cases",
+          "proconfig": [
+            "search_path=dation_private, public, pg_temp"
+          ],
+          "prosecdef": false,
+          "definition": "CREATE OR REPLACE FUNCTION dation_private.list_decision_cases(case_status text DEFAULT 'active'::text, page_limit integer DEFAULT 50, page_offset integer DEFAULT 0, summary_only boolean DEFAULT false)\n RETURNS TABLE(case_row jsonb, orders jsonb, fleet jsonb, summaries jsonb)\n LANGUAGE plpgsql\n STABLE\n SET search_path TO 'dation_private', 'public', 'pg_temp'\nAS $function$\nBEGIN\n IF case_status IS NOT NULL AND case_status NOT IN ('active','completed','archived')\n    OR page_limit IS NULL OR page_limit < 1 OR page_limit > 100\n    OR page_offset IS NULL OR page_offset < 0 OR summary_only IS NULL THEN\n   RAISE EXCEPTION USING ERRCODE='22023', MESSAGE='Paginaci\u00f3n de casos inv\u00e1lida';\n END IF;\n RETURN QUERY\n WITH page AS MATERIALIZED (\n   SELECT c.* FROM public.decision_cases c\n   WHERE c.workspace_id=dation_private.workspace_id() AND (case_status IS NULL OR c.status=case_status)\n   ORDER BY c.last_activity_at DESC,c.id DESC LIMIT page_limit OFFSET page_offset\n ), nodes(node_id) AS (VALUES\n   ('logistics_assignment'::text),('logistics_scheduling'),('logistics_final_assignment'))\n SELECT to_jsonb(c),\n   CASE WHEN o.id IS NULL THEN NULL WHEN summary_only THEN jsonb_build_object(\n     'id',o.id,'dataset_type',o.dataset_type,'canonical_filename',o.canonical_filename,\n     'label',o.label,'original_filename',o.original_filename)\n     ELSE to_jsonb(o) END,\n   CASE WHEN f.id IS NULL THEN NULL WHEN summary_only THEN jsonb_build_object(\n     'id',f.id,'dataset_type',f.dataset_type,'canonical_filename',f.canonical_filename,\n     'label',f.label,'original_filename',f.original_filename)\n     ELSE to_jsonb(f) END,\n   (SELECT jsonb_object_agg(n.node_id,jsonb_build_object(\n     'run_count',(SELECT count(*) FROM public.decision_runs r\n       WHERE r.decision_case_id=c.id AND r.node_id=n.node_id),\n     'latest',(SELECT to_jsonb(compact) FROM (\n       SELECT r.id,r.node_id,r.upstream_run_id,r.status,r.error_message,\n              r.approved_at,r.superseded_at\n       FROM public.decision_runs r WHERE r.decision_case_id=c.id AND r.node_id=n.node_id\n       ORDER BY r.created_at DESC,r.id DESC LIMIT 1) compact),\n     'approved',(SELECT to_jsonb(compact) FROM (\n       SELECT r.id,r.node_id,r.upstream_run_id,r.status,r.error_message,\n              r.approved_at,r.superseded_at\n       FROM public.decision_runs r WHERE r.decision_case_id=c.id AND r.node_id=n.node_id\n       AND r.approved_at IS NOT NULL AND r.superseded_at IS NULL LIMIT 1) compact)\n   )) FROM nodes n)\n FROM page c LEFT JOIN public.datasets o ON o.id=c.orders_dataset_id\n             LEFT JOIN public.datasets f ON f.id=c.fleet_dataset_id\n ORDER BY c.last_activity_at DESC,c.id DESC;\nEND;\n$function$\n",
+          "schema_name": "dation_private"
+        }
+      },
+      {
+        "before": {
+          "acl": "{postgres=X/postgres,service_role=X/postgres}",
+          "args": "target_workspace_id uuid, actor_user_id uuid",
+          "name": "platform_home",
+          "proconfig": [
+            "search_path=public, pg_temp"
+          ],
+          "prosecdef": true,
+          "definition": "CREATE OR REPLACE FUNCTION public.platform_home(target_workspace_id uuid, actor_user_id uuid)\n RETURNS jsonb\n LANGUAGE plpgsql\n STABLE SECURITY DEFINER\n SET search_path TO 'public', 'pg_temp'\nAS $function$\nDECLARE member_role text; recent jsonb; attention jsonb; attention_total bigint;\nBEGIN\n SELECT m.access_role INTO member_role\n FROM workspace_members m JOIN workspaces w ON w.id=m.workspace_id\n JOIN profiles p ON p.id=m.user_id\n JOIN auth.users u ON u.id=m.user_id AND u.email_confirmed_at IS NOT NULL\n WHERE m.workspace_id=target_workspace_id AND m.user_id=actor_user_id\n   AND m.status='active' AND w.status='active';\n IF NOT FOUND THEN RAISE EXCEPTION 'Membership denied' USING ERRCODE='42501'; END IF;\n PERFORM set_config('dation.workspace_id',target_workspace_id::text,true);\n\n -- Three recent, non-archived cases. Run summaries are read in this same snapshot;\n -- cached state alone must never determine an approval or the current version.\n SELECT coalesce(jsonb_agg(jsonb_build_object(\n   'case',jsonb_build_object('id',c.id,'status',c.status,'state_json',c.state_json,\n     'orders_dataset_id',c.orders_dataset_id,'fleet_dataset_id',c.fleet_dataset_id,\n     'last_activity_at',c.last_activity_at,'is_demo',EXISTS(SELECT 1 FROM datasets d WHERE d.workspace_id=c.workspace_id AND d.id IN(c.orders_dataset_id,c.fleet_dataset_id) AND d.is_sample)),\n   'label',coalesce(nullif(c.label,''),nullif(o.label,''),o.canonical_filename,o.original_filename),\n   'summaries',dation_private.decision_case_history(c.id,NULL,0,0)->'summaries'\n ) ORDER BY c.last_activity_at DESC,c.id DESC),'[]') INTO recent\n FROM (SELECT * FROM decision_cases WHERE workspace_id=target_workspace_id\n   AND status IN('active','completed') ORDER BY last_activity_at DESC,id DESC LIMIT 3) c\n JOIN datasets o ON o.id=c.orders_dataset_id AND o.workspace_id=target_workspace_id;\n\n attention='[]'; attention_total=0;\n -- Assigned reviewers see their work; admins retain an audited override.\n IF member_role IN('admin','operator') THEN\n  WITH reviews AS (\n   SELECT c.id AS case_id,c.last_activity_at,r.id AS run_id,r.node_id,'review'::text AS kind\n   FROM decision_cases c\n   CROSS JOIN (VALUES ('logistics_assignment'::text),('logistics_scheduling')) n(node_id)\n   JOIN LATERAL (SELECT id,node_id,status,approved_at,superseded_at,upstream_run_id\n     FROM decision_runs WHERE workspace_id=target_workspace_id\n       AND decision_case_id=c.id AND node_id=n.node_id\n     ORDER BY created_at DESC,id DESC LIMIT 1) r ON true\n   WHERE c.workspace_id=target_workspace_id AND c.status='active'\n     AND r.status='completed' AND r.approved_at IS NULL AND r.superseded_at IS NULL\n     AND coalesce((dation_private.case_collaboration(target_workspace_id,c.id,actor_user_id)->r.node_id->>'can_approve')::boolean,false)\n     AND (r.node_id='logistics_assignment' OR EXISTS(\n       SELECT 1 FROM decision_runs source WHERE source.id=r.upstream_run_id\n         AND source.workspace_id=target_workspace_id AND source.decision_case_id=c.id\n         AND source.node_id='logistics_assignment' AND source.status='completed'\n         AND source.approved_at IS NOT NULL AND source.superseded_at IS NULL))\n  ), handoffs AS (\n   SELECT c.id AS case_id,c.last_activity_at,NULL::uuid AS run_id,'logistics_scheduling'::text AS node_id,'handoff'::text AS kind\n   FROM decision_cases c JOIN decision_assignments a ON a.workspace_id=c.workspace_id AND a.decision_case_id=c.id\n    AND a.node_id='logistics_scheduling' AND a.owner_user_id=actor_user_id\n   JOIN decision_runs source ON source.workspace_id=c.workspace_id AND source.decision_case_id=c.id AND source.node_id='logistics_assignment'\n    AND source.status='completed' AND source.approved_at IS NOT NULL AND source.superseded_at IS NULL\n   WHERE c.workspace_id=target_workspace_id AND c.status='active'\n    AND dation_private.responsibility_eligible(target_workspace_id,a.owner_user_id,'decision_owner')\n    AND NOT EXISTS(SELECT 1 FROM decision_runs r WHERE r.workspace_id=c.workspace_id AND r.decision_case_id=c.id AND r.node_id='logistics_scheduling'\n     AND r.upstream_run_id=source.id AND r.superseded_at IS NULL AND r.status IN('queued','running','completed'))\n  ), work AS (SELECT * FROM reviews UNION ALL SELECT * FROM handoffs), candidates AS (\n   SELECT work.*,EXISTS(SELECT 1 FROM decision_cases c JOIN datasets d ON d.workspace_id=c.workspace_id AND d.id IN(c.orders_dataset_id,c.fleet_dataset_id) WHERE c.workspace_id=target_workspace_id AND c.id=work.case_id AND d.is_sample) AS is_demo,count(*) OVER() AS total FROM work ORDER BY last_activity_at DESC,case_id DESC,node_id LIMIT 5\n  ) SELECT coalesce(jsonb_agg(to_jsonb(candidates)-'total'\n      ORDER BY last_activity_at DESC,case_id DESC,node_id),'[]'),coalesce(max(total),0)\n    INTO attention,attention_total FROM candidates;\n END IF;\n RETURN jsonb_build_object('recent_cases',recent,\n   'attention',jsonb_build_object('items',attention,'total',attention_total));\nEND; $function$\n",
+          "schema_name": "public"
+        },
+        "after": {
+          "acl": "{postgres=X/postgres,service_role=X/postgres}",
+          "args": "target_workspace_id uuid, actor_user_id uuid",
+          "name": "platform_home",
+          "proconfig": [
+            "search_path=public, pg_temp"
+          ],
+          "prosecdef": true,
+          "definition": "CREATE OR REPLACE FUNCTION public.platform_home(target_workspace_id uuid, actor_user_id uuid)\n RETURNS jsonb\n LANGUAGE plpgsql\n STABLE SECURITY DEFINER\n SET search_path TO 'public', 'pg_temp'\nAS $function$\nDECLARE member_role text; recent jsonb; attention jsonb; attention_total bigint;\nBEGIN\n SELECT m.access_role INTO member_role\n FROM workspace_members m JOIN workspaces w ON w.id=m.workspace_id\n JOIN profiles p ON p.id=m.user_id\n JOIN auth.users u ON u.id=m.user_id AND u.email_confirmed_at IS NOT NULL\n WHERE m.workspace_id=target_workspace_id AND m.user_id=actor_user_id\n   AND m.status='active' AND w.status='active';\n IF NOT FOUND THEN RAISE EXCEPTION 'Membership denied' USING ERRCODE='42501'; END IF;\n PERFORM set_config('dation.workspace_id',target_workspace_id::text,true);\n\n -- Three recent, non-archived cases. Run summaries are read in this same snapshot;\n -- cached state alone must never determine an approval or the current version.\n SELECT coalesce(jsonb_agg(jsonb_build_object(\n   'case',jsonb_build_object('id',c.id,'status',c.status,'state_json',c.state_json,\n     'orders_dataset_id',c.orders_dataset_id,'fleet_dataset_id',c.fleet_dataset_id,\n     'workflow_version',c.workflow_version,'logistics_model_version_id',c.logistics_model_version_id,'planning_start',c.planning_start,'planning_end',c.planning_end,'last_activity_at',c.last_activity_at,'is_demo',EXISTS(SELECT 1 FROM datasets d WHERE d.workspace_id=c.workspace_id AND d.id IN(c.orders_dataset_id,c.fleet_dataset_id) AND d.is_sample)),\n   'label',coalesce(nullif(c.label,''),nullif(o.label,''),o.canonical_filename,o.original_filename,'DC-'||upper(left(c.id::text,8))),\n   'summaries',dation_private.decision_case_history(c.id,NULL,0,0)->'summaries'\n ) ORDER BY c.last_activity_at DESC,c.id DESC),'[]') INTO recent\n FROM (SELECT * FROM decision_cases WHERE workspace_id=target_workspace_id\n   AND status IN('active','completed') ORDER BY last_activity_at DESC,id DESC LIMIT 3) c\n LEFT JOIN datasets o ON o.id=c.orders_dataset_id AND o.workspace_id=target_workspace_id;\n\n attention='[]'; attention_total=0;\n -- Assigned reviewers see their work; admins retain an audited override.\n IF member_role IN('admin','operator') THEN\n  WITH reviews AS (\n   SELECT c.id AS case_id,c.last_activity_at,r.id AS run_id,r.node_id,'review'::text AS kind\n   FROM decision_cases c\n   CROSS JOIN (VALUES ('logistics_assignment'::text),('logistics_scheduling')) n(node_id)\n   JOIN LATERAL (SELECT id,node_id,status,approved_at,superseded_at,upstream_run_id\n     FROM decision_runs WHERE workspace_id=target_workspace_id\n       AND decision_case_id=c.id AND node_id=n.node_id\n     ORDER BY created_at DESC,id DESC LIMIT 1) r ON true\n   WHERE c.workspace_id=target_workspace_id AND c.status='active'\n     AND r.status='completed' AND r.approved_at IS NULL AND r.superseded_at IS NULL\n     AND coalesce((dation_private.case_collaboration(target_workspace_id,c.id,actor_user_id)->r.node_id->>'can_approve')::boolean,false)\n     AND (r.node_id='logistics_assignment' OR EXISTS(\n       SELECT 1 FROM decision_runs source WHERE source.id=r.upstream_run_id\n         AND source.workspace_id=target_workspace_id AND source.decision_case_id=c.id\n         AND source.node_id='logistics_assignment' AND source.status='completed'\n         AND source.approved_at IS NOT NULL AND source.superseded_at IS NULL))\n  ), handoffs AS (\n   SELECT c.id AS case_id,c.last_activity_at,NULL::uuid AS run_id,'logistics_scheduling'::text AS node_id,'handoff'::text AS kind\n   FROM decision_cases c JOIN decision_assignments a ON a.workspace_id=c.workspace_id AND a.decision_case_id=c.id\n    AND a.node_id='logistics_scheduling' AND a.owner_user_id=actor_user_id\n   JOIN decision_runs source ON source.workspace_id=c.workspace_id AND source.decision_case_id=c.id AND source.node_id='logistics_assignment'\n    AND source.status='completed' AND source.approved_at IS NOT NULL AND source.superseded_at IS NULL\n   WHERE c.workspace_id=target_workspace_id AND c.status='active'\n    AND dation_private.responsibility_eligible(target_workspace_id,a.owner_user_id,'decision_owner')\n    AND NOT EXISTS(SELECT 1 FROM decision_runs r WHERE r.workspace_id=c.workspace_id AND r.decision_case_id=c.id AND r.node_id='logistics_scheduling'\n     AND r.upstream_run_id=source.id AND r.superseded_at IS NULL AND r.status IN('queued','running','completed'))\n  ), work AS (SELECT * FROM reviews UNION ALL SELECT * FROM handoffs), candidates AS (\n   SELECT work.*,EXISTS(SELECT 1 FROM decision_cases c JOIN datasets d ON d.workspace_id=c.workspace_id AND d.id IN(c.orders_dataset_id,c.fleet_dataset_id) WHERE c.workspace_id=target_workspace_id AND c.id=work.case_id AND d.is_sample) AS is_demo,count(*) OVER() AS total FROM work ORDER BY last_activity_at DESC,case_id DESC,node_id LIMIT 5\n  ) SELECT coalesce(jsonb_agg(to_jsonb(candidates)-'total'\n      ORDER BY last_activity_at DESC,case_id DESC,node_id),'[]'),coalesce(max(total),0)\n    INTO attention,attention_total FROM candidates;\n END IF;\n RETURN jsonb_build_object('recent_cases',recent,\n   'attention',jsonb_build_object('items',attention,'total',attention_total));\nEND; $function$\n",
+          "schema_name": "public"
+        }
+      }
+    ]
+  },
+  "relations": {
+    "before_count": 26,
+    "after_count": 33,
+    "added": [
+      {
+        "acl": "{postgres=arwdDxtm/postgres}",
+        "name": "decision_definition_versions",
+        "relkind": "r",
+        "schema_name": "dation_private",
+        "relrowsecurity": true,
+        "relforcerowsecurity": true
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,authenticated=r/postgres,service_role=r/postgres}",
+        "name": "case_data_pack_entries",
+        "relkind": "r",
+        "schema_name": "public",
+        "relrowsecurity": true,
+        "relforcerowsecurity": true
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,authenticated=r/postgres,service_role=r/postgres}",
+        "name": "case_data_pack_versions",
+        "relkind": "r",
+        "schema_name": "public",
+        "relrowsecurity": true,
+        "relforcerowsecurity": true
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,authenticated=r/postgres,service_role=r/postgres}",
+        "name": "case_data_packs",
+        "relkind": "r",
+        "schema_name": "public",
+        "relrowsecurity": true,
+        "relforcerowsecurity": true
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,service_role=r/postgres}",
+        "name": "decision_result_artifacts",
+        "relkind": "r",
+        "schema_name": "public",
+        "relrowsecurity": true,
+        "relforcerowsecurity": true
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,authenticated=r/postgres,service_role=r/postgres}",
+        "name": "logistics_model_versions",
+        "relkind": "r",
+        "schema_name": "public",
+        "relrowsecurity": true,
+        "relforcerowsecurity": true
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,authenticated=r/postgres,service_role=r/postgres}",
+        "name": "logistics_models",
+        "relkind": "r",
+        "schema_name": "public",
+        "relrowsecurity": true,
+        "relforcerowsecurity": true
+      }
+    ],
+    "removed": [],
+    "changed": []
+  },
+  "constraints": {
+    "before_count": 187,
+    "after_count": 299,
+    "added": [
+      {
+        "name": "decision_definition_versions_definition_hash_check",
+        "contype": "c",
+        "definition": "CHECK ((definition_hash ~ '^[0-9a-f]{64}$'::text))",
+        "table_name": "decision_definition_versions",
+        "condeferred": false,
+        "schema_name": "dation_private",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_definition_versions_definition_jsonb_check",
+        "contype": "c",
+        "definition": "CHECK ((jsonb_typeof(definition_jsonb) = 'object'::text))",
+        "table_name": "decision_definition_versions",
+        "condeferred": false,
+        "schema_name": "dation_private",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_definition_versions_pkey",
+        "contype": "p",
+        "definition": "PRIMARY KEY (version)",
+        "table_name": "decision_definition_versions",
+        "condeferred": false,
+        "schema_name": "dation_private",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_definition_versions_version_check",
+        "contype": "c",
+        "definition": "CHECK ((version ~ '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$'::text))",
+        "table_name": "decision_definition_versions",
+        "condeferred": false,
+        "schema_name": "dation_private",
+        "condeferrable": false
+      },
+      {
+        "name": "case_data_pack_entries_canonical_sha256_check",
+        "contype": "c",
+        "definition": "CHECK ((canonical_sha256 ~ '^[0-9a-f]{64}$'::text))",
+        "table_name": "case_data_pack_entries",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "case_data_pack_entries_check",
+        "contype": "c",
+        "definition": "CHECK ((normalized_path = ((((((workspace_id)::text || '/normalized/'::text) || (dataset_id)::text) || '/'::text) || canonical_sha256) || '.json'::text)))",
+        "table_name": "case_data_pack_entries",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "case_data_pack_entries_contract_hash_check",
+        "contype": "c",
+        "definition": "CHECK ((contract_hash ~ '^[0-9a-f]{64}$'::text))",
+        "table_name": "case_data_pack_entries",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "case_data_pack_entries_normalized_bucket_check",
+        "contype": "c",
+        "definition": "CHECK ((normalized_bucket ~ '^[a-z0-9][a-z0-9-]{0,62}$'::text))",
+        "table_name": "case_data_pack_entries",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "case_data_pack_entries_pkey",
+        "contype": "p",
+        "definition": "PRIMARY KEY (pack_version_id, slot_key)",
+        "table_name": "case_data_pack_entries",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "case_data_pack_entries_raw_sha256_check",
+        "contype": "c",
+        "definition": "CHECK ((raw_sha256 ~ '^[0-9a-f]{64}$'::text))",
+        "table_name": "case_data_pack_entries",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "case_data_pack_entries_record_count_check",
+        "contype": "c",
+        "definition": "CHECK ((record_count >= 0))",
+        "table_name": "case_data_pack_entries",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "case_data_pack_entries_slot_key_check",
+        "contype": "c",
+        "definition": "CHECK ((slot_key = ANY (ARRAY['transport_demand'::text, 'transport_resources'::text, 'scheduling_enrichment'::text])))",
+        "table_name": "case_data_pack_entries",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "case_data_pack_entries_workspace_id_case_id_pack_version_i_fkey",
+        "contype": "f",
+        "definition": "FOREIGN KEY (workspace_id, case_id, pack_version_id) REFERENCES case_data_pack_versions(workspace_id, case_id, id) ON DELETE RESTRICT",
+        "table_name": "case_data_pack_entries",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "case_data_pack_entries_workspace_id_dataset_id_contract_id_fkey",
+        "contype": "f",
+        "definition": "FOREIGN KEY (workspace_id, dataset_id, contract_id, contract_hash, raw_sha256, canonical_sha256, normalizer_version) REFERENCES datasets(workspace_id, id, data_contract_id, data_contract_hash, sha256, canonical_sha256, normalizer_version) ON DELETE RESTRICT",
+        "table_name": "case_data_pack_entries",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "case_data_pack_versions_contract_set_hash_check",
+        "contype": "c",
+        "definition": "CHECK ((contract_set_hash ~ '^[0-9a-f]{64}$'::text))",
+        "table_name": "case_data_pack_versions",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "case_data_pack_versions_manifest_hash_check",
+        "contype": "c",
+        "definition": "CHECK ((manifest_hash ~ '^[0-9a-f]{64}$'::text))",
+        "table_name": "case_data_pack_versions",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "case_data_pack_versions_pack_id_version_key",
+        "contype": "u",
+        "definition": "UNIQUE (pack_id, version)",
+        "table_name": "case_data_pack_versions",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "case_data_pack_versions_pkey",
+        "contype": "p",
+        "definition": "PRIMARY KEY (id)",
+        "table_name": "case_data_pack_versions",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "case_data_pack_versions_version_check",
+        "contype": "c",
+        "definition": "CHECK ((version > 0))",
+        "table_name": "case_data_pack_versions",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "case_data_pack_versions_workspace_id_case_id_id_key",
+        "contype": "u",
+        "definition": "UNIQUE (workspace_id, case_id, id)",
+        "table_name": "case_data_pack_versions",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "case_data_pack_versions_workspace_id_case_id_pack_id_fkey",
+        "contype": "f",
+        "definition": "FOREIGN KEY (workspace_id, case_id, pack_id) REFERENCES case_data_packs(workspace_id, case_id, id) ON DELETE RESTRICT",
+        "table_name": "case_data_pack_versions",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "case_data_pack_versions_workspace_id_case_id_pack_id_id_key",
+        "contype": "u",
+        "definition": "UNIQUE (workspace_id, case_id, pack_id, id)",
+        "table_name": "case_data_pack_versions",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "case_data_pack_versions_workspace_id_created_by_fkey",
+        "contype": "f",
+        "definition": "FOREIGN KEY (workspace_id, created_by) REFERENCES workspace_members(workspace_id, user_id) ON DELETE RESTRICT",
+        "table_name": "case_data_pack_versions",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "case_data_pack_versions_workspace_id_id_key",
+        "contype": "u",
+        "definition": "UNIQUE (workspace_id, id)",
+        "table_name": "case_data_pack_versions",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "case_data_packs_pkey",
+        "contype": "p",
+        "definition": "PRIMARY KEY (id)",
+        "table_name": "case_data_packs",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "case_data_packs_revision_check",
+        "contype": "c",
+        "definition": "CHECK ((revision > 0))",
+        "table_name": "case_data_packs",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "case_data_packs_workspace_id_case_id_fkey",
+        "contype": "f",
+        "definition": "FOREIGN KEY (workspace_id, case_id) REFERENCES decision_cases(workspace_id, id) ON DELETE RESTRICT",
+        "table_name": "case_data_packs",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "case_data_packs_workspace_id_case_id_id_key",
+        "contype": "u",
+        "definition": "UNIQUE (workspace_id, case_id, id)",
+        "table_name": "case_data_packs",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "case_data_packs_workspace_id_case_id_key",
+        "contype": "u",
+        "definition": "UNIQUE (workspace_id, case_id)",
+        "table_name": "case_data_packs",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "case_data_packs_workspace_id_id_key",
+        "contype": "u",
+        "definition": "UNIQUE (workspace_id, id)",
+        "table_name": "case_data_packs",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "ultimate_pack_complete",
+        "contype": "t",
+        "definition": "TRIGGER DEFERRABLE INITIALLY DEFERRED",
+        "table_name": "case_data_packs",
+        "condeferred": true,
+        "schema_name": "public",
+        "condeferrable": true
+      },
+      {
+        "name": "ultimate_pack_current_version",
+        "contype": "f",
+        "definition": "FOREIGN KEY (workspace_id, case_id, id, current_version_id) REFERENCES case_data_pack_versions(workspace_id, case_id, pack_id, id) ON DELETE RESTRICT DEFERRABLE INITIALLY DEFERRED",
+        "table_name": "case_data_packs",
+        "condeferred": true,
+        "schema_name": "public",
+        "condeferrable": true
+      },
+      {
+        "name": "datasets_canonical_sha256_check",
+        "contype": "c",
+        "definition": "CHECK ((canonical_sha256 ~ '^[0-9a-f]{64}$'::text))",
+        "table_name": "datasets",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "datasets_data_contract_hash_check",
+        "contype": "c",
+        "definition": "CHECK ((data_contract_hash ~ '^[0-9a-f]{64}$'::text))",
+        "table_name": "datasets",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "ultimate_dataset_contract",
+        "contype": "c",
+        "definition": "CHECK (\nCASE\n    WHEN (dataset_type = ANY (ARRAY['transport_demand'::text, 'transport_resources'::text])) THEN ((num_nonnulls(data_contract_id, data_contract_hash, normalizer_version, canonical_sha256, sha256, schema_version) = 6) AND ((length(data_contract_id) >= 1) AND (length(data_contract_id) <= 128)) AND ((length(normalizer_version) >= 1) AND (length(normalizer_version) <= 128)))\n    ELSE (num_nonnulls(data_contract_id, data_contract_hash, normalizer_version, canonical_sha256) = 0)\nEND)",
+        "table_name": "datasets",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "ultimate_dataset_interpretation_identity",
+        "contype": "u",
+        "definition": "UNIQUE (workspace_id, id, data_contract_id, data_contract_hash, sha256, canonical_sha256, normalizer_version)",
+        "table_name": "datasets",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_approval_events_reason_code_check",
+        "contype": "c",
+        "definition": "CHECK ((reason_code = ANY (ARRAY['INPUT_READ_SET_CHANGED'::text, 'UPSTREAM_INVALIDATED'::text, 'RUN_REPLACED'::text])))",
+        "table_name": "decision_approval_events",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "ultimate_approval_cause",
+        "contype": "c",
+        "definition": "CHECK (\nCASE\n    WHEN (reason_code = 'INPUT_READ_SET_CHANGED'::text) THEN ((caused_by_pack_version_id IS NOT NULL) AND (action = 'superseded'::text))\n    ELSE (caused_by_pack_version_id IS NULL)\nEND)",
+        "table_name": "decision_approval_events",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "ultimate_approval_pack",
+        "contype": "f",
+        "definition": "FOREIGN KEY (workspace_id, case_id, caused_by_pack_version_id) REFERENCES case_data_pack_versions(workspace_id, case_id, id) ON DELETE RESTRICT",
+        "table_name": "decision_approval_events",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_cases_case_policy_hash_check",
+        "contype": "c",
+        "definition": "CHECK ((case_policy_hash ~ '^[0-9a-f]{64}$'::text))",
+        "table_name": "decision_cases",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_cases_operating_mode_check",
+        "contype": "c",
+        "definition": "CHECK ((operating_mode = ANY (ARRAY['OPERATIONAL'::text, 'SIMULATION'::text])))",
+        "table_name": "decision_cases",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_cases_workflow_version_check",
+        "contype": "c",
+        "definition": "CHECK ((workflow_version = ANY (ARRAY[1, 2])))",
+        "table_name": "decision_cases",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "ultimate_case_context",
+        "contype": "c",
+        "definition": "CHECK (\nCASE\n    WHEN (workflow_version = 1) THEN ((orders_dataset_id IS NOT NULL) AND (fleet_dataset_id IS NOT NULL) AND (input_signature IS NOT NULL) AND (num_nonnulls(logistics_model_version_id, planning_start, planning_end, operating_mode, case_policy_schema_version, case_policy_jsonb, case_policy_hash, context_frozen_at, graph_definition_version) = 0))\n    ELSE ((orders_dataset_id IS NULL) AND (fleet_dataset_id IS NULL) AND (input_signature IS NULL) AND (num_nonnulls(logistics_model_version_id, planning_start, planning_end, operating_mode, case_policy_schema_version, case_policy_jsonb, case_policy_hash, graph_definition_version) = 8) AND (planning_start <= planning_end) AND (case_policy_schema_version = 'case_policy_v1'::text) AND (jsonb_typeof(case_policy_jsonb) = 'object'::text))\nEND)",
+        "table_name": "decision_cases",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "ultimate_case_model",
+        "contype": "f",
+        "definition": "FOREIGN KEY (workspace_id, logistics_model_version_id, graph_definition_version) REFERENCES logistics_model_versions(workspace_id, id, graph_definition_version) ON DELETE RESTRICT",
+        "table_name": "decision_cases",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "ultimate_case_model_identity",
+        "contype": "u",
+        "definition": "UNIQUE (workspace_id, id, logistics_model_version_id)",
+        "table_name": "decision_cases",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "ultimate_case_pack_complete",
+        "contype": "t",
+        "definition": "TRIGGER DEFERRABLE INITIALLY DEFERRED",
+        "table_name": "decision_cases",
+        "condeferred": true,
+        "schema_name": "public",
+        "condeferrable": true
+      },
+      {
+        "name": "decision_interpretation_sources_decision_context_hash_check",
+        "contype": "c",
+        "definition": "CHECK ((decision_context_hash ~ '^[0-9a-f]{64}$'::text))",
+        "table_name": "decision_interpretation_sources",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_interpretation_sources_result_fingerprint_check",
+        "contype": "c",
+        "definition": "CHECK ((result_fingerprint ~ '^[0-9a-f]{64}$'::text))",
+        "table_name": "decision_interpretation_sources",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "ultimate_interpretation_provenance",
+        "contype": "c",
+        "definition": "CHECK (\nCASE\n    WHEN (provenance_version IS NULL) THEN (num_nonnulls(result_fingerprint, decision_context_schema, decision_context_hash, mode, selected_entity, evidence_refs) = 0)\n    ELSE ((provenance_version = 2) AND (num_nonnulls(result_fingerprint, decision_context_schema, decision_context_hash, mode, evidence_refs) = 5) AND (decision_context_schema = 'decision_context_v1'::text) AND (mode = ANY (ARRAY['EXPLAIN'::text, 'EXPLORE'::text, 'COMPARE'::text, 'REVIEW'::text])) AND (jsonb_typeof(evidence_refs) = 'array'::text) AND (octet_length((evidence_refs)::text) <= 51200) AND ((selected_entity IS NULL) OR ((jsonb_typeof(selected_entity) = 'object'::text) AND (selected_entity ?& ARRAY['type'::text, 'id'::text]) AND (((selected_entity - 'type'::text) - 'id'::text) = '{}'::jsonb) AND (jsonb_typeof((selected_entity -> 'type'::text)) = 'string'::text) AND (jsonb_typeof((selected_entity -> 'id'::text)) = 'string'::text) AND ((selected_entity ->> 'type'::text) = ANY (ARRAY['CASE'::text, 'TRIP'::text, 'ORDER'::text, 'RESOURCE'::text, 'ALTERNATIVE'::text])) AND ((selected_entity ->> 'id'::text) ~ '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$'::text))))\nEND)",
+        "table_name": "decision_interpretation_sources",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "ultimate_interpretation_result",
+        "contype": "f",
+        "definition": "FOREIGN KEY (workspace_id, run_id, result_fingerprint) REFERENCES decision_runs(workspace_id, id, result_fingerprint) ON DELETE RESTRICT",
+        "table_name": "decision_interpretation_sources",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_result_artifacts_artifact_schema_check",
+        "contype": "c",
+        "definition": "CHECK ((artifact_schema = ANY (ARRAY['transport_trip_v1'::text, 'demand_resolution_v1'::text, 'resource_usage_v1'::text, 'day_schedule_trip_v1'::text, 'resource_timeline_v1'::text, 'service_analysis_v1'::text, 'entity_evidence_v1'::text, 'reason_emission_v1'::text, 'export_rows_v1'::text, 'decision_context_v1'::text, 'engine_core_v1'::text, 'engine_evidence_v1'::text, 'sankey_projection_v1'::text, 'day_gantt_projection_v1'::text])))",
+        "table_name": "decision_result_artifacts",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_result_artifacts_assembler_version_check",
+        "contype": "c",
+        "definition": "CHECK ((assembler_version ~ '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$'::text))",
+        "table_name": "decision_result_artifacts",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_result_artifacts_check",
+        "contype": "c",
+        "definition": "CHECK ((((publication_state = 'PREPARED'::text) AND (result_fingerprint IS NULL)) OR ((publication_state = 'READY'::text) AND (result_fingerprint IS NOT NULL))))",
+        "table_name": "decision_result_artifacts",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_result_artifacts_check1",
+        "contype": "c",
+        "definition": "CHECK ((storage_path = ((((((((((workspace_id)::text || '/runs/'::text) || (run_id)::text) || '/'::text) || lower(kind)) || '/'::text) || part_key) || '/'::text) || content_sha256) ||\nCASE\n    WHEN (media_type = 'application/json'::text) THEN '.json'::text\n    ELSE '.jsonl'::text\nEND)))",
+        "table_name": "decision_result_artifacts",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_result_artifacts_content_sha256_check",
+        "contype": "c",
+        "definition": "CHECK ((content_sha256 ~ '^[0-9a-f]{64}$'::text))",
+        "table_name": "decision_result_artifacts",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_result_artifacts_core_fingerprint_check",
+        "contype": "c",
+        "definition": "CHECK ((core_fingerprint ~ '^[0-9a-f]{64}$'::text))",
+        "table_name": "decision_result_artifacts",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_result_artifacts_kind_check",
+        "contype": "c",
+        "definition": "CHECK ((kind = ANY (ARRAY['CORE'::text, 'EVIDENCE'::text, 'ENTITY_EVIDENCE'::text, 'DETAIL_DATASET'::text, 'VISUAL'::text, 'EXPORT_ROWS'::text, 'AI_BASE'::text, 'ALTERNATIVE_PLAN'::text])))",
+        "table_name": "decision_result_artifacts",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_result_artifacts_lookup_keys_check",
+        "contype": "c",
+        "definition": "CHECK (((cardinality(lookup_keys) <= 100) AND (array_position(lookup_keys, NULL::text) IS NULL)))",
+        "table_name": "decision_result_artifacts",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_result_artifacts_media_type_check",
+        "contype": "c",
+        "definition": "CHECK ((media_type = ANY (ARRAY['application/json'::text, 'application/x-ndjson'::text])))",
+        "table_name": "decision_result_artifacts",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_result_artifacts_part_key_check",
+        "contype": "c",
+        "definition": "CHECK ((part_key ~ '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$'::text))",
+        "table_name": "decision_result_artifacts",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_result_artifacts_pkey",
+        "contype": "p",
+        "definition": "PRIMARY KEY (id)",
+        "table_name": "decision_result_artifacts",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_result_artifacts_producer_generation_check",
+        "contype": "c",
+        "definition": "CHECK ((producer_generation > 0))",
+        "table_name": "decision_result_artifacts",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_result_artifacts_producer_metadata_check",
+        "contype": "c",
+        "definition": "CHECK (((jsonb_typeof(producer_metadata) = 'object'::text) AND (octet_length((producer_metadata)::text) <= 16384)))",
+        "table_name": "decision_result_artifacts",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_result_artifacts_publication_state_check",
+        "contype": "c",
+        "definition": "CHECK ((publication_state = ANY (ARRAY['PREPARED'::text, 'READY'::text])))",
+        "table_name": "decision_result_artifacts",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_result_artifacts_result_fingerprint_check",
+        "contype": "c",
+        "definition": "CHECK ((result_fingerprint ~ '^[0-9a-f]{64}$'::text))",
+        "table_name": "decision_result_artifacts",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_result_artifacts_schema_version_check",
+        "contype": "c",
+        "definition": "CHECK ((schema_version = 1))",
+        "table_name": "decision_result_artifacts",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_result_artifacts_size_bytes_check",
+        "contype": "c",
+        "definition": "CHECK ((size_bytes >= 0))",
+        "table_name": "decision_result_artifacts",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_result_artifacts_storage_bucket_check",
+        "contype": "c",
+        "definition": "CHECK ((storage_bucket ~ '^[a-z0-9][a-z0-9-]{0,62}$'::text))",
+        "table_name": "decision_result_artifacts",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_result_artifacts_storage_bucket_storage_path_key",
+        "contype": "u",
+        "definition": "UNIQUE (storage_bucket, storage_path)",
+        "table_name": "decision_result_artifacts",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_result_artifacts_workspace_id_id_key",
+        "contype": "u",
+        "definition": "UNIQUE (workspace_id, id)",
+        "table_name": "decision_result_artifacts",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_result_artifacts_workspace_id_run_id_fkey",
+        "contype": "f",
+        "definition": "FOREIGN KEY (workspace_id, run_id) REFERENCES decision_runs(workspace_id, id) ON DELETE RESTRICT",
+        "table_name": "decision_result_artifacts",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_result_artifacts_workspace_id_run_id_kind_part_key_key",
+        "contype": "u",
+        "definition": "UNIQUE (workspace_id, run_id, kind, part_key, content_sha256)",
+        "table_name": "decision_result_artifacts",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "ultimate_artifact_published_run",
+        "contype": "f",
+        "definition": "FOREIGN KEY (workspace_id, run_id, result_fingerprint) REFERENCES decision_runs(workspace_id, id, result_fingerprint) ON DELETE RESTRICT DEFERRABLE INITIALLY DEFERRED",
+        "table_name": "decision_result_artifacts",
+        "condeferred": true,
+        "schema_name": "public",
+        "condeferrable": true
+      },
+      {
+        "name": "ultimate_artifact_ready",
+        "contype": "t",
+        "definition": "TRIGGER DEFERRABLE INITIALLY DEFERRED",
+        "table_name": "decision_result_artifacts",
+        "condeferred": true,
+        "schema_name": "public",
+        "condeferrable": true
+      },
+      {
+        "name": "decision_runs_artifact_manifest_hash_check",
+        "contype": "c",
+        "definition": "CHECK ((artifact_manifest_hash ~ '^[0-9a-f]{64}$'::text))",
+        "table_name": "decision_runs",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_runs_case_policy_hash_check",
+        "contype": "c",
+        "definition": "CHECK ((case_policy_hash ~ '^[0-9a-f]{64}$'::text))",
+        "table_name": "decision_runs",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_runs_contract_hash_check",
+        "contype": "c",
+        "definition": "CHECK ((contract_hash ~ '^[0-9a-f]{64}$'::text))",
+        "table_name": "decision_runs",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_runs_core_fingerprint_check",
+        "contype": "c",
+        "definition": "CHECK ((core_fingerprint ~ '^[0-9a-f]{64}$'::text))",
+        "table_name": "decision_runs",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_runs_graph_definition_version_fkey",
+        "contype": "f",
+        "definition": "FOREIGN KEY (graph_definition_version) REFERENCES dation_private.decision_definition_versions(version) ON DELETE RESTRICT",
+        "table_name": "decision_runs",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_runs_input_context_hash_check",
+        "contype": "c",
+        "definition": "CHECK ((input_context_hash ~ '^[0-9a-f]{64}$'::text))",
+        "table_name": "decision_runs",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_runs_node_policy_hash_check",
+        "contype": "c",
+        "definition": "CHECK ((node_policy_hash ~ '^[0-9a-f]{64}$'::text))",
+        "table_name": "decision_runs",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "decision_runs_workflow_version_check",
+        "contype": "c",
+        "definition": "CHECK ((workflow_version = ANY (ARRAY[1, 2])))",
+        "table_name": "decision_runs",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "ultimate_run_context",
+        "contype": "c",
+        "definition": "CHECK (\nCASE\n    WHEN (workflow_version = 1) THEN ((schema_version <> ALL (ARRAY['transport_plan_v1'::text, 'day_scheduling_v1'::text])) AND (num_nonnulls(logistics_model_version_id, data_pack_version_id, graph_definition_version, case_policy_hash, node_policy_hash, contract_hash, input_context_hash, transit_model_version, runtime_profile, result_schema_version, invalidated_by_pack_version_id) = 0))\n    ELSE ((num_nonnulls(decision_case_id, node_id, logistics_model_version_id, data_pack_version_id, graph_definition_version, case_policy_hash, node_policy_hash, contract_hash, input_context_hash, transit_model_version, runtime_profile, result_schema_version) = 12) AND (orders_dataset_id IS NULL) AND (fleet_dataset_id IS NULL) AND (engine_version = '2.0.0'::text) AND (result_schema_version = 1) AND (transit_model_version = 'DATION_TRANSIT_V1'::text) AND (runtime_profile = schema_version) AND (((node_id = 'logistics_assignment'::text) AND (schema_version = 'transport_plan_v1'::text) AND (engine_name = 'transport_plan'::text)) OR ((node_id = 'logistics_scheduling'::text) AND (schema_version = 'day_scheduling_v1'::text) AND (engine_name = 'day_scheduling'::text))))\nEND)",
+        "table_name": "decision_runs",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "ultimate_run_invalidation_cause",
+        "contype": "c",
+        "definition": "CHECK (((invalidated_by_pack_version_id IS NULL) OR (superseded_at IS NOT NULL)))",
+        "table_name": "decision_runs",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "ultimate_run_invalidation_pack",
+        "contype": "f",
+        "definition": "FOREIGN KEY (workspace_id, decision_case_id, invalidated_by_pack_version_id) REFERENCES case_data_pack_versions(workspace_id, case_id, id) ON DELETE RESTRICT",
+        "table_name": "decision_runs",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "ultimate_run_model",
+        "contype": "f",
+        "definition": "FOREIGN KEY (workspace_id, decision_case_id, logistics_model_version_id) REFERENCES decision_cases(workspace_id, id, logistics_model_version_id) ON DELETE RESTRICT",
+        "table_name": "decision_runs",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "ultimate_run_pack",
+        "contype": "f",
+        "definition": "FOREIGN KEY (workspace_id, decision_case_id, data_pack_version_id) REFERENCES case_data_pack_versions(workspace_id, case_id, id) ON DELETE RESTRICT",
+        "table_name": "decision_runs",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "ultimate_run_publication",
+        "contype": "c",
+        "definition": "CHECK (\nCASE\n    WHEN (workflow_version = 1) THEN (num_nonnulls(result_package_version, assembler_version, artifact_manifest_hash, core_fingerprint) = 0)\n    ELSE (((result_package_version IS NULL) OR (result_package_version = 1)) AND ((status <> 'completed'::text) OR ((num_nonnulls(result_package_version, assembler_version, artifact_manifest_hash, core_fingerprint, result_fingerprint) = 5) AND (NOT ((result_json #>> '{fingerprints,result_fingerprint}'::text[]) IS DISTINCT FROM result_fingerprint)) AND (NOT ((result_json #>> '{fingerprints,core_result_fingerprint}'::text[]) IS DISTINCT FROM core_fingerprint)) AND (NOT ((result_json ->> 'assembler_version'::text) IS DISTINCT FROM assembler_version)))))\nEND)",
+        "table_name": "decision_runs",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "ultimate_run_result_identity",
+        "contype": "u",
+        "definition": "UNIQUE (workspace_id, id, result_fingerprint)",
+        "table_name": "decision_runs",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "logistics_model_versions_config_hash_check",
+        "contype": "c",
+        "definition": "CHECK ((config_hash ~ '^[0-9a-f]{64}$'::text))",
+        "table_name": "logistics_model_versions",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "logistics_model_versions_config_jsonb_check",
+        "contype": "c",
+        "definition": "CHECK ((jsonb_typeof(config_jsonb) = 'object'::text))",
+        "table_name": "logistics_model_versions",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "logistics_model_versions_config_schema_version_check",
+        "contype": "c",
+        "definition": "CHECK (((length(config_schema_version) >= 1) AND (length(config_schema_version) <= 128)))",
+        "table_name": "logistics_model_versions",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "logistics_model_versions_contract_descriptor_jsonb_check",
+        "contype": "c",
+        "definition": "CHECK ((jsonb_typeof(contract_descriptor_jsonb) = 'object'::text))",
+        "table_name": "logistics_model_versions",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "logistics_model_versions_contract_hash_check",
+        "contype": "c",
+        "definition": "CHECK ((contract_hash ~ '^[0-9a-f]{64}$'::text))",
+        "table_name": "logistics_model_versions",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "logistics_model_versions_contract_registry_version_check",
+        "contype": "c",
+        "definition": "CHECK (((length(contract_registry_version) >= 1) AND (length(contract_registry_version) <= 128)))",
+        "table_name": "logistics_model_versions",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "logistics_model_versions_graph_definition_version_fkey",
+        "contype": "f",
+        "definition": "FOREIGN KEY (graph_definition_version) REFERENCES dation_private.decision_definition_versions(version) ON DELETE RESTRICT",
+        "table_name": "logistics_model_versions",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "logistics_model_versions_model_id_version_key",
+        "contype": "u",
+        "definition": "UNIQUE (model_id, version)",
+        "table_name": "logistics_model_versions",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "logistics_model_versions_pkey",
+        "contype": "p",
+        "definition": "PRIMARY KEY (id)",
+        "table_name": "logistics_model_versions",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "logistics_model_versions_version_check",
+        "contype": "c",
+        "definition": "CHECK ((version > 0))",
+        "table_name": "logistics_model_versions",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "logistics_model_versions_workspace_id_id_graph_definition_v_key",
+        "contype": "u",
+        "definition": "UNIQUE (workspace_id, id, graph_definition_version)",
+        "table_name": "logistics_model_versions",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "logistics_model_versions_workspace_id_id_key",
+        "contype": "u",
+        "definition": "UNIQUE (workspace_id, id)",
+        "table_name": "logistics_model_versions",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "logistics_model_versions_workspace_id_model_id_fkey",
+        "contype": "f",
+        "definition": "FOREIGN KEY (workspace_id, model_id) REFERENCES logistics_models(workspace_id, id) ON DELETE RESTRICT",
+        "table_name": "logistics_model_versions",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "logistics_model_versions_workspace_id_model_id_id_key",
+        "contype": "u",
+        "definition": "UNIQUE (workspace_id, model_id, id)",
+        "table_name": "logistics_model_versions",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "logistics_model_versions_workspace_id_published_by_fkey",
+        "contype": "f",
+        "definition": "FOREIGN KEY (workspace_id, published_by) REFERENCES workspace_members(workspace_id, user_id) ON DELETE RESTRICT",
+        "table_name": "logistics_model_versions",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "logistics_models_description_check",
+        "contype": "c",
+        "definition": "CHECK ((length(description) <= 1000))",
+        "table_name": "logistics_models",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "logistics_models_name_check",
+        "contype": "c",
+        "definition": "CHECK (((length(TRIM(BOTH FROM name)) >= 1) AND (length(TRIM(BOTH FROM name)) <= 120)))",
+        "table_name": "logistics_models",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "logistics_models_pkey",
+        "contype": "p",
+        "definition": "PRIMARY KEY (id)",
+        "table_name": "logistics_models",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "logistics_models_revision_check",
+        "contype": "c",
+        "definition": "CHECK ((revision > 0))",
+        "table_name": "logistics_models",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "logistics_models_status_check",
+        "contype": "c",
+        "definition": "CHECK ((status = ANY (ARRAY['active'::text, 'archived'::text])))",
+        "table_name": "logistics_models",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "logistics_models_workspace_id_created_by_fkey",
+        "contype": "f",
+        "definition": "FOREIGN KEY (workspace_id, created_by) REFERENCES workspace_members(workspace_id, user_id) ON DELETE RESTRICT",
+        "table_name": "logistics_models",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "logistics_models_workspace_id_fkey",
+        "contype": "f",
+        "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id) ON DELETE RESTRICT",
+        "table_name": "logistics_models",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      },
+      {
+        "name": "logistics_models_workspace_id_id_key",
+        "contype": "u",
+        "definition": "UNIQUE (workspace_id, id)",
+        "table_name": "logistics_models",
+        "condeferred": false,
+        "schema_name": "public",
+        "condeferrable": false
+      }
+    ],
+    "removed": [],
+    "changed": [
+      {
+        "before": {
+          "name": "datasets_dataset_type_check",
+          "contype": "c",
+          "definition": "CHECK ((dataset_type = ANY (ARRAY['logistics_legacy'::text, 'orders'::text, 'fleet'::text])))",
+          "table_name": "datasets",
+          "condeferred": false,
+          "schema_name": "public",
+          "condeferrable": false
+        },
+        "after": {
+          "name": "datasets_dataset_type_check",
+          "contype": "c",
+          "definition": "CHECK ((dataset_type = ANY (ARRAY['logistics_legacy'::text, 'orders'::text, 'fleet'::text, 'transport_demand'::text, 'transport_resources'::text])))",
+          "table_name": "datasets",
+          "condeferred": false,
+          "schema_name": "public",
+          "condeferrable": false
+        }
+      },
+      {
+        "before": {
+          "name": "decision_runs_superseded_requires_approval_check",
+          "contype": "c",
+          "definition": "CHECK (((superseded_at IS NULL) OR (approved_at IS NOT NULL) OR (superseded_by_run_id IS NOT NULL)))",
+          "table_name": "decision_runs",
+          "condeferred": false,
+          "schema_name": "public",
+          "condeferrable": false
+        },
+        "after": {
+          "name": "decision_runs_superseded_requires_approval_check",
+          "contype": "c",
+          "definition": "CHECK (((superseded_at IS NULL) OR (approved_at IS NOT NULL) OR (superseded_by_run_id IS NOT NULL) OR ((workflow_version = 2) AND (invalidated_by_pack_version_id IS NOT NULL))))",
+          "table_name": "decision_runs",
+          "condeferred": false,
+          "schema_name": "public",
+          "condeferrable": false
+        }
+      }
+    ]
+  }
+}

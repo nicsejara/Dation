@@ -1,0 +1,112 @@
+[
+  {
+    "kind": "assignment",
+    "viewport": [
+      1440,
+      900
+    ],
+    "changed_pixels": 0,
+    "same_styles": true,
+    "before": "post-t9-assignment-desktop.png",
+    "after": "candidate-assignment-desktop.png"
+  },
+  {
+    "kind": "scheduling",
+    "viewport": [
+      1440,
+      900
+    ],
+    "changed_pixels": 0,
+    "same_styles": true,
+    "before": "post-t9-scheduling-desktop.png",
+    "after": "candidate-scheduling-desktop.png"
+  },
+  {
+    "kind": "assignment",
+    "viewport": [
+      1024,
+      768
+    ],
+    "changed_pixels": 0,
+    "same_styles": true,
+    "before": "post-t9-assignment-laptop.png",
+    "after": "candidate-assignment-laptop.png"
+  },
+  {
+    "kind": "scheduling",
+    "viewport": [
+      1024,
+      768
+    ],
+    "changed_pixels": 0,
+    "same_styles": true,
+    "before": "post-t9-scheduling-laptop.png",
+    "after": "candidate-scheduling-laptop.png"
+  },
+  {
+    "kind": "assignment",
+    "viewport": [
+      768,
+      1024
+    ],
+    "changed_pixels": 0,
+    "same_styles": true,
+    "before": "post-t9-assignment-tablet.png",
+    "after": "candidate-assignment-tablet.png"
+  },
+  {
+    "kind": "scheduling",
+    "viewport": [
+      768,
+      1024
+    ],
+    "changed_pixels": 0,
+    "same_styles": true,
+    "before": "post-t9-scheduling-tablet.png",
+    "after": "candidate-scheduling-tablet.png"
+  },
+  {
+    "kind": "assignment",
+    "viewport": [
+      375,
+      812
+    ],
+    "changed_pixels": 0,
+    "same_styles": true,
+    "before": "post-t9-assignment-phone.png",
+    "after": "candidate-assignment-phone.png"
+  },
+  {
+    "kind": "scheduling",
+    "viewport": [
+      375,
+      812
+    ],
+    "changed_pixels": 0,
+    "same_styles": true,
+    "before": "post-t9-scheduling-phone.png",
+    "after": "candidate-scheduling-phone.png"
+  },
+  {
+    "kind": "assignment",
+    "viewport": [
+      320,
+      640
+    ],
+    "changed_pixels": 0,
+    "same_styles": true,
+    "before": "post-t9-assignment-small.png",
+    "after": "candidate-assignment-small.png"
+  },
+  {
+    "kind": "scheduling",
+    "viewport": [
+      320,
+      640
+    ],
+    "changed_pixels": 0,
+    "same_styles": true,
+    "before": "post-t9-scheduling-small.png",
+    "after": "candidate-scheduling-small.png"
+  }
+]

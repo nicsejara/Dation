@@ -1,0 +1,8 @@
+{
+  "name": "dation-t0r2-sql-04ac7b018d",
+  "id": "0f455e04de523a31b04a2df95e0e7b6688b93919ac5532ea1d0e75a97217f362",
+  "docker_server": "28.4.0",
+  "network": "none",
+  "label": "dation.task=T0-R2",
+  "production_applied": false
+}

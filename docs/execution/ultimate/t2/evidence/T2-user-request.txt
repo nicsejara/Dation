@@ -1,0 +1,627 @@
+T1 queda formalmente aprobado con estado:
+
+# GO — T1 COMPLETADO
+
+El reporte oficial es:
+
+`docs/execution/ultimate/t1/t1-execution-report.md`
+
+Autorizo ahora exclusivamente:
+
+# T2 — SCHEMA + COMPATIBLE READERS + RESULT ARTIFACT METADATA
+
+Seguí estrictamente:
+
+`DATION_FINAL_MASTER_EXECUTION_PLAN.md`
+
+y utilizá como baseline inmediato:
+
+`docs/execution/ultimate/t1/t1-execution-report.md`
+
+junto con los reportes T0 únicamente cuando una decisión histórica lo requiera.
+
+---
+
+# REGLA DE EFICIENCIA
+
+NO realices una nueva auditoría end-to-end.
+
+T0 ya certificó el baseline y T1 certificó Contracts / Registry / Transit.
+
+Para T2:
+
+1. leé la sección T2 del Master Plan;
+2. leé el reporte T1;
+3. inspeccioná únicamente los módulos, SQL, readers, callers y tests afectados por T2;
+4. ampliá la inspección sólo ante una incompatibilidad concreta;
+5. no vuelvas a recorrer engines, frontend o plataforma completa por precaución.
+
+---
+
+# CHECKPOINT PREVIO
+
+Antes de modificar T2:
+
+- registrá el estado exacto post-T1;
+- preservá todos los cambios existentes;
+- no hagas reset;
+- no sobrescribas trabajo previo.
+
+Si existe un checkpoint local autorizado, registralo.
+
+Si no existe commit, generá un manifest/hash o patch de referencia suficiente para diferenciar claramente:
+
+```text
+POST-T1 BASELINE
+vs
+T2 CHANGES
+```
+
+No hagas push.
+
+---
+
+# OBJETIVO T2
+
+Expandir la persistencia necesaria para Ultimate de forma:
+
+- aditiva;
+- versionada;
+- tenant-safe;
+- backward compatible;
+- sin activar todavía comportamiento Ultimate público.
+
+T2 debe preparar:
+
+```text
+Logistics Models
+Model Versions
+Decision Case context
+Progressive Data Pack
+Run context pinning
+Result artifact metadata
+IA provenance
+Compatible readers
+```
+
+sin implementar todavía T3–T10.
+
+---
+
+# SKILLS
+
+Aplicá `Execution Skills Policy`.
+
+Para T2 son especialmente pertinentes las Skills verificadas de:
+
+- Supabase;
+- PostgreSQL best practices;
+- cloud/runtime cuando sea necesario para sandbox/tests.
+
+No usar Skills UX/UI salvo que un reader compartido exija una corrección mínima de compatibilidad.
+
+Las Skills no pueden cambiar F01–F23 ni ampliar scope.
+
+---
+
+# 1. DATABASE — EXPANSIÓN ADITIVA
+
+Implementá únicamente la expansión definida para T2.
+
+Debe contemplar, según el Master Plan:
+
+## Nuevas estructuras
+
+- `logistics_models`
+- `logistics_model_versions`
+- `case_data_packs`
+- `case_data_pack_versions`
+- `case_data_pack_entries`
+- `dation_private.decision_definition_versions`
+- `decision_result_artifacts`
+
+y las extensiones Ultimate previstas sobre:
+
+- `decision_cases`
+- `datasets`
+- `decision_runs`
+- approval / invalidation metadata
+- decision interpretation provenance
+
+Usá los nombres/paths definitivos del Master Plan y de T1.
+
+No inventes una estructura alternativa.
+
+---
+
+# 2. RESULT ARTIFACT METADATA
+
+T2 prepara metadata y bindings.
+
+NO publica todavía resultados Ultimate.
+
+Debe quedar preparado el modelo para:
+
+```text
+PREPARED artifact
+→ future fenced publication
+→ READY
+```
+
+pero T8 será responsable de la publicación real.
+
+T2 debe permitir describir:
+
+- workspace;
+- Run;
+- artifact kind;
+- part key;
+- artifact schema/version;
+- SHA256;
+- size;
+- media type;
+- Storage bucket/path;
+- assembler version;
+- core fingerprint;
+- result fingerprint cuando corresponda;
+- publication state;
+- entity lookup keys;
+- producer metadata.
+
+No almacenar blobs pesados de evidencia en JSONB.
+
+---
+
+# 3. TENANCY
+
+Todas las nuevas relaciones deben ser tenant-safe.
+
+Aplicar, donde corresponda:
+
+```text
+workspace_id NOT NULL
+```
+
+y claves/constraints que impidan referencias cross-workspace.
+
+Verificar explícitamente:
+
+- Model → Version
+- Case → Model Version
+- Case → Pack
+- Pack → Version
+- Pack Version → Entry
+- Entry → Dataset
+- Run → Case/context
+- Artifact → Run
+
+No confiar únicamente en RLS para integridad relacional.
+
+---
+
+# 4. RLS / GRANTS
+
+Implementar únicamente las policies/grants necesarios para las estructuras T2.
+
+Preservar los defaults administrativos de Supabase identificados durante T0.
+
+NO asumir equivalencia perfecta con PostgreSQL genérico.
+
+NO ampliar permisos para lograr tests verdes.
+
+Verificar:
+
+- authenticated boundaries;
+- service role;
+- tenant isolation;
+- server-side authority;
+- absence of PUBLIC grants indebidos.
+
+---
+
+# 5. DECISION CASE COMPATIBILITY
+
+Legacy Cases continúan utilizando su contrato actual.
+
+Ultimate debe poder representar:
+
+```text
+Case existente
+sin Orders/Fleet todavía
+```
+
+pero sólo para la nueva cohorte/workflow.
+
+No eliminar globalmente restricciones legacy si eso rompe Cases históricos.
+
+La compatibilidad debe resolverse mediante:
+
+- workflow/version discriminator;
+- constraints condicionadas;
+- compatible readers.
+
+No mediante fake IDs o placeholders.
+
+---
+
+# 6. WORKFLOW VERSION
+
+Distinguir explícitamente:
+
+```text
+legacy workflow
+vs
+Ultimate workflow
+```
+
+No confundir:
+
+`workflow_version`
+
+con cualquier `workflow_policy_version` ya existente.
+
+No reinterpretar datos históricos.
+
+---
+
+# 7. RUN PINNING
+
+Preparar las columnas/constraints necesarias para que futuras Runs puedan fijar:
+
+- Model Version;
+- Pack Version;
+- Case Policy;
+- Node Policy;
+- Decision Definition / Graph;
+- Contract;
+- Transit version;
+- Engine/runtime identity;
+- fingerprints correspondientes.
+
+T2 prepara persistencia.
+
+NO implementa todavía admission Ultimate completa.
+
+---
+
+# 8. DATASETS
+
+Agregar soporte aditivo para nuevos tipos:
+
+```text
+transport_demand
+transport_resources
+```
+
+con metadata necesaria:
+
+- data contract;
+- contract hash;
+- normalizer;
+- canonical hash;
+- interpretación/versionado.
+
+No modificar semántica de Orders/Fleet legacy.
+
+No convertir automáticamente Fleet → Resource.
+
+---
+
+# 9. PROGRESSIVE DATA PACK
+
+T2 crea la persistencia.
+
+NO implementar todavía el workflow completo de publicación de T4.
+
+Debe poder representar:
+
+```text
+Case
+↓
+stable Data Pack
+↓
+immutable Data Pack Versions
+↓
+entries
+```
+
+sin introducir ciclos entre:
+
+```text
+input pack
+and
+result output
+```
+
+Los resultados futuros se resolverán por Runs/artifacts.
+
+---
+
+# 10. DECISION DEFINITIONS
+
+Preparar el catálogo privado/versionado previsto.
+
+No implementar editor de graph ni sistema de plugins.
+
+Debe funcionar como registry controlado por release/code.
+
+No permitir edición arbitraria por clientes.
+
+---
+
+# 11. IA PROVENANCE
+
+Agregar únicamente metadata nullable y compatible para futuras interpretaciones v2:
+
+- result fingerprint;
+- decision context schema/hash;
+- mode;
+- selected entity;
+- evidence refs;
+- provenance correspondiente.
+
+Legacy debe seguir funcionando con NULL.
+
+No implementar todavía Decision Copilot v2.
+
+---
+
+# 12. COMPATIBLE READERS
+
+Actualizar únicamente readers necesarios para que la plataforma pueda convivir con:
+
+```text
+legacy data
++
+new empty Ultimate structures
+```
+
+Especial atención a:
+
+- Case readers;
+- Home;
+- Decision Center;
+- Data Hub;
+- repository/domain serializers.
+
+No exponer todavía features Ultimate no implementadas.
+
+No mostrar resultados ficticios.
+
+No ocultar Cases vacíos Ultimate debido a inner joins legacy.
+
+---
+
+# 13. MIGRATIONS
+
+Queda autorizado en T2:
+
+### Crear migraciones nuevas en el repositorio.
+
+### Aplicarlas exclusivamente en sandbox owned de pruebas.
+
+### Ejecutar fresh-install / upgrade / rollback-readiness tests según Master Plan.
+
+NO queda autorizado:
+
+- aplicar migraciones en producción;
+- modificar Supabase productivo;
+- migration history repair;
+- baseline replay;
+- DROP destructivos;
+- rewrites masivos;
+- backfill especulativo;
+- cambios remotos.
+
+Las migraciones deben:
+
+- usar timestamp nuevo real;
+- ser pequeñas y ordenadas;
+- ser repetibles en el procedimiento de fresh-install/upgrade;
+- preservar legacy;
+- incluir constraints/RLS/grants/indexes correspondientes.
+
+---
+
+# 14. ARTIFACT STORAGE
+
+T2 sólo prepara metadata/contratos relacionados con Storage.
+
+No publicar todavía artifacts de Result Ultimate.
+
+Si se requiere validar paths/bucket constraints:
+
+- usar sandbox/local;
+- no modificar bucket productivo;
+- no hacer público ningún bucket.
+
+---
+
+# 15. PROHIBIDO EN T2
+
+NO ejecutar T3.
+
+NO crear Model UI.
+
+NO crear Case Setup Ultimate funcional.
+
+NO implementar Data Pack publishing completo.
+
+NO implementar Decision Graph.
+
+NO implementar D1 Ultimate.
+
+NO implementar D2 Ultimate.
+
+NO implementar Result Assembler productivo.
+
+NO publicar DecisionResultPackage.
+
+NO crear Sankey.
+
+NO crear Gantt.
+
+NO modificar Dation IA funcionalmente.
+
+NO aplicar migraciones a producción.
+
+NO deploy.
+
+NO push.
+
+NO refactor transversal.
+
+---
+
+# 16. TESTING
+
+Ejecutá lo definido por T2:
+
+- B-PY
+- B-NODE
+- B-SQL
+- S2
+
+y tests focales estrictamente necesarios.
+
+Baseline post-T1:
+
+```text
+U1: 61 PASS
+Python: 444 PASS
+Node: 128 PASS
+0 failures
+0 errors
+0 skips
+```
+
+El baseline transversal estabilizado T0 continúa siendo:
+
+```text
+Browser 251 PASS
+SQL 46 PASS
+E2E 86 PASS
+Focus 9 PASS
+```
+
+No repitas Browser/E2E completos si T2 no toca una frontera que los requiera.
+
+Si los compatible readers afectan esas superficies, ejecutá primero tests focales y ampliá sólo según evidencia.
+
+---
+
+# 17. TESTS SQL OBLIGATORIOS
+
+S2 debe demostrar como mínimo:
+
+## Fresh install
+
+Schema completo desde cero.
+
+## Upgrade
+
+Baseline actual → T2.
+
+## Legacy compatibility
+
+Datos/rows legacy siguen siendo válidos.
+
+## Ultimate empty Case compatibility
+
+Las nuevas estructuras permiten Case Ultimate sin pair legacy.
+
+## RLS / Grants
+
+Positivos y negativos.
+
+## Cross-tenant FK
+
+Debe fallar.
+
+## Published Model immutability preparation
+
+Constraints correctas.
+
+## Pack version integrity
+
+No referencias cruzadas inválidas.
+
+## Result artifact metadata
+
+Estados/bindings inválidos rechazados.
+
+## Legacy NULL compatibility
+
+Nuevas columnas no rompen historia.
+
+---
+
+# 18. STOP CONDITIONS
+
+STOP inmediato si:
+
+- se requiere rewrite destructivo de historia;
+- Case legacy deja de ser legible;
+- FK cross-tenant es aceptada;
+- RLS/grant abre una frontera;
+- reader oculta Cases Ultimate vacíos;
+- migration requiere baseline replay;
+- schema nuevo obliga a reinterpretar resultados legacy;
+- se necesita implementar T3 para hacer pasar T2;
+- artifact READY puede existir sin binding válido;
+- un cambio SQL productivo remoto resulta necesario para continuar.
+
+Documentá y STOP.
+
+No adelantes fases.
+
+---
+
+# 19. REPORTING
+
+Crear:
+
+`docs/execution/ultimate/t2/t2-execution-report.md`
+
+Registrar además:
+
+- migration files;
+- catalog diff;
+- fresh-install result;
+- upgrade result;
+- RLS/grants diff;
+- FK/constraint matrix;
+- tests;
+- Skills usadas;
+- deviations;
+- rollback readiness.
+
+Separar:
+
+## Schema changes
+
+## Reader changes
+
+## Legacy compatibility changes
+
+## Result artifact preparation
+
+## IA provenance preparation
+
+---
+
+# 20. FINAL DECISION
+
+Una sola salida:
+
+**GO — T2 completado. T3 puede ser solicitado.**
+
+o
+
+**STOP — T2 no cumple condiciones para autorizar T3.**
+
+Aunque resulte GO:
+
+# NO EJECUTES T3.
+
+Finalizá después del reporte.

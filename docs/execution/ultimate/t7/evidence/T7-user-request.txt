@@ -1,0 +1,955 @@
+T6 queda formalmente aprobado:
+
+# GO — T6 COMPLETADO
+
+Reporte oficial:
+
+`docs/execution/ultimate/t6/t6-execution-report.md`
+
+Autorizo exclusivamente:
+
+# T7 — D1 POLICY / COST / COVERAGE + RESULT & EVIDENCE ASSEMBLER
+
+Usá como hoja de ruta:
+
+`DATION_FINAL_MASTER_EXECUTION_PLAN.md`
+
+y como baseline inmediato:
+
+`docs/execution/ultimate/t6/t6-execution-report.md`
+
+## REGLA DE EFICIENCIA
+
+NO realices una nueva auditoría end-to-end.
+
+T0–T6 constituyen el baseline validado.
+
+Inspeccioná únicamente los componentes directamente afectados por T7:
+
+- D1 Core/Evidence T6;
+- Policy/Cost helpers T1;
+- Result contracts T1;
+- `app/results/`;
+- reason/metric catalogs;
+- fixtures/oracles T7;
+- tests afectados.
+
+Expandí la inspección sólo si aparece una incompatibilidad concreta.
+
+---
+
+# OBJETIVO
+
+Completar D1 — Transport Plan incorporando:
+
+- Case Goal;
+- Node Policy;
+- hard guardrails;
+- priority protection;
+- cost models;
+- coverage policy;
+- partial/gap semantics;
+- deterministic tie-breaks;
+- 0–3 material alternatives;
+- certified metrics;
+- D1 Result & Evidence Assembler;
+- `transport_plan_v1`;
+- Sankey projection;
+- Detailed Analysis datasets;
+- exceptions;
+- assumptions;
+- Approval Review;
+- export rows;
+- `decision_context_v1` base;
+- fingerprints/manifests.
+
+T7 NO publica todavía resultados en DB/Storage. Eso corresponde a T8.
+
+---
+
+# 1. POLICY HIERARCHY
+
+Implementar exactamente:
+
+```text
+Hard constraints / guardrails
+        ↓
+Maximum feasible priority coverage
+        ↓
+Primary Goal
+        ↓
+Preferences / deterministic tie-breaks
+```
+
+Un objetivo económico nunca puede relajar hard constraints.
+
+`MINIMIZE_COST` NO puede elegir plan vacío cuando existe demanda servible.
+
+---
+
+# 2. GLOBAL GOALS
+
+Soportar:
+
+```text
+MINIMIZE_COST
+MAXIMIZE_SERVICE
+MAXIMIZE_OWN_CAPACITY
+MINIMIZE_TRIPS
+BALANCED
+CUSTOM
+```
+
+Mantener:
+
+```text
+Goal ≠ Guardrail ≠ Preference
+```
+
+`BALANCED` / `CUSTOM` sólo pueden combinar objetivos inferiores normalizados.
+
+Nunca pueden comprar capacidad ficticia o relajar constraints.
+
+---
+
+# 3. PRIORITY
+
+Prioridad:
+
+```text
+HIGH
+MEDIUM
+LOW
+```
+
+debe proteger cobertura antes que preferencias económicas cuando el contrato/policy así lo define.
+
+Fixture G debe preservar:
+
+```text
+HIGH 30
+MEDIUM 30
+capacity 40
+→ HIGH 30 + MEDIUM 10
+```
+
+independientemente del orden de filas.
+
+---
+
+# 4. PARTIAL COVERAGE
+
+Un plan parcial puede ser un resultado válido.
+
+Ejemplo:
+
+```text
+demand 70
+capacity 52
+→ assigned 52
+→ residual 18
+→ CAPACITY_GAP
+```
+
+No convertirlo en technical failure.
+
+Debe distinguirse:
+
+- mathematical feasibility;
+- policy feasibility;
+- full coverage;
+- partial coverage;
+- hard constraint status.
+
+---
+
+# 5. COST MODELS
+
+Implementar las semánticas aprobadas:
+
+## EXTERNAL
+
+```text
+PER_TRIP
+PER_KM
+```
+
+con:
+
+```text
+ONE_WAY
+ROUND_TRIP
+```
+
+## OWN
+
+Operating/marginal cost por km aplicado al ciclo DIRECT correspondiente.
+
+No inventar:
+
+- fixed fees no contratados;
+- FX;
+- revenue;
+- margin;
+- implicit costs.
+
+Una Case utiliza una moneda.
+
+Unknown cost:
+
+```text
+null
+```
+
+NO:
+
+```text
+0
+```
+
+Si la policy depende de costo y el costo requerido es desconocido, manejarlo explícitamente según contrato.
+
+---
+
+# 6. COST ORACLES
+
+Validar especialmente fixtures:
+
+## B
+Own 30 km, 2/km round-trip-equivalent → cost 120, elegir OWN frente a external 300.
+
+## C
+Own 480 km → 1920; External → 800, elegir external.
+
+## N
+100 km:
+- external PER_KM 1 ONE_WAY → 100
+- external PER_TRIP → 150
+→ elegir PER_KM.
+
+Si cambia a ROUND_TRIP:
+
+→ 200
+→ elegir PER_TRIP 150.
+
+No reutilizar la función productiva como oracle.
+
+---
+
+# 7. SOLVER STATUS
+
+Mantener honestamente:
+
+```text
+OPTIMAL
+FEASIBLE
+UNKNOWN
+INFEASIBLE
+```
+
+No convertir FEASIBLE en OPTIMAL.
+
+No presentar UNKNOWN como prueba de que un gap sea inevitable.
+
+---
+
+# 8. CERTIFIED METRICS
+
+El engine/certifier debe producir métricas certificadas.
+
+Como mínimo D1:
+
+- total_cost;
+- trip_count;
+- demand_coverage;
+- capacity_utilization;
+- resource_mix;
+- resources_used;
+- coverage_by_priority;
+- assigned/unassigned demand.
+
+## Utilization
+
+Usar la definición congelada:
+
+```text
+sum(load across used trips)
+/
+sum(guaranteed capacity across used trips)
+```
+
+sobre la primary reporting dimension.
+
+NO promedio simple de porcentajes de Trips.
+
+Ratio con denominador cero:
+
+```text
+null
+```
+
+---
+
+# 9. RESULT & EVIDENCE ASSEMBLER
+
+Implementar el boundary puro definido en el Master Plan.
+
+Conceptualmente:
+
+```text
+Engine Core Result
++
+Engine Evidence
++
+Frozen Context
++
+Versions
+        ↓
+Result & Evidence Assembler
+        ↓
+DecisionResultPackage
++
+Artifacts
+```
+
+El assembler puede:
+
+- copiar hechos certificados;
+- construir joins;
+- proyectar datasets;
+- ordenar/agrupar para presentación;
+- producir deterministic summaries/templates;
+- construir review/context/export;
+- verificar consistencia.
+
+NO puede:
+
+- optimizar;
+- cambiar assignments;
+- recalcular Trips;
+- elegir otro recurso;
+- inventar reasons;
+- completar datos faltantes;
+- aprobar.
+
+---
+
+# 10. TRANSPORT_PLAN_V1
+
+Construir el package completo D1:
+
+```text
+transport_plan_v1
+```
+
+incluyendo:
+
+- summary;
+- metrics;
+- transport_plan/trips;
+- demand_resolution;
+- resource_usage;
+- primary_visual;
+- alternatives;
+- exceptions;
+- assumptions;
+- evidence;
+- approval_review;
+- exports;
+- ai_context;
+- fingerprints.
+
+No persistir/publicar todavía.
+
+---
+
+# 11. SANKEY
+
+El assembler debe generar:
+
+```text
+DESTINATION
+    ↓
+TRIP
+    ↓
+RESOURCE
+```
+
+Una sola primary reporting dimension como `value`.
+
+No mezclar:
+
+- pallets;
+- kg;
+- volume;
+- units.
+
+No calcular coverage desde el Sankey.
+
+Coverage viene de metrics certificadas.
+
+## IMPORTANTE
+
+Cada capa del Sankey transporta el mismo flow.
+
+Para validar cobertura se suma un corte:
+
+```text
+Destination → Trip
+```
+
+o:
+
+```text
+Trip → Resource
+```
+
+NO ambas capas juntas.
+
+No crear un Trip ficticio para residual.
+
+---
+
+# 12. DETAILED ANALYSIS DATASETS
+
+Construir las seis proyecciones D1:
+
+```text
+Plan
+Demand
+Resources
+Alternatives
+Exceptions
+Evidence
+```
+
+Sin nueva matemática en las tabs.
+
+Debe existir descriptor de:
+
+- schema;
+- columns;
+- types;
+- units;
+- row key;
+- ordering;
+- scope;
+- hashes/refs.
+
+---
+
+# 13. DEMAND RESOLUTION
+
+Por orden:
+
+- requested;
+- assigned;
+- residual;
+- coverage ratio;
+- Trip(s);
+- Resource(s);
+- status;
+- reason refs.
+
+Estados al menos:
+
+```text
+COVERED
+PARTIALLY_COVERED
+UNASSIGNED
+```
+
+Debe representar correctamente split.
+
+---
+
+# 14. RESOURCE USAGE
+
+EXTERNAL:
+
+- services_available;
+- services_used;
+- services_remaining;
+- availability source;
+- load;
+- utilization;
+- cost.
+
+OWN:
+
+- units;
+- trips;
+- load;
+- distance;
+- utilization;
+- operating cost.
+
+No inventar disponibilidad.
+
+---
+
+# 15. REASON CODES
+
+Utilizar sólo reason codes sustentados por evidencia.
+
+Especial atención a:
+
+```text
+SELECTED_LOWEST_COST_FEASIBLE
+SELECTED_ONLY_FEASIBLE_RESOURCE
+SELECTED_PRIORITY_PROTECTION
+SELECTED_OWN_COST_ADVANTAGE
+CONSOLIDATED_COMPATIBLE_DEMAND
+NO_COMPATIBLE_RESOURCE
+NON_SPLIT_EXCEEDS_GUARANTEED_CAPACITY
+EXTERNAL_SERVICE_LIMIT
+HORIZON_CAPACITY_LIMIT
+DATE_WINDOW_INCOMPATIBLE
+CAPACITY_GAP
+RESOURCE_SERVICE_LIMIT_REACHED
+ASSUMED_EXTERNAL_AVAILABILITY
+GUARANTEED_CAPACITY_USED_FOR_FEASIBILITY
+```
+
+No inferir motivos desde solver status o el Goal.
+
+Si falta prueba suficiente:
+
+no emitir el claim.
+
+---
+
+# 16. EXCEPTIONS / ASSUMPTIONS
+
+Exceptions:
+
+```text
+BUSINESS
+FEASIBILITY
+POLICY
+DATA
+ASSUMPTION
+```
+
+Assumption sources:
+
+```text
+USER_CONFIRMED
+MODEL_DEFAULT
+DATION_DEFAULT
+DERIVED
+```
+
+Technical engine failure NO es una business exception.
+
+---
+
+# 17. ALTERNATIVES
+
+Publicar:
+
+```text
+Recommended
++
+0–3 materially different alternatives
+```
+
+Las alternativas deben:
+
+- ser calculadas determinísticamente;
+- usar mismos inputs;
+- respetar mismos hard constraints;
+- poseer metrics certificadas;
+- tener plan/evidence recuperable;
+- poseer deltas;
+- ser materialmente distintas.
+
+NO exponer OR-Tools search tree.
+
+NO inventar alternativas con IA.
+
+NO generarlas en frontend.
+
+Si no se calculan:
+
+usar estado explícito como:
+
+```text
+NOT_COMPUTED
+BUDGET_LIMIT
+NO_MATERIAL_ALTERNATIVE
+```
+
+`alternatives=[]` no significa automáticamente que no exista ninguna.
+
+---
+
+# 18. APPROVAL REVIEW
+
+Construir review D1 determinístico desde los mismos hechos:
+
+- coverage;
+- full/partial;
+- hard constraints;
+- policy feasibility;
+- solver status;
+- exceptions;
+- assumptions;
+- review items.
+
+Mantener:
+
+```text
+decision_ready_for_review
+≠
+approval_allowed
+```
+
+`approval_allowed` se resolverá mediante permisos/freshness/backend en T8.
+
+---
+
+# 19. EXPORT ROWS
+
+Preparar:
+
+```text
+Transport_Plan.csv
+```
+
+una fila por Trip–Order allocation.
+
+## COST RULE
+
+Costo de Trip consolidado se reconoce una sola vez.
+
+Ejemplo:
+
+Trip cost = 100
+2 allocations
+
+CSV:
+
+```text
+row 1 → 100
+row 2 → null
+```
+
+NO:
+
+```text
+100 + 100
+```
+
+NO distribuir proporcionalmente costo sin regla del engine.
+
+La suma completa debe coincidir con total_cost cuando el costo esté completo.
+
+---
+
+# 20. AI CONTEXT BASE
+
+Construir únicamente la base:
+
+```text
+decision_context_v1
+```
+
+desde el package.
+
+Debe incluir:
+
+- Case;
+- Model;
+- Horizon;
+- Case Policy;
+- Decision Definition;
+- Node Policy;
+- input summary;
+- result summary;
+- metrics;
+- exceptions;
+- assumptions;
+- evidence summary;
+- alternatives summary;
+- Approval Review;
+- entity refs.
+
+NO llamar todavía al LLM.
+
+NO enviar raw CSV.
+
+---
+
+# 21. FINGERPRINTS
+
+Aplicar el DAG T1.
+
+Verificar:
+
+```text
+input_context_hash
+core_result_fingerprint
+artifact content hash
+result_fingerprint
+```
+
+sin autorreferencia.
+
+Assembler/version/contracts deben entrar donde corresponda.
+
+No incluir:
+
+- current permissions;
+- approval overlay;
+- signed URLs.
+
+---
+
+# 22. CONSISTENCY VALIDATION
+
+Antes de producir AssemblyBundle verificar:
+
+```text
+Core
+=
+Metrics
+=
+Details
+=
+Sankey
+=
+Export rows
+=
+Approval Review
+=
+AI context facts
+```
+
+Si existe inconsistencia:
+
+fallar assembly.
+
+NO corregir silenciosamente un Core incorrecto.
+
+---
+
+# 23. FIXTURES PRIORITARIAS
+
+Utilizar especialmente:
+
+- B — own cheaper;
+- C — external cheaper at long distance;
+- F — partial gap;
+- G — priority;
+- N — cost basis;
+- O — assumed availability;
+- R1–R8 — consistency/result architecture.
+
+También conservar A/D/E/M cubiertos por T6.
+
+---
+
+# 24. RESULT ARCHITECTURE TESTS
+
+Probar como mínimo:
+
+### R1
+Trip consolidado: costo reconocido una vez.
+
+### R2
+Weighted utilization.
+
+### R3
+Sankey cut, no double count.
+
+### R4
+NULL ≠ 0.
+
+### R5
+No emitir causalidad sin prueba.
+
+### R6
+Unknown schema safe-fail.
+
+### R7
+0–3 alternatives y estados.
+
+### R8
+Canonical/fingerprint DAG.
+
+---
+
+# 25. LEGACY
+
+Preservar:
+
+- assignment_v1;
+- scheduling_v1;
+- dispatch_v2;
+- exports legacy;
+- comparative service legacy;
+- schemas históricos;
+- frontend actual.
+
+No reensamblar resultados históricos.
+
+---
+
+# 26. NO PERSISTENCE / PUBLICATION
+
+T7 genera y valida el:
+
+```text
+AssemblyBundle
+```
+
+en memoria/tests.
+
+NO publicar todavía en:
+
+- DB;
+- Storage;
+- Run lifecycle.
+
+Eso corresponde a T8.
+
+---
+
+# 27. PROHIBIDO
+
+NO ejecutar T8.
+
+NO implementar durable worker publication.
+
+NO modificar approval SQL para Ultimate.
+
+NO implementar D2.
+
+NO conectar dashboards productivos.
+
+NO implementar Decision Copilot real.
+
+NO deploy.
+
+NO producción.
+
+NO push.
+
+NO refactor transversal.
+
+---
+
+# 28. SKILLS
+
+Aplicá Execution Skills Policy.
+
+Usá sólo Skills pertinentes a:
+
+- Python/domain;
+- optimization;
+- backend architecture;
+- testing.
+
+No usar Skills UI sin necesidad.
+
+---
+
+# 29. TESTING
+
+Ejecutá:
+
+- B-PY
+- B-NODE
+- U7
+
+más focales necesarias.
+
+No repetir Browser/E2E/SQL completos salvo impacto demostrado.
+
+U7 debe cubrir:
+
+- policies;
+- costs;
+- priority;
+- partial coverage;
+- metrics;
+- alternatives;
+- assembler;
+- Sankey;
+- details;
+- reason proof;
+- review;
+- export rows;
+- AI context base;
+- fingerprints;
+- determinism.
+
+---
+
+# 30. STOP CONDITIONS
+
+STOP si:
+
+- MINIMIZE_COST elige plan vacío con demanda servible;
+- priority se sacrifica por costo contra policy;
+- hard guardrail se relaja;
+- assembler modifica el plan;
+- assembler inventa reasons;
+- alternatives violan constraints;
+- Sankey calcula coverage;
+- Sankey double counts;
+- CSV duplica cost;
+- NULL se convierte en 0;
+- frontend/IA resulta necesario para producir el package;
+- Core y proyecciones divergen;
+- legacy cambia;
+- T7 requiere T8 para certificar el resultado.
+
+---
+
+# 31. REPORTING
+
+Crear:
+
+`docs/execution/ultimate/t7/t7-execution-report.md`
+
+Incluir:
+
+- baseline T6;
+- checkpoint;
+- Skills;
+- files created/modified;
+- Policy hierarchy;
+- Cost model;
+- Priority;
+- Coverage/gap;
+- Metrics;
+- Alternatives;
+- Result & Evidence Assembler;
+- transport_plan_v1;
+- Sankey;
+- Detailed Analysis datasets;
+- Exceptions/Assumptions;
+- Approval Review;
+- Export rows;
+- AI Context;
+- Fingerprints;
+- Consistency validation;
+- tests;
+- legacy compatibility;
+- deviations;
+- risks;
+- gate evaluation.
+
+Terminar con una única decisión:
+
+**GO — T7 completado. T8 puede ser solicitado.**
+
+o
+
+**STOP — T7 no cumple condiciones para autorizar T8.**
+
+Aunque resulte GO:
+
+# NO EJECUTES T8.

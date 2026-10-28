@@ -1,0 +1,8 @@
+{
+  "suite": "B-BROWSER",
+  "signal": "SIGINT",
+  "pid": 254588,
+  "timestamp": "2026-10-25T22:53:11.681128+00:00",
+  "reason": "New fixture snapshot KeyError left the route/teardown unresponsive for more than five minutes. STOP is already required; no source edits allowed with unresolved focus cluster. This run is incomplete and must not be certified as 251 executed tests.",
+  "last_log_write": "2026-10-25T22:46:56.078135+00:00"
+}

@@ -1,0 +1,550 @@
+{
+  "case_id": "4f194ef9-37fd-4abd-8958-65a8427c45b1",
+  "run": {
+    "id": "30aef302-6b1c-4752-9d08-b210c5e1614e",
+    "dataset_id": "2bba23c0-3bb2-459f-bf1a-36bab421954a",
+    "created_at": "2026-10-26T05:09:02.809906+00:00",
+    "started_at": "2026-10-26T05:09:04.629457+00:00",
+    "finished_at": "2026-10-26T05:09:04.681826+00:00",
+    "engine_name": "logistics-scheduling-engine",
+    "engine_version": "1.0.0",
+    "configuration_json": {
+      "options": {
+        "max_horizon_days": 180,
+        "solve_time_limit_s": 3.0,
+        "total_time_limit_s": 20.0,
+        "deterministic_limit": 0.05
+      },
+      "strategy": "service_first",
+      "decision_case": {
+        "case_id": "4f194ef9-37fd-4abd-8958-65a8427c45b1",
+        "node_id": "logistics_scheduling"
+      },
+      "temporal_rules": [],
+      "planning_window_end": null,
+      "planning_window_start": null,
+      "use_delivery_due_dates": true,
+      "source_assignment_run_id": "e1586fdd-0963-4332-9e8d-b9f95fda4d57"
+    },
+    "status": "completed",
+    "result_json": {
+      "engine": {
+        "name": "logistics-scheduling-engine",
+        "solver": {
+          "gap": 0.0,
+          "name": "OR-Tools CP-SAT",
+          "seed": 0,
+          "method": "cp_sat",
+          "status": "optimal",
+          "version": "9.15.6755",
+          "wall_ms": 8,
+          "time_limit_s": 3.0,
+          "deterministic_time": 8.66342000000001e-05,
+          "deterministic_limit": 0.05
+        },
+        "version": "1.0.0",
+        "wall_ms": 10,
+        "executed_at": "2026-10-26T05:09:04.678913+00:00"
+      },
+      "inputs": {
+        "fleet": {
+          "rows": 2,
+          "label": "Flota \u00b7 2 veh\u00edculos",
+          "sha256": "eaec0c4aef5a24041536d390c0e2c4f0fa4e64efea5cf8b822abbf0d89ea1c53",
+          "filename": "d2-qa-fleet.csv",
+          "created_at": "2026-10-26T05:08:59.570581+00:00",
+          "dataset_id": "df8dd9ed-ecc4-45b2-95f9-6e41d6070674",
+          "schema_version": "fleet_v3"
+        },
+        "orders": {
+          "rows": 4,
+          "label": "\u00d3rdenes \u00b7 4 registros",
+          "sha256": "d801d54d40ef64048ca4c4732ca65db5c1307d0ec9f59e2e374a3e90a1e621d1",
+          "filename": "d2-qa-orders.csv",
+          "created_at": "2026-10-26T05:08:59.434123+00:00",
+          "dataset_id": "2bba23c0-3bb2-459f-bf1a-36bab421954a",
+          "schema_version": "orders_v3"
+        },
+        "assignment": {
+          "run_id": "e1586fdd-0963-4332-9e8d-b9f95fda4d57",
+          "trip_count": 7,
+          "approved_at": "2026-10-26T05:09:02.621018+00:00",
+          "schema_version": "assignment_v1",
+          "result_fingerprint": "5e5268fdf26c8979334a67b46b8e168ef13dd7250ca85f87fce35e34a564ca20",
+          "assignment_fingerprint": "e3a04a9b2fbb483f75feef37cdd2188ce1c50e20bae36db68577a117c75c2fb1"
+        }
+      },
+      "handoff": {
+        "trip_ids": [
+          "A-00001",
+          "A-00004",
+          "A-00002",
+          "A-00005",
+          "A-00003",
+          "A-00006",
+          "A-00007"
+        ],
+        "trip_count": 7,
+        "source_path": "scenarios.selected.trips",
+        "next_decision": "logistics_final_assignment",
+        "schema_version": "final_assignment_input_v1",
+        "source_decision": "logistics_scheduling",
+        "schedule_fingerprint": "8f72c7519bcb9d39d175f84eb1c5b9777c126a09830c73fa970b7f49a3b71d06",
+        "assignment_fingerprint": "e3a04a9b2fbb483f75feef37cdd2188ce1c50e20bae36db68577a117c75c2fb1"
+      },
+      "analysis": {
+        "temporal": true,
+        "focus_rules": [],
+        "sla_enabled": true,
+        "sla_available": true,
+        "planning_window": {
+          "end": null,
+          "start": null,
+          "effective_horizon_days": 180,
+          "effective_horizon_start": "2026-10-01"
+        },
+        "focused_trip_ids": [],
+        "assignment_locked": true,
+        "focused_trip_count": 0,
+        "objective_hierarchy": [
+          "late_orders",
+          "total_late_days",
+          "total_wait_days",
+          "makespan"
+        ]
+      },
+      "decision": {
+        "id": "logistics_scheduling",
+        "label": "Planificaci\u00f3n recomendada",
+        "status": "recommended",
+        "strategy": "service_first"
+      },
+      "scenarios": {
+        "selected": {
+          "name": "Planificaci\u00f3n recomendada",
+          "trips": [
+            {
+              "loads": [
+                {
+                  "kg": 2000.0,
+                  "units": 4,
+                  "product": "Pallet QA",
+                  "order_id": "D2-1-1"
+                },
+                {
+                  "kg": 6000.0,
+                  "units": 12,
+                  "product": "Pallet QA",
+                  "order_id": "D2-1-2"
+                }
+              ],
+              "origin": "Cordoba",
+              "load_kg": 8000.0,
+              "trip_id": "A-00001",
+              "base_site": "Cordoba",
+              "ownership": "own",
+              "wait_days": 0,
+              "cycle_days": 2,
+              "ready_date": "2026-10-01",
+              "vehicle_id": "QA-TIME-1",
+              "capacity_kg": 8000.0,
+              "destination": "Destino 1",
+              "distance_km": 600.0,
+              "utilization": 1.0,
+              "arrival_date": "2026-10-02",
+              "transit_days": 1,
+              "vehicle_type": "Truck_L",
+              "dispatch_date": "2026-10-01",
+              "provider_name": null,
+              "estimated_cost": 1464000.0,
+              "estimated_co2_kg": 1224.0,
+              "delivery_due_date": "2026-10-04",
+              "resource_available_again": "2026-10-03"
+            },
+            {
+              "loads": [
+                {
+                  "kg": 5000.0,
+                  "units": 10,
+                  "product": "Pallet QA",
+                  "order_id": "D2-2-1"
+                }
+              ],
+              "origin": "Rosario",
+              "load_kg": 5000.0,
+              "trip_id": "A-00004",
+              "base_site": "Rosario",
+              "ownership": "own",
+              "wait_days": 0,
+              "cycle_days": 2,
+              "ready_date": "2026-10-01",
+              "vehicle_id": "QA-TIME-2",
+              "capacity_kg": 5000.0,
+              "destination": "Destino 2",
+              "distance_km": 600.0,
+              "utilization": 1.0,
+              "arrival_date": "2026-10-02",
+              "transit_days": 1,
+              "vehicle_type": "Truck_L",
+              "dispatch_date": "2026-10-01",
+              "provider_name": null,
+              "estimated_cost": 1464000.0,
+              "estimated_co2_kg": 1224.0,
+              "delivery_due_date": "2026-10-04",
+              "resource_available_again": "2026-10-03"
+            },
+            {
+              "loads": [
+                {
+                  "kg": 8000.0,
+                  "units": 16,
+                  "product": "Pallet QA",
+                  "order_id": "D2-1-1"
+                }
+              ],
+              "origin": "Cordoba",
+              "load_kg": 8000.0,
+              "trip_id": "A-00002",
+              "base_site": "Cordoba",
+              "ownership": "own",
+              "wait_days": 2,
+              "cycle_days": 2,
+              "ready_date": "2026-10-01",
+              "vehicle_id": "QA-TIME-1",
+              "capacity_kg": 8000.0,
+              "destination": "Destino 1",
+              "distance_km": 600.0,
+              "utilization": 1.0,
+              "arrival_date": "2026-10-04",
+              "transit_days": 1,
+              "vehicle_type": "Truck_L",
+              "dispatch_date": "2026-10-03",
+              "provider_name": null,
+              "estimated_cost": 1464000.0,
+              "estimated_co2_kg": 1224.0,
+              "delivery_due_date": "2026-10-04",
+              "resource_available_again": "2026-10-05"
+            },
+            {
+              "loads": [
+                {
+                  "kg": 5000.0,
+                  "units": 10,
+                  "product": "Pallet QA",
+                  "order_id": "D2-2-1"
+                }
+              ],
+              "origin": "Rosario",
+              "load_kg": 5000.0,
+              "trip_id": "A-00005",
+              "base_site": "Rosario",
+              "ownership": "own",
+              "wait_days": 2,
+              "cycle_days": 2,
+              "ready_date": "2026-10-01",
+              "vehicle_id": "QA-TIME-2",
+              "capacity_kg": 5000.0,
+              "destination": "Destino 2",
+              "distance_km": 600.0,
+              "utilization": 1.0,
+              "arrival_date": "2026-10-04",
+              "transit_days": 1,
+              "vehicle_type": "Truck_L",
+              "dispatch_date": "2026-10-03",
+              "provider_name": null,
+              "estimated_cost": 1464000.0,
+              "estimated_co2_kg": 1224.0,
+              "delivery_due_date": "2026-10-04",
+              "resource_available_again": "2026-10-05"
+            },
+            {
+              "loads": [
+                {
+                  "kg": 4000.0,
+                  "units": 8,
+                  "product": "Pallet QA",
+                  "order_id": "D2-1-2"
+                }
+              ],
+              "origin": "Cordoba",
+              "load_kg": 4000.0,
+              "trip_id": "A-00003",
+              "base_site": "Cordoba",
+              "ownership": "own",
+              "wait_days": 4,
+              "cycle_days": 2,
+              "ready_date": "2026-10-01",
+              "vehicle_id": "QA-TIME-1",
+              "capacity_kg": 8000.0,
+              "destination": "Destino 1",
+              "distance_km": 600.0,
+              "utilization": 0.5,
+              "arrival_date": "2026-10-06",
+              "transit_days": 1,
+              "vehicle_type": "Truck_L",
+              "dispatch_date": "2026-10-05",
+              "provider_name": null,
+              "estimated_cost": 1464000.0,
+              "estimated_co2_kg": 1224.0,
+              "delivery_due_date": "2026-10-20",
+              "resource_available_again": "2026-10-07"
+            },
+            {
+              "loads": [
+                {
+                  "kg": 5000.0,
+                  "units": 10,
+                  "product": "Pallet QA",
+                  "order_id": "D2-2-2"
+                }
+              ],
+              "origin": "Rosario",
+              "load_kg": 5000.0,
+              "trip_id": "A-00006",
+              "base_site": "Rosario",
+              "ownership": "own",
+              "wait_days": 4,
+              "cycle_days": 2,
+              "ready_date": "2026-10-01",
+              "vehicle_id": "QA-TIME-2",
+              "capacity_kg": 5000.0,
+              "destination": "Destino 2",
+              "distance_km": 600.0,
+              "utilization": 1.0,
+              "arrival_date": "2026-10-06",
+              "transit_days": 1,
+              "vehicle_type": "Truck_L",
+              "dispatch_date": "2026-10-05",
+              "provider_name": null,
+              "estimated_cost": 1464000.0,
+              "estimated_co2_kg": 1224.0,
+              "delivery_due_date": "2026-10-20",
+              "resource_available_again": "2026-10-07"
+            },
+            {
+              "loads": [
+                {
+                  "kg": 5000.0,
+                  "units": 10,
+                  "product": "Pallet QA",
+                  "order_id": "D2-2-2"
+                }
+              ],
+              "origin": "Rosario",
+              "load_kg": 5000.0,
+              "trip_id": "A-00007",
+              "base_site": "Rosario",
+              "ownership": "own",
+              "wait_days": 6,
+              "cycle_days": 2,
+              "ready_date": "2026-10-01",
+              "vehicle_id": "QA-TIME-2",
+              "capacity_kg": 5000.0,
+              "destination": "Destino 2",
+              "distance_km": 600.0,
+              "utilization": 1.0,
+              "arrival_date": "2026-10-08",
+              "transit_days": 1,
+              "vehicle_type": "Truck_L",
+              "dispatch_date": "2026-10-07",
+              "provider_name": null,
+              "estimated_cost": 1464000.0,
+              "estimated_co2_kg": 1224.0,
+              "delivery_due_date": "2026-10-20",
+              "resource_available_again": "2026-10-09"
+            }
+          ],
+          "solver": {
+            "gap": 0.0,
+            "name": "OR-Tools CP-SAT",
+            "seed": 0,
+            "method": "cp_sat",
+            "status": "optimal",
+            "version": "9.15.6755",
+            "wall_ms": 8,
+            "time_limit_s": 3.0,
+            "deterministic_time": 8.66342000000001e-05,
+            "deterministic_limit": 0.05
+          },
+          "metrics": {
+            "orders": 4,
+            "due_orders": 4,
+            "late_orders": 0,
+            "total_trips": 7,
+            "on_time_rate": 1.0,
+            "schedule_end": "2026-10-09",
+            "avg_wait_days": 2.5714285714285716,
+            "makespan_days": 8,
+            "max_late_days": 0,
+            "max_wait_days": 6,
+            "vehicles_used": 2,
+            "avg_cycle_days": 2.0,
+            "on_time_orders": 4,
+            "schedule_start": "2026-10-01",
+            "total_busy_days": 14,
+            "total_late_days": 0,
+            "total_wait_days": 18,
+            "avg_lead_time_days": 4.5
+          },
+          "feasible": true,
+          "order_outcomes": [
+            {
+              "on_time": true,
+              "order_id": "D2-1-1",
+              "priority": "High",
+              "trip_ids": [
+                "A-00001",
+                "A-00002"
+              ],
+              "late_days": 0,
+              "ready_date": "2026-10-01",
+              "vehicle_ids": [
+                "QA-TIME-1"
+              ],
+              "arrival_date": "2026-10-04",
+              "lead_time_days": 3,
+              "delivery_due_date": "2026-10-04",
+              "first_dispatch_date": "2026-10-01"
+            },
+            {
+              "on_time": true,
+              "order_id": "D2-1-2",
+              "priority": "Normal",
+              "trip_ids": [
+                "A-00001",
+                "A-00003"
+              ],
+              "late_days": 0,
+              "ready_date": "2026-10-01",
+              "vehicle_ids": [
+                "QA-TIME-1"
+              ],
+              "arrival_date": "2026-10-06",
+              "lead_time_days": 5,
+              "delivery_due_date": "2026-10-20",
+              "first_dispatch_date": "2026-10-01"
+            },
+            {
+              "on_time": true,
+              "order_id": "D2-2-1",
+              "priority": "High",
+              "trip_ids": [
+                "A-00004",
+                "A-00005"
+              ],
+              "late_days": 0,
+              "ready_date": "2026-10-01",
+              "vehicle_ids": [
+                "QA-TIME-2"
+              ],
+              "arrival_date": "2026-10-04",
+              "lead_time_days": 3,
+              "delivery_due_date": "2026-10-04",
+              "first_dispatch_date": "2026-10-01"
+            },
+            {
+              "on_time": true,
+              "order_id": "D2-2-2",
+              "priority": "Normal",
+              "trip_ids": [
+                "A-00006",
+                "A-00007"
+              ],
+              "late_days": 0,
+              "ready_date": "2026-10-01",
+              "vehicle_ids": [
+                "QA-TIME-2"
+              ],
+              "arrival_date": "2026-10-08",
+              "lead_time_days": 7,
+              "delivery_due_date": "2026-10-20",
+              "first_dispatch_date": "2026-10-05"
+            }
+          ],
+          "schedule_fingerprint": "8f72c7519bcb9d39d175f84eb1c5b9777c126a09830c73fa970b7f49a3b71d06"
+        }
+      },
+      "exceptions": [],
+      "assumptions": [
+        "Scheduling conserva exactamente los viajes, cargas y vehicle_id aprobados en Assignment.",
+        "Los filtros temporales nunca excluyen viajes: s\u00f3lo priorizan o restringen la fecha de salida del subconjunto seleccionado.",
+        "La fecha m\u00ednima de salida respeta disponibilidad de carga, disponibilidad del veh\u00edculo y las ventanas configuradas.",
+        "La duraci\u00f3n diaria usa distance_km, avg_speed_kmh y driving_hours_per_day.",
+        "El veh\u00edculo queda ocupado hasta completar ida, entrega y retorno a su base.",
+        "No se modelan horas intrad\u00eda, descansos regulatorios detallados, tr\u00e1fico, clima ni tiempos de carga/descarga.",
+        "delivery_due_date participa s\u00f3lo en Servicio primero y cuando est\u00e1 completo en Orders."
+      ],
+      "configuration": {
+        "options": {
+          "max_horizon_days": 180,
+          "solve_time_limit_s": 3.0,
+          "total_time_limit_s": 20.0,
+          "deterministic_limit": 0.05
+        },
+        "strategy": "service_first",
+        "temporal_rules": [],
+        "planning_window_end": null,
+        "planning_window_start": null,
+        "use_delivery_due_dates": true
+      },
+      "decision_case": {
+        "case_id": "4f194ef9-37fd-4abd-8958-65a8427c45b1",
+        "node_id": "logistics_scheduling"
+      },
+      "schema_version": "scheduling_v1",
+      "decision_drivers": {
+        "late_orders": 0,
+        "focused_trips": 0,
+        "makespan_days": 8,
+        "vehicles_used": 2,
+        "temporal_rules": 0,
+        "total_late_days": 0,
+        "total_wait_days": 18,
+        "trips_sequenced": 7
+      },
+      "result_fingerprint": "59852c4e5208ef2f45935ebd2c8f4cf4dc1726358553417ec2932352dc512ae5"
+    },
+    "error_message": null,
+    "duration_ms": 10,
+    "schema_version": "scheduling_v1",
+    "orders_dataset_id": "2bba23c0-3bb2-459f-bf1a-36bab421954a",
+    "fleet_dataset_id": "df8dd9ed-ecc4-45b2-95f9-6e41d6070674",
+    "input_fingerprint": "a1b33d6068e5532eba4ae820a077701e5e8b7a8ee1161be3a5bc0acfa0165bc3",
+    "result_fingerprint": "59852c4e5208ef2f45935ebd2c8f4cf4dc1726358553417ec2932352dc512ae5",
+    "summary_json": {
+      "orders": 4,
+      "due_orders": 4,
+      "late_orders": 0,
+      "total_trips": 7,
+      "on_time_rate": 1.0,
+      "schedule_end": "2026-10-09",
+      "avg_wait_days": 2.5714285714285716,
+      "makespan_days": 8,
+      "max_late_days": 0,
+      "max_wait_days": 6,
+      "vehicles_used": 2,
+      "avg_cycle_days": 2.0,
+      "on_time_orders": 4,
+      "schedule_start": "2026-10-01",
+      "total_busy_days": 14,
+      "total_late_days": 0,
+      "total_wait_days": 18,
+      "avg_lead_time_days": 4.5
+    },
+    "progress_json": {
+      "stage": "completed"
+    },
+    "decision_case_id": "4f194ef9-37fd-4abd-8958-65a8427c45b1",
+    "node_id": "logistics_scheduling",
+    "upstream_run_id": "e1586fdd-0963-4332-9e8d-b9f95fda4d57",
+    "approved_at": null,
+    "superseded_at": null,
+    "superseded_by_run_id": null,
+    "approved_by": null,
+    "workspace_id": "00000000-0000-4000-8000-00000000da71",
+    "approved_by_user_id": null,
+    "created_by_user_id": "10000000-0000-4000-8000-000000000001"
+  },
+  "critical_resource": "QA-TIME-2",
+  "source_sha": "ef997235a30251fbf7ae53690ed738092ee973d8"
+}

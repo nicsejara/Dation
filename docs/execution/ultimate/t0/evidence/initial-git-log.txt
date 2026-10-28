@@ -1,0 +1,12 @@
+ef99723 (HEAD -> main, origin/main, origin/HEAD, fix/final-polish-run-lineage-saga) Stabilize final polish and lineage flows
+417b3eb Fix contextual new-run routing and preserve run lineage
+2a704be Normalize D1 and D2 dashboard hero media layout
+92764c8 Polish shared controls and new-run warning actions
+7351632 (ux-ui/unified-hero-illustrations-and-icon-refinement) Simplify DDA icons and fix sidebar logo hover
+df4b7a2 Introduce unified isometric hero illustration family
+47584ee Refine home hero structure and bottom panel
+eb39562 Align Home hero with Logistics hero and unify CTA sizing
+0c03de5 Upgrade Home hero to Dation Decision Network
+39906b3 Final Polish Phase 7: stabilize responsive and accessibility
+628a659 Final Polish Phase 6: upgrade execution experience
+31ff3fc Final Polish Phase 5: refine dashboard presentation

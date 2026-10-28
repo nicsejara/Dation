@@ -54,15 +54,16 @@ async def main():
         rows=list(csv.reader(io.StringIO(path.read_text(encoding='utf-8-sig')),delimiter=';'))
         assert 'Recurso disponible' in rows[0] and {t['trip_id'] for t in DATA['run']['result_json']['scenarios']['selected']['trips']}=={r[0] for r in rows[1:]}
         assert all(path=='/api/platform/activity/exports' for _,path in writes) and not errors,(writes,errors)
-        await assign_workflow_person(page,'logistics_scheduling','approver')
-        await page.locator('[data-approve-final]').click()
+        await assign_workflow_person(page,'logistics_scheduling')
+        await page.locator('[data-approve-toolbar]').click()
         await page.wait_for_function("window.DationDispatch.getWorkspace().decisionCase.nodes.logistics_scheduling.status==='approved'")
-        assert await page.locator('[data-approve-final]').is_disabled()
+        await page.locator('[data-approve-toolbar]').wait_for(state='detached')
+        assert await page.locator('[data-approve-toolbar]').count()==0
         assert all(path.endswith('/approve') or path.endswith('/responsibilities/logistics_scheduling') or path in ('/api/runs/preflight','/api/platform/activity/exports') for _,path in writes),writes
         assert sum(path.endswith('/approve') for _,path in writes)==1,writes
         persisted=await (await api_get(context,BASE+'/api/runs/'+DATA['run']['id'])).json()
         assert persisted['approved_at'] and persisted['result_fingerprint']==DATA['run']['result_fingerprint']
-        await page.locator('[data-more-menu] summary').click();await page.locator('[data-dashboard-map]').click()
+        await page.locator('.dda-navigation a').last.click()
         await page.locator('[data-map-node=logistics_scheduling][data-map-action=open-result]').first.wait_for()
         await browser.close()
     report={'passed':True,'states':states,'javascript_errors':errors,'writes':writes,'dataset':'QA temporal reproducible (no Golden Pallets v2)','assignment_frozen':True,'source_sha':DATA['source_sha']}

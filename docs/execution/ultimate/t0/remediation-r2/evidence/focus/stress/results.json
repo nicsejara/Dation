@@ -1,0 +1,326 @@
+[
+  {
+    "surface": "data",
+    "width": 320,
+    "height": 256,
+    "device_scale_factor": 1,
+    "zoom_equivalent": null,
+    "touch": true,
+    "focus": {
+      "skip": false,
+      "tag": "BUTTON",
+      "text": "2Mapa de decisiones",
+      "visibleFocus": true,
+      "outline": "solid",
+      "width": 3,
+      "color": "rgb(80, 200, 196)",
+      "occluded": false,
+      "outside": false,
+      "rect": {
+        "x": 144,
+        "y": 73,
+        "width": 158,
+        "height": 48
+      },
+      "identity": "<button type=\"button\" class=\"dda-workspace-step\" data-step=\"2\" aria-disabled=\"false\"><span class=\"dda-workspace-step__marker\">2</span><span class=\"dda-workspace-step__copy\"><strong>Mapa de decisiones</strong></span></button>"
+    },
+    "overflow": false
+  },
+  {
+    "surface": "map",
+    "width": 320,
+    "height": 256,
+    "device_scale_factor": 1,
+    "zoom_equivalent": null,
+    "touch": true,
+    "focus": {
+      "skip": false,
+      "tag": "BUTTON",
+      "text": "2Mapa de decisiones",
+      "visibleFocus": true,
+      "outline": "solid",
+      "width": 3,
+      "color": "rgb(80, 200, 196)",
+      "occluded": false,
+      "outside": false,
+      "rect": {
+        "x": 78,
+        "y": 73,
+        "width": 158,
+        "height": 48
+      },
+      "identity": "<button type=\"button\" class=\"dda-workspace-step is-current\" data-step=\"2\" aria-disabled=\"false\" aria-current=\"step\"><span class=\"dda-workspace-step__marker\">2</span><span class=\"dda-workspace-step__copy\"><strong>Mapa de decisiones</strong></span></button>"
+    },
+    "overflow": false
+  },
+  {
+    "surface": "assignment",
+    "width": 320,
+    "height": 256,
+    "device_scale_factor": 1,
+    "zoom_equivalent": null,
+    "touch": true,
+    "focus": {
+      "skip": false,
+      "tag": "BUTTON",
+      "text": "Revisar y ejecutar",
+      "visibleFocus": true,
+      "outline": "solid",
+      "width": 3,
+      "color": "rgb(80, 200, 196)",
+      "occluded": false,
+      "outside": false,
+      "rect": {
+        "x": 85,
+        "y": 105.46875,
+        "width": 210,
+        "height": 46
+      },
+      "identity": "<button class=\"d-button d-button--workflow d-button--primary\" type=\"button\" aria-describedby=\"workflow-action-message-1\" aria-busy=\"false\" data-config-review=\"\"><span class=\"\">Revisar y ejecutar</span><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\" fill=\"none\" stroke=\"currentColor\" s"
+    },
+    "overflow": false
+  },
+  {
+    "surface": "scheduling",
+    "width": 320,
+    "height": 256,
+    "device_scale_factor": 1,
+    "zoom_equivalent": null,
+    "touch": true,
+    "focus": {
+      "skip": false,
+      "tag": "BUTTON",
+      "text": "Ventana personalizadaFijá el período dentro del cual deben ocurrir las fechas de salida de todos los",
+      "visibleFocus": true,
+      "outline": "solid",
+      "width": 3,
+      "color": "rgb(80, 200, 196)",
+      "occluded": false,
+      "outside": false,
+      "rect": {
+        "x": 76,
+        "y": 43.78125,
+        "width": 228,
+        "height": 169.328125
+      },
+      "identity": "<button type=\"button\" class=\"decision-config-option assignment-choice-card scheduling-window-card\" data-scheduling-window-mode=\"custom\" aria-pressed=\"false\"><span class=\"assignment-choice-card__icon\"><svg class=\"assignment-icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M8 "
+    },
+    "overflow": false
+  },
+  {
+    "surface": "data",
+    "width": 568,
+    "height": 320,
+    "device_scale_factor": 1,
+    "zoom_equivalent": null,
+    "touch": true,
+    "focus": {
+      "skip": false,
+      "tag": "BUTTON",
+      "text": "2Mapa de decisiones",
+      "visibleFocus": true,
+      "outline": "solid",
+      "width": 3,
+      "color": "rgb(80, 200, 196)",
+      "occluded": false,
+      "outside": false,
+      "rect": {
+        "x": 239,
+        "y": 73,
+        "width": 158,
+        "height": 48
+      },
+      "identity": "<button type=\"button\" class=\"dda-workspace-step\" data-step=\"2\" aria-disabled=\"false\"><span class=\"dda-workspace-step__marker\">2</span><span class=\"dda-workspace-step__copy\"><strong>Mapa de decisiones</strong></span></button>"
+    },
+    "overflow": false
+  },
+  {
+    "surface": "map",
+    "width": 568,
+    "height": 320,
+    "device_scale_factor": 1,
+    "zoom_equivalent": null,
+    "touch": true,
+    "focus": {
+      "skip": false,
+      "tag": "BUTTON",
+      "text": "2Mapa de decisiones",
+      "visibleFocus": true,
+      "outline": "solid",
+      "width": 3,
+      "color": "rgb(80, 200, 196)",
+      "occluded": false,
+      "outside": false,
+      "rect": {
+        "x": 239,
+        "y": 73,
+        "width": 158,
+        "height": 48
+      },
+      "identity": "<button type=\"button\" class=\"dda-workspace-step is-current\" data-step=\"2\" aria-disabled=\"false\" aria-current=\"step\"><span class=\"dda-workspace-step__marker\">2</span><span class=\"dda-workspace-step__copy\"><strong>Mapa de decisiones</strong></span></button>"
+    },
+    "overflow": false
+  },
+  {
+    "surface": "assignment",
+    "width": 568,
+    "height": 320,
+    "device_scale_factor": 1,
+    "zoom_equivalent": null,
+    "touch": true,
+    "focus": {
+      "skip": false,
+      "tag": "BUTTON",
+      "text": "Revisar y ejecutar",
+      "visibleFocus": true,
+      "outline": "solid",
+      "width": 3,
+      "color": "rgb(80, 200, 196)",
+      "occluded": false,
+      "outside": false,
+      "rect": {
+        "x": 85,
+        "y": 168.640625,
+        "width": 458,
+        "height": 46
+      },
+      "identity": "<button class=\"d-button d-button--workflow d-button--primary\" type=\"button\" aria-describedby=\"workflow-action-message-1\" aria-busy=\"false\" data-config-review=\"\"><span class=\"\">Revisar y ejecutar</span><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\" fill=\"none\" stroke=\"currentColor\" s"
+    },
+    "overflow": false
+  },
+  {
+    "surface": "scheduling",
+    "width": 568,
+    "height": 320,
+    "device_scale_factor": 1,
+    "zoom_equivalent": null,
+    "touch": true,
+    "focus": {
+      "skip": false,
+      "tag": "BUTTON",
+      "text": "Ventana personalizadaFijá el período dentro del cual deben ocurrir las fechas de salida de todos los",
+      "visibleFocus": true,
+      "outline": "solid",
+      "width": 3,
+      "color": "rgb(80, 200, 196)",
+      "occluded": false,
+      "outside": false,
+      "rect": {
+        "x": 76,
+        "y": 84.703125,
+        "width": 476,
+        "height": 150.484375
+      },
+      "identity": "<button type=\"button\" class=\"decision-config-option assignment-choice-card scheduling-window-card\" data-scheduling-window-mode=\"custom\" aria-pressed=\"false\"><span class=\"assignment-choice-card__icon\"><svg class=\"assignment-icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M8 "
+    },
+    "overflow": false
+  },
+  {
+    "surface": "data",
+    "width": 720,
+    "height": 450,
+    "device_scale_factor": 2,
+    "zoom_equivalent": "200% at 1440x900",
+    "touch": true,
+    "focus": {
+      "skip": false,
+      "tag": "BUTTON",
+      "text": "2Mapa de decisiones",
+      "visibleFocus": true,
+      "outline": "solid",
+      "width": 3,
+      "color": "rgb(80, 200, 196)",
+      "occluded": false,
+      "outside": false,
+      "rect": {
+        "x": 251,
+        "y": 75,
+        "width": 150,
+        "height": 48
+      },
+      "identity": "<button type=\"button\" class=\"dda-workspace-step\" data-step=\"2\" aria-disabled=\"false\"><span class=\"dda-workspace-step__marker\">2</span><span class=\"dda-workspace-step__copy\"><strong>Mapa de decisiones</strong></span></button>"
+    },
+    "overflow": false
+  },
+  {
+    "surface": "map",
+    "width": 720,
+    "height": 450,
+    "device_scale_factor": 2,
+    "zoom_equivalent": "200% at 1440x900",
+    "touch": true,
+    "focus": {
+      "skip": false,
+      "tag": "BUTTON",
+      "text": "2Mapa de decisiones",
+      "visibleFocus": true,
+      "outline": "solid",
+      "width": 3,
+      "color": "rgb(80, 200, 196)",
+      "occluded": false,
+      "outside": false,
+      "rect": {
+        "x": 251,
+        "y": 75,
+        "width": 150,
+        "height": 48
+      },
+      "identity": "<button type=\"button\" class=\"dda-workspace-step is-current\" data-step=\"2\" aria-disabled=\"false\" aria-current=\"step\"><span class=\"dda-workspace-step__marker\">2</span><span class=\"dda-workspace-step__copy\"><strong>Mapa de decisiones</strong></span></button>"
+    },
+    "overflow": false
+  },
+  {
+    "surface": "assignment",
+    "width": 720,
+    "height": 450,
+    "device_scale_factor": 2,
+    "zoom_equivalent": "200% at 1440x900",
+    "touch": true,
+    "focus": {
+      "skip": false,
+      "tag": "BUTTON",
+      "text": "Revisar y ejecutar",
+      "visibleFocus": true,
+      "outline": "solid",
+      "width": 3,
+      "color": "rgb(80, 200, 196)",
+      "occluded": false,
+      "outside": false,
+      "rect": {
+        "x": 526.421875,
+        "y": 379,
+        "width": 168.578125,
+        "height": 46
+      },
+      "identity": "<button class=\"d-button d-button--workflow d-button--primary\" type=\"button\" aria-describedby=\"workflow-action-message-1\" aria-busy=\"false\" data-config-review=\"\"><span class=\"\">Revisar y ejecutar</span><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\" fill=\"none\" stroke=\"currentColor\" s"
+    },
+    "overflow": false
+  },
+  {
+    "surface": "scheduling",
+    "width": 720,
+    "height": 450,
+    "device_scale_factor": 2,
+    "zoom_equivalent": "200% at 1440x900",
+    "touch": true,
+    "focus": {
+      "skip": false,
+      "tag": "BUTTON",
+      "text": "Ventana personalizadaFijá el período dentro del cual deben ocurrir las fechas de salida de todos los",
+      "visibleFocus": true,
+      "outline": "solid",
+      "width": 3,
+      "color": "rgb(80, 200, 196)",
+      "occluded": false,
+      "outside": false,
+      "rect": {
+        "x": 88,
+        "y": 172,
+        "width": 616,
+        "height": 135.640625
+      },
+      "identity": "<button type=\"button\" class=\"decision-config-option assignment-choice-card scheduling-window-card\" data-scheduling-window-mode=\"custom\" aria-pressed=\"false\"><span class=\"assignment-choice-card__icon\"><svg class=\"assignment-icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M8 "
+    },
+    "overflow": false
+  }
+]

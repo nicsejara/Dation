@@ -1,0 +1,299 @@
+{
+  "contract_id": "transport_demand_v1",
+  "schema_version": "transport_demand_v1",
+  "registry_version": "ULTIMATE_DOMAIN_V1",
+  "model_version_id": "10000000-0000-4000-8000-000000000099",
+  "configuration_hash": "6924bfc9d3898d611e76dd2198eee739b4a4c2c79a2eb417948f3cebcc206b8c",
+  "semantic_entity": "transport_demand",
+  "fields": [
+    {
+      "semantic_key": "order_id",
+      "semantic_entity": "transport_demand",
+      "type": "IDENTIFIER",
+      "unit": null,
+      "required_for": [
+        "INPUT_SCHEMA"
+      ],
+      "used_by": [
+        "logistics_assignment",
+        "logistics_scheduling"
+      ],
+      "validation": {
+        "max_length": 128
+      },
+      "engine_role": "INPUT",
+      "public_header": "order_id",
+      "examples": [
+        "ORD-001"
+      ],
+      "nullable": false,
+      "applies_when": {}
+    },
+    {
+      "semantic_key": "origin_id",
+      "semantic_entity": "transport_demand",
+      "type": "IDENTIFIER",
+      "unit": null,
+      "required_for": [
+        "INPUT_SCHEMA"
+      ],
+      "used_by": [
+        "logistics_assignment",
+        "logistics_scheduling"
+      ],
+      "validation": {
+        "max_length": 128
+      },
+      "engine_role": "INPUT",
+      "public_header": "origin_id",
+      "examples": [
+        "ORIGIN-01"
+      ],
+      "nullable": false,
+      "applies_when": {}
+    },
+    {
+      "semantic_key": "destination_id",
+      "semantic_entity": "transport_demand",
+      "type": "IDENTIFIER",
+      "unit": null,
+      "required_for": [
+        "INPUT_SCHEMA"
+      ],
+      "used_by": [
+        "logistics_assignment",
+        "logistics_scheduling"
+      ],
+      "validation": {
+        "max_length": 128
+      },
+      "engine_role": "INPUT",
+      "public_header": "destination_id",
+      "examples": [
+        "DEST-01"
+      ],
+      "nullable": false,
+      "applies_when": {}
+    },
+    {
+      "semantic_key": "distance_km",
+      "semantic_entity": "transport_demand",
+      "type": "DECIMAL",
+      "unit": "km",
+      "required_for": [
+        "INPUT_SCHEMA"
+      ],
+      "used_by": [
+        "logistics_assignment",
+        "logistics_scheduling"
+      ],
+      "validation": {
+        "positive": true,
+        "scale": 3
+      },
+      "engine_role": "INPUT",
+      "public_header": "distance_km",
+      "examples": [
+        "500"
+      ],
+      "nullable": false,
+      "applies_when": {}
+    },
+    {
+      "semantic_key": "ready_date",
+      "semantic_entity": "transport_demand",
+      "type": "DATE",
+      "unit": null,
+      "required_for": [
+        "INPUT_SCHEMA"
+      ],
+      "used_by": [
+        "logistics_assignment",
+        "logistics_scheduling"
+      ],
+      "validation": {
+        "format": "YYYY-MM-DD"
+      },
+      "engine_role": "INPUT",
+      "public_header": "ready_date",
+      "examples": [
+        "2026-11-02"
+      ],
+      "nullable": false,
+      "applies_when": {}
+    },
+    {
+      "semantic_key": "delivery_due_date",
+      "semantic_entity": "transport_demand",
+      "type": "DATE",
+      "unit": null,
+      "required_for": [
+        "INPUT_SCHEMA"
+      ],
+      "used_by": [
+        "logistics_assignment",
+        "logistics_scheduling"
+      ],
+      "validation": {
+        "format": "YYYY-MM-DD"
+      },
+      "engine_role": "INPUT",
+      "public_header": "delivery_due_date",
+      "examples": [
+        "2026-11-06"
+      ],
+      "nullable": false,
+      "applies_when": {}
+    },
+    {
+      "semantic_key": "priority",
+      "semantic_entity": "transport_demand",
+      "type": "ENUM",
+      "unit": null,
+      "required_for": [
+        "INPUT_SCHEMA"
+      ],
+      "used_by": [
+        "logistics_assignment",
+        "logistics_scheduling"
+      ],
+      "validation": {
+        "values": [
+          "HIGH",
+          "MEDIUM",
+          "LOW"
+        ]
+      },
+      "engine_role": "INPUT",
+      "public_header": "priority",
+      "examples": [
+        "MEDIUM"
+      ],
+      "nullable": false,
+      "applies_when": {}
+    },
+    {
+      "semantic_key": "split_allowed",
+      "semantic_entity": "transport_demand",
+      "type": "BOOLEAN",
+      "unit": null,
+      "required_for": [
+        "INPUT_SCHEMA"
+      ],
+      "used_by": [
+        "logistics_assignment",
+        "logistics_scheduling"
+      ],
+      "validation": {
+        "values": [
+          "true",
+          "false"
+        ]
+      },
+      "engine_role": "INPUT",
+      "public_header": "split_allowed",
+      "examples": [
+        "false"
+      ],
+      "nullable": false,
+      "applies_when": {}
+    },
+    {
+      "semantic_key": "demand_pallets",
+      "semantic_entity": "transport_demand",
+      "type": "DECIMAL",
+      "unit": "pallets",
+      "required_for": [
+        "INPUT_SCHEMA"
+      ],
+      "used_by": [
+        "logistics_assignment",
+        "logistics_scheduling"
+      ],
+      "validation": {
+        "minimum": 0,
+        "scale": 3
+      },
+      "engine_role": "INPUT",
+      "public_header": "demand_pallets",
+      "examples": [
+        "10"
+      ],
+      "nullable": false,
+      "applies_when": {}
+    },
+    {
+      "semantic_key": "compatibility_groups",
+      "semantic_entity": "transport_demand",
+      "type": "ID_LIST",
+      "unit": null,
+      "required_for": [
+        "INPUT_SCHEMA"
+      ],
+      "used_by": [
+        "logistics_assignment",
+        "logistics_scheduling"
+      ],
+      "validation": {
+        "separator": "|",
+        "max_items": 100
+      },
+      "engine_role": "INPUT",
+      "public_header": "compatibility_groups",
+      "examples": [
+        "DRY"
+      ],
+      "nullable": false,
+      "applies_when": {}
+    }
+  ],
+  "rules": {
+    "extra_columns": "REJECT",
+    "header_matching": "EXACT",
+    "delimiter": ",",
+    "encoding": "UTF-8",
+    "value_whitespace": "TRIM_NFC",
+    "max_raw_bytes": 10485760,
+    "max_normalized_bytes": 10485760,
+    "max_rows": 10000,
+    "empty_rows": "REJECT",
+    "model": {
+      "version": 1,
+      "operating_role": "SHIPPER",
+      "transport_pattern": "DIRECT",
+      "allowed_sources": [
+        "OWN",
+        "EXTERNAL"
+      ],
+      "active_dimensions": [
+        "pallets"
+      ],
+      "primary_dimension": "pallets",
+      "split_permitted": false,
+      "homogeneous_loads_declared": false,
+      "currency_policy": {
+        "currency": "ARS",
+        "minor_units": 2,
+        "rounding": "ROUND_HALF_UP"
+      },
+      "own_cost_model": "OWN_OPERATING_CYCLE",
+      "external_cost_models": [
+        "PER_TRIP",
+        "PER_KM"
+      ],
+      "per_km_billing_bases": [
+        "ONE_WAY",
+        "ROUND_TRIP"
+      ]
+    },
+    "unknown_cost": "PRESERVE_NULL",
+    "unknown_availability": "PRESERVE_UNKNOWN",
+    "assumed_external_default": {
+      "when": "ASSUMED explicitly declared and services_available empty",
+      "value": 1,
+      "source": "DATION_DEFAULT"
+    }
+  },
+  "normalizer_version": "DATION_INPUT_NORMALIZER_V1",
+  "contract_hash": "ff5b5c2b2b9324ab8bc8bd9693d83d668b7e45bdf03ca783e824bbd69fb77469"
+}

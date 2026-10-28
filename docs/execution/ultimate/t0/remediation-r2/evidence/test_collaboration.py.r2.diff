@@ -1,0 +1,17 @@
+--- backend/tests/e2e/test_collaboration.py (R1 end)
++++ backend/tests/e2e/test_collaboration.py (R2)
+@@ -95,7 +95,14 @@
+    before=self.s.sql(f"SELECT count(*) FROM decision_approval_events WHERE run_id='{d2}';");self.approve(d2,case,'logistics_scheduling');self.assertEqual(self.s.sql(f"SELECT count(*) FROM decision_approval_events WHERE run_id='{d2}';"),before)
+    self.checked(self.update(USER_B,'operator','disabled'));detail=self.checked(self.a.get('/api/platform/decisions/'+case));self.assertFalse(detail['nodes'][0]['approver']['active'])
+    self.assertEqual(self.b.get('/api/platform/team',headers={'X-Dation-Workspace-Id':self.s.workspace_a}).status_code,403)
++   # Disabling a member does not mutate the assignment version or historical actor.
++   # An unchanged assignment is a no-op; exercise CAS with an actual reassignment.
++   unchanged=self.checked(self.assign(case,version=first['updated_at']))
++   self.assertEqual(unchanged['updated_at'],first['updated_at'])
++   reassigned=self.checked(self.assign(case,owner=USER_A,approver=USER_A,version=first['updated_at']))
++   self.assertNotEqual(reassigned['updated_at'],first['updated_at'])
+    self.assertEqual(self.assign(case,version=first['updated_at']).status_code,409)
++   self.assertEqual(self.checked(self.a.get('/api/runs/'+d1))['approved_by_user_id'],USER_B)
+   # Composite FKs and RLS block cross-workspace assignments, even for a guessed ID.
+   self.s.sql(f"UPDATE profiles SET active_workspace_id='{self.s.workspace_b}' WHERE id='{USER_B}';")
+   self.assertEqual(self.b.get('/api/platform/decisions/'+case).status_code,404)

@@ -1,0 +1,18 @@
+{
+  "name": "cloud-environment:cloud-environment-runtime",
+  "package": "c5/cloud-environment-runtime",
+  "source": "skill://plugin_connector_1p_c5b7d5df5d7081918f2c4be5a633ed5d/cloud-environment-runtime/SKILL.md",
+  "sha256": "de2ea16a5a8727be2a6cbf6a57d60c3eac1082119dd9685e69a2b8e83db120bc",
+  "read": true,
+  "applied": "Managed runner readiness and child-process credential isolation only",
+  "verified": "U1/B-PY/B-NODE with existing Python/Node dependencies and no remote operations",
+  "not_applied": [
+    "Docker",
+    "VPN",
+    "deploy",
+    "network configuration"
+  ],
+  "backend_domain_testing_skill": "N/A — no relevant dedicated skill available; unittest/oracles are tools",
+  "UI_skills": "N/A — no interface modification",
+  "Supabase_skills": "N/A — no database operation; T2 handoff transcribes approved plan only"
+}

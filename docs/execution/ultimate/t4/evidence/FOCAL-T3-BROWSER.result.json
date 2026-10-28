@@ -1,0 +1,24 @@
+{
+  "suite": "FOCAL-T3-BROWSER",
+  "status": "PASS",
+  "tests": 1,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "started_at": "2026-10-26T19:19:32.834762+00:00",
+  "finished_at": "2026-10-26T19:19:59.301081+00:00",
+  "seconds": 26.466,
+  "cwd": "/workspace/Dation/backend",
+  "command": [
+    "/workspace/Dation/backend/.browser-venv/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "test_ultimate_case_setup.UltimateCaseSetupTests.test_01_ui_model_publish_case_without_csv_and_reload",
+    "-v"
+  ],
+  "exit_code": 0,
+  "production_credentials_cleared": true,
+  "PYTHONPATH": "tests/browser",
+  "log_sha256": "a555aa9af82bdaca745743c1ff8c42ecf6070b2774f435207102b06c91f9a522"
+}

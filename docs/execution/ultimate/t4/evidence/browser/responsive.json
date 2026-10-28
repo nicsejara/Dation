@@ -1,0 +1,68 @@
+[
+  {
+    "width": 1440,
+    "scroll": 1440,
+    "badgeHeight": 31.1875,
+    "badgeWidth": 84.6875,
+    "iconFill": "none",
+    "iconStroke": "rgb(105, 169, 232)",
+    "iconWidth": 20,
+    "chooseHeight": 36,
+    "headerWhitespace": "nowrap"
+  },
+  {
+    "width": 1280,
+    "scroll": 1280,
+    "badgeHeight": 31.1875,
+    "badgeWidth": 84.6875,
+    "iconFill": "none",
+    "iconStroke": "rgb(105, 169, 232)",
+    "iconWidth": 20,
+    "chooseHeight": 36,
+    "headerWhitespace": "nowrap"
+  },
+  {
+    "width": 1024,
+    "scroll": 1024,
+    "badgeHeight": 31.1875,
+    "badgeWidth": 84.6875,
+    "iconFill": "none",
+    "iconStroke": "rgb(105, 169, 232)",
+    "iconWidth": 20,
+    "chooseHeight": 36,
+    "headerWhitespace": "nowrap"
+  },
+  {
+    "width": 768,
+    "scroll": 768,
+    "badgeHeight": 31.1875,
+    "badgeWidth": 84.6875,
+    "iconFill": "none",
+    "iconStroke": "rgb(105, 169, 232)",
+    "iconWidth": 20,
+    "chooseHeight": 36,
+    "headerWhitespace": "nowrap"
+  },
+  {
+    "width": 390,
+    "scroll": 390,
+    "badgeHeight": 31.1875,
+    "badgeWidth": 84.6875,
+    "iconFill": "none",
+    "iconStroke": "rgb(105, 169, 232)",
+    "iconWidth": 20,
+    "chooseHeight": 36,
+    "headerWhitespace": "nowrap"
+  },
+  {
+    "width": 320,
+    "scroll": 320,
+    "badgeHeight": 31.1875,
+    "badgeWidth": 84.6875,
+    "iconFill": "none",
+    "iconStroke": "rgb(105, 169, 232)",
+    "iconWidth": 20,
+    "chooseHeight": 36,
+    "headerWhitespace": "nowrap"
+  }
+]

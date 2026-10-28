@@ -5,6 +5,7 @@ from uuid import uuid4
 import httpx
 from auth_fixture import USER_A,USER_B,VIEWER,DISABLED
 from sandbox import Sandbox
+from workflow_fixture import apply_attributes
 import test_workflow_gates as gates
 
 
@@ -23,28 +24,31 @@ class OptimizedResponsibilityTests(unittest.TestCase):
 
     def test_split_roles_reload_independent_node_assignments_and_actual_approval(self):
         self.s.sql("UPDATE workspace_members SET status='active' WHERE user_id='"+DISABLED+"';")
-        self.roles(USER_A,['data_owner','decision_owner'])
-        self.roles(DISABLED,['data_steward','approver'])
-        cid,orders,fleet=self.case()
-        for group,uid in [('data_owner',USER_A),('data_steward',DISABLED)]:
+        self.roles(USER_A,['data_owner'])
+        self.roles(DISABLED,['decision_owner'])
+        cid,orders,fleet=self.case();apply_attributes(self.a,cid)
+        for group,uid in [('data_owner',USER_A),('decision_owner',DISABLED)]:
             members=self.checked(self.a.get('/api/platform/team',params={'candidates':'true','responsibility':group}))['members']
             self.assertEqual([m['user_id'] for m in members],[uid])
-        self.assign(cid,'data_owner',USER_A)
-        saved=self.assign(cid,'data_steward',DISABLED)
+        saved=self.assign(cid,'data_owner',USER_A)
         self.assertEqual(saved['stages']['data_owner']['owner']['id'],USER_A)
-        self.assertEqual(saved['stages']['data_steward']['owner']['id'],DISABLED)
+        self.assertEqual(saved['stages']['data_preparation']['owner']['id'],USER_A)
+        self.assertNotIn('data_steward',saved['stages'])
         self.checked(self.a.get('/api/platform/decisions/'+cid+'/workflow-readiness'))
-        stale=self.a.put('/api/platform/decisions/'+cid+'/responsibilities/data_steward',json={
+        stale=self.a.put('/api/platform/decisions/'+cid+'/responsibilities/data_owner',json={
             'expected_updated_at':None,'owner_user_id':None,'approver_user_id':None})
         self.assertEqual(stale.status_code,409)
+        self.assertEqual(self.a.put('/api/platform/decisions/'+cid+'/responsibilities/data_steward',json={
+            'expected_updated_at':None,'owner_user_id':DISABLED}).status_code,422)
         current=self.snapshot(cid)['stages']['data_owner']
         denied=self.a.put('/api/platform/decisions/'+cid+'/responsibilities/data_owner',json={
             'expected_updated_at':current['updated_at'],'owner_user_id':DISABLED,'approver_user_id':None})
         self.assertEqual(denied.status_code,409)
         self.assertEqual(self.snapshot(cid)['stages'],saved['stages'])
-        self.assign(cid,'logistics_assignment',USER_A,DISABLED)
+        self.roles(USER_A,['data_owner','decision_owner'])
+        self.assign(cid,'logistics_assignment',DISABLED)
         self.assign(cid,'logistics_scheduling',USER_A,None)
-        self.assertIsNone(self.snapshot(cid)['stages']['logistics_scheduling']['approver'])
+        self.assertEqual(self.snapshot(cid)['stages']['logistics_scheduling']['approver']['id'],USER_A)
         self.s.start_worker();run=self.admit(self.body(cid,orders,fleet));self.finish(run)
         with httpx.Client(base_url=self.s.api_url,trust_env=False,headers={'Authorization':'Bearer '+self.s.user_tokens[DISABLED]}) as approver:
             result=self.checked(approver.post('/api/runs/'+run+'/approve',json={'case_id':cid,'node_id':'logistics_assignment'}))
@@ -64,19 +68,26 @@ class OptimizedResponsibilityTests(unittest.TestCase):
         with httpx.Client(base_url=self.s.api_url,trust_env=False,headers={'Authorization':'Bearer '+self.s.user_tokens[USER_B]}) as other:
             self.assertEqual(other.get('/api/platform/decisions/'+cid+'/responsibilities').status_code,404)
         self.assign(cid,'data_owner',None)
-        self.assertTrue(self.snapshot(cid)['stages']['data_preparation']['owner_eligible'])
-        self.assertEqual(self.snapshot(cid)['stages']['data_preparation']['owner']['id'],DISABLED)
+        self.assertFalse(self.snapshot(cid)['stages']['data_preparation']['owner_eligible'])
+        self.assertIsNone(self.snapshot(cid)['stages']['data_preparation']['owner'])
+        self.assertEqual(self.a.get('/api/platform/decisions/'+cid+'/workflow-readiness').status_code,409)
+        self.assertEqual(self.checked(self.a.get('/api/runs/'+run))['approved_by_user_id'],DISABLED)
 
     def test_legacy_assignment_projects_to_its_explicit_role_without_ambiguous_overwrite(self):
-        self.roles(USER_A,['data_steward'])
+        self.roles(USER_A,['data_owner'])
         cid,orders,fleet=self.case()
         result=self.assign(cid,'data_preparation',USER_A)
-        self.assertEqual(result['stages']['data_steward']['owner']['id'],USER_A)
+        self.assertEqual(result['stages']['data_owner']['owner']['id'],USER_A)
         legacy=result['stages']['data_preparation']
+        cleared=self.assign(cid,'data_owner',None)
         stale=self.a.put('/api/platform/decisions/'+cid+'/responsibilities/data_preparation',json={
             'expected_updated_at':legacy['updated_at'],'owner_user_id':None,'approver_user_id':None})
         self.assertEqual(stale.status_code,409)
-        self.assertEqual(self.snapshot(cid)['stages']['data_steward']['owner']['id'],USER_A)
+        self.assertIsNone(self.snapshot(cid)['stages']['data_owner']['owner'])
+        restored=self.assign(cid,'data_preparation',USER_A)
+        self.assertNotEqual(restored['stages']['data_owner']['updated_at'],cleared['stages']['data_owner']['updated_at'])
+        self.assertEqual(restored['stages']['data_owner']['owner']['id'],USER_A)
+        self.assertEqual(restored['stages']['data_preparation']['owner']['id'],USER_A)
 
     def test_archive_persists_reloads_and_preserves_case_history_and_assignments(self):
         self.roles(USER_A,['data_owner'])
@@ -112,7 +123,10 @@ class DataRoleMigrationTests(unittest.TestCase):
         with Sandbox(migration_hook=seed) as s:
             current=json.loads(s.sql("SELECT to_jsonb(a)-'stage_key' FROM dation_private.workflow_stage_assignments a WHERE decision_case_id='"+cid+"' AND stage_key='data_steward';"))
             self.assertEqual(current,captured['assignment'])
+            canonical=json.loads(s.sql("SELECT to_jsonb(a)-'stage_key' FROM dation_private.workflow_stage_assignments a WHERE decision_case_id='"+cid+"' AND stage_key='data_owner';"))
+            self.assertEqual(canonical,captured['assignment'])
             response=s.api_client.get('/api/platform/decisions/'+cid+'/responsibilities')
             self.assertEqual(response.status_code,200,response.text)
-            self.assertEqual(response.json()['stages']['data_steward']['owner']['id'],uid)
+            self.assertNotIn('data_steward',response.json()['stages'])
+            self.assertEqual(response.json()['stages']['data_owner']['owner']['id'],uid)
             self.assertEqual(response.json()['stages']['data_preparation']['owner']['id'],uid)

@@ -1,0 +1,47 @@
+{
+  "suite": "B-E2E",
+  "status": "FAIL",
+  "started_at": "2026-10-25T22:53:11.867224+00:00",
+  "finished_at": "2026-10-25T23:07:15.571106+00:00",
+  "command": [
+    "/workspace/Dation/.venv/bin/python",
+    "-B",
+    "tests/e2e/run_suite.py"
+  ],
+  "cwd": "/workspace/Dation/backend",
+  "exit_code": 1,
+  "tests": 83,
+  "failures_count": 5,
+  "skipped": 0,
+  "failures": [
+    {
+      "kind": "FAIL",
+      "test": "test_02_assigned_approval_handoff_attribution_override_and_retry (test_collaboration.CollaborationTests.test_02_assigned_approval_handoff_attribution_override_and_retry)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_09_home_attention_tracks_real_versions_and_removes_approved_or_archived (test_tenancy.TenancyTests.test_09_home_attention_tracks_real_versions_and_removes_approved_or_archived)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_browser_complete_workflow_at_mobile_width (test_workflow.WorkflowTests.test_browser_complete_workflow_at_mobile_width)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_browser_creation_execution_approval_navigation_and_mobile_history (test_workflow.WorkflowTests.test_browser_creation_execution_approval_navigation_and_mobile_history)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_scheduling_dashboard_v21_preserves_assignment_and_temporal_relations (test_workflow.WorkflowTests.test_scheduling_dashboard_v21_preserves_assignment_and_temporal_relations)"
+    }
+  ],
+  "wall_seconds": 843.694,
+  "suite_reported_seconds": 843.227,
+  "log_path": "docs/execution/ultimate/t0/remediation/evidence/B-E2E.log",
+  "log_sha256": "64fe0d9ef7bf8e56ced6da70b5dc0187a7507491a24b2302a56dded0027e591d",
+  "production_credentials_cleared": true,
+  "docker_target": "local unix socket",
+  "sql_container": null,
+  "failed_test_cases_unique": 5,
+  "passed_test_cases": 78
+}

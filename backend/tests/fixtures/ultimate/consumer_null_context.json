@@ -1,0 +1,353 @@
+{
+  "schema_version": "decision_context_v1",
+  "context_version": 1,
+  "provenance": {
+    "run_id": "10000000-0000-4000-8000-000000001005",
+    "result_fingerprint": "a6d700ae615938a22af9099544e27bc15561e5757cacc362c9bdd88fed8b6a56"
+  },
+  "mode": "EXPLAIN",
+  "case": {
+    "planning_start": "2026-11-02",
+    "planning_end": "2026-11-08",
+    "workspace_id": "00000000-0000-0000-0000-000000000001",
+    "case_id": "00000000-0000-0000-0000-000000000002",
+    "case_name": "Semana 45",
+    "operating_role": "SHIPPER",
+    "logistics_model_id": "00000000-0000-0000-0000-000000000003",
+    "logistics_model_version_id": "00000000-0000-0000-0000-000000000004",
+    "logistics_model_version": 1,
+    "data_pack_version_id": "00000000-0000-0000-0000-000000000005",
+    "data_pack_version": 1,
+    "model_hash": "1111111111111111111111111111111111111111111111111111111111111111",
+    "pack_manifest_hash": "2222222222222222222222222222222222222222222222222222222222222222",
+    "graph_version": "ULTIMATE_GRAPH_V1",
+    "contract_hash": "3333333333333333333333333333333333333333333333333333333333333333",
+    "case_policy": {
+      "version": 1,
+      "primary_goal": "MAXIMIZE_SERVICE",
+      "guardrails": [],
+      "preferences": []
+    },
+    "node_policy": {
+      "version": 1,
+      "primary_goal": "MAXIMIZE_SERVICE",
+      "guardrails": [],
+      "preferences": [],
+      "override": false,
+      "override_reason": null
+    },
+    "currency_policy": {
+      "currency": "ARS",
+      "minor_units": 2,
+      "rounding": "ROUND_HALF_UP"
+    },
+    "primary_dimension": "pallets",
+    "active_dimensions": [
+      "pallets"
+    ],
+    "read_set": [
+      {
+        "slot": "transport_demand",
+        "canonical_sha256": "4444444444444444444444444444444444444444444444444444444444444444",
+        "contract_hash": "5555555555555555555555555555555555555555555555555555555555555555",
+        "normalizer_version": "demand_v1"
+      },
+      {
+        "slot": "transport_resources",
+        "canonical_sha256": "6666666666666666666666666666666666666666666666666666666666666666",
+        "contract_hash": "7777777777777777777777777777777777777777777777777777777777777777",
+        "normalizer_version": "resources_v1"
+      }
+    ],
+    "display_metadata": {}
+  },
+  "logistics_model": {
+    "id": "00000000-0000-0000-0000-000000000003",
+    "version_id": "00000000-0000-0000-0000-000000000004",
+    "version": 1,
+    "model_hash": "1111111111111111111111111111111111111111111111111111111111111111"
+  },
+  "case_policy": {
+    "version": 1,
+    "primary_goal": "MAXIMIZE_SERVICE",
+    "guardrails": [],
+    "preferences": []
+  },
+  "decision_definition": {
+    "node_id": "logistics_assignment",
+    "version": "ULTIMATE_GRAPH_V1",
+    "decision_type": "TRANSPORT_PLAN"
+  },
+  "node_policy": {
+    "version": 1,
+    "primary_goal": "MAXIMIZE_SERVICE",
+    "guardrails": [],
+    "preferences": [],
+    "override": false,
+    "override_reason": null
+  },
+  "input_summary": {
+    "orders": 1,
+    "demand": {
+      "pallets": "1",
+      "weight_kg": null,
+      "volume_m3": null,
+      "units": null
+    },
+    "priority_distribution": {
+      "HIGH": 0,
+      "MEDIUM": 1,
+      "LOW": 0
+    },
+    "own_resources": 0,
+    "external_resources": 1
+  },
+  "result_summary": {
+    "template_id": "ultimate.transport_plan.certified_v1",
+    "template_version": 1,
+    "facts": {
+      "trip_count": 1,
+      "assigned": "1",
+      "residual": "0",
+      "coverage_ratio": "1",
+      "total_cost": null,
+      "currency": "ARS",
+      "primary_dimension": "pallets",
+      "policy_feasible": true,
+      "solver_status": "OPTIMAL"
+    }
+  },
+  "metrics": {
+    "total_cost": null,
+    "cost_completeness": "UNKNOWN",
+    "trip_count": 1,
+    "demand_coverage": {
+      "primary_dimension": "pallets",
+      "requested": "1",
+      "assigned": "1",
+      "unassigned": "0",
+      "ratio": "1"
+    },
+    "capacity_utilization": {
+      "primary_dimension": "pallets",
+      "weighted_ratio": "0.5"
+    },
+    "resource_mix": {
+      "own_trip_ratio": "0",
+      "external_trip_ratio": "1"
+    },
+    "resources_used": 1,
+    "coverage_by_priority": [
+      {
+        "priority": "HIGH",
+        "coverage_ratio": null
+      },
+      {
+        "priority": "MEDIUM",
+        "coverage_ratio": "1"
+      },
+      {
+        "priority": "LOW",
+        "coverage_ratio": null
+      }
+    ]
+  },
+  "exceptions": [],
+  "assumptions": [],
+  "evidence_summary": {
+    "solver": {
+      "status": "OPTIMAL",
+      "objective_value": "1000",
+      "best_bound": "1000",
+      "certificate": {
+        "kind": "GLOBAL_OPTIMUM",
+        "evidence_ref": "POL-beec7784415417dcf2ca534e"
+      }
+    },
+    "policy": {
+      "case_goal": "MAXIMIZE_SERVICE",
+      "effective_node_policy": "MAXIMIZE_SERVICE",
+      "override": false,
+      "override_reason": null,
+      "evidence_id": "POL-beec7784415417dcf2ca534e"
+    },
+    "constraints": [
+      {
+        "evidence_id": "POL-beec7784415417dcf2ca534e",
+        "code": "POLICY_CERTIFICATE",
+        "status": "SATISFIED",
+        "hard": true,
+        "facts": {
+          "definition": "D1_POLICY_V1",
+          "goal": "MAXIMIZE_SERVICE",
+          "coverage_basis": "PRIMARY_DIMENSION",
+          "source_share_basis": "TRIPS",
+          "critical_priority": "HIGH",
+          "candidate_set_complete": true,
+          "model_sha256": "89815780728c541177d585e68e5950fd39780f28e7ac9b587c1684f84aefc50e",
+          "model_deterministic_budget": "5",
+          "kernel_deterministic_budget": "1",
+          "local_comparison_budget": "0.015625",
+          "bound_COST": 0,
+          "bound_TRIPS": 1,
+          "bound_SERVICE": 1000,
+          "bound_OWN_CAPACITY": 1000,
+          "normalized_scale": 10000,
+          "stage_0_name": "COVERAGE_MEDIUM",
+          "stage_0_status": "OPTIMAL",
+          "stage_0_value": 1000,
+          "stage_0_bound": 1000,
+          "stage_1_name": "MAXIMIZE_SERVICE",
+          "stage_1_status": "OPTIMAL",
+          "stage_1_value": 1000,
+          "stage_1_bound": 1000,
+          "stage_2_name": "STABLE_RESOURCE_TIE",
+          "stage_2_status": "OPTIMAL",
+          "stage_2_value": 1,
+          "stage_2_bound": 1
+        }
+      }
+    ],
+    "reason_emissions": {
+      "mode": "REFERENCE",
+      "delivery_version": 1,
+      "dataset_id": "reasons",
+      "row_schema": "reason_emission_v1",
+      "schema_version": 1,
+      "row_count": 3,
+      "artifacts": [
+        {
+          "artifact_id": "03ee1d84-705a-5f98-b6ff-b19e71fb5f81",
+          "workspace_id": "00000000-0000-0000-0000-000000000001",
+          "run_id": "10000000-0000-4000-8000-000000001005",
+          "kind": "EVIDENCE",
+          "part_key": "reasons-000",
+          "artifact_schema": "reason_emission_v1",
+          "schema_version": 1,
+          "content_sha256": "643a0b6a3f55c55588c31a66ab807a9ad9b5893532254713d28c766d893e4df1",
+          "size_bytes": 1467,
+          "media_type": "application/json",
+          "core_fingerprint": "19429936059f563600b83c6f5ea8524345400dacb32700c9b6aed9512765ce90",
+          "assembler_version": "RESULT_ASSEMBLER_D1_V1"
+        }
+      ]
+    },
+    "parts": [
+      {
+        "mode": "REFERENCE",
+        "delivery_version": 1,
+        "dataset_id": "engine-evidence",
+        "row_schema": "engine_evidence_v1",
+        "schema_version": 1,
+        "row_count": 3,
+        "artifacts": [
+          {
+            "artifact_id": "1e673306-1900-5ffc-ab43-d9012bff56ab",
+            "workspace_id": "00000000-0000-0000-0000-000000000001",
+            "run_id": "10000000-0000-4000-8000-000000001005",
+            "kind": "EVIDENCE",
+            "part_key": "engine-evidence-000",
+            "artifact_schema": "engine_evidence_v1",
+            "schema_version": 1,
+            "content_sha256": "1ff61068e74ac0fc18e67f345defa650f232007faec04e13f5281ae517009f29",
+            "size_bytes": 8327,
+            "media_type": "application/json",
+            "core_fingerprint": "19429936059f563600b83c6f5ea8524345400dacb32700c9b6aed9512765ce90",
+            "assembler_version": "RESULT_ASSEMBLER_D1_V1"
+          }
+        ]
+      },
+      {
+        "mode": "REFERENCE",
+        "delivery_version": 1,
+        "dataset_id": "evidence",
+        "row_schema": "entity_evidence_v1",
+        "schema_version": 1,
+        "row_count": 3,
+        "artifacts": [
+          {
+            "artifact_id": "e9cbfa96-6595-54ae-9bd1-75349feb06f7",
+            "workspace_id": "00000000-0000-0000-0000-000000000001",
+            "run_id": "10000000-0000-4000-8000-000000001005",
+            "kind": "ENTITY_EVIDENCE",
+            "part_key": "evidence-000",
+            "artifact_schema": "entity_evidence_v1",
+            "schema_version": 1,
+            "content_sha256": "3b0656daafc91fe3b66e159bc488186b6f882a7d0b1981401c75f4ea638d40d8",
+            "size_bytes": 1382,
+            "media_type": "application/json",
+            "core_fingerprint": "19429936059f563600b83c6f5ea8524345400dacb32700c9b6aed9512765ce90",
+            "assembler_version": "RESULT_ASSEMBLER_D1_V1"
+          }
+        ]
+      },
+      {
+        "mode": "REFERENCE",
+        "delivery_version": 1,
+        "dataset_id": "sankey-entity-index",
+        "row_schema": "entity_evidence_v1",
+        "schema_version": 1,
+        "row_count": 3,
+        "artifacts": [
+          {
+            "artifact_id": "0ed9e93c-5edf-5b98-af1e-69bfe5384e35",
+            "workspace_id": "00000000-0000-0000-0000-000000000001",
+            "run_id": "10000000-0000-4000-8000-000000001005",
+            "kind": "ENTITY_EVIDENCE",
+            "part_key": "sankey-entity-index-000",
+            "artifact_schema": "entity_evidence_v1",
+            "schema_version": 1,
+            "content_sha256": "b013465522922a02904098f323e0e48c83db2a8fd2b5657a08c4a2b6d6192185",
+            "size_bytes": 1036,
+            "media_type": "application/json",
+            "core_fingerprint": "19429936059f563600b83c6f5ea8524345400dacb32700c9b6aed9512765ce90",
+            "assembler_version": "RESULT_ASSEMBLER_D1_V1"
+          }
+        ]
+      },
+      {
+        "mode": "REFERENCE",
+        "delivery_version": 1,
+        "dataset_id": "analysis-status",
+        "row_schema": "entity_evidence_v1",
+        "schema_version": 1,
+        "row_count": 1,
+        "artifacts": [
+          {
+            "artifact_id": "40cb420e-a5fc-5604-942c-b0f0feb4fe8e",
+            "workspace_id": "00000000-0000-0000-0000-000000000001",
+            "run_id": "10000000-0000-4000-8000-000000001005",
+            "kind": "EVIDENCE",
+            "part_key": "analysis-status-000",
+            "artifact_schema": "entity_evidence_v1",
+            "schema_version": 1,
+            "content_sha256": "6cf2758a7381fc6ab9a583903ed7df21a17f2b77207b4894aebbee782844cb4a",
+            "size_bytes": 691,
+            "media_type": "application/json",
+            "core_fingerprint": "19429936059f563600b83c6f5ea8524345400dacb32700c9b6aed9512765ce90",
+            "assembler_version": "RESULT_ASSEMBLER_D1_V1"
+          }
+        ]
+      }
+    ]
+  },
+  "alternatives_summary": [],
+  "approval_review": {
+    "schema_version": "approval_review_v1",
+    "decision_ready_for_review": true,
+    "hard_constraints_satisfied": true,
+    "coverage_status": "FULL",
+    "exception_count": 0,
+    "assumption_count": 0,
+    "review_items": [],
+    "scheduled_ratio": null,
+    "expected_delivery_compliance": null,
+    "at_risk_count": null,
+    "late_count": null,
+    "pre_horizon_count": null
+  },
+  "selected_entity": null,
+  "selected_alternative_ids": [],
+  "selected_evidence_refs": [],
+  "context_hash": "b5b3721c915d34d49f4a0b9341f971866232bc359cea0f219871ec55b9b1cb0f"
+}

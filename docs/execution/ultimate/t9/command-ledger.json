@@ -1,0 +1,158 @@
+{
+  "phase": "T9",
+  "suites": [
+    {
+      "suite": "B-PY",
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "started_at": "2026-10-27T18:21:06.342897+00:00",
+      "finished_at": "2026-10-27T18:21:43.466452+00:00",
+      "seconds": 37.124,
+      "exit_code": 0
+    },
+    {
+      "suite": "B-NODE",
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "node",
+        "--test",
+        "--experimental-test-isolation=none",
+        "tests/test_*.js",
+        "tests/test_*.mjs"
+      ],
+      "started_at": "2026-10-27T18:23:04.187487+00:00",
+      "finished_at": "2026-10-27T18:23:04.531463+00:00",
+      "seconds": 0.343975658,
+      "exit_code": 0
+    },
+    {
+      "suite": "U9",
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "tests.test_day_scheduling_core",
+        "tests.test_day_result_package",
+        "-v"
+      ],
+      "started_at": "2026-10-27T18:21:43.468026+00:00",
+      "finished_at": "2026-10-27T18:21:48.953173+00:00",
+      "seconds": 5.485,
+      "exit_code": 0
+    },
+    {
+      "suite": "E9",
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "tests.e2e.test_ultimate_d2_lineage",
+        "-v"
+      ],
+      "started_at": "2026-10-27T18:21:48.954035+00:00",
+      "finished_at": "2026-10-27T18:23:19.253860+00:00",
+      "seconds": 90.3,
+      "exit_code": 0
+    },
+    {
+      "suite": "S8",
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "tests.integration.test_ultimate_publication",
+        "-v"
+      ],
+      "started_at": "2026-10-27T18:23:19.255604+00:00",
+      "finished_at": "2026-10-27T18:24:18.449576+00:00",
+      "seconds": 59.194,
+      "exit_code": 0
+    },
+    {
+      "suite": "E8",
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "tests.e2e.test_ultimate_d1_result",
+        "-v"
+      ],
+      "started_at": "2026-10-27T18:24:18.452309+00:00",
+      "finished_at": "2026-10-27T18:25:35.776132+00:00",
+      "seconds": 77.324,
+      "exit_code": 0
+    },
+    {
+      "suite": "L8",
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "tests.integration.test_ultimate_run_lineage",
+        "-v"
+      ],
+      "started_at": "2026-10-27T18:25:35.779796+00:00",
+      "finished_at": "2026-10-27T18:26:01.803692+00:00",
+      "seconds": 26.024,
+      "exit_code": 0
+    },
+    {
+      "suite": "D1-COMPAT",
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "/workspace/work/dation-t9/drivers/d1-compat.py"
+      ],
+      "started_at": "2026-10-27T18:26:01.805583+00:00",
+      "finished_at": "2026-10-27T18:26:05.085155+00:00",
+      "seconds": 3.28,
+      "exit_code": 0
+    },
+    {
+      "suite": "LEGACY",
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "/workspace/work/dation-t9/drivers/legacy-transition.py"
+      ],
+      "started_at": "2026-10-27T18:26:05.087291+00:00",
+      "finished_at": "2026-10-27T18:26:43.856298+00:00",
+      "seconds": 38.769,
+      "exit_code": 0
+    }
+  ],
+  "QA_driver": "evidence/drivers/qa.py",
+  "integrity_driver": "evidence/drivers/finalize.py",
+  "git_diff_check": "PASS",
+  "owned_advisors": "evidence/advisors-command.json",
+  "credentials_cleared": [
+    "SUPABASE_URL",
+    "SUPABASE_SECRET_KEY",
+    "SUPABASE_ACCESS_TOKEN",
+    "LLM_API_KEY",
+    "LLM_BASE_URL",
+    "GCP_ACCESS_TOKEN"
+  ],
+  "git_write_push_deploy_or_production_access": false
+}

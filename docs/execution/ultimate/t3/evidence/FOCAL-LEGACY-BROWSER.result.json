@@ -1,0 +1,26 @@
+{
+  "suite": "FOCAL-LEGACY-BROWSER",
+  "status": "PASS",
+  "tests": 3,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "started_at": "2026-10-26T18:12:27.092812+00:00",
+  "finished_at": "2026-10-26T18:12:44.296996+00:00",
+  "seconds": 17.204,
+  "cwd": "/workspace/Dation/backend",
+  "command": [
+    "/workspace/Dation/backend/.browser-venv/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "test_navigation.NavigationTests.test_new_decision_goes_to_empty_data_without_losing_existing_case",
+    "test_navigation.NavigationTests.test_approved_assignment_continues_directly_to_scheduling_configuration",
+    "test_navigation.NavigationTests.test_map_selector_switches_case_data_progress_url_and_restores_cancel_focus",
+    "-v"
+  ],
+  "exit_code": 0,
+  "production_credentials_cleared": true,
+  "PYTHONPATH": "tests/browser",
+  "log_sha256": "06eeae536b5bdaf958decacae598e0417cfb9c64013a1df6d067c248a98f6412"
+}

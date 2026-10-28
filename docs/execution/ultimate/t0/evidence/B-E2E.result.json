@@ -1,0 +1,178 @@
+{
+  "suite": "B-E2E",
+  "status": "FAIL",
+  "started_at": "2026-10-25T17:57:50.963008+00:00",
+  "finished_at": "2026-10-25T18:17:43.550908+00:00",
+  "command": [
+    "/workspace/Dation/.venv/bin/python",
+    "-B",
+    "tests/e2e/run_suite.py"
+  ],
+  "cwd": "/workspace/Dation/backend",
+  "exit_code": 1,
+  "tests": 83,
+  "failures_count": 29,
+  "skipped": 0,
+  "failures": [
+    {
+      "kind": "ERROR",
+      "test": "test_existing_steward_assignment_keeps_person_actor_and_version (test_optimized_responsibilities.DataRoleMigrationTests.test_existing_steward_assignment_keeps_person_actor_and_version)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_03_browser_real_home_case_events_and_exports (test_activity.ActivityTests.test_03_browser_real_home_case_events_and_exports)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_01_team_browser_invitation_acceptance_assignments_and_access (test_collaboration.CollaborationTests.test_01_team_browser_invitation_acceptance_assignments_and_access)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_02_assigned_approval_handoff_attribution_override_and_retry (test_collaboration.CollaborationTests.test_02_assigned_approval_handoff_attribution_override_and_retry)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_03_invitation_confirmation_expiry_revocation_recipient_and_idempotency (test_collaboration.CollaborationTests.test_03_invitation_confirmation_expiry_revocation_recipient_and_idempotency)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_04_last_admin_concurrency_and_assignment_races (test_collaboration.CollaborationTests.test_04_last_admin_concurrency_and_assignment_races)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_02_live_workflow_completion_review_lineage_history_and_read_purity (test_decision_center.DecisionCenterTests.test_02_live_workflow_completion_review_lineage_history_and_read_purity)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_04_portfolio_summary_is_global_actionable_and_read_only (test_decision_center.DecisionCenterTests.test_04_portfolio_summary_is_global_actionable_and_read_only)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_04_browser_first_run_empty_states_demo_and_recovery (test_onboarding.OnboardingTests.test_04_browser_first_run_empty_states_demo_and_recovery)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_legacy_assignment_projects_to_its_explicit_role_without_ambiguous_overwrite (test_optimized_responsibilities.OptimizedResponsibilityTests.test_legacy_assignment_projects_to_its_explicit_role_without_ambiguous_overwrite)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_split_roles_reload_independent_node_assignments_and_actual_approval (test_optimized_responsibilities.OptimizedResponsibilityTests.test_split_roles_reload_independent_node_assignments_and_actual_approval)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_09_home_attention_tracks_real_versions_and_removes_approved_or_archived (test_tenancy.TenancyTests.test_09_home_attention_tracks_real_versions_and_removes_approved_or_archived)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_11_real_browser_catalog_revocation_and_reenable (test_tenancy.TenancyTests.test_11_real_browser_catalog_revocation_and_reenable)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_approved_precedence_actual_actor_and_explicit_candidate_access (test_v2_foundation.FoundationDomainTests.test_approved_precedence_actual_actor_and_explicit_candidate_access)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_multi_responsibility_candidates_cas_and_legacy_compatibility (test_v2_foundation.FoundationDomainTests.test_multi_responsibility_candidates_cas_and_legacy_compatibility)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_stage_assignments_enforce_eligibility_and_keep_get_read_only (test_v2_foundation.FoundationDomainTests.test_stage_assignments_enforce_eligibility_and_keep_get_read_only)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_legacy_member_is_backfilled_without_rewriting_the_membership (test_v2_foundation.MigrationCompatibilityTests.test_legacy_member_is_backfilled_without_rewriting_the_membership)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_distinct_people_complete_the_golden_workflow_and_cross_surface_matrix (test_v2_golden.GoldenWorkflowTests.test_distinct_people_complete_the_golden_workflow_and_cross_surface_matrix)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_assignment_scheduling_and_replacement_update_history_and_compact_list (test_workflow.WorkflowTests.test_assignment_scheduling_and_replacement_update_history_and_compact_list)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_browser_complete_workflow_at_mobile_width (test_workflow.WorkflowTests.test_browser_complete_workflow_at_mobile_width)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_browser_creation_execution_approval_navigation_and_mobile_history (test_workflow.WorkflowTests.test_browser_creation_execution_approval_navigation_and_mobile_history)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_platform_auth_navigation_profile_and_logout (test_workflow.WorkflowTests.test_platform_auth_navigation_profile_and_logout)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_scheduling_dashboard_v21_preserves_assignment_and_temporal_relations (test_workflow.WorkflowTests.test_scheduling_dashboard_v21_preserves_assignment_and_temporal_relations)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_atomic_team_edit_keeps_multiple_roles_and_rolls_back_invalid_access (test_workflow_gates.WorkflowGateTests.test_atomic_team_edit_keeps_multiple_roles_and_rolls_back_invalid_access)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_d1_d2_gates_are_independent_and_assigned_approver_is_not_actual_actor (test_workflow_gates.WorkflowGateTests.test_d1_d2_gates_are_independent_and_assigned_approver_is_not_actual_actor)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_new_cases_require_data_owner_and_approver_but_replays_keep_their_result (test_workflow_gates.WorkflowGateTests.test_new_cases_require_data_owner_and_approver_but_replays_keep_their_result)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_role_loss_cross_workspace_forgery_and_policy_changes_do_not_bypass_gates (test_workflow_gates.WorkflowGateTests.test_role_loss_cross_workspace_forgery_and_policy_changes_do_not_bypass_gates)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_existing_case_is_unchanged_and_legacy_actions_remain_available (test_workflow_gates.WorkflowMigrationCompatibilityTests.test_existing_case_is_unchanged_and_legacy_actions_remain_available)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_02_admin_browser_preferences_free_plan_and_historical_evidence (test_workspace_settings.WorkspaceSettingsTests.test_02_admin_browser_preferences_free_plan_and_historical_evidence)"
+    }
+  ],
+  "wall_seconds": 1192.56,
+  "suite_reported_seconds": 1191.493,
+  "log_path": "docs/execution/ultimate/t0/evidence/B-E2E.log",
+  "log_sha256": "8ad873c8375cac7ecb576bb36f3da855c87845fe056b44e11706aca1adc62d04",
+  "production_credentials_cleared": true,
+  "docker_target": "local unix socket",
+  "sql_container": null,
+  "assertion_failures": 28,
+  "error_entries": 1,
+  "failure_entries": 29,
+  "failed_test_ids_unique": 29,
+  "failure_display_ids": [
+    "test_existing_steward_assignment_keeps_person_actor_and_version (test_optimized_responsibilities.DataRoleMigrationTests.test_existing_steward_assignment_keeps_person_actor_and_version)",
+    "test_03_browser_real_home_case_events_and_exports (test_activity.ActivityTests.test_03_browser_real_home_case_events_and_exports)",
+    "test_01_team_browser_invitation_acceptance_assignments_and_access (test_collaboration.CollaborationTests.test_01_team_browser_invitation_acceptance_assignments_and_access)",
+    "test_02_assigned_approval_handoff_attribution_override_and_retry (test_collaboration.CollaborationTests.test_02_assigned_approval_handoff_attribution_override_and_retry)",
+    "test_03_invitation_confirmation_expiry_revocation_recipient_and_idempotency (test_collaboration.CollaborationTests.test_03_invitation_confirmation_expiry_revocation_recipient_and_idempotency)",
+    "test_04_last_admin_concurrency_and_assignment_races (test_collaboration.CollaborationTests.test_04_last_admin_concurrency_and_assignment_races)",
+    "test_02_live_workflow_completion_review_lineage_history_and_read_purity (test_decision_center.DecisionCenterTests.test_02_live_workflow_completion_review_lineage_history_and_read_purity)",
+    "test_04_portfolio_summary_is_global_actionable_and_read_only (test_decision_center.DecisionCenterTests.test_04_portfolio_summary_is_global_actionable_and_read_only)",
+    "test_04_browser_first_run_empty_states_demo_and_recovery (test_onboarding.OnboardingTests.test_04_browser_first_run_empty_states_demo_and_recovery)",
+    "test_legacy_assignment_projects_to_its_explicit_role_without_ambiguous_overwrite (test_optimized_responsibilities.OptimizedResponsibilityTests.test_legacy_assignment_projects_to_its_explicit_role_without_ambiguous_overwrite)",
+    "test_split_roles_reload_independent_node_assignments_and_actual_approval (test_optimized_responsibilities.OptimizedResponsibilityTests.test_split_roles_reload_independent_node_assignments_and_actual_approval)",
+    "test_09_home_attention_tracks_real_versions_and_removes_approved_or_archived (test_tenancy.TenancyTests.test_09_home_attention_tracks_real_versions_and_removes_approved_or_archived)",
+    "test_11_real_browser_catalog_revocation_and_reenable (test_tenancy.TenancyTests.test_11_real_browser_catalog_revocation_and_reenable)",
+    "test_approved_precedence_actual_actor_and_explicit_candidate_access (test_v2_foundation.FoundationDomainTests.test_approved_precedence_actual_actor_and_explicit_candidate_access)",
+    "test_multi_responsibility_candidates_cas_and_legacy_compatibility (test_v2_foundation.FoundationDomainTests.test_multi_responsibility_candidates_cas_and_legacy_compatibility)",
+    "test_stage_assignments_enforce_eligibility_and_keep_get_read_only (test_v2_foundation.FoundationDomainTests.test_stage_assignments_enforce_eligibility_and_keep_get_read_only)",
+    "test_legacy_member_is_backfilled_without_rewriting_the_membership (test_v2_foundation.MigrationCompatibilityTests.test_legacy_member_is_backfilled_without_rewriting_the_membership)",
+    "test_distinct_people_complete_the_golden_workflow_and_cross_surface_matrix (test_v2_golden.GoldenWorkflowTests.test_distinct_people_complete_the_golden_workflow_and_cross_surface_matrix)",
+    "test_assignment_scheduling_and_replacement_update_history_and_compact_list (test_workflow.WorkflowTests.test_assignment_scheduling_and_replacement_update_history_and_compact_list)",
+    "test_browser_complete_workflow_at_mobile_width (test_workflow.WorkflowTests.test_browser_complete_workflow_at_mobile_width)",
+    "test_browser_creation_execution_approval_navigation_and_mobile_history (test_workflow.WorkflowTests.test_browser_creation_execution_approval_navigation_and_mobile_history)",
+    "test_platform_auth_navigation_profile_and_logout (test_workflow.WorkflowTests.test_platform_auth_navigation_profile_and_logout)",
+    "test_scheduling_dashboard_v21_preserves_assignment_and_temporal_relations (test_workflow.WorkflowTests.test_scheduling_dashboard_v21_preserves_assignment_and_temporal_relations)",
+    "test_atomic_team_edit_keeps_multiple_roles_and_rolls_back_invalid_access (test_workflow_gates.WorkflowGateTests.test_atomic_team_edit_keeps_multiple_roles_and_rolls_back_invalid_access)",
+    "test_d1_d2_gates_are_independent_and_assigned_approver_is_not_actual_actor (test_workflow_gates.WorkflowGateTests.test_d1_d2_gates_are_independent_and_assigned_approver_is_not_actual_actor)",
+    "test_new_cases_require_data_owner_and_approver_but_replays_keep_their_result (test_workflow_gates.WorkflowGateTests.test_new_cases_require_data_owner_and_approver_but_replays_keep_their_result)",
+    "test_role_loss_cross_workspace_forgery_and_policy_changes_do_not_bypass_gates (test_workflow_gates.WorkflowGateTests.test_role_loss_cross_workspace_forgery_and_policy_changes_do_not_bypass_gates)",
+    "test_existing_case_is_unchanged_and_legacy_actions_remain_available (test_workflow_gates.WorkflowMigrationCompatibilityTests.test_existing_case_is_unchanged_and_legacy_actions_remain_available)",
+    "test_02_admin_browser_preferences_free_plan_and_historical_evidence (test_workspace_settings.WorkspaceSettingsTests.test_02_admin_browser_preferences_free_plan_and_historical_evidence)"
+  ],
+  "failed_test_cases_unique": 29,
+  "passed_test_cases": 54
+}

@@ -1,0 +1,177 @@
+"""T0-R2: Home attention follows existing Owner authority, without granting it."""
+import unittest
+
+import httpx
+
+from auth_fixture import USER_A, USER_B, VIEWER, DISABLED
+from sandbox import Sandbox, REPO, wait_for
+from workflow_fixture import set_roles
+import test_workflow as workflow
+
+
+MIGRATION = REPO / 'supabase/migrations/20261026010000_home_decision_owner_attention.sql'
+
+
+class HomeOwnerAttentionTests(unittest.TestCase):
+    prepare_case_workflow = True
+    auto_assign_workflow = False
+    checked = workflow.WorkflowTests.checked
+    upload = workflow.WorkflowTests.upload
+    case = workflow.WorkflowTests.case
+    body = workflow.WorkflowTests.body
+    admit = workflow.WorkflowTests.admit
+    finish = workflow.WorkflowTests.finish
+    approve = workflow.WorkflowTests.approve
+
+    @classmethod
+    def setUpClass(cls):
+        cls.before_migration = {}
+
+        def capture_previous(sandbox, name):
+            if name == MIGRATION.name:
+                cls.before_migration['definition'] = sandbox.sql(
+                    "SELECT pg_get_functiondef('public.platform_home(uuid,uuid)'::regprocedure);")
+
+        cls.s = Sandbox(migration_hook=capture_previous).__enter__()
+        cls.addClassCleanup(cls.s.__exit__, None, None, None)
+
+    def setUp(self):
+        self.s.stop(self.s.worker)
+        self.s.sql('TRUNCATE datasets,decision_runs,decision_cases,decision_approval_events,audit_events CASCADE;')
+        self.s.sql(f"DELETE FROM dation_private.member_responsibilities WHERE workspace_id='{self.s.workspace_a}' AND user_id IN('{VIEWER}','{DISABLED}');")
+        self.s.sql(f"UPDATE workspace_members SET business_role=NULL,access_role=CASE WHEN user_id='{USER_A}' THEN 'admin' WHEN user_id='{VIEWER}' THEN 'viewer' ELSE 'operator' END,status=CASE WHEN user_id='{DISABLED}' THEN 'disabled' ELSE 'active' END WHERE workspace_id='{self.s.workspace_a}';")
+        self.a = self.s.api_client
+        set_roles(self.a, USER_A, ['data_owner', 'decision_owner'])
+
+    def client(self, uid):
+        client = httpx.Client(base_url=self.s.api_url,
+                              headers={'Authorization': 'Bearer ' + self.s.user_tokens[uid]},
+                              trust_env=False, timeout=30)
+        self.addCleanup(client.close)
+        return client
+
+    def operator(self):
+        member = next(m for m in self.checked(self.a.get('/api/platform/team'))['members']
+                      if m['user_id'] == DISABLED)
+        self.checked(self.a.patch('/api/platform/team/members/' + DISABLED, json={
+            'expected_updated_at': member['updated_at'], 'access_role': 'operator',
+            'status': 'active', 'business_roles': []}))
+        return self.client(DISABLED)
+
+    def assign(self, cid, node, uid):
+        snapshot = self.checked(self.a.get(f'/api/platform/decisions/{cid}/responsibilities'))
+        return self.checked(self.a.put(f'/api/platform/decisions/{cid}/responsibilities/{node}', json={
+            'expected_updated_at': snapshot['stages'][node]['updated_at'], 'owner_user_id': uid}))
+
+    def attention(self, client=None):
+        return self.checked((client or self.a).get('/api/platform/home'))['attention']
+
+    def approve_as(self, client, cid, rid):
+        return client.post('/api/runs/' + rid + '/approve',
+                           json={'case_id': cid, 'node_id': 'logistics_assignment'})
+
+    def test_fresh_schema_owner_nonowner_viewer_and_tenant_boundaries(self):
+        definition = self.s.sql("SELECT pg_get_functiondef('public.platform_home(uuid,uuid)'::regprocedure);")
+        self.assertIn('dation_private.case_collaboration', definition)
+        self.assertNotIn('a.approver_user_id', definition)
+        operator, viewer, other = self.operator(), self.client(VIEWER), self.client(USER_B)
+        cid, orders, fleet = self.case()
+        self.s.start_worker()
+        rid = self.admit(self.body(cid, orders, fleet))
+        self.finish(rid)
+        self.assertEqual(self.attention()['total'], 1)
+        self.assertEqual(self.attention()['items'][0]['run_id'], rid)
+        for client in (operator, viewer):
+            self.assertEqual(self.attention(client)['total'], 0)
+            self.assertEqual(self.approve_as(client, cid, rid).status_code, 403)
+        self.assertEqual(self.attention(other)['total'], 0)
+        self.assertEqual(other.get('/api/decision-cases/' + cid).status_code, 404)
+        self.assertEqual(self.approve_as(other, cid, rid).status_code, 404)
+        self.assertEqual(self.s.db.post('rpc/platform_home', json={
+            'target_workspace_id': self.s.workspace_a, 'actor_user_id': USER_B}).status_code, 403)
+        for credential in (self.s.anon_token, self.s.user_tokens[USER_A]):
+            self.assertIn(self.s.http.post(self.s.rest_url + '/rpc/platform_home',
+                headers={'Authorization': 'Bearer ' + credential}, json={
+                    'target_workspace_id': self.s.workspace_a, 'actor_user_id': USER_A}).status_code, (401, 403))
+        approved = self.checked(self.approve_as(self.a, cid, rid))
+        self.assertEqual(approved['approved_by_user_id'], USER_A)
+        self.assertEqual(self.attention()['total'], 0)
+
+    def test_operator_owner_admin_override_role_loss_and_handoff(self):
+        owner = self.operator()
+        set_roles(self.a, DISABLED, ['decision_owner'])
+        cid, orders, fleet = self.case()
+        self.assign(cid, 'logistics_assignment', DISABLED)
+        self.assign(cid, 'logistics_scheduling', DISABLED)
+        self.s.start_worker()
+        rid = self.admit(self.body(cid, orders, fleet))
+        self.finish(rid)
+        for client in (owner, self.a):
+            self.assertEqual(self.attention(client)['total'], 1)
+            collaboration = self.checked(client.get('/api/decision-cases/' + cid))['collaboration']
+            self.assertTrue(collaboration['logistics_assignment']['can_approve'])
+        set_roles(self.a, DISABLED, [])
+        for client in (owner, self.a):
+            self.assertEqual(self.attention(client)['total'], 0)
+            self.assertEqual(self.approve_as(client, cid, rid).status_code, 409)
+        set_roles(self.a, DISABLED, ['decision_owner'])
+        approved = self.checked(self.approve_as(owner, cid, rid))
+        self.assertEqual(approved['approved_by_user_id'], DISABLED)
+        self.assertEqual(self.attention(owner)['items'][0]['kind'], 'handoff')
+        self.assertEqual(self.attention()['total'], 0)
+        set_roles(self.a, DISABLED, [])
+        self.assertEqual(self.attention(owner)['total'], 0)
+        set_roles(self.a, DISABLED, ['decision_owner'])
+        replacement = self.admit(self.body(cid, orders, fleet))
+        self.finish(replacement)
+        self.assertEqual(self.attention(owner)['items'][0]['run_id'], replacement)
+        self.assertEqual(self.attention()['items'][0]['run_id'], replacement)
+        current = self.checked(self.approve_as(self.a, cid, replacement))
+        self.assertEqual(current['approved_by_user_id'], USER_A)
+        historical = self.checked(self.a.get('/api/runs/' + rid))
+        self.assertEqual(historical['approved_at'], approved['approved_at'])
+        self.assertEqual(historical['approved_by_user_id'], DISABLED)
+        self.assertTrue(historical['superseded_at'])
+
+    def test_upgrade_preserves_history_rows_function_identity_and_execute_acl(self):
+        # Recreate the exact pre-migration function captured during fresh rebuild,
+        # populate the previous schema through its real API, then upgrade it.
+        self.s.sql(self.before_migration['definition'])
+        self.addCleanup(lambda: self.s.sql(MIGRATION.read_text()))
+        unassigned = self.operator()
+        cid, orders, fleet = self.case()
+        self.s.start_worker()
+        previous = self.admit(self.body(cid, orders, fleet))
+        self.finish(previous)
+        self.approve(previous, cid)
+        current = self.admit(self.body(cid, orders, fleet))
+        self.finish(current)
+        wait_for(lambda: self.s.sql('SELECT count(*) FROM decision_case_reconciliations;') == '0',
+                 'reconciliation before migration comparison')
+        self.s.stop(self.s.worker)
+        # Warm the existing REST/function path and reproduce the old defect on
+        # persisted history before replacing the function in this live stack.
+        self.assertEqual(self.attention(unassigned)['total'], 1)
+
+        def rows():
+            tables = ['decision_cases', 'decision_runs', 'decision_approval_events',
+                      'audit_events', 'decision_assignments', 'datasets',
+                      'dation_private.workflow_stage_assignments']
+            return {table: self.s.sql(f"SELECT md5(coalesce(string_agg(to_jsonb(t)::text,'' ORDER BY to_jsonb(t)::text),'')) FROM {table} t;")
+                    for table in tables}
+
+        def function_metadata():
+            return self.s.sql("SELECT jsonb_build_object('oid',oid,'owner',proowner,'acl',proacl,'security_definer',prosecdef,'config',proconfig) FROM pg_proc WHERE oid='public.platform_home(uuid,uuid)'::regprocedure;")
+
+        before, acl = rows(), function_metadata()
+        self.s.sql(MIGRATION.read_text())
+        self.assertEqual(rows(), before)
+        self.assertEqual(function_metadata(), acl)
+        self.assertEqual(self.attention(unassigned)['total'], 0)
+        self.assertEqual(self.approve_as(unassigned, cid, current).status_code, 403)
+        self.assertEqual(self.s.sql("SELECT has_function_privilege('anon','public.platform_home(uuid,uuid)','EXECUTE') OR has_function_privilege('authenticated','public.platform_home(uuid,uuid)','EXECUTE');"), 'f')
+        self.assertEqual(self.s.sql("SELECT has_function_privilege('service_role','public.platform_home(uuid,uuid)','EXECUTE');"), 't')
+        self.assertEqual(self.attention()['items'][0]['run_id'], current)
+        historical = self.checked(self.a.get('/api/runs/' + previous))
+        self.assertTrue(historical['approved_at'] and historical['superseded_at'])
+        self.assertEqual(historical['approved_by_user_id'], USER_A)

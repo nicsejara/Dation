@@ -1,0 +1,216 @@
+{
+  "phase": "T5",
+  "baseline_head": "ef997235a30251fbf7ae53690ed738092ee973d8",
+  "comparison": "Immediate post-T4 checkpoint; HEAD only for previously clean files",
+  "source_files": 29,
+  "created": [
+    "backend/app/domain/logistics/definitions.py",
+    "backend/app/domain/logistics/graph.py",
+    "backend/app/domain/logistics/requirements.py",
+    "backend/app/platform/ultimate_graph_routes.py",
+    "backend/app/services/decision_graph_service.py",
+    "backend/app/static/css/ultimate-graph.css",
+    "backend/app/static/js/dispatch/cases/ultimate-decision-map.mjs",
+    "backend/app/static/js/dispatch/navigation/ultimate-graph.mjs",
+    "backend/tests/browser/test_ultimate_navigation.py",
+    "backend/tests/e2e/ultimate_graph_fixture.py",
+    "backend/tests/e2e/ultimate_graph_state.py",
+    "backend/tests/integration/test_ultimate_graph.py",
+    "backend/tests/test_ultimate_graph.py",
+    "backend/tests/test_ultimate_graph_navigation.mjs",
+    "supabase/migrations/20261027033128_ultimate_decision_graph.sql"
+  ],
+  "modified": [
+    "backend/app/platform/decision_center.py",
+    "backend/app/platform/home.py",
+    "backend/app/platform/routes.py",
+    "backend/app/platform/ultimate_routes.py",
+    "backend/app/static/js/dispatch/cases/decision-map.mjs",
+    "backend/app/static/js/dispatch/cases/ultimate-case-setup.mjs",
+    "backend/app/static/js/dispatch/navigation/case-flow.mjs",
+    "backend/app/static/js/dispatch/traceability-controller.mjs",
+    "backend/app/static/js/dispatch/traceability-ui.mjs",
+    "backend/app/static/js/dispatch/upload/ultimate-case-data.mjs",
+    "backend/app/static/js/dispatch/workspace.mjs",
+    "backend/app/static/js/platform/dda-navigation.mjs",
+    "backend/app/static/js/platform/decision-center.mjs",
+    "backend/tests/browser/test_ultimate_case_setup.py"
+  ],
+  "files": {
+    "backend/app/domain/logistics/definitions.py": {
+      "bytes": 3624,
+      "sha256": "022730dbeaa917c7a34b6df33a02d5f195857bb231691f9304f6c8bdde8b7c84",
+      "baseline_sha256": null,
+      "baseline": "new T5 file"
+    },
+    "backend/app/domain/logistics/graph.py": {
+      "bytes": 6557,
+      "sha256": "ed95b4cead5316e898b48b50251fdc68fbaa45d9f1516e67bc40ffc5a31359b6",
+      "baseline_sha256": null,
+      "baseline": "new T5 file"
+    },
+    "backend/app/domain/logistics/requirements.py": {
+      "bytes": 2583,
+      "sha256": "beee097eb8a8606d54ef092e6267899f903c5e2e83185a5acf4a81daea12cd60",
+      "baseline_sha256": null,
+      "baseline": "new T5 file"
+    },
+    "backend/app/platform/decision_center.py": {
+      "bytes": 7877,
+      "sha256": "c698e050224758d8d80f58d4810ef552530a0c943833ab58e00960f15fad383c",
+      "baseline_sha256": "38438c5fab3fb7db413adbcd2de6d63db00d32a668af79178f11993f4713c8c8",
+      "baseline": "post-T4 checkpoint"
+    },
+    "backend/app/platform/home.py": {
+      "bytes": 6544,
+      "sha256": "3d2ad1eb931dfd53bf840373e0da65fefbefdb98feb82cc98f0f2227dec1bac6",
+      "baseline_sha256": "155e76e05d973dd11df6de48302589c5dcab65dfd031c10b89e8b9e6e5fd157e",
+      "baseline": "post-T4 checkpoint"
+    },
+    "backend/app/platform/routes.py": {
+      "bytes": 2066,
+      "sha256": "5e4b4979f072c95c5ce14976bb087423b09d9e873bab9083cf91f6dea090481b",
+      "baseline_sha256": "4df6a3639ff68efb62ff9fff0d933379fc3ce207cec53f0fb84823ef7f439aa1",
+      "baseline": "post-T4 checkpoint"
+    },
+    "backend/app/platform/ultimate_graph_routes.py": {
+      "bytes": 1123,
+      "sha256": "87d6d93c6cac0efdd994fbb39b885e8f9c185d07cf5dca5b38e77a394382692f",
+      "baseline_sha256": null,
+      "baseline": "new T5 file"
+    },
+    "backend/app/platform/ultimate_routes.py": {
+      "bytes": 2454,
+      "sha256": "6fd82e06e5563d71e761d8fd84322a72e42380f9854ed41550273eb5e2894aa0",
+      "baseline_sha256": "9cf6b537c329ad623e65c09e5c5d44f853bd82cc24d4e5590360f9df6aaf0b32",
+      "baseline": "post-T4 checkpoint"
+    },
+    "backend/app/services/decision_graph_service.py": {
+      "bytes": 4220,
+      "sha256": "0cdac724845a340524c7715199986a43bb2b4e4a9b7f09204bd5fe26f827ce96",
+      "baseline_sha256": null,
+      "baseline": "new T5 file"
+    },
+    "backend/app/static/css/ultimate-graph.css": {
+      "bytes": 1299,
+      "sha256": "1437092c2bde8eb0c3977e4c4770a5bc51fd9cda2232937e8343b8c931d23d32",
+      "baseline_sha256": null,
+      "baseline": "new T5 file"
+    },
+    "backend/app/static/js/dispatch/cases/decision-map.mjs": {
+      "bytes": 22502,
+      "sha256": "83663a32b823699d9b8f1908de27cc8b2434df5ef45ae4b9d94adf52e533159b",
+      "baseline_sha256": "951a942ad0f37eaba74f9976fb73d8516bf151ea587ab19b9c557d68423fe4d4",
+      "baseline": "HEAD"
+    },
+    "backend/app/static/js/dispatch/cases/ultimate-case-setup.mjs": {
+      "bytes": 13938,
+      "sha256": "bd8156ae07b756cc0f147aaaecd68a15da5a0b35c18fa4d1ea49516bcba83b24",
+      "baseline_sha256": "be54da8bb9bfce52664fca0db37a2671675e00a7bc41789b04df485d50d56f35",
+      "baseline": "post-T4 checkpoint"
+    },
+    "backend/app/static/js/dispatch/cases/ultimate-decision-map.mjs": {
+      "bytes": 9890,
+      "sha256": "3eb329eb7950daf40edbde9a46933ff4378fcf6478fbb9d8073367b1fd8d7799",
+      "baseline_sha256": null,
+      "baseline": "new T5 file"
+    },
+    "backend/app/static/js/dispatch/navigation/case-flow.mjs": {
+      "bytes": 5467,
+      "sha256": "242708a3c33c9cde5cb8a40cf37fe449f912664731d0204a7e92b2e5cd286c84",
+      "baseline_sha256": "aa16ebf730fd6c040ae50517bde950c789f0656fbaad7663a6a8a9315dd14b79",
+      "baseline": "HEAD"
+    },
+    "backend/app/static/js/dispatch/navigation/ultimate-graph.mjs": {
+      "bytes": 1837,
+      "sha256": "d248a00c7208f0a5098f5c8cec0bfe2f3e981afa521ed1cab290c65532184f3f",
+      "baseline_sha256": null,
+      "baseline": "new T5 file"
+    },
+    "backend/app/static/js/dispatch/traceability-controller.mjs": {
+      "bytes": 4405,
+      "sha256": "4c524b11938a41f7a37688dc79f2b822e96dbc109cecdf8b3e0acde330c1d27f",
+      "baseline_sha256": "297936f0f304ad41560baf0b3ccab0ddd0e02ca98dd658ff11f6d321b77ca35a",
+      "baseline": "HEAD"
+    },
+    "backend/app/static/js/dispatch/traceability-ui.mjs": {
+      "bytes": 13852,
+      "sha256": "e8953e0d1fcc8bc52d0b1575fb16e96b2553aa677e48d19b7b9c18a6bff9c237",
+      "baseline_sha256": "dd38dc4b0aebf604e300c7df757461b0de9a569ded99c6a34ad4055a6eaa1741",
+      "baseline": "HEAD"
+    },
+    "backend/app/static/js/dispatch/upload/ultimate-case-data.mjs": {
+      "bytes": 21496,
+      "sha256": "7fef0f06f45d47f0f106d2ef2050ae4e347801362fcce510d7da4caea235d063",
+      "baseline_sha256": "92e345f2585e97d7867d7eed55bb48293982ead895f7f24a6bd096201a30b4bf",
+      "baseline": "post-T4 checkpoint"
+    },
+    "backend/app/static/js/dispatch/workspace.mjs": {
+      "bytes": 54138,
+      "sha256": "176d97552f4b5d3c1fe496b0b231d82cb24638e6c8dd9ad840002e465e7ffbfd",
+      "baseline_sha256": "5c372aedddba984a1cc64992029c659a9e0e7fb3bf7e10051f03e7326df9ad4c",
+      "baseline": "post-T4 checkpoint"
+    },
+    "backend/app/static/js/platform/dda-navigation.mjs": {
+      "bytes": 3387,
+      "sha256": "30954af3d3e5d5a2f4f7f7552cce96570b4e4e1fa7f313a8616bb1a36b4d1530",
+      "baseline_sha256": "eba5c4248673a97a6662ea84c2bd63e2afb6fe6cfcaa549fc941f13b29c1f904",
+      "baseline": "post-T4 checkpoint"
+    },
+    "backend/app/static/js/platform/decision-center.mjs": {
+      "bytes": 29860,
+      "sha256": "0184917edbee915d8f3aa3830da2fa178710059c45d3ee30cc7c821fae32c5f1",
+      "baseline_sha256": "38ba7ec4911cee9b8cb3771075736fb034cb489501fd9e1f1741a25cf6b4cf81",
+      "baseline": "HEAD"
+    },
+    "backend/tests/browser/test_ultimate_case_setup.py": {
+      "bytes": 22621,
+      "sha256": "22ab44c0bb1d2249c666448ddf69d4d02f6203b14cf3751f176a9b76c45b4c6b",
+      "baseline_sha256": "53123eed6a103f9ccdcfa0902fb331f753896163f856b7712d98e96c319488c5",
+      "baseline": "post-T4 checkpoint"
+    },
+    "backend/tests/browser/test_ultimate_navigation.py": {
+      "bytes": 18497,
+      "sha256": "dcd5a0f0db8461b3e5433de7cbec8d1dda7c1e83c751bb495b6d5d5faa9e7dfd",
+      "baseline_sha256": null,
+      "baseline": "new T5 file"
+    },
+    "backend/tests/e2e/ultimate_graph_fixture.py": {
+      "bytes": 641,
+      "sha256": "4ece268821f36a254bb3aecc584c042aa5c4270c14415db7539ff228e61b381a",
+      "baseline_sha256": null,
+      "baseline": "new T5 file"
+    },
+    "backend/tests/e2e/ultimate_graph_state.py": {
+      "bytes": 5133,
+      "sha256": "6516d15cf1c9c19a2d73b0aa18bd0f21fd427e49ca2026f409ab2ca928e65d64",
+      "baseline_sha256": null,
+      "baseline": "new T5 file"
+    },
+    "backend/tests/integration/test_ultimate_graph.py": {
+      "bytes": 12130,
+      "sha256": "1619e56b83b0ae457739abf890e52ff4eef2efe25fa352aa8f283cde47c885a4",
+      "baseline_sha256": null,
+      "baseline": "new T5 file"
+    },
+    "backend/tests/test_ultimate_graph.py": {
+      "bytes": 8992,
+      "sha256": "5a54b72e9ed5379de2cdb21fa184b292b08d79c57fd35def261fcc4371a31fc6",
+      "baseline_sha256": null,
+      "baseline": "new T5 file"
+    },
+    "backend/tests/test_ultimate_graph_navigation.mjs": {
+      "bytes": 2013,
+      "sha256": "ce765fe10c1b8fc85fbdb79ec7e69fd52c436d93ce53f4734d3725fe74587ec7",
+      "baseline_sha256": null,
+      "baseline": "new T5 file"
+    },
+    "supabase/migrations/20261027033128_ultimate_decision_graph.sql": {
+      "bytes": 9039,
+      "sha256": "972b897b4243b43609d8153d8b0e08f9fc04479f6b871eb9b2aa8ec906f36c2f",
+      "baseline_sha256": null,
+      "baseline": "new T5 file"
+    }
+  },
+  "no_global_tokens_assets_engine_or_infrastructure_changes": true
+}

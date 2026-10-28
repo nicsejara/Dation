@@ -1,0 +1,26 @@
+{
+  "suite": "S2",
+  "status": "PASS",
+  "tests": 26,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "started_at": "2026-10-26T14:56:45.255413+00:00",
+  "finished_at": "2026-10-26T14:57:09.628515+00:00",
+  "seconds": 24.373,
+  "cwd": "/workspace/Dation/backend",
+  "command": [
+    "/workspace/Dation/.venv/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "test_ultimate_schema",
+    "-v"
+  ],
+  "exit_code": 0,
+  "production_credentials_cleared": true,
+  "container": "dation-t2-20261026-ultimate",
+  "PYTHONPATH": "tests/integration",
+  "log_path": "/workspace/work/dation-t2/S2.log",
+  "log_sha256": "1aec5d66e5728a13e71809e726368f762ed395c040345a391e545db36e795f78"
+}

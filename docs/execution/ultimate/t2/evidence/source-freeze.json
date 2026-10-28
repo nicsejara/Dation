@@ -1,0 +1,18 @@
+{
+  "phase": "T2",
+  "frozen_at": "2026-10-26T14:54:05.481605+00:00",
+  "head": "ef997235a30251fbf7ae53690ed738092ee973d8",
+  "post_T1_files_preserved": 343,
+  "files": {
+    "backend/app/domain/decision_cases.py": "10e03efd6e373af6ef0983142021b7150405b4731b4cdb4a5adb903ff908eef2",
+    "backend/app/services/decision_case_service.py": "2cb8e73b5ea6686054153ef206a9a20a8d761536b41d88f7cb6862943e5aae4b",
+    "backend/app/platform/repository.py": "5a01de9f19060b6be879172887835ea05cfcbef9786e766ca6391e1da9520a6c",
+    "backend/app/platform/home.py": "85fa4ec8883a8c48329f9aeff04aa2f2b8f6df1ea1c325255b1c1d040a301d1d",
+    "backend/app/platform/decision_center.py": "38438c5fab3fb7db413adbcd2de6d63db00d32a668af79178f11993f4713c8c8",
+    "backend/tests/test_ultimate_readers.py": "10a9788dd465acd81b7c1d22071659942a00d1003288d649aabbe107aa8938bd",
+    "backend/tests/integration/ultimate_sql_support.py": "13c6e50aa13c4e5aae96e145908279ff42cdeb10831f7c47388ee4c3f0a6ff8f",
+    "backend/tests/integration/test_ultimate_schema.py": "881585a31de3d2951e6f374872e0e71b8bdeebbcabeab6d2d0b807b9e3330ead",
+    "supabase/migrations/20261026143813_ultimate_foundation.sql": "fda2b4510a929c0f5d975a9278eb6fb60a7cb71c2bf3a3f22a43baeb00d9c8c6",
+    "supabase/migrations/20261026144259_ultimate_result_artifacts.sql": "ec096a6e51f5c44e918bad8c4258c61aa14376a7e673bc61d68496a7cea5c66f"
+  }
+}

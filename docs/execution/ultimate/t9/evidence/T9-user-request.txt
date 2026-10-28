@@ -1,0 +1,1042 @@
+T8 queda formalmente aprobado:
+
+# GO — T8 COMPLETADO
+
+Reporte oficial:
+
+`docs/execution/ultimate/t8/t8-execution-report.md`
+
+Autorizo exclusivamente:
+
+# T9 — D2 DAY SCHEDULING + ENGINE EVIDENCE + RESULT ASSEMBLER D2
+
+Usá como hoja de ruta:
+
+`DATION_FINAL_MASTER_EXECUTION_PLAN.md`
+
+y como baseline inmediato:
+
+`docs/execution/ultimate/t8/t8-execution-report.md`
+
+NO ejecutes T10.
+
+---
+
+# REGLA DE EFICIENCIA
+
+NO realices una nueva auditoría end-to-end.
+
+T0–T8 constituyen el baseline validado.
+
+Inspeccioná únicamente:
+
+- D1 approved result contract;
+- exact upstream fingerprint;
+- TransitEstimator T1;
+- shared feasibility kernel T6;
+- scheduling runtime legacy sólo como referencia de convivencia;
+- nuevos módulos D2;
+- Result Assembler/projections compartidos;
+- result publication T8;
+- tests T9.
+
+Expandí la inspección únicamente ante una incompatibilidad concreta.
+
+---
+
+# OBJETIVO
+
+Implementar:
+
+# D2 — DAY SCHEDULING
+
+Pregunta:
+
+> ¿Qué día debe salir cada viaje para cumplir compromisos de entrega respetando disponibilidad y reutilización de recursos?
+
+Input fundamental:
+
+```text
+Approved D1 Transport Plan
++
+exact D1 result_fingerprint
++
+Case Horizon
++
+Transit Model
++
+Resource availability/reuse
+```
+
+Output:
+
+```text
+Fixed D1 Trips
++
+Dispatch Date
++
+Expected Arrival
++
+OWN occupancy / available again
++
+Service status
++
+Schedule Margin
+```
+
+---
+
+# 1. D1 ES INMUTABLE PARA D2
+
+D2 debe preservar exactamente:
+
+- Trip ID;
+- Order IDs;
+- allocations;
+- fractions;
+- loads;
+- origin;
+- destination;
+- distance;
+- Resource ID;
+- Resource Source.
+
+D2 NO puede:
+
+- reasignar Orders;
+- cambiar Resource;
+- consolidar nuevamente;
+- dividir nuevamente;
+- crear Trips diferentes;
+- eliminar Trips para mejorar KPIs.
+
+Regla:
+
+```text
+D1 decides WHAT
+D2 decides WHEN
+```
+
+---
+
+# 2. UPSTREAM EXACTO
+
+D2 sólo puede consumir:
+
+```text
+approved D1 Run
++
+exact result_fingerprint
+```
+
+No:
+
+- latest Run;
+- latest completed;
+- current UI selection;
+- result reconstruido desde el Case actual.
+
+Persistir/validar:
+
+```text
+source_transport_plan.run_id
+source_transport_plan.result_fingerprint
+```
+
+---
+
+# 3. GRANULARIDAD
+
+MVP:
+
+# DAY
+
+No scheduling horario.
+
+No timestamps operativos.
+
+No docks.
+
+No turnos.
+
+No drivers.
+
+No patentes.
+
+No routing.
+
+---
+
+# 4. TRANSIT
+
+Reutilizar exclusivamente el TransitEstimator T1.
+
+```text
+outbound_days = ceil(distance_km / 500)
+
+OWN:
+cycle_days = ceil((distance_km * 2) / 500)
+
+EXTERNAL:
+cycle_days = null
+```
+
+Arrival inclusiva:
+
+```text
+expected_arrival =
+dispatch_date + outbound_days - 1
+```
+
+OWN:
+
+```text
+available_again =
+dispatch_date + cycle_days
+```
+
+Intervalo de ocupación:
+
+```text
+[dispatch_date, available_again)
+```
+
+No duplicar fórmulas en D2.
+
+---
+
+# 5. FEASIBLE DISPATCH WINDOW
+
+Para cada Trip construir determinísticamente su ventana.
+
+Conceptualmente:
+
+```text
+earliest =
+max(
+    trip ready date,
+    planning_start,
+    resource availability
+)
+```
+
+Latest por due date:
+
+```text
+latest_due =
+delivery_due_date - (outbound_days - 1)
+```
+
+y:
+
+```text
+latest =
+min(
+    planning_end,
+    latest_due,
+    other certified restrictions
+)
+```
+
+No recalcular ready/due desde raw CSV.
+
+Usar facts aprobados de D1/contexto congelado.
+
+---
+
+# 6. HORIZON
+
+El horizonte limita:
+
+# DISPATCH DATE
+
+Debe cumplirse:
+
+```text
+planning_start
+<= dispatch_date
+<= planning_end
+```
+
+Arrival puede ocurrir después de `planning_end`.
+
+Ejemplo aprobado:
+
+```text
+dispatch: 8 Nov
+arrival: 10 Nov
+planning_end: 8 Nov
+```
+
+puede ser válido.
+
+No cortar arrival al final del horizonte.
+
+---
+
+# 7. PRE-HORIZON
+
+Si para cumplir el due date el Trip debería haber salido antes de `planning_start`:
+
+```text
+PRE_HORIZON_DISPATCH_REQUIRED
+```
+
+Ejemplo:
+
+```text
+latest_due < planning_start
+```
+
+No esconderlo como LATE.
+
+No inventar una salida dentro del horizonte para aparentar cumplimiento.
+
+---
+
+# 8. OWN RESOURCES
+
+OWN debe respetar:
+
+```text
+units_available
+```
+
+y reutilización temporal.
+
+Una unidad no puede participar en dos ciclos superpuestos.
+
+Para grupos:
+
+- utilizar capacidad equivalente a `units_available`;
+- usar NoOverlap/Cumulative/slots internos según arquitectura aprobada;
+- mantener el mismo `resource_id` de D1.
+
+Un slot interno NO se convierte en nueva patente ni en nueva resource assignment.
+
+---
+
+# 9. EXTERNAL RESOURCES
+
+External:
+
+- dispatch;
+- expected arrival.
+
+Pero:
+
+```text
+cycle_days = null
+busy_until = null
+available_again = null
+```
+
+No modelar retorno ficticio.
+
+No bloquear el recurso por viaje de regreso.
+
+Respetar, donde corresponda, la oferta/servicios ya certificada por D1.
+
+---
+
+# 10. SHARED FEASIBILITY KERNEL
+
+Reutilizar el kernel desarrollado en T6.
+
+No implementar otro modelo diferente de factibilidad.
+
+La frontera:
+
+```text
+T6/D1:
+fixed trips are temporally feasible
+
+T9/D2:
+choose exact feasible dispatch days
+```
+
+Si T9 descubre que T6 certificó algo imposible:
+
+STOP.
+
+No modificar silenciosamente los Trips para solucionar la inconsistencia.
+
+---
+
+# 11. SERVICE STATUS
+
+Implementar exactamente:
+
+```text
+margin > 0
+→ ON_TIME
+
+margin = 0
+→ AT_RISK
+
+margin < 0
+→ LATE
+```
+
+con:
+
+```text
+schedule_margin_days =
+delivery_due_date - expected_arrival_date
+```
+
+en días calendario.
+
+Además:
+
+```text
+PRE_HORIZON_DISPATCH_REQUIRED
+UNSCHEDULED
+```
+
+como estados explícitos cuando correspondan.
+
+---
+
+# 12. LATE
+
+No programar tarde silenciosamente si hard constraints no lo permiten.
+
+Si existe una policy que permita lateness explícita, debe estar certificada.
+
+Por defecto:
+
+Trip no programable respetando constraints:
+
+→ UNSCHEDULED / feasibility result correspondiente.
+
+No mover el due date.
+
+---
+
+# 13. ALL D1 TRIPS MUST REMAIN
+
+`schedule.trips` debe conservar todos los Trips aprobados de D1.
+
+Incluso:
+
+- UNSCHEDULED;
+- PRE_HORIZON;
+- infeasible dentro del horizonte.
+
+No eliminar Trips para que:
+
+```text
+scheduled_ratio
+```
+
+parezca mejor.
+
+---
+
+# 14. D2 CORE RESULT
+
+Producir `DayScheduleCoreV1`.
+
+Por Trip, como mínimo:
+
+- trip_id;
+- resource_id;
+- resource_source;
+- ready date;
+- dispatch date;
+- expected arrival date;
+- delivery due date;
+- outbound_days;
+- cycle_days si OWN;
+- occupancy/busy interval si OWN;
+- available_again si OWN;
+- schedule_margin_days;
+- status;
+- reason refs.
+
+Además conservar refs/facts D1 necesarios.
+
+---
+
+# 15. D2 ENGINE EVIDENCE
+
+Emitir facts estructurados.
+
+Reason codes mínimos según catálogo:
+
+```text
+SCHEDULED_WITHIN_FEASIBLE_WINDOW
+SCHEDULED_EARLIEST_FEASIBLE
+SCHEDULED_TO_PROTECT_DUE_DATE
+DELAYED_BY_READY_DATE
+DELAYED_BY_RESOURCE_OCCUPANCY
+ZERO_MARGIN
+PRE_HORIZON_DISPATCH_REQUIRED
+NO_FEASIBLE_DISPATCH_DAY
+RESOURCE_CAPACITY_CONFLICT
+UNSCHEDULED
+```
+
+No emitir causalidad sin evidencia.
+
+---
+
+# 16. CERTIFIED METRICS
+
+Como mínimo:
+
+- total_trips;
+- scheduled_trips;
+- scheduled_ratio;
+- ON_TIME count;
+- AT_RISK count;
+- LATE count;
+- PRE_HORIZON count;
+- UNSCHEDULED count;
+- expected delivery compliance;
+- average schedule margin;
+- peak dispatch day;
+- exception count.
+
+Mantener la semántica congelada:
+
+```text
+expected delivery compliance =
+(ON_TIME + AT_RISK) / total_trips
+```
+
+Strict ON_TIME debe mantenerse separado.
+
+No confundir ambos.
+
+---
+
+# 17. AVERAGE MARGIN
+
+Promedio sólo sobre Trips con margin conocido.
+
+No convertir margin NULL a cero.
+
+Denominador explícito.
+
+---
+
+# 18. PEAK DISPATCH DAY
+
+Calcular backend/certifier.
+
+En empate:
+
+usar regla determinística estable, por ejemplo fecha más temprana según contrato T1/T9.
+
+Frontend no debe decidir el empate.
+
+---
+
+# 19. D2 RESULT ASSEMBLER
+
+Reutilizar el mismo boundary `app/results/`.
+
+NO crear otro sistema paralelo.
+
+Construir:
+
+```text
+day_scheduling_v1
+```
+
+desde:
+
+```text
+DayScheduleCore
++
+Engine Evidence
++
+Frozen Context
++
+Approved D1 fingerprint
+```
+
+Assembler no puede cambiar fechas ni resolver conflictos.
+
+---
+
+# 20. DAY GANTT PROJECTION
+
+Producir backend projection:
+
+```text
+Resource
+×
+Day
+×
+Trip
+```
+
+Rows:
+
+- resource_id;
+- source.
+
+Items:
+
+- Trip ID;
+- dispatch;
+- arrival;
+- status;
+- occupancy start/end para OWN;
+- lane/subtrack si el backend lo requiere.
+
+Frontend T10 sólo renderizará.
+
+No calcular en JS:
+
+- outbound days;
+- cycles;
+- occupancy;
+- margin;
+- dispatch.
+
+---
+
+# 21. OWN GANTT
+
+OWN debe mostrar ocupación del ciclo.
+
+Si arrival/return supera horizon:
+
+conservar dato completo.
+
+No truncarlo matemáticamente.
+
+Viewport puede limitar visualización, pero el dataset conserva fechas reales.
+
+---
+
+# 22. EXTERNAL GANTT
+
+External muestra:
+
+- dispatch;
+- arrival.
+
+NO barra de retorno OWN.
+
+NO occupancy ficticia posterior.
+
+---
+
+# 23. DETAILED ANALYSIS DATASETS
+
+Construir:
+
+```text
+Schedule
+Trips
+Resources
+Service
+Exceptions
+Evidence
+```
+
+## Schedule
+Trip/resource/ready/dispatch/arrival/due/margin/status.
+
+## Trips
+D1 immutable facts + D2 timing.
+
+## Resources
+OWN occupancy / EXTERNAL dispatch usage.
+
+## Service
+Ordenado por menor margin primero.
+
+## Exceptions
+Pre-horizon, unscheduled, at-risk, etc.
+
+## Evidence
+Schedule window, selected date, blocking occupancy, constraints/reasons.
+
+No nueva matemática en consumers.
+
+---
+
+# 24. APPROVAL REVIEW D2
+
+Construir determinísticamente:
+
+- scheduled ratio;
+- expected compliance;
+- ON_TIME;
+- AT_RISK;
+- LATE;
+- PRE_HORIZON;
+- UNSCHEDULED;
+- hard constraints;
+- exceptions;
+- assumptions;
+- review items.
+
+Mantener:
+
+```text
+decision_ready_for_review
+≠
+approval_allowed
+```
+
+El overlay actual sigue siendo responsabilidad T8/backend.
+
+---
+
+# 25. EXPORT
+
+Preparar:
+
+```text
+Day_Schedule.csv
+```
+
+Una fila por Trip D1.
+
+También debe incluir filas:
+
+- UNSCHEDULED;
+- PRE_HORIZON.
+
+No omitirlas.
+
+No crear nuevas allocations.
+
+---
+
+# 26. DECISION CONTEXT
+
+Extender/reutilizar:
+
+```text
+decision_context_v1
+```
+
+para D2.
+
+Debe incluir:
+
+- source D1 Run/fingerprint;
+- schedule summary;
+- service metrics;
+- exceptions;
+- assumptions;
+- evidence;
+- review.
+
+No LLM real todavía.
+
+---
+
+# 27. RESULT FINGERPRINT
+
+D2 debe incluir:
+
+```text
+upstream_result_fingerprint
+```
+
+como parte del contexto/fingerprint aprobado.
+
+D2 B creada desde D1 A:
+
+siempre queda ligada a D1 A.
+
+No actualizar posteriormente a D1 B por “latest”.
+
+---
+
+# 28. PUBLICATION
+
+Reutilizar exactamente el pipeline T8:
+
+```text
+Engine
+→ Core/Evidence
+→ Assembler
+→ Artifacts
+→ atomic publication
+```
+
+No crear un segundo mecanismo para D2.
+
+---
+
+# 29. DECISION GRAPH
+
+Después de D1 APPROVED y runtime D2 implementado:
+
+T5 puede ahora proyectar honestamente:
+
+```text
+D2 READY
+runtime_available = true
+```
+
+cuando corresponda.
+
+No modificar sus requirements para requerir CSV extra estándar.
+
+---
+
+# 30. FIXTURES PRIORITARIAS
+
+Usar especialmente:
+
+## H
+External 1150 km.
+
+Expected:
+
+```text
+outbound = 3
+cycle = null
+```
+
+## I
+2 Trips OWN 480 km, 1 unit:
+
+```text
+dispatch 2 / 4
+available_again 4 / 6
+```
+
+## J
+Dispatch último día del horizon y arrival posterior.
+
+## K
+PRE_HORIZON.
+
+## L
+3 Trips OWN 480 km:
+
+1 unit:
+
+```text
+2 / 4 / 6
+```
+
+2 units:
+
+```text
+2 / 2 / 4
+```
+
+más R9–R13.
+
+---
+
+# 31. R9–R13
+
+Validar:
+
+### R9
+Core / Gantt / Service / CSV / context usan fechas idénticas.
+
+### R10
+dispatch=arrival visible; OWN end exclusive; EXTERNAL sin retorno.
+
+### R11
+PRE_HORIZON, UNSCHEDULED y LATE distintos.
+
+### R12
+6 ON_TIME + 2 AT_RISK:
+
+expected compliance = 100%
+
+pero strict ON_TIME = 6/8.
+
+### R13
+OWN group con 2 units nunca excede simultaneidad 2.
+
+---
+
+# 32. LEGACY
+
+Preservar:
+
+- scheduling_v1;
+- calendarios legacy;
+- helpers históricos;
+- assignment legacy;
+- Runs;
+- approvals;
+- routes.
+
+No migrar resultados históricos a D2 v2.
+
+---
+
+# 33. PROHIBIDO
+
+NO ejecutar T10.
+
+NO modificar D1 assignments.
+
+NO implementar horas.
+
+NO crear patentes/drivers.
+
+NO implementar routing.
+
+NO generar dashboard final.
+
+NO conectar Copilot real.
+
+NO recalcular fechas en frontend.
+
+NO crear otro publication pipeline.
+
+NO deploy.
+
+NO producción.
+
+NO push.
+
+NO refactor transversal.
+
+---
+
+# 34. SKILLS
+
+Aplicá Execution Skills Policy.
+
+Utilizá sólo Skills pertinentes a:
+
+- Python;
+- scheduling/optimization;
+- backend;
+- testing.
+
+No usar Skills UI salvo necesidad estricta.
+
+---
+
+# 35. TESTING
+
+Ejecutá:
+
+- B-PY
+- B-NODE
+- U9
+- E9
+
+más focales necesarias.
+
+Si publication/lineage T8 se modifica, ejecutar las regresiones focales correspondientes.
+
+No repetir suites amplias no afectadas por rutina.
+
+---
+
+# 36. E9 LINEAGE
+
+Probar explícitamente:
+
+```text
+D1 A approved
+→ D2 A
+
+D1 A remains approved
+→ new D2 B
+```
+
+Ambas:
+
+```text
+source = D1 A
+```
+
+Luego:
+
+```text
+D1 B approved
+→ D2 C
+```
+
+D2 C:
+
+```text
+source = D1 B
+```
+
+D2 A/B nunca cambian de upstream histórico.
+
+---
+
+# 37. STOP CONDITIONS
+
+STOP si:
+
+- D2 reasigna Orders;
+- D2 cambia Resources;
+- D2 cambia load/fractions;
+- Trip IDs desaparecen;
+- frontend/assembler calcula fechas;
+- Transit se duplica;
+- external obtiene return cycle;
+- own reuse ocurre antes de available_again;
+- PRE_HORIZON se mezcla con LATE;
+- UNSCHEDULED Trip se elimina;
+- Gantt difiere del Core;
+- D2 usa otro D1 fingerprint;
+- latest reemplaza upstream histórico;
+- T9 necesita T10 para certificar sus resultados.
+
+---
+
+# 38. REPORTING
+
+Crear:
+
+`docs/execution/ultimate/t9/t9-execution-report.md`
+
+Incluir:
+
+- baseline T8;
+- checkpoint;
+- Skills;
+- files created/modified;
+- Upstream D1 binding;
+- Scheduling Core;
+- Feasible windows;
+- Transit;
+- OWN reuse;
+- EXTERNAL semantics;
+- status/margin;
+- Engine Evidence;
+- Metrics;
+- Result Assembler;
+- day_scheduling_v1;
+- Gantt projection;
+- Detailed Analysis datasets;
+- Approval Review;
+- Export;
+- Decision Context;
+- Publication integration;
+- Lineage;
+- Fixtures/oracles;
+- tests;
+- legacy compatibility;
+- deviations;
+- risks;
+- gate evaluation.
+
+Finalizar únicamente con:
+
+**GO — T9 completado. T10 puede ser solicitado.**
+
+o
+
+**STOP — T9 no cumple condiciones para autorizar T10.**
+
+Aunque resulte GO:
+
+# NO EJECUTES T10.

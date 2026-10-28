@@ -1,0 +1,25 @@
+{
+  "phase": "T2",
+  "baseline_head": "ef997235a30251fbf7ae53690ed738092ee973d8",
+  "baseline_files_preserved": 343,
+  "files_modified": [
+    "backend/app/domain/decision_cases.py",
+    "backend/app/services/decision_case_service.py",
+    "backend/app/platform/repository.py",
+    "backend/app/platform/home.py",
+    "backend/app/platform/decision_center.py"
+  ],
+  "files_created": [
+    "backend/tests/test_ultimate_readers.py",
+    "backend/tests/integration/ultimate_sql_support.py",
+    "backend/tests/integration/test_ultimate_schema.py",
+    "supabase/migrations/20261026143813_ultimate_foundation.sql",
+    "supabase/migrations/20261026144259_ultimate_result_artifacts.sql"
+  ],
+  "change_patch_sha256": "2bfda25252fb0814eb31fb0c248871aac51f6ff205d8223b2411c4ad93ce36e1",
+  "no_new_UI_or_engine_changes": true,
+  "no_T3": true,
+  "no_commit": true,
+  "no_push": true,
+  "no_remote_writes": true
+}

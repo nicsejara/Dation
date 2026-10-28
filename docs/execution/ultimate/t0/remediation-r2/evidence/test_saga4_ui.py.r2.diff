@@ -1,0 +1,12 @@
+--- backend/tests/browser/test_saga4_ui.py (R1 end)
++++ backend/tests/browser/test_saga4_ui.py (R2)
+@@ -22,7 +22,8 @@
+         await self.b.open('logistics-config',node)
+         context=self.page.locator('#dispatch-config-root [data-config-context]')
+         await context.wait_for();self.assertEqual(await context.locator('summary').inner_text(),'Contexto del Case\n⌄')
+-        await context.locator('summary').click();await self.page.wait_for_function("document.querySelector('#dispatch-config-root summary').title==='Cerrar contexto del Case'")
++        await context.locator('summary').click();await self.page.wait_for_function("document.querySelector('#dispatch-config-root [data-config-context]>summary').title==='Cerrar contexto del Case'")
++        self.assertTrue(await context.evaluate('el=>el.open'))
+         config_fields=await context.locator('dt').all_text_contents()
+         for active in ('logistics_assignment','logistics_scheduling'):
+             self.b.case=copy.deepcopy(original)

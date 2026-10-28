@@ -1,0 +1,13 @@
+{
+  "version": "T7_CONTROLLED_FIXTURES_V1",
+  "currency": "ARS",
+  "cases": {
+    "B": {"distance_km": "30", "own_rate": "2", "external_per_trip": "300", "expected_source": "OWN", "expected_cost": "120"},
+    "C": {"distance_km": "480", "own_rate": "2", "external_per_trip": "800", "expected_source": "EXTERNAL", "expected_cost": "800"},
+    "N_ONE_WAY": {"distance_km": "100", "per_km_rate": "1", "per_trip": "150", "basis": "ONE_WAY", "expected_resource": "KM", "expected_cost": "100"},
+    "N_ROUND_TRIP": {"distance_km": "100", "per_km_rate": "1", "per_trip": "150", "basis": "ROUND_TRIP", "expected_resource": "TRIP", "expected_cost": "150"},
+    "F": {"requested": "70", "guaranteed": "26", "services": 2, "expected_assigned": "52", "expected_residual": "18"},
+    "G": {"high": "30", "medium": "30", "capacity": "40", "expected_high": "30", "expected_medium": "10"},
+    "O": {"availability_source": "ASSUMED", "services_available": 1, "expected_assumption_source": "DERIVED"}
+  }
+}

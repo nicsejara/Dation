@@ -1,0 +1,991 @@
+T5 queda formalmente aprobado con estado:
+
+# GO — T5 COMPLETADO
+
+El reporte oficial es:
+
+`docs/execution/ultimate/t5/t5-execution-report.md`
+
+Autorizo ahora exclusivamente:
+
+# T6 — D1 TRANSPORT PLAN CORE + ENGINE EVIDENCE + RESOURCE FEASIBILITY
+
+Seguí estrictamente:
+
+`DATION_FINAL_MASTER_EXECUTION_PLAN.md`
+
+Utilizá como baseline inmediato:
+
+`docs/execution/ultimate/t5/t5-execution-report.md`
+
+y consultá reportes anteriores únicamente cuando una decisión histórica o contrato concreto lo requiera.
+
+---
+
+# REGLA DE EFICIENCIA
+
+NO realices una nueva auditoría end-to-end.
+
+T0–T5 constituyen el baseline validado.
+
+Para T6:
+
+1. leé la sección T6 del Master Plan;
+2. revisá únicamente las Frozen Architectural Decisions relevantes;
+3. inspeccioná únicamente:
+   - domain contracts T1;
+   - Transport Demand / Resource DTOs;
+   - TransitEstimator;
+   - engine registry;
+   - assignment engine legacy como referencia de convivencia, NO como target;
+   - nuevos módulos D1;
+   - feasibility kernel;
+   - evidence/certifier contracts;
+   - tests afectados;
+4. ampliá la inspección sólo ante una incompatibilidad concreta.
+
+No recorras frontend, dashboards, IA, Data Hub o toda Supabase por precaución.
+
+---
+
+# CHECKPOINT
+
+Antes de modificar T6:
+
+registrá y preservá el estado post-T5.
+
+Si está autorizado dentro del workflow actual, creá un:
+
+**commit local de checkpoint post-T5, SIN push**.
+
+Objetivo:
+
+```text
+POST-T5 PLATFORM BASELINE
+vs
+T6 ENGINE CHANGES
+```
+
+Si no podés crear el commit por las reglas vigentes, generá una referencia/hash/patch equivalente.
+
+No hagas reset ni alteres historia remota.
+
+---
+
+# OBJETIVO T6
+
+Construir el núcleo determinístico de:
+
+# D1 — TRANSPORT PLAN
+
+Pregunta de negocio:
+
+> ¿Cómo construir el plan de transporte más conveniente para cubrir la demanda priorizada dentro del horizonte utilizando la capacidad de transporte disponible?
+
+T6 debe resolver la **factibilidad estructural del plan**, incluyendo:
+
+- demand allocation;
+- trip creation;
+- compatible consolidation;
+- active capacity dimensions;
+- split / non-split;
+- OWN resources;
+- EXTERNAL resources;
+- finite external services;
+- own resource units;
+- temporal feasibility;
+- residual / unassigned demand;
+- Engine Core Result;
+- Engine Evidence estructurada.
+
+T6 NO completa todavía toda la política económica de T7.
+
+---
+
+# 1. NUEVO RUNTIME, LEGACY PRESERVADO
+
+Implementá una nueva versión/perfil de D1.
+
+NO modificar la semántica de:
+
+- `assignment_v1`;
+- resultados legacy;
+- goldens históricos;
+- callers legacy.
+
+El nuevo runtime debe convivir mediante registry/version identity.
+
+No renombrar silenciosamente el engine histórico.
+
+---
+
+# 2. INPUTS
+
+Consumir exclusivamente los DTOs/snapshots Ultimate ya definidos.
+
+## Demand
+
+Como mínimo, según Model:
+
+- order_id;
+- origin;
+- destination;
+- distance_km;
+- active capacity dimensions;
+- split_allowed;
+- ready_date;
+- delivery_due_date;
+- priority;
+- compatibility.
+
+## Resources
+
+Common:
+
+- resource_id;
+- source OWN / EXTERNAL;
+- guaranteed capacity;
+- active dimensions;
+- compatibility;
+- relevant source constraints.
+
+OWN:
+
+- units_available;
+- operating/base information necesaria;
+- reuse assumptions.
+
+EXTERNAL:
+
+- services_available;
+- availability source;
+- guaranteed capacity;
+- finite offer semantics.
+
+No leer CSV directamente dentro del solver.
+
+No reconstruir contratos en el engine.
+
+---
+
+# 3. ACTIVE CAPACITY DIMENSIONS
+
+El engine debe respetar simultáneamente todas las dimensiones activas del Model.
+
+Ejemplos:
+
+```text
+PALLETS
+WEIGHT
+VOLUME
+UNITS
+```
+
+Si Model usa:
+
+```text
+PALLETS + WEIGHT
+```
+
+un Trip debe satisfacer ambas.
+
+No reducir factibilidad a la dimensión primaria de reporting.
+
+La dimensión primaria sirve para reporting, NO para ignorar restricciones físicas adicionales.
+
+---
+
+# 4. GUARANTEED CAPACITY
+
+Factibilidad utiliza:
+
+```text
+guaranteed_capacity
+```
+
+NO:
+
+```text
+maximum_capacity
+```
+
+salvo que exista confirmación contractual futura explícita.
+
+Ejemplo:
+
+```text
+guaranteed pallets = 26
+maximum pallets = 30
+```
+
+Una orden non-split de 28 pallets:
+
+NO cabe.
+
+No usar maximum para mejorar artificialmente cobertura.
+
+---
+
+# 5. SPLIT / NON-SPLIT
+
+## Non-split
+
+Una demanda:
+
+```text
+split_allowed = false
+```
+
+debe:
+
+- viajar íntegramente en un solo Trip;
+- o quedar residual/unassigned.
+
+Nunca:
+
+```text
+26 + 2
+```
+
+si la orden requiere 28 y ningún recurso puede transportar 28.
+
+## Split
+
+Cuando está permitido:
+
+la fracción debe conservar proporcionalmente todas las dimensiones activas.
+
+No dividir pallets independientemente del peso/volumen correspondiente.
+
+---
+
+# 6. CONSERVATION
+
+Debe cumplirse por cada orden y dimensión:
+
+```text
+assigned + residual = requested
+```
+
+con precisión definida por contratos T1.
+
+No perder demanda.
+
+No crear demanda.
+
+No ocultar residual.
+
+---
+
+# 7. EXTERNAL RESOURCES
+
+Los recursos EXTERNAL representan oferta finita durante el horizonte.
+
+`services_available` limita la cantidad total de servicios/trips utilizables según contrato.
+
+Ejemplo:
+
+```text
+Resource E1
+services_available = 2
+```
+
+NO puede generar:
+
+```text
+3, 4, 5...
+```
+
+Trips abstractos.
+
+El límite no se resetea por día o lane salvo contrato explícito.
+
+`availability_source = ASSUMED` debe conservarse como assumption/evidence.
+
+No convertirlo a CONFIRMED.
+
+---
+
+# 8. OWN RESOURCES
+
+OWN representa capacidad interna reutilizable.
+
+Debe respetar:
+
+```text
+units_available
+```
+
+y factibilidad temporal.
+
+Una única unidad física lógica NO puede atender simultáneamente múltiples ciclos incompatibles.
+
+No multiplicar capacidad de un Trip por `units_available`.
+
+Ejemplo:
+
+```text
+1 truck
+capacity = 26 pallets
+units_available = 3
+```
+
+NO significa que un único Trip tenga capacidad 78.
+
+Significa que existen hasta tres unidades equivalentes disponibles para ciclos compatibles.
+
+---
+
+# 9. SHARED DAY RESOURCE FEASIBILITY KERNEL
+
+Implementá el kernel puro definido en el Master Plan:
+
+```text
+day_resource_feasibility
+```
+
+o nombre equivalente coherente con el repo.
+
+Debe recibir Trips/candidatos fijos y verificar si pueden ser soportados temporalmente por los recursos dentro del horizonte.
+
+Debe devolver conceptos equivalentes a:
+
+```text
+FEASIBLE
+INFEASIBLE
+UNKNOWN
+```
+
+más witness/evidence cuando corresponda.
+
+## IMPORTANTE
+
+D1 utiliza este kernel para certificar factibilidad.
+
+D1 NO debe producir el calendario D2.
+
+T9 reutilizará el mismo kernel para construir el schedule real.
+
+La frontera debe quedar:
+
+```text
+D1:
+Can these fixed trips/resources be scheduled feasibly?
+
+D2:
+On which exact days should those fixed trips depart?
+```
+
+No crear dependencia circular D1 → D2.
+
+---
+
+# 10. TRANSIT
+
+Reutilizar exclusivamente la autoridad T1.
+
+No duplicar fórmulas.
+
+Recordatorio:
+
+```text
+outbound_days = ceil(distance / 500)
+
+OWN cycle_days = ceil(2 * distance / 500)
+
+EXTERNAL cycle_days = null
+```
+
+T6 usa esto para factibilidad temporal.
+
+No calcular nuevamente con 70 km/h dentro del engine.
+
+---
+
+# 11. CONSOLIDATION
+
+Permitir consolidación únicamente cuando exista compatibilidad real.
+
+Como mínimo:
+
+- same origin;
+- same destination;
+- compatible cargo;
+- compatible resource;
+- all active capacity constraints;
+- temporal windows con intersección válida;
+- consolidation permitted by Model.
+
+No implementar multi-stop.
+
+No consolidar órdenes únicamente porque “entran físicamente”.
+
+Ejemplo:
+
+```text
+Order A window 2–3 Nov
+Order B window 6–8 Nov
+```
+
+no deben consolidarse aunque compartan ruta.
+
+---
+
+# 12. ROUTE / NETWORK
+
+MVP:
+
+```text
+DIRECT origin → destination
+```
+
+No implementar:
+
+- multi-stop;
+- hub routing;
+- vehicle routing problem;
+- dock scheduling;
+- route sequencing.
+
+Eso permanece fuera de scope.
+
+---
+
+# 13. CANDIDATE TRIPS
+
+Generar candidatos de forma acotada y determinística.
+
+Evitar explosión combinatoria innecesaria.
+
+No crear todos los subconjuntos posibles sin bounds.
+
+Aplicar:
+
+- deterministic ordering;
+- stable IDs;
+- explicit solver budgets;
+- bounded candidate generation.
+
+Registrar límites si corresponde.
+
+---
+
+# 14. SOLVER MODEL
+
+Puede utilizar OR-Tools / CP-SAT según arquitectura existente.
+
+Variables conceptuales aprobadas:
+
+```text
+y_t = trip open
+
+x_it = demand/order assignment or fraction
+
+u_i = residual/unassigned demand
+```
+
+Aplicar constraints necesarias de:
+
+- conservation;
+- capacity;
+- non-split;
+- compatibility;
+- external services;
+- resource feasibility;
+- temporal feasibility.
+
+No implementar todavía toda la jerarquía económica/policies T7.
+
+---
+
+# 15. COVERAGE EN T6
+
+T6 debe producir correctamente:
+
+- assigned demand;
+- residual demand;
+- coverage structural outcome.
+
+Un capacity gap es:
+
+```text
+valid business result
+```
+
+NO error técnico.
+
+Ejemplo:
+
+```text
+Demand = 70
+Available = 52
+```
+
+Resultado:
+
+```text
+assigned = 52
+residual = 18
+```
+
+No FAIL del engine.
+
+---
+
+# 16. PRIORITY
+
+T6 debe conservar `HIGH / MEDIUM / LOW` en Core/Evidence y preparar constraints/policy hooks.
+
+La lexicografía completa de prioridad/goal corresponde principalmente a T7.
+
+No introducir heurísticas económicas o comerciales escondidas en T6.
+
+Si T6 necesita una regla mínima para construir una solución estructural de test, debe estar explícitamente prevista en el Master Plan y ser determinística.
+
+---
+
+# 17. COST
+
+T6 puede transportar/capturar facts de costo necesarios para candidatos/evidence, pero:
+
+NO implementar todavía la política completa de:
+
+- MINIMIZE_COST;
+- BALANCED;
+- MAXIMIZE_OWN_CAPACITY;
+- MINIMIZE_TRIPS;
+- alternatives.
+
+Eso corresponde a T7.
+
+No seleccionar recursos sólo porque “parecen más baratos” fuera de una policy implementada.
+
+---
+
+# 18. ENGINE CORE RESULT
+
+Producir el Core Result tipado definido en T1.
+
+Debe contener suficiente información canónica para T7.
+
+Como mínimo:
+
+## Trips
+
+- trip_id;
+- origin;
+- destination;
+- distance;
+- resource_id;
+- resource_source;
+- order allocations;
+- fractions;
+- loads por dimensión;
+- guaranteed capacities;
+- utilization por dimensión;
+- ready/due information relevante;
+- feasibility facts;
+- references a evidence/reasons cuando corresponda.
+
+## Demand resolution
+
+- order_id;
+- requested;
+- assigned;
+- residual;
+- coverage;
+- trip refs;
+- status preliminar estructural.
+
+## Resource usage
+
+- resource_id;
+- source;
+- services/units facts;
+- trips;
+- capacity facts;
+- relevant utilization facts.
+
+No producir todavía Hero, Sankey o dashboard data.
+
+---
+
+# 19. ENGINE EVIDENCE
+
+T6 debe producir evidencia estructurada.
+
+No texto libre como fuente de verdad.
+
+Debe poder probar hechos como:
+
+- resource incompatible;
+- guaranteed capacity insufficient;
+- non-split infeasible;
+- service limit reached;
+- date window incompatible;
+- candidate rejected;
+- own temporal witness;
+- residual/capacity gap.
+
+Los reason codes deben cumplir el catálogo T1.
+
+No emitir reason code si no existen los facts requeridos.
+
+---
+
+# 20. POSITIVE REASONS
+
+No forzar una explicación positiva para cada selección.
+
+Sólo emitir:
+
+```text
+SELECTED_ONLY_FEASIBLE_RESOURCE
+```
+
+si el candidate set relevante fue suficientemente exhaustivo para probarlo.
+
+No emitir:
+
+```text
+SELECTED_LOWEST_COST_FEASIBLE
+```
+
+en T6 si la comparación económica completa aún corresponde a T7.
+
+Ausencia de razón certificada es válida.
+
+---
+
+# 21. SOLVER STATUS
+
+Preservar:
+
+```text
+OPTIMAL
+FEASIBLE
+UNKNOWN
+INFEASIBLE
+```
+
+No maquillar:
+
+```text
+FEASIBLE → OPTIMAL
+```
+
+No afirmar que un residual es inevitable si el solver terminó UNKNOWN sin certificado suficiente.
+
+Error técnico:
+
+→ Run/engine failure futuro.
+
+No business exception falsa.
+
+---
+
+# 22. INDEPENDENT VALIDATOR / CERTIFIER
+
+Crear validación independiente del candidato/result final.
+
+Debe comprobar como mínimo:
+
+- conservation;
+- every active dimension;
+- guaranteed capacities;
+- non-split;
+- split fractions;
+- resource/source compatibility;
+- external service limits;
+- own units;
+- temporal witness;
+- stable entity references.
+
+El validator no debe simplemente confiar en que el solver lo hizo bien.
+
+Si validator y solver difieren:
+
+STOP / engine error.
+
+No “arreglar” el resultado después silenciosamente.
+
+---
+
+# 23. DETERMINISM
+
+Para mismo:
+
+- Model;
+- inputs;
+- horizon;
+- contract;
+- solver configuration;
+- seed/version;
+
+debe existir comportamiento reproducible dentro de las garantías definidas.
+
+Usar stable ordering/tie-breaks cuando corresponda.
+
+No depender del orden de filas del CSV.
+
+Permutar inputs no debe cambiar prioridad/cobertura estructural sin razón matemática.
+
+---
+
+# 24. FIXTURES PRIORITARIAS
+
+Utilizar los fixtures controlados del Master Plan relevantes a T6.
+
+Especialmente:
+
+## A
+70 pallets / recursos externos finitos.
+
+T6 debe demostrar factibilidad/capacity/trip count estructural.
+
+La selección económica final se completa T7.
+
+## D
+Consolidación compatible y ventanas incompatibles.
+
+## E
+Non-split 28 vs guaranteed 26/30.
+
+## F
+Capacity gap.
+
+## M
+Múltiples dimensiones.
+
+Agregar casos de:
+
+- services_available = 0;
+- units_available = 0;
+- no compatible resource;
+- duplicate IDs rejected upstream;
+- temporal window incompatible.
+
+---
+
+# 25. ORACLES
+
+Para casos pequeños:
+
+crear oracle independiente por enumeración/brute force cuando sea viable.
+
+NO reutilizar la función objetivo o las mismas funciones del solver como “oracle”.
+
+El objetivo es detectar errores reales del modelo.
+
+---
+
+# 26. NO PERSISTENCE PRODUCTIVA
+
+T6 trabaja sobre DTOs/snapshots y tests.
+
+NO publicar todavía:
+
+- Runs Ultimate productivas;
+- artifacts;
+- Result Packages.
+
+La conexión durable corresponde a T8.
+
+El nuevo runtime puede permanecer:
+
+```text
+implemented for tests
+but not publicly admitted
+```
+
+según registry/capability.
+
+---
+
+# 27. FRONTEND
+
+Ningún cambio funcional de frontend debería ser necesario en T6.
+
+Si existe algún caller mínimo de capability:
+
+hacer únicamente adaptación imprescindible.
+
+No modificar Decision Map para fingir runtime público.
+
+No dashboards.
+
+---
+
+# 28. SKILLS
+
+Aplicá la `Execution Skills Policy`.
+
+Utilizá sólo Skills pertinentes a:
+
+- Python;
+- optimization/engine engineering si están disponibles;
+- testing;
+- runtime.
+
+No usar Skills de diseño/UI salvo una necesidad real e inesperada.
+
+No instalar nuevas herramientas sin autorización.
+
+---
+
+# 29. PROHIBIDO EN T6
+
+NO ejecutar T7.
+
+NO implementar policy económica completa.
+
+NO implementar alternatives.
+
+NO implementar Result Assembler completo.
+
+NO publicar package.
+
+NO modificar Approval.
+
+NO implementar D2 schedule.
+
+NO construir Sankey.
+
+NO construir Gantt.
+
+NO implementar Dation IA.
+
+NO hacer migraciones productivas.
+
+NO deploy.
+
+NO push.
+
+NO refactor transversal.
+
+---
+
+# 30. TESTING
+
+Ejecutá:
+
+- B-PY
+- B-NODE
+- U6
+
+y focales estrictamente necesarios.
+
+No repetir Browser/E2E/SQL completos salvo impacto demostrado.
+
+U6 debe cubrir:
+
+- vector capacities;
+- split;
+- non-split;
+- conservation;
+- finite services;
+- own units;
+- compatibility;
+- consolidation;
+- date windows;
+- shared feasibility kernel;
+- evidence;
+- independent validator;
+- determinism;
+- solver status honesty.
+
+---
+
+# 31. STOP CONDITIONS
+
+STOP si:
+
+- D1 vuelve a separar Trip Planning como otra decisión;
+- external resource produce servicios ilimitados;
+- guaranteed capacity se reemplaza por maximum;
+- units_available multiplica capacidad de un Trip;
+- una dimensión activa es ignorada;
+- non-split se divide;
+- conservation falla;
+- D1 produce un calendario D2;
+- feasibility own depende de ejecutar D2;
+- frontend/assembler inventa reasons;
+- solver status se maquilla;
+- UNKNOWN se usa para afirmar inevitabilidad;
+- validator detecta inconsistencia;
+- legacy assignment cambia;
+- T6 necesita implementar T7 para pasar sus invariantes estructurales.
+
+---
+
+# 32. REPORTING
+
+Crear:
+
+`docs/execution/ultimate/t6/t6-execution-report.md`
+
+Incluir:
+
+## Baseline
+
+## Checkpoint post-T5
+
+## Skills utilizadas
+
+## Files Created
+
+## Files Modified
+
+## D1 Core Architecture
+
+## Candidate Generation
+
+## Capacity Model
+
+## Split / Non-Split
+
+## External Finite Resources
+
+## Own Resource Feasibility
+
+## Shared Feasibility Kernel
+
+## Consolidation
+
+## Core Result
+
+## Engine Evidence
+
+## Independent Validator
+
+## Solver Status
+
+## Determinism
+
+## Fixtures / Oracles
+
+## Tests
+
+## Legacy Compatibility
+
+## Deviations
+
+## Risks
+
+## Gate Evaluation
+
+## FINAL DECISION
+
+Una sola:
+
+**GO — T6 completado. T7 puede ser solicitado.**
+
+o
+
+**STOP — T6 no cumple condiciones para autorizar T7.**
+
+Aunque resulte GO:
+
+# NO EJECUTES T7.
+
+Finalizá después del reporte.

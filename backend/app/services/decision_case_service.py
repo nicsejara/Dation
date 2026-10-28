@@ -19,6 +19,8 @@ from app.domain.decision_cases import (
     validate_case_state,
     project_case_history,
     run_history_item,
+    case_workflow_version,
+    case_projection_options,
 )
 
 from app.platform.repository import http_client
@@ -91,6 +93,8 @@ async def ensure_case(
 ) -> dict:
     existing = await get_case_row(case_id)
     if existing:
+        if case_workflow_version(existing) != 1:
+            raise ValueError("La escritura legacy no puede reemplazar el contexto Ultimate.")
         if (
             str(existing["orders_dataset_id"]) != str(orders_dataset_id)
             or str(existing["fleet_dataset_id"]) != str(fleet_dataset_id)
@@ -167,12 +171,15 @@ async def update_case(
     row = await get_case_row(case_id)
     if not row:
         raise LookupError("No se encontró el Decision Case.")
+    ultimate = case_workflow_version(row) == 2
+    if ultimate and (state is not None or status not in (None, "active", "archived")):
+        raise ValueError("La escritura legacy no puede reemplazar el contexto Ultimate.")
     if status is not None and status not in CASE_STATUSES:
         raise ValueError("Estado de Decision Case inválido.")
 
     now = utc_now()
     values: dict = {
-        "schema_version": CASE_SCHEMA_VERSION,
+        "schema_version": row["schema_version"] if ultimate else CASE_SCHEMA_VERSION,
         "updated_at": now,
         "last_activity_at": now,
     }
@@ -245,13 +252,13 @@ async def sync_case_history(case_id: str) -> dict:
     row = await get_case_row(case_id)
     if not row:
         raise LookupError("No se encontró el Decision Case.")
+    if case_workflow_version(row) == 2:
+        raise ValueError("El cache Ultimate no se actualiza mediante el workflow legacy.")
     snapshot = await history_snapshot(case_id)
     state = project_case_history(
         row.get("state_json") or {},
         [],
-        case_id=case_id,
-        orders_dataset_id=str(row["orders_dataset_id"]),
-        fleet_dataset_id=str(row["fleet_dataset_id"]),
+        **case_projection_options(row),
         summaries=snapshot["summaries"],
     )
     return await update_case(case_id, state=state)
@@ -363,9 +370,7 @@ async def get_run_history(
     state = project_case_history(
         row.get("state_json") or {},
         [],
-        case_id=case_id,
-        orders_dataset_id=str(row["orders_dataset_id"]),
-        fleet_dataset_id=str(row["fleet_dataset_id"]),
+        **case_projection_options(row),
         summaries=snapshot["summaries"],
     )
     page = snapshot["runs"]
@@ -404,6 +409,11 @@ async def get_case(case_id: str) -> dict:
     row = await get_case_row(case_id)
     if not row:
         raise LookupError("No se encontró el Decision Case.")
+    if case_workflow_version(row) == 2:
+        snapshot = await history_snapshot(case_id)
+        state = project_case_history(row.get("state_json") or {}, [],
+            **case_projection_options(row), summaries=snapshot["summaries"])
+        return {"case": row, "decision_case": state, "orders": None, "fleet": None}
     orders, fleet, snapshot = await asyncio.gather(
         get_dataset(str(row["orders_dataset_id"])),
         get_dataset(str(row["fleet_dataset_id"])),
@@ -449,15 +459,14 @@ async def list_cases(
     result = []
     for bundle in bundles:
         row, orders, fleet = bundle["case_row"], bundle["orders"], bundle["fleet"]
-        if not orders or not fleet:
+        ultimate = case_workflow_version(row) == 2
+        if not ultimate and (not orders or not fleet):
             raise LookupError("No se encontró el Data Pack del Decision Case.")
-        if orders.get("dataset_type") != "orders" or fleet.get("dataset_type") != "fleet":
+        if not ultimate and (orders.get("dataset_type") != "orders" or fleet.get("dataset_type") != "fleet"):
             raise ValueError("El Data Pack del Decision Case no conserva sus tipos.")
         state = project_case_history(
             row.get("state_json") or {}, [],
-            case_id=str(row["id"]),
-            orders_dataset_id=str(row["orders_dataset_id"]),
-            fleet_dataset_id=str(row["fleet_dataset_id"]),
+            **case_projection_options(row),
             summaries=bundle["summaries"],
         )
         result.append({

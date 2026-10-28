@@ -5,6 +5,7 @@ from uuid import uuid4
 import httpx
 from auth_fixture import USER_A,USER_B,VIEWER,DISABLED
 from sandbox import Sandbox
+from workflow_fixture import apply_attributes
 import test_workflow as workflow
 
 class MigrationCompatibilityTests(unittest.TestCase):
@@ -16,7 +17,8 @@ class MigrationCompatibilityTests(unittest.TestCase):
             captured['row']=s.sql(f"SELECT to_jsonb(m)::text FROM workspace_members m WHERE user_id='{legacy}';")
         with Sandbox(migration_hook=seed) as s:
             self.assertEqual(s.sql(f"SELECT to_jsonb(m)::text FROM workspace_members m WHERE user_id='{legacy}';"),captured['row'])
-            self.assertEqual(s.sql(f"SELECT responsibility FROM dation_private.member_responsibilities WHERE user_id='{legacy}';"),'data_steward')
+            roles=json.loads(s.sql(f"SELECT jsonb_agg(responsibility ORDER BY responsibility) FROM dation_private.member_responsibilities WHERE user_id='{legacy}';"))
+            self.assertEqual(roles,['data_owner','data_steward'])
 
 class FoundationDomainTests(unittest.TestCase):
     auto_assign_workflow=False
@@ -54,32 +56,41 @@ class FoundationDomainTests(unittest.TestCase):
     def read(self,case):return self.checked(self.a.get(f'/api/platform/decisions/{case}/responsibilities'))
 
     def test_multi_responsibility_candidates_cas_and_legacy_compatibility(self):
-        before=self.member(USER_A);self.checked(self.roles(USER_A,['data_steward','decision_owner','approver']))
-        self.assertEqual(set(self.member(USER_A)['business_roles']),{'data_steward','decision_owner','approver'})
+        before=self.member(USER_A);self.checked(self.roles(USER_A,['data_owner','decision_owner']))
+        self.assertEqual(set(self.member(USER_A)['business_roles']),{'data_owner','decision_owner'})
         self.assertEqual(self.member(USER_A)['access_role'],'admin')
         self.assertEqual(self.roles(USER_A,[],version=before['updated_at']).status_code,409)
-        self.assertEqual(self.roles(USER_A,['approver','approver']).status_code,422)
-        self.checked(self.roles(VIEWER,['data_owner','decision_owner','approver']))
-        self.checked(self.roles(DISABLED,['data_owner','decision_owner','approver']))
+        self.assertEqual(self.roles(USER_A,['decision_owner','decision_owner']).status_code,422)
+        for retired in ('data_steward','approver'):
+            self.assertEqual(self.roles(USER_A,[retired]).status_code,422)
+        self.checked(self.roles(VIEWER,['data_owner','decision_owner']))
+        self.checked(self.roles(DISABLED,['data_owner','decision_owner']))
         self.s.sql(f"UPDATE workspace_members SET status='active' WHERE user_id='{DISABLED}'; UPDATE auth.users SET email_confirmed_at=NULL WHERE id='{DISABLED}';")
-        for group in ('data','decision_owner','approver'):
+        for group in ('data','data_owner','decision_owner'):
             response=self.checked(self.a.get('/api/platform/team',params={'candidates':'true','responsibility':group,'limit':1}))
             self.assertEqual(response['total'],1);self.assertEqual(response['members'][0]['user_id'],USER_A)
             self.assertEqual(self.checked(self.a.get('/api/platform/team',params={'candidates':'true','responsibility':group,'offset':1}))['members'],[])
+        for retired in ('data_steward','approver'):
+            result=self.checked(self.a.get('/api/platform/team',params={'candidates':'true','responsibility':retired}))
+            self.assertEqual(result['total'],0)
+            self.assertEqual(result['members'],[])
         self.assertEqual(self.a.get('/api/platform/team?responsibility=approver').status_code,422)
         b=self.client(USER_B)
         self.assertEqual(self.checked(b.get('/api/platform/team?candidates=true&responsibility=approver'))['total'],0)
-        self.assertEqual(b.patch('/api/platform/team/members/'+USER_A+'/responsibilities',json={'expected_updated_at':self.member(USER_A)['updated_at'],'business_roles':['approver']}).status_code,404)
+        self.assertEqual(b.patch('/api/platform/team/members/'+USER_A+'/responsibilities',json={'expected_updated_at':self.member(USER_A)['updated_at'],'business_roles':['decision_owner']}).status_code,404)
         self.assertEqual(self.client(VIEWER).patch('/api/platform/team/members/'+VIEWER+'/responsibilities',json={'expected_updated_at':self.member(VIEWER)['updated_at'],'business_roles':[]}).status_code,403)
         # The single-value old contract replaces the canonical role set on change.
+        member=self.member(USER_A)
+        self.checked(self.a.patch('/api/platform/team/members/'+USER_A,json={'expected_updated_at':member['updated_at'],'access_role':'admin','business_role':'decision_owner','status':'active'}))
+        self.assertEqual(self.member(USER_A)['business_roles'],['decision_owner'])
         member=self.member(USER_A)
         self.checked(self.a.patch('/api/platform/team/members/'+USER_A,json={'expected_updated_at':member['updated_at'],'access_role':'admin','business_role':'data_owner','status':'active'}))
         self.assertEqual(self.member(USER_A)['business_roles'],['data_owner'])
         self.assertEqual(self.checked(self.a.get('/api/platform/team?candidates=true&responsibility=approver'))['members'],[])
 
     def test_stage_assignments_enforce_eligibility_and_keep_get_read_only(self):
-        case,_,_=self.case();self.checked(self.roles(USER_A,['data_owner','decision_owner','approver']))
-        self.checked(self.roles(VIEWER,['approver']))
+        case,_,_=self.case();self.checked(self.roles(USER_A,['data_owner','decision_owner']))
+        self.checked(self.roles(VIEWER,['decision_owner']))
         original=self.read(case);self.assertTrue(original['gates_enforced'])
         self.assertTrue(all(s['owner'] is None for s in original['stages'].values()))
         self.assertEqual(self.assign(case,'data_preparation',VIEWER).status_code,409)
@@ -97,8 +108,9 @@ class FoundationDomainTests(unittest.TestCase):
         self.checked(self.assign(case,'logistics_assignment',USER_A,USER_A,version))
         self.assertEqual(self.s.sql("SELECT md5(string_agg(to_jsonb(e)::text,'' ORDER BY id)) FROM audit_events e;"),snapshot)
         kinds=json.loads(self.s.sql("SELECT jsonb_agg(event_type) FROM audit_events;"))
-        for kind in ('stage.responsible_assigned','decision.owner_assigned','decision.approver_assigned'):self.assertIn(kind,kinds)
-        self.checked(self.roles(USER_A,['approver']))
+        for kind in ('stage.responsible_changed','decision.owner_changed'):self.assertIn(kind,kinds)
+        self.assertNotIn('decision.approver_assigned',kinds)
+        self.checked(self.roles(USER_A,['decision_owner']))
         self.assertFalse(self.read(case)['stages']['data_preparation']['owner_eligible'])
         self.assertEqual(self.read(case)['stages']['data_preparation']['owner']['id'],USER_A)
         self.assertEqual(self.client(USER_B).get(f'/api/platform/decisions/{case}/responsibilities').status_code,404)
@@ -108,19 +120,25 @@ class FoundationDomainTests(unittest.TestCase):
 
     def test_approved_precedence_actual_actor_and_explicit_candidate_access(self):
         row=self.member(VIEWER)
-        self.checked(self.a.patch('/api/platform/team/members/'+VIEWER,json={'expected_updated_at':row['updated_at'],'access_role':'operator','business_role':'approver','status':'active'}))
-        self.checked(self.roles(USER_A,['data_steward','decision_owner']))
-        case,orders,fleet=self.case();self.checked(self.assign(case,'data_preparation',USER_A));self.checked(self.assign(case,'logistics_assignment',USER_A,VIEWER))
+        self.checked(self.a.patch('/api/platform/team/members/'+VIEWER,json={'expected_updated_at':row['updated_at'],'access_role':'operator','business_role':'decision_owner','status':'active'}))
+        self.checked(self.roles(USER_A,['data_owner','decision_owner']))
+        case,orders,fleet=self.case();apply_attributes(self.a,case)
+        self.checked(self.assign(case,'data_preparation',USER_A));self.checked(self.assign(case,'logistics_assignment',VIEWER))
         self.s.start_worker();first=self.finish(self.admit(self.body(case,orders,fleet)));approved=self.approve(first['id'],case)
         self.assertEqual(approved['approved_by_user_id'],USER_A)
         self.assertEqual(self.read(case)['stages']['logistics_assignment']['approver']['id'],VIEWER)
+        current=self.checked(self.a.get('/api/platform/decisions/'+case))['nodes'][0]
+        self.assertEqual(current['target']['run_id'],first['id']);self.assertTrue(current['approval_current'])
         second=self.finish(self.admit(self.body(case,orders,fleet)))
         detail=self.checked(self.a.get('/api/platform/decisions/'+case));node=detail['nodes'][0]
-        self.assertEqual(node['target']['run_id'],first['id']);self.assertEqual(node['latest_run']['id'],second['id'])
+        self.assertEqual(node['target']['run_id'],second['id']);self.assertEqual(node['latest_run']['id'],second['id'])
+        self.assertFalse(node['approval_current'])
+        historical=self.checked(self.a.get('/api/runs/'+first['id']))
+        self.assertEqual(historical['approved_at'],approved['approved_at']);self.assertIsNotNone(historical['superseded_at'])
         self.assertEqual(self.checked(self.a.get('/api/runs/'+second['id']))['id'],second['id'])
         self.assertEqual(detail['context']['caseId'],case)
         event=json.loads(self.s.sql(f"SELECT metadata_json FROM audit_events WHERE event_type='decision.approved' AND object_id='{first['id']}';"))
-        self.assertTrue(event['admin_override']);self.assertEqual(event['assigned_approver_user_id'],VIEWER)
+        self.assertTrue(event['admin_override']);self.assertEqual(event['assigned_decision_owner_user_id'],VIEWER)
 
     def test_private_relations_and_new_rpcs_are_not_direct_client_capabilities(self):
         for table in ('member_responsibilities','workflow_stage_assignments'):

@@ -1,0 +1,23 @@
+{
+  "suite": "S8",
+  "status": "PASS",
+  "tests": 13,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "exit_code": 0,
+  "started_at": "2026-10-27T18:23:19.255604+00:00",
+  "finished_at": "2026-10-27T18:24:18.449576+00:00",
+  "seconds": 59.194,
+  "cwd": "/workspace/Dation/backend",
+  "command": [
+    "/workspace/Dation/.venv/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "tests.integration.test_ultimate_publication",
+    "-v"
+  ],
+  "production_credentials_cleared": true,
+  "log_sha256": "3d219f5e01fe9c6cb2f3e8a048cff66ba81323a9db792357e6a5c42707578f11"
+}

@@ -1,0 +1,20 @@
+{
+  "suite": "R8",
+  "status": "PASS",
+  "tests": 1,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "exit_code": 0,
+  "started_at": "2026-10-27T14:56:14.851381+00:00",
+  "finished_at": "2026-10-27T14:57:21.224245+00:00",
+  "seconds": 66.373,
+  "cwd": "/workspace/Dation/backend",
+  "command": [
+    "/workspace/Dation/.venv/bin/python",
+    "-B",
+    "/workspace/work/dation-t8/drivers/legacy-transition.py"
+  ],
+  "production_credentials_cleared": true,
+  "log_sha256": "1341d34fd43e211b1904a2410acd0372eb346751f0af374ea7f85516fb5d2d9a"
+}

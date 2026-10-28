@@ -1,0 +1,12 @@
+{
+  "only_changed_file": [
+    "backend/tests/browser/test_ultimate_case_setup.py"
+  ],
+  "change": "W3 waits for DOMContentLoaded plus explicit setup readiness, bounded 30s; functional assertions unchanged",
+  "reused_unchanged_consumers": [
+    "B-PY",
+    "B-NODE",
+    "S3"
+  ],
+  "product_files_unchanged": true
+}

@@ -24,11 +24,11 @@ async def main():
    # The server denies the still-valid JWT; fetch refreshes identity without replay.
    status=await page.evaluate("async()=> (await fetch('/api/decision-cases')).status");assert status==403
    root=page.locator('[data-home-dda-catalog]');await root.locator('[data-dda-entitlement=disabled]').wait_for()
-   assert urlsplit(page.url).path=='/app/ddas'
+   assert urlsplit(page.url).path=='/app'
    assert await root.locator('button[data-view-target],a').count()==0
    assert await page.locator('.asset-item').is_disabled()
    for path in ['/app/ddas/logistics','/app/ddas/logistics/data','/app/ddas/logistics/dashboard','/app/history']:
-    await page.goto(BASE+path);await root.locator('[data-dda-entitlement=disabled]').wait_for();assert urlsplit(page.url).path=='/app/ddas'
+    await page.goto(BASE+path);await root.locator('[data-dda-entitlement=disabled]').wait_for();assert urlsplit(page.url).path=='/app'
    for width in (1440,1024,768,390):
     await page.set_viewport_size({'width':width,'height':1000})
     await page.evaluate('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))')

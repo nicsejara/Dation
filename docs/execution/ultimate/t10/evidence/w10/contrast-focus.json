@@ -1,0 +1,1090 @@
+{
+  "text": [
+    {
+      "tag": "H1",
+      "text": "Plan de transporte recomendado",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        25,
+        36,
+        45,
+        1
+      ],
+      "ratio": 14.733144784434272,
+      "required": 3
+    },
+    {
+      "tag": "path",
+      "text": "",
+      "foreground": [
+        16,
+        22,
+        28,
+        1
+      ],
+      "background": [
+        80,
+        200,
+        196,
+        1
+      ],
+      "ratio": 9.015462491453153,
+      "required": 3
+    },
+    {
+      "tag": "path",
+      "text": "",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        25,
+        36,
+        45,
+        1
+      ],
+      "ratio": 14.733144784434272,
+      "required": 3
+    },
+    {
+      "tag": "path",
+      "text": "",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        25,
+        36,
+        45,
+        1
+      ],
+      "ratio": 14.733144784434272,
+      "required": 3
+    },
+    {
+      "tag": "path",
+      "text": "",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        25,
+        36,
+        45,
+        1
+      ],
+      "ratio": 14.733144784434272,
+      "required": 3
+    },
+    {
+      "tag": "path",
+      "text": "",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        25,
+        36,
+        45,
+        1
+      ],
+      "ratio": 14.733144784434272,
+      "required": 3
+    },
+    {
+      "tag": "path",
+      "text": "",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        32,
+        46,
+        57,
+        1
+      ],
+      "ratio": 12.981136079806113,
+      "required": 3
+    },
+    {
+      "tag": "path",
+      "text": "",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        32,
+        46,
+        57,
+        1
+      ],
+      "ratio": 12.981136079806113,
+      "required": 3
+    },
+    {
+      "tag": "path",
+      "text": "",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        32,
+        46,
+        57,
+        1
+      ],
+      "ratio": 12.981136079806113,
+      "required": 3
+    },
+    {
+      "tag": "path",
+      "text": "",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        25,
+        36,
+        45,
+        1
+      ],
+      "ratio": 14.733144784434272,
+      "required": 3
+    },
+    {
+      "tag": "path",
+      "text": "",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        32,
+        46,
+        57,
+        1
+      ],
+      "ratio": 12.981136079806113,
+      "required": 3
+    },
+    {
+      "tag": "H2",
+      "text": "Indicadores de la decisi\u00f3n",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        16,
+        22,
+        28,
+        1
+      ],
+      "ratio": 17.006710971423363,
+      "required": 3
+    },
+    {
+      "tag": "SPAN",
+      "text": "Costo recomendado",
+      "foreground": [
+        184,
+        200,
+        207,
+        1
+      ],
+      "background": [
+        16,
+        22,
+        28,
+        1
+      ],
+      "ratio": 10.57659792986431,
+      "required": 4.5
+    },
+    {
+      "tag": "STRONG",
+      "text": "$\u00a01.000,00",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        16,
+        22,
+        28,
+        1
+      ],
+      "ratio": 17.006710971423363,
+      "required": 3
+    },
+    {
+      "tag": "P",
+      "text": "Publicado por el motor",
+      "foreground": [
+        184,
+        200,
+        207,
+        1
+      ],
+      "background": [
+        16,
+        22,
+        28,
+        1
+      ],
+      "ratio": 10.57659792986431,
+      "required": 4.5
+    },
+    {
+      "tag": "SPAN",
+      "text": "Viajes",
+      "foreground": [
+        184,
+        200,
+        207,
+        1
+      ],
+      "background": [
+        16,
+        22,
+        28,
+        1
+      ],
+      "ratio": 10.57659792986431,
+      "required": 4.5
+    },
+    {
+      "tag": "STRONG",
+      "text": "1",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        16,
+        22,
+        28,
+        1
+      ],
+      "ratio": 17.006710971423363,
+      "required": 3
+    },
+    {
+      "tag": "P",
+      "text": "Publicado por el motor",
+      "foreground": [
+        184,
+        200,
+        207,
+        1
+      ],
+      "background": [
+        16,
+        22,
+        28,
+        1
+      ],
+      "ratio": 10.57659792986431,
+      "required": 4.5
+    },
+    {
+      "tag": "SPAN",
+      "text": "Cobertura de demanda",
+      "foreground": [
+        184,
+        200,
+        207,
+        1
+      ],
+      "background": [
+        16,
+        22,
+        28,
+        1
+      ],
+      "ratio": 10.57659792986431,
+      "required": 4.5
+    },
+    {
+      "tag": "STRONG",
+      "text": "100%",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        16,
+        22,
+        28,
+        1
+      ],
+      "ratio": 17.006710971423363,
+      "required": 3
+    },
+    {
+      "tag": "P",
+      "text": "Publicado por el motor",
+      "foreground": [
+        184,
+        200,
+        207,
+        1
+      ],
+      "background": [
+        16,
+        22,
+        28,
+        1
+      ],
+      "ratio": 10.57659792986431,
+      "required": 4.5
+    },
+    {
+      "tag": "SPAN",
+      "text": "Utilizaci\u00f3n de capacidad",
+      "foreground": [
+        184,
+        200,
+        207,
+        1
+      ],
+      "background": [
+        16,
+        22,
+        28,
+        1
+      ],
+      "ratio": 10.57659792986431,
+      "required": 4.5
+    },
+    {
+      "tag": "STRONG",
+      "text": "50%",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        16,
+        22,
+        28,
+        1
+      ],
+      "ratio": 17.006710971423363,
+      "required": 3
+    },
+    {
+      "tag": "P",
+      "text": "Publicado por el motor",
+      "foreground": [
+        184,
+        200,
+        207,
+        1
+      ],
+      "background": [
+        16,
+        22,
+        28,
+        1
+      ],
+      "ratio": 10.57659792986431,
+      "required": 4.5
+    },
+    {
+      "tag": "SPAN",
+      "text": "Recursos utilizados",
+      "foreground": [
+        184,
+        200,
+        207,
+        1
+      ],
+      "background": [
+        16,
+        22,
+        28,
+        1
+      ],
+      "ratio": 10.57659792986431,
+      "required": 4.5
+    },
+    {
+      "tag": "STRONG",
+      "text": "1",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        16,
+        22,
+        28,
+        1
+      ],
+      "ratio": 17.006710971423363,
+      "required": 3
+    },
+    {
+      "tag": "P",
+      "text": "Publicado por el motor",
+      "foreground": [
+        184,
+        200,
+        207,
+        1
+      ],
+      "background": [
+        16,
+        22,
+        28,
+        1
+      ],
+      "ratio": 10.57659792986431,
+      "required": 4.5
+    },
+    {
+      "tag": "H2",
+      "text": "Flujo del plan de transporte",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        25,
+        36,
+        45,
+        1
+      ],
+      "ratio": 14.733144784434272,
+      "required": 3
+    },
+    {
+      "tag": "path",
+      "text": "DEST-01 \u2192 TP-fde90e179eb0451d219c8196-1: 10 pallets",
+      "foreground": [
+        71.75,
+        175.4,
+        173.35,
+        1
+      ],
+      "background": [
+        25,
+        36,
+        45,
+        1
+      ],
+      "ratio": 6.040161480274944,
+      "required": 3
+    },
+    {
+      "tag": "path",
+      "text": "TP-fde90e179eb0451d219c8196-1 \u2192 RESOURCE-BBBBBBBBBBBBBBBBBBBBBBB",
+      "foreground": [
+        71.75,
+        175.4,
+        173.35,
+        1
+      ],
+      "background": [
+        25,
+        36,
+        45,
+        1
+      ],
+      "ratio": 6.040161480274944,
+      "required": 3
+    },
+    {
+      "tag": "rect",
+      "text": "",
+      "foreground": [
+        80,
+        200,
+        196,
+        1
+      ],
+      "background": [
+        25,
+        36,
+        45,
+        1
+      ],
+      "ratio": 7.810217649280076,
+      "required": 3
+    },
+    {
+      "tag": "text",
+      "text": "DEST-01",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        25,
+        36,
+        45,
+        1
+      ],
+      "ratio": 14.733144784434272,
+      "required": 4.5
+    },
+    {
+      "tag": "rect",
+      "text": "",
+      "foreground": [
+        80,
+        200,
+        196,
+        1
+      ],
+      "background": [
+        25,
+        36,
+        45,
+        1
+      ],
+      "ratio": 7.810217649280076,
+      "required": 3
+    },
+    {
+      "tag": "text",
+      "text": "RESOURCE-BBBBBBBBBBBBBBB\u2026",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        25,
+        36,
+        45,
+        1
+      ],
+      "ratio": 14.733144784434272,
+      "required": 4.5
+    },
+    {
+      "tag": "rect",
+      "text": "",
+      "foreground": [
+        80,
+        200,
+        196,
+        1
+      ],
+      "background": [
+        25,
+        36,
+        45,
+        1
+      ],
+      "ratio": 7.810217649280076,
+      "required": 3
+    },
+    {
+      "tag": "text",
+      "text": "TP-fde90e179eb0451d219c8\u2026",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        25,
+        36,
+        45,
+        1
+      ],
+      "ratio": 14.733144784434272,
+      "required": 4.5
+    },
+    {
+      "tag": "H2",
+      "text": "Revisi\u00f3n de la decisi\u00f3n",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        25,
+        36,
+        45,
+        1
+      ],
+      "ratio": 14.733144784434272,
+      "required": 3
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Revisar excepciones",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        32,
+        46,
+        57,
+        1
+      ],
+      "ratio": 12.981136079806113,
+      "required": 4.5
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Consultar a Dation IA",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        32,
+        46,
+        57,
+        1
+      ],
+      "ratio": 12.981136079806113,
+      "required": 4.5
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Verificar para aprobar",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        32,
+        46,
+        57,
+        1
+      ],
+      "ratio": 12.981136079806113,
+      "required": 4.5
+    },
+    {
+      "tag": "H2",
+      "text": "Detalles de ejecuci\u00f3n",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        34,
+        50,
+        62,
+        1
+      ],
+      "ratio": 12.309017208126702,
+      "required": 3
+    },
+    {
+      "tag": "path",
+      "text": "",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        32,
+        46,
+        57,
+        1
+      ],
+      "ratio": 12.981136079806113,
+      "required": 3
+    },
+    {
+      "tag": "H2",
+      "text": "Detalle del viaje",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        34,
+        50,
+        62,
+        1
+      ],
+      "ratio": 12.309017208126702,
+      "required": 3
+    },
+    {
+      "tag": "H2",
+      "text": "Dation IA",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        25,
+        36,
+        45,
+        1
+      ],
+      "ratio": 14.733144784434272,
+      "required": 4.5
+    },
+    {
+      "tag": "path",
+      "text": "",
+      "foreground": [
+        16,
+        22,
+        28,
+        1
+      ],
+      "background": [
+        80,
+        200,
+        196,
+        1
+      ],
+      "ratio": 9.015462491453153,
+      "required": 3
+    },
+    {
+      "tag": "path",
+      "text": "",
+      "foreground": [
+        16,
+        22,
+        28,
+        1
+      ],
+      "background": [
+        80,
+        200,
+        196,
+        1
+      ],
+      "ratio": 9.015462491453153,
+      "required": 3,
+      "state": "deemphasized"
+    },
+    {
+      "tag": "path",
+      "text": "",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        25,
+        36,
+        45,
+        1
+      ],
+      "ratio": 14.733144784434272,
+      "required": 3,
+      "state": "deemphasized"
+    },
+    {
+      "tag": "path",
+      "text": "",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        25,
+        36,
+        45,
+        1
+      ],
+      "ratio": 14.733144784434272,
+      "required": 3,
+      "state": "deemphasized"
+    },
+    {
+      "tag": "path",
+      "text": "",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        25,
+        36,
+        45,
+        1
+      ],
+      "ratio": 14.733144784434272,
+      "required": 3,
+      "state": "deemphasized"
+    },
+    {
+      "tag": "path",
+      "text": "",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        25,
+        36,
+        45,
+        1
+      ],
+      "ratio": 14.733144784434272,
+      "required": 3,
+      "state": "deemphasized"
+    },
+    {
+      "tag": "path",
+      "text": "",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        32,
+        46,
+        57,
+        1
+      ],
+      "ratio": 12.981136079806113,
+      "required": 3,
+      "state": "deemphasized"
+    },
+    {
+      "tag": "path",
+      "text": "",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        32,
+        46,
+        57,
+        1
+      ],
+      "ratio": 12.981136079806113,
+      "required": 3,
+      "state": "deemphasized"
+    },
+    {
+      "tag": "path",
+      "text": "",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        32,
+        46,
+        57,
+        1
+      ],
+      "ratio": 12.981136079806113,
+      "required": 3,
+      "state": "deemphasized"
+    },
+    {
+      "tag": "path",
+      "text": "",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        25,
+        36,
+        45,
+        1
+      ],
+      "ratio": 14.733144784434272,
+      "required": 3,
+      "state": "deemphasized"
+    },
+    {
+      "tag": "path",
+      "text": "",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        32,
+        46,
+        57,
+        1
+      ],
+      "ratio": 12.981136079806113,
+      "required": 3,
+      "state": "deemphasized"
+    },
+    {
+      "tag": "path",
+      "text": "DEST-01 \u2192 TP-fde90e179eb0451d219c8196-1: 10 pallets",
+      "foreground": [
+        55.25,
+        126.20000000000002,
+        128.05,
+        1
+      ],
+      "background": [
+        25,
+        36,
+        45,
+        1
+      ],
+      "ratio": 3.3572277846593557,
+      "required": 3,
+      "state": "deemphasized"
+    },
+    {
+      "tag": "path",
+      "text": "TP-fde90e179eb0451d219c8196-1 \u2192 RESOURCE-BBBBBBBBBBBBBBBBBBBBBBB",
+      "foreground": [
+        55.25,
+        126.20000000000002,
+        128.05,
+        1
+      ],
+      "background": [
+        25,
+        36,
+        45,
+        1
+      ],
+      "ratio": 3.3572277846593557,
+      "required": 3,
+      "state": "deemphasized"
+    },
+    {
+      "tag": "path",
+      "text": "",
+      "foreground": [
+        243,
+        248,
+        250,
+        1
+      ],
+      "background": [
+        32,
+        46,
+        57,
+        1
+      ],
+      "ratio": 12.981136079806113,
+      "required": 3,
+      "state": "deemphasized"
+    },
+    {
+      "tag": "path",
+      "text": "",
+      "foreground": [
+        16,
+        22,
+        28,
+        1
+      ],
+      "background": [
+        80,
+        200,
+        196,
+        1
+      ],
+      "ratio": 9.015462491453153,
+      "required": 3,
+      "state": "deemphasized"
+    }
+  ],
+  "focus": {
+    "top": 566.578125,
+    "bottom": 606.578125,
+    "viewport": 812,
+    "obscured": false,
+    "outline": "solid",
+    "color": "rgb(80, 200, 196)",
+    "width": "3px",
+    "background": "rgb(25, 36, 45)"
+  }
+}

@@ -48,6 +48,10 @@ async def platform_call(name, body):
             if code == "42501":
                 raise HTTPException(403, "No tenés acceso activo a este workspace.")
             if code == "22023":
+                if name == 'platform_ultimate_data_pack':
+                    raise HTTPException(409, "Revisá el contrato de la Model Version, el candidato y el estado de los inputs antes de publicar.")
+                if name == 'platform_ultimate_foundation':
+                    raise HTTPException(409, "Revisá el contexto, el horizonte y la elegibilidad del Decision Owner antes de guardar.")
                 collaboration_errors = {
                     'platform_set_member_responsibilities': 'Revisá las responsabilidades y actualizá la membresía antes de reintentar.',
                     'platform_apply_case_attributes': 'Revisá los atributos y elegí un Data Owner activo y elegible en este workspace.',

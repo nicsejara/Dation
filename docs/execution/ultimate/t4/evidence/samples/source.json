@@ -1,0 +1,10 @@
+{
+  "source": "Synthetic U4 published-Version-shaped fixture; no customer or production data",
+  "model_version_id": "10000000-0000-4000-8000-000000000099",
+  "source_functions": [
+    "compile_contract",
+    "template_csv",
+    "normalize_input"
+  ],
+  "purpose": "Reviewable exact descriptor -> template -> normalized snapshot examples"
+}

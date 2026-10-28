@@ -19,7 +19,7 @@ export async function listDecisionCases(signal){
 }
 export async function openDecisionMap({preferActiveCase=false,trigger=null,forceSelector=false}={}){
   const owner=interaction();
-  const activeCaseId=window.DationDispatch.getWorkspace().decisionCase?.id;
+  const workspace=window.DationDispatch.getWorkspace(),activeCaseId=workspace.decisionCase?.id||workspace.ultimateCaseContext?.id;
   if(!forceSelector&&preferActiveCase&&activeCaseId)return window.DationDispatch.openCase(activeCaseId,'logistics-map',null);
   try{
     const cases=await listDecisionCases(owner.signal);if(!owner.active)return;

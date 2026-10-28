@@ -1,0 +1,10 @@
+--- backend/tests/e2e/scheduling_dashboard_journey.py (R1 end)
++++ backend/tests/e2e/scheduling_dashboard_journey.py (R2)
+@@ -57,6 +57,7 @@
+         await assign_workflow_person(page,'logistics_scheduling')
+         await page.locator('[data-approve-toolbar]').click()
+         await page.wait_for_function("window.DationDispatch.getWorkspace().decisionCase.nodes.logistics_scheduling.status==='approved'")
++        await page.locator('[data-approve-toolbar]').wait_for(state='detached')
+         assert await page.locator('[data-approve-toolbar]').count()==0
+         assert all(path.endswith('/approve') or path.endswith('/responsibilities/logistics_scheduling') or path in ('/api/runs/preflight','/api/platform/activity/exports') for _,path in writes),writes
+         assert sum(path.endswith('/approve') for _,path in writes)==1,writes

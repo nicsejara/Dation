@@ -221,6 +221,7 @@ async def main():
             await owner.locator('.dispatch-decision-tab[data-decision-node=logistics_assignment]').click()
             await owner.locator('.assignment-dashboard-v2').wait_for()
             await owner.get_by_role('button',name='Nueva corrida',exact=True).click()
+            await owner.locator('[data-new-run-warning][open]').get_by_role('button',name='Confirmar nueva corrida',exact=True).click()
             await owner.locator('[data-config-review]').wait_for()
             d1=await execute('logistics_assignment')
             assert await owner.evaluate('window.DationDispatch.getWorkspace().decisionCase.nodes.logistics_scheduling.status')=='stale'

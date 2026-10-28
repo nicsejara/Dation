@@ -1,0 +1,70 @@
+"""Reconstruct only the current Git schema in an owned T0 database."""
+from datetime import datetime, timezone
+import json
+from pathlib import Path
+import subprocess
+import time
+import uuid
+
+ROOT = Path('/workspace/Dation')
+OUT = ROOT / 'docs/execution/ultimate/t0/evidence'
+CONTAINER = 'dation-t0-dcf39757a6'
+DATABASE = 'dation_t0_catalog_' + uuid.uuid4().hex[:10]
+
+def sql(text, database=DATABASE):
+    run = subprocess.run(['docker', '--host=unix:///var/run/docker.sock', 'exec', '-i', CONTAINER,
+                          'psql', '-U', 'postgres', '-d', database, '-X', '-A', '-t',
+                          '-v', 'ON_ERROR_STOP=1'], input=text, capture_output=True, text=True)
+    if run.returncode:
+        raise RuntimeError(run.stderr)
+    return run.stdout.strip()
+
+query = """SELECT jsonb_build_object(
+'captured_at',clock_timestamp(),
+'triggers',(SELECT jsonb_agg(jsonb_build_object('schema',n.nspname,'table',c.relname,'name',t.tgname,'enabled',t.tgenabled,'definition',pg_get_triggerdef(t.oid)) ORDER BY n.nspname,c.relname,t.tgname) FROM pg_trigger t JOIN pg_class c ON c.oid=t.tgrelid JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname IN ('public','dation_private') AND NOT t.tgisinternal),
+'schema_acls',(SELECT jsonb_agg(jsonb_build_object('schema',nspname,'acl',nspacl::text) ORDER BY nspname) FROM pg_namespace WHERE nspname IN ('public','dation_private')),
+'default_acls',(SELECT jsonb_agg(jsonb_build_object('schema',n.nspname,'owner',pg_get_userbyid(d.defaclrole),'type',d.defaclobjtype,'acl',d.defaclacl::text) ORDER BY n.nspname,d.defaclobjtype) FROM pg_default_acl d LEFT JOIN pg_namespace n ON n.oid=d.defaclnamespace WHERE n.nspname IN ('public','dation_private')),
+'tables',(SELECT jsonb_agg(jsonb_build_object('schema',n.nspname,'name',c.relname,'kind',c.relkind,'rls',c.relrowsecurity,'force_rls',c.relforcerowsecurity,'owner',pg_get_userbyid(c.relowner)) ORDER BY n.nspname,c.relname) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname IN ('public','dation_private') AND c.relkind IN ('r','v','m','p')),
+'columns',(SELECT jsonb_agg(jsonb_build_object('schema',table_schema,'table',table_name,'name',column_name,'type',data_type,'udt',udt_name,'nullable',is_nullable,'default',column_default,'ordinal',ordinal_position) ORDER BY table_schema,table_name,ordinal_position) FROM information_schema.columns WHERE table_schema IN ('public','dation_private')),
+'constraints',(SELECT jsonb_agg(jsonb_build_object('schema',n.nspname,'table',c.relname,'name',con.conname,'type',con.contype,'validated',con.convalidated,'definition',pg_get_constraintdef(con.oid,true)) ORDER BY n.nspname,c.relname,con.conname) FROM pg_constraint con JOIN pg_class c ON c.oid=con.conrelid JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname IN ('public','dation_private')),
+'indexes',(SELECT jsonb_agg(jsonb_build_object('schema',schemaname,'table',tablename,'name',indexname,'definition',indexdef) ORDER BY schemaname,tablename,indexname) FROM pg_indexes WHERE schemaname IN ('public','dation_private')),
+'policies',(SELECT jsonb_agg(jsonb_build_object('schema',schemaname,'table',tablename,'name',policyname,'permissive',permissive,'roles',roles,'command',cmd,'using',qual,'with_check',with_check) ORDER BY schemaname,tablename,policyname) FROM pg_policies WHERE schemaname IN ('public','dation_private')),
+'functions',(SELECT jsonb_agg(jsonb_build_object('schema',n.nspname,'name',p.proname,'identity_arguments',pg_get_function_identity_arguments(p.oid),'arguments',pg_get_function_arguments(p.oid),'result',pg_get_function_result(p.oid),'security_definer',p.prosecdef,'volatility',p.provolatile,'config',p.proconfig,'acl',p.proacl::text,'source_md5',md5(p.prosrc),'definition_md5',md5(pg_get_functiondef(p.oid))) ORDER BY n.nspname,p.proname,pg_get_function_identity_arguments(p.oid)) FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname IN ('public','dation_private') AND p.prokind='f'),
+'table_grants',(SELECT jsonb_agg(jsonb_build_object('schema',table_schema,'table',table_name,'grantee',grantee,'privilege',privilege_type) ORDER BY table_schema,table_name,grantee,privilege_type) FROM information_schema.role_table_grants WHERE table_schema IN ('public','dation_private'))
+);"""
+
+started = time.monotonic()
+sql('CREATE DATABASE ' + DATABASE + ';', database='postgres')
+applied = []
+try:
+    sql((ROOT/'backend/tests/integration/infrastructure.sql').read_text())
+    sql("CREATE SCHEMA auth; CREATE TABLE auth.users(id uuid PRIMARY KEY,email text,email_confirmed_at timestamptz); CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $$ SELECT (nullif(current_setting('request.jwt.claims',true),'')::jsonb->>'sub')::uuid $$; GRANT USAGE ON SCHEMA auth TO authenticated; GRANT EXECUTE ON FUNCTION auth.uid() TO authenticated;")
+    baseline = ROOT/'supabase/baseline/20261010100000_public_schema.sql'
+    sql(baseline.read_text())
+    applied.append(str(baseline.relative_to(ROOT)))
+    for migration in sorted((ROOT/'supabase/migrations').glob('*.sql')):
+        if migration.name[:14] > '20261010100000':
+            sql(migration.read_text())
+            applied.append(str(migration.relative_to(ROOT)))
+    local = json.loads(sql(query))
+    live = json.loads((OUT/'sql-catalog-live.json').read_text())['data'][0]['catalog']
+    extended = json.loads((OUT/'sql-extended-metadata-live.json').read_text())['data'][0]['metadata']
+    for kind in ['triggers','schema_acls','default_acls']:
+        live[kind] = extended[kind]
+    comparison = {}
+    for kind in ['tables','columns','constraints','indexes','policies','functions','table_grants','triggers','schema_acls','default_acls']:
+        old = {json.dumps(x,sort_keys=True,ensure_ascii=False) for x in live[kind] or []}
+        new = {json.dumps(x,sort_keys=True,ensure_ascii=False) for x in local[kind] or []}
+        comparison[kind] = {'live_count':len(old),'git_rebuild_count':len(new),
+                            'identical':old==new,
+                            'live_only':[json.loads(x) for x in sorted(old-new)],
+                            'git_rebuild_only':[json.loads(x) for x in sorted(new-old)]}
+    record = {'phase':'T0','production_writes':False,'owned_container':CONTAINER,
+              'database':DATABASE,'auth_fixture':'same shape as tests/e2e/sandbox.py',
+              'applied_git_files':applied,'duration_seconds':round(time.monotonic()-started,3),
+              'query':query,'catalog':local,'comparison':comparison}
+    (OUT/'sql-git-rebuild-comparison.json').write_text(json.dumps(record,indent=2,ensure_ascii=False)+'\n')
+    print(json.dumps({'files_applied_to_owned_database':len(applied),
+                      'comparison':{k:{q:v[q] for q in ['live_count','git_rebuild_count','identical']} for k,v in comparison.items()}}),flush=True)
+finally:
+    sql('DROP DATABASE ' + DATABASE + ';', database='postgres')

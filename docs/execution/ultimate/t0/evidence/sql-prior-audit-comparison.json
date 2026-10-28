@@ -1,0 +1,42 @@
+{
+  "prior_evidence": "/workspace/work/ultimate-mvp-plan/live-schema.json",
+  "current_evidence": "sql-catalog-live.json",
+  "comparison": {
+    "functions": {
+      "identical_on_comparable_fields": true,
+      "prior_count": 101,
+      "current_count": 101,
+      "prior_only": 0,
+      "current_only": 0
+    },
+    "columns": {
+      "identical_on_comparable_fields": true,
+      "prior_count": 232,
+      "current_count": 232,
+      "prior_only": 0,
+      "current_only": 0
+    },
+    "constraints": {
+      "identical_on_comparable_fields": true,
+      "prior_count": 161,
+      "current_count": 161,
+      "prior_only": 0,
+      "current_only": 0,
+      "format_note": "Compared pg_get_constraintdef(oid) in both captures. Initial pretty=true output differs in formatting only; full Git rebuild was already exact."
+    },
+    "indexes": {
+      "identical_on_comparable_fields": true,
+      "prior_count": 79,
+      "current_count": 79,
+      "prior_only": 0,
+      "current_only": 0
+    },
+    "policies": {
+      "identical_on_comparable_fields": true,
+      "prior_count": 17,
+      "current_count": 17,
+      "prior_only": 0,
+      "current_only": 0
+    }
+  }
+}

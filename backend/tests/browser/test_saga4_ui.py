@@ -22,7 +22,8 @@ class Saga4UITests(unittest.IsolatedAsyncioTestCase):
         await self.b.open('logistics-config',node)
         context=self.page.locator('#dispatch-config-root [data-config-context]')
         await context.wait_for();self.assertEqual(await context.locator('summary').inner_text(),'Contexto del Case\n⌄')
-        await context.locator('summary').click();await self.page.wait_for_function("document.querySelector('#dispatch-config-root summary').title==='Cerrar contexto del Case'")
+        await context.locator('summary').click();await self.page.wait_for_function("document.querySelector('#dispatch-config-root [data-config-context]>summary').title==='Cerrar contexto del Case'")
+        self.assertTrue(await context.evaluate('el=>el.open'))
         config_fields=await context.locator('dt').all_text_contents()
         for active in ('logistics_assignment','logistics_scheduling'):
             self.b.case=copy.deepcopy(original)
@@ -127,7 +128,7 @@ class Saga4UITests(unittest.IsolatedAsyncioTestCase):
                 await self.page.wait_for_function("!document.querySelector('#dispatch-map-root article[data-decision-node=logistics_scheduling] [data-map-action=configure]').disabled")
                 await card.locator('[data-map-action=configure]').click();await self.page.locator('[data-scheduling-review]').wait_for()
             await self.b.open('decision-dashboard',node,run['id'])
-            await self.page.get_by_role('button',name='Nueva corrida',exact=True).click();await self.page.locator('[data-config-review]').wait_for()
+            await self.page.get_by_role('button',name='Nueva corrida',exact=True).click();await self.b.confirm_rerun();await self.page.locator('[data-config-review]').wait_for()
             query=parse_qs(urlparse(self.page.url).query);self.assertEqual(query['case_id'],[self.b.case['id']]);self.assertEqual(query['node_id'],[node]);self.assertNotIn('run_id',query)
         self.assertEqual(self.b.execution_bodies,[])
 
@@ -150,6 +151,6 @@ class Saga4UITests(unittest.IsolatedAsyncioTestCase):
             await self.page.locator('[data-export-menu] summary').click()
             async with self.page.expect_download() as pending:await self.page.locator('[data-export-'+form+']').click()
             download=await pending.value;self.assertTrue(download.suggested_filename.endswith('.'+form))
-        await self.page.get_by_role('button',name='Nueva corrida',exact=True).click();await self.page.locator('[data-scheduling-review]').wait_for()
+        await self.page.get_by_role('button',name='Nueva corrida',exact=True).click();await self.b.confirm_rerun();await self.page.locator('[data-scheduling-review]').wait_for()
         query=parse_qs(urlparse(self.page.url).query);self.assertEqual(query['node_id'],[node]);self.assertEqual(query['case_id'],[self.b.case['id']]);self.assertNotIn('run_id',query)
         self.assertEqual(self.b.execution_bodies,[])

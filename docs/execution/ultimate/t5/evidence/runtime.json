@@ -1,0 +1,17 @@
+{
+  "date": "2026-10-27",
+  "client_timezone": "America/Buenos_Aires",
+  "log_timezone": "UTC",
+  "python": "3.13.5",
+  "node": "24.19.0",
+  "chromium": "151.0.7922.173",
+  "postgres": "17.11",
+  "docker": "28.4.0",
+  "supabase_cli": "2.122.0",
+  "app_runner": "/workspace/Dation/.venv/bin/python",
+  "browser_runner": "/workspace/Dation/backend/.browser-venv/bin/python",
+  "Docker": "Local Unix socket; inherited endpoint/context/TLS selectors cleared for owned fixtures only.",
+  "QA_authorization": "Local loopback/Chromium/Docker execution approved by tool review; no external project used as sandbox.",
+  "production_credentials_used": false,
+  "new_application_dependencies": false
+}

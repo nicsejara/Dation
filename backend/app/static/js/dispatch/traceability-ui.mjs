@@ -48,13 +48,21 @@ function caseStats(item){
   const nodes=item?.decision_case?.nodes||{};
   const values=Object.values(nodes);
   return {
-    approved:values.filter(node=>node?.status==='approved').length,
-    runs:values.reduce((sum,node)=>sum+(Number(node?.run_count)||0),0),
+    approved:item.case?.progress?.approved??values.filter(node=>node?.status==='approved').length,
+    runs:values.length?values.reduce((sum,node)=>sum+(Number(node?.run_count)||0),0):item.case?.progress?null:0,
   };
 }
 
 function caseCard(item,currentCaseId){
   const row=item.case||{};
+  if(row.workflow_version===2){
+    return '<article class="dispatch-case-option '+(String(row.id)===String(currentCaseId)?'is-current':'')+'">'
+      +'<div class="dispatch-case-option__top"><div><small>DECISION CASE</small><strong>'+esc(row.label||shortCaseId(row.id))+'</strong></div>'
+      +(String(row.id)===String(currentCaseId)?'<span class="dispatch-case-option__current">Abierto ahora</span>':'')+'</div>'
+      +'<div class="dispatch-case-option__pack"><span><small>CONTEXTO</small><strong>'+esc(shortCaseId(row.id))+'</strong></span><span><small>PROGRESO</small><strong>'+num(item.graph?.approved_count??row.progress?.approved??0)+' / 2 aprobadas</strong></span></div>'
+      +'<div class="dispatch-case-option__footer"><span>'+esc(row.status==='archived'?'Archivado':'Data Pack progresivo')+'</span>'
+      +(String(row.id)===String(currentCaseId)?'<button type="button" disabled>Caso actual</button>':'<button type="button" data-open-case="'+esc(row.id)+'">Abrir caso →</button>')+'</div></article>';
+  }
   const stats=caseStats(item);
   const current=String(row.id||'')===String(currentCaseId||'');
   return '<article class="dispatch-case-option '+(current?'is-current':'')+'">'
@@ -68,8 +76,8 @@ function caseCard(item,currentCaseId){
       +'<span><small>FLOTA</small><strong title="'+esc(datasetName(item.fleet))+'">'+esc(datasetName(item.fleet))+'</strong></span>'
     +'</div>'
     +'<div class="dispatch-case-option__metrics">'
-      +'<span><strong>'+num(stats.approved)+'/3</strong><small>decisiones vigentes</small></span>'
-      +'<span><strong>'+num(stats.runs)+'</strong><small>corridas registradas</small></span>'
+      +'<span><strong>'+num(stats.approved)+'/'+(row.progress?.total??3)+'</strong><small>decisiones vigentes</small></span>'
+      +'<span><strong>'+(stats.runs==null?'—':num(stats.runs))+'</strong><small>corridas registradas</small></span>'
     +'</div>'
     +'<div class="dispatch-case-option__footer">'
       +'<span>Última actividad · '+esc(dateTime(row.last_activity_at||row.updated_at))+'</span>'

@@ -1,0 +1,7 @@
+{
+  "api_url": "http://127.0.0.1:57009",
+  "baseline_url": "http://127.0.0.1:59757",
+  "control_dir": "/tmp/dation-e2e-0d6e04fdb758-b1pxg3sr/storage",
+  "pg_container": "dation-e2e-0d6e04fdb758-pg",
+  "database": "dation_e2e"
+}

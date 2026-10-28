@@ -1,0 +1,7 @@
+{
+  "remaining_owned_T5_containers": [],
+  "suite_fixtures_closed_by_context_managers": true,
+  "one_shot_postgres_version_container_removed_automatically": true,
+  "no_global_daemon_or_unowned_resource_stopped": true,
+  "production_resources_modified": false
+}

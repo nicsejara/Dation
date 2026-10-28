@@ -1,0 +1,175 @@
+{
+  "description": "Synthetic persisted ABI facts; no target semantics applied. Legacy date/cost quirks intentionally preserved.",
+  "orders": [
+    {
+      "order_id": "EARLY",
+      "product": "Producto EARLY",
+      "quantity_units": 1,
+      "unit_weight_kg": 500,
+      "origin": "Cordoba",
+      "destination": "Mendoza",
+      "distance_km": 480,
+      "estimated_dispatch_date": "2026-11-02",
+      "priority": "Normal",
+      "delivery_due_date": "2026-11-03"
+    },
+    {
+      "order_id": "LATER",
+      "product": "Producto LATER",
+      "quantity_units": 1,
+      "unit_weight_kg": 500,
+      "origin": "Cordoba",
+      "destination": "Mendoza",
+      "distance_km": 480,
+      "estimated_dispatch_date": "2026-11-06",
+      "priority": "Normal",
+      "delivery_due_date": "2026-11-10"
+    }
+  ],
+  "fleet": [
+    {
+      "vehicle_id": "EXT",
+      "license_plate": "",
+      "vehicle_type": "Truck",
+      "ownership": "third_party",
+      "provider_name": "Proveedor",
+      "base_site": "*",
+      "capacity_kg": 1000,
+      "capacity_m3": "",
+      "cost_per_km": 1,
+      "fixed_trip_cost": 10,
+      "fuel_l_per_100km": 20,
+      "co2_kg_per_km": 0.5,
+      "avg_speed_kmh": 80,
+      "driving_hours_per_day": 10,
+      "status": "available",
+      "available_from": "2026-10-01",
+      "available_until": ""
+    }
+  ],
+  "configuration": {
+    "objective": "min_trips",
+    "dimensions": [
+      "trips",
+      "own_fleet"
+    ]
+  },
+  "options": {
+    "analysis_depth": "essential",
+    "solve_time_limit_s": 5,
+    "deterministic_limit": 0.05
+  },
+  "input_sha256": {
+    "orders": "f3d15124687e5dc74daafda6f4e5953c9e7f1473b16f1b1466280d62ffb2432a",
+    "fleet": "24d0bf6cf0396f1769a48260ce50e2c1ab3da8bf28a0c2387c59e7fb46022a6d"
+  },
+  "assignment_schema": "assignment_v1",
+  "scheduling_schema": "scheduling_v1",
+  "assignment_trips": [
+    {
+      "vehicle_id": "EXT",
+      "vehicle_type": "Truck",
+      "ownership": "third_party",
+      "provider_name": "Proveedor",
+      "base_site": "*",
+      "origin": "Cordoba",
+      "destination": "Mendoza",
+      "distance_km": 480.0,
+      "capacity_kg": 1000.0,
+      "loads": [
+        {
+          "order_id": "EARLY",
+          "product": "Producto EARLY",
+          "units": 1,
+          "kg": 500.0
+        },
+        {
+          "order_id": "LATER",
+          "product": "Producto LATER",
+          "units": 1,
+          "kg": 500.0
+        }
+      ],
+      "load_kg": 1000.0,
+      "trip_id": "A-00001",
+      "utilization": 1.0,
+      "estimated_cost": 970.0,
+      "estimated_co2_kg": 480.0
+    }
+  ],
+  "scheduling_trips": [
+    {
+      "vehicle_id": "EXT",
+      "vehicle_type": "Truck",
+      "ownership": "third_party",
+      "provider_name": "Proveedor",
+      "base_site": "*",
+      "origin": "Cordoba",
+      "destination": "Mendoza",
+      "distance_km": 480.0,
+      "capacity_kg": 1000.0,
+      "loads": [
+        {
+          "order_id": "EARLY",
+          "product": "Producto EARLY",
+          "units": 1,
+          "kg": 500.0
+        },
+        {
+          "order_id": "LATER",
+          "product": "Producto LATER",
+          "units": 1,
+          "kg": 500.0
+        }
+      ],
+      "load_kg": 1000.0,
+      "trip_id": "A-00001",
+      "utilization": 1.0,
+      "estimated_cost": 970.0,
+      "estimated_co2_kg": 480.0,
+      "ready_date": "2026-11-06",
+      "dispatch_date": "2026-11-06",
+      "arrival_date": "2026-11-07",
+      "transit_days": 1,
+      "cycle_days": 2,
+      "resource_available_again": "2026-11-08",
+      "wait_days": 0,
+      "delivery_due_date": "2026-11-03"
+    }
+  ],
+  "assignment_handoff": {
+    "schema_version": "scheduling_input_v1",
+    "source_decision": "logistics_assignment",
+    "next_decision": "logistics_scheduling",
+    "source_path": "scenarios.selected.trips",
+    "assignment_fingerprint": "1cfaed862e0e10eab688693e6cb0335208e9bd86180747230282845118b6fb72",
+    "trip_count": 1,
+    "trip_ids": [
+      "A-00001"
+    ]
+  },
+  "scheduling_handoff": {
+    "schema_version": "final_assignment_input_v1",
+    "source_decision": "logistics_scheduling",
+    "next_decision": "logistics_final_assignment",
+    "source_path": "scenarios.selected.trips",
+    "assignment_fingerprint": "1cfaed862e0e10eab688693e6cb0335208e9bd86180747230282845118b6fb72",
+    "schedule_fingerprint": "3f3d00678bcee691640541f33590d909f38ae2bef42ac8491be39554ee0d2a01",
+    "trip_count": 1,
+    "trip_ids": [
+      "A-00001"
+    ]
+  },
+  "csv": {
+    "name": "assignment-recomendada.csv",
+    "mime": "text/csv; charset=utf-8",
+    "sha256": "76d6f53ac195c5b341c1d49358ad8f358de286f47b66097e2ff413726a5a5293",
+    "bytes": 546
+  },
+  "legacy_math_sha256": "a83050e74c2776ce4d0ca5d06f14319bd9cf471ff1d968abb4d203fa8b945678",
+  "capture_note": "Initial comparison used co2_kg_per_km=1; only CO2 differed. Replayed with prior fixture default .5 to compare identical inputs. No product/fixture source changed.",
+  "comparison_to_prior": {
+    "assignment_trips_identical": true,
+    "scheduling_trips_identical": true
+  }
+}

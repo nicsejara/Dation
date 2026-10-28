@@ -1,0 +1,21 @@
+{
+  "date": "2026-10-26",
+  "client_timezone": "America/Buenos_Aires",
+  "python": "3.13.5",
+  "node": "24.19.0",
+  "chromium": "151.0.7922.173",
+  "docker": "28.4.0",
+  "postgres": "17.11",
+  "supabase_cli": "2.122.0",
+  "application_python": "/workspace/Dation/.venv/bin/python",
+  "browser_python": "/workspace/Dation/backend/.browser-venv/bin/python",
+  "docker_socket": "unix:///var/run/docker.sock",
+  "SQL_container": "dation-t4-20261026-inputs",
+  "SQL_labels": {
+    "dation.qa.phase": "T4",
+    "dation.qa.owner": "codex-dation"
+  },
+  "network": "Restricted session proxy; local fixtures; no VPN; no allowlist bypass.",
+  "production_credentials_used": false,
+  "application_dependencies_added": false
+}

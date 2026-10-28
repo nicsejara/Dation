@@ -1,0 +1,121 @@
+[
+  {
+    "inside": true,
+    "name": "Contexto del Case",
+    "top": 297.78125,
+    "bottom": 337.78125,
+    "hit": true
+  },
+  {
+    "inside": true,
+    "name": "Descargar template de Demanda",
+    "top": 783.515625,
+    "bottom": 819.515625,
+    "hit": true
+  },
+  {
+    "inside": true,
+    "name": "Subir nuevo",
+    "top": 753.515625,
+    "bottom": 820.296875,
+    "hit": true
+  },
+  {
+    "inside": true,
+    "name": "Reutilizar anterior",
+    "top": 753.515625,
+    "bottom": 820.296875,
+    "hit": true
+  },
+  {
+    "inside": true,
+    "name": "Elegir CSV de Demanda",
+    "top": 586.484375,
+    "bottom": 820.453125,
+    "hit": true
+  },
+  {
+    "inside": true,
+    "name": "Elegir archivo",
+    "top": 722.265625,
+    "bottom": 758.265625,
+    "hit": true
+  },
+  {
+    "inside": true,
+    "name": "Reemplazar",
+    "top": 477.734375,
+    "bottom": 503.125,
+    "hit": true
+  },
+  {
+    "inside": true,
+    "name": "Ver columnas",
+    "top": 477.734375,
+    "bottom": 503.125,
+    "hit": true
+  },
+  {
+    "inside": true,
+    "name": "Quitar selecci\u00f3n",
+    "top": 511.125,
+    "bottom": 536.515625,
+    "hit": true
+  },
+  {
+    "inside": true,
+    "name": "Vista previa del candidato de Demanda",
+    "top": 570.671875,
+    "bottom": 819.84375,
+    "hit": true
+  },
+  {
+    "inside": true,
+    "name": "Guardar candidato de Demanda",
+    "top": 779.84375,
+    "bottom": 819.84375,
+    "hit": true
+  },
+  {
+    "inside": true,
+    "name": "Descargar template de Recursos",
+    "top": 471.546875,
+    "bottom": 507.546875,
+    "hit": true
+  },
+  {
+    "inside": true,
+    "name": "Subir nuevo",
+    "top": 528.546875,
+    "bottom": 595.328125,
+    "hit": true
+  },
+  {
+    "inside": true,
+    "name": "Reutilizar anterior",
+    "top": 528.546875,
+    "bottom": 595.328125,
+    "hit": true
+  },
+  {
+    "inside": true,
+    "name": "Elegir CSV de Recursos",
+    "top": 586.515625,
+    "bottom": 820.484375,
+    "hit": true
+  },
+  {
+    "inside": true,
+    "name": "Elegir archivo",
+    "top": 722.296875,
+    "bottom": 758.296875,
+    "hit": true
+  },
+  {
+    "inside": true,
+    "name": "Ver manifest de versi\u00f3n 1",
+    "top": 802.765625,
+    "bottom": 842.765625,
+    "hit": true
+  }
+]

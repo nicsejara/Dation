@@ -1,0 +1,20 @@
+{
+  "suite": "FOCAL-EMPTY-API",
+  "status": "PASS",
+  "tests": 4,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "started_at": "2026-10-26T14:57:38.722846+00:00",
+  "finished_at": "2026-10-26T14:58:01.021845+00:00",
+  "seconds": 22.299,
+  "command": [
+    "/workspace/Dation/.venv/bin/python",
+    "-B",
+    "/tmp/dation-t2-empty-case-smoke.py"
+  ],
+  "cwd": "/workspace/Dation",
+  "production_credentials_cleared": true,
+  "test_ids": [],
+  "no_public_Ultimate_creation": true
+}

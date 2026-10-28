@@ -1,0 +1,24 @@
+/* T3 layout only. Dation controls, typography, colors and motion stay authoritative. */
+.ultimate-foundation { display:grid; gap:var(--space-6); max-inline-size:var(--platform-page-max,1180px); margin-inline:auto; padding:var(--space-6); min-inline-size:0; }
+.ultimate-foundation .ultimate-form,.ultimate-foundation .ultimate-section,.ultimate-foundation .ultimate-list { display:grid; gap:var(--space-4); min-inline-size:0; }
+.ultimate-foundation .ultimate-section { margin:0; padding:var(--space-5); }
+.ultimate-foundation .ultimate-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--space-4); min-inline-size:0; }
+.ultimate-foundation .ultimate-choices { margin:0; padding:0; border:0; display:grid; align-content:start; gap:var(--space-2); min-inline-size:0; }
+.ultimate-foundation .ultimate-choices legend { margin-block-end:var(--space-2); }
+.ultimate-foundation .ultimate-actions,.ultimate-foundation .ultimate-footer,.ultimate-foundation .ultimate-model-card,.ultimate-foundation .ultimate-version,.ultimate-foundation .ultimate-toolbar { display:flex; flex-wrap:wrap; gap:var(--space-3); align-items:center; justify-content:space-between; min-inline-size:0; }
+.ultimate-foundation .ultimate-model-card>div { flex:1 1 18rem; min-inline-size:0; display:grid; gap:var(--space-2); }
+.ultimate-foundation .ultimate-footer { padding:var(--space-4); }
+.ultimate-foundation .ultimate-footer>p { flex:1 1 18rem; min-inline-size:0; }
+.ultimate-foundation .ultimate-policy { grid-column:1/-1; }
+.ultimate-foundation .ultimate-policy>summary { cursor:pointer; padding-block:var(--space-3); color:var(--color-text); }
+.ultimate-foundation .ultimate-policy .ultimate-grid { margin-block:var(--space-3); }
+.ultimate-foundation .ultimate-errors { display:grid; gap:var(--space-2); padding:var(--space-4); border:1px solid var(--color-danger); border-radius:var(--radius-md); }
+.ultimate-foundation .ultimate-errors a { color:var(--color-danger); text-decoration:underline; }
+.ultimate-foundation [hidden] { display:none!important; }
+.ultimate-foundation :is(h1,h2,h3,p,legend,summary,option) { overflow-wrap:anywhere; }
+.ultimate-foundation .ultimate-saved-context { display:grid; gap:var(--space-2); }
+.ultimate-foundation .ultimate-version { padding-block:var(--space-3); border-block-end:1px solid var(--color-border); }
+.ultimate-foundation .ultimate-toolbar .d-field { flex:1 1 16rem; }
+.ultimate-entry { margin-block:var(--space-5); padding:var(--space-4); }
+.ultimate-entry .platform-actions { display:flex; flex-wrap:wrap; gap:var(--space-3); }
+@media(max-width:700px) { .ultimate-foundation { padding:var(--space-4); } .ultimate-foundation .ultimate-grid { grid-template-columns:minmax(0,1fr); } .ultimate-foundation .ultimate-section { padding:var(--space-4); } }

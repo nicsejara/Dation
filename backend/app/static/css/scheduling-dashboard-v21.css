@@ -137,7 +137,7 @@
 .scheduling-context__grid article:last-child{border-right:0}
 .scheduling-context__grid article>.scheduling-v2__icon{width:16px;height:16px;min-width:16px;color:var(--color-text-muted)}
 .scheduling-context__grid strong{font-size:24px;font-weight:500;font-variant-numeric:tabular-nums}
-.scheduling-kpis{gap:0;border-block:1px solid var(--color-border)}
+.scheduling-kpis{grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border-block:1px solid var(--color-border)}
 .scheduling-kpis article{container-type:inline-size;box-shadow:none;min-height:160px;padding:20px;border:0;border-right:1px solid var(--color-border);border-radius:0;background:transparent}
 
 .scheduling-kpis article:last-child{border-right:0}

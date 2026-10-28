@@ -1,0 +1,8 @@
+{
+  "source_or_test_changes": false,
+  "corrections": [
+    "Candidate baseline labels and patch filename changed from inherited T3 labels to post-T3/T4.",
+    "Visual parity metadata key now says t4_stylesheet_loaded_after; driver already loaded ultimate-case-data.css."
+  ],
+  "raw_test_logs_or_results_changed": false
+}

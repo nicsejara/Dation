@@ -1,0 +1,1592 @@
+--- post-T3/backend/app/domain/logistics/data_contracts.py
++++ T4/backend/app/domain/logistics/data_contracts.py
+@@ -0,0 +1,104 @@
++"""T4 exact, versioned input descriptors. No engine, fuzzy mapping or graph."""
++import csv
++import io
++from typing import Literal
++from uuid import UUID
++
++from pydantic import Field
++from app.domain.logistics.base import ContractModel, SHA256
++from app.domain.logistics.units import QUANTITY_SCALES
++from app.models.ultimate_foundation import LogisticsModelConfigurationV1
++from app.results.canonical import canonical_bytes, content_sha256
++
++REGISTRY_VERSION='ULTIMATE_DOMAIN_V1'
++NORMALIZER_VERSION='DATION_INPUT_NORMALIZER_V1'
++ENTITIES=('transport_demand','transport_resources')
++MAX_BYTES=10*1024*1024
++MAX_ROWS=10000
++
++
++class SemanticField(ContractModel):
++    semantic_key: str
++    semantic_entity: Literal['transport_demand','transport_resources']
++    type: Literal['IDENTIFIER','DECIMAL','INTEGER','DATE','BOOLEAN','ENUM','ID_LIST','LANES']
++    unit: str | None
++    required_for: tuple[str,...]
++    used_by: tuple[str,...] = ('logistics_assignment','logistics_scheduling')
++    validation: dict
++    engine_role: str
++    public_header: str
++    examples: tuple[str,...]
++    nullable: bool = False
++    applies_when: dict = Field(default_factory=dict)
++
++
++class DataContract(ContractModel):
++    contract_id: str
++    schema_version: str
++    registry_version: str
++    model_version_id: UUID
++    configuration_hash: SHA256
++    semantic_entity: Literal['transport_demand','transport_resources']
++    fields: tuple[SemanticField,...]
++    rules: dict
++    normalizer_version: str = NORMALIZER_VERSION
++    contract_hash: SHA256
++
++
++def compile_contract(model_version,semantic_entity,registry_version=REGISTRY_VERSION):
++    """The argument is a persisted published Version, never a browser schema."""
++    if semantic_entity not in ENTITIES or registry_version!=REGISTRY_VERSION:raise ValueError('Unknown semantic entity/registry')
++    if model_version.get('contract_registry_version',registry_version)!=registry_version:raise ValueError('Published Model uses an unsupported registry')
++    config=LogisticsModelConfigurationV1.model_validate(model_version['config_jsonb'])
++    model_id=UUID(str(model_version['id']));fields=[]
++    def add(key,type,example,*,unit=None,nullable=False,when=None,required=('INPUT_SCHEMA',),role='INPUT',**validation):
++        fields.append(SemanticField(semantic_key=key,semantic_entity=semantic_entity,type=type,unit=unit,
++            required_for=required,validation=validation,engine_role=role,public_header=key,examples=(example,),nullable=nullable,applies_when=when or {}))
++    if semantic_entity=='transport_demand':
++        for key,example in [('order_id','ORD-001'),('origin_id','ORIGIN-01'),('destination_id','DEST-01')]:add(key,'IDENTIFIER',example,max_length=128)
++        add('distance_km','DECIMAL','500',unit='km',positive=True,scale=3)
++        add('ready_date','DATE','2026-11-02',format='YYYY-MM-DD');add('delivery_due_date','DATE','2026-11-06',format='YYYY-MM-DD')
++        add('priority','ENUM','MEDIUM',values=['HIGH','MEDIUM','LOW']);add('split_allowed','BOOLEAN','true' if config.split_permitted else 'false',values=['true','false'])
++        for dim in config.active_dimensions:add('demand_'+dim,'DECIMAL','10',unit=dim,minimum=0,scale=QUANTITY_SCALES[dim])
++    else:
++        add('resource_id','IDENTIFIER','RES-001',max_length=128)
++        add('source','ENUM',config.allowed_sources[0],values=list(config.allowed_sources))
++        add('lanes','LANES','[["ORIGIN-01","DEST-01"]]',format='JSON array of [origin_id,destination_id] pairs',max_items=100)
++        for dim in config.active_dimensions:
++            add('guaranteed_'+dim,'DECIMAL','20',unit=dim,positive=True,scale=QUANTITY_SCALES[dim])
++            add('maximum_'+dim,'DECIMAL','',unit=dim,nullable=True,positive=True,scale=QUANTITY_SCALES[dim])
++        if 'OWN' in config.allowed_sources:
++            add('units_available','INTEGER','1',unit='units',nullable=True,when={'source':'OWN'},required=('OWN_FEASIBILITY',),minimum=0)
++            add('base_origin_id','IDENTIFIER','ORIGIN-01',when={'source':'OWN'},max_length=128)
++            add('operating_cost_per_km','DECIMAL','1',unit=config.currency_policy.currency+'/km',nullable=True,when={'source':'OWN'},required=('ECONOMIC_GOAL',),minimum=0,scale=6)
++        if 'EXTERNAL' in config.allowed_sources:
++            add('services_available','INTEGER','1',unit='horizon_services',nullable=True,when={'source':'EXTERNAL'},required=('EXTERNAL_FEASIBILITY',),minimum=0)
++            add('availability_source','ENUM','CONFIRMED',when={'source':'EXTERNAL'},values=['CONFIRMED','ASSUMED','UNKNOWN'])
++            add('cost_model','ENUM',config.external_cost_models[0],when={'source':'EXTERNAL'},values=list(config.external_cost_models))
++            if 'PER_TRIP' in config.external_cost_models:add('trip_rate','DECIMAL','100',unit=config.currency_policy.currency+'/trip',nullable=True,when={'source':'EXTERNAL','cost_model':'PER_TRIP'},required=('ECONOMIC_GOAL',),minimum=0,scale=6)
++            if 'PER_KM' in config.external_cost_models:
++                add('per_km_rate','DECIMAL','1',unit=config.currency_policy.currency+'/km',nullable=True,when={'source':'EXTERNAL','cost_model':'PER_KM'},required=('ECONOMIC_GOAL',),minimum=0,scale=6)
++                add('billing_basis','ENUM',config.per_km_billing_bases[0],when={'source':'EXTERNAL','cost_model':'PER_KM'},values=list(config.per_km_billing_bases))
++    add('compatibility_groups','ID_LIST','DRY',nullable=config.homogeneous_loads_declared,separator='|',max_items=100)
++    rules={'extra_columns':'REJECT','header_matching':'EXACT','delimiter':',','encoding':'UTF-8','value_whitespace':'TRIM_NFC',
++        'max_raw_bytes':MAX_BYTES,'max_normalized_bytes':MAX_BYTES,'max_rows':MAX_ROWS,'empty_rows':'REJECT',
++        'model':config.model_dump(mode='json'),'unknown_cost':'PRESERVE_NULL','unknown_availability':'PRESERVE_UNKNOWN',
++        'assumed_external_default':{'when':'ASSUMED explicitly declared and services_available empty','value':1,'source':'DATION_DEFAULT'}}
++    body=dict(contract_id=semantic_entity+'_v1',schema_version=semantic_entity+'_v1',registry_version=registry_version,
++        model_version_id=str(model_id),configuration_hash=model_version['config_hash'],semantic_entity=semantic_entity,
++        fields=[f.model_dump(mode='json') for f in fields],rules=rules,normalizer_version=NORMALIZER_VERSION)
++    return DataContract(**body,contract_hash=content_sha256(canonical_bytes(body)))
++
++
++def template_csv(contract):
++    """Five operational examples, generated from the descriptor's own fields."""
++    out=io.StringIO(newline='');writer=csv.writer(out,lineterminator='\n');writer.writerow([f.public_header for f in contract.fields])
++    model=contract.rules['model']
++    for index in range(5):
++        source=model['allowed_sources'][index%len(model['allowed_sources'])]
++        cost=model['external_cost_models'][index%len(model['external_cost_models'])] if model['external_cost_models'] else None
++        values={f.public_header:f.examples[0] for f in contract.fields}
++        values['source']=source;values['cost_model']=cost
++        key='order_id' if contract.semantic_entity=='transport_demand' else 'resource_id';values[key]=('ORD-' if key=='order_id' else 'RES-')+str(index+1).zfill(3)
++        writer.writerow([values[f.public_header] if all(values.get(k)==v for k,v in f.applies_when.items()) else '' for f in contract.fields])
++    return out.getvalue().encode('utf-8')
+--- post-T3/backend/app/domain/logistics/normalizers.py
++++ T4/backend/app/domain/logistics/normalizers.py
+@@ -0,0 +1,129 @@
++"""T4 deterministic exact-schema CSV -> T1 DTO snapshots, without solver/IA."""
++import csv
++from datetime import date
++from decimal import Decimal,localcontext
++import io
++import json
++import re
++import unicodedata
++
++from pydantic import TypeAdapter,ValidationError
++from app.domain.logistics.base import Identifier,Count,decimal_value
++from app.domain.logistics.contracts import Demand,TransportResource
++from app.domain.logistics.units import scaled_integer
++from app.results.canonical import canonical_bytes,canonical_tree,content_sha256
++from .data_contracts import DataContract,MAX_BYTES,MAX_ROWS,NORMALIZER_VERSION,REGISTRY_VERSION
++
++ID=TypeAdapter(Identifier);COUNT=TypeAdapter(Count)
++
++
++class InputValidationError(ValueError):
++    def __init__(self,report):super().__init__('Revisá el formato y los campos indicados.');self.report=report
++
++
++def normalize_input(contents,contract):
++    contract=DataContract.model_validate(contract);errors=[];warnings=[];records=[];assumptions=[];seen=set()
++    def problem(code,row,column,message,**extra):return dict(code=code,row=row,column=column,message=message,hint='Usá el template de esta Model Version y revisá la regla del campo.',**extra)
++    def fail(code,message,column=None):raise InputValidationError({'valid':False,'errors':[problem(code,1,column,message)],'warnings':[],'counts':{'errors':1,'warnings':0}})
++    if contract.normalizer_version!=NORMALIZER_VERSION or contract.registry_version!=REGISTRY_VERSION:fail('UNSUPPORTED_VERSION','El contrato requiere una versión de normalizer/registry no disponible.')
++    if not contents or len(contents)>MAX_BYTES:fail('SIZE_LIMIT','El CSV debe contener datos y no superar 10 MB.')
++    try:text=contents.decode('utf-8-sig')
++    except UnicodeError:fail('ENCODING','Guardá el CSV con codificación UTF-8.')
++    if '\x00' in text:fail('ENCODING','El archivo contiene bytes no permitidos.')
++    reader=csv.reader(io.StringIO(text,newline=''),delimiter=',',strict=True)
++    try:headers=next(reader)
++    except (StopIteration,csv.Error):fail('HEADER','Falta el encabezado CSV.')
++    if len(set(headers))!=len(headers):fail('DUPLICATE_HEADER','Hay columnas repetidas.')
++    expected={f.public_header for f in contract.fields}
++    extra=set(headers)-expected
++    if extra:fail('EXTRA_COLUMN','Hay columnas ajenas al contrato. No se guardó el archivo.',sorted(extra)[0][:120])
++    missing=expected-set(headers)
++    if missing:fail('MISSING_COLUMN','Faltan columnas del template; las celdas no aplicables pueden quedar vacías.',sorted(missing)[0])
++    config=contract.rules['model'];fields={f.public_header:f for f in contract.fields}
++    def parse(field,value):
++        if field.type=='IDENTIFIER':return ID.validate_python(value)
++        if field.type=='INTEGER':
++            if not re.fullmatch(r'(?:0|[1-9][0-9]*)',value):raise ValueError('Ingresá un entero no negativo.')
++            return COUNT.validate_python(int(value))
++        if field.type=='DECIMAL':
++            v=decimal_value(value);scaled_integer(v,field.validation['scale'])
++            if v<0 or field.validation.get('positive') and v==0:raise ValueError('La cantidad/capacidad debe ser positiva; los costos no negativos.')
++            return v
++        if field.type=='DATE':
++            if not re.fullmatch(r'\d{4}-\d{2}-\d{2}',value):raise ValueError('Usá fecha AAAA-MM-DD, sin hora.')
++            return date.fromisoformat(value)
++        if field.type=='BOOLEAN':
++            if value not in ('true','false'):raise ValueError('Usá true o false.')
++            return value=='true'
++        if field.type=='ENUM':
++            if value not in field.validation['values']:raise ValueError('Elegí un valor declarado por el contrato.')
++            return value
++        if field.type=='ID_LIST':
++            items=value.split('|')
++            if len(items)>100 or len(set(items))!=len(items):raise ValueError('Grupos únicos; máximo 100.')
++            return tuple(sorted(ID.validate_python(x) for x in items))
++        if field.type=='LANES':
++            items=json.loads(value)
++            if not isinstance(items,list) or not 1<=len(items)<=100:raise ValueError('Informá entre 1 y 100 rutas explícitas.')
++            lanes=[]
++            for item in items:
++                if not isinstance(item,list) or len(item)!=2:raise ValueError('Cada ruta es [origen,destino].')
++                lanes.append(tuple(ID.validate_python(x) for x in item))
++            if len(set(lanes))!=len(lanes):raise ValueError('No repitas rutas.')
++            return tuple(sorted(lanes))
++        raise ValueError('Tipo de campo desconocido.')
++    try:
++        for index,values in enumerate(reader,2):
++            if index>MAX_ROWS+1:fail('ROW_LIMIT','El CSV admite hasta 10.000 filas operativas.')
++            before=len(errors)
++            if len(values)!=len(headers):errors.append(problem('ROW_WIDTH',index,None,'La fila no coincide con las columnas del template.'));continue
++            raw={k:unicodedata.normalize('NFC',v.strip()) for k,v in zip(headers,values)};row={}
++            for key,field in fields.items():
++                value=raw[key];applies=all(raw.get(k)==v for k,v in field.applies_when.items())
++                if not applies:
++                    if value:errors.append(problem('SOURCE_CONDITIONAL',index,key,'Este campo no aplica a la fuente o tarifa de la fila.'))
++                    row[key]=None;continue
++                if not value:
++                    if not field.nullable:errors.append(problem('REQUIRED_VALUE',index,key,'Completá el campo requerido para esta fila.'))
++                    row[key]=None;continue
++                try:row[key]=parse(field,value)
++                except (ValueError,ValidationError,TypeError,OverflowError,RecursionError):errors.append(problem('INVALID_VALUE',index,key,'El valor no cumple el tipo, enum, unidad o precisión del contrato.'))
++            if len(errors)!=before:
++                if len(errors)>=100:break
++                continue
++            entity_id=row['order_id' if contract.semantic_entity=='transport_demand' else 'resource_id']
++            if entity_id in seen:errors.append(problem('DUPLICATE_ID',index,'order_id' if contract.semantic_entity=='transport_demand' else 'resource_id','El ID debe ser único.'));continue
++            seen.add(entity_id)
++            try:
++                if contract.semantic_entity=='transport_demand':
++                    if row['split_allowed'] and not config['split_permitted']:raise ValueError('El Model no permite split.')
++                    dto=Demand(**{k:row[k] for k in ['order_id','origin_id','destination_id','distance_km','ready_date','delivery_due_date','priority','split_allowed']},requested={dim:row['demand_'+dim] for dim in config['active_dimensions']},compatibility_groups=row['compatibility_groups'] or ())
++                else:
++                    own=row['source']=='OWN';amount=row.get('services_available');source=row.get('availability_source')
++                    if not own and source=='ASSUMED':
++                        defaulted=amount is None
++                        if defaulted:amount=1
++                        assumptions.append({'code':'ASSUMED_EXTERNAL_AVAILABILITY','entity_id':entity_id,'value':amount,'unit':'horizon_services','source':'DATION_DEFAULT' if defaulted else 'DERIVED'})
++                        warnings.append(problem('ASSUMED_EXTERNAL_AVAILABILITY',index,'services_available','Disponibilidad ASSUMED: '+str(amount)+'. No se considera confirmada.'))
++                    guaranteed={dim:row['guaranteed_'+dim] for dim in config['active_dimensions']};maximum={dim:row['maximum_'+dim] for dim in config['active_dimensions']}
++                    rate=row.get('operating_cost_per_km') if own else row.get('trip_rate' if row['cost_model']=='PER_TRIP' else 'per_km_rate')
++                    if rate is None:warnings.append(problem('UNKNOWN_COST',index,'operating_cost_per_km' if own else 'trip_rate' if row['cost_model']=='PER_TRIP' else 'per_km_rate','Costo desconocido: se conserva null. No habilita por sí solo un objetivo económico.'))
++                    if (row.get('units_available') if own else amount) is None:warnings.append(problem('UNKNOWN_AVAILABILITY',index,'units_available' if own else 'services_available','Disponibilidad desconocida; no representa capacidad ilimitada.'))
++                    dto=TransportResource(resource_id=entity_id,source=row['source'],guaranteed_capacity=guaranteed,maximum_capacity=maximum if any(v is not None for v in maximum.values()) else None,lanes=row['lanes'],compatibility_groups=row['compatibility_groups'] or (),units_available=row.get('units_available') if own else None,base_origin_id=row.get('base_origin_id') if own else None,operating_cost_per_km=rate if own else None,services_available=None if own else amount,availability_source=None if own else source,external_cost=None if own else {'cost_model':row['cost_model'],'rate':rate,'billing_basis':row.get('billing_basis')})
++                records.append(canonical_tree(dto))
++            except (ValueError,ValidationError,TypeError):errors.append(problem('DOMAIN_CONTRACT',index,None,'Revisá fechas ready/due, split, garantizada/máxima y coherencia de disponibilidad/source.'))
++    except csv.Error:fail('CSV_SYNTAX','El CSV tiene comillas o delimitadores inválidos.')
++    if not records and not errors:errors.append(problem('EMPTY_DATA',2,None,'Agregá al menos una fila operativa.'))
++    report={'valid':not errors,'schema':contract.schema_version,'contract_hash':contract.contract_hash,'errors':errors[:100],'warnings':warnings[:100],'counts':{'errors':len(errors),'warnings':len(warnings)},'rows':len(records),'columns':len(headers)}
++    if errors:raise InputValidationError(report)
++    key='order_id' if contract.semantic_entity=='transport_demand' else 'resource_id';records.sort(key=lambda r:r[key]);assumptions.sort(key=lambda a:a['entity_id'])
++    normalized={'schema_version':'normalized_logistics_input_v1','semantic_entity':contract.semantic_entity,'model_version_id':str(contract.model_version_id),'contract_id':contract.contract_id,'contract_hash':contract.contract_hash,'normalizer_version':NORMALIZER_VERSION,'currency_policy':dict(config['currency_policy']),'records':records,'assumptions':assumptions}
++    data=canonical_bytes(normalized)
++    if len(data)>MAX_BYTES:fail('NORMALIZED_SIZE_LIMIT','El snapshot normalizado supera 10 MB. Dividí el archivo antes de publicar.')
++    summary={'semantic_entity':contract.semantic_entity,'record_count':len(records),'assumptions':assumptions[:20],'assumptions_total':len(assumptions),'assumptions_truncated':len(assumptions)>20,'assumed_external_count':len(assumptions),'unknown_availability_count':sum(1 for w in warnings if w['code']=='UNKNOWN_AVAILABILITY'),'unknown_cost_count':sum(1 for w in warnings if w['code']=='UNKNOWN_COST')}
++    if contract.semantic_entity=='transport_demand':
++        with localcontext() as context:
++            context.prec=60;summary['quantity_totals']=canonical_tree({dim:sum((Decimal(r['requested'][dim]) for r in records),Decimal(0)) for dim in config['active_dimensions']})
++    else:summary['source_counts']={s:sum(r['source']==s for r in records) for s in config['allowed_sources']}
++    report.update(preview=records[:10],summary=summary)
++    return {'bytes':data,'raw_sha256':content_sha256(contents),'canonical_sha256':content_sha256(data),'record_count':len(records),'normalized_size':len(data),'report':report}
+--- post-T3/backend/app/models/ultimate_data_pack.py
++++ T4/backend/app/models/ultimate_data_pack.py
+@@ -0,0 +1,25 @@
++"""T4 client intents contain IDs and CAS only, never paths or schemas."""
++from typing import Literal
++from uuid import UUID
++from pydantic import Field,model_validator
++from app.domain.logistics.base import ContractModel
++
++Entity=Literal['transport_demand','transport_resources']
++
++class SlotSelection(ContractModel):
++    slot_key: Entity
++    upload_id: UUID | None = None
++    dataset_id: UUID | None = None
++    @model_validator(mode='after')
++    def one_reference(self):
++        if (self.upload_id is None)==(self.dataset_id is None):raise ValueError('Elegí un candidato o dataset compatible.')
++        return self
++
++class PackPublication(ContractModel):
++    publication_id: UUID
++    expected_revision: int=Field(strict=True,ge=1)
++    selection: tuple[SlotSelection,...]=Field(min_length=1,max_length=2)
++    @model_validator(mode='after')
++    def unique_slots(self):
++        if len({s.slot_key for s in self.selection})!=len(self.selection):raise ValueError('Una selección por slot.')
++        return self
+--- post-T3/backend/app/platform/data_hub.py
++++ T4/backend/app/platform/data_hub.py
+@@ -1,6 +1,7 @@
+ """Workspace library projection; only explicit reuse crosses into a DDA."""
+ import csv
+ import io
++import json
+ from urllib.parse import quote
+ 
+ import httpx
+@@ -47,6 +48,14 @@
+ 
+ async def preview(ctx,dataset_id,limit=25,offset=0):
+     row=await active_dataset(ctx,dataset_id)
++    if row.get('dataset_type') in {'transport_demand','transport_resources'}:
++        from app.services.case_data_pack_service import normalized_preview
++        data=await normalized_preview(ctx,dataset_id,limit,offset)
++        # Data Hub keeps its existing table contract; the source is the verified
++        # normalized DTO rather than a second delimiter/schema inference.
++        columns=list(data['records'][0]) if data['records'] else []
++        return {'columns':columns,'rows':[[json.dumps(r[k],ensure_ascii=False) if isinstance(r[k],(dict,list)) else str(r[k]) if r[k] is not None else '—' for k in columns] for r in data['records']],
++            'limit':limit,'offset':offset,'has_more':offset+limit<data['total'],'cell_limit':500,'canonical_sha256':data['canonical_sha256'],'normalizer_version':data['normalizer_version']}
+     contents=await download_dataset(row)
+     if len(contents)>10*1024*1024:raise HTTPException(413,'La vista previa admite archivos de hasta 10 MB.')
+     try:
+@@ -107,6 +116,15 @@
+     return await platform_call('platform_dataset_upload',{**body,'operation':'finish'})
+ 
+ 
++async def archive_input(ctx,dataset_id,archived):
++    row=await active_dataset(ctx,dataset_id)
++    if row.get('dataset_type') in {'transport_demand','transport_resources'}:
++        from app.services.case_data_pack_service import call
++        return await call(ctx,'dataset_archive',dataset_id=str(dataset_id),archived=archived)
++    await dispatch.archive_dataset(str(dataset_id),archived)
++    return {'archived':archived}
++
++
+ async def delete_dataset(ctx,dataset_id):
+     body={'actor_user_id':ctx.user_id,'target_workspace_id':ctx.workspace_id,'target_dataset_id':str(dataset_id)}
+     try:permit=await platform_call('platform_dataset_delete',body)
+--- post-T3/backend/app/platform/data_routes.py
++++ T4/backend/app/platform/data_routes.py
+@@ -81,13 +81,11 @@
+ 
+ @router.post('/datasets/{dataset_id}/archive')
+ async def archive(dataset_id:UUID,ctx=Depends(require_upload_access)):
+-    await hub.active_dataset(ctx,dataset_id)
+-    await guarded(dispatch.archive_dataset(str(dataset_id),True));return {'archived':True}
++    return await guarded(hub.archive_input(ctx,dataset_id,True))
+ 
+ @router.post('/datasets/{dataset_id}/unarchive')
+ async def unarchive(dataset_id:UUID,ctx=Depends(require_upload_access)):
+-    await hub.active_dataset(ctx,dataset_id)
+-    await guarded(dispatch.archive_dataset(str(dataset_id),False));return {'archived':False}
++    return await guarded(hub.archive_input(ctx,dataset_id,False))
+ 
+ @router.delete('/datasets/{dataset_id}')
+ async def delete(dataset_id:UUID,ctx=Depends(require_upload_access)):
+--- post-T3/backend/app/platform/identity.py
++++ T4/backend/app/platform/identity.py
+@@ -48,6 +48,8 @@
+             if code == "42501":
+                 raise HTTPException(403, "No tenés acceso activo a este workspace.")
+             if code == "22023":
++                if name == 'platform_ultimate_data_pack':
++                    raise HTTPException(409, "Revisá el contrato de la Model Version, el candidato y el estado de los inputs antes de publicar.")
+                 if name == 'platform_ultimate_foundation':
+                     raise HTTPException(409, "Revisá el contexto, el horizonte y la elegibilidad del Decision Owner antes de guardar.")
+                 collaboration_errors = {
+--- post-T3/backend/app/platform/routes.py
++++ T4/backend/app/platform/routes.py
+@@ -11,6 +11,7 @@
+ from app.platform.activity_routes import router as activity_router
+ from app.platform.onboarding_routes import router as onboarding_router
+ from app.platform.ultimate_routes import router as ultimate_router
++from app.platform.ultimate_data_routes import router as ultimate_data_router
+ 
+ router=APIRouter(prefix='/api/platform')
+ router.include_router(data_router)
+@@ -20,6 +21,7 @@
+ router.include_router(activity_router)
+ router.include_router(onboarding_router)
+ router.include_router(ultimate_router)
++router.include_router(ultimate_data_router)
+ 
+ @router.get('/home')
+ async def get_home(ctx=Depends(require_upload_access)):
+--- post-T3/backend/app/platform/ultimate_data_routes.py
++++ T4/backend/app/platform/ultimate_data_routes.py
+@@ -0,0 +1,62 @@
++"""T4 typed input routes. Model/contracts/paths always come from checked state."""
++from uuid import UUID
++from fastapi import APIRouter,Depends,File,HTTPException,Query,UploadFile
++from fastapi.responses import Response
++from app.auth import require_upload_access
++from app.platform.entitlements import require_dda
++from app.models.ultimate_data_pack import Entity,PackPublication
++from app.services import case_data_pack_service as service
++from app.domain.logistics.data_contracts import template_csv,MAX_BYTES
++
++router=APIRouter(prefix='/logistics-cases')
++
++def access(ctx=Depends(require_upload_access)):require_dda(ctx,'logistics');return ctx
++
++async def contents(file):
++    if not (file.filename or '').lower().endswith('.csv') or file.content_type not in ('text/csv','application/csv','application/octet-stream'):
++        raise HTTPException(415,'Usá el template CSV UTF-8 de esta Model Version.')
++    body=await file.read(MAX_BYTES+1)
++    if len(body)>MAX_BYTES:raise HTTPException(413,'El CSV supera 10 MB.')
++    return body
++
++@router.get('/{case_id}/data')
++async def data(case_id:UUID,offset:int=Query(0,ge=0,le=1000000),ctx=Depends(access)):return await service.context(ctx,case_id,offset)
++
++@router.get('/{case_id}/data/contracts/{entity}')
++async def contract(case_id:UUID,entity:Entity,ctx=Depends(access)):return (await service.contract_for(ctx,case_id,entity)).model_dump(mode='json')
++
++@router.get('/{case_id}/data/templates/{entity}')
++async def template(case_id:UUID,entity:Entity,ctx=Depends(access)):
++    contract=await service.contract_for(ctx,case_id,entity)
++    return Response(template_csv(contract),media_type='text/csv; charset=utf-8',headers={'Content-Disposition':f'attachment; filename="{entity}.csv"','X-Dation-Contract-Hash':contract.contract_hash})
++
++@router.post('/{case_id}/data/validate/{entity}')
++async def validate(case_id:UUID,entity:Entity,contract_hash:str=Query(...,pattern=r'^[0-9a-f]{64}$'),file:UploadFile=File(...),ctx=Depends(access)):
++    return await service.validate(ctx,case_id,entity,await contents(file),contract_hash)
++
++@router.post('/{case_id}/data/uploads/{entity}')
++async def upload(case_id:UUID,entity:Entity,upload_id:UUID,contract_hash:str=Query(...,pattern=r'^[0-9a-f]{64}$'),file:UploadFile=File(...),ctx=Depends(access)):
++    return await service.upload(ctx,case_id,entity,await contents(file),file.filename,upload_id,contract_hash)
++
++@router.post('/{case_id}/data/uploads/{upload_id}/recover')
++async def recover(case_id:UUID,upload_id:UUID,ctx=Depends(access)):return await service.recover(ctx,case_id,upload_id)
++
++@router.post('/{case_id}/data/uploads/{upload_id}/discard')
++async def discard(case_id:UUID,upload_id:UUID,ctx=Depends(access)):return await service.discard(ctx,case_id,upload_id)
++
++@router.get('/{case_id}/data/reuse/{entity}')
++async def reuse(case_id:UUID,entity:Entity,offset:int=Query(0,ge=0,le=1000000),ctx=Depends(access)):return await service.compatible(ctx,case_id,entity,offset)
++
++@router.post('/{case_id}/data/publish')
++async def publish(case_id:UUID,payload:PackPublication,ctx=Depends(access)):return await service.publication(ctx,case_id,payload)
++
++@router.get('/{case_id}/data/versions/{version_id}')
++async def history(case_id:UUID,version_id:UUID,ctx=Depends(access)):return await service.version(ctx,case_id,version_id)
++
++@router.get('/{case_id}/data/preview/{dataset_id}')
++async def preview(case_id:UUID,dataset_id:UUID,ctx=Depends(access)):
++    # Case membership/binding before a workspace-wide normalized dataset read.
++    state=await service.state(ctx,case_id)
++    if str(dataset_id) not in {e['dataset_id'] for e in state['entries']}|{j.get('dataset_id') for j in state['uploads']}:
++        raise HTTPException(404,'El input no está vinculado a este Case.')
++    return await service.normalized_preview(ctx,dataset_id,10)
+--- post-T3/backend/app/services/case_data_pack_service.py
++++ T4/backend/app/services/case_data_pack_service.py
+@@ -0,0 +1,194 @@
++"""T4 checked Pack API with immutable private bytes and durable upload recovery."""
++import json
++from pathlib import PurePosixPath
++from urllib.parse import quote
++from uuid import UUID,uuid5
++
++import httpx
++from fastapi import HTTPException
++from app.config import SUPABASE_URL,SUPABASE_INPUT_BUCKET
++from app.platform.identity import platform_call,headers
++from app.services.http_service import http_client
++from app.services.logistics_model_service import snapshot_hash
++from app.domain.logistics.data_contracts import compile_contract,ENTITIES,MAX_BYTES,NORMALIZER_VERSION
++from app.domain.logistics.normalizers import normalize_input,InputValidationError
++from app.results.canonical import content_sha256
++
++
++async def call(ctx,operation,**arguments):
++    return await platform_call('platform_ultimate_data_pack',{'target_workspace_id':ctx.workspace_id,'actor_user_id':ctx.user_id,'operation':operation,'arguments':arguments})
++
++
++async def state(ctx,case_id,offset=0):return await call(ctx,'state',case_id=str(case_id),offset=offset)
++
++
++def public_upload(j):
++    return {k:j.get(k) for k in ['id','entity','status','dataset_id','filename','created_at','updated_at','cleanup_pending','raw_sha256','canonical_sha256','contract_hash','normalizer_version','record_count']}
++
++
++def public_entry(entry):
++    return {k:entry.get(k) for k in ['slot_key','dataset_id','contract_id','contract_hash','raw_sha256','canonical_sha256','normalizer_version','record_count','summary']}
++
++
++async def context(ctx,case_id,offset=0):
++    value=await state(ctx,case_id,offset);result={k:value[k] for k in ['case','pack','version','history','history_total','enabled','can_edit','runtime_execution_available']}
++    contracts={entity:compile_contract(value['model_version'],entity).model_dump(mode='json') for entity in ENTITIES}
++    result.update(contracts=contracts,entries=[public_entry(x) for x in value['entries']],uploads=[public_upload(j) for j in value['uploads']],history_offset=offset,
++        inputs_available={entity:any(e['slot_key']==entity for e in value['entries']) for entity in ENTITIES},decision_readiness=None)
++    return result
++
++
++async def contract_for(ctx,case_id,entity):
++    data=await state(ctx,case_id)
++    return compile_contract(data['model_version'],entity)
++
++
++def checked_hash(contract,expected):
++    if contract.contract_hash!=expected:raise HTTPException(409,'El contrato no corresponde a esta Model Version. Descargá su template.')
++
++
++async def validate(ctx,case_id,entity,contents,expected):
++    contract=await contract_for(ctx,case_id,entity);checked_hash(contract,expected)
++    try:return normalize_input(contents,contract)['report']
++    except InputValidationError as error:raise HTTPException(422,error.report) from None
++
++
++def object_url(bucket,path):
++    if not bucket or any(x in ('','.','..') for x in path.split('/')):raise HTTPException(409,'La referencia privada requiere revisión.')
++    return SUPABASE_URL+'/storage/v1/object/'+quote(bucket,safe='')+'/'+quote(path,safe='/')
++
++
++async def private_bucket(bucket):
++    try:
++        async with http_client() as client:r=await client.get(SUPABASE_URL+'/storage/v1/bucket/'+quote(bucket,safe=''),headers=headers(),timeout=15)
++        r.raise_for_status();data=r.json()
++        allowed=data.get('allowed_mime_types')
++        if data.get('public') is not False or allowed is not None and not all(x in allowed for x in ['text/csv','application/json']):
++            raise HTTPException(503,'El bucket privado debe admitir CSV y JSON normalizado. No se modificó su configuración.')
++    except httpx.HTTPError:raise HTTPException(503,'No se pudo verificar Storage privado. El candidato se conserva.') from None
++
++
++async def read_object(bucket,path,hash_,size,*,missing=False):
++    try:
++        async with http_client() as client:
++            async with client.stream('GET',object_url(bucket,path),headers=headers(),timeout=30) as response:
++                if missing and response.status_code==404:return None
++                response.raise_for_status();chunks=[];length=0
++                async for part in response.aiter_bytes():
++                    length+=len(part)
++                    if length>MAX_BYTES:raise HTTPException(409,'El objeto privado supera el límite permitido.')
++                    chunks.append(part)
++        data=b''.join(chunks)
++    except httpx.HTTPError:raise HTTPException(503,'No se pudieron verificar los bytes privados. El Pack vigente no cambió.') from None
++    if len(data)!=size or content_sha256(data)!=hash_:raise HTTPException(409,'Los bytes privados no coinciden con su snapshot. El Pack vigente no cambió.')
++    return data
++
++
++async def put_object(bucket,path,contents,mime,hash_):
++    try:
++        async with http_client() as client:r=await client.post(object_url(bucket,path),headers={**headers(),'Content-Type':mime,'x-upsert':'false'},content=contents,timeout=30)
++        if r.status_code in (400,409):
++            # Never upsert: reconcile a prior completed POST by exact hash/size.
++            await read_object(bucket,path,hash_,len(contents));return
++        r.raise_for_status()
++    except httpx.HTTPError:raise HTTPException(503,'La carga quedó interrumpida. Recuperá el candidato antes de publicar; no se movió el Pack.') from None
++
++
++async def cleanup(ctx,case_id,upload_id):
++    permit=await call(ctx,'cleanup',case_id=str(case_id),upload_id=str(upload_id))
++    if not permit.get('may_delete_reserved_objects'):return permit
++    # Each reserved UUID belongs to exactly one journal, and is never reused by
++    # another upload. SQL proves it has no dataset/Pack consumer before deletion.
++    try:
++        async with http_client() as client:
++            for path in [permit['storage_path'],permit['normalized_path']]:
++                r=await client.delete(object_url(permit['storage_bucket'],path),headers=headers(),timeout=30)
++                if r.status_code not in (200,204,404):r.raise_for_status()
++    except httpx.HTTPError:return permit
++    return await call(ctx,'cleanup_finish',case_id=str(case_id),upload_id=str(upload_id))
++
++
++async def recover(ctx,case_id,upload_id):
++    j=await call(ctx,'upload_get',case_id=str(case_id),upload_id=str(upload_id))
++    if j['status'] in ('DISCARDED','DISCARDING'):raise HTTPException(409,'El candidato fue descartado; creá una nueva intención de carga.')
++    if j['status']=='READY':
++        if j['cleanup_pending']:await cleanup(ctx,case_id,upload_id)
++        return public_upload(j)
++    contract=await contract_for(ctx,case_id,j['entity']);checked_hash(contract,j['contract_hash']);await private_bucket(j['storage_bucket'])
++    raw=await read_object(j['storage_bucket'],j['storage_path'],j['raw_sha256'],j['raw_size'],missing=True)
++    if raw is None:raise HTTPException(409,'Falta el CSV del candidato. Volvé a subir el mismo archivo con esta intención.')
++    try:normalized=normalize_input(raw,contract)
++    except InputValidationError:raise HTTPException(409,'El candidato no coincide con su contrato inmutable.') from None
++    if normalized['canonical_sha256']!=j['canonical_sha256'] or normalized['normalized_size']!=j['normalized_size']:raise HTTPException(409,'El normalizer no coincide con el snapshot preparado.')
++    await put_object(j['storage_bucket'],j['normalized_path'],normalized['bytes'],'application/json',j['canonical_sha256'])
++    await read_object(j['storage_bucket'],j['normalized_path'],j['canonical_sha256'],j['normalized_size'])
++    result=await call(ctx,'store',case_id=str(case_id),upload_id=str(upload_id),verified_raw_sha256=j['raw_sha256'],verified_canonical_sha256=j['canonical_sha256'])
++    if result['cleanup_pending']:
++        try:result=await cleanup(ctx,case_id,upload_id)
++        except HTTPException:pass  # Durable successful metadata must not become a false failed upload.
++    return public_upload(result)
++
++
++async def upload(ctx,case_id,entity,contents,filename,upload_id,expected):
++    contract=await contract_for(ctx,case_id,entity);checked_hash(contract,expected)
++    try:normalized=normalize_input(contents,contract)
++    except InputValidationError as error:raise HTTPException(422,error.report) from None
++    name=PurePosixPath((filename or entity+'.csv').replace('\\','/')).name[:120]
++    profile={k:v for k,v in normalized['report'].items() if k not in ('preview','summary')}
++    body=dict(case_id=str(case_id),upload_id=str(upload_id),entity=entity,contract_id=contract.contract_id,contract_hash=contract.contract_hash,normalizer_version=NORMALIZER_VERSION,
++        raw_sha256=normalized['raw_sha256'],canonical_sha256=normalized['canonical_sha256'],raw_size=len(contents),normalized_size=normalized['normalized_size'],record_count=normalized['record_count'],column_count=len(contract.fields),filename=name,storage_bucket=SUPABASE_INPUT_BUCKET,profile=profile,summary=normalized['report']['summary'])
++    intent=snapshot_hash('ultimate_upload_intent_v1',{'actor':ctx.user_id,**body})
++    j=await call(ctx,'prepare',**body,intent_hash=intent)
++    if j['status']=='READY':return public_upload(j)
++    if j['status']!='PREPARED':raise HTTPException(409,'La intención de carga fue descartada.')
++    await private_bucket(j['storage_bucket'])
++    await put_object(j['storage_bucket'],j['storage_path'],contents,'text/csv',j['raw_sha256'])
++    return await recover(ctx,case_id,upload_id)
++
++
++async def publication(ctx,case_id,payload):
++    body=payload.model_dump(mode='json',exclude_none=True);body['selection'].sort(key=lambda item:item['slot_key'])
++    intent=snapshot_hash('ultimate_pack_publication_intent_v1',{'actor':ctx.user_id,'case_id':str(case_id),**body})
++    replay=await call(ctx,'replay',case_id=str(case_id),publication_id=body['publication_id'],intent_hash=intent)
++    if replay['replayed']:return replay
++    current=await state(ctx,case_id);contracts={e:compile_contract(current['model_version'],e).contract_hash for e in ENTITIES}
++    plan=await call(ctx,'plan',case_id=str(case_id),selection=body['selection'],contracts=contracts)
++    entries=plan['entries']
++    for entry in entries:
++        await private_bucket(entry['storage_bucket'])
++        await read_object(entry['storage_bucket'],entry['storage_path'],entry['raw_sha256'],entry['raw_size'])
++        await read_object(entry['normalized_bucket'],entry['normalized_path'],entry['canonical_sha256'],entry['normalized_size'])
++    version_id=uuid5(UUID(body['publication_id']),'pack-version-v1')
++    semantic_entries=[{k:e[k] for k in ['slot_key','dataset_id','contract_id','contract_hash','raw_sha256','canonical_sha256','normalizer_version','normalized_bucket','normalized_path','record_count']} for e in entries]
++    manifest={'version':plan['next_version'],'workspace_id':ctx.workspace_id,'case_id':str(case_id),'pack_id':plan['pack']['id'],'pack_version_id':str(version_id),'entries':semantic_entries}
++    return await call(ctx,'publish',**body,case_id=str(case_id),intent_hash=intent,contracts=contracts,entries=entries,
++        expected_current_version_id=plan['pack']['current_version_id'],version_id=str(version_id),
++        manifest_hash=snapshot_hash('case_data_pack_manifest_v1',manifest),contract_set_hash=snapshot_hash('case_data_pack_contract_set_v1',[(e['slot_key'],e['contract_hash']) for e in entries]))
++
++
++async def compatible(ctx,case_id,entity,offset=0):
++    contract=await contract_for(ctx,case_id,entity)
++    return await call(ctx,'compatible',case_id=str(case_id),entity=entity,contract_hash=contract.contract_hash,offset=offset)
++
++
++async def version(ctx,case_id,version_id):
++    data=await call(ctx,'version_get',case_id=str(case_id),version_id=str(version_id))
++    return {'version':data['version'],'entries':[public_entry(e) for e in data['entries']]}
++
++
++async def normalized_preview(ctx,dataset_id,limit=25,offset=0):
++    data=await call(ctx,'dataset_get',dataset_id=str(dataset_id));entry=data['entry']
++    if not entry:raise HTTPException(409,'Falta la provenance del snapshot normalizado.')
++    await private_bucket(entry['normalized_bucket'])
++    raw=await read_object(entry['normalized_bucket'],entry['normalized_path'],entry['canonical_sha256'],entry['normalized_size'])
++    normalized=json.loads(raw)
++    return {'semantic_entity':entry['slot_key'],'records':normalized['records'][offset:offset+limit],'summary':entry['summary'],
++        'total':entry['record_count'],'limit':limit,'offset':offset,'canonical_sha256':entry['canonical_sha256'],'normalizer_version':entry['normalizer_version']}
++
++
++async def discard(ctx,case_id,upload_id):
++    result=await call(ctx,'discard',case_id=str(case_id),upload_id=str(upload_id))
++    if result.get('may_delete_reserved_objects'):
++        try:result=await cleanup(ctx,case_id,upload_id)
++        except HTTPException:pass
++    return public_upload(result)
+--- post-T3/backend/app/static/css/ultimate-case-data.css
++++ T4/backend/app/static/css/ultimate-case-data.css
+@@ -0,0 +1,16 @@
++/* T4 composition only: existing upload controls/cards/validation retain their CSS. */
++.ultimate-case-data .t4-slots { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-5);min-width:0; }
++.ultimate-case-data :is(.t4-slot,.t4-current,.t4-candidates,.t4-publish,.t4-history,.t4-preview) { display:grid;gap:var(--space-3);min-width:0;align-content:start; }
++.ultimate-case-data :is(.t4-current,.t4-candidates,.t4-publish,.t4-history,.t4-preview,.t4-manifest) { padding:var(--space-4); }
++.ultimate-case-data :is(.t4-candidate,.t4-history-row,.t4-reuse-row) { display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-3);min-width:0; }
++.ultimate-case-data .t4-candidate { padding-block:var(--space-3);border-block-end:1px solid var(--color-border); }
++.ultimate-case-data .t4-candidate>p { flex:1 1 100%;overflow-wrap:anywhere; }
++.ultimate-case-data .dispatch-pro-file-card { min-width:0; }
++.ultimate-case-data .dispatch-pro-inline-validation-body { overflow:hidden;min-width:0; }
++.ultimate-case-data .dispatch-pro-inline-validation-body>.dispatch-table-wrap { max-height:300px; }
++.ultimate-case-data .dispatch-table-wrap table { width:max-content;min-width:100%; }
++.ultimate-case-data .dispatch-table-wrap th { white-space:nowrap; }
++.ultimate-case-data .dispatch-table-wrap td { min-width:6rem;max-width:26rem; }
++.ultimate-case-data .t4-contract-dialog { width:min(960px,calc(100vw - 32px)); }
++.ultimate-case-data :is(td,th,.d-id) { overflow-wrap:anywhere; }
++@media(max-width:1100px) { .ultimate-case-data .t4-slots { grid-template-columns:minmax(0,1fr); } }
+--- post-T3/backend/app/static/js/dispatch/cases/ultimate-case-setup.mjs
++++ T4/backend/app/static/js/dispatch/cases/ultimate-case-setup.mjs
+@@ -21,6 +21,7 @@
+    owners:Object.fromEntries(['logistics_assignment','logistics_scheduling'].map(id=>[id,{id:current?.responsibilities.stages[id].owner?.id||'',updated_at:current?.responsibilities.stages[id].updated_at||null}])),policy_values:policyInputValues(policy)};
+   const draft=saved||initial,editable=fresh||current.permissions.can_edit,mathEditable=fresh||current.permissions.can_edit_mathematical,canAssign=fresh?caps.can_assign:current.permissions.can_assign;
+   root.replaceChildren();const header=pageHeader(root,fresh?'Crear Decision Case':row.label||'Contexto del Case','El Case guarda el objetivo, el horizonte y la versión del Model. Podés crearlo antes de cargar archivos.');header.append(button('Logistics Models',()=>navigate('logistics-models',{modelId:null})));
++  if(row){try{const inputs=await api('/api/platform/logistics-cases/'+row.id+'/data',{signal:scope.signal});if(scope.active&&(inputs.enabled||inputs.entries.length))header.append(button('Administrar datos del Case',()=>navigate('logistics-case-data',{caseId:row.id})));}catch(error){if(error.name==='AbortError')throw error;}}
+   if(row){const savedCard=el('section',undefined,'d-card ultimate-saved-context');savedCard.append(el('h2','Contexto guardado','d-card-title'),el('p','Versión '+current.model_version.version+' de '+current.model.name+' · '+row.planning_start+' a '+row.planning_end,'d-body'),el('p','Data Pack inicial: '+(current.entry_count?'datos vinculados':'sin archivos')+'. El contexto se conserva al recargar.','d-metadata'));
+    if(row.context_frozen_at)savedCard.append(el('p','El horizonte y la política quedaron congelados con la primera admisión. El nombre, la descripción y los responsables conservan sus reglas de edición.','d-body'));root.append(savedCard);}
+   const kit=mountForm(root,scope,{initial,store,submitLabel:fresh?'Crear Case':'Guardar contexto',onReload:()=>navigate('logistics-case-setup',{caseId:route.caseId,replace:true}),onSave:async value=>{
+--- post-T3/backend/app/static/js/dispatch/navigation/resource.mjs
++++ T4/backend/app/static/js/dispatch/navigation/resource.mjs
+@@ -1,5 +1,5 @@
+-export const PLATFORM_PATHS=Object.freeze({'platform-home':'/app',inicio:'/app/ddas','platform-decisions':'/app/decisions','platform-data':'/app/data','platform-team':'/app/team',settings:'/app/settings',profile:'/app/profile','logistics-overview':'/app/ddas/logistics',overview:'/app/ddas/logistics','logistics-data':'/app/ddas/logistics/data','logistics-map':'/app/ddas/logistics/decisions','logistics-config':'/app/ddas/logistics/configure','decision-dashboard':'/app/ddas/logistics/dashboard',traceability:'/app/history',library:'/app/history','logistics-models':'/app/ddas/logistics/models','logistics-case-setup':'/app/ddas/logistics/case'});
+-export const VIEWS=['platform-home','platform-decisions','platform-data','platform-team','profile','inicio','logistics-overview','traceability','overview','logistics-data','logistics-map','logistics-config','decision-dashboard','library','settings','logistics-models','logistics-case-setup'];
++export const PLATFORM_PATHS=Object.freeze({'platform-home':'/app',inicio:'/app/ddas','platform-decisions':'/app/decisions','platform-data':'/app/data','platform-team':'/app/team',settings:'/app/settings',profile:'/app/profile','logistics-overview':'/app/ddas/logistics',overview:'/app/ddas/logistics','logistics-data':'/app/ddas/logistics/data','logistics-map':'/app/ddas/logistics/decisions','logistics-config':'/app/ddas/logistics/configure','decision-dashboard':'/app/ddas/logistics/dashboard',traceability:'/app/history',library:'/app/history','logistics-models':'/app/ddas/logistics/models','logistics-case-setup':'/app/ddas/logistics/case','logistics-case-data':'/app/ddas/logistics/case/data'});
++export const VIEWS=['platform-home','platform-decisions','platform-data','platform-team','profile','inicio','logistics-overview','traceability','overview','logistics-data','logistics-map','logistics-config','decision-dashboard','library','settings','logistics-models','logistics-case-setup','logistics-case-data'];
+ export const NODES=['logistics_assignment','logistics_scheduling','logistics_final_assignment'];
+ const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+ import {HUB_KEYS,readHubResource,writeHubResource} from '../../platform/data-resource.mjs';
+@@ -32,7 +32,7 @@
+   for(const key of ['view','case_id','node_id','run_id','dda','settings_tab','model_id',...HUB_KEYS,...CENTER_KEYS])next.searchParams.delete(key);
+   next.pathname=PLATFORM_PATHS[resource.view]||'/app';
+   next.searchParams.set('view',resource.view);
+-  if(resource.caseId&&['overview','logistics-overview','logistics-data','logistics-map','logistics-config','decision-dashboard','traceability','library','logistics-case-setup'].includes(resource.view))next.searchParams.set('case_id',resource.caseId);
++  if(resource.caseId&&['overview','logistics-overview','logistics-data','logistics-map','logistics-config','decision-dashboard','traceability','library','logistics-case-setup','logistics-case-data'].includes(resource.view))next.searchParams.set('case_id',resource.caseId);
+   if(resource.modelId&&['logistics-models','logistics-case-setup'].includes(resource.view))next.searchParams.set('model_id',resource.modelId);
+   if(['logistics-config','decision-dashboard'].includes(resource.view)&&resource.nodeId)next.searchParams.set('node_id',resource.nodeId);
+   if(resource.view==='decision-dashboard'&&resource.runId)next.searchParams.set('run_id',resource.runId);
+--- post-T3/backend/app/static/js/dispatch/upload/ultimate-case-data.mjs
++++ T4/backend/app/static/js/dispatch/upload/ultimate-case-data.mjs
+@@ -0,0 +1,108 @@
++// T4 composes the existing upload cards and validation drawer. No graph states.
++import {api,errorBox,download} from '../shared.mjs';
++import {scopeFor} from '../lifecycle.mjs';
++import {ensureStylesheet} from '../styles.mjs';
++import {loadingState,mountDialog} from '../../platform/components.mjs';
++import {el,button,pageHeader,draftStore,confirmAction} from '../models/forms.mjs';
++import {createDropCard} from './dropcard.mjs';
++import {createValidationDrawer} from './validation-report.mjs';
++
++const ENTITIES=[['transport_demand','Demanda','orders'],['transport_resources','Recursos','fleet']];
++
++async function request(path,options={}){
++ let response;try{response=await fetch(path,options);}catch(e){if(e.name==='AbortError')throw e;throw Object.assign(new Error('No se confirmó la operación. Conservá el CSV y recuperá el candidato.'),{status:503});}
++ const data=await response.json();if(!response.ok)throw Object.assign(new Error(typeof data.detail==='string'?data.detail:'Revisá las filas y columnas indicadas.'),{status:response.status,report:data.detail?.errors?data.detail:null});return data;
++}
++
++function previewTable(parent,records,label){
++ if(!records?.length){parent.append(el('p','Sin filas para mostrar.','d-metadata'));return;}
++ const wrap=el('div',undefined,'dispatch-table-wrap');wrap.tabIndex=0;wrap.role='region';wrap.setAttribute('aria-label',label);
++ const table=el('table'),head=el('thead'),titles=el('tr'),columns=Object.keys(records[0]);
++ for(const key of columns){const th=el('th',key);th.scope='col';titles.append(th);}head.append(titles);table.append(head);const body=el('tbody');
++ for(const row of records){const tr=el('tr');for(const key of columns){const value=row[key];tr.append(el('td',value===null?'Desconocido':typeof value==='object'?JSON.stringify(value):String(value)));}body.append(tr);}table.append(body);wrap.append(table);parent.append(wrap);
++}
++
++function showContract(root,scope,contract,source){
++ const dialog=el('dialog',undefined,'d-modal t4-contract-dialog'),body=el('div',undefined,'d-modal__body'),title=el('h2','Columnas del contrato','d-modal__title');title.id='t4-contract-title';dialog.setAttribute('aria-labelledby',title.id);body.append(title,el('p','Headers exactos, sin aliases ni columnas comerciales. Dejá vacíos los campos que no aplican a la fuente.','d-body'));
++ const wrap=el('div',undefined,'dispatch-table-wrap');wrap.tabIndex=0;wrap.role='region';wrap.setAttribute('aria-label','Especificación de columnas');const table=el('table'),head=el('thead'),hr=el('tr');for(const text of ['Columna','Tipo / unidad','Aplica cuando','Regla / ejemplo'])hr.append(el('th',text));head.append(hr);table.append(head);const rows=el('tbody');
++ for(const f of contract.fields){const tr=el('tr');for(const value of [f.public_header,f.type+(f.unit?' · '+f.unit:''),Object.keys(f.applies_when).length?JSON.stringify(f.applies_when):'Todas las filas',(f.nullable?'Puede ser desconocido / vacío. ':'Requerido. ')+JSON.stringify(f.validation)+' · '+f.examples.join(', ')])tr.append(el('td',value));rows.append(tr);}table.append(rows);wrap.append(table);body.append(wrap);const actions=el('div',undefined,'d-modal__actions'),close=button('Cerrar',()=>mounted.close());actions.append(close);dialog.append(body,actions);root.append(dialog);const mounted=mountDialog({dialog,initialFocus:close});dialog.addEventListener('close',()=>{mounted.dispose();dialog.remove();source?.focus();},{once:true});scope.own(()=>{mounted.dispose();dialog.remove();});mounted.open();
++}
++
++export async function mountCaseData(root,{route,navigate,onContext}){
++ delete root.dataset.ultimateReady;const scope=scopeFor(root);root.className='dispatch dispatch-upload-pro d-platform ultimate-foundation ultimate-case-data';root.append(loadingState('Recuperando Data Pack…'));
++ if(!route.caseId){errorBox(root,Object.assign(new Error('Elegí un Case para administrar sus datos.'),{status:404}),()=>navigate('logistics-case-setup',{caseId:null}));return;}
++ try{
++  await ensureStylesheet('ultimate-foundation-styles','/static/css/ultimate-foundation.css','t3-v1');await ensureStylesheet('ultimate-case-data-styles','/static/css/ultimate-case-data.css','t4-v1');
++  const base='/api/platform/logistics-cases/'+route.caseId+'/data',data=await api(base,{signal:scope.signal});if(!scope.active)return;onContext?.(data.case);
++  const store=draftStore('pack',route.caseId),draft=store.read()||{selection:{},uploadIntents:{},publication:null};draft.selection||={};draft.uploadIntents||={};const save=()=>store.write(draft);
++  root.replaceChildren();const header=pageHeader(root,'Datos del Case',data.case.label+' · '+data.case.planning_start+' a '+data.case.planning_end);header.append(button('Contexto del Case',()=>navigate('logistics-case-setup',{caseId:route.caseId})));
++  const message=el('p','Validar o guardar un candidato no cambia el Pack publicado.','d-metadata');message.dataset.packMessage='';message.role='status';root.append(message);
++  const current=el('section',undefined,'d-card t4-current'),headline=el('h2','Pack · versión '+data.version.version,'d-card-title');headline.dataset.packCurrentVersion=String(data.version.version);current.append(headline,el('p','Revisión '+data.pack.revision+' · '+(data.entries.length?data.entries.length+' entradas publicadas':'Pack inicial vacío')+'. El Case existe aunque todavía no tenga archivos.','d-body'),el('p','Inputs publicados no equivalen a una decisión READY. La ejecución Ultimate todavía no está disponible.','d-metadata'));
++  if(!data.can_edit)current.append(el('p','Publicación cerrada o acceso de sólo lectura. Los snapshots existentes se conservan.','d-body'));root.append(current);
++  const validationDrawer=createValidationDrawer(scope),slots=el('div',undefined,'t4-slots');root.append(slots);const pendingFiles=new Set();
++  const leave=()=>!pendingFiles.size||window.confirm('Tenés un archivo seleccionado sin guardar como candidato. Conservá el CSV antes de salir.');window.dationUltimateCanLeave=leave;scope.own(()=>{if(window.dationUltimateCanLeave===leave)delete window.dationUltimateCanLeave;});scope.listen(window,'beforeunload',e=>{if(pendingFiles.size){e.preventDefault();e.returnValue='';}});
++  const reload=()=>navigate('logistics-case-data',{caseId:route.caseId,replace:true});
++  function tell(error){if(!scope.active)return;message.textContent=error.message;message.role='alert';}
++  const publishArea=el('section',undefined,'d-card t4-publish');let publicationBusy=false;
++  const selections=el('p',undefined,'d-body'),publish=button('Publicar versión del Pack',()=>publishSelection(),'primary');
++  function reflectSelection(){selections.textContent=pendingFiles.size?'Guardá los CSV seleccionados como candidatos o quitá su selección antes de publicar.':Object.values(draft.selection).length?'Selección para la próxima publicación: '+Object.keys(draft.selection).map(x=>x==='transport_demand'?'Demanda':'Recursos').join(' + ')+'. El manifest conserva también los slots publicados anteriores.':'Elegí candidatos válidos o inputs compatibles para publicar.';publish.disabled=!data.can_edit||!Object.keys(draft.selection).length||pendingFiles.size>0;}
++  async function publishSelection(recover=false){
++   if(publicationBusy)return;publicationBusy=true;publish.disabled=true;
++   try{
++    if(!recover&&!await confirmAction(root,scope,'Publicar Data Pack','Se creará una versión inmutable con el manifest completo. Los snapshots anteriores se conservan.','Publicar Pack'))return;
++    const body=draft.publication||{publication_id:crypto.randomUUID(),expected_revision:data.pack.revision,selection:Object.values(draft.selection)};
++    draft.publication=body;save();const result=await request(base+'/publish',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:scope.signal});
++    if(!scope.active)return;draft.publication=null;draft.selection={};save();await reload();
++   }catch(error){if(scope.active){tell(error);if(error.status===409){const review=button('Recargar Pack y revisar',()=>{draft.publication=null;save();reload();});publishArea.append(review);}else message.textContent='No se confirmó la publicación. Recuperá la misma intención antes de publicar otra versión.';}}
++   finally{publicationBusy=false;if(scope.active)reflectSelection();}
++  }
++  for(const [entity,label,visualKind]of ENTITIES){
++   const contract=data.contracts[entity],published=data.entries.find(e=>e.slot_key===entity),format={columns:contract.fields.map(f=>({name:f.public_header,required:!f.nullable,type:f.type,rule:JSON.stringify(f.validation),example:f.examples[0]}))};
++   const ref=createDropCard(visualKind,format),host=el('section',undefined,'t4-slot');host.dataset.t4Slot=entity;host.append(ref.card);slots.append(host);
++   ref.card.querySelector('h3').textContent=label;ref.card.querySelector('.dispatch-pro-file-copy p').textContent=entity==='transport_demand'?'Órdenes pseudonimizadas, rutas, fechas y cantidades activas del Model.':'Recursos propios o externos, capacidades garantizadas, disponibilidad y tarifas explícitas.';
++   ref.drop.setAttribute('aria-label','Elegir CSV de '+label);ref.dropStrong.textContent='Arrastrá el CSV de '+label;ref.file.setAttribute('aria-label','CSV de '+label);ref.file.dataset.t4File=entity;
++   ref.previousView.querySelector('strong').textContent='Inputs compatibles de '+label;ref.previousEmpty.querySelector('p').textContent='Todavía no hay inputs compatibles con esta Model Version.';ref.previousAll.textContent='Siguiente página';
++   const chips=[...ref.card.querySelectorAll('.dispatch-pro-requirement')];const nullable=contract.fields.filter(f=>f.nullable||Object.keys(f.applies_when).length).length;
++   for(const [i,chip]of chips.entries()){chip.title='Todos los headers del template deben estar presentes. Sólo las celdas opcionales o no aplicables quedan vacías.';chip.lastChild.textContent=i===0?contract.fields.length+' columnas exactas':nullable+' admiten vacío según la fila';}
++   ref.template.href=base+'/templates/'+entity;ref.template.download=entity+'.csv';ref.template.setAttribute('aria-label','Descargar template de '+label);
++   scope.listen(ref.template,'click',async e=>{e.preventDefault();try{const r=await fetch(ref.template.href,{signal:scope.signal});if(!r.ok)throw new Error('No se pudo descargar el template.');download(entity+'.csv',await r.text(),'text/csv;charset=utf-8');}catch(error){tell(error);}});
++   scope.listen(ref.reviewColumns,'click',()=>showContract(root,scope,contract,ref.reviewColumns));
++   ref.headerState.textContent=published?'Publicado · v'+data.version.version:'Sin publicar';ref.headerState.classList.toggle('is-success',!!published);ref.headerState.classList.toggle('is-pending',!published);ref.validationHint.textContent='La validación no publica datos.';
++   ref.validationBody.append(el('p','Descargá el template exacto. No incluyas nombre de cliente, CUIT, SKU, factura, ingresos ni margen.','d-body'));
++   if(published){const summary=published.summary;const text=el('p','Publicado: '+published.record_count+' filas. '+(summary.assumed_external_count?summary.assumed_external_count+' disponibilidades ASSUMED. ':'')+(summary.unknown_cost_count?summary.unknown_cost_count+' costos desconocidos. ':''),'d-metadata');text.dataset.publishedSummary='';host.append(text,button('Vista previa publicada de '+label,async()=>{try{const result=await api(base+'/preview/'+published.dataset_id,{signal:scope.signal});const preview=el('section',undefined,'d-card t4-preview');preview.append(el('h3','Snapshot publicado de '+label,'d-card-title'));previewTable(preview,result.records,'Vista previa publicada de '+label);host.append(preview);}catch(error){tell(error);}}));}
++   let file=null,report=null,busy=false,generation=0,controller=null,offset=0;
++   const saveCandidate=button('Guardar candidato de '+label,()=>storeCandidate(),'primary');saveCandidate.disabled=true;host.append(saveCandidate);
++   function controls(){saveCandidate.disabled=!data.can_edit||busy||!report?.valid;saveCandidate.setAttribute('aria-busy',String(busy));ref.choose.disabled=!data.can_edit||busy;ref.drop.setAttribute('aria-disabled',String(!data.can_edit||busy));ref.file.disabled=!data.can_edit||busy;ref.actions.hidden=!file;ref.replace.disabled=!data.can_edit||busy;ref.remove.disabled=!data.can_edit||busy;ref.cancelUpload.hidden=!busy;ref.progress.hidden=!busy;ref.progressTitle.textContent='Guardando candidato…';ref.progressFile.textContent=file?.name||'';}
++   async function validateFile(selected){
++    const own=++generation;file=selected;report=null;pendingFiles.add(entity);reflectSelection();ref.filePanel.hidden=false;ref.fileName.textContent=file.name;ref.fileMeta.textContent=file.size+' bytes · candidato local';ref.validationBody.replaceChildren(loadingState('Validando CSV…'));controls();
++    const form=new FormData();form.append('file',file);
++    try{const result=await request(base+'/validate/'+entity+'?'+new URLSearchParams({contract_hash:contract.contract_hash}),{method:'POST',body:form,signal:scope.signal});if(!scope.active||own!==generation)return;report=result;ref.validationBody.replaceChildren(el('p','Válido: '+result.rows+' filas. '+result.counts.warnings+' advertencias. Todavía no está publicado.','d-body'));previewTable(ref.validationBody,result.preview,'Vista previa del candidato de '+label);
++     if(result.warnings.length)ref.validationBody.append(button('Revisar advertencias de '+label,e=>validationDrawer.open({report,filename:file.name,source:ref.choose})));
++    }catch(error){if(!scope.active||own!==generation)return;report=error.report;ref.validationBody.replaceChildren(el('p',error.report?'El archivo contiene errores. No se creó un candidato ni se guardaron bytes.':error.message,'d-body'));if(error.report)ref.validationBody.append(button('Revisar errores de '+label,()=>validationDrawer.open({report:error.report,filename:file.name,source:ref.choose})));}finally{if(scope.active&&own===generation)controls();}
++   }
++   const choose=()=>{if(data.can_edit&&!busy)ref.file.click();};scope.listen(ref.choose,'click',e=>{e.stopPropagation();choose();});scope.listen(ref.drop,'click',choose);scope.listen(ref.drop,'keydown',e=>{if(['Enter',' '].includes(e.key)){e.preventDefault();choose();}});scope.listen(ref.file,'change',()=>{if(ref.file.files[0])validateFile(ref.file.files[0]);});scope.listen(ref.drop,'dragover',e=>e.preventDefault());scope.listen(ref.drop,'drop',e=>{e.preventDefault();if(data.can_edit&&!busy&&e.dataTransfer.files[0])validateFile(e.dataTransfer.files[0]);});scope.listen(ref.replace,'click',choose);
++   ref.remove.textContent='Quitar selección';scope.listen(ref.remove,'click',()=>{generation++;file=null;report=null;ref.file.value='';ref.filePanel.hidden=true;pendingFiles.delete(entity);reflectSelection();ref.validationBody.replaceChildren(el('p','El Pack publicado se conserva.','d-metadata'));controls();});
++   scope.listen(ref.cancelUpload,'click',()=>controller?.abort());
++   async function storeCandidate(){
++    if(busy||!file||!report?.valid)return;busy=true;controller=new AbortController();scope.own(()=>controller?.abort());controls();const id=draft.uploadIntents[entity]||crypto.randomUUID();draft.uploadIntents[entity]=id;save();const form=new FormData();form.append('file',file);
++    try{const candidate=await request(base+'/uploads/'+entity+'?'+new URLSearchParams({contract_hash:contract.contract_hash,upload_id:id}),{method:'POST',body:form,signal:controller.signal});if(!scope.active)return;draft.selection[entity]={slot_key:entity,upload_id:candidate.id};delete draft.uploadIntents[entity];save();pendingFiles.delete(entity);report=null;reflectSelection();if(!pendingFiles.size)await reload();else message.textContent='Candidato de '+label+' guardado. El otro CSV seleccionado se conserva hasta que lo guardes o quites.';}
++    catch(error){if(scope.active){message.textContent='Carga pendiente. El Pack publicado no cambió. Recuperá el candidato o volvé a adjuntar el mismo CSV.';message.role='alert';const recover=button('Consultar carga pendiente de '+label,()=>{pendingFiles.delete(entity);reload();});host.append(recover);}}
++    finally{busy=false;if(scope.active)controls();}
++   }
++   async function loadReuse(){try{const result=await api(base+'/reuse/'+entity+'?offset='+offset,{signal:scope.signal});if(!scope.active)return;ref.previousList.replaceChildren();ref.previousEmpty.hidden=result.items.length>0;for(const item of result.items){const row=el('div',undefined,'d-card t4-reuse-row');row.append(el('p',item.original_filename+' · '+item.row_count+' filas','d-body'),button('Seleccionar input compatible',()=>{draft.selection[entity]={slot_key:entity,dataset_id:item.id};draft.publication=null;save();reflectSelection();message.textContent='Input compatible seleccionado. Todavía no se publicó una versión.';}));ref.previousList.append(row);}ref.previousAll.disabled=result.items.length<25;ref.setReuseCount(result.items.length);}catch(error){tell(error);}}
++   scope.listen(ref.reuseTab,'click',loadReuse);scope.listen(ref.previousAll,'click',()=>{offset+=25;loadReuse();});controls();
++   const candidates=el('section',undefined,'d-card t4-candidates');candidates.setAttribute('aria-label','Candidatos de '+label);candidates.append(el('h3','Candidatos de '+label,'d-card-title'));
++   for(const j of data.uploads.filter(j=>j.entity===entity)){
++    const row=el('div',undefined,'t4-candidate');row.dataset.uploadId=j.id;const included=data.entries.some(e=>e.slot_key===entity&&e.dataset_id===j.dataset_id);row.append(el('p',j.filename+' · '+(included?'Publicado en el Pack vigente':j.status==='READY'?'Candidato válido; no está en el Pack vigente':'Carga interrumpida: recuperable'),'d-body'));
++    if(j.status==='READY'){const select=button('Seleccionar candidato',()=>{draft.selection[entity]={slot_key:entity,upload_id:j.id};draft.publication=null;save();reflectSelection();message.textContent='Candidato seleccionado; el Pack vigente no cambió.';});select.disabled=!data.can_edit;row.append(select);}
++    else{const recover=button('Recuperar candidato',async()=>{recover.disabled=true;try{const value=await request(base+'/uploads/'+j.id+'/recover',{method:'POST',signal:scope.signal});if(!scope.active)return;draft.selection[entity]={slot_key:entity,upload_id:value.id};delete draft.uploadIntents[entity];save();pendingFiles.delete(entity);if(!pendingFiles.size)await reload();else reflectSelection();}catch(error){tell(error);if(scope.active)recover.disabled=false;}});recover.disabled=!data.can_edit;row.append(recover);}
++    const discard=button('Descartar candidato',async()=>{if(!await confirmAction(root,scope,'Descartar candidato','Se conserva el Pack publicado y toda su historia. Sólo se retira este candidato.','Descartar candidato'))return;try{await request(base+'/uploads/'+j.id+'/discard',{method:'POST',signal:scope.signal});if(!scope.active)return;if(draft.selection[entity]?.upload_id===j.id)delete draft.selection[entity];if(draft.uploadIntents[entity]===j.id)delete draft.uploadIntents[entity];save();pendingFiles.delete(entity);await reload();}catch(error){tell(error);}});discard.disabled=!data.can_edit;row.append(discard);candidates.append(row);
++   }host.append(candidates);
++  }
++  publishArea.append(el('h2','Publicación explícita','d-card-title'),selections,publish);reflectSelection();if(draft.publication){const recover=button('Recuperar publicación',()=>publishSelection(true));recover.disabled=!data.can_edit;publishArea.append(el('p','Hay una intención de publicación pendiente de confirmar. Reintentá la misma antes de crear otra.','d-body'),recover);}root.append(publishArea);
++  const history=el('section',undefined,'d-card t4-history');history.append(el('h2','Historial del Pack','d-card-title'));let historyOffset=0;
++  const historyRows=el('div'),historyNext=button('Versiones anteriores',async()=>{try{historyOffset+=20;const older=await api(base+'?offset='+historyOffset,{signal:scope.signal});if(scope.active)renderHistory(older.history,older.history_total);}catch(error){tell(error);}});history.append(historyRows,historyNext);root.append(history);
++  function renderHistory(versions,total){historyRows.replaceChildren();for(const v of versions){const row=el('div',undefined,'t4-history-row');row.append(el('span','Versión '+v.version+(v.id===data.version.id?' · vigente':''),'d-body'),button('Ver manifest de versión '+v.version,async()=>{try{const value=await api(base+'/versions/'+v.id,{signal:scope.signal});if(!scope.active)return;const details=el('section',undefined,'d-card t4-manifest');details.append(el('h3','Manifest de versión '+v.version,'d-card-title'));for(const entry of value.entries)details.append(el('p',entry.slot_key+' · '+entry.record_count+' filas · '+entry.canonical_sha256,'d-id'));if(!value.entries.length)details.append(el('p','Manifest vacío inicial.','d-body'));history.append(details);}catch(error){tell(error);}}));historyRows.append(row);}historyNext.disabled=historyOffset+20>=total;}renderHistory(data.history,data.history_total);
++  root.dataset.ultimateReady='true';
++ }catch(error){if(scope.active)errorBox(root,error,()=>navigate('logistics-case-data',{caseId:route.caseId,replace:true}));}
++}
+--- post-T3/backend/app/static/js/dispatch/workspace.mjs
++++ T4/backend/app/static/js/dispatch/workspace.mjs
+@@ -801,6 +801,7 @@
+ for(const [key,view]of [['data','logistics-data'],['map','logistics-map'],['config','logistics-config'],['dashboard','decision-dashboard']])roots[key]=root(view,'dispatch-'+key+'-root');
+ roots.models=root('logistics-models','ultimate-models-root');
+ roots.caseSetup=root('logistics-case-setup','ultimate-case-setup-root');
++roots.caseData=root('logistics-case-data','ultimate-case-data-root');
+ 
+ async function ensurePersistedCase(generation=routeGeneration,applyIdentity=false,deferIdentity=false){
+   const current=state.decisionCase;if(!current)return;
+@@ -851,11 +852,11 @@
+   }
+   const aliases={overview:'logistics-overview',library:'traceability'};
+   const publicView=Object.entries(aliases).find(([,value])=>value===view)?.[0]||view;
+-  const next={view:publicView,caseId:!['logistics-data','logistics-map','logistics-config','decision-dashboard','logistics-case-setup'].includes(publicView)?null:publicView==='logistics-case-setup'?(options.caseId||null):options.caseId===undefined?state.decisionCase?.id||null:options.caseId,nodeId:options.nodeId===undefined?state.activeNode:options.nodeId,runId:options.runId||(publicView==='decision-dashboard'?state.run?.id||resource?.runId:null)};
++  const next={view:publicView,caseId:!['logistics-data','logistics-map','logistics-config','decision-dashboard','logistics-case-setup','logistics-case-data'].includes(publicView)?null:['logistics-case-setup','logistics-case-data'].includes(publicView)?(options.caseId||null):options.caseId===undefined?state.decisionCase?.id||null:options.caseId,nodeId:options.nodeId===undefined?state.activeNode:options.nodeId,runId:options.runId||(publicView==='decision-dashboard'?state.run?.id||resource?.runId:null)};
+   if(['logistics-models','logistics-case-setup'].includes(publicView))next.modelId=options.modelId||null;
+   saveDraft();routeController?.abort();routeController=new AbortController();const generation=++routeGeneration;
+   runPolling.stop();pollGeneration++;
+-  for(const root of Object.values(roots)){disposeScope(root);root.replaceChildren();root.className='dispatch';}
++  for(const root of Object.values(roots)){disposeScope(root);root.replaceChildren();root.className='dispatch';delete root.dataset.ultimateReady;}
+   resource=next;
+   if(publicView==='platform-data')next.hub=options.hub||{};
+   if(publicView==='platform-decisions')next.center=options.center||{};
+@@ -865,11 +866,16 @@
+   document.body.classList.toggle('dispatch-result',publicView==='decision-dashboard');
+   renderView(aliases[publicView]||publicView);
+   if(options.render===false)return;
+-  const root=roots[{'logistics-data':'data','logistics-map':'map','logistics-config':'config','decision-dashboard':'dashboard','logistics-models':'models','logistics-case-setup':'caseSetup'}[publicView]];
++  const root=roots[{'logistics-data':'data','logistics-map':'map','logistics-config':'config','decision-dashboard':'dashboard','logistics-models':'models','logistics-case-setup':'caseSetup','logistics-case-data':'caseData'}[publicView]];
+   if(!root)return;
+   root.hidden=false;
+   createScope(root);
+   try{
++    if(publicView==='logistics-case-data'){
++      const {mountCaseData}=await import('./upload/ultimate-case-data.mjs');
++      if(generation===routeGeneration)await mountCaseData(root,{route:next,navigate:navigateResource,onContext:row=>{state.ultimateCaseContext=row;window.dationRenderContextNavigation?.();}});
++      return;
++    }
+     if(publicView==='logistics-models'||publicView==='logistics-case-setup'){
+       if(publicView==='logistics-models'){const {mountModels}=await import('./models/index.mjs');if(generation===routeGeneration)await mountModels(root,{route:next,navigate:navigateResource});}
+       else{const {mountCaseSetup}=await import('./cases/ultimate-case-setup.mjs');if(generation===routeGeneration)await mountCaseSetup(root,{route:next,navigate:navigateResource,onContext:result=>{state.ultimateCaseContext=result.case;window.dationRenderContextNavigation?.();}});}
+--- post-T3/backend/app/static/js/platform/data-hub.mjs
++++ T4/backend/app/static/js/platform/data-hub.mjs
+@@ -51,7 +51,7 @@
+  function maintenance(row,permits){const wrap=el('div',undefined,'hub-maintenance'),trigger=button('',()=>{},'ghost'),panel=el('div',undefined,'hub-maintenance__menu');trigger.append(icon('moreHorizontal'));trigger.classList.add('hub-icon-button');trigger.setAttribute('aria-label','Acciones de '+name(row));panel.role='menu';
+   const add=(label,fn)=>{const b=button(label,fn);b.role='menuitem';panel.append(b);};
+   if(!row.deletion_pending){const a=download(row);a.role='menuitem';panel.append(a);}
+-  const canArchive=permits?.can_archive??(writable()&&['orders','fleet'].includes(row.dataset_type)&&!row.is_default&&!row.deletion_pending);
++  const canArchive=permits?.can_archive??(writable()&&['orders','fleet','transport_demand','transport_resources'].includes(row.dataset_type)&&!row.is_default&&!row.deletion_pending);
+   if(canArchive)add(row.archived_at?'Restaurar':'Archivar',()=>mutation(row,row.archived_at?'unarchive':'archive'));
+   if(permits?.can_delete&&writable())add(row.deletion_pending?'Completar eliminación':'Eliminar definitivamente',()=>mutation(row,'delete'));
+   if(!panel.childElementCount)return {node:el('span'),dispose:()=>{}};wrap.append(trigger,panel);const menu=mountDropdown({trigger,panel});return {node:wrap,dispose:()=>menu.dispose()};
+--- post-T3/backend/app/static/js/platform/data-presentation.mjs
++++ T4/backend/app/static/js/platform/data-presentation.mjs
+@@ -1,6 +1,6 @@
+ import {FOUNDATION} from './foundation.mjs';
+ export const getDatasetDisplayName=row=>row.label||row.canonical_filename||row.original_filename||'Dataset';
+-export const getDatasetTypePresentation=row=>FOUNDATION.datasetTypes[row.dataset_type]||row.dataset_type||'Sin registro';
++export const getDatasetTypePresentation=row=>({transport_demand:'Demanda de transporte',transport_resources:'Recursos de transporte'}[row.dataset_type]||FOUNDATION.datasetTypes[row.dataset_type]||row.dataset_type||'Sin registro');
+ export const getValidationPresentation=row=>({label:{validated:'Validado',issues:'Con observaciones',unknown:'Sin registro'}[row.validation]||'Sin registro',tone:{validated:'success',issues:'warning'}[row.validation]||'neutral'});
+ export const getLifecyclePresentation=row=>({label:row.deletion_pending?'Eliminación pendiente':row.archived_at?'Archivado':'Activo',tone:row.deletion_pending?'warning':'neutral'});
+ export const getUsagePresentation=row=>`${row.case_count||0} Decision ${row.case_count===1?'Case':'Cases'}`;
+--- post-T3/backend/app/static/js/platform/dda-navigation.mjs
++++ T4/backend/app/static/js/platform/dda-navigation.mjs
+@@ -15,6 +15,7 @@
+   {label:'DDA Logística',target:{view:'logistics-overview',caseId:null,nodeId:null,runId:null},state:view==='logistics-overview'?'current':'available'},
+  ];
+  if(view==='logistics-models')entries.push({label:'Logistics Models',target:null,state:'current'});
++ else if(view==='logistics-case-data')entries.push({label:ultimate?.label||'Contexto del Case',target:{view:'logistics-case-setup',caseId:route.caseId,nodeId:null,runId:null},state:'available'},{label:'Datos del Case',target:null,state:'current'});
+  else if(view==='logistics-case-setup')entries.push({label:ultimate?.label||(route.caseId?'Contexto del Case':'Nuevo Case'),target:null,state:'current'});
+  else if(route.caseId){
+   entries.push({label:workspace.caseContext?.label||currentCase?.label||'Decision Case',target:{view:'logistics-map',caseId:route.caseId,nodeId:null,runId:null},state:view==='logistics-map'?'current':'available'});
+--- post-T3/backend/app/templates/app.html
++++ T4/backend/app/templates/app.html
+@@ -475,6 +475,7 @@
+ 
+         <section class="view d-platform" data-view-panel="logistics-models" aria-live="polite"></section>
+         <section class="view d-platform" data-view-panel="logistics-case-setup" aria-live="polite"></section>
++        <section class="view d-platform" data-view-panel="logistics-case-data" aria-live="polite"></section>
+ 
+         <!-- CARGAR DATOS: el contenido se monta desde dispatch/upload/index.mjs -->
+         <section
+@@ -1113,6 +1114,7 @@
+           view === 'logistics-overview'
+           || view === 'logistics-models'
+           || view === 'logistics-case-setup'
++          || view === 'logistics-case-data'
+           || view === 'logistics-data'
+           || view === 'logistics-map'
+           || view === 'logistics-config'
+--- post-T3/backend/tests/browser/test_ultimate_case_data.py
++++ T4/backend/tests/browser/test_ultimate_case_data.py
+@@ -0,0 +1,97 @@
++"""W4: Case Data over real API/SQL and owned private Storage-contract fixtures."""
++import asyncio,csv,io,json,os,select,subprocess,unittest
++from pathlib import Path
++from uuid import uuid4
++from playwright.async_api import async_playwright
++import test_ultimate_case_setup as t3
++
++ROOT=Path(__file__).resolve().parents[2];REPO=ROOT.parent
++OUT=Path(os.environ.get('DATION_T4_BROWSER_ARTIFACTS','/tmp/dation-t4-browser'))
++
++
++class UltimateCaseDataTests(unittest.IsolatedAsyncioTestCase):
++    # Reuse auth/request/Model/Case helpers, not the nine T3 test methods.
++    asyncSetUp=t3.UltimateCaseSetupTests.asyncSetUp
++    asyncTearDown=t3.UltimateCaseSetupTests.asyncTearDown
++    login=t3.UltimateCaseSetupTests.login
++    request=t3.UltimateCaseSetupTests.request
++    api=t3.UltimateCaseSetupTests.api
++    model=t3.UltimateCaseSetupTests.model
++    case=t3.UltimateCaseSetupTests.case
++    @classmethod
++    def setUpClass(cls):
++        OUT.mkdir(parents=True,exist_ok=True);t3.OUT=OUT;cls.fixture_log=(OUT/'fixture.log').open('w')
++        env=os.environ.copy()
++        for k in ['SUPABASE_URL','SUPABASE_SECRET_KEY','SUPABASE_ACCESS_TOKEN','LLM_API_KEY','LLM_BASE_URL','GCP_ACCESS_TOKEN']:env[k]=''
++        for k in ['DOCKER_HOST','DOCKER_CONTEXT','DOCKER_TLS','DOCKER_TLS_VERIFY','DOCKER_CERT_PATH']:env.pop(k,None)
++        env.update(PYTHONDONTWRITEBYTECODE='1',DOCKER_HOST='unix:///var/run/docker.sock')
++        cls.fixture=subprocess.Popen([str(REPO/'.venv/bin/python'),'-B',str(ROOT/'tests/e2e/ultimate_data_fixture.py')],cwd=ROOT,env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=cls.fixture_log,text=True)
++        if not select.select([cls.fixture.stdout],[],[],60)[0]:cls.fixture.terminate();cls.fixture.wait(10);raise RuntimeError('T4 fixture startup timeout')
++        line=cls.fixture.stdout.readline()
++        if not line:raise RuntimeError('T4 fixture failed: '+(OUT/'fixture.log').read_text()[-4000:])
++        value=json.loads(line);cls.base=value['api_url'];cls.control=Path(value['control_dir'])
++    tearDownClass=classmethod(t3.UltimateCaseSetupTests.tearDownClass.__func__)
++    async def open_data(self,cid):
++        await self.page.goto(self.base+'/app/ddas/logistics/case/data?case_id='+cid,wait_until='domcontentloaded');await self.page.locator('[data-ultimate-ready="true"]').wait_for(timeout=30000)
++    async def template(self,cid,entity):
++        r=await self.request('GET',f'/api/platform/logistics-cases/{cid}/data/templates/{entity}');self.assertTrue(r.ok,await r.text());return await r.body()
++    async def upload_api(self,cid,entity='transport_demand'):
++        data=await self.api('GET',f'/api/platform/logistics-cases/{cid}/data');raw=await self.template(cid,entity);session=await self.context.request.post(self.base+'/auth/session',headers={'Origin':self.base});token=(await session.json())['access_token']
++        r=await self.context.request.post(self.base+f'/api/platform/logistics-cases/{cid}/data/uploads/{entity}?upload_id={uuid4()}&contract_hash='+data['contracts'][entity]['contract_hash'],headers={'Authorization':'Bearer '+token},multipart={'file':{'name':'operacion.csv','mimeType':'text/csv','buffer':raw}});self.assertTrue(r.ok,await r.text());return await r.json()
++    async def attach(self,cid,entity='transport_demand',raw=None):
++        raw=raw if raw is not None else await self.template(cid,entity)
++        await self.page.locator(f'[data-t4-file="{entity}"]').set_input_files({'name':'operacion.csv','mimeType':'text/csv','buffer':raw})
++        slot=self.page.locator(f'[data-t4-slot="{entity}"]');await slot.get_by_role('button',name='Guardar candidato de '+('Demanda' if entity=='transport_demand' else 'Recursos'),exact=True).wait_for();return slot
++    async def store_ui(self,cid,entity='transport_demand'):
++        slot=await self.attach(cid,entity);save=slot.get_by_role('button',name='Guardar candidato de '+('Demanda' if entity=='transport_demand' else 'Recursos'),exact=True);await save.wait_for();await self.page.wait_for_function('e=>!document.querySelector(`[data-t4-slot="${e}"] button[aria-busy]`)?.disabled',arg=entity)
++        await save.click();await self.page.get_by_role('button',name='Seleccionar candidato',exact=True).first.wait_for()
++    async def publish_ui(self):
++        await self.page.get_by_role('button',name='Publicar versión del Pack',exact=True).click();dialog=self.page.get_by_role('dialog',name='Publicar Data Pack');await dialog.wait_for();await dialog.get_by_role('button',name='Publicar Pack',exact=True).click()
++    async def test_01_upload_preview_publish_two_slots_and_reload(self):
++        _,_,c=await self.case();cid=c['case']['id'];await self.open_data(cid);await self.store_ui(cid)
++        self.assertEqual(await self.page.locator('[data-pack-current-version]').get_attribute('data-pack-current-version'),'1')
++        await self.publish_ui();await self.page.locator('[data-pack-current-version="2"]').wait_for();await self.store_ui(cid,'transport_resources');await self.publish_ui();await self.page.locator('[data-pack-current-version="3"]').wait_for()
++        await self.page.reload();await self.page.locator('[data-ultimate-ready="true"]').wait_for();state=await self.api('GET',f'/api/platform/logistics-cases/{cid}/data');self.assertEqual(len(state['entries']),2);self.assertIsNone(state['decision_readiness']);self.assertFalse(state['runtime_execution_available'])
++        await self.page.get_by_role('button',name='Ver manifest de versión 2',exact=True).click();await self.page.get_by_role('heading',name='Manifest de versión 2',exact=True).wait_for();(OUT/'published-case.json').write_text(json.dumps({'case_id':cid,'version':3,'entries':[e['slot_key'] for e in state['entries']],'graph_ready':None},indent=2))
++    async def test_02_validation_drawer_exact_columns_and_keyboard_escape(self):
++        _,_,c=await self.case();cid=c['case']['id'];await self.open_data(cid);data=await self.api('GET',f'/api/platform/logistics-cases/{cid}/data');count=len(data['contracts']['transport_demand']['fields']);self.assertTrue(await self.page.locator('[data-t4-slot="transport_demand"]').get_by_text(str(count)+' columnas exactas',exact=True).is_visible());raw=(await self.template(cid,'transport_demand')).decode().splitlines();raw[0]+=',customer_name'
++        for i in range(1,len(raw)):raw[i]+=',PRIVATE-COMMERCIAL'
++        slot=await self.attach(cid,raw=('\n'.join(raw)+'\n').encode());review=slot.get_by_role('button',name='Revisar errores de Demanda',exact=True);await review.wait_for();await review.focus();await self.page.keyboard.press('Enter');drawer=self.page.get_by_role('dialog',name='Problemas de validación');await drawer.wait_for();self.assertNotIn('PRIVATE-COMMERCIAL',await drawer.inner_text());await self.page.keyboard.press('Escape');await drawer.wait_for(state='hidden');self.assertTrue(await slot.get_by_role('button',name='Elegir archivo',exact=True).evaluate('n=>n===document.activeElement'))
++        columns=slot.get_by_role('button',name='Ver columnas',exact=True);await columns.click();spec=self.page.get_by_role('dialog',name='Columnas del contrato');await spec.wait_for();self.assertEqual(await spec.locator('tbody tr').count(),count);await self.page.keyboard.press('Escape');await spec.wait_for(state='hidden');self.assertTrue(await columns.evaluate('n=>n===document.activeElement'))
++        await slot.get_by_role('button',name='Quitar selección',exact=True).click();self.assertEqual(await slot.locator('input[type=file]').evaluate('n=>n.files.length'),0);self.assertFalse(await review.is_visible());self.assertTrue(await slot.get_by_role('button',name='Guardar candidato de Demanda',exact=True).is_disabled())
++        self.assertEqual(await self.page.locator('[data-pack-current-version]').get_attribute('data-pack-current-version'),'1');state=await self.api('GET',f'/api/platform/logistics-cases/{cid}/data');self.assertEqual(state['uploads'],[])
++    async def test_03_interrupted_upload_reload_recovery_and_publish(self):
++        _,_,c=await self.case();cid=c['case']['id'];await self.open_data(cid);(self.control/'fail-t4-store').touch();slot=await self.attach(cid);await slot.get_by_role('button',name='Guardar candidato de Demanda',exact=True).click();await self.page.get_by_role('button',name='Consultar carga pendiente de Demanda',exact=True).wait_for()
++        await self.page.get_by_role('button',name='Consultar carga pendiente de Demanda',exact=True).click();await self.page.get_by_role('button',name='Recuperar candidato',exact=True).wait_for();await self.page.get_by_role('button',name='Recuperar candidato',exact=True).click();await self.page.get_by_role('button',name='Seleccionar candidato',exact=True).wait_for();self.assertEqual(await self.page.locator('[data-pack-current-version]').get_attribute('data-pack-current-version'),'1');await self.publish_ui();await self.page.locator('[data-pack-current-version="2"]').wait_for()
++    async def test_04_lost_publication_response_recovers_same_intent(self):
++        _,_,c=await self.case();cid=c['case']['id'];await self.open_data(cid);await self.store_ui(cid);(self.control/'lose-t4-publish-response').touch();await self.publish_ui();await self.page.get_by_text('No se confirmó la publicación. Recuperá la misma intención antes de publicar otra versión.',exact=True).wait_for()
++        self.page.on('dialog',lambda d:d.accept());await self.page.reload();await self.page.get_by_role('button',name='Recuperar publicación',exact=True).wait_for();await self.page.get_by_role('button',name='Recuperar publicación',exact=True).click();await self.page.locator('[data-pack-current-version="2"]').wait_for();state=await self.api('GET',f'/api/platform/logistics-cases/{cid}/data');self.assertEqual(state['history_total'],2)
++    async def test_05_compatible_reuse_and_cas_conflict_keep_selection(self):
++        m,v,c=await self.case();cid=c['case']['id'];j=await self.upload_api(cid);await self.open_data(cid);await self.page.get_by_role('button',name='Seleccionar candidato',exact=True).click()
++        await self.api('POST',f'/api/platform/logistics-cases/{cid}/data/publish',{'publication_id':str(uuid4()),'expected_revision':1,'selection':[{'slot_key':'transport_demand','upload_id':j['id']}]});await self.publish_ui();await self.page.get_by_role('button',name='Recargar Pack y revisar',exact=True).wait_for();await self.page.get_by_role('button',name='Recargar Pack y revisar',exact=True).click();await self.page.locator('[data-pack-current-version="2"]').wait_for()
++        slot=self.page.locator('[data-t4-slot="transport_demand"]');await slot.get_by_role('button',name='Reutilizar anterior',exact=False).click();await slot.get_by_role('button',name='Seleccionar input compatible',exact=True).wait_for();await slot.get_by_role('button',name='Seleccionar input compatible',exact=True).first.click();self.assertTrue(await self.page.get_by_role('button',name='Publicar versión del Pack',exact=True).is_enabled())
++    async def test_06_responsive_long_filename_zoom_touch_contrast_and_focus(self):
++        _,_,c=await self.case();cid=c['case']['id'];await self.open_data(cid);raw=await self.template(cid,'transport_demand');name=('Distribución Buenos Aires · planificación operativa semanal · centros de transferencia · '+('zona-sur-'*5))[:116]+'.csv';await self.page.locator('[data-t4-file="transport_demand"]').set_input_files({'name':name,'mimeType':'text/csv','buffer':raw});await self.page.get_by_text('Válido: 5 filas. 0 advertencias. Todavía no está publicado.',exact=True).wait_for()
++        audit=(ROOT/'tests/browser/theme_audit.js').read_text();contrast=await self.page.evaluate(audit,'.ultimate-case-data');(OUT/'contrast.json').write_text(json.dumps(contrast,indent=2));self.assertEqual(contrast['failures'],[])
++        metrics=[]
++        for width in [1440,1280,1024,768,390,320]:
++            await self.page.set_viewport_size({'width':width,'height':1000});await self.page.evaluate('scrollTo(0,0)');await self.page.screenshot(path=str(OUT/f'case-data-{width}.png'),full_page=True,animations='disabled');m=await self.page.evaluate('''()=>{const slot=document.querySelector('[data-t4-slot="transport_demand"]'),badge=slot.querySelector('.dispatch-pro-state-badge').getBoundingClientRect(),icon=getComputedStyle(slot.querySelector('.dispatch-pro-entity-icon svg')),choose=slot.querySelector('.dispatch-pro-choose').getBoundingClientRect(),th=slot.querySelector('th');return {width:innerWidth,scroll:document.documentElement.scrollWidth,badgeHeight:badge.height,badgeWidth:badge.width,iconFill:icon.fill,iconStroke:icon.stroke,iconWidth:parseFloat(icon.width),chooseHeight:choose.height,headerWhitespace:getComputedStyle(th).whiteSpace}}''');self.assertLessEqual(m['scroll'],width+1,m);self.assertLess(m['badgeHeight'],40,m);self.assertGreater(m['badgeWidth'],60,m);self.assertEqual(m['iconFill'],'none');self.assertNotEqual(m['iconStroke'],'none');self.assertEqual(m['iconWidth'],20);self.assertLess(m['chooseHeight'],50,m);self.assertEqual(m['headerWhitespace'],'nowrap');metrics.append(m)
++        await self.page.set_viewport_size({'width':1440,'height':1000});await self.page.evaluate('document.documentElement.style.zoom="2"');self.assertLessEqual(await self.page.evaluate('document.documentElement.scrollWidth'),1441);await self.page.screenshot(path=str(OUT/'case-data-zoom200.png'),full_page=True);await self.page.evaluate('document.documentElement.style.zoom="1"');self.assertTrue(await self.page.evaluate('matchMedia("(prefers-reduced-motion:reduce)").matches'))
++        await self.page.set_viewport_size({'width':390,'height':1000});await self.page.locator('.ultimate-case-data header button').focus();focus=[]
++        for _ in range(45):
++            await self.page.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))');m=await self.page.evaluate('''()=>{const n=document.activeElement,b=n.getBoundingClientRect(),hit=document.elementFromPoint(b.x+b.width/2,b.y+b.height/2);return {inside:!!n.closest('.ultimate-case-data'),name:n.getAttribute('aria-label')||n.textContent.slice(0,50),top:b.top,bottom:b.bottom,hit:hit===n||n.contains(hit)}}''')
++            if not m['inside']:break
++            self.assertTrue(m['hit'] and m['top']>=0 and m['bottom']<=1000,m);focus.append(m);await self.page.keyboard.press('Tab')
++        self.assertGreater(len(focus),10);(OUT/'responsive.json').write_text(json.dumps(metrics,indent=2));(OUT/'keyboard-focus.json').write_text(json.dumps(focus,indent=2))
++    async def test_07_viewer_reads_and_setup_context_link_is_recoverable(self):
++        _,_,c=await self.case();cid=c['case']['id'];await self.page.goto(self.base+'/app/ddas/logistics/case?case_id='+cid,wait_until='domcontentloaded');await self.page.get_by_role('button',name='Administrar datos del Case',exact=True).wait_for();await self.page.get_by_role('button',name='Administrar datos del Case',exact=True).click();await self.page.locator('[data-ultimate-ready="true"]').wait_for()
++        viewer=await self.browser.new_context(viewport={'width':390,'height':844},is_mobile=True,has_touch=True);await self.login(viewer,3);page=await viewer.new_page();await page.goto(self.base+'/app/ddas/logistics/case/data?case_id='+cid,wait_until='domcontentloaded');await page.locator('[data-ultimate-ready="true"]').wait_for();self.assertTrue(await page.get_by_role('button',name='Guardar candidato de Demanda',exact=True).is_disabled());await page.get_by_role('button',name='Contexto del Case',exact=True).tap();await page.get_by_role('button',name='Administrar datos del Case',exact=True).wait_for();await viewer.close()
++    async def test_08_saving_one_slot_keeps_the_other_selected_csv(self):
++        _,_,c=await self.case();cid=c['case']['id'];await self.open_data(cid);d=await self.attach(cid);r=await self.attach(cid,'transport_resources')
++        await self.page.wait_for_function('!document.querySelector("[data-t4-slot=transport_resources] button[aria-busy]")?.disabled')
++        await d.get_by_role('button',name='Guardar candidato de Demanda',exact=True).click();await self.page.get_by_text('Candidato de Demanda guardado. El otro CSV seleccionado se conserva hasta que lo guardes o quites.',exact=True).wait_for()
++        self.assertEqual(await r.locator('input[type=file]').evaluate('n=>n.files.length'),1);self.assertTrue(await self.page.get_by_role('button',name='Publicar versión del Pack',exact=True).is_disabled())
++        await r.get_by_role('button',name='Guardar candidato de Recursos',exact=True).click();await self.page.get_by_role('button',name='Seleccionar candidato',exact=True).first.wait_for();await self.publish_ui();await self.page.locator('[data-pack-current-version="2"]').wait_for();state=await self.api('GET',f'/api/platform/logistics-cases/{cid}/data');self.assertEqual(len(state['entries']),2);self.assertEqual(await self.page.get_by_text('operacion.csv · Publicado en el Pack vigente',exact=True).count(),2)
++
++
++if __name__=='__main__':unittest.main()
+--- post-T3/backend/tests/e2e/ultimate_data_fixture.py
++++ T4/backend/tests/e2e/ultimate_data_fixture.py
+@@ -0,0 +1,22 @@
++"""Owned T4 API/PostgREST/PostgreSQL + explicit private MIME fixture; no engines."""
++import json
++import sys
++from sandbox import Sandbox
++from auth_fixture import VIEWER,DISABLED
++
++class DataPackSandbox(Sandbox):
++    def docker(self,*args):
++        if args and args[0]=='run':args=(args[0],'--label','dation.qa.phase=T4','--label','dation.qa.owner=codex-dation',*args[1:])
++        return super().docker(*args)
++    def start_process(self,name,args,**options):
++        if name=='storage':args=[x.replace('storage_gateway:app','ultimate_storage_gateway:app') for x in args]
++        return super().start_process(name,args,**options)
++    def start(self):
++        super().start()
++        self.sql('UPDATE dation_private.platform_release SET ultimate_foundation_enabled=true,ultimate_data_pack_enabled=true;')
++        (self.directory/'auth-fixture-users.json').write_text(json.dumps({'user-3@example.test':{'id':VIEWER,'refresh':'fixture-refresh-t4-viewer'}}))
++
++if __name__=='__main__':
++    with DataPackSandbox() as sandbox:
++        print(json.dumps({'api_url':sandbox.api_url,'control_dir':str(sandbox.storage)}),flush=True)
++        sys.stdin.readline()
+--- post-T3/backend/tests/e2e/ultimate_storage_gateway.py
++++ T4/backend/tests/e2e/ultimate_storage_gateway.py
+@@ -0,0 +1,28 @@
++"""T4-only private JSON/CSV Storage contract fixture and deterministic faults."""
++import json
++from fastapi import Request
++from fastapi.responses import JSONResponse
++from storage_gateway import app,ROOT,authorized
++
++@app.middleware('http')
++async def ultimate_inputs(request:Request,call_next):
++    path=request.url.path
++    if path=='/storage/v1/bucket/dda-inputs':
++        if not authorized(request):return JSONResponse({'error':'Unauthorized'},status_code=401)
++        return JSONResponse({'id':'dda-inputs','name':'dda-inputs','public':False,'allowed_mime_types':['text/csv','application/json'],'file_size_limit':10485760})
++    operation=None
++    if path=='/rest/v1/rpc/platform_ultimate_data_pack' and request.method=='POST':
++        operation=(await request.json()).get('operation')
++        marker=ROOT/('fail-t4-'+str(operation))
++        if marker.exists():marker.unlink();return JSONResponse({'error':'Synthetic T4 RPC outage'},status_code=503)
++    if path.startswith('/storage/v1/object/') and request.method=='POST':
++        normalized='/normalized/' in path
++        if request.headers.get('content-type')!=('application/json' if normalized else 'text/csv'):return JSONResponse({'error':'MIME not allowed'},status_code=415)
++        marker=ROOT/('fail-t4-normalized' if normalized else 'fail-t4-raw')
++        if marker.exists():marker.unlink();return JSONResponse({'error':'Synthetic T4 Storage outage'},status_code=503)
++    response=await call_next(request)
++    if operation:
++        marker=ROOT/('lose-t4-'+operation+'-response')
++        if marker.exists() and response.status_code<300:marker.unlink();return JSONResponse({'error':'Synthetic lost committed T4 response'},status_code=503)
++    if '/storage/v1/object/' in path and '/normalized/' in path and response.status_code==200:response.headers['Content-Type']='application/json'
++    return response
+--- post-T3/backend/tests/integration/test_ultimate_data_pack.py
++++ T4/backend/tests/integration/test_ultimate_data_pack.py
+@@ -0,0 +1,149 @@
++"""S4: real checked SQL/API/Storage-contract publication, faults and isolation."""
++from concurrent.futures import ThreadPoolExecutor
++import csv,io,json
++from pathlib import Path
++import sys,unittest
++from uuid import uuid4
++import httpx
++
++sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'e2e'))
++from ultimate_data_fixture import DataPackSandbox
++from auth_fixture import USER_A,USER_B,VIEWER,DISABLED
++from tests.test_ultimate_data_contracts import model as domain_model
++
++
++class UltimateDataPackTests(unittest.TestCase):
++    @classmethod
++    def setUpClass(cls):
++        cls.s=DataPackSandbox().__enter__();cls.addClassCleanup(cls.s.__exit__,None,None,None)
++    def ok(self,r):self.assertTrue(r.is_success,r.text);return r.json()
++    def setUp(self):
++        self.a=self.s.api_client;self.m=self.ok(self.a.post('/api/platform/logistics-models',json={'id':str(uuid4()),'name':'S4 operación','configuration':domain_model()['config_jsonb']}))
++        self.v=self.ok(self.a.post('/api/platform/logistics-models/'+self.m['model']['id']+'/versions',json={'version_id':str(uuid4()),'expected_revision':1}))
++        self.c=self.new_case();self.cid=self.c['case']['id'];self.base='/api/platform/logistics-cases/'+self.cid+'/data'
++    def new_case(self,version=None):return self.ok(self.a.post('/api/platform/logistics-cases',json={'id':str(uuid4()),'name':'S4 sin CSV','logistics_model_version_id':version or self.v['version']['id'],'planning_start':'2026-11-02','planning_end':'2026-11-08','horizon_type':'WEEKLY','case_policy':{'primary_goal':'MINIMIZE_COST'},'decision_owner_user_id':USER_A}))
++    def state(self):return self.ok(self.a.get(self.base))
++    def template(self,entity='transport_demand'):return self.a.get(self.base+'/templates/'+entity).content
++    def upload_response(self,entity='transport_demand',body=None,uid=None):
++        uid=uid or str(uuid4());contract=self.state()['contracts'][entity];body=body if body is not None else self.template(entity)
++        return uid,self.a.post(self.base+'/uploads/'+entity,params={'upload_id':uid,'contract_hash':contract['contract_hash']},files={'file':('operacion.csv',body,'text/csv')})
++    def upload(self,entity='transport_demand',body=None):return self.ok(self.upload_response(entity,body)[1])
++    def publication(self,selection,revision=None,pid=None):return {'publication_id':pid or str(uuid4()),'expected_revision':revision or self.state()['pack']['revision'],'selection':selection}
++    def publish(self,j):return self.ok(self.a.post(self.base+'/publish',json=self.publication([{'slot_key':j['entity'],'upload_id':j['id']}])))
++    def sql(self,text):return self.s.sql(text)
++    def marker(self,name):(self.s.storage/name).touch()
++    def raw_path(self,j):return self.s.storage/'dda-inputs'/self.sql(f"SELECT workspace_id::text||'/'||reserved_dataset_id::text||'/input.csv' FROM dation_private.ultimate_input_uploads WHERE id='{j}';")
++    def test_01_empty_case_contracts_and_flag_keep_execution_closed(self):
++        state=self.state();self.assertEqual(state['entries'],[]);self.assertEqual(state['version']['version'],1);self.assertEqual(state['inputs_available'],{'transport_demand':False,'transport_resources':False});self.assertIsNone(state['decision_readiness']);self.assertFalse(state['runtime_execution_available'])
++    def test_02_template_validate_and_snapshot_identity_agree(self):
++        for entity in ['transport_demand','transport_resources']:
++            contract=self.state()['contracts'][entity];raw=self.template(entity);response=self.a.post(self.base+'/validate/'+entity,params={'contract_hash':contract['contract_hash']},files={'file':('input.csv',raw,'text/csv')});report=self.ok(response);self.assertTrue(report['valid']);self.assertEqual(report['rows'],5);self.assertEqual(report['contract_hash'],contract['contract_hash'])
++        self.assertEqual(self.state()['pack']['revision'],1)
++    def test_03_upload_is_candidate_not_published_and_reloads(self):
++        before=self.state();j=self.upload();after=self.state();self.assertEqual(after['pack'],before['pack']);self.assertEqual(after['entries'],[]);self.assertEqual(j['status'],'READY');self.assertEqual(after['uploads'][0]['id'],j['id']);self.assertNotIn('storage_path',j)
++    def test_04_demand_publish_is_immutable_complete_manifest(self):
++        j=self.upload();result=self.publish(j);state=self.state();self.assertEqual(result['version']['version'],2);self.assertEqual(state['version']['id'],result['version']['id']);self.assertEqual([e['slot_key'] for e in state['entries']],['transport_demand'])
++        old=self.ok(self.a.get(self.base+'/versions/'+self.c['planning_context']['data_pack_version_id']));self.assertEqual(old['entries'],[])
++    def test_05_resources_publication_carries_demand_forward(self):
++        d=self.upload();first=self.publish(d);r=self.upload('transport_resources');second=self.publish(r);state=self.state();self.assertEqual(second['version']['version'],3);self.assertEqual(len(state['entries']),2)
++        historic=self.ok(self.a.get(self.base+'/versions/'+first['version']['id']));self.assertEqual(len(historic['entries']),1);self.assertEqual(historic['entries'][0]['dataset_id'],d['dataset_id']);self.assertEqual(next(e for e in state['entries'] if e['slot_key']=='transport_demand')['dataset_id'],d['dataset_id'])
++        self.assertEqual([x['slot_key'] for x in second['publication']['changes']],['transport_resources'])
++    def test_06_storage_yes_database_no_recovers_without_pointer_move(self):
++        self.marker('fail-t4-store');uid,response=self.upload_response();self.assertEqual(response.status_code,503);self.assertTrue(self.raw_path(uid).exists());self.assertEqual(self.state()['pack']['revision'],1)
++        recovered=self.ok(self.a.post(self.base+'/uploads/'+uid+'/recover'));self.assertEqual(recovered['status'],'READY');self.assertEqual(self.state()['pack']['revision'],1);self.publish(recovered)
++    def test_07_metadata_commit_lost_response_recovers_same_dataset(self):
++        self.marker('lose-t4-store-response');uid,response=self.upload_response();self.assertEqual(response.status_code,503);count=self.sql(f"SELECT count(*) FROM datasets WHERE id=(SELECT dataset_id FROM dation_private.ultimate_input_uploads WHERE id='{uid}');");self.assertEqual(count,'1')
++        a=self.ok(self.a.post(self.base+'/uploads/'+uid+'/recover'));b=self.ok(self.a.post(self.base+'/uploads/'+uid+'/recover'));self.assertEqual(a['dataset_id'],b['dataset_id']);self.assertEqual(self.state()['pack']['revision'],1)
++    def test_08_publish_commit_lost_response_replays_exact_version(self):
++        j=self.upload();body=self.publication([{'slot_key':j['entity'],'upload_id':j['id']}]);self.marker('lose-t4-publish-response');r=self.a.post(self.base+'/publish',json=body);self.assertEqual(r.status_code,503)
++        after=self.state();reply=self.ok(self.a.post(self.base+'/publish',json=body));self.assertTrue(reply['replayed']);self.assertEqual(reply['version']['id'],after['version']['id']);self.assertEqual(self.state()['history_total'],2)
++    def test_09_interrupted_raw_can_retry_same_upload_identity(self):
++        self.marker('fail-t4-raw');raw=self.template();uid,response=self.upload_response(body=raw);self.assertEqual(response.status_code,503);self.assertEqual(self.a.post(self.base+'/uploads/'+uid+'/recover').status_code,409)
++        same,result=self.upload_response(body=raw,uid=uid);self.assertEqual(self.ok(result)['id'],uid);self.assertEqual(self.state()['pack']['revision'],1)
++    def test_10_interrupted_normalized_object_recovers_from_raw(self):
++        self.marker('fail-t4-normalized');uid,response=self.upload_response();self.assertEqual(response.status_code,503);self.assertTrue(self.raw_path(uid).exists());recovered=self.ok(self.a.post(self.base+'/uploads/'+uid+'/recover'));self.assertEqual(recovered['status'],'READY');self.publish(recovered)
++    def test_11_cas_conflict_preserves_candidate_and_current(self):
++        a=self.upload();b=self.upload('transport_resources');old=self.publication([{'slot_key':b['entity'],'upload_id':b['id']}],revision=1);self.publish(a);before=self.state();self.assertEqual(self.a.post(self.base+'/publish',json=old).status_code,409);after=self.state();self.assertEqual(after['pack'],before['pack']);self.assertTrue(any(j['id']==b['id'] and j['status']=='READY' for j in after['uploads']))
++    def test_12_same_raw_and_contract_deduplicate_without_replacing_bytes(self):
++        a=self.upload();raw=self.raw_path(a['id']).read_bytes();b=self.upload();self.assertEqual(a['dataset_id'],b['dataset_id']);self.assertEqual(self.raw_path(a['id']).read_bytes(),raw);self.assertFalse(self.raw_path(b['id']).exists());self.assertEqual(self.state()['pack']['revision'],1)
++    def test_13_reuse_same_version_across_cases_is_explicit(self):
++        j=self.upload();other=self.new_case();base='/api/platform/logistics-cases/'+other['case']['id']+'/data';items=self.ok(self.a.get(base+'/reuse/transport_demand'))['items'];self.assertIn(j['dataset_id'],[x['id'] for x in items])
++        body={'publication_id':str(uuid4()),'expected_revision':1,'selection':[{'slot_key':'transport_demand','dataset_id':j['dataset_id']}]};self.ok(self.a.post(base+'/publish',json=body));self.assertEqual(self.state()['entries'],[])
++    def test_14_same_raw_different_contract_is_a_distinct_logical_dataset(self):
++        first=self.upload();config=domain_model(operating_role='HYBRID')['config_jsonb'];m=self.ok(self.a.post('/api/platform/logistics-models',json={'id':str(uuid4()),'name':'Otra interpretación','configuration':config}));v=self.ok(self.a.post('/api/platform/logistics-models/'+m['model']['id']+'/versions',json={'version_id':str(uuid4()),'expected_revision':1}));other=self.new_case(v['version']['id']);base='/api/platform/logistics-cases/'+other['case']['id']+'/data';state=self.ok(self.a.get(base));raw=self.template()
++        second=self.ok(self.a.post(base+'/uploads/transport_demand',params={'upload_id':str(uuid4()),'contract_hash':state['contracts']['transport_demand']['contract_hash']},files={'file':('operacion.csv',raw,'text/csv')}));self.assertEqual(first['raw_sha256'],second['raw_sha256']);self.assertNotEqual(first['dataset_id'],second['dataset_id']);self.assertNotEqual(first['contract_hash'],second['contract_hash'])
++        bad={'publication_id':str(uuid4()),'expected_revision':1,'selection':[{'slot_key':'transport_demand','dataset_id':first['dataset_id']}]};self.assertEqual(self.a.post(base+'/publish',json=bad).status_code,409)
++    def test_15_cross_workspace_case_dataset_and_storage_are_denied(self):
++        j=self.upload();self.publish(j)
++        with httpx.Client(base_url=self.s.api_url,headers={'Authorization':'Bearer '+self.s.user_tokens[USER_B]},trust_env=False) as b:
++            self.assertEqual(b.get(self.base).status_code,404);self.assertEqual(b.get('/api/platform/data/datasets/'+j['dataset_id']+'/preview').status_code,404)
++            self.assertEqual(b.post(self.base+'/uploads/'+j['id']+'/recover').status_code,404)
++        self.assertEqual(self.s.http.get(self.s.env['SUPABASE_URL']+'/storage/v1/object/dda-inputs/'+str(self.raw_path(j['id']).relative_to(self.s.storage/'dda-inputs'))).status_code,401)
++    def test_16_viewer_reads_but_cannot_upload_or_publish(self):
++        with httpx.Client(base_url=self.s.api_url,headers={'Authorization':'Bearer '+self.s.user_tokens[VIEWER]},trust_env=False) as viewer:
++            self.assertFalse(self.ok(viewer.get(self.base))['can_edit']);raw=self.template();hash_=self.state()['contracts']['transport_demand']['contract_hash']
++            r=viewer.post(self.base+'/uploads/transport_demand',params={'upload_id':str(uuid4()),'contract_hash':hash_},files={'file':('input.csv',raw,'text/csv')});self.assertEqual(r.status_code,403)
++            self.assertEqual(viewer.post(self.base+'/publish',json=self.publication([{'slot_key':'transport_demand','dataset_id':str(uuid4())}])).status_code,403)
++        self.assertEqual(self.state()['entries'],[])
++    def test_17_default_closed_flag_and_read_only_rollback(self):
++        j=self.upload();self.publish(j);before=self.state();self.sql('UPDATE dation_private.platform_release SET ultimate_data_pack_enabled=false;')
++        try:
++            self.assertFalse(self.state()['can_edit']);self.assertEqual(self.state()['entries'],before['entries']);self.assertEqual(self.upload_response()[1].status_code,404)
++        finally:self.sql('UPDATE dation_private.platform_release SET ultimate_data_pack_enabled=true;')
++    def test_18_version_metadata_and_objects_are_immutable(self):
++        j=self.upload();v=self.publish(j)['version']['id']
++        for sql in [f"UPDATE case_data_pack_versions SET manifest_hash='{'b'*64}' WHERE id='{v}';",f"UPDATE case_data_pack_entries SET record_count=1 WHERE pack_version_id='{v}';",f"DELETE FROM dation_private.ultimate_input_objects WHERE dataset_id='{j['dataset_id']}';"]:
++            with self.assertRaises(AssertionError):self.sql(sql)
++        path=str(self.raw_path(j['id']).relative_to(self.s.storage));r=self.s.http.post(self.s.env['SUPABASE_URL']+'/storage/v1/object/'+path,headers={'Authorization':'Bearer '+self.s.token,'apikey':self.s.token,'Content-Type':'text/csv','x-upsert':'false'},content=b'replacement');self.assertEqual(r.status_code,409)
++    def test_19_referenced_input_cannot_be_deleted_by_legacy_hub(self):
++        j=self.upload();self.publish(j);self.ok(self.a.post('/api/platform/data/datasets/'+j['dataset_id']+'/archive'));self.assertEqual(self.a.delete('/api/platform/data/datasets/'+j['dataset_id']).status_code,409);self.assertTrue(self.raw_path(j['id']).exists())
++    def test_20_no_pointer_to_missing_or_wrong_bytes(self):
++        j=self.upload();path=self.raw_path(j['id']);raw=path.read_bytes();path.write_bytes(b'corrupted')
++        try:self.assertEqual(self.a.post(self.base+'/publish',json=self.publication([{'slot_key':j['entity'],'upload_id':j['id']}])).status_code,409);self.assertEqual(self.state()['pack']['revision'],1)
++        finally:path.write_bytes(raw)
++        self.publish(j)
++    def test_21_schema_extra_pii_never_enters_journal_or_storage(self):
++        raw=self.template().decode().splitlines();raw[0]+=',customer_name'
++        for i in range(1,len(raw)):raw[i]+=',PRIVATE-DO-NOT-STORE'
++        before=self.sql(f"SELECT count(*) FROM dation_private.ultimate_input_uploads WHERE case_id='{self.cid}';");_,r=self.upload_response(body=('\n'.join(raw)+'\n').encode());self.assertEqual(r.status_code,422);self.assertNotIn('PRIVATE-DO-NOT-STORE',r.text);self.assertEqual(before,self.sql(f"SELECT count(*) FROM dation_private.ultimate_input_uploads WHERE case_id='{self.cid}';"))
++    def test_22_client_paths_and_contract_forgery_are_rejected(self):
++        body=self.publication([{'slot_key':'transport_demand','dataset_id':str(uuid4())}]);body['storage_path']='another-tenant/object';self.assertEqual(self.a.post(self.base+'/publish',json=body).status_code,422)
++        self.assertEqual(self.a.post(self.base+'/uploads/transport_demand',params={'upload_id':str(uuid4()),'contract_hash':'a'*64},files={'file':('input.csv',self.template(),'text/csv')}).status_code,409)
++        for role in ['anon','authenticated']:
++            with self.assertRaises(AssertionError):self.sql(f"SET ROLE {role}; SELECT platform_ultimate_data_pack('{self.s.workspace_a}','{USER_A}','state','{{}}');")
++    def test_23_concurrent_publications_have_one_cas_winner(self):
++        a=self.upload();b=self.upload('transport_resources');bodies=[self.publication([{'slot_key':j['entity'],'upload_id':j['id']}],revision=1) for j in [a,b]]
++        def post(body):
++            with httpx.Client(base_url=self.s.api_url,headers={'Authorization':'Bearer '+self.s.user_tokens[USER_A]},trust_env=False,timeout=30) as client:return client.post(self.base+'/publish',json=body).status_code
++        with ThreadPoolExecutor(2) as pool:statuses=list(pool.map(post,bodies))
++        self.assertEqual(sorted(statuses),[200,409]);self.assertEqual(self.state()['history_total'],2)
++    def test_24_replay_precedes_mutable_flag_and_revision(self):
++        j=self.upload();body=self.publication([{'slot_key':j['entity'],'upload_id':j['id']}]);first=self.ok(self.a.post(self.base+'/publish',json=body));self.sql('UPDATE dation_private.platform_release SET ultimate_data_pack_enabled=false;')
++        try:again=self.ok(self.a.post(self.base+'/publish',json=body));self.assertTrue(again['replayed']);self.assertEqual(first['version'],again['version'])
++        finally:self.sql('UPDATE dation_private.platform_release SET ultimate_data_pack_enabled=true;')
++    def test_25_discard_interrupted_candidate_is_safe_and_idempotent(self):
++        self.marker('fail-t4-normalized');uid,response=self.upload_response();self.assertEqual(response.status_code,503);path=self.raw_path(uid);self.assertTrue(path.exists())
++        self.ok(self.a.post(self.base+'/uploads/'+uid+'/discard'));self.assertFalse(path.exists());self.ok(self.a.post(self.base+'/uploads/'+uid+'/discard'));self.assertEqual(self.state()['entries'],[]);self.assertEqual(self.a.post(self.base+'/uploads/'+uid+'/recover').status_code,409)
++    def test_26_normalized_preview_and_hub_use_same_hash(self):
++        j=self.upload();self.publish(j);a=self.ok(self.a.get(self.base+'/preview/'+j['dataset_id']));b=self.ok(self.a.get('/api/platform/data/datasets/'+j['dataset_id']+'/preview'));self.assertEqual(a['canonical_sha256'],j['canonical_sha256']);self.assertEqual(a['canonical_sha256'],b['canonical_sha256']);self.assertEqual(len(a['records']),5);self.assertNotIn('product',a['records'][0])
++    def test_27_upload_intent_cannot_be_rebound_to_changed_bytes(self):
++        raw=self.template();uid,r=self.upload_response(body=raw);self.ok(r);changed=raw.replace(b'ORD-001',b'ORD-999');_,retry=self.upload_response(body=changed,uid=uid);self.assertEqual(retry.status_code,409);self.assertEqual(self.state()['pack']['revision'],1)
++    def test_28_private_catalog_and_case_context_ownership_stay_intact(self):
++        before=self.c['responsibilities']['stages'];j=self.upload();self.publish(j);after=self.ok(self.a.get('/api/platform/logistics-cases/'+self.cid+'/context'));self.assertEqual(before,after['responsibilities']['stages']);self.assertIsNone(after['case']['context_frozen_at'])
++        for table in ['ultimate_input_objects','ultimate_input_uploads','ultimate_pack_publications']:
++            with self.assertRaises(AssertionError):self.sql('SET ROLE service_role; SELECT * FROM dation_private.'+table+';')
++    def test_29_missing_normalized_bytes_cannot_publish_a_partial_pack(self):
++        j=self.upload();relative=self.sql(f"SELECT normalized_bucket||'/'||normalized_path FROM dation_private.ultimate_input_objects WHERE dataset_id='{j['dataset_id']}';");path=self.s.storage/relative;contents=path.read_bytes();path.unlink()
++        try:
++            r=self.a.post(self.base+'/publish',json=self.publication([{'slot_key':j['entity'],'upload_id':j['id']}]));self.assertEqual(r.status_code,503);self.assertEqual(self.state()['pack']['revision'],1)
++        finally:path.write_bytes(contents)
++    def test_30_concurrent_equal_uploads_reuse_one_dataset_and_clean_only_orphans(self):
++        raw=self.template();hash_=self.state()['contracts']['transport_demand']['contract_hash'];ids=[str(uuid4()),str(uuid4())]
++        def store(uid):
++            with httpx.Client(base_url=self.s.api_url,headers={'Authorization':'Bearer '+self.s.user_tokens[USER_A]},trust_env=False,timeout=30) as client:
++                r=client.post(self.base+'/uploads/transport_demand',params={'upload_id':uid,'contract_hash':hash_},files={'file':('operacion.csv',raw,'text/csv')});self.assertEqual(r.status_code,200,r.text);return r.json()
++        with ThreadPoolExecutor(2) as pool:stored=list(pool.map(store,ids))
++        self.assertEqual(stored[0]['dataset_id'],stored[1]['dataset_id']);self.assertEqual(sum(self.raw_path(uid).exists() for uid in ids),1);self.assertEqual(self.state()['pack']['revision'],1)
++
++
++if __name__=='__main__':unittest.main()
+--- post-T3/backend/tests/test_ultimate_data_contracts.py
++++ T4/backend/tests/test_ultimate_data_contracts.py
+@@ -0,0 +1,130 @@
++"""U4: descriptor/template/parser/normalizer coherence and O/P/Q/R boundaries."""
++import copy,csv,io,json
++from itertools import product
++import unittest
++from uuid import uuid4
++
++from app.domain.logistics.data_contracts import compile_contract,template_csv,NORMALIZER_VERSION,REGISTRY_VERSION
++from app.domain.logistics.normalizers import normalize_input,InputValidationError
++from app.services.logistics_model_service import configuration_snapshot
++from tests.test_ultimate_case_models import config
++
++MID='10000000-0000-4000-8000-000000000099'
++def model(**changes):
++    c,h=configuration_snapshot(config(**changes));return {'id':MID,'config_jsonb':c,'config_hash':h}
++def contract(entity='transport_demand',**changes):return compile_contract(model(**changes),entity)
++def rows(c):return list(csv.DictReader(io.StringIO(template_csv(c).decode())))
++def emit(c,data):
++    out=io.StringIO();w=csv.DictWriter(out,fieldnames=[f.public_header for f in c.fields],lineterminator='\n');w.writeheader();w.writerows(data);return out.getvalue().encode()
++def one(c,**changes):
++    row=rows(c)[0];row.update(changes);return emit(c,[row])
++
++
++class UltimateDataContractTests(unittest.TestCase):
++    def reject(self,c,body,code=None):
++        with self.assertRaises(InputValidationError) as raised:normalize_input(body,c)
++        self.assertFalse(raised.exception.report['valid'])
++        if code:self.assertTrue(any(x['code']==code for x in raised.exception.report['errors']),raised.exception.report)
++        return raised.exception.report
++    def test_descriptor_serializes_and_hash_is_deterministic(self):
++        a=contract();b=contract();self.assertEqual(a,b);self.assertEqual(a.contract_hash,b.contract_hash)
++        self.assertEqual(a.model_validate_json(a.model_dump_json()),a)
++        self.assertEqual(a.registry_version,REGISTRY_VERSION);self.assertEqual(a.normalizer_version,NORMALIZER_VERSION)
++        for f in a.fields:
++            self.assertTrue(f.semantic_key and f.engine_role and f.required_for and f.used_by and f.examples)
++        self.assertEqual(a.rules['extra_columns'],'REJECT')
++    def test_unknown_entity_or_registry_fails_closed(self):
++        for entity,registry in [('orders',REGISTRY_VERSION),('transport_demand','UNKNOWN')]:
++            with self.assertRaises(ValueError):compile_contract(model(),entity,registry)
++    def test_pallet_only_needs_no_kg_and_template_has_five_valid_rows(self):
++        for entity in ['transport_demand','transport_resources']:
++            c=contract(entity);self.assertFalse(any('weight_kg' in f.public_header for f in c.fields));self.assertEqual(normalize_input(template_csv(c),c)['record_count'],5)
++    def test_Q_role_source_and_dimension_matrix_uses_same_semantics(self):
++        for role,sources,dim in product(['SHIPPER','LOGISTICS_PROVIDER','HYBRID'],[['OWN'],['EXTERNAL'],['OWN','EXTERNAL']],['pallets','weight_kg','volume_m3','units']):
++            with self.subTest(role=role,sources=sources,dim=dim):
++                for entity in ['transport_demand','transport_resources']:
++                    c=contract(entity,operating_role=role,allowed_sources=sources,active_dimensions=[dim],primary_dimension=dim)
++                    self.assertEqual(normalize_input(template_csv(c),c)['record_count'],5)
++                    self.assertNotIn('engine_name',c.model_dump())
++    def test_only_own_or_external_fields_are_compiled(self):
++        own={f.public_header for f in contract('transport_resources',allowed_sources=['OWN']).fields};external={f.public_header for f in contract('transport_resources',allowed_sources=['EXTERNAL']).fields}
++        self.assertNotIn('services_available',own);self.assertNotIn('units_available',external)
++    def test_conditional_fields_are_checked_per_row(self):
++        c=contract('transport_resources');self.reject(c,one(c,services_available='1'),'SOURCE_CONDITIONAL')
++        ex=rows(c)[1];ex['units_available']='1';self.reject(c,emit(c,[ex]),'SOURCE_CONDITIONAL')
++    def test_contract_hash_pins_configuration_and_published_version(self):
++        c=contract();self.assertNotEqual(c.contract_hash,contract(split_permitted=True).contract_hash)
++        v=model();v['id']=str(uuid4());self.assertNotEqual(c.contract_hash,compile_contract(v,'transport_demand').contract_hash)
++    def test_missing_header_is_guided_and_not_inferred(self):
++        c=contract();self.reject(c,template_csv(c).replace(b'demand_pallets',b'Peso'),'EXTRA_COLUMN')
++        text=template_csv(c).decode().splitlines();text[0]=text[0].replace(',demand_pallets','');self.reject(c,('\n'.join(text)+'\n').encode(),'MISSING_COLUMN')
++    def test_P_forbidden_commercial_extras_are_rejected_without_echoing_values(self):
++        c=contract()
++        for extra in ['customer_name','CUIT','SKU','invoice','revenue','margin','dispatch_date']:
++            body=template_csv(c).decode().splitlines();body[0]+=','+extra
++            for i in range(1,len(body)):body[i]+=',PRIVATE-COMMERCIAL'
++            result=self.reject(c,('\n'.join(body)+'\n').encode(),'EXTRA_COLUMN');self.assertNotIn('PRIVATE-COMMERCIAL',json.dumps(result))
++    def test_R_duplicate_ids_enum_dates_and_ready_due(self):
++        c=contract();r=rows(c);r[1]['order_id']=r[0]['order_id'];self.reject(c,emit(c,r),'DUPLICATE_ID')
++        for values in [dict(priority='Normal'),dict(ready_date='02/11/2026'),dict(ready_date='2026-02-30'),dict(ready_date='2026-11-08',delivery_due_date='2026-11-02'),dict(split_allowed='yes')]:
++            with self.subTest(values=values):self.reject(c,one(c,**values))
++    def test_R_negative_or_zero_physical_capacity_and_guarantee_above_max(self):
++        c=contract('transport_resources')
++        for values in [dict(guaranteed_pallets='0'),dict(guaranteed_pallets='-1'),dict(maximum_pallets='1')]:
++            with self.subTest(values=values):self.reject(c,one(c,**values))
++    def test_availability_zero_is_valid_own_and_external(self):
++        c=contract('transport_resources');a=rows(c)[0];a['units_available']='0';b=rows(c)[1];b['services_available']='0'
++        n=json.loads(normalize_input(emit(c,[a,b]),c)['bytes']);self.assertEqual(n['records'][0]['units_available'],0);self.assertEqual(n['records'][1]['services_available'],0)
++    def test_unknown_external_capacity_is_not_assumed_or_unlimited(self):
++        c=contract('transport_resources',allowed_sources=['EXTERNAL']);n=normalize_input(one(c,services_available='',availability_source='UNKNOWN'),c)
++        row=json.loads(n['bytes'])['records'][0];self.assertIsNone(row['services_available']);self.assertEqual(row['availability_source'],'UNKNOWN');self.assertEqual(n['report']['summary']['unknown_availability_count'],1)
++        self.reject(c,one(c,services_available='',availability_source='CONFIRMED'))
++        self.reject(c,one(c,services_available='1',availability_source='UNKNOWN'))
++    def test_O_explicit_assumption_defaults_one_with_frozen_provenance(self):
++        c=contract('transport_resources',allowed_sources=['EXTERNAL']);n=normalize_input(one(c,services_available='',availability_source='ASSUMED'),c);snapshot=json.loads(n['bytes'])
++        self.assertEqual(snapshot['records'][0]['services_available'],1);self.assertEqual(snapshot['records'][0]['availability_source'],'ASSUMED');self.assertEqual(snapshot['assumptions'][0]['source'],'DATION_DEFAULT')
++        self.assertEqual(n['report']['warnings'][0]['code'],'ASSUMED_EXTERNAL_AVAILABILITY')
++    def test_unknown_cost_is_null_and_known_zero_remains_zero(self):
++        c=contract('transport_resources',allowed_sources=['EXTERNAL'],external_cost_models=['PER_TRIP']);a=normalize_input(one(c,trip_rate=''),c);b=normalize_input(one(c,trip_rate='0'),c)
++        self.assertIsNone(json.loads(a['bytes'])['records'][0]['external_cost']['rate']);self.assertEqual(json.loads(b['bytes'])['records'][0]['external_cost']['rate'],'0');self.assertNotEqual(a['canonical_sha256'],b['canonical_sha256'])
++    def test_per_km_basis_and_disallowed_rate_are_checked(self):
++        c=contract('transport_resources',allowed_sources=['EXTERNAL'],external_cost_models=['PER_KM'],per_km_billing_bases=['ROUND_TRIP'])
++        self.assertEqual(json.loads(normalize_input(template_csv(c),c)['bytes'])['records'][0]['external_cost']['billing_basis'],'ROUND_TRIP')
++        self.reject(c,one(c,billing_basis='ONE_WAY'));self.reject(c,one(c,billing_basis=''))
++    def test_multidimensional_units_precision_and_fraction_coherence_not_inferred(self):
++        c=contract(active_dimensions=['pallets','weight_kg','volume_m3'],primary_dimension='pallets')
++        n=normalize_input(one(c,demand_pallets='1.001',demand_weight_kg='10.123',demand_volume_m3='.123456'),c)
++        self.assertEqual(json.loads(n['bytes'])['records'][0]['requested']['volume_m3'],'0.123456')
++        self.reject(c,one(c,demand_pallets='1.0001'));self.reject(c,one(c,demand_weight_kg=''))
++    def test_no_fuzzy_numeric_date_or_boolean_mapping(self):
++        c=contract()
++        for values in [dict(distance_km='1,5'),dict(distance_km='NaN'),dict(distance_km='Infinity'),dict(split_allowed='1'),dict(priority='medium')]:self.reject(c,one(c,**values))
++    def test_compatibility_is_explicit_unless_model_declares_homogeneous(self):
++        c=contract();self.reject(c,one(c,compatibility_groups=''),'REQUIRED_VALUE')
++        homogeneous=contract(homogeneous_loads_declared=True);self.assertEqual(json.loads(normalize_input(one(homogeneous,compatibility_groups=''),homogeneous)['bytes'])['records'][0]['compatibility_groups'],[])
++    def test_no_arbitrary_lanes_or_source_inference(self):
++        c=contract('transport_resources')
++        for values in [dict(lanes='all'),dict(lanes='[]'),dict(lanes='[["A"]]'),dict(source='THIRD_PARTY'),dict(lanes='[["A","B"],["A","B"]]')]:self.reject(c,one(c,**values))
++    def test_canonical_reproduction_and_raw_hash_distinction(self):
++        c=contract();a=normalize_input(template_csv(c),c);b=normalize_input(template_csv(c),c);self.assertEqual(a,b)
++        r=rows(c);r.reverse();changed=normalize_input(emit(c,r),c);self.assertNotEqual(a['raw_sha256'],changed['raw_sha256']);self.assertEqual(a['canonical_sha256'],changed['canonical_sha256'])
++        self.assertNotEqual(a['raw_sha256'],a['canonical_sha256'])
++    def test_blank_invalid_utf8_duplicate_header_and_csv_syntax(self):
++        c=contract()
++        for body in [b'',b'\xff\xfe',b'order_id,order_id\nA,B\n',template_csv(c).split(b'\n',1)[0]+b'\n',template_csv(c).split(b'\n',1)[0]+b'\n"unterminated']:
++            self.reject(c,body)
++    def test_descriptor_maps_are_immutable(self):
++        c=contract()
++        with self.assertRaises(TypeError):c.rules['extra_columns']='ALLOW'
++        with self.assertRaises(TypeError):c.fields[0].validation['max_length']=10000
++    def test_unsupported_pinned_versions_fail_closed(self):
++        c=contract();self.reject(c.model_copy(update={'normalizer_version':'UNKNOWN'}),template_csv(c),'UNSUPPORTED_VERSION')
++        value=model();value['contract_registry_version']='UNKNOWN'
++        with self.assertRaises(ValueError):compile_contract(value,'transport_demand')
++    def test_assumption_summary_is_bounded_without_losing_total_provenance(self):
++        c=contract('transport_resources',allowed_sources=['EXTERNAL']);base=rows(c)[0];data=[]
++        for i in range(101):data.append({**base,'resource_id':'RES-'+str(i),'services_available':'','availability_source':'ASSUMED'})
++        n=normalize_input(emit(c,data),c);summary=n['report']['summary'];self.assertEqual(summary['assumptions_total'],101);self.assertEqual(len(summary['assumptions']),20);self.assertTrue(summary['assumptions_truncated']);self.assertEqual(len(json.loads(n['bytes'])['assumptions']),101)
++
++
++if __name__=='__main__':unittest.main()
+--- post-T3/backend/tests/test_ultimate_data_navigation.mjs
++++ T4/backend/tests/test_ultimate_data_navigation.mjs
+@@ -0,0 +1,15 @@
++import test from 'node:test';
++import assert from 'node:assert/strict';
++import {readResource,resourceUrl} from '../app/static/js/dispatch/navigation/resource.mjs';
++import {getDatasetTypePresentation} from '../app/static/js/platform/data-presentation.mjs';
++const id='10000000-0000-4000-8000-000000000001';
++test('Case Data deep link preserves its Case without a legacy pair or Run',()=>{
++ const url=resourceUrl('https://example.test/app?run_id='+id+'&model_id='+id,{view:'logistics-case-data',caseId:id,nodeId:null,runId:null});
++ assert.equal(url.pathname,'/app/ddas/logistics/case/data');assert.equal(readResource(url).caseId,id);assert.equal(readResource(url).runId,null);assert.equal(url.searchParams.has('model_id'),false);
++ assert.equal(readResource(resourceUrl(url,{view:'logistics-case-setup',caseId:id})).caseId,id);
++});
++test('Data Hub labels Ultimate semantic inputs without changing legacy presentation',()=>{
++ assert.equal(getDatasetTypePresentation({dataset_type:'transport_demand'}),'Demanda de transporte');
++ assert.equal(getDatasetTypePresentation({dataset_type:'transport_resources'}),'Recursos de transporte');
++ assert.equal(getDatasetTypePresentation({dataset_type:'unknown'}),'unknown');
++});
+--- post-T3/supabase/migrations/20261026184655_ultimate_progressive_data_pack.sql
++++ T4/supabase/migrations/20261026184655_ultimate_progressive_data_pack.sql
+@@ -0,0 +1,263 @@
++-- T4: exact input candidates, private object provenance and complete Pack publication.
++-- No graph resolver, execution, approval mutation or production Storage configuration.
++BEGIN;
++SET LOCAL lock_timeout='5s';
++SET LOCAL statement_timeout='90s';
++ALTER TABLE dation_private.platform_release ADD COLUMN ultimate_data_pack_enabled boolean NOT NULL DEFAULT false;
++
++CREATE TABLE dation_private.ultimate_input_objects (
++ workspace_id uuid NOT NULL, dataset_id uuid NOT NULL, model_version_id uuid NOT NULL,
++ normalized_bucket text NOT NULL CHECK(normalized_bucket ~ '^[a-z0-9][a-z0-9-]{0,62}$'),
++ normalized_path text NOT NULL CHECK(normalized_path ~ ('^'||workspace_id::text||'/normalized/'||dataset_id::text||'/[0-9a-f]{64}[.]json$')),
++ normalized_size bigint NOT NULL CHECK(normalized_size BETWEEN 1 AND 10485760),
++ summary jsonb NOT NULL CHECK(jsonb_typeof(summary)='object' AND octet_length(summary::text)<=65536),
++ created_at timestamptz NOT NULL DEFAULT now(), PRIMARY KEY(workspace_id,dataset_id),
++ FOREIGN KEY(workspace_id,dataset_id) REFERENCES public.datasets(workspace_id,id) ON DELETE RESTRICT,
++ FOREIGN KEY(workspace_id,model_version_id) REFERENCES public.logistics_model_versions(workspace_id,id) ON DELETE RESTRICT
++);
++CREATE INDEX ultimate_input_objects_model ON dation_private.ultimate_input_objects(workspace_id,model_version_id);
++CREATE TRIGGER t4_input_objects_immutable BEFORE UPDATE OR DELETE ON dation_private.ultimate_input_objects FOR EACH ROW EXECUTE FUNCTION dation_private.ultimate_immutable();
++
++CREATE TABLE dation_private.ultimate_input_uploads (
++ id uuid PRIMARY KEY, workspace_id uuid NOT NULL, case_id uuid NOT NULL, model_version_id uuid NOT NULL,
++ entity text NOT NULL CHECK(entity IN('transport_demand','transport_resources')),
++ reserved_dataset_id uuid NOT NULL UNIQUE DEFAULT gen_random_uuid(), dataset_id uuid,
++ actor_user_id uuid NOT NULL, intent_hash text NOT NULL CHECK(intent_hash ~ '^[0-9a-f]{64}$'),
++ contract_id text NOT NULL CHECK(length(contract_id) BETWEEN 1 AND 128), contract_hash text NOT NULL CHECK(contract_hash ~ '^[0-9a-f]{64}$'),
++ normalizer_version text NOT NULL CHECK(length(normalizer_version) BETWEEN 1 AND 128),
++ raw_sha256 text NOT NULL CHECK(raw_sha256 ~ '^[0-9a-f]{64}$'), canonical_sha256 text NOT NULL CHECK(canonical_sha256 ~ '^[0-9a-f]{64}$'),
++ raw_size bigint NOT NULL CHECK(raw_size BETWEEN 1 AND 10485760), normalized_size bigint NOT NULL CHECK(normalized_size BETWEEN 1 AND 10485760),
++ record_count bigint NOT NULL CHECK(record_count BETWEEN 1 AND 10000), column_count integer NOT NULL CHECK(column_count BETWEEN 1 AND 50),
++ filename text NOT NULL CHECK(length(filename) BETWEEN 1 AND 120), storage_bucket text NOT NULL CHECK(storage_bucket ~ '^[a-z0-9][a-z0-9-]{0,62}$'),
++ profile jsonb NOT NULL CHECK(jsonb_typeof(profile)='object' AND octet_length(profile::text)<=262144),
++ summary jsonb NOT NULL CHECK(jsonb_typeof(summary)='object' AND octet_length(summary::text)<=65536),
++ status text NOT NULL DEFAULT 'PREPARED' CHECK(status IN('PREPARED','READY','DISCARDING','DISCARDED')),
++ cleanup_pending boolean NOT NULL DEFAULT false,
++ created_at timestamptz NOT NULL DEFAULT now(),updated_at timestamptz NOT NULL DEFAULT now(),
++ UNIQUE(workspace_id,case_id,id),
++ FOREIGN KEY(workspace_id,case_id,model_version_id) REFERENCES public.decision_cases(workspace_id,id,logistics_model_version_id) ON DELETE RESTRICT,
++ FOREIGN KEY(workspace_id,dataset_id) REFERENCES public.datasets(workspace_id,id) ON DELETE RESTRICT,
++ FOREIGN KEY(workspace_id,actor_user_id) REFERENCES public.workspace_members(workspace_id,user_id) ON DELETE RESTRICT,
++ CHECK((status='READY')=(dataset_id IS NOT NULL) OR status IN('DISCARDING','DISCARDED'))
++);
++CREATE INDEX ultimate_input_uploads_case ON dation_private.ultimate_input_uploads(workspace_id,case_id,created_at DESC,id);
++CREATE INDEX ultimate_input_uploads_dataset ON dation_private.ultimate_input_uploads(workspace_id,dataset_id);
++
++CREATE TABLE dation_private.ultimate_pack_publications (
++ id uuid PRIMARY KEY, workspace_id uuid NOT NULL, case_id uuid NOT NULL, pack_version_id uuid NOT NULL,
++ intent_hash text NOT NULL CHECK(intent_hash ~ '^[0-9a-f]{64}$'), actor_user_id uuid NOT NULL,
++ previous_version_id uuid NOT NULL, changes jsonb NOT NULL, created_at timestamptz NOT NULL DEFAULT now(),
++ FOREIGN KEY(workspace_id,case_id,pack_version_id) REFERENCES public.case_data_pack_versions(workspace_id,case_id,id) ON DELETE RESTRICT,
++ FOREIGN KEY(workspace_id,case_id,previous_version_id) REFERENCES public.case_data_pack_versions(workspace_id,case_id,id) ON DELETE RESTRICT,
++ FOREIGN KEY(workspace_id,actor_user_id) REFERENCES public.workspace_members(workspace_id,user_id) ON DELETE RESTRICT
++);
++CREATE INDEX ultimate_pack_publications_case ON dation_private.ultimate_pack_publications(workspace_id,case_id,created_at DESC);
++CREATE TRIGGER t4_publications_immutable BEFORE UPDATE OR DELETE ON dation_private.ultimate_pack_publications FOR EACH ROW EXECUTE FUNCTION dation_private.ultimate_immutable();
++
++CREATE FUNCTION dation_private.t4_entry(wid uuid,slot text,did uuid) RETURNS jsonb
++LANGUAGE sql STABLE SET search_path=pg_catalog AS $$
++ SELECT jsonb_build_object('slot_key',slot,'dataset_id',d.id,'contract_id',d.data_contract_id,'contract_hash',d.data_contract_hash,
++  'raw_sha256',d.sha256,'canonical_sha256',d.canonical_sha256,'normalizer_version',d.normalizer_version,
++  'normalized_bucket',o.normalized_bucket,'normalized_path',o.normalized_path,'normalized_size',o.normalized_size,
++  'record_count',d.row_count,'storage_bucket',d.storage_bucket,'storage_path',d.storage_path,'raw_size',d.size_bytes,'summary',o.summary)
++ FROM public.datasets d JOIN dation_private.ultimate_input_objects o ON o.workspace_id=d.workspace_id AND o.dataset_id=d.id
++ WHERE d.workspace_id=wid AND d.id=did AND d.dataset_type=slot AND d.deletion_requested_at IS NULL;
++$$;
++
++CREATE FUNCTION dation_private.t4_upload(j dation_private.ultimate_input_uploads) RETURNS jsonb
++LANGUAGE sql STABLE SET search_path=pg_catalog AS $$
++ SELECT to_jsonb(j)||jsonb_build_object('storage_path',j.workspace_id::text||'/'||j.reserved_dataset_id::text||'/input.csv',
++  'normalized_path',j.workspace_id::text||'/normalized/'||j.reserved_dataset_id::text||'/'||j.canonical_sha256||'.json');
++$$;
++
++CREATE FUNCTION dation_private.t4_entries(wid uuid,cid uuid,selection jsonb,contracts jsonb) RETURNS jsonb
++LANGUAGE plpgsql STABLE SET search_path=pg_catalog AS $$
++DECLARE item jsonb; did uuid; model uuid; entry jsonb; result jsonb='{}'; slot text;
++BEGIN
++ SELECT logistics_model_version_id INTO model FROM public.decision_cases WHERE workspace_id=wid AND id=cid;
++ IF jsonb_typeof(selection) IS DISTINCT FROM 'array' OR jsonb_array_length(selection) NOT BETWEEN 1 AND 2
++  OR (SELECT count(*)<>count(DISTINCT x->>'slot_key') FROM jsonb_array_elements(selection) x) THEN RAISE EXCEPTION 'Invalid slot selection' USING ERRCODE='22023'; END IF;
++ SELECT coalesce(jsonb_object_agg(e.slot_key,dation_private.t4_entry(wid,e.slot_key,e.dataset_id)),'{}') INTO result
++  FROM public.case_data_packs p JOIN public.case_data_pack_entries e ON e.workspace_id=p.workspace_id AND e.pack_version_id=p.current_version_id
++  WHERE p.workspace_id=wid AND p.case_id=cid;
++ FOR item IN SELECT x FROM jsonb_array_elements(selection) x LOOP
++  slot=item->>'slot_key';
++  IF coalesce(slot,'') NOT IN('transport_demand','transport_resources') OR num_nonnulls(item->>'upload_id',item->>'dataset_id')<>1 THEN RAISE EXCEPTION 'Invalid semantic slot' USING ERRCODE='22023'; END IF;
++  IF item?'upload_id' THEN
++   SELECT dataset_id INTO did FROM dation_private.ultimate_input_uploads WHERE workspace_id=wid AND case_id=cid AND id=(item->>'upload_id')::uuid AND entity=slot AND status='READY';
++  ELSE did=(item->>'dataset_id')::uuid; END IF;
++  entry=dation_private.t4_entry(wid,slot,did);
++  IF entry IS NULL OR entry->>'contract_hash' IS DISTINCT FROM contracts->>slot
++   OR NOT EXISTS(SELECT 1 FROM dation_private.ultimate_input_objects o JOIN public.datasets d ON d.workspace_id=o.workspace_id AND d.id=o.dataset_id
++    WHERE o.workspace_id=wid AND o.dataset_id=did AND o.model_version_id=model AND d.archived_at IS NULL) THEN
++   RAISE EXCEPTION 'Input is not compatible with this Model Version' USING ERRCODE='22023'; END IF;
++  result=jsonb_set(result,ARRAY[slot],entry);
++ END LOOP;
++ IF EXISTS(SELECT 1 FROM jsonb_each(result) x WHERE x.value='null'::jsonb) THEN RAISE EXCEPTION 'Missing immutable input metadata' USING ERRCODE='22023'; END IF;
++ RETURN (SELECT coalesce(jsonb_agg(value ORDER BY key),'[]') FROM jsonb_each(result));
++END; $$;
++
++CREATE FUNCTION public.platform_ultimate_data_pack(target_workspace_id uuid,actor_user_id uuid,operation text,arguments jsonb DEFAULT '{}')
++RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog AS $$
++DECLARE role_name text; c public.decision_cases; p public.case_data_packs; v public.case_data_pack_versions;
++ j dation_private.ultimate_input_uploads; pub dation_private.ultimate_pack_publications; d public.datasets;
++ item jsonb; entries jsonb; did uuid; target uuid; published uuid; number integer; enabled boolean; old_entries jsonb; changes jsonb;
++BEGIN
++ role_name=dation_private.data_actor(target_workspace_id,actor_user_id);
++ IF operation IS NULL OR operation NOT IN('state','history','upload_get','prepare','store','plan','publish','replay','compatible','dataset_get','dataset_archive','version_get','discard','cleanup','cleanup_finish')
++  OR jsonb_typeof(arguments) IS DISTINCT FROM 'object' OR octet_length(arguments::text)>1048576 THEN RAISE EXCEPTION 'Invalid Pack operation' USING ERRCODE='22023'; END IF;
++ IF operation IN('dataset_get','dataset_archive') THEN
++  SELECT * INTO d FROM public.datasets WHERE workspace_id=target_workspace_id AND id=(arguments->>'dataset_id')::uuid AND deletion_requested_at IS NULL;
++  IF NOT FOUND OR d.dataset_type NOT IN('transport_demand','transport_resources') THEN RAISE EXCEPTION 'Input not found' USING ERRCODE='P0002'; END IF;
++  IF operation='dataset_archive' THEN
++   PERFORM 1 FROM public.workspaces WHERE id=target_workspace_id FOR UPDATE;
++   PERFORM dation_private.data_actor(target_workspace_id,actor_user_id,true);
++   PERFORM set_config('dation.workspace_id',target_workspace_id::text,true);PERFORM set_config('dation.actor_user_id',actor_user_id::text,true);
++   UPDATE public.datasets SET archived_at=CASE WHEN (arguments->>'archived')::boolean THEN clock_timestamp() ELSE NULL END WHERE workspace_id=target_workspace_id AND id=d.id;
++   RETURN jsonb_build_object('archived',(arguments->>'archived')::boolean);
++  END IF;
++  RETURN jsonb_build_object('dataset',to_jsonb(d),'entry',dation_private.t4_entry(target_workspace_id,d.dataset_type,d.id));
++ END IF;
++ target=(arguments->>'case_id')::uuid;
++ SELECT * INTO c FROM public.decision_cases WHERE workspace_id=target_workspace_id AND id=target AND workflow_version=2;
++ IF NOT FOUND THEN RAISE EXCEPTION 'Ultimate Case not found' USING ERRCODE='P0002'; END IF;
++ IF NOT EXISTS(SELECT 1 FROM public.workspace_ddas WHERE workspace_id=target_workspace_id AND dda_id='logistics' AND status='enabled') THEN RAISE EXCEPTION 'DDA denied' USING ERRCODE='42501'; END IF;
++ SELECT * INTO p FROM public.case_data_packs WHERE workspace_id=target_workspace_id AND case_id=c.id;
++ IF operation='replay' THEN
++  PERFORM dation_private.data_actor(target_workspace_id,actor_user_id,true);
++  SELECT * INTO pub FROM dation_private.ultimate_pack_publications WHERE id=(arguments->>'publication_id')::uuid;
++  IF NOT FOUND THEN RETURN jsonb_build_object('replayed',false); END IF;
++  IF pub.workspace_id<>target_workspace_id OR pub.case_id<>c.id THEN RAISE EXCEPTION 'Publication not found' USING ERRCODE='P0002'; END IF;
++  IF pub.intent_hash IS DISTINCT FROM arguments->>'intent_hash' THEN RAISE EXCEPTION 'Publication intent changed' USING ERRCODE='55006'; END IF;
++  RETURN jsonb_build_object('replayed',true,'publication',to_jsonb(pub),'version',(SELECT to_jsonb(x) FROM public.case_data_pack_versions x WHERE workspace_id=target_workspace_id AND id=pub.pack_version_id));
++ END IF;
++ IF operation IN('prepare','store','plan','publish','discard','cleanup','cleanup_finish') THEN
++  PERFORM 1 FROM public.workspaces WHERE id=target_workspace_id FOR UPDATE;
++  PERFORM dation_private.data_actor(target_workspace_id,actor_user_id,true);
++  SELECT * INTO c FROM public.decision_cases WHERE workspace_id=target_workspace_id AND id=target FOR UPDATE;
++  SELECT * INTO p FROM public.case_data_packs WHERE workspace_id=target_workspace_id AND case_id=target FOR UPDATE;
++  IF NOT EXISTS(SELECT 1 FROM public.workspace_ddas WHERE workspace_id=target_workspace_id AND dda_id='logistics' AND status='enabled') THEN RAISE EXCEPTION 'DDA denied' USING ERRCODE='42501'; END IF;
++  -- Resolve a committed publication before mutable revision/flag/archive checks.
++  IF operation='publish' THEN
++   SELECT * INTO pub FROM dation_private.ultimate_pack_publications WHERE id=(arguments->>'publication_id')::uuid;
++   IF FOUND THEN
++    IF pub.workspace_id<>target_workspace_id OR pub.case_id<>target THEN RAISE EXCEPTION 'Publication not found' USING ERRCODE='P0002'; END IF;
++    IF pub.intent_hash IS DISTINCT FROM arguments->>'intent_hash' THEN RAISE EXCEPTION 'Publication intent changed' USING ERRCODE='55006'; END IF;
++    RETURN jsonb_build_object('replayed',true,'publication',to_jsonb(pub),'version',(SELECT to_jsonb(x) FROM public.case_data_pack_versions x WHERE workspace_id=target_workspace_id AND id=pub.pack_version_id));
++   END IF;
++  END IF;
++  SELECT ultimate_foundation_enabled AND ultimate_data_pack_enabled INTO enabled FROM dation_private.platform_release WHERE singleton;
++  IF NOT enabled THEN RAISE EXCEPTION 'Ultimate input publication is closed' USING ERRCODE='P0002'; END IF;
++  IF c.status='archived' THEN RAISE EXCEPTION 'Restore Case before editing inputs' USING ERRCODE='22023'; END IF;
++  PERFORM set_config('dation.workspace_id',target_workspace_id::text,true);PERFORM set_config('dation.actor_user_id',actor_user_id::text,true);
++ END IF;
++ IF operation IN('state','history') THEN
++  SELECT ultimate_foundation_enabled AND ultimate_data_pack_enabled INTO enabled FROM dation_private.platform_release WHERE singleton;
++  RETURN jsonb_build_object('case',to_jsonb(c),'pack',to_jsonb(p),'model_version',(SELECT to_jsonb(x) FROM public.logistics_model_versions x WHERE workspace_id=target_workspace_id AND id=c.logistics_model_version_id),
++   'version',(SELECT to_jsonb(x) FROM public.case_data_pack_versions x WHERE workspace_id=target_workspace_id AND id=p.current_version_id),
++   'latest_version',(SELECT max(version) FROM public.case_data_pack_versions WHERE workspace_id=target_workspace_id AND pack_id=p.id),
++   'entries',coalesce((SELECT jsonb_agg(dation_private.t4_entry(target_workspace_id,e.slot_key,e.dataset_id) ORDER BY e.slot_key) FROM public.case_data_pack_entries e WHERE e.workspace_id=target_workspace_id AND e.pack_version_id=p.current_version_id),'[]'),
++   'uploads',coalesce((SELECT jsonb_agg(dation_private.t4_upload(x) ORDER BY created_at DESC,id) FROM (SELECT * FROM dation_private.ultimate_input_uploads WHERE workspace_id=target_workspace_id AND case_id=target AND status<>'DISCARDED' ORDER BY created_at DESC,id LIMIT 20) x),'[]'),
++   'history',coalesce((SELECT jsonb_agg(to_jsonb(x) ORDER BY version DESC) FROM (SELECT * FROM public.case_data_pack_versions WHERE workspace_id=target_workspace_id AND pack_id=p.id ORDER BY version DESC LIMIT 20 OFFSET greatest(0,least(coalesce((arguments->>'offset')::integer,0),1000000))) x),'[]'),
++   'history_total',(SELECT count(*) FROM public.case_data_pack_versions WHERE workspace_id=target_workspace_id AND pack_id=p.id),
++   'enabled',enabled,'can_edit',enabled AND role_name<>'viewer' AND c.status<>'archived','runtime_execution_available',false);
++ END IF;
++ IF operation='version_get' THEN
++  SELECT * INTO v FROM public.case_data_pack_versions WHERE workspace_id=target_workspace_id AND case_id=target AND id=(arguments->>'version_id')::uuid;
++  IF NOT FOUND THEN RAISE EXCEPTION 'Pack Version not found' USING ERRCODE='P0002'; END IF;
++  RETURN jsonb_build_object('version',to_jsonb(v),'entries',coalesce((SELECT jsonb_agg(dation_private.t4_entry(target_workspace_id,e.slot_key,e.dataset_id) ORDER BY e.slot_key) FROM public.case_data_pack_entries e WHERE e.workspace_id=target_workspace_id AND e.pack_version_id=v.id),'[]'));
++ END IF;
++ IF operation='compatible' THEN
++  IF coalesce(arguments->>'entity','') NOT IN('transport_demand','transport_resources') THEN RAISE EXCEPTION 'Invalid entity' USING ERRCODE='22023'; END IF;
++  RETURN jsonb_build_object('items',coalesce((SELECT jsonb_agg(to_jsonb(x)) FROM (SELECT ds.id,ds.original_filename,ds.row_count,ds.created_at,ds.data_contract_hash FROM public.datasets ds JOIN dation_private.ultimate_input_objects o ON o.workspace_id=ds.workspace_id AND o.dataset_id=ds.id
++   WHERE ds.workspace_id=target_workspace_id AND ds.dataset_type=arguments->>'entity' AND ds.data_contract_hash=arguments->>'contract_hash'
++    AND o.model_version_id=c.logistics_model_version_id AND ds.archived_at IS NULL AND ds.deletion_requested_at IS NULL ORDER BY ds.created_at DESC,ds.id LIMIT 25 OFFSET greatest(0,least(coalesce((arguments->>'offset')::integer,0),1000000))) x),'[]'));
++ END IF;
++ IF operation='prepare' THEN
++  SELECT * INTO j FROM dation_private.ultimate_input_uploads WHERE id=(arguments->>'upload_id')::uuid;
++  IF FOUND THEN
++   IF j.workspace_id<>target_workspace_id OR j.case_id<>target THEN RAISE EXCEPTION 'Upload not found' USING ERRCODE='P0002'; END IF;
++   IF j.intent_hash IS DISTINCT FROM arguments->>'intent_hash' THEN RAISE EXCEPTION 'Upload intent changed' USING ERRCODE='55006'; END IF;
++   RETURN dation_private.t4_upload(j);
++  END IF;
++  IF coalesce(arguments->>'entity','') NOT IN('transport_demand','transport_resources') OR arguments#>>'{profile,valid}' IS DISTINCT FROM 'true' THEN RAISE EXCEPTION 'Validated input required' USING ERRCODE='22023'; END IF;
++  INSERT INTO dation_private.ultimate_input_uploads(id,workspace_id,case_id,model_version_id,entity,actor_user_id,intent_hash,contract_id,contract_hash,normalizer_version,raw_sha256,canonical_sha256,raw_size,normalized_size,record_count,column_count,filename,storage_bucket,profile,summary)
++   VALUES((arguments->>'upload_id')::uuid,target_workspace_id,target,c.logistics_model_version_id,arguments->>'entity',actor_user_id,arguments->>'intent_hash',arguments->>'contract_id',arguments->>'contract_hash',arguments->>'normalizer_version',arguments->>'raw_sha256',arguments->>'canonical_sha256',(arguments->>'raw_size')::bigint,(arguments->>'normalized_size')::bigint,(arguments->>'record_count')::bigint,(arguments->>'column_count')::integer,arguments->>'filename',arguments->>'storage_bucket',arguments->'profile',arguments->'summary') RETURNING * INTO j;
++  RETURN dation_private.t4_upload(j);
++ END IF;
++ IF operation IN('upload_get','store','discard','cleanup','cleanup_finish') THEN
++  SELECT * INTO j FROM dation_private.ultimate_input_uploads WHERE workspace_id=target_workspace_id AND case_id=target AND id=(arguments->>'upload_id')::uuid FOR UPDATE;
++  IF NOT FOUND THEN RAISE EXCEPTION 'Upload not found' USING ERRCODE='P0002'; END IF;
++  IF operation='upload_get' THEN RETURN dation_private.t4_upload(j); END IF;
++  IF operation='store' THEN
++   IF j.status='READY' THEN RETURN dation_private.t4_upload(j); END IF;
++   IF j.status<>'PREPARED' OR j.raw_sha256 IS DISTINCT FROM arguments->>'verified_raw_sha256' OR j.canonical_sha256 IS DISTINCT FROM arguments->>'verified_canonical_sha256' THEN RAISE EXCEPTION 'Upload is not complete or was discarded' USING ERRCODE='22023'; END IF;
++   SELECT * INTO d FROM public.datasets WHERE workspace_id=target_workspace_id AND dataset_type=j.entity AND sha256=j.raw_sha256 AND data_contract_hash=j.contract_hash;
++   IF FOUND THEN
++    IF d.canonical_sha256<>j.canonical_sha256 OR d.normalizer_version<>j.normalizer_version OR d.archived_at IS NOT NULL OR d.deletion_requested_at IS NOT NULL
++     OR NOT EXISTS(SELECT 1 FROM dation_private.ultimate_input_objects WHERE workspace_id=target_workspace_id AND dataset_id=d.id AND model_version_id=j.model_version_id) THEN RAISE EXCEPTION 'Stored interpretation unavailable' USING ERRCODE='22023'; END IF;
++   ELSE
++    INSERT INTO public.datasets(id,workspace_id,dataset_type,original_filename,canonical_filename,storage_bucket,storage_path,mime_type,size_bytes,sha256,status,row_count,column_count,schema_version,profile_json,uploaded_by_user_id,data_contract_id,data_contract_hash,normalizer_version,canonical_sha256)
++     VALUES(j.reserved_dataset_id,target_workspace_id,j.entity,j.filename,j.entity||'.csv',j.storage_bucket,target_workspace_id::text||'/'||j.reserved_dataset_id::text||'/input.csv','text/csv',j.raw_size,j.raw_sha256,'uploaded',j.record_count,j.column_count,j.entity||'_v1',j.profile,j.actor_user_id,j.contract_id,j.contract_hash,j.normalizer_version,j.canonical_sha256) RETURNING * INTO d;
++    INSERT INTO dation_private.ultimate_input_objects(workspace_id,dataset_id,model_version_id,normalized_bucket,normalized_path,normalized_size,summary)
++     VALUES(target_workspace_id,d.id,j.model_version_id,j.storage_bucket,target_workspace_id::text||'/normalized/'||d.id::text||'/'||j.canonical_sha256||'.json',j.normalized_size,j.summary);
++   END IF;
++   UPDATE dation_private.ultimate_input_uploads SET dataset_id=d.id,status='READY',cleanup_pending=d.id<>reserved_dataset_id,updated_at=clock_timestamp() WHERE id=j.id RETURNING * INTO j;
++   RETURN dation_private.t4_upload(j);
++  END IF;
++  IF operation='discard' THEN
++   -- READY metadata is durable/reusable; discard the candidate link only.
++   UPDATE dation_private.ultimate_input_uploads SET status='DISCARDED',cleanup_pending=(dataset_id IS NULL OR dataset_id<>reserved_dataset_id),updated_at=clock_timestamp() WHERE id=j.id RETURNING * INTO j;
++  ELSIF operation='cleanup_finish' THEN
++   UPDATE dation_private.ultimate_input_uploads SET cleanup_pending=false,updated_at=clock_timestamp() WHERE id=j.id RETURNING * INTO j;
++  END IF;
++  IF operation IN('discard','cleanup') AND j.cleanup_pending AND NOT EXISTS(SELECT 1 FROM public.datasets WHERE id=j.reserved_dataset_id) THEN
++   RETURN dation_private.t4_upload(j)||jsonb_build_object('may_delete_reserved_objects',true);
++  END IF;
++  RETURN dation_private.t4_upload(j)||jsonb_build_object('may_delete_reserved_objects',false);
++ END IF;
++ entries=dation_private.t4_entries(target_workspace_id,target,arguments->'selection',arguments->'contracts');
++ IF operation='plan' THEN RETURN jsonb_build_object('pack',to_jsonb(p),'entries',entries,'next_version',(SELECT max(version)+1 FROM public.case_data_pack_versions WHERE workspace_id=target_workspace_id AND pack_id=p.id)); END IF;
++ IF p.revision IS DISTINCT FROM (arguments->>'expected_revision')::bigint OR p.current_version_id IS DISTINCT FROM (arguments->>'expected_current_version_id')::uuid THEN RAISE EXCEPTION 'Pack changed; candidate retained' USING ERRCODE='55006'; END IF;
++ IF entries IS DISTINCT FROM arguments->'entries' OR coalesce(arguments->>'manifest_hash','') !~ '^[0-9a-f]{64}$' OR coalesce(arguments->>'contract_set_hash','') !~ '^[0-9a-f]{64}$' OR coalesce(arguments->>'intent_hash','') !~ '^[0-9a-f]{64}$' THEN RAISE EXCEPTION 'Incomplete manifest' USING ERRCODE='22023'; END IF;
++ SELECT coalesce(jsonb_object_agg(e.slot_key,jsonb_build_object('raw_sha256',e.raw_sha256,'canonical_sha256',e.canonical_sha256,'contract_hash',e.contract_hash)),'{}') INTO old_entries FROM public.case_data_pack_entries e WHERE e.workspace_id=target_workspace_id AND e.pack_version_id=p.current_version_id;
++ SELECT coalesce(jsonb_agg(jsonb_build_object('slot_key',x->>'slot_key','previous',old_entries->(x->>'slot_key'),'current',jsonb_build_object('raw_sha256',x->>'raw_sha256','canonical_sha256',x->>'canonical_sha256','contract_hash',x->>'contract_hash')) ORDER BY x->>'slot_key'),'[]') INTO changes
++  FROM jsonb_array_elements(entries) x WHERE old_entries->(x->>'slot_key') IS DISTINCT FROM jsonb_build_object('raw_sha256',x->>'raw_sha256','canonical_sha256',x->>'canonical_sha256','contract_hash',x->>'contract_hash');
++ SELECT max(version)+1 INTO number FROM public.case_data_pack_versions WHERE workspace_id=target_workspace_id AND pack_id=p.id;
++ published=(arguments->>'version_id')::uuid;
++ INSERT INTO public.case_data_pack_versions(id,workspace_id,case_id,pack_id,version,manifest_hash,contract_set_hash,created_by) VALUES(published,target_workspace_id,target,p.id,number,arguments->>'manifest_hash',arguments->>'contract_set_hash',actor_user_id) RETURNING * INTO v;
++ FOR item IN SELECT x FROM jsonb_array_elements(entries) x LOOP
++  INSERT INTO public.case_data_pack_entries(pack_version_id,slot_key,workspace_id,case_id,dataset_id,contract_id,contract_hash,raw_sha256,canonical_sha256,normalizer_version,normalized_bucket,normalized_path,record_count)
++   VALUES(v.id,item->>'slot_key',target_workspace_id,target,(item->>'dataset_id')::uuid,item->>'contract_id',item->>'contract_hash',item->>'raw_sha256',item->>'canonical_sha256',item->>'normalizer_version',item->>'normalized_bucket',item->>'normalized_path',(item->>'record_count')::bigint);
++ END LOOP;
++ INSERT INTO dation_private.ultimate_pack_publications(id,workspace_id,case_id,pack_version_id,intent_hash,actor_user_id,previous_version_id,changes)
++  VALUES((arguments->>'publication_id')::uuid,target_workspace_id,target,v.id,arguments->>'intent_hash',actor_user_id,p.current_version_id,changes) RETURNING * INTO pub;
++ UPDATE public.case_data_packs SET current_version_id=v.id,revision=revision+1 WHERE workspace_id=target_workspace_id AND id=p.id;
++ UPDATE public.decision_cases SET updated_at=clock_timestamp(),last_activity_at=clock_timestamp() WHERE workspace_id=target_workspace_id AND id=target;
++ INSERT INTO public.audit_events(workspace_id,actor_user_id,event_type,object_type,object_id,decision_case_id,metadata_json) VALUES(target_workspace_id,actor_user_id,'case_data_pack.published','case_data_pack',p.id,target,jsonb_build_object('version_id',v.id,'version',v.version,'changes',changes));
++ RETURN jsonb_build_object('replayed',false,'publication',to_jsonb(pub),'version',to_jsonb(v));
++END; $$;
++
++-- New normalized metadata is a durable consumer: old delete journals cannot remove
++-- one of its two objects. Published Pack FKs continue to protect historical inputs.
++DO $$ DECLARE source text; BEGIN
++ source=pg_get_functiondef('dation_private.dataset_referenced(uuid,uuid)'::regprocedure);
++ source=replace(source,'BEGIN'||chr(10),'BEGIN'||chr(10)||' IF EXISTS(SELECT 1 FROM dation_private.ultimate_input_objects WHERE workspace_id=wid AND dataset_id=did) THEN RETURN true; END IF;'||chr(10));
++ EXECUTE source;
++ source=pg_get_functiondef('public.platform_data_hub(uuid,uuid,text,text,text,uuid,uuid,uuid,integer,integer)'::regprocedure);
++ IF strpos(source,'target.dataset_type IN(''orders'',''fleet'')')=0 THEN RAISE EXCEPTION 'Unexpected Dataset Library archive projection'; END IF;
++ source=replace(source,'target.dataset_type IN(''orders'',''fleet'')','target.dataset_type IN(''orders'',''fleet'',''transport_demand'',''transport_resources'')');
++ EXECUTE source;
++END; $$;
++DO $$ DECLARE rel text; BEGIN
++ FOREACH rel IN ARRAY ARRAY['ultimate_input_objects','ultimate_input_uploads','ultimate_pack_publications'] LOOP
++  EXECUTE format('ALTER TABLE dation_private.%I ENABLE ROW LEVEL SECURITY',rel);
++  EXECUTE format('ALTER TABLE dation_private.%I FORCE ROW LEVEL SECURITY',rel);
++  EXECUTE format('REVOKE ALL ON dation_private.%I FROM PUBLIC,anon,authenticated,service_role',rel);
++ END LOOP;
++END; $$;
++REVOKE ALL ON FUNCTION dation_private.t4_entry(uuid,text,uuid),dation_private.t4_upload(dation_private.ultimate_input_uploads),dation_private.t4_entries(uuid,uuid,jsonb,jsonb) FROM PUBLIC,anon,authenticated,service_role;
++REVOKE ALL ON FUNCTION public.platform_ultimate_data_pack(uuid,uuid,text,jsonb) FROM PUBLIC,anon,authenticated;
++GRANT EXECUTE ON FUNCTION public.platform_ultimate_data_pack(uuid,uuid,text,jsonb) TO service_role;
++NOTIFY pgrst,'reload schema';
++COMMIT;

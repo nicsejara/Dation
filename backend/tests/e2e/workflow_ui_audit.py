@@ -29,19 +29,23 @@ class WorkflowUIAudit:
         await self.page.mouse.move(0, 0)
         actual = await button.evaluate('''el=>{
             const s=getComputedStyle(el),icon=el.querySelector('svg');
-            return {style:Object.fromEntries(['minHeight','padding','borderRadius','font','gap','backgroundImage','color'].map(k=>[k,s[k]])),
-                shared:el.classList.contains('d-button--workflow'),icons:el.querySelectorAll('svg').length,
+            return {style:Object.fromEntries(['minHeight','padding','borderRadius','fontFamily','fontSize','fontWeight','gap','backgroundColor','color'].map(k=>[k,s[k]])),
+                lineHeight:s.lineHeight,continuation:el.matches('[data-after-approve]'),
+                primary:el.classList.contains('d-button--primary'),shared:el.classList.contains('d-button--workflow'),icons:el.querySelectorAll('svg').length,
                 decorative:icon?.getAttribute('aria-hidden'),clipped:el.scrollWidth>el.clientWidth||el.scrollHeight>el.clientHeight};
         }''')
         assert actual['shared'] and actual['icons'] == 1 and actual['decorative'] == 'true', (name, actual)
         assert not actual['clipped'] and actual['style']['minHeight'] == '46px', (name, actual)
-        assert 'linear-gradient' in actual['style']['backgroundImage'], (name, actual)
+        assert actual['primary'], (name, actual)
+        # Contextual continuation wraps at 1.4 (dashboard-toolbar.css); other
+        # workflow controls use 1.35. Shared style remains identical.
+        assert actual['lineHeight']==('18.2px' if actual['continuation'] else '17.55px'),(name,actual)
         if self.action_reference is None:
             self.action_reference = actual['style']
         assert actual['style'] == self.action_reference, (name, actual, self.action_reference)
         await button.hover()
-        hover = await button.evaluate('el=>getComputedStyle(el).backgroundImage')
-        assert hover != actual['style']['backgroundImage'], (name, hover)
+        hover = await button.evaluate('el=>getComputedStyle(el).backgroundColor')
+        assert hover != actual['style']['backgroundColor'], (name, hover)
         await self.page.mouse.move(0, 0)
         self.actions.append({'name': name, **actual, 'hover': hover})
 
@@ -51,18 +55,20 @@ class WorkflowUIAudit:
         actual = await hero.evaluate('''el=>{
             const r=el.getBoundingClientRect(),step=el.querySelector('.d-hero-meta__step'),decision=el.querySelector('.d-hero-meta__decision');
             const s=step.getBoundingClientRect(),d=decision?.getBoundingClientRect();
-            return {height:r.height,overflow:el.scrollWidth>el.clientWidth,panel:el.querySelector('.dispatch-pro-hero-visual').getBoundingClientRect().height,
+            return {height:r.height,overflow:el.scrollWidth>el.clientWidth,panel:el.querySelector('.dispatch-pro-hero-visual')?.getBoundingClientRect().height??null,optional:el.querySelector('.dispatch-pro-hero-visual')?.tagName==='DETAILS',minimum:getComputedStyle(el).minHeight,
                 stepSize:parseFloat(getComputedStyle(step).fontSize),stepWeight:parseFloat(getComputedStyle(step).fontWeight),
                 decision:decision?{text:decision.textContent,below:d.top>=s.bottom+3.5,aligned:Math.abs(d.left-s.left)<.5,
-                    size:parseFloat(getComputedStyle(decision).fontSize),weight:parseFloat(getComputedStyle(decision).fontWeight)}:null};
+                    size:parseFloat(getComputedStyle(decision).fontSize),weight:parseFloat(getComputedStyle(decision).fontWeight),
+                    padding:getComputedStyle(decision).padding,border:getComputedStyle(decision).borderWidth}:null};
         }''')
-        assert not actual['overflow'] and actual['panel'] > 0, (name, actual)
-        if self.viewport['width'] >= 1280:
-            assert abs(actual['height'] - 260) < 1, (name, actual)
+        assert not actual['overflow'] and actual['height']>0 and actual['minimum']=='0px', (name, actual)
+        if name.startswith('data'):assert actual['panel'] is None,(name,actual)
+        else:assert actual['optional'] and actual['panel']>0,(name,actual)
         if decision:
             d = actual['decision']
-            assert d and d['text'] == decision and d['below'] and d['aligned'], (name, actual)
-            assert d['size'] < actual['stepSize'] and d['weight'] < actual['stepWeight'], (name, actual)
+            assert d and d['text'] == decision,(name,actual)
+            assert d['size']==actual['stepSize']==12 and d['weight']==actual['stepWeight']==500,(name,actual)
+            assert d['padding']=='0px' and d['border']=='0px',(name,actual)
         else:
             assert actual['decision'] is None, (name, actual)
         self.heroes.append({'name': name, **actual})
@@ -88,8 +94,8 @@ class WorkflowUIAudit:
         await dialog.wait_for()
         assert await dialog.evaluate("el=>el.matches(':modal')")
         labels = await dialog.locator('.d-execution-review__row strong').all_text_contents()
-        assert labels == (['Decision Case', 'Responsable', 'Alcance', 'Objetivo', 'Prioridades', 'Recursos'] if kind == 'assignment'
-                          else ['Decision Case', 'Responsable', 'Entrada', 'Ventana', 'Reglas por foco', 'Objetivo', 'Recursos']), labels
+        assert labels == (['Decision Case', 'Decision Owner', 'Alcance', 'Objetivo', 'Prioridades', 'Recursos'] if kind == 'assignment'
+                          else ['Decision Case', 'Decision Owner', 'Entrada', 'Ventana', 'Reglas por foco', 'Objetivo', 'Recursos']), labels
         actual = await dialog.evaluate('''el=>{
             const style=node=>{const s=getComputedStyle(node);return Object.fromEntries(
                 ['padding','borderRadius','font','color','background','gap','maxWidth','maxHeight'].map(k=>[k,s[k]]));};

@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-26",
+  "client_timezone": "America/Buenos_Aires",
+  "python": "3.13.5",
+  "node": "24.19.0",
+  "chromium": "151.0.7922.173",
+  "postgres": "17.11",
+  "supabase_cli": "2.122.0",
+  "application_python": "/workspace/Dation/.venv/bin/python",
+  "browser_python": "/workspace/Dation/backend/.browser-venv/bin/python",
+  "optional_pixel_analysis": "System Python with existing Pillow; not an app/test runner fallback.",
+  "docker_socket": "unix:///var/run/docker.sock",
+  "SQL_container": "dation-t3-20261026-ultimate",
+  "SQL_labels": {
+    "dation.qa.phase": "T3",
+    "dation.qa.owner": "codex-dation"
+  },
+  "production_credentials_used": false,
+  "application_dependencies_added": false
+}

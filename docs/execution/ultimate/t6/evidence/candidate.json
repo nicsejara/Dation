@@ -1,0 +1,55 @@
+{
+  "phase": "T6",
+  "head": "ef997235a30251fbf7ae53690ed738092ee973d8",
+  "frozen_at": "2026-10-27T12:50:21.033587+00:00",
+  "files": {
+    "backend/app/engines/assignment/transport_contracts.py": {
+      "bytes": 4799,
+      "sha256": "c9d7696b36f003f47d8a9b139284e4735b536c4d20e0dc074474cff167bed223",
+      "baseline_sha256": null,
+      "baseline": "new T6 file"
+    },
+    "backend/app/engines/assignment/transport_model.py": {
+      "bytes": 9478,
+      "sha256": "3f2b9733343a00438749e1c0de13b89155d866a3ab6122925fcf57caa641fc04",
+      "baseline_sha256": null,
+      "baseline": "new T6 file"
+    },
+    "backend/app/engines/assignment/transport_plan.py": {
+      "bytes": 19448,
+      "sha256": "4ceed544a19653c05077c6bec7f5e70f95143344b8504ef2a0c48299e6439af2",
+      "baseline_sha256": null,
+      "baseline": "new T6 file"
+    },
+    "backend/app/engines/assignment/transport_validator.py": {
+      "bytes": 19872,
+      "sha256": "3ce62b2b187b4a7ffbb307679c679063e822cf838c6408a69f7232ee169ec889",
+      "baseline_sha256": null,
+      "baseline": "new T6 file"
+    },
+    "backend/app/engines/common/__init__.py": {
+      "bytes": 57,
+      "sha256": "35e6a452386832e8b9b5bfc9c0bdb8af21bec3625028417eeafc55a4949ddf6d",
+      "baseline_sha256": null,
+      "baseline": "new T6 file"
+    },
+    "backend/app/engines/common/day_resource_feasibility.py": {
+      "bytes": 6173,
+      "sha256": "07070db298fe8e71f1a2f5067252ffaf8b3def3110fe78dad47bbd66e7d5c348",
+      "baseline_sha256": null,
+      "baseline": "new T6 file"
+    },
+    "backend/app/results/registry.py": {
+      "bytes": 9889,
+      "sha256": "4e514cf47c0a38166c4dd52febc31ed798ddb6b4c7974b0fbe7989481f911310",
+      "baseline_sha256": "b393a095d0e550d482f21c9d7c36ee0dfa3f538c16d0ca145e78e50c8469f6e1",
+      "baseline": "post-T5 checkpoint"
+    },
+    "backend/tests/test_transport_plan_core.py": {
+      "bytes": 29910,
+      "sha256": "0bc8680a6e6e7703ba90c36afdffd2ea2dcc905f4e62bd4d828c7fdc441e9836",
+      "baseline_sha256": null,
+      "baseline": "new T6 file"
+    }
+  }
+}

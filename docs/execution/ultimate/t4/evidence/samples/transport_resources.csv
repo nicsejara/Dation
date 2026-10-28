@@ -1,0 +1,6 @@
+resource_id,source,lanes,guaranteed_pallets,maximum_pallets,units_available,base_origin_id,operating_cost_per_km,services_available,availability_source,cost_model,trip_rate,per_km_rate,billing_basis,compatibility_groups
+RES-001,OWN,"[[""ORIGIN-01"",""DEST-01""]]",20,,1,ORIGIN-01,1,,,,,,,DRY
+RES-002,EXTERNAL,"[[""ORIGIN-01"",""DEST-01""]]",20,,,,,1,CONFIRMED,PER_KM,,1,ONE_WAY,DRY
+RES-003,OWN,"[[""ORIGIN-01"",""DEST-01""]]",20,,1,ORIGIN-01,1,,,,,,,DRY
+RES-004,EXTERNAL,"[[""ORIGIN-01"",""DEST-01""]]",20,,,,,1,CONFIRMED,PER_KM,,1,ONE_WAY,DRY
+RES-005,OWN,"[[""ORIGIN-01"",""DEST-01""]]",20,,1,ORIGIN-01,1,,,,,,,DRY

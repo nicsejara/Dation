@@ -1,0 +1,14 @@
+/* T5 composition only; approved Map/cards/controls remain authoritative. */
+.ultimate-graph-view .t5-actions { display:flex;flex-wrap:wrap;gap:var(--space-3);align-items:center;min-width:0; }
+.ultimate-graph-view .t5-context { display:grid;gap:var(--space-3);padding:var(--space-5);min-width:0; }
+.ultimate-graph-view .t5-node-extra { display:grid;gap:var(--space-3);min-width:0; }
+.ultimate-graph-view .t5-node-extra :is(p,code) { overflow-wrap:anywhere; }
+.ultimate-graph-view .t5-node { display:grid;gap:var(--space-3);min-width:0; }
+.ultimate-graph-view .t5-history-row { display:flex;flex-wrap:wrap;gap:var(--space-3);align-items:center;padding-block:var(--space-3);border-block-end:1px solid var(--color-border); }
+.ultimate-graph-view .t5-history-row>p { flex:1 1 16rem;min-width:0;overflow-wrap:anywhere; }
+.ultimate-graph-view .t5-edge { display:grid;place-items:center;color:var(--color-text-muted);padding:var(--space-3); }
+.ultimate-graph-view .t5-readonly { padding:var(--space-4);border:1px solid var(--color-border);border-radius:var(--radius-md);background:var(--color-surface); }
+@media(min-width:621px) {
+ .ultimate-graph-view .dispatch-decision-node__actionrow { max-width:none; }
+ .ultimate-graph-view .dispatch-decision-node__action { width:max-content;white-space:nowrap; }
+}

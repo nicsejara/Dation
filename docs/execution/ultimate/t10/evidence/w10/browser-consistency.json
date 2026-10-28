@@ -1,0 +1,28 @@
+[
+  {
+    "run_id": "5feef9f2-9725-4fd6-8a16-6b9343674cc9",
+    "result_fingerprint": "ded835f75e666dab6298e2a6a0a24ca650903601f1831f63a40ca6f068e09cbe",
+    "surfaces": [
+      "visible dashboard",
+      "all six details tabs",
+      "CSV UI download",
+      "complete JSON UI download",
+      "IA response",
+      "review UI"
+    ],
+    "status": "PASS"
+  },
+  {
+    "run_id": "8ca4cb05-ca36-40db-aa49-ba493b6f9430",
+    "result_fingerprint": "227a7bf642ceaa2754050f429d190bc96a43b20a963ee3c8faf114af75d1f06e",
+    "surfaces": [
+      "visible dashboard",
+      "all six details tabs",
+      "CSV UI download",
+      "complete JSON UI download",
+      "IA response",
+      "review UI"
+    ],
+    "status": "PASS"
+  }
+]

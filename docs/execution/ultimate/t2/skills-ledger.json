@@ -1,0 +1,47 @@
+{
+  "phase": "T2",
+  "skills": [
+    {
+      "name": "supabase:supabase",
+      "source_snapshot": "supabase-skill.txt",
+      "sha256": "d2f7ca35f2292dc711037506ef64b7a03da6adf96d30abd60c5d856b875dda8c",
+      "read": true,
+      "applied": "RLS, explicit ACLs under managed defaults, versioned additive migrations and official CLI generation",
+      "verified": "S2 26 tests, local SQL/HTTP negatives; no remote advisors/schema operations"
+    },
+    {
+      "name": "supabase:supabase-postgres-best-practices",
+      "source_snapshot": "postgres-skill.txt",
+      "sha256": "f5939ff6703520881ec40204deb519771cd8d597934932ececa8af4a622443c7",
+      "read": true,
+      "applied": "Composite FKs/indexes, membership policies and small ordered transactions",
+      "verified": "Catalog/FK/grant comparison and S2"
+    },
+    {
+      "name": "cloud-environment:cloud-environment-runtime",
+      "source_snapshot": "runtime-skill.txt",
+      "sha256": "de2ea16a5a8727be2a6cbf6a57d60c3eac1082119dd9685e69a2b8e83db120bc",
+      "read": true,
+      "applied": "Managed runtime readiness and owned local Docker/PostgreSQL isolation",
+      "verified": "Local daemon verified, PostgreSQL17/label asserted, scoped runners without production credentials"
+    }
+  ],
+  "postgres_references": [
+    "schema-foreign-key-indexes.md",
+    "security-rls-performance.md"
+  ],
+  "runtime_references": [
+    "references/docker.md",
+    "references/networking.md"
+  ],
+  "Supabase_documentation": {
+    "changelog_requested": "https://supabase.com/changelog.md",
+    "changelog_http_status": 403,
+    "fallback": "Official search_docs MCP; captured Supabase T0 defaults and current CLI --help",
+    "snapshot": "supabase-docs.txt",
+    "no_network_policy_bypass": true,
+    "no_project_link_or_remote_query": true
+  },
+  "UI_skills": "N/A — no frontend or design change",
+  "no_stack_or_frozen_decision_changed": true
+}

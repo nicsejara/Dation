@@ -20,6 +20,8 @@ async def workflow_readiness(case_id:UUID,node_id:Literal['logistics_assignment'
     from app.routes.dispatch import guarded
     require_dda(ctx,'logistics')
     case=await guarded(decision_case_service.get_case(str(case_id)))
+    if case['case'].get('workflow_version')==2:
+        raise HTTPException(409,'El contexto del Case está guardado; todavía no hay ejecución Ultimate disponible.')
     inputs=await guarded(dispatch_service.check_inputs(case['orders']['id'],case['fleet']['id'],True))
     if not inputs.get('valid'):
         raise HTTPException(409,'Validá y corregí el Data Pack antes de continuar.')
@@ -117,6 +119,10 @@ class CaseDataPack(BaseModel):
 async def replace_data_pack(case_id:UUID,payload:CaseDataPack,ctx=Depends(require_upload_access)):
     from app.services import decision_case_service
     from app.routes.dispatch import guarded
+    current_case=await guarded(decision_case_service.get_case_row(str(case_id)))
+    if current_case and current_case.get('workflow_version')==2:
+        from fastapi import HTTPException
+        raise HTTPException(409,'Este Case utiliza un Data Pack progresivo; el reemplazo legacy no corresponde.')
     await guarded(decision_case_service._validate_data_pack(str(payload.orders_dataset_id),str(payload.fleet_dataset_id)))
     return await platform_call('platform_replace_case_data_pack',{'actor_user_id':ctx.user_id,'target_workspace_id':ctx.workspace_id,
         'target_case_id':str(case_id),'expected_updated_at':payload.expected_updated_at.isoformat(),

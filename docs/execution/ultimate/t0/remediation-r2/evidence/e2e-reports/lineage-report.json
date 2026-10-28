@@ -1,0 +1,198 @@
+{
+  "scenarios": {
+    "A": "PASS",
+    "D": "PASS",
+    "B": "PASS",
+    "E": "PASS",
+    "C": "PASS",
+    "F": "PASS"
+  },
+  "runs": {
+    "D1_01": "e492e847-e023-4422-b8de-6e69afd3ca51",
+    "D1_02": "65736915-a832-4894-8f08-e99f526f3a87",
+    "D1_A": "220635a2-b319-4833-8c3a-1abc295f3410",
+    "D2_A": "654cf350-bcd2-4597-bf53-f1ee301a9e53",
+    "D2_B": "c90c1a22-47bf-4229-8ab6-00b13851bcbd",
+    "D1_B": "26cadf40-7927-4498-97ff-adfb00b44fd2",
+    "D2_C": "01e42d6e-2953-44e0-9a52-b80d4e0f997e"
+  },
+  "requests": [
+    {
+      "id": "e492e847-e023-4422-b8de-6e69afd3ca51",
+      "body": {
+        "orders_dataset_id": "e7adb971-2f42-471d-8e9c-f53cea94991f",
+        "fleet_dataset_id": "843540a8-dc66-4891-af59-534ace9510f5",
+        "configuration": {
+          "mode": "preset",
+          "objective": "balanced",
+          "dimensions": [
+            "trips",
+            "cost",
+            "own_fleet"
+          ],
+          "scope": {
+            "filters": []
+          }
+        },
+        "options": {
+          "allow_third_party": true,
+          "resource_mode": "mixed",
+          "analysis_depth": "essential",
+          "anomaly_decisions": {}
+        },
+        "decision_case": {
+          "case_id": "b031b28d-6aa7-4251-92b3-93ad352c0240",
+          "node_id": "logistics_assignment"
+        }
+      }
+    },
+    {
+      "id": "65736915-a832-4894-8f08-e99f526f3a87",
+      "body": {
+        "orders_dataset_id": "e7adb971-2f42-471d-8e9c-f53cea94991f",
+        "fleet_dataset_id": "843540a8-dc66-4891-af59-534ace9510f5",
+        "configuration": {
+          "mode": "preset",
+          "objective": "balanced",
+          "dimensions": [
+            "trips",
+            "cost",
+            "own_fleet"
+          ],
+          "scope": {
+            "filters": []
+          }
+        },
+        "options": {
+          "allow_third_party": true,
+          "resource_mode": "mixed",
+          "analysis_depth": "essential",
+          "anomaly_decisions": {}
+        },
+        "decision_case": {
+          "case_id": "b031b28d-6aa7-4251-92b3-93ad352c0240",
+          "node_id": "logistics_assignment"
+        }
+      }
+    },
+    {
+      "id": "220635a2-b319-4833-8c3a-1abc295f3410",
+      "body": {
+        "orders_dataset_id": "e7adb971-2f42-471d-8e9c-f53cea94991f",
+        "fleet_dataset_id": "843540a8-dc66-4891-af59-534ace9510f5",
+        "configuration": {
+          "mode": "preset",
+          "objective": "balanced",
+          "dimensions": [
+            "trips",
+            "cost",
+            "own_fleet"
+          ],
+          "scope": {
+            "filters": []
+          }
+        },
+        "options": {
+          "allow_third_party": true,
+          "resource_mode": "mixed",
+          "analysis_depth": "essential",
+          "anomaly_decisions": {}
+        },
+        "decision_case": {
+          "case_id": "b031b28d-6aa7-4251-92b3-93ad352c0240",
+          "node_id": "logistics_assignment"
+        }
+      }
+    },
+    {
+      "id": "654cf350-bcd2-4597-bf53-f1ee301a9e53",
+      "body": {
+        "orders_dataset_id": "e7adb971-2f42-471d-8e9c-f53cea94991f",
+        "fleet_dataset_id": "843540a8-dc66-4891-af59-534ace9510f5",
+        "source_run_id": "220635a2-b319-4833-8c3a-1abc295f3410",
+        "configuration": {
+          "strategy": "service_first",
+          "use_delivery_due_dates": true,
+          "planning_window_start": null,
+          "planning_window_end": null,
+          "temporal_rules": []
+        },
+        "options": {},
+        "decision_case": {
+          "case_id": "b031b28d-6aa7-4251-92b3-93ad352c0240",
+          "node_id": "logistics_scheduling"
+        }
+      }
+    },
+    {
+      "id": "c90c1a22-47bf-4229-8ab6-00b13851bcbd",
+      "body": {
+        "orders_dataset_id": "e7adb971-2f42-471d-8e9c-f53cea94991f",
+        "fleet_dataset_id": "843540a8-dc66-4891-af59-534ace9510f5",
+        "source_run_id": "220635a2-b319-4833-8c3a-1abc295f3410",
+        "configuration": {
+          "strategy": "service_first",
+          "use_delivery_due_dates": true,
+          "planning_window_start": null,
+          "planning_window_end": null,
+          "temporal_rules": []
+        },
+        "options": {},
+        "decision_case": {
+          "case_id": "b031b28d-6aa7-4251-92b3-93ad352c0240",
+          "node_id": "logistics_scheduling"
+        }
+      }
+    },
+    {
+      "id": "26cadf40-7927-4498-97ff-adfb00b44fd2",
+      "body": {
+        "orders_dataset_id": "e7adb971-2f42-471d-8e9c-f53cea94991f",
+        "fleet_dataset_id": "843540a8-dc66-4891-af59-534ace9510f5",
+        "configuration": {
+          "mode": "preset",
+          "objective": "balanced",
+          "dimensions": [
+            "trips",
+            "cost",
+            "own_fleet"
+          ],
+          "scope": {
+            "filters": []
+          }
+        },
+        "options": {
+          "allow_third_party": true,
+          "resource_mode": "mixed",
+          "analysis_depth": "essential",
+          "anomaly_decisions": {}
+        },
+        "decision_case": {
+          "case_id": "b031b28d-6aa7-4251-92b3-93ad352c0240",
+          "node_id": "logistics_assignment"
+        }
+      }
+    },
+    {
+      "id": "01e42d6e-2953-44e0-9a52-b80d4e0f997e",
+      "body": {
+        "orders_dataset_id": "e7adb971-2f42-471d-8e9c-f53cea94991f",
+        "fleet_dataset_id": "843540a8-dc66-4891-af59-534ace9510f5",
+        "source_run_id": "26cadf40-7927-4498-97ff-adfb00b44fd2",
+        "configuration": {
+          "strategy": "service_first",
+          "use_delivery_due_dates": true,
+          "planning_window_start": null,
+          "planning_window_end": null,
+          "temporal_rules": []
+        },
+        "options": {},
+        "decision_case": {
+          "case_id": "b031b28d-6aa7-4251-92b3-93ad352c0240",
+          "node_id": "logistics_scheduling"
+        }
+      }
+    }
+  ],
+  "errors": []
+}

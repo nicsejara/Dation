@@ -1,0 +1,16 @@
+{
+  "at": "2026-10-27T19:35:58.254591+00:00",
+  "head": "ef997235a30251fbf7ae53690ed738092ee973d8",
+  "baseline_files": 920,
+  "missing": [],
+  "changed_baseline_files": [
+    "backend/app/routes/results.py",
+    "backend/app/static/js/dispatch/navigation/resource.mjs",
+    "backend/app/static/js/dispatch/workspace.mjs"
+  ],
+  "B_PY": "672 PASS",
+  "B_NODE": "147 PASS",
+  "E10": "7 PASS",
+  "W10": "interrupted after first 3 PASS; rerun required",
+  "T11_executed": false
+}

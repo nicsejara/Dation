@@ -1,0 +1,43 @@
+{
+  "passed": true,
+  "objectives": [
+    {
+      "objective": "min_trips",
+      "run_id": "d515a247-bcca-4012-9cf7-939679562b8e",
+      "selected_fingerprint": "9ab18efbc2a0962badbfcf659e8a4a411ea884abcc57720a096f1d45b7b1f4a4",
+      "own_weight_share": 0.0,
+      "passed": true
+    },
+    {
+      "objective": "min_cost",
+      "run_id": "8361609d-d0f0-43f9-9c2b-b6b15d244b2e",
+      "selected_fingerprint": "b32071bcb18f22d0caf9cc8eda68bae72ea6d6a008ce010a5dd2db9c4a2519c1",
+      "own_weight_share": 1.0,
+      "passed": true
+    },
+    {
+      "objective": "max_own_fleet",
+      "run_id": "0fcdc78f-5cf3-4bfa-82ad-f180875ac79b",
+      "selected_fingerprint": "b32071bcb18f22d0caf9cc8eda68bae72ea6d6a008ce010a5dd2db9c4a2519c1",
+      "own_weight_share": 1.0,
+      "passed": true
+    },
+    {
+      "objective": "balanced",
+      "run_id": "19262b5a-2660-4972-b167-6e0d4229c679",
+      "selected_fingerprint": "b32071bcb18f22d0caf9cc8eda68bae72ea6d6a008ce010a5dd2db9c4a2519c1",
+      "own_weight_share": 1.0,
+      "passed": true
+    },
+    {
+      "objective": "min_co2",
+      "run_id": "70876ccb-e79c-4282-984d-7d8ae5b2d54e",
+      "selected_fingerprint": "b32071bcb18f22d0caf9cc8eda68bae72ea6d6a008ce010a5dd2db9c4a2519c1",
+      "own_weight_share": 1.0,
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "writes_from_browser": [],
+  "dataset": "reproducible V3 QA: 4 orders, 3 resources; not Golden Pallets v2"
+}

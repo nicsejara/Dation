@@ -1,0 +1,25 @@
+{
+  "suite": "U1",
+  "status": "PASS",
+  "tests": 60,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "started_at": "2026-10-26T13:00:45.451054+00:00",
+  "finished_at": "2026-10-26T13:00:47.134280+00:00",
+  "seconds": 1.683,
+  "cwd": "/workspace/Dation/backend",
+  "command": [
+    "/workspace/Dation/.venv/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "tests.test_ultimate_contracts",
+    "tests.test_ultimate_transit",
+    "-v"
+  ],
+  "exit_code": 0,
+  "production_credentials_cleared": true,
+  "log_path": "/workspace/work/dation-t1/U1.log",
+  "log_sha256": "8ff8486bb0b417469960f23eec19722e4fb8dc8db41f06a89b3dd8f4b44fec6b"
+}

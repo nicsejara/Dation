@@ -1,0 +1,201 @@
+{
+  "default_acls_unchanged": true,
+  "existing_table_acls_unchanged": true,
+  "new_table_rls": [
+    {
+      "schema": "dation_private",
+      "table": "decision_definition_versions",
+      "rls": true,
+      "force_rls": true,
+      "acl": "{postgres=arwdDxtm/postgres}"
+    },
+    {
+      "schema": "public",
+      "table": "case_data_pack_entries",
+      "rls": true,
+      "force_rls": true,
+      "acl": "{postgres=arwdDxtm/postgres,authenticated=r/postgres,service_role=r/postgres}"
+    },
+    {
+      "schema": "public",
+      "table": "case_data_pack_versions",
+      "rls": true,
+      "force_rls": true,
+      "acl": "{postgres=arwdDxtm/postgres,authenticated=r/postgres,service_role=r/postgres}"
+    },
+    {
+      "schema": "public",
+      "table": "case_data_packs",
+      "rls": true,
+      "force_rls": true,
+      "acl": "{postgres=arwdDxtm/postgres,authenticated=r/postgres,service_role=r/postgres}"
+    },
+    {
+      "schema": "public",
+      "table": "decision_result_artifacts",
+      "rls": true,
+      "force_rls": true,
+      "acl": "{postgres=arwdDxtm/postgres,service_role=r/postgres}"
+    },
+    {
+      "schema": "public",
+      "table": "logistics_model_versions",
+      "rls": true,
+      "force_rls": true,
+      "acl": "{postgres=arwdDxtm/postgres,authenticated=r/postgres,service_role=r/postgres}"
+    },
+    {
+      "schema": "public",
+      "table": "logistics_models",
+      "rls": true,
+      "force_rls": true,
+      "acl": "{postgres=arwdDxtm/postgres,authenticated=r/postgres,service_role=r/postgres}"
+    }
+  ],
+  "new_policies": [
+    {
+      "cmd": "SELECT",
+      "qual": "dation_private.is_member(workspace_id)",
+      "roles": [
+        "authenticated"
+      ],
+      "tablename": "case_data_pack_entries",
+      "permissive": "PERMISSIVE",
+      "policyname": "tenant_read",
+      "schemaname": "public",
+      "with_check": null
+    },
+    {
+      "cmd": "SELECT",
+      "qual": "dation_private.is_member(workspace_id)",
+      "roles": [
+        "authenticated"
+      ],
+      "tablename": "case_data_pack_versions",
+      "permissive": "PERMISSIVE",
+      "policyname": "tenant_read",
+      "schemaname": "public",
+      "with_check": null
+    },
+    {
+      "cmd": "SELECT",
+      "qual": "dation_private.is_member(workspace_id)",
+      "roles": [
+        "authenticated"
+      ],
+      "tablename": "case_data_packs",
+      "permissive": "PERMISSIVE",
+      "policyname": "tenant_read",
+      "schemaname": "public",
+      "with_check": null
+    },
+    {
+      "cmd": "SELECT",
+      "qual": "dation_private.is_member(workspace_id)",
+      "roles": [
+        "authenticated"
+      ],
+      "tablename": "logistics_model_versions",
+      "permissive": "PERMISSIVE",
+      "policyname": "tenant_read",
+      "schemaname": "public",
+      "with_check": null
+    },
+    {
+      "cmd": "SELECT",
+      "qual": "dation_private.is_member(workspace_id)",
+      "roles": [
+        "authenticated"
+      ],
+      "tablename": "logistics_models",
+      "permissive": "PERMISSIVE",
+      "policyname": "tenant_read",
+      "schemaname": "public",
+      "with_check": null
+    }
+  ],
+  "removed_policies": [],
+  "new_function_acls": [
+    {
+      "name": "dation_private.ultimate_artifact_guard",
+      "acl": "{postgres=X/postgres}",
+      "search_path": [
+        "search_path=pg_catalog"
+      ],
+      "security_definer": false
+    },
+    {
+      "name": "dation_private.ultimate_artifact_ready",
+      "acl": "{postgres=X/postgres}",
+      "search_path": [
+        "search_path=pg_catalog"
+      ],
+      "security_definer": false
+    },
+    {
+      "name": "dation_private.ultimate_case_guard",
+      "acl": "{postgres=X/postgres}",
+      "search_path": [
+        "search_path=pg_catalog"
+      ],
+      "security_definer": false
+    },
+    {
+      "name": "dation_private.ultimate_case_pack_complete",
+      "acl": "{postgres=X/postgres}",
+      "search_path": [
+        "search_path=pg_catalog"
+      ],
+      "security_definer": false
+    },
+    {
+      "name": "dation_private.ultimate_dataset_identity",
+      "acl": "{postgres=X/postgres}",
+      "search_path": [
+        "search_path=pg_catalog"
+      ],
+      "security_definer": false
+    },
+    {
+      "name": "dation_private.ultimate_immutable",
+      "acl": "{postgres=X/postgres}",
+      "search_path": [
+        "search_path=pg_catalog"
+      ],
+      "security_definer": false
+    },
+    {
+      "name": "dation_private.ultimate_interpretation_guard",
+      "acl": "{postgres=X/postgres}",
+      "search_path": [
+        "search_path=pg_catalog"
+      ],
+      "security_definer": false
+    },
+    {
+      "name": "dation_private.ultimate_pack_guard",
+      "acl": "{postgres=X/postgres}",
+      "search_path": [
+        "search_path=pg_catalog"
+      ],
+      "security_definer": false
+    },
+    {
+      "name": "dation_private.ultimate_publication_identity",
+      "acl": "{postgres=X/postgres}",
+      "search_path": [
+        "search_path=pg_catalog"
+      ],
+      "security_definer": false
+    },
+    {
+      "name": "dation_private.ultimate_run_guard",
+      "acl": "{postgres=X/postgres}",
+      "search_path": [
+        "search_path=pg_catalog"
+      ],
+      "security_definer": false
+    }
+  ],
+  "changed_function_acls_preserved": true
+}

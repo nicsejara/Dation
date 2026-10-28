@@ -1,0 +1,47 @@
+{
+  "preexisting_containers_preserved": [
+    {
+      "id": "57d0569c15c9",
+      "status": "exited"
+    },
+    {
+      "id": "89c072eaca56",
+      "status": "exited"
+    },
+    {
+      "id": "e63696788ed3",
+      "status": "exited"
+    },
+    {
+      "id": "ada4ae04845f",
+      "status": "exited"
+    }
+  ],
+  "r2_sql_containers_remaining": [],
+  "docker_containers": [
+    {
+      "id": "57d0569c15c9",
+      "name": "dation-e2e-32a7a4542664-rest",
+      "state": "exited"
+    },
+    {
+      "id": "89c072eaca56",
+      "name": "dation-e2e-32a7a4542664-pg",
+      "state": "exited"
+    },
+    {
+      "id": "e63696788ed3",
+      "name": "dation-progressive-sql",
+      "state": "exited"
+    },
+    {
+      "id": "ada4ae04845f",
+      "name": "dation-phase7-sql",
+      "state": "exited"
+    }
+  ],
+  "e2e_networks_remaining": [
+    "dation-e2e-32a7a4542664-net"
+  ],
+  "remote_resources_changed": false
+}

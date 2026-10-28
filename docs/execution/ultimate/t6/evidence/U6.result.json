@@ -1,0 +1,23 @@
+{
+  "suite": "U6",
+  "status": "PASS",
+  "tests": 47,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "exit_code": 0,
+  "started_at": "2026-10-27T12:50:55.869803+00:00",
+  "finished_at": "2026-10-27T12:51:01.538918+00:00",
+  "seconds": 5.669,
+  "cwd": "/workspace/Dation/backend",
+  "command": [
+    "/workspace/Dation/.venv/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "tests.test_transport_plan_core",
+    "-v"
+  ],
+  "production_credentials_cleared": true,
+  "log_sha256": "0a819796e5c83316849be720d2a0b8a7b739b7bfc238ac3ddcb2b54eb94596f8"
+}

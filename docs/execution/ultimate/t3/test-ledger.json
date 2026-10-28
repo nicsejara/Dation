@@ -1,0 +1,269 @@
+{
+  "phase": "T3",
+  "suites": [
+    {
+      "suite": "B-PY",
+      "status": "PASS",
+      "tests": 473,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "started_at": "2026-10-26T18:05:40.290772+00:00",
+      "finished_at": "2026-10-26T18:05:59.070336+00:00",
+      "seconds": 18.78,
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "exit_code": 0,
+      "production_credentials_cleared": true,
+      "PYTHONPATH": null,
+      "log_sha256": "a98801a135953a353ef7951db4db353c0b08a60e69e479029106e31b81fc8ba6",
+      "log": "evidence/B-PY.log",
+      "raw_result": "evidence/B-PY.result.json"
+    },
+    {
+      "suite": "B-NODE",
+      "status": "PASS",
+      "tests": 132,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "started_at": "2026-10-26T18:21:06.391881+00:00",
+      "finished_at": "2026-10-26T18:21:08.344173+00:00",
+      "seconds": 1.952,
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "node",
+        "--test",
+        "tests/test_dashboard_selectors.js",
+        "tests/test_assignment_ai_summary.mjs",
+        "tests/test_assignment_dashboard_v2_selectors.mjs",
+        "tests/test_assignment_executive_kpis.mjs",
+        "tests/test_case_navigation.mjs",
+        "tests/test_center_resource.mjs",
+        "tests/test_chart_theme.mjs",
+        "tests/test_data_provenance.mjs",
+        "tests/test_data_resource.mjs",
+        "tests/test_decision_case.mjs",
+        "tests/test_dispatch_upload_selectors.mjs",
+        "tests/test_execution_progress.mjs",
+        "tests/test_home_dda_catalog.mjs",
+        "tests/test_lifecycle.mjs",
+        "tests/test_navigation.mjs",
+        "tests/test_platform_recovery.mjs",
+        "tests/test_scheduling_dashboard_v21_selectors.mjs",
+        "tests/test_ultimate_case_navigation.mjs",
+        "tests/test_v2_foundation.mjs",
+        "tests/test_workflow_gates.mjs",
+        "tests/test_workspace_settings.mjs"
+      ],
+      "exit_code": 0,
+      "production_credentials_cleared": true,
+      "PYTHONPATH": null,
+      "log_sha256": "cded1bac2fac7389d51351d588ff931558e38527623be9706aaf1b47babd6a6d",
+      "log": "evidence/B-NODE.log",
+      "raw_result": "evidence/B-NODE.result.json"
+    },
+    {
+      "suite": "S3",
+      "status": "PASS",
+      "tests": 25,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "started_at": "2026-10-26T18:06:00.770611+00:00",
+      "finished_at": "2026-10-26T18:06:35.606909+00:00",
+      "seconds": 34.836,
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "test_ultimate_case_models",
+        "-v"
+      ],
+      "exit_code": 0,
+      "production_credentials_cleared": true,
+      "PYTHONPATH": "tests/integration",
+      "log_sha256": "2b3cfe768c521a9d36bb58c080cc34f67a052c0925a39a5189898c1fe8740ff1",
+      "log": "evidence/S3.log",
+      "raw_result": "evidence/S3.result.json"
+    },
+    {
+      "suite": "W3",
+      "status": "PASS",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "started_at": "2026-10-26T18:23:49.550581+00:00",
+      "finished_at": "2026-10-26T18:25:10.055913+00:00",
+      "seconds": 80.506,
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "/workspace/Dation/backend/.browser-venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "test_ultimate_case_setup",
+        "-v"
+      ],
+      "exit_code": 0,
+      "production_credentials_cleared": true,
+      "PYTHONPATH": "tests/browser",
+      "log_sha256": "5e3ca6608e17369d391163f0cb59eda9c8ce7a741401d6e5b8f7a79ba13bf913",
+      "log": "evidence/W3.log",
+      "raw_result": "evidence/W3.result.json"
+    },
+    {
+      "suite": "FOCAL-LEGACY-API",
+      "status": "PASS",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "started_at": "2026-10-26T18:11:19.266398+00:00",
+      "finished_at": "2026-10-26T18:12:27.091485+00:00",
+      "seconds": 67.825,
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "test_decision_center.DecisionCenterTests.test_01_case_library_labels_pagination_identity_and_isolation",
+        "test_optimized_responsibilities.OptimizedResponsibilityTests.test_split_roles_reload_independent_node_assignments_and_actual_approval",
+        "test_optimized_responsibilities.OptimizedResponsibilityTests.test_archive_persists_reloads_and_preserves_case_history_and_assignments",
+        "-v"
+      ],
+      "exit_code": 0,
+      "production_credentials_cleared": true,
+      "PYTHONPATH": "tests/e2e",
+      "log_sha256": "e95c9cdea3734798f9097e8cc06573058eba052540170bea2af13d626867da54",
+      "log": "evidence/FOCAL-LEGACY-API.log",
+      "raw_result": "evidence/FOCAL-LEGACY-API.result.json"
+    },
+    {
+      "suite": "FOCAL-LEGACY-BROWSER",
+      "status": "PASS",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "started_at": "2026-10-26T18:12:27.092812+00:00",
+      "finished_at": "2026-10-26T18:12:44.296996+00:00",
+      "seconds": 17.204,
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "/workspace/Dation/backend/.browser-venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "test_navigation.NavigationTests.test_new_decision_goes_to_empty_data_without_losing_existing_case",
+        "test_navigation.NavigationTests.test_approved_assignment_continues_directly_to_scheduling_configuration",
+        "test_navigation.NavigationTests.test_map_selector_switches_case_data_progress_url_and_restores_cancel_focus",
+        "-v"
+      ],
+      "exit_code": 0,
+      "production_credentials_cleared": true,
+      "PYTHONPATH": "tests/browser",
+      "log_sha256": "06eeae536b5bdaf958decacae598e0417cfb9c64013a1df6d067c248a98f6412",
+      "log": "evidence/FOCAL-LEGACY-BROWSER.log",
+      "raw_result": "evidence/FOCAL-LEGACY-BROWSER.result.json"
+    }
+  ],
+  "aliases": [
+    {
+      "suite": "U3",
+      "status": "PASS",
+      "tests": 17,
+      "included_in": "B-PY",
+      "module": "tests.test_ultimate_case_models",
+      "log_lines": [
+        "test_publish_replay_uses_persisted_identity_before_mutable_draft (test_ultimate_case_models.UltimateCaseModelServiceTests.test_publish_replay_uses_persisted_identity_before_mutable_draft) ... ok",
+        "test_service_derives_tenant_and_actor_instead_of_accepting_client_authority (test_ultimate_case_models.UltimateCaseModelServiceTests.test_service_derives_tenant_and_actor_instead_of_accepting_client_authority) ... ok",
+        "test_case_exists_without_any_dataset_or_execution_fields (test_ultimate_case_models.UltimateCaseModelsTests.test_case_exists_without_any_dataset_or_execution_fields) ... ok",
+        "test_configuration_hash_is_exact_and_semantic (test_ultimate_case_models.UltimateCaseModelsTests.test_configuration_hash_is_exact_and_semantic) ... ok",
+        "test_context_update_requires_changes_and_preserves_owner_cas (test_ultimate_case_models.UltimateCaseModelsTests.test_context_update_requires_changes_and_preserves_owner_cas) ... ok",
+        "test_cost_and_billing_options_are_closed (test_ultimate_case_models.UltimateCaseModelsTests.test_cost_and_billing_options_are_closed) ... ok",
+        "test_currency_precision_does_not_infer_live_workspace_or_fx (test_ultimate_case_models.UltimateCaseModelsTests.test_currency_precision_does_not_infer_live_workspace_or_fx) ... ok",
+        "test_dimensions_and_sources_are_explicit_and_unique (test_ultimate_case_models.UltimateCaseModelsTests.test_dimensions_and_sources_are_explicit_and_unique) ... ok",
+        "test_goals_guardrails_and_preferences_keep_t1_authority (test_ultimate_case_models.UltimateCaseModelsTests.test_goals_guardrails_and_preferences_keep_t1_authority) ... ok",
+        "test_horizon_is_inclusive_ordered_and_date_only (test_ultimate_case_models.UltimateCaseModelsTests.test_horizon_is_inclusive_ordered_and_date_only) ... ok",
+        "test_horizon_types_and_operating_modes_do_not_create_simulation_engine (test_ultimate_case_models.UltimateCaseModelsTests.test_horizon_types_and_operating_modes_do_not_create_simulation_engine) ... ok",
+        "test_initial_pack_identity_and_hash_are_reproducible_without_placeholders (test_ultimate_case_models.UltimateCaseModelsTests.test_initial_pack_identity_and_hash_are_reproducible_without_placeholders) ... ok",
+        "test_metadata_owner_and_freeze_clock_do_not_change_mathematical_context (test_ultimate_case_models.UltimateCaseModelsTests.test_metadata_owner_and_freeze_clock_do_not_change_mathematical_context) ... ok",
+        "test_model_binding_is_not_an_editable_case_field (test_ultimate_case_models.UltimateCaseModelsTests.test_model_binding_is_not_an_editable_case_field) ... ok",
+        "test_model_identity_text_is_normalized_and_not_part_of_configuration (test_ultimate_case_models.UltimateCaseModelsTests.test_model_identity_text_is_normalized_and_not_part_of_configuration) ... ok",
+        "test_pre_admission_context_is_typed_serializable_and_does_not_fake_a_read_set (test_ultimate_case_models.UltimateCaseModelsTests.test_pre_admission_context_is_typed_serializable_and_does_not_fake_a_read_set) ... ok",
+        "test_three_operating_roles_preserve_the_same_domain_contract_and_no_runtime_selection (test_ultimate_case_models.UltimateCaseModelsTests.test_three_operating_roles_preserve_the_same_domain_contract_and_no_runtime_selection) ... ok"
+      ],
+      "repeated_only_for_alias": false
+    }
+  ],
+  "additional_boundaries": [
+    {
+      "name": "schema-boundary",
+      "status": "PASS",
+      "evidence": "evidence/schema-boundary.json"
+    },
+    {
+      "name": "native-visual-parity",
+      "status": "PASS",
+      "viewports": [
+        1440,
+        1280,
+        1024,
+        768,
+        390
+      ],
+      "evidence": "evidence/visual-parity/parity.json"
+    },
+    {
+      "name": "actual-DDA-Hero",
+      "status": "PASS",
+      "geometry_styles_unchanged": true,
+      "mobile_corner_changed_pixels": 4,
+      "evidence": "evidence/dda-parity/parity.json"
+    }
+  ],
+  "not_run": [
+    {
+      "suite": "B-BROWSER full",
+      "reason": "W3 plus three affected legacy navigation tests"
+    },
+    {
+      "suite": "B-E2E full",
+      "reason": "Three affected legacy API/approval/archive tests"
+    },
+    {
+      "suite": "B-SQL historical full",
+      "reason": "S3 full-catalog RPC suite plus additive migration/ACL/legacy-row focal"
+    }
+  ],
+  "inherited_baseline": {
+    "T2": "docs/execution/ultimate/t2/t2-execution-report.md",
+    "B-PY": 456,
+    "B-NODE": 128,
+    "B-SQL": 72,
+    "S2": 26
+  },
+  "qa_reuse": [
+    "evidence/qa-reuse.json",
+    "evidence/qa-reuse-dirty-fix.json"
+  ],
+  "all_suites_match_final_affected_source_files": true,
+  "latest_dirty_fix_consumers_repeated": [
+    "B-NODE",
+    "W3"
+  ]
+}

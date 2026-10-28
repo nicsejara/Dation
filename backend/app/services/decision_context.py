@@ -160,6 +160,10 @@ def build_decision_context(
     result_json: dict,
     configuration_json: dict | None = None,
 ) -> dict:
+    if result_json.get('result_schema'):
+        raise ValueError('Published packages require decision_context_v1 and an exact result fingerprint.')
+    if result_json.get('schema_version') and result_json['schema_version'] not in {'assignment_v1','scheduling_v1','dispatch_v1','dispatch_v2'}:
+        raise ValueError('UNSUPPORTED_RESULT_SCHEMA')
     if result_json.get('schema_version') == 'scheduling_v1':
         from app.services.scheduling_context import build_scheduling_context
         return build_scheduling_context(result_json)

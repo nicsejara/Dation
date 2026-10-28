@@ -1,0 +1,24 @@
+{
+  "suite": "U9",
+  "status": "PASS",
+  "tests": 28,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "exit_code": 0,
+  "started_at": "2026-10-27T18:21:43.468026+00:00",
+  "finished_at": "2026-10-27T18:21:48.953173+00:00",
+  "seconds": 5.485,
+  "cwd": "/workspace/Dation/backend",
+  "command": [
+    "/workspace/Dation/.venv/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "tests.test_day_scheduling_core",
+    "tests.test_day_result_package",
+    "-v"
+  ],
+  "production_credentials_cleared": true,
+  "log_sha256": "34269718eeb4f6659b90f6e5df710e9bd22d211ba59501044f9063c3183d2ce5"
+}

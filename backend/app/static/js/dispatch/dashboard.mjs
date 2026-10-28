@@ -15,6 +15,8 @@ import * as assignmentAiSummary from './assignment/assignment-ai-summary.mjs';
 import * as assignmentAdvanced from './assignment/assignment-advanced.mjs';
 import * as comparativeUpgrade from './comparative-upgrade.mjs';
 import {downloadRunExport} from './runs/export.mjs';
+import * as publishedDashboard from './results/dashboard.mjs';
+import {RESULT_SCHEMAS} from './results/package.mjs';
 import * as schedulingDashboard from './scheduling/scheduling-dashboard.mjs';
 import {decisionRail,bindDecisionRail} from './navigation/decision-nav.mjs';
 import {
@@ -267,8 +269,14 @@ export async function render(root,run,onRerun,caseActions={}){
 
   dispose(root);
   const result=run.result_json;
-  await ensureDashboardStyles(result?.schema_version);
+  await ensureDashboardStyles(RESULT_SCHEMAS.has(result?.result_schema)?'assignment_v1':result?.schema_version);
+  if(RESULT_SCHEMAS.has(result?.result_schema))await ensureStylesheet('ultimate-results-styles','/static/css/ultimate-results.css','ultimate-t10-v1');
   if(!scope.active)return;
+
+  if(RESULT_SCHEMAS.has(result?.result_schema))return publishedDashboard.render(root,run,onRerun,caseActions);
+  if(result?.result_schema||!['assignment_v1','scheduling_v1','dispatch_v1','dispatch_v2'].includes(result?.schema_version)){
+    errorBox(root,new Error('UNSUPPORTED_RESULT_SCHEMA'),()=>caseActions.onRefresh?.());return;
+  }
 
   if(result?.schema_version==='scheduling_v1'){
     return schedulingDashboard.render(

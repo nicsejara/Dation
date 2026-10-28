@@ -1,0 +1,1509 @@
+diff --git a/backend/app/domain/decision_cases.py b/backend/app/domain/decision_cases.py
+index ae4bba1..f0a1033 100644
+--- a/backend/app/domain/decision_cases.py
++++ b/backend/app/domain/decision_cases.py
+@@ -55,6 +55,23 @@ def input_signature(orders_dataset_id: str, fleet_dataset_id: str) -> str:
+     return f"{orders_dataset_id}:{fleet_dataset_id}"
+ 
+ 
++def case_workflow_version(row: dict) -> int:
++    """Missing discriminator means legacy; unknown cohorts never fall through."""
++    version = row.get("workflow_version", 1)
++    if type(version) is not int or version not in (1, 2):
++        raise ValueError("Versión de workflow del Case no soportada.")
++    return version
++
++
++def case_projection_options(row: dict) -> dict:
++    return {
++        "case_id": str(row["id"]),
++        "orders_dataset_id": str(row["orders_dataset_id"]) if row.get("orders_dataset_id") is not None else None,
++        "fleet_dataset_id": str(row["fleet_dataset_id"]) if row.get("fleet_dataset_id") is not None else None,
++        "workflow_version": case_workflow_version(row),
++    }
++
++
+ def create_node_state(status: str) -> dict:
+     return {
+         "status": status,
+@@ -74,13 +91,17 @@ def create_case_state(
+     fleet_dataset_id: str,
+     *,
+     created_at: str | None = None,
++    workflow_version: int = 1,
+ ) -> dict:
++    case_workflow_version({"workflow_version": workflow_version})
++    if workflow_version == 2 and (orders_dataset_id is not None or fleet_dataset_id is not None):
++        raise ValueError("El workflow Ultimate utiliza un Pack versionado, no el pair legacy.")
+     now = created_at or utc_now()
+-    return {
++    state = {
+         "schema_version": CASE_SCHEMA_VERSION,
+         "id": case_id,
+         "domain": CASE_DOMAIN,
+-        "signature": input_signature(orders_dataset_id, fleet_dataset_id),
++        "signature": input_signature(orders_dataset_id, fleet_dataset_id) if workflow_version == 1 else None,
+         "created_at": now,
+         "updated_at": now,
+         "inputs": {
+@@ -89,11 +110,14 @@ def create_case_state(
+         },
+         "stale_predecessor": None,
+         "nodes": {
+-            "logistics_assignment": create_node_state("available"),
++            "logistics_assignment": create_node_state("available" if workflow_version == 1 else "needs_data"),
+             "logistics_scheduling": create_node_state("locked"),
+             "logistics_final_assignment": create_node_state("locked"),
+         },
+     }
++    if workflow_version == 2:
++        state["workflow_version"] = 2
++    return state
+ 
+ 
+ def validate_case_state(
+@@ -102,9 +126,12 @@ def validate_case_state(
+     case_id: str,
+     orders_dataset_id: str,
+     fleet_dataset_id: str,
++    workflow_version: int = 1,
+ ) -> dict:
+     if not isinstance(state, dict):
+         raise ValueError("El estado del Decision Case debe ser un objeto.")
++    if "workflow_version" in state and case_workflow_version(state) != workflow_version:
++        raise ValueError("El cache del Case corresponde a otro workflow.")
+     if state.get("id") not in (None, case_id):
+         raise ValueError("El estado corresponde a otro Decision Case.")
+     inputs = state.get("inputs") or {}
+@@ -119,12 +146,13 @@ def validate_case_state(
+             orders_dataset_id,
+             fleet_dataset_id,
+             created_at=state.get("created_at"),
++            workflow_version=workflow_version,
+         ),
+         **state,
+         "schema_version": CASE_SCHEMA_VERSION,
+         "id": case_id,
+         "domain": CASE_DOMAIN,
+-        "signature": input_signature(orders_dataset_id, fleet_dataset_id),
++        "signature": input_signature(orders_dataset_id, fleet_dataset_id) if workflow_version == 1 else None,
+         "inputs": {
+             "orders_dataset_id": orders_dataset_id,
+             "fleet_dataset_id": fleet_dataset_id,
+@@ -135,6 +163,7 @@ def validate_case_state(
+         case_id,
+         orders_dataset_id,
+         fleet_dataset_id,
++        workflow_version=workflow_version,
+     )["nodes"]
+     canonical["nodes"] = {
+         node_id: {
+@@ -170,12 +199,14 @@ def project_case_history(
+     orders_dataset_id: str,
+     fleet_dataset_id: str,
+     summaries: dict | None = None,
++    workflow_version: int = 1,
+ ) -> dict:
+     canonical = validate_case_state(
+         state,
+         case_id=case_id,
+         orders_dataset_id=orders_dataset_id,
+         fleet_dataset_id=fleet_dataset_id,
++        workflow_version=workflow_version,
+     )
+     grouped = {node_id: [] for node_id in NODE_IDS}
+     if summaries is not None:
+@@ -239,6 +270,8 @@ def project_case_history(
+                 )
+ 
+     assignment = current_approved["logistics_assignment"]
++    if workflow_version == 2 and not grouped["logistics_assignment"]:
++        canonical["nodes"]["logistics_assignment"]["status"] = "needs_data"
+     scheduling = current_approved["logistics_scheduling"]
+     final_assignment = current_approved["logistics_final_assignment"]
+ 
+diff --git a/backend/app/platform/decision_center.py b/backend/app/platform/decision_center.py
+index 378aa40..bf07393 100644
+--- a/backend/app/platform/decision_center.py
++++ b/backend/app/platform/decision_center.py
+@@ -1,15 +1,14 @@
+ """A read-only case projection over the canonical history, never a state repair."""
+ from app.platform.identity import platform_call
+ from app.platform.home import recent_case
+-from app.domain.decision_cases import project_case_history, run_history_item, NODE_IDS
++from app.domain.decision_cases import project_case_history, run_history_item, NODE_IDS, case_projection_options
+ from app.platform.foundation import REGISTRY,resolve_node_destination,case_context,objective_presentation
+ 
+ LABELS={key:value['label'] for key,value in REGISTRY['decisions'].items()}
+ 
+ def canonical(bundle):
+     row=bundle['case']
+-    options={'case_id':row['id'],'orders_dataset_id':row['orders_dataset_id'],
+-        'fleet_dataset_id':row['fleet_dataset_id'],'summaries':bundle['summaries']}
++    options={**case_projection_options(row),'summaries':bundle['summaries']}
+     try:return project_case_history(bundle.get('state_json') or {},[],**options)
+     except (ValueError,TypeError,AttributeError):
+         # A historical cache cannot hide persisted evidence or break the entire
+@@ -41,6 +40,9 @@ def project(bundle,detail=False):
+         'last_activity_at':row['last_activity_at'],'updated_at':row['updated_at'],
+         'resume':target(resume['node_id'],resume['status'],resume.get('run_id'),state['nodes'][resume['node_id']]) or {'view':'logistics-map','node_id':resume['node_id'],'run_id':None}}
+     result.update(category=row.get('category'),description=row.get('description'))
++    if row.get('workflow_version') == 2:
++        result['workflow_version'] = 2
++        result['resume'] = resume['resume']
+     result['context']=case_context(result)
+     relevant=resume['node_id'];assignment=collaboration.get(relevant) or {}
+     result['approver']=assignment.get('approver')
+diff --git a/backend/app/platform/home.py b/backend/app/platform/home.py
+index 5dd9371..a324ff7 100644
+--- a/backend/app/platform/home.py
++++ b/backend/app/platform/home.py
+@@ -1,6 +1,6 @@
+ """Compact Home presentation over the existing, tenant-authorized case history."""
+ from app.platform.identity import platform_call
+-from app.domain.decision_cases import project_case_history
++from app.domain.decision_cases import project_case_history, case_projection_options
+ from app.platform.activity import home_activity
+ from app.platform.onboarding import home_progress
+ from app.platform.foundation import REGISTRY, case_context, resolve_node_destination
+@@ -10,9 +10,7 @@ NODE_LABELS = {key: value['label'] for key, value in REGISTRY['decisions'].items
+ 
+ def recent_case(bundle):
+     row = bundle['case']
+-    options = dict(case_id=str(row['id']),
+-        orders_dataset_id=str(row['orders_dataset_id']), fleet_dataset_id=str(row['fleet_dataset_id']),
+-        summaries=bundle['summaries'])
++    options = {**case_projection_options(row), 'summaries': bundle['summaries']}
+     try:
+         state = project_case_history(row.get('state_json') or {}, [], **options)
+     except (ValueError, TypeError, AttributeError):
+@@ -54,6 +52,10 @@ def _item(row, bundle, key, status, run_id, node, completed=False):
+             'last_activity_at': row['last_activity_at'], 'run_id': run_id, 'is_demo': bool(row.get('is_demo')),
+             'resume': resume or {'view': 'logistics-map', 'node_id': key, 'run_id': None},
+             'approval_current': node['status'] == 'approved'}
++    if row.get('workflow_version') == 2:
++        # T2 retains the Case in shared readers without opening a legacy run/config flow.
++        item['workflow_version'] = 2
++        item['resume'] = None
+     item['context'] = case_context({**item, 'dda': 'logistics'})
+     return item
+ 
+diff --git a/backend/app/platform/repository.py b/backend/app/platform/repository.py
+index 6babe23..6911ada 100644
+--- a/backend/app/platform/repository.py
++++ b/backend/app/platform/repository.py
+@@ -16,6 +16,8 @@ from app.services.http_service import http_client as raw_client
+ TABLES = frozenset({"datasets", "decision_cases", "decision_runs", "dispatch_run_jobs",
+     "decision_case_reconciliations", "decision_approval_events", "decision_comparative_analyses",
+     "decision_explanations", "decision_messages", "decision_chat_turns", "decision_interpretation_sources"})
++ULTIMATE_READ_TABLES = frozenset({"logistics_models", "logistics_model_versions", "case_data_packs",
++    "case_data_pack_versions", "case_data_pack_entries"})
+ INFRA_RPC = frozenset({"claim_dispatch_job", "claim_comparative_analysis", "report_dispatch_worker"})
+ WORKER_RPC = frozenset({"heartbeat_dispatch_job", "finish_dispatch_job", "heartbeat_comparative_analysis",
+     "finish_comparative_analysis", "ack_case_reconciliation", "decision_case_history"})
+@@ -65,8 +67,10 @@ class TenantClient:
+             if is_infrastructure() and table == "decision_case_reconciliations" and method == "GET":
+                 return await self.client.request(method, url, **options)
+             ctx = current()
+-            if table not in TABLES:
++            if table not in TABLES | ULTIMATE_READ_TABLES:
+                 raise RuntimeError("Unregistered tenant relation")
++            if table in ULTIMATE_READ_TABLES and method not in {"GET", "HEAD"}:
++                raise HTTPException(403, "La escritura Ultimate requiere su operación autorizada.")
+             # Service-only audit context, derived from verified authority.
+             audit_headers = httpx.Headers(options.get("headers") or {})
+             audit_headers["X-Dation-Workspace-Id"] = ctx.workspace_id
+@@ -90,6 +94,8 @@ class TenantClient:
+                     for row in rows:
+                         if not isinstance(row, dict) or row.get("workspace_id", ctx.workspace_id) != ctx.workspace_id:
+                             raise RuntimeError("Invalid tenant payload")
++                        if method in {"POST", "PUT"} and table in {"decision_cases", "decision_runs"} and row.get("workflow_version", 1) != 1:
++                            raise HTTPException(409, "La admisión Ultimate todavía no está habilitada.")
+                     options["json"] = ([{**row, "workspace_id": ctx.workspace_id} for row in rows]
+                                        if isinstance(body, list) else {**body, "workspace_id": ctx.workspace_id})
+                     if method=='POST' and table in {'decision_cases','decision_runs'} and not ctx.worker:
+diff --git a/backend/app/services/decision_case_service.py b/backend/app/services/decision_case_service.py
+index bb4884e..dfd25a8 100644
+--- a/backend/app/services/decision_case_service.py
++++ b/backend/app/services/decision_case_service.py
+@@ -19,6 +19,8 @@ from app.domain.decision_cases import (
+     validate_case_state,
+     project_case_history,
+     run_history_item,
++    case_workflow_version,
++    case_projection_options,
+ )
+ 
+ from app.platform.repository import http_client
+@@ -91,6 +93,8 @@ async def ensure_case(
+ ) -> dict:
+     existing = await get_case_row(case_id)
+     if existing:
++        if case_workflow_version(existing) != 1:
++            raise ValueError("La escritura legacy no puede reemplazar el contexto Ultimate.")
+         if (
+             str(existing["orders_dataset_id"]) != str(orders_dataset_id)
+             or str(existing["fleet_dataset_id"]) != str(fleet_dataset_id)
+@@ -167,12 +171,15 @@ async def update_case(
+     row = await get_case_row(case_id)
+     if not row:
+         raise LookupError("No se encontró el Decision Case.")
++    ultimate = case_workflow_version(row) == 2
++    if ultimate and (state is not None or status not in (None, "active", "archived")):
++        raise ValueError("La escritura legacy no puede reemplazar el contexto Ultimate.")
+     if status is not None and status not in CASE_STATUSES:
+         raise ValueError("Estado de Decision Case inválido.")
+ 
+     now = utc_now()
+     values: dict = {
+-        "schema_version": CASE_SCHEMA_VERSION,
++        "schema_version": row["schema_version"] if ultimate else CASE_SCHEMA_VERSION,
+         "updated_at": now,
+         "last_activity_at": now,
+     }
+@@ -245,13 +252,13 @@ async def sync_case_history(case_id: str) -> dict:
+     row = await get_case_row(case_id)
+     if not row:
+         raise LookupError("No se encontró el Decision Case.")
++    if case_workflow_version(row) == 2:
++        raise ValueError("El cache Ultimate no se actualiza mediante el workflow legacy.")
+     snapshot = await history_snapshot(case_id)
+     state = project_case_history(
+         row.get("state_json") or {},
+         [],
+-        case_id=case_id,
+-        orders_dataset_id=str(row["orders_dataset_id"]),
+-        fleet_dataset_id=str(row["fleet_dataset_id"]),
++        **case_projection_options(row),
+         summaries=snapshot["summaries"],
+     )
+     return await update_case(case_id, state=state)
+@@ -363,9 +370,7 @@ async def get_run_history(
+     state = project_case_history(
+         row.get("state_json") or {},
+         [],
+-        case_id=case_id,
+-        orders_dataset_id=str(row["orders_dataset_id"]),
+-        fleet_dataset_id=str(row["fleet_dataset_id"]),
++        **case_projection_options(row),
+         summaries=snapshot["summaries"],
+     )
+     page = snapshot["runs"]
+@@ -404,6 +409,11 @@ async def get_case(case_id: str) -> dict:
+     row = await get_case_row(case_id)
+     if not row:
+         raise LookupError("No se encontró el Decision Case.")
++    if case_workflow_version(row) == 2:
++        snapshot = await history_snapshot(case_id)
++        state = project_case_history(row.get("state_json") or {}, [],
++            **case_projection_options(row), summaries=snapshot["summaries"])
++        return {"case": row, "decision_case": state, "orders": None, "fleet": None}
+     orders, fleet, snapshot = await asyncio.gather(
+         get_dataset(str(row["orders_dataset_id"])),
+         get_dataset(str(row["fleet_dataset_id"])),
+@@ -449,15 +459,14 @@ async def list_cases(
+     result = []
+     for bundle in bundles:
+         row, orders, fleet = bundle["case_row"], bundle["orders"], bundle["fleet"]
+-        if not orders or not fleet:
++        ultimate = case_workflow_version(row) == 2
++        if not ultimate and (not orders or not fleet):
+             raise LookupError("No se encontró el Data Pack del Decision Case.")
+-        if orders.get("dataset_type") != "orders" or fleet.get("dataset_type") != "fleet":
++        if not ultimate and (orders.get("dataset_type") != "orders" or fleet.get("dataset_type") != "fleet"):
+             raise ValueError("El Data Pack del Decision Case no conserva sus tipos.")
+         state = project_case_history(
+             row.get("state_json") or {}, [],
+-            case_id=str(row["id"]),
+-            orders_dataset_id=str(row["orders_dataset_id"]),
+-            fleet_dataset_id=str(row["fleet_dataset_id"]),
++            **case_projection_options(row),
+             summaries=bundle["summaries"],
+         )
+         result.append({
+diff --git a/backend/tests/test_ultimate_readers.py b/backend/tests/test_ultimate_readers.py
+new file mode 100644
+index 0000000..f95d2b1
+--- /dev/null
++++ b/backend/tests/test_ultimate_readers.py
+@@ -0,0 +1,124 @@
++"""Shared readers keep the empty Ultimate cohort visible without legacy writes."""
++import copy
++import unittest
++from unittest.mock import AsyncMock, patch
++
++import httpx
++from fastapi import HTTPException
++
++from app.domain.decision_cases import (create_case_state, project_case_history,
++    case_projection_options, case_workflow_version, NODE_IDS)
++from app.platform.home import recent_case
++from app.platform.decision_center import project
++from app.services import decision_case_service as service
++
++
++def fixture():
++    row=dict(id='00000000-0000-4000-8000-000000000123',schema_version='decision_case_v2',
++        workflow_version=2,orders_dataset_id=None,fleet_dataset_id=None,state_json={},
++        created_at='2026-10-26T12:00:00Z',updated_at='2026-10-26T12:00:00Z',
++        last_activity_at='2026-10-26T12:00:00Z',status='active',label='Semana 45')
++    summaries={node:dict(run_count=0,latest=None,approved=None) for node in NODE_IDS}
++    return dict(case=row,case_row=row,state_json={},summaries=summaries,status='active',
++                in_review=False,orders=None,fleet=None)
++
++
++class UltimateReaderTests(unittest.TestCase):
++    def test_empty_case_has_null_references_and_requires_data(self):
++        row=fixture()['case']
++        result=project_case_history({},[],**case_projection_options(row))
++        self.assertIsNone(result['signature'])
++        self.assertEqual(result['inputs'],dict(orders_dataset_id=None,fleet_dataset_id=None))
++        self.assertEqual(result['nodes']['logistics_assignment']['status'],'needs_data')
++        self.assertTrue(all(node['run_count']==0 for node in result['nodes'].values()))
++
++    def test_legacy_case_projection_does_not_gain_ultimate_fields(self):
++        state=create_case_state('case','orders','fleet')
++        self.assertEqual(state['signature'],'orders:fleet')
++        self.assertEqual(state['nodes']['logistics_assignment']['status'],'available')
++        self.assertNotIn('workflow_version',state)
++        self.assertEqual(case_workflow_version({}),1)
++
++    def test_unknown_or_bool_cohort_is_not_legacy(self):
++        for value in (0,3,True,'2',None):
++            with self.subTest(value=value),self.assertRaises(ValueError):
++                case_workflow_version(dict(workflow_version=value))
++
++    def test_cached_legacy_approval_cannot_open_empty_ultimate_config(self):
++        b=fixture();b['case']['state_json']={'nodes':{'logistics_assignment':{'status':'approved'}}}
++        home=recent_case(b)
++        self.assertEqual(home['status'],'needs_data')
++        self.assertIsNone(home['resume'])
++        self.assertIsNone(home['run_id'])
++
++    def test_home_and_center_keep_empty_case_without_fake_results(self):
++        b=fixture();before=copy.deepcopy(b)
++        home=recent_case(b);center=project(b,True)
++        self.assertEqual(home['case_id'],center['id'])
++        self.assertEqual(center['progress'],dict(approved=0,total=2))
++        self.assertIsNone(center['orders']);self.assertIsNone(center['fleet'])
++        self.assertTrue(all(node['target'] is None for node in center['nodes']))
++        self.assertEqual(b,before)
++
++    def test_cohort_mismatch_and_fake_pair_are_rejected(self):
++        with self.assertRaises(ValueError):
++            project_case_history({'workflow_version':1},[],**case_projection_options(fixture()['case']))
++        with self.assertRaises(ValueError):
++            create_case_state('case','orders','fleet',workflow_version=2)
++
++
++class UltimateServiceReaderTests(unittest.IsolatedAsyncioTestCase):
++    async def test_detail_does_not_fetch_null_dataset_ids(self):
++        b=fixture()
++        with patch.object(service,'get_case_row',AsyncMock(return_value=b['case'])), \
++             patch.object(service,'history_snapshot',AsyncMock(return_value={'summaries':b['summaries']})), \
++             patch.object(service,'get_dataset',AsyncMock()) as datasets:
++            result=await service.get_case(b['case']['id'])
++        datasets.assert_not_awaited()
++        self.assertIsNone(result['orders']);self.assertIsNone(result['fleet'])
++
++    async def test_list_keeps_empty_case_and_does_not_repair_rows(self):
++        b=fixture()
++        with patch.object(service,'_db',AsyncMock(return_value=[b])) as db:
++            result=await service.list_cases()
++        self.assertEqual(result[0]['case']['id'],b['case']['id'])
++        self.assertEqual(result[0]['decision_case']['workflow_version'],2)
++        self.assertEqual(db.await_args.args,('POST','rpc/list_decision_cases'))
++
++    async def test_legacy_missing_pair_is_still_an_error(self):
++        b=fixture();b['case']['workflow_version']=1
++        with patch.object(service,'_db',AsyncMock(return_value=[b])):
++            with self.assertRaises(LookupError):await service.list_cases()
++
++    async def test_legacy_state_write_cannot_overwrite_ultimate_context(self):
++        b=fixture()
++        with patch.object(service,'get_case_row',AsyncMock(return_value=b['case'])), \
++             patch.object(service,'_db',AsyncMock()) as db:
++            with self.assertRaises(ValueError):await service.update_case(b['case']['id'],state={})
++            with self.assertRaises(ValueError):await service.ensure_case(b['case']['id'],'orders','fleet')
++            with self.assertRaises(ValueError):await service.sync_case_history(b['case']['id'])
++        db.assert_not_awaited()
++
++    async def test_archiving_retains_ultimate_schema_identity(self):
++        b=fixture()
++        with patch.object(service,'get_case_row',AsyncMock(return_value=b['case'])), \
++             patch.object(service,'_db',AsyncMock(return_value=[b['case']])) as db:
++            await service.update_case(b['case']['id'],status='archived')
++        body=db.await_args.kwargs['body']
++        self.assertEqual(body['schema_version'],b['case']['schema_version'])
++        self.assertNotIn('state_json',body)
++
++    async def test_progressive_relations_are_read_only_and_tenant_scoped(self):
++        from app.platform.repository import TenantClient
++        from app.platform import repository
++        ctx=type('ReaderContext',(),dict(workspace_id='workspace',user_id='user',worker=False,access_role='admin'))()
++        raw=AsyncMock();raw.request.return_value=httpx.Response(200,json=[])
++        with patch.object(repository,'current',return_value=ctx),patch.object(repository,'is_infrastructure',return_value=False):
++            client=TenantClient(raw)
++            await client.get(repository.SUPABASE_URL+'/rest/v1/case_data_packs')
++            self.assertEqual(raw.request.await_args.kwargs['params']['workspace_id'],'eq.workspace')
++            with self.assertRaises(HTTPException):await client.post(repository.SUPABASE_URL+'/rest/v1/case_data_packs',json={})
++            with self.assertRaises(HTTPException):await client.post(repository.SUPABASE_URL+'/rest/v1/decision_cases',json={'workflow_version':2})
++
++
++if __name__=='__main__':unittest.main()
+diff --git a/backend/tests/integration/ultimate_sql_support.py b/backend/tests/integration/ultimate_sql_support.py
+new file mode 100644
+index 0000000..2861785
+--- /dev/null
++++ b/backend/tests/integration/ultimate_sql_support.py
+@@ -0,0 +1,142 @@
++"""Complete PostgreSQL 17 application catalog, exclusively in a labelled owned sandbox.
++
++Unlike SQLSandbox's intentionally historical coverage, this applies the captured
++baseline plus EVERY later migration. It never repairs history or contacts Supabase.
++"""
++from pathlib import Path
++import json
++import os
++import subprocess
++from uuid import uuid4
++
++REPO = Path(__file__).resolve().parents[3]
++BASELINE = REPO / 'supabase/baseline/20261010100000_public_schema.sql'
++POST_T1_CUTOFF = '20261026010000'
++CONTAINER = os.environ.get('DATION_SQL_TEST_CONTAINER')
++DOCKER = ['docker', '--host=unix:///var/run/docker.sock']
++
++AUTH = """
++CREATE SCHEMA auth;
++CREATE TABLE auth.users(id uuid PRIMARY KEY,email text,email_confirmed_at timestamptz);
++CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $$
++ SELECT (nullif(current_setting('request.jwt.claims',true),'')::jsonb->>'sub')::uuid $$;
++GRANT USAGE ON SCHEMA auth TO authenticated;
++GRANT EXECUTE ON FUNCTION auth.uid() TO authenticated;
++"""
++
++# Captured T0 Supabase administrative defaults; fixture only, never product DDL.
++MANAGED_DEFAULTS = """
++DO $$ BEGIN IF NOT EXISTS(SELECT 1 FROM pg_roles WHERE rolname='supabase_admin') THEN
++ CREATE ROLE supabase_admin NOLOGIN; END IF; END $$;
++ALTER DEFAULT PRIVILEGES FOR ROLE postgres,supabase_admin IN SCHEMA public
++ GRANT ALL ON TABLES TO postgres,anon,authenticated,service_role;
++ALTER DEFAULT PRIVILEGES FOR ROLE postgres,supabase_admin IN SCHEMA public
++ GRANT ALL ON SEQUENCES TO postgres,anon,authenticated,service_role;
++ALTER DEFAULT PRIVILEGES FOR ROLE postgres,supabase_admin IN SCHEMA public
++ GRANT EXECUTE ON FUNCTIONS TO postgres,anon,authenticated,service_role;
++"""
++MANAGED_EXISTING_GRANTS = """
++GRANT DELETE,TRUNCATE,REFERENCES,TRIGGER ON public.profiles,public.workspace_ddas,
++ public.workspace_members,public.workspaces TO service_role;
++GRANT REFERENCES,TRIGGER ON public.audit_events TO service_role;
++"""
++
++CATALOG_SQL = """
++SELECT jsonb_build_object(
++ 'columns',(SELECT jsonb_agg(to_jsonb(x) ORDER BY table_schema,table_name,ordinal_position)
++  FROM (SELECT table_schema,table_name,ordinal_position,column_name,data_type,udt_name,is_nullable,column_default
++   FROM information_schema.columns WHERE table_schema IN('public','dation_private')) x),
++ 'constraints',(SELECT jsonb_agg(to_jsonb(x) ORDER BY schema_name,table_name,name)
++  FROM (SELECT n.nspname schema_name,t.relname table_name,c.conname name,c.contype,
++    c.condeferrable,c.condeferred,pg_get_constraintdef(c.oid) definition
++   FROM pg_constraint c JOIN pg_class t ON t.oid=c.conrelid JOIN pg_namespace n ON n.oid=t.relnamespace
++   WHERE n.nspname IN('public','dation_private')) x),
++ 'indexes',(SELECT jsonb_agg(to_jsonb(x) ORDER BY schemaname,tablename,indexname)
++  FROM (SELECT schemaname,tablename,indexname,indexdef FROM pg_indexes
++   WHERE schemaname IN('public','dation_private')) x),
++ 'policies',(SELECT jsonb_agg(to_jsonb(x) ORDER BY schemaname,tablename,policyname)
++  FROM (SELECT * FROM pg_policies WHERE schemaname IN('public','dation_private')) x),
++ 'relations',(SELECT jsonb_agg(to_jsonb(x) ORDER BY schema_name,name)
++  FROM (SELECT n.nspname schema_name,c.relname name,c.relkind,c.relrowsecurity,c.relforcerowsecurity,c.relacl::text acl
++   FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
++   WHERE n.nspname IN('public','dation_private') AND c.relkind IN('r','p','v')) x),
++ 'functions',(SELECT jsonb_agg(to_jsonb(x) ORDER BY schema_name,name,args)
++  FROM (SELECT n.nspname schema_name,p.proname name,pg_get_function_identity_arguments(p.oid) args,
++    p.prosecdef,p.proconfig,p.proacl::text acl,pg_get_functiondef(p.oid) definition
++   FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
++   WHERE n.nspname IN('public','dation_private') AND p.prokind='f') x),
++ 'triggers',(SELECT jsonb_agg(to_jsonb(x) ORDER BY schema_name,table_name,name)
++  FROM (SELECT n.nspname schema_name,c.relname table_name,t.tgname name,t.tgenabled,pg_get_triggerdef(t.oid) definition
++   FROM pg_trigger t JOIN pg_class c ON c.oid=t.tgrelid JOIN pg_namespace n ON n.oid=c.relnamespace
++   WHERE NOT t.tgisinternal AND n.nspname IN('public','dation_private')) x),
++ 'defaults',(SELECT jsonb_agg(to_jsonb(x) ORDER BY owner_name,schema_name,kind)
++  FROM (SELECT pg_get_userbyid(d.defaclrole) owner_name,n.nspname schema_name,d.defaclobjtype kind,d.defaclacl::text acl
++   FROM pg_default_acl d JOIN pg_namespace n ON n.oid=d.defaclnamespace
++   WHERE n.nspname IN('public','dation_private')) x));
++"""
++
++
++class UltimateSQLSandbox:
++    @classmethod
++    def command(cls, sql, database=None, check=True):
++        if not CONTAINER:
++            raise RuntimeError('DATION_SQL_TEST_CONTAINER must name an owned T2 PostgreSQL 17 sandbox')
++        env=os.environ.copy()
++        for name in ('DOCKER_HOST','DOCKER_CONTEXT','DOCKER_TLS','DOCKER_TLS_VERIFY','DOCKER_CERT_PATH'):
++            env.pop(name,None)
++        result=subprocess.run([*DOCKER,'exec','-i',CONTAINER,'psql','-U','postgres',
++            '-d',database or cls.database,'-X','-q','-A','-t','-v','ON_ERROR_STOP=1','-v','VERBOSITY=verbose'],
++            input=sql,text=True,capture_output=True,env=env,timeout=60)
++        if check and result.returncode:
++            raise AssertionError(result.stderr)
++        return result
++
++    @classmethod
++    def verify_owner(cls):
++        result=subprocess.run([*DOCKER,'inspect','--format','{{index .Config.Labels "dation.qa.phase"}}',CONTAINER or ''],
++                              capture_output=True,text=True,timeout=10)
++        if result.returncode or result.stdout.strip()!='T2':
++            raise RuntimeError('Refusing an unlabelled/non-owned SQL container')
++        version=cls.command('SHOW server_version_num;',database='postgres').stdout.strip()
++        if not 170000<=int(version)<180000:
++            raise RuntimeError('Ultimate SQL suite requires PostgreSQL 17')
++
++    @classmethod
++    def create_database(cls, ultimate=True):
++        name='dation_t2_'+uuid4().hex
++        cls.command('CREATE DATABASE '+name+';',database='postgres')
++        try:
++            cls.command((Path(__file__).parent/'infrastructure.sql').read_text(),database=name)
++            cls.command(AUTH+MANAGED_DEFAULTS,database=name)
++            cls.command(BASELINE.read_text(),database=name)
++            cls.migrate(name,ultimate=ultimate)
++            cls.command(MANAGED_EXISTING_GRANTS,database=name)
++        except BaseException:
++            cls.drop_database(name)
++            raise
++        return name
++
++    @classmethod
++    def migrate(cls,database,ultimate=True,only_t2=False):
++        for migration in sorted((REPO/'supabase/migrations').glob('*.sql')):
++            version=migration.name[:14]
++            if version<='20261010100000' or (not ultimate and version>POST_T1_CUTOFF):continue
++            if only_t2 and version<=POST_T1_CUTOFF:continue
++            cls.command(migration.read_text(),database=database)
++
++    @classmethod
++    def drop_database(cls,name):
++        if not name.startswith('dation_t2_'):raise RuntimeError('Not an owned disposable database')
++        cls.command('DROP DATABASE '+name+';',database='postgres')
++
++    @classmethod
++    def catalog(cls,database=None):
++        return json.loads(cls.command(CATALOG_SQL,database=database).stdout)
++
++    @classmethod
++    def setUpClass(cls):
++        cls.verify_owner()
++        cls.database=cls.create_database()
++
++    @classmethod
++    def tearDownClass(cls):cls.drop_database(cls.database)
+diff --git a/backend/tests/integration/test_ultimate_schema.py b/backend/tests/integration/test_ultimate_schema.py
+new file mode 100644
+index 0000000..a092f14
+--- /dev/null
++++ b/backend/tests/integration/test_ultimate_schema.py
+@@ -0,0 +1,346 @@
++"""S2: real complete-catalog fresh/upgrade, tenancy, immutable metadata and readers.
++
++All rows are synthetic persistence fixtures; no engine, artifact bytes, publisher,
++LLM or product activation is involved. Missing owned infrastructure is an ERROR.
++"""
++import json
++import os
++import re
++from pathlib import Path
++import unittest
++from uuid import uuid4
++
++from ultimate_sql_support import UltimateSQLSandbox, REPO
++
++WORK=Path(os.environ.get('DATION_T2_EVIDENCE','/tmp/dation-t2-evidence'))
++USER_A,USER_B,VIEWER,DISABLED=[str(uuid4()) for _ in range(4)]
++H='a'*64
++
++
++def literal(value):return "'"+json.dumps(value,separators=(',',':')).replace("'","''")+"'::jsonb"
++
++
++class UltimateSchemaTests(UltimateSQLSandbox,unittest.TestCase):
++    @classmethod
++    def setUpClass(cls):
++        super().setUpClass();WORK.mkdir(parents=True,exist_ok=True)
++        cls.command("UPDATE dation_private.platform_release SET admissions_open=true,workflow_gates_enabled=true;")
++        for uid in (USER_A,USER_B,VIEWER,DISABLED):
++            cls.command(f"INSERT INTO auth.users VALUES('{uid}','{uid}@example.test',now());")
++        cls.wa=json.loads(cls.command(f"SELECT platform_create_workspace('{USER_A}','T2 A','AR','UTC','ARS');").stdout)['workspace_id']
++        cls.wb=json.loads(cls.command(f"SELECT platform_create_workspace('{USER_B}','T2 B','AR','UTC','ARS');").stdout)['workspace_id']
++        cls.command(f"INSERT INTO profiles(id) VALUES('{VIEWER}'),('{DISABLED}'); INSERT INTO workspace_members(workspace_id,user_id,access_role,status) VALUES('{cls.wa}','{VIEWER}','viewer','active'),('{cls.wa}','{DISABLED}','operator','disabled');")
++        cls.ma,cls.mb,cls.va,cls.vb=[str(uuid4()) for _ in range(4)]
++        cls.command(f"INSERT INTO dation_private.decision_definition_versions VALUES('ULTIMATE_GRAPH_V1','{H}','{{}}',now());")
++        for wid,uid,mid,vid in [(cls.wa,USER_A,cls.ma,cls.va),(cls.wb,USER_B,cls.mb,cls.vb)]:
++            cls.command(f"""INSERT INTO logistics_models(id,workspace_id,name,created_by) VALUES('{mid}','{wid}','Operación','{uid}');
++            INSERT INTO logistics_model_versions(id,workspace_id,model_id,version,graph_definition_version,config_schema_version,
++             config_jsonb,contract_descriptor_jsonb,config_hash,contract_hash,contract_registry_version,published_by)
++            VALUES('{vid}','{wid}','{mid}',1,'ULTIMATE_GRAPH_V1','logistics_model_v1','{{}}','{{}}','{H}','{H}','SEMANTIC_FIELDS_V1','{uid}');""")
++
++    def sql(self,sql):return self.command(sql).stdout.strip()
++
++    def reject(self,sql,*codes):
++        result=self.command(sql,check=False)
++        self.assertNotEqual(result.returncode,0,'Invalid write was accepted: '+sql)
++        if codes:self.assertTrue(any(code in result.stderr for code in codes),result.stderr)
++        return result.stderr
++
++    def case_sql(self, *, workspace=None, model=None, user=None, demand=False):
++        w=workspace or self.wa;model=model or self.va;u=user or USER_A
++        ids=dict(id=str(uuid4()),pack=str(uuid4()),version=str(uuid4()),dataset=str(uuid4()),workspace=w)
++        c,p,v,d=ids['id'],ids['pack'],ids['version'],ids['dataset']
++        sql=f"""INSERT INTO decision_cases(id,workspace_id,workflow_version,logistics_model_version_id,
++         planning_start,planning_end,operating_mode,case_policy_schema_version,case_policy_jsonb,case_policy_hash,
++         graph_definition_version,context_frozen_at,label)
++         VALUES('{c}','{w}',2,'{model}','2026-11-02','2026-11-08','OPERATIONAL','case_policy_v1',
++          '{{"version":1,"primary_goal":"MINIMIZE_COST"}}','{H}','ULTIMATE_GRAPH_V1',now(),'T2 Case');
++         INSERT INTO case_data_packs(id,workspace_id,case_id) VALUES('{p}','{w}','{c}');
++         INSERT INTO case_data_pack_versions(id,workspace_id,case_id,pack_id,version,manifest_hash,contract_set_hash,created_by)
++          VALUES('{v}','{w}','{c}','{p}',1,'{H}','{H}','{u}');"""
++        if demand:
++            raw=uuid4().hex*2
++            sql+=f"""INSERT INTO datasets(id,workspace_id,dataset_type,original_filename,storage_path,sha256,
++              data_contract_id,data_contract_hash,normalizer_version,canonical_sha256,schema_version)
++              VALUES('{d}','{w}','transport_demand','demand.csv','{w}/{d}/demand.csv','{raw}',
++              'transport_demand_v1','{H}','DEMAND_V1','{H}','transport_demand_v1');
++             INSERT INTO case_data_pack_entries(pack_version_id,slot_key,workspace_id,case_id,dataset_id,contract_id,contract_hash,
++              raw_sha256,canonical_sha256,normalizer_version,normalized_bucket,normalized_path,record_count)
++              VALUES('{v}','transport_demand','{w}','{c}','{d}','transport_demand_v1','{H}','{raw}','{H}',
++              'DEMAND_V1','dda-inputs','{w}/normalized/{d}/{H}.json',1);"""
++        sql+=f"UPDATE case_data_packs SET current_version_id='{v}' WHERE id='{p}';"
++        return ids,sql
++
++    def make_case(self,**kwargs):
++        ids,sql=self.case_sql(**kwargs);self.sql('BEGIN;'+sql+'COMMIT;');return ids
++
++    def run_sql(self,c, *, run_id=None, manifest=None, complete=True, model=None):
++        rid=run_id or str(uuid4());w=c['workspace'];model=model or self.va
++        result=dict(result_schema='transport_plan_v1',result_schema_version=1,assembler_version='RESULT_ASSEMBLER_V1',
++            fingerprints=dict(result_fingerprint='b'*64,core_result_fingerprint='c'*64),artifact_manifest=dict(version=1,artifacts=manifest or []))
++        publication=(",result_package_version,assembler_version,artifact_manifest_hash,core_fingerprint,result_fingerprint,result_json" if complete else '')
++        values=(f",1,'RESULT_ASSEMBLER_V1','{H}','{'c'*64}','{'b'*64}',{literal(result)}" if complete else '')
++        sql=f"""INSERT INTO decision_runs(id,workspace_id,dataset_id,decision_case_id,node_id,workflow_version,
++         logistics_model_version_id,data_pack_version_id,graph_definition_version,case_policy_hash,node_policy_hash,
++         contract_hash,input_context_hash,transit_model_version,runtime_profile,result_schema_version,engine_name,engine_version,
++         schema_version,status{publication}) VALUES('{rid}','{w}','{c['dataset']}','{c['id']}','logistics_assignment',2,
++         '{model}','{c['version']}','ULTIMATE_GRAPH_V1','{H}','{H}','{H}','{H}','DATION_TRANSIT_V1',
++         'transport_plan_v1',1,'transport_plan','2.0.0','transport_plan_v1','{'completed' if complete else 'queued'}'{values});"""
++        return rid,sql
++
++    def artifact(self, *, state='PREPARED', workspace=None, bad_manifest=False):
++        c=self.make_case(demand=True);rid=str(uuid4());aid=str(uuid4());w=workspace or c['workspace']
++        descriptor=dict(artifact_id=aid,workspace_id=w,run_id=rid,kind='CORE',part_key='main',artifact_schema='engine_core_v1',
++            schema_version=1,content_sha256=H,size_bytes=12,media_type='application/json',core_fingerprint='c'*64,assembler_version='RESULT_ASSEMBLER_V1')
++        _,run=self.run_sql(c,run_id=rid,manifest=[] if bad_manifest else [descriptor])
++        self.sql(run)
++        fp='NULL' if state=='PREPARED' else "'"+'b'*64+"'"
++        sql=f"""INSERT INTO decision_result_artifacts(id,workspace_id,run_id,kind,part_key,artifact_schema,schema_version,
++         content_sha256,size_bytes,media_type,storage_bucket,storage_path,assembler_version,core_fingerprint,result_fingerprint,
++         publication_state,producer_lease_token,producer_generation,producer_metadata)
++         VALUES('{aid}','{w}','{rid}','CORE','main','engine_core_v1',1,'{H}',12,'application/json','dda-inputs',
++          '{w}/runs/{rid}/core/main/{H}.json','RESULT_ASSEMBLER_V1','{'c'*64}',{fp},'{state}','{uuid4()}',1,'{{"engine":"transport_plan"}}');"""
++        return c,rid,aid,sql
++
++    def test_01_fresh_and_upgrade_catalog_match_without_rewriting_legacy(self):
++        db=self.create_database(ultimate=False)
++        try:
++            w='00000000-0000-4000-8000-00000000da71';o,f,c,r=[str(uuid4()) for _ in range(4)]
++            self.command(f"""INSERT INTO datasets(id,workspace_id,dataset_type,original_filename,storage_path)
++             VALUES('{o}','{w}','orders','o.csv','{w}/{o}/o.csv'),('{f}','{w}','fleet','f.csv','{w}/{f}/f.csv');
++             INSERT INTO decision_cases(id,workspace_id,orders_dataset_id,fleet_dataset_id,input_signature)
++             VALUES('{c}','{w}','{o}','{f}','{o}:{f}');
++             INSERT INTO decision_runs(id,workspace_id,dataset_id,orders_dataset_id,fleet_dataset_id,decision_case_id,node_id,
++              engine_name,engine_version,schema_version,status,result_json,approved_at,approved_by)
++             VALUES('{r}','{w}','{o}','{o}','{f}','{c}','logistics_assignment','logistics-assignment-engine','1.0.0',
++              'assignment_v1','completed','{{"schema_version":"assignment_v1","legacy_evidence":[1,2]}}',now(),'shared_workspace:dation');
++             INSERT INTO decision_approval_events(workspace_id,run_id,case_id,node_id,action,actor)
++              VALUES('{w}','{r}','{c}','logistics_assignment','approved','shared_workspace:dation');""",database=db)
++            before=self.catalog(db)
++            tables=['datasets','decision_cases','decision_runs','decision_approval_events','decision_interpretation_sources']
++            originals={t:[row['column_name'] for row in before['columns'] if row['table_name']==t and row['table_schema']=='public'] for t in tables}
++            def rows():
++                return {t:json.loads(self.command('SELECT coalesce(jsonb_agg(to_jsonb(t)),\'[]\') FROM (SELECT '+','.join(originals[t])+' FROM public.'+t+' ORDER BY id) t;',database=db).stdout) for t in tables}
++            old=rows();self.migrate(db,only_t2=True);after=self.catalog(db)
++            self.assertEqual(rows(),old);self.assertEqual(after,self.catalog())
++            self.assertEqual(before['defaults'],after['defaults'])
++            (WORK/'post-t1-catalog.json').write_text(json.dumps(before,indent=2)+'\n')
++            (WORK/'fresh-catalog.json').write_text(json.dumps(self.catalog(),indent=2)+'\n')
++            (WORK/'upgrade-catalog.json').write_text(json.dumps(after,indent=2)+'\n')
++            (WORK/'upgrade-preservation.json').write_text(json.dumps(dict(catalog_equal=True,legacy_rows_equal=True,
++                default_acls_unchanged=True,tables=tables,rows=sum(map(len,old.values()))),indent=2)+'\n')
++        finally:self.drop_database(db)
++
++    def test_02_empty_case_initial_pack_is_atomic_and_legacy_pair_stays_required(self):
++        ids,sql=self.case_sql();self.sql('BEGIN;'+sql+'COMMIT;')
++        self.assertEqual(self.sql(f"SELECT orders_dataset_id IS NULL AND fleet_dataset_id IS NULL AND workflow_version=2 AND workflow_policy_version=1 FROM decision_cases WHERE id='{ids['id']}';"),'t')
++        _,incomplete=self.case_sql()
++        self.reject(incomplete.split('INSERT INTO case_data_packs')[0],'23514')
++        self.reject(f"INSERT INTO decision_cases(workspace_id) VALUES('{self.wa}');",'23514')
++
++    def test_03_model_version_fk_is_tenant_safe(self):
++        self.reject(f"""INSERT INTO logistics_model_versions(workspace_id,model_id,version,graph_definition_version,config_schema_version,
++         config_jsonb,contract_descriptor_jsonb,config_hash,contract_hash,contract_registry_version,published_by)
++         VALUES('{self.wb}','{self.ma}',2,'ULTIMATE_GRAPH_V1','logistics_model_v1','{{}}','{{}}','{H}','{H}','V1','{USER_B}');""",'23503')
++
++    def test_04_case_model_fk_is_tenant_safe(self):
++        _,sql=self.case_sql(model=self.vb)
++        self.reject('BEGIN;'+sql+'COMMIT;','23503')
++
++    def test_05_pack_case_fk_is_tenant_safe(self):
++        c=self.make_case()
++        self.reject(f"INSERT INTO case_data_packs(workspace_id,case_id) VALUES('{self.wb}','{c['id']}');",'23503')
++
++    def test_06_pack_version_and_current_pointer_cannot_cross_case(self):
++        a=self.make_case();b=self.make_case()
++        self.reject(f"UPDATE case_data_packs SET current_version_id='{b['version']}' WHERE id='{a['pack']}';",'23503')
++        self.reject(f"UPDATE case_data_packs SET current_version_id=NULL WHERE id='{a['pack']}';",'23514')
++        self.reject(f"""INSERT INTO case_data_pack_versions(workspace_id,case_id,pack_id,version,manifest_hash,contract_set_hash,created_by)
++         VALUES('{self.wa}','{a['id']}','{b['pack']}',2,'{H}','{H}','{USER_A}');""",'23503')
++
++    def test_07_entry_dataset_fk_rejects_cross_tenant(self):
++        b=self.make_case(workspace=self.wb,model=self.vb,user=USER_B,demand=True)
++        _,sql=self.case_sql(demand=True)
++        prefix,entry=sql.split('INSERT INTO case_data_pack_entries',1)
++        # Replace only the dataset UUID, retaining correct A version/Case ownership.
++        original=re.search(r"INSERT INTO datasets\(.*?VALUES\('([^']+)'",prefix,re.S).group(1)
++        entry=entry.replace(original,b['dataset'])
++        self.reject('BEGIN;'+prefix+'INSERT INTO case_data_pack_entries'+entry+'COMMIT;','23503')
++
++    def test_08_published_versions_and_entries_are_immutable(self):
++        c=self.make_case(demand=True)
++        for statement in [f"UPDATE logistics_model_versions SET config_hash='{'b'*64}' WHERE id='{self.va}';",
++            f"DELETE FROM logistics_model_versions WHERE id='{self.va}';",
++            f"UPDATE case_data_pack_versions SET manifest_hash='{'b'*64}' WHERE id='{c['version']}';",
++            f"UPDATE case_data_pack_entries SET record_count=2 WHERE pack_version_id='{c['version']}';",
++            "UPDATE dation_private.decision_definition_versions SET definition_jsonb='{}';"]:
++            with self.subTest(statement=statement):self.reject(statement,'22023')
++        self.reject(f"INSERT INTO case_data_pack_entries SELECT * FROM case_data_pack_entries WHERE pack_version_id='{c['version']}';",'22023')
++
++    def test_09_case_binding_and_frozen_policy_cannot_be_rewritten(self):
++        c=self.make_case()
++        for change in ["workflow_version=1",f"logistics_model_version_id='{self.vb}'","planning_end='2026-11-09'",
++                       "state_json='{\"nodes\":{}}'",f"case_policy_hash='{'b'*64}'"]:
++            with self.subTest(change=change):self.reject(f"UPDATE decision_cases SET {change} WHERE id='{c['id']}';",'22023')
++        self.sql(f"UPDATE decision_cases SET description='Metadata editable' WHERE id='{c['id']}';")
++
++    def test_10_dataset_interpretation_is_required_immutable_and_dedup_is_versioned(self):
++        c=self.make_case(demand=True);d=c['dataset']
++        self.reject(f"UPDATE datasets SET data_contract_hash='{'b'*64}' WHERE id='{d}';",'22023')
++        self.reject(f"INSERT INTO datasets(workspace_id,dataset_type,original_filename,storage_path) VALUES('{self.wa}','transport_resources','r.csv','{self.wa}/{uuid4()}/r.csv');",'23514','22023')
++        def duplicate(contract):
++            nd=str(uuid4())
++            return f"""INSERT INTO datasets(id,workspace_id,dataset_type,original_filename,storage_path,sha256,schema_version,
++              data_contract_id,data_contract_hash,normalizer_version,canonical_sha256)
++             SELECT '{nd}',workspace_id,dataset_type,'clone.csv','{self.wa}/{nd}/clone.csv',sha256,schema_version,
++              data_contract_id,'{contract}',normalizer_version,canonical_sha256 FROM datasets WHERE id='{d}';"""
++        self.reject(duplicate(H),'23505');self.sql(duplicate('b'*64))
++        self.assertIn("dataset_type = ANY (ARRAY['orders'::text, 'fleet'::text])",self.sql("SELECT indexdef FROM pg_indexes WHERE indexname='datasets_dispatch_hash_key';"))
++
++    def test_11_run_pins_case_model_pack_and_is_immutable(self):
++        c=self.make_case(demand=True);rid,sql=self.run_sql(c,complete=False);self.sql(sql)
++        self.reject(f"UPDATE decision_runs SET data_pack_version_id='{uuid4()}' WHERE id='{rid}';",'22023')
++        _,wrong=self.run_sql(c,model=self.vb,complete=False)
++        self.reject(wrong,'23503')
++        self.reject(f"UPDATE decision_runs SET workflow_version=1 WHERE id='{rid}';",'22023')
++
++    def test_12_run_cannot_use_another_cases_pack_or_unpinned_primary_dataset(self):
++        a=self.make_case(demand=True);b=self.make_case(demand=True)
++        _,sql=self.run_sql(a,complete=False)
++        self.reject(sql.replace(a['version'],b['version']),'22023','23503')
++        self.reject(sql.replace(a['dataset'],b['dataset']),'22023')
++
++    def test_13_prepared_metadata_does_not_mean_ready(self):
++        c,rid,aid,sql=self.artifact();self.sql(sql)
++        self.assertEqual(self.sql(f"SELECT publication_state||':'||(result_fingerprint IS NULL)::text FROM decision_result_artifacts WHERE id='{aid}';"),'PREPARED:true')
++        self.reject(f"UPDATE decision_result_artifacts SET publication_state='READY' WHERE id='{aid}';",'23514')
++
++    def test_14_ready_requires_exact_run_manifest_and_fingerprint(self):
++        c,rid,aid,sql=self.artifact(state='READY',bad_manifest=True)
++        self.reject(sql,'23514')
++        c,rid,aid,sql=self.artifact(state='READY')
++        self.reject(sql.replace("'"+'b'*64+"'","'"+'d'*64+"'"),'23503','23514')
++        self.sql(sql)
++        self.reject(f"UPDATE decision_result_artifacts SET size_bytes=13 WHERE id='{aid}';",'22023')
++        self.reject(f"DELETE FROM decision_result_artifacts WHERE id='{aid}';",'22023')
++
++    def test_15_artifact_tenant_path_schema_and_size_are_closed(self):
++        c,rid,aid,sql=self.artifact(workspace=self.wb)
++        self.reject(sql,'22023','23503')
++        c,rid,aid,sql=self.artifact()
++        for invalid in [sql.replace("'engine_core_v1'","'unknown_v9'"),sql.replace(',12,',',-1,'),
++                        sql.replace('/runs/','/../'),sql.replace("'application/json'","'text/plain'")]:
++            with self.subTest(invalid=invalid):self.reject(invalid,'23514')
++
++    def test_16_legacy_null_provenance_remains_valid(self):
++        # Old interpretation rows can remain wholly NULL; no v2 reinterpretation.
++        catalog=self.catalog()
++        columns=[x for x in catalog['columns'] if x['table_name']=='decision_interpretation_sources' and x['column_name'] in
++                 {'provenance_version','result_fingerprint','decision_context_schema','decision_context_hash','mode','selected_entity','evidence_refs'}]
++        self.assertEqual(len(columns),7);self.assertTrue(all(x['is_nullable']=='YES' for x in columns))
++        o,f,c,r,ex=[str(uuid4()) for _ in range(5)]
++        self.sql(f"""INSERT INTO datasets(id,workspace_id,dataset_type,original_filename,storage_path)
++         VALUES('{o}','{self.wa}','orders','o.csv','{self.wa}/{o}/o.csv'),('{f}','{self.wa}','fleet','f.csv','{self.wa}/{f}/f.csv');
++         INSERT INTO decision_cases(id,workspace_id,orders_dataset_id,fleet_dataset_id,input_signature)
++         VALUES('{c}','{self.wa}','{o}','{f}','{o}:{f}');
++         INSERT INTO decision_runs(id,workspace_id,dataset_id,orders_dataset_id,fleet_dataset_id,decision_case_id,node_id,
++          engine_name,engine_version,schema_version,status,result_json)
++         VALUES('{r}','{self.wa}','{o}','{o}','{f}','{c}','logistics_assignment','logistics-assignment-engine','1.0.0',
++          'assignment_v1','completed','{{"schema_version":"assignment_v1"}}');
++         INSERT INTO decision_explanations(id,workspace_id,run_id,provider,model,knowledge_version,prompt_version,response_json)
++          VALUES('{ex}','{self.wa}','{r}','fixture','fixture','v1','v1','{{}}');
++         INSERT INTO decision_interpretation_sources(workspace_id,run_id,explanation_id) VALUES('{self.wa}','{r}','{ex}');""")
++        self.assertEqual(self.sql(f"SELECT provenance_version IS NULL AND result_fingerprint IS NULL AND evidence_refs IS NULL FROM decision_interpretation_sources WHERE explanation_id='{ex}';"),'t')
++
++    def test_17_provenance_uses_same_run_fingerprint_and_ready_artifact(self):
++        c,rid,aid,sql=self.artifact(state='READY');self.sql(sql);ex=str(uuid4())
++        self.sql(f"INSERT INTO decision_explanations(id,workspace_id,run_id,provider,model,knowledge_version,prompt_version,response_json) VALUES('{ex}','{self.wa}','{rid}','fixture','fixture','v1','v1','{{}}');")
++        base=f"""INSERT INTO decision_interpretation_sources(workspace_id,run_id,explanation_id,provenance_version,
++         result_fingerprint,decision_context_schema,decision_context_hash,mode,selected_entity,evidence_refs)
++         VALUES('{self.wa}','{rid}','{ex}',2,'{'b'*64}','decision_context_v1','{H}','REVIEW',
++          '{{"type":"TRIP","id":"VIA-001"}}','[{{"artifact_id":"{aid}","content_sha256":"{H}"}}]');"""
++        self.reject(base.replace("'REVIEW'","'OPTIMIZE'"),'23514')
++        self.reject(base.replace(aid,str(uuid4())),'22023')
++        self.reject(base.replace("'"+'b'*64+"'","'"+'d'*64+"'"),'22023','23503')
++        self.sql(base)
++        self.reject(f"UPDATE decision_interpretation_sources SET decision_context_hash='{'b'*64}' WHERE explanation_id='{ex}';",'22023')
++
++    def test_18_rls_membership_read_positives_and_negatives(self):
++        for uid,count in [(USER_A,1),(USER_B,0),(VIEWER,1),(DISABLED,0)]:
++            with self.subTest(uid=uid):
++                self.assertEqual(self.sql(f"SET ROLE authenticated; SET request.jwt.claims='{json.dumps({'sub':uid})}'; SELECT count(*) FROM logistics_models WHERE id='{self.ma}';"),str(count))
++        self.assertEqual(self.sql("SET ROLE service_role; SELECT count(*)>0 FROM logistics_models;"),'t')
++
++    def test_19_no_client_or_service_direct_writes_and_private_registry_is_release_only(self):
++        for role in ['anon','authenticated','service_role']:
++            with self.subTest(role=role):
++                self.reject(f"SET ROLE {role}; INSERT INTO logistics_models(workspace_id,name,created_by) VALUES('{self.wa}','Denied','{USER_A}');",'42501')
++                self.reject(f"SET ROLE {role}; SELECT * FROM dation_private.decision_definition_versions;",'42501')
++        self.reject('SET ROLE authenticated; SELECT * FROM decision_result_artifacts;','42501')
++        self.reject('SET ROLE anon; SELECT * FROM logistics_models;','42501')
++
++    def test_20_no_public_grants_new_functions_or_tables_and_defaults_preserved(self):
++        c=self.catalog();new=[r for r in c['relations'] if r['name'] in {'logistics_models','logistics_model_versions',
++          'case_data_packs','case_data_pack_versions','case_data_pack_entries','decision_result_artifacts','decision_definition_versions'}]
++        self.assertEqual(len(new),7);self.assertTrue(all(r['relrowsecurity'] and r['relforcerowsecurity'] for r in new))
++        for row in new:self.assertIsNone(re.search(r'(?:\{|,)=',row['acl'] or ''))
++        funcs=[r for r in c['functions'] if r['name'].startswith('ultimate_')]
++        self.assertTrue(funcs)
++        for f in funcs:
++            self.assertFalse(f['prosecdef']);self.assertEqual(f['proconfig'],['search_path=pg_catalog'])
++            self.assertIsNone(re.search(r'(?:\{|,)=',f['acl'] or ''))
++        self.assertEqual(len(c['defaults']),6)
++
++    def test_21_empty_case_home_center_and_legacy_case_list_are_read_only(self):
++        c=self.make_case();stamp=self.sql(f"SELECT updated_at FROM decision_cases WHERE id='{c['id']}';")
++        data=json.loads(self.sql(f"SELECT platform_home('{self.wa}','{USER_A}');"))
++        self.assertIn(c['id'],[b['case']['id'] for b in data['recent_cases']])
++        item=next(b for b in data['recent_cases'] if b['case']['id']==c['id'])
++        self.assertEqual(item['case']['workflow_version'],2)
++        detail=json.loads(self.sql(f"SELECT platform_decision_center('{self.wa}','{USER_A}',target_case_id=>'{c['id']}');"))
++        self.assertIsNone(detail['orders']);self.assertIsNone(detail['fleet'])
++        rows=json.loads(self.sql(f"SET dation.workspace_id='{self.wa}'; SELECT jsonb_agg(to_jsonb(x)) FROM dation_private.list_decision_cases(NULL,100,0,true) x;"))
++        self.assertIn(c['id'],[r['case_row']['id'] for r in rows])
++        self.assertIsNone(next(r for r in rows if r['case_row']['id']==c['id'])['orders'])
++        self.assertEqual(self.sql(f"SELECT updated_at FROM decision_cases WHERE id='{c['id']}';"),stamp)
++        self.reject(f"SELECT platform_decision_center('{self.wa}','{USER_B}',target_case_id=>'{c['id']}');",'42501')
++
++    def test_22_data_hub_tracks_pack_usage_and_prevents_object_deletion(self):
++        c=self.make_case(demand=True)
++        self.assertEqual(self.sql(f"SELECT dation_private.dataset_referenced('{self.wa}','{c['dataset']}');"),'t')
++        detail=json.loads(self.sql(f"SELECT platform_dataset_library('{self.wa}','{USER_A}',target_dataset_id=>'{c['dataset']}');"))
++        self.assertEqual(detail['case_total'],1);self.assertFalse(detail['can_delete'])
++        self.assertEqual(detail['used_in'][0]['id'],c['id'])
++        self.reject(f"DELETE FROM datasets WHERE id='{c['dataset']}';",'23503')
++
++    def test_23_catalog_has_composite_fks_for_all_required_edges(self):
++        fks=[x for x in self.catalog()['constraints'] if x['contype']=='f']
++        expected={'ultimate_case_model','ultimate_pack_current_version','ultimate_run_model','ultimate_run_pack',
++            'ultimate_artifact_published_run','ultimate_interpretation_result'}
++        self.assertTrue(expected<={x['name'] for x in fks})
++        for name in expected:
++            self.assertIn('FOREIGN KEY (workspace_id,',next(x['definition'] for x in fks if x['name']==name))
++        ready=next(x for x in fks if x['name']=='ultimate_artifact_published_run')
++        self.assertTrue(ready['condeferrable'] and ready['condeferred'])
++        (WORK/'fk-constraint-matrix.json').write_text(json.dumps(fks,indent=2)+'\n')
++
++    def test_24_terminal_publication_metadata_and_history_cannot_be_rewritten(self):
++        c=self.make_case(demand=True);rid,sql=self.run_sql(c);self.sql(sql)
++        self.reject(f"UPDATE decision_runs SET artifact_manifest_hash='{'b'*64}' WHERE id='{rid}';",'22023')
++        self.reject(f"UPDATE decision_runs SET result_json='{{}}' WHERE id='{rid}';",'22023')
++        self.reject(f"DELETE FROM decision_cases WHERE id='{c['id']}';",'23503')
++
++    def test_25_entry_version_fk_cannot_cross_case(self):
++        other=self.make_case();c,sql=self.case_sql(demand=True)
++        prefix,entry=sql.split('INSERT INTO case_data_pack_entries',1)
++        entry=entry.replace(c['id'],other['id'])
++        self.reject('BEGIN;'+prefix+'INSERT INTO case_data_pack_entries'+entry+'COMMIT;','23503')
++
++    def test_26_prepared_to_ready_binding_can_commit_without_rewriting_identity(self):
++        c,rid,aid,sql=self.artifact();self.sql(sql)
++        self.reject(f"UPDATE decision_result_artifacts SET size_bytes=999 WHERE id='{aid}';",'22023')
++        self.sql(f"UPDATE decision_result_artifacts SET publication_state='READY',result_fingerprint='{'b'*64}' WHERE id='{aid}';")
++        self.assertEqual(self.sql(f"SELECT publication_state FROM decision_result_artifacts WHERE id='{aid}';"),'READY')
++
++
++if __name__=='__main__':unittest.main()
+diff --git a/supabase/migrations/20261026143813_ultimate_foundation.sql b/supabase/migrations/20261026143813_ultimate_foundation.sql
+new file mode 100644
+index 0000000..ca281b7
+--- /dev/null
++++ b/supabase/migrations/20261026143813_ultimate_foundation.sql
+@@ -0,0 +1,375 @@
++-- T2 expansion only. No cohort activation, publishers, admission RPCs or backfill.
++BEGIN;
++SET LOCAL lock_timeout='5s';
++SET LOCAL statement_timeout='90s';
++
++CREATE TABLE dation_private.decision_definition_versions (
++ version text PRIMARY KEY CHECK(version ~ '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$'),
++ definition_hash text NOT NULL CHECK(definition_hash ~ '^[0-9a-f]{64}$'),
++ definition_jsonb jsonb NOT NULL CHECK(jsonb_typeof(definition_jsonb)='object'),
++ created_at timestamptz NOT NULL DEFAULT now()
++);
++ALTER TABLE dation_private.decision_definition_versions ENABLE ROW LEVEL SECURITY;
++ALTER TABLE dation_private.decision_definition_versions FORCE ROW LEVEL SECURITY;
++REVOKE ALL ON dation_private.decision_definition_versions FROM PUBLIC,anon,authenticated,service_role;
++
++CREATE TABLE public.logistics_models (
++ id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
++ workspace_id uuid NOT NULL REFERENCES public.workspaces(id) ON DELETE RESTRICT,
++ name text NOT NULL CHECK(length(trim(name)) BETWEEN 1 AND 120),
++ description text CHECK(length(description)<=1000),
++ status text NOT NULL DEFAULT 'active' CHECK(status IN('active','archived')),
++ revision bigint NOT NULL DEFAULT 1 CHECK(revision>0),
++ created_by uuid NOT NULL,
++ created_at timestamptz NOT NULL DEFAULT now(),
++ updated_at timestamptz NOT NULL DEFAULT now(),
++ UNIQUE(workspace_id,id),
++ FOREIGN KEY(workspace_id,created_by) REFERENCES public.workspace_members(workspace_id,user_id) ON DELETE RESTRICT
++);
++CREATE INDEX logistics_models_listing ON public.logistics_models(workspace_id,status,updated_at DESC,id);
++CREATE INDEX logistics_models_creator ON public.logistics_models(workspace_id,created_by);
++
++-- Versions represent published snapshots; drafts/publication workflows belong to T3.
++CREATE TABLE public.logistics_model_versions (
++ id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
++ workspace_id uuid NOT NULL,
++ model_id uuid NOT NULL,
++ version integer NOT NULL CHECK(version>0),
++ graph_definition_version text NOT NULL REFERENCES dation_private.decision_definition_versions(version) ON DELETE RESTRICT,
++ config_schema_version text NOT NULL CHECK(length(config_schema_version) BETWEEN 1 AND 128),
++ config_jsonb jsonb NOT NULL CHECK(jsonb_typeof(config_jsonb)='object'),
++ contract_descriptor_jsonb jsonb NOT NULL CHECK(jsonb_typeof(contract_descriptor_jsonb)='object'),
++ config_hash text NOT NULL CHECK(config_hash ~ '^[0-9a-f]{64}$'),
++ contract_hash text NOT NULL CHECK(contract_hash ~ '^[0-9a-f]{64}$'),
++ contract_registry_version text NOT NULL CHECK(length(contract_registry_version) BETWEEN 1 AND 128),
++ published_by uuid NOT NULL,
++ published_at timestamptz NOT NULL DEFAULT now(),
++ UNIQUE(model_id,version), UNIQUE(workspace_id,id), UNIQUE(workspace_id,model_id,id),
++ UNIQUE(workspace_id,id,graph_definition_version),
++ FOREIGN KEY(workspace_id,model_id) REFERENCES public.logistics_models(workspace_id,id) ON DELETE RESTRICT,
++ FOREIGN KEY(workspace_id,published_by) REFERENCES public.workspace_members(workspace_id,user_id) ON DELETE RESTRICT
++);
++CREATE INDEX logistics_model_versions_graph ON public.logistics_model_versions(graph_definition_version);
++CREATE INDEX logistics_model_versions_publisher ON public.logistics_model_versions(workspace_id,published_by);
++
++ALTER TABLE public.decision_cases
++ ADD COLUMN workflow_version smallint NOT NULL DEFAULT 1 CHECK(workflow_version IN(1,2)),
++ ADD COLUMN logistics_model_version_id uuid,
++ ADD COLUMN planning_start date,
++ ADD COLUMN planning_end date,
++ ADD COLUMN operating_mode text CHECK(operating_mode IN('OPERATIONAL','SIMULATION')),
++ ADD COLUMN case_policy_schema_version text,
++ ADD COLUMN case_policy_jsonb jsonb,
++ ADD COLUMN case_policy_hash text CHECK(case_policy_hash ~ '^[0-9a-f]{64}$'),
++ ADD COLUMN context_frozen_at timestamptz,
++ ADD COLUMN graph_definition_version text,
++ ALTER COLUMN orders_dataset_id DROP NOT NULL,
++ ALTER COLUMN fleet_dataset_id DROP NOT NULL,
++ ALTER COLUMN input_signature DROP NOT NULL,
++ ADD CONSTRAINT ultimate_case_context CHECK(CASE WHEN workflow_version=1 THEN
++   orders_dataset_id IS NOT NULL AND fleet_dataset_id IS NOT NULL AND input_signature IS NOT NULL
++   AND num_nonnulls(logistics_model_version_id,planning_start,planning_end,operating_mode,
++     case_policy_schema_version,case_policy_jsonb,case_policy_hash,context_frozen_at,graph_definition_version)=0
++  ELSE orders_dataset_id IS NULL AND fleet_dataset_id IS NULL AND input_signature IS NULL
++   AND num_nonnulls(logistics_model_version_id,planning_start,planning_end,operating_mode,
++     case_policy_schema_version,case_policy_jsonb,case_policy_hash,graph_definition_version)=8
++   AND planning_start<=planning_end AND case_policy_schema_version='case_policy_v1'
++   AND jsonb_typeof(case_policy_jsonb)='object' END),
++ ADD CONSTRAINT ultimate_case_model FOREIGN KEY(workspace_id,logistics_model_version_id,graph_definition_version)
++   REFERENCES public.logistics_model_versions(workspace_id,id,graph_definition_version) ON DELETE RESTRICT,
++ ADD CONSTRAINT ultimate_case_model_identity UNIQUE(workspace_id,id,logistics_model_version_id);
++CREATE INDEX ultimate_cases_model ON public.decision_cases(workspace_id,logistics_model_version_id,graph_definition_version)
++ WHERE workflow_version=2;
++
++CREATE TABLE public.case_data_packs (
++ id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
++ workspace_id uuid NOT NULL,
++ case_id uuid NOT NULL,
++ current_version_id uuid,
++ revision bigint NOT NULL DEFAULT 1 CHECK(revision>0),
++ created_at timestamptz NOT NULL DEFAULT now(),
++ UNIQUE(workspace_id,id), UNIQUE(workspace_id,case_id), UNIQUE(workspace_id,case_id,id),
++ FOREIGN KEY(workspace_id,case_id) REFERENCES public.decision_cases(workspace_id,id) ON DELETE RESTRICT
++);
++CREATE TABLE public.case_data_pack_versions (
++ id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
++ workspace_id uuid NOT NULL,
++ case_id uuid NOT NULL,
++ pack_id uuid NOT NULL,
++ version integer NOT NULL CHECK(version>0),
++ manifest_hash text NOT NULL CHECK(manifest_hash ~ '^[0-9a-f]{64}$'),
++ contract_set_hash text NOT NULL CHECK(contract_set_hash ~ '^[0-9a-f]{64}$'),
++ created_by uuid NOT NULL,
++ created_at timestamptz NOT NULL DEFAULT now(),
++ -- Server-only guard: entries must be inserted in their version's creation transaction.
++ created_xid xid8 NOT NULL DEFAULT pg_current_xact_id(),
++ UNIQUE(pack_id,version), UNIQUE(workspace_id,id), UNIQUE(workspace_id,case_id,id),
++ UNIQUE(workspace_id,case_id,pack_id,id),
++ FOREIGN KEY(workspace_id,case_id,pack_id) REFERENCES public.case_data_packs(workspace_id,case_id,id) ON DELETE RESTRICT,
++ FOREIGN KEY(workspace_id,created_by) REFERENCES public.workspace_members(workspace_id,user_id) ON DELETE RESTRICT
++);
++CREATE INDEX case_data_pack_versions_history ON public.case_data_pack_versions(workspace_id,case_id,version DESC);
++CREATE INDEX case_data_pack_versions_creator ON public.case_data_pack_versions(workspace_id,created_by);
++ALTER TABLE public.case_data_packs ADD CONSTRAINT ultimate_pack_current_version
++ FOREIGN KEY(workspace_id,case_id,id,current_version_id)
++ REFERENCES public.case_data_pack_versions(workspace_id,case_id,pack_id,id) ON DELETE RESTRICT DEFERRABLE INITIALLY DEFERRED;
++CREATE INDEX case_data_packs_current ON public.case_data_packs(workspace_id,case_id,id,current_version_id);
++
++ALTER TABLE public.datasets
++ ADD COLUMN data_contract_id text,
++ ADD COLUMN data_contract_hash text CHECK(data_contract_hash ~ '^[0-9a-f]{64}$'),
++ ADD COLUMN normalizer_version text,
++ ADD COLUMN canonical_sha256 text CHECK(canonical_sha256 ~ '^[0-9a-f]{64}$'),
++ DROP CONSTRAINT datasets_dataset_type_check,
++ ADD CONSTRAINT datasets_dataset_type_check CHECK(dataset_type IN('logistics_legacy','orders','fleet','transport_demand','transport_resources')),
++ ADD CONSTRAINT ultimate_dataset_contract CHECK(CASE WHEN dataset_type IN('transport_demand','transport_resources') THEN
++  num_nonnulls(data_contract_id,data_contract_hash,normalizer_version,canonical_sha256,sha256,schema_version)=6
++   AND length(data_contract_id) BETWEEN 1 AND 128 AND length(normalizer_version) BETWEEN 1 AND 128
++  ELSE num_nonnulls(data_contract_id,data_contract_hash,normalizer_version,canonical_sha256)=0 END),
++ ADD CONSTRAINT ultimate_dataset_interpretation_identity UNIQUE(workspace_id,id,data_contract_id,data_contract_hash,sha256,canonical_sha256,normalizer_version);
++-- Preserve datasets_dispatch_hash_key's legacy partial predicate without modification.
++CREATE UNIQUE INDEX datasets_ultimate_interpretation ON public.datasets(workspace_id,dataset_type,sha256,data_contract_hash)
++ WHERE dataset_type IN('transport_demand','transport_resources') AND sha256 IS NOT NULL;
++
++CREATE TABLE public.case_data_pack_entries (
++ pack_version_id uuid NOT NULL,
++ slot_key text NOT NULL CHECK(slot_key IN('transport_demand','transport_resources','scheduling_enrichment')),
++ workspace_id uuid NOT NULL,
++ case_id uuid NOT NULL,
++ dataset_id uuid NOT NULL,
++ contract_id text NOT NULL,
++ contract_hash text NOT NULL CHECK(contract_hash ~ '^[0-9a-f]{64}$'),
++ raw_sha256 text NOT NULL CHECK(raw_sha256 ~ '^[0-9a-f]{64}$'),
++ canonical_sha256 text NOT NULL CHECK(canonical_sha256 ~ '^[0-9a-f]{64}$'),
++ normalizer_version text NOT NULL,
++ normalized_bucket text NOT NULL CHECK(normalized_bucket ~ '^[a-z0-9][a-z0-9-]{0,62}$'),
++ normalized_path text NOT NULL,
++ record_count bigint NOT NULL CHECK(record_count>=0),
++ PRIMARY KEY(pack_version_id,slot_key),
++ FOREIGN KEY(workspace_id,case_id,pack_version_id) REFERENCES public.case_data_pack_versions(workspace_id,case_id,id) ON DELETE RESTRICT,
++ FOREIGN KEY(workspace_id,dataset_id,contract_id,contract_hash,raw_sha256,canonical_sha256,normalizer_version)
++  REFERENCES public.datasets(workspace_id,id,data_contract_id,data_contract_hash,sha256,canonical_sha256,normalizer_version) ON DELETE RESTRICT,
++ CHECK(normalized_path=workspace_id::text||'/normalized/'||dataset_id::text||'/'||canonical_sha256||'.json')
++);
++CREATE INDEX case_data_pack_entries_dataset ON public.case_data_pack_entries(workspace_id,dataset_id);
++CREATE INDEX case_data_pack_entries_case ON public.case_data_pack_entries(workspace_id,case_id,pack_version_id);
++
++ALTER TABLE public.decision_runs
++ ADD COLUMN workflow_version smallint NOT NULL DEFAULT 1 CHECK(workflow_version IN(1,2)),
++ ADD COLUMN logistics_model_version_id uuid,
++ ADD COLUMN data_pack_version_id uuid,
++ ADD COLUMN graph_definition_version text REFERENCES dation_private.decision_definition_versions(version) ON DELETE RESTRICT,
++ ADD COLUMN case_policy_hash text CHECK(case_policy_hash ~ '^[0-9a-f]{64}$'),
++ ADD COLUMN node_policy_hash text CHECK(node_policy_hash ~ '^[0-9a-f]{64}$'),
++ ADD COLUMN contract_hash text CHECK(contract_hash ~ '^[0-9a-f]{64}$'),
++ ADD COLUMN input_context_hash text CHECK(input_context_hash ~ '^[0-9a-f]{64}$'),
++ ADD COLUMN transit_model_version text,
++ ADD COLUMN runtime_profile text,
++ ADD COLUMN result_schema_version integer,
++ ADD COLUMN invalidated_by_pack_version_id uuid,
++ ADD CONSTRAINT ultimate_run_invalidation_cause CHECK(invalidated_by_pack_version_id IS NULL OR superseded_at IS NOT NULL),
++ ADD CONSTRAINT ultimate_run_model FOREIGN KEY(workspace_id,decision_case_id,logistics_model_version_id)
++  REFERENCES public.decision_cases(workspace_id,id,logistics_model_version_id) ON DELETE RESTRICT,
++ ADD CONSTRAINT ultimate_run_pack FOREIGN KEY(workspace_id,decision_case_id,data_pack_version_id)
++  REFERENCES public.case_data_pack_versions(workspace_id,case_id,id) ON DELETE RESTRICT,
++ ADD CONSTRAINT ultimate_run_invalidation_pack FOREIGN KEY(workspace_id,decision_case_id,invalidated_by_pack_version_id)
++  REFERENCES public.case_data_pack_versions(workspace_id,case_id,id) ON DELETE RESTRICT,
++ ADD CONSTRAINT ultimate_run_context CHECK(CASE WHEN workflow_version=1 THEN
++   schema_version NOT IN('transport_plan_v1','day_scheduling_v1') AND num_nonnulls(logistics_model_version_id,data_pack_version_id,graph_definition_version,case_policy_hash,node_policy_hash,
++    contract_hash,input_context_hash,transit_model_version,runtime_profile,result_schema_version,invalidated_by_pack_version_id)=0
++  ELSE num_nonnulls(decision_case_id,node_id,logistics_model_version_id,data_pack_version_id,graph_definition_version,case_policy_hash,
++    node_policy_hash,contract_hash,input_context_hash,transit_model_version,runtime_profile,result_schema_version)=12
++   AND orders_dataset_id IS NULL AND fleet_dataset_id IS NULL AND engine_version='2.0.0' AND result_schema_version=1
++   AND transit_model_version='DATION_TRANSIT_V1' AND runtime_profile=schema_version
++   AND ((node_id='logistics_assignment' AND schema_version='transport_plan_v1' AND engine_name='transport_plan')
++     OR (node_id='logistics_scheduling' AND schema_version='day_scheduling_v1' AND engine_name='day_scheduling')) END);
++CREATE INDEX ultimate_runs_context ON public.decision_runs(workspace_id,decision_case_id,data_pack_version_id);
++CREATE INDEX ultimate_runs_model ON public.decision_runs(workspace_id,decision_case_id,logistics_model_version_id);
++CREATE INDEX ultimate_runs_graph ON public.decision_runs(graph_definition_version);
++CREATE INDEX ultimate_runs_invalidated ON public.decision_runs(workspace_id,decision_case_id,invalidated_by_pack_version_id)
++ WHERE invalidated_by_pack_version_id IS NOT NULL;
++
++ALTER TABLE public.decision_approval_events
++ ADD COLUMN reason_code text CHECK(reason_code IN('INPUT_READ_SET_CHANGED','UPSTREAM_INVALIDATED','RUN_REPLACED')),
++ ADD COLUMN caused_by_pack_version_id uuid,
++ ADD CONSTRAINT ultimate_approval_pack FOREIGN KEY(workspace_id,case_id,caused_by_pack_version_id)
++  REFERENCES public.case_data_pack_versions(workspace_id,case_id,id) ON DELETE RESTRICT,
++ ADD CONSTRAINT ultimate_approval_cause CHECK(CASE WHEN reason_code='INPUT_READ_SET_CHANGED' THEN
++   caused_by_pack_version_id IS NOT NULL AND action='superseded'
++  ELSE caused_by_pack_version_id IS NULL END);
++CREATE INDEX ultimate_approval_cause ON public.decision_approval_events(workspace_id,case_id,caused_by_pack_version_id)
++ WHERE caused_by_pack_version_id IS NOT NULL;
++ALTER TABLE public.decision_runs DROP CONSTRAINT decision_runs_superseded_requires_approval_check;
++ALTER TABLE public.decision_runs ADD CONSTRAINT decision_runs_superseded_requires_approval_check CHECK(
++ superseded_at IS NULL OR approved_at IS NOT NULL OR superseded_by_run_id IS NOT NULL
++ OR (workflow_version=2 AND invalidated_by_pack_version_id IS NOT NULL));
++
++CREATE FUNCTION dation_private.ultimate_immutable() RETURNS trigger
++LANGUAGE plpgsql SET search_path=pg_catalog AS $$
++BEGIN RAISE EXCEPTION 'Published Ultimate snapshot is immutable' USING ERRCODE='22023'; END; $$;
++CREATE TRIGGER ultimate_definition_immutable BEFORE UPDATE OR DELETE ON dation_private.decision_definition_versions
++ FOR EACH ROW EXECUTE FUNCTION dation_private.ultimate_immutable();
++CREATE TRIGGER ultimate_model_version_immutable BEFORE UPDATE OR DELETE ON public.logistics_model_versions
++ FOR EACH ROW EXECUTE FUNCTION dation_private.ultimate_immutable();
++CREATE TRIGGER ultimate_pack_version_immutable BEFORE UPDATE OR DELETE ON public.case_data_pack_versions
++ FOR EACH ROW EXECUTE FUNCTION dation_private.ultimate_immutable();
++CREATE TRIGGER ultimate_pack_entry_immutable BEFORE UPDATE OR DELETE ON public.case_data_pack_entries
++ FOR EACH ROW EXECUTE FUNCTION dation_private.ultimate_immutable();
++
++CREATE FUNCTION dation_private.ultimate_dataset_identity() RETURNS trigger
++LANGUAGE plpgsql SET search_path=pg_catalog AS $$
++BEGIN
++ IF ROW(NEW.data_contract_id,NEW.data_contract_hash,NEW.normalizer_version,NEW.canonical_sha256)
++ IS DISTINCT FROM ROW(OLD.data_contract_id,OLD.data_contract_hash,OLD.normalizer_version,OLD.canonical_sha256) THEN
++  RAISE EXCEPTION 'Dataset interpretation is immutable; create a new version' USING ERRCODE='22023'; END IF;
++ RETURN NEW;
++END; $$;
++CREATE TRIGGER ultimate_dataset_identity BEFORE UPDATE ON public.datasets
++ FOR EACH ROW EXECUTE FUNCTION dation_private.ultimate_dataset_identity();
++
++CREATE FUNCTION dation_private.ultimate_case_guard() RETURNS trigger
++LANGUAGE plpgsql SET search_path=pg_catalog AS $$
++BEGIN
++ IF TG_OP='UPDATE' THEN
++  IF NEW.workflow_version<>OLD.workflow_version OR NEW.logistics_model_version_id IS DISTINCT FROM OLD.logistics_model_version_id
++    OR NEW.graph_definition_version IS DISTINCT FROM OLD.graph_definition_version THEN
++   RAISE EXCEPTION 'Case cohort/model binding is immutable' USING ERRCODE='22023'; END IF;
++  IF OLD.workflow_version=2 AND (NEW.state_json IS DISTINCT FROM OLD.state_json OR
++   (OLD.context_frozen_at IS NOT NULL AND ROW(NEW.planning_start,NEW.planning_end,NEW.operating_mode,
++     NEW.case_policy_schema_version,NEW.case_policy_jsonb,NEW.case_policy_hash,NEW.context_frozen_at)
++    IS DISTINCT FROM ROW(OLD.planning_start,OLD.planning_end,OLD.operating_mode,
++     OLD.case_policy_schema_version,OLD.case_policy_jsonb,OLD.case_policy_hash,OLD.context_frozen_at))) THEN
++   RAISE EXCEPTION 'Ultimate context cannot be overwritten by a legacy write' USING ERRCODE='22023'; END IF;
++ END IF;
++ RETURN NEW;
++END; $$;
++CREATE TRIGGER ultimate_case_context_guard BEFORE UPDATE ON public.decision_cases
++ FOR EACH ROW EXECUTE FUNCTION dation_private.ultimate_case_guard();
++
++CREATE FUNCTION dation_private.ultimate_pack_guard() RETURNS trigger
++LANGUAGE plpgsql SET search_path=pg_catalog AS $$
++DECLARE cohort smallint; version_xid xid8; actual_type text;
++BEGIN
++ IF TG_TABLE_NAME='case_data_packs' THEN
++  SELECT workflow_version INTO cohort FROM public.decision_cases WHERE workspace_id=NEW.workspace_id AND id=NEW.case_id;
++  IF cohort IS NOT NULL AND cohort<>2 THEN RAISE EXCEPTION 'Progressive Pack requires an Ultimate Case' USING ERRCODE='22023'; END IF;
++  IF TG_OP='UPDATE' AND ROW(NEW.id,NEW.workspace_id,NEW.case_id,NEW.created_at)
++    IS DISTINCT FROM ROW(OLD.id,OLD.workspace_id,OLD.case_id,OLD.created_at) THEN
++   RAISE EXCEPTION 'Pack identity is immutable' USING ERRCODE='22023'; END IF;
++ ELSIF TG_TABLE_NAME='case_data_pack_versions' THEN NEW.created_xid=pg_current_xact_id();
++ ELSE
++  SELECT created_xid INTO version_xid FROM public.case_data_pack_versions
++   WHERE workspace_id=NEW.workspace_id AND case_id=NEW.case_id AND id=NEW.pack_version_id;
++  IF NOT FOUND THEN RETURN NEW; END IF; -- The composite FK rejects an absent/cross-tenant version.
++  IF version_xid IS DISTINCT FROM pg_current_xact_id() THEN
++   RAISE EXCEPTION 'Entries belong to the immutable version creation transaction' USING ERRCODE='22023'; END IF;
++  SELECT dataset_type INTO actual_type FROM public.datasets WHERE workspace_id=NEW.workspace_id AND id=NEW.dataset_id;
++  IF NOT FOUND THEN RETURN NEW; END IF; -- The interpretation FK is authoritative.
++  IF NEW.slot_key IN('transport_demand','transport_resources') AND actual_type IS DISTINCT FROM NEW.slot_key THEN
++   RAISE EXCEPTION 'Pack slot conflicts with dataset contract' USING ERRCODE='22023'; END IF;
++ END IF;
++ RETURN NEW;
++END; $$;
++CREATE TRIGGER ultimate_pack_guard BEFORE INSERT OR UPDATE ON public.case_data_packs FOR EACH ROW EXECUTE FUNCTION dation_private.ultimate_pack_guard();
++CREATE TRIGGER ultimate_pack_version_creation BEFORE INSERT ON public.case_data_pack_versions FOR EACH ROW EXECUTE FUNCTION dation_private.ultimate_pack_guard();
++CREATE TRIGGER ultimate_pack_entry_creation BEFORE INSERT ON public.case_data_pack_entries FOR EACH ROW EXECUTE FUNCTION dation_private.ultimate_pack_guard();
++CREATE TRIGGER ultimate_model_workspace BEFORE UPDATE ON public.logistics_models
++ FOR EACH ROW EXECUTE FUNCTION dation_private.protect_workspace();
++
++CREATE FUNCTION dation_private.ultimate_case_pack_complete() RETURNS trigger
++LANGUAGE plpgsql SET search_path=pg_catalog AS $$
++BEGIN
++ IF TG_TABLE_NAME='decision_cases' THEN
++  IF NEW.workflow_version=2 AND NOT EXISTS(SELECT 1 FROM public.case_data_packs
++   WHERE workspace_id=NEW.workspace_id AND case_id=NEW.id AND current_version_id IS NOT NULL) THEN
++   RAISE EXCEPTION 'Ultimate Case and initial Pack/version must commit together' USING ERRCODE='23514'; END IF;
++ ELSE
++  IF EXISTS(SELECT 1 FROM public.case_data_packs WHERE id=NEW.id AND current_version_id IS NULL) THEN
++   RAISE EXCEPTION 'Stable Pack must commit with a current version' USING ERRCODE='23514'; END IF;
++ END IF;
++ RETURN NULL;
++END; $$;
++CREATE CONSTRAINT TRIGGER ultimate_case_pack_complete AFTER INSERT ON public.decision_cases
++ DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION dation_private.ultimate_case_pack_complete();
++CREATE CONSTRAINT TRIGGER ultimate_pack_complete AFTER INSERT OR UPDATE ON public.case_data_packs
++ DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION dation_private.ultimate_case_pack_complete();
++
++CREATE FUNCTION dation_private.ultimate_run_guard() RETURNS trigger
++LANGUAGE plpgsql SET search_path=pg_catalog AS $$
++DECLARE c public.decision_cases;
++BEGIN
++ IF NEW.decision_case_id IS NOT NULL THEN
++  SELECT * INTO c FROM public.decision_cases WHERE workspace_id=NEW.workspace_id AND id=NEW.decision_case_id;
++  IF FOUND AND c.workflow_version<>NEW.workflow_version THEN
++   RAISE EXCEPTION 'Run/Case cohorts differ' USING ERRCODE='22023'; END IF;
++ END IF;
++ IF TG_OP='UPDATE' AND ROW(NEW.workflow_version,NEW.logistics_model_version_id,NEW.data_pack_version_id,
++  NEW.graph_definition_version,NEW.case_policy_hash,NEW.node_policy_hash,NEW.contract_hash,NEW.input_context_hash,
++  NEW.transit_model_version,NEW.runtime_profile,NEW.result_schema_version)
++ IS DISTINCT FROM ROW(OLD.workflow_version,OLD.logistics_model_version_id,OLD.data_pack_version_id,
++  OLD.graph_definition_version,OLD.case_policy_hash,OLD.node_policy_hash,OLD.contract_hash,OLD.input_context_hash,
++  OLD.transit_model_version,OLD.runtime_profile,OLD.result_schema_version) THEN
++  RAISE EXCEPTION 'Run context pinning is immutable' USING ERRCODE='22023'; END IF;
++ IF NEW.workflow_version=2 THEN
++  IF c.context_frozen_at IS NULL OR NEW.case_policy_hash IS DISTINCT FROM c.case_policy_hash
++    OR NEW.graph_definition_version IS DISTINCT FROM c.graph_definition_version THEN
++   RAISE EXCEPTION 'Run requires the frozen Case policy/graph' USING ERRCODE='22023'; END IF;
++  IF NOT EXISTS(SELECT 1 FROM public.case_data_pack_entries WHERE workspace_id=NEW.workspace_id
++    AND case_id=NEW.decision_case_id AND pack_version_id=NEW.data_pack_version_id
++    AND slot_key='transport_demand' AND dataset_id=NEW.dataset_id) THEN
++   RAISE EXCEPTION 'Run primary raw Demand must belong to its Pack' USING ERRCODE='22023'; END IF;
++  IF NEW.status='completed' AND (NEW.result_json->>'result_schema' IS DISTINCT FROM NEW.schema_version
++    OR NEW.result_json->>'result_schema_version' IS DISTINCT FROM NEW.result_schema_version::text) THEN
++   RAISE EXCEPTION 'Run/package schema mismatch' USING ERRCODE='22023'; END IF;
++ END IF;
++ RETURN NEW;
++END; $$;
++CREATE TRIGGER ultimate_run_context_guard BEFORE INSERT OR UPDATE ON public.decision_runs
++ FOR EACH ROW EXECUTE FUNCTION dation_private.ultimate_run_guard();
++
++-- Explicit object ACLs neutralize broad Supabase defaults for NEW objects only.
++DO $$ DECLARE relation_name text; BEGIN
++ FOREACH relation_name IN ARRAY ARRAY['logistics_models','logistics_model_versions','case_data_packs','case_data_pack_versions','case_data_pack_entries'] LOOP
++  EXECUTE format('ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY',relation_name);
++  EXECUTE format('ALTER TABLE public.%I FORCE ROW LEVEL SECURITY',relation_name);
++  EXECUTE format('REVOKE ALL ON public.%I FROM PUBLIC,anon,authenticated,service_role',relation_name);
++  EXECUTE format('GRANT SELECT ON public.%I TO authenticated,service_role',relation_name);
++  EXECUTE format('CREATE POLICY tenant_read ON public.%I FOR SELECT TO authenticated USING(dation_private.is_member(workspace_id))',relation_name);
++ END LOOP;
++END; $$;
++REVOKE ALL ON FUNCTION dation_private.ultimate_immutable(),dation_private.ultimate_case_guard(),
++ dation_private.ultimate_pack_guard(),dation_private.ultimate_case_pack_complete(),dation_private.ultimate_run_guard(),dation_private.ultimate_dataset_identity()
++ FROM PUBLIC,anon,authenticated,service_role;
++
++-- Targeted dual-reader changes preserve existing function identities/ACLs/authority.
++DO $reader$ DECLARE source text; BEGIN
++ source=pg_get_functiondef('dation_private.list_decision_cases(text,integer,integer,boolean)'::regprocedure);
++ IF strpos(source,'FROM page c JOIN public.datasets o')=0 OR strpos(source,'JOIN public.datasets f ON f.id=c.fleet_dataset_id')=0 THEN
++  RAISE EXCEPTION 'Unexpected Case-list reader; review compatibility'; END IF;
++ source=replace(source,'FROM page c JOIN public.datasets o','FROM page c LEFT JOIN public.datasets o');
++ source=replace(source,'JOIN public.datasets f ON f.id=c.fleet_dataset_id','LEFT JOIN public.datasets f ON f.id=c.fleet_dataset_id');
++ source=replace(source,'CASE WHEN summary_only THEN','CASE WHEN o.id IS NULL THEN NULL WHEN summary_only THEN');
++ -- The second projection refers to f, not o.
++ source=replace(source,'CASE WHEN o.id IS NULL THEN NULL WHEN summary_only THEN jsonb_build_object('||chr(10)||'     ''id'',f.id',
++  'CASE WHEN f.id IS NULL THEN NULL WHEN summary_only THEN jsonb_build_object('||chr(10)||'     ''id'',f.id');
++ EXECUTE source;
++ source=pg_get_functiondef('public.platform_home(uuid,uuid)'::regprocedure);
++ IF strpos(source,'JOIN datasets o ON o.id=c.orders_dataset_id')=0 THEN RAISE EXCEPTION 'Unexpected Home reader'; END IF;
++ source=replace(source,'JOIN datasets o ON o.id=c.orders_dataset_id','LEFT JOIN datasets o ON o.id=c.orders_dataset_id');
++ source=replace(source,'''last_activity_at'',c.last_activity_at,''is_demo''',
++  '''workflow_version'',c.workflow_version,''logistics_model_version_id'',c.logistics_model_version_id,''planning_start'',c.planning_start,''planning_end'',c.planning_end,''last_activity_at'',c.last_activity_at,''is_demo''');
++ source=replace(source,'o.canonical_filename,o.original_filename)',
++  'o.canonical_filename,o.original_filename,''DC-''||upper(left(c.id::text,8)))');
++ EXECUTE source;
++ source=pg_get_functiondef('dation_private.dataset_referenced(uuid,uuid)'::regprocedure);
++ source=replace(source,'BEGIN'||chr(10),'BEGIN'||chr(10)||
++  ' IF EXISTS(SELECT 1 FROM public.case_data_pack_entries WHERE workspace_id=wid AND dataset_id=did) THEN RETURN true; END IF;'||chr(10));
++ EXECUTE source;
++ source=pg_get_functiondef('dation_private.dataset_case_usage(uuid,uuid)'::regprocedure);
++ source=replace(source,'(c.orders_dataset_id=did OR c.fleet_dataset_id=did OR EXISTS(',
++  '(c.orders_dataset_id=did OR c.fleet_dataset_id=did OR EXISTS(SELECT 1 FROM public.case_data_pack_entries e WHERE e.workspace_id=wid AND e.case_id=c.id AND e.dataset_id=did) OR EXISTS(');
++ EXECUTE source;
++END; $reader$;
++
++NOTIFY pgrst,'reload schema';
++COMMIT;
+diff --git a/supabase/migrations/20261026144259_ultimate_result_artifacts.sql b/supabase/migrations/20261026144259_ultimate_result_artifacts.sql
+new file mode 100644
+index 0000000..504e09f
+--- /dev/null
++++ b/supabase/migrations/20261026144259_ultimate_result_artifacts.sql
+@@ -0,0 +1,169 @@
++-- T2 metadata preparation. No object upload, publishing RPC or Storage configuration.
++BEGIN;
++SET LOCAL lock_timeout='5s';
++SET LOCAL statement_timeout='90s';
++ALTER TABLE public.decision_runs
++ ADD COLUMN result_package_version integer,
++ ADD COLUMN assembler_version text,
++ ADD COLUMN artifact_manifest_hash text CHECK(artifact_manifest_hash ~ '^[0-9a-f]{64}$'),
++ ADD COLUMN core_fingerprint text CHECK(core_fingerprint ~ '^[0-9a-f]{64}$'),
++ ADD CONSTRAINT ultimate_run_result_identity UNIQUE(workspace_id,id,result_fingerprint),
++ ADD CONSTRAINT ultimate_run_publication CHECK(CASE WHEN workflow_version=1 THEN
++   num_nonnulls(result_package_version,assembler_version,artifact_manifest_hash,core_fingerprint)=0
++  ELSE (result_package_version IS NULL OR result_package_version=1) AND
++   (status<>'completed' OR (num_nonnulls(result_package_version,assembler_version,artifact_manifest_hash,core_fingerprint,result_fingerprint)=5
++     AND result_json#>>'{fingerprints,result_fingerprint}' IS NOT DISTINCT FROM result_fingerprint
++     AND result_json#>>'{fingerprints,core_result_fingerprint}' IS NOT DISTINCT FROM core_fingerprint
++     AND result_json->>'assembler_version' IS NOT DISTINCT FROM assembler_version)) END);
++
++CREATE TABLE public.decision_result_artifacts (
++ id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
++ workspace_id uuid NOT NULL,
++ run_id uuid NOT NULL,
++ kind text NOT NULL CHECK(kind IN('CORE','EVIDENCE','ENTITY_EVIDENCE','DETAIL_DATASET','VISUAL','EXPORT_ROWS','AI_BASE','ALTERNATIVE_PLAN')),
++ part_key text NOT NULL CHECK(part_key ~ '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$'),
++ artifact_schema text NOT NULL CHECK(artifact_schema IN('transport_trip_v1','demand_resolution_v1','resource_usage_v1',
++  'day_schedule_trip_v1','resource_timeline_v1','service_analysis_v1','entity_evidence_v1','reason_emission_v1',
++  'export_rows_v1','decision_context_v1','engine_core_v1','engine_evidence_v1','sankey_projection_v1','day_gantt_projection_v1')),
++ schema_version integer NOT NULL CHECK(schema_version=1),
++ content_sha256 text NOT NULL CHECK(content_sha256 ~ '^[0-9a-f]{64}$'),
++ size_bytes bigint NOT NULL CHECK(size_bytes>=0),
++ media_type text NOT NULL CHECK(media_type IN('application/json','application/x-ndjson')),
++ storage_bucket text NOT NULL CHECK(storage_bucket ~ '^[a-z0-9][a-z0-9-]{0,62}$'),
++ storage_path text NOT NULL,
++ assembler_version text NOT NULL CHECK(assembler_version ~ '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$'),
++ core_fingerprint text NOT NULL CHECK(core_fingerprint ~ '^[0-9a-f]{64}$'),
++ result_fingerprint text CHECK(result_fingerprint ~ '^[0-9a-f]{64}$'),
++ publication_state text NOT NULL DEFAULT 'PREPARED' CHECK(publication_state IN('PREPARED','READY')),
++ lookup_keys text[] NOT NULL DEFAULT '{}' CHECK(cardinality(lookup_keys)<=100 AND array_position(lookup_keys,NULL) IS NULL),
++ producer_lease_token uuid NOT NULL,
++ producer_generation bigint NOT NULL CHECK(producer_generation>0),
++ producer_metadata jsonb NOT NULL CHECK(jsonb_typeof(producer_metadata)='object' AND octet_length(producer_metadata::text)<=16384),
++ created_at timestamptz NOT NULL DEFAULT now(),
++ UNIQUE(workspace_id,id), UNIQUE(workspace_id,run_id,kind,part_key,content_sha256),
++ UNIQUE(storage_bucket,storage_path),
++ FOREIGN KEY(workspace_id,run_id) REFERENCES public.decision_runs(workspace_id,id) ON DELETE RESTRICT,
++ CONSTRAINT ultimate_artifact_published_run FOREIGN KEY(workspace_id,run_id,result_fingerprint)
++  REFERENCES public.decision_runs(workspace_id,id,result_fingerprint) ON DELETE RESTRICT DEFERRABLE INITIALLY DEFERRED,
++ CHECK((publication_state='PREPARED' AND result_fingerprint IS NULL)
++   OR (publication_state='READY' AND result_fingerprint IS NOT NULL)),
++ CHECK(storage_path=workspace_id::text||'/runs/'||run_id::text||'/'||lower(kind)||'/'||part_key||'/'||content_sha256||
++   CASE WHEN media_type='application/json' THEN '.json' ELSE '.jsonl' END)
++);
++CREATE INDEX decision_result_artifacts_lookup ON public.decision_result_artifacts(workspace_id,run_id,kind,part_key);
++CREATE INDEX decision_result_artifacts_binding ON public.decision_result_artifacts(workspace_id,run_id,result_fingerprint);
++CREATE INDEX decision_result_artifacts_entities ON public.decision_result_artifacts USING gin(lookup_keys);
++ALTER TABLE public.decision_result_artifacts ENABLE ROW LEVEL SECURITY;
++ALTER TABLE public.decision_result_artifacts FORCE ROW LEVEL SECURITY;
++-- Storage locators remain server-only; membership-checked retrieval is T8.
++REVOKE ALL ON public.decision_result_artifacts FROM PUBLIC,anon,authenticated,service_role;
++GRANT SELECT ON public.decision_result_artifacts TO service_role;
++
++CREATE FUNCTION dation_private.ultimate_artifact_guard() RETURNS trigger
++LANGUAGE plpgsql SET search_path=pg_catalog AS $$
++DECLARE key text;
++BEGIN
++ IF TG_OP<>'INSERT' THEN
++  IF OLD.publication_state='READY' THEN RAISE EXCEPTION 'READY artifact is immutable' USING ERRCODE='22023'; END IF;
++  IF TG_OP='DELETE' THEN RETURN OLD; END IF;
++  IF (to_jsonb(NEW)-'publication_state'-'result_fingerprint') IS DISTINCT FROM
++     (to_jsonb(OLD)-'publication_state'-'result_fingerprint') THEN
++   RAISE EXCEPTION 'Prepared artifact identity is immutable' USING ERRCODE='22023'; END IF;
++ END IF;
++ FOREACH key IN ARRAY NEW.lookup_keys LOOP
++  IF key !~ '^(ORDER|TRIP|RESOURCE|ALTERNATIVE|EXCEPTION)/[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$' THEN
++   RAISE EXCEPTION 'Invalid entity lookup key' USING ERRCODE='22023'; END IF;
++ END LOOP;
++ IF NOT EXISTS(SELECT 1 FROM public.decision_runs WHERE workspace_id=NEW.workspace_id AND id=NEW.run_id AND workflow_version=2) THEN
++  RAISE EXCEPTION 'Artifacts require an Ultimate Run' USING ERRCODE='22023'; END IF;
++ RETURN NEW;
++END; $$;
++CREATE TRIGGER ultimate_artifact_identity BEFORE INSERT OR UPDATE OR DELETE ON public.decision_result_artifacts
++ FOR EACH ROW EXECUTE FUNCTION dation_private.ultimate_artifact_guard();
++
++-- Deferred so a future publisher can bind metadata and the package in one transaction.
++-- This proves the metadata/package binding, not remote bytes or a worker lease fence (T8).
++CREATE FUNCTION dation_private.ultimate_artifact_ready() RETURNS trigger
++LANGUAGE plpgsql SET search_path=pg_catalog AS $$
++DECLARE a public.decision_result_artifacts; r public.decision_runs; descriptor jsonb;
++BEGIN
++ SELECT * INTO a FROM public.decision_result_artifacts WHERE id=NEW.id;
++ IF NOT FOUND OR a.publication_state<>'READY' THEN RETURN NULL; END IF;
++ SELECT * INTO r FROM public.decision_runs WHERE workspace_id=a.workspace_id AND id=a.run_id;
++ descriptor=jsonb_build_object('artifact_id',a.id,'workspace_id',a.workspace_id,'run_id',a.run_id,
++  'kind',a.kind,'part_key',a.part_key,'artifact_schema',a.artifact_schema,'schema_version',a.schema_version,
++  'content_sha256',a.content_sha256,'size_bytes',a.size_bytes,'media_type',a.media_type,
++  'core_fingerprint',a.core_fingerprint,'assembler_version',a.assembler_version);
++ IF r.status<>'completed' OR r.result_package_version IS DISTINCT FROM 1
++  OR r.result_fingerprint IS DISTINCT FROM a.result_fingerprint OR r.core_fingerprint IS DISTINCT FROM a.core_fingerprint
++  OR r.assembler_version IS DISTINCT FROM a.assembler_version OR r.artifact_manifest_hash IS NULL
++  OR NOT EXISTS(SELECT 1 FROM jsonb_array_elements(coalesce(r.result_json#>'{artifact_manifest,artifacts}','[]')) item
++    WHERE item @> descriptor) THEN
++  RAISE EXCEPTION 'READY artifact requires its exact published Run/manifest binding' USING ERRCODE='23514'; END IF;
++ RETURN NULL;
++END; $$;
++CREATE CONSTRAINT TRIGGER ultimate_artifact_ready AFTER INSERT OR UPDATE ON public.decision_result_artifacts
++ DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION dation_private.ultimate_artifact_ready();
++
++CREATE FUNCTION dation_private.ultimate_publication_identity() RETURNS trigger
++LANGUAGE plpgsql SET search_path=pg_catalog AS $$
++BEGIN
++ IF OLD.status IN('completed','error') AND ROW(NEW.result_package_version,NEW.assembler_version,NEW.artifact_manifest_hash,NEW.core_fingerprint)
++ IS DISTINCT FROM ROW(OLD.result_package_version,OLD.assembler_version,OLD.artifact_manifest_hash,OLD.core_fingerprint) THEN
++  RAISE EXCEPTION 'Terminal publication metadata is immutable' USING ERRCODE='22023'; END IF;
++ RETURN NEW;
++END; $$;
++CREATE TRIGGER ultimate_publication_identity BEFORE UPDATE ON public.decision_runs
++ FOR EACH ROW EXECUTE FUNCTION dation_private.ultimate_publication_identity();
++
++ALTER TABLE public.decision_interpretation_sources
++ ADD COLUMN provenance_version integer,
++ ADD COLUMN result_fingerprint text CHECK(result_fingerprint ~ '^[0-9a-f]{64}$'),
++ ADD COLUMN decision_context_schema text,
++ ADD COLUMN decision_context_hash text CHECK(decision_context_hash ~ '^[0-9a-f]{64}$'),
++ ADD COLUMN mode text,
++ ADD COLUMN selected_entity jsonb,
++ ADD COLUMN evidence_refs jsonb,
++ ADD CONSTRAINT ultimate_interpretation_provenance CHECK(CASE WHEN provenance_version IS NULL THEN
++   num_nonnulls(result_fingerprint,decision_context_schema,decision_context_hash,mode,selected_entity,evidence_refs)=0
++  ELSE provenance_version=2 AND num_nonnulls(result_fingerprint,decision_context_schema,decision_context_hash,mode,evidence_refs)=5
++   AND decision_context_schema='decision_context_v1' AND mode IN('EXPLAIN','EXPLORE','COMPARE','REVIEW')
++   AND jsonb_typeof(evidence_refs)='array' AND octet_length(evidence_refs::text)<=51200
++   AND (selected_entity IS NULL OR (jsonb_typeof(selected_entity)='object' AND
++     selected_entity ?& ARRAY['type','id'] AND selected_entity-'type'-'id'='{}'::jsonb AND
++     jsonb_typeof(selected_entity->'type')='string' AND jsonb_typeof(selected_entity->'id')='string' AND
++     selected_entity->>'type' IN('CASE','TRIP','ORDER','RESOURCE','ALTERNATIVE') AND
++     selected_entity->>'id' ~ '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$')) END),
++ ADD CONSTRAINT ultimate_interpretation_result FOREIGN KEY(workspace_id,run_id,result_fingerprint)
++  REFERENCES public.decision_runs(workspace_id,id,result_fingerprint) ON DELETE RESTRICT;
++CREATE INDEX ultimate_interpretation_context ON public.decision_interpretation_sources(workspace_id,run_id,result_fingerprint,decision_context_hash)
++ WHERE provenance_version IS NOT NULL;
++
++CREATE FUNCTION dation_private.ultimate_interpretation_guard() RETURNS trigger
++LANGUAGE plpgsql SET search_path=pg_catalog AS $$
++DECLARE ref jsonb;
++BEGIN
++ IF TG_OP='UPDATE' THEN
++  IF NEW IS DISTINCT FROM OLD THEN RAISE EXCEPTION 'Interpretation provenance is immutable' USING ERRCODE='22023'; END IF;
++  RETURN NEW;
++ END IF;
++ IF NEW.provenance_version IS NOT NULL THEN
++  IF NOT EXISTS(SELECT 1 FROM public.decision_runs WHERE workspace_id=NEW.workspace_id AND id=NEW.run_id
++    AND result_fingerprint=NEW.result_fingerprint AND workflow_version=2 AND status='completed' AND result_package_version=1) THEN
++   RAISE EXCEPTION 'Interpretation requires the published Ultimate result' USING ERRCODE='22023'; END IF;
++  FOR ref IN SELECT value FROM jsonb_array_elements(NEW.evidence_refs) LOOP
++   IF NOT EXISTS(SELECT 1 FROM public.decision_result_artifacts WHERE workspace_id=NEW.workspace_id AND run_id=NEW.run_id
++     AND result_fingerprint=NEW.result_fingerprint AND publication_state='READY'
++     AND id::text=ref->>'artifact_id' AND content_sha256=ref->>'content_sha256') THEN
++    RAISE EXCEPTION 'Interpretation evidence must belong to the same published Run' USING ERRCODE='22023'; END IF;
++  END LOOP;
++ END IF;
++ RETURN NEW;
++END; $$;
++CREATE TRIGGER ultimate_interpretation_guard BEFORE INSERT OR UPDATE ON public.decision_interpretation_sources
++ FOR EACH ROW EXECUTE FUNCTION dation_private.ultimate_interpretation_guard();
++REVOKE ALL ON FUNCTION dation_private.ultimate_artifact_guard(),dation_private.ultimate_artifact_ready(),
++ dation_private.ultimate_publication_identity(),dation_private.ultimate_interpretation_guard()
++ FROM PUBLIC,anon,authenticated,service_role;
++NOTIFY pgrst,'reload schema';
++COMMIT;

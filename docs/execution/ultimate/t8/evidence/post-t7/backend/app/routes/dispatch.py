@@ -1,0 +1,505 @@
+from pathlib import Path
+from typing import Literal
+from uuid import UUID, uuid4
+
+import httpx
+import logging
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    HTTPException,
+    Query,
+    UploadFile,
+)
+from fastapi.responses import Response, JSONResponse
+from pydantic import BaseModel, ConfigDict, Field, model_validator
+
+from app.auth import require_upload_access
+from app.models.assignment_config import (
+    AssignmentConfig,
+    AssignmentOptions,
+    AssignmentResourceMode,
+    AssignmentScopeFilter,
+)
+from app.models.dispatch_config import DispatchConfig, DispatchOptions
+from app.models.scheduling_config import SchedulingConfig, SchedulingOptions
+from app.services import decision_case_service as case_service
+from app.services import dispatch_service as service
+from app.services import dispatch_job_service as jobs
+from app.services.assignment_config_service import preview_assignment_configuration
+from app.validators.contracts import public_contracts, template_csv
+
+
+router = APIRouter(
+    dependencies=[Depends(require_upload_access)]
+)
+
+
+class Inputs(BaseModel):
+    orders_dataset_id: UUID
+    fleet_dataset_id: UUID
+    allow_third_party: bool = True
+
+
+class AssignmentPreviewRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    orders_dataset_id: UUID
+    fleet_dataset_id: UUID
+    filters: list[AssignmentScopeFilter] = Field(default_factory=list, max_length=12)
+    resource_mode: AssignmentResourceMode = "mixed"
+
+
+class DecisionCaseRef(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    case_id: UUID
+    node_id: Literal["logistics_assignment", "logistics_scheduling"]
+
+
+from app.models.case_identity import CaseIdentity
+
+class DecisionCaseCreate(CaseIdentity):
+    model_config = ConfigDict(extra="forbid")
+
+    id: UUID
+    orders_dataset_id: UUID
+    fleet_dataset_id: UUID
+    state: dict | None = None
+
+
+class DecisionCaseUpdate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    status: Literal["active", "completed", "archived"] | None = None
+    state: dict | None = None
+
+    @model_validator(mode="after")
+    def non_empty(self):
+        if self.status is None and self.state is None:
+            raise ValueError("Indicá un estado o un snapshot para actualizar el caso.")
+        return self
+
+
+class RunRequest(BaseModel):
+    orders_dataset_id: UUID
+    fleet_dataset_id: UUID
+    configuration: dict = Field(default_factory=dict)
+    options: dict = Field(default_factory=dict)
+    decision_case: DecisionCaseRef | None = None
+    source_run_id: UUID | None = None
+
+    @model_validator(mode="after")
+    def canonical(self):
+        node_id = (
+            self.decision_case.node_id
+            if self.decision_case
+            else None
+        )
+        if node_id == "logistics_assignment":
+            self.configuration = (
+                AssignmentConfig.model_validate(
+                    self.configuration
+                ).model_dump()
+            )
+            self.options = (
+                AssignmentOptions.model_validate(
+                    self.options
+                ).model_dump()
+            )
+        elif node_id == "logistics_scheduling":
+            if not self.source_run_id:
+                raise ValueError(
+                    "Scheduling requiere source_run_id de Assignment."
+                )
+            self.configuration = (
+                SchedulingConfig.model_validate(
+                    self.configuration
+                ).model_dump(mode="json")
+            )
+            self.options = (
+                SchedulingOptions.model_validate(
+                    self.options
+                ).model_dump()
+            )
+        else:
+            self.configuration = (
+                DispatchConfig.model_validate(
+                    self.configuration
+                ).model_dump()
+            )
+            self.options = (
+                DispatchOptions.model_validate(
+                    self.options
+                ).model_dump()
+            )
+        return self
+
+
+class ApprovalRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    case_id: UUID
+    node_id: Literal[
+        "logistics_assignment",
+        "logistics_scheduling",
+    ]
+
+
+class LabelUpdate(BaseModel):
+    label: str
+
+
+async def guarded(call):
+    try:
+        return await call
+    except TimeoutError as exc:
+        raise HTTPException(408, str(exc)) from exc
+    except LookupError as exc:
+        raise HTTPException(404, str(exc)) from exc
+    except jobs.RunConflict as exc:
+        raise HTTPException(409, str(exc)) from exc
+    except jobs.QueueFull as exc:
+        raise HTTPException(429, str(exc), headers={"Retry-After":"5"}) from exc
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
+    except httpx.HTTPError as exc:
+        if isinstance(exc,httpx.HTTPStatusError):
+            from app.platform.identity import raise_workflow_conflict
+            raise_workflow_conflict(exc.response)
+        raise HTTPException(
+            502,
+            "No se pudo guardar o recuperar la información de despacho.",
+        ) from exc
+
+
+@router.get("/api/dispatch/status")
+async def status():
+    return await service.system_status()
+
+
+@router.get("/api/dispatch/contracts")
+async def contracts():
+    return {
+        "formats": public_contracts(),
+        "file_rules": {
+            "extension": ".csv",
+            "max_bytes": 10 * 1024 * 1024,
+            "encoding": "UTF-8",
+            "delimiters": [",", ";"],
+            "date_formats": ["AAAA-MM-DD", "d/m/AAAA"],
+            "decimal_rule": (
+                "Usá punto decimal; con separador punto y coma también se admite coma."
+            ),
+        },
+    }
+
+
+@router.get("/api/decision-cases")
+async def list_decision_cases(
+    status: Literal["active", "completed", "archived"] | None = Query("active"),
+    limit: int = Query(50, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    summary: bool = Query(False),
+):
+    cases = await guarded(
+        case_service.list_cases(
+            status=status,
+            limit=limit,
+            offset=offset,
+            summary=summary,
+        )
+    )
+    return {"cases": cases}
+
+
+@router.post("/api/decision-cases")
+async def create_decision_case(payload: DecisionCaseCreate):
+    case = await guarded(
+        case_service.ensure_case(
+            str(payload.id),
+            str(payload.orders_dataset_id),
+            str(payload.fleet_dataset_id),
+            state=payload.state,
+            **({'identity':payload.model_dump(include={'label','category','description'},exclude_unset=True)}
+               if payload.model_fields_set.intersection({'label','category','description'}) else {}),
+        )
+    )
+    return {"case": case}
+
+
+@router.get("/api/decision-cases/{case_id}")
+async def get_decision_case(case_id: UUID):
+    from app.platform.context import current
+    from app.platform.identity import platform_call
+    result = await guarded(case_service.get_case(str(case_id)))
+    ctx = current()
+    collaboration = await platform_call('platform_case_collaboration', {
+        'target_workspace_id': ctx.workspace_id, 'actor_user_id': ctx.user_id,
+        'target_case_id': str(case_id)})
+    responsibilities = await platform_call('platform_workflow_responsibilities', {
+        'target_workspace_id': ctx.workspace_id, 'actor_user_id': ctx.user_id,
+        'target_case_id': str(case_id)})
+    return {**result, 'collaboration': collaboration, 'workflow_responsibilities': responsibilities}
+
+
+@router.get("/api/decision-cases/{case_id}/runs")
+async def get_decision_case_runs(
+    case_id: UUID,
+    node_id: Literal[
+        "logistics_assignment",
+        "logistics_scheduling",
+        "logistics_final_assignment",
+    ] | None = Query(None),
+    limit: int = Query(50, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+):
+    return await guarded(
+        case_service.get_run_history(
+            str(case_id),
+            node_id=node_id,
+            limit=limit,
+            offset=offset,
+        )
+    )
+
+
+@router.patch("/api/decision-cases/{case_id}")
+async def update_decision_case(case_id: UUID, payload: DecisionCaseUpdate):
+    case = await guarded(
+        case_service.update_case(
+            str(case_id),
+            state=payload.state,
+            status=payload.status,
+        )
+    )
+    return {"case": case}
+
+
+@router.post("/api/datasets/validate")
+async def validate_dataset(
+    dataset_type: str = Query(...),
+    file: UploadFile = File(...),
+):
+    if dataset_type not in ("orders", "fleet"):
+        raise HTTPException(422, "Tipo de dataset inválido.")
+    filename = file.filename or "input.csv"
+    if not filename.lower().endswith(".csv"):
+        raise HTTPException(
+            400,
+            "Sólo se admiten archivos con extensión .csv.",
+        )
+    contents = await file.read()
+    if len(contents) > 10 * 1024 * 1024:
+        raise HTTPException(
+            413,
+            "El archivo supera el límite actual de 10 MB.",
+        )
+    return service.validate_input(
+        filename,
+        contents,
+        dataset_type,
+    )
+
+
+@router.post("/api/datasets/load-sample")
+async def load_sample():
+    if not await service.available():
+        raise HTTPException(
+            503,
+            "Falta activar el almacenamiento de datos.",
+        )
+    return await guarded(service.load_sample_inputs())
+
+
+@router.patch("/api/datasets/{dataset_id}")
+async def update_dataset(dataset_id: UUID, payload: LabelUpdate):
+    dataset = await guarded(
+        service.update_dataset_label(
+            str(dataset_id),
+            payload.label,
+        )
+    )
+    return {"dataset": dataset}
+
+
+@router.get("/api/datasets/{dataset_id}/download")
+async def download_dataset(dataset_id: UUID):
+    dataset, contents = await guarded(
+        service.download_input(str(dataset_id))
+    )
+    filename = Path(
+        dataset.get("original_filename") or "datos.csv"
+    ).name
+    filename = (
+        filename
+        .replace("\r", "")
+        .replace("\n", "")
+        .replace('"', "")
+    )
+    return Response(
+        content=contents,
+        media_type="text/csv; charset=utf-8",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+        },
+    )
+
+
+@router.post("/api/runs/preflight")
+async def preflight(payload: Inputs):
+    return await guarded(
+        service.check_inputs(
+            str(payload.orders_dataset_id),
+            str(payload.fleet_dataset_id),
+            payload.allow_third_party,
+        )
+    )
+
+
+@router.post("/api/runs/assignment-preview")
+async def assignment_preview(payload: AssignmentPreviewRequest):
+    return await guarded(
+        preview_assignment_configuration(
+            str(payload.orders_dataset_id),
+            str(payload.fleet_dataset_id),
+            filters=[item.model_dump() for item in payload.filters],
+            resource_mode=payload.resource_mode,
+        )
+    )
+
+
+@router.post("/api/runs", status_code=202)
+async def run(payload: RunRequest, response: Response, run_id: UUID | None = Query(None)):
+    if not await service.available():
+        raise HTTPException(503, "El almacenamiento de Dispatch todavía no está activado.")
+    effective_run_id = str(run_id or uuid4())
+    case_ref = payload.decision_case.model_dump(mode="json") if payload.decision_case else None
+    result = await guarded(jobs.enqueue(
+        str(payload.orders_dataset_id), str(payload.fleet_dataset_id),
+        payload.configuration, payload.options, effective_run_id, case_ref,
+        str(payload.source_run_id) if payload.source_run_id else None,
+    ))
+    response.headers["Location"] = "/api/runs/" + effective_run_id
+    response.headers["Retry-After"] = "2"
+    return result
+
+
+@router.post("/api/runs/{run_id}/cancel")
+async def cancel_run(run_id: UUID):
+    return await guarded(jobs.cancel(str(run_id)))
+
+
+@router.post("/api/runs/{run_id}/approve")
+async def approve_run(
+    run_id: UUID,
+    payload: ApprovalRequest,
+):
+    async def operation():
+        run = await case_service.approve_run_version(
+            str(run_id),
+            case_id=str(payload.case_id),
+            node_id=payload.node_id,
+        )
+        # Approval and the reconciliation outbox commit together in the database.
+        # A failed projection cannot turn a persisted approval into an HTTP failure.
+        try:
+            await case_service.sync_case_history(str(payload.case_id))
+        except (httpx.HTTPError, ValueError, LookupError):
+            logging.getLogger(__name__).warning("approval_projection_pending run_id=%s case_id=%s",run_id,payload.case_id)
+            run = {**run, "projection_pending": True}
+        return run
+
+    return await guarded(operation())
+
+
+@router.post("/api/datasets/{dataset_id}/default")
+async def default(dataset_id: UUID):
+    await guarded(
+        service.db(
+            "POST",
+            "rpc/set_default_fleet",
+            body={"target_id": str(dataset_id)},
+        )
+    )
+    return {"ok": True}
+
+
+@router.post("/api/datasets/{dataset_id}/archive")
+async def archive(dataset_id: UUID):
+    dataset = await guarded(
+        service.archive_dataset(
+            str(dataset_id),
+            True,
+        )
+    )
+    return {"dataset": dataset}
+
+
+@router.post("/api/datasets/{dataset_id}/unarchive")
+async def unarchive(dataset_id: UUID):
+    dataset = await guarded(
+        service.archive_dataset(
+            str(dataset_id),
+            False,
+        )
+    )
+    return {"dataset": dataset}
+
+
+@router.get("/api/dispatch/templates/{kind}")
+async def template(kind: str):
+    if kind not in ("orders", "fleet"):
+        raise HTTPException(404, "Plantilla no disponible.")
+    return Response(
+        content=template_csv(kind),
+        media_type="text/csv; charset=utf-8",
+        headers={
+            "Content-Disposition": f'attachment; filename="{kind}.csv"',
+        },
+    )
+
+
+@router.post("/api/datasets/{dataset_id}/refresh-profile")
+async def refresh_dataset_profile(dataset_id: UUID):
+    async def operation():
+        dataset = await service.get_dataset(str(dataset_id))
+        if not dataset:
+            raise LookupError("No se encontró el dataset.")
+        return {"dataset": await service._ensure_profile(dataset, persist=True)}
+    return await guarded(operation())
+
+
+@router.get('/api/runs/{run_id}/comparative')
+async def comparative_state(run_id: UUID):
+    from app.services.comparative_analysis_service import get_analysis, AnalysisConflict
+    try:
+        return await get_analysis(str(run_id))
+    except AnalysisConflict as exc:
+        raise HTTPException(409,str(exc)) from exc
+    except LookupError as exc:
+        raise HTTPException(404,str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(422,str(exc)) from exc
+    except httpx.HTTPError as exc:
+        raise HTTPException(503,'No se pudo recuperar el análisis comparativo.') from exc
+
+
+@router.post('/api/runs/{run_id}/comparative')
+async def comparative_generate(run_id: UUID, retry: bool = Query(default=False)):
+    from app.services.comparative_analysis_service import generate_analysis, AnalysisConflict
+    try:
+        artifact = await generate_analysis(str(run_id),retry=retry)
+        return JSONResponse(artifact,status_code=202 if artifact['status'] in ('queued','running') else 200,
+                            headers={'Location':'/api/runs/'+str(run_id)+'/comparative','Retry-After':'2'})
+    except AnalysisConflict as exc:
+        raise HTTPException(409,str(exc)) from exc
+    except LookupError as exc:
+        raise HTTPException(404,str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(422,str(exc)) from exc
+    except jobs.QueueFull as exc:
+        raise HTTPException(429,str(exc),headers={'Retry-After':'5'}) from exc
+    except httpx.HTTPError as exc:
+        raise HTTPException(503,'No se pudo recuperar o registrar el análisis comparativo.') from exc

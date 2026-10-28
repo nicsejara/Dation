@@ -1,0 +1,24 @@
+{
+  "suite": "B-E2E",
+  "status": "PASS",
+  "started_at": "2026-10-26T04:54:45.439853+00:00",
+  "finished_at": "2026-10-26T05:10:32.247804+00:00",
+  "command": [
+    "/workspace/Dation/.venv/bin/python",
+    "-B",
+    "tests/e2e/run_suite.py"
+  ],
+  "cwd": "/workspace/Dation/backend",
+  "exit_code": 0,
+  "tests": 86,
+  "failures_count": 0,
+  "skipped": 0,
+  "failures": [],
+  "wall_seconds": 946.801,
+  "suite_reported_seconds": 946.193,
+  "log_path": "/workspace/work/dation-t0r2/revalidation/B-E2E.log",
+  "log_sha256": "352d6c02900edee948686d074d0e910d93ca9fda501bcfe770a998208791b625",
+  "production_credentials_cleared": true,
+  "docker_target": "local unix socket",
+  "sql_container": null
+}

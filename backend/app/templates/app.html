@@ -473,6 +473,10 @@
           </div>
         </section>
 
+        <section class="view d-platform" data-view-panel="logistics-models" aria-live="polite"></section>
+        <section class="view d-platform" data-view-panel="logistics-case-setup" aria-live="polite"></section>
+        <section class="view d-platform" data-view-panel="logistics-case-data" aria-live="polite"></section>
+
         <!-- CARGAR DATOS: el contenido se monta desde dispatch/upload/index.mjs -->
         <section
           class="view"
@@ -1108,6 +1112,9 @@
       function isLogisticsView(view) {
         return (
           view === 'logistics-overview'
+          || view === 'logistics-models'
+          || view === 'logistics-case-setup'
+          || view === 'logistics-case-data'
           || view === 'logistics-data'
           || view === 'logistics-map'
           || view === 'logistics-config'

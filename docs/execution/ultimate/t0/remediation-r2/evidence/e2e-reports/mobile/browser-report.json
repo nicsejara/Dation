@@ -1,0 +1,1857 @@
+{
+  "passed": true,
+  "source_sha": "ef997235a30251fbf7ae53690ed738092ee973d8",
+  "ui": {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "checkpoints": [
+      {
+        "name": "inicio",
+        "view": "platform-home",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "textCount": 72,
+        "minimumContrast": 4.531024205669996,
+        "failures": [],
+        "hero": null,
+        "overflow": false,
+        "legacyBoundary": false,
+        "scheme": "dark",
+        "cards": [
+          {
+            "background": "rgb(25, 36, 45)",
+            "x": 76,
+            "y": 564.953125,
+            "width": 298,
+            "height": 313.265625,
+            "right": 374,
+            "bottom": 878.21875
+          },
+          {
+            "background": "rgb(19, 27, 34)",
+            "x": 76,
+            "y": 894.21875,
+            "width": 298,
+            "height": 258.90625,
+            "right": 374,
+            "bottom": 1153.125
+          },
+          {
+            "background": "rgb(19, 27, 34)",
+            "x": 76,
+            "y": 1169.125,
+            "width": 298,
+            "height": 238.765625,
+            "right": 374,
+            "bottom": 1407.890625
+          },
+          {
+            "background": "rgb(19, 27, 34)",
+            "x": 76,
+            "y": 1423.890625,
+            "width": 298,
+            "height": 258.90625,
+            "right": 374,
+            "bottom": 1682.796875
+          },
+          {
+            "background": "rgb(19, 27, 34)",
+            "x": 76,
+            "y": 1698.796875,
+            "width": 298,
+            "height": 258.90625,
+            "right": 374,
+            "bottom": 1957.703125
+          },
+          {
+            "background": "rgb(19, 27, 34)",
+            "x": 76,
+            "y": 1973.703125,
+            "width": 298,
+            "height": 258.90625,
+            "right": 374,
+            "bottom": 2232.609375
+          },
+          {
+            "background": "rgb(19, 27, 34)",
+            "x": 76,
+            "y": 2248.609375,
+            "width": 298,
+            "height": 238.765625,
+            "right": 374,
+            "bottom": 2487.375
+          }
+        ]
+      },
+      {
+        "name": "overview",
+        "view": "logistics-overview",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "textCount": 103,
+        "minimumContrast": 5.743091435903668,
+        "failures": [],
+        "hero": {
+          "x": 76,
+          "y": -283,
+          "width": 298,
+          "height": 579.1875,
+          "right": 374,
+          "bottom": 296.1875
+        },
+        "overflow": false,
+        "legacyBoundary": false,
+        "scheme": "dark",
+        "cards": [
+          {
+            "background": "rgba(0, 0, 0, 0)",
+            "x": 76,
+            "y": 324.1875,
+            "width": 298,
+            "height": 1117.59375,
+            "right": 374,
+            "bottom": 1441.78125
+          },
+          {
+            "background": "rgba(0, 0, 0, 0)",
+            "x": 76,
+            "y": 538.609375,
+            "width": 298,
+            "height": 182.1875,
+            "right": 374,
+            "bottom": 720.796875
+          },
+          {
+            "background": "rgba(0, 0, 0, 0)",
+            "x": 76,
+            "y": 744.796875,
+            "width": 298,
+            "height": 202.328125,
+            "right": 374,
+            "bottom": 947.125
+          },
+          {
+            "background": "rgba(0, 0, 0, 0)",
+            "x": 76,
+            "y": 971.125,
+            "width": 298,
+            "height": 202.328125,
+            "right": 374,
+            "bottom": 1173.453125
+          },
+          {
+            "background": "rgba(0, 0, 0, 0)",
+            "x": 76,
+            "y": 1197.453125,
+            "width": 298,
+            "height": 202.328125,
+            "right": 374,
+            "bottom": 1399.78125
+          },
+          {
+            "background": "rgba(0, 0, 0, 0)",
+            "x": 76,
+            "y": 1469.78125,
+            "width": 298,
+            "height": 654.65625,
+            "right": 374,
+            "bottom": 2124.4375
+          },
+          {
+            "background": "rgba(0, 0, 0, 0)",
+            "x": 76,
+            "y": 2152.4375,
+            "width": 298,
+            "height": 1217.71875,
+            "right": 374,
+            "bottom": 3370.15625
+          },
+          {
+            "background": "rgb(25, 36, 45)",
+            "x": 76,
+            "y": 2363,
+            "width": 298,
+            "height": 281.359375,
+            "right": 374,
+            "bottom": 2644.359375
+          },
+          {
+            "background": "rgb(25, 36, 45)",
+            "x": 76,
+            "y": 2676.359375,
+            "width": 298,
+            "height": 308.65625,
+            "right": 374,
+            "bottom": 2985.015625
+          },
+          {
+            "background": "rgb(25, 36, 45)",
+            "x": 76,
+            "y": 3017.015625,
+            "width": 298,
+            "height": 281.359375,
+            "right": 374,
+            "bottom": 3298.375
+          },
+          {
+            "background": "rgba(0, 0, 0, 0)",
+            "x": 76,
+            "y": 3398.15625,
+            "width": 298,
+            "height": 1458.28125,
+            "right": 374,
+            "bottom": 4856.4375
+          },
+          {
+            "background": "rgb(25, 36, 45)",
+            "x": 76,
+            "y": 3588.578125,
+            "width": 298,
+            "height": 473.546875,
+            "right": 374,
+            "bottom": 4062.125
+          },
+          {
+            "background": "rgb(25, 36, 45)",
+            "x": 76,
+            "y": 4078.125,
+            "width": 298,
+            "height": 359.96875,
+            "right": 374,
+            "bottom": 4438.09375
+          },
+          {
+            "background": "rgb(25, 36, 45)",
+            "x": 76,
+            "y": 4454.09375,
+            "width": 298,
+            "height": 402.34375,
+            "right": 374,
+            "bottom": 4856.4375
+          },
+          {
+            "background": "rgba(0, 0, 0, 0)",
+            "x": 76,
+            "y": 4884.4375,
+            "width": 298,
+            "height": 398.78125,
+            "right": 374,
+            "bottom": 5283.21875
+          },
+          {
+            "background": "rgba(0, 0, 0, 0)",
+            "x": 76,
+            "y": 5053.71875,
+            "width": 298,
+            "height": 72,
+            "right": 374,
+            "bottom": 5125.71875
+          },
+          {
+            "background": "rgba(0, 0, 0, 0)",
+            "x": 76,
+            "y": 5125.71875,
+            "width": 298,
+            "height": 52.5,
+            "right": 374,
+            "bottom": 5178.21875
+          },
+          {
+            "background": "rgba(0, 0, 0, 0)",
+            "x": 76,
+            "y": 5178.21875,
+            "width": 298,
+            "height": 52.5,
+            "right": 374,
+            "bottom": 5230.71875
+          },
+          {
+            "background": "rgba(0, 0, 0, 0)",
+            "x": 76,
+            "y": 5230.71875,
+            "width": 298,
+            "height": 52.5,
+            "right": 374,
+            "bottom": 5283.21875
+          }
+        ]
+      },
+      {
+        "name": "data-pending",
+        "view": "logistics-data",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "textCount": 74,
+        "minimumContrast": 5.429139914708745,
+        "failures": [],
+        "hero": {
+          "x": 76,
+          "y": 170,
+          "width": 298,
+          "height": 162.28125,
+          "right": 374,
+          "bottom": 332.28125
+        },
+        "overflow": false,
+        "legacyBoundary": false,
+        "scheme": "dark",
+        "cards": [
+          {
+            "background": "rgb(25, 36, 45)",
+            "x": 76,
+            "y": 1491.8125,
+            "width": 298,
+            "height": 1033.078125,
+            "right": 374,
+            "bottom": 2524.890625
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 96,
+            "y": 2233.96875,
+            "width": 258,
+            "height": 69.640625,
+            "right": 354,
+            "bottom": 2303.609375
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 96,
+            "y": 2311.609375,
+            "width": 258,
+            "height": 69.640625,
+            "right": 354,
+            "bottom": 2381.25
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 96,
+            "y": 2389.25,
+            "width": 258,
+            "height": 69.640625,
+            "right": 354,
+            "bottom": 2458.890625
+          },
+          {
+            "background": "rgb(25, 36, 45)",
+            "x": 76,
+            "y": 2548.890625,
+            "width": 298,
+            "height": 1033.078125,
+            "right": 374,
+            "bottom": 3581.96875
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 96,
+            "y": 3291.046875,
+            "width": 258,
+            "height": 69.640625,
+            "right": 354,
+            "bottom": 3360.6875
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 96,
+            "y": 3368.6875,
+            "width": 258,
+            "height": 69.640625,
+            "right": 354,
+            "bottom": 3438.328125
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 96,
+            "y": 3446.328125,
+            "width": 258,
+            "height": 69.640625,
+            "right": 354,
+            "bottom": 3515.96875
+          },
+          {
+            "background": "rgb(19, 27, 34)",
+            "x": 76,
+            "y": 617.40625,
+            "width": 298,
+            "height": 210.59375,
+            "right": 374,
+            "bottom": 828
+          }
+        ]
+      },
+      {
+        "name": "data-ready",
+        "view": "logistics-data",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "textCount": 72,
+        "minimumContrast": 5.429139914708745,
+        "failures": [],
+        "hero": {
+          "x": 76,
+          "y": -632,
+          "width": 298,
+          "height": 162.28125,
+          "right": 374,
+          "bottom": -469.71875
+        },
+        "overflow": false,
+        "legacyBoundary": false,
+        "scheme": "dark",
+        "cards": [
+          {
+            "background": "rgb(25, 36, 45)",
+            "x": 76,
+            "y": 709,
+            "width": 298,
+            "height": 793,
+            "right": 374,
+            "bottom": 1502
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 354,
+            "y": 1394,
+            "width": 52,
+            "height": 104.5,
+            "right": 406,
+            "bottom": 1498.5
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 354,
+            "y": 1506.5,
+            "width": 52,
+            "height": 119.5,
+            "right": 406,
+            "bottom": 1626
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 354,
+            "y": 1634,
+            "width": 52,
+            "height": 104.5,
+            "right": 406,
+            "bottom": 1738.5
+          },
+          {
+            "background": "rgb(25, 36, 45)",
+            "x": 76,
+            "y": 1526,
+            "width": 298,
+            "height": 773.5,
+            "right": 374,
+            "bottom": 2299.5
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 354,
+            "y": 2191.5,
+            "width": 52,
+            "height": 104.5,
+            "right": 406,
+            "bottom": 2296
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 354,
+            "y": 2304,
+            "width": 52,
+            "height": 119.5,
+            "right": 406,
+            "bottom": 2423.5
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 354,
+            "y": 2431.5,
+            "width": 52,
+            "height": 104.5,
+            "right": 406,
+            "bottom": 2536
+          },
+          {
+            "background": "rgb(19, 27, 34)",
+            "x": 76,
+            "y": 617.40625,
+            "width": 298,
+            "height": 210.59375,
+            "right": 374,
+            "bottom": 828
+          }
+        ]
+      },
+      {
+        "name": "map-ready",
+        "view": "logistics-map",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "textCount": 45,
+        "minimumContrast": 5.429139914708745,
+        "failures": [],
+        "hero": {
+          "x": 76,
+          "y": 170,
+          "width": 298,
+          "height": 235.96875,
+          "right": 374,
+          "bottom": 405.96875
+        },
+        "overflow": false,
+        "legacyBoundary": false,
+        "scheme": "dark",
+        "cards": []
+      },
+      {
+        "name": "assignment-config",
+        "view": "logistics-config",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "textCount": 70,
+        "minimumContrast": 5.429139914708745,
+        "failures": [],
+        "hero": {
+          "x": 76,
+          "y": -627.796875,
+          "width": 298,
+          "height": 278.1875,
+          "right": 374,
+          "bottom": -349.609375
+        },
+        "overflow": false,
+        "legacyBoundary": false,
+        "scheme": "dark",
+        "cards": [
+          {
+            "background": "rgba(0, 0, 0, 0)",
+            "x": 76,
+            "y": -247.71875,
+            "width": 298,
+            "height": 662.65625,
+            "right": 374,
+            "bottom": 414.9375
+          },
+          {
+            "background": "rgba(0, 0, 0, 0)",
+            "x": 76,
+            "y": 446.9375,
+            "width": 298,
+            "height": 1173.25,
+            "right": 374,
+            "bottom": 1620.1875
+          },
+          {
+            "background": "rgb(25, 36, 45)",
+            "x": 76,
+            "y": 633.78125,
+            "width": 298,
+            "height": 150.484375,
+            "right": 374,
+            "bottom": 784.265625
+          },
+          {
+            "background": "rgb(25, 36, 45)",
+            "x": 76,
+            "y": 796.265625,
+            "width": 298,
+            "height": 131.640625,
+            "right": 374,
+            "bottom": 927.90625
+          },
+          {
+            "background": "rgb(25, 36, 45)",
+            "x": 76,
+            "y": 939.90625,
+            "width": 298,
+            "height": 150.484375,
+            "right": 374,
+            "bottom": 1090.390625
+          },
+          {
+            "background": "rgb(25, 36, 45)",
+            "x": 76,
+            "y": 1102.390625,
+            "width": 298,
+            "height": 169.078125,
+            "right": 374,
+            "bottom": 1271.46875
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 76,
+            "y": 1283.46875,
+            "width": 298,
+            "height": 150.484375,
+            "right": 374,
+            "bottom": 1433.953125
+          },
+          {
+            "background": "rgb(25, 36, 45)",
+            "x": 76,
+            "y": 1445.953125,
+            "width": 298,
+            "height": 150.234375,
+            "right": 374,
+            "bottom": 1596.1875
+          },
+          {
+            "background": "rgba(0, 0, 0, 0)",
+            "x": 76,
+            "y": 1652.1875,
+            "width": 298,
+            "height": 790.375,
+            "right": 374,
+            "bottom": 2442.5625
+          },
+          {
+            "background": "rgb(25, 36, 45)",
+            "x": 76,
+            "y": 1839.03125,
+            "width": 298,
+            "height": 150.234375,
+            "right": 374,
+            "bottom": 1989.265625
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 76,
+            "y": 2001.265625,
+            "width": 298,
+            "height": 169.078125,
+            "right": 374,
+            "bottom": 2170.34375
+          },
+          {
+            "background": "rgb(25, 36, 45)",
+            "x": 76,
+            "y": 2182.34375,
+            "width": 298,
+            "height": 169.078125,
+            "right": 374,
+            "bottom": 2351.421875
+          },
+          {
+            "background": "rgba(0, 0, 0, 0)",
+            "x": 76,
+            "y": 2474.5625,
+            "width": 298,
+            "height": 534.046875,
+            "right": 374,
+            "bottom": 3008.609375
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 76,
+            "y": 2616.40625,
+            "width": 298,
+            "height": 120.734375,
+            "right": 374,
+            "bottom": 2737.140625
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 76,
+            "y": 2749.140625,
+            "width": 298,
+            "height": 102.734375,
+            "right": 374,
+            "bottom": 2851.875
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 76,
+            "y": 2863.875,
+            "width": 298,
+            "height": 120.734375,
+            "right": 374,
+            "bottom": 2984.609375
+          },
+          {
+            "background": "rgb(19, 27, 34)",
+            "x": 76,
+            "y": 620.65625,
+            "width": 298,
+            "height": 207.34375,
+            "right": 374,
+            "bottom": 828
+          }
+        ]
+      },
+      {
+        "name": "assignment-review",
+        "view": "logistics-config",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "textCount": 17,
+        "minimumContrast": 6.161887829123643,
+        "failures": [],
+        "hero": null,
+        "overflow": false,
+        "legacyBoundary": false,
+        "scheme": "dark",
+        "cards": []
+      },
+      {
+        "name": "assignment-pending",
+        "view": "decision-dashboard",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "textCount": 13,
+        "minimumContrast": 6.161887829123643,
+        "failures": [],
+        "hero": null,
+        "overflow": false,
+        "legacyBoundary": false,
+        "scheme": "dark",
+        "cards": []
+      },
+      {
+        "name": "assignment-dashboard",
+        "view": "decision-dashboard",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "textCount": 128,
+        "minimumContrast": 5.429139914708745,
+        "failures": [],
+        "hero": null,
+        "overflow": false,
+        "legacyBoundary": false,
+        "scheme": "dark",
+        "cards": []
+      },
+      {
+        "name": "assignment-approved",
+        "view": "decision-dashboard",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "textCount": 267,
+        "minimumContrast": 5.429139914708745,
+        "failures": [],
+        "hero": null,
+        "overflow": false,
+        "legacyBoundary": false,
+        "scheme": "dark",
+        "cards": []
+      },
+      {
+        "name": "map-after-assignment",
+        "view": "logistics-map",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "textCount": 49,
+        "minimumContrast": 5.429139914708745,
+        "failures": [],
+        "hero": {
+          "x": 76,
+          "y": -1187,
+          "width": 298,
+          "height": 235.96875,
+          "right": 374,
+          "bottom": -951.03125
+        },
+        "overflow": false,
+        "legacyBoundary": false,
+        "scheme": "dark",
+        "cards": []
+      },
+      {
+        "name": "scheduling-config",
+        "view": "logistics-config",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "textCount": 74,
+        "minimumContrast": 5.429139914708745,
+        "failures": [],
+        "hero": {
+          "x": 76,
+          "y": 430.203125,
+          "width": 298,
+          "height": 299.875,
+          "right": 374,
+          "bottom": 730.078125
+        },
+        "overflow": false,
+        "legacyBoundary": false,
+        "scheme": "dark",
+        "cards": [
+          {
+            "background": "rgba(0, 0, 0, 0)",
+            "x": 76,
+            "y": 831.96875,
+            "width": 298,
+            "height": 1205.25,
+            "right": 374,
+            "bottom": 2037.21875
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 76,
+            "y": 1351.765625,
+            "width": 298,
+            "height": 187.921875,
+            "right": 374,
+            "bottom": 1539.6875
+          },
+          {
+            "background": "rgb(25, 36, 45)",
+            "x": 76,
+            "y": 1551.6875,
+            "width": 298,
+            "height": 150.484375,
+            "right": 374,
+            "bottom": 1702.171875
+          },
+          {
+            "background": "rgb(25, 36, 45)",
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          },
+          {
+            "background": "rgba(0, 0, 0, 0)",
+            "x": 76,
+            "y": 2069.21875,
+            "width": 298,
+            "height": 598.6875,
+            "right": 374,
+            "bottom": 2667.90625
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 76,
+            "y": 2256.0625,
+            "width": 298,
+            "height": 187.921875,
+            "right": 374,
+            "bottom": 2443.984375
+          },
+          {
+            "background": "rgb(25, 36, 45)",
+            "x": 76,
+            "y": 2455.984375,
+            "width": 298,
+            "height": 187.921875,
+            "right": 374,
+            "bottom": 2643.90625
+          },
+          {
+            "background": "rgba(0, 0, 0, 0)",
+            "x": 76,
+            "y": 2699.90625,
+            "width": 298,
+            "height": 549.9375,
+            "right": 374,
+            "bottom": 3249.84375
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 76,
+            "y": 2906.25,
+            "width": 298,
+            "height": 229.5625,
+            "right": 374,
+            "bottom": 3135.8125
+          },
+          {
+            "background": "rgba(0, 0, 0, 0)",
+            "x": 76,
+            "y": 3281.84375,
+            "width": 298,
+            "height": 552.046875,
+            "right": 374,
+            "bottom": 3833.890625
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 76,
+            "y": 3423.6875,
+            "width": 298,
+            "height": 120.734375,
+            "right": 374,
+            "bottom": 3544.421875
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 76,
+            "y": 3556.421875,
+            "width": 298,
+            "height": 120.734375,
+            "right": 374,
+            "bottom": 3677.15625
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 76,
+            "y": 3689.15625,
+            "width": 298,
+            "height": 120.734375,
+            "right": 374,
+            "bottom": 3809.890625
+          },
+          {
+            "background": "rgb(19, 27, 34)",
+            "x": 76,
+            "y": 620.65625,
+            "width": 298,
+            "height": 207.34375,
+            "right": 374,
+            "bottom": 828
+          }
+        ]
+      },
+      {
+        "name": "scheduling-review",
+        "view": "logistics-config",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "textCount": 19,
+        "minimumContrast": 6.161887829123643,
+        "failures": [],
+        "hero": null,
+        "overflow": false,
+        "legacyBoundary": false,
+        "scheme": "dark",
+        "cards": []
+      },
+      {
+        "name": "scheduling-error",
+        "view": "decision-dashboard",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "textCount": 6,
+        "minimumContrast": 7.810217649280076,
+        "failures": [],
+        "hero": null,
+        "overflow": false,
+        "legacyBoundary": false,
+        "scheme": "dark",
+        "cards": []
+      },
+      {
+        "name": "scheduling-reconfigured",
+        "view": "logistics-config",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "textCount": 74,
+        "minimumContrast": 5.429139914708745,
+        "failures": [],
+        "hero": {
+          "x": 76,
+          "y": -983.796875,
+          "width": 298,
+          "height": 299.875,
+          "right": 374,
+          "bottom": -683.921875
+        },
+        "overflow": false,
+        "legacyBoundary": false,
+        "scheme": "dark",
+        "cards": [
+          {
+            "background": "rgba(0, 0, 0, 0)",
+            "x": 76,
+            "y": -582.03125,
+            "width": 298,
+            "height": 1205.25,
+            "right": 374,
+            "bottom": 623.21875
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 76,
+            "y": -62.234375,
+            "width": 298,
+            "height": 187.921875,
+            "right": 374,
+            "bottom": 125.6875
+          },
+          {
+            "background": "rgb(25, 36, 45)",
+            "x": 76,
+            "y": 137.6875,
+            "width": 298,
+            "height": 150.484375,
+            "right": 374,
+            "bottom": 288.171875
+          },
+          {
+            "background": "rgb(25, 36, 45)",
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          },
+          {
+            "background": "rgba(0, 0, 0, 0)",
+            "x": 76,
+            "y": 655.21875,
+            "width": 298,
+            "height": 598.6875,
+            "right": 374,
+            "bottom": 1253.90625
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 76,
+            "y": 842.0625,
+            "width": 298,
+            "height": 187.921875,
+            "right": 374,
+            "bottom": 1029.984375
+          },
+          {
+            "background": "rgb(25, 36, 45)",
+            "x": 76,
+            "y": 1041.984375,
+            "width": 298,
+            "height": 187.921875,
+            "right": 374,
+            "bottom": 1229.90625
+          },
+          {
+            "background": "rgba(0, 0, 0, 0)",
+            "x": 76,
+            "y": 1285.90625,
+            "width": 298,
+            "height": 549.9375,
+            "right": 374,
+            "bottom": 1835.84375
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 76,
+            "y": 1492.25,
+            "width": 298,
+            "height": 229.5625,
+            "right": 374,
+            "bottom": 1721.8125
+          },
+          {
+            "background": "rgba(0, 0, 0, 0)",
+            "x": 76,
+            "y": 1867.84375,
+            "width": 298,
+            "height": 552.046875,
+            "right": 374,
+            "bottom": 2419.890625
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 76,
+            "y": 2009.6875,
+            "width": 298,
+            "height": 120.734375,
+            "right": 374,
+            "bottom": 2130.421875
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 76,
+            "y": 2142.421875,
+            "width": 298,
+            "height": 120.734375,
+            "right": 374,
+            "bottom": 2263.15625
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 76,
+            "y": 2275.15625,
+            "width": 298,
+            "height": 120.734375,
+            "right": 374,
+            "bottom": 2395.890625
+          },
+          {
+            "background": "rgb(19, 27, 34)",
+            "x": 76,
+            "y": 620.65625,
+            "width": 298,
+            "height": 207.34375,
+            "right": 374,
+            "bottom": 828
+          }
+        ]
+      },
+      {
+        "name": "scheduling-dashboard",
+        "view": "decision-dashboard",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "textCount": 110,
+        "minimumContrast": 6.161887829123643,
+        "failures": [],
+        "hero": null,
+        "overflow": false,
+        "legacyBoundary": false,
+        "scheme": "dark",
+        "cards": []
+      },
+      {
+        "name": "scheduling-approved",
+        "view": "decision-dashboard",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "textCount": 109,
+        "minimumContrast": 6.161887829123643,
+        "failures": [],
+        "hero": null,
+        "overflow": false,
+        "legacyBoundary": false,
+        "scheme": "dark",
+        "cards": []
+      },
+      {
+        "name": "map-completed",
+        "view": "logistics-map",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "textCount": 52,
+        "minimumContrast": 6.161887829123643,
+        "failures": [],
+        "hero": {
+          "x": 76,
+          "y": 170,
+          "width": 298,
+          "height": 235.96875,
+          "right": 374,
+          "bottom": 405.96875
+        },
+        "overflow": false,
+        "legacyBoundary": false,
+        "scheme": "dark",
+        "cards": []
+      },
+      {
+        "name": "new-decision-after-mobile-history",
+        "view": "logistics-data",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "textCount": 74,
+        "minimumContrast": 5.429139914708745,
+        "failures": [],
+        "hero": {
+          "x": 76,
+          "y": 170,
+          "width": 298,
+          "height": 162.28125,
+          "right": 374,
+          "bottom": 332.28125
+        },
+        "overflow": false,
+        "legacyBoundary": false,
+        "scheme": "dark",
+        "cards": [
+          {
+            "background": "rgb(25, 36, 45)",
+            "x": 76,
+            "y": 1491.8125,
+            "width": 298,
+            "height": 1048.46875,
+            "right": 374,
+            "bottom": 2540.28125
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 96,
+            "y": 2249.359375,
+            "width": 258,
+            "height": 69.640625,
+            "right": 354,
+            "bottom": 2319
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 96,
+            "y": 2327,
+            "width": 258,
+            "height": 69.640625,
+            "right": 354,
+            "bottom": 2396.640625
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 96,
+            "y": 2404.640625,
+            "width": 258,
+            "height": 69.640625,
+            "right": 354,
+            "bottom": 2474.28125
+          },
+          {
+            "background": "rgb(25, 36, 45)",
+            "x": 76,
+            "y": 2564.28125,
+            "width": 298,
+            "height": 1048.46875,
+            "right": 374,
+            "bottom": 3612.75
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "right": 0,
+            "bottom": 0
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 96,
+            "y": 3321.828125,
+            "width": 258,
+            "height": 69.640625,
+            "right": 354,
+            "bottom": 3391.46875
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 96,
+            "y": 3399.46875,
+            "width": 258,
+            "height": 69.640625,
+            "right": 354,
+            "bottom": 3469.109375
+          },
+          {
+            "background": "rgb(32, 46, 57)",
+            "x": 96,
+            "y": 3477.109375,
+            "width": 258,
+            "height": 69.640625,
+            "right": 354,
+            "bottom": 3546.75
+          },
+          {
+            "background": "rgb(19, 27, 34)",
+            "x": 76,
+            "y": 617.40625,
+            "width": 298,
+            "height": 210.59375,
+            "right": 374,
+            "bottom": 828
+          }
+        ]
+      }
+    ],
+    "heroes": [
+      {
+        "name": "data-pending",
+        "height": 162.28125,
+        "overflow": false,
+        "panel": null,
+        "optional": false,
+        "minimum": "0px",
+        "stepSize": 12,
+        "stepWeight": 500,
+        "decision": null
+      },
+      {
+        "name": "data-ready",
+        "height": 162.28125,
+        "overflow": false,
+        "panel": null,
+        "optional": false,
+        "minimum": "0px",
+        "stepSize": 12,
+        "stepWeight": 500,
+        "decision": null
+      },
+      {
+        "name": "map-ready",
+        "height": 235.96875,
+        "overflow": false,
+        "panel": 36,
+        "optional": true,
+        "minimum": "0px",
+        "stepSize": 12,
+        "stepWeight": 500,
+        "decision": null
+      },
+      {
+        "name": "assignment",
+        "height": 278.1875,
+        "overflow": false,
+        "panel": 36,
+        "optional": true,
+        "minimum": "0px",
+        "stepSize": 12,
+        "stepWeight": 500,
+        "decision": {
+          "text": "DECISI\u00d3N 1 DE 3",
+          "below": true,
+          "aligned": true,
+          "size": 12,
+          "weight": 500,
+          "padding": "0px",
+          "border": "0px"
+        }
+      },
+      {
+        "name": "map-after-assignment",
+        "height": 235.96875,
+        "overflow": false,
+        "panel": 36,
+        "optional": true,
+        "minimum": "0px",
+        "stepSize": 12,
+        "stepWeight": 500,
+        "decision": null
+      },
+      {
+        "name": "scheduling",
+        "height": 299.875,
+        "overflow": false,
+        "panel": 36,
+        "optional": true,
+        "minimum": "0px",
+        "stepSize": 12,
+        "stepWeight": 500,
+        "decision": {
+          "text": "DECISI\u00d3N 2 DE 3",
+          "below": true,
+          "aligned": true,
+          "size": 12,
+          "weight": 500,
+          "padding": "0px",
+          "border": "0px"
+        }
+      }
+    ],
+    "bars": [
+      {
+        "name": "data",
+        "items": [
+          {
+            "width": 133,
+            "height": 48,
+            "clipped": false
+          },
+          {
+            "width": 133,
+            "height": 48,
+            "clipped": false
+          },
+          {
+            "width": 133,
+            "height": 48,
+            "clipped": false
+          },
+          {
+            "width": 133,
+            "height": 48,
+            "clipped": false
+          }
+        ],
+        "actionWidth": 272,
+        "overflow": false
+      },
+      {
+        "name": "assignment",
+        "items": [
+          {
+            "width": 133,
+            "height": 46.375,
+            "clipped": false
+          },
+          {
+            "width": 133,
+            "height": 46.375,
+            "clipped": false
+          },
+          {
+            "width": 133,
+            "height": 46.375,
+            "clipped": false
+          }
+        ],
+        "actionWidth": 272,
+        "overflow": false
+      },
+      {
+        "name": "scheduling",
+        "items": [
+          {
+            "width": 133,
+            "height": 46.375,
+            "clipped": false
+          },
+          {
+            "width": 133,
+            "height": 46.375,
+            "clipped": false
+          },
+          {
+            "width": 133,
+            "height": 46.375,
+            "clipped": false
+          }
+        ],
+        "actionWidth": 272,
+        "overflow": false
+      }
+    ],
+    "actions": [
+      {
+        "name": "data",
+        "style": {
+          "minHeight": "46px",
+          "padding": "0px 20px",
+          "borderRadius": "6px",
+          "fontFamily": "Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+          "fontSize": "13px",
+          "fontWeight": "600",
+          "gap": "8px",
+          "backgroundColor": "rgb(80, 200, 196)",
+          "color": "rgb(16, 22, 28)"
+        },
+        "lineHeight": "17.55px",
+        "continuation": false,
+        "primary": true,
+        "shared": true,
+        "icons": 1,
+        "decorative": "true",
+        "clipped": false,
+        "hover": "rgb(67, 166, 199)"
+      },
+      {
+        "name": "map-assignment",
+        "style": {
+          "minHeight": "46px",
+          "padding": "0px 20px",
+          "borderRadius": "6px",
+          "fontFamily": "Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+          "fontSize": "13px",
+          "fontWeight": "600",
+          "gap": "8px",
+          "backgroundColor": "rgb(80, 200, 196)",
+          "color": "rgb(16, 22, 28)"
+        },
+        "lineHeight": "17.55px",
+        "continuation": false,
+        "primary": true,
+        "shared": true,
+        "icons": 1,
+        "decorative": "true",
+        "clipped": false,
+        "hover": "rgb(67, 166, 199)"
+      },
+      {
+        "name": "assignment-review",
+        "style": {
+          "minHeight": "46px",
+          "padding": "0px 20px",
+          "borderRadius": "6px",
+          "fontFamily": "Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+          "fontSize": "13px",
+          "fontWeight": "600",
+          "gap": "8px",
+          "backgroundColor": "rgb(80, 200, 196)",
+          "color": "rgb(16, 22, 28)"
+        },
+        "lineHeight": "17.55px",
+        "continuation": false,
+        "primary": true,
+        "shared": true,
+        "icons": 1,
+        "decorative": "true",
+        "clipped": false,
+        "hover": "rgb(67, 166, 199)"
+      },
+      {
+        "name": "assignment-execute",
+        "style": {
+          "minHeight": "46px",
+          "padding": "0px 20px",
+          "borderRadius": "6px",
+          "fontFamily": "Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+          "fontSize": "13px",
+          "fontWeight": "600",
+          "gap": "8px",
+          "backgroundColor": "rgb(80, 200, 196)",
+          "color": "rgb(16, 22, 28)"
+        },
+        "lineHeight": "17.55px",
+        "continuation": false,
+        "primary": true,
+        "shared": true,
+        "icons": 1,
+        "decorative": "true",
+        "clipped": false,
+        "hover": "rgb(67, 166, 199)"
+      },
+      {
+        "name": "assignment-continue",
+        "style": {
+          "minHeight": "46px",
+          "padding": "0px 20px",
+          "borderRadius": "6px",
+          "fontFamily": "Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+          "fontSize": "13px",
+          "fontWeight": "600",
+          "gap": "8px",
+          "backgroundColor": "rgb(80, 200, 196)",
+          "color": "rgb(16, 22, 28)"
+        },
+        "lineHeight": "18.2px",
+        "continuation": true,
+        "primary": true,
+        "shared": true,
+        "icons": 1,
+        "decorative": "true",
+        "clipped": false,
+        "hover": "rgb(67, 166, 199)"
+      },
+      {
+        "name": "map-scheduling",
+        "style": {
+          "minHeight": "46px",
+          "padding": "0px 20px",
+          "borderRadius": "6px",
+          "fontFamily": "Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+          "fontSize": "13px",
+          "fontWeight": "600",
+          "gap": "8px",
+          "backgroundColor": "rgb(80, 200, 196)",
+          "color": "rgb(16, 22, 28)"
+        },
+        "lineHeight": "17.55px",
+        "continuation": false,
+        "primary": true,
+        "shared": true,
+        "icons": 1,
+        "decorative": "true",
+        "clipped": false,
+        "hover": "rgb(67, 166, 199)"
+      },
+      {
+        "name": "scheduling-review",
+        "style": {
+          "minHeight": "46px",
+          "padding": "0px 20px",
+          "borderRadius": "6px",
+          "fontFamily": "Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+          "fontSize": "13px",
+          "fontWeight": "600",
+          "gap": "8px",
+          "backgroundColor": "rgb(80, 200, 196)",
+          "color": "rgb(16, 22, 28)"
+        },
+        "lineHeight": "17.55px",
+        "continuation": false,
+        "primary": true,
+        "shared": true,
+        "icons": 1,
+        "decorative": "true",
+        "clipped": false,
+        "hover": "rgb(67, 166, 199)"
+      },
+      {
+        "name": "scheduling-execute",
+        "style": {
+          "minHeight": "46px",
+          "padding": "0px 20px",
+          "borderRadius": "6px",
+          "fontFamily": "Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+          "fontSize": "13px",
+          "fontWeight": "600",
+          "gap": "8px",
+          "backgroundColor": "rgb(80, 200, 196)",
+          "color": "rgb(16, 22, 28)"
+        },
+        "lineHeight": "17.55px",
+        "continuation": false,
+        "primary": true,
+        "shared": true,
+        "icons": 1,
+        "decorative": "true",
+        "clipped": false,
+        "hover": "rgb(67, 166, 199)"
+      }
+    ],
+    "reviews": [
+      {
+        "name": "assignment",
+        "width": 358,
+        "center": 0,
+        "height": 806.859375,
+        "style": {
+          "shell": {
+            "padding": "16px",
+            "borderRadius": "16px",
+            "font": "13px / 19.5px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "color": "rgb(243, 248, 250)",
+            "background": "rgb(25, 36, 45) none repeat scroll 0% 0% / auto padding-box border-box",
+            "gap": "normal",
+            "maxWidth": "650px",
+            "maxHeight": "812px"
+          },
+          "heading": {
+            "padding": "0px",
+            "borderRadius": "0px",
+            "font": "700 22px / 27.5px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "color": "rgb(243, 248, 250)",
+            "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+            "gap": "normal",
+            "maxWidth": "none",
+            "maxHeight": "none"
+          },
+          "row": {
+            "padding": "16px 0px",
+            "borderRadius": "0px",
+            "font": "13px / 21.45px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "color": "rgb(184, 200, 207)",
+            "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+            "gap": "4px",
+            "maxWidth": "none",
+            "maxHeight": "none"
+          },
+          "value": {
+            "padding": "0px",
+            "borderRadius": "0px",
+            "font": "13px / 21.45px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "color": "rgb(243, 248, 250)",
+            "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+            "gap": "normal",
+            "maxWidth": "none",
+            "maxHeight": "none"
+          },
+          "footer": {
+            "padding": "0px",
+            "borderRadius": "0px",
+            "font": "13px / 19.5px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "color": "rgb(243, 248, 250)",
+            "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+            "gap": "12px",
+            "maxWidth": "none",
+            "maxHeight": "none"
+          }
+        },
+        "tab_trap": true,
+        "secondary_role": true
+      },
+      {
+        "name": "scheduling",
+        "width": 358,
+        "center": 0,
+        "height": 812,
+        "style": {
+          "shell": {
+            "padding": "16px",
+            "borderRadius": "16px",
+            "font": "13px / 19.5px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "color": "rgb(243, 248, 250)",
+            "background": "rgb(25, 36, 45) none repeat scroll 0% 0% / auto padding-box border-box",
+            "gap": "normal",
+            "maxWidth": "650px",
+            "maxHeight": "812px"
+          },
+          "heading": {
+            "padding": "0px",
+            "borderRadius": "0px",
+            "font": "700 22px / 27.5px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "color": "rgb(243, 248, 250)",
+            "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+            "gap": "normal",
+            "maxWidth": "none",
+            "maxHeight": "none"
+          },
+          "row": {
+            "padding": "16px 0px",
+            "borderRadius": "0px",
+            "font": "13px / 21.45px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "color": "rgb(184, 200, 207)",
+            "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+            "gap": "4px",
+            "maxWidth": "none",
+            "maxHeight": "none"
+          },
+          "value": {
+            "padding": "0px",
+            "borderRadius": "0px",
+            "font": "13px / 21.45px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "color": "rgb(243, 248, 250)",
+            "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+            "gap": "normal",
+            "maxWidth": "none",
+            "maxHeight": "none"
+          },
+          "footer": {
+            "padding": "0px",
+            "borderRadius": "0px",
+            "font": "13px / 19.5px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "color": "rgb(243, 248, 250)",
+            "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+            "gap": "12px",
+            "maxWidth": "none",
+            "maxHeight": "none"
+          }
+        },
+        "tab_trap": true,
+        "secondary_role": true
+      }
+    ],
+    "toolbars": [
+      {
+        "name": "assignment",
+        "hero": true,
+        "insideHero": true,
+        "left": -22,
+        "right": -20,
+        "tools": [
+          {
+            "width": 256,
+            "height": 46,
+            "padding": "8px 12px",
+            "radius": "6px",
+            "font": "700 12px / 16.8px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "gap": "8px"
+          },
+          {
+            "width": 256,
+            "height": 46,
+            "padding": "8px 12px",
+            "radius": "6px",
+            "font": "700 12px / 16.8px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "gap": "8px"
+          }
+        ],
+        "primary": {
+          "width": 256,
+          "height": 46
+        }
+      },
+      {
+        "name": "scheduling",
+        "hero": true,
+        "insideHero": true,
+        "left": -22,
+        "right": -20,
+        "tools": [
+          {
+            "width": 256,
+            "height": 46,
+            "padding": "8px 12px",
+            "radius": "6px",
+            "font": "700 12px / 16.8px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "gap": "8px"
+          },
+          {
+            "width": 256,
+            "height": 46,
+            "padding": "8px 12px",
+            "radius": "6px",
+            "font": "700 12px / 16.8px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+            "gap": "8px"
+          }
+        ],
+        "primary": {
+          "width": 256,
+          "height": 46
+        }
+      }
+    ]
+  },
+  "inicio_to_overview": true,
+  "approval_map_scheduling_configuration": true,
+  "disabled_upload_action_and_hover": true,
+  "shared_workflow_visual_contract": true,
+  "review_keyboard_cancel_and_confirmation": true,
+  "creation_from_files": true,
+  "refresh_during_queue": true,
+  "queued_before_worker_start": true,
+  "assignment_and_scheduling_approved": true,
+  "cold_link": true,
+  "back_forward_refresh": true,
+  "idle_request_budget": true,
+  "mobile_history": true,
+  "export_has_records": true,
+  "comparative_reused_and_restored": true,
+  "trip_detail_keyboard": true,
+  "direct_next_configuration": true,
+  "comparative_close_reopen_without_post": true,
+  "terminal_scheduling_reconfigured_as_new_run": true,
+  "failed_run_retained_unchanged": true,
+  "map_toolbar_and_closed_contexts": true,
+  "overview_dual_cta_without_cases": true,
+  "overview_single_case_center_to_map": true,
+  "new_decision_clears_context_and_preserves_history": true,
+  "javascript_errors": [],
+  "unexpected_http_errors": [],
+  "expected_draft_hydration_misses": 0,
+  "requests": 1042
+}

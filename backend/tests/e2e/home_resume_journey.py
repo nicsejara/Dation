@@ -24,7 +24,11 @@ async def main():
   center=page.locator('[data-platform-decisions]');await center.locator('[data-case-open="'+CASE+'"]').click()
   node=center.locator('[data-center-node=logistics_assignment]')
   await node.locator('summary',has_text='Responsables y aprobación').click()
-  await node.get_by_role('link',name='Abrir dashboard aprobado',exact=True).click()
+  assert await node.get_by_role('link',name='Abrir dashboard aprobado',exact=True).count()==0
+  await node.locator('summary',has_text='Historial de corridas').click()
+  previous=node.locator('.center-run').filter(has=page.get_by_role('link',name='RUN-'+OFFICIAL[:8],exact=True))
+  await previous.wait_for();assert 'Reemplazada' in await previous.inner_text()
+  await previous.get_by_role('link',name='RUN-'+OFFICIAL[:8],exact=True).click()
   await page.locator('.assignment-dashboard-v2').wait_for();assert parse_qs(urlsplit(page.url).query)['run_id']==[OFFICIAL]
   await page.go_back();await node.locator('summary',has_text='Responsables y aprobación').click()
   await node.get_by_role('link',name='Abrir último dashboard',exact=True).click()

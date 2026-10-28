@@ -1,0 +1,172 @@
+[
+  {
+    "kind": "d1",
+    "size": [
+      1440,
+      900
+    ],
+    "viewport": 1440,
+    "width": 1440,
+    "font": "Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+    "radius": "0px 8px 8px 0px",
+    "border": "rgba(145, 189, 199, 0.18) rgba(145, 189, 199, 0.18) rgba(145, 189, 199, 0.18) rgb(80, 200, 196)",
+    "background": "rgb(25, 36, 45)",
+    "padding": "32px",
+    "cardRadius": "0px",
+    "color": "rgb(243, 248, 250)",
+    "surface": "rgb(16, 22, 28)"
+  },
+  {
+    "kind": "d1",
+    "size": [
+      1024,
+      768
+    ],
+    "viewport": 1024,
+    "width": 1024,
+    "font": "Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+    "radius": "0px 8px 8px 0px",
+    "border": "rgba(145, 189, 199, 0.18) rgba(145, 189, 199, 0.18) rgba(145, 189, 199, 0.18) rgb(80, 200, 196)",
+    "background": "rgb(25, 36, 45)",
+    "padding": "32px",
+    "cardRadius": "0px",
+    "color": "rgb(243, 248, 250)",
+    "surface": "rgb(16, 22, 28)"
+  },
+  {
+    "kind": "d1",
+    "size": [
+      768,
+      1024
+    ],
+    "viewport": 768,
+    "width": 768,
+    "font": "Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+    "radius": "0px 8px 8px 0px",
+    "border": "rgba(145, 189, 199, 0.18) rgba(145, 189, 199, 0.18) rgba(145, 189, 199, 0.18) rgb(80, 200, 196)",
+    "background": "rgb(25, 36, 45)",
+    "padding": "24px",
+    "cardRadius": "0px",
+    "color": "rgb(243, 248, 250)",
+    "surface": "rgb(16, 22, 28)"
+  },
+  {
+    "kind": "d1",
+    "size": [
+      375,
+      812
+    ],
+    "viewport": 375,
+    "width": 375,
+    "font": "Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+    "radius": "0px 8px 8px 0px",
+    "border": "rgba(145, 189, 199, 0.18) rgba(145, 189, 199, 0.18) rgba(145, 189, 199, 0.18) rgb(80, 200, 196)",
+    "background": "rgb(25, 36, 45)",
+    "padding": "20px",
+    "cardRadius": "0px",
+    "color": "rgb(243, 248, 250)",
+    "surface": "rgb(16, 22, 28)"
+  },
+  {
+    "kind": "d1",
+    "size": [
+      320,
+      640
+    ],
+    "viewport": 320,
+    "width": 320,
+    "font": "Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+    "radius": "0px 8px 8px 0px",
+    "border": "rgba(145, 189, 199, 0.18) rgba(145, 189, 199, 0.18) rgba(145, 189, 199, 0.18) rgb(80, 200, 196)",
+    "background": "rgb(25, 36, 45)",
+    "padding": "20px",
+    "cardRadius": "0px",
+    "color": "rgb(243, 248, 250)",
+    "surface": "rgb(16, 22, 28)"
+  },
+  {
+    "kind": "d2",
+    "size": [
+      1440,
+      900
+    ],
+    "viewport": 1440,
+    "width": 1440,
+    "font": "Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+    "radius": "0px 8px 8px 0px",
+    "border": "rgba(145, 189, 199, 0.18) rgba(145, 189, 199, 0.18) rgba(145, 189, 199, 0.18) rgb(80, 200, 196)",
+    "background": "rgb(25, 36, 45)",
+    "padding": "32px",
+    "cardRadius": "0px",
+    "color": "rgb(243, 248, 250)",
+    "surface": "rgb(16, 22, 28)"
+  },
+  {
+    "kind": "d2",
+    "size": [
+      1024,
+      768
+    ],
+    "viewport": 1024,
+    "width": 1024,
+    "font": "Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+    "radius": "0px 8px 8px 0px",
+    "border": "rgba(145, 189, 199, 0.18) rgba(145, 189, 199, 0.18) rgba(145, 189, 199, 0.18) rgb(80, 200, 196)",
+    "background": "rgb(25, 36, 45)",
+    "padding": "32px",
+    "cardRadius": "0px",
+    "color": "rgb(243, 248, 250)",
+    "surface": "rgb(16, 22, 28)"
+  },
+  {
+    "kind": "d2",
+    "size": [
+      768,
+      1024
+    ],
+    "viewport": 768,
+    "width": 768,
+    "font": "Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+    "radius": "0px 8px 8px 0px",
+    "border": "rgba(145, 189, 199, 0.18) rgba(145, 189, 199, 0.18) rgba(145, 189, 199, 0.18) rgb(80, 200, 196)",
+    "background": "rgb(25, 36, 45)",
+    "padding": "24px",
+    "cardRadius": "0px",
+    "color": "rgb(243, 248, 250)",
+    "surface": "rgb(16, 22, 28)"
+  },
+  {
+    "kind": "d2",
+    "size": [
+      375,
+      812
+    ],
+    "viewport": 375,
+    "width": 375,
+    "font": "Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+    "radius": "0px 8px 8px 0px",
+    "border": "rgba(145, 189, 199, 0.18) rgba(145, 189, 199, 0.18) rgba(145, 189, 199, 0.18) rgb(80, 200, 196)",
+    "background": "rgb(25, 36, 45)",
+    "padding": "20px",
+    "cardRadius": "0px",
+    "color": "rgb(243, 248, 250)",
+    "surface": "rgb(16, 22, 28)"
+  },
+  {
+    "kind": "d2",
+    "size": [
+      320,
+      640
+    ],
+    "viewport": 320,
+    "width": 320,
+    "font": "Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+    "radius": "0px 8px 8px 0px",
+    "border": "rgba(145, 189, 199, 0.18) rgba(145, 189, 199, 0.18) rgba(145, 189, 199, 0.18) rgb(80, 200, 196)",
+    "background": "rgb(25, 36, 45)",
+    "padding": "20px",
+    "cardRadius": "0px",
+    "color": "rgb(243, 248, 250)",
+    "surface": "rgb(16, 22, 28)"
+  }
+]

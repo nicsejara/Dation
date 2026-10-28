@@ -1,0 +1,24 @@
+{
+  "suite": "FOCAL-CASE-CREATE",
+  "status": "PASS",
+  "tests": 1,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "started_at": "2026-10-27T04:29:25.711588+00:00",
+  "finished_at": "2026-10-27T04:29:45.652598+00:00",
+  "seconds": 19.941,
+  "cwd": "/workspace/Dation/backend",
+  "command": [
+    "/workspace/Dation/backend/.browser-venv/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "test_ultimate_case_setup.UltimateCaseSetupTests.test_01_ui_model_publish_case_without_csv_and_reload",
+    "-v"
+  ],
+  "exit_code": 0,
+  "production_credentials_cleared": true,
+  "PYTHONPATH": "tests/browser",
+  "log_sha256": "7385ee13877683a73c34ea94b85f8e69bb80f9a6fac7ffdb9996da51430ef809"
+}

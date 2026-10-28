@@ -55,6 +55,23 @@ def input_signature(orders_dataset_id: str, fleet_dataset_id: str) -> str:
     return f"{orders_dataset_id}:{fleet_dataset_id}"
 
 
+def case_workflow_version(row: dict) -> int:
+    """Missing discriminator means legacy; unknown cohorts never fall through."""
+    version = row.get("workflow_version", 1)
+    if type(version) is not int or version not in (1, 2):
+        raise ValueError("Versión de workflow del Case no soportada.")
+    return version
+
+
+def case_projection_options(row: dict) -> dict:
+    return {
+        "case_id": str(row["id"]),
+        "orders_dataset_id": str(row["orders_dataset_id"]) if row.get("orders_dataset_id") is not None else None,
+        "fleet_dataset_id": str(row["fleet_dataset_id"]) if row.get("fleet_dataset_id") is not None else None,
+        "workflow_version": case_workflow_version(row),
+    }
+
+
 def create_node_state(status: str) -> dict:
     return {
         "status": status,
@@ -74,13 +91,17 @@ def create_case_state(
     fleet_dataset_id: str,
     *,
     created_at: str | None = None,
+    workflow_version: int = 1,
 ) -> dict:
+    case_workflow_version({"workflow_version": workflow_version})
+    if workflow_version == 2 and (orders_dataset_id is not None or fleet_dataset_id is not None):
+        raise ValueError("El workflow Ultimate utiliza un Pack versionado, no el pair legacy.")
     now = created_at or utc_now()
-    return {
+    state = {
         "schema_version": CASE_SCHEMA_VERSION,
         "id": case_id,
         "domain": CASE_DOMAIN,
-        "signature": input_signature(orders_dataset_id, fleet_dataset_id),
+        "signature": input_signature(orders_dataset_id, fleet_dataset_id) if workflow_version == 1 else None,
         "created_at": now,
         "updated_at": now,
         "inputs": {
@@ -89,11 +110,14 @@ def create_case_state(
         },
         "stale_predecessor": None,
         "nodes": {
-            "logistics_assignment": create_node_state("available"),
+            "logistics_assignment": create_node_state("available" if workflow_version == 1 else "needs_data"),
             "logistics_scheduling": create_node_state("locked"),
             "logistics_final_assignment": create_node_state("locked"),
         },
     }
+    if workflow_version == 2:
+        state["workflow_version"] = 2
+    return state
 
 
 def validate_case_state(
@@ -102,9 +126,12 @@ def validate_case_state(
     case_id: str,
     orders_dataset_id: str,
     fleet_dataset_id: str,
+    workflow_version: int = 1,
 ) -> dict:
     if not isinstance(state, dict):
         raise ValueError("El estado del Decision Case debe ser un objeto.")
+    if "workflow_version" in state and case_workflow_version(state) != workflow_version:
+        raise ValueError("El cache del Case corresponde a otro workflow.")
     if state.get("id") not in (None, case_id):
         raise ValueError("El estado corresponde a otro Decision Case.")
     inputs = state.get("inputs") or {}
@@ -119,12 +146,13 @@ def validate_case_state(
             orders_dataset_id,
             fleet_dataset_id,
             created_at=state.get("created_at"),
+            workflow_version=workflow_version,
         ),
         **state,
         "schema_version": CASE_SCHEMA_VERSION,
         "id": case_id,
         "domain": CASE_DOMAIN,
-        "signature": input_signature(orders_dataset_id, fleet_dataset_id),
+        "signature": input_signature(orders_dataset_id, fleet_dataset_id) if workflow_version == 1 else None,
         "inputs": {
             "orders_dataset_id": orders_dataset_id,
             "fleet_dataset_id": fleet_dataset_id,
@@ -135,6 +163,7 @@ def validate_case_state(
         case_id,
         orders_dataset_id,
         fleet_dataset_id,
+        workflow_version=workflow_version,
     )["nodes"]
     canonical["nodes"] = {
         node_id: {
@@ -170,12 +199,14 @@ def project_case_history(
     orders_dataset_id: str,
     fleet_dataset_id: str,
     summaries: dict | None = None,
+    workflow_version: int = 1,
 ) -> dict:
     canonical = validate_case_state(
         state,
         case_id=case_id,
         orders_dataset_id=orders_dataset_id,
         fleet_dataset_id=fleet_dataset_id,
+        workflow_version=workflow_version,
     )
     grouped = {node_id: [] for node_id in NODE_IDS}
     if summaries is not None:
@@ -239,6 +270,8 @@ def project_case_history(
                 )
 
     assignment = current_approved["logistics_assignment"]
+    if workflow_version == 2 and not grouped["logistics_assignment"]:
+        canonical["nodes"]["logistics_assignment"]["status"] = "needs_data"
     scheduling = current_approved["logistics_scheduling"]
     final_assignment = current_approved["logistics_final_assignment"]
 

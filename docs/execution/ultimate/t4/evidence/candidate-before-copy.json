@@ -1,0 +1,157 @@
+{
+  "phase": "T4",
+  "head": "ef997235a30251fbf7ae53690ed738092ee973d8",
+  "frozen_at": "2026-10-26T19:16:55.863013+00:00",
+  "files": {
+    "backend/app/domain/logistics/data_contracts.py": {
+      "bytes": 7369,
+      "sha256": "195d6d74fee3dab71534954421a129fbcbb8aaaefa87b2e8a975d967bd96a265",
+      "baseline_sha256": null,
+      "baseline": "new T4 file"
+    },
+    "backend/app/domain/logistics/normalizers.py": {
+      "bytes": 11412,
+      "sha256": "9c14d52fba4e62a454435463646cef51b8def2ca0cf568453f5b00b28b0a6b49",
+      "baseline_sha256": null,
+      "baseline": "new T4 file"
+    },
+    "backend/app/models/ultimate_data_pack.py": {
+      "bytes": 1002,
+      "sha256": "19929e3997751cffe76b1362860b17c8a74209169e1271bbbfe47e7485f58b35",
+      "baseline_sha256": null,
+      "baseline": "new T4 file"
+    },
+    "backend/app/platform/data_hub.py": {
+      "bytes": 7890,
+      "sha256": "f664f36a41ee6e327bad1b2beacfeacf56e33c50084996b2540c517e34bda05b",
+      "baseline_sha256": "051fc63ad8fb67c558b010d4dcbe46a22704c89b599e1072003610e8f4c717a1",
+      "baseline": "HEAD"
+    },
+    "backend/app/platform/data_routes.py": {
+      "bytes": 5882,
+      "sha256": "9f256b3136ce123bd4aa6d48017fc6f79b60b4411f74156983ac16af95697001",
+      "baseline_sha256": "976a567679df260b21e0d432870657376d5722e28adb86d71d1c5ecf77a51234",
+      "baseline": "HEAD"
+    },
+    "backend/app/platform/identity.py": {
+      "bytes": 5715,
+      "sha256": "abf4e2e8fabf8ad0526b13a36e50675f5a3be3de416a13f2ee7bf3d69333e823",
+      "baseline_sha256": "7d7562883c58bcfd8fd35c6314fb53596a5d014e245a8663fbde250e88365011",
+      "baseline": "post-T3 checkpoint"
+    },
+    "backend/app/platform/routes.py": {
+      "bytes": 1942,
+      "sha256": "4df6a3639ff68efb62ff9fff0d933379fc3ce207cec53f0fb84823ef7f439aa1",
+      "baseline_sha256": "a4de8863783bd49cb3d01f00ca721d0497e27cf763e829d73df84c2aca7f404d",
+      "baseline": "post-T3 checkpoint"
+    },
+    "backend/app/platform/ultimate_data_routes.py": {
+      "bytes": 3798,
+      "sha256": "12e933add12d6c79829f11b40652d2748b1370b27c24de4a3b0390f033232569",
+      "baseline_sha256": null,
+      "baseline": "new T4 file"
+    },
+    "backend/app/services/case_data_pack_service.py": {
+      "bytes": 12682,
+      "sha256": "0261c99084c145f4af3f4d7496d2e2c7aa1e11932af670c5b0278e27f90a0da6",
+      "baseline_sha256": null,
+      "baseline": "new T4 file"
+    },
+    "backend/app/static/css/ultimate-case-data.css": {
+      "bytes": 1349,
+      "sha256": "972f25466d6d900b0054418c99a340d4cc0bb30138a00ce75cfb9e3a10c79169",
+      "baseline_sha256": null,
+      "baseline": "new T4 file"
+    },
+    "backend/app/static/js/dispatch/cases/ultimate-case-setup.mjs": {
+      "bytes": 13780,
+      "sha256": "be54da8bb9bfce52664fca0db37a2671675e00a7bc41789b04df485d50d56f35",
+      "baseline_sha256": "bc9dd7ede225d98324c0302f133a32070c9cc14307279ecd5184299615876010",
+      "baseline": "post-T3 checkpoint"
+    },
+    "backend/app/static/js/dispatch/navigation/resource.mjs": {
+      "bytes": 5576,
+      "sha256": "c0553af6b9bfb1db3af34294ddfaeaadbdaa3f3dfc7d03a5551b733269e9e902",
+      "baseline_sha256": "84d12a20daad4c02edf34863c85617e7dd2f347d95eafcf198367d3cc4609907",
+      "baseline": "post-T3 checkpoint"
+    },
+    "backend/app/static/js/dispatch/upload/ultimate-case-data.mjs": {
+      "bytes": 20856,
+      "sha256": "362d2d6c7998a7cb008c753489d0016840e48845c528cb63252c494411f65b31",
+      "baseline_sha256": null,
+      "baseline": "new T4 file"
+    },
+    "backend/app/static/js/dispatch/workspace.mjs": {
+      "bytes": 53215,
+      "sha256": "5c372aedddba984a1cc64992029c659a9e0e7fb3bf7e10051f03e7326df9ad4c",
+      "baseline_sha256": "db5bc99fa379b8a9d8733ff83647e7f95394a943d83a04670ab768cb6b00e76f",
+      "baseline": "post-T3 checkpoint"
+    },
+    "backend/app/static/js/platform/data-hub.mjs": {
+      "bytes": 24950,
+      "sha256": "fae18794fb4634e83f287544ef2864da8a7d24419e00fe9bad746d5975a49b51",
+      "baseline_sha256": "a6a2213337ab054ed611ba17c41c36a5494cf1428d4b7a5781e41749b6de55af",
+      "baseline": "HEAD"
+    },
+    "backend/app/static/js/platform/data-presentation.mjs": {
+      "bytes": 1163,
+      "sha256": "0290b3c10b4e28f23a640d9ceabcd09f54d477afc946af9dc0800177a0c43dc8",
+      "baseline_sha256": "118a06a38ccb8ecf569d049c9a1764bd84a1de4d8e1b832bd8c7e8e18dbe51e6",
+      "baseline": "HEAD"
+    },
+    "backend/app/static/js/platform/dda-navigation.mjs": {
+      "bytes": 3381,
+      "sha256": "eba5c4248673a97a6662ea84c2bd63e2afb6fe6cfcaa549fc941f13b29c1f904",
+      "baseline_sha256": "a04644f8474d6361cd322cd53c129652b2ad4a321c1674fd64c8544b97802b47",
+      "baseline": "post-T3 checkpoint"
+    },
+    "backend/app/templates/app.html": {
+      "bytes": 71317,
+      "sha256": "7f707f031891f30e0c50090c29eb64f24f2dd5e0883023b01bb9115036aa0f7b",
+      "baseline_sha256": "10ed8e2dcd4854fc6e5e2fe6522051fabec7de603ad8f29c5f2db0741f7efa7f",
+      "baseline": "post-T3 checkpoint"
+    },
+    "backend/tests/browser/test_ultimate_case_data.py": {
+      "bytes": 15086,
+      "sha256": "b24c95dc420bd061e9b94655244cd969ddf73d065912b49749fb8bcfc09429d0",
+      "baseline_sha256": null,
+      "baseline": "new T4 file"
+    },
+    "backend/tests/e2e/ultimate_data_fixture.py": {
+      "bytes": 1146,
+      "sha256": "c2f0a7106d3d6b542e3efc938a45815020d6aa9b4c525e47fa1cfd58a2544f8d",
+      "baseline_sha256": null,
+      "baseline": "new T4 file"
+    },
+    "backend/tests/e2e/ultimate_storage_gateway.py": {
+      "bytes": 1862,
+      "sha256": "f0279df7eec6e749d4dc85c71b4886afc5d35d88a6ac69c92d996c927dc61687",
+      "baseline_sha256": null,
+      "baseline": "new T4 file"
+    },
+    "backend/tests/integration/test_ultimate_data_pack.py": {
+      "bytes": 19953,
+      "sha256": "b48a3d94e40de6bd06720154780ebb1eed8d10ba01cf6911d195fbd5e539a623",
+      "baseline_sha256": null,
+      "baseline": "new T4 file"
+    },
+    "backend/tests/test_ultimate_data_contracts.py": {
+      "bytes": 11641,
+      "sha256": "8e5ae3b1ed9099bb66c82791d7716da87909212c813c0a16a17be7f1caa30497",
+      "baseline_sha256": null,
+      "baseline": "new T4 file"
+    },
+    "backend/tests/test_ultimate_data_navigation.mjs": {
+      "bytes": 1208,
+      "sha256": "bb67ea6b4105d2ebd6479975d5296ae521e20043b9094648b632370c0f729202",
+      "baseline_sha256": null,
+      "baseline": "new T4 file"
+    },
+    "supabase/migrations/20261026184655_ultimate_progressive_data_pack.sql": {
+      "bytes": 28017,
+      "sha256": "0e664f71d197cba4c4d6d09135b7f2b140370751665570cf775a90baa8702068",
+      "baseline_sha256": null,
+      "baseline": "new T4 file"
+    }
+  }
+}

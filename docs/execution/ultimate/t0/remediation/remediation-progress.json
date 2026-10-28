@@ -1,0 +1,118 @@
+{
+  "updated_at": "2026-10-25T22:31:29.860877+00:00",
+  "completed_focal": [
+    {
+      "clusters": [
+        "C-NETWORK",
+        "C-READY"
+      ],
+      "status": "FOCAL PASS",
+      "log": "C-network-ready-focal.log",
+      "sha256": "dab36214c9afd89ea5ebc7c9d7ee2ad9a37aceb6b0f5834ecd5a897e530d6aaf",
+      "files": [
+        "backend/tests/browser/test_navigation.py",
+        "/tmp/dation-t0r-run-suite.py"
+      ]
+    },
+    {
+      "clusters": [
+        "B-VALIDATION",
+        "B-CONTRAST",
+        "B-FOCUS-MARGIN"
+      ],
+      "status": "FOCAL PASS",
+      "log": "B-css-final-focal.log",
+      "sha256": "fdb44407f685eb901515bf01f1966174f6193c2d1e95f5be5cffee0f1e87f0d1",
+      "files": [
+        "backend/app/static/css/workflow-context.css",
+        "backend/app/static/css/dispatch.css"
+      ]
+    },
+    {
+      "clusters": [
+        "A-MIGRATION"
+      ],
+      "status": "FOCAL PASS",
+      "log": "A-migration-current-gates.log",
+      "sha256": "a7e1edd06889e3fd3b08af5fd575bbc059792f5ad1bfbe53a7c40e672c4bb7e0",
+      "files": [
+        "backend/tests/e2e/test_optimized_responsibilities.py",
+        "backend/tests/e2e/test_v2_foundation.py",
+        "backend/tests/e2e/test_workflow_gates.py"
+      ]
+    },
+    {
+      "clusters": [
+        "A-INSIGHT"
+      ],
+      "status": "FOCAL PASS",
+      "log": "A-insight-final-focal.log",
+      "sha256": "7a6c0da16cfa01c9b5a23fd6ab34ad909b341e53dd7be25392fa1b12aa5f29c5"
+    },
+    {
+      "clusters": [
+        "A-ROLES Foundation"
+      ],
+      "status": "FOCAL PASS",
+      "log": "A-roles-foundation-accepted.log",
+      "sha256": "c3c933982e5564395dc53fb18be261a676d61e3da91b09ae18cbad1023e99682"
+    },
+    {
+      "clusters": [
+        "A-ROLES Gates"
+      ],
+      "status": "FOCAL PASS",
+      "log": "A-roles-gates.log",
+      "sha256": "f1e5fbcc7b6089cdf5b60fa65cac349ebdc93fc6624e9f29cf0260db25d5bb7b"
+    },
+    {
+      "clusters": [
+        "A-ROLES single owner/alias"
+      ],
+      "status": "FOCAL PASS",
+      "log": "A-roles-single-owner-alias.log",
+      "sha256": "497d6de2723b317159a4dced498d3e6132291da3b002c88146fdb8cda21159ae"
+    },
+    {
+      "clusters": [
+        "A-PREPARATION shared Browser fixture",
+        "A-VISUAL geometry/terminology",
+        "B-KPI-CASCADE",
+        "B-CSV-CONTRAST"
+      ],
+      "status": "FOCAL PASS (12 cases)",
+      "log": "A-preparation-and-B-cascade-related.log",
+      "sha256": "efb299737ec87aa90bb4ed98d62dbbb10242a9fa8e0d488882572e25649da030"
+    },
+    {
+      "clusters": [
+        "A-ACTIONS",
+        "A-RERUN Browser/Saga4"
+      ],
+      "status": "FOCAL PASS (14 cases)",
+      "log": "A-actions-rerun-related.log",
+      "sha256": "d3e243419455ed83787f3c49a1f05549316c9f8cab8510af687a0bd55971855f"
+    },
+    {
+      "clusters": [
+        "A-RERUN Golden real stack"
+      ],
+      "status": "FOCAL PASS (2 cases)",
+      "log": "A-rerun-golden-real-stack.log",
+      "sha256": "55d705d94feb3c02837bad370dac817c0982d2a573ef3fcc82eee7ecfdde34fb"
+    },
+    {
+      "clusters": [
+        "A-ROLES WorkflowContext",
+        "A-PREPARATION WorkflowContext",
+        "D-ATTRIBUTES",
+        "D-NAV-GEOMETRY"
+      ],
+      "status": "FOCAL PASS (21 cases)",
+      "log": "A-D-workflow-context-related.log",
+      "sha256": "5fef559cd946619e36f84eb9ae2cd5d334c82bdf2d649597b1e1284a1c56400c"
+    }
+  ],
+  "final_suites": "NOT RUN yet; initial concurrent diagnostics were intentionally interrupted after isolation cause was confirmed.",
+  "T1_executed": false
+}

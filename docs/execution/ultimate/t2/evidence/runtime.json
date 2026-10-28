@@ -1,0 +1,18 @@
+{
+  "python": "3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
+  "node": "v24.19.0",
+  "pydantic": "2.14.0",
+  "fastapi": "0.143.0",
+  "postgres": "PostgreSQL 17.11 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+  "postgres_image_digests": [
+    "postgres@sha256:b0f9560a2de083e2cc7382e75f808c7381a32852a7ec49117deedb300e552b24"
+  ],
+  "docker_target": "unix:///var/run/docker.sock",
+  "owned_container": "dation-t2-20261026-ultimate",
+  "container_network": "none",
+  "published_ports": [],
+  "supabase_cli": "2.122.0 (tool only)",
+  "production_credentials_cleared": true,
+  "application_dependencies_changed": false,
+  "remote_SQL_operations": false
+}

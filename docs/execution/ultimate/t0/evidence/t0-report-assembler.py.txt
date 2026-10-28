@@ -1,0 +1,338 @@
+"""Assemble T0 documentation from captured evidence; never edits product/tests."""
+import ast
+from collections import Counter
+from datetime import datetime, timezone
+import hashlib
+import html
+import json
+from pathlib import Path
+import re
+import shutil
+import subprocess
+
+ROOT=Path('/workspace/Dation')
+BASE=ROOT/'docs/execution/ultimate'
+T0=BASE/'t0'
+EV=T0/'evidence'
+SUITES=['B-PY','B-NODE','B-BROWSER','B-SQL','B-E2E','B-FOCUS']
+def read(name):return json.loads((EV/name).read_text())
+def write(path,data):path.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
+def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
+def git(*args):return subprocess.check_output(['git',*args],cwd=ROOT,text=True).strip()
+results=[read(n+'.result.json') for n in SUITES]
+manifest=json.loads((BASE/'source-manifest.json').read_text())
+changed=[x['path'] for x in manifest['tracked_files'] if not (ROOT/x['path']).is_file() or sha(ROOT/x['path'])!=x['sha256']]
+norm_changed=[x['path'] for x in manifest['normative_sources'] if x.get('available') and sha(ROOT/x['path'])!=x['sha256']]
+assert not changed and not norm_changed,(changed,norm_changed)
+assert git('rev-parse','HEAD')==manifest['head']
+assert not git('diff','--name-only') and not git('diff','--cached','--name-only')
+
+historical={
+'test_workflow_context.WorkflowContextTests.test_map_assignment_is_consumed_readonly_by_config_and_review',
+'test_workflow_context.WorkflowContextTests.test_dda_navigation_resolves_canonical_runs_without_losing_context',
+'test_workflow_context.WorkflowContextTests.test_dashboard_trace_shares_the_copy_row_and_context_pills_are_equal'}
+
+def parse_failures(name):
+    log=(EV/(name+'.log')).read_text()
+    pattern=r'^(FAIL|ERROR): ([^\n]+)\n-{10,}\n(.*?)(?=^={20,}\n(?:FAIL|ERROR):|^-{20,}\nRan |\Z)'
+    found=[]
+    for kind,title,trace in re.findall(pattern,log,re.M|re.S):
+        ident=re.search(r'\(([A-Za-z0-9_.]+)\)',title)
+        ident=ident.group(1) if ident else title
+        frames=re.findall(r'File "(/workspace/Dation/backend/[^\"]+)", line (\d+), in ([^\n]+)',trace)
+        first=next((f for f in frames if '/tests/' in f[0]),None)
+        assertion='';source=None
+        if first:
+            path=Path(first[0]);lineno=int(first[1]);source=str(path.relative_to(ROOT))+':'+str(lineno)
+            assertion=path.read_text().splitlines()[lineno-1].strip()
+        error_lines=[l for l in trace.splitlines() if re.match(r'^(AssertionError|KeyError|RuntimeError|TimeoutError|playwright\.).*',l)]
+        observed=error_lines[-1] if error_lines else trace.strip().splitlines()[-1]
+        category='Hallazgo nuevo en baseline; causa pendiente de aislamiento'
+        classification='Hallazgo del baseline actual, origen aún sin atribuir. No hubo cambio productivo T0; no hay prueba histórica suficiente para exención G-B.'
+        expected=assertion or 'La prueba debía completar el contrato indicado sin error.'
+        recommendation='Reproducir el caso con inputs/selector/estado exactos; corregir sólo la causa demostrada dentro del alcance autorizado. No cambiar producto/asserts a ciegas.'
+        blocking=True
+        if "Input should be 'data_owner' or 'decision_owner'" in trace:
+            category='Fixture/API de roles desactualizada'
+            classification='Preexistente y demostrable por contrato actual: caller usa enum rechazado; hallazgo medido por primera vez en esta suite T0.'
+            expected='Request de equipo aceptado por el test (200/201); fixture envía roles antiguos.'
+            recommendation='Alinear sólo el fixture de escritura con data_owner/decision_owner y flujo actual, validando el escenario completo. No ampliar el enum público para hacer pasar el test.'
+        elif "KeyError: 'data_steward'" in trace or "'data_steward\\ndata_owner' != 'data_steward'" in trace:
+            category='Expectativa legacy de roles/proyección/migración'
+            classification='Preexistente por diferencia explícita entre fixture y contrato/migraciones actuales; no producida por cambios T0.'
+            recommendation='Conciliar aliases legacy de lectura, roles públicos actuales y bridge de migración; preservar persona/actor/versiones. No borrar roles o historia para satisfacer snapshots.'
+        elif 'attributes_applied_at' in trace:
+            category='Snapshot/fixture de Case anterior a atributos aplicados'
+            classification='Preexistente: schema actual agrega el campo antes de T0; comparación del test no contempla ese estado.'
+            recommendation='Actualizar el golden/fixture explícito de columnas del schema actual y verificar que los campos históricos permanecen iguales; no modificar filas productivas.'
+        elif 'Aplicá los atributos del Case' in trace:
+            category='Precondición/orden de gates anterior al contrato actual'
+            classification='Preexistente demostrable: test espera un gate posterior sin satisfacer atributos actuales.'
+            recommendation='Preparar atributos/Owner requeridos en la fixture y conservar las verificaciones posteriores; no relajar guards.'
+        elif ident.endswith('test_assignment_scheduling_and_replacement_update_history_and_compact_list'):
+            category='Conteo histórico previo a invalidación propia/downstream'
+            classification='Preexistente: test espera4 eventos, observa5; SQL actual y escenario real A–F preservan supersession propia y downstream.'
+            expected='Exactamente4 eventos de aprobación/supersession en el test.'
+            observed='5 eventos. No se borró historia ni se cambió el resultado para cumplir el conteo.'
+            recommendation='Reconciliar el golden de eventos con cada acción/actor/Run del flujo vigente; no sustituirlo por un conteo laxo.'
+        elif ident.endswith('test_09_home_attention_tracks_real_versions_and_removes_approved_or_archived'):
+            category='Expectativa de aprobación vigente anterior a nueva admission'
+            classification='Preexistente: comentario del test retiene approval anterior tras admission; contrato actual retira propia/downstream. No es una decisión nueva T0.'
+            recommendation='Reconciliar assertions con freshness/admission vigentes y source Run exacta; preservar historia y actores.'
+        if "'Decision Owner'" in trace and "'Responsable'" in trace:
+            category='Expectativa de labels anterior al vocabulario UI vigente'
+            classification='Discrepancia preexistente de expectativa literal frente al componente actual; no se cambia la UI aprobada para hacer pasar el test.'
+            recommendation='Reconciliar fixture/labels con Decision Owner y verificar accesibilidad/controles reales; no rediseñar ni relajar las verificaciones restantes.'
+        if 'data-workflow-responsibility=data_steward' in trace:
+            category='Selector legacy de responsabilidad'
+            classification='Fixture/assertion refiere data_steward; contrato público actual usa data_owner. Confirmar el selector correcto antes de reparar.'
+            recommendation='Actualizar únicamente fixture/selector demostrado obsoleto manteniendo el control de identidad, permisos y estado.'
+        historical_signature=(ident.endswith('test_dashboard_trace_shares_the_copy_row_and_context_pills_are_equal') and '162.609375 not less than 1' in trace) or (ident.endswith('test_dda_navigation_resolves_canonical_runs_without_losing_context') and '[data-scheduling-review]' in trace and 'Timeout 6000ms' in trace) or (ident.endswith('test_map_assignment_is_consumed_readonly_by_config_and_review') and '[data-config-review]' in trace and 'Timeout 6000ms' in trace)
+        if ident in historical and historical_signature:
+            category='Deuda histórica WorkflowContext documentada'
+            classification='ID registrado en summary versionado del baseline7351632; reproducido ahora en ef99723. No se generaliza esta exención a otros tests.'
+            blocking=False
+            recommendation='Reparación acotada al primer consumer afectado (T5 para routing/Config; T10 para geometría), con cobertura vigente; T11 exige suites verdes.'
+        found.append({'suite':name,'kind':kind,'test_id':ident,'display_id':title,'component':ident.rsplit('.',1)[0],
+                      'source':source,'assertion':assertion,'expected':expected,'observed':observed,
+                      'category':category,'classification':classification,'impact':'Escenario de regresión sin certificar; revisar la expectativa y sus precondiciones antes de continuar.' if blocking else 'Deuda histórica específica con reparación/cobertura requerida por G-B.',
+                      'historical_proof':'docs/final-polish-run-lineage-saga-summary.md:72; misma firma de fallo reproducida' if ident in historical and historical_signature else None,
+                      'blocks_T1_individually':blocking,
+                      'recommendation':recommendation,'evidence':[name+'.log','initial source-manifest.json',
+                      'all839 tracked files equal prior audit manifest and current HEAD'],
+                      'traceback':trace.strip()})
+    return found
+
+failures=[]
+for r in results:
+    if r['suite'] in ['B-BROWSER','B-E2E']:
+        entries=parse_failures(r['suite']);failures.extend(entries)
+        log=(EV/(r['suite']+'.log')).read_text()
+        summary=re.search(r'^FAILED \(([^\n]+)\)',log,re.M)
+        numbers={k:int(v) for k,v in re.findall(r'(failures|errors|skipped)=(\d+)',summary.group(1) if summary else '')}
+        r.update(assertion_failures=numbers.get('failures',0),error_entries=numbers.get('errors',0),
+                 failure_entries=len(entries),failed_test_ids_unique=len({x['test_id'] for x in entries}),
+                 failure_display_ids=[x['display_id'] for x in entries])
+        assert len(entries)==numbers.get('failures',0)+numbers.get('errors',0),(r['suite'],len(entries),numbers)
+        write(EV/(r['suite']+'.result.json'),r)
+
+identities={}
+for r in results:
+    log=(EV/(r['suite']+'.log')).read_text()
+    if r['suite']=='B-NODE':
+        ids=[arg for arg in r['command'] if arg.startswith('tests/')]
+        assert all(('✔ '+arg+' ') in log for arg in ids)
+    else:
+        ids=re.findall(r'^(?:test\w+|unittest\.case\.FunctionTestCase) \((test[^)\n]+)\)',log,re.M)
+    assert len(ids)==r['tests'],(r['suite'],len(ids),r['tests'])
+    failed={f['test_id'] for f in failures if f['suite']==r['suite']}
+    assert failed.issubset(set(ids)),(r['suite'],failed-set(ids))
+    identities[r['suite']]=[{'test_id':i,'outcome':'FAIL' if i in failed else 'PASS',
+                             'failure_entries':sum(f['suite']==r['suite'] and f['test_id']==i for f in failures)} for i in ids]
+    r['failed_test_cases_unique']=len(failed)
+    r['passed_test_cases']=len(ids)-len(failed)
+    write(EV/(r['suite']+'.result.json'),r)
+write(EV/'test-identities.json',identities)
+
+now=datetime.now(timezone.utc).isoformat()
+debt={'phase':'T0','captured_at':now,'source_head':manifest['head'],'product_modified':False,
+      'historic_exemption_ids':sorted(historical),'failures':failures,
+      'isolated_diagnostic':{'file':'evidence/browser-isolated-diagnostic.log','tests':2,'passed':1,'errors':1,
+          'greeting':'Passed isolated after full-suite error; timing/order cause not certified. Does not erase full-suite failure.',
+          'scheduling_navigation':'Reproduced standalone: [data-scheduling-review] timeout6000ms.'}}
+write(T0/'debt-register.json',debt)
+def cell(x):return html.escape(str(x)).replace('|','\\|').replace('\n',' ')[:300].replace('[','\\[').replace(']','\\]')
+lines=['# T0 — Registro individual de deuda y fallos','',
+'Cada entrada conserva ID, componente, assertion, esperado/observado, clasificación/evidencia, recomendación y si bloquea T1. Los trazados completos están en [JSON](debt-register.json) y logs originales. No se modificó ningún test/fixture/producto.','',
+'Preexistente significa discrepancia demostrable del contrato/código encontrado; no significa que el test hubiese fallado en todas las corridas históricas. Los fallos sin causa demostrada se conservan como hallazgos nuevos del baseline, sin exención automática.','',
+'Los3 IDs WorkflowContext del summary versionado se identifican individualmente. El resto no queda cubierto por esa excepción.','',
+'| Suite / Test ID | Componente / assertion | Esperado | Observado | Clasificación | Bloquea T1 |',
+'|---|---|---|---|---|---|']
+for f in failures:
+    lines.append('| '+cell(f['suite']+' / '+f['display_id'])+' | '+cell((f['source'] or f['component'])+' — '+f['assertion'])+' | '+cell(f['expected'])+' | '+cell(f['observed'])+' | '+cell(f['category'])+' | '+('Sí' if f['blocks_T1_individually'] else 'No por sí solo; G-B')+' |')
+lines += ['', '## Evidencia transversal', '',
+'- HEAD y839 archivos tracked son idénticos al manifest de la auditoría previa y al snapshot inicial T0. Ambos planes y fuentes normativas conservan hashes.',
+'- OpenAPI actual local y producción son iguales; la API de escritura de roles sólo admite data_owner/decision_owner. Los aliases de lectura no son enums de escritura.',
+'- Los101 cuerpos/firmas/ACL/configs de funciones coinciden con la reconstrucción actual Git; no hubo SQL de escritura remoto.',
+'- B-FOCUS9 PASS y lineage real A–F PASS no sustituyen el fallo de las suites amplias.',
+'- El diagnóstico aislado pasó saludo y reprodujo Config D2; un PASS aislado no convierte B-BROWSER en PASS.',
+'- No se desactivaron tests, no se agregaron skips ni se debilitaron assertions.','']
+(T0/'debt-register.md').write_text('\n'.join(lines))
+
+ledger={'phase':'T0','head':manifest['head'],'captured_at':now,'results':results,
+        'states':'PASS / FAIL / BLOCKED / NOT RUN','product_credentials_in_test_processes':'cleared',
+        'no_skips_allowed':True,'failure_register':'debt-register.json','identities':'evidence/test-identities.json',
+        'notes':['Node24 spec reporter counters were parsed from unchanged log; no Node suite rerun.',
+                 'B-SQL legacy helper scope is intentionally truncated; full current schema reconstructed separately.',
+                 'All suites were executed, including required B-FOCUS. No target T1+ tests/features created.']}
+write(T0/'baseline-test-ledger.json',ledger)
+skills=read('skills-used.json');docker=read('docker-sandbox.json');env=read('environment-baseline.json')
+remote=read('remote-readonly-observations.json');catalog=read('sql-catalog-live.json')['data'][0]['catalog']
+verification={'phase':'T0','at':now,'head':git('rev-parse','HEAD'),'branch':git('branch','--show-current'),
+              'origin_main':git('rev-parse','origin/main'),'main_origin_ahead_behind':git('rev-list','--left-right','--count','main...origin/main'),
+              'tracked_verified':len(manifest['tracked_files']),'changed_tracked':changed,'changed_normative_sources':norm_changed,
+              'staged_diff':git('diff','--cached','--name-only'),'status':git('status','--short','--branch'),
+              'owned_sql_cleaned_up':docker.get('cleaned_up'),'preexisting_containers_preserved':docker.get('preexisting_containers_preserved'),
+              'T1_executed':False,'commits_created':False,'push':False,'production_writes':False,'deploy':False,
+              'master_plan_sha256':sha(ROOT/'DATION_FINAL_MASTER_EXECUTION_PLAN.md'),
+              'previous_plan_sha256':sha(ROOT/'docs/ultimate-mvp-implementation-master-plan.md')}
+write(EV/'preservation-verification.json',verification)
+prior_path=Path('/workspace/work/ultimate-mvp-plan/baseline.json')
+prior=json.loads(prior_path.read_text())
+prior_differences=[x['path'] for x in manifest['tracked_files'] if prior['files'].get(x['path'])!=x['sha256']]
+assert not prior_differences
+write(EV/'prior-source-comparison.json',{'previous_manifest_path':str(prior_path),'previous_manifest_sha256':sha(prior_path),
+      'previous_head':prior['head'],'current_head':manifest['head'],'files_compared':len(manifest['tracked_files']),'differences':prior_differences})
+commands={'phase':'T0','test_commands':[{'suite':r['suite'],'cwd':r['cwd'],'argv':r['command'],'env':'production credentials blank; PYTHONDONTWRITEBYTECODE=1; browser PYTHONPATH=tests/browser; local owned Docker only'} for r in results],
+          'git':['git status --short --branch','git fetch origin','git log --oneline --decorate -12','git rev-list --left-right --count main...origin/main','git rev-parse HEAD','git diff --name-only','git diff --cached --name-only','git ls-files -z'],
+          'runtime':['Python/Node/Docker version probes','local-socket docker info','docker run postgres:17-alpine --network none with owned T0 label','current Git baseline+23 upgrades in owned database; DROP afterwards','guarded docker rm --force --volumes owned T0 container only'],
+          'sql_container_creation_argv':['docker','--host=unix:///var/run/docker.sock','run','-d','--name',docker['owned_container'],'--label','dation.task=T0','--network','none','-e','POSTGRES_HOST_AUTH_METHOD=trust','-e','POSTGRES_DB=dation_t0','postgres:17-alpine'],
+          'reproduction_image_digest':docker['image_digest'],
+          'remote_read_only':['Supabase execute_sql: metadata SELECT statements retained in evidence JSON / schema-rebuild script','Supabase list_migrations(project_id=gijiinufjjurgfeehufj)','GET production /health and /openapi.json','GET Cloud Run service metadata (401)','GET Supabase changelog (403 proxy denial)'],
+          'reproduction_sources':['evidence/t0-suite-runner.py.txt','evidence/t0-schema-rebuild.py.txt','evidence/t0-report-assembler.py.txt'],
+          'diagnostic':'isolated unittest HomeHero greeting + Navigation approved Assignment→Scheduling config; evidence/browser-isolated-diagnostic.log',
+          'additional_inspection':'targeted rg/source/caller reads cited by ABI matrix; no general UX audit or mutating Skill workflow'}
+write(T0/'command-ledger.json',commands)
+
+categories=Counter(f['category'] for f in failures)
+testrows=[]
+for r in results:
+    detail=('failures='+str(r.get('assertion_failures',0))+', errors='+str(r.get('error_entries',0))) if r['status']=='FAIL' else 'sin fallos'
+    testrows.append(f"| {r['suite']} | {r['status']} | {r['tests']} | {r.get('suite_reported_seconds') or r['wall_seconds']:.3f}s | {r['skipped']} | {detail} |")
+gates=[
+('G-A','PASS','Sólo documentación/evidencia/tests T0;839 hashes y fuentes preservados; ningún T1.'),
+('G-B','FAIL','Deuda amplia supera los3 IDs históricos; fallos nuevos del baseline y casos sin causa aislada. No se admite exención global.'),
+('G-C','PASS con findings','ABI real registrada. Divergencias de fixtures frente a roles/gates/history actuales quedan explícitas, sin cambiar semántica.'),
+('G-D','PASS con findings','Catálogo de aplicación reconstruido; history incompleto/defaults/grants administrativos reconocidos; cero escrituras remotas.'),
+('G-E','PASS limitado T0','383 unit PASS y golden legacy idéntico; ningún engine modificado. No certifica motores Ultimate inexistentes.'),
+('G-R','BLOCKED','Golden/cross-surface E2E no termina verde. CSV/probes/OpenAPI preservados no sustituyen ese gate.'),
+('G-L','BLOCKED','Lineage real A–F y focales pasan; suite amplia contiene expectativas incompatibles de approval/history/Home sin conciliación cerrada.'),
+('G-S','BLOCKED en cobertura amplia','RLS/grants y negativos SQL/tenant pasan en su alcance; casos de permisos/approval detenidos por setup422 o expectations UI no certifican el escenario amplio. No se afirma bypass ni se acepta un PASS global.'),
+('G-P','PASS limitado T0','Suites actuales verifican payloads/listados acotados. SLOs/escala Ultimate quedan fuera de T0 y NOT RUN.'),
+('G-ENV','PASS','Seis suites ejecutadas sin skips y con runners/DB owned. Bloqueos iniciales del sandbox recuperados; Cloud Run admin401 y changelog403 son límites de observación registrados.'),
+]
+created=[str(p.relative_to(ROOT)) for p in sorted(BASE.rglob('*')) if p.is_file()]
+report=f'''# T0 EXECUTION REPORT
+
+## Baseline
+
+- HEAD: `{verification['head']}`; branch `{verification['branch']}`.
+- `origin/main`: `{verification['origin_main']}` tras fetch; ahead/behind `{verification['main_origin_ahead_behind']}`. No se sincronizó/reescribió código.
+- Estado inicial: dos documentos untracked preexistentes; tracked/staged limpios. Estado final: esos documentos preservados y entregables T0 sin commit.
+- 839 archivos tracked idénticos al snapshot inicial y al manifest de la auditoría previa. Fuentes normativas disponibles y hashes registrados.
+- Entorno: Linux x86_64; Python de suites3.13.5; Node24.19.0; Docker28.4; PostgreSQL sandbox17.11/producción17.6; Playwright{env['browser']['playwright']} y {env['browser']['actual_chromium_version']}.
+- Credenciales productivas vacías en procesos de test. API/Auth/Storage/worker E2E locales y sintéticos. No instalación de paquetes/Skills ni reinicio de daemon.
+
+```text
+{verification['status']}
+```
+
+## Skills utilizadas
+
+'''
+for s in skills['skills']:
+    report+=f"- `{s['name']}`: {s['activity']} Versión `{s['version'] or 'sin versión declarada'}`; recurso/hash en [ledger](evidence/skills-used.json).\n"
+report+='''
+No se activaron Skills UX/UI/motion, no hubo redesign ni instalación. Se respetaron F01–F23 y la precedencia aprobada; ejemplos genéricos de RLS no reemplazaron membership/checked RPC actuales.
+
+## Archivos creados
+
+- [Source manifest](../source-manifest.json):839 hashes, fuentes normativas/Skills y preflight Git.
+- [ABI/compatibility matrix](abi-compatibility-matrix.md).
+- [Test ledger](baseline-test-ledger.json) y [command ledger](command-ledger.json).
+- [Deuda individual legible](debt-register.md) y [detalle completo/tracebacks](debt-register.json).
+- [SQL/catalog findings](sql-catalog-findings.md).
+- Este reporte y `evidence/`: logs originales, snapshots SQL/API/runtime, goldens, scripts de reproducción documentales, verificación de preservación y manifiesto de artifacts. Inventario exacto en artifact-integrity.json.
+
+## Archivos modificados
+
+Ningún archivo productivo, fixture/test existente, Master Plan ni documento previo. Las actualizaciones de archivos creados durante T0 pertenecen exclusivamente a sus entregables/evidencia.
+
+## Archivos preexistentes preservados
+
+- `DATION_FINAL_MASTER_EXECUTION_PLAN.md`: SHA256 `c7543ffa1ef26c79d9142797863fc8ba83613f6cb426cf1621eb0c11b5a27823`.
+- `docs/ultimate-mvp-implementation-master-plan.md`: SHA256 `ff824a2fae9566cfb4e1f77ae81e8806d0b76d179b208660b29e9bd00e9ab6d6`.
+- 839 tracked files, ambos planes y attachments normativos intactos. Los4 contenedores Docker preexistentes también se conservaron.
+
+## Comandos ejecutados
+
+Los argv/cwd/env de cada suite están en el [command ledger](command-ledger.json). Incluye fetch/status/log/hash reads,6 suites exactas del plan, diagnóstico aislado, reconstrucción SQL owned y GET/SELECT remotos. Las consultas y scripts reproducibles se preservan como evidencia; no se ejecutó script de despliegue/repair.
+
+## Test Results
+
+| Suite | Estado | Tests | Duración reportada | Skips | Resultado |
+|---|---|---:|---:|---:|---|
+'''+ '\n'.join(testrows)+f'''
+
+La cuenta de failures/errors browser incluye subtests; el registro conserva cada entrada y el ID base, sin restar incorrectamente subtests para inferir PASS. Los logs completos y sus SHA256 están en el ledger. Las6 suites se ejecutaron; no se sustituyeron por los conteos históricos.
+
+Diagnóstico adicional:2 tests; saludo PASS aislado tras ERROR de suite amplia; navegación a Config D2 vuelve a ERROR por timeout6000ms. No elimina fallos del baseline. B-FOCUS9 PASS y el E2E de lineage A–F PASS son evidencia focal, no un PASS global.
+
+## SQL / Catalog Findings
+
+19 tablas públicas con RLS;7 privadas;269 columnas;187 constraints;90 índices;17 policies;101 funciones;46 triggers. Objetos/funciones/triggers coinciden con rebuild actual Git. History remoto:10 filas hasta5/10; Git31 migraciones, con baseline10/10+23 upgrades reproducidos sólo en DB owned. No repair/replay remoto.
+
+Diferencias registradas:18 grants adicionales de service_role en producción;6 default ACL administrados frente a0 en Postgres genérico; ACL pública contiene USAGE explícito adicional de postgres. No implican nuevos grants a anon/authenticated en la diferencia de tablas. Storage privado10MiB todavía sin JSON/JSONL. Ver [hallazgos y adaptación mínima](sql-catalog-findings.md).
+
+## ABI / Compatibility Findings
+
+91 paths/98 operaciones; OpenAPI local=auditoría previa=OpenAPI productivo. Engines actuales: Assignment1.0.0/assignment_v1, Scheduling1.0.0/scheduling_v1, Dispatch2.2.0/dispatch_v2. Estado SQL error se mantiene, distinto de FAILED del contrato futuro. Handoffs scheduling_input_v1/final_assignment_input_v1 intactos.
+
+La [matriz](abi-compatibility-matrix.md) registra requests, idempotencia/lease, context/freshness, actores/approvals, CSV/unknown schema, legacy KPIs/IA, calendario/costos y adapters futuros aprobados. Ningún DTO/profile/registry nuevo se implementó.
+
+## Pre-existing Debt
+
+Los3 IDs WorkflowContext documentados se identifican individualmente al reproducirse. Otras discrepancias demostrables pertenecen a fixtures/expectativas anteriores al contrato actual: roles de escritura, alias data_steward, bridge de migración, atributos aplicados y conteos/semántica de supersession.
+
+No se asume que todos los timeouts o fallos visuales tengan esa causa. Los restantes quedan como hallazgos nuevos del baseline con atribución pendiente. Cada entrada del [registro](debt-register.json) indica ID, componente, assertion, esperado/observado, evidencia, clasificación y bloqueo T1.
+
+## New Issues
+
+- Las suites amplias revelan más fallos que la deuda previamente documentada. Ninguno se oculta por un PASS focal o por mantener el mismo HEAD.
+- Existen fallos de render/journeys/selectores/estados que aún no tienen causa inequívoca; el saludo ilustra una diferencia entre suite e aislamiento.
+- Algunas fixtures de aprobación esperan controles disabled y observan controles habilitados; las verificaciones backend/Owner no se dan por satisfechas a partir de esa UI. Conciliar el modelo actual de roles y los escenarios pendientes antes de certificar permisos de extremo a extremo.
+- Metadata de privilegios/defaults Supabase no es idéntica al sandbox genérico. Antes de expansión futura debe contemplarse ese contexto efectivo.
+- Cloud Run GET administrativo401; no se recertifica SHA de imagen/worker/IAM. Health y contrato público sí observados. Changelog Supabase bloqueado por proxy403; no se eludió la política.
+
+No hubo cambios productivos T0; no se afirma que una causa desconocida sea deuda histórica exenta.
+
+## Deviations from Master Plan
+
+Ninguna desviación de implementación: T0 solamente; T1 no iniciado. Las observaciones nuevas invalidan una lectura de baseline globalmente verde, que el plan tampoco había certificado. Se registran los fallos amplios y la diferencia administrativa de grants sin modificar el Master Plan.
+
+Adaptaciones operativas: recuperación autorizada del sandbox de red/socket; Node24 usó reporter spec y se corrigió el parser de evidencia, no la suite; segundo rebuild local amplió verificación de triggers/ACL. Sin cambio de tests, asserts, fixtures o reglas.
+
+## Risks discovered
+
+- Continuar sobre suites amplias en rojo puede ocultar regresiones futuras o legitimar expectations incompatibles.
+- No confundir fallo de setup por enum422 con prueba de autorización/aprobación efectivamente completada.
+- No restaurar approvals/eventos viejos para cumplir tests previos a supersession actual.
+- No usar migration history incompleto ni defaults del sandbox para inferir el estado efectivo Supabase.
+- No inferir imagen/revisión productiva a partir de health/OpenAPI. Fuentes aprobadas siguen untracked por instrucción; hashes pinneados en manifest.
+
+## Rollback status
+
+No hay código/datos productivos que revertir. No reset, commit, push, migration productiva, cambio de RLS/grants/secrets/Cloud Run o deploy. Bases de rebuild eliminadas; contenedor SQL T0 eliminado; harness E2E terminó y sus recursos fueron limpiados;4 contenedores preexistentes preservados. Entregables documentales quedan para revisión.
+
+## Gate Evaluation
+
+| Gate | Estado T0 | Evidencia / alcance |
+|---|---|---|
+'''
+for g,status,reason in gates:report+=f'| {g} | {status} | {reason} |\n'
+report+='''
+G-UI y G-REL no se activaron como cambios de producto/release: no hubo frontend modificado ni despliegue. Las regresiones observadas del baseline no quedan aprobadas por esa ausencia de cambios.
+
+## FINAL T0 DECISION
+
+**STOP — T0 no cumple las condiciones para autorizar T1.**
+
+Se ejecutó y preservó el baseline completo, pero B-BROWSER y B-E2E fallan con deuda/hallazgos que exceden la excepción histórica documentada. G-B no pasa; cobertura amplia de resultados/lineage queda bloqueada hasta conciliar individualmente expectativas actuales y reproducir causas pendientes. No corresponde declarar GO ni corregir silenciosamente backend/UX/approvals para hacer pasar tests.
+
+T1 no se ejecutó ni queda autorizada por este reporte. La siguiente acción deberá resolver/revalidar los bloqueos del baseline dentro del alcance que se autorice, sin avanzar automáticamente.
+'''
+(T0/'t0-execution-report.md').write_text(report)
+shutil.copyfile(Path(__file__),EV/'t0-report-assembler.py.txt')
+write(T0/'artifact-integrity.json',{'captured_at':now,'excludes_self':True,'files':[{'path':str(p.relative_to(ROOT)),'bytes':p.stat().st_size,'sha256':sha(p)} for p in sorted(BASE.rglob('*')) if p.is_file() and p.name!='artifact-integrity.json']})
+print(json.dumps({'report':str(T0/'t0-execution-report.md'),'suites':[{k:r.get(k) for k in ['suite','status','tests','assertion_failures','error_entries','skipped']} for r in results],
+                  'failure_entries':len(failures),'categories':dict(categories),'source_preservation':len(manifest['tracked_files']),'decision':'STOP','T1_executed':False},ensure_ascii=False,indent=2))

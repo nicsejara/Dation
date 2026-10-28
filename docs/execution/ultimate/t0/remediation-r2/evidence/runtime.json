@@ -1,0 +1,21 @@
+{
+  "phase": "T0-R2",
+  "captured_at": "2026-10-26T04:32:47.093480+00:00",
+  "python": "Python 3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
+  "browser_python": "Python 3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
+  "playwright": "1.63.0",
+  "node": "v24.19.0",
+  "chromium": "Chromium 151.0.7922.173 built on Debian GNU/Linux 13 (trixie)",
+  "lock": "/tmp/dation-t0r-suite.lock",
+  "network": "local owned Docker and loopback; remote APIs not used",
+  "credentials_blank": [
+    "SUPABASE_URL",
+    "SUPABASE_SECRET_KEY",
+    "SUPABASE_ACCESS_TOKEN",
+    "LLM_API_KEY",
+    "LLM_BASE_URL",
+    "GCP_ACCESS_TOKEN"
+  ],
+  "vpn_used": false,
+  "packages_installed_R2": false
+}

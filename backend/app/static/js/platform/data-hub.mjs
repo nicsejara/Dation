@@ -51,7 +51,7 @@ export function mountDataHub(root,getIdentity){
  function maintenance(row,permits){const wrap=el('div',undefined,'hub-maintenance'),trigger=button('',()=>{},'ghost'),panel=el('div',undefined,'hub-maintenance__menu');trigger.append(icon('moreHorizontal'));trigger.classList.add('hub-icon-button');trigger.setAttribute('aria-label','Acciones de '+name(row));panel.role='menu';
   const add=(label,fn)=>{const b=button(label,fn);b.role='menuitem';panel.append(b);};
   if(!row.deletion_pending){const a=download(row);a.role='menuitem';panel.append(a);}
-  const canArchive=permits?.can_archive??(writable()&&['orders','fleet'].includes(row.dataset_type)&&!row.is_default&&!row.deletion_pending);
+  const canArchive=permits?.can_archive??(writable()&&['orders','fleet','transport_demand','transport_resources'].includes(row.dataset_type)&&!row.is_default&&!row.deletion_pending);
   if(canArchive)add(row.archived_at?'Restaurar':'Archivar',()=>mutation(row,row.archived_at?'unarchive':'archive'));
   if(permits?.can_delete&&writable())add(row.deletion_pending?'Completar eliminación':'Eliminar definitivamente',()=>mutation(row,'delete'));
   if(!panel.childElementCount)return {node:el('span'),dispose:()=>{}};wrap.append(trigger,panel);const menu=mountDropdown({trigger,panel});return {node:wrap,dispose:()=>menu.dispose()};

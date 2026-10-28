@@ -1,0 +1,76 @@
+{
+  "T11_executed": false,
+  "T9_entries_verified_before_T10": 88,
+  "baseline_bytes": 43794290,
+  "baseline_files": 920,
+  "baseline_head": "ef997235a30251fbf7ae53690ed738092ee973d8",
+  "branch": "main",
+  "changed_baseline_pending_files": [
+    "backend/app/routes/results.py",
+    "backend/app/static/js/dispatch/navigation/resource.mjs",
+    "backend/app/static/js/dispatch/workspace.mjs"
+  ],
+  "checkpoint_sha256": "042274bb505a265b072121a281cd5d33a15e4d22bc6ecfe6d279181ef8bf15e8",
+  "created": 18,
+  "git_diff_check": 0,
+  "git_writes": false,
+  "master_plan_sha256": "c7543ffa1ef26c79d9142797863fc8ba83613f6cb426cf1621eb0c11b5a27823",
+  "missing_baseline_files": [],
+  "modified": 10,
+  "modified_preimages": {
+    "backend/app/platform/exports.py": {
+      "bytes": 4089,
+      "copy": "evidence/pre-t10/backend/app/platform/exports.py",
+      "sha256": "f51de634ba6c546360a2f006d4f4f8a537ace147051d62903000ffde57fd33c7"
+    },
+    "backend/app/routes/results.py": {
+      "bytes": 2122,
+      "copy": "evidence/pre-t10/backend/app/routes/results.py",
+      "sha256": "cbab534afc7459d94fafdf4601c153157fd7cc38d4ae4d7e4bdac369b0057ebb"
+    },
+    "backend/app/services/decision_context.py": {
+      "bytes": 8414,
+      "copy": "evidence/pre-t10/backend/app/services/decision_context.py",
+      "sha256": "10c7494cb41a608d48764e116c5d779fef0747f23d3577c968ea329cc6dac37f"
+    },
+    "backend/app/services/decision_interpreter_service.py": {
+      "bytes": 23911,
+      "copy": "evidence/pre-t10/backend/app/services/decision_interpreter_service.py",
+      "sha256": "5a0d846947719c83a1f1ee0b4007526c2dc348ae4150aa030a255852e0e710d2"
+    },
+    "backend/app/static/js/dispatch/dashboard.mjs": {
+      "bytes": 12855,
+      "copy": "evidence/pre-t10/backend/app/static/js/dispatch/dashboard.mjs",
+      "sha256": "59de33bf52b40ee4189249d85f098bc023805797c8c008bba82eafbd5a31729e"
+    },
+    "backend/app/static/js/dispatch/navigation/resource.mjs": {
+      "bytes": 5576,
+      "copy": "evidence/pre-t10/backend/app/static/js/dispatch/navigation/resource.mjs",
+      "sha256": "c0553af6b9bfb1db3af34294ddfaeaadbdaa3f3dfc7d03a5551b733269e9e902"
+    },
+    "backend/app/static/js/dispatch/runs/contextual-assistant.mjs": {
+      "bytes": 2255,
+      "copy": "evidence/pre-t10/backend/app/static/js/dispatch/runs/contextual-assistant.mjs",
+      "sha256": "72799995f1862802e19f807488ff5643c813e7cb61eac743eb5ee194b3af24b9"
+    },
+    "backend/app/static/js/dispatch/runs/dashboard-toolbar.mjs": {
+      "bytes": 13625,
+      "copy": "evidence/pre-t10/backend/app/static/js/dispatch/runs/dashboard-toolbar.mjs",
+      "sha256": "3af0badd6b781f43a0422ced16cdb43b9afc736f107058ebbc759d6d569bdf6d"
+    },
+    "backend/app/static/js/dispatch/runs/export.mjs": {
+      "bytes": 4685,
+      "copy": "evidence/pre-t10/backend/app/static/js/dispatch/runs/export.mjs",
+      "sha256": "ee1a37f70d27b65f89943c7c1f84364d50935a4f9572a1908b13d07d85a7a10d"
+    },
+    "backend/app/static/js/dispatch/workspace.mjs": {
+      "bytes": 54138,
+      "copy": "evidence/pre-t10/backend/app/static/js/dispatch/workspace.mjs",
+      "sha256": "176d97552f4b5d3c1fe496b0b231d82cb24638e6c8dd9ad840002e465e7ffbfd"
+    }
+  },
+  "production_operations": false,
+  "source_files": 28,
+  "source_manifest_sha256": "42e0c094608a0b82d0007789f424ce517f7e75a648fcf45cc40c05628447908b",
+  "staged": []
+}

@@ -1,0 +1,1371 @@
+--- post-T5/backend/app/engines/assignment/transport_contracts.py
++++ T6/backend/app/engines/assignment/transport_contracts.py
+@@ -0,0 +1,90 @@
++"""Private test-profile D1 boundary; T1 DTOs remain the publication ABI."""
++from math import gcd
++from functools import reduce
++from typing import Literal
++from uuid import UUID
++
++from pydantic import AwareDatetime, Field, model_validator
++from app.domain.logistics.base import ContractModel
++from app.domain.logistics.contracts import Demand, TransportResource, LogisticsModelVersion, FrozenCaseContext
++from app.domain.logistics.units import QUANTITY_SCALES, scaled_integer
++from app.domain.logistics.units import QuantityVector
++from app.results.contracts import EngineOutput, DemandResolution, ResourceUsage
++from app.engines.common.day_resource_feasibility import FeasibilityCertificate
++
++
++class TransportPlanOptions(ContractModel):
++    seed: int = Field(default=0, strict=True, ge=0, le=2**31-1)
++    max_slots: int = Field(default=128, strict=True, ge=0, le=256)
++    max_variables: int = Field(default=20000, strict=True, ge=0, le=30000)
++    deterministic_budget: int = Field(default=5, strict=True, ge=0, le=30)
++    kernel_budget: int = Field(default=2, strict=True, ge=0, le=30)
++
++
++class TransportPlanInput(ContractModel):
++    model: LogisticsModelVersion
++    context: FrozenCaseContext
++    demands: tuple[Demand, ...] = Field(max_length=100)
++    resources: tuple[TransportResource, ...] = Field(max_length=40)
++    run_id: UUID
++    result_generated_at: AwareDatetime
++    options: TransportPlanOptions = Field(default_factory=TransportPlanOptions)
++
++    @model_validator(mode='after')
++    def pinned_inputs(self):
++        m, c = self.model, self.context
++        if (m.workspace_id,m.model_id,m.version_id,m.version,m.configuration_hash,m.currency_policy,m.primary_dimension,set(m.active_dimensions)) != (c.workspace_id,c.logistics_model_id,c.logistics_model_version_id,c.logistics_model_version,c.model_hash,c.currency_policy,c.primary_dimension,set(c.active_dimensions)):
++            raise ValueError('Model and Frozen Case context do not match')
++        if {x.slot for x in c.read_set} != {'transport_demand','transport_resources'}:
++            raise ValueError('D1 requires the two explicit T1 semantic inputs')
++        for rows, key in [(self.demands,'order_id'),(self.resources,'resource_id')]:
++            if len({getattr(row,key) for row in rows}) != len(rows):
++                raise ValueError('Duplicate '+key)
++        for order in self.demands:
++            order.requested.require(m.active_dimensions)
++            if not m.homogeneous_loads_declared and not order.compatibility_groups:
++                raise ValueError('Compatibility must be explicit outside homogeneous Model')
++            values = [scaled_integer(getattr(order.requested,d),QUANTITY_SCALES[d]) for d in m.active_dimensions]
++            if not any(values):
++                raise ValueError('Demand must be positive in an active dimension')
++            # CP integer products and fraction display conversion stay bounded.
++            if sum(values) > 2**50 or reduce(gcd, values)*1000000 > 2**60:
++                raise ValueError('D1 numeric model budget exceeded')
++        for resource in self.resources:
++            resource.guaranteed_capacity.require(m.active_dimensions, positive=True)
++            if not m.homogeneous_loads_declared and not resource.compatibility_groups:
++                raise ValueError('Resource compatibility must be explicit')
++            if any(scaled_integer(getattr(resource.guaranteed_capacity,d),QUANTITY_SCALES[d]) > 2**50 for d in m.active_dimensions):
++                raise ValueError('D1 capacity numeric budget exceeded')
++            if resource.source in m.allowed_sources and (resource.units_available is None if resource.source == 'OWN' else resource.services_available is None or resource.availability_source == 'UNKNOWN'):
++                raise ValueError('Unknown availability cannot be invented by the solver')
++        if (c.planning_end-c.planning_start).days > 365:
++            raise ValueError('D1 supports at most 366 inclusive departure days')
++        return self
++
++
++class SearchTrace(ContractModel):
++    version: Literal['D1_STRUCTURAL_FRACTION_COVERAGE_V1'] = 'D1_STRUCTURAL_FRACTION_COVERAGE_V1'
++    native_statuses: tuple[str,...]
++    solver_version: str
++    seed: int
++    candidate_slots: int
++    variable_count: int
++    candidate_set_complete: bool
++    limits: tuple[str,...]
++    model_sha256: str
++    structural_input_sha256: str
++    options: TransportPlanOptions
++
++
++class TransportPlanComputation(ContractModel):
++    output: EngineOutput
++    demand_resolution: tuple[DemandResolution,...]
++    residuals: dict[str,QuantityVector]
++    resource_usage: tuple[ResourceUsage,...]
++    temporal_certificate: FeasibilityCertificate
++    search: SearchTrace
++
++
++class EngineCertificationError(RuntimeError):
++    """Technical failure. Never patch or publish an inconsistent candidate."""
+--- post-T5/backend/app/engines/assignment/transport_model.py
++++ T6/backend/app/engines/assignment/transport_model.py
+@@ -0,0 +1,192 @@
++"""Bounded structural CP-SAT model. No monetary goal or public schedule.
++
++One x quantum transports an exact proportional vector. The denominator is the
++GCD of the T1 scaled quantities, not a primary-dimension capacity shortcut.
++"""
++from collections import defaultdict
++from dataclasses import dataclass
++from functools import reduce
++from math import gcd, lcm
++import hashlib
++
++from ortools.sat.python import cp_model
++import ortools
++
++from app.domain.logistics.base import Priority
++from app.domain.logistics.units import QUANTITY_SCALES, scaled_integer
++from app.results.canonical import canonical_bytes
++from app.engines.common.day_resource_feasibility import dispatch_window
++
++
++def compatible(order, resource, model):
++    if resource.source not in model.allowed_sources:
++        return False
++    if (order.origin_id, order.destination_id) not in resource.lanes:
++        return False
++    if resource.source == 'OWN' and resource.base_origin_id != order.origin_id:
++        return False
++    if order.compatibility_groups:
++        return set(order.compatibility_groups).issubset(resource.compatibility_groups)
++    return model.homogeneous_loads_declared
++
++
++def quantities(order, dimensions):
++    values = {d:scaled_integer(getattr(order.requested,d), QUANTITY_SCALES[d]) for d in dimensions}
++    denominator = reduce(gcd, values.values())
++    return denominator, {d:v//denominator for d,v in values.items()}
++
++
++@dataclass
++class Slot:
++    resource: object
++    indices: tuple
++    present: object
++    start: object
++    fractions: dict
++    distance: object
++
++
++def solve_structural(request):
++    orders = sorted(request.demands, key=lambda o:o.order_id)
++    resources = sorted(request.resources, key=lambda r:r.resource_id)
++    dims, options = request.model.active_dimensions, request.options
++    model = cp_model.CpModel()
++    groups = defaultdict(list)
++    for i,o in enumerate(orders):
++        groups[(o.origin_id,o.destination_id,o.distance_km,tuple(sorted(o.compatibility_groups)))].append(i)
++    denominators = {i:quantities(o,dims) for i,o in enumerate(orders)}
++    slots, by_order, by_resource, intervals = [], defaultdict(list), defaultdict(list), defaultdict(list)
++    limits = set()
++    variables = 0
++    days = (request.context.planning_end-request.context.planning_start).days+1
++    for resource in resources:
++        if resource.source not in request.model.allowed_sources:
++            continue
++        available = resource.units_available if resource.source == 'OWN' else resource.services_available
++        if not available:
++            continue
++        for key, group in sorted(groups.items()):
++            eligible = []
++            bound = 0
++            for i in group:
++                order = orders[i]
++                if not compatible(order,resource,request.model):
++                    continue
++                first,last,_ = dispatch_window(order,resource,request.context)
++                if first > last:
++                    continue
++                ratios = [(getattr(order.requested,d),getattr(resource.guaranteed_capacity,d)) for d in dims]
++                non_split = not (order.split_allowed and request.model.split_permitted)
++                if non_split and any(q>c for q,c in ratios):
++                    continue
++                eligible.append(i)
++                # Exact integer ceil of the largest vector load/capacity ratio.
++                bound += max((scaled_integer(q,QUANTITY_SCALES[d])+scaled_integer(c,QUANTITY_SCALES[d])-1)//scaled_integer(c,QUANTITY_SCALES[d]) for d,(q,c) in zip(dims,ratios))
++            if not eligible:
++                continue
++            count = min(bound, available*(days if resource.source == 'OWN' else 1))
++            for _ in range(count):
++                needed = 2 + 2*len(eligible)
++                if len(slots) >= options.max_slots or variables+needed > options.max_variables:
++                    limits.add('CANDIDATE_MODEL_BUDGET')
++                    break
++                index = len(slots)
++                y = model.new_bool_var('trip_'+str(index))
++                start = model.new_int_var(request.context.planning_start.toordinal(), request.context.planning_end.toordinal(),'start_'+str(index))
++                fractions, selected = {}, []
++                for i in eligible:
++                    order = orders[i]
++                    denominator, unit = denominators[i]
++                    x = model.new_int_var(0,denominator,f'x_{index}_{i}')
++                    b = model.new_bool_var(f'has_{index}_{i}')
++                    if order.split_allowed and request.model.split_permitted:
++                        # A positive allocation must survive six-decimal DTO display.
++                        minimum = max(1,(denominator+1999999)//2000000)
++                        model.add(x >= minimum*b)
++                        model.add(x <= denominator*b)
++                    else:
++                        model.add(x == denominator*b)
++                    model.add(b <= y)
++                    first,last,_ = dispatch_window(order,resource,request.context)
++                    model.add(start >= first).only_enforce_if(b)
++                    model.add(start <= last).only_enforce_if(b)
++                    fractions[i] = x
++                    by_order[i].append(x)
++                    selected.append(b)
++                model.add(sum(selected) >= y)
++                for d in dims:
++                    cap = scaled_integer(getattr(resource.guaranteed_capacity,d),QUANTITY_SCALES[d])
++                    model.add(sum(denominators[i][1][d]*fractions[i] for i in eligible) <= cap*y)
++                slot = Slot(resource,tuple(eligible),y,start,fractions,key[2])
++                slots.append(slot)
++                by_resource[resource.resource_id].append(y)
++                if resource.source == 'OWN':
++                    estimate = dispatch_window(orders[eligible[0]],resource,request.context)[2]
++                    intervals[resource.resource_id].append(model.new_optional_fixed_size_interval_var(start,estimate.cycle_days,y,'cycle_'+str(index)))
++                variables += needed
++    scores = defaultdict(list)
++    objective_budget_exceeded = False
++    common = {}
++    for priority in Priority:
++        common[priority] = 1
++        for i,o in enumerate(orders):
++            if o.priority == priority:
++                common[priority] = lcm(common[priority],denominators[i][0])
++                if common[priority]*len(orders) > 2**60:
++                    objective_budget_exceeded = True
++                    break
++    for i, order in enumerate(orders):
++        denominator = denominators[i][0]
++        if by_order[i]:
++            model.add(sum(by_order[i]) <= denominator)
++        if not objective_budget_exceeded:
++            scores[order.priority].extend(x*(common[order.priority]//denominator) for x in by_order[i])
++    for resource in resources:
++        ys = by_resource[resource.resource_id]
++        if resource.source == 'EXTERNAL' and ys:
++            model.add(sum(ys) <= resource.services_available)
++        if resource.source == 'OWN' and ys:
++            model.add_cumulative(intervals[resource.resource_id],[1]*len(ys),min(resource.units_available,len(ys)))
++    if model.validate():
++        raise RuntimeError('D1 structural model invalid: '+model.validate())
++    solver = cp_model.CpSolver()
++    solver.parameters.num_search_workers = 1
++    solver.parameters.random_seed = options.seed
++    solver.parameters.max_deterministic_time = options.deterministic_budget/3
++    solver.parameters.max_time_in_seconds = 10
++    statuses, selected_values = [], None
++    # Only structural priority/coverage. No cost/own/trip/preference objective.
++    # T7 must certify the complete business-policy hierarchy separately.
++    if objective_budget_exceeded:
++        limits.add('RATIONAL_COVERAGE_INTEGER_BUDGET')
++        statuses.append('UNKNOWN')
++    for priority in (() if objective_budget_exceeded else Priority):
++        objective = sum(scores[priority])
++        model.maximize(objective)
++        status = solver.solve(model)
++        statuses.append(solver.status_name(status))
++        if status == cp_model.MODEL_INVALID:
++            raise RuntimeError('Invalid D1 CP-SAT response')
++        if status not in (cp_model.OPTIMAL,cp_model.FEASIBLE):
++            if selected_values is None:
++                break
++            limits.add('LATER_COVERAGE_STAGE_UNPROVEN')
++            break
++        selected_values = [{i:solver.value(x) for i,x in s.fractions.items()} if solver.value(s.present) else {} for s in slots]
++        if status != cp_model.OPTIMAL:
++            limits.add('COVERAGE_STAGE_UNPROVEN')
++            break
++        if scores[priority]:
++            model.add(objective == sum(solver.value(s) for s in scores[priority]))
++    input_projection = {'model':request.model,'context':request.context,
++        'demands':orders,'resources':resources,'options':options}
++    return orders, denominators, slots, selected_values, {
++        'native_statuses':tuple(statuses),'solver_version':ortools.__version__,'seed':options.seed,
++        'candidate_slots':len(slots),'variable_count':len(model.proto.variables),
++        # Conservative equal compatibility-group partition is deliberately not
++        # an exhaustive global candidate-set certificate.
++        'candidate_set_complete':False,'limits':tuple(sorted(limits)),
++        'model_sha256':hashlib.sha256(str(model.proto).encode()).hexdigest(),
++        'structural_input_sha256':hashlib.sha256(canonical_bytes(input_projection)).hexdigest(),
++        'options':options,
++    }
+--- post-T5/backend/app/engines/assignment/transport_plan.py
++++ T6/backend/app/engines/assignment/transport_plan.py
+@@ -0,0 +1,238 @@
++"""Inactive transport_plan/2.0.0 core producer, callable on pinned DTOs in tests.
++
++No CSV, DB, artifacts, worker admission, economic policy or D2 recommendation.
++"""
++from collections import Counter
++from datetime import date
++from decimal import Decimal, ROUND_HALF_UP, localcontext
++import hashlib
++
++from app.domain.logistics.base import Dimension, Priority
++from app.domain.logistics.units import QuantityVector, QUANTITY_SCALES
++from app.results import contracts as c
++from app.results.canonical import canonical_bytes, input_context_hash, core_result_fingerprint
++from app.results.reason_codes import ReasonEmission, reason_definition
++from app.engines.common.day_resource_feasibility import (
++    FixedTrip, FeasibilityCertificate, day_resource_feasibility, dispatch_window)
++from .transport_contracts import TransportPlanInput, TransportPlanComputation, EngineCertificationError
++from .transport_model import solve_structural, compatible
++
++IDENTITY = c.RuntimeIdentity(engine_name='transport_plan',engine_version='2.0.0',
++    runtime_profile='transport_plan_v1',result_schema='transport_plan_v1',result_schema_version=1)
++
++
++def ratio(numerator, denominator, scale=4):
++    if not denominator:
++        return None
++    with localcontext() as ctx:
++        ctx.prec = 60
++        return (Decimal(numerator)/Decimal(denominator)).quantize(Decimal(1).scaleb(-scale), rounding=ROUND_HALF_UP)
++
++
++def vector(values):
++    return QuantityVector(**values)
++
++
++def run_transport_plan(request):
++    request = TransportPlanInput.model_validate(request)
++    with localcontext() as ctx:
++        ctx.prec = 60
++        return _run(request)
++
++
++def _run(request):
++    orders, denominators, slots, selected, trace = solve_structural(request)
++    dims, context = request.model.active_dimensions, request.context
++    staged = []
++    if selected is not None:
++        for slot, values in zip(slots,selected):
++            allocations = []
++            for i,numerator in sorted(values.items()):
++                if not numerator:
++                    continue
++                denominator, units = denominators[i]
++                load = vector({d:Decimal(units[d]*numerator).scaleb(-QUANTITY_SCALES[d]) for d in dims})
++                allocations.append(c.Allocation(order_id=orders[i].order_id,
++                    allocation_fraction=ratio(numerator,denominator,6),load=load))
++            if not allocations:
++                continue
++            rows = [o for o in orders if o.order_id in {a.order_id for a in allocations}]
++            load = vector({d:sum(getattr(a.load,d) for a in allocations) for d in dims})
++            cap = vector({d:getattr(slot.resource.guaranteed_capacity,d) for d in dims})
++            data = dict(origin_id=rows[0].origin_id,destination_id=rows[0].destination_id,
++                distance_km=slot.distance,resource_id=slot.resource.resource_id,resource_source=slot.resource.source,
++                orders=tuple(allocations),total_load=load,guaranteed_capacity=cap,
++                utilization=c.UtilizationVector(**{d:ratio(getattr(load,d),getattr(cap,d)) for d in dims}),
++                estimated_cost=None,ready_date=max(o.ready_date for o in rows),
++                delivery_due_date=min(o.delivery_due_date for o in rows))
++            staged.append((canonical_bytes(data),data))
++    trips, repeated = [], Counter()
++    for key,data in sorted(staged,key=lambda pair:pair[0]):
++        digest = hashlib.sha256(key).hexdigest()[:24]
++        repeated[digest] += 1
++        trips.append(c.Trip(trip_id=f'TP-{digest}-{repeated[digest]}',**data))
++    temporal = day_resource_feasibility([
++        FixedTrip(trip_id=t.trip_id,resource_id=t.resource_id,distance_km=t.distance_km,
++            ready_date=t.ready_date,delivery_due_date=t.delivery_due_date) for t in trips
++    ],request.resources,{'planning_start':context.planning_start,'planning_end':context.planning_end},
++        deterministic_budget=request.options.kernel_budget)
++    if trips and temporal.status == 'INFEASIBLE':
++        raise EngineCertificationError('D1 candidate and independent fixed-trip kernel disagree')
++    usable = selected is not None and temporal.status == 'FEASIBLE'
++    if not usable:
++        trips = []
++        if temporal.status == 'FEASIBLE':
++            temporal = FeasibilityCertificate(status='UNKNOWN',native_status='NOT_RUN',cause='NO_STRUCTURAL_INCUMBENT')
++    # A CP optimum for the restricted structural model is not a certificate of
++    # T7's complete goal/policy. Preserve its native status in the search trace.
++    status = 'FEASIBLE' if usable else ('INFEASIBLE' if trace['native_statuses'][-1:] == ('INFEASIBLE',) else 'UNKNOWN')
++    assigned = {o.order_id:{d:Decimal(0) for d in dims} for o in orders}
++    trip_refs = {o.order_id:[] for o in orders}
++    for trip in trips:
++        for allocation in trip.orders:
++            trip_refs[allocation.order_id].append(trip.trip_id)
++            for d in dims:
++                assigned[allocation.order_id][d] += getattr(allocation.load,d)
++    residuals = {o.order_id:vector({d:getattr(o.requested,d)-assigned[o.order_id][d] for d in dims}) for o in orders}
++    resolutions, usages = [], []
++    for order in orders:
++        residual = residuals[order.order_id]
++        has_gap = any(getattr(residual,d)>0 for d in dims)
++        has_assigned = any(assigned[order.order_id][d]>0 for d in dims)
++        resolutions.append(c.DemandResolution(order_id=order.order_id,priority=order.priority,
++            requested=vector({d:getattr(order.requested,d) for d in dims}),assigned=vector(assigned[order.order_id]),
++            coverage_ratio=ratio(assigned[order.order_id][request.model.primary_dimension],getattr(order.requested,request.model.primary_dimension)),
++            trip_ids=tuple(sorted(trip_refs[order.order_id])),status='COVERED' if not has_gap else 'PARTIALLY_COVERED' if has_assigned else 'UNASSIGNED'))
++    for resource in sorted(request.resources,key=lambda r:r.resource_id):
++        used = [t for t in trips if t.resource_id == resource.resource_id]
++        totals = {d:sum((getattr(t.total_load,d) for t in used),Decimal(0)) for d in dims}
++        usages.append(c.ResourceUsage(resource_id=resource.resource_id,resource_source=resource.source,
++            trip_ids=tuple(t.trip_id for t in used),total_load=vector(totals),total_cost=None,
++            weighted_utilization=c.UtilizationVector(**{d:ratio(totals[d],len(used)*getattr(resource.guaranteed_capacity,d)) for d in dims}),
++            services_available=resource.services_available,services_used=len(used) if resource.source=='EXTERNAL' else None,
++            services_remaining=resource.services_available-len(used) if resource.services_available is not None else None,
++            availability_source=resource.availability_source,units_available=resource.units_available,
++            trip_count=len(used),total_distance_km=sum((t.distance_km for t in used),Decimal(0))))
++    reasons, constraints = [], []
++    def constraint(code, facts, *, entity='global', satisfied=True, hard=True):
++        eid = 'E-'+hashlib.sha256(canonical_bytes([code,entity,facts])).hexdigest()[:24]
++        constraints.append(c.ConstraintEvidence(evidence_id=eid,code=code,
++            status='SATISFIED' if satisfied else 'VIOLATED',hard=hard,facts=facts))
++        return eid
++    def reason(code,kind,entity,facts,reference):
++        definition=reason_definition(code)
++        rid='R-'+hashlib.sha256(canonical_bytes([code,kind,entity,facts])).hexdigest()[:24]
++        emission=ReasonEmission(emission_id=rid,code=code,entity_type=kind,entity_id=entity,
++            producer='transport_plan',claim_strength=definition.claim_strength,facts=facts,evidence_refs=(reference,))
++        reasons.append(emission)
++    cert_ref=constraint('STRUCTURAL_CERTIFICATE',{'solution_found':usable,'temporal_status':temporal.status},hard=False)
++    constraint('SEARCH_SCOPE',{'objective_scope':trace.get('version','D1_STRUCTURAL_FRACTION_COVERAGE_V1'),
++        'native_statuses':trace['native_statuses'],'candidate_set_complete':False,
++        'candidate_slots':trace['candidate_slots'],'variable_count':trace['variable_count'],
++        'limits':trace['limits'],'seed':request.options.seed,'model_sha256':trace['model_sha256'],
++        'solver_version':trace['solver_version']},hard=False)
++    for witness in temporal.witness:
++        constraint('TEMPORAL_WITNESS',witness.model_dump(mode='python'),entity=witness.trip_id)
++    for trip in trips:
++        for d in dims:
++            facts=dict(dimension=d,guaranteed_capacity=getattr(trip.guaranteed_capacity,d),load=getattr(trip.total_load,d),capacity_basis='GUARANTEED')
++            ref=constraint('VECTOR_CAPACITY',facts,entity=trip.trip_id)
++            reason('GUARANTEED_CAPACITY_USED_FOR_FEASIBILITY','TRIP',trip.trip_id,facts,ref)
++        if len(trip.orders)>1:
++            first,last,_=dispatch_window(trip,next(r for r in request.resources if r.resource_id==trip.resource_id),context)
++            ref=constraint('CONSOLIDATION',{'trip_id':trip.trip_id,'order_ids':tuple(a.order_id for a in trip.orders)},entity=trip.trip_id)
++            reason('CONSOLIDATED_COMPATIBLE_DEMAND','TRIP',trip.trip_id,dict(order_ids=tuple(a.order_id for a in trip.orders),
++                compatibility_certificate_ref=ref,window_start=date.fromordinal(first),window_end=date.fromordinal(last)),ref)
++    for resource, usage in zip(sorted(request.resources,key=lambda r:r.resource_id),usages):
++        if resource.source=='EXTERNAL':
++            ref=constraint('FINITE_SERVICES',dict(resource_id=resource.resource_id,services_available=resource.services_available,services_used=usage.services_used),entity=resource.resource_id)
++            if resource.availability_source=='ASSUMED':
++                reason('ASSUMED_EXTERNAL_AVAILABILITY','RESOURCE',resource.resource_id,dict(services_available=resource.services_available,availability_source='ASSUMED'),ref)
++            if resource.services_available==usage.services_used:
++                reason('RESOURCE_SERVICE_LIMIT_REACHED','RESOURCE',resource.resource_id,dict(services_available=resource.services_available,services_used=usage.services_used),ref)
++    for order in orders:
++        eligible=[r for r in request.resources if compatible(order,r,request.model)]
++        if not eligible:
++            ref=constraint('COMPATIBILITY_EXHAUSTION',{'order_id':order.order_id,'resource_ids':tuple(r.resource_id for r in request.resources)},entity=order.order_id,hard=False)
++            reason('NO_COMPATIBLE_RESOURCE','ORDER',order.order_id,dict(compatible_resource_count=0,candidate_set_complete=True,certificate_ref=ref),ref)
++        if not(order.split_allowed and request.model.split_permitted) and eligible:
++            for d in dims:
++                maximum=max(getattr(r.guaranteed_capacity,d) for r in eligible)
++                if getattr(order.requested,d)>maximum:
++                    reason('NON_SPLIT_EXCEEDS_GUARANTEED_CAPACITY','ORDER',order.order_id,
++                        dict(split_allowed=False,dimension=d,requested=getattr(order.requested,d),maximum_guaranteed_capacity=maximum),cert_ref)
++        if eligible:
++            windows=[dispatch_window(order,r,context)[:2] for r in eligible]
++            if all(a>b for a,b in windows) and max(b for a,b in windows)>=1:
++                reason('DATE_WINDOW_INCOMPATIBLE','ORDER',order.order_id,dict(earliest_dispatch=date.fromordinal(windows[0][0]),latest_dispatch=date.fromordinal(max(b for a,b in windows))),cert_ref)
++        if usable:
++            for d in dims:
++                if getattr(residuals[order.order_id],d)>0:
++                    reason('CAPACITY_GAP','ORDER',order.order_id,dict(dimension=d,unassigned_quantity=getattr(residuals[order.order_id],d)),cert_ref)
++    def refs(kind,entity):
++        return tuple(r.emission_id for r in reasons if r.entity_type==kind and r.entity_id==entity)
++    trips=[c.Trip.model_validate({**t.model_dump(), 'reason_codes':tuple(sorted({r.code for r in reasons if r.entity_type=='TRIP' and r.entity_id==t.trip_id}))}) for t in trips]
++    resolutions=[c.DemandResolution.model_validate({**o.model_dump(),'reason_codes':tuple(sorted({r.code for r in reasons if r.entity_type=='ORDER' and r.entity_id==o.order_id}))}) for o in resolutions]
++    entities=[]
++    for order,resolution in zip(orders,resolutions):
++        facts={'priority':order.priority,'trip_ids':resolution.trip_ids,'split_allowed':order.split_allowed and request.model.split_permitted}
++        for d in dims:
++            facts.update({f'requested_{d}':getattr(order.requested,d),f'assigned_{d}':getattr(resolution.assigned,d),f'residual_{d}':getattr(residuals[order.order_id],d)})
++        candidates=[]
++        for resource in sorted(request.resources,key=lambda r:r.resource_id):
++            rejected=[]
++            if not compatible(order,resource,request.model):rejected.append('RESOURCE_INCOMPATIBLE')
++            first,last,_=dispatch_window(order,resource,context)
++            if first>last:rejected.append('DATE_WINDOW_INCOMPATIBLE')
++            if not(order.split_allowed and request.model.split_permitted) and any(getattr(order.requested,d)>getattr(resource.guaranteed_capacity,d) for d in dims):rejected.append('NON_SPLIT_CAPACITY')
++            available=resource.units_available if resource.source=='OWN' else resource.services_available
++            if available==0:rejected.append('ZERO_AVAILABILITY')
++            candidate_facts={'order_id':order.order_id,'resource_id':resource.resource_id,
++                'rejected_by':tuple(rejected),'scope':'STATIC_PAIR_ONLY',
++                'origin_id':order.origin_id,'destination_id':order.destination_id,
++                'source':resource.source,'source_allowed':resource.source in request.model.allowed_sources,
++                'lane_allowed':(order.origin_id,order.destination_id) in resource.lanes,
++                'order_compatibility':tuple(sorted(order.compatibility_groups)),
++                'resource_compatibility':tuple(sorted(resource.compatibility_groups)),
++                'earliest_dispatch_ordinal':first,'latest_dispatch_ordinal':last,
++                'availability':available,'split_permitted':order.split_allowed and request.model.split_permitted}
++            for d in dims:
++                candidate_facts.update({f'requested_{d}':getattr(order.requested,d),f'guaranteed_{d}':getattr(resource.guaranteed_capacity,d)})
++            constraint('CANDIDATE_ELIGIBILITY',candidate_facts,entity=order.order_id+':'+resource.resource_id,satisfied=not rejected,hard=False)
++            chosen=any(t.resource_id==resource.resource_id and any(a.order_id==order.order_id for a in t.orders) for t in trips)
++            candidates.append(c.CandidateSummary(resource_id=resource.resource_id,status='SELECTED' if chosen else 'INFEASIBLE' if rejected else 'UNKNOWN',estimated_cost=None,reason_refs=()))
++        entities.append(c.EntityEvidence(entity_type='ORDER',entity_id=order.order_id,facts=facts,reason_refs=refs('ORDER',order.order_id),candidate_summary=tuple(candidates)))
++    for resource,usage in zip(sorted(request.resources,key=lambda r:r.resource_id),usages):
++        facts={'source':resource.source,'trip_ids':usage.trip_ids,'services_available':resource.services_available,
++            'services_used':usage.services_used,'units_available':resource.units_available,'availability_source':resource.availability_source,
++            'operating_cost_per_km':resource.operating_cost_per_km,'external_cost_model':resource.external_cost.cost_model if resource.external_cost else None,
++            'external_rate':resource.external_cost.rate if resource.external_cost else None,
++            'billing_basis':resource.external_cost.billing_basis if resource.external_cost else None}
++        entities.append(c.EntityEvidence(entity_type='RESOURCE',entity_id=resource.resource_id,facts=facts,reason_refs=refs('RESOURCE',resource.resource_id)))
++    entities.extend(c.EntityEvidence(entity_type='TRIP',entity_id=t.trip_id,facts={'resource_id':t.resource_id,'order_ids':tuple(a.order_id for a in t.orders)},reason_refs=refs('TRIP',t.trip_id)) for t in trips)
++    primary=request.model.primary_dimension
++    requested=sum((getattr(o.requested,primary) for o in orders),Decimal(0))
++    total_assigned=sum((getattr(o.assigned,primary) for o in resolutions),Decimal(0))
++    own=sum(t.resource_source=='OWN' for t in trips)
++    gap=vector({d:sum((getattr(v,d) for v in residuals.values()),Decimal(0)) for d in dims})
++    coverage={p:(sum((getattr(o.assigned,primary) for o in resolutions if o.priority==p),Decimal(0)),sum((getattr(o.requested,primary) for o in orders if o.priority==p),Decimal(0))) for p in Priority}
++    metrics=dict(total_cost=None,cost_completeness='UNKNOWN',trip_count=len(trips),
++        demand_coverage=dict(primary_dimension=primary,requested=requested,assigned=total_assigned,unassigned=requested-total_assigned,ratio=ratio(total_assigned,requested)),
++        capacity_utilization=dict(primary_dimension=primary,weighted_ratio=ratio(sum((getattr(t.total_load,primary) for t in trips),Decimal(0)),sum((getattr(t.guaranteed_capacity,primary) for t in trips),Decimal(0)))),
++        resource_mix=dict(own_trip_ratio=ratio(own,len(trips)),external_trip_ratio=ratio(len(trips)-own,len(trips))),resources_used=len({t.resource_id for t in trips}),
++        coverage_by_priority=[dict(priority=p,coverage_ratio=ratio(*coverage[p])) for p in Priority])
++    core=c.EngineCoreResult(result_schema='transport_plan_v1',decision=c.Decision(node_id='logistics_assignment',decision_type='TRANSPORT_PLAN',decision_label='Transport Plan',run_id=request.run_id),
++        context=context,engine=c.EngineHeader(engine_name=IDENTITY.engine_name,engine_version=IDENTITY.engine_version,runtime_profile=IDENTITY.runtime_profile,
++            solver='OR_TOOLS_CP_SAT',solver_status=status,result_generated_at=request.result_generated_at),input_context_hash=input_context_hash(context,IDENTITY),
++        feasibility=c.Feasibility(solution_found=usable,policy_feasible=None,hard_constraints_satisfied=True if usable else None,
++            full_demand_coverage=not any(getattr(gap,d)>0 for d in dims) if usable else None),metrics=metrics,
++        transport_plan=c.TransportPlan(trips=tuple(trips),unassigned_demand=tuple(o for o in resolutions if o.status!='COVERED'),capacity_gap=gap if any(getattr(gap,d)>0 for d in dims) else None))
++    solver=dict(status=status,objective_value=None,best_bound=None,certificate=c.SolverCertificate(kind='FEASIBILITY' if usable else 'INFEASIBILITY',evidence_ref=cert_ref) if usable or status=='INFEASIBLE' else None)
++    evidence=c.EngineEvidence(result_schema='transport_plan_v1',workspace_id=context.workspace_id,run_id=request.run_id,input_context_hash=core.input_context_hash,
++        core_result_fingerprint=core_result_fingerprint(core),policy=c.PolicyEvidence(case_goal=context.case_policy.primary_goal,effective_node_policy=context.node_policy.primary_goal,
++            override=context.node_policy.override,override_reason=context.node_policy.override_reason,evidence_id=cert_ref),constraints=tuple(constraints),solver=c.SolverEvidence(**solver),
++        reasons=tuple(reasons),entities=tuple(entities))
++    computation=TransportPlanComputation(output=c.EngineOutput(core=core,evidence=evidence),demand_resolution=tuple(resolutions),residuals=residuals,resource_usage=tuple(usages),temporal_certificate=temporal,search=trace)
++    from .transport_validator import certify_transport_plan
++    certify_transport_plan(request,computation)
++    return computation
+--- post-T5/backend/app/engines/assignment/transport_validator.py
++++ T6/backend/app/engines/assignment/transport_validator.py
+@@ -0,0 +1,243 @@
++"""Independent post-solve certifier: reads immutable inputs and output only.
++
++No import of the candidate generator, CP model, extraction, or metric producer.
++An inconsistency is a technical engine error; never repair the candidate here.
++"""
++from collections import defaultdict
++from decimal import Decimal, ROUND_HALF_UP, localcontext
++from fractions import Fraction
++
++from app.domain.logistics.base import Dimension, Priority
++from app.domain.logistics.transit import TransitEstimator
++from app.results.canonical import core_result_fingerprint
++from .transport_contracts import TransportPlanInput, TransportPlanComputation, EngineCertificationError
++
++
++def certify_transport_plan(request, result):
++    try:
++        request=TransportPlanInput.model_validate(request)
++        result=TransportPlanComputation.model_validate(result)
++        with localcontext() as ctx:
++            ctx.prec=60
++            _certify(request,result)
++    except (ValueError, AssertionError, KeyError, TypeError, ArithmeticError) as exc:
++        raise EngineCertificationError('Independent D1 certification failed: '+str(exc)) from exc
++    return True
++
++
++def _certify(request,result):
++    def check(value,message):
++        if not value:raise ValueError(message)
++    def rounded(n,d,scale=4):
++        return None if not d else (Decimal(n)/Decimal(d)).quantize(Decimal(1).scaleb(-scale),rounding=ROUND_HALF_UP)
++    m,context=request.model,request.context
++    core,evidence=result.output.core,result.output.evidence
++    check(core.context==context and core.decision.run_id==request.run_id,'Pinned context/Run changed')
++    check(core.engine.engine_name=='transport_plan' and core.engine.engine_version=='2.0.0' and core.engine.runtime_profile=='transport_plan_v1','Wrong runtime identity')
++    check(core.feasibility.policy_feasible is None,'T6 cannot certify T7 policy')
++    check(evidence.core_result_fingerprint==core_result_fingerprint(core),'Core fingerprint changed')
++    trips=core.transport_plan.trips
++    dims=m.active_dimensions
++    orders={o.order_id:o for o in request.demands}
++    resources={r.resource_id:r for r in request.resources}
++    totals={oid:{d:Decimal(0) for d in dims} for oid in orders}
++    refs=defaultdict(list)
++    per_resource=defaultdict(list)
++    trip_map={t.trip_id:t for t in trips}
++    check(len(trip_map)==len(trips),'Duplicate Trip IDs')
++    allowed_entities={('ORDER',oid) for oid in orders}|{('RESOURCE',rid) for rid in resources}|{('TRIP',tid) for tid in trip_map}
++    entities={(e.entity_type,e.entity_id):e for e in evidence.entities}
++    check(len(entities)==len(evidence.entities) and set(entities)==allowed_entities,'Entity evidence set differs')
++    for trip in trips:
++        check(trip.resource_id in resources,'Unknown resource reference')
++        resource=resources[trip.resource_id]
++        check(trip.resource_source==resource.source and resource.source in m.allowed_sources,'Resource source mismatch')
++        check((trip.origin_id,trip.destination_id) in resource.lanes,'Ineligible resource lane')
++        check(resource.source!='OWN' or resource.base_origin_id==trip.origin_id,'OWN base differs')
++        per_resource[resource.resource_id].append(trip)
++        rows=[]
++        for allocation in trip.orders:
++            check(allocation.order_id in orders,'Unknown Order reference')
++            order=orders[allocation.order_id];rows.append(order)
++            check((trip.origin_id,trip.destination_id,trip.distance_km)==(order.origin_id,order.destination_id,order.distance_km),'Route/distance modified')
++            check(set(order.compatibility_groups).issubset(resource.compatibility_groups) if order.compatibility_groups else m.homogeneous_loads_declared,'Incompatible resource/cargo')
++            fraction=None
++            for d in dims:
++                q,load=getattr(order.requested,d),getattr(allocation.load,d)
++                check(load is not None,'Missing active dimension')
++                if q:
++                    current=Fraction(load)/Fraction(q)
++                    check(fraction is None or current==fraction,'Split vector loses proportionality')
++                    fraction=current
++                else:check(load==0,'Demand created in a zero dimension')
++                totals[order.order_id][d]+=load
++            check(fraction is not None and 0<fraction<=1,'Invalid allocation fraction')
++            check(allocation.allocation_fraction==rounded(fraction.numerator,fraction.denominator,6),'Fraction display differs from exact vector')
++            if not(order.split_allowed and m.split_permitted):
++                check(fraction==1,'Non-split demand divided')
++            refs[order.order_id].append(trip.trip_id)
++        check(len({tuple(sorted(o.compatibility_groups)) for o in rows})==1,'Unsafe heterogeneous consolidation')
++        check(trip.ready_date==max(o.ready_date for o in rows) and trip.delivery_due_date==min(o.delivery_due_date for o in rows),'Trip window modified')
++        for d in Dimension:
++            if d not in dims:
++                check(getattr(trip.total_load,d) is None and getattr(trip.guaranteed_capacity,d) is None,'Inactive dimension presented as certified')
++                continue
++            load=sum(getattr(a.load,d) for a in trip.orders)
++            cap=getattr(resource.guaranteed_capacity,d)
++            check(trip.guaranteed_capacity.model_dump()[d]==cap,'Guaranteed capacity changed')
++            check(getattr(trip.total_load,d)==load and load<=cap,'Trip capacity exceeded or load not conserved')
++            check(getattr(trip.utilization,d)==rounded(load,cap),'Utilization differs')
++        check(trip.estimated_cost is None,'T6 fabricated a cost policy output')
++    resolutions={r.order_id:r for r in result.demand_resolution}
++    check(len(resolutions)==len(result.demand_resolution) and set(resolutions)==set(orders)==set(result.residuals),'Missing demand resolution/residual')
++    residual_rows=[]
++    gap={d:Decimal(0) for d in dims}
++    for oid,order in orders.items():
++        resolution=resolutions[oid]
++        check(resolution.priority==order.priority,'Priority changed')
++        check(tuple(sorted(refs[oid]))==resolution.trip_ids,'Order Trip references differ')
++        if not(order.split_allowed and m.split_permitted):check(len(refs[oid])<=1,'Non-split assigned across Trips')
++        entity=entities['ORDER',oid]
++        check(entity.facts['priority']==order.priority,'Order evidence priority changed')
++        for d in dims:
++            requested,assigned=getattr(order.requested,d),totals[oid][d]
++            residual=getattr(result.residuals[oid],d)
++            check(assigned+residual==requested and residual>=0,'Conservation violated')
++            check(getattr(resolution.requested,d)==requested and getattr(resolution.assigned,d)==assigned,'Demand DTO differs from allocations')
++            check(Decimal(entity.facts['requested_'+d])==requested and Decimal(entity.facts['assigned_'+d])==assigned and Decimal(entity.facts['residual_'+d])==residual,'Order evidence differs from conservation')
++            gap[d]+=residual
++        any_gap=any(getattr(result.residuals[oid],d)>0 for d in dims)
++        any_assigned=any(totals[oid][d]>0 for d in dims)
++        expected='COVERED' if not any_gap else 'PARTIALLY_COVERED' if any_assigned else 'UNASSIGNED'
++        check(resolution.status==expected,'False structural coverage status')
++        check(resolution.coverage_ratio==rounded(totals[oid][m.primary_dimension],getattr(order.requested,m.primary_dimension)),'Order coverage ratio differs')
++        if any_gap:residual_rows.append(resolution)
++    check(tuple(sorted(residual_rows,key=lambda o:o.order_id))==core.transport_plan.unassigned_demand,'Residual rows missing')
++    if any(gap.values()):
++        check(core.transport_plan.capacity_gap is not None,'Gap hidden')
++        for d in dims:check(getattr(core.transport_plan.capacity_gap,d)==gap[d],'Gap total changed')
++    else:check(core.transport_plan.capacity_gap is None,'False gap')
++    cert=result.temporal_certificate
++    witnesses={w.trip_id:w for w in cert.witness}
++    check(len(witnesses)==len(cert.witness),'Duplicate witness')
++    if core.feasibility.solution_found:
++        check(core.engine.solver_status in ('OPTIMAL','FEASIBLE','UNKNOWN') and cert.status=='FEASIBLE' and set(witnesses)==set(trip_map),'Uncertified candidate exposed')
++        check(core.feasibility.hard_constraints_satisfied is True,'Missing structural certification')
++        check(core.feasibility.full_demand_coverage==(not any(gap.values())),'False full coverage')
++    else:
++        check(not trips and not witnesses and core.engine.solver_status in ('UNKNOWN','INFEASIBLE'),'Unusable result contains Trips')
++        check(core.feasibility.hard_constraints_satisfied is None and core.feasibility.full_demand_coverage is None,'No-solution claims certainty')
++    occupancy=defaultdict(list)
++    usage={u.resource_id:u for u in result.resource_usage}
++    check(len(usage)==len(result.resource_usage) and set(usage)==set(resources),'Missing resource usage')
++    for rid,resource in resources.items():
++        used=per_resource[rid]
++        u=usage[rid]
++        check(u.resource_source==resource.source and u.trip_count==len(used) and u.trip_ids==tuple(t.trip_id for t in used),'Resource usage identity/count differs')
++        check(u.total_distance_km==sum((t.distance_km for t in used),Decimal(0)),'Resource distance differs')
++        check(u.total_cost is None,'Uncertified cost')
++        if resource.source=='EXTERNAL':
++            check(u.services_available==resource.services_available and u.services_used==len(used) and u.services_remaining==(resource.services_available-len(used) if resource.services_available is not None else None),'External quota facts differ')
++            check(u.availability_source==resource.availability_source,'Availability assumption changed')
++            check(not used or resource.services_available is not None and len(used)<=resource.services_available,'Finite horizon service quota exceeded')
++        else:
++            check(u.units_available==resource.units_available and u.services_used is None,'OWN units changed')
++        for d in dims:
++            total=sum((getattr(t.total_load,d) for t in used),Decimal(0))
++            check(getattr(u.total_load,d)==total and getattr(u.weighted_utilization,d)==rounded(total,len(used)*getattr(resource.guaranteed_capacity,d)),'Resource utilization differs')
++        for trip in used:
++            w=witnesses[trip.trip_id]
++            check(w.resource_id==rid and context.planning_start<=w.dispatch<=context.planning_end and w.dispatch>=trip.ready_date,'Temporal witness references/window invalid')
++            dates=TransitEstimator.dates(w.dispatch,trip.distance_km,resource.source)
++            check(w.arrival==dates.arrival and w.arrival<=trip.delivery_due_date and w.available_again==dates.available_again,'Temporal witness violates T1 transit/due')
++            if resource.source=='EXTERNAL':check(w.unit_index is None and w.available_again is None,'Invented external cycle')
++            else:
++                check(w.unit_index is not None and 0<=w.unit_index<resource.units_available,'Invalid OWN unit index')
++                occupancy[rid,w.unit_index].append((w.dispatch,w.available_again))
++    for periods in occupancy.values():
++        ordered=sorted(periods)
++        check(all(a[1]<=b[0] for a,b in zip(ordered,ordered[1:])),'OWN unit overlaps')
++    metric=core.metrics
++    primary=m.primary_dimension
++    requested=sum((getattr(o.requested,primary) for o in orders.values()),Decimal(0))
++    assigned=sum((totals[oid][primary] for oid in orders),Decimal(0))
++    check((metric.demand_coverage.requested,metric.demand_coverage.assigned,metric.demand_coverage.unassigned,metric.demand_coverage.ratio)==(requested,assigned,requested-assigned,rounded(assigned,requested)),'Coverage metrics differ')
++    check(metric.trip_count==len(trips) and metric.resources_used==len({t.resource_id for t in trips}),'Count metrics differ')
++    own=sum(t.resource_source=='OWN' for t in trips)
++    check((metric.resource_mix.own_trip_ratio,metric.resource_mix.external_trip_ratio)==(rounded(own,len(trips)),rounded(len(trips)-own,len(trips))),'Resource mix differs')
++    check(metric.capacity_utilization.weighted_ratio==rounded(sum((getattr(t.total_load,primary) for t in trips),Decimal(0)),sum((getattr(t.guaranteed_capacity,primary) for t in trips),Decimal(0))),'Weighted utilization differs')
++    check(metric.total_cost is None and metric.cost_completeness=='UNKNOWN','T7 economic claim in T6')
++    coverage={v.priority:v.coverage_ratio for v in metric.coverage_by_priority}
++    check(set(coverage)==set(Priority),'Missing priority strata')
++    for priority in Priority:
++        check(coverage[priority]==rounded(sum((totals[oid][primary] for oid,o in orders.items() if o.priority==priority),Decimal(0)),sum((getattr(o.requested,primary) for o in orders.values() if o.priority==priority),Decimal(0))),'Priority coverage differs')
++    constraint_ids={e.evidence_id for e in evidence.constraints}
++    check(len(constraint_ids)==len(evidence.constraints),'Duplicate constraint evidence')
++    pair_evidence={}
++    for constraint in evidence.constraints:
++        if constraint.code!='CANDIDATE_ELIGIBILITY':continue
++        f=constraint.facts
++        o,r=orders[f['order_id']],resources[f['resource_id']]
++        key=(o.order_id,r.resource_id)
++        check(key not in pair_evidence,'Duplicate candidate pair evidence')
++        pair_evidence[key]=constraint
++        rejected=[]
++        eligible=r.source in m.allowed_sources and (o.origin_id,o.destination_id) in r.lanes and (r.source!='OWN' or r.base_origin_id==o.origin_id) and (set(o.compatibility_groups).issubset(r.compatibility_groups) if o.compatibility_groups else m.homogeneous_loads_declared)
++        if not eligible:rejected.append('RESOURCE_INCOMPATIBLE')
++        first=max(context.planning_start,o.ready_date).toordinal()
++        last=min(context.planning_end.toordinal(),o.delivery_due_date.toordinal()-TransitEstimator.estimate(o.distance_km,r.source).outbound_days+1)
++        if first>last:rejected.append('DATE_WINDOW_INCOMPATIBLE')
++        if not(o.split_allowed and m.split_permitted) and any(getattr(o.requested,d)>getattr(r.guaranteed_capacity,d) for d in dims):rejected.append('NON_SPLIT_CAPACITY')
++        available=r.units_available if r.source=='OWN' else r.services_available
++        if available==0:rejected.append('ZERO_AVAILABILITY')
++        check(tuple(rejected)==f['rejected_by'] and constraint.status==('VIOLATED' if rejected else 'SATISFIED') and not constraint.hard,'Candidate rejection facts differ')
++        check((f['earliest_dispatch_ordinal'],f['latest_dispatch_ordinal'],f['availability'])==(first,last,available),'Candidate window/availability differs')
++        for d in dims:check(Decimal(f['requested_'+d])==getattr(o.requested,d) and Decimal(f['guaranteed_'+d])==getattr(r.guaranteed_capacity,d),'Candidate vector facts differ')
++    check(set(pair_evidence)=={(o,r) for o in orders for r in resources},'Missing pair evidence')
++    for reason in evidence.reasons:
++        check((reason.entity_type,reason.entity_id) in allowed_entities,'Reason entity missing')
++        check(set(reason.evidence_refs).issubset(constraint_ids),'Reason certificate missing')
++        f=reason.facts
++        if reason.code=='CAPACITY_GAP':
++            check(core.feasibility.solution_found and f['unassigned_quantity']==getattr(result.residuals[reason.entity_id],f['dimension']),'Unsupported gap reason')
++        elif reason.code=='GUARANTEED_CAPACITY_USED_FOR_FEASIBILITY':
++            trip=trip_map[reason.entity_id]
++            check(f['guaranteed_capacity']==getattr(trip.guaranteed_capacity,f['dimension']) and f['load']==getattr(trip.total_load,f['dimension']),'Capacity reason differs')
++        elif reason.code=='CONSOLIDATED_COMPATIBLE_DEMAND':
++            trip=trip_map[reason.entity_id]
++            check(set(f['order_ids'])=={a.order_id for a in trip.orders} and f['compatibility_certificate_ref'] in constraint_ids,'Consolidation proof missing')
++        elif reason.code in ('ASSUMED_EXTERNAL_AVAILABILITY','RESOURCE_SERVICE_LIMIT_REACHED'):
++            r=resources[reason.entity_id]
++            check(r.source=='EXTERNAL' and f['services_available']==r.services_available,'External reason differs')
++            if reason.code=='ASSUMED_EXTERNAL_AVAILABILITY':check(r.availability_source=='ASSUMED','False assumption')
++            else:check(f['services_used']==len(per_resource[r.resource_id])==r.services_available,'False service saturation')
++        elif reason.code=='NO_COMPATIBLE_RESOURCE':
++            o=orders[reason.entity_id]
++            eligible=[r for r in resources.values() if r.source in m.allowed_sources and (o.origin_id,o.destination_id) in r.lanes and (r.source!='OWN' or r.base_origin_id==o.origin_id) and (set(o.compatibility_groups).issubset(r.compatibility_groups) if o.compatibility_groups else m.homogeneous_loads_declared)]
++            check(not eligible and f['certificate_ref'] in constraint_ids,'False compatibility exhaustion')
++        elif reason.code=='NON_SPLIT_EXCEEDS_GUARANTEED_CAPACITY':
++            o=orders[reason.entity_id]
++            check(not(o.split_allowed and m.split_permitted) and f['requested']==getattr(o.requested,f['dimension']),'False non-split proof')
++            eligible=[r for r in resources.values() if r.source in m.allowed_sources and (o.origin_id,o.destination_id) in r.lanes and (r.source!='OWN' or r.base_origin_id==o.origin_id) and (set(o.compatibility_groups).issubset(r.compatibility_groups) if o.compatibility_groups else m.homogeneous_loads_declared)]
++            check(bool(eligible) and max(getattr(r.guaranteed_capacity,f['dimension']) for r in eligible)==f['maximum_guaranteed_capacity'],'Non-split bound omitted resource')
++        elif reason.code=='DATE_WINDOW_INCOMPATIBLE':
++            o=orders[reason.entity_id]
++            eligible=[r for r in resources.values() if r.source in m.allowed_sources and (o.origin_id,o.destination_id) in r.lanes and (r.source!='OWN' or r.base_origin_id==o.origin_id) and (set(o.compatibility_groups).issubset(r.compatibility_groups) if o.compatibility_groups else m.homogeneous_loads_declared)]
++            latest=[min(context.planning_end.toordinal(),o.delivery_due_date.toordinal()-TransitEstimator.estimate(o.distance_km,r.source).outbound_days+1) for r in eligible]
++            check(bool(latest) and f['earliest_dispatch']==max(context.planning_start,o.ready_date) and f['latest_dispatch'].toordinal()==max(latest) and f['earliest_dispatch']>f['latest_dispatch'],'Invalid date contradiction')
++        else:
++            raise ValueError('Unsupported T6 reason claim: '+reason.code)
++    reason_map={r.emission_id:r for r in evidence.reasons}
++    for key,entity in entities.items():
++        for ref in entity.reason_refs:
++            check((reason_map[ref].entity_type,reason_map[ref].entity_id)==key,'Cross-entity reason reference')
++        if entity.entity_type=='ORDER':
++            candidates={c.resource_id:c for c in entity.candidate_summary}
++            check(len(candidates)==len(entity.candidate_summary) and set(candidates)==set(resources),'Incomplete static candidate set')
++            for rid,candidate in candidates.items():
++                selected=any(t.resource_id==rid and any(a.order_id==entity.entity_id for a in t.orders) for t in trips)
++                check((candidate.status=='SELECTED')==selected,'False candidate selection')
++                rejected=pair_evidence[entity.entity_id,rid].status=='VIOLATED'
++                check(candidate.status==('SELECTED' if selected else 'INFEASIBLE' if rejected else 'UNKNOWN'),'Unsupported candidate feasibility claim')
++                check(candidate.estimated_cost is None,'Uncertified candidate cost')
++    check(core.engine.solver_status!='OPTIMAL','T6 producer must not claim a T7/global optimum')
+--- post-T5/backend/app/engines/common/__init__.py
++++ T6/backend/app/engines/common/__init__.py
+@@ -0,0 +1 @@
++"""Pure kernels shared by versioned decision engines."""
+--- post-T5/backend/app/engines/common/day_resource_feasibility.py
++++ T6/backend/app/engines/common/day_resource_feasibility.py
+@@ -0,0 +1,116 @@
++"""Fixed-trip temporal certificate, independent of D1 allocation and D2 policy.
++
++The witness is a proof of existence, not a published dispatch recommendation.
++OWN occupancy ends exclusively; EXTERNAL services share one horizon quota.
++"""
++from collections import defaultdict
++from datetime import date
++from typing import Literal
++
++from ortools.sat.python import cp_model
++from pydantic import Field
++
++from app.domain.logistics.base import ContractModel, DecisionDate, Identifier, Positive
++from app.domain.logistics.contracts import Horizon, TransportResource
++from app.domain.logistics.transit import TransitEstimator
++
++
++class FixedTrip(ContractModel):
++    trip_id: Identifier
++    resource_id: Identifier
++    distance_km: Positive
++    ready_date: DecisionDate
++    delivery_due_date: DecisionDate
++
++
++class TemporalWitness(ContractModel):
++    trip_id: Identifier
++    resource_id: Identifier
++    dispatch: DecisionDate
++    arrival: DecisionDate
++    available_again: DecisionDate | None
++    unit_index: int | None = Field(default=None, strict=True, ge=0)
++
++
++class FeasibilityCertificate(ContractModel):
++    status: Literal['FEASIBLE', 'INFEASIBLE', 'UNKNOWN']
++    witness: tuple[TemporalWitness, ...] = ()
++    native_status: str
++    scope: Literal['FIXED_TRIPS_EXISTENCE_V1'] = 'FIXED_TRIPS_EXISTENCE_V1'
++    cause: str | None = None
++
++
++def dispatch_window(trip, resource, horizon):
++    """Use the T1 authority; horizon bounds departures, not arrival/return."""
++    estimate = TransitEstimator.estimate(trip.distance_km, resource.source)
++    earliest = max(horizon.planning_start, trip.ready_date)
++    # Ordinals avoid DATE underflow on a clearly impossible long transit.
++    latest = min(horizon.planning_end.toordinal(),
++                 trip.delivery_due_date.toordinal() - estimate.outbound_days + 1)
++    return earliest.toordinal(), latest, estimate
++
++
++def day_resource_feasibility(trips, resources, horizon, *, deterministic_budget=2.0):
++    horizon = Horizon.model_validate(horizon)
++    trips = tuple(FixedTrip.model_validate(t) for t in trips)
++    resources = tuple(TransportResource.model_validate(r) for r in resources)
++    if len({t.trip_id for t in trips}) != len(trips) or len({r.resource_id for r in resources}) != len(resources):
++        raise ValueError('Duplicate fixed Trip/resource IDs')
++    if len(trips) > 256 or len(resources) > 40 or (horizon.planning_end-horizon.planning_start).days > 365:
++        return FeasibilityCertificate(status='UNKNOWN', native_status='NOT_RUN', cause='KERNEL_BUDGET')
++    if not 0 <= deterministic_budget <= 30:
++        raise ValueError('Invalid deterministic kernel budget')
++    by_id = {r.resource_id: r for r in resources}
++    if any(t.resource_id not in by_id for t in trips):
++        raise ValueError('Unknown fixed Trip resource')
++    if not trips:
++        return FeasibilityCertificate(status='FEASIBLE', native_status='TRIVIAL')
++    model = cp_model.CpModel()
++    starts, intervals, counts, estimates = {}, defaultdict(list), defaultdict(int), {}
++    for trip in sorted(trips, key=lambda t: t.trip_id):
++        resource = by_id[trip.resource_id]
++        available = resource.units_available if resource.source == 'OWN' else resource.services_available
++        if available is None or resource.source == 'EXTERNAL' and resource.availability_source == 'UNKNOWN':
++            return FeasibilityCertificate(status='UNKNOWN', native_status='NOT_RUN', cause='UNKNOWN_AVAILABILITY')
++        earliest, latest, estimate = dispatch_window(trip, resource, horizon)
++        if earliest > latest or available == 0:
++            return FeasibilityCertificate(status='INFEASIBLE', native_status='EXACT_BOUND', cause='WINDOW_OR_ZERO_AVAILABILITY')
++        start = model.new_int_var(earliest, latest, 'start_' + trip.trip_id)
++        starts[trip.trip_id] = start
++        estimates[trip.trip_id] = estimate
++        counts[resource.resource_id] += 1
++        if resource.source == 'OWN':
++            intervals[resource.resource_id].append(model.new_fixed_size_interval_var(start, estimate.cycle_days, 'cycle_'+trip.trip_id))
++    for rid, count in counts.items():
++        resource = by_id[rid]
++        if resource.source == 'EXTERNAL' and count > resource.services_available:
++            return FeasibilityCertificate(status='INFEASIBLE', native_status='EXACT_BOUND', cause='HORIZON_SERVICE_LIMIT')
++        if resource.source == 'OWN':
++            model.add_cumulative(intervals[rid], [1]*count, min(resource.units_available, count))
++    solver = cp_model.CpSolver()
++    solver.parameters.num_search_workers = 1
++    solver.parameters.random_seed = 0
++    solver.parameters.max_deterministic_time = deterministic_budget
++    solver.parameters.max_time_in_seconds = 10
++    status = solver.solve(model)
++    native = solver.status_name(status)
++    if status == cp_model.MODEL_INVALID:
++        raise RuntimeError('Invalid fixed-trip feasibility model: '+model.validate())
++    if status not in (cp_model.OPTIMAL, cp_model.FEASIBLE):
++        return FeasibilityCertificate(status='INFEASIBLE' if status == cp_model.INFEASIBLE else 'UNKNOWN', native_status=native)
++    witness, free = [], defaultdict(dict)
++    # Colour the certified interval graph: logical units, never vehicle plates.
++    for trip in sorted(trips, key=lambda t: (solver.value(starts[t.trip_id]), t.trip_id)):
++        r = by_id[trip.resource_id]
++        dispatch = date.fromordinal(solver.value(starts[trip.trip_id]))
++        dates = TransitEstimator.dates(dispatch, trip.distance_km, r.source)
++        unit = None
++        if r.source == 'OWN':
++            busy = free[r.resource_id]
++            unit = next((u for u in range(min(r.units_available, len(trips))) if busy.get(u, date.min) <= dispatch), None)
++            if unit is None:
++                raise RuntimeError('Kernel interval witness cannot be coloured')
++            busy[unit] = dates.available_again
++        witness.append(TemporalWitness(trip_id=trip.trip_id, resource_id=r.resource_id,
++            dispatch=dispatch, arrival=dates.arrival, available_again=dates.available_again, unit_index=unit))
++    return FeasibilityCertificate(status='FEASIBLE', native_status=native, witness=tuple(sorted(witness, key=lambda w:w.trip_id)))
+--- post-T5/backend/app/results/registry.py
++++ T6/backend/app/results/registry.py
+@@ -57,6 +57,20 @@
+     RuntimeRegistration('transport_plan', '2.0.0', 'transport_plan_v1', 'transport_plan_v1', 1, 'logistics_assignment', False, False),
+     RuntimeRegistration('day_scheduling', '2.0.0', 'day_scheduling_v1', 'day_scheduling_v1', 1, 'logistics_scheduling', False, False),
+ )
++
++
++def resolve_test_core(identity):
++    """Explicit inactive T6 test profile; never used by public admission.
++
++    The production registration remains unavailable until policy/publication
++    phases are complete. Matching only a node or schema is insufficient.
++    """
++    entry = resolve_runtime(identity)
++    if entry.identity != RuntimeIdentity(engine_name='transport_plan',engine_version='2.0.0',
++            runtime_profile='transport_plan_v1',result_schema='transport_plan_v1',result_schema_version=1):
++        raise RuntimeUnavailable('No test Core producer for this exact identity')
++    from app.engines.assignment.transport_plan import run_transport_plan
++    return run_transport_plan
+ 
+ 
+ def resolve_schema(name, version):
+--- post-T5/backend/tests/test_transport_plan_core.py
++++ T6/backend/tests/test_transport_plan_core.py
+@@ -0,0 +1,447 @@
++"""U6: structural invariants, adversarial certification and independent oracles."""
++from datetime import date
++from decimal import Decimal as D, localcontext
++from fractions import Fraction
++from itertools import product, permutations
++import json
++from pathlib import Path
++import unittest
++
++from app.engines.assignment.transport_contracts import TransportPlanInput, EngineCertificationError
++from app.engines.assignment.transport_plan import run_transport_plan, IDENTITY
++from app.engines.assignment.transport_validator import certify_transport_plan
++from app.engines.common.day_resource_feasibility import day_resource_feasibility
++from app.results import registry
++from app.results.canonical import core_result_fingerprint, canonical_bytes
++from app.results.contracts import EngineCoreResult
++from tests.ultimate_fixtures import context, RUN1
++
++
++def order(oid='O1', pallets='70', *, split=True, **changes):
++    value=dict(order_id=oid,origin_id='A',destination_id='B',distance_km='480',
++        ready_date='2026-11-02',delivery_due_date='2026-11-08',priority='MEDIUM',
++        split_allowed=split,requested={'pallets':pallets},compatibility_groups=['DRY'])
++    value.update(changes)
++    return value
++
++
++def resource(rid='E1', cap='26', services=2, *, source='EXTERNAL', **changes):
++    value=dict(resource_id=rid,source=source,guaranteed_capacity={'pallets':cap},
++        lanes=[['A','B']],compatibility_groups=['DRY'])
++    if source=='EXTERNAL':value.update(services_available=services,availability_source='CONFIRMED',
++        external_cost={'cost_model':'PER_TRIP','rate':'100','billing_basis':None})
++    else:value.update(units_available=services,base_origin_id='A',operating_cost_per_km=None)
++    value.update(changes)
++    return value
++
++
++def request(orders=None, resources=None, *, dims=('pallets',), options=None, model_changes=None, context_changes=None):
++    data=context().model_dump(mode='python')
++    data.update(active_dimensions=list(dims),primary_dimension=dims[0],
++        case_policy={'primary_goal':'MAXIMIZE_SERVICE'},node_policy={'primary_goal':'MAXIMIZE_SERVICE'})
++    data.update(context_changes or {})
++    model=dict(workspace_id=data['workspace_id'],model_id=data['logistics_model_id'],version_id=data['logistics_model_version_id'],
++        version=data['logistics_model_version'],configuration_hash=data['model_hash'],operating_role=data['operating_role'],
++        primary_dimension=data['primary_dimension'],active_dimensions=list(dims),allowed_sources=['OWN','EXTERNAL'],
++        homogeneous_loads_declared=False,split_permitted=True,currency_policy=data['currency_policy'],contract_registry_version='ULTIMATE_CONTRACTS_V1')
++    model.update(model_changes or {})
++    return TransportPlanInput.model_validate(dict(model=model,context=data,demands=[order()] if orders is None else orders,
++        resources=[resource()] if resources is None else resources,run_id=RUN1,result_generated_at='2026-11-02T00:00:00Z',options=options or {}))
++
++
++def coverage(result):
++    v=result.output.core.metrics.demand_coverage
++    return v.assigned,v.unassigned
++
++
++def external_oracle(quantities, capacities):
++    """Brute force whole orders into finite services, no engine helpers/objective."""
++    best=0
++    for placements in product(range(-1,len(capacities)),repeat=len(quantities)):
++        loads=[0]*len(capacities)
++        for amount,target in zip(quantities,placements):
++            if target>=0:loads[target]+=amount
++        if all(load<=cap for load,cap in zip(loads,capacities)):
++            best=max(best,sum(q for q,p in zip(quantities,placements) if p>=0))
++    return best
++
++
++def temporal_oracle(windows, cycles, units):
++    """Exhaustive day/unit placements. No CP-SAT or TransitEstimator call."""
++    domains=[[(day,unit) for day in range(first,last+1) for unit in range(units)] for first,last in windows]
++    for placements in product(*domains):
++        if all(ui!=uj or di+cycles[i]<=dj or dj+cycles[j]<=di
++               for i,(di,ui) in enumerate(placements) for j,(dj,uj) in enumerate(placements) if i<j):
++            return True
++    return False
++
++
++def rebind_mutant_core(data):
++    """Keep the T1 envelope valid so adversarial tests reach the certifier."""
++    data['output']['evidence']['core_result_fingerprint']=core_result_fingerprint(EngineCoreResult.model_validate(data['output']['core']))
++    return data
++
++
++class TransportPlanCoreTests(unittest.TestCase):
++    def test_A_70_pallets_finite_services_three_trips(self):
++        result=run_transport_plan(request(resources=[resource('E1','26',2,maximum_capacity={'pallets':'30'}),resource('E2','30',1)]))
++        self.assertEqual(coverage(result),(70,0))
++        self.assertEqual(result.output.core.metrics.trip_count,3)
++        self.assertEqual({u.resource_id:u.services_used for u in result.resource_usage},{'E1':2,'E2':1})
++        self.assertIsNone(result.output.core.metrics.total_cost)
++
++    def test_F_capacity_gap_is_valid_partial_business_result(self):
++        result=run_transport_plan(request())
++        self.assertEqual(coverage(result),(52,18))
++        self.assertEqual(result.residuals['O1'].pallets,18)
++        self.assertTrue(result.output.core.feasibility.solution_found)
++        self.assertEqual(result.output.core.engine.solver_status,'FEASIBLE')
++        self.assertEqual(result.output.core.metrics.trip_count,2)
++        reasons=[r for r in result.output.evidence.reasons if r.code=='CAPACITY_GAP']
++        self.assertEqual(len(reasons),1)
++        self.assertEqual(reasons[0].claim_strength,'OBSERVED')
++
++    def test_non_split_28_uses_guaranteed_30_only(self):
++        result=run_transport_plan(request([order(pallets='28',split=False)],[resource('A','26',3,maximum_capacity={'pallets':'30'}),resource('B','30',1)]))
++        self.assertEqual(coverage(result),(28,0))
++        self.assertEqual([t.resource_id for t in result.output.core.transport_plan.trips],['B'])
++
++    def test_non_split_cannot_use_maximum_or_26_plus_2(self):
++        result=run_transport_plan(request([order(pallets='28',split=False)],[resource(maximum_capacity={'pallets':'30'})]))
++        self.assertEqual(coverage(result),(0,28))
++        self.assertEqual(result.output.core.transport_plan.trips,())
++        self.assertIn('NON_SPLIT_EXCEEDS_GUARANTEED_CAPACITY',{r.code for r in result.output.evidence.reasons})
++
++    def test_Model_disables_split_even_if_order_allows(self):
++        result=run_transport_plan(request([order(pallets='28')],model_changes={'split_permitted':False}))
++        self.assertEqual(coverage(result),(0,28))
++
++    def test_M_all_vector_dimensions_constrain_non_split(self):
++        resources=[resource('A',guaranteed_capacity={'pallets':'30','weight_kg':'20000'}),resource('B',guaranteed_capacity={'pallets':'30','weight_kg':'26000'})]
++        for weight,expected in [('28000',0),('24000',28)]:
++            with self.subTest(weight=weight):
++                result=run_transport_plan(request([order(split=False,requested={'pallets':'28','weight_kg':weight})],resources,dims=('pallets','weight_kg')))
++                self.assertEqual(coverage(result)[0],expected)
++                if expected:self.assertEqual(result.output.core.transport_plan.trips[0].resource_id,'B')
++
++    def test_split_preserves_exact_vector_and_fraction_display(self):
++        result=run_transport_plan(request([order(requested={'pallets':'70','weight_kg':'140000','volume_m3':'7','units':'140'})],
++            [resource(guaranteed_capacity={'pallets':'26','weight_kg':'52000','volume_m3':'2.6','units':'52'})],dims=('pallets','weight_kg','volume_m3','units')))
++        self.assertEqual(result.residuals['O1'].model_dump(),{'pallets':D(18),'weight_kg':D(36000),'volume_m3':D('1.8'),'units':D(36)})
++        for trip in result.output.core.transport_plan.trips:
++            a=trip.orders[0]
++            self.assertEqual(Fraction(a.load.pallets)/70,Fraction(a.load.weight_kg)/140000)
++            self.assertEqual(a.allocation_fraction,D('.371429'))
++
++    def test_precision_lattice_does_not_split_dimensions_independently(self):
++        result=run_transport_plan(request([order(requested={'pallets':'.003','volume_m3':'.000002'})],
++            [resource(guaranteed_capacity={'pallets':'.002','volume_m3':'.000001'})],dims=('pallets','volume_m3')))
++        self.assertEqual(coverage(result),(0,D('.003')))
++
++    def test_zero_primary_demand_still_preserves_other_active_dimension(self):
++        result=run_transport_plan(request([order(requested={'pallets':'0','weight_kg':'100'})],
++            [resource(guaranteed_capacity={'pallets':'1','weight_kg':'100'})],dims=('pallets','weight_kg')))
++        self.assertEqual(result.residuals['O1'].weight_kg,0)
++        self.assertIsNone(result.demand_resolution[0].coverage_ratio)
++
++    def test_D_compatible_orders_consolidate_one_service(self):
++        result=run_transport_plan(request([order('A','6',split=False),order('B','8',split=False)],[resource(services=1)]))
++        self.assertEqual(coverage(result),(14,0))
++        self.assertEqual(result.output.core.metrics.trip_count,1)
++        self.assertIn('CONSOLIDATED_COMPATIBLE_DEMAND',{r.code for r in result.output.evidence.reasons})
++
++    def test_D_disjoint_windows_do_not_consolidate(self):
++        orders=[order('A','6',split=False,delivery_due_date='2026-11-03'),order('B','8',split=False,ready_date='2026-11-06')]
++        one=run_transport_plan(request(orders,[resource(services=1)]))
++        self.assertEqual(one.output.core.metrics.trip_count,1)
++        self.assertGreater(coverage(one)[1],0)
++        two=run_transport_plan(request(orders,[resource(services=2)]))
++        self.assertEqual(coverage(two),(14,0))
++        self.assertEqual(two.output.core.metrics.trip_count,2)
++
++    def test_consolidation_requires_route_distance_and_cargo_compatibility(self):
++        for changed in [dict(destination_id='C'),dict(distance_km='481'),dict(compatibility_groups=['CHILLED'])]:
++            with self.subTest(changed=changed):
++                resources=[resource(services=2,lanes=[['A','B'],['A','C']],compatibility_groups=['DRY','CHILLED'])]
++                result=run_transport_plan(request([order('A','6',split=False),order('B','8',split=False,**changed)],resources))
++                self.assertEqual(result.output.core.metrics.trip_count,2)
++
++    def test_incompatible_resource_is_certified_without_fake_selection_reason(self):
++        result=run_transport_plan(request(resources=[resource(compatibility_groups=['CHILLED'])]))
++        self.assertEqual(coverage(result),(0,70))
++        self.assertIn('NO_COMPATIBLE_RESOURCE',{r.code for r in result.output.evidence.reasons})
++        self.assertFalse(any(r.code.startswith('SELECTED_') for r in result.output.evidence.reasons))
++
++    def test_external_quota_shared_across_lanes_and_days(self):
++        orders=[order(str(i),'20',split=False,destination_id=str(i),ready_date=f'2026-11-0{2+i}',delivery_due_date=f'2026-11-0{2+i}') for i in range(3)]
++        result=run_transport_plan(request(orders,[resource(services=2,lanes=[['A',str(i)] for i in range(3)])]))
++        self.assertEqual(result.output.core.metrics.trip_count,2)
++        self.assertEqual(coverage(result),(40,20))
++
++    def test_assumed_external_availability_is_not_confirmed(self):
++        result=run_transport_plan(request(resources=[resource(services=1,availability_source='ASSUMED')]))
++        self.assertEqual(coverage(result),(26,44))
++        self.assertEqual(result.resource_usage[0].availability_source,'ASSUMED')
++        self.assertIn('ASSUMED_EXTERNAL_AVAILABILITY',{r.code for r in result.output.evidence.reasons})
++
++    def test_zero_services_and_zero_own_units_are_business_gaps(self):
++        for resources in [[resource(services=0)],[resource('OWN',services=0,source='OWN')]]:
++            with self.subTest(resources=resources):
++                result=run_transport_plan(request(resources=resources))
++                self.assertEqual(coverage(result),(0,70))
++                self.assertTrue(result.output.core.feasibility.solution_found)
++
++    def test_unknown_availability_fails_input_boundary_not_infinity(self):
++        for resources in [[resource(services=None,availability_source='UNKNOWN')],[resource('OWN',services=None,source='OWN')]]:
++            with self.subTest(resources=resources),self.assertRaises(ValueError):request(resources=resources)
++
++    def test_own_units_do_not_multiply_per_trip_capacity(self):
++        result=run_transport_plan(request([order(pallets='78',split=False)],[resource('OWN',source='OWN',services=3)]))
++        self.assertEqual(coverage(result),(0,78))
++        split=run_transport_plan(request([order(pallets='78')],[resource('OWN',source='OWN',services=3)],context_changes={'planning_end':'2026-11-02'}))
++        self.assertEqual(coverage(split),(78,0))
++        self.assertEqual(len({w.unit_index for w in split.temporal_certificate.witness}),3)
++
++    def test_own_single_unit_cannot_cover_simultaneous_incompatible_cycles(self):
++        result=run_transport_plan(request([order('A','26',split=False,delivery_due_date='2026-11-02'),order('B','26',split=False,delivery_due_date='2026-11-02')],
++            [resource('OWN',source='OWN',services=1)]))
++        self.assertEqual(coverage(result),(26,26))
++
++    def test_own_reuse_uses_T1_cycle_and_exclusive_interval(self):
++        result=run_transport_plan(request([order(pallets='78')],[resource('OWN',source='OWN',services=1)]))
++        self.assertEqual(coverage(result),(78,0))
++        witnesses=sorted(result.temporal_certificate.witness,key=lambda w:w.dispatch)
++        self.assertEqual(len(witnesses),3)
++        self.assertTrue(all((w.available_again-w.dispatch).days==2 for w in witnesses))
++        self.assertTrue(all(a.available_again<=b.dispatch for a,b in zip(witnesses,witnesses[1:])))
++        self.assertIsNone(result.output.core.schedule)
++        self.assertFalse(any('SCHEDULED' in r.code for r in result.output.evidence.reasons))
++
++    def test_horizon_bounds_departure_not_arrival_or_return(self):
++        for source in ['OWN','EXTERNAL']:
++            result=run_transport_plan(request([order(pallets='1',distance_km='1150',ready_date='2026-11-08',delivery_due_date='2026-11-10')],[resource(source,services=1,source=source)]))
++            self.assertEqual(coverage(result),(1,0))
++            witness=result.temporal_certificate.witness[0]
++            self.assertEqual((witness.dispatch,witness.arrival),(date(2026,11,8),date(2026,11,10)))
++            if source=='EXTERNAL':self.assertIsNone(witness.available_again)
++
++    def test_impossible_window_has_certified_date_reason(self):
++        result=run_transport_plan(request([order(distance_km='1150',ready_date='2026-11-08',delivery_due_date='2026-11-09')]))
++        self.assertEqual(coverage(result),(0,70))
++        self.assertIn('DATE_WINDOW_INCOMPATIBLE',{r.code for r in result.output.evidence.reasons})
++
++    def test_source_model_filter_and_role_do_not_grant_resource_capacity(self):
++        signatures=[]
++        for role in ['SHIPPER','LOGISTICS_PROVIDER','HYBRID']:
++            result=run_transport_plan(request(resources=[resource('E'),resource('OWN',source='OWN')],
++                model_changes={'operating_role':role,'allowed_sources':['EXTERNAL']},context_changes={'operating_role':role}))
++            self.assertTrue(all(t.resource_source=='EXTERNAL' for t in result.output.core.transport_plan.trips))
++            signatures.append([(t.trip_id,t.total_load) for t in result.output.core.transport_plan.trips])
++        self.assertEqual(signatures[0],signatures[1]);self.assertEqual(signatures[1],signatures[2])
++
++    def test_duplicate_ids_and_missing_dimensions_rejected_before_solver(self):
++        bad=[lambda:request([order(),order()]),lambda:request(resources=[resource(),resource()]),
++             lambda:request(dims=('pallets','weight_kg')),lambda:request([order(requested={'pallets':'0'})]),
++             lambda:request(model_changes={'version':2}),lambda:request(resources=[resource(guaranteed_capacity={'pallets':'0'})])]
++        for fixture in bad:
++            with self.subTest(fixture=fixture),self.assertRaises(ValueError):fixture()
++
++    def test_empty_demand_zero_trips_no_false_percent_or_cost(self):
++        result=run_transport_plan(request([]))
++        self.assertEqual(coverage(result),(0,0));self.assertEqual(result.demand_resolution,())
++        self.assertIsNone(result.output.core.metrics.resource_mix.own_trip_ratio)
++        self.assertIsNone(result.output.core.metrics.demand_coverage.ratio)
++        self.assertTrue(result.output.core.feasibility.full_demand_coverage)
++
++    def test_no_resources_conserves_all_orders(self):
++        result=run_transport_plan(request([order('A','5'),order('B','3')],[]))
++        self.assertEqual(coverage(result),(0,8))
++        self.assertEqual(len(result.demand_resolution),2)
++
++    def test_zero_solver_budget_is_UNKNOWN_without_inevitability_claim(self):
++        result=run_transport_plan(request(options={'deterministic_budget':0}))
++        self.assertEqual(result.output.core.engine.solver_status,'UNKNOWN')
++        self.assertFalse(result.output.core.feasibility.solution_found)
++        self.assertIsNone(result.output.core.feasibility.full_demand_coverage)
++        self.assertNotIn('CAPACITY_GAP',{r.code for r in result.output.evidence.reasons})
++        self.assertIsNone(result.output.evidence.solver.certificate)
++
++    def test_candidate_budget_is_bounded_and_does_not_prove_gap_inevitable(self):
++        result=run_transport_plan(request(options={'max_slots':1,'max_variables':4}))
++        self.assertEqual(result.search.candidate_slots,1)
++        self.assertIn('CANDIDATE_MODEL_BUDGET',result.search.limits)
++        self.assertEqual(coverage(result),(26,44))
++        self.assertEqual(result.output.core.engine.solver_status,'FEASIBLE')
++        self.assertFalse(result.search.candidate_set_complete)
++        self.assertLessEqual(result.search.variable_count,4)
++
++    def test_rational_coverage_budget_returns_unknown_instead_of_integer_overflow(self):
++        orders=[order('O'+str(i),str(q),split=False) for i,q in enumerate([1009,1013,1019,1021,1031,1033])]
++        result=run_transport_plan(request(orders,[resource(cap='10000',services=6)]))
++        self.assertEqual(result.output.core.engine.solver_status,'UNKNOWN')
++        self.assertIn('RATIONAL_COVERAGE_INTEGER_BUDGET',result.search.limits)
++
++    def test_candidate_evidence_contains_checked_vector_rejection_facts(self):
++        req=request([order(pallets='28',split=False)],[resource(maximum_capacity={'pallets':'30'})])
++        good=run_transport_plan(req)
++        pair=next(c for c in good.output.evidence.constraints if c.code=='CANDIDATE_ELIGIBILITY')
++        self.assertEqual(pair.facts['requested_pallets'],'28')
++        self.assertEqual(pair.facts['guaranteed_pallets'],'26')
++        self.assertIn('NON_SPLIT_CAPACITY',pair.facts['rejected_by'])
++        bad=good.model_dump(mode='python')
++        pair=next(c for c in bad['output']['evidence']['constraints'] if c['code']=='CANDIDATE_ELIGIBILITY')
++        pair['facts']['guaranteed_pallets']='30'
++        with self.assertRaisesRegex(EngineCertificationError,'Candidate vector facts differ'):
++            certify_transport_plan(req,bad)
++
++    def test_native_optimal_is_scoped_not_presented_as_T7_global_optimum(self):
++        result=run_transport_plan(request())
++        self.assertIn('OPTIMAL',result.search.native_statuses)
++        self.assertEqual(result.output.core.engine.solver_status,'FEASIBLE')
++        self.assertEqual(result.output.evidence.solver.certificate.kind,'FEASIBILITY')
++        self.assertIsNone(result.output.evidence.solver.best_bound)
++
++    def test_independent_kernel_unknown_never_certifies_selected_own_plan(self):
++        result=run_transport_plan(request(resources=[resource('OWN',source='OWN',services=1)],options={'kernel_budget':0}))
++        self.assertEqual(result.output.core.engine.solver_status,'UNKNOWN')
++        self.assertEqual(result.output.core.transport_plan.trips,())
++        self.assertEqual(result.temporal_certificate.status,'UNKNOWN')
++
++    def test_cost_facts_do_not_drive_T6_selection_or_positive_reason(self):
++        results=[]
++        for rate in ['1','10000']:
++            resources=[resource('A','26',2,external_cost={'cost_model':'PER_TRIP','rate':rate,'billing_basis':None}),resource('B','26',2)]
++            results.append(run_transport_plan(request(resources=resources)))
++        self.assertEqual(results[0].output.core.transport_plan,results[1].output.core.transport_plan)
++        self.assertTrue(all(r.code not in {'SELECTED_LOWEST_COST_FEASIBLE','SELECTED_ONLY_FEASIBLE_RESOURCE','SELECTED_OWN_COST_ADVANTAGE','SELECTED_PRIORITY_PROTECTION'} for r in results[0].output.evidence.reasons))
++
++    def test_permuted_rows_are_deterministic_and_preserve_inputs(self):
++        orders=[order('B','14'),order('A','20',priority='HIGH'),order('C','5',split=False)]
++        resources=[resource('B','26',1),resource('A','26',1)]
++        fingerprints=[];evidence=[]
++        for rows in permutations(orders):
++            req=request(list(rows),list(reversed(resources)))
++            before=canonical_bytes(req)
++            result=run_transport_plan(req)
++            self.assertEqual(canonical_bytes(req),before)
++            fingerprints.append(core_result_fingerprint(result.output.core))
++            evidence.append(canonical_bytes(result.output.evidence))
++        self.assertEqual(len(set(fingerprints)),1);self.assertEqual(len(set(evidence)),1)
++
++    def test_decimal_context_does_not_change_math(self):
++        outputs=[]
++        req=request()
++        for precision in [6,28,60]:
++            with localcontext() as ctx:
++                ctx.prec=precision;outputs.append(core_result_fingerprint(run_transport_plan(req).output.core))
++        self.assertEqual(len(set(outputs)),1)
++
++    def test_registry_test_profile_is_explicit_inactive_and_legacy_unchanged(self):
++        self.assertIs(registry.resolve_test_core(IDENTITY),run_transport_plan)
++        with self.assertRaises(registry.RuntimeUnavailable):registry.resolve_runtime(IDENTITY,require_available=True)
++        legacy=registry.RUNTIMES[0]
++        self.assertEqual((legacy.engine_name,legacy.engine_version,legacy.result_schema),('logistics-assignment-engine','1.0.0','assignment_v1'))
++        with self.assertRaises(registry.RuntimeUnavailable):registry.resolve_test_core(legacy.identity)
++        metadata=json.loads((Path(__file__).parents[1]/'app/static/contracts/result-contracts-v1.json').read_text())
++        self.assertEqual(registry.contract_metadata(),metadata)
++
++    def test_small_non_split_oracle_exhaustive_equal_demand_units(self):
++        # Equal order quantities make the independent maximum-quantity oracle
++        # comparable to the structural fractional-coverage objective.
++        for amount,count,cap,services in product([1,2,3],[1,2,3],[2,3,4],[0,1,2]):
++            with self.subTest(amount=amount,count=count,cap=cap,services=services):
++                expected=external_oracle([amount]*count,[cap]*services)
++                result=run_transport_plan(request([order('O'+str(i),str(amount),split=False) for i in range(count)],[resource(cap=str(cap),services=services)]))
++                self.assertEqual(coverage(result)[0],expected)
++
++    def test_kernel_against_independent_day_unit_enumeration(self):
++        for units,narrow in product([1,2],[True,False]):
++            windows=[(0,0),(0,0)] if narrow else [(0,2),(0,2),(0,2)]
++            trips=[dict(trip_id='T'+str(i),resource_id='OWN',distance_km='480',ready_date='2026-11-02',delivery_due_date='2026-11-02' if narrow else '2026-11-04') for i in range(len(windows))]
++            req=request(resources=[resource('OWN',cap='1',services=units,source='OWN')])
++            result=day_resource_feasibility(trips,req.resources,{'planning_start':'2026-11-02','planning_end':'2026-11-04'})
++            self.assertEqual(result.status=='FEASIBLE',temporal_oracle(windows,[2]*len(windows),units))
++
++    def test_kernel_external_no_return_unknown_and_global_quota(self):
++        trips=[dict(trip_id='T'+str(i),resource_id='E1',distance_km='1150',ready_date='2026-11-02',delivery_due_date='2026-11-04') for i in range(2)]
++        horizon={'planning_start':'2026-11-02','planning_end':'2026-11-08'}
++        req=request(resources=[resource(services=2)])
++        result=day_resource_feasibility(trips,req.resources,horizon)
++        self.assertEqual(result.status,'FEASIBLE')
++        self.assertTrue(all(w.unit_index is None and w.available_again is None for w in result.witness))
++        self.assertEqual(day_resource_feasibility(trips,request(resources=[resource(services=1)]).resources,horizon).status,'INFEASIBLE')
++        unknown=resource(services=None,availability_source='UNKNOWN')
++        self.assertEqual(day_resource_feasibility(trips,[unknown],horizon).status,'UNKNOWN')
++
++    def test_certifier_rejects_wrong_residual_and_source_and_references(self):
++        req=request();good=run_transport_plan(req)
++        mutations=[]
++        bad=good.model_dump(mode='python');bad['residuals']['O1']['pallets']+=1;mutations.append(bad)
++        bad=good.model_dump(mode='python');bad['resource_usage'][0]['services_available']+=1;mutations.append(bad)
++        bad=good.model_dump(mode='python');bad['demand_resolution'][0]['trip_ids']=();mutations.append(bad)
++        bad=good.model_dump(mode='python');bad['output']['core']['transport_plan']['trips'][0]['orders'][0]['allocation_fraction']=D('.5');mutations.append(bad)
++        for bad in mutations:
++            with self.subTest(mutation=mutations.index(bad)),self.assertRaises(EngineCertificationError):certify_transport_plan(req,bad)
++
++    def test_certifier_rejects_vector_capacity_and_non_split_mismatch(self):
++        req=request([order(pallets='10',split=False)],[resource(cap='26',services=1)])
++        good=run_transport_plan(req)
++        for field,value in [('resource_source','OWN'),('distance_km',D('481')),('orders',[{'order_id':'O1','allocation_fraction':D('.5'),'load':{'pallets':D('10')}}])]:
++            bad=good.model_dump(mode='python');bad['output']['core']['transport_plan']['trips'][0][field]=value
++            rebind_mutant_core(bad)
++            with self.subTest(field=field),self.assertRaisesRegex(EngineCertificationError,'source mismatch|Route/distance modified|Fraction display differs'):
++                certify_transport_plan(req,bad)
++        bad=good.model_dump(mode='python');trip=bad['output']['core']['transport_plan']['trips'][0]
++        trip['guaranteed_capacity']['pallets']=D('30');trip['utilization']['pallets']=D('.3333')
++        with self.assertRaisesRegex(EngineCertificationError,'Guaranteed capacity changed'):
++            certify_transport_plan(req,rebind_mutant_core(bad))
++
++    def test_certifier_rejects_original_solver_service_and_unit_overcommit(self):
++        req=request();result=run_transport_plan(req)
++        reduced=request(resources=[resource(services=1)])
++        with self.assertRaisesRegex(EngineCertificationError,'quota facts differ'):
++            certify_transport_plan(reduced,result)
++        own=request([order(pallets='26')],[resource('OWN',source='OWN',services=1)])
++        result=run_transport_plan(own)
++        zero=request([order(pallets='26')],[resource('OWN',source='OWN',services=0)])
++        with self.assertRaisesRegex(EngineCertificationError,'OWN units changed'):
++            certify_transport_plan(zero,result)
++
++    def test_structural_priority_is_explicit_and_not_an_economic_goal(self):
++        result=run_transport_plan(request([order('HIGH','30',priority='HIGH'),order('MEDIUM','30',priority='MEDIUM')],[resource(cap='40',services=1)]))
++        self.assertEqual({o.order_id:o.assigned.pallets for o in result.demand_resolution},{'HIGH':D('30'),'MEDIUM':D('10')})
++        self.assertIsNone(result.output.core.feasibility.policy_feasible)
++        self.assertEqual(result.search.version,'D1_STRUCTURAL_FRACTION_COVERAGE_V1')
++
++    def test_kernel_zero_units_window_and_unknown_budget_are_distinct(self):
++        fixed=[dict(trip_id='T1',resource_id='OWN',distance_km='480',ready_date='2026-11-02',delivery_due_date='2026-11-02')]
++        horizon={'planning_start':'2026-11-02','planning_end':'2026-11-04'}
++        self.assertEqual(day_resource_feasibility(fixed,[resource('OWN',source='OWN',services=0)],horizon).status,'INFEASIBLE')
++        self.assertEqual(day_resource_feasibility(fixed,[resource('OWN',source='OWN',services=1)],horizon,deterministic_budget=0).status,'UNKNOWN')
++        fixed[0]['distance_km']='1150'
++        self.assertEqual(day_resource_feasibility(fixed,[resource('OWN',source='OWN',services=1)],horizon).status,'INFEASIBLE')
++
++    def test_kernel_rejects_unstable_entity_references(self):
++        fixed=[dict(trip_id='T1',resource_id='MISSING',distance_km='480',ready_date='2026-11-02',delivery_due_date='2026-11-04')]
++        horizon={'planning_start':'2026-11-02','planning_end':'2026-11-04'}
++        with self.assertRaises(ValueError):day_resource_feasibility(fixed,request().resources,horizon)
++        fixed[0]['resource_id']='E1'
++        with self.assertRaises(ValueError):day_resource_feasibility(fixed*2,request().resources,horizon)
++
++    def test_certifier_rejects_own_overlap_and_invalid_unit_and_due(self):
++        req=request([order(pallets='52')],[resource('OWN',source='OWN',services=1)])
++        good=run_transport_plan(req)
++        for mutate in ['unit','due','overlap']:
++            bad=good.model_dump(mode='python');w=bad['temporal_certificate']['witness']
++            if mutate=='unit':w[0]['unit_index']=1
++            elif mutate=='due':w[0]['arrival']=date(2026,11,10)
++            else:
++                w[1]['dispatch']=w[0]['dispatch'];w[1]['arrival']=w[0]['arrival'];w[1]['available_again']=w[0]['available_again']
++            with self.subTest(mutation=mutate),self.assertRaises(EngineCertificationError):certify_transport_plan(req,bad)
++
++    def test_serialization_round_trip_still_certifies(self):
++        req=request();good=run_transport_plan(req)
++        self.assertTrue(certify_transport_plan(req,json.loads(good.model_dump_json())))
++
++
++if __name__=='__main__':unittest.main()

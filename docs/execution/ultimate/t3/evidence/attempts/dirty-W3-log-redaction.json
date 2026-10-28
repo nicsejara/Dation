@@ -1,0 +1,5 @@
+{
+  "raw_log_sha256": "d6acb383089bb7ba5fff0a8a00f95133b9cfd31f4a8ff84876dd5441870e2793",
+  "sanitized_log_sha256": "b10c9992fe1dde18bc6d1e9c441173183569db0454db29737743206c19bb2b68",
+  "redaction": "Ephemeral fixture auth cookie header removed; synthetic isolated auth only."
+}

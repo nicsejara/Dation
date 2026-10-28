@@ -1,0 +1,743 @@
+{
+  "phase": "T4",
+  "baseline_pending_files": 507,
+  "checkpoint_copies_verified": 507,
+  "unchanged_current_files": 500,
+  "intentionally_extended_files": [
+    "backend/app/platform/identity.py",
+    "backend/app/platform/routes.py",
+    "backend/app/static/js/dispatch/cases/ultimate-case-setup.mjs",
+    "backend/app/static/js/dispatch/navigation/resource.mjs",
+    "backend/app/static/js/dispatch/workspace.mjs",
+    "backend/app/static/js/platform/dda-navigation.mjs",
+    "backend/app/templates/app.html"
+  ],
+  "preimages": "evidence/post-t3/",
+  "historical_T3_manifest_unchanged": true,
+  "historical_T3_entries_verified": 144,
+  "T3_resolution": [
+    {
+      "path": "backend/app/models/ultimate_foundation.py",
+      "matches_historical_hash": true,
+      "resolved_from": "backend/app/models/ultimate_foundation.py"
+    },
+    {
+      "path": "backend/app/platform/decision_routes.py",
+      "matches_historical_hash": true,
+      "resolved_from": "backend/app/platform/decision_routes.py"
+    },
+    {
+      "path": "backend/app/platform/home.py",
+      "matches_historical_hash": true,
+      "resolved_from": "backend/app/platform/home.py"
+    },
+    {
+      "path": "backend/app/platform/identity.py",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/post-t3/backend/app/platform/identity.py"
+    },
+    {
+      "path": "backend/app/platform/routes.py",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/post-t3/backend/app/platform/routes.py"
+    },
+    {
+      "path": "backend/app/platform/ultimate_routes.py",
+      "matches_historical_hash": true,
+      "resolved_from": "backend/app/platform/ultimate_routes.py"
+    },
+    {
+      "path": "backend/app/services/logistics_model_service.py",
+      "matches_historical_hash": true,
+      "resolved_from": "backend/app/services/logistics_model_service.py"
+    },
+    {
+      "path": "backend/app/static/css/ultimate-foundation.css",
+      "matches_historical_hash": true,
+      "resolved_from": "backend/app/static/css/ultimate-foundation.css"
+    },
+    {
+      "path": "backend/app/static/js/dispatch/cases/ultimate-case-setup.mjs",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/post-t3/backend/app/static/js/dispatch/cases/ultimate-case-setup.mjs"
+    },
+    {
+      "path": "backend/app/static/js/dispatch/models/entry.mjs",
+      "matches_historical_hash": true,
+      "resolved_from": "backend/app/static/js/dispatch/models/entry.mjs"
+    },
+    {
+      "path": "backend/app/static/js/dispatch/models/forms.mjs",
+      "matches_historical_hash": true,
+      "resolved_from": "backend/app/static/js/dispatch/models/forms.mjs"
+    },
+    {
+      "path": "backend/app/static/js/dispatch/models/index.mjs",
+      "matches_historical_hash": true,
+      "resolved_from": "backend/app/static/js/dispatch/models/index.mjs"
+    },
+    {
+      "path": "backend/app/static/js/dispatch/models/policy.mjs",
+      "matches_historical_hash": true,
+      "resolved_from": "backend/app/static/js/dispatch/models/policy.mjs"
+    },
+    {
+      "path": "backend/app/static/js/dispatch/models/setup-values.mjs",
+      "matches_historical_hash": true,
+      "resolved_from": "backend/app/static/js/dispatch/models/setup-values.mjs"
+    },
+    {
+      "path": "backend/app/static/js/dispatch/navigation/resource.mjs",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/post-t3/backend/app/static/js/dispatch/navigation/resource.mjs"
+    },
+    {
+      "path": "backend/app/static/js/dispatch/workspace.mjs",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/post-t3/backend/app/static/js/dispatch/workspace.mjs"
+    },
+    {
+      "path": "backend/app/static/js/platform/dda-navigation.mjs",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/post-t3/backend/app/static/js/platform/dda-navigation.mjs"
+    },
+    {
+      "path": "backend/app/templates/app.html",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/post-t3/backend/app/templates/app.html"
+    },
+    {
+      "path": "backend/tests/browser/test_ultimate_case_setup.py",
+      "matches_historical_hash": true,
+      "resolved_from": "backend/tests/browser/test_ultimate_case_setup.py"
+    },
+    {
+      "path": "backend/tests/e2e/ultimate_setup_fixture.py",
+      "matches_historical_hash": true,
+      "resolved_from": "backend/tests/e2e/ultimate_setup_fixture.py"
+    },
+    {
+      "path": "backend/tests/integration/test_ultimate_case_models.py",
+      "matches_historical_hash": true,
+      "resolved_from": "backend/tests/integration/test_ultimate_case_models.py"
+    },
+    {
+      "path": "backend/tests/test_ultimate_case_models.py",
+      "matches_historical_hash": true,
+      "resolved_from": "backend/tests/test_ultimate_case_models.py"
+    },
+    {
+      "path": "backend/tests/test_ultimate_case_navigation.mjs",
+      "matches_historical_hash": true,
+      "resolved_from": "backend/tests/test_ultimate_case_navigation.mjs"
+    },
+    {
+      "path": "supabase/migrations/20261026161050_ultimate_case_models.sql",
+      "matches_historical_hash": true,
+      "resolved_from": "supabase/migrations/20261026161050_ultimate_case_models.sql"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/command-ledger.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/command-ledger.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/B-NODE.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/B-NODE.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/B-NODE.result.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/B-NODE.result.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/B-PY.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/B-PY.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/B-PY.result.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/B-PY.result.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/FOCAL-LEGACY-API.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/FOCAL-LEGACY-API.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/FOCAL-LEGACY-API.result.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/FOCAL-LEGACY-API.result.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/FOCAL-LEGACY-BROWSER.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/FOCAL-LEGACY-BROWSER.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/FOCAL-LEGACY-BROWSER.result.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/FOCAL-LEGACY-BROWSER.result.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/S3.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/S3.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/S3.result.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/S3.result.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/T3-user-request.txt",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/T3-user-request.txt"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/W3.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/W3.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/W3.result.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/W3.result.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/attempts/before-dirty-fix-B-NODE.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/attempts/before-dirty-fix-B-NODE.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/attempts/before-dirty-fix-B-NODE.result.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/attempts/before-dirty-fix-B-NODE.result.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/attempts/before-dirty-fix-W3.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/attempts/before-dirty-fix-W3.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/attempts/before-dirty-fix-W3.result.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/attempts/before-dirty-fix-W3.result.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/attempts/dda-parity-final.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/attempts/dda-parity-final.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/attempts/dda-parity.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/attempts/dda-parity.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/attempts/dirty-W3-log-redaction.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/attempts/dirty-W3-log-redaction.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/attempts/dirty-W3.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/attempts/dirty-W3.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/attempts/dirty-W3.result.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/attempts/dirty-W3.result.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/attempts/dirty-qa-final-dirty.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/attempts/dirty-qa-final-dirty.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/attempts/first-final-W3.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/attempts/first-final-W3.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/attempts/first-final-W3.result.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/attempts/first-final-W3.result.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/attempts/first-final-qa-batch.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/attempts/first-final-qa-batch.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/attempts/s3-01.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/attempts/s3-01.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/attempts/s3-02.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/attempts/s3-02.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/attempts/s3-focal-03.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/attempts/s3-focal-03.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/attempts/s3-focal-04.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/attempts/s3-focal-04.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/attempts/schema-boundary.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/attempts/schema-boundary.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/attempts/visual-parity.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/attempts/visual-parity.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/attempts/w3-01.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/attempts/w3-01.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/attempts/w3-02.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/attempts/w3-02.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/attempts/w3-focus-03.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/attempts/w3-focus-03.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/attempts/w3-publish-04.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/attempts/w3-publish-04.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/browser/case-contrast.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/browser/case-contrast.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/browser/case-stress-1024.png",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/browser/case-stress-1024.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/browser/case-stress-1280.png",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/browser/case-stress-1280.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/browser/case-stress-1440.png",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/browser/case-stress-1440.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/browser/case-stress-320.png",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/browser/case-stress-320.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/browser/case-stress-390.png",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/browser/case-stress-390.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/browser/case-stress-768.png",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/browser/case-stress-768.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/browser/case-zoom200.png",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/browser/case-zoom200.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/browser/durable-context.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/browser/durable-context.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/browser/fixture.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/browser/fixture.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/browser/home-context-routing.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/browser/home-context-routing.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/browser/keyboard-focus-latest.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/browser/keyboard-focus-latest.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/browser/keyboard-focus.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/browser/keyboard-focus.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/browser/responsive-measurements.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/browser/responsive-measurements.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/browser/test_01_ui_model_publish_case_without_csv_and_reload.png",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/browser/test_01_ui_model_publish_case_without_csv_and_reload.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/browser/test_02_validation_dirty_reload_and_cas_preserve_draft.png",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/browser/test_02_validation_dirty_reload_and_cas_preserve_draft.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/browser/test_03_viewer_reads_without_controls_or_write_authority.png",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/browser/test_03_viewer_reads_without_controls_or_write_authority.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/browser/test_04_responsive_stress_zoom_touch_and_native_controls.png",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/browser/test_04_responsive_stress_zoom_touch_and_native_controls.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/browser/test_05_legacy_navigation_and_home_recover_empty_case.png",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/browser/test_05_legacy_navigation_and_home_recover_empty_case.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/browser/test_06_keyboard_focus_contrast_and_labels.png",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/browser/test_06_keyboard_focus_contrast_and_labels.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/browser/test_07_models_library_empty_search_and_versioned_edit.png",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/browser/test_07_models_library_empty_search_and_versioned_edit.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/browser/test_08_publish_cas_recovers_without_overwriting_a_published_version.png",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/browser/test_08_publish_cas_recovers_without_overwriting_a_published_version.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/browser/test_09_unchanged_values_do_not_restore_a_false_dirty_draft.png",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/browser/test_09_unchanged_values_do_not_restore_a_false_dirty_draft.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/candidate-before-dirty-fix.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/candidate-before-dirty-fix.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/candidate-before-w3-harness-update.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/candidate-before-w3-harness-update.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/candidate.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/candidate.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/cleanup.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/cleanup.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/dation-t3-consolidate.py",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/dation-t3-consolidate.py"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/dation-t3-dda-parity-browser.py",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/dation-t3-dda-parity-browser.py"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/dation-t3-dda-parity.py",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/dation-t3-dda-parity.py"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/dation-t3-qa.py",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/dation-t3-qa.py"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/dation-t3-schema-evidence.py",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/dation-t3-schema-evidence.py"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/dation-t3-visual-parity.py",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/dation-t3-visual-parity.py"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/dda-parity/after-1440.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/dda-parity/after-1440.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/dda-parity/after-1440.png",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/dda-parity/after-1440.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/dda-parity/after-390.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/dda-parity/after-390.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/dda-parity/after-390.png",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/dda-parity/after-390.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/dda-parity/before-1440.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/dda-parity/before-1440.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/dda-parity/before-1440.png",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/dda-parity/before-1440.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/dda-parity/before-390.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/dda-parity/before-390.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/dda-parity/before-390.png",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/dda-parity/before-390.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/dda-parity/parity.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/dda-parity/parity.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/initial-state.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/initial-state.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/post-t2/backend/app/platform/home.py",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/post-t2/backend/app/platform/home.py"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/post-t2-tracked.patch",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/post-t2-tracked.patch"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/qa-batch.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/qa-batch.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/qa-final-browser-legacy.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/qa-final-browser-legacy.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/qa-final-dirty.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/qa-final-dirty.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/qa-final-w3.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/qa-final-w3.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/qa-reuse-dirty-fix.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/qa-reuse-dirty-fix.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/qa-reuse.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/qa-reuse.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/runtime.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/runtime.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/schema-boundary.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/schema-boundary.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/skills/break-ui/SKILL.md",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/skills/break-ui/SKILL.md"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/skills/design-system/SKILL.md",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/skills/design-system/SKILL.md"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/skills/emil-design-eng/SKILL.md",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/skills/emil-design-eng/SKILL.md"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/skills/postgres-skill.txt",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/skills/postgres-skill.txt"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/skills/runtime-skill.txt",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/skills/runtime-skill.txt"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/skills/supabase-skill.txt",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/skills/supabase-skill.txt"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/skills/ui-ux-pro-max/SKILL.md",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/skills/ui-ux-pro-max/SKILL.md"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/t3-changes.patch",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/t3-changes.patch"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/ui-skill-form-guidance.txt",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/ui-skill-form-guidance.txt"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/visual-before/foundation-1440.png",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/visual-before/foundation-1440.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/visual-before/foundation-390.png",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/visual-before/foundation-390.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/visual-before/tokens-1440.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/visual-before/tokens-1440.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/visual-before/tokens-390.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/visual-before/tokens-390.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/visual-parity/after-1024.png",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/visual-parity/after-1024.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/visual-parity/after-1280.png",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/visual-parity/after-1280.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/visual-parity/after-1440.png",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/visual-parity/after-1440.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/visual-parity/after-390.png",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/visual-parity/after-390.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/visual-parity/after-768.png",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/visual-parity/after-768.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/visual-parity/before-1024.png",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/visual-parity/before-1024.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/visual-parity/before-1280.png",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/visual-parity/before-1280.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/visual-parity/before-1440.png",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/visual-parity/before-1440.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/visual-parity/before-390.png",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/visual-parity/before-390.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/visual-parity/before-768.png",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/visual-parity/before-768.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/evidence/visual-parity/parity.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/visual-parity/parity.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/final-workspace.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/final-workspace.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/preservation.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/preservation.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/scope-diff.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/scope-diff.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/skills-ledger.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/skills-ledger.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/t3-execution-report.md",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/t3-execution-report.md"
+    },
+    {
+      "path": "docs/execution/ultimate/t3/test-ledger.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/test-ledger.json"
+    }
+  ],
+  "old_reports_migrations_contracts_tests_preserved": true,
+  "candidate_verified": true,
+  "source_files": 25
+}

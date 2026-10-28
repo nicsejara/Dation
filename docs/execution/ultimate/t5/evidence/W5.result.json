@@ -1,0 +1,24 @@
+{
+  "suite": "W5",
+  "status": "PASS",
+  "tests": 10,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "started_at": "2026-10-27T04:30:56.136113+00:00",
+  "finished_at": "2026-10-27T04:32:21.937351+00:00",
+  "seconds": 85.801,
+  "cwd": "/workspace/Dation/backend",
+  "command": [
+    "/workspace/Dation/backend/.browser-venv/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "test_ultimate_navigation",
+    "-v"
+  ],
+  "exit_code": 0,
+  "production_credentials_cleared": true,
+  "PYTHONPATH": "tests/browser",
+  "log_sha256": "bc0257dad76222aa3b0a58a75e57a56a23b44db618d30013b019bb153035ff46"
+}

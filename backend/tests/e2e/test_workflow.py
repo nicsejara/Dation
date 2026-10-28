@@ -7,6 +7,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import unittest
+from threading import Event, Thread
 from uuid import uuid4
 
 from fixtures import csv_input,assignment_matrix_inputs
@@ -246,7 +247,9 @@ class WorkflowTests(unittest.TestCase):
         state=self.checked(self.s.db.get('decision_cases',params={'id':'eq.'+case}))[0]['state_json']
         self.assertEqual(state['nodes']['logistics_scheduling']['status'],'stale')
         events=self.checked(self.s.db.get('decision_approval_events',params={'case_id':'eq.'+case}))
-        self.assertEqual(len(events),4)
+        self.assertCountEqual([(e['run_id'],e['action']) for e in events],[
+            (assignment['id'],'approved'),(scheduling['id'],'approved'),(alternative['id'],'approved'),
+            (assignment['id'],'superseded'),(scheduling['id'],'superseded')])
 
     def analysis(self,identifier):
         return self.checked(self.s.api_client.get('/api/runs/'+identifier+'/comparative'))
@@ -363,7 +366,17 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(outcome.returncode,0,outcome.stdout+outcome.stderr)
 
     def browser_journey(self,scenario,viewport):
-        self.s.start_worker()
+        self.s.stop(self.s.worker)
+        worker_start=self.s.storage/'start-browser-worker'
+        worker_start.unlink(missing_ok=True)
+        finished=Event();startup_errors=[]
+        def start_after_queue_check():
+            while not finished.wait(.05):
+                if worker_start.exists():
+                    try:self.s.start_worker()
+                    except Exception as exc:startup_errors.append(repr(exc))
+                    return
+        coordinator=Thread(target=start_after_queue_check)
         browser_python=os.getenv('DATION_BROWSER_PYTHON',str(ROOT/'.browser-venv/bin/python'))
         inputs=self.s.directory/'inputs';inputs.mkdir(exist_ok=True)
         for kind in ('orders','fleet'):(inputs/(kind+'.csv')).write_bytes(csv_input(kind))
@@ -371,13 +384,19 @@ class WorkflowTests(unittest.TestCase):
              'DATION_E2E_VIEWPORT':json.dumps(viewport)}
         if artifacts:=os.getenv('DATION_E2E_ARTIFACTS'):
             env['DATION_E2E_ARTIFACTS']=str(Path(artifacts)/scenario)
-        result=subprocess.run([browser_python,str(ROOT/'tests/e2e/browser_journey.py')],cwd=ROOT,
-            env=env,
-            text=True,capture_output=True,timeout=180)
+        coordinator.start()
+        try:
+            result=subprocess.run([browser_python,str(ROOT/'tests/e2e/browser_journey.py')],cwd=ROOT,
+                env=env,
+                text=True,capture_output=True,timeout=180)
+        finally:
+            finished.set();coordinator.join();worker_start.unlink(missing_ok=True)
+        self.assertEqual(startup_errors,[])
         self.assertEqual(result.returncode,0,result.stdout+result.stderr)
         report=json.loads(result.stdout.strip().splitlines()[-1])
         self.assertTrue(report['passed']);self.assertEqual(report['javascript_errors'],[])
         self.assertTrue(report['creation_from_files']);self.assertTrue(report['refresh_during_queue'])
+        self.assertTrue(report['queued_before_worker_start']);self.assertIsNotNone(self.s.worker)
         self.assertTrue(report['inicio_to_overview']);self.assertTrue(report['approval_map_scheduling_configuration'])
         self.assertTrue(report['shared_workflow_visual_contract']);self.assertTrue(report['review_keyboard_cancel_and_confirmation'])
         self.assertEqual(report['ui']['viewport'],viewport)

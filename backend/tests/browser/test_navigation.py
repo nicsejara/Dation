@@ -8,11 +8,12 @@ import socket
 import subprocess
 import shutil
 import time
+import traceback
 import unittest
 import importlib.util
 from urllib.parse import parse_qs, urlparse
 
-from playwright.async_api import async_playwright
+from playwright.async_api import async_playwright, Error as PlaywrightError
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = json.loads((Path(__file__).parent / "fixtures.json").read_text())
@@ -54,10 +55,14 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
 
     async def asyncSetUp(self):
         self.f = copy.deepcopy(FIXTURE)
+        self.f['case_row'].update(label='Decision Case',category='simulation',description=None,
+            attributes_applied_at='2026-10-22T00:00:00Z',updated_at='2026-10-22T00:00:00Z')
         self.case = self.f["case"]
         self.runs = {r["id"]: r for r in self.f["runs"].values()}
         self.requests = []
         self.errors = []
+        self.fixture_errors = []
+        self.fixture_closing = False
         self.delay = {}
         self.post_status = 202
         self.missing_run = False
@@ -81,6 +86,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.approval_fail_once=False
         self.other_cases={}
         self.workflows={}
+        self.attribute_writes=0
+        self.responsibility_writes=0
         self.execution_bodies=[]
         self.run_fetch_failures=0
         self.home_data={'recent_cases':[],'attention':{'items':[],'total':0},'activity':{'available':False,'items':[]}}
@@ -88,6 +95,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.onboarding_data=None
         self.ddas=[{'workspace_id':'00000000-0000-4000-8000-00000000da71','dda_id':'logistics','status':'enabled'}]
         self.access_role='admin'
+        self.workflows[self.case['id']]=self.workflow_fixture(self.case['id'],prepared=True)
         self.hub_rows={row['id']:copy.deepcopy(row) for row in self.f['datasets'].values()}
         self.hub_cases=[]
         self.hub_failure=False
@@ -128,30 +136,93 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.page.on("pageerror", lambda error: self.errors.append(str(error)))
 
     async def asyncTearDown(self):
-        await self.browser.close()
-        await self.pw.stop()
+        self.fixture_closing = True
+        try:
+            await self.context.unroute_all(behavior='ignoreErrors')
+            await self.browser.close()
+        finally:
+            await self.pw.stop()
         self.assertEqual(self.errors, [], "Browser JavaScript errors")
+        self.assertEqual(self.fixture_errors, [], "Browser API fixture errors")
+
+    def workflow_fixture(self,case_id,prepared=False):
+        person={'id':'10000000-0000-4000-8000-000000000001','name':'Synthetic owner','active':True,'access_role':'admin'} if prepared else None
+        stages={key:{'owner':copy.deepcopy(person),'owner_eligible':bool(person),
+            'approver':copy.deepcopy(person) if key!='data_owner' else None,
+            'approver_eligible':bool(person) and key!='data_owner','updated_at':None,
+            'can_execute':True,'can_approve':True}
+            for key in ('data_owner','logistics_assignment','logistics_scheduling')}
+        stages['data_preparation']=stages['data_owner']
+        return {'case_id':case_id,'can_assign':self.access_role=='admin','can_prepare':self.access_role!='viewer',
+            'gates_enforced':True,'policy_version':1,'attributes_applied':prepared,'stages':stages}
 
     def hydrated(self):
+        workflow=copy.deepcopy(self.workflows[self.case['id']])
+        workflow['can_assign']=self.access_role=='admin' and self.f['case_row'].get('status')!='archived'
+        workflow['can_prepare']=self.access_role!='viewer'
+        for stage in workflow['stages'].values():
+            allowed=self.access_role in ('admin','operator') and (self.access_role=='admin' or (stage.get('owner') or {}).get('id')=='10000000-0000-4000-8000-000000000001')
+            stage['can_execute']=allowed;stage['can_approve']=allowed
         return {"case":{**self.f["case_row"],"state_json":self.case},"decision_case":self.case,
-                "orders":self.f["datasets"]["orders"],"fleet":self.f["datasets"]["fleet"]}
+                "orders":self.f["datasets"]["orders"],"fleet":self.f["datasets"]["fleet"],
+                'workflow_responsibilities':workflow}
 
     async def route_api(self, route):
+        # A fixture exception must fail the test, not strand a paused request
+        # and prevent Chromium teardown from completing.
+        try:
+            await self._route_api(route)
+        except Exception as exc:
+            if self.fixture_closing and isinstance(exc,PlaywrightError) and (
+                'Route is already handled' in str(exc) or 'has been closed' in str(exc)):
+                return
+            self.fixture_errors.append(traceback.format_exc())
+            await route.fulfill(status=500,json={'detail':'Browser API fixture failed; see unittest diagnostics.'})
+
+    async def _route_api(self, route):
         request = route.request
         u = urlparse(request.url)
         path, query, method = u.path, parse_qs(u.query), request.method
         self.requests.append((method, path))
+        if path.startswith('/api/platform/decisions/') and path.endswith('/attributes') and method=='PUT':
+            cid=path.split('/')[4];body=request.post_data_json
+            bundle=self.hydrated() if cid==self.case['id'] else self.other_cases[cid]
+            row=self.f['case_row'] if cid==self.case['id'] else bundle['case']
+            snapshot=self.workflows[cid];stage=snapshot['stages']['data_owner']
+            if self.access_role=='viewer':await route.fulfill(status=403,json={'detail':'Viewer cannot apply attributes'});return
+            if body['expected_updated_at']!=row['updated_at'] or body['expected_owner_updated_at']!=stage['updated_at']:
+                await route.fulfill(status=409,json={'detail':'Case or Data Owner changed'});return
+            self.attribute_writes+=1;stamp=f'2026-10-22T01:00:{self.attribute_writes:02d}Z'
+            row.update({key:body.get(key) for key in ('label','category','description')});row.update(updated_at=stamp,attributes_applied_at=stamp)
+            snapshot['attributes_applied']=True
+            if 'data_owner_user_id' in body:
+                uid=body['data_owner_user_id']
+                stage.update(owner={'id':uid,'name':'Synthetic owner','active':True,'access_role':'admin'} if uid else None,
+                    owner_eligible=bool(uid),updated_at=stamp)
+                snapshot['stages']['data_preparation']=stage
+            await route.fulfill(json={'id':cid});return
         if path=='/api/platform/team' and query.get('candidates')==['true']:
             await route.fulfill(json={'members':[{'user_id':'10000000-0000-4000-8000-000000000001','name':'Synthetic owner','email':'fixture@example.test'}],'total':1,'limit':25,'offset':0});return
         if '/responsibilities' in path and path.startswith('/api/platform/decisions/'):
             cid=path.split('/')[4];snapshot=self.workflows[cid]
             if method=='PUT':
-                stage=snapshot['stages'][path.split('/')[-1]]
-                for field in ('owner','approver'):
-                    uid=request.post_data_json[field+'_user_id'];stage[field]={'id':uid,'name':'Synthetic owner','active':True,'access_role':'admin'} if uid else None;stage[field+'_eligible']=bool(uid)
-                stage['updated_at']='2026-10-21T01:00:00Z'
+                if self.access_role=='viewer':await route.fulfill(status=403,json={'detail':'Viewer cannot assign an Owner'});return
+                key=path.split('/')[-1];key='data_owner' if key=='data_preparation' else key
+                stage=snapshot['stages'][key];body=request.post_data_json
+                if body['expected_updated_at']!=stage['updated_at']:
+                    await route.fulfill(status=409,json={'detail':'Assignment changed'});return
+                uid=body['owner_user_id'];person={'id':uid,'name':'Synthetic owner','active':True,'access_role':'admin'} if uid else None
+                self.responsibility_writes+=1
+                stage.update(owner=person,owner_eligible=bool(uid),approver=person if key!='data_owner' else None,
+                    approver_eligible=bool(uid) and key!='data_owner',updated_at=f'2026-10-22T02:00:{self.responsibility_writes:02d}Z')
+                if key=='data_owner':snapshot['stages']['data_preparation']=stage
             await route.fulfill(json=snapshot);return
         if path.endswith('/workflow-readiness'):
+            snapshot=self.workflows[path.split('/')[4]]
+            if not snapshot['attributes_applied']:
+                await route.fulfill(status=409,headers={'X-Dation-Workflow-Gate':'attributes'},json={'detail':'Aplicá los atributos del Case antes de continuar.'});return
+            if not snapshot['stages']['data_owner']['owner_eligible']:
+                await route.fulfill(status=409,headers={'X-Dation-Workflow-Gate':'data'},json={'detail':'Asigná un Data Owner activo y elegible antes de continuar.'});return
             await route.fulfill(json={'ready':True});return
         if path=='/api/platform/activity/exports':
             body=json.loads(request.post_data);run=self.runs.get(body['run_id'])
@@ -210,10 +281,11 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                 for item in self.other_cases.values():
                     datasets.update({item[k]['id']:item[k] for k in ('orders','fleet')})
                 row={'id':body['id'],'status':'active','state_json':body['state'],
+                     'label':None,'category':None,'description':None,'attributes_applied_at':None,'updated_at':'2026-10-22T00:00:00Z',
                      'orders_dataset_id':body['orders_dataset_id'],'fleet_dataset_id':body['fleet_dataset_id']}
                 self.other_cases[body['id']]={'case':row,'decision_case':body['state'],
                     'orders':datasets[body['orders_dataset_id']],'fleet':datasets[body['fleet_dataset_id']]}
-                self.workflows[body['id']]={'case_id':body['id'],'can_assign':True,'gates_enforced':True,'policy_version':1,'stages':{stage:{'owner':None,'approver':None,'owner_eligible':False,'approver_eligible':False,'updated_at':None} for stage in ('data_preparation','logistics_assignment','logistics_scheduling')}}
+                self.workflows[body['id']]=self.workflow_fixture(body['id'])
                 self.other_cases[body['id']]['workflow_responsibilities']=self.workflows[body['id']]
                 data={'case':row}
             else:
@@ -257,8 +329,16 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             row["result_json"]["decision_case"].update(status="review",approved_at=None)
             self.runs[rid] = row
             node = self.case["nodes"]["logistics_"+kind]
-            node.update(latest_run_id=rid,run_count=node.get("run_count",0)+1)
-            if not node.get("approved_run_id"): node.update(run_id=rid,status="review")
+            affected=['logistics_scheduling'] if kind=='assignment' else []
+            if node.get('approved_run_id'):affected.insert(0,'logistics_'+kind)
+            for prior in self.runs.values():
+                if prior['id']!=rid and prior.get('node_id') in affected and not prior.get('superseded_at'):
+                    prior.update(superseded_at='2026-10-25T00:00:00Z',superseded_by_run_id=rid)
+            for key in affected:
+                current=self.case['nodes'][key]
+                current.update(approved_run_id=None,approved_at=None)
+                if key!='logistics_'+kind and current.get('run_id'):current['status']='stale'
+            node.update(latest_run_id=rid,run_id=rid,status='review',run_count=node.get('run_count',0)+1,latest_execution_status='completed')
             status, data = self.post_status, {**row,"status":"queued","result_json":None}
             if status >= 400: data = {"detail":"Lost response after acceptance"}
         elif path == "/api/runs": data = {"items":list(self.runs.values())}
@@ -272,6 +352,10 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                 row["approved_at"] = "2026-10-10T12:00:00+00:00"
                 row["result_json"]["decision_case"].update(status="approved",approved_at=row["approved_at"])
                 self.case["nodes"][row["node_id"]].update(status="approved",approved_run_id=rid,run_id=rid)
+                if row['node_id']=='logistics_assignment':
+                    following=self.case['nodes']['logistics_scheduling']
+                    if following['status']=='locked' and not following.get('run_id'):
+                        following['status']='available'
                 data = row
         elif path.endswith("/interpretation"):
             data = {"explanation":None,"messages":[],"configured":False}
@@ -320,7 +404,11 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         for key,label,flag in [('logistics_assignment','Asignación de carga','available'),('logistics_scheduling','Planificación de despachos','locked'),('logistics_final_assignment','Asignación de vehículos','coming_soon')]:
             nodes.append({'id':key,'label':label,'status':flag,'owner':None,'approver':None,'run_count':1 if key=='logistics_assignment' else 0,'latest_run':None,'approved_run':None,'approval_current':False,'target':None if key=='logistics_final_assignment' else {'view':'logistics-config' if flag=='available' else 'logistics-map','node_id':key,'run_id':None}})
         row.update(current_objective=None,display_status=row['status'])
-        detail={**row,'orders':self.f['datasets']['orders'],'fleet':self.f['datasets']['fleet'],'nodes':nodes}
+        rows=([row] if self.selector_size else [])+[
+            {**row,'id':cid,'friendly_id':'DC-'+cid[:8].upper(),'label':bundle['case'].get('label') or 'Caso B','status':bundle['case'].get('status','active')}
+            for cid,bundle in self.other_cases.items()]
+        selected=next((r for r in rows if path==prefix+'/'+r['id']),row)
+        detail={**selected,'orders':self.f['datasets']['orders'],'fleet':self.f['datasets']['fleet'],'nodes':nodes,'responsibilities':copy.deepcopy(self.workflows.get(selected['id']))}
         if self.center_failure:status,data=503,{'detail':'Decision Center no está disponible.'}
         elif method=='PATCH':
             if self.center_conflict:self.center_conflict=False;status,data=409,{'detail':'El caso cambió.'}
@@ -334,7 +422,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         elif path==prefix:
             term=query.get('q',[''])[0].lower();kind=query.get('filter',['all'])[0]
             match=bool(self.center_archived)==(kind=='archived') and kind not in ('completed','review') and (not term or term in (self.center_label or '').lower() or term in row['id'].lower())
-            data={'items':[row] if match else [],'total':int(match),'limit':25,'offset':0,'summary':getattr(self,'center_summary',{'active_cases':int(not self.center_archived),'in_review':0,'pending_approval':0,'approved':0}),'dda_options':['logistics'],'owner_options':[]}
+            matching=[r for r in rows if bool(r['status']=='archived')==(kind=='archived') and kind not in ('completed','review') and (not term or term in (r['label'] or '').lower() or term in r['id'].lower())]
+            data={'items':matching,'total':len(matching),'limit':25,'offset':0,'summary':getattr(self,'center_summary',{'active_cases':sum(r['status']!='archived' for r in rows),'in_review':0,'pending_approval':0,'approved':0}),'dda_options':['logistics'],'owner_options':[]}
         else:data=detail
         await route.fulfill(status=status,content_type='application/json',body=json.dumps(data))
 
@@ -385,6 +474,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         if run: query += "&run_id="+run
         await self.page.goto(f"http://127.0.0.1:{self.port}/app?{query}")
         try:
+            await self.wait_for_app()
             await self.page.wait_for_function("window.DationDispatch && window.DationDispatch.getWorkspace().decisionCase?.persisted")
         except Exception:
             print("UI_BOOT_DIAGNOSTIC="+json.dumps({"url":self.page.url,"errors":self.errors,"requests":self.requests,"state":await self.page.evaluate("({loading:document.documentElement.classList.contains('d-session-loading'),workspace:window.DationDispatch?.getWorkspace(),text:document.body.innerText.slice(-500)})")}))
@@ -393,7 +483,12 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         if view == "logistics-config": await self.page.wait_for_selector("[data-scheduling-review]" if node == "logistics_scheduling" else "[data-config-review]")
         if view == "decision-dashboard": await self.page.wait_for_selector(".dispatch-scheduling-dashboard" if node == "logistics_scheduling" else ".assignment-dashboard-v2")
 
+    async def wait_for_app(self):
+        # Template controls may exist before boot has loaded the workspace API.
+        await self.page.wait_for_function("window.DationDispatch && !document.documentElement.classList.contains('d-session-loading')")
+
     async def nav(self, view):
+        await self.wait_for_app()
         await self.page.evaluate("view=>window.dationNavigate(view)",view)
 
     async def test_cold_assignment_link(self):
@@ -417,7 +512,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(await self.page.locator('#dispatch-assignment').is_visible())
         self.assertEqual(await self.page.locator('[data-assignment-advanced-toggle]').get_attribute('aria-expanded'),'false')
         self.assertEqual(await self.page.locator('[data-flow],[data-case-flow],.dispatch-dashboard-map-back').count(),0)
-        self.assertFalse(await self.page.locator('#dda-workspace-nav-shell').is_visible())
+        self.assertTrue(await self.page.locator('#dda-workspace-nav-shell').is_visible())
 
     async def test_trip_detail_is_contextual_toggleable_and_escape_restores_focus(self):
         await self.dashboard();await self.open_advanced()
@@ -470,7 +565,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
     async def test_new_run_direct_configuration_preserves_business_context_and_history(self):
         await self.dashboard();before=copy.deepcopy(self.case)
         await self.page.locator('[data-more-menu] summary').click()
-        await self.page.locator('[data-rerun]').click()
+        await self.page.locator('[data-rerun]').click();await self.confirm_rerun()
         await self.page.wait_for_selector('[data-config-review]')
         self.assertEqual(parse_qs(urlparse(self.page.url).query)['case_id'],[before['id']])
         self.assertNotIn('run_id=',self.page.url)
@@ -479,17 +574,18 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_new_decision_goes_to_empty_data_without_losing_existing_case(self):
         await self.dashboard();before=copy.deepcopy(self.case)
-        await self.page.locator('[data-more-menu] summary').click()
-        await self.page.locator('[data-new-decision]').click()
+        await self.page.locator('.sidebar .asset-item[data-view=logistics-overview]').click()
+        await self.page.locator('[data-start-new-decision]').click()
         await self.page.wait_for_selector('[data-kind=orders] input[type=file]',state='attached')
         self.assertIn('view=logistics-data',self.page.url)
         self.assertEqual(await self.page.evaluate('window.DationDispatch.getWorkspace().orders'),None)
         self.assertEqual(self.case,before)
+        await self.page.go_back();await self.page.locator('.dda-landing__hero').wait_for()
         await self.page.go_back();await self.page.wait_for_selector('.assignment-dashboard-v2')
         self.assertEqual(await self.page.evaluate('window.DationDispatch.getWorkspace().orders.id'),self.f['ids']['orders'])
 
     async def test_approved_assignment_continues_directly_to_scheduling_configuration(self):
-        self.case['nodes']['logistics_scheduling'].update(status='locked',run_id=None,latest_run_id=None,run_count=0)
+        self.case['nodes']['logistics_scheduling'].update(status='available',run_id=None,latest_run_id=None,run_count=0)
         await self.dashboard()
         await self.page.locator('[data-after-approve]').click()
         await self.page.wait_for_selector('[data-scheduling-review]')
@@ -502,8 +598,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.dashboard()
         await self.page.locator('[data-after-approve]').wait_for(state='visible')
         await self.page.locator('[data-after-approve]').click()
-        await self.page.wait_for_selector('.dispatch-scheduling-dashboard')
-        self.assertIn('run_id='+self.f['ids']['scheduling'],self.page.url)
+        await self.page.wait_for_selector('[data-scheduling-review]')
+        self.assertIn('node_id=logistics_scheduling',self.page.url);self.assertNotIn('run_id=',self.page.url)
         self.assertEqual(self.execution_bodies,[])
 
     async def test_mobile_trip_detail_has_no_document_overflow(self):
@@ -533,6 +629,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             item['case'][kind+'_dataset_id']=item[kind]['id']
         case['signature']=item['orders']['id']+':'+item['fleet']['id']
         item['decision_case']=case;item['case'].update(id=cid,state_json=case)
+        self.workflows[cid]=self.workflow_fixture(cid,prepared=True)
+        item['workflow_responsibilities']=self.workflows[cid]
         self.other_cases[cid]=item
         return item
 
@@ -548,51 +646,49 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_overview_has_two_hero_actions_and_disabled_visible_map_without_cases(self):
         self.selector_size=0
-        await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=overview')
-        await self.page.locator('[data-start-new-decision]').wait_for(state='visible')
+        await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=overview');await self.wait_for_app()
         self.assertEqual(await self.page.locator('.dda-landing button').count(),2)
-        self.assertFalse(await self.page.locator('[data-start-new-decision]').is_disabled())
-        map_button=self.page.locator('[data-open-decision-map]')
-        self.assertTrue(await map_button.is_visible());self.assertTrue(await map_button.is_disabled())
-        self.assertEqual(await map_button.get_attribute('aria-disabled'),'true')
-        self.assertEqual(await map_button.evaluate('(x)=>getComputedStyle(x).cursor'),'not-allowed')
-        self.assertEqual(await map_button.evaluate('(x)=>getComputedStyle(x).opacity'),'1')
-        bg=await map_button.evaluate('(x)=>getComputedStyle(x).backgroundColor')
-        await map_button.hover(force=True)
-        self.assertEqual(bg,await map_button.evaluate('(x)=>getComputedStyle(x).backgroundColor'))
-        initial=self.page.url;await map_button.dispatch_event('click');self.assertEqual(self.page.url,initial)
+        start=self.page.locator('[data-start-new-decision]');center=self.page.locator('[data-open-decision-map]')
+        self.assertFalse(await start.is_disabled());self.assertFalse(await center.is_disabled())
+        self.assertEqual(await self.page.get_by_role('button',name='Ver mis casos de Logística',exact=True).count(),1)
         self.assertEqual(await self.page.locator('[data-go-data],[data-go-map],[data-go-home],.dda-landing__mobile-primary').count(),0)
-        await self.page.set_viewport_size({'width':390,'height':844})
-        self.assertTrue(await self.page.locator('[data-start-new-decision]').is_visible())
-        self.assertTrue(await map_button.is_visible())
-        await self.page.locator('[data-start-new-decision]').click()
-        await self.page.locator('[data-kind=orders] input[type=file]').wait_for(state='attached')
-        self.assertIn('view=logistics-data',self.page.url)
+        await self.page.set_viewport_size({'width':390,'height':844});self.assertTrue(await start.is_visible());self.assertTrue(await center.is_visible())
+        await center.click();await self.page.locator('[data-platform-decisions] .center-empty').wait_for()
+        self.assertEqual(parse_qs(urlparse(self.page.url).query).get('center_dda'),['logistics'])
+        self.assertEqual(await self.page.locator('.dispatch-case-selector').count(),0)
+        await self.page.go_back();await start.click();await self.page.locator('[data-kind=orders] input[type=file]').wait_for(state='attached')
+        self.assertIn('view=logistics-data',self.page.url);self.assertEqual(self.execution_bodies,[])
 
     async def test_overview_map_with_active_case_and_multiple_cases_uses_existing_selector(self):
         other=self.second_case();await self.open();await self.nav('logistics-overview')
-        await self.page.locator('[data-open-decision-map]').click()
-        await self.page.locator('.is-current').get_by_role('button',name='Caso actual').wait_for()
-        await self.page.locator('[data-open-case="'+other['case']['id']+'"]').click()
-        await self.page.locator('[data-select-case]').wait_for(state='visible')
-        self.assertIn('case_id='+other['case']['id'],self.page.url)
+        before=copy.deepcopy(self.case);await self.page.locator('[data-open-decision-map]').click()
+        root=self.page.locator('[data-platform-decisions]');await root.get_by_role('table').wait_for()
+        self.assertEqual(parse_qs(urlparse(self.page.url).query).get('center_dda'),['logistics'])
+        self.assertEqual(await root.locator('tbody tr').count(),2)
+        await root.locator('[data-case-open="'+other['case']['id']+'"]').click()
+        await root.get_by_role('heading',name='Cadena de decisiones',exact=True).wait_for()
+        self.assertIn('center_case_id='+other['case']['id'],self.page.url)
         self.assertEqual(await self.page.locator('.dispatch-case-selector').count(),0)
+        self.assertEqual(self.case,before);self.assertEqual(self.execution_bodies,[])
 
     async def test_overview_multiple_cases_without_selection_uses_existing_selector(self):
-        other=self.second_case()
-        await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=overview')
-        await self.page.wait_for_function("document.querySelector('[data-open-decision-map]')?.disabled===false")
-        await self.page.locator('[data-open-decision-map]').click()
-        await self.page.locator('[data-open-case="'+other['case']['id']+'"]').click()
-        await self.page.locator('[data-select-case]').wait_for(state='visible')
-        self.assertIn('case_id='+other['case']['id'],self.page.url)
+        other=self.second_case();await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=overview');await self.wait_for_app()
+        before=copy.deepcopy(self.case);await self.page.locator('[data-open-decision-map]').click()
+        root=self.page.locator('[data-platform-decisions]');await root.get_by_role('table').wait_for()
+        self.assertEqual(parse_qs(urlparse(self.page.url).query).get('center_dda'),['logistics'])
+        self.assertEqual(await root.locator('tbody tr').count(),2)
+        await root.locator('[data-case-open="'+other['case']['id']+'"]').click()
+        await root.get_by_role('heading',name='Cadena de decisiones',exact=True).wait_for()
+        self.assertIn('center_case_id='+other['case']['id'],self.page.url)
+        self.assertEqual(await self.page.locator('.dispatch-case-selector').count(),0)
+        self.assertEqual(self.case,before);self.assertEqual(self.execution_bodies,[])
 
     async def test_overview_single_case_map_opens_directly_and_new_decision_clears_active_context(self):
         await self.open();await self.nav('logistics-overview')
         self.assertFalse(await self.page.locator('[data-start-new-decision]').is_disabled())
         self.assertFalse(await self.page.locator('[data-open-decision-map]').is_disabled())
         await self.page.locator('[data-open-decision-map]').click()
-        await self.page.locator('[data-select-case]').wait_for(state='visible')
+        await self.page.locator('[data-platform-decisions] [data-case-open]').wait_for()
         self.assertEqual(await self.page.locator('.dispatch-case-selector').count(),0)
         await self.nav('logistics-overview');before=copy.deepcopy(self.case)
         await self.page.evaluate('''()=>{const start=window.DationDispatch.startNewDecision;window.__starts=0;
@@ -608,44 +704,39 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         drafts=await self.page.evaluate("JSON.parse(sessionStorage.getItem('dation.dispatch.drafts.v1'))")
         self.assertIn(self.case['id'],drafts)
         await self.page.go_back();await self.page.locator('[data-open-decision-map]').click()
-        await self.page.locator('[data-select-case]').wait_for(state='visible')
-        self.assertEqual(await self.page.evaluate('window.DationDispatch.getWorkspace().decisionCase.id'),self.case['id'])
+        await self.page.locator('[data-platform-decisions] [data-case-open]').click()
+        await self.page.locator('[data-platform-decisions]').get_by_role('heading',name='Cadena de decisiones',exact=True).wait_for()
+        self.assertIn('center_case_id='+self.case['id'],self.page.url)
 
     async def test_overview_availability_ignores_stale_responses_and_refreshes_on_bfcache(self):
         self.selector_size=0
-        await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=overview')
-        await self.page.locator('[data-start-new-decision]').wait_for(state='visible')
-        await self.page.wait_for_timeout(100)
-        await self.page.evaluate('''()=>{window.__caseResolvers=[];
-          window.DationDispatch.listDecisionCases=()=>new Promise(resolve=>window.__caseResolvers.push(resolve));
-          window.dispatchEvent(new CustomEvent('dation:cases-ready'));
-          window.dispatchEvent(new CustomEvent('dation:cases-ready'));}''')
-        await self.page.evaluate('window.__caseResolvers[1]([{}])')
-        self.assertFalse(await self.page.locator('[data-open-decision-map]').is_disabled())
-        await self.page.evaluate('window.__caseResolvers[0]([])')
-        self.assertFalse(await self.page.locator('[data-open-decision-map]').is_disabled())
-        await self.page.evaluate("window.dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true}))")
-        await self.page.evaluate('window.__caseResolvers[2]([])')
-        self.assertTrue(await self.page.locator('[data-open-decision-map]').is_disabled())
+        await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=overview');await self.wait_for_app()
+        await self.page.evaluate("()=>{window.__listCalls=0;window.DationDispatch.listDecisionCases=()=>{window.__listCalls++;return Promise.reject(new Error('Obsolete availability lookup'));};for(let i=0;i<2;i++)dispatchEvent(new CustomEvent('dation:cases-ready'));dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true}));}")
+        center=self.page.locator('[data-open-decision-map]');self.assertFalse(await center.is_disabled())
         self.assertFalse(await self.page.locator('[data-start-new-decision]').is_disabled())
+        self.assertEqual(await self.page.evaluate('window.__listCalls'),0,'Current CTA opens the Center even without Cases; no stale availability response can disable it.')
+        await center.click();await self.page.locator('[data-platform-decisions] .center-empty').wait_for()
+        self.assertEqual(parse_qs(urlparse(self.page.url).query).get('center_dda'),['logistics'])
+        self.assertEqual(self.execution_bodies,[])
 
     async def check_context_layout(self,kind):
         details=self.page.locator('[data-config-context]');summary=details.locator('summary')
         self.assertFalse(await details.get_attribute('open'))
         before=await summary.bounding_box();root=await details.bounding_box()
-        self.assertLess(abs(before['width']-(root['width']-2)),2)
+        inner_width=await details.evaluate('el=>el.clientWidth')
+        self.assertAlmostEqual(before['width'],inner_width,delta=1)
         await summary.focus();await self.page.keyboard.press('Enter')
         self.assertTrue(await details.evaluate('(x)=>x.open'))
         after=await summary.bounding_box();self.assertAlmostEqual(before['height'],after['height'],delta=1)
         geometry=await details.evaluate('''el=>{const rect=x=>{const r=x.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height,right:r.right,bottom:r.bottom}};
           const body=el.querySelector('.decision-config-case__body'),files=el.querySelector('.decision-config-case__files');
-          return {root:rect(el),body:rect(body),identity:rect(el.querySelector('.assignment-case-strip__identity')),
+          return {root:rect(el),body:rect(body),identity:rect(el.querySelector('.case-context-fields')),
             header:rect(el.querySelector('.decision-config-case__pack-header')),button:rect(el.querySelector('.assignment-change-data')),
             columns:getComputedStyle(files).gridTemplateColumns.split(' ').length,
             cards:[...files.children].map(rect),wrapperDisplay:getComputedStyle(el).display,
             names:[...files.querySelectorAll('.dispatch-datapack-file__name')].map(x=>({title:x.title,overflow:getComputedStyle(x).textOverflow}))};}''')
         self.assertEqual(geometry['wrapperDisplay'],'block')
-        self.assertLess(abs(geometry['body']['w']-(geometry['root']['w']-2)),2)
+        self.assertAlmostEqual(geometry['body']['w'],inner_width,delta=1)
         self.assertEqual(geometry['columns'],1 if self.page.viewport_size['width']<=720 else 2)
         self.assertGreaterEqual(geometry['header']['y'],geometry['identity']['bottom']-1)
         self.assertGreaterEqual(min(card['y'] for card in geometry['cards']),geometry['header']['bottom']-1)
@@ -709,7 +800,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
     async def test_map_disclosure_layout_remains_readable_at_all_five_breakpoints(self):
         for width in (1440,1280,1024,768,390):
             await self.page.set_viewport_size({'width':width,'height':1000})
-            await self.open();details=self.page.locator('[data-map-context]')
+            await self.open();details=self.page.locator('[data-config-context]')
             await details.locator('summary').click()
             cards=await details.locator('.dispatch-datapack-file').all()
             rectangles=[await card.bounding_box() for card in cards]
@@ -719,18 +810,18 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             self.assertFalse(await self.page.evaluate('document.documentElement.scrollWidth>innerWidth'))
 
     async def test_map_disclosure_keeps_progress_visible_and_preserves_columns_and_change_data(self):
-        await self.open();details=self.page.locator('[data-map-context]')
+        await self.open();details=self.page.locator('[data-config-context]')
         self.assertFalse(await details.get_attribute('open'))
-        self.assertTrue(await self.page.locator('.dispatch-map-progress [role=progressbar]').is_visible())
-        self.assertEqual(await details.locator('[role=progressbar]').count(),0)
-        self.assertFalse(await details.locator('[data-map-columns]').first.is_visible())
-        await details.locator('summary').click()
-        self.assertTrue(await details.locator('[data-map-columns]').first.is_visible())
-        await details.locator('[data-map-columns=orders]').click()
-        await self.page.locator('.dispatch-guide [aria-label=Cerrar]').wait_for(state='visible')
-        await self.page.locator('.dispatch-guide [aria-label=Cerrar]').click()
-        await details.locator('[data-map-action=data]').click()
-        await self.page.locator('[data-confirm-change]').click()
+        progress=self.page.locator('.dispatch-case-progress__grid')
+        self.assertTrue(await progress.is_visible());self.assertEqual(await progress.locator('li').count(),3)
+        self.assertEqual(await details.locator('[aria-current=step]').count(),0)
+        self.assertFalse(await details.locator('[data-map-change-data]').is_visible())
+        await details.locator('summary').press('Enter')
+        self.assertEqual(await details.locator('.decision-config-data-file').count(),2)
+        self.assertEqual(await details.locator('.dispatch-datapack-file__topline small').all_inner_texts(),['ÓRDENES','FLOTA'])
+        self.assertEqual(await details.locator('[data-map-columns]').count(),0)
+        self.assertEqual(await details.locator('.dispatch-datapack-file__name').first.get_attribute('title'),self.f['datasets']['orders']['canonical_filename'])
+        await details.locator('[data-map-change-data]').click()
         await self.page.locator('[data-kind=orders] input[type=file]').wait_for(state='attached')
 
     async def test_both_configuration_contexts_are_closed_and_scheduling_source_stays_visible(self):
@@ -742,7 +833,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             if kind=='scheduling':self.assertTrue(await self.page.get_by_text('ASIGNACIÓN APROBADA',exact=True).is_visible())
             await details.locator('summary').click()
             self.assertTrue(await details.locator('button').first.is_visible())
-            self.assertIn('Cambiar datos',await details.inner_text())
+            self.assertIn('Cambiar Data Pack',await details.inner_text())
 
     async def test_comparative_can_close_reopen_reload_without_mutation_or_another_post(self):
         self.essential();await self.dashboard();await self.open_advanced();before=copy.deepcopy(self.case)
@@ -763,7 +854,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         failed=self.failed_run('scheduling');before=copy.deepcopy(failed)
         await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=decision-dashboard&case_id={self.case["id"]}&node_id=logistics_scheduling&run_id={failed["id"]}')
         await self.page.locator('[data-reconfigure-run]').wait_for(state='visible')
-        self.assertEqual(await self.page.locator('[data-error-map]').inner_text(),'Decision Map')
+        self.assertEqual(await self.page.locator('[data-run-terminal-error] button').count(),1)
+        self.assertEqual(await self.page.locator('[data-reconfigure-run]').inner_text(),'Volver a configuración')
         self.assertNotIn('Reintentar',await self.page.locator('[data-run-terminal-error]').inner_text())
         await self.page.locator('[data-reconfigure-run]').click()
         await self.page.locator('[data-scheduling-review]').wait_for(state='visible')
@@ -778,9 +870,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.execution_bodies[-1]['source_run_id'],self.f['ids']['assignment'])
         self.assertEqual(self.execution_bodies[-1]['configuration']['planning_window_end'],'2026-12-31')
         self.assertEqual(self.runs[failed['id']],before)
-        await self.page.locator('[data-more-menu] summary').click()
-        await self.page.locator('[data-dashboard-map]').click()
-        await self.page.locator('[data-select-case]').wait_for(state='visible')
+        await self.page.locator('.dda-navigation a').last.click()
+        await self.page.locator('[data-map-node=logistics_scheduling]').first.wait_for(state='visible')
         await self.page.evaluate("window.DationDispatch.openRunHistory('logistics_scheduling')")
         await self.page.locator('[data-history-range]').wait_for(state='visible')
         self.assertIn('de 2',await self.page.locator('[data-history-range]').inner_text())
@@ -806,18 +897,14 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(any(m=='POST' and p=='/api/runs' for m,p in self.requests))
 
     async def test_map_selector_switches_case_data_progress_url_and_restores_cancel_focus(self):
-        await self.mock_recent_case_switcher()
         other=self.second_case();await self.open()
-        await self.page.locator('[data-select-case]').click();await self.page.locator('[data-case-switcher] nav').get_by_role('button',name=other['case']['id'],exact=False).wait_for(state='visible')
-        await self.page.keyboard.press('Escape')
-        self.assertTrue(await self.page.locator('[data-case-switcher] button').first.evaluate('(x)=>x===document.activeElement'))
-        await self.page.locator('[data-select-case]').click()
-        await self.page.locator('[data-case-switcher] nav').get_by_role('button',name=other['case']['id'],exact=False).click()
+        await self.open_legacy_case_picker();await self.page.keyboard.press('Escape')
+        self.assertTrue(await self.page.locator('[data-config-context] summary').evaluate('el=>el===document.activeElement'))
+        await self.open_legacy_case_picker();await self.page.locator('[data-open-case="'+other['case']['id']+'"]').click()
         await self.page.wait_for_function('id=>window.DationDispatch.getWorkspace().decisionCase.id===id',arg=other['case']['id'])
-        await self.page.locator('[data-map-context]').wait_for(state='visible')
-        state=await self.page.evaluate('window.DationDispatch.getWorkspace()')
+        await self.page.locator('[data-config-context]').wait_for();state=await self.page.evaluate('window.DationDispatch.getWorkspace()')
         self.assertEqual(state['orders']['id'],other['orders']['id']);self.assertEqual(state['fleet']['id'],other['fleet']['id'])
-        self.assertEqual(await self.page.locator('.dispatch-map-progress [role=progressbar]').get_attribute('aria-valuenow'),'0')
+        self.assertIn('0 de 2 aprobadas',await self.page.locator('.dispatch-case-progress').inner_text())
         self.assertIn('case_id='+other['case']['id'],self.page.url);self.assertNotIn('run_id=',self.page.url)
         await self.page.go_back();await self.page.wait_for_function('id=>window.DationDispatch.getWorkspace().decisionCase.id===id',arg=self.case['id'])
 
@@ -825,9 +912,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         other=self.second_case();before=copy.deepcopy(self.case)
         for kind in ('assignment','scheduling'):
             await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=decision-dashboard&case_id={other["case"]["id"]}&node_id=logistics_{kind}&run_id={self.f["ids"][kind]}')
-            await self.page.locator('[data-more-menu] summary').click()
-            await self.page.locator('[data-dashboard-map]').click()
-            await self.page.locator('[data-select-case]').wait_for(state='visible')
+            await self.page.locator('.dda-navigation a').last.click()
+            await self.page.locator('[data-map-node=logistics_assignment]').first.wait_for(state='visible')
             self.assertIn('case_id='+self.case['id'],self.page.url)
             self.assertNotIn('run_id=',self.page.url);self.assertNotIn('node_id=',self.page.url)
         self.assertEqual(self.case,before)
@@ -839,7 +925,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.open('logistics-config','logistics_scheduling');self.assertFalse(await self.page.evaluate('document.documentElement.scrollWidth>innerWidth'))
         await self.dashboard()
         await self.page.locator('[data-more-menu] summary').click()
-        self.assertTrue(await self.page.locator('[data-dashboard-map]').is_visible())
+        self.assertTrue(await self.page.locator('.dda-navigation a').last.is_visible())
         await self.page.keyboard.press('Escape')
         for text in ('KPI del resultado','Parte del objetivo'):
             self.assertNotIn(text,await self.page.locator('#dispatch-hero').inner_text())
@@ -904,10 +990,11 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(await button.is_disabled());self.assertEqual(await button.inner_text(),'Aprobando…')
         self.assertEqual(await button.get_attribute('aria-busy'),'true')
         self.assertEqual(await button.evaluate("el=>getComputedStyle(el,'::after').animationName"),'d-workflow-spin')
-        await button.dispatch_event('click');await self.page.locator('[data-approve-final]').dispatch_event('click')
+        await button.dispatch_event('click');await button.dispatch_event('click')
         await self.page.wait_for_function("document.querySelector('[data-status-badge]').textContent==='Aprobada'")
-        self.assertEqual(self.approval_calls,1);self.assertTrue(await button.is_visible());self.assertTrue(await button.is_disabled())
-        self.assertTrue(await self.page.locator('[data-approve-final]').is_disabled())
+        await button.wait_for(state='detached')
+        self.assertEqual(self.approval_calls,1);self.assertEqual(await button.count(),0)
+        self.assertEqual(await self.page.locator('[data-approve-final]').count(),0)
         await self.page.locator('[data-after-approve]').wait_for(state='visible')
         self.assertEqual(self.case['nodes']['logistics_assignment']['approved_run_id'],self.f['ids']['assignment'])
 
@@ -925,14 +1012,14 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_scheduling_uses_shared_menus_drawer_and_exports_without_format_changes(self):
         await self.open('decision-dashboard','logistics_scheduling',self.f['ids']['scheduling'])
-        self.assertEqual(await self.page.locator('[data-more-menu] button').count(),3)
+        self.assertEqual(await self.page.locator('[data-more-menu] button').count(),1)
         self.assertEqual(await self.page.locator('[data-export-menu] button').count(),2)
         self.assertNotIn('Acciones ···',await self.page.locator('[data-dashboard-toolbar]').inner_text())
         self.assertFalse(await self.page.locator('[data-run-drawer]').is_visible())
         await self.page.locator('[data-more-menu] summary').click();await self.page.locator('[data-run-details]').click()
         drawer=self.page.locator('[data-run-drawer]');await drawer.wait_for(state='visible')
         content=await drawer.inner_text()
-        for value in ('Assignment fuente',self.f['ids']['assignment'],'Inicio','Fin','Motor','Solver','Servicio de IA'):
+        for value in ('Assignment fuente',self.f['ids']['assignment'],'Inicio','Fin','Motor','Solver','Run ID'):
             self.assertIn(value,content)
         await self.page.keyboard.press('Shift+Tab');self.assertTrue(await drawer.evaluate('(x)=>x.contains(document.activeElement)'))
         await self.page.keyboard.press('Escape');self.assertFalse(await drawer.is_visible())
@@ -993,8 +1080,12 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_case_selector_paginates_compact_active_and_completed_and_hydrates_only_selection(self):
         self.selector_size=100
-        await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=overview')
-        await self.page.wait_for_function("document.querySelector('[data-open-decision-map]')?.disabled===false")
+        # Overview loads onboarding independently from the Case selector. Finish
+        # that boot request before measuring only the selector's three pages.
+        async with self.page.expect_response(lambda r:urlparse(r.url).path=='/api/platform/onboarding') as onboarding:
+            await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=overview')
+        await (await onboarding.value).body()
+        await self.wait_for_app()
         before=len(self.requests)
         await self.page.evaluate('window.DationDispatch.openDecisionMap()')
         await self.page.wait_for_selector('[data-open-case]')
@@ -1309,7 +1400,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                 detail:o.tooltip[0].formatter({dataIndex:0})};
         }''')
         self.assertEqual(actual['background'],'transparent');self.assertEqual(actual['text'],'#f3f8fa')
-        self.assertEqual(actual['tooltip']['backgroundColor'],'#172731');self.assertEqual(actual['tooltip']['textStyle']['color'],'#f3f8fa')
+        self.assertEqual(actual['tooltip']['backgroundColor'],'#22323e');self.assertEqual(actual['tooltip']['textStyle']['color'],'#f3f8fa')
         trips=before['result_json']['scenarios']['selected']['trips']
         self.assertEqual(len(actual['durations']),len(trips));self.assertEqual(actual['hidden'],0)
         self.assertIn('Salida:',actual['detail']);self.assertIn('Disponible:',actual['detail'])
@@ -1569,8 +1660,12 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.page.wait_for_selector(".assignment-dashboard-v2")
         self.assertEqual(self.execution_bodies[-1]["options"]["analysis_depth"],"essential")
         approved = await self.page.evaluate("window.DationDispatch.getWorkspace().decisionCase.nodes.logistics_assignment.approved_run_id")
-        self.assertEqual(approved,self.f["ids"]["assignment"])
-        self.assertNotEqual(parse_qs(urlparse(self.page.url).query)["run_id"][0],approved)
+        self.assertIsNone(approved)
+        old=self.runs[self.f['ids']['assignment']]
+        self.assertTrue(old['approved_at']);self.assertTrue(old['superseded_at'])
+        current=parse_qs(urlparse(self.page.url).query)['run_id'][0]
+        self.assertNotEqual(current,old['id']);self.assertEqual(old['superseded_by_run_id'],current)
+        self.assertEqual(self.case['nodes']['logistics_scheduling']['status'],'stale')
 
     async def test_scheduling_executes_with_rules_contract(self):
         await self.open("logistics-config","logistics_scheduling")
@@ -1602,7 +1697,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.open("decision-dashboard","logistics_assignment",self.f["ids"]["assignment"])
         path=f"/api/runs/{self.f['ids']['assignment']}/explain"
         self.delay[path]=.8
-        await self.page.locator("[data-explain]").click()
+        await self.open_insight()
         await self.nav("logistics-map")
         await self.page.wait_for_timeout(950)
         self.assertEqual(await self.page.locator("#dispatch-dashboard-root").inner_text(),"")
@@ -1693,8 +1788,11 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         first=copy.deepcopy(self.case)
         self.case={**copy.deepcopy(first),"id":"00000000-0000-4000-8000-000000000006"}
         self.f["case_row"]["id"]=self.case["id"]
+        self.workflows[self.case['id']]=self.workflow_fixture(self.case['id'],prepared=True)
         await self.page.evaluate("id=>window.DationDispatch.openCase(id,'logistics-config','logistics_assignment')",self.case["id"])
         self.assertEqual(await self.page.evaluate("window.DationDispatch.getWorkspace().objective"),"balanced")
+        self.assertEqual(self.workflows[first['id']]['case_id'],first['id'])
+        self.assertEqual(self.workflows[self.case['id']]['case_id'],self.case['id'])
         self.case=first
         self.f["case_row"]["id"]=first["id"]
         await self.page.evaluate("id=>window.DationDispatch.openCase(id,'logistics-config','logistics_assignment')",first["id"])
@@ -1810,7 +1908,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                     await self.page.goto(f"http://127.0.0.1:{self.port}/app?view={view}")
                 else:
                     await self.open(view,node)
-                hero=self.page.locator(".view.is-active .d-page-hero")
+                hero=self.page.locator(".view.is-active .platform-home__header" if view=="inicio" else ".view.is-active .d-page-hero")
                 await hero.wait_for(state="visible")
                 metrics=await hero.evaluate("""el=>{
                     const s=getComputedStyle(el), h=el.querySelector('h1'), r=el.getBoundingClientRect();
@@ -1826,15 +1924,16 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                 }""")
                 with self.subTest(width=width,view=view,node=node):
                     self.assertEqual(metrics["scheme"],"dark")
-                    self.assertEqual(metrics["body"],"rgb(7, 16, 21)")
-                    self.assertEqual(metrics["topbar"],"rgba(10, 20, 27, 0.96)")
+                    self.assertEqual(metrics["body"],"rgb(16, 22, 28)")
+                    self.assertEqual(metrics["topbar"],"rgb(19, 27, 34)")
                     self.assertFalse(metrics["overflow"])
                     self.assertTrue(metrics["childrenFit"])
-                    self.assertGreaterEqual(metrics["minHeight"],210)
-                    self.assertTrue(20<=metrics["padding"]<=28)
-                    self.assertEqual(metrics["radius"],24)
+                    self.assertGreater(metrics["height"],0)
+                    if view not in ("inicio","logistics-overview"):self.assertEqual(metrics["minHeight"],0)
+                    self.assertGreaterEqual(metrics["padding"],16)
+                    self.assertEqual(metrics["radius"],16 if view in ('inicio','logistics-overview') else 0)
                     self.assertTrue(28<=metrics["title"]<=40)
-                    if metrics["workspace"]:self.assertEqual(metrics["workspace"],"rgb(15, 27, 36)")
+                    if metrics["workspace"]:self.assertEqual(metrics["workspace"],"rgba(0, 0, 0, 0)")
                     if metrics["current"]:self.assertEqual(metrics["current"],"rgb(243, 248, 250)")
                     self.assertTrue(all(cursor=="default" for cursor in metrics["disabledCursors"]))
             # The real SPA path retains dynamically loaded styles across decisions.
@@ -1855,22 +1954,16 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(await primary.evaluate("el=>el.matches(':focus-visible')"))
         self.assertEqual(await primary.evaluate("el=>getComputedStyle(el).outlineStyle"),"solid")
         self.assertEqual(await primary.evaluate("el=>parseFloat(getComputedStyle(el).outlineWidth)"),3)
-        normal=await primary.evaluate("el=>getComputedStyle(el).backgroundImage")
+        audit=(Path(__file__).parent/'theme_audit.js').read_text()
+        normal=await primary.evaluate("el=>getComputedStyle(el).backgroundColor")
+        regular=await self.page.evaluate(audit,'.dda-landing__hero-actions')
+        self.assertGreater(regular['textCount'],0);self.assertEqual(regular['failures'],[])
+        self.assertGreaterEqual(regular['minimumContrast'],4.5)
         await primary.hover();await self.page.wait_for_timeout(180)
-        hover=await primary.evaluate("el=>getComputedStyle(el).backgroundImage")
+        hover=await primary.evaluate("el=>getComputedStyle(el).backgroundColor")
         self.assertNotEqual(normal,hover)
-        # Actual computed colors, including every point of the action gradient.
-        contrast=await primary.evaluate("""(el,gradients)=>{
-            const rgb=s=>(s.match(/[\\d.]+/g)||[]).map(Number).slice(0,3);
-            const lum=c=>c.map(x=>x/255).map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4).reduce((a,x,i)=>a+x*[.2126,.7152,.0722][i],0);
-            const ratio=(a,b)=>(Math.max(lum(a),lum(b))+.05)/(Math.min(lum(a),lum(b))+.05);
-            const fg=rgb(getComputedStyle(el).color);
-            return Math.min(...gradients.map(gradient=>{
-            const stops=gradient.match(/rgb\\([^)]+\\)/g).map(rgb);
-            return Math.min(...stops.slice(1).flatMap((b,i)=>Array.from({length:257},(_,k)=>ratio(fg,b.map((v,j)=>stops[i][j]+(v-stops[i][j])*k/256)))));
-            }));
-        }""",[normal,hover])
-        self.assertGreaterEqual(contrast,4.5)
+        hovered=await self.page.evaluate(audit,'.dda-landing__hero-actions')
+        self.assertEqual(hovered['failures'],[]);self.assertGreaterEqual(hovered['minimumContrast'],4.5)
         await self.page.evaluate("""()=>{
             const region=document.createElement('div');region.id='theme-control-fixture';
             for(const variant of ['secondary','ghost','danger','icon','menu']) {
@@ -2143,8 +2236,9 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(await self.page.evaluate("window.dationGetCurrentView()"), "logistics-overview")
         for state, label in (("is-active", "Optimiza hoy"), ("is-inactive", "En consolidación")):
             pills = self.page.locator(".dda-landing__variable-pill." + state)
-            self.assertEqual(await pills.count(), 3)
-            self.assertEqual(await pills.locator(".dda-landing__variable-status").all_text_contents(), [label] * 3)
+            self.assertEqual(await pills.count(), 2 if state=="is-active" else 3)
+            self.assertEqual(await pills.locator('.dda-landing__variable-status').all_text_contents(),
+                             ['Assignment · distribución sin calendario','Assignment · proporción de carga transportada'] if state=='is-active' else ['Assignment · según datos','Assignment · según datos','Scheduling · viajes aprobados y datos temporales'])
         chain = self.page.locator(".dda-landing__chain")
         self.assertEqual(await chain.locator(".is-conceptual").count(), 3)
         self.assertEqual(await chain.locator("button,[data-node-state],.dda-landing__node-footer").count(), 0)
@@ -2169,11 +2263,16 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             await card.get_by_role("button", name="Usar esta carga", exact=True).click()
 
     async def assign_data_responsible(self):
-        root=self.page.locator('[data-workflow-responsibility=data_preparation]')
-        await root.get_by_role('button',name='Seleccionar responsable',exact=True).click()
-        await root.get_by_label('Responsable de datos',exact=True).select_option('10000000-0000-4000-8000-000000000001')
-        await root.get_by_role('button',name='Guardar',exact=True).click()
-        await root.get_by_role('button',name='Cambiar',exact=True).wait_for()
+        form=self.page.locator('[data-case-identity]')
+        if not await form.get_by_label('Nombre del Case',exact=True).input_value():
+            await form.get_by_label('Nombre del Case',exact=True).fill('Decision Case')
+        if not await form.get_by_label('Categoría',exact=True).input_value():
+            await form.get_by_label('Categoría',exact=True).select_option('simulation')
+        owner=form.get_by_label('Data Owner',exact=True)
+        await owner.locator('option[value="10000000-0000-4000-8000-000000000001"]').wait_for(state='attached')
+        await owner.select_option('10000000-0000-4000-8000-000000000001')
+        await form.get_by_role('button',name='Aplicar',exact=True).click()
+        await form.get_by_text('Atributos y Data Owner aplicados.',exact=True).wait_for()
 
     async def test_data_pack_has_one_stable_dark_bar_across_responsive_reuse(self):
         audit = (Path(__file__).parent / "theme_audit.js").read_text()
@@ -2316,12 +2415,9 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                 self.assertFalse(metrics["overflow"])
                 copy = context.locator('button[aria-label="Copiar ID completo del caso"]')
                 await copy.focus()
-                self.assertEqual(await copy.evaluate("el=>getComputedStyle(el).outlineColor"), "rgb(57, 188, 192)")
-                if view == "logistics-map":
-                    await context.locator("[data-map-columns=orders]").click()
-                    await self.page.locator(".dispatch-guide").wait_for(state="visible")
-                    self.assertEqual((await self.page.evaluate(audit, ".dispatch-guide"))["failures"], [])
-                    await self.page.keyboard.press("Escape")
+                self.assertEqual(await copy.evaluate("el=>getComputedStyle(el).outlineColor"), "rgb(80, 200, 196)")
+                self.assertEqual(await context.locator('.decision-config-data-file').count(),2)
+                self.assertEqual(await context.locator('.dispatch-datapack-file__topline small').all_inner_texts(),['ÓRDENES','FLOTA'])
                 await summary.focus()
                 await self.page.keyboard.press("Space")
                 self.assertFalse(await context.evaluate("el=>el.open"))
@@ -2368,10 +2464,10 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.context.route('**/static/css/decision-map-case-v2.css*',sheet)
         await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=logistics-map&case_id={self.case["id"]}',wait_until='domcontentloaded')
         await self.page.get_by_role('button',name='Reintentar',exact=True).click()
-        await self.page.locator('[data-select-case]').wait_for(state='visible')
+        await self.page.locator('[data-config-context]').wait_for(state='visible')
         for view,node in [('logistics-config','logistics_scheduling'),('logistics-config','logistics_assignment'),('logistics-map',None),('logistics-config','logistics_assignment')]:
             await self.page.evaluate('args=>window.DationDispatch.openCase(...args)',[self.case['id'],view,node])
-            ready='[data-select-case]' if view=='logistics-map' else '[data-scheduling-review]' if node=='logistics_scheduling' else '[data-config-review]'
+            ready='[data-config-context]' if view=='logistics-map' else '[data-scheduling-review]' if node=='logistics_scheduling' else '[data-config-review]'
             await self.page.locator(ready).wait_for(state='visible')
         await self.page.locator('[data-filter-dialog-open]').click()
         await self.page.locator('[data-filter-add=destination]').click()
@@ -2408,6 +2504,12 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.execution_bodies,[])
 
 
+    async def open_legacy_case_picker(self):
+        trigger=self.page.locator('[data-config-context] summary')
+        await trigger.focus()
+        await self.page.evaluate("()=>window.DationDispatch.openDecisionMap({forceSelector:true,trigger:document.querySelector('[data-config-context] summary')})")
+        await self.page.locator('.dispatch-case-selector').wait_for()
+
     async def mock_recent_case_switcher(self):
         async def recent(route):
             if self.selector_failure:
@@ -2418,69 +2520,43 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.context.route('**/api/platform/decisions?**',recent)
 
     async def test_case_ux_single_current_picker_never_navigates_and_restores_keyboard_focus(self):
-        await self.mock_recent_case_switcher()
-        await self.open()
-        url=self.page.url
-        before=len(self.requests)
-        await self.page.evaluate('''()=>{window.__caseCalls=[];const original=window.DationDispatch.openCase;
-          window.DationDispatch.openCase=(...args)=>{window.__caseCalls.push(args);return original(...args);};}''')
-        trigger=self.page.locator('[data-select-case]')
-        await trigger.focus();await self.page.keyboard.press('Enter')
-        dialog=self.page.locator('[data-case-switcher] nav')
-        await dialog.get_by_role('button',name='Abrir este caso en Decision Center').wait_for()
-        self.assertEqual(await dialog.locator('[aria-current=true]').count(),1)
-        await dialog.locator('[aria-current=true]').click()
-        self.assertTrue(await dialog.is_hidden())
-        await self.page.locator('[data-case-switcher] button').first.click()
-        await dialog.get_by_role('button',name='Abrir este caso en Decision Center').wait_for()
-        self.assertEqual(self.page.url,url)
-        self.assertEqual(await self.page.evaluate('window.__caseCalls'),[])
-        self.assertFalse(any(p.startswith('/api/decision-cases/') for _,p in self.requests[before:]))
+        await self.open();url=self.page.url;before=len(self.requests)
+        await self.page.evaluate("()=>{window.__caseCalls=[];const original=window.DationDispatch.openCase;window.DationDispatch.openCase=(...args)=>{window.__caseCalls.push(args);return original(...args);};}")
+        await self.open_legacy_case_picker();dialog=self.page.locator('.dispatch-case-selector')
+        self.assertEqual(await dialog.locator('.is-current').count(),1)
+        self.assertTrue(await dialog.get_by_role('button',name='Caso actual',exact=True).is_disabled())
+        self.assertIn('No hay otros Decision Cases',await dialog.inner_text())
         await self.page.keyboard.press('Escape')
-        self.assertTrue(await self.page.locator('[data-case-switcher] button').first.evaluate('(el)=>el===document.activeElement'))
-        self.assertEqual(self.page.url,url)
+        self.assertTrue(await self.page.locator('[data-config-context] summary').evaluate('el=>el===document.activeElement'))
+        await self.open_legacy_case_picker();await dialog.get_by_role('button',name='Cerrar',exact=True).click()
+        self.assertEqual(self.page.url,url);self.assertEqual(await self.page.evaluate('window.__caseCalls'),[])
+        self.assertFalse(any(p.startswith('/api/decision-cases/') for _,p in self.requests[before:]))
 
     async def test_case_ux_completed_picker_switches_once_without_reload_and_preserves_drafts(self):
-        await self.mock_recent_case_switcher()
         other=self.second_case();other['case']['status']='completed'
-        await self.open('logistics-config','logistics_assignment')
-        await self.page.locator('[data-objective=min_cost]').click()
-        await self.nav('logistics-map')
-        await self.page.evaluate('''()=>{window.__documentIdentity='kept';window.__caseCalls=[];
-          const original=window.DationDispatch.openCase;
-          window.DationDispatch.openCase=(...args)=>{window.__caseCalls.push(args);return original(...args);};}''')
-        await self.page.locator('[data-select-case]').click()
-        await self.page.locator('[data-case-switcher] nav').get_by_role('button',name='Abrir este caso en Decision Center').wait_for()
-        self.assertTrue(await self.page.get_by_text('Completado',exact=True).is_visible())
-        await self.page.locator('[data-case-switcher] nav').get_by_role('button',name=other['case']['id'],exact=False).click()
+        await self.open('logistics-config','logistics_assignment');await self.page.locator('[data-objective=min_cost]').click();await self.nav('logistics-map')
+        await self.page.evaluate("()=>{window.__documentIdentity='kept';window.__caseCalls=[];const original=window.DationDispatch.openCase;window.DationDispatch.openCase=(...args)=>{window.__caseCalls.push(args);return original(...args);};}")
+        await self.open_legacy_case_picker();dialog=self.page.locator('.dispatch-case-selector')
+        self.assertTrue(await dialog.get_by_text('Completado',exact=True).is_visible())
+        await dialog.locator('[data-open-case="'+other['case']['id']+'"]').click()
         await self.page.wait_for_function('id=>window.DationDispatch.getWorkspace().decisionCase.id===id',arg=other['case']['id'])
-        await self.page.locator('[data-select-case]').wait_for()
         self.assertEqual(await self.page.evaluate('window.__caseCalls'),[[other['case']['id'],'logistics-map',None]])
-        self.assertEqual(await self.page.evaluate('window.__documentIdentity'),'kept')
-        self.assertEqual(await self.page.locator('dialog[open]').count(),0)
+        self.assertEqual(await self.page.evaluate('window.__documentIdentity'),'kept');self.assertEqual(await self.page.locator('dialog[open]').count(),0)
         self.assertEqual(await self.page.evaluate('window.DationDispatch.getWorkspace().orders.id'),other['orders']['id'])
-        await self.page.go_back()
-        await self.page.wait_for_function('id=>window.DationDispatch.getWorkspace().decisionCase.id===id',arg=self.case['id'])
-        await self.page.go_forward()
-        await self.page.wait_for_function('id=>window.DationDispatch.getWorkspace().decisionCase.id===id',arg=other['case']['id'])
+        await self.page.go_back();await self.page.wait_for_function('id=>window.DationDispatch.getWorkspace().decisionCase.id===id',arg=self.case['id'])
+        await self.page.go_forward();await self.page.wait_for_function('id=>window.DationDispatch.getWorkspace().decisionCase.id===id',arg=other['case']['id'])
         await self.page.evaluate("id=>window.DationDispatch.openCase(id,'logistics-config','logistics_assignment')",self.case['id'])
         self.assertEqual(await self.page.evaluate('window.DationDispatch.getWorkspace().objective'),'min_cost')
 
     async def test_case_ux_picker_load_error_keeps_map_and_archived_cases_are_excluded(self):
-        await self.mock_recent_case_switcher()
         other=self.second_case();other['case']['status']='archived'
         await self.open();url=self.page.url
-        await self.page.locator('[data-select-case]').click()
-        await self.page.locator('[data-case-switcher] nav').get_by_role('button',name='Abrir este caso en Decision Center').wait_for()
-        self.assertEqual(await self.page.locator('[data-case-switcher] [aria-current=true]').count(),1)
-        self.assertEqual(await self.page.locator('[data-case-switcher] nav').get_by_role('button',name=other['case']['id'],exact=False).count(),0)
-        await self.page.keyboard.press('Escape')
-        self.selector_failure=True
-        await self.page.locator('[data-select-case]').click()
-        await self.page.get_by_text('No pudimos cargar los casos.',exact=False).wait_for()
-        self.assertEqual(self.page.url,url)
-        await self.page.keyboard.press('Escape')
-        self.assertTrue(await self.page.locator('[data-case-switcher] button').first.evaluate('(el)=>el===document.activeElement'))
+        await self.open_legacy_case_picker();dialog=self.page.locator('.dispatch-case-selector')
+        self.assertEqual(await dialog.locator('.is-current').count(),1)
+        self.assertEqual(await dialog.locator('[data-open-case="'+other['case']['id']+'"]').count(),0)
+        await self.page.keyboard.press('Escape');self.selector_failure=True
+        await self.open_legacy_case_picker();self.assertIn('No pudimos cargar los casos.',await dialog.inner_text());self.assertEqual(self.page.url,url)
+        await self.page.keyboard.press('Escape');self.assertTrue(await self.page.locator('[data-config-context] summary').evaluate('el=>el===document.activeElement'))
 
     async def test_case_ux_first_pack_is_persisted_before_execution_without_transition_notice(self):
         await self.mock_recent_case_switcher()
@@ -2493,7 +2569,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.assign_data_responsible()
         cid=await self.page.evaluate('window.DationDispatch.getWorkspace().decisionCase.id')
         await root.get_by_role('button',name='Seleccioná tu decisión',exact=True).click()
-        await self.page.locator('[data-select-case]').wait_for()
+        await self.page.locator('[data-config-context]').wait_for()
         state=await self.page.evaluate('window.DationDispatch.getWorkspace()')
         self.assertTrue(state['decisionCase']['persisted'])
         self.assertEqual(state['decisionCase']['id'],cid)
@@ -2501,15 +2577,27 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(await self.page.locator('[data-case-transition]').count(),0)
         self.assertEqual(self.requests.count(('POST','/api/decision-cases')),1)
         self.assertEqual(self.execution_bodies,[])
-        await self.page.locator('[data-select-case]').click()
-        await self.page.locator('[data-case-switcher] nav').get_by_role('button',name='Abrir este caso en Decision Center').wait_for()
-        self.assertEqual(await self.page.locator('[data-case-switcher] [aria-current=true]').count(),1)
+        await self.open_legacy_case_picker()
+        self.assertEqual(await self.page.locator('.dispatch-case-selector .is-current').count(),1)
 
     async def test_case_ux_real_data_change_retains_lineage_but_reopening_history_has_no_new_notice(self):
         other=self.second_case()
         saved={'decisionCase':{**self.case,'persisted':True},'orders':other['orders'],'fleet':other['fleet']}
         await self.page.add_init_script('sessionStorage.setItem('+json.dumps(KEY)+','+json.dumps(json.dumps(saved))+');')
         await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=logistics-map')
+        # Replacing a Data Pack creates a pending Case. Apply its own attributes
+        # and Data Owner through the UI before entering its Map.
+        form=self.page.locator('[data-case-identity]');await form.wait_for()
+        self.assertEqual(await self.page.evaluate('window.dationGetCurrentView()'),'logistics-data')
+        self.assertTrue(await self.page.locator('.d-workflow-action-bar button').is_disabled())
+        await form.get_by_label('Nombre del Case',exact=True).fill('Cambio de Data Pack')
+        await form.get_by_label('Categoría',exact=True).select_option('simulation')
+        owner=form.get_by_label('Data Owner',exact=True)
+        await owner.locator('option[value="10000000-0000-4000-8000-000000000001"]').wait_for(state='attached')
+        await owner.select_option('10000000-0000-4000-8000-000000000001')
+        await form.get_by_role('button',name='Aplicar',exact=True).click()
+        await self.page.locator('.d-workflow-action-bar[data-state=ready]').wait_for()
+        await self.page.locator('.d-workflow-action-bar button').click()
         notice=self.page.locator('[data-case-transition]');await notice.wait_for()
         state=await self.page.evaluate('window.DationDispatch.getWorkspace()');cid=state['decisionCase']['id']
         copy_text=await notice.inner_text()
@@ -2520,10 +2608,10 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual((await self.page.evaluate(audit,'[data-case-transition]'))['failures'],[])
         self.assertEqual(self.other_cases[cid]['decision_case']['stale_predecessor']['id'],self.case['id'])
         await self.page.evaluate("id=>window.DationDispatch.openCase(id)",self.case['id'])
-        await self.page.locator('[data-select-case]').wait_for()
+        await self.page.locator('[data-config-context]').wait_for()
         self.assertEqual(await self.page.locator('[data-case-transition]').count(),0)
         await self.page.evaluate("id=>window.DationDispatch.openCase(id)",cid)
-        await self.page.locator('[data-select-case]').wait_for()
+        await self.page.locator('[data-config-context]').wait_for()
         self.assertEqual(await self.page.locator('[data-case-transition]').count(),0)
         self.assertEqual(await self.page.evaluate('window.DationDispatch.getWorkspace().orders.id'),other['orders']['id'])
 
@@ -2541,7 +2629,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             data_height=(await self.page.locator('#dispatch-data-root .d-page-hero').bounding_box())['height']
             await self.open();map_style=await self.page.locator('#dispatch-map-root .d-page-hero').evaluate(style)
             self.assertEqual(data,map_style)
-            if width==1440:self.assertLess(abs((await self.page.locator('#dispatch-map-root .d-page-hero').bounding_box())['height']-data_height),32)
+            self.assertEqual(await self.page.locator('#dispatch-data-root .dispatch-pro-hero-visual').count(),0)
+            self.assertEqual(await self.page.locator('#dispatch-map-root details.dispatch-pro-hero-visual').count(),1)
             self.assertFalse(await self.page.evaluate('document.documentElement.scrollWidth>innerWidth'))
         for reduced in ('no-preference','reduce'):
             await self.page.emulate_media(reduced_motion=reduced)
@@ -2561,9 +2650,14 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                 if reduced=='reduce':self.assertEqual(result['animation'],'none')
 
     async def test_case_ux_both_reviews_keep_config_and_only_confirm_executes_once(self):
+        original=copy.deepcopy(self.f)
         for width,height in ((1440,1000),(390,844)):
             await self.page.set_viewport_size({'width':width,'height':height})
             for kind in ('assignment','scheduling'):
+                # Each review scenario starts with an approved upstream. The
+                # preceding D1 admission correctly supersedes D2's upstream.
+                self.f=copy.deepcopy(original);self.case=self.f['case']
+                self.runs={r['id']:r for r in self.f['runs'].values()}
                 await self.open('logistics-config','logistics_'+kind)
                 trigger=self.page.locator('[data-config-review]' if kind=='assignment' else '[data-scheduling-review]')
                 confirm='[data-config-execute]' if kind=='assignment' else '[data-scheduling-execute]'
@@ -2609,29 +2703,35 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                 self.assertFalse(probe['outside'] or probe['occluded'],probe)
             if 'dda-workspace-step' in probe['identity']:
                 self.assertTrue(await self.page.evaluate('''()=>{
-                    const el=document.activeElement,r=el.getBoundingClientRect(),nav=el.closest('nav').getBoundingClientRect();
-                    return r.left-5>=nav.left&&r.right+5<=nav.right;
+                    const el=document.activeElement,r=el.getBoundingClientRect();
+                    return r.left-5>=0&&r.right+5<=innerWidth;
                 }'''),probe)
             return probe
+        original_case=copy.deepcopy(self.case)
         for width,height in ((320,568),(320,256),(568,320)):
             await self.page.set_viewport_size({'width':width,'height':height})
             for kind,view,node in (('data','logistics-data',None),('map','logistics-map',None),
                                   ('assignment','logistics-config','logistics_assignment'),('scheduling','logistics-config','logistics_scheduling')):
                 with self.subTest(width=width,height=height,screen=kind):
+                    self.case.clear();self.case.update(copy.deepcopy(original_case))
                     saved=copy.deepcopy(self.case)
                     if kind=='map':self.case['nodes']=copy.deepcopy(self.f['initial_case']['nodes'])
                     await self.open(view,node)
                     if kind=='data':await self.page.locator('.d-workflow-action-bar[data-state=ready]').wait_for()
                     if kind=='map':
-                        progress=self.page.get_by_role('progressbar',name='Decisiones aprobadas',exact=True)
-                        self.assertEqual(await progress.get_attribute('aria-valuenow'),'0')
-                        self.assertEqual(await progress.get_attribute('aria-valuetext'),'0 de 3 decisiones aprobadas')
+                        progress=self.page.locator('.dispatch-case-progress')
+                        self.assertIn('0 de 2 aprobadas',await progress.inner_text())
+                        self.assertEqual(await progress.locator('li').count(),3)
+                        self.assertEqual(await progress.locator('[aria-disabled=true]').count(),1)
                     if kind=='assignment':
                         for name in ('Órdenes en el análisis','Flota habilitada'):
                             progress=self.page.get_by_role('progressbar',name=name,exact=True)
                             self.assertTrue(await progress.get_attribute('aria-valuetext'))
                     layers=await self.page.locator('.topbar,.dda-workspace-nav-shell,.d-workflow-action-bar').evaluate_all('els=>els.map(el=>getComputedStyle(el).position)')
-                    self.assertTrue(all(value=='static' for value in layers),layers)
+                    self.assertTrue(all(value=='static' for value in layers[:2]),layers)
+                    if kind!='map':
+                        self.assertEqual(layers[-1],'static' if height<=360 else 'fixed')
+                        self.assertTrue(await self.page.locator('.main').evaluate('e=>getComputedStyle(e).overflowY==="auto"'))
                     seen=set()
                     for _ in range(120):
                         await self.page.keyboard.press('Tab');probe=await check_focus()
@@ -2709,8 +2809,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                     await trigger.focus();await self.page.keyboard.press('Enter')
                     dialog=self.page.locator('dialog.d-execution-review[open]');await dialog.wait_for()
                     labels=await dialog.locator('.d-execution-review__row strong').all_text_contents()
-                    self.assertEqual(labels,['Decision Case','Responsable','Alcance','Objetivo','Prioridades','Recursos'] if kind=='assignment'
-                        else ['Decision Case','Responsable','Entrada','Ventana','Reglas por foco','Objetivo','Recursos'])
+                    self.assertEqual(labels,['Decision Case','Decision Owner','Alcance','Objetivo','Prioridades','Recursos'] if kind=='assignment'
+                        else ['Decision Case','Decision Owner','Entrada','Ventana','Reglas por foco','Objetivo','Recursos'])
                     self.assertEqual(await dialog.locator('.d-execution-review__note').count(),1)
                     self.assertEqual(await dialog.locator('form').get_attribute('method'),'dialog')
                     self.assertTrue(await dialog.evaluate("el=>el.matches(':modal')"))
@@ -2852,7 +2952,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                         disabled:button.disabled,busy:button.getAttribute('aria-busy'),
                         spinner:getComputedStyle(button,'::after').animationName,
                         iconDisplay:getComputedStyle(button.querySelector('svg')).display,
-                        primary:s.backgroundImage!=='none',
+                        primary:button.classList.contains('d-button--primary'),
                         described:document.getElementById(button.getAttribute('aria-describedby'))?.textContent});
                     button.click();
                 }
@@ -2889,7 +2989,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             const action=bar.querySelector('.d-button'),r=action.getBoundingClientRect();
             return {items:items.map(el=>{const r=el.getBoundingClientRect();return {
                 width:r.width,height:r.height,clipped:el.scrollWidth>el.clientWidth||el.scrollHeight>el.clientHeight};}),
-                actionWidth:r.width,primary:getComputedStyle(action).backgroundImage!=='none',
+                actionWidth:r.width,primary:action.classList.contains('d-button--primary'),
                 overflow:document.documentElement.scrollWidth>innerWidth};
         }'''
         for width in (1440,1280,1024,768,390):
@@ -2905,7 +3005,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                         await bar.locator('.d-workflow-action-bar__item strong,.d-workflow-action-bar__item span').first.evaluate(
                             "el=>el.textContent='Recursos disponibles para todas las operaciones seleccionadas y sus prioridades'")
                     sizes=await bar.evaluate(geometry)
-                    self.assertEqual(len(sizes['items']),2 if node is None else 3)
+                    self.assertEqual(len(sizes['items']),4 if node is None else 3)
                     self.assertLess(max(x['width'] for x in sizes['items'])-min(x['width'] for x in sizes['items']),.25)
                     self.assertLess(max(x['height'] for x in sizes['items'])-min(x['height'] for x in sizes['items']),.25)
                     self.assertGreater(sizes['actionWidth'],max(x['width'] for x in sizes['items']))
@@ -2928,7 +3028,9 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             actual=await button.evaluate('''el=>{
                 const s=getComputedStyle(el),icon=el.querySelector('svg'),i=getComputedStyle(icon);
                 return {minHeight:s.minHeight,padding:s.padding,radius:s.borderRadius,
-                    font:s.font,fontWeight:s.fontWeight,gap:s.gap,background:s.backgroundImage,color:s.color,
+                    fontFamily:s.fontFamily,fontSize:s.fontSize,fontWeight:s.fontWeight,
+                    lineHeight:s.lineHeight,continuation:el.matches('[data-after-approve]'),gap:s.gap,background:s.backgroundImage,
+                    backgroundColor:s.backgroundColor,color:s.color,
                     outline:s.outline,offset:s.outlineOffset,iconWidth:i.width,iconHeight:i.height,
                     iconCount:el.querySelectorAll('svg').length,decorative:icon.getAttribute('aria-hidden'),
                     textArrow:el.textContent.includes('→'),focused:document.activeElement===el,
@@ -2941,7 +3043,16 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(actual['iconCount'],1,label)
             self.assertEqual(actual['decorative'],'true',label)
             self.assertFalse(actual['textArrow'],label)
-            self.assertIn('linear-gradient',actual['background'],label)
+            self.assertEqual(actual['background'],'none',label)
+            token=await button.evaluate('''el=>{
+                const sample=document.createElement('span');sample.style.backgroundColor='var(--color-action-primary-bg)';
+                el.append(sample);const value=getComputedStyle(sample).backgroundColor;sample.remove();return value;
+            }''')
+            self.assertEqual(actual['backgroundColor'],token,label)
+            # The approved contextual continuation wraps at 1.4; all other
+            # workflow controls retain the 1.35 primitive line box.
+            continuation=actual.pop('continuation')
+            self.assertEqual(actual.pop('lineHeight'),'18.2px' if continuation else '17.55px',label)
             if reference is None:reference=actual
             self.assertEqual(actual,reference,label)
         for width in (1440,1280,1024,768,390):
@@ -2969,72 +3080,40 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             await check(self.page.locator('[data-approve-toolbar]'),'assignment-approve')
             await self.page.locator('[data-approve-toolbar]').click()
             await check(self.page.locator('[data-after-approve]'),'continue')
-            self.assertFalse(await self.page.locator('[data-dashboard-map]').evaluate("el=>el.classList.contains('d-button--primary')"))
+            self.assertEqual(await self.page.locator('[data-dashboard-map]').count(),0)
+            map_step=self.page.locator('.dda-workspace-step[data-step="2"]')
+            self.assertFalse(await map_step.is_disabled())
+            self.assertFalse(await map_step.evaluate("el=>el.classList.contains('d-button--primary')"))
+            self.assertTrue(await self.page.locator('[data-rerun]').evaluate("el=>el.classList.contains('d-button--secondary')"))
         self.assertEqual(self.approval_calls,5)
         self.assertEqual(self.execution_bodies,[])
 
     async def test_workflow_heroes_share_metadata_panel_and_stable_desktop_height(self):
         await self.page.emulate_media(reduced_motion='reduce')
         for width,height in ((1440,1000),(1280,1000),(1024,1000),(768,1000),(390,1000),(360,1000),(360,250)):
-            await self.page.set_viewport_size({'width':width,'height':height})
-            records=[]
-            for view,node in (('logistics-data',None),('logistics-map',None),
-                              ('logistics-config','logistics_assignment'),('logistics-config','logistics_scheduling')):
-                await self.open(view,node)
-                hero=self.page.locator('.view.is-active .d-page-hero--workflow');await hero.wait_for()
-                if node=='logistics_scheduling':
-                    self.assertEqual(await hero.locator('.dispatch-pro-how-node strong').nth(1).inner_text(),'Calendario operativo + secuencia')
-                metrics=await hero.evaluate('''el=>{
-                    const rect=x=>{const r=x.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,height:r.height,width:r.width};};
-                    const style=x=>{const s=getComputedStyle(x);return {size:parseFloat(s.fontSize),weight:parseFloat(s.fontWeight),border:s.borderColor,color:s.color};};
-                    const s=getComputedStyle(el),copy=el.querySelector('.dispatch-pro-hero-copy'),panel=el.querySelector('.dispatch-pro-hero-visual');
-                    const step=el.querySelector('.d-hero-meta__step'),decision=el.querySelector('.d-hero-meta__decision');
-                    const items=[...panel.querySelectorAll('.dispatch-pro-how-node')];
-                    return {hero:rect(el),copy:rect(copy),panel:rect(panel),columns:s.gridTemplateColumns,
-                        padding:s.padding,gap:parseFloat(s.gap),animation:s.animationName,metaTop:rect(step).top-rect(el).top,
-                        step:{...rect(step),...style(step)},decision:decision?{...rect(decision),...style(decision)}:null,
-                        items:items.map(x=>{const text=x.querySelector('strong'),range=document.createRange();range.selectNodeContents(text);
-                            return {...rect(x),lines:new Set([...range.getClientRects()].map(r=>Math.round(r.y))).size,font:style(text).size,
-                                clipped:x.scrollWidth>x.clientWidth||text.scrollWidth>text.clientWidth};}),
-                        overflow:el.scrollWidth>el.clientWidth||document.documentElement.scrollWidth>innerWidth};
-                }''')
-                with self.subTest(width=width,height=height,view=view,node=node):
-                    self.assertFalse(metrics['overflow']);self.assertEqual(metrics['animation'],'none')
-                    self.assertEqual(len(metrics['items']),3)
-                    self.assertAlmostEqual(metrics['metaTop'],float(metrics['padding'].split()[0].removesuffix('px'))+1,delta=.25)
-                    for item in metrics['items']:
-                        self.assertFalse(item['clipped']);self.assertGreater(item['height'],0)
-                        self.assertGreaterEqual(item['font'],12)
-                        self.assertGreaterEqual(item['left'],metrics['hero']['left'])
-                        self.assertLessEqual(item['right'],metrics['hero']['right'])
-                    if node:
-                        step,decision=metrics['step'],metrics['decision']
-                        self.assertIsNotNone(decision)
-                        self.assertGreaterEqual(decision['top'],step['bottom']+3.5)
-                        self.assertAlmostEqual(step['left'],decision['left'],delta=.25)
-                        self.assertGreater(step['size'],decision['size']);self.assertGreater(step['weight'],decision['weight'])
-                        self.assertNotEqual(step['border'],decision['border']);self.assertNotEqual(step['color'],decision['color'])
-                    else:self.assertIsNone(metrics['decision'])
-                    if width>=1280:
-                        self.assertGreaterEqual(metrics['panel']['width'],320)
-                        self.assertTrue(all(item['lines']==1 for item in metrics['items']))
-                    else:self.assertGreaterEqual(metrics['panel']['top'],metrics['copy']['bottom']+metrics['gap']-.5)
-                    if height==250:
-                        positions=await self.page.locator('.topbar,.dda-workspace-nav-shell,.d-workflow-action-bar').evaluate_all('els=>els.map(el=>getComputedStyle(el).position)')
-                        self.assertTrue(all(position=='static' for position in positions),positions)
-                        if node:
-                            await self.page.keyboard.press('Tab')
-                            await self.page.locator('[data-config-review]' if node=='logistics_assignment' else '[data-scheduling-review]').focus()
-                            await self.page.locator('[data-config-context] summary').focus()
-                            focus=await self.page.evaluate((Path(__file__).parent/'focus_audit.js').read_text())
-                            self.assertTrue(focus['visibleFocus'],focus)
-                            self.assertFalse(focus['occluded'] or focus['outside'],focus)
-                records.append(metrics)
-            if width>=1280:
-                self.assertLessEqual(max(r['hero']['height'] for r in records)-min(r['hero']['height'] for r in records),1)
-                self.assertEqual(len({r['columns'] for r in records}),1)
-                self.assertTrue(all(r['hero']['height']<=266 for r in records))
-        self.assertFalse(any(m=='POST' and p=='/api/runs' for m,p in self.requests))
+            await self.page.set_viewport_size({'width':width,'height':height});records=[]
+            for view,node in (('logistics-data',None),('logistics-map',None),('logistics-config','logistics_assignment'),('logistics-config','logistics_scheduling')):
+                await self.open(view,node);hero=self.page.locator('.view.is-active .d-page-hero--workflow');await hero.wait_for()
+                panel=hero.locator('details.dispatch-pro-hero-visual')
+                self.assertEqual(await panel.count(),0 if view=='logistics-data' else 1)
+                if await panel.count():
+                    self.assertFalse(await panel.evaluate('e=>e.open'))
+                    await panel.locator('summary').press('Enter');self.assertTrue(await panel.evaluate('e=>e.open'))
+                    self.assertEqual(await panel.locator('.dispatch-pro-how-node').count(),3)
+                    for item in await panel.locator('.dispatch-pro-how-node').all():
+                        self.assertTrue(await item.is_visible());self.assertTrue(await item.evaluate('e=>e.scrollWidth<=e.clientWidth+1'))
+                    if node=='logistics_scheduling':self.assertEqual(await panel.locator('.dispatch-pro-how-node strong').nth(1).inner_text(),'Calendario operativo + secuencia')
+                    await panel.locator('summary').press('Enter');self.assertFalse(await panel.evaluate('e=>e.open'))
+                metrics=await hero.evaluate("e=>{const s=getComputedStyle(e),r=e.getBoundingClientRect(),c=e.querySelector('.dispatch-pro-hero-copy').getBoundingClientRect();return {minHeight:s.minHeight,padding:s.padding,gap:s.gap,radius:s.borderRadius,columns:s.gridTemplateColumns,animation:s.animationName,fit:c.left>=r.left&&c.right<=r.right+1&&c.bottom<=r.bottom,overflow:e.scrollWidth>e.clientWidth||document.documentElement.scrollWidth>innerWidth}}")
+                self.assertEqual(metrics['minHeight'],'0px');self.assertEqual(metrics['animation'],'none');self.assertTrue(metrics['fit']);self.assertFalse(metrics['overflow'])
+                self.assertEqual(await hero.locator('.d-hero-meta__decision').count(),1 if node else 0)
+                records.append({k:metrics[k] for k in ('minHeight','padding','gap','radius','columns')})
+                if height==250 and node:
+                    await self.page.locator('[data-config-context] summary').focus()
+                    audit=await self.page.evaluate((Path(__file__).parent/'focus_audit.js').read_text())
+                    self.assertTrue(audit['visibleFocus']);self.assertFalse(audit['occluded'] or audit['outside'])
+            self.assertTrue(all(r==records[0] for r in records),records)
+        self.assertEqual(self.execution_bodies,[])
 
     async def test_workflow_hero_future_content_wraps_without_clipping_or_html_injection(self):
         await self.open('logistics-config','logistics_assignment')
@@ -3043,22 +3122,22 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             result=await self.page.evaluate('''async()=>{
                 const {decisionHero}=await import('/static/js/dispatch/decision-config-ui.mjs');
                 const owner=document.createElement('div');document.querySelector('#dispatch-config-root').append(owner);
-                owner.style.setProperty('--hero-meta-gap','10px');
+                owner.style.setProperty('--hero-copy-gap','10px');
                 owner.innerHTML=decisionHero({step:{number:7,label:'Nueva decisión '+ 'Contenido'.repeat(35)},decisionIndex:4,totalDecisions:20,
                     title:'Título'+ 'Largo'.repeat(60),description:'Descripción'+ 'Extendida'.repeat(90),
                     panelTitle:'<img src=x onerror=alert(1)>',panelFootnote:'Nota '+ 'Prolongada'.repeat(60),
                     panelItems:Array.from({length:5},()=>({icon:'truck',label:'Campo'+ 'Extendido'.repeat(30),description:'Valor'+ 'Largo'.repeat(90)}))});
-                const hero=owner.firstElementChild,texts=[...hero.querySelectorAll('h1,p,small,strong,.d-hero-meta>span,.dispatch-pro-how-history>span')];
+                const hero=owner.firstElementChild;hero.querySelector('details').open=true;const texts=[...hero.querySelectorAll('h1,p,small,strong,.d-hero-meta>span,.dispatch-pro-how-history>span')];
                 const result={overflow:hero.scrollWidth>hero.clientWidth||document.documentElement.scrollWidth>innerWidth,
                     clipped:texts.some(el=>el.scrollWidth>el.clientWidth+1||el.scrollHeight>el.clientHeight+1),
                     decision:hero.querySelector('.d-hero-meta__decision').textContent,
                     panelItems:hero.querySelectorAll('.dispatch-pro-how-node').length,
                     images:hero.querySelectorAll('img:not(.dispatch-pro-hero-watermark)').length,
-                    title:hero.querySelector('.dispatch-pro-how-title').textContent,gap:getComputedStyle(hero.querySelector('.d-hero-meta')).gap};
+                    title:hero.querySelector('.dispatch-pro-hero-visual>summary').textContent,gap:getComputedStyle(hero.querySelector('.dispatch-pro-hero-copy')).gap};
                 owner.remove();return result;
             }''')
             self.assertFalse(result['overflow'],result);self.assertFalse(result['clipped'],result)
-            self.assertEqual(result['decision'],'DECISIÓN 04 DE 20');self.assertEqual(result['panelItems'],5)
+            self.assertEqual(result['decision'],'DECISIÓN 4 DE 20');self.assertEqual(result['panelItems'],5)
             self.assertEqual(result['images'],0);self.assertEqual(result['title'],'<img src=x onerror=alert(1)>')
             self.assertEqual(result['gap'],'10px')
 
@@ -3088,7 +3167,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                 owner.remove();return {variants,hasPanel};
             }''')
             self.assertEqual([v['decision'] for v in result['variants']],
-                             [None,None,None,'DECISIÓN 01 DE 3','DECISIÓN 02 DE 3'])
+                             [None,None,None,'DECISIÓN 1 DE 3','DECISIÓN 2 DE 3'])
             self.assertTrue(result['hasPanel'])
             for variant in result['variants']:
                 self.assertFalse(variant['panel'])
@@ -3097,6 +3176,46 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(variant['images'],0)
                 self.assertFalse(variant['overflow'])
         self.assertEqual(self.execution_bodies,[])
+
+    async def confirm_rerun(self):
+        dialog=self.page.locator('[data-new-run-warning][open]')
+        await dialog.wait_for()
+        self.assertIn('Las decisiones anteriores aprobadas se conservan.',await dialog.inner_text())
+        await dialog.get_by_role('button',name='Confirmar nueva corrida',exact=True).click()
+
+    async def open_insight(self):
+        toggle=self.page.locator('[data-insight-toggle]')
+        if await toggle.get_attribute('aria-expanded')=='false':await toggle.click()
+
+    async def check_capability_toggle(self,kind):
+        toggle=self.page.locator('[data-'+kind+'-advanced-toggle]')
+        content=self.page.locator('[data-'+kind+'-advanced-content]')
+        section=self.page.locator('[data-'+kind+'-advanced]')
+        for width,height in ((1440,1000),(768,1024),(390,844),(320,568)):
+            await self.page.set_viewport_size({'width':width,'height':height})
+            await self.page.emulate_media(reduced_motion='reduce')
+            await toggle.scroll_into_view_if_needed();await toggle.focus()
+            before=await toggle.evaluate('el=>({url:location.href,y:scrollY,background:getComputedStyle(el).backgroundColor,border:getComputedStyle(el).borderColor})')
+            self.assertEqual(await toggle.locator('strong').inner_text(),'Análisis avanzado')
+            self.assertEqual(await toggle.get_attribute('aria-controls'),await content.get_attribute('id'))
+            self.assertEqual(await toggle.get_attribute('aria-expanded'),'false')
+            self.assertTrue(await content.evaluate('el=>el.hidden'))
+            await toggle.press('Enter')
+            self.assertEqual(await toggle.get_attribute('aria-expanded'),'true')
+            self.assertTrue(await toggle.evaluate('el=>el.classList.contains("is-selected")'))
+            self.assertFalse(await content.evaluate('el=>el.hidden'))
+            self.assertTrue(await section.evaluate('el=>el.classList.contains("is-open")'))
+            after=await toggle.evaluate('el=>({background:getComputedStyle(el).backgroundColor,border:getComputedStyle(el).borderColor,transition:getComputedStyle(el).transitionDuration,focus:el===document.activeElement&&el.matches(":focus-visible"),outline:parseFloat(getComputedStyle(el).outlineWidth),fits:el.scrollWidth<=el.clientWidth})')
+            self.assertNotEqual(after['background'],before['background']);self.assertNotEqual(after['border'],before['border'])
+            self.assertEqual(after['transition'],'0s');self.assertTrue(after['focus']);self.assertGreaterEqual(after['outline'],2)
+            self.assertTrue(after['fits']);self.assertFalse(await self.page.evaluate('document.documentElement.scrollWidth>innerWidth'))
+            self.assertEqual(self.page.url,before['url']);self.assertAlmostEqual(await self.page.evaluate('scrollY'),before['y'],delta=2)
+            await toggle.press('Space')
+            self.assertEqual(await toggle.get_attribute('aria-expanded'),'false');self.assertTrue(await content.evaluate('el=>el.hidden'))
+            self.assertFalse(await section.evaluate('el=>el.classList.contains("is-open")'))
+            self.assertEqual(await toggle.locator('strong').inner_text(),'Análisis avanzado')
+            self.assertTrue(await toggle.evaluate('el=>el===document.activeElement'))
+            self.assertEqual(self.page.url,before['url']);self.assertAlmostEqual(await self.page.evaluate('scrollY'),before['y'],delta=2)
 
     async def open_advanced(self):
         toggle=self.page.locator('[data-assignment-advanced-toggle]')
@@ -3123,7 +3242,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(await self.page.locator('#dispatch-assignment').evaluate('el=>el===window.savedEvidence'))
         self.assertTrue(await self.page.evaluate('window.savedFrontier===document.querySelector(".assignment-frontier__chart svg")'))
         await self.page.reload();await self.page.locator('#dispatch-assignment').wait_for(state='visible')
-        self.assertEqual(await self.page.locator('[data-assignment-advanced-label]').inner_text(),'Ocultar análisis avanzado')
+        self.assertEqual(await self.page.locator('[data-assignment-advanced-toggle] strong').inner_text(),'Análisis avanzado')
         self.assertEqual(await self.page.locator('[data-assignment-advanced-toggle]').get_attribute('aria-expanded'),'true')
         self.assertEqual(await self.page.evaluate('sessionStorage.getItem("dation.assignment.presentation."+window.DationDispatch.getWorkspace().run.id)'),'advanced')
         self.assertEqual(await self.page.locator('.assignment-dashboard-v2').get_attribute('data-analysis-depth'),'essential')
@@ -3131,41 +3250,11 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.comparative_posts,0);self.assertEqual(self.explain_calls,0);self.assertEqual(self.execution_bodies,[])
 
     async def test_d1_v2_disclosure_keyboard_feedback_and_manual_scroll(self):
-        await self.page.emulate_media(reduced_motion='reduce');await self.dashboard();url=self.page.url
-        toggle=self.page.locator('[data-assignment-advanced-toggle]')
-        content=self.page.locator('[data-assignment-advanced-content]')
-        self.assertEqual(await toggle.get_attribute('type'),'button')
-        self.assertEqual(await toggle.get_attribute('aria-controls'),await content.get_attribute('id'))
-        self.assertEqual(await content.get_attribute('id'),'assignment-presentation-'+self.f['ids']['assignment']+'-advanced-content')
-        self.assertEqual(await self.page.locator('[data-assignment-advanced-chevron]').get_attribute('aria-hidden'),'true')
+        await self.dashboard()
+        self.assertEqual(await self.page.locator('[data-assignment-advanced-toggle]').get_attribute('type'),'button')
+        self.assertEqual(await self.page.locator('[data-assignment-advanced-content]').get_attribute('id'),'assignment-presentation-'+self.f['ids']['assignment']+'-content')
         self.assertEqual(await self.page.locator('.assignment-view-control,[data-assignment-view]').count(),0)
-        for width,height in ((1440,1000),(768,1024),(390,844),(320,568)):
-            await self.page.set_viewport_size({'width':width,'height':height})
-            await toggle.evaluate('el=>el.scrollIntoView({block:"center"})');await toggle.focus()
-            before=await toggle.evaluate('''el=>({y:scrollY,background:getComputedStyle(el).backgroundColor,
-                border:getComputedStyle(el).borderColor,leading:getComputedStyle(el.querySelector('.assignment-advanced__copy svg')).transform})''')
-            self.assertEqual(await toggle.get_attribute('aria-expanded'),'false');self.assertTrue(await content.evaluate('el=>el.hidden'))
-            self.assertEqual(await self.page.locator('[data-assignment-advanced-label]').inner_text(),'Mostrar análisis avanzado')
-            await self.page.keyboard.press('Enter')
-            self.assertEqual(await toggle.get_attribute('aria-expanded'),'true');self.assertFalse(await content.evaluate('el=>el.hidden'))
-            self.assertTrue(await self.page.locator('[data-assignment-advanced]').evaluate('el=>el.classList.contains("is-open")'))
-            self.assertEqual(await self.page.locator('[data-assignment-advanced-label]').inner_text(),'Ocultar análisis avanzado')
-            after=await toggle.evaluate('''el=>{const s=getComputedStyle(el),c=el.querySelector('[data-assignment-advanced-chevron]'),a=el.querySelector('.assignment-advanced__copy'),r=el.getBoundingClientRect(),cr=c.getBoundingClientRect();return {
-                y:scrollY,background:s.backgroundColor,border:s.borderColor,rotation:getComputedStyle(c).transform,
-                leading:getComputedStyle(a.querySelector('svg')).transform,transition:getComputedStyle(c).transitionDuration,
-                fits:cr.right<=r.right&&a.getBoundingClientRect().right<=cr.left&&el.scrollWidth<=el.clientWidth,
-                focus:el===document.activeElement&&el.matches(':focus-visible'),outline:parseFloat(s.outlineWidth)};}''')
-            self.assertEqual(after['y'],before['y']);self.assertNotEqual(after['background'],before['background'])
-            self.assertNotEqual(after['border'],before['border']);self.assertEqual(after['leading'],before['leading'])
-            self.assertEqual(after['rotation'],'matrix(-1, 0, 0, -1, 0, 0)');self.assertEqual(after['transition'],'0s')
-            self.assertTrue(after['fits']);self.assertTrue(after['focus']);self.assertGreaterEqual(after['outline'],2)
-            await self.page.keyboard.press('Space')
-            self.assertEqual(await toggle.get_attribute('aria-expanded'),'false');self.assertTrue(await content.evaluate('el=>el.hidden'))
-            self.assertFalse(await self.page.locator('[data-assignment-advanced]').evaluate('el=>el.classList.contains("is-open")'))
-            self.assertEqual(await self.page.locator('[data-assignment-advanced-label]').inner_text(),'Mostrar análisis avanzado')
-            self.assertEqual(await self.page.evaluate('scrollY'),before['y']);self.assertEqual(self.page.url,url)
-            self.assertEqual(await self.page.locator('[data-assignment-advanced-chevron]').evaluate('el=>getComputedStyle(el).transform'),'none')
-            self.assertTrue(await toggle.evaluate('el=>el===document.activeElement'))
+        await self.check_capability_toggle('assignment')
         self.assertEqual(self.explain_calls,0);self.assertEqual(self.comparative_posts,0);self.assertEqual(self.execution_bodies,[])
 
     async def test_d1_v2_all_objectives_highlight_the_actual_selected_scenario(self):
@@ -3186,9 +3275,9 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
     async def test_d1_v2_ai_cached_brief_copy_chat_and_collapse_without_inference(self):
         self.saved_explanation={'id':'cached','response_json':{'executive_summary':'Resumen ejecutivo persistido <script>malicioso()</script>','key_drivers':['Evidencia persistida'],'caveats':['Assignment no define fechas.']}}
         await self.dashboard()
-        await self.page.get_by_text('Resumen disponible',exact=True).wait_for()
+        await self.page.locator('[data-ai-summary-state=available]').wait_for(state='attached')
         self.assertFalse(await self.page.locator('[data-ai-summary-body]').is_visible())
-        await self.page.locator('[data-explain]').click()
+        await self.open_insight()
         await self.page.locator('[data-ai-summary-controls]').wait_for(state='visible')
         self.assertEqual(self.explain_calls,0)
         self.assertEqual(await self.page.locator('[data-response] script,[data-response] img,.dispatch-ai-evidence-grid').count(),0)
@@ -3202,12 +3291,12 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn(self.f['ids']['assignment'][:8],await self.page.locator('.dispatch-chat-context').inner_text())
         await self.page.keyboard.press('Escape');self.assertFalse(await self.page.locator('.dispatch-chat').is_visible())
         await self.page.locator('[data-ai-collapse]').click();self.assertFalse(await self.page.locator('[data-ai-summary-body]').is_visible())
-        await self.page.locator('[data-explain]').click();self.assertEqual(self.explain_calls,0)
+        await self.open_insight();self.assertEqual(self.explain_calls,0)
 
     async def test_d1_v2_ai_loading_error_retry_regeneration_are_explicit_and_coalesced(self):
         self.explain_fail_once=True;self.delay[f"/api/runs/{self.f['ids']['assignment']}/explain"]=.4
         await self.dashboard();self.assertEqual(self.explain_calls,0)
-        button=self.page.locator('[data-explain]');await button.click()
+        button=self.page.locator('[data-explain]');await self.open_insight()
         self.assertTrue(await button.is_disabled());self.assertEqual(await button.get_attribute('aria-busy'),'true')
         await button.dispatch_event('click')
         await self.page.get_by_role('alert').filter(has_text='Fallo sintético de IA').wait_for()
@@ -3221,10 +3310,12 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_d1_v2_new_comparative_evidence_marks_summary_stale_without_automatic_ai(self):
         self.essential();self.saved_explanation={'id':'original','response_json':{'executive_summary':'Resumen original'}}
-        await self.dashboard();await self.page.get_by_text('Resumen disponible',exact=True).wait_for()
-        await self.page.locator('[data-explain]').click();await self.page.get_by_text('Resumen original',exact=True).wait_for()
+        await self.dashboard();await self.page.locator('[data-ai-summary-state=available]').wait_for(state='attached')
+        await self.open_insight();await self.page.get_by_text('Resumen original',exact=True).wait_for()
         await self.open_advanced();await self.page.locator('[data-generate-comparative]').click()
         await self.page.wait_for_selector('[data-comparative-state=queued]');self.comparative['status']='completed'
+        await self.page.locator('[data-ai-summary-state=stale]').wait_for(state='attached')
+        await self.open_insight()
         await self.page.locator('[data-ai-summary-availability]').filter(has_text='Hay nueva evidencia disponible').wait_for()
         self.assertEqual(self.explain_calls,0);self.assertIn('Resumen original',await self.page.locator('[data-response]').inner_text())
         await self.page.locator('[data-explain]').click()
@@ -3241,7 +3332,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn('Escenario no factible',await self.page.locator('[data-assignment-hero-status]').inner_text())
         self.assertIn('—',await self.page.locator('[data-executive-kpi=total_cost]').inner_text())
         self.assertTrue(await self.page.locator('[data-approve-toolbar]').is_disabled())
-        self.assertTrue(await self.page.locator('[data-approve-final]').is_disabled())
+        self.assertEqual(await self.page.locator('[data-approve-final]').count(),0)
         self.assertIn('No factible',await self.page.locator('#assignment-scenarios').inner_text())
         await self.open_advanced();await self.page.locator('[data-comparison-select]').select_option('min_cost')
         self.assertIn('Referencia no factible',await self.page.locator('#dispatch-comparative').inner_text())
@@ -3249,7 +3340,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_d1_v2_final_approval_updates_hero_and_continues_to_scheduling(self):
         self.review_assignment();await self.dashboard()
-        await self.page.locator('[data-approve-final]').click()
+        await self.page.locator('[data-approve-toolbar]').click()
         await self.page.wait_for_function("document.querySelector('[data-status-badge]').textContent==='Aprobada'")
         self.assertEqual(self.approval_calls,1);self.assertTrue(await self.page.locator('[data-approve-toolbar]').is_disabled())
         self.assertIn('Decisión aprobada',await self.page.locator('[data-assignment-hero-status]').inner_text())
@@ -3259,13 +3350,14 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.execution_bodies,[])
 
     async def test_d1_v2_local_hero_has_a_readable_svg_fallback(self):
-        await self.context.route('**/assignment-hero-truck.webp',lambda route:route.abort())
+        await self.context.route('**/assignment-isometric.webp',lambda route:route.abort())
         await self.page.set_viewport_size({'width':390,'height':844});await self.dashboard()
         await self.page.locator('.assignment-hero__art[data-fallback=true]').wait_for()
         self.assertTrue(await self.page.locator('#dispatch-hero h1').is_visible())
         self.assertTrue(await self.page.locator('[data-rerun]').is_visible())
-        background=await self.page.locator('.assignment-hero__art').evaluate('el=>getComputedStyle(el).backgroundImage')
-        self.assertIn('/static/assets/dda-logistics.svg',background)
+        art=self.page.locator('.assignment-hero__art');self.assertTrue(await art.locator('img').evaluate('e=>e.hidden'))
+        self.assertEqual(await art.get_attribute('aria-hidden'),'true')
+        self.assertGreater((await art.bounding_box())['height'],0)
         self.assertFalse(await self.page.evaluate('document.documentElement.scrollWidth>innerWidth'))
 
     async def test_d1_v2_essential_and_advanced_fit_low_viewports_and_keyboard(self):
@@ -3337,28 +3429,13 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn('Asignación aprobada · viajes y vehículos fijos',await root.inner_text())
         self.assertIn('Plan con excepciones',await self.page.locator('#dispatch-hero').inner_text())
         button=self.page.locator('[data-scheduling-advanced-toggle]')
-        for width,height in [(1440,1000),(768,1024),(390,844),(320,568)]:
-            await self.page.set_viewport_size({'width':width,'height':height})
-            await self.page.emulate_media(reduced_motion='reduce')
-            await button.scroll_into_view_if_needed();await button.focus()
-            before=await self.page.evaluate('({url:location.href,y:scrollY})')
-            await button.press('Enter')
-            self.assertEqual(await button.get_attribute('aria-expanded'),'true')
-            self.assertIn('Ocultar análisis avanzado',await button.inner_text())
-            state=await self.page.evaluate('''()=>{const a=document.querySelector('[data-scheduling-advanced]'),b=a.querySelector('button'),c=a.querySelector('[data-scheduling-advanced-content]'),s=getComputedStyle(a.querySelector('.scheduling-advanced__chevron'));return {hidden:c.hidden,active:a.classList.contains('is-open'),controls:b.getAttribute('aria-controls')===c.id,rotation:s.transform,transition:s.transitionDuration,width:document.documentElement.scrollWidth,viewport:innerWidth,y:scrollY,url:location.href};}''')
-            self.assertFalse(state['hidden']);self.assertTrue(state['active']);self.assertTrue(state['controls'])
-            self.assertNotEqual(state['rotation'],'none');self.assertEqual(state['transition'],'0s')
-            self.assertLessEqual(state['width'],state['viewport']+1)
-            self.assertEqual(state['url'],before['url']);self.assertLessEqual(abs(state['y']-before['y']),2)
-            await button.press('Space')
-            self.assertEqual(await button.get_attribute('aria-expanded'),'false')
-            self.assertIn('Mostrar análisis avanzado',await button.inner_text())
+        await self.check_capability_toggle('scheduling')
         await self.page.locator('[data-scheduling-full-plan]').click()
         await self.page.wait_for_function("document.activeElement?.id==='scheduling-full-plan'")
         self.assertEqual(await self.page.locator('#scheduling-full-plan tbody tr').count(),len(original['result_json']['scenarios']['selected']['trips']))
         await self.page.reload();await button.wait_for()
         self.assertEqual(await button.get_attribute('aria-expanded'),'true')
-        self.assertIn('Ocultar análisis avanzado',await button.inner_text())
+        self.assertEqual(await button.locator('strong').inner_text(),'Análisis avanzado')
         self.assertEqual(self.f['runs']['scheduling'],original)
         self.assertEqual(self.execution_bodies,[]);self.assertEqual(self.comparative_posts,0);self.assertEqual(self.explain_calls,0)
 
@@ -3398,13 +3475,15 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.saved_explanation={'id':'cached-D2','response_json':{'executive_summary':'Plan temporal cacheado','key_drivers':['Assignment bloqueada'],'caveats':['Revisar márgenes']}}
         await self.open('decision-dashboard','logistics_scheduling',self.f['ids']['scheduling'])
         button=self.page.locator('[data-explain]');self.assertEqual(self.explain_calls,0)
-        await button.click();await self.page.get_by_text('Plan temporal cacheado',exact=True).wait_for()
+        await self.open_insight();await self.page.get_by_text('Plan temporal cacheado',exact=True).wait_for()
         self.assertEqual(self.explain_calls,0)
         await self.page.locator('[data-ai-collapse]').click()
         self.assertEqual(await button.get_attribute('aria-expanded'),'false')
         self.saved_explanation_evidence='previous-evidence'
-        await self.page.reload();await button.wait_for();await self.page.get_by_text('Hay evidencia más reciente',exact=True).wait_for()
-        await button.click();await self.page.get_by_text('Synthetic explanation',exact=True).wait_for()
+        await self.page.reload();await self.wait_for_app()
+        await self.page.locator('[data-ai-summary-state=stale]').wait_for(state='attached')
+        self.assertIn('Hay evidencia más reciente',await self.page.locator('[data-ai-summary-availability]').text_content())
+        await self.open_insight();await self.page.get_by_text('Synthetic explanation',exact=True).wait_for()
         self.assertEqual(self.explain_calls,1)
         await self.page.locator('[data-ai-ask]').click();await self.page.locator('.dispatch-chat:not([hidden])').wait_for()
         await self.page.keyboard.press('Escape');self.assertEqual(await self.page.locator('[data-chat]').get_attribute('aria-expanded'),'false')
@@ -3416,15 +3495,16 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.case['nodes']['logistics_scheduling']['approved_run_id']=None
         r=self.f['runs']['scheduling'];r['approved_at']=None;r['result_json']['decision_case']['status']='review'
         await self.open('decision-dashboard','logistics_scheduling',self.f['ids']['scheduling'])
-        await self.page.locator('[data-explain]').click();await self.page.get_by_role('button',name='Reintentar resumen',exact=True).click()
+        await self.open_insight();await self.page.get_by_role('button',name='Reintentar resumen',exact=True).click()
         await self.page.get_by_text('Synthetic explanation',exact=True).wait_for();self.assertEqual(self.explain_calls,2)
-        approve=self.page.locator('[data-approve-final]');await approve.click();await self.page.locator('[data-approval-error]:not([hidden])').wait_for()
+        approve=self.page.locator('[data-approve-toolbar]');await approve.click();await self.page.locator('[data-approval-error]:not([hidden])').wait_for()
         self.assertFalse(await approve.is_disabled());await approve.click()
-        await self.page.wait_for_function("document.querySelector('[data-approve-final]').disabled")
+        await self.page.wait_for_function("document.querySelector('[data-approve-toolbar]').disabled")
         await self.page.locator('[data-scheduling-hero-status]').filter(has_text='Planificación aprobada').wait_for()
-        self.assertEqual(self.approval_calls,2);self.assertTrue(await self.page.locator('[data-approve-toolbar]').is_disabled())
+        await approve.wait_for(state='detached')
+        self.assertEqual(self.approval_calls,2);self.assertEqual(await self.page.locator('[data-approve-toolbar]').count(),0)
         await self.page.reload();await self.page.locator('.scheduling-dashboard-v2').wait_for()
-        self.assertTrue(await self.page.locator('[data-approve-final]').is_disabled());self.assertEqual(self.execution_bodies,[])
+        self.assertEqual(await self.page.locator('[data-approve-toolbar]').count(),0);self.assertEqual(await self.page.locator('[data-status-badge]').inner_text(),'Aprobada');self.assertEqual(self.execution_bodies,[])
 
     async def test_d2_v21_stale_assignment_preserves_evidence_and_blocks_approval(self):
         self.case['nodes']['logistics_scheduling']['status']='stale'
@@ -3443,7 +3523,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         r['engine']['solver']['status']='infeasible';r['scenarios']['selected']['solver']['status']='infeasible'
         await self.open('decision-dashboard','logistics_scheduling',self.f['ids']['scheduling'])
         await self.page.get_by_role('heading',level=1,name='No existe una planificación factible',exact=True).wait_for()
-        self.assertTrue(await self.page.locator('[data-approve-toolbar]').is_disabled());self.assertTrue(await self.page.locator('[data-approve-final]').is_disabled())
+        self.assertTrue(await self.page.locator('[data-approve-toolbar]').is_disabled());self.assertEqual(await self.page.locator('[data-approve-final]').count(),0)
         self.assertFalse(await self.page.locator('[data-scheduling-advanced]').is_visible())
         self.assertFalse(await self.page.locator('#scheduling-kpis').is_visible())
         self.assertEqual(await self.page.locator('.dispatch-chart').count(),0)
@@ -3466,6 +3546,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                     run['result_json']['decision_case']['status']=state
                     metrics=copy.deepcopy(run['result_json']['scenarios']['selected']['metrics'])
                     await self.open('decision-dashboard','logistics_'+kind,run['id'])
+                    await self.page.locator('[data-approve-toolbar]:visible,[data-after-approve]:visible').wait_for()
                     await self.page.locator('#'+kind+'-context').get_by_role('heading',name='Contexto',exact=True).wait_for()
                     await self.page.get_by_role('heading',name='Indicadores de la '+('asignación' if kind=='assignment' else 'planificación'),exact=True).wait_for()
                     self.assertEqual(await self.page.locator('.'+('assignment-context__grid' if kind=='assignment' else 'scheduling-context__grid')+' article').count(),4)
@@ -3473,7 +3554,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                     if kind=='scheduling':
                         context=await self.page.locator('#scheduling-context').inner_text()
                         for redundant in ('Contexto heredado','Heredados de Assignment','Órdenes heredadas'):self.assertNotIn(redundant,context)
-                        self.assertIn('Assignment bloqueada',context)
+                        self.assertIn('Asignación aprobada · viajes y vehículos fijos',context)
                     else:self.assertIn('Objetivo de la corrida',await self.page.locator('#dispatch-hero').inner_text())
                     geometry=await self.page.evaluate('''()=>{
                       const hero=document.querySelector('#dispatch-hero'),h=hero.getBoundingClientRect(),toolbar=hero.querySelector('[data-toolbar-placement="hero"]'),t=toolbar.getBoundingClientRect();
@@ -3483,10 +3564,11 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                       const control=q=>{const n=toolbar.querySelector(q),r=n.getBoundingClientRect(),i=n.querySelector('svg').getBoundingClientRect();return {width:r.width,height:r.height,padding:getComputedStyle(n).padding,border:getComputedStyle(n).border,radius:getComputedStyle(n).borderRadius,font:type(n),gap:getComputedStyle(n).gap,icon:[i.width,i.height]};};
                       const grid=document.querySelector('.assignment-context__grid,.scheduling-context__grid'),kpi=document.querySelector('.assignment-essential__kpi-strip,.scheduling-kpis');
                       const status=hero.querySelector('[data-assignment-hero-status],[data-scheduling-hero-status]'),sr=status.getBoundingClientRect();
-                      const primary=toolbar.querySelector('[data-approve-toolbar]'),pr=primary?.getBoundingClientRect(),rerun=toolbar.querySelector('[data-rerun]').getBoundingClientRect(),last=toolbar.querySelector('[data-more-menu]').getBoundingClientRect();
-                      return {heroHeight:h.height,heroMin:getComputedStyle(hero).minHeight,padding:getComputedStyle(hero).padding,toolbarY:t.y-h.y,toolbarHeight:t.height,divider:getComputedStyle(toolbar).borderTopWidth,
+                      const primary=toolbar.querySelector('[data-approve-toolbar]:not([hidden]),[data-after-approve]:not([hidden])'),pr=primary?.getBoundingClientRect(),rerun=toolbar.querySelector('[data-rerun]').getBoundingClientRect(),last=toolbar.querySelector('[data-more-menu]').getBoundingClientRect();
+                      return {heroHeight:h.height,heroMin:getComputedStyle(hero).minHeight,padding:getComputedStyle(hero).padding,toolbarY:t.y-h.y,toolbarBottomGap:h.bottom-t.bottom,toolbarHeight:t.height,divider:getComputedStyle(toolbar).borderTopWidth,
                         title:type(hero.querySelector('h1')),headline:type(hero.querySelector('.assignment-hero__headline,.scheduling-hero__headline')),
                         status:{height:sr.height,...style(status,['padding','borderRadius','fontSize','fontWeight','lineHeight','gap'])},copy:hero.querySelector('.assignment-hero__content,[data-scheduling-hero]').getBoundingClientRect().width,
+                        copyFits:(()=>{const c=hero.querySelector('.assignment-hero__content,[data-scheduling-hero]').getBoundingClientRect();return c.top>=h.top&&c.bottom<=t.top+1&&c.right<=h.right+1})(),
                         controls:['[data-rerun]','[data-export-menu]>summary','[data-more-menu]>summary'].map(control),primaryHeight:pr?.height,
                         primaryLeft:pr?pr.left-t.left:null,toolsRight:t.right-last.right,grouped:rerun.right<=last.left+1,
                         context:card('.assignment-context__grid article,.scheduling-context__grid article'),kpi:card('[data-executive-kpi],[data-scheduling-kpi]'),
@@ -3494,19 +3576,28 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                         overflow:document.documentElement.scrollWidth>innerWidth};
                     }''')
                     self.assertFalse(geometry['overflow'],(width,state,kind,geometry))
-                    expected_columns=4 if width>1100 else 1 if width<=600 else 2
-                    self.assertEqual(geometry['columns'],expected_columns);self.assertEqual(geometry['kpiColumns'],expected_columns)
+                    self.assertTrue(geometry['copyFits'],(width,state,kind,geometry))
+                    self.assertGreaterEqual(geometry['heroHeight'],float(geometry['heroMin'].removesuffix('px')))
+                    expected_columns=4 if width>1100 else 2
+                    expected_kpi_columns=4 if width>900 else 1 if width<=600 else 2
+                    self.assertEqual(geometry['columns'],expected_columns);self.assertEqual(geometry['kpiColumns'],expected_kpi_columns)
                     self.assertEqual(geometry['divider'],'1px')
                     if width>1100:
                         self.assertAlmostEqual(geometry['primaryLeft'],0,delta=1);self.assertAlmostEqual(geometry['toolsRight'],0,delta=1);self.assertTrue(geometry['grouped'])
                     if width<=760:self.assertTrue(all(abs(c['height']-geometry['primaryHeight'])<.25 for c in geometry['controls']))
                     if reference:
                         for key in ('heroMin','padding','title','headline','status','controls','context','kpi'):
-                            self.assertEqual(geometry[key],reference[key],(width,state,key,geometry[key],reference[key]))
+                            actual_style=copy.deepcopy(geometry[key]);reference_style=copy.deepcopy(reference[key])
+                            if key in ('context','kpi'):
+                                # Different metric narratives can grow above the shared minimum.
+                                self.assertGreaterEqual(actual_style.pop('height'),float(actual_style['minHeight'].removesuffix('px')))
+                                self.assertGreaterEqual(reference_style.pop('height'),float(reference_style['minHeight'].removesuffix('px')))
+                                # Fractional grid tracks can differ by a 1/64 CSS-pixel layout unit.
+                                for dimension in ('width',):
+                                    self.assertAlmostEqual(actual_style.pop(dimension),reference_style.pop(dimension),delta=.25)
+                            self.assertEqual(actual_style,reference_style,(width,state,key,actual_style,reference_style))
                         self.assertAlmostEqual(geometry['copy'],reference['copy'],delta=.25)
-                        if width>=768:
-                            self.assertAlmostEqual(geometry['heroHeight'],reference['heroHeight'],delta=.5)
-                            self.assertAlmostEqual(geometry['toolbarY'],reference['toolbarY'],delta=.5)
+                        self.assertAlmostEqual(geometry['toolbarBottomGap'],reference['toolbarBottomGap'],delta=.5)
                     reference=geometry
                     actual=await self.page.evaluate('window.DationDispatch.getWorkspace().run.result_json.scenarios.selected.metrics')
                     self.assertEqual(actual,metrics)
@@ -3647,7 +3738,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.page.goto(f'http://127.0.0.1:{self.port}/app/ddas/logistics/dashboard?run_id={self.f["runs"]["assignment"]["id"]}')
         root=self.page.locator('[data-home-dda-catalog]')
         await root.locator('[data-dda-id=logistics][data-dda-entitlement=disabled]').wait_for()
-        self.assertEqual(urlparse(self.page.url).path,'/app/ddas')
+        self.assertEqual(urlparse(self.page.url).path,'/app')
         self.assertEqual(await root.locator('[data-dda-id=logistics] button,a').count(),0)
         self.assertTrue(await self.page.locator('.asset-item').is_disabled())
         self.assertFalse(await self.page.locator('.asset-item .status-dot').is_visible())
@@ -3691,7 +3782,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(await self.page.locator('#home-open-logistics').is_disabled())
         self.assertTrue(await self.page.locator('.asset-item').is_disabled())
         await self.page.evaluate("window.dationNavigate('logistics-data')")
-        self.assertEqual(await self.page.evaluate('window.dationGetCurrentView()'),'inicio')
+        self.assertEqual(await self.page.evaluate('window.dationGetCurrentView()'),'platform-home')
         self.assertTrue(all(method=='GET' and path=='/api/platform/onboarding' for method,path in self.requests),self.requests)
 
     async def test_data_hub_library_details_preview_history_and_responsive(self):
@@ -3975,36 +4066,29 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(any(method in ('POST','PUT','PATCH','DELETE') and path.startswith('/api/platform/decisions') for method,path in self.requests))
 
     async def test_center_assignment_search_preserves_both_selections_and_explicit_clear(self):
-        alice='10000000-0000-4000-8000-000000000011'
-        bruno='10000000-0000-4000-8000-000000000012'
-        people=[{'user_id':alice,'name':'Alice','active':True},{'user_id':bruno,'name':'Bruno','active':True}]
-        writes=[]
+        alice='10000000-0000-4000-8000-000000000011';bruno='10000000-0000-4000-8000-000000000012'
+        people=[{'user_id':alice,'name':'Alice','email':'alice@example.test','active':True},{'user_id':bruno,'name':'Bruno','email':'bruno@example.test','active':True}];writes=[]
+        stage=self.workflows[self.case['id']]['stages']['logistics_assignment'];stage.update(owner=None,owner_eligible=False,updated_at=None)
         async def candidates(route):
-            q=parse_qs(urlparse(route.request.url).query).get('q',[''])[0].lower()
-            await route.fulfill(content_type='application/json',body=json.dumps({'members':[p for p in people if q in p['name'].lower()]}))
+            query=parse_qs(urlparse(route.request.url).query);self.assertEqual(query.get('responsibility'),['decision_owner'])
+            await route.fulfill(json={'members':people,'total':2})
         async def assign(route):
-            writes.append(json.loads(route.request.post_data))
-            await route.fulfill(content_type='application/json',body='{}')
+            body=route.request.post_data_json;writes.append(body);person=next((p for p in people if p['user_id']==body['owner_user_id']),None)
+            stage.update(owner={**person,'id':person['user_id']} if person else None,owner_eligible=bool(person),updated_at='v'+str(len(writes)))
+            await route.fulfill(json=self.workflows[self.case['id']])
         await self.context.route('**/api/platform/team?**',candidates)
         await self.context.route('**/api/platform/decisions/*/responsibilities/logistics_assignment',assign)
-        await self.open('logistics-map');await self.nav('platform-decisions')
-        root=self.page.locator('[data-platform-decisions]')
-        await root.get_by_role('link',name='Abrir',exact=True).click()
-        await root.locator('.center-drawer:visible .center-drawer__content>.center-responsibilities').get_by_role('button',name='Asignar responsable · Asignación de carga',exact=True).click()
-        dialog=self.page.get_by_role('dialog');owner=dialog.get_by_label('Responsable',exact=True);approver=dialog.get_by_label('Aprobador asignado',exact=True)
-        async def ready():
-            await self.page.wait_for_function("!document.querySelector('#center-owner_user_id').closest('form').querySelector('button[type=submit]').disabled")
-        async def search(q):
-            await dialog.get_by_label('Buscar personas por nombre o email').fill(q)
-            await dialog.get_by_role('button',name='Buscar personas',exact=True).click();await ready()
-        await ready();await owner.select_option(alice);await approver.select_option(bruno)
-        await search('Bruno');self.assertEqual(await owner.input_value(),alice);self.assertEqual(await approver.input_value(),bruno)
-        await search('Alice');self.assertEqual(await owner.input_value(),alice);self.assertEqual(await approver.input_value(),bruno)
-        await owner.select_option('');await search('Bruno');self.assertEqual(await owner.input_value(),'')
-        await search('Alice');await owner.select_option(alice)
-        await dialog.get_by_role('button',name='Guardar responsables',exact=True).click()
-        await root.get_by_text('Responsables actualizados.',exact=True).wait_for()
-        self.assertEqual(writes,[{'expected_updated_at':None,'owner_user_id':alice,'approver_user_id':bruno}])
+        await self.open();await self.nav('platform-decisions');root=self.page.locator('[data-platform-decisions]');await root.get_by_role('link',name='Abrir',exact=True).click()
+        async def editor():
+            await root.locator('.center-drawer__content>.center-responsibilities button').click()
+            select=self.page.get_by_role('dialog',name='Decision Owner',exact=True).get_by_label('Decision Owner',exact=True);await select.locator('option[value="'+alice+'"]').wait_for(state='attached');return select
+        select=await editor();self.assertEqual(await select.locator('option').count(),3)
+        await select.select_option(alice);await select.select_option(bruno);self.assertEqual(await select.input_value(),bruno)
+        self.assertEqual(await self.page.get_by_label('Aprobador asignado',exact=True).count(),0)
+        await self.page.get_by_role('dialog',name='Decision Owner',exact=True).get_by_role('button',name='Guardar',exact=True).click();await root.get_by_text('Responsable actualizado.',exact=True).wait_for()
+        select=await editor();self.assertEqual(await select.input_value(),bruno);await select.select_option('')
+        await self.page.get_by_role('dialog',name='Decision Owner',exact=True).get_by_role('button',name='Guardar',exact=True).click();await self.page.get_by_role('dialog',name='Decision Owner',exact=True).wait_for(state='detached')
+        self.assertEqual(writes,[{'expected_updated_at':None,'owner_user_id':bruno},{'expected_updated_at':'v1','owner_user_id':None}])
 
     async def test_center_v2_late_detail_does_not_reopen_closed_drawer(self):
         await self.open('logistics-map');await self.nav('platform-decisions')

@@ -190,18 +190,20 @@ class TenancyTests(unittest.TestCase):
             self.assertEqual(self.checked(viewer.get('/api/platform/home'))['attention']['total'],0)
         self.checked(self.a.post('/api/runs/'+run['id']+'/approve',json={'case_id':ca,'node_id':'logistics_assignment'}))
         self.assertEqual(self.checked(self.a.get('/api/platform/home'))['attention']['total'],0)
-        # A new candidate does not revoke the earlier approved version, but it
-        # still appears for review when the actual new run finishes.
+        # F16: admission supersedes current approval but retains historical evidence.
         newer=self.checked(self.a.post('/api/runs',json=self.body(ca,oa,fa)),202)
         recent=self.checked(self.a.get('/api/platform/home'))['recent_cases'][0]
         self.assertEqual((recent['case_id'],recent['run_id'],recent['node_id']),(ca,newer['id'],'logistics_assignment'))
         self.assertIn(recent['status'],('running','review'))
-        self.assertEqual(recent['resume']['run_id'],run['id']);self.assertTrue(recent['approval_current'])
+        self.assertEqual(recent['resume']['run_id'],newer['id']);self.assertFalse(recent['approval_current'])
+        historical=self.checked(self.a.get('/api/runs/'+run['id']))
+        self.assertTrue(historical['approved_at']);self.assertTrue(historical['superseded_at'])
         wait_for(lambda:completed(newer['id']),'Home replacement candidate',timeout=60)
         home=self.checked(self.a.get('/api/platform/home'))
         self.assertEqual(home['attention']['items'][0]['run_id'],newer['id'])
         self.assertEqual((home['recent_cases'][0]['run_id'],home['recent_cases'][0]['status']),(newer['id'],'review'))
-        self.assertEqual(home['recent_cases'][0]['resume']['run_id'],run['id'])
+        self.assertEqual(home['recent_cases'][0]['resume']['run_id'],newer['id'])
+        self.assertFalse(home['recent_cases'][0]['approval_current'])
         stamp=lambda:self.s.sql("SELECT (SELECT count(*) FROM decision_runs)||':'||(SELECT count(*) FROM decision_approval_events)||':'||(SELECT count(*) FROM audit_events);")
         before=stamp();root=Path(__file__).resolve().parents[2]
         browser=subprocess.run([str(root/'.browser-venv/bin/python'),str(root/'tests/e2e/home_resume_journey.py')],cwd=root,env={**self.s.env,'DATION_E2E_URL':self.s.api_url,'DATION_HOME_CASE':ca,'DATION_HOME_OFFICIAL':run['id'],'DATION_HOME_CANDIDATE':newer['id']},capture_output=True,text=True,timeout=120)

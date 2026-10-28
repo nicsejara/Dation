@@ -1,0 +1,104 @@
+{
+  "states": 32,
+  "before_failing_states": 4,
+  "after_failing_states": 0,
+  "normal_height_style_parity": true,
+  "normal_height_screenshots": [
+    {
+      "file": "data-320-568-rest.png",
+      "normal_height_pixel_identical": true
+    },
+    {
+      "file": "map-320-568-rest.png",
+      "normal_height_pixel_identical": true
+    },
+    {
+      "file": "assignment-320-568-rest.png",
+      "normal_height_pixel_identical": true
+    },
+    {
+      "file": "scheduling-320-568-rest.png",
+      "normal_height_pixel_identical": true
+    },
+    {
+      "file": "data-1440-1000-rest.png",
+      "normal_height_pixel_identical": true
+    },
+    {
+      "file": "map-1440-1000-rest.png",
+      "normal_height_pixel_identical": true
+    },
+    {
+      "file": "assignment-1440-1000-rest.png",
+      "normal_height_pixel_identical": true
+    },
+    {
+      "file": "scheduling-1440-1000-rest.png",
+      "normal_height_pixel_identical": true
+    },
+    {
+      "file": "data-1280-1000-rest.png",
+      "normal_height_pixel_identical": true
+    },
+    {
+      "file": "map-1280-1000-rest.png",
+      "normal_height_pixel_identical": true
+    },
+    {
+      "file": "assignment-1280-1000-rest.png",
+      "normal_height_pixel_identical": true
+    },
+    {
+      "file": "scheduling-1280-1000-rest.png",
+      "normal_height_pixel_identical": true
+    },
+    {
+      "file": "data-1024-1000-rest.png",
+      "normal_height_pixel_identical": true
+    },
+    {
+      "file": "map-1024-1000-rest.png",
+      "normal_height_pixel_identical": true
+    },
+    {
+      "file": "assignment-1024-1000-rest.png",
+      "normal_height_pixel_identical": true
+    },
+    {
+      "file": "scheduling-1024-1000-rest.png",
+      "normal_height_pixel_identical": true
+    },
+    {
+      "file": "data-768-1000-rest.png",
+      "normal_height_pixel_identical": true
+    },
+    {
+      "file": "map-768-1000-rest.png",
+      "normal_height_pixel_identical": true
+    },
+    {
+      "file": "assignment-768-1000-rest.png",
+      "normal_height_pixel_identical": true
+    },
+    {
+      "file": "scheduling-768-1000-rest.png",
+      "normal_height_pixel_identical": true
+    },
+    {
+      "file": "data-390-844-rest.png",
+      "normal_height_pixel_identical": true
+    },
+    {
+      "file": "map-390-844-rest.png",
+      "normal_height_pixel_identical": true
+    },
+    {
+      "file": "assignment-390-844-rest.png",
+      "normal_height_pixel_identical": true
+    },
+    {
+      "file": "scheduling-390-844-rest.png",
+      "normal_height_pixel_identical": true
+    }
+  ]
+}

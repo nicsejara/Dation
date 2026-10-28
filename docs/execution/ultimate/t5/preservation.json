@@ -1,0 +1,773 @@
+{
+  "phase": "T5",
+  "baseline_pending_files": 627,
+  "checkpoint_copies_verified": 627,
+  "unchanged_current_baseline_files": 618,
+  "intentionally_extended_baseline_files": [
+    "backend/app/platform/decision_center.py",
+    "backend/app/platform/home.py",
+    "backend/app/platform/routes.py",
+    "backend/app/platform/ultimate_routes.py",
+    "backend/app/static/js/dispatch/cases/ultimate-case-setup.mjs",
+    "backend/app/static/js/dispatch/upload/ultimate-case-data.mjs",
+    "backend/app/static/js/dispatch/workspace.mjs",
+    "backend/app/static/js/platform/dda-navigation.mjs",
+    "backend/tests/browser/test_ultimate_case_setup.py"
+  ],
+  "historical_T4_manifest_unchanged": true,
+  "historical_T4_entries_verified": 147,
+  "T4_resolution": [
+    {
+      "path": "backend/app/domain/logistics/data_contracts.py",
+      "sha256_verified": true,
+      "resolved_from": "backend/app/domain/logistics/data_contracts.py"
+    },
+    {
+      "path": "backend/app/domain/logistics/normalizers.py",
+      "sha256_verified": true,
+      "resolved_from": "backend/app/domain/logistics/normalizers.py"
+    },
+    {
+      "path": "backend/app/models/ultimate_data_pack.py",
+      "sha256_verified": true,
+      "resolved_from": "backend/app/models/ultimate_data_pack.py"
+    },
+    {
+      "path": "backend/app/platform/data_hub.py",
+      "sha256_verified": true,
+      "resolved_from": "backend/app/platform/data_hub.py"
+    },
+    {
+      "path": "backend/app/platform/data_routes.py",
+      "sha256_verified": true,
+      "resolved_from": "backend/app/platform/data_routes.py"
+    },
+    {
+      "path": "backend/app/platform/identity.py",
+      "sha256_verified": true,
+      "resolved_from": "backend/app/platform/identity.py"
+    },
+    {
+      "path": "backend/app/platform/routes.py",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t5/evidence/post-t4/backend/app/platform/routes.py"
+    },
+    {
+      "path": "backend/app/platform/ultimate_data_routes.py",
+      "sha256_verified": true,
+      "resolved_from": "backend/app/platform/ultimate_data_routes.py"
+    },
+    {
+      "path": "backend/app/services/case_data_pack_service.py",
+      "sha256_verified": true,
+      "resolved_from": "backend/app/services/case_data_pack_service.py"
+    },
+    {
+      "path": "backend/app/static/css/ultimate-case-data.css",
+      "sha256_verified": true,
+      "resolved_from": "backend/app/static/css/ultimate-case-data.css"
+    },
+    {
+      "path": "backend/app/static/js/dispatch/cases/ultimate-case-setup.mjs",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t5/evidence/post-t4/backend/app/static/js/dispatch/cases/ultimate-case-setup.mjs"
+    },
+    {
+      "path": "backend/app/static/js/dispatch/navigation/resource.mjs",
+      "sha256_verified": true,
+      "resolved_from": "backend/app/static/js/dispatch/navigation/resource.mjs"
+    },
+    {
+      "path": "backend/app/static/js/dispatch/upload/ultimate-case-data.mjs",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t5/evidence/post-t4/backend/app/static/js/dispatch/upload/ultimate-case-data.mjs"
+    },
+    {
+      "path": "backend/app/static/js/dispatch/workspace.mjs",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t5/evidence/post-t4/backend/app/static/js/dispatch/workspace.mjs"
+    },
+    {
+      "path": "backend/app/static/js/platform/data-hub.mjs",
+      "sha256_verified": true,
+      "resolved_from": "backend/app/static/js/platform/data-hub.mjs"
+    },
+    {
+      "path": "backend/app/static/js/platform/data-presentation.mjs",
+      "sha256_verified": true,
+      "resolved_from": "backend/app/static/js/platform/data-presentation.mjs"
+    },
+    {
+      "path": "backend/app/static/js/platform/dda-navigation.mjs",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t5/evidence/post-t4/backend/app/static/js/platform/dda-navigation.mjs"
+    },
+    {
+      "path": "backend/app/templates/app.html",
+      "sha256_verified": true,
+      "resolved_from": "backend/app/templates/app.html"
+    },
+    {
+      "path": "backend/tests/browser/test_ultimate_case_data.py",
+      "sha256_verified": true,
+      "resolved_from": "backend/tests/browser/test_ultimate_case_data.py"
+    },
+    {
+      "path": "backend/tests/e2e/ultimate_data_fixture.py",
+      "sha256_verified": true,
+      "resolved_from": "backend/tests/e2e/ultimate_data_fixture.py"
+    },
+    {
+      "path": "backend/tests/e2e/ultimate_storage_gateway.py",
+      "sha256_verified": true,
+      "resolved_from": "backend/tests/e2e/ultimate_storage_gateway.py"
+    },
+    {
+      "path": "backend/tests/integration/test_ultimate_data_pack.py",
+      "sha256_verified": true,
+      "resolved_from": "backend/tests/integration/test_ultimate_data_pack.py"
+    },
+    {
+      "path": "backend/tests/test_ultimate_data_contracts.py",
+      "sha256_verified": true,
+      "resolved_from": "backend/tests/test_ultimate_data_contracts.py"
+    },
+    {
+      "path": "backend/tests/test_ultimate_data_navigation.mjs",
+      "sha256_verified": true,
+      "resolved_from": "backend/tests/test_ultimate_data_navigation.mjs"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/command-ledger.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/command-ledger.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/B-NODE.log",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/B-NODE.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/B-NODE.result.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/B-NODE.result.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/B-PY.log",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/B-PY.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/B-PY.result.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/B-PY.result.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/FOCAL-LEGACY-API.log",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/FOCAL-LEGACY-API.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/FOCAL-LEGACY-API.result.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/FOCAL-LEGACY-API.result.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/FOCAL-T3-BROWSER.log",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/FOCAL-T3-BROWSER.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/FOCAL-T3-BROWSER.result.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/FOCAL-T3-BROWSER.result.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/S4.log",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/S4.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/S4.result.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/S4.result.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/T4-user-request.txt",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/T4-user-request.txt"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/W4.log",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/W4.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/W4.result.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/W4.result.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/attempts/before-composition-W4.log",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/attempts/before-composition-W4.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/attempts/before-composition-W4.result.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/attempts/before-composition-W4.result.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/attempts/before-copy-W4.log",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/attempts/before-copy-W4.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/attempts/before-copy-W4.result.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/attempts/before-copy-W4.result.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/attempts/compatible-debug.log",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/attempts/compatible-debug.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/attempts/s4-01.log",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/attempts/s4-01.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/attempts/s4-focal-02.log",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/attempts/s4-focal-02.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/attempts/schema-boundary.log",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/attempts/schema-boundary.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/attempts/u4-01.log",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/attempts/u4-01.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/attempts/visual-parity.log",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/attempts/visual-parity.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/attempts/w4-01.log",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/attempts/w4-01.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/attempts/w4-02.log",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/attempts/w4-02.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/attempts/w4-03.log",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/attempts/w4-03.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/browser/case-data-1024.png",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/browser/case-data-1024.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/browser/case-data-1280.png",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/browser/case-data-1280.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/browser/case-data-1440.png",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/browser/case-data-1440.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/browser/case-data-320.png",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/browser/case-data-320.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/browser/case-data-390.png",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/browser/case-data-390.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/browser/case-data-768.png",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/browser/case-data-768.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/browser/case-data-zoom200.png",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/browser/case-data-zoom200.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/browser/contrast.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/browser/contrast.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/browser/fixture.log",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/browser/fixture.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/browser/keyboard-focus.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/browser/keyboard-focus.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/browser/published-case.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/browser/published-case.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/browser/responsive.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/browser/responsive.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/browser/test_01_upload_preview_publish_two_slots_and_reload.png",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/browser/test_01_upload_preview_publish_two_slots_and_reload.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/browser/test_02_validation_drawer_exact_columns_and_keyboard_escape.png",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/browser/test_02_validation_drawer_exact_columns_and_keyboard_escape.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/browser/test_03_interrupted_upload_reload_recovery_and_publish.png",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/browser/test_03_interrupted_upload_reload_recovery_and_publish.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/browser/test_04_lost_publication_response_recovers_same_intent.png",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/browser/test_04_lost_publication_response_recovers_same_intent.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/browser/test_05_compatible_reuse_and_cas_conflict_keep_selection.png",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/browser/test_05_compatible_reuse_and_cas_conflict_keep_selection.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/browser/test_06_responsive_long_filename_zoom_touch_contrast_and_focus.png",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/browser/test_06_responsive_long_filename_zoom_touch_contrast_and_focus.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/browser/test_07_viewer_reads_and_setup_context_link_is_recoverable.png",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/browser/test_07_viewer_reads_and_setup_context_link_is_recoverable.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/browser/test_08_saving_one_slot_keeps_the_other_selected_csv.png",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/browser/test_08_saving_one_slot_keeps_the_other_selected_csv.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/candidate-before-composition-fix.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/candidate-before-composition-fix.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/candidate-before-copy.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/candidate-before-copy.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/candidate.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/candidate.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/cleanup.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/cleanup.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/dation-t4-before-visual.py",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/dation-t4-before-visual.py"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/dation-t4-consolidate.py",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/dation-t4-consolidate.py"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/dation-t4-finalize.py",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/dation-t4-finalize.py"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/dation-t4-qa.py",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/dation-t4-qa.py"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/dation-t4-schema-evidence.py",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/dation-t4-schema-evidence.py"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/dation-t4-visual-parity.py",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/dation-t4-visual-parity.py"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/evidence-label-corrections.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/evidence-label-corrections.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/final-state.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/final-state.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/initial-state.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/initial-state.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/legacy-api/data-hub/dataset-1024.png",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/legacy-api/data-hub/dataset-1024.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/legacy-api/data-hub/dataset-1280.png",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/legacy-api/data-hub/dataset-1280.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/legacy-api/data-hub/dataset-1440.png",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/legacy-api/data-hub/dataset-1440.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/legacy-api/data-hub/dataset-390.png",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/legacy-api/data-hub/dataset-390.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/legacy-api/data-hub/dataset-768.png",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/legacy-api/data-hub/dataset-768.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/post-t3-tracked.patch",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/post-t3-tracked.patch"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/post-t3/backend/app/platform/identity.py",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/post-t3/backend/app/platform/identity.py"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/post-t3/backend/app/platform/routes.py",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/post-t3/backend/app/platform/routes.py"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/post-t3/backend/app/static/js/dispatch/cases/ultimate-case-setup.mjs",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/post-t3/backend/app/static/js/dispatch/cases/ultimate-case-setup.mjs"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/post-t3/backend/app/static/js/dispatch/navigation/resource.mjs",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/post-t3/backend/app/static/js/dispatch/navigation/resource.mjs"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/post-t3/backend/app/static/js/dispatch/workspace.mjs",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/post-t3/backend/app/static/js/dispatch/workspace.mjs"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/post-t3/backend/app/static/js/platform/dda-navigation.mjs",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/post-t3/backend/app/static/js/platform/dda-navigation.mjs"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/post-t3/backend/app/templates/app.html",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/post-t3/backend/app/templates/app.html"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/qa-batch.log",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/qa-batch.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/qa-final-composition.log",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/qa-final-composition.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/qa-final-w4.log",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/qa-final-w4.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/qa-reuse-before-composition-fix.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/qa-reuse-before-composition-fix.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/qa-reuse.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/qa-reuse.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/runtime.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/runtime.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/samples/source.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/samples/source.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/samples/transport_demand-contract.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/samples/transport_demand-contract.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/samples/transport_demand-normalized.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/samples/transport_demand-normalized.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/samples/transport_demand-validation.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/samples/transport_demand-validation.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/samples/transport_demand.csv",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/samples/transport_demand.csv"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/samples/transport_resources-contract.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/samples/transport_resources-contract.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/samples/transport_resources-normalized.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/samples/transport_resources-normalized.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/samples/transport_resources-validation.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/samples/transport_resources-validation.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/samples/transport_resources.csv",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/samples/transport_resources.csv"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/schema-boundary.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/schema-boundary.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/skills/break-ui/CATALOG.md",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/skills/break-ui/CATALOG.md"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/skills/break-ui/SKILL.md",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/skills/break-ui/SKILL.md"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/skills/design-system/SKILL.md",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/skills/design-system/SKILL.md"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/skills/design-system/references/states-and-variants.md",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/skills/design-system/references/states-and-variants.md"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/skills/design-system/references/token-architecture.md",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/skills/design-system/references/token-architecture.md"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/skills/emil-design-eng/SKILL.md",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/skills/emil-design-eng/SKILL.md"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/skills/postgres-skill.txt",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/skills/postgres-skill.txt"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/skills/runtime-skill.txt",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/skills/runtime-skill.txt"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/skills/supabase-skill.txt",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/skills/supabase-skill.txt"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/skills/ui-ux-pro-max/SKILL.md",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/skills/ui-ux-pro-max/SKILL.md"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/t4-changes.patch",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/t4-changes.patch"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/visual-before/foundation-1440.png",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/visual-before/foundation-1440.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/visual-before/foundation-390.png",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/visual-before/foundation-390.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/visual-before/tokens-1440.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/visual-before/tokens-1440.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/visual-before/tokens-390.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/visual-before/tokens-390.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/visual-composition-fix/before-1440.png",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/visual-composition-fix/before-1440.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/visual-composition-fix/before-390.png",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/visual-composition-fix/before-390.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/visual-parity/after-1024.png",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/visual-parity/after-1024.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/visual-parity/after-1280.png",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/visual-parity/after-1280.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/visual-parity/after-1440.png",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/visual-parity/after-1440.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/visual-parity/after-390.png",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/visual-parity/after-390.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/visual-parity/after-768.png",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/visual-parity/after-768.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/visual-parity/before-1024.png",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/visual-parity/before-1024.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/visual-parity/before-1280.png",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/visual-parity/before-1280.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/visual-parity/before-1440.png",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/visual-parity/before-1440.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/visual-parity/before-390.png",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/visual-parity/before-390.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/visual-parity/before-768.png",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/visual-parity/before-768.png"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/evidence/visual-parity/parity.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/evidence/visual-parity/parity.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/preservation.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/preservation.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/scope-diff.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/scope-diff.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/skills-ledger.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/skills-ledger.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/t4-execution-report.md",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/t4-execution-report.md"
+    },
+    {
+      "path": "docs/execution/ultimate/t4/test-ledger.json",
+      "sha256_verified": true,
+      "resolved_from": "docs/execution/ultimate/t4/test-ledger.json"
+    },
+    {
+      "path": "supabase/migrations/20261026184655_ultimate_progressive_data_pack.sql",
+      "sha256_verified": true,
+      "resolved_from": "supabase/migrations/20261026184655_ultimate_progressive_data_pack.sql"
+    }
+  ],
+  "pre_STOP_inventory_verified": 8,
+  "pre_STOP_files_unchanged": [
+    "backend/app/domain/logistics/definitions.py",
+    "backend/app/domain/logistics/graph.py",
+    "backend/app/domain/logistics/requirements.py",
+    "backend/app/platform/routes.py",
+    "backend/app/platform/ultimate_graph_routes.py",
+    "backend/tests/test_ultimate_graph.py"
+  ],
+  "pre_STOP_files_extended_after_recovery": [
+    "backend/app/services/decision_graph_service.py",
+    "supabase/migrations/20261027033128_ultimate_decision_graph.sql"
+  ],
+  "reason_for_extensions": {
+    "backend/app/services/decision_graph_service.py": "Shared callers, actors/history count integration; existing resolver reused.",
+    "supabase/migrations/20261027033128_ultimate_decision_graph.sql": "S5 found error_message column mismatch; completed read-only metadata/cohort/count projection."
+  }
+}

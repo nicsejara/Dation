@@ -3,10 +3,20 @@ import {DECISION_META} from '../decision-ui.mjs';
 import {decisionRail,bindDecisionRail} from './decision-nav.mjs';
 import {hasCaseExecutions,caseAttributesReady} from '../cases/case-identity.mjs';
 import {configurationAvailable} from './decision-target.mjs';
+import {graphTarget} from './ultimate-graph.mjs';
 
 const views=['logistics-data','logistics-map','logistics-config','decision-dashboard'];
 const signatures=new WeakMap();
 export function caseFlowSteps(view,route,state={}){
+ const graph=state.ultimateGraph?.case_id===route.caseId?state.ultimateGraph:null;
+ if(graph){
+  const node=graph.nodes.find(n=>n.id===(route.nodeId||graph.attention_node_id)),result=node?.actions.result;
+  return ['Datos del Case','Mapa de decisiones','Configurar decisión','Dashboard'].map((label,index)=>{
+   const target=index===0?{view:'logistics-case-data',caseId:route.caseId,nodeId:null,runId:null}:index===1?{view:'logistics-map',caseId:route.caseId,nodeId:null,runId:null}:index===2?graphTarget(node?.actions.configure.target):route.runId?{view:'decision-dashboard',caseId:route.caseId,nodeId:route.nodeId,runId:route.runId}:graphTarget(result?.target);
+   return {label,view:target?.view,current:target?.view===view,disabled:index===2?!node?.actions.configure.allowed:index===3?!route.runId&&!result?.allowed:false,
+    completed:false,context:index>=2&&target?.view===view?node?.label:null,target};
+  });
+ }
  const own=state.decisionCase?.id===route.caseId?state.decisionCase:null;
  const node=own?.nodes?.[route.nodeId],target=node&&resolveNodeDestination(route.nodeId,node);
  const hasRun=target?.view==='decision-dashboard',selected=Boolean(node&&target);
@@ -31,8 +41,9 @@ export function revealCurrentStep(root){
  root.scrollLeft+=offset-(root.clientWidth-step.offsetWidth)/2;
 }
 export function renderCaseFlow(root,{view,route,state={}}){
- root.parentElement.hidden=!views.includes(view);
- if(!views.includes(view)){root.replaceChildren();signatures.delete(root);return;}
+ const visible=[...views,'logistics-case-data'].includes(view);
+ root.parentElement.hidden=!visible;
+ if(!visible){root.replaceChildren();signatures.delete(root);return;}
  const steps=caseFlowSteps(view,route,state),signature=JSON.stringify(steps);
  if(signatures.get(root)===signature&&root.children.length)return;
  signatures.set(root,signature);root.replaceChildren();

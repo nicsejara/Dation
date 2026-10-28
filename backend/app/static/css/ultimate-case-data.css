@@ -1,0 +1,16 @@
+/* T4 composition only: existing upload controls/cards/validation retain their CSS. */
+.ultimate-case-data .t4-slots { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-5);min-width:0; }
+.ultimate-case-data :is(.t4-slot,.t4-current,.t4-candidates,.t4-publish,.t4-history,.t4-preview) { display:grid;gap:var(--space-3);min-width:0;align-content:start; }
+.ultimate-case-data :is(.t4-current,.t4-candidates,.t4-publish,.t4-history,.t4-preview,.t4-manifest) { padding:var(--space-4); }
+.ultimate-case-data :is(.t4-candidate,.t4-history-row,.t4-reuse-row) { display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-3);min-width:0; }
+.ultimate-case-data .t4-candidate { padding-block:var(--space-3);border-block-end:1px solid var(--color-border); }
+.ultimate-case-data .t4-candidate>p { flex:1 1 100%;overflow-wrap:anywhere; }
+.ultimate-case-data .dispatch-pro-file-card { min-width:0; }
+.ultimate-case-data .dispatch-pro-inline-validation-body { overflow:hidden;min-width:0; }
+.ultimate-case-data .dispatch-pro-inline-validation-body>.dispatch-table-wrap { max-height:300px; }
+.ultimate-case-data .dispatch-table-wrap table { width:max-content;min-width:100%; }
+.ultimate-case-data .dispatch-table-wrap th { white-space:nowrap; }
+.ultimate-case-data .dispatch-table-wrap td { min-width:6rem;max-width:26rem; }
+.ultimate-case-data .t4-contract-dialog { width:min(960px,calc(100vw - 32px)); }
+.ultimate-case-data :is(td,th,.d-id) { overflow-wrap:anywhere; }
+@media(max-width:1100px) { .ultimate-case-data .t4-slots { grid-template-columns:minmax(0,1fr); } }

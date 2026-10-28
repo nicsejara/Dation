@@ -1,0 +1,56 @@
+{
+  "phase": "T7",
+  "available_local_skills": [
+    ".agents/skills/banner-design/SKILL.md",
+    ".agents/skills/brand/SKILL.md",
+    ".agents/skills/break-ui/SKILL.md",
+    ".agents/skills/design/SKILL.md",
+    ".agents/skills/design-system/SKILL.md",
+    ".agents/skills/design-taste-frontend/SKILL.md",
+    ".agents/skills/emil-design-eng/SKILL.md",
+    ".agents/skills/improve-animations/SKILL.md",
+    ".agents/skills/review-animations/SKILL.md",
+    ".agents/skills/slides/SKILL.md",
+    ".agents/skills/ui-styling/SKILL.md",
+    ".agents/skills/ui-ux-pro-max/SKILL.md"
+  ],
+  "used": [
+    {
+      "name": "cloud-environment:cloud-environment-runtime",
+      "package": "c5/cloud-environment-runtime",
+      "read_this_phase": true,
+      "source": "skill://plugin_connector_1p_c5b7d5df5d7081918f2c4be5a633ed5d/cloud-environment-runtime/SKILL.md",
+      "snapshot": "evidence/skills/runtime-skill.txt",
+      "sha256": "de2ea16a5a8727be2a6cbf6a57d60c3eac1082119dd9685e69a2b8e83db120bc",
+      "applied": [
+        "current managed environment status",
+        "local runners",
+        "production-credential-cleared QA"
+      ],
+      "verified": [
+        "running/connected with current observations",
+        "Python3.13.5 OR-Tools9.15.6755 Node24.19.0",
+        "three mandatory suites PASS"
+      ]
+    }
+  ],
+  "not_available": [
+    "dedicated Python/domain skill",
+    "dedicated optimization skill",
+    "dedicated Python testing skill"
+  ],
+  "not_applicable": [
+    {
+      "category": "design/UI",
+      "reason": "No frontend changes."
+    },
+    {
+      "category": "Supabase/Docker",
+      "reason": "No schema, SQL, remote project or new container used."
+    }
+  ],
+  "tools_installed": false,
+  "dependencies_installed": false,
+  "subagents_used": false,
+  "precedence": "Approved contracts and invariants before Skill guidance"
+}

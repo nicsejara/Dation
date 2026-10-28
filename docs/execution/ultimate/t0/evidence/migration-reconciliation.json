@@ -1,0 +1,237 @@
+{
+  "git_migrations": [
+    {
+      "path": "supabase/migrations/20261001004934_dispatch_v1.sql",
+      "version": "20261001004934",
+      "exact_remote_history_version": false,
+      "rebuild_role": "captured baseline covers this historical period; not replayed"
+    },
+    {
+      "path": "supabase/migrations/20261001193000_dataset_library.sql",
+      "version": "20261001193000",
+      "exact_remote_history_version": false,
+      "rebuild_role": "captured baseline covers this historical period; not replayed"
+    },
+    {
+      "path": "supabase/migrations/20261002184751_dispatch_v2_integrity.sql",
+      "version": "20261002184751",
+      "exact_remote_history_version": true,
+      "rebuild_role": "captured baseline covers this historical period; not replayed"
+    },
+    {
+      "path": "supabase/migrations/20261004183243_dataset_canonical_filename.sql",
+      "version": "20261004183243",
+      "exact_remote_history_version": true,
+      "rebuild_role": "captured baseline covers this historical period; not replayed"
+    },
+    {
+      "path": "supabase/migrations/20261005010436_decision_cases_v1.sql",
+      "version": "20261005010436",
+      "exact_remote_history_version": true,
+      "rebuild_role": "captured baseline covers this historical period; not replayed"
+    },
+    {
+      "path": "supabase/migrations/20261005010758_decision_cases_v1_activity_fix.sql",
+      "version": "20261005010758",
+      "exact_remote_history_version": true,
+      "rebuild_role": "captured baseline covers this historical period; not replayed"
+    },
+    {
+      "path": "supabase/migrations/20261005012207_decision_run_history_v2.sql",
+      "version": "20261005012207",
+      "exact_remote_history_version": true,
+      "rebuild_role": "captured baseline covers this historical period; not replayed"
+    },
+    {
+      "path": "supabase/migrations/20261010100000_dispatch_durable_jobs.sql",
+      "version": "20261010100000",
+      "exact_remote_history_version": false,
+      "rebuild_role": "captured baseline covers this historical period; not replayed"
+    },
+    {
+      "path": "supabase/migrations/20261010183000_persistence_traceability.sql",
+      "version": "20261010183000",
+      "exact_remote_history_version": false,
+      "rebuild_role": "applied after baseline to owned reconstruction"
+    },
+    {
+      "path": "supabase/migrations/20261010190000_approval_clock_after_lock.sql",
+      "version": "20261010190000",
+      "exact_remote_history_version": false,
+      "rebuild_role": "applied after baseline to owned reconstruction"
+    },
+    {
+      "path": "supabase/migrations/20261010220000_case_list_performance.sql",
+      "version": "20261010220000",
+      "exact_remote_history_version": false,
+      "rebuild_role": "applied after baseline to owned reconstruction"
+    },
+    {
+      "path": "supabase/migrations/20261010233000_operational_observability.sql",
+      "version": "20261010233000",
+      "exact_remote_history_version": false,
+      "rebuild_role": "applied after baseline to owned reconstruction"
+    },
+    {
+      "path": "supabase/migrations/20261013090000_progressive_comparative_analysis.sql",
+      "version": "20261013090000",
+      "exact_remote_history_version": false,
+      "rebuild_role": "applied after baseline to owned reconstruction"
+    },
+    {
+      "path": "supabase/migrations/20261018090000_platform_identity_tenancy.sql",
+      "version": "20261018090000",
+      "exact_remote_history_version": false,
+      "rebuild_role": "applied after baseline to owned reconstruction"
+    },
+    {
+      "path": "supabase/migrations/20261018100000_platform_profile.sql",
+      "version": "20261018100000",
+      "exact_remote_history_version": false,
+      "rebuild_role": "applied after baseline to owned reconstruction"
+    },
+    {
+      "path": "supabase/migrations/20261018110000_platform_home.sql",
+      "version": "20261018110000",
+      "exact_remote_history_version": false,
+      "rebuild_role": "applied after baseline to owned reconstruction"
+    },
+    {
+      "path": "supabase/migrations/20261018120000_platform_data_hub.sql",
+      "version": "20261018120000",
+      "exact_remote_history_version": false,
+      "rebuild_role": "applied after baseline to owned reconstruction"
+    },
+    {
+      "path": "supabase/migrations/20261018130000_platform_decision_center.sql",
+      "version": "20261018130000",
+      "exact_remote_history_version": false,
+      "rebuild_role": "applied after baseline to owned reconstruction"
+    },
+    {
+      "path": "supabase/migrations/20261019100000_platform_collaboration.sql",
+      "version": "20261019100000",
+      "exact_remote_history_version": false,
+      "rebuild_role": "applied after baseline to owned reconstruction"
+    },
+    {
+      "path": "supabase/migrations/20261019110000_platform_workspace_settings.sql",
+      "version": "20261019110000",
+      "exact_remote_history_version": false,
+      "rebuild_role": "applied after baseline to owned reconstruction"
+    },
+    {
+      "path": "supabase/migrations/20261019120000_platform_audit_activity.sql",
+      "version": "20261019120000",
+      "exact_remote_history_version": false,
+      "rebuild_role": "applied after baseline to owned reconstruction"
+    },
+    {
+      "path": "supabase/migrations/20261019130000_platform_onboarding_demo.sql",
+      "version": "20261019130000",
+      "exact_remote_history_version": false,
+      "rebuild_role": "applied after baseline to owned reconstruction"
+    },
+    {
+      "path": "supabase/migrations/20261020010000_platform_v2_foundation.sql",
+      "version": "20261020010000",
+      "exact_remote_history_version": false,
+      "rebuild_role": "applied after baseline to owned reconstruction"
+    },
+    {
+      "path": "supabase/migrations/20261020020000_platform_decision_portfolio.sql",
+      "version": "20261020020000",
+      "exact_remote_history_version": false,
+      "rebuild_role": "applied after baseline to owned reconstruction"
+    },
+    {
+      "path": "supabase/migrations/20261020030000_platform_dataset_library.sql",
+      "version": "20261020030000",
+      "exact_remote_history_version": false,
+      "rebuild_role": "applied after baseline to owned reconstruction"
+    },
+    {
+      "path": "supabase/migrations/20261021010000_platform_workflow_gates.sql",
+      "version": "20261021010000",
+      "exact_remote_history_version": false,
+      "rebuild_role": "applied after baseline to owned reconstruction"
+    },
+    {
+      "path": "supabase/migrations/20261021020000_platform_data_responsibilities.sql",
+      "version": "20261021020000",
+      "exact_remote_history_version": false,
+      "rebuild_role": "applied after baseline to owned reconstruction"
+    },
+    {
+      "path": "supabase/migrations/20261022010000_case_identity_preparation.sql",
+      "version": "20261022010000",
+      "exact_remote_history_version": false,
+      "rebuild_role": "applied after baseline to owned reconstruction"
+    },
+    {
+      "path": "supabase/migrations/20261022020000_decision_run_reopening.sql",
+      "version": "20261022020000",
+      "exact_remote_history_version": false,
+      "rebuild_role": "applied after baseline to owned reconstruction"
+    },
+    {
+      "path": "supabase/migrations/20261022030000_case_ownership_readiness.sql",
+      "version": "20261022030000",
+      "exact_remote_history_version": false,
+      "rebuild_role": "applied after baseline to owned reconstruction"
+    },
+    {
+      "path": "supabase/migrations/20261022040000_case_attributes_apply.sql",
+      "version": "20261022040000",
+      "exact_remote_history_version": false,
+      "rebuild_role": "applied after baseline to owned reconstruction"
+    }
+  ],
+  "git_count": 31,
+  "remote_history_count": 10,
+  "remote_last_version": "20261005012207",
+  "remote_history_rows": [
+    {
+      "version": "20260928234222",
+      "name": "init_dda_mvp_core"
+    },
+    {
+      "version": "20260928234319",
+      "name": "harden_dda_backend_grants"
+    },
+    {
+      "version": "20260929023644",
+      "name": "add_decision_ai_interpretation"
+    },
+    {
+      "version": "20261001195701",
+      "name": "dispatch_v1"
+    },
+    {
+      "version": "20261001195708",
+      "name": "dataset_library"
+    },
+    {
+      "version": "20261002184751",
+      "name": "dispatch_v2_integrity"
+    },
+    {
+      "version": "20261004183243",
+      "name": "dataset_canonical_filename"
+    },
+    {
+      "version": "20261005010436",
+      "name": "decision_cases_v1"
+    },
+    {
+      "version": "20261005010758",
+      "name": "decision_cases_v1_activity_fix"
+    },
+    {
+      "version": "20261005012207",
+      "name": "decision_run_history_v2"
+    }
+  ],
+  "warning": "History is incomplete relative to effective application schema. Exact timestamp/name correspondence is not proof of SQL equivalence. No history repair/replay performed.",
+  "rebuild": "baseline/20261010100000_public_schema.sql plus all migrations after captured baseline; comparison in sql-git-rebuild-comparison.json"
+}

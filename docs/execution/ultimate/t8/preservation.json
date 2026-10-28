@@ -1,0 +1,256 @@
+{
+  "phase": "T8",
+  "baseline_inventory_files": 823,
+  "baseline_inventory_bytes": 42112762,
+  "checkpoint_sha256": "059e581b35fa899254286ef75410730193211a0adc303f8854fed44d346a837d",
+  "checkpoint_kind": "Equivalent immutable copies + SHA256 inventory + binary tracked patch; .git read-only",
+  "workspace_full_copies": "/workspace/work/dation-t8/post-t7",
+  "copies_verified": 823,
+  "current_files_unchanged": 821,
+  "intentionally_extended_from_inventory": [
+    "backend/app/domain/logistics/graph.py",
+    "backend/app/platform/repository.py"
+  ],
+  "preimages": {
+    "backend/app/domain/logistics/graph.py": "evidence/post-t7/backend/app/domain/logistics/graph.py",
+    "backend/app/platform/repository.py": "evidence/post-t7/backend/app/platform/repository.py",
+    "backend/app/routes/dispatch.py": "evidence/post-t7/backend/app/routes/dispatch.py",
+    "backend/app/services/dispatch_job_service.py": "evidence/post-t7/backend/app/services/dispatch_job_service.py"
+  },
+  "T7_manifest_unchanged": true,
+  "T7_entries_verified": 46,
+  "T7_resolution": [
+    {
+      "path": "backend/app/engines/assignment/transport_contracts.py",
+      "resolved_from": "backend/app/engines/assignment/transport_contracts.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/app/engines/assignment/transport_model.py",
+      "resolved_from": "backend/app/engines/assignment/transport_model.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/app/engines/assignment/transport_plan.py",
+      "resolved_from": "backend/app/engines/assignment/transport_plan.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/app/engines/assignment/transport_policies.py",
+      "resolved_from": "backend/app/engines/assignment/transport_policies.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/app/engines/assignment/transport_policy_result.py",
+      "resolved_from": "backend/app/engines/assignment/transport_policy_result.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/app/engines/assignment/transport_policy_validator.py",
+      "resolved_from": "backend/app/engines/assignment/transport_policy_validator.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/app/results/ai_context.py",
+      "resolved_from": "backend/app/results/ai_context.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/app/results/approval_review.py",
+      "resolved_from": "backend/app/results/approval_review.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/app/results/assembler.py",
+      "resolved_from": "backend/app/results/assembler.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/app/results/export_rows.py",
+      "resolved_from": "backend/app/results/export_rows.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/app/results/projections.py",
+      "resolved_from": "backend/app/results/projections.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/app/results/registry.py",
+      "resolved_from": "backend/app/results/registry.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/app/results/validation.py",
+      "resolved_from": "backend/app/results/validation.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/tests/fixtures/ultimate/t7-fixtures.json",
+      "resolved_from": "backend/tests/fixtures/ultimate/t7-fixtures.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/tests/test_transport_plan_policies.py",
+      "resolved_from": "backend/tests/test_transport_plan_policies.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/tests/test_transport_result_package.py",
+      "resolved_from": "backend/tests/test_transport_result_package.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t7/command-ledger.json",
+      "resolved_from": "docs/execution/ultimate/t7/command-ledger.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/B-NODE.log",
+      "resolved_from": "docs/execution/ultimate/t7/evidence/B-NODE.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/B-NODE.result.json",
+      "resolved_from": "docs/execution/ultimate/t7/evidence/B-NODE.result.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/B-PY.log",
+      "resolved_from": "docs/execution/ultimate/t7/evidence/B-PY.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/B-PY.result.json",
+      "resolved_from": "docs/execution/ultimate/t7/evidence/B-PY.result.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/T7-user-request.txt",
+      "resolved_from": "docs/execution/ultimate/t7/evidence/T7-user-request.txt",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/U7.log",
+      "resolved_from": "docs/execution/ultimate/t7/evidence/U7.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/U7.result.json",
+      "resolved_from": "docs/execution/ultimate/t7/evidence/U7.result.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/attempts/U7-package-first.log",
+      "resolved_from": "docs/execution/ultimate/t7/evidence/attempts/U7-package-first.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/attempts/U7-policies-first.log",
+      "resolved_from": "docs/execution/ultimate/t7/evidence/attempts/U7-policies-first.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/attempts/U7-second.log",
+      "resolved_from": "docs/execution/ultimate/t7/evidence/attempts/U7-second.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/attempts/U7-third.log",
+      "resolved_from": "docs/execution/ultimate/t7/evidence/attempts/U7-third.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/candidate.json",
+      "resolved_from": "docs/execution/ultimate/t7/evidence/candidate.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/drivers/finalize.py",
+      "resolved_from": "docs/execution/ultimate/t7/evidence/drivers/finalize.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/drivers/qa.py",
+      "resolved_from": "docs/execution/ultimate/t7/evidence/drivers/qa.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/final-state.json",
+      "resolved_from": "docs/execution/ultimate/t7/evidence/final-state.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/initial-state.json",
+      "resolved_from": "docs/execution/ultimate/t7/evidence/initial-state.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/post-t6-tracked.patch",
+      "resolved_from": "docs/execution/ultimate/t7/evidence/post-t6-tracked.patch",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/post-t6/backend/app/engines/assignment/transport_contracts.py",
+      "resolved_from": "docs/execution/ultimate/t7/evidence/post-t6/backend/app/engines/assignment/transport_contracts.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/post-t6/backend/app/engines/assignment/transport_model.py",
+      "resolved_from": "docs/execution/ultimate/t7/evidence/post-t6/backend/app/engines/assignment/transport_model.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/post-t6/backend/app/engines/assignment/transport_plan.py",
+      "resolved_from": "docs/execution/ultimate/t7/evidence/post-t6/backend/app/engines/assignment/transport_plan.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/post-t6/backend/app/results/registry.py",
+      "resolved_from": "docs/execution/ultimate/t7/evidence/post-t6/backend/app/results/registry.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/qa-final-batch.log",
+      "resolved_from": "docs/execution/ultimate/t7/evidence/qa-final-batch.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/skills/runtime-skill.txt",
+      "resolved_from": "docs/execution/ultimate/t7/evidence/skills/runtime-skill.txt",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/t7-changes.patch",
+      "resolved_from": "docs/execution/ultimate/t7/evidence/t7-changes.patch",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t7/preservation.json",
+      "resolved_from": "docs/execution/ultimate/t7/preservation.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t7/scope-diff.json",
+      "resolved_from": "docs/execution/ultimate/t7/scope-diff.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t7/skills-ledger.json",
+      "resolved_from": "docs/execution/ultimate/t7/skills-ledger.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t7/t7-execution-report.md",
+      "resolved_from": "docs/execution/ultimate/t7/t7-execution-report.md",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t7/test-ledger.json",
+      "resolved_from": "docs/execution/ultimate/t7/test-ledger.json",
+      "sha256_verified": true
+    }
+  ],
+  "T7_math_assembler_catalogs_legacy_engines_and_frontend_preserved": true,
+  "no_reset_clean_discard_checkout_staging_commit_or_history_change": true
+}

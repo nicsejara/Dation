@@ -1,0 +1,24 @@
+{
+  "suite": "S3",
+  "status": "PASS",
+  "tests": 25,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "started_at": "2026-10-26T18:06:00.770611+00:00",
+  "finished_at": "2026-10-26T18:06:35.606909+00:00",
+  "seconds": 34.836,
+  "cwd": "/workspace/Dation/backend",
+  "command": [
+    "/workspace/Dation/.venv/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "test_ultimate_case_models",
+    "-v"
+  ],
+  "exit_code": 0,
+  "production_credentials_cleared": true,
+  "PYTHONPATH": "tests/integration",
+  "log_sha256": "2b3cfe768c521a9d36bb58c080cc34f67a052c0925a39a5189898c1fe8740ff1"
+}

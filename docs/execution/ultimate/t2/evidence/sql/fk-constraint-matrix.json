@@ -1,0 +1,992 @@
+[
+  {
+    "name": "dataset_deletions_actor_user_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (actor_user_id) REFERENCES auth.users(id)",
+    "table_name": "dataset_deletions",
+    "condeferred": false,
+    "schema_name": "dation_private",
+    "condeferrable": false
+  },
+  {
+    "name": "dataset_deletions_workspace_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)",
+    "table_name": "dataset_deletions",
+    "condeferred": false,
+    "schema_name": "dation_private",
+    "condeferrable": false
+  },
+  {
+    "name": "dataset_uploads_actor_user_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (actor_user_id) REFERENCES auth.users(id)",
+    "table_name": "dataset_uploads",
+    "condeferred": false,
+    "schema_name": "dation_private",
+    "condeferrable": false
+  },
+  {
+    "name": "dataset_uploads_workspace_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)",
+    "table_name": "dataset_uploads",
+    "condeferred": false,
+    "schema_name": "dation_private",
+    "condeferrable": false
+  },
+  {
+    "name": "legacy_owners_claimed_by_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (claimed_by) REFERENCES auth.users(id)",
+    "table_name": "legacy_owners",
+    "condeferred": false,
+    "schema_name": "dation_private",
+    "condeferrable": false
+  },
+  {
+    "name": "legacy_owners_workspace_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)",
+    "table_name": "legacy_owners",
+    "condeferred": false,
+    "schema_name": "dation_private",
+    "condeferrable": false
+  },
+  {
+    "name": "member_responsibilities_workspace_id_user_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, user_id) REFERENCES workspace_members(workspace_id, user_id) ON DELETE CASCADE",
+    "table_name": "member_responsibilities",
+    "condeferred": false,
+    "schema_name": "dation_private",
+    "condeferrable": false
+  },
+  {
+    "name": "workflow_stage_assignments_updated_by_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (updated_by) REFERENCES auth.users(id)",
+    "table_name": "workflow_stage_assignments",
+    "condeferred": false,
+    "schema_name": "dation_private",
+    "condeferrable": false
+  },
+  {
+    "name": "workflow_stage_assignments_workspace_id_decision_case_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, decision_case_id) REFERENCES decision_cases(workspace_id, id) ON DELETE CASCADE",
+    "table_name": "workflow_stage_assignments",
+    "condeferred": false,
+    "schema_name": "dation_private",
+    "condeferrable": false
+  },
+  {
+    "name": "workflow_stage_assignments_workspace_id_owner_user_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, owner_user_id) REFERENCES workspace_members(workspace_id, user_id)",
+    "table_name": "workflow_stage_assignments",
+    "condeferred": false,
+    "schema_name": "dation_private",
+    "condeferrable": false
+  },
+  {
+    "name": "workspace_onboarding_user_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (user_id) REFERENCES profiles(id) ON DELETE CASCADE",
+    "table_name": "workspace_onboarding",
+    "condeferred": false,
+    "schema_name": "dation_private",
+    "condeferrable": false
+  },
+  {
+    "name": "workspace_onboarding_workspace_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id) ON DELETE CASCADE",
+    "table_name": "workspace_onboarding",
+    "condeferred": false,
+    "schema_name": "dation_private",
+    "condeferrable": false
+  },
+  {
+    "name": "audit_events_actor_user_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (actor_user_id) REFERENCES auth.users(id)",
+    "table_name": "audit_events",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "audit_events_workspace_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)",
+    "table_name": "audit_events",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "case_data_pack_entries_workspace_id_case_id_pack_version_i_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, case_id, pack_version_id) REFERENCES case_data_pack_versions(workspace_id, case_id, id) ON DELETE RESTRICT",
+    "table_name": "case_data_pack_entries",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "case_data_pack_entries_workspace_id_dataset_id_contract_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, dataset_id, contract_id, contract_hash, raw_sha256, canonical_sha256, normalizer_version) REFERENCES datasets(workspace_id, id, data_contract_id, data_contract_hash, sha256, canonical_sha256, normalizer_version) ON DELETE RESTRICT",
+    "table_name": "case_data_pack_entries",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "case_data_pack_versions_workspace_id_case_id_pack_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, case_id, pack_id) REFERENCES case_data_packs(workspace_id, case_id, id) ON DELETE RESTRICT",
+    "table_name": "case_data_pack_versions",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "case_data_pack_versions_workspace_id_created_by_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, created_by) REFERENCES workspace_members(workspace_id, user_id) ON DELETE RESTRICT",
+    "table_name": "case_data_pack_versions",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "case_data_packs_workspace_id_case_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, case_id) REFERENCES decision_cases(workspace_id, id) ON DELETE RESTRICT",
+    "table_name": "case_data_packs",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "ultimate_pack_current_version",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, case_id, id, current_version_id) REFERENCES case_data_pack_versions(workspace_id, case_id, pack_id, id) ON DELETE RESTRICT DEFERRABLE INITIALLY DEFERRED",
+    "table_name": "case_data_packs",
+    "condeferred": true,
+    "schema_name": "public",
+    "condeferrable": true
+  },
+  {
+    "name": "datasets_parent_dataset_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (parent_dataset_id) REFERENCES datasets(id)",
+    "table_name": "datasets",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "datasets_uploaded_by_user_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (uploaded_by_user_id) REFERENCES auth.users(id)",
+    "table_name": "datasets",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "datasets_workspace_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)",
+    "table_name": "datasets",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "tenant_datasets_parent_dataset_id",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, parent_dataset_id) REFERENCES datasets(workspace_id, id)",
+    "table_name": "datasets",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_approval_events_actor_user_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (actor_user_id) REFERENCES auth.users(id)",
+    "table_name": "decision_approval_events",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_approval_events_case_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (case_id) REFERENCES decision_cases(id) ON DELETE RESTRICT",
+    "table_name": "decision_approval_events",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_approval_events_replacement_run_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (replacement_run_id) REFERENCES decision_runs(id) ON DELETE RESTRICT",
+    "table_name": "decision_approval_events",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_approval_events_run_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (run_id) REFERENCES decision_runs(id) ON DELETE RESTRICT",
+    "table_name": "decision_approval_events",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_approval_events_workspace_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)",
+    "table_name": "decision_approval_events",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "tenant_decision_approval_events_case_id",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, case_id) REFERENCES decision_cases(workspace_id, id)",
+    "table_name": "decision_approval_events",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "tenant_decision_approval_events_replacement_run_id",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, replacement_run_id) REFERENCES decision_runs(workspace_id, id)",
+    "table_name": "decision_approval_events",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "tenant_decision_approval_events_run_id",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, run_id) REFERENCES decision_runs(workspace_id, id)",
+    "table_name": "decision_approval_events",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "ultimate_approval_pack",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, case_id, caused_by_pack_version_id) REFERENCES case_data_pack_versions(workspace_id, case_id, id) ON DELETE RESTRICT",
+    "table_name": "decision_approval_events",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_assignments_workspace_id_approver_user_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, approver_user_id) REFERENCES workspace_members(workspace_id, user_id)",
+    "table_name": "decision_assignments",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_assignments_workspace_id_decision_case_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, decision_case_id) REFERENCES decision_cases(workspace_id, id)",
+    "table_name": "decision_assignments",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_assignments_workspace_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)",
+    "table_name": "decision_assignments",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_assignments_workspace_id_owner_user_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, owner_user_id) REFERENCES workspace_members(workspace_id, user_id)",
+    "table_name": "decision_assignments",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_case_reconciliations_case_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (case_id) REFERENCES decision_cases(id) ON DELETE CASCADE",
+    "table_name": "decision_case_reconciliations",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_case_reconciliations_workspace_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)",
+    "table_name": "decision_case_reconciliations",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "tenant_decision_case_reconciliations_case_id",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, case_id) REFERENCES decision_cases(workspace_id, id)",
+    "table_name": "decision_case_reconciliations",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_cases_created_by_user_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (created_by_user_id) REFERENCES auth.users(id)",
+    "table_name": "decision_cases",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_cases_fleet_dataset_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (fleet_dataset_id) REFERENCES datasets(id) ON DELETE RESTRICT",
+    "table_name": "decision_cases",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_cases_orders_dataset_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (orders_dataset_id) REFERENCES datasets(id) ON DELETE RESTRICT",
+    "table_name": "decision_cases",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_cases_workspace_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)",
+    "table_name": "decision_cases",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "tenant_decision_cases_fleet_dataset_id",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, fleet_dataset_id) REFERENCES datasets(workspace_id, id)",
+    "table_name": "decision_cases",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "tenant_decision_cases_orders_dataset_id",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, orders_dataset_id) REFERENCES datasets(workspace_id, id)",
+    "table_name": "decision_cases",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "ultimate_case_model",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, logistics_model_version_id, graph_definition_version) REFERENCES logistics_model_versions(workspace_id, id, graph_definition_version) ON DELETE RESTRICT",
+    "table_name": "decision_cases",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_chat_turns_run_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (run_id) REFERENCES decision_runs(id) ON DELETE CASCADE",
+    "table_name": "decision_chat_turns",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_chat_turns_workspace_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)",
+    "table_name": "decision_chat_turns",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "tenant_decision_chat_turns_run_id",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, run_id) REFERENCES decision_runs(workspace_id, id)",
+    "table_name": "decision_chat_turns",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_comparative_analyses_base_run_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (base_run_id) REFERENCES decision_runs(id) ON DELETE RESTRICT",
+    "table_name": "decision_comparative_analyses",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_comparative_analyses_workspace_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)",
+    "table_name": "decision_comparative_analyses",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "tenant_decision_comparative_analyses_base_run_id",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, base_run_id) REFERENCES decision_runs(workspace_id, id)",
+    "table_name": "decision_comparative_analyses",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_explanations_run_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (run_id) REFERENCES decision_runs(id) ON UPDATE RESTRICT ON DELETE CASCADE",
+    "table_name": "decision_explanations",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_explanations_workspace_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)",
+    "table_name": "decision_explanations",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "tenant_decision_explanations_run_id",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, run_id) REFERENCES decision_runs(workspace_id, id)",
+    "table_name": "decision_explanations",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_interpretation_sources_chat_turn_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (chat_turn_id) REFERENCES decision_chat_turns(turn_id) ON DELETE RESTRICT",
+    "table_name": "decision_interpretation_sources",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_interpretation_sources_explanation_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (explanation_id) REFERENCES decision_explanations(id) ON DELETE RESTRICT",
+    "table_name": "decision_interpretation_sources",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_interpretation_sources_run_id_analysis_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (run_id, analysis_id) REFERENCES decision_comparative_analyses(base_run_id, id) ON DELETE RESTRICT",
+    "table_name": "decision_interpretation_sources",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_interpretation_sources_run_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (run_id) REFERENCES decision_runs(id) ON DELETE RESTRICT",
+    "table_name": "decision_interpretation_sources",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_interpretation_sources_workspace_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)",
+    "table_name": "decision_interpretation_sources",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "tenant_decision_interpretation_sources_analysis_id",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, analysis_id) REFERENCES decision_comparative_analyses(workspace_id, id)",
+    "table_name": "decision_interpretation_sources",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "tenant_decision_interpretation_sources_chat_turn_id",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, chat_turn_id) REFERENCES decision_chat_turns(workspace_id, turn_id)",
+    "table_name": "decision_interpretation_sources",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "tenant_decision_interpretation_sources_explanation_id",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, explanation_id) REFERENCES decision_explanations(workspace_id, id)",
+    "table_name": "decision_interpretation_sources",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "tenant_decision_interpretation_sources_run_id",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, run_id) REFERENCES decision_runs(workspace_id, id)",
+    "table_name": "decision_interpretation_sources",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "ultimate_interpretation_result",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, run_id, result_fingerprint) REFERENCES decision_runs(workspace_id, id, result_fingerprint) ON DELETE RESTRICT",
+    "table_name": "decision_interpretation_sources",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_messages_run_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (run_id) REFERENCES decision_runs(id) ON UPDATE RESTRICT ON DELETE CASCADE",
+    "table_name": "decision_messages",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_messages_turn_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (turn_id) REFERENCES decision_chat_turns(turn_id) ON DELETE CASCADE",
+    "table_name": "decision_messages",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_messages_workspace_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)",
+    "table_name": "decision_messages",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "tenant_decision_messages_run_id",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, run_id) REFERENCES decision_runs(workspace_id, id)",
+    "table_name": "decision_messages",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "tenant_decision_messages_turn_id",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, turn_id) REFERENCES decision_chat_turns(workspace_id, turn_id)",
+    "table_name": "decision_messages",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_result_artifacts_workspace_id_run_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, run_id) REFERENCES decision_runs(workspace_id, id) ON DELETE RESTRICT",
+    "table_name": "decision_result_artifacts",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "ultimate_artifact_published_run",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, run_id, result_fingerprint) REFERENCES decision_runs(workspace_id, id, result_fingerprint) ON DELETE RESTRICT DEFERRABLE INITIALLY DEFERRED",
+    "table_name": "decision_result_artifacts",
+    "condeferred": true,
+    "schema_name": "public",
+    "condeferrable": true
+  },
+  {
+    "name": "decision_runs_approved_by_user_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (approved_by_user_id) REFERENCES auth.users(id)",
+    "table_name": "decision_runs",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_runs_created_by_user_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (created_by_user_id) REFERENCES auth.users(id)",
+    "table_name": "decision_runs",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_runs_dataset_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (dataset_id) REFERENCES datasets(id) ON UPDATE RESTRICT ON DELETE RESTRICT",
+    "table_name": "decision_runs",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_runs_decision_case_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (decision_case_id) REFERENCES decision_cases(id) ON DELETE RESTRICT",
+    "table_name": "decision_runs",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_runs_fleet_dataset_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (fleet_dataset_id) REFERENCES datasets(id)",
+    "table_name": "decision_runs",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_runs_graph_definition_version_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (graph_definition_version) REFERENCES dation_private.decision_definition_versions(version) ON DELETE RESTRICT",
+    "table_name": "decision_runs",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_runs_orders_dataset_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (orders_dataset_id) REFERENCES datasets(id)",
+    "table_name": "decision_runs",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_runs_superseded_by_run_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (superseded_by_run_id) REFERENCES decision_runs(id) ON DELETE SET NULL",
+    "table_name": "decision_runs",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_runs_upstream_run_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (upstream_run_id) REFERENCES decision_runs(id) ON DELETE RESTRICT",
+    "table_name": "decision_runs",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "decision_runs_workspace_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)",
+    "table_name": "decision_runs",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "tenant_decision_runs_dataset_id",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, dataset_id) REFERENCES datasets(workspace_id, id)",
+    "table_name": "decision_runs",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "tenant_decision_runs_decision_case_id",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, decision_case_id) REFERENCES decision_cases(workspace_id, id)",
+    "table_name": "decision_runs",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "tenant_decision_runs_fleet_dataset_id",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, fleet_dataset_id) REFERENCES datasets(workspace_id, id)",
+    "table_name": "decision_runs",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "tenant_decision_runs_orders_dataset_id",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, orders_dataset_id) REFERENCES datasets(workspace_id, id)",
+    "table_name": "decision_runs",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "tenant_decision_runs_superseded_by_run_id",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, superseded_by_run_id) REFERENCES decision_runs(workspace_id, id)",
+    "table_name": "decision_runs",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "tenant_decision_runs_upstream_run_id",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, upstream_run_id) REFERENCES decision_runs(workspace_id, id)",
+    "table_name": "decision_runs",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "ultimate_run_invalidation_pack",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, decision_case_id, invalidated_by_pack_version_id) REFERENCES case_data_pack_versions(workspace_id, case_id, id) ON DELETE RESTRICT",
+    "table_name": "decision_runs",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "ultimate_run_model",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, decision_case_id, logistics_model_version_id) REFERENCES decision_cases(workspace_id, id, logistics_model_version_id) ON DELETE RESTRICT",
+    "table_name": "decision_runs",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "ultimate_run_pack",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, decision_case_id, data_pack_version_id) REFERENCES case_data_pack_versions(workspace_id, case_id, id) ON DELETE RESTRICT",
+    "table_name": "decision_runs",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "dispatch_run_jobs_run_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (run_id) REFERENCES decision_runs(id) ON DELETE RESTRICT",
+    "table_name": "dispatch_run_jobs",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "dispatch_run_jobs_workspace_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)",
+    "table_name": "dispatch_run_jobs",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "tenant_dispatch_run_jobs_run_id",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, run_id) REFERENCES decision_runs(workspace_id, id)",
+    "table_name": "dispatch_run_jobs",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "logistics_model_versions_graph_definition_version_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (graph_definition_version) REFERENCES dation_private.decision_definition_versions(version) ON DELETE RESTRICT",
+    "table_name": "logistics_model_versions",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "logistics_model_versions_workspace_id_model_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, model_id) REFERENCES logistics_models(workspace_id, id) ON DELETE RESTRICT",
+    "table_name": "logistics_model_versions",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "logistics_model_versions_workspace_id_published_by_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, published_by) REFERENCES workspace_members(workspace_id, user_id) ON DELETE RESTRICT",
+    "table_name": "logistics_model_versions",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "logistics_models_workspace_id_created_by_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id, created_by) REFERENCES workspace_members(workspace_id, user_id) ON DELETE RESTRICT",
+    "table_name": "logistics_models",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "logistics_models_workspace_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id) ON DELETE RESTRICT",
+    "table_name": "logistics_models",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "profiles_active_workspace_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (active_workspace_id) REFERENCES workspaces(id)",
+    "table_name": "profiles",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "profiles_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE",
+    "table_name": "profiles",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "workspace_ddas_workspace_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)",
+    "table_name": "workspace_ddas",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "workspace_invitations_accepted_by_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (accepted_by) REFERENCES auth.users(id)",
+    "table_name": "workspace_invitations",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "workspace_invitations_invited_by_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (invited_by) REFERENCES auth.users(id)",
+    "table_name": "workspace_invitations",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "workspace_invitations_workspace_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)",
+    "table_name": "workspace_invitations",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "workspace_members_invited_by_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (invited_by) REFERENCES auth.users(id)",
+    "table_name": "workspace_members",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "workspace_members_user_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id)",
+    "table_name": "workspace_members",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "workspace_members_workspace_id_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)",
+    "table_name": "workspace_members",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  },
+  {
+    "name": "workspaces_created_by_fkey",
+    "contype": "f",
+    "definition": "FOREIGN KEY (created_by) REFERENCES auth.users(id)",
+    "table_name": "workspaces",
+    "condeferred": false,
+    "schema_name": "public",
+    "condeferrable": false
+  }
+]

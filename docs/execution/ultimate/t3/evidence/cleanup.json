@@ -1,0 +1,11 @@
+{
+  "owned_container": "dation-t3-20261026-ultimate",
+  "labels_verified": {
+    "dation.qa.owner": "codex-dation",
+    "dation.qa.phase": "T3"
+  },
+  "network": "none",
+  "ports_exposed": false,
+  "container_and_owned_volume_removed": true,
+  "other_containers_or_daemon_stopped": false
+}

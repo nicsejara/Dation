@@ -12,16 +12,20 @@ async def main():
   page=await context.new_page();page.set_default_timeout(20000);page.on('pageerror',lambda error:errors.append(str(error)))
   await page.goto(BASE+'/login');await page.get_by_label('Email',exact=True).fill('user-1@example.test');await page.get_by_label('Contraseña',exact=True).fill('dispatch-e2e-private');await page.get_by_role('button',name='Ingresar',exact=True).click()
   await page.locator('[data-platform-home] h1').wait_for();assert '/login' not in page.url
-  home=page.locator('[data-platform-home]');await home.locator('.platform-home__case').wait_for()
-  assert await home.locator('.platform-home__attention').count()==1
-  assert await home.locator('.platform-home__quick-link').count()==3
-  await home.get_by_role('link',name='Revisar Asignación de carga · DC-'+os.environ['DATION_HOME_CASE'][:8].upper(),exact=True).click();await page.locator('.assignment-dashboard-v2').wait_for()
+  home=page.locator('[data-platform-home]');await home.get_by_role('heading',name='Accesos rápidos',exact=True).wait_for()
+  assert await home.locator('.platform-home__case,.platform-home__attention').count()==0
+  assert await home.locator('.platform-home__quick-link').count()==4
+  await home.get_by_role('link',name='Ir a Decision Center',exact=True).click()
+  center=page.locator('[data-platform-decisions]');await center.locator('[data-case-open="'+os.environ['DATION_HOME_CASE']+'"]').click()
+  node=center.locator('[data-center-node=logistics_assignment]');await node.locator('summary',has_text='Responsables y aprobación').click()
+  await node.get_by_role('link',name='Abrir último dashboard',exact=True).click();await page.locator('.assignment-dashboard-v2').wait_for()
   assert os.environ['DATION_HOME_CASE'] in page.url and os.environ['DATION_HOME_RUN'] in page.url
-  await page.go_back();await home.locator('.platform-home__case').wait_for()
-  await home.get_by_role('link',name='Continuar DC-'+os.environ['DATION_HOME_CASE'][:8].upper(),exact=True).click();await page.locator('.assignment-dashboard-v2').wait_for()
-  await page.locator('.nav [data-platform-view="platform-home"]').click();await home.locator('.platform-home__case').wait_for()
+  await page.go_back();await center.get_by_role('heading',name='Cadena de decisiones',exact=True).wait_for()
+  await node.locator('summary',has_text='Responsables y aprobación').click()
+  await node.get_by_role('link',name='Abrir último dashboard',exact=True).click();await page.locator('.assignment-dashboard-v2').wait_for()
+  await page.locator('.nav [data-platform-view="platform-home"]').click();await home.get_by_role('heading',name='Accesos rápidos',exact=True).wait_for()
   assert not await page.locator('.sidebar').get_by_text('Cloud Run',exact=True).count()
-  await page.locator('.nav [data-platform-view="inicio"]').click();await page.locator('[data-dda-id]').first.wait_for();assert urlsplit(page.url).path=='/app/ddas'
+  await home.get_by_role('link',name='Explorar DDA',exact=True).click();await page.locator('[data-dda-id]').first.wait_for();assert urlsplit(page.url).path=='/app';assert await page.evaluate('document.activeElement.id')=='dation-dda-title'
   before=await page.evaluate('history.length');await page.locator('.nav [data-platform-view="settings"]').click();await page.locator('[data-workspace-settings] .d-card').first.wait_for();assert await page.evaluate('history.length')==before+1
   assert not await page.locator('[data-platform-diagnostics]').evaluate('n=>n.open')
   await page.go_back();await page.locator('[data-home-dda-catalog]').wait_for(state='visible');await page.go_forward();await page.locator('[data-workspace-settings]').wait_for(state='visible')

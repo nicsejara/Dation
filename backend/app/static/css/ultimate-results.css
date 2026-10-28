@@ -1,0 +1,38 @@
+/* T10 functional layout only. Existing Dation shells/tokens own visual styling. */
+.ultimate-results .ultimate-results__panel{min-width:0;padding:var(--space-6,24px)}
+.ultimate-results .ultimate-results__heading{margin:0 0 12px}
+.ultimate-results .ultimate-results__chart-scroll{max-width:100%;max-height:520px;overflow:auto;border-radius:var(--radius-md);padding:8px}
+.ultimate-results .ultimate-results__chart-scroll svg{display:block;min-width:940px;width:100%}
+.ultimate-results svg text{fill:var(--color-text);font:inherit;font-size:12px}
+.ultimate-results__sankey path{fill:none;stroke:var(--d-brand-teal-bright);opacity:.85}
+.ultimate-results__sankey path.is-muted{opacity:.55}
+.ultimate-results__sankey rect,.ultimate-results__gantt rect{fill:var(--d-brand-teal-bright);stroke:var(--color-text-accent)}
+.ultimate-results__gantt .is-external{fill:var(--color-surface-raised);stroke-width:2}
+.ultimate-results svg [role=button]{cursor:pointer}
+.ultimate-results svg [role=button]:focus-visible rect,.ultimate-results svg .is-selected rect{stroke:var(--color-text);stroke-width:3}
+.ultimate-results .ultimate-results__chart-list ul{display:grid;gap:8px;padding:0;list-style:none}
+.ultimate-results .ultimate-results__chart-list li{display:flex;align-items:center;flex-wrap:wrap;gap:8px;overflow-wrap:anywhere}
+.ultimate-results [data-details]>summary{cursor:pointer;font-weight:700;padding:8px;min-height:44px}
+.ultimate-results .ultimate-results__tabs{display:flex;gap:8px;overflow:auto;margin:16px 0;padding:4px}
+.ultimate-results .ultimate-results__tabs [aria-selected=true]{border-color:var(--color-text-accent);background:var(--color-surface-raised)}
+.ultimate-results .ultimate-results__filters{display:flex;align-items:end;flex-wrap:wrap;gap:12px;margin:16px 0}
+.ultimate-results .ultimate-results__filters label{display:grid;gap:4px;min-width:0}
+.ultimate-results .ultimate-results__filters input,.ultimate-results .ultimate-results__filters select{max-width:100%}
+.ultimate-results .ultimate-results__pagination{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:12px 0}
+.ultimate-results .ultimate-results__table td,.ultimate-results .ultimate-results__table th{max-width:280px;overflow-wrap:anywhere;white-space:normal;vertical-align:top}
+.ultimate-results .ultimate-results__table th button{font:inherit;color:inherit;text-align:start}
+.ultimate-results .ultimate-results__review-actions{display:flex;gap:12px;flex-wrap:wrap}
+.ultimate-results [data-review] .ultimate-results__facts{grid-template-columns:repeat(3,minmax(0,1fr))}
+.ultimate-results .ultimate-results__facts{display:grid;gap:12px}
+.ultimate-results .ultimate-results__facts>div{min-width:0;overflow-wrap:anywhere;border-bottom:1px solid var(--color-border);padding-bottom:8px}
+.ultimate-results .ultimate-results__facts dt{font-weight:700}
+.ultimate-results .ultimate-results__facts dd{margin:4px 0 0;white-space:pre-wrap}
+.ultimate-results .ultimate-results__entity[hidden],.ultimate-results .ultimate-results__assistant[hidden]{display:none!important}
+.ultimate-results .ultimate-results__assistant{position:fixed;inset:84px 16px 90px auto;width:min(420px,calc(100vw - 32px));z-index:var(--z-modal,100);overflow:auto;padding:20px;border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);background:var(--color-surface)}
+.ultimate-results .ultimate-results__assistant form{display:grid;gap:12px}
+.ultimate-results .ultimate-results__assistant textarea{width:100%;min-height:96px;box-sizing:border-box}
+.ultimate-results .ultimate-results__assistant header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ultimate-results .ultimate-results__answer{white-space:pre-wrap;overflow-wrap:anywhere}
+.ultimate-results .ultimate-results__feedback{overflow-wrap:anywhere}
+.ultimate-results [data-selection-status],.ultimate-results [data-ai-binding],.ultimate-results [data-overlay-status]{overflow-wrap:anywhere}
+@media(max-width:600px){.ultimate-results .ultimate-results__panel{padding:16px}.ultimate-results .ultimate-results__filters>*{max-width:100%}.ultimate-results .ultimate-results__assistant{inset:76px 12px 82px;width:auto}.ultimate-results [data-review] .ultimate-results__facts{grid-template-columns:repeat(2,minmax(0,1fr))}}

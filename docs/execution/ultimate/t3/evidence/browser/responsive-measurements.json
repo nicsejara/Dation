@@ -1,0 +1,1034 @@
+[
+  {
+    "width": 1440,
+    "scroll": 1440,
+    "root": {
+      "x": 264,
+      "y": 97,
+      "width": 1144,
+      "height": 2075.421875,
+      "top": 97,
+      "right": 1408,
+      "bottom": 2172.421875,
+      "left": 264
+    },
+    "controls": [
+      {
+        "name": "Logistics Models",
+        "height": 40,
+        "right": 1384,
+        "left": 1244.53125
+      },
+      {
+        "name": "case_name",
+        "height": 41.5,
+        "right": 828,
+        "left": 309
+      },
+      {
+        "name": "case_description",
+        "height": 120,
+        "right": 1363,
+        "left": 844
+      },
+      {
+        "name": "case_model_search",
+        "height": 41.5,
+        "right": 828,
+        "left": 309
+      },
+      {
+        "name": "model_id",
+        "height": 40,
+        "right": 1363,
+        "left": 844
+      },
+      {
+        "name": "model_version_id",
+        "height": 40,
+        "right": 828,
+        "left": 309
+      },
+      {
+        "name": "Buscar Models",
+        "height": 40,
+        "right": 828,
+        "left": 309
+      },
+      {
+        "name": "operating_mode",
+        "height": 40,
+        "right": 828,
+        "left": 309
+      },
+      {
+        "name": "horizon_type",
+        "height": 40,
+        "right": 1363,
+        "left": 844
+      },
+      {
+        "name": "planning_start",
+        "height": 43.5,
+        "right": 828,
+        "left": 309
+      },
+      {
+        "name": "planning_end",
+        "height": 43.5,
+        "right": 1363,
+        "left": 844
+      },
+      {
+        "name": "primary_goal",
+        "height": 40,
+        "right": 828,
+        "left": 309
+      },
+      {
+        "name": "enable_MINIMUM_DEMAND_COVERAGE",
+        "height": 20,
+        "right": 329,
+        "left": 309
+      },
+      {
+        "name": "guard_MINIMUM_DEMAND_COVERAGE",
+        "height": 41.5,
+        "right": 828,
+        "left": 309
+      },
+      {
+        "name": "enable_CRITICAL_DEMAND_COVERAGE",
+        "height": 20,
+        "right": 864,
+        "left": 844
+      },
+      {
+        "name": "guard_CRITICAL_DEMAND_COVERAGE",
+        "height": 41.5,
+        "right": 1363,
+        "left": 844
+      },
+      {
+        "name": "enable_MAXIMUM_EXTERNAL_SHARE",
+        "height": 20,
+        "right": 329,
+        "left": 309
+      },
+      {
+        "name": "guard_MAXIMUM_EXTERNAL_SHARE",
+        "height": 41.5,
+        "right": 828,
+        "left": 309
+      },
+      {
+        "name": "enable_MINIMUM_OWN_SHARE",
+        "height": 20,
+        "right": 864,
+        "left": 844
+      },
+      {
+        "name": "guard_MINIMUM_OWN_SHARE",
+        "height": 41.5,
+        "right": 1363,
+        "left": 844
+      },
+      {
+        "name": "weight_COST",
+        "height": 41.5,
+        "right": 828,
+        "left": 309
+      },
+      {
+        "name": "weight_TRIPS",
+        "height": 41.5,
+        "right": 1363,
+        "left": 844
+      },
+      {
+        "name": "weight_SERVICE",
+        "height": 41.5,
+        "right": 828,
+        "left": 309
+      },
+      {
+        "name": "weight_OWN_CAPACITY",
+        "height": 41.5,
+        "right": 1363,
+        "left": 844
+      },
+      {
+        "name": "decision_owner_user_id",
+        "height": 40,
+        "right": 828,
+        "left": 309
+      },
+      {
+        "name": "Crear Case",
+        "height": 40,
+        "right": 1367,
+        "left": 1264.34375
+      }
+    ]
+  },
+  {
+    "width": 1280,
+    "scroll": 1280,
+    "root": {
+      "x": 264,
+      "y": 97,
+      "width": 984,
+      "height": 2075.21875,
+      "top": 97,
+      "right": 1248,
+      "bottom": 2172.21875,
+      "left": 264
+    },
+    "controls": [
+      {
+        "name": "Logistics Models",
+        "height": 40,
+        "right": 1224,
+        "left": 1084.53125
+      },
+      {
+        "name": "case_name",
+        "height": 41.5,
+        "right": 748,
+        "left": 309
+      },
+      {
+        "name": "case_description",
+        "height": 120,
+        "right": 1203,
+        "left": 764
+      },
+      {
+        "name": "case_model_search",
+        "height": 41.5,
+        "right": 748,
+        "left": 309
+      },
+      {
+        "name": "model_id",
+        "height": 40,
+        "right": 1203,
+        "left": 764
+      },
+      {
+        "name": "model_version_id",
+        "height": 40,
+        "right": 748,
+        "left": 309
+      },
+      {
+        "name": "Buscar Models",
+        "height": 40,
+        "right": 748,
+        "left": 309
+      },
+      {
+        "name": "operating_mode",
+        "height": 40,
+        "right": 748,
+        "left": 309
+      },
+      {
+        "name": "horizon_type",
+        "height": 40,
+        "right": 1203,
+        "left": 764
+      },
+      {
+        "name": "planning_start",
+        "height": 43.5,
+        "right": 748,
+        "left": 309
+      },
+      {
+        "name": "planning_end",
+        "height": 43.5,
+        "right": 1203,
+        "left": 764
+      },
+      {
+        "name": "primary_goal",
+        "height": 40,
+        "right": 748,
+        "left": 309
+      },
+      {
+        "name": "enable_MINIMUM_DEMAND_COVERAGE",
+        "height": 20,
+        "right": 329,
+        "left": 309
+      },
+      {
+        "name": "guard_MINIMUM_DEMAND_COVERAGE",
+        "height": 41.5,
+        "right": 748,
+        "left": 309
+      },
+      {
+        "name": "enable_CRITICAL_DEMAND_COVERAGE",
+        "height": 20,
+        "right": 784,
+        "left": 764
+      },
+      {
+        "name": "guard_CRITICAL_DEMAND_COVERAGE",
+        "height": 41.5,
+        "right": 1203,
+        "left": 764
+      },
+      {
+        "name": "enable_MAXIMUM_EXTERNAL_SHARE",
+        "height": 20,
+        "right": 329,
+        "left": 309
+      },
+      {
+        "name": "guard_MAXIMUM_EXTERNAL_SHARE",
+        "height": 41.5,
+        "right": 748,
+        "left": 309
+      },
+      {
+        "name": "enable_MINIMUM_OWN_SHARE",
+        "height": 20,
+        "right": 784,
+        "left": 764
+      },
+      {
+        "name": "guard_MINIMUM_OWN_SHARE",
+        "height": 41.5,
+        "right": 1203,
+        "left": 764
+      },
+      {
+        "name": "weight_COST",
+        "height": 41.5,
+        "right": 748,
+        "left": 309
+      },
+      {
+        "name": "weight_TRIPS",
+        "height": 41.5,
+        "right": 1203,
+        "left": 764
+      },
+      {
+        "name": "weight_SERVICE",
+        "height": 41.5,
+        "right": 748,
+        "left": 309
+      },
+      {
+        "name": "weight_OWN_CAPACITY",
+        "height": 41.5,
+        "right": 1203,
+        "left": 764
+      },
+      {
+        "name": "decision_owner_user_id",
+        "height": 40,
+        "right": 748,
+        "left": 309
+      },
+      {
+        "name": "Crear Case",
+        "height": 40,
+        "right": 1207,
+        "left": 1104.34375
+      }
+    ]
+  },
+  {
+    "width": 1024,
+    "scroll": 1024,
+    "root": {
+      "x": 250,
+      "y": 97,
+      "width": 742,
+      "height": 2084.25,
+      "top": 97,
+      "right": 992,
+      "bottom": 2181.25,
+      "left": 250
+    },
+    "controls": [
+      {
+        "name": "Logistics Models",
+        "height": 40,
+        "right": 968,
+        "left": 828.53125
+      },
+      {
+        "name": "case_name",
+        "height": 41.5,
+        "right": 613,
+        "left": 295
+      },
+      {
+        "name": "case_description",
+        "height": 120,
+        "right": 947,
+        "left": 629
+      },
+      {
+        "name": "case_model_search",
+        "height": 41.5,
+        "right": 613,
+        "left": 295
+      },
+      {
+        "name": "model_id",
+        "height": 40,
+        "right": 947,
+        "left": 629
+      },
+      {
+        "name": "model_version_id",
+        "height": 40,
+        "right": 613,
+        "left": 295
+      },
+      {
+        "name": "Buscar Models",
+        "height": 40,
+        "right": 613,
+        "left": 295
+      },
+      {
+        "name": "operating_mode",
+        "height": 40,
+        "right": 613,
+        "left": 295
+      },
+      {
+        "name": "horizon_type",
+        "height": 40,
+        "right": 947,
+        "left": 629
+      },
+      {
+        "name": "planning_start",
+        "height": 43.5,
+        "right": 613,
+        "left": 295
+      },
+      {
+        "name": "planning_end",
+        "height": 43.5,
+        "right": 947,
+        "left": 629
+      },
+      {
+        "name": "primary_goal",
+        "height": 40,
+        "right": 613,
+        "left": 295
+      },
+      {
+        "name": "enable_MINIMUM_DEMAND_COVERAGE",
+        "height": 20,
+        "right": 315,
+        "left": 295
+      },
+      {
+        "name": "guard_MINIMUM_DEMAND_COVERAGE",
+        "height": 41.5,
+        "right": 613,
+        "left": 295
+      },
+      {
+        "name": "enable_CRITICAL_DEMAND_COVERAGE",
+        "height": 20,
+        "right": 649,
+        "left": 629
+      },
+      {
+        "name": "guard_CRITICAL_DEMAND_COVERAGE",
+        "height": 41.5,
+        "right": 947,
+        "left": 629
+      },
+      {
+        "name": "enable_MAXIMUM_EXTERNAL_SHARE",
+        "height": 20,
+        "right": 315,
+        "left": 295
+      },
+      {
+        "name": "guard_MAXIMUM_EXTERNAL_SHARE",
+        "height": 41.5,
+        "right": 613,
+        "left": 295
+      },
+      {
+        "name": "enable_MINIMUM_OWN_SHARE",
+        "height": 20,
+        "right": 649,
+        "left": 629
+      },
+      {
+        "name": "guard_MINIMUM_OWN_SHARE",
+        "height": 41.5,
+        "right": 947,
+        "left": 629
+      },
+      {
+        "name": "weight_COST",
+        "height": 41.5,
+        "right": 613,
+        "left": 295
+      },
+      {
+        "name": "weight_TRIPS",
+        "height": 41.5,
+        "right": 947,
+        "left": 629
+      },
+      {
+        "name": "weight_SERVICE",
+        "height": 41.5,
+        "right": 613,
+        "left": 295
+      },
+      {
+        "name": "weight_OWN_CAPACITY",
+        "height": 41.5,
+        "right": 947,
+        "left": 629
+      },
+      {
+        "name": "decision_owner_user_id",
+        "height": 40,
+        "right": 613,
+        "left": 295
+      },
+      {
+        "name": "Crear Case",
+        "height": 40,
+        "right": 951,
+        "left": 848.34375
+      }
+    ]
+  },
+  {
+    "width": 768,
+    "scroll": 768,
+    "root": {
+      "x": 90,
+      "y": 97,
+      "width": 660,
+      "height": 2083.421875,
+      "top": 97,
+      "right": 750,
+      "bottom": 2180.421875,
+      "left": 90
+    },
+    "controls": [
+      {
+        "name": "Logistics Models",
+        "height": 40,
+        "right": 726,
+        "left": 586.53125
+      },
+      {
+        "name": "case_name",
+        "height": 41.5,
+        "right": 412,
+        "left": 135
+      },
+      {
+        "name": "case_description",
+        "height": 120,
+        "right": 705,
+        "left": 428
+      },
+      {
+        "name": "case_model_search",
+        "height": 41.5,
+        "right": 412,
+        "left": 135
+      },
+      {
+        "name": "model_id",
+        "height": 40,
+        "right": 705,
+        "left": 428
+      },
+      {
+        "name": "model_version_id",
+        "height": 40,
+        "right": 412,
+        "left": 135
+      },
+      {
+        "name": "Buscar Models",
+        "height": 40,
+        "right": 412,
+        "left": 135
+      },
+      {
+        "name": "operating_mode",
+        "height": 40,
+        "right": 412,
+        "left": 135
+      },
+      {
+        "name": "horizon_type",
+        "height": 40,
+        "right": 705,
+        "left": 428
+      },
+      {
+        "name": "planning_start",
+        "height": 43.5,
+        "right": 412,
+        "left": 135
+      },
+      {
+        "name": "planning_end",
+        "height": 43.5,
+        "right": 705,
+        "left": 428
+      },
+      {
+        "name": "primary_goal",
+        "height": 40,
+        "right": 412,
+        "left": 135
+      },
+      {
+        "name": "enable_MINIMUM_DEMAND_COVERAGE",
+        "height": 20,
+        "right": 155,
+        "left": 135
+      },
+      {
+        "name": "guard_MINIMUM_DEMAND_COVERAGE",
+        "height": 41.5,
+        "right": 412,
+        "left": 135
+      },
+      {
+        "name": "enable_CRITICAL_DEMAND_COVERAGE",
+        "height": 20,
+        "right": 448,
+        "left": 428
+      },
+      {
+        "name": "guard_CRITICAL_DEMAND_COVERAGE",
+        "height": 41.5,
+        "right": 705,
+        "left": 428
+      },
+      {
+        "name": "enable_MAXIMUM_EXTERNAL_SHARE",
+        "height": 20,
+        "right": 155,
+        "left": 135
+      },
+      {
+        "name": "guard_MAXIMUM_EXTERNAL_SHARE",
+        "height": 41.5,
+        "right": 412,
+        "left": 135
+      },
+      {
+        "name": "enable_MINIMUM_OWN_SHARE",
+        "height": 20,
+        "right": 448,
+        "left": 428
+      },
+      {
+        "name": "guard_MINIMUM_OWN_SHARE",
+        "height": 41.5,
+        "right": 705,
+        "left": 428
+      },
+      {
+        "name": "weight_COST",
+        "height": 41.5,
+        "right": 412,
+        "left": 135
+      },
+      {
+        "name": "weight_TRIPS",
+        "height": 41.5,
+        "right": 705,
+        "left": 428
+      },
+      {
+        "name": "weight_SERVICE",
+        "height": 41.5,
+        "right": 412,
+        "left": 135
+      },
+      {
+        "name": "weight_OWN_CAPACITY",
+        "height": 41.5,
+        "right": 705,
+        "left": 428
+      },
+      {
+        "name": "decision_owner_user_id",
+        "height": 40,
+        "right": 412,
+        "left": 135
+      },
+      {
+        "name": "Crear Case",
+        "height": 40,
+        "right": 709,
+        "left": 606.34375
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "scroll": 390,
+    "root": {
+      "x": 76,
+      "y": 97,
+      "width": 298,
+      "height": 3152.8125,
+      "top": 97,
+      "right": 374,
+      "bottom": 3249.8125,
+      "left": 76
+    },
+    "controls": [
+      {
+        "name": "Logistics Models",
+        "height": 40,
+        "right": 358,
+        "left": 92
+      },
+      {
+        "name": "case_name",
+        "height": 41.5,
+        "right": 341,
+        "left": 109
+      },
+      {
+        "name": "case_description",
+        "height": 120,
+        "right": 341,
+        "left": 109
+      },
+      {
+        "name": "case_model_search",
+        "height": 41.5,
+        "right": 341,
+        "left": 109
+      },
+      {
+        "name": "model_id",
+        "height": 40,
+        "right": 341,
+        "left": 109
+      },
+      {
+        "name": "model_version_id",
+        "height": 40,
+        "right": 341,
+        "left": 109
+      },
+      {
+        "name": "Buscar Models",
+        "height": 40,
+        "right": 341,
+        "left": 109
+      },
+      {
+        "name": "operating_mode",
+        "height": 40,
+        "right": 341,
+        "left": 109
+      },
+      {
+        "name": "horizon_type",
+        "height": 40,
+        "right": 341,
+        "left": 109
+      },
+      {
+        "name": "planning_start",
+        "height": 43.5,
+        "right": 341,
+        "left": 109
+      },
+      {
+        "name": "planning_end",
+        "height": 43.5,
+        "right": 341,
+        "left": 109
+      },
+      {
+        "name": "primary_goal",
+        "height": 40,
+        "right": 341,
+        "left": 109
+      },
+      {
+        "name": "enable_MINIMUM_DEMAND_COVERAGE",
+        "height": 20,
+        "right": 129,
+        "left": 109
+      },
+      {
+        "name": "guard_MINIMUM_DEMAND_COVERAGE",
+        "height": 41.5,
+        "right": 341,
+        "left": 109
+      },
+      {
+        "name": "enable_CRITICAL_DEMAND_COVERAGE",
+        "height": 20,
+        "right": 129,
+        "left": 109
+      },
+      {
+        "name": "guard_CRITICAL_DEMAND_COVERAGE",
+        "height": 41.5,
+        "right": 341,
+        "left": 109
+      },
+      {
+        "name": "enable_MAXIMUM_EXTERNAL_SHARE",
+        "height": 20,
+        "right": 129,
+        "left": 109
+      },
+      {
+        "name": "guard_MAXIMUM_EXTERNAL_SHARE",
+        "height": 41.5,
+        "right": 341,
+        "left": 109
+      },
+      {
+        "name": "enable_MINIMUM_OWN_SHARE",
+        "height": 20,
+        "right": 129,
+        "left": 109
+      },
+      {
+        "name": "guard_MINIMUM_OWN_SHARE",
+        "height": 41.5,
+        "right": 341,
+        "left": 109
+      },
+      {
+        "name": "weight_COST",
+        "height": 41.5,
+        "right": 341,
+        "left": 109
+      },
+      {
+        "name": "weight_TRIPS",
+        "height": 41.5,
+        "right": 341,
+        "left": 109
+      },
+      {
+        "name": "weight_SERVICE",
+        "height": 41.5,
+        "right": 341,
+        "left": 109
+      },
+      {
+        "name": "weight_OWN_CAPACITY",
+        "height": 41.5,
+        "right": 341,
+        "left": 109
+      },
+      {
+        "name": "decision_owner_user_id",
+        "height": 40,
+        "right": 341,
+        "left": 109
+      },
+      {
+        "name": "Crear Case",
+        "height": 40,
+        "right": 211.65625,
+        "left": 109
+      }
+    ]
+  },
+  {
+    "width": 320,
+    "scroll": 320,
+    "root": {
+      "x": 76,
+      "y": 97,
+      "width": 228,
+      "height": 3521.671875,
+      "top": 97,
+      "right": 304,
+      "bottom": 3618.671875,
+      "left": 76
+    },
+    "controls": [
+      {
+        "name": "Logistics Models",
+        "height": 40,
+        "right": 288,
+        "left": 92
+      },
+      {
+        "name": "case_name",
+        "height": 41.5,
+        "right": 271,
+        "left": 109
+      },
+      {
+        "name": "case_description",
+        "height": 120,
+        "right": 271,
+        "left": 109
+      },
+      {
+        "name": "case_model_search",
+        "height": 41.5,
+        "right": 271,
+        "left": 109
+      },
+      {
+        "name": "model_id",
+        "height": 40,
+        "right": 271,
+        "left": 109
+      },
+      {
+        "name": "model_version_id",
+        "height": 40,
+        "right": 271,
+        "left": 109
+      },
+      {
+        "name": "Buscar Models",
+        "height": 40,
+        "right": 271,
+        "left": 109
+      },
+      {
+        "name": "operating_mode",
+        "height": 40,
+        "right": 271,
+        "left": 109
+      },
+      {
+        "name": "horizon_type",
+        "height": 40,
+        "right": 271,
+        "left": 109
+      },
+      {
+        "name": "planning_start",
+        "height": 43.5,
+        "right": 271,
+        "left": 109
+      },
+      {
+        "name": "planning_end",
+        "height": 43.5,
+        "right": 271,
+        "left": 109
+      },
+      {
+        "name": "primary_goal",
+        "height": 40,
+        "right": 271,
+        "left": 109
+      },
+      {
+        "name": "enable_MINIMUM_DEMAND_COVERAGE",
+        "height": 20,
+        "right": 129,
+        "left": 109
+      },
+      {
+        "name": "guard_MINIMUM_DEMAND_COVERAGE",
+        "height": 41.5,
+        "right": 271,
+        "left": 109
+      },
+      {
+        "name": "enable_CRITICAL_DEMAND_COVERAGE",
+        "height": 20,
+        "right": 129,
+        "left": 109
+      },
+      {
+        "name": "guard_CRITICAL_DEMAND_COVERAGE",
+        "height": 41.5,
+        "right": 271,
+        "left": 109
+      },
+      {
+        "name": "enable_MAXIMUM_EXTERNAL_SHARE",
+        "height": 20,
+        "right": 129,
+        "left": 109
+      },
+      {
+        "name": "guard_MAXIMUM_EXTERNAL_SHARE",
+        "height": 41.5,
+        "right": 271,
+        "left": 109
+      },
+      {
+        "name": "enable_MINIMUM_OWN_SHARE",
+        "height": 20,
+        "right": 129,
+        "left": 109
+      },
+      {
+        "name": "guard_MINIMUM_OWN_SHARE",
+        "height": 41.5,
+        "right": 271,
+        "left": 109
+      },
+      {
+        "name": "weight_COST",
+        "height": 41.5,
+        "right": 271,
+        "left": 109
+      },
+      {
+        "name": "weight_TRIPS",
+        "height": 41.5,
+        "right": 271,
+        "left": 109
+      },
+      {
+        "name": "weight_SERVICE",
+        "height": 41.5,
+        "right": 271,
+        "left": 109
+      },
+      {
+        "name": "weight_OWN_CAPACITY",
+        "height": 41.5,
+        "right": 271,
+        "left": 109
+      },
+      {
+        "name": "decision_owner_user_id",
+        "height": 40,
+        "right": 271,
+        "left": 109
+      },
+      {
+        "name": "Crear Case",
+        "height": 40,
+        "right": 211.65625,
+        "left": 109
+      }
+    ]
+  }
+]

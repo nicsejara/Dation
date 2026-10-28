@@ -1,0 +1,27 @@
+{
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.41",
+  "uid": 1000,
+  "orchestrator_python": "3.12.14",
+  "app_test_python": "3.13.5",
+  "browser_test_python": "3.13.5",
+  "node": "v24.19.0",
+  "docker": "28.4.0",
+  "sql_sandbox_postgres": "17.11",
+  "production_postgres": "17.6",
+  "browser": {
+    "python": "3.13.5",
+    "playwright": "1.63.0",
+    "chromium_executable": "/home/agent/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome",
+    "executable_present": false,
+    "actual_selected_executable": "/usr/bin/chromium",
+    "actual_chromium_version": "Chromium 151.0.7922.173 built on Debian GNU/Linux 13 (trixie)"
+  },
+  "packages_installed_by_T0": false,
+  "daemon_restarted": false,
+  "production_changes": false,
+  "bootstrap_notes": [
+    "Default exec network could not reach proxy; git fetch succeeded under explicit additional network permission.",
+    "Socket-specific sandbox grant failed in bubblewrap; local Docker verified and used via authorized sandbox escalation.",
+    "No daemon startup/restart or arbitrary endpoint used."
+  ]
+}

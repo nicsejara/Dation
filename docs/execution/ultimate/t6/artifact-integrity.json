@@ -1,0 +1,175 @@
+{
+  "phase": "T6",
+  "head": "ef997235a30251fbf7ae53690ed738092ee973d8",
+  "captured_at": "2026-10-27T12:55:45.494168+00:00",
+  "decision": "GO",
+  "excludes_self": true,
+  "source_files": 8,
+  "files": [
+    {
+      "path": "backend/app/engines/assignment/transport_contracts.py",
+      "bytes": 4799,
+      "sha256": "c9d7696b36f003f47d8a9b139284e4735b536c4d20e0dc074474cff167bed223"
+    },
+    {
+      "path": "backend/app/engines/assignment/transport_model.py",
+      "bytes": 9478,
+      "sha256": "3f2b9733343a00438749e1c0de13b89155d866a3ab6122925fcf57caa641fc04"
+    },
+    {
+      "path": "backend/app/engines/assignment/transport_plan.py",
+      "bytes": 19448,
+      "sha256": "4ceed544a19653c05077c6bec7f5e70f95143344b8504ef2a0c48299e6439af2"
+    },
+    {
+      "path": "backend/app/engines/assignment/transport_validator.py",
+      "bytes": 19872,
+      "sha256": "3ce62b2b187b4a7ffbb307679c679063e822cf838c6408a69f7232ee169ec889"
+    },
+    {
+      "path": "backend/app/engines/common/__init__.py",
+      "bytes": 57,
+      "sha256": "35e6a452386832e8b9b5bfc9c0bdb8af21bec3625028417eeafc55a4949ddf6d"
+    },
+    {
+      "path": "backend/app/engines/common/day_resource_feasibility.py",
+      "bytes": 6173,
+      "sha256": "07070db298fe8e71f1a2f5067252ffaf8b3def3110fe78dad47bbd66e7d5c348"
+    },
+    {
+      "path": "backend/app/results/registry.py",
+      "bytes": 9889,
+      "sha256": "4e514cf47c0a38166c4dd52febc31ed798ddb6b4c7974b0fbe7989481f911310"
+    },
+    {
+      "path": "backend/tests/test_transport_plan_core.py",
+      "bytes": 29910,
+      "sha256": "0bc8680a6e6e7703ba90c36afdffd2ea2dcc905f4e62bd4d828c7fdc441e9836"
+    },
+    {
+      "path": "docs/execution/ultimate/t6/command-ledger.json",
+      "bytes": 2893,
+      "sha256": "31f7057543a6d9547a80fd922d2490ab8ed9b41bdd6740b8d7f9e2c10dc81a29"
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/B-NODE.log",
+      "bytes": 12067,
+      "sha256": "bb231c331499850b11899776ff57df3f0cb06a52075b15d7290c2853460ed9dc"
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/B-NODE.result.json",
+      "bytes": 1413,
+      "sha256": "7a4cfaf3a1b9ae313e429e85b985617d63e760502c2f541ce8565d01a2081298"
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/B-PY.log",
+      "bytes": 115774,
+      "sha256": "8f3546ec465446ffd1afea524f079f7471dd478b2e16b575826920d551a9a686"
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/B-PY.result.json",
+      "bytes": 558,
+      "sha256": "a0a02378b5fae75f3f9385eecb5a7e221d058debdaa978d333c88a211539dff7"
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/T6-user-request.txt",
+      "bytes": 17510,
+      "sha256": "c0c6f819cf15505294ebfef70ca3788f3347654b07f55388f7316c5f97247a77"
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/U6.log",
+      "bytes": 8398,
+      "sha256": "0a819796e5c83316849be720d2a0b8a7b739b7bfc238ac3ddcb2b54eb94596f8"
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/U6.result.json",
+      "bytes": 553,
+      "sha256": "1de4961f45c467b9a3291b85c1ba5cc0354db8d1b3bea9fbc4dbcb20e13f33e0"
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/attempts/U6-first.log",
+      "bytes": 7268,
+      "sha256": "a7a61b721ad9c8ea2d887df911d60a9bf2b3cffb9c645a713d9259315b306160"
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/attempts/U6-second.log",
+      "bytes": 7996,
+      "sha256": "9d53b27e60f3fe06c4d61332b7f678c36ac812d254bb9f471ec2f8b750cd1193"
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/candidate.json",
+      "bytes": 2059,
+      "sha256": "02dbafcaa3f60f1f8b3d6e53e703f6cac698961fa60552fb8424596c18daa204"
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/drivers/finalize.py",
+      "bytes": 9596,
+      "sha256": "36eecbaf78224c661b4258e610c76ea74e57f9d2f24fa06517e9d6f80cbbb9c0"
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/drivers/qa.py",
+      "bytes": 4055,
+      "sha256": "d98bd02665857062bfc7fc0dba7d870926b26f558422433d7934ad4307c2266b"
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/final-state.json",
+      "bytes": 57048,
+      "sha256": "07f2cb46ab13e75b80611c00eceff7f1a14ca98a9a2684aa5dd96a3e0a0003a3"
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/initial-state.json",
+      "bytes": 207725,
+      "sha256": "6564312a0d34de8e599e49f0d252def6e13b7fe997a974d76762e83157b2bfe4"
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/post-t5-tracked.patch",
+      "bytes": 352457,
+      "sha256": "7b0ffe4269d0477273fac488900d8bace92f6f12f1b5b62538472b845c5cf504"
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/post-t5/backend/app/results/registry.py",
+      "bytes": 9196,
+      "sha256": "b393a095d0e550d482f21c9d7c36ee0dfa3f538c16d0ca145e78e50c8469f6e1"
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/qa-final-batch.log",
+      "bytes": 2610,
+      "sha256": "7661a6fda2a04d800f6a6739bf6db3a7640b46b88abb9d5c5149f1e1285ded45"
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/skills/runtime-skill.txt",
+      "bytes": 3986,
+      "sha256": "de2ea16a5a8727be2a6cbf6a57d60c3eac1082119dd9685e69a2b8e83db120bc"
+    },
+    {
+      "path": "docs/execution/ultimate/t6/evidence/t6-changes.patch",
+      "bytes": 93128,
+      "sha256": "5beb3c43ec24d11a6aae8053b9a75bb06b22e9c420b34c0cd58cfe8edf858f83"
+    },
+    {
+      "path": "docs/execution/ultimate/t6/preservation.json",
+      "bytes": 750,
+      "sha256": "7827deb34964f1530103ab0b3694fc4aff8d7b7e5dd7d6c65df47d509b60090a"
+    },
+    {
+      "path": "docs/execution/ultimate/t6/scope-diff.json",
+      "bytes": 2741,
+      "sha256": "b77ed99d37f13b5ab2362fa593edb4df2bc0ad2a8e6df4fdf4c1600a308ef501"
+    },
+    {
+      "path": "docs/execution/ultimate/t6/skills-ledger.json",
+      "bytes": 1920,
+      "sha256": "c2e67fe64bc505e43458a91d853607600a349c6863c492e6834bc62c2128a8d6"
+    },
+    {
+      "path": "docs/execution/ultimate/t6/t6-execution-report.md",
+      "bytes": 24617,
+      "sha256": "8656a39bd4ac2855fdc0cf35bde6103463e15ce563f485a2a1c5735ed68b3586"
+    },
+    {
+      "path": "docs/execution/ultimate/t6/test-ledger.json",
+      "bytes": 12748,
+      "sha256": "f98f0ad9d9d861f93fd154e7e6fe7dc68f01524864e230a9a8c537209ed97199"
+    }
+  ]
+}

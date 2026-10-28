@@ -1,0 +1,1764 @@
+{
+  "phase": "T0-R",
+  "classified_before_source_changes": true,
+  "classified_at": "2026-10-25T19:57:03.150456+00:00",
+  "source_head": "ef997235a30251fbf7ae53690ed738092ee973d8",
+  "baseline_register_sha256": "03be6886e878f5dde3fd0cc39ab8e7cd21779fb4a98493de1a79d23cffae5c02",
+  "baseline_failure_entries": 145,
+  "unresolved_clusters": 0,
+  "groups": [
+    {
+      "id": "C-NETWORK",
+      "category": "C",
+      "baseline_indices": [
+        0,
+        10,
+        17,
+        22,
+        23,
+        37,
+        38,
+        39
+      ],
+      "cause": "Browser module loading overlaps creation/removal of Docker bridge networks by E2E; Chromium aborts local imports with ERR_NETWORK_CHANGED.",
+      "component": "T0 suite orchestration / Chromium bootstrap",
+      "expected_by_test": "Application modules and UI finish loading.",
+      "actual": "Intermittent timeouts / caught bootstrap failure; focal and quiet-network boot probes pass.",
+      "contract": "G-ENV: tests must execute in an isolated, reproducible environment; no automatic reload masking errors.",
+      "evidence": [
+        "browser-observed.log: test_case_ux_stale_local_lineage_cannot_show_a_transition_notice requestfailed ERR_NETWORK_CHANGED and T0R_BOOT_ERROR",
+        "T0 B-BROWSER 17:55:32–18:29:24 UTC overlaps B-E2E 17:57:50–18:17:43 and B-SQL; same overlap reproduced T0-R",
+        "boot-probe, boot-complete and boot-log: 66 quiet-network initializations; current-failures.log 4/5 PASS, remaining obsolete selector"
+      ],
+      "change": "Pending; classified before source edits",
+      "focal_tests": [],
+      "result": "NOT RUN after remediation",
+      "tests": [
+        "test_home_hero.HomeHeroTests.test_h6_greeting_keeps_workspace_timezone_identity_updates_and_fallback",
+        "test_navigation.NavigationTests.test_cold_scheduling_link_and_refresh",
+        "test_navigation.NavigationTests.test_d1_v2_view_modes_preserve_evidence_and_restore_without_reexecution",
+        "test_navigation.NavigationTests.test_data_hub_archive_delete_retry_and_text_safety",
+        "test_navigation.NavigationTests.test_data_hub_empty_failure_readonly_and_legacy_links",
+        "test_navigation.NavigationTests.test_phase5_toolbar_menus_are_exclusive_outside_escape_and_viewport_safe",
+        "test_navigation.NavigationTests.test_phase6_all_pages_have_dark_contrast_accessible_names_and_no_overflow",
+        "test_navigation.NavigationTests.test_phase6_mobile_footer_grid_keeps_keyboard_focus_visible_without_scroll_or_state_changes"
+      ],
+      "failure_entries": 8,
+      "test_sources": [
+        "backend/tests/browser/test_home_hero.py:70",
+        "backend/tests/browser/test_navigation.py:1012",
+        "backend/tests/browser/test_navigation.py:1074",
+        "backend/tests/browser/test_navigation.py:1110",
+        "backend/tests/browser/test_navigation.py:1239",
+        "backend/tests/browser/test_navigation.py:3107",
+        "backend/tests/browser/test_navigation.py:3752",
+        "backend/tests/browser/test_navigation.py:3762"
+      ]
+    },
+    {
+      "id": "C-READY",
+      "category": "C",
+      "baseline_indices": [
+        3
+      ],
+      "cause": "Test treats the template CTA enabled state as proof that the asynchronous workspace API has mounted.",
+      "component": "Navigation browser setup / API readiness wait",
+      "expected_by_test": "window.DationDispatch already exists after a template button becomes enabled.",
+      "actual": "Immediate evaluate runs while only the skip link is rendered and DationDispatch is undefined.",
+      "contract": "platform/boot.mjs loads workspace asynchronously after identity; tests must wait for the API they invoke.",
+      "evidence": [
+        "dation-t0r-diagnostic.log: exact undefined openDecisionMap exception and skip-only body",
+        "platform/boot.mjs; dda-logistics-landing.js syncHeroActions"
+      ],
+      "change": "Pending; classified before source edits",
+      "focal_tests": [],
+      "result": "NOT RUN after remediation",
+      "tests": [
+        "test_navigation.NavigationTests.test_case_selector_paginates_compact_active_and_completed_and_hydrates_only_selection"
+      ],
+      "failure_entries": 1,
+      "test_sources": [
+        "backend/tests/browser/test_navigation.py:999"
+      ]
+    },
+    {
+      "id": "B-VALIDATION",
+      "category": "B",
+      "baseline_indices": [
+        73
+      ],
+      "cause": "Legacy CSS wins the equal-specificity cascade and adds an unconditional Validado pseudo-element to the current data card.",
+      "component": "decision-trace-v3.css / workflow-context.css Case Context cards",
+      "expected_by_test": "Invalid input profiles never claim validation.",
+      "actual": "No validation badge in DOM, but ::after says ✓ Validado for both invalid datasets.",
+      "contract": "decisionDataFileCard validates only when profile_json.counts.errors === 0; preserve truthful evidence.",
+      "evidence": [
+        "css-probe.jsonl: both configurations; errors=1 and computed pseudo content ✓ Validado",
+        "decision-config-ui.mjs decisionDataFileCard; decision-trace-v3.css:165"
+      ],
+      "change": "Pending; classified before source edits",
+      "focal_tests": [],
+      "result": "NOT RUN after remediation",
+      "tests": [
+        "test_navigation.NavigationTests.test_config_disclosures_do_not_claim_validation_for_profiles_with_errors"
+      ],
+      "failure_entries": 1,
+      "test_sources": [
+        "backend/tests/browser/test_navigation.py:706"
+      ]
+    },
+    {
+      "id": "B-CONTRAST",
+      "category": "B",
+      "baseline_indices": [
+        76
+      ],
+      "cause": "Muted capability preview text lacks AA contrast on its hover surface.",
+      "component": "dispatch.css Decision Intelligence capability small text",
+      "expected_by_test": "Small text contrast >= 4.5.",
+      "actual": "4.402332901228427 at 1280px; foreground rgb(145,165,175).",
+      "contract": "Existing AA accessibility acceptance, same theme audit without relaxing its threshold.",
+      "evidence": [
+        "T0 B-BROWSER exact contrast trace; diagnostic reproduction",
+        "dispatch.css:4750–4752; theme_audit.js"
+      ],
+      "change": "Pending; classified before source edits",
+      "focal_tests": [],
+      "result": "NOT RUN after remediation",
+      "tests": [
+        "test_navigation.NavigationTests.test_d1_v2_essential_and_advanced_fit_low_viewports_and_keyboard"
+      ],
+      "failure_entries": 1,
+      "test_sources": [
+        "backend/tests/browser/test_navigation.py:3279"
+      ]
+    },
+    {
+      "id": "A-ROLES",
+      "category": "A",
+      "baseline_indices": [
+        9,
+        59,
+        60,
+        64,
+        66,
+        112,
+        113,
+        115,
+        118,
+        119,
+        120,
+        121,
+        123,
+        125,
+        126,
+        129,
+        130,
+        131,
+        139,
+        140,
+        142
+      ],
+      "cause": "Fixtures and assertions still split Data Owner/Data Steward or assign a separate Approver and use the old assignment editor.",
+      "component": "Browser WorkflowContext/Center/Team fixtures and E2E collaboration/foundation/gates",
+      "expected_by_test": "Legacy role writes and separate approver controls/eligibility are accepted.",
+      "actual": "Write API accepts data_owner and decision_owner; one Decision Owner or Admin executes/approves; current controls select that owner.",
+      "contract": "docs/domain-model.md; team_routes.py Responsibility literal; workflow-responsibility.mjs; current checked SQL authority.",
+      "evidence": [
+        "T0 E2E 422 validation bodies; test_saga3_ui missing-owner acceptance passes",
+        "docs/domain-model.md:11,32; cases/workflow-responsibility.mjs; platform/team_routes.py"
+      ],
+      "change": "Pending; classified before source edits",
+      "focal_tests": [],
+      "result": "NOT RUN after remediation",
+      "tests": [
+        "test_collaboration.CollaborationTests.test_01_team_browser_invitation_acceptance_assignments_and_access",
+        "test_collaboration.CollaborationTests.test_02_assigned_approval_handoff_attribution_override_and_retry",
+        "test_collaboration.CollaborationTests.test_03_invitation_confirmation_expiry_revocation_recipient_and_idempotency",
+        "test_collaboration.CollaborationTests.test_04_last_admin_concurrency_and_assignment_races",
+        "test_decision_center.DecisionCenterTests.test_04_portfolio_summary_is_global_actionable_and_read_only",
+        "test_navigation.NavigationTests.test_center_assignment_search_preserves_both_selections_and_explicit_clear",
+        "test_optimized_responsibilities.OptimizedResponsibilityTests.test_legacy_assignment_projects_to_its_explicit_role_without_ambiguous_overwrite",
+        "test_optimized_responsibilities.OptimizedResponsibilityTests.test_split_roles_reload_independent_node_assignments_and_actual_approval",
+        "test_v2_foundation.FoundationDomainTests.test_approved_precedence_actual_actor_and_explicit_candidate_access",
+        "test_v2_foundation.FoundationDomainTests.test_multi_responsibility_candidates_cas_and_legacy_compatibility",
+        "test_v2_foundation.FoundationDomainTests.test_stage_assignments_enforce_eligibility_and_keep_get_read_only",
+        "test_workflow_context.WorkflowContextTests.test_both_dashboards_keep_approval_blocked_until_an_eligible_approver_is_saved",
+        "test_workflow_context.WorkflowContextTests.test_data_gate_registers_only_on_assignment_and_opens_the_same_case_map",
+        "test_workflow_context.WorkflowContextTests.test_data_roles_exist_before_csv_and_stay_below_compatibility",
+        "test_workflow_context.WorkflowContextTests.test_data_save_does_not_overwrite_assignment_changed_while_editing",
+        "test_workflow_context.WorkflowContextTests.test_operator_registers_a_pending_data_case_and_refreshes_admin_assignment",
+        "test_workflow_context.WorkflowContextTests.test_team_keeps_one_invitation_entry_and_edits_multiple_roles_together",
+        "test_workflow_gates.WorkflowGateTests.test_atomic_team_edit_keeps_multiple_roles_and_rolls_back_invalid_access",
+        "test_workflow_gates.WorkflowGateTests.test_d1_d2_gates_are_independent_and_assigned_approver_is_not_actual_actor",
+        "test_workflow_gates.WorkflowGateTests.test_role_loss_cross_workspace_forgery_and_policy_changes_do_not_bypass_gates"
+      ],
+      "failure_entries": 21,
+      "test_sources": [
+        "backend/tests/browser/test_navigation.py:3993",
+        "backend/tests/browser/test_workflow_context.py:155",
+        "backend/tests/browser/test_workflow_context.py:180",
+        "backend/tests/browser/test_workflow_context.py:193",
+        "backend/tests/browser/test_workflow_context.py:214",
+        "backend/tests/browser/test_workflow_context.py:260",
+        "backend/tests/browser/test_workflow_context.py:338",
+        "backend/tests/e2e/test_collaboration.py:29",
+        "backend/tests/e2e/test_decision_center.py:131",
+        "backend/tests/e2e/test_optimized_responsibilities.py:27",
+        "backend/tests/e2e/test_optimized_responsibilities.py:71",
+        "backend/tests/e2e/test_v2_foundation.py:111",
+        "backend/tests/e2e/test_v2_foundation.py:57",
+        "backend/tests/e2e/test_v2_foundation.py:81",
+        "backend/tests/e2e/test_workflow_gates.py:101",
+        "backend/tests/e2e/test_workflow_gates.py:125",
+        "backend/tests/e2e/test_workflow_gates.py:141"
+      ]
+    },
+    {
+      "id": "A-PREPARATION",
+      "category": "A",
+      "baseline_indices": [
+        1,
+        5,
+        7,
+        24,
+        25,
+        43,
+        46,
+        48,
+        49,
+        51,
+        52,
+        54,
+        55,
+        65,
+        67,
+        122,
+        138,
+        141
+      ],
+      "cause": "Positive fixtures omit the applied attribute/owner snapshot, rely on a separate Save for Data Owner, or mark a ready next decision locked.",
+      "component": "Navigation upload/config fixtures; WorkflowContext; E2E workflow setup",
+      "expected_by_test": "CSV pair alone or old independent owner save makes the Case/configuration ready.",
+      "actual": "Four independent checks and joint Apply precede Case readiness; next Config requires actual eligible owner and upstream approval.",
+      "contract": "docs/domain-model.md preparation contract; decision-target.mjs configurationAvailable; attributes-before-CSV acceptance.",
+      "evidence": [
+        "test_attributes_before_csv.py; test_saga5_ui.py; test_saga3_ui.py",
+        "workflow_fixture.py prepare_stage; workspace.mjs ready and hydrateCase"
+      ],
+      "change": "Pending; classified before source edits",
+      "focal_tests": [],
+      "result": "NOT RUN after remediation",
+      "tests": [
+        "test_decision_center.DecisionCenterTests.test_02_live_workflow_completion_review_lineage_history_and_read_purity",
+        "test_navigation.NavigationTests.test_approved_assignment_continues_directly_to_scheduling_configuration",
+        "test_navigation.NavigationTests.test_case_ux_first_pack_is_persisted_before_execution_without_transition_notice",
+        "test_navigation.NavigationTests.test_case_ux_real_data_change_retains_lineage_but_reopening_history_has_no_new_notice",
+        "test_navigation.NavigationTests.test_data_pack_has_one_stable_dark_bar_across_responsive_reuse",
+        "test_navigation.NavigationTests.test_data_pack_relation_error_recovers_to_ready_with_optional_warnings",
+        "test_navigation.NavigationTests.test_workflow_bars_equalize_context_and_keep_a_wider_primary_action",
+        "test_navigation.NavigationTests.test_workflow_keyboard_and_text_spacing_at_320_and_landscape",
+        "test_navigation.NavigationTests.test_workflow_progressive_actions_share_styles_arrow_and_keyboard_focus",
+        "test_workflow.WorkflowTests.test_scheduling_dashboard_v21_preserves_assignment_and_temporal_relations",
+        "test_workflow_context.WorkflowContextTests.test_owner_revoked_at_admission_returns_to_config_without_polling_a_phantom_run",
+        "test_workflow_context.WorkflowContextTests.test_viewer_and_late_candidates_do_not_gain_mutation_controls",
+        "test_workflow_gates.WorkflowGateTests.test_new_cases_require_data_owner_and_approver_but_replays_keep_their_result"
+      ],
+      "failure_entries": 18,
+      "test_sources": [
+        "backend/tests/browser/test_navigation.py:2196",
+        "backend/tests/browser/test_navigation.py:2286",
+        "backend/tests/browser/test_navigation.py:2493",
+        "backend/tests/browser/test_navigation.py:2513",
+        "backend/tests/browser/test_navigation.py:2623",
+        "backend/tests/browser/test_navigation.py:2624",
+        "backend/tests/browser/test_navigation.py:2902",
+        "backend/tests/browser/test_navigation.py:2952",
+        "backend/tests/browser/test_navigation.py:495",
+        "backend/tests/browser/test_workflow_context.py:113",
+        "backend/tests/browser/test_workflow_context.py:228",
+        "backend/tests/e2e/test_decision_center.py:73",
+        "backend/tests/e2e/test_workflow.py:353",
+        "backend/tests/e2e/test_workflow_gates.py:83"
+      ]
+    },
+    {
+      "id": "A-CONTEXT",
+      "category": "A",
+      "baseline_indices": [
+        2,
+        4,
+        6,
+        8,
+        28,
+        29,
+        30,
+        40,
+        47,
+        50,
+        53,
+        58,
+        62,
+        68,
+        69,
+        81
+      ],
+      "cause": "Tests target removed map/case-switcher hooks, an unscoped first summary, old context markup/copy or a uniform legacy hero.",
+      "component": "Map/Config context, canonical Case navigation and current hero composition",
+      "expected_by_test": "data-select-case, data-map-context, old map buttons/identity columns and equal old hero heights remain.",
+      "actual": "Case identity is fixed; its context is data-config-context; canonical Case navigation returns to its Map; Data hero is copy-only.",
+      "contract": "docs/navigation.md; Saga3/4/5 approved behavior; decisionCaseCard; current Map and Data composition.",
+      "evidence": [
+        "test_workflow_context.test_case_context_is_fixed_and_keyboard_navigation_returns_to_its_map",
+        "cases/decision-map.mjs render; decision-config-ui.mjs decisionCaseCard; test_saga5_ui.py"
+      ],
+      "change": "Pending; classified before source edits",
+      "focal_tests": [],
+      "result": "NOT RUN after remediation",
+      "tests": [
+        "test_navigation.NavigationTests.test_both_configuration_contexts_are_closed_and_scheduling_source_stays_visible",
+        "test_navigation.NavigationTests.test_both_toolbar_map_buttons_use_run_case_and_preserve_business_state",
+        "test_navigation.NavigationTests.test_case_ux_completed_picker_switches_once_without_reload_and_preserves_drafts",
+        "test_navigation.NavigationTests.test_case_ux_hero_contract_and_attention_contours_at_desktop_mobile_and_reflow",
+        "test_navigation.NavigationTests.test_case_ux_picker_load_error_keeps_map_and_archived_cases_are_excluded",
+        "test_navigation.NavigationTests.test_case_ux_single_current_picker_never_navigates_and_restores_keyboard_focus",
+        "test_navigation.NavigationTests.test_map_config_and_toolbar_fit_mobile_without_obsolete_kpi_or_calendar_actions",
+        "test_navigation.NavigationTests.test_map_disclosure_keeps_progress_visible_and_preserves_columns_and_change_data",
+        "test_navigation.NavigationTests.test_map_disclosure_layout_remains_readable_at_all_five_breakpoints",
+        "test_navigation.NavigationTests.test_map_selector_switches_case_data_progress_url_and_restores_cancel_focus",
+        "test_navigation.NavigationTests.test_phase7_map_styles_retry_and_remain_shared_with_config_and_filters",
+        "test_navigation.NavigationTests.test_workflow_keyboard_and_text_spacing_at_320_and_landscape",
+        "test_saga4_ui.Saga4UITests.test_shared_case_context_and_compact_map_milestones",
+        "test_workflow_context.WorkflowContextTests.test_history_and_archived_maps_remain_readable_after_data_owner_loses_eligibility"
+      ],
+      "failure_entries": 16,
+      "test_sources": [
+        "backend/tests/browser/test_navigation.py:2371",
+        "backend/tests/browser/test_navigation.py:2428",
+        "backend/tests/browser/test_navigation.py:2452",
+        "backend/tests/browser/test_navigation.py:2472",
+        "backend/tests/browser/test_navigation.py:2544",
+        "backend/tests/browser/test_navigation.py:2627",
+        "backend/tests/browser/test_navigation.py:713",
+        "backend/tests/browser/test_navigation.py:723",
+        "backend/tests/browser/test_navigation.py:745",
+        "backend/tests/browser/test_navigation.py:811",
+        "backend/tests/browser/test_navigation.py:829",
+        "backend/tests/browser/test_navigation.py:842",
+        "backend/tests/browser/test_saga4_ui.py:25",
+        "backend/tests/browser/test_workflow_context.py:245"
+      ]
+    },
+    {
+      "id": "A-HOME",
+      "category": "A",
+      "baseline_indices": [
+        33,
+        34,
+        35,
+        36,
+        70,
+        71,
+        80,
+        82,
+        117,
+        124,
+        128,
+        135,
+        136,
+        137
+      ],
+      "cause": "Historical Home/catalog/overview journeys expect the previous standalone catalog, old Home activity widgets or a disabled map CTA.",
+      "component": "Home/catalog/Logistics entry and E2E entry journeys",
+      "expected_by_test": "Catalog route /app/ddas and inicio remain current; overview opens a Case selector and old Home cards/activity exist.",
+      "actual": "Catalog is embedded in Home /app; inicio resolves to platform-home; Logistics CTA opens its filtered Decision Center and remains useful with no Cases.",
+      "contract": "Approved visual-product-upgrade Phase 2; platform/home.mjs; dda-logistics-landing.js; navigation/resource.mjs.",
+      "evidence": [
+        "docs/visual-product-upgrade-summary.md Phase 2; current home.mjs DOM",
+        "dda-logistics-landing.js syncHeroActions/bindActions; platform/dda-catalog.mjs"
+      ],
+      "change": "Pending; classified before source edits",
+      "focal_tests": [],
+      "result": "NOT RUN after remediation",
+      "tests": [
+        "test_activity.ActivityTests.test_03_browser_real_home_case_events_and_exports",
+        "test_navigation.NavigationTests.test_catalog_entitlements_cover_deep_links_revocation_and_reenable",
+        "test_navigation.NavigationTests.test_catalog_fallback_keeps_disabled_entitlement_closed",
+        "test_navigation.NavigationTests.test_home_card_keyboard_and_informational_overview_with_native_faq",
+        "test_navigation.NavigationTests.test_overview_availability_ignores_stale_responses_and_refreshes_on_bfcache",
+        "test_navigation.NavigationTests.test_overview_has_two_hero_actions_and_disabled_visible_map_without_cases",
+        "test_navigation.NavigationTests.test_overview_map_with_active_case_and_multiple_cases_uses_existing_selector",
+        "test_navigation.NavigationTests.test_overview_multiple_cases_without_selection_uses_existing_selector",
+        "test_navigation.NavigationTests.test_overview_single_case_map_opens_directly_and_new_decision_clears_active_context",
+        "test_onboarding.OnboardingTests.test_04_browser_first_run_empty_states_demo_and_recovery",
+        "test_tenancy.TenancyTests.test_11_real_browser_catalog_revocation_and_reenable",
+        "test_workflow.WorkflowTests.test_browser_complete_workflow_at_mobile_width",
+        "test_workflow.WorkflowTests.test_browser_creation_execution_approval_navigation_and_mobile_history",
+        "test_workflow.WorkflowTests.test_platform_auth_navigation_profile_and_logout"
+      ],
+      "failure_entries": 14,
+      "test_sources": [
+        "backend/tests/browser/test_navigation.py:2146",
+        "backend/tests/browser/test_navigation.py:3650",
+        "backend/tests/browser/test_navigation.py:3694",
+        "backend/tests/browser/test_navigation.py:556",
+        "backend/tests/browser/test_navigation.py:575",
+        "backend/tests/browser/test_navigation.py:586",
+        "backend/tests/browser/test_navigation.py:595",
+        "backend/tests/browser/test_navigation.py:623",
+        "backend/tests/e2e/test_activity.py:86",
+        "backend/tests/e2e/test_onboarding.py:71",
+        "backend/tests/e2e/test_tenancy.py:251",
+        "backend/tests/e2e/test_workflow.py:314",
+        "backend/tests/e2e/test_workflow.py:317",
+        "backend/tests/e2e/test_workflow.py:363"
+      ]
+    },
+    {
+      "id": "A-ACTIONS",
+      "category": "A",
+      "baseline_indices": [
+        13,
+        14,
+        19,
+        20,
+        26,
+        31,
+        41,
+        42,
+        84
+      ],
+      "cause": "Tests expect duplicate approval, obsolete More menu actions, old terminal error actions or direct continuation to an existing next dashboard.",
+      "component": "Current dashboard toolbar / terminal recovery / continuation",
+      "expected_by_test": "data-approve-final and data-dashboard-map exist; old More contains three actions; continuation reopens D2 review.",
+      "actual": "One toolbar approval, Export and technical details; next eligible decision opens Config; terminal error offers one same-decision Config CTA.",
+      "contract": "docs/navigation.md continuation; Saga3 terminal recovery; dashboard-toolbar.mjs and dashboard-actions.mjs.",
+      "evidence": [
+        "test_saga3_ui.py; test_run_lineage_polish.py; docs/final-polish-run-lineage-saga-summary.md",
+        "runs/dashboard-toolbar.mjs; workspace.mjs dashboardContinuation"
+      ],
+      "change": "Pending; classified before source edits",
+      "focal_tests": [],
+      "result": "NOT RUN after remediation",
+      "tests": [
+        "test_navigation.NavigationTests.test_d1_v2_final_approval_updates_hero_and_continues_to_scheduling",
+        "test_navigation.NavigationTests.test_d1_v2_infeasible_and_missing_metrics_remain_explicit",
+        "test_navigation.NavigationTests.test_d2_v21_ai_retry_approval_and_approved_state",
+        "test_navigation.NavigationTests.test_d2_v21_infeasible_never_recommends_or_approves",
+        "test_navigation.NavigationTests.test_existing_review_continues_to_its_dashboard_without_another_configuration",
+        "test_navigation.NavigationTests.test_new_decision_goes_to_empty_data_without_losing_existing_case",
+        "test_navigation.NavigationTests.test_scheduling_uses_shared_menus_drawer_and_exports_without_format_changes",
+        "test_navigation.NavigationTests.test_terminal_scheduling_error_restores_window_and_executes_new_run",
+        "test_navigation.NavigationTests.test_toolbar_approval_is_unique_direct_and_preserves_continuation"
+      ],
+      "failure_entries": 9,
+      "test_sources": [
+        "backend/tests/browser/test_navigation.py:3244",
+        "backend/tests/browser/test_navigation.py:3252",
+        "backend/tests/browser/test_navigation.py:3419",
+        "backend/tests/browser/test_navigation.py:3446",
+        "backend/tests/browser/test_navigation.py:483",
+        "backend/tests/browser/test_navigation.py:505",
+        "backend/tests/browser/test_navigation.py:766",
+        "backend/tests/browser/test_navigation.py:907",
+        "backend/tests/browser/test_navigation.py:928"
+      ]
+    },
+    {
+      "id": "A-INSIGHT",
+      "category": "A",
+      "baseline_indices": [
+        11,
+        12,
+        16,
+        18,
+        27,
+        72,
+        75,
+        77
+      ],
+      "cause": "Tests bypass the current Insight capability, expect hidden controls visible, or require old advanced toggle labels/IDs.",
+      "component": "Dashboard Decision Intelligence / IA tests",
+      "expected_by_test": "Inline AI summary controls/availability are visible without selecting Insight; advanced labels toggle Mostrar/Ocultar.",
+      "actual": "Insight and Advanced are peer capabilities; evidence opens full-width below; stable labels and current IDs preserve caching/retry/lazy behavior.",
+      "contract": "Approved Final Polish Phase 4 / C7, preserving inference and evidence contracts.",
+      "evidence": [
+        "docs/final-polish-saga-summary.md Phase 4; test_final_polish.py test_c7",
+        "dashboard-presentation.mjs; assignment-ai-summary.mjs; scheduling-ai-summary.mjs"
+      ],
+      "change": "Pending; classified before source edits",
+      "focal_tests": [],
+      "result": "NOT RUN after remediation",
+      "tests": [
+        "test_navigation.NavigationTests.test_comparative_original_always_keeps_essential_before_comparative_and_ia",
+        "test_navigation.NavigationTests.test_d1_v2_ai_cached_brief_copy_chat_and_collapse_without_inference",
+        "test_navigation.NavigationTests.test_d1_v2_ai_loading_error_retry_regeneration_are_explicit_and_coalesced",
+        "test_navigation.NavigationTests.test_d1_v2_disclosure_keyboard_feedback_and_manual_scroll",
+        "test_navigation.NavigationTests.test_d1_v2_new_comparative_evidence_marks_summary_stale_without_automatic_ai",
+        "test_navigation.NavigationTests.test_d2_v21_ai_cache_generation_freshness_and_chat",
+        "test_navigation.NavigationTests.test_d2_v21_disclosure_keyboard_persistence_preview_and_evidence",
+        "test_navigation.NavigationTests.test_explanation_aborts_on_navigation"
+      ],
+      "failure_entries": 8,
+      "test_sources": [
+        "backend/tests/browser/test_navigation.py:1605",
+        "backend/tests/browser/test_navigation.py:3139",
+        "backend/tests/browser/test_navigation.py:3189",
+        "backend/tests/browser/test_navigation.py:3210",
+        "backend/tests/browser/test_navigation.py:3224",
+        "backend/tests/browser/test_navigation.py:3347",
+        "backend/tests/browser/test_navigation.py:3401",
+        "backend/tests/browser/test_navigation.py:420"
+      ]
+    },
+    {
+      "id": "A-HERO",
+      "category": "A",
+      "baseline_indices": [
+        15,
+        21,
+        44,
+        45,
+        98
+      ],
+      "cause": "Hero tests use old artwork URL, generic page-hero class, removed panel title selector, zero-padded metadata or always-expanded panel geometry.",
+      "component": "Shared hero tests and current art fallbacks",
+      "expected_by_test": "Old assignment-hero-truck asset and step labels DECISIÓN 01; all workflow heroes have identical panel markup.",
+      "actual": "Current unified isometric assets, product hero on Home, unpadded metadata and native optional panel disclosure.",
+      "contract": "Approved Final Polish C4 and unified illustration family; shared decisionHero implementation.",
+      "evidence": [
+        "docs/final-polish-saga-summary.md C4; unified-hero-illustrations-and-icon-refinement-summary.md",
+        "decision-config-ui.mjs decisionHero; test_home_hero.py; test_unified_heroes.py"
+      ],
+      "change": "Pending; classified before source edits",
+      "focal_tests": [],
+      "result": "NOT RUN after remediation",
+      "tests": [
+        "test_navigation.NavigationTests.test_d1_v2_local_hero_has_a_readable_svg_fallback",
+        "test_navigation.NavigationTests.test_dark_shell_and_heroes_survive_responsive_and_warm_navigation",
+        "test_navigation.NavigationTests.test_workflow_hero_future_content_wraps_without_clipping_or_html_injection",
+        "test_navigation.NavigationTests.test_workflow_heroes_share_metadata_panel_and_stable_desktop_height",
+        "test_navigation.NavigationTests.test_workflow_primitives_hero_supports_optional_metadata_and_panel"
+      ],
+      "failure_entries": 5,
+      "test_sources": [
+        "backend/tests/browser/test_navigation.py:1814",
+        "backend/tests/browser/test_navigation.py:2987",
+        "backend/tests/browser/test_navigation.py:3043",
+        "backend/tests/browser/test_navigation.py:3090",
+        "backend/tests/browser/test_navigation.py:3264"
+      ]
+    },
+    {
+      "id": "A-VISUAL",
+      "category": "A",
+      "baseline_indices": [
+        74,
+        78,
+        79,
+        83,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        99,
+        144
+      ],
+      "cause": "Historical visual assertions hardcode removed copy, old teal/overlay colors, gradients/filter hover, side borders or static command bars.",
+      "component": "Current tokens, command bars, context layout and Settings tab assertions",
+      "expected_by_test": "Primary role means gradient; hover means filter change; selected tab means different text color; width always subtracts two side borders.",
+      "actual": "Current design uses role classes/solid tokens, background and underline feedback, computed side borders, and fixed reserved command bars.",
+      "contract": "Approved visual-product-upgrade design system and Final Polish C5; preserve semantic state/accessibility rather than obsolete decoration.",
+      "evidence": [
+        "docs/visual-product-upgrade-summary.md design system; docs/final-polish-saga-summary.md C5",
+        "css-probe.jsonl computed full width/zero side borders; platform-workspace-settings.css:9; workflow-action-bar.mjs"
+      ],
+      "change": "Pending; classified before source edits",
+      "focal_tests": [],
+      "result": "NOT RUN after remediation",
+      "tests": [
+        "test_navigation.NavigationTests.test_d1_d2_upper_geometry_and_visible_headings_are_normalized",
+        "test_navigation.NavigationTests.test_dark_buttons_have_keyboard_focus_contrast_and_stable_disabled_state",
+        "test_navigation.NavigationTests.test_data_pack_context_is_dark_with_native_disclosure_in_map_and_configs",
+        "test_navigation.NavigationTests.test_phase5_schedule_chart_preserves_data_dates_and_dark_tooltip",
+        "test_navigation.NavigationTests.test_shared_config_disclosures_are_full_width_without_overlap_at_all_five_breakpoints",
+        "test_navigation.NavigationTests.test_workflow_keyboard_and_text_spacing_at_320_and_landscape",
+        "test_navigation.NavigationTests.test_workflow_primitives_preserve_action_identity_states_and_token_overrides",
+        "test_workspace_settings.WorkspaceSettingsTests.test_02_admin_browser_preferences_free_plan_and_historical_evidence"
+      ],
+      "failure_entries": 19,
+      "test_sources": [
+        "backend/tests/browser/test_navigation.py:1312",
+        "backend/tests/browser/test_navigation.py:1861",
+        "backend/tests/browser/test_navigation.py:2319",
+        "backend/tests/browser/test_navigation.py:2634",
+        "backend/tests/browser/test_navigation.py:2875",
+        "backend/tests/browser/test_navigation.py:3476",
+        "backend/tests/browser/test_navigation.py:668",
+        "backend/tests/e2e/test_workspace_settings.py:55"
+      ]
+    },
+    {
+      "id": "A-TERMINOLOGY",
+      "category": "A",
+      "baseline_indices": [
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ],
+      "cause": "Review dialog tests still expect the generic Responsable label.",
+      "component": "Execution review tests",
+      "expected_by_test": "Row label Responsable.",
+      "actual": "Row label Decision Owner with unchanged owner authority and execution payload.",
+      "contract": "docs/domain-model.md Decision Owner; current execution review callers.",
+      "evidence": [
+        "T0 12 exact subtest failures; assignment/scheduling config dialog rows"
+      ],
+      "change": "Pending; classified before source edits",
+      "focal_tests": [],
+      "result": "NOT RUN after remediation",
+      "tests": [
+        "test_navigation.NavigationTests.test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports"
+      ],
+      "failure_entries": 12,
+      "test_sources": [
+        "backend/tests/browser/test_navigation.py:2712"
+      ]
+    },
+    {
+      "id": "A-RERUN",
+      "category": "A",
+      "baseline_indices": [
+        32,
+        56,
+        57,
+        133
+      ],
+      "cause": "Journeys click Nueva corrida but never confirm the approved warning dialog.",
+      "component": "Browser Saga4/Navigation and E2E golden new-run journeys",
+      "expected_by_test": "Click immediately shows same-decision configuration.",
+      "actual": "Native confirmation warns about current/downstream invalidation; only confirmation opens same Case/Decision Config, with no admission yet.",
+      "contract": "Final Run Lineage Saga F3; runs/new-run-warning.mjs; user-approved F1–F12.",
+      "evidence": [
+        "docs/final-polish-run-lineage-saga-summary.md; test_run_lineage_polish.py",
+        "golden_journey.py:223; runs/new-run-warning.mjs"
+      ],
+      "change": "Pending; classified before source edits",
+      "focal_tests": [],
+      "result": "NOT RUN after remediation",
+      "tests": [
+        "test_navigation.NavigationTests.test_new_run_direct_configuration_preserves_business_context_and_history",
+        "test_saga4_ui.Saga4UITests.test_approval_hero_routes_by_next_owner_and_rerun_keeps_case_and_decision",
+        "test_saga4_ui.Saga4UITests.test_last_decision_completes_case_and_technical_menu_keeps_exports",
+        "test_v2_golden.GoldenWorkflowTests.test_distinct_people_complete_the_golden_workflow_and_cross_surface_matrix"
+      ],
+      "failure_entries": 4,
+      "test_sources": [
+        "backend/tests/browser/test_navigation.py:474",
+        "backend/tests/browser/test_saga4_ui.py:130",
+        "backend/tests/browser/test_saga4_ui.py:153",
+        "backend/tests/e2e/test_v2_golden.py:71"
+      ]
+    },
+    {
+      "id": "A-MIGRATION",
+      "category": "A",
+      "baseline_indices": [
+        116,
+        132,
+        143
+      ],
+      "cause": "Compatibility assertions do not account for the existing data_owner bridge/projection or added nullable attribute timestamp.",
+      "component": "E2E historical migration fixtures/projection checks",
+      "expected_by_test": "Only data_steward role/projection remains; whole Case JSON has no attributes_applied_at column.",
+      "actual": "Legacy row is retained while data_owner is bridged/projected; new nullable timestamp is part of current schema.",
+      "contract": "Existing 20261021020000 data responsibilities and subsequent attributes migrations; compatibility fields are not independent operational roles.",
+      "evidence": [
+        "T0 SQL catalogue matches Git; migration fixtures seed before these existing migrations",
+        "docs/domain-model.md compatibility; test_optimized_responsibilities.py migration test"
+      ],
+      "change": "Pending; classified before source edits",
+      "focal_tests": [],
+      "result": "NOT RUN after remediation",
+      "tests": [
+        "test_optimized_responsibilities.DataRoleMigrationTests.test_existing_steward_assignment_keeps_person_actor_and_version",
+        "test_v2_foundation.MigrationCompatibilityTests.test_legacy_member_is_backfilled_without_rewriting_the_membership",
+        "test_workflow_gates.WorkflowMigrationCompatibilityTests.test_existing_case_is_unchanged_and_legacy_actions_remain_available"
+      ],
+      "failure_entries": 3,
+      "test_sources": [
+        "backend/tests/e2e/test_optimized_responsibilities.py:117",
+        "backend/tests/e2e/test_v2_foundation.py:19",
+        "backend/tests/e2e/test_workflow_gates.py:22"
+      ]
+    },
+    {
+      "id": "A-LINEAGE",
+      "category": "A",
+      "baseline_indices": [
+        127,
+        134
+      ],
+      "cause": "Tests expect the former current approval/Home resume and four events after replacement admission.",
+      "component": "E2E Home projection / approval and supersession event history",
+      "expected_by_test": "Earlier D1 stays approval_current and resumes after new D1 admission; only four history events.",
+      "actual": "Admission supersedes own current approval and downstream; historical evidence retained; five concrete approved/superseded events.",
+      "contract": "Master F16; docs/decision-runs.md; approved Run Lineage Saga; no event deletion or restored current approvals.",
+      "evidence": [
+        "T0 E2E exact old/current ID assertion and five events",
+        "test_run_lineage.py A–F PASS; final-polish-run-lineage-saga-summary.md"
+      ],
+      "change": "Pending; classified before source edits",
+      "focal_tests": [],
+      "result": "NOT RUN after remediation",
+      "tests": [
+        "test_tenancy.TenancyTests.test_09_home_attention_tracks_real_versions_and_removes_approved_or_archived",
+        "test_workflow.WorkflowTests.test_assignment_scheduling_and_replacement_update_history_and_compact_list"
+      ],
+      "failure_entries": 2,
+      "test_sources": [
+        "backend/tests/e2e/test_tenancy.py:199",
+        "backend/tests/e2e/test_workflow.py:249"
+      ]
+    },
+    {
+      "id": "D-ATTRIBUTES",
+      "category": "D",
+      "baseline_indices": [
+        61,
+        63
+      ],
+      "cause": "Exactly documented historical WorkflowContext positive fixtures omit the applied attribute gate.",
+      "component": "WorkflowContext navigation/read-only review fixtures",
+      "expected_by_test": "Config can open without applied attributes in the fixture snapshot.",
+      "actual": "Current gates require the fixture to represent applied attributes and eligible owner.",
+      "contract": "Same as A-PREPARATION; exact debt independently reproduced at baseline 7351632.",
+      "evidence": [
+        "docs/final-polish-run-lineage-saga-summary.md:72; T0 exact historical debt IDs"
+      ],
+      "change": "Pending; classified before source edits",
+      "focal_tests": [],
+      "result": "NOT RUN after remediation",
+      "tests": [
+        "test_workflow_context.WorkflowContextTests.test_dda_navigation_resolves_canonical_runs_without_losing_context",
+        "test_workflow_context.WorkflowContextTests.test_map_assignment_is_consumed_readonly_by_config_and_review"
+      ],
+      "failure_entries": 2,
+      "test_sources": [
+        "backend/tests/browser/test_workflow_context.py:280",
+        "backend/tests/browser/test_workflow_context.py:73"
+      ]
+    },
+    {
+      "id": "D-NAV-GEOMETRY",
+      "category": "D",
+      "baseline_indices": [
+        114
+      ],
+      "cause": "Exactly documented previous navigator geometry assertion requires equal widths.",
+      "component": "WorkflowContext dashboard trace / Decision Navigator test",
+      "expected_by_test": "All three context steps have equal width.",
+      "actual": "Current navigator uses natural widths; exact 162.609375px difference on both historical and current baseline.",
+      "contract": "Approved current context navigation; retain labels, targets, keyboard and no overflow checks.",
+      "evidence": [
+        "docs/final-polish-run-lineage-saga-summary.md:72; T0 historic exemption IDs"
+      ],
+      "change": "Pending; classified before source edits",
+      "focal_tests": [],
+      "result": "NOT RUN after remediation",
+      "tests": [
+        "test_workflow_context.WorkflowContextTests.test_dashboard_trace_shares_the_copy_row_and_context_pills_are_equal"
+      ],
+      "failure_entries": 1,
+      "test_sources": [
+        "backend/tests/browser/test_workflow_context.py:326"
+      ]
+    }
+  ],
+  "entries": [
+    {
+      "baseline_index": 0,
+      "test_id": "test_home_hero.HomeHeroTests.test_h6_greeting_keeps_workspace_timezone_identity_updates_and_fallback",
+      "display_id": "test_h6_greeting_keeps_workspace_timezone_identity_updates_and_fallback (test_home_hero.HomeHeroTests.test_h6_greeting_keeps_workspace_timezone_identity_updates_and_fallback)",
+      "cluster": "C-NETWORK"
+    },
+    {
+      "baseline_index": 1,
+      "test_id": "test_navigation.NavigationTests.test_approved_assignment_continues_directly_to_scheduling_configuration",
+      "display_id": "test_approved_assignment_continues_directly_to_scheduling_configuration (test_navigation.NavigationTests.test_approved_assignment_continues_directly_to_scheduling_configuration)",
+      "cluster": "A-PREPARATION"
+    },
+    {
+      "baseline_index": 2,
+      "test_id": "test_navigation.NavigationTests.test_both_toolbar_map_buttons_use_run_case_and_preserve_business_state",
+      "display_id": "test_both_toolbar_map_buttons_use_run_case_and_preserve_business_state (test_navigation.NavigationTests.test_both_toolbar_map_buttons_use_run_case_and_preserve_business_state)",
+      "cluster": "A-CONTEXT"
+    },
+    {
+      "baseline_index": 3,
+      "test_id": "test_navigation.NavigationTests.test_case_selector_paginates_compact_active_and_completed_and_hydrates_only_selection",
+      "display_id": "test_case_selector_paginates_compact_active_and_completed_and_hydrates_only_selection (test_navigation.NavigationTests.test_case_selector_paginates_compact_active_and_completed_and_hydrates_only_selection)",
+      "cluster": "C-READY"
+    },
+    {
+      "baseline_index": 4,
+      "test_id": "test_navigation.NavigationTests.test_case_ux_completed_picker_switches_once_without_reload_and_preserves_drafts",
+      "display_id": "test_case_ux_completed_picker_switches_once_without_reload_and_preserves_drafts (test_navigation.NavigationTests.test_case_ux_completed_picker_switches_once_without_reload_and_preserves_drafts)",
+      "cluster": "A-CONTEXT"
+    },
+    {
+      "baseline_index": 5,
+      "test_id": "test_navigation.NavigationTests.test_case_ux_first_pack_is_persisted_before_execution_without_transition_notice",
+      "display_id": "test_case_ux_first_pack_is_persisted_before_execution_without_transition_notice (test_navigation.NavigationTests.test_case_ux_first_pack_is_persisted_before_execution_without_transition_notice)",
+      "cluster": "A-PREPARATION"
+    },
+    {
+      "baseline_index": 6,
+      "test_id": "test_navigation.NavigationTests.test_case_ux_picker_load_error_keeps_map_and_archived_cases_are_excluded",
+      "display_id": "test_case_ux_picker_load_error_keeps_map_and_archived_cases_are_excluded (test_navigation.NavigationTests.test_case_ux_picker_load_error_keeps_map_and_archived_cases_are_excluded)",
+      "cluster": "A-CONTEXT"
+    },
+    {
+      "baseline_index": 7,
+      "test_id": "test_navigation.NavigationTests.test_case_ux_real_data_change_retains_lineage_but_reopening_history_has_no_new_notice",
+      "display_id": "test_case_ux_real_data_change_retains_lineage_but_reopening_history_has_no_new_notice (test_navigation.NavigationTests.test_case_ux_real_data_change_retains_lineage_but_reopening_history_has_no_new_notice)",
+      "cluster": "A-PREPARATION"
+    },
+    {
+      "baseline_index": 8,
+      "test_id": "test_navigation.NavigationTests.test_case_ux_single_current_picker_never_navigates_and_restores_keyboard_focus",
+      "display_id": "test_case_ux_single_current_picker_never_navigates_and_restores_keyboard_focus (test_navigation.NavigationTests.test_case_ux_single_current_picker_never_navigates_and_restores_keyboard_focus)",
+      "cluster": "A-CONTEXT"
+    },
+    {
+      "baseline_index": 9,
+      "test_id": "test_navigation.NavigationTests.test_center_assignment_search_preserves_both_selections_and_explicit_clear",
+      "display_id": "test_center_assignment_search_preserves_both_selections_and_explicit_clear (test_navigation.NavigationTests.test_center_assignment_search_preserves_both_selections_and_explicit_clear)",
+      "cluster": "A-ROLES"
+    },
+    {
+      "baseline_index": 10,
+      "test_id": "test_navigation.NavigationTests.test_cold_scheduling_link_and_refresh",
+      "display_id": "test_cold_scheduling_link_and_refresh (test_navigation.NavigationTests.test_cold_scheduling_link_and_refresh)",
+      "cluster": "C-NETWORK"
+    },
+    {
+      "baseline_index": 11,
+      "test_id": "test_navigation.NavigationTests.test_d1_v2_ai_cached_brief_copy_chat_and_collapse_without_inference",
+      "display_id": "test_d1_v2_ai_cached_brief_copy_chat_and_collapse_without_inference (test_navigation.NavigationTests.test_d1_v2_ai_cached_brief_copy_chat_and_collapse_without_inference)",
+      "cluster": "A-INSIGHT"
+    },
+    {
+      "baseline_index": 12,
+      "test_id": "test_navigation.NavigationTests.test_d1_v2_ai_loading_error_retry_regeneration_are_explicit_and_coalesced",
+      "display_id": "test_d1_v2_ai_loading_error_retry_regeneration_are_explicit_and_coalesced (test_navigation.NavigationTests.test_d1_v2_ai_loading_error_retry_regeneration_are_explicit_and_coalesced)",
+      "cluster": "A-INSIGHT"
+    },
+    {
+      "baseline_index": 13,
+      "test_id": "test_navigation.NavigationTests.test_d1_v2_final_approval_updates_hero_and_continues_to_scheduling",
+      "display_id": "test_d1_v2_final_approval_updates_hero_and_continues_to_scheduling (test_navigation.NavigationTests.test_d1_v2_final_approval_updates_hero_and_continues_to_scheduling)",
+      "cluster": "A-ACTIONS"
+    },
+    {
+      "baseline_index": 14,
+      "test_id": "test_navigation.NavigationTests.test_d1_v2_infeasible_and_missing_metrics_remain_explicit",
+      "display_id": "test_d1_v2_infeasible_and_missing_metrics_remain_explicit (test_navigation.NavigationTests.test_d1_v2_infeasible_and_missing_metrics_remain_explicit)",
+      "cluster": "A-ACTIONS"
+    },
+    {
+      "baseline_index": 15,
+      "test_id": "test_navigation.NavigationTests.test_d1_v2_local_hero_has_a_readable_svg_fallback",
+      "display_id": "test_d1_v2_local_hero_has_a_readable_svg_fallback (test_navigation.NavigationTests.test_d1_v2_local_hero_has_a_readable_svg_fallback)",
+      "cluster": "A-HERO"
+    },
+    {
+      "baseline_index": 16,
+      "test_id": "test_navigation.NavigationTests.test_d1_v2_new_comparative_evidence_marks_summary_stale_without_automatic_ai",
+      "display_id": "test_d1_v2_new_comparative_evidence_marks_summary_stale_without_automatic_ai (test_navigation.NavigationTests.test_d1_v2_new_comparative_evidence_marks_summary_stale_without_automatic_ai)",
+      "cluster": "A-INSIGHT"
+    },
+    {
+      "baseline_index": 17,
+      "test_id": "test_navigation.NavigationTests.test_d1_v2_view_modes_preserve_evidence_and_restore_without_reexecution",
+      "display_id": "test_d1_v2_view_modes_preserve_evidence_and_restore_without_reexecution (test_navigation.NavigationTests.test_d1_v2_view_modes_preserve_evidence_and_restore_without_reexecution)",
+      "cluster": "C-NETWORK"
+    },
+    {
+      "baseline_index": 18,
+      "test_id": "test_navigation.NavigationTests.test_d2_v21_ai_cache_generation_freshness_and_chat",
+      "display_id": "test_d2_v21_ai_cache_generation_freshness_and_chat (test_navigation.NavigationTests.test_d2_v21_ai_cache_generation_freshness_and_chat)",
+      "cluster": "A-INSIGHT"
+    },
+    {
+      "baseline_index": 19,
+      "test_id": "test_navigation.NavigationTests.test_d2_v21_ai_retry_approval_and_approved_state",
+      "display_id": "test_d2_v21_ai_retry_approval_and_approved_state (test_navigation.NavigationTests.test_d2_v21_ai_retry_approval_and_approved_state)",
+      "cluster": "A-ACTIONS"
+    },
+    {
+      "baseline_index": 20,
+      "test_id": "test_navigation.NavigationTests.test_d2_v21_infeasible_never_recommends_or_approves",
+      "display_id": "test_d2_v21_infeasible_never_recommends_or_approves (test_navigation.NavigationTests.test_d2_v21_infeasible_never_recommends_or_approves)",
+      "cluster": "A-ACTIONS"
+    },
+    {
+      "baseline_index": 21,
+      "test_id": "test_navigation.NavigationTests.test_dark_shell_and_heroes_survive_responsive_and_warm_navigation",
+      "display_id": "test_dark_shell_and_heroes_survive_responsive_and_warm_navigation (test_navigation.NavigationTests.test_dark_shell_and_heroes_survive_responsive_and_warm_navigation)",
+      "cluster": "A-HERO"
+    },
+    {
+      "baseline_index": 22,
+      "test_id": "test_navigation.NavigationTests.test_data_hub_archive_delete_retry_and_text_safety",
+      "display_id": "test_data_hub_archive_delete_retry_and_text_safety (test_navigation.NavigationTests.test_data_hub_archive_delete_retry_and_text_safety)",
+      "cluster": "C-NETWORK"
+    },
+    {
+      "baseline_index": 23,
+      "test_id": "test_navigation.NavigationTests.test_data_hub_empty_failure_readonly_and_legacy_links",
+      "display_id": "test_data_hub_empty_failure_readonly_and_legacy_links (test_navigation.NavigationTests.test_data_hub_empty_failure_readonly_and_legacy_links)",
+      "cluster": "C-NETWORK"
+    },
+    {
+      "baseline_index": 24,
+      "test_id": "test_navigation.NavigationTests.test_data_pack_has_one_stable_dark_bar_across_responsive_reuse",
+      "display_id": "test_data_pack_has_one_stable_dark_bar_across_responsive_reuse (test_navigation.NavigationTests.test_data_pack_has_one_stable_dark_bar_across_responsive_reuse)",
+      "cluster": "A-PREPARATION"
+    },
+    {
+      "baseline_index": 25,
+      "test_id": "test_navigation.NavigationTests.test_data_pack_relation_error_recovers_to_ready_with_optional_warnings",
+      "display_id": "test_data_pack_relation_error_recovers_to_ready_with_optional_warnings (test_navigation.NavigationTests.test_data_pack_relation_error_recovers_to_ready_with_optional_warnings)",
+      "cluster": "A-PREPARATION"
+    },
+    {
+      "baseline_index": 26,
+      "test_id": "test_navigation.NavigationTests.test_existing_review_continues_to_its_dashboard_without_another_configuration",
+      "display_id": "test_existing_review_continues_to_its_dashboard_without_another_configuration (test_navigation.NavigationTests.test_existing_review_continues_to_its_dashboard_without_another_configuration)",
+      "cluster": "A-ACTIONS"
+    },
+    {
+      "baseline_index": 27,
+      "test_id": "test_navigation.NavigationTests.test_explanation_aborts_on_navigation",
+      "display_id": "test_explanation_aborts_on_navigation (test_navigation.NavigationTests.test_explanation_aborts_on_navigation)",
+      "cluster": "A-INSIGHT"
+    },
+    {
+      "baseline_index": 28,
+      "test_id": "test_navigation.NavigationTests.test_map_disclosure_keeps_progress_visible_and_preserves_columns_and_change_data",
+      "display_id": "test_map_disclosure_keeps_progress_visible_and_preserves_columns_and_change_data (test_navigation.NavigationTests.test_map_disclosure_keeps_progress_visible_and_preserves_columns_and_change_data)",
+      "cluster": "A-CONTEXT"
+    },
+    {
+      "baseline_index": 29,
+      "test_id": "test_navigation.NavigationTests.test_map_disclosure_layout_remains_readable_at_all_five_breakpoints",
+      "display_id": "test_map_disclosure_layout_remains_readable_at_all_five_breakpoints (test_navigation.NavigationTests.test_map_disclosure_layout_remains_readable_at_all_five_breakpoints)",
+      "cluster": "A-CONTEXT"
+    },
+    {
+      "baseline_index": 30,
+      "test_id": "test_navigation.NavigationTests.test_map_selector_switches_case_data_progress_url_and_restores_cancel_focus",
+      "display_id": "test_map_selector_switches_case_data_progress_url_and_restores_cancel_focus (test_navigation.NavigationTests.test_map_selector_switches_case_data_progress_url_and_restores_cancel_focus)",
+      "cluster": "A-CONTEXT"
+    },
+    {
+      "baseline_index": 31,
+      "test_id": "test_navigation.NavigationTests.test_new_decision_goes_to_empty_data_without_losing_existing_case",
+      "display_id": "test_new_decision_goes_to_empty_data_without_losing_existing_case (test_navigation.NavigationTests.test_new_decision_goes_to_empty_data_without_losing_existing_case)",
+      "cluster": "A-ACTIONS"
+    },
+    {
+      "baseline_index": 32,
+      "test_id": "test_navigation.NavigationTests.test_new_run_direct_configuration_preserves_business_context_and_history",
+      "display_id": "test_new_run_direct_configuration_preserves_business_context_and_history (test_navigation.NavigationTests.test_new_run_direct_configuration_preserves_business_context_and_history)",
+      "cluster": "A-RERUN"
+    },
+    {
+      "baseline_index": 33,
+      "test_id": "test_navigation.NavigationTests.test_overview_availability_ignores_stale_responses_and_refreshes_on_bfcache",
+      "display_id": "test_overview_availability_ignores_stale_responses_and_refreshes_on_bfcache (test_navigation.NavigationTests.test_overview_availability_ignores_stale_responses_and_refreshes_on_bfcache)",
+      "cluster": "A-HOME"
+    },
+    {
+      "baseline_index": 34,
+      "test_id": "test_navigation.NavigationTests.test_overview_map_with_active_case_and_multiple_cases_uses_existing_selector",
+      "display_id": "test_overview_map_with_active_case_and_multiple_cases_uses_existing_selector (test_navigation.NavigationTests.test_overview_map_with_active_case_and_multiple_cases_uses_existing_selector)",
+      "cluster": "A-HOME"
+    },
+    {
+      "baseline_index": 35,
+      "test_id": "test_navigation.NavigationTests.test_overview_multiple_cases_without_selection_uses_existing_selector",
+      "display_id": "test_overview_multiple_cases_without_selection_uses_existing_selector (test_navigation.NavigationTests.test_overview_multiple_cases_without_selection_uses_existing_selector)",
+      "cluster": "A-HOME"
+    },
+    {
+      "baseline_index": 36,
+      "test_id": "test_navigation.NavigationTests.test_overview_single_case_map_opens_directly_and_new_decision_clears_active_context",
+      "display_id": "test_overview_single_case_map_opens_directly_and_new_decision_clears_active_context (test_navigation.NavigationTests.test_overview_single_case_map_opens_directly_and_new_decision_clears_active_context)",
+      "cluster": "A-HOME"
+    },
+    {
+      "baseline_index": 37,
+      "test_id": "test_navigation.NavigationTests.test_phase5_toolbar_menus_are_exclusive_outside_escape_and_viewport_safe",
+      "display_id": "test_phase5_toolbar_menus_are_exclusive_outside_escape_and_viewport_safe (test_navigation.NavigationTests.test_phase5_toolbar_menus_are_exclusive_outside_escape_and_viewport_safe)",
+      "cluster": "C-NETWORK"
+    },
+    {
+      "baseline_index": 38,
+      "test_id": "test_navigation.NavigationTests.test_phase6_all_pages_have_dark_contrast_accessible_names_and_no_overflow",
+      "display_id": "test_phase6_all_pages_have_dark_contrast_accessible_names_and_no_overflow (test_navigation.NavigationTests.test_phase6_all_pages_have_dark_contrast_accessible_names_and_no_overflow)",
+      "cluster": "C-NETWORK"
+    },
+    {
+      "baseline_index": 39,
+      "test_id": "test_navigation.NavigationTests.test_phase6_mobile_footer_grid_keeps_keyboard_focus_visible_without_scroll_or_state_changes",
+      "display_id": "test_phase6_mobile_footer_grid_keeps_keyboard_focus_visible_without_scroll_or_state_changes (test_navigation.NavigationTests.test_phase6_mobile_footer_grid_keeps_keyboard_focus_visible_without_scroll_or_state_changes)",
+      "cluster": "C-NETWORK"
+    },
+    {
+      "baseline_index": 40,
+      "test_id": "test_navigation.NavigationTests.test_phase7_map_styles_retry_and_remain_shared_with_config_and_filters",
+      "display_id": "test_phase7_map_styles_retry_and_remain_shared_with_config_and_filters (test_navigation.NavigationTests.test_phase7_map_styles_retry_and_remain_shared_with_config_and_filters)",
+      "cluster": "A-CONTEXT"
+    },
+    {
+      "baseline_index": 41,
+      "test_id": "test_navigation.NavigationTests.test_terminal_scheduling_error_restores_window_and_executes_new_run",
+      "display_id": "test_terminal_scheduling_error_restores_window_and_executes_new_run (test_navigation.NavigationTests.test_terminal_scheduling_error_restores_window_and_executes_new_run)",
+      "cluster": "A-ACTIONS"
+    },
+    {
+      "baseline_index": 42,
+      "test_id": "test_navigation.NavigationTests.test_toolbar_approval_is_unique_direct_and_preserves_continuation",
+      "display_id": "test_toolbar_approval_is_unique_direct_and_preserves_continuation (test_navigation.NavigationTests.test_toolbar_approval_is_unique_direct_and_preserves_continuation)",
+      "cluster": "A-ACTIONS"
+    },
+    {
+      "baseline_index": 43,
+      "test_id": "test_navigation.NavigationTests.test_workflow_bars_equalize_context_and_keep_a_wider_primary_action",
+      "display_id": "test_workflow_bars_equalize_context_and_keep_a_wider_primary_action (test_navigation.NavigationTests.test_workflow_bars_equalize_context_and_keep_a_wider_primary_action)",
+      "cluster": "A-PREPARATION"
+    },
+    {
+      "baseline_index": 44,
+      "test_id": "test_navigation.NavigationTests.test_workflow_hero_future_content_wraps_without_clipping_or_html_injection",
+      "display_id": "test_workflow_hero_future_content_wraps_without_clipping_or_html_injection (test_navigation.NavigationTests.test_workflow_hero_future_content_wraps_without_clipping_or_html_injection)",
+      "cluster": "A-HERO"
+    },
+    {
+      "baseline_index": 45,
+      "test_id": "test_navigation.NavigationTests.test_workflow_heroes_share_metadata_panel_and_stable_desktop_height",
+      "display_id": "test_workflow_heroes_share_metadata_panel_and_stable_desktop_height (test_navigation.NavigationTests.test_workflow_heroes_share_metadata_panel_and_stable_desktop_height)",
+      "cluster": "A-HERO"
+    },
+    {
+      "baseline_index": 46,
+      "test_id": "test_navigation.NavigationTests.test_workflow_keyboard_and_text_spacing_at_320_and_landscape",
+      "display_id": "test_workflow_keyboard_and_text_spacing_at_320_and_landscape (test_navigation.NavigationTests.test_workflow_keyboard_and_text_spacing_at_320_and_landscape) (width=320, height=568, screen='data')",
+      "cluster": "A-PREPARATION"
+    },
+    {
+      "baseline_index": 47,
+      "test_id": "test_navigation.NavigationTests.test_workflow_keyboard_and_text_spacing_at_320_and_landscape",
+      "display_id": "test_workflow_keyboard_and_text_spacing_at_320_and_landscape (test_navigation.NavigationTests.test_workflow_keyboard_and_text_spacing_at_320_and_landscape) (width=320, height=568, screen='map')",
+      "cluster": "A-CONTEXT"
+    },
+    {
+      "baseline_index": 48,
+      "test_id": "test_navigation.NavigationTests.test_workflow_keyboard_and_text_spacing_at_320_and_landscape",
+      "display_id": "test_workflow_keyboard_and_text_spacing_at_320_and_landscape (test_navigation.NavigationTests.test_workflow_keyboard_and_text_spacing_at_320_and_landscape) (width=320, height=568, screen='scheduling')",
+      "cluster": "A-PREPARATION"
+    },
+    {
+      "baseline_index": 49,
+      "test_id": "test_navigation.NavigationTests.test_workflow_keyboard_and_text_spacing_at_320_and_landscape",
+      "display_id": "test_workflow_keyboard_and_text_spacing_at_320_and_landscape (test_navigation.NavigationTests.test_workflow_keyboard_and_text_spacing_at_320_and_landscape) (width=320, height=256, screen='data')",
+      "cluster": "A-PREPARATION"
+    },
+    {
+      "baseline_index": 50,
+      "test_id": "test_navigation.NavigationTests.test_workflow_keyboard_and_text_spacing_at_320_and_landscape",
+      "display_id": "test_workflow_keyboard_and_text_spacing_at_320_and_landscape (test_navigation.NavigationTests.test_workflow_keyboard_and_text_spacing_at_320_and_landscape) (width=320, height=256, screen='map')",
+      "cluster": "A-CONTEXT"
+    },
+    {
+      "baseline_index": 51,
+      "test_id": "test_navigation.NavigationTests.test_workflow_keyboard_and_text_spacing_at_320_and_landscape",
+      "display_id": "test_workflow_keyboard_and_text_spacing_at_320_and_landscape (test_navigation.NavigationTests.test_workflow_keyboard_and_text_spacing_at_320_and_landscape) (width=320, height=256, screen='scheduling')",
+      "cluster": "A-PREPARATION"
+    },
+    {
+      "baseline_index": 52,
+      "test_id": "test_navigation.NavigationTests.test_workflow_keyboard_and_text_spacing_at_320_and_landscape",
+      "display_id": "test_workflow_keyboard_and_text_spacing_at_320_and_landscape (test_navigation.NavigationTests.test_workflow_keyboard_and_text_spacing_at_320_and_landscape) (width=568, height=320, screen='data')",
+      "cluster": "A-PREPARATION"
+    },
+    {
+      "baseline_index": 53,
+      "test_id": "test_navigation.NavigationTests.test_workflow_keyboard_and_text_spacing_at_320_and_landscape",
+      "display_id": "test_workflow_keyboard_and_text_spacing_at_320_and_landscape (test_navigation.NavigationTests.test_workflow_keyboard_and_text_spacing_at_320_and_landscape) (width=568, height=320, screen='map')",
+      "cluster": "A-CONTEXT"
+    },
+    {
+      "baseline_index": 54,
+      "test_id": "test_navigation.NavigationTests.test_workflow_keyboard_and_text_spacing_at_320_and_landscape",
+      "display_id": "test_workflow_keyboard_and_text_spacing_at_320_and_landscape (test_navigation.NavigationTests.test_workflow_keyboard_and_text_spacing_at_320_and_landscape) (width=568, height=320, screen='scheduling')",
+      "cluster": "A-PREPARATION"
+    },
+    {
+      "baseline_index": 55,
+      "test_id": "test_navigation.NavigationTests.test_workflow_progressive_actions_share_styles_arrow_and_keyboard_focus",
+      "display_id": "test_workflow_progressive_actions_share_styles_arrow_and_keyboard_focus (test_navigation.NavigationTests.test_workflow_progressive_actions_share_styles_arrow_and_keyboard_focus)",
+      "cluster": "A-PREPARATION"
+    },
+    {
+      "baseline_index": 56,
+      "test_id": "test_saga4_ui.Saga4UITests.test_approval_hero_routes_by_next_owner_and_rerun_keeps_case_and_decision",
+      "display_id": "test_approval_hero_routes_by_next_owner_and_rerun_keeps_case_and_decision (test_saga4_ui.Saga4UITests.test_approval_hero_routes_by_next_owner_and_rerun_keeps_case_and_decision)",
+      "cluster": "A-RERUN"
+    },
+    {
+      "baseline_index": 57,
+      "test_id": "test_saga4_ui.Saga4UITests.test_last_decision_completes_case_and_technical_menu_keeps_exports",
+      "display_id": "test_last_decision_completes_case_and_technical_menu_keeps_exports (test_saga4_ui.Saga4UITests.test_last_decision_completes_case_and_technical_menu_keeps_exports)",
+      "cluster": "A-RERUN"
+    },
+    {
+      "baseline_index": 58,
+      "test_id": "test_saga4_ui.Saga4UITests.test_shared_case_context_and_compact_map_milestones",
+      "display_id": "test_shared_case_context_and_compact_map_milestones (test_saga4_ui.Saga4UITests.test_shared_case_context_and_compact_map_milestones)",
+      "cluster": "A-CONTEXT"
+    },
+    {
+      "baseline_index": 59,
+      "test_id": "test_workflow_context.WorkflowContextTests.test_data_gate_registers_only_on_assignment_and_opens_the_same_case_map",
+      "display_id": "test_data_gate_registers_only_on_assignment_and_opens_the_same_case_map (test_workflow_context.WorkflowContextTests.test_data_gate_registers_only_on_assignment_and_opens_the_same_case_map)",
+      "cluster": "A-ROLES"
+    },
+    {
+      "baseline_index": 60,
+      "test_id": "test_workflow_context.WorkflowContextTests.test_data_save_does_not_overwrite_assignment_changed_while_editing",
+      "display_id": "test_data_save_does_not_overwrite_assignment_changed_while_editing (test_workflow_context.WorkflowContextTests.test_data_save_does_not_overwrite_assignment_changed_while_editing)",
+      "cluster": "A-ROLES"
+    },
+    {
+      "baseline_index": 61,
+      "test_id": "test_workflow_context.WorkflowContextTests.test_dda_navigation_resolves_canonical_runs_without_losing_context",
+      "display_id": "test_dda_navigation_resolves_canonical_runs_without_losing_context (test_workflow_context.WorkflowContextTests.test_dda_navigation_resolves_canonical_runs_without_losing_context)",
+      "cluster": "D-ATTRIBUTES"
+    },
+    {
+      "baseline_index": 62,
+      "test_id": "test_workflow_context.WorkflowContextTests.test_history_and_archived_maps_remain_readable_after_data_owner_loses_eligibility",
+      "display_id": "test_history_and_archived_maps_remain_readable_after_data_owner_loses_eligibility (test_workflow_context.WorkflowContextTests.test_history_and_archived_maps_remain_readable_after_data_owner_loses_eligibility)",
+      "cluster": "A-CONTEXT"
+    },
+    {
+      "baseline_index": 63,
+      "test_id": "test_workflow_context.WorkflowContextTests.test_map_assignment_is_consumed_readonly_by_config_and_review",
+      "display_id": "test_map_assignment_is_consumed_readonly_by_config_and_review (test_workflow_context.WorkflowContextTests.test_map_assignment_is_consumed_readonly_by_config_and_review)",
+      "cluster": "D-ATTRIBUTES"
+    },
+    {
+      "baseline_index": 64,
+      "test_id": "test_workflow_context.WorkflowContextTests.test_operator_registers_a_pending_data_case_and_refreshes_admin_assignment",
+      "display_id": "test_operator_registers_a_pending_data_case_and_refreshes_admin_assignment (test_workflow_context.WorkflowContextTests.test_operator_registers_a_pending_data_case_and_refreshes_admin_assignment)",
+      "cluster": "A-ROLES"
+    },
+    {
+      "baseline_index": 65,
+      "test_id": "test_workflow_context.WorkflowContextTests.test_owner_revoked_at_admission_returns_to_config_without_polling_a_phantom_run",
+      "display_id": "test_owner_revoked_at_admission_returns_to_config_without_polling_a_phantom_run (test_workflow_context.WorkflowContextTests.test_owner_revoked_at_admission_returns_to_config_without_polling_a_phantom_run)",
+      "cluster": "A-PREPARATION"
+    },
+    {
+      "baseline_index": 66,
+      "test_id": "test_workflow_context.WorkflowContextTests.test_team_keeps_one_invitation_entry_and_edits_multiple_roles_together",
+      "display_id": "test_team_keeps_one_invitation_entry_and_edits_multiple_roles_together (test_workflow_context.WorkflowContextTests.test_team_keeps_one_invitation_entry_and_edits_multiple_roles_together)",
+      "cluster": "A-ROLES"
+    },
+    {
+      "baseline_index": 67,
+      "test_id": "test_workflow_context.WorkflowContextTests.test_viewer_and_late_candidates_do_not_gain_mutation_controls",
+      "display_id": "test_viewer_and_late_candidates_do_not_gain_mutation_controls (test_workflow_context.WorkflowContextTests.test_viewer_and_late_candidates_do_not_gain_mutation_controls)",
+      "cluster": "A-PREPARATION"
+    },
+    {
+      "baseline_index": 68,
+      "test_id": "test_navigation.NavigationTests.test_both_configuration_contexts_are_closed_and_scheduling_source_stays_visible",
+      "display_id": "test_both_configuration_contexts_are_closed_and_scheduling_source_stays_visible (test_navigation.NavigationTests.test_both_configuration_contexts_are_closed_and_scheduling_source_stays_visible)",
+      "cluster": "A-CONTEXT"
+    },
+    {
+      "baseline_index": 69,
+      "test_id": "test_navigation.NavigationTests.test_case_ux_hero_contract_and_attention_contours_at_desktop_mobile_and_reflow",
+      "display_id": "test_case_ux_hero_contract_and_attention_contours_at_desktop_mobile_and_reflow (test_navigation.NavigationTests.test_case_ux_hero_contract_and_attention_contours_at_desktop_mobile_and_reflow)",
+      "cluster": "A-CONTEXT"
+    },
+    {
+      "baseline_index": 70,
+      "test_id": "test_navigation.NavigationTests.test_catalog_entitlements_cover_deep_links_revocation_and_reenable",
+      "display_id": "test_catalog_entitlements_cover_deep_links_revocation_and_reenable (test_navigation.NavigationTests.test_catalog_entitlements_cover_deep_links_revocation_and_reenable)",
+      "cluster": "A-HOME"
+    },
+    {
+      "baseline_index": 71,
+      "test_id": "test_navigation.NavigationTests.test_catalog_fallback_keeps_disabled_entitlement_closed",
+      "display_id": "test_catalog_fallback_keeps_disabled_entitlement_closed (test_navigation.NavigationTests.test_catalog_fallback_keeps_disabled_entitlement_closed)",
+      "cluster": "A-HOME"
+    },
+    {
+      "baseline_index": 72,
+      "test_id": "test_navigation.NavigationTests.test_comparative_original_always_keeps_essential_before_comparative_and_ia",
+      "display_id": "test_comparative_original_always_keeps_essential_before_comparative_and_ia (test_navigation.NavigationTests.test_comparative_original_always_keeps_essential_before_comparative_and_ia)",
+      "cluster": "A-INSIGHT"
+    },
+    {
+      "baseline_index": 73,
+      "test_id": "test_navigation.NavigationTests.test_config_disclosures_do_not_claim_validation_for_profiles_with_errors",
+      "display_id": "test_config_disclosures_do_not_claim_validation_for_profiles_with_errors (test_navigation.NavigationTests.test_config_disclosures_do_not_claim_validation_for_profiles_with_errors)",
+      "cluster": "B-VALIDATION"
+    },
+    {
+      "baseline_index": 74,
+      "test_id": "test_navigation.NavigationTests.test_d1_d2_upper_geometry_and_visible_headings_are_normalized",
+      "display_id": "test_d1_d2_upper_geometry_and_visible_headings_are_normalized (test_navigation.NavigationTests.test_d1_d2_upper_geometry_and_visible_headings_are_normalized)",
+      "cluster": "A-VISUAL"
+    },
+    {
+      "baseline_index": 75,
+      "test_id": "test_navigation.NavigationTests.test_d1_v2_disclosure_keyboard_feedback_and_manual_scroll",
+      "display_id": "test_d1_v2_disclosure_keyboard_feedback_and_manual_scroll (test_navigation.NavigationTests.test_d1_v2_disclosure_keyboard_feedback_and_manual_scroll)",
+      "cluster": "A-INSIGHT"
+    },
+    {
+      "baseline_index": 76,
+      "test_id": "test_navigation.NavigationTests.test_d1_v2_essential_and_advanced_fit_low_viewports_and_keyboard",
+      "display_id": "test_d1_v2_essential_and_advanced_fit_low_viewports_and_keyboard (test_navigation.NavigationTests.test_d1_v2_essential_and_advanced_fit_low_viewports_and_keyboard)",
+      "cluster": "B-CONTRAST"
+    },
+    {
+      "baseline_index": 77,
+      "test_id": "test_navigation.NavigationTests.test_d2_v21_disclosure_keyboard_persistence_preview_and_evidence",
+      "display_id": "test_d2_v21_disclosure_keyboard_persistence_preview_and_evidence (test_navigation.NavigationTests.test_d2_v21_disclosure_keyboard_persistence_preview_and_evidence)",
+      "cluster": "A-INSIGHT"
+    },
+    {
+      "baseline_index": 78,
+      "test_id": "test_navigation.NavigationTests.test_dark_buttons_have_keyboard_focus_contrast_and_stable_disabled_state",
+      "display_id": "test_dark_buttons_have_keyboard_focus_contrast_and_stable_disabled_state (test_navigation.NavigationTests.test_dark_buttons_have_keyboard_focus_contrast_and_stable_disabled_state)",
+      "cluster": "A-VISUAL"
+    },
+    {
+      "baseline_index": 79,
+      "test_id": "test_navigation.NavigationTests.test_data_pack_context_is_dark_with_native_disclosure_in_map_and_configs",
+      "display_id": "test_data_pack_context_is_dark_with_native_disclosure_in_map_and_configs (test_navigation.NavigationTests.test_data_pack_context_is_dark_with_native_disclosure_in_map_and_configs)",
+      "cluster": "A-VISUAL"
+    },
+    {
+      "baseline_index": 80,
+      "test_id": "test_navigation.NavigationTests.test_home_card_keyboard_and_informational_overview_with_native_faq",
+      "display_id": "test_home_card_keyboard_and_informational_overview_with_native_faq (test_navigation.NavigationTests.test_home_card_keyboard_and_informational_overview_with_native_faq)",
+      "cluster": "A-HOME"
+    },
+    {
+      "baseline_index": 81,
+      "test_id": "test_navigation.NavigationTests.test_map_config_and_toolbar_fit_mobile_without_obsolete_kpi_or_calendar_actions",
+      "display_id": "test_map_config_and_toolbar_fit_mobile_without_obsolete_kpi_or_calendar_actions (test_navigation.NavigationTests.test_map_config_and_toolbar_fit_mobile_without_obsolete_kpi_or_calendar_actions)",
+      "cluster": "A-CONTEXT"
+    },
+    {
+      "baseline_index": 82,
+      "test_id": "test_navigation.NavigationTests.test_overview_has_two_hero_actions_and_disabled_visible_map_without_cases",
+      "display_id": "test_overview_has_two_hero_actions_and_disabled_visible_map_without_cases (test_navigation.NavigationTests.test_overview_has_two_hero_actions_and_disabled_visible_map_without_cases)",
+      "cluster": "A-HOME"
+    },
+    {
+      "baseline_index": 83,
+      "test_id": "test_navigation.NavigationTests.test_phase5_schedule_chart_preserves_data_dates_and_dark_tooltip",
+      "display_id": "test_phase5_schedule_chart_preserves_data_dates_and_dark_tooltip (test_navigation.NavigationTests.test_phase5_schedule_chart_preserves_data_dates_and_dark_tooltip)",
+      "cluster": "A-VISUAL"
+    },
+    {
+      "baseline_index": 84,
+      "test_id": "test_navigation.NavigationTests.test_scheduling_uses_shared_menus_drawer_and_exports_without_format_changes",
+      "display_id": "test_scheduling_uses_shared_menus_drawer_and_exports_without_format_changes (test_navigation.NavigationTests.test_scheduling_uses_shared_menus_drawer_and_exports_without_format_changes)",
+      "cluster": "A-ACTIONS"
+    },
+    {
+      "baseline_index": 85,
+      "test_id": "test_navigation.NavigationTests.test_shared_config_disclosures_are_full_width_without_overlap_at_all_five_breakpoints",
+      "display_id": "test_shared_config_disclosures_are_full_width_without_overlap_at_all_five_breakpoints (test_navigation.NavigationTests.test_shared_config_disclosures_are_full_width_without_overlap_at_all_five_breakpoints) (width=1440, kind='assignment')",
+      "cluster": "A-VISUAL"
+    },
+    {
+      "baseline_index": 86,
+      "test_id": "test_navigation.NavigationTests.test_shared_config_disclosures_are_full_width_without_overlap_at_all_five_breakpoints",
+      "display_id": "test_shared_config_disclosures_are_full_width_without_overlap_at_all_five_breakpoints (test_navigation.NavigationTests.test_shared_config_disclosures_are_full_width_without_overlap_at_all_five_breakpoints) (width=1440, kind='scheduling')",
+      "cluster": "A-VISUAL"
+    },
+    {
+      "baseline_index": 87,
+      "test_id": "test_navigation.NavigationTests.test_shared_config_disclosures_are_full_width_without_overlap_at_all_five_breakpoints",
+      "display_id": "test_shared_config_disclosures_are_full_width_without_overlap_at_all_five_breakpoints (test_navigation.NavigationTests.test_shared_config_disclosures_are_full_width_without_overlap_at_all_five_breakpoints) (width=1280, kind='assignment')",
+      "cluster": "A-VISUAL"
+    },
+    {
+      "baseline_index": 88,
+      "test_id": "test_navigation.NavigationTests.test_shared_config_disclosures_are_full_width_without_overlap_at_all_five_breakpoints",
+      "display_id": "test_shared_config_disclosures_are_full_width_without_overlap_at_all_five_breakpoints (test_navigation.NavigationTests.test_shared_config_disclosures_are_full_width_without_overlap_at_all_five_breakpoints) (width=1280, kind='scheduling')",
+      "cluster": "A-VISUAL"
+    },
+    {
+      "baseline_index": 89,
+      "test_id": "test_navigation.NavigationTests.test_shared_config_disclosures_are_full_width_without_overlap_at_all_five_breakpoints",
+      "display_id": "test_shared_config_disclosures_are_full_width_without_overlap_at_all_five_breakpoints (test_navigation.NavigationTests.test_shared_config_disclosures_are_full_width_without_overlap_at_all_five_breakpoints) (width=1024, kind='assignment')",
+      "cluster": "A-VISUAL"
+    },
+    {
+      "baseline_index": 90,
+      "test_id": "test_navigation.NavigationTests.test_shared_config_disclosures_are_full_width_without_overlap_at_all_five_breakpoints",
+      "display_id": "test_shared_config_disclosures_are_full_width_without_overlap_at_all_five_breakpoints (test_navigation.NavigationTests.test_shared_config_disclosures_are_full_width_without_overlap_at_all_five_breakpoints) (width=1024, kind='scheduling')",
+      "cluster": "A-VISUAL"
+    },
+    {
+      "baseline_index": 91,
+      "test_id": "test_navigation.NavigationTests.test_shared_config_disclosures_are_full_width_without_overlap_at_all_five_breakpoints",
+      "display_id": "test_shared_config_disclosures_are_full_width_without_overlap_at_all_five_breakpoints (test_navigation.NavigationTests.test_shared_config_disclosures_are_full_width_without_overlap_at_all_five_breakpoints) (width=768, kind='assignment')",
+      "cluster": "A-VISUAL"
+    },
+    {
+      "baseline_index": 92,
+      "test_id": "test_navigation.NavigationTests.test_shared_config_disclosures_are_full_width_without_overlap_at_all_five_breakpoints",
+      "display_id": "test_shared_config_disclosures_are_full_width_without_overlap_at_all_five_breakpoints (test_navigation.NavigationTests.test_shared_config_disclosures_are_full_width_without_overlap_at_all_five_breakpoints) (width=768, kind='scheduling')",
+      "cluster": "A-VISUAL"
+    },
+    {
+      "baseline_index": 93,
+      "test_id": "test_navigation.NavigationTests.test_shared_config_disclosures_are_full_width_without_overlap_at_all_five_breakpoints",
+      "display_id": "test_shared_config_disclosures_are_full_width_without_overlap_at_all_five_breakpoints (test_navigation.NavigationTests.test_shared_config_disclosures_are_full_width_without_overlap_at_all_five_breakpoints) (width=390, kind='assignment')",
+      "cluster": "A-VISUAL"
+    },
+    {
+      "baseline_index": 94,
+      "test_id": "test_navigation.NavigationTests.test_shared_config_disclosures_are_full_width_without_overlap_at_all_five_breakpoints",
+      "display_id": "test_shared_config_disclosures_are_full_width_without_overlap_at_all_five_breakpoints (test_navigation.NavigationTests.test_shared_config_disclosures_are_full_width_without_overlap_at_all_five_breakpoints) (width=390, kind='scheduling')",
+      "cluster": "A-VISUAL"
+    },
+    {
+      "baseline_index": 95,
+      "test_id": "test_navigation.NavigationTests.test_workflow_keyboard_and_text_spacing_at_320_and_landscape",
+      "display_id": "test_workflow_keyboard_and_text_spacing_at_320_and_landscape (test_navigation.NavigationTests.test_workflow_keyboard_and_text_spacing_at_320_and_landscape) (width=320, height=568, screen='assignment')",
+      "cluster": "A-VISUAL"
+    },
+    {
+      "baseline_index": 96,
+      "test_id": "test_navigation.NavigationTests.test_workflow_keyboard_and_text_spacing_at_320_and_landscape",
+      "display_id": "test_workflow_keyboard_and_text_spacing_at_320_and_landscape (test_navigation.NavigationTests.test_workflow_keyboard_and_text_spacing_at_320_and_landscape) (width=320, height=256, screen='assignment')",
+      "cluster": "A-VISUAL"
+    },
+    {
+      "baseline_index": 97,
+      "test_id": "test_navigation.NavigationTests.test_workflow_keyboard_and_text_spacing_at_320_and_landscape",
+      "display_id": "test_workflow_keyboard_and_text_spacing_at_320_and_landscape (test_navigation.NavigationTests.test_workflow_keyboard_and_text_spacing_at_320_and_landscape) (width=568, height=320, screen='assignment')",
+      "cluster": "A-VISUAL"
+    },
+    {
+      "baseline_index": 98,
+      "test_id": "test_navigation.NavigationTests.test_workflow_primitives_hero_supports_optional_metadata_and_panel",
+      "display_id": "test_workflow_primitives_hero_supports_optional_metadata_and_panel (test_navigation.NavigationTests.test_workflow_primitives_hero_supports_optional_metadata_and_panel)",
+      "cluster": "A-HERO"
+    },
+    {
+      "baseline_index": 99,
+      "test_id": "test_navigation.NavigationTests.test_workflow_primitives_preserve_action_identity_states_and_token_overrides",
+      "display_id": "test_workflow_primitives_preserve_action_identity_states_and_token_overrides (test_navigation.NavigationTests.test_workflow_primitives_preserve_action_identity_states_and_token_overrides)",
+      "cluster": "A-VISUAL"
+    },
+    {
+      "baseline_index": 100,
+      "test_id": "test_navigation.NavigationTests.test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports",
+      "display_id": "test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports (test_navigation.NavigationTests.test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports) (width=1440, height=1000, kind='assignment')",
+      "cluster": "A-TERMINOLOGY"
+    },
+    {
+      "baseline_index": 101,
+      "test_id": "test_navigation.NavigationTests.test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports",
+      "display_id": "test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports (test_navigation.NavigationTests.test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports) (width=1440, height=1000, kind='scheduling')",
+      "cluster": "A-TERMINOLOGY"
+    },
+    {
+      "baseline_index": 102,
+      "test_id": "test_navigation.NavigationTests.test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports",
+      "display_id": "test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports (test_navigation.NavigationTests.test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports) (width=1280, height=1000, kind='assignment')",
+      "cluster": "A-TERMINOLOGY"
+    },
+    {
+      "baseline_index": 103,
+      "test_id": "test_navigation.NavigationTests.test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports",
+      "display_id": "test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports (test_navigation.NavigationTests.test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports) (width=1280, height=1000, kind='scheduling')",
+      "cluster": "A-TERMINOLOGY"
+    },
+    {
+      "baseline_index": 104,
+      "test_id": "test_navigation.NavigationTests.test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports",
+      "display_id": "test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports (test_navigation.NavigationTests.test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports) (width=1024, height=1000, kind='assignment')",
+      "cluster": "A-TERMINOLOGY"
+    },
+    {
+      "baseline_index": 105,
+      "test_id": "test_navigation.NavigationTests.test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports",
+      "display_id": "test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports (test_navigation.NavigationTests.test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports) (width=1024, height=1000, kind='scheduling')",
+      "cluster": "A-TERMINOLOGY"
+    },
+    {
+      "baseline_index": 106,
+      "test_id": "test_navigation.NavigationTests.test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports",
+      "display_id": "test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports (test_navigation.NavigationTests.test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports) (width=768, height=1000, kind='assignment')",
+      "cluster": "A-TERMINOLOGY"
+    },
+    {
+      "baseline_index": 107,
+      "test_id": "test_navigation.NavigationTests.test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports",
+      "display_id": "test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports (test_navigation.NavigationTests.test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports) (width=768, height=1000, kind='scheduling')",
+      "cluster": "A-TERMINOLOGY"
+    },
+    {
+      "baseline_index": 108,
+      "test_id": "test_navigation.NavigationTests.test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports",
+      "display_id": "test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports (test_navigation.NavigationTests.test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports) (width=390, height=844, kind='assignment')",
+      "cluster": "A-TERMINOLOGY"
+    },
+    {
+      "baseline_index": 109,
+      "test_id": "test_navigation.NavigationTests.test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports",
+      "display_id": "test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports (test_navigation.NavigationTests.test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports) (width=390, height=844, kind='scheduling')",
+      "cluster": "A-TERMINOLOGY"
+    },
+    {
+      "baseline_index": 110,
+      "test_id": "test_navigation.NavigationTests.test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports",
+      "display_id": "test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports (test_navigation.NavigationTests.test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports) (width=360, height=250, kind='assignment')",
+      "cluster": "A-TERMINOLOGY"
+    },
+    {
+      "baseline_index": 111,
+      "test_id": "test_navigation.NavigationTests.test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports",
+      "display_id": "test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports (test_navigation.NavigationTests.test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports) (width=360, height=250, kind='scheduling')",
+      "cluster": "A-TERMINOLOGY"
+    },
+    {
+      "baseline_index": 112,
+      "test_id": "test_workflow_context.WorkflowContextTests.test_both_dashboards_keep_approval_blocked_until_an_eligible_approver_is_saved",
+      "display_id": "test_both_dashboards_keep_approval_blocked_until_an_eligible_approver_is_saved (test_workflow_context.WorkflowContextTests.test_both_dashboards_keep_approval_blocked_until_an_eligible_approver_is_saved) (node='logistics_assignment')",
+      "cluster": "A-ROLES"
+    },
+    {
+      "baseline_index": 113,
+      "test_id": "test_workflow_context.WorkflowContextTests.test_both_dashboards_keep_approval_blocked_until_an_eligible_approver_is_saved",
+      "display_id": "test_both_dashboards_keep_approval_blocked_until_an_eligible_approver_is_saved (test_workflow_context.WorkflowContextTests.test_both_dashboards_keep_approval_blocked_until_an_eligible_approver_is_saved) (node='logistics_scheduling')",
+      "cluster": "A-ROLES"
+    },
+    {
+      "baseline_index": 114,
+      "test_id": "test_workflow_context.WorkflowContextTests.test_dashboard_trace_shares_the_copy_row_and_context_pills_are_equal",
+      "display_id": "test_dashboard_trace_shares_the_copy_row_and_context_pills_are_equal (test_workflow_context.WorkflowContextTests.test_dashboard_trace_shares_the_copy_row_and_context_pills_are_equal)",
+      "cluster": "D-NAV-GEOMETRY"
+    },
+    {
+      "baseline_index": 115,
+      "test_id": "test_workflow_context.WorkflowContextTests.test_data_roles_exist_before_csv_and_stay_below_compatibility",
+      "display_id": "test_data_roles_exist_before_csv_and_stay_below_compatibility (test_workflow_context.WorkflowContextTests.test_data_roles_exist_before_csv_and_stay_below_compatibility)",
+      "cluster": "A-ROLES"
+    },
+    {
+      "baseline_index": 116,
+      "test_id": "test_optimized_responsibilities.DataRoleMigrationTests.test_existing_steward_assignment_keeps_person_actor_and_version",
+      "display_id": "test_existing_steward_assignment_keeps_person_actor_and_version (test_optimized_responsibilities.DataRoleMigrationTests.test_existing_steward_assignment_keeps_person_actor_and_version)",
+      "cluster": "A-MIGRATION"
+    },
+    {
+      "baseline_index": 117,
+      "test_id": "test_activity.ActivityTests.test_03_browser_real_home_case_events_and_exports",
+      "display_id": "test_03_browser_real_home_case_events_and_exports (test_activity.ActivityTests.test_03_browser_real_home_case_events_and_exports)",
+      "cluster": "A-HOME"
+    },
+    {
+      "baseline_index": 118,
+      "test_id": "test_collaboration.CollaborationTests.test_01_team_browser_invitation_acceptance_assignments_and_access",
+      "display_id": "test_01_team_browser_invitation_acceptance_assignments_and_access (test_collaboration.CollaborationTests.test_01_team_browser_invitation_acceptance_assignments_and_access)",
+      "cluster": "A-ROLES"
+    },
+    {
+      "baseline_index": 119,
+      "test_id": "test_collaboration.CollaborationTests.test_02_assigned_approval_handoff_attribution_override_and_retry",
+      "display_id": "test_02_assigned_approval_handoff_attribution_override_and_retry (test_collaboration.CollaborationTests.test_02_assigned_approval_handoff_attribution_override_and_retry)",
+      "cluster": "A-ROLES"
+    },
+    {
+      "baseline_index": 120,
+      "test_id": "test_collaboration.CollaborationTests.test_03_invitation_confirmation_expiry_revocation_recipient_and_idempotency",
+      "display_id": "test_03_invitation_confirmation_expiry_revocation_recipient_and_idempotency (test_collaboration.CollaborationTests.test_03_invitation_confirmation_expiry_revocation_recipient_and_idempotency)",
+      "cluster": "A-ROLES"
+    },
+    {
+      "baseline_index": 121,
+      "test_id": "test_collaboration.CollaborationTests.test_04_last_admin_concurrency_and_assignment_races",
+      "display_id": "test_04_last_admin_concurrency_and_assignment_races (test_collaboration.CollaborationTests.test_04_last_admin_concurrency_and_assignment_races)",
+      "cluster": "A-ROLES"
+    },
+    {
+      "baseline_index": 122,
+      "test_id": "test_decision_center.DecisionCenterTests.test_02_live_workflow_completion_review_lineage_history_and_read_purity",
+      "display_id": "test_02_live_workflow_completion_review_lineage_history_and_read_purity (test_decision_center.DecisionCenterTests.test_02_live_workflow_completion_review_lineage_history_and_read_purity)",
+      "cluster": "A-PREPARATION"
+    },
+    {
+      "baseline_index": 123,
+      "test_id": "test_decision_center.DecisionCenterTests.test_04_portfolio_summary_is_global_actionable_and_read_only",
+      "display_id": "test_04_portfolio_summary_is_global_actionable_and_read_only (test_decision_center.DecisionCenterTests.test_04_portfolio_summary_is_global_actionable_and_read_only)",
+      "cluster": "A-ROLES"
+    },
+    {
+      "baseline_index": 124,
+      "test_id": "test_onboarding.OnboardingTests.test_04_browser_first_run_empty_states_demo_and_recovery",
+      "display_id": "test_04_browser_first_run_empty_states_demo_and_recovery (test_onboarding.OnboardingTests.test_04_browser_first_run_empty_states_demo_and_recovery)",
+      "cluster": "A-HOME"
+    },
+    {
+      "baseline_index": 125,
+      "test_id": "test_optimized_responsibilities.OptimizedResponsibilityTests.test_legacy_assignment_projects_to_its_explicit_role_without_ambiguous_overwrite",
+      "display_id": "test_legacy_assignment_projects_to_its_explicit_role_without_ambiguous_overwrite (test_optimized_responsibilities.OptimizedResponsibilityTests.test_legacy_assignment_projects_to_its_explicit_role_without_ambiguous_overwrite)",
+      "cluster": "A-ROLES"
+    },
+    {
+      "baseline_index": 126,
+      "test_id": "test_optimized_responsibilities.OptimizedResponsibilityTests.test_split_roles_reload_independent_node_assignments_and_actual_approval",
+      "display_id": "test_split_roles_reload_independent_node_assignments_and_actual_approval (test_optimized_responsibilities.OptimizedResponsibilityTests.test_split_roles_reload_independent_node_assignments_and_actual_approval)",
+      "cluster": "A-ROLES"
+    },
+    {
+      "baseline_index": 127,
+      "test_id": "test_tenancy.TenancyTests.test_09_home_attention_tracks_real_versions_and_removes_approved_or_archived",
+      "display_id": "test_09_home_attention_tracks_real_versions_and_removes_approved_or_archived (test_tenancy.TenancyTests.test_09_home_attention_tracks_real_versions_and_removes_approved_or_archived)",
+      "cluster": "A-LINEAGE"
+    },
+    {
+      "baseline_index": 128,
+      "test_id": "test_tenancy.TenancyTests.test_11_real_browser_catalog_revocation_and_reenable",
+      "display_id": "test_11_real_browser_catalog_revocation_and_reenable (test_tenancy.TenancyTests.test_11_real_browser_catalog_revocation_and_reenable)",
+      "cluster": "A-HOME"
+    },
+    {
+      "baseline_index": 129,
+      "test_id": "test_v2_foundation.FoundationDomainTests.test_approved_precedence_actual_actor_and_explicit_candidate_access",
+      "display_id": "test_approved_precedence_actual_actor_and_explicit_candidate_access (test_v2_foundation.FoundationDomainTests.test_approved_precedence_actual_actor_and_explicit_candidate_access)",
+      "cluster": "A-ROLES"
+    },
+    {
+      "baseline_index": 130,
+      "test_id": "test_v2_foundation.FoundationDomainTests.test_multi_responsibility_candidates_cas_and_legacy_compatibility",
+      "display_id": "test_multi_responsibility_candidates_cas_and_legacy_compatibility (test_v2_foundation.FoundationDomainTests.test_multi_responsibility_candidates_cas_and_legacy_compatibility)",
+      "cluster": "A-ROLES"
+    },
+    {
+      "baseline_index": 131,
+      "test_id": "test_v2_foundation.FoundationDomainTests.test_stage_assignments_enforce_eligibility_and_keep_get_read_only",
+      "display_id": "test_stage_assignments_enforce_eligibility_and_keep_get_read_only (test_v2_foundation.FoundationDomainTests.test_stage_assignments_enforce_eligibility_and_keep_get_read_only)",
+      "cluster": "A-ROLES"
+    },
+    {
+      "baseline_index": 132,
+      "test_id": "test_v2_foundation.MigrationCompatibilityTests.test_legacy_member_is_backfilled_without_rewriting_the_membership",
+      "display_id": "test_legacy_member_is_backfilled_without_rewriting_the_membership (test_v2_foundation.MigrationCompatibilityTests.test_legacy_member_is_backfilled_without_rewriting_the_membership)",
+      "cluster": "A-MIGRATION"
+    },
+    {
+      "baseline_index": 133,
+      "test_id": "test_v2_golden.GoldenWorkflowTests.test_distinct_people_complete_the_golden_workflow_and_cross_surface_matrix",
+      "display_id": "test_distinct_people_complete_the_golden_workflow_and_cross_surface_matrix (test_v2_golden.GoldenWorkflowTests.test_distinct_people_complete_the_golden_workflow_and_cross_surface_matrix)",
+      "cluster": "A-RERUN"
+    },
+    {
+      "baseline_index": 134,
+      "test_id": "test_workflow.WorkflowTests.test_assignment_scheduling_and_replacement_update_history_and_compact_list",
+      "display_id": "test_assignment_scheduling_and_replacement_update_history_and_compact_list (test_workflow.WorkflowTests.test_assignment_scheduling_and_replacement_update_history_and_compact_list)",
+      "cluster": "A-LINEAGE"
+    },
+    {
+      "baseline_index": 135,
+      "test_id": "test_workflow.WorkflowTests.test_browser_complete_workflow_at_mobile_width",
+      "display_id": "test_browser_complete_workflow_at_mobile_width (test_workflow.WorkflowTests.test_browser_complete_workflow_at_mobile_width)",
+      "cluster": "A-HOME"
+    },
+    {
+      "baseline_index": 136,
+      "test_id": "test_workflow.WorkflowTests.test_browser_creation_execution_approval_navigation_and_mobile_history",
+      "display_id": "test_browser_creation_execution_approval_navigation_and_mobile_history (test_workflow.WorkflowTests.test_browser_creation_execution_approval_navigation_and_mobile_history)",
+      "cluster": "A-HOME"
+    },
+    {
+      "baseline_index": 137,
+      "test_id": "test_workflow.WorkflowTests.test_platform_auth_navigation_profile_and_logout",
+      "display_id": "test_platform_auth_navigation_profile_and_logout (test_workflow.WorkflowTests.test_platform_auth_navigation_profile_and_logout)",
+      "cluster": "A-HOME"
+    },
+    {
+      "baseline_index": 138,
+      "test_id": "test_workflow.WorkflowTests.test_scheduling_dashboard_v21_preserves_assignment_and_temporal_relations",
+      "display_id": "test_scheduling_dashboard_v21_preserves_assignment_and_temporal_relations (test_workflow.WorkflowTests.test_scheduling_dashboard_v21_preserves_assignment_and_temporal_relations)",
+      "cluster": "A-PREPARATION"
+    },
+    {
+      "baseline_index": 139,
+      "test_id": "test_workflow_gates.WorkflowGateTests.test_atomic_team_edit_keeps_multiple_roles_and_rolls_back_invalid_access",
+      "display_id": "test_atomic_team_edit_keeps_multiple_roles_and_rolls_back_invalid_access (test_workflow_gates.WorkflowGateTests.test_atomic_team_edit_keeps_multiple_roles_and_rolls_back_invalid_access)",
+      "cluster": "A-ROLES"
+    },
+    {
+      "baseline_index": 140,
+      "test_id": "test_workflow_gates.WorkflowGateTests.test_d1_d2_gates_are_independent_and_assigned_approver_is_not_actual_actor",
+      "display_id": "test_d1_d2_gates_are_independent_and_assigned_approver_is_not_actual_actor (test_workflow_gates.WorkflowGateTests.test_d1_d2_gates_are_independent_and_assigned_approver_is_not_actual_actor)",
+      "cluster": "A-ROLES"
+    },
+    {
+      "baseline_index": 141,
+      "test_id": "test_workflow_gates.WorkflowGateTests.test_new_cases_require_data_owner_and_approver_but_replays_keep_their_result",
+      "display_id": "test_new_cases_require_data_owner_and_approver_but_replays_keep_their_result (test_workflow_gates.WorkflowGateTests.test_new_cases_require_data_owner_and_approver_but_replays_keep_their_result)",
+      "cluster": "A-PREPARATION"
+    },
+    {
+      "baseline_index": 142,
+      "test_id": "test_workflow_gates.WorkflowGateTests.test_role_loss_cross_workspace_forgery_and_policy_changes_do_not_bypass_gates",
+      "display_id": "test_role_loss_cross_workspace_forgery_and_policy_changes_do_not_bypass_gates (test_workflow_gates.WorkflowGateTests.test_role_loss_cross_workspace_forgery_and_policy_changes_do_not_bypass_gates)",
+      "cluster": "A-ROLES"
+    },
+    {
+      "baseline_index": 143,
+      "test_id": "test_workflow_gates.WorkflowMigrationCompatibilityTests.test_existing_case_is_unchanged_and_legacy_actions_remain_available",
+      "display_id": "test_existing_case_is_unchanged_and_legacy_actions_remain_available (test_workflow_gates.WorkflowMigrationCompatibilityTests.test_existing_case_is_unchanged_and_legacy_actions_remain_available)",
+      "cluster": "A-MIGRATION"
+    },
+    {
+      "baseline_index": 144,
+      "test_id": "test_workspace_settings.WorkspaceSettingsTests.test_02_admin_browser_preferences_free_plan_and_historical_evidence",
+      "display_id": "test_02_admin_browser_preferences_free_plan_and_historical_evidence (test_workspace_settings.WorkspaceSettingsTests.test_02_admin_browser_preferences_free_plan_and_historical_evidence)",
+      "cluster": "A-VISUAL"
+    }
+  ],
+  "additional_findings": [
+    {
+      "id": "B-FOCUS-MARGIN",
+      "category": "B",
+      "discovered_after": "B-CONTRAST correction lets original test reach the 360x250 keyboard scenario",
+      "cause": "Dashboard focus scroll margins 16px top/80px bottom exceed the short viewport together with the 198.765625px capability; native focus centers the margin area and moves the button top to -6.4375px.",
+      "contract": "Existing no-obscured/outside keyboard focus acceptance, no assertion weakening.",
+      "evidence": [
+        "focus-probe.jsonl",
+        "focus-360-250.png",
+        "dashboard-toolbar.css low-height scroll-margin rule"
+      ],
+      "change": "Pending minimal scroll-margin override limited to Decision Intelligence capabilities in low viewports."
+    },
+    {
+      "id": "B-KPI-CASCADE",
+      "category": "B",
+      "discovered_after": "Porting the blocked geometry test to current copy and actions reveals mismatched KPI tracks at1024px",
+      "cause": "Latest Scheduling KPI band omits default grid-template-columns reset; its inherited max-width1100 two-column rule stays active, unlike D1. Both latest responsive bands specify two columns at900 and one at600.",
+      "expected": "Shared KPI band default4, tablet2 below900, mobile1 below600, with data/typography retained.",
+      "actual": "D1 four179.5px tracks vsD2 two359px tracks at1024; same default4 and mobile1 elsewhere.",
+      "contract": "Current shared D1/D2 upper geometry and approved KPI bands, existing test coverage; minimal CSS cascade correction without redesign.",
+      "evidence": [
+        "kpi-cascade/before.json",
+        "kpi-cascade/before-scheduling-1024.png",
+        "assignment-dashboard-decision.css:168,178,183",
+        "scheduling-dashboard-v21.css:117,140,151,154"
+      ],
+      "change": "Pending default4 reset on latest scheduling-kpis rule."
+    },
+    {
+      "id": "B-CSV-CONTRAST",
+      "category": "B",
+      "cause": "The reuse-drawer CSV text uses the same muted token that fails 4.5 on its hover surface.",
+      "actual": "4.402332901228427 for CSV, rgb(145,165,175), reached after repairing Apply preconditions.",
+      "contract": "Original theme audit AA threshold4.5, unchanged.",
+      "evidence": [
+        "A-preparation-focal.log exact failure",
+        "dda-logistics-upload.css:111"
+      ],
+      "change": "Pending existing secondary text token on that icon label only."
+    },
+    {
+      "id": "B-HOME-ATTENTION",
+      "category": "B",
+      "discovered_after": "A-ROLES fixture corrections allow collaboration approval scenario to progress",
+      "component": "public.platform_home(uuid,uuid) / app/platform/home.py",
+      "cause": "Home assigned_work review filtering uses retired decision_assignments.approver_user_id, now NULL for current Owner assignments. Unlike current approvals and Center, its SQL definition was not converted to owner_user_id.",
+      "expected_by_test": "An unassigned Operator does not receive someone else’s assigned review; current Owner and Admin retain their work.",
+      "actual": "Assigned Owner USER_B; raw approver NULL; unassigned Operator receives attention.total=1 and review item; collaboration.can_approve=false; approval POST403 and approved_at remains NULL.",
+      "contract": "docs/domain-model.md current Owner vs read-only compatibility fields; platform_home SQL comment Assigned reviewers see their work; API attention.scope=assigned_work.",
+      "evidence": [
+        "B-home-attention-proof.log",
+        "supabase/migrations/20261019130000_platform_onboarding_demo.sql:79",
+        "supabase/migrations/20261022030000_case_ownership_readiness.sql:66,148-166",
+        "A-roles-workflow-related.log test_02_assigned_approval_handoff_attribution_override_and_retry"
+      ],
+      "change": "NONE. Changing the checked persisted SQL function requires a versioned migration; user expressly prohibits migrations in T0-R. No test assertion or production privilege was weakened.",
+      "result": "STOP / requires separately authorized SQL remediation",
+      "requires_migration": true
+    },
+    {
+      "id": "E-FOCUS-REMAINDER",
+      "category": "E",
+      "component": "narrow/short viewport keyboard traversal after current Map/Config fixtures load",
+      "tests": [
+        "test_navigation.NavigationTests.test_workflow_keyboard_and_text_spacing_at_320_and_landscape"
+      ],
+      "actual": "In the related focal run, a focused workflow step is occluded at 320x256, and a Scheduling window option has y=-17.921875 at 568x320. Focus audit retains original visibility/occlusion/outside thresholds.",
+      "expected_by_test": "Keyboard focus remains visible, reachable and unoccluded at 320px and short landscape with text spacing.",
+      "contract": "Current accessibility acceptance; no blanket timeout or relaxation of focus checks.",
+      "evidence": [
+        "A-home-context-hero-related.log: test_workflow_keyboard_and_text_spacing_at_320_and_landscape"
+      ],
+      "change": "NONE after the newly exposed unresolved finding. Code/test edits frozen before final suites.",
+      "result": "UNRESOLVED; STOP before speculative changes"
+    }
+  ],
+  "remediation_unresolved_clusters": 1,
+  "remaining_fixture_findings": [
+    {
+      "id": "C-FIXTURE-SNAPSHOT",
+      "category": "C",
+      "component": "NavigationTests.hydrated / workflow snapshot routing",
+      "cause": "Some existing tests change the synthetic current Case ID; the newly explicit workflow map remains keyed by the prior ID.",
+      "actual": "KeyError for synthetic Case ...0006 in hydrated() after Case ID mutation.",
+      "tests": [
+        "test_navigation.NavigationTests.test_assignment_draft_is_restored_per_case"
+      ],
+      "evidence": [
+        "revalidation/B-BROWSER.log"
+      ],
+      "change": "NONE after STOP / source freeze; pending fixture correction before any integration",
+      "result": "Introduced fixture regression, explicitly retained as a blocker; not historical exemption or engine regression."
+    }
+  ]
+}

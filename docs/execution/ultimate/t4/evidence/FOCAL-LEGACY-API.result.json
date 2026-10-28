@@ -1,0 +1,27 @@
+{
+  "suite": "FOCAL-LEGACY-API",
+  "status": "PASS",
+  "tests": 4,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "started_at": "2026-10-26T19:18:56.921063+00:00",
+  "finished_at": "2026-10-26T19:19:32.833797+00:00",
+  "seconds": 35.913,
+  "cwd": "/workspace/Dation/backend",
+  "command": [
+    "/workspace/Dation/.venv/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "test_data_hub.DataHubTests.test_06_real_browser_dda_upload_library_lineage_download_and_safe_delete",
+    "test_data_hub.DataHubTests.test_07_failed_upload_cleanup_is_tracked_and_workspace_authorized",
+    "test_data_hub.DataHubTests.test_09_v2_summary_composed_filters_historical_lineage_and_read_purity",
+    "test_data_hub.DataHubTests.test_10_lost_committed_upload_response_preserves_metadata_and_bytes",
+    "-v"
+  ],
+  "exit_code": 0,
+  "production_credentials_cleared": true,
+  "PYTHONPATH": "tests/e2e",
+  "log_sha256": "0deef776fdacb5ca3a2ad194b18a4820d6cac9df052f74307cf8f1683f3048be"
+}

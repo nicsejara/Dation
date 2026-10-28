@@ -1,0 +1,498 @@
+import {createScope,scopeFor} from "../lifecycle.mjs";
+import {resolveNodeDestination} from '../navigation/decision-target.mjs';
+import {ensureDecisionCaseStyles} from "../styles.mjs";
+import {esc,num} from "../shared.mjs";
+import {STATUS,deriveDecisionNodes} from "./decision-case.mjs";
+import {WORKFLOW_ACTION_CLASS,workflowActionLabel} from "../workflow-action-bar.mjs";
+import {decisionHero,decisionCaseCard,decisionDataFileCard,bindCaseContext} from "../decision-config-ui.mjs";
+import {
+  DECISION_ORDER,
+  DECISION_META,
+  iconSvg,
+  statusUi,
+} from "../decision-ui.mjs";
+
+
+function workflowStep(id,fallback){
+  const steps=(window.DationDdaFlow&&Array.isArray(window.DationDdaFlow.steps))
+    ?window.DationDdaFlow.steps
+    :[];
+  return steps.find(step=>step.id===id)||fallback;
+}
+
+function readinessById(readiness){
+  return Object.fromEntries(
+    (readiness?.decisions||[]).map(item=>[item.id,item]),
+  );
+}
+
+function compactDateTime(value){
+  if(!value)return null;
+  const parsed=new Date(value);
+  if(Number.isNaN(parsed.getTime()))return null;
+  return new Intl.DateTimeFormat("es-AR",{
+    day:"2-digit",
+    month:"short",
+    hour:"2-digit",
+    minute:"2-digit",
+  }).format(parsed);
+}
+
+function displayCaseId(value){
+  if(!value)return "—";
+  return "DC-"+String(value).slice(0,8).toUpperCase();
+}
+
+function dependencyState(nodeId,nodes){
+  if(nodeId==="logistics_assignment"){
+    return {ready:true,label:"Sin dependencia previa",waiting:null};
+  }
+  const previousId=nodeId==="logistics_scheduling"
+    ?"logistics_assignment"
+    :"logistics_scheduling";
+  const previous=nodes?.[previousId]||{};
+  const previousMeta=DECISION_META[previousId];
+  const ready=previous.status===STATUS.APPROVED;
+  return {
+    ready,
+    label:ready?previousMeta.short+" aprobada":"Esperando "+previousMeta.short,
+    waiting:ready?null:previousMeta.short,
+    previousId,
+  };
+}
+
+function dataIssueText(decision){
+  const missing=(decision?.missing||[])
+    .map(item=>item.label||item.code)
+    .filter(Boolean);
+  if(missing.length){
+    return missing.slice(0,2).join(" · ")+(missing.length>2?" · +"+(missing.length-2):"");
+  }
+  const blockers=(decision?.blockers||[])
+    .map(item=>item.detail||item.code)
+    .filter(Boolean);
+  return blockers.length?blockers[0]:null;
+}
+
+function actionFor(nodeId,status,node,dataReady){
+  const meta=DECISION_META[nodeId];
+  const target=resolveNodeDestination(nodeId,{...node,status});
+  if(target?.view==='decision-dashboard'&&node?.approved_run_id&&status!=='stale')return {action:'open-result',label:'Ver resultado',disabled:false};
+  if(status===STATUS.APPROVED){
+    return node?.run_id
+      ?{action:"open-result",label:"Ver resultado",disabled:false}
+      :{action:null,label:"Resultado no disponible",disabled:true};
+  }
+  if(status===STATUS.RUNNING){
+    return node?.run_id
+      ?{action:"open-result",label:"Ver ejecución →",disabled:false}
+      :{action:null,label:"Ejecución en curso",disabled:true};
+  }
+  if(status===STATUS.STALE)return {action:'configure',label:'Volver a configurar →',disabled:false};
+  if(status===STATUS.REVIEW){
+    return node?.run_id
+      ?{action:"open-result",label:"Revisar →",disabled:false}
+      :{action:"configure",label:"Revisar configuración →",disabled:false};
+  }
+  if(!dataReady&&[STATUS.NEEDS_DATA,STATUS.LOCKED].includes(status)){
+    return {action:"data",label:"Completar datos →",disabled:false};
+  }
+  if(status===STATUS.LOCKED){
+    return {action:null,label:null,disabled:true};
+  }
+  if(status===STATUS.ERROR){
+    return meta.implemented
+      ?{action:"configure",label:"Revisar y reintentar →",disabled:false}
+      :{action:null,label:"Motor aún no disponible",disabled:true};
+  }
+  if(status===STATUS.AVAILABLE){
+    return meta.implemented
+      ?{action:"configure",label:meta.configureLabel,disabled:false}
+      :{action:null,label:"Motor en próxima fase",disabled:true};
+  }
+  return {action:null,label:null,disabled:true};
+}
+
+export function deriveNodePresentationState(nodeId,node,decision,nodes){
+  const dependency=dependencyState(nodeId,nodes);
+  const dataReady=Boolean(decision?.data_ready);
+  const runtimeStatus=[
+    STATUS.RUNNING,
+    STATUS.REVIEW,
+    STATUS.APPROVED,
+    STATUS.ERROR,
+    STATUS.STALE,
+  ].includes(node?.status)?node.status:null;
+  const status=runtimeStatus||(
+    !dependency.ready
+      ?STATUS.LOCKED
+      :(dataReady?STATUS.AVAILABLE:STATUS.NEEDS_DATA)
+  );
+  return {
+    nodeId,
+    status,
+    dataReady,
+    dependencyReady:dependency.ready,
+    dependencyLabel:dependency.label,
+    waitingFor:dependency.waiting,
+    previousId:dependency.previousId||null,
+    missingData:dataIssueText(decision),
+    action:actionFor(nodeId,status,node,dataReady),
+    runId:node?.run_id||null,
+    approvedAt:compactDateTime(node?.approved_at),
+    error:node?.error||null,
+  };
+}
+
+function statusDetail(presentation){
+  if(presentation.status===STATUS.APPROVED){
+    return presentation.approvedAt
+      ?"Aprobada el "+presentation.approvedAt+"."
+      :"Decisión aprobada.";
+  }
+  if(presentation.status===STATUS.RUNNING){
+    return "Dation está procesando esta decisión.";
+  }
+  if(presentation.status===STATUS.REVIEW){
+    return "El resultado está listo para revisar y aprobar.";
+  }
+  if(presentation.status===STATUS.STALE){
+    return "Cambiaron los datos de entrada.";
+  }
+  if(presentation.status===STATUS.ERROR){
+    return presentation.error||"La ejecución necesita revisión antes de continuar.";
+  }
+  if(!presentation.dataReady){
+    return presentation.missingData
+      ?"Faltan datos para esta decisión: "+presentation.missingData+"."
+      :"Faltan datos para esta decisión.";
+  }
+  if(presentation.status===STATUS.LOCKED){
+    return "Tus datos alcanzan.";
+  }
+  if(presentation.status===STATUS.AVAILABLE){
+    return "Tus datos alcanzan y no hay dependencias.";
+  }
+  return "Esta decisión está esperando sus condiciones de habilitación.";
+}
+
+function stateChip(status){
+  const ui=statusUi(status);
+  return '<span class="dispatch-map-state-chip is-'+esc(ui.tone)+'" '
+    +'title="'+esc(ui.description)+'" tabindex="0">'
+    +iconSvg(ui.icon,"dispatch-map-icon")
+    +'<span>'+esc(ui.label)+'</span>'
+    +'</span>';
+}
+
+function nodeActionMarkup(nodeId,presentation){
+  const action=presentation.action;
+  const approved=presentation.status===STATUS.APPROVED;
+  const waiting=presentation.status===STATUS.LOCKED;
+  if(approved&&action?.action){
+    return '<div class="dispatch-decision-node__actions">'
+      +'<button type="button" class="dispatch-map-secondary-action" '
+        +'data-map-action="'+esc(action.action)+'" data-map-node="'+esc(nodeId)+'">Ver resultado</button>'
+    +'</div>';
+  }
+  if(action?.action){
+    const primary=action.action!=="open-result"||presentation.status===STATUS.REVIEW;
+    return '<button type="button" class="dispatch-decision-node__action '+(primary?WORKFLOW_ACTION_CLASS+' d-button--primary':'d-button')+'" '
+      +'data-map-action="'+esc(action.action)+'" data-map-node="'+esc(nodeId)+'">'
+      +workflowActionLabel(action.label||"Continuar")
+    +'</button>';
+  }
+  if(waiting&&presentation.waitingFor){
+    return '<div class="dispatch-decision-node__waiting">'
+      +iconSvg("lock","dispatch-map-icon")
+      +'<span>Se habilita al aprobar '+esc(presentation.waitingFor)+'.</span>'
+    +'</div>';
+  }
+  if(action?.label){
+    return '<div class="dispatch-decision-node__waiting">'
+      +iconSvg("clock","dispatch-map-icon")
+      +'<span>'+esc(action.label)+'</span>'
+    +'</div>';
+  }
+  return "";
+}
+
+function nodeCard(nodeId,presentation,isNext){
+  const meta=DECISION_META[nodeId];
+  const waiting=presentation.status===STATUS.LOCKED
+    ||presentation.status===STATUS.NEEDS_DATA;
+  const approved=presentation.status===STATUS.APPROVED;
+  const review=[STATUS.REVIEW,STATUS.STALE,STATUS.ERROR].includes(presentation.status);
+  const statusId="decision-status-"+nodeId;
+  const cardClass="dispatch-decision-node is-"+esc(presentation.status)
+    +(isNext?" is-next":"")
+    +(approved?" is-approved":"")
+    +(review?" is-review":"")
+    +(waiting?" is-waiting":"");
+
+  return '<article class="'+cardClass+'" data-decision-node="'+esc(nodeId)+'" '
+    +'aria-label="Decisión '+esc(meta.index)+': '+esc(meta.label)+'" '
+    +(isNext?'aria-current="step" ':'')
+    +(waiting?'tabindex="0" aria-disabled="true" aria-describedby="'+esc(statusId)+'" ':'')
+    +'>'
+    +(isNext?'<span class="dispatch-decision-node__next">SIGUIENTE DECISIÓN</span>':'')
+    +'<header class="dispatch-decision-node__head">'
+      +'<span class="dispatch-decision-node__icon">'
+        +iconSvg(approved?"checkCircle":meta.icon,"dispatch-map-icon")
+      +'</span>'
+      +'<span class="dispatch-decision-node__decision-label">DECISIÓN '+esc(meta.index)+'</span>'
+      +stateChip(presentation.status)
+    +'</header>'
+    +'<h3>'+esc(meta.label)+'</h3>'
+    +'<p class="dispatch-decision-node__question">'+esc(meta.question)+'</p>'
+    +'<div class="dispatch-decision-node__output">'
+      +'<span class="dispatch-decision-node__output-icon">'+iconSvg("clipboardCheck","dispatch-map-icon")+'</span>'
+      +'<div><small>QUÉ ENTREGA</small><strong>'+esc(meta.output)+'</strong></div>'
+    +'</div>'
+    +'<p class="dispatch-decision-node__statusline" id="'+esc(statusId)+'">'
+      +iconSvg(
+        approved?"checkCircle":review?"alertTriangle":presentation.dataReady?"checkCircle":"alertTriangle",
+        "dispatch-map-icon",
+      )
+      +'<span>'+esc(statusDetail(presentation))+'</span>'
+    +'</p>'
+    +(presentation.runId
+      ?'<small class="dispatch-decision-node__run">Corrida '+esc(String(presentation.runId).slice(0,8))+'</small>'
+      :'<small class="dispatch-decision-node__run is-empty" aria-hidden="true">&nbsp;</small>')
+    +'<div class="dispatch-decision-node__actionrow">'
+      +nodeActionMarkup(nodeId,presentation)
+    +'</div>'
+  +'</article>';
+}
+
+// Legacy visible copy removed from connector UI: "Requiere aprobación".
+function connector(fromId,toId,presentations,nextNodeId){
+  const source=presentations[fromId];
+  const fromMeta=DECISION_META[fromId];
+  const sourceApproved=source?.status===STATUS.APPROVED;
+  const active=[STATUS.RUNNING,STATUS.REVIEW,STATUS.STALE].includes(source?.status)
+    ||(sourceApproved&&toId===nextNodeId&&presentations[toId]?.status===STATUS.AVAILABLE);
+  const tone=sourceApproved?"complete":active?"active":"waiting";
+  const icon=sourceApproved?"checkCircle":active?"chevronRight":"lock";
+  const detail=sourceApproved
+    ?fromMeta.short+" aprobada"
+    :"Se habilita al aprobar "+fromMeta.short;
+  return '<div class="dispatch-decision-edge is-'+tone+'" '
+    +'role="img" aria-label="'+esc(detail)+'" title="'+esc(detail)+'" tabindex="0">'
+    +'<span class="dispatch-decision-edge__line" aria-hidden="true"></span>'
+    +'<span class="dispatch-decision-edge__marker" aria-hidden="true">'
+      +iconSvg(icon,"dispatch-map-icon")
+    +'</span>'
+  +'</div>';
+}
+
+function heroMarkup(decisionCase){
+  const mapStep=workflowStep("map",{number:2,label:"Mapa de decisiones"});
+  return decisionHero({
+    className:"dispatch-pro-hero dispatch-map-premium__hero",
+    reveal:true,
+    step:mapStep,
+    title:decisionCase?.label||"Decision Case",
+    description:"Dation muestra qué decisiones podés resolver con tus datos y cuáles se habilitan después. Elegí, configurá y aprobá para avanzar.",
+    panelTitle:"CÓMO AVANZA EL CASO",
+    panelArtwork:false,
+    panelItems:[
+      {label:"1 · ELEGÍ",description:"La decisión que está disponible.",icon:"mousePointer"},
+      {label:"2 · CONFIGURÁ",description:"Definí tu prioridad y compará escenarios.",icon:"sliders"},
+      {label:"3 · APROBÁ",description:"Aprobá y habilitá la siguiente decisión.",icon:"checkCircle"},
+    ],
+    panelFootnote:"Reabrí cada decisión desde su tarjeta.",
+  });
+}
+
+export function progressMarkup(presentations,approved,activeNodeId){
+  const implemented=DECISION_ORDER.filter(id=>DECISION_META[id].implemented);
+  const reached=Math.max(0,...DECISION_ORDER.map((id,index)=>DECISION_META[id].implemented&&(
+    id===activeNodeId||!['locked','needs_data'].includes(presentations[id]?.status))?index:0));
+  return '<div class="dispatch-case-progress"><div class="dispatch-case-progress__heading"><small>PROGRESO</small><strong>'+num(approved)+' de '+implemented.length+' aprobadas</strong></div>'
+    +'<ol class="dispatch-case-progress__grid" aria-label="Progreso por decisión" style="--decision-count:'+DECISION_ORDER.length+'">'
+    +DECISION_ORDER.map((id,index)=>{
+      const meta=DECISION_META[id],locked=!meta.implemented||index>reached;
+      const status=locked?'No disponible':presentations[id]?.status===STATUS.APPROVED?'Aprobada':'Alcanzada';
+      return '<li class="dispatch-case-progress__item '+(locked?'is-waiting':'is-reached')+(index===reached?' is-active':'')+'"'+(!meta.implemented?' aria-disabled="true"':'')+(index===reached?' aria-current="step"':'')+' title="'+esc(meta.label+': '+status)+'">'
+        +'<span class="dispatch-case-progress__segment" aria-hidden="true">'+(index+1)+'</span><span class="dispatch-case-progress__label">'+esc(meta.label+': '+status)+'</span></li>';
+    }).join('')+'</ol></div>';
+}
+
+function caseCardMarkup(decisionCase,orders,fleet,dataOwner){
+  return decisionCaseCard({caseId:decisionCase?.id,caseLabel:decisionCase?.label,dataOwner,
+    copyHook:'data-copy-case-id',feedbackHook:'data-case-copy-feedback',changeHook:'data-map-change-data',
+    files:[['orders',orders],['fleet',fleet]].map(([kind,dataset])=>{
+      const count=Number(dataset?.row_count||0);
+      return decisionDataFileCard({kind,dataset,countText:num(count)+' '+(kind==='orders'?(count===1?'orden':'órdenes'):(count===1?'vehículo':'vehículos'))});
+    })});
+}
+
+function legendMarkup(){
+  return '<div class="dispatch-map-legend" aria-label="Estados de las decisiones">'
+    +[
+      ["Disponible","playCircle","available","Podés configurarla ahora."],
+      ["Requiere revisión","alertTriangle","review","Hay un resultado o cambio que requiere revisión."],
+      ["Aprobada","checkCircle","approved","La decisión quedó aprobada y registrada."],
+      ["En espera","clock","waiting","Se habilita cuando se cumplen sus condiciones."],
+    ].map(([label,icon,tone,description])=>(
+      '<span class="dispatch-map-state-chip is-'+tone+'" title="'+esc(description)+'" tabindex="0">'
+        +iconSvg(icon,"dispatch-map-icon")+'<span>'+label+'</span>'
+      +'</span>'
+    )).join("")
+  +'</div>';
+}
+
+function completeBanner(approved,lastRunId){
+  if(approved!==2)return "";
+  return '<section class="dispatch-map-complete">'
+    +'<span>'+iconSvg("checkCircle","dispatch-map-icon")+'</span>'
+    +'<div><small>CASO COMPLETO</small><strong>Case completado · 2/2 aprobadas.</strong>'
+      +'<p>Podés volver al resultado final o reabrir cualquier decisión desde su tarjeta.</p></div>'
+    +'<button type="button" data-map-action="center">Volver a Decision Center →</button>'
+  +'</section>';
+}
+
+function changeDataDialog(presentations){
+  const affected=DECISION_ORDER.filter(nodeId=>presentations[nodeId]?.status===STATUS.APPROVED);
+  const impact=affected.length
+    ?'<div class="dispatch-map-dialog__impact"><strong>Decisiones aprobadas afectadas</strong><ul>'
+      +affected.map(nodeId=>'<li>'+esc(DECISION_META[nodeId].label)+'</li>').join("")
+      +'</ul></div>'
+    :'<div class="dispatch-map-dialog__impact is-empty"><strong>No hay decisiones aprobadas todavía.</strong></div>';
+  return '<dialog class="dispatch-map-dialog" data-change-data-dialog>'
+    +'<form method="dialog">'
+      +'<span class="dispatch-map-dialog__icon">'+iconSvg("refresh","dispatch-map-icon")+'</span>'
+      +'<h3>¿Cambiar los datos del caso?</h3>'
+      +'<p>Si cambiás los datos, Dation va a crear un nuevo Decision Case y conservará el historial del caso actual.</p>'
+      +impact
+      +'<div class="dispatch-map-dialog__actions">'
+        +'<button value="cancel" class="dispatch-map-secondary-action">Cancelar</button>'
+        +'<button value="confirm" class="dispatch-map-primary-action" data-confirm-change>Cambiar datos</button>'
+      +'</div>'
+    +'</form>'
+  +'</dialog>';
+}
+
+export async function renderDecisionMap(
+  root,
+  {decisionCase,readiness,orders,fleet,onConfigure,onOpenResult,onData,transitionNotice=null,dataOwner},
+){
+  const scope=createScope(root);scope.own(()=>{root._guideDrawer=null;});
+  await ensureDecisionCaseStyles();
+  if(!scope.active)return;
+  const nodes=deriveDecisionNodes(decisionCase,readiness);
+  const evidence=readinessById(readiness);
+  const presentations=Object.fromEntries(
+    DECISION_ORDER.map(nodeId=>[
+      nodeId,
+      deriveNodePresentationState(nodeId,nodes[nodeId]||{},evidence[nodeId],nodes),
+    ]),
+  );
+  const approved=DECISION_ORDER.filter(
+    nodeId=>presentations[nodeId].status===STATUS.APPROVED,
+  ).length;
+  const nextNodeId=DECISION_ORDER.find(nodeId=>(
+    presentations[nodeId].status===STATUS.AVAILABLE&&DECISION_META[nodeId].implemented
+  ))||null;
+  const attentionNodeId=DECISION_ORDER.find(nodeId=>[
+    STATUS.RUNNING,
+    STATUS.REVIEW,
+    STATUS.STALE,
+    STATUS.ERROR,
+  ].includes(presentations[nodeId].status))||null;
+  const activeNodeId=nextNodeId||attentionNodeId;
+
+  root.className="dispatch dispatch-upload-pro dispatch-decision-map dispatch-decision-map--premium dispatch-decision-map--case-v2";
+  root.innerHTML=
+    heroMarkup(decisionCase)
+    +(transitionNotice
+      ?'<section class="dispatch-map-stale dispatch-map-stale--premium" role="status" data-case-transition>'
+        +iconSvg("info","dispatch-map-icon")
+        +'<div><strong>Nuevo Decision Case por cambio de datos</strong><p>El Data Pack cambió. Dation creó '+esc(displayCaseId(transitionNotice.caseId))+' y conservó '+esc(displayCaseId(transitionNotice.predecessorId))+' para mantener la trazabilidad.</p></div>'
+      +'</section>'
+      :'')
+    +'<section class="dispatch-map-progress" aria-label="Progreso del caso">'+progressMarkup(presentations,approved,activeNodeId)+'</section>'
+    +caseCardMarkup(decisionCase,orders,fleet,dataOwner)
+    +'<section class="dispatch-map-chain-section dispatch-map-chain-section--open" aria-labelledby="decision-chain-title">'
+      +'<header class="dispatch-map-chain-heading">'
+        +'<div><span class="dispatch-map-eyebrow">DECISIONES DEL CASO</span>'
+          +'<h2 id="decision-chain-title">¿Qué decisión querés revisar o ejecutar?</h2>'
+          +'<p>Cada decisión se aprueba antes de habilitar la siguiente.</p></div>'
+        +legendMarkup()
+      +'</header>'
+      +completeBanner(approved,presentations.logistics_final_assignment.runId)
+      +'<div class="dispatch-node-map" aria-label="Cadena de decisiones">'
+        +nodeCard("logistics_assignment",presentations.logistics_assignment,nextNodeId==="logistics_assignment")
+        +connector("logistics_assignment","logistics_scheduling",presentations,nextNodeId)
+        +nodeCard("logistics_scheduling",presentations.logistics_scheduling,nextNodeId==="logistics_scheduling")
+        +connector("logistics_scheduling","logistics_final_assignment",presentations,nextNodeId)
+        +nodeCard("logistics_final_assignment",presentations.logistics_final_assignment,nextNodeId==="logistics_final_assignment")
+      +'</div>'
+    +'</section>'
+    +changeDataDialog(presentations);
+
+  const fullCaseId=String(decisionCase?.id||"");
+
+  const copyButton=root.querySelector("[data-copy-case-id]");
+  const feedback=root.querySelector("[data-case-copy-feedback]");
+  if(copyButton){
+    copyButton.onclick=async()=>{
+      try{
+        await navigator.clipboard.writeText(fullCaseId);
+        copyButton.classList.add("is-copied");
+        copyButton.setAttribute("title","ID copiado");
+        if(feedback)feedback.textContent="ID copiado";
+        scope.timeout(()=>{
+          copyButton.classList.remove("is-copied");
+          copyButton.setAttribute("title","Copiar ID");
+          if(feedback)feedback.textContent="";
+        },2000);
+      }catch{
+        if(feedback)feedback.textContent="No se pudo copiar el ID";
+      }
+    };
+  }
+
+  bindCaseContext(root);
+  scope.listen(root.querySelector('[data-map-change-data]'),'click',()=>onData?.());
+
+  const changeDialog=root.querySelector("[data-change-data-dialog]");
+  const confirmChange=root.querySelector("[data-confirm-change]");
+  if(confirmChange){
+    confirmChange.onclick=event=>{
+      event.preventDefault();
+      changeDialog?.close();
+      onData?.();
+    };
+  }
+
+  root.querySelectorAll("[data-map-action]").forEach(button=>{
+    button.onclick=()=>{
+      const action=button.dataset.mapAction;
+      const nodeId=button.dataset.mapNode;
+      if(action==="configure"){
+        onConfigure?.(nodeId);
+        return;
+      }
+      if(action==="open-result"){
+        onOpenResult?.(nodeId);
+        return;
+      }
+      if(action==="center"){window.DationDispatch.openDecisionCenter();return;}
+      if(action==="data"){
+        if(button.dataset.confirmDataChange==="true"){
+          if(changeDialog?.showModal){
+            changeDialog.showModal();
+          }else if(window.confirm(
+            "Si cambiás los datos, Dation va a crear un nuevo Decision Case y conservará el historial del actual. ¿Querés continuar?",
+          )){
+            onData?.();
+          }
+          return;
+        }
+        onData?.();
+      }
+    };
+  });
+}

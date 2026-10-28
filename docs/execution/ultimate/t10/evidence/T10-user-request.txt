@@ -1,0 +1,1078 @@
+T9 queda formalmente aprobado:
+
+# GO — T9 COMPLETADO
+
+Reporte oficial:
+
+`docs/execution/ultimate/t9/t9-execution-report.md`
+
+Autorizo exclusivamente:
+
+# T10 — DASHBOARDS + DETAILED ANALYSIS + EXPORT + DATION IA / APPROVAL COPILOT
+
+Usá como hoja de ruta:
+
+`DATION_FINAL_MASTER_EXECUTION_PLAN.md`
+
+y como baseline inmediato:
+
+`docs/execution/ultimate/t9/t9-execution-report.md`
+
+NO ejecutes T11.
+
+---
+
+# REGLA DE EFICIENCIA
+
+NO realices una nueva auditoría end-to-end.
+
+T0–T9 constituyen el baseline validado.
+
+Inspeccioná únicamente:
+
+- result package readers;
+- dashboards D1/D2;
+- current result selectors;
+- charts/renderers;
+- Detailed Analysis;
+- drawers;
+- exports;
+- Decision Context / interpreter;
+- Approval Review UI;
+- browser/navigation callers;
+- tests T10.
+
+Expandí la inspección sólo ante incompatibilidad concreta.
+
+---
+
+# PRINCIPIO CENTRAL
+
+En T10:
+
+```text
+Engine decides
+Evidence proves
+Assembler structures
+Dashboard represents
+Dation IA explains
+User approves
+```
+
+NO crear nueva matemática en frontend, export o IA.
+
+Si una métrica o dato falta:
+
+VOLVER AL PRODUCER CORRESPONDIENTE.
+
+NO inventarlo en T10.
+
+---
+
+# 1. FUENTE ÚNICA DE VERDAD
+
+D1 consume:
+
+`transport_plan_v1`
+
+D2 consume:
+
+`day_scheduling_v1`
+
+Dashboard, Detailed Analysis, CSV, JSON, IA y Approval Review deben mostrar exactamente los mismos hechos y `result_fingerprint`.
+
+NO reconstruir decisiones desde:
+
+- Case actual;
+- raw datasets;
+- frontend state;
+- filtros;
+- LLM.
+
+---
+
+# 2. SKILLS
+
+Aplicá estrictamente `Execution Skills Policy`.
+
+Para T10 usar especialmente, si están disponibles:
+
+- `design-system`
+- `emil-design-eng`
+- `ui-ux-pro-max`
+- `break-ui`
+
+y Skills de browser/accessibility/testing.
+
+`review-animations` sólo si se invoca explícitamente y existe necesidad real.
+
+Antes de modificar cualquier superficie:
+
+1. inspeccioná el diseño actual;
+2. identificá tokens, typography, spacing, radius, borders, shadows, states y responsive behavior;
+3. reutilizá componentes actuales;
+4. extendé Dation, no lo rediseñes.
+
+---
+
+# 3. UI PRESERVATION GATE
+
+T10 debe respetar estrictamente el UI Preservation Gate definido en el Master Plan.
+
+No modificar globalmente:
+
+- design tokens;
+- typography;
+- colors;
+- radius;
+- spacing;
+- navigation shell;
+- Hero family;
+- button system;
+- card system.
+
+Los nuevos componentes deben sentirse nativos de Dation.
+
+---
+
+# 4. ANATOMÍA COMÚN DEL DASHBOARD
+
+Mantener:
+
+```text
+Decision Hero
+↓
+4–5 Executive KPIs
+↓
+Primary Decision Visual
+↓
+Análisis detallado ▾
+↓
+Dation IA flotante/contextual
+↓
+Review Summary
+↓
+Approve
+```
+
+NO volver a introducir botones superiores duplicados de:
+
+- Vista esencial;
+- Análisis detallado.
+
+Debe existir un único control claro para expandir/cerrar Detailed Analysis.
+
+---
+
+# 5. D1 HERO — TRANSPORT PLAN
+
+Debe responder:
+
+> ¿Qué recomienda Dation?
+
+Ejemplo conceptual:
+
+“Dation recomienda cubrir X demanda mediante Y viajes utilizando Z recursos, con un costo estimado de …”
+
+Hero corto.
+
+Mostrar contexto secundario:
+
+- Transport Plan;
+- policy;
+- horizon;
+- Logistics Model Version;
+- Run status.
+
+No inventar savings/ROI sin baseline real.
+
+---
+
+# 6. D1 KPIs
+
+Máximo 4–5 cards.
+
+Consumir únicamente metrics certificadas.
+
+Base:
+
+- Total Recommended Cost;
+- Trip Count;
+- Demand Coverage;
+- Capacity Utilization;
+- contextual fifth KPI.
+
+Quinto KPI puede ser:
+
+- Own / External Mix;
+- Resources Used;
+- Capacity Gap;
+
+según contexto.
+
+Frontend NO calcula:
+
+- weighted utilization;
+- coverage;
+- resource mix;
+- costs.
+
+---
+
+# 7. D1 PRIMARY VISUAL — SANKEY
+
+Consumir `primary_visual` generado por backend.
+
+Semántica:
+
+```text
+DESTINATION
+→ TRIP
+→ RESOURCE
+```
+
+Width = primary reporting dimension.
+
+NO:
+
+- recalcular flows;
+- sumar ambas capas como coverage;
+- mezclar pallets/kg/volume;
+- inventar residual como Trip.
+
+Interactions:
+
+- click Destination → highlight related Trips/Resources;
+- click Trip → Detail Drawer;
+- click Resource → highlight absorbed demand.
+
+Sin navegación de página.
+
+---
+
+# 8. D1 DETAIL DRAWER
+
+Al seleccionar Trip mostrar desde package/entity retrieval:
+
+- Trip ID;
+- Orders;
+- Origin;
+- Destination;
+- Resource;
+- Source;
+- Load;
+- Capacity;
+- Utilization;
+- Cost;
+- deterministic reason/evidence.
+
+CTA contextual:
+
+“Ask Dation IA about this trip”
+
+o copy equivalente actual de Dation.
+
+No inventar explicación desde UI.
+
+---
+
+# 9. D1 DETAILED ANALYSIS
+
+Collapsed por default.
+
+Tabs exactas:
+
+```text
+Plan
+Demand
+Resources
+Alternatives
+Exceptions
+Evidence
+```
+
+Consumir datasets certificados.
+
+No recalcular negocio.
+
+---
+
+# 10. D1 PLAN TAB
+
+Mostrar tabla operacional con:
+
+- Trip;
+- Orders;
+- Origin;
+- Destination;
+- Resource;
+- Source;
+- Load;
+- Capacity;
+- Utilization;
+- Cost.
+
+Permitir:
+
+- sort;
+- filter;
+- search;
+- export.
+
+Sin convertirlo en enterprise grid innecesario.
+
+---
+
+# 11. D1 DEMAND TAB
+
+Por order:
+
+- Order ID;
+- Priority;
+- Requested;
+- Assigned;
+- Trip(s);
+- Resource(s);
+- Coverage;
+- Status;
+- Reason.
+
+Debe soportar:
+
+```text
+COVERED
+PARTIALLY_COVERED
+UNASSIGNED
+```
+
+y mostrar split correctamente.
+
+---
+
+# 12. D1 RESOURCES TAB
+
+EXTERNAL:
+
+- services available;
+- used;
+- remaining;
+- capacity;
+- utilization;
+- total cost;
+- availability source.
+
+OWN:
+
+- units;
+- trips;
+- capacity;
+- distance;
+- cost;
+- utilization.
+
+No inventar disponibilidad.
+
+---
+
+# 13. D1 ALTERNATIVES TAB
+
+Mostrar sólo las 0–3 alternatives ya publicadas.
+
+NO ejecutar solver al abrir la tab.
+
+NO pedir al LLM generar alternativas.
+
+Mostrar:
+
+- profile/policy;
+- cost;
+- trips;
+- coverage;
+- own share;
+- deltas;
+- material differences.
+
+Si `alternatives=[]`, mostrar el estado correcto:
+
+- NOT_COMPUTED;
+- BUDGET_LIMIT;
+- NO_MATERIAL_ALTERNATIVE;
+
+según package.
+
+---
+
+# 14. D1 EXCEPTIONS TAB
+
+Separar claramente:
+
+- business exceptions;
+- feasibility;
+- policy;
+- data;
+- assumptions.
+
+No confundir technical failure con business exception.
+
+---
+
+# 15. D1 EVIDENCE TAB
+
+Mostrar trazabilidad útil, no solver internals.
+
+Context:
+
+- Case;
+- Horizon;
+- Model Version;
+- Data Pack Version.
+
+Policy:
+
+- Case Goal;
+- Node Policy;
+- override;
+- guardrails.
+
+Engine:
+
+- engine/version;
+- solver status;
+- Transit version.
+
+Constraints:
+
+- capacity;
+- availability;
+- priority;
+- non-split;
+- compatibility;
+- date feasibility.
+
+Fingerprints pueden existir en sección avanzada.
+
+---
+
+# 16. D2 HERO — DAY SCHEDULING
+
+Debe responder:
+
+> ¿Cómo queda programado el plan aprobado?
+
+Ejemplo:
+
+“Los 8 viajes aprobados pueden programarse dentro del horizonte…”
+
+Consumir exclusivamente D2 package.
+
+---
+
+# 17. D2 KPIs
+
+Base:
+
+- Trips Scheduled;
+- Expected Delivery Compliance;
+- Average Schedule Margin;
+- Peak Dispatch Day;
+- Exceptions Count.
+
+No confundir:
+
+```text
+Expected Compliance
+```
+
+con:
+
+```text
+Strict ON_TIME
+```
+
+Mantener las definiciones T9.
+
+---
+
+# 18. D2 PRIMARY VISUAL — DAY GANTT
+
+Consumir proyección backend.
+
+Semántica:
+
+```text
+RESOURCE
+×
+DAY
+×
+TRIP
+```
+
+Frontend NO calcula:
+
+- dispatch;
+- arrival;
+- outbound_days;
+- cycle_days;
+- occupancy;
+- available_again;
+- schedule_margin.
+
+Sólo transforma coordenadas/fechas certificadas en pixels/layout.
+
+---
+
+# 19. OWN VS EXTERNAL GANTT
+
+OWN:
+
+mostrar occupancy/cycle según package.
+
+EXTERNAL:
+
+mostrar dispatch/arrival.
+
+NO barra de retorno ficticia.
+
+Arrival/return puede extenderse fuera del Planning Horizon.
+
+No truncar hechos.
+
+---
+
+# 20. D2 DETAIL DRAWER
+
+Mostrar:
+
+- Trip ID;
+- Orders;
+- Resource;
+- Load;
+- Dispatch;
+- Expected Arrival;
+- Due;
+- Margin;
+- Status;
+- inherited D1 cost;
+- deterministic reasons.
+
+Usar exact upstream D1 facts.
+
+---
+
+# 21. D2 DETAILED ANALYSIS
+
+Tabs:
+
+```text
+Schedule
+Trips
+Resources
+Service
+Exceptions
+Evidence
+```
+
+---
+
+# 22. SERVICE TAB
+
+Mostrar:
+
+- ON_TIME;
+- AT_RISK;
+- LATE;
+- PRE_HORIZON;
+- UNSCHEDULED.
+
+Orden recomendado:
+
+menor schedule margin primero.
+
+No recalcular status en JS.
+
+---
+
+# 23. SELECTED ENTITY CONTEXT
+
+Implementar el binding:
+
+```text
+run_id
+result_fingerprint
+entity_type
+entity_id
+```
+
+Ejemplo:
+
+click `VIA-004`
+
+→ Drawer VIA-004
+
+→ IA recibe evidence de VIA-004.
+
+No enviar dataset completo innecesariamente.
+
+No buscar mismo ID en otro Run/Case.
+
+---
+
+# 24. DATION IA — APPROVAL COPILOT
+
+La IA debe funcionar como:
+
+# Decision Approval Copilot
+
+NO como chatbot genérico sobre `result_json`.
+
+Modos:
+
+```text
+EXPLAIN
+EXPLORE
+COMPARE
+REVIEW
+```
+
+Debe utilizar:
+
+`decision_context_v1`
+
+y evidence publicada.
+
+---
+
+# 25. IA RESPONSE PRINCIPLE
+
+Para claims explicativos:
+
+```text
+FACT
+↓
+REASON
+↓
+BUSINESS IMPLICATION
+```
+
+Ejemplo:
+
+Pregunta:
+
+“¿Por qué elegiste Transporte Centro?”
+
+La IA debe responder sólo si existe evidence/reason suficiente.
+
+No inferir causalidad simplemente observando costos.
+
+---
+
+# 26. IA PROHIBITIONS
+
+La IA NO puede:
+
+- cambiar el plan;
+- ejecutar solver;
+- aprobar;
+- inventar alternatives;
+- inventar reason codes;
+- completar missing data;
+- fabricar what-if.
+
+Ante:
+
+> ¿Qué pasa si cambio X?
+
+Responder que requiere nueva Simulation/Run determinística cuando realmente modifica constraints.
+
+---
+
+# 27. APPROVAL AWARENESS
+
+Antes de approval:
+
+hablar de:
+
+“recomendación actual”
+
+Después:
+
+“decisión aprobada”
+
+No afirmar que la empresa decidió antes de aprobación.
+
+---
+
+# 28. REVIEW SUMMARY
+
+Antes del botón Approve mostrar un resumen pequeño:
+
+- Decision ready for review;
+- Coverage / Scheduling status;
+- Hard constraints;
+- Exceptions;
+- Assumptions;
+- status.
+
+Actions:
+
+- Review exceptions;
+- Ask Dation IA;
+- Approve decision.
+
+No crear otro dashboard.
+
+---
+
+# 29. APPROVAL
+
+El frontend consume `approval_allowed`/blockers del backend.
+
+NO inferir autorización desde:
+
+- review text;
+- node state;
+- Owner label;
+- package.
+
+POST sigue usando guards T8.
+
+---
+
+# 30. EXPORT
+
+D1:
+
+- `Transport_Plan.csv`
+- Decision Summary / JSON completo según contract.
+
+D2:
+
+- `Day_Schedule.csv`
+- Decision Summary / JSON completo.
+
+NO reconstruir rows desde DOM.
+
+NO recalcular Costs.
+
+Usar projections T7/T9.
+
+---
+
+# 31. FULL JSON
+
+Cuando se pide JSON completo:
+
+resolver refs autorizadas y devolver package/evidence completo según contrato.
+
+No afirmar “complete” si falta artifact.
+
+Artifact missing/corrupt:
+
+→ error explícito.
+
+---
+
+# 32. PERFORMANCE
+
+Dashboard inicial:
+
+```text
+summary
++
+metrics
++
+primary visual
+```
+
+No descargar:
+
+- all evidence;
+- all alternatives details;
+- full tables;
+- IA entity data;
+
+hasta que el usuario los solicite.
+
+Detailed Analysis lazy.
+
+Entity evidence lazy.
+
+IA contextual lazy.
+
+---
+
+# 33. RESULT READER
+
+Crear/use un reader schema-aware para nuevas Runs.
+
+Unknown schema:
+
+safe failure.
+
+NO fallback:
+
+```text
+unknown → Dispatch
+```
+
+Preservar readers v1.
+
+---
+
+# 34. VISUAL CONSISTENCY
+
+D1 y D2 deben compartir:
+
+- Hero shell;
+- KPI cards;
+- toolbar;
+- Detailed Analysis control;
+- drawer pattern;
+- review area;
+- IA panel.
+
+Sankey y Gantt son visuales distintos, pero deben pertenecer al mismo sistema visual.
+
+---
+
+# 35. RESPONSIVE
+
+Validar como mínimo:
+
+- 1440×900;
+- 1024×768;
+- 768×1024;
+- 375×812;
+- 320×640.
+
+No clipping.
+
+No horizontal overflow no controlado.
+
+Focus visible.
+
+Charts deben tener fallback/lista accesible cuando corresponda.
+
+---
+
+# 36. ACCESSIBILITY
+
+Validar:
+
+- keyboard;
+- focus;
+- semantic controls;
+- labels;
+- aria cuando corresponda;
+- contrast;
+- selected states;
+- drawer focus management;
+- close/return focus;
+- chart alternative representation.
+
+No sacrificar accessibility para igualar un mockup.
+
+---
+
+# 37. ANIMATIONS
+
+Preservar animaciones actuales.
+
+No agregar motion decorativo excesivo.
+
+Especialmente:
+
+- highlight de cards debe respetar border radius;
+- no rectangular flash sobre boxes redondeados;
+- disclosure debe mostrar claramente open/closed state.
+
+Si se usa `review-animations`, hacerlo únicamente para validar estas interacciones.
+
+---
+
+# 38. LEGACY
+
+Preservar:
+
+- dashboards legacy;
+- existing exports;
+- existing chat/explain;
+- comparative service v1;
+- history;
+- deep links;
+- filters;
+- navigation;
+- Owner/Viewer/Admin.
+
+No hacer que v1 consuma package v2.
+
+---
+
+# 39. NO ENGINE CHANGES
+
+T10 no debe modificar:
+
+- D1 assignments;
+- D1 costs;
+- D1 metrics;
+- D2 dates;
+- statuses;
+- alternatives;
+- evidence.
+
+Si un consumer necesita un dato no disponible:
+
+STOP / volver a producer correspondiente.
+
+No solucionar creando cálculo local.
+
+---
+
+# 40. TESTING
+
+Ejecutá:
+
+- B-PY
+- B-NODE
+- U10
+- W10
+- E10
+- B-FOCUS
+
+y focales necesarias.
+
+No repetir suites no afectadas sin evidencia.
+
+---
+
+# 41. CROSS-CONSUMER CONSISTENCY
+
+E10 debe demostrar para una misma Run:
+
+```text
+Dashboard
+=
+Detailed Analysis
+=
+CSV
+=
+JSON
+=
+Dation IA
+=
+Approval Review
+```
+
+en los facts certificados.
+
+---
+
+# 42. RESULT ARCHITECTURE R1–R18
+
+Ejecutar los R-cases aplicables a T10, especialmente:
+
+- R1 cost CSV;
+- R2 weighted utilization;
+- R3 Sankey cut;
+- R4 NULL;
+- R5 causal claims;
+- R6 unknown schema;
+- R7 alternatives;
+- R9 dates;
+- R10 occupancy;
+- R11 statuses;
+- R12 compliance;
+- R14 selected entity race;
+- R15 LLM hallucination guard;
+- R16 approval race;
+- R17 lazy loading;
+- R18 publication/retry compatibility cuando consumer lo toca.
+
+---
+
+# 43. IA TESTING
+
+Usar provider stub/determinístico para assertions críticas.
+
+Probar:
+
+- invented metric;
+- invented reason code;
+- invented alternative;
+- fake what-if;
+- selected entity wrong Run;
+- stale context;
+- provider failure;
+- malformed response.
+
+Fallback determinístico cuando corresponda.
+
+No depender de un LLM live para certificar matemáticas.
+
+---
+
+# 44. STOP CONDITIONS
+
+STOP si:
+
+- frontend calcula KPI;
+- frontend calcula D2 dates;
+- Sankey calcula coverage;
+- export reconstruye plan;
+- IA inventa reason;
+- Compare genera nueva alternative;
+- result fingerprint se pierde;
+- selected entity mezcla Runs;
+- review text controla permisos;
+- initial page descarga evidence completa;
+- D1/D2 visuales modifican negocio;
+- legacy consumer se rompe;
+- design-system drift significativo;
+- T10 necesita cambiar matemática de T7/T9.
+
+---
+
+# 45. REPORTING
+
+Crear:
+
+`docs/execution/ultimate/t10/t10-execution-report.md`
+
+Incluir:
+
+- baseline T9;
+- checkpoint;
+- Skills;
+- files created/modified;
+- Result Reader;
+- D1 Dashboard;
+- D1 Sankey;
+- D1 Detailed Analysis;
+- D2 Dashboard;
+- D2 Gantt;
+- D2 Detailed Analysis;
+- Selected Entity;
+- Dation IA;
+- Approval Review;
+- Export;
+- Responsive;
+- Accessibility;
+- Performance/lazy loading;
+- cross-consumer consistency;
+- tests;
+- legacy compatibility;
+- deviations;
+- risks;
+- gate evaluation.
+
+Finalizar únicamente con:
+
+**GO — T10 completado. T11 puede ser solicitado.**
+
+o
+
+**STOP — T10 no cumple condiciones para autorizar T11.**
+
+Aunque resulte GO:
+
+# NO EJECUTES T11.

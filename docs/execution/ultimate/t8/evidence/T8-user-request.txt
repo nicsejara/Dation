@@ -1,0 +1,735 @@
+T7 queda formalmente aprobado:
+
+# GO — T7 COMPLETADO
+
+Reporte oficial:
+
+`docs/execution/ultimate/t7/t7-execution-report.md`
+
+Autorizo exclusivamente:
+
+# T8 — RUN + WORKER + APPROVAL + LINEAGE + RESULT PUBLICATION
+
+Usá como hoja de ruta:
+
+`DATION_FINAL_MASTER_EXECUTION_PLAN.md`
+
+y como baseline inmediato:
+
+`docs/execution/ultimate/t7/t7-execution-report.md`
+
+NO ejecutes T9.
+
+---
+
+# REGLA DE EFICIENCIA
+
+NO realices una nueva auditoría end-to-end.
+
+T0–T7 constituyen el baseline validado.
+
+Inspeccioná exclusivamente:
+
+- DecisionRun/admission;
+- dispatch/job/worker;
+- runtime registry;
+- result publication;
+- artifacts;
+- Storage;
+- approval;
+- freshness;
+- lineage;
+- replay/idempotency;
+- SQL/RPC afectados;
+- tests T8.
+
+Expandí la inspección sólo ante incompatibilidad concreta.
+
+---
+
+# OBJETIVO
+
+Conectar el D1 Ultimate ya certificado en T7 al lifecycle durable:
+
+```text
+Case + frozen context
+        ↓
+Admission
+        ↓
+Decision Run
+        ↓
+Durable Job / Worker
+        ↓
+D1 Engine T7
+        ↓
+AssemblyBundle
+        ↓
+Prepare immutable artifacts
+        ↓
+Validate
+        ↓
+Fenced atomic publication
+        ↓
+COMPLETED Run
+        ↓
+Approval Review
+        ↓
+Human approval
+        ↓
+Lineage / downstream readiness
+```
+
+T8 NO modifica la matemática de D1.
+
+---
+
+# 1. RUN ADMISSION
+
+Una nueva Run Ultimate debe fijar de manera reproducible:
+
+- Case;
+- Model Version;
+- Data Pack Version;
+- Case Policy;
+- Node Policy;
+- Decision Definition / Graph version;
+- Contract/version;
+- Transit version;
+- Engine/runtime identity;
+- input/context hashes;
+- upstream fingerprint cuando corresponda.
+
+La Run nunca debe reconstruir estos valores posteriormente desde el Case actual.
+
+---
+
+# 2. UNA INTENCIÓN = UNA RUN
+
+Preservar idempotencia.
+
+Retries/replay no deben crear Runs duplicadas.
+
+Replay debe usar la intención y contexto ya persistidos antes de revalidar caminos mutables nuevos.
+
+No reinterpretar una intención vieja con el estado actual del Case.
+
+---
+
+# 3. WORKER / RUNTIME REGISTRY
+
+El worker debe resolver por identidad persistida del runtime.
+
+NO sólo por:
+
+`node_id`.
+
+Preservar jobs legacy.
+
+Workers desplegados durante una transición deben poder reconocer correctamente jobs históricos y Ultimate según su versión/capability.
+
+No usar fallback de engine incorrecto.
+
+---
+
+# 4. ENGINE INVOCATION
+
+T8 conecta exactamente el runtime D1 aprobado de T7.
+
+NO:
+
+- recalcular policies;
+- modificar assignments;
+- reconstruir AssemblyBundle;
+- añadir lógica matemática en worker/service.
+
+El pipeline debe ser:
+
+```text
+Pinned Input
+→ D1 Engine
+→ Core + Evidence
+→ T7 Assembler
+→ AssemblyBundle
+```
+
+---
+
+# 5. ARTIFACT PREPARATION
+
+Implementar metadata/persistencia preparada en T2.
+
+Los artifacts pesados deben ser:
+
+- privados;
+- inmutables;
+- hash-verified;
+- tenant-scoped;
+- Run-scoped;
+- schema/versioned.
+
+Estado conceptual:
+
+```text
+PREPARED
+↓
+validated
+↓
+READY
+```
+
+Nunca READY sin binding válido.
+
+---
+
+# 6. STORAGE
+
+Uploads:
+
+- server-generated paths;
+- private bucket;
+- content-addressed cuando corresponda;
+- `upsert=false`;
+- hash/size verified.
+
+Nunca confiar en Storage path enviado por cliente.
+
+No hacer fetch arbitrario desde URLs controladas por usuario.
+
+---
+
+# 7. ATOMIC PUBLICATION
+
+La regla principal:
+
+# Una Run NO puede quedar COMPLETED hasta que todo su package/artifacts estén íntegros.
+
+El finish v2 debe verificar:
+
+- lease válido;
+- Run correcta;
+- frozen context;
+- artifact manifest;
+- expected schemas;
+- hashes;
+- package;
+- result fingerprint;
+- producer/runtime versions.
+
+Y publicar atómicamente:
+
+```text
+Run COMPLETED
++
+Result Package
++
+Manifest
++
+Artifact READY bindings
++
+Fingerprint
+```
+
+No publicación parcial.
+
+---
+
+# 8. LEASE FENCING
+
+Un worker que perdió su lease:
+
+NO puede publicar.
+
+Probar:
+
+- lease expiration;
+- worker race;
+- retry;
+- duplicate finish;
+- late worker.
+
+Sólo el owner válido puede realizar el commit final.
+
+---
+
+# 9. CRASH RECOVERY
+
+Cubrir al menos:
+
+```text
+crash before artifact upload
+crash during uploads
+crash after upload / before finish
+crash after finish / response lost
+```
+
+Retries deben ser seguros.
+
+Artifacts PREPARED huérfanos pueden recuperarse/limpiarse únicamente si se demuestra que ningún manifest publicado los referencia.
+
+Nunca borrar READY artifacts como estrategia de retry.
+
+---
+
+# 10. RESULT PACKAGE RETRIEVAL
+
+Implementar servicios equivalentes a:
+
+- lightweight result;
+- details dataset;
+- entity evidence;
+- artifact retrieval;
+- approval review.
+
+Todos deben validar:
+
+```text
+workspace
++
+run
++
+result_fingerprint
++
+artifact binding
+```
+
+Unknown/mismatch:
+
+→ safe failure.
+
+No usar Case actual para recomponer resultado histórico.
+
+---
+
+# 11. LIGHTWEIGHT RESULT
+
+La lectura inicial debe devolver:
+
+- summary;
+- metrics;
+- primary visual descriptor/data según size;
+- package metadata;
+- refs.
+
+NO descargar toda la evidencia pesada.
+
+Preservar la arquitectura de performance aprobada.
+
+---
+
+# 12. APPROVAL REVIEW
+
+El package contiene el review determinístico de T7.
+
+T8 debe agregar el overlay actual:
+
+```text
+permissions
++
+freshness
++
+current context
++
+approval rules
+```
+
+para producir:
+
+```text
+approval_allowed
+blockers
+```
+
+sin modificar el package inmutable.
+
+---
+
+# 13. HUMAN APPROVAL
+
+Approval requiere:
+
+- exact Run;
+- exact result fingerprint;
+- package íntegro;
+- owner/admin según reglas vigentes;
+- context/read-set vigente;
+- Case válido;
+- upstream válido cuando corresponda.
+
+Revalidar bajo locks en el POST.
+
+Un GET previo de review NO constituye autorización duradera.
+
+---
+
+# 14. OWNER / ACTOR
+
+Preservar estrictamente:
+
+- Decision Owner;
+- Admin;
+- Viewer boundaries;
+- historical actor.
+
+Cambiar Owner actual:
+
+NO reescribe quién aprobó históricamente.
+
+No volver al concepto retirado de Approver.
+
+---
+
+# 15. FRESHNESS / INVALIDATION
+
+Implementar la lógica T8 prevista para read-set consumers.
+
+Si cambia un input consumido por D1:
+
+- current D1 puede quedar stale/superseded;
+- downstream debe invalidarse según closure.
+
+Pero:
+
+NO borrar:
+
+- Run;
+- package;
+- approval history;
+- actor;
+- evidence.
+
+Cambios irrelevantes al read set NO deben invalidar D1.
+
+---
+
+# 16. PACK VERSION ≠ AUTOMATIC INVALIDATION
+
+No invalidar sólo porque cambió el número de Data Pack Version.
+
+Comparar el read set semántico correspondiente.
+
+Ejemplo:
+
+- Demand/Resources iguales;
+- enrichment sólo D2 cambia;
+
+→ D1 puede seguir vigente.
+
+---
+
+# 17. REPLAY
+
+Probar explícitamente:
+
+```text
+old intention replay
+after new current path exists
+```
+
+Debe devolver/reconocer la Run original según contrato.
+
+NO crear otra Run.
+
+NO restaurar approvals retiradas.
+
+NO reescribir snapshots.
+
+---
+
+# 18. RESULT FINGERPRINT
+
+El publicado debe ser el generado/validado por T7/T1.
+
+No recalcular un package antiguo con assembler nuevo durante retrieval.
+
+Artifacts y manifest deben corresponder exactamente al mismo fingerprint.
+
+---
+
+# 19. APPROVAL + DECISION GRAPH
+
+Después de aprobación vigente de D1:
+
+T5 debe poder proyectar:
+
+```text
+D1 APPROVED
+↓
+D2 dependency satisfied
+```
+
+pero T9 todavía no existe.
+
+No fingir runtime D2 disponible.
+
+---
+
+# 20. RESULT SERVICES
+
+Implementar según Master Plan módulos equivalentes a:
+
+```text
+result_package_service
+result_artifact_service
+```
+
+y routes versionadas/schema-aware.
+
+No crear un segundo store de verdad.
+
+---
+
+# 21. LEGACY
+
+Preservar completamente:
+
+- legacy Runs;
+- legacy worker/jobs;
+- assignment_v1;
+- scheduling_v1;
+- dispatch_v2;
+- approvals;
+- history;
+- replay;
+- exports;
+- Case flows.
+
+No backfill de ResultPackage sobre legacy.
+
+---
+
+# 22. MIGRATIONS / SQL
+
+Quedan autorizadas únicamente las migraciones T8 previstas para:
+
+- prepare/finish publication;
+- artifact binding;
+- approval guards;
+- freshness/invalidation;
+- provenance;
+- checked RPCs.
+
+Sólo probar en sandbox owned.
+
+NO aplicar a producción.
+
+NO repair migration history.
+
+NO baseline replay.
+
+NO destructive rewrite.
+
+---
+
+# 23. SECURITY
+
+Probar:
+
+- cross-tenant artifact lookup;
+- wrong Run;
+- wrong fingerprint;
+- Viewer write attempts;
+- Owner boundaries;
+- arbitrary Storage path;
+- foreign artifact binding;
+- stale review/approve race.
+
+Service role no sustituye autorización funcional.
+
+---
+
+# 24. T8 NO ES T10
+
+No conectar todavía:
+
+- final dashboard;
+- Sankey renderer;
+- Detailed Analysis UI;
+- Copilot real.
+
+Puede existir integración mínima necesaria para submit/status/error de Run.
+
+Los consumidores completos corresponden a T10.
+
+---
+
+# 25. T8 NO ES T9
+
+NO implementar Day Scheduling.
+
+NO producir `day_scheduling_v1`.
+
+NO modificar el D1 aprobado para facilitar D2.
+
+---
+
+# 26. TESTS
+
+Ejecutá:
+
+- B-PY
+- B-NODE
+- B-FOCUS
+- U8
+- S8
+- E8
+
+más focales necesarias.
+
+No ejecutar suites amplias no afectadas por rutina.
+
+---
+
+# 27. E8 END-TO-END
+
+Debe probar con API + SQL + worker reales aislados:
+
+```text
+Ultimate Case
+↓
+valid Pack
+↓
+D1 admission
+↓
+Run
+↓
+job
+↓
+worker
+↓
+D1 engine
+↓
+AssemblyBundle
+↓
+artifacts
+↓
+atomic finish
+↓
+COMPLETED
+↓
+result retrieval
+↓
+approval review
+↓
+human approval
+```
+
+y comprobar mismo `result_fingerprint`.
+
+---
+
+# 28. RACES / FAILURE TESTS
+
+Como mínimo:
+
+- duplicate submit;
+- retry;
+- lost lease;
+- worker crash;
+- artifact upload partial;
+- finish twice;
+- Pack changes while Run executes;
+- owner change between GET review and POST approval;
+- cross-tenant access;
+- replay after newer Run.
+
+---
+
+# 29. LINEAGE
+
+Ejecutar escenarios relevantes L-A–L-F definidos en el Master Plan para la frontera T8.
+
+En especial:
+
+- new D1 invalidation;
+- D2 upstream preservation conceptual;
+- historical approvals;
+- replay;
+- enrichment read-set;
+- metadata/Owner change.
+
+No borrar historia para simplificar tests.
+
+---
+
+# 30. STOP CONDITIONS
+
+STOP si:
+
+- Run COMPLETED sin artifacts íntegros;
+- lease perdido publica;
+- retry crea otra Run;
+- replay reejecuta efectos;
+- approval usa otro fingerprint;
+- stale result puede aprobarse;
+- artifact de otro tenant se liga;
+- arbitrary path se acepta;
+- Pack actual sustituye frozen context;
+- invalidation borra historia;
+- worker legacy deja de resolver;
+- retrieval recalcula package;
+- T8 necesita cambiar matemática T7 para funcionar.
+
+---
+
+# 31. CHECKPOINT / ROLLBACK
+
+Preservá checkpoint post-T7.
+
+Rollback seguro de T8:
+
+```text
+disable Ultimate admissions
++
+retain dual-compatible readers/workers
++
+preserve Runs/artifacts/history
+```
+
+Nunca rollback mediante DELETE de Runs o approvals.
+
+---
+
+# 32. REPORTING
+
+Crear:
+
+`docs/execution/ultimate/t8/t8-execution-report.md`
+
+Incluir:
+
+- baseline T7;
+- checkpoint;
+- Skills;
+- files created/modified;
+- Admission;
+- Run pinning;
+- Worker registry;
+- Artifact preparation;
+- Atomic publication;
+- Lease fencing;
+- Crash recovery;
+- Retrieval;
+- Approval Review;
+- Human approval;
+- Freshness/invalidation;
+- Replay/idempotency;
+- Security;
+- Lineage;
+- Tests;
+- Legacy compatibility;
+- deviations;
+- risks;
+- rollback;
+- gate evaluation.
+
+Terminar con:
+
+**GO — T8 completado. T9 puede ser solicitado.**
+
+o
+
+**STOP — T8 no cumple condiciones para autorizar T9.**
+
+Aunque resulte GO:
+
+# NO EJECUTES T9.

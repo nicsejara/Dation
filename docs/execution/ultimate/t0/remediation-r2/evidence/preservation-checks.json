@@ -1,0 +1,24 @@
+{
+  "frozen_files_match": true,
+  "master_unchanged": true,
+  "old_plan_unchanged": true,
+  "new_skips": [],
+  "timeout_changes": [],
+  "modified_existing_migrations": [],
+  "protected_product_changes": [],
+  "r2_scope_files": [
+    "backend/app/static/css/dation-design-system.css",
+    "backend/tests/browser/test_navigation.py",
+    "backend/tests/browser/test_saga4_ui.py",
+    "backend/tests/e2e/browser_auth.py",
+    "backend/tests/e2e/browser_journey.py",
+    "backend/tests/e2e/collaboration_approval_journey.py",
+    "backend/tests/e2e/home_resume_journey.py",
+    "backend/tests/e2e/scheduling_dashboard_journey.py",
+    "backend/tests/e2e/test_collaboration.py",
+    "backend/tests/e2e/test_workflow.py",
+    "backend/tests/e2e/workflow_ui_audit.py",
+    "backend/tests/e2e/test_home_owner_attention.py",
+    "supabase/migrations/20261026010000_home_decision_owner_attention.sql"
+  ]
+}

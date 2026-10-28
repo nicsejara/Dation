@@ -1,0 +1,3974 @@
+{
+  "B-PY": [
+    {
+      "test_id": "test_assignment_config_redesign.AssignmentConfigRedesignContractTests.test_hero_case_and_four_sections",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_config_redesign.AssignmentConfigRedesignContractTests.test_objective_custom_and_co2_policy",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_config_redesign.AssignmentConfigRedesignContractTests.test_old_assignment_composer_copy_is_not_visible_in_new_module",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_config_redesign.AssignmentConfigRedesignContractTests.test_resource_policy_and_inert_advanced_options",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_config_redesign.AssignmentConfigRedesignContractTests.test_scope_is_real_and_previewed_server_side",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_config_redesign.AssignmentConfigRedesignContractTests.test_summary_and_accessibility",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_config_map_icons_keep_outline_svg_contract",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_panel_copy_wraps_instead_of_overflowing",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_summary_reuses_case_visual_language",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_mobile_case_summary_stacks_cleanly",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase0_contract.AssignmentDashboardPhase0EngineContractTests.test_comparative_balanced_has_same_reference_shape",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase0_contract.AssignmentDashboardPhase0EngineContractTests.test_comparative_custom_adds_balanced_reference",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase0_contract.AssignmentDashboardPhase0EngineContractTests.test_comparative_simple_preset_publishes_extremes_and_balanced",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase0_contract.AssignmentDashboardPhase0EngineContractTests.test_essential_balanced_keeps_extremes_but_hides_frontier",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase0_contract.AssignmentDashboardPhase0EngineContractTests.test_essential_custom_keeps_extremes_without_balanced_reference",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase0_contract.AssignmentDashboardPhase0EngineContractTests.test_essential_simple_preset_publishes_only_requested_reference",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase0_contract.AssignmentDashboardPhase0FixtureTests.test_assignment_fixtures_never_claim_temporal_output",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase0_contract.AssignmentDashboardPhase0FixtureTests.test_comparative_fixture_covers_same_plan_fingerprint",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase0_contract.AssignmentDashboardPhase0FixtureTests.test_comparative_fixture_exposes_metric_level_references",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase0_contract.AssignmentDashboardPhase0FixtureTests.test_essential_fixture_has_one_reference_and_no_frontier",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase0_contract.AssignmentDashboardPhase0FixtureTests.test_fixtures_distinguish_depth_from_three_persisted_paths",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase0_contract.AssignmentDashboardPhase0FixtureTests.test_only_selected_scenario_contains_operational_detail",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase1.AssignmentDashboardPhase1Tests.test_analysis_depth_selector_reads_persisted_contract",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase1.AssignmentDashboardPhase1Tests.test_assignment_v2_is_schema_scoped_and_scheduling_stays_separate",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase1.AssignmentDashboardPhase1Tests.test_decision_case_rail_preserves_disabled_navigation_guard",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase1.AssignmentDashboardPhase1Tests.test_execution_drawer_closes_with_button_escape_and_backdrop",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase1.AssignmentDashboardPhase1Tests.test_existing_assignment_content_modules_are_preserved",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase1.AssignmentDashboardPhase1Tests.test_export_downloads_audited_csv_and_json_artifacts",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase1.AssignmentDashboardPhase1Tests.test_hero_is_the_only_approval_entry_using_the_existing_controller",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase1.AssignmentDashboardPhase1Tests.test_rerun_returns_to_existing_handler_without_auto_execution",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase1.AssignmentDashboardPhase1Tests.test_review_and_approved_states_are_explicit",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase1.AssignmentDashboardPhase1Tests.test_shell_keeps_technical_depth_without_product_badge",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase1.AssignmentDashboardPhase1Tests.test_styles_are_scoped_responsive_and_focus_visible",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase2.AssignmentDashboardPhase2Tests.test_approval_is_only_in_toolbar_and_approved_state_has_no_dead_disabled_cta",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase2.AssignmentDashboardPhase2Tests.test_essential_is_always_base_and_comparative_is_insertable",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase2.AssignmentDashboardPhase2Tests.test_essential_selectors_use_persisted_assignment_contract",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase2.AssignmentDashboardPhase2Tests.test_evidence_is_trip_centric_without_large_chart",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase2.AssignmentDashboardPhase2Tests.test_orders_are_auditable_from_persisted_order_outcomes",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase2.AssignmentDashboardPhase2Tests.test_phase2_css_is_depth_scoped_responsive_and_does_not_touch_scheduling",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase2.AssignmentDashboardPhase2Tests.test_single_vehicle_has_compact_summary_instead_of_bar_chart",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase2.AssignmentDashboardPhase2Tests.test_summary_separates_objective_metrics_from_descriptive_kpis",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase2.AssignmentDashboardPhase2Tests.test_validation_keeps_real_warnings_and_has_a_single_empty_state",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase3.AssignmentDashboardPhase3Tests.test_comparative_composition_extends_essential_in_the_same_dashboard",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase3.AssignmentDashboardPhase3Tests.test_comparative_keeps_real_validation_as_final_review",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase3.AssignmentDashboardPhase3Tests.test_comparative_selectors_are_direction_aware_and_use_persisted_metrics",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase3.AssignmentDashboardPhase3Tests.test_comparative_summary_includes_main_and_secondary_metrics",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase3.AssignmentDashboardPhase3Tests.test_comparison_is_quantitative_without_narrative_or_reference_trip_reconstruction",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_dashboard_phase3.AssignmentDashboardPhase3Tests.test_phase3_css_is_scoped_responsive_and_does_not_touch_scheduling",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_engine.AssignmentEngineTests.test_assignment_is_deterministic",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_engine.AssignmentEngineTests.test_assignment_v1_is_non_temporal",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_engine.AssignmentEngineTests.test_dates_do_not_change_assignment",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_engine.AssignmentEngineTests.test_handoff_is_explicit",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_engine.AssignmentEngineTests.test_min_trips_consolidates_same_route",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_engine.AssignmentEngineTests.test_missing_cost_rejects_cost_dimension",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_engine.AssignmentEngineTests.test_one_vehicle_can_receive_multiple_abstract_trips",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_engine.AssignmentEngineTests.test_own_fleet_and_co2_are_distinct_objectives",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_applied_filters_have_independent_expand_and_remove_actions",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_collapsed_filter_keeps_a_compact_summary",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_collapsible_filter_behavior_is_loaded_by_assignment_workspace",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_filter_open_state_survives_config_rerenders",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_filter_toggle_has_responsive_and_reduced_motion_styles",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_scope.AssignmentScopeTests.test_category_filter",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_scope.AssignmentScopeTests.test_date_filter_uses_resolved_absolute_range",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_scope.AssignmentScopeTests.test_numeric_filter",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_scope.AssignmentScopeTests.test_preview_only_exposes_present_filterable_columns",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_scope.AssignmentScopeTests.test_resource_mode_is_backward_compatible",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_assignment_scope.AssignmentScopeTests.test_scope_contract_rejects_wrong_type",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_case_domain.CaseDomainTests.test_cached_approval_cannot_survive_absent_authoritative_runs",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_case_domain.CaseDomainTests.test_case_identity_and_run_counts_are_validated",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_case_domain.CaseDomainTests.test_domain_has_no_infrastructure_dependency",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_case_domain.CaseDomainTests.test_projection_preserves_baseline_outputs_and_input_evidence",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_center_v2_projection.CenterObjectiveTests.test_official_objective_is_not_replaced_by_a_later_candidate",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_center_v2_projection.CenterObjectiveTests.test_unknown_objective_is_preserved_and_missing_draft_is_not_invented",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_case_persistence.DecisionCaseHTTPTests.test_create_case_accepts_client_case_id_and_data_pack",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_case_persistence.DecisionCaseHTTPTests.test_list_and_restore_case_contract",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_case_persistence.DecisionCaseServiceTests.test_approval_unlocks_next_node_without_losing_case_identity",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_case_persistence.DecisionCaseServiceTests.test_base_state_is_bound_to_immutable_data_pack",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_case_persistence.DecisionCaseServiceTests.test_existing_case_cannot_be_rebound",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_case_persistence.DecisionCaseServiceTests.test_state_cannot_move_to_another_data_pack",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_config_ui_foundation.DecisionConfigUiFoundationTests.test_assignment_consumes_shared_primitives",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_config_ui_foundation.DecisionConfigUiFoundationTests.test_assignment_no_longer_owns_duplicate_component_renderers",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_config_ui_foundation.DecisionConfigUiFoundationTests.test_scheduling_now_consumes_shared_primitives",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_config_ui_foundation.DecisionConfigUiFoundationTests.test_shared_module_exposes_canonical_primitives",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_config_ui_foundation.DecisionConfigUiFoundationTests.test_shared_option_components_keep_disabled_accessibility_contract",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_config_ui_foundation.DecisionConfigUiFoundationTests.test_shared_primitives_preserve_assignment_visual_contract",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_context.DecisionContextTests.test_context_exposes_reference_semantics",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_context.DecisionContextTests.test_custom_run_keeps_custom_identity",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_context.DecisionContextTests.test_equivalence_does_not_rename_custom",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_map_case_v2.DecisionMapCaseV2ContractTests.test_case_identity_and_progress",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_map_case_v2.DecisionMapCaseV2ContractTests.test_change_data_discloses_available_impact",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_map_case_v2.DecisionMapCaseV2ContractTests.test_data_pack_reuses_real_dataset_metadata",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_map_case_v2.DecisionMapCaseV2ContractTests.test_decision_cards_and_connectors_are_clean",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_map_case_v2.DecisionMapCaseV2ContractTests.test_visual_alignment_and_responsive_contract",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_map_micro_polish.DecisionMapMicroPolishTests.test_active_cta_uses_shared_sizing_and_hover_feedback",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_map_micro_polish.DecisionMapMicroPolishTests.test_global_state_legend_is_hidden",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_map_micro_polish.DecisionMapMicroPolishTests.test_progress_uses_numbered_milestones_without_labels",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_map_micro_polish.DecisionMapMicroPolishTests.test_reduced_motion_removes_cta_translation",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_run_history_v2.DecisionRunHistoryHTTPTests.test_history_endpoint_is_scoped_by_case_and_node",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_run_history_v2.DecisionRunHistoryModelTests.test_candidate_run_does_not_replace_current_approval",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_run_history_v2.DecisionRunHistoryModelTests.test_insert_promotes_embedded_case_lineage",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_run_history_v2.DecisionRunHistoryModelTests.test_new_assignment_approval_marks_old_scheduling_stale",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_run_history_v2.DecisionRunHistoryModelTests.test_superseded_upstream_cannot_seed_new_run",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_run_history_v2.DecisionRunHistoryModelTests.test_version_approval_uses_atomic_rpc",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_context.DispatchContextTests.test_assignment_context_excludes_temporal_semantics",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_context.DispatchContextTests.test_context_has_hard_size_bound",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_context.DispatchContextTests.test_numeric_guard",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_context.DispatchContextTests.test_scheduling_context_keeps_assignment_locked",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_engine.DispatchEngineTests.test_active_dimensions_limit_comparative_scenarios",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_engine.DispatchEngineTests.test_anomalies_include_and_exclude",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_engine.DispatchEngineTests.test_consolidation_and_integer_capacity",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_engine.DispatchEngineTests.test_custom_four_weight_score_respects_sla_first",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_engine.DispatchEngineTests.test_dispatch_v2_contract_and_determinism",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_engine.DispatchEngineTests.test_essential_depth_solves_only_required_preset",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_engine.DispatchEngineTests.test_finite_fleet_returns_sla_exception_instead_of_error",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_engine.DispatchEngineTests.test_historical_vehicle_assignment_is_ignored",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_engine.DispatchEngineTests.test_max_utilization_prefers_own_weight",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_engine.DispatchEngineTests.test_min_co2_prefers_cleaner_vehicle",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_engine.DispatchEngineTests.test_multiday_cycle_blocks_own_fleet_until_return",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_engine.DispatchEngineTests.test_outlier_requires_decision",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_engine.DispatchEngineTests.test_physical_late_is_reported",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_engine.DispatchEngineTests.test_reprogramming",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_engine.DispatchEngineTests.test_sensitivity_is_standard_objective_set",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_engine.DispatchEngineTests.test_sla_first_outsources_even_under_min_cost",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_engine.DispatchEngineTests.test_spatial_pool_cannot_serve_another_origin",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_engine.DispatchEngineTests.test_trip_exposes_pool_and_base",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_engine.DispatchEngineTests.test_trip_load_exposes_product_for_assignment_dashboard",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_engine.DispatchEngineTests.test_validation_rejects_corrupt_plan",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_engine.DispatchEngineTests.test_validation_rejects_temporal_double_booking",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_fixtures.DownloadableFixtureTests.test_expected_results",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_http.DispatchHTTPTests.test_assignment_run_uses_non_temporal_configuration",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_http.DispatchHTTPTests.test_authentication_required",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_http.DispatchHTTPTests.test_decision_approval_endpoint",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_http.DispatchHTTPTests.test_migration_gate_and_default",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_http.DispatchHTTPTests.test_preflight_and_new_run",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_http.DispatchHTTPTests.test_run_accepts_decision_case_lineage",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_http.DispatchHTTPTests.test_scheduling_run_requires_assignment_source",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_http.DispatchHTTPTests.test_typed_list",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_http.DispatchHTTPTests.test_typed_upload_validation_and_templates",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_ingestion.DataPackHTTPTests.test_archive_current_fleet_is_rejected",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_ingestion.DataPackHTTPTests.test_contract_endpoint_exposes_progressive_v3",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_ingestion.DataPackHTTPTests.test_status_uses_detailed_service",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_ingestion.DataPackHTTPTests.test_validate_does_not_require_supabase",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_ingestion.DataPackValidationTests.test_canonical_filename_uses_kind_and_cordoba_time",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_ingestion.DataPackValidationTests.test_detects_legacy_mixed_format",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_ingestion.DataPackValidationTests.test_minimal_data_pack_unlocks_only_assignment_data",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_ingestion.DataPackValidationTests.test_readiness_blocks_assignment_when_site_has_no_fleet",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_ingestion.DataPackValidationTests.test_report_accumulates_multiple_errors",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_ingestion.DataPackValidationTests.test_report_caps_visible_problems_at_one_hundred",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_ingestion.DataPackValidationTests.test_strict_wrapper_still_raises_first_error",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_ingestion.DataPackValidationTests.test_templates_are_complete_but_only_core_is_required",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_ingestion.DataPackValidationTests.test_v3_sample_profiles_and_readiness",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_jobs.DurableHTTPTests.test_conflict_and_capacity_statuses",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_jobs.DurableHTTPTests.test_explicit_cancel_command",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_jobs.DurableHTTPTests.test_persisted_approval_succeeds_when_projection_is_unavailable",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_jobs.JobAdmissionTests.test_case_admission_uses_single_atomic_rpc",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_jobs.JobAdmissionTests.test_rpc_capacity_and_conflict_errors_are_explicit",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_jobs.JobAdmissionTests.test_same_id_with_different_intention_conflicts",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_jobs.JobAdmissionTests.test_same_intention_replays_before_mutable_upstream_validation",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_jobs.JobAdmissionTests.test_wrong_dataset_types_never_enter_queue",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_jobs.WorkerTests.test_completed_result_is_written_once_with_lease_and_progress_is_nonblocking",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_jobs.WorkerTests.test_dependency_outage_leaves_job_for_lease_recovery",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_jobs.WorkerTests.test_invalid_engine_version_is_terminal_without_running_solver",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_jobs.WorkerTests.test_projection_acknowledges_only_observed_version",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_jobs.WorkerTests.test_projection_failure_only_reschedules_observed_outbox_version",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_jobs.WorkerTests.test_real_assignment_engine_uses_leased_writer_without_duplicate_insert",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_jobs.WorkerTests.test_stale_worker_cannot_overwrite_new_owner",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_read_purity.ReadPurityTests.test_401_403_and_provider_errors_are_never_rpc_success",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_read_purity.ReadPurityTests.test_explicit_profile_refresh_persists",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_read_purity.ReadPurityTests.test_get_stale_run_never_writes",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_read_purity.ReadPurityTests.test_missing_queue_schema_blocks_execution_availability",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_read_purity.ReadPurityTests.test_profile_read_derives_metadata_without_persisting",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_read_purity.ReadPurityTests.test_rpc_diagnostics_use_authorized_catalog_without_execution",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_validation.DispatchValidationTests.test_dimension_contract_and_dynamic_balanced_weights",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_validation.DispatchValidationTests.test_fleet_v3_uses_real_vehicle_identity",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_validation.DispatchValidationTests.test_inconsistent_route_distances",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_validation.DispatchValidationTests.test_legacy_fleet_v1_and_v2_are_adapted",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_validation.DispatchValidationTests.test_legacy_orders_converter_remains_readable",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_validation.DispatchValidationTests.test_minimal_v3_data_pack_is_valid",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_validation.DispatchValidationTests.test_optional_values_are_validated_when_present",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_validation.DispatchValidationTests.test_own_vehicle_requires_concrete_site",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_dispatch_validation.DispatchValidationTests.test_phase4_weights_require_four_business_dimensions",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_foundation_assets.FoundationAssetsTests.test_previous_module_urls_redirect_to_the_same_canonical_source",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_frontend_contract.FrontendContractTests.test_accessibility_hooks_exist",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_frontend_contract.FrontendContractTests.test_assignment_phase3_is_non_temporal_in_frontend",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_frontend_contract.FrontendContractTests.test_brand_assets_contract",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_frontend_contract.FrontendContractTests.test_chat_has_retryable_error_state",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_frontend_contract.FrontendContractTests.test_dashboard_export_and_drawer_chat_contract",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_frontend_contract.FrontendContractTests.test_dashboard_has_required_executive_sections",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_frontend_contract.FrontendContractTests.test_dashboard_hides_technical_metadata_from_hero",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_frontend_contract.FrontendContractTests.test_dashboard_separates_objective_from_decision",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_frontend_contract.FrontendContractTests.test_dashboard_stage_contract",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_frontend_contract.FrontendContractTests.test_dda_internal_navigation_contract",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_frontend_contract.FrontendContractTests.test_dda_logistics_landing_contract",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_frontend_contract.FrontendContractTests.test_decision_chain_phase2_contract",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_frontend_contract.FrontendContractTests.test_decision_flow_continues_after_approval",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_frontend_contract.FrontendContractTests.test_dispatch_configuration_has_single_renderer",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_frontend_contract.FrontendContractTests.test_dispatch_workspace_is_loaded_once",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_frontend_contract.FrontendContractTests.test_export_and_ai_ux_contract",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_frontend_contract.FrontendContractTests.test_focused_dispatch_dashboard_contract",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_frontend_contract.FrontendContractTests.test_home_dda_selector_copy_contract",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_frontend_contract.FrontendContractTests.test_interpreter_stage_contract",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_frontend_contract.FrontendContractTests.test_javascript_referenced_ids_exist",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_frontend_contract.FrontendContractTests.test_latest_decision_access_contract",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_frontend_contract.FrontendContractTests.test_legacy_english_ui_copy_removed",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_frontend_contract.FrontendContractTests.test_nodal_map_unifies_readiness_and_hierarchy",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_frontend_contract.FrontendContractTests.test_premium_decision_map_contract",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_frontend_contract.FrontendContractTests.test_primary_views_exist",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_frontend_contract.FrontendContractTests.test_reassignment_detail_has_filters_sort_and_export",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_frontend_contract.FrontendContractTests.test_scheduling_phase4_frontend_contract",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_frontend_contract.FrontendContractTests.test_sidebar_exposes_platform_navigation_and_contextual_logistics",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_frontend_contract.FrontendContractTests.test_single_ingestion_contract",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_frontend_import_graph.FrontendImportGraphTests.test_template_entrypoints_and_relative_imports_resolve",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_home_v2.HomeResumeTests.test_completed_cache_without_approvals_does_not_claim_completion",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_home_v2.HomeResumeTests.test_initial_case_opens_configuration_and_reads_do_not_repair_legacy_cache",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_home_v2.HomeResumeTests.test_ordinary_resume_opens_official_approval_and_retains_candidate_id",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_home_v2.HomeResumeTests.test_real_two_step_approval_opens_latest_official_dashboard",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_home_v2.HomeResumeTests.test_stale_scheduling_does_not_navigate_as_an_official_approval",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_landing_navigation_contract.LandingNavigationContractTests.test_landing_keeps_only_case_existence_as_dynamic_state",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_landing_navigation_contract.LandingNavigationContractTests.test_landing_map_is_informational_not_runtime_status",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_landing_navigation_contract.LandingNavigationContractTests.test_overview_ctas_start_case_or_open_filtered_global_center",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_landing_navigation_contract.LandingNavigationContractTests.test_state_legend_and_card_actions_are_removed_at_runtime",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_logistics_engine.LogisticsEngineV02Tests.test_baseline_is_reference_assignment",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_logistics_engine.LogisticsEngineV02Tests.test_custom_70_30_is_deterministic",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_logistics_engine.LogisticsEngineV02Tests.test_custom_cost_extreme_matches_min_cost",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_logistics_engine.LogisticsEngineV02Tests.test_custom_result_keeps_baseline_and_scores",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_logistics_engine.LogisticsEngineV02Tests.test_custom_trips_extreme_matches_min_trips",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_logistics_engine.LogisticsEngineV02Tests.test_legacy_min_cost_run_is_reconstructable",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_logistics_engine.LogisticsEngineV02Tests.test_weights_must_be_in_range",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_logistics_engine.LogisticsEngineV02Tests.test_weights_must_sum_to_one",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_observability_phase7.LLMTests.test_completed_turn_replay_avoids_provider_and_retains_audit_identity",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_observability_phase7.LLMTests.test_history_uses_latest_window_and_exposes_older_page",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_observability_phase7.LLMTests.test_provider_retry_and_io_share_one_deadline",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_observability_phase7.LLMTests.test_retry_delay_handles_invalid_nonfinite_and_negative_inputs",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_observability_phase7.LLMTests.test_retry_is_capped_once_and_usage_is_sanitized",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_observability_phase7.LLMTests.test_turn_is_persisted_with_one_atomic_rpc_and_usage",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_observability_phase7.LLMTests.test_whole_turn_deadline_also_bounds_database_waits",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_observability_phase7.OperationsTests.test_probe_failure_and_healthy_database_without_worker_are_distinct",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_observability_phase7.TelemetryTests.test_admission_identity_does_not_change_replay_fingerprint",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_observability_phase7.TelemetryTests.test_cancelled_dependency_is_measured_without_swallowing_cancellation",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_observability_phase7.TelemetryTests.test_dependency_instrumentation_preserves_identity_headers_and_timeout",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_observability_phase7.TelemetryTests.test_errors_auth_validation_and_invalid_inbound_headers_are_correlated",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_observability_phase7.TelemetryTests.test_formatter_discards_bodies_urls_exception_text_and_nonfinite_values",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_observability_phase7.TelemetryTests.test_parallel_requests_keep_correlation_and_registered_route_labels",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_observability_phase7.TelemetryTests.test_unhandled_error_returns_safe_response_and_headers",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_performance_phase5.CaseListTests.test_case_page_has_one_database_request_at_every_size",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_performance_phase5.CaseListTests.test_invalid_pagination_and_dataset_types_fail_before_hydration",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_performance_phase5.CaseListTests.test_next_read_observes_replacement_and_stale_downstream",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_performance_phase5.PoolTests.test_error_and_cancellation_release_pool_and_standalone_client",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_performance_phase5.PoolTests.test_headers_and_timeouts_are_request_local_even_when_pool_is_shared",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_performance_phase5.PoolTests.test_lifespan_shares_client_with_parallel_tasks_and_closes_on_shutdown",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_persistence_phase4.PersistenceTests.test_approval_body_cannot_claim_a_person",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_persistence_phase4.PersistenceTests.test_atomic_conflict_is_a_business_conflict",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_persistence_phase4.PersistenceTests.test_case_and_projection_use_full_counts_without_history_window",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_persistence_phase4.PersistenceTests.test_case_creation_race_preserves_binding",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_persistence_phase4.PersistenceTests.test_history_does_not_slice_page_or_drop_other_node_approvals",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_persistence_phase4.PersistenceTests.test_history_rpc_uses_only_a_read_request_and_omits_null_node",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_persistence_phase4.PersistenceTests.test_private_api_requires_credentials",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_persistence_phase4.PersistenceTests.test_stale_approval_is_not_labeled_current",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_platform_activity.ActivityProjectionTests.test_attribution_distinguishes_actor_system_and_unknown",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_platform_activity.ActivityProjectionTests.test_failed_or_empty_export_is_rejected_before_audit",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_platform_activity.ActivityProjectionTests.test_server_csv_matches_original_exporter_for_both_nodes_and_legacy",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_platform_entitlements.EntitlementTests.test_business_api_blocks_before_provider_while_home_remains_available",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_platform_entitlements.EntitlementTests.test_disabled_home_never_queries_business_data",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_platform_entitlements.EntitlementTests.test_resolved_identity_is_fail_closed_and_ignores_forged_claims",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_platform_onboarding.OnboardingPackTests.test_corrupted_golden_pack_is_rejected_before_any_upload",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_platform_security.AuthFlowTests.test_password_change_clears_recovery_session_and_requests_fresh_login",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_platform_security.AuthFlowTests.test_recovery_does_not_expose_provider_account_existence_errors",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_platform_security.AuthFlowTests.test_recovery_link_requires_initiating_browser",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_platform_security.AuthFlowTests.test_revoked_refresh_clears_session_and_csrf_blocks_logout",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_platform_security.AuthFlowTests.test_signup_uses_pkce_confirmation_redirect_and_http_only_secure_cookie",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_platform_security.JWTTests.test_signature_claims_caching_and_rotation",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_platform_security.RepositorySecurityTests.test_concurrent_requests_keep_independent_workspace_filters",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_platform_security.RepositorySecurityTests.test_missing_context_viewer_write_and_worker_rpc_never_reach_provider",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_platform_security.RepositorySecurityTests.test_rpc_binds_verified_authority_and_legacy_storage_checks_database_first",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_production_deployment.ProductionDeploymentTests.test_image_update_preserves_secrets_account_and_resource_limits",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_production_deployment.ProductionDeploymentTests.test_readiness_failure_is_reported",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_production_deployment.ProductionDeploymentTests.test_ready_old_generation_or_old_revision_is_not_accepted",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_production_deployment.ProductionDeploymentTests.test_worker_create_requires_confirmed_404",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_production_deployment.ProductionDeploymentTests.test_worker_permission_error_never_attempts_creation",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_progressive_comparative.ProgressiveEngineTests.test_balanced_essential_reuses_all_persisted_references",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_progressive_comparative.ProgressiveEngineTests.test_mismatched_configuration_cannot_anchor_another_decision",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_progressive_comparative.ProgressiveEngineTests.test_missing_references_are_generated_without_reoptimizing_selected_plan",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_progressive_comparative.ProgressiveEngineTests.test_progressive_runtime_reapplies_original_scope_and_resource_policy",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_progressive_comparative.ProgressiveServiceTests.test_admission_reconstructs_configuration_and_only_depth_changes",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_progressive_comparative.ProgressiveServiceTests.test_chat_uses_persisted_comparative_and_records_scope_captured_before_provider",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_progressive_comparative.ProgressiveServiceTests.test_endpoint_requires_auth_and_rejects_unknown_unfinished_and_unsupported_base",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_progressive_comparative.ProgressiveServiceTests.test_enriched_evidence_is_copied_and_never_changes_primary_result",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_progressive_comparative.ProgressiveServiceTests.test_existing_comparative_does_not_create_another_artifact",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_progressive_comparative.ProgressiveServiceTests.test_invalid_companion_cannot_redefine_primary_selection",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_progressive_comparative.ProgressiveServiceTests.test_saved_original_explanation_is_marked_until_enriched_scope_is_generated",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_run_request_serialization.SchedulingAdmissionSerializationTests.test_automatic_window_still_uses_null_dates",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_run_request_serialization.SchedulingAdmissionSerializationTests.test_focus_rule_dates_are_json_safe_and_keep_the_same_intention",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_run_request_serialization.SchedulingAdmissionSerializationTests.test_global_planning_dates_are_json_safe_for_durable_admission",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_runtime_compatibility.RuntimeCompatibilityTests.test_invalid_dataset_type_remains_422",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_runtime_compatibility.RuntimeCompatibilityTests.test_module_assets_revalidate_without_losing_etags",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_runtime_compatibility.RuntimeCompatibilityTests.test_orders_and_fleet_csv_bom",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_runtime_compatibility.RuntimeCompatibilityTests.test_protected_html_and_multipart_auth",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_runtime_compatibility.RuntimeCompatibilityTests.test_static_byte_ranges_and_unsatisfiable_range",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase1.SchedulingConfigPhase1Tests.test_custom_window_delays_dispatch_but_keeps_assignment",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase1.SchedulingConfigPhase1Tests.test_custom_window_fails_if_all_dispatches_cannot_fit",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase1.SchedulingConfigPhase1Tests.test_earliest_dispatch_strategy_does_not_use_due_dates",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase1.SchedulingConfigPhase1Tests.test_phase1_execution_sends_real_window_and_strategy",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase1.SchedulingConfigPhase1Tests.test_phase1_scheduling_ui_matches_assignment_configuration_language",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase1.SchedulingConfigPhase1Tests.test_phase1_ui_is_loaded_and_responsive",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase1.SchedulingConfigPhase1Tests.test_scheduling_window_is_part_of_canonical_configuration",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase1.SchedulingConfigPhase1Tests.test_scheduling_window_rejects_reversed_dates",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests.test_scheduling_engine.SchedulingEngineTests.test_available_until_can_make_schedule_infeasible",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests.test_scheduling_engine.SchedulingEngineTests.test_handoff_to_final_assignment_is_versioned",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests.test_scheduling_engine.SchedulingEngineTests.test_same_vehicle_trips_do_not_overlap",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests.test_scheduling_engine.SchedulingEngineTests.test_scheduling_is_deterministic",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests.test_scheduling_engine.SchedulingEngineTests.test_scheduling_preserves_assignment_exactly",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests.test_scheduling_engine.SchedulingEngineTests.test_service_first_prioritizes_urgent_trip",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests.test_scheduling_engine.SchedulingEngineTests.test_unavoidable_late_order_is_reported",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests.test_scheduling_engine.SchedulingEngineTests.test_vehicle_available_from_is_respected",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests.test_scheduling_engine.SchedulingEngineTests.test_available_until_can_make_schedule_infeasible",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests.test_scheduling_engine.SchedulingEngineTests.test_handoff_to_final_assignment_is_versioned",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests.test_scheduling_engine.SchedulingEngineTests.test_same_vehicle_trips_do_not_overlap",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests.test_scheduling_engine.SchedulingEngineTests.test_scheduling_is_deterministic",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests.test_scheduling_engine.SchedulingEngineTests.test_scheduling_preserves_assignment_exactly",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests.test_scheduling_engine.SchedulingEngineTests.test_service_first_prioritizes_urgent_trip",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests.test_scheduling_engine.SchedulingEngineTests.test_unavoidable_late_order_is_reported",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests.test_scheduling_engine.SchedulingEngineTests.test_vehicle_available_from_is_respected",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase2.SchedulingPhase2EngineTests.test_duplicate_rule_ids_are_rejected",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase2.SchedulingPhase2EngineTests.test_filtered_window_is_enforced_for_matching_trip",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase2.SchedulingPhase2EngineTests.test_prioritized_destination_dispatches_first_without_dropping_trips",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase2.SchedulingPhase2EngineTests.test_product_filter_uses_assignment_loads",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase2.SchedulingPhase2EngineTests.test_rule_that_matches_no_trip_is_rejected",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase2.SchedulingPhase2EngineTests.test_specific_window_must_stay_inside_global_window",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase2.SchedulingPhase2FrontendContractTests.test_execution_sends_temporal_rules",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase2.SchedulingPhase2FrontendContractTests.test_filter_fields_are_derived_from_assignment_output",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase2.SchedulingPhase2FrontendContractTests.test_phase2_rules_are_responsive",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase2.SchedulingPhase2FrontendContractTests.test_ui_exposes_priority_and_specific_window_actions",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_phase2_exposes_selected_disabled_and_locked_states",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_phase2_keeps_same_four_section_anatomy_as_assignment",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_phase2_progressive_disclosure_does_not_change_execution_payload",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_phase2_summary_reuses_shared_assignment_bar",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase3.SchedulingConfigPhase3RuleEditorTests.test_duplicate_and_impossible_overlapping_windows_are_guarded",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase3.SchedulingConfigPhase3RuleEditorTests.test_editor_has_live_impact_and_overlap_feedback",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase3.SchedulingConfigPhase3RuleEditorTests.test_editor_preserves_backend_temporal_rules_contract",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase3.SchedulingConfigPhase3RuleEditorTests.test_editor_supports_create_edit_cancel_and_remove",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase3.SchedulingConfigPhase3RuleEditorTests.test_pending_draft_blocks_review_and_execution",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase3.SchedulingConfigPhase3RuleEditorTests.test_phase3_is_bootstrapped_and_cache_busted",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase3.SchedulingConfigPhase3RuleEditorTests.test_phase3_rule_editor_is_responsive_and_motion_safe",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase3.SchedulingConfigPhase3RuleEditorTests.test_restoring_run_does_not_restore_transient_editor_state",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase3.SchedulingConfigPhase3RuleEditorTests.test_rule_list_reuses_shared_rule_card_primitive",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase4.SchedulingConfigPhase4LifecycleTests.test_dashboard_exposes_persisted_configuration_evidence",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase4.SchedulingConfigPhase4LifecycleTests.test_decision_case_moves_running_review_and_error",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase4.SchedulingConfigPhase4LifecycleTests.test_error_state_preserves_config_and_offers_retry",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase4.SchedulingConfigPhase4LifecycleTests.test_legacy_scheduling_renderer_never_becomes_visible",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase4.SchedulingConfigPhase4LifecycleTests.test_lifecycle_supports_polling_and_network_recovery",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase4.SchedulingConfigPhase4LifecycleTests.test_pending_state_does_not_fake_percentage",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase4.SchedulingConfigPhase4LifecycleTests.test_phase4_is_responsive_and_motion_safe",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase4.SchedulingConfigPhase4LifecycleTests.test_phase4_owns_final_execute_click_without_changing_rule_editor",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase4.SchedulingConfigPhase4LifecycleTests.test_phase4_reuses_phase3_validation_and_execution_contract",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_config_phase4.SchedulingConfigPhase4LifecycleTests.test_shell_bootstraps_shared_configuration_layer_explicitly",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_engine.SchedulingEngineTests.test_available_until_can_make_schedule_infeasible",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_engine.SchedulingEngineTests.test_handoff_to_final_assignment_is_versioned",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_engine.SchedulingEngineTests.test_same_vehicle_trips_do_not_overlap",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_engine.SchedulingEngineTests.test_scheduling_is_deterministic",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_engine.SchedulingEngineTests.test_scheduling_preserves_assignment_exactly",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_engine.SchedulingEngineTests.test_service_first_prioritizes_urgent_trip",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_engine.SchedulingEngineTests.test_unavoidable_late_order_is_reported",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_engine.SchedulingEngineTests.test_vehicle_available_from_is_respected",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_service.SchedulingServiceTests.test_approval_preserves_result_fingerprint",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_service.SchedulingServiceTests.test_scheduling_rejects_unapproved_assignment",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_shared_ui_phase2.SchedulingSharedUiPhase2Tests.test_advanced_options_replace_active_depth_configuration",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_shared_ui_phase2.SchedulingSharedUiPhase2Tests.test_objective_uses_shared_selected_and_disabled_cards",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_shared_ui_phase2.SchedulingSharedUiPhase2Tests.test_phase2_is_responsive_and_reduced_motion_safe",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_shared_ui_phase2.SchedulingSharedUiPhase2Tests.test_phase2_keeps_engine_contract_untouched",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_shared_ui_phase2.SchedulingSharedUiPhase2Tests.test_resources_are_inherited_and_locked",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_shared_ui_phase2.SchedulingSharedUiPhase2Tests.test_scheduling_uses_assignment_reference_shell",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_shared_ui_phase2.SchedulingSharedUiPhase2Tests.test_summary_chips_are_reactive_and_validate_before_review",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_scheduling_shared_ui_phase2.SchedulingSharedUiPhase2Tests.test_temporal_scope_uses_progressive_disclosure_without_changing_rules",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_traceability_phase3.TraceabilityPhase3Contracts.test_controller_restores_data_pack_before_guarded_views",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_traceability_phase3.TraceabilityPhase3Contracts.test_history_distinguishes_current_candidate_and_superseded",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_traceability_phase3.TraceabilityPhase3Contracts.test_landing_opens_global_center_filtered_to_logistics",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_traceability_phase3.TraceabilityPhase3Contracts.test_map_exposes_run_history_and_new_run_flow",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_traceability_phase3.TraceabilityPhase3Contracts.test_traceability_ui_is_responsive",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_upload_journal_concurrency.UploadJournalConcurrencyTests.test_committed_upload_retries_busy_journal_without_reupload",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_upload_journal_concurrency.UploadJournalConcurrencyTests.test_duplicate_loser_finishes_compensation_and_preserves_original",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_upload_journal_concurrency.UploadJournalConcurrencyTests.test_retries_are_bounded_and_only_for_explicit_sql_contention",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_v2_foundation.FoundationTests.test_backend_obeys_the_same_destination_contract_as_browser",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_v2_foundation.FoundationTests.test_objective_and_context_labels_do_not_rewrite_engine_configuration",
+      "outcome": "PASS",
+      "failure_entries": 0
+    }
+  ],
+  "B-NODE": [
+    {
+      "test_id": "tests/test_dashboard_selectors.js",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests/test_assignment_ai_summary.mjs",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests/test_assignment_dashboard_v2_selectors.mjs",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests/test_assignment_executive_kpis.mjs",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests/test_case_navigation.mjs",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests/test_center_resource.mjs",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests/test_chart_theme.mjs",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests/test_data_provenance.mjs",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests/test_data_resource.mjs",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests/test_decision_case.mjs",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests/test_dispatch_upload_selectors.mjs",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests/test_execution_progress.mjs",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests/test_home_dda_catalog.mjs",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests/test_lifecycle.mjs",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests/test_navigation.mjs",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests/test_platform_recovery.mjs",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests/test_scheduling_dashboard_v21_selectors.mjs",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests/test_v2_foundation.mjs",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests/test_workflow_gates.mjs",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "tests/test_workspace_settings.mjs",
+      "outcome": "PASS",
+      "failure_entries": 0
+    }
+  ],
+  "B-BROWSER": [
+    {
+      "test_id": "test_attributes_before_csv.AttributesBeforeCSVTests.test_1_no_csv_valid_and_dirty_can_apply_and_reverting_disables_it",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_attributes_before_csv.AttributesBeforeCSVTests.test_2_no_csv_applied_attributes_and_owner_survive_reload_but_global_cta_is_disabled",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_attributes_before_csv.AttributesBeforeCSVTests.test_3_csv_complete_without_applied_attributes_keeps_global_cta_disabled",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_attributes_before_csv.AttributesBeforeCSVTests.test_4_adding_csv_promotes_applied_attributes_and_owner_once_without_another_apply",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_final_polish.FinalPolishTests.test_c1_overview_hero_has_local_art_process_and_unchanged_actions",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_final_polish.FinalPolishTests.test_c2_demo_tracks_actual_pack_provenance_across_case_surfaces",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_final_polish.FinalPolishTests.test_c3_contextual_launcher_sheet_busy_and_keyboard_preserve_chat",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_final_polish.FinalPolishTests.test_c4_metadata_has_independent_unpadded_decision_label",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_final_polish.FinalPolishTests.test_c5_command_bars_remain_visible_without_obscuring_controls",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_final_polish.FinalPolishTests.test_c6_c9_static_metrics_and_distinct_hero_art_preserve_results",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_final_polish.FinalPolishTests.test_c7_capabilities_share_full_width_evidence_without_extra_inference",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_final_polish.FinalPolishTests.test_c8_flow_tracks_real_stages_without_percentage_or_motion_when_reduced",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_final_polish.FinalPolishTests.test_final_polish_stress_at_data_boundary_with_dev_only_toggle",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_foundation_components.FoundationComponentTests.test_previous_urls_preserve_native_imports_exports_and_escaped_result_text",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_foundation_components.FoundationComponentTests.test_real_shells_focus_the_requested_plan_and_dispose_queued_actions",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_foundation_components.FoundationComponentTests.test_real_shells_keep_disclosure_storage_isolated_and_restore_per_run",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_home_hero.HomeHeroTests.test_alignment_matches_logistics_frame_and_control_geometry",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_home_hero.HomeHeroTests.test_art_is_small_and_reserves_geometry_and_content_survives_failure",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_home_hero.HomeHeroTests.test_h1_h3_h4_h5_copy_network_band_and_reflow",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_home_hero.HomeHeroTests.test_h2_catalog_center_keyboard_and_history_use_existing_navigation",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_home_hero.HomeHeroTests.test_h5_zoom_200_percent_keeps_hero_ctas_visible_with_keyboard",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_home_hero.HomeHeroTests.test_h6_greeting_keeps_workspace_timezone_identity_updates_and_fallback",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_activity_case_late_response_is_disposed_after_navigation",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_approved_assignment_continues_directly_to_scheduling_configuration",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_assignment_draft_is_restored_per_case",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_back_forward_restore_resource",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_bfcache_denied_session_hides_private_content_and_offers_recovery",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_both_configuration_contexts_are_closed_and_scheduling_source_stays_visible",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_both_toolbar_map_buttons_use_run_case_and_preserve_business_state",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_case_selector_paginates_compact_active_and_completed_and_hydrates_only_selection",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_case_ux_both_reviews_keep_config_and_only_confirm_executes_once",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_case_ux_completed_picker_switches_once_without_reload_and_preserves_drafts",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_case_ux_first_pack_is_persisted_before_execution_without_transition_notice",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_case_ux_hero_contract_and_attention_contours_at_desktop_mobile_and_reflow",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_case_ux_picker_load_error_keeps_map_and_archived_cases_are_excluded",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_case_ux_real_data_change_retains_lineage_but_reopening_history_has_no_new_notice",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_case_ux_single_current_picker_never_navigates_and_restores_keyboard_focus",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_case_ux_stale_local_lineage_cannot_show_a_transition_notice",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_catalog_entitlements_cover_deep_links_revocation_and_reenable",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_catalog_fallback_keeps_disabled_entitlement_closed",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_center_assignment_search_preserves_both_selections_and_explicit_clear",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_center_v2_kpis_and_docked_or_modal_drawer_preserve_portfolio",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_center_v2_late_detail_does_not_reopen_closed_drawer",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_chat_response_cannot_focus_a_departed_screen",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_chat_retry_reuses_turn_id_and_older_messages_prepend",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_cold_assignment_link",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_cold_scheduling_link_and_refresh",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_comparative_can_close_reopen_reload_without_mutation_or_another_post",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_comparative_error_retry_and_departure_cancels_polling",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_comparative_original_always_keeps_essential_before_comparative_and_ia",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_config_controls_and_review_use_native_dark_roles",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_config_d2_keeps_node",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_config_disclosure_preserves_copy_id_change_data_and_real_validation_labels",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_config_disclosures_do_not_claim_validation_for_profiles_with_errors",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_d1_d2_hero_grows_for_objective_and_tools_align_without_approval",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_d1_d2_normalized_hero_keeps_approval_reconfigure_export_and_details",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_d1_d2_upper_geometry_and_visible_headings_are_normalized",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_d1_v2_ai_cached_brief_copy_chat_and_collapse_without_inference",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_d1_v2_ai_loading_error_retry_regeneration_are_explicit_and_coalesced",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_d1_v2_all_objectives_highlight_the_actual_selected_scenario",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_d1_v2_disclosure_keyboard_feedback_and_manual_scroll",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_d1_v2_essential_and_advanced_fit_low_viewports_and_keyboard",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_d1_v2_final_approval_updates_hero_and_continues_to_scheduling",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_d1_v2_infeasible_and_missing_metrics_remain_explicit",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_d1_v2_local_hero_has_a_readable_svg_fallback",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_d1_v2_new_comparative_evidence_marks_summary_stale_without_automatic_ai",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_d1_v2_table_focus_reveals_partially_clipped_trip_control",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_d1_v2_view_modes_preserve_evidence_and_restore_without_reexecution",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_d2_v21_ai_cache_generation_freshness_and_chat",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_d2_v21_ai_retry_approval_and_approved_state",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_d2_v21_disclosure_keyboard_persistence_preview_and_evidence",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_d2_v21_infeasible_never_recommends_or_approves",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_d2_v21_no_sla_null_dates_custom_window_and_rules",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_d2_v21_stale_assignment_preserves_evidence_and_blocks_approval",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_d2_v21_timeline_vehicle_rows_sla_and_release_dates",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_dark_buttons_have_keyboard_focus_contrast_and_stable_disabled_state",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_dark_shell_and_heroes_survive_responsive_and_warm_navigation",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_dashboard_drawer_traps_focus_and_escape_returns_to_menu",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_dashboard_exports_csv",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_dashboard_toolbars_share_controls_and_symmetric_bleed",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_data_hub_archive_delete_retry_and_text_safety",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_data_hub_drawer_keyboard_focus_and_no_list_refetch",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_data_hub_empty_failure_readonly_and_legacy_links",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_data_hub_incomplete_upload_cleanup_is_explicit_and_text_safe",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_data_hub_library_details_preview_history_and_responsive",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_data_hub_stale_detail_cannot_replace_new_selection_or_navigate_after_leave",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_data_hub_summary_filters_and_viewer_preserve_download",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_data_pack_context_is_dark_with_native_disclosure_in_map_and_configs",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_data_pack_has_one_stable_dark_bar_across_responsive_reuse",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_data_pack_invalid_file_focus_busy_cancel_and_service_unavailable",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_data_pack_relation_error_recovers_to_ready_with_optional_warnings",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_decision_center_failures_readonly_conflict_and_global_recovery",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_decision_center_search_detail_disclosure_label_and_archive",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_existing_review_continues_to_its_dashboard_without_another_configuration",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_explanation_aborts_on_navigation",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_foundation_dashboard_navigation_prefers_approved_over_later_candidate",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_four_kpis_and_comparator_use_independent_scenario_averages_and_pp",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_history_modal_removed_when_leaving",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_history_page_error_retries_and_late_response_cannot_reopen_dialog",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_history_paginates_and_preserves_approval_outside_page",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_home_card_keyboard_and_informational_overview_with_native_faq",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_home_catalog_filters_preserve_navigation_and_workspace",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_home_catalog_keeps_a_usable_fallback_without_its_module",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_home_catalog_responsive_accessible_and_honest_states",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_home_center_keep_readable_headers_and_catalog_cta",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_home_overview_dark_contrast_and_responsive_actions",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_home_v2_has_no_global_guide_or_demo_and_viewer_explores_catalog",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_ia_retains_and_labels_original_turn_when_comparative_finishes_mid_response",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_late_execution_response_does_not_reopen_dashboard",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_lost_post_response_recovers_same_run",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_malformed_saved_state",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_map_clears_run_from_url",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_map_config_and_toolbar_fit_mobile_without_obsolete_kpi_or_calendar_actions",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_map_disclosure_keeps_progress_visible_and_preserves_columns_and_change_data",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_map_disclosure_layout_remains_readable_at_all_five_breakpoints",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_map_idle_makes_no_requests",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_map_selector_switches_case_data_progress_url_and_restores_cancel_focus",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_missing_run_stops_polling",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_mobile_config_stays_within_viewport",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_mobile_map_and_dashboard_do_not_overflow",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_mobile_trip_detail_has_no_document_overflow",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_module_urls_have_single_identity",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_new_assignment_preserves_approval",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_new_decision_goes_to_empty_data_without_losing_existing_case",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_new_run_direct_configuration_preserves_business_context_and_history",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_observers_are_disposed_after_repeated_routes",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_onboarding_demo_late_response_does_not_leave_settings",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_overview_availability_ignores_stale_responses_and_refreshes_on_bfcache",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_overview_has_two_hero_actions_and_disabled_visible_map_without_cases",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_overview_map_with_active_case_and_multiple_cases_uses_existing_selector",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_overview_multiple_cases_without_selection_uses_existing_selector",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_overview_single_case_map_opens_directly_and_new_decision_clears_active_context",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_overview_two_actions_use_rows_on_desktop_and_stack_on_mobile",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_phase4_advanced_options_are_disabled_and_workflow_is_shared",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_phase4_config_waits_for_its_stylesheet_before_rendering",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_phase4_dark_config_forms_review_and_footer_at_five_widths",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_phase4_filter_dialog_is_dark_accessible_and_preserves_escape_focus",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_phase4_historical_depths_open_without_recalculation_or_depth_badge",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_phase4_old_assignment_drafts_keep_criteria_and_send_essential",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_phase4_scheduling_old_depth_and_unknown_options_are_not_reactivated",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_phase4_weight_edits_refresh_validation_and_review_without_losing_focus",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_phase5_chat_escape_restores_focus_and_all_dashboard_state",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_phase5_comparative_states_stay_dark_and_do_not_change_the_base",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_phase5_dashboard_dark_roles_and_contrast_at_five_widths",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_phase5_delayed_dashboard_styles_cannot_reopen_a_view_after_navigation",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_phase5_historical_dispatch_remains_dark_readable_and_exports_original_json",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_phase5_programmatic_menu_opening_is_exclusive_and_cleanup_survives_navigation",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_phase5_schedule_chart_preserves_data_dates_and_dark_tooltip",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_phase5_toolbar_menus_are_exclusive_outside_escape_and_viewport_safe",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_phase6_all_pages_have_dark_contrast_accessible_names_and_no_overflow",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_phase6_chat_composer_and_modal_keyboard_remain_visible_on_mobile",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_phase6_mobile_footer_grid_keeps_keyboard_focus_visible_without_scroll_or_state_changes",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_phase6_native_date_picker_and_select_preserve_the_scheduling_contract",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_phase6_native_search_number_checkbox_range_and_autofill_keep_dark_roles",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_phase6_reduced_motion_updates_real_chart_and_cleans_up_on_departure",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_phase6_reflow_at_200_and_400_percent_keeps_pages_dialog_and_chat_reachable",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_phase6_tab_and_reverse_tab_keep_focus_visible_below_sticky_layers",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_phase7_delayed_map_styles_do_not_restore_an_abandoned_route",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_phase7_library_and_settings_share_the_dark_roles",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_phase7_map_styles_retry_and_remain_shared_with_config_and_filters",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_progressive_analysis_is_local_and_restores_after_reload",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_refined_comparator_and_scheduling_drawer_fit_mobile_viewport",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_scheduling_does_not_poll_before_admission_finishes",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_scheduling_executes_with_rules_contract",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_scheduling_uses_shared_menus_drawer_and_exports_without_format_changes",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_shared_config_disclosures_are_full_width_without_overlap_at_all_five_breakpoints",
+      "outcome": "FAIL",
+      "failure_entries": 10
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_shared_drawer_cleans_up_on_navigation_and_scheduling_chat_has_one_listener",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_stale_result_has_no_approval",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_terminal_assignment_error_restores_objective_and_retains_failed_run",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_terminal_scheduling_error_restores_window_and_executes_new_run",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_toolbar_approval_error_restores_button_and_can_retry_once",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_toolbar_approval_is_unique_direct_and_preserves_continuation",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_transient_run_fetch_error_retries_without_showing_terminal_actions",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_trip_detail_is_contextual_toggleable_and_escape_restores_focus",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_unknown_resource_shows_error",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_validation_retains_real_operational_and_critical_controls",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_validation_without_controls_is_one_simple_state_and_no_inline_actions",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_workflow_bars_equalize_context_and_keep_a_wider_primary_action",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_workflow_hero_future_content_wraps_without_clipping_or_html_injection",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_workflow_heroes_share_metadata_panel_and_stable_desktop_height",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_workflow_keyboard_and_text_spacing_at_320_and_landscape",
+      "outcome": "FAIL",
+      "failure_entries": 12
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_workflow_primitives_hero_supports_optional_metadata_and_panel",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_workflow_primitives_preserve_action_identity_states_and_token_overrides",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_workflow_progressive_actions_share_styles_arrow_and_keyboard_focus",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_workflow_review_escapes_content_and_wraps_long_values",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_workflow_review_respects_motion_preference_changes_while_open",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_workflow_review_retry_preserves_feedback_and_guards_execution",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_workflow_reviews_share_shell_and_accessible_controls_at_six_viewports",
+      "outcome": "FAIL",
+      "failure_entries": 12
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_workspace_home_empty_state_and_catalog_access",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_workspace_home_quick_access_routes_preserve_history",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_workspace_settings_retry_conflict_readonly_and_tab_history",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_platform_foundation.PlatformFoundationTests.test_actual_text_control_and_keyboard_focus_contrast",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_platform_foundation.PlatformFoundationTests.test_dropdown_keyboard_outside_and_viewport_position",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_platform_foundation.PlatformFoundationTests.test_form_labels_validation_and_native_choice_keyboard",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_platform_foundation.PlatformFoundationTests.test_native_modal_traps_tab_escape_and_returns_focus",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_platform_foundation.PlatformFoundationTests.test_real_runtime_cascade_fits_five_widths_and_mobile_targets",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_platform_foundation.PlatformFoundationTests.test_reduced_motion_and_zoom_preserve_readability",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_platform_foundation.PlatformFoundationTests.test_remount_disposal_and_drawer_keep_single_handlers_and_focus",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_platform_settings.PlatformSettingsTests.test_settings_uses_foundation_and_keeps_status_refresh_and_dda_context",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_run_lineage_polish.RunLineagePolishTests.test_f12_warning_is_disposed_when_navigation_changes_before_confirmation",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_run_lineage_polish.RunLineagePolishTests.test_f2_owners_share_native_select_geometry_and_interaction_states",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_run_lineage_polish.RunLineagePolishTests.test_f3_case_flow_keeps_steps_without_decorative_truck",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_run_lineage_polish.RunLineagePolishTests.test_f4_warning_has_equal_canonical_actions_keyboard_and_cleanup",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_run_lineage_polish.RunLineagePolishTests.test_f5_shared_media_slot_is_stable_when_narrative_grows",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_run_lineage_polish.RunLineagePolishTests.test_f6_pending_d1_opens_its_configuration_without_warning_or_admission",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_run_lineage_polish.RunLineagePolishTests.test_f7_f8_approved_reruns_cancel_or_open_only_the_current_decision",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_run_lineage_polish.RunLineagePolishTests.test_f9_reconfiguration_cannot_fork_a_persisted_case_on_mismatched_profiles",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_saga3_ui.Saga3UITests.test_both_terminal_runs_offer_one_same_case_same_decision_configuration_cta",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_saga3_ui.Saga3UITests.test_missing_owner_blocks_map_configuration_and_direct_configuration_entry",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_saga4_ui.Saga4UITests.test_approval_hero_routes_by_next_owner_and_rerun_keeps_case_and_decision",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_saga4_ui.Saga4UITests.test_execution_uses_real_stages_and_indeterminate_feedback_then_success_or_error",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_saga4_ui.Saga4UITests.test_last_decision_completes_case_and_technical_menu_keeps_exports",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_saga4_ui.Saga4UITests.test_shared_case_context_and_compact_map_milestones",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_saga5_ui.Saga5UITests.test_d1_and_d2_share_result_geometry_highlights_and_support_without_clipping",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_saga5_ui.Saga5UITests.test_failed_apply_preserves_drafts_and_viewer_has_no_save_or_owner_editor",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_saga5_ui.Saga5UITests.test_map_and_config_keep_the_same_rounded_hover_and_error_cta_is_primary",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_saga5_ui.Saga5UITests.test_one_attributes_apply_saves_owner_and_keeps_four_independent_checks",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_unified_heroes.UnifiedHeroTests.test_dashboard_art_stays_clear_of_result_copy_and_mobile_controls",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_unified_heroes.UnifiedHeroTests.test_overview_actions_keep_filtered_center_and_prepare_a_new_case_without_execution",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_unified_heroes.UnifiedHeroTests.test_shared_icons_have_transparent_edges_and_row_owns_all_sidebar_states",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_ux_upgrade.UXUpgradeTests.test_constrained_viewports_keep_forms_and_table_scrollers_reachable",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_ux_upgrade.UXUpgradeTests.test_current_case_flow_step_is_visible_on_entry_and_resize",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_ux_upgrade.UXUpgradeTests.test_dashboard_launcher_and_exports_preserve_persisted_evidence",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_ux_upgrade.UXUpgradeTests.test_focused_attributes_are_unobscured_at_every_breakpoint",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_ux_upgrade.UXUpgradeTests.test_human_approval_stays_run_specific_and_duplicate_clicks_are_guarded",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_ux_upgrade.UXUpgradeTests.test_invitation_errors_preserve_status_handling_without_exposing_parser_text",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_ux_upgrade.UXUpgradeTests.test_mobile_center_words_fit_and_filter_labels_remain_visible",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_ux_upgrade.UXUpgradeTests.test_skip_and_keyboard_navigation_do_not_follow_workspace_updates",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_ux_upgrade_stress.UXStressTests.test_demo_worst_empty_one_toggle_preserves_readable_counts",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_ux_upgrade_stress.UXStressTests.test_long_case_and_filenames_and_numeric_extremes",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_ux_upgrade_stress.UXStressTests.test_multilingual_identity_and_large_paginated_team",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_ux_upgrade_stress.UXStressTests.test_route_change_during_loading_does_not_reopen_team",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_v2_regression.SelectedDrawerRegressionTests.test_data_hub_reload_closes_back_to_selected_second_dataset_without_refetch",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_v2_regression.SelectedDrawerRegressionTests.test_decision_center_reload_closes_back_to_selected_second_case_without_refetch",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_workflow_context.WorkflowContextTests.test_both_dashboards_keep_approval_blocked_until_an_eligible_approver_is_saved",
+      "outcome": "FAIL",
+      "failure_entries": 2
+    },
+    {
+      "test_id": "test_workflow_context.WorkflowContextTests.test_case_context_is_fixed_and_keyboard_navigation_returns_to_its_map",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_workflow_context.WorkflowContextTests.test_dashboard_trace_shares_the_copy_row_and_context_pills_are_equal",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_workflow_context.WorkflowContextTests.test_data_gate_registers_only_on_assignment_and_opens_the_same_case_map",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_workflow_context.WorkflowContextTests.test_data_roles_exist_before_csv_and_stay_below_compatibility",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_workflow_context.WorkflowContextTests.test_data_save_does_not_overwrite_assignment_changed_while_editing",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_workflow_context.WorkflowContextTests.test_dda_navigation_resolves_canonical_runs_without_losing_context",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_workflow_context.WorkflowContextTests.test_empty_candidates_and_conflict_preserve_the_map_assignment",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_workflow_context.WorkflowContextTests.test_history_and_archived_maps_remain_readable_after_data_owner_loses_eligibility",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_workflow_context.WorkflowContextTests.test_map_assignment_is_consumed_readonly_by_config_and_review",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_workflow_context.WorkflowContextTests.test_mobile_reflow_and_status_marker_are_independent_from_selection",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_workflow_context.WorkflowContextTests.test_operator_registers_a_pending_data_case_and_refreshes_admin_assignment",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_workflow_context.WorkflowContextTests.test_owner_revoked_at_admission_returns_to_config_without_polling_a_phantom_run",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_workflow_context.WorkflowContextTests.test_recovery_and_new_password_finish_on_login_with_generic_confirmation",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_workflow_context.WorkflowContextTests.test_team_keeps_one_invitation_entry_and_edits_multiple_roles_together",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_workflow_context.WorkflowContextTests.test_viewer_and_late_candidates_do_not_gain_mutation_controls",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_workflow_context.WorkflowContextTests.test_viewer_cannot_execute_even_when_all_business_responsibilities_are_eligible",
+      "outcome": "PASS",
+      "failure_entries": 0
+    }
+  ],
+  "B-SQL": [
+    {
+      "test_id": "test_durable_queue_sql.DurableQueueSQLTests.test_admission_bound_and_no_orphan_run",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_durable_queue_sql.DurableQueueSQLTests.test_anonymous_role_cannot_claim_or_read_jobs",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_durable_queue_sql.DurableQueueSQLTests.test_cancel_fences_worker_and_does_not_overwrite_completion",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_durable_queue_sql.DurableQueueSQLTests.test_completed_run_survives_failed_projection",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_durable_queue_sql.DurableQueueSQLTests.test_concurrent_workers_claim_different_jobs",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_durable_queue_sql.DurableQueueSQLTests.test_crashed_worker_recovers_same_id_and_fences_old_writer",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_durable_queue_sql.DurableQueueSQLTests.test_deadline_expires_queued_work_without_get_side_effects",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_durable_queue_sql.DurableQueueSQLTests.test_enqueue_is_atomic_and_queued",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_durable_queue_sql.DurableQueueSQLTests.test_heartbeat_cannot_revive_expired_lease",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_durable_queue_sql.DurableQueueSQLTests.test_idempotent_replay_and_conflicting_intention",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_durable_queue_sql.DurableQueueSQLTests.test_maintenance_bounds_restart_attempts",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_durable_queue_sql.DurableQueueSQLTests.test_projection_ack_does_not_lose_concurrent_approval",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_observability_sql.ObservabilitySQLTests.test_catalog_matches_reviewed_manifest_and_detects_definition_drift",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_observability_sql.ObservabilitySQLTests.test_concurrent_same_turn_commits_once",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_observability_sql.ObservabilitySQLTests.test_failed_validation_and_message_insert_roll_back_entire_turn",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_observability_sql.ObservabilitySQLTests.test_historical_message_remains_unattributed_and_completed_run_required",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_observability_sql.ObservabilitySQLTests.test_private_roles_cannot_read_or_invoke_operations_and_chat",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_observability_sql.ObservabilitySQLTests.test_replay_returns_first_answer_and_conflict_does_not_duplicate",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_observability_sql.ObservabilitySQLTests.test_snapshot_is_read_only_has_actual_percentile_and_fresh_worker_counts",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_observability_sql.ObservabilitySQLTests.test_turn_commits_both_messages_and_sanitized_audit_metadata",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_observability_sql.ObservabilitySQLTests.test_worker_shutdown_and_old_registry_cleanup",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_performance_sql.CaseListSQLTests.test_counts_old_approval_latest_and_replacements_are_live_without_heavy_artifacts",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_performance_sql.CaseListSQLTests.test_invalid_bounds_and_untrusted_roles_cannot_execute",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_performance_sql.CaseListSQLTests.test_page_bounds_stable_ties_all_statuses_and_full_metadata_compatibility",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_performance_sql.CaseListSQLTests.test_summary_uses_bounded_page_and_existing_history_indexes",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_persistence_sql.PersistenceSQLTests.test_admitted_child_can_finish_after_parent_replacement",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_persistence_sql.PersistenceSQLTests.test_approval_timestamp_is_taken_after_waiting_for_case_lock",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_persistence_sql.PersistenceSQLTests.test_captured_catalog_rebuild_and_upgrade_preserve_historical_evidence",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_persistence_sql.PersistenceSQLTests.test_concurrent_approvals_are_serialized_and_audited",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_persistence_sql.PersistenceSQLTests.test_history_counts_and_approval_survive_beyond_1000_and_tied_dates",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_persistence_sql.PersistenceSQLTests.test_identity_result_and_event_mutation_are_rejected",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_persistence_sql.PersistenceSQLTests.test_node_page_preserves_upstream_summary",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_persistence_sql.PersistenceSQLTests.test_old_upstream_cannot_admit_or_approve_new_children",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_persistence_sql.PersistenceSQLTests.test_parent_child_race_never_accepts_stale_approval",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_persistence_sql.PersistenceSQLTests.test_retry_preserves_approval_and_previous_cannot_resurrect",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_persistence_sql.PersistenceSQLTests.test_untrusted_roles_cannot_read_private_data_or_call_rpc",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_progressive_comparative_sql.ProgressiveSQLTests.test_catalog_install_is_idempotent_and_rejects_drift",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_progressive_comparative_sql.ProgressiveSQLTests.test_chat_provenance_is_atomic_and_idempotent",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_progressive_comparative_sql.ProgressiveSQLTests.test_concurrent_admission_is_one_artifact_and_no_business_write",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_progressive_comparative_sql.ProgressiveSQLTests.test_exhaustion_deadline_and_explicit_retry_keep_same_identity",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_progressive_comparative_sql.ProgressiveSQLTests.test_explanation_scope_prefers_enriched_evidence_over_late_original",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_progressive_comparative_sql.ProgressiveSQLTests.test_finish_rejects_changed_selection_business_configuration_or_options",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_progressive_comparative_sql.ProgressiveSQLTests.test_invalid_intention_and_unfinished_base_cannot_enter_queue",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_progressive_comparative_sql.ProgressiveSQLTests.test_private_roles_and_least_privilege",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_progressive_comparative_sql.ProgressiveSQLTests.test_restart_fences_old_worker_and_heartbeat_cannot_revive_it",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_progressive_comparative_sql.ProgressiveSQLTests.test_reuse_is_completed_without_worker_and_completed_artifact_is_immutable",
+      "outcome": "PASS",
+      "failure_entries": 0
+    }
+  ],
+  "B-E2E": [
+    {
+      "test_id": "test_activity.ActivityTests.test_01_committed_data_events_immutable_isolated_and_keyset",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_activity.ActivityTests.test_02_real_worker_approval_and_generated_exports",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_activity.ActivityTests.test_03_browser_real_home_case_events_and_exports",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_activity.ActivityTests.test_04_failed_execution_is_system_event_without_error_contents",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_activity.ActivityTests.test_05_deletion_and_new_workspace_are_real_audited_actions",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_case_preparation.CasePreparationTests.test_data_pack_changes_fork_while_preserving_original_people_and_runs",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_case_preparation.CasePreparationTests.test_identity_survives_reload_and_respects_cas_and_workspace_access",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_collaboration.CollaborationTests.test_01_team_browser_invitation_acceptance_assignments_and_access",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_collaboration.CollaborationTests.test_02_assigned_approval_handoff_attribution_override_and_retry",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_collaboration.CollaborationTests.test_03_invitation_confirmation_expiry_revocation_recipient_and_idempotency",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_collaboration.CollaborationTests.test_04_last_admin_concurrency_and_assignment_races",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_data_hub.DataHubTests.test_01_library_attribution_pagination_literal_search_and_workspace_boundary",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_data_hub.DataHubTests.test_02_detail_preview_filters_and_derived_packs_preserve_case_history",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_data_hub.DataHubTests.test_03_data_hub_survives_disabled_dda_but_reuse_and_viewer_writes_are_denied",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_data_hub.DataHubTests.test_04_deletion_is_recoverable_and_prevents_new_references",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_data_hub.DataHubTests.test_05_row_lock_conflict_returns_retryable_error_without_deleting_storage",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_data_hub.DataHubTests.test_06_real_browser_dda_upload_library_lineage_download_and_safe_delete",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_data_hub.DataHubTests.test_07_failed_upload_cleanup_is_tracked_and_workspace_authorized",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_data_hub.DataHubTests.test_08_historical_unknown_attribution_and_validation_are_not_invented",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_data_hub.DataHubTests.test_09_v2_summary_composed_filters_historical_lineage_and_read_purity",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_data_hub.DataHubTests.test_10_lost_committed_upload_response_preserves_metadata_and_bytes",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_data_hub.DataHubTests.test_11_dda_interrupted_upload_is_visible_and_recoverable_in_hub",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_center.DecisionCenterTests.test_01_case_library_labels_pagination_identity_and_isolation",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_center.DecisionCenterTests.test_02_live_workflow_completion_review_lineage_history_and_read_purity",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_decision_center.DecisionCenterTests.test_03_historical_attribution_is_unknown_and_inactive_members_cannot_read",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_decision_center.DecisionCenterTests.test_04_portfolio_summary_is_global_actionable_and_read_only",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_decision_center.DecisionCenterTests.test_05_portfolio_five_thousand_cases_remains_bounded",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_final_polish_lineage.FinalPolishLineageTests.test_actual_rerun_routing_and_lineage_scenarios_a_through_f",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_onboarding.OnboardingTests.test_01_personal_exploration_is_idempotent_and_tenant_authorized",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_onboarding.OnboardingTests.test_02_sample_concurrency_preserves_default_and_existing_file_origin",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_onboarding.OnboardingTests.test_03_golden_pack_runs_both_real_decisions_and_remains_demo",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_onboarding.OnboardingTests.test_04_browser_first_run_empty_states_demo_and_recovery",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_optimized_responsibilities.DataRoleMigrationTests.test_existing_steward_assignment_keeps_person_actor_and_version",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_optimized_responsibilities.OptimizedResponsibilityTests.test_archive_persists_reloads_and_preserves_case_history_and_assignments",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_optimized_responsibilities.OptimizedResponsibilityTests.test_legacy_assignment_projects_to_its_explicit_role_without_ambiguous_overwrite",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_optimized_responsibilities.OptimizedResponsibilityTests.test_split_roles_reload_independent_node_assignments_and_actual_approval",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_saga3.Saga3Tests.test_another_operator_cannot_execute_or_approve_the_assigned_owners_decision",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_saga3.Saga3Tests.test_attributes_keep_case_but_different_data_pack_forks_idempotently",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_saga3.Saga3Tests.test_legacy_steward_remains_historical_but_is_operationally_a_data_owner",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_saga3.Saga3Tests.test_multiple_runs_reopen_current_and_downstream_without_destroying_evidence",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_saga3.Saga3Tests.test_readiness_requires_applied_attributes_and_each_canonical_owner",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_saga3.Saga3Tests.test_upgrade_reopening_preserves_a_run_selected_after_other_candidates",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_saga5_attributes.Saga5AttributesTests.test_joint_apply_and_metadata_or_owner_edits_keep_case_and_four_part_readiness",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_saga5_attributes.Saga5AttributesTests.test_joint_submit_preserves_tenant_viewer_and_admin_only_owner_permissions",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_saga5_attributes.Saga5AttributesTests.test_owner_conflicts_and_ineligible_people_roll_back_all_attributes_and_audit",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_sandbox_cleanup.SandboxCleanupTests.test_owned_resources_are_released_after_success_and_startup_failure",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_tenancy.TenancyTests.test_01_identical_bytes_are_separate_and_all_cross_object_reads_fail",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_tenancy.TenancyTests.test_02_defaults_and_parent_case_injections_cannot_cross_workspaces",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_tenancy.TenancyTests.test_03_roles_disabled_members_and_identity_forgery",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_tenancy.TenancyTests.test_04_invalid_and_expired_jwt_and_basic_are_rejected",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_tenancy.TenancyTests.test_05_direct_rest_rls_rpc_and_storage_deny_cross_access",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_tenancy.TenancyTests.test_06_worker_preserves_tenant_and_cross_runs_evidence_are_blocked",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_tenancy.TenancyTests.test_07_login_refresh_logout_cookie_security_and_csrf",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_tenancy.TenancyTests.test_08_home_snapshot_is_bounded_tenant_scoped_and_read_only",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_tenancy.TenancyTests.test_09_home_attention_tracks_real_versions_and_removes_approved_or_archived",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_tenancy.TenancyTests.test_10_entitlements_are_rechecked_per_request_without_affecting_other_workspaces_or_accepted_jobs",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_tenancy.TenancyTests.test_11_real_browser_catalog_revocation_and_reenable",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_v2_foundation.FoundationDomainTests.test_approved_precedence_actual_actor_and_explicit_candidate_access",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_v2_foundation.FoundationDomainTests.test_multi_responsibility_candidates_cas_and_legacy_compatibility",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_v2_foundation.FoundationDomainTests.test_private_relations_and_new_rpcs_are_not_direct_client_capabilities",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_v2_foundation.FoundationDomainTests.test_stage_assignments_enforce_eligibility_and_keep_get_read_only",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_v2_foundation.MigrationCompatibilityTests.test_legacy_member_is_backfilled_without_rewriting_the_membership",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_v2_golden.GoldenWorkflowTests.test_distinct_people_complete_the_golden_workflow_and_cross_surface_matrix",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_v2_golden.GoldenWorkflowTests.test_workspace_boundaries_and_viewer_responsibilities_do_not_grant_writes",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_workflow.WorkflowTests.test_accepted_job_survives_api_restart_and_crashed_worker_lease",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_workflow.WorkflowTests.test_assignment_dashboard_all_objectives_use_actual_worker_evidence",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_workflow.WorkflowTests.test_assignment_scheduling_and_replacement_update_history_and_compact_list",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_workflow.WorkflowTests.test_browser_complete_workflow_at_mobile_width",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_workflow.WorkflowTests.test_browser_creation_execution_approval_navigation_and_mobile_history",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_workflow.WorkflowTests.test_comparative_error_retry_and_existing_reference_reuse",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_workflow.WorkflowTests.test_platform_auth_navigation_profile_and_logout",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_workflow.WorkflowTests.test_private_ingestion_deduplication_and_tampered_storage_fail_closed",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_workflow.WorkflowTests.test_private_operations_trace_worker_readiness_and_cluster_metrics",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_workflow.WorkflowTests.test_progressive_comparative_recovers_real_worker_without_changing_case_or_history",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_workflow.WorkflowTests.test_scheduling_dashboard_v21_preserves_assignment_and_temporal_relations",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_workflow_gates.WorkflowGateTests.test_atomic_team_edit_keeps_multiple_roles_and_rolls_back_invalid_access",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_workflow_gates.WorkflowGateTests.test_d1_d2_gates_are_independent_and_assigned_approver_is_not_actual_actor",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_workflow_gates.WorkflowGateTests.test_new_cases_require_data_owner_and_approver_but_replays_keep_their_result",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_workflow_gates.WorkflowGateTests.test_role_loss_cross_workspace_forgery_and_policy_changes_do_not_bypass_gates",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_workflow_gates.WorkflowMigrationCompatibilityTests.test_existing_case_is_unchanged_and_legacy_actions_remain_available",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_workspace_settings.WorkspaceSettingsTests.test_01_free_for_existing_and_new_workspaces_secure_validation_and_reads",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_workspace_settings.WorkspaceSettingsTests.test_02_admin_browser_preferences_free_plan_and_historical_evidence",
+      "outcome": "FAIL",
+      "failure_entries": 1
+    },
+    {
+      "test_id": "test_workspace_settings.WorkspaceSettingsTests.test_03_roles_concurrency_and_dda_status_are_independent_of_free",
+      "outcome": "PASS",
+      "failure_entries": 0
+    }
+  ],
+  "B-FOCUS": [
+    {
+      "test_id": "test_run_lineage_polish.RunLineagePolishTests.test_f12_warning_is_disposed_when_navigation_changes_before_confirmation",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_run_lineage_polish.RunLineagePolishTests.test_f2_owners_share_native_select_geometry_and_interaction_states",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_run_lineage_polish.RunLineagePolishTests.test_f3_case_flow_keeps_steps_without_decorative_truck",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_run_lineage_polish.RunLineagePolishTests.test_f4_warning_has_equal_canonical_actions_keyboard_and_cleanup",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_run_lineage_polish.RunLineagePolishTests.test_f5_shared_media_slot_is_stable_when_narrative_grows",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_run_lineage_polish.RunLineagePolishTests.test_f6_pending_d1_opens_its_configuration_without_warning_or_admission",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_run_lineage_polish.RunLineagePolishTests.test_f7_f8_approved_reruns_cancel_or_open_only_the_current_decision",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_run_lineage_polish.RunLineagePolishTests.test_f9_reconfiguration_cannot_fork_a_persisted_case_on_mismatched_profiles",
+      "outcome": "PASS",
+      "failure_entries": 0
+    },
+    {
+      "test_id": "test_navigation.NavigationTests.test_foundation_dashboard_navigation_prefers_approved_over_later_candidate",
+      "outcome": "PASS",
+      "failure_entries": 0
+    }
+  ]
+}

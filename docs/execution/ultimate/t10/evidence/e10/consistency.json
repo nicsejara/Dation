@@ -1,0 +1,34 @@
+[
+  {
+    "run_id": "9c7323b8-428d-4339-bd26-77e1e653caff",
+    "result_fingerprint": "cb6761054418ec0a5dce8a6ad0fecb1d2e521bee1d78eb5ee7028db789b44215",
+    "schema": "transport_plan_v1",
+    "surfaces": [
+      "result/dashboard reader",
+      "primary visual",
+      "details",
+      "CSV",
+      "full JSON",
+      "decision_context_v1",
+      "Copilot",
+      "approval review"
+    ],
+    "status": "PASS"
+  },
+  {
+    "run_id": "81621d2a-7086-4b01-ac9d-d66cb557cd27",
+    "result_fingerprint": "2ad5271ab0f8b467eb57d30b28ff6b328f8135430a67988c53ff9f7c1986201b",
+    "schema": "day_scheduling_v1",
+    "surfaces": [
+      "result/dashboard reader",
+      "primary visual",
+      "details",
+      "CSV",
+      "full JSON",
+      "decision_context_v1",
+      "Copilot",
+      "approval review"
+    ],
+    "status": "PASS"
+  }
+]

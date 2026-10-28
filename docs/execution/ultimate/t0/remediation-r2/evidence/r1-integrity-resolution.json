@@ -1,0 +1,427 @@
+{
+  "manifest_sha256": "4eb863475f1d166e43e53efd6405da3594a32218ece95c5624bd7ae81e4aa8c2",
+  "matched": 84,
+  "unresolved": [],
+  "resolved": [
+    {
+      "path": "docs/execution/ultimate/t0/baseline-test-ledger.json",
+      "resolved": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/docs/execution/ultimate/t0/baseline-test-ledger.json",
+      "sha256": "d5dd864ebf4904dd908006810072f9e549382522bb8cc6f2eaa691d624aa0ffe"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/command-ledger.json",
+      "resolved": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/docs/execution/ultimate/t0/command-ledger.json",
+      "sha256": "1c65a002dd1f68a55b00ab2b68f2ae932568b3b48382f9a1a8d953f42359730c"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/debt-register.json",
+      "resolved": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/docs/execution/ultimate/t0/debt-register.json",
+      "sha256": "286848670aad6367e597c80fa91e92cc6e8c0532cee81173b156ff39d24a5779"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/debt-register.md",
+      "resolved": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/docs/execution/ultimate/t0/debt-register.md",
+      "sha256": "5f116b87a0a50cee8161ffc3a064bf82a0f395149aa8f72b8fb37afe21a7ad03"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/A-D-workflow-context-focal.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/A-D-workflow-context-focal.log",
+      "sha256": "b1af7073da5f73849bcf8ce2498cfbdf86daa47b72fe9da170d8b115bb9c9d0e"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/A-D-workflow-context-related.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/A-D-workflow-context-related.log",
+      "sha256": "5fef559cd946619e36f84eb9ae2cd5d334c82bdf2d649597b1e1284a1c56400c"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/A-actions-rerun-focal.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/A-actions-rerun-focal.log",
+      "sha256": "a52d6979f7339eb253f3b34f53ce883f272966409c54d26128a5c41572ee14ea"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/A-actions-rerun-related.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/A-actions-rerun-related.log",
+      "sha256": "d3e243419455ed83787f3c49a1f05549316c9f8cab8510af687a0bd55971855f"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/A-entry-lineage-focal.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/A-entry-lineage-focal.log",
+      "sha256": "cf566866ac39e4f489bd6696aeb689d7f3280607826098cf049edc6d512eadf3"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/A-geometry-current-breakpoints.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/A-geometry-current-breakpoints.log",
+      "sha256": "1f37940e22b95db8f697a3a6ced7dec252dff4557e95f486f08ac1388cf5fe71"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/A-geometry-current-primary.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/A-geometry-current-primary.log",
+      "sha256": "9aa73fe725c03d0f032323a9816de3fa2190d38f22b0cf687ee3e822fa2a88a9"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/A-geometry-footer-parity.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/A-geometry-footer-parity.log",
+      "sha256": "0c69d4ba2d965621d8593a1c8f70ad7cf225d25359d6234c649d39e1a2b61e1e"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/A-home-context-hero-focal.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/A-home-context-hero-focal.log",
+      "sha256": "70a13f2aa305a57a2c75fc56daf85dbcd22098c7e5cb72b54c17b95137dc554a"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/A-home-context-hero-related.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/A-home-context-hero-related.log",
+      "sha256": "8519bfadea7f7fefe3aa53b8ebf5a361da35da35258f2e4b76fccd8facf81d4f"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/A-insight-final-focal.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/A-insight-final-focal.log",
+      "sha256": "7a6c0da16cfa01c9b5a23fd6ab34ad909b341e53dd7be25392fa1b12aa5f29c5"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/A-insight-focal.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/A-insight-focal.log",
+      "sha256": "c14b281eedc7c63b386ab223f324dd853b731799fd8181603552f8710e660eea"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/A-migration-current-gates.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/A-migration-current-gates.log",
+      "sha256": "a7e1edd06889e3fd3b08af5fd575bbc059792f5ad1bfbe53a7c40e672c4bb7e0"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/A-migration-focal.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/A-migration-focal.log",
+      "sha256": "05d14921c32a1639c0eda84bd6f995190bf81b841b6a321ac988b21b9473feda"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/A-preparation-and-B-cascade-related.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/A-preparation-and-B-cascade-related.log",
+      "sha256": "efb299737ec87aa90bb4ed98d62dbbb10242a9fa8e0d488882572e25649da030"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/A-preparation-focal.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/A-preparation-focal.log",
+      "sha256": "7fa43aafbcd156848b283f78d05efc43f3fac015318e2d0ee24eff333157969f"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/A-rerun-golden-real-stack.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/A-rerun-golden-real-stack.log",
+      "sha256": "55d705d94feb3c02837bad370dac817c0982d2a573ef3fcc82eee7ecfdde34fb"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/A-roles-foundation-accepted.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/A-roles-foundation-accepted.log",
+      "sha256": "c3c933982e5564395dc53fb18be261a676d61e3da91b09ae18cbad1023e99682"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/A-roles-foundation-final.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/A-roles-foundation-final.log",
+      "sha256": "f3ec66f76d51d52c0bb88250f4a86c59c6fbac17c67301442ded3164956b2bd6"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/A-roles-foundation.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/A-roles-foundation.log",
+      "sha256": "a157d7fd56024259457252d7d8d31b923303191171838c3e83cd07e1810f6044"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/A-roles-gates.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/A-roles-gates.log",
+      "sha256": "f1e5fbcc7b6089cdf5b60fa65cac349ebdc93fc6624e9f29cf0260db25d5bb7b"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/A-roles-single-owner-alias.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/A-roles-single-owner-alias.log",
+      "sha256": "497d6de2723b317159a4dced498d3e6132291da3b002c88146fdb8cda21159ae"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/A-roles-workflow-related.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/A-roles-workflow-related.log",
+      "sha256": "0b822457cba6499c621a4408204fd210362a5137e3a1f103dc8e2005a375b303"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/A-visual-terminology-focal.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/A-visual-terminology-focal.log",
+      "sha256": "6bd6ab330420070308d5109d6c45f9a6c17592d3761a9273ddcbd1b233ccf3a0"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/A-visual-terminology-related.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/A-visual-terminology-related.log",
+      "sha256": "482816c7bc6f7352b5dec2690d6948b699eede086722f8b2c5b31678a8729943"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/B-BROWSER.interruption.json",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/B-BROWSER.interruption.json",
+      "sha256": "e57af8cc411e314d45eeab727b49a1a12ea021c65c0aade55873e64cc9877c13"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/B-BROWSER.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/B-BROWSER.log",
+      "sha256": "b439c8150722d72267883764612fcdf80953a020d36bc48c2511a41ec8de52e4"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/B-BROWSER.result.json",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/B-BROWSER.result.json",
+      "sha256": "eaa8e151462f77bdbdb3595bc11aaf745c3016fa160c7cddbc153ac6481f3fbd"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/B-E2E.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/B-E2E.log",
+      "sha256": "64fe0d9ef7bf8e56ced6da70b5dc0187a7507491a24b2302a56dded0027e591d"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/B-E2E.result.json",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/B-E2E.result.json",
+      "sha256": "d9940429ab22fa8521972e7918789c5548c431b9cace48cb556449669d2f26f1"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/B-FOCUS.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/B-FOCUS.log",
+      "sha256": "04cb821c332ccf8a1550ad8c88f4067b0de48c62fea64fa06c550f4b5a67e12a"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/B-FOCUS.result.json",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/B-FOCUS.result.json",
+      "sha256": "c4b5ab13e081c7bfbd24146d992e678c6d560e4964d2e4a40ce17870bfad8760"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/B-NODE.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/B-NODE.log",
+      "sha256": "de1aa985323d4edd39bfb1f0e3feb517495f130ef54ad30accfa31a603c66dad"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/B-NODE.result.json",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/B-NODE.result.json",
+      "sha256": "f640b5b23ff5c3c8104511ce79787188116756c43c7742b8c120d8f69378642f"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/B-PY.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/B-PY.log",
+      "sha256": "3dfa9f997dbca6c3f22b1c04d40efe4bdbaf3405a935a03258545e740f504604"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/B-PY.result.json",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/B-PY.result.json",
+      "sha256": "65055aa6f849267f83538b971ac028bd926c892265ef8a3a9344b5d85e679600"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/B-contrast-focus-related.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/B-contrast-focus-related.log",
+      "sha256": "9c7f403b090356d8ab668d672f1c29d3e0747e006d8915cc6760dd34612b94f0"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/B-css-and-focus-focal.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/B-css-and-focus-focal.log",
+      "sha256": "986f58b41b2be20db6c653f70cb8d91a816366fe4ad269f1ad3da64c3cb71471"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/B-css-final-focal.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/B-css-final-focal.log",
+      "sha256": "fdb44407f685eb901515bf01f1966174f6193c2d1e95f5be5cffee0f1e87f0d1"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/B-css-focal.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/B-css-focal.log",
+      "sha256": "fd81322f5f79a0f1f3e8e5f5374775221cd85bf601de2d37397aa5792712d2a1"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/B-home-attention-proof.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/B-home-attention-proof.log",
+      "sha256": "00d71015d5413918b86073dd93362cf51a3696331cfe4e1ffd089f170e16de72"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/B-kpi-and-hero-parity-accepted.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/B-kpi-and-hero-parity-accepted.log",
+      "sha256": "840fcf1a9c4b3c46e269cd791bcce4019eba47eeabe1806e861e3bae2812babb"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/B-kpi-cascade-focal.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/B-kpi-cascade-focal.log",
+      "sha256": "013c1a558f27b1f100ba30805eade25d8feb25e80a9c4166c69e7f05196d3fda"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/B-kpi-cascade-related.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/B-kpi-cascade-related.log",
+      "sha256": "0a8a3fd906916cec0f7ebecc59744b5bfb5e4dcba027f8a6858bc830be87f5a0"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/C-network-ready-focal.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/C-network-ready-focal.log",
+      "sha256": "dab36214c9afd89ea5ebc7c9d7ee2ad9a37aceb6b0f5834ecd5a897e530d6aaf"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/browser-observed.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/browser-observed.log",
+      "sha256": "ad8ca5467c81efa1b00a0c70dbb42ce560c77f2dd18e50dc5c6c108ac29501ab"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/data-hub-and-context-focal.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/data-hub-and-context-focal.log",
+      "sha256": "557ec105aa4e04ed55555b04d128019633596669991a5a5e224eec1cc3943e55"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/dation-t0r-final-batch.py",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/dation-t0r-final-batch.py",
+      "sha256": "5e8d660195119457dce1f208fcad3957b42760e0005f8e7bfbaef23eefd19d37"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/dation-t0r-home-attention-proof.py",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/dation-t0r-home-attention-proof.py",
+      "sha256": "74483611abdf62a4bf892416eb51946c3dbca0af4ce69ecb5f855b7905ff230a"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/dation-t0r-run-suite.py",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/dation-t0r-run-suite.py",
+      "sha256": "4d88183950f08d9d2a91b6c807f4d77eca0e9c544815c845d76ec4c7aa0133fd"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/diagnostic-B-E2E-pre-final.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/diagnostic-B-E2E-pre-final.log",
+      "sha256": "b3ae1ab01cb9f555f0b36e74ee6a19c8233e0d2aeb850f5540be92fdc818eb9b"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/kpi-after.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/kpi-after.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/kpi-before.log",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/kpi-before.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/kpi-cascade/after-assignment-1024.png",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/kpi-cascade/after-assignment-1024.png",
+      "sha256": "b65f69c5b98560f6b90176713d7520ee774876378f6952ceeed200d602a9f8ec"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/kpi-cascade/after-assignment-1440.png",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/kpi-cascade/after-assignment-1440.png",
+      "sha256": "e404b415d7591dbf5525771f37e585aba9598ed32c3a4376e04c036eeea1044a"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/kpi-cascade/after-assignment-390.png",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/kpi-cascade/after-assignment-390.png",
+      "sha256": "3505c5a669a0853536250fe007a1b080e7f3b35d137932cb27983e251c56c86a"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/kpi-cascade/after-scheduling-1024.png",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/kpi-cascade/after-scheduling-1024.png",
+      "sha256": "f22eaca9880c0f77665700831db2616572ef1bbe6060066b547bdaca1a5e4fa6"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/kpi-cascade/after-scheduling-1440.png",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/kpi-cascade/after-scheduling-1440.png",
+      "sha256": "46d7cd94e4967a9bf8ab30a83ee433ad5c769fb92987df91b014c5863e8453bc"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/kpi-cascade/after-scheduling-390.png",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/kpi-cascade/after-scheduling-390.png",
+      "sha256": "6f1dec01cbbbfa0670ce82239441439193a98ab7ea8af004691505d6d83bafa4"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/kpi-cascade/after.json",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/kpi-cascade/after.json",
+      "sha256": "f31ec192e98b72d6b6b96479727f79fe7a912a42aadb2f8753aebef381af4ff3"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/kpi-cascade/before-assignment-1024.png",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/kpi-cascade/before-assignment-1024.png",
+      "sha256": "b65f69c5b98560f6b90176713d7520ee774876378f6952ceeed200d602a9f8ec"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/kpi-cascade/before-assignment-1440.png",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/kpi-cascade/before-assignment-1440.png",
+      "sha256": "e404b415d7591dbf5525771f37e585aba9598ed32c3a4376e04c036eeea1044a"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/kpi-cascade/before-assignment-390.png",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/kpi-cascade/before-assignment-390.png",
+      "sha256": "3505c5a669a0853536250fe007a1b080e7f3b35d137932cb27983e251c56c86a"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/kpi-cascade/before-scheduling-1024.png",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/kpi-cascade/before-scheduling-1024.png",
+      "sha256": "4f1f0700124ace4b87c810afe4d2b31b85098493b079e6a25e3f0ba6f1fcd3b9"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/kpi-cascade/before-scheduling-1440.png",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/kpi-cascade/before-scheduling-1440.png",
+      "sha256": "46d7cd94e4967a9bf8ab30a83ee433ad5c769fb92987df91b014c5863e8453bc"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/kpi-cascade/before-scheduling-390.png",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/kpi-cascade/before-scheduling-390.png",
+      "sha256": "6f1dec01cbbbfa0670ce82239441439193a98ab7ea8af004691505d6d83bafa4"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/kpi-cascade/before.json",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/kpi-cascade/before.json",
+      "sha256": "14063c0cc1462f547efa4205b8f18b7256dd14dac3bcd13174b409c3b8e3e55a"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/original-metadata/baseline-test-ledger.json",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/original-metadata/baseline-test-ledger.json",
+      "sha256": "25e7e64f8507edb61c1bca51f411fc1a9860e5dd4648e315d54a40ce625d9849"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/original-metadata/command-ledger.json",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/original-metadata/command-ledger.json",
+      "sha256": "ce6573c4527edf0d9daa76813b35821d536c1d2281d3013f95dc8826d22946c7"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/original-metadata/debt-register.json",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/original-metadata/debt-register.json",
+      "sha256": "03be6886e878f5dde3fd0cc39ab8e7cd21779fb4a98493de1a79d23cffae5c02"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/original-metadata/debt-register.md",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/original-metadata/debt-register.md",
+      "sha256": "3d72d27334de75ffc070fba1b0b9e0cc1038258e27297646077532018132fb26"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/original-metadata/sha256.json",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/original-metadata/sha256.json",
+      "sha256": "2ae7700c960bdb1fa0c98f9366ab85d8d53226e0367ff99fdf828342b33bd106"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/evidence/original-metadata/t0-execution-report.md",
+      "resolved": "docs/execution/ultimate/t0/remediation/evidence/original-metadata/t0-execution-report.md",
+      "sha256": "a9a3ea08c112e326b99d351f3f0054cd12820221c766f52dbbea0c5640e4f9f1"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/final-workspace.json",
+      "resolved": "docs/execution/ultimate/t0/remediation/final-workspace.json",
+      "sha256": "762d3bd76ec6ce197819d810b61e8178bf33c3b617c518371cbcd0f547a2a97e"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/initial-root-cause-classification.json",
+      "resolved": "docs/execution/ultimate/t0/remediation/initial-root-cause-classification.json",
+      "sha256": "7d18453ff8e888cc28c0fd2ab663a9f5a39ad623dbd28835180f2383b347bb3f"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/remediation-progress.json",
+      "resolved": "docs/execution/ultimate/t0/remediation/remediation-progress.json",
+      "sha256": "95bd01d27b47c118b86e72b01acee4e1117cc52d832e36363c98cc3f2b735779"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/root-cause-classification.json",
+      "resolved": "docs/execution/ultimate/t0/remediation/root-cause-classification.json",
+      "sha256": "ec5c4d12f884280873e27e97c7e83c9b60fb564b25723bfb29fa5dc205087966"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/root-cause-results.json",
+      "resolved": "docs/execution/ultimate/t0/remediation/root-cause-results.json",
+      "sha256": "a177a70206e379b659f8ef32f701e637807e9b39d6bf06e33c305e4000a45d7e"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/source-freeze.json",
+      "resolved": "docs/execution/ultimate/t0/remediation/source-freeze.json",
+      "sha256": "ebdff2855aa71a078db890e8cc259b83a3c27611dbc22d96b342502aec8a726c"
+    },
+    {
+      "path": "docs/execution/ultimate/t0/t0-remediation-report.md",
+      "resolved": "docs/execution/ultimate/t0/t0-remediation-report.md",
+      "sha256": "e1343ea34485bfb0724534d78ecfc11b55f8ce8cc2d0a724605076fb01ab5a20"
+    }
+  ]
+}

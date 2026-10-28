@@ -1,0 +1,8 @@
+{
+  "exact_openapi_equal_to_T0_and_T1": true,
+  "paths": 91,
+  "operations": 98,
+  "no_new_public_endpoints": true,
+  "no_startup_or_requests": true,
+  "baseline_sha256": "aaca1d29796a8260bf7ae467a3aead8afe5dac071776e7a3d0d0fbc481faa37f"
+}

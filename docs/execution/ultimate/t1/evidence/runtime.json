@@ -1,0 +1,9 @@
+{
+  "python": "Python 3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
+  "node": "v24.19.0",
+  "pydantic": "2.14.0",
+  "fastapi": "0.143.0",
+  "production_credentials_cleared": true,
+  "new_dependencies_installed": false,
+  "database_browser_docker_operations": false
+}

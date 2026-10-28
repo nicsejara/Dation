@@ -1,0 +1,301 @@
+{
+  "phase": "T3",
+  "baseline_pending_files": 392,
+  "checkpoint_copies_verified": 392,
+  "unchanged_current_files": 391,
+  "intentionally_extended_files": [
+    "backend/app/platform/home.py"
+  ],
+  "historical_T2_manifest_unchanged": true,
+  "historical_T2_entries_verified": 57,
+  "T2_resolution": [
+    {
+      "path": "backend/app/domain/decision_cases.py",
+      "matches_historical_hash": true,
+      "resolved_from": "backend/app/domain/decision_cases.py"
+    },
+    {
+      "path": "backend/app/platform/decision_center.py",
+      "matches_historical_hash": true,
+      "resolved_from": "backend/app/platform/decision_center.py"
+    },
+    {
+      "path": "backend/app/platform/home.py",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t3/evidence/post-t2/backend/app/platform/home.py"
+    },
+    {
+      "path": "backend/app/platform/repository.py",
+      "matches_historical_hash": true,
+      "resolved_from": "backend/app/platform/repository.py"
+    },
+    {
+      "path": "backend/app/services/decision_case_service.py",
+      "matches_historical_hash": true,
+      "resolved_from": "backend/app/services/decision_case_service.py"
+    },
+    {
+      "path": "backend/tests/integration/test_ultimate_schema.py",
+      "matches_historical_hash": true,
+      "resolved_from": "backend/tests/integration/test_ultimate_schema.py"
+    },
+    {
+      "path": "backend/tests/integration/ultimate_sql_support.py",
+      "matches_historical_hash": true,
+      "resolved_from": "backend/tests/integration/ultimate_sql_support.py"
+    },
+    {
+      "path": "backend/tests/test_ultimate_readers.py",
+      "matches_historical_hash": true,
+      "resolved_from": "backend/tests/test_ultimate_readers.py"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/command-ledger.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/command-ledger.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/B-NODE.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/B-NODE.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/B-NODE.result.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/B-NODE.result.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/B-PY.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/B-PY.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/B-PY.result.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/B-PY.result.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/B-SQL.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/B-SQL.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/B-SQL.result.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/B-SQL.result.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/FOCAL-API.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/FOCAL-API.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/FOCAL-API.result.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/FOCAL-API.result.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/FOCAL-EMPTY-API.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/FOCAL-EMPTY-API.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/FOCAL-EMPTY-API.result.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/FOCAL-EMPTY-API.result.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/S2.attempt1.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/S2.attempt1.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/S2.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/S2.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/S2.result.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/S2.result.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/T2-user-request.txt",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/T2-user-request.txt"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/api-preservation.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/api-preservation.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/catalog-diff.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/catalog-diff.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/dation-t2-close-evidence.py",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/dation-t2-close-evidence.py"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/dation-t2-consolidate.py",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/dation-t2-consolidate.py"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/dation-t2-empty-case-smoke.py",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/dation-t2-empty-case-smoke.py"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/dation-t2-qa.py",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/dation-t2-qa.py"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/first-install-catalog.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/first-install-catalog.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/initial-state.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/initial-state.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/post-t1-tracked.patch",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/post-t1-tracked.patch"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/postgres-skill.txt",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/postgres-skill.txt"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/preservation.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/preservation.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/qa-batch.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/qa-batch.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/readers.attempt1.log",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/readers.attempt1.log"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/rls-grants-diff.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/rls-grants-diff.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/runtime-skill.txt",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/runtime-skill.txt"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/runtime.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/runtime.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/sandbox-cleanup.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/sandbox-cleanup.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/scope-diff.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/scope-diff.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/skills-ledger.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/skills-ledger.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/source-freeze.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/source-freeze.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/sql/fk-constraint-matrix.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/sql/fk-constraint-matrix.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/sql/fresh-catalog.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/sql/fresh-catalog.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/sql/post-t1-catalog.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/sql/post-t1-catalog.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/sql/upgrade-catalog.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/sql/upgrade-catalog.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/sql/upgrade-preservation.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/sql/upgrade-preservation.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/supabase-docs.txt",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/supabase-docs.txt"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/supabase-skill.txt",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/supabase-skill.txt"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/evidence/t2-changes.patch",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/evidence/t2-changes.patch"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/final-workspace.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/final-workspace.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/skills-ledger.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/skills-ledger.json"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/t2-execution-report.md",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/t2-execution-report.md"
+    },
+    {
+      "path": "docs/execution/ultimate/t2/test-ledger.json",
+      "matches_historical_hash": true,
+      "resolved_from": "docs/execution/ultimate/t2/test-ledger.json"
+    },
+    {
+      "path": "supabase/migrations/20261026143813_ultimate_foundation.sql",
+      "matches_historical_hash": true,
+      "resolved_from": "supabase/migrations/20261026143813_ultimate_foundation.sql"
+    },
+    {
+      "path": "supabase/migrations/20261026144259_ultimate_result_artifacts.sql",
+      "matches_historical_hash": true,
+      "resolved_from": "supabase/migrations/20261026144259_ultimate_result_artifacts.sql"
+    }
+  ],
+  "old_reports_migrations_contracts_tests_preserved": true,
+  "candidate_verified": true,
+  "source_files": 24
+}

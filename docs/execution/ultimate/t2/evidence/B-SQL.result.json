@@ -1,0 +1,30 @@
+{
+  "suite": "B-SQL",
+  "status": "PASS",
+  "tests": 72,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "started_at": "2026-10-26T14:55:23.566675+00:00",
+  "finished_at": "2026-10-26T14:56:45.255054+00:00",
+  "seconds": 81.688,
+  "cwd": "/workspace/Dation/backend",
+  "command": [
+    "/workspace/Dation/.venv/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests/integration",
+    "-p",
+    "test_*.py",
+    "-v"
+  ],
+  "exit_code": 0,
+  "production_credentials_cleared": true,
+  "container": "dation-t2-20261026-ultimate",
+  "PYTHONPATH": null,
+  "log_path": "/workspace/work/dation-t2/B-SQL.log",
+  "log_sha256": "ee3c202d9475e2325a3f13f1a06cb778ab2499ba919fbebd2765ab1f0a93fa21"
+}

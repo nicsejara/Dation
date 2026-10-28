@@ -1,0 +1,1211 @@
+{
+  "project_ref": "gijiinufjjurgfeehufj",
+  "read_only": true,
+  "query": "SELECT jsonb_build_object('constraints',(SELECT jsonb_agg(jsonb_build_object('name',c.conname,'table',t.relname,'definition',pg_get_constraintdef(c.oid)) ORDER BY t.relname,c.conname) FROM pg_constraint c JOIN pg_class t ON t.oid=c.conrelid JOIN pg_namespace n ON n.oid=t.relnamespace WHERE n.nspname='public'),'triggers',(SELECT jsonb_agg(jsonb_build_object('schema',n.nspname,'table',c.relname,'name',t.tgname,'enabled',t.tgenabled,'definition',pg_get_triggerdef(t.oid)) ORDER BY n.nspname,c.relname,t.tgname) FROM pg_trigger t JOIN pg_class c ON c.oid=t.tgrelid JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname IN ('public','dation_private') AND NOT t.tgisinternal),'schema_acls',(SELECT jsonb_agg(jsonb_build_object('schema',nspname,'acl',nspacl::text) ORDER BY nspname) FROM pg_namespace WHERE nspname IN ('public','dation_private')),'default_acls',(SELECT jsonb_agg(jsonb_build_object('schema',n.nspname,'owner',pg_get_userbyid(d.defaclrole),'type',d.defaclobjtype,'acl',d.defaclacl::text) ORDER BY n.nspname,d.defaclobjtype) FROM pg_default_acl d LEFT JOIN pg_namespace n ON n.oid=d.defaclnamespace WHERE n.nspname IN ('public','dation_private')),'storage_buckets',(SELECT jsonb_agg(jsonb_build_object('id',id,'public',public,'file_size_limit',file_size_limit,'allowed_mime_types',allowed_mime_types) ORDER BY id) FROM storage.buckets),'storage_policies',(SELECT jsonb_agg(to_jsonb(p) ORDER BY tablename,policyname) FROM pg_policies p WHERE schemaname='storage'),'platform_release',(SELECT jsonb_agg(to_jsonb(r)) FROM dation_private.platform_release r)) AS metadata;",
+  "data": [
+    {
+      "metadata": {
+        "triggers": [
+          {
+            "name": "activity_enrich",
+            "table": "audit_events",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER activity_enrich BEFORE INSERT ON public.audit_events FOR EACH ROW EXECUTE FUNCTION dation_private.activity_enrich()"
+          },
+          {
+            "name": "audit_events_immutable",
+            "table": "audit_events",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER audit_events_immutable BEFORE DELETE OR UPDATE ON public.audit_events FOR EACH ROW EXECUTE FUNCTION reject_approval_event_mutation()"
+          },
+          {
+            "name": "activity_dataset",
+            "table": "datasets",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER activity_dataset AFTER INSERT OR DELETE OR UPDATE ON public.datasets FOR EACH ROW EXECUTE FUNCTION dation_private.activity_capture()"
+          },
+          {
+            "name": "data_hub_deletion_guard",
+            "table": "datasets",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER data_hub_deletion_guard BEFORE INSERT OR UPDATE ON public.datasets FOR EACH ROW EXECUTE FUNCTION dation_private.guard_dataset_deletion()"
+          },
+          {
+            "name": "dataset_storage_namespace",
+            "table": "datasets",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER dataset_storage_namespace BEFORE INSERT ON public.datasets FOR EACH ROW EXECUTE FUNCTION dation_private.validate_new_storage_namespace()"
+          },
+          {
+            "name": "datasets_persistence_identity",
+            "table": "datasets",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER datasets_persistence_identity BEFORE UPDATE ON public.datasets FOR EACH ROW EXECUTE FUNCTION protect_persistence_identity()"
+          },
+          {
+            "name": "datasets_workspace_immutable",
+            "table": "datasets",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER datasets_workspace_immutable BEFORE UPDATE ON public.datasets FOR EACH ROW EXECUTE FUNCTION dation_private.protect_workspace()"
+          },
+          {
+            "name": "approval_events_immutable",
+            "table": "decision_approval_events",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER approval_events_immutable BEFORE DELETE OR UPDATE ON public.decision_approval_events FOR EACH ROW EXECUTE FUNCTION reject_approval_event_mutation()"
+          },
+          {
+            "name": "data_hub_deletion_guard",
+            "table": "decision_approval_events",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER data_hub_deletion_guard BEFORE INSERT OR UPDATE ON public.decision_approval_events FOR EACH ROW EXECUTE FUNCTION dation_private.guard_dataset_deletion()"
+          },
+          {
+            "name": "decision_approval_events_workspace_immutable",
+            "table": "decision_approval_events",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER decision_approval_events_workspace_immutable BEFORE UPDATE ON public.decision_approval_events FOR EACH ROW EXECUTE FUNCTION dation_private.protect_workspace()"
+          },
+          {
+            "name": "data_hub_deletion_guard",
+            "table": "decision_case_reconciliations",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER data_hub_deletion_guard BEFORE INSERT OR UPDATE ON public.decision_case_reconciliations FOR EACH ROW EXECUTE FUNCTION dation_private.guard_dataset_deletion()"
+          },
+          {
+            "name": "decision_case_reconciliations_workspace_immutable",
+            "table": "decision_case_reconciliations",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER decision_case_reconciliations_workspace_immutable BEFORE UPDATE ON public.decision_case_reconciliations FOR EACH ROW EXECUTE FUNCTION dation_private.protect_workspace()"
+          },
+          {
+            "name": "activity_case",
+            "table": "decision_cases",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER activity_case AFTER INSERT OR UPDATE ON public.decision_cases FOR EACH ROW EXECUTE FUNCTION dation_private.activity_capture()"
+          },
+          {
+            "name": "case_attributes_applied",
+            "table": "decision_cases",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER case_attributes_applied BEFORE INSERT OR UPDATE OF label, category, description ON public.decision_cases FOR EACH ROW EXECUTE FUNCTION dation_private.apply_case_attributes()"
+          },
+          {
+            "name": "case_state_tenant_references",
+            "table": "decision_cases",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER case_state_tenant_references BEFORE INSERT OR UPDATE OF state_json ON public.decision_cases FOR EACH ROW EXECUTE FUNCTION dation_private.validate_case_state_tenancy()"
+          },
+          {
+            "name": "case_workflow_policy",
+            "table": "decision_cases",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER case_workflow_policy BEFORE INSERT OR UPDATE OF workflow_policy_version ON public.decision_cases FOR EACH ROW EXECUTE FUNCTION dation_private.protect_workflow_policy()"
+          },
+          {
+            "name": "cases_persistence_identity",
+            "table": "decision_cases",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER cases_persistence_identity BEFORE UPDATE ON public.decision_cases FOR EACH ROW EXECUTE FUNCTION protect_persistence_identity()"
+          },
+          {
+            "name": "center_provenance_guard",
+            "table": "decision_cases",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER center_provenance_guard BEFORE INSERT OR UPDATE ON public.decision_cases FOR EACH ROW EXECUTE FUNCTION dation_private.center_provenance()"
+          },
+          {
+            "name": "data_hub_deletion_guard",
+            "table": "decision_cases",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER data_hub_deletion_guard BEFORE INSERT OR UPDATE ON public.decision_cases FOR EACH ROW EXECUTE FUNCTION dation_private.guard_dataset_deletion()"
+          },
+          {
+            "name": "decision_cases_workspace_immutable",
+            "table": "decision_cases",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER decision_cases_workspace_immutable BEFORE UPDATE ON public.decision_cases FOR EACH ROW EXECUTE FUNCTION dation_private.protect_workspace()"
+          },
+          {
+            "name": "data_hub_deletion_guard",
+            "table": "decision_chat_turns",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER data_hub_deletion_guard BEFORE INSERT OR UPDATE ON public.decision_chat_turns FOR EACH ROW EXECUTE FUNCTION dation_private.guard_dataset_deletion()"
+          },
+          {
+            "name": "decision_chat_turns_workspace_immutable",
+            "table": "decision_chat_turns",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER decision_chat_turns_workspace_immutable BEFORE UPDATE ON public.decision_chat_turns FOR EACH ROW EXECUTE FUNCTION dation_private.protect_workspace()"
+          },
+          {
+            "name": "comparative_identity",
+            "table": "decision_comparative_analyses",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER comparative_identity BEFORE UPDATE ON public.decision_comparative_analyses FOR EACH ROW EXECUTE FUNCTION protect_comparative_analysis()"
+          },
+          {
+            "name": "data_hub_deletion_guard",
+            "table": "decision_comparative_analyses",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER data_hub_deletion_guard BEFORE INSERT OR UPDATE ON public.decision_comparative_analyses FOR EACH ROW EXECUTE FUNCTION dation_private.guard_dataset_deletion()"
+          },
+          {
+            "name": "decision_comparative_analyses_workspace_immutable",
+            "table": "decision_comparative_analyses",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER decision_comparative_analyses_workspace_immutable BEFORE UPDATE ON public.decision_comparative_analyses FOR EACH ROW EXECUTE FUNCTION dation_private.protect_workspace()"
+          },
+          {
+            "name": "data_hub_deletion_guard",
+            "table": "decision_explanations",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER data_hub_deletion_guard BEFORE INSERT OR UPDATE ON public.decision_explanations FOR EACH ROW EXECUTE FUNCTION dation_private.guard_dataset_deletion()"
+          },
+          {
+            "name": "decision_explanations_workspace_immutable",
+            "table": "decision_explanations",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER decision_explanations_workspace_immutable BEFORE UPDATE ON public.decision_explanations FOR EACH ROW EXECUTE FUNCTION dation_private.protect_workspace()"
+          },
+          {
+            "name": "data_hub_deletion_guard",
+            "table": "decision_interpretation_sources",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER data_hub_deletion_guard BEFORE INSERT OR UPDATE ON public.decision_interpretation_sources FOR EACH ROW EXECUTE FUNCTION dation_private.guard_dataset_deletion()"
+          },
+          {
+            "name": "decision_interpretation_sources_workspace_immutable",
+            "table": "decision_interpretation_sources",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER decision_interpretation_sources_workspace_immutable BEFORE UPDATE ON public.decision_interpretation_sources FOR EACH ROW EXECUTE FUNCTION dation_private.protect_workspace()"
+          },
+          {
+            "name": "interpretation_source_identity",
+            "table": "decision_interpretation_sources",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER interpretation_source_identity BEFORE INSERT ON public.decision_interpretation_sources FOR EACH ROW EXECUTE FUNCTION validate_interpretation_source()"
+          },
+          {
+            "name": "data_hub_deletion_guard",
+            "table": "decision_messages",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER data_hub_deletion_guard BEFORE INSERT OR UPDATE ON public.decision_messages FOR EACH ROW EXECUTE FUNCTION dation_private.guard_dataset_deletion()"
+          },
+          {
+            "name": "decision_messages_workspace_immutable",
+            "table": "decision_messages",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER decision_messages_workspace_immutable BEFORE UPDATE ON public.decision_messages FOR EACH ROW EXECUTE FUNCTION dation_private.protect_workspace()"
+          },
+          {
+            "name": "activity_run",
+            "table": "decision_runs",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER activity_run AFTER INSERT OR UPDATE ON public.decision_runs FOR EACH ROW EXECUTE FUNCTION dation_private.activity_capture()"
+          },
+          {
+            "name": "center_provenance_guard",
+            "table": "decision_runs",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER center_provenance_guard BEFORE INSERT OR UPDATE ON public.decision_runs FOR EACH ROW EXECUTE FUNCTION dation_private.center_provenance()"
+          },
+          {
+            "name": "data_hub_deletion_guard",
+            "table": "decision_runs",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER data_hub_deletion_guard BEFORE INSERT OR UPDATE ON public.decision_runs FOR EACH ROW EXECUTE FUNCTION dation_private.guard_dataset_deletion()"
+          },
+          {
+            "name": "decision_runs_current_admission",
+            "table": "decision_runs",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER decision_runs_current_admission BEFORE INSERT ON public.decision_runs FOR EACH ROW EXECUTE FUNCTION validate_current_run_admission()"
+          },
+          {
+            "name": "decision_runs_dispatch_contract",
+            "table": "decision_runs",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER decision_runs_dispatch_contract BEFORE INSERT OR UPDATE ON public.decision_runs FOR EACH ROW EXECUTE FUNCTION validate_dispatch_run()"
+          },
+          {
+            "name": "decision_runs_history_contract",
+            "table": "decision_runs",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER decision_runs_history_contract BEFORE INSERT OR UPDATE ON public.decision_runs FOR EACH ROW EXECUTE FUNCTION validate_decision_run_history()"
+          },
+          {
+            "name": "decision_runs_reconcile_insert",
+            "table": "decision_runs",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER decision_runs_reconcile_insert AFTER INSERT ON public.decision_runs FOR EACH ROW EXECUTE FUNCTION enqueue_case_reconciliation()"
+          },
+          {
+            "name": "decision_runs_reconcile_update",
+            "table": "decision_runs",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER decision_runs_reconcile_update AFTER UPDATE OF status, approved_at, superseded_at ON public.decision_runs FOR EACH ROW EXECUTE FUNCTION enqueue_case_reconciliation()"
+          },
+          {
+            "name": "decision_runs_reopen",
+            "table": "decision_runs",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER decision_runs_reopen AFTER INSERT ON public.decision_runs FOR EACH ROW EXECUTE FUNCTION dation_private.reopen_on_run_admission()"
+          },
+          {
+            "name": "decision_runs_workspace_immutable",
+            "table": "decision_runs",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER decision_runs_workspace_immutable BEFORE UPDATE ON public.decision_runs FOR EACH ROW EXECUTE FUNCTION dation_private.protect_workspace()"
+          },
+          {
+            "name": "runs_persistence_identity",
+            "table": "decision_runs",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER runs_persistence_identity BEFORE UPDATE ON public.decision_runs FOR EACH ROW EXECUTE FUNCTION protect_persistence_identity()"
+          },
+          {
+            "name": "data_hub_deletion_guard",
+            "table": "dispatch_run_jobs",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER data_hub_deletion_guard BEFORE INSERT OR UPDATE ON public.dispatch_run_jobs FOR EACH ROW EXECUTE FUNCTION dation_private.guard_dataset_deletion()"
+          },
+          {
+            "name": "dispatch_run_jobs_workspace_immutable",
+            "table": "dispatch_run_jobs",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER dispatch_run_jobs_workspace_immutable BEFORE UPDATE ON public.dispatch_run_jobs FOR EACH ROW EXECUTE FUNCTION dation_private.protect_workspace()"
+          },
+          {
+            "name": "member_responsibility_compat",
+            "table": "workspace_members",
+            "schema": "public",
+            "enabled": "O",
+            "definition": "CREATE TRIGGER member_responsibility_compat AFTER INSERT OR UPDATE OF business_role ON public.workspace_members FOR EACH ROW EXECUTE FUNCTION dation_private.member_responsibility_compat()"
+          }
+        ],
+        "constraints": [
+          {
+            "name": "audit_events_actor_user_id_fkey",
+            "table": "audit_events",
+            "definition": "FOREIGN KEY (actor_user_id) REFERENCES auth.users(id)"
+          },
+          {
+            "name": "audit_events_pkey",
+            "table": "audit_events",
+            "definition": "PRIMARY KEY (id)"
+          },
+          {
+            "name": "audit_events_workspace_id_fkey",
+            "table": "audit_events",
+            "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)"
+          },
+          {
+            "name": "datasets_column_count_nonnegative",
+            "table": "datasets",
+            "definition": "CHECK (((column_count IS NULL) OR (column_count >= 0)))"
+          },
+          {
+            "name": "datasets_dataset_type_check",
+            "table": "datasets",
+            "definition": "CHECK ((dataset_type = ANY (ARRAY['logistics_legacy'::text, 'orders'::text, 'fleet'::text])))"
+          },
+          {
+            "name": "datasets_parent_dataset_id_fkey",
+            "table": "datasets",
+            "definition": "FOREIGN KEY (parent_dataset_id) REFERENCES datasets(id)"
+          },
+          {
+            "name": "datasets_pkey",
+            "table": "datasets",
+            "definition": "PRIMARY KEY (id)"
+          },
+          {
+            "name": "datasets_row_count_nonnegative",
+            "table": "datasets",
+            "definition": "CHECK (((row_count IS NULL) OR (row_count >= 0)))"
+          },
+          {
+            "name": "datasets_sha256_format",
+            "table": "datasets",
+            "definition": "CHECK (((sha256 IS NULL) OR (sha256 ~ '^[0-9a-f]{64}$'::text)))"
+          },
+          {
+            "name": "datasets_size_bytes_nonnegative",
+            "table": "datasets",
+            "definition": "CHECK (((size_bytes IS NULL) OR (size_bytes >= 0)))"
+          },
+          {
+            "name": "datasets_status_valid",
+            "table": "datasets",
+            "definition": "CHECK ((status = ANY (ARRAY['uploaded'::text, 'processing'::text, 'processed'::text, 'error'::text])))"
+          },
+          {
+            "name": "datasets_storage_path_key",
+            "table": "datasets",
+            "definition": "UNIQUE (storage_path)"
+          },
+          {
+            "name": "datasets_uploaded_by_user_id_fkey",
+            "table": "datasets",
+            "definition": "FOREIGN KEY (uploaded_by_user_id) REFERENCES auth.users(id)"
+          },
+          {
+            "name": "datasets_workspace_id_fkey",
+            "table": "datasets",
+            "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)"
+          },
+          {
+            "name": "tenant_datasets_parent_dataset_id",
+            "table": "datasets",
+            "definition": "FOREIGN KEY (workspace_id, parent_dataset_id) REFERENCES datasets(workspace_id, id)"
+          },
+          {
+            "name": "authenticated_event_actor",
+            "table": "decision_approval_events",
+            "definition": "CHECK ((((actor = 'shared_workspace:dation'::text) AND (actor_user_id IS NULL)) OR ((actor_user_id IS NOT NULL) AND (actor = ('user:'::text || (actor_user_id)::text)))))"
+          },
+          {
+            "name": "decision_approval_events_action_check",
+            "table": "decision_approval_events",
+            "definition": "CHECK ((action = ANY (ARRAY['approved'::text, 'superseded'::text])))"
+          },
+          {
+            "name": "decision_approval_events_actor_check",
+            "table": "decision_approval_events",
+            "definition": "CHECK (((actor = 'shared_workspace:dation'::text) OR (actor ~ '^user:[0-9a-f-]{36}$'::text)))"
+          },
+          {
+            "name": "decision_approval_events_actor_user_id_fkey",
+            "table": "decision_approval_events",
+            "definition": "FOREIGN KEY (actor_user_id) REFERENCES auth.users(id)"
+          },
+          {
+            "name": "decision_approval_events_case_id_fkey",
+            "table": "decision_approval_events",
+            "definition": "FOREIGN KEY (case_id) REFERENCES decision_cases(id) ON DELETE RESTRICT"
+          },
+          {
+            "name": "decision_approval_events_pkey",
+            "table": "decision_approval_events",
+            "definition": "PRIMARY KEY (id)"
+          },
+          {
+            "name": "decision_approval_events_replacement_run_id_fkey",
+            "table": "decision_approval_events",
+            "definition": "FOREIGN KEY (replacement_run_id) REFERENCES decision_runs(id) ON DELETE RESTRICT"
+          },
+          {
+            "name": "decision_approval_events_run_id_action_key",
+            "table": "decision_approval_events",
+            "definition": "UNIQUE (run_id, action)"
+          },
+          {
+            "name": "decision_approval_events_run_id_fkey",
+            "table": "decision_approval_events",
+            "definition": "FOREIGN KEY (run_id) REFERENCES decision_runs(id) ON DELETE RESTRICT"
+          },
+          {
+            "name": "decision_approval_events_workspace_id_fkey",
+            "table": "decision_approval_events",
+            "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)"
+          },
+          {
+            "name": "tenant_decision_approval_events_case_id",
+            "table": "decision_approval_events",
+            "definition": "FOREIGN KEY (workspace_id, case_id) REFERENCES decision_cases(workspace_id, id)"
+          },
+          {
+            "name": "tenant_decision_approval_events_replacement_run_id",
+            "table": "decision_approval_events",
+            "definition": "FOREIGN KEY (workspace_id, replacement_run_id) REFERENCES decision_runs(workspace_id, id)"
+          },
+          {
+            "name": "tenant_decision_approval_events_run_id",
+            "table": "decision_approval_events",
+            "definition": "FOREIGN KEY (workspace_id, run_id) REFERENCES decision_runs(workspace_id, id)"
+          },
+          {
+            "name": "decision_assignments_node_id_check",
+            "table": "decision_assignments",
+            "definition": "CHECK ((node_id = ANY (ARRAY['logistics_assignment'::text, 'logistics_scheduling'::text, 'logistics_final_assignment'::text])))"
+          },
+          {
+            "name": "decision_assignments_pkey",
+            "table": "decision_assignments",
+            "definition": "PRIMARY KEY (decision_case_id, node_id)"
+          },
+          {
+            "name": "decision_assignments_workspace_id_approver_user_id_fkey",
+            "table": "decision_assignments",
+            "definition": "FOREIGN KEY (workspace_id, approver_user_id) REFERENCES workspace_members(workspace_id, user_id)"
+          },
+          {
+            "name": "decision_assignments_workspace_id_decision_case_id_fkey",
+            "table": "decision_assignments",
+            "definition": "FOREIGN KEY (workspace_id, decision_case_id) REFERENCES decision_cases(workspace_id, id)"
+          },
+          {
+            "name": "decision_assignments_workspace_id_fkey",
+            "table": "decision_assignments",
+            "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)"
+          },
+          {
+            "name": "decision_assignments_workspace_id_owner_user_id_fkey",
+            "table": "decision_assignments",
+            "definition": "FOREIGN KEY (workspace_id, owner_user_id) REFERENCES workspace_members(workspace_id, user_id)"
+          },
+          {
+            "name": "decision_case_reconciliations_case_id_fkey",
+            "table": "decision_case_reconciliations",
+            "definition": "FOREIGN KEY (case_id) REFERENCES decision_cases(id) ON DELETE CASCADE"
+          },
+          {
+            "name": "decision_case_reconciliations_pkey",
+            "table": "decision_case_reconciliations",
+            "definition": "PRIMARY KEY (case_id)"
+          },
+          {
+            "name": "decision_case_reconciliations_workspace_id_fkey",
+            "table": "decision_case_reconciliations",
+            "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)"
+          },
+          {
+            "name": "tenant_decision_case_reconciliations_case_id",
+            "table": "decision_case_reconciliations",
+            "definition": "FOREIGN KEY (workspace_id, case_id) REFERENCES decision_cases(workspace_id, id)"
+          },
+          {
+            "name": "decision_cases_category_check",
+            "table": "decision_cases",
+            "definition": "CHECK ((category = ANY (ARRAY['weekly'::text, 'monthly'::text, 'extraordinary'::text, 'simulation'::text, 'live_operation'::text])))"
+          },
+          {
+            "name": "decision_cases_created_by_user_id_fkey",
+            "table": "decision_cases",
+            "definition": "FOREIGN KEY (created_by_user_id) REFERENCES auth.users(id)"
+          },
+          {
+            "name": "decision_cases_description_check",
+            "table": "decision_cases",
+            "definition": "CHECK (((description IS NULL) OR ((length(description) >= 1) AND (length(description) <= 1000))))"
+          },
+          {
+            "name": "decision_cases_distinct_inputs_check",
+            "table": "decision_cases",
+            "definition": "CHECK ((orders_dataset_id <> fleet_dataset_id))"
+          },
+          {
+            "name": "decision_cases_domain_check",
+            "table": "decision_cases",
+            "definition": "CHECK ((domain = 'logistics'::text))"
+          },
+          {
+            "name": "decision_cases_fleet_dataset_id_fkey",
+            "table": "decision_cases",
+            "definition": "FOREIGN KEY (fleet_dataset_id) REFERENCES datasets(id) ON DELETE RESTRICT"
+          },
+          {
+            "name": "decision_cases_label_check",
+            "table": "decision_cases",
+            "definition": "CHECK (((label IS NULL) OR (((length(label) >= 1) AND (length(label) <= 120)) AND (label = TRIM(BOTH FROM label)))))"
+          },
+          {
+            "name": "decision_cases_orders_dataset_id_fkey",
+            "table": "decision_cases",
+            "definition": "FOREIGN KEY (orders_dataset_id) REFERENCES datasets(id) ON DELETE RESTRICT"
+          },
+          {
+            "name": "decision_cases_pkey",
+            "table": "decision_cases",
+            "definition": "PRIMARY KEY (id)"
+          },
+          {
+            "name": "decision_cases_status_check",
+            "table": "decision_cases",
+            "definition": "CHECK ((status = ANY (ARRAY['active'::text, 'completed'::text, 'archived'::text])))"
+          },
+          {
+            "name": "decision_cases_workflow_policy_version_check",
+            "table": "decision_cases",
+            "definition": "CHECK ((workflow_policy_version = ANY (ARRAY[0, 1])))"
+          },
+          {
+            "name": "decision_cases_workspace_id_fkey",
+            "table": "decision_cases",
+            "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)"
+          },
+          {
+            "name": "tenant_decision_cases_fleet_dataset_id",
+            "table": "decision_cases",
+            "definition": "FOREIGN KEY (workspace_id, fleet_dataset_id) REFERENCES datasets(workspace_id, id)"
+          },
+          {
+            "name": "tenant_decision_cases_orders_dataset_id",
+            "table": "decision_cases",
+            "definition": "FOREIGN KEY (workspace_id, orders_dataset_id) REFERENCES datasets(workspace_id, id)"
+          },
+          {
+            "name": "decision_chat_turns_knowledge_version_check",
+            "table": "decision_chat_turns",
+            "definition": "CHECK (((length(knowledge_version) >= 1) AND (length(knowledge_version) <= 150)))"
+          },
+          {
+            "name": "decision_chat_turns_model_check",
+            "table": "decision_chat_turns",
+            "definition": "CHECK (((length(model) >= 1) AND (length(model) <= 150)))"
+          },
+          {
+            "name": "decision_chat_turns_pkey",
+            "table": "decision_chat_turns",
+            "definition": "PRIMARY KEY (turn_id)"
+          },
+          {
+            "name": "decision_chat_turns_prompt_version_check",
+            "table": "decision_chat_turns",
+            "definition": "CHECK (((length(prompt_version) >= 1) AND (length(prompt_version) <= 150)))"
+          },
+          {
+            "name": "decision_chat_turns_provider_check",
+            "table": "decision_chat_turns",
+            "definition": "CHECK (((length(provider) >= 1) AND (length(provider) <= 100)))"
+          },
+          {
+            "name": "decision_chat_turns_question_hash_check",
+            "table": "decision_chat_turns",
+            "definition": "CHECK ((question_hash ~ '^[0-9a-f]{64}$'::text))"
+          },
+          {
+            "name": "decision_chat_turns_run_id_fkey",
+            "table": "decision_chat_turns",
+            "definition": "FOREIGN KEY (run_id) REFERENCES decision_runs(id) ON DELETE CASCADE"
+          },
+          {
+            "name": "decision_chat_turns_usage_json_check",
+            "table": "decision_chat_turns",
+            "definition": "CHECK ((jsonb_typeof(usage_json) = 'object'::text))"
+          },
+          {
+            "name": "decision_chat_turns_workspace_id_fkey",
+            "table": "decision_chat_turns",
+            "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)"
+          },
+          {
+            "name": "tenant_decision_chat_turns_run_id",
+            "table": "decision_chat_turns",
+            "definition": "FOREIGN KEY (workspace_id, run_id) REFERENCES decision_runs(workspace_id, id)"
+          },
+          {
+            "name": "decision_comparative_analyses_base_run_id_fkey",
+            "table": "decision_comparative_analyses",
+            "definition": "FOREIGN KEY (base_run_id) REFERENCES decision_runs(id) ON DELETE RESTRICT"
+          },
+          {
+            "name": "decision_comparative_analyses_base_run_id_id_key",
+            "table": "decision_comparative_analyses",
+            "definition": "UNIQUE (base_run_id, id)"
+          },
+          {
+            "name": "decision_comparative_analyses_base_run_id_key",
+            "table": "decision_comparative_analyses",
+            "definition": "UNIQUE (base_run_id)"
+          },
+          {
+            "name": "decision_comparative_analyses_check",
+            "table": "decision_comparative_analyses",
+            "definition": "CHECK ((((status = 'running'::text) AND (lease_token IS NOT NULL) AND (lease_expires_at IS NOT NULL)) OR ((status <> 'running'::text) AND (lease_token IS NULL) AND (lease_expires_at IS NULL))))"
+          },
+          {
+            "name": "decision_comparative_analyses_check1",
+            "table": "decision_comparative_analyses",
+            "definition": "CHECK (((status <> 'completed'::text) OR ((jsonb_typeof(result_json) = 'object'::text) AND (result_fingerprint IS NOT NULL))))"
+          },
+          {
+            "name": "decision_comparative_analyses_max_attempts_check",
+            "table": "decision_comparative_analyses",
+            "definition": "CHECK (((max_attempts >= 1) AND (max_attempts <= 5)))"
+          },
+          {
+            "name": "decision_comparative_analyses_pkey",
+            "table": "decision_comparative_analyses",
+            "definition": "PRIMARY KEY (id)"
+          },
+          {
+            "name": "decision_comparative_analyses_source_mode_check",
+            "table": "decision_comparative_analyses",
+            "definition": "CHECK ((source_mode = ANY (ARRAY['existing'::text, 'computed'::text])))"
+          },
+          {
+            "name": "decision_comparative_analyses_status_check",
+            "table": "decision_comparative_analyses",
+            "definition": "CHECK ((status = ANY (ARRAY['queued'::text, 'running'::text, 'completed'::text, 'error'::text])))"
+          },
+          {
+            "name": "decision_comparative_analyses_workspace_id_fkey",
+            "table": "decision_comparative_analyses",
+            "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)"
+          },
+          {
+            "name": "tenant_decision_comparative_analyses_base_run_id",
+            "table": "decision_comparative_analyses",
+            "definition": "FOREIGN KEY (workspace_id, base_run_id) REFERENCES decision_runs(workspace_id, id)"
+          },
+          {
+            "name": "decision_explanations_pkey",
+            "table": "decision_explanations",
+            "definition": "PRIMARY KEY (id)"
+          },
+          {
+            "name": "decision_explanations_run_id_fkey",
+            "table": "decision_explanations",
+            "definition": "FOREIGN KEY (run_id) REFERENCES decision_runs(id) ON UPDATE RESTRICT ON DELETE CASCADE"
+          },
+          {
+            "name": "decision_explanations_workspace_id_fkey",
+            "table": "decision_explanations",
+            "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)"
+          },
+          {
+            "name": "tenant_decision_explanations_run_id",
+            "table": "decision_explanations",
+            "definition": "FOREIGN KEY (workspace_id, run_id) REFERENCES decision_runs(workspace_id, id)"
+          },
+          {
+            "name": "decision_interpretation_sources_chat_turn_id_fkey",
+            "table": "decision_interpretation_sources",
+            "definition": "FOREIGN KEY (chat_turn_id) REFERENCES decision_chat_turns(turn_id) ON DELETE RESTRICT"
+          },
+          {
+            "name": "decision_interpretation_sources_chat_turn_id_key",
+            "table": "decision_interpretation_sources",
+            "definition": "UNIQUE (chat_turn_id)"
+          },
+          {
+            "name": "decision_interpretation_sources_check",
+            "table": "decision_interpretation_sources",
+            "definition": "CHECK (((((explanation_id IS NOT NULL))::integer + ((chat_turn_id IS NOT NULL))::integer) = 1))"
+          },
+          {
+            "name": "decision_interpretation_sources_explanation_id_fkey",
+            "table": "decision_interpretation_sources",
+            "definition": "FOREIGN KEY (explanation_id) REFERENCES decision_explanations(id) ON DELETE RESTRICT"
+          },
+          {
+            "name": "decision_interpretation_sources_explanation_id_key",
+            "table": "decision_interpretation_sources",
+            "definition": "UNIQUE (explanation_id)"
+          },
+          {
+            "name": "decision_interpretation_sources_pkey",
+            "table": "decision_interpretation_sources",
+            "definition": "PRIMARY KEY (id)"
+          },
+          {
+            "name": "decision_interpretation_sources_run_id_analysis_id_fkey",
+            "table": "decision_interpretation_sources",
+            "definition": "FOREIGN KEY (run_id, analysis_id) REFERENCES decision_comparative_analyses(base_run_id, id) ON DELETE RESTRICT"
+          },
+          {
+            "name": "decision_interpretation_sources_run_id_fkey",
+            "table": "decision_interpretation_sources",
+            "definition": "FOREIGN KEY (run_id) REFERENCES decision_runs(id) ON DELETE RESTRICT"
+          },
+          {
+            "name": "decision_interpretation_sources_workspace_id_fkey",
+            "table": "decision_interpretation_sources",
+            "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)"
+          },
+          {
+            "name": "tenant_decision_interpretation_sources_analysis_id",
+            "table": "decision_interpretation_sources",
+            "definition": "FOREIGN KEY (workspace_id, analysis_id) REFERENCES decision_comparative_analyses(workspace_id, id)"
+          },
+          {
+            "name": "tenant_decision_interpretation_sources_chat_turn_id",
+            "table": "decision_interpretation_sources",
+            "definition": "FOREIGN KEY (workspace_id, chat_turn_id) REFERENCES decision_chat_turns(workspace_id, turn_id)"
+          },
+          {
+            "name": "tenant_decision_interpretation_sources_explanation_id",
+            "table": "decision_interpretation_sources",
+            "definition": "FOREIGN KEY (workspace_id, explanation_id) REFERENCES decision_explanations(workspace_id, id)"
+          },
+          {
+            "name": "tenant_decision_interpretation_sources_run_id",
+            "table": "decision_interpretation_sources",
+            "definition": "FOREIGN KEY (workspace_id, run_id) REFERENCES decision_runs(workspace_id, id)"
+          },
+          {
+            "name": "decision_messages_pkey",
+            "table": "decision_messages",
+            "definition": "PRIMARY KEY (id)"
+          },
+          {
+            "name": "decision_messages_role_check",
+            "table": "decision_messages",
+            "definition": "CHECK ((role = ANY (ARRAY['user'::text, 'assistant'::text])))"
+          },
+          {
+            "name": "decision_messages_run_id_fkey",
+            "table": "decision_messages",
+            "definition": "FOREIGN KEY (run_id) REFERENCES decision_runs(id) ON UPDATE RESTRICT ON DELETE CASCADE"
+          },
+          {
+            "name": "decision_messages_turn_id_fkey",
+            "table": "decision_messages",
+            "definition": "FOREIGN KEY (turn_id) REFERENCES decision_chat_turns(turn_id) ON DELETE CASCADE"
+          },
+          {
+            "name": "decision_messages_workspace_id_fkey",
+            "table": "decision_messages",
+            "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)"
+          },
+          {
+            "name": "tenant_decision_messages_run_id",
+            "table": "decision_messages",
+            "definition": "FOREIGN KEY (workspace_id, run_id) REFERENCES decision_runs(workspace_id, id)"
+          },
+          {
+            "name": "tenant_decision_messages_turn_id",
+            "table": "decision_messages",
+            "definition": "FOREIGN KEY (workspace_id, turn_id) REFERENCES decision_chat_turns(workspace_id, turn_id)"
+          },
+          {
+            "name": "authenticated_approval_actor",
+            "table": "decision_runs",
+            "definition": "CHECK ((((approved_by IS NULL) AND (approved_by_user_id IS NULL)) OR ((approved_by = 'shared_workspace:dation'::text) AND (approved_by_user_id IS NULL)) OR ((approved_by_user_id IS NOT NULL) AND (approved_by = ('user:'::text || (approved_by_user_id)::text)))))"
+          },
+          {
+            "name": "decision_runs_approved_by_check",
+            "table": "decision_runs",
+            "definition": "CHECK (((approved_by IS NULL) OR ((approved_at IS NOT NULL) AND ((approved_by = 'shared_workspace:dation'::text) OR (approved_by ~ '^user:[0-9a-f-]{36}$'::text)))))"
+          },
+          {
+            "name": "decision_runs_approved_by_user_id_fkey",
+            "table": "decision_runs",
+            "definition": "FOREIGN KEY (approved_by_user_id) REFERENCES auth.users(id)"
+          },
+          {
+            "name": "decision_runs_case_node_pair_check",
+            "table": "decision_runs",
+            "definition": "CHECK ((((decision_case_id IS NULL) AND (node_id IS NULL)) OR ((decision_case_id IS NOT NULL) AND (node_id IS NOT NULL))))"
+          },
+          {
+            "name": "decision_runs_completed_has_result",
+            "table": "decision_runs",
+            "definition": "CHECK (((status <> 'completed'::text) OR (result_json IS NOT NULL)))"
+          },
+          {
+            "name": "decision_runs_created_by_user_id_fkey",
+            "table": "decision_runs",
+            "definition": "FOREIGN KEY (created_by_user_id) REFERENCES auth.users(id)"
+          },
+          {
+            "name": "decision_runs_dataset_id_fkey",
+            "table": "decision_runs",
+            "definition": "FOREIGN KEY (dataset_id) REFERENCES datasets(id) ON UPDATE RESTRICT ON DELETE RESTRICT"
+          },
+          {
+            "name": "decision_runs_decision_case_id_fkey",
+            "table": "decision_runs",
+            "definition": "FOREIGN KEY (decision_case_id) REFERENCES decision_cases(id) ON DELETE RESTRICT"
+          },
+          {
+            "name": "decision_runs_duration_nonnegative",
+            "table": "decision_runs",
+            "definition": "CHECK (((duration_ms IS NULL) OR (duration_ms >= 0)))"
+          },
+          {
+            "name": "decision_runs_error_has_message",
+            "table": "decision_runs",
+            "definition": "CHECK (((status <> 'error'::text) OR (error_message IS NOT NULL)))"
+          },
+          {
+            "name": "decision_runs_fleet_dataset_id_fkey",
+            "table": "decision_runs",
+            "definition": "FOREIGN KEY (fleet_dataset_id) REFERENCES datasets(id)"
+          },
+          {
+            "name": "decision_runs_node_id_check",
+            "table": "decision_runs",
+            "definition": "CHECK (((node_id IS NULL) OR (node_id = ANY (ARRAY['logistics_assignment'::text, 'logistics_scheduling'::text, 'logistics_final_assignment'::text]))))"
+          },
+          {
+            "name": "decision_runs_orders_dataset_id_fkey",
+            "table": "decision_runs",
+            "definition": "FOREIGN KEY (orders_dataset_id) REFERENCES datasets(id)"
+          },
+          {
+            "name": "decision_runs_pkey",
+            "table": "decision_runs",
+            "definition": "PRIMARY KEY (id)"
+          },
+          {
+            "name": "decision_runs_status_valid",
+            "table": "decision_runs",
+            "definition": "CHECK ((status = ANY (ARRAY['queued'::text, 'running'::text, 'completed'::text, 'error'::text])))"
+          },
+          {
+            "name": "decision_runs_superseded_by_run_id_fkey",
+            "table": "decision_runs",
+            "definition": "FOREIGN KEY (superseded_by_run_id) REFERENCES decision_runs(id) ON DELETE SET NULL"
+          },
+          {
+            "name": "decision_runs_superseded_requires_approval_check",
+            "table": "decision_runs",
+            "definition": "CHECK (((superseded_at IS NULL) OR (approved_at IS NOT NULL) OR (superseded_by_run_id IS NOT NULL)))"
+          },
+          {
+            "name": "decision_runs_upstream_run_id_fkey",
+            "table": "decision_runs",
+            "definition": "FOREIGN KEY (upstream_run_id) REFERENCES decision_runs(id) ON DELETE RESTRICT"
+          },
+          {
+            "name": "decision_runs_workspace_id_fkey",
+            "table": "decision_runs",
+            "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)"
+          },
+          {
+            "name": "tenant_decision_runs_dataset_id",
+            "table": "decision_runs",
+            "definition": "FOREIGN KEY (workspace_id, dataset_id) REFERENCES datasets(workspace_id, id)"
+          },
+          {
+            "name": "tenant_decision_runs_decision_case_id",
+            "table": "decision_runs",
+            "definition": "FOREIGN KEY (workspace_id, decision_case_id) REFERENCES decision_cases(workspace_id, id)"
+          },
+          {
+            "name": "tenant_decision_runs_fleet_dataset_id",
+            "table": "decision_runs",
+            "definition": "FOREIGN KEY (workspace_id, fleet_dataset_id) REFERENCES datasets(workspace_id, id)"
+          },
+          {
+            "name": "tenant_decision_runs_orders_dataset_id",
+            "table": "decision_runs",
+            "definition": "FOREIGN KEY (workspace_id, orders_dataset_id) REFERENCES datasets(workspace_id, id)"
+          },
+          {
+            "name": "tenant_decision_runs_superseded_by_run_id",
+            "table": "decision_runs",
+            "definition": "FOREIGN KEY (workspace_id, superseded_by_run_id) REFERENCES decision_runs(workspace_id, id)"
+          },
+          {
+            "name": "tenant_decision_runs_upstream_run_id",
+            "table": "decision_runs",
+            "definition": "FOREIGN KEY (workspace_id, upstream_run_id) REFERENCES decision_runs(workspace_id, id)"
+          },
+          {
+            "name": "dispatch_job_lease_pair",
+            "table": "dispatch_run_jobs",
+            "definition": "CHECK ((((state = 'running'::text) AND (lease_token IS NOT NULL) AND (lease_expires_at IS NOT NULL)) OR ((state <> 'running'::text) AND (lease_token IS NULL) AND (lease_expires_at IS NULL))))"
+          },
+          {
+            "name": "dispatch_run_jobs_max_attempts_check",
+            "table": "dispatch_run_jobs",
+            "definition": "CHECK (((max_attempts >= 1) AND (max_attempts <= 5)))"
+          },
+          {
+            "name": "dispatch_run_jobs_pkey",
+            "table": "dispatch_run_jobs",
+            "definition": "PRIMARY KEY (run_id)"
+          },
+          {
+            "name": "dispatch_run_jobs_run_id_fkey",
+            "table": "dispatch_run_jobs",
+            "definition": "FOREIGN KEY (run_id) REFERENCES decision_runs(id) ON DELETE RESTRICT"
+          },
+          {
+            "name": "dispatch_run_jobs_state_check",
+            "table": "dispatch_run_jobs",
+            "definition": "CHECK ((state = ANY (ARRAY['queued'::text, 'running'::text, 'completed'::text, 'error'::text])))"
+          },
+          {
+            "name": "dispatch_run_jobs_workspace_id_fkey",
+            "table": "dispatch_run_jobs",
+            "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)"
+          },
+          {
+            "name": "tenant_dispatch_run_jobs_run_id",
+            "table": "dispatch_run_jobs",
+            "definition": "FOREIGN KEY (workspace_id, run_id) REFERENCES decision_runs(workspace_id, id)"
+          },
+          {
+            "name": "dispatch_worker_instances_pkey",
+            "table": "dispatch_worker_instances",
+            "definition": "PRIMARY KEY (worker_id)"
+          },
+          {
+            "name": "dispatch_worker_instances_revision_check",
+            "table": "dispatch_worker_instances",
+            "definition": "CHECK ((revision ~ '^[a-zA-Z0-9-]{1,100}$'::text))"
+          },
+          {
+            "name": "profiles_active_workspace_id_fkey",
+            "table": "profiles",
+            "definition": "FOREIGN KEY (active_workspace_id) REFERENCES workspaces(id)"
+          },
+          {
+            "name": "profiles_first_name_check",
+            "table": "profiles",
+            "definition": "CHECK ((length(first_name) <= 100))"
+          },
+          {
+            "name": "profiles_id_fkey",
+            "table": "profiles",
+            "definition": "FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE"
+          },
+          {
+            "name": "profiles_last_name_check",
+            "table": "profiles",
+            "definition": "CHECK ((length(last_name) <= 100))"
+          },
+          {
+            "name": "profiles_pkey",
+            "table": "profiles",
+            "definition": "PRIMARY KEY (id)"
+          },
+          {
+            "name": "workspace_ddas_dda_id_check",
+            "table": "workspace_ddas",
+            "definition": "CHECK ((dda_id = ANY (ARRAY['logistics'::text, 'production'::text, 'inventory'::text, 'demand'::text, 'purchasing'::text, 'maintenance'::text, 'pricing'::text])))"
+          },
+          {
+            "name": "workspace_ddas_pkey",
+            "table": "workspace_ddas",
+            "definition": "PRIMARY KEY (workspace_id, dda_id)"
+          },
+          {
+            "name": "workspace_ddas_status_check",
+            "table": "workspace_ddas",
+            "definition": "CHECK ((status = ANY (ARRAY['enabled'::text, 'disabled'::text, 'coming_soon'::text])))"
+          },
+          {
+            "name": "workspace_ddas_workspace_id_fkey",
+            "table": "workspace_ddas",
+            "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)"
+          },
+          {
+            "name": "workspace_invitations_accepted_by_fkey",
+            "table": "workspace_invitations",
+            "definition": "FOREIGN KEY (accepted_by) REFERENCES auth.users(id)"
+          },
+          {
+            "name": "workspace_invitations_access_role_check",
+            "table": "workspace_invitations",
+            "definition": "CHECK ((access_role = ANY (ARRAY['admin'::text, 'operator'::text, 'viewer'::text])))"
+          },
+          {
+            "name": "workspace_invitations_business_role_check",
+            "table": "workspace_invitations",
+            "definition": "CHECK (((business_role IS NULL) OR (business_role = ANY (ARRAY['data_owner'::text, 'data_steward'::text, 'decision_owner'::text, 'approver'::text]))))"
+          },
+          {
+            "name": "workspace_invitations_email_check",
+            "table": "workspace_invitations",
+            "definition": "CHECK (((email = lower(TRIM(BOTH FROM email))) AND ((length(email) >= 3) AND (length(email) <= 254)) AND (email ~ '^[^[:space:]@]+@[^[:space:]@]+[.][^[:space:]@]+$'::text)))"
+          },
+          {
+            "name": "workspace_invitations_invited_by_fkey",
+            "table": "workspace_invitations",
+            "definition": "FOREIGN KEY (invited_by) REFERENCES auth.users(id)"
+          },
+          {
+            "name": "workspace_invitations_pkey",
+            "table": "workspace_invitations",
+            "definition": "PRIMARY KEY (id)"
+          },
+          {
+            "name": "workspace_invitations_status_check",
+            "table": "workspace_invitations",
+            "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'accepted'::text, 'revoked'::text])))"
+          },
+          {
+            "name": "workspace_invitations_workspace_id_fkey",
+            "table": "workspace_invitations",
+            "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)"
+          },
+          {
+            "name": "member_business_responsibility",
+            "table": "workspace_members",
+            "definition": "CHECK (((business_role IS NULL) OR (business_role = ANY (ARRAY['data_owner'::text, 'data_steward'::text, 'decision_owner'::text, 'approver'::text]))))"
+          },
+          {
+            "name": "workspace_members_access_role_check",
+            "table": "workspace_members",
+            "definition": "CHECK ((access_role = ANY (ARRAY['admin'::text, 'operator'::text, 'viewer'::text])))"
+          },
+          {
+            "name": "workspace_members_invited_by_fkey",
+            "table": "workspace_members",
+            "definition": "FOREIGN KEY (invited_by) REFERENCES auth.users(id)"
+          },
+          {
+            "name": "workspace_members_pkey",
+            "table": "workspace_members",
+            "definition": "PRIMARY KEY (workspace_id, user_id)"
+          },
+          {
+            "name": "workspace_members_status_check",
+            "table": "workspace_members",
+            "definition": "CHECK ((status = ANY (ARRAY['invited'::text, 'active'::text, 'disabled'::text])))"
+          },
+          {
+            "name": "workspace_members_user_id_fkey",
+            "table": "workspace_members",
+            "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id)"
+          },
+          {
+            "name": "workspace_members_workspace_id_fkey",
+            "table": "workspace_members",
+            "definition": "FOREIGN KEY (workspace_id) REFERENCES workspaces(id)"
+          },
+          {
+            "name": "workspaces_country_check",
+            "table": "workspaces",
+            "definition": "CHECK ((country ~ '^[A-Z]{2}$'::text))"
+          },
+          {
+            "name": "workspaces_created_by_fkey",
+            "table": "workspaces",
+            "definition": "FOREIGN KEY (created_by) REFERENCES auth.users(id)"
+          },
+          {
+            "name": "workspaces_currency_check",
+            "table": "workspaces",
+            "definition": "CHECK ((currency ~ '^[A-Z]{3}$'::text))"
+          },
+          {
+            "name": "workspaces_name_check",
+            "table": "workspaces",
+            "definition": "CHECK (((length(TRIM(BOTH FROM name)) >= 2) AND (length(TRIM(BOTH FROM name)) <= 120)))"
+          },
+          {
+            "name": "workspaces_pkey",
+            "table": "workspaces",
+            "definition": "PRIMARY KEY (id)"
+          },
+          {
+            "name": "workspaces_status_check",
+            "table": "workspaces",
+            "definition": "CHECK ((status = ANY (ARRAY['active'::text, 'disabled'::text])))"
+          }
+        ],
+        "schema_acls": [
+          {
+            "acl": "{postgres=UC/postgres,authenticated=U/postgres,service_role=U/postgres}",
+            "schema": "dation_private"
+          },
+          {
+            "acl": "{pg_database_owner=UC/pg_database_owner,=U/pg_database_owner,postgres=U/pg_database_owner,anon=U/pg_database_owner,authenticated=U/pg_database_owner,service_role=U/pg_database_owner}",
+            "schema": "public"
+          }
+        ],
+        "default_acls": [
+          {
+            "acl": "{postgres=rwU/postgres,anon=rwU/postgres,authenticated=rwU/postgres,service_role=rwU/postgres}",
+            "type": "S",
+            "owner": "postgres",
+            "schema": "public"
+          },
+          {
+            "acl": "{postgres=rwU/supabase_admin,anon=rwU/supabase_admin,authenticated=rwU/supabase_admin,service_role=rwU/supabase_admin}",
+            "type": "S",
+            "owner": "supabase_admin",
+            "schema": "public"
+          },
+          {
+            "acl": "{postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}",
+            "type": "f",
+            "owner": "postgres",
+            "schema": "public"
+          },
+          {
+            "acl": "{postgres=X/supabase_admin,anon=X/supabase_admin,authenticated=X/supabase_admin,service_role=X/supabase_admin}",
+            "type": "f",
+            "owner": "supabase_admin",
+            "schema": "public"
+          },
+          {
+            "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+            "type": "r",
+            "owner": "postgres",
+            "schema": "public"
+          },
+          {
+            "acl": "{postgres=arwdDxtm/supabase_admin,anon=arwdDxtm/supabase_admin,authenticated=arwdDxtm/supabase_admin,service_role=arwdDxtm/supabase_admin}",
+            "type": "r",
+            "owner": "supabase_admin",
+            "schema": "public"
+          }
+        ],
+        "storage_buckets": [
+          {
+            "id": "dda-inputs",
+            "public": false,
+            "file_size_limit": 10485760,
+            "allowed_mime_types": [
+              "text/csv",
+              "application/csv",
+              "application/vnd.ms-excel",
+              "text/plain"
+            ]
+          }
+        ],
+        "platform_release": [
+          {
+            "singleton": true,
+            "admissions_open": true,
+            "workflow_gates_enabled": true
+          }
+        ],
+        "storage_policies": null
+      }
+    }
+  ]
+}

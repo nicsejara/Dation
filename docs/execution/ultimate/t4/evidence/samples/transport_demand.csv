@@ -1,0 +1,6 @@
+order_id,origin_id,destination_id,distance_km,ready_date,delivery_due_date,priority,split_allowed,demand_pallets,compatibility_groups
+ORD-001,ORIGIN-01,DEST-01,500,2026-11-02,2026-11-06,MEDIUM,false,10,DRY
+ORD-002,ORIGIN-01,DEST-01,500,2026-11-02,2026-11-06,MEDIUM,false,10,DRY
+ORD-003,ORIGIN-01,DEST-01,500,2026-11-02,2026-11-06,MEDIUM,false,10,DRY
+ORD-004,ORIGIN-01,DEST-01,500,2026-11-02,2026-11-06,MEDIUM,false,10,DRY
+ORD-005,ORIGIN-01,DEST-01,500,2026-11-02,2026-11-06,MEDIUM,false,10,DRY

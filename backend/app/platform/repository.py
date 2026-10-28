@@ -16,7 +16,9 @@ from app.services.http_service import http_client as raw_client
 TABLES = frozenset({"datasets", "decision_cases", "decision_runs", "dispatch_run_jobs",
     "decision_case_reconciliations", "decision_approval_events", "decision_comparative_analyses",
     "decision_explanations", "decision_messages", "decision_chat_turns", "decision_interpretation_sources"})
-INFRA_RPC = frozenset({"claim_dispatch_job", "claim_comparative_analysis", "report_dispatch_worker"})
+ULTIMATE_READ_TABLES = frozenset({"logistics_models", "logistics_model_versions", "case_data_packs",
+    "case_data_pack_versions", "case_data_pack_entries"})
+INFRA_RPC = frozenset({"claim_dispatch_job", "claim_dispatch_job_v2", "claim_comparative_analysis", "report_dispatch_worker"})
 WORKER_RPC = frozenset({"heartbeat_dispatch_job", "finish_dispatch_job", "heartbeat_comparative_analysis",
     "finish_comparative_analysis", "ack_case_reconciliation", "decision_case_history"})
 READ_RPC = frozenset({"list_decision_cases", "decision_case_history", "read_decision_chat_turn",
@@ -65,8 +67,10 @@ class TenantClient:
             if is_infrastructure() and table == "decision_case_reconciliations" and method == "GET":
                 return await self.client.request(method, url, **options)
             ctx = current()
-            if table not in TABLES:
+            if table not in TABLES | ULTIMATE_READ_TABLES:
                 raise RuntimeError("Unregistered tenant relation")
+            if table in ULTIMATE_READ_TABLES and method not in {"GET", "HEAD"}:
+                raise HTTPException(403, "La escritura Ultimate requiere su operación autorizada.")
             # Service-only audit context, derived from verified authority.
             audit_headers = httpx.Headers(options.get("headers") or {})
             audit_headers["X-Dation-Workspace-Id"] = ctx.workspace_id
@@ -90,6 +94,8 @@ class TenantClient:
                     for row in rows:
                         if not isinstance(row, dict) or row.get("workspace_id", ctx.workspace_id) != ctx.workspace_id:
                             raise RuntimeError("Invalid tenant payload")
+                        if method in {"POST", "PUT"} and table in {"decision_cases", "decision_runs"} and row.get("workflow_version", 1) != 1:
+                            raise HTTPException(409, "La admisión Ultimate todavía no está habilitada.")
                     options["json"] = ([{**row, "workspace_id": ctx.workspace_id} for row in rows]
                                        if isinstance(body, list) else {**body, "workspace_id": ctx.workspace_id})
                     if method=='POST' and table in {'decision_cases','decision_runs'} and not ctx.worker:

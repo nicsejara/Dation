@@ -5,6 +5,7 @@ import {esc,num} from "../shared.mjs";
 import {STATUS,deriveDecisionNodes} from "./decision-case.mjs";
 import {WORKFLOW_ACTION_CLASS,workflowActionLabel} from "../workflow-action-bar.mjs";
 import {decisionHero,decisionCaseCard,decisionDataFileCard,bindCaseContext} from "../decision-config-ui.mjs";
+import {graphStateUi,graphActionLabel,graphNodeDescription} from '../navigation/ultimate-graph.mjs';
 import {
   DECISION_ORDER,
   DECISION_META,
@@ -217,8 +218,7 @@ function nodeActionMarkup(nodeId,presentation){
   return "";
 }
 
-function nodeCard(nodeId,presentation,isNext){
-  const meta=DECISION_META[nodeId];
+function nodeCard(nodeId,presentation,isNext,meta=DECISION_META[nodeId]){
   const waiting=presentation.status===STATUS.LOCKED
     ||presentation.status===STATUS.NEEDS_DATA;
   const approved=presentation.status===STATUS.APPROVED;
@@ -233,7 +233,7 @@ function nodeCard(nodeId,presentation,isNext){
   return '<article class="'+cardClass+'" data-decision-node="'+esc(nodeId)+'" '
     +'aria-label="Decisión '+esc(meta.index)+': '+esc(meta.label)+'" '
     +(isNext?'aria-current="step" ':'')
-    +(waiting?'tabindex="0" aria-disabled="true" aria-describedby="'+esc(statusId)+'" ':'')
+    +(waiting?'tabindex="0" '+(presentation.interactive?'':'aria-disabled="true" ')+'aria-describedby="'+esc(statusId)+'" ':'')
     +'>'
     +(isNext?'<span class="dispatch-decision-node__next">SIGUIENTE DECISIÓN</span>':'')
     +'<header class="dispatch-decision-node__head">'
@@ -241,7 +241,7 @@ function nodeCard(nodeId,presentation,isNext){
         +iconSvg(approved?"checkCircle":meta.icon,"dispatch-map-icon")
       +'</span>'
       +'<span class="dispatch-decision-node__decision-label">DECISIÓN '+esc(meta.index)+'</span>'
-      +stateChip(presentation.status)
+      +(presentation.stateChip||stateChip(presentation.status))
     +'</header>'
     +'<h3>'+esc(meta.label)+'</h3>'
     +'<p class="dispatch-decision-node__question">'+esc(meta.question)+'</p>'
@@ -251,10 +251,10 @@ function nodeCard(nodeId,presentation,isNext){
     +'</div>'
     +'<p class="dispatch-decision-node__statusline" id="'+esc(statusId)+'">'
       +iconSvg(
-        approved?"checkCircle":review?"alertTriangle":presentation.dataReady?"checkCircle":"alertTriangle",
+        presentation.statusIcon||(approved?"checkCircle":review?"alertTriangle":presentation.dataReady?"checkCircle":"alertTriangle"),
         "dispatch-map-icon",
       )
-      +'<span>'+esc(statusDetail(presentation))+'</span>'
+      +'<span>'+esc(presentation.detail||statusDetail(presentation))+'</span>'
     +'</p>'
     +(presentation.runId
       ?'<small class="dispatch-decision-node__run">Corrida '+esc(String(presentation.runId).slice(0,8))+'</small>'
@@ -263,6 +263,15 @@ function nodeCard(nodeId,presentation,isNext){
       +nodeActionMarkup(nodeId,presentation)
     +'</div>'
   +'</article>';
+}
+
+/** Compose the approved card with the server projection, without deriving state. */
+export function graphNodeMarkup(node,index,isNext=false){
+ const ui=graphStateUi(node.node_state),action=node.primary_action;
+ const presentation={status:ui.style,dataReady:true,statusIcon:ui.icon,runId:node.run_id,detail:graphNodeDescription(node),interactive:Boolean(action?.allowed),
+  action:{action:action?.allowed?'graph-primary':null,label:action?graphActionLabel(action,node):null,disabled:!action?.allowed},
+  stateChip:'<span class="dispatch-map-state-chip is-'+esc(ui.tone)+'" data-graph-state="'+esc(node.node_state)+'">'+esc(ui.label)+'</span>'};
+ return nodeCard(node.id,presentation,isNext,{...DECISION_META[node.id],index:index+1,label:node.label,question:node.question,output:index===0?'Plan de transporte':'Calendario de despachos'});
 }
 
 // Legacy visible copy removed from connector UI: "Requiere aprobación".
@@ -286,7 +295,7 @@ function connector(fromId,toId,presentations,nextNodeId){
   +'</div>';
 }
 
-function heroMarkup(decisionCase){
+export function heroMarkup(decisionCase){
   const mapStep=workflowStep("map",{number:2,label:"Mapa de decisiones"});
   return decisionHero({
     className:"dispatch-pro-hero dispatch-map-premium__hero",

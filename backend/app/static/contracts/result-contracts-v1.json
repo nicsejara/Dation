@@ -1,0 +1,7559 @@
+{
+  "$defs": {
+    "AIContextReference": {
+      "additionalProperties": false,
+      "properties": {
+        "base_context": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ReferenceDataset"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "schema_version": {
+          "const": "decision_context_v1",
+          "default": "decision_context_v1",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "base_context"
+      ],
+      "title": "AIContextReference",
+      "type": "object"
+    },
+    "Allocation": {
+      "additionalProperties": false,
+      "properties": {
+        "allocation_fraction": {
+          "anyOf": [
+            {
+              "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "format": "exact-decimal",
+          "title": "Allocation Fraction"
+        },
+        "load": {
+          "$ref": "#/$defs/QuantityVector"
+        },
+        "order_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Order Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "order_id",
+        "allocation_fraction",
+        "load"
+      ],
+      "title": "Allocation",
+      "type": "object"
+    },
+    "AlternativeDescriptor": {
+      "additionalProperties": false,
+      "properties": {
+        "alternative_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Alternative Id",
+          "type": "string"
+        },
+        "difference_vs_recommended": {
+          "$ref": "#/$defs/AlternativeDifference"
+        },
+        "evidence": {
+          "$ref": "#/$defs/Delivery_EntityEvidence_"
+        },
+        "material_differences": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "title": "Material Differences",
+          "type": "array"
+        },
+        "metrics": {
+          "$ref": "#/$defs/AlternativeMetrics"
+        },
+        "plan": {
+          "$ref": "#/$defs/Delivery_Union_Trip__ScheduleTrip__"
+        },
+        "policy": {
+          "title": "Policy",
+          "type": "string"
+        }
+      },
+      "required": [
+        "alternative_id",
+        "policy",
+        "metrics",
+        "difference_vs_recommended",
+        "material_differences",
+        "plan",
+        "evidence"
+      ],
+      "title": "AlternativeDescriptor",
+      "type": "object"
+    },
+    "AlternativeDifference": {
+      "additionalProperties": false,
+      "properties": {
+        "cost_delta": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "format": "exact-decimal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Cost Delta"
+        },
+        "own_share_delta": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "format": "exact-decimal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Own Share Delta"
+        },
+        "trip_delta": {
+          "title": "Trip Delta",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "cost_delta",
+        "trip_delta",
+        "own_share_delta"
+      ],
+      "title": "AlternativeDifference",
+      "type": "object"
+    },
+    "AlternativeMetrics": {
+      "additionalProperties": false,
+      "properties": {
+        "coverage_ratio": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "format": "exact-decimal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Coverage Ratio"
+        },
+        "own_trip_ratio": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "format": "exact-decimal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Own Trip Ratio"
+        },
+        "total_cost": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "format": "exact-decimal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Total Cost"
+        },
+        "trip_count": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Trip Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "total_cost",
+        "trip_count",
+        "coverage_ratio",
+        "own_trip_ratio"
+      ],
+      "title": "AlternativeMetrics",
+      "type": "object"
+    },
+    "AlternativeSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "alternative_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Alternative Id",
+          "type": "string"
+        },
+        "evidence_refs": {
+          "items": {
+            "$ref": "#/$defs/ResultArtifactReference"
+          },
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "metrics": {
+          "$ref": "#/$defs/AlternativeMetrics"
+        }
+      },
+      "required": [
+        "alternative_id",
+        "metrics",
+        "evidence_refs"
+      ],
+      "title": "AlternativeSummary",
+      "type": "object"
+    },
+    "ApprovalOverlay": {
+      "additionalProperties": false,
+      "properties": {
+        "approval_allowed": {
+          "title": "Approval Allowed",
+          "type": "boolean"
+        },
+        "approval_blockers": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "title": "Approval Blockers",
+          "type": "array"
+        },
+        "freshness": {
+          "enum": [
+            "CURRENT",
+            "STALE",
+            "SUPERSEDED",
+            "UNKNOWN"
+          ],
+          "title": "Freshness",
+          "type": "string"
+        },
+        "result_fingerprint": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Result Fingerprint",
+          "type": "string"
+        },
+        "run_id": {
+          "format": "uuid",
+          "title": "Run Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "run_id",
+        "result_fingerprint",
+        "approval_allowed",
+        "freshness",
+        "approval_blockers"
+      ],
+      "title": "ApprovalOverlay",
+      "type": "object"
+    },
+    "ApprovalReview": {
+      "additionalProperties": false,
+      "properties": {
+        "assumption_count": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Assumption Count",
+          "type": "integer"
+        },
+        "at_risk_count": {
+          "anyOf": [
+            {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "At Risk Count"
+        },
+        "coverage_status": {
+          "enum": [
+            "FULL",
+            "PARTIAL",
+            "NONE",
+            "UNKNOWN"
+          ],
+          "title": "Coverage Status",
+          "type": "string"
+        },
+        "decision_ready_for_review": {
+          "title": "Decision Ready For Review",
+          "type": "boolean"
+        },
+        "exception_count": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Exception Count",
+          "type": "integer"
+        },
+        "expected_delivery_compliance": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "format": "exact-decimal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected Delivery Compliance"
+        },
+        "hard_constraints_satisfied": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Hard Constraints Satisfied"
+        },
+        "late_count": {
+          "anyOf": [
+            {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Late Count"
+        },
+        "pre_horizon_count": {
+          "anyOf": [
+            {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pre Horizon Count"
+        },
+        "review_items": {
+          "items": {
+            "$ref": "#/$defs/ReviewItem"
+          },
+          "title": "Review Items",
+          "type": "array"
+        },
+        "scheduled_ratio": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "format": "exact-decimal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Scheduled Ratio"
+        },
+        "schema_version": {
+          "const": "approval_review_v1",
+          "default": "approval_review_v1",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "decision_ready_for_review",
+        "hard_constraints_satisfied",
+        "coverage_status",
+        "exception_count",
+        "assumption_count",
+        "review_items"
+      ],
+      "title": "ApprovalReview",
+      "type": "object"
+    },
+    "ApprovalReviewResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "approval_overlay": {
+          "$ref": "#/$defs/ApprovalOverlay"
+        },
+        "approval_review": {
+          "$ref": "#/$defs/ApprovalReview"
+        },
+        "provenance": {
+          "$ref": "#/$defs/ResultBinding"
+        }
+      },
+      "required": [
+        "provenance",
+        "approval_review",
+        "approval_overlay"
+      ],
+      "title": "ApprovalReviewResponse",
+      "type": "object"
+    },
+    "ArtifactManifest": {
+      "additionalProperties": false,
+      "properties": {
+        "artifacts": {
+          "items": {
+            "$ref": "#/$defs/ResultArtifactReference"
+          },
+          "title": "Artifacts",
+          "type": "array"
+        },
+        "version": {
+          "const": 1,
+          "default": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "artifacts"
+      ],
+      "title": "ArtifactManifest",
+      "type": "object"
+    },
+    "ArtifactReadError": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": {
+          "format": "uuid",
+          "title": "Artifact Id",
+          "type": "string"
+        },
+        "code": {
+          "enum": [
+            "ARTIFACT_MISSING",
+            "ARTIFACT_INTEGRITY_ERROR"
+          ],
+          "title": "Code",
+          "type": "string"
+        },
+        "expected_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Expected Sha256",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "UNAVAILABLE",
+            "CORRUPT"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "artifact_id",
+        "expected_sha256",
+        "code"
+      ],
+      "title": "ArtifactReadError",
+      "type": "object"
+    },
+    "AssumptionDescriptor": {
+      "additionalProperties": false,
+      "properties": {
+        "assumption_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Assumption Id",
+          "type": "string"
+        },
+        "code": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Code",
+          "type": "string"
+        },
+        "entity_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Entity Id",
+          "type": "string"
+        },
+        "entity_type": {
+          "$ref": "#/$defs/EntityType"
+        },
+        "reason_ref": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Reason Ref",
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "USER_CONFIRMED",
+            "MODEL_DEFAULT",
+            "DATION_DEFAULT",
+            "DERIVED"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "unit": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "assumption_id",
+        "code",
+        "entity_type",
+        "entity_id",
+        "value",
+        "unit",
+        "source",
+        "reason_ref"
+      ],
+      "title": "AssumptionDescriptor",
+      "type": "object"
+    },
+    "CandidateSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "estimated_cost": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "format": "exact-decimal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Estimated Cost"
+        },
+        "reason_refs": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "title": "Reason Refs",
+          "type": "array"
+        },
+        "resource_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Resource Id",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "SELECTED",
+            "FEASIBLE",
+            "INFEASIBLE",
+            "UNKNOWN"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "resource_id",
+        "status",
+        "estimated_cost",
+        "reason_refs"
+      ],
+      "title": "CandidateSummary",
+      "type": "object"
+    },
+    "CasePolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "guardrails": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Guardrail"
+          },
+          "title": "Guardrails",
+          "type": "array"
+        },
+        "preferences": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Preference"
+          },
+          "title": "Preferences",
+          "type": "array"
+        },
+        "primary_goal": {
+          "enum": [
+            "MINIMIZE_COST",
+            "MAXIMIZE_SERVICE",
+            "MAXIMIZE_OWN_CAPACITY",
+            "MINIMIZE_TRIPS",
+            "BALANCED",
+            "CUSTOM"
+          ],
+          "title": "Primary Goal",
+          "type": "string"
+        },
+        "version": {
+          "const": 1,
+          "default": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "primary_goal"
+      ],
+      "title": "CasePolicy",
+      "type": "object"
+    },
+    "ConstraintEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Code",
+          "type": "string"
+        },
+        "evidence_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "facts": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title": "Facts",
+          "type": "object"
+        },
+        "hard": {
+          "title": "Hard",
+          "type": "boolean"
+        },
+        "status": {
+          "enum": [
+            "SATISFIED",
+            "VIOLATED",
+            "UNKNOWN"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "evidence_id",
+        "code",
+        "status",
+        "hard",
+        "facts"
+      ],
+      "title": "ConstraintEvidence",
+      "type": "object"
+    },
+    "Coverage": {
+      "additionalProperties": false,
+      "properties": {
+        "assigned": {
+          "anyOf": [
+            {
+              "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "format": "exact-decimal",
+          "title": "Assigned"
+        },
+        "primary_dimension": {
+          "$ref": "#/$defs/Dimension"
+        },
+        "ratio": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "format": "exact-decimal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Ratio"
+        },
+        "requested": {
+          "anyOf": [
+            {
+              "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "format": "exact-decimal",
+          "title": "Requested"
+        },
+        "unassigned": {
+          "anyOf": [
+            {
+              "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "format": "exact-decimal",
+          "title": "Unassigned"
+        }
+      },
+      "required": [
+        "primary_dimension",
+        "requested",
+        "assigned",
+        "unassigned",
+        "ratio"
+      ],
+      "title": "Coverage",
+      "type": "object"
+    },
+    "CurrencyPolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "currency": {
+          "pattern": "^[A-Z]{3}$",
+          "title": "Currency",
+          "type": "string"
+        },
+        "minor_units": {
+          "maximum": 6,
+          "minimum": 0,
+          "title": "Minor Units",
+          "type": "integer"
+        },
+        "rounding": {
+          "const": "ROUND_HALF_UP",
+          "default": "ROUND_HALF_UP",
+          "title": "Rounding",
+          "type": "string"
+        }
+      },
+      "required": [
+        "currency",
+        "minor_units"
+      ],
+      "title": "CurrencyPolicy",
+      "type": "object"
+    },
+    "DaySchedule": {
+      "additionalProperties": false,
+      "properties": {
+        "trips": {
+          "items": {
+            "$ref": "#/$defs/ScheduleTrip"
+          },
+          "title": "Trips",
+          "type": "array"
+        }
+      },
+      "required": [
+        "trips"
+      ],
+      "title": "DaySchedule",
+      "type": "object"
+    },
+    "DaySchedulingMetrics": {
+      "additionalProperties": false,
+      "properties": {
+        "average_schedule_margin_days": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "format": "exact-decimal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Average Schedule Margin Days"
+        },
+        "exception_count": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Exception Count",
+          "type": "integer"
+        },
+        "on_time_ratio": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "format": "exact-decimal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "On Time Ratio"
+        },
+        "peak_dispatch_day": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PeakDispatchDay"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "scheduled_trips": {
+          "$ref": "#/$defs/ScheduledTrips"
+        },
+        "service_level": {
+          "$ref": "#/$defs/ServiceLevel"
+        }
+      },
+      "required": [
+        "scheduled_trips",
+        "service_level",
+        "on_time_ratio",
+        "average_schedule_margin_days",
+        "peak_dispatch_day",
+        "exception_count"
+      ],
+      "title": "DaySchedulingMetrics",
+      "type": "object"
+    },
+    "Decision": {
+      "additionalProperties": false,
+      "properties": {
+        "decision_label": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Decision Label",
+          "type": "string"
+        },
+        "decision_type": {
+          "enum": [
+            "TRANSPORT_PLAN",
+            "DAY_SCHEDULING"
+          ],
+          "title": "Decision Type",
+          "type": "string"
+        },
+        "node_id": {
+          "enum": [
+            "logistics_assignment",
+            "logistics_scheduling"
+          ],
+          "title": "Node Id",
+          "type": "string"
+        },
+        "run_id": {
+          "format": "uuid",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "status": {
+          "const": "COMPLETED",
+          "default": "COMPLETED",
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "node_id",
+        "decision_type",
+        "decision_label",
+        "run_id"
+      ],
+      "title": "Decision",
+      "type": "object"
+    },
+    "DecisionContextResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "approval_overlay": {
+          "$ref": "#/$defs/ApprovalOverlay"
+        },
+        "context": {
+          "$ref": "#/$defs/DecisionContextV1"
+        }
+      },
+      "required": [
+        "context",
+        "approval_overlay"
+      ],
+      "title": "DecisionContextResponse",
+      "type": "object"
+    },
+    "DecisionContextV1": {
+      "additionalProperties": false,
+      "properties": {
+        "alternatives_summary": {
+          "items": {
+            "$ref": "#/$defs/AlternativeSummary"
+          },
+          "title": "Alternatives Summary",
+          "type": "array"
+        },
+        "approval_review": {
+          "$ref": "#/$defs/ApprovalReview"
+        },
+        "assumptions": {
+          "items": {
+            "$ref": "#/$defs/AssumptionDescriptor"
+          },
+          "title": "Assumptions",
+          "type": "array"
+        },
+        "case": {
+          "$ref": "#/$defs/FrozenCaseContext"
+        },
+        "case_policy": {
+          "$ref": "#/$defs/CasePolicy"
+        },
+        "context_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Context Hash",
+          "type": "string"
+        },
+        "context_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Context Version",
+          "type": "integer"
+        },
+        "decision_definition": {
+          "$ref": "#/$defs/DecisionDefinitionContext"
+        },
+        "evidence_summary": {
+          "$ref": "#/$defs/EvidenceSummary"
+        },
+        "exceptions": {
+          "items": {
+            "$ref": "#/$defs/ExceptionDescriptor"
+          },
+          "title": "Exceptions",
+          "type": "array"
+        },
+        "input_summary": {
+          "$ref": "#/$defs/InputSummary"
+        },
+        "logistics_model": {
+          "$ref": "#/$defs/ModelContext"
+        },
+        "metrics": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TransportPlanMetrics"
+            },
+            {
+              "$ref": "#/$defs/DaySchedulingMetrics"
+            }
+          ],
+          "title": "Metrics"
+        },
+        "mode": {
+          "enum": [
+            "EXPLAIN",
+            "EXPLORE",
+            "COMPARE",
+            "REVIEW"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "node_policy": {
+          "$ref": "#/$defs/NodePolicy"
+        },
+        "provenance": {
+          "$ref": "#/$defs/ResultBinding"
+        },
+        "result_summary": {
+          "$ref": "#/$defs/ExecutiveSummary"
+        },
+        "schema_version": {
+          "const": "decision_context_v1",
+          "default": "decision_context_v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "selected_alternative_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "title": "Selected Alternative Ids",
+          "type": "array"
+        },
+        "selected_entity": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EntityRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "selected_evidence_refs": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ResultArtifactReference"
+          },
+          "title": "Selected Evidence Refs",
+          "type": "array"
+        }
+      },
+      "required": [
+        "provenance",
+        "mode",
+        "case",
+        "logistics_model",
+        "case_policy",
+        "decision_definition",
+        "node_policy",
+        "input_summary",
+        "result_summary",
+        "metrics",
+        "exceptions",
+        "assumptions",
+        "evidence_summary",
+        "alternatives_summary",
+        "approval_review",
+        "selected_entity",
+        "context_hash"
+      ],
+      "title": "DecisionContextV1",
+      "type": "object"
+    },
+    "DecisionDefinitionContext": {
+      "additionalProperties": false,
+      "properties": {
+        "decision_type": {
+          "enum": [
+            "TRANSPORT_PLAN",
+            "DAY_SCHEDULING"
+          ],
+          "title": "Decision Type",
+          "type": "string"
+        },
+        "node_id": {
+          "enum": [
+            "logistics_assignment",
+            "logistics_scheduling"
+          ],
+          "title": "Node Id",
+          "type": "string"
+        },
+        "version": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "node_id",
+        "version",
+        "decision_type"
+      ],
+      "title": "DecisionDefinitionContext",
+      "type": "object"
+    },
+    "DecisionIntentV2": {
+      "additionalProperties": false,
+      "properties": {
+        "context_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Context Hash",
+          "type": "string"
+        },
+        "context_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Context Version",
+          "type": "integer"
+        },
+        "evidence_hashes": {
+          "items": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "title": "Evidence Hashes",
+          "type": "array"
+        },
+        "mode": {
+          "enum": [
+            "EXPLAIN",
+            "EXPLORE",
+            "COMPARE",
+            "REVIEW"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "provenance": {
+          "$ref": "#/$defs/ResultBinding"
+        },
+        "question": {
+          "maxLength": 4000,
+          "minLength": 1,
+          "title": "Question",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "decision_intent_v2",
+          "default": "decision_intent_v2",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "selected_alternative_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "title": "Selected Alternative Ids",
+          "type": "array"
+        },
+        "selected_entity": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EntityRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "provenance",
+        "context_hash",
+        "mode",
+        "question",
+        "selected_entity",
+        "evidence_hashes"
+      ],
+      "title": "DecisionIntentV2",
+      "type": "object"
+    },
+    "DecisionResultPackageV1": {
+      "additionalProperties": false,
+      "properties": {
+        "ai_context": {
+          "$ref": "#/$defs/AIContextReference"
+        },
+        "alternatives": {
+          "items": {
+            "$ref": "#/$defs/AlternativeDescriptor"
+          },
+          "maxItems": 3,
+          "title": "Alternatives",
+          "type": "array"
+        },
+        "alternatives_state": {
+          "enum": [
+            "NOT_COMPUTED",
+            "COMPUTED_NONE",
+            "COMPUTED"
+          ],
+          "title": "Alternatives State",
+          "type": "string"
+        },
+        "approval_review": {
+          "$ref": "#/$defs/ApprovalReview"
+        },
+        "artifact_manifest": {
+          "$ref": "#/$defs/ArtifactManifest"
+        },
+        "assembler_version": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Assembler Version",
+          "type": "string"
+        },
+        "assumptions": {
+          "items": {
+            "$ref": "#/$defs/AssumptionDescriptor"
+          },
+          "title": "Assumptions",
+          "type": "array"
+        },
+        "context": {
+          "$ref": "#/$defs/FrozenCaseContext"
+        },
+        "decision": {
+          "$ref": "#/$defs/Decision"
+        },
+        "details": {
+          "items": {
+            "$ref": "#/$defs/DetailDatasetDescriptor"
+          },
+          "title": "Details",
+          "type": "array"
+        },
+        "engine": {
+          "$ref": "#/$defs/EngineHeader"
+        },
+        "evidence": {
+          "$ref": "#/$defs/EvidenceSummary"
+        },
+        "exceptions": {
+          "items": {
+            "$ref": "#/$defs/ExceptionDescriptor"
+          },
+          "title": "Exceptions",
+          "type": "array"
+        },
+        "exports": {
+          "$ref": "#/$defs/Exports"
+        },
+        "feasibility": {
+          "$ref": "#/$defs/Feasibility"
+        },
+        "fingerprints": {
+          "$ref": "#/$defs/FingerprintSet"
+        },
+        "metrics": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TransportPlanMetrics"
+            },
+            {
+              "$ref": "#/$defs/DaySchedulingMetrics"
+            }
+          ],
+          "title": "Metrics"
+        },
+        "package_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Package Version",
+          "type": "integer"
+        },
+        "primary_visual": {
+          "$ref": "#/$defs/PrimaryVisual"
+        },
+        "result_schema": {
+          "enum": [
+            "transport_plan_v1",
+            "day_scheduling_v1"
+          ],
+          "title": "Result Schema",
+          "type": "string"
+        },
+        "result_schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Schema Version",
+          "type": "integer"
+        },
+        "schedule": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PublishedSchedule"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "source_transport_plan": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResultBinding"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "summary": {
+          "$ref": "#/$defs/ExecutiveSummary"
+        },
+        "transport_plan": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PublishedTransportPlan"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "result_schema",
+        "assembler_version",
+        "decision",
+        "context",
+        "engine",
+        "feasibility",
+        "summary",
+        "metrics",
+        "primary_visual",
+        "details",
+        "alternatives",
+        "alternatives_state",
+        "exceptions",
+        "assumptions",
+        "evidence",
+        "approval_review",
+        "exports",
+        "ai_context",
+        "artifact_manifest",
+        "fingerprints"
+      ],
+      "title": "DecisionResultPackageV1",
+      "type": "object"
+    },
+    "Delivery_DemandResolution_": {
+      "discriminator": {
+        "mapping": {
+          "INLINE": "#/$defs/InlineDataset_DemandResolution_",
+          "REFERENCE": "#/$defs/ReferenceDataset"
+        },
+        "propertyName": "mode"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/InlineDataset_DemandResolution_"
+        },
+        {
+          "$ref": "#/$defs/ReferenceDataset"
+        }
+      ]
+    },
+    "Delivery_EntityEvidence_": {
+      "discriminator": {
+        "mapping": {
+          "INLINE": "#/$defs/InlineDataset_EntityEvidence_",
+          "REFERENCE": "#/$defs/ReferenceDataset"
+        },
+        "propertyName": "mode"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/InlineDataset_EntityEvidence_"
+        },
+        {
+          "$ref": "#/$defs/ReferenceDataset"
+        }
+      ]
+    },
+    "Delivery_ReasonEmission_": {
+      "discriminator": {
+        "mapping": {
+          "INLINE": "#/$defs/InlineDataset_ReasonEmission_",
+          "REFERENCE": "#/$defs/ReferenceDataset"
+        },
+        "propertyName": "mode"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/InlineDataset_ReasonEmission_"
+        },
+        {
+          "$ref": "#/$defs/ReferenceDataset"
+        }
+      ]
+    },
+    "Delivery_ScheduleTrip_": {
+      "discriminator": {
+        "mapping": {
+          "INLINE": "#/$defs/InlineDataset_ScheduleTrip_",
+          "REFERENCE": "#/$defs/ReferenceDataset"
+        },
+        "propertyName": "mode"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/InlineDataset_ScheduleTrip_"
+        },
+        {
+          "$ref": "#/$defs/ReferenceDataset"
+        }
+      ]
+    },
+    "Delivery_Trip_": {
+      "discriminator": {
+        "mapping": {
+          "INLINE": "#/$defs/InlineDataset_Trip_",
+          "REFERENCE": "#/$defs/ReferenceDataset"
+        },
+        "propertyName": "mode"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/InlineDataset_Trip_"
+        },
+        {
+          "$ref": "#/$defs/ReferenceDataset"
+        }
+      ]
+    },
+    "Delivery_Union_DemandResolution__ResourceUsage__ResourceTimeline__ServiceAnalysis__EntityEvidence__Trip__ScheduleTrip__": {
+      "discriminator": {
+        "mapping": {
+          "INLINE": "#/$defs/InlineDataset_Union_DemandResolution__ResourceUsage__ResourceTimeline__ServiceAnalysis__EntityEvidence__Trip__ScheduleTrip__",
+          "REFERENCE": "#/$defs/ReferenceDataset"
+        },
+        "propertyName": "mode"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/InlineDataset_Union_DemandResolution__ResourceUsage__ResourceTimeline__ServiceAnalysis__EntityEvidence__Trip__ScheduleTrip__"
+        },
+        {
+          "$ref": "#/$defs/ReferenceDataset"
+        }
+      ]
+    },
+    "Delivery_Union_Trip__ScheduleTrip__": {
+      "discriminator": {
+        "mapping": {
+          "INLINE": "#/$defs/InlineDataset_Union_Trip__ScheduleTrip__",
+          "REFERENCE": "#/$defs/ReferenceDataset"
+        },
+        "propertyName": "mode"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/InlineDataset_Union_Trip__ScheduleTrip__"
+        },
+        {
+          "$ref": "#/$defs/ReferenceDataset"
+        }
+      ]
+    },
+    "Delivery_dict_str__Annotated_Union_str__Annotated_int__Strict_strict_True____Annotated_bool__Strict_strict_True____tuple_str___________NoneType___BeforeValidator___": {
+      "discriminator": {
+        "mapping": {
+          "INLINE": "#/$defs/InlineDataset_dict_str__Annotated_Union_str__Annotated_int__Strict_strict_True____Annotated_bool__Strict_strict_True____tuple_str___________NoneType___BeforeValidator___",
+          "REFERENCE": "#/$defs/ReferenceDataset"
+        },
+        "propertyName": "mode"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/InlineDataset_dict_str__Annotated_Union_str__Annotated_int__Strict_strict_True____Annotated_bool__Strict_strict_True____tuple_str___________NoneType___BeforeValidator___"
+        },
+        {
+          "$ref": "#/$defs/ReferenceDataset"
+        }
+      ]
+    },
+    "Demand": {
+      "additionalProperties": false,
+      "properties": {
+        "compatibility_groups": {
+          "default": [],
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "title": "Compatibility Groups",
+          "type": "array"
+        },
+        "delivery_due_date": {
+          "format": "date",
+          "title": "Delivery Due Date",
+          "type": "string"
+        },
+        "destination_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Destination Id",
+          "type": "string"
+        },
+        "distance_km": {
+          "anyOf": [
+            {
+              "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "format": "exact-decimal",
+          "title": "Distance Km"
+        },
+        "order_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Order Id",
+          "type": "string"
+        },
+        "origin_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Origin Id",
+          "type": "string"
+        },
+        "priority": {
+          "$ref": "#/$defs/Priority"
+        },
+        "ready_date": {
+          "format": "date",
+          "title": "Ready Date",
+          "type": "string"
+        },
+        "requested": {
+          "$ref": "#/$defs/QuantityVector"
+        },
+        "split_allowed": {
+          "title": "Split Allowed",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "order_id",
+        "origin_id",
+        "destination_id",
+        "distance_km",
+        "ready_date",
+        "delivery_due_date",
+        "priority",
+        "split_allowed",
+        "requested"
+      ],
+      "title": "Demand",
+      "type": "object"
+    },
+    "DemandResolution": {
+      "additionalProperties": false,
+      "properties": {
+        "assigned": {
+          "$ref": "#/$defs/QuantityVector"
+        },
+        "coverage_ratio": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "format": "exact-decimal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Coverage Ratio"
+        },
+        "order_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Order Id",
+          "type": "string"
+        },
+        "priority": {
+          "$ref": "#/$defs/Priority"
+        },
+        "reason_codes": {
+          "default": [],
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "title": "Reason Codes",
+          "type": "array"
+        },
+        "requested": {
+          "$ref": "#/$defs/QuantityVector"
+        },
+        "status": {
+          "enum": [
+            "COVERED",
+            "PARTIALLY_COVERED",
+            "UNASSIGNED"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "trip_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "title": "Trip Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "order_id",
+        "priority",
+        "requested",
+        "assigned",
+        "coverage_ratio",
+        "trip_ids",
+        "status"
+      ],
+      "title": "DemandResolution",
+      "type": "object"
+    },
+    "DetailColumn": {
+      "additionalProperties": false,
+      "properties": {
+        "format": {
+          "enum": [
+            "ID",
+            "TEXT",
+            "DATE",
+            "DECIMAL",
+            "MONEY",
+            "RATIO",
+            "COUNT",
+            "STATUS"
+          ],
+          "title": "Format",
+          "type": "string"
+        },
+        "key": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Key",
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Unit"
+        }
+      },
+      "required": [
+        "key",
+        "unit",
+        "format"
+      ],
+      "title": "DetailColumn",
+      "type": "object"
+    },
+    "DetailDatasetDescriptor": {
+      "additionalProperties": false,
+      "properties": {
+        "columns": {
+          "items": {
+            "$ref": "#/$defs/DetailColumn"
+          },
+          "title": "Columns",
+          "type": "array"
+        },
+        "data": {
+          "$ref": "#/$defs/Delivery_Union_DemandResolution__ResourceUsage__ResourceTimeline__ServiceAnalysis__EntityEvidence__Trip__ScheduleTrip__"
+        },
+        "dataset_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Dataset Id",
+          "type": "string"
+        },
+        "dataset_type": {
+          "enum": [
+            "PLAN",
+            "DEMAND",
+            "RESOURCES",
+            "SCHEDULE",
+            "TRIPS",
+            "SERVICE",
+            "EVIDENCE"
+          ],
+          "title": "Dataset Type",
+          "type": "string"
+        },
+        "primary_key": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Primary Key",
+          "type": "array"
+        },
+        "stable_order": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Stable Order",
+          "type": "array"
+        }
+      },
+      "required": [
+        "dataset_id",
+        "dataset_type",
+        "columns",
+        "primary_key",
+        "stable_order",
+        "data"
+      ],
+      "title": "DetailDatasetDescriptor",
+      "type": "object"
+    },
+    "DetailPage_Union_DemandResolution__ResourceUsage__ResourceTimeline__ServiceAnalysis__EntityEvidence__Trip__ScheduleTrip__": {
+      "additionalProperties": false,
+      "properties": {
+        "dataset_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Dataset Id",
+          "type": "string"
+        },
+        "limit": {
+          "maximum": 100,
+          "minimum": 1,
+          "title": "Limit",
+          "type": "integer"
+        },
+        "offset": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Offset",
+          "type": "integer"
+        },
+        "provenance": {
+          "$ref": "#/$defs/ResultBinding"
+        },
+        "rows": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/DemandResolution"
+              },
+              {
+                "$ref": "#/$defs/ResourceUsage"
+              },
+              {
+                "$ref": "#/$defs/ResourceTimeline"
+              },
+              {
+                "$ref": "#/$defs/ServiceAnalysis"
+              },
+              {
+                "$ref": "#/$defs/EntityEvidence"
+              },
+              {
+                "$ref": "#/$defs/Trip"
+              },
+              {
+                "$ref": "#/$defs/ScheduleTrip"
+              }
+            ]
+          },
+          "title": "Rows",
+          "type": "array"
+        },
+        "total": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Total",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "provenance",
+        "dataset_id",
+        "offset",
+        "limit",
+        "total",
+        "rows"
+      ],
+      "title": "DetailPage[Union[DemandResolution, ResourceUsage, ResourceTimeline, ServiceAnalysis, EntityEvidence, Trip, ScheduleTrip]]",
+      "type": "object"
+    },
+    "Dimension": {
+      "enum": [
+        "pallets",
+        "weight_kg",
+        "volume_m3",
+        "units"
+      ],
+      "title": "Dimension",
+      "type": "string"
+    },
+    "DispatchEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "arrival_date": {
+          "format": "date",
+          "title": "Arrival Date",
+          "type": "string"
+        },
+        "dispatch_date": {
+          "format": "date",
+          "title": "Dispatch Date",
+          "type": "string"
+        },
+        "trip_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Trip Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "trip_id",
+        "dispatch_date",
+        "arrival_date"
+      ],
+      "title": "DispatchEvent",
+      "type": "object"
+    },
+    "EngineCoreResult": {
+      "additionalProperties": false,
+      "properties": {
+        "context": {
+          "$ref": "#/$defs/FrozenCaseContext"
+        },
+        "contract_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Contract Version",
+          "type": "integer"
+        },
+        "decision": {
+          "$ref": "#/$defs/Decision"
+        },
+        "engine": {
+          "$ref": "#/$defs/EngineHeader"
+        },
+        "feasibility": {
+          "$ref": "#/$defs/Feasibility"
+        },
+        "input_context_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Input Context Hash",
+          "type": "string"
+        },
+        "metrics": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TransportPlanMetrics"
+            },
+            {
+              "$ref": "#/$defs/DaySchedulingMetrics"
+            }
+          ],
+          "title": "Metrics"
+        },
+        "result_schema": {
+          "enum": [
+            "transport_plan_v1",
+            "day_scheduling_v1"
+          ],
+          "title": "Result Schema",
+          "type": "string"
+        },
+        "result_schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Result Schema Version",
+          "type": "integer"
+        },
+        "schedule": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DaySchedule"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "source_transport_plan": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResultBinding"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "transport_plan": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TransportPlan"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "result_schema",
+        "decision",
+        "context",
+        "engine",
+        "input_context_hash",
+        "feasibility",
+        "metrics"
+      ],
+      "title": "EngineCoreResult",
+      "type": "object"
+    },
+    "EngineEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "constraints": {
+          "items": {
+            "$ref": "#/$defs/ConstraintEvidence"
+          },
+          "title": "Constraints",
+          "type": "array"
+        },
+        "contract_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Contract Version",
+          "type": "integer"
+        },
+        "core_result_fingerprint": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Core Result Fingerprint",
+          "type": "string"
+        },
+        "entities": {
+          "items": {
+            "$ref": "#/$defs/EntityEvidence"
+          },
+          "title": "Entities",
+          "type": "array"
+        },
+        "input_context_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Input Context Hash",
+          "type": "string"
+        },
+        "policy": {
+          "$ref": "#/$defs/PolicyEvidence"
+        },
+        "reasons": {
+          "items": {
+            "$ref": "#/$defs/ReasonEmission"
+          },
+          "title": "Reasons",
+          "type": "array"
+        },
+        "result_schema": {
+          "enum": [
+            "transport_plan_v1",
+            "day_scheduling_v1"
+          ],
+          "title": "Result Schema",
+          "type": "string"
+        },
+        "run_id": {
+          "format": "uuid",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "solver": {
+          "$ref": "#/$defs/SolverEvidence"
+        },
+        "workspace_id": {
+          "format": "uuid",
+          "title": "Workspace Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "result_schema",
+        "workspace_id",
+        "run_id",
+        "input_context_hash",
+        "core_result_fingerprint",
+        "policy",
+        "constraints",
+        "solver",
+        "reasons",
+        "entities"
+      ],
+      "title": "EngineEvidence",
+      "type": "object"
+    },
+    "EngineHeader": {
+      "additionalProperties": false,
+      "properties": {
+        "engine_name": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Engine Name",
+          "type": "string"
+        },
+        "engine_version": {
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+          "title": "Engine Version",
+          "type": "string"
+        },
+        "result_generated_at": {
+          "format": "date-time",
+          "title": "Result Generated At",
+          "type": "string"
+        },
+        "runtime_profile": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Runtime Profile",
+          "type": "string"
+        },
+        "solver": {
+          "const": "OR_TOOLS_CP_SAT",
+          "title": "Solver",
+          "type": "string"
+        },
+        "solver_status": {
+          "enum": [
+            "OPTIMAL",
+            "FEASIBLE",
+            "UNKNOWN",
+            "INFEASIBLE"
+          ],
+          "title": "Solver Status",
+          "type": "string"
+        },
+        "transit_model_version": {
+          "const": "DATION_TRANSIT_V1",
+          "default": "DATION_TRANSIT_V1",
+          "title": "Transit Model Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "engine_name",
+        "engine_version",
+        "runtime_profile",
+        "solver",
+        "solver_status",
+        "result_generated_at"
+      ],
+      "title": "EngineHeader",
+      "type": "object"
+    },
+    "EngineOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "core": {
+          "$ref": "#/$defs/EngineCoreResult"
+        },
+        "evidence": {
+          "$ref": "#/$defs/EngineEvidence"
+        }
+      },
+      "required": [
+        "core",
+        "evidence"
+      ],
+      "title": "EngineOutput",
+      "type": "object"
+    },
+    "EntityEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_summary": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/CandidateSummary"
+          },
+          "title": "Candidate Summary",
+          "type": "array"
+        },
+        "entity_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Entity Id",
+          "type": "string"
+        },
+        "entity_type": {
+          "$ref": "#/$defs/EntityType"
+        },
+        "facts": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title": "Facts",
+          "type": "object"
+        },
+        "reason_refs": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "title": "Reason Refs",
+          "type": "array"
+        }
+      },
+      "required": [
+        "entity_type",
+        "entity_id",
+        "facts",
+        "reason_refs"
+      ],
+      "title": "EntityEvidence",
+      "type": "object"
+    },
+    "EntityRef": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/$defs/EntityType"
+        }
+      },
+      "required": [
+        "type",
+        "id"
+      ],
+      "title": "EntityRef",
+      "type": "object"
+    },
+    "EntityType": {
+      "enum": [
+        "CASE",
+        "ORDER",
+        "TRIP",
+        "RESOURCE",
+        "ALTERNATIVE"
+      ],
+      "title": "EntityType",
+      "type": "string"
+    },
+    "EstimatedCost": {
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "anyOf": [
+            {
+              "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "format": "exact-decimal",
+          "title": "Amount"
+        },
+        "cost_model": {
+          "enum": [
+            "PER_TRIP",
+            "PER_KM",
+            "OWN_OPERATING_CYCLE"
+          ],
+          "title": "Cost Model",
+          "type": "string"
+        },
+        "currency": {
+          "pattern": "^[A-Z]{3}$",
+          "title": "Currency",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount",
+        "currency",
+        "cost_model"
+      ],
+      "title": "EstimatedCost",
+      "type": "object"
+    },
+    "EvidenceSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "constraints": {
+          "items": {
+            "$ref": "#/$defs/ConstraintEvidence"
+          },
+          "title": "Constraints",
+          "type": "array"
+        },
+        "parts": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ReferenceDataset"
+          },
+          "title": "Parts",
+          "type": "array"
+        },
+        "policy": {
+          "$ref": "#/$defs/PolicyEvidence"
+        },
+        "reason_emissions": {
+          "$ref": "#/$defs/Delivery_ReasonEmission_"
+        },
+        "solver": {
+          "$ref": "#/$defs/SolverEvidence"
+        }
+      },
+      "required": [
+        "solver",
+        "policy",
+        "constraints",
+        "reason_emissions"
+      ],
+      "title": "EvidenceSummary",
+      "type": "object"
+    },
+    "ExceptionDescriptor": {
+      "additionalProperties": false,
+      "properties": {
+        "category": {
+          "enum": [
+            "BUSINESS",
+            "FEASIBILITY",
+            "POLICY",
+            "DATA",
+            "ASSUMPTION"
+          ],
+          "title": "Category",
+          "type": "string"
+        },
+        "code": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Code",
+          "type": "string"
+        },
+        "entity_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Entity Ids",
+          "type": "array"
+        },
+        "entity_type": {
+          "$ref": "#/$defs/EntityType"
+        },
+        "exception_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Exception Id",
+          "type": "string"
+        },
+        "facts": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title": "Facts",
+          "type": "object"
+        },
+        "message_key": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Message Key",
+          "type": "string"
+        },
+        "reason_ref": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Reason Ref",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "INFO",
+            "ATTENTION",
+            "BLOCKING"
+          ],
+          "title": "Severity",
+          "type": "string"
+        }
+      },
+      "required": [
+        "exception_id",
+        "category",
+        "severity",
+        "code",
+        "entity_type",
+        "entity_ids",
+        "message_key",
+        "facts",
+        "reason_ref"
+      ],
+      "title": "ExceptionDescriptor",
+      "type": "object"
+    },
+    "ExecutiveSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "facts": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title": "Facts",
+          "type": "object"
+        },
+        "template_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Template Id",
+          "type": "string"
+        },
+        "template_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Template Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "template_id",
+        "facts"
+      ],
+      "title": "ExecutiveSummary",
+      "type": "object"
+    },
+    "ExportDescriptor": {
+      "additionalProperties": false,
+      "properties": {
+        "available": {
+          "title": "Available",
+          "type": "boolean"
+        },
+        "cost_scope": {
+          "anyOf": [
+            {
+              "const": "TRIP_ONCE",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cost Scope"
+        },
+        "granularity": {
+          "enum": [
+            "TRIP_ORDER",
+            "TRIP",
+            "PACKAGE"
+          ],
+          "title": "Granularity",
+          "type": "string"
+        },
+        "rows": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Delivery_dict_str__Annotated_Union_str__Annotated_int__Strict_strict_True____Annotated_bool__Strict_strict_True____tuple_str___________NoneType___BeforeValidator___"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "enum": [
+            "TRANSPORT_PLAN",
+            "DAY_SCHEDULE",
+            "DECISION_RESULT_PACKAGE"
+          ],
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "available",
+        "type",
+        "granularity"
+      ],
+      "title": "ExportDescriptor",
+      "type": "object"
+    },
+    "Exports": {
+      "additionalProperties": false,
+      "properties": {
+        "csv": {
+          "$ref": "#/$defs/ExportDescriptor"
+        },
+        "json": {
+          "$ref": "#/$defs/ExportDescriptor"
+        }
+      },
+      "required": [
+        "csv",
+        "json"
+      ],
+      "title": "Exports",
+      "type": "object"
+    },
+    "ExternalCost": {
+      "additionalProperties": false,
+      "properties": {
+        "billing_basis": {
+          "anyOf": [
+            {
+              "enum": [
+                "ONE_WAY",
+                "ROUND_TRIP"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Billing Basis"
+        },
+        "cost_model": {
+          "enum": [
+            "PER_TRIP",
+            "PER_KM"
+          ],
+          "title": "Cost Model",
+          "type": "string"
+        },
+        "rate": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "format": "exact-decimal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Rate"
+        }
+      },
+      "required": [
+        "cost_model",
+        "rate",
+        "billing_basis"
+      ],
+      "title": "ExternalCost",
+      "type": "object"
+    },
+    "FactRequirement": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "id",
+            "text",
+            "decimal",
+            "positive",
+            "count",
+            "date",
+            "true",
+            "false",
+            "ids",
+            "dimension",
+            "currency",
+            "priority",
+            "availability",
+            "capacity_basis",
+            "reason_code"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "name": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "kind"
+      ],
+      "title": "FactRequirement",
+      "type": "object"
+    },
+    "Feasibility": {
+      "additionalProperties": false,
+      "properties": {
+        "full_demand_coverage": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Full Demand Coverage"
+        },
+        "hard_constraints_satisfied": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Hard Constraints Satisfied"
+        },
+        "policy_feasible": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Policy Feasible"
+        },
+        "solution_found": {
+          "title": "Solution Found",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "solution_found",
+        "policy_feasible",
+        "hard_constraints_satisfied",
+        "full_demand_coverage"
+      ],
+      "title": "Feasibility",
+      "type": "object"
+    },
+    "FingerprintSet": {
+      "additionalProperties": false,
+      "properties": {
+        "canonical_version": {
+          "const": "DATION_CANONICAL_V1",
+          "default": "DATION_CANONICAL_V1",
+          "title": "Canonical Version",
+          "type": "string"
+        },
+        "case_policy_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Case Policy Hash",
+          "type": "string"
+        },
+        "contract_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Contract Hash",
+          "type": "string"
+        },
+        "core_result_fingerprint": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Core Result Fingerprint",
+          "type": "string"
+        },
+        "data_pack_version": {
+          "minimum": 1,
+          "title": "Data Pack Version",
+          "type": "integer"
+        },
+        "engine_version": {
+          "title": "Engine Version",
+          "type": "string"
+        },
+        "input_context_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Input Context Hash",
+          "type": "string"
+        },
+        "model_version": {
+          "minimum": 1,
+          "title": "Model Version",
+          "type": "integer"
+        },
+        "node_policy_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Node Policy Hash",
+          "type": "string"
+        },
+        "result_fingerprint": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Result Fingerprint",
+          "type": "string"
+        },
+        "transit_model_version": {
+          "const": "DATION_TRANSIT_V1",
+          "default": "DATION_TRANSIT_V1",
+          "title": "Transit Model Version",
+          "type": "string"
+        },
+        "upstream_result_fingerprint": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Upstream Result Fingerprint"
+        }
+      },
+      "required": [
+        "input_context_hash",
+        "core_result_fingerprint",
+        "result_fingerprint",
+        "model_version",
+        "data_pack_version",
+        "case_policy_hash",
+        "node_policy_hash",
+        "contract_hash",
+        "engine_version",
+        "upstream_result_fingerprint"
+      ],
+      "title": "FingerprintSet",
+      "type": "object"
+    },
+    "FrozenCaseContext": {
+      "additionalProperties": false,
+      "properties": {
+        "active_dimensions": {
+          "items": {
+            "$ref": "#/$defs/Dimension"
+          },
+          "title": "Active Dimensions",
+          "type": "array"
+        },
+        "case_id": {
+          "format": "uuid",
+          "title": "Case Id",
+          "type": "string"
+        },
+        "case_name": {
+          "maxLength": 200,
+          "title": "Case Name",
+          "type": "string"
+        },
+        "case_policy": {
+          "$ref": "#/$defs/CasePolicy"
+        },
+        "contract_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Contract Hash",
+          "type": "string"
+        },
+        "currency_policy": {
+          "$ref": "#/$defs/CurrencyPolicy"
+        },
+        "data_pack_version": {
+          "minimum": 1,
+          "title": "Data Pack Version",
+          "type": "integer"
+        },
+        "data_pack_version_id": {
+          "format": "uuid",
+          "title": "Data Pack Version Id",
+          "type": "string"
+        },
+        "display_metadata": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Display Metadata",
+          "type": "object"
+        },
+        "graph_version": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Graph Version",
+          "type": "string"
+        },
+        "logistics_model_id": {
+          "format": "uuid",
+          "title": "Logistics Model Id",
+          "type": "string"
+        },
+        "logistics_model_version": {
+          "minimum": 1,
+          "title": "Logistics Model Version",
+          "type": "integer"
+        },
+        "logistics_model_version_id": {
+          "format": "uuid",
+          "title": "Logistics Model Version Id",
+          "type": "string"
+        },
+        "model_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Model Hash",
+          "type": "string"
+        },
+        "node_policy": {
+          "$ref": "#/$defs/NodePolicy"
+        },
+        "operating_role": {
+          "enum": [
+            "SHIPPER",
+            "LOGISTICS_PROVIDER",
+            "HYBRID"
+          ],
+          "title": "Operating Role",
+          "type": "string"
+        },
+        "pack_manifest_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Pack Manifest Hash",
+          "type": "string"
+        },
+        "planning_end": {
+          "format": "date",
+          "title": "Planning End",
+          "type": "string"
+        },
+        "planning_start": {
+          "format": "date",
+          "title": "Planning Start",
+          "type": "string"
+        },
+        "primary_dimension": {
+          "$ref": "#/$defs/Dimension"
+        },
+        "read_set": {
+          "items": {
+            "$ref": "#/$defs/SemanticInput"
+          },
+          "title": "Read Set",
+          "type": "array"
+        },
+        "workspace_id": {
+          "format": "uuid",
+          "title": "Workspace Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "planning_start",
+        "planning_end",
+        "workspace_id",
+        "case_id",
+        "case_name",
+        "operating_role",
+        "logistics_model_id",
+        "logistics_model_version_id",
+        "logistics_model_version",
+        "data_pack_version_id",
+        "data_pack_version",
+        "model_hash",
+        "pack_manifest_hash",
+        "graph_version",
+        "contract_hash",
+        "case_policy",
+        "node_policy",
+        "currency_policy",
+        "primary_dimension",
+        "active_dimensions",
+        "read_set"
+      ],
+      "title": "FrozenCaseContext",
+      "type": "object"
+    },
+    "GanttItem": {
+      "additionalProperties": false,
+      "properties": {
+        "arrival_date": {
+          "format": "date",
+          "title": "Arrival Date",
+          "type": "string"
+        },
+        "dispatch_date": {
+          "format": "date",
+          "title": "Dispatch Date",
+          "type": "string"
+        },
+        "occupancy_end": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Occupancy End"
+        },
+        "occupancy_start": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Occupancy Start"
+        },
+        "resource_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Resource Id",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "ON_TIME",
+            "AT_RISK",
+            "LATE",
+            "PRE_HORIZON_DISPATCH_REQUIRED",
+            "UNSCHEDULED"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "trip_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Trip Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "trip_id",
+        "resource_id",
+        "dispatch_date",
+        "arrival_date",
+        "occupancy_start",
+        "occupancy_end",
+        "status"
+      ],
+      "title": "GanttItem",
+      "type": "object"
+    },
+    "GanttProjection": {
+      "additionalProperties": false,
+      "properties": {
+        "items": {
+          "items": {
+            "$ref": "#/$defs/GanttItem"
+          },
+          "title": "Items",
+          "type": "array"
+        },
+        "planning_end": {
+          "format": "date",
+          "title": "Planning End",
+          "type": "string"
+        },
+        "planning_start": {
+          "format": "date",
+          "title": "Planning Start",
+          "type": "string"
+        },
+        "rows": {
+          "items": {
+            "$ref": "#/$defs/GanttRow"
+          },
+          "title": "Rows",
+          "type": "array"
+        },
+        "type": {
+          "const": "DAY_GANTT",
+          "default": "DAY_GANTT",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "planning_start",
+        "planning_end",
+        "rows",
+        "items"
+      ],
+      "title": "GanttProjection",
+      "type": "object"
+    },
+    "GanttRow": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "resource_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Resource Id",
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/ResourceSource"
+        }
+      },
+      "required": [
+        "resource_id",
+        "label",
+        "source"
+      ],
+      "title": "GanttRow",
+      "type": "object"
+    },
+    "Guardrail": {
+      "additionalProperties": false,
+      "properties": {
+        "hard": {
+          "const": true,
+          "default": true,
+          "title": "Hard",
+          "type": "boolean"
+        },
+        "kind": {
+          "enum": [
+            "MINIMUM_DEMAND_COVERAGE",
+            "CRITICAL_DEMAND_COVERAGE",
+            "MAXIMUM_EXTERNAL_SHARE",
+            "MINIMUM_OWN_SHARE"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "limit": {
+          "anyOf": [
+            {
+              "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "format": "exact-decimal",
+          "title": "Limit"
+        }
+      },
+      "required": [
+        "kind",
+        "limit"
+      ],
+      "title": "Guardrail",
+      "type": "object"
+    },
+    "InlineDataset_DemandResolution_": {
+      "additionalProperties": false,
+      "properties": {
+        "dataset_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Dataset Id",
+          "type": "string"
+        },
+        "delivery_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Delivery Version",
+          "type": "integer"
+        },
+        "mode": {
+          "const": "INLINE",
+          "default": "INLINE",
+          "title": "Mode",
+          "type": "string"
+        },
+        "row_count": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Row Count",
+          "type": "integer"
+        },
+        "row_schema": {
+          "enum": [
+            "transport_trip_v1",
+            "demand_resolution_v1",
+            "resource_usage_v1",
+            "day_schedule_trip_v1",
+            "resource_timeline_v1",
+            "service_analysis_v1",
+            "entity_evidence_v1",
+            "reason_emission_v1",
+            "export_rows_v1",
+            "decision_context_v1",
+            "engine_core_v1",
+            "engine_evidence_v1",
+            "sankey_projection_v1",
+            "day_gantt_projection_v1"
+          ],
+          "title": "Row Schema",
+          "type": "string"
+        },
+        "rows": {
+          "items": {
+            "$ref": "#/$defs/DemandResolution"
+          },
+          "title": "Rows",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "dataset_id",
+        "row_schema",
+        "row_count",
+        "rows"
+      ],
+      "title": "InlineDataset[DemandResolution]",
+      "type": "object"
+    },
+    "InlineDataset_EntityEvidence_": {
+      "additionalProperties": false,
+      "properties": {
+        "dataset_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Dataset Id",
+          "type": "string"
+        },
+        "delivery_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Delivery Version",
+          "type": "integer"
+        },
+        "mode": {
+          "const": "INLINE",
+          "default": "INLINE",
+          "title": "Mode",
+          "type": "string"
+        },
+        "row_count": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Row Count",
+          "type": "integer"
+        },
+        "row_schema": {
+          "enum": [
+            "transport_trip_v1",
+            "demand_resolution_v1",
+            "resource_usage_v1",
+            "day_schedule_trip_v1",
+            "resource_timeline_v1",
+            "service_analysis_v1",
+            "entity_evidence_v1",
+            "reason_emission_v1",
+            "export_rows_v1",
+            "decision_context_v1",
+            "engine_core_v1",
+            "engine_evidence_v1",
+            "sankey_projection_v1",
+            "day_gantt_projection_v1"
+          ],
+          "title": "Row Schema",
+          "type": "string"
+        },
+        "rows": {
+          "items": {
+            "$ref": "#/$defs/EntityEvidence"
+          },
+          "title": "Rows",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "dataset_id",
+        "row_schema",
+        "row_count",
+        "rows"
+      ],
+      "title": "InlineDataset[EntityEvidence]",
+      "type": "object"
+    },
+    "InlineDataset_ReasonEmission_": {
+      "additionalProperties": false,
+      "properties": {
+        "dataset_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Dataset Id",
+          "type": "string"
+        },
+        "delivery_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Delivery Version",
+          "type": "integer"
+        },
+        "mode": {
+          "const": "INLINE",
+          "default": "INLINE",
+          "title": "Mode",
+          "type": "string"
+        },
+        "row_count": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Row Count",
+          "type": "integer"
+        },
+        "row_schema": {
+          "enum": [
+            "transport_trip_v1",
+            "demand_resolution_v1",
+            "resource_usage_v1",
+            "day_schedule_trip_v1",
+            "resource_timeline_v1",
+            "service_analysis_v1",
+            "entity_evidence_v1",
+            "reason_emission_v1",
+            "export_rows_v1",
+            "decision_context_v1",
+            "engine_core_v1",
+            "engine_evidence_v1",
+            "sankey_projection_v1",
+            "day_gantt_projection_v1"
+          ],
+          "title": "Row Schema",
+          "type": "string"
+        },
+        "rows": {
+          "items": {
+            "$ref": "#/$defs/ReasonEmission"
+          },
+          "title": "Rows",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "dataset_id",
+        "row_schema",
+        "row_count",
+        "rows"
+      ],
+      "title": "InlineDataset[ReasonEmission]",
+      "type": "object"
+    },
+    "InlineDataset_ScheduleTrip_": {
+      "additionalProperties": false,
+      "properties": {
+        "dataset_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Dataset Id",
+          "type": "string"
+        },
+        "delivery_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Delivery Version",
+          "type": "integer"
+        },
+        "mode": {
+          "const": "INLINE",
+          "default": "INLINE",
+          "title": "Mode",
+          "type": "string"
+        },
+        "row_count": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Row Count",
+          "type": "integer"
+        },
+        "row_schema": {
+          "enum": [
+            "transport_trip_v1",
+            "demand_resolution_v1",
+            "resource_usage_v1",
+            "day_schedule_trip_v1",
+            "resource_timeline_v1",
+            "service_analysis_v1",
+            "entity_evidence_v1",
+            "reason_emission_v1",
+            "export_rows_v1",
+            "decision_context_v1",
+            "engine_core_v1",
+            "engine_evidence_v1",
+            "sankey_projection_v1",
+            "day_gantt_projection_v1"
+          ],
+          "title": "Row Schema",
+          "type": "string"
+        },
+        "rows": {
+          "items": {
+            "$ref": "#/$defs/ScheduleTrip"
+          },
+          "title": "Rows",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "dataset_id",
+        "row_schema",
+        "row_count",
+        "rows"
+      ],
+      "title": "InlineDataset[ScheduleTrip]",
+      "type": "object"
+    },
+    "InlineDataset_Trip_": {
+      "additionalProperties": false,
+      "properties": {
+        "dataset_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Dataset Id",
+          "type": "string"
+        },
+        "delivery_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Delivery Version",
+          "type": "integer"
+        },
+        "mode": {
+          "const": "INLINE",
+          "default": "INLINE",
+          "title": "Mode",
+          "type": "string"
+        },
+        "row_count": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Row Count",
+          "type": "integer"
+        },
+        "row_schema": {
+          "enum": [
+            "transport_trip_v1",
+            "demand_resolution_v1",
+            "resource_usage_v1",
+            "day_schedule_trip_v1",
+            "resource_timeline_v1",
+            "service_analysis_v1",
+            "entity_evidence_v1",
+            "reason_emission_v1",
+            "export_rows_v1",
+            "decision_context_v1",
+            "engine_core_v1",
+            "engine_evidence_v1",
+            "sankey_projection_v1",
+            "day_gantt_projection_v1"
+          ],
+          "title": "Row Schema",
+          "type": "string"
+        },
+        "rows": {
+          "items": {
+            "$ref": "#/$defs/Trip"
+          },
+          "title": "Rows",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "dataset_id",
+        "row_schema",
+        "row_count",
+        "rows"
+      ],
+      "title": "InlineDataset[Trip]",
+      "type": "object"
+    },
+    "InlineDataset_Union_DemandResolution__ResourceUsage__ResourceTimeline__ServiceAnalysis__EntityEvidence__Trip__ScheduleTrip__": {
+      "additionalProperties": false,
+      "properties": {
+        "dataset_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Dataset Id",
+          "type": "string"
+        },
+        "delivery_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Delivery Version",
+          "type": "integer"
+        },
+        "mode": {
+          "const": "INLINE",
+          "default": "INLINE",
+          "title": "Mode",
+          "type": "string"
+        },
+        "row_count": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Row Count",
+          "type": "integer"
+        },
+        "row_schema": {
+          "enum": [
+            "transport_trip_v1",
+            "demand_resolution_v1",
+            "resource_usage_v1",
+            "day_schedule_trip_v1",
+            "resource_timeline_v1",
+            "service_analysis_v1",
+            "entity_evidence_v1",
+            "reason_emission_v1",
+            "export_rows_v1",
+            "decision_context_v1",
+            "engine_core_v1",
+            "engine_evidence_v1",
+            "sankey_projection_v1",
+            "day_gantt_projection_v1"
+          ],
+          "title": "Row Schema",
+          "type": "string"
+        },
+        "rows": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/DemandResolution"
+              },
+              {
+                "$ref": "#/$defs/ResourceUsage"
+              },
+              {
+                "$ref": "#/$defs/ResourceTimeline"
+              },
+              {
+                "$ref": "#/$defs/ServiceAnalysis"
+              },
+              {
+                "$ref": "#/$defs/EntityEvidence"
+              },
+              {
+                "$ref": "#/$defs/Trip"
+              },
+              {
+                "$ref": "#/$defs/ScheduleTrip"
+              }
+            ]
+          },
+          "title": "Rows",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "dataset_id",
+        "row_schema",
+        "row_count",
+        "rows"
+      ],
+      "title": "InlineDataset[Union[DemandResolution, ResourceUsage, ResourceTimeline, ServiceAnalysis, EntityEvidence, Trip, ScheduleTrip]]",
+      "type": "object"
+    },
+    "InlineDataset_Union_Trip__ScheduleTrip__": {
+      "additionalProperties": false,
+      "properties": {
+        "dataset_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Dataset Id",
+          "type": "string"
+        },
+        "delivery_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Delivery Version",
+          "type": "integer"
+        },
+        "mode": {
+          "const": "INLINE",
+          "default": "INLINE",
+          "title": "Mode",
+          "type": "string"
+        },
+        "row_count": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Row Count",
+          "type": "integer"
+        },
+        "row_schema": {
+          "enum": [
+            "transport_trip_v1",
+            "demand_resolution_v1",
+            "resource_usage_v1",
+            "day_schedule_trip_v1",
+            "resource_timeline_v1",
+            "service_analysis_v1",
+            "entity_evidence_v1",
+            "reason_emission_v1",
+            "export_rows_v1",
+            "decision_context_v1",
+            "engine_core_v1",
+            "engine_evidence_v1",
+            "sankey_projection_v1",
+            "day_gantt_projection_v1"
+          ],
+          "title": "Row Schema",
+          "type": "string"
+        },
+        "rows": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Trip"
+              },
+              {
+                "$ref": "#/$defs/ScheduleTrip"
+              }
+            ]
+          },
+          "title": "Rows",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "dataset_id",
+        "row_schema",
+        "row_count",
+        "rows"
+      ],
+      "title": "InlineDataset[Union[Trip, ScheduleTrip]]",
+      "type": "object"
+    },
+    "InlineDataset_dict_str__Annotated_Union_str__Annotated_int__Strict_strict_True____Annotated_bool__Strict_strict_True____tuple_str___________NoneType___BeforeValidator___": {
+      "additionalProperties": false,
+      "properties": {
+        "dataset_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Dataset Id",
+          "type": "string"
+        },
+        "delivery_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Delivery Version",
+          "type": "integer"
+        },
+        "mode": {
+          "const": "INLINE",
+          "default": "INLINE",
+          "title": "Mode",
+          "type": "string"
+        },
+        "row_count": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Row Count",
+          "type": "integer"
+        },
+        "row_schema": {
+          "enum": [
+            "transport_trip_v1",
+            "demand_resolution_v1",
+            "resource_usage_v1",
+            "day_schedule_trip_v1",
+            "resource_timeline_v1",
+            "service_analysis_v1",
+            "entity_evidence_v1",
+            "reason_emission_v1",
+            "export_rows_v1",
+            "decision_context_v1",
+            "engine_core_v1",
+            "engine_evidence_v1",
+            "sankey_projection_v1",
+            "day_gantt_projection_v1"
+          ],
+          "title": "Row Schema",
+          "type": "string"
+        },
+        "rows": {
+          "items": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "object"
+          },
+          "title": "Rows",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "dataset_id",
+        "row_schema",
+        "row_count",
+        "rows"
+      ],
+      "title": "InlineDataset[dict[str, Annotated[Union[str, Annotated[int, Strict(strict=True)], Annotated[bool, Strict(strict=True)], tuple[str, ...], NoneType], BeforeValidator]]]",
+      "type": "object"
+    },
+    "InputSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "demand": {
+          "$ref": "#/$defs/QuantityVector"
+        },
+        "external_resources": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "External Resources",
+          "type": "integer"
+        },
+        "orders": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Orders",
+          "type": "integer"
+        },
+        "own_resources": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Own Resources",
+          "type": "integer"
+        },
+        "priority_distribution": {
+          "additionalProperties": {
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "propertyNames": {
+            "$ref": "#/$defs/Priority"
+          },
+          "title": "Priority Distribution",
+          "type": "object"
+        }
+      },
+      "required": [
+        "orders",
+        "demand",
+        "priority_distribution",
+        "own_resources",
+        "external_resources"
+      ],
+      "title": "InputSummary",
+      "type": "object"
+    },
+    "LogisticsModelVersion": {
+      "additionalProperties": false,
+      "properties": {
+        "active_dimensions": {
+          "items": {
+            "$ref": "#/$defs/Dimension"
+          },
+          "title": "Active Dimensions",
+          "type": "array"
+        },
+        "allowed_sources": {
+          "items": {
+            "$ref": "#/$defs/ResourceSource"
+          },
+          "title": "Allowed Sources",
+          "type": "array"
+        },
+        "configuration_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Configuration Hash",
+          "type": "string"
+        },
+        "contract_registry_version": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Contract Registry Version",
+          "type": "string"
+        },
+        "currency_policy": {
+          "$ref": "#/$defs/CurrencyPolicy"
+        },
+        "homogeneous_loads_declared": {
+          "title": "Homogeneous Loads Declared",
+          "type": "boolean"
+        },
+        "model_id": {
+          "format": "uuid",
+          "title": "Model Id",
+          "type": "string"
+        },
+        "operating_role": {
+          "enum": [
+            "SHIPPER",
+            "LOGISTICS_PROVIDER",
+            "HYBRID"
+          ],
+          "title": "Operating Role",
+          "type": "string"
+        },
+        "primary_dimension": {
+          "$ref": "#/$defs/Dimension"
+        },
+        "split_permitted": {
+          "title": "Split Permitted",
+          "type": "boolean"
+        },
+        "transport_pattern": {
+          "const": "DIRECT",
+          "default": "DIRECT",
+          "title": "Transport Pattern",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        },
+        "version_id": {
+          "format": "uuid",
+          "title": "Version Id",
+          "type": "string"
+        },
+        "workspace_id": {
+          "format": "uuid",
+          "title": "Workspace Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "workspace_id",
+        "model_id",
+        "version_id",
+        "version",
+        "operating_role",
+        "primary_dimension",
+        "active_dimensions",
+        "allowed_sources",
+        "homogeneous_loads_declared",
+        "split_permitted",
+        "currency_policy",
+        "contract_registry_version",
+        "configuration_hash"
+      ],
+      "title": "LogisticsModelVersion",
+      "type": "object"
+    },
+    "MetricDescriptor": {
+      "additionalProperties": false,
+      "properties": {
+        "currency_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Currency Path"
+        },
+        "denominator": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Denominator"
+        },
+        "dimension_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Dimension Path"
+        },
+        "metric_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Metric Id",
+          "type": "string"
+        },
+        "null_semantics": {
+          "title": "Null Semantics",
+          "type": "string"
+        },
+        "numerator": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Numerator"
+        },
+        "path": {
+          "title": "Path",
+          "type": "string"
+        },
+        "precision": {
+          "maximum": 6,
+          "minimum": 0,
+          "title": "Precision",
+          "type": "integer"
+        },
+        "precision_source": {
+          "default": "FIXED",
+          "enum": [
+            "FIXED",
+            "CURRENCY_POLICY",
+            "DIMENSION_POLICY"
+          ],
+          "title": "Precision Source",
+          "type": "string"
+        },
+        "producer": {
+          "enum": [
+            "transport_plan",
+            "day_scheduling"
+          ],
+          "title": "Producer",
+          "type": "string"
+        },
+        "result_schema": {
+          "enum": [
+            "transport_plan_v1",
+            "day_scheduling_v1"
+          ],
+          "title": "Result Schema",
+          "type": "string"
+        },
+        "unit": {
+          "enum": [
+            "MONEY",
+            "TRIP",
+            "RESOURCE",
+            "RATIO",
+            "DAY",
+            "QUANTITY",
+            "COUNT"
+          ],
+          "title": "Unit",
+          "type": "string"
+        },
+        "version": {
+          "const": 1,
+          "default": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "metric_id",
+        "result_schema",
+        "path",
+        "producer",
+        "unit",
+        "precision",
+        "null_semantics"
+      ],
+      "title": "MetricDescriptor",
+      "type": "object"
+    },
+    "ModelContext": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "model_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Model Hash",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        },
+        "version_id": {
+          "format": "uuid",
+          "title": "Version Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "version_id",
+        "version",
+        "model_hash"
+      ],
+      "title": "ModelContext",
+      "type": "object"
+    },
+    "Money": {
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "anyOf": [
+            {
+              "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "format": "exact-decimal",
+          "title": "Amount"
+        },
+        "currency": {
+          "pattern": "^[A-Z]{3}$",
+          "title": "Currency",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount",
+        "currency"
+      ],
+      "title": "Money",
+      "type": "object"
+    },
+    "NodePolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "guardrails": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Guardrail"
+          },
+          "title": "Guardrails",
+          "type": "array"
+        },
+        "override": {
+          "default": false,
+          "title": "Override",
+          "type": "boolean"
+        },
+        "override_reason": {
+          "anyOf": [
+            {
+              "maxLength": 1000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Override Reason"
+        },
+        "preferences": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Preference"
+          },
+          "title": "Preferences",
+          "type": "array"
+        },
+        "primary_goal": {
+          "enum": [
+            "MINIMIZE_COST",
+            "MAXIMIZE_SERVICE",
+            "MAXIMIZE_OWN_CAPACITY",
+            "MINIMIZE_TRIPS",
+            "BALANCED",
+            "CUSTOM"
+          ],
+          "title": "Primary Goal",
+          "type": "string"
+        },
+        "version": {
+          "const": 1,
+          "default": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "primary_goal"
+      ],
+      "title": "NodePolicy",
+      "type": "object"
+    },
+    "Occupancy": {
+      "additionalProperties": false,
+      "properties": {
+        "busy_until": {
+          "format": "date",
+          "title": "Busy Until",
+          "type": "string"
+        },
+        "dispatch_date": {
+          "format": "date",
+          "title": "Dispatch Date",
+          "type": "string"
+        },
+        "trip_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Trip Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "trip_id",
+        "dispatch_date",
+        "busy_until"
+      ],
+      "title": "Occupancy",
+      "type": "object"
+    },
+    "PeakDispatchDay": {
+      "additionalProperties": false,
+      "properties": {
+        "date": {
+          "format": "date",
+          "title": "Date",
+          "type": "string"
+        },
+        "trip_count": {
+          "minimum": 1,
+          "title": "Trip Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "date",
+        "trip_count"
+      ],
+      "title": "PeakDispatchDay",
+      "type": "object"
+    },
+    "PolicyEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "case_goal": {
+          "title": "Case Goal",
+          "type": "string"
+        },
+        "effective_node_policy": {
+          "title": "Effective Node Policy",
+          "type": "string"
+        },
+        "evidence_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "override": {
+          "title": "Override",
+          "type": "boolean"
+        },
+        "override_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Override Reason"
+        }
+      },
+      "required": [
+        "case_goal",
+        "effective_node_policy",
+        "override",
+        "override_reason",
+        "evidence_id"
+      ],
+      "title": "PolicyEvidence",
+      "type": "object"
+    },
+    "Preference": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "COST",
+            "TRIPS",
+            "SERVICE",
+            "OWN_CAPACITY"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "weight": {
+          "anyOf": [
+            {
+              "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "format": "exact-decimal",
+          "title": "Weight"
+        }
+      },
+      "required": [
+        "kind",
+        "weight"
+      ],
+      "title": "Preference",
+      "type": "object"
+    },
+    "PrimaryVisual": {
+      "additionalProperties": false,
+      "properties": {
+        "projection": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SankeyProjection"
+            },
+            {
+              "$ref": "#/$defs/GanttProjection"
+            },
+            {
+              "$ref": "#/$defs/ReferenceDataset"
+            }
+          ],
+          "title": "Projection"
+        },
+        "type": {
+          "enum": [
+            "SANKEY",
+            "DAY_GANTT"
+          ],
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "projection"
+      ],
+      "title": "PrimaryVisual",
+      "type": "object"
+    },
+    "Priority": {
+      "enum": [
+        "HIGH",
+        "MEDIUM",
+        "LOW"
+      ],
+      "title": "Priority",
+      "type": "string"
+    },
+    "PriorityCoverage": {
+      "additionalProperties": false,
+      "properties": {
+        "coverage_ratio": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "format": "exact-decimal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Coverage Ratio"
+        },
+        "priority": {
+          "$ref": "#/$defs/Priority"
+        }
+      },
+      "required": [
+        "priority",
+        "coverage_ratio"
+      ],
+      "title": "PriorityCoverage",
+      "type": "object"
+    },
+    "PublishedSchedule": {
+      "additionalProperties": false,
+      "properties": {
+        "trips": {
+          "$ref": "#/$defs/Delivery_ScheduleTrip_"
+        }
+      },
+      "required": [
+        "trips"
+      ],
+      "title": "PublishedSchedule",
+      "type": "object"
+    },
+    "PublishedTransportPlan": {
+      "additionalProperties": false,
+      "properties": {
+        "capacity_gap": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/QuantityVector"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "trips": {
+          "$ref": "#/$defs/Delivery_Trip_"
+        },
+        "unassigned_demand": {
+          "$ref": "#/$defs/Delivery_DemandResolution_"
+        }
+      },
+      "required": [
+        "trips",
+        "unassigned_demand",
+        "capacity_gap"
+      ],
+      "title": "PublishedTransportPlan",
+      "type": "object"
+    },
+    "QuantityVector": {
+      "additionalProperties": false,
+      "properties": {
+        "pallets": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "format": "exact-decimal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pallets"
+        },
+        "units": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "format": "exact-decimal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Units"
+        },
+        "volume_m3": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "format": "exact-decimal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Volume M3"
+        },
+        "weight_kg": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "format": "exact-decimal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Weight Kg"
+        }
+      },
+      "title": "QuantityVector",
+      "type": "object"
+    },
+    "ReasonCodeDefinition": {
+      "additionalProperties": false,
+      "properties": {
+        "claim_strength": {
+          "enum": [
+            "OBSERVED",
+            "CERTIFIED_FEASIBILITY",
+            "CERTIFIED_COMPARISON",
+            "CERTIFIED_INFEASIBILITY"
+          ],
+          "title": "Claim Strength",
+          "type": "string"
+        },
+        "entity_scope": {
+          "items": {
+            "$ref": "#/$defs/EntityType"
+          },
+          "title": "Entity Scope",
+          "type": "array"
+        },
+        "message_key": {
+          "title": "Message Key",
+          "type": "string"
+        },
+        "producer": {
+          "enum": [
+            "transport_plan",
+            "day_scheduling"
+          ],
+          "title": "Producer",
+          "type": "string"
+        },
+        "required_facts": {
+          "items": {
+            "$ref": "#/$defs/FactRequirement"
+          },
+          "title": "Required Facts",
+          "type": "array"
+        },
+        "stable_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Stable Id",
+          "type": "string"
+        },
+        "version": {
+          "const": 1,
+          "default": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "stable_id",
+        "entity_scope",
+        "producer",
+        "required_facts",
+        "claim_strength",
+        "message_key"
+      ],
+      "title": "ReasonCodeDefinition",
+      "type": "object"
+    },
+    "ReasonEmission": {
+      "additionalProperties": false,
+      "properties": {
+        "claim_strength": {
+          "enum": [
+            "OBSERVED",
+            "CERTIFIED_FEASIBILITY",
+            "CERTIFIED_COMPARISON",
+            "CERTIFIED_INFEASIBILITY"
+          ],
+          "title": "Claim Strength",
+          "type": "string"
+        },
+        "code": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Code",
+          "type": "string"
+        },
+        "emission_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Emission Id",
+          "type": "string"
+        },
+        "entity_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Entity Id",
+          "type": "string"
+        },
+        "entity_type": {
+          "$ref": "#/$defs/EntityType"
+        },
+        "evidence_refs": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "facts": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "anyOf": [
+                  {
+                    "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+                    "type": "string"
+                  },
+                  {
+                    "type": "integer"
+                  }
+                ],
+                "format": "exact-decimal"
+              },
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title": "Facts",
+          "type": "object"
+        },
+        "producer": {
+          "enum": [
+            "transport_plan",
+            "day_scheduling"
+          ],
+          "title": "Producer",
+          "type": "string"
+        },
+        "version": {
+          "const": 1,
+          "default": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "emission_id",
+        "code",
+        "entity_type",
+        "entity_id",
+        "producer",
+        "claim_strength",
+        "facts",
+        "evidence_refs"
+      ],
+      "title": "ReasonEmission",
+      "type": "object"
+    },
+    "ReferenceDataset": {
+      "additionalProperties": false,
+      "properties": {
+        "artifacts": {
+          "items": {
+            "$ref": "#/$defs/ResultArtifactReference"
+          },
+          "minItems": 1,
+          "title": "Artifacts",
+          "type": "array"
+        },
+        "dataset_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Dataset Id",
+          "type": "string"
+        },
+        "delivery_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Delivery Version",
+          "type": "integer"
+        },
+        "mode": {
+          "const": "REFERENCE",
+          "default": "REFERENCE",
+          "title": "Mode",
+          "type": "string"
+        },
+        "row_count": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Row Count",
+          "type": "integer"
+        },
+        "row_schema": {
+          "enum": [
+            "transport_trip_v1",
+            "demand_resolution_v1",
+            "resource_usage_v1",
+            "day_schedule_trip_v1",
+            "resource_timeline_v1",
+            "service_analysis_v1",
+            "entity_evidence_v1",
+            "reason_emission_v1",
+            "export_rows_v1",
+            "decision_context_v1",
+            "engine_core_v1",
+            "engine_evidence_v1",
+            "sankey_projection_v1",
+            "day_gantt_projection_v1"
+          ],
+          "title": "Row Schema",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "dataset_id",
+        "row_schema",
+        "row_count",
+        "artifacts"
+      ],
+      "title": "ReferenceDataset",
+      "type": "object"
+    },
+    "ResourceMix": {
+      "additionalProperties": false,
+      "properties": {
+        "external_trip_ratio": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "format": "exact-decimal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "External Trip Ratio"
+        },
+        "own_trip_ratio": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "format": "exact-decimal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Own Trip Ratio"
+        }
+      },
+      "required": [
+        "own_trip_ratio",
+        "external_trip_ratio"
+      ],
+      "title": "ResourceMix",
+      "type": "object"
+    },
+    "ResourceSource": {
+      "enum": [
+        "OWN",
+        "EXTERNAL"
+      ],
+      "title": "ResourceSource",
+      "type": "string"
+    },
+    "ResourceTimeline": {
+      "additionalProperties": false,
+      "properties": {
+        "dispatch_events": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/DispatchEvent"
+          },
+          "title": "Dispatch Events",
+          "type": "array"
+        },
+        "occupancy": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Occupancy"
+          },
+          "title": "Occupancy",
+          "type": "array"
+        },
+        "resource_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Resource Id",
+          "type": "string"
+        },
+        "resource_source": {
+          "$ref": "#/$defs/ResourceSource"
+        },
+        "units_available": {
+          "anyOf": [
+            {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Units Available"
+        }
+      },
+      "required": [
+        "resource_id",
+        "resource_source",
+        "units_available"
+      ],
+      "title": "ResourceTimeline",
+      "type": "object"
+    },
+    "ResourceUsage": {
+      "additionalProperties": false,
+      "properties": {
+        "availability_source": {
+          "anyOf": [
+            {
+              "enum": [
+                "CONFIRMED",
+                "ASSUMED",
+                "UNKNOWN"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Availability Source"
+        },
+        "resource_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Resource Id",
+          "type": "string"
+        },
+        "resource_source": {
+          "$ref": "#/$defs/ResourceSource"
+        },
+        "services_available": {
+          "anyOf": [
+            {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Services Available"
+        },
+        "services_remaining": {
+          "anyOf": [
+            {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Services Remaining"
+        },
+        "services_used": {
+          "anyOf": [
+            {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Services Used"
+        },
+        "total_cost": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "total_distance_km": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "format": "exact-decimal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Total Distance Km"
+        },
+        "total_load": {
+          "$ref": "#/$defs/QuantityVector"
+        },
+        "trip_count": {
+          "anyOf": [
+            {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Trip Count"
+        },
+        "trip_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "title": "Trip Ids",
+          "type": "array"
+        },
+        "units_available": {
+          "anyOf": [
+            {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Units Available"
+        },
+        "weighted_utilization": {
+          "$ref": "#/$defs/UtilizationVector"
+        }
+      },
+      "required": [
+        "resource_id",
+        "resource_source",
+        "trip_ids",
+        "total_load",
+        "total_cost",
+        "weighted_utilization"
+      ],
+      "title": "ResourceUsage",
+      "type": "object"
+    },
+    "ResultArtifactReference": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": {
+          "format": "uuid",
+          "title": "Artifact Id",
+          "type": "string"
+        },
+        "artifact_schema": {
+          "enum": [
+            "transport_trip_v1",
+            "demand_resolution_v1",
+            "resource_usage_v1",
+            "day_schedule_trip_v1",
+            "resource_timeline_v1",
+            "service_analysis_v1",
+            "entity_evidence_v1",
+            "reason_emission_v1",
+            "export_rows_v1",
+            "decision_context_v1",
+            "engine_core_v1",
+            "engine_evidence_v1",
+            "sankey_projection_v1",
+            "day_gantt_projection_v1"
+          ],
+          "title": "Artifact Schema",
+          "type": "string"
+        },
+        "assembler_version": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Assembler Version",
+          "type": "string"
+        },
+        "content_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Sha256",
+          "type": "string"
+        },
+        "core_fingerprint": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Core Fingerprint",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "CORE",
+            "EVIDENCE",
+            "ENTITY_EVIDENCE",
+            "DETAIL_DATASET",
+            "VISUAL",
+            "EXPORT_ROWS",
+            "AI_BASE",
+            "ALTERNATIVE_PLAN"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "media_type": {
+          "enum": [
+            "application/json",
+            "application/x-ndjson"
+          ],
+          "title": "Media Type",
+          "type": "string"
+        },
+        "part_key": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Part Key",
+          "type": "string"
+        },
+        "run_id": {
+          "format": "uuid",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "size_bytes": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Size Bytes",
+          "type": "integer"
+        },
+        "workspace_id": {
+          "format": "uuid",
+          "title": "Workspace Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "artifact_id",
+        "workspace_id",
+        "run_id",
+        "kind",
+        "part_key",
+        "artifact_schema",
+        "content_sha256",
+        "size_bytes",
+        "media_type",
+        "core_fingerprint",
+        "assembler_version"
+      ],
+      "title": "ResultArtifactReference",
+      "type": "object"
+    },
+    "ResultBinding": {
+      "additionalProperties": false,
+      "properties": {
+        "result_fingerprint": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Result Fingerprint",
+          "type": "string"
+        },
+        "run_id": {
+          "format": "uuid",
+          "title": "Run Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "run_id",
+        "result_fingerprint"
+      ],
+      "title": "ResultBinding",
+      "type": "object"
+    },
+    "ResultContractBundle": {
+      "additionalProperties": false,
+      "description": "Validates a supplied bundle; never assembles, publishes or reads artifacts.",
+      "properties": {
+        "core": {
+          "$ref": "#/$defs/EngineCoreResult"
+        },
+        "evidence": {
+          "$ref": "#/$defs/EngineEvidence"
+        },
+        "package": {
+          "$ref": "#/$defs/DecisionResultPackageV1"
+        }
+      },
+      "required": [
+        "core",
+        "evidence",
+        "package"
+      ],
+      "title": "ResultContractBundle",
+      "type": "object"
+    },
+    "ResultError": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "enum": [
+            "UNSUPPORTED_RESULT_SCHEMA",
+            "UNSUPPORTED_RUNTIME_IDENTITY",
+            "RUNTIME_UNAVAILABLE",
+            "RESULT_FINGERPRINT_MISMATCH",
+            "ARTIFACT_MISSING",
+            "ARTIFACT_INTEGRITY_ERROR",
+            "CONTEXT_MISMATCH"
+          ],
+          "title": "Code",
+          "type": "string"
+        },
+        "expected_result_fingerprint": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Expected Result Fingerprint"
+        },
+        "retryable": {
+          "title": "Retryable",
+          "type": "boolean"
+        },
+        "run_id": {
+          "format": "uuid",
+          "title": "Run Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "run_id",
+        "expected_result_fingerprint",
+        "retryable"
+      ],
+      "title": "ResultError",
+      "type": "object"
+    },
+    "ResultResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "approval_overlay": {
+          "$ref": "#/$defs/ApprovalOverlay"
+        },
+        "package": {
+          "$ref": "#/$defs/DecisionResultPackageV1"
+        },
+        "provenance": {
+          "$ref": "#/$defs/ResultBinding"
+        }
+      },
+      "required": [
+        "package",
+        "provenance",
+        "approval_overlay"
+      ],
+      "title": "ResultResponse",
+      "type": "object"
+    },
+    "ReviewItem": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Code",
+          "type": "string"
+        },
+        "entity": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EntityRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidence_refs": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "priority": {
+          "minimum": 1,
+          "title": "Priority",
+          "type": "integer"
+        },
+        "type": {
+          "enum": [
+            "ASSUMPTION",
+            "BUSINESS_GAP",
+            "SERVICE_RISK",
+            "HARD_CONSTRAINT",
+            "POLICY",
+            "DATA"
+          ],
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "priority",
+        "type",
+        "code",
+        "entity",
+        "evidence_refs"
+      ],
+      "title": "ReviewItem",
+      "type": "object"
+    },
+    "SankeyLink": {
+      "additionalProperties": false,
+      "properties": {
+        "order_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "title": "Order Ids",
+          "type": "array"
+        },
+        "source": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Source",
+          "type": "string"
+        },
+        "target": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Target",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "format": "exact-decimal",
+          "title": "Value"
+        }
+      },
+      "required": [
+        "source",
+        "target",
+        "value"
+      ],
+      "title": "SankeyLink",
+      "type": "object"
+    },
+    "SankeyNode": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "DESTINATION",
+            "TRIP",
+            "RESOURCE"
+          ],
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "label"
+      ],
+      "title": "SankeyNode",
+      "type": "object"
+    },
+    "SankeyProjection": {
+      "additionalProperties": false,
+      "properties": {
+        "links": {
+          "items": {
+            "$ref": "#/$defs/SankeyLink"
+          },
+          "title": "Links",
+          "type": "array"
+        },
+        "nodes": {
+          "items": {
+            "$ref": "#/$defs/SankeyNode"
+          },
+          "title": "Nodes",
+          "type": "array"
+        },
+        "type": {
+          "const": "SANKEY",
+          "default": "SANKEY",
+          "title": "Type",
+          "type": "string"
+        },
+        "value_dimension": {
+          "$ref": "#/$defs/Dimension"
+        }
+      },
+      "required": [
+        "value_dimension",
+        "nodes",
+        "links"
+      ],
+      "title": "SankeyProjection",
+      "type": "object"
+    },
+    "ScheduleTrip": {
+      "additionalProperties": false,
+      "properties": {
+        "available_again": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Available Again"
+        },
+        "cycle_days": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cycle Days"
+        },
+        "delivery_due_date": {
+          "format": "date",
+          "title": "Delivery Due Date",
+          "type": "string"
+        },
+        "dispatch_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Dispatch Date"
+        },
+        "expected_arrival_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Expected Arrival Date"
+        },
+        "outbound_days": {
+          "minimum": 1,
+          "title": "Outbound Days",
+          "type": "integer"
+        },
+        "ready_date": {
+          "format": "date",
+          "title": "Ready Date",
+          "type": "string"
+        },
+        "reason_codes": {
+          "default": [],
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "title": "Reason Codes",
+          "type": "array"
+        },
+        "resource_busy_until": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Resource Busy Until"
+        },
+        "resource_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Resource Id",
+          "type": "string"
+        },
+        "resource_source": {
+          "$ref": "#/$defs/ResourceSource"
+        },
+        "schedule_margin_days": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Schedule Margin Days"
+        },
+        "status": {
+          "enum": [
+            "ON_TIME",
+            "AT_RISK",
+            "LATE",
+            "PRE_HORIZON_DISPATCH_REQUIRED",
+            "UNSCHEDULED"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "trip_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Trip Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "trip_id",
+        "resource_id",
+        "resource_source",
+        "ready_date",
+        "delivery_due_date",
+        "dispatch_date",
+        "expected_arrival_date",
+        "outbound_days",
+        "status"
+      ],
+      "title": "ScheduleTrip",
+      "type": "object"
+    },
+    "ScheduledTrips": {
+      "additionalProperties": false,
+      "properties": {
+        "ratio": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "format": "exact-decimal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Ratio"
+        },
+        "scheduled": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Scheduled",
+          "type": "integer"
+        },
+        "total": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Total",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "scheduled",
+        "total",
+        "ratio"
+      ],
+      "title": "ScheduledTrips",
+      "type": "object"
+    },
+    "SemanticInput": {
+      "additionalProperties": false,
+      "properties": {
+        "canonical_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Canonical Sha256",
+          "type": "string"
+        },
+        "contract_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Contract Hash",
+          "type": "string"
+        },
+        "normalizer_version": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Normalizer Version",
+          "type": "string"
+        },
+        "slot": {
+          "enum": [
+            "transport_demand",
+            "transport_resources",
+            "scheduling_enrichment"
+          ],
+          "title": "Slot",
+          "type": "string"
+        }
+      },
+      "required": [
+        "slot",
+        "canonical_sha256",
+        "contract_hash",
+        "normalizer_version"
+      ],
+      "title": "SemanticInput",
+      "type": "object"
+    },
+    "ServiceAnalysis": {
+      "additionalProperties": false,
+      "properties": {
+        "arrival_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Arrival Date"
+        },
+        "delivery_due_date": {
+          "format": "date",
+          "title": "Delivery Due Date",
+          "type": "string"
+        },
+        "dispatch_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Dispatch Date"
+        },
+        "margin_days": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Margin Days"
+        },
+        "status": {
+          "enum": [
+            "ON_TIME",
+            "AT_RISK",
+            "LATE",
+            "PRE_HORIZON_DISPATCH_REQUIRED",
+            "UNSCHEDULED"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "trip_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Trip Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "trip_id",
+        "dispatch_date",
+        "arrival_date",
+        "delivery_due_date",
+        "margin_days",
+        "status"
+      ],
+      "title": "ServiceAnalysis",
+      "type": "object"
+    },
+    "ServiceLevel": {
+      "additionalProperties": false,
+      "properties": {
+        "at_risk": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "At Risk",
+          "type": "integer"
+        },
+        "late": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Late",
+          "type": "integer"
+        },
+        "on_time": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "On Time",
+          "type": "integer"
+        },
+        "pre_horizon": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Pre Horizon",
+          "type": "integer"
+        },
+        "unscheduled": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Unscheduled",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "on_time",
+        "at_risk",
+        "late",
+        "pre_horizon",
+        "unscheduled"
+      ],
+      "title": "ServiceLevel",
+      "type": "object"
+    },
+    "SolverCertificate": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence_ref": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Evidence Ref",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "GLOBAL_OPTIMUM",
+            "INFEASIBILITY",
+            "FEASIBILITY"
+          ],
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "evidence_ref"
+      ],
+      "title": "SolverCertificate",
+      "type": "object"
+    },
+    "SolverEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "best_bound": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "format": "exact-decimal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Best Bound"
+        },
+        "certificate": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SolverCertificate"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "objective_value": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "format": "exact-decimal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Objective Value"
+        },
+        "status": {
+          "enum": [
+            "OPTIMAL",
+            "FEASIBLE",
+            "UNKNOWN",
+            "INFEASIBLE"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "objective_value",
+        "best_bound",
+        "certificate"
+      ],
+      "title": "SolverEvidence",
+      "type": "object"
+    },
+    "TransportPlan": {
+      "additionalProperties": false,
+      "properties": {
+        "capacity_gap": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/QuantityVector"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "trips": {
+          "items": {
+            "$ref": "#/$defs/Trip"
+          },
+          "title": "Trips",
+          "type": "array"
+        },
+        "unassigned_demand": {
+          "items": {
+            "$ref": "#/$defs/DemandResolution"
+          },
+          "title": "Unassigned Demand",
+          "type": "array"
+        }
+      },
+      "required": [
+        "trips",
+        "unassigned_demand",
+        "capacity_gap"
+      ],
+      "title": "TransportPlan",
+      "type": "object"
+    },
+    "TransportPlanMetrics": {
+      "additionalProperties": false,
+      "properties": {
+        "capacity_utilization": {
+          "$ref": "#/$defs/Utilization"
+        },
+        "cost_completeness": {
+          "enum": [
+            "COMPLETE",
+            "PARTIAL",
+            "UNKNOWN"
+          ],
+          "title": "Cost Completeness",
+          "type": "string"
+        },
+        "coverage_by_priority": {
+          "items": {
+            "$ref": "#/$defs/PriorityCoverage"
+          },
+          "title": "Coverage By Priority",
+          "type": "array"
+        },
+        "demand_coverage": {
+          "$ref": "#/$defs/Coverage"
+        },
+        "resource_mix": {
+          "$ref": "#/$defs/ResourceMix"
+        },
+        "resources_used": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Resources Used",
+          "type": "integer"
+        },
+        "total_cost": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "trip_count": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Trip Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "total_cost",
+        "cost_completeness",
+        "trip_count",
+        "demand_coverage",
+        "capacity_utilization",
+        "resource_mix",
+        "resources_used",
+        "coverage_by_priority"
+      ],
+      "title": "TransportPlanMetrics",
+      "type": "object"
+    },
+    "TransportResource": {
+      "additionalProperties": false,
+      "properties": {
+        "availability_source": {
+          "anyOf": [
+            {
+              "enum": [
+                "CONFIRMED",
+                "ASSUMED",
+                "UNKNOWN"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Availability Source"
+        },
+        "base_origin_id": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Base Origin Id"
+        },
+        "compatibility_groups": {
+          "default": [],
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "title": "Compatibility Groups",
+          "type": "array"
+        },
+        "external_cost": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ExternalCost"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "guaranteed_capacity": {
+          "$ref": "#/$defs/QuantityVector"
+        },
+        "lanes": {
+          "items": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+                "type": "string"
+              },
+              {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+                "type": "string"
+              }
+            ],
+            "type": "array"
+          },
+          "title": "Lanes",
+          "type": "array"
+        },
+        "maximum_capacity": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/QuantityVector"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "operating_cost_per_km": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "format": "exact-decimal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Operating Cost Per Km"
+        },
+        "resource_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Resource Id",
+          "type": "string"
+        },
+        "services_available": {
+          "anyOf": [
+            {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Services Available"
+        },
+        "source": {
+          "$ref": "#/$defs/ResourceSource"
+        },
+        "units_available": {
+          "anyOf": [
+            {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Units Available"
+        }
+      },
+      "required": [
+        "resource_id",
+        "source",
+        "guaranteed_capacity",
+        "lanes"
+      ],
+      "title": "TransportResource",
+      "type": "object"
+    },
+    "Trip": {
+      "additionalProperties": false,
+      "properties": {
+        "delivery_due_date": {
+          "format": "date",
+          "title": "Delivery Due Date",
+          "type": "string"
+        },
+        "destination_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Destination Id",
+          "type": "string"
+        },
+        "distance_km": {
+          "anyOf": [
+            {
+              "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "format": "exact-decimal",
+          "title": "Distance Km"
+        },
+        "estimated_cost": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EstimatedCost"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "guaranteed_capacity": {
+          "$ref": "#/$defs/QuantityVector"
+        },
+        "orders": {
+          "items": {
+            "$ref": "#/$defs/Allocation"
+          },
+          "minItems": 1,
+          "title": "Orders",
+          "type": "array"
+        },
+        "origin_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Origin Id",
+          "type": "string"
+        },
+        "ready_date": {
+          "format": "date",
+          "title": "Ready Date",
+          "type": "string"
+        },
+        "reason_codes": {
+          "default": [],
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+            "type": "string"
+          },
+          "title": "Reason Codes",
+          "type": "array"
+        },
+        "resource_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Resource Id",
+          "type": "string"
+        },
+        "resource_source": {
+          "$ref": "#/$defs/ResourceSource"
+        },
+        "total_load": {
+          "$ref": "#/$defs/QuantityVector"
+        },
+        "trip_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Trip Id",
+          "type": "string"
+        },
+        "utilization": {
+          "$ref": "#/$defs/UtilizationVector"
+        }
+      },
+      "required": [
+        "trip_id",
+        "origin_id",
+        "destination_id",
+        "distance_km",
+        "resource_id",
+        "resource_source",
+        "orders",
+        "total_load",
+        "guaranteed_capacity",
+        "utilization",
+        "estimated_cost",
+        "ready_date",
+        "delivery_due_date"
+      ],
+      "title": "Trip",
+      "type": "object"
+    },
+    "UltimateRunRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "case_id": {
+          "format": "uuid",
+          "title": "Case Id",
+          "type": "string"
+        },
+        "data_pack_version_id": {
+          "format": "uuid",
+          "title": "Data Pack Version Id",
+          "type": "string"
+        },
+        "expected_context_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Expected Context Hash",
+          "type": "string"
+        },
+        "model_version_id": {
+          "format": "uuid",
+          "title": "Model Version Id",
+          "type": "string"
+        },
+        "node_id": {
+          "enum": [
+            "logistics_assignment",
+            "logistics_scheduling"
+          ],
+          "title": "Node Id",
+          "type": "string"
+        },
+        "node_policy": {
+          "$ref": "#/$defs/NodePolicy"
+        },
+        "request_schema": {
+          "const": "ultimate_run_request_v1",
+          "default": "ultimate_run_request_v1",
+          "title": "Request Schema",
+          "type": "string"
+        },
+        "source_transport_plan": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ResultBinding"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "workflow_version": {
+          "const": 2,
+          "default": 2,
+          "title": "Workflow Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "case_id",
+        "node_id",
+        "expected_context_hash",
+        "model_version_id",
+        "data_pack_version_id",
+        "node_policy"
+      ],
+      "title": "UltimateRunRequest",
+      "type": "object"
+    },
+    "Utilization": {
+      "additionalProperties": false,
+      "properties": {
+        "primary_dimension": {
+          "$ref": "#/$defs/Dimension"
+        },
+        "weighted_ratio": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "format": "exact-decimal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Weighted Ratio"
+        }
+      },
+      "required": [
+        "primary_dimension",
+        "weighted_ratio"
+      ],
+      "title": "Utilization",
+      "type": "object"
+    },
+    "UtilizationVector": {
+      "additionalProperties": false,
+      "properties": {
+        "pallets": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "format": "exact-decimal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pallets"
+        },
+        "units": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "format": "exact-decimal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Units"
+        },
+        "volume_m3": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "format": "exact-decimal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Volume M3"
+        },
+        "weight_kg": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "format": "exact-decimal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Weight Kg"
+        }
+      },
+      "title": "UtilizationVector",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "api": [
+    {
+      "implemented": false,
+      "method": "GET",
+      "path": "/api/runs/{run_id}/result",
+      "required_query": "expected_result_fingerprint"
+    },
+    {
+      "implemented": false,
+      "method": "GET",
+      "path": "/api/runs/{run_id}/details/{dataset_id}",
+      "required_query": "expected_result_fingerprint"
+    },
+    {
+      "implemented": false,
+      "method": "GET",
+      "path": "/api/runs/{run_id}/entities/{entity_type}/{entity_id}",
+      "required_query": "expected_result_fingerprint"
+    },
+    {
+      "implemented": false,
+      "method": "GET",
+      "path": "/api/runs/{run_id}/artifacts/{artifact_id}",
+      "required_query": "expected_result_fingerprint"
+    },
+    {
+      "implemented": false,
+      "method": "GET",
+      "path": "/api/runs/{run_id}/approval-review",
+      "required_query": "expected_result_fingerprint"
+    },
+    {
+      "implemented": false,
+      "method": "POST",
+      "path": "/api/runs/{run_id}/decision-context",
+      "required_query": "expected_result_fingerprint"
+    },
+    {
+      "implemented": false,
+      "method": "POST",
+      "path": "/api/runs/{run_id}/decision-assistant/v1",
+      "required_query": "expected_result_fingerprint"
+    }
+  ],
+  "budgets": {
+    "entities_per_chunk": 100,
+    "evidence_chunk_bytes": 1048576,
+    "package_bytes": 524288,
+    "page_rows": 100,
+    "selected_entity_bytes": 51200,
+    "visual_inline_bytes": 262144
+  },
+  "canonical_version": "DATION_CANONICAL_V1",
+  "contract": "DATION_RESULT_CONTRACTS_V1",
+  "decimal_wire_format": "FINITE_DECIMAL_STRING",
+  "json_schemas": {
+    "AlternativeDescriptor": {
+      "$ref": "#/$defs/AlternativeDescriptor"
+    },
+    "ApprovalReview": {
+      "$ref": "#/$defs/ApprovalReview"
+    },
+    "ApprovalReviewResponse": {
+      "$ref": "#/$defs/ApprovalReviewResponse"
+    },
+    "ArtifactReadError": {
+      "$ref": "#/$defs/ArtifactReadError"
+    },
+    "AssumptionDescriptor": {
+      "$ref": "#/$defs/AssumptionDescriptor"
+    },
+    "CasePolicy": {
+      "$ref": "#/$defs/CasePolicy"
+    },
+    "CurrencyPolicy": {
+      "$ref": "#/$defs/CurrencyPolicy"
+    },
+    "DecisionContextResponse": {
+      "$ref": "#/$defs/DecisionContextResponse"
+    },
+    "DecisionContextV1": {
+      "$ref": "#/$defs/DecisionContextV1"
+    },
+    "DecisionIntentV2": {
+      "$ref": "#/$defs/DecisionIntentV2"
+    },
+    "DecisionResultPackageV1": {
+      "$ref": "#/$defs/DecisionResultPackageV1"
+    },
+    "Demand": {
+      "$ref": "#/$defs/Demand"
+    },
+    "DetailDatasetDescriptor": {
+      "$ref": "#/$defs/DetailDatasetDescriptor"
+    },
+    "DetailPage[Union[DemandResolution, ResourceUsage, ResourceTimeline, ServiceAnalysis, EntityEvidence, Trip, ScheduleTrip]]": {
+      "$ref": "#/$defs/DetailPage_Union_DemandResolution__ResourceUsage__ResourceTimeline__ServiceAnalysis__EntityEvidence__Trip__ScheduleTrip__"
+    },
+    "EngineCoreResult": {
+      "$ref": "#/$defs/EngineCoreResult"
+    },
+    "EngineEvidence": {
+      "$ref": "#/$defs/EngineEvidence"
+    },
+    "EngineOutput": {
+      "$ref": "#/$defs/EngineOutput"
+    },
+    "ExceptionDescriptor": {
+      "$ref": "#/$defs/ExceptionDescriptor"
+    },
+    "FingerprintSet": {
+      "$ref": "#/$defs/FingerprintSet"
+    },
+    "FrozenCaseContext": {
+      "$ref": "#/$defs/FrozenCaseContext"
+    },
+    "LogisticsModelVersion": {
+      "$ref": "#/$defs/LogisticsModelVersion"
+    },
+    "MetricDescriptor": {
+      "$ref": "#/$defs/MetricDescriptor"
+    },
+    "Money": {
+      "$ref": "#/$defs/Money"
+    },
+    "NodePolicy": {
+      "$ref": "#/$defs/NodePolicy"
+    },
+    "ReasonCodeDefinition": {
+      "$ref": "#/$defs/ReasonCodeDefinition"
+    },
+    "ResultArtifactReference": {
+      "$ref": "#/$defs/ResultArtifactReference"
+    },
+    "ResultContractBundle": {
+      "$ref": "#/$defs/ResultContractBundle"
+    },
+    "ResultError": {
+      "$ref": "#/$defs/ResultError"
+    },
+    "ResultResponse": {
+      "$ref": "#/$defs/ResultResponse"
+    },
+    "TransportResource": {
+      "$ref": "#/$defs/TransportResource"
+    },
+    "UltimateRunRequest": {
+      "$ref": "#/$defs/UltimateRunRequest"
+    }
+  },
+  "metric_catalog_version": "DATION_METRICS_V1",
+  "metrics": [
+    {
+      "currency_path": "context.currency_policy.currency",
+      "denominator": null,
+      "dimension_path": null,
+      "metric_id": "total_cost",
+      "null_semantics": "UNKNOWN_OR_UNDEFINED_IS_NULL_NEVER_ZERO",
+      "numerator": null,
+      "path": "metrics.total_cost",
+      "precision": 6,
+      "precision_source": "CURRENCY_POLICY",
+      "producer": "transport_plan",
+      "result_schema": "transport_plan_v1",
+      "unit": "MONEY",
+      "version": 1
+    },
+    {
+      "currency_path": null,
+      "denominator": null,
+      "dimension_path": null,
+      "metric_id": "trip_count",
+      "null_semantics": "UNKNOWN_OR_UNDEFINED_IS_NULL_NEVER_ZERO",
+      "numerator": null,
+      "path": "metrics.trip_count",
+      "precision": 0,
+      "precision_source": "FIXED",
+      "producer": "transport_plan",
+      "result_schema": "transport_plan_v1",
+      "unit": "TRIP",
+      "version": 1
+    },
+    {
+      "currency_path": null,
+      "denominator": "requested",
+      "dimension_path": null,
+      "metric_id": "demand_coverage.ratio",
+      "null_semantics": "UNKNOWN_OR_UNDEFINED_IS_NULL_NEVER_ZERO",
+      "numerator": "assigned",
+      "path": "metrics.demand_coverage.ratio",
+      "precision": 4,
+      "precision_source": "FIXED",
+      "producer": "transport_plan",
+      "result_schema": "transport_plan_v1",
+      "unit": "RATIO",
+      "version": 1
+    },
+    {
+      "currency_path": null,
+      "denominator": null,
+      "dimension_path": "context.primary_dimension",
+      "metric_id": "demand_coverage.requested",
+      "null_semantics": "UNKNOWN_OR_UNDEFINED_IS_NULL_NEVER_ZERO",
+      "numerator": null,
+      "path": "metrics.demand_coverage.requested",
+      "precision": 6,
+      "precision_source": "DIMENSION_POLICY",
+      "producer": "transport_plan",
+      "result_schema": "transport_plan_v1",
+      "unit": "QUANTITY",
+      "version": 1
+    },
+    {
+      "currency_path": null,
+      "denominator": null,
+      "dimension_path": "context.primary_dimension",
+      "metric_id": "demand_coverage.assigned",
+      "null_semantics": "UNKNOWN_OR_UNDEFINED_IS_NULL_NEVER_ZERO",
+      "numerator": null,
+      "path": "metrics.demand_coverage.assigned",
+      "precision": 6,
+      "precision_source": "DIMENSION_POLICY",
+      "producer": "transport_plan",
+      "result_schema": "transport_plan_v1",
+      "unit": "QUANTITY",
+      "version": 1
+    },
+    {
+      "currency_path": null,
+      "denominator": null,
+      "dimension_path": "context.primary_dimension",
+      "metric_id": "demand_coverage.unassigned",
+      "null_semantics": "UNKNOWN_OR_UNDEFINED_IS_NULL_NEVER_ZERO",
+      "numerator": null,
+      "path": "metrics.demand_coverage.unassigned",
+      "precision": 6,
+      "precision_source": "DIMENSION_POLICY",
+      "producer": "transport_plan",
+      "result_schema": "transport_plan_v1",
+      "unit": "QUANTITY",
+      "version": 1
+    },
+    {
+      "currency_path": null,
+      "denominator": "sum_trip_guaranteed_capacity",
+      "dimension_path": null,
+      "metric_id": "capacity_utilization.weighted_ratio",
+      "null_semantics": "UNKNOWN_OR_UNDEFINED_IS_NULL_NEVER_ZERO",
+      "numerator": "sum_trip_load",
+      "path": "metrics.capacity_utilization.weighted_ratio",
+      "precision": 4,
+      "precision_source": "FIXED",
+      "producer": "transport_plan",
+      "result_schema": "transport_plan_v1",
+      "unit": "RATIO",
+      "version": 1
+    },
+    {
+      "currency_path": null,
+      "denominator": "trip_count",
+      "dimension_path": null,
+      "metric_id": "resource_mix.own_trip_ratio",
+      "null_semantics": "UNKNOWN_OR_UNDEFINED_IS_NULL_NEVER_ZERO",
+      "numerator": "own_trips",
+      "path": "metrics.resource_mix.own_trip_ratio",
+      "precision": 4,
+      "precision_source": "FIXED",
+      "producer": "transport_plan",
+      "result_schema": "transport_plan_v1",
+      "unit": "RATIO",
+      "version": 1
+    },
+    {
+      "currency_path": null,
+      "denominator": "trip_count",
+      "dimension_path": null,
+      "metric_id": "resource_mix.external_trip_ratio",
+      "null_semantics": "UNKNOWN_OR_UNDEFINED_IS_NULL_NEVER_ZERO",
+      "numerator": "external_trips",
+      "path": "metrics.resource_mix.external_trip_ratio",
+      "precision": 4,
+      "precision_source": "FIXED",
+      "producer": "transport_plan",
+      "result_schema": "transport_plan_v1",
+      "unit": "RATIO",
+      "version": 1
+    },
+    {
+      "currency_path": null,
+      "denominator": null,
+      "dimension_path": null,
+      "metric_id": "resources_used",
+      "null_semantics": "UNKNOWN_OR_UNDEFINED_IS_NULL_NEVER_ZERO",
+      "numerator": null,
+      "path": "metrics.resources_used",
+      "precision": 0,
+      "precision_source": "FIXED",
+      "producer": "transport_plan",
+      "result_schema": "transport_plan_v1",
+      "unit": "RESOURCE",
+      "version": 1
+    },
+    {
+      "currency_path": null,
+      "denominator": "requested_by_priority",
+      "dimension_path": null,
+      "metric_id": "coverage_by_priority.coverage_ratio",
+      "null_semantics": "UNKNOWN_OR_UNDEFINED_IS_NULL_NEVER_ZERO",
+      "numerator": "assigned_by_priority",
+      "path": "metrics.coverage_by_priority.coverage_ratio",
+      "precision": 4,
+      "precision_source": "FIXED",
+      "producer": "transport_plan",
+      "result_schema": "transport_plan_v1",
+      "unit": "RATIO",
+      "version": 1
+    },
+    {
+      "currency_path": null,
+      "denominator": null,
+      "dimension_path": null,
+      "metric_id": "scheduled_trips.scheduled",
+      "null_semantics": "UNKNOWN_OR_UNDEFINED_IS_NULL_NEVER_ZERO",
+      "numerator": null,
+      "path": "metrics.scheduled_trips.scheduled",
+      "precision": 0,
+      "precision_source": "FIXED",
+      "producer": "day_scheduling",
+      "result_schema": "day_scheduling_v1",
+      "unit": "TRIP",
+      "version": 1
+    },
+    {
+      "currency_path": null,
+      "denominator": null,
+      "dimension_path": null,
+      "metric_id": "scheduled_trips.total",
+      "null_semantics": "UNKNOWN_OR_UNDEFINED_IS_NULL_NEVER_ZERO",
+      "numerator": null,
+      "path": "metrics.scheduled_trips.total",
+      "precision": 0,
+      "precision_source": "FIXED",
+      "producer": "day_scheduling",
+      "result_schema": "day_scheduling_v1",
+      "unit": "TRIP",
+      "version": 1
+    },
+    {
+      "currency_path": null,
+      "denominator": "total",
+      "dimension_path": null,
+      "metric_id": "scheduled_trips.ratio",
+      "null_semantics": "UNKNOWN_OR_UNDEFINED_IS_NULL_NEVER_ZERO",
+      "numerator": "scheduled",
+      "path": "metrics.scheduled_trips.ratio",
+      "precision": 4,
+      "precision_source": "FIXED",
+      "producer": "day_scheduling",
+      "result_schema": "day_scheduling_v1",
+      "unit": "RATIO",
+      "version": 1
+    },
+    {
+      "currency_path": null,
+      "denominator": null,
+      "dimension_path": null,
+      "metric_id": "service_level.on_time",
+      "null_semantics": "UNKNOWN_OR_UNDEFINED_IS_NULL_NEVER_ZERO",
+      "numerator": null,
+      "path": "metrics.service_level.on_time",
+      "precision": 0,
+      "precision_source": "FIXED",
+      "producer": "day_scheduling",
+      "result_schema": "day_scheduling_v1",
+      "unit": "TRIP",
+      "version": 1
+    },
+    {
+      "currency_path": null,
+      "denominator": null,
+      "dimension_path": null,
+      "metric_id": "service_level.at_risk",
+      "null_semantics": "UNKNOWN_OR_UNDEFINED_IS_NULL_NEVER_ZERO",
+      "numerator": null,
+      "path": "metrics.service_level.at_risk",
+      "precision": 0,
+      "precision_source": "FIXED",
+      "producer": "day_scheduling",
+      "result_schema": "day_scheduling_v1",
+      "unit": "TRIP",
+      "version": 1
+    },
+    {
+      "currency_path": null,
+      "denominator": null,
+      "dimension_path": null,
+      "metric_id": "service_level.late",
+      "null_semantics": "UNKNOWN_OR_UNDEFINED_IS_NULL_NEVER_ZERO",
+      "numerator": null,
+      "path": "metrics.service_level.late",
+      "precision": 0,
+      "precision_source": "FIXED",
+      "producer": "day_scheduling",
+      "result_schema": "day_scheduling_v1",
+      "unit": "TRIP",
+      "version": 1
+    },
+    {
+      "currency_path": null,
+      "denominator": null,
+      "dimension_path": null,
+      "metric_id": "service_level.pre_horizon",
+      "null_semantics": "UNKNOWN_OR_UNDEFINED_IS_NULL_NEVER_ZERO",
+      "numerator": null,
+      "path": "metrics.service_level.pre_horizon",
+      "precision": 0,
+      "precision_source": "FIXED",
+      "producer": "day_scheduling",
+      "result_schema": "day_scheduling_v1",
+      "unit": "TRIP",
+      "version": 1
+    },
+    {
+      "currency_path": null,
+      "denominator": null,
+      "dimension_path": null,
+      "metric_id": "service_level.unscheduled",
+      "null_semantics": "UNKNOWN_OR_UNDEFINED_IS_NULL_NEVER_ZERO",
+      "numerator": null,
+      "path": "metrics.service_level.unscheduled",
+      "precision": 0,
+      "precision_source": "FIXED",
+      "producer": "day_scheduling",
+      "result_schema": "day_scheduling_v1",
+      "unit": "TRIP",
+      "version": 1
+    },
+    {
+      "currency_path": null,
+      "denominator": "total_trips",
+      "dimension_path": null,
+      "metric_id": "on_time_ratio",
+      "null_semantics": "UNKNOWN_OR_UNDEFINED_IS_NULL_NEVER_ZERO",
+      "numerator": "on_time+at_risk",
+      "path": "metrics.on_time_ratio",
+      "precision": 4,
+      "precision_source": "FIXED",
+      "producer": "day_scheduling",
+      "result_schema": "day_scheduling_v1",
+      "unit": "RATIO",
+      "version": 1
+    },
+    {
+      "currency_path": null,
+      "denominator": "trips_with_known_margin",
+      "dimension_path": null,
+      "metric_id": "average_schedule_margin_days",
+      "null_semantics": "UNKNOWN_OR_UNDEFINED_IS_NULL_NEVER_ZERO",
+      "numerator": "known_margins",
+      "path": "metrics.average_schedule_margin_days",
+      "precision": 4,
+      "precision_source": "FIXED",
+      "producer": "day_scheduling",
+      "result_schema": "day_scheduling_v1",
+      "unit": "DAY",
+      "version": 1
+    },
+    {
+      "currency_path": null,
+      "denominator": null,
+      "dimension_path": null,
+      "metric_id": "peak_dispatch_day.trip_count",
+      "null_semantics": "UNKNOWN_OR_UNDEFINED_IS_NULL_NEVER_ZERO",
+      "numerator": null,
+      "path": "metrics.peak_dispatch_day.trip_count",
+      "precision": 0,
+      "precision_source": "FIXED",
+      "producer": "day_scheduling",
+      "result_schema": "day_scheduling_v1",
+      "unit": "TRIP",
+      "version": 1
+    },
+    {
+      "currency_path": null,
+      "denominator": null,
+      "dimension_path": null,
+      "metric_id": "exception_count",
+      "null_semantics": "UNKNOWN_OR_UNDEFINED_IS_NULL_NEVER_ZERO",
+      "numerator": null,
+      "path": "metrics.exception_count",
+      "precision": 0,
+      "precision_source": "FIXED",
+      "producer": "day_scheduling",
+      "result_schema": "day_scheduling_v1",
+      "unit": "COUNT",
+      "version": 1
+    }
+  ],
+  "reason_catalog_version": "DATION_REASONS_V1",
+  "reason_codes": [
+    {
+      "claim_strength": "CERTIFIED_COMPARISON",
+      "entity_scope": [
+        "TRIP"
+      ],
+      "message_key": "ultimate.reason.selected_lowest_cost_feasible",
+      "producer": "transport_plan",
+      "required_facts": [
+        {
+          "kind": "id",
+          "name": "selected_resource_id"
+        },
+        {
+          "kind": "decimal",
+          "name": "selected_cost"
+        },
+        {
+          "kind": "currency",
+          "name": "currency"
+        },
+        {
+          "kind": "decimal",
+          "name": "minimum_feasible_cost"
+        },
+        {
+          "kind": "true",
+          "name": "candidate_set_complete"
+        },
+        {
+          "kind": "id",
+          "name": "certificate_ref"
+        }
+      ],
+      "stable_id": "SELECTED_LOWEST_COST_FEASIBLE",
+      "version": 1
+    },
+    {
+      "claim_strength": "CERTIFIED_FEASIBILITY",
+      "entity_scope": [
+        "TRIP"
+      ],
+      "message_key": "ultimate.reason.selected_only_feasible_resource",
+      "producer": "transport_plan",
+      "required_facts": [
+        {
+          "kind": "id",
+          "name": "selected_resource_id"
+        },
+        {
+          "kind": "count",
+          "name": "feasible_candidate_count"
+        },
+        {
+          "kind": "true",
+          "name": "candidate_set_complete"
+        },
+        {
+          "kind": "id",
+          "name": "certificate_ref"
+        }
+      ],
+      "stable_id": "SELECTED_ONLY_FEASIBLE_RESOURCE",
+      "version": 1
+    },
+    {
+      "claim_strength": "OBSERVED",
+      "entity_scope": [
+        "ORDER",
+        "TRIP"
+      ],
+      "message_key": "ultimate.reason.selected_priority_protection",
+      "producer": "transport_plan",
+      "required_facts": [
+        {
+          "kind": "priority",
+          "name": "protected_priority"
+        },
+        {
+          "kind": "positive",
+          "name": "assigned_quantity"
+        },
+        {
+          "kind": "id",
+          "name": "policy_evidence_ref"
+        }
+      ],
+      "stable_id": "SELECTED_PRIORITY_PROTECTION",
+      "version": 1
+    },
+    {
+      "claim_strength": "CERTIFIED_COMPARISON",
+      "entity_scope": [
+        "TRIP"
+      ],
+      "message_key": "ultimate.reason.selected_own_cost_advantage",
+      "producer": "transport_plan",
+      "required_facts": [
+        {
+          "kind": "decimal",
+          "name": "own_cost"
+        },
+        {
+          "kind": "decimal",
+          "name": "external_cost"
+        },
+        {
+          "kind": "currency",
+          "name": "currency"
+        },
+        {
+          "kind": "true",
+          "name": "candidate_set_complete"
+        },
+        {
+          "kind": "id",
+          "name": "certificate_ref"
+        }
+      ],
+      "stable_id": "SELECTED_OWN_COST_ADVANTAGE",
+      "version": 1
+    },
+    {
+      "claim_strength": "CERTIFIED_FEASIBILITY",
+      "entity_scope": [
+        "TRIP"
+      ],
+      "message_key": "ultimate.reason.consolidated_compatible_demand",
+      "producer": "transport_plan",
+      "required_facts": [
+        {
+          "kind": "ids",
+          "name": "order_ids"
+        },
+        {
+          "kind": "id",
+          "name": "compatibility_certificate_ref"
+        },
+        {
+          "kind": "date",
+          "name": "window_start"
+        },
+        {
+          "kind": "date",
+          "name": "window_end"
+        }
+      ],
+      "stable_id": "CONSOLIDATED_COMPATIBLE_DEMAND",
+      "version": 1
+    },
+    {
+      "claim_strength": "CERTIFIED_INFEASIBILITY",
+      "entity_scope": [
+        "ORDER"
+      ],
+      "message_key": "ultimate.reason.no_compatible_resource",
+      "producer": "transport_plan",
+      "required_facts": [
+        {
+          "kind": "count",
+          "name": "compatible_resource_count"
+        },
+        {
+          "kind": "true",
+          "name": "candidate_set_complete"
+        },
+        {
+          "kind": "id",
+          "name": "certificate_ref"
+        }
+      ],
+      "stable_id": "NO_COMPATIBLE_RESOURCE",
+      "version": 1
+    },
+    {
+      "claim_strength": "CERTIFIED_INFEASIBILITY",
+      "entity_scope": [
+        "ORDER"
+      ],
+      "message_key": "ultimate.reason.non_split_exceeds_guaranteed_capacity",
+      "producer": "transport_plan",
+      "required_facts": [
+        {
+          "kind": "false",
+          "name": "split_allowed"
+        },
+        {
+          "kind": "dimension",
+          "name": "dimension"
+        },
+        {
+          "kind": "positive",
+          "name": "requested"
+        },
+        {
+          "kind": "decimal",
+          "name": "maximum_guaranteed_capacity"
+        }
+      ],
+      "stable_id": "NON_SPLIT_EXCEEDS_GUARANTEED_CAPACITY",
+      "version": 1
+    },
+    {
+      "claim_strength": "OBSERVED",
+      "entity_scope": [
+        "ORDER",
+        "RESOURCE"
+      ],
+      "message_key": "ultimate.reason.external_service_limit",
+      "producer": "transport_plan",
+      "required_facts": [
+        {
+          "kind": "id",
+          "name": "resource_id"
+        },
+        {
+          "kind": "count",
+          "name": "services_available"
+        },
+        {
+          "kind": "count",
+          "name": "services_used"
+        }
+      ],
+      "stable_id": "EXTERNAL_SERVICE_LIMIT",
+      "version": 1
+    },
+    {
+      "claim_strength": "CERTIFIED_INFEASIBILITY",
+      "entity_scope": [
+        "ORDER",
+        "CASE"
+      ],
+      "message_key": "ultimate.reason.horizon_capacity_limit",
+      "producer": "transport_plan",
+      "required_facts": [
+        {
+          "kind": "date",
+          "name": "planning_start"
+        },
+        {
+          "kind": "date",
+          "name": "planning_end"
+        },
+        {
+          "kind": "id",
+          "name": "feasibility_certificate_ref"
+        }
+      ],
+      "stable_id": "HORIZON_CAPACITY_LIMIT",
+      "version": 1
+    },
+    {
+      "claim_strength": "CERTIFIED_INFEASIBILITY",
+      "entity_scope": [
+        "ORDER",
+        "TRIP"
+      ],
+      "message_key": "ultimate.reason.date_window_incompatible",
+      "producer": "transport_plan",
+      "required_facts": [
+        {
+          "kind": "date",
+          "name": "earliest_dispatch"
+        },
+        {
+          "kind": "date",
+          "name": "latest_dispatch"
+        }
+      ],
+      "stable_id": "DATE_WINDOW_INCOMPATIBLE",
+      "version": 1
+    },
+    {
+      "claim_strength": "OBSERVED",
+      "entity_scope": [
+        "ORDER",
+        "CASE"
+      ],
+      "message_key": "ultimate.reason.capacity_gap",
+      "producer": "transport_plan",
+      "required_facts": [
+        {
+          "kind": "dimension",
+          "name": "dimension"
+        },
+        {
+          "kind": "positive",
+          "name": "unassigned_quantity"
+        }
+      ],
+      "stable_id": "CAPACITY_GAP",
+      "version": 1
+    },
+    {
+      "claim_strength": "OBSERVED",
+      "entity_scope": [
+        "RESOURCE"
+      ],
+      "message_key": "ultimate.reason.resource_service_limit_reached",
+      "producer": "transport_plan",
+      "required_facts": [
+        {
+          "kind": "count",
+          "name": "services_available"
+        },
+        {
+          "kind": "count",
+          "name": "services_used"
+        }
+      ],
+      "stable_id": "RESOURCE_SERVICE_LIMIT_REACHED",
+      "version": 1
+    },
+    {
+      "claim_strength": "OBSERVED",
+      "entity_scope": [
+        "RESOURCE"
+      ],
+      "message_key": "ultimate.reason.assumed_external_availability",
+      "producer": "transport_plan",
+      "required_facts": [
+        {
+          "kind": "count",
+          "name": "services_available"
+        },
+        {
+          "kind": "availability",
+          "name": "availability_source"
+        }
+      ],
+      "stable_id": "ASSUMED_EXTERNAL_AVAILABILITY",
+      "version": 1
+    },
+    {
+      "claim_strength": "CERTIFIED_FEASIBILITY",
+      "entity_scope": [
+        "TRIP",
+        "RESOURCE"
+      ],
+      "message_key": "ultimate.reason.guaranteed_capacity_used_for_feasibility",
+      "producer": "transport_plan",
+      "required_facts": [
+        {
+          "kind": "dimension",
+          "name": "dimension"
+        },
+        {
+          "kind": "positive",
+          "name": "guaranteed_capacity"
+        },
+        {
+          "kind": "decimal",
+          "name": "load"
+        },
+        {
+          "kind": "capacity_basis",
+          "name": "capacity_basis"
+        }
+      ],
+      "stable_id": "GUARANTEED_CAPACITY_USED_FOR_FEASIBILITY",
+      "version": 1
+    },
+    {
+      "claim_strength": "CERTIFIED_FEASIBILITY",
+      "entity_scope": [
+        "TRIP"
+      ],
+      "message_key": "ultimate.reason.scheduled_within_feasible_window",
+      "producer": "day_scheduling",
+      "required_facts": [
+        {
+          "kind": "date",
+          "name": "earliest_dispatch"
+        },
+        {
+          "kind": "date",
+          "name": "latest_dispatch"
+        },
+        {
+          "kind": "date",
+          "name": "selected_dispatch"
+        }
+      ],
+      "stable_id": "SCHEDULED_WITHIN_FEASIBLE_WINDOW",
+      "version": 1
+    },
+    {
+      "claim_strength": "CERTIFIED_FEASIBILITY",
+      "entity_scope": [
+        "TRIP"
+      ],
+      "message_key": "ultimate.reason.scheduled_earliest_feasible",
+      "producer": "day_scheduling",
+      "required_facts": [
+        {
+          "kind": "date",
+          "name": "earliest_dispatch"
+        },
+        {
+          "kind": "date",
+          "name": "selected_dispatch"
+        }
+      ],
+      "stable_id": "SCHEDULED_EARLIEST_FEASIBLE",
+      "version": 1
+    },
+    {
+      "claim_strength": "OBSERVED",
+      "entity_scope": [
+        "TRIP"
+      ],
+      "message_key": "ultimate.reason.scheduled_to_protect_due_date",
+      "producer": "day_scheduling",
+      "required_facts": [
+        {
+          "kind": "date",
+          "name": "arrival_date"
+        },
+        {
+          "kind": "date",
+          "name": "delivery_due_date"
+        },
+        {
+          "kind": "id",
+          "name": "schedule_evidence_ref"
+        }
+      ],
+      "stable_id": "SCHEDULED_TO_PROTECT_DUE_DATE",
+      "version": 1
+    },
+    {
+      "claim_strength": "OBSERVED",
+      "entity_scope": [
+        "TRIP"
+      ],
+      "message_key": "ultimate.reason.delayed_by_ready_date",
+      "producer": "day_scheduling",
+      "required_facts": [
+        {
+          "kind": "date",
+          "name": "unconstrained_dispatch"
+        },
+        {
+          "kind": "date",
+          "name": "ready_date"
+        },
+        {
+          "kind": "date",
+          "name": "selected_dispatch"
+        }
+      ],
+      "stable_id": "DELAYED_BY_READY_DATE",
+      "version": 1
+    },
+    {
+      "claim_strength": "OBSERVED",
+      "entity_scope": [
+        "TRIP"
+      ],
+      "message_key": "ultimate.reason.delayed_by_resource_occupancy",
+      "producer": "day_scheduling",
+      "required_facts": [
+        {
+          "kind": "id",
+          "name": "resource_id"
+        },
+        {
+          "kind": "date",
+          "name": "desired_dispatch"
+        },
+        {
+          "kind": "date",
+          "name": "resource_busy_until"
+        },
+        {
+          "kind": "date",
+          "name": "selected_dispatch"
+        }
+      ],
+      "stable_id": "DELAYED_BY_RESOURCE_OCCUPANCY",
+      "version": 1
+    },
+    {
+      "claim_strength": "OBSERVED",
+      "entity_scope": [
+        "TRIP"
+      ],
+      "message_key": "ultimate.reason.zero_margin",
+      "producer": "day_scheduling",
+      "required_facts": [
+        {
+          "kind": "count",
+          "name": "margin_days"
+        },
+        {
+          "kind": "date",
+          "name": "arrival_date"
+        },
+        {
+          "kind": "date",
+          "name": "delivery_due_date"
+        }
+      ],
+      "stable_id": "ZERO_MARGIN",
+      "version": 1
+    },
+    {
+      "claim_strength": "CERTIFIED_INFEASIBILITY",
+      "entity_scope": [
+        "TRIP"
+      ],
+      "message_key": "ultimate.reason.pre_horizon_dispatch_required",
+      "producer": "day_scheduling",
+      "required_facts": [
+        {
+          "kind": "date",
+          "name": "latest_dispatch"
+        },
+        {
+          "kind": "date",
+          "name": "planning_start"
+        }
+      ],
+      "stable_id": "PRE_HORIZON_DISPATCH_REQUIRED",
+      "version": 1
+    },
+    {
+      "claim_strength": "CERTIFIED_INFEASIBILITY",
+      "entity_scope": [
+        "TRIP"
+      ],
+      "message_key": "ultimate.reason.no_feasible_dispatch_day",
+      "producer": "day_scheduling",
+      "required_facts": [
+        {
+          "kind": "count",
+          "name": "feasible_day_count"
+        },
+        {
+          "kind": "id",
+          "name": "feasibility_certificate_ref"
+        }
+      ],
+      "stable_id": "NO_FEASIBLE_DISPATCH_DAY",
+      "version": 1
+    },
+    {
+      "claim_strength": "OBSERVED",
+      "entity_scope": [
+        "TRIP"
+      ],
+      "message_key": "ultimate.reason.resource_capacity_conflict",
+      "producer": "day_scheduling",
+      "required_facts": [
+        {
+          "kind": "id",
+          "name": "resource_id"
+        },
+        {
+          "kind": "count",
+          "name": "concurrent_trips"
+        },
+        {
+          "kind": "count",
+          "name": "units_available"
+        },
+        {
+          "kind": "date",
+          "name": "conflict_date"
+        }
+      ],
+      "stable_id": "RESOURCE_CAPACITY_CONFLICT",
+      "version": 1
+    },
+    {
+      "claim_strength": "OBSERVED",
+      "entity_scope": [
+        "TRIP"
+      ],
+      "message_key": "ultimate.reason.unscheduled",
+      "producer": "day_scheduling",
+      "required_facts": [
+        {
+          "kind": "reason_code",
+          "name": "cause_code"
+        },
+        {
+          "kind": "id",
+          "name": "cause_evidence_ref"
+        }
+      ],
+      "stable_id": "UNSCHEDULED",
+      "version": 1
+    }
+  ],
+  "registry_version": "DATION_RESULTS_REGISTRY_V1",
+  "runtimes": [
+    {
+      "available": true,
+      "engine_name": "logistics-assignment-engine",
+      "engine_version": "1.0.0",
+      "implemented": true,
+      "node_id": "logistics_assignment",
+      "result_schema": "assignment_v1",
+      "result_schema_version": 1,
+      "runtime_profile": null
+    },
+    {
+      "available": true,
+      "engine_name": "logistics-scheduling-engine",
+      "engine_version": "1.0.0",
+      "implemented": true,
+      "node_id": "logistics_scheduling",
+      "result_schema": "scheduling_v1",
+      "result_schema_version": 1,
+      "runtime_profile": null
+    },
+    {
+      "available": true,
+      "engine_name": "logistics-dispatch-engine",
+      "engine_version": "2.2.0",
+      "implemented": true,
+      "node_id": null,
+      "result_schema": "dispatch_v2",
+      "result_schema_version": 2,
+      "runtime_profile": null
+    },
+    {
+      "available": false,
+      "engine_name": "transport_plan",
+      "engine_version": "2.0.0",
+      "implemented": false,
+      "node_id": "logistics_assignment",
+      "result_schema": "transport_plan_v1",
+      "result_schema_version": 1,
+      "runtime_profile": "transport_plan_v1"
+    },
+    {
+      "available": false,
+      "engine_name": "day_scheduling",
+      "engine_version": "2.0.0",
+      "implemented": false,
+      "node_id": "logistics_scheduling",
+      "result_schema": "day_scheduling_v1",
+      "result_schema_version": 1,
+      "runtime_profile": "day_scheduling_v1"
+    }
+  ],
+  "schemas": [
+    {
+      "cohort": "LEGACY",
+      "name": "assignment_v1",
+      "reader": "LEGACY_ORIGINAL",
+      "version": 1
+    },
+    {
+      "cohort": "LEGACY",
+      "name": "scheduling_v1",
+      "reader": "LEGACY_ORIGINAL",
+      "version": 1
+    },
+    {
+      "cohort": "LEGACY",
+      "name": "dispatch_v2",
+      "reader": "LEGACY_ORIGINAL",
+      "version": 2
+    },
+    {
+      "cohort": "ULTIMATE",
+      "name": "transport_plan_v1",
+      "reader": "DecisionResultPackageV1",
+      "version": 1
+    },
+    {
+      "cohort": "ULTIMATE",
+      "name": "day_scheduling_v1",
+      "reader": "DecisionResultPackageV1",
+      "version": 1
+    }
+  ],
+  "units": {
+    "distance_km_scale": 3,
+    "fx": false,
+    "money_scale": "context.currency_policy.minor_units",
+    "quantity_scales": {
+      "pallets": 3,
+      "units": 3,
+      "volume_m3": 6,
+      "weight_kg": 3
+    },
+    "rate_scale": 6,
+    "ratio_scale": 4,
+    "rounding": "ROUND_HALF_UP",
+    "scaled_integer_bound": 9223372036854775807
+  }
+}

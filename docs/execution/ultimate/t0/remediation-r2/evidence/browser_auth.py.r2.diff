@@ -1,0 +1,13 @@
+--- backend/tests/e2e/browser_auth.py (R1 end)
++++ backend/tests/e2e/browser_auth.py (R2)
+@@ -38,5 +38,10 @@
+     select=root.get_by_label('Decision Owner',exact=True)
+     await select.locator('option[value="'+uid+'"]').wait_for(state='attached')
+     await select.select_option(uid)
++    previous=await root.element_handle()
++    map_view=await page.evaluate("window.dationGetCurrentView()==='logistics-map'")
+     await root.get_by_role('button',name='Guardar',exact=True).click()
++    await page.wait_for_function("({stage,uid})=>{const s=window.DationDispatch.getWorkspace().workflow?.stages?.[stage];return s?.owner?.id===uid&&s.owner_eligible;}",arg={'stage':stage,'uid':uid})
++    if map_view:
++        await page.wait_for_function('el=>!el.isConnected',arg=previous)
+     await root.get_by_role('button',name='Cambiar',exact=True).wait_for()

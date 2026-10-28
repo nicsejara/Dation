@@ -1,0 +1,93 @@
+{
+  "phase": "T3",
+  "skills": [
+    {
+      "name": "design-system",
+      "source": ".agents/skills/design-system/SKILL.md",
+      "sha256": "655468bb723a6bc9d17fcb09a6a005e10e313d63b879f4d74fb2abdc3041ae3f",
+      "read": true,
+      "applied": "Reused existing native semantic/component tokens, controls and states; no generator or token rewrite.",
+      "verified": "Native gallery pixel/computed-style parity at five widths; scoped stylesheet.",
+      "source_snapshot": "evidence/skills/design-system/SKILL.md"
+    },
+    {
+      "name": "emil-design-eng",
+      "source": ".agents/skills/emil-design-eng/SKILL.md",
+      "sha256": "ffbe68e6007fb42cb8149f089b400a1ca007d59ba23e8948e2be4476f3175939",
+      "read": true,
+      "applied": "Immediate functional feedback, native dialog focus/Escape/return, keyboard and reduced motion. No added animation.",
+      "verified": "W3 01/02/06/08, Before/After table in report.",
+      "source_snapshot": "evidence/skills/emil-design-eng/SKILL.md"
+    },
+    {
+      "name": "ui-ux-pro-max",
+      "source": ".agents/skills/ui-ux-pro-max/SKILL.md",
+      "sha256": "e5baf9400d4347e5ed3eb1f6b99cd0b9ba545b8b0e507aabb2b87397bbf73ea1",
+      "read": true,
+      "applied": "Focused forms search: linked focusable error summary, inline aria-describedby errors and blur validation.",
+      "verified": "W3 02; exact-percent Node test; evidence/ui-skill-form-guidance.txt.",
+      "source_snapshot": "evidence/skills/ui-ux-pro-max/SKILL.md"
+    },
+    {
+      "name": "break-ui",
+      "source": ".agents/skills/break-ui/SKILL.md",
+      "sha256": "e7eec1d70ac56a04255e9c0dbe98084ea3d544cc04aaad34f32c95d6fa9dff5e",
+      "read": true,
+      "applied": "Schema-backed 120-character names, 1000-character descriptions, Unicode, empty/one/multiple results, 320px and zoom200%. Fixtures only.",
+      "verified": "W3 04/07 responsive screenshots; no production toggle.",
+      "source_snapshot": "evidence/skills/break-ui/SKILL.md"
+    },
+    {
+      "name": "supabase:supabase",
+      "source_snapshot": "evidence/skills/supabase-skill.txt",
+      "sha256": "d2f7ca35f2292dc711037506ef64b7a03da6adf96d30abd60c5d856b875dda8c",
+      "read": true,
+      "reused_from_same_conversation_T2": true,
+      "applied": "Additive CLI-generated migration, checked SECURITY DEFINER RPC, tenant/actor authority and default-closed flag.",
+      "verified": "S3 25; real API negatives; schema-boundary ACL/RLS check."
+    },
+    {
+      "name": "supabase:supabase-postgres-best-practices",
+      "source_snapshot": "evidence/skills/postgres-skill.txt",
+      "sha256": "f5939ff6703520881ec40204deb519771cd8d597934932ececa8af4a622443c7",
+      "read": true,
+      "reused_from_same_conversation_T2": true,
+      "applied": "Workspace→Case ordered locks, CAS, composite FKs and immutable version snapshots.",
+      "verified": "S3 concurrent publication/admission-edit race and metadata/history preservation."
+    },
+    {
+      "name": "cloud-environment:cloud-environment-runtime",
+      "source_snapshot": "evidence/skills/runtime-skill.txt",
+      "sha256": "de2ea16a5a8727be2a6cbf6a57d60c3eac1082119dd9685e69a2b8e83db120bc",
+      "read": true,
+      "reused_from_same_conversation_T2": true,
+      "applied": "Owned local PostgreSQL/PostgREST/Chromium harness; credential-cleared runners and local socket.",
+      "verified": "Label/version assertions and cleanup evidence; no remote project access."
+    }
+  ],
+  "references": [
+    "design-system/references/token-architecture.md",
+    "design-system/references/states-and-variants.md",
+    "break-ui/CATALOG.md",
+    "postgres/schema-foreign-key-indexes.md",
+    "postgres/security-rls-performance.md",
+    "runtime/references/docker.md",
+    "runtime/references/networking.md"
+  ],
+  "omitted": [
+    {
+      "guidance": "new palettes/fonts/design system/starters/React/Framer examples",
+      "reason": "User requires existing native Dation stack/tokens/typography and no global redesign."
+    },
+    {
+      "guidance": "break-ui report-before-fixing stop / first-response-only variants",
+      "reason": "Explicit T3 end-to-end implementation and specific scoped task take precedence; no new approval step or product toggle."
+    },
+    {
+      "guidance": "general motion/brand audits or automatic review-animations",
+      "reason": "Outside authorized T3; review-animations disable-model-invocation respected."
+    }
+  ],
+  "no_added_dependencies": true,
+  "UI_preservation_gate": "PASS"
+}

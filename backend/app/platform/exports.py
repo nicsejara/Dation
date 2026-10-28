@@ -19,6 +19,8 @@ def generate(run,format):
  result=run.get('result_json')
  if run.get('status')!='completed' or not isinstance(result,dict):raise ValueError('La corrida no contiene un resultado exportable.')
  schema=result.get('schema_version')
+ if result.get('result_schema') or (schema is not None and schema not in {'assignment_v1','scheduling_v1','dispatch_v1','dispatch_v2'}):
+  raise ValueError('UNSUPPORTED_RESULT_SCHEMA: usá la exportación versionada con Run y fingerprint para packages publicados.')
  if format=='json':
   name='planificacion-'+run['id']+'.json' if schema=='scheduling_v1' else 'dation-'+run['id'][:8]+'.json'
   return name,json.dumps(result,ensure_ascii=False,indent=2).encode('utf-8'),'application/json'

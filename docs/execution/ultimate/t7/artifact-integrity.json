@@ -1,0 +1,240 @@
+{
+  "phase": "T7",
+  "head": "ef997235a30251fbf7ae53690ed738092ee973d8",
+  "captured_at": "2026-10-27T13:47:32.952215+00:00",
+  "decision": "GO",
+  "excludes_self": true,
+  "source_files": 16,
+  "files": [
+    {
+      "path": "backend/app/engines/assignment/transport_contracts.py",
+      "bytes": 4814,
+      "sha256": "014cf75217a9328f523902bfdda94991e6ebfc4e0b563b611f8c0abb4b611d8e"
+    },
+    {
+      "path": "backend/app/engines/assignment/transport_model.py",
+      "bytes": 9951,
+      "sha256": "8ac123a6feacb53ef21de3d464caf2de91e4de27b324f4adfbcfecfd8a647b86"
+    },
+    {
+      "path": "backend/app/engines/assignment/transport_plan.py",
+      "bytes": 19544,
+      "sha256": "6d841aa3477de3e18f844a7a37f0b628d5ee2d07dbd612f457ae9e0e13888392"
+    },
+    {
+      "path": "backend/app/engines/assignment/transport_policies.py",
+      "bytes": 8176,
+      "sha256": "e75b6f01dd7e83b77bc8f283d72a8fe40ec08fe0d0e1dc828f9bd71482d151aa"
+    },
+    {
+      "path": "backend/app/engines/assignment/transport_policy_result.py",
+      "bytes": 15387,
+      "sha256": "9916eb75b30c6a45bcf3ad36c369307708793b585509bccd538e83f9754e6330"
+    },
+    {
+      "path": "backend/app/engines/assignment/transport_policy_validator.py",
+      "bytes": 8540,
+      "sha256": "285d3f32556d85ed4288b0ff5ae76255b632cdacb710fa955086e76356b2667b"
+    },
+    {
+      "path": "backend/app/results/ai_context.py",
+      "bytes": 3086,
+      "sha256": "02aa9104ecc5f79394a755d05dc5a863a0f7c1c2889523ded643c86f131039e5"
+    },
+    {
+      "path": "backend/app/results/approval_review.py",
+      "bytes": 1769,
+      "sha256": "0992f84913c1d36ed5ffde863a0d42ef41dcd4196b2a193fa7a0ae44ebaa6a43"
+    },
+    {
+      "path": "backend/app/results/assembler.py",
+      "bytes": 13851,
+      "sha256": "881fdd43db3a4c43ff9492058c9d34b99dc35f55408ba28d1eff9b4692da217e"
+    },
+    {
+      "path": "backend/app/results/export_rows.py",
+      "bytes": 1011,
+      "sha256": "f3ffb19d354d3469f398ff34b551539f8e65961f1a2b8536b1b4ab63f225592e"
+    },
+    {
+      "path": "backend/app/results/projections.py",
+      "bytes": 4597,
+      "sha256": "8cb04102392aaad9e94c6422c7937001f363abbdfd45cd8c543521454981cbb2"
+    },
+    {
+      "path": "backend/app/results/registry.py",
+      "bytes": 10149,
+      "sha256": "d183a4374bbbe0552aeab0c8098e724f82fb4e7dd0dc27ade7a4755747d10591"
+    },
+    {
+      "path": "backend/app/results/validation.py",
+      "bytes": 19888,
+      "sha256": "29992a6e3e90b0b9f98efeb82e6073ef4ae361456f78aee312b1d13284c71ed9"
+    },
+    {
+      "path": "backend/tests/fixtures/ultimate/t7-fixtures.json",
+      "bytes": 990,
+      "sha256": "46988ea2107fb313dd17211b16e27e48036d3f7c5749b3c5d012d1d6c237a489"
+    },
+    {
+      "path": "backend/tests/test_transport_plan_policies.py",
+      "bytes": 13714,
+      "sha256": "f9106f1cff4b552a7be1bb1b9bf03776f52501439566927caad39fee94436033"
+    },
+    {
+      "path": "backend/tests/test_transport_result_package.py",
+      "bytes": 16997,
+      "sha256": "c0163244d05f6804a11368857dd534189ce72a76c8c41c6e78950f7bebe3da34"
+    },
+    {
+      "path": "docs/execution/ultimate/t7/command-ledger.json",
+      "bytes": 2868,
+      "sha256": "5ccb730c4fd4100909021f9ce977d5cec886412c63d02b418693614e13ff57b2"
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/B-NODE.log",
+      "bytes": 12075,
+      "sha256": "6ad6d1931977dd52ef103a70002ae202c29e091dd34e88c376d7414059ff2748"
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/B-NODE.result.json",
+      "bytes": 1413,
+      "sha256": "f93cbc24f727e353ae51cd00a45e0220add14cdd14c1c9f03502d2c7d0ab21ad"
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/B-PY.log",
+      "bytes": 124193,
+      "sha256": "cd2e24697af288c407b59d75c5132b988d597bebd58cfd8b61df908c7879a835"
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/B-PY.result.json",
+      "bytes": 558,
+      "sha256": "be5b42883656eb4f24bdea9b309d0dfecc6872b5f160ff13865f93584ff574c2"
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/T7-user-request.txt",
+      "bytes": 14083,
+      "sha256": "53459fec772eaf91fec405d66669d56136a68f391173da37e625832ec79972c5"
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/U7.log",
+      "bytes": 8821,
+      "sha256": "bb50cfa934c663b83df8c35bfdcb53edcbc72e59504db4f90e0371bf9ed4f4d7"
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/U7.result.json",
+      "bytes": 600,
+      "sha256": "f74bb7f97f30e3fac9cc2190a4fe332350bd001b37af739a05fa99b2008d4333"
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/attempts/U7-package-first.log",
+      "bytes": 4624,
+      "sha256": "ead93461bff2da1374a4347a9837be144e6a622a5427a84b7730347dc5e833d9"
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/attempts/U7-policies-first.log",
+      "bytes": 3273,
+      "sha256": "c9558ecef4146c501df3cee221649d3b4251a05f1e70aea71d475d0ed58a153a"
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/attempts/U7-second.log",
+      "bytes": 8415,
+      "sha256": "b1762f35ddf3d1436aea541f6512faf2a4bd5a42914f97740791c7e85ed28cc4"
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/attempts/U7-third.log",
+      "bytes": 8608,
+      "sha256": "dc92b3470f3f97c93333c0e9fc5ae6ed22a9c8babf0ab61ba429fbafa675f6f0"
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/candidate.json",
+      "bytes": 4077,
+      "sha256": "60a2dcae89f1ac6eac93ac8311672966e73b1f1c247d56344c101294207127c3"
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/drivers/finalize.py",
+      "bytes": 9987,
+      "sha256": "3ec7333c21a3feaf7dfc4ea3ba4cc209f9cd60ab01c0512d650ba9d8f0510d5e"
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/drivers/qa.py",
+      "bytes": 3980,
+      "sha256": "2c60c6e469f75889cdd86be6a6bca331e3e591ec5f378ca0455cb0ec3ecc03d8"
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/final-state.json",
+      "bytes": 59287,
+      "sha256": "b2b6eee16acc4cd293744565e9b00eca6d20088ab5359f80c2cd442c9593a719"
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/initial-state.json",
+      "bytes": 208206,
+      "sha256": "7b5a2e864b5ae4e6d975d6f73a87f6b90d9c97b2b46ee3ac600529dd41aca278"
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/post-t6-tracked.patch",
+      "bytes": 352457,
+      "sha256": "7b0ffe4269d0477273fac488900d8bace92f6f12f1b5b62538472b845c5cf504"
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/post-t6/backend/app/engines/assignment/transport_contracts.py",
+      "bytes": 4799,
+      "sha256": "c9d7696b36f003f47d8a9b139284e4735b536c4d20e0dc074474cff167bed223"
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/post-t6/backend/app/engines/assignment/transport_model.py",
+      "bytes": 9478,
+      "sha256": "3f2b9733343a00438749e1c0de13b89155d866a3ab6122925fcf57caa641fc04"
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/post-t6/backend/app/engines/assignment/transport_plan.py",
+      "bytes": 19448,
+      "sha256": "4ceed544a19653c05077c6bec7f5e70f95143344b8504ef2a0c48299e6439af2"
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/post-t6/backend/app/results/registry.py",
+      "bytes": 9889,
+      "sha256": "4e514cf47c0a38166c4dd52febc31ed798ddb6b4c7974b0fbe7989481f911310"
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/qa-final-batch.log",
+      "bytes": 2651,
+      "sha256": "70e4c0068f4017adea1173600b19658f73ea5ad8ea3e1743b2ee14961872afab"
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/skills/runtime-skill.txt",
+      "bytes": 3986,
+      "sha256": "de2ea16a5a8727be2a6cbf6a57d60c3eac1082119dd9685e69a2b8e83db120bc"
+    },
+    {
+      "path": "docs/execution/ultimate/t7/evidence/t7-changes.patch",
+      "bytes": 116033,
+      "sha256": "2fd4af8e2bf9e68d9221b9395874ecc0d41437c446968cb17957a0a8f634ae46"
+    },
+    {
+      "path": "docs/execution/ultimate/t7/preservation.json",
+      "bytes": 7242,
+      "sha256": "6b2b408db37af4ed18bbbd310d9d776ab53fabd88621c1c58c0d6da04abe59e0"
+    },
+    {
+      "path": "docs/execution/ultimate/t7/scope-diff.json",
+      "bytes": 5131,
+      "sha256": "813a6b91f13750b0dc3673a1a932c659bc892b23636cd988f5c7085161bb9acc"
+    },
+    {
+      "path": "docs/execution/ultimate/t7/skills-ledger.json",
+      "bytes": 1856,
+      "sha256": "e0d0e88f41a53bdbd4bdd7d927df20e7872454f040eb176df9f3b435ca5ccfd8"
+    },
+    {
+      "path": "docs/execution/ultimate/t7/t7-execution-report.md",
+      "bytes": 26375,
+      "sha256": "3fc1d79c5396699d18aafa23e104f9f8b075feb0131cbb229665dd4dfd63e4c5"
+    },
+    {
+      "path": "docs/execution/ultimate/t7/test-ledger.json",
+      "bytes": 21996,
+      "sha256": "6a03d5b61d6e0d2ec9b8f6c44dfddd4ac97ac4466fe0363c74bf099acbe6b3f8"
+    }
+  ]
+}

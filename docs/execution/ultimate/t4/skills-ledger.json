@@ -1,0 +1,122 @@
+{
+  "phase": "T4",
+  "skills": [
+    {
+      "name": "design-system",
+      "source": ".agents/skills/design-system/SKILL.md",
+      "sha256": "655468bb723a6bc9d17fcb09a6a005e10e313d63b879f4d74fb2abdc3041ae3f",
+      "read": true,
+      "applied": "Read main and states guide in T4; reused native tokens, cards, drop-card factory, dialog and drawer. No generator.",
+      "verified": "Native pixels/computed styles identical at five widths; scoped CSS only.",
+      "source_snapshot": "evidence/skills/design-system/SKILL.md"
+    },
+    {
+      "name": "emil-design-eng",
+      "source": ".agents/skills/emil-design-eng/SKILL.md",
+      "sha256": "ffbe68e6007fb42cb8149f089b400a1ca007d59ba23e8948e2be4476f3175939",
+      "read": true,
+      "applied": "Guidance read earlier in this conversation; applied native focus/Escape/return, immediate validation, reduced motion; no new animation.",
+      "verified": "W4 keyboard, modal, drawer, reduced motion and Before/After/Why table.",
+      "source_snapshot": "evidence/skills/emil-design-eng/SKILL.md"
+    },
+    {
+      "name": "ui-ux-pro-max",
+      "source": ".agents/skills/ui-ux-pro-max/SKILL.md",
+      "sha256": "e5baf9400d4347e5ed3eb1f6b99cd0b9ba545b8b0e507aabb2b87397bbf73ea1",
+      "read": true,
+      "applied": "Reused focused form/accessibility guidance read in T3; exact headers from server and native error states.",
+      "verified": "W4 guided invalid schema/preview, responsive/contrast; no palette/font generation.",
+      "source_snapshot": "evidence/skills/ui-ux-pro-max/SKILL.md"
+    },
+    {
+      "name": "break-ui",
+      "source": ".agents/skills/break-ui/SKILL.md",
+      "sha256": "e7eec1d70ac56a04255e9c0dbe98084ea3d544cc04aaad34f32c95d6fa9dff5e",
+      "read": true,
+      "applied": "Guidance and catalog read earlier in this conversation; schema-backed filename length120, Unicode, empty/one/multiple states, 320px/zoom200%.",
+      "verified": "W4 stress/touch and preserved screenshots, fixture-only data.",
+      "source_snapshot": "evidence/skills/break-ui/SKILL.md"
+    },
+    {
+      "name": "supabase:supabase",
+      "package": "c0/supabase",
+      "source_snapshot": "evidence/skills/supabase-skill.txt",
+      "sha256": "d2f7ca35f2292dc711037506ef64b7a03da6adf96d30abd60c5d856b875dda8c",
+      "read": true,
+      "read_during_T4": true,
+      "applied": "Checked service-role RPC, membership/DDA/actor/tenant checks, private Storage with immutable objects, additional default-closed flag.",
+      "verified": "S4 30, Storage fault injection, schema ACL/RLS preservation; official Storage documentation consulted."
+    },
+    {
+      "name": "supabase:supabase-postgres-best-practices",
+      "package": "c0/supabase-postgres-best-practices",
+      "source_snapshot": "evidence/skills/postgres-skill.txt",
+      "sha256": "f5939ff6703520881ec40204deb519771cd8d597934932ececa8af4a622443c7",
+      "read": true,
+      "read_during_T4": true,
+      "applied": "Ordered workspace-to-Case locks, CAS, complete manifest transaction, uniqueness/FKs and immutable metadata.",
+      "verified": "S4 concurrency, stale revision/replay, cross-tenant and consumed-delete negatives."
+    },
+    {
+      "name": "cloud-environment:cloud-environment-runtime",
+      "package": "c5/cloud-environment-runtime",
+      "source_snapshot": "evidence/skills/runtime-skill.txt",
+      "sha256": "de2ea16a5a8727be2a6cbf6a57d60c3eac1082119dd9685e69a2b8e83db120bc",
+      "read": true,
+      "read_during_T4": true,
+      "applied": "Environment status/network policy, owned labelled local SQL fixture, credential-cleared Python/Chromium, local Docker socket.",
+      "verified": "Version checks, no productive access/writes, scoped resource cleanup evidence."
+    }
+  ],
+  "references": [
+    {
+      "source": "design-system/references/states-and-variants.md",
+      "reading": "read during T4"
+    },
+    {
+      "source": "design-system/references/token-architecture.md",
+      "reading": "reused same-conversation reading"
+    },
+    {
+      "source": "break-ui/CATALOG.md",
+      "reading": "reused same-conversation reading"
+    },
+    {
+      "source": "postgres/schema-foreign-key-indexes.md",
+      "reading": "reused same-conversation reading"
+    },
+    {
+      "source": "postgres/security-rls-performance.md",
+      "reading": "reused same-conversation reading"
+    },
+    {
+      "source": "runtime/references/docker.md",
+      "reading": "read during T4"
+    },
+    {
+      "source": "runtime/references/networking.md",
+      "reading": "read during T4"
+    }
+  ],
+  "omitted": [
+    {
+      "guidance": "New palette/fonts/starter/framework or generated design system",
+      "reason": "Frozen F01/F23 and explicit native UI preservation."
+    },
+    {
+      "guidance": "break-ui stop before implementing any finding",
+      "reason": "Explicit end-to-end T4 authorization takes precedence for scoped fixes."
+    },
+    {
+      "guidance": "General audit, improve-animations, automatic review-animations",
+      "reason": "No transversal audit authorized; no new animation; review-animations requires explicit invocation."
+    },
+    {
+      "guidance": "Production migration or bucket configuration",
+      "reason": "User explicitly prohibits productive Storage, migrations, deployment and push."
+    }
+  ],
+  "unavailable_required_dependencies": [],
+  "application_dependencies_added": false,
+  "UI_preservation_gate": "PASS"
+}

@@ -1,0 +1,31 @@
+{
+  "suite": "B-BROWSER",
+  "status": "PASS",
+  "started_at": "2026-10-26T04:30:56.179690+00:00",
+  "finished_at": "2026-10-26T04:54:45.361032+00:00",
+  "command": [
+    "/workspace/Dation/backend/.browser-venv/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests/browser",
+    "-p",
+    "test_*.py",
+    "-v"
+  ],
+  "cwd": "/workspace/Dation/backend",
+  "exit_code": 0,
+  "tests": 251,
+  "failures_count": 0,
+  "skipped": 0,
+  "failures": [],
+  "wall_seconds": 1429.174,
+  "suite_reported_seconds": 1428.501,
+  "log_path": "/workspace/work/dation-t0r2/revalidation/B-BROWSER.log",
+  "log_sha256": "d13c9e01cd20429cf5ab5fa143b23307a1ba8ef124de17dac8de2444d140826b",
+  "production_credentials_cleared": true,
+  "docker_target": "local unix socket",
+  "sql_container": null
+}

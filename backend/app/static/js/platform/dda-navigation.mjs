@@ -5,7 +5,8 @@ const rendered=new WeakMap();
 /** Context navigation uses the existing canonical destinations and route contract. */
 export function renderDdaNavigation(root,{view,route,workspace={}}){
  const currentCase=workspace.decisionCase?.id===route.caseId?workspace.decisionCase:null;
- const signature=JSON.stringify([view,route.caseId,workspace.caseContext?.label,currentCase?.label]);
+ const ultimate=workspace.ultimateCaseContext?.id===route.caseId?workspace.ultimateCaseContext:null;
+ const signature=JSON.stringify([view,route.caseId,workspace.caseContext?.label,currentCase?.label,ultimate?.label]);
  if(rendered.get(root)===signature&&root.firstElementChild?.tagName==='OL')return;
  rendered.set(root,signature);root.replaceChildren();root.classList.add('dda-navigation');root.setAttribute('aria-label','Navegación del DDA');
  const list=document.createElement('ol');root.append(list);
@@ -13,8 +14,11 @@ export function renderDdaNavigation(root,{view,route,workspace={}}){
   {label:'Decision Data Assets',target:{view:'platform-home',caseId:null,nodeId:null,runId:null},state:'available'},
   {label:'DDA Logística',target:{view:'logistics-overview',caseId:null,nodeId:null,runId:null},state:view==='logistics-overview'?'current':'available'},
  ];
- if(route.caseId){
-  entries.push({label:workspace.caseContext?.label||currentCase?.label||'Decision Case',target:{view:'logistics-map',caseId:route.caseId,nodeId:null,runId:null},state:view==='logistics-map'?'current':'available'});
+ if(view==='logistics-models')entries.push({label:'Logistics Models',target:null,state:'current'});
+ else if(view==='logistics-case-data')entries.push({label:ultimate?.label||'Decision Case',target:{view:'logistics-map',caseId:route.caseId,nodeId:null,runId:null},state:'available'},{label:'Datos del Case',target:null,state:'current'});
+ else if(view==='logistics-case-setup')entries.push({label:ultimate?.label||(route.caseId?'Contexto del Case':'Nuevo Case'),target:null,state:'current'});
+ else if(route.caseId){
+  entries.push({label:ultimate?.label||workspace.caseContext?.label||currentCase?.label||'Decision Case',target:{view:'logistics-map',caseId:route.caseId,nodeId:null,runId:null},state:view==='logistics-map'?'current':'available'});
  }else if(view==='logistics-data'){
   entries.push({label:'Nuevo Case',target:null,state:'current'});
  }

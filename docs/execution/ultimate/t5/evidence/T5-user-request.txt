@@ -1,0 +1,1071 @@
+T4 queda formalmente aprobado con estado:
+
+# GO — T4 COMPLETADO
+
+El reporte oficial es:
+
+`docs/execution/ultimate/t4/t4-execution-report.md`
+
+Autorizo ahora exclusivamente:
+
+# T5 — DECISION GRAPH + READINESS + CONTEXTUAL NAVIGATION
+
+Seguí estrictamente:
+
+`DATION_FINAL_MASTER_EXECUTION_PLAN.md`
+
+Utilizá como baseline inmediato:
+
+`docs/execution/ultimate/t4/t4-execution-report.md`
+
+Consultá reportes anteriores únicamente cuando una decisión histórica o una compatibilidad concreta lo requiera.
+
+---
+
+# REGLA DE EFICIENCIA
+
+NO realices una nueva auditoría end-to-end.
+
+T0–T4 constituyen el baseline validado.
+
+Para T5:
+
+1. leé la sección T5 del Master Plan;
+2. revisá únicamente las Frozen Architectural Decisions relevantes;
+3. inspeccioná sólo:
+   - Decision Definitions;
+   - requirements/readiness;
+   - approvals/upstream lineage;
+   - Pack state;
+   - Case projections;
+   - Home/Decision Center;
+   - Decision Map;
+   - navegación contextual;
+   - tests afectados;
+4. ampliá la inspección únicamente ante una incompatibilidad concreta;
+5. no recorras engines, Result Architecture, IA o Storage completo por precaución.
+
+---
+
+# OBJETIVO T5
+
+Implementar la autoridad única para:
+
+```text
+Case Context
++
+Model Version
++
+Progressive Data Pack
++
+Run History
++
+Approvals
++
+Decision Definitions
++
+Runtime Capabilities
+        ↓
+Decision Graph
+        ↓
+Node State
++
+Available Actions
++
+Navigation
+```
+
+T5 debe permitir responder de forma determinística:
+
+- qué decisiones existen;
+- cuáles aplican;
+- cuáles están bloqueadas;
+- cuáles necesitan datos;
+- cuáles están listas;
+- cuáles están en ejecución;
+- cuáles terminaron;
+- cuáles están aprobadas;
+- cuáles son futuras;
+- qué acción puede ejecutar el usuario.
+
+El frontend NO debe reconstruir estas reglas por su cuenta.
+
+---
+
+# 1. FINAL DECISION GRAPH MVP
+
+El graph funcional Ultimate queda:
+
+```text
+D1 — Transport Plan
+        ↓
+     APPROVED
+        ↓
+D2 — Day Scheduling
+```
+
+Futuras ramas pueden mostrarse únicamente como:
+
+```text
+COMING_SOON
+```
+
+cuando estén definidas por el producto.
+
+NO implementar una D3 universal.
+
+NO crear Branch entity.
+
+NO implementar Routing, Dock Planning, Sourcing, Simulation o Replanning.
+
+---
+
+# 2. TECHNICAL NODE IDs
+
+Preservar los IDs técnicos congelados:
+
+```text
+logistics_assignment
+logistics_scheduling
+```
+
+Los labels de producto pueden ser:
+
+```text
+Transport Plan
+Day Scheduling
+```
+
+No renombrar IDs históricos ni romper URLs/lineage.
+
+---
+
+# 3. DECISION DEFINITION
+
+Implementar/utilizar el contrato definido desde T1.
+
+Cada Definition debe declarar de forma versionada:
+
+- id;
+- version;
+- question;
+- implemented;
+- applicability;
+- dependencies;
+- required approvals;
+- required inputs;
+- read_set;
+- decision variables;
+- hard constraints;
+- soft constraints;
+- objectives;
+- outputs;
+- evidence;
+- downstream contract.
+
+El registry debe ser controlado por código/release.
+
+NO implementar editor visual de graph.
+
+NO permitir definitions arbitrarias desde cliente.
+
+---
+
+# 4. NODE STATES
+
+Implementar exactamente:
+
+```text
+LOCKED
+DATA_REQUIRED
+READY
+IN_PROGRESS
+COMPLETED
+APPROVED
+COMING_SOON
+NOT_APPLICABLE
+```
+
+No crear estados alternativos para resolver casos locales.
+
+---
+
+# 5. STATE SEMANTICS
+
+## LOCKED
+
+Dependencia/upstream requerido no satisfecho.
+
+Ejemplo:
+
+D2 antes de tener D1 aprobado.
+
+---
+
+## DATA_REQUIRED
+
+Dependencias satisfechas, pero faltan inputs requeridos.
+
+Ejemplo:
+
+D1 sin Demand o Resources publicados.
+
+---
+
+## READY
+
+Todos los requisitos de negocio/datos/dependencias están satisfechos.
+
+READY significa:
+
+> el nodo está preparado para ser configurado/ejecutado.
+
+NO significa automáticamente:
+
+- que el usuario tenga permisos;
+- que el runtime esté disponible;
+- que ya exista una Run;
+- que esté aprobado.
+
+Esas dimensiones deben mantenerse separadas.
+
+---
+
+## IN_PROGRESS
+
+Existe Run vigente:
+
+```text
+QUEUED / RUNNING
+```
+
+según lifecycle actual.
+
+---
+
+## COMPLETED
+
+Existe resultado publicado de la Run vigente y pendiente de aprobación.
+
+---
+
+## APPROVED
+
+Existe aprobación vigente del resultado actual y sus read sets/contexto permanecen frescos.
+
+---
+
+## COMING_SOON
+
+Definition reconocida pero sin implementación ejecutable.
+
+Nunca debe producir CTA de ejecución.
+
+---
+
+## NOT_APPLICABLE
+
+El nodo no aplica al contexto/resultados.
+
+Ejemplo futuro válido:
+
+D2 si D1 aprobado tiene cero Trips y el contrato establece no aplicabilidad.
+
+No fabricar una Run vacía.
+
+---
+
+# 6. DIMENSIONES ORTOGONALES
+
+No comprimir todo en node state.
+
+Mantener separadas:
+
+```text
+Node State
+Freshness
+Technical Failure
+Runtime Availability
+Permission / Action Eligibility
+```
+
+Ejemplo:
+
+```text
+READY
++
+runtime unavailable
+```
+
+no debe convertirse artificialmente en LOCKED.
+
+Un failure técnico tampoco debe transformarse en DATA_REQUIRED.
+
+---
+
+# 7. REQUIREMENTS / READ SETS
+
+Implementar requirements desde las Definitions y Data Contracts reales.
+
+D1 requiere normalmente:
+
+```text
+transport_demand
+transport_resources
+```
+
+válidos/publicados para la Model Version correspondiente.
+
+D2 requiere:
+
+```text
+approved current D1 Transport Plan
+```
+
+y cualquier enrichment adicional sólo si la Definition realmente lo exige.
+
+## REGLA IMPORTANTE
+
+Los campos estándar:
+
+- ready_date;
+- delivery_due_date;
+- distance_km;
+
+ya pertenecen al Demand contract.
+
+Por lo tanto:
+
+# D2 NO debe requerir un CSV adicional en el flujo estándar.
+
+No crear DATA_REQUIRED artificial para D2 si toda la información necesaria ya existe.
+
+---
+
+# 8. READ SET SEMANTICS
+
+El graph debe poder saber qué parte del contexto consume cada nodo.
+
+Esto será crítico para invalidación posterior.
+
+Ejemplo conceptual:
+
+```text
+D1 reads:
+- Demand
+- Resources
+- Model
+- Horizon
+- Case Policy
+- Node Policy
+
+D2 reads:
+- Approved D1 result
+- Horizon
+- relevant scheduling enrichment
+```
+
+No implementar invalidación completa de T8 antes de tiempo.
+
+Pero el resolver debe usar/read-set metadata correctamente.
+
+---
+
+# 9. FRESHNESS
+
+Una aprobación histórica permanece histórica.
+
+Si cambia un input consumido:
+
+```text
+current node
+→ stale / superseded
+```
+
+según reglas correspondientes.
+
+NO borrar:
+
+- Run;
+- approval event;
+- actor;
+- timestamps;
+- historical result.
+
+La proyección actual puede dejar de estar APPROVED sin eliminar la historia.
+
+---
+
+# 10. APPROVAL DEPENDENCIES
+
+D2 sólo puede desbloquearse a partir del:
+
+```text
+approved current D1
+```
+
+No utilizar simplemente:
+
+```text
+latest completed D1
+```
+
+No utilizar:
+
+```text
+latest created Run
+```
+
+No elegir por `created_at` cuando existe lineage/approval authority.
+
+Preservar las reglas verificadas en T0-R/T0-R2.
+
+---
+
+# 11. RUNTIME AVAILABILITY
+
+Todavía NO están integrados los engines Ultimate de T6–T9.
+
+Por lo tanto T5 debe ser honesto.
+
+Puede existir:
+
+```text
+node_state = READY
+runtime_available = false
+```
+
+si corresponde.
+
+No marcar como implementado/ejecutable un runtime inexistente sólo para completar la UI.
+
+No llamar engines legacy como reemplazo silencioso.
+
+---
+
+# 12. SERVER AUTHORITY
+
+El backend debe ser la autoridad del graph.
+
+Implementar algo equivalente a:
+
+```text
+resolve_case_graph(
+    context,
+    pack,
+    run_history,
+    responsibilities,
+    runtime_capabilities
+)
+```
+
+según el Master Plan.
+
+Frontend consume la proyección.
+
+NO debe reimplementar:
+
+- dependency logic;
+- approval dependencies;
+- readiness;
+- applicability;
+- freshness.
+
+---
+
+# 13. SQL / CONCURRENCY
+
+Donde una acción dependa de estado mutable:
+
+- revalidar bajo locks/RPC correspondiente;
+- no confiar en la proyección obtenida anteriormente por GET.
+
+La UI puede mostrar:
+
+```text
+READY
+```
+
+pero admission futura debe volver a comprobar condiciones.
+
+T5 prepara esta autoridad.
+
+NO implementar todavía admission completa T8.
+
+---
+
+# 14. DECISION MAP UX
+
+Implementar el Decision Map definitivo dentro del lenguaje visual actual de Dation.
+
+Debe representar claramente:
+
+```text
+Transport Plan
+      ↓
+Day Scheduling
+```
+
+más futuras ramas visualmente diferenciadas cuando corresponda.
+
+El usuario debe entender:
+
+- qué decisión está disponible;
+- qué falta;
+- qué está bloqueado;
+- qué terminó;
+- qué está aprobado;
+- qué viene después.
+
+---
+
+# 15. MAP DESIGN
+
+Aplicá la `Execution Skills Policy`.
+
+Para esta fase son especialmente pertinentes:
+
+- `design-system`;
+- `emil-design-eng`;
+- `ui-ux-pro-max`;
+- `break-ui`.
+
+Usalas sólo como soporte.
+
+## ANTES DE MODIFICAR
+
+Inspeccioná el Decision Map actual y patrones relacionados:
+
+- Hero;
+- cards/nodes;
+- badges;
+- status indicators;
+- connectors;
+- hover;
+- selected states;
+- buttons;
+- responsive behavior;
+- empty/loading/error states.
+
+Preservar el lenguaje visual actual.
+
+NO realizar redesign transversal.
+
+---
+
+# 16. DECISION CASE SELECTOR
+
+Preservar/mejorar únicamente según el diseño ya aprobado.
+
+El selector de Decision Case debe:
+
+- mostrar el Case actual;
+- permitir seleccionar otros Cases existentes según contexto;
+- no provocar refresh accidental;
+- mantener URL/contexto coherentes;
+- no recrear Case;
+- no modificar Pack.
+
+No inventar una nueva jerarquía.
+
+---
+
+# 17. NEW CASE INDICATOR
+
+Preservar la regla acordada:
+
+Si es el primer/único Decision Case:
+
+→ no mostrar un aviso redundante de “nuevo Decision Case”.
+
+Si ya existen otros Cases y se está creando/seleccionando uno nuevo:
+
+→ puede mostrarse el contexto correspondiente.
+
+No usar este indicador como fuente de estado del graph.
+
+---
+
+# 18. NAVIGATION
+
+Flujo Ultimate target:
+
+```text
+Create / Open Case
+        ↓
+Decision Map
+        ↓
+DATA_REQUIRED
+        ↓
+Case Data
+        ↓
+Decision Map
+        ↓
+READY
+        ↓
+Configure Decision
+```
+
+T5 llega hasta Config/navigation.
+
+NO ejecuta todavía D1.
+
+---
+
+# 19. DATA_REQUIRED ACTION
+
+Cuando un nodo D1 esté DATA_REQUIRED:
+
+CTA:
+
+```text
+Complete Case Data
+```
+
+o copy equivalente aprobado.
+
+Debe navegar al Case Data contextual.
+
+Después de publicar los inputs:
+
+volver al Map debe mostrar la nueva proyección.
+
+No duplicar lógica de readiness en Case Data.
+
+---
+
+# 20. READY ACTION
+
+Cuando D1 esté READY:
+
+CTA:
+
+```text
+Configure Transport Plan
+```
+
+Debe abrir Config D1 contextual.
+
+T5 puede preparar navegación/config shell.
+
+NO ejecutar engine.
+
+---
+
+# 21. D2 NAVIGATION
+
+Antes de D1 APPROVED:
+
+D2 debe estar:
+
+```text
+LOCKED
+```
+
+Después de D1 APPROVED y con requisitos satisfechos:
+
+```text
+READY
+```
+
+La acción debe navegar a Config D2.
+
+No pedir nuevamente Demand/Resources si no existe requisito real.
+
+---
+
+# 22. RUN HISTORY
+
+Preservar acceso a Runs anteriores.
+
+Abrir una Run histórica:
+
+NO debe cambiar el Case current graph.
+
+NO debe seleccionar automáticamente “latest”.
+
+NO debe modificar aprobación vigente.
+
+Deep links deben mantener explícitamente:
+
+- Case;
+- node;
+- Run cuando corresponda.
+
+---
+
+# 23. NEW RUN
+
+Preservar el comportamiento acordado:
+
+```text
+Nueva corrida D1
+→ Config D1
+
+Nueva corrida D2
+→ Config D2
+```
+
+No pasar artificialmente por:
+
+```text
+Data Upload
+```
+
+si los datos siguen vigentes.
+
+No cambiar de Decision Case.
+
+---
+
+# 24. BACK / FORWARD / RELOAD
+
+Debe preservarse correctamente:
+
+- Case seleccionado;
+- node seleccionado;
+- Run histórica cuando aplica;
+- Map state;
+- Config context.
+
+Probar:
+
+- Back;
+- Forward;
+- reload;
+- BFCache cuando aplique;
+- deep links;
+- navigation races.
+
+---
+
+# 25. HOME / DECISION CENTER
+
+Actualizar únicamente proyecciones necesarias para convivir con Cases Ultimate.
+
+Home/Center deben poder mostrar:
+
+- Cases sin Runs;
+- Cases con DATA_REQUIRED;
+- Cases READY;
+- Runs vigentes;
+- aprobación/attention actual.
+
+No recalcular el graph independientemente.
+
+Usar backend projection/metadata común.
+
+Preservar legacy.
+
+---
+
+# 26. FUTURE NODES
+
+Si se muestran:
+
+```text
+Capacity Sourcing
+Routing
+Dock Planning
+Simulation
+Replanning
+```
+
+deben ser estrictamente:
+
+```text
+COMING_SOON
+```
+
+y sólo cuando estén previstos por la Definition/UI aprobada.
+
+No agregar funcionalidades ficticias.
+
+No mostrar CTA ejecutable.
+
+---
+
+# 27. NO ENGINE EXECUTION
+
+T5 no debe llamar:
+
+- D1 Ultimate;
+- D2 Ultimate;
+- Result Assembler.
+
+Si un usuario llega a Config de un nodo cuyo runtime aún no está disponible:
+
+la UI/backend debe comunicar correctamente esa capacidad/feature gating durante desarrollo.
+
+No ejecutar legacy como fallback.
+
+---
+
+# 28. LEGACY
+
+Preservar totalmente:
+
+- navegación legacy;
+- Runs legacy;
+- Orders/Fleet workflow;
+- Decision Center legacy;
+- historical approvals;
+- Home attention;
+- archived Cases;
+- direct links;
+- Owner/Viewer/Admin semantics.
+
+No convertir Cases históricos a workflow Ultimate.
+
+---
+
+# 29. PROHIBIDO EN T5
+
+NO ejecutar T6.
+
+NO implementar D1 solver.
+
+NO implementar D2 scheduler.
+
+NO implementar Result Assembler.
+
+NO crear alternatives.
+
+NO crear Sankey.
+
+NO crear Gantt.
+
+NO implementar Decision Copilot.
+
+NO implementar full invalidation T8 adelantada.
+
+NO modificar datos productivos.
+
+NO deploy.
+
+NO push.
+
+NO refactor transversal.
+
+---
+
+# 30. TESTING
+
+Ejecutá según Master Plan:
+
+- B-PY
+- B-NODE
+- U5
+- S5
+- W5
+- B-FOCUS
+
+más focales estrictamente necesarios.
+
+No ejecutes Browser/E2E completos por rutina salvo impacto demostrado.
+
+---
+
+# 31. TESTS FUNCIONALES MÍNIMOS
+
+Probar como mínimo:
+
+## Empty Case
+
+```text
+Case nuevo
+→ Map accesible
+→ D1 DATA_REQUIRED
+→ D2 LOCKED
+```
+
+## Demand only
+
+```text
+Demand publicado
+Resources missing
+→ D1 DATA_REQUIRED
+```
+
+## Complete Data Pack
+
+```text
+Demand + Resources
+→ D1 READY
+```
+
+sin ejecutar engine.
+
+## D1 lifecycle fixture
+
+```text
+READY
+→ IN_PROGRESS
+→ COMPLETED
+→ APPROVED
+```
+
+mediante fixtures/state controlado, no engine Ultimate ficticio.
+
+## D2 dependency
+
+```text
+D1 COMPLETED
+→ D2 LOCKED
+
+D1 APPROVED
+→ D2 READY
+```
+
+si no requiere enrichment adicional.
+
+## Historical approval
+
+Una Run antigua aprobada no se convierte en “current” simplemente porque sea histórica.
+
+## New D1
+
+Nueva Run no debe pasar por Upload si Pack sigue vigente.
+
+## New D2
+
+Nueva Run mantiene upstream D1 aprobado exacto.
+
+---
+
+# 32. READ SET TESTS
+
+Probar conceptualmente:
+
+### Irrelevant enrichment
+
+No debe invalidar D1 si no pertenece a su read set.
+
+### Demand/Resources change
+
+Debe cambiar la proyección/freshness correspondiente.
+
+No hace falta implementar todavía toda la invalidación persistente T8, pero la semántica debe quedar correctamente representada.
+
+---
+
+# 33. NAVIGATION TESTS
+
+W5 debe probar:
+
+- Map;
+- Case Data;
+- Config D1;
+- Config D2;
+- Back;
+- Forward;
+- reload;
+- Case switch;
+- Run history;
+- new run;
+- Owner/Viewer;
+- archived;
+- responsive;
+- keyboard/focus;
+- navigation races.
+
+---
+
+# 34. UI PRESERVATION
+
+Antes de GO validar:
+
+- nodes/cards consistentes con Dation;
+- no design-token drift;
+- Hero coherente con Case Data;
+- selectors/dropdowns actuales preservados;
+- responsive;
+- keyboard;
+- focus visible;
+- no scroll clipping;
+- no animaciones rectangulares sobre cards redondeadas;
+- no duplicación innecesaria de controles.
+
+No utilizar una Skill para justificar redesign.
+
+---
+
+# 35. STOP CONDITIONS
+
+STOP si:
+
+- frontend y backend difieren en node state;
+- Decision Graph depende de heurística de UI;
+- D2 queda READY sin D1 aprobado;
+- D2 exige CSV adicional sin requisito real;
+- historical latest sustituye approved current;
+- enrichment irrelevante invalida D1;
+- Case cambia al recuperar Config;
+- future node se vuelve ejecutable;
+- runtime inexistente se marca disponible;
+- nueva corrida fuerza Upload sin motivo;
+- Back/Forward pierde Case/Run;
+- legacy navigation se rompe;
+- T5 necesita implementar D1/T6 para poder funcionar.
+
+---
+
+# 36. REPORTING
+
+Crear:
+
+`docs/execution/ultimate/t5/t5-execution-report.md`
+
+Incluir:
+
+## Baseline
+
+## Skills utilizadas
+
+## Files Created
+
+## Files Modified
+
+## Decision Definitions
+
+## Graph Resolver
+
+## Node State Semantics
+
+## Requirements / Read Sets
+
+## Freshness
+
+## Runtime Availability
+
+## Decision Map UI
+
+## Navigation
+
+## Home / Decision Center Integration
+
+## Legacy Compatibility
+
+## Tests
+
+## Deviations
+
+## Risks
+
+## Gate Evaluation
+
+## FINAL DECISION
+
+Una sola:
+
+**GO — T5 completado. T6 puede ser solicitado.**
+
+o
+
+**STOP — T5 no cumple condiciones para autorizar T6.**
+
+Aunque resulte GO:
+
+# NO EJECUTES T6.
+
+Finalizá después del reporte.

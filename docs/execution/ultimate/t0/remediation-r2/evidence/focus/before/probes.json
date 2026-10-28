@@ -1,0 +1,2150 @@
+[
+  {
+    "kind": "data",
+    "width": 320,
+    "height": 568,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "dispatch-pro-hero d-page-hero d-page-hero--workflow d-page-hero--copy-only is-visible",
+          "width": 228,
+          "height": 194.1875,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 228,
+          "height": 63.8125,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar",
+          "width": 228,
+          "height": 235.71875,
+          "font": "",
+          "padding": "12px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "10px"
+        }
+      ]
+    },
+    "visited": 27,
+    "failures": []
+  },
+  {
+    "kind": "map",
+    "width": 320,
+    "height": 568,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "dispatch-pro-hero dispatch-map-premium__hero d-page-hero d-page-hero--workflow",
+          "width": 228,
+          "height": 257.65625,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 228,
+          "height": 31.90625,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        }
+      ]
+    },
+    "visited": 21,
+    "failures": []
+  },
+  {
+    "kind": "assignment",
+    "width": 320,
+    "height": 568,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "decision-config-hero dispatch-pro-hero assignment-config-hero d-page-hero d-page-hero--workflow",
+          "width": 228,
+          "height": 331.78125,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 228,
+          "height": 95.71875,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar d-workflow-action-bar--config",
+          "width": 228,
+          "height": 239.71875,
+          "font": "",
+          "padding": "12px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "10px"
+        }
+      ]
+    },
+    "visited": 36,
+    "failures": []
+  },
+  {
+    "kind": "scheduling",
+    "width": 320,
+    "height": 568,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "decision-config-hero dispatch-pro-hero assignment-config-hero d-page-hero d-page-hero--workflow",
+          "width": 228,
+          "height": 353.46875,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 228,
+          "height": 95.71875,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar d-workflow-action-bar--config",
+          "width": 228,
+          "height": 239.71875,
+          "font": "",
+          "padding": "12px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "10px"
+        }
+      ]
+    },
+    "visited": 28,
+    "failures": []
+  },
+  {
+    "kind": "data",
+    "width": 320,
+    "height": 256,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "dispatch-pro-hero d-page-hero d-page-hero--workflow d-page-hero--copy-only is-visible",
+          "width": 228,
+          "height": 194.1875,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 228,
+          "height": 63.8125,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar",
+          "width": 228,
+          "height": 126.53125,
+          "font": "",
+          "padding": "8px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "6px"
+        }
+      ]
+    },
+    "visited": 12,
+    "failures": [
+      {
+        "step": 11,
+        "immediate": {
+          "skip": false,
+          "tag": "BUTTON",
+          "text": "1Datos del Case",
+          "visibleFocus": true,
+          "outline": "solid",
+          "width": 3,
+          "color": "rgb(80, 200, 196)",
+          "occluded": true,
+          "outside": false,
+          "rect": {
+            "x": 74,
+            "y": 73,
+            "width": 158,
+            "height": 48
+          },
+          "identity": "<button type=\"button\" class=\"dda-workspace-step is-current\" data-step=\"1\" aria-disabled=\"false\" aria-current=\"step\"><span class=\"dda-workspace-step__marker\">1</span><span class=\"dda-workspace-step__copy\"><strong>Datos del Case</strong></span></button>"
+        },
+        "stable": {
+          "skip": false,
+          "tag": "BUTTON",
+          "text": "1Datos del Case",
+          "visibleFocus": true,
+          "outline": "solid",
+          "width": 3,
+          "color": "rgb(80, 200, 196)",
+          "occluded": true,
+          "outside": false,
+          "rect": {
+            "x": 74,
+            "y": 73,
+            "width": 158,
+            "height": 48
+          },
+          "identity": "<button type=\"button\" class=\"dda-workspace-step is-current\" data-step=\"1\" aria-disabled=\"false\" aria-current=\"step\"><span class=\"dda-workspace-step__marker\">1</span><span class=\"dda-workspace-step__copy\"><strong>Datos del Case</strong></span></button>"
+        },
+        "details": {
+          "hits": [
+            {
+              "tag": "BUTTON",
+              "cls": "dda-workspace-step is-current",
+              "text": "1Datos del Case"
+            },
+            {
+              "tag": "DIV",
+              "cls": "app-shell",
+              "text": "\n    \n      \n        \n          \n        \n        \n          Dation\n  "
+            },
+            {
+              "tag": "DIV",
+              "cls": "app-shell",
+              "text": "\n    \n      \n        \n          \n        \n        \n          Dation\n  "
+            }
+          ],
+          "ancestors": [
+            {
+              "tag": "BUTTON",
+              "cls": "dda-workspace-step is-current",
+              "rect": {
+                "x": 74,
+                "y": 73,
+                "w": 158,
+                "h": 48
+              },
+              "overflowX": "visible",
+              "overflowY": "visible",
+              "scrollTop": 0,
+              "scrollLeft": 0,
+              "padding": "6px 8px",
+              "position": "static"
+            },
+            {
+              "tag": "NAV",
+              "cls": "dda-workspace-nav",
+              "rect": {
+                "x": 70,
+                "y": 69,
+                "w": 240,
+                "h": 56
+              },
+              "overflowX": "auto",
+              "overflowY": "auto",
+              "scrollTop": 0,
+              "scrollLeft": 0,
+              "padding": "4px",
+              "position": "static"
+            },
+            {
+              "tag": "SECTION",
+              "cls": "dda-workspace-nav-shell",
+              "rect": {
+                "x": 60,
+                "y": 61,
+                "w": 260,
+                "h": 73
+              },
+              "overflowX": "visible",
+              "overflowY": "visible",
+              "scrollTop": 0,
+              "scrollLeft": 0,
+              "padding": "8px 10px",
+              "position": "static"
+            },
+            {
+              "tag": "MAIN",
+              "cls": "main has-workflow-commands has-compact-workflow-commands",
+              "rect": {
+                "x": 60,
+                "y": 0,
+                "w": 260,
+                "h": 89
+              },
+              "overflowX": "auto",
+              "overflowY": "auto",
+              "scrollTop": 0,
+              "scrollLeft": 0,
+              "padding": "0px",
+              "position": "static"
+            },
+            {
+              "tag": "DIV",
+              "cls": "app-shell",
+              "rect": {
+                "x": 0,
+                "y": 0,
+                "w": 320,
+                "h": 256
+              },
+              "overflowX": "visible",
+              "overflowY": "visible",
+              "scrollTop": 0,
+              "scrollLeft": 0,
+              "padding": "0px",
+              "position": "static"
+            },
+            {
+              "tag": "BODY",
+              "cls": "dispatch-enabled",
+              "rect": {
+                "x": 0,
+                "y": 0,
+                "w": 320,
+                "h": 256
+              },
+              "overflowX": "visible",
+              "overflowY": "visible",
+              "scrollTop": 0,
+              "scrollLeft": 0,
+              "padding": "0px",
+              "position": "static"
+            },
+            {
+              "tag": "HTML",
+              "cls": "",
+              "rect": {
+                "x": 0,
+                "y": 0,
+                "w": 320,
+                "h": 256
+              },
+              "overflowX": "visible",
+              "overflowY": "visible",
+              "scrollTop": 0,
+              "scrollLeft": 0,
+              "padding": "0px",
+              "position": "static"
+            }
+          ],
+          "bar": {
+            "x": 76,
+            "y": 121.46875,
+            "w": 228,
+            "h": 126.53125
+          }
+        }
+      }
+    ]
+  },
+  {
+    "kind": "map",
+    "width": 320,
+    "height": 256,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "dispatch-pro-hero dispatch-map-premium__hero d-page-hero d-page-hero--workflow",
+          "width": 228,
+          "height": 257.65625,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 228,
+          "height": 31.90625,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        }
+      ]
+    },
+    "visited": 21,
+    "failures": []
+  },
+  {
+    "kind": "assignment",
+    "width": 320,
+    "height": 256,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "decision-config-hero dispatch-pro-hero assignment-config-hero d-page-hero d-page-hero--workflow",
+          "width": 228,
+          "height": 331.78125,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 228,
+          "height": 95.71875,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar d-workflow-action-bar--config",
+          "width": 228,
+          "height": 132.5625,
+          "font": "",
+          "padding": "8px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "6px"
+        }
+      ]
+    },
+    "visited": 12,
+    "failures": [
+      {
+        "step": 11,
+        "immediate": {
+          "skip": false,
+          "tag": "BUTTON",
+          "text": "✓Datos del Case",
+          "visibleFocus": true,
+          "outline": "solid",
+          "width": 3,
+          "color": "rgb(80, 200, 196)",
+          "occluded": true,
+          "outside": false,
+          "rect": {
+            "x": 74,
+            "y": 75,
+            "width": 158,
+            "height": 48
+          },
+          "identity": "<button type=\"button\" class=\"dda-workspace-step is-complete\" data-step=\"1\" aria-disabled=\"false\"><span class=\"dda-workspace-step__marker\">✓</span><span class=\"dda-workspace-step__copy\"><strong>Datos del Case</strong></span></button>"
+        },
+        "stable": {
+          "skip": false,
+          "tag": "BUTTON",
+          "text": "✓Datos del Case",
+          "visibleFocus": true,
+          "outline": "solid",
+          "width": 3,
+          "color": "rgb(80, 200, 196)",
+          "occluded": true,
+          "outside": false,
+          "rect": {
+            "x": 74,
+            "y": 75,
+            "width": 158,
+            "height": 48
+          },
+          "identity": "<button type=\"button\" class=\"dda-workspace-step is-complete\" data-step=\"1\" aria-disabled=\"false\"><span class=\"dda-workspace-step__marker\">✓</span><span class=\"dda-workspace-step__copy\"><strong>Datos del Case</strong></span></button>"
+        },
+        "details": {
+          "hits": [
+            {
+              "tag": "DIV",
+              "cls": "app-shell",
+              "text": "\n    \n      \n        \n          \n        \n        \n          Dation\n  "
+            },
+            {
+              "tag": "DIV",
+              "cls": "app-shell",
+              "text": "\n    \n      \n        \n          \n        \n        \n          Dation\n  "
+            },
+            {
+              "tag": "DIV",
+              "cls": "app-shell",
+              "text": "\n    \n      \n        \n          \n        \n        \n          Dation\n  "
+            }
+          ],
+          "ancestors": [
+            {
+              "tag": "BUTTON",
+              "cls": "dda-workspace-step is-complete",
+              "rect": {
+                "x": 74,
+                "y": 75,
+                "w": 158,
+                "h": 48
+              },
+              "overflowX": "visible",
+              "overflowY": "visible",
+              "scrollTop": 0,
+              "scrollLeft": 0,
+              "padding": "6px 8px",
+              "position": "static"
+            },
+            {
+              "tag": "NAV",
+              "cls": "dda-workspace-nav",
+              "rect": {
+                "x": 70,
+                "y": 69,
+                "w": 240,
+                "h": 60
+              },
+              "overflowX": "auto",
+              "overflowY": "auto",
+              "scrollTop": 0,
+              "scrollLeft": 0,
+              "padding": "4px",
+              "position": "static"
+            },
+            {
+              "tag": "SECTION",
+              "cls": "dda-workspace-nav-shell",
+              "rect": {
+                "x": 60,
+                "y": 61,
+                "w": 260,
+                "h": 77
+              },
+              "overflowX": "visible",
+              "overflowY": "visible",
+              "scrollTop": 0,
+              "scrollLeft": 0,
+              "padding": "8px 10px",
+              "position": "static"
+            },
+            {
+              "tag": "MAIN",
+              "cls": "main has-workflow-commands has-compact-workflow-commands",
+              "rect": {
+                "x": 60,
+                "y": 0,
+                "w": 260,
+                "h": 83
+              },
+              "overflowX": "auto",
+              "overflowY": "auto",
+              "scrollTop": 0,
+              "scrollLeft": 0,
+              "padding": "0px",
+              "position": "static"
+            },
+            {
+              "tag": "DIV",
+              "cls": "app-shell",
+              "rect": {
+                "x": 0,
+                "y": 0,
+                "w": 320,
+                "h": 256
+              },
+              "overflowX": "visible",
+              "overflowY": "visible",
+              "scrollTop": 0,
+              "scrollLeft": 0,
+              "padding": "0px",
+              "position": "static"
+            },
+            {
+              "tag": "BODY",
+              "cls": "dispatch-enabled",
+              "rect": {
+                "x": 0,
+                "y": 0,
+                "w": 320,
+                "h": 256
+              },
+              "overflowX": "visible",
+              "overflowY": "visible",
+              "scrollTop": 0,
+              "scrollLeft": 0,
+              "padding": "0px",
+              "position": "static"
+            },
+            {
+              "tag": "HTML",
+              "cls": "",
+              "rect": {
+                "x": 0,
+                "y": 0,
+                "w": 320,
+                "h": 256
+              },
+              "overflowX": "visible",
+              "overflowY": "visible",
+              "scrollTop": 0,
+              "scrollLeft": 0,
+              "padding": "0px",
+              "position": "static"
+            }
+          ],
+          "bar": {
+            "x": 76,
+            "y": 115.4375,
+            "w": 228,
+            "h": 132.5625
+          }
+        }
+      }
+    ]
+  },
+  {
+    "kind": "scheduling",
+    "width": 320,
+    "height": 256,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "decision-config-hero dispatch-pro-hero assignment-config-hero d-page-hero d-page-hero--workflow",
+          "width": 228,
+          "height": 353.46875,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 228,
+          "height": 95.71875,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar d-workflow-action-bar--config",
+          "width": 228,
+          "height": 148.75,
+          "font": "",
+          "padding": "8px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "6px"
+        }
+      ]
+    },
+    "visited": 12,
+    "failures": [
+      {
+        "step": 11,
+        "immediate": {
+          "skip": false,
+          "tag": "BUTTON",
+          "text": "✓Datos del Case",
+          "visibleFocus": true,
+          "outline": "solid",
+          "width": 3,
+          "color": "rgb(80, 200, 196)",
+          "occluded": true,
+          "outside": false,
+          "rect": {
+            "x": 74,
+            "y": 75,
+            "width": 158,
+            "height": 48
+          },
+          "identity": "<button type=\"button\" class=\"dda-workspace-step is-complete\" data-step=\"1\" aria-disabled=\"false\"><span class=\"dda-workspace-step__marker\">✓</span><span class=\"dda-workspace-step__copy\"><strong>Datos del Case</strong></span></button>"
+        },
+        "stable": {
+          "skip": false,
+          "tag": "BUTTON",
+          "text": "✓Datos del Case",
+          "visibleFocus": true,
+          "outline": "solid",
+          "width": 3,
+          "color": "rgb(80, 200, 196)",
+          "occluded": true,
+          "outside": false,
+          "rect": {
+            "x": 74,
+            "y": 75,
+            "width": 158,
+            "height": 48
+          },
+          "identity": "<button type=\"button\" class=\"dda-workspace-step is-complete\" data-step=\"1\" aria-disabled=\"false\"><span class=\"dda-workspace-step__marker\">✓</span><span class=\"dda-workspace-step__copy\"><strong>Datos del Case</strong></span></button>"
+        },
+        "details": {
+          "hits": [
+            {
+              "tag": "DIV",
+              "cls": "app-shell",
+              "text": "\n    \n      \n        \n          \n        \n        \n          Dation\n  "
+            },
+            {
+              "tag": "SECTION",
+              "cls": "d-workflow-action-bar d-workflow-action-bar--config",
+              "text": "Tu configuraciónLista para revisar. Cambios guardados en esta sesión.V"
+            },
+            {
+              "tag": "BUTTON",
+              "cls": "d-workflow-action-bar__item d-workflow-action-bar__chip",
+              "text": "ObjetivoServicio primero"
+            }
+          ],
+          "ancestors": [
+            {
+              "tag": "BUTTON",
+              "cls": "dda-workspace-step is-complete",
+              "rect": {
+                "x": 74,
+                "y": 75,
+                "w": 158,
+                "h": 48
+              },
+              "overflowX": "visible",
+              "overflowY": "visible",
+              "scrollTop": 0,
+              "scrollLeft": 0,
+              "padding": "6px 8px",
+              "position": "static"
+            },
+            {
+              "tag": "NAV",
+              "cls": "dda-workspace-nav",
+              "rect": {
+                "x": 70,
+                "y": 69,
+                "w": 240,
+                "h": 60
+              },
+              "overflowX": "auto",
+              "overflowY": "auto",
+              "scrollTop": 0,
+              "scrollLeft": 0,
+              "padding": "4px",
+              "position": "static"
+            },
+            {
+              "tag": "SECTION",
+              "cls": "dda-workspace-nav-shell",
+              "rect": {
+                "x": 60,
+                "y": 61,
+                "w": 260,
+                "h": 77
+              },
+              "overflowX": "visible",
+              "overflowY": "visible",
+              "scrollTop": 0,
+              "scrollLeft": 0,
+              "padding": "8px 10px",
+              "position": "static"
+            },
+            {
+              "tag": "MAIN",
+              "cls": "main has-workflow-commands has-compact-workflow-commands",
+              "rect": {
+                "x": 60,
+                "y": 0,
+                "w": 260,
+                "h": 67
+              },
+              "overflowX": "auto",
+              "overflowY": "auto",
+              "scrollTop": 0,
+              "scrollLeft": 0,
+              "padding": "0px",
+              "position": "static"
+            },
+            {
+              "tag": "DIV",
+              "cls": "app-shell",
+              "rect": {
+                "x": 0,
+                "y": 0,
+                "w": 320,
+                "h": 256
+              },
+              "overflowX": "visible",
+              "overflowY": "visible",
+              "scrollTop": 0,
+              "scrollLeft": 0,
+              "padding": "0px",
+              "position": "static"
+            },
+            {
+              "tag": "BODY",
+              "cls": "dispatch-enabled",
+              "rect": {
+                "x": 0,
+                "y": 0,
+                "w": 320,
+                "h": 256
+              },
+              "overflowX": "visible",
+              "overflowY": "visible",
+              "scrollTop": 0,
+              "scrollLeft": 0,
+              "padding": "0px",
+              "position": "static"
+            },
+            {
+              "tag": "HTML",
+              "cls": "",
+              "rect": {
+                "x": 0,
+                "y": 0,
+                "w": 320,
+                "h": 256
+              },
+              "overflowX": "visible",
+              "overflowY": "visible",
+              "scrollTop": 0,
+              "scrollLeft": 0,
+              "padding": "0px",
+              "position": "static"
+            }
+          ],
+          "bar": {
+            "x": 76,
+            "y": 99.25,
+            "w": 228,
+            "h": 148.75
+          }
+        }
+      }
+    ]
+  },
+  {
+    "kind": "data",
+    "width": 568,
+    "height": 320,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "dispatch-pro-hero d-page-hero d-page-hero--workflow d-page-hero--copy-only is-visible",
+          "width": 476,
+          "height": 140.59375,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 476,
+          "height": 31.90625,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar",
+          "width": 476,
+          "height": 100,
+          "font": "",
+          "padding": "8px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "6px"
+        }
+      ]
+    },
+    "visited": 27,
+    "failures": []
+  },
+  {
+    "kind": "map",
+    "width": 568,
+    "height": 320,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "dispatch-pro-hero dispatch-map-premium__hero d-page-hero d-page-hero--workflow",
+          "width": 476,
+          "height": 214.28125,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 476,
+          "height": 31.90625,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        }
+      ]
+    },
+    "visited": 21,
+    "failures": []
+  },
+  {
+    "kind": "assignment",
+    "width": 568,
+    "height": 320,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "decision-config-hero dispatch-pro-hero assignment-config-hero d-page-hero d-page-hero--workflow",
+          "width": 476,
+          "height": 214.28125,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 476,
+          "height": 31.90625,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar d-workflow-action-bar--config",
+          "width": 476,
+          "height": 116.375,
+          "font": "",
+          "padding": "8px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "6px"
+        }
+      ]
+    },
+    "visited": 36,
+    "failures": []
+  },
+  {
+    "kind": "scheduling",
+    "width": 568,
+    "height": 320,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "decision-config-hero dispatch-pro-hero assignment-config-hero d-page-hero d-page-hero--workflow",
+          "width": 476,
+          "height": 246.1875,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 476,
+          "height": 63.8125,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar d-workflow-action-bar--config",
+          "width": 476,
+          "height": 116.375,
+          "font": "",
+          "padding": "8px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "6px"
+        }
+      ]
+    },
+    "visited": 20,
+    "failures": [
+      {
+        "step": 19,
+        "immediate": {
+          "skip": false,
+          "tag": "BUTTON",
+          "text": "Ventana automáticaEl motor comienza en la primera fecha factible y encuentra el calendario completo ",
+          "visibleFocus": true,
+          "outline": "solid",
+          "width": 3,
+          "color": "rgb(80, 200, 196)",
+          "occluded": false,
+          "outside": true,
+          "rect": {
+            "x": 76,
+            "y": -17.921875,
+            "width": 476,
+            "height": 169.078125
+          },
+          "identity": "<button type=\"button\" class=\"decision-config-option assignment-choice-card scheduling-window-card is-selected\" data-scheduling-window-mode=\"auto\" aria-pressed=\"true\"><span class=\"assignment-choice-card__icon\"><svg class=\"assignment-icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><pa"
+        },
+        "stable": {
+          "skip": false,
+          "tag": "BUTTON",
+          "text": "Ventana automáticaEl motor comienza en la primera fecha factible y encuentra el calendario completo ",
+          "visibleFocus": true,
+          "outline": "solid",
+          "width": 3,
+          "color": "rgb(80, 200, 196)",
+          "occluded": false,
+          "outside": true,
+          "rect": {
+            "x": 76,
+            "y": -17.921875,
+            "width": 476,
+            "height": 169.078125
+          },
+          "identity": "<button type=\"button\" class=\"decision-config-option assignment-choice-card scheduling-window-card is-selected\" data-scheduling-window-mode=\"auto\" aria-pressed=\"true\"><span class=\"assignment-choice-card__icon\"><svg class=\"assignment-icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><pa"
+        },
+        "details": {
+          "hits": [
+            {
+              "tag": "BUTTON",
+              "cls": "decision-config-option assignment-choice-card scheduling-window-card is-selected",
+              "text": "Ventana automáticaEl motor comienza en la primera fecha factible y enc"
+            },
+            {
+              "tag": "SMALL",
+              "cls": "",
+              "text": "El motor comienza en la primera fecha factible y encuentra el calendar"
+            },
+            {
+              "tag": "EM",
+              "cls": "",
+              "text": "Recomendada"
+            }
+          ],
+          "ancestors": [
+            {
+              "tag": "BUTTON",
+              "cls": "decision-config-option assignment-choice-card scheduling-window-card is-selected",
+              "rect": {
+                "x": 76,
+                "y": -17.921875,
+                "w": 476,
+                "h": 169.078125
+              },
+              "overflowX": "visible",
+              "overflowY": "visible",
+              "scrollTop": 0,
+              "scrollLeft": 0,
+              "padding": "18px",
+              "position": "relative"
+            },
+            {
+              "tag": "DIV",
+              "cls": "assignment-objective-grid scheduling-window-mode",
+              "rect": {
+                "x": 76,
+                "y": -17.921875,
+                "w": 476,
+                "h": 331.5625
+              },
+              "overflowX": "visible",
+              "overflowY": "visible",
+              "scrollTop": 0,
+              "scrollLeft": 0,
+              "padding": "0px",
+              "position": "static"
+            },
+            {
+              "tag": "SECTION",
+              "cls": "assignment-section scheduling-section",
+              "rect": {
+                "x": 76,
+                "y": -498.71875,
+                "w": 476,
+                "h": 1113.796875
+              },
+              "overflowX": "visible",
+              "overflowY": "visible",
+              "scrollTop": 0,
+              "scrollLeft": 0,
+              "padding": "24px 0px",
+              "position": "static"
+            },
+            {
+              "tag": "MAIN",
+              "cls": "assignment-config-sections scheduling-config-sections",
+              "rect": {
+                "x": 76,
+                "y": -498.71875,
+                "w": 476,
+                "h": 2721.296875
+              },
+              "overflowX": "visible",
+              "overflowY": "visible",
+              "scrollTop": 0,
+              "scrollLeft": 0,
+              "padding": "0px",
+              "position": "static"
+            },
+            {
+              "tag": "DIV",
+              "cls": "scheduling-config-v2 assignment-config-v2",
+              "rect": {
+                "x": 76,
+                "y": -846.796875,
+                "w": 476,
+                "h": 3069.375
+              },
+              "overflowX": "visible",
+              "overflowY": "visible",
+              "scrollTop": 0,
+              "scrollLeft": 0,
+              "padding": "0px",
+              "position": "static"
+            },
+            {
+              "tag": "DIV",
+              "cls": "dispatch dispatch-upload-pro assignment-config-root scheduling-config-root",
+              "rect": {
+                "x": 76,
+                "y": -1103,
+                "w": 476,
+                "h": 3397.578125
+              },
+              "overflowX": "visible",
+              "overflowY": "visible",
+              "scrollTop": 0,
+              "scrollLeft": 0,
+              "padding": "0px 0px 24px",
+              "position": "static"
+            },
+            {
+              "tag": "SECTION",
+              "cls": "view is-active",
+              "rect": {
+                "x": 76,
+                "y": -1103,
+                "w": 476,
+                "h": 3397.578125
+              },
+              "overflowX": "visible",
+              "overflowY": "visible",
+              "scrollTop": 0,
+              "scrollLeft": 0,
+              "padding": "0px",
+              "position": "static"
+            },
+            {
+              "tag": "DIV",
+              "cls": "content",
+              "rect": {
+                "x": 60,
+                "y": -1189,
+                "w": 508,
+                "h": 3555.578125
+              },
+              "overflowX": "visible",
+              "overflowY": "visible",
+              "scrollTop": 0,
+              "scrollLeft": 0,
+              "padding": "36px 16px 72px",
+              "position": "static"
+            },
+            {
+              "tag": "MAIN",
+              "cls": "main has-workflow-commands has-compact-workflow-commands",
+              "rect": {
+                "x": 60,
+                "y": 0,
+                "w": 508,
+                "h": 163
+              },
+              "overflowX": "auto",
+              "overflowY": "auto",
+              "scrollTop": 1327,
+              "scrollLeft": 0,
+              "padding": "0px",
+              "position": "static"
+            },
+            {
+              "tag": "DIV",
+              "cls": "app-shell",
+              "rect": {
+                "x": 0,
+                "y": 0,
+                "w": 568,
+                "h": 320
+              },
+              "overflowX": "visible",
+              "overflowY": "visible",
+              "scrollTop": 0,
+              "scrollLeft": 0,
+              "padding": "0px",
+              "position": "static"
+            },
+            {
+              "tag": "BODY",
+              "cls": "dispatch-enabled",
+              "rect": {
+                "x": 0,
+                "y": 0,
+                "w": 568,
+                "h": 320
+              },
+              "overflowX": "visible",
+              "overflowY": "visible",
+              "scrollTop": 0,
+              "scrollLeft": 0,
+              "padding": "0px",
+              "position": "static"
+            },
+            {
+              "tag": "HTML",
+              "cls": "",
+              "rect": {
+                "x": 0,
+                "y": 0,
+                "w": 568,
+                "h": 320
+              },
+              "overflowX": "visible",
+              "overflowY": "visible",
+              "scrollTop": 0,
+              "scrollLeft": 0,
+              "padding": "0px",
+              "position": "static"
+            }
+          ],
+          "bar": {
+            "x": 76,
+            "y": 195.625,
+            "w": 476,
+            "h": 116.375
+          }
+        }
+      }
+    ]
+  },
+  {
+    "kind": "data",
+    "width": 1440,
+    "height": 1000,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "dispatch-pro-hero d-page-hero d-page-hero--workflow d-page-hero--copy-only is-visible",
+          "width": 1144,
+          "height": 149.71875,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 1144,
+          "height": 41.03125,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar",
+          "width": 1144,
+          "height": 83.375,
+          "font": "",
+          "padding": "12px 16px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "16px"
+        }
+      ]
+    },
+    "visited": 27,
+    "failures": []
+  },
+  {
+    "kind": "map",
+    "width": 1440,
+    "height": 1000,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "dispatch-pro-hero dispatch-map-premium__hero d-page-hero d-page-hero--workflow",
+          "width": 1144,
+          "height": 223.40625,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 1144,
+          "height": 41.03125,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        }
+      ]
+    },
+    "visited": 21,
+    "failures": []
+  },
+  {
+    "kind": "assignment",
+    "width": 1440,
+    "height": 1000,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "decision-config-hero dispatch-pro-hero assignment-config-hero d-page-hero d-page-hero--workflow",
+          "width": 1144,
+          "height": 201.71875,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 1144,
+          "height": 41.03125,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar d-workflow-action-bar--config",
+          "width": 1144,
+          "height": 80,
+          "font": "",
+          "padding": "12px 16px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "16px"
+        }
+      ]
+    },
+    "visited": 36,
+    "failures": []
+  },
+  {
+    "kind": "scheduling",
+    "width": 1440,
+    "height": 1000,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "decision-config-hero dispatch-pro-hero assignment-config-hero d-page-hero d-page-hero--workflow",
+          "width": 1144,
+          "height": 223.40625,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 1144,
+          "height": 41.03125,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar d-workflow-action-bar--config",
+          "width": 1144,
+          "height": 80,
+          "font": "",
+          "padding": "12px 16px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "16px"
+        }
+      ]
+    },
+    "visited": 28,
+    "failures": []
+  },
+  {
+    "kind": "data",
+    "width": 1280,
+    "height": 1000,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "dispatch-pro-hero d-page-hero d-page-hero--workflow d-page-hero--copy-only is-visible",
+          "width": 984,
+          "height": 149.546875,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 984,
+          "height": 40.859375,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar",
+          "width": 984,
+          "height": 83.375,
+          "font": "",
+          "padding": "12px 16px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "16px"
+        }
+      ]
+    },
+    "visited": 27,
+    "failures": []
+  },
+  {
+    "kind": "map",
+    "width": 1280,
+    "height": 1000,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "dispatch-pro-hero dispatch-map-premium__hero d-page-hero d-page-hero--workflow",
+          "width": 984,
+          "height": 223.234375,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 984,
+          "height": 40.859375,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        }
+      ]
+    },
+    "visited": 21,
+    "failures": []
+  },
+  {
+    "kind": "assignment",
+    "width": 1280,
+    "height": 1000,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "decision-config-hero dispatch-pro-hero assignment-config-hero d-page-hero d-page-hero--workflow",
+          "width": 984,
+          "height": 201.546875,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 984,
+          "height": 40.859375,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar d-workflow-action-bar--config",
+          "width": 984,
+          "height": 80,
+          "font": "",
+          "padding": "12px 16px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "16px"
+        }
+      ]
+    },
+    "visited": 36,
+    "failures": []
+  },
+  {
+    "kind": "scheduling",
+    "width": 1280,
+    "height": 1000,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "decision-config-hero dispatch-pro-hero assignment-config-hero d-page-hero d-page-hero--workflow",
+          "width": 984,
+          "height": 223.234375,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 984,
+          "height": 40.859375,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar d-workflow-action-bar--config",
+          "width": 984,
+          "height": 80,
+          "font": "",
+          "padding": "12px 16px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "16px"
+        }
+      ]
+    },
+    "visited": 28,
+    "failures": []
+  },
+  {
+    "kind": "data",
+    "width": 1024,
+    "height": 1000,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "dispatch-pro-hero d-page-hero d-page-hero--workflow d-page-hero--copy-only is-visible",
+          "width": 742,
+          "height": 141.359375,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 742,
+          "height": 32.671875,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar",
+          "width": 742,
+          "height": 144.546875,
+          "font": "",
+          "padding": "12px 16px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "16px"
+        }
+      ]
+    },
+    "visited": 27,
+    "failures": []
+  },
+  {
+    "kind": "map",
+    "width": 1024,
+    "height": 1000,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "dispatch-pro-hero dispatch-map-premium__hero d-page-hero d-page-hero--workflow",
+          "width": 742,
+          "height": 215.046875,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 742,
+          "height": 32.671875,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        }
+      ]
+    },
+    "visited": 21,
+    "failures": []
+  },
+  {
+    "kind": "assignment",
+    "width": 1024,
+    "height": 1000,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "decision-config-hero dispatch-pro-hero assignment-config-hero d-page-hero d-page-hero--workflow",
+          "width": 742,
+          "height": 193.359375,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 742,
+          "height": 32.671875,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar d-workflow-action-bar--config",
+          "width": 742,
+          "height": 130.359375,
+          "font": "",
+          "padding": "12px 16px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "16px"
+        }
+      ]
+    },
+    "visited": 36,
+    "failures": []
+  },
+  {
+    "kind": "scheduling",
+    "width": 1024,
+    "height": 1000,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "decision-config-hero dispatch-pro-hero assignment-config-hero d-page-hero d-page-hero--workflow",
+          "width": 742,
+          "height": 215.046875,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 742,
+          "height": 32.671875,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar d-workflow-action-bar--config",
+          "width": 742,
+          "height": 130.359375,
+          "font": "",
+          "padding": "12px 16px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "16px"
+        }
+      ]
+    },
+    "visited": 28,
+    "failures": []
+  },
+  {
+    "kind": "data",
+    "width": 768,
+    "height": 1000,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "dispatch-pro-hero d-page-hero d-page-hero--workflow d-page-hero--copy-only is-visible",
+          "width": 660,
+          "height": 140.59375,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 660,
+          "height": 31.90625,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar",
+          "width": 660,
+          "height": 183.984375,
+          "font": "",
+          "padding": "12px 16px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "16px"
+        }
+      ]
+    },
+    "visited": 27,
+    "failures": []
+  },
+  {
+    "kind": "map",
+    "width": 768,
+    "height": 1000,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "dispatch-pro-hero dispatch-map-premium__hero d-page-hero d-page-hero--workflow",
+          "width": 660,
+          "height": 214.28125,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 660,
+          "height": 31.90625,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        }
+      ]
+    },
+    "visited": 21,
+    "failures": []
+  },
+  {
+    "kind": "assignment",
+    "width": 768,
+    "height": 1000,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "decision-config-hero dispatch-pro-hero assignment-config-hero d-page-hero d-page-hero--workflow",
+          "width": 660,
+          "height": 192.59375,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 660,
+          "height": 31.90625,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar d-workflow-action-bar--config",
+          "width": 660,
+          "height": 130.359375,
+          "font": "",
+          "padding": "12px 16px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "16px"
+        }
+      ]
+    },
+    "visited": 36,
+    "failures": []
+  },
+  {
+    "kind": "scheduling",
+    "width": 768,
+    "height": 1000,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "decision-config-hero dispatch-pro-hero assignment-config-hero d-page-hero d-page-hero--workflow",
+          "width": 660,
+          "height": 214.28125,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 660,
+          "height": 31.90625,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar d-workflow-action-bar--config",
+          "width": 660,
+          "height": 130.359375,
+          "font": "",
+          "padding": "12px 16px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "16px"
+        }
+      ]
+    },
+    "visited": 28,
+    "failures": []
+  },
+  {
+    "kind": "data",
+    "width": 390,
+    "height": 844,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "dispatch-pro-hero d-page-hero d-page-hero--workflow d-page-hero--copy-only is-visible",
+          "width": 298,
+          "height": 162.28125,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 298,
+          "height": 31.90625,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar",
+          "width": 298,
+          "height": 210.59375,
+          "font": "",
+          "padding": "12px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "10px"
+        }
+      ]
+    },
+    "visited": 27,
+    "failures": []
+  },
+  {
+    "kind": "map",
+    "width": 390,
+    "height": 844,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "dispatch-pro-hero dispatch-map-premium__hero d-page-hero d-page-hero--workflow",
+          "width": 298,
+          "height": 235.96875,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 298,
+          "height": 31.90625,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        }
+      ]
+    },
+    "visited": 21,
+    "failures": []
+  },
+  {
+    "kind": "assignment",
+    "width": 390,
+    "height": 844,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "decision-config-hero dispatch-pro-hero assignment-config-hero d-page-hero d-page-hero--workflow",
+          "width": 298,
+          "height": 278.1875,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 298,
+          "height": 63.8125,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar d-workflow-action-bar--config",
+          "width": 298,
+          "height": 207.34375,
+          "font": "",
+          "padding": "12px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "10px"
+        }
+      ]
+    },
+    "visited": 36,
+    "failures": []
+  },
+  {
+    "kind": "scheduling",
+    "width": 390,
+    "height": 844,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "decision-config-hero dispatch-pro-hero assignment-config-hero d-page-hero d-page-hero--workflow",
+          "width": 298,
+          "height": 299.875,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 298,
+          "height": 63.8125,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar d-workflow-action-bar--config",
+          "width": 298,
+          "height": 207.34375,
+          "font": "",
+          "padding": "12px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "10px"
+        }
+      ]
+    },
+    "visited": 28,
+    "failures": []
+  }
+]

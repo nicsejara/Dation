@@ -1,0 +1,891 @@
+T3 queda formalmente aprobado con estado:
+
+# GO — T3 COMPLETADO
+
+El reporte oficial es:
+
+`docs/execution/ultimate/t3/t3-execution-report.md`
+
+Autorizo ahora exclusivamente:
+
+# T4 — DYNAMIC DATA CONTRACTS + PROGRESSIVE DATA PACK
+
+Seguí estrictamente:
+
+`DATION_FINAL_MASTER_EXECUTION_PLAN.md`
+
+Utilizá como baseline inmediato:
+
+`docs/execution/ultimate/t3/t3-execution-report.md`
+
+y consultá reportes anteriores únicamente cuando una decisión histórica lo requiera.
+
+---
+
+# REGLA DE EFICIENCIA
+
+NO realices una nueva auditoría end-to-end.
+
+T0–T3 constituyen el baseline validado.
+
+Para T4:
+
+1. leé la sección T4 del Master Plan;
+2. revisá únicamente las Frozen Architectural Decisions relevantes;
+3. inspeccioná sólo contratos, normalizers, upload/storage, Pack services, Data Hub/Case Data callers y tests afectados;
+4. ampliá la inspección sólo ante una incompatibilidad concreta;
+5. no recorras engines, Result Architecture, IA o toda la plataforma por precaución.
+
+---
+
+# OBJETIVO T4
+
+Implementar el sistema de:
+
+```text
+Logistics Model Version
+        ↓
+Compiled Data Contract
+        ↓
+Template
+        ↓
+Validate
+        ↓
+Normalize
+        ↓
+Candidate Upload
+        ↓
+Published Data Pack Version
+```
+
+Al finalizar T4, un Case Ultimate debe poder recibir y publicar inputs operativos de forma:
+
+- exacta;
+- versionada;
+- reproducible;
+- tenant-safe;
+- recuperable;
+- compatible con el Model;
+- sin depender de mappings fuzzy;
+- sin modificar snapshots ya consumidos.
+
+---
+
+# SKILLS
+
+Aplicá la `Execution Skills Policy`.
+
+Especialmente relevantes:
+
+- Supabase;
+- PostgreSQL best practices;
+- cloud/runtime para Storage/sandbox/tests;
+- `design-system` / `emil-design-eng` únicamente para las superficies Case Data/Data Hub realmente modificadas.
+
+La UI debe preservar el lenguaje visual actual de Dation.
+
+NO realizar redesign transversal.
+
+---
+
+# 1. DYNAMIC DATA CONTRACTS
+
+Implementá:
+
+```text
+compile_contract(
+    model_version,
+    semantic_entity,
+    registry_version
+) -> DataContract
+```
+
+según los contratos definidos en T1.
+
+El Data Contract debe derivarse del Logistics Model Version publicado.
+
+No debe depender de labels visuales ni heurísticas.
+
+Debe declarar como mínimo:
+
+- contract_id;
+- schema_version;
+- registry_version;
+- model_version_id;
+- semantic_entity;
+- fields;
+- types;
+- units;
+- required_for;
+- used_by;
+- validation rules;
+- engine_role;
+- public header;
+- examples;
+- contract hash.
+
+---
+
+# 2. SEMANTIC ENTITIES
+
+Para Ultimate MVP:
+
+```text
+transport_demand
+transport_resources
+```
+
+No modificar Orders/Fleet legacy.
+
+No convertir automáticamente formatos legacy a Ultimate.
+
+---
+
+# 3. TRANSPORT DEMAND CONTRACT
+
+Debe permitir representar, según Model:
+
+- order_id;
+- origin;
+- destination;
+- distance_km;
+- ready_date;
+- delivery_due_date;
+- priority;
+- split_allowed;
+- dimensiones activas:
+  - pallets;
+  - weight;
+  - volume;
+  - units;
+- compatibility cuando corresponda.
+
+Sólo exigir dimensiones activadas por el Model.
+
+Ejemplo:
+
+```text
+PALLETS_ONLY
+```
+
+NO debe requerir kg.
+
+---
+
+# 4. TRANSPORT RESOURCE CONTRACT
+
+Debe soportar:
+
+```text
+OWN
+EXTERNAL
+```
+
+con campos condicionales.
+
+## Common
+
+- resource_id;
+- source;
+- capacities activas;
+- guaranteed capacity;
+- compatibility;
+- lane/network constraints;
+- cost model correspondiente.
+
+## OWN
+
+- units_available;
+- base;
+- operating_cost_per_km;
+- dimensiones activas.
+
+## EXTERNAL
+
+- services_available;
+- availability source;
+- PER_TRIP / PER_KM;
+- ONE_WAY / ROUND_TRIP;
+- cost values;
+- compatibility.
+
+No exigir campos de OWN a EXTERNAL ni viceversa.
+
+---
+
+# 5. EXACT SCHEMA
+
+Para Ultimate MVP:
+
+NO implementar fuzzy mapping.
+
+NO inferir automáticamente:
+
+```text
+"Peso"
+"Peso KG"
+"KG"
+"Weight"
+```
+
+como si fueran equivalentes sin contrato.
+
+El template publicado por Dation debe ser la fuente explícita del formato esperado.
+
+Si una columna requerida falta:
+
+→ validation error guiado.
+
+Si existe una columna extra no declarada:
+
+→ aplicar la política aprobada del contrato.
+
+No ingerir silenciosamente información comercial/PII.
+
+---
+
+# 6. PRIVACY
+
+Los contratos Ultimate NO deben requerir:
+
+- customer name;
+- CUIT;
+- SKU;
+- product description;
+- invoice;
+- revenue;
+- margin;
+- commercial pricing unrelated to transport.
+
+Rechazar extras no permitidos cuando el contrato así lo indique.
+
+Preservar pseudonimización operativa.
+
+---
+
+# 7. TEMPLATES
+
+Generar templates dinámicos a partir del Data Contract.
+
+No mantener una segunda definición manual del schema.
+
+La misma fuente debe gobernar:
+
+```text
+Template
+Validation
+Normalization
+Readiness
+Admission futura
+```
+
+No duplicar columnas en frontend y backend.
+
+---
+
+# 8. NORMALIZATION
+
+Implementar normalizers versionados.
+
+Cada dataset publicado debe conservar:
+
+- raw hash;
+- canonical hash;
+- contract ID;
+- contract hash;
+- normalizer version;
+- semantic entity;
+- Model Version;
+- provenance correspondiente.
+
+Normalización debe ser determinística.
+
+Mismo input + mismo contrato + mismo normalizer:
+
+→ mismo canonical representation/hash.
+
+---
+
+# 9. UNKNOWN VALUES
+
+Mantener estrictamente:
+
+```text
+null != 0
+unknown != unlimited
+unknown availability != confirmed
+```
+
+Ejemplo:
+
+`services_available = 0`
+
+es válido y distinto de:
+
+`services_available = null`.
+
+Si se aplica default de disponibilidad externa:
+
+debe quedar explícito como:
+
+```text
+ASSUMED
+```
+
+Nunca convertirlo silenciosamente en CONFIRMED.
+
+---
+
+# 10. PROGRESSIVE DATA PACK
+
+Utilizar las estructuras creadas en T2/T3.
+
+Un Case ya posee:
+
+```text
+Stable Data Pack
++
+Version inicial vacía
+```
+
+T4 debe permitir evolucionarlo:
+
+```text
+Pack v1
+empty
+
+Pack v2
+Demand
+
+Pack v3
+Demand + Resources
+
+Pack v4
+Demand + Resources + future enrichment
+```
+
+Cada versión publicada es inmutable.
+
+---
+
+# 11. PACK VERSION SEMANTICS
+
+Una nueva versión debe representar un manifest completo del estado del Pack.
+
+No sólo el delta.
+
+Debe poder determinarse exactamente qué inputs pertenecían a cada versión.
+
+No modificar versiones previas.
+
+No sustituir bytes ya consumidos.
+
+---
+
+# 12. CANDIDATE VS PUBLISHED
+
+Separar claramente:
+
+```text
+candidate upload
+```
+
+de:
+
+```text
+published Pack Version
+```
+
+Un upload incompleto o inválido NO debe modificar:
+
+- current Pack;
+- approvals;
+- graph readiness;
+- Runs;
+- history.
+
+Sólo la publicación exitosa modifica el current pointer.
+
+---
+
+# 13. UPLOAD PIPELINE
+
+Implementar el pipeline aprobado:
+
+```text
+Validate
+↓
+Journal
+↓
+Private Storage Upload
+↓
+Metadata
+↓
+Complete Manifest
+↓
+Publish under CAS / locks
+```
+
+La publicación debe ser atómica desde el punto de vista del Case.
+
+No permitir estado:
+
+```text
+DB says published
+but bytes missing
+```
+
+o:
+
+```text
+Storage uploaded
+and current pointer moved before metadata complete
+```
+
+---
+
+# 14. RECOVERY
+
+Implementar/reutilizar recovery para escenarios:
+
+```text
+Storage YES / DB NO
+DB YES / client response lost
+candidate upload interrupted
+CAS conflict
+retry
+```
+
+Retry debe ser idempotente.
+
+No crear Pack Versions duplicadas por reintento.
+
+---
+
+# 15. DATASET REUSE
+
+Permitir reutilizar datasets previos sólo si la interpretación es compatible.
+
+La igualdad de raw bytes NO es suficiente.
+
+Debe considerar:
+
+- semantic entity;
+- contract;
+- contract hash;
+- units;
+- normalizer;
+- Model compatibility.
+
+Un mismo CSV bajo otro contrato puede significar otro dataset lógico.
+
+---
+
+# 16. STORAGE
+
+Usar Storage privado.
+
+No buckets públicos.
+
+No confiar en path suministrado por cliente.
+
+Validar:
+
+- workspace;
+- Case;
+- dataset;
+- Pack;
+- contract;
+- MIME;
+- size;
+- ownership.
+
+No aplicar cambios en Storage productivo durante esta fase.
+
+Utilizar sandbox/entorno autorizado.
+
+---
+
+# 17. CASE DATA UX
+
+Implementar únicamente la UI necesaria para administrar el Progressive Data Pack.
+
+Debe respetar el diseño actual de Dation.
+
+Flujo esperado:
+
+```text
+Case
+↓
+Case Data
+↓
+Demand
+Resources
+↓
+Download Template
+Upload
+Validate
+Preview
+Publish
+Reuse previous
+```
+
+No implementar todavía Decision Graph T5.
+
+Puede dejar disponible la acción futura hacia Map, pero no simular estados del graph.
+
+---
+
+# 18. UI PRESERVATION
+
+Antes de modificar Case Data:
+
+1. inspeccioná los componentes existentes de carga;
+2. reutilizá:
+   - cards;
+   - dropzones;
+   - buttons;
+   - validation states;
+   - alerts;
+   - loading patterns;
+   - typography;
+   - spacing;
+   - responsive rules;
+3. usar las Skills pertinentes;
+4. preservar la apariencia actual.
+
+No crear una segunda estética para Ultimate.
+
+---
+
+# 19. VALIDATION UX
+
+Distinguir claramente:
+
+```text
+Valid
+Warning
+Error
+Candidate
+Published
+```
+
+No mostrar “Datos listos” antes de que el Pack requerido esté realmente publicado.
+
+No confundir:
+
+```text
+file uploaded
+```
+
+con:
+
+```text
+input ready for decision
+```
+
+---
+
+# 20. READINESS
+
+T4 puede producir información de inputs disponibles.
+
+NO implementar todavía el resolver completo del Decision Graph T5.
+
+Debe poder determinar qué slots del Pack están presentes y válidos.
+
+Pero:
+
+```text
+Pack complete
+```
+
+NO equivale automáticamente a:
+
+```text
+Decision READY
+```
+
+Eso corresponde a T5.
+
+---
+
+# 21. INVALIDATION
+
+T4 debe publicar correctamente Pack Versions y metadata necesaria para invalidación futura.
+
+NO implementar toda la closure del Graph T5/T8 antes de tiempo.
+
+Pero debe conservar suficiente provenance para saber:
+
+- qué dataset cambió;
+- qué semantic entity cambió;
+- qué Pack Version se publicó;
+- qué hashes cambiaron.
+
+---
+
+# 22. INPUT SUMMARY
+
+Dejar preparada la información estructurada necesaria para que en fases posteriores pueda construirse:
+
+```text
+InputSummary
+```
+
+sin enviar raw CSV al LLM.
+
+T4 NO implementa Dation IA.
+
+---
+
+# 23. LEGACY
+
+Preservar totalmente:
+
+- Orders/Fleet uploads;
+- Data Hub actual;
+- reuse legacy;
+- archive/delete;
+- download;
+- historical dataset IDs;
+- raw hashes;
+- current validations.
+
+Ultimate debe coexistir mediante cohort/version branching.
+
+No reescribir legacy para adaptarlo al modelo nuevo.
+
+---
+
+# 24. PROHIBIDO EN T4
+
+NO ejecutar T5.
+
+NO implementar Decision Graph.
+
+NO implementar D1.
+
+NO implementar D2.
+
+NO implementar Result Assembler.
+
+NO implementar alternatives.
+
+NO construir Sankey/Gantt.
+
+NO implementar Decision Copilot.
+
+NO alterar Approval rules.
+
+NO hacer migraciones productivas.
+
+NO deploy.
+
+NO push.
+
+NO limpiar datasets actuales.
+
+NO hacer refactor transversal.
+
+---
+
+# 25. DATABASE / RPC
+
+Podés implementar los RPC/services de Pack previstos por T4:
+
+- candidate handling;
+- publish Pack Version;
+- CAS;
+- journal/recovery;
+- compatibility/reuse;
+- protected delete where applicable.
+
+Cualquier migración adicional:
+
+- debe estar estrictamente justificada;
+- debe ser aditiva;
+- probarse sólo en sandbox;
+- no aplicarse a producción.
+
+Si T4 demuestra una carencia fundamental del schema T2:
+
+STOP si requiere rediseño contractual.
+
+---
+
+# 26. TESTING
+
+Ejecutá:
+
+- B-PY
+- B-NODE
+- U4
+- S4
+- W4
+
+y focales necesarias.
+
+No repitas todo Browser/E2E salvo que exista impacto demostrado.
+
+Probar como mínimo:
+
+## Contract compiler
+
+- exact schema;
+- conditional fields;
+- primary dimensions;
+- source conditionality;
+- contract hash determinístico.
+
+## Validation
+
+- missing required column;
+- extra forbidden column;
+- incorrect type;
+- invalid date;
+- duplicate ID;
+- invalid enum;
+- capacity <= 0;
+- availability = 0 válida;
+- unknown availability;
+- unknown cost;
+- ready > due.
+
+## Normalization
+
+- deterministic;
+- units preserved;
+- null preserved;
+- raw vs canonical hash.
+
+## Pack
+
+- publish;
+- immutable versions;
+- CAS;
+- retry;
+- candidate vs published;
+- complete manifest.
+
+## Recovery
+
+- Storage yes / DB no;
+- DB yes / response lost;
+- interrupted upload;
+- retry.
+
+## Reuse
+
+- same bytes/same contract;
+- same bytes/different contract;
+- incompatible Model Version.
+
+## Tenant isolation
+
+- cross-workspace metadata;
+- Storage access;
+- Pack binding.
+
+## UI
+
+- upload;
+- validation;
+- recovery;
+- history;
+- reuse;
+- responsive;
+- keyboard;
+- correct published state.
+
+---
+
+# 27. CONTROLLED FIXTURES
+
+Usar los fixtures Ultimate previstos donde correspondan, especialmente:
+
+- O — assumed external availability;
+- P — pseudonymized demand / forbidden extras;
+- Q — operating role/source matrix;
+- R — invalid data.
+
+No utilizar datos comerciales reales como oracle.
+
+---
+
+# 28. STOP CONDITIONS
+
+STOP si:
+
+- semantic mapping depende de heurística;
+- template/backend mantienen schemas distintos;
+- bytes consumidos pueden reemplazarse;
+- current Pack apunta a upload incompleto;
+- retry duplica Pack Version;
+- cross-tenant reuse es posible;
+- extra commercial/PII se persiste silenciosamente;
+- same raw file bajo diferente contract se deduplica incorrectamente;
+- legacy upload flow se rompe;
+- Pack readiness intenta implementar Graph T5;
+- T4 necesita solver/engine para validar datos;
+- Storage productivo debe modificarse para continuar.
+
+---
+
+# 29. REPORTING
+
+Crear:
+
+`docs/execution/ultimate/t4/t4-execution-report.md`
+
+Incluir:
+
+## Baseline
+
+## Skills utilizadas
+
+## Files Created
+
+## Files Modified
+
+## Contract Compiler
+
+## Templates
+
+## Validation
+
+## Normalization
+
+## Progressive Pack
+
+## Storage / Recovery
+
+## Dataset Reuse
+
+## Case Data UX
+
+## Legacy Compatibility
+
+## Tests
+
+## Deviations
+
+## Risks
+
+## Gate Evaluation
+
+## FINAL DECISION
+
+Una sola:
+
+**GO — T4 completado. T5 puede ser solicitado.**
+
+o
+
+**STOP — T4 no cumple condiciones para autorizar T5.**
+
+Aunque resulte GO:
+
+# NO EJECUTES T5.
+
+Finalizá después del reporte.

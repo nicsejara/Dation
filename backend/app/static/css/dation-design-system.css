@@ -277,6 +277,10 @@
 .d-workflow-action-bar[data-compact=true] .d-workflow-action-bar__actions>.d-button{grid-column:2;min-width:0}
 @media(max-width:620px){.d-workflow-action-bar[data-compact=true] .d-workflow-action-bar__actions{grid-template-columns:minmax(0,1fr)}.d-workflow-action-bar[data-compact=true] .d-workflow-action-bar__actions>.d-button{grid-column:1}}
 @media(max-height:360px){
+  /* A fixed command area can leave less space than one focusable control.
+     Keep the same controls in flow so short viewports can scroll them fully. */
+  .main.has-workflow-commands{height:100dvh;scroll-padding-block:8px}
+  .d-workflow-action-bar{position:static}
   .d-workflow-action-bar{padding:8px;gap:6px;bottom:calc(8px + var(--workflow-keyboard-inset,0px))}
   .d-workflow-action-bar__meta{display:none}
   .d-workflow-action-bar__items{grid-template-columns:repeat(var(--workflow-context-count,4),minmax(0,1fr));gap:4px}

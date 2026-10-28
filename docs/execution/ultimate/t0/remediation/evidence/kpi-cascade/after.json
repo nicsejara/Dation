@@ -1,0 +1,50 @@
+[
+  {
+    "columns": "274px 274px 274px 274px",
+    "text": "Costo total\n$ 28.106.000\n\nCosto estimado de ejecutar toda la asignación.\n\nViajes\n48\n\nViajes requeridos para transportar la carga.\n\nUtilización\n94,7 %\n\nCarga transportada dividida por la capacidad total de los viajes utilizados.\n\nFlota propia\n100 %\n\nParticipación de la carga transportada con flota propia, medida por peso.",
+    "background": "rgba(0, 0, 0, 0)",
+    "width": 1096,
+    "width_px": 1440,
+    "kind": "assignment"
+  },
+  {
+    "columns": "273.984px 274px 274px 274px",
+    "text": "Cumplimiento SLA\n16,7 %\n\n5 de 30 órdenes en fecha\n\nHorizonte operativo\n62 días\n\n1 de oct de 2026 → 2 de dic de 2026\n\nEspera promedio\n19,25 días\n\nEntre disponibilidad y despacho\n\nRecurso crítico\nVEH-005\n\n38 de 48 viajes · 61 días ocupado",
+    "background": "rgba(0, 0, 0, 0)",
+    "width": 1095.984375,
+    "width_px": 1440,
+    "kind": "scheduling"
+  },
+  {
+    "columns": "179.5px 179.5px 179.5px 179.5px",
+    "text": "Costo total\n$ 28.106.000\n\nCosto estimado de ejecutar toda la asignación.\n\nViajes\n48\n\nViajes requeridos para transportar la carga.\n\nUtilización\n94,7 %\n\nCarga transportada dividida por la capacidad total de los viajes utilizados.\n\nFlota propia\n100 %\n\nParticipación de la carga transportada con flota propia, medida por peso.",
+    "background": "rgba(0, 0, 0, 0)",
+    "width": 718,
+    "width_px": 1024,
+    "kind": "assignment"
+  },
+  {
+    "columns": "179.5px 179.5px 179.5px 179.5px",
+    "text": "Cumplimiento SLA\n16,7 %\n\n5 de 30 órdenes en fecha\n\nHorizonte operativo\n62 días\n\n1 de oct de 2026 → 2 de dic de 2026\n\nEspera promedio\n19,25 días\n\nEntre disponibilidad y despacho\n\nRecurso crítico\nVEH-005\n\n38 de 48 viajes · 61 días ocupado",
+    "background": "rgba(0, 0, 0, 0)",
+    "width": 718,
+    "width_px": 1024,
+    "kind": "scheduling"
+  },
+  {
+    "columns": "298px",
+    "text": "Costo total\n$ 28.106.000\n\nCosto estimado de ejecutar toda la asignación.\n\nViajes\n48\n\nViajes requeridos para transportar la carga.\n\nUtilización\n94,7 %\n\nCarga transportada dividida por la capacidad total de los viajes utilizados.\n\nFlota propia\n100 %\n\nParticipación de la carga transportada con flota propia, medida por peso.",
+    "background": "rgba(0, 0, 0, 0)",
+    "width": 298,
+    "width_px": 390,
+    "kind": "assignment"
+  },
+  {
+    "columns": "298px",
+    "text": "Cumplimiento SLA\n16,7 %\n\n5 de 30 órdenes en fecha\n\nHorizonte operativo\n62 días\n\n1 de oct de 2026 → 2 de dic de 2026\n\nEspera promedio\n19,25 días\n\nEntre disponibilidad y despacho\n\nRecurso crítico\nVEH-005\n\n38 de 48 viajes · 61 días ocupado",
+    "background": "rgba(0, 0, 0, 0)",
+    "width": 298,
+    "width_px": 390,
+    "kind": "scheduling"
+  }
+]

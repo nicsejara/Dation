@@ -1,0 +1,25 @@
+{
+  "phase": "T1",
+  "frozen_at": "2026-10-26T13:14:47.396091+00:00",
+  "head": "ef997235a30251fbf7ae53690ed738092ee973d8",
+  "files": {
+    "backend/app/domain/logistics/__init__.py": "eba83b74e79423fafd39570b8508ea39302e55dafc2a42516f7f263a49662d70",
+    "backend/app/domain/logistics/base.py": "c809ede54d1d6f27ea292f2046df07e200a5b4ae79c4d8c2e4a0715b0c0cb2b5",
+    "backend/app/domain/logistics/contracts.py": "32988900d955c9a3a4243e964a3d7b3c485a8f4b84b5bfbaaebd581af3ec63e3",
+    "backend/app/domain/logistics/costs.py": "1b05955be9bf0d28a51db25ffe01cfba4b5e9c5c1a2045bd913b60f103066975",
+    "backend/app/domain/logistics/transit.py": "4bd48cef104cd5c45022e69bc61d192c40071b40f641ea1acea82cb5aaf2119c",
+    "backend/app/domain/logistics/units.py": "b3fc9ce313ee5dc49dc002046be5866d0484616cbabc33637f9f749a94742eb2",
+    "backend/app/results/__init__.py": "a25d73619d411e2b0ca9fd327634ea8f9ecd432df48f4ac2fcbf9802cc1489ca",
+    "backend/app/results/canonical.py": "5e8e66af9a41f33829ee010f2a5da86f7bc460c08efa2570f13b7a07ebfa6c56",
+    "backend/app/results/contracts.py": "e626aae6c59094dbc424680a9c67cfaa63f595818f781d39c5486372aa388705",
+    "backend/app/results/metrics.py": "062c288c02b031764df7e02fb6bcc071fa6a73dcb16527c48c9054029fc9b8c4",
+    "backend/app/results/reason_codes.py": "0536de32b2e8384286d90539b0031997cf4a953bd0f7acc1b1dece0bbba34911",
+    "backend/app/results/registry.py": "b393a095d0e550d482f21c9d7c36ee0dfa3f538c16d0ca145e78e50c8469f6e1",
+    "backend/app/static/contracts/result-contracts-v1.json": "b8fbb932cdaf4aa6c05ab92085bdff79ae6f9f5a22ac81561be837841f132be5",
+    "backend/tests/fixtures/ultimate/fingerprint-vectors-v1.json": "be8bc6059f45be762a764ba9f9cde0bf790a96d03e790ba65e0ad27a73bc69cc",
+    "backend/tests/test_ultimate_contracts.py": "7ec78ccc43bcf4b7483f07a7e433386b164a506f0b625aec621f8b61f9c42efe",
+    "backend/tests/test_ultimate_transit.py": "eeede95ca13506acdd10e0ec369c73ee5f8099392dd56ffbc8896f31459e109b",
+    "backend/tests/ultimate_fixtures.py": "7d8d68967da92b11219fbf7512353faae45a0f88af5f9fc6f08c6f5907abc408"
+  },
+  "t0_r2_preserved": true
+}

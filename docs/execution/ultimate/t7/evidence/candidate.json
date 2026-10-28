@@ -1,0 +1,103 @@
+{
+  "phase": "T7",
+  "head": "ef997235a30251fbf7ae53690ed738092ee973d8",
+  "frozen_at": "2026-10-27T13:41:25.699612+00:00",
+  "files": {
+    "backend/app/engines/assignment/transport_contracts.py": {
+      "bytes": 4814,
+      "sha256": "014cf75217a9328f523902bfdda94991e6ebfc4e0b563b611f8c0abb4b611d8e",
+      "baseline_sha256": "c9d7696b36f003f47d8a9b139284e4735b536c4d20e0dc074474cff167bed223",
+      "baseline": "post-T6 checkpoint"
+    },
+    "backend/app/engines/assignment/transport_model.py": {
+      "bytes": 9951,
+      "sha256": "8ac123a6feacb53ef21de3d464caf2de91e4de27b324f4adfbcfecfd8a647b86",
+      "baseline_sha256": "3f2b9733343a00438749e1c0de13b89155d866a3ab6122925fcf57caa641fc04",
+      "baseline": "post-T6 checkpoint"
+    },
+    "backend/app/engines/assignment/transport_plan.py": {
+      "bytes": 19544,
+      "sha256": "6d841aa3477de3e18f844a7a37f0b628d5ee2d07dbd612f457ae9e0e13888392",
+      "baseline_sha256": "4ceed544a19653c05077c6bec7f5e70f95143344b8504ef2a0c48299e6439af2",
+      "baseline": "post-T6 checkpoint"
+    },
+    "backend/app/engines/assignment/transport_policies.py": {
+      "bytes": 8176,
+      "sha256": "e75b6f01dd7e83b77bc8f283d72a8fe40ec08fe0d0e1dc828f9bd71482d151aa",
+      "baseline_sha256": null,
+      "baseline": "new T7 file"
+    },
+    "backend/app/engines/assignment/transport_policy_result.py": {
+      "bytes": 15387,
+      "sha256": "9916eb75b30c6a45bcf3ad36c369307708793b585509bccd538e83f9754e6330",
+      "baseline_sha256": null,
+      "baseline": "new T7 file"
+    },
+    "backend/app/engines/assignment/transport_policy_validator.py": {
+      "bytes": 8540,
+      "sha256": "285d3f32556d85ed4288b0ff5ae76255b632cdacb710fa955086e76356b2667b",
+      "baseline_sha256": null,
+      "baseline": "new T7 file"
+    },
+    "backend/app/results/ai_context.py": {
+      "bytes": 3086,
+      "sha256": "02aa9104ecc5f79394a755d05dc5a863a0f7c1c2889523ded643c86f131039e5",
+      "baseline_sha256": null,
+      "baseline": "new T7 file"
+    },
+    "backend/app/results/approval_review.py": {
+      "bytes": 1769,
+      "sha256": "0992f84913c1d36ed5ffde863a0d42ef41dcd4196b2a193fa7a0ae44ebaa6a43",
+      "baseline_sha256": null,
+      "baseline": "new T7 file"
+    },
+    "backend/app/results/assembler.py": {
+      "bytes": 13851,
+      "sha256": "881fdd43db3a4c43ff9492058c9d34b99dc35f55408ba28d1eff9b4692da217e",
+      "baseline_sha256": null,
+      "baseline": "new T7 file"
+    },
+    "backend/app/results/export_rows.py": {
+      "bytes": 1011,
+      "sha256": "f3ffb19d354d3469f398ff34b551539f8e65961f1a2b8536b1b4ab63f225592e",
+      "baseline_sha256": null,
+      "baseline": "new T7 file"
+    },
+    "backend/app/results/projections.py": {
+      "bytes": 4597,
+      "sha256": "8cb04102392aaad9e94c6422c7937001f363abbdfd45cd8c543521454981cbb2",
+      "baseline_sha256": null,
+      "baseline": "new T7 file"
+    },
+    "backend/app/results/registry.py": {
+      "bytes": 10149,
+      "sha256": "d183a4374bbbe0552aeab0c8098e724f82fb4e7dd0dc27ade7a4755747d10591",
+      "baseline_sha256": "4e514cf47c0a38166c4dd52febc31ed798ddb6b4c7974b0fbe7989481f911310",
+      "baseline": "post-T6 checkpoint"
+    },
+    "backend/app/results/validation.py": {
+      "bytes": 19888,
+      "sha256": "29992a6e3e90b0b9f98efeb82e6073ef4ae361456f78aee312b1d13284c71ed9",
+      "baseline_sha256": null,
+      "baseline": "new T7 file"
+    },
+    "backend/tests/fixtures/ultimate/t7-fixtures.json": {
+      "bytes": 990,
+      "sha256": "46988ea2107fb313dd17211b16e27e48036d3f7c5749b3c5d012d1d6c237a489",
+      "baseline_sha256": null,
+      "baseline": "new T7 file"
+    },
+    "backend/tests/test_transport_plan_policies.py": {
+      "bytes": 13714,
+      "sha256": "f9106f1cff4b552a7be1bb1b9bf03776f52501439566927caad39fee94436033",
+      "baseline_sha256": null,
+      "baseline": "new T7 file"
+    },
+    "backend/tests/test_transport_result_package.py": {
+      "bytes": 16997,
+      "sha256": "c0163244d05f6804a11368857dd534189ce72a76c8c41c6e78950f7bebe3da34",
+      "baseline_sha256": null,
+      "baseline": "new T7 file"
+    }
+  }
+}

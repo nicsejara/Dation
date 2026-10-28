@@ -1,0 +1,28 @@
+{
+  "suite": "B-FOCUS",
+  "status": "PASS",
+  "started_at": "2026-10-26T05:10:32.331372+00:00",
+  "finished_at": "2026-10-26T05:11:35.146712+00:00",
+  "command": [
+    "/workspace/Dation/backend/.browser-venv/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "test_run_lineage_polish",
+    "test_navigation.NavigationTests.test_foundation_dashboard_navigation_prefers_approved_over_later_candidate",
+    "-v"
+  ],
+  "cwd": "/workspace/Dation/backend",
+  "exit_code": 0,
+  "tests": 9,
+  "failures_count": 0,
+  "skipped": 0,
+  "failures": [],
+  "wall_seconds": 62.812,
+  "suite_reported_seconds": 62.514,
+  "log_path": "/workspace/work/dation-t0r2/revalidation/B-FOCUS.log",
+  "log_sha256": "ad91c2f8d3639aaeaed19f3cb7ffab5f1f77f90e3b9d84f8c7bcf5a067520296",
+  "production_credentials_cleared": true,
+  "docker_target": "local unix socket",
+  "sql_container": null
+}

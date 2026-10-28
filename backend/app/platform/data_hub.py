@@ -1,6 +1,7 @@
 """Workspace library projection; only explicit reuse crosses into a DDA."""
 import csv
 import io
+import json
 from urllib.parse import quote
 
 import httpx
@@ -47,6 +48,14 @@ async def active_dataset(ctx,dataset_id):
 
 async def preview(ctx,dataset_id,limit=25,offset=0):
     row=await active_dataset(ctx,dataset_id)
+    if row.get('dataset_type') in {'transport_demand','transport_resources'}:
+        from app.services.case_data_pack_service import normalized_preview
+        data=await normalized_preview(ctx,dataset_id,limit,offset)
+        # Data Hub keeps its existing table contract; the source is the verified
+        # normalized DTO rather than a second delimiter/schema inference.
+        columns=list(data['records'][0]) if data['records'] else []
+        return {'columns':columns,'rows':[[json.dumps(r[k],ensure_ascii=False) if isinstance(r[k],(dict,list)) else str(r[k]) if r[k] is not None else '—' for k in columns] for r in data['records']],
+            'limit':limit,'offset':offset,'has_more':offset+limit<data['total'],'cell_limit':500,'canonical_sha256':data['canonical_sha256'],'normalizer_version':data['normalizer_version']}
     contents=await download_dataset(row)
     if len(contents)>10*1024*1024:raise HTTPException(413,'La vista previa admite archivos de hasta 10 MB.')
     try:
@@ -105,6 +114,15 @@ async def discard_upload(ctx,operation_id):
     if permit.get('cleared'):return permit
     await delete_authorized_object(ctx,permit['dataset_id'],permit)
     return await platform_call('platform_dataset_upload',{**body,'operation':'finish'})
+
+
+async def archive_input(ctx,dataset_id,archived):
+    row=await active_dataset(ctx,dataset_id)
+    if row.get('dataset_type') in {'transport_demand','transport_resources'}:
+        from app.services.case_data_pack_service import call
+        return await call(ctx,'dataset_archive',dataset_id=str(dataset_id),archived=archived)
+    await dispatch.archive_dataset(str(dataset_id),archived)
+    return {'archived':archived}
 
 
 async def delete_dataset(ctx,dataset_id):

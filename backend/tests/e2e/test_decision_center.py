@@ -70,6 +70,8 @@ class DecisionCenterTests(unittest.TestCase):
   self.assertEqual(detail['resume'],{'view':'logistics-config','node_id':'logistics_scheduling','run_id':None})
   self.assertEqual(detail['nodes'][0]['approved_run']['created_by']['id'],USER_A)
   self.assertEqual(detail['nodes'][0]['approved_run']['approved_by']['id'],USER_A)
+  from workflow_fixture import prepare_stage
+  prepare_stage(self.a,case,'logistics_scheduling')
   self.browser(case,assignment,'available')
   scheduling=self.admit(self.body(case,orders,fleet,'logistics_scheduling',assignment));self.finish(scheduling)
   detail=self.center(case);self.assertTrue(detail['in_review']);self.assertEqual(detail['status'],'active')
@@ -82,7 +84,9 @@ class DecisionCenterTests(unittest.TestCase):
   self.assertEqual(self.center(case)['status'],'completed');self.assertEqual(self.checked(self.a.get('/api/platform/decisions?filter=completed'))['total'],1)
   replacement=self.admit(self.body(case,orders,fleet));self.finish(replacement)
   detail=self.center(case);self.assertEqual(detail['status'],'active');self.assertTrue(detail['in_review'])
-  self.assertEqual(detail['nodes'][0]['approved_run']['id'],assignment);self.assertEqual(detail['nodes'][0]['latest_run']['id'],replacement)
+  self.assertIsNone(detail['nodes'][0]['approved_run']);self.assertFalse(detail['nodes'][0]['approval_current'])
+  self.assertEqual(detail['nodes'][0]['latest_run']['id'],replacement)
+  previous=self.checked(self.a.get('/api/runs/'+assignment));self.assertTrue(previous['approved_at']);self.assertTrue(previous['superseded_at'])
   before=self.s.sql("SELECT md5(string_agg(to_jsonb(c)::text,'' ORDER BY id)) FROM decision_cases c;")
   self.center(case);history=self.checked(self.a.get('/api/platform/decisions/'+case+'/runs?node_id=logistics_assignment&limit=1&offset=1'))
   self.assertEqual(history['total'],2);self.assertEqual(history['items'][0]['id'],assignment)
@@ -128,7 +132,7 @@ class DecisionCenterTests(unittest.TestCase):
   with httpx.Client(base_url=self.s.api_url,headers={'Authorization':'Bearer '+self.s.user_tokens[VIEWER]},trust_env=False) as viewer:
    result=portfolio(viewer);self.assertEqual(result['summary']['in_review'],1);self.assertEqual(result['summary']['pending_approval'],0);self.assertEqual(portfolio(viewer,filter='pending_approval')['total'],0)
   member=next(m for m in self.checked(self.a.get('/api/platform/team'))['members'] if m['user_id']==USER_A)
-  self.checked(self.a.patch('/api/platform/team/members/'+USER_A+'/responsibilities',json={'expected_updated_at':member['updated_at'],'business_roles':['data_owner','decision_owner','approver']}))
+  self.checked(self.a.patch('/api/platform/team/members/'+USER_A+'/responsibilities',json={'expected_updated_at':member['updated_at'],'business_roles':['data_owner','decision_owner']}))
   stage=self.center(case)['responsibilities']['stages']['data_preparation']
   self.checked(self.a.put('/api/platform/decisions/'+case+'/responsibilities/data_preparation',json={'expected_updated_at':stage['updated_at'],'owner_user_id':USER_A}))
   self.assertEqual(portfolio(owner='me')['total'],1);self.assertEqual(portfolio(owner=USER_A)['total'],1);self.assertEqual(portfolio(owner='unassigned')['total'],26);self.assertEqual(portfolio(owner=USER_B)['total'],0)
@@ -145,9 +149,11 @@ class DecisionCenterTests(unittest.TestCase):
   result=portfolio();self.assertEqual(result['summary']['active_cases'],26);self.assertEqual(result['summary']['approved'],2)
   replacement_body=self.body(case,orders,fleet);replacement_body['configuration']={'mode':'preset','objective':'min_cost','dimensions':['trips','cost','own_fleet','co2']}
   replacement=self.admit(replacement_body);self.finish(replacement);detail=self.center(case)
-  self.assertEqual(detail['current_objective']['id'],'balanced');self.assertEqual(detail['current_objective']['run_id'],run)
+  self.assertEqual(detail['current_objective']['id'],'min_cost');self.assertEqual(detail['current_objective']['run_id'],replacement)
+  self.assertEqual(detail['current_objective']['source'],'latest_run')
+  self.assertFalse(detail['nodes'][0]['approval_current']);self.assertFalse(detail['nodes'][1]['approval_current'])
   self.assertEqual(detail['nodes'][0]['latest_objective']['id'],'min_cost');self.assertEqual(detail['nodes'][0]['latest_run']['id'],replacement)
-  result=portfolio();self.assertEqual(result['summary'],{'active_cases':27,'in_review':1,'pending_approval':1,'approved':2})
+  result=portfolio();self.assertEqual(result['summary'],{'active_cases':27,'in_review':1,'pending_approval':1,'approved':0})
   self.approve(replacement,case);self.assertEqual(portfolio()['summary']['approved'],1);self.assertFalse(self.center(case)['nodes'][1]['approval_current'])
   self.checked(self.a.patch('/api/platform/decisions/'+case,json={'expected_updated_at':self.center(case)['updated_at'],'archived':True}))
   self.assertEqual(portfolio()['summary'],{'active_cases':26,'in_review':0,'pending_approval':0,'approved':0})

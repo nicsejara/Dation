@@ -1,0 +1,163 @@
+{
+  "phase": "T0-R2",
+  "frozen_at": "2026-10-26T04:30:14.199978+00:00",
+  "head": "ef997235a30251fbf7ae53690ed738092ee973d8",
+  "files": {
+    "backend/app/static/css/dation-design-system.css": "3e160520a613ff04fa0d845bd072c0a50d4a3dd4fcc96e9a2f6a44411b248f95",
+    "backend/app/static/css/dda-logistics-upload.css": "3892e44a580f24b828925ebe02316435dbbf1fe6d62775806724f05b33d46e0f",
+    "backend/app/static/css/dispatch.css": "067b4077a95b813fcb3b9171e8c429ae76a15d5edacad73803a154161b4c12ce",
+    "backend/app/static/css/scheduling-dashboard-v21.css": "08c102772fe046513a7892699d1469c937e6334c6d1f43bdc9d049617f662fe6",
+    "backend/app/static/css/workflow-context.css": "0d4e61317fd8a8e9f8667393ee8b6f2d5f59cf3201db279ab399f7ec3bb01cf6",
+    "backend/tests/browser/test_navigation.py": "f49a997de32b383bc0eced5a024333c37bbcff2b0c25c70fa01cb874ee80b537",
+    "backend/tests/browser/test_saga4_ui.py": "d1ea7452f61673478b9ca4ca187605094ab70b35031c024ec9adc2e0560145ce",
+    "backend/tests/browser/test_workflow_context.py": "8048f2a215b278d31ff5b3aac13fcee6bb4bda619bdd917516c18e91f863e8dd",
+    "backend/tests/e2e/activity_journey.py": "5abc02508945ac448fd27a5ae70a38d8cfa59274244200a5c896676fafe0d1e4",
+    "backend/tests/e2e/browser_auth.py": "495f40c2515e9ecde358e1c7fdba3cbc1504459822c1343a3fcd782ea9f31bf4",
+    "backend/tests/e2e/browser_journey.py": "790ff6dd5dcba7bebb4f74116cb27ceb761c28c470d5cf71489e0526ce1c7bc1",
+    "backend/tests/e2e/collaboration_approval_journey.py": "266c80149522d7737fa86cc440eb4aa7aaa60e115339944629de286ae4d21ea9",
+    "backend/tests/e2e/collaboration_journey.py": "5c1a165d5102001bead158b9d0ad95d70b3b3a4e0bfc972f72a7932c21bed699",
+    "backend/tests/e2e/entitlements_journey.py": "fbef7a8ae12cc82ad883abb2f10e3e94f0e14e27d0ca98a6a55a70577ed0b8e3",
+    "backend/tests/e2e/golden_journey.py": "b8413202cae44d1c3ac5a24c8f5af06f782549e2a8b1cb79f9f4a1808444711b",
+    "backend/tests/e2e/home_resume_journey.py": "9d581cc3b58e8502c43faf237011fb5a2eb53b76bc6a38acb94e3ec49effbbb4",
+    "backend/tests/e2e/onboarding_journey.py": "2dc8e8a000730aca1e70a1ec9dcf958696c4532d81275e5e682e10166ed7301b",
+    "backend/tests/e2e/platform_journey.py": "5937231e6224b4a6b789a3587525d356743c6eb4c29db79021c816a69f5b40a3",
+    "backend/tests/e2e/scheduling_dashboard_journey.py": "edb5ef733f9d8ec0c96c114de65b02ab46c0384b50914337090596a7ea91b8db",
+    "backend/tests/e2e/test_collaboration.py": "fde7ae735eddfd52b4ed2c6ca11273372359c69137dfce5005b4f22a19d70c1c",
+    "backend/tests/e2e/test_decision_center.py": "dce9bd666237525bb85b0fc061af3db5b2651c90691d22a12d9e210eef58947a",
+    "backend/tests/e2e/test_optimized_responsibilities.py": "580473f556b7ad9c133327782b70440fa24f710ecb6475b0dec65e5802ee9547",
+    "backend/tests/e2e/test_tenancy.py": "f2f74332ae9eeed6988d1a3061a624832e63e2d91c33583e235bb6e62962ab35",
+    "backend/tests/e2e/test_v2_foundation.py": "bbd693ad973297e2672304c057b7ea38c345066bdc482edd4e163706c50427e3",
+    "backend/tests/e2e/test_workflow.py": "51e0323137631a931406157e0e9a7e9b113a8ce406a1f32e021d0426729ed281",
+    "backend/tests/e2e/test_workflow_gates.py": "ad21d324bc5c6f665e17dc437665fc1b47f7c01d634f004008253234005a4652",
+    "backend/tests/e2e/workflow_fixture.py": "f763df7b19123d44148ef1827d06c3bcc02654e459752d871face44a6f9fc22c",
+    "backend/tests/e2e/workflow_ui_audit.py": "8ca23ddff62365ad56080793d51e000a347f19e86fac48efec65491fc1913229",
+    "backend/tests/e2e/workspace_settings_journey.py": "d1cdb989b970df56640b2d9298e26d96d17985b1a3b7eb4ba6e9be6ce10dbcca",
+    "backend/tests/e2e/test_home_owner_attention.py": "80ddba3e0e3431e0dd2b59b9cb346581cd9903837f0330052db0ee1de5fb3468",
+    "supabase/migrations/20261026010000_home_decision_owner_attention.sql": "e9ea4bbdb66def0e668cfb93f2eccd2dd797c12d1247617d4cf763564135ccae"
+  },
+  "existing_test_ids": [
+    {
+      "file": "backend/tests/browser/test_navigation.py",
+      "test_ids_preserved": true,
+      "count": 169
+    },
+    {
+      "file": "backend/tests/browser/test_saga4_ui.py",
+      "test_ids_preserved": true,
+      "count": 4
+    },
+    {
+      "file": "backend/tests/browser/test_workflow_context.py",
+      "test_ids_preserved": true,
+      "count": 17
+    },
+    {
+      "file": "backend/tests/e2e/activity_journey.py",
+      "test_ids_preserved": true,
+      "count": 0
+    },
+    {
+      "file": "backend/tests/e2e/browser_auth.py",
+      "test_ids_preserved": true,
+      "count": 0
+    },
+    {
+      "file": "backend/tests/e2e/browser_journey.py",
+      "test_ids_preserved": true,
+      "count": 0
+    },
+    {
+      "file": "backend/tests/e2e/collaboration_approval_journey.py",
+      "test_ids_preserved": true,
+      "count": 0
+    },
+    {
+      "file": "backend/tests/e2e/collaboration_journey.py",
+      "test_ids_preserved": true,
+      "count": 0
+    },
+    {
+      "file": "backend/tests/e2e/entitlements_journey.py",
+      "test_ids_preserved": true,
+      "count": 0
+    },
+    {
+      "file": "backend/tests/e2e/golden_journey.py",
+      "test_ids_preserved": true,
+      "count": 0
+    },
+    {
+      "file": "backend/tests/e2e/home_resume_journey.py",
+      "test_ids_preserved": true,
+      "count": 0
+    },
+    {
+      "file": "backend/tests/e2e/onboarding_journey.py",
+      "test_ids_preserved": true,
+      "count": 0
+    },
+    {
+      "file": "backend/tests/e2e/platform_journey.py",
+      "test_ids_preserved": true,
+      "count": 0
+    },
+    {
+      "file": "backend/tests/e2e/scheduling_dashboard_journey.py",
+      "test_ids_preserved": true,
+      "count": 0
+    },
+    {
+      "file": "backend/tests/e2e/test_collaboration.py",
+      "test_ids_preserved": true,
+      "count": 4
+    },
+    {
+      "file": "backend/tests/e2e/test_decision_center.py",
+      "test_ids_preserved": true,
+      "count": 5
+    },
+    {
+      "file": "backend/tests/e2e/test_optimized_responsibilities.py",
+      "test_ids_preserved": true,
+      "count": 4
+    },
+    {
+      "file": "backend/tests/e2e/test_tenancy.py",
+      "test_ids_preserved": true,
+      "count": 11
+    },
+    {
+      "file": "backend/tests/e2e/test_v2_foundation.py",
+      "test_ids_preserved": true,
+      "count": 5
+    },
+    {
+      "file": "backend/tests/e2e/test_workflow.py",
+      "test_ids_preserved": true,
+      "count": 11
+    },
+    {
+      "file": "backend/tests/e2e/test_workflow_gates.py",
+      "test_ids_preserved": true,
+      "count": 5
+    },
+    {
+      "file": "backend/tests/e2e/workflow_fixture.py",
+      "test_ids_preserved": true,
+      "count": 0
+    },
+    {
+      "file": "backend/tests/e2e/workflow_ui_audit.py",
+      "test_ids_preserved": true,
+      "count": 0
+    },
+    {
+      "file": "backend/tests/e2e/workspace_settings_journey.py",
+      "test_ids_preserved": true,
+      "count": 0
+    }
+  ],
+  "new_test_module": "test_home_owner_attention",
+  "new_tests": 3,
+  "T1_executed": false
+}

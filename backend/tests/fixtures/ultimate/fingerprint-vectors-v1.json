@@ -1,0 +1,43 @@
+{
+  "canonical_version": "DATION_CANONICAL_V1",
+  "canonical_vectors": [
+    {
+      "name": "empty",
+      "input": {},
+      "canonical_utf8": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "name": "ordering",
+      "input": {
+        "b": true,
+        "a": 1
+      },
+      "canonical_utf8": "{\"a\":1,\"b\":true}",
+      "sha256": "d918e8d1a9eb1f54b583326cad9950c771474b5c8ac1072bb0f2a0ad148d6de5"
+    },
+    {
+      "name": "unicode",
+      "input": {
+        "label": "é"
+      },
+      "canonical_utf8": "{\"label\":\"é\"}",
+      "sha256": "59a69e5a8f92914b2096dd10b10431fe5c21baa7990508f95718e2f40fc718db"
+    },
+    {
+      "name": "null_zero",
+      "input": {
+        "unknown": null,
+        "zero": 0
+      },
+      "canonical_utf8": "{\"unknown\":null,\"zero\":0}",
+      "sha256": "c5117781c1d4bfb43acb15158870998e50c874b8863e5183fa9556b1401ff933"
+    }
+  ],
+  "typed_vectors": {
+    "d1_core": "70d62b6c6b44d2aa2dcb906ab990f7cc1304aaa5ccb7e79cc2339eeed3aab35c",
+    "d1_package": "eaefe48219b0969843ea1b81e595148639164cbca465eb247715ae13a048cfff",
+    "d2_package": "10e4ab5176c78b5d4d8bc89ff61bccf8f0d92f07a18ec39a6026a6dad9018e5a",
+    "decision_context": "12b90d738e7ddd157e768d681f9cf8e5ebc9fe30eb00e76f744356ffa6495dd3"
+  }
+}

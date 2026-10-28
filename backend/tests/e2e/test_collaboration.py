@@ -26,7 +26,7 @@ class CollaborationTests(unittest.TestCase):
   self.s.sql('TRUNCATE datasets,decision_runs,decision_cases,decision_approval_events,workspace_invitations CASCADE;')
   self.s.sql(f"DELETE FROM workspace_members WHERE workspace_id='{self.s.workspace_a}' AND user_id='{USER_B}'; UPDATE workspace_members SET access_role=CASE WHEN user_id='{USER_A}' THEN 'admin' WHEN user_id='{VIEWER}' THEN 'viewer' ELSE 'operator' END,status=CASE WHEN user_id='{DISABLED}' THEN 'disabled' ELSE 'active' END,business_role=NULL,updated_at=clock_timestamp() WHERE workspace_id='{self.s.workspace_a}'; UPDATE profiles SET active_workspace_id='{self.s.workspace_b}' WHERE id='{USER_B}'; UPDATE auth.users SET email_confirmed_at=now();")
   self.a=self.s.api_client
-  set_roles(self.a,USER_A,['data_steward','decision_owner','approver'])
+  set_roles(self.a,USER_A,['data_owner','decision_owner'])
   self.b=httpx.Client(base_url=self.s.api_url,headers={'Authorization':'Bearer '+self.s.user_tokens[USER_B]},trust_env=False,timeout=30);self.addCleanup(self.b.close)
  def team(self):return self.checked(self.a.get('/api/platform/team'))
  def row(self,uid):return next(row for row in self.team()['members'] if row['user_id']==uid)
@@ -34,12 +34,12 @@ class CollaborationTests(unittest.TestCase):
   row=self.row(uid)
   return (client or self.a).patch('/api/platform/team/members/'+uid,json={'expected_updated_at':version or row['updated_at'],'access_role':role,'business_role':business,'status':status})
  def invite(self,email='user-2@example.test',role='operator'):
-  return self.checked(self.a.post('/api/platform/team/invitations',json={'email':email,'access_role':role,'business_role':'approver'}),201)
+  return self.checked(self.a.post('/api/platform/team/invitations',json={'email':email,'access_role':role,'business_role':'decision_owner'}),201)
  def bff(self,uid=USER_B):
   c=httpx.Client(base_url=self.s.api_url,headers={'Origin':self.s.api_url},trust_env=False,timeout=30)
   c.cookies.set('dation_access',self.s.user_tokens[uid]);self.addCleanup(c.close);return c
  def join(self):
-  invitation=self.invite();self.checked(self.bff().post('/auth/invitations/'+invitation['id']+'/accept'));set_roles(self.a,USER_B,['decision_owner','approver']);return invitation
+  invitation=self.invite();self.checked(self.bff().post('/auth/invitations/'+invitation['id']+'/accept'));set_roles(self.a,USER_B,['decision_owner']);return invitation
  def assign(self,case,node='logistics_assignment',owner=USER_B,approver=USER_B,version=None):
   return self.a.put('/api/platform/decisions/'+case+'/assignments/'+node,json={'expected_updated_at':version,'owner_user_id':owner,'approver_user_id':approver})
 
@@ -48,7 +48,7 @@ class CollaborationTests(unittest.TestCase):
   root=Path(__file__).resolve().parents[2]
   result=subprocess.run([str(root/'.browser-venv/bin/python'),str(root/'tests/e2e/collaboration_journey.py')],cwd=root,env={**self.s.env,'DATION_E2E_URL':self.s.api_url,'DATION_TEAM_CASE':case,'DATION_TEAM_USER_B':USER_B},capture_output=True,text=True,timeout=180)
   self.assertEqual(result.returncode,0,result.stdout+result.stderr)
-  row=self.row(USER_B);self.assertEqual(row['access_role'],'operator');self.assertEqual(row['business_role'],'approver')
+  row=self.row(USER_B);self.assertEqual(row['access_role'],'operator');self.assertEqual(row['business_role'],'decision_owner')
   c=self.checked(self.a.get('/api/platform/decisions/'+case));self.assertEqual(c['nodes'][0]['approver']['id'],USER_B)
   for field in ['owner_user_id','approver_user_id']:
    invalid={'expected_updated_at':c['nodes'][0]['assignment_updated_at'],'owner_user_id':USER_A,'approver_user_id':USER_A,field:DISABLED}
@@ -56,7 +56,7 @@ class CollaborationTests(unittest.TestCase):
   other=self.checked(self.b.get('/api/platform/team'));self.assertEqual(other['invitations'],[])
   self.assertEqual(self.b.post('/api/platform/team/invitations',json={'email':'third@example.test','access_role':'admin'}).status_code,403)
   self.assertEqual(self.b.put('/api/platform/decisions/'+case+'/assignments/logistics_assignment',json={'expected_updated_at':None,'owner_user_id':USER_B,'approver_user_id':USER_B}).status_code,403)
-  row=self.row(USER_B);self.checked(self.update(USER_B,'viewer',business='data_steward'));self.assertEqual(self.update(USER_B,'operator',version=row['updated_at']).status_code,409)
+  row=self.row(USER_B);self.checked(self.update(USER_B,'viewer',business='data_owner'));self.assertEqual(self.update(USER_B,'operator',version=row['updated_at']).status_code,409)
   self.assertFalse(any(m['user_id']==USER_B for m in self.checked(self.a.get('/api/platform/team?candidates=true'))['members']))
   self.assertEqual(self.b.get('/api/platform/team').status_code,200);self.assertEqual(self.b.patch('/api/platform/team/members/'+USER_A,json={}).status_code,403)
   for rpc in ['platform_team','platform_invite_member','platform_update_member','platform_assign_decision','platform_received_invitations','platform_case_collaboration']:
@@ -91,11 +91,18 @@ class CollaborationTests(unittest.TestCase):
    d2=self.admit(self.body(case,orders,fleet,'logistics_scheduling',d1));self.finish(d2)
    self.assertEqual(operator.post('/api/runs/'+d2+'/approve',json={'case_id':case,'node_id':'logistics_scheduling'}).status_code,403)
    self.approve(d2,case,'logistics_scheduling')
-   event=json.loads(self.s.sql(f"SELECT metadata_json FROM audit_events WHERE event_type='decision.approved' AND metadata_json->>'run_id'='{d2}';"));self.assertTrue(event['admin_override']);self.assertEqual(event['assigned_approver_user_id'],USER_B)
+   event=json.loads(self.s.sql(f"SELECT metadata_json FROM audit_events WHERE event_type='decision.approved' AND metadata_json->>'run_id'='{d2}';"));self.assertTrue(event['admin_override']);self.assertEqual(event['assigned_decision_owner_user_id'],USER_B)
    before=self.s.sql(f"SELECT count(*) FROM decision_approval_events WHERE run_id='{d2}';");self.approve(d2,case,'logistics_scheduling');self.assertEqual(self.s.sql(f"SELECT count(*) FROM decision_approval_events WHERE run_id='{d2}';"),before)
    self.checked(self.update(USER_B,'operator','disabled'));detail=self.checked(self.a.get('/api/platform/decisions/'+case));self.assertFalse(detail['nodes'][0]['approver']['active'])
    self.assertEqual(self.b.get('/api/platform/team',headers={'X-Dation-Workspace-Id':self.s.workspace_a}).status_code,403)
+   # Disabling a member does not mutate the assignment version or historical actor.
+   # An unchanged assignment is a no-op; exercise CAS with an actual reassignment.
+   unchanged=self.checked(self.assign(case,version=first['updated_at']))
+   self.assertEqual(unchanged['updated_at'],first['updated_at'])
+   reassigned=self.checked(self.assign(case,owner=USER_A,approver=USER_A,version=first['updated_at']))
+   self.assertNotEqual(reassigned['updated_at'],first['updated_at'])
    self.assertEqual(self.assign(case,version=first['updated_at']).status_code,409)
+   self.assertEqual(self.checked(self.a.get('/api/runs/'+d1))['approved_by_user_id'],USER_B)
   # Composite FKs and RLS block cross-workspace assignments, even for a guessed ID.
   self.s.sql(f"UPDATE profiles SET active_workspace_id='{self.s.workspace_b}' WHERE id='{USER_B}';")
   self.assertEqual(self.b.get('/api/platform/decisions/'+case).status_code,404)
@@ -142,6 +149,6 @@ class CollaborationTests(unittest.TestCase):
   self.assertEqual(sorted(results),[200,409]);self.assertEqual(self.s.sql(f"SELECT count(*) FROM workspace_members WHERE workspace_id='{self.s.workspace_a}' AND access_role='admin' AND status='active';"),'1')
   self.s.sql(f"UPDATE workspace_members SET access_role='admin' WHERE user_id='{USER_A}' AND workspace_id='{self.s.workspace_a}';")
   case,_,_=self.case()
-  set_roles(self.a,USER_B,['decision_owner','approver'])
+  set_roles(self.a,USER_B,['decision_owner'])
   with ThreadPoolExecutor(max_workers=2) as pool:results=list(pool.map(lambda _:self.assign(case).status_code,range(2)))
   self.assertEqual(sorted(results),[200,409]);self.assertEqual(self.s.sql(f"SELECT count(*) FROM decision_assignments WHERE decision_case_id='{case}';"),'1')

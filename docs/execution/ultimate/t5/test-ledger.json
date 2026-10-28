@@ -1,0 +1,296 @@
+{
+  "phase": "T5",
+  "suites": [
+    {
+      "suite": "B-PY",
+      "status": "PASS",
+      "tests": 521,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "started_at": "2026-10-27T04:26:02.343993+00:00",
+      "finished_at": "2026-10-27T04:26:32.430441+00:00",
+      "seconds": 30.086,
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "exit_code": 0,
+      "production_credentials_cleared": true,
+      "PYTHONPATH": null,
+      "log_sha256": "d6e20dd9e4bca7408a869feb68df84b8c9a3e2f613a32b1dcf9dfa81a0fcffab",
+      "log": "evidence/B-PY.log",
+      "raw_result": "evidence/B-PY.result.json"
+    },
+    {
+      "suite": "B-NODE",
+      "status": "PASS",
+      "tests": 137,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "started_at": "2026-10-27T04:26:32.433494+00:00",
+      "finished_at": "2026-10-27T04:26:34.340665+00:00",
+      "seconds": 1.907,
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "node",
+        "--test",
+        "tests/test_dashboard_selectors.js",
+        "tests/test_assignment_ai_summary.mjs",
+        "tests/test_assignment_dashboard_v2_selectors.mjs",
+        "tests/test_assignment_executive_kpis.mjs",
+        "tests/test_case_navigation.mjs",
+        "tests/test_center_resource.mjs",
+        "tests/test_chart_theme.mjs",
+        "tests/test_data_provenance.mjs",
+        "tests/test_data_resource.mjs",
+        "tests/test_decision_case.mjs",
+        "tests/test_dispatch_upload_selectors.mjs",
+        "tests/test_execution_progress.mjs",
+        "tests/test_home_dda_catalog.mjs",
+        "tests/test_lifecycle.mjs",
+        "tests/test_navigation.mjs",
+        "tests/test_platform_recovery.mjs",
+        "tests/test_scheduling_dashboard_v21_selectors.mjs",
+        "tests/test_ultimate_case_navigation.mjs",
+        "tests/test_ultimate_data_navigation.mjs",
+        "tests/test_ultimate_graph_navigation.mjs",
+        "tests/test_v2_foundation.mjs",
+        "tests/test_workflow_gates.mjs",
+        "tests/test_workspace_settings.mjs"
+      ],
+      "exit_code": 0,
+      "production_credentials_cleared": true,
+      "PYTHONPATH": null,
+      "log_sha256": "5cbc0372c1d48a96fcafab60d8d2d47bcd0259d715c8145cf796a75b8cd9f4ce",
+      "log": "evidence/B-NODE.log",
+      "raw_result": "evidence/B-NODE.result.json"
+    },
+    {
+      "suite": "S5",
+      "status": "PASS",
+      "tests": 19,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "started_at": "2026-10-27T04:26:34.342105+00:00",
+      "finished_at": "2026-10-27T04:27:01.248900+00:00",
+      "seconds": 26.907,
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "test_ultimate_graph",
+        "-v"
+      ],
+      "exit_code": 0,
+      "production_credentials_cleared": true,
+      "PYTHONPATH": "tests/integration",
+      "log_sha256": "b81480746a34e8d17cd89bd05f82aa2655024472798a3c145c9087cfcc1aa1ab",
+      "log": "evidence/S5.log",
+      "raw_result": "evidence/S5.result.json"
+    },
+    {
+      "suite": "W5",
+      "status": "PASS",
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "started_at": "2026-10-27T04:30:56.136113+00:00",
+      "finished_at": "2026-10-27T04:32:21.937351+00:00",
+      "seconds": 85.801,
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "/workspace/Dation/backend/.browser-venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "test_ultimate_navigation",
+        "-v"
+      ],
+      "exit_code": 0,
+      "production_credentials_cleared": true,
+      "PYTHONPATH": "tests/browser",
+      "log_sha256": "bc0257dad76222aa3b0a58a75e57a56a23b44db618d30013b019bb153035ff46",
+      "log": "evidence/W5.log",
+      "raw_result": "evidence/W5.result.json"
+    },
+    {
+      "suite": "B-FOCUS",
+      "status": "PASS",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "started_at": "2026-10-27T04:28:16.143937+00:00",
+      "finished_at": "2026-10-27T04:29:25.710270+00:00",
+      "seconds": 69.566,
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "/workspace/Dation/backend/.browser-venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "test_run_lineage_polish",
+        "test_navigation.NavigationTests.test_foundation_dashboard_navigation_prefers_approved_over_later_candidate",
+        "-v"
+      ],
+      "exit_code": 0,
+      "production_credentials_cleared": true,
+      "PYTHONPATH": "tests/browser",
+      "log_sha256": "292f093a87f499e8e4d86df3de08b87732be772be0d4a03ad6f53aa8f7e026fb",
+      "log": "evidence/B-FOCUS.log",
+      "raw_result": "evidence/B-FOCUS.result.json"
+    },
+    {
+      "suite": "FOCAL-CASE-CREATE",
+      "status": "PASS",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "started_at": "2026-10-27T04:29:25.711588+00:00",
+      "finished_at": "2026-10-27T04:29:45.652598+00:00",
+      "seconds": 19.941,
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "/workspace/Dation/backend/.browser-venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "test_ultimate_case_setup.UltimateCaseSetupTests.test_01_ui_model_publish_case_without_csv_and_reload",
+        "-v"
+      ],
+      "exit_code": 0,
+      "production_credentials_cleared": true,
+      "PYTHONPATH": "tests/browser",
+      "log_sha256": "7385ee13877683a73c34ea94b85f8e69bb80f9a6fac7ffdb9996da51430ef809",
+      "log": "evidence/FOCAL-CASE-CREATE.log",
+      "raw_result": "evidence/FOCAL-CASE-CREATE.result.json"
+    }
+  ],
+  "aliases": [
+    {
+      "suite": "U5",
+      "status": "PASS",
+      "tests": 23,
+      "included_in": "B-PY",
+      "module": "tests.test_ultimate_graph",
+      "log_lines": [
+        "test_approval_authority_beats_created_at (test_ultimate_graph.UltimateGraphTests.test_approval_authority_beats_created_at) ... ok",
+        "test_complete_pack_is_ready_with_runtime_unavailable (test_ultimate_graph.UltimateGraphTests.test_complete_pack_is_ready_with_runtime_unavailable) ... ok",
+        "test_completed_d1_does_not_unlock_d2_but_approved_does (test_ultimate_graph.UltimateGraphTests.test_completed_d1_does_not_unlock_d2_but_approved_does) ... ok",
+        "test_consumed_demand_change_makes_approval_stale_without_mutating_it (test_ultimate_graph.UltimateGraphTests.test_consumed_demand_change_makes_approval_stale_without_mutating_it) ... ok",
+        "test_contract_normalizer_and_unknowns_are_requirements (test_ultimate_graph.UltimateGraphTests.test_contract_normalizer_and_unknowns_are_requirements) ... ok",
+        "test_cycle_and_unknown_dependency_fail_closed (test_ultimate_graph.UltimateGraphTests.test_cycle_and_unknown_dependency_fail_closed) ... ok",
+        "test_d1_controlled_lifecycle (test_ultimate_graph.UltimateGraphTests.test_d1_controlled_lifecycle) ... ok",
+        "test_d2_pins_exact_approved_upstream (test_ultimate_graph.UltimateGraphTests.test_d2_pins_exact_approved_upstream) ... ok",
+        "test_definition_snapshot_has_required_metadata_and_closure (test_ultimate_graph.UltimateGraphTests.test_definition_snapshot_has_required_metadata_and_closure) ... ok",
+        "test_demand_only_is_not_ready (test_ultimate_graph.UltimateGraphTests.test_demand_only_is_not_ready) ... ok",
+        "test_empty_case_has_data_required_and_locked (test_ultimate_graph.UltimateGraphTests.test_empty_case_has_data_required_and_locked) ... ok",
+        "test_exact_eight_states_are_closed (test_ultimate_graph.UltimateGraphTests.test_exact_eight_states_are_closed) ... ok",
+        "test_future_definition_never_executable (test_ultimate_graph.UltimateGraphTests.test_future_definition_never_executable) ... ok",
+        "test_incomplete_publication_is_not_completed_or_approved (test_ultimate_graph.UltimateGraphTests.test_incomplete_publication_is_not_completed_or_approved) ... ok",
+        "test_irrelevant_enrichment_does_not_invalidate_d1_or_d2 (test_ultimate_graph.UltimateGraphTests.test_irrelevant_enrichment_does_not_invalidate_d1_or_d2) ... ok",
+        "test_new_run_targets_config_d1_d2_without_upload (test_ultimate_graph.UltimateGraphTests.test_new_run_targets_config_d1_d2_without_upload) ... ok",
+        "test_registry_order_does_not_change_dependencies (test_ultimate_graph.UltimateGraphTests.test_registry_order_does_not_change_dependencies) ... ok",
+        "test_superseded_approval_is_historical_only (test_ultimate_graph.UltimateGraphTests.test_superseded_approval_is_historical_only) ... ok",
+        "test_technical_error_is_orthogonal_to_data (test_ultimate_graph.UltimateGraphTests.test_technical_error_is_orthogonal_to_data) ... ok",
+        "test_unknown_graph_binding_never_falls_back_to_legacy (test_ultimate_graph.UltimateGraphTests.test_unknown_graph_binding_never_falls_back_to_legacy) ... ok",
+        "test_unknown_trip_count_does_not_mean_zero (test_ultimate_graph.UltimateGraphTests.test_unknown_trip_count_does_not_mean_zero) ... ok",
+        "test_viewer_owner_missing_archived_leave_ready_business_state (test_ultimate_graph.UltimateGraphTests.test_viewer_owner_missing_archived_leave_ready_business_state) ... ok",
+        "test_zero_trips_is_not_applicable_and_creates_no_run (test_ultimate_graph.UltimateGraphTests.test_zero_trips_is_not_applicable_and_creates_no_run) ... ok"
+      ],
+      "repeated_only_for_alias": false
+    }
+  ],
+  "pre_STOP_U5": {
+    "tests": 23,
+    "status": "PASS",
+    "log": "evidence/U5-first.log",
+    "log_sha256": "ef3f873075b9753848795bc93527801c9ee39d79f2f5297d576ad9a1356d29fb",
+    "core_source_and_tests_preserved": true
+  },
+  "additional_boundaries": [
+    {
+      "name": "schema-boundary",
+      "status": "PASS",
+      "evidence": "evidence/schema-boundary.json"
+    },
+    {
+      "name": "native-primitives-parity",
+      "status": "PASS",
+      "widths": [
+        1440,
+        1280,
+        1024,
+        768,
+        390
+      ],
+      "evidence": "evidence/visual-parity/parity.json"
+    },
+    {
+      "name": "legacy-Map-parity",
+      "status": "PASS",
+      "widths": [
+        1440,
+        390
+      ],
+      "evidence": "evidence/legacy-map-parity/parity.json"
+    },
+    {
+      "name": "responsive-focus-contrast",
+      "status": "PASS",
+      "widths": [
+        1440,
+        1280,
+        1024,
+        768,
+        390,
+        320
+      ],
+      "zoom": "200%",
+      "evidence": [
+        "evidence/browser/responsive.json",
+        "evidence/browser/focus.json",
+        "evidence/browser/contrast.json"
+      ]
+    }
+  ],
+  "not_run": [
+    {
+      "suite": "B-BROWSER full",
+      "reason": "User requests scoped W5/B-FOCUS and actual affected callers only."
+    },
+    {
+      "suite": "B-E2E full",
+      "reason": "S5 and W5 real API/SQL fixtures cover the modified boundary; no new engine."
+    },
+    {
+      "suite": "T0-T4 rerun",
+      "reason": "Approved baseline; only one changed Case-create browser focal executed."
+    },
+    {
+      "suite": "T6 and later",
+      "reason": "Explicitly unauthorized."
+    }
+  ],
+  "qa_reuse": [
+    "evidence/qa-reuse.json"
+  ],
+  "latest_label_fix_consumers_repeated": [
+    "W5"
+  ],
+  "all_suites_match_final_affected_source_files": true
+}

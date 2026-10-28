@@ -13,13 +13,14 @@ import {ddaEnabled} from './entitlements.mjs';
 import {CENTER_FILTERS,readCenterResource} from './center-resource.mjs';
 import {mountActivity} from './activity.mjs';
 import {workspaceDate,workspaceNumber} from './workspace-format.mjs';
+import {GRAPH_STATE_UI,graphStateUi,graphActionLabel} from '../dispatch/navigation/ultimate-graph.mjs';
 
 const BASE='/api/platform/decisions',size=25;
 const statusNames={active:'En progreso',completed:'Completado',archived:'Archivado',review:'En revisión',pending_approval:'Pendiente de aprobación',approved:'Aprobada',running:'En ejecución',error:'Requiere revisión',stale:'Requiere actualizar',available:'Disponible',locked:'Bloqueado',needs_data:'Faltan datos',coming_soon:'Próximamente'};
 function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;}
 function icon(name){const box=el('span',undefined,'center-icon');box.innerHTML=iconSvg(name);return box;}
 function button(text,handler,kind='secondary'){const n=el('button',text,'d-button d-button--'+kind);n.type='button';n.addEventListener('click',handler);return n;}
-function pill(status){const n=el('span',statusNames[status]||status,'center-status');n.dataset.state=status;n.dataset.tone=statePresentation(status==='pending_approval'?'review':status).tone;return n;}
+function pill(status){const graph=GRAPH_STATE_UI[status],n=el('span',graph?.label||statusNames[status]||status,'center-status');n.dataset.state=status;n.dataset.tone=graph?.tone||statePresentation(status==='pending_approval'?'review':status).tone;return n;}
 function person(value,fallback='Sin asignar'){return value?.name?value.name+(value.active===false?' (inactivo)':''):fallback;}
 function ddaLabel(id){return DDA_CATALOG.find(d=>d.id===id)?.title||id||'DDA';}
 function namedPerson(value){const wrap=el('span',undefined,'center-person'),initials=personInitials(value?.name),avatar=el('span',initials,'center-avatar');avatar.setAttribute('aria-hidden','true');wrap.append(avatar,el('span',person(value)));return wrap;}
@@ -122,9 +123,9 @@ export function mountDecisionCenter(root,getIdentity){
   const stages=c.responsibilities?.stages||{};for(const [key,label]of [['data_owner','Data Owner']])if(stages[key])linked.append(personField(c,key,'owner',label,stages[key].owner));if(!stages.data_owner&&stages.data_preparation)linked.append(personField(c,'data_preparation','owner','Responsable de datos',stages.data_preparation.owner));content.append(linked);
   const chain=el('section',undefined,'center-chain');chain.append(el('h3','Cadena de decisiones','d-card-title'));const list=el('ol',undefined,'center-timeline');chain.append(list);content.append(chain);const histories=[];
   for(const [index,node]of (c.nodes||[]).entries()){
-   const meta=DECISION_META[node.id]||{label:node.label},item=el('li',undefined,'center-node');item.dataset.centerNode=node.id;const header=el('div',undefined,'center-node__header');header.append(el('span',String(index+1).padStart(2,'0'),'center-node__number'),el('h4',meta.label,'center-node-title'),pill(node.status));item.append(header,el('p','Objetivo · '+(node.objective?.label||'Por definir'),'center-node__objective'));
+   const meta=node.node_state?{label:node.label}:DECISION_META[node.id]||{label:node.label},item=el('li',undefined,'center-node');item.dataset.centerNode=node.id;const header=el('div',undefined,'center-node__header');header.append(el('span',String(index+1).padStart(2,'0'),'center-node__number'),el('h4',meta.label,'center-node-title'),pill(node.status));item.append(header,el('p','Objetivo · '+(node.objective?.label||'Por definir'),'center-node__objective'));
    if(node.target&&!['locked','needs_data','coming_soon'].includes(node.status)){const label={approved:'Ver dashboard',review:'Revisar',available:'Configurar',running:'Ver ejecución'}[node.status]||'Ver decisión',candidate=['review','running','error'].includes(node.status)&&node.latest_run&&!node.latest_run.approved_at;
-    item.append(destination(label,candidate?{view:'decision-dashboard',node_id:node.id,run_id:node.latest_run.id}:node.target,c,{continuation:true}));
+    item.append(destination(node.node_state?graphActionLabel(node.primary_action,node):label,candidate?{view:'decision-dashboard',node_id:node.id,run_id:node.latest_run.id}:node.target,c,{continuation:true}));
     if(candidate&&node.latest_objective?.id!==node.objective?.id)item.append(el('p','Objetivo de la candidata · '+(node.latest_objective?.label||'Por definir'),'d-metadata'));
    }
    const details=el('details',undefined,'center-node-details');details.append(el('summary','Responsables y aprobación'));const fields=el('div',undefined,'center-responsibilities');fields.append(personField(c,node.id,'owner','Decision Owner',node.owner));details.append(fields);

@@ -1,0 +1,156 @@
+{
+  "phase": "T0",
+  "test_commands": [
+    {
+      "suite": "B-PY",
+      "cwd": "/workspace/Dation/backend",
+      "argv": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "env": "production credentials blank; PYTHONDONTWRITEBYTECODE=1; browser PYTHONPATH=tests/browser; local owned Docker only"
+    },
+    {
+      "suite": "B-NODE",
+      "cwd": "/workspace/Dation/backend",
+      "argv": [
+        "node",
+        "--test",
+        "tests/test_dashboard_selectors.js",
+        "tests/test_assignment_ai_summary.mjs",
+        "tests/test_assignment_dashboard_v2_selectors.mjs",
+        "tests/test_assignment_executive_kpis.mjs",
+        "tests/test_case_navigation.mjs",
+        "tests/test_center_resource.mjs",
+        "tests/test_chart_theme.mjs",
+        "tests/test_data_provenance.mjs",
+        "tests/test_data_resource.mjs",
+        "tests/test_decision_case.mjs",
+        "tests/test_dispatch_upload_selectors.mjs",
+        "tests/test_execution_progress.mjs",
+        "tests/test_home_dda_catalog.mjs",
+        "tests/test_lifecycle.mjs",
+        "tests/test_navigation.mjs",
+        "tests/test_platform_recovery.mjs",
+        "tests/test_scheduling_dashboard_v21_selectors.mjs",
+        "tests/test_v2_foundation.mjs",
+        "tests/test_workflow_gates.mjs",
+        "tests/test_workspace_settings.mjs"
+      ],
+      "env": "production credentials blank; PYTHONDONTWRITEBYTECODE=1; browser PYTHONPATH=tests/browser; local owned Docker only"
+    },
+    {
+      "suite": "B-BROWSER",
+      "cwd": "/workspace/Dation/backend",
+      "argv": [
+        "/workspace/Dation/backend/.browser-venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/browser",
+        "-p",
+        "test_*.py",
+        "-v"
+      ],
+      "env": "production credentials blank; PYTHONDONTWRITEBYTECODE=1; browser PYTHONPATH=tests/browser; local owned Docker only"
+    },
+    {
+      "suite": "B-SQL",
+      "cwd": "/workspace/Dation/backend",
+      "argv": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/integration",
+        "-p",
+        "test_*.py",
+        "-v"
+      ],
+      "env": "production credentials blank; PYTHONDONTWRITEBYTECODE=1; browser PYTHONPATH=tests/browser; local owned Docker only"
+    },
+    {
+      "suite": "B-E2E",
+      "cwd": "/workspace/Dation/backend",
+      "argv": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "tests/e2e/run_suite.py"
+      ],
+      "env": "production credentials blank; PYTHONDONTWRITEBYTECODE=1; browser PYTHONPATH=tests/browser; local owned Docker only"
+    },
+    {
+      "suite": "B-FOCUS",
+      "cwd": "/workspace/Dation/backend",
+      "argv": [
+        "/workspace/Dation/backend/.browser-venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "test_run_lineage_polish",
+        "test_navigation.NavigationTests.test_foundation_dashboard_navigation_prefers_approved_over_later_candidate",
+        "-v"
+      ],
+      "env": "production credentials blank; PYTHONDONTWRITEBYTECODE=1; browser PYTHONPATH=tests/browser; local owned Docker only"
+    }
+  ],
+  "git": [
+    "git status --short --branch",
+    "git fetch origin",
+    "git log --oneline --decorate -12",
+    "git rev-list --left-right --count main...origin/main",
+    "git rev-parse HEAD",
+    "git diff --name-only",
+    "git diff --cached --name-only",
+    "git ls-files -z"
+  ],
+  "runtime": [
+    "Python/Node/Docker version probes",
+    "local-socket docker info",
+    "docker run postgres:17-alpine --network none with owned T0 label",
+    "current Git baseline+23 upgrades in owned database; DROP afterwards",
+    "guarded docker rm --force --volumes owned T0 container only"
+  ],
+  "sql_container_creation_argv": [
+    "docker",
+    "--host=unix:///var/run/docker.sock",
+    "run",
+    "-d",
+    "--name",
+    "dation-t0-dcf39757a6",
+    "--label",
+    "dation.task=T0",
+    "--network",
+    "none",
+    "-e",
+    "POSTGRES_HOST_AUTH_METHOD=trust",
+    "-e",
+    "POSTGRES_DB=dation_t0",
+    "postgres:17-alpine"
+  ],
+  "reproduction_image_digest": "postgres@sha256:b0f9560a2de083e2cc7382e75f808c7381a32852a7ec49117deedb300e552b24",
+  "remote_read_only": [
+    "Supabase execute_sql: metadata SELECT statements retained in evidence JSON / schema-rebuild script",
+    "Supabase list_migrations(project_id=gijiinufjjurgfeehufj)",
+    "GET production /health and /openapi.json",
+    "GET Cloud Run service metadata (401)",
+    "GET Supabase changelog (403 proxy denial)"
+  ],
+  "reproduction_sources": [
+    "evidence/t0-suite-runner.py.txt",
+    "evidence/t0-schema-rebuild.py.txt",
+    "evidence/t0-report-assembler.py.txt"
+  ],
+  "diagnostic": "isolated unittest HomeHero greeting + Navigation approved Assignment→Scheduling config; evidence/browser-isolated-diagnostic.log",
+  "additional_inspection": "targeted rg/source/caller reads cited by ABI matrix; no general UX audit or mutating Skill workflow"
+}

@@ -1,0 +1,177 @@
+{
+  "phase": "T0-R2",
+  "captured_at": "2026-10-26T04:34:21.654085+00:00",
+  "roots": [
+    {
+      "id": "R2-B-FIXTURE",
+      "category": "C",
+      "cause": "Synthetic Case ID is replaced without creating its workflow snapshot; intercepted request raises KeyError and strands teardown.",
+      "evidence": [
+        "fixture-cause-proof.log",
+        "fixture-lifecycle-focal.log",
+        "fixture-lifecycle-related.log"
+      ],
+      "fix": "Register the second Case workflow explicitly. Return500 and retain fixture exception diagnostics; always close Playwright; ignore only expected closed/already-handled route completion during teardown.",
+      "focal": "20/20 PASS"
+    },
+    {
+      "id": "R2-A-HOME-SQL",
+      "category": "B",
+      "cause": "platform_home still filters review on retired approver_user_id; current Owner writes leave itNULL.",
+      "contract": "Reuse dation_private.case_collaboration can_approve; handoff requires an eligible assigned Decision Owner. Approval RPC remains sole authority.",
+      "migration": "20261026010000_home_decision_owner_attention.sql",
+      "evidence": [
+        "sql-home-focal.log"
+      ],
+      "focal": "3/3 PASS; Owner/nonowner/Admin/Viewer/tenant, revoked roles, handoff, history, upgrade/fresh and ACL"
+    },
+    {
+      "id": "R2-C-SHORT-FOCUS",
+      "category": "B",
+      "cause": "In short viewports a fixed command bar reserves most of main.height:67–89px at320x256; nav/control rects extend beyond that clipped scroll viewport. At568x320 the169px option exceeds163px main height. Current scroll padding150px exacerbates native scroll. Two animation frames do not resolve it.",
+      "evidence": [
+        "focus/before/probes.json",
+        "focus-before.log"
+      ],
+      "planned_fix": "Only max-height360px: return commands to normal flow, use full-height main scroll viewport and8px scroll padding; preserve all styles/tokens and all normal-height geometry.",
+      "fix": "At max-height360px, commands return to normal flow; main retains100dvh scrolling and8px scroll padding. All existing tokens and field styles remain.",
+      "comparison": {
+        "states": 32,
+        "before_failing": 4,
+        "after_failing": 0,
+        "normal_height_pixel_identical": 24
+      }
+    },
+    {
+      "id": "R2-D-E2E-5",
+      "tests": [
+        "test_collaboration.CollaborationTests.test_02_assigned_approval_handoff_attribution_override_and_retry",
+        "test_tenancy.TenancyTests.test_09_home_attention_tracks_real_versions_and_removes_approved_or_archived",
+        "test_workflow.WorkflowTests.test_browser_complete_workflow_at_mobile_width",
+        "test_workflow.WorkflowTests.test_browser_creation_execution_approval_navigation_and_mobile_history",
+        "test_workflow.WorkflowTests.test_scheduling_dashboard_v21_preserves_assignment_and_temporal_relations"
+      ],
+      "classification": [
+        "B Home SQL",
+        "A nested has locator incorrectly scoped under row",
+        "A two Data checks vs four current independent checks",
+        "A same Data precondition",
+        "C store updated before approved DOM rerender"
+      ],
+      "evidence": [
+        "T0-R final B-E2E log",
+        "five-e2e-focal.log"
+      ],
+      "changes": "Current relative historical locator; four Data checks; wait for approved toolbar removal rather than only store mutation. No product change for these test/harness roots.",
+      "followup_contracts": [
+        {
+          "cause": "Owner save rebuilds Map after local Cambiar appears",
+          "category": "C",
+          "fix": "Wait snapshot Owner eligibility and old Map selector detachment before editing next stage."
+        },
+        {
+          "cause": "Real approved D1 toolbar rerenders without an approval button",
+          "category": "A/C",
+          "fix": "Wait for removal and assert zero approval controls after approved status."
+        },
+        {
+          "cause": "No-op assignment after member disabled does not change assignment CAS version",
+          "category": "A",
+          "fix": "Assert no-op preserves version, then actual reassignment advances it and stale CAS is rejected; historical actor stays unchanged."
+        },
+        {
+          "cause": "Storage download gate held longer than real45s dependency budget while UI checked queue",
+          "category": "C",
+          "fix": "Parent keeps real worker stopped until child proves accepted queued Run survives reload, then starts worker through an owned file marker. No dependency timeout inflation, synthetic results or new retries."
+        },
+        {
+          "category": "A",
+          "cause": "Pending view heading was renamed from decisión to recomendación; real API remained queued and error-free.",
+          "fix": "Use current heading and assert visible EN COLA DE EJECUCIÓN alongside exact queued API status."
+        },
+        {
+          "category": "A",
+          "cause": "Contextual continuation deliberately uses 1.4 line-height (dashboard-toolbar.css:138); other workflow controls use 1.35.",
+          "fix": "Assert both exact line boxes and compare all shared size/font family/font size/font weight/color/geometry; no product CSS change."
+        }
+      ],
+      "focal_outcome": {
+        "collaboration": "PASS — five-e2e-current.log",
+        "home_history": "PASS — five-e2e-current.log",
+        "d2_temporal_relations": "PASS — five-e2e-current.log",
+        "mobile": "PASS — two-e2e-current.log",
+        "desktop": "PASS — two-e2e-current.log"
+      },
+      "relationship_to_A_B_C": "Collaboration reproduces A Home attention; other roots are stale expectations or fixture/async lifecycle, not an approval, tenant, engine or data regression."
+    }
+  ],
+  "T1_executed": false,
+  "browser_residuals": {
+    "first_full_attempt": {
+      "tests": 251,
+      "failures": 3,
+      "errors": 6,
+      "log": "revalidation/B-BROWSER.attempt1.log"
+    },
+    "roots": [
+      {
+        "test": "test_case_selector_paginates_compact_active_and_completed_and_hydrates_only_selection",
+        "category": "C",
+        "cause": "Unrelated asynchronous Overview onboarding GET was included in the Case-selector measurement.",
+        "fix": "Await that response body before starting exact three-page/no-hydration request measurement."
+      },
+      {
+        "test": "test_case_ux_both_reviews_keep_config_and_only_confirm_executes_once",
+        "category": "C/A",
+        "cause": "D1 execution correctly supersedes downstream, then the next independent D2 review scenario reuses this now-invalid upstream fixture.",
+        "fix": "Restore explicit independent initial Case/runs before each scenario; retain admission count and confirmation/coalescing assertions."
+      },
+      {
+        "test": "test_case_ux_real_data_change_retains_lineage_but_reopening_history_has_no_new_notice",
+        "category": "A",
+        "cause": "New Case from changed inputs has no applied attributes or Data Owner and is correctly routed to Data.",
+        "fix": "Assert pending gate, apply own attributes/Owner via real UI, enter Map and retain all transition/historical reopening assertions."
+      },
+      {
+        "test": "test_toolbar_approval_is_unique_direct_and_preserves_continuation",
+        "category": "A/C",
+        "cause": "Toolbar removes the approval control after successful approval/rerender.",
+        "fix": "Wait detached, assert no approval controls, retain busy/coalescing/actual approval/continuation assertions."
+      },
+      {
+        "test": "test_d2_v21_ai_retry_approval_and_approved_state",
+        "category": "C",
+        "cause": "Store/hero approval mutation precedes complete toolbar rerender.",
+        "fix": "Wait for approval control detachment and retain retries/reload/status/no-extra-execution checks."
+      },
+      {
+        "test": "test_shared_case_context_and_compact_map_milestones",
+        "category": "A",
+        "cause": "Generic first summary now belongs to optional hero illustration, not the Case disclosure being clicked.",
+        "fix": "Read title on the exact Case disclosure and assert native details.open."
+      },
+      {
+        "test": "test_workflow_progressive_actions_share_styles_arrow_and_keyboard_focus",
+        "category": "A",
+        "cause": "Retired gradient, exact-font assumption across intentional continuation line box, and retired dashboard Map control.",
+        "fix": "Assert existing solid primary token and shared styles, exact 1.35/1.4 line boxes, secondary rerun and enabled Map navigation; no weaker geometry/focus checks."
+      }
+    ],
+    "not_reproduced_without_product_change": [
+      {
+        "test": "test_art_is_small_and_reserves_geometry_and_content_survives_failure",
+        "observation": "Initial full attempt timed out on Home; unchanged isolated diagnostic passes. No product cause claimed. Final full rerun required; not exempted."
+      },
+      {
+        "test": "test_dashboard_toolbars_share_controls_and_symmetric_bleed",
+        "observation": "Initial full attempt timed out opening D2; unchanged full multi-viewport diagnostic passes. No product cause claimed. Final full rerun required; not exempted."
+      }
+    ],
+    "focal_logs": [
+      "browser-diagnostic.log",
+      "browser-residual-focal.log",
+      "browser-styles-focal.log",
+      "browser-workflow-style-final.log"
+    ]
+  }
+}

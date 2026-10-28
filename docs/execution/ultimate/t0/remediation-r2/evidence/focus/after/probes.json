@@ -1,0 +1,1354 @@
+[
+  {
+    "kind": "data",
+    "width": 320,
+    "height": 568,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "dispatch-pro-hero d-page-hero d-page-hero--workflow d-page-hero--copy-only is-visible",
+          "width": 228,
+          "height": 194.1875,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 228,
+          "height": 63.8125,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar",
+          "width": 228,
+          "height": 235.71875,
+          "font": "",
+          "padding": "12px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "10px"
+        }
+      ]
+    },
+    "visited": 27,
+    "failures": []
+  },
+  {
+    "kind": "map",
+    "width": 320,
+    "height": 568,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "dispatch-pro-hero dispatch-map-premium__hero d-page-hero d-page-hero--workflow",
+          "width": 228,
+          "height": 257.65625,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 228,
+          "height": 31.90625,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        }
+      ]
+    },
+    "visited": 21,
+    "failures": []
+  },
+  {
+    "kind": "assignment",
+    "width": 320,
+    "height": 568,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "decision-config-hero dispatch-pro-hero assignment-config-hero d-page-hero d-page-hero--workflow",
+          "width": 228,
+          "height": 331.78125,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 228,
+          "height": 95.71875,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar d-workflow-action-bar--config",
+          "width": 228,
+          "height": 239.71875,
+          "font": "",
+          "padding": "12px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "10px"
+        }
+      ]
+    },
+    "visited": 36,
+    "failures": []
+  },
+  {
+    "kind": "scheduling",
+    "width": 320,
+    "height": 568,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "decision-config-hero dispatch-pro-hero assignment-config-hero d-page-hero d-page-hero--workflow",
+          "width": 228,
+          "height": 353.46875,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 228,
+          "height": 95.71875,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar d-workflow-action-bar--config",
+          "width": 228,
+          "height": 239.71875,
+          "font": "",
+          "padding": "12px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "10px"
+        }
+      ]
+    },
+    "visited": 28,
+    "failures": []
+  },
+  {
+    "kind": "data",
+    "width": 320,
+    "height": 256,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "dispatch-pro-hero d-page-hero d-page-hero--workflow d-page-hero--copy-only is-visible",
+          "width": 228,
+          "height": 194.1875,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 228,
+          "height": 63.8125,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar",
+          "width": 228,
+          "height": 126.53125,
+          "font": "",
+          "padding": "8px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "6px"
+        }
+      ]
+    },
+    "visited": 27,
+    "failures": []
+  },
+  {
+    "kind": "map",
+    "width": 320,
+    "height": 256,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "dispatch-pro-hero dispatch-map-premium__hero d-page-hero d-page-hero--workflow",
+          "width": 228,
+          "height": 257.65625,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 228,
+          "height": 31.90625,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        }
+      ]
+    },
+    "visited": 21,
+    "failures": []
+  },
+  {
+    "kind": "assignment",
+    "width": 320,
+    "height": 256,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "decision-config-hero dispatch-pro-hero assignment-config-hero d-page-hero d-page-hero--workflow",
+          "width": 228,
+          "height": 331.78125,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 228,
+          "height": 95.71875,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar d-workflow-action-bar--config",
+          "width": 228,
+          "height": 132.5625,
+          "font": "",
+          "padding": "8px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "6px"
+        }
+      ]
+    },
+    "visited": 36,
+    "failures": []
+  },
+  {
+    "kind": "scheduling",
+    "width": 320,
+    "height": 256,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "decision-config-hero dispatch-pro-hero assignment-config-hero d-page-hero d-page-hero--workflow",
+          "width": 228,
+          "height": 353.46875,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 228,
+          "height": 95.71875,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar d-workflow-action-bar--config",
+          "width": 228,
+          "height": 148.75,
+          "font": "",
+          "padding": "8px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "6px"
+        }
+      ]
+    },
+    "visited": 28,
+    "failures": []
+  },
+  {
+    "kind": "data",
+    "width": 568,
+    "height": 320,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "dispatch-pro-hero d-page-hero d-page-hero--workflow d-page-hero--copy-only is-visible",
+          "width": 476,
+          "height": 140.59375,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 476,
+          "height": 31.90625,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar",
+          "width": 476,
+          "height": 100,
+          "font": "",
+          "padding": "8px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "6px"
+        }
+      ]
+    },
+    "visited": 27,
+    "failures": []
+  },
+  {
+    "kind": "map",
+    "width": 568,
+    "height": 320,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "dispatch-pro-hero dispatch-map-premium__hero d-page-hero d-page-hero--workflow",
+          "width": 476,
+          "height": 214.28125,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 476,
+          "height": 31.90625,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        }
+      ]
+    },
+    "visited": 21,
+    "failures": []
+  },
+  {
+    "kind": "assignment",
+    "width": 568,
+    "height": 320,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "decision-config-hero dispatch-pro-hero assignment-config-hero d-page-hero d-page-hero--workflow",
+          "width": 476,
+          "height": 214.28125,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 476,
+          "height": 31.90625,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar d-workflow-action-bar--config",
+          "width": 476,
+          "height": 116.375,
+          "font": "",
+          "padding": "8px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "6px"
+        }
+      ]
+    },
+    "visited": 36,
+    "failures": []
+  },
+  {
+    "kind": "scheduling",
+    "width": 568,
+    "height": 320,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "decision-config-hero dispatch-pro-hero assignment-config-hero d-page-hero d-page-hero--workflow",
+          "width": 476,
+          "height": 246.1875,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 476,
+          "height": 63.8125,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar d-workflow-action-bar--config",
+          "width": 476,
+          "height": 116.375,
+          "font": "",
+          "padding": "8px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "6px"
+        }
+      ]
+    },
+    "visited": 28,
+    "failures": []
+  },
+  {
+    "kind": "data",
+    "width": 1440,
+    "height": 1000,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "dispatch-pro-hero d-page-hero d-page-hero--workflow d-page-hero--copy-only is-visible",
+          "width": 1144,
+          "height": 149.71875,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 1144,
+          "height": 41.03125,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar",
+          "width": 1144,
+          "height": 83.375,
+          "font": "",
+          "padding": "12px 16px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "16px"
+        }
+      ]
+    },
+    "visited": 27,
+    "failures": []
+  },
+  {
+    "kind": "map",
+    "width": 1440,
+    "height": 1000,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "dispatch-pro-hero dispatch-map-premium__hero d-page-hero d-page-hero--workflow",
+          "width": 1144,
+          "height": 223.40625,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 1144,
+          "height": 41.03125,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        }
+      ]
+    },
+    "visited": 21,
+    "failures": []
+  },
+  {
+    "kind": "assignment",
+    "width": 1440,
+    "height": 1000,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "decision-config-hero dispatch-pro-hero assignment-config-hero d-page-hero d-page-hero--workflow",
+          "width": 1144,
+          "height": 201.71875,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 1144,
+          "height": 41.03125,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar d-workflow-action-bar--config",
+          "width": 1144,
+          "height": 80,
+          "font": "",
+          "padding": "12px 16px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "16px"
+        }
+      ]
+    },
+    "visited": 36,
+    "failures": []
+  },
+  {
+    "kind": "scheduling",
+    "width": 1440,
+    "height": 1000,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "decision-config-hero dispatch-pro-hero assignment-config-hero d-page-hero d-page-hero--workflow",
+          "width": 1144,
+          "height": 223.40625,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 1144,
+          "height": 41.03125,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar d-workflow-action-bar--config",
+          "width": 1144,
+          "height": 80,
+          "font": "",
+          "padding": "12px 16px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "16px"
+        }
+      ]
+    },
+    "visited": 28,
+    "failures": []
+  },
+  {
+    "kind": "data",
+    "width": 1280,
+    "height": 1000,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "dispatch-pro-hero d-page-hero d-page-hero--workflow d-page-hero--copy-only is-visible",
+          "width": 984,
+          "height": 149.546875,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 984,
+          "height": 40.859375,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar",
+          "width": 984,
+          "height": 83.375,
+          "font": "",
+          "padding": "12px 16px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "16px"
+        }
+      ]
+    },
+    "visited": 27,
+    "failures": []
+  },
+  {
+    "kind": "map",
+    "width": 1280,
+    "height": 1000,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "dispatch-pro-hero dispatch-map-premium__hero d-page-hero d-page-hero--workflow",
+          "width": 984,
+          "height": 223.234375,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 984,
+          "height": 40.859375,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        }
+      ]
+    },
+    "visited": 21,
+    "failures": []
+  },
+  {
+    "kind": "assignment",
+    "width": 1280,
+    "height": 1000,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "decision-config-hero dispatch-pro-hero assignment-config-hero d-page-hero d-page-hero--workflow",
+          "width": 984,
+          "height": 201.546875,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 984,
+          "height": 40.859375,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar d-workflow-action-bar--config",
+          "width": 984,
+          "height": 80,
+          "font": "",
+          "padding": "12px 16px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "16px"
+        }
+      ]
+    },
+    "visited": 36,
+    "failures": []
+  },
+  {
+    "kind": "scheduling",
+    "width": 1280,
+    "height": 1000,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "decision-config-hero dispatch-pro-hero assignment-config-hero d-page-hero d-page-hero--workflow",
+          "width": 984,
+          "height": 223.234375,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 984,
+          "height": 40.859375,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar d-workflow-action-bar--config",
+          "width": 984,
+          "height": 80,
+          "font": "",
+          "padding": "12px 16px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "16px"
+        }
+      ]
+    },
+    "visited": 28,
+    "failures": []
+  },
+  {
+    "kind": "data",
+    "width": 1024,
+    "height": 1000,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "dispatch-pro-hero d-page-hero d-page-hero--workflow d-page-hero--copy-only is-visible",
+          "width": 742,
+          "height": 141.359375,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 742,
+          "height": 32.671875,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar",
+          "width": 742,
+          "height": 144.546875,
+          "font": "",
+          "padding": "12px 16px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "16px"
+        }
+      ]
+    },
+    "visited": 27,
+    "failures": []
+  },
+  {
+    "kind": "map",
+    "width": 1024,
+    "height": 1000,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "dispatch-pro-hero dispatch-map-premium__hero d-page-hero d-page-hero--workflow",
+          "width": 742,
+          "height": 215.046875,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 742,
+          "height": 32.671875,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        }
+      ]
+    },
+    "visited": 21,
+    "failures": []
+  },
+  {
+    "kind": "assignment",
+    "width": 1024,
+    "height": 1000,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "decision-config-hero dispatch-pro-hero assignment-config-hero d-page-hero d-page-hero--workflow",
+          "width": 742,
+          "height": 193.359375,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 742,
+          "height": 32.671875,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar d-workflow-action-bar--config",
+          "width": 742,
+          "height": 130.359375,
+          "font": "",
+          "padding": "12px 16px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "16px"
+        }
+      ]
+    },
+    "visited": 36,
+    "failures": []
+  },
+  {
+    "kind": "scheduling",
+    "width": 1024,
+    "height": 1000,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "decision-config-hero dispatch-pro-hero assignment-config-hero d-page-hero d-page-hero--workflow",
+          "width": 742,
+          "height": 215.046875,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 742,
+          "height": 32.671875,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar d-workflow-action-bar--config",
+          "width": 742,
+          "height": 130.359375,
+          "font": "",
+          "padding": "12px 16px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "16px"
+        }
+      ]
+    },
+    "visited": 28,
+    "failures": []
+  },
+  {
+    "kind": "data",
+    "width": 768,
+    "height": 1000,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "dispatch-pro-hero d-page-hero d-page-hero--workflow d-page-hero--copy-only is-visible",
+          "width": 660,
+          "height": 140.59375,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 660,
+          "height": 31.90625,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar",
+          "width": 660,
+          "height": 183.984375,
+          "font": "",
+          "padding": "12px 16px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "16px"
+        }
+      ]
+    },
+    "visited": 27,
+    "failures": []
+  },
+  {
+    "kind": "map",
+    "width": 768,
+    "height": 1000,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "dispatch-pro-hero dispatch-map-premium__hero d-page-hero d-page-hero--workflow",
+          "width": 660,
+          "height": 214.28125,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 660,
+          "height": 31.90625,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        }
+      ]
+    },
+    "visited": 21,
+    "failures": []
+  },
+  {
+    "kind": "assignment",
+    "width": 768,
+    "height": 1000,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "decision-config-hero dispatch-pro-hero assignment-config-hero d-page-hero d-page-hero--workflow",
+          "width": 660,
+          "height": 192.59375,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 660,
+          "height": 31.90625,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar d-workflow-action-bar--config",
+          "width": 660,
+          "height": 130.359375,
+          "font": "",
+          "padding": "12px 16px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "16px"
+        }
+      ]
+    },
+    "visited": 36,
+    "failures": []
+  },
+  {
+    "kind": "scheduling",
+    "width": 768,
+    "height": 1000,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "decision-config-hero dispatch-pro-hero assignment-config-hero d-page-hero d-page-hero--workflow",
+          "width": 660,
+          "height": 214.28125,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 660,
+          "height": 31.90625,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar d-workflow-action-bar--config",
+          "width": 660,
+          "height": 130.359375,
+          "font": "",
+          "padding": "12px 16px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "16px"
+        }
+      ]
+    },
+    "visited": 28,
+    "failures": []
+  },
+  {
+    "kind": "data",
+    "width": 390,
+    "height": 844,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "dispatch-pro-hero d-page-hero d-page-hero--workflow d-page-hero--copy-only is-visible",
+          "width": 298,
+          "height": 162.28125,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 298,
+          "height": 31.90625,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar",
+          "width": 298,
+          "height": 210.59375,
+          "font": "",
+          "padding": "12px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "10px"
+        }
+      ]
+    },
+    "visited": 27,
+    "failures": []
+  },
+  {
+    "kind": "map",
+    "width": 390,
+    "height": 844,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "dispatch-pro-hero dispatch-map-premium__hero d-page-hero d-page-hero--workflow",
+          "width": 298,
+          "height": 235.96875,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 298,
+          "height": 31.90625,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        }
+      ]
+    },
+    "visited": 21,
+    "failures": []
+  },
+  {
+    "kind": "assignment",
+    "width": 390,
+    "height": 844,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "decision-config-hero dispatch-pro-hero assignment-config-hero d-page-hero d-page-hero--workflow",
+          "width": 298,
+          "height": 278.1875,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 298,
+          "height": 63.8125,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar d-workflow-action-bar--config",
+          "width": 298,
+          "height": 207.34375,
+          "font": "",
+          "padding": "12px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "10px"
+        }
+      ]
+    },
+    "visited": 36,
+    "failures": []
+  },
+  {
+    "kind": "scheduling",
+    "width": 390,
+    "height": 844,
+    "baseline": {
+      "overflow": false,
+      "style": [
+        {
+          "class": "decision-config-hero dispatch-pro-hero assignment-config-hero d-page-hero d-page-hero--workflow",
+          "width": 298,
+          "height": 299.875,
+          "font": "",
+          "padding": "20px 0px 24px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "",
+          "gap": "16px"
+        },
+        {
+          "class": "",
+          "width": 298,
+          "height": 63.8125,
+          "font": "",
+          "padding": "0px",
+          "radius": "0px",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "0px none rgb(243, 248, 250)",
+          "gap": "normal"
+        },
+        {
+          "class": "d-workflow-action-bar d-workflow-action-bar--config",
+          "width": 298,
+          "height": 207.34375,
+          "font": "",
+          "padding": "12px",
+          "radius": "8px",
+          "background": "rgb(19, 27, 34)",
+          "border": "1px solid rgba(145, 189, 199, 0.28)",
+          "gap": "10px"
+        }
+      ]
+    },
+    "visited": 28,
+    "failures": []
+  }
+]

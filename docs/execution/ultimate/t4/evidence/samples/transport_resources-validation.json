@@ -1,0 +1,167 @@
+{
+  "valid": true,
+  "schema": "transport_resources_v1",
+  "contract_hash": "a0c4ab7e8a3d98643918e72850dac818afcaa85e5a20b692da4859a1a96d8e4d",
+  "errors": [],
+  "warnings": [],
+  "counts": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "rows": 5,
+  "columns": 15,
+  "preview": [
+    {
+      "resource_id": "RES-001",
+      "source": "OWN",
+      "guaranteed_capacity": {
+        "pallets": "20",
+        "weight_kg": null,
+        "volume_m3": null,
+        "units": null
+      },
+      "maximum_capacity": null,
+      "lanes": [
+        [
+          "ORIGIN-01",
+          "DEST-01"
+        ]
+      ],
+      "compatibility_groups": [
+        "DRY"
+      ],
+      "units_available": 1,
+      "base_origin_id": "ORIGIN-01",
+      "operating_cost_per_km": "1",
+      "services_available": null,
+      "availability_source": null,
+      "external_cost": null
+    },
+    {
+      "resource_id": "RES-002",
+      "source": "EXTERNAL",
+      "guaranteed_capacity": {
+        "pallets": "20",
+        "weight_kg": null,
+        "volume_m3": null,
+        "units": null
+      },
+      "maximum_capacity": null,
+      "lanes": [
+        [
+          "ORIGIN-01",
+          "DEST-01"
+        ]
+      ],
+      "compatibility_groups": [
+        "DRY"
+      ],
+      "units_available": null,
+      "base_origin_id": null,
+      "operating_cost_per_km": null,
+      "services_available": 1,
+      "availability_source": "CONFIRMED",
+      "external_cost": {
+        "cost_model": "PER_KM",
+        "rate": "1",
+        "billing_basis": "ONE_WAY"
+      }
+    },
+    {
+      "resource_id": "RES-003",
+      "source": "OWN",
+      "guaranteed_capacity": {
+        "pallets": "20",
+        "weight_kg": null,
+        "volume_m3": null,
+        "units": null
+      },
+      "maximum_capacity": null,
+      "lanes": [
+        [
+          "ORIGIN-01",
+          "DEST-01"
+        ]
+      ],
+      "compatibility_groups": [
+        "DRY"
+      ],
+      "units_available": 1,
+      "base_origin_id": "ORIGIN-01",
+      "operating_cost_per_km": "1",
+      "services_available": null,
+      "availability_source": null,
+      "external_cost": null
+    },
+    {
+      "resource_id": "RES-004",
+      "source": "EXTERNAL",
+      "guaranteed_capacity": {
+        "pallets": "20",
+        "weight_kg": null,
+        "volume_m3": null,
+        "units": null
+      },
+      "maximum_capacity": null,
+      "lanes": [
+        [
+          "ORIGIN-01",
+          "DEST-01"
+        ]
+      ],
+      "compatibility_groups": [
+        "DRY"
+      ],
+      "units_available": null,
+      "base_origin_id": null,
+      "operating_cost_per_km": null,
+      "services_available": 1,
+      "availability_source": "CONFIRMED",
+      "external_cost": {
+        "cost_model": "PER_KM",
+        "rate": "1",
+        "billing_basis": "ONE_WAY"
+      }
+    },
+    {
+      "resource_id": "RES-005",
+      "source": "OWN",
+      "guaranteed_capacity": {
+        "pallets": "20",
+        "weight_kg": null,
+        "volume_m3": null,
+        "units": null
+      },
+      "maximum_capacity": null,
+      "lanes": [
+        [
+          "ORIGIN-01",
+          "DEST-01"
+        ]
+      ],
+      "compatibility_groups": [
+        "DRY"
+      ],
+      "units_available": 1,
+      "base_origin_id": "ORIGIN-01",
+      "operating_cost_per_km": "1",
+      "services_available": null,
+      "availability_source": null,
+      "external_cost": null
+    }
+  ],
+  "summary": {
+    "semantic_entity": "transport_resources",
+    "record_count": 5,
+    "assumptions": [],
+    "assumptions_total": 0,
+    "assumptions_truncated": false,
+    "assumed_external_count": 0,
+    "unknown_availability_count": 0,
+    "unknown_cost_count": 0,
+    "source_counts": {
+      "OWN": 3,
+      "EXTERNAL": 2
+    }
+  }
+}

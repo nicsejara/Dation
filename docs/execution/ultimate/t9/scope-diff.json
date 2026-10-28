@@ -1,0 +1,164 @@
+{
+  "phase": "T9",
+  "baseline_head": "ef997235a30251fbf7ae53690ed738092ee973d8",
+  "comparison": "Immediate post-T8 checkpoint",
+  "source_files": 21,
+  "created": [
+    "backend/app/engines/scheduling/day_contracts.py",
+    "backend/app/engines/scheduling/day_metrics.py",
+    "backend/app/engines/scheduling/day_scheduling.py",
+    "backend/app/engines/scheduling/day_validator.py",
+    "backend/app/results/day_assembler.py",
+    "backend/app/results/day_projections.py",
+    "backend/app/results/day_validation.py",
+    "backend/tests/day_fixtures.py",
+    "backend/tests/e2e/test_ultimate_d2_lineage.py",
+    "backend/tests/e2e/ultimate_day_fixture.py",
+    "backend/tests/test_day_result_package.py",
+    "backend/tests/test_day_scheduling_core.py",
+    "supabase/migrations/20261027175943_ultimate_day_scheduling.sql"
+  ],
+  "modified": [
+    "backend/app/engines/common/day_resource_feasibility.py",
+    "backend/app/results/ai_context.py",
+    "backend/app/results/assembler.py",
+    "backend/app/results/registry.py",
+    "backend/app/results/validation.py",
+    "backend/app/routes/results.py",
+    "backend/app/services/decision_graph_service.py",
+    "backend/app/services/ultimate_run_service.py"
+  ],
+  "files": {
+    "backend/app/engines/common/day_resource_feasibility.py": {
+      "bytes": 7017,
+      "sha256": "40c0fc6255614e1406997ac8ede926fc3c7bc057a89da24bb7c9c7eadd783987",
+      "baseline_sha256": "07070db298fe8e71f1a2f5067252ffaf8b3def3110fe78dad47bbd66e7d5c348",
+      "baseline": "post-T8 checkpoint"
+    },
+    "backend/app/engines/scheduling/day_contracts.py": {
+      "bytes": 2622,
+      "sha256": "ccb80736a3fa70c07c426f5237bf14ac188d2123068904d7402768225e3775b3",
+      "baseline_sha256": null,
+      "baseline": "new T9 file"
+    },
+    "backend/app/engines/scheduling/day_metrics.py": {
+      "bytes": 1379,
+      "sha256": "2095d23114490eafa96f69c92665dc10384b1398d7363cb5382ca85a706d53b0",
+      "baseline_sha256": null,
+      "baseline": "new T9 file"
+    },
+    "backend/app/engines/scheduling/day_scheduling.py": {
+      "bytes": 13279,
+      "sha256": "437262d14b40e3e6dcce4c97a01809658c23c915f0bc59c75fb5697a401ce6a8",
+      "baseline_sha256": null,
+      "baseline": "new T9 file"
+    },
+    "backend/app/engines/scheduling/day_validator.py": {
+      "bytes": 4751,
+      "sha256": "f6c8b0876f78d48c2fc1d568ae600a7b19ea71a6ac808d6a41fd5f3f0b9ad10a",
+      "baseline_sha256": null,
+      "baseline": "new T9 file"
+    },
+    "backend/app/results/ai_context.py": {
+      "bytes": 3073,
+      "sha256": "98f60814695ee8eab64b68cfb6de4919cdde0c0f20eeae39ddecb40cb2122e7b",
+      "baseline_sha256": "02aa9104ecc5f79394a755d05dc5a863a0f7c1c2889523ded643c86f131039e5",
+      "baseline": "post-T8 checkpoint"
+    },
+    "backend/app/results/assembler.py": {
+      "bytes": 14199,
+      "sha256": "c9b55d686ce5c1bc5965b1a52f5ca91d4006ae68095ecc8e2ec37ced0ae82074",
+      "baseline_sha256": "881fdd43db3a4c43ff9492058c9d34b99dc35f55408ba28d1eff9b4692da217e",
+      "baseline": "post-T8 checkpoint"
+    },
+    "backend/app/results/day_assembler.py": {
+      "bytes": 5910,
+      "sha256": "a64240575317b6e3a250fe4d87730d6d4b15cc8d7247b5d01892d114d490ee2b",
+      "baseline_sha256": null,
+      "baseline": "new T9 file"
+    },
+    "backend/app/results/day_projections.py": {
+      "bytes": 5390,
+      "sha256": "05f96484e8f5798141e812a4f87c0d39658708db7493a064a7da7500a71f3eec",
+      "baseline_sha256": null,
+      "baseline": "new T9 file"
+    },
+    "backend/app/results/day_validation.py": {
+      "bytes": 4071,
+      "sha256": "566a111860661fe29b748eb011e3c68abbb41d5411cbbee61418e2a236c660db",
+      "baseline_sha256": null,
+      "baseline": "new T9 file"
+    },
+    "backend/app/results/registry.py": {
+      "bytes": 10857,
+      "sha256": "34f0f86a29d14c5fdd1f9d8514ee69cb202b6c9c4ba59b6be7c189886c1ad15b",
+      "baseline_sha256": "d183a4374bbbe0552aeab0c8098e724f82fb4e7dd0dc27ade7a4755747d10591",
+      "baseline": "post-T8 checkpoint"
+    },
+    "backend/app/results/validation.py": {
+      "bytes": 20045,
+      "sha256": "879b2f0c7aa54b73b02307e317519a7b2319c9e03b872a765a47842a5621e975",
+      "baseline_sha256": "29992a6e3e90b0b9f98efeb82e6073ef4ae361456f78aee312b1d13284c71ed9",
+      "baseline": "post-T8 checkpoint"
+    },
+    "backend/app/routes/results.py": {
+      "bytes": 2122,
+      "sha256": "cbab534afc7459d94fafdf4601c153157fd7cc38d4ae4d7e4bdac369b0057ebb",
+      "baseline_sha256": "6e7dde88f7be5be07681029c07da7f236884e0998373e99e641ee0f2acc7413d",
+      "baseline": "post-T8 checkpoint"
+    },
+    "backend/app/services/decision_graph_service.py": {
+      "bytes": 4273,
+      "sha256": "cbbde56f862a74146275a28a58544a05f9e703c98b6551c2e2719494844ee8a4",
+      "baseline_sha256": "0cdac724845a340524c7715199986a43bb2b4e4a9b7f09204bd5fe26f827ce96",
+      "baseline": "post-T8 checkpoint"
+    },
+    "backend/app/services/ultimate_run_service.py": {
+      "bytes": 11450,
+      "sha256": "d2a2f46d7fad8b34669fff608fd4444dc8b51a6d619aec739a17d4be8a2e7220",
+      "baseline_sha256": "7e68f866fcda6709faaadbd11db36c8491f78cd1eccfc414b9842e8fdfe2423c",
+      "baseline": "post-T8 checkpoint"
+    },
+    "backend/tests/day_fixtures.py": {
+      "bytes": 1882,
+      "sha256": "34f5f7d49c007a31e621e0e16af736d5201cf401a0573734b50e76dec0943793",
+      "baseline_sha256": null,
+      "baseline": "new T9 file"
+    },
+    "backend/tests/e2e/test_ultimate_d2_lineage.py": {
+      "bytes": 10693,
+      "sha256": "538e9e8ad1d19b76b606df4159ea1063f7fd88a9a736ed3b41fec387b89ef837",
+      "baseline_sha256": null,
+      "baseline": "new T9 file"
+    },
+    "backend/tests/e2e/ultimate_day_fixture.py": {
+      "bytes": 660,
+      "sha256": "40c764831014c0977143babcf98377121ac719e9a92629e585e229c3b985789c",
+      "baseline_sha256": null,
+      "baseline": "new T9 file"
+    },
+    "backend/tests/test_day_result_package.py": {
+      "bytes": 7973,
+      "sha256": "5279677fa3ba0a707993fc38d85147e78549354e35a73a7cdbc20a6a767d2f97",
+      "baseline_sha256": null,
+      "baseline": "new T9 file"
+    },
+    "backend/tests/test_day_scheduling_core.py": {
+      "bytes": 6463,
+      "sha256": "163e66996c06e8d23a01da5cffec44e8ce1ce8f3bf131642be27c5f0d580a8cc",
+      "baseline_sha256": null,
+      "baseline": "new T9 file"
+    },
+    "supabase/migrations/20261027175943_ultimate_day_scheduling.sql": {
+      "bytes": 31069,
+      "sha256": "b80474f89988521ecc4b76a4f27f095ba69ee72c075c3b0c428f2187d3643805",
+      "baseline_sha256": null,
+      "baseline": "new T9 file"
+    }
+  },
+  "frontend_changes": false,
+  "D1_assignment_math_changes": false,
+  "production_infrastructure_changes": false,
+  "public_admissions_enabled": false,
+  "T10_executed": false
+}

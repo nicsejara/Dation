@@ -1,0 +1,31 @@
+{
+  "phase": "T4",
+  "verified_at": "2026-10-26T19:40:03.855655+00:00",
+  "head": "ef997235a30251fbf7ae53690ed738092ee973d8",
+  "branch": "main",
+  "cached_origin_main": "ef997235a30251fbf7ae53690ed738092ee973d8",
+  "remote_verification_this_phase": false,
+  "status_short_branch": "## main...origin/main\n M backend/app/domain/decision_cases.py\n M backend/app/platform/data_hub.py\n M backend/app/platform/data_routes.py\n M backend/app/platform/decision_center.py\n M backend/app/platform/decision_routes.py\n M backend/app/platform/home.py\n M backend/app/platform/identity.py\n M backend/app/platform/repository.py\n M backend/app/platform/routes.py\n M backend/app/services/decision_case_service.py\n M backend/app/static/css/dation-design-system.css\n M backend/app/static/css/dda-logistics-upload.css\n M backend/app/static/css/dispatch.css\n M backend/app/static/css/scheduling-dashboard-v21.css\n M backend/app/static/css/workflow-context.css\n M backend/app/static/js/dispatch/navigation/resource.mjs\n M backend/app/static/js/dispatch/workspace.mjs\n M backend/app/static/js/platform/data-hub.mjs\n M backend/app/static/js/platform/data-presentation.mjs\n M backend/app/static/js/platform/dda-navigation.mjs\n M backend/app/templates/app.html\n M backend/tests/browser/test_navigation.py\n M backend/tests/browser/test_saga4_ui.py\n M backend/tests/browser/test_workflow_context.py\n M backend/tests/e2e/activity_journey.py\n M backend/tests/e2e/browser_auth.py\n M backend/tests/e2e/browser_journey.py\n M backend/tests/e2e/collaboration_approval_journey.py\n M backend/tests/e2e/collaboration_journey.py\n M backend/tests/e2e/entitlements_journey.py\n M backend/tests/e2e/golden_journey.py\n M backend/tests/e2e/home_resume_journey.py\n M backend/tests/e2e/onboarding_journey.py\n M backend/tests/e2e/platform_journey.py\n M backend/tests/e2e/scheduling_dashboard_journey.py\n M backend/tests/e2e/test_collaboration.py\n M backend/tests/e2e/test_decision_center.py\n M backend/tests/e2e/test_optimized_responsibilities.py\n M backend/tests/e2e/test_tenancy.py\n M backend/tests/e2e/test_v2_foundation.py\n M backend/tests/e2e/test_workflow.py\n M backend/tests/e2e/test_workflow_gates.py\n M backend/tests/e2e/workflow_fixture.py\n M backend/tests/e2e/workflow_ui_audit.py\n M backend/tests/e2e/workspace_settings_journey.py\n?? DATION_FINAL_MASTER_EXECUTION_PLAN.md\n?? backend/app/domain/logistics/\n?? backend/app/models/ultimate_data_pack.py\n?? backend/app/models/ultimate_foundation.py\n?? backend/app/platform/ultimate_data_routes.py\n?? backend/app/platform/ultimate_routes.py\n?? backend/app/results/\n?? backend/app/services/case_data_pack_service.py\n?? backend/app/services/logistics_model_service.py\n?? backend/app/static/contracts/result-contracts-v1.json\n?? backend/app/static/css/ultimate-case-data.css\n?? backend/app/static/css/ultimate-foundation.css\n?? backend/app/static/js/dispatch/cases/ultimate-case-setup.mjs\n?? backend/app/static/js/dispatch/models/\n?? backend/app/static/js/dispatch/upload/ultimate-case-data.mjs\n?? backend/tests/browser/test_ultimate_case_data.py\n?? backend/tests/browser/test_ultimate_case_setup.py\n?? backend/tests/e2e/test_home_owner_attention.py\n?? backend/tests/e2e/ultimate_data_fixture.py\n?? backend/tests/e2e/ultimate_setup_fixture.py\n?? backend/tests/e2e/ultimate_storage_gateway.py\n?? backend/tests/fixtures/ultimate/\n?? backend/tests/integration/test_ultimate_case_models.py\n?? backend/tests/integration/test_ultimate_data_pack.py\n?? backend/tests/integration/test_ultimate_schema.py\n?? backend/tests/integration/ultimate_sql_support.py\n?? backend/tests/test_ultimate_case_models.py\n?? backend/tests/test_ultimate_case_navigation.mjs\n?? backend/tests/test_ultimate_contracts.py\n?? backend/tests/test_ultimate_data_contracts.py\n?? backend/tests/test_ultimate_data_navigation.mjs\n?? backend/tests/test_ultimate_readers.py\n?? backend/tests/test_ultimate_transit.py\n?? backend/tests/ultimate_fixtures.py\n?? docs/execution/\n?? docs/ultimate-mvp-implementation-master-plan.md\n?? supabase/migrations/20261026010000_home_decision_owner_attention.sql\n?? supabase/migrations/20261026143813_ultimate_foundation.sql\n?? supabase/migrations/20261026144259_ultimate_result_artifacts.sql\n?? supabase/migrations/20261026161050_ultimate_case_models.sql\n?? supabase/migrations/20261026184655_ultimate_progressive_data_pack.sql",
+  "staged": [],
+  "working_tree_clean": false,
+  "scope": {
+    "source_test_migration_files": 25,
+    "created": 14,
+    "modified": 11,
+    "baseline_pending": 507,
+    "baseline_current_unchanged": 500,
+    "baseline_intentionally_extended": 7,
+    "unexpected_mutations": []
+  },
+  "candidate_hashes_verified": true,
+  "historical_T3_entries_verified": 144,
+  "git_diff_check": "PASS",
+  "all_required_suites": "PASS",
+  "secret_token_scan_findings": [],
+  "local_QA_cleanup": "PASS",
+  "commit_created": false,
+  "push": false,
+  "deploy": false,
+  "production_changes": false,
+  "T5_executed": false
+}

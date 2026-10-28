@@ -14,6 +14,7 @@ import {renderExecutionProgress} from './runs/execution-progress.mjs';
 import {responsibilityProblem} from './cases/workflow-responsibility.mjs';
 import {confirmNewRun} from './runs/new-run-warning.mjs';
 import {currentLogisticsEnabled,logisticsView} from '../platform/entitlements.mjs';
+import {mountFoundationEntry} from './models/entry.mjs';
 
 const KEY='dation.dispatch.workspace.v5';
 const NAV_VERSION='workspace-nav-v1';
@@ -798,6 +799,9 @@ export async function show(run){
 }
 
 for(const [key,view]of [['data','logistics-data'],['map','logistics-map'],['config','logistics-config'],['dashboard','decision-dashboard']])roots[key]=root(view,'dispatch-'+key+'-root');
+roots.models=root('logistics-models','ultimate-models-root');
+roots.caseSetup=root('logistics-case-setup','ultimate-case-setup-root');
+roots.caseData=root('logistics-case-data','ultimate-case-data-root');
 
 async function ensurePersistedCase(generation=routeGeneration,applyIdentity=false,deferIdentity=false){
   const current=state.decisionCase;if(!current)return;
@@ -830,6 +834,11 @@ async function ensurePersistedCase(generation=routeGeneration,applyIdentity=fals
 async function hydrateCase(caseId,generation=routeGeneration,expectedInputs=null){
   const item=await api('/api/decision-cases/'+caseId,{signal:routeController?.signal});
   if(generation!==routeGeneration)return;
+  if(item.case?.workflow_version===2){
+    state.ultimateCaseContext=item.case;state.decisionCase=null;state.orders=null;state.fleet=null;state.workflow=null;
+    return {ultimate:true,case:item.case};
+  }
+  state.ultimateCaseContext=null;state.ultimateGraph=null;
   if(expectedInputs&&(state.decisionCase?.id!==caseId||inputSignature(state.orders,state.fleet)!==expectedInputs))return;
   if(String(item.decision_case?.id)!==String(caseId)||String(item.orders?.id)!==String(item.decision_case?.inputs?.orders_dataset_id||item.case?.orders_dataset_id)||String(item.fleet?.id)!==String(item.decision_case?.inputs?.fleet_dataset_id||item.case?.fleet_dataset_id))throw new Error('El Decision Case no coincide con su Data Pack.');
   if(state.decisionCase?.id!==caseId){saveDraft();resetAssignmentConfiguration();Object.assign(state,cleanDraft(drafts[caseId]));state.preflight=null;state.configPreview=null;state.run=null;transitionCaseId=null;}
@@ -840,16 +849,19 @@ async function hydrateCase(caseId,generation=routeGeneration,expectedInputs=null
   state.orders=item.orders;state.fleet=item.fleet;state.decisionCase={...item.decision_case,status:item.case.status,label:item.case.label,category:item.case.category,description:item.case.description,attributes_applied_at:item.case.attributes_applied_at,collaboration:item.collaboration,persisted:true};state.workflow=item.workflow_responsibilities||null;state.caseContext=caseContext({...item.case,context:item.context});persist();return item;
 }
 async function navigateResource(view,options={}){
+  if(options.history!==false&&window.dationUltimateCanLeave&&!window.dationUltimateCanLeave())return;
   if(view==='inicio')view='platform-home';
   if(logisticsView(view)&&!currentLogisticsEnabled()){
     return navigateResource('inicio',{replace:true,caseId:null,nodeId:null});
   }
   const aliases={overview:'logistics-overview',library:'traceability'};
   const publicView=Object.entries(aliases).find(([,value])=>value===view)?.[0]||view;
-  const next={view:publicView,caseId:!['logistics-data','logistics-map','logistics-config','decision-dashboard'].includes(publicView)?null:options.caseId===undefined?state.decisionCase?.id||null:options.caseId,nodeId:options.nodeId===undefined?state.activeNode:options.nodeId,runId:options.runId||(publicView==='decision-dashboard'?state.run?.id||resource?.runId:null)};
+  const next={view:publicView,caseId:!['logistics-data','logistics-map','logistics-config','decision-dashboard','logistics-case-setup','logistics-case-data'].includes(publicView)?null:['logistics-case-setup','logistics-case-data'].includes(publicView)?(options.caseId||null):options.caseId===undefined?state.decisionCase?.id||state.ultimateCaseContext?.id||null:options.caseId,nodeId:options.nodeId===undefined?state.activeNode:options.nodeId,runId:options.runId||(publicView==='decision-dashboard'?state.run?.id||resource?.runId:null)};
+  if(['logistics-models','logistics-case-setup'].includes(publicView))next.modelId=options.modelId||null;
   saveDraft();routeController?.abort();routeController=new AbortController();const generation=++routeGeneration;
   runPolling.stop();pollGeneration++;
-  for(const root of Object.values(roots)){disposeScope(root);root.replaceChildren();root.className='dispatch';}
+  for(const root of Object.values(roots)){disposeScope(root);root.replaceChildren();root.className='dispatch';delete root.dataset.ultimateReady;delete root.dataset.graphReady;}
+  state.ultimateGraph=null;
   resource=next;
   if(publicView==='platform-data')next.hub=options.hub||{};
   if(publicView==='platform-decisions')next.center=options.center||{};
@@ -859,12 +871,36 @@ async function navigateResource(view,options={}){
   document.body.classList.toggle('dispatch-result',publicView==='decision-dashboard');
   renderView(aliases[publicView]||publicView);
   if(options.render===false)return;
-  const root=roots[{'logistics-data':'data','logistics-map':'map','logistics-config':'config','decision-dashboard':'dashboard'}[publicView]];
+  const root=roots[{'logistics-data':'data','logistics-map':'map','logistics-config':'config','decision-dashboard':'dashboard','logistics-models':'models','logistics-case-setup':'caseSetup','logistics-case-data':'caseData'}[publicView]];
   if(!root)return;
   root.hidden=false;
   createScope(root);
   try{
-    if(next.caseId){try{await hydrateCase(next.caseId,generation);}catch(error){if(!(error.status===404&&state.decisionCase?.id===next.caseId&&!state.decisionCase.persisted&&state.orders&&state.fleet))throw error;}}
+    if(publicView==='logistics-case-data'){
+      const {mountCaseData}=await import('./upload/ultimate-case-data.mjs');
+      if(generation===routeGeneration)await mountCaseData(root,{route:next,navigate:navigateResource,onContext:(row,graph)=>{if(generation!==routeGeneration)return;state.ultimateCaseContext=row;state.ultimateGraph=graph;window.dationRenderContextNavigation?.();}});
+      return;
+    }
+    if(publicView==='logistics-models'||publicView==='logistics-case-setup'){
+      if(publicView==='logistics-models'){const {mountModels}=await import('./models/index.mjs');if(generation===routeGeneration)await mountModels(root,{route:next,navigate:navigateResource});}
+      else{const {mountCaseSetup}=await import('./cases/ultimate-case-setup.mjs');if(generation===routeGeneration)await mountCaseSetup(root,{route:next,navigate:navigateResource,onContext:result=>{state.ultimateCaseContext=result.case;window.dationRenderContextNavigation?.();}});}
+      if(generation===routeGeneration)window.dationRenderContextNavigation?.();return;
+    }
+    if(next.caseId){try{
+      const loaded=await hydrateCase(next.caseId,generation);
+      if(generation!==routeGeneration)return;
+      if(loaded?.ultimate){
+        if(publicView==='logistics-data')return navigateResource('logistics-case-data',{caseId:next.caseId,nodeId:null,runId:null,replace:true});
+        if(publicView==='decision-dashboard'){
+          const {mountUltimateResult}=await import('./results/mount.mjs');
+          if(generation===routeGeneration)await mountUltimateResult(root,{route:next,navigate:navigateResource,onContext:(row,graph)=>{if(generation!==routeGeneration)return;state.ultimateCaseContext=row;state.ultimateGraph=graph;window.dationRenderContextNavigation?.();}});
+          return;
+        }
+        const {mountUltimateGraph}=await import('./cases/ultimate-decision-map.mjs');
+        if(generation===routeGeneration)await mountUltimateGraph(root,{route:next,navigate:navigateResource,onContext:(row,graph)=>{if(generation!==routeGeneration)return;state.ultimateCaseContext=row;state.ultimateGraph=graph;window.dationRenderContextNavigation?.();}});
+        return;
+      }
+    }catch(error){if(!(error.status===404&&state.decisionCase?.id===next.caseId&&!state.decisionCase.persisted&&state.orders&&state.fleet))throw error;}}
     if(generation!==routeGeneration)return;
     if(publicView==='logistics-data')await loadData();
     if(publicView==='logistics-map')await loadDecisionMap();
@@ -879,7 +915,7 @@ async function navigateResource(view,options={}){
       if(!next.runId)throw new Error('Seleccioná una corrida para abrir su resultado.');
       pending('recovering');poll(next.runId,pollGeneration,next.nodeId);
     }
-  }catch(error){if(generation===routeGeneration&&!routeController.signal.aborted)errorBox(root,error,()=>navigateResource(view,{...options,replace:true}));}
+  }catch(error){if(generation===routeGeneration&&!routeController.signal.aborted){if(error.ultimateCaseId)return navigateResource('logistics-case-setup',{caseId:error.ultimateCaseId,replace:true});errorBox(root,error,()=>navigateResource(view,{...options,replace:true}));}}
 }
 async function openRun(id,nodeId=state.activeNode,caseId=state.decisionCase?.id){return navigateResource('decision-dashboard',{runId:id,nodeId,caseId});}
 async function executeConfiguredScheduling({sourceRun,configuration,options}){
@@ -897,6 +933,7 @@ window.DationDispatch.openCaseInDecisionCenter=caseId=>window.DationDispatch.ope
 window.DationDispatch.openDashboard=(caseId,nodeId,runId)=>openRun(runId,nodeId,caseId);
 window.DationDispatch.openWorkspaceSettings=settingsTab=>navigateResource('settings',{settingsTab,caseId:null,nodeId:null});
 window.DationDispatch.reuseHubData=inputs=>startNewDecision(inputs);
+mountFoundationEntry();
 document.body.classList.add('dispatch-enabled');
 mountTraceability();
 async function restoreResource(){try{const target=readResource(location.href);await navigateResource(target.view,{...target,history:false});}catch(error){if(location.pathname.replace(/\/$/,'')==='/app/settings')return navigateResource('settings',{history:false,settingsTab:'general',caseId:null,nodeId:null});if(location.pathname.replace(/\/$/,'')==='/app/data')return navigateResource('platform-data',{history:false,caseId:null,nodeId:null});if(location.pathname.replace(/\/$/,'')==='/app/decisions')return navigateResource('platform-decisions',{history:false,caseId:null,nodeId:null});document.body.classList.add('dispatch-result');renderView('decision-dashboard');roots.dashboard.hidden=false;errorBox(roots.dashboard,Object.assign(error,{kind:'navigation',actionLabel:'Volver al Data Pack'}),()=>navigate('logistics-data'));}}

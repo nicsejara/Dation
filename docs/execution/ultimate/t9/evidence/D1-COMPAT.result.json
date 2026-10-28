@@ -1,0 +1,20 @@
+{
+  "suite": "D1-COMPAT",
+  "status": "PASS",
+  "tests": 3,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "exit_code": 0,
+  "started_at": "2026-10-27T18:26:01.805583+00:00",
+  "finished_at": "2026-10-27T18:26:05.085155+00:00",
+  "seconds": 3.28,
+  "cwd": "/workspace/Dation/backend",
+  "command": [
+    "/workspace/Dation/.venv/bin/python",
+    "-B",
+    "/workspace/work/dation-t9/drivers/d1-compat.py"
+  ],
+  "production_credentials_cleared": true,
+  "log_sha256": "f333120ef6d421e3f664fa32de0e8bc9c5f164d5dae55ba52c85de87b437f980"
+}

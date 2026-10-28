@@ -1,0 +1,31 @@
+{
+  "suite": "B-PY",
+  "status": "PASS",
+  "started_at": "2026-10-25T22:43:04.721900+00:00",
+  "finished_at": "2026-10-25T22:43:20.821486+00:00",
+  "command": [
+    "/workspace/Dation/.venv/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-v"
+  ],
+  "cwd": "/workspace/Dation/backend",
+  "exit_code": 0,
+  "tests": 383,
+  "failures_count": 0,
+  "skipped": 0,
+  "failures": [],
+  "wall_seconds": 16.097,
+  "suite_reported_seconds": 14.895,
+  "log_path": "docs/execution/ultimate/t0/remediation/evidence/B-PY.log",
+  "log_sha256": "3dfa9f997dbca6c3f22b1c04d40efe4bdbaf3405a935a03258545e740f504604",
+  "production_credentials_cleared": true,
+  "docker_target": "local unix socket",
+  "sql_container": null,
+  "failed_test_cases_unique": 0,
+  "passed_test_cases": 383
+}

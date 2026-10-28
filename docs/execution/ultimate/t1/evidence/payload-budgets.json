@@ -1,0 +1,24 @@
+{
+  "fixture_kind": "hypothetical ABI fixtures, no engine or assembler producer",
+  "budgets": {
+    "package_bytes": 524288,
+    "visual_inline_bytes": 262144,
+    "evidence_chunk_bytes": 1048576,
+    "entities_per_chunk": 100,
+    "page_rows": 100,
+    "selected_entity_bytes": 51200
+  },
+  "measure": "canonical UTF-8 bytes",
+  "D1_package": 7534,
+  "D2_package": 6737,
+  "D1_inline_visual": 361,
+  "D2_inline_visual": 336,
+  "decision_context": 4263,
+  "selection_fixture": null,
+  "not_certified": [
+    "production performance",
+    "chunking",
+    "retrieval",
+    "payloads from real engines"
+  ]
+}

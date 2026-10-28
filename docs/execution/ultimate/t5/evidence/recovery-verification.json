@@ -1,0 +1,50 @@
+{
+  "verified_at": "2026-10-27T03:53:38.636913+00:00",
+  "head": "ef997235a30251fbf7ae53690ed738092ee973d8",
+  "branch": "main",
+  "checkpoint_files_verified": 627,
+  "T4_manifest_entries_verified": 147,
+  "baseline_files_unchanged": 626,
+  "baseline_files_extended": [
+    "backend/app/platform/routes.py"
+  ],
+  "pre_stop_T5_files": {
+    "backend/app/domain/logistics/definitions.py": {
+      "bytes": 3624,
+      "sha256": "022730dbeaa917c7a34b6df33a02d5f195857bb231691f9304f6c8bdde8b7c84"
+    },
+    "backend/app/domain/logistics/graph.py": {
+      "bytes": 6557,
+      "sha256": "ed95b4cead5316e898b48b50251fdc68fbaa45d9f1516e67bc40ffc5a31359b6"
+    },
+    "backend/app/domain/logistics/requirements.py": {
+      "bytes": 2583,
+      "sha256": "beee097eb8a8606d54ef092e6267899f903c5e2e83185a5acf4a81daea12cd60"
+    },
+    "backend/app/platform/routes.py": {
+      "bytes": 2066,
+      "sha256": "5e4b4979f072c95c5ce14976bb087423b09d9e873bab9083cf91f6dea090481b"
+    },
+    "backend/app/platform/ultimate_graph_routes.py": {
+      "bytes": 1123,
+      "sha256": "87d6d93c6cac0efdd994fbb39b885e8f9c185d07cf5dca5b38e77a394382692f"
+    },
+    "backend/app/services/decision_graph_service.py": {
+      "bytes": 2828,
+      "sha256": "ae1f64dff366d3096a3a05515ba20159e3aedb38ee2f5228c72428b8f0dc4f35"
+    },
+    "backend/tests/test_ultimate_graph.py": {
+      "bytes": 8992,
+      "sha256": "5a54b72e9ed5379de2cdb21fa184b292b08d79c57fd35def261fcc4371a31fc6"
+    },
+    "supabase/migrations/20261027033128_ultimate_decision_graph.sql": {
+      "bytes": 8475,
+      "sha256": "d7eee8e8e234a6aa68083d85a4a4536bad47546fe8cd46e5ed2253ccf596d9d7"
+    }
+  },
+  "U5_log_sha256": "ef3f873075b9753848795bc93527801c9ee39d79f2f5297d576ad9a1356d29fb",
+  "U5_pre_stop": "23 PASS",
+  "unexpected_or_missing_changes": [],
+  "staged": [],
+  "reset_clean_or_destructive_checkout": false
+}

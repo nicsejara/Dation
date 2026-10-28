@@ -1,0 +1,104 @@
+{
+  "phase": "T5",
+  "skills": [
+    {
+      "name": "design-system",
+      "source": ".agents/skills/design-system/SKILL.md",
+      "sha256": "655468bb723a6bc9d17fcb09a6a005e10e313d63b879f4d74fb2abdc3041ae3f",
+      "read": true,
+      "reading": "PRE-STOP T5 / same-conversation relevant guide reused on recovery; no full reread",
+      "applied": "Native Hero, cards, controls, states and semantic tokens; no generator.",
+      "verified": "Primitive and legacy Map pixel/style parity.",
+      "source_snapshot": "evidence/skills/design-system/SKILL.md"
+    },
+    {
+      "name": "emil-design-eng",
+      "source": ".agents/skills/emil-design-eng/SKILL.md",
+      "sha256": "ffbe68e6007fb42cb8149f089b400a1ca007d59ba23e8948e2be4476f3175939",
+      "read": true,
+      "reading": "PRE-STOP T5 / same-conversation relevant guide reused on recovery; no full reread",
+      "applied": "Focus/Escape/return, native selectors/dialog, scope disposal and reduced motion; no new animation.",
+      "verified": "W5/B-FOCUS and Before/After/Why report table.",
+      "source_snapshot": "evidence/skills/emil-design-eng/SKILL.md"
+    },
+    {
+      "name": "ui-ux-pro-max",
+      "source": ".agents/skills/ui-ux-pro-max/SKILL.md",
+      "sha256": "e5baf9400d4347e5ed3eb1f6b99cd0b9ba545b8b0e507aabb2b87397bbf73ea1",
+      "read": true,
+      "reading": "PRE-STOP T5 / same-conversation relevant guide reused on recovery; no full reread",
+      "applied": "Focused form/navigation/a11y guidance reused; no design system/palette generation.",
+      "verified": "W5 contrast, keyboard, touch and responsive.",
+      "source_snapshot": "evidence/skills/ui-ux-pro-max/SKILL.md"
+    },
+    {
+      "name": "break-ui",
+      "source": ".agents/skills/break-ui/SKILL.md",
+      "sha256": "e7eec1d70ac56a04255e9c0dbe98084ea3d544cc04aaad34f32c95d6fa9dff5e",
+      "read": true,
+      "reading": "PRE-STOP T5 / same-conversation relevant guide reused on recovery; no full reread",
+      "applied": "Schema-backed 120-character Unicode Case name, empty/one/multiple Cases, 320px and zoom200.",
+      "verified": "W5 fixtures/screenshots only; no commercial data or product toggle.",
+      "source_snapshot": "evidence/skills/break-ui/SKILL.md"
+    },
+    {
+      "name": "supabase:supabase",
+      "package": "c0/supabase",
+      "sha256": "d2f7ca35f2292dc711037506ef64b7a03da6adf96d30abd60c5d856b875dda8c",
+      "source_snapshot": "evidence/skills/supabase-skill.txt",
+      "read": true,
+      "reading": "PRE-STOP T5; runtime read again on recovery",
+      "applied": "Checked private snapshot/RPC, service-role-only grant, tenant/actor checks; official function docs.",
+      "verified": "S5, schema-boundary, version checks and cleanup."
+    },
+    {
+      "name": "supabase:supabase-postgres-best-practices",
+      "package": "c0/supabase-postgres-best-practices",
+      "sha256": "f5939ff6703520881ec40204deb519771cd8d597934932ececa8af4a622443c7",
+      "source_snapshot": "evidence/skills/postgres-skill.txt",
+      "read": true,
+      "reading": "PRE-STOP T5; runtime read again on recovery",
+      "applied": "Ordered locks, private snapshots, bounded/paged reads and existing ACL/RLS preservation.",
+      "verified": "S5, schema-boundary, version checks and cleanup."
+    },
+    {
+      "name": "cloud-environment:cloud-environment-runtime",
+      "package": "c5/cloud-environment-runtime",
+      "sha256": "de2ea16a5a8727be2a6cbf6a57d60c3eac1082119dd9685e69a2b8e83db120bc",
+      "source_snapshot": "evidence/skills/runtime-skill.txt",
+      "read": true,
+      "reading": "PRE-STOP T5; runtime read again on recovery",
+      "applied": "Executor recovery check, local Docker/runners, credential-cleared QA, owned cleanup.",
+      "verified": "S5, schema-boundary, version checks and cleanup."
+    }
+  ],
+  "references": [
+    "design-system/references/token-architecture.md",
+    "design-system/references/states-and-variants.md",
+    "break-ui/CATALOG.md",
+    "runtime-docker-reference.txt",
+    "runtime-networking-reference.txt",
+    "Postgres same-conversation RLS/index guidance"
+  ],
+  "omitted": [
+    {
+      "guidance": "Global redesign, palette/font/starter/framework or generated tokens",
+      "reason": "F01/F23 and user preservation constraint."
+    },
+    {
+      "guidance": "Motion audit / automatic review-animations",
+      "reason": "No new audit or animation authorized."
+    },
+    {
+      "guidance": "break-ui report-before-fixing approval pause",
+      "reason": "Explicit end-to-end T5 implementation authorization takes precedence."
+    },
+    {
+      "guidance": "Production SQL/Storage/deployment",
+      "reason": "Explicitly prohibited in T5."
+    }
+  ],
+  "required_dependencies_missing": [],
+  "application_dependencies_added": false,
+  "UI_preservation_gate": "PASS"
+}

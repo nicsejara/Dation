@@ -12,6 +12,7 @@ from app.platform.context import bind, current, job_context, worker_infrastructu
 from app.observability import bind_context, context, event, identify, metrics
 
 import httpx
+from fastapi import HTTPException
 
 from app.services import decision_case_service as cases
 from app.services import dispatch_service as dispatch
@@ -113,7 +114,12 @@ async def reconcile_cases(limit=10):
         case_id, version = task["case_id"], task["version"]
         try:
             with bind(job_context(task)):
-                await cases.sync_case_history(case_id)
+                try:
+                    await cases.sync_case_history(case_id)
+                except ValueError as exc:
+                    # Ultimate has no mutable legacy cache. The existing reader
+                    # identifies that cohort before making any projection write.
+                    if str(exc)!='El cache Ultimate no se actualiza mediante el workflow legacy.':raise
             with bind(job_context(task)):
                 await dispatch.db("POST","rpc/ack_case_reconciliation",body={"target_case_id":case_id,"observed_version":version})
             event("case_reconciled", case_id=case_id, version=version)
@@ -200,6 +206,9 @@ async def _process_job(job, *, executor=None, job_kind="dispatch_job", target_ke
     pulse = asyncio.create_task(keep_alive())
     try:
         request = job["request_json"]
+        if request.get('workflow_version')==2:
+            from app.services.ultimate_run_service import execute_job
+            return await execute_job(job,progress)
         name, version, schema = engine_identity((request.get("decision_case") or {}).get("node_id"))
         if (name,version,schema) != (request["engine_name"],request["engine_version"],request["schema_version"]):
             raise ValueError("El worker no tiene la versión de motor registrada para esta corrida.")
@@ -218,6 +227,12 @@ async def _process_job(job, *, executor=None, job_kind="dispatch_job", target_ke
     except httpx.HTTPError:
         # The job remains durable; expiration permits recovery after a provider outage.
         event(event_prefix+"_dependency_unavailable", level=logging.WARNING)
+    except HTTPException as exc:
+        if exc.status_code==503 or (exc.status_code==409 and (exc.headers or {}).get('X-Dation-Retryable')=='true'):
+            event(event_prefix+'_publication_pending',level=logging.WARNING)
+        elif not lost.is_set():
+            try:await writer({'status':'error','error_message':str(exc.detail)[:1500],'progress_json':{'stage':'error'}})
+            except (httpx.HTTPError,LeaseLost):event(event_prefix+'_error_persistence_pending',level=logging.WARNING)
     except Exception as exc:
         if not lost.is_set():
             try:
@@ -231,7 +246,11 @@ async def _process_job(job, *, executor=None, job_kind="dispatch_job", target_ke
 
 
 async def worker_step(*, include_analyses=False, stop=None):
-    rows = await dispatch.db("POST","rpc/claim_dispatch_job",body={"worker_token":str(uuid4()),"lease_seconds":120}) or []
+    body={"worker_token":str(uuid4()),"lease_seconds":120}
+    try:rows=await dispatch.db('POST','rpc/claim_dispatch_job_v2',body=body) or []
+    except httpx.HTTPStatusError as exc:
+        if exc.response.status_code!=404:raise
+        rows=await dispatch.db('POST','rpc/claim_dispatch_job',body=body) or []
     if rows: await process_job(rows[0])
     analysis_rows = []
     if include_analyses and not (stop and stop.is_set()):

@@ -1,0 +1,25 @@
+{
+  "suite": "B-FOCUS",
+  "status": "PASS",
+  "tests": 9,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "started_at": "2026-10-27T04:28:16.143937+00:00",
+  "finished_at": "2026-10-27T04:29:25.710270+00:00",
+  "seconds": 69.566,
+  "cwd": "/workspace/Dation/backend",
+  "command": [
+    "/workspace/Dation/backend/.browser-venv/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "test_run_lineage_polish",
+    "test_navigation.NavigationTests.test_foundation_dashboard_navigation_prefers_approved_over_later_candidate",
+    "-v"
+  ],
+  "exit_code": 0,
+  "production_credentials_cleared": true,
+  "PYTHONPATH": "tests/browser",
+  "log_sha256": "292f093a87f499e8e4d86df3de08b87732be772be0d4a03ad6f53aa8f7e026fb"
+}

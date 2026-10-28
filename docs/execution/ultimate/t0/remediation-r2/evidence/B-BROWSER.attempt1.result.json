@@ -1,0 +1,68 @@
+{
+  "suite": "B-BROWSER",
+  "status": "FAIL",
+  "started_at": "2026-10-26T03:52:10.563228+00:00",
+  "finished_at": "2026-10-26T04:17:27.213382+00:00",
+  "command": [
+    "/workspace/Dation/backend/.browser-venv/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests/browser",
+    "-p",
+    "test_*.py",
+    "-v"
+  ],
+  "cwd": "/workspace/Dation/backend",
+  "exit_code": 1,
+  "tests": 251,
+  "failures_count": 9,
+  "skipped": 0,
+  "failures": [
+    {
+      "kind": "ERROR",
+      "test": "test_art_is_small_and_reserves_geometry_and_content_survives_failure (test_home_hero.HomeHeroTests.test_art_is_small_and_reserves_geometry_and_content_survives_failure)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_case_ux_both_reviews_keep_config_and_only_confirm_executes_once (test_navigation.NavigationTests.test_case_ux_both_reviews_keep_config_and_only_confirm_executes_once)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_case_ux_real_data_change_retains_lineage_but_reopening_history_has_no_new_notice (test_navigation.NavigationTests.test_case_ux_real_data_change_retains_lineage_but_reopening_history_has_no_new_notice)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_dashboard_toolbars_share_controls_and_symmetric_bleed (test_navigation.NavigationTests.test_dashboard_toolbars_share_controls_and_symmetric_bleed)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_toolbar_approval_is_unique_direct_and_preserves_continuation (test_navigation.NavigationTests.test_toolbar_approval_is_unique_direct_and_preserves_continuation)"
+    },
+    {
+      "kind": "ERROR",
+      "test": "test_shared_case_context_and_compact_map_milestones (test_saga4_ui.Saga4UITests.test_shared_case_context_and_compact_map_milestones)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_case_selector_paginates_compact_active_and_completed_and_hydrates_only_selection (test_navigation.NavigationTests.test_case_selector_paginates_compact_active_and_completed_and_hydrates_only_selection)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_d2_v21_ai_retry_approval_and_approved_state (test_navigation.NavigationTests.test_d2_v21_ai_retry_approval_and_approved_state)"
+    },
+    {
+      "kind": "FAIL",
+      "test": "test_workflow_progressive_actions_share_styles_arrow_and_keyboard_focus (test_navigation.NavigationTests.test_workflow_progressive_actions_share_styles_arrow_and_keyboard_focus)"
+    }
+  ],
+  "wall_seconds": 1516.644,
+  "suite_reported_seconds": 1516.273,
+  "log_path": "/workspace/work/dation-t0r2/revalidation/B-BROWSER.log",
+  "log_sha256": "b56a3cf1f8777cfdddffbc3de326e2b58165c6c6953e8748693a6468a2c8e100",
+  "production_credentials_cleared": true,
+  "docker_target": "local unix socket",
+  "sql_container": null
+}

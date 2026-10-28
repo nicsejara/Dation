@@ -1,0 +1,179 @@
+{
+  "phase": "T3",
+  "baseline": "ef997235a30251fbf7ae53690ed738092ee973d8",
+  "files": {
+    "backend/app/models/ultimate_foundation.py": {
+      "bytes": 5764,
+      "sha256": "5d178b0c8d14c99768c9090e92c1d0af736ff0b9b831ceaf24506f42ad4f7e15",
+      "baseline_sha256": null,
+      "baseline": "new T3 file"
+    },
+    "backend/app/platform/decision_routes.py": {
+      "bytes": 8156,
+      "sha256": "9b9935d194e06644a308bb2331d52747fa0faf902f52181be6e0d7339df85cce",
+      "baseline_sha256": "fd8e56d0b7ef73eb3daa59c0e3c10a46aa4e10f1857114b2b7eb2c3ade90d394",
+      "baseline": "HEAD"
+    },
+    "backend/app/platform/home.py": {
+      "bytes": 4815,
+      "sha256": "155e76e05d973dd11df6de48302589c5dcab65dfd031c10b89e8b9e6e5fd157e",
+      "baseline_sha256": "85fa4ec8883a8c48329f9aeff04aa2f2b8f6df1ea1c325255b1c1d040a301d1d",
+      "baseline": "post-T2 checkpoint"
+    },
+    "backend/app/platform/identity.py": {
+      "bytes": 5510,
+      "sha256": "7d7562883c58bcfd8fd35c6314fb53596a5d014e245a8663fbde250e88365011",
+      "baseline_sha256": "5c53d6681dd7ea7e2974e365d9002ccbfc4f5dd62004a9222693f77f0b4d7520",
+      "baseline": "HEAD"
+    },
+    "backend/app/platform/routes.py": {
+      "bytes": 1821,
+      "sha256": "a4de8863783bd49cb3d01f00ca721d0497e27cf763e829d73df84c2aca7f404d",
+      "baseline_sha256": "27dc9c320c67831c906d5cd5dc66741a5973f6ee876a5918559496758e69d607",
+      "baseline": "HEAD"
+    },
+    "backend/app/platform/ultimate_routes.py": {
+      "bytes": 2391,
+      "sha256": "9cf6b537c329ad623e65c09e5c5d44f853bd82cc24d4e5590360f9df6aaf0b32",
+      "baseline_sha256": null,
+      "baseline": "new T3 file"
+    },
+    "backend/app/services/logistics_model_service.py": {
+      "bytes": 6842,
+      "sha256": "db6ad888ae39c9706fbd0a32ba23d9f586e54fb1e6de78c805a08497fdfd478a",
+      "baseline_sha256": null,
+      "baseline": "new T3 file"
+    },
+    "backend/app/static/css/ultimate-foundation.css": {
+      "bytes": 2795,
+      "sha256": "1be7398866e8e02920a511b18e6bce127755b4fbffe6f2e1e44a30c7c16bc9a3",
+      "baseline_sha256": null,
+      "baseline": "new T3 file"
+    },
+    "backend/app/static/js/dispatch/cases/ultimate-case-setup.mjs": {
+      "bytes": 13453,
+      "sha256": "bc9dd7ede225d98324c0302f133a32070c9cc14307279ecd5184299615876010",
+      "baseline_sha256": null,
+      "baseline": "new T3 file"
+    },
+    "backend/app/static/js/dispatch/models/entry.mjs": {
+      "bytes": 1603,
+      "sha256": "c59ff8c80bfd11c2f7a123c8fa46e2a76c5e5f9fd059b69573eca327cd30720d",
+      "baseline_sha256": null,
+      "baseline": "new T3 file"
+    },
+    "backend/app/static/js/dispatch/models/forms.mjs": {
+      "bytes": 8352,
+      "sha256": "6e9c0936628e126604a5e9c7381ebd93c1cd4aebeb6ccaf82bc35f1fe6863fa9",
+      "baseline_sha256": null,
+      "baseline": "new T3 file"
+    },
+    "backend/app/static/js/dispatch/models/index.mjs": {
+      "bytes": 12527,
+      "sha256": "bc08f17efb8ae25c6cc533a20151216a09f25c20a69bcf71f0dc860a90591643",
+      "baseline_sha256": null,
+      "baseline": "new T3 file"
+    },
+    "backend/app/static/js/dispatch/models/policy.mjs": {
+      "bytes": 4150,
+      "sha256": "0d8a52f4221fc08a76e2f3d2315f3a35785661b94d3f43b9ce7c45f85fee6f93",
+      "baseline_sha256": null,
+      "baseline": "new T3 file"
+    },
+    "backend/app/static/js/dispatch/models/setup-values.mjs": {
+      "bytes": 1148,
+      "sha256": "390c80f20e3f55065ac814b3e29ed9c38462ec92fb29b65d2dda125add31cbc0",
+      "baseline_sha256": null,
+      "baseline": "new T3 file"
+    },
+    "backend/app/static/js/dispatch/navigation/resource.mjs": {
+      "bytes": 5478,
+      "sha256": "84d12a20daad4c02edf34863c85617e7dd2f347d95eafcf198367d3cc4609907",
+      "baseline_sha256": "0e2e6b00a5db4312c90834b0902be235aab13b7c0379846933f4252f8be137f0",
+      "baseline": "HEAD"
+    },
+    "backend/app/static/js/dispatch/workspace.mjs": {
+      "bytes": 52690,
+      "sha256": "db5bc99fa379b8a9d8733ff83647e7f95394a943d83a04670ab768cb6b00e76f",
+      "baseline_sha256": "f973ef05de99f17cb63851f7482af9e1d7d34d1fe9ac6820c1325aac877e533e",
+      "baseline": "HEAD"
+    },
+    "backend/app/static/js/platform/dda-navigation.mjs": {
+      "bytes": 3132,
+      "sha256": "a04644f8474d6361cd322cd53c129652b2ad4a321c1674fd64c8544b97802b47",
+      "baseline_sha256": "4085f2945543ac5c76f346202adda997f45e1a550482781fc5976669464b1196",
+      "baseline": "HEAD"
+    },
+    "backend/app/templates/app.html": {
+      "bytes": 71164,
+      "sha256": "10ed8e2dcd4854fc6e5e2fe6522051fabec7de603ad8f29c5f2db0741f7efa7f",
+      "baseline_sha256": "2df929f5aabb9001223a028e583262d47656d46819fdafacbf90141a7023e3b5",
+      "baseline": "HEAD"
+    },
+    "backend/tests/browser/test_ultimate_case_setup.py": {
+      "bytes": 22467,
+      "sha256": "53123eed6a103f9ccdcfa0902fb331f753896163f856b7712d98e96c319488c5",
+      "baseline_sha256": null,
+      "baseline": "new T3 file"
+    },
+    "backend/tests/e2e/ultimate_setup_fixture.py": {
+      "bytes": 527,
+      "sha256": "8c092ecbad547dc81a79e92f5878a95e592ba44fb6f45c16381aa0516cf4b06d",
+      "baseline_sha256": null,
+      "baseline": "new T3 file"
+    },
+    "backend/tests/integration/test_ultimate_case_models.py": {
+      "bytes": 24103,
+      "sha256": "04ec6fa46b0d8756b6f7734f2370b3016c5c3be2a95ecfd0471e18900b50423a",
+      "baseline_sha256": null,
+      "baseline": "new T3 file"
+    },
+    "backend/tests/test_ultimate_case_models.py": {
+      "bytes": 10178,
+      "sha256": "6a3f2df4bc0dfaa2158e29705d6b16689cdca42364f844406593f8e2a9165ad8",
+      "baseline_sha256": null,
+      "baseline": "new T3 file"
+    },
+    "backend/tests/test_ultimate_case_navigation.mjs": {
+      "bytes": 1985,
+      "sha256": "dc3d9841b991408dad8649a05304a3cf7d6f2c5c9f408b57973f9341540622ef",
+      "baseline_sha256": null,
+      "baseline": "new T3 file"
+    },
+    "supabase/migrations/20261026161050_ultimate_case_models.sql": {
+      "bytes": 28266,
+      "sha256": "43dc2b76ed01d2ce0bff41f35788de3b00bafa3fabcc90c2582f479f8fd5c627",
+      "baseline_sha256": null,
+      "baseline": "new T3 file"
+    }
+  },
+  "created": [
+    "backend/app/models/ultimate_foundation.py",
+    "backend/app/platform/ultimate_routes.py",
+    "backend/app/services/logistics_model_service.py",
+    "backend/app/static/css/ultimate-foundation.css",
+    "backend/app/static/js/dispatch/cases/ultimate-case-setup.mjs",
+    "backend/app/static/js/dispatch/models/entry.mjs",
+    "backend/app/static/js/dispatch/models/forms.mjs",
+    "backend/app/static/js/dispatch/models/index.mjs",
+    "backend/app/static/js/dispatch/models/policy.mjs",
+    "backend/app/static/js/dispatch/models/setup-values.mjs",
+    "backend/tests/browser/test_ultimate_case_setup.py",
+    "backend/tests/e2e/ultimate_setup_fixture.py",
+    "backend/tests/integration/test_ultimate_case_models.py",
+    "backend/tests/test_ultimate_case_models.py",
+    "backend/tests/test_ultimate_case_navigation.mjs",
+    "supabase/migrations/20261026161050_ultimate_case_models.sql"
+  ],
+  "modified": [
+    "backend/app/platform/decision_routes.py",
+    "backend/app/platform/home.py",
+    "backend/app/platform/identity.py",
+    "backend/app/platform/routes.py",
+    "backend/app/static/js/dispatch/navigation/resource.mjs",
+    "backend/app/static/js/dispatch/workspace.mjs",
+    "backend/app/static/js/platform/dda-navigation.mjs",
+    "backend/app/templates/app.html"
+  ],
+  "no_infrastructure_or_global_design_token_changes": true
+}

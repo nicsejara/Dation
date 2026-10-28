@@ -1,0 +1,20 @@
+{
+  "changed_files": [
+    "backend/app/static/js/dispatch/upload/ultimate-case-data.mjs",
+    "backend/app/static/css/ultimate-case-data.css",
+    "backend/tests/browser/test_ultimate_case_data.py"
+  ],
+  "change": "Final UI composition correction: retain native upload context and badge class, reveal local file actions, horizontally scroll readable preview columns; exact-header copy already corrected. No backend/parser/SQL changes.",
+  "rerun": [
+    "W4",
+    "native-visual-parity"
+  ],
+  "reused_unchanged_consumers": [
+    "B-PY",
+    "B-NODE",
+    "S4",
+    "FOCAL-LEGACY-API",
+    "FOCAL-T3-BROWSER"
+  ],
+  "source_compatibility_verified": true
+}

@@ -15,7 +15,7 @@ async def journey():
     base=os.environ['DATION_E2E_URL']
     assert urlparse(base).hostname=='127.0.0.1', 'E2E must use its owned loopback API.'
     inputs=Path(os.environ['DATION_E2E_INPUTS'])
-    gate=Path(os.environ['DATION_E2E_STORAGE'])/'block-downloads'
+    gate=Path(os.environ['DATION_E2E_STORAGE'])/'start-browser-worker'
     errors,requests,failed,expected_draft_misses=[],[],[],[]
     admitted=False
     artifact=os.getenv('DATION_E2E_ARTIFACTS')
@@ -61,7 +61,7 @@ async def journey():
             await page.wait_for_selector('[data-start-new-decision]')
             assert await page.locator('.dda-landing button').count()==2
             assert not await page.locator('[data-start-new-decision]').is_disabled()
-            assert await page.locator('[data-open-decision-map]').is_disabled()
+            assert not await page.locator('[data-open-decision-map]').is_disabled()
             await ui.checkpoint('overview')
             await page.locator('[data-start-new-decision]').click()
             await page.wait_for_selector('[data-kind="orders"] input[type=file]',state='attached')
@@ -83,16 +83,16 @@ async def journey():
             await assign_workflow_person(page,'data_preparation')
             await page.locator('.d-workflow-action-bar[data-state=ready]').wait_for()
             await ui.hero('data-ready')
-            await ui.bar('data',2)
+            await ui.bar('data',4)
             await ui.action('data',next_button)
             await ui.checkpoint('data-ready')
             await next_button.click()
             await page.wait_for_selector('[data-map-node="logistics_assignment"][data-map-action]')
             await ui.hero('map-ready')
-            await ui.action('map-assignment',page.locator('[data-map-node="logistics_assignment"][data-map-action]').first)
+            assert await page.locator('[data-map-node="logistics_assignment"][data-map-action]').first.is_disabled()
             await ui.checkpoint('map-ready')
-            assert not await page.locator('[data-map-context]').get_attribute('open')
-            assert await page.locator('.dispatch-map-progress [role=progressbar]').is_visible()
+            assert not await page.locator('[data-config-context]').get_attribute('open')
+            assert await page.locator('.dispatch-case-progress__grid').is_visible()
             # A validated case is durable and selectable before its first run.
             initial=await page.evaluate('window.DationDispatch.getWorkspace().decisionCase')
             assert initial['persisted']
@@ -100,19 +100,21 @@ async def journey():
             assert persisted.status==200,{'status':persisted.status,'body':(await persisted.text())[:2000],'case_id':initial['id']}
             assert (await persisted.json())['decision_case']['inputs']==initial['inputs']
             map_url=page.url
-            await page.locator('[data-select-case]').click()
-            switcher=page.locator('[data-case-switcher]')
-            await switcher.get_by_role('navigation',name='Decision Cases recientes').wait_for()
-            assert await switcher.locator('nav [aria-current=true]').count()==1
-            assert await switcher.get_by_role('button',name='Abrir este caso en Decision Center',exact=True).is_visible()
-            await page.keyboard.press('Escape')
-            assert page.url==map_url
-            assert await switcher.locator('button').first.evaluate('el=>el===document.activeElement')
+            trigger=page.locator('[data-config-context] summary');await trigger.focus()
+            await page.evaluate("()=>window.DationDispatch.openDecisionMap({forceSelector:true,trigger:document.querySelector('[data-config-context] summary')})")
+            switcher=page.locator('.dispatch-case-selector');await switcher.wait_for()
+            assert await switcher.locator('.is-current').count()==1
+            assert await switcher.get_by_role('button',name='Caso actual',exact=True).is_disabled()
+            await page.keyboard.press('Escape');assert page.url==map_url
+            assert await trigger.evaluate('el=>el===document.activeElement')
+            await assign_workflow_person(page,'logistics_assignment')
+            await assign_workflow_person(page,'logistics_scheduling')
+            await ui.action('map-assignment',page.locator('[data-map-node="logistics_assignment"][data-map-action]').first)
             assert await page.locator('[data-case-transition]').count()==0
             await page.locator('[data-map-node="logistics_assignment"][data-map-action]').first.click()
             await page.wait_for_selector('[data-config-review]')
             await assign_workflow_person(page,'logistics_assignment')
-            await ui.hero('assignment','DECISIÓN 01 DE 3')
+            await ui.hero('assignment','DECISIÓN 1 DE 3')
             assert not await page.locator('[data-config-context]').get_attribute('open')
             assert await page.locator("[data-depth]").count()==0
             assert await page.locator(".decision-advanced-option:disabled").count()==3
@@ -136,7 +138,6 @@ async def journey():
             assert page.url==config_url
             assert sum(method=='POST' and path=='/api/runs' for method,path in requests)==before_review
             await page.locator('[data-config-review]').click()
-            gate.touch()
             async with page.expect_response(lambda response:
                 urlparse(response.url).path=='/api/runs' and response.request.method=='POST') as accepted:
                 await page.locator('[data-config-execute]').click()
@@ -149,10 +150,11 @@ async def journey():
             await page.reload(wait_until='domcontentloaded')
             assert parse_qs(urlparse(page.url).query)['run_id']==[assignment]
             pending=await api_get(context,base+'/api/runs/'+assignment)
-            assert (await pending.json())['status'] in ('queued','running')
-            await page.get_by_role('heading',name='Preparando tu decisión',exact=True).wait_for()
+            assert (await pending.json())['status']=='queued'
+            await page.get_by_role('heading',name='Preparando tu recomendación',exact=True).wait_for()
+            await page.locator('[data-run-stage]').filter(has_text='EN COLA DE EJECUCIÓN').wait_for()
             await ui.checkpoint('assignment-pending')
-            gate.unlink()
+            gate.touch()
             await page.wait_for_selector('.assignment-dashboard-v2')
             await ui.toolbar('assignment')
             await ui.checkpoint('assignment-dashboard')
@@ -177,16 +179,15 @@ async def journey():
             await page.reload(wait_until='domcontentloaded')
             await page.wait_for_selector('[data-comparative-state=completed]')
             assert await page.locator('[data-generate-comparative]').count()==0
-            await assign_workflow_person(page,'logistics_assignment','approver')
+            await assign_workflow_person(page,'logistics_assignment')
             await page.locator('[data-approve-toolbar]').click()
             await page.wait_for_function("window.DationDispatch.getWorkspace().decisionCase.nodes.logistics_assignment.status==='approved'")
             await page.locator('[data-after-approve]').wait_for(state='visible')
             await ui.action('assignment-continue',page.locator('[data-after-approve]'))
             await ui.checkpoint('assignment-approved')
-            await page.locator('[data-more-menu] summary').click()
-            await page.locator('[data-dashboard-map]').click()
+            await page.locator('.dda-navigation a').last.click()
             await page.wait_for_selector('[data-map-node="logistics_scheduling"][data-map-action="configure"]')
-            assert await page.get_by_role('progressbar',name='Decisiones aprobadas',exact=True).get_attribute('aria-valuenow')=='1'
+            assert '1 de 2 aprobadas' in await page.locator('.dispatch-case-progress').inner_text()
             await ui.hero('map-after-assignment')
             await ui.action('map-scheduling',page.locator('[data-map-node="logistics_scheduling"][data-map-action="configure"]'))
             await ui.checkpoint('map-after-assignment')
@@ -203,7 +204,7 @@ async def journey():
             await page.reload(wait_until='domcontentloaded');await page.wait_for_selector('[data-scheduling-review]')
             assert not await page.locator('[data-config-context]').get_attribute('open')
             assert await page.get_by_text('ASIGNACIÓN APROBADA',exact=True).is_visible()
-            await ui.hero('scheduling','DECISIÓN 02 DE 3')
+            await ui.hero('scheduling','DECISIÓN 2 DE 3')
             await assign_workflow_person(page,'logistics_scheduling')
             await ui.bar('scheduling',3)
             await ui.action('scheduling-review',page.locator('[data-scheduling-review]'))
@@ -257,7 +258,7 @@ async def journey():
             await page.wait_for_selector('.dispatch-scheduling-dashboard')
             await ui.toolbar('scheduling')
             await ui.checkpoint('scheduling-dashboard')
-            await assign_workflow_person(page,'logistics_scheduling','approver')
+            await assign_workflow_person(page,'logistics_scheduling')
             await page.locator('[data-approve-toolbar]').click()
             await page.wait_for_function("window.DationDispatch.getWorkspace().decisionCase.nodes.logistics_scheduling.status==='approved'")
             await ui.checkpoint('scheduling-approved')
@@ -269,10 +270,9 @@ async def journey():
             assert await cold.evaluate("window.DationDispatch.getWorkspace().decisionCase.nodes.logistics_assignment.approved_run_id")==assignment
             await cold.close()
             assert await (await api_get(context,base+'/api/runs/'+failed_scheduling)).json()==failed_snapshot
-            await page.locator('[data-more-menu] summary').click()
-            await page.locator('[data-dashboard-map]').click()
+            await page.locator('.dda-navigation a').last.click()
             await page.wait_for_selector('[data-map-node="logistics_assignment"]')
-            assert await page.get_by_role('progressbar',name='Decisiones aprobadas',exact=True).get_attribute('aria-valuenow')=='2'
+            assert '2 de 2 aprobadas' in await page.locator('.dispatch-case-progress').inner_text()
             await ui.checkpoint('map-completed')
             await page.wait_for_timeout(500)
             before=sum(path.startswith('/api/') for _,path in requests)
@@ -298,6 +298,8 @@ async def journey():
             await page.wait_for_selector('[data-start-new-decision]')
             assert not await page.locator('[data-open-decision-map]').is_disabled()
             await page.locator('[data-open-decision-map]').click()
+            await page.locator('[data-platform-decisions] [data-case-open="'+case+'"]').click()
+            await page.locator('[data-platform-decisions]').get_by_role('link',name='Ir al Decision Map',exact=True).click()
             await page.wait_for_selector('[data-map-node="logistics_assignment"]')
             assert await page.locator('.dispatch-case-selector').count()==0
             await page.evaluate("window.dationNavigate('logistics-overview')")
@@ -315,13 +317,13 @@ async def journey():
             report={'passed':True,'source_sha':subprocess.check_output(['git','rev-parse','HEAD'],cwd=Path(__file__).resolve().parents[3],text=True).strip(),
                 'ui':ui.report(),'inicio_to_overview':True,'approval_map_scheduling_configuration':True,
                 'disabled_upload_action_and_hover':True,'shared_workflow_visual_contract':True,
-                'review_keyboard_cancel_and_confirmation':True,'creation_from_files':True,'refresh_during_queue':True,
+                'review_keyboard_cancel_and_confirmation':True,'creation_from_files':True,'refresh_during_queue':True,'queued_before_worker_start':True,
                 'assignment_and_scheduling_approved':True,'cold_link':True,'back_forward_refresh':True,
                 'idle_request_budget':True,'mobile_history':True,'export_has_records':True,
                 'comparative_reused_and_restored':True,'trip_detail_keyboard':True,'direct_next_configuration':True,
                 'comparative_close_reopen_without_post':True,'terminal_scheduling_reconfigured_as_new_run':True,
                 'failed_run_retained_unchanged':True,'map_toolbar_and_closed_contexts':True,
-                'overview_dual_cta_without_cases':True,'overview_single_case_direct_map':True,
+                'overview_dual_cta_without_cases':True,'overview_single_case_center_to_map':True,
                 'new_decision_clears_context_and_preserves_history':True,
                 'javascript_errors':errors,'unexpected_http_errors':failed,
                 'expected_draft_hydration_misses':len(expected_draft_misses),'requests':len(requests)}

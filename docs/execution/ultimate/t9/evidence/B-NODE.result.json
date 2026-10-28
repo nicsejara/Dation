@@ -1,0 +1,24 @@
+{
+  "suite": "B-NODE",
+  "status": "PASS",
+  "tests": 137,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "exit_code": 0,
+  "started_at": "2026-10-27T18:23:04.187487+00:00",
+  "finished_at": "2026-10-27T18:23:04.531463+00:00",
+  "seconds": 0.343975658,
+  "timing_source": "Node native duration and log mtime",
+  "cwd": "/workspace/Dation/backend",
+  "command": [
+    "node",
+    "--test",
+    "--experimental-test-isolation=none",
+    "tests/test_*.js",
+    "tests/test_*.mjs"
+  ],
+  "production_credentials_cleared": false,
+  "no_network_or_provider_calls": true,
+  "log_sha256": "19dd16d9df19b07280f7dbe471d7eb0628a7fc5c410dd5bddebf0699be3973d0"
+}

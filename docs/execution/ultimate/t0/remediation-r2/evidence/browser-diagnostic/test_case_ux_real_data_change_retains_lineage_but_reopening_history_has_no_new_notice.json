@@ -1,0 +1,2191 @@
+{
+  "name": "test_case_ux_real_data_change_retains_lineage_but_reopening_history_has_no_new_notice",
+  "url": "http://127.0.0.1:56661/app/ddas/logistics/data?view=logistics-data&case_id=85fb9c6e-c9cb-41fc-af4c-591f20d1827e",
+  "text": "Saltar al contenido principal\nDation\nDecision Intelligence\nInicio\nDecision Intelligence\nDecision Center\nDatos\nDatos\nWorkspace\nEquipo\nConfiguraci\u00f3n\n\nDecision Data Assets\n\nDDA Log\u00edstica\nSU\nSynthetic User\nSynthetic workspace\nDecision Data Assets\nDDA Log\u00edstica\nDecision Case\n1\nDatos del Case\n2\nMapa de decisiones\n3\nConfigurar decisi\u00f3n\n4\nDashboard\nModo demo \u00b7 Est\u00e1s trabajando con datos de ejemplo.\nPASO 1 \u00b7 CARGA DE DATOS\nPreparar Decision Case\n\nDefin\u00ed el contexto y prepar\u00e1 una base confiable para tus decisiones.\n\nAtributos del Case\n\nDefin\u00ed el contexto operativo y el responsable de los datos.\n\nNombre del Case\nCategor\u00eda\nEleg\u00ed una categor\u00eda\nSemanal\nMensual\nExtraordinario\nSimulaci\u00f3n\nOperaci\u00f3n real\nDescripci\u00f3n (opcional)\nResponsable de datos\nData Owner\nSin asignar\nSynthetic owner \u00b7 fixture@example.test\n\nSe guarda junto con los atributos al aplicar.\n\nAplicar\n\nProb\u00e1 el pack de ejemplo de Log\u00edstica. Se guardar\u00e1n \u00d3rdenes y Flota una sola vez; tu flota vigente se conserva.\n\nUsar datos de ejemplo\n\nSi reemplaz\u00e1s \u00d3rdenes o Flota por datos distintos, se crear\u00e1 otro Decision Case. Este Case y sus resultados se conservan.\n\nIniciar otro Decision Case\nDATA PACK\nEleg\u00ed c\u00f3mo cargar tus datos.\n\nSub\u00ed archivos nuevos o reutiliz\u00e1 una carga anterior. Cada archivo se valida apenas lo carg\u00e1s; las columnas opcionales no bloquean este paso.\n\n01 \u00b7 DEMANDA\n\u00d3rdenes\n\nCada fila es una orden, con sus productos, cantidades, origen, destino y fechas.\n\nListo\n7 m\u00ednimas\n3 opcionales\nDescargar plantilla\nSubir nuevo\nReutilizar anterior \u00b7 1\n1 \u00b7 CARGAR ARCHIVO\nCaso-B-orders.csv\n30 \u00f3rdenes\n2,4 KB\nReemplazar\nVer columnas\nQuitar\n2 \u00b7 VALIDACI\u00d3N\nArchivo listo.\nTodos los controles correctos\nVer detalle\nColumnas opcionales: 3 de 3\n02 \u00b7 RECURSOS\nFlota\n\nCada fila es un veh\u00edculo, con su capacidad, disponibilidad, costos y velocidad.\n\nListo\n5 m\u00ednimas\n12 opcionales\nDescargar plantilla\nSubir nuevo\nReutilizar anterior \u00b7 1\n1 \u00b7 CARGAR ARCHIVO\nCaso-B-fleet.csv\n8 veh\u00edculos\n1,1 KB\nReemplazar\nVer columnas\nQuitar\n2 \u00b7 VALIDACI\u00d3N\nArchivo listo.\nTodos los controles correctos\nVer detalle\nColumnas opcionales: 11 de 12\nEntre archivos\nCompatibilidad correcta entre \u00d3rdenes y Flota.\nDATA PACK\nAplic\u00e1 los atributos del Case antes de continuar.\n\u00d3rdenes: listo\nFlota: listo\nAtributos: pendiente\nData Owner: pendiente\nSeleccion\u00e1 tu decisi\u00f3n",
+  "requests": [
+    [
+      "GET",
+      "/api/runs"
+    ],
+    [
+      "GET",
+      "/api/system/llm-status"
+    ],
+    [
+      "POST",
+      "/api/runs/preflight"
+    ],
+    [
+      "POST",
+      "/api/decision-cases"
+    ],
+    [
+      "GET",
+      "/api/decision-cases/85fb9c6e-c9cb-41fc-af4c-591f20d1827e"
+    ],
+    [
+      "GET",
+      "/api/decision-cases/85fb9c6e-c9cb-41fc-af4c-591f20d1827e"
+    ],
+    [
+      "GET",
+      "/api/platform/team"
+    ],
+    [
+      "GET",
+      "/api/dispatch/status"
+    ],
+    [
+      "GET",
+      "/api/dispatch/contracts"
+    ],
+    [
+      "GET",
+      "/api/datasets"
+    ],
+    [
+      "GET",
+      "/api/datasets"
+    ],
+    [
+      "GET",
+      "/api/platform/team"
+    ],
+    [
+      "POST",
+      "/api/runs/preflight"
+    ],
+    [
+      "GET",
+      "/api/platform/team"
+    ]
+  ],
+  "fixture_errors": [],
+  "errors": [],
+  "workspace": {
+    "caseIdentity": {
+      "label": "",
+      "category": null,
+      "description": null
+    },
+    "identityDirty": false,
+    "dataOwnerDraft": {
+      "caseId": "85fb9c6e-c9cb-41fc-af4c-591f20d1827e",
+      "version": null,
+      "open": true,
+      "value": "",
+      "owner": null,
+      "ownerEligible": false,
+      "dirty": false,
+      "restoreFocus": false
+    },
+    "attributesApplied": false,
+    "appliedPreparation": null,
+    "orders": {
+      "id": "00000000-0000-4000-9000-000000000011",
+      "dataset_type": "orders",
+      "schema_version": "orders_v3",
+      "original_filename": "orders.csv",
+      "canonical_filename": "Caso-B-orders.csv",
+      "row_count": 30,
+      "column_count": 10,
+      "created_at": "2026-10-09T12:00:00+00:00",
+      "is_default": false,
+      "is_sample": true,
+      "archived_at": null,
+      "label": "Audit synthetic orders",
+      "status": "validated",
+      "size_bytes": 2465,
+      "sha256": "c2ade0b09a5d541baf4de990f050af4212e23f2f6fc676393ac3b9032260b99b",
+      "profile_json": {
+        "valid": true,
+        "detected_format": "orders_v3",
+        "schema": "orders_v3",
+        "rows": 30,
+        "columns": 10,
+        "profile": {
+          "profile_version": 3,
+          "orders": 30,
+          "total_units": 519,
+          "total_weight_kg": 430100,
+          "routes": 5,
+          "origins": 1,
+          "origin_sites": [
+            "Cordoba"
+          ],
+          "destinations": 5,
+          "products": 3,
+          "max_order_kg": 36000,
+          "estimated_dispatch_date_range": {
+            "from": "2026-10-01",
+            "to": "2026-10-10"
+          },
+          "priority_mix": {
+            "High": 4,
+            "Low": 3,
+            "Normal": 23
+          }
+        },
+        "completeness": {
+          "order_id": {
+            "present": true,
+            "filled_rows": 30,
+            "total_rows": 30,
+            "complete": true,
+            "required": true,
+            "used_by": [
+              "assignment",
+              "scheduling",
+              "final_assignment"
+            ],
+            "unlock_label": null
+          },
+          "product": {
+            "present": true,
+            "filled_rows": 30,
+            "total_rows": 30,
+            "complete": true,
+            "required": true,
+            "used_by": [
+              "assignment",
+              "final_assignment"
+            ],
+            "unlock_label": null
+          },
+          "quantity_units": {
+            "present": true,
+            "filled_rows": 30,
+            "total_rows": 30,
+            "complete": true,
+            "required": true,
+            "used_by": [
+              "assignment"
+            ],
+            "unlock_label": null
+          },
+          "unit_weight_kg": {
+            "present": true,
+            "filled_rows": 30,
+            "total_rows": 30,
+            "complete": true,
+            "required": true,
+            "used_by": [
+              "assignment"
+            ],
+            "unlock_label": null
+          },
+          "origin": {
+            "present": true,
+            "filled_rows": 30,
+            "total_rows": 30,
+            "complete": true,
+            "required": true,
+            "used_by": [
+              "assignment",
+              "scheduling"
+            ],
+            "unlock_label": null
+          },
+          "destination": {
+            "present": true,
+            "filled_rows": 30,
+            "total_rows": 30,
+            "complete": true,
+            "required": true,
+            "used_by": [
+              "assignment",
+              "scheduling"
+            ],
+            "unlock_label": null
+          },
+          "distance_km": {
+            "present": true,
+            "filled_rows": 30,
+            "total_rows": 30,
+            "complete": true,
+            "required": true,
+            "used_by": [
+              "assignment",
+              "scheduling"
+            ],
+            "unlock_label": null
+          },
+          "estimated_dispatch_date": {
+            "present": true,
+            "filled_rows": 30,
+            "total_rows": 30,
+            "complete": true,
+            "required": false,
+            "used_by": [
+              "scheduling"
+            ],
+            "unlock_label": "Planificaci\u00f3n"
+          },
+          "priority": {
+            "present": true,
+            "filled_rows": 30,
+            "total_rows": 30,
+            "complete": true,
+            "required": false,
+            "used_by": [
+              "scheduling"
+            ],
+            "unlock_label": "Planificaci\u00f3n avanzada"
+          },
+          "delivery_due_date": {
+            "present": true,
+            "filled_rows": 30,
+            "total_rows": 30,
+            "complete": true,
+            "required": false,
+            "used_by": [
+              "scheduling"
+            ],
+            "unlock_label": "SLA de planificaci\u00f3n"
+          }
+        },
+        "preview": {
+          "columns": [
+            "order_id",
+            "product",
+            "quantity_units",
+            "unit_weight_kg",
+            "origin",
+            "destination",
+            "distance_km",
+            "estimated_dispatch_date",
+            "priority",
+            "delivery_due_date"
+          ],
+          "rows": [
+            {
+              "order_id": "SHP-0001",
+              "product": "Producto C",
+              "quantity_units": 12,
+              "unit_weight_kg": 500,
+              "origin": "Cordoba",
+              "destination": "San Luis",
+              "distance_km": 420,
+              "estimated_dispatch_date": "2026-10-04",
+              "priority": "Normal",
+              "delivery_due_date": "2026-10-07"
+            },
+            {
+              "order_id": "SHP-0002",
+              "product": "Producto B",
+              "quantity_units": 19,
+              "unit_weight_kg": 1200,
+              "origin": "Cordoba",
+              "destination": "Tucuman",
+              "distance_km": 570,
+              "estimated_dispatch_date": "2026-10-07",
+              "priority": "Normal",
+              "delivery_due_date": "2026-10-11"
+            },
+            {
+              "order_id": "SHP-0003",
+              "product": "Producto A",
+              "quantity_units": 26,
+              "unit_weight_kg": 800,
+              "origin": "Cordoba",
+              "destination": "San Francisco",
+              "distance_km": 205,
+              "estimated_dispatch_date": "2026-10-10",
+              "priority": "Normal",
+              "delivery_due_date": "2026-10-12"
+            },
+            {
+              "order_id": "SHP-0004",
+              "product": "Producto C",
+              "quantity_units": 7,
+              "unit_weight_kg": 500,
+              "origin": "Cordoba",
+              "destination": "San Francisco",
+              "distance_km": 205,
+              "estimated_dispatch_date": "2026-10-03",
+              "priority": "Normal",
+              "delivery_due_date": "2026-10-06"
+            },
+            {
+              "order_id": "SHP-0005",
+              "product": "Producto B",
+              "quantity_units": 14,
+              "unit_weight_kg": 1200,
+              "origin": "Cordoba",
+              "destination": "Rosario",
+              "distance_km": 400,
+              "estimated_dispatch_date": "2026-10-06",
+              "priority": "Normal",
+              "delivery_due_date": "2026-10-10"
+            }
+          ],
+          "shown": 5
+        },
+        "detected": {
+          "delimiter": ";",
+          "encoding": "UTF-8",
+          "date_format": "AAAA-MM-DD",
+          "aliases": [],
+          "columns": 10
+        },
+        "suggested_label": "\u00d3rdenes \u00b7 30 registros",
+        "errors": [],
+        "warnings": [],
+        "counts": {
+          "errors": 0,
+          "warnings": 0
+        },
+        "truncated": false
+      }
+    },
+    "fleet": {
+      "id": "00000000-0000-4000-9000-000000000012",
+      "dataset_type": "fleet",
+      "schema_version": "fleet_v3",
+      "original_filename": "fleet.csv",
+      "canonical_filename": "Caso-B-fleet.csv",
+      "row_count": 8,
+      "column_count": 17,
+      "created_at": "2026-10-09T12:00:00+00:00",
+      "is_default": true,
+      "is_sample": true,
+      "archived_at": null,
+      "label": "Audit synthetic fleet",
+      "status": "validated",
+      "size_bytes": 1115,
+      "sha256": "e705fbbdcfe64e06727af35f1a2184c1526e07afd8c57530b04b708478e5c1e8",
+      "profile_json": {
+        "valid": true,
+        "detected_format": "fleet_v3",
+        "schema": "fleet_v3",
+        "rows": 8,
+        "columns": 17,
+        "profile": {
+          "profile_version": 4,
+          "fleet": [
+            {
+              "vehicle_id": "VEH-001",
+              "license_plate": "AE123XX",
+              "vehicle_type": "Truck_L",
+              "ownership": "own",
+              "provider_name": "",
+              "base_site": "Cordoba",
+              "capacity_kg": 25000,
+              "capacity_m3": 65,
+              "cost_per_km": 1180,
+              "fixed_trip_cost": 48000,
+              "fuel_l_per_100km": 38,
+              "co2_kg_per_km": 1.02,
+              "avg_speed_kmh": 70,
+              "driving_hours_per_day": 10,
+              "status": "available",
+              "available_from": "2026-10-01",
+              "available_until": "2027-10-31",
+              "_row": 2,
+              "fleet_pool_id": "VEH-001",
+              "base_location": "Cordoba",
+              "units_available": 1,
+              "legacy_global_scope": false
+            },
+            {
+              "vehicle_id": "VEH-002",
+              "license_plate": "AF456YY",
+              "vehicle_type": "Truck_L",
+              "ownership": "own",
+              "provider_name": "",
+              "base_site": "Cordoba",
+              "capacity_kg": 25000,
+              "capacity_m3": 65,
+              "cost_per_km": 1180,
+              "fixed_trip_cost": 48000,
+              "fuel_l_per_100km": 38,
+              "co2_kg_per_km": 1.02,
+              "avg_speed_kmh": 70,
+              "driving_hours_per_day": 10,
+              "status": "available",
+              "available_from": "2026-10-01",
+              "available_until": "2027-10-31",
+              "_row": 3,
+              "fleet_pool_id": "VEH-002",
+              "base_location": "Cordoba",
+              "units_available": 1,
+              "legacy_global_scope": false
+            },
+            {
+              "vehicle_id": "VEH-003",
+              "license_plate": "AG789ZZ",
+              "vehicle_type": "Truck_M",
+              "ownership": "own",
+              "provider_name": "",
+              "base_site": "Cordoba",
+              "capacity_kg": 15000,
+              "capacity_m3": 42,
+              "cost_per_km": 920,
+              "fixed_trip_cost": 35000,
+              "fuel_l_per_100km": 30,
+              "co2_kg_per_km": 0.8,
+              "avg_speed_kmh": 70,
+              "driving_hours_per_day": 10,
+              "status": "available",
+              "available_from": "2026-10-01",
+              "available_until": "2027-10-31",
+              "_row": 4,
+              "fleet_pool_id": "VEH-003",
+              "base_location": "Cordoba",
+              "units_available": 1,
+              "legacy_global_scope": false
+            },
+            {
+              "vehicle_id": "VEH-004",
+              "license_plate": "AH321CC",
+              "vehicle_type": "Truck_M",
+              "ownership": "own",
+              "provider_name": "",
+              "base_site": "Cordoba",
+              "capacity_kg": 15000,
+              "capacity_m3": 42,
+              "cost_per_km": 920,
+              "fixed_trip_cost": 35000,
+              "fuel_l_per_100km": 30,
+              "co2_kg_per_km": 0.8,
+              "avg_speed_kmh": 70,
+              "driving_hours_per_day": 10,
+              "status": "available",
+              "available_from": "2026-10-01",
+              "available_until": "2027-10-31",
+              "_row": 5,
+              "fleet_pool_id": "VEH-004",
+              "base_location": "Cordoba",
+              "units_available": 1,
+              "legacy_global_scope": false
+            },
+            {
+              "vehicle_id": "VEH-005",
+              "license_plate": "AI654DD",
+              "vehicle_type": "Truck_S",
+              "ownership": "own",
+              "provider_name": "",
+              "base_site": "Cordoba",
+              "capacity_kg": 8000,
+              "capacity_m3": 25,
+              "cost_per_km": 720,
+              "fixed_trip_cost": 25000,
+              "fuel_l_per_100km": 22,
+              "co2_kg_per_km": 0.59,
+              "avg_speed_kmh": 70,
+              "driving_hours_per_day": 10,
+              "status": "available",
+              "available_from": "2026-10-01",
+              "available_until": "2027-10-31",
+              "_row": 6,
+              "fleet_pool_id": "VEH-005",
+              "base_location": "Cordoba",
+              "units_available": 1,
+              "legacy_global_scope": false
+            },
+            {
+              "vehicle_id": "VEH-101",
+              "license_plate": "AJ111AA",
+              "vehicle_type": "Truck_L",
+              "ownership": "third_party",
+              "provider_name": "Transportes Norte",
+              "base_site": "Cordoba",
+              "capacity_kg": 25000,
+              "capacity_m3": 65,
+              "cost_per_km": 1534,
+              "fixed_trip_cost": 62400,
+              "fuel_l_per_100km": 38,
+              "co2_kg_per_km": 1.02,
+              "avg_speed_kmh": 70,
+              "driving_hours_per_day": 10,
+              "status": "available",
+              "available_from": "2026-10-01",
+              "available_until": "2027-10-31",
+              "_row": 7,
+              "fleet_pool_id": "VEH-101",
+              "base_location": "Cordoba",
+              "units_available": 1,
+              "legacy_global_scope": false
+            },
+            {
+              "vehicle_id": "VEH-102",
+              "license_plate": "AK222BB",
+              "vehicle_type": "Truck_M",
+              "ownership": "third_party",
+              "provider_name": "Logistica Centro",
+              "base_site": "Cordoba",
+              "capacity_kg": 15000,
+              "capacity_m3": 42,
+              "cost_per_km": 1270,
+              "fixed_trip_cost": 52000,
+              "fuel_l_per_100km": 30,
+              "co2_kg_per_km": 0.8,
+              "avg_speed_kmh": 70,
+              "driving_hours_per_day": 10,
+              "status": "available",
+              "available_from": "2026-10-01",
+              "available_until": "2027-10-31",
+              "_row": 8,
+              "fleet_pool_id": "VEH-102",
+              "base_location": "Cordoba",
+              "units_available": 1,
+              "legacy_global_scope": false
+            },
+            {
+              "vehicle_id": "VEH-103",
+              "license_plate": "AL333CC",
+              "vehicle_type": "Truck_S",
+              "ownership": "third_party",
+              "provider_name": "Carga Express",
+              "base_site": "Cordoba",
+              "capacity_kg": 8000,
+              "capacity_m3": 25,
+              "cost_per_km": 1030,
+              "fixed_trip_cost": 39000,
+              "fuel_l_per_100km": 22,
+              "co2_kg_per_km": 0.59,
+              "avg_speed_kmh": 70,
+              "driving_hours_per_day": 10,
+              "status": "available",
+              "available_from": "2026-10-01",
+              "available_until": "2027-10-31",
+              "_row": 9,
+              "fleet_pool_id": "VEH-103",
+              "base_location": "Cordoba",
+              "units_available": 1,
+              "legacy_global_scope": false
+            }
+          ],
+          "vehicles": 8,
+          "own_vehicles": 5,
+          "third_party_vehicles": 3,
+          "types": 3,
+          "sites": [
+            "Cordoba"
+          ],
+          "available_now": 8,
+          "total_capacity_kg": 136000,
+          "has_third_party": true
+        },
+        "completeness": {
+          "vehicle_id": {
+            "present": true,
+            "filled_rows": 8,
+            "total_rows": 8,
+            "complete": true,
+            "required": true,
+            "used_by": [
+              "assignment",
+              "scheduling",
+              "final_assignment"
+            ],
+            "unlock_label": null
+          },
+          "license_plate": {
+            "present": true,
+            "filled_rows": 8,
+            "total_rows": 8,
+            "complete": true,
+            "required": false,
+            "used_by": [
+              "final_assignment"
+            ],
+            "unlock_label": "Asignaci\u00f3n final"
+          },
+          "vehicle_type": {
+            "present": true,
+            "filled_rows": 8,
+            "total_rows": 8,
+            "complete": true,
+            "required": true,
+            "used_by": [
+              "assignment",
+              "scheduling",
+              "final_assignment"
+            ],
+            "unlock_label": null
+          },
+          "ownership": {
+            "present": true,
+            "filled_rows": 8,
+            "total_rows": 8,
+            "complete": true,
+            "required": true,
+            "used_by": [
+              "assignment",
+              "final_assignment"
+            ],
+            "unlock_label": null
+          },
+          "provider_name": {
+            "present": true,
+            "filled_rows": 3,
+            "total_rows": 8,
+            "complete": false,
+            "required": false,
+            "used_by": [
+              "final_assignment"
+            ],
+            "unlock_label": "Detalle de ejecuci\u00f3n"
+          },
+          "base_site": {
+            "present": true,
+            "filled_rows": 8,
+            "total_rows": 8,
+            "complete": true,
+            "required": true,
+            "used_by": [
+              "assignment",
+              "scheduling"
+            ],
+            "unlock_label": null
+          },
+          "capacity_kg": {
+            "present": true,
+            "filled_rows": 8,
+            "total_rows": 8,
+            "complete": true,
+            "required": true,
+            "used_by": [
+              "assignment"
+            ],
+            "unlock_label": null
+          },
+          "capacity_m3": {
+            "present": true,
+            "filled_rows": 8,
+            "total_rows": 8,
+            "complete": true,
+            "required": false,
+            "used_by": [
+              "assignment"
+            ],
+            "unlock_label": "Restricci\u00f3n volum\u00e9trica"
+          },
+          "cost_per_km": {
+            "present": true,
+            "filled_rows": 8,
+            "total_rows": 8,
+            "complete": true,
+            "required": false,
+            "used_by": [
+              "assignment"
+            ],
+            "unlock_label": "Objetivo Costo"
+          },
+          "fixed_trip_cost": {
+            "present": true,
+            "filled_rows": 8,
+            "total_rows": 8,
+            "complete": true,
+            "required": false,
+            "used_by": [
+              "assignment"
+            ],
+            "unlock_label": "Objetivo Costo"
+          },
+          "fuel_l_per_100km": {
+            "present": true,
+            "filled_rows": 8,
+            "total_rows": 8,
+            "complete": true,
+            "required": false,
+            "used_by": [
+              "assignment"
+            ],
+            "unlock_label": "An\u00e1lisis de combustible"
+          },
+          "co2_kg_per_km": {
+            "present": true,
+            "filled_rows": 8,
+            "total_rows": 8,
+            "complete": true,
+            "required": false,
+            "used_by": [
+              "assignment"
+            ],
+            "unlock_label": "Objetivo CO\u2082"
+          },
+          "avg_speed_kmh": {
+            "present": true,
+            "filled_rows": 8,
+            "total_rows": 8,
+            "complete": true,
+            "required": false,
+            "used_by": [
+              "scheduling"
+            ],
+            "unlock_label": "Planificaci\u00f3n"
+          },
+          "driving_hours_per_day": {
+            "present": true,
+            "filled_rows": 8,
+            "total_rows": 8,
+            "complete": true,
+            "required": false,
+            "used_by": [
+              "scheduling"
+            ],
+            "unlock_label": "Planificaci\u00f3n"
+          },
+          "status": {
+            "present": true,
+            "filled_rows": 8,
+            "total_rows": 8,
+            "complete": true,
+            "required": false,
+            "used_by": [
+              "scheduling",
+              "final_assignment"
+            ],
+            "unlock_label": "Planificaci\u00f3n"
+          },
+          "available_from": {
+            "present": true,
+            "filled_rows": 8,
+            "total_rows": 8,
+            "complete": true,
+            "required": false,
+            "used_by": [
+              "scheduling",
+              "final_assignment"
+            ],
+            "unlock_label": "Planificaci\u00f3n"
+          },
+          "available_until": {
+            "present": true,
+            "filled_rows": 8,
+            "total_rows": 8,
+            "complete": true,
+            "required": false,
+            "used_by": [
+              "scheduling",
+              "final_assignment"
+            ],
+            "unlock_label": "Asignaci\u00f3n final"
+          }
+        },
+        "preview": {
+          "columns": [
+            "vehicle_id",
+            "license_plate",
+            "vehicle_type",
+            "ownership",
+            "provider_name",
+            "base_site",
+            "capacity_kg",
+            "capacity_m3",
+            "cost_per_km",
+            "fixed_trip_cost",
+            "fuel_l_per_100km",
+            "co2_kg_per_km",
+            "avg_speed_kmh",
+            "driving_hours_per_day",
+            "status",
+            "available_from",
+            "available_until"
+          ],
+          "rows": [
+            {
+              "vehicle_id": "VEH-001",
+              "license_plate": "AE123XX",
+              "vehicle_type": "Truck_L",
+              "ownership": "own",
+              "provider_name": "",
+              "base_site": "Cordoba",
+              "capacity_kg": 25000,
+              "capacity_m3": 65,
+              "cost_per_km": 1180,
+              "fixed_trip_cost": 48000,
+              "fuel_l_per_100km": 38,
+              "co2_kg_per_km": 1.02,
+              "avg_speed_kmh": 70,
+              "driving_hours_per_day": 10,
+              "status": "available",
+              "available_from": "2026-10-01",
+              "available_until": "2027-10-31"
+            },
+            {
+              "vehicle_id": "VEH-002",
+              "license_plate": "AF456YY",
+              "vehicle_type": "Truck_L",
+              "ownership": "own",
+              "provider_name": "",
+              "base_site": "Cordoba",
+              "capacity_kg": 25000,
+              "capacity_m3": 65,
+              "cost_per_km": 1180,
+              "fixed_trip_cost": 48000,
+              "fuel_l_per_100km": 38,
+              "co2_kg_per_km": 1.02,
+              "avg_speed_kmh": 70,
+              "driving_hours_per_day": 10,
+              "status": "available",
+              "available_from": "2026-10-01",
+              "available_until": "2027-10-31"
+            },
+            {
+              "vehicle_id": "VEH-003",
+              "license_plate": "AG789ZZ",
+              "vehicle_type": "Truck_M",
+              "ownership": "own",
+              "provider_name": "",
+              "base_site": "Cordoba",
+              "capacity_kg": 15000,
+              "capacity_m3": 42,
+              "cost_per_km": 920,
+              "fixed_trip_cost": 35000,
+              "fuel_l_per_100km": 30,
+              "co2_kg_per_km": 0.8,
+              "avg_speed_kmh": 70,
+              "driving_hours_per_day": 10,
+              "status": "available",
+              "available_from": "2026-10-01",
+              "available_until": "2027-10-31"
+            },
+            {
+              "vehicle_id": "VEH-004",
+              "license_plate": "AH321CC",
+              "vehicle_type": "Truck_M",
+              "ownership": "own",
+              "provider_name": "",
+              "base_site": "Cordoba",
+              "capacity_kg": 15000,
+              "capacity_m3": 42,
+              "cost_per_km": 920,
+              "fixed_trip_cost": 35000,
+              "fuel_l_per_100km": 30,
+              "co2_kg_per_km": 0.8,
+              "avg_speed_kmh": 70,
+              "driving_hours_per_day": 10,
+              "status": "available",
+              "available_from": "2026-10-01",
+              "available_until": "2027-10-31"
+            },
+            {
+              "vehicle_id": "VEH-005",
+              "license_plate": "AI654DD",
+              "vehicle_type": "Truck_S",
+              "ownership": "own",
+              "provider_name": "",
+              "base_site": "Cordoba",
+              "capacity_kg": 8000,
+              "capacity_m3": 25,
+              "cost_per_km": 720,
+              "fixed_trip_cost": 25000,
+              "fuel_l_per_100km": 22,
+              "co2_kg_per_km": 0.59,
+              "avg_speed_kmh": 70,
+              "driving_hours_per_day": 10,
+              "status": "available",
+              "available_from": "2026-10-01",
+              "available_until": "2027-10-31"
+            }
+          ],
+          "shown": 5
+        },
+        "detected": {
+          "delimiter": ";",
+          "encoding": "UTF-8",
+          "date_format": null,
+          "aliases": [],
+          "columns": 17,
+          "source_format": "fleet_v3"
+        },
+        "suggested_label": "Flota \u00b7 8 veh\u00edculos",
+        "errors": [],
+        "warnings": [],
+        "counts": {
+          "errors": 0,
+          "warnings": 0
+        },
+        "truncated": false
+      }
+    },
+    "dimensions": [
+      "trips",
+      "own_fleet"
+    ],
+    "weights": {
+      "trips": 50,
+      "cost": 0,
+      "own_fleet": 50,
+      "co2": 0
+    },
+    "customWeights": null,
+    "lastPreset": "balanced",
+    "objective": "balanced",
+    "allow": true,
+    "resourceMode": "mixed",
+    "scopeFilters": [],
+    "decisions": {},
+    "configured": false,
+    "decisionCase": {
+      "schema_version": "decision_case_v2",
+      "id": "85fb9c6e-c9cb-41fc-af4c-591f20d1827e",
+      "domain": "logistics",
+      "signature": "00000000-0000-4000-9000-000000000011:00000000-0000-4000-9000-000000000012",
+      "created_at": "2026-10-26T04:22:55.966Z",
+      "updated_at": "2026-10-26T04:22:55.966Z",
+      "inputs": {
+        "orders_dataset_id": "00000000-0000-4000-9000-000000000011",
+        "fleet_dataset_id": "00000000-0000-4000-9000-000000000012"
+      },
+      "stale_predecessor": {
+        "id": "00000000-0000-4000-8000-000000000003",
+        "status": "stale",
+        "signature": "00000000-0000-4000-8000-000000000001:00000000-0000-4000-8000-000000000002",
+        "updated_at": "2026-10-09T12:00:00+00:00",
+        "approved_run_id": "00000000-0000-4000-8000-000000000004"
+      },
+      "nodes": {
+        "logistics_assignment": {
+          "status": "available",
+          "run_id": null,
+          "latest_run_id": null,
+          "approved_run_id": null,
+          "run_count": 0,
+          "latest_execution_status": null,
+          "approved_at": null,
+          "error": null
+        },
+        "logistics_scheduling": {
+          "status": "locked",
+          "run_id": null,
+          "latest_run_id": null,
+          "approved_run_id": null,
+          "run_count": 0,
+          "latest_execution_status": null,
+          "approved_at": null,
+          "error": null
+        },
+        "logistics_final_assignment": {
+          "status": "locked",
+          "run_id": null,
+          "latest_run_id": null,
+          "approved_run_id": null,
+          "run_count": 0,
+          "latest_execution_status": null,
+          "approved_at": null,
+          "error": null
+        }
+      },
+      "status": "active",
+      "label": null,
+      "category": null,
+      "description": null,
+      "attributes_applied_at": null,
+      "collaboration": null,
+      "persisted": true
+    },
+    "activeNode": null,
+    "schedulingUseDueDates": true,
+    "configPreview": null,
+    "preflight": {
+      "valid": true,
+      "decision": "logistics_assignment",
+      "scope": "non_temporal",
+      "errors": [],
+      "warnings": [],
+      "anomalies": [],
+      "findings": [],
+      "summary": {
+        "orders": 30,
+        "fleet_rows": 8,
+        "active_vehicles": 8,
+        "origins": 1
+      },
+      "decision_readiness": {
+        "data_pack": "logistics_data_pack_v1",
+        "orders_schema": "orders_v3",
+        "fleet_schema": "fleet_v3",
+        "decisions": [
+          {
+            "id": "logistics_assignment",
+            "level": 1,
+            "label": "Asignaci\u00f3n de carga",
+            "question": "\u00bfC\u00f3mo conviene construir los viajes y distribuir la carga?",
+            "dependency": null,
+            "data_ready": true,
+            "state": "available",
+            "missing": [],
+            "blockers": [],
+            "capabilities": [
+              {
+                "id": "trips",
+                "label": "Menor cantidad de viajes",
+                "available": true,
+                "missing": []
+              },
+              {
+                "id": "own_fleet",
+                "label": "Priorizar flota propia",
+                "available": true,
+                "missing": []
+              },
+              {
+                "id": "cost",
+                "label": "Optimizar costo",
+                "available": true,
+                "missing": []
+              },
+              {
+                "id": "co2",
+                "label": "Optimizar CO\u2082",
+                "available": true,
+                "missing": []
+              }
+            ]
+          },
+          {
+            "id": "logistics_scheduling",
+            "level": 2,
+            "label": "Planificaci\u00f3n",
+            "question": "\u00bfCu\u00e1ndo conviene ejecutar los viajes ya definidos?",
+            "dependency": "logistics_assignment",
+            "data_ready": true,
+            "state": "locked",
+            "missing": [],
+            "unlock_reason": "Primero valid\u00e1 Asignaci\u00f3n de carga.",
+            "capabilities": [
+              {
+                "id": "sla",
+                "label": "Evaluar fecha objetivo de entrega",
+                "available": true,
+                "missing": []
+              }
+            ]
+          },
+          {
+            "id": "logistics_final_assignment",
+            "level": 3,
+            "label": "Asignaci\u00f3n final",
+            "question": "\u00bfQu\u00e9 cami\u00f3n y patente ejecuta cada viaje programado?",
+            "dependency": "logistics_scheduling",
+            "data_ready": true,
+            "state": "locked",
+            "missing": [],
+            "unlock_reason": "Primero valid\u00e1 Planificaci\u00f3n.",
+            "capabilities": []
+          }
+        ],
+        "next_available": "logistics_assignment",
+        "summary": {
+          "available": 1,
+          "data_ready": 3,
+          "locked": 2
+        }
+      },
+      "orders_profile": {
+        "profile_version": 3,
+        "orders": 30,
+        "total_units": 519,
+        "total_weight_kg": 430100,
+        "routes": 5,
+        "origins": 1,
+        "origin_sites": [
+          "Cordoba"
+        ],
+        "destinations": 5,
+        "products": 3,
+        "max_order_kg": 36000,
+        "estimated_dispatch_date_range": {
+          "from": "2026-10-01",
+          "to": "2026-10-10"
+        },
+        "priority_mix": {
+          "High": 4,
+          "Low": 3,
+          "Normal": 23
+        }
+      },
+      "fleet_profile": {
+        "profile_version": 4,
+        "fleet": [
+          {
+            "vehicle_id": "VEH-001",
+            "license_plate": "AE123XX",
+            "vehicle_type": "Truck_L",
+            "ownership": "own",
+            "provider_name": "",
+            "base_site": "Cordoba",
+            "capacity_kg": 25000,
+            "capacity_m3": 65,
+            "cost_per_km": 1180,
+            "fixed_trip_cost": 48000,
+            "fuel_l_per_100km": 38,
+            "co2_kg_per_km": 1.02,
+            "avg_speed_kmh": 70,
+            "driving_hours_per_day": 10,
+            "status": "available",
+            "available_from": "2026-10-01",
+            "available_until": "2027-10-31",
+            "_row": 2,
+            "fleet_pool_id": "VEH-001",
+            "base_location": "Cordoba",
+            "units_available": 1,
+            "legacy_global_scope": false
+          },
+          {
+            "vehicle_id": "VEH-002",
+            "license_plate": "AF456YY",
+            "vehicle_type": "Truck_L",
+            "ownership": "own",
+            "provider_name": "",
+            "base_site": "Cordoba",
+            "capacity_kg": 25000,
+            "capacity_m3": 65,
+            "cost_per_km": 1180,
+            "fixed_trip_cost": 48000,
+            "fuel_l_per_100km": 38,
+            "co2_kg_per_km": 1.02,
+            "avg_speed_kmh": 70,
+            "driving_hours_per_day": 10,
+            "status": "available",
+            "available_from": "2026-10-01",
+            "available_until": "2027-10-31",
+            "_row": 3,
+            "fleet_pool_id": "VEH-002",
+            "base_location": "Cordoba",
+            "units_available": 1,
+            "legacy_global_scope": false
+          },
+          {
+            "vehicle_id": "VEH-003",
+            "license_plate": "AG789ZZ",
+            "vehicle_type": "Truck_M",
+            "ownership": "own",
+            "provider_name": "",
+            "base_site": "Cordoba",
+            "capacity_kg": 15000,
+            "capacity_m3": 42,
+            "cost_per_km": 920,
+            "fixed_trip_cost": 35000,
+            "fuel_l_per_100km": 30,
+            "co2_kg_per_km": 0.8,
+            "avg_speed_kmh": 70,
+            "driving_hours_per_day": 10,
+            "status": "available",
+            "available_from": "2026-10-01",
+            "available_until": "2027-10-31",
+            "_row": 4,
+            "fleet_pool_id": "VEH-003",
+            "base_location": "Cordoba",
+            "units_available": 1,
+            "legacy_global_scope": false
+          },
+          {
+            "vehicle_id": "VEH-004",
+            "license_plate": "AH321CC",
+            "vehicle_type": "Truck_M",
+            "ownership": "own",
+            "provider_name": "",
+            "base_site": "Cordoba",
+            "capacity_kg": 15000,
+            "capacity_m3": 42,
+            "cost_per_km": 920,
+            "fixed_trip_cost": 35000,
+            "fuel_l_per_100km": 30,
+            "co2_kg_per_km": 0.8,
+            "avg_speed_kmh": 70,
+            "driving_hours_per_day": 10,
+            "status": "available",
+            "available_from": "2026-10-01",
+            "available_until": "2027-10-31",
+            "_row": 5,
+            "fleet_pool_id": "VEH-004",
+            "base_location": "Cordoba",
+            "units_available": 1,
+            "legacy_global_scope": false
+          },
+          {
+            "vehicle_id": "VEH-005",
+            "license_plate": "AI654DD",
+            "vehicle_type": "Truck_S",
+            "ownership": "own",
+            "provider_name": "",
+            "base_site": "Cordoba",
+            "capacity_kg": 8000,
+            "capacity_m3": 25,
+            "cost_per_km": 720,
+            "fixed_trip_cost": 25000,
+            "fuel_l_per_100km": 22,
+            "co2_kg_per_km": 0.59,
+            "avg_speed_kmh": 70,
+            "driving_hours_per_day": 10,
+            "status": "available",
+            "available_from": "2026-10-01",
+            "available_until": "2027-10-31",
+            "_row": 6,
+            "fleet_pool_id": "VEH-005",
+            "base_location": "Cordoba",
+            "units_available": 1,
+            "legacy_global_scope": false
+          },
+          {
+            "vehicle_id": "VEH-101",
+            "license_plate": "AJ111AA",
+            "vehicle_type": "Truck_L",
+            "ownership": "third_party",
+            "provider_name": "Transportes Norte",
+            "base_site": "Cordoba",
+            "capacity_kg": 25000,
+            "capacity_m3": 65,
+            "cost_per_km": 1534,
+            "fixed_trip_cost": 62400,
+            "fuel_l_per_100km": 38,
+            "co2_kg_per_km": 1.02,
+            "avg_speed_kmh": 70,
+            "driving_hours_per_day": 10,
+            "status": "available",
+            "available_from": "2026-10-01",
+            "available_until": "2027-10-31",
+            "_row": 7,
+            "fleet_pool_id": "VEH-101",
+            "base_location": "Cordoba",
+            "units_available": 1,
+            "legacy_global_scope": false
+          },
+          {
+            "vehicle_id": "VEH-102",
+            "license_plate": "AK222BB",
+            "vehicle_type": "Truck_M",
+            "ownership": "third_party",
+            "provider_name": "Logistica Centro",
+            "base_site": "Cordoba",
+            "capacity_kg": 15000,
+            "capacity_m3": 42,
+            "cost_per_km": 1270,
+            "fixed_trip_cost": 52000,
+            "fuel_l_per_100km": 30,
+            "co2_kg_per_km": 0.8,
+            "avg_speed_kmh": 70,
+            "driving_hours_per_day": 10,
+            "status": "available",
+            "available_from": "2026-10-01",
+            "available_until": "2027-10-31",
+            "_row": 8,
+            "fleet_pool_id": "VEH-102",
+            "base_location": "Cordoba",
+            "units_available": 1,
+            "legacy_global_scope": false
+          },
+          {
+            "vehicle_id": "VEH-103",
+            "license_plate": "AL333CC",
+            "vehicle_type": "Truck_S",
+            "ownership": "third_party",
+            "provider_name": "Carga Express",
+            "base_site": "Cordoba",
+            "capacity_kg": 8000,
+            "capacity_m3": 25,
+            "cost_per_km": 1030,
+            "fixed_trip_cost": 39000,
+            "fuel_l_per_100km": 22,
+            "co2_kg_per_km": 0.59,
+            "avg_speed_kmh": 70,
+            "driving_hours_per_day": 10,
+            "status": "available",
+            "available_from": "2026-10-01",
+            "available_until": "2027-10-31",
+            "_row": 9,
+            "fleet_pool_id": "VEH-103",
+            "base_location": "Cordoba",
+            "units_available": 1,
+            "legacy_global_scope": false
+          }
+        ],
+        "vehicles": 8,
+        "own_vehicles": 5,
+        "third_party_vehicles": 3,
+        "types": 3,
+        "sites": [
+          "Cordoba"
+        ],
+        "available_now": 8,
+        "total_capacity_kg": 136000,
+        "has_third_party": true
+      },
+      "orders_dataset": {
+        "id": "00000000-0000-4000-8000-000000000001",
+        "dataset_type": "orders",
+        "schema_version": "orders_v3",
+        "original_filename": "orders.csv",
+        "canonical_filename": "Orders_20261009_090000.csv",
+        "row_count": 30,
+        "column_count": 10,
+        "created_at": "2026-10-09T12:00:00+00:00",
+        "is_default": false,
+        "is_sample": true,
+        "archived_at": null,
+        "label": "Audit synthetic orders",
+        "status": "validated",
+        "size_bytes": 2465,
+        "sha256": "c2ade0b09a5d541baf4de990f050af4212e23f2f6fc676393ac3b9032260b99b",
+        "profile_json": {
+          "valid": true,
+          "detected_format": "orders_v3",
+          "schema": "orders_v3",
+          "rows": 30,
+          "columns": 10,
+          "profile": {
+            "profile_version": 3,
+            "orders": 30,
+            "total_units": 519,
+            "total_weight_kg": 430100,
+            "routes": 5,
+            "origins": 1,
+            "origin_sites": [
+              "Cordoba"
+            ],
+            "destinations": 5,
+            "products": 3,
+            "max_order_kg": 36000,
+            "estimated_dispatch_date_range": {
+              "from": "2026-10-01",
+              "to": "2026-10-10"
+            },
+            "priority_mix": {
+              "High": 4,
+              "Low": 3,
+              "Normal": 23
+            }
+          },
+          "completeness": {
+            "order_id": {
+              "present": true,
+              "filled_rows": 30,
+              "total_rows": 30,
+              "complete": true,
+              "required": true,
+              "used_by": [
+                "assignment",
+                "scheduling",
+                "final_assignment"
+              ],
+              "unlock_label": null
+            },
+            "product": {
+              "present": true,
+              "filled_rows": 30,
+              "total_rows": 30,
+              "complete": true,
+              "required": true,
+              "used_by": [
+                "assignment",
+                "final_assignment"
+              ],
+              "unlock_label": null
+            },
+            "quantity_units": {
+              "present": true,
+              "filled_rows": 30,
+              "total_rows": 30,
+              "complete": true,
+              "required": true,
+              "used_by": [
+                "assignment"
+              ],
+              "unlock_label": null
+            },
+            "unit_weight_kg": {
+              "present": true,
+              "filled_rows": 30,
+              "total_rows": 30,
+              "complete": true,
+              "required": true,
+              "used_by": [
+                "assignment"
+              ],
+              "unlock_label": null
+            },
+            "origin": {
+              "present": true,
+              "filled_rows": 30,
+              "total_rows": 30,
+              "complete": true,
+              "required": true,
+              "used_by": [
+                "assignment",
+                "scheduling"
+              ],
+              "unlock_label": null
+            },
+            "destination": {
+              "present": true,
+              "filled_rows": 30,
+              "total_rows": 30,
+              "complete": true,
+              "required": true,
+              "used_by": [
+                "assignment",
+                "scheduling"
+              ],
+              "unlock_label": null
+            },
+            "distance_km": {
+              "present": true,
+              "filled_rows": 30,
+              "total_rows": 30,
+              "complete": true,
+              "required": true,
+              "used_by": [
+                "assignment",
+                "scheduling"
+              ],
+              "unlock_label": null
+            },
+            "estimated_dispatch_date": {
+              "present": true,
+              "filled_rows": 30,
+              "total_rows": 30,
+              "complete": true,
+              "required": false,
+              "used_by": [
+                "scheduling"
+              ],
+              "unlock_label": "Planificaci\u00f3n"
+            },
+            "priority": {
+              "present": true,
+              "filled_rows": 30,
+              "total_rows": 30,
+              "complete": true,
+              "required": false,
+              "used_by": [
+                "scheduling"
+              ],
+              "unlock_label": "Planificaci\u00f3n avanzada"
+            },
+            "delivery_due_date": {
+              "present": true,
+              "filled_rows": 30,
+              "total_rows": 30,
+              "complete": true,
+              "required": false,
+              "used_by": [
+                "scheduling"
+              ],
+              "unlock_label": "SLA de planificaci\u00f3n"
+            }
+          },
+          "preview": {
+            "columns": [
+              "order_id",
+              "product",
+              "quantity_units",
+              "unit_weight_kg",
+              "origin",
+              "destination",
+              "distance_km",
+              "estimated_dispatch_date",
+              "priority",
+              "delivery_due_date"
+            ],
+            "rows": [
+              {
+                "order_id": "SHP-0001",
+                "product": "Producto C",
+                "quantity_units": 12,
+                "unit_weight_kg": 500,
+                "origin": "Cordoba",
+                "destination": "San Luis",
+                "distance_km": 420,
+                "estimated_dispatch_date": "2026-10-04",
+                "priority": "Normal",
+                "delivery_due_date": "2026-10-07"
+              },
+              {
+                "order_id": "SHP-0002",
+                "product": "Producto B",
+                "quantity_units": 19,
+                "unit_weight_kg": 1200,
+                "origin": "Cordoba",
+                "destination": "Tucuman",
+                "distance_km": 570,
+                "estimated_dispatch_date": "2026-10-07",
+                "priority": "Normal",
+                "delivery_due_date": "2026-10-11"
+              },
+              {
+                "order_id": "SHP-0003",
+                "product": "Producto A",
+                "quantity_units": 26,
+                "unit_weight_kg": 800,
+                "origin": "Cordoba",
+                "destination": "San Francisco",
+                "distance_km": 205,
+                "estimated_dispatch_date": "2026-10-10",
+                "priority": "Normal",
+                "delivery_due_date": "2026-10-12"
+              },
+              {
+                "order_id": "SHP-0004",
+                "product": "Producto C",
+                "quantity_units": 7,
+                "unit_weight_kg": 500,
+                "origin": "Cordoba",
+                "destination": "San Francisco",
+                "distance_km": 205,
+                "estimated_dispatch_date": "2026-10-03",
+                "priority": "Normal",
+                "delivery_due_date": "2026-10-06"
+              },
+              {
+                "order_id": "SHP-0005",
+                "product": "Producto B",
+                "quantity_units": 14,
+                "unit_weight_kg": 1200,
+                "origin": "Cordoba",
+                "destination": "Rosario",
+                "distance_km": 400,
+                "estimated_dispatch_date": "2026-10-06",
+                "priority": "Normal",
+                "delivery_due_date": "2026-10-10"
+              }
+            ],
+            "shown": 5
+          },
+          "detected": {
+            "delimiter": ";",
+            "encoding": "UTF-8",
+            "date_format": "AAAA-MM-DD",
+            "aliases": [],
+            "columns": 10
+          },
+          "suggested_label": "\u00d3rdenes \u00b7 30 registros",
+          "errors": [],
+          "warnings": [],
+          "counts": {
+            "errors": 0,
+            "warnings": 0
+          },
+          "truncated": false
+        }
+      },
+      "fleet_dataset": {
+        "id": "00000000-0000-4000-8000-000000000002",
+        "dataset_type": "fleet",
+        "schema_version": "fleet_v3",
+        "original_filename": "fleet.csv",
+        "canonical_filename": "Fleet_20261009_090000.csv",
+        "row_count": 8,
+        "column_count": 17,
+        "created_at": "2026-10-09T12:00:00+00:00",
+        "is_default": true,
+        "is_sample": true,
+        "archived_at": null,
+        "label": "Audit synthetic fleet",
+        "status": "validated",
+        "size_bytes": 1115,
+        "sha256": "e705fbbdcfe64e06727af35f1a2184c1526e07afd8c57530b04b708478e5c1e8",
+        "profile_json": {
+          "valid": true,
+          "detected_format": "fleet_v3",
+          "schema": "fleet_v3",
+          "rows": 8,
+          "columns": 17,
+          "profile": {
+            "profile_version": 4,
+            "fleet": [
+              {
+                "vehicle_id": "VEH-001",
+                "license_plate": "AE123XX",
+                "vehicle_type": "Truck_L",
+                "ownership": "own",
+                "provider_name": "",
+                "base_site": "Cordoba",
+                "capacity_kg": 25000,
+                "capacity_m3": 65,
+                "cost_per_km": 1180,
+                "fixed_trip_cost": 48000,
+                "fuel_l_per_100km": 38,
+                "co2_kg_per_km": 1.02,
+                "avg_speed_kmh": 70,
+                "driving_hours_per_day": 10,
+                "status": "available",
+                "available_from": "2026-10-01",
+                "available_until": "2027-10-31",
+                "_row": 2,
+                "fleet_pool_id": "VEH-001",
+                "base_location": "Cordoba",
+                "units_available": 1,
+                "legacy_global_scope": false
+              },
+              {
+                "vehicle_id": "VEH-002",
+                "license_plate": "AF456YY",
+                "vehicle_type": "Truck_L",
+                "ownership": "own",
+                "provider_name": "",
+                "base_site": "Cordoba",
+                "capacity_kg": 25000,
+                "capacity_m3": 65,
+                "cost_per_km": 1180,
+                "fixed_trip_cost": 48000,
+                "fuel_l_per_100km": 38,
+                "co2_kg_per_km": 1.02,
+                "avg_speed_kmh": 70,
+                "driving_hours_per_day": 10,
+                "status": "available",
+                "available_from": "2026-10-01",
+                "available_until": "2027-10-31",
+                "_row": 3,
+                "fleet_pool_id": "VEH-002",
+                "base_location": "Cordoba",
+                "units_available": 1,
+                "legacy_global_scope": false
+              },
+              {
+                "vehicle_id": "VEH-003",
+                "license_plate": "AG789ZZ",
+                "vehicle_type": "Truck_M",
+                "ownership": "own",
+                "provider_name": "",
+                "base_site": "Cordoba",
+                "capacity_kg": 15000,
+                "capacity_m3": 42,
+                "cost_per_km": 920,
+                "fixed_trip_cost": 35000,
+                "fuel_l_per_100km": 30,
+                "co2_kg_per_km": 0.8,
+                "avg_speed_kmh": 70,
+                "driving_hours_per_day": 10,
+                "status": "available",
+                "available_from": "2026-10-01",
+                "available_until": "2027-10-31",
+                "_row": 4,
+                "fleet_pool_id": "VEH-003",
+                "base_location": "Cordoba",
+                "units_available": 1,
+                "legacy_global_scope": false
+              },
+              {
+                "vehicle_id": "VEH-004",
+                "license_plate": "AH321CC",
+                "vehicle_type": "Truck_M",
+                "ownership": "own",
+                "provider_name": "",
+                "base_site": "Cordoba",
+                "capacity_kg": 15000,
+                "capacity_m3": 42,
+                "cost_per_km": 920,
+                "fixed_trip_cost": 35000,
+                "fuel_l_per_100km": 30,
+                "co2_kg_per_km": 0.8,
+                "avg_speed_kmh": 70,
+                "driving_hours_per_day": 10,
+                "status": "available",
+                "available_from": "2026-10-01",
+                "available_until": "2027-10-31",
+                "_row": 5,
+                "fleet_pool_id": "VEH-004",
+                "base_location": "Cordoba",
+                "units_available": 1,
+                "legacy_global_scope": false
+              },
+              {
+                "vehicle_id": "VEH-005",
+                "license_plate": "AI654DD",
+                "vehicle_type": "Truck_S",
+                "ownership": "own",
+                "provider_name": "",
+                "base_site": "Cordoba",
+                "capacity_kg": 8000,
+                "capacity_m3": 25,
+                "cost_per_km": 720,
+                "fixed_trip_cost": 25000,
+                "fuel_l_per_100km": 22,
+                "co2_kg_per_km": 0.59,
+                "avg_speed_kmh": 70,
+                "driving_hours_per_day": 10,
+                "status": "available",
+                "available_from": "2026-10-01",
+                "available_until": "2027-10-31",
+                "_row": 6,
+                "fleet_pool_id": "VEH-005",
+                "base_location": "Cordoba",
+                "units_available": 1,
+                "legacy_global_scope": false
+              },
+              {
+                "vehicle_id": "VEH-101",
+                "license_plate": "AJ111AA",
+                "vehicle_type": "Truck_L",
+                "ownership": "third_party",
+                "provider_name": "Transportes Norte",
+                "base_site": "Cordoba",
+                "capacity_kg": 25000,
+                "capacity_m3": 65,
+                "cost_per_km": 1534,
+                "fixed_trip_cost": 62400,
+                "fuel_l_per_100km": 38,
+                "co2_kg_per_km": 1.02,
+                "avg_speed_kmh": 70,
+                "driving_hours_per_day": 10,
+                "status": "available",
+                "available_from": "2026-10-01",
+                "available_until": "2027-10-31",
+                "_row": 7,
+                "fleet_pool_id": "VEH-101",
+                "base_location": "Cordoba",
+                "units_available": 1,
+                "legacy_global_scope": false
+              },
+              {
+                "vehicle_id": "VEH-102",
+                "license_plate": "AK222BB",
+                "vehicle_type": "Truck_M",
+                "ownership": "third_party",
+                "provider_name": "Logistica Centro",
+                "base_site": "Cordoba",
+                "capacity_kg": 15000,
+                "capacity_m3": 42,
+                "cost_per_km": 1270,
+                "fixed_trip_cost": 52000,
+                "fuel_l_per_100km": 30,
+                "co2_kg_per_km": 0.8,
+                "avg_speed_kmh": 70,
+                "driving_hours_per_day": 10,
+                "status": "available",
+                "available_from": "2026-10-01",
+                "available_until": "2027-10-31",
+                "_row": 8,
+                "fleet_pool_id": "VEH-102",
+                "base_location": "Cordoba",
+                "units_available": 1,
+                "legacy_global_scope": false
+              },
+              {
+                "vehicle_id": "VEH-103",
+                "license_plate": "AL333CC",
+                "vehicle_type": "Truck_S",
+                "ownership": "third_party",
+                "provider_name": "Carga Express",
+                "base_site": "Cordoba",
+                "capacity_kg": 8000,
+                "capacity_m3": 25,
+                "cost_per_km": 1030,
+                "fixed_trip_cost": 39000,
+                "fuel_l_per_100km": 22,
+                "co2_kg_per_km": 0.59,
+                "avg_speed_kmh": 70,
+                "driving_hours_per_day": 10,
+                "status": "available",
+                "available_from": "2026-10-01",
+                "available_until": "2027-10-31",
+                "_row": 9,
+                "fleet_pool_id": "VEH-103",
+                "base_location": "Cordoba",
+                "units_available": 1,
+                "legacy_global_scope": false
+              }
+            ],
+            "vehicles": 8,
+            "own_vehicles": 5,
+            "third_party_vehicles": 3,
+            "types": 3,
+            "sites": [
+              "Cordoba"
+            ],
+            "available_now": 8,
+            "total_capacity_kg": 136000,
+            "has_third_party": true
+          },
+          "completeness": {
+            "vehicle_id": {
+              "present": true,
+              "filled_rows": 8,
+              "total_rows": 8,
+              "complete": true,
+              "required": true,
+              "used_by": [
+                "assignment",
+                "scheduling",
+                "final_assignment"
+              ],
+              "unlock_label": null
+            },
+            "license_plate": {
+              "present": true,
+              "filled_rows": 8,
+              "total_rows": 8,
+              "complete": true,
+              "required": false,
+              "used_by": [
+                "final_assignment"
+              ],
+              "unlock_label": "Asignaci\u00f3n final"
+            },
+            "vehicle_type": {
+              "present": true,
+              "filled_rows": 8,
+              "total_rows": 8,
+              "complete": true,
+              "required": true,
+              "used_by": [
+                "assignment",
+                "scheduling",
+                "final_assignment"
+              ],
+              "unlock_label": null
+            },
+            "ownership": {
+              "present": true,
+              "filled_rows": 8,
+              "total_rows": 8,
+              "complete": true,
+              "required": true,
+              "used_by": [
+                "assignment",
+                "final_assignment"
+              ],
+              "unlock_label": null
+            },
+            "provider_name": {
+              "present": true,
+              "filled_rows": 3,
+              "total_rows": 8,
+              "complete": false,
+              "required": false,
+              "used_by": [
+                "final_assignment"
+              ],
+              "unlock_label": "Detalle de ejecuci\u00f3n"
+            },
+            "base_site": {
+              "present": true,
+              "filled_rows": 8,
+              "total_rows": 8,
+              "complete": true,
+              "required": true,
+              "used_by": [
+                "assignment",
+                "scheduling"
+              ],
+              "unlock_label": null
+            },
+            "capacity_kg": {
+              "present": true,
+              "filled_rows": 8,
+              "total_rows": 8,
+              "complete": true,
+              "required": true,
+              "used_by": [
+                "assignment"
+              ],
+              "unlock_label": null
+            },
+            "capacity_m3": {
+              "present": true,
+              "filled_rows": 8,
+              "total_rows": 8,
+              "complete": true,
+              "required": false,
+              "used_by": [
+                "assignment"
+              ],
+              "unlock_label": "Restricci\u00f3n volum\u00e9trica"
+            },
+            "cost_per_km": {
+              "present": true,
+              "filled_rows": 8,
+              "total_rows": 8,
+              "complete": true,
+              "required": false,
+              "used_by": [
+                "assignment"
+              ],
+              "unlock_label": "Objetivo Costo"
+            },
+            "fixed_trip_cost": {
+              "present": true,
+              "filled_rows": 8,
+              "total_rows": 8,
+              "complete": true,
+              "required": false,
+              "used_by": [
+                "assignment"
+              ],
+              "unlock_label": "Objetivo Costo"
+            },
+            "fuel_l_per_100km": {
+              "present": true,
+              "filled_rows": 8,
+              "total_rows": 8,
+              "complete": true,
+              "required": false,
+              "used_by": [
+                "assignment"
+              ],
+              "unlock_label": "An\u00e1lisis de combustible"
+            },
+            "co2_kg_per_km": {
+              "present": true,
+              "filled_rows": 8,
+              "total_rows": 8,
+              "complete": true,
+              "required": false,
+              "used_by": [
+                "assignment"
+              ],
+              "unlock_label": "Objetivo CO\u2082"
+            },
+            "avg_speed_kmh": {
+              "present": true,
+              "filled_rows": 8,
+              "total_rows": 8,
+              "complete": true,
+              "required": false,
+              "used_by": [
+                "scheduling"
+              ],
+              "unlock_label": "Planificaci\u00f3n"
+            },
+            "driving_hours_per_day": {
+              "present": true,
+              "filled_rows": 8,
+              "total_rows": 8,
+              "complete": true,
+              "required": false,
+              "used_by": [
+                "scheduling"
+              ],
+              "unlock_label": "Planificaci\u00f3n"
+            },
+            "status": {
+              "present": true,
+              "filled_rows": 8,
+              "total_rows": 8,
+              "complete": true,
+              "required": false,
+              "used_by": [
+                "scheduling",
+                "final_assignment"
+              ],
+              "unlock_label": "Planificaci\u00f3n"
+            },
+            "available_from": {
+              "present": true,
+              "filled_rows": 8,
+              "total_rows": 8,
+              "complete": true,
+              "required": false,
+              "used_by": [
+                "scheduling",
+                "final_assignment"
+              ],
+              "unlock_label": "Planificaci\u00f3n"
+            },
+            "available_until": {
+              "present": true,
+              "filled_rows": 8,
+              "total_rows": 8,
+              "complete": true,
+              "required": false,
+              "used_by": [
+                "scheduling",
+                "final_assignment"
+              ],
+              "unlock_label": "Asignaci\u00f3n final"
+            }
+          },
+          "preview": {
+            "columns": [
+              "vehicle_id",
+              "license_plate",
+              "vehicle_type",
+              "ownership",
+              "provider_name",
+              "base_site",
+              "capacity_kg",
+              "capacity_m3",
+              "cost_per_km",
+              "fixed_trip_cost",
+              "fuel_l_per_100km",
+              "co2_kg_per_km",
+              "avg_speed_kmh",
+              "driving_hours_per_day",
+              "status",
+              "available_from",
+              "available_until"
+            ],
+            "rows": [
+              {
+                "vehicle_id": "VEH-001",
+                "license_plate": "AE123XX",
+                "vehicle_type": "Truck_L",
+                "ownership": "own",
+                "provider_name": "",
+                "base_site": "Cordoba",
+                "capacity_kg": 25000,
+                "capacity_m3": 65,
+                "cost_per_km": 1180,
+                "fixed_trip_cost": 48000,
+                "fuel_l_per_100km": 38,
+                "co2_kg_per_km": 1.02,
+                "avg_speed_kmh": 70,
+                "driving_hours_per_day": 10,
+                "status": "available",
+                "available_from": "2026-10-01",
+                "available_until": "2027-10-31"
+              },
+              {
+                "vehicle_id": "VEH-002",
+                "license_plate": "AF456YY",
+                "vehicle_type": "Truck_L",
+                "ownership": "own",
+                "provider_name": "",
+                "base_site": "Cordoba",
+                "capacity_kg": 25000,
+                "capacity_m3": 65,
+                "cost_per_km": 1180,
+                "fixed_trip_cost": 48000,
+                "fuel_l_per_100km": 38,
+                "co2_kg_per_km": 1.02,
+                "avg_speed_kmh": 70,
+                "driving_hours_per_day": 10,
+                "status": "available",
+                "available_from": "2026-10-01",
+                "available_until": "2027-10-31"
+              },
+              {
+                "vehicle_id": "VEH-003",
+                "license_plate": "AG789ZZ",
+                "vehicle_type": "Truck_M",
+                "ownership": "own",
+                "provider_name": "",
+                "base_site": "Cordoba",
+                "capacity_kg": 15000,
+                "capacity_m3": 42,
+                "cost_per_km": 920,
+                "fixed_trip_cost": 35000,
+                "fuel_l_per_100km": 30,
+                "co2_kg_per_km": 0.8,
+                "avg_speed_kmh": 70,
+                "driving_hours_per_day": 10,
+                "status": "available",
+                "available_from": "2026-10-01",
+                "available_until": "2027-10-31"
+              },
+              {
+                "vehicle_id": "VEH-004",
+                "license_plate": "AH321CC",
+                "vehicle_type": "Truck_M",
+                "ownership": "own",
+                "provider_name": "",
+                "base_site": "Cordoba",
+                "capacity_kg": 15000,
+                "capacity_m3": 42,
+                "cost_per_km": 920,
+                "fixed_trip_cost": 35000,
+                "fuel_l_per_100km": 30,
+                "co2_kg_per_km": 0.8,
+                "avg_speed_kmh": 70,
+                "driving_hours_per_day": 10,
+                "status": "available",
+                "available_from": "2026-10-01",
+                "available_until": "2027-10-31"
+              },
+              {
+                "vehicle_id": "VEH-005",
+                "license_plate": "AI654DD",
+                "vehicle_type": "Truck_S",
+                "ownership": "own",
+                "provider_name": "",
+                "base_site": "Cordoba",
+                "capacity_kg": 8000,
+                "capacity_m3": 25,
+                "cost_per_km": 720,
+                "fixed_trip_cost": 25000,
+                "fuel_l_per_100km": 22,
+                "co2_kg_per_km": 0.59,
+                "avg_speed_kmh": 70,
+                "driving_hours_per_day": 10,
+                "status": "available",
+                "available_from": "2026-10-01",
+                "available_until": "2027-10-31"
+              }
+            ],
+            "shown": 5
+          },
+          "detected": {
+            "delimiter": ";",
+            "encoding": "UTF-8",
+            "date_format": null,
+            "aliases": [],
+            "columns": 17,
+            "source_format": "fleet_v3"
+          },
+          "suggested_label": "Flota \u00b7 8 veh\u00edculos",
+          "errors": [],
+          "warnings": [],
+          "counts": {
+            "errors": 0,
+            "warnings": 0
+          },
+          "truncated": false
+        }
+      }
+    },
+    "available": true,
+    "run": null,
+    "forkedFrom": null,
+    "workflow": {
+      "case_id": "85fb9c6e-c9cb-41fc-af4c-591f20d1827e",
+      "can_assign": true,
+      "can_prepare": true,
+      "gates_enforced": true,
+      "policy_version": 1,
+      "attributes_applied": false,
+      "stages": {
+        "data_owner": {
+          "owner": null,
+          "owner_eligible": false,
+          "approver": null,
+          "approver_eligible": false,
+          "updated_at": null,
+          "can_execute": true,
+          "can_approve": true
+        },
+        "logistics_assignment": {
+          "owner": null,
+          "owner_eligible": false,
+          "approver": null,
+          "approver_eligible": false,
+          "updated_at": null,
+          "can_execute": true,
+          "can_approve": true
+        },
+        "logistics_scheduling": {
+          "owner": null,
+          "owner_eligible": false,
+          "approver": null,
+          "approver_eligible": false,
+          "updated_at": null,
+          "can_execute": true,
+          "can_approve": true
+        },
+        "data_preparation": {
+          "owner": null,
+          "owner_eligible": false,
+          "approver": null,
+          "approver_eligible": false,
+          "updated_at": null,
+          "can_execute": true,
+          "can_approve": true
+        }
+      }
+    },
+    "caseContext": {
+      "caseId": "85fb9c6e-c9cb-41fc-af4c-591f20d1827e",
+      "friendlyId": "DC-85FB9C6E",
+      "label": null,
+      "dda": "logistics",
+      "status": "active",
+      "currentNode": null,
+      "progress": null
+    },
+    "caseVersion": "2026-10-22T00:00:00Z"
+  }
+}

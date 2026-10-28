@@ -1,0 +1,123 @@
+{
+  "valid": true,
+  "schema": "transport_demand_v1",
+  "contract_hash": "ff5b5c2b2b9324ab8bc8bd9693d83d668b7e45bdf03ca783e824bbd69fb77469",
+  "errors": [],
+  "warnings": [],
+  "counts": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "rows": 5,
+  "columns": 10,
+  "preview": [
+    {
+      "order_id": "ORD-001",
+      "origin_id": "ORIGIN-01",
+      "destination_id": "DEST-01",
+      "distance_km": "500",
+      "ready_date": "2026-11-02",
+      "delivery_due_date": "2026-11-06",
+      "priority": "MEDIUM",
+      "split_allowed": false,
+      "requested": {
+        "pallets": "10",
+        "weight_kg": null,
+        "volume_m3": null,
+        "units": null
+      },
+      "compatibility_groups": [
+        "DRY"
+      ]
+    },
+    {
+      "order_id": "ORD-002",
+      "origin_id": "ORIGIN-01",
+      "destination_id": "DEST-01",
+      "distance_km": "500",
+      "ready_date": "2026-11-02",
+      "delivery_due_date": "2026-11-06",
+      "priority": "MEDIUM",
+      "split_allowed": false,
+      "requested": {
+        "pallets": "10",
+        "weight_kg": null,
+        "volume_m3": null,
+        "units": null
+      },
+      "compatibility_groups": [
+        "DRY"
+      ]
+    },
+    {
+      "order_id": "ORD-003",
+      "origin_id": "ORIGIN-01",
+      "destination_id": "DEST-01",
+      "distance_km": "500",
+      "ready_date": "2026-11-02",
+      "delivery_due_date": "2026-11-06",
+      "priority": "MEDIUM",
+      "split_allowed": false,
+      "requested": {
+        "pallets": "10",
+        "weight_kg": null,
+        "volume_m3": null,
+        "units": null
+      },
+      "compatibility_groups": [
+        "DRY"
+      ]
+    },
+    {
+      "order_id": "ORD-004",
+      "origin_id": "ORIGIN-01",
+      "destination_id": "DEST-01",
+      "distance_km": "500",
+      "ready_date": "2026-11-02",
+      "delivery_due_date": "2026-11-06",
+      "priority": "MEDIUM",
+      "split_allowed": false,
+      "requested": {
+        "pallets": "10",
+        "weight_kg": null,
+        "volume_m3": null,
+        "units": null
+      },
+      "compatibility_groups": [
+        "DRY"
+      ]
+    },
+    {
+      "order_id": "ORD-005",
+      "origin_id": "ORIGIN-01",
+      "destination_id": "DEST-01",
+      "distance_km": "500",
+      "ready_date": "2026-11-02",
+      "delivery_due_date": "2026-11-06",
+      "priority": "MEDIUM",
+      "split_allowed": false,
+      "requested": {
+        "pallets": "10",
+        "weight_kg": null,
+        "volume_m3": null,
+        "units": null
+      },
+      "compatibility_groups": [
+        "DRY"
+      ]
+    }
+  ],
+  "summary": {
+    "semantic_entity": "transport_demand",
+    "record_count": 5,
+    "assumptions": [],
+    "assumptions_total": 0,
+    "assumptions_truncated": false,
+    "assumed_external_count": 0,
+    "unknown_availability_count": 0,
+    "unknown_cost_count": 0,
+    "quantity_totals": {
+      "pallets": "50"
+    }
+  }
+}

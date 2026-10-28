@@ -1,0 +1,452 @@
+{
+  "phase": "T9",
+  "baseline_inventory_files": 864,
+  "baseline_inventory_bytes": 42840096,
+  "checkpoint_sha256": "5fa1c33abf2ab52673f4dcca648f2217b502ac9011beea99071996cebbdbd28e",
+  "checkpoint_kind": "Equivalent post-T8 copies + inventory SHA256 + tracked patch; no git writes",
+  "workspace_full_copies": "/workspace/work/dation-t9/post-t8",
+  "copies_verified": 864,
+  "current_files_unchanged": 856,
+  "intentionally_extended_from_inventory": [
+    "backend/app/engines/common/day_resource_feasibility.py",
+    "backend/app/results/ai_context.py",
+    "backend/app/results/assembler.py",
+    "backend/app/results/registry.py",
+    "backend/app/results/validation.py",
+    "backend/app/routes/results.py",
+    "backend/app/services/decision_graph_service.py",
+    "backend/app/services/ultimate_run_service.py"
+  ],
+  "preimages": {
+    "backend/app/engines/common/day_resource_feasibility.py": "evidence/post-t8/backend/app/engines/common/day_resource_feasibility.py",
+    "backend/app/results/ai_context.py": "evidence/post-t8/backend/app/results/ai_context.py",
+    "backend/app/results/assembler.py": "evidence/post-t8/backend/app/results/assembler.py",
+    "backend/app/results/registry.py": "evidence/post-t8/backend/app/results/registry.py",
+    "backend/app/results/validation.py": "evidence/post-t8/backend/app/results/validation.py",
+    "backend/app/routes/results.py": "evidence/post-t8/backend/app/routes/results.py",
+    "backend/app/services/decision_graph_service.py": "evidence/post-t8/backend/app/services/decision_graph_service.py",
+    "backend/app/services/ultimate_run_service.py": "evidence/post-t8/backend/app/services/ultimate_run_service.py"
+  },
+  "T8_manifest_unchanged": true,
+  "T8_entries_verified": 83,
+  "T8_resolution": [
+    {
+      "path": "docs/execution/ultimate/t8/command-ledger.json",
+      "resolved_from": "docs/execution/ultimate/t8/command-ledger.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/B-FOCUS.log",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/B-FOCUS.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/B-FOCUS.result.json",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/B-FOCUS.result.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/B-NODE.log",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/B-NODE.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/B-NODE.result.json",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/B-NODE.result.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/B-PY.log",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/B-PY.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/B-PY.result.json",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/B-PY.result.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/E8.log",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/E8.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/E8.result.json",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/E8.result.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/L8.log",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/L8.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/L8.result.json",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/L8.result.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/R8.log",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/R8.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/R8.result.json",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/R8.result.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/S8.log",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/S8.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/S8.result.json",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/S8.result.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/T8-user-request.txt",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/T8-user-request.txt",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/U8.log",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/U8.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/U8.result.json",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/U8.result.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/advisors-command.json",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/advisors-command.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/advisors.json",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/advisors.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/advisors.stderr",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/advisors.stderr",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/attempts/B-FOCUS-first.log",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/attempts/B-FOCUS-first.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/attempts/B-FOCUS-second.log",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/attempts/B-FOCUS-second.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/attempts/B-NODE-first.log",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/attempts/B-NODE-first.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/attempts/B-PY-first.log",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/attempts/B-PY-first.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/attempts/E8-first.log",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/attempts/E8-first.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/attempts/E8-fourth.log",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/attempts/E8-fourth.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/attempts/E8-second.log",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/attempts/E8-second.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/attempts/E8-third.log",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/attempts/E8-third.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/attempts/S8-first.log",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/attempts/S8-first.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/attempts/S8-second.log",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/attempts/S8-second.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/attempts/U8-first.log",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/attempts/U8-first.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/attempts/U8-second.log",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/attempts/U8-second.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/attempts/U8-third.log",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/attempts/U8-third.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/attempts/happy-first.log",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/attempts/happy-first.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/attempts/prepare-diagnostic.log",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/attempts/prepare-diagnostic.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/attempts/qa-boundary-final.log",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/attempts/qa-boundary-final.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/attempts/qa-boundary-final2.log",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/attempts/qa-boundary-final2.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/attempts/qa-final-batch.log",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/attempts/qa-final-batch.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/attempts/qa-legacy-transition.log",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/attempts/qa-legacy-transition.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/attempts/startup-second.log",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/attempts/startup-second.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/attempts/startup-third.log",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/attempts/startup-third.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/candidate.json",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/candidate.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/drivers/finalize.py",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/drivers/finalize.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/drivers/legacy-transition.py",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/drivers/legacy-transition.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/drivers/qa.py",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/drivers/qa.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/final-state.json",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/final-state.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/initial-state.json",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/initial-state.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/post-t7/backend/app/domain/logistics/graph.py",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/post-t7/backend/app/domain/logistics/graph.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/post-t7/backend/app/platform/repository.py",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/post-t7/backend/app/platform/repository.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/post-t7/backend/app/routes/dispatch.py",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/post-t7/backend/app/routes/dispatch.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/post-t7/backend/app/services/dispatch_job_service.py",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/post-t7/backend/app/services/dispatch_job_service.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/post-t7-tracked.patch",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/post-t7-tracked.patch",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/qa-boundary-final.log",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/qa-boundary-final.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/qa-boundary-final2.log",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/qa-boundary-final2.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/qa-final-batch.log",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/qa-final-batch.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/qa-legacy-transition.log",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/qa-legacy-transition.log",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/skills/postgres-skill.txt",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/skills/postgres-skill.txt",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/skills/runtime-docker-reference.txt",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/skills/runtime-docker-reference.txt",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/skills/runtime-network-reference.txt",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/skills/runtime-network-reference.txt",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/skills/runtime-skill.txt",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/skills/runtime-skill.txt",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/evidence/skills/supabase-skill.txt",
+      "resolved_from": "docs/execution/ultimate/t8/evidence/skills/supabase-skill.txt",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/preservation.json",
+      "resolved_from": "docs/execution/ultimate/t8/preservation.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/scope-diff.json",
+      "resolved_from": "docs/execution/ultimate/t8/scope-diff.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/skills-ledger.json",
+      "resolved_from": "docs/execution/ultimate/t8/skills-ledger.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/t8-execution-report.md",
+      "resolved_from": "docs/execution/ultimate/t8/t8-execution-report.md",
+      "sha256_verified": true
+    },
+    {
+      "path": "docs/execution/ultimate/t8/test-ledger.json",
+      "resolved_from": "docs/execution/ultimate/t8/test-ledger.json",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/app/domain/logistics/graph.py",
+      "resolved_from": "backend/app/domain/logistics/graph.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/app/platform/repository.py",
+      "resolved_from": "backend/app/platform/repository.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/app/routes/dispatch.py",
+      "resolved_from": "backend/app/routes/dispatch.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/app/routes/results.py",
+      "resolved_from": "docs/execution/ultimate/t9/evidence/post-t8/backend/app/routes/results.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/app/services/dispatch_job_service.py",
+      "resolved_from": "backend/app/services/dispatch_job_service.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/app/services/result_artifact_service.py",
+      "resolved_from": "backend/app/services/result_artifact_service.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/app/services/result_package_service.py",
+      "resolved_from": "backend/app/services/result_package_service.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/app/services/ultimate_run_service.py",
+      "resolved_from": "docs/execution/ultimate/t9/evidence/post-t8/backend/app/services/ultimate_run_service.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/tests/e2e/test_ultimate_d1_result.py",
+      "resolved_from": "backend/tests/e2e/test_ultimate_d1_result.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/tests/e2e/ultimate_result_fixture.py",
+      "resolved_from": "backend/tests/e2e/ultimate_result_fixture.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/tests/e2e/ultimate_result_gateway.py",
+      "resolved_from": "backend/tests/e2e/ultimate_result_gateway.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/tests/e2e/ultimate_result_helpers.py",
+      "resolved_from": "backend/tests/e2e/ultimate_result_helpers.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/tests/integration/test_ultimate_publication.py",
+      "resolved_from": "backend/tests/integration/test_ultimate_publication.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/tests/integration/test_ultimate_run_lineage.py",
+      "resolved_from": "backend/tests/integration/test_ultimate_run_lineage.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "backend/tests/test_result_package_service.py",
+      "resolved_from": "backend/tests/test_result_package_service.py",
+      "sha256_verified": true
+    },
+    {
+      "path": "supabase/migrations/20261027140333_ultimate_result_publication.sql",
+      "resolved_from": "supabase/migrations/20261027140333_ultimate_result_publication.sql",
+      "sha256_verified": true
+    }
+  ],
+  "D1_exact_byte_vectors_verified": 3,
+  "legacy_engines_frontend_and_T1_metadata_preserved": true,
+  "no_reset_clean_discard_checkout_staging_commit_or_history_change": true
+}

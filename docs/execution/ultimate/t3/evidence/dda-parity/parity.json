@@ -1,0 +1,97 @@
+{
+  "real_dda_hero": true,
+  "only_difference": "closed flag vs enabled T3 entry below the unchanged Hero",
+  "viewports": [
+    {
+      "width": 1440,
+      "png_bytes_equal": true,
+      "geometry_and_computed_styles_equal": true,
+      "sha256": {
+        "before": "35a859df7a819a73d8c0b44585b837739a6cbf14de83d97ee54f74a72f88dc0f",
+        "after": "35a859df7a819a73d8c0b44585b837739a6cbf14de83d97ee54f74a72f88dc0f"
+      },
+      "size": [
+        1144,
+        480
+      ],
+      "changed_pixels": 0,
+      "equal_pixel_percent": 100.0,
+      "differences": [],
+      "assessment": "Exact pixel parity."
+    },
+    {
+      "width": 390,
+      "png_bytes_equal": false,
+      "geometry_and_computed_styles_equal": true,
+      "sha256": {
+        "before": "bd20a74f613b131b322be8b3a394553b1f4ec77cd3de7dac0c89129239993c87",
+        "after": "848bc159225701b6ab6cc16938f13406c412721a802226339ec39cf0f72b6186"
+      },
+      "size": [
+        298,
+        580
+      ],
+      "changed_pixels": 4,
+      "equal_pixel_percent": 99.99768572089795,
+      "differences": [
+        {
+          "x": 282,
+          "y": 577,
+          "before": [
+            22,
+            31,
+            39
+          ],
+          "after": [
+            23,
+            33,
+            41
+          ]
+        },
+        {
+          "x": 283,
+          "y": 577,
+          "before": [
+            22,
+            31,
+            39
+          ],
+          "after": [
+            27,
+            37,
+            46
+          ]
+        },
+        {
+          "x": 282,
+          "y": 578,
+          "before": [
+            44,
+            59,
+            67
+          ],
+          "after": [
+            43,
+            57,
+            65
+          ]
+        },
+        {
+          "x": 283,
+          "y": 578,
+          "before": [
+            44,
+            59,
+            67
+          ],
+          "after": [
+            40,
+            54,
+            62
+          ]
+        }
+      ],
+      "assessment": "Identical geometry/styles and content. Four antialiased corner pixels at mobile; no layout/content/color-token change."
+    }
+  ]
+}

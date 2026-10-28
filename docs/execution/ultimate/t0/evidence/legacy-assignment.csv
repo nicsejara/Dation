@@ -1,0 +1,3 @@
+﻿"Viaje";"Vehicle ID";"Tipo de vehículo";"Propiedad";"Proveedor";"Site base";"Origen";"Destino";"Orden";"Producto";"Unidades asignadas";"Kg asignados";"Carga total viaje (kg)";"Capacidad viaje (kg)";"Utilización viaje";"Costo estimado viaje";"CO2 estimado viaje"
+"A-00001";"EXT";"Truck";"Tercerizado";"Proveedor";"*";"Cordoba";"Mendoza";"EARLY";"Producto EARLY";"1";"500";"1000";"1000";"1";"970";"480"
+"A-00001";"EXT";"Truck";"Tercerizado";"Proveedor";"*";"Cordoba";"Mendoza";"LATER";"Producto LATER";"1";"500";"1000";"1000";"1";"970";"480"

@@ -1,0 +1,208 @@
+--- backend/tests/browser/test_navigation.py (R1 end)
++++ backend/tests/browser/test_navigation.py (R2)
+@@ -8,11 +8,12 @@
+ import subprocess
+ import shutil
+ import time
++import traceback
+ import unittest
+ import importlib.util
+ from urllib.parse import parse_qs, urlparse
+ 
+-from playwright.async_api import async_playwright
++from playwright.async_api import async_playwright, Error as PlaywrightError
+ 
+ ROOT = Path(__file__).resolve().parents[2]
+ FIXTURE = json.loads((Path(__file__).parent / "fixtures.json").read_text())
+@@ -60,6 +61,8 @@
+         self.runs = {r["id"]: r for r in self.f["runs"].values()}
+         self.requests = []
+         self.errors = []
++        self.fixture_errors = []
++        self.fixture_closing = False
+         self.delay = {}
+         self.post_status = 202
+         self.missing_run = False
+@@ -133,9 +136,14 @@
+         self.page.on("pageerror", lambda error: self.errors.append(str(error)))
+ 
+     async def asyncTearDown(self):
+-        await self.browser.close()
+-        await self.pw.stop()
++        self.fixture_closing = True
++        try:
++            await self.context.unroute_all(behavior='ignoreErrors')
++            await self.browser.close()
++        finally:
++            await self.pw.stop()
+         self.assertEqual(self.errors, [], "Browser JavaScript errors")
++        self.assertEqual(self.fixture_errors, [], "Browser API fixture errors")
+ 
+     def workflow_fixture(self,case_id,prepared=False):
+         person={'id':'10000000-0000-4000-8000-000000000001','name':'Synthetic owner','active':True,'access_role':'admin'} if prepared else None
+@@ -160,6 +168,18 @@
+                 'workflow_responsibilities':workflow}
+ 
+     async def route_api(self, route):
++        # A fixture exception must fail the test, not strand a paused request
++        # and prevent Chromium teardown from completing.
++        try:
++            await self._route_api(route)
++        except Exception as exc:
++            if self.fixture_closing and isinstance(exc,PlaywrightError) and (
++                'Route is already handled' in str(exc) or 'has been closed' in str(exc)):
++                return
++            self.fixture_errors.append(traceback.format_exc())
++            await route.fulfill(status=500,json={'detail':'Browser API fixture failed; see unittest diagnostics.'})
++
++    async def _route_api(self, route):
+         request = route.request
+         u = urlparse(request.url)
+         path, query, method = u.path, parse_qs(u.query), request.method
+@@ -972,7 +992,8 @@
+         self.assertEqual(await button.evaluate("el=>getComputedStyle(el,'::after').animationName"),'d-workflow-spin')
+         await button.dispatch_event('click');await button.dispatch_event('click')
+         await self.page.wait_for_function("document.querySelector('[data-status-badge]').textContent==='Aprobada'")
+-        self.assertEqual(self.approval_calls,1);self.assertTrue(await button.is_visible());self.assertTrue(await button.is_disabled())
++        await button.wait_for(state='detached')
++        self.assertEqual(self.approval_calls,1);self.assertEqual(await button.count(),0)
+         self.assertEqual(await self.page.locator('[data-approve-final]').count(),0)
+         await self.page.locator('[data-after-approve]').wait_for(state='visible')
+         self.assertEqual(self.case['nodes']['logistics_assignment']['approved_run_id'],self.f['ids']['assignment'])
+@@ -1059,7 +1080,11 @@
+ 
+     async def test_case_selector_paginates_compact_active_and_completed_and_hydrates_only_selection(self):
+         self.selector_size=100
+-        await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=overview')
++        # Overview loads onboarding independently from the Case selector. Finish
++        # that boot request before measuring only the selector's three pages.
++        async with self.page.expect_response(lambda r:urlparse(r.url).path=='/api/platform/onboarding') as onboarding:
++            await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=overview')
++        await (await onboarding.value).body()
+         await self.wait_for_app()
+         before=len(self.requests)
+         await self.page.evaluate('window.DationDispatch.openDecisionMap()')
+@@ -1763,8 +1788,11 @@
+         first=copy.deepcopy(self.case)
+         self.case={**copy.deepcopy(first),"id":"00000000-0000-4000-8000-000000000006"}
+         self.f["case_row"]["id"]=self.case["id"]
++        self.workflows[self.case['id']]=self.workflow_fixture(self.case['id'],prepared=True)
+         await self.page.evaluate("id=>window.DationDispatch.openCase(id,'logistics-config','logistics_assignment')",self.case["id"])
+         self.assertEqual(await self.page.evaluate("window.DationDispatch.getWorkspace().objective"),"balanced")
++        self.assertEqual(self.workflows[first['id']]['case_id'],first['id'])
++        self.assertEqual(self.workflows[self.case['id']]['case_id'],self.case['id'])
+         self.case=first
+         self.f["case_row"]["id"]=first["id"]
+         await self.page.evaluate("id=>window.DationDispatch.openCase(id,'logistics-config','logistics_assignment')",first["id"])
+@@ -1903,7 +1931,7 @@
+                     self.assertGreater(metrics["height"],0)
+                     if view not in ("inicio","logistics-overview"):self.assertEqual(metrics["minHeight"],0)
+                     self.assertGreaterEqual(metrics["padding"],16)
+-                    self.assertEqual(metrics["radius"],16)
++                    self.assertEqual(metrics["radius"],16 if view in ('inicio','logistics-overview') else 0)
+                     self.assertTrue(28<=metrics["title"]<=40)
+                     if metrics["workspace"]:self.assertEqual(metrics["workspace"],"rgba(0, 0, 0, 0)")
+                     if metrics["current"]:self.assertEqual(metrics["current"],"rgb(243, 248, 250)")
+@@ -2557,6 +2585,19 @@
+         saved={'decisionCase':{**self.case,'persisted':True},'orders':other['orders'],'fleet':other['fleet']}
+         await self.page.add_init_script('sessionStorage.setItem('+json.dumps(KEY)+','+json.dumps(json.dumps(saved))+');')
+         await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=logistics-map')
++        # Replacing a Data Pack creates a pending Case. Apply its own attributes
++        # and Data Owner through the UI before entering its Map.
++        form=self.page.locator('[data-case-identity]');await form.wait_for()
++        self.assertEqual(await self.page.evaluate('window.dationGetCurrentView()'),'logistics-data')
++        self.assertTrue(await self.page.locator('.d-workflow-action-bar button').is_disabled())
++        await form.get_by_label('Nombre del Case',exact=True).fill('Cambio de Data Pack')
++        await form.get_by_label('Categoría',exact=True).select_option('simulation')
++        owner=form.get_by_label('Data Owner',exact=True)
++        await owner.locator('option[value="10000000-0000-4000-8000-000000000001"]').wait_for(state='attached')
++        await owner.select_option('10000000-0000-4000-8000-000000000001')
++        await form.get_by_role('button',name='Aplicar',exact=True).click()
++        await self.page.locator('.d-workflow-action-bar[data-state=ready]').wait_for()
++        await self.page.locator('.d-workflow-action-bar button').click()
+         notice=self.page.locator('[data-case-transition]');await notice.wait_for()
+         state=await self.page.evaluate('window.DationDispatch.getWorkspace()');cid=state['decisionCase']['id']
+         copy_text=await notice.inner_text()
+@@ -2609,9 +2650,14 @@
+                 if reduced=='reduce':self.assertEqual(result['animation'],'none')
+ 
+     async def test_case_ux_both_reviews_keep_config_and_only_confirm_executes_once(self):
++        original=copy.deepcopy(self.f)
+         for width,height in ((1440,1000),(390,844)):
+             await self.page.set_viewport_size({'width':width,'height':height})
+             for kind in ('assignment','scheduling'):
++                # Each review scenario starts with an approved upstream. The
++                # preceding D1 admission correctly supersedes D2's upstream.
++                self.f=copy.deepcopy(original);self.case=self.f['case']
++                self.runs={r['id']:r for r in self.f['runs'].values()}
+                 await self.open('logistics-config','logistics_'+kind)
+                 trigger=self.page.locator('[data-config-review]' if kind=='assignment' else '[data-scheduling-review]')
+                 confirm='[data-config-execute]' if kind=='assignment' else '[data-scheduling-execute]'
+@@ -2684,7 +2730,7 @@
+                     layers=await self.page.locator('.topbar,.dda-workspace-nav-shell,.d-workflow-action-bar').evaluate_all('els=>els.map(el=>getComputedStyle(el).position)')
+                     self.assertTrue(all(value=='static' for value in layers[:2]),layers)
+                     if kind!='map':
+-                        self.assertEqual(layers[-1],'fixed')
++                        self.assertEqual(layers[-1],'static' if height<=360 else 'fixed')
+                         self.assertTrue(await self.page.locator('.main').evaluate('e=>getComputedStyle(e).overflowY==="auto"'))
+                     seen=set()
+                     for _ in range(120):
+@@ -2959,7 +3005,7 @@
+                         await bar.locator('.d-workflow-action-bar__item strong,.d-workflow-action-bar__item span').first.evaluate(
+                             "el=>el.textContent='Recursos disponibles para todas las operaciones seleccionadas y sus prioridades'")
+                     sizes=await bar.evaluate(geometry)
+-                    self.assertEqual(len(sizes['items']),2 if node is None else 3)
++                    self.assertEqual(len(sizes['items']),4 if node is None else 3)
+                     self.assertLess(max(x['width'] for x in sizes['items'])-min(x['width'] for x in sizes['items']),.25)
+                     self.assertLess(max(x['height'] for x in sizes['items'])-min(x['height'] for x in sizes['items']),.25)
+                     self.assertGreater(sizes['actionWidth'],max(x['width'] for x in sizes['items']))
+@@ -2982,7 +3028,9 @@
+             actual=await button.evaluate('''el=>{
+                 const s=getComputedStyle(el),icon=el.querySelector('svg'),i=getComputedStyle(icon);
+                 return {minHeight:s.minHeight,padding:s.padding,radius:s.borderRadius,
+-                    font:s.font,fontWeight:s.fontWeight,gap:s.gap,background:s.backgroundImage,color:s.color,
++                    fontFamily:s.fontFamily,fontSize:s.fontSize,fontWeight:s.fontWeight,
++                    lineHeight:s.lineHeight,continuation:el.matches('[data-after-approve]'),gap:s.gap,background:s.backgroundImage,
++                    backgroundColor:s.backgroundColor,color:s.color,
+                     outline:s.outline,offset:s.outlineOffset,iconWidth:i.width,iconHeight:i.height,
+                     iconCount:el.querySelectorAll('svg').length,decorative:icon.getAttribute('aria-hidden'),
+                     textArrow:el.textContent.includes('→'),focused:document.activeElement===el,
+@@ -2995,7 +3043,16 @@
+             self.assertEqual(actual['iconCount'],1,label)
+             self.assertEqual(actual['decorative'],'true',label)
+             self.assertFalse(actual['textArrow'],label)
+-            self.assertIn('linear-gradient',actual['background'],label)
++            self.assertEqual(actual['background'],'none',label)
++            token=await button.evaluate('''el=>{
++                const sample=document.createElement('span');sample.style.backgroundColor='var(--color-action-primary-bg)';
++                el.append(sample);const value=getComputedStyle(sample).backgroundColor;sample.remove();return value;
++            }''')
++            self.assertEqual(actual['backgroundColor'],token,label)
++            # The approved contextual continuation wraps at 1.4; all other
++            # workflow controls retain the 1.35 primitive line box.
++            continuation=actual.pop('continuation')
++            self.assertEqual(actual.pop('lineHeight'),'18.2px' if continuation else '17.55px',label)
+             if reference is None:reference=actual
+             self.assertEqual(actual,reference,label)
+         for width in (1440,1280,1024,768,390):
+@@ -3023,7 +3080,11 @@
+             await check(self.page.locator('[data-approve-toolbar]'),'assignment-approve')
+             await self.page.locator('[data-approve-toolbar]').click()
+             await check(self.page.locator('[data-after-approve]'),'continue')
+-            self.assertFalse(await self.page.locator('[data-dashboard-map]').evaluate("el=>el.classList.contains('d-button--primary')"))
++            self.assertEqual(await self.page.locator('[data-dashboard-map]').count(),0)
++            map_step=self.page.locator('.dda-workspace-step[data-step="2"]')
++            self.assertFalse(await map_step.is_disabled())
++            self.assertFalse(await map_step.evaluate("el=>el.classList.contains('d-button--primary')"))
++            self.assertTrue(await self.page.locator('[data-rerun]').evaluate("el=>el.classList.contains('d-button--secondary')"))
+         self.assertEqual(self.approval_calls,5)
+         self.assertEqual(self.execution_bodies,[])
+ 
+@@ -3440,6 +3501,7 @@
+         self.assertFalse(await approve.is_disabled());await approve.click()
+         await self.page.wait_for_function("document.querySelector('[data-approve-toolbar]').disabled")
+         await self.page.locator('[data-scheduling-hero-status]').filter(has_text='Planificación aprobada').wait_for()
++        await approve.wait_for(state='detached')
+         self.assertEqual(self.approval_calls,2);self.assertEqual(await self.page.locator('[data-approve-toolbar]').count(),0)
+         await self.page.reload();await self.page.locator('.scheduling-dashboard-v2').wait_for()
+         self.assertEqual(await self.page.locator('[data-approve-toolbar]').count(),0);self.assertEqual(await self.page.locator('[data-status-badge]').inner_text(),'Aprobada');self.assertEqual(self.execution_bodies,[])

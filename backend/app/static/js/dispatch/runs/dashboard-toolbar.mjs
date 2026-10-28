@@ -11,6 +11,11 @@ const actionLabel=(text,name)=>icon(name)+'<span>'+esc(text)+'</span>';
 
 function detailRows(run,scheduling){
   const result=run.result_json||{},metrics=result.scenarios?.selected?.metrics||{},solver=result.engine?.solver||{};
+  if(['transport_plan_v1','day_scheduling_v1'].includes(result.result_schema))return [
+    ['Run ID',run.id],['Estado',run.status],['Motor',result.engine.engine_name+' '+result.engine.engine_version],
+    ['Solver',result.engine.solver_status],['Huella',run.result_fingerprint],['Caso',result.context.case_name],
+    ['Modelo',result.context.logistics_model_version],['Horizonte',result.context.planning_start+' → '+result.context.planning_end],
+    ...(result.source_transport_plan?[['D1 fuente',result.source_transport_plan.run_id],['Huella D1',result.source_transport_plan.result_fingerprint]]:[])];
   return [
     ['Run ID',run.id],['Estado',run.status],['Creada',run.created_at],['Inicio de ejecución',run.started_at],['Finalizada',run.completed_at],
     ['Motor',[result.engine?.name||run.engine_name,result.engine?.version||run.engine_version].filter(Boolean).join(' ')],
@@ -27,7 +32,7 @@ function detailRows(run,scheduling){
 }
 
 export function renderDashboardToolbar(run,caseActions={},options={}){
-  const scheduling=run.result_json?.schema_version==='scheduling_v1';
+  const scheduling=run.result_json?.schema_version==='scheduling_v1'||run.result_json?.result_schema==='day_scheduling_v1';
   const hero=options.placement==='hero';
   const status=decisionStatusUi(caseActions.status);
   const title=scheduling?'Planificación de despachos':'Asignación de carga';
@@ -140,7 +145,8 @@ export function bindDashboardToolbar(root,run,{onRerun,caseActions={}}={}){
     const button=event.currentTarget,original=button.innerHTML;
     closeMenus();button.disabled=true;button.textContent='Preparando archivo…';
     try{await handler();if(!scope.active)return;button.innerHTML=actionLabel('Exportado','check');}
-    catch{if(scope.active)button.textContent='No se pudo exportar';}
+    catch(error){if(scope.active){button.textContent='No se pudo exportar';if(['transport_plan_v1','day_scheduling_v1'].includes(run.result_json?.result_schema)){
+      const feedback=root.querySelector('[data-approval-error]');feedback.textContent=error.message;feedback.hidden=false;}}}
     scope.timeout(()=>{button.innerHTML=original;button.disabled=false;},1200);
   }
   scope.listen(root.querySelector('[data-export-csv]'),'click',event=>exportFile(event,()=>downloadRunExport(run,'csv',{signal:scope.signal})));

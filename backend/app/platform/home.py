@@ -1,6 +1,6 @@
 """Compact Home presentation over the existing, tenant-authorized case history."""
 from app.platform.identity import platform_call
-from app.domain.decision_cases import project_case_history
+from app.domain.decision_cases import project_case_history, case_projection_options
 from app.platform.activity import home_activity
 from app.platform.onboarding import home_progress
 from app.platform.foundation import REGISTRY, case_context, resolve_node_destination
@@ -10,9 +10,7 @@ NODE_LABELS = {key: value['label'] for key, value in REGISTRY['decisions'].items
 
 def recent_case(bundle):
     row = bundle['case']
-    options = dict(case_id=str(row['id']),
-        orders_dataset_id=str(row['orders_dataset_id']), fleet_dataset_id=str(row['fleet_dataset_id']),
-        summaries=bundle['summaries'])
+    options = {**case_projection_options(row), 'summaries': bundle['summaries']}
     try:
         state = project_case_history(row.get('state_json') or {}, [], **options)
     except (ValueError, TypeError, AttributeError):
@@ -54,6 +52,11 @@ def _item(row, bundle, key, status, run_id, node, completed=False):
             'last_activity_at': row['last_activity_at'], 'run_id': run_id, 'is_demo': bool(row.get('is_demo')),
             'resume': resume or {'view': 'logistics-map', 'node_id': key, 'run_id': None},
             'approval_current': node['status'] == 'approved'}
+    if row.get('workflow_version') == 2:
+        # T2 retains the Case in shared readers without opening a legacy run/config flow.
+        item['workflow_version'] = 2
+        item['resume'] = ({'view':'logistics-case-setup','node_id':None,'run_id':None}
+                          if row.get('foundation_context_available') or row.get('creation_intent_hash') else None)
     item['context'] = case_context({**item, 'dda': 'logistics'})
     return item
 
@@ -66,8 +69,33 @@ async def home_snapshot(ctx):
                 'activity': activity,'onboarding':onboarding}
     data = await platform_call('platform_home', {'actor_user_id': ctx.user_id,
                                                'target_workspace_id': ctx.workspace_id})
-    return {'recent_cases': [recent_case(bundle) for bundle in data['recent_cases']],
-            'attention': {**data['attention'], 'scope': 'assigned_work',
-                          'items': [{**item, 'node_label': NODE_LABELS[item['node_id']]}
-                                    for item in data['attention']['items']]},
+    recent=[recent_case(bundle) for bundle in data['recent_cases']]
+    from app.services import decision_graph_service
+    graphs={}
+    for item in recent:
+        if item.get('workflow_version')==2 and item.get('resume') is not None:
+            projection=await decision_graph_service.read(ctx,item['case_id']);graph=projection['graph'];graphs[item['case_id']]=graph
+            focus=next(n for n in graph['nodes'] if n['id']==graph['attention_node_id'])
+            item.update(graph=graph,resume=graph['resume'],status=focus['node_state'],node_id=focus['id'],node_label=focus['label'],approval_current=focus['node_state']=='APPROVED')
+    attention=[];removed=0
+    for item in data['attention']['items']:
+        case_id=item['case_id'];graph=graphs.get(case_id)
+        if graph is None:
+            cohort=await decision_graph_service.snapshot(ctx,case_id,operation='cohort')
+            if cohort['workflow_version']==2:
+                graph=(await decision_graph_service.read(ctx,case_id))['graph'];graphs[case_id]=graph
+        projected={**item,'node_label':NODE_LABELS[item['node_id']]}
+        if graph:
+            node=next(n for n in graph['nodes'] if n['id']==item['node_id'])
+            # Refine the existing attention candidates using the same graph; do not
+            # advertise a stale handoff or a result outside the current read set.
+            valid=(item['kind']=='handoff' and node['node_state']=='READY' or
+                   item['kind']=='review' and node['node_state']=='COMPLETED' and node['run_id']==item.get('run_id'))
+            if not valid:removed+=1;continue
+            projected.update(graph=graph,resume=graph['resume'],node_label=node['label'],node_state=node['node_state'])
+        attention.append(projected)
+    return {'recent_cases': recent,
+            'attention': {**data['attention'], 'scope': 'assigned_work','items':attention,
+                'total':max(0,data['attention']['total']-removed),
+                'total_is_upper_bound':data['attention']['total']>len(data['attention']['items'])},
             'activity': activity,'onboarding':onboarding}

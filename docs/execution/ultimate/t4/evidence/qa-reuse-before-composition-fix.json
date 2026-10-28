@@ -1,0 +1,18 @@
+{
+  "changed_files": [
+    "backend/app/static/js/dispatch/upload/ultimate-case-data.mjs",
+    "backend/tests/browser/test_ultimate_case_data.py"
+  ],
+  "change": "Exact header count and nullable-cell wording from the server descriptor; parser and all API/SQL unchanged.",
+  "rerun": [
+    "W4"
+  ],
+  "reused_unchanged_consumers": [
+    "B-PY",
+    "B-NODE",
+    "S4",
+    "FOCAL-LEGACY-API",
+    "FOCAL-T3-BROWSER"
+  ],
+  "source_compatibility_verified": true
+}

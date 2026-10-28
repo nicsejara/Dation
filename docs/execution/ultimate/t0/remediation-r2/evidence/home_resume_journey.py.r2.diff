@@ -1,0 +1,11 @@
+--- backend/tests/e2e/home_resume_journey.py (R1 end)
++++ backend/tests/e2e/home_resume_journey.py (R2)
+@@ -26,7 +26,7 @@
+   await node.locator('summary',has_text='Responsables y aprobación').click()
+   assert await node.get_by_role('link',name='Abrir dashboard aprobado',exact=True).count()==0
+   await node.locator('summary',has_text='Historial de corridas').click()
+-  previous=node.locator('.center-run').filter(has=node.get_by_role('link',name='RUN-'+OFFICIAL[:8],exact=True))
++  previous=node.locator('.center-run').filter(has=page.get_by_role('link',name='RUN-'+OFFICIAL[:8],exact=True))
+   await previous.wait_for();assert 'Reemplazada' in await previous.inner_text()
+   await previous.get_by_role('link',name='RUN-'+OFFICIAL[:8],exact=True).click()
+   await page.locator('.assignment-dashboard-v2').wait_for();assert parse_qs(urlsplit(page.url).query)['run_id']==[OFFICIAL]

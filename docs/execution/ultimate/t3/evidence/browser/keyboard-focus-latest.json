@@ -1,0 +1,22 @@
+{
+  "width": 390,
+  "inForm": true,
+  "name": "Crear Case",
+  "tag": "BUTTON",
+  "rect": {
+    "x": 109,
+    "y": 854.8125,
+    "width": 102.65625,
+    "height": 40,
+    "top": 854.8125,
+    "right": 211.65625,
+    "bottom": 894.8125,
+    "left": 109
+  },
+  "scroll": 2470,
+  "hit": "d-button d-button--primary",
+  "visible": true,
+  "reachable": true,
+  "outline": 3,
+  "label": ""
+}

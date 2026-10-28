@@ -1,0 +1,96 @@
+{
+  "phase": "T7",
+  "suites": [
+    {
+      "suite": "B-PY",
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "started_at": "2026-10-27T13:41:25.701046+00:00",
+      "finished_at": "2026-10-27T13:42:01.615915+00:00",
+      "seconds": 35.915,
+      "exit_code": 0
+    },
+    {
+      "suite": "B-NODE",
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "node",
+        "--test",
+        "tests/test_dashboard_selectors.js",
+        "tests/test_assignment_ai_summary.mjs",
+        "tests/test_assignment_dashboard_v2_selectors.mjs",
+        "tests/test_assignment_executive_kpis.mjs",
+        "tests/test_case_navigation.mjs",
+        "tests/test_center_resource.mjs",
+        "tests/test_chart_theme.mjs",
+        "tests/test_data_provenance.mjs",
+        "tests/test_data_resource.mjs",
+        "tests/test_decision_case.mjs",
+        "tests/test_dispatch_upload_selectors.mjs",
+        "tests/test_execution_progress.mjs",
+        "tests/test_home_dda_catalog.mjs",
+        "tests/test_lifecycle.mjs",
+        "tests/test_navigation.mjs",
+        "tests/test_platform_recovery.mjs",
+        "tests/test_scheduling_dashboard_v21_selectors.mjs",
+        "tests/test_ultimate_case_navigation.mjs",
+        "tests/test_ultimate_data_navigation.mjs",
+        "tests/test_ultimate_graph_navigation.mjs",
+        "tests/test_v2_foundation.mjs",
+        "tests/test_workflow_gates.mjs",
+        "tests/test_workspace_settings.mjs"
+      ],
+      "started_at": "2026-10-27T13:42:01.617609+00:00",
+      "finished_at": "2026-10-27T13:42:06.063624+00:00",
+      "seconds": 4.446,
+      "exit_code": 0
+    },
+    {
+      "suite": "U7",
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "tests.test_transport_plan_policies",
+        "tests.test_transport_result_package",
+        "-v"
+      ],
+      "started_at": "2026-10-27T13:42:06.064717+00:00",
+      "finished_at": "2026-10-27T13:42:12.268872+00:00",
+      "seconds": 6.204,
+      "exit_code": 0
+    }
+  ],
+  "QA_driver": "evidence/drivers/qa.py",
+  "integrity_driver": "evidence/drivers/finalize.py",
+  "production_credentials_cleared": [
+    "SUPABASE_URL",
+    "SUPABASE_SECRET_KEY",
+    "SUPABASE_ACCESS_TOKEN",
+    "LLM_API_KEY",
+    "LLM_BASE_URL",
+    "GCP_ACCESS_TOKEN"
+  ],
+  "runtime": {
+    "python": "3.13.5",
+    "ortools": "9.15.6755",
+    "node": "24.19.0",
+    "cloud_observations_current": true,
+    "cloud_connectivity": "connected",
+    "cloud_observed_phase": "running"
+  },
+  "git_diff_check": "PASS",
+  "local_checkpoint_commit": false,
+  "no_push_deploy_or_production_access": true
+}

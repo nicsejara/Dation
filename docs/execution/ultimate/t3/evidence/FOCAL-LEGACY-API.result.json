@@ -1,0 +1,26 @@
+{
+  "suite": "FOCAL-LEGACY-API",
+  "status": "PASS",
+  "tests": 3,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "started_at": "2026-10-26T18:11:19.266398+00:00",
+  "finished_at": "2026-10-26T18:12:27.091485+00:00",
+  "seconds": 67.825,
+  "cwd": "/workspace/Dation/backend",
+  "command": [
+    "/workspace/Dation/.venv/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "test_decision_center.DecisionCenterTests.test_01_case_library_labels_pagination_identity_and_isolation",
+    "test_optimized_responsibilities.OptimizedResponsibilityTests.test_split_roles_reload_independent_node_assignments_and_actual_approval",
+    "test_optimized_responsibilities.OptimizedResponsibilityTests.test_archive_persists_reloads_and_preserves_case_history_and_assignments",
+    "-v"
+  ],
+  "exit_code": 0,
+  "production_credentials_cleared": true,
+  "PYTHONPATH": "tests/e2e",
+  "log_sha256": "e95c9cdea3734798f9097e8cc06573058eba052540170bea2af13d626867da54"
+}

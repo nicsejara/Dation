@@ -28,12 +28,16 @@ from app.services import decision_case_service as case_service
 from app.services import dispatch_service as service
 from app.services import dispatch_job_service as jobs
 from app.services.assignment_config_service import preview_assignment_configuration
+from app.results.contracts import UltimateRunRequest
+from app.platform.context import current
 from app.validators.contracts import public_contracts, template_csv
 
 
 router = APIRouter(
     dependencies=[Depends(require_upload_access)]
 )
+from app.routes.results import router as result_router
+router.include_router(result_router)
 
 
 class Inputs(BaseModel):
@@ -141,6 +145,7 @@ class ApprovalRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     case_id: UUID
+    expected_result_fingerprint: str | None = Field(default=None,pattern=r'^[0-9a-f]{64}$')
     node_id: Literal[
         "logistics_assignment",
         "logistics_scheduling",
@@ -371,7 +376,14 @@ async def assignment_preview(payload: AssignmentPreviewRequest):
 
 
 @router.post("/api/runs", status_code=202)
-async def run(payload: RunRequest, response: Response, run_id: UUID | None = Query(None)):
+async def run(payload: RunRequest | UltimateRunRequest, response: Response, run_id: UUID | None = Query(None)):
+    if isinstance(payload,UltimateRunRequest):
+        from app.services import ultimate_run_service
+        if run_id is None:raise HTTPException(422,'Una intención Ultimate requiere run_id explícito para replay seguro.')
+        result=await ultimate_run_service.enqueue(current(),payload,run_id)
+        response.headers['Location']='/api/runs/'+str(run_id)
+        response.headers['Retry-After']='2'
+        return result
     if not await service.available():
         raise HTTPException(503, "El almacenamiento de Dispatch todavía no está activado.")
     effective_run_id = str(run_id or uuid4())
@@ -396,6 +408,9 @@ async def approve_run(
     run_id: UUID,
     payload: ApprovalRequest,
 ):
+    if payload.expected_result_fingerprint is not None:
+        from app.services import result_package_service
+        return await result_package_service.approve(current(),run_id,payload.case_id,payload.node_id,payload.expected_result_fingerprint)
     async def operation():
         run = await case_service.approve_run_version(
             str(run_id),

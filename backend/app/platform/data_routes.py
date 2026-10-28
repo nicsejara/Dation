@@ -81,13 +81,11 @@ async def reuse(dataset_id:UUID,ctx=Depends(require_upload_access)):
 
 @router.post('/datasets/{dataset_id}/archive')
 async def archive(dataset_id:UUID,ctx=Depends(require_upload_access)):
-    await hub.active_dataset(ctx,dataset_id)
-    await guarded(dispatch.archive_dataset(str(dataset_id),True));return {'archived':True}
+    return await guarded(hub.archive_input(ctx,dataset_id,True))
 
 @router.post('/datasets/{dataset_id}/unarchive')
 async def unarchive(dataset_id:UUID,ctx=Depends(require_upload_access)):
-    await hub.active_dataset(ctx,dataset_id)
-    await guarded(dispatch.archive_dataset(str(dataset_id),False));return {'archived':False}
+    return await guarded(hub.archive_input(ctx,dataset_id,False))
 
 @router.delete('/datasets/{dataset_id}')
 async def delete(dataset_id:UUID,ctx=Depends(require_upload_access)):

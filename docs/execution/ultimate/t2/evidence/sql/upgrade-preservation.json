@@ -1,0 +1,13 @@
+{
+  "catalog_equal": true,
+  "legacy_rows_equal": true,
+  "default_acls_unchanged": true,
+  "tables": [
+    "datasets",
+    "decision_cases",
+    "decision_runs",
+    "decision_approval_events",
+    "decision_interpretation_sources"
+  ],
+  "rows": 5
+}

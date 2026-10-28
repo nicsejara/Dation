@@ -1,0 +1,16 @@
+{
+  "scope": "owned loopback final T10 schema only",
+  "container": "dation-e2e-06b8f9041abc-pg",
+  "command": [
+    "/home/agent/.npm/_npx/91eb58246759989d/node_modules/@supabase/cli-linux-x64/bin/supabase",
+    "db",
+    "advisors",
+    "--db-url",
+    "postgresql://postgres@127.0.0.1:32844/dation_e2e?sslmode=disable",
+    "--type",
+    "all",
+    "--output",
+    "json"
+  ],
+  "exit_code": 0
+}

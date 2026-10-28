@@ -1,0 +1,12 @@
+{
+  "captured_at": "2026-10-26T15:02:17.177245+00:00",
+  "owned_container": "dation-t2-20261026-ultimate",
+  "owner_label_verified": true,
+  "remaining_databases_before_cleanup": [
+    "postgres"
+  ],
+  "stopped": true,
+  "removed": true,
+  "other_containers_changed": false,
+  "production_access": false
+}

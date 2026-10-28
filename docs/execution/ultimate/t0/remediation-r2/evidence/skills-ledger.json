@@ -1,0 +1,52 @@
+{
+  "phase": "T0-R2",
+  "skills": [
+    {
+      "skill": "supabase:supabase",
+      "package": "c0/supabase",
+      "objective": "Bounded compatible SQL migration and owned sandbox",
+      "boundary": "platform_home and current authority readers",
+      "decision": "Reuse existing approval authority; no remote mutation or grants expansion"
+    },
+    {
+      "skill": "supabase:supabase-postgres-best-practices",
+      "package": "c0/supabase-postgres-best-practices",
+      "references": [
+        "security-privileges.md"
+      ],
+      "objective": "Least privilege of stored functions",
+      "boundary": "public.platform_home definition and unchanged execute ACL",
+      "decision": "CREATE OR REPLACE retains OID/owner/ACL; tests prove allowed and denied callers"
+    },
+    {
+      "skill": "emil-design-eng",
+      "source": ".agents/skills/emil-design-eng/SKILL.md",
+      "sha256": "ffbe68e6007fb42cb8149f089b400a1ca007d59ba23e8948e2be4476f3175939",
+      "objective": "Native focus, accessibility and responsive preservation",
+      "boundary": "height<=360 media query; existing controls and tokens",
+      "decision": "Remove fixed occlusion only in short viewports; retain normal screenshots and keyboard/touch/reduced motion behavior"
+    },
+    {
+      "skill": "cloud-environment:cloud-environment-runtime",
+      "package": "c5/cloud-environment-runtime",
+      "references": [
+        "Docker",
+        "networking"
+      ],
+      "objective": "Reproducible owned runners/sandbox",
+      "boundary": "local Docker, loopback, serial lifecycle",
+      "decision": "No concurrent network creation and Chromium; no production access"
+    }
+  ],
+  "not_applied": [
+    "global visual audit",
+    "branding redesign",
+    "motion audit",
+    "plugin installation"
+  ],
+  "precedence": "User scope and frozen Master decisions take precedence over optional skill recommendations",
+  "new_tokens": false,
+  "new_components": false,
+  "new_animations": false,
+  "T1_executed": false
+}

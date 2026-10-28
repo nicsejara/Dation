@@ -23,7 +23,7 @@ async def main():
    for tab,label in [('general','General'),('operation','Operación'),('ddas','Decision Data Assets'),('plan','Plan y facturación')]:
     await root.get_by_role('tab',name=label,exact=True).click();await root.locator('[role=tabpanel]:not([hidden]) .d-card').wait_for();probe=await page.evaluate(theme);assert not probe['overflow'] and not probe['failures'],probe
     geometry=await root.evaluate("n=>{const tabs=n.querySelector('[role=tablist]').getBoundingClientRect(),card=n.querySelector('[role=tabpanel]:not([hidden])').getBoundingClientRect();return {below:card.top>=tabs.bottom+19,width:Math.abs(card.width-n.getBoundingClientRect().width),heights:[...n.querySelectorAll('[role=tab]')].map(t=>t.getBoundingClientRect().height)}}");assert geometry['below'] and geometry['width']<2 and max(geometry['heights'])<75,geometry
-    selected=await root.evaluate("n=>getComputedStyle(n.querySelector('[aria-selected=true]')).color!==getComputedStyle(n.querySelector('[aria-selected=false]')).color");assert selected
+    selected=await root.evaluate("n=>{const selected=getComputedStyle(n.querySelector('[aria-selected=true]')),other=getComputedStyle(n.querySelector('[aria-selected=false]'));return selected.borderBottomWidth==='2px'&&selected.borderBottomColor!==other.borderBottomColor;}");assert selected
     if artifacts:await page.screenshot(path=str(artifacts/f'{tab}-{width}.png'),full_page=True)
   assert await root.get_by_role('heading',name='Plan Free',exact=True).count()==1;assert await root.get_by_role('button').count()==0;assert 'No hay cobros' in await root.inner_text();assert 'Tarjeta' not in await root.inner_text()
   await page.reload();await root.get_by_role('heading',name='Plan Free',exact=True).wait_for();await page.go_back()

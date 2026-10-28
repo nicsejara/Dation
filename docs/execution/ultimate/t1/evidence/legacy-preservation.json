@@ -1,0 +1,1821 @@
+{
+  "phase": "T1",
+  "captured_at": "2026-10-26T13:21:59.839201+00:00",
+  "source_head": "ef997235a30251fbf7ae53690ed738092ee973d8",
+  "baseline_artifacts_verified": 248,
+  "baseline_manifest_unchanged": true,
+  "baseline_files": [
+    {
+      "path": "DATION_FINAL_MASTER_EXECUTION_PLAN.md",
+      "sha256": "c7543ffa1ef26c79d9142797863fc8ba83613f6cb426cf1621eb0c11b5a27823",
+      "unchanged": true
+    },
+    {
+      "path": "backend/app/static/css/dation-design-system.css",
+      "sha256": "3e160520a613ff04fa0d845bd072c0a50d4a3dd4fcc96e9a2f6a44411b248f95",
+      "unchanged": true
+    },
+    {
+      "path": "backend/app/static/css/dda-logistics-upload.css",
+      "sha256": "3892e44a580f24b828925ebe02316435dbbf1fe6d62775806724f05b33d46e0f",
+      "unchanged": true
+    },
+    {
+      "path": "backend/app/static/css/dispatch.css",
+      "sha256": "067b4077a95b813fcb3b9171e8c429ae76a15d5edacad73803a154161b4c12ce",
+      "unchanged": true
+    },
+    {
+      "path": "backend/app/static/css/scheduling-dashboard-v21.css",
+      "sha256": "08c102772fe046513a7892699d1469c937e6334c6d1f43bdc9d049617f662fe6",
+      "unchanged": true
+    },
+    {
+      "path": "backend/app/static/css/workflow-context.css",
+      "sha256": "0d4e61317fd8a8e9f8667393ee8b6f2d5f59cf3201db279ab399f7ec3bb01cf6",
+      "unchanged": true
+    },
+    {
+      "path": "backend/tests/browser/test_navigation.py",
+      "sha256": "f49a997de32b383bc0eced5a024333c37bbcff2b0c25c70fa01cb874ee80b537",
+      "unchanged": true
+    },
+    {
+      "path": "backend/tests/browser/test_saga4_ui.py",
+      "sha256": "d1ea7452f61673478b9ca4ca187605094ab70b35031c024ec9adc2e0560145ce",
+      "unchanged": true
+    },
+    {
+      "path": "backend/tests/browser/test_workflow_context.py",
+      "sha256": "8048f2a215b278d31ff5b3aac13fcee6bb4bda619bdd917516c18e91f863e8dd",
+      "unchanged": true
+    },
+    {
+      "path": "backend/tests/e2e/activity_journey.py",
+      "sha256": "5abc02508945ac448fd27a5ae70a38d8cfa59274244200a5c896676fafe0d1e4",
+      "unchanged": true
+    },
+    {
+      "path": "backend/tests/e2e/browser_auth.py",
+      "sha256": "495f40c2515e9ecde358e1c7fdba3cbc1504459822c1343a3fcd782ea9f31bf4",
+      "unchanged": true
+    },
+    {
+      "path": "backend/tests/e2e/browser_journey.py",
+      "sha256": "790ff6dd5dcba7bebb4f74116cb27ceb761c28c470d5cf71489e0526ce1c7bc1",
+      "unchanged": true
+    },
+    {
+      "path": "backend/tests/e2e/collaboration_approval_journey.py",
+      "sha256": "266c80149522d7737fa86cc440eb4aa7aaa60e115339944629de286ae4d21ea9",
+      "unchanged": true
+    },
+    {
+      "path": "backend/tests/e2e/collaboration_journey.py",
+      "sha256": "5c1a165d5102001bead158b9d0ad95d70b3b3a4e0bfc972f72a7932c21bed699",
+      "unchanged": true
+    },
+    {
+      "path": "backend/tests/e2e/entitlements_journey.py",
+      "sha256": "fbef7a8ae12cc82ad883abb2f10e3e94f0e14e27d0ca98a6a55a70577ed0b8e3",
+      "unchanged": true
+    },
+    {
+      "path": "backend/tests/e2e/golden_journey.py",
+      "sha256": "b8413202cae44d1c3ac5a24c8f5af06f782549e2a8b1cb79f9f4a1808444711b",
+      "unchanged": true
+    },
+    {
+      "path": "backend/tests/e2e/home_resume_journey.py",
+      "sha256": "9d581cc3b58e8502c43faf237011fb5a2eb53b76bc6a38acb94e3ec49effbbb4",
+      "unchanged": true
+    },
+    {
+      "path": "backend/tests/e2e/onboarding_journey.py",
+      "sha256": "2dc8e8a000730aca1e70a1ec9dcf958696c4532d81275e5e682e10166ed7301b",
+      "unchanged": true
+    },
+    {
+      "path": "backend/tests/e2e/platform_journey.py",
+      "sha256": "5937231e6224b4a6b789a3587525d356743c6eb4c29db79021c816a69f5b40a3",
+      "unchanged": true
+    },
+    {
+      "path": "backend/tests/e2e/scheduling_dashboard_journey.py",
+      "sha256": "edb5ef733f9d8ec0c96c114de65b02ab46c0384b50914337090596a7ea91b8db",
+      "unchanged": true
+    },
+    {
+      "path": "backend/tests/e2e/test_collaboration.py",
+      "sha256": "fde7ae735eddfd52b4ed2c6ca11273372359c69137dfce5005b4f22a19d70c1c",
+      "unchanged": true
+    },
+    {
+      "path": "backend/tests/e2e/test_decision_center.py",
+      "sha256": "dce9bd666237525bb85b0fc061af3db5b2651c90691d22a12d9e210eef58947a",
+      "unchanged": true
+    },
+    {
+      "path": "backend/tests/e2e/test_home_owner_attention.py",
+      "sha256": "80ddba3e0e3431e0dd2b59b9cb346581cd9903837f0330052db0ee1de5fb3468",
+      "unchanged": true
+    },
+    {
+      "path": "backend/tests/e2e/test_optimized_responsibilities.py",
+      "sha256": "580473f556b7ad9c133327782b70440fa24f710ecb6475b0dec65e5802ee9547",
+      "unchanged": true
+    },
+    {
+      "path": "backend/tests/e2e/test_tenancy.py",
+      "sha256": "f2f74332ae9eeed6988d1a3061a624832e63e2d91c33583e235bb6e62962ab35",
+      "unchanged": true
+    },
+    {
+      "path": "backend/tests/e2e/test_v2_foundation.py",
+      "sha256": "bbd693ad973297e2672304c057b7ea38c345066bdc482edd4e163706c50427e3",
+      "unchanged": true
+    },
+    {
+      "path": "backend/tests/e2e/test_workflow.py",
+      "sha256": "51e0323137631a931406157e0e9a7e9b113a8ce406a1f32e021d0426729ed281",
+      "unchanged": true
+    },
+    {
+      "path": "backend/tests/e2e/test_workflow_gates.py",
+      "sha256": "ad21d324bc5c6f665e17dc437665fc1b47f7c01d634f004008253234005a4652",
+      "unchanged": true
+    },
+    {
+      "path": "backend/tests/e2e/workflow_fixture.py",
+      "sha256": "f763df7b19123d44148ef1827d06c3bcc02654e459752d871face44a6f9fc22c",
+      "unchanged": true
+    },
+    {
+      "path": "backend/tests/e2e/workflow_ui_audit.py",
+      "sha256": "8ca23ddff62365ad56080793d51e000a347f19e86fac48efec65491fc1913229",
+      "unchanged": true
+    },
+    {
+      "path": "backend/tests/e2e/workspace_settings_journey.py",
+      "sha256": "d1cdb989b970df56640b2d9298e26d96d17985b1a3b7eb4ba6e9be6ce10dbcca",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/source-manifest.json",
+      "sha256": "8a54d9d62c9a84cabe67f2c656590d1fca4a890947d864ae47497bd8acfd0549",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/artifact-integrity.json",
+      "sha256": "2ebf4015e41201bbe3622802c67a46a2eb123e7828e2e1b3d8033a90193557a6",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/baseline-test-ledger.json",
+      "sha256": "779c5c90307140edd13e1d2f7ba11e71a388051f11f65b44acaccf99179c4fb1",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/command-ledger.json",
+      "sha256": "06eb0ab3c4ce743625ac8a4a411f78b29f1c1dda3b4db2dfc2e35f8d83c9e1d2",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/debt-register.json",
+      "sha256": "446e43b55fad558f4c60d09dd619c5e2e21acd8249b9472d02e4abd0a0139d7f",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/debt-register.md",
+      "sha256": "0e93de4233c1f91084533125294edc635a846932f67487ed9c499153218c7330",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation/artifact-integrity.json",
+      "sha256": "4eb863475f1d166e43e53efd6405da3594a32218ece95c5624bd7ae81e4aa8c2",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/20261026010000_home_decision_owner_attention.sql.r2.diff",
+      "sha256": "23472c6c333e8c1f74932cd95fa3d66313cab26b55375b5da783c47937817877",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/B-BROWSER.attempt1.log",
+      "sha256": "b56a3cf1f8777cfdddffbc3de326e2b58165c6c6953e8748693a6468a2c8e100",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/B-BROWSER.attempt1.result.json",
+      "sha256": "17e9e136fa463429026baaf4d0bbcefd9faf7eaf3cedced6df9467b780ce29f4",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/B-BROWSER.log",
+      "sha256": "d13c9e01cd20429cf5ab5fa143b23307a1ba8ef124de17dac8de2444d140826b",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/B-BROWSER.result.json",
+      "sha256": "a1d427098d5fce2a5f0ebdca72c0c03a86a72defa49b5d148ac72a59573731f3",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/B-E2E.log",
+      "sha256": "352d6c02900edee948686d074d0e910d93ca9fda501bcfe770a998208791b625",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/B-E2E.result.json",
+      "sha256": "2f362370645ba0d34c65f8a8f56eb551529f5c4c5debcb63f95cd6ba603d05a8",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/B-FOCUS.log",
+      "sha256": "ad91c2f8d3639aaeaed19f3cb7ffab5f1f77f90e3b9d84f8c7bcf5a067520296",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/B-FOCUS.result.json",
+      "sha256": "3576e37a58a0ac386dfec4a152d6ea7349794ca71f6409ac728f5e1355452046",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/B-NODE.log",
+      "sha256": "295918a37d2e4ec7d75f687587d227e42184c1ce08e6486cbd147fc0781a9132",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/B-NODE.result.json",
+      "sha256": "7f22a663dbd2a740b6c11169501d1764326d841926629076c3b7fbcb53192eaf",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/B-PY.log",
+      "sha256": "e2802bcfc3f4f51042be1f1ac678c500b37e9464f4179eab1d1fa4d712215a77",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/B-PY.result.json",
+      "sha256": "7d0a9083993547b63e572c1d58bab06129b8010a117679a8d52f62943930a8c1",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/B-SQL.attempt1.log",
+      "sha256": "f0fd3cee7bbea01d42d849ed1c0b9d9fa0b5529989566ae47e39ca107cd3ad2c",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/B-SQL.attempt1.result.json",
+      "sha256": "22aca6db62f75f9404ab93d80dc2a24e3e359da7c9de1832549ce82580dc5edd",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/B-SQL.log",
+      "sha256": "35e4cbc836c7d0806fd327d952409db0bd186c5a002b8b10c44435c746aae4b8",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/B-SQL.result.json",
+      "sha256": "7db38f28851e80450b538aa05a2e83d295d88156589c0b0e7a5f694eeaa0121c",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/T0-R2-user-request.txt",
+      "sha256": "39784da53acb281d7c300f958957d34e658b6a2ff5c38a8b22cde797672d01a7",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/browser-diagnostic/test_case_ux_real_data_change_retains_lineage_but_reopening_history_has_no_new_notice.json",
+      "sha256": "f02d4d96f859bb040ac4ad81c1dea58bee23113253ca79b0a8b6377063645933",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/browser-diagnostic/test_case_ux_real_data_change_retains_lineage_but_reopening_history_has_no_new_notice.png",
+      "sha256": "801a652e7cc5fc26c5105148572ef5d33503d694750eaa5b43ae69141d56529a",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/browser-diagnostic/test_shared_case_context_and_compact_map_milestones.json",
+      "sha256": "2de3ce2f8378405227f445c7470558663e963b2667ff655796cfd6ff2943233e",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/browser-diagnostic/test_shared_case_context_and_compact_map_milestones.png",
+      "sha256": "a1bbad38c3cf9d2f11296417fbcf7287ce7f9f796115b5bec7216d2cdbb9315f",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/browser-diagnostic.log",
+      "sha256": "0dde6348bff2e13c1387e4ab7f428025224faa86abc2a532cf0cbf4620134e85",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/browser-residual-focal.log",
+      "sha256": "0c9678a79047323053c4257d36c6a25f48ae5dadf2ef43382a7052cc6ffd0007",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/browser-styles-focal.log",
+      "sha256": "a5bd7a8d9d03242b1992ee50900c7c004923ac842239891e65b953a0b843df50",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/browser-workflow-style-final.log",
+      "sha256": "052f5fec29e738be3e448ea3f3f0576fce0dde509bd107d22f295fa7257ee8d4",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/browser_auth.py.r2.diff",
+      "sha256": "7286469e5f91cc67d3680065fdf5b730772ce4efbad071e813caad715f02ed15",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/browser_journey.py.r2.diff",
+      "sha256": "f5ae627c204486b15d1b4c2142548b2c6e02513a765acb8e73f8227c70df2655",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/collaboration_approval_journey.py.r2.diff",
+      "sha256": "3b1c24ee3bc2e5569512249911158566d5a01840ad5968c79d2906295390b5d2",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/dation-design-system.css.r2.diff",
+      "sha256": "a1b1815a51875dce8066684da829e9aab57904773bfdfadc6bd1c165c001a9c0",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/dation-t0r2-run-suite.py",
+      "sha256": "dcd2b651069ecc254ad8df00074998814ab16c34a0835e8074be716a56d2478e",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/e2e-reports/assignment-matrix-browser-report.json",
+      "sha256": "63a37fe7002498817be15e807e14b471a79b6a1afd919ccf06f8a10c16862449",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/e2e-reports/desktop/browser-report.json",
+      "sha256": "dc5b17291728ec89028d187401bbcee5a2e9e91c848b29fa3790d0e3c5b59040",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/e2e-reports/golden-v2/report.json",
+      "sha256": "64df0aaac4b38a13bb29a45b6488a45766cccfb7ed824afe54162c82986de7af",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/e2e-reports/lineage-report.json",
+      "sha256": "9c339a72b54c906b2dcaf44981799bf0a49501e7e771862b24bea27a5341811b",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/e2e-reports/mobile/browser-report.json",
+      "sha256": "5415537b04a50aa70f58264368c5200881216c4c176d462a333824d38c7e6f7e",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/e2e-reports/scheduling-dashboard-browser-report.json",
+      "sha256": "d9d662d6d5a24a21e0795c063251cb2fee07f830bc41e7a82075db7e16cae66d",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/e2e-reports/scheduling-dashboard-manifest.json",
+      "sha256": "293d1a7a202a37f57eec0772293bf86b4f308fd08d1d27a443dd886700dd9272",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/e2e-reports/suite-report.json",
+      "sha256": "87f6055c6ee1c3260c73324ba468561eb0489b2ed214d1edda41c999f1d0b33a",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/e2e-suite-report.json",
+      "sha256": "87f6055c6ee1c3260c73324ba468561eb0489b2ed214d1edda41c999f1d0b33a",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/final-batch.log",
+      "sha256": "771d02d42e993899203fe63608012e10bdca4fc036578631aaa4573a59666777",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/final-source-freeze.json",
+      "sha256": "27741cab553742ef6d557f46ef91993c90a2b6fac2020bb63a7bd83d86c2bd8d",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/five-e2e-current.log",
+      "sha256": "ad9f7a3407246e30403d2876e01f4ce8a20fc4bfca15f58541cd81e0991fc33a",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/five-e2e-focal.log",
+      "sha256": "c5f1fb24da37e6bf67b7636dfd18b9d43aa00cd50d992bc6498c04e98c35cd86",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/fixture-cause-proof.log",
+      "sha256": "a3d13b0157815bfecd782233691edf44b648a4ce2097bfc406ba6adfe8d790a2",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/fixture-fault-lifecycle.log",
+      "sha256": "da7012e362020ea8a715ede193f05f8733b2c5def1fc95403c0e0554ca94e61b",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/fixture-lifecycle-focal.log",
+      "sha256": "f9d6705f235c90bb695903bbfd5e99b955e1ff053edd924e014758ff02bdb8c1",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/fixture-lifecycle-related.log",
+      "sha256": "fb589fb9dc78006e35f5d7c19f9d01f4d767c7efae61f9c6758d9b50bc1fa6c9",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focal-ledger.json",
+      "sha256": "24e4a0fc5c09610d4b95d5d41b7039681a1c16ee53512c51887849dcc3e33bb1",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/after/assignment-1024-1000-rest.png",
+      "sha256": "999db3dadab73c1c614f952bbf120ce03900259562d263c9f462f9c5c3951224",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/after/assignment-1280-1000-rest.png",
+      "sha256": "6d592c96c3dc6760fcb32f9ddc2cddc0949f088d76a871dbc7e17bb3b6108802",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/after/assignment-1440-1000-rest.png",
+      "sha256": "0f84c0d4705266d1eec61bf75d8bbd4c1740a3b34afa60f018acbe8e587e02fd",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/after/assignment-320-256-rest.png",
+      "sha256": "e97b087589bde0574593ea60a7961eae81dbd009e0efc5d3fc8c96242cb56103",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/after/assignment-320-568-rest.png",
+      "sha256": "b9fd54e2eef3aa3a106cf5efd9da97a4cba97fe5b3917bed71a390c798a0a02d",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/after/assignment-390-844-rest.png",
+      "sha256": "44942af3c4eec9f9f8145c693cf4ad1fa511445105e5a6a314559c8e7478044c",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/after/assignment-568-320-rest.png",
+      "sha256": "dfcf7d32bf5fc984b30584ed7febe629ba4e54751038e42e4d703c89000edf78",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/after/assignment-768-1000-rest.png",
+      "sha256": "44990a853bced36638f7b55a9b3d6c9dd60e8e99e0673d21db44c993ff919d6e",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/after/data-1024-1000-rest.png",
+      "sha256": "9d4177722c17c8e878e92b4cf1404b5bacc364e9bcc207df1ea2da46750106ee",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/after/data-1280-1000-rest.png",
+      "sha256": "6299d230c56a89e2d9a80c5c10a7a70306ba7026ff871df36f4134f70630aff7",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/after/data-1440-1000-rest.png",
+      "sha256": "8f4e11ae94e9c561554cacf0e6c8e5e38b9615fb61a3a7564a9ff307a193f150",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/after/data-320-256-rest.png",
+      "sha256": "4e814e72404e436f80cbc51ffd4567e35ade2b6de315ada8ea3f77558dce89a9",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/after/data-320-568-rest.png",
+      "sha256": "6ed45889527e8ab65b5996afceb4a09233dd4386e5cce2111868bcf651c35d0a",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/after/data-390-844-rest.png",
+      "sha256": "3ca5fc00484d7624df56e54aceecbcd1baf85364e7468d71217c33c8579a5bb2",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/after/data-568-320-rest.png",
+      "sha256": "72b7bd9b6696b6c20b1741f209e69da8e3b52227ddcf167a61d3548eac5498e9",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/after/data-768-1000-rest.png",
+      "sha256": "26852ef88ab3e6aa17adff5e19824a04de266d231985b0e8bc2c6f1a2315b40d",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/after/map-1024-1000-rest.png",
+      "sha256": "15e99733d2508bafabd9a0db6562eea4d9c60d87e71dcb64c395755e040b4956",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/after/map-1280-1000-rest.png",
+      "sha256": "baa49c374663d4a7e53df86a4085975342cfa924b9d520d29ff8bbc8917aae94",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/after/map-1440-1000-rest.png",
+      "sha256": "79eaedf38dba9d9b1b18c2ce50655af44809646e720ec4ad638f787a4d157d36",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/after/map-320-256-rest.png",
+      "sha256": "fcac5805546953e5289a7079e80e1e265d655d29b36a7d788d3c9e25feb2855a",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/after/map-320-568-rest.png",
+      "sha256": "5af7134e6b0dcfcf736d9a73b3154649d94b480a3916bb3ded6771eb0edfe5f4",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/after/map-390-844-rest.png",
+      "sha256": "ce93aec6fe4116693a64ec15975f79696b567ba19cc7b858756c05221efe0524",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/after/map-568-320-rest.png",
+      "sha256": "9f041bf2e760b51f1d457b142bedb9ece0ac3a36efc8e47662d588860aa4068b",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/after/map-768-1000-rest.png",
+      "sha256": "6c282f3adc6de7f0b710e9aed84bf1c26c4a64b8cea9dfdb3d3efd9b19d95e9c",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/after/probes.json",
+      "sha256": "17fa2de018336be63a4010021c2c8d485a6f0d86fcd42475e15b9f2a68ec91a2",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/after/scheduling-1024-1000-rest.png",
+      "sha256": "718b0236b447728be6441f1bb594ffa6a0a359d9a76a4e275c758eeec30a4674",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/after/scheduling-1280-1000-rest.png",
+      "sha256": "3caddafb02b82604f97bb26ebe1aa5d63873b5bb269bd10d79f17a06f1b4d078",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/after/scheduling-1440-1000-rest.png",
+      "sha256": "67c3feb263a14d9ed57d34fe3315b3a5a42e5a0b7e1c3615aac23cd1780fcfc8",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/after/scheduling-320-256-rest.png",
+      "sha256": "2f91eb7b3096a126e5205841bd9310044a51dece65543d9920dd619aba034f37",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/after/scheduling-320-568-rest.png",
+      "sha256": "a25dbca22837889bed8559d43fd1b552b0534bc2fac1ddd812ad34bc70ea7f6c",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/after/scheduling-390-844-rest.png",
+      "sha256": "e66aaa5578100c3e8caedbe5d9b1c4f85c42b65e895a8749760f5b920abaa447",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/after/scheduling-568-320-rest.png",
+      "sha256": "a0c4e108eca4a05f971931da2ad6edc318e6b8ea8faf9e6075d96c18a90be362",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/after/scheduling-768-1000-rest.png",
+      "sha256": "1619e6bcef86ddd078d49018194c69e665319ea8a7be7d6f9f6c05a9d1d7e25f",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/assignment-1024-1000-rest.png",
+      "sha256": "999db3dadab73c1c614f952bbf120ce03900259562d263c9f462f9c5c3951224",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/assignment-1280-1000-rest.png",
+      "sha256": "6d592c96c3dc6760fcb32f9ddc2cddc0949f088d76a871dbc7e17bb3b6108802",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/assignment-1440-1000-rest.png",
+      "sha256": "0f84c0d4705266d1eec61bf75d8bbd4c1740a3b34afa60f018acbe8e587e02fd",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/assignment-320-256-focus.png",
+      "sha256": "fb6ae2da1ea5fed3dfb4678c8d971a7851fa0782b3b7f2c62cf68d7650fc9b7d",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/assignment-320-256-rest.png",
+      "sha256": "19acaf26ea9fb6cd73134b41fba9b1fb638e75575f85e838b34febdae0642ae7",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/assignment-320-568-rest.png",
+      "sha256": "b9fd54e2eef3aa3a106cf5efd9da97a4cba97fe5b3917bed71a390c798a0a02d",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/assignment-390-844-rest.png",
+      "sha256": "44942af3c4eec9f9f8145c693cf4ad1fa511445105e5a6a314559c8e7478044c",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/assignment-568-320-rest.png",
+      "sha256": "bd16858b14b08075ae59445b077737f6f0a80f5434ec8c90510c4ed9b9c61c49",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/assignment-768-1000-rest.png",
+      "sha256": "44990a853bced36638f7b55a9b3d6c9dd60e8e99e0673d21db44c993ff919d6e",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/data-1024-1000-rest.png",
+      "sha256": "9d4177722c17c8e878e92b4cf1404b5bacc364e9bcc207df1ea2da46750106ee",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/data-1280-1000-rest.png",
+      "sha256": "6299d230c56a89e2d9a80c5c10a7a70306ba7026ff871df36f4134f70630aff7",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/data-1440-1000-rest.png",
+      "sha256": "8f4e11ae94e9c561554cacf0e6c8e5e38b9615fb61a3a7564a9ff307a193f150",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/data-320-256-focus.png",
+      "sha256": "898120e020df5b253ef3a8e20596f71f2b9917a3f5180ccda43320a22c47a9c5",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/data-320-256-rest.png",
+      "sha256": "531887538fea35cec45649dc8d6a4a5c53c8525ddf794448cba43c15db063579",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/data-320-568-rest.png",
+      "sha256": "6ed45889527e8ab65b5996afceb4a09233dd4386e5cce2111868bcf651c35d0a",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/data-390-844-rest.png",
+      "sha256": "3ca5fc00484d7624df56e54aceecbcd1baf85364e7468d71217c33c8579a5bb2",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/data-568-320-rest.png",
+      "sha256": "bd658d7fc4164dc076319fd08cd88e88fe4ed1e02565824e700628c51c3d92be",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/data-768-1000-rest.png",
+      "sha256": "26852ef88ab3e6aa17adff5e19824a04de266d231985b0e8bc2c6f1a2315b40d",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/map-1024-1000-rest.png",
+      "sha256": "15e99733d2508bafabd9a0db6562eea4d9c60d87e71dcb64c395755e040b4956",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/map-1280-1000-rest.png",
+      "sha256": "baa49c374663d4a7e53df86a4085975342cfa924b9d520d29ff8bbc8917aae94",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/map-1440-1000-rest.png",
+      "sha256": "79eaedf38dba9d9b1b18c2ce50655af44809646e720ec4ad638f787a4d157d36",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/map-320-256-rest.png",
+      "sha256": "fcac5805546953e5289a7079e80e1e265d655d29b36a7d788d3c9e25feb2855a",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/map-320-568-rest.png",
+      "sha256": "5af7134e6b0dcfcf736d9a73b3154649d94b480a3916bb3ded6771eb0edfe5f4",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/map-390-844-rest.png",
+      "sha256": "ce93aec6fe4116693a64ec15975f79696b567ba19cc7b858756c05221efe0524",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/map-568-320-rest.png",
+      "sha256": "9f041bf2e760b51f1d457b142bedb9ece0ac3a36efc8e47662d588860aa4068b",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/map-768-1000-rest.png",
+      "sha256": "6c282f3adc6de7f0b710e9aed84bf1c26c4a64b8cea9dfdb3d3efd9b19d95e9c",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/probes.json",
+      "sha256": "b429bdd5a81edb13b975ded610394abf16f28559c4ec2f9346be11a950d2ecaa",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/scheduling-1024-1000-rest.png",
+      "sha256": "718b0236b447728be6441f1bb594ffa6a0a359d9a76a4e275c758eeec30a4674",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/scheduling-1280-1000-rest.png",
+      "sha256": "3caddafb02b82604f97bb26ebe1aa5d63873b5bb269bd10d79f17a06f1b4d078",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/scheduling-1440-1000-rest.png",
+      "sha256": "67c3feb263a14d9ed57d34fe3315b3a5a42e5a0b7e1c3615aac23cd1780fcfc8",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/scheduling-320-256-focus.png",
+      "sha256": "4c20703de42d56b27489ef10d87048073b6153590f82b525545a8784c20e586e",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/scheduling-320-256-rest.png",
+      "sha256": "7773463a929098075008720240e656a4f3a18a5e71f28cf3a5f16f11b8bab89a",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/scheduling-320-568-rest.png",
+      "sha256": "a25dbca22837889bed8559d43fd1b552b0534bc2fac1ddd812ad34bc70ea7f6c",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/scheduling-390-844-rest.png",
+      "sha256": "e66aaa5578100c3e8caedbe5d9b1c4f85c42b65e895a8749760f5b920abaa447",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/scheduling-568-320-focus.png",
+      "sha256": "880250ace7b170bf91b85bd49aa6eebf393adc4cc59a0c574233aaa553911535",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/scheduling-568-320-rest.png",
+      "sha256": "cbcf753b379d8d31684988be231e71f6f897674336b34fa52a8666a5c799ed04",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/before/scheduling-768-1000-rest.png",
+      "sha256": "1619e6bcef86ddd078d49018194c69e665319ea8a7be7d6f9f6c05a9d1d7e25f",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/comparison.json",
+      "sha256": "e7f9f39bf157dbf0dd7d0f2e34ceb8f203f73409c086be523fa1ab7cab462a10",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/stress/assignment-320-256-1x-focus.png",
+      "sha256": "02f868b76ae44531b29066a6ed5128cb9604e20b78137b028fe1fcbb51e41d2b",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/stress/assignment-568-320-1x-focus.png",
+      "sha256": "75bb177199fdfe929c7a4eba81efa873e0889387706313fbdf2b46af4d2e5b8b",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/stress/assignment-720-450-2x-focus.png",
+      "sha256": "e60c53aa4401dc7de9cef926f48f14ed11612afe81f7ce4f62bb1e5f19cd12bf",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/stress/data-320-256-1x-focus.png",
+      "sha256": "2d768616c858a34d875ae4762eef2ac2a16b6e6a56984a0bee7a3e91ccc131fd",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/stress/data-568-320-1x-focus.png",
+      "sha256": "d31f6fb4eac9c79f4c0108ef9a8cea432026dd39b25507ebd4df0f98633786fd",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/stress/data-720-450-2x-focus.png",
+      "sha256": "d64f0726d77b34cf17b19ea1c6c20ca31d8ab4fdb35e3d921d56efe64d7a86e2",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/stress/map-320-256-1x-focus.png",
+      "sha256": "5f650c9bf2299742985406991bd5992540bf5fb1b60a4c68a753a1ba56faf9d8",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/stress/map-568-320-1x-focus.png",
+      "sha256": "5d58159188dd03248f473f085b18b78cf98b70754fd1228dfa9dff728e775915",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/stress/map-720-450-2x-focus.png",
+      "sha256": "b45118a03702bbb42e1c6935f33a777ca6b3a553c9ebe86a48a17623eb721a71",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/stress/results.json",
+      "sha256": "a58dc1ce2b96daca187176fa05e8ed242030220aa84bc8503b7ca1426209bc53",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/stress/scheduling-320-256-1x-focus.png",
+      "sha256": "9292e3b7df79992eead09a0cb6ac03cf3cfb802174957a30a5174fcb37c73dcf",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/stress/scheduling-568-320-1x-focus.png",
+      "sha256": "47c7ff19b4ccbacf9ba371ff4e01dc89418aa5094b80c0603e1af2477ae73407",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus/stress/scheduling-720-450-2x-focus.png",
+      "sha256": "3768ede5726a0df6478a5972daddd2252e2664c96b8ac97e4bbe567729b4316b",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus-after.log",
+      "sha256": "2371d3f4ae746b44b717f10e1fe34c6a238d16fe1d9a597fca5339bdd0a38ebe",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus-and-preservation-focal.log",
+      "sha256": "39d215594ad56fb7e4ec3a9ae5431e8749fe29d653b0215f06cbe172671aa993",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus-before.log",
+      "sha256": "97265568737a2f22925b0bc4e7f7dd3cff9179c2e34488a2939daf380df057a0",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/focus-stress.log",
+      "sha256": "ab506c65e4f05b62123f8a1f2b8548785504b256ae0bb410082e68a7c793059c",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/home_resume_journey.py.r2.diff",
+      "sha256": "4cb3e95205177e5fd8f2952b01ba30f1d6eabdfe891afcc4b12dc427c2fc906e",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/initial-state.json",
+      "sha256": "1f6f05328109af158114dfdfe2da71656e2d3af8a84aec8dab920e695da10c52",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/owned-cleanup.json",
+      "sha256": "c7f43defd5080337477454163cde493ae23dacc4d999f2bcb94131b82f0cb274",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/owned-sql-container.attempt1.json",
+      "sha256": "e0f011e52a4b6dc32fc92c2bbff69652956e11ab2427559313d12e31ea47cef3",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/owned-sql-container.json",
+      "sha256": "8fd01c448e17648de5dc73ae99ea027815015e9e16dd3c92d1c07e011df7d2df",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/platform_home.pre-r2.rollback.sql",
+      "sha256": "d9b11574b65d8454a616f53682f82c9abbd7f0d0c57362f7cdbb418d555f1cb4",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/preservation-checks.json",
+      "sha256": "fc08c5b7b5793be5e59698000c9f847857107828434a40f575a9d858e3cff1db",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/backend/app/static/css/dda-logistics-upload.css",
+      "sha256": "3892e44a580f24b828925ebe02316435dbbf1fe6d62775806724f05b33d46e0f",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/backend/app/static/css/dispatch.css",
+      "sha256": "067b4077a95b813fcb3b9171e8c429ae76a15d5edacad73803a154161b4c12ce",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/backend/app/static/css/scheduling-dashboard-v21.css",
+      "sha256": "08c102772fe046513a7892699d1469c937e6334c6d1f43bdc9d049617f662fe6",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/backend/app/static/css/workflow-context.css",
+      "sha256": "0d4e61317fd8a8e9f8667393ee8b6f2d5f59cf3201db279ab399f7ec3bb01cf6",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/backend/tests/browser/test_navigation.py",
+      "sha256": "0f0660dd24f5ebdc376d02911d37f9583930ecd02936ebeb64d9999841b1295a",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/backend/tests/browser/test_saga4_ui.py",
+      "sha256": "915cf603eb564c7bf2a78a062f87b2f85a56b5fe69fa675d6a0242634d173dcf",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/backend/tests/browser/test_workflow_context.py",
+      "sha256": "8048f2a215b278d31ff5b3aac13fcee6bb4bda619bdd917516c18e91f863e8dd",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/backend/tests/e2e/activity_journey.py",
+      "sha256": "5abc02508945ac448fd27a5ae70a38d8cfa59274244200a5c896676fafe0d1e4",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/backend/tests/e2e/browser_auth.py",
+      "sha256": "801a5305331ea57f419cac7191101c0dab910dc544392913dbcc6a4a87c63ef6",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/backend/tests/e2e/browser_journey.py",
+      "sha256": "ce6dd6f1bb300de83b18a98e46886c709d49f1b13bd7e7b2956096123574f207",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/backend/tests/e2e/collaboration_approval_journey.py",
+      "sha256": "aed190227f06b506b5a0c468001d2149fc2698a27a9badb6bdd58a7bec904604",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/backend/tests/e2e/collaboration_journey.py",
+      "sha256": "5c1a165d5102001bead158b9d0ad95d70b3b3a4e0bfc972f72a7932c21bed699",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/backend/tests/e2e/entitlements_journey.py",
+      "sha256": "fbef7a8ae12cc82ad883abb2f10e3e94f0e14e27d0ca98a6a55a70577ed0b8e3",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/backend/tests/e2e/golden_journey.py",
+      "sha256": "b8413202cae44d1c3ac5a24c8f5af06f782549e2a8b1cb79f9f4a1808444711b",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/backend/tests/e2e/home_resume_journey.py",
+      "sha256": "8eb1b890a419d650c0848a27b0ad8b4e116ae037e2dd63270aac21f4b44facee",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/backend/tests/e2e/onboarding_journey.py",
+      "sha256": "2dc8e8a000730aca1e70a1ec9dcf958696c4532d81275e5e682e10166ed7301b",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/backend/tests/e2e/platform_journey.py",
+      "sha256": "5937231e6224b4a6b789a3587525d356743c6eb4c29db79021c816a69f5b40a3",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/backend/tests/e2e/scheduling_dashboard_journey.py",
+      "sha256": "98bca66759072b53ff40aaa9d1ea5fc09ded665c89285ae9fcc375dd48af8fe9",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/backend/tests/e2e/test_collaboration.py",
+      "sha256": "1c42329466b1d89836c988bd2a791a4619aad82cfd09b5272c76314d899ff04b",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/backend/tests/e2e/test_decision_center.py",
+      "sha256": "dce9bd666237525bb85b0fc061af3db5b2651c90691d22a12d9e210eef58947a",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/backend/tests/e2e/test_optimized_responsibilities.py",
+      "sha256": "580473f556b7ad9c133327782b70440fa24f710ecb6475b0dec65e5802ee9547",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/backend/tests/e2e/test_tenancy.py",
+      "sha256": "f2f74332ae9eeed6988d1a3061a624832e63e2d91c33583e235bb6e62962ab35",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/backend/tests/e2e/test_v2_foundation.py",
+      "sha256": "bbd693ad973297e2672304c057b7ea38c345066bdc482edd4e163706c50427e3",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/backend/tests/e2e/test_workflow.py",
+      "sha256": "f678e949d41e4a992b00227962f061bf3f0e365126003561ae4a214034e2acde",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/backend/tests/e2e/test_workflow_gates.py",
+      "sha256": "ad21d324bc5c6f665e17dc437665fc1b47f7c01d634f004008253234005a4652",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/backend/tests/e2e/workflow_fixture.py",
+      "sha256": "f763df7b19123d44148ef1827d06c3bcc02654e459752d871face44a6f9fc22c",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/backend/tests/e2e/workflow_ui_audit.py",
+      "sha256": "f55c179e048e49751e431e982c40a0876cb109a5ef4f9ee197ebae8901504f82",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/backend/tests/e2e/workspace_settings_journey.py",
+      "sha256": "d1cdb989b970df56640b2d9298e26d96d17985b1a3b7eb4ba6e9be6ce10dbcca",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/docs/execution/ultimate/t0/artifact-integrity.json",
+      "sha256": "2ebf4015e41201bbe3622802c67a46a2eb123e7828e2e1b3d8033a90193557a6",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/docs/execution/ultimate/t0/baseline-test-ledger.json",
+      "sha256": "d5dd864ebf4904dd908006810072f9e549382522bb8cc6f2eaa691d624aa0ffe",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/docs/execution/ultimate/t0/command-ledger.json",
+      "sha256": "1c65a002dd1f68a55b00ab2b68f2ae932568b3b48382f9a1a8d953f42359730c",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/docs/execution/ultimate/t0/debt-register.json",
+      "sha256": "286848670aad6367e597c80fa91e92cc6e8c0532cee81173b156ff39d24a5779",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/docs/execution/ultimate/t0/debt-register.md",
+      "sha256": "5f116b87a0a50cee8161ffc3a064bf82a0f395149aa8f72b8fb37afe21a7ad03",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/docs/execution/ultimate/t0/remediation/artifact-integrity.json",
+      "sha256": "4eb863475f1d166e43e53efd6405da3594a32218ece95c5624bd7ae81e4aa8c2",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-baseline/docs/execution/ultimate/t0/t0-remediation-report.md",
+      "sha256": "e1343ea34485bfb0724534d78ecfc11b55f8ce8cc2d0a724605076fb01ab5a20",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r1-integrity-resolution.json",
+      "sha256": "99b630cb6866f453969c4b6d923dcd8c577e716f5575283bb7d73c7b5f292299",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/r2-scope-diff.json",
+      "sha256": "af964c327066c5897d8df5f837de75a682c863553d07e675ae6ade85c6ee0b39",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/root-causes.json",
+      "sha256": "3c7008aca7c1384f985435b5e35ae13aee12ea9a8eee10b3bfc9de1a4280b45e",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/runtime.json",
+      "sha256": "fb28dfc85afb23bdf27a390c06f3c986e8c065cd8616a60232900db6d00cf388",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/scheduling_dashboard_journey.py.r2.diff",
+      "sha256": "1fe9996bd4ea1f4efce4217314aa443e76f05ce3065576fd537d9d2baa16cba9",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/skills-ledger.json",
+      "sha256": "ae089b383b4fa95bced84413835bf7b31947d262059f61af3c5a5b023f1c3709",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/sql-home-focal.log",
+      "sha256": "719c65be1a590f37a4d7cf249a02ed59e84ed9210918675496d81092624c17f9",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/t0r2-browser-diagnostic.py",
+      "sha256": "bc157fcb0843b2fd370c2ed8dba3e43494da3e1dbab93416b9ba001d994d2e44",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/t0r2-consolidate.py",
+      "sha256": "0cc6cf9ab4f5a898f5d8cd7bb48ffa5eeeddc8ea4769869ea78d9cbccdf79481",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/t0r2-final-batch.py",
+      "sha256": "3950b10af1c4676a859013478ff016c00d68ddf04f3516f40f07cd68db266bb8",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/t0r2-fixture-fault-probe.py",
+      "sha256": "46899a39038a16e4e15bb0788a76cedb47ede1566f68ada7849b287916821634",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/t0r2-focus-probe.py",
+      "sha256": "ef6dc0ce4e693303c2eec3a1c9fb01d8b7ff719420b9ab97bad6f1a79f13b8a7",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/t0r2-focus-stress.py",
+      "sha256": "2a22acfdb685407948149a267a66e9b12131865a622cb2fe382e6d772148e8a9",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/t0r2-sql-suite.py",
+      "sha256": "0a16d17b8b6e9b1ff9b3c8eafce3660e4fe13090853d89ccb7bdf3e5eee7d559",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/test_collaboration.py.r2.diff",
+      "sha256": "5f6d1dd64b26833c341ce5e5693b2c4bb0c9dad6df6d838ff00c88c525873ee0",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/test_home_owner_attention.py.r2.diff",
+      "sha256": "da0181ada85a7a30d9ef5c367822a849999238fc2c002661ca0fca01d4ebe403",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/test_navigation.py.r2.diff",
+      "sha256": "51937cd6a5a43634cdce1c57a8a07947b191b33e1a6337d8350bcca0a774e18d",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/test_saga4_ui.py.r2.diff",
+      "sha256": "e2d36fb6a4820b791f93ad0e074476cd3c3c2ac313d6f6ed445572bed177db55",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/test_workflow.py.r2.diff",
+      "sha256": "777bd11812718a258c977e72ee80c7bc4e2df6850f0b27070e2a5d3822ac30bd",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/three-e2e-current-contract.log",
+      "sha256": "4b79f44110c67347b493ffeef518d10cc50f4378420927f25fa46e2510feba34",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/three-e2e-lifecycle.log",
+      "sha256": "4c888ea881e72c40c69084b738349a96e6a32aada9bdff9bab21af789183e932",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/three-e2e-related.log",
+      "sha256": "acdc143e53c77d3e027dae51f2803e765c9baf00e99988f351fe71fbe97010d5",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/two-e2e-current.log",
+      "sha256": "149ec0b4e228c3c700e9fd72f269d5674671f4c144522197d9e389a316f6687e",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/evidence/workflow_ui_audit.py.r2.diff",
+      "sha256": "73e25f4bd2f4c93f29746b4be85b0b486a2b511882b951e1c1ce3bb419046ce3",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/final-workspace.json",
+      "sha256": "0608db5571dfae91cd1dbc822d6dcaf75e41b1d32443aed1e341279d4f9353c2",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/qa-summary.json",
+      "sha256": "5f5facc13de95706b143332765a4660420eda7a70bd1f66971cc4d86c2fe6c33",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/remediation-r2/test-identities.json",
+      "sha256": "cd522f0112406c6bbf8e7f6e93c48b754b2d21fbf5e5b1ee07ea9e98b656b2ac",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/t0-remediation-r2-report.md",
+      "sha256": "13a1ed90d85e9eec08e6b48bf2f1edd104ebcc34c8ead3c49ae7f2d539fa814e",
+      "unchanged": true
+    },
+    {
+      "path": "docs/execution/ultimate/t0/t0-remediation-report.md",
+      "sha256": "e1343ea34485bfb0724534d78ecfc11b55f8ce8cc2d0a724605076fb01ab5a20",
+      "unchanged": true
+    },
+    {
+      "path": "docs/ultimate-mvp-implementation-master-plan.md",
+      "sha256": "ff824a2fae9566cfb4e1f77ae81e8806d0b76d179b208660b29e9bd00e9ab6d6",
+      "unchanged": true
+    },
+    {
+      "path": "supabase/migrations/20261026010000_home_decision_owner_attention.sql",
+      "sha256": "e9ea4bbdb66def0e668cfb93f2eccd2dd797c12d1247617d4cf763564135ccae",
+      "unchanged": true
+    }
+  ],
+  "candidate_files_match_final_test_freeze": [
+    {
+      "path": "backend/app/domain/logistics/__init__.py",
+      "sha256": "eba83b74e79423fafd39570b8508ea39302e55dafc2a42516f7f263a49662d70",
+      "unchanged": true
+    },
+    {
+      "path": "backend/app/domain/logistics/base.py",
+      "sha256": "c809ede54d1d6f27ea292f2046df07e200a5b4ae79c4d8c2e4a0715b0c0cb2b5",
+      "unchanged": true
+    },
+    {
+      "path": "backend/app/domain/logistics/contracts.py",
+      "sha256": "32988900d955c9a3a4243e964a3d7b3c485a8f4b84b5bfbaaebd581af3ec63e3",
+      "unchanged": true
+    },
+    {
+      "path": "backend/app/domain/logistics/costs.py",
+      "sha256": "1b05955be9bf0d28a51db25ffe01cfba4b5e9c5c1a2045bd913b60f103066975",
+      "unchanged": true
+    },
+    {
+      "path": "backend/app/domain/logistics/transit.py",
+      "sha256": "4bd48cef104cd5c45022e69bc61d192c40071b40f641ea1acea82cb5aaf2119c",
+      "unchanged": true
+    },
+    {
+      "path": "backend/app/domain/logistics/units.py",
+      "sha256": "b3fc9ce313ee5dc49dc002046be5866d0484616cbabc33637f9f749a94742eb2",
+      "unchanged": true
+    },
+    {
+      "path": "backend/app/results/__init__.py",
+      "sha256": "a25d73619d411e2b0ca9fd327634ea8f9ecd432df48f4ac2fcbf9802cc1489ca",
+      "unchanged": true
+    },
+    {
+      "path": "backend/app/results/canonical.py",
+      "sha256": "5e8e66af9a41f33829ee010f2a5da86f7bc460c08efa2570f13b7a07ebfa6c56",
+      "unchanged": true
+    },
+    {
+      "path": "backend/app/results/contracts.py",
+      "sha256": "e626aae6c59094dbc424680a9c67cfaa63f595818f781d39c5486372aa388705",
+      "unchanged": true
+    },
+    {
+      "path": "backend/app/results/metrics.py",
+      "sha256": "062c288c02b031764df7e02fb6bcc071fa6a73dcb16527c48c9054029fc9b8c4",
+      "unchanged": true
+    },
+    {
+      "path": "backend/app/results/reason_codes.py",
+      "sha256": "0536de32b2e8384286d90539b0031997cf4a953bd0f7acc1b1dece0bbba34911",
+      "unchanged": true
+    },
+    {
+      "path": "backend/app/results/registry.py",
+      "sha256": "b393a095d0e550d482f21c9d7c36ee0dfa3f538c16d0ca145e78e50c8469f6e1",
+      "unchanged": true
+    },
+    {
+      "path": "backend/app/static/contracts/result-contracts-v1.json",
+      "sha256": "b8fbb932cdaf4aa6c05ab92085bdff79ae6f9f5a22ac81561be837841f132be5",
+      "unchanged": true
+    },
+    {
+      "path": "backend/tests/fixtures/ultimate/fingerprint-vectors-v1.json",
+      "sha256": "be8bc6059f45be762a764ba9f9cde0bf790a96d03e790ba65e0ad27a73bc69cc",
+      "unchanged": true
+    },
+    {
+      "path": "backend/tests/test_ultimate_contracts.py",
+      "sha256": "7ec78ccc43bcf4b7483f07a7e433386b164a506f0b625aec621f8b61f9c42efe",
+      "unchanged": true
+    },
+    {
+      "path": "backend/tests/test_ultimate_transit.py",
+      "sha256": "eeede95ca13506acdd10e0ec369c73ee5f8099392dd56ffbc8896f31459e109b",
+      "unchanged": true
+    },
+    {
+      "path": "backend/tests/ultimate_fixtures.py",
+      "sha256": "7d8d68967da92b11219fbf7512353faae45a0f88af5f9fc6f08c6f5907abc408",
+      "unchanged": true
+    }
+  ],
+  "existing_tracked_changes_unchanged": [
+    "backend/app/static/css/dation-design-system.css",
+    "backend/app/static/css/dda-logistics-upload.css",
+    "backend/app/static/css/dispatch.css",
+    "backend/app/static/css/scheduling-dashboard-v21.css",
+    "backend/app/static/css/workflow-context.css",
+    "backend/tests/browser/test_navigation.py",
+    "backend/tests/browser/test_saga4_ui.py",
+    "backend/tests/browser/test_workflow_context.py",
+    "backend/tests/e2e/activity_journey.py",
+    "backend/tests/e2e/browser_auth.py",
+    "backend/tests/e2e/browser_journey.py",
+    "backend/tests/e2e/collaboration_approval_journey.py",
+    "backend/tests/e2e/collaboration_journey.py",
+    "backend/tests/e2e/entitlements_journey.py",
+    "backend/tests/e2e/golden_journey.py",
+    "backend/tests/e2e/home_resume_journey.py",
+    "backend/tests/e2e/onboarding_journey.py",
+    "backend/tests/e2e/platform_journey.py",
+    "backend/tests/e2e/scheduling_dashboard_journey.py",
+    "backend/tests/e2e/test_collaboration.py",
+    "backend/tests/e2e/test_decision_center.py",
+    "backend/tests/e2e/test_optimized_responsibilities.py",
+    "backend/tests/e2e/test_tenancy.py",
+    "backend/tests/e2e/test_v2_foundation.py",
+    "backend/tests/e2e/test_workflow.py",
+    "backend/tests/e2e/test_workflow_gates.py",
+    "backend/tests/e2e/workflow_fixture.py",
+    "backend/tests/e2e/workflow_ui_audit.py",
+    "backend/tests/e2e/workspace_settings_journey.py"
+  ],
+  "baseline_python_tests": 383,
+  "final_python_tests": 444,
+  "baseline_python_test_ids_retained": [
+    "test_assignment_config_redesign.AssignmentConfigRedesignContractTests.test_hero_case_and_four_sections.test_hero_case_and_four_sections",
+    "test_assignment_config_redesign.AssignmentConfigRedesignContractTests.test_objective_custom_and_co2_policy.test_objective_custom_and_co2_policy",
+    "test_assignment_config_redesign.AssignmentConfigRedesignContractTests.test_old_assignment_composer_copy_is_not_visible_in_new_module.test_old_assignment_composer_copy_is_not_visible_in_new_module",
+    "test_assignment_config_redesign.AssignmentConfigRedesignContractTests.test_resource_policy_and_inert_advanced_options.test_resource_policy_and_inert_advanced_options",
+    "test_assignment_config_redesign.AssignmentConfigRedesignContractTests.test_scope_is_real_and_previewed_server_side.test_scope_is_real_and_previewed_server_side",
+    "test_assignment_config_redesign.AssignmentConfigRedesignContractTests.test_summary_and_accessibility.test_summary_and_accessibility",
+    "test_config_map_icons_keep_outline_svg_contract",
+    "test_decision_panel_copy_wraps_instead_of_overflowing",
+    "test_decision_summary_reuses_case_visual_language",
+    "test_mobile_case_summary_stacks_cleanly",
+    "test_assignment_dashboard_phase0_contract.AssignmentDashboardPhase0EngineContractTests.test_comparative_balanced_has_same_reference_shape.test_comparative_balanced_has_same_reference_shape",
+    "test_assignment_dashboard_phase0_contract.AssignmentDashboardPhase0EngineContractTests.test_comparative_custom_adds_balanced_reference.test_comparative_custom_adds_balanced_reference",
+    "test_assignment_dashboard_phase0_contract.AssignmentDashboardPhase0EngineContractTests.test_comparative_simple_preset_publishes_extremes_and_balanced.test_comparative_simple_preset_publishes_extremes_and_balanced",
+    "test_assignment_dashboard_phase0_contract.AssignmentDashboardPhase0EngineContractTests.test_essential_balanced_keeps_extremes_but_hides_frontier.test_essential_balanced_keeps_extremes_but_hides_frontier",
+    "test_assignment_dashboard_phase0_contract.AssignmentDashboardPhase0EngineContractTests.test_essential_custom_keeps_extremes_without_balanced_reference.test_essential_custom_keeps_extremes_without_balanced_reference",
+    "test_assignment_dashboard_phase0_contract.AssignmentDashboardPhase0EngineContractTests.test_essential_simple_preset_publishes_only_requested_reference.test_essential_simple_preset_publishes_only_requested_reference",
+    "test_assignment_dashboard_phase0_contract.AssignmentDashboardPhase0FixtureTests.test_assignment_fixtures_never_claim_temporal_output.test_assignment_fixtures_never_claim_temporal_output",
+    "test_assignment_dashboard_phase0_contract.AssignmentDashboardPhase0FixtureTests.test_comparative_fixture_covers_same_plan_fingerprint.test_comparative_fixture_covers_same_plan_fingerprint",
+    "test_assignment_dashboard_phase0_contract.AssignmentDashboardPhase0FixtureTests.test_comparative_fixture_exposes_metric_level_references.test_comparative_fixture_exposes_metric_level_references",
+    "test_assignment_dashboard_phase0_contract.AssignmentDashboardPhase0FixtureTests.test_essential_fixture_has_one_reference_and_no_frontier.test_essential_fixture_has_one_reference_and_no_frontier",
+    "test_assignment_dashboard_phase0_contract.AssignmentDashboardPhase0FixtureTests.test_fixtures_distinguish_depth_from_three_persisted_paths.test_fixtures_distinguish_depth_from_three_persisted_paths",
+    "test_assignment_dashboard_phase0_contract.AssignmentDashboardPhase0FixtureTests.test_only_selected_scenario_contains_operational_detail.test_only_selected_scenario_contains_operational_detail",
+    "test_assignment_dashboard_phase1.AssignmentDashboardPhase1Tests.test_analysis_depth_selector_reads_persisted_contract.test_analysis_depth_selector_reads_persisted_contract",
+    "test_assignment_dashboard_phase1.AssignmentDashboardPhase1Tests.test_assignment_v2_is_schema_scoped_and_scheduling_stays_separate.test_assignment_v2_is_schema_scoped_and_scheduling_stays_separate",
+    "test_assignment_dashboard_phase1.AssignmentDashboardPhase1Tests.test_decision_case_rail_preserves_disabled_navigation_guard.test_decision_case_rail_preserves_disabled_navigation_guard",
+    "test_assignment_dashboard_phase1.AssignmentDashboardPhase1Tests.test_execution_drawer_closes_with_button_escape_and_backdrop.test_execution_drawer_closes_with_button_escape_and_backdrop",
+    "test_assignment_dashboard_phase1.AssignmentDashboardPhase1Tests.test_existing_assignment_content_modules_are_preserved.test_existing_assignment_content_modules_are_preserved",
+    "test_assignment_dashboard_phase1.AssignmentDashboardPhase1Tests.test_export_downloads_audited_csv_and_json_artifacts.test_export_downloads_audited_csv_and_json_artifacts",
+    "test_assignment_dashboard_phase1.AssignmentDashboardPhase1Tests.test_hero_is_the_only_approval_entry_using_the_existing_controller.test_hero_is_the_only_approval_entry_using_the_existing_controller",
+    "test_assignment_dashboard_phase1.AssignmentDashboardPhase1Tests.test_rerun_returns_to_existing_handler_without_auto_execution.test_rerun_returns_to_existing_handler_without_auto_execution",
+    "test_assignment_dashboard_phase1.AssignmentDashboardPhase1Tests.test_review_and_approved_states_are_explicit.test_review_and_approved_states_are_explicit",
+    "test_assignment_dashboard_phase1.AssignmentDashboardPhase1Tests.test_shell_keeps_technical_depth_without_product_badge.test_shell_keeps_technical_depth_without_product_badge",
+    "test_assignment_dashboard_phase1.AssignmentDashboardPhase1Tests.test_styles_are_scoped_responsive_and_focus_visible.test_styles_are_scoped_responsive_and_focus_visible",
+    "test_assignment_dashboard_phase2.AssignmentDashboardPhase2Tests.test_approval_is_only_in_toolbar_and_approved_state_has_no_dead_disabled_cta.test_approval_is_only_in_toolbar_and_approved_state_has_no_dead_disabled_cta",
+    "test_assignment_dashboard_phase2.AssignmentDashboardPhase2Tests.test_essential_is_always_base_and_comparative_is_insertable.test_essential_is_always_base_and_comparative_is_insertable",
+    "test_assignment_dashboard_phase2.AssignmentDashboardPhase2Tests.test_essential_selectors_use_persisted_assignment_contract.test_essential_selectors_use_persisted_assignment_contract",
+    "test_assignment_dashboard_phase2.AssignmentDashboardPhase2Tests.test_evidence_is_trip_centric_without_large_chart.test_evidence_is_trip_centric_without_large_chart",
+    "test_assignment_dashboard_phase2.AssignmentDashboardPhase2Tests.test_orders_are_auditable_from_persisted_order_outcomes.test_orders_are_auditable_from_persisted_order_outcomes",
+    "test_assignment_dashboard_phase2.AssignmentDashboardPhase2Tests.test_phase2_css_is_depth_scoped_responsive_and_does_not_touch_scheduling.test_phase2_css_is_depth_scoped_responsive_and_does_not_touch_scheduling",
+    "test_assignment_dashboard_phase2.AssignmentDashboardPhase2Tests.test_single_vehicle_has_compact_summary_instead_of_bar_chart.test_single_vehicle_has_compact_summary_instead_of_bar_chart",
+    "test_assignment_dashboard_phase2.AssignmentDashboardPhase2Tests.test_summary_separates_objective_metrics_from_descriptive_kpis.test_summary_separates_objective_metrics_from_descriptive_kpis",
+    "test_assignment_dashboard_phase2.AssignmentDashboardPhase2Tests.test_validation_keeps_real_warnings_and_has_a_single_empty_state.test_validation_keeps_real_warnings_and_has_a_single_empty_state",
+    "test_assignment_dashboard_phase3.AssignmentDashboardPhase3Tests.test_comparative_composition_extends_essential_in_the_same_dashboard.test_comparative_composition_extends_essential_in_the_same_dashboard",
+    "test_assignment_dashboard_phase3.AssignmentDashboardPhase3Tests.test_comparative_keeps_real_validation_as_final_review.test_comparative_keeps_real_validation_as_final_review",
+    "test_assignment_dashboard_phase3.AssignmentDashboardPhase3Tests.test_comparative_selectors_are_direction_aware_and_use_persisted_metrics.test_comparative_selectors_are_direction_aware_and_use_persisted_metrics",
+    "test_assignment_dashboard_phase3.AssignmentDashboardPhase3Tests.test_comparative_summary_includes_main_and_secondary_metrics.test_comparative_summary_includes_main_and_secondary_metrics",
+    "test_assignment_dashboard_phase3.AssignmentDashboardPhase3Tests.test_comparison_is_quantitative_without_narrative_or_reference_trip_reconstruction.test_comparison_is_quantitative_without_narrative_or_reference_trip_reconstruction",
+    "test_assignment_dashboard_phase3.AssignmentDashboardPhase3Tests.test_phase3_css_is_scoped_responsive_and_does_not_touch_scheduling.test_phase3_css_is_scoped_responsive_and_does_not_touch_scheduling",
+    "test_assignment_engine.AssignmentEngineTests.test_assignment_is_deterministic.test_assignment_is_deterministic",
+    "test_assignment_engine.AssignmentEngineTests.test_assignment_v1_is_non_temporal.test_assignment_v1_is_non_temporal",
+    "test_assignment_engine.AssignmentEngineTests.test_dates_do_not_change_assignment.test_dates_do_not_change_assignment",
+    "test_assignment_engine.AssignmentEngineTests.test_handoff_is_explicit.test_handoff_is_explicit",
+    "test_assignment_engine.AssignmentEngineTests.test_min_trips_consolidates_same_route.test_min_trips_consolidates_same_route",
+    "test_assignment_engine.AssignmentEngineTests.test_missing_cost_rejects_cost_dimension.test_missing_cost_rejects_cost_dimension",
+    "test_assignment_engine.AssignmentEngineTests.test_one_vehicle_can_receive_multiple_abstract_trips.test_one_vehicle_can_receive_multiple_abstract_trips",
+    "test_assignment_engine.AssignmentEngineTests.test_own_fleet_and_co2_are_distinct_objectives.test_own_fleet_and_co2_are_distinct_objectives",
+    "test_applied_filters_have_independent_expand_and_remove_actions",
+    "test_collapsed_filter_keeps_a_compact_summary",
+    "test_collapsible_filter_behavior_is_loaded_by_assignment_workspace",
+    "test_filter_open_state_survives_config_rerenders",
+    "test_filter_toggle_has_responsive_and_reduced_motion_styles",
+    "test_assignment_scope.AssignmentScopeTests.test_category_filter.test_category_filter",
+    "test_assignment_scope.AssignmentScopeTests.test_date_filter_uses_resolved_absolute_range.test_date_filter_uses_resolved_absolute_range",
+    "test_assignment_scope.AssignmentScopeTests.test_numeric_filter.test_numeric_filter",
+    "test_assignment_scope.AssignmentScopeTests.test_preview_only_exposes_present_filterable_columns.test_preview_only_exposes_present_filterable_columns",
+    "test_assignment_scope.AssignmentScopeTests.test_resource_mode_is_backward_compatible.test_resource_mode_is_backward_compatible",
+    "test_assignment_scope.AssignmentScopeTests.test_scope_contract_rejects_wrong_type.test_scope_contract_rejects_wrong_type",
+    "test_case_domain.CaseDomainTests.test_cached_approval_cannot_survive_absent_authoritative_runs.test_cached_approval_cannot_survive_absent_authoritative_runs",
+    "test_case_domain.CaseDomainTests.test_case_identity_and_run_counts_are_validated.test_case_identity_and_run_counts_are_validated",
+    "test_case_domain.CaseDomainTests.test_domain_has_no_infrastructure_dependency.test_domain_has_no_infrastructure_dependency",
+    "test_case_domain.CaseDomainTests.test_projection_preserves_baseline_outputs_and_input_evidence.test_projection_preserves_baseline_outputs_and_input_evidence",
+    "test_center_v2_projection.CenterObjectiveTests.test_official_objective_is_not_replaced_by_a_later_candidate.test_official_objective_is_not_replaced_by_a_later_candidate",
+    "test_center_v2_projection.CenterObjectiveTests.test_unknown_objective_is_preserved_and_missing_draft_is_not_invented.test_unknown_objective_is_preserved_and_missing_draft_is_not_invented",
+    "test_decision_case_persistence.DecisionCaseHTTPTests.test_create_case_accepts_client_case_id_and_data_pack.test_create_case_accepts_client_case_id_and_data_pack",
+    "test_decision_case_persistence.DecisionCaseHTTPTests.test_list_and_restore_case_contract.test_list_and_restore_case_contract",
+    "test_decision_case_persistence.DecisionCaseServiceTests.test_approval_unlocks_next_node_without_losing_case_identity.test_approval_unlocks_next_node_without_losing_case_identity",
+    "test_decision_case_persistence.DecisionCaseServiceTests.test_base_state_is_bound_to_immutable_data_pack.test_base_state_is_bound_to_immutable_data_pack",
+    "test_decision_case_persistence.DecisionCaseServiceTests.test_existing_case_cannot_be_rebound.test_existing_case_cannot_be_rebound",
+    "test_decision_case_persistence.DecisionCaseServiceTests.test_state_cannot_move_to_another_data_pack.test_state_cannot_move_to_another_data_pack",
+    "test_decision_config_ui_foundation.DecisionConfigUiFoundationTests.test_assignment_consumes_shared_primitives.test_assignment_consumes_shared_primitives",
+    "test_decision_config_ui_foundation.DecisionConfigUiFoundationTests.test_assignment_no_longer_owns_duplicate_component_renderers.test_assignment_no_longer_owns_duplicate_component_renderers",
+    "test_decision_config_ui_foundation.DecisionConfigUiFoundationTests.test_scheduling_now_consumes_shared_primitives.test_scheduling_now_consumes_shared_primitives",
+    "test_decision_config_ui_foundation.DecisionConfigUiFoundationTests.test_shared_module_exposes_canonical_primitives.test_shared_module_exposes_canonical_primitives",
+    "test_decision_config_ui_foundation.DecisionConfigUiFoundationTests.test_shared_option_components_keep_disabled_accessibility_contract.test_shared_option_components_keep_disabled_accessibility_contract",
+    "test_decision_config_ui_foundation.DecisionConfigUiFoundationTests.test_shared_primitives_preserve_assignment_visual_contract.test_shared_primitives_preserve_assignment_visual_contract",
+    "test_decision_context.DecisionContextTests.test_context_exposes_reference_semantics.test_context_exposes_reference_semantics",
+    "test_decision_context.DecisionContextTests.test_custom_run_keeps_custom_identity.test_custom_run_keeps_custom_identity",
+    "test_decision_context.DecisionContextTests.test_equivalence_does_not_rename_custom.test_equivalence_does_not_rename_custom",
+    "test_decision_map_case_v2.DecisionMapCaseV2ContractTests.test_case_identity_and_progress.test_case_identity_and_progress",
+    "test_decision_map_case_v2.DecisionMapCaseV2ContractTests.test_change_data_discloses_available_impact.test_change_data_discloses_available_impact",
+    "test_decision_map_case_v2.DecisionMapCaseV2ContractTests.test_data_pack_reuses_real_dataset_metadata.test_data_pack_reuses_real_dataset_metadata",
+    "test_decision_map_case_v2.DecisionMapCaseV2ContractTests.test_decision_cards_and_connectors_are_clean.test_decision_cards_and_connectors_are_clean",
+    "test_decision_map_case_v2.DecisionMapCaseV2ContractTests.test_visual_alignment_and_responsive_contract.test_visual_alignment_and_responsive_contract",
+    "test_decision_map_micro_polish.DecisionMapMicroPolishTests.test_active_cta_uses_shared_sizing_and_hover_feedback.test_active_cta_uses_shared_sizing_and_hover_feedback",
+    "test_decision_map_micro_polish.DecisionMapMicroPolishTests.test_global_state_legend_is_hidden.test_global_state_legend_is_hidden",
+    "test_decision_map_micro_polish.DecisionMapMicroPolishTests.test_progress_uses_numbered_milestones_without_labels.test_progress_uses_numbered_milestones_without_labels",
+    "test_decision_map_micro_polish.DecisionMapMicroPolishTests.test_reduced_motion_removes_cta_translation.test_reduced_motion_removes_cta_translation",
+    "test_decision_run_history_v2.DecisionRunHistoryHTTPTests.test_history_endpoint_is_scoped_by_case_and_node.test_history_endpoint_is_scoped_by_case_and_node",
+    "test_decision_run_history_v2.DecisionRunHistoryModelTests.test_candidate_run_does_not_replace_current_approval.test_candidate_run_does_not_replace_current_approval",
+    "test_decision_run_history_v2.DecisionRunHistoryModelTests.test_insert_promotes_embedded_case_lineage.test_insert_promotes_embedded_case_lineage",
+    "test_decision_run_history_v2.DecisionRunHistoryModelTests.test_new_assignment_approval_marks_old_scheduling_stale.test_new_assignment_approval_marks_old_scheduling_stale",
+    "test_decision_run_history_v2.DecisionRunHistoryModelTests.test_superseded_upstream_cannot_seed_new_run.test_superseded_upstream_cannot_seed_new_run",
+    "test_decision_run_history_v2.DecisionRunHistoryModelTests.test_version_approval_uses_atomic_rpc.test_version_approval_uses_atomic_rpc",
+    "test_dispatch_context.DispatchContextTests.test_assignment_context_excludes_temporal_semantics.test_assignment_context_excludes_temporal_semantics",
+    "test_dispatch_context.DispatchContextTests.test_context_has_hard_size_bound.test_context_has_hard_size_bound",
+    "test_dispatch_context.DispatchContextTests.test_numeric_guard.test_numeric_guard",
+    "test_dispatch_context.DispatchContextTests.test_scheduling_context_keeps_assignment_locked.test_scheduling_context_keeps_assignment_locked",
+    "test_dispatch_engine.DispatchEngineTests.test_active_dimensions_limit_comparative_scenarios.test_active_dimensions_limit_comparative_scenarios",
+    "test_dispatch_engine.DispatchEngineTests.test_anomalies_include_and_exclude.test_anomalies_include_and_exclude",
+    "test_dispatch_engine.DispatchEngineTests.test_consolidation_and_integer_capacity.test_consolidation_and_integer_capacity",
+    "test_dispatch_engine.DispatchEngineTests.test_custom_four_weight_score_respects_sla_first.test_custom_four_weight_score_respects_sla_first",
+    "test_dispatch_engine.DispatchEngineTests.test_dispatch_v2_contract_and_determinism.test_dispatch_v2_contract_and_determinism",
+    "test_dispatch_engine.DispatchEngineTests.test_essential_depth_solves_only_required_preset.test_essential_depth_solves_only_required_preset",
+    "test_dispatch_engine.DispatchEngineTests.test_finite_fleet_returns_sla_exception_instead_of_error.test_finite_fleet_returns_sla_exception_instead_of_error",
+    "test_dispatch_engine.DispatchEngineTests.test_historical_vehicle_assignment_is_ignored.test_historical_vehicle_assignment_is_ignored",
+    "test_dispatch_engine.DispatchEngineTests.test_max_utilization_prefers_own_weight.test_max_utilization_prefers_own_weight",
+    "test_dispatch_engine.DispatchEngineTests.test_min_co2_prefers_cleaner_vehicle.test_min_co2_prefers_cleaner_vehicle",
+    "test_dispatch_engine.DispatchEngineTests.test_multiday_cycle_blocks_own_fleet_until_return.test_multiday_cycle_blocks_own_fleet_until_return",
+    "test_dispatch_engine.DispatchEngineTests.test_outlier_requires_decision.test_outlier_requires_decision",
+    "test_dispatch_engine.DispatchEngineTests.test_physical_late_is_reported.test_physical_late_is_reported",
+    "test_dispatch_engine.DispatchEngineTests.test_reprogramming.test_reprogramming",
+    "test_dispatch_engine.DispatchEngineTests.test_sensitivity_is_standard_objective_set.test_sensitivity_is_standard_objective_set",
+    "test_dispatch_engine.DispatchEngineTests.test_sla_first_outsources_even_under_min_cost.test_sla_first_outsources_even_under_min_cost",
+    "test_dispatch_engine.DispatchEngineTests.test_spatial_pool_cannot_serve_another_origin.test_spatial_pool_cannot_serve_another_origin",
+    "test_dispatch_engine.DispatchEngineTests.test_trip_exposes_pool_and_base.test_trip_exposes_pool_and_base",
+    "test_dispatch_engine.DispatchEngineTests.test_trip_load_exposes_product_for_assignment_dashboard.test_trip_load_exposes_product_for_assignment_dashboard",
+    "test_dispatch_engine.DispatchEngineTests.test_validation_rejects_corrupt_plan.test_validation_rejects_corrupt_plan",
+    "test_dispatch_engine.DispatchEngineTests.test_validation_rejects_temporal_double_booking.test_validation_rejects_temporal_double_booking",
+    "test_dispatch_fixtures.DownloadableFixtureTests.test_expected_results.test_expected_results",
+    "test_dispatch_http.DispatchHTTPTests.test_assignment_run_uses_non_temporal_configuration.test_assignment_run_uses_non_temporal_configuration",
+    "test_dispatch_http.DispatchHTTPTests.test_authentication_required.test_authentication_required",
+    "test_dispatch_http.DispatchHTTPTests.test_decision_approval_endpoint.test_decision_approval_endpoint",
+    "test_dispatch_http.DispatchHTTPTests.test_migration_gate_and_default.test_migration_gate_and_default",
+    "test_dispatch_http.DispatchHTTPTests.test_preflight_and_new_run.test_preflight_and_new_run",
+    "test_dispatch_http.DispatchHTTPTests.test_run_accepts_decision_case_lineage.test_run_accepts_decision_case_lineage",
+    "test_dispatch_http.DispatchHTTPTests.test_scheduling_run_requires_assignment_source.test_scheduling_run_requires_assignment_source",
+    "test_dispatch_http.DispatchHTTPTests.test_typed_list.test_typed_list",
+    "test_dispatch_http.DispatchHTTPTests.test_typed_upload_validation_and_templates.test_typed_upload_validation_and_templates",
+    "test_dispatch_ingestion.DataPackHTTPTests.test_archive_current_fleet_is_rejected.test_archive_current_fleet_is_rejected",
+    "test_dispatch_ingestion.DataPackHTTPTests.test_contract_endpoint_exposes_progressive_v3.test_contract_endpoint_exposes_progressive_v3",
+    "test_dispatch_ingestion.DataPackHTTPTests.test_status_uses_detailed_service.test_status_uses_detailed_service",
+    "test_dispatch_ingestion.DataPackHTTPTests.test_validate_does_not_require_supabase.test_validate_does_not_require_supabase",
+    "test_dispatch_ingestion.DataPackValidationTests.test_canonical_filename_uses_kind_and_cordoba_time.test_canonical_filename_uses_kind_and_cordoba_time",
+    "test_dispatch_ingestion.DataPackValidationTests.test_detects_legacy_mixed_format.test_detects_legacy_mixed_format",
+    "test_dispatch_ingestion.DataPackValidationTests.test_minimal_data_pack_unlocks_only_assignment_data.test_minimal_data_pack_unlocks_only_assignment_data",
+    "test_dispatch_ingestion.DataPackValidationTests.test_readiness_blocks_assignment_when_site_has_no_fleet.test_readiness_blocks_assignment_when_site_has_no_fleet",
+    "test_dispatch_ingestion.DataPackValidationTests.test_report_accumulates_multiple_errors.test_report_accumulates_multiple_errors",
+    "test_dispatch_ingestion.DataPackValidationTests.test_report_caps_visible_problems_at_one_hundred.test_report_caps_visible_problems_at_one_hundred",
+    "test_dispatch_ingestion.DataPackValidationTests.test_strict_wrapper_still_raises_first_error.test_strict_wrapper_still_raises_first_error",
+    "test_dispatch_ingestion.DataPackValidationTests.test_templates_are_complete_but_only_core_is_required.test_templates_are_complete_but_only_core_is_required",
+    "test_dispatch_ingestion.DataPackValidationTests.test_v3_sample_profiles_and_readiness.test_v3_sample_profiles_and_readiness",
+    "test_dispatch_jobs.DurableHTTPTests.test_conflict_and_capacity_statuses.test_conflict_and_capacity_statuses",
+    "test_dispatch_jobs.DurableHTTPTests.test_explicit_cancel_command.test_explicit_cancel_command",
+    "test_dispatch_jobs.DurableHTTPTests.test_persisted_approval_succeeds_when_projection_is_unavailable.test_persisted_approval_succeeds_when_projection_is_unavailable",
+    "test_dispatch_jobs.JobAdmissionTests.test_case_admission_uses_single_atomic_rpc.test_case_admission_uses_single_atomic_rpc",
+    "test_dispatch_jobs.JobAdmissionTests.test_rpc_capacity_and_conflict_errors_are_explicit.test_rpc_capacity_and_conflict_errors_are_explicit",
+    "test_dispatch_jobs.JobAdmissionTests.test_same_id_with_different_intention_conflicts.test_same_id_with_different_intention_conflicts",
+    "test_dispatch_jobs.JobAdmissionTests.test_same_intention_replays_before_mutable_upstream_validation.test_same_intention_replays_before_mutable_upstream_validation",
+    "test_dispatch_jobs.JobAdmissionTests.test_wrong_dataset_types_never_enter_queue.test_wrong_dataset_types_never_enter_queue",
+    "test_dispatch_jobs.WorkerTests.test_completed_result_is_written_once_with_lease_and_progress_is_nonblocking.test_completed_result_is_written_once_with_lease_and_progress_is_nonblocking",
+    "test_dispatch_jobs.WorkerTests.test_dependency_outage_leaves_job_for_lease_recovery.test_dependency_outage_leaves_job_for_lease_recovery",
+    "test_dispatch_jobs.WorkerTests.test_invalid_engine_version_is_terminal_without_running_solver.test_invalid_engine_version_is_terminal_without_running_solver",
+    "test_dispatch_jobs.WorkerTests.test_projection_acknowledges_only_observed_version.test_projection_acknowledges_only_observed_version",
+    "test_dispatch_jobs.WorkerTests.test_projection_failure_only_reschedules_observed_outbox_version.test_projection_failure_only_reschedules_observed_outbox_version",
+    "test_dispatch_jobs.WorkerTests.test_real_assignment_engine_uses_leased_writer_without_duplicate_insert.test_real_assignment_engine_uses_leased_writer_without_duplicate_insert",
+    "test_dispatch_jobs.WorkerTests.test_stale_worker_cannot_overwrite_new_owner.test_stale_worker_cannot_overwrite_new_owner",
+    "test_dispatch_read_purity.ReadPurityTests.test_401_403_and_provider_errors_are_never_rpc_success.test_401_403_and_provider_errors_are_never_rpc_success",
+    "test_dispatch_read_purity.ReadPurityTests.test_explicit_profile_refresh_persists.test_explicit_profile_refresh_persists",
+    "test_dispatch_read_purity.ReadPurityTests.test_get_stale_run_never_writes.test_get_stale_run_never_writes",
+    "test_dispatch_read_purity.ReadPurityTests.test_missing_queue_schema_blocks_execution_availability.test_missing_queue_schema_blocks_execution_availability",
+    "test_dispatch_read_purity.ReadPurityTests.test_profile_read_derives_metadata_without_persisting.test_profile_read_derives_metadata_without_persisting",
+    "test_dispatch_read_purity.ReadPurityTests.test_rpc_diagnostics_use_authorized_catalog_without_execution.test_rpc_diagnostics_use_authorized_catalog_without_execution",
+    "test_dispatch_validation.DispatchValidationTests.test_dimension_contract_and_dynamic_balanced_weights.test_dimension_contract_and_dynamic_balanced_weights",
+    "test_dispatch_validation.DispatchValidationTests.test_fleet_v3_uses_real_vehicle_identity.test_fleet_v3_uses_real_vehicle_identity",
+    "test_dispatch_validation.DispatchValidationTests.test_inconsistent_route_distances.test_inconsistent_route_distances",
+    "test_dispatch_validation.DispatchValidationTests.test_legacy_fleet_v1_and_v2_are_adapted.test_legacy_fleet_v1_and_v2_are_adapted",
+    "test_dispatch_validation.DispatchValidationTests.test_legacy_orders_converter_remains_readable.test_legacy_orders_converter_remains_readable",
+    "test_dispatch_validation.DispatchValidationTests.test_minimal_v3_data_pack_is_valid.test_minimal_v3_data_pack_is_valid",
+    "test_dispatch_validation.DispatchValidationTests.test_optional_values_are_validated_when_present.test_optional_values_are_validated_when_present",
+    "test_dispatch_validation.DispatchValidationTests.test_own_vehicle_requires_concrete_site.test_own_vehicle_requires_concrete_site",
+    "test_dispatch_validation.DispatchValidationTests.test_phase4_weights_require_four_business_dimensions.test_phase4_weights_require_four_business_dimensions",
+    "test_foundation_assets.FoundationAssetsTests.test_previous_module_urls_redirect_to_the_same_canonical_source.test_previous_module_urls_redirect_to_the_same_canonical_source",
+    "test_frontend_contract.FrontendContractTests.test_accessibility_hooks_exist.test_accessibility_hooks_exist",
+    "test_frontend_contract.FrontendContractTests.test_assignment_phase3_is_non_temporal_in_frontend.test_assignment_phase3_is_non_temporal_in_frontend",
+    "test_frontend_contract.FrontendContractTests.test_brand_assets_contract.test_brand_assets_contract",
+    "test_frontend_contract.FrontendContractTests.test_chat_has_retryable_error_state.test_chat_has_retryable_error_state",
+    "test_frontend_contract.FrontendContractTests.test_dashboard_export_and_drawer_chat_contract.test_dashboard_export_and_drawer_chat_contract",
+    "test_frontend_contract.FrontendContractTests.test_dashboard_has_required_executive_sections.test_dashboard_has_required_executive_sections",
+    "test_frontend_contract.FrontendContractTests.test_dashboard_hides_technical_metadata_from_hero.test_dashboard_hides_technical_metadata_from_hero",
+    "test_frontend_contract.FrontendContractTests.test_dashboard_separates_objective_from_decision.test_dashboard_separates_objective_from_decision",
+    "test_frontend_contract.FrontendContractTests.test_dashboard_stage_contract.test_dashboard_stage_contract",
+    "test_frontend_contract.FrontendContractTests.test_dda_internal_navigation_contract.test_dda_internal_navigation_contract",
+    "test_frontend_contract.FrontendContractTests.test_dda_logistics_landing_contract.test_dda_logistics_landing_contract",
+    "test_frontend_contract.FrontendContractTests.test_decision_chain_phase2_contract.test_decision_chain_phase2_contract",
+    "test_frontend_contract.FrontendContractTests.test_decision_flow_continues_after_approval.test_decision_flow_continues_after_approval",
+    "test_frontend_contract.FrontendContractTests.test_dispatch_configuration_has_single_renderer.test_dispatch_configuration_has_single_renderer",
+    "test_frontend_contract.FrontendContractTests.test_dispatch_workspace_is_loaded_once.test_dispatch_workspace_is_loaded_once",
+    "test_frontend_contract.FrontendContractTests.test_export_and_ai_ux_contract.test_export_and_ai_ux_contract",
+    "test_frontend_contract.FrontendContractTests.test_focused_dispatch_dashboard_contract.test_focused_dispatch_dashboard_contract",
+    "test_frontend_contract.FrontendContractTests.test_home_dda_selector_copy_contract.test_home_dda_selector_copy_contract",
+    "test_frontend_contract.FrontendContractTests.test_interpreter_stage_contract.test_interpreter_stage_contract",
+    "test_frontend_contract.FrontendContractTests.test_javascript_referenced_ids_exist.test_javascript_referenced_ids_exist",
+    "test_frontend_contract.FrontendContractTests.test_latest_decision_access_contract.test_latest_decision_access_contract",
+    "test_frontend_contract.FrontendContractTests.test_legacy_english_ui_copy_removed.test_legacy_english_ui_copy_removed",
+    "test_frontend_contract.FrontendContractTests.test_nodal_map_unifies_readiness_and_hierarchy.test_nodal_map_unifies_readiness_and_hierarchy",
+    "test_frontend_contract.FrontendContractTests.test_premium_decision_map_contract.test_premium_decision_map_contract",
+    "test_frontend_contract.FrontendContractTests.test_primary_views_exist.test_primary_views_exist",
+    "test_frontend_contract.FrontendContractTests.test_reassignment_detail_has_filters_sort_and_export.test_reassignment_detail_has_filters_sort_and_export",
+    "test_frontend_contract.FrontendContractTests.test_scheduling_phase4_frontend_contract.test_scheduling_phase4_frontend_contract",
+    "test_frontend_contract.FrontendContractTests.test_sidebar_exposes_platform_navigation_and_contextual_logistics.test_sidebar_exposes_platform_navigation_and_contextual_logistics",
+    "test_frontend_contract.FrontendContractTests.test_single_ingestion_contract.test_single_ingestion_contract",
+    "test_frontend_import_graph.FrontendImportGraphTests.test_template_entrypoints_and_relative_imports_resolve.test_template_entrypoints_and_relative_imports_resolve",
+    "test_home_v2.HomeResumeTests.test_completed_cache_without_approvals_does_not_claim_completion.test_completed_cache_without_approvals_does_not_claim_completion",
+    "test_home_v2.HomeResumeTests.test_initial_case_opens_configuration_and_reads_do_not_repair_legacy_cache.test_initial_case_opens_configuration_and_reads_do_not_repair_legacy_cache",
+    "test_home_v2.HomeResumeTests.test_ordinary_resume_opens_official_approval_and_retains_candidate_id.test_ordinary_resume_opens_official_approval_and_retains_candidate_id",
+    "test_home_v2.HomeResumeTests.test_real_two_step_approval_opens_latest_official_dashboard.test_real_two_step_approval_opens_latest_official_dashboard",
+    "test_home_v2.HomeResumeTests.test_stale_scheduling_does_not_navigate_as_an_official_approval.test_stale_scheduling_does_not_navigate_as_an_official_approval",
+    "test_landing_navigation_contract.LandingNavigationContractTests.test_landing_keeps_only_case_existence_as_dynamic_state.test_landing_keeps_only_case_existence_as_dynamic_state",
+    "test_landing_navigation_contract.LandingNavigationContractTests.test_landing_map_is_informational_not_runtime_status.test_landing_map_is_informational_not_runtime_status",
+    "test_landing_navigation_contract.LandingNavigationContractTests.test_overview_ctas_start_case_or_open_filtered_global_center.test_overview_ctas_start_case_or_open_filtered_global_center",
+    "test_landing_navigation_contract.LandingNavigationContractTests.test_state_legend_and_card_actions_are_removed_at_runtime.test_state_legend_and_card_actions_are_removed_at_runtime",
+    "test_logistics_engine.LogisticsEngineV02Tests.test_baseline_is_reference_assignment.test_baseline_is_reference_assignment",
+    "test_logistics_engine.LogisticsEngineV02Tests.test_custom_70_30_is_deterministic.test_custom_70_30_is_deterministic",
+    "test_logistics_engine.LogisticsEngineV02Tests.test_custom_cost_extreme_matches_min_cost.test_custom_cost_extreme_matches_min_cost",
+    "test_logistics_engine.LogisticsEngineV02Tests.test_custom_result_keeps_baseline_and_scores.test_custom_result_keeps_baseline_and_scores",
+    "test_logistics_engine.LogisticsEngineV02Tests.test_custom_trips_extreme_matches_min_trips.test_custom_trips_extreme_matches_min_trips",
+    "test_logistics_engine.LogisticsEngineV02Tests.test_legacy_min_cost_run_is_reconstructable.test_legacy_min_cost_run_is_reconstructable",
+    "test_logistics_engine.LogisticsEngineV02Tests.test_weights_must_be_in_range.test_weights_must_be_in_range",
+    "test_logistics_engine.LogisticsEngineV02Tests.test_weights_must_sum_to_one.test_weights_must_sum_to_one",
+    "test_observability_phase7.LLMTests.test_completed_turn_replay_avoids_provider_and_retains_audit_identity.test_completed_turn_replay_avoids_provider_and_retains_audit_identity",
+    "test_observability_phase7.LLMTests.test_history_uses_latest_window_and_exposes_older_page.test_history_uses_latest_window_and_exposes_older_page",
+    "test_observability_phase7.LLMTests.test_provider_retry_and_io_share_one_deadline.test_provider_retry_and_io_share_one_deadline",
+    "test_observability_phase7.LLMTests.test_retry_delay_handles_invalid_nonfinite_and_negative_inputs.test_retry_delay_handles_invalid_nonfinite_and_negative_inputs",
+    "test_observability_phase7.LLMTests.test_retry_is_capped_once_and_usage_is_sanitized.test_retry_is_capped_once_and_usage_is_sanitized",
+    "test_observability_phase7.LLMTests.test_turn_is_persisted_with_one_atomic_rpc_and_usage.test_turn_is_persisted_with_one_atomic_rpc_and_usage",
+    "test_observability_phase7.LLMTests.test_whole_turn_deadline_also_bounds_database_waits.test_whole_turn_deadline_also_bounds_database_waits",
+    "test_observability_phase7.OperationsTests.test_probe_failure_and_healthy_database_without_worker_are_distinct.test_probe_failure_and_healthy_database_without_worker_are_distinct",
+    "test_observability_phase7.TelemetryTests.test_admission_identity_does_not_change_replay_fingerprint.test_admission_identity_does_not_change_replay_fingerprint",
+    "test_observability_phase7.TelemetryTests.test_cancelled_dependency_is_measured_without_swallowing_cancellation.test_cancelled_dependency_is_measured_without_swallowing_cancellation",
+    "test_observability_phase7.TelemetryTests.test_dependency_instrumentation_preserves_identity_headers_and_timeout.test_dependency_instrumentation_preserves_identity_headers_and_timeout",
+    "test_observability_phase7.TelemetryTests.test_errors_auth_validation_and_invalid_inbound_headers_are_correlated.test_errors_auth_validation_and_invalid_inbound_headers_are_correlated",
+    "test_observability_phase7.TelemetryTests.test_formatter_discards_bodies_urls_exception_text_and_nonfinite_values.test_formatter_discards_bodies_urls_exception_text_and_nonfinite_values",
+    "test_observability_phase7.TelemetryTests.test_parallel_requests_keep_correlation_and_registered_route_labels.test_parallel_requests_keep_correlation_and_registered_route_labels",
+    "test_observability_phase7.TelemetryTests.test_unhandled_error_returns_safe_response_and_headers.test_unhandled_error_returns_safe_response_and_headers",
+    "test_performance_phase5.CaseListTests.test_case_page_has_one_database_request_at_every_size.test_case_page_has_one_database_request_at_every_size",
+    "test_performance_phase5.CaseListTests.test_invalid_pagination_and_dataset_types_fail_before_hydration.test_invalid_pagination_and_dataset_types_fail_before_hydration",
+    "test_performance_phase5.CaseListTests.test_next_read_observes_replacement_and_stale_downstream.test_next_read_observes_replacement_and_stale_downstream",
+    "test_performance_phase5.PoolTests.test_error_and_cancellation_release_pool_and_standalone_client.test_error_and_cancellation_release_pool_and_standalone_client",
+    "test_performance_phase5.PoolTests.test_headers_and_timeouts_are_request_local_even_when_pool_is_shared.test_headers_and_timeouts_are_request_local_even_when_pool_is_shared",
+    "test_performance_phase5.PoolTests.test_lifespan_shares_client_with_parallel_tasks_and_closes_on_shutdown.test_lifespan_shares_client_with_parallel_tasks_and_closes_on_shutdown",
+    "test_persistence_phase4.PersistenceTests.test_approval_body_cannot_claim_a_person.test_approval_body_cannot_claim_a_person",
+    "test_persistence_phase4.PersistenceTests.test_atomic_conflict_is_a_business_conflict.test_atomic_conflict_is_a_business_conflict",
+    "test_persistence_phase4.PersistenceTests.test_case_and_projection_use_full_counts_without_history_window.test_case_and_projection_use_full_counts_without_history_window",
+    "test_persistence_phase4.PersistenceTests.test_case_creation_race_preserves_binding.test_case_creation_race_preserves_binding",
+    "test_persistence_phase4.PersistenceTests.test_history_does_not_slice_page_or_drop_other_node_approvals.test_history_does_not_slice_page_or_drop_other_node_approvals",
+    "test_persistence_phase4.PersistenceTests.test_history_rpc_uses_only_a_read_request_and_omits_null_node.test_history_rpc_uses_only_a_read_request_and_omits_null_node",
+    "test_persistence_phase4.PersistenceTests.test_private_api_requires_credentials.test_private_api_requires_credentials",
+    "test_persistence_phase4.PersistenceTests.test_stale_approval_is_not_labeled_current.test_stale_approval_is_not_labeled_current",
+    "test_platform_activity.ActivityProjectionTests.test_attribution_distinguishes_actor_system_and_unknown.test_attribution_distinguishes_actor_system_and_unknown",
+    "test_platform_activity.ActivityProjectionTests.test_failed_or_empty_export_is_rejected_before_audit.test_failed_or_empty_export_is_rejected_before_audit",
+    "test_platform_activity.ActivityProjectionTests.test_server_csv_matches_original_exporter_for_both_nodes_and_legacy.test_server_csv_matches_original_exporter_for_both_nodes_and_legacy",
+    "test_platform_entitlements.EntitlementTests.test_business_api_blocks_before_provider_while_home_remains_available.test_business_api_blocks_before_provider_while_home_remains_available",
+    "test_platform_entitlements.EntitlementTests.test_disabled_home_never_queries_business_data.test_disabled_home_never_queries_business_data",
+    "test_platform_entitlements.EntitlementTests.test_resolved_identity_is_fail_closed_and_ignores_forged_claims.test_resolved_identity_is_fail_closed_and_ignores_forged_claims",
+    "test_platform_onboarding.OnboardingPackTests.test_corrupted_golden_pack_is_rejected_before_any_upload.test_corrupted_golden_pack_is_rejected_before_any_upload",
+    "test_platform_security.AuthFlowTests.test_password_change_clears_recovery_session_and_requests_fresh_login.test_password_change_clears_recovery_session_and_requests_fresh_login",
+    "test_platform_security.AuthFlowTests.test_recovery_does_not_expose_provider_account_existence_errors.test_recovery_does_not_expose_provider_account_existence_errors",
+    "test_platform_security.AuthFlowTests.test_recovery_link_requires_initiating_browser.test_recovery_link_requires_initiating_browser",
+    "test_platform_security.AuthFlowTests.test_revoked_refresh_clears_session_and_csrf_blocks_logout.test_revoked_refresh_clears_session_and_csrf_blocks_logout",
+    "test_platform_security.AuthFlowTests.test_signup_uses_pkce_confirmation_redirect_and_http_only_secure_cookie.test_signup_uses_pkce_confirmation_redirect_and_http_only_secure_cookie",
+    "test_platform_security.JWTTests.test_signature_claims_caching_and_rotation.test_signature_claims_caching_and_rotation",
+    "test_platform_security.RepositorySecurityTests.test_concurrent_requests_keep_independent_workspace_filters.test_concurrent_requests_keep_independent_workspace_filters",
+    "test_platform_security.RepositorySecurityTests.test_missing_context_viewer_write_and_worker_rpc_never_reach_provider.test_missing_context_viewer_write_and_worker_rpc_never_reach_provider",
+    "test_platform_security.RepositorySecurityTests.test_rpc_binds_verified_authority_and_legacy_storage_checks_database_first.test_rpc_binds_verified_authority_and_legacy_storage_checks_database_first",
+    "test_production_deployment.ProductionDeploymentTests.test_image_update_preserves_secrets_account_and_resource_limits.test_image_update_preserves_secrets_account_and_resource_limits",
+    "test_production_deployment.ProductionDeploymentTests.test_readiness_failure_is_reported.test_readiness_failure_is_reported",
+    "test_production_deployment.ProductionDeploymentTests.test_ready_old_generation_or_old_revision_is_not_accepted.test_ready_old_generation_or_old_revision_is_not_accepted",
+    "test_production_deployment.ProductionDeploymentTests.test_worker_create_requires_confirmed_404.test_worker_create_requires_confirmed_404",
+    "test_production_deployment.ProductionDeploymentTests.test_worker_permission_error_never_attempts_creation.test_worker_permission_error_never_attempts_creation",
+    "test_progressive_comparative.ProgressiveEngineTests.test_balanced_essential_reuses_all_persisted_references.test_balanced_essential_reuses_all_persisted_references",
+    "test_progressive_comparative.ProgressiveEngineTests.test_mismatched_configuration_cannot_anchor_another_decision.test_mismatched_configuration_cannot_anchor_another_decision",
+    "test_progressive_comparative.ProgressiveEngineTests.test_missing_references_are_generated_without_reoptimizing_selected_plan.test_missing_references_are_generated_without_reoptimizing_selected_plan",
+    "test_progressive_comparative.ProgressiveEngineTests.test_progressive_runtime_reapplies_original_scope_and_resource_policy.test_progressive_runtime_reapplies_original_scope_and_resource_policy",
+    "test_progressive_comparative.ProgressiveServiceTests.test_admission_reconstructs_configuration_and_only_depth_changes.test_admission_reconstructs_configuration_and_only_depth_changes",
+    "test_progressive_comparative.ProgressiveServiceTests.test_chat_uses_persisted_comparative_and_records_scope_captured_before_provider.test_chat_uses_persisted_comparative_and_records_scope_captured_before_provider",
+    "test_progressive_comparative.ProgressiveServiceTests.test_endpoint_requires_auth_and_rejects_unknown_unfinished_and_unsupported_base.test_endpoint_requires_auth_and_rejects_unknown_unfinished_and_unsupported_base",
+    "test_progressive_comparative.ProgressiveServiceTests.test_enriched_evidence_is_copied_and_never_changes_primary_result.test_enriched_evidence_is_copied_and_never_changes_primary_result",
+    "test_progressive_comparative.ProgressiveServiceTests.test_existing_comparative_does_not_create_another_artifact.test_existing_comparative_does_not_create_another_artifact",
+    "test_progressive_comparative.ProgressiveServiceTests.test_invalid_companion_cannot_redefine_primary_selection.test_invalid_companion_cannot_redefine_primary_selection",
+    "test_progressive_comparative.ProgressiveServiceTests.test_saved_original_explanation_is_marked_until_enriched_scope_is_generated.test_saved_original_explanation_is_marked_until_enriched_scope_is_generated",
+    "test_run_request_serialization.SchedulingAdmissionSerializationTests.test_automatic_window_still_uses_null_dates.test_automatic_window_still_uses_null_dates",
+    "test_run_request_serialization.SchedulingAdmissionSerializationTests.test_focus_rule_dates_are_json_safe_and_keep_the_same_intention.test_focus_rule_dates_are_json_safe_and_keep_the_same_intention",
+    "test_run_request_serialization.SchedulingAdmissionSerializationTests.test_global_planning_dates_are_json_safe_for_durable_admission.test_global_planning_dates_are_json_safe_for_durable_admission",
+    "test_runtime_compatibility.RuntimeCompatibilityTests.test_invalid_dataset_type_remains_422.test_invalid_dataset_type_remains_422",
+    "test_runtime_compatibility.RuntimeCompatibilityTests.test_module_assets_revalidate_without_losing_etags.test_module_assets_revalidate_without_losing_etags",
+    "test_runtime_compatibility.RuntimeCompatibilityTests.test_orders_and_fleet_csv_bom.test_orders_and_fleet_csv_bom",
+    "test_runtime_compatibility.RuntimeCompatibilityTests.test_protected_html_and_multipart_auth.test_protected_html_and_multipart_auth",
+    "test_runtime_compatibility.RuntimeCompatibilityTests.test_static_byte_ranges_and_unsatisfiable_range.test_static_byte_ranges_and_unsatisfiable_range",
+    "test_scheduling_config_phase1.SchedulingConfigPhase1Tests.test_custom_window_delays_dispatch_but_keeps_assignment.test_custom_window_delays_dispatch_but_keeps_assignment",
+    "test_scheduling_config_phase1.SchedulingConfigPhase1Tests.test_custom_window_fails_if_all_dispatches_cannot_fit.test_custom_window_fails_if_all_dispatches_cannot_fit",
+    "test_scheduling_config_phase1.SchedulingConfigPhase1Tests.test_earliest_dispatch_strategy_does_not_use_due_dates.test_earliest_dispatch_strategy_does_not_use_due_dates",
+    "test_scheduling_config_phase1.SchedulingConfigPhase1Tests.test_phase1_execution_sends_real_window_and_strategy.test_phase1_execution_sends_real_window_and_strategy",
+    "test_scheduling_config_phase1.SchedulingConfigPhase1Tests.test_phase1_scheduling_ui_matches_assignment_configuration_language.test_phase1_scheduling_ui_matches_assignment_configuration_language",
+    "test_scheduling_config_phase1.SchedulingConfigPhase1Tests.test_phase1_ui_is_loaded_and_responsive.test_phase1_ui_is_loaded_and_responsive",
+    "test_scheduling_config_phase1.SchedulingConfigPhase1Tests.test_scheduling_window_is_part_of_canonical_configuration.test_scheduling_window_is_part_of_canonical_configuration",
+    "test_scheduling_config_phase1.SchedulingConfigPhase1Tests.test_scheduling_window_rejects_reversed_dates.test_scheduling_window_rejects_reversed_dates",
+    "tests.test_scheduling_engine.SchedulingEngineTests.test_available_until_can_make_schedule_infeasible.test_available_until_can_make_schedule_infeasible",
+    "tests.test_scheduling_engine.SchedulingEngineTests.test_handoff_to_final_assignment_is_versioned.test_handoff_to_final_assignment_is_versioned",
+    "tests.test_scheduling_engine.SchedulingEngineTests.test_same_vehicle_trips_do_not_overlap.test_same_vehicle_trips_do_not_overlap",
+    "tests.test_scheduling_engine.SchedulingEngineTests.test_scheduling_is_deterministic.test_scheduling_is_deterministic",
+    "tests.test_scheduling_engine.SchedulingEngineTests.test_scheduling_preserves_assignment_exactly.test_scheduling_preserves_assignment_exactly",
+    "tests.test_scheduling_engine.SchedulingEngineTests.test_service_first_prioritizes_urgent_trip.test_service_first_prioritizes_urgent_trip",
+    "tests.test_scheduling_engine.SchedulingEngineTests.test_unavoidable_late_order_is_reported.test_unavoidable_late_order_is_reported",
+    "tests.test_scheduling_engine.SchedulingEngineTests.test_vehicle_available_from_is_respected.test_vehicle_available_from_is_respected",
+    "tests.test_scheduling_engine.SchedulingEngineTests.test_available_until_can_make_schedule_infeasible.test_available_until_can_make_schedule_infeasible",
+    "tests.test_scheduling_engine.SchedulingEngineTests.test_handoff_to_final_assignment_is_versioned.test_handoff_to_final_assignment_is_versioned",
+    "tests.test_scheduling_engine.SchedulingEngineTests.test_same_vehicle_trips_do_not_overlap.test_same_vehicle_trips_do_not_overlap",
+    "tests.test_scheduling_engine.SchedulingEngineTests.test_scheduling_is_deterministic.test_scheduling_is_deterministic",
+    "tests.test_scheduling_engine.SchedulingEngineTests.test_scheduling_preserves_assignment_exactly.test_scheduling_preserves_assignment_exactly",
+    "tests.test_scheduling_engine.SchedulingEngineTests.test_service_first_prioritizes_urgent_trip.test_service_first_prioritizes_urgent_trip",
+    "tests.test_scheduling_engine.SchedulingEngineTests.test_unavoidable_late_order_is_reported.test_unavoidable_late_order_is_reported",
+    "tests.test_scheduling_engine.SchedulingEngineTests.test_vehicle_available_from_is_respected.test_vehicle_available_from_is_respected",
+    "test_scheduling_config_phase2.SchedulingPhase2EngineTests.test_duplicate_rule_ids_are_rejected.test_duplicate_rule_ids_are_rejected",
+    "test_scheduling_config_phase2.SchedulingPhase2EngineTests.test_filtered_window_is_enforced_for_matching_trip.test_filtered_window_is_enforced_for_matching_trip",
+    "test_scheduling_config_phase2.SchedulingPhase2EngineTests.test_prioritized_destination_dispatches_first_without_dropping_trips.test_prioritized_destination_dispatches_first_without_dropping_trips",
+    "test_scheduling_config_phase2.SchedulingPhase2EngineTests.test_product_filter_uses_assignment_loads.test_product_filter_uses_assignment_loads",
+    "test_scheduling_config_phase2.SchedulingPhase2EngineTests.test_rule_that_matches_no_trip_is_rejected.test_rule_that_matches_no_trip_is_rejected",
+    "test_scheduling_config_phase2.SchedulingPhase2EngineTests.test_specific_window_must_stay_inside_global_window.test_specific_window_must_stay_inside_global_window",
+    "test_scheduling_config_phase2.SchedulingPhase2FrontendContractTests.test_execution_sends_temporal_rules.test_execution_sends_temporal_rules",
+    "test_scheduling_config_phase2.SchedulingPhase2FrontendContractTests.test_filter_fields_are_derived_from_assignment_output.test_filter_fields_are_derived_from_assignment_output",
+    "test_scheduling_config_phase2.SchedulingPhase2FrontendContractTests.test_phase2_rules_are_responsive.test_phase2_rules_are_responsive",
+    "test_scheduling_config_phase2.SchedulingPhase2FrontendContractTests.test_ui_exposes_priority_and_specific_window_actions.test_ui_exposes_priority_and_specific_window_actions",
+    "test_phase2_exposes_selected_disabled_and_locked_states",
+    "test_phase2_keeps_same_four_section_anatomy_as_assignment",
+    "test_phase2_progressive_disclosure_does_not_change_execution_payload",
+    "test_phase2_summary_reuses_shared_assignment_bar",
+    "test_scheduling_config_phase3.SchedulingConfigPhase3RuleEditorTests.test_duplicate_and_impossible_overlapping_windows_are_guarded.test_duplicate_and_impossible_overlapping_windows_are_guarded",
+    "test_scheduling_config_phase3.SchedulingConfigPhase3RuleEditorTests.test_editor_has_live_impact_and_overlap_feedback.test_editor_has_live_impact_and_overlap_feedback",
+    "test_scheduling_config_phase3.SchedulingConfigPhase3RuleEditorTests.test_editor_preserves_backend_temporal_rules_contract.test_editor_preserves_backend_temporal_rules_contract",
+    "test_scheduling_config_phase3.SchedulingConfigPhase3RuleEditorTests.test_editor_supports_create_edit_cancel_and_remove.test_editor_supports_create_edit_cancel_and_remove",
+    "test_scheduling_config_phase3.SchedulingConfigPhase3RuleEditorTests.test_pending_draft_blocks_review_and_execution.test_pending_draft_blocks_review_and_execution",
+    "test_scheduling_config_phase3.SchedulingConfigPhase3RuleEditorTests.test_phase3_is_bootstrapped_and_cache_busted.test_phase3_is_bootstrapped_and_cache_busted",
+    "test_scheduling_config_phase3.SchedulingConfigPhase3RuleEditorTests.test_phase3_rule_editor_is_responsive_and_motion_safe.test_phase3_rule_editor_is_responsive_and_motion_safe",
+    "test_scheduling_config_phase3.SchedulingConfigPhase3RuleEditorTests.test_restoring_run_does_not_restore_transient_editor_state.test_restoring_run_does_not_restore_transient_editor_state",
+    "test_scheduling_config_phase3.SchedulingConfigPhase3RuleEditorTests.test_rule_list_reuses_shared_rule_card_primitive.test_rule_list_reuses_shared_rule_card_primitive",
+    "test_scheduling_config_phase4.SchedulingConfigPhase4LifecycleTests.test_dashboard_exposes_persisted_configuration_evidence.test_dashboard_exposes_persisted_configuration_evidence",
+    "test_scheduling_config_phase4.SchedulingConfigPhase4LifecycleTests.test_decision_case_moves_running_review_and_error.test_decision_case_moves_running_review_and_error",
+    "test_scheduling_config_phase4.SchedulingConfigPhase4LifecycleTests.test_error_state_preserves_config_and_offers_retry.test_error_state_preserves_config_and_offers_retry",
+    "test_scheduling_config_phase4.SchedulingConfigPhase4LifecycleTests.test_legacy_scheduling_renderer_never_becomes_visible.test_legacy_scheduling_renderer_never_becomes_visible",
+    "test_scheduling_config_phase4.SchedulingConfigPhase4LifecycleTests.test_lifecycle_supports_polling_and_network_recovery.test_lifecycle_supports_polling_and_network_recovery",
+    "test_scheduling_config_phase4.SchedulingConfigPhase4LifecycleTests.test_pending_state_does_not_fake_percentage.test_pending_state_does_not_fake_percentage",
+    "test_scheduling_config_phase4.SchedulingConfigPhase4LifecycleTests.test_phase4_is_responsive_and_motion_safe.test_phase4_is_responsive_and_motion_safe",
+    "test_scheduling_config_phase4.SchedulingConfigPhase4LifecycleTests.test_phase4_owns_final_execute_click_without_changing_rule_editor.test_phase4_owns_final_execute_click_without_changing_rule_editor",
+    "test_scheduling_config_phase4.SchedulingConfigPhase4LifecycleTests.test_phase4_reuses_phase3_validation_and_execution_contract.test_phase4_reuses_phase3_validation_and_execution_contract",
+    "test_scheduling_config_phase4.SchedulingConfigPhase4LifecycleTests.test_shell_bootstraps_shared_configuration_layer_explicitly.test_shell_bootstraps_shared_configuration_layer_explicitly",
+    "test_scheduling_engine.SchedulingEngineTests.test_available_until_can_make_schedule_infeasible.test_available_until_can_make_schedule_infeasible",
+    "test_scheduling_engine.SchedulingEngineTests.test_handoff_to_final_assignment_is_versioned.test_handoff_to_final_assignment_is_versioned",
+    "test_scheduling_engine.SchedulingEngineTests.test_same_vehicle_trips_do_not_overlap.test_same_vehicle_trips_do_not_overlap",
+    "test_scheduling_engine.SchedulingEngineTests.test_scheduling_is_deterministic.test_scheduling_is_deterministic",
+    "test_scheduling_engine.SchedulingEngineTests.test_scheduling_preserves_assignment_exactly.test_scheduling_preserves_assignment_exactly",
+    "test_scheduling_engine.SchedulingEngineTests.test_service_first_prioritizes_urgent_trip.test_service_first_prioritizes_urgent_trip",
+    "test_scheduling_engine.SchedulingEngineTests.test_unavoidable_late_order_is_reported.test_unavoidable_late_order_is_reported",
+    "test_scheduling_engine.SchedulingEngineTests.test_vehicle_available_from_is_respected.test_vehicle_available_from_is_respected",
+    "test_scheduling_service.SchedulingServiceTests.test_approval_preserves_result_fingerprint.test_approval_preserves_result_fingerprint",
+    "test_scheduling_service.SchedulingServiceTests.test_scheduling_rejects_unapproved_assignment.test_scheduling_rejects_unapproved_assignment",
+    "test_scheduling_shared_ui_phase2.SchedulingSharedUiPhase2Tests.test_advanced_options_replace_active_depth_configuration.test_advanced_options_replace_active_depth_configuration",
+    "test_scheduling_shared_ui_phase2.SchedulingSharedUiPhase2Tests.test_objective_uses_shared_selected_and_disabled_cards.test_objective_uses_shared_selected_and_disabled_cards",
+    "test_scheduling_shared_ui_phase2.SchedulingSharedUiPhase2Tests.test_phase2_is_responsive_and_reduced_motion_safe.test_phase2_is_responsive_and_reduced_motion_safe",
+    "test_scheduling_shared_ui_phase2.SchedulingSharedUiPhase2Tests.test_phase2_keeps_engine_contract_untouched.test_phase2_keeps_engine_contract_untouched",
+    "test_scheduling_shared_ui_phase2.SchedulingSharedUiPhase2Tests.test_resources_are_inherited_and_locked.test_resources_are_inherited_and_locked",
+    "test_scheduling_shared_ui_phase2.SchedulingSharedUiPhase2Tests.test_scheduling_uses_assignment_reference_shell.test_scheduling_uses_assignment_reference_shell",
+    "test_scheduling_shared_ui_phase2.SchedulingSharedUiPhase2Tests.test_summary_chips_are_reactive_and_validate_before_review.test_summary_chips_are_reactive_and_validate_before_review",
+    "test_scheduling_shared_ui_phase2.SchedulingSharedUiPhase2Tests.test_temporal_scope_uses_progressive_disclosure_without_changing_rules.test_temporal_scope_uses_progressive_disclosure_without_changing_rules",
+    "test_traceability_phase3.TraceabilityPhase3Contracts.test_controller_restores_data_pack_before_guarded_views.test_controller_restores_data_pack_before_guarded_views",
+    "test_traceability_phase3.TraceabilityPhase3Contracts.test_history_distinguishes_current_candidate_and_superseded.test_history_distinguishes_current_candidate_and_superseded",
+    "test_traceability_phase3.TraceabilityPhase3Contracts.test_landing_opens_global_center_filtered_to_logistics.test_landing_opens_global_center_filtered_to_logistics",
+    "test_traceability_phase3.TraceabilityPhase3Contracts.test_map_exposes_run_history_and_new_run_flow.test_map_exposes_run_history_and_new_run_flow",
+    "test_traceability_phase3.TraceabilityPhase3Contracts.test_traceability_ui_is_responsive.test_traceability_ui_is_responsive",
+    "test_upload_journal_concurrency.UploadJournalConcurrencyTests.test_committed_upload_retries_busy_journal_without_reupload.test_committed_upload_retries_busy_journal_without_reupload",
+    "test_upload_journal_concurrency.UploadJournalConcurrencyTests.test_duplicate_loser_finishes_compensation_and_preserves_original.test_duplicate_loser_finishes_compensation_and_preserves_original",
+    "test_upload_journal_concurrency.UploadJournalConcurrencyTests.test_retries_are_bounded_and_only_for_explicit_sql_contention.test_retries_are_bounded_and_only_for_explicit_sql_contention",
+    "test_v2_foundation.FoundationTests.test_backend_obeys_the_same_destination_contract_as_browser.test_backend_obeys_the_same_destination_contract_as_browser",
+    "test_v2_foundation.FoundationTests.test_objective_and_context_labels_do_not_rewrite_engine_configuration.test_objective_and_context_labels_do_not_rewrite_engine_configuration"
+  ],
+  "missing_baseline_python_test_ids": [],
+  "new_python_test_ids": [
+    "test_ultimate_contracts.UltimateCanonicalTests.test_artifacts_reject_future_hash_and_mutable_overlays.test_artifacts_reject_future_hash_and_mutable_overlays",
+    "test_ultimate_contracts.UltimateCanonicalTests.test_binary_floats_nonfinites_and_nonstring_keys_fail_closed.test_binary_floats_nonfinites_and_nonstring_keys_fail_closed",
+    "test_ultimate_contracts.UltimateCanonicalTests.test_context_mode_selection_and_evidence_enter_v2_intent.test_context_mode_selection_and_evidence_enter_v2_intent",
+    "test_ultimate_contracts.UltimateCanonicalTests.test_known_canonical_vectors_and_hashes.test_known_canonical_vectors_and_hashes",
+    "test_ultimate_contracts.UltimateCanonicalTests.test_mathematical_hashes_exclude_run_display_clock_and_current_actor.test_mathematical_hashes_exclude_run_display_clock_and_current_actor",
+    "test_ultimate_contracts.UltimateCanonicalTests.test_package_fingerprint_excludes_only_its_own_field.test_package_fingerprint_excludes_only_its_own_field",
+    "test_ultimate_contracts.UltimateCanonicalTests.test_pinned_core_package_context_vectors.test_pinned_core_package_context_vectors",
+    "test_ultimate_contracts.UltimateCanonicalTests.test_semantic_money_changes_mathematical_fingerprint.test_semantic_money_changes_mathematical_fingerprint",
+    "test_ultimate_contracts.UltimateCanonicalTests.test_unicode_dates_and_object_order_are_stable.test_unicode_dates_and_object_order_are_stable",
+    "test_ultimate_contracts.UltimateDomainTests.test_contracts_are_deeply_immutable.test_contracts_are_deeply_immutable",
+    "test_ultimate_contracts.UltimateDomainTests.test_cost_models_and_billing_basis_are_explicit.test_cost_models_and_billing_basis_are_explicit",
+    "test_ultimate_contracts.UltimateDomainTests.test_cost_rounding_does_not_depend_on_decimal_context.test_cost_rounding_does_not_depend_on_decimal_context",
+    "test_ultimate_contracts.UltimateDomainTests.test_dimensions_are_not_interchangeable_or_unlimited.test_dimensions_are_not_interchangeable_or_unlimited",
+    "test_ultimate_contracts.UltimateDomainTests.test_maximum_capacity_cannot_replace_guaranteed.test_maximum_capacity_cannot_replace_guaranteed",
+    "test_ultimate_contracts.UltimateDomainTests.test_money_zero_is_known_and_precision_is_pinned.test_money_zero_is_known_and_precision_is_pinned",
+    "test_ultimate_contracts.UltimateDomainTests.test_no_fx_or_live_workspace_currency_inference.test_no_fx_or_live_workspace_currency_inference",
+    "test_ultimate_contracts.UltimateDomainTests.test_nonfinite_floats_negative_quantities_and_timestamps_are_rejected.test_nonfinite_floats_negative_quantities_and_timestamps_are_rejected",
+    "test_ultimate_contracts.UltimateDomainTests.test_override_is_explicit_and_cannot_relax_hard_guardrails.test_override_is_explicit_and_cannot_relax_hard_guardrails",
+    "test_ultimate_contracts.UltimateDomainTests.test_scaled_integer_precision_and_overflow.test_scaled_integer_precision_and_overflow",
+    "test_ultimate_contracts.UltimateDomainTests.test_unknown_cost_is_never_manufactured_zero.test_unknown_cost_is_never_manufactured_zero",
+    "test_ultimate_contracts.UltimateDomainTests.test_unknown_external_availability_is_not_confirmed.test_unknown_external_availability_is_not_confirmed",
+    "test_ultimate_contracts.UltimateReasonMetricTests.test_all_source_reason_codes_require_facts_and_provenance.test_all_source_reason_codes_require_facts_and_provenance",
+    "test_ultimate_contracts.UltimateReasonMetricTests.test_global_comparison_requires_complete_candidate_certificate.test_global_comparison_requires_complete_candidate_certificate",
+    "test_ultimate_contracts.UltimateReasonMetricTests.test_metric_producer_is_unique.test_metric_producer_is_unique",
+    "test_ultimate_contracts.UltimateReasonMetricTests.test_non_split_reason_has_a_numerical_witness.test_non_split_reason_has_a_numerical_witness",
+    "test_ultimate_contracts.UltimateReasonMetricTests.test_optimal_requires_proof_not_a_display_label.test_optimal_requires_proof_not_a_display_label",
+    "test_ultimate_contracts.UltimateReasonMetricTests.test_service_categories_and_expected_compliance_are_distinct.test_service_categories_and_expected_compliance_are_distinct",
+    "test_ultimate_contracts.UltimateReasonMetricTests.test_unknown_solver_is_not_global_infeasibility_but_keeps_local_witnesses.test_unknown_solver_is_not_global_infeasibility_but_keeps_local_witnesses",
+    "test_ultimate_contracts.UltimateReasonMetricTests.test_zero_denominator_is_not_a_fabricated_ratio.test_zero_denominator_is_not_a_fabricated_ratio",
+    "test_ultimate_contracts.UltimateRegistryTests.test_known_ultimate_is_not_implemented_or_available.test_known_ultimate_is_not_implemented_or_available",
+    "test_ultimate_contracts.UltimateRegistryTests.test_legacy_and_ultimate_headers_are_unambiguous.test_legacy_and_ultimate_headers_are_unambiguous",
+    "test_ultimate_contracts.UltimateRegistryTests.test_lifecycle_adapter_does_not_rename_persisted_error.test_lifecycle_adapter_does_not_rename_persisted_error",
+    "test_ultimate_contracts.UltimateRegistryTests.test_persisted_identity_not_node_determines_resolution.test_persisted_identity_not_node_determines_resolution",
+    "test_ultimate_contracts.UltimateRegistryTests.test_static_metadata_matches_authority_and_references_resolve.test_static_metadata_matches_authority_and_references_resolve",
+    "test_ultimate_contracts.UltimateRegistryTests.test_three_legacy_identities_match_existing_dispatcher.test_three_legacy_identities_match_existing_dispatcher",
+    "test_ultimate_contracts.UltimateRegistryTests.test_ultimate_identity_requires_all_persisted_versions.test_ultimate_identity_requires_all_persisted_versions",
+    "test_ultimate_contracts.UltimateRegistryTests.test_unknown_schema_or_version_never_falls_back_to_dispatch.test_unknown_schema_or_version_never_falls_back_to_dispatch",
+    "test_ultimate_contracts.UltimateResultContractTests.test_ai_context_is_exact_versioned_and_compare_is_not_invented.test_ai_context_is_exact_versioned_and_compare_is_not_invented",
+    "test_ultimate_contracts.UltimateResultContractTests.test_api_discriminator_does_not_accept_client_engine_or_graph.test_api_discriminator_does_not_accept_client_engine_or_graph",
+    "test_ultimate_contracts.UltimateResultContractTests.test_both_specialized_packages_and_engine_outputs_validate.test_both_specialized_packages_and_engine_outputs_validate",
+    "test_ultimate_contracts.UltimateResultContractTests.test_bundle_rejects_a_well_hashed_package_for_other_mathematics.test_bundle_rejects_a_well_hashed_package_for_other_mathematics",
+    "test_ultimate_contracts.UltimateResultContractTests.test_context_cannot_switch_decision_metrics_or_current_overlay_run.test_context_cannot_switch_decision_metrics_or_current_overlay_run",
+    "test_ultimate_contracts.UltimateResultContractTests.test_core_reasons_cannot_be_published_without_engine_facts.test_core_reasons_cannot_be_published_without_engine_facts",
+    "test_ultimate_contracts.UltimateResultContractTests.test_d2_cannot_reassign_or_change_upstream_identity.test_d2_cannot_reassign_or_change_upstream_identity",
+    "test_ultimate_contracts.UltimateResultContractTests.test_data_reference_cannot_masquerade_as_inline_empty.test_data_reference_cannot_masquerade_as_inline_empty",
+    "test_ultimate_contracts.UltimateResultContractTests.test_empty_inline_is_not_missing_or_corrupt_artifact.test_empty_inline_is_not_missing_or_corrupt_artifact",
+    "test_ultimate_contracts.UltimateResultContractTests.test_hard_violation_no_solution_is_not_review_ready.test_hard_violation_no_solution_is_not_review_ready",
+    "test_ultimate_contracts.UltimateResultContractTests.test_inconsistent_schema_node_body_and_currency_are_rejected.test_inconsistent_schema_node_body_and_currency_are_rejected",
+    "test_ultimate_contracts.UltimateResultContractTests.test_no_alternatives_computed_is_not_no_alternatives_exist.test_no_alternatives_computed_is_not_no_alternatives_exist",
+    "test_ultimate_contracts.UltimateResultContractTests.test_reference_manifest_and_tenant_run_core_binding.test_reference_manifest_and_tenant_run_core_binding",
+    "test_ultimate_contracts.UltimateResultContractTests.test_review_and_policy_evidence_are_exact_copies_of_certified_facts.test_review_and_policy_evidence_are_exact_copies_of_certified_facts",
+    "test_ultimate_contracts.UltimateResultContractTests.test_review_does_not_grant_current_authority.test_review_does_not_grant_current_authority",
+    "test_ultimate_contracts.UltimateResultContractTests.test_versions_are_not_booleans_and_decimal_wire_is_lossless.test_versions_are_not_booleans_and_decimal_wire_is_lossless",
+    "test_ultimate_transit.UltimateTransitTests.test_calendar_crosses_month_and_leap_day.test_calendar_crosses_month_and_leap_day",
+    "test_ultimate_transit.UltimateTransitTests.test_exact_decimal_boundary_and_context_independence.test_exact_decimal_boundary_and_context_independence",
+    "test_ultimate_transit.UltimateTransitTests.test_external_has_no_return_occupancy.test_external_has_no_return_occupancy",
+    "test_ultimate_transit.UltimateTransitTests.test_horizon_limits_departures_not_arrivals.test_horizon_limits_departures_not_arrivals",
+    "test_ultimate_transit.UltimateTransitTests.test_inclusive_arrival_and_exclusive_own_availability.test_inclusive_arrival_and_exclusive_own_availability",
+    "test_ultimate_transit.UltimateTransitTests.test_invalid_distance_source_and_timestamp_fail_closed.test_invalid_distance_source_and_timestamp_fail_closed",
+    "test_ultimate_transit.UltimateTransitTests.test_own_cycle_is_independent_from_twice_rounded_outbound.test_own_cycle_is_independent_from_twice_rounded_outbound",
+    "test_ultimate_transit.UltimateTransitTests.test_standard_distance_boundaries.test_standard_distance_boundaries"
+  ],
+  "baseline_node_command_unchanged": true,
+  "node_files": 20,
+  "no_stage_commit_push_or_remote_operations": true
+}

@@ -7,7 +7,7 @@ export function renderAssistantLauncher(run){
 }
 
 /** Presentation only. The dashboard continues to own the existing chat callbacks. */
-export function bindAssistantLauncher(root,onOpen){
+export function bindAssistantLauncher(root,onOpen,{avoidSelector=null}={}){
   const scope=scopeFor(root),button=root.querySelector('[data-chat]');
   scope.listen(button,'click',onOpen);
   scope.listen(root,'dispatch:assistant-busy',event=>{
@@ -25,12 +25,20 @@ export function bindAssistantLauncher(root,onOpen){
         bottom=Math.min(innerHeight-b.height-12,Math.max(bottom,innerHeight-r.top+12));
       }
     }
+    if(avoidSelector){
+      const bounds=[...root.querySelectorAll(avoidSelector)].map(node=>node.getBoundingClientRect()).filter(r=>r.width&&r.height&&r.bottom>0&&r.top<innerHeight);
+      const fab=button.getBoundingClientRect();
+      if(bounds.some(r=>r.right>fab.left-12&&r.left<fab.right+12&&r.bottom>innerHeight-bottom-fab.height-12&&r.top<innerHeight-bottom+12)){
+        bottom=Math.min(innerHeight-fab.height-12,Math.max(bottom,innerHeight-Math.min(...bounds.map(r=>r.top))+12));
+      }
+    }
     root.style.setProperty('--assistant-bottom',bottom+'px');
     root.style.setProperty('--assistant-keyboard',keyboard+'px');
     root.style.setProperty('--assistant-height',(viewport?.height||innerHeight)+'px');
   }
   scope.listen(document,'focusin',layout);scope.listen(document,'scroll',layout,{capture:true,passive:true});
   scope.listen(window,'resize',layout);
+  if(avoidSelector)scope.listen(root,'toggle',layout,{capture:true});
   if(window.visualViewport){scope.listen(visualViewport,'resize',layout);scope.listen(visualViewport,'scroll',layout);}
   scope.own(()=>['--assistant-bottom','--assistant-keyboard','--assistant-height'].forEach(key=>root.style.removeProperty(key)));
   layout();

@@ -1,0 +1,67 @@
+--- backend/tests/e2e/browser_journey.py (R1 end)
++++ backend/tests/e2e/browser_journey.py (R2)
+@@ -15,7 +15,7 @@
+     base=os.environ['DATION_E2E_URL']
+     assert urlparse(base).hostname=='127.0.0.1', 'E2E must use its owned loopback API.'
+     inputs=Path(os.environ['DATION_E2E_INPUTS'])
+-    gate=Path(os.environ['DATION_E2E_STORAGE'])/'block-downloads'
++    gate=Path(os.environ['DATION_E2E_STORAGE'])/'start-browser-worker'
+     errors,requests,failed,expected_draft_misses=[],[],[],[]
+     admitted=False
+     artifact=os.getenv('DATION_E2E_ARTIFACTS')
+@@ -83,13 +83,13 @@
+             await assign_workflow_person(page,'data_preparation')
+             await page.locator('.d-workflow-action-bar[data-state=ready]').wait_for()
+             await ui.hero('data-ready')
+-            await ui.bar('data',2)
++            await ui.bar('data',4)
+             await ui.action('data',next_button)
+             await ui.checkpoint('data-ready')
+             await next_button.click()
+             await page.wait_for_selector('[data-map-node="logistics_assignment"][data-map-action]')
+             await ui.hero('map-ready')
+-            await ui.action('map-assignment',page.locator('[data-map-node="logistics_assignment"][data-map-action]').first)
++            assert await page.locator('[data-map-node="logistics_assignment"][data-map-action]').first.is_disabled()
+             await ui.checkpoint('map-ready')
+             assert not await page.locator('[data-config-context]').get_attribute('open')
+             assert await page.locator('.dispatch-case-progress__grid').is_visible()
+@@ -109,6 +109,7 @@
+             assert await trigger.evaluate('el=>el===document.activeElement')
+             await assign_workflow_person(page,'logistics_assignment')
+             await assign_workflow_person(page,'logistics_scheduling')
++            await ui.action('map-assignment',page.locator('[data-map-node="logistics_assignment"][data-map-action]').first)
+             assert await page.locator('[data-case-transition]').count()==0
+             await page.locator('[data-map-node="logistics_assignment"][data-map-action]').first.click()
+             await page.wait_for_selector('[data-config-review]')
+@@ -137,7 +138,6 @@
+             assert page.url==config_url
+             assert sum(method=='POST' and path=='/api/runs' for method,path in requests)==before_review
+             await page.locator('[data-config-review]').click()
+-            gate.touch()
+             async with page.expect_response(lambda response:
+                 urlparse(response.url).path=='/api/runs' and response.request.method=='POST') as accepted:
+                 await page.locator('[data-config-execute]').click()
+@@ -150,10 +150,11 @@
+             await page.reload(wait_until='domcontentloaded')
+             assert parse_qs(urlparse(page.url).query)['run_id']==[assignment]
+             pending=await api_get(context,base+'/api/runs/'+assignment)
+-            assert (await pending.json())['status'] in ('queued','running')
+-            await page.get_by_role('heading',name='Preparando tu decisión',exact=True).wait_for()
++            assert (await pending.json())['status']=='queued'
++            await page.get_by_role('heading',name='Preparando tu recomendación',exact=True).wait_for()
++            await page.locator('[data-run-stage]').filter(has_text='EN COLA DE EJECUCIÓN').wait_for()
+             await ui.checkpoint('assignment-pending')
+-            gate.unlink()
++            gate.touch()
+             await page.wait_for_selector('.assignment-dashboard-v2')
+             await ui.toolbar('assignment')
+             await ui.checkpoint('assignment-dashboard')
+@@ -316,7 +317,7 @@
+             report={'passed':True,'source_sha':subprocess.check_output(['git','rev-parse','HEAD'],cwd=Path(__file__).resolve().parents[3],text=True).strip(),
+                 'ui':ui.report(),'inicio_to_overview':True,'approval_map_scheduling_configuration':True,
+                 'disabled_upload_action_and_hover':True,'shared_workflow_visual_contract':True,
+-                'review_keyboard_cancel_and_confirmation':True,'creation_from_files':True,'refresh_during_queue':True,
++                'review_keyboard_cancel_and_confirmation':True,'creation_from_files':True,'refresh_during_queue':True,'queued_before_worker_start':True,
+                 'assignment_and_scheduling_approved':True,'cold_link':True,'back_forward_refresh':True,
+                 'idle_request_budget':True,'mobile_history':True,'export_has_records':True,
+                 'comparative_reused_and_restored':True,'trip_detail_keyboard':True,'direct_next_configuration':True,

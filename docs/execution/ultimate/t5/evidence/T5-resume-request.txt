@@ -1,0 +1,390 @@
+El STOP anterior de T5 fue exclusivamente:
+
+# STOP ENV — pérdida de disponibilidad del entorno
+
+NO fue un STOP CONTRACT ni un fallo funcional de la arquitectura.
+
+Queda autorizado reanudar exclusivamente:
+
+# T5 — DECISION GRAPH + READINESS + CONTEXTUAL NAVIGATION
+
+desde el estado actual preservado.
+
+NO reinicies T5 desde cero.
+
+NO realices una nueva auditoría end-to-end.
+
+NO ejecutes T6.
+
+---
+
+# 1. PRIMER OBJETIVO — RECUPERAR EL ENTORNO
+
+Antes de modificar código:
+
+1. verificá disponibilidad de:
+   - filesystem/workspace;
+   - Python;
+   - Node;
+   - Docker;
+   - PostgreSQL sandbox;
+   - browser/Chromium;
+   - runners;
+2. confirmá HEAD y working tree;
+3. verificá que el checkpoint T4 sigue intacto;
+4. identificá exactamente los cambios parciales ya realizados por T5;
+5. no hagas reset;
+6. no descartes cambios;
+7. no repliques trabajo ya implementado.
+
+Si el entorno no puede recuperarse:
+
+**STOP ENV nuevamente**.
+
+---
+
+# 2. PRESERVAR EL TRABAJO T5 YA COMPLETADO
+
+Actualmente quedaron implementados y deben reutilizarse:
+
+- Decision Definitions;
+- Graph Resolver;
+- Requirements;
+- snapshot SQL/API.
+
+Además:
+
+- U5 ejecutado;
+- 23 escenarios PASS.
+
+NO reimplementar estos componentes salvo que una validación posterior revele una regresión concreta.
+
+No repetir U5 únicamente por rutina si:
+
+- los archivos relevantes no cambiaron;
+- existe evidencia/log verificable del PASS.
+
+Si posteriores cambios de T5 afectan su frontera, entonces sí repetir U5.
+
+---
+
+# 3. RECONSTRUIR EL LEDGER T5
+
+Como el reporte final no pudo guardarse antes de la caída, reconstruí únicamente la información necesaria a partir de:
+
+- working tree actual;
+- command history/logs disponibles;
+- archivos creados/modificados;
+- evidencia preservada;
+- U5 ya ejecutado.
+
+No hagas una nueva auditoría para reconstruirlo.
+
+Registrá claramente:
+
+```text
+PRE-STOP ENV
+vs
+POST-RECOVERY
+```
+
+---
+
+# 4. CONTINUAR EXCLUSIVAMENTE CON LOS PENDIENTES
+
+Completar únicamente:
+
+## A. UI integration
+
+Decision Map y navegación contextual según T5.
+
+## B. B-PY
+
+## C. B-NODE
+
+## D. S5
+
+## E. W5
+
+## F. B-FOCUS
+
+y cualquier focal estrictamente requerido por fallos encontrados.
+
+---
+
+# 5. UI INTEGRATION
+
+La UI debe consumir el Graph Resolver/backend authority ya implementado.
+
+NO duplicar lógica de:
+
+- readiness;
+- dependencies;
+- approvals;
+- freshness;
+- runtime availability;
+- applicability.
+
+El frontend sólo representa la proyección.
+
+Aplicá Execution Skills Policy.
+
+Usá Skills visuales pertinentes únicamente como soporte para preservar:
+
+- design system actual;
+- Hero;
+- cards;
+- nodes;
+- badges;
+- buttons;
+- dropdowns;
+- focus;
+- responsive;
+- loading/error/empty states.
+
+NO rediseñar Dation.
+
+---
+
+# 6. RECORDATORIO FUNCIONAL T5
+
+La proyección debe mantener:
+
+```text
+LOCKED
+DATA_REQUIRED
+READY
+IN_PROGRESS
+COMPLETED
+APPROVED
+COMING_SOON
+NOT_APPLICABLE
+```
+
+y mantener separadas:
+
+```text
+Node State
+Freshness
+Technical Failure
+Runtime Availability
+Permission Eligibility
+```
+
+D1:
+
+```text
+Missing Demand/Resources
+→ DATA_REQUIRED
+
+Demand + Resources published
+→ READY
+```
+
+D2:
+
+```text
+D1 not approved
+→ LOCKED
+
+Current D1 approved
+→ READY
+```
+
+si no requiere enrichment adicional.
+
+D2 NO debe solicitar CSV extra estándar.
+
+---
+
+# 7. RUNTIME AVAILABILITY
+
+T6/T9 todavía no están ejecutados.
+
+Por lo tanto:
+
+```text
+READY
+```
+
+puede coexistir con:
+
+```text
+runtime_available = false
+```
+
+No ejecutar engines legacy como fallback.
+
+No declarar runtime Ultimate disponible antes de su implementación.
+
+---
+
+# 8. NAVIGATION
+
+Validar:
+
+```text
+Case
+→ Decision Map
+→ DATA_REQUIRED
+→ Case Data
+→ Map
+→ READY
+→ Config D1
+```
+
+y:
+
+```text
+D1 APPROVED
+→ D2 READY
+→ Config D2
+```
+
+Preservar:
+
+- Case seleccionado;
+- node;
+- Run histórica;
+- Back;
+- Forward;
+- reload;
+- deep link;
+- new run;
+- Case switch.
+
+Una nueva corrida con datos vigentes NO debe forzar Upload nuevamente.
+
+---
+
+# 9. TESTING FINAL
+
+Para cerrar T5 ejecutar las suites exigidas:
+
+- B-PY
+- B-NODE
+- U5 si corresponde repetirlo por cambios posteriores;
+- S5
+- W5
+- B-FOCUS
+
+Si la integración UI toca otras fronteras Browser relevantes, ejecutar focales adicionales según evidencia.
+
+No marcar como PASS:
+
+- suite no ejecutada;
+- runner caído;
+- test count 0;
+- skips;
+- infraestructura faltante.
+
+---
+
+# 10. NO REEJECUTAR TRABAJO INNECESARIO
+
+La prioridad es conservar capacidad y contexto.
+
+NO:
+
+- repetir T0;
+- repetir T1–T4;
+- auditar todo el repo;
+- reconstruir schema completo sin necesidad;
+- volver a investigar componentes no afectados;
+- releer todas las Skills.
+
+Usá:
+
+```text
+Master Plan
++
+T4 report
++
+current T5 working tree
++
+U5 evidence
+```
+
+como contexto suficiente.
+
+---
+
+# 11. PROHIBIDO
+
+NO ejecutar T6.
+
+NO implementar D1 Core.
+
+NO implementar D2.
+
+NO implementar Result Assembler.
+
+NO crear Sankey.
+
+NO crear Gantt.
+
+NO implementar IA Ultimate.
+
+NO modificar producción.
+
+NO deploy.
+
+NO push.
+
+NO hacer reset del working tree.
+
+---
+
+# 12. REPORTE FINAL T5
+
+Cuando el entorno esté recuperado y las validaciones terminen, crear:
+
+`docs/execution/ultimate/t5/t5-execution-report.md`
+
+Debe incluir:
+
+- baseline T4;
+- estado recuperado;
+- trabajo T5 previo al STOP ENV;
+- trabajo completado después de la recuperación;
+- Skills utilizadas;
+- files created/modified;
+- Definitions;
+- Graph Resolver;
+- Requirements;
+- SQL/API snapshot;
+- UI integration;
+- Navigation;
+- tests;
+- deviations;
+- risks;
+- gate evaluation.
+
+Separar claramente:
+
+```text
+Work completed before STOP ENV
+Work completed after recovery
+```
+
+---
+
+# 13. FINAL DECISION
+
+Una única salida:
+
+**GO — T5 completado. T6 puede ser solicitado.**
+
+o
+
+**STOP — T5 no cumple condiciones para autorizar T6.**
+
+Si el entorno vuelve a fallar:
+
+**STOP ENV.**
+
+Aunque resulte GO:
+
+# NO EJECUTES T6.
+
+Finalizá después del reporte.

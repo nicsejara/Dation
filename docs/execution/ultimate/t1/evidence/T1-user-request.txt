@@ -1,0 +1,577 @@
+T0 queda formalmente aprobado con estado:
+
+# GO — T0 BASELINE ESTABILIZADO
+
+Los reportes T0, T0-R y T0-R2 constituyen el baseline oficial previo a la implementación Ultimate.
+
+Autorizo ahora exclusivamente:
+
+# T1 — DOMAIN / RESULT CONTRACTS + REGISTRY + TRANSIT
+
+Seguí estrictamente:
+
+`DATION_FINAL_MASTER_EXECUTION_PLAN.md`
+
+y la evidencia de ejecución:
+
+- `docs/execution/ultimate/t0/t0-execution-report.md`
+- `docs/execution/ultimate/t0/t0-remediation-report.md`
+- `docs/execution/ultimate/t0/t0-remediation-r2-report.md`
+
+## REGLA DE EFICIENCIA
+
+NO realices una nueva auditoría end-to-end.
+
+T0 ya constituye el baseline validado.
+
+Antes de modificar código:
+
+1. leé la sección T1 del Master Plan;
+2. revisá únicamente las Frozen Architectural Decisions relevantes;
+3. consultá los reportes T0 sólo cuando sea necesario;
+4. inspeccioná exclusivamente los módulos, callers y tests directamente relacionados con T1;
+5. ampliá la inspección únicamente si aparece una incompatibilidad concreta.
+
+No recorras nuevamente toda la plataforma por precaución.
+
+---
+
+# OBJETIVO DE T1
+
+Congelar e implementar las interfaces tipadas y reglas fundamentales que utilizarán las fases posteriores.
+
+T1 debe dejar disponibles, de acuerdo con el Master Plan:
+
+- dominio logístico Ultimate;
+- TransitEstimator único;
+- reglas puras de costos;
+- estructuras de CasePolicy / NodePolicy;
+- Core Result contracts;
+- Engine Evidence contracts;
+- DecisionResultPackage contracts;
+- result schema registry;
+- runtime/engine identity registry compatible;
+- Metric catalog;
+- Reason Code catalog;
+- canonical serialization;
+- fingerprint/hash DAG;
+- INLINE / REFERENCE delivery contracts;
+- Decision Context v1 contract;
+- Approval Review contract;
+- API/result ABI necesaria para fases posteriores.
+
+---
+
+# SKILLS
+
+Aplicá la `Execution Skills Policy`.
+
+Utilizá únicamente Skills realmente pertinentes para T1.
+
+No uses Skills UX/UI si no se modifica interfaz.
+
+Skills de backend/domain/testing pueden utilizarse cuando aporten valor.
+
+Registrá cuáles fueron utilizadas y con qué propósito.
+
+Las Skills NO pueden:
+
+- cambiar F01–F23;
+- cambiar stack;
+- introducir framework nuevo;
+- rediseñar arquitectura;
+- implementar features de fases posteriores.
+
+---
+
+# PRESERVAR LEGACY
+
+Es obligatorio preservar:
+
+- `assignment_v1`;
+- `scheduling_v1`;
+- `dispatch_v2`;
+- serializers históricos;
+- date helpers legacy;
+- registry existente;
+- API existente;
+- exports legacy;
+- schemas históricos.
+
+Los contratos Ultimate son **aditivos y versionados**.
+
+No realizar backfill ni reinterpretar resultados históricos.
+
+---
+
+# TRANSIT CONTRACT
+
+Implementá el Transit estándar Ultimate según las decisiones congeladas.
+
+Debe existir una única autoridad para nuevas decisiones.
+
+Reglas:
+
+```text
+effective_distance_per_day = 500 km
+
+outbound_days =
+ceil(distance_km / 500)
+
+OWN cycle_days =
+ceil((distance_km * 2) / 500)
+
+EXTERNAL cycle_days =
+null
+
+arrival =
+dispatch + outbound_days - 1
+
+OWN available_again =
+dispatch + cycle_days
+```
+
+Los helpers legacy no deben modificarse.
+
+Agregar tests de frontera como mínimo:
+
+```text
+120 km  → 1 outbound day
+500 km  → 1
+501 km  → 2
+1000 km → 2
+
+OWN 480 km
+→ outbound 1
+→ cycle 2
+```
+
+No duplicar esta fórmula en módulos posteriores.
+
+---
+
+# RESULT CONTRACTS
+
+Implementá los contratos definidos en:
+
+`DATION_ENGINE_OUTPUT_CONTRACTS_V1.md`
+
+siguiendo la integración ya fijada en el Final Master Execution Plan.
+
+Como mínimo dejar tipado/versionado:
+
+```text
+EngineCoreResult
+EngineEvidence
+DecisionResultPackageV1
+DecisionContextV1
+ApprovalReview
+ResultArtifactReference
+DetailDatasetDescriptor
+MetricDescriptor
+ReasonCodeDefinition
+AlternativeDescriptor
+ExceptionDescriptor
+AssumptionDescriptor
+FingerprintSet
+```
+
+No hace falta producir todavía un resultado D1/D2 real.
+
+T1 define la ABI.
+
+---
+
+# RESULT SCHEMAS
+
+Registrar explícitamente:
+
+```text
+transport_plan_v1
+day_scheduling_v1
+```
+
+sin marcar engines no implementados como disponibles para ejecución productiva.
+
+Debe existir distinción clara entre:
+
+```text
+schema known
+vs
+runtime implemented
+vs
+runtime available
+```
+
+No permitir fallback como:
+
+```text
+unknown → Dispatch
+```
+
+Unknown schema debe fallar de forma segura.
+
+---
+
+# REASON CODES
+
+Crear catálogo versionado conforme al Master Plan.
+
+Los reason codes deben declarar como mínimo:
+
+- stable ID;
+- version;
+- entity scope;
+- producer;
+- facts requeridos;
+- claim strength;
+- translation/message key.
+
+No implementar lógica de IA que invente reasons.
+
+Un reason sin hechos suficientes debe ser inválido.
+
+---
+
+# METRICS
+
+Definir catálogo/versiones/unidades/precision/null semantics.
+
+Debe quedar explícito:
+
+```text
+null != 0
+unknown != unlimited
+unknown availability != confirmed
+```
+
+No implementar matemática de D1/D2 todavía salvo helpers puros autorizados en T1.
+
+---
+
+# MONEY / UNITS
+
+Congelar contratos para:
+
+- currency;
+- Decimal / scaled integer policy;
+- rounding;
+- capacity dimensions;
+- ratio precision;
+- cost models;
+- billing basis.
+
+No introducir FX.
+
+Una Case utiliza una moneda según contrato Ultimate.
+
+---
+
+# CANONICALIZATION / FINGERPRINTS
+
+Implementá y testeá el DAG aprobado:
+
+```text
+Input Context
+↓
+input_context_hash
+
+Core Result
+↓
+core_result_fingerprint
+
+Artifacts
+↓
+content SHA256
+
+Package + Manifest
+↓
+result_fingerprint
+```
+
+Evitar cualquier ciclo de hash.
+
+Excluir de fingerprints matemáticos:
+
+- signed URLs;
+- current permissions;
+- current approval overlay;
+- display-only metadata;
+- timestamps que no pertenezcan a la decisión matemática.
+
+Crear test vectors determinísticos.
+
+Mismo contenido canónico debe producir mismo hash.
+
+Cambio semántico debe cambiar hash.
+
+---
+
+# REGISTRY
+
+El registry debe resolver por identidad/versiones persistidas.
+
+No depender únicamente de `node_id`.
+
+Debe preservar resolución legacy.
+
+No habilites todavía ejecución Ultimate si el producer no existe.
+
+---
+
+# DECISION CONTEXT / IA
+
+Implementar únicamente el CONTRACT de:
+
+```text
+decision_context_v1
+```
+
+y modos:
+
+```text
+EXPLAIN
+EXPLORE
+COMPARE
+REVIEW
+```
+
+No llamar todavía a Groq/OpenAI para funcionalidades Ultimate nuevas.
+
+No implementar selected-entity retrieval completo si corresponde a T8/T10.
+
+Sí definir su ABI.
+
+---
+
+# APPROVAL REVIEW
+
+Definir el contrato determinístico.
+
+Mantener separación:
+
+```text
+approval_review
+```
+
+≠
+
+```text
+approval_allowed
+```
+
+`approval_allowed` seguirá siendo overlay actual de permisos/freshness/backend en fases posteriores.
+
+No meter autorización dentro del package inmutable.
+
+---
+
+# INLINE / REFERENCE
+
+Definir las variantes versionadas para datos pequeños/grandes.
+
+Nunca representar:
+
+```text
+artifact missing
+```
+
+como:
+
+```text
+[]
+```
+
+Debe distinguirse:
+
+- inline data;
+- reference;
+- empty valid dataset;
+- unavailable/corrupt artifact.
+
+---
+
+# FILES ESPERADOS
+
+Seguí los paths reales definidos en T1 del Master Plan.
+
+Como referencia, está previsto crear bajo:
+
+```text
+backend/app/domain/logistics/
+backend/app/results/
+```
+
+incluyendo módulos equivalentes a:
+
+```text
+contracts.py
+canonical.py
+registry.py
+reason_codes.py
+```
+
+y tests Ultimate correspondientes.
+
+No fuerces exactamente un nombre si el repositorio real exige una adaptación mínima, pero documentá cualquier desviación.
+
+---
+
+# PROHIBIDO EN T1
+
+NO ejecutar T2.
+
+NO crear migraciones.
+
+NO modificar Supabase productivo.
+
+NO crear tablas.
+
+NO implementar D1 Ultimate.
+
+NO implementar D2 Ultimate.
+
+NO implementar Result Assembler completo si pertenece a T7.
+
+NO publicar artifacts.
+
+NO construir Sankey.
+
+NO construir Gantt.
+
+NO modificar dashboards.
+
+NO modificar Dation IA productiva.
+
+NO rediseñar UI.
+
+NO deploy.
+
+NO Cloud Run.
+
+NO push/commit salvo autorización separada.
+
+NO refactor transversal.
+
+---
+
+# TESTING
+
+Ejecutá:
+
+- B-PY
+- B-NODE
+- U1
+
+y cualquier test focal estrictamente necesario.
+
+El baseline oficial es el obtenido en T0-R2:
+
+```text
+Python 383 PASS
+Node 128 PASS
+Browser 251 PASS
+SQL 46 PASS
+E2E 86 PASS
+Focus 9 PASS
+0 failures
+0 errors
+0 skips
+```
+
+No hace falta volver a ejecutar Browser/E2E/SQL completos salvo que T1 toque directamente una frontera que pueda afectarlos o el Master Plan lo requiera.
+
+No quemes capacidad repitiendo suites sin necesidad.
+
+Si aparece una regresión relevante, ampliá el test scope de forma focalizada.
+
+---
+
+# STOP CONDITIONS
+
+Aplicá estrictamente los gates.
+
+STOP inmediato si:
+
+- un nuevo DTO exige reinterpretar resultados legacy;
+- hay dos productores distintos para una misma métrica;
+- unknown schema cae silenciosamente a otro schema;
+- reason code puede emitirse sin facts;
+- Transit queda duplicado;
+- canonicalization produce hashes no determinísticos;
+- se requiere cambiar una Frozen Architectural Decision;
+- la implementación necesita una migración perteneciente a T2.
+
+En esos casos:
+
+documentar → STOP.
+
+No resolver adelantando fases.
+
+---
+
+# REPORTE FINAL
+
+Crear:
+
+`docs/execution/ultimate/t1/t1-execution-report.md`
+
+y los ledgers/evidencia correspondientes.
+
+El reporte debe incluir:
+
+## Baseline utilizado
+
+## Skills utilizadas
+
+## Files Created
+
+## Files Modified
+
+## Contracts implemented
+
+## Registry changes
+
+## Transit implementation
+
+## Canonicalization / fingerprints
+
+## Reason Code catalog
+
+## Metric / Money / Unit contracts
+
+## Tests executed
+
+Para cada suite:
+
+- PASS
+- FAIL
+- BLOCKED
+- NOT RUN
+- count
+- failures
+- duration cuando esté disponible
+
+## Legacy regression assessment
+
+## Deviations from Master Plan
+
+## Risks discovered
+
+## STOP / GO gate evaluation
+
+## FINAL T1 DECISION
+
+Una sola:
+
+**GO — T1 completado. T2 puede ser solicitado.**
+
+o
+
+**STOP — T1 no cumple las condiciones para autorizar T2.**
+
+Aunque el resultado sea GO:
+
+# NO EJECUTES T2.
+
+Finalizá después de entregar el reporte.

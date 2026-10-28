@@ -1,0 +1,232 @@
+{
+  "phase": "T2",
+  "captured_at": "2026-10-26T15:06:55.733265+00:00",
+  "commands": [
+    {
+      "kind": "required_or_focal_final_suite",
+      "suite": "B-PY",
+      "argv": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "cwd": "/workspace/Dation/backend",
+      "PYTHONPATH": null,
+      "exit_code": 0,
+      "log": "evidence/B-PY.log",
+      "result": "evidence/B-PY.result.json"
+    },
+    {
+      "kind": "required_or_focal_final_suite",
+      "suite": "B-NODE",
+      "argv": [
+        "node",
+        "--test",
+        "tests/test_dashboard_selectors.js",
+        "tests/test_assignment_ai_summary.mjs",
+        "tests/test_assignment_dashboard_v2_selectors.mjs",
+        "tests/test_assignment_executive_kpis.mjs",
+        "tests/test_case_navigation.mjs",
+        "tests/test_center_resource.mjs",
+        "tests/test_chart_theme.mjs",
+        "tests/test_data_provenance.mjs",
+        "tests/test_data_resource.mjs",
+        "tests/test_decision_case.mjs",
+        "tests/test_dispatch_upload_selectors.mjs",
+        "tests/test_execution_progress.mjs",
+        "tests/test_home_dda_catalog.mjs",
+        "tests/test_lifecycle.mjs",
+        "tests/test_navigation.mjs",
+        "tests/test_platform_recovery.mjs",
+        "tests/test_scheduling_dashboard_v21_selectors.mjs",
+        "tests/test_v2_foundation.mjs",
+        "tests/test_workflow_gates.mjs",
+        "tests/test_workspace_settings.mjs"
+      ],
+      "cwd": "/workspace/Dation/backend",
+      "PYTHONPATH": null,
+      "exit_code": 0,
+      "log": "evidence/B-NODE.log",
+      "result": "evidence/B-NODE.result.json"
+    },
+    {
+      "kind": "required_or_focal_final_suite",
+      "suite": "B-SQL",
+      "argv": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/integration",
+        "-p",
+        "test_*.py",
+        "-v"
+      ],
+      "cwd": "/workspace/Dation/backend",
+      "PYTHONPATH": null,
+      "exit_code": 0,
+      "log": "evidence/B-SQL.log",
+      "result": "evidence/B-SQL.result.json"
+    },
+    {
+      "kind": "required_or_focal_final_suite",
+      "suite": "S2",
+      "argv": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "test_ultimate_schema",
+        "-v"
+      ],
+      "cwd": "/workspace/Dation/backend",
+      "PYTHONPATH": "tests/integration",
+      "exit_code": 0,
+      "log": "evidence/S2.log",
+      "result": "evidence/S2.result.json"
+    },
+    {
+      "kind": "required_or_focal_final_suite",
+      "suite": "FOCAL-API",
+      "argv": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "test_decision_center.DecisionCenterTests.test_01_case_library_labels_pagination_identity_and_isolation",
+        "test_data_hub.DataHubTests.test_02_detail_preview_filters_and_derived_packs_preserve_case_history",
+        "test_home_owner_attention.HomeOwnerAttentionTests.test_fresh_schema_owner_nonowner_viewer_and_tenant_boundaries",
+        "-v"
+      ],
+      "cwd": "/workspace/Dation/backend",
+      "PYTHONPATH": "tests/e2e",
+      "exit_code": 0,
+      "log": "evidence/FOCAL-API.log",
+      "result": "evidence/FOCAL-API.result.json"
+    },
+    {
+      "kind": "required_or_focal_final_suite",
+      "suite": "FOCAL-EMPTY-API",
+      "argv": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "/tmp/dation-t2-empty-case-smoke.py"
+      ],
+      "cwd": "/workspace/Dation",
+      "PYTHONPATH": null,
+      "exit_code": 0,
+      "log": "evidence/FOCAL-EMPTY-API.log",
+      "result": "evidence/FOCAL-EMPTY-API.result.json"
+    },
+    {
+      "kind": "checkpoint",
+      "script": "evidence/initial-state.json",
+      "patch": "evidence/post-t1-tracked.patch",
+      "no_commit": true
+    },
+    {
+      "kind": "official_CLI_migration_creation",
+      "argv": [
+        "npx",
+        "--offline",
+        "--yes",
+        "supabase@2.122.0",
+        "migration",
+        "new",
+        "ultimate_foundation"
+      ],
+      "cwd": "/workspace/Dation",
+      "exit_code": 0
+    },
+    {
+      "kind": "official_CLI_migration_creation",
+      "argv": [
+        "npx",
+        "--offline",
+        "--yes",
+        "supabase@2.122.0",
+        "migration",
+        "new",
+        "ultimate_result_artifacts"
+      ],
+      "cwd": "/workspace/Dation",
+      "exit_code": 0
+    },
+    {
+      "kind": "suite_orchestration",
+      "argv": [
+        "python",
+        "-B",
+        "/tmp/dation-t2-qa.py"
+      ],
+      "cwd": "/workspace/Dation",
+      "exit_code": 0,
+      "script": "evidence/dation-t2-qa.py",
+      "log": "evidence/qa-batch.log"
+    },
+    {
+      "kind": "focal_proof_and_cleanup",
+      "argv": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "/tmp/dation-t2-close-evidence.py"
+      ],
+      "cwd": "/workspace/Dation",
+      "exit_code": 0,
+      "script": "evidence/dation-t2-close-evidence.py"
+    },
+    {
+      "kind": "read_only_git",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "cwd": "/workspace/Dation",
+      "exit_code": 0
+    },
+    {
+      "kind": "read_only_git",
+      "argv": [
+        "git",
+        "status",
+        "--short",
+        "--branch"
+      ],
+      "cwd": "/workspace/Dation"
+    },
+    {
+      "kind": "read_only_git",
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/workspace/Dation"
+    }
+  ],
+  "scope": "Exact final runner argv plus migration/checkpoint/evidence operations; not a transcript of every file read",
+  "credential_environment": {
+    "cleared_in_children": [
+      "SUPABASE_URL",
+      "SUPABASE_SECRET_KEY",
+      "SUPABASE_ACCESS_TOKEN",
+      "LLM_API_KEY",
+      "LLM_BASE_URL",
+      "GCP_ACCESS_TOKEN"
+    ],
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "DATION_SQL_TEST_CONTAINER": "dation-t2-20261026-ultimate"
+  },
+  "Docker_selector": "explicit local socket; inherited endpoint/context/TLS selectors cleared",
+  "no_remote_database_operations": true,
+  "no_commit_push_deploy": true,
+  "T3_executed": false
+}

@@ -1,15 +1,14 @@
 """A read-only case projection over the canonical history, never a state repair."""
 from app.platform.identity import platform_call
 from app.platform.home import recent_case
-from app.domain.decision_cases import project_case_history, run_history_item, NODE_IDS
+from app.domain.decision_cases import project_case_history, run_history_item, NODE_IDS, case_projection_options
 from app.platform.foundation import REGISTRY,resolve_node_destination,case_context,objective_presentation
 
 LABELS={key:value['label'] for key,value in REGISTRY['decisions'].items()}
 
 def canonical(bundle):
     row=bundle['case']
-    options={'case_id':row['id'],'orders_dataset_id':row['orders_dataset_id'],
-        'fleet_dataset_id':row['fleet_dataset_id'],'summaries':bundle['summaries']}
+    options={**case_projection_options(row),'summaries':bundle['summaries']}
     try:return project_case_history(bundle.get('state_json') or {},[],**options)
     except (ValueError,TypeError,AttributeError):
         # A historical cache cannot hide persisted evidence or break the entire
@@ -41,6 +40,9 @@ def project(bundle,detail=False):
         'last_activity_at':row['last_activity_at'],'updated_at':row['updated_at'],
         'resume':target(resume['node_id'],resume['status'],resume.get('run_id'),state['nodes'][resume['node_id']]) or {'view':'logistics-map','node_id':resume['node_id'],'run_id':None}}
     result.update(category=row.get('category'),description=row.get('description'))
+    if row.get('workflow_version') == 2:
+        result['workflow_version'] = 2
+        result['resume'] = resume['resume']
     result['context']=case_context(result)
     relevant=resume['node_id'];assignment=collaboration.get(relevant) or {}
     result['approver']=assignment.get('approver')
@@ -88,14 +90,23 @@ async def read(ctx,**options):
 
 async def listing(ctx,**options):
     data=await read(ctx,**options)
-    return {**data,'items':[project(item) for item in data['items']]}
+    from app.services.decision_graph_service import enrich_center
+    return {**data,'items':await enrich_center(ctx,[project(item) for item in data['items']])}
 
-async def detail(ctx,case_id):return project(await read(ctx,target_case_id=str(case_id)),True)
+async def detail(ctx,case_id):
+    from app.services.decision_graph_service import enrich_center
+    return (await enrich_center(ctx,[project(await read(ctx,target_case_id=str(case_id)),True)]))[0]
 
 async def history(ctx,case_id,node_id,limit,offset,run_id=None):
+    from app.services import decision_graph_service
     if run_id:limit,offset=1,0
     options={'search_text':str(run_id)} if run_id else {}
     data=await read(ctx,target_case_id=str(case_id),target_node_id=node_id,page_limit=limit,page_offset=offset,**options)
+    if data['case'].get('workflow_version')==2:
+        if run_id:
+            data=await decision_graph_service.read(ctx,case_id,node_id,run_id)
+            return {'items':[data['selected_run']],'total':1,'limit':1,'offset':0}
+        return await decision_graph_service.history(ctx,case_id,node_id,limit,offset)
     state=canonical(data)
     return {'items':[run_history_item(run,state) for run in data['runs']],
         'total':len(data['runs']) if run_id else data['summaries'][node_id]['run_count'],'limit':limit,'offset':offset}

@@ -1,0 +1,28 @@
+{
+  "suite": "B-PY",
+  "status": "PASS",
+  "tests": 456,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "started_at": "2026-10-26T14:55:00.242366+00:00",
+  "finished_at": "2026-10-26T14:55:21.833703+00:00",
+  "seconds": 21.591,
+  "cwd": "/workspace/Dation/backend",
+  "command": [
+    "/workspace/Dation/.venv/bin/python",
+    "-B",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-v"
+  ],
+  "exit_code": 0,
+  "production_credentials_cleared": true,
+  "container": null,
+  "PYTHONPATH": null,
+  "log_path": "/workspace/work/dation-t2/B-PY.log",
+  "log_sha256": "864bfed67f469e242c92abd9aed44922a7be19833cbceb88dd0bc663c279d02b"
+}

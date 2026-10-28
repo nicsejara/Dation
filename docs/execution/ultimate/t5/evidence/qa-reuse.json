@@ -1,0 +1,20 @@
+{
+  "changed_files": [
+    "backend/app/static/js/dispatch/cases/ultimate-decision-map.mjs",
+    "backend/tests/browser/test_ultimate_navigation.py"
+  ],
+  "change": "Do not label the generic attention focus as a next decision; a fully approved Case must show no next-decision marker. Server graph, SQL, action eligibility and all other consumers unchanged.",
+  "rerun": [
+    "W5"
+  ],
+  "reused_unchanged_consumers": [
+    "B-PY",
+    "B-NODE",
+    "S5",
+    "B-FOCUS",
+    "FOCAL-CASE-CREATE",
+    "native-visual-parity",
+    "legacy-map-parity"
+  ],
+  "U5_core_files_unchanged_since_pre_stop": true
+}

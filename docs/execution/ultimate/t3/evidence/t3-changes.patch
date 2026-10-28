@@ -1,0 +1,1787 @@
+--- post-T2/backend/app/models/ultimate_foundation.py
++++ T3/backend/app/models/ultimate_foundation.py
+@@ -0,0 +1,131 @@
++"""T3 setup DTOs. No datasets, admission requests, engines or result producers."""
++from datetime import datetime
++from typing import Literal
++from uuid import UUID
++import unicodedata
++
++from pydantic import AwareDatetime, Field, StrictBool, field_validator, model_validator
++from app.domain.logistics.base import ContractModel, DecisionDate, Dimension, ResourceSource
++from app.domain.logistics.contracts import CasePolicy, Horizon, LogisticsModelVersion
++from app.domain.logistics.units import CurrencyPolicy
++
++HorizonType = Literal['DAILY','WEEKLY','MONTHLY','CUSTOM']
++OperatingMode = Literal['OPERATIONAL','SIMULATION']
++
++
++def clean_text(value):
++    if value is None:return None
++    value=unicodedata.normalize('NFC',value.strip())
++    if not value:raise ValueError('Ingresá un texto o quitá el valor opcional.')
++    return value
++
++
++class LogisticsModelConfigurationV1(ContractModel):
++    version: Literal[1] = 1
++    operating_role: Literal['SHIPPER','LOGISTICS_PROVIDER','HYBRID']
++    transport_pattern: Literal['DIRECT'] = 'DIRECT'
++    allowed_sources: tuple[ResourceSource,...] = Field(min_length=1,max_length=2)
++    active_dimensions: tuple[Dimension,...] = Field(min_length=1,max_length=4)
++    primary_dimension: Dimension
++    split_permitted: StrictBool = False
++    homogeneous_loads_declared: StrictBool = False
++    currency_policy: CurrencyPolicy
++    own_cost_model: Literal['OWN_OPERATING_CYCLE'] = 'OWN_OPERATING_CYCLE'
++    external_cost_models: tuple[Literal['PER_TRIP','PER_KM'],...] = ('PER_TRIP','PER_KM')
++    per_km_billing_bases: tuple[Literal['ONE_WAY','ROUND_TRIP'],...] = ('ONE_WAY','ROUND_TRIP')
++
++    @model_validator(mode='after')
++    def explicit_configuration(self):
++        for values in [self.active_dimensions,self.allowed_sources,self.external_cost_models,self.per_km_billing_bases]:
++            if len(values)!=len(set(values)):raise ValueError('Las opciones no pueden repetirse.')
++        if self.primary_dimension not in self.active_dimensions:
++            raise ValueError('La dimensión principal debe estar activa.')
++        if ResourceSource.EXTERNAL in self.allowed_sources and not self.external_cost_models:
++            raise ValueError('Definí al menos una tarifa externa permitida.')
++        if 'PER_KM' in self.external_cost_models and not self.per_km_billing_bases:
++            raise ValueError('Definí la base de facturación por kilómetro.')
++        return self
++
++
++class ModelCreate(ContractModel):
++    id: UUID
++    name: str = Field(min_length=1,max_length=120)
++    description: str | None = Field(default=None,max_length=1000)
++    configuration: LogisticsModelConfigurationV1
++    _text=field_validator('name','description')(clean_text)
++
++
++class ModelUpdate(ContractModel):
++    expected_revision: int = Field(strict=True,ge=1)
++    name: str = Field(min_length=1,max_length=120)
++    description: str | None = Field(default=None,max_length=1000)
++    status: Literal['active','archived'] = 'active'
++    configuration: LogisticsModelConfigurationV1
++    _text=field_validator('name','description')(clean_text)
++
++
++class ModelPublish(ContractModel):
++    version_id: UUID
++    expected_revision: int = Field(strict=True,ge=1)
++
++
++class UltimateCaseCreate(Horizon):
++    id: UUID
++    name: str = Field(min_length=1,max_length=120)
++    description: str | None = Field(default=None,max_length=1000)
++    logistics_model_version_id: UUID
++    horizon_type: HorizonType
++    operating_mode: OperatingMode = 'OPERATIONAL'
++    case_policy: CasePolicy
++    decision_owner_user_id: UUID | None = None
++    _text=field_validator('name','description')(clean_text)
++
++
++class OwnerUpdate(ContractModel):
++    node_id: Literal['logistics_assignment','logistics_scheduling']
++    owner_user_id: UUID | None
++    expected_updated_at: AwareDatetime | None
++
++
++class UltimateCaseUpdate(ContractModel):
++    expected_updated_at: AwareDatetime
++    name: str | None = Field(default=None,min_length=1,max_length=120)
++    description: str | None = Field(default=None,max_length=1000)
++    planning_start: DecisionDate | None = None
++    planning_end: DecisionDate | None = None
++    horizon_type: HorizonType | None = None
++    operating_mode: OperatingMode | None = None
++    case_policy: CasePolicy | None = None
++    owner_updates: tuple[OwnerUpdate,...] = Field(default=(),max_length=2)
++    _text=field_validator('name','description')(clean_text)
++
++    @model_validator(mode='after')
++    def actual_change(self):
++        if not self.model_fields_set-{'expected_updated_at','owner_updates'} and not self.owner_updates:
++            raise ValueError('Elegí un cambio para guardar.')
++        if len({x.node_id for x in self.owner_updates})!=len(self.owner_updates):
++            raise ValueError('Una asignación por decisión.')
++        for key in self.model_fields_set-{'description','owner_updates'}:
++            if getattr(self,key) is None:raise ValueError('El campo requerido no puede quitarse: '+key)
++        return self
++
++
++class PlanningContextV1(Horizon):
++    """Durable pre-admission context; an empty Pack is NOT a FrozenCaseContext."""
++    schema_version: Literal['planning_context_v1'] = 'planning_context_v1'
++    workspace_id: UUID
++    case_id: UUID
++    operating_mode: OperatingMode
++    horizon_type: HorizonType | None
++    model: LogisticsModelVersion
++    case_policy: CasePolicy
++    case_policy_hash: str = Field(pattern=r'^[0-9a-f]{64}$')
++    graph_definition_version: str
++    data_pack_id: UUID
++    data_pack_version_id: UUID
++    data_pack_version: int = Field(strict=True,ge=1)
++    pack_manifest_hash: str = Field(pattern=r'^[0-9a-f]{64}$')
++    contract_hash: str = Field(pattern=r'^[0-9a-f]{64}$')
++    context_frozen_at: AwareDatetime | None
++    # No raw IDs/read sets invented; assembly/admission remains T4/T8.
++    admission_available: Literal[False] = False
+--- post-T2/backend/app/platform/decision_routes.py
++++ T3/backend/app/platform/decision_routes.py
+@@ -20,6 +20,8 @@
+     from app.routes.dispatch import guarded
+     require_dda(ctx,'logistics')
+     case=await guarded(decision_case_service.get_case(str(case_id)))
++    if case['case'].get('workflow_version')==2:
++        raise HTTPException(409,'El contexto del Case está guardado; todavía no hay ejecución Ultimate disponible.')
+     inputs=await guarded(dispatch_service.check_inputs(case['orders']['id'],case['fleet']['id'],True))
+     if not inputs.get('valid'):
+         raise HTTPException(409,'Validá y corregí el Data Pack antes de continuar.')
+@@ -117,6 +119,10 @@
+ async def replace_data_pack(case_id:UUID,payload:CaseDataPack,ctx=Depends(require_upload_access)):
+     from app.services import decision_case_service
+     from app.routes.dispatch import guarded
++    current_case=await guarded(decision_case_service.get_case_row(str(case_id)))
++    if current_case and current_case.get('workflow_version')==2:
++        from fastapi import HTTPException
++        raise HTTPException(409,'Este Case utiliza un Data Pack progresivo; el reemplazo legacy no corresponde.')
+     await guarded(decision_case_service._validate_data_pack(str(payload.orders_dataset_id),str(payload.fleet_dataset_id)))
+     return await platform_call('platform_replace_case_data_pack',{'actor_user_id':ctx.user_id,'target_workspace_id':ctx.workspace_id,
+         'target_case_id':str(case_id),'expected_updated_at':payload.expected_updated_at.isoformat(),
+--- post-T2/backend/app/platform/home.py
++++ T3/backend/app/platform/home.py
+@@ -55,7 +55,8 @@
+     if row.get('workflow_version') == 2:
+         # T2 retains the Case in shared readers without opening a legacy run/config flow.
+         item['workflow_version'] = 2
+-        item['resume'] = None
++        item['resume'] = ({'view':'logistics-case-setup','node_id':None,'run_id':None}
++                          if row.get('foundation_context_available') or row.get('creation_intent_hash') else None)
+     item['context'] = case_context({**item, 'dda': 'logistics'})
+     return item
+ 
+--- post-T2/backend/app/platform/identity.py
++++ T3/backend/app/platform/identity.py
+@@ -48,6 +48,8 @@
+             if code == "42501":
+                 raise HTTPException(403, "No tenés acceso activo a este workspace.")
+             if code == "22023":
++                if name == 'platform_ultimate_foundation':
++                    raise HTTPException(409, "Revisá el contexto, el horizonte y la elegibilidad del Decision Owner antes de guardar.")
+                 collaboration_errors = {
+                     'platform_set_member_responsibilities': 'Revisá las responsabilidades y actualizá la membresía antes de reintentar.',
+                     'platform_apply_case_attributes': 'Revisá los atributos y elegí un Data Owner activo y elegible en este workspace.',
+--- post-T2/backend/app/platform/routes.py
++++ T3/backend/app/platform/routes.py
+@@ -10,6 +10,7 @@
+ from app.platform.settings_routes import router as settings_router
+ from app.platform.activity_routes import router as activity_router
+ from app.platform.onboarding_routes import router as onboarding_router
++from app.platform.ultimate_routes import router as ultimate_router
+ 
+ router=APIRouter(prefix='/api/platform')
+ router.include_router(data_router)
+@@ -18,6 +19,7 @@
+ router.include_router(settings_router)
+ router.include_router(activity_router)
+ router.include_router(onboarding_router)
++router.include_router(ultimate_router)
+ 
+ @router.get('/home')
+ async def get_home(ctx=Depends(require_upload_access)):
+--- post-T2/backend/app/platform/ultimate_routes.py
++++ T3/backend/app/platform/ultimate_routes.py
+@@ -0,0 +1,47 @@
++"""Versioned Model/Case setup routes. Cohort creation is checked in SQL and closed by default."""
++from uuid import UUID
++from fastapi import APIRouter, Depends, Query
++from app.auth import require_upload_access
++from app.platform.entitlements import require_dda
++from app.models.ultimate_foundation import ModelCreate,ModelUpdate,ModelPublish,UltimateCaseCreate,UltimateCaseUpdate
++from app.services import logistics_model_service as service
++
++router=APIRouter()
++
++def logistics(ctx):require_dda(ctx,'logistics');return ctx
++
++@router.get('/ultimate-foundation/capabilities')
++async def capabilities(ctx=Depends(require_upload_access)):
++    return await service.capabilities(ctx)
++
++@router.get('/logistics-models')
++async def models(q:str=Query('',max_length=120),include_archived:bool=False,limit:int=Query(25,ge=1,le=50),offset:int=Query(0,ge=0,le=1000000),ctx=Depends(require_upload_access)):
++    return await service.list_models(logistics(ctx),search_text=q,include_archived=include_archived,limit=limit,offset=offset)
++
++@router.post('/logistics-models')
++async def create_model(payload:ModelCreate,ctx=Depends(require_upload_access)):
++    return await service.create_model(logistics(ctx),payload)
++
++@router.get('/logistics-models/{model_id}')
++async def model(model_id:UUID,ctx=Depends(require_upload_access)):
++    return await service.get_model(logistics(ctx),model_id)
++
++@router.put('/logistics-models/{model_id}')
++async def update_model(model_id:UUID,payload:ModelUpdate,ctx=Depends(require_upload_access)):
++    return await service.update_model(logistics(ctx),model_id,payload)
++
++@router.post('/logistics-models/{model_id}/versions')
++async def publish_model(model_id:UUID,payload:ModelPublish,ctx=Depends(require_upload_access)):
++    return await service.publish_model(logistics(ctx),model_id,payload)
++
++@router.post('/logistics-cases')
++async def create_case(payload:UltimateCaseCreate,ctx=Depends(require_upload_access)):
++    return await service.create_case(logistics(ctx),payload)
++
++@router.get('/logistics-cases/{case_id}/context')
++async def context(case_id:UUID,ctx=Depends(require_upload_access)):
++    return await service.get_case_context(logistics(ctx),case_id)
++
++@router.patch('/logistics-cases/{case_id}/context')
++async def update_context(case_id:UUID,payload:UltimateCaseUpdate,ctx=Depends(require_upload_access)):
++    return await service.update_case_context(logistics(ctx),case_id,payload)
+--- post-T2/backend/app/services/logistics_model_service.py
++++ T3/backend/app/services/logistics_model_service.py
+@@ -0,0 +1,115 @@
++"""T3 application services over checked SQL RPC. No service-key table writes."""
++from uuid import UUID, uuid5
++from fastapi import HTTPException
++
++from app.models.ultimate_foundation import LogisticsModelConfigurationV1, PlanningContextV1
++from app.domain.logistics.contracts import LogisticsModelVersion, Demand, TransportResource
++from app.results.canonical import canonical_bytes, canonical_tree, content_sha256, policy_hash
++from app.platform.identity import platform_call
++
++GRAPH_VERSION='ULTIMATE_FOUNDATION_V1'
++CONTRACT_REGISTRY_VERSION='ULTIMATE_DOMAIN_V1'
++
++
++def snapshot_hash(kind,value):
++    return content_sha256(canonical_bytes({'canonical_version':'DATION_CANONICAL_V1','kind':kind,'value':value}))
++
++
++def configuration_snapshot(config):
++    value=canonical_tree(LogisticsModelConfigurationV1.model_validate(config))
++    return value,snapshot_hash('logistics_model_configuration_v1',value)
++
++
++def contract_reference(configuration_hash):
++    """References the static T1 domain ABI; does not compile CSV/slot contracts."""
++    value={'schema_version':'ultimate_model_domain_reference_v1','registry_version':CONTRACT_REGISTRY_VERSION,
++        'configuration_hash':configuration_hash,'domain_schema_sha256':{
++            'Demand':content_sha256(canonical_bytes(Demand.model_json_schema())),
++            'TransportResource':content_sha256(canonical_bytes(TransportResource.model_json_schema()))}}
++    return value,snapshot_hash('ultimate_model_domain_reference_v1',value)
++
++
++async def call(ctx,operation,arguments=None):
++    return await platform_call('platform_ultimate_foundation',{'target_workspace_id':ctx.workspace_id,
++        'actor_user_id':ctx.user_id,'operation':operation,'arguments':arguments or {}})
++
++
++async def capabilities(ctx):return await call(ctx,'capabilities')
++
++
++async def list_models(ctx,**options):return await call(ctx,'model_list',options)
++
++
++async def get_model(ctx,model_id):return await call(ctx,'model_get',{'model_id':str(model_id)})
++
++
++async def create_model(ctx,payload):
++    config,hash_=configuration_snapshot(payload.configuration)
++    body=payload.model_dump(mode='json',exclude={'configuration'})
++    return await call(ctx,'model_create',{**body,'configuration':config,'configuration_hash':hash_,
++        'creation_intent_hash':snapshot_hash('model_creation_intent_v1',{'actor':ctx.user_id,**body,'configuration':config})})
++
++
++async def update_model(ctx,model_id,payload):
++    config,hash_=configuration_snapshot(payload.configuration)
++    return await call(ctx,'model_update',{'model_id':str(model_id),**payload.model_dump(mode='json',exclude={'configuration'}),
++        'configuration':config,'configuration_hash':hash_})
++
++
++async def publish_model(ctx,model_id,payload):
++    model=await get_model(ctx,model_id)
++    # SQL resolves replay before checking mutable draft/revision/status.
++    existing=next((v for v in model['versions'] if v['id']==str(payload.version_id)),None)
++    if existing:
++        return await call(ctx,'model_publish',{'model_id':str(model_id),**payload.model_dump(mode='json')})
++    config,hash_=configuration_snapshot(model['model']['draft_config_jsonb'])
++    descriptor,contract_hash=contract_reference(hash_)
++    return await call(ctx,'model_publish',{'model_id':str(model_id),**payload.model_dump(mode='json'),
++        'configuration_hash':hash_,'contract_descriptor':descriptor,'contract_hash':contract_hash})
++
++
++def empty_pack_snapshot(workspace_id,case_id):
++    case_id=UUID(str(case_id));pack_id=uuid5(case_id,'data-pack-v1');version_id=uuid5(case_id,'data-pack-version-1')
++    manifest={'version':1,'workspace_id':workspace_id,'case_id':str(case_id),'pack_id':str(pack_id),
++              'pack_version_id':str(version_id),'entries':[]}
++    return {'pack_id':str(pack_id),'pack_version_id':str(version_id),
++        'manifest_hash':snapshot_hash('case_data_pack_manifest_v1',manifest),
++        'contract_set_hash':snapshot_hash('case_data_pack_contract_set_v1',[])}
++
++
++async def create_case(ctx,payload):
++    body=payload.model_dump(mode='json');policy=canonical_tree(payload.case_policy)
++    result=await call(ctx,'case_create',{**body,'case_policy':policy,'case_policy_hash':policy_hash(payload.case_policy),
++        **empty_pack_snapshot(ctx.workspace_id,payload.id),
++        'creation_intent_hash':snapshot_hash('case_creation_intent_v1',{'actor':ctx.user_id,**body})})
++    return enrich_context(result)
++
++
++def enrich_context(result):
++    row=result['case'];version=result['model_version'];pack=result['pack'];pv=result['pack_version']
++    config=LogisticsModelConfigurationV1.model_validate(version['config_jsonb'])
++    model=LogisticsModelVersion(workspace_id=row['workspace_id'],model_id=version['model_id'],version_id=version['id'],
++        version=version['version'],operating_role=config.operating_role,transport_pattern=config.transport_pattern,
++        allowed_sources=config.allowed_sources,active_dimensions=config.active_dimensions,primary_dimension=config.primary_dimension,
++        homogeneous_loads_declared=config.homogeneous_loads_declared,split_permitted=config.split_permitted,
++        currency_policy=config.currency_policy,contract_registry_version=version['contract_registry_version'],configuration_hash=version['config_hash'])
++    context=PlanningContextV1(workspace_id=row['workspace_id'],case_id=row['id'],planning_start=row['planning_start'],planning_end=row['planning_end'],
++        operating_mode=row['operating_mode'],horizon_type=row.get('horizon_type'),model=model,case_policy=row['case_policy_jsonb'],
++        case_policy_hash=row['case_policy_hash'],graph_definition_version=row['graph_definition_version'],
++        data_pack_id=pack['id'],data_pack_version_id=pv['id'],data_pack_version=pv['version'],pack_manifest_hash=pv['manifest_hash'],
++        contract_hash=version['contract_hash'],context_frozen_at=row['context_frozen_at'])
++    # Display/Owner/freeze audit time is not part of the mathematical context.
++    projection=context.model_dump(mode='python',exclude={'context_frozen_at'})
++    return {**result,'planning_context':canonical_tree(context),'planning_context_hash':snapshot_hash('planning_context_v1',projection)}
++
++
++async def get_case_context(ctx,case_id):return enrich_context(await call(ctx,'case_get',{'case_id':str(case_id)}))
++
++
++async def update_case_context(ctx,case_id,payload):
++    changes=payload.model_dump(mode='json',exclude={'expected_updated_at','owner_updates'},exclude_unset=True)
++    if payload.case_policy is not None:
++        changes['case_policy']=canonical_tree(payload.case_policy);changes['case_policy_hash']=policy_hash(payload.case_policy)
++    result=await call(ctx,'case_update',{'case_id':str(case_id),'expected_updated_at':payload.expected_updated_at.isoformat(),
++        'changes':changes,'owner_updates':[item.model_dump(mode='json') for item in payload.owner_updates]})
++    return enrich_context(result)
+--- post-T2/backend/app/static/css/ultimate-foundation.css
++++ T3/backend/app/static/css/ultimate-foundation.css
+@@ -0,0 +1,24 @@
++/* T3 layout only. Dation controls, typography, colors and motion stay authoritative. */
++.ultimate-foundation { display:grid; gap:var(--space-6); max-inline-size:var(--platform-page-max,1180px); margin-inline:auto; padding:var(--space-6); min-inline-size:0; }
++.ultimate-foundation .ultimate-form,.ultimate-foundation .ultimate-section,.ultimate-foundation .ultimate-list { display:grid; gap:var(--space-4); min-inline-size:0; }
++.ultimate-foundation .ultimate-section { margin:0; padding:var(--space-5); }
++.ultimate-foundation .ultimate-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--space-4); min-inline-size:0; }
++.ultimate-foundation .ultimate-choices { margin:0; padding:0; border:0; display:grid; align-content:start; gap:var(--space-2); min-inline-size:0; }
++.ultimate-foundation .ultimate-choices legend { margin-block-end:var(--space-2); }
++.ultimate-foundation .ultimate-actions,.ultimate-foundation .ultimate-footer,.ultimate-foundation .ultimate-model-card,.ultimate-foundation .ultimate-version,.ultimate-foundation .ultimate-toolbar { display:flex; flex-wrap:wrap; gap:var(--space-3); align-items:center; justify-content:space-between; min-inline-size:0; }
++.ultimate-foundation .ultimate-model-card>div { flex:1 1 18rem; min-inline-size:0; display:grid; gap:var(--space-2); }
++.ultimate-foundation .ultimate-footer { padding:var(--space-4); }
++.ultimate-foundation .ultimate-footer>p { flex:1 1 18rem; min-inline-size:0; }
++.ultimate-foundation .ultimate-policy { grid-column:1/-1; }
++.ultimate-foundation .ultimate-policy>summary { cursor:pointer; padding-block:var(--space-3); color:var(--color-text); }
++.ultimate-foundation .ultimate-policy .ultimate-grid { margin-block:var(--space-3); }
++.ultimate-foundation .ultimate-errors { display:grid; gap:var(--space-2); padding:var(--space-4); border:1px solid var(--color-danger); border-radius:var(--radius-md); }
++.ultimate-foundation .ultimate-errors a { color:var(--color-danger); text-decoration:underline; }
++.ultimate-foundation [hidden] { display:none!important; }
++.ultimate-foundation :is(h1,h2,h3,p,legend,summary,option) { overflow-wrap:anywhere; }
++.ultimate-foundation .ultimate-saved-context { display:grid; gap:var(--space-2); }
++.ultimate-foundation .ultimate-version { padding-block:var(--space-3); border-block-end:1px solid var(--color-border); }
++.ultimate-foundation .ultimate-toolbar .d-field { flex:1 1 16rem; }
++.ultimate-entry { margin-block:var(--space-5); padding:var(--space-4); }
++.ultimate-entry .platform-actions { display:flex; flex-wrap:wrap; gap:var(--space-3); }
++@media(max-width:700px) { .ultimate-foundation { padding:var(--space-4); } .ultimate-foundation .ultimate-grid { grid-template-columns:minmax(0,1fr); } .ultimate-foundation .ultimate-section { padding:var(--space-4); } }
+--- post-T2/backend/app/static/js/dispatch/cases/ultimate-case-setup.mjs
++++ T3/backend/app/static/js/dispatch/cases/ultimate-case-setup.mjs
+@@ -0,0 +1,79 @@
++import {api,post,errorBox} from '../shared.mjs';
++import {scopeFor} from '../lifecycle.mjs';
++import {ensureStylesheet} from '../styles.mjs';
++import {loadingState} from '../../platform/components.mjs';
++import {el,button,field,section,pageHeader,draftStore,mountForm} from '../models/forms.mjs';
++import {mountPolicy,policyInputValues} from '../models/policy.mjs';
++import {ROLES,DIMENSIONS} from '../models/index.mjs';
++import {horizonEnd} from '../models/setup-values.mjs';
++
++export async function mountCaseSetup(root,{route,navigate,onContext}){
++ delete root.dataset.ultimateReady;
++ const scope=scopeFor(root);await ensureStylesheet('ultimate-foundation-styles','/static/css/ultimate-foundation.css','t3-v1');if(!scope.active)return;
++ root.className='dispatch d-platform ultimate-foundation';root.append(loadingState('Recuperando contexto del Case…'));
++ try{
++  const fresh=!route.caseId,[caps,current]=await Promise.all([api('/api/platform/ultimate-foundation/capabilities',{signal:scope.signal}),fresh?Promise.resolve(null):api('/api/platform/logistics-cases/'+route.caseId+'/context',{signal:scope.signal})]);
++  if(!scope.active)return;if(fresh&&!caps.can_create_case)throw Object.assign(new Error('La creación de Cases no está disponible para este acceso.'),{status:403});
++  if(current)onContext?.(current);
++  const row=current?.case,store=draftStore('case',route.caseId||'new'),saved=store.read(),policy=current?.planning_context.case_policy||{version:1,primary_goal:'MINIMIZE_COST',guardrails:[],preferences:[]};
++  const initial={id:row?.id||crypto.randomUUID(),name:row?.label||'',description:row?.description||'',model_id:current?.model.id||route.modelId||'',logistics_model_version_id:row?.logistics_model_version_id||'',
++   planning_start:row?.planning_start||'',planning_end:row?.planning_end||'',horizon_type:row?.horizon_type||'WEEKLY',operating_mode:row?.operating_mode||'OPERATIONAL',expected_updated_at:row?.updated_at||null,decision_owner_user_id:'',
++   owners:Object.fromEntries(['logistics_assignment','logistics_scheduling'].map(id=>[id,{id:current?.responsibilities.stages[id].owner?.id||'',updated_at:current?.responsibilities.stages[id].updated_at||null}])),policy_values:policyInputValues(policy)};
++  const draft=saved||initial,editable=fresh||current.permissions.can_edit,mathEditable=fresh||current.permissions.can_edit_mathematical,canAssign=fresh?caps.can_assign:current.permissions.can_assign;
++  root.replaceChildren();const header=pageHeader(root,fresh?'Crear Decision Case':row.label||'Contexto del Case','El Case guarda el objetivo, el horizonte y la versión del Model. Podés crearlo antes de cargar archivos.');header.append(button('Logistics Models',()=>navigate('logistics-models',{modelId:null})));
++  if(row){const savedCard=el('section',undefined,'d-card ultimate-saved-context');savedCard.append(el('h2','Contexto guardado','d-card-title'),el('p','Versión '+current.model_version.version+' de '+current.model.name+' · '+row.planning_start+' a '+row.planning_end,'d-body'),el('p','Data Pack inicial: '+(current.entry_count?'datos vinculados':'sin archivos')+'. El contexto se conserva al recargar.','d-metadata'));
++   if(row.context_frozen_at)savedCard.append(el('p','El horizonte y la política quedaron congelados con la primera admisión. El nombre, la descripción y los responsables conservan sus reglas de edición.','d-body'));root.append(savedCard);}
++  const kit=mountForm(root,scope,{initial,store,submitLabel:fresh?'Crear Case':'Guardar contexto',onReload:()=>navigate('logistics-case-setup',{caseId:route.caseId,replace:true}),onSave:async value=>{
++   let result;
++   if(fresh){result=await post('/api/platform/logistics-cases',{id:value.id,name:value.name,description:value.description||null,logistics_model_version_id:value.logistics_model_version_id,
++     planning_start:value.planning_start,planning_end:value.planning_end,horizon_type:value.horizon_type,operating_mode:value.operating_mode,case_policy:policyUI.read(),decision_owner_user_id:canAssign?value.decision_owner_user_id||null:null},{signal:scope.signal});}
++   else{
++    const body={expected_updated_at:value.expected_updated_at,name:value.name,description:value.description||null};
++    if(mathEditable)Object.assign(body,{planning_start:value.planning_start,planning_end:value.planning_end,horizon_type:value.horizon_type,operating_mode:value.operating_mode,case_policy:policyUI.read()});
++    if(canAssign)body.owner_updates=Object.entries(value.owners).filter(([id,o])=>o.id!==(current.responsibilities.stages[id].owner?.id||'')).map(([id,o])=>({node_id:id,owner_user_id:o.id||null,expected_updated_at:o.updated_at}));
++    result=await api('/api/platform/logistics-cases/'+row.id+'/context',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:scope.signal});
++   }
++   kit.markSaved();if(scope.active){onContext?.(result);await navigate('logistics-case-setup',{caseId:result.case.id,replace:true});}
++  }});
++  const form=kit.form;form.inert=true;form.setAttribute('aria-busy','true');
++  const identity=section(form,'Identidad del Case'),name=field(identity,'Nombre del Case',{name:'case_name',value:draft.name,required:true,maxLength:120}),description=field(identity,'Descripción (opcional)',{name:'case_description',type:'textarea',value:draft.description,maxLength:1000});
++  const modelGroup=section(form,'Model y versión publicada','La versión elegida queda ligada al Case y no puede reemplazarse después de crear el contexto.');
++  let selectedModel=current?.model.id||draft.model_id,selectedVersion=draft.logistics_model_version_id,modelsGeneration=0;
++  const modelSearch=field(modelGroup,'Buscar Model por nombre',{name:'case_model_search',type:'search',maxLength:120}),modelSelect=field(modelGroup,'Logistics Model',{name:'model_id',options:[['','Elegí un Model']],required:true}),versionSelect=field(modelGroup,'Model Version',{name:'model_version_id',options:[['','Elegí una versión publicada']],required:true});
++  const summary=el('p',undefined,'d-field__help');modelGroup.append(summary);
++  async function versions(id){const own=++modelsGeneration;versionSelect.disabled=true;const data=await api('/api/platform/logistics-models/'+id,{signal:scope.signal});if(!scope.active||own!==modelsGeneration)return;
++   versionSelect.replaceChildren();const empty=el('option','Elegí una versión publicada');empty.value='';versionSelect.append(empty);
++   for(const v of data.versions){const option=el('option','Versión '+v.version);option.value=v.id;versionSelect.append(option);}
++   versionSelect.value=selectedVersion;versionSelect.disabled=!fresh;const render=()=>{const v=data.versions.find(v=>v.id===versionSelect.value);summary.textContent=v?[ROLES.find(([k])=>k===v.config_jsonb.operating_role)?.[1],DIMENSIONS.find(([k])=>k===v.config_jsonb.primary_dimension)?.[1],v.config_jsonb.currency_policy.currency].filter(Boolean).join(' · '):'Elegí una versión publicada. Los borradores no se pueden vincular.';};scope.listen(versionSelect,'change',render);render();
++  }
++  async function models(){const own=++modelsGeneration;const result=await api('/api/platform/logistics-models?'+new URLSearchParams({q:modelSearch.value,limit:50}),{signal:scope.signal});if(!scope.active||own!==modelsGeneration)return;
++   modelSelect.replaceChildren();const placeholder=el('option','Elegí un Model');placeholder.value='';modelSelect.append(placeholder);for(const m of result.items.filter(x=>x.versions.length)){const o=el('option',m.name);o.value=m.id;modelSelect.append(o);}
++   if(selectedModel&&!result.items.some(m=>m.id===selectedModel)){const data=await api('/api/platform/logistics-models/'+selectedModel,{signal:scope.signal});if(!scope.active)return;const o=el('option',data.model.name);o.value=selectedModel;modelSelect.append(o);}
++   modelSelect.value=selectedModel;modelSelect.disabled=!fresh;if(selectedModel)await versions(selectedModel);
++  }
++  const search=button('Buscar Models',()=>models().catch(e=>{if(scope.active){summary.textContent=e.message;summary.role='alert';}}));modelGroup.append(search);modelSearch.disabled=search.disabled=!fresh;
++  scope.listen(modelSelect,'change',()=>{selectedModel=modelSelect.value;selectedVersion='';if(selectedModel)versions(selectedModel).catch(e=>{if(scope.active){summary.textContent=e.message;summary.role='alert';}});else versionSelect.replaceChildren();});
++  const horizon=section(form,'Horizonte de planificación','Fechas inclusivas que delimitan las salidas de la decisión. El tipo ofrece un punto de partida; se guardan las fechas concretas.');
++  const mode=field(horizon,'Operating Mode',{name:'operating_mode',options:[['OPERATIONAL','Operacional'],['SIMULATION','Simulación']],value:draft.operating_mode}),type=field(horizon,'Tipo de horizonte',{name:'horizon_type',options:[['DAILY','Diario'],['WEEKLY','Semanal'],['MONTHLY','Mensual'],['CUSTOM','Personalizado']],value:draft.horizon_type});
++  const start=field(horizon,'Inicio de planificación',{name:'planning_start',type:'date',value:draft.planning_start,required:true}),end=field(horizon,'Fin de planificación',{name:'planning_end',type:'date',value:draft.planning_end,required:true});
++  const preset=()=>{const value=horizonEnd(start.value,type.value);if(value){end.value=value;end.dispatchEvent(new Event('input',{bubbles:true}));}};scope.listen(type,'change',preset);scope.listen(start,'change',preset);
++  for(const input of [mode,type,start,end])input.disabled=!mathEditable;
++  const policyUI=mountPolicy(form,scope,policy,{readOnly:!mathEditable,draftValues:draft.policy_values});
++  const ownersGroup=section(form,'Decision Owner','La asignación usa las responsabilidades vigentes del Equipo. Sólo un Admin puede cambiar responsables.');
++  const owners={};
++  if(fresh)owners.initial=field(ownersGroup,'Decision Owner inicial (D1 y D2)',{name:'decision_owner_user_id',options:[['','Elegí un Decision Owner']],value:draft.decision_owner_user_id,required:canAssign});
++  else for(const [id,label]of [['logistics_assignment','Decision Owner · Asignación de carga'],['logistics_scheduling','Decision Owner · Planificación de despachos']])owners[id]=field(ownersGroup,label,{name:'owner_'+id,options:[['','Sin asignar']],value:draft.owners[id].id});
++  if(canAssign){const people=[];let offset=0,total=0;do{const result=await api('/api/platform/team?'+new URLSearchParams({candidates:'true',responsibility:'decision_owner',limit:50,offset}),{signal:scope.signal});if(!scope.active)return;people.push(...result.members);offset+=50;total=result.total;if(offset<total&&!result.members.length)throw new Error('El Equipo cambió. Recargá la lista de personas.');}while(offset<total);
++   for(const [id,control]of Object.entries(owners)){const currentId=id==='initial'?draft.decision_owner_user_id:draft.owners[id].id;for(const person of people){const option=el('option',person.name+' · '+person.email);option.value=person.user_id;control.append(option);}if(currentId&&!people.some(p=>p.user_id===currentId)){const option=el('option',(current?.responsibilities.stages[id]?.owner?.name||'Responsable anterior')+' (no elegible)');option.value=currentId;option.disabled=true;control.append(option);}control.value=currentId;}
++   if(!people.length)ownersGroup.append(el('p','No hay personas elegibles. Revisá las responsabilidades en Equipo antes de asignar.','d-field__help'));
++  }else{for(const [id,control]of Object.entries(owners)){const person=current?.responsibilities.stages[id]?.owner;if(person){const option=el('option',person.name);option.value=person.id;control.append(option);control.value=person.id;}control.disabled=true;}ownersGroup.append(el('p',fresh?'Podés crear el Case con Owner pendiente. Un Admin debe completar la asignación antes de ejecutar decisiones.':'La asignación está administrada por un Admin.','d-field__help'));}
++  const collect=()=>({id:draft.id,name:name.value.trim(),description:description.value.trim(),model_id:modelSelect.value,logistics_model_version_id:versionSelect.value,
++   planning_start:start.value,planning_end:end.value,horizon_type:type.value,operating_mode:mode.value,expected_updated_at:draft.expected_updated_at,
++   decision_owner_user_id:owners.initial?.value||'',owners:Object.fromEntries(['logistics_assignment','logistics_scheduling'].map(id=>[id,{id:owners[id]?.value||draft.owners[id].id,updated_at:draft.owners[id].updated_at}])),policy_values:policyUI.draft()});
++  kit.setCollector(collect,()=>{const errors=mathEditable?policyUI.validate():{};if(start.value&&end.value&&start.value>end.value)errors.planning_end='La fecha de fin debe ser igual o posterior a la de inicio.';if(fresh&&!versionSelect.value)errors.model_version_id='Elegí una Model Version publicada.';if(fresh&&canAssign&&!owners.initial.value)errors.decision_owner_user_id='Elegí un Decision Owner activo y elegible.';return errors;});
++  kit.finish();if(!editable){for(const control of form.querySelectorAll('input,select,textarea,button'))control.disabled=true;kit.status.textContent='Contexto de sólo lectura.';}
++  if(saved)kit.status.textContent='Borrador recuperado. La versión guardada se mantiene hasta que apliques los cambios.';
++  await models();
++  if(!scope.active)return;form.inert=false;form.removeAttribute('aria-busy');if(!saved)kit.markSaved();root.dataset.ultimateReady='true';
++ }catch(error){if(scope.active)errorBox(root,error,()=>navigate('logistics-case-setup',{caseId:route.caseId,modelId:route.modelId,replace:true}));}
++}
+--- post-T2/backend/app/static/js/dispatch/models/entry.mjs
++++ T3/backend/app/static/js/dispatch/models/entry.mjs
+@@ -0,0 +1,18 @@
++import {api} from '../shared.mjs';
++import {createScope} from '../lifecycle.mjs';
++import {ensureStylesheet} from '../styles.mjs';
++import {el,button} from './forms.mjs';
++export function mountFoundationEntry(){
++ const anchor=document.querySelector('[data-view-panel="logistics-overview"] .dda-landing__hero');if(!anchor)return;
++ const host=el('section',undefined,'d-platform d-card ultimate-entry');host.hidden=true;host.setAttribute('aria-label','Models y contexto de Logística');anchor.after(host);
++ const scope=createScope(host);let generation=0;
++ async function refresh(){host.hidden=true;const own=++generation;
++  try{const caps=await api('/api/platform/ultimate-foundation/capabilities',{signal:scope.signal});if(!scope.active||own!==generation||!caps.enabled)return;
++   await ensureStylesheet('ultimate-foundation-styles','/static/css/ultimate-foundation.css','t3-v1');if(!scope.active||own!==generation)return;
++   const actions=el('div',undefined,'platform-actions');actions.append(button('Logistics Models',()=>window.dationNavigate('logistics-models')));
++   if(caps.can_create_case)actions.append(button('Crear Case sin archivos',()=>window.DationDispatch.openCase(null,'logistics-case-setup'),'primary'));
++   host.replaceChildren(el('h2','Planificá desde el contexto','d-card-title'),el('p','Reutilizá un Model publicado y guardá el Case antes de cargar datos.','d-body'),actions);host.hidden=false;
++  }catch{if(scope.active&&own===generation)host.hidden=true;}
++ }
++ scope.listen(window,'dation:identity',refresh);scope.listen(window,'pagehide',()=>scope.dispose());refresh();return scope;
++}
+--- post-T2/backend/app/static/js/dispatch/models/forms.mjs
++++ T3/backend/app/static/js/dispatch/models/forms.mjs
+@@ -0,0 +1,72 @@
++// T3 composition of Dation's existing form/control classes, not a second design system.
++import {mountDialog} from '../../platform/components.mjs';
++import {draftSignature} from './setup-values.mjs';
++export {percentToRatio,ratioToPercent} from './setup-values.mjs';
++export const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};
++export function button(text,run,kind='secondary'){const b=el('button',text,'d-button d-button--'+kind);b.type='button';if(run)b.addEventListener('click',run);return b;}
++export function field(parent,label,{name,type='text',value='',options,required=false,maxLength,help,readOnly=false}={}){
++ const host=el('div',undefined,'d-field'),id='ultimate-'+name,caption=el('label',label,'d-field__label');caption.htmlFor=id;
++ const input=el(options?'select':type==='textarea'?'textarea':'input',undefined,options?'d-select':type==='textarea'?'d-textarea':'d-input');input.id=id;input.name=name;
++ if(!options&&type!=='textarea')input.type=type;
++ if(options)for(const [v,text]of options){const o=el('option',text);o.value=v;input.append(o);}
++ input.value=value??'';input.required=required;if(maxLength)input.maxLength=maxLength;if(readOnly)input.readOnly=true;
++ const error=el('p',undefined,'d-field__error');error.id=id+'-error';error.dataset.errorFor=name;
++ const hint=el('p',help||'', 'd-field__help');hint.id=id+'-help';input.setAttribute('aria-describedby',hint.id+' '+error.id);
++ host.append(caption,input,hint,error);parent.append(host);return input;
++}
++export function section(form,title,copy){const node=el('fieldset',undefined,'d-card ultimate-section'),legend=el('legend',title,'d-card-title');node.append(legend);if(copy)node.append(el('p',copy,'d-metadata'));const body=el('div',undefined,'ultimate-grid');node.append(body);form.append(node);return body;}
++export function choices(parent,title,name,options,values){
++ const box=el('fieldset',undefined,'ultimate-choices');box.append(el('legend',title,'d-field__label'));
++ for(const [v,text]of options){const label=el('label',undefined,'d-choice'),input=el('input',undefined,'d-check');input.type='checkbox';input.name=name;input.value=v;input.checked=values.includes(v);label.append(input,el('span',text,'d-choice__copy'));box.append(label);}
++ parent.append(box);return ()=>[...box.querySelectorAll('input:checked')].map(n=>n.value);
++}
++export function pageHeader(root,title,copy){const header=el('header',undefined,'d-page-header'),text=el('div',undefined,'d-page-header__copy');text.append(el('p','DDA Logística','d-eyebrow'),el('h1',title,'d-page-title'),el('p',copy,'d-page-description'));header.append(text);root.append(header);return header;}
++
++export function draftStore(kind,id='new'){
++ const identity=window.dationSession?.identity,key=['dation.ultimate.setup.v1',identity?.membership?.workspace_id,identity?.profile?.id,kind,id].join('.');
++ return {read(){try{return JSON.parse(sessionStorage.getItem(key)||'null');}catch{return null;}},write(value){try{sessionStorage.setItem(key,JSON.stringify(value));}catch{}},clear(){try{sessionStorage.removeItem(key);}catch{}}};
++}
++
++export function mountForm(root,scope,{initial,store,onSave,onReload,submitLabel='Guardar cambios'}){
++ const form=el('form',undefined,'ultimate-form');form.noValidate=true;form.setAttribute('aria-label',submitLabel);
++ const errors=el('div',undefined,'ultimate-errors');errors.hidden=true;errors.role='alert';errors.tabIndex=-1;form.append(errors);root.append(form);
++ const footer=el('footer',undefined,'d-card ultimate-footer'),status=el('p','Sin cambios pendientes.','d-metadata');status.role='status';status.setAttribute('aria-live','polite');
++ const submit=el('button',submitLabel,'d-button d-button--primary');submit.type='submit';footer.append(status,submit);
++ let collect=()=>initial,check=()=>({}),busy=false,clean=draftSignature(initial),dirty=false;
++ const saveDraft=()=>{const value=collect();dirty=draftSignature(value)!==clean;if(dirty)store?.write(value);else store?.clear();status.textContent=dirty?'Cambios sin guardar. El borrador se conserva en este navegador.':'Sin cambios pendientes.';};
++ const inline=(name,message)=>{const input=form.elements.namedItem(name);const error=form.querySelector('[data-error-for="'+name+'"]');if(error)error.textContent=message||'';if(input?.setAttribute){if(message){input.setAttribute('aria-invalid','true');const details=input.closest('details');if(details)details.open=true;}else input.removeAttribute('aria-invalid');}};
++ const showErrors=values=>{
++  for(const item of form.querySelectorAll('[data-error-for]'))inline(item.dataset.errorFor,'');
++  errors.replaceChildren();const entries=Object.entries(values).filter(([,v])=>v);errors.hidden=!entries.length;
++  if(entries.length){errors.append(el('h2','Revisá estos campos','d-card-title'));for(const [name,message]of entries){inline(name,message);const link=el('a',message);link.href='#ultimate-'+name;link.addEventListener('click',e=>{e.preventDefault();form.elements.namedItem(name)?.focus?.();});errors.append(link);}errors.focus();}
++ };
++ const conflict=message=>{status.textContent=message;status.role='alert';if(onReload&&!footer.querySelector('[data-conflict-reload]')){const b=button('Descartar borrador y recargar',async()=>{if(await confirmAction(root,scope,'Descartar el borrador','Se cargarán los datos guardados. Tus cambios pendientes se descartarán.','Descartar y recargar')){store?.clear();dirty=false;await onReload();}});b.dataset.conflictReload='true';footer.append(b);}};
++ scope.listen(form,'input',saveDraft);scope.listen(form,'change',saveDraft);
++ scope.listen(form,'focusout',event=>{const n=event.target;if(n.matches?.('input,select,textarea'))inline(n.name,n.validity.valid?'':n.validationMessage);});
++ scope.listen(form,'submit',async event=>{
++  event.preventDefault();if(busy)return;
++  const values={};for(const n of form.querySelectorAll('input,select,textarea'))if(!n.disabled&&!n.validity.valid)values[n.name]=n.validationMessage;
++  Object.assign(values,check());showErrors(values);if(Object.values(values).some(Boolean))return;
++  busy=true;submit.disabled=true;submit.setAttribute('aria-busy','true');status.textContent='Guardando…';
++  try{await onSave(collect());if(scope.active){store?.clear();dirty=false;clean=draftSignature(collect());status.textContent='Cambios guardados.';}}
++  catch(error){if(scope.active){status.textContent=error.status===409?'La versión guardada cambió. Tu borrador se conserva; revisá la versión actual antes de reintentar.':error.message;status.role='alert';
++   if(error.status===409)conflict(status.textContent);
++  }}finally{busy=false;if(scope.active){submit.disabled=false;submit.removeAttribute('aria-busy');}}
++ });
++ const beforeUnload=e=>{if(dirty){e.preventDefault();e.returnValue='';}};scope.listen(window,'beforeunload',beforeUnload);
++ const leave=()=>!dirty||window.confirm('Tenés cambios sin guardar. El borrador se conservará en este navegador. ¿Querés salir?');
++ window.dationUltimateCanLeave=leave;scope.own(()=>{if(window.dationUltimateCanLeave===leave)delete window.dationUltimateCanLeave;});
++ return {form,footer,status,submit,conflict,setCollector(fn,validate=()=>({})){collect=fn;check=validate;dirty=draftSignature(collect())!==clean;},finish(){form.append(footer);},markSaved(){store?.clear();dirty=false;clean=draftSignature(collect());},get dirty(){return dirty;},showErrors};
++}
++
++export function confirmAction(root,scope,title,copy,action='Confirmar'){
++ return new Promise(resolve=>{
++  const dialog=el('dialog',undefined,'d-modal'),header=el('h2',title,'d-modal__title');header.id='ultimate-dialog-title';dialog.setAttribute('aria-labelledby',header.id);
++  const body=el('div',undefined,'d-modal__body'),actions=el('div',undefined,'d-modal__actions');body.append(header,el('p',copy,'d-body'));
++  const cancel=button('Cancelar',()=>mounted.close('cancel')),yes=button(action,()=>mounted.close('confirm'),'primary');actions.append(cancel,yes);dialog.append(body,actions);root.append(dialog);
++  const mounted=mountDialog({dialog,initialFocus:cancel});let settled=false;
++  const finish=value=>{if(settled)return;settled=true;mounted.dispose();dialog.remove();resolve(value);};
++  dialog.addEventListener('close',()=>finish(dialog.returnValue==='confirm'),{once:true});scope.own(()=>finish(false));mounted.open();
++ });
++}
++
+--- post-T2/backend/app/static/js/dispatch/models/index.mjs
++++ T3/backend/app/static/js/dispatch/models/index.mjs
+@@ -0,0 +1,81 @@
++import {api,post,errorBox} from '../shared.mjs';
++import {scopeFor} from '../lifecycle.mjs';
++import {ensureStylesheet} from '../styles.mjs';
++import {loadingState} from '../../platform/components.mjs';
++import {el,button,field,section,choices,pageHeader,draftStore,mountForm,confirmAction} from './forms.mjs';
++
++export const ROLES=[['SHIPPER','Generador de carga'],['LOGISTICS_PROVIDER','Proveedor logístico'],['HYBRID','Operación híbrida']];
++export const DIMENSIONS=[['pallets','Pallets'],['weight_kg','Peso (kg)'],['volume_m3','Volumen (m³)'],['units','Unidades']];
++export const defaultConfiguration=currency=>({version:1,operating_role:'SHIPPER',transport_pattern:'DIRECT',allowed_sources:['OWN','EXTERNAL'],
++ active_dimensions:['pallets'],primary_dimension:'pallets',split_permitted:false,homogeneous_loads_declared:false,
++ currency_policy:{currency:currency||'ARS',minor_units:2,rounding:'ROUND_HALF_UP'},own_cost_model:'OWN_OPERATING_CYCLE',external_cost_models:['PER_TRIP','PER_KM'],per_km_billing_bases:['ONE_WAY','ROUND_TRIP']});
++
++export async function mountModels(root,{route,navigate}){
++ delete root.dataset.ultimateReady;
++ const scope=scopeFor(root);await ensureStylesheet('ultimate-foundation-styles','/static/css/ultimate-foundation.css','t3-v1');if(!scope.active)return;
++ root.className='dispatch d-platform ultimate-foundation';root.append(loadingState('Cargando Logistics Models…'));
++ try{
++  const caps=await api('/api/platform/ultimate-foundation/capabilities',{signal:scope.signal});if(!scope.active)return;
++  if(route.modelId)await editor(caps);else await library(caps);
++ }catch(error){if(scope.active)errorBox(root,error,()=>navigate('logistics-models',{modelId:route.modelId}));}
++ async function library(caps){
++  let offset=0,search='';root.replaceChildren();const header=pageHeader(root,'Logistics Models','Una configuración reusable de tu operación. Publicá versiones para usarlas en distintos Cases sin modificar su historia.');
++  const actions=el('div',undefined,'d-page-header__actions');if(caps.can_manage_models)actions.append(button('Crear Model',()=>navigate('logistics-models',{modelId:'new'}),'primary'));
++  if(caps.can_create_case)actions.append(button('Crear Decision Case',()=>navigate('logistics-case-setup',{caseId:null})));header.append(actions);
++  const toolbar=el('form',undefined,'ultimate-toolbar'),q=field(toolbar,'Buscar Models',{name:'model_search',type:'search',maxLength:120});const find=button('Buscar',()=>{search=q.value;offset=0;load();});toolbar.append(find);scope.listen(toolbar,'submit',e=>{e.preventDefault();find.click();});root.append(toolbar);
++  const list=el('div',undefined,'ultimate-list'),pager=el('div',undefined,'ultimate-actions');root.append(list,pager);let generation=0;
++  async function load(){const own=++generation;list.replaceChildren(loadingState('Cargando Models…'));try{const result=await api('/api/platform/logistics-models?'+new URLSearchParams({q:search,limit:25,offset,include_archived:'true'}),{signal:scope.signal});if(!scope.active||own!==generation)return;
++   list.replaceChildren();if(!result.items.length)list.append(el('p',search?'No hay Models que coincidan. Probá otro nombre.':'Todavía no hay Models. Un Admin puede crear y publicar la primera versión.','d-card d-body'));
++   for(const m of result.items){const card=el('article',undefined,'d-card ultimate-model-card'),copy=el('div');copy.append(el('h2',m.name,'d-card-title'),el('p',m.description||'Configuración de operación logística.','d-body'),el('p',(m.status==='archived'?'Archivado · ':'')+(m.versions.length?m.versions.length+' '+(m.versions.length===1?'versión publicada':'versiones publicadas'):'Sin versiones publicadas'),'d-metadata'));
++    card.append(copy,button('Abrir Model',()=>navigate('logistics-models',{modelId:m.id})));list.append(card);}
++   pager.replaceChildren(button('Anterior',()=>{offset=Math.max(0,offset-25);load();}),el('span',result.total+' Models','d-metadata'),button('Siguiente',()=>{offset+=25;load();}));pager.firstChild.disabled=offset===0;pager.lastChild.disabled=offset+25>=result.total;
++  }catch(error){if(scope.active&&own===generation)errorBox(list,error,load);}}await load();if(scope.active)root.dataset.ultimateReady='true';
++ }
++ async function editor(caps){
++  const fresh=route.modelId==='new';if(fresh&&!caps.can_manage_models)throw Object.assign(new Error('Sólo un Admin puede crear Models.'),{status:403});
++  const data=fresh?null:await api('/api/platform/logistics-models/'+route.modelId,{signal:scope.signal});if(!scope.active)return;
++  const store=draftStore('model',route.modelId),base=data?.model,saved=store.read();
++  const initial={id:base?.id||crypto.randomUUID(),name:base?.name||'',description:base?.description||'',status:base?.status||'active',expected_revision:base?.revision||1,
++   configuration:base?.draft_config_jsonb||defaultConfiguration(window.dationSession.identity.workspace.currency)};
++  const draft=saved||initial;let publishedIntent=saved?.publish_intent||null;
++  root.replaceChildren();const header=pageHeader(root,fresh?'Crear Logistics Model':base.name,'El borrador puede cambiar. Cada publicación conserva una versión inmutable para los Cases que la utilizan.');header.append(button('Volver a Models',()=>navigate('logistics-models',{modelId:null})));
++  const kit=mountForm(root,scope,{initial,store,submitLabel:fresh?'Crear Model':'Guardar borrador',onReload:()=>navigate('logistics-models',{modelId:route.modelId,replace:true}),onSave:async value=>{
++   const body={name:value.name,description:value.description||null,configuration:value.configuration};let result;
++   if(fresh)result=await post('/api/platform/logistics-models',{id:value.id,...body},{signal:scope.signal});
++   else result=await api('/api/platform/logistics-models/'+base.id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({...body,status:value.status,expected_revision:value.expected_revision}),signal:scope.signal});
++   kit.markSaved();if(scope.active)await navigate('logistics-models',{modelId:result.model.id,replace:true});
++  }});
++  const form=kit.form,identity=section(form,'Identidad del Model'),name=field(identity,'Nombre del Model',{name:'model_name',value:draft.name,required:true,maxLength:120}),description=field(identity,'Descripción (opcional)',{name:'model_description',type:'textarea',value:draft.description,maxLength:1000});
++  const status=field(identity,'Estado',{name:'model_status',options:[['active','Activo'],['archived','Archivado']],value:draft.status});
++  const config=draft.configuration,operation=section(form,'Operación y recursos','El rol describe la operación. Los permisos y el motor de decisión se mantienen iguales para todos los roles.');
++  const role=field(operation,'Operating Role',{name:'operating_role',options:ROLES,value:config.operating_role}),pattern=field(operation,'Patrón de transporte',{name:'transport_pattern',value:'Directo · origen a destino',readOnly:true});
++  const sources=choices(operation,'Fuentes de recursos','sources',[['OWN','Propios'],['EXTERNAL','Externos']],config.allowed_sources);
++  const dimensions=choices(operation,'Dimensiones de capacidad','dimensions',DIMENSIONS,config.active_dimensions),primary=field(operation,'Dimensión principal de reporte',{name:'primary_dimension',options:DIMENSIONS,value:config.primary_dimension});
++  const split=choices(operation,'Comportamiento de carga','split',[['yes','Permitir fraccionamiento de órdenes']],config.split_permitted?['yes']:[]);
++  const homogeneous=choices(operation,'Compatibilidad','homogeneous',[['yes','Declarar cargas homogéneas']],config.homogeneous_loads_declared?['yes']:[]);
++  operation.append(el('p','Sin declaración de homogeneidad, la compatibilidad de consolidación debe ser explícita. Los viajes son directos; no incluyen multiparada.','d-field__help'));
++  const costs=section(form,'Moneda y reglas de costo','Las tarifas concretas se informan con los recursos. Un costo desconocido no se convierte en cero.');
++  const currency=field(costs,'Moneda',{name:'currency',value:config.currency_policy.currency,required:true,maxLength:3}),minor=field(costs,'Decimales monetarios',{name:'minor_units',options:Array.from({length:7},(_,i)=>[String(i),String(i)]),value:String(config.currency_policy.minor_units)});
++  field(costs,'Costo de recursos propios',{name:'own_cost',value:'Costo operativo del ciclo directo',readOnly:true});
++  const external=choices(costs,'Tarifas externas permitidas','external_costs',[['PER_TRIP','Por viaje'],['PER_KM','Por kilómetro']],config.external_cost_models),billing=choices(costs,'Base de facturación por km','billing',[['ONE_WAY','Sólo ida'],['ROUND_TRIP','Ida y vuelta']],config.per_km_billing_bases);
++  const collect=()=>({id:draft.id,expected_revision:draft.expected_revision,name:name.value.trim(),description:description.value.trim(),status:status.value,configuration:{version:1,operating_role:role.value,transport_pattern:'DIRECT',allowed_sources:sources(),active_dimensions:dimensions(),primary_dimension:primary.value,split_permitted:split().length>0,homogeneous_loads_declared:homogeneous().length>0,currency_policy:{currency:currency.value.trim().toUpperCase(),minor_units:Number(minor.value),rounding:'ROUND_HALF_UP'},own_cost_model:'OWN_OPERATING_CYCLE',external_cost_models:external(),per_km_billing_bases:billing()}});
++  kit.setCollector(collect,()=>{const c=collect().configuration,e={};if(!c.allowed_sources.length)e.operating_role='Elegí al menos una fuente de recursos.';if(!c.active_dimensions.includes(c.primary_dimension))e.primary_dimension='La dimensión principal debe estar activa.';if(!/^[A-Z]{3}$/.test(c.currency_policy.currency))e.currency='Ingresá una moneda de tres letras, por ejemplo ARS.';if(c.allowed_sources.includes('EXTERNAL')&&!c.external_cost_models.length)e.own_cost='Elegí una tarifa externa permitida.';if(c.external_cost_models.includes('PER_KM')&&!c.per_km_billing_bases.length)e.own_cost='Elegí una base de facturación por kilómetro.';return e;});
++  kit.finish();if(!caps.can_manage_models){for(const n of form.querySelectorAll('input,select,textarea,button'))n.disabled=true;kit.status.textContent='Sólo un Admin puede editar o publicar el Model.';}
++  if(saved)kit.status.textContent=base&&draft.expected_revision!==base.revision?'Hay un borrador de una revisión anterior. Se conserva para que puedas revisarlo.':'Borrador recuperado en este navegador.';
++  if(data){
++   const history=el('section',undefined,'d-card ultimate-section');history.append(el('h2','Versiones publicadas','d-section-title'),el('p','Una nueva versión no cambia los Cases que ya utilizan una anterior.','d-body'));
++   if(!data.versions.length)history.append(el('p','Todavía no hay versiones publicadas.','d-metadata'));
++   for(const v of data.versions){const row=el('div',undefined,'ultimate-version');row.append(el('strong','Versión '+v.version),el('span',ROLES.find(([id])=>id===v.config_jsonb.operating_role)?.[1]||v.config_jsonb.operating_role,'d-metadata'),el('span',v.config_jsonb.currency_policy?.currency||'','d-metadata'));if(caps.can_create_case&&base.status==='active')row.append(button('Crear Case con este Model',()=>navigate('logistics-case-setup',{caseId:null,modelId:base.id})));history.append(row);}
++   if(caps.can_manage_models&&base.status==='active'){
++    const publish=button('Publicar nueva versión',async()=>{
++     if(kit.dirty){kit.status.textContent='Guardá el borrador antes de publicar.';return;}
++     if(!await confirmAction(root,scope,'Publicar una nueva versión','La configuración guardada quedará inmutable. Las versiones y los Cases anteriores se conservarán.','Publicar versión'))return;
++     publishedIntent ||= {version_id:crypto.randomUUID(),expected_revision:base.revision};store.write({...collect(),publish_intent:publishedIntent});publish.disabled=true;publish.setAttribute('aria-busy','true');
++     try{await post('/api/platform/logistics-models/'+base.id+'/versions',publishedIntent,{signal:scope.signal});kit.markSaved();if(scope.active)await navigate('logistics-models',{modelId:base.id,replace:true});}
++     catch(error){if(scope.active){if(error.status===409)kit.conflict('El Model cambió. Tu borrador se conserva. Recargá la versión guardada antes de publicar.');else{kit.status.textContent=error.message;kit.status.role='alert';}publish.disabled=false;publish.removeAttribute('aria-busy');}}
++    },'primary');history.append(publish);
++   }root.append(history);
++  }
++  if(!saved)kit.markSaved();root.dataset.ultimateReady='true';
++ }
++}
+--- post-T2/backend/app/static/js/dispatch/models/policy.mjs
++++ T3/backend/app/static/js/dispatch/models/policy.mjs
+@@ -0,0 +1,27 @@
++import {el,field,section,percentToRatio,ratioToPercent} from './forms.mjs';
++export const GOALS=[['MINIMIZE_COST','Minimizar costo'],['MAXIMIZE_SERVICE','Maximizar servicio'],['MAXIMIZE_OWN_CAPACITY','Maximizar capacidad propia'],['MINIMIZE_TRIPS','Minimizar viajes'],['BALANCED','Balanceado'],['CUSTOM','Personalizado']];
++const GUARDS=[['MINIMUM_DEMAND_COVERAGE','Cobertura mínima de demanda'],['CRITICAL_DEMAND_COVERAGE','Cobertura de demanda crítica'],['MAXIMUM_EXTERNAL_SHARE','Participación externa máxima'],['MINIMUM_OWN_SHARE','Participación propia mínima']];
++const PREFS=[['COST','Costo'],['TRIPS','Viajes'],['SERVICE','Servicio'],['OWN_CAPACITY','Capacidad propia']];
++export function policyInputValues(policy){
++ return {goal:policy.primary_goal,guards:Object.fromEntries(GUARDS.map(([kind])=>[kind,{enabled:(policy.guardrails||[]).some(x=>x.kind===kind),percent:ratioToPercent(policy.guardrails?.find(x=>x.kind===kind)?.limit??(kind.startsWith('MAXIMUM')?'1':'0'))}])),weights:Object.fromEntries(PREFS.map(([kind])=>[kind,ratioToPercent(policy.preferences?.find(x=>x.kind===kind)?.weight??'.25')]))};
++}
++export function mountPolicy(form,scope,policy={version:1,primary_goal:'MINIMIZE_COST',guardrails:[],preferences:[]},{readOnly=false,draftValues}={}){
++ const body=section(form,'Objetivo global y reglas','El objetivo orienta la decisión. Los límites obligatorios y las preferencias se guardan por separado.');
++ const goal=field(body,'Objetivo global',{name:'primary_goal',options:GOALS,value:draftValues?.goal||policy.primary_goal,required:true});goal.disabled=readOnly;
++ const details=el('details',undefined,'ultimate-policy'),summary=el('summary','Límites obligatorios y preferencias');details.append(summary);body.append(details);
++ const guards=el('div',undefined,'ultimate-grid');details.append(guards);
++ const controls=GUARDS.map(([kind,label])=>{
++  const wrap=el('div',undefined,'d-field'),choice=el('label',undefined,'d-choice'),check=el('input',undefined,'d-check');check.type='checkbox';check.name='enable_'+kind;check.checked=(policy.guardrails||[]).some(x=>x.kind===kind);check.disabled=readOnly;choice.append(check,el('span',label));wrap.append(choice);guards.append(wrap);
++  if(draftValues?.guards?.[kind])check.checked=draftValues.guards[kind].enabled;
++  const value=field(wrap,label+' (%)',{name:'guard_'+kind,type:'number',value:draftValues?.guards?.[kind]?.percent??ratioToPercent(policy.guardrails?.find(x=>x.kind===kind)?.limit??(kind.startsWith('MAXIMUM')?'1':'0'))});value.min='0';value.max='100';value.step='.01';value.disabled=readOnly||!check.checked;
++  scope.listen(check,'change',()=>value.disabled=readOnly||!check.checked);return {kind,check,value};
++ });
++ const prefs=el('div',undefined,'ultimate-grid');details.append(prefs);
++ const weights=PREFS.map(([kind,label])=>{const value=field(prefs,label+' (%)',{name:'weight_'+kind,type:'number',value:draftValues?.weights?.[kind]??ratioToPercent(policy.preferences?.find(x=>x.kind===kind)?.weight??'.25')});value.min='0';value.max='100';value.step='.01';return {kind,value};});
++ function update(){prefs.hidden=goal.value!=='CUSTOM';for(const w of weights)w.value.disabled=readOnly||goal.value!=='CUSTOM';}scope.listen(goal,'change',update);update();
++ return {draft(){return {goal:goal.value,guards:Object.fromEntries(controls.map(x=>[x.kind,{enabled:x.check.checked,percent:x.value.value}])),weights:Object.fromEntries(weights.map(x=>[x.kind,x.value.value]))};},read(){return {version:1,primary_goal:goal.value,guardrails:controls.filter(x=>x.check.checked).map(x=>({kind:x.kind,hard:true,limit:percentToRatio(x.value.value)})),preferences:goal.value==='CUSTOM'?weights.map(x=>({kind:x.kind,weight:percentToRatio(x.value.value)})):[]};},validate(){
++  const errors={};for(const c of controls)if(c.check.checked)try{percentToRatio(c.value.value);}catch(e){errors[c.value.name]=e.message;}
++  if(goal.value==='CUSTOM'){try{const total=weights.reduce((sum,x)=>sum+Math.round(Number(percentToRatio(x.value.value))*10000),0);if(total!==10000)errors.weight_COST='Las preferencias deben sumar 100 %.';}catch(e){errors.weight_COST=e.message;}}
++  return errors;
++ }};
++}
+--- post-T2/backend/app/static/js/dispatch/models/setup-values.mjs
++++ T3/backend/app/static/js/dispatch/models/setup-values.mjs
+@@ -0,0 +1,17 @@
++// Pure setup value conversions. No runtime, graph or permission selection.
++export function draftSignature(value){
++ return JSON.stringify(value,(_key,item)=>item&&typeof item==='object'&&!Array.isArray(item)?Object.fromEntries(Object.keys(item).sort().map(key=>[key,item[key]])):item);
++}
++export function horizonEnd(start,type){
++ if(!/^\d{4}-\d{2}-\d{2}$/.test(start)||type==='CUSTOM')return null;
++ const date=new Date(start+'T12:00:00Z');if(Number.isNaN(date.valueOf()))return null;
++ if(type==='WEEKLY')date.setUTCDate(date.getUTCDate()+6);
++ if(type==='MONTHLY')date.setUTCMonth(date.getUTCMonth()+1,0);
++ return date.toISOString().slice(0,10);
++}
++export function percentToRatio(value){
++ if(!/^(?:100(?:\.0{1,2})?|[0-9]{1,2}(?:\.[0-9]{1,2})?)$/.test(String(value)))throw new Error('Ingresá un porcentaje de 0 a 100, con hasta dos decimales.');
++ const [integer,fraction='']=String(value).split('.'),basis=Number(integer)*100+Number(fraction.padEnd(2,'0'));
++ return basis===10000?'1':('0.'+String(basis).padStart(4,'0')).replace(/0+$/,'').replace(/\.$/,'');
++}
++export function ratioToPercent(value){return String(Math.round(Number(value)*10000)/100);}
+--- post-T2/backend/app/static/js/dispatch/navigation/resource.mjs
++++ T3/backend/app/static/js/dispatch/navigation/resource.mjs
+@@ -1,5 +1,5 @@
+-export const PLATFORM_PATHS=Object.freeze({'platform-home':'/app',inicio:'/app/ddas','platform-decisions':'/app/decisions','platform-data':'/app/data','platform-team':'/app/team',settings:'/app/settings',profile:'/app/profile','logistics-overview':'/app/ddas/logistics',overview:'/app/ddas/logistics','logistics-data':'/app/ddas/logistics/data','logistics-map':'/app/ddas/logistics/decisions','logistics-config':'/app/ddas/logistics/configure','decision-dashboard':'/app/ddas/logistics/dashboard',traceability:'/app/history',library:'/app/history'});
+-export const VIEWS=['platform-home','platform-decisions','platform-data','platform-team','profile','inicio','logistics-overview','traceability','overview','logistics-data','logistics-map','logistics-config','decision-dashboard','library','settings'];
++export const PLATFORM_PATHS=Object.freeze({'platform-home':'/app',inicio:'/app/ddas','platform-decisions':'/app/decisions','platform-data':'/app/data','platform-team':'/app/team',settings:'/app/settings',profile:'/app/profile','logistics-overview':'/app/ddas/logistics',overview:'/app/ddas/logistics','logistics-data':'/app/ddas/logistics/data','logistics-map':'/app/ddas/logistics/decisions','logistics-config':'/app/ddas/logistics/configure','decision-dashboard':'/app/ddas/logistics/dashboard',traceability:'/app/history',library:'/app/history','logistics-models':'/app/ddas/logistics/models','logistics-case-setup':'/app/ddas/logistics/case'});
++export const VIEWS=['platform-home','platform-decisions','platform-data','platform-team','profile','inicio','logistics-overview','traceability','overview','logistics-data','logistics-map','logistics-config','decision-dashboard','library','settings','logistics-models','logistics-case-setup'];
+ export const NODES=['logistics_assignment','logistics_scheduling','logistics_final_assignment'];
+ const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+ import {HUB_KEYS,readHubResource,writeHubResource} from '../../platform/data-resource.mjs';
+@@ -21,14 +21,19 @@
+   if(resource.view==='platform-data')resource.hub=readHubResource(parsed);
+   if(resource.view==='platform-decisions')resource.center=readCenterResource(parsed);
+   if(resource.view==='settings')resource.settingsTab=readSettingsTab(parsed);
++  if(['logistics-models','logistics-case-setup'].includes(resource.view)){
++    resource.modelId=q.get('model_id');
++    if(resource.modelId&&!UUID.test(resource.modelId)&&!(resource.view==='logistics-models'&&resource.modelId==='new'))throw new Error('El Model del enlace no es válido.');
++  }
+   return resource;
+ }
+ export function resourceUrl(url,resource){
+   const next=new URL(url,'http://localhost');
+-  for(const key of ['view','case_id','node_id','run_id','dda','settings_tab',...HUB_KEYS,...CENTER_KEYS])next.searchParams.delete(key);
++  for(const key of ['view','case_id','node_id','run_id','dda','settings_tab','model_id',...HUB_KEYS,...CENTER_KEYS])next.searchParams.delete(key);
+   next.pathname=PLATFORM_PATHS[resource.view]||'/app';
+   next.searchParams.set('view',resource.view);
+-  if(resource.caseId&&['overview','logistics-overview','logistics-data','logistics-map','logistics-config','decision-dashboard','traceability','library'].includes(resource.view))next.searchParams.set('case_id',resource.caseId);
++  if(resource.caseId&&['overview','logistics-overview','logistics-data','logistics-map','logistics-config','decision-dashboard','traceability','library','logistics-case-setup'].includes(resource.view))next.searchParams.set('case_id',resource.caseId);
++  if(resource.modelId&&['logistics-models','logistics-case-setup'].includes(resource.view))next.searchParams.set('model_id',resource.modelId);
+   if(['logistics-config','decision-dashboard'].includes(resource.view)&&resource.nodeId)next.searchParams.set('node_id',resource.nodeId);
+   if(resource.view==='decision-dashboard'&&resource.runId)next.searchParams.set('run_id',resource.runId);
+   if(resource.view==='platform-data')writeHubResource(next,resource.hub);
+--- post-T2/backend/app/static/js/dispatch/workspace.mjs
++++ T3/backend/app/static/js/dispatch/workspace.mjs
+@@ -14,6 +14,7 @@
+ import {responsibilityProblem} from './cases/workflow-responsibility.mjs';
+ import {confirmNewRun} from './runs/new-run-warning.mjs';
+ import {currentLogisticsEnabled,logisticsView} from '../platform/entitlements.mjs';
++import {mountFoundationEntry} from './models/entry.mjs';
+ 
+ const KEY='dation.dispatch.workspace.v5';
+ const NAV_VERSION='workspace-nav-v1';
+@@ -798,6 +799,8 @@
+ }
+ 
+ for(const [key,view]of [['data','logistics-data'],['map','logistics-map'],['config','logistics-config'],['dashboard','decision-dashboard']])roots[key]=root(view,'dispatch-'+key+'-root');
++roots.models=root('logistics-models','ultimate-models-root');
++roots.caseSetup=root('logistics-case-setup','ultimate-case-setup-root');
+ 
+ async function ensurePersistedCase(generation=routeGeneration,applyIdentity=false,deferIdentity=false){
+   const current=state.decisionCase;if(!current)return;
+@@ -830,6 +833,7 @@
+ async function hydrateCase(caseId,generation=routeGeneration,expectedInputs=null){
+   const item=await api('/api/decision-cases/'+caseId,{signal:routeController?.signal});
+   if(generation!==routeGeneration)return;
++  if(item.case?.workflow_version===2)throw Object.assign(new Error('Abrí el contexto del Case Ultimate.'),{ultimateCaseId:caseId});
+   if(expectedInputs&&(state.decisionCase?.id!==caseId||inputSignature(state.orders,state.fleet)!==expectedInputs))return;
+   if(String(item.decision_case?.id)!==String(caseId)||String(item.orders?.id)!==String(item.decision_case?.inputs?.orders_dataset_id||item.case?.orders_dataset_id)||String(item.fleet?.id)!==String(item.decision_case?.inputs?.fleet_dataset_id||item.case?.fleet_dataset_id))throw new Error('El Decision Case no coincide con su Data Pack.');
+   if(state.decisionCase?.id!==caseId){saveDraft();resetAssignmentConfiguration();Object.assign(state,cleanDraft(drafts[caseId]));state.preflight=null;state.configPreview=null;state.run=null;transitionCaseId=null;}
+@@ -840,13 +844,15 @@
+   state.orders=item.orders;state.fleet=item.fleet;state.decisionCase={...item.decision_case,status:item.case.status,label:item.case.label,category:item.case.category,description:item.case.description,attributes_applied_at:item.case.attributes_applied_at,collaboration:item.collaboration,persisted:true};state.workflow=item.workflow_responsibilities||null;state.caseContext=caseContext({...item.case,context:item.context});persist();return item;
+ }
+ async function navigateResource(view,options={}){
++  if(options.history!==false&&window.dationUltimateCanLeave&&!window.dationUltimateCanLeave())return;
+   if(view==='inicio')view='platform-home';
+   if(logisticsView(view)&&!currentLogisticsEnabled()){
+     return navigateResource('inicio',{replace:true,caseId:null,nodeId:null});
+   }
+   const aliases={overview:'logistics-overview',library:'traceability'};
+   const publicView=Object.entries(aliases).find(([,value])=>value===view)?.[0]||view;
+-  const next={view:publicView,caseId:!['logistics-data','logistics-map','logistics-config','decision-dashboard'].includes(publicView)?null:options.caseId===undefined?state.decisionCase?.id||null:options.caseId,nodeId:options.nodeId===undefined?state.activeNode:options.nodeId,runId:options.runId||(publicView==='decision-dashboard'?state.run?.id||resource?.runId:null)};
++  const next={view:publicView,caseId:!['logistics-data','logistics-map','logistics-config','decision-dashboard','logistics-case-setup'].includes(publicView)?null:publicView==='logistics-case-setup'?(options.caseId||null):options.caseId===undefined?state.decisionCase?.id||null:options.caseId,nodeId:options.nodeId===undefined?state.activeNode:options.nodeId,runId:options.runId||(publicView==='decision-dashboard'?state.run?.id||resource?.runId:null)};
++  if(['logistics-models','logistics-case-setup'].includes(publicView))next.modelId=options.modelId||null;
+   saveDraft();routeController?.abort();routeController=new AbortController();const generation=++routeGeneration;
+   runPolling.stop();pollGeneration++;
+   for(const root of Object.values(roots)){disposeScope(root);root.replaceChildren();root.className='dispatch';}
+@@ -859,11 +865,16 @@
+   document.body.classList.toggle('dispatch-result',publicView==='decision-dashboard');
+   renderView(aliases[publicView]||publicView);
+   if(options.render===false)return;
+-  const root=roots[{'logistics-data':'data','logistics-map':'map','logistics-config':'config','decision-dashboard':'dashboard'}[publicView]];
++  const root=roots[{'logistics-data':'data','logistics-map':'map','logistics-config':'config','decision-dashboard':'dashboard','logistics-models':'models','logistics-case-setup':'caseSetup'}[publicView]];
+   if(!root)return;
+   root.hidden=false;
+   createScope(root);
+   try{
++    if(publicView==='logistics-models'||publicView==='logistics-case-setup'){
++      if(publicView==='logistics-models'){const {mountModels}=await import('./models/index.mjs');if(generation===routeGeneration)await mountModels(root,{route:next,navigate:navigateResource});}
++      else{const {mountCaseSetup}=await import('./cases/ultimate-case-setup.mjs');if(generation===routeGeneration)await mountCaseSetup(root,{route:next,navigate:navigateResource,onContext:result=>{state.ultimateCaseContext=result.case;window.dationRenderContextNavigation?.();}});}
++      if(generation===routeGeneration)window.dationRenderContextNavigation?.();return;
++    }
+     if(next.caseId){try{await hydrateCase(next.caseId,generation);}catch(error){if(!(error.status===404&&state.decisionCase?.id===next.caseId&&!state.decisionCase.persisted&&state.orders&&state.fleet))throw error;}}
+     if(generation!==routeGeneration)return;
+     if(publicView==='logistics-data')await loadData();
+@@ -879,7 +890,7 @@
+       if(!next.runId)throw new Error('Seleccioná una corrida para abrir su resultado.');
+       pending('recovering');poll(next.runId,pollGeneration,next.nodeId);
+     }
+-  }catch(error){if(generation===routeGeneration&&!routeController.signal.aborted)errorBox(root,error,()=>navigateResource(view,{...options,replace:true}));}
++  }catch(error){if(generation===routeGeneration&&!routeController.signal.aborted){if(error.ultimateCaseId)return navigateResource('logistics-case-setup',{caseId:error.ultimateCaseId,replace:true});errorBox(root,error,()=>navigateResource(view,{...options,replace:true}));}}
+ }
+ async function openRun(id,nodeId=state.activeNode,caseId=state.decisionCase?.id){return navigateResource('decision-dashboard',{runId:id,nodeId,caseId});}
+ async function executeConfiguredScheduling({sourceRun,configuration,options}){
+@@ -897,6 +908,7 @@
+ window.DationDispatch.openDashboard=(caseId,nodeId,runId)=>openRun(runId,nodeId,caseId);
+ window.DationDispatch.openWorkspaceSettings=settingsTab=>navigateResource('settings',{settingsTab,caseId:null,nodeId:null});
+ window.DationDispatch.reuseHubData=inputs=>startNewDecision(inputs);
++mountFoundationEntry();
+ document.body.classList.add('dispatch-enabled');
+ mountTraceability();
+ async function restoreResource(){try{const target=readResource(location.href);await navigateResource(target.view,{...target,history:false});}catch(error){if(location.pathname.replace(/\/$/,'')==='/app/settings')return navigateResource('settings',{history:false,settingsTab:'general',caseId:null,nodeId:null});if(location.pathname.replace(/\/$/,'')==='/app/data')return navigateResource('platform-data',{history:false,caseId:null,nodeId:null});if(location.pathname.replace(/\/$/,'')==='/app/decisions')return navigateResource('platform-decisions',{history:false,caseId:null,nodeId:null});document.body.classList.add('dispatch-result');renderView('decision-dashboard');roots.dashboard.hidden=false;errorBox(roots.dashboard,Object.assign(error,{kind:'navigation',actionLabel:'Volver al Data Pack'}),()=>navigate('logistics-data'));}}
+--- post-T2/backend/app/static/js/platform/dda-navigation.mjs
++++ T3/backend/app/static/js/platform/dda-navigation.mjs
+@@ -5,7 +5,8 @@
+ /** Context navigation uses the existing canonical destinations and route contract. */
+ export function renderDdaNavigation(root,{view,route,workspace={}}){
+  const currentCase=workspace.decisionCase?.id===route.caseId?workspace.decisionCase:null;
+- const signature=JSON.stringify([view,route.caseId,workspace.caseContext?.label,currentCase?.label]);
++ const ultimate=workspace.ultimateCaseContext?.id===route.caseId?workspace.ultimateCaseContext:null;
++ const signature=JSON.stringify([view,route.caseId,workspace.caseContext?.label,currentCase?.label,ultimate?.label]);
+  if(rendered.get(root)===signature&&root.firstElementChild?.tagName==='OL')return;
+  rendered.set(root,signature);root.replaceChildren();root.classList.add('dda-navigation');root.setAttribute('aria-label','Navegación del DDA');
+  const list=document.createElement('ol');root.append(list);
+@@ -13,7 +14,9 @@
+   {label:'Decision Data Assets',target:{view:'platform-home',caseId:null,nodeId:null,runId:null},state:'available'},
+   {label:'DDA Logística',target:{view:'logistics-overview',caseId:null,nodeId:null,runId:null},state:view==='logistics-overview'?'current':'available'},
+  ];
+- if(route.caseId){
++ if(view==='logistics-models')entries.push({label:'Logistics Models',target:null,state:'current'});
++ else if(view==='logistics-case-setup')entries.push({label:ultimate?.label||(route.caseId?'Contexto del Case':'Nuevo Case'),target:null,state:'current'});
++ else if(route.caseId){
+   entries.push({label:workspace.caseContext?.label||currentCase?.label||'Decision Case',target:{view:'logistics-map',caseId:route.caseId,nodeId:null,runId:null},state:view==='logistics-map'?'current':'available'});
+  }else if(view==='logistics-data'){
+   entries.push({label:'Nuevo Case',target:null,state:'current'});
+--- post-T2/backend/app/templates/app.html
++++ T3/backend/app/templates/app.html
+@@ -473,6 +473,9 @@
+           </div>
+         </section>
+ 
++        <section class="view d-platform" data-view-panel="logistics-models" aria-live="polite"></section>
++        <section class="view d-platform" data-view-panel="logistics-case-setup" aria-live="polite"></section>
++
+         <!-- CARGAR DATOS: el contenido se monta desde dispatch/upload/index.mjs -->
+         <section
+           class="view"
+@@ -1108,6 +1111,8 @@
+       function isLogisticsView(view) {
+         return (
+           view === 'logistics-overview'
++          || view === 'logistics-models'
++          || view === 'logistics-case-setup'
+           || view === 'logistics-data'
+           || view === 'logistics-map'
+           || view === 'logistics-config'
+--- post-T2/backend/tests/browser/test_ultimate_case_setup.py
++++ T3/backend/tests/browser/test_ultimate_case_setup.py
+@@ -0,0 +1,199 @@
++"""W3: new setup surfaces over actual auth/API and the full isolated SQL catalog."""
++import json
++import os
++from pathlib import Path
++import select
++import subprocess
++import unittest
++from uuid import uuid4
++
++from playwright.async_api import async_playwright
++
++ROOT=Path(__file__).resolve().parents[2]
++REPO=ROOT.parent
++ADMIN='10000000-0000-4000-8000-000000000001'
++OUT=Path(os.environ.get('DATION_T3_BROWSER_ARTIFACTS','/tmp/dation-t3-browser'))
++CONFIG=dict(version=1,operating_role='SHIPPER',transport_pattern='DIRECT',allowed_sources=['OWN','EXTERNAL'],active_dimensions=['pallets'],primary_dimension='pallets',split_permitted=False,homogeneous_loads_declared=False,currency_policy=dict(currency='ARS',minor_units=2,rounding='ROUND_HALF_UP'),own_cost_model='OWN_OPERATING_CYCLE',external_cost_models=['PER_TRIP','PER_KM'],per_km_billing_bases=['ONE_WAY','ROUND_TRIP'])
++
++
++class UltimateCaseSetupTests(unittest.IsolatedAsyncioTestCase):
++    @classmethod
++    def setUpClass(cls):
++        OUT.mkdir(parents=True,exist_ok=True)
++        cls.fixture_log=(OUT/'fixture.log').open('w')
++        env=os.environ.copy()
++        for key in ['SUPABASE_URL','SUPABASE_SECRET_KEY','SUPABASE_ACCESS_TOKEN','LLM_API_KEY','LLM_BASE_URL','GCP_ACCESS_TOKEN']:env[key]=''
++        for key in ['DOCKER_HOST','DOCKER_CONTEXT','DOCKER_TLS','DOCKER_TLS_VERIFY','DOCKER_CERT_PATH']:env.pop(key,None)
++        env.update(PYTHONDONTWRITEBYTECODE='1',DOCKER_HOST='unix:///var/run/docker.sock')
++        cls.fixture=subprocess.Popen([str(REPO/'.venv/bin/python'),'-B',str(ROOT/'tests/e2e/ultimate_setup_fixture.py')],cwd=ROOT,env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=cls.fixture_log,text=True)
++        if not select.select([cls.fixture.stdout],[],[],60)[0]:
++            cls.fixture.terminate();cls.fixture.wait(10);raise RuntimeError('Owned W3 API fixture did not become ready')
++        line=cls.fixture.stdout.readline()
++        if not line:
++            cls.fixture.wait(10);raise RuntimeError('Owned W3 fixture failed: '+(OUT/'fixture.log').read_text()[-4000:])
++        cls.base=json.loads(line)['api_url']
++    @classmethod
++    def tearDownClass(cls):
++        cls.fixture.stdin.write('stop\n');cls.fixture.stdin.flush();cls.fixture.stdin.close()
++        try:cls.fixture.wait(30)
++        except subprocess.TimeoutExpired:cls.fixture.terminate();cls.fixture.wait(10)
++        cls.fixture.stdout.close();cls.fixture_log.close()
++        if cls.fixture.returncode:raise AssertionError('W3 fixture cleanup failed')
++    async def asyncSetUp(self):
++        self.pw=await async_playwright().start();self.browser=await self.pw.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
++        self.context=await self.browser.new_context(viewport={'width':1440,'height':1000},reduced_motion='reduce')
++        await self.login(self.context)
++        self.page=await self.context.new_page();self.page.set_default_timeout(12000)
++        self.errors=[];self.page.on('pageerror',lambda error:self.errors.append(str(error)))
++    async def asyncTearDown(self):
++        if self.errors:(OUT/(self._testMethodName+'-errors.json')).write_text(json.dumps(self.errors,indent=2))
++        await self.page.screenshot(path=str(OUT/(self._testMethodName+'.png')),full_page=True,animations='disabled')
++        await self.browser.close();await self.pw.stop();self.assertEqual(self.errors,[])
++    async def login(self,context,user=1):
++        r=await context.request.post(self.base+'/auth/login',headers={'Origin':self.base},data={'email':f'user-{user}@example.test','password':'dispatch-e2e-private'})
++        self.assertEqual(r.status,200,await r.text())
++    async def request(self,method,path,body=None,context=None):
++        context=context or self.context
++        # Playwright retries only ECONNRESET here, never HTTP business failures.
++        # This fixture-only read/refresh has no Model/Case write side effect.
++        session=await context.request.post(self.base+'/auth/session',headers={'Origin':self.base},max_retries=1);self.assertEqual(session.status,200)
++        token=(await session.json())['access_token'];response=await context.request.fetch(self.base+path,method=method,headers={'Authorization':'Bearer '+token},data=body)
++        return response
++    async def api(self,method,path,body=None):
++        r=await self.request(method,path,body);self.assertTrue(r.ok,await r.text());return await r.json()
++    async def model(self,name=None):
++        m=await self.api('POST','/api/platform/logistics-models',{'id':str(uuid4()),'name':name or 'Operación '+str(uuid4())[:8],'configuration':CONFIG})
++        v=await self.api('POST','/api/platform/logistics-models/'+m['model']['id']+'/versions',{'version_id':str(uuid4()),'expected_revision':m['model']['revision']})
++        return m,v
++    async def case(self):
++        m,v=await self.model();c=await self.api('POST','/api/platform/logistics-cases',{'id':str(uuid4()),'name':'Case sin CSV','logistics_model_version_id':v['version']['id'],'planning_start':'2026-11-02','planning_end':'2026-11-08','horizon_type':'WEEKLY','operating_mode':'OPERATIONAL','case_policy':{'primary_goal':'MINIMIZE_COST'},'decision_owner_user_id':ADMIN})
++        return m,v,c
++    async def open(self,path):
++        await self.page.goto(self.base+path,wait_until='domcontentloaded',timeout=30000)
++        await self.page.locator('.ultimate-foundation[data-ultimate-ready="true"]').wait_for(timeout=30000)
++    async def test_01_ui_model_publish_case_without_csv_and_reload(self):
++        await self.open('/app/ddas/logistics/models?model_id=new')
++        await self.page.get_by_label('Nombre del Model',exact=True).fill('W3 · Distribución región sur')
++        await self.page.get_by_role('button',name='Crear Model',exact=True).click()
++        await self.page.get_by_role('button',name='Publicar nueva versión',exact=True).wait_for()
++        trigger=self.page.get_by_role('button',name='Publicar nueva versión',exact=True);await trigger.focus();await self.page.keyboard.press('Enter')
++        dialog=self.page.get_by_role('dialog');await dialog.wait_for();self.assertEqual(await self.page.evaluate('document.activeElement.textContent'),'Cancelar')
++        await self.page.keyboard.press('Escape');await dialog.wait_for(state='detached');self.assertTrue(await trigger.evaluate('n=>n===document.activeElement'))
++        await trigger.click();await dialog.get_by_role('button',name='Publicar versión',exact=True).click()
++        await self.page.get_by_text('Versión 1',exact=True).wait_for()
++        await self.page.get_by_role('button',name='Crear Case con este Model',exact=True).click()
++        await self.page.locator('[data-ultimate-ready="true"] form').wait_for()
++        await self.page.get_by_label('Nombre del Case',exact=True).fill('Semana 45 · Operación Buenos Aires')
++        version=self.page.get_by_label('Model Version',exact=True);await version.locator('option').nth(1).wait_for(state='attached');await version.select_option(index=1)
++        await self.page.get_by_label('Inicio de planificación',exact=True).fill('2026-11-02');await self.page.get_by_label('Inicio de planificación',exact=True).press('Tab')
++        await self.page.get_by_label('Fin de planificación',exact=True).fill('2026-11-08')
++        await self.page.get_by_label('Decision Owner inicial (D1 y D2)',exact=True).select_option(ADMIN)
++        await self.page.get_by_role('button',name='Crear Case',exact=True).click()
++        await self.page.get_by_role('button',name='Guardar contexto',exact=True).wait_for();await self.page.get_by_role('heading',name='Contexto guardado',exact=True).wait_for()
++        cid=await self.page.evaluate('new URL(location.href).searchParams.get("case_id")');self.assertTrue(cid)
++        self.assertEqual(await self.page.locator('input[type="file"]').count(),0)
++        before=await self.api('GET','/api/platform/logistics-cases/'+cid+'/context');self.assertEqual(before['entry_count'],0)
++        await self.page.reload();await self.page.locator('[data-ultimate-ready="true"]').wait_for()
++        self.assertEqual(await self.page.get_by_label('Nombre del Case',exact=True).input_value(),'Semana 45 · Operación Buenos Aires')
++        after=await self.api('GET','/api/platform/logistics-cases/'+cid+'/context');self.assertEqual(before['planning_context_hash'],after['planning_context_hash'])
++        (OUT/'durable-context.json').write_text(json.dumps({'case_id':cid,'entry_count':after['entry_count'],'hash_stable':True,'no_csv':True},indent=2))
++    async def test_02_validation_dirty_reload_and_cas_preserve_draft(self):
++        _,_,c=await self.case();cid=c['case']['id'];await self.open('/app/ddas/logistics/case?case_id='+cid)
++        await self.page.get_by_label('Objetivo global',exact=True).select_option('CUSTOM');await self.page.locator('.ultimate-policy summary').click()
++        await self.page.get_by_label('Costo (%)',exact=True).fill('10');await self.page.get_by_role('button',name='Guardar contexto',exact=True).click()
++        await self.page.get_by_role('link',name='Las preferencias deben sumar 100 %.').wait_for();self.assertTrue(await self.page.locator('.ultimate-errors').evaluate('n=>n===document.activeElement'))
++        await self.page.get_by_role('link',name='Las preferencias deben sumar 100 %.').click();self.assertEqual(await self.page.evaluate('document.activeElement.name'),'weight_COST')
++        await self.page.get_by_label('Objetivo global',exact=True).select_option('MINIMIZE_COST')
++        await self.page.get_by_label('Nombre del Case',exact=True).fill('Mi borrador pendiente')
++        self.page.on('dialog',lambda dialog:dialog.accept())
++        await self.page.reload();await self.page.locator('[data-ultimate-ready="true"]').wait_for();self.assertEqual(await self.page.get_by_label('Nombre del Case',exact=True).input_value(),'Mi borrador pendiente')
++        await self.api('PATCH','/api/platform/logistics-cases/'+cid+'/context',{'expected_updated_at':c['case']['updated_at'],'name':'Cambio concurrente'})
++        await self.page.get_by_role('button',name='Guardar contexto',exact=True).click();await self.page.get_by_text('La versión guardada cambió. Tu borrador se conserva; revisá la versión actual antes de reintentar.',exact=True).wait_for()
++        self.assertEqual(await self.page.get_by_label('Nombre del Case',exact=True).input_value(),'Mi borrador pendiente')
++        await self.page.get_by_role('button',name='Descartar borrador y recargar',exact=True).click();dialog=self.page.get_by_role('dialog');await dialog.wait_for();await self.page.keyboard.press('Escape');await dialog.wait_for(state='detached')
++        self.assertEqual(await self.page.get_by_label('Nombre del Case',exact=True).input_value(),'Mi borrador pendiente')
++        await self.page.get_by_role('button',name='Descartar borrador y recargar',exact=True).click();await dialog.get_by_role('button',name='Descartar y recargar',exact=True).click()
++        await self.page.get_by_label('Nombre del Case',exact=True).wait_for();await self.page.wait_for_function('document.querySelector("[name=case_name]")?.value==="Cambio concurrente"')
++    async def test_03_viewer_reads_without_controls_or_write_authority(self):
++        _,_,c=await self.case();viewer=await self.browser.new_context(viewport={'width':390,'height':844});await self.login(viewer,3)
++        page=await viewer.new_page();await page.goto(self.base+'/app/ddas/logistics/case?case_id='+c['case']['id']);await page.locator('[data-ultimate-ready="true"]').wait_for()
++        self.assertTrue(await page.get_by_label('Nombre del Case',exact=True).is_disabled());self.assertTrue(await page.get_by_role('button',name='Guardar contexto',exact=True).is_disabled())
++        response=await self.request('PATCH','/api/platform/logistics-cases/'+c['case']['id']+'/context',{'expected_updated_at':c['case']['updated_at'],'name':'Forbidden'},context=viewer);self.assertEqual(response.status,403)
++        await viewer.close()
++    async def test_04_responsive_stress_zoom_touch_and_native_controls(self):
++        long_name='Operación de distribución interregional · '+('área metropolitana y centros de consolidación · '*3)
++        m,v=await self.model(long_name[:120]);await self.open('/app/ddas/logistics/case?model_id='+m['model']['id'])
++        await self.page.get_by_label('Nombre del Case',exact=True).fill(long_name[:120]);await self.page.get_by_label('Descripción (opcional)',exact=True).fill(('Planificación operativa ñ · '*50)[:1000])
++        await self.page.get_by_label('Model Version',exact=True).select_option(v['version']['id'])
++        await self.page.get_by_label('Objetivo global',exact=True).select_option('CUSTOM');await self.page.locator('.ultimate-policy summary').click()
++        measurements=[]
++        for width in [1440,1280,1024,768,390,320]:
++            await self.page.set_viewport_size({'width':width,'height':1000});await self.page.evaluate('scrollTo(0,0)');await self.page.screenshot(path=str(OUT/f'case-stress-{width}.png'),full_page=True,animations='disabled')
++            data=await self.page.evaluate('''()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,root:document.querySelector('.ultimate-foundation').getBoundingClientRect().toJSON(),controls:[...document.querySelectorAll('.ultimate-foundation input,.ultimate-foundation select,.ultimate-foundation textarea,.ultimate-foundation button')].filter(n=>n.getClientRects().length).map(n=>({name:n.name||n.textContent,height:n.getBoundingClientRect().height,right:n.getBoundingClientRect().right,left:n.getBoundingClientRect().left}))})''')
++            self.assertLessEqual(data['scroll'],width+1);self.assertTrue(all(x['right']<=width+1 and x['left']>=0 for x in data['controls']),data);measurements.append(data)
++        await self.page.set_viewport_size({'width':1440,'height':1000});await self.page.evaluate('document.documentElement.style.zoom="2"')
++        self.assertLessEqual(await self.page.evaluate('document.documentElement.scrollWidth'),1441);await self.page.screenshot(path=str(OUT/'case-zoom200.png'),full_page=True)
++        self.assertTrue(await self.page.evaluate('matchMedia("(prefers-reduced-motion:reduce)").matches'))
++        await self.page.evaluate('document.documentElement.style.zoom="1"')
++        touch=await self.browser.new_context(viewport={'width':390,'height':844},has_touch=True,is_mobile=True,reduced_motion='reduce');await self.login(touch)
++        page=await touch.new_page();await page.goto(self.base+'/app/ddas/logistics/case?case_id='+ (await self.case())[2]['case']['id']);await page.locator('[data-ultimate-ready="true"]').wait_for();await page.get_by_label('Nombre del Case',exact=True).tap();self.assertEqual(await page.evaluate('document.activeElement.name'),'case_name');await touch.close()
++        (OUT/'responsive-measurements.json').write_text(json.dumps(measurements,indent=2))
++    async def test_05_legacy_navigation_and_home_recover_empty_case(self):
++        _,_,c=await self.case();cid=c['case']['id']
++        await self.open('/app/ddas/logistics/decisions?case_id='+cid)
++        self.assertIn('/app/ddas/logistics/case',self.page.url);self.assertIn('case_id='+cid,self.page.url)
++        response=await self.request('PUT','/api/platform/decisions/'+cid+'/data-pack',{'expected_updated_at':c['case']['updated_at'],'orders_dataset_id':str(uuid4()),'fleet_dataset_id':str(uuid4())})
++        self.assertEqual(response.status,409)
++        readiness=await self.request('GET','/api/platform/decisions/'+cid+'/workflow-readiness');self.assertEqual(readiness.status,409)
++        home=await self.api('GET','/api/platform/home');(OUT/'home-context-routing.json').write_text(json.dumps({'ultimate_case':cid,'legacy_link_recovers_context':True,'home_keys':list(home)},indent=2))
++    async def test_06_keyboard_focus_contrast_and_labels(self):
++        m,v=await self.model();await self.open('/app/ddas/logistics/case?model_id='+m['model']['id'])
++        await self.page.get_by_label('Objetivo global',exact=True).select_option('CUSTOM');await self.page.locator('.ultimate-policy summary').click()
++        audit=(ROOT/'tests/browser/theme_audit.js').read_text();contrast=await self.page.evaluate(audit,'.ultimate-foundation')
++        (OUT/'case-contrast.json').write_text(json.dumps(contrast,indent=2));self.assertGreater(contrast['textCount'],20);self.assertEqual(contrast['failures'],[])
++        measurements=[]
++        for width in [1440,390]:
++            await self.page.set_viewport_size({'width':width,'height':1000})
++            first=self.page.locator('.ultimate-foundation header button');await first.focus();count=0
++            while count<80:
++                await self.page.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))')
++                data=await self.page.evaluate('''()=>{const n=document.activeElement,b=n.getBoundingClientRect(),hit=document.elementFromPoint(b.x+b.width/2,b.y+b.height/2),c=getComputedStyle(n);return {inForm:!!n.closest('.ultimate-foundation'),name:n.name||n.textContent.slice(0,60),tag:n.tagName,rect:b.toJSON(),scroll:scrollY,hit:hit?.className,visible:b.top>=0&&b.bottom<=innerHeight,reachable:hit===n||n.contains(hit),outline:parseFloat(c.outlineWidth),label:n.labels?[...n.labels].map(x=>x.textContent).join(''):null}}''')
++                if not data['inForm']:break
++                (OUT/'keyboard-focus-latest.json').write_text(json.dumps({'width':width,**data},indent=2))
++                self.assertTrue(data['visible'] and data['reachable'],data)
++                if data['tag'] in ['INPUT','SELECT','TEXTAREA']:self.assertTrue(data['label'],data)
++                measurements.append({'width':width,**data});count+=1;await self.page.keyboard.press('Tab')
++            self.assertGreater(count,15);self.assertLess(count,80)
++        (OUT/'keyboard-focus.json').write_text(json.dumps(measurements,indent=2))
++    async def test_07_models_library_empty_search_and_versioned_edit(self):
++        m,v=await self.model('W3 colección · '+str(uuid4())[:8]);mid=m['model']['id']
++        await self.open('/app/ddas/logistics/models?model_id='+mid)
++        await self.page.get_by_label('Operating Role',exact=True).select_option('HYBRID');await self.page.get_by_role('button',name='Guardar borrador',exact=True).click()
++        await self.page.wait_for_function('document.querySelector("[name=operating_role]")?.value==="HYBRID" && document.querySelector(".ultimate-footer [role=status]")?.textContent==="Sin cambios pendientes."')
++        await self.page.get_by_role('button',name='Publicar nueva versión',exact=True).click();await self.page.get_by_role('dialog').get_by_role('button',name='Publicar versión',exact=True).click();await self.page.get_by_text('Versión 2',exact=True).wait_for()
++        stored=await self.api('GET','/api/platform/logistics-models/'+mid);self.assertEqual(len(stored['versions']),2);self.assertEqual(stored['versions'][1]['id'],v['version']['id']);self.assertEqual(stored['versions'][1]['config_jsonb']['operating_role'],'SHIPPER')
++        await self.page.get_by_role('button',name='Volver a Models',exact=True).click();await self.page.get_by_label('Buscar Models',exact=True).wait_for()
++        await self.page.get_by_label('Buscar Models',exact=True).fill('No existe '+str(uuid4()));await self.page.get_by_role('button',name='Buscar',exact=True).click();await self.page.get_by_text('No hay Models que coincidan. Probá otro nombre.',exact=True).wait_for()
++        await self.page.get_by_label('Buscar Models',exact=True).fill(stored['model']['name']);await self.page.get_by_role('button',name='Buscar',exact=True).click();await self.page.get_by_role('button',name='Abrir Model',exact=True).wait_for();self.assertEqual(await self.page.locator('.ultimate-model-card').count(),1)
++    async def test_08_publish_cas_recovers_without_overwriting_a_published_version(self):
++        m,v=await self.model();mid=m['model']['id'];await self.open('/app/ddas/logistics/models?model_id='+mid)
++        await self.api('PUT','/api/platform/logistics-models/'+mid,{'expected_revision':2,'name':'Nombre concurrente','configuration':{**CONFIG,'operating_role':'HYBRID'}})
++        await self.page.get_by_role('button',name='Publicar nueva versión',exact=True).click();await self.page.get_by_role('dialog').get_by_role('button',name='Publicar versión',exact=True).click()
++        await self.page.get_by_text('El Model cambió. Tu borrador se conserva. Recargá la versión guardada antes de publicar.',exact=True).wait_for()
++        self.assertEqual(await self.page.get_by_label('Nombre del Model',exact=True).input_value(),m['model']['name'])
++        await self.page.get_by_role('button',name='Descartar borrador y recargar',exact=True).click();await self.page.get_by_role('dialog').get_by_role('button',name='Descartar y recargar',exact=True).click()
++        await self.page.wait_for_function('document.querySelector("[name=model_name]")?.value==="Nombre concurrente"')
++        await self.page.get_by_role('button',name='Publicar nueva versión',exact=True).click();await self.page.get_by_role('dialog').get_by_role('button',name='Publicar versión',exact=True).click();await self.page.get_by_text('Versión 2',exact=True).wait_for()
++        stored=await self.api('GET','/api/platform/logistics-models/'+mid);self.assertEqual(stored['versions'][1]['id'],v['version']['id']);self.assertEqual(stored['versions'][0]['config_jsonb']['operating_role'],'HYBRID')
++    async def test_09_unchanged_values_do_not_restore_a_false_dirty_draft(self):
++        _,_,c=await self.case();await self.open('/app/ddas/logistics/case?case_id='+c['case']['id'])
++        await self.page.get_by_label('Nombre del Case',exact=True).fill(c['case']['label'])
++        await self.page.reload();await self.page.locator('[data-ultimate-ready="true"]').wait_for()
++        self.assertEqual(await self.page.locator('.ultimate-footer [role=status]').text_content(),'Sin cambios pendientes.')
++        self.assertFalse(await self.page.evaluate('Object.keys(sessionStorage).filter(k=>k.startsWith("dation.ultimate.setup.v1")).length>0'))
++        await self.page.get_by_label('Nombre del Case',exact=True).fill('Borrador que sí cambia')
++        self.page.on('dialog',lambda dialog:dialog.accept());await self.page.reload();await self.page.locator('[data-ultimate-ready="true"]').wait_for()
++        self.assertEqual(await self.page.get_by_label('Nombre del Case',exact=True).input_value(),'Borrador que sí cambia')
++
++
++if __name__=='__main__':unittest.main()
+--- post-T2/backend/tests/e2e/ultimate_setup_fixture.py
++++ T3/backend/tests/e2e/ultimate_setup_fixture.py
+@@ -0,0 +1,11 @@
++"""Owned backend for W3. No worker, real auth/API/PostgREST/SQL, no production."""
++import json
++import sys
++from sandbox import Sandbox
++from auth_fixture import VIEWER
++
++with Sandbox() as sandbox:
++    sandbox.sql('UPDATE dation_private.platform_release SET ultimate_foundation_enabled=true;')
++    (sandbox.directory/'auth-fixture-users.json').write_text(json.dumps({'user-3@example.test':{'id':VIEWER,'refresh':'fixture-refresh-t3-viewer'}}))
++    print(json.dumps({'api_url':sandbox.api_url}),flush=True)
++    sys.stdin.readline()
+--- post-T2/backend/tests/integration/test_ultimate_case_models.py
++++ T3/backend/tests/integration/test_ultimate_case_models.py
+@@ -0,0 +1,230 @@
++"""S3: checked T3 RPCs and locking against the complete PostgreSQL 17 catalog.
++
++Synthetic admission rows exercise freeze only: no ingestion, publisher or engine.
++Missing owned infrastructure fails rather than skips.
++"""
++import asyncio
++from concurrent.futures import ThreadPoolExecutor
++import json
++import os
++import subprocess
++import time
++from types import SimpleNamespace
++import unittest
++from unittest.mock import patch
++from uuid import UUID,uuid4
++
++from ultimate_sql_support import UltimateSQLSandbox, CONTAINER, DOCKER
++from app.models.ultimate_foundation import ModelCreate, ModelUpdate, ModelPublish, UltimateCaseCreate, UltimateCaseUpdate
++from app.services import logistics_model_service as service
++from tests.test_ultimate_case_models import config
++
++ADMIN,OTHER,OPERATOR,VIEWER,DISABLED=[str(uuid4()) for _ in range(5)]
++H='a'*64
++
++def literal(value):return "'"+json.dumps(value,separators=(',',':')).replace("'","''")+"'::jsonb"
++
++
++class UltimateCaseSQLTests(UltimateSQLSandbox,unittest.TestCase):
++    @classmethod
++    def verify_owner(cls):
++        result=subprocess.run([*DOCKER,'inspect','--format','{{index .Config.Labels "dation.qa.phase"}}|{{index .Config.Labels "dation.qa.owner"}}',CONTAINER or ''],capture_output=True,text=True,timeout=10)
++        if result.returncode or result.stdout.strip()!='T3|codex-dation':raise RuntimeError('S3 requires its labelled owned T3 sandbox')
++        if not 170000<=int(cls.command('SHOW server_version_num;',database='postgres').stdout)<180000:raise RuntimeError('PostgreSQL 17 required')
++
++    @classmethod
++    def setUpClass(cls):
++        super().setUpClass()
++        cls.command('UPDATE dation_private.platform_release SET admissions_open=true,workflow_gates_enabled=true;')
++        for uid in [ADMIN,OTHER,OPERATOR,VIEWER,DISABLED]:cls.command(f"INSERT INTO auth.users VALUES('{uid}','{uid}@example.test',now());")
++        cls.wa=json.loads(cls.command(f"SELECT platform_create_workspace('{ADMIN}','T3 A','AR','UTC','ARS');").stdout)['workspace_id']
++        cls.wb=json.loads(cls.command(f"SELECT platform_create_workspace('{OTHER}','T3 B','AR','UTC','ARS');").stdout)['workspace_id']
++        for wid,uid in [(cls.wa,ADMIN),(cls.wb,OTHER)]:
++            cls.command(f"SELECT platform_set_member_responsibilities('{wid}','{uid}','{uid}',(SELECT updated_at FROM workspace_members WHERE workspace_id='{wid}' AND user_id='{uid}'),ARRAY['decision_owner']);")
++        cls.command(f"INSERT INTO profiles(id) VALUES('{OPERATOR}'),('{VIEWER}'),('{DISABLED}'); INSERT INTO workspace_members(workspace_id,user_id,access_role,status) VALUES('{cls.wa}','{OPERATOR}','operator','active'),('{cls.wa}','{VIEWER}','viewer','active'),('{cls.wa}','{DISABLED}','operator','disabled');")
++        cls.command('UPDATE dation_private.platform_release SET ultimate_foundation_enabled=true;')
++
++    def sql(self,sql):return self.command(sql).stdout.strip()
++    def reject(self,sql,*codes):
++        result=self.command(sql,check=False);self.assertNotEqual(result.returncode,0,sql)
++        if codes:self.assertTrue(any(code in result.stderr for code in codes),result.stderr)
++        return result.stderr
++    def rpc_sql(self,operation,args=None,user=ADMIN,workspace=None):
++        return f"SET ROLE service_role; SELECT public.platform_ultimate_foundation('{workspace or self.wa}','{user}','{operation}',{literal(args or {})});"
++    def rpc(self,operation,args=None,**ctx):return json.loads(self.sql(self.rpc_sql(operation,args,**ctx)))
++    def invoke(self,method,*args,user=ADMIN,workspace=None):
++        ctx=SimpleNamespace(workspace_id=workspace or self.wa,user_id=user)
++        async def bridge(_name,body):return self.rpc(body['operation'],body['arguments'],user=body['actor_user_id'],workspace=body['target_workspace_id'])
++        with patch.object(service,'platform_call',bridge):return asyncio.run(method(ctx,*args))
++    def model(self,**changes):
++        return self.invoke(service.create_model,ModelCreate(id=uuid4(),name='Operación '+str(uuid4())[:8],configuration=config(**changes)))
++    def publish(self,model):
++        return self.invoke(service.publish_model,model['model']['id'],ModelPublish(version_id=uuid4(),expected_revision=model['model']['revision']))
++    def case(self,version=None,**changes):
++        version=version or self.publish(self.model())['version']['id']
++        values=dict(id=uuid4(),name='Semana 45',logistics_model_version_id=version,planning_start='2026-11-02',planning_end='2026-11-08',horizon_type='WEEKLY',case_policy={'primary_goal':'MINIMIZE_COST'},decision_owner_user_id=ADMIN)
++        values.update(changes)
++        return self.invoke(service.create_case,UltimateCaseCreate(**values))
++    def update(self,c,**changes):
++        return self.invoke(service.update_case_context,c['case']['id'],UltimateCaseUpdate(expected_updated_at=c['case']['updated_at'],**changes))
++    def test_01_model_create_list_search_and_identity_replay(self):
++        payload=ModelCreate(id=uuid4(),name='Unicode · Operación ñ',configuration=config())
++        a=self.invoke(service.create_model,payload);b=self.invoke(service.create_model,payload)
++        self.assertEqual(a,b);listed=self.rpc('model_list',{'search_text':'Operación ñ','limit':1})
++        self.assertEqual(listed['total'],1);self.assertEqual(listed['items'][0]['id'],str(payload.id))
++        self.assertNotIn('draft_config_jsonb',listed['items'][0])
++        with self.assertRaises(AssertionError):self.invoke(service.create_model,payload.model_copy(update={'name':'Changed'}))
++    def test_02_publish_is_append_only_and_replay_survives_draft_edit(self):
++        m=self.model();payload=ModelPublish(version_id=uuid4(),expected_revision=1);first=self.invoke(service.publish_model,m['model']['id'],payload)
++        edited=self.invoke(service.update_model,m['model']['id'],ModelUpdate(expected_revision=2,name='Nuevo borrador',configuration=config(split_permitted=True)))
++        replay=self.invoke(service.publish_model,m['model']['id'],payload);self.assertTrue(replay['replayed']);self.assertEqual(first['version'],replay['version'])
++        second=self.publish(edited);self.assertEqual(second['version']['version'],2);self.assertNotEqual(second['version']['config_hash'],first['version']['config_hash'])
++        for sql in [f"UPDATE logistics_model_versions SET config_hash='{H}' WHERE id='{payload.version_id}';",f"DELETE FROM logistics_model_versions WHERE id='{payload.version_id}';"]:self.reject(sql,'22023')
++    def test_03_cases_reuse_one_version_and_new_version_does_not_rebind(self):
++        m=self.model();v=self.publish(m);a=self.case(v['version']['id']);b=self.case(v['version']['id'])
++        self.assertEqual(a['model_version'],b['model_version']);self.assertNotEqual(a['pack']['id'],b['pack']['id'])
++        latest=self.rpc('model_get',{'model_id':m['model']['id']});self.publish(latest)
++        reread=self.invoke(service.get_case_context,a['case']['id']);self.assertEqual(reread['model_version']['id'],v['version']['id'])
++    def test_04_empty_case_pack_is_atomic_tenant_bound_and_reloads(self):
++        c=self.case();row=c['case'];self.assertIsNone(row['orders_dataset_id']);self.assertIsNone(row['fleet_dataset_id']);self.assertEqual(c['entry_count'],0)
++        self.assertEqual(c['pack']['workspace_id'],self.wa);self.assertEqual(c['pack']['case_id'],row['id']);self.assertEqual(c['pack']['current_version_id'],c['pack_version']['id']);self.assertEqual(c['pack_version']['version'],1)
++        self.assertFalse(c['planning_context']['admission_available']);self.assertEqual(c,self.invoke(service.get_case_context,row['id']))
++    def test_05_binding_is_immutable_even_before_admission(self):
++        c=self.case();v=self.publish(self.model())['version']['id'];self.reject(f"UPDATE decision_cases SET logistics_model_version_id='{v}' WHERE id='{c['case']['id']}';",'22023')
++        self.reject(self.rpc_sql('case_update',{'case_id':c['case']['id'],'expected_updated_at':c['case']['updated_at'],'changes':{'logistics_model_version_id':v},'owner_updates':[]}),'22023')
++    def test_06_invalid_horizon_rolls_back_case_pack_and_owners(self):
++        c=self.case();before=self.sql('SELECT count(*) FROM case_data_packs;')
++        self.reject(self.rpc_sql('case_update',{'case_id':c['case']['id'],'expected_updated_at':c['case']['updated_at'],'changes':{'planning_end':'2026-10-01'},'owner_updates':[]}),'23514')
++        self.assertEqual(self.invoke(service.get_case_context,c['case']['id'])['case']['planning_end'],'2026-11-08');self.assertEqual(before,self.sql('SELECT count(*) FROM case_data_packs;'))
++    def test_07_policy_and_modes_are_persisted_not_executed(self):
++        for goal in ['MINIMIZE_COST','MAXIMIZE_SERVICE','MAXIMIZE_OWN_CAPACITY','MINIMIZE_TRIPS','BALANCED','CUSTOM']:
++            policy={'primary_goal':goal}
++            if goal=='CUSTOM':policy.update(preferences=[{'kind':'COST','weight':'.6'},{'kind':'SERVICE','weight':'.4'}],guardrails=[{'kind':'MINIMUM_DEMAND_COVERAGE','limit':'.9','hard':True}])
++            c=self.case(case_policy=policy,operating_mode='SIMULATION');self.assertEqual(c['planning_context']['case_policy']['primary_goal'],goal);self.assertEqual(c['case']['operating_mode'],'SIMULATION')
++        self.assertFalse(self.rpc('capabilities')['runtime_execution_available'])
++    def test_08_pre_admission_math_edit_changes_context_hash(self):
++        c=self.case();updated=self.update(c,planning_end='2026-11-09',horizon_type='CUSTOM',case_policy={'primary_goal':'BALANCED'})
++        self.assertNotEqual(c['planning_context_hash'],updated['planning_context_hash']);self.assertIsNone(updated['case']['context_frozen_at'])
++    def test_09_case_and_owner_cas_preserve_atomicity(self):
++        c=self.case();new=self.update(c,name='Nombre actual')
++        with self.assertRaises(AssertionError):self.update(c,name='Obsoleto')
++        with self.assertRaises(AssertionError):self.update(new,name='No debe guardarse',owner_updates=[{'node_id':'logistics_assignment','owner_user_id':None,'expected_updated_at':None}])
++        self.assertEqual(self.invoke(service.get_case_context,c['case']['id'])['case']['label'],'Nombre actual')
++    def test_10_admin_owner_is_required_eligible_and_atomic(self):
++        for owner in [None,VIEWER,OTHER,DISABLED]:
++            before=self.sql('SELECT count(*) FROM decision_cases;')
++            with self.assertRaises(AssertionError):self.case(decision_owner_user_id=owner)
++            self.assertEqual(before,self.sql('SELECT count(*) FROM decision_cases;'))
++        c=self.case();self.assertEqual(c['responsibilities']['stages']['logistics_assignment']['owner']['id'],ADMIN)
++        self.assertEqual(c['responsibilities']['stages']['logistics_scheduling']['owner']['id'],ADMIN)
++    def test_11_operator_can_create_pending_but_not_assign_or_publish(self):
++        v=self.publish(self.model())['version']['id'];p=UltimateCaseCreate(id=uuid4(),name='Owner pendiente',logistics_model_version_id=v,planning_start='2026-11-02',planning_end='2026-11-02',horizon_type='DAILY',case_policy={'primary_goal':'MINIMIZE_COST'})
++        c=self.invoke(service.create_case,p,user=OPERATOR);self.assertIsNone(c['responsibilities']['stages']['logistics_assignment']['owner'])
++        with self.assertRaises(AssertionError):self.invoke(service.create_case,p.model_copy(update={'id':uuid4(),'decision_owner_user_id':UUID(ADMIN)}),user=OPERATOR)
++        self.reject(self.rpc_sql('model_create',{},user=OPERATOR),'42501')
++        self.reject(self.rpc_sql('model_publish',{},user=OPERATOR),'42501')
++    def test_12_viewer_read_only_and_disabled_member_rejected(self):
++        c=self.case();self.assertFalse(self.rpc('case_get',{'case_id':c['case']['id']},user=VIEWER)['permissions']['can_edit'])
++        for operation in ['case_update','case_create','model_update']:self.reject(self.rpc_sql(operation,{},user=VIEWER),'42501')
++        self.reject(self.rpc_sql('capabilities',{},user=DISABLED),'42501')
++    def test_13_cross_workspace_cannot_read_or_bind(self):
++        c=self.case()
++        for op,args in [('case_get',{'case_id':c['case']['id']}),('model_get',{'model_id':c['model']['id']})]:self.reject(self.rpc_sql(op,args,user=OTHER,workspace=self.wb),'P0002')
++        self.reject(self.rpc_sql('capabilities',{},user=OTHER),'42501')
++        p=UltimateCaseCreate(id=uuid4(),name='Cross tenant',logistics_model_version_id=c['model_version']['id'],planning_start='2026-11-02',planning_end='2026-11-02',horizon_type='DAILY',case_policy={'primary_goal':'MINIMIZE_COST'},decision_owner_user_id=OTHER)
++        with self.assertRaises(AssertionError):self.invoke(service.create_case,p,user=OTHER,workspace=self.wb)
++    def test_14_closed_flag_blocks_writes_keeps_existing_context_readable(self):
++        c=self.case();self.sql('UPDATE dation_private.platform_release SET ultimate_foundation_enabled=false;')
++        try:
++            self.assertFalse(self.rpc('capabilities')['enabled']);self.assertEqual(self.rpc('case_get',{'case_id':c['case']['id']})['case']['id'],c['case']['id'])
++            self.assertFalse(self.rpc('case_get',{'case_id':c['case']['id']})['permissions']['can_edit'])
++            self.reject(self.rpc_sql('case_update',{}),'P0002')
++        finally:self.sql('UPDATE dation_private.platform_release SET ultimate_foundation_enabled=true;')
++    def test_15_role_does_not_grant_permission_or_select_runtime(self):
++        for role in ['SHIPPER','LOGISTICS_PROVIDER','HYBRID']:
++            c=self.case(self.publish(self.model(operating_role=role))['version']['id']);self.assertEqual(c['case']['graph_definition_version'],service.GRAPH_VERSION)
++            self.assertFalse(c['planning_context']['admission_available']);self.assertFalse(self.rpc('case_get',{'case_id':c['case']['id']},user=VIEWER)['permissions']['can_edit'])
++    def test_16_archived_model_prevents_new_binding_preserves_existing(self):
++        m=self.model();v=self.publish(m);c=self.case(v['version']['id'])
++        self.invoke(service.update_model,m['model']['id'],ModelUpdate(expected_revision=2,name='Archivado',status='archived',configuration=config()))
++        self.assertEqual(self.invoke(service.get_case_context,c['case']['id'])['model_version']['id'],v['version']['id'])
++        with self.assertRaises(AssertionError):self.case(v['version']['id'])
++    def test_17_concurrent_publish_has_one_cas_winner(self):
++        m=self.model();configuration,h=service.configuration_snapshot(config());descriptor,ch=service.contract_reference(h)
++        def publish(_):return self.command(self.rpc_sql('model_publish',{'model_id':m['model']['id'],'version_id':str(uuid4()),'expected_revision':1,'configuration_hash':h,'contract_descriptor':descriptor,'contract_hash':ch}),check=False)
++        with ThreadPoolExecutor(2) as pool:results=list(pool.map(publish,range(2)))
++        self.assertEqual(sum(r.returncode==0 for r in results),1);self.assertTrue(any('55006' in r.stderr for r in results))
++    def test_18_private_acl_and_direct_write_denials(self):
++        for role in ['anon','authenticated']:
++            self.reject(f"SET ROLE {role}; SELECT public.platform_ultimate_foundation('{self.wa}','{ADMIN}','capabilities');",'42501')
++        for table in ['logistics_models','logistics_model_versions','case_data_packs','case_data_pack_versions']:
++            self.reject(f'SET ROLE service_role; DELETE FROM {table};','42501')
++        self.reject('SET ROLE service_role; UPDATE dation_private.platform_release SET ultimate_foundation_enabled=true;','42501')
++    def test_19_sql_rejects_invalid_policy_and_config_without_api(self):
++        c=self.case();invalid={'version':1,'primary_goal':'CUSTOM','guardrails':[],'preferences':[]}
++        self.reject(self.rpc_sql('case_update',{'case_id':c['case']['id'],'expected_updated_at':c['case']['updated_at'],'changes':{'case_policy':invalid,'case_policy_hash':H},'owner_updates':[]}),'22023')
++        m=self.model();configuration,h=service.configuration_snapshot(config());configuration['operating_role']='ADMIN'
++        self.reject(self.rpc_sql('model_update',{'model_id':m['model']['id'],'expected_revision':1,'configuration':configuration,'configuration_hash':h,'name':'Invalid','status':'active'}),'22023')
++    def test_23_pack_failure_rolls_back_new_case_and_pack(self):
++        c=self.case();cid=str(uuid4());args=dict(id=cid,name='Atomic failure',logistics_model_version_id=c['model_version']['id'],planning_start='2026-11-02',planning_end='2026-11-08',horizon_type='WEEKLY',operating_mode='OPERATIONAL',case_policy=c['case']['case_policy_jsonb'],case_policy_hash=c['case']['case_policy_hash'],decision_owner_user_id=ADMIN,creation_intent_hash=H,**service.empty_pack_snapshot(self.wa,cid))
++        args['pack_version_id']=c['pack_version']['id'];before=self.sql('SELECT (SELECT count(*) FROM decision_cases)||\':\'||(SELECT count(*) FROM case_data_packs);')
++        self.reject(self.rpc_sql('case_create',args),'23505');self.assertEqual(before,self.sql('SELECT (SELECT count(*) FROM decision_cases)||\':\'||(SELECT count(*) FROM case_data_packs);'))
++    def test_24_disabled_dda_denies_foundation_and_stale_model_cas(self):
++        m=self.model();self.publish(m)
++        with self.assertRaises(AssertionError):self.invoke(service.update_model,m['model']['id'],ModelUpdate(expected_revision=1,name='Stale',configuration=config()))
++        self.sql(f"UPDATE workspace_ddas SET status='disabled' WHERE workspace_id='{self.wa}' AND dda_id='logistics';")
++        try:
++            self.assertFalse(self.rpc('capabilities')['enabled']);self.reject(self.rpc_sql('model_get',{'model_id':m['model']['id']}),'42501')
++        finally:self.sql(f"UPDATE workspace_ddas SET status='enabled' WHERE workspace_id='{self.wa}' AND dda_id='logistics';")
++    def test_25_existing_archive_restore_keeps_binding_owners_and_pack(self):
++        c=self.case();cid=c['case']['id']
++        def archive(stamp,value):self.sql(f"SELECT platform_update_case(actor_user_id=>'{ADMIN}',target_workspace_id=>'{self.wa}',target_case_id=>'{cid}',expected_updated_at=>'{stamp}'::timestamptz,change_label=>false,new_label=>NULL,archive=>{str(value).lower()});")
++        archive(c['case']['updated_at'],True);archived=self.invoke(service.get_case_context,cid);self.assertFalse(archived['permissions']['can_edit']);self.assertEqual(archived['case']['status'],'archived')
++        archive(archived['case']['updated_at'],False);restored=self.invoke(service.get_case_context,cid);self.assertEqual(restored['pack'],c['pack']);self.assertEqual(restored['model_version'],c['model_version']);self.assertEqual(restored['responsibilities']['stages'],c['responsibilities']['stages'])
++
++    def admission_fixture(self,c):
++        """Create immutable metadata fixtures only, never call a T4 publisher."""
++        w=self.wa;cid=c['case']['id'];p=c['pack']['id'];pv,d,r=[str(uuid4()) for _ in range(3)];raw=uuid4().hex*2
++        self.sql(f"""BEGIN; INSERT INTO datasets(id,workspace_id,dataset_type,original_filename,storage_path,sha256,data_contract_id,data_contract_hash,normalizer_version,canonical_sha256,schema_version)
++         VALUES('{d}','{w}','transport_demand','fixture.csv','{w}/{d}/fixture.csv','{raw}','transport_demand_v1','{H}','DEMAND_V1','{H}','transport_demand_v1');
++         INSERT INTO case_data_pack_versions(id,workspace_id,case_id,pack_id,version,manifest_hash,contract_set_hash,created_by)
++          VALUES('{pv}','{w}','{cid}','{p}',2,'{H}','{H}','{ADMIN}');
++         INSERT INTO case_data_pack_entries(pack_version_id,slot_key,workspace_id,case_id,dataset_id,contract_id,contract_hash,raw_sha256,canonical_sha256,normalizer_version,normalized_bucket,normalized_path,record_count)
++          VALUES('{pv}','transport_demand','{w}','{cid}','{d}','transport_demand_v1','{H}','{raw}','{H}','DEMAND_V1','dda-inputs','{w}/normalized/{d}/{H}.json',1); COMMIT;""")
++        return r,f"""INSERT INTO decision_runs(id,workspace_id,dataset_id,decision_case_id,node_id,workflow_version,logistics_model_version_id,data_pack_version_id,graph_definition_version,case_policy_hash,node_policy_hash,contract_hash,input_context_hash,transit_model_version,runtime_profile,result_schema_version,engine_name,engine_version,schema_version,status,created_by_user_id)
++          VALUES('{r}','{w}','{d}','{cid}','logistics_assignment',2,'{c['model_version']['id']}','{pv}','{service.GRAPH_VERSION}','{c['case']['case_policy_hash']}','{H}','{H}','{H}','DATION_TRANSIT_V1','transport_plan_v1',1,'transport_plan','2.0.0','transport_plan_v1','queued','{ADMIN}');"""
++    def test_20_first_admission_freezes_sql_math_metadata_and_owner_remain_editable(self):
++        c=self.case();rid,sql=self.admission_fixture(c);self.sql(sql);frozen=self.invoke(service.get_case_context,c['case']['id']);self.assertIsNotNone(frozen['case']['context_frozen_at']);self.assertFalse(frozen['permissions']['can_edit_mathematical'])
++        for change in ["planning_end='2026-11-09'","horizon_type='CUSTOM'","operating_mode='SIMULATION'",f"case_policy_hash='{H}'"]:self.reject(f"UPDATE decision_cases SET {change} WHERE id='{c['case']['id']}';",'22023')
++        before=self.sql(f"SELECT to_jsonb(r) FROM decision_runs r WHERE id='{rid}';")
++        owner=frozen['responsibilities']['stages']['logistics_assignment'];changed=self.update(frozen,name='Nombre nuevo',description='Metadata permitida',owner_updates=[{'node_id':'logistics_assignment','owner_user_id':None,'expected_updated_at':owner['updated_at']}])
++        self.assertEqual(changed['planning_context_hash'],frozen['planning_context_hash']);self.assertEqual(before,self.sql(f"SELECT to_jsonb(r) FROM decision_runs r WHERE id='{rid}';"));self.assertIsNone(changed['responsibilities']['stages']['logistics_assignment']['owner'])
++        self.assertGreater(int(self.sql(f"SELECT count(*) FROM audit_events WHERE decision_case_id='{c['case']['id']}';")),0)
++    def test_21_failed_admission_rolls_back_freeze(self):
++        c=self.case();_,sql=self.admission_fixture(c);self.reject(sql.replace(c['case']['case_policy_hash'],'b'*64),'22023')
++        self.assertIsNone(self.invoke(service.get_case_context,c['case']['id'])['case']['context_frozen_at'])
++        self.update(c,planning_end='2026-11-09')
++    def test_22_admission_and_context_update_serialize_on_workspace_lock(self):
++        c=self.case();_,sql=self.admission_fixture(c)
++        env=os.environ.copy()
++        for key in ['DOCKER_HOST','DOCKER_CONTEXT','DOCKER_TLS','DOCKER_TLS_VERIFY','DOCKER_CERT_PATH']:env.pop(key,None)
++        process=subprocess.Popen([*DOCKER,'exec','-i',CONTAINER,'psql','-U','postgres','-d',self.database,'-X','-q','-A','-t','-v','ON_ERROR_STOP=1'],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,env=env)
++        try:
++            process.stdin.write("BEGIN; SET application_name='dation_t3_admission_race';"+sql+"SELECT 'ADMISSION_LOCKED';\n");process.stdin.flush()
++            self.assertEqual(process.stdout.readline().strip(),'ADMISSION_LOCKED')
++            with ThreadPoolExecutor(1) as pool:
++                future=pool.submit(self.command,self.rpc_sql('case_update',{'case_id':c['case']['id'],'expected_updated_at':c['case']['updated_at'],'changes':{'planning_end':'2026-11-09'},'owner_updates':[]}),check=False)
++                deadline=time.monotonic()+5;blocked=False
++                while time.monotonic()<deadline:
++                    if self.sql("SELECT count(*) FROM pg_stat_activity WHERE datname=current_database() AND wait_event_type='Lock' AND query LIKE '%platform_ultimate_foundation%';")!='0':blocked=True;break
++                    time.sleep(.03)
++                self.assertTrue(blocked,'Context update must wait on the admission transaction')
++                process.stdin.write('COMMIT;\n');process.stdin.flush();process.stdin.close();self.assertEqual(process.wait(10),0)
++                result=future.result(10);self.assertNotEqual(result.returncode,0);self.assertIn('55006',result.stderr)
++            self.assertEqual(self.invoke(service.get_case_context,c['case']['id'])['case']['planning_end'],'2026-11-08')
++        finally:
++            if process.poll() is None:process.terminate();process.wait(5)
++            process.stdout.close();process.stderr.close()
++
++
++if __name__=='__main__':unittest.main()
+--- post-T2/backend/tests/test_ultimate_case_models.py
++++ T3/backend/tests/test_ultimate_case_models.py
+@@ -0,0 +1,138 @@
++"""U3: T3 configuration, Case setup contracts and exact pre-admission snapshots."""
++import copy
++from datetime import datetime,timezone
++import unittest
++from unittest.mock import AsyncMock,patch
++from uuid import UUID,uuid4
++
++from pydantic import ValidationError
++from app.models.ultimate_foundation import (LogisticsModelConfigurationV1,ModelCreate,ModelUpdate,ModelPublish,
++    UltimateCaseCreate,UltimateCaseUpdate,PlanningContextV1)
++from app.services import logistics_model_service as service
++from app.domain.logistics.contracts import CasePolicy
++from app.results.canonical import policy_hash
++
++
++def config(**changes):
++    values=dict(operating_role='SHIPPER',allowed_sources=['OWN','EXTERNAL'],
++        active_dimensions=['pallets'],primary_dimension='pallets',currency_policy={'currency':'ARS','minor_units':2})
++    values.update(changes)
++    return LogisticsModelConfigurationV1.model_validate(values)
++
++
++def case_request(**changes):
++    values=dict(id=uuid4(),name='Semana 45',logistics_model_version_id=uuid4(),planning_start='2026-11-02',planning_end='2026-11-08',
++        horizon_type='WEEKLY',case_policy={'primary_goal':'MINIMIZE_COST'})
++    values.update(changes);return UltimateCaseCreate.model_validate(values)
++
++
++def raw_context():
++    ws,cid,mid,mvid=[str(uuid4()) for _ in range(4)];configuration,h=service.configuration_snapshot(config());descriptor,ch=service.contract_reference(h)
++    p=service.empty_pack_snapshot(ws,cid);policy=CasePolicy(primary_goal='MINIMIZE_COST')
++    return dict(case=dict(workspace_id=ws,id=cid,label='Semana 45',description=None,planning_start='2026-11-02',planning_end='2026-11-08',
++        operating_mode='OPERATIONAL',horizon_type='WEEKLY',case_policy_jsonb=policy.model_dump(mode='json'),case_policy_hash=policy_hash(policy),
++        graph_definition_version=service.GRAPH_VERSION,context_frozen_at=None),
++        model=dict(id=mid,name='Operación'),model_version=dict(id=mvid,model_id=mid,version=1,config_jsonb=configuration,
++            config_hash=h,contract_hash=ch,contract_registry_version=service.CONTRACT_REGISTRY_VERSION),
++        pack=dict(id=p['pack_id']),pack_version=dict(id=p['pack_version_id'],version=1,manifest_hash=p['manifest_hash']),responsibilities={},entry_count=0)
++
++
++class UltimateCaseModelsTests(unittest.TestCase):
++    def test_three_operating_roles_preserve_the_same_domain_contract_and_no_runtime_selection(self):
++        for role in ['SHIPPER','LOGISTICS_PROVIDER','HYBRID']:
++            values=config(operating_role=role);self.assertEqual(values.transport_pattern,'DIRECT')
++            self.assertNotIn('engine_name',values.model_dump());self.assertNotIn('access_role',values.model_dump())
++
++    def test_dimensions_and_sources_are_explicit_and_unique(self):
++        for change in [dict(active_dimensions=['weight_kg'],primary_dimension='pallets'),dict(active_dimensions=['pallets','pallets']),dict(allowed_sources=[]),dict(allowed_sources=['OWN','OWN'])]:
++            with self.subTest(change=change),self.assertRaises(ValidationError):config(**change)
++
++    def test_cost_and_billing_options_are_closed(self):
++        for change in [dict(external_cost_models=[]),dict(external_cost_models=['PER_KM'],per_km_billing_bases=[]),dict(own_cost_model='FREE_OWN')]:
++            with self.subTest(change=change),self.assertRaises(ValidationError):config(**change)
++
++    def test_currency_precision_does_not_infer_live_workspace_or_fx(self):
++        self.assertEqual(config().currency_policy.currency,'ARS')
++        for policy in [{'currency':'usd','minor_units':2},{'currency':'USD','minor_units':True},{'currency':'USD','minor_units':7}]:
++            with self.subTest(policy=policy),self.assertRaises(ValidationError):config(currency_policy=policy)
++
++    def test_configuration_hash_is_exact_and_semantic(self):
++        value,h=service.configuration_snapshot(config());again=service.configuration_snapshot(dict(reversed(list(value.items()))))
++        self.assertEqual((value,h),again)
++        self.assertNotEqual(h,service.configuration_snapshot(config(split_permitted=True))[1])
++        descriptor,ch=service.contract_reference(h)
++        self.assertEqual(descriptor['configuration_hash'],h);self.assertEqual(ch,service.contract_reference(h)[1])
++        self.assertNotIn('csv',descriptor);self.assertNotIn('template',descriptor)
++
++    def test_model_identity_text_is_normalized_and_not_part_of_configuration(self):
++        payload=ModelCreate(id=uuid4(),name='  Operacio\u0301n  ',configuration=config())
++        self.assertEqual(payload.name,'Operación')
++        with self.assertRaises(ValidationError):ModelCreate(id=uuid4(),name='   ',configuration=config())
++        with self.assertRaises(ValidationError):ModelPublish(version_id=uuid4(),expected_revision=True)
++
++    def test_case_exists_without_any_dataset_or_execution_fields(self):
++        request=case_request();self.assertNotIn('orders_dataset_id',request.model_dump());self.assertNotIn('fleet_dataset_id',request.model_dump())
++        with self.assertRaises(ValidationError):case_request(orders_dataset_id=uuid4())
++
++    def test_horizon_is_inclusive_ordered_and_date_only(self):
++        self.assertEqual(case_request(planning_end='2026-11-02').planning_end.isoformat(),'2026-11-02')
++        for change in [dict(planning_end='2026-11-01'),dict(planning_start='2026-11-02T00:00:00Z'),dict(planning_start=datetime.now(timezone.utc))]:
++            with self.subTest(change=change),self.assertRaises(ValidationError):case_request(**change)
++
++    def test_horizon_types_and_operating_modes_do_not_create_simulation_engine(self):
++        for kind in ['DAILY','WEEKLY','MONTHLY','CUSTOM']:
++            for mode in ['OPERATIONAL','SIMULATION']:
++                self.assertEqual(case_request(horizon_type=kind,operating_mode=mode).operating_mode,mode)
++        with self.assertRaises(ValidationError):case_request(engine_name='simulation_engine')
++
++    def test_goals_guardrails_and_preferences_keep_t1_authority(self):
++        for goal in ['MINIMIZE_COST','MAXIMIZE_SERVICE','MAXIMIZE_OWN_CAPACITY','MINIMIZE_TRIPS','BALANCED']:
++            self.assertEqual(case_request(case_policy={'primary_goal':goal}).case_policy.primary_goal,goal)
++        custom={'primary_goal':'CUSTOM','guardrails':[{'kind':'MINIMUM_DEMAND_COVERAGE','limit':'.9','hard':True}],
++            'preferences':[{'kind':'COST','weight':'.5'},{'kind':'SERVICE','weight':'.5'}]}
++        self.assertEqual(len(case_request(case_policy=custom).case_policy.preferences),2)
++        with self.assertRaises(ValidationError):case_request(case_policy={'primary_goal':'CUSTOM'})
++
++    def test_model_binding_is_not_an_editable_case_field(self):
++        with self.assertRaises(ValidationError):UltimateCaseUpdate(expected_updated_at='2026-10-26T12:00:00Z',logistics_model_version_id=uuid4())
++
++    def test_context_update_requires_changes_and_preserves_owner_cas(self):
++        with self.assertRaises(ValidationError):UltimateCaseUpdate(expected_updated_at='2026-10-26T12:00:00Z')
++        with self.assertRaises(ValidationError):UltimateCaseUpdate(expected_updated_at='2026-10-26T12:00:00Z',planning_start=None)
++        change=UltimateCaseUpdate(expected_updated_at='2026-10-26T12:00:00Z',owner_updates=[{'node_id':'logistics_assignment','owner_user_id':uuid4(),'expected_updated_at':None}])
++        self.assertIsNone(change.owner_updates[0].expected_updated_at)
++
++    def test_initial_pack_identity_and_hash_are_reproducible_without_placeholders(self):
++        cid=uuid4();a=service.empty_pack_snapshot(str(uuid4()),cid);self.assertEqual(a['pack_id'],service.empty_pack_snapshot('workspace',cid)['pack_id'])
++        self.assertNotEqual(a['pack_id'],a['pack_version_id']);self.assertTrue(UUID(a['pack_id']))
++        self.assertNotIn('dataset_id',a);self.assertNotEqual(a['manifest_hash'],service.empty_pack_snapshot('workspace',uuid4())['manifest_hash'])
++
++    def test_pre_admission_context_is_typed_serializable_and_does_not_fake_a_read_set(self):
++        result=service.enrich_context(raw_context());context=PlanningContextV1.model_validate(result['planning_context'])
++        self.assertFalse(context.admission_available);self.assertNotIn('read_set',result['planning_context'])
++        self.assertEqual(PlanningContextV1.model_validate_json(context.model_dump_json()),context)
++
++    def test_metadata_owner_and_freeze_clock_do_not_change_mathematical_context(self):
++        value=raw_context();before=service.enrich_context(value)['planning_context_hash'];changed=copy.deepcopy(value)
++        changed['case'].update(label='Otro nombre',description='Metadata editable',context_frozen_at='2026-10-26T12:00:00Z');changed['responsibilities']={'owner':'another'}
++        self.assertEqual(before,service.enrich_context(changed)['planning_context_hash'])
++        changed['case']['planning_end']='2026-11-09';self.assertNotEqual(before,service.enrich_context(changed)['planning_context_hash'])
++
++
++class UltimateCaseModelServiceTests(unittest.IsolatedAsyncioTestCase):
++    async def test_service_derives_tenant_and_actor_instead_of_accepting_client_authority(self):
++        ctx=type('Context',(),dict(workspace_id=str(uuid4()),user_id=str(uuid4())))()
++        payload=ModelCreate(id=uuid4(),name='Operación',configuration=config())
++        with patch.object(service,'platform_call',AsyncMock(return_value={})) as call:
++            await service.create_model(ctx,payload)
++        body=call.await_args.args[1];self.assertEqual(body['target_workspace_id'],ctx.workspace_id);self.assertEqual(body['actor_user_id'],ctx.user_id)
++        self.assertEqual(body['operation'],'model_create');self.assertEqual(len(body['arguments']['configuration_hash']),64)
++
++    async def test_publish_replay_uses_persisted_identity_before_mutable_draft(self):
++        vid=uuid4();ctx=object();payload=ModelPublish(version_id=vid,expected_revision=1)
++        with patch.object(service,'get_model',AsyncMock(return_value={'model':{'draft_config_jsonb':None},'versions':[{'id':str(vid)}]})),patch.object(service,'call',AsyncMock(return_value={'replayed':True})) as call:
++            await service.publish_model(ctx,uuid4(),payload)
++        self.assertNotIn('configuration_hash',call.await_args.args[2])
++
++
++if __name__=='__main__':unittest.main()
+--- post-T2/backend/tests/test_ultimate_case_navigation.mjs
++++ T3/backend/tests/test_ultimate_case_navigation.mjs
+@@ -0,0 +1,23 @@
++import test from 'node:test';
++import assert from 'node:assert/strict';
++import {readResource,resourceUrl} from '../app/static/js/dispatch/navigation/resource.mjs';
++import {horizonEnd,percentToRatio,draftSignature} from '../app/static/js/dispatch/models/setup-values.mjs';
++const id='10000000-0000-4000-8000-000000000001';
++test('Ultimate setup deep links retain Case/Model identities without a Run or fake pair',()=>{
++ const url=resourceUrl('https://example.test/app?run_id='+id,{view:'logistics-case-setup',caseId:id,modelId:id});
++ assert.equal(readResource(url).caseId,id);assert.equal(readResource(url).modelId,id);assert.equal(readResource(url).runId,null);
++ const models=resourceUrl(url,{view:'logistics-models',modelId:'new'});assert.equal(readResource(models).modelId,'new');assert.equal(readResource(models).caseId,null);
++ assert.throws(()=>readResource('https://example.test/app/ddas/logistics/case?model_id=new'));
++});
++test('Horizon presets produce concrete UTC dates across month and leap boundaries',()=>{
++ assert.equal(horizonEnd('2026-11-02','DAILY'),'2026-11-02');assert.equal(horizonEnd('2026-11-28','WEEKLY'),'2026-12-04');
++ assert.equal(horizonEnd('2028-02-01','MONTHLY'),'2028-02-29');assert.equal(horizonEnd('2026-02-01','MONTHLY'),'2026-02-28');assert.equal(horizonEnd('2026-11-02','CUSTOM'),null);
++});
++test('Preference input uses exact bounded decimal strings rather than binary wire floats',()=>{
++ assert.equal(percentToRatio('0'),'0');assert.equal(percentToRatio('100'),'1');assert.equal(percentToRatio('10.01'),'0.1001');
++ for(const value of ['NaN','101','-1','0.001',''])assert.throws(()=>percentToRatio(value));
++});
++test('Dirty comparison ignores JSON object key order while preserving meaningful array edits',()=>{
++ assert.equal(draftSignature({name:'Caso',configuration:{a:1,b:[1,2]}}),draftSignature({configuration:{b:[1,2],a:1},name:'Caso'}));
++ assert.notEqual(draftSignature({sources:['OWN','EXTERNAL']}),draftSignature({sources:['EXTERNAL','OWN']}));
++});
+--- post-T2/supabase/migrations/20261026161050_ultimate_case_models.sql
++++ T3/supabase/migrations/20261026161050_ultimate_case_models.sql
+@@ -0,0 +1,309 @@
++-- T3 only: checked Model/Case setup and first-admission context freeze.
++-- No admissions, Pack publishing, graph resolver, engines or release activation.
++BEGIN;
++SET LOCAL lock_timeout='5s';
++SET LOCAL statement_timeout='90s';
++
++ALTER TABLE dation_private.platform_release ADD COLUMN ultimate_foundation_enabled boolean NOT NULL DEFAULT false;
++ALTER TABLE public.logistics_models
++ ADD COLUMN draft_config_jsonb jsonb CHECK(draft_config_jsonb IS NULL OR jsonb_typeof(draft_config_jsonb)='object'),
++ ADD COLUMN draft_config_hash text CHECK(draft_config_hash ~ '^[0-9a-f]{64}$'),
++ ADD COLUMN creation_intent_hash text CHECK(creation_intent_hash ~ '^[0-9a-f]{64}$');
++ALTER TABLE public.logistics_model_versions ADD COLUMN source_model_revision bigint CHECK(source_model_revision>0);
++ALTER TABLE public.decision_cases
++ ADD COLUMN horizon_type text CHECK(horizon_type IN('DAILY','WEEKLY','MONTHLY','CUSTOM')),
++ ADD COLUMN creation_intent_hash text CHECK(creation_intent_hash ~ '^[0-9a-f]{64}$');
++
++-- Release-controlled structural reference for Model bindings, not a state resolver.
++-- T1 fixture graph identities remain untouched. New execution capabilities stay off.
++INSERT INTO dation_private.decision_definition_versions(version,definition_hash,definition_jsonb)
++VALUES('ULTIMATE_FOUNDATION_V1','723c6fe85946adf7108492251451722f2100b7e7aeecb887e78da3d952f9786f',
++ '{"schema_version":"decision_definition_reference_v1","version":"ULTIMATE_FOUNDATION_V1","node_ids":["logistics_assignment","logistics_scheduling"],"domain_contract_registry_version":"ULTIMATE_DOMAIN_V1","execution_available":false}');
++
++CREATE FUNCTION dation_private.t3_configuration_valid(value jsonb) RETURNS boolean
++LANGUAGE plpgsql IMMUTABLE SET search_path=pg_catalog AS $$
++DECLARE key text; arr jsonb;
++BEGIN
++ IF jsonb_typeof(value) IS DISTINCT FROM 'object' OR value->>'version' IS DISTINCT FROM '1' OR jsonb_typeof(value->'version') IS DISTINCT FROM 'number'
++ OR NOT value ?& ARRAY['version','operating_role','transport_pattern','allowed_sources','active_dimensions','primary_dimension',
++   'split_permitted','homogeneous_loads_declared','currency_policy','own_cost_model','external_cost_models','per_km_billing_bases']
++ OR value-ARRAY['version','operating_role','transport_pattern','allowed_sources','active_dimensions','primary_dimension',
++   'split_permitted','homogeneous_loads_declared','currency_policy','own_cost_model','external_cost_models','per_km_billing_bases']<>'{}'
++ OR coalesce(value->>'operating_role','') NOT IN('SHIPPER','LOGISTICS_PROVIDER','HYBRID')
++ OR value->>'transport_pattern' IS DISTINCT FROM 'DIRECT' OR value->>'own_cost_model' IS DISTINCT FROM 'OWN_OPERATING_CYCLE'
++ OR jsonb_typeof(value->'split_permitted') IS DISTINCT FROM 'boolean'
++ OR jsonb_typeof(value->'homogeneous_loads_declared') IS DISTINCT FROM 'boolean' THEN RETURN false; END IF;
++ FOREACH key IN ARRAY ARRAY['allowed_sources','active_dimensions','external_cost_models','per_km_billing_bases'] LOOP
++  arr=value->key;
++  IF jsonb_typeof(arr) IS DISTINCT FROM 'array' OR jsonb_array_length(arr)>4
++   OR (SELECT count(*)<>count(DISTINCT x) FROM jsonb_array_elements_text(arr) x) THEN RETURN false; END IF;
++ END LOOP;
++ IF jsonb_array_length(value->'allowed_sources')=0 OR jsonb_array_length(value->'active_dimensions')=0
++ OR EXISTS(SELECT 1 FROM jsonb_array_elements_text(value->'allowed_sources') x WHERE x IS NULL OR x NOT IN('OWN','EXTERNAL'))
++ OR EXISTS(SELECT 1 FROM jsonb_array_elements_text(value->'active_dimensions') x WHERE x IS NULL OR x NOT IN('pallets','weight_kg','volume_m3','units'))
++ OR NOT (value->'active_dimensions') ? coalesce(value->>'primary_dimension','')
++ OR EXISTS(SELECT 1 FROM jsonb_array_elements_text(value->'external_cost_models') x WHERE x IS NULL OR x NOT IN('PER_TRIP','PER_KM'))
++ OR EXISTS(SELECT 1 FROM jsonb_array_elements_text(value->'per_km_billing_bases') x WHERE x IS NULL OR x NOT IN('ONE_WAY','ROUND_TRIP'))
++ OR ((value->'allowed_sources') ? 'EXTERNAL' AND jsonb_array_length(value->'external_cost_models')=0)
++ OR ((value->'external_cost_models') ? 'PER_KM' AND jsonb_array_length(value->'per_km_billing_bases')=0) THEN RETURN false; END IF;
++ arr=value->'currency_policy';
++ RETURN coalesce(jsonb_typeof(arr)='object' AND arr ?& ARRAY['currency','minor_units','rounding']
++  AND arr-ARRAY['currency','minor_units','rounding']='{}' AND arr->>'currency' ~ '^[A-Z]{3}$'
++  AND jsonb_typeof(arr->'minor_units')='number' AND arr->>'minor_units' ~ '^[0-6]$'
++  AND arr->>'rounding'='ROUND_HALF_UP',false);
++END; $$;
++
++CREATE FUNCTION dation_private.t3_policy_valid(value jsonb) RETURNS boolean
++LANGUAGE plpgsql IMMUTABLE SET search_path=pg_catalog AS $$
++DECLARE item jsonb; total numeric=0;
++BEGIN
++ IF jsonb_typeof(value) IS DISTINCT FROM 'object' OR value->>'version' IS DISTINCT FROM '1' OR jsonb_typeof(value->'version') IS DISTINCT FROM 'number'
++ OR NOT value ?& ARRAY['version','primary_goal','guardrails','preferences']
++ OR value-ARRAY['version','primary_goal','guardrails','preferences']<>'{}'
++ OR coalesce(value->>'primary_goal','') NOT IN('MINIMIZE_COST','MAXIMIZE_SERVICE','MAXIMIZE_OWN_CAPACITY','MINIMIZE_TRIPS','BALANCED','CUSTOM')
++ OR jsonb_typeof(value->'guardrails') IS DISTINCT FROM 'array' OR jsonb_typeof(value->'preferences') IS DISTINCT FROM 'array'
++ THEN RETURN false; END IF;
++ IF jsonb_array_length(value->'guardrails')>4 OR jsonb_array_length(value->'preferences')>4 THEN RETURN false; END IF;
++ FOR item IN SELECT x FROM jsonb_array_elements(value->'guardrails') x LOOP
++  IF NOT item ?& ARRAY['kind','limit','hard'] OR item-ARRAY['kind','limit','hard']<>'{}'
++   OR coalesce(item->>'kind','') NOT IN('MINIMUM_DEMAND_COVERAGE','CRITICAL_DEMAND_COVERAGE','MAXIMUM_EXTERNAL_SHARE','MINIMUM_OWN_SHARE')
++   OR item->'hard' IS DISTINCT FROM 'true'::jsonb OR coalesce(item->>'limit','') !~ '^(0(\.[0-9]{1,4})?|1(\.0{1,4})?)$' THEN RETURN false; END IF;
++ END LOOP;
++ FOR item IN SELECT x FROM jsonb_array_elements(value->'preferences') x LOOP
++  IF NOT item ?& ARRAY['kind','weight'] OR item-ARRAY['kind','weight']<>'{}'
++   OR coalesce(item->>'kind','') NOT IN('COST','TRIPS','SERVICE','OWN_CAPACITY')
++   OR coalesce(item->>'weight','') !~ '^(0(\.[0-9]{1,4})?|1(\.0{1,4})?)$' THEN RETURN false; END IF;
++  total=total+(item->>'weight')::numeric;
++ END LOOP;
++ RETURN (SELECT count(*)=count(DISTINCT x->>'kind') FROM jsonb_array_elements(value->'guardrails') x)
++  AND (SELECT count(*)=count(DISTINCT x->>'kind') FROM jsonb_array_elements(value->'preferences') x)
++  AND (jsonb_array_length(value->'preferences')=0 OR total=1)
++  AND (value->>'primary_goal'<>'CUSTOM' OR jsonb_array_length(value->'preferences')>0);
++END; $$;
++
++CREATE FUNCTION dation_private.t3_case_context(c public.decision_cases,uid uuid) RETURNS jsonb
++LANGUAGE plpgsql STABLE SET search_path=pg_catalog AS $$
++DECLARE role_name text; enabled boolean;
++BEGIN
++ role_name=dation_private.team_actor(c.workspace_id,uid);
++ SELECT ultimate_foundation_enabled INTO enabled FROM dation_private.platform_release WHERE singleton;
++ RETURN jsonb_build_object('case',to_jsonb(c),'model_version',(SELECT to_jsonb(v) FROM public.logistics_model_versions v WHERE v.workspace_id=c.workspace_id AND v.id=c.logistics_model_version_id),
++  'model',(SELECT to_jsonb(m)-'draft_config_jsonb' FROM public.logistics_models m JOIN public.logistics_model_versions v ON v.workspace_id=m.workspace_id AND v.model_id=m.id WHERE v.workspace_id=c.workspace_id AND v.id=c.logistics_model_version_id),
++  'pack',(SELECT to_jsonb(p) FROM public.case_data_packs p WHERE p.workspace_id=c.workspace_id AND p.case_id=c.id),
++  'pack_version',(SELECT to_jsonb(v)-'created_xid' FROM public.case_data_packs p JOIN public.case_data_pack_versions v ON v.workspace_id=p.workspace_id AND v.case_id=p.case_id AND v.pack_id=p.id AND v.id=p.current_version_id WHERE p.workspace_id=c.workspace_id AND p.case_id=c.id),
++  'entry_count',(SELECT count(*) FROM public.case_data_pack_entries e JOIN public.case_data_packs p ON p.workspace_id=e.workspace_id AND p.case_id=e.case_id AND p.current_version_id=e.pack_version_id WHERE p.workspace_id=c.workspace_id AND p.case_id=c.id),
++  'responsibilities',public.platform_workflow_responsibilities(c.workspace_id,uid,c.id),
++  'permissions',jsonb_build_object('can_edit',enabled AND role_name IN('admin','operator') AND c.status<>'archived',
++   'can_assign',enabled AND role_name='admin' AND c.status<>'archived',
++   'can_edit_mathematical',enabled AND role_name IN('admin','operator') AND c.status<>'archived' AND c.context_frozen_at IS NULL
++    AND NOT EXISTS(SELECT 1 FROM public.decision_runs WHERE workspace_id=c.workspace_id AND decision_case_id=c.id)));
++END; $$;
++
++CREATE FUNCTION public.platform_ultimate_foundation(target_workspace_id uuid,actor_user_id uuid,operation text,arguments jsonb DEFAULT '{}')
++RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog AS $$
++DECLARE role_name text; enabled boolean; dda boolean; m public.logistics_models; v public.logistics_model_versions;
++ c public.decision_cases; item jsonb; changes jsonb; owner_id uuid; expected_stamp timestamptz; target uuid;
++ page_limit integer; page_offset integer; search_text text; result jsonb;
++BEGIN
++ role_name=dation_private.team_actor(target_workspace_id,actor_user_id);
++ SELECT ultimate_foundation_enabled INTO enabled FROM dation_private.platform_release WHERE singleton;
++ SELECT EXISTS(SELECT 1 FROM public.workspace_ddas WHERE workspace_id=target_workspace_id AND dda_id='logistics' AND status='enabled') INTO dda;
++ IF operation='capabilities' THEN RETURN jsonb_build_object('enabled',enabled AND dda,'can_create_case',enabled AND dda AND role_name IN('admin','operator'),
++  'can_manage_models',enabled AND dda AND role_name='admin','can_assign',enabled AND dda AND role_name='admin','runtime_execution_available',false); END IF;
++ IF NOT dda THEN RAISE EXCEPTION 'DDA access denied' USING ERRCODE='42501'; END IF;
++ IF operation IS NULL OR operation NOT IN('model_list','model_get','model_create','model_update','model_publish','case_get','case_create','case_update')
++  OR jsonb_typeof(arguments) IS DISTINCT FROM 'object' OR octet_length(arguments::text)>524288 THEN
++  RAISE EXCEPTION 'Invalid foundation operation' USING ERRCODE='22023'; END IF;
++ IF operation IN('model_create','model_update','model_publish','case_create','case_update') THEN
++  PERFORM 1 FROM public.workspaces WHERE id=target_workspace_id FOR UPDATE;
++  role_name=dation_private.team_actor(target_workspace_id,actor_user_id,operation IN('model_create','model_update','model_publish'));
++  SELECT ultimate_foundation_enabled INTO enabled FROM dation_private.platform_release WHERE singleton;
++  IF NOT EXISTS(SELECT 1 FROM public.workspace_ddas WHERE workspace_id=target_workspace_id AND dda_id='logistics' AND status='enabled') THEN RAISE EXCEPTION 'DDA access denied' USING ERRCODE='42501'; END IF;
++  IF role_name='viewer' THEN RAISE EXCEPTION 'Read-only membership' USING ERRCODE='42501'; END IF;
++  IF NOT enabled THEN RAISE EXCEPTION 'Ultimate creation is closed' USING ERRCODE='P0002'; END IF;
++  PERFORM set_config('dation.workspace_id',target_workspace_id::text,true);
++  PERFORM set_config('dation.actor_user_id',actor_user_id::text,true);
++ END IF;
++
++ IF operation='model_list' THEN
++  page_limit=coalesce((arguments->>'limit')::integer,25);page_offset=coalesce((arguments->>'offset')::integer,0);search_text=coalesce(arguments->>'search_text','');
++  IF page_limit NOT BETWEEN 1 AND 50 OR page_offset NOT BETWEEN 0 AND 1000000 OR length(search_text)>120 THEN RAISE EXCEPTION 'Invalid page' USING ERRCODE='22023'; END IF;
++  WITH matched AS (SELECT * FROM public.logistics_models WHERE workspace_id=target_workspace_id
++   AND (coalesce((arguments->>'include_archived')::boolean,false) OR status='active')
++   AND (search_text='' OR strpos(lower(name),lower(search_text))>0)),
++  page AS (SELECT * FROM matched ORDER BY updated_at DESC,id LIMIT page_limit OFFSET page_offset)
++  SELECT jsonb_build_object('items',coalesce((SELECT jsonb_agg(to_jsonb(p)-'draft_config_jsonb'||jsonb_build_object('versions',
++    (SELECT coalesce(jsonb_agg(jsonb_build_object('id',vv.id,'version',vv.version,'published_at',vv.published_at) ORDER BY vv.version DESC),'[]') FROM public.logistics_model_versions vv WHERE vv.workspace_id=p.workspace_id AND vv.model_id=p.id)) ORDER BY p.updated_at DESC,p.id) FROM page p),'[]'),
++   'total',(SELECT count(*) FROM matched),'limit',page_limit,'offset',page_offset) INTO result;
++  RETURN result;
++ END IF;
++
++ IF operation IN('model_get','model_update','model_publish') THEN
++  SELECT * INTO m FROM public.logistics_models WHERE workspace_id=target_workspace_id AND id=(arguments->>'model_id')::uuid;
++  IF NOT FOUND THEN RAISE EXCEPTION 'Model not found' USING ERRCODE='P0002'; END IF;
++ END IF;
++ IF operation='model_create' THEN
++  target=(arguments->>'id')::uuid;
++  SELECT * INTO m FROM public.logistics_models WHERE id=target;
++  IF FOUND THEN
++   IF m.workspace_id<>target_workspace_id THEN RAISE EXCEPTION 'Model not found' USING ERRCODE='P0002'; END IF;
++   IF m.creation_intent_hash IS DISTINCT FROM arguments->>'creation_intent_hash' THEN RAISE EXCEPTION 'Creation intent changed' USING ERRCODE='55006'; END IF;
++  ELSE
++   IF NOT dation_private.t3_configuration_valid(arguments->'configuration') OR coalesce(arguments->>'configuration_hash','') !~ '^[0-9a-f]{64}$'
++    OR coalesce(arguments->>'creation_intent_hash','') !~ '^[0-9a-f]{64}$' THEN RAISE EXCEPTION 'Invalid Model configuration' USING ERRCODE='22023'; END IF;
++   INSERT INTO public.logistics_models(id,workspace_id,name,description,created_by,draft_config_jsonb,draft_config_hash,creation_intent_hash)
++   VALUES(target,target_workspace_id,arguments->>'name',arguments->>'description',actor_user_id,arguments->'configuration',arguments->>'configuration_hash',arguments->>'creation_intent_hash') RETURNING * INTO m;
++   INSERT INTO public.audit_events(workspace_id,actor_user_id,event_type,object_type,object_id) VALUES(target_workspace_id,actor_user_id,'logistics_model.created','logistics_model',m.id);
++  END IF;
++ ELSIF operation='model_update' THEN
++  IF m.revision IS DISTINCT FROM (arguments->>'expected_revision')::bigint THEN RAISE EXCEPTION 'Model changed' USING ERRCODE='55006'; END IF;
++  IF NOT dation_private.t3_configuration_valid(arguments->'configuration') OR coalesce(arguments->>'configuration_hash','') !~ '^[0-9a-f]{64}$' THEN RAISE EXCEPTION 'Invalid Model configuration' USING ERRCODE='22023'; END IF;
++  UPDATE public.logistics_models SET name=arguments->>'name',description=arguments->>'description',status=arguments->>'status',draft_config_jsonb=arguments->'configuration',
++   draft_config_hash=arguments->>'configuration_hash',revision=revision+1,updated_at=clock_timestamp() WHERE id=m.id AND workspace_id=target_workspace_id RETURNING * INTO m;
++  INSERT INTO public.audit_events(workspace_id,actor_user_id,event_type,object_type,object_id,metadata_json) VALUES(target_workspace_id,actor_user_id,'logistics_model.updated','logistics_model',m.id,jsonb_build_object('revision',m.revision));
++ ELSIF operation='model_publish' THEN
++  SELECT * INTO v FROM public.logistics_model_versions WHERE id=(arguments->>'version_id')::uuid;
++  IF FOUND THEN
++   IF v.workspace_id<>target_workspace_id OR v.model_id<>m.id THEN RAISE EXCEPTION 'Version not found' USING ERRCODE='P0002'; END IF;
++   IF v.source_model_revision IS DISTINCT FROM (arguments->>'expected_revision')::bigint THEN RAISE EXCEPTION 'Publish intent changed' USING ERRCODE='55006'; END IF;
++   RETURN jsonb_build_object('version',to_jsonb(v),'model_revision',m.revision,'replayed',true);
++  END IF;
++  IF m.revision IS DISTINCT FROM (arguments->>'expected_revision')::bigint OR m.draft_config_hash IS DISTINCT FROM arguments->>'configuration_hash' THEN RAISE EXCEPTION 'Model changed' USING ERRCODE='55006'; END IF;
++  IF m.status<>'active' OR NOT dation_private.t3_configuration_valid(m.draft_config_jsonb)
++   OR coalesce(arguments->>'contract_hash','') !~ '^[0-9a-f]{64}$'
++   OR arguments#>>'{contract_descriptor,schema_version}' IS DISTINCT FROM 'ultimate_model_domain_reference_v1'
++   OR arguments#>>'{contract_descriptor,configuration_hash}' IS DISTINCT FROM m.draft_config_hash THEN RAISE EXCEPTION 'Invalid publication' USING ERRCODE='22023'; END IF;
++  INSERT INTO public.logistics_model_versions(id,workspace_id,model_id,version,graph_definition_version,config_schema_version,config_jsonb,
++   contract_descriptor_jsonb,config_hash,contract_hash,contract_registry_version,published_by,source_model_revision)
++  VALUES((arguments->>'version_id')::uuid,target_workspace_id,m.id,(SELECT coalesce(max(version),0)+1 FROM public.logistics_model_versions WHERE model_id=m.id),
++   'ULTIMATE_FOUNDATION_V1','logistics_model_config_v1',m.draft_config_jsonb,arguments->'contract_descriptor',m.draft_config_hash,arguments->>'contract_hash','ULTIMATE_DOMAIN_V1',actor_user_id,m.revision) RETURNING * INTO v;
++  UPDATE public.logistics_models SET revision=revision+1,updated_at=clock_timestamp() WHERE id=m.id RETURNING * INTO m;
++  INSERT INTO public.audit_events(workspace_id,actor_user_id,event_type,object_type,object_id,metadata_json)
++   VALUES(target_workspace_id,actor_user_id,'logistics_model.version_published','logistics_model',m.id,jsonb_build_object('version_id',v.id,'version',v.version));
++  RETURN jsonb_build_object('version',to_jsonb(v),'model_revision',m.revision,'replayed',false);
++ END IF;
++ IF operation IN('model_get','model_create','model_update') THEN
++  RETURN jsonb_build_object('model',to_jsonb(m),'versions',coalesce((SELECT jsonb_agg(to_jsonb(vv) ORDER BY vv.version DESC)
++   FROM public.logistics_model_versions vv WHERE vv.workspace_id=target_workspace_id AND vv.model_id=m.id),'[]'));
++ END IF;
++
++ target=(arguments->>CASE WHEN operation='case_create' THEN 'id' ELSE 'case_id' END)::uuid;
++ SELECT * INTO c FROM public.decision_cases WHERE workspace_id=target_workspace_id AND id=target;
++ IF operation='case_create' THEN
++  IF FOUND THEN
++   IF c.workflow_version<>2 OR c.creation_intent_hash IS DISTINCT FROM arguments->>'creation_intent_hash' THEN RAISE EXCEPTION 'Creation intent changed' USING ERRCODE='55006'; END IF;
++   RETURN dation_private.t3_case_context(c,actor_user_id);
++  END IF;
++  IF EXISTS(SELECT 1 FROM public.decision_cases WHERE id=target) THEN RAISE EXCEPTION 'Case not found' USING ERRCODE='P0002'; END IF;
++  SELECT * INTO v FROM public.logistics_model_versions WHERE workspace_id=target_workspace_id AND id=(arguments->>'logistics_model_version_id')::uuid;
++  IF NOT FOUND THEN RAISE EXCEPTION 'Model Version not found' USING ERRCODE='P0002'; END IF;
++  SELECT * INTO m FROM public.logistics_models WHERE workspace_id=target_workspace_id AND id=v.model_id;
++  IF m.status<>'active' OR NOT dation_private.t3_configuration_valid(v.config_jsonb) THEN RAISE EXCEPTION 'Choose an active published Model Version' USING ERRCODE='22023'; END IF;
++  IF length(coalesce(trim(arguments->>'name'),'')) NOT BETWEEN 1 AND 120
++   OR NOT dation_private.t3_policy_valid(arguments->'case_policy') OR coalesce(arguments->>'case_policy_hash','') !~ '^[0-9a-f]{64}$'
++   OR coalesce(arguments->>'horizon_type','') NOT IN('DAILY','WEEKLY','MONTHLY','CUSTOM')
++   OR coalesce(arguments->>'creation_intent_hash','') !~ '^[0-9a-f]{64}$' THEN RAISE EXCEPTION 'Invalid Case context' USING ERRCODE='22023'; END IF;
++  owner_id=(arguments->>'decision_owner_user_id')::uuid;
++  IF role_name='admin' AND owner_id IS NULL THEN RAISE EXCEPTION 'Choose a Decision Owner' USING ERRCODE='22023'; END IF;
++  IF owner_id IS NOT NULL AND role_name<>'admin' THEN RAISE EXCEPTION 'Only Admin may assign owners' USING ERRCODE='42501'; END IF;
++  IF owner_id IS NOT NULL AND NOT dation_private.responsibility_eligible(target_workspace_id,owner_id,'decision_owner') THEN RAISE EXCEPTION 'Owner is not eligible' USING ERRCODE='22023'; END IF;
++  INSERT INTO public.decision_cases(id,workspace_id,schema_version,workflow_version,label,description,category,logistics_model_version_id,
++   planning_start,planning_end,horizon_type,operating_mode,case_policy_schema_version,case_policy_jsonb,case_policy_hash,graph_definition_version,created_by_user_id,creation_intent_hash)
++  VALUES(target,target_workspace_id,'decision_case_v2',2,arguments->>'name',arguments->>'description',
++   CASE arguments->>'horizon_type' WHEN 'WEEKLY' THEN 'weekly' WHEN 'MONTHLY' THEN 'monthly' WHEN 'DAILY' THEN 'live_operation' ELSE 'extraordinary' END,
++   v.id,(arguments->>'planning_start')::date,(arguments->>'planning_end')::date,arguments->>'horizon_type',arguments->>'operating_mode','case_policy_v1',arguments->'case_policy',arguments->>'case_policy_hash',v.graph_definition_version,actor_user_id,arguments->>'creation_intent_hash') RETURNING * INTO c;
++  INSERT INTO public.case_data_packs(id,workspace_id,case_id) VALUES((arguments->>'pack_id')::uuid,target_workspace_id,c.id);
++  INSERT INTO public.case_data_pack_versions(id,workspace_id,case_id,pack_id,version,manifest_hash,contract_set_hash,created_by)
++   VALUES((arguments->>'pack_version_id')::uuid,target_workspace_id,c.id,(arguments->>'pack_id')::uuid,1,arguments->>'manifest_hash',arguments->>'contract_set_hash',actor_user_id);
++  UPDATE public.case_data_packs SET current_version_id=(arguments->>'pack_version_id')::uuid WHERE workspace_id=target_workspace_id AND case_id=c.id;
++  IF owner_id IS NOT NULL THEN
++   PERFORM public.platform_assign_decision(target_workspace_id,actor_user_id,c.id,'logistics_assignment',NULL,owner_id,NULL);
++   PERFORM public.platform_assign_decision(target_workspace_id,actor_user_id,c.id,'logistics_scheduling',NULL,owner_id,NULL);
++  END IF;
++  RETURN dation_private.t3_case_context(c,actor_user_id);
++ END IF;
++ IF NOT FOUND OR c.workflow_version<>2 THEN RAISE EXCEPTION 'Ultimate Case not found' USING ERRCODE='P0002'; END IF;
++ IF operation='case_get' THEN RETURN dation_private.t3_case_context(c,actor_user_id); END IF;
++ SELECT * INTO c FROM public.decision_cases WHERE workspace_id=target_workspace_id AND id=target FOR UPDATE;
++ IF c.updated_at IS DISTINCT FROM (arguments->>'expected_updated_at')::timestamptz THEN RAISE EXCEPTION 'Case changed' USING ERRCODE='55006'; END IF;
++ IF c.status='archived' THEN RAISE EXCEPTION 'Restore Case before editing' USING ERRCODE='22023'; END IF;
++ changes=arguments->'changes';
++ IF jsonb_typeof(changes) IS DISTINCT FROM 'object' OR changes-ARRAY['name','description','planning_start','planning_end','horizon_type','operating_mode','case_policy','case_policy_hash']<>'{}'
++  OR (changes?'case_policy' AND NOT dation_private.t3_policy_valid(changes->'case_policy'))
++  OR (changes?'name' AND nullif(trim(changes->>'name'),'') IS NULL)
++  OR jsonb_typeof(arguments->'owner_updates') IS DISTINCT FROM 'array' OR jsonb_array_length(arguments->'owner_updates')>2 THEN
++  RAISE EXCEPTION 'Invalid context update' USING ERRCODE='22023'; END IF;
++ IF jsonb_array_length(arguments->'owner_updates')>0 AND role_name<>'admin' THEN RAISE EXCEPTION 'Only Admin may assign owners' USING ERRCODE='42501'; END IF;
++ IF (SELECT count(*)<>count(DISTINCT x->>'node_id') FROM jsonb_array_elements(arguments->'owner_updates') x) THEN RAISE EXCEPTION 'Duplicate owner update' USING ERRCODE='22023'; END IF;
++ UPDATE public.decision_cases SET label=CASE WHEN changes?'name' THEN changes->>'name' ELSE label END,
++  description=CASE WHEN changes?'description' THEN changes->>'description' ELSE description END,
++  planning_start=CASE WHEN changes?'planning_start' THEN (changes->>'planning_start')::date ELSE planning_start END,
++  planning_end=CASE WHEN changes?'planning_end' THEN (changes->>'planning_end')::date ELSE planning_end END,
++  horizon_type=CASE WHEN changes?'horizon_type' THEN changes->>'horizon_type' ELSE horizon_type END,
++  operating_mode=CASE WHEN changes?'operating_mode' THEN changes->>'operating_mode' ELSE operating_mode END,
++  case_policy_jsonb=CASE WHEN changes?'case_policy' THEN changes->'case_policy' ELSE case_policy_jsonb END,
++  case_policy_hash=CASE WHEN changes?'case_policy' THEN changes->>'case_policy_hash' ELSE case_policy_hash END,
++  updated_at=clock_timestamp(),last_activity_at=clock_timestamp()
++ WHERE workspace_id=target_workspace_id AND id=c.id RETURNING * INTO c;
++ FOR item IN SELECT x FROM jsonb_array_elements(arguments->'owner_updates') x LOOP
++  PERFORM public.platform_assign_decision(target_workspace_id,actor_user_id,c.id,item->>'node_id',
++   (item->>'expected_updated_at')::timestamptz,(item->>'owner_user_id')::uuid,NULL);
++ END LOOP;
++ INSERT INTO public.audit_events(workspace_id,actor_user_id,event_type,object_type,object_id,decision_case_id,metadata_json)
++ VALUES(target_workspace_id,actor_user_id,'decision_case.context_updated','decision_case',c.id,c.id,
++  jsonb_build_object('fields',(SELECT coalesce(jsonb_agg(k),'[]') FROM jsonb_object_keys(changes) k)));
++ RETURN dation_private.t3_case_context(c,actor_user_id);
++END; $$;
++
++CREATE FUNCTION dation_private.t3_model_identity() RETURNS trigger
++LANGUAGE plpgsql SET search_path=pg_catalog AS $$
++BEGIN
++ IF ROW(NEW.id,NEW.workspace_id,NEW.created_by,NEW.created_at,NEW.creation_intent_hash)
++  IS DISTINCT FROM ROW(OLD.id,OLD.workspace_id,OLD.created_by,OLD.created_at,OLD.creation_intent_hash)
++  OR NEW.revision<>OLD.revision+1 THEN RAISE EXCEPTION 'Model identity/revision is immutable' USING ERRCODE='22023'; END IF;
++ RETURN NEW;
++END; $$;
++CREATE TRIGGER t3_model_identity BEFORE UPDATE ON public.logistics_models FOR EACH ROW EXECUTE FUNCTION dation_private.t3_model_identity();
++
++CREATE FUNCTION dation_private.t3_context_guard() RETURNS trigger
++LANGUAGE plpgsql SET search_path=pg_catalog AS $$
++BEGIN
++ IF OLD.workflow_version=2 THEN
++  IF NEW.creation_intent_hash IS DISTINCT FROM OLD.creation_intent_hash THEN RAISE EXCEPTION 'Creation intent is immutable' USING ERRCODE='22023'; END IF;
++  IF (OLD.context_frozen_at IS NOT NULL OR EXISTS(SELECT 1 FROM public.decision_runs WHERE workspace_id=OLD.workspace_id AND decision_case_id=OLD.id))
++   AND ROW(NEW.planning_start,NEW.planning_end,NEW.horizon_type,NEW.operating_mode,NEW.case_policy_jsonb,NEW.case_policy_hash)
++    IS DISTINCT FROM ROW(OLD.planning_start,OLD.planning_end,OLD.horizon_type,OLD.operating_mode,OLD.case_policy_jsonb,OLD.case_policy_hash) THEN
++   RAISE EXCEPTION 'El horizonte y la política están congelados desde la primera admisión.' USING ERRCODE='22023'; END IF;
++ END IF;
++ RETURN NEW;
++END; $$;
++CREATE TRIGGER t3_context_guard BEFORE UPDATE ON public.decision_cases FOR EACH ROW EXECUTE FUNCTION dation_private.t3_context_guard();
++CREATE FUNCTION dation_private.t3_freeze_on_admission() RETURNS trigger
++LANGUAGE plpgsql SET search_path=pg_catalog AS $$
++DECLARE c public.decision_cases;
++BEGIN
++ IF NEW.workflow_version<>2 THEN RETURN NEW; END IF;
++ PERFORM 1 FROM public.workspaces WHERE id=NEW.workspace_id FOR UPDATE;
++ SELECT * INTO c FROM public.decision_cases WHERE workspace_id=NEW.workspace_id AND id=NEW.decision_case_id FOR UPDATE;
++ IF c.workflow_version=2 AND c.context_frozen_at IS NULL THEN
++  UPDATE public.decision_cases SET context_frozen_at=clock_timestamp(),updated_at=clock_timestamp()
++   WHERE workspace_id=c.workspace_id AND id=c.id;
++ END IF;
++ RETURN NEW;
++END; $$;
++CREATE TRIGGER a_ultimate_context_freeze BEFORE INSERT ON public.decision_runs FOR EACH ROW EXECUTE FUNCTION dation_private.t3_freeze_on_admission();
++
++REVOKE ALL ON FUNCTION dation_private.t3_configuration_valid(jsonb),dation_private.t3_policy_valid(jsonb),
++ dation_private.t3_case_context(public.decision_cases,uuid),dation_private.t3_model_identity(),dation_private.t3_context_guard(),dation_private.t3_freeze_on_admission()
++ FROM PUBLIC,anon,authenticated,service_role;
++REVOKE ALL ON FUNCTION public.platform_ultimate_foundation(uuid,uuid,text,jsonb) FROM PUBLIC,anon,authenticated;
++GRANT EXECUTE ON FUNCTION public.platform_ultimate_foundation(uuid,uuid,text,jsonb) TO service_role;
++DO $$ DECLARE source text; BEGIN
++ source=pg_get_functiondef('public.platform_home(uuid,uuid)'::regprocedure);
++ IF strpos(source,'''workflow_version'',c.workflow_version')=0 THEN RAISE EXCEPTION 'Unexpected Home compatibility reader'; END IF;
++ source=replace(source,'''workflow_version'',c.workflow_version',
++  '''foundation_context_available'',c.workflow_version=2 AND c.creation_intent_hash IS NOT NULL,''workflow_version'',c.workflow_version');
++ EXECUTE source;
++END; $$;
++NOTIFY pgrst,'reload schema';
++COMMIT;

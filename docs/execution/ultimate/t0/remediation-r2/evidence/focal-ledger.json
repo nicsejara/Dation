@@ -1,0 +1,308 @@
+{
+  "phase": "T0-R2",
+  "results": [
+    {
+      "log": "browser-diagnostic.log",
+      "tests": 4,
+      "seconds": 53.372,
+      "status": "FAIL",
+      "failures": [
+        {
+          "kind": "ERROR",
+          "test": "test_case_ux_real_data_change_retains_lineage_but_reopening_history_has_no_new_notice (test_navigation.NavigationTests.test_case_ux_real_data_change_retains_lineage_but_reopening_history_has_no_new_notice)"
+        },
+        {
+          "kind": "ERROR",
+          "test": "test_shared_case_context_and_compact_map_milestones (test_saga4_ui.Saga4UITests.test_shared_case_context_and_compact_map_milestones)"
+        }
+      ],
+      "observed_test_ids": [
+        "test_home_hero.HomeHeroTests.test_art_is_small_and_reserves_geometry_and_content_survives_failure",
+        "test_navigation.NavigationTests.test_dashboard_toolbars_share_controls_and_symmetric_bleed",
+        "test_navigation.NavigationTests.test_case_ux_real_data_change_retains_lineage_but_reopening_history_has_no_new_notice",
+        "test_saga4_ui.Saga4UITests.test_shared_case_context_and_compact_map_milestones"
+      ],
+      "original_raw_log_preserved": true
+    },
+    {
+      "log": "browser-residual-focal.log",
+      "tests": 7,
+      "seconds": 34.369,
+      "status": "FAIL",
+      "failures": [
+        {
+          "kind": "FAIL",
+          "test": "test_workflow_progressive_actions_share_styles_arrow_and_keyboard_focus (test_navigation.NavigationTests.test_workflow_progressive_actions_share_styles_arrow_and_keyboard_focus)"
+        }
+      ],
+      "observed_test_ids": [
+        "test_navigation.NavigationTests.test_toolbar_approval_is_unique_direct_and_preserves_continuation",
+        "test_navigation.NavigationTests.test_case_selector_paginates_compact_active_and_completed_and_hydrates_only_selection",
+        "test_navigation.NavigationTests.test_case_ux_both_reviews_keep_config_and_only_confirm_executes_once",
+        "test_navigation.NavigationTests.test_case_ux_real_data_change_retains_lineage_but_reopening_history_has_no_new_notice",
+        "test_navigation.NavigationTests.test_workflow_progressive_actions_share_styles_arrow_and_keyboard_focus",
+        "test_navigation.NavigationTests.test_d2_v21_ai_retry_approval_and_approved_state",
+        "test_saga4_ui.Saga4UITests.test_shared_case_context_and_compact_map_milestones"
+      ],
+      "original_raw_log_preserved": true
+    },
+    {
+      "log": "browser-styles-focal.log",
+      "tests": 2,
+      "seconds": 17.651,
+      "status": "FAIL",
+      "failures": [
+        {
+          "kind": "ERROR",
+          "test": "test_workflow_progressive_actions_share_styles_arrow_and_keyboard_focus (test_navigation.NavigationTests.test_workflow_progressive_actions_share_styles_arrow_and_keyboard_focus)"
+        }
+      ],
+      "observed_test_ids": [
+        "test_navigation.NavigationTests.test_case_selector_paginates_compact_active_and_completed_and_hydrates_only_selection",
+        "test_navigation.NavigationTests.test_workflow_progressive_actions_share_styles_arrow_and_keyboard_focus"
+      ],
+      "original_raw_log_preserved": true
+    },
+    {
+      "log": "browser-workflow-style-final.log",
+      "tests": 1,
+      "seconds": 32.859,
+      "status": "PASS",
+      "failures": [],
+      "observed_test_ids": [
+        "test_navigation.NavigationTests.test_workflow_progressive_actions_share_styles_arrow_and_keyboard_focus"
+      ],
+      "original_raw_log_preserved": true
+    },
+    {
+      "log": "five-e2e-current.log",
+      "tests": 5,
+      "seconds": 130.764,
+      "status": "FAIL",
+      "failures": [
+        {
+          "kind": "FAIL",
+          "test": "test_browser_complete_workflow_at_mobile_width (test_workflow.WorkflowTests.test_browser_complete_workflow_at_mobile_width)"
+        },
+        {
+          "kind": "FAIL",
+          "test": "test_browser_creation_execution_approval_navigation_and_mobile_history (test_workflow.WorkflowTests.test_browser_creation_execution_approval_navigation_and_mobile_history)"
+        }
+      ],
+      "observed_test_ids": [
+        "test_collaboration.CollaborationTests.test_02_assigned_approval_handoff_attribution_override_and_retry",
+        "test_tenancy.TenancyTests.test_09_home_attention_tracks_real_versions_and_removes_approved_or_archived",
+        "test_workflow.WorkflowTests.test_browser_complete_workflow_at_mobile_width",
+        "test_workflow.WorkflowTests.test_browser_creation_execution_approval_navigation_and_mobile_history",
+        "test_workflow.WorkflowTests.test_scheduling_dashboard_v21_preserves_assignment_and_temporal_relations"
+      ],
+      "original_raw_log_preserved": true
+    },
+    {
+      "log": "five-e2e-focal.log",
+      "tests": 5,
+      "seconds": 138.797,
+      "status": "FAIL",
+      "failures": [
+        {
+          "kind": "FAIL",
+          "test": "test_02_assigned_approval_handoff_attribution_override_and_retry (test_collaboration.CollaborationTests.test_02_assigned_approval_handoff_attribution_override_and_retry)"
+        },
+        {
+          "kind": "FAIL",
+          "test": "test_browser_complete_workflow_at_mobile_width (test_workflow.WorkflowTests.test_browser_complete_workflow_at_mobile_width)"
+        },
+        {
+          "kind": "FAIL",
+          "test": "test_browser_creation_execution_approval_navigation_and_mobile_history (test_workflow.WorkflowTests.test_browser_creation_execution_approval_navigation_and_mobile_history)"
+        }
+      ],
+      "observed_test_ids": [
+        "test_collaboration.CollaborationTests.test_02_assigned_approval_handoff_attribution_override_and_retry",
+        "test_tenancy.TenancyTests.test_09_home_attention_tracks_real_versions_and_removes_approved_or_archived",
+        "test_workflow.WorkflowTests.test_browser_complete_workflow_at_mobile_width",
+        "test_workflow.WorkflowTests.test_browser_creation_execution_approval_navigation_and_mobile_history",
+        "test_workflow.WorkflowTests.test_scheduling_dashboard_v21_preserves_assignment_and_temporal_relations"
+      ],
+      "original_raw_log_preserved": true
+    },
+    {
+      "log": "fixture-lifecycle-focal.log",
+      "tests": 20,
+      "seconds": 77.157,
+      "status": "FAIL",
+      "failures": [
+        {
+          "kind": "FAIL",
+          "test": "test_map_selector_switches_case_data_progress_url_and_restores_cancel_focus (test_navigation.NavigationTests.test_map_selector_switches_case_data_progress_url_and_restores_cancel_focus)"
+        }
+      ],
+      "observed_test_ids": [
+        "test_navigation.NavigationTests.test_assignment_draft_is_restored_per_case",
+        "test_navigation.NavigationTests.test_map_selector_switches_case_data_progress_url_and_restores_cancel_focus",
+        "test_navigation.NavigationTests.test_case_ux_completed_picker_switches_once_without_reload_and_preserves_drafts",
+        "test_workflow_context.WorkflowContextTests.test_both_dashboards_keep_approval_blocked_until_an_eligible_approver_is_saved",
+        "test_workflow_context.WorkflowContextTests.test_case_context_is_fixed_and_keyboard_navigation_returns_to_its_map",
+        "test_workflow_context.WorkflowContextTests.test_dashboard_trace_shares_the_copy_row_and_context_pills_are_equal",
+        "test_workflow_context.WorkflowContextTests.test_data_gate_registers_only_on_assignment_and_opens_the_same_case_map",
+        "test_workflow_context.WorkflowContextTests.test_data_roles_exist_before_csv_and_stay_below_compatibility",
+        "test_workflow_context.WorkflowContextTests.test_data_save_does_not_overwrite_assignment_changed_while_editing",
+        "test_workflow_context.WorkflowContextTests.test_dda_navigation_resolves_canonical_runs_without_losing_context",
+        "test_workflow_context.WorkflowContextTests.test_empty_candidates_and_conflict_preserve_the_map_assignment",
+        "test_workflow_context.WorkflowContextTests.test_history_and_archived_maps_remain_readable_after_data_owner_loses_eligibility",
+        "test_workflow_context.WorkflowContextTests.test_map_assignment_is_consumed_readonly_by_config_and_review",
+        "test_workflow_context.WorkflowContextTests.test_mobile_reflow_and_status_marker_are_independent_from_selection",
+        "test_workflow_context.WorkflowContextTests.test_operator_registers_a_pending_data_case_and_refreshes_admin_assignment",
+        "test_workflow_context.WorkflowContextTests.test_owner_revoked_at_admission_returns_to_config_without_polling_a_phantom_run",
+        "test_workflow_context.WorkflowContextTests.test_recovery_and_new_password_finish_on_login_with_generic_confirmation",
+        "test_workflow_context.WorkflowContextTests.test_team_keeps_one_invitation_entry_and_edits_multiple_roles_together",
+        "test_workflow_context.WorkflowContextTests.test_viewer_and_late_candidates_do_not_gain_mutation_controls",
+        "test_workflow_context.WorkflowContextTests.test_viewer_cannot_execute_even_when_all_business_responsibilities_are_eligible"
+      ],
+      "original_raw_log_preserved": true
+    },
+    {
+      "log": "fixture-lifecycle-related.log",
+      "tests": 20,
+      "seconds": 79.406,
+      "status": "PASS",
+      "failures": [],
+      "observed_test_ids": [
+        "test_navigation.NavigationTests.test_assignment_draft_is_restored_per_case",
+        "test_navigation.NavigationTests.test_map_selector_switches_case_data_progress_url_and_restores_cancel_focus",
+        "test_navigation.NavigationTests.test_case_ux_completed_picker_switches_once_without_reload_and_preserves_drafts",
+        "test_workflow_context.WorkflowContextTests.test_both_dashboards_keep_approval_blocked_until_an_eligible_approver_is_saved",
+        "test_workflow_context.WorkflowContextTests.test_case_context_is_fixed_and_keyboard_navigation_returns_to_its_map",
+        "test_workflow_context.WorkflowContextTests.test_dashboard_trace_shares_the_copy_row_and_context_pills_are_equal",
+        "test_workflow_context.WorkflowContextTests.test_data_gate_registers_only_on_assignment_and_opens_the_same_case_map",
+        "test_workflow_context.WorkflowContextTests.test_data_roles_exist_before_csv_and_stay_below_compatibility",
+        "test_workflow_context.WorkflowContextTests.test_data_save_does_not_overwrite_assignment_changed_while_editing",
+        "test_workflow_context.WorkflowContextTests.test_dda_navigation_resolves_canonical_runs_without_losing_context",
+        "test_workflow_context.WorkflowContextTests.test_empty_candidates_and_conflict_preserve_the_map_assignment",
+        "test_workflow_context.WorkflowContextTests.test_history_and_archived_maps_remain_readable_after_data_owner_loses_eligibility",
+        "test_workflow_context.WorkflowContextTests.test_map_assignment_is_consumed_readonly_by_config_and_review",
+        "test_workflow_context.WorkflowContextTests.test_mobile_reflow_and_status_marker_are_independent_from_selection",
+        "test_workflow_context.WorkflowContextTests.test_operator_registers_a_pending_data_case_and_refreshes_admin_assignment",
+        "test_workflow_context.WorkflowContextTests.test_owner_revoked_at_admission_returns_to_config_without_polling_a_phantom_run",
+        "test_workflow_context.WorkflowContextTests.test_recovery_and_new_password_finish_on_login_with_generic_confirmation",
+        "test_workflow_context.WorkflowContextTests.test_team_keeps_one_invitation_entry_and_edits_multiple_roles_together",
+        "test_workflow_context.WorkflowContextTests.test_viewer_and_late_candidates_do_not_gain_mutation_controls",
+        "test_workflow_context.WorkflowContextTests.test_viewer_cannot_execute_even_when_all_business_responsibilities_are_eligible"
+      ],
+      "original_raw_log_preserved": true
+    },
+    {
+      "log": "focus-and-preservation-focal.log",
+      "tests": 3,
+      "seconds": 74.988,
+      "status": "PASS",
+      "failures": [],
+      "observed_test_ids": [
+        "test_navigation.NavigationTests.test_workflow_keyboard_and_text_spacing_at_320_and_landscape",
+        "test_navigation.NavigationTests.test_dark_shell_and_heroes_survive_responsive_and_warm_navigation",
+        "test_navigation.NavigationTests.test_workflow_bars_equalize_context_and_keep_a_wider_primary_action"
+      ],
+      "original_raw_log_preserved": true
+    },
+    {
+      "log": "sql-home-focal.log",
+      "tests": 3,
+      "seconds": 34.372,
+      "status": "PASS",
+      "failures": [],
+      "observed_test_ids": [
+        "test_home_owner_attention.HomeOwnerAttentionTests.test_fresh_schema_owner_nonowner_viewer_and_tenant_boundaries",
+        "test_home_owner_attention.HomeOwnerAttentionTests.test_operator_owner_admin_override_role_loss_and_handoff",
+        "test_home_owner_attention.HomeOwnerAttentionTests.test_upgrade_preserves_history_rows_function_identity_and_execute_acl"
+      ],
+      "original_raw_log_preserved": true
+    },
+    {
+      "log": "three-e2e-current-contract.log",
+      "tests": 3,
+      "seconds": 219.449,
+      "status": "FAIL",
+      "failures": [
+        {
+          "kind": "FAIL",
+          "test": "test_02_assigned_approval_handoff_attribution_override_and_retry (test_collaboration.CollaborationTests.test_02_assigned_approval_handoff_attribution_override_and_retry)"
+        },
+        {
+          "kind": "FAIL",
+          "test": "test_browser_complete_workflow_at_mobile_width (test_workflow.WorkflowTests.test_browser_complete_workflow_at_mobile_width)"
+        },
+        {
+          "kind": "FAIL",
+          "test": "test_browser_creation_execution_approval_navigation_and_mobile_history (test_workflow.WorkflowTests.test_browser_creation_execution_approval_navigation_and_mobile_history)"
+        }
+      ],
+      "observed_test_ids": [
+        "test_collaboration.CollaborationTests.test_02_assigned_approval_handoff_attribution_override_and_retry",
+        "test_workflow.WorkflowTests.test_browser_complete_workflow_at_mobile_width",
+        "test_workflow.WorkflowTests.test_browser_creation_execution_approval_navigation_and_mobile_history"
+      ],
+      "original_raw_log_preserved": true
+    },
+    {
+      "log": "three-e2e-lifecycle.log",
+      "tests": 3,
+      "seconds": 125.137,
+      "status": "FAIL",
+      "failures": [
+        {
+          "kind": "FAIL",
+          "test": "test_browser_complete_workflow_at_mobile_width (test_workflow.WorkflowTests.test_browser_complete_workflow_at_mobile_width)"
+        },
+        {
+          "kind": "FAIL",
+          "test": "test_browser_creation_execution_approval_navigation_and_mobile_history (test_workflow.WorkflowTests.test_browser_creation_execution_approval_navigation_and_mobile_history)"
+        }
+      ],
+      "observed_test_ids": [
+        "test_collaboration.CollaborationTests.test_02_assigned_approval_handoff_attribution_override_and_retry",
+        "test_workflow.WorkflowTests.test_browser_complete_workflow_at_mobile_width",
+        "test_workflow.WorkflowTests.test_browser_creation_execution_approval_navigation_and_mobile_history"
+      ],
+      "original_raw_log_preserved": true
+    },
+    {
+      "log": "three-e2e-related.log",
+      "tests": 3,
+      "seconds": 132.297,
+      "status": "FAIL",
+      "failures": [
+        {
+          "kind": "FAIL",
+          "test": "test_02_assigned_approval_handoff_attribution_override_and_retry (test_collaboration.CollaborationTests.test_02_assigned_approval_handoff_attribution_override_and_retry)"
+        },
+        {
+          "kind": "FAIL",
+          "test": "test_browser_complete_workflow_at_mobile_width (test_workflow.WorkflowTests.test_browser_complete_workflow_at_mobile_width)"
+        },
+        {
+          "kind": "FAIL",
+          "test": "test_browser_creation_execution_approval_navigation_and_mobile_history (test_workflow.WorkflowTests.test_browser_creation_execution_approval_navigation_and_mobile_history)"
+        }
+      ],
+      "observed_test_ids": [
+        "test_collaboration.CollaborationTests.test_02_assigned_approval_handoff_attribution_override_and_retry",
+        "test_workflow.WorkflowTests.test_browser_complete_workflow_at_mobile_width",
+        "test_workflow.WorkflowTests.test_browser_creation_execution_approval_navigation_and_mobile_history"
+      ],
+      "original_raw_log_preserved": true
+    },
+    {
+      "log": "two-e2e-current.log",
+      "tests": 2,
+      "seconds": 88.978,
+      "status": "PASS",
+      "failures": [],
+      "observed_test_ids": [
+        "test_workflow.WorkflowTests.test_browser_complete_workflow_at_mobile_width",
+        "test_workflow.WorkflowTests.test_browser_creation_execution_approval_navigation_and_mobile_history"
+      ],
+      "original_raw_log_preserved": true
+    }
+  ],
+  "note": "Counts describe each attempt independently. Focal PASS does not substitute mandatory full suites."
+}

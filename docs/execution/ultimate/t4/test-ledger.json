@@ -1,0 +1,294 @@
+{
+  "phase": "T4",
+  "suites": [
+    {
+      "suite": "B-PY",
+      "status": "PASS",
+      "tests": 498,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "started_at": "2026-10-26T19:16:55.865668+00:00",
+      "finished_at": "2026-10-26T19:17:15.520947+00:00",
+      "seconds": 19.655,
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "exit_code": 0,
+      "production_credentials_cleared": true,
+      "PYTHONPATH": null,
+      "log_sha256": "db2427ab76bdd5c40f90ce535ab3dd75dc95f9be89a989dc7edb43913ec298d2",
+      "log": "evidence/B-PY.log",
+      "raw_result": "evidence/B-PY.result.json"
+    },
+    {
+      "suite": "B-NODE",
+      "status": "PASS",
+      "tests": 134,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "started_at": "2026-10-26T19:17:15.523049+00:00",
+      "finished_at": "2026-10-26T19:17:17.692592+00:00",
+      "seconds": 2.17,
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "node",
+        "--test",
+        "tests/test_dashboard_selectors.js",
+        "tests/test_assignment_ai_summary.mjs",
+        "tests/test_assignment_dashboard_v2_selectors.mjs",
+        "tests/test_assignment_executive_kpis.mjs",
+        "tests/test_case_navigation.mjs",
+        "tests/test_center_resource.mjs",
+        "tests/test_chart_theme.mjs",
+        "tests/test_data_provenance.mjs",
+        "tests/test_data_resource.mjs",
+        "tests/test_decision_case.mjs",
+        "tests/test_dispatch_upload_selectors.mjs",
+        "tests/test_execution_progress.mjs",
+        "tests/test_home_dda_catalog.mjs",
+        "tests/test_lifecycle.mjs",
+        "tests/test_navigation.mjs",
+        "tests/test_platform_recovery.mjs",
+        "tests/test_scheduling_dashboard_v21_selectors.mjs",
+        "tests/test_ultimate_case_navigation.mjs",
+        "tests/test_ultimate_data_navigation.mjs",
+        "tests/test_v2_foundation.mjs",
+        "tests/test_workflow_gates.mjs",
+        "tests/test_workspace_settings.mjs"
+      ],
+      "exit_code": 0,
+      "production_credentials_cleared": true,
+      "PYTHONPATH": null,
+      "log_sha256": "946ea5270947f775cbee6bee32ce964218291336f4c44c79ced54ae060fd734a",
+      "log": "evidence/B-NODE.log",
+      "raw_result": "evidence/B-NODE.result.json"
+    },
+    {
+      "suite": "S4",
+      "status": "PASS",
+      "tests": 30,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "started_at": "2026-10-26T19:17:17.693865+00:00",
+      "finished_at": "2026-10-26T19:17:54.801755+00:00",
+      "seconds": 37.108,
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "test_ultimate_data_pack",
+        "-v"
+      ],
+      "exit_code": 0,
+      "production_credentials_cleared": true,
+      "PYTHONPATH": "tests/integration",
+      "log_sha256": "80eb9f567fdd9b8827abcf2692979df393b4a1cb03c31de7dc9783f4e2fc696b",
+      "log": "evidence/S4.log",
+      "raw_result": "evidence/S4.result.json"
+    },
+    {
+      "suite": "W4",
+      "status": "PASS",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "started_at": "2026-10-26T19:34:21.351629+00:00",
+      "finished_at": "2026-10-26T19:35:55.237236+00:00",
+      "seconds": 93.886,
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "/workspace/Dation/backend/.browser-venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "test_ultimate_case_data",
+        "-v"
+      ],
+      "exit_code": 0,
+      "production_credentials_cleared": true,
+      "PYTHONPATH": "tests/browser",
+      "log_sha256": "062f21da78543bd565bfface24d151cbfa4e4ffab920153e70009c4bc6b3c7de",
+      "log": "evidence/W4.log",
+      "raw_result": "evidence/W4.result.json"
+    },
+    {
+      "suite": "FOCAL-LEGACY-API",
+      "status": "PASS",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "started_at": "2026-10-26T19:18:56.921063+00:00",
+      "finished_at": "2026-10-26T19:19:32.833797+00:00",
+      "seconds": 35.913,
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "/workspace/Dation/.venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "test_data_hub.DataHubTests.test_06_real_browser_dda_upload_library_lineage_download_and_safe_delete",
+        "test_data_hub.DataHubTests.test_07_failed_upload_cleanup_is_tracked_and_workspace_authorized",
+        "test_data_hub.DataHubTests.test_09_v2_summary_composed_filters_historical_lineage_and_read_purity",
+        "test_data_hub.DataHubTests.test_10_lost_committed_upload_response_preserves_metadata_and_bytes",
+        "-v"
+      ],
+      "exit_code": 0,
+      "production_credentials_cleared": true,
+      "PYTHONPATH": "tests/e2e",
+      "log_sha256": "0deef776fdacb5ca3a2ad194b18a4820d6cac9df052f74307cf8f1683f3048be",
+      "log": "evidence/FOCAL-LEGACY-API.log",
+      "raw_result": "evidence/FOCAL-LEGACY-API.result.json"
+    },
+    {
+      "suite": "FOCAL-T3-BROWSER",
+      "status": "PASS",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "started_at": "2026-10-26T19:19:32.834762+00:00",
+      "finished_at": "2026-10-26T19:19:59.301081+00:00",
+      "seconds": 26.466,
+      "cwd": "/workspace/Dation/backend",
+      "command": [
+        "/workspace/Dation/backend/.browser-venv/bin/python",
+        "-B",
+        "-m",
+        "unittest",
+        "test_ultimate_case_setup.UltimateCaseSetupTests.test_01_ui_model_publish_case_without_csv_and_reload",
+        "-v"
+      ],
+      "exit_code": 0,
+      "production_credentials_cleared": true,
+      "PYTHONPATH": "tests/browser",
+      "log_sha256": "a555aa9af82bdaca745743c1ff8c42ecf6070b2774f435207102b06c91f9a522",
+      "log": "evidence/FOCAL-T3-BROWSER.log",
+      "raw_result": "evidence/FOCAL-T3-BROWSER.result.json"
+    }
+  ],
+  "aliases": [
+    {
+      "suite": "U4",
+      "status": "PASS",
+      "tests": 25,
+      "included_in": "B-PY",
+      "module": "tests.test_ultimate_data_contracts",
+      "log_lines": [
+        "test_O_explicit_assumption_defaults_one_with_frozen_provenance (test_ultimate_data_contracts.UltimateDataContractTests.test_O_explicit_assumption_defaults_one_with_frozen_provenance) ... ok",
+        "test_P_forbidden_commercial_extras_are_rejected_without_echoing_values (test_ultimate_data_contracts.UltimateDataContractTests.test_P_forbidden_commercial_extras_are_rejected_without_echoing_values) ... ok",
+        "test_Q_role_source_and_dimension_matrix_uses_same_semantics (test_ultimate_data_contracts.UltimateDataContractTests.test_Q_role_source_and_dimension_matrix_uses_same_semantics) ... ok",
+        "test_R_duplicate_ids_enum_dates_and_ready_due (test_ultimate_data_contracts.UltimateDataContractTests.test_R_duplicate_ids_enum_dates_and_ready_due) ... ok",
+        "test_R_negative_or_zero_physical_capacity_and_guarantee_above_max (test_ultimate_data_contracts.UltimateDataContractTests.test_R_negative_or_zero_physical_capacity_and_guarantee_above_max) ... ok",
+        "test_assumption_summary_is_bounded_without_losing_total_provenance (test_ultimate_data_contracts.UltimateDataContractTests.test_assumption_summary_is_bounded_without_losing_total_provenance) ... ok",
+        "test_availability_zero_is_valid_own_and_external (test_ultimate_data_contracts.UltimateDataContractTests.test_availability_zero_is_valid_own_and_external) ... ok",
+        "test_blank_invalid_utf8_duplicate_header_and_csv_syntax (test_ultimate_data_contracts.UltimateDataContractTests.test_blank_invalid_utf8_duplicate_header_and_csv_syntax) ... ok",
+        "test_canonical_reproduction_and_raw_hash_distinction (test_ultimate_data_contracts.UltimateDataContractTests.test_canonical_reproduction_and_raw_hash_distinction) ... ok",
+        "test_compatibility_is_explicit_unless_model_declares_homogeneous (test_ultimate_data_contracts.UltimateDataContractTests.test_compatibility_is_explicit_unless_model_declares_homogeneous) ... ok",
+        "test_conditional_fields_are_checked_per_row (test_ultimate_data_contracts.UltimateDataContractTests.test_conditional_fields_are_checked_per_row) ... ok",
+        "test_contract_hash_pins_configuration_and_published_version (test_ultimate_data_contracts.UltimateDataContractTests.test_contract_hash_pins_configuration_and_published_version) ... ok",
+        "test_descriptor_maps_are_immutable (test_ultimate_data_contracts.UltimateDataContractTests.test_descriptor_maps_are_immutable) ... ok",
+        "test_descriptor_serializes_and_hash_is_deterministic (test_ultimate_data_contracts.UltimateDataContractTests.test_descriptor_serializes_and_hash_is_deterministic) ... ok",
+        "test_missing_header_is_guided_and_not_inferred (test_ultimate_data_contracts.UltimateDataContractTests.test_missing_header_is_guided_and_not_inferred) ... ok",
+        "test_multidimensional_units_precision_and_fraction_coherence_not_inferred (test_ultimate_data_contracts.UltimateDataContractTests.test_multidimensional_units_precision_and_fraction_coherence_not_inferred) ... ok",
+        "test_no_arbitrary_lanes_or_source_inference (test_ultimate_data_contracts.UltimateDataContractTests.test_no_arbitrary_lanes_or_source_inference) ... ok",
+        "test_no_fuzzy_numeric_date_or_boolean_mapping (test_ultimate_data_contracts.UltimateDataContractTests.test_no_fuzzy_numeric_date_or_boolean_mapping) ... ok",
+        "test_only_own_or_external_fields_are_compiled (test_ultimate_data_contracts.UltimateDataContractTests.test_only_own_or_external_fields_are_compiled) ... ok",
+        "test_pallet_only_needs_no_kg_and_template_has_five_valid_rows (test_ultimate_data_contracts.UltimateDataContractTests.test_pallet_only_needs_no_kg_and_template_has_five_valid_rows) ... ok",
+        "test_per_km_basis_and_disallowed_rate_are_checked (test_ultimate_data_contracts.UltimateDataContractTests.test_per_km_basis_and_disallowed_rate_are_checked) ... ok",
+        "test_unknown_cost_is_null_and_known_zero_remains_zero (test_ultimate_data_contracts.UltimateDataContractTests.test_unknown_cost_is_null_and_known_zero_remains_zero) ... ok",
+        "test_unknown_entity_or_registry_fails_closed (test_ultimate_data_contracts.UltimateDataContractTests.test_unknown_entity_or_registry_fails_closed) ... ok",
+        "test_unknown_external_capacity_is_not_assumed_or_unlimited (test_ultimate_data_contracts.UltimateDataContractTests.test_unknown_external_capacity_is_not_assumed_or_unlimited) ... ok",
+        "test_unsupported_pinned_versions_fail_closed (test_ultimate_data_contracts.UltimateDataContractTests.test_unsupported_pinned_versions_fail_closed) ... ok"
+      ],
+      "repeated_only_for_alias": false
+    }
+  ],
+  "additional_boundaries": [
+    {
+      "name": "schema-boundary",
+      "status": "PASS",
+      "evidence": "evidence/schema-boundary.json"
+    },
+    {
+      "name": "native-visual-parity",
+      "status": "PASS",
+      "viewports": [
+        1440,
+        1280,
+        1024,
+        768,
+        390
+      ],
+      "evidence": "evidence/visual-parity/parity.json"
+    },
+    {
+      "name": "responsive-stress",
+      "status": "PASS",
+      "viewports": [
+        1440,
+        1280,
+        1024,
+        768,
+        390,
+        320
+      ],
+      "zoom": "200%",
+      "evidence": "evidence/browser/responsive.json"
+    },
+    {
+      "name": "keyboard-focus",
+      "status": "PASS",
+      "evidence": "evidence/browser/keyboard-focus.json"
+    },
+    {
+      "name": "contrast",
+      "status": "PASS",
+      "evidence": "evidence/browser/contrast.json"
+    }
+  ],
+  "not_run": [
+    {
+      "suite": "B-BROWSER full",
+      "reason": "W4 plus affected legacy upload browser test and one T3 setup browser focal"
+    },
+    {
+      "suite": "B-E2E full",
+      "reason": "Four affected legacy Hub/upload/recovery/history tests plus S4"
+    },
+    {
+      "suite": "B-SQL historical full",
+      "reason": "S4 full-catalog RPC/API suite plus schema/ACL/RLS/legacy-row boundary"
+    }
+  ],
+  "inherited_baseline": {
+    "T3": "docs/execution/ultimate/t3/t3-execution-report.md",
+    "B-PY": 473,
+    "B-NODE": 132,
+    "S3": 25,
+    "W3": 9
+  },
+  "qa_reuse": [
+    "evidence/qa-reuse.json"
+  ],
+  "all_suites_match_final_affected_source_files": true,
+  "latest_UI_composition_change_consumers_repeated": [
+    "W4",
+    "native-visual-parity"
+  ],
+  "no_solver_or_LLM_required": true
+}

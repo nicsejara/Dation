@@ -1,0 +1,23 @@
+{
+  "owned_container": "dation-t0-dcf39757a6",
+  "container_id": "6ca77b4b8e3b6ba49b3a86fd1b990e865b57bdcbc17ee4769a4861a469838aa1",
+  "label": "dation.task=T0",
+  "network": "none",
+  "postgres_version": "17.11",
+  "existing_containers_before": [
+    "57d0569c15c9 dation-e2e-32a7a4542664-rest",
+    "89c072eaca56 dation-e2e-32a7a4542664-pg",
+    "e63696788ed3 dation-progressive-sql",
+    "ada4ae04845f dation-phase7-sql"
+  ],
+  "image_id": "sha256:79bd7c99e923138f136f8009d6bffa66e21e9d4fda5c0c561b00fc9c90cfe537",
+  "image_digest": "postgres@sha256:b0f9560a2de083e2cc7382e75f808c7381a32852a7ec49117deedb300e552b24",
+  "cleaned_up": true,
+  "preexisting_containers_preserved": true,
+  "containers_after_cleanup": [
+    "57d0569c15c9 dation-e2e-32a7a4542664-rest",
+    "89c072eaca56 dation-e2e-32a7a4542664-pg",
+    "e63696788ed3 dation-progressive-sql",
+    "ada4ae04845f dation-phase7-sql"
+  ]
+}

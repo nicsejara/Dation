@@ -1,0 +1,1332 @@
+--- post-T4/backend/app/domain/logistics/definitions.py
++++ T5/backend/app/domain/logistics/definitions.py
+@@ -0,0 +1,72 @@
++"""Release-controlled Ultimate Decision Definitions. No browser-supplied graph."""
++from typing import Literal
++from pydantic import StrictBool
++from .base import ContractModel
++from app.results.canonical import canonical_bytes, content_sha256
++
++GRAPH_VERSION = 'ULTIMATE_DECISION_GRAPH_V1'
++BINDINGS = ('ULTIMATE_FOUNDATION_V1', GRAPH_VERSION)
++
++class DecisionDefinition(ContractModel):
++    id: str
++    version: str = '1'
++    label: str
++    question: str
++    implemented: StrictBool
++    applicability: Literal['ALWAYS', 'UPSTREAM_HAS_TRIPS']
++    dependencies: tuple[str, ...]
++    required_approvals: tuple[str, ...]
++    required_inputs: tuple[str, ...]
++    read_set: tuple[str, ...]
++    decision_variables: tuple[str, ...]
++    hard_constraints: tuple[str, ...]
++    soft_constraints: tuple[str, ...]
++    objectives: tuple[str, ...]
++    outputs: tuple[str, ...]
++    evidence: tuple[str, ...]
++    downstream_contract: str | None
++
++DEFINITIONS = (
++    DecisionDefinition(id='logistics_assignment', label='Transport Plan',
++        question='¿Cómo asignar la demanda a recursos y viajes?', implemented=True,
++        applicability='ALWAYS', dependencies=(), required_approvals=(),
++        required_inputs=('transport_demand','transport_resources'),
++        read_set=('transport_demand','transport_resources','model','horizon','case_policy','node_policy'),
++        decision_variables=('assignments','trips','consolidation','fractions'),
++        hard_constraints=('guaranteed_capacity','finite_availability','compatibility','split_policy','case_guardrails'),
++        soft_constraints=('case_preferences',), objectives=('case_primary_goal',),
++        outputs=('transport_plan_v1',), evidence=('engine_core_v1','decision_evidence_v1'),
++        downstream_contract='approved_transport_plan_v1'),
++    DecisionDefinition(id='logistics_scheduling', label='Day Scheduling',
++        question='¿Qué día debe despacharse cada viaje aprobado?', implemented=True,
++        applicability='UPSTREAM_HAS_TRIPS', dependencies=('logistics_assignment',),
++        required_approvals=('logistics_assignment',), required_inputs=(),
++        read_set=('approved:logistics_assignment','horizon','node_policy'),
++        decision_variables=('dispatch_day',),
++        hard_constraints=('fixed_upstream_trips','inclusive_horizon','resource_cycle'),
++        soft_constraints=('service_dates',), objectives=('case_primary_goal',),
++        outputs=('day_scheduling_v1',), evidence=('engine_core_v1','decision_evidence_v1'),
++        downstream_contract=None),
++)
++
++def validate_definitions(definitions):
++    nodes={d.id:d for d in definitions}
++    if len(nodes)!=len(definitions): raise ValueError('Duplicate Definition')
++    closure={}
++    def visit(key, stack=()):
++        if key in stack: raise ValueError('Cyclic Definitions')
++        if key not in nodes: raise ValueError('Unknown dependency')
++        if key not in closure:
++            d=nodes[key]
++            if not set(d.required_approvals)<=set(d.dependencies): raise ValueError('Approval outside dependencies')
++            closure[key]=tuple(sorted(set(d.dependencies).union(*(set(visit(p,(*stack,key))) for p in d.dependencies))))
++        return closure[key]
++    for key in nodes: visit(key)
++    return closure
++
++def definition_snapshot():
++    return {'schema_version':'decision_graph_definition_v1','version':GRAPH_VERSION,
++        'supported_bindings':list(BINDINGS), 'nodes':[d.model_dump(mode='json') for d in DEFINITIONS],
++        'dependency_closure':{k:list(v) for k,v in validate_definitions(DEFINITIONS).items()}}
++
++def definition_hash(): return content_sha256(canonical_bytes(definition_snapshot()))
+--- post-T4/backend/app/domain/logistics/graph.py
++++ T5/backend/app/domain/logistics/graph.py
+@@ -0,0 +1,75 @@
++"""Single pure server authority for Ultimate node states/actions/freshness."""
++from .definitions import DEFINITIONS, GRAPH_VERSION, BINDINGS, definition_hash, validate_definitions
++from .requirements import input_requirements, read_identity, hash_value
++
++NODE_STATES=('LOCKED','DATA_REQUIRED','READY','IN_PROGRESS','COMPLETED','APPROVED','COMING_SOON','NOT_APPLICABLE')
++
++def target(view,case_id,node_id=None,run_id=None):
++    return {'view':view,'case_id':case_id,'node_id':node_id,'run_id':run_id}
++
++def resolve_case_graph(context, model, pack, run_history, responsibilities, runtime_capabilities, *, definitions=DEFINITIONS, permissions=None):
++    if context.get('workflow_version')!=2 or context['graph_definition_version'] not in BINDINGS: raise ValueError('Unsupported Ultimate graph binding')
++    validate_definitions(definitions);permissions=permissions or {};nodes={};case_id=context['id'];entries=pack['entries']
++    # Topological traversal is independent of registry ordering and UI position.
++    def resolve(d):
++        if d.id in nodes:return nodes[d.id]
++        for parent in d.dependencies:resolve(next(x for x in definitions if x.id==parent))
++        missing=input_requirements(d,model,entries,context['case_policy_jsonb'])
++        reads=read_identity(d,context,entries,nodes)
++        blocked=[p for p in d.required_approvals if nodes[p]['node_state']!='APPROVED']
++        runs=[r for r in run_history if r['node_id']==d.id]
++        active=[r for r in runs if not r.get('superseded_at')]
++        approved=[r for r in active if r.get('approved_at')]
++        # Approval/lineage wins over created_at. Ambiguous active candidates fail closed.
++        candidates=[r for r in active if not r.get('approved_at')]
++        run=approved[0] if len(approved)==1 else candidates[0] if len(candidates)==1 else None
++        failure='AMBIGUOUS_CURRENT_RUN' if len(approved)>1 or not approved and len(candidates)>1 else None
++        stale_reasons=[]
++        if run:
++            frozen=run.get('graph_snapshot') or {}
++            if frozen.get('definition_hash')!=definition_hash():stale_reasons.append('DEFINITION_CHANGED')
++            if frozen.get('read_set')!=reads:stale_reasons.append('CONSUMED_INPUT_CHANGED')
++            if run.get('logistics_model_version_id')!=context['logistics_model_version_id'] or run.get('case_policy_hash')!=context['case_policy_hash']:stale_reasons.append('CONTEXT_CHANGED')
++            if d.required_approvals and run.get('upstream_run_id')!=reads.get('approved:'+d.required_approvals[0]):stale_reasons.append('UPSTREAM_CHANGED')
++            if run.get('status')=='error':failure=run.get('error') or 'TECHNICAL_FAILURE'
++        fresh=not stale_reasons
++        applicable=not(d.applicability=='UPSTREAM_HAS_TRIPS' and not blocked and any(nodes[p].get('trip_count')==0 for p in d.dependencies))
++        state='COMING_SOON' if not d.implemented else 'LOCKED' if blocked else 'NOT_APPLICABLE' if not applicable else 'DATA_REQUIRED' if missing else 'READY'
++        result_published=bool(run and run.get('result_published'))
++        if d.implemented and applicable and not blocked and not missing and run and fresh:
++            if run['status'] in ('queued','running'):state='IN_PROGRESS'
++            elif run['status']=='completed' and result_published:state='APPROVED' if run.get('approved_at') else 'COMPLETED'
++        stage=(responsibilities.get('stages') or {}).get(d.id) or {};data=(responsibilities.get('stages') or {}).get('data_owner') or {}
++        gates=responsibilities.get('gates_enforced',True)
++        permission_reasons=[]
++        if context.get('status')=='archived':permission_reasons.append('ARCHIVED_CASE')
++        if not permissions.get('can_write',False):permission_reasons.append('READ_ONLY')
++        if gates and not data.get('owner_eligible'):permission_reasons.append('DATA_OWNER_REQUIRED')
++        if gates and not stage.get('owner_eligible'):permission_reasons.append('DECISION_OWNER_REQUIRED')
++        runtime=bool(runtime_capabilities.get(d.id,False) and d.implemented)
++        can_configure=state in ('READY','COMPLETED','APPROVED') and not permission_reasons and not failure
++        config=target('logistics-config',case_id,d.id)
++        run_id=run['id'] if run else None
++        actions={'configure':{'allowed':can_configure,'target':config,'reasons':permission_reasons},
++            'execute':{'allowed':False,'reasons':['ADMISSION_NOT_IMPLEMENTED']+([] if runtime else ['RUNTIME_UNAVAILABLE'])},
++            'new_run':{'allowed':can_configure,'target':config},
++            'data':{'allowed':d.implemented and state=='DATA_REQUIRED','target':target('logistics-case-data',case_id)},
++            'result':{'allowed':bool(run_id and (result_published or run['status'] in ('queued','running','error'))),'target':target('decision-dashboard',case_id,d.id,run_id)}}
++        primary=actions['data'] if state=='DATA_REQUIRED' else actions['result'] if state in ('COMPLETED','APPROVED','IN_PROGRESS') else actions['configure'] if state=='READY' else None
++        nodes[d.id]={'id':d.id,'label':d.label,'question':d.question,'definition_version':d.version,
++            'node_state':state,'freshness':'STALE' if stale_reasons else 'CURRENT' if run else 'NOT_EVALUATED',
++            'stale_reasons':stale_reasons,'technical_failure':failure,'runtime_available':runtime,
++            'implemented':d.implemented,'requirements':missing,'blocked_by':blocked,'read_set':reads,'read_set_hash':hash_value(reads),
++            'run_id':run_id,'approved_run_id':run_id if state=='APPROVED' else None,
++            'upstream_run_id':reads.get('approved:logistics_assignment'),
++            'trip_count':run.get('trip_count') if run and state=='APPROVED' else None,
++            'actions':actions,'primary_action':primary,'owner':stage.get('owner'),
++            'history_count':max([r.get('history_count',len(runs)) for r in runs],default=0), 'outputs':list(d.outputs)}
++        return nodes[d.id]
++    for definition in definitions:resolve(definition)
++    ordered=[nodes[d.id] for d in definitions]
++    focus=next((n for n in ordered if n['node_state'] not in ('APPROVED','NOT_APPLICABLE','COMING_SOON','LOCKED')),ordered[0])
++    return {'schema_version':'case_graph_v1','graph_version':GRAPH_VERSION,'definition_hash':definition_hash(),
++        'binding_version':context['graph_definition_version'],'case_id':case_id,'nodes':ordered,
++        'resume':target('logistics-map',case_id),'attention_node_id':focus['id'],
++        'approved_count':sum(n['node_state']=='APPROVED' for n in ordered),'runtime_execution_available':False}
+--- post-T4/backend/app/domain/logistics/requirements.py
++++ T5/backend/app/domain/logistics/requirements.py
+@@ -0,0 +1,34 @@
++"""Input requirements and semantic read identities from published snapshots."""
++from app.domain.logistics.data_contracts import compile_contract, NORMALIZER_VERSION
++from app.results.canonical import canonical_bytes, content_sha256
++
++def hash_value(value): return content_sha256(canonical_bytes(value))
++
++def input_requirements(definition, model, entries, policy):
++    indexed={e['slot_key']:e for e in entries};missing=[]
++    economic=policy['primary_goal'] in ('MINIMIZE_COST','BALANCED') or any(p['kind']=='COST' and float(p['weight'])>0 for p in policy.get('preferences',[]))
++    for slot in definition.required_inputs:
++        item=indexed.get(slot)
++        if not item:
++            missing.append({'code':'MISSING_INPUT','slot':slot,'label':'Demanda' if slot=='transport_demand' else 'Recursos'});continue
++        contract=compile_contract(model,slot)
++        if item.get('contract_hash')!=contract.contract_hash or item.get('normalizer_version')!=NORMALIZER_VERSION or item.get('model_version_id',model['id'])!=model['id'] or item.get('record_count',0)<=0:
++            missing.append({'code':'INCOMPATIBLE_INPUT','slot':slot,'label':'Input incompatible con la Model Version'});continue
++        summary=item.get('summary') or {}
++        if summary.get('unknown_availability_count',0):missing.append({'code':'UNKNOWN_AVAILABILITY','slot':slot,'label':'Disponibilidad requerida desconocida'})
++        if economic and summary.get('unknown_cost_count',0):missing.append({'code':'UNKNOWN_COST','slot':slot,'label':'Costos requeridos por el objetivo desconocidos'})
++    return missing
++
++def read_identity(definition, context, entries, nodes, node_policy=None):
++    indexed={e['slot_key']:e for e in entries};result={}
++    for key in definition.read_set:
++        if key in ('transport_demand','transport_resources','scheduling_enrichment'):
++            item=indexed.get(key);result[key]=None if item is None else {k:item[k] for k in ('canonical_sha256','contract_hash','normalizer_version')}
++        elif key=='model':result[key]=context['logistics_model_version_id']
++        elif key=='horizon':result[key]=[context['planning_start'],context['planning_end']]
++        elif key=='case_policy':result[key]=context['case_policy_hash']
++        elif key=='node_policy':result[key]=node_policy or context['case_policy_hash']
++        elif key.startswith('approved:'):
++            upstream=nodes.get(key.split(':',1)[1]) or {};result[key]=upstream.get('approved_run_id') if upstream.get('node_state')=='APPROVED' else None
++        else:raise ValueError('Unrecognized read set')
++    return result
+--- post-T4/backend/app/platform/decision_center.py
++++ T5/backend/app/platform/decision_center.py
+@@ -90,14 +90,23 @@
+ 
+ async def listing(ctx,**options):
+     data=await read(ctx,**options)
+-    return {**data,'items':[project(item) for item in data['items']]}
++    from app.services.decision_graph_service import enrich_center
++    return {**data,'items':await enrich_center(ctx,[project(item) for item in data['items']])}
+ 
+-async def detail(ctx,case_id):return project(await read(ctx,target_case_id=str(case_id)),True)
++async def detail(ctx,case_id):
++    from app.services.decision_graph_service import enrich_center
++    return (await enrich_center(ctx,[project(await read(ctx,target_case_id=str(case_id)),True)]))[0]
+ 
+ async def history(ctx,case_id,node_id,limit,offset,run_id=None):
++    from app.services import decision_graph_service
+     if run_id:limit,offset=1,0
+     options={'search_text':str(run_id)} if run_id else {}
+     data=await read(ctx,target_case_id=str(case_id),target_node_id=node_id,page_limit=limit,page_offset=offset,**options)
++    if data['case'].get('workflow_version')==2:
++        if run_id:
++            data=await decision_graph_service.read(ctx,case_id,node_id,run_id)
++            return {'items':[data['selected_run']],'total':1,'limit':1,'offset':0}
++        return await decision_graph_service.history(ctx,case_id,node_id,limit,offset)
+     state=canonical(data)
+     return {'items':[run_history_item(run,state) for run in data['runs']],
+         'total':len(data['runs']) if run_id else data['summaries'][node_id]['run_count'],'limit':limit,'offset':offset}
+--- post-T4/backend/app/platform/home.py
++++ T5/backend/app/platform/home.py
+@@ -69,8 +69,33 @@
+                 'activity': activity,'onboarding':onboarding}
+     data = await platform_call('platform_home', {'actor_user_id': ctx.user_id,
+                                                'target_workspace_id': ctx.workspace_id})
+-    return {'recent_cases': [recent_case(bundle) for bundle in data['recent_cases']],
+-            'attention': {**data['attention'], 'scope': 'assigned_work',
+-                          'items': [{**item, 'node_label': NODE_LABELS[item['node_id']]}
+-                                    for item in data['attention']['items']]},
++    recent=[recent_case(bundle) for bundle in data['recent_cases']]
++    from app.services import decision_graph_service
++    graphs={}
++    for item in recent:
++        if item.get('workflow_version')==2 and item.get('resume') is not None:
++            projection=await decision_graph_service.read(ctx,item['case_id']);graph=projection['graph'];graphs[item['case_id']]=graph
++            focus=next(n for n in graph['nodes'] if n['id']==graph['attention_node_id'])
++            item.update(graph=graph,resume=graph['resume'],status=focus['node_state'],node_id=focus['id'],node_label=focus['label'],approval_current=focus['node_state']=='APPROVED')
++    attention=[];removed=0
++    for item in data['attention']['items']:
++        case_id=item['case_id'];graph=graphs.get(case_id)
++        if graph is None:
++            cohort=await decision_graph_service.snapshot(ctx,case_id,operation='cohort')
++            if cohort['workflow_version']==2:
++                graph=(await decision_graph_service.read(ctx,case_id))['graph'];graphs[case_id]=graph
++        projected={**item,'node_label':NODE_LABELS[item['node_id']]}
++        if graph:
++            node=next(n for n in graph['nodes'] if n['id']==item['node_id'])
++            # Refine the existing attention candidates using the same graph; do not
++            # advertise a stale handoff or a result outside the current read set.
++            valid=(item['kind']=='handoff' and node['node_state']=='READY' or
++                   item['kind']=='review' and node['node_state']=='COMPLETED' and node['run_id']==item.get('run_id'))
++            if not valid:removed+=1;continue
++            projected.update(graph=graph,resume=graph['resume'],node_label=node['label'],node_state=node['node_state'])
++        attention.append(projected)
++    return {'recent_cases': recent,
++            'attention': {**data['attention'], 'scope': 'assigned_work','items':attention,
++                'total':max(0,data['attention']['total']-removed),
++                'total_is_upper_bound':data['attention']['total']>len(data['attention']['items'])},
+             'activity': activity,'onboarding':onboarding}
+--- post-T4/backend/app/platform/routes.py
++++ T5/backend/app/platform/routes.py
+@@ -12,6 +12,7 @@
+ from app.platform.onboarding_routes import router as onboarding_router
+ from app.platform.ultimate_routes import router as ultimate_router
+ from app.platform.ultimate_data_routes import router as ultimate_data_router
++from app.platform.ultimate_graph_routes import router as ultimate_graph_router
+ 
+ router=APIRouter(prefix='/api/platform')
+ router.include_router(data_router)
+@@ -22,6 +23,7 @@
+ router.include_router(onboarding_router)
+ router.include_router(ultimate_router)
+ router.include_router(ultimate_data_router)
++router.include_router(ultimate_graph_router)
+ 
+ @router.get('/home')
+ async def get_home(ctx=Depends(require_upload_access)):
+--- post-T4/backend/app/platform/ultimate_graph_routes.py
++++ T5/backend/app/platform/ultimate_graph_routes.py
+@@ -0,0 +1,22 @@
++"""T5 read/config-context only. No admission or graph supplied by the browser."""
++from typing import Literal
++from uuid import UUID
++from fastapi import APIRouter,Depends,Query
++from app.auth import require_upload_access
++from app.platform.entitlements import require_dda
++from app.services import decision_graph_service as service
++
++router=APIRouter(prefix='/logistics-cases')
++Node=Literal['logistics_assignment','logistics_scheduling']
++def access(ctx=Depends(require_upload_access)):require_dda(ctx,'logistics');return ctx
++
++@router.get('/{case_id}/graph')
++async def graph(case_id:UUID,node_id:Node|None=None,run_id:UUID|None=None,ctx=Depends(access)):
++    return await service.read(ctx,case_id,node_id,run_id)
++
++@router.get('/{case_id}/graph/config/{node_id}')
++async def config(case_id:UUID,node_id:Node,ctx=Depends(access)):return await service.configure(ctx,case_id,node_id)
++
++@router.get('/{case_id}/graph/history/{node_id}')
++async def history(case_id:UUID,node_id:Node,limit:int=Query(25,ge=1,le=50),offset:int=Query(0,ge=0,le=1000000),ctx=Depends(access)):
++    return await service.history(ctx,case_id,node_id,limit,offset)
+--- post-T4/backend/app/platform/ultimate_routes.py
++++ T5/backend/app/platform/ultimate_routes.py
+@@ -40,7 +40,8 @@
+ 
+ @router.get('/logistics-cases/{case_id}/context')
+ async def context(case_id:UUID,ctx=Depends(require_upload_access)):
+-    return await service.get_case_context(logistics(ctx),case_id)
++    from app.services import decision_graph_service
++    return await decision_graph_service.case_context(logistics(ctx),case_id)
+ 
+ @router.patch('/logistics-cases/{case_id}/context')
+ async def update_context(case_id:UUID,payload:UltimateCaseUpdate,ctx=Depends(require_upload_access)):
+--- post-T4/backend/app/services/decision_graph_service.py
++++ T5/backend/app/services/decision_graph_service.py
+@@ -0,0 +1,64 @@
++"""One graph projection for Map, Config, Case, Home and Center; no execution."""
++from fastapi import HTTPException
++from app.platform.identity import platform_call
++from app.domain.logistics.definitions import definition_hash, definition_snapshot
++from app.domain.logistics.graph import resolve_case_graph
++
++async def snapshot(ctx,case_id,operation='snapshot',node_id=None,run_id=None,limit=25,offset=0):
++    return await platform_call('platform_ultimate_graph',{'target_workspace_id':ctx.workspace_id,'actor_user_id':ctx.user_id,
++        'target_case_id':str(case_id),'operation':operation,'target_node_id':node_id,
++        'selected_run_id':str(run_id) if run_id else None,'page_limit':limit,'page_offset':offset})
++
++def project(data):
++    registry=data.get('definition') or {}
++    if registry.get('definition_hash')!=definition_hash() or registry.get('definition_jsonb')!=definition_snapshot():
++        raise HTTPException(409,'La Definition del graph no coincide con este release. No se habilitó ejecución.')
++    graph=resolve_case_graph(data['case'],data['model_version'],{'entries':data['entries']},data['runs'],
++        data['responsibilities'],{},permissions=data['permissions'])
++    for node in graph['nodes']:
++        node['history_count']=data.get('history_counts',{}).get(node['id'],node['history_count'])
++    return {'case':data['case'],'graph':graph,'pack':data['pack'],'pack_version':data['pack_version'],
++        'model':data['model'],'responsibilities':data['responsibilities'],'selected_run':data.get('selected_run')}
++
++async def read(ctx,case_id,node_id=None,run_id=None):return project(await snapshot(ctx,case_id,node_id=node_id,run_id=run_id))
++
++async def configure(ctx,case_id,node_id):
++    data=project(await snapshot(ctx,case_id,'configure',node_id))
++    node=next(n for n in data['graph']['nodes'] if n['id']==node_id)
++    if not node['actions']['configure']['allowed']:
++        raise HTTPException(409,{'message':'La decisión no puede configurarse en el contexto actual.','node':node})
++    return {**data,'configuration_context':{'case_id':str(case_id),'node_id':node_id,
++        'upstream_run_id':node['upstream_run_id'],'read_set':node['read_set'],'read_set_hash':node['read_set_hash'],
++        'definition_hash':data['graph']['definition_hash'],'runtime_available':False,'admission_available':False}}
++
++async def history(ctx,case_id,node_id,limit=25,offset=0):return await snapshot(ctx,case_id,'history',node_id,limit=limit,offset=offset)
++
++def center_item(item,data):
++    graph=data['graph'];focus=next(n for n in graph['nodes'] if n['id']==graph['attention_node_id'])
++    runs={r['id']:r for r in data.get('runs',[])}
++    projected=[{**n,'status':n['node_state'],'run_count':n['history_count'],
++        'approval_current':n['node_state']=='APPROVED','latest_run':runs.get(n['run_id']),
++        'approved_run':runs.get(n['approved_run_id']),
++        'target':n['primary_action']['target'] if n['primary_action'] and n['primary_action']['allowed'] else None}
++        for n in graph['nodes']]
++    return {**item,'workflow_version':2,'graph':graph,'resume':graph['resume'],
++        'current_step':focus['id'],'current_step_label':focus['label'],'display_status':'archived' if item.get('status')=='archived' else focus['node_state'],
++        'progress':{'approved':graph['approved_count'],'total':len(graph['nodes'])},
++        'nodes':projected,'owner':focus['owner'],'runtime_execution_available':False,
++        'responsibilities':data['responsibilities']}
++
++async def enrich_center(ctx,items):
++    import asyncio
++    semaphore=asyncio.Semaphore(4)
++    async def enrich(item):
++        if item.get('workflow_version')!=2 or item.get('resume') is None:return item
++        async with semaphore:
++            raw=await snapshot(ctx,item['id']);data=project(raw)
++            return center_item(item,{**data,'runs':raw['runs']})
++    return await asyncio.gather(*(enrich(item) for item in items))
++
++async def case_context(ctx,case_id):
++    from app.services.logistics_model_service import enrich_context
++    raw=await snapshot(ctx,case_id)
++    context=enrich_context({k:v for k,v in raw.items() if k not in ('definition','runs','entries','selected_run')})
++    return {**context,'graph':project(raw)['graph']}
+--- post-T4/backend/app/static/css/ultimate-graph.css
++++ T5/backend/app/static/css/ultimate-graph.css
+@@ -0,0 +1,14 @@
++/* T5 composition only; approved Map/cards/controls remain authoritative. */
++.ultimate-graph-view .t5-actions { display:flex;flex-wrap:wrap;gap:var(--space-3);align-items:center;min-width:0; }
++.ultimate-graph-view .t5-context { display:grid;gap:var(--space-3);padding:var(--space-5);min-width:0; }
++.ultimate-graph-view .t5-node-extra { display:grid;gap:var(--space-3);min-width:0; }
++.ultimate-graph-view .t5-node-extra :is(p,code) { overflow-wrap:anywhere; }
++.ultimate-graph-view .t5-node { display:grid;gap:var(--space-3);min-width:0; }
++.ultimate-graph-view .t5-history-row { display:flex;flex-wrap:wrap;gap:var(--space-3);align-items:center;padding-block:var(--space-3);border-block-end:1px solid var(--color-border); }
++.ultimate-graph-view .t5-history-row>p { flex:1 1 16rem;min-width:0;overflow-wrap:anywhere; }
++.ultimate-graph-view .t5-edge { display:grid;place-items:center;color:var(--color-text-muted);padding:var(--space-3); }
++.ultimate-graph-view .t5-readonly { padding:var(--space-4);border:1px solid var(--color-border);border-radius:var(--radius-md);background:var(--color-surface); }
++@media(min-width:621px) {
++ .ultimate-graph-view .dispatch-decision-node__actionrow { max-width:none; }
++ .ultimate-graph-view .dispatch-decision-node__action { width:max-content;white-space:nowrap; }
++}
+--- post-T4/backend/app/static/js/dispatch/cases/decision-map.mjs
++++ T5/backend/app/static/js/dispatch/cases/decision-map.mjs
+@@ -5,6 +5,7 @@
+ import {STATUS,deriveDecisionNodes} from "./decision-case.mjs";
+ import {WORKFLOW_ACTION_CLASS,workflowActionLabel} from "../workflow-action-bar.mjs";
+ import {decisionHero,decisionCaseCard,decisionDataFileCard,bindCaseContext} from "../decision-config-ui.mjs";
++import {graphStateUi,graphActionLabel,graphNodeDescription} from '../navigation/ultimate-graph.mjs';
+ import {
+   DECISION_ORDER,
+   DECISION_META,
+@@ -217,8 +218,7 @@
+   return "";
+ }
+ 
+-function nodeCard(nodeId,presentation,isNext){
+-  const meta=DECISION_META[nodeId];
++function nodeCard(nodeId,presentation,isNext,meta=DECISION_META[nodeId]){
+   const waiting=presentation.status===STATUS.LOCKED
+     ||presentation.status===STATUS.NEEDS_DATA;
+   const approved=presentation.status===STATUS.APPROVED;
+@@ -233,7 +233,7 @@
+   return '<article class="'+cardClass+'" data-decision-node="'+esc(nodeId)+'" '
+     +'aria-label="Decisión '+esc(meta.index)+': '+esc(meta.label)+'" '
+     +(isNext?'aria-current="step" ':'')
+-    +(waiting?'tabindex="0" aria-disabled="true" aria-describedby="'+esc(statusId)+'" ':'')
++    +(waiting?'tabindex="0" '+(presentation.interactive?'':'aria-disabled="true" ')+'aria-describedby="'+esc(statusId)+'" ':'')
+     +'>'
+     +(isNext?'<span class="dispatch-decision-node__next">SIGUIENTE DECISIÓN</span>':'')
+     +'<header class="dispatch-decision-node__head">'
+@@ -241,7 +241,7 @@
+         +iconSvg(approved?"checkCircle":meta.icon,"dispatch-map-icon")
+       +'</span>'
+       +'<span class="dispatch-decision-node__decision-label">DECISIÓN '+esc(meta.index)+'</span>'
+-      +stateChip(presentation.status)
++      +(presentation.stateChip||stateChip(presentation.status))
+     +'</header>'
+     +'<h3>'+esc(meta.label)+'</h3>'
+     +'<p class="dispatch-decision-node__question">'+esc(meta.question)+'</p>'
+@@ -251,10 +251,10 @@
+     +'</div>'
+     +'<p class="dispatch-decision-node__statusline" id="'+esc(statusId)+'">'
+       +iconSvg(
+-        approved?"checkCircle":review?"alertTriangle":presentation.dataReady?"checkCircle":"alertTriangle",
++        presentation.statusIcon||(approved?"checkCircle":review?"alertTriangle":presentation.dataReady?"checkCircle":"alertTriangle"),
+         "dispatch-map-icon",
+       )
+-      +'<span>'+esc(statusDetail(presentation))+'</span>'
++      +'<span>'+esc(presentation.detail||statusDetail(presentation))+'</span>'
+     +'</p>'
+     +(presentation.runId
+       ?'<small class="dispatch-decision-node__run">Corrida '+esc(String(presentation.runId).slice(0,8))+'</small>'
+@@ -263,6 +263,15 @@
+       +nodeActionMarkup(nodeId,presentation)
+     +'</div>'
+   +'</article>';
++}
++
++/** Compose the approved card with the server projection, without deriving state. */
++export function graphNodeMarkup(node,index,isNext=false){
++ const ui=graphStateUi(node.node_state),action=node.primary_action;
++ const presentation={status:ui.style,dataReady:true,statusIcon:ui.icon,runId:node.run_id,detail:graphNodeDescription(node),interactive:Boolean(action?.allowed),
++  action:{action:action?.allowed?'graph-primary':null,label:action?graphActionLabel(action,node):null,disabled:!action?.allowed},
++  stateChip:'<span class="dispatch-map-state-chip is-'+esc(ui.tone)+'" data-graph-state="'+esc(node.node_state)+'">'+esc(ui.label)+'</span>'};
++ return nodeCard(node.id,presentation,isNext,{...DECISION_META[node.id],index:index+1,label:node.label,question:node.question,output:index===0?'Plan de transporte':'Calendario de despachos'});
+ }
+ 
+ // Legacy visible copy removed from connector UI: "Requiere aprobación".
+@@ -286,7 +295,7 @@
+   +'</div>';
+ }
+ 
+-function heroMarkup(decisionCase){
++export function heroMarkup(decisionCase){
+   const mapStep=workflowStep("map",{number:2,label:"Mapa de decisiones"});
+   return decisionHero({
+     className:"dispatch-pro-hero dispatch-map-premium__hero",
+--- post-T4/backend/app/static/js/dispatch/cases/ultimate-case-setup.mjs
++++ T5/backend/app/static/js/dispatch/cases/ultimate-case-setup.mjs
+@@ -21,7 +21,7 @@
+    owners:Object.fromEntries(['logistics_assignment','logistics_scheduling'].map(id=>[id,{id:current?.responsibilities.stages[id].owner?.id||'',updated_at:current?.responsibilities.stages[id].updated_at||null}])),policy_values:policyInputValues(policy)};
+   const draft=saved||initial,editable=fresh||current.permissions.can_edit,mathEditable=fresh||current.permissions.can_edit_mathematical,canAssign=fresh?caps.can_assign:current.permissions.can_assign;
+   root.replaceChildren();const header=pageHeader(root,fresh?'Crear Decision Case':row.label||'Contexto del Case','El Case guarda el objetivo, el horizonte y la versión del Model. Podés crearlo antes de cargar archivos.');header.append(button('Logistics Models',()=>navigate('logistics-models',{modelId:null})));
+-  if(row){try{const inputs=await api('/api/platform/logistics-cases/'+row.id+'/data',{signal:scope.signal});if(scope.active&&(inputs.enabled||inputs.entries.length))header.append(button('Administrar datos del Case',()=>navigate('logistics-case-data',{caseId:row.id})));}catch(error){if(error.name==='AbortError')throw error;}}
++  if(row){header.append(button('Mapa de decisiones',()=>navigate('logistics-map',{caseId:row.id,nodeId:null,runId:null})));try{const inputs=await api('/api/platform/logistics-cases/'+row.id+'/data',{signal:scope.signal});if(scope.active&&(inputs.enabled||inputs.entries.length))header.append(button('Administrar datos del Case',()=>navigate('logistics-case-data',{caseId:row.id})));}catch(error){if(error.name==='AbortError')throw error;}}
+   if(row){const savedCard=el('section',undefined,'d-card ultimate-saved-context');savedCard.append(el('h2','Contexto guardado','d-card-title'),el('p','Versión '+current.model_version.version+' de '+current.model.name+' · '+row.planning_start+' a '+row.planning_end,'d-body'),el('p','Data Pack inicial: '+(current.entry_count?'datos vinculados':'sin archivos')+'. El contexto se conserva al recargar.','d-metadata'));
+    if(row.context_frozen_at)savedCard.append(el('p','El horizonte y la política quedaron congelados con la primera admisión. El nombre, la descripción y los responsables conservan sus reglas de edición.','d-body'));root.append(savedCard);}
+   const kit=mountForm(root,scope,{initial,store,submitLabel:fresh?'Crear Case':'Guardar contexto',onReload:()=>navigate('logistics-case-setup',{caseId:route.caseId,replace:true}),onSave:async value=>{
+@@ -34,7 +34,7 @@
+     if(canAssign)body.owner_updates=Object.entries(value.owners).filter(([id,o])=>o.id!==(current.responsibilities.stages[id].owner?.id||'')).map(([id,o])=>({node_id:id,owner_user_id:o.id||null,expected_updated_at:o.updated_at}));
+     result=await api('/api/platform/logistics-cases/'+row.id+'/context',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:scope.signal});
+    }
+-   kit.markSaved();if(scope.active){onContext?.(result);await navigate('logistics-case-setup',{caseId:result.case.id,replace:true});}
++   kit.markSaved();if(scope.active){onContext?.(result);await navigate(fresh?'logistics-map':'logistics-case-setup',{caseId:result.case.id,nodeId:null,runId:null,replace:true});}
+   }});
+   const form=kit.form;form.inert=true;form.setAttribute('aria-busy','true');
+   const identity=section(form,'Identidad del Case'),name=field(identity,'Nombre del Case',{name:'case_name',value:draft.name,required:true,maxLength:120}),description=field(identity,'Descripción (opcional)',{name:'case_description',type:'textarea',value:draft.description,maxLength:1000});
+--- post-T4/backend/app/static/js/dispatch/cases/ultimate-decision-map.mjs
++++ T5/backend/app/static/js/dispatch/cases/ultimate-decision-map.mjs
+@@ -0,0 +1,86 @@
++// T5 presents server graph/actions. No readiness or dependency resolver in JS.
++import {api,errorBox} from '../shared.mjs';
++import {scopeFor,createScope} from '../lifecycle.mjs';
++import {ensureStylesheet,ensureDecisionCaseStyles} from '../styles.mjs';
++import {loadingState} from '../../platform/components.mjs';
++import {el,button} from '../models/forms.mjs';
++import {heroMarkup,graphNodeMarkup} from './decision-map.mjs';
++import {graphStateUi,graphTarget} from '../navigation/ultimate-graph.mjs';
++import {openCaseSelector} from '../traceability-ui.mjs';
++import {mountResponsibilitySelector} from './workflow-responsibility.mjs';
++
++export async function mountUltimateGraph(root,{route,navigate,onContext}){
++ const scope=scopeFor(root);root.append(loadingState('Recuperando mapa de decisiones…'));
++ let pickerVersion=0,activePicker=null;const historyVersions=new Map();
++ const follow=t=>{const target=graphTarget(t);return target&&navigate(target.view,target);};
++ try{
++  await ensureDecisionCaseStyles();await ensureStylesheet('ultimate-graph-styles','/static/css/ultimate-graph.css','t5-v1');
++  const base='/api/platform/logistics-cases/'+route.caseId,query=new URLSearchParams();
++  if(route.runId)query.set('run_id',route.runId);if(route.nodeId)query.set('node_id',route.nodeId);
++  let data=await api(base+'/graph?'+query,{signal:scope.signal});if(!scope.active)return;
++  const selected=()=>data.graph.nodes.find(n=>n.id===route.nodeId);
++  if(route.view==='logistics-config'&&selected()?.actions.configure.allowed){data=await api(base+'/graph/config/'+route.nodeId,{signal:scope.signal});if(!scope.active)return;}
++  onContext?.(data.case,data.graph);
++  root.className='dispatch dispatch-upload-pro dispatch-decision-map dispatch-decision-map--premium dispatch-decision-map--case-v2 ultimate-graph-view';root.innerHTML=heroMarkup(data.case);
++  const actions=el('div',undefined,'t5-actions'),context=el('section',undefined,'d-card t5-context');
++  const map=()=>navigate('logistics-map',{caseId:route.caseId,nodeId:null,runId:null});
++  actions.append(button('Mapa de decisiones',map),button('Datos del Case',()=>navigate('logistics-case-data',{caseId:route.caseId,nodeId:null,runId:null})),button('Contexto del Case',()=>navigate('logistics-case-setup',{caseId:route.caseId,nodeId:null,runId:null})));
++  const choose=button('Seleccionar Decision Case',()=>picker(0,choose));actions.append(choose);root.append(actions);
++  context.append(el('h2',data.case.label,'d-card-title'),el('p',data.model.name+' · '+data.case.planning_start+' a '+data.case.planning_end,'d-body'),el('p','Pack versión '+data.pack_version.version+' · '+data.graph.approved_count+' de '+data.graph.nodes.length+' decisiones aprobadas.','d-metadata'));root.append(context);
++  if(route.view==='logistics-map'){
++   const owner=el('div');context.append(owner);mountResponsibilitySelector(owner,{caseId:route.caseId,stageKey:'data_owner',snapshot:data.responsibilities,onSaved:map});
++  }
++  if(data.case.status==='archived')root.append(el('p','Case archivado. El historial permanece disponible en modo de lectura.','t5-readonly'));
++  async function picker(offset,trigger){
++   const own=++pickerVersion;
++   try{
++    const list=await api('/api/platform/decisions?'+new URLSearchParams({dda:'logistics',limit:25,offset}),{signal:scope.signal});if(!scope.active||own!==pickerVersion)return;
++    activePicker?.close();
++    const child=createScope(document.createElement('div'));scope.own(()=>child.dispose());
++    const dialog=openCaseSelector(list.items.map(item=>({case:item,graph:item.graph,decision_case:{nodes:{}},orders:item.orders,fleet:item.fleet})),{scope:child,trigger,currentCaseId:route.caseId,onSelect:id=>navigate('logistics-map',{caseId:id,nodeId:null,runId:null})});
++    activePicker=dialog;
++    dialog.querySelector('.dispatch-case-selector__summary strong').textContent=list.total+' casos · página '+(offset/25+1);
++    const controls=el('div',undefined,'t5-actions'),previous=button('Página anterior',()=>{dialog.close();picker(offset-25,trigger);}),next=button('Página siguiente',()=>{dialog.close();picker(offset+25,trigger);});previous.disabled=offset===0;next.disabled=offset+25>=list.total;controls.append(previous,next);dialog.querySelector('.dispatch-trace-shell').append(controls);
++   }catch(error){if(scope.active)context.append(el('p',error.message,'d-body'));}
++  }
++  if(route.view==='logistics-map'){
++   const chain=el('section',undefined,'dispatch-map-chain-section dispatch-map-chain-section--open');chain.append(el('h2','Decisiones del Case'));
++   const list=el('div',undefined,'dispatch-node-map');list.setAttribute('aria-label','Cadena de decisiones');chain.append(list);root.append(chain);
++   for(const [index,node]of data.graph.nodes.entries()){
++    const host=el('section',undefined,'t5-node');host.dataset.graphNode=node.id;host.dataset.nodeState=node.node_state;host.innerHTML=graphNodeMarkup(node,index);list.append(host);
++    const owners=el('section',undefined,'workflow-map-responsibilities'),owner=el('div');owners.setAttribute('aria-label','Responsables de '+node.label);owners.append(owner);host.querySelector('article').append(owners);
++    mountResponsibilitySelector(owner,{caseId:route.caseId,stageKey:node.id,snapshot:data.responsibilities,onSaved:map});
++    for(const b of host.querySelectorAll('[data-map-action]'))scope.listen(b,'click',()=>follow(node.primary_action.target));
++    const extra=el('div',undefined,'t5-node-extra');
++    if(!node.runtime_available)extra.append(el('p','La ejecución de esta decisión todavía no está disponible.','d-metadata'));
++    const reasons=node.actions.configure.reasons||[];if(reasons.length)extra.append(el('p',reasons.includes('DATA_OWNER_REQUIRED')?'Asigná un Data Owner activo en este Map.':reasons.includes('DECISION_OWNER_REQUIRED')?'Asigná un Decision Owner activo en este Map.':'Acceso de sólo lectura para esta decisión.','d-metadata'));
++    extra.append(button('Historial de '+node.label,()=>history(node,extra,0)));host.append(extra);
++    if(index<data.graph.nodes.length-1){const edge=el('div','↓','t5-edge');edge.setAttribute('aria-hidden','true');list.append(edge);}
++   }
++  }else if(route.view==='logistics-config'){
++   const node=selected();if(!node)throw new Error('Seleccioná una decisión desde el Map.');
++   const panel=el('section',undefined,'d-card t5-context');panel.dataset.graphConfig=node.id;panel.append(el('h2','Configurar '+node.label,'d-card-title'),el('p',graphStateUi(node.node_state).label,'d-body'));
++   if(data.configuration_context){panel.append(el('p','Objetivo y reglas: los del contexto guardado del Case.','d-body'));if(data.configuration_context.upstream_run_id)panel.append(el('p','Upstream aprobado: '+data.configuration_context.upstream_run_id,'d-metadata'));}
++   else panel.append(el('p','La configuración no está habilitada para este acceso o contexto. Revisá el Map y los responsables.','d-body'));
++   panel.append(el('p','La ejecución de esta decisión todavía no está disponible.','d-body'));const execute=button('Ejecutar decisión',()=>{},'primary');execute.disabled=true;panel.append(execute);root.append(panel);
++  }else if(route.view==='decision-dashboard'){
++   const run=data.selected_run;if(!run||run.id!==route.runId)throw new Error('La corrida solicitada no pertenece a este contexto.');
++   const node=selected(),panel=el('section',undefined,'d-card t5-context');panel.dataset.graphHistoricalRun=run.id;
++   panel.append(el('h2','Corrida '+run.id,'d-card-title'),el('p','Estado de la ejecución: '+run.status,'d-body'),el('p',run.approved_at?'Aprobación registrada: '+run.approved_at:'Sin aprobación registrada.','d-metadata'),el('p',run.superseded_at?'La corrida fue reemplazada; su historial se conserva.':'La selección histórica no modifica el Map actual.','d-metadata'));
++   if(run.upstream_run_id)panel.append(el('p','Upstream: '+run.upstream_run_id,'d-metadata'));
++   panel.append(el('p','La visualización del resultado de esta decisión todavía no está disponible.','d-body'));
++   if(node){const rerun=button('Nueva corrida · '+node.label,()=>follow(node.actions.new_run.target),'primary');rerun.disabled=!node.actions.new_run.allowed;panel.append(rerun);}root.append(panel);
++  }
++  async function history(node,parent,offset){
++   const own=(historyVersions.get(node.id)||0)+1;historyVersions.set(node.id,own);
++   try{
++    const data=await api(base+'/graph/history/'+node.id+'?'+new URLSearchParams({limit:25,offset}),{signal:scope.signal});if(!scope.active||own!==historyVersions.get(node.id))return;
++    let section=parent.querySelector('[data-t5-history]');if(!section){section=el('section',undefined,'d-card t5-context');section.dataset.t5History='';parent.append(section);}section.replaceChildren(el('h3','Historial de '+node.label,'d-card-title'));
++    for(const run of data.items){const row=el('div',undefined,'t5-history-row');row.append(el('p',run.id+' · '+run.status+(run.approved_at?' · aprobación registrada':'')+(run.superseded_at?' · reemplazada':''),'d-body'),button('Abrir corrida '+run.id.slice(0,8),()=>navigate('decision-dashboard',{caseId:route.caseId,nodeId:node.id,runId:run.id})));section.append(row);}
++    if(!data.items.length)section.append(el('p','Todavía no hay corridas registradas.','d-metadata'));
++    const paging=el('div',undefined,'t5-actions'),back=button('Corridas anteriores',()=>history(node,parent,offset+25)),previous=button('Volver a corridas recientes',()=>history(node,parent,offset-25));back.disabled=offset+25>=data.total;previous.disabled=offset===0;paging.append(previous,back);section.append(paging);
++   }catch(error){if(scope.active)parent.append(el('p',error.message,'d-body'));}
++  }
++  root.dataset.ultimateReady='true';root.dataset.graphReady='true';
++ }catch(error){if(scope.active)errorBox(root,error,()=>navigate('logistics-map',{caseId:route.caseId,nodeId:null,runId:null,replace:true}));}
++}
+--- post-T4/backend/app/static/js/dispatch/navigation/case-flow.mjs
++++ T5/backend/app/static/js/dispatch/navigation/case-flow.mjs
+@@ -3,10 +3,20 @@
+ import {decisionRail,bindDecisionRail} from './decision-nav.mjs';
+ import {hasCaseExecutions,caseAttributesReady} from '../cases/case-identity.mjs';
+ import {configurationAvailable} from './decision-target.mjs';
++import {graphTarget} from './ultimate-graph.mjs';
+ 
+ const views=['logistics-data','logistics-map','logistics-config','decision-dashboard'];
+ const signatures=new WeakMap();
+ export function caseFlowSteps(view,route,state={}){
++ const graph=state.ultimateGraph?.case_id===route.caseId?state.ultimateGraph:null;
++ if(graph){
++  const node=graph.nodes.find(n=>n.id===(route.nodeId||graph.attention_node_id)),result=node?.actions.result;
++  return ['Datos del Case','Mapa de decisiones','Configurar decisión','Dashboard'].map((label,index)=>{
++   const target=index===0?{view:'logistics-case-data',caseId:route.caseId,nodeId:null,runId:null}:index===1?{view:'logistics-map',caseId:route.caseId,nodeId:null,runId:null}:index===2?graphTarget(node?.actions.configure.target):route.runId?{view:'decision-dashboard',caseId:route.caseId,nodeId:route.nodeId,runId:route.runId}:graphTarget(result?.target);
++   return {label,view:target?.view,current:target?.view===view,disabled:index===2?!node?.actions.configure.allowed:index===3?!route.runId&&!result?.allowed:false,
++    completed:false,context:index>=2&&target?.view===view?node?.label:null,target};
++  });
++ }
+  const own=state.decisionCase?.id===route.caseId?state.decisionCase:null;
+  const node=own?.nodes?.[route.nodeId],target=node&&resolveNodeDestination(route.nodeId,node);
+  const hasRun=target?.view==='decision-dashboard',selected=Boolean(node&&target);
+@@ -31,8 +41,9 @@
+  root.scrollLeft+=offset-(root.clientWidth-step.offsetWidth)/2;
+ }
+ export function renderCaseFlow(root,{view,route,state={}}){
+- root.parentElement.hidden=!views.includes(view);
+- if(!views.includes(view)){root.replaceChildren();signatures.delete(root);return;}
++ const visible=[...views,'logistics-case-data'].includes(view);
++ root.parentElement.hidden=!visible;
++ if(!visible){root.replaceChildren();signatures.delete(root);return;}
+  const steps=caseFlowSteps(view,route,state),signature=JSON.stringify(steps);
+  if(signatures.get(root)===signature&&root.children.length)return;
+  signatures.set(root,signature);root.replaceChildren();
+--- post-T4/backend/app/static/js/dispatch/navigation/ultimate-graph.mjs
++++ T5/backend/app/static/js/dispatch/navigation/ultimate-graph.mjs
+@@ -0,0 +1,25 @@
++// Display vocabulary and route adaptation only. Business states/actions come from the server.
++export const GRAPH_STATE_UI=Object.freeze({
++ LOCKED:{label:'En espera',tone:'waiting',style:'locked',icon:'lock'},
++ DATA_REQUIRED:{label:'Requiere datos',tone:'waiting',style:'needs_data',icon:'alertTriangle'},
++ READY:{label:'Lista para configurar',tone:'available',style:'available',icon:'checkCircle'},
++ IN_PROGRESS:{label:'En ejecución',tone:'running',style:'running',icon:'loader'},
++ COMPLETED:{label:'Pendiente de aprobación',tone:'review',style:'review',icon:'clipboardCheck'},
++ APPROVED:{label:'Aprobada',tone:'approved',style:'approved',icon:'checkCircle'},
++ COMING_SOON:{label:'Próximamente',tone:'waiting',style:'locked',icon:'clock'},
++ NOT_APPLICABLE:{label:'No aplica',tone:'waiting',style:'locked',icon:'info'},
++});
++export function graphStateUi(state){return GRAPH_STATE_UI[state]||{label:'Estado no disponible',tone:'waiting',style:'locked'};}
++export function graphTarget(target){return target?{view:target.view,caseId:target.case_id,nodeId:target.node_id,runId:target.run_id}:null;}
++export function graphActionLabel(action,node){
++ if(action?.target?.view==='logistics-case-data')return 'Completar datos del Case';
++ if(action?.target?.view==='decision-dashboard')return 'Abrir corrida';
++ return 'Configurar '+node.label;
++}
++export function graphNodeDescription(node){
++ if(node.requirements.length)return node.requirements.map(r=>r.label).join(' · ');
++ if(node.blocked_by.length)return 'Requiere la aprobación vigente de Transport Plan.';
++ if(node.freshness==='STALE')return 'Cambiaron datos consumidos por esta decisión. El historial se conserva.';
++ if(node.technical_failure)return 'La última ejecución registró un error técnico. Los datos publicados se conservan.';
++ return graphStateUi(node.node_state).label+'.';
++}
+--- post-T4/backend/app/static/js/dispatch/traceability-controller.mjs
++++ T5/backend/app/static/js/dispatch/traceability-controller.mjs
+@@ -19,7 +19,7 @@
+ }
+ export async function openDecisionMap({preferActiveCase=false,trigger=null,forceSelector=false}={}){
+   const owner=interaction();
+-  const activeCaseId=window.DationDispatch.getWorkspace().decisionCase?.id;
++  const workspace=window.DationDispatch.getWorkspace(),activeCaseId=workspace.decisionCase?.id||workspace.ultimateCaseContext?.id;
+   if(!forceSelector&&preferActiveCase&&activeCaseId)return window.DationDispatch.openCase(activeCaseId,'logistics-map',null);
+   try{
+     const cases=await listDecisionCases(owner.signal);if(!owner.active)return;
+--- post-T4/backend/app/static/js/dispatch/traceability-ui.mjs
++++ T5/backend/app/static/js/dispatch/traceability-ui.mjs
+@@ -48,13 +48,21 @@
+   const nodes=item?.decision_case?.nodes||{};
+   const values=Object.values(nodes);
+   return {
+-    approved:values.filter(node=>node?.status==='approved').length,
+-    runs:values.reduce((sum,node)=>sum+(Number(node?.run_count)||0),0),
++    approved:item.case?.progress?.approved??values.filter(node=>node?.status==='approved').length,
++    runs:values.length?values.reduce((sum,node)=>sum+(Number(node?.run_count)||0),0):item.case?.progress?null:0,
+   };
+ }
+ 
+ function caseCard(item,currentCaseId){
+   const row=item.case||{};
++  if(row.workflow_version===2){
++    return '<article class="dispatch-case-option '+(String(row.id)===String(currentCaseId)?'is-current':'')+'">'
++      +'<div class="dispatch-case-option__top"><div><small>DECISION CASE</small><strong>'+esc(row.label||shortCaseId(row.id))+'</strong></div>'
++      +(String(row.id)===String(currentCaseId)?'<span class="dispatch-case-option__current">Abierto ahora</span>':'')+'</div>'
++      +'<div class="dispatch-case-option__pack"><span><small>CONTEXTO</small><strong>'+esc(shortCaseId(row.id))+'</strong></span><span><small>PROGRESO</small><strong>'+num(item.graph?.approved_count??row.progress?.approved??0)+' / 2 aprobadas</strong></span></div>'
++      +'<div class="dispatch-case-option__footer"><span>'+esc(row.status==='archived'?'Archivado':'Data Pack progresivo')+'</span>'
++      +(String(row.id)===String(currentCaseId)?'<button type="button" disabled>Caso actual</button>':'<button type="button" data-open-case="'+esc(row.id)+'">Abrir caso →</button>')+'</div></article>';
++  }
+   const stats=caseStats(item);
+   const current=String(row.id||'')===String(currentCaseId||'');
+   return '<article class="dispatch-case-option '+(current?'is-current':'')+'">'
+@@ -68,8 +76,8 @@
+       +'<span><small>FLOTA</small><strong title="'+esc(datasetName(item.fleet))+'">'+esc(datasetName(item.fleet))+'</strong></span>'
+     +'</div>'
+     +'<div class="dispatch-case-option__metrics">'
+-      +'<span><strong>'+num(stats.approved)+'/3</strong><small>decisiones vigentes</small></span>'
+-      +'<span><strong>'+num(stats.runs)+'</strong><small>corridas registradas</small></span>'
++      +'<span><strong>'+num(stats.approved)+'/'+(row.progress?.total??3)+'</strong><small>decisiones vigentes</small></span>'
++      +'<span><strong>'+(stats.runs==null?'—':num(stats.runs))+'</strong><small>corridas registradas</small></span>'
+     +'</div>'
+     +'<div class="dispatch-case-option__footer">'
+       +'<span>Última actividad · '+esc(dateTime(row.last_activity_at||row.updated_at))+'</span>'
+--- post-T4/backend/app/static/js/dispatch/upload/ultimate-case-data.mjs
++++ T5/backend/app/static/js/dispatch/upload/ultimate-case-data.mjs
+@@ -33,9 +33,11 @@
+  if(!route.caseId){errorBox(root,Object.assign(new Error('Elegí un Case para administrar sus datos.'),{status:404}),()=>navigate('logistics-case-setup',{caseId:null}));return;}
+  try{
+   await ensureStylesheet('ultimate-foundation-styles','/static/css/ultimate-foundation.css','t3-v1');await ensureStylesheet('ultimate-case-data-styles','/static/css/ultimate-case-data.css','t4-v1');
+-  const base='/api/platform/logistics-cases/'+route.caseId+'/data',data=await api(base,{signal:scope.signal});if(!scope.active)return;onContext?.(data.case);
++  const base='/api/platform/logistics-cases/'+route.caseId+'/data',data=await api(base,{signal:scope.signal});if(!scope.active)return;
++  const graphData=await api('/api/platform/logistics-cases/'+route.caseId+'/graph',{signal:scope.signal});if(!scope.active)return;onContext?.(data.case,graphData.graph);
+   const store=draftStore('pack',route.caseId),draft=store.read()||{selection:{},uploadIntents:{},publication:null};draft.selection||={};draft.uploadIntents||={};const save=()=>store.write(draft);
+   root.replaceChildren();const header=pageHeader(root,'Datos del Case',data.case.label+' · '+data.case.planning_start+' a '+data.case.planning_end);header.append(button('Contexto del Case',()=>navigate('logistics-case-setup',{caseId:route.caseId})));
++  header.append(button('Volver al Decision Map',()=>navigate('logistics-map',{caseId:route.caseId,nodeId:null,runId:null})));
+   const message=el('p','Validar o guardar un candidato no cambia el Pack publicado.','d-metadata');message.dataset.packMessage='';message.role='status';root.append(message);
+   const current=el('section',undefined,'d-card t4-current'),headline=el('h2','Pack · versión '+data.version.version,'d-card-title');headline.dataset.packCurrentVersion=String(data.version.version);current.append(headline,el('p','Revisión '+data.pack.revision+' · '+(data.entries.length?data.entries.length+' entradas publicadas':'Pack inicial vacío')+'. El Case existe aunque todavía no tenga archivos.','d-body'),el('p','Inputs publicados no equivalen a una decisión READY. La ejecución Ultimate todavía no está disponible.','d-metadata'));
+   if(!data.can_edit)current.append(el('p','Publicación cerrada o acceso de sólo lectura. Los snapshots existentes se conservan.','d-body'));root.append(current);
+--- post-T4/backend/app/static/js/dispatch/workspace.mjs
++++ T5/backend/app/static/js/dispatch/workspace.mjs
+@@ -834,7 +834,11 @@
+ async function hydrateCase(caseId,generation=routeGeneration,expectedInputs=null){
+   const item=await api('/api/decision-cases/'+caseId,{signal:routeController?.signal});
+   if(generation!==routeGeneration)return;
+-  if(item.case?.workflow_version===2)throw Object.assign(new Error('Abrí el contexto del Case Ultimate.'),{ultimateCaseId:caseId});
++  if(item.case?.workflow_version===2){
++    state.ultimateCaseContext=item.case;state.decisionCase=null;state.orders=null;state.fleet=null;state.workflow=null;
++    return {ultimate:true,case:item.case};
++  }
++  state.ultimateCaseContext=null;state.ultimateGraph=null;
+   if(expectedInputs&&(state.decisionCase?.id!==caseId||inputSignature(state.orders,state.fleet)!==expectedInputs))return;
+   if(String(item.decision_case?.id)!==String(caseId)||String(item.orders?.id)!==String(item.decision_case?.inputs?.orders_dataset_id||item.case?.orders_dataset_id)||String(item.fleet?.id)!==String(item.decision_case?.inputs?.fleet_dataset_id||item.case?.fleet_dataset_id))throw new Error('El Decision Case no coincide con su Data Pack.');
+   if(state.decisionCase?.id!==caseId){saveDraft();resetAssignmentConfiguration();Object.assign(state,cleanDraft(drafts[caseId]));state.preflight=null;state.configPreview=null;state.run=null;transitionCaseId=null;}
+@@ -852,11 +856,12 @@
+   }
+   const aliases={overview:'logistics-overview',library:'traceability'};
+   const publicView=Object.entries(aliases).find(([,value])=>value===view)?.[0]||view;
+-  const next={view:publicView,caseId:!['logistics-data','logistics-map','logistics-config','decision-dashboard','logistics-case-setup','logistics-case-data'].includes(publicView)?null:['logistics-case-setup','logistics-case-data'].includes(publicView)?(options.caseId||null):options.caseId===undefined?state.decisionCase?.id||null:options.caseId,nodeId:options.nodeId===undefined?state.activeNode:options.nodeId,runId:options.runId||(publicView==='decision-dashboard'?state.run?.id||resource?.runId:null)};
++  const next={view:publicView,caseId:!['logistics-data','logistics-map','logistics-config','decision-dashboard','logistics-case-setup','logistics-case-data'].includes(publicView)?null:['logistics-case-setup','logistics-case-data'].includes(publicView)?(options.caseId||null):options.caseId===undefined?state.decisionCase?.id||state.ultimateCaseContext?.id||null:options.caseId,nodeId:options.nodeId===undefined?state.activeNode:options.nodeId,runId:options.runId||(publicView==='decision-dashboard'?state.run?.id||resource?.runId:null)};
+   if(['logistics-models','logistics-case-setup'].includes(publicView))next.modelId=options.modelId||null;
+   saveDraft();routeController?.abort();routeController=new AbortController();const generation=++routeGeneration;
+   runPolling.stop();pollGeneration++;
+-  for(const root of Object.values(roots)){disposeScope(root);root.replaceChildren();root.className='dispatch';delete root.dataset.ultimateReady;}
++  for(const root of Object.values(roots)){disposeScope(root);root.replaceChildren();root.className='dispatch';delete root.dataset.ultimateReady;delete root.dataset.graphReady;}
++  state.ultimateGraph=null;
+   resource=next;
+   if(publicView==='platform-data')next.hub=options.hub||{};
+   if(publicView==='platform-decisions')next.center=options.center||{};
+@@ -873,7 +878,7 @@
+   try{
+     if(publicView==='logistics-case-data'){
+       const {mountCaseData}=await import('./upload/ultimate-case-data.mjs');
+-      if(generation===routeGeneration)await mountCaseData(root,{route:next,navigate:navigateResource,onContext:row=>{state.ultimateCaseContext=row;window.dationRenderContextNavigation?.();}});
++      if(generation===routeGeneration)await mountCaseData(root,{route:next,navigate:navigateResource,onContext:(row,graph)=>{if(generation!==routeGeneration)return;state.ultimateCaseContext=row;state.ultimateGraph=graph;window.dationRenderContextNavigation?.();}});
+       return;
+     }
+     if(publicView==='logistics-models'||publicView==='logistics-case-setup'){
+@@ -881,7 +886,16 @@
+       else{const {mountCaseSetup}=await import('./cases/ultimate-case-setup.mjs');if(generation===routeGeneration)await mountCaseSetup(root,{route:next,navigate:navigateResource,onContext:result=>{state.ultimateCaseContext=result.case;window.dationRenderContextNavigation?.();}});}
+       if(generation===routeGeneration)window.dationRenderContextNavigation?.();return;
+     }
+-    if(next.caseId){try{await hydrateCase(next.caseId,generation);}catch(error){if(!(error.status===404&&state.decisionCase?.id===next.caseId&&!state.decisionCase.persisted&&state.orders&&state.fleet))throw error;}}
++    if(next.caseId){try{
++      const loaded=await hydrateCase(next.caseId,generation);
++      if(generation!==routeGeneration)return;
++      if(loaded?.ultimate){
++        if(publicView==='logistics-data')return navigateResource('logistics-case-data',{caseId:next.caseId,nodeId:null,runId:null,replace:true});
++        const {mountUltimateGraph}=await import('./cases/ultimate-decision-map.mjs');
++        if(generation===routeGeneration)await mountUltimateGraph(root,{route:next,navigate:navigateResource,onContext:(row,graph)=>{if(generation!==routeGeneration)return;state.ultimateCaseContext=row;state.ultimateGraph=graph;window.dationRenderContextNavigation?.();}});
++        return;
++      }
++    }catch(error){if(!(error.status===404&&state.decisionCase?.id===next.caseId&&!state.decisionCase.persisted&&state.orders&&state.fleet))throw error;}}
+     if(generation!==routeGeneration)return;
+     if(publicView==='logistics-data')await loadData();
+     if(publicView==='logistics-map')await loadDecisionMap();
+--- post-T4/backend/app/static/js/platform/dda-navigation.mjs
++++ T5/backend/app/static/js/platform/dda-navigation.mjs
+@@ -15,10 +15,10 @@
+   {label:'DDA Logística',target:{view:'logistics-overview',caseId:null,nodeId:null,runId:null},state:view==='logistics-overview'?'current':'available'},
+  ];
+  if(view==='logistics-models')entries.push({label:'Logistics Models',target:null,state:'current'});
+- else if(view==='logistics-case-data')entries.push({label:ultimate?.label||'Contexto del Case',target:{view:'logistics-case-setup',caseId:route.caseId,nodeId:null,runId:null},state:'available'},{label:'Datos del Case',target:null,state:'current'});
++ else if(view==='logistics-case-data')entries.push({label:ultimate?.label||'Decision Case',target:{view:'logistics-map',caseId:route.caseId,nodeId:null,runId:null},state:'available'},{label:'Datos del Case',target:null,state:'current'});
+  else if(view==='logistics-case-setup')entries.push({label:ultimate?.label||(route.caseId?'Contexto del Case':'Nuevo Case'),target:null,state:'current'});
+  else if(route.caseId){
+-  entries.push({label:workspace.caseContext?.label||currentCase?.label||'Decision Case',target:{view:'logistics-map',caseId:route.caseId,nodeId:null,runId:null},state:view==='logistics-map'?'current':'available'});
++  entries.push({label:ultimate?.label||workspace.caseContext?.label||currentCase?.label||'Decision Case',target:{view:'logistics-map',caseId:route.caseId,nodeId:null,runId:null},state:view==='logistics-map'?'current':'available'});
+  }else if(view==='logistics-data'){
+   entries.push({label:'Nuevo Case',target:null,state:'current'});
+  }
+--- post-T4/backend/app/static/js/platform/decision-center.mjs
++++ T5/backend/app/static/js/platform/decision-center.mjs
+@@ -13,13 +13,14 @@
+ import {CENTER_FILTERS,readCenterResource} from './center-resource.mjs';
+ import {mountActivity} from './activity.mjs';
+ import {workspaceDate,workspaceNumber} from './workspace-format.mjs';
++import {GRAPH_STATE_UI,graphStateUi,graphActionLabel} from '../dispatch/navigation/ultimate-graph.mjs';
+ 
+ const BASE='/api/platform/decisions',size=25;
+ const statusNames={active:'En progreso',completed:'Completado',archived:'Archivado',review:'En revisión',pending_approval:'Pendiente de aprobación',approved:'Aprobada',running:'En ejecución',error:'Requiere revisión',stale:'Requiere actualizar',available:'Disponible',locked:'Bloqueado',needs_data:'Faltan datos',coming_soon:'Próximamente'};
+ function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;}
+ function icon(name){const box=el('span',undefined,'center-icon');box.innerHTML=iconSvg(name);return box;}
+ function button(text,handler,kind='secondary'){const n=el('button',text,'d-button d-button--'+kind);n.type='button';n.addEventListener('click',handler);return n;}
+-function pill(status){const n=el('span',statusNames[status]||status,'center-status');n.dataset.state=status;n.dataset.tone=statePresentation(status==='pending_approval'?'review':status).tone;return n;}
++function pill(status){const graph=GRAPH_STATE_UI[status],n=el('span',graph?.label||statusNames[status]||status,'center-status');n.dataset.state=status;n.dataset.tone=graph?.tone||statePresentation(status==='pending_approval'?'review':status).tone;return n;}
+ function person(value,fallback='Sin asignar'){return value?.name?value.name+(value.active===false?' (inactivo)':''):fallback;}
+ function ddaLabel(id){return DDA_CATALOG.find(d=>d.id===id)?.title||id||'DDA';}
+ function namedPerson(value){const wrap=el('span',undefined,'center-person'),initials=personInitials(value?.name),avatar=el('span',initials,'center-avatar');avatar.setAttribute('aria-hidden','true');wrap.append(avatar,el('span',person(value)));return wrap;}
+@@ -122,9 +123,9 @@
+   const stages=c.responsibilities?.stages||{};for(const [key,label]of [['data_owner','Data Owner']])if(stages[key])linked.append(personField(c,key,'owner',label,stages[key].owner));if(!stages.data_owner&&stages.data_preparation)linked.append(personField(c,'data_preparation','owner','Responsable de datos',stages.data_preparation.owner));content.append(linked);
+   const chain=el('section',undefined,'center-chain');chain.append(el('h3','Cadena de decisiones','d-card-title'));const list=el('ol',undefined,'center-timeline');chain.append(list);content.append(chain);const histories=[];
+   for(const [index,node]of (c.nodes||[]).entries()){
+-   const meta=DECISION_META[node.id]||{label:node.label},item=el('li',undefined,'center-node');item.dataset.centerNode=node.id;const header=el('div',undefined,'center-node__header');header.append(el('span',String(index+1).padStart(2,'0'),'center-node__number'),el('h4',meta.label,'center-node-title'),pill(node.status));item.append(header,el('p','Objetivo · '+(node.objective?.label||'Por definir'),'center-node__objective'));
++   const meta=node.node_state?{label:node.label}:DECISION_META[node.id]||{label:node.label},item=el('li',undefined,'center-node');item.dataset.centerNode=node.id;const header=el('div',undefined,'center-node__header');header.append(el('span',String(index+1).padStart(2,'0'),'center-node__number'),el('h4',meta.label,'center-node-title'),pill(node.status));item.append(header,el('p','Objetivo · '+(node.objective?.label||'Por definir'),'center-node__objective'));
+    if(node.target&&!['locked','needs_data','coming_soon'].includes(node.status)){const label={approved:'Ver dashboard',review:'Revisar',available:'Configurar',running:'Ver ejecución'}[node.status]||'Ver decisión',candidate=['review','running','error'].includes(node.status)&&node.latest_run&&!node.latest_run.approved_at;
+-    item.append(destination(label,candidate?{view:'decision-dashboard',node_id:node.id,run_id:node.latest_run.id}:node.target,c,{continuation:true}));
++    item.append(destination(node.node_state?graphActionLabel(node.primary_action,node):label,candidate?{view:'decision-dashboard',node_id:node.id,run_id:node.latest_run.id}:node.target,c,{continuation:true}));
+     if(candidate&&node.latest_objective?.id!==node.objective?.id)item.append(el('p','Objetivo de la candidata · '+(node.latest_objective?.label||'Por definir'),'d-metadata'));
+    }
+    const details=el('details',undefined,'center-node-details');details.append(el('summary','Responsables y aprobación'));const fields=el('div',undefined,'center-responsibilities');fields.append(personField(c,node.id,'owner','Decision Owner',node.owner));details.append(fields);
+--- post-T4/backend/tests/browser/test_ultimate_case_setup.py
++++ T5/backend/tests/browser/test_ultimate_case_setup.py
+@@ -89,6 +89,7 @@
+         await self.page.get_by_label('Fin de planificación',exact=True).fill('2026-11-08')
+         await self.page.get_by_label('Decision Owner inicial (D1 y D2)',exact=True).select_option(ADMIN)
+         await self.page.get_by_role('button',name='Crear Case',exact=True).click()
++        await self.page.locator('[data-graph-ready="true"]').wait_for();await self.page.get_by_role('button',name='Contexto del Case',exact=True).click()
+         await self.page.get_by_role('button',name='Guardar contexto',exact=True).wait_for();await self.page.get_by_role('heading',name='Contexto guardado',exact=True).wait_for()
+         cid=await self.page.evaluate('new URL(location.href).searchParams.get("case_id")');self.assertTrue(cid)
+         self.assertEqual(await self.page.locator('input[type="file"]').count(),0)
+--- post-T4/backend/tests/browser/test_ultimate_navigation.py
++++ T5/backend/tests/browser/test_ultimate_navigation.py
+@@ -0,0 +1,125 @@
++"""W5 scoped UI/navigation over real API/SQL and explicit lifecycle metadata."""
++import asyncio,json,os,select,subprocess,unittest
++from pathlib import Path
++from playwright.async_api import expect
++import test_ultimate_case_setup as t3
++import test_ultimate_case_data as t4
++
++ROOT=Path(__file__).resolve().parents[2];REPO=ROOT.parent
++OUT=Path(os.environ.get('DATION_T5_BROWSER_ARTIFACTS','/workspace/work/dation-t5/browser'))
++D1='logistics_assignment';D2='logistics_scheduling'
++
++class UltimateNavigationTests(unittest.IsolatedAsyncioTestCase):
++    asyncSetUp=t3.UltimateCaseSetupTests.asyncSetUp
++    asyncTearDown=t3.UltimateCaseSetupTests.asyncTearDown
++    login=t3.UltimateCaseSetupTests.login
++    request=t3.UltimateCaseSetupTests.request
++    api=t3.UltimateCaseSetupTests.api
++    model=t3.UltimateCaseSetupTests.model
++    case=t3.UltimateCaseSetupTests.case
++    template=t4.UltimateCaseDataTests.template
++    upload_api=t4.UltimateCaseDataTests.upload_api
++    attach=t4.UltimateCaseDataTests.attach
++    publish_ui=t4.UltimateCaseDataTests.publish_ui
++    store_ui=t4.UltimateCaseDataTests.store_ui
++    @classmethod
++    def setUpClass(cls):
++        OUT.mkdir(parents=True,exist_ok=True);t3.OUT=OUT;cls.fixture_log=(OUT/'fixture.log').open('w')
++        env=os.environ.copy()
++        for k in ['SUPABASE_URL','SUPABASE_SECRET_KEY','SUPABASE_ACCESS_TOKEN','LLM_API_KEY','LLM_BASE_URL','GCP_ACCESS_TOKEN']:env[k]=''
++        for k in ['DOCKER_HOST','DOCKER_CONTEXT','DOCKER_TLS','DOCKER_TLS_VERIFY','DOCKER_CERT_PATH']:env.pop(k,None)
++        env.update(PYTHONDONTWRITEBYTECODE='1',DOCKER_HOST='unix:///var/run/docker.sock')
++        cls.fixture=subprocess.Popen([str(REPO/'.venv/bin/python'),'-B',str(ROOT/'tests/e2e/ultimate_graph_fixture.py')],cwd=ROOT,env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=cls.fixture_log,text=True)
++        if not select.select([cls.fixture.stdout],[],[],60)[0]:cls.fixture.terminate();cls.fixture.wait(10);raise RuntimeError('T5 fixture startup timeout')
++        line=cls.fixture.stdout.readline()
++        if not line:raise RuntimeError('T5 fixture failed: '+(OUT/'fixture.log').read_text()[-3000:])
++        value=json.loads(line);cls.base=value['api_url'];cls.pg=value['pg_container'];cls.database=value['database']
++    tearDownClass=classmethod(t3.UltimateCaseSetupTests.tearDownClass.__func__)
++    async def open_map(self,cid):
++        await self.page.goto(self.base+'/app/ddas/logistics/decisions?case_id='+cid,wait_until='domcontentloaded');await self.page.locator('[data-graph-ready="true"]').wait_for(timeout=30000)
++    async def owner(self,cid):await self.api('PUT','/api/platform/decisions/'+cid+'/responsibilities/data_owner',{'expected_updated_at':None,'owner_user_id':t3.ADMIN})
++    async def full(self,cid):
++        for entity in ['transport_demand','transport_resources']:
++            j=await self.upload_api(cid,entity);state=await self.api('GET',f'/api/platform/logistics-cases/{cid}/data')
++            from uuid import uuid4
++            await self.api('POST',f'/api/platform/logistics-cases/{cid}/data/publish',{'publication_id':str(uuid4()),'expected_revision':state['pack']['revision'],'selection':[{'slot_key':entity,'upload_id':j['id']}]})
++        await self.owner(cid)
++    async def install(self,cid,node=D1,**options):
++        session=await self.context.request.post(self.base+'/auth/session',headers={'Origin':self.base});token=(await session.json())['access_token']
++        env=os.environ.copy();env['PYTHONPATH']=str(ROOT)
++        child=await asyncio.create_subprocess_exec(str(REPO/'.venv/bin/python'),'-B',str(ROOT/'tests/e2e/ultimate_graph_state.py'),cwd=ROOT,env=env,stdin=asyncio.subprocess.PIPE,stdout=asyncio.subprocess.PIPE,stderr=asyncio.subprocess.PIPE)
++        out,error=await child.communicate(json.dumps({'base':self.base,'token':token,'pg':self.pg,'database':self.database,'case_id':cid,'node_id':node,'options':options}).encode())
++        self.assertEqual(child.returncode,0,error.decode());return json.loads(out)['run_id']
++    async def test_01_empty_map_data_publish_ready_and_config_d1(self):
++        _,_,c=await self.case();cid=c['case']['id'];await self.owner(cid);await self.open_map(cid)
++        await expect(self.page.locator('[data-graph-node="'+D1+'"]')).to_have_attribute('data-node-state','DATA_REQUIRED');await expect(self.page.locator('[data-graph-node="'+D2+'"]')).to_have_attribute('data-node-state','LOCKED')
++        self.assertEqual(await self.page.locator('[data-graph-node]').count(),2);self.assertEqual(await self.page.get_by_text('Nuevo Decision Case por cambio de datos',exact=True).count(),0)
++        await self.page.screenshot(path=str(OUT/'empty-map.png'),full_page=True,animations='disabled')
++        await self.page.get_by_role('button',name='Completar datos del Case',exact=False).click();await self.page.locator('[data-ultimate-ready="true"]').wait_for();await self.store_ui(cid);await self.publish_ui();await self.page.locator('[data-pack-current-version="2"]').wait_for()
++        await self.page.get_by_role('button',name='Volver al Decision Map',exact=True).click();await self.page.locator('[data-graph-ready="true"]').wait_for();await expect(self.page.locator('[data-graph-node="'+D1+'"]')).to_have_attribute('data-node-state','DATA_REQUIRED')
++        await self.page.get_by_role('button',name='Completar datos del Case',exact=False).click();await self.page.locator('[data-ultimate-ready="true"]').wait_for();await self.store_ui(cid,'transport_resources');await self.publish_ui();await self.page.locator('[data-pack-current-version="3"]').wait_for();await self.page.get_by_role('button',name='Volver al Decision Map',exact=True).click();await self.page.locator('[data-graph-ready="true"]').wait_for()
++        await expect(self.page.locator('[data-graph-node="'+D1+'"]')).to_have_attribute('data-node-state','READY');await self.page.get_by_role('button',name='Configurar Transport Plan',exact=False).click();await self.page.locator('[data-graph-config="'+D1+'"]').wait_for();self.assertTrue(await self.page.get_by_role('button',name='Ejecutar decisión',exact=True).is_disabled());self.assertEqual(await self.page.locator('input[type=file]').count(),0)
++        await self.page.reload();await self.page.locator('[data-graph-config="'+D1+'"]').wait_for();self.assertEqual(await self.page.evaluate('new URL(location.href).searchParams.get("case_id")'),cid)
++    async def test_02_approved_d1_opens_d2_config_with_exact_upstream(self):
++        _,_,c=await self.case();cid=c['case']['id'];await self.full(cid);rid=await self.install(cid,approved=True);await self.open_map(cid)
++        await expect(self.page.locator('[data-graph-node="'+D2+'"]')).to_have_attribute('data-node-state','READY');await self.page.get_by_role('button',name='Configurar Day Scheduling',exact=False).click();await self.page.locator('[data-graph-config="'+D2+'"]').wait_for();await self.page.get_by_text('Upstream aprobado: '+rid,exact=True).wait_for();self.assertEqual(await self.page.locator('input[type=file]').count(),0)
++        await self.page.reload();await self.page.locator('[data-graph-config="'+D2+'"]').wait_for();self.assertIn('node_id='+D2,self.page.url)
++    async def test_03_history_new_run_back_forward_reload_keep_case_node_and_run(self):
++        _,_,c=await self.case();cid=c['case']['id'];await self.full(cid);up=await self.install(cid,approved=True);child=await self.install(cid,D2,approved=True);await self.open_map(cid)
++        self.assertEqual(await self.page.locator('.ultimate-graph-view .dispatch-decision-node__next').count(),0)
++        await self.page.get_by_role('button',name='Historial de Day Scheduling',exact=True).click();await self.page.get_by_role('button',name='Abrir corrida '+child[:8],exact=True).click();await self.page.locator('[data-graph-historical-run="'+child+'"]').wait_for()
++        await self.page.get_by_role('button',name='Nueva corrida · Day Scheduling',exact=True).click();await self.page.locator('[data-graph-config="'+D2+'"]').wait_for();await self.page.get_by_text('Upstream aprobado: '+up,exact=True).wait_for()
++        await self.page.go_back();await self.page.locator('[data-graph-historical-run="'+child+'"]').wait_for();await self.page.reload();await self.page.locator('[data-graph-historical-run="'+child+'"]').wait_for();await self.page.go_forward();await self.page.locator('[data-graph-config="'+D2+'"]').wait_for()
++        await self.page.goto(self.base+'/app/ddas/logistics/dashboard?case_id='+cid+'&node_id='+D1+'&run_id='+up);await self.page.locator('[data-graph-historical-run="'+up+'"]').wait_for();await self.page.get_by_role('button',name='Nueva corrida · Transport Plan',exact=True).click();await self.page.locator('[data-graph-config="'+D1+'"]').wait_for();self.assertEqual(await self.page.locator('input[type=file]').count(),0)
++    async def test_04_case_selector_escape_switch_and_history_navigation(self):
++        _,_,a=await self.case();_,_,b=await self.case();ca=a['case']['id'];cb=b['case']['id'];await self.open_map(ca)
++        trigger=self.page.get_by_role('button',name='Seleccionar Decision Case',exact=True);await trigger.click();dialog=self.page.get_by_role('dialog',name='Seleccionar Decision Case');await dialog.wait_for();await self.page.keyboard.press('Escape');await dialog.wait_for(state='hidden');self.assertTrue(await trigger.evaluate('n=>n===document.activeElement'))
++        await trigger.click();await self.page.locator('[data-open-case="'+cb+'"]').click();await self.page.locator('[data-graph-ready="true"]').wait_for();self.assertIn('case_id='+cb,self.page.url)
++        await self.page.go_back();await self.page.locator('[data-graph-ready="true"]').wait_for();self.assertIn('case_id='+ca,self.page.url);await self.page.go_forward();await self.page.locator('[data-graph-ready="true"]').wait_for();self.assertIn('case_id='+cb,self.page.url)
++        await self.page.reload();await self.page.locator('[data-graph-ready="true"]').wait_for();self.assertEqual((await self.api('GET','/api/platform/logistics-cases/'+cb+'/data'))['version']['version'],1)
++    async def test_05_viewer_touch_and_archived_preserve_read_only_state(self):
++        _,_,c=await self.case();cid=c['case']['id'];await self.full(cid)
++        viewer=await self.browser.new_context(viewport={'width':390,'height':844},is_mobile=True,has_touch=True);await self.login(viewer,3);page=await viewer.new_page();await page.goto(self.base+'/app/ddas/logistics/decisions?case_id='+cid);await page.locator('[data-graph-ready="true"]').wait_for();await expect(page.locator('[data-graph-node="'+D1+'"]')).to_have_attribute('data-node-state','READY');self.assertEqual(await page.get_by_role('button',name='Configurar Transport Plan',exact=False).count(),0);await page.get_by_role('button',name='Datos del Case',exact=True).tap();await page.locator('[data-ultimate-ready="true"]').wait_for();self.assertTrue(await page.get_by_role('button',name='Guardar candidato de Demanda',exact=True).is_disabled());await viewer.close()
++        row=(await self.api('GET','/api/platform/logistics-cases/'+cid+'/context'))['case'];await self.api('PATCH','/api/platform/decisions/'+cid,{'expected_updated_at':row['updated_at'],'archived':True});await self.open_map(cid);await self.page.get_by_text('Case archivado. El historial permanece disponible en modo de lectura.',exact=True).wait_for();self.assertEqual(await self.page.get_by_role('button',name='Configurar Transport Plan',exact=False).count(),0)
++    async def test_06_responsive_native_states_keyboard_zoom_and_contrast(self):
++        _,_,c=await self.case();cid=c['case']['id'];row=(await self.api('GET','/api/platform/logistics-cases/'+cid+'/context'))['case']
++        await self.api('PATCH','/api/platform/logistics-cases/'+cid+'/context',{'expected_updated_at':row['updated_at'],'name':('Distribución Buenos Aires · café · operación semanal · '*4)[:120]})
++        await self.full(cid);await self.open_map(cid)
++        audit=(ROOT/'tests/browser/theme_audit.js').read_text();contrast=await self.page.evaluate(audit,'.ultimate-graph-view');(OUT/'contrast.json').write_text(json.dumps(contrast,indent=2));self.assertEqual(contrast['failures'],[])
++        metrics=[]
++        for width in [1440,1280,1024,768,390,320]:
++            await self.page.set_viewport_size({'width':width,'height':1000});await self.page.screenshot(path=str(OUT/f'map-{width}.png'),full_page=True,animations='disabled');m=await self.page.evaluate('({width:innerWidth,scroll:document.documentElement.scrollWidth})');self.assertLessEqual(m['scroll'],width+1,m);metrics.append(m)
++        await self.page.set_viewport_size({'width':1440,'height':1000});await self.page.evaluate('document.documentElement.style.zoom="2"');self.assertLessEqual(await self.page.evaluate('document.documentElement.scrollWidth'),1441);await self.page.screenshot(path=str(OUT/'map-zoom200.png'),full_page=True);await self.page.evaluate('document.documentElement.style.zoom="1"');self.assertTrue(await self.page.evaluate('matchMedia("(prefers-reduced-motion:reduce)").matches'))
++        await self.page.set_viewport_size({'width':390,'height':1000});await self.page.get_by_role('button',name='Mapa de decisiones',exact=True).focus();focus=[]
++        for _ in range(35):
++            await self.page.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))');m=await self.page.evaluate('''()=>{const n=document.activeElement,b=n.getBoundingClientRect(),hit=document.elementFromPoint(b.x+b.width/2,b.y+b.height/2);return {inside:!!n.closest('.ultimate-graph-view'),name:n.textContent.slice(0,60),hit:hit===n||n.contains(hit),top:b.top,bottom:b.bottom}}''')
++            if not m['inside']:break
++            self.assertTrue(m['hit'] and m['top']>=0 and m['bottom']<=1000,m);focus.append(m);await self.page.keyboard.press('Tab')
++        self.assertGreaterEqual(len(focus),7);(OUT/'responsive.json').write_text(json.dumps(metrics,indent=2));(OUT/'focus.json').write_text(json.dumps(focus,indent=2))
++    async def test_07_navigation_race_disposes_old_case_projection(self):
++        _,_,a=await self.case();_,_,b=await self.case();ca=a['case']['id'];cb=b['case']['id'];await self.open_map(cb)
++        async def delay(route):await asyncio.sleep(.4);await route.continue_()
++        await self.page.route('**/logistics-cases/'+ca+'/graph*',delay)
++        await self.page.evaluate('(id)=>{window.DationDispatch.openCase(id,"logistics-map",null)}',ca);await asyncio.sleep(.1);await self.page.evaluate('(id)=>{window.DationDispatch.openCase(id,"logistics-map",null)}',cb)
++        await self.page.locator('[data-graph-ready="true"]').wait_for();await asyncio.sleep(.6);self.assertIn('case_id='+cb,self.page.url);self.assertEqual(await self.page.evaluate('window.DationDispatch.getWorkspace().ultimateGraph.case_id'),cb);self.assertEqual(await self.page.locator('[data-graph-ready="true"]').count(),1)
++        async def delay_picker(route):await asyncio.sleep(.2);await route.continue_()
++        await self.page.route('**/api/platform/decisions?*',delay_picker);choose=self.page.get_by_role('button',name='Seleccionar Decision Case',exact=True);await choose.click();await choose.click();await self.page.get_by_role('dialog',name='Seleccionar Decision Case').first.wait_for();await asyncio.sleep(.4);self.assertEqual(await self.page.get_by_role('dialog',name='Seleccionar Decision Case').count(),1);await self.page.keyboard.press('Escape')
++    async def test_08_cross_document_return_and_persisted_pageshow_restore_context(self):
++        _,_,c=await self.case();cid=c['case']['id'];await self.open_map(cid);await self.page.goto('about:blank');await self.page.go_back();await self.page.locator('[data-graph-ready="true"]').wait_for();self.assertIn('case_id='+cid,self.page.url)
++        await self.page.evaluate('dispatchEvent(new PageTransitionEvent("pageshow",{persisted:true}))');await self.page.locator('[data-graph-ready="true"]').wait_for();self.assertEqual(await self.page.evaluate('window.DationDispatch.getWorkspace().ultimateGraph.case_id'),cid)
++    async def test_09_native_owner_selector_unlocks_configuration_without_changing_pack(self):
++        _,_,c=await self.case();cid=c['case']['id']
++        for entity in ['transport_demand','transport_resources']:
++            j=await self.upload_api(cid,entity);state=await self.api('GET',f'/api/platform/logistics-cases/{cid}/data')
++            from uuid import uuid4
++            await self.api('POST',f'/api/platform/logistics-cases/{cid}/data/publish',{'publication_id':str(uuid4()),'expected_revision':state['pack']['revision'],'selection':[{'slot_key':entity,'upload_id':j['id']}]})
++        await self.open_map(cid);self.assertEqual(await self.page.get_by_role('button',name='Configurar Transport Plan',exact=False).count(),0)
++        owner=self.page.locator('[data-workflow-responsibility="data_owner"]');await owner.get_by_role('button',name='Seleccionar responsable',exact=True).click();select=owner.locator('select');await select.locator('option[value="'+t3.ADMIN+'"]').wait_for(state='attached');await select.select_option(t3.ADMIN);await owner.get_by_role('button',name='Guardar',exact=True).click();await self.page.get_by_role('button',name='Configurar Transport Plan',exact=False).wait_for()
++        current=await self.api('GET',f'/api/platform/logistics-cases/{cid}/data');self.assertEqual(current['version']['version'],3);self.assertEqual(current['pack']['revision'],3)
++    async def test_10_center_renders_shared_graph_and_routes_to_case_data_and_config(self):
++        _,_,c=await self.case();cid=c['case']['id'];await self.page.goto(self.base+'/app/decisions?center_case_id='+cid,wait_until='domcontentloaded')
++        node=self.page.locator('[data-center-node="'+D1+'"]');await node.get_by_role('heading',name='Transport Plan',exact=True).wait_for();await node.get_by_text('Requiere datos',exact=True).wait_for()
++        await node.get_by_role('link',name='Completar datos del Case',exact=True).click();await self.page.locator('[data-ultimate-ready="true"]').wait_for();self.assertIn('case_id='+cid,self.page.url)
++        await self.full(cid);await self.page.goto(self.base+'/app/decisions?center_case_id='+cid,wait_until='domcontentloaded');node=self.page.locator('[data-center-node="'+D1+'"]');await node.get_by_text('Lista para configurar',exact=True).wait_for();await node.get_by_role('link',name='Configurar Transport Plan',exact=True).click();await self.page.locator('[data-graph-config="'+D1+'"]').wait_for();self.assertIn('case_id='+cid,self.page.url)
++
++if __name__=='__main__':unittest.main()
+--- post-T4/backend/tests/e2e/ultimate_graph_fixture.py
++++ T5/backend/tests/e2e/ultimate_graph_fixture.py
+@@ -0,0 +1,13 @@
++"""Owned T5 API/SQL/Storage-contract fixture. No Ultimate engine is started."""
++import json,sys
++from ultimate_data_fixture import DataPackSandbox, Sandbox
++
++class GraphSandbox(DataPackSandbox):
++    def docker(self,*args):
++        if args and args[0]=='run':args=(args[0],'--label','dation.qa.phase=T5','--label','dation.qa.owner=codex-dation',*args[1:])
++        return Sandbox.docker(self,*args)
++
++if __name__=='__main__':
++    with GraphSandbox() as sandbox:
++        print(json.dumps({'api_url':sandbox.api_url,'control_dir':str(sandbox.storage),'pg_container':sandbox.pg,'database':sandbox.database}),flush=True)
++        sys.stdin.readline()
+--- post-T4/backend/tests/e2e/ultimate_graph_state.py
++++ T5/backend/tests/e2e/ultimate_graph_state.py
+@@ -0,0 +1,58 @@
++"""Explicit T5 lifecycle metadata fixtures; not a solver or result producer."""
++import json
++from uuid import uuid4
++from app.domain.logistics.definitions import definition_hash
++
++def install_run(s,client,case_id,node_id='logistics_assignment',*,status='completed',approved=False,trip_count=2):
++    data=client.get('/api/platform/logistics-cases/'+case_id+'/graph').json()
++    node=next(n for n in data['graph']['nodes'] if n['id']==node_id)
++    ctx=client.get('/api/platform/logistics-cases/'+case_id+'/context').json()
++    pack=client.get('/api/platform/logistics-cases/'+case_id+'/data').json()
++    demand=next(e for e in pack['entries'] if e['slot_key']=='transport_demand')
++    row=ctx['case'];wid=row['workspace_id'];rid=str(uuid4());aid=str(uuid4());actor=row['created_by_user_id']
++    schema='transport_plan_v1' if node_id=='logistics_assignment' else 'day_scheduling_v1'
++    config={'ultimate_graph':{'definition_hash':definition_hash(),'read_set':node['read_set']}}
++    descriptor={'artifact_id':aid,'workspace_id':wid,'run_id':rid,'kind':'CORE','part_key':'main','artifact_schema':'engine_core_v1','schema_version':1,'content_sha256':'a'*64,'size_bytes':2,'media_type':'application/json','core_fingerprint':'b'*64,'assembler_version':'RESULT_ASSEMBLER_V1'}
++    result={'result_schema':schema,'result_schema_version':1,'assembler_version':'RESULT_ASSEMBLER_V1',
++        'fingerprints':{'result_fingerprint':'c'*64,'core_result_fingerprint':'b'*64},
++        'artifact_manifest':{'artifacts':[descriptor]},'metrics':{'trip_count':trip_count}}
++    quote=lambda value:"'"+json.dumps(value,separators=(',',':')).replace("'","''")+"'::jsonb"
++    publication_cols=',result_json,result_package_version,assembler_version,artifact_manifest_hash,core_fingerprint,result_fingerprint' if status=='completed' else ''
++    publication_values=','+quote(result)+",1,'RESULT_ASSEMBLER_V1','"+'d'*64+"','"+'b'*64+"','"+'c'*64+"'" if status=='completed' else ''
++    approval_cols=',approved_at,approved_by,approved_by_user_id' if approved else ''
++    approval_values=",clock_timestamp(),'user:"+actor+"','"+actor+"'" if approved else ''
++    source="'"+node['upstream_run_id']+"'" if node['upstream_run_id'] else 'NULL'
++    sql=f"""BEGIN;
++    UPDATE decision_cases SET context_frozen_at=coalesce(context_frozen_at,clock_timestamp()) WHERE id='{case_id}';
++    INSERT INTO decision_runs(id,workspace_id,dataset_id,decision_case_id,node_id,workflow_version,created_by_user_id,
++      logistics_model_version_id,data_pack_version_id,graph_definition_version,case_policy_hash,node_policy_hash,
++      contract_hash,input_context_hash,transit_model_version,runtime_profile,result_schema_version,engine_name,engine_version,
++      schema_version,status,configuration_json,upstream_run_id{publication_cols}{approval_cols})
++    VALUES('{rid}','{wid}','{demand['dataset_id']}','{case_id}','{node_id}',2,'{actor}',
++      '{row['logistics_model_version_id']}','{pack['version']['id']}','{row['graph_definition_version']}',
++      '{row['case_policy_hash']}','{row['case_policy_hash']}','{ctx['model_version']['contract_hash']}','{'e'*64}',
++      'DATION_TRANSIT_V1','{schema}',1,'{'transport_plan' if node_id=='logistics_assignment' else 'day_scheduling'}','2.0.0',
++      '{schema}','{status}',{quote(config)},{source}{publication_values}{approval_values});"""
++    if status=='completed':
++        sql+=f"""INSERT INTO decision_result_artifacts(id,workspace_id,run_id,kind,part_key,artifact_schema,schema_version,
++          content_sha256,size_bytes,media_type,storage_bucket,storage_path,assembler_version,core_fingerprint,result_fingerprint,
++          publication_state,producer_lease_token,producer_generation,producer_metadata)
++        VALUES('{aid}','{wid}','{rid}','CORE','main','engine_core_v1',1,'{'a'*64}',2,'application/json','dda-results',
++          '{wid}/runs/{rid}/core/main/{'a'*64}.json','RESULT_ASSEMBLER_V1','{'b'*64}','{'c'*64}',
++          'READY','{uuid4()}',1,'{{"fixture":"T5 controlled metadata only; no engine/output certification"}}');"""
++    sql+='COMMIT;';s.sql(sql)
++    return rid
++
++if __name__=='__main__':
++    import subprocess,sys,httpx
++    value=json.load(sys.stdin)
++    class SQL:
++        def sql(self,sql):
++            check=subprocess.run(['docker','--host=unix:///var/run/docker.sock','inspect','--format','{{index .Config.Labels "dation.qa.phase"}}',value['pg']],capture_output=True,text=True,timeout=10)
++            if check.returncode or check.stdout.strip()!='T5':raise AssertionError('Not an owned T5 fixture')
++            result=subprocess.run(['docker','--host=unix:///var/run/docker.sock','exec','-i',value['pg'],'psql','-U','postgres','-d',value['database'],'-X','-A','-t','-v','ON_ERROR_STOP=1'],input=sql,capture_output=True,text=True,timeout=30)
++            if result.returncode:raise AssertionError(result.stderr)
++            return result.stdout
++    with httpx.Client(base_url=value['base'],headers={'Authorization':'Bearer '+value['token']},trust_env=False,timeout=30) as client:
++        run_id=install_run(SQL(),client,value['case_id'],value['node_id'],**value['options'])
++    print(json.dumps({'run_id':run_id}))
+--- post-T4/backend/tests/integration/test_ultimate_graph.py
++++ T5/backend/tests/integration/test_ultimate_graph.py
+@@ -0,0 +1,101 @@
++"""S5: real API/RPC projection, tenant/permissions, lifecycle and immutable lineage."""
++import json,sys,unittest
++from pathlib import Path
++from uuid import uuid4
++sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'e2e'))
++from ultimate_graph_fixture import GraphSandbox
++from ultimate_graph_state import install_run
++from auth_fixture import USER_A,USER_B,VIEWER
++from tests.test_ultimate_data_contracts import model
++
++D1='logistics_assignment';D2='logistics_scheduling'
++
++class UltimateGraphTests(unittest.TestCase):
++    @classmethod
++    def setUpClass(cls):cls.s=GraphSandbox().__enter__();cls.addClassCleanup(cls.s.__exit__,None,None,None)
++    def ok(self,r):self.assertTrue(r.is_success,r.text);return r.json()
++    def setUp(self):
++        self.a=self.s.api_client
++        m=self.ok(self.a.post('/api/platform/logistics-models',json={'id':str(uuid4()),'name':'T5 graph','configuration':model()['config_jsonb']}))
++        self.v=self.ok(self.a.post('/api/platform/logistics-models/'+m['model']['id']+'/versions',json={'version_id':str(uuid4()),'expected_revision':1}))
++        self.c=self.new_case();self.cid=self.c['case']['id'];self.base='/api/platform/logistics-cases/'+self.cid
++    def new_case(self):return self.ok(self.a.post('/api/platform/logistics-cases',json={'id':str(uuid4()),'name':'T5 sin CSV','logistics_model_version_id':self.v['version']['id'],'planning_start':'2026-11-02','planning_end':'2026-11-08','horizon_type':'WEEKLY','case_policy':{'primary_goal':'MINIMIZE_COST'},'decision_owner_user_id':USER_A}))
++    def graph(self):return self.ok(self.a.get(self.base+'/graph'))
++    def nodes(self):return {n['id']:n for n in self.graph()['graph']['nodes']}
++    def publish(self,entity='transport_demand',raw=None):
++        state=self.ok(self.a.get(self.base+'/data'));raw=raw or self.a.get(self.base+'/data/templates/'+entity).content
++        j=self.ok(self.a.post(self.base+'/data/uploads/'+entity,params={'upload_id':str(uuid4()),'contract_hash':state['contracts'][entity]['contract_hash']},files={'file':('T5.csv',raw,'text/csv')}))
++        return self.ok(self.a.post(self.base+'/data/publish',json={'publication_id':str(uuid4()),'expected_revision':state['pack']['revision'],'selection':[{'slot_key':entity,'upload_id':j['id']}]}))
++    def full(self):self.publish();self.publish('transport_resources')
++    def owner(self):
++        return self.ok(self.a.put('/api/platform/decisions/'+self.cid+'/responsibilities/data_owner',json={'expected_updated_at':None,'owner_user_id':USER_A}))
++    def test_01_empty_case_snapshot_and_versioned_definitions(self):
++        g=self.graph();self.assertEqual([n['node_state'] for n in g['graph']['nodes']],['DATA_REQUIRED','LOCKED']);self.assertFalse(g['graph']['runtime_execution_available']);self.assertEqual(g['case']['id'],self.cid)
++    def test_02_demand_then_full_pack_and_contextual_config(self):
++        self.publish();self.assertEqual(self.nodes()[D1]['node_state'],'DATA_REQUIRED');self.publish('transport_resources');self.owner();n=self.nodes()[D1];self.assertEqual(n['node_state'],'READY');self.assertFalse(n['runtime_available']);r=self.ok(self.a.get(self.base+'/graph/config/'+D1));self.assertEqual(r['configuration_context']['case_id'],self.cid);self.assertFalse(r['configuration_context']['admission_available'])
++    def test_03_candidates_are_not_ready(self):
++        state=self.ok(self.a.get(self.base+'/data'));raw=self.a.get(self.base+'/data/templates/transport_demand').content
++        self.ok(self.a.post(self.base+'/data/uploads/transport_demand',params={'upload_id':str(uuid4()),'contract_hash':state['contracts']['transport_demand']['contract_hash']},files={'file':('T5.csv',raw,'text/csv')}));self.assertEqual(self.nodes()[D1]['node_state'],'DATA_REQUIRED')
++    def test_04_cross_tenant_and_forged_nodes_denied(self):
++        self.assertEqual(self.a.get(self.base+'/graph/config/future').status_code,422)
++        import httpx
++        with httpx.Client(base_url=self.s.api_url,headers={'Authorization':'Bearer '+self.s.user_tokens[USER_B]},trust_env=False) as b:self.assertIn(b.get(self.base+'/graph').status_code,[403,404])
++    def test_05_viewer_and_missing_owners_do_not_change_ready_state(self):
++        self.full();self.assertEqual(self.nodes()[D1]['node_state'],'READY');self.assertEqual(self.a.get(self.base+'/graph/config/'+D1).status_code,409)
++        import httpx
++        with httpx.Client(base_url=self.s.api_url,headers={'Authorization':'Bearer '+self.s.user_tokens[VIEWER]},trust_env=False) as v:
++            n=self.ok(v.get(self.base+'/graph'))['graph']['nodes'][0];self.assertEqual(n['node_state'],'READY');self.assertFalse(n['actions']['configure']['allowed'])
++    def test_06_sql_rpc_not_publicly_executable(self):
++        for role in ['anon','authenticated']:
++            with self.assertRaises(AssertionError):self.s.sql(f"SET ROLE {role}; SELECT platform_ultimate_graph('{self.s.workspace_a}','{USER_A}','{self.cid}');")
++    def test_07_in_progress_completed_approved_are_controlled_metadata(self):
++        self.full();rid=install_run(self.s,self.a,self.cid,status='queued');self.assertEqual(self.nodes()[D1]['node_state'],'IN_PROGRESS')
++        self.s.sql(f"UPDATE decision_runs SET status='error',error_message='T5 controlled failure' WHERE id='{rid}';")
++        # A fresh Case for the completed publication, not a fake solver transition.
++        self.c=self.new_case();self.cid=self.c['case']['id'];self.base='/api/platform/logistics-cases/'+self.cid;self.full();install_run(self.s,self.a,self.cid)
++        self.assertEqual(self.nodes()[D1]['node_state'],'COMPLETED');self.assertEqual(self.nodes()[D2]['node_state'],'LOCKED')
++    def test_08_approved_upstream_unlocks_d2_without_extra_csv(self):
++        self.full();self.owner();rid=install_run(self.s,self.a,self.cid,approved=True);n=self.nodes();self.assertEqual(n[D1]['node_state'],'APPROVED');self.assertEqual(n[D2]['node_state'],'READY');self.assertEqual(n[D2]['requirements'],[]);self.assertEqual(n[D2]['upstream_run_id'],rid);self.assertEqual(self.ok(self.a.get(self.base+'/graph/config/'+D2))['configuration_context']['upstream_run_id'],rid)
++    def test_09_historical_run_selection_does_not_move_graph(self):
++        self.full();old=install_run(self.s,self.a,self.cid,approved=True);new=install_run(self.s,self.a,self.cid,status='queued');before=self.graph()['graph'];selected=self.ok(self.a.get(self.base+'/graph',params={'node_id':D1,'run_id':old}));self.assertEqual(selected['selected_run']['id'],old);self.assertEqual(selected['graph'],before);self.assertEqual(self.nodes()[D1]['run_id'],new)
++    def test_10_freshness_changes_do_not_delete_history(self):
++        self.full();rid=install_run(self.s,self.a,self.cid,approved=True);raw=self.a.get(self.base+'/data/templates/transport_demand').content.replace(b'ORD-001',b'ORD-999');self.publish(raw=raw);n=self.nodes();self.assertEqual(n[D1]['freshness'],'STALE');self.assertEqual(n[D2]['node_state'],'LOCKED');self.assertEqual(self.s.sql(f"SELECT count(*) FROM decision_runs WHERE id='{rid}' AND approved_at IS NOT NULL;"),'1')
++    def test_11_zero_trips_not_applicable_and_history_is_paged(self):
++        self.full();rid=install_run(self.s,self.a,self.cid,approved=True,trip_count=0);self.assertEqual(self.nodes()[D2]['node_state'],'NOT_APPLICABLE');h=self.ok(self.a.get(self.base+'/graph/history/'+D1));self.assertEqual(h['total'],1);self.assertEqual(h['items'][0]['id'],rid);self.assertEqual(self.a.get(self.base+'/graph/history/'+D1+'?limit=0').status_code,422)
++    def test_12_new_d2_preserves_upstream_and_config_read_is_pure(self):
++        self.full();self.owner();up=install_run(self.s,self.a,self.cid,approved=True);install_run(self.s,self.a,self.cid,D2,approved=True)
++        before=self.s.sql(f"SELECT jsonb_agg(to_jsonb(r) ORDER BY id) FROM decision_runs r WHERE decision_case_id='{self.cid}';")
++        for _ in range(2):self.assertEqual(self.ok(self.a.get(self.base+'/graph/config/'+D2))['configuration_context']['upstream_run_id'],up)
++        self.assertEqual(before,self.s.sql(f"SELECT jsonb_agg(to_jsonb(r) ORDER BY id) FROM decision_runs r WHERE decision_case_id='{self.cid}';"))
++    def test_13_map_center_context_home_share_one_projection(self):
++        self.full();self.owner();g=self.graph()['graph'];context=self.ok(self.a.get(self.base+'/context'));self.assertEqual(context['graph'],g)
++        center=self.ok(self.a.get('/api/platform/decisions/'+self.cid));self.assertEqual(center['graph'],g);self.assertEqual(center['display_status'],'READY')
++        home=self.ok(self.a.get('/api/platform/home'));item=next(x for x in home['recent_cases'] if x['case_id']==self.cid);self.assertEqual(item['graph'],g);self.assertEqual(item['resume']['view'],'logistics-map')
++    def test_14_archived_case_is_readable_but_not_configurable(self):
++        self.full();self.owner();row=self.ok(self.a.get(self.base+'/context'))['case'];self.ok(self.a.patch('/api/platform/decisions/'+self.cid,json={'expected_updated_at':row['updated_at'],'archived':True}))
++        self.assertEqual(self.nodes()[D1]['node_state'],'READY');self.assertFalse(self.nodes()[D1]['actions']['configure']['allowed']);self.assertEqual(self.ok(self.a.get('/api/platform/decisions/'+self.cid))['display_status'],'archived')
++    def test_15_wrong_case_or_node_run_binding_is_not_selected(self):
++        self.full();rid=install_run(self.s,self.a,self.cid,approved=True);self.assertEqual(self.a.get(self.base+'/graph',params={'node_id':D2,'run_id':rid}).status_code,404)
++        other=self.new_case()['case']['id'];self.assertEqual(self.a.get('/api/platform/logistics-cases/'+other+'/graph',params={'run_id':rid}).status_code,404)
++    def test_16_approval_and_snapshot_definitions_are_not_mutated_by_reads(self):
++        self.full();rid=install_run(self.s,self.a,self.cid,approved=True);before=self.s.sql(f"SELECT to_jsonb(r) FROM decision_runs r WHERE id='{rid}';")
++        for _ in range(3):self.graph()
++        self.assertEqual(before,self.s.sql(f"SELECT to_jsonb(r) FROM decision_runs r WHERE id='{rid}';"))
++        with self.assertRaises(AssertionError):self.s.sql("UPDATE dation_private.decision_definition_versions SET definition_jsonb='{}' WHERE version='ULTIMATE_DECISION_GRAPH_V1';")
++    def test_17_runtime_and_admission_stay_closed_with_complete_inputs(self):
++        self.full();self.owner();before=self.s.sql(f"SELECT count(*) FROM decision_runs WHERE decision_case_id='{self.cid}';")
++        for node in [D1,D2]:self.assertFalse(self.nodes()[node]['actions']['execute']['allowed']);self.assertFalse(self.nodes()[node]['runtime_available'])
++        self.ok(self.a.get(self.base+'/graph/config/'+D1));self.assertEqual(before,self.s.sql(f"SELECT count(*) FROM decision_runs WHERE decision_case_id='{self.cid}';"))
++    def test_18_superseded_downstream_keeps_count_history_actors_and_upstream(self):
++        self.full();up=install_run(self.s,self.a,self.cid,approved=True);child=install_run(self.s,self.a,self.cid,D2,approved=True);install_run(self.s,self.a,self.cid,status='queued')
++        n=self.nodes()[D2];self.assertEqual(n['node_state'],'LOCKED');self.assertEqual(n['history_count'],1)
++        h=self.ok(self.a.get(self.base+'/graph/history/'+D2));self.assertEqual(h['items'][0]['id'],child);self.assertEqual(h['items'][0]['upstream_run_id'],up);self.assertTrue(h['items'][0]['superseded_at']);self.assertTrue(h['items'][0]['approval_actor'])
++    def test_19_home_attention_outside_recent_cases_uses_current_graph(self):
++        self.full();install_run(self.s,self.a,self.cid,approved=True)
++        for _ in range(3):self.new_case()
++        home=self.ok(self.a.get('/api/platform/home'));self.assertNotIn(self.cid,[c['case_id'] for c in home['recent_cases']])
++        attention=next(i for i in home['attention']['items'] if i['case_id']==self.cid);self.assertEqual(attention['graph']['nodes'][1]['node_state'],'READY')
++        raw=self.a.get(self.base+'/data/templates/transport_demand').content.replace(b'ORD-001',b'ORD-997');self.publish(raw=raw)
++        home=self.ok(self.a.get('/api/platform/home'));self.assertNotIn(self.cid,[i['case_id'] for i in home['attention']['items']])
++
++if __name__=='__main__':unittest.main()
+--- post-T4/backend/tests/test_ultimate_graph.py
++++ T5/backend/tests/test_ultimate_graph.py
+@@ -0,0 +1,89 @@
++"""U5 controlled graph transitions, approvals, read sets and orthogonal gates."""
++import copy,unittest
++from app.domain.logistics.definitions import DEFINITIONS,definition_hash,definition_snapshot,validate_definitions
++from app.domain.logistics.graph import resolve_case_graph,NODE_STATES
++from app.domain.logistics.data_contracts import compile_contract,NORMALIZER_VERSION
++from tests.test_ultimate_data_contracts import model
++
++D1='logistics_assignment';D2='logistics_scheduling'
++CID='10000000-0000-4000-8000-000000000001'
++
++def fixture():
++    version=model();ctx={'id':CID,'workflow_version':2,'graph_definition_version':'ULTIMATE_FOUNDATION_V1',
++        'logistics_model_version_id':version['id'],'case_policy_hash':'a'*64,
++        'case_policy_jsonb':{'primary_goal':'MINIMIZE_COST'},'planning_start':'2026-11-02','planning_end':'2026-11-08','status':'active'}
++    entries=[{'slot_key':e,'contract_hash':compile_contract(version,e).contract_hash,'normalizer_version':NORMALIZER_VERSION,
++        'model_version_id':version['id'],'record_count':5,'canonical_sha256':('b' if e=='transport_demand' else 'c')*64,
++        'summary':{'unknown_availability_count':0,'unknown_cost_count':0}} for e in ['transport_demand','transport_resources']]
++    responsibilities={'gates_enforced':True,'stages':{key:{'owner_eligible':True,'can_execute':True,'owner':{'id':CID}} for key in ['data_owner',D1,D2]}}
++    return dict(context=ctx,model=version,pack={'entries':entries},run_history=[],responsibilities=responsibilities,runtime_capabilities={},permissions={'can_write':True})
++
++def nodes(f):return {n['id']:n for n in resolve_case_graph(**f)['nodes']}
++
++def run(f,node=D1,status='completed',approved=False,id='20000000-0000-4000-8000-000000000001',trips=2):
++    n=nodes(f)[node]
++    return {'id':id,'node_id':node,'status':status,'logistics_model_version_id':f['context']['logistics_model_version_id'],
++        'case_policy_hash':f['context']['case_policy_hash'],'approved_at':'2026-11-02T00:00:00Z' if approved else None,
++        'upstream_run_id':n['upstream_run_id'],'result_published':status=='completed','trip_count':trips,
++        'graph_snapshot':{'definition_hash':definition_hash(),'read_set':n['read_set']}}
++
++class UltimateGraphTests(unittest.TestCase):
++    def test_empty_case_has_data_required_and_locked(self):
++        f=fixture();f['pack']['entries']=[];n=nodes(f);self.assertEqual(n[D1]['node_state'],'DATA_REQUIRED');self.assertEqual(n[D2]['node_state'],'LOCKED');self.assertEqual(n[D1]['primary_action']['target']['case_id'],CID)
++    def test_demand_only_is_not_ready(self):
++        f=fixture();f['pack']['entries']=f['pack']['entries'][:1];self.assertEqual(nodes(f)[D1]['requirements'][0]['slot'],'transport_resources')
++    def test_complete_pack_is_ready_with_runtime_unavailable(self):
++        n=nodes(fixture());self.assertEqual(n[D1]['node_state'],'READY');self.assertFalse(n[D1]['runtime_available']);self.assertTrue(n[D1]['actions']['configure']['allowed']);self.assertFalse(n[D1]['actions']['execute']['allowed'])
++    def test_exact_eight_states_are_closed(self):self.assertEqual(set(NODE_STATES),{'LOCKED','DATA_REQUIRED','READY','IN_PROGRESS','COMPLETED','APPROVED','COMING_SOON','NOT_APPLICABLE'})
++    def test_d1_controlled_lifecycle(self):
++        f=fixture()
++        for status,approved,expected in [('queued',False,'IN_PROGRESS'),('running',False,'IN_PROGRESS'),('completed',False,'COMPLETED'),('completed',True,'APPROVED')]:
++            f['run_history']=[run(f,status=status,approved=approved)];self.assertEqual(nodes(f)[D1]['node_state'],expected)
++    def test_completed_d1_does_not_unlock_d2_but_approved_does(self):
++        f=fixture();f['run_history']=[run(f)];self.assertEqual(nodes(f)[D2]['node_state'],'LOCKED');f['run_history'][0]['approved_at']='now';self.assertEqual(nodes(f)[D2]['node_state'],'READY');self.assertEqual(nodes(f)[D2]['requirements'],[])
++    def test_approval_authority_beats_created_at(self):
++        f=fixture();a=run(f,approved=True);b=run(f,id='later');b['created_at']='2099';f['run_history']=[b,a];self.assertEqual(nodes(f)[D1]['approved_run_id'],a['id'])
++    def test_superseded_approval_is_historical_only(self):
++        f=fixture();a=run(f,approved=True);a['superseded_at']='now';f['run_history']=[a];self.assertIsNone(nodes(f)[D1]['approved_run_id']);self.assertEqual(nodes(f)[D2]['node_state'],'LOCKED')
++    def test_consumed_demand_change_makes_approval_stale_without_mutating_it(self):
++        f=fixture();a=run(f,approved=True);f['run_history']=[a];before=copy.deepcopy(a);f['pack']['entries'][0]['canonical_sha256']='d'*64;n=nodes(f);self.assertEqual(n[D1]['freshness'],'STALE');self.assertEqual(n[D1]['node_state'],'READY');self.assertEqual(n[D2]['node_state'],'LOCKED');self.assertEqual(a,before)
++    def test_irrelevant_enrichment_does_not_invalidate_d1_or_d2(self):
++        f=fixture();f['run_history']=[run(f,approved=True)];f['run_history'].append(run(f,D2,approved=True,id='child'));before=nodes(f);f['pack']['entries'].append({'slot_key':'scheduling_enrichment','canonical_sha256':'f'*64});self.assertEqual(nodes(f),before)
++    def test_d2_pins_exact_approved_upstream(self):
++        f=fixture();f['run_history']=[run(f,approved=True)];child=run(f,D2,approved=True,id='child');child['upstream_run_id']='another';f['run_history'].append(child);self.assertEqual(nodes(f)[D2]['freshness'],'STALE');self.assertIsNone(nodes(f)[D2]['approved_run_id'])
++    def test_zero_trips_is_not_applicable_and_creates_no_run(self):
++        f=fixture();f['run_history']=[run(f,approved=True,trips=0)];n=nodes(f)[D2];self.assertEqual(n['node_state'],'NOT_APPLICABLE');self.assertIsNone(n['run_id']);self.assertFalse(n['actions']['configure']['allowed'])
++    def test_unknown_trip_count_does_not_mean_zero(self):
++        f=fixture();f['run_history']=[run(f,approved=True,trips=None)];self.assertEqual(nodes(f)[D2]['node_state'],'READY')
++    def test_future_definition_never_executable(self):
++        f=fixture();future=DEFINITIONS[0].model_copy(update={'id':'future_capacity','implemented':False});f['definitions']=(*DEFINITIONS,future);n=nodes(f)['future_capacity'];self.assertEqual(n['node_state'],'COMING_SOON');self.assertFalse(any(a['allowed'] for a in n['actions'].values()))
++    def test_cycle_and_unknown_dependency_fail_closed(self):
++        for defs in [(DEFINITIONS[0].model_copy(update={'dependencies':(D2,)}),DEFINITIONS[1]),(DEFINITIONS[0].model_copy(update={'dependencies':('unknown',)}),)]:
++            with self.assertRaises(ValueError):validate_definitions(defs)
++    def test_definition_snapshot_has_required_metadata_and_closure(self):
++        s=definition_snapshot();self.assertEqual(s['dependency_closure'][D2],[D1]);self.assertEqual(s['nodes'][1]['required_inputs'],[]);self.assertEqual(len(definition_hash()),64)
++    def test_technical_error_is_orthogonal_to_data(self):
++        f=fixture();f['run_history']=[run(f,status='error')];n=nodes(f)[D1];self.assertEqual(n['node_state'],'READY');self.assertTrue(n['technical_failure']);self.assertFalse(n['actions']['configure']['allowed'])
++    def test_viewer_owner_missing_archived_leave_ready_business_state(self):
++        for kind in ['viewer','data_owner','owner','archived']:
++            f=fixture()
++            if kind=='viewer':f['permissions']['can_write']=False
++            elif kind=='archived':f['context']['status']='archived'
++            else:f['responsibilities']['stages']['data_owner' if kind=='data_owner' else D1]['owner_eligible']=False
++            n=nodes(f)[D1];self.assertEqual(n['node_state'],'READY');self.assertFalse(n['actions']['configure']['allowed'])
++    def test_incomplete_publication_is_not_completed_or_approved(self):
++        f=fixture();r=run(f,approved=True);r['result_published']=False;f['run_history']=[r];self.assertEqual(nodes(f)[D1]['node_state'],'READY');self.assertEqual(nodes(f)[D2]['node_state'],'LOCKED')
++    def test_contract_normalizer_and_unknowns_are_requirements(self):
++        for key,value in [('contract_hash','bad'),('normalizer_version','unknown'),('summary',{'unknown_cost_count':1}),('summary',{'unknown_availability_count':1})]:
++            f=fixture();f['pack']['entries'][1][key]=value;self.assertEqual(nodes(f)[D1]['node_state'],'DATA_REQUIRED')
++    def test_new_run_targets_config_d1_d2_without_upload(self):
++        f=fixture();f['run_history']=[run(f,approved=True)]
++        for node in [D1,D2]:
++            action=nodes(f)[node]['actions']['new_run'];self.assertEqual(action['target']['view'],'logistics-config');self.assertEqual(action['target']['node_id'],node);self.assertEqual(action['target']['case_id'],CID)
++    def test_registry_order_does_not_change_dependencies(self):
++        f=fixture();a=nodes(f);f['definitions']=tuple(reversed(DEFINITIONS));self.assertEqual(nodes(f),a)
++    def test_unknown_graph_binding_never_falls_back_to_legacy(self):
++        f=fixture();f['context']['graph_definition_version']='unknown'
++        with self.assertRaises(ValueError):nodes(f)
++
++if __name__=='__main__':unittest.main()
+--- post-T4/backend/tests/test_ultimate_graph_navigation.mjs
++++ T5/backend/tests/test_ultimate_graph_navigation.mjs
+@@ -0,0 +1,23 @@
++import test from 'node:test';
++import assert from 'node:assert/strict';
++globalThis.window={};
++const {caseFlowSteps}=await import('../app/static/js/dispatch/navigation/case-flow.mjs');
++import {graphTarget,graphActionLabel} from '../app/static/js/dispatch/navigation/ultimate-graph.mjs';
++const caseId='10000000-0000-4000-8000-000000000001',runId='20000000-0000-4000-8000-000000000001';
++function state(allowed=true){return {ultimateGraph:{case_id:caseId,attention_node_id:'logistics_assignment',nodes:[{id:'logistics_assignment',label:'Transport Plan',node_state:'READY',runtime_available:false,actions:{configure:{allowed,target:{view:'logistics-config',case_id:caseId,node_id:'logistics_assignment',run_id:null}},result:{allowed:true,target:{view:'decision-dashboard',case_id:caseId,node_id:'logistics_assignment',run_id:runId}}}}]}};}
++test('Ultimate navigation respects server permission independently of READY and runtime',()=>{
++ const route={caseId,nodeId:'logistics_assignment'};
++ assert.equal(caseFlowSteps('logistics-map',route,state())[2].disabled,false);
++ assert.equal(caseFlowSteps('logistics-map',route,state(false))[2].disabled,true);
++ assert.equal(caseFlowSteps('logistics-case-data',route,state())[1].disabled,false);
++});
++test('Historical dashboard step keeps explicit Run instead of server current result',()=>{
++ const historic='30000000-0000-4000-8000-000000000001';
++ const steps=caseFlowSteps('decision-dashboard',{caseId,nodeId:'logistics_assignment',runId:historic},state());
++ assert.equal(steps[3].target.runId,historic);assert.equal(steps[3].target.caseId,caseId);
++});
++test('Serialized primary action labels and routes retain contextual Case/node/Run',()=>{
++ const action=JSON.parse(JSON.stringify({allowed:true,target:{view:'logistics-case-data',case_id:caseId,node_id:null,run_id:null}}));
++ assert.equal(graphActionLabel(action,{label:'Transport Plan'}),'Completar datos del Case');
++ assert.deepEqual(graphTarget(action.target),{view:'logistics-case-data',caseId,nodeId:null,runId:null});
++});
+--- post-T4/supabase/migrations/20261027033128_ultimate_decision_graph.sql
++++ T5/supabase/migrations/20261027033128_ultimate_decision_graph.sql
+@@ -0,0 +1,82 @@
++-- T5 read-only graph snapshot. No node-state table, admissions, engine or invalidation writes.
++BEGIN;
++SET LOCAL lock_timeout='5s';
++SET LOCAL statement_timeout='90s';
++
++-- Definition JSON/hash is generated from the release-controlled Python registry below.
++INSERT INTO dation_private.decision_definition_versions(version,definition_hash,definition_jsonb) VALUES('ULTIMATE_DECISION_GRAPH_V1','d4c7883c79ee9fd7f2406216112814d12d361f499afe814cb11a60b31ccd225a','{"schema_version":"decision_graph_definition_v1","version":"ULTIMATE_DECISION_GRAPH_V1","supported_bindings":["ULTIMATE_FOUNDATION_V1","ULTIMATE_DECISION_GRAPH_V1"],"nodes":[{"id":"logistics_assignment","version":"1","label":"Transport Plan","question":"\u00bfC\u00f3mo asignar la demanda a recursos y viajes?","implemented":true,"applicability":"ALWAYS","dependencies":[],"required_approvals":[],"required_inputs":["transport_demand","transport_resources"],"read_set":["transport_demand","transport_resources","model","horizon","case_policy","node_policy"],"decision_variables":["assignments","trips","consolidation","fractions"],"hard_constraints":["guaranteed_capacity","finite_availability","compatibility","split_policy","case_guardrails"],"soft_constraints":["case_preferences"],"objectives":["case_primary_goal"],"outputs":["transport_plan_v1"],"evidence":["engine_core_v1","decision_evidence_v1"],"downstream_contract":"approved_transport_plan_v1"},{"id":"logistics_scheduling","version":"1","label":"Day Scheduling","question":"\u00bfQu\u00e9 d\u00eda debe despacharse cada viaje aprobado?","implemented":true,"applicability":"UPSTREAM_HAS_TRIPS","dependencies":["logistics_assignment"],"required_approvals":["logistics_assignment"],"required_inputs":[],"read_set":["approved:logistics_assignment","horizon","node_policy"],"decision_variables":["dispatch_day"],"hard_constraints":["fixed_upstream_trips","inclusive_horizon","resource_cycle"],"soft_constraints":["service_dates"],"objectives":["case_primary_goal"],"outputs":["day_scheduling_v1"],"evidence":["engine_core_v1","decision_evidence_v1"],"downstream_contract":null}],"dependency_closure":{"logistics_assignment":[],"logistics_scheduling":["logistics_assignment"]}}');
++
++CREATE FUNCTION dation_private.t5_run_projection(r public.decision_runs) RETURNS jsonb
++LANGUAGE sql STABLE SET search_path=pg_catalog AS $$
++ SELECT jsonb_build_object('id',r.id,'node_id',r.node_id,'status',r.status,'created_at',r.created_at,
++  'approved_at',r.approved_at,'approved_by',dation_private.team_person(r.workspace_id,r.approved_by_user_id),
++  'approval_actor',r.approved_by,'created_by',dation_private.team_person(r.workspace_id,r.created_by_user_id),'superseded_at',r.superseded_at,
++  'upstream_run_id',r.upstream_run_id,'logistics_model_version_id',r.logistics_model_version_id,
++  'case_policy_hash',r.case_policy_hash,'error',left(r.error_message,500),
++  'graph_snapshot',CASE WHEN octet_length((r.configuration_json->'ultimate_graph')::text)<=16384
++   THEN r.configuration_json->'ultimate_graph' ELSE NULL END,
++  'result_published',r.status='completed' AND r.result_fingerprint IS NOT NULL
++   AND EXISTS(SELECT 1 FROM public.decision_result_artifacts a WHERE a.workspace_id=r.workspace_id AND a.run_id=r.id
++    AND a.result_fingerprint=r.result_fingerprint AND a.kind='CORE' AND a.publication_state='READY')
++   AND NOT EXISTS(SELECT 1 FROM public.decision_result_artifacts a WHERE a.workspace_id=r.workspace_id AND a.run_id=r.id AND a.publication_state<>'READY'),
++  'trip_count',CASE WHEN jsonb_typeof(r.result_json#>'{metrics,trip_count}')='number'
++   AND r.result_json#>>'{metrics,trip_count}' ~ '^[0-9]+$' THEN r.result_json#>'{metrics,trip_count}' ELSE NULL END);
++$$;
++REVOKE ALL ON FUNCTION dation_private.t5_run_projection(public.decision_runs) FROM PUBLIC,anon,authenticated,service_role;
++
++CREATE FUNCTION public.platform_ultimate_graph(target_workspace_id uuid,actor_user_id uuid,target_case_id uuid,
++ operation text DEFAULT 'snapshot',target_node_id text DEFAULT NULL,selected_run_id uuid DEFAULT NULL,
++ page_limit integer DEFAULT 25,page_offset integer DEFAULT 0) RETURNS jsonb
++LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog AS $$
++DECLARE c public.decision_cases; role_name text; body jsonb; runs jsonb; selected jsonb; history jsonb; total bigint;
++BEGIN
++ role_name=dation_private.team_actor(target_workspace_id,actor_user_id);
++ IF operation NOT IN('snapshot','configure','history','cohort') OR operation IS NULL
++ OR target_node_id IS NOT NULL AND target_node_id NOT IN('logistics_assignment','logistics_scheduling')
++ OR operation IN('configure','history') AND target_node_id IS NULL
++ OR page_limit NOT BETWEEN 1 AND 50 OR page_offset NOT BETWEEN 0 AND 1000000 THEN
++  RAISE EXCEPTION 'Invalid graph request' USING ERRCODE='22023'; END IF;
++ IF NOT EXISTS(SELECT 1 FROM public.workspace_ddas WHERE workspace_id=target_workspace_id AND dda_id='logistics' AND status='enabled') THEN
++  RAISE EXCEPTION 'DDA access denied' USING ERRCODE='42501'; END IF;
++ -- Same order as Pack/context/admission writers. One coherent, authorized input snapshot.
++ PERFORM 1 FROM public.workspaces WHERE id=target_workspace_id FOR SHARE;
++ SELECT * INTO c FROM public.decision_cases WHERE workspace_id=target_workspace_id AND id=target_case_id FOR SHARE;
++ IF NOT FOUND THEN RAISE EXCEPTION 'Case not found' USING ERRCODE='P0002'; END IF;
++ role_name=dation_private.team_actor(target_workspace_id,actor_user_id);
++ IF operation='cohort' THEN RETURN jsonb_build_object('workflow_version',c.workflow_version); END IF;
++ IF c.workflow_version<>2 OR c.graph_definition_version NOT IN('ULTIMATE_FOUNDATION_V1','ULTIMATE_DECISION_GRAPH_V1') THEN
++  RAISE EXCEPTION 'Unsupported graph cohort/binding' USING ERRCODE='22023'; END IF;
++ IF selected_run_id IS NOT NULL THEN
++  SELECT dation_private.t5_run_projection(r) INTO selected FROM public.decision_runs r
++  WHERE r.workspace_id=target_workspace_id AND r.decision_case_id=c.id AND r.workflow_version=2 AND r.id=selected_run_id
++   AND (target_node_id IS NULL OR r.node_id=target_node_id);
++  IF NOT FOUND THEN RAISE EXCEPTION 'Run not found in Case/node' USING ERRCODE='P0002'; END IF;
++ END IF;
++ IF operation='history' THEN
++  SELECT count(*) INTO total FROM public.decision_runs WHERE workspace_id=target_workspace_id AND decision_case_id=c.id AND workflow_version=2 AND node_id=target_node_id;
++  SELECT coalesce(jsonb_agg(dation_private.t5_run_projection(r) ORDER BY r.created_at DESC,r.id DESC),'[]') INTO history
++   FROM (SELECT * FROM public.decision_runs WHERE workspace_id=target_workspace_id AND decision_case_id=c.id AND workflow_version=2 AND node_id=target_node_id
++    ORDER BY created_at DESC,id DESC LIMIT page_limit OFFSET page_offset) r;
++  RETURN jsonb_build_object('items',history,'total',total,'limit',page_limit,'offset',page_offset);
++ END IF;
++ IF (SELECT count(*) FROM public.decision_runs WHERE workspace_id=target_workspace_id AND decision_case_id=c.id AND workflow_version=2 AND superseded_at IS NULL)>100 THEN
++  RAISE EXCEPTION 'Ambiguous/unbounded active history' USING ERRCODE='22023'; END IF;
++ body=dation_private.t3_case_context(c,actor_user_id);
++ SELECT coalesce(jsonb_agg(dation_private.t5_run_projection(r)||jsonb_build_object('history_count',
++  (SELECT count(*) FROM public.decision_runs h WHERE h.workspace_id=r.workspace_id AND h.decision_case_id=r.decision_case_id AND h.node_id=r.node_id))),'[]')
++ INTO runs FROM public.decision_runs r WHERE r.workspace_id=target_workspace_id AND r.decision_case_id=c.id AND r.workflow_version=2 AND r.superseded_at IS NULL;
++ RETURN body||jsonb_build_object('definition',(SELECT to_jsonb(d) FROM dation_private.decision_definition_versions d WHERE version='ULTIMATE_DECISION_GRAPH_V1'),
++  'entries',coalesce((SELECT jsonb_agg(jsonb_build_object('slot_key',e.slot_key,'contract_hash',e.contract_hash,
++   'canonical_sha256',e.canonical_sha256,'normalizer_version',e.normalizer_version,'record_count',e.record_count,
++   'model_version_id',o.model_version_id,'summary',o.summary) ORDER BY e.slot_key)
++   FROM public.case_data_pack_entries e JOIN dation_private.ultimate_input_objects o ON o.workspace_id=e.workspace_id AND o.dataset_id=e.dataset_id
++   WHERE e.workspace_id=c.workspace_id AND e.case_id=c.id AND e.pack_version_id=(body#>>'{pack,current_version_id}')::uuid),'[]'),
++  'runs',runs,'selected_run',selected,
++  'history_counts',(SELECT jsonb_object_agg(n.id,(SELECT count(*) FROM public.decision_runs h
++    WHERE h.workspace_id=c.workspace_id AND h.decision_case_id=c.id AND h.workflow_version=2 AND h.node_id=n.id))
++    FROM (VALUES('logistics_assignment'),('logistics_scheduling')) n(id)),
++  'permissions',coalesce(body->'permissions','{}')||jsonb_build_object('can_write',role_name IN('admin','operator') AND c.status<>'archived'));
++END; $$;
++REVOKE ALL ON FUNCTION public.platform_ultimate_graph(uuid,uuid,uuid,text,text,uuid,integer,integer) FROM PUBLIC,anon,authenticated,service_role;
++GRANT EXECUTE ON FUNCTION public.platform_ultimate_graph(uuid,uuid,uuid,text,text,uuid,integer,integer) TO service_role;
++COMMIT;

@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "command": [
+    "/workspace/Dation/.venv/bin/python",
+    "-B",
+    "-c",
+    "import json; from tests.ultimate_fixtures import core,package,ai_context; from app.results.canonical import core_result_fingerprint; print(json.dumps([core_result_fingerprint(core()),package().fingerprints.result_fingerprint,package(\"d2\").fingerprints.result_fingerprint,ai_context().context_hash]))"
+  ],
+  "results": [
+    {
+      "seed": "1",
+      "fingerprints": [
+        "70d62b6c6b44d2aa2dcb906ab990f7cc1304aaa5ccb7e79cc2339eeed3aab35c",
+        "eaefe48219b0969843ea1b81e595148639164cbca465eb247715ae13a048cfff",
+        "10e4ab5176c78b5d4d8bc89ff61bccf8f0d92f07a18ec39a6026a6dad9018e5a",
+        "12b90d738e7ddd157e768d681f9cf8e5ebc9fe30eb00e76f744356ffa6495dd3"
+      ]
+    },
+    {
+      "seed": "2701",
+      "fingerprints": [
+        "70d62b6c6b44d2aa2dcb906ab990f7cc1304aaa5ccb7e79cc2339eeed3aab35c",
+        "eaefe48219b0969843ea1b81e595148639164cbca465eb247715ae13a048cfff",
+        "10e4ab5176c78b5d4d8bc89ff61bccf8f0d92f07a18ec39a6026a6dad9018e5a",
+        "12b90d738e7ddd157e768d681f9cf8e5ebc9fe30eb00e76f744356ffa6495dd3"
+      ]
+    }
+  ]
+}

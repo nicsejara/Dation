@@ -14,12 +14,18 @@ def set_roles(client,uid,roles):
     return checked(client.patch('/api/platform/team/members/'+uid+'/responsibilities',json={
         'expected_updated_at':member['updated_at'],'business_roles':roles}))
 
+def apply_attributes(client,cid):
+    """Apply identity without assigning owners, so gate tests retain missing-owner cases."""
+    case=checked(client.get(f'/api/platform/decisions/{cid}'))
+    return checked(client.patch(f'/api/platform/decisions/{cid}',json={
+        'expected_updated_at':case['updated_at'],'label':case.get('label') or 'Synthetic Case',
+        'category':case.get('category') or 'simulation'}))
+
 def prepare_stage(client,cid,node,*,approval=False,uid=USER_A):
     snapshot=checked(client.get(f'/api/platform/decisions/{cid}/responsibilities'))
     if not snapshot['gates_enforced']:return
     if not snapshot.get('attributes_applied'):
-        case=checked(client.get(f'/api/platform/decisions/{cid}'))
-        checked(client.patch(f'/api/platform/decisions/{cid}',json={'expected_updated_at':case['updated_at'],'label':case.get('label') or 'Synthetic Case','category':case.get('category') or 'simulation'}))
+        apply_attributes(client,cid)
     for stage in ([node] if approval else ['data_owner',node]):
         value=snapshot['stages'][stage]
         if value['owner']:continue

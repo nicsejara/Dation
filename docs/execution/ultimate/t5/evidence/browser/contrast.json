@@ -1,0 +1,17 @@
+{
+  "textCount": 43,
+  "minimumContrast": 5.429139914708745,
+  "failures": [],
+  "hero": {
+    "x": 264,
+    "y": 170,
+    "width": 1144,
+    "height": 264.4375,
+    "right": 1408,
+    "bottom": 434.4375
+  },
+  "overflow": false,
+  "legacyBoundary": false,
+  "scheme": "dark",
+  "cards": []
+}

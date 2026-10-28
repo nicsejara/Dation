@@ -1,0 +1,42 @@
+{
+  "phase": "T8",
+  "subagents_used": false,
+  "dependencies_installed": false,
+  "used": [
+    {
+      "name": "supabase:supabase",
+      "package": "c0/supabase",
+      "snapshot": "evidence/skills/supabase-skill.txt",
+      "applied": [
+        "official Storage docs via MCP",
+        "CLI-generated migration",
+        "checked RPC/RLS/grants",
+        "owned Advisors"
+      ]
+    },
+    {
+      "name": "supabase:supabase-postgres-best-practices",
+      "package": "c0/supabase-postgres-best-practices",
+      "snapshot": "evidence/skills/postgres-skill.txt",
+      "applied": [
+        "consistent locks",
+        "least privilege",
+        "scoped indexes",
+        "lease fencing"
+      ]
+    },
+    {
+      "name": "cloud-environment:cloud-environment-runtime",
+      "package": "c5/cloud-environment-runtime",
+      "snapshot": "evidence/skills/runtime-skill.txt",
+      "applied": [
+        "current environment/network observations",
+        "owned Docker resources",
+        "loopback QA",
+        "production credentials cleared"
+      ]
+    }
+  ],
+  "design_skills": "Not applicable; no frontend changes",
+  "precedence": "User T8 scope and current checked-actor architecture preserved; no production operations"
+}

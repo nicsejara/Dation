@@ -1,0 +1,17 @@
+{
+  "same_fixture_theme_data": true,
+  "viewports": [
+    {
+      "width": 1440,
+      "before_sha256": "a10c38bda706096fdba56533c2ce7d4bb74b1fe1405407e012f022786dcf11cb",
+      "after_sha256": "a10c38bda706096fdba56533c2ce7d4bb74b1fe1405407e012f022786dcf11cb",
+      "pixels_equal": true
+    },
+    {
+      "width": 390,
+      "before_sha256": "d1d9f0308f1a31da0f05014bf3de23f20e7f8ccf08a7aee8b1ea89c2769de7d1",
+      "after_sha256": "d1d9f0308f1a31da0f05014bf3de23f20e7f8ccf08a7aee8b1ea89c2769de7d1",
+      "pixels_equal": true
+    }
+  ]
+}

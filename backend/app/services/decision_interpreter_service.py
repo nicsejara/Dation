@@ -338,6 +338,12 @@ async def _load_completed_run(
             "No se encontró la corrida solicitada."
         )
 
+    if run.get('workflow_version') == 2 or (run.get('result_json') or {}).get('result_schema'):
+        raise ValueError('Published packages require decision_context_v1 and an exact result fingerprint.')
+    schema=(run.get('result_json') or {}).get('schema_version')
+    if schema and schema not in {'assignment_v1','scheduling_v1','dispatch_v1','dispatch_v2'}:
+        raise ValueError('UNSUPPORTED_RESULT_SCHEMA')
+
     if (
         run.get("status") != "completed"
         or not run.get("result_json")
