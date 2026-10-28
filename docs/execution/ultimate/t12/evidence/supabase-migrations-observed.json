@@ -1,0 +1,45 @@
+{
+  "observed_at_utc": "2026-10-28T23:14:28.920Z",
+  "migrations": [
+    {
+      "version": "20260928234222",
+      "name": "init_dda_mvp_core"
+    },
+    {
+      "version": "20260928234319",
+      "name": "harden_dda_backend_grants"
+    },
+    {
+      "version": "20260929023644",
+      "name": "add_decision_ai_interpretation"
+    },
+    {
+      "version": "20261001195701",
+      "name": "dispatch_v1"
+    },
+    {
+      "version": "20261001195708",
+      "name": "dataset_library"
+    },
+    {
+      "version": "20261002184751",
+      "name": "dispatch_v2_integrity"
+    },
+    {
+      "version": "20261004183243",
+      "name": "dataset_canonical_filename"
+    },
+    {
+      "version": "20261005010436",
+      "name": "decision_cases_v1"
+    },
+    {
+      "version": "20261005010758",
+      "name": "decision_cases_v1_activity_fix"
+    },
+    {
+      "version": "20261005012207",
+      "name": "decision_run_history_v2"
+    }
+  ]
+}

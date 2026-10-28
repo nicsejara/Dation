@@ -1,0 +1,46 @@
+{
+  "scope": "Exact structural T11 catalog query; roles/owner defaults can differ between managed production and sandbox; mismatch is not automatically migration drift.",
+  "candidate_reference": "docs/execution/ultimate/t2/evidence/sql/post-t1-catalog.json",
+  "categories": {
+    "columns": {
+      "live_count": 269,
+      "certified_pre_ultimate_count": 269,
+      "equal": true
+    },
+    "indexes": {
+      "live_count": 90,
+      "certified_pre_ultimate_count": 90,
+      "equal": true
+    },
+    "defaults": {
+      "live_count": 6,
+      "certified_pre_ultimate_count": 6,
+      "equal": true
+    },
+    "policies": {
+      "live_count": 17,
+      "certified_pre_ultimate_count": 17,
+      "equal": true
+    },
+    "triggers": {
+      "live_count": 46,
+      "certified_pre_ultimate_count": 46,
+      "equal": true
+    },
+    "functions": {
+      "live_count": 101,
+      "certified_pre_ultimate_count": 101,
+      "equal": false
+    },
+    "relations": {
+      "live_count": 26,
+      "certified_pre_ultimate_count": 26,
+      "equal": true
+    },
+    "constraints": {
+      "live_count": 187,
+      "certified_pre_ultimate_count": 187,
+      "equal": true
+    }
+  }
+}

@@ -1,0 +1,710 @@
+{
+  "result": "PASS",
+  "engine_executions": 0,
+  "network_requests": 0,
+  "production_writes": 0,
+  "positive_checks": 10,
+  "expected_negative_checks": 1,
+  "checks": [
+    {
+      "scenario": "A",
+      "entity": "transport_demand",
+      "result": "PASS",
+      "scope": "local CSV normalization only",
+      "report": {
+        "valid": true,
+        "schema": "transport_demand_v1",
+        "contract_hash": "9ac47b819e30787a34b79e7fe2d69560307dc580be9bf3958b61b439e54265d4",
+        "errors": [],
+        "warnings": [],
+        "counts": {
+          "errors": 0,
+          "warnings": 0
+        },
+        "rows": 1,
+        "columns": 10,
+        "preview": [
+          {
+            "order_id": "O1",
+            "origin_id": "A",
+            "destination_id": "B",
+            "distance_km": "480",
+            "ready_date": "2026-11-02",
+            "delivery_due_date": "2026-11-08",
+            "priority": "MEDIUM",
+            "split_allowed": true,
+            "requested": {
+              "pallets": "70",
+              "weight_kg": null,
+              "volume_m3": null,
+              "units": null
+            },
+            "compatibility_groups": [
+              "DRY"
+            ]
+          }
+        ],
+        "summary": {
+          "semantic_entity": "transport_demand",
+          "record_count": 1,
+          "assumptions": [],
+          "assumptions_total": 0,
+          "assumptions_truncated": false,
+          "assumed_external_count": 0,
+          "unknown_availability_count": 0,
+          "unknown_cost_count": 0,
+          "quantity_totals": {
+            "pallets": "70"
+          }
+        }
+      }
+    },
+    {
+      "scenario": "A",
+      "entity": "transport_resources",
+      "result": "PASS",
+      "scope": "local CSV normalization only",
+      "report": {
+        "valid": true,
+        "schema": "transport_resources_v1",
+        "contract_hash": "0e1179e4a837250ee76a9abf1b93f549d35112f7043696ae2ed2635b506f4e3c",
+        "errors": [],
+        "warnings": [],
+        "counts": {
+          "errors": 0,
+          "warnings": 0
+        },
+        "rows": 2,
+        "columns": 12,
+        "preview": [
+          {
+            "resource_id": "E1",
+            "source": "EXTERNAL",
+            "guaranteed_capacity": {
+              "pallets": "26",
+              "weight_kg": null,
+              "volume_m3": null,
+              "units": null
+            },
+            "maximum_capacity": null,
+            "lanes": [
+              [
+                "A",
+                "B"
+              ]
+            ],
+            "compatibility_groups": [
+              "DRY"
+            ],
+            "units_available": null,
+            "base_origin_id": null,
+            "operating_cost_per_km": null,
+            "services_available": 2,
+            "availability_source": "CONFIRMED",
+            "external_cost": {
+              "cost_model": "PER_TRIP",
+              "rate": "100",
+              "billing_basis": null
+            }
+          },
+          {
+            "resource_id": "E2",
+            "source": "EXTERNAL",
+            "guaranteed_capacity": {
+              "pallets": "30",
+              "weight_kg": null,
+              "volume_m3": null,
+              "units": null
+            },
+            "maximum_capacity": null,
+            "lanes": [
+              [
+                "A",
+                "B"
+              ]
+            ],
+            "compatibility_groups": [
+              "DRY"
+            ],
+            "units_available": null,
+            "base_origin_id": null,
+            "operating_cost_per_km": null,
+            "services_available": 1,
+            "availability_source": "CONFIRMED",
+            "external_cost": {
+              "cost_model": "PER_TRIP",
+              "rate": "150",
+              "billing_basis": null
+            }
+          }
+        ],
+        "summary": {
+          "semantic_entity": "transport_resources",
+          "record_count": 2,
+          "assumptions": [],
+          "assumptions_total": 0,
+          "assumptions_truncated": false,
+          "assumed_external_count": 0,
+          "unknown_availability_count": 0,
+          "unknown_cost_count": 0,
+          "source_counts": {
+            "EXTERNAL": 2
+          }
+        }
+      }
+    },
+    {
+      "scenario": "B",
+      "entity": "transport_demand",
+      "result": "PASS",
+      "scope": "local CSV normalization only",
+      "report": {
+        "valid": true,
+        "schema": "transport_demand_v1",
+        "contract_hash": "577eb164013815b22de5a581db0fd9803184954d06d4d0cb4971c2b31c6d8736",
+        "errors": [],
+        "warnings": [],
+        "counts": {
+          "errors": 0,
+          "warnings": 0
+        },
+        "rows": 1,
+        "columns": 10,
+        "preview": [
+          {
+            "order_id": "O1",
+            "origin_id": "A",
+            "destination_id": "B",
+            "distance_km": "30",
+            "ready_date": "2026-11-02",
+            "delivery_due_date": "2026-11-08",
+            "priority": "MEDIUM",
+            "split_allowed": false,
+            "requested": {
+              "pallets": "1",
+              "weight_kg": null,
+              "volume_m3": null,
+              "units": null
+            },
+            "compatibility_groups": [
+              "DRY"
+            ]
+          }
+        ],
+        "summary": {
+          "semantic_entity": "transport_demand",
+          "record_count": 1,
+          "assumptions": [],
+          "assumptions_total": 0,
+          "assumptions_truncated": false,
+          "assumed_external_count": 0,
+          "unknown_availability_count": 0,
+          "unknown_cost_count": 0,
+          "quantity_totals": {
+            "pallets": "1"
+          }
+        }
+      }
+    },
+    {
+      "scenario": "B",
+      "entity": "transport_resources",
+      "result": "PASS",
+      "scope": "local CSV normalization only",
+      "report": {
+        "valid": true,
+        "schema": "transport_resources_v1",
+        "contract_hash": "ba400ae3af4e79b28213cbe10da5103e9b008e79e695f58bf71f8353a6180949",
+        "errors": [],
+        "warnings": [],
+        "counts": {
+          "errors": 0,
+          "warnings": 0
+        },
+        "rows": 2,
+        "columns": 15,
+        "preview": [
+          {
+            "resource_id": "EXT",
+            "source": "EXTERNAL",
+            "guaranteed_capacity": {
+              "pallets": "2",
+              "weight_kg": null,
+              "volume_m3": null,
+              "units": null
+            },
+            "maximum_capacity": null,
+            "lanes": [
+              [
+                "A",
+                "B"
+              ]
+            ],
+            "compatibility_groups": [
+              "DRY"
+            ],
+            "units_available": null,
+            "base_origin_id": null,
+            "operating_cost_per_km": null,
+            "services_available": 1,
+            "availability_source": "CONFIRMED",
+            "external_cost": {
+              "cost_model": "PER_TRIP",
+              "rate": "300",
+              "billing_basis": null
+            }
+          },
+          {
+            "resource_id": "OWN",
+            "source": "OWN",
+            "guaranteed_capacity": {
+              "pallets": "2",
+              "weight_kg": null,
+              "volume_m3": null,
+              "units": null
+            },
+            "maximum_capacity": null,
+            "lanes": [
+              [
+                "A",
+                "B"
+              ]
+            ],
+            "compatibility_groups": [
+              "DRY"
+            ],
+            "units_available": 1,
+            "base_origin_id": "A",
+            "operating_cost_per_km": "2",
+            "services_available": null,
+            "availability_source": null,
+            "external_cost": null
+          }
+        ],
+        "summary": {
+          "semantic_entity": "transport_resources",
+          "record_count": 2,
+          "assumptions": [],
+          "assumptions_total": 0,
+          "assumptions_truncated": false,
+          "assumed_external_count": 0,
+          "unknown_availability_count": 0,
+          "unknown_cost_count": 0,
+          "source_counts": {
+            "OWN": 1,
+            "EXTERNAL": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "C",
+      "entity": "transport_demand",
+      "result": "PASS",
+      "scope": "local CSV normalization only",
+      "report": {
+        "valid": true,
+        "schema": "transport_demand_v1",
+        "contract_hash": "d86d8ad13318a2e95f6d2960d7a2716662ef4867bf8951aa9b496da9fc502259",
+        "errors": [],
+        "warnings": [],
+        "counts": {
+          "errors": 0,
+          "warnings": 0
+        },
+        "rows": 1,
+        "columns": 10,
+        "preview": [
+          {
+            "order_id": "O1",
+            "origin_id": "A",
+            "destination_id": "B",
+            "distance_km": "480",
+            "ready_date": "2026-11-02",
+            "delivery_due_date": "2026-11-08",
+            "priority": "MEDIUM",
+            "split_allowed": true,
+            "requested": {
+              "pallets": "70",
+              "weight_kg": null,
+              "volume_m3": null,
+              "units": null
+            },
+            "compatibility_groups": [
+              "DRY"
+            ]
+          }
+        ],
+        "summary": {
+          "semantic_entity": "transport_demand",
+          "record_count": 1,
+          "assumptions": [],
+          "assumptions_total": 0,
+          "assumptions_truncated": false,
+          "assumed_external_count": 0,
+          "unknown_availability_count": 0,
+          "unknown_cost_count": 0,
+          "quantity_totals": {
+            "pallets": "70"
+          }
+        }
+      }
+    },
+    {
+      "scenario": "C",
+      "entity": "transport_resources",
+      "result": "PASS",
+      "scope": "local CSV normalization only",
+      "report": {
+        "valid": true,
+        "schema": "transport_resources_v1",
+        "contract_hash": "b494ea06a522046d15d9a9f0a7b10744bb328e2a7af89ef393f6625f06ffc294",
+        "errors": [],
+        "warnings": [],
+        "counts": {
+          "errors": 0,
+          "warnings": 0
+        },
+        "rows": 1,
+        "columns": 12,
+        "preview": [
+          {
+            "resource_id": "E1",
+            "source": "EXTERNAL",
+            "guaranteed_capacity": {
+              "pallets": "26",
+              "weight_kg": null,
+              "volume_m3": null,
+              "units": null
+            },
+            "maximum_capacity": null,
+            "lanes": [
+              [
+                "A",
+                "B"
+              ]
+            ],
+            "compatibility_groups": [
+              "DRY"
+            ],
+            "units_available": null,
+            "base_origin_id": null,
+            "operating_cost_per_km": null,
+            "services_available": 2,
+            "availability_source": "CONFIRMED",
+            "external_cost": {
+              "cost_model": "PER_TRIP",
+              "rate": "100",
+              "billing_basis": null
+            }
+          }
+        ],
+        "summary": {
+          "semantic_entity": "transport_resources",
+          "record_count": 1,
+          "assumptions": [],
+          "assumptions_total": 0,
+          "assumptions_truncated": false,
+          "assumed_external_count": 0,
+          "unknown_availability_count": 0,
+          "unknown_cost_count": 0,
+          "source_counts": {
+            "EXTERNAL": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "D",
+      "entity": "transport_demand",
+      "result": "PASS",
+      "scope": "local CSV normalization only",
+      "report": {
+        "valid": true,
+        "schema": "transport_demand_v1",
+        "contract_hash": "9669550b0f3b3a2190fdf17a73e9b8f0e2024b890a3562a6df0441f1b1070e90",
+        "errors": [],
+        "warnings": [],
+        "counts": {
+          "errors": 0,
+          "warnings": 0
+        },
+        "rows": 2,
+        "columns": 10,
+        "preview": [
+          {
+            "order_id": "O0",
+            "origin_id": "A",
+            "destination_id": "B",
+            "distance_km": "480",
+            "ready_date": "2026-11-02",
+            "delivery_due_date": "2026-11-08",
+            "priority": "MEDIUM",
+            "split_allowed": false,
+            "requested": {
+              "pallets": "26",
+              "weight_kg": null,
+              "volume_m3": null,
+              "units": null
+            },
+            "compatibility_groups": [
+              "DRY"
+            ]
+          },
+          {
+            "order_id": "O1",
+            "origin_id": "A",
+            "destination_id": "B",
+            "distance_km": "480",
+            "ready_date": "2026-11-02",
+            "delivery_due_date": "2026-11-08",
+            "priority": "MEDIUM",
+            "split_allowed": false,
+            "requested": {
+              "pallets": "26",
+              "weight_kg": null,
+              "volume_m3": null,
+              "units": null
+            },
+            "compatibility_groups": [
+              "DRY"
+            ]
+          }
+        ],
+        "summary": {
+          "semantic_entity": "transport_demand",
+          "record_count": 2,
+          "assumptions": [],
+          "assumptions_total": 0,
+          "assumptions_truncated": false,
+          "assumed_external_count": 0,
+          "unknown_availability_count": 0,
+          "unknown_cost_count": 0,
+          "quantity_totals": {
+            "pallets": "52"
+          }
+        }
+      }
+    },
+    {
+      "scenario": "D",
+      "entity": "transport_resources",
+      "result": "PASS",
+      "scope": "local CSV normalization only",
+      "report": {
+        "valid": true,
+        "schema": "transport_resources_v1",
+        "contract_hash": "19cb47f61d3da35d38ffbf30f62112508fa1e392a9ca3ffcf36657ae0903da78",
+        "errors": [],
+        "warnings": [],
+        "counts": {
+          "errors": 0,
+          "warnings": 0
+        },
+        "rows": 1,
+        "columns": 9,
+        "preview": [
+          {
+            "resource_id": "R1",
+            "source": "OWN",
+            "guaranteed_capacity": {
+              "pallets": "26",
+              "weight_kg": null,
+              "volume_m3": null,
+              "units": null
+            },
+            "maximum_capacity": null,
+            "lanes": [
+              [
+                "A",
+                "B"
+              ]
+            ],
+            "compatibility_groups": [
+              "DRY"
+            ],
+            "units_available": 1,
+            "base_origin_id": "A",
+            "operating_cost_per_km": "1",
+            "services_available": null,
+            "availability_source": null,
+            "external_cost": null
+          }
+        ],
+        "summary": {
+          "semantic_entity": "transport_resources",
+          "record_count": 1,
+          "assumptions": [],
+          "assumptions_total": 0,
+          "assumptions_truncated": false,
+          "assumed_external_count": 0,
+          "unknown_availability_count": 0,
+          "unknown_cost_count": 0,
+          "source_counts": {
+            "OWN": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "E",
+      "entity": "transport_demand",
+      "result": "PASS",
+      "scope": "local CSV normalization only",
+      "report": {
+        "valid": true,
+        "schema": "transport_demand_v1",
+        "contract_hash": "89b8b245b4084c57b8d88ff8819ed9c0272bbbe4eb89b27f08fbefc301c8b1bc",
+        "errors": [],
+        "warnings": [],
+        "counts": {
+          "errors": 0,
+          "warnings": 0
+        },
+        "rows": 1,
+        "columns": 10,
+        "preview": [
+          {
+            "order_id": "O1",
+            "origin_id": "A",
+            "destination_id": "B",
+            "distance_km": "480",
+            "ready_date": "2026-11-04",
+            "delivery_due_date": "2026-11-04",
+            "priority": "MEDIUM",
+            "split_allowed": false,
+            "requested": {
+              "pallets": "26",
+              "weight_kg": null,
+              "volume_m3": null,
+              "units": null
+            },
+            "compatibility_groups": [
+              "DRY"
+            ]
+          }
+        ],
+        "summary": {
+          "semantic_entity": "transport_demand",
+          "record_count": 1,
+          "assumptions": [],
+          "assumptions_total": 0,
+          "assumptions_truncated": false,
+          "assumed_external_count": 0,
+          "unknown_availability_count": 0,
+          "unknown_cost_count": 0,
+          "quantity_totals": {
+            "pallets": "26"
+          }
+        }
+      }
+    },
+    {
+      "scenario": "E-negative",
+      "result": "PASS_EXPECTED_REJECTION",
+      "scope": "local CSV normalization only",
+      "report": {
+        "valid": false,
+        "schema": "transport_demand_v1",
+        "contract_hash": "89b8b245b4084c57b8d88ff8819ed9c0272bbbe4eb89b27f08fbefc301c8b1bc",
+        "errors": [
+          {
+            "code": "DUPLICATE_ID",
+            "row": 3,
+            "column": "order_id",
+            "message": "El ID debe ser \u00fanico.",
+            "hint": "Us\u00e1 el template de esta Model Version y revis\u00e1 la regla del campo."
+          }
+        ],
+        "warnings": [],
+        "counts": {
+          "errors": 1,
+          "warnings": 0
+        },
+        "rows": 1,
+        "columns": 10
+      }
+    },
+    {
+      "scenario": "E",
+      "entity": "transport_resources",
+      "result": "PASS",
+      "scope": "local CSV normalization only",
+      "report": {
+        "valid": true,
+        "schema": "transport_resources_v1",
+        "contract_hash": "dd7423d9cfb8ef7aa1b3a62cc63991843ca1e5f34f12ebc8ccf6e8fef719afc5",
+        "errors": [],
+        "warnings": [
+          {
+            "code": "ASSUMED_EXTERNAL_AVAILABILITY",
+            "row": 2,
+            "column": "services_available",
+            "message": "Disponibilidad ASSUMED: 1. No se considera confirmada.",
+            "hint": "Us\u00e1 el template de esta Model Version y revis\u00e1 la regla del campo."
+          }
+        ],
+        "counts": {
+          "errors": 0,
+          "warnings": 1
+        },
+        "rows": 1,
+        "columns": 15,
+        "preview": [
+          {
+            "resource_id": "EXT",
+            "source": "EXTERNAL",
+            "guaranteed_capacity": {
+              "pallets": "26",
+              "weight_kg": null,
+              "volume_m3": null,
+              "units": null
+            },
+            "maximum_capacity": null,
+            "lanes": [
+              [
+                "A",
+                "B"
+              ]
+            ],
+            "compatibility_groups": [
+              "DRY"
+            ],
+            "units_available": null,
+            "base_origin_id": null,
+            "operating_cost_per_km": null,
+            "services_available": 1,
+            "availability_source": "ASSUMED",
+            "external_cost": {
+              "cost_model": "PER_TRIP",
+              "rate": "100",
+              "billing_basis": null
+            }
+          }
+        ],
+        "summary": {
+          "semantic_entity": "transport_resources",
+          "record_count": 1,
+          "assumptions": [
+            {
+              "code": "ASSUMED_EXTERNAL_AVAILABILITY",
+              "entity_id": "EXT",
+              "value": 1,
+              "unit": "horizon_services",
+              "source": "DATION_DEFAULT"
+            }
+          ],
+          "assumptions_total": 1,
+          "assumptions_truncated": false,
+          "assumed_external_count": 1,
+          "unknown_availability_count": 0,
+          "unknown_cost_count": 0,
+          "source_counts": {
+            "OWN": 0,
+            "EXTERNAL": 1
+          }
+        }
+      }
+    }
+  ]
+}

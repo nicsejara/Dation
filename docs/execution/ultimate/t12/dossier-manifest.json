@@ -1,0 +1,200 @@
+{
+  "phase": "T12",
+  "decision": "HOLD",
+  "candidate_commit": "bd4da14bc1b8125a6fcd13dcb6475911698224d3",
+  "application_content_sha256": "fe9944b73f6a5b9f189d57477f1205fd73ca485ff9b92a7cf2fd272565e92138",
+  "files": {
+    "evidence/cloud-run-api.json": {
+      "bytes": 760,
+      "sha256": "1239fdce133716b49fe428801ba06b51ae322ace80436adc8c9e47f56be2d254"
+    },
+    "evidence/cloud-run-worker.json": {
+      "bytes": 767,
+      "sha256": "f57ea3f4aa3a00ecf4f1b72fea42e416f83c4684c73a77186a32d369b58de2a4"
+    },
+    "evidence/commit-preflight.json": {
+      "bytes": 130,
+      "sha256": "78ab06767b8f9b279c534aaf836f3c8150ca83aa6361187bf8f683274a8e7237"
+    },
+    "evidence/frontend-content-manifest.json": {
+      "bytes": 31668,
+      "sha256": "0064440cfa772dea978b78e30875ab1f9a7c0aa5fdce61451a2be749e6233802"
+    },
+    "evidence/gcp-project.json": {
+      "bytes": 766,
+      "sha256": "f0010fb6940b4513bf73de144f799055d6cea0a19e06d395b12c93d39dbe6795"
+    },
+    "evidence/github-main-observed.json": {
+      "bytes": 309,
+      "sha256": "7f72adac5ced483b2b1ffca910a24e70e6a53a460a855c80d5e8c7568b3bbfa3"
+    },
+    "evidence/image-and-github-observation.json": {
+      "bytes": 339,
+      "sha256": "db3784f441c568a2259c7a87d48ad0155d6c45d7a01ee2ed0db409bb88b82f51"
+    },
+    "evidence/migration-preflight-recognition.json": {
+      "bytes": 46271,
+      "sha256": "09773f9a030676734109950dcdbfff560405d05e681a99dc2de53ed4ff5ba635"
+    },
+    "evidence/pre-ultimate-catalog-comparison-summary.json": {
+      "bytes": 1179,
+      "sha256": "cb46498e7842294a12cf934eb5506c0f87d1f89db90cd03538cc2cefa243e766"
+    },
+    "evidence/pre-ultimate-catalog-function-diff.json": {
+      "bytes": 1881,
+      "sha256": "76266c29fd20f856fa9e9ae40975be19671239532841d58d6acfdbc1df4ce25d"
+    },
+    "evidence/preflight-local.json": {
+      "bytes": 1983,
+      "sha256": "a062e0056a17a4eb4efe32194f1890f5c032643cf54742767ef72cc24ab74d6f"
+    },
+    "evidence/prepare-pilot-inputs.py": {
+      "bytes": 6332,
+      "sha256": "6a8ede2b9b14b681d534dfad8facb4b1e3be290c22b30f9de554f777273facd3"
+    },
+    "evidence/production-catalog-complete.json": {
+      "bytes": 409909,
+      "sha256": "e297d4d9e34e4a7451e07d7e4371bed04f7af90f82c3c9806730c7d2c43e416a"
+    },
+    "evidence/production-health.json": {
+      "bytes": 276,
+      "sha256": "a8fe59aee7d813e5138d8c67be4814fd62c2679b3402bafe67d612b925296baf"
+    },
+    "evidence/production-public-route-observations.json": {
+      "bytes": 978,
+      "sha256": "37097ec58d2e2ec3de8e8ea657a59e71e4890ac63244001c5b5aabd48c89d6b3"
+    },
+    "evidence/production-storage-settings.json": {
+      "bytes": 314,
+      "sha256": "cfffc7dbfb7d8e52f915ed62a955bc5171ae76b552aa43f3181773caab18cc6f"
+    },
+    "evidence/rc-commit.json": {
+      "bytes": 122088,
+      "sha256": "aeba546b33c6dd2d2c35f8c4c34d1d29af4102e406bf25a742a80b4aada81b9e"
+    },
+    "evidence/rc-staged-content.json": {
+      "bytes": 122029,
+      "sha256": "d42048df4b7bc0a6140b17e16cd2ebfadf072a03fbe1a0e528481e3fd0752323"
+    },
+    "evidence/read-production-catalog.sql": {
+      "bytes": 2533,
+      "sha256": "e524bed00f04889ad33edd1681ab6f2d72086a335f377ddec6e505f7a3cb43ae"
+    },
+    "evidence/read-production-preflight.py": {
+      "bytes": 3897,
+      "sha256": "8d2fbdb14f5e17fdb3a1e8e6348e941cf8e51703291e1b71310638eed5480697"
+    },
+    "evidence/source-and-dossier-verification.json": {
+      "bytes": 703,
+      "sha256": "aa72e1c5f5e36aa6bd5bc6f77e0d479fab29238d2fbcb088ad4b654082ff3531"
+    },
+    "evidence/supabase-backups.json": {
+      "bytes": 400,
+      "sha256": "5f98ff367bb72f91ececafdd750c11e973b32df997e8d278e74108533fe0a848"
+    },
+    "evidence/supabase-catalog-observed.json": {
+      "bytes": 1777,
+      "sha256": "927b45e1f6c81c9b0ebf525feb352a46c38cffe53f85b7096a514c97e63af562"
+    },
+    "evidence/supabase-changelog.json": {
+      "bytes": 218,
+      "sha256": "16bd4560672df265f82e97c1915c40069a81a250957a83707deba4752972fcb8"
+    },
+    "evidence/supabase-migrations-observed.json": {
+      "bytes": 939,
+      "sha256": "aae54ebb57a5cdd6c30da98052110ff91802ccb21ba5213dc64bb910d0c8d6ca"
+    },
+    "evidence/supabase-project-observed.json": {
+      "bytes": 545,
+      "sha256": "12f6220db129e6c6f5f1229f10ff19b2a64d00c8428671c61e28a55ae577ff37"
+    },
+    "evidence/t12-validation.json": {
+      "bytes": 2242,
+      "sha256": "c8be77e89c20bb89528bb32991e95f2c0c9a91e63764e1152a767e64300184c0"
+    },
+    "pilot/A/model-configuration.json": {
+      "bytes": 545,
+      "sha256": "57b1e603a1e8966a398ccfe98d411ce7cbf0f4f3435806da1c137ebf930230d0"
+    },
+    "pilot/A/transport_demand.csv": {
+      "bytes": 186,
+      "sha256": "1ef61ea7d66f4191aaed5ac0bd01bfc09196a672615413b8ac374cd1af84da6d"
+    },
+    "pilot/A/transport_resources.csv": {
+      "bytes": 297,
+      "sha256": "e5e9c145f311c8200a876f45cf7a1eab4464c732cd12b7dbc4e838b855b64eb2"
+    },
+    "pilot/B/model-configuration.json": {
+      "bytes": 557,
+      "sha256": "65a34160463c1a5556dd3a7a568b89d9ba667315b1b145cc9f1e02ae131ae7b1"
+    },
+    "pilot/B/transport_demand.csv": {
+      "bytes": 185,
+      "sha256": "0665c86a7c29c4c29fbcf971759df8d3f5c0308f9139242be5845d2cbbaff3ec"
+    },
+    "pilot/B/transport_resources.csv": {
+      "bytes": 333,
+      "sha256": "61e08dcab7084e1c98b9537313ca3484d4f6da75011d0c01fb4dbfb2932247b0"
+    },
+    "pilot/C/model-configuration.json": {
+      "bytes": 545,
+      "sha256": "57b1e603a1e8966a398ccfe98d411ce7cbf0f4f3435806da1c137ebf930230d0"
+    },
+    "pilot/C/transport_demand.csv": {
+      "bytes": 186,
+      "sha256": "1ef61ea7d66f4191aaed5ac0bd01bfc09196a672615413b8ac374cd1af84da6d"
+    },
+    "pilot/C/transport_resources.csv": {
+      "bytes": 232,
+      "sha256": "dbaf1969a51cbaecd36e00f8a8caa1a6a87a2b1e98197755334f6b7295f61ed4"
+    },
+    "pilot/D/model-configuration.json": {
+      "bytes": 541,
+      "sha256": "ec8b99f393b4c7300ff93b7de1245cfab3c3ddc1839d61014e662c3dccd262f5"
+    },
+    "pilot/D/transport_demand.csv": {
+      "bytes": 240,
+      "sha256": "ff8ee07e9c3d87c18e6e9663cc786b0e588e8b60979d315e5831eb46a0460aec"
+    },
+    "pilot/D/transport_resources.csv": {
+      "bytes": 173,
+      "sha256": "d8818fa08e4675744e2c3ee9e9c557549588121d1970f477c201db6b36be4eea"
+    },
+    "pilot/E/model-configuration.json": {
+      "bytes": 557,
+      "sha256": "65a34160463c1a5556dd3a7a568b89d9ba667315b1b145cc9f1e02ae131ae7b1"
+    },
+    "pilot/E/transport_demand-duplicate-invalid.csv": {
+      "bytes": 240,
+      "sha256": "030f53390ccac534da0a54d3354e435e92e24be296002f726023ee154ec6312c"
+    },
+    "pilot/E/transport_demand.csv": {
+      "bytes": 187,
+      "sha256": "be94cf81da0a796ce44f8a1301ecea5b6b75a25894168686623a81bc65889dd8"
+    },
+    "pilot/E/transport_resources.csv": {
+      "bytes": 286,
+      "sha256": "8e56beeda777df959792dd103bf2d19faf6b572adf9f694f18670adb751595ad"
+    },
+    "pilot/README.md": {
+      "bytes": 3148,
+      "sha256": "26a0d59a663722a7603d7a7519fd959e838f51e9bd1fdafacb3063ecedd753ec"
+    },
+    "pilot/input-validation.json": {
+      "bytes": 19747,
+      "sha256": "1f3e5acc527dd032edcb78185d72dc8484789792889cc6b15ed6db8863ee6aa0"
+    },
+    "pilot/scenarios.json": {
+      "bytes": 3970,
+      "sha256": "d86cc094cf0c64119b172224951c93d68a588767263b58ad6212089c891bb695"
+    },
+    "release-candidate-manifest.json": {
+      "bytes": 14423,
+      "sha256": "554b56dd2901dda8d4601aa9367da4609ce8e04b368695112bede005f9bf6b4b"
+    },
+    "t12-rollout-report.md": {
+      "bytes": 26845,
+      "sha256": "97ec67e686eb1b323f9eb037ad16b0338d963410043ecb57dafaaf348161b890"
+    }
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "status": "PREPARED_LOCAL_ONLY",
+  "workspace_id": null,
+  "actor_user_id": null,
+  "cohort_size_target": "1–3 explicitly controlled workspaces",
+  "production_write_enabled": false,
+  "note": "Local placeholder Model Version UUIDs are used only to compile contracts. Publish real Model Versions and obtain their exact template/contract hash before upload. No synthetic production tenant or actor is invented. These inputs are not permanent production fixtures.",
+  "scenarios": [
+    {
+      "id": "A",
+      "configuration": "A/model-configuration.json",
+      "planning_start": "2026-11-02",
+      "planning_end": "2026-11-08",
+      "horizon_type": "WEEKLY",
+      "case_policy": {
+        "primary_goal": "MINIMIZE_COST"
+      },
+      "expected_business_checks": {
+        "coverage": "70/70 pallets",
+        "trips": 3,
+        "total_cost_ARS": "350",
+        "source": "EXTERNAL"
+      },
+      "certified_test_reference": "tests.test_transport_plan_policies.TransportPlanPolicyTests.test_A_F_partial_gap_and_min_cost_never_prefers_empty",
+      "production_execution": "NOT_RUN"
+    },
+    {
+      "id": "B",
+      "configuration": "B/model-configuration.json",
+      "planning_start": "2026-11-02",
+      "planning_end": "2026-11-08",
+      "horizon_type": "WEEKLY",
+      "case_policy": {
+        "primary_goal": "MINIMIZE_COST"
+      },
+      "expected_business_checks": {
+        "coverage": "1/1 pallets",
+        "selected_source": "OWN",
+        "total_cost_ARS": "120"
+      },
+      "certified_test_reference": "tests.test_transport_plan_policies.TransportPlanPolicyTests.test_B_C_independent_literal_cost_oracles",
+      "production_execution": "NOT_RUN"
+    },
+    {
+      "id": "C",
+      "configuration": "C/model-configuration.json",
+      "planning_start": "2026-11-02",
+      "planning_end": "2026-11-08",
+      "horizon_type": "WEEKLY",
+      "case_policy": {
+        "primary_goal": "MINIMIZE_COST"
+      },
+      "expected_business_checks": {
+        "coverage": "52/70 pallets",
+        "unassigned_pallets": "18",
+        "trips": 2,
+        "total_cost_ARS": "200",
+        "required_reason": "CAPACITY_GAP",
+        "review": "Explicit partial coverage; no fabricated FULL"
+      },
+      "certified_test_reference": "tests.test_transport_plan_policies.TransportPlanPolicyTests.test_A_F_partial_gap_and_min_cost_never_prefers_empty",
+      "production_execution": "NOT_RUN"
+    },
+    {
+      "id": "D",
+      "configuration": "D/model-configuration.json",
+      "planning_start": "2026-11-02",
+      "planning_end": "2026-11-08",
+      "horizon_type": "WEEKLY",
+      "case_policy": {
+        "primary_goal": "MINIMIZE_COST"
+      },
+      "expected_business_checks": {
+        "trips": 2,
+        "D2_dispatch_dates": [
+          "2026-11-02",
+          "2026-11-04"
+        ],
+        "D2_available_again": [
+          "2026-11-04",
+          "2026-11-06"
+        ],
+        "cycle_days": 2,
+        "source_D1": "Exact approved Run + fingerprint; no reassignment"
+      },
+      "certified_test_reference": "tests.test_day_scheduling_core.DaySchedulingCoreTests.test_I_own_one_unit_reuses_exclusive_cycle_end",
+      "production_execution": "NOT_RUN"
+    },
+    {
+      "id": "E",
+      "configuration": "E/model-configuration.json",
+      "planning_start": "2026-11-02",
+      "planning_end": "2026-11-08",
+      "horizon_type": "WEEKLY",
+      "case_policy": {
+        "primary_goal": "MINIMIZE_COST"
+      },
+      "expected_business_checks": {
+        "availability": "ASSUMED, services derive to 1 with explicit provenance",
+        "D2_dispatch_date": "2026-11-04",
+        "D2_margin_days": 0,
+        "D2_status": "AT_RISK",
+        "negative_input": "duplicate order_id must be rejected before publication"
+      },
+      "certified_test_reference": "tests.test_day_scheduling_core.DaySchedulingCoreTests.test_ready_delay_and_zero_margin_have_fact_backed_reasons",
+      "production_execution": "NOT_RUN"
+    }
+  ]
+}

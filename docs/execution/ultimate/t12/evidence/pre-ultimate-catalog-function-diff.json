@@ -1,0 +1,13 @@
+[
+  {
+    "function": [
+      "public",
+      "platform_home",
+      "target_workspace_id uuid, actor_user_id uuid"
+    ],
+    "changed_fields": [
+      "definition"
+    ],
+    "diff": "--- certified-pre-Ultimate\n+++ production-T12\n@@ -41,7 +41,7 @@\n      ORDER BY created_at DESC,id DESC LIMIT 1) r ON true\n    WHERE c.workspace_id=target_workspace_id AND c.status='active'\n      AND r.status='completed' AND r.approved_at IS NULL AND r.superseded_at IS NULL\n-     AND coalesce((dation_private.case_collaboration(target_workspace_id,c.id,actor_user_id)->r.node_id->>'can_approve')::boolean,false)\n+     AND (member_role='admin' OR NOT EXISTS(SELECT 1 FROM decision_assignments a WHERE a.workspace_id=target_workspace_id AND a.decision_case_id=c.id AND a.node_id=r.node_id AND a.approver_user_id IS NOT NULL AND a.approver_user_id<>actor_user_id))\n      AND (r.node_id='logistics_assignment' OR EXISTS(\n        SELECT 1 FROM decision_runs source WHERE source.id=r.upstream_run_id\n          AND source.workspace_id=target_workspace_id AND source.decision_case_id=c.id\n@@ -54,7 +54,6 @@\n    JOIN decision_runs source ON source.workspace_id=c.workspace_id AND source.decision_case_id=c.id AND source.node_id='logistics_assignment'\n     AND source.status='completed' AND source.approved_at IS NOT NULL AND source.superseded_at IS NULL\n    WHERE c.workspace_id=target_workspace_id AND c.status='active'\n-    AND dation_private.responsibility_eligible(target_workspace_id,a.owner_user_id,'decision_owner')\n     AND NOT EXISTS(SELECT 1 FROM decision_runs r WHERE r.workspace_id=c.workspace_id AND r.decision_case_id=c.id AND r.node_id='logistics_scheduling'\n      AND r.upstream_run_id=source.id AND r.superseded_at IS NULL AND r.status IN('queued','running','completed'))\n   ), work AS (SELECT * FROM reviews UNION ALL SELECT * FROM handoffs), candidates AS (\n"
+  }
+]

@@ -1,0 +1,6 @@
+{
+  "local_images": "\"sha256:b26cfedb7e7a70927171801dd89b44429b568b719528328cc5b99e78cf781ddb\" [\"dation-certification:t11-r-under-test\"] []\n\"sha256:610a317cbde6fe000d034bdb9dce28ad9f7309a948b13eb804d4483e6dd48041\" [\"dation-certification:rollback-dual-compatible-t11\"] []\n",
+  "github_combined_status": {
+    "statuses": []
+  }
+}

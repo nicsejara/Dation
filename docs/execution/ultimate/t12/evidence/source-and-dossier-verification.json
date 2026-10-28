@@ -1,0 +1,20 @@
+{
+  "result": "PASS",
+  "verified_source_files": 380,
+  "every_source_byte_matches_RC_git_blob": true,
+  "source_content_sha256_certified": "fe9944b73f6a5b9f189d57477f1205fd73ca485ff9b92a7cf2fd272565e92138",
+  "verified_migration_files": 40,
+  "verified_knowledge_files": 9,
+  "preserved_T11_dossiers": {
+    "dossier-manifest.json": {
+      "verified_files": 311,
+      "manifest_sha256": "00b47c03111223ef054f88a1a5b16d84f01b05219e82711285d9b132dc9c52cc"
+    },
+    "t11-remediation-manifest.json": {
+      "verified_files": 207,
+      "manifest_sha256": "a5277b7ca7edbf4f648f422bf47ee17519a91f7474dd7fa18b01ab5756348037"
+    }
+  },
+  "new_application_edits_in_T12": 0,
+  "new_migrations_in_T12": 0
+}

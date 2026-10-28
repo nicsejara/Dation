@@ -1,0 +1,8 @@
+{
+  "observed_at_utc": "2026-10-28T23:12:52.967960+00:00",
+  "operation": "GET",
+  "url": "https://supabase.com/changelog.md",
+  "production_mutation": false,
+  "error_type": "ProxyError",
+  "error": "403 Forbidden"
+}

@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "operating_role": "SHIPPER",
+  "transport_pattern": "DIRECT",
+  "allowed_sources": [
+    "OWN",
+    "EXTERNAL"
+  ],
+  "active_dimensions": [
+    "pallets"
+  ],
+  "primary_dimension": "pallets",
+  "split_permitted": false,
+  "homogeneous_loads_declared": false,
+  "currency_policy": {
+    "currency": "ARS",
+    "minor_units": 2,
+    "rounding": "ROUND_HALF_UP"
+  },
+  "own_cost_model": "OWN_OPERATING_CYCLE",
+  "external_cost_models": [
+    "PER_TRIP",
+    "PER_KM"
+  ],
+  "per_km_billing_bases": [
+    "ONE_WAY",
+    "ROUND_TRIP"
+  ]
+}

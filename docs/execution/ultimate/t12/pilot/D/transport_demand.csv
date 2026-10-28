@@ -1,0 +1,3 @@
+order_id,origin_id,destination_id,distance_km,ready_date,delivery_due_date,priority,split_allowed,demand_pallets,compatibility_groups
+O0,A,B,480,2026-11-02,2026-11-08,MEDIUM,false,26,DRY
+O1,A,B,480,2026-11-02,2026-11-08,MEDIUM,false,26,DRY

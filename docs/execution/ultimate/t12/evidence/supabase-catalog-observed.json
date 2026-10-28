@@ -1,0 +1,97 @@
+{
+  "rls": [
+    {
+      "table": "audit_events",
+      "enabled": true
+    },
+    {
+      "table": "datasets",
+      "enabled": true
+    },
+    {
+      "table": "decision_approval_events",
+      "enabled": true
+    },
+    {
+      "table": "decision_assignments",
+      "enabled": true
+    },
+    {
+      "table": "decision_case_reconciliations",
+      "enabled": true
+    },
+    {
+      "table": "decision_cases",
+      "enabled": true
+    },
+    {
+      "table": "decision_chat_turns",
+      "enabled": true
+    },
+    {
+      "table": "decision_comparative_analyses",
+      "enabled": true
+    },
+    {
+      "table": "decision_explanations",
+      "enabled": true
+    },
+    {
+      "table": "decision_interpretation_sources",
+      "enabled": true
+    },
+    {
+      "table": "decision_messages",
+      "enabled": true
+    },
+    {
+      "table": "decision_runs",
+      "enabled": true
+    },
+    {
+      "table": "dispatch_run_jobs",
+      "enabled": true
+    },
+    {
+      "table": "dispatch_worker_instances",
+      "enabled": true
+    },
+    {
+      "table": "profiles",
+      "enabled": true
+    },
+    {
+      "table": "workspace_ddas",
+      "enabled": true
+    },
+    {
+      "table": "workspace_invitations",
+      "enabled": true
+    },
+    {
+      "table": "workspace_members",
+      "enabled": true
+    },
+    {
+      "table": "workspaces",
+      "enabled": true
+    }
+  ],
+  "buckets": [
+    {
+      "id": "dda-inputs",
+      "public": false
+    }
+  ],
+  "database": "postgres",
+  "postgres": "17.6",
+  "observed_at": "2026-10-28T23:13:50.77341+00:00",
+  "release_flags": {
+    "singleton": true,
+    "admissions_open": true,
+    "workflow_gates_enabled": true
+  },
+  "ultimate_functions": [],
+  "ultimate_model_table": null,
+  "case_ultimate_columns": []
+}

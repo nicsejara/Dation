@@ -1,0 +1,3 @@
+resource_id,source,lanes,guaranteed_pallets,maximum_pallets,units_available,base_origin_id,operating_cost_per_km,services_available,availability_source,cost_model,trip_rate,per_km_rate,billing_basis,compatibility_groups
+OWN,OWN,"[[""A"",""B""]]",2,,1,A,2,,,,,,,DRY
+EXT,EXTERNAL,"[[""A"",""B""]]",2,,,,,1,CONFIRMED,PER_TRIP,300,,,DRY

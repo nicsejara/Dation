@@ -1,0 +1,15 @@
+{
+  "observed_at_utc": "2026-10-28T23:12:52.966873+00:00",
+  "operation": "GET",
+  "url": "https://api.supabase.com/v1/projects/gijiinufjjurgfeehufj/database/backups",
+  "production_mutation": false,
+  "status": 200,
+  "seconds": 0.5196564409998246,
+  "result": {
+    "region": "us-west-2",
+    "walg_enabled": true,
+    "pitr_enabled": false,
+    "backups": [],
+    "physical_backup_data": {}
+  }
+}

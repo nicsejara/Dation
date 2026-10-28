@@ -1,0 +1,9 @@
+{
+  "observed_at_utc": "2026-10-28T23:12:52.964147+00:00",
+  "operation": "GET",
+  "url": "https://cloudresourcemanager.googleapis.com/v1/projects/dation-510100",
+  "production_mutation": false,
+  "status": 401,
+  "seconds": 0.33683582799858414,
+  "error": "{'code': 401, 'message': 'Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.', 'status': 'UNAUTHENTICATED', 'details': [{'@type': 'type.googleapis.com/google.rpc.ErrorInfo', 'reason': 'ACCESS_TOKEN_TYPE_UNSUPPORTED', 'metadata': {'method': 'google.cloudresourcemanager.v1.Projects.GetProject', 'service': 'cloudresourcemanager.googleapis.com'}}]}"
+}

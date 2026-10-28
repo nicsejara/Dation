@@ -1,0 +1,9 @@
+{
+  "observed_at_utc": "2026-10-28T23:12:52.965278+00:00",
+  "operation": "GET",
+  "url": "https://run.googleapis.com/v1/projects/dation-510100/locations/us-west1/services/dation-core",
+  "production_mutation": false,
+  "status": 401,
+  "seconds": 0.7703983699902892,
+  "error": "{'code': 401, 'message': 'Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.', 'status': 'UNAUTHENTICATED', 'details': [{'@type': 'type.googleapis.com/google.rpc.ErrorInfo', 'reason': 'ACCESS_TOKEN_TYPE_UNSUPPORTED', 'metadata': {'method': 'google.cloud.run.v1.Services.GetService', 'service': 'run.googleapis.com'}}]}"
+}

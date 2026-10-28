@@ -1,0 +1,59 @@
+{
+  "phase": "T12",
+  "observed_at_utc": "2026-10-28T23:27:54.292996+00:00",
+  "result": "PASS_FOR_DOCUMENTATION_AND_RC_PRESERVATION_NOT_PRODUCTION_SMOKE",
+  "authorization": {
+    "sediment_file_id": "file_000000001188820eb8cc88ce8bdb9076",
+    "sha256": "25217ec98452f4e54d38b7b228f054558261554793b433c4743d8f4fc044d526"
+  },
+  "source_verification": "source-and-dossier-verification.json",
+  "checks": {
+    "application_bytes_unchanged_since_certified_T11_R": true,
+    "T11_original_and_remediation_dossiers_preserved": true,
+    "source_blobs_match_RC_git_commit": true,
+    "new_application_edits": 0,
+    "new_migrations": 0,
+    "json_syntax": "PASS",
+    "python_evidence_ast": "PASS",
+    "local_document_links": "PASS",
+    "credential_pattern_scan": "PASS",
+    "required_report_sections": 23,
+    "pilot_csv_positive_normalizations": 10,
+    "pilot_csv_expected_duplicate_rejection": 1,
+    "new_engine_executions": 0,
+    "production_runs": 0,
+    "production_mutations": 0,
+    "production_smoke": "BLOCKED_NOT_RUN"
+  },
+  "commands_and_operations": [
+    {
+      "command": "git fetch origin",
+      "effect": "refresh remote refs only; no push"
+    },
+    {
+      "command": "git rev-list --left-right --count origin/main...bd4da14",
+      "result": "0 2"
+    },
+    {
+      "command": ".venv/bin/python -B /workspace/work/dation-t12/read_production_preflight.py",
+      "effect": "GET provider metadata and health only; results archived separately"
+    },
+    {
+      "operation": "Supabase connector get_project/list_migrations/SELECT catalog and Storage metadata",
+      "effect": "read-only; no customer rows, write SQL or history repair"
+    },
+    {
+      "command": "docker --host=unix:///var/run/docker.sock image inspect [candidate] [rollback]",
+      "effect": "local inspect only; RepoDigests empty for both"
+    },
+    {
+      "command": ".venv/bin/python -B /workspace/work/dation-t12/prepare_pilot_inputs.py",
+      "effect": "local synthetic inputs; unchanged compiler/normalizer; no network/engine calls"
+    },
+    {
+      "command": ".venv/bin/python -B /workspace/work/dation-t12/freeze_t12_evidence.py",
+      "effect": "local hashes/Git blob checks and documentation only"
+    }
+  ],
+  "gate": "HOLD"
+}

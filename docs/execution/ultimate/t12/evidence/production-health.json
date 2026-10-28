@@ -1,0 +1,11 @@
+{
+  "observed_at_utc": "2026-10-28T23:12:52.967328+00:00",
+  "operation": "GET",
+  "url": "https://dation-core-469052310590.us-west1.run.app/health",
+  "production_mutation": false,
+  "status": 200,
+  "seconds": 10.759245073015336,
+  "result": {
+    "status": "healthy"
+  }
+}
