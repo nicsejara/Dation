@@ -18,12 +18,17 @@ ejecutarlo sobre `nicsejara/Dation`, `main`, environment `Dation`.
   `ultimate-mvp-production-20261029`. Objeto tag `067b5aea122256a8b0eb82f87f6363c153eb5407`;
   target pelado `3e8712962ba7b444f47b44d5afa9887f4c2e4a10`. Mensaje: Dation Ultimate MVP consolidated production
   baseline after T0-T12. No había tags remotos previos.
-- Cambios documentales en `chore/final-repository-hygiene`, integrables por
-  fast-forward; esa referencia temporal debe desaparecer al cerrar la integración.
-- **SHA final:** el commit que incorpora este informe. Su identidad se resuelve
-  sin inventar un SHA autorreferente con
-  `git log -1 --format=%H -- docs/FINAL_REPOSITORY_HYGIENE_REPORT.md`.
-  La respuesta de entrega registra el SHA numérico después de publicar y verificar.
+- **SHA final de `main`: `3e8712962ba7b444f47b44d5afa9887f4c2e4a10`**, sin cambios respecto del inicial.
+- Cambios documentales publicados en `chore/final-repository-hygiene`; commit de
+  contenido inicial `f857c0cda8045428fd4a0566cdf377fbdbae334d`, seguido por la
+  actualización de este informe para registrar los bloqueos de aprobación.
+- La revisión automática rechazó el push directo a `main` por ser la rama
+  predeterminada y disparar producción, requiriendo aprobación explícita. Se optó
+  por publicar la rama de trabajo y preparar una PR borrador como alternativa
+  revisable. No se usó otra API para eludir el rechazo.
+- La rama temporal se conserva hasta aprobar e integrar el cambio documental;
+  después debe eliminarse. El SHA exacto del candidato se resuelve con
+  `git rev-parse origin/chore/final-repository-hygiene` y se informa en la entrega.
 
 ## Branch cleanup
 
@@ -40,7 +45,9 @@ de GitHub (100 + 4) y contrastado con fetch Git. `main` se conserva. Las otras
 - **0 C, 0 D remotas.** No se importó ningún cambio de ramas históricas.
 - `recovery/t12-t12r-environment-20261029` es B: mismo SHA `3e8712962ba7b444f47b44d5afa9887f4c2e4a10`.
 
-**Eliminadas remotas: 0. Conservadas remotas: 104, incluido `main`.** La revisión
+**Eliminadas remotas históricas: 0. Conservadas históricas: 104, incluido `main`.**
+Hay además una rama temporal nueva `chore/final-repository-hygiene` para revisión:
+**105 ramas remotas en total al preparar la entrega**. La revisión
 automática rechazó la eliminación atómica de las 103 referencias por alcance
 amplio y coste de reversión, exigiendo aprobación explícita de esa lista exacta.
 No se eludió la revisión por lotes menores ni otra API. La lista constituye el
@@ -153,7 +160,9 @@ La lectura administrativa de triggers GCP respondió HTTP 401 tanto en región
 us-west1 como global usando el binding existente; no se renovaron tokens. El
 check de Cloud Build en GitHub permite confirmar el pipeline sin depender de ese
 token temporal. No hubo deploy manual ni cambios de IAM, cuentas o servicios.
-El commit documental acepta el deployment automático normal que provoque `main`.
+El push a `main` fue rechazado antes de ejecutarse; el commit documental permanece
+en la rama temporal. Una integración aprobada aceptará el deployment automático
+normal, sin operaciones GCP manuales adicionales.
 
 ## Codex environment
 
@@ -240,8 +249,9 @@ Diff de **12 archivos, todos Markdown**. Validación focal **PASS**: whitespace/
 Dockerfile, unicidad de versiones/contenidos y orden de 41 migraciones, árbol de
 migraciones intacto, ascendencia/clasificación y tag anotado. No se ejecutó T11 ni suites funcionales:
 no se eliminaron archivos de código ni se modificaron imports, build o runtime.
-Las verificaciones finales de `main`, HEAD, origin y working tree se registran
-en la respuesta de entrega después de integrar el commit.
+La entrega vuelve al `main` original, con HEAD igual a `origin/main` y working tree
+limpio. La rama temporal conserva los documentos para revisión; el WIP local D
+permanece aparte. Las referencias observadas se registran en la respuesta de entrega.
 
 ## Deferred
 
@@ -437,8 +447,8 @@ Todas las filas siguientes se conservan remotamente hasta aprobar su eliminació
 
 # HOLD — UNIQUE WORK NOT YET CONSOLIDATED
 
-Motivo: WIP local D preservado y no incorporado. Además, la eliminación de 103
-ramas remotas certificadas espera aprobación explícita tras rechazo de la
-revisión automática. No corresponde declarar CLEAN mientras persista trabajo
+Motivo: WIP local D preservado y no incorporado. Además, la integración documental
+a `main` y la eliminación de 103 ramas remotas certificadas esperan aprobación
+explícita tras sendos rechazos de la revisión automática. No corresponde declarar CLEAN mientras persista trabajo
 único potencialmente relevante. El baseline y el contexto maestro están
 preparados; no se sacrificó trabajo único para obtener el resultado ideal.
