@@ -21,7 +21,7 @@ from auth_fixture import USER_A
 from tests.test_ultimate_data_contracts import model
 
 SYSTEM_TABLES={'workspace_members','workspace_ddas','workspace_invitations',
-              'legacy_owners','member_responsibilities','workspace_onboarding'}
+              'legacy_owners','member_responsibilities','workspace_onboarding','ultimate_pilot_workspaces'}
 
 
 class CertificationSandbox(DaySandbox):

@@ -13,6 +13,7 @@ class DataPackSandbox(Sandbox):
         return super().start_process(name,args,**options)
     def start(self):
         super().start()
+        self.sql(f"INSERT INTO dation_private.ultimate_pilot_workspaces(workspace_id,enabled) VALUES('{self.workspace_a}',true); UPDATE dation_private.platform_release SET ultimate_pilot_enabled=true;")
         self.sql('UPDATE dation_private.platform_release SET ultimate_foundation_enabled=true,ultimate_data_pack_enabled=true;')
         (self.directory/'auth-fixture-users.json').write_text(json.dumps({'user-3@example.test':{'id':VIEWER,'refresh':'fixture-refresh-t4-viewer'}}))
 

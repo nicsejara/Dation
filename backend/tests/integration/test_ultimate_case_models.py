@@ -48,6 +48,8 @@ class UltimateCaseSQLTests(UltimateSQLSandbox,unittest.TestCase):
             cls.command(f"SELECT platform_set_member_responsibilities('{wid}','{uid}','{uid}',(SELECT updated_at FROM workspace_members WHERE workspace_id='{wid}' AND user_id='{uid}'),ARRAY['decision_owner']);")
         cls.command(f"INSERT INTO profiles(id) VALUES('{OPERATOR}'),('{VIEWER}'),('{DISABLED}'); INSERT INTO workspace_members(workspace_id,user_id,access_role,status) VALUES('{cls.wa}','{OPERATOR}','operator','active'),('{cls.wa}','{VIEWER}','viewer','active'),('{cls.wa}','{DISABLED}','operator','disabled');")
         cls.command('UPDATE dation_private.platform_release SET ultimate_foundation_enabled=true;')
+        # T12-R: this owned fixture explicitly enrolls A; B remains legacy-only.
+        cls.command(f"INSERT INTO dation_private.ultimate_pilot_workspaces(workspace_id,enabled) VALUES('{cls.wa}',true); UPDATE dation_private.platform_release SET ultimate_pilot_enabled=true;")
 
     def sql(self,sql):return self.command(sql).stdout.strip()
     def reject(self,sql,*codes):
