@@ -57,7 +57,7 @@ class FinalPolishTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(await hero.locator('h1>span').inner_text(),'con mejor análisis.')
             self.assertEqual(await hero.locator('.dda-landing__flow-node small').all_inner_texts(),['ENTRADA','INTELIGENCIA','DECISIÓN'])
             self.assertEqual(await hero.get_by_role('button').count(),2)
-            self.assertTrue(await hero.get_by_role('button',name='Iniciar nuevo Decision Case',exact=False).is_visible())
+            self.assertTrue(await hero.get_by_role('button',name='Comenzar',exact=False).is_visible())
             self.assertTrue(await hero.get_by_role('button',name='Ver mis casos de Logística',exact=False).is_visible())
             if width>700:
                 await self.page.wait_for_function('document.querySelector(".dda-landing__hero-art")?.naturalWidth>0')

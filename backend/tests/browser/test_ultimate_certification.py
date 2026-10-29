@@ -32,7 +32,7 @@ class UltimateCertificationTests(unittest.IsolatedAsyncioTestCase):
         for name in ['SUPABASE_URL','SUPABASE_SECRET_KEY','SUPABASE_ACCESS_TOKEN','LLM_API_KEY','LLM_BASE_URL','GCP_ACCESS_TOKEN']:env[name]=''
         for name in ['DOCKER_CONTEXT','DOCKER_TLS','DOCKER_TLS_VERIFY','DOCKER_CERT_PATH']:env.pop(name,None)
         env.update(DOCKER_HOST='unix:///var/run/docker.sock',PYTHONDONTWRITEBYTECODE='1')
-        cls.fixture=subprocess.Popen([str(REPO/'.venv/bin/python'),'-B',str(BACKEND/'tests/e2e/ultimate_certification_fixture.py')],
+        cls.fixture=subprocess.Popen([setup.RUNTIME_PYTHON,'-B',str(BACKEND/'tests/e2e/ultimate_certification_fixture.py')],
             cwd=BACKEND,env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=cls.fixture_log,text=True)
         if not select.select([cls.fixture.stdout],[],[],60)[0]:raise RuntimeError('T11 owned browser fixture timeout')
         line=cls.fixture.stdout.readline()
@@ -40,7 +40,7 @@ class UltimateCertificationTests(unittest.IsolatedAsyncioTestCase):
         cls.f=json.loads(line);cls.base=cls.f['api_url'];(OUT/'owned-fixture.json').write_text(json.dumps(cls.f,indent=2)+'\n')
     tearDownClass=classmethod(setup.UltimateCaseSetupTests.tearDownClass.__func__)
     async def asyncSetUp(self):
-        self.pw=await async_playwright().start();self.browser=await self.pw.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
+        self.pw=await async_playwright().start();self.browser=await self.pw.chromium.launch(executable_path=setup.CHROMIUM_EXECUTABLE,headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
         self.context=await self.browser.new_context(viewport={'width':1440,'height':900},reduced_motion='reduce')
         await self.login(self.context);self.page=await self.context.new_page();self.page.set_default_timeout(20000)
         self.errors=[];self.requests=[];self.page.on('pageerror',lambda e:self.errors.append(str(e)))
@@ -80,11 +80,11 @@ class UltimateCertificationTests(unittest.IsolatedAsyncioTestCase):
         await self.page.get_by_role('button',name='Crear Case con este Model',exact=True).click()
         await self.page.locator('.ultimate-foundation[data-ultimate-ready=true] input[name=case_name]').wait_for()
         await self.page.get_by_label('Nombre del Case',exact=True).fill('T11 · Semana desde cero')
-        version=self.page.get_by_label('Model Version',exact=True);await version.locator('option').nth(1).wait_for(state='attached');await version.select_option(index=1)
+        version=self.page.get_by_label('Model Version',exact=True);await version.locator('option').first.wait_for(state='attached');await version.select_option(index=0)
         await self.page.get_by_label('Inicio de planificación',exact=True).fill('2026-11-02');await self.page.get_by_label('Inicio de planificación',exact=True).press('Tab')
         await self.page.get_by_label('Fin de planificación',exact=True).fill('2026-11-08')
         await self.page.get_by_label('Decision Owner inicial (D1 y D2)',exact=True).select_option(setup.ADMIN)
-        await self.page.get_by_role('button',name='Crear Case',exact=True).click();await self.page.locator('[data-graph-ready=true]').wait_for()
+        await self.page.get_by_role('button',name='Crear Decision Case',exact=True).click();await self.page.locator('[data-graph-ready=true]').wait_for()
         cid=parse_qs(urlparse(self.page.url).query)['case_id'][0]
         await expect(self.page.locator('[data-graph-node=logistics_assignment]')).to_have_attribute('data-node-state','DATA_REQUIRED')
         await self.page.get_by_role('button',name='Seleccionar responsable',exact=True).click()
@@ -150,6 +150,12 @@ class UltimateCertificationTests(unittest.IsolatedAsyncioTestCase):
         for key,node in [('d1','logistics_assignment'),('d2','logistics_scheduling')]:
             surfaces.append(('config-'+key,'/app?view=logistics-config&case_id='+cid+'&node_id='+node,'[data-graph-config="'+node+'"]'))
         for size,width,height in SIZES:
+            # Release rendered charts/screenshots between independent viewport
+            # samples while preserving the authenticated fixture context.
+            await self.page.close();self.page=await self.context.new_page()
+            self.page.set_default_timeout(20000)
+            self.page.on('pageerror',lambda e:self.errors.append(str(e)))
+            self.page.on('request',lambda r:self.requests.append({'method':r.method,'path':urlparse(r.url).path}))
             await self.page.set_viewport_size({'width':width,'height':height})
             for name,path,selector in surfaces:
                 await self.go(path,selector);await self.capture(records,name,size,width,height)

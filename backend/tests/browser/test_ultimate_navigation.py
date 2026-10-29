@@ -6,7 +6,7 @@ import test_ultimate_case_setup as t3
 import test_ultimate_case_data as t4
 
 ROOT=Path(__file__).resolve().parents[2];REPO=ROOT.parent
-OUT=Path(os.environ.get('DATION_T5_BROWSER_ARTIFACTS','/workspace/work/dation-t5/browser'))
+OUT=Path(os.environ.get('DATION_T5_BROWSER_ARTIFACTS','/tmp/dation-t5-browser'))
 D1='logistics_assignment';D2='logistics_scheduling'
 
 class UltimateNavigationTests(unittest.IsolatedAsyncioTestCase):
@@ -29,7 +29,7 @@ class UltimateNavigationTests(unittest.IsolatedAsyncioTestCase):
         for k in ['SUPABASE_URL','SUPABASE_SECRET_KEY','SUPABASE_ACCESS_TOKEN','LLM_API_KEY','LLM_BASE_URL','GCP_ACCESS_TOKEN']:env[k]=''
         for k in ['DOCKER_HOST','DOCKER_CONTEXT','DOCKER_TLS','DOCKER_TLS_VERIFY','DOCKER_CERT_PATH']:env.pop(k,None)
         env.update(PYTHONDONTWRITEBYTECODE='1',DOCKER_HOST='unix:///var/run/docker.sock')
-        cls.fixture=subprocess.Popen([str(REPO/'.venv/bin/python'),'-B',str(ROOT/'tests/e2e/ultimate_graph_fixture.py')],cwd=ROOT,env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=cls.fixture_log,text=True)
+        cls.fixture=subprocess.Popen([t3.RUNTIME_PYTHON,'-B',str(ROOT/'tests/e2e/ultimate_graph_fixture.py')],cwd=ROOT,env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=cls.fixture_log,text=True)
         if not select.select([cls.fixture.stdout],[],[],60)[0]:cls.fixture.terminate();cls.fixture.wait(10);raise RuntimeError('T5 fixture startup timeout')
         line=cls.fixture.stdout.readline()
         if not line:raise RuntimeError('T5 fixture failed: '+(OUT/'fixture.log').read_text()[-3000:])
@@ -47,7 +47,7 @@ class UltimateNavigationTests(unittest.IsolatedAsyncioTestCase):
     async def install(self,cid,node=D1,**options):
         session=await self.context.request.post(self.base+'/auth/session',headers={'Origin':self.base});token=(await session.json())['access_token']
         env=os.environ.copy();env['PYTHONPATH']=str(ROOT)
-        child=await asyncio.create_subprocess_exec(str(REPO/'.venv/bin/python'),'-B',str(ROOT/'tests/e2e/ultimate_graph_state.py'),cwd=ROOT,env=env,stdin=asyncio.subprocess.PIPE,stdout=asyncio.subprocess.PIPE,stderr=asyncio.subprocess.PIPE)
+        child=await asyncio.create_subprocess_exec(t3.RUNTIME_PYTHON,'-B',str(ROOT/'tests/e2e/ultimate_graph_state.py'),cwd=ROOT,env=env,stdin=asyncio.subprocess.PIPE,stdout=asyncio.subprocess.PIPE,stderr=asyncio.subprocess.PIPE)
         out,error=await child.communicate(json.dumps({'base':self.base,'token':token,'pg':self.pg,'database':self.database,'case_id':cid,'node_id':node,'options':options}).encode())
         self.assertEqual(child.returncode,0,error.decode());return json.loads(out)['run_id']
     async def test_01_empty_map_data_publish_ready_and_config_d1(self):
@@ -73,7 +73,7 @@ class UltimateNavigationTests(unittest.IsolatedAsyncioTestCase):
         for k in ['DOCKER_CONTEXT','DOCKER_TLS','DOCKER_TLS_VERIFY','DOCKER_CERT_PATH']:env.pop(k,None)
         env.update(DOCKER_HOST='unix:///var/run/docker.sock',PYTHONDONTWRITEBYTECODE='1',PYTHONPATH=str(ROOT))
         log=(OUT/'history-published-fixture.log').open('w')
-        fixture=subprocess.Popen([str(REPO/'.venv/bin/python'),'-B',str(ROOT/'tests/e2e/ultimate_consumer_fixture.py')],cwd=ROOT,env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=log,text=True)
+        fixture=subprocess.Popen([t3.RUNTIME_PYTHON,'-B',str(ROOT/'tests/e2e/ultimate_consumer_fixture.py')],cwd=ROOT,env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=log,text=True)
         try:
             if not await asyncio.to_thread(lambda:select.select([fixture.stdout],[],[],60)[0]):raise RuntimeError('Published history fixture timeout')
             value=json.loads(fixture.stdout.readline());self.base=value['api_url'];await self.login(self.context)

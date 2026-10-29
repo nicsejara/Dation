@@ -25,8 +25,9 @@
 
 /* Initial planning composes the existing controls on one continuous page. */
 .ultimate-planning-model > div,.ultimate-grid > .ultimate-contracts { grid-column:1/-1; min-inline-size:0; }
+.ultimate-planning-model .d-choice:has(>input:disabled) { color:var(--color-text-secondary); }
 .ultimate-contracts,.ultimate-contract { display:grid; gap:var(--space-3); min-inline-size:0; }
-.ultimate-contracts .dispatch-table-wrap { max-inline-size:100%; overflow:auto; }
+.ultimate-contracts .dispatch-table-wrap { max-inline-size:100%; max-block-size:60vh; overflow:auto; scroll-margin-block:var(--space-4); }
 .ultimate-contracts table { width:100%; }
 .ultimate-contracts td { overflow-wrap:anywhere; }
 [data-planning-case] { display:grid; gap:var(--space-4); min-inline-size:0; }
