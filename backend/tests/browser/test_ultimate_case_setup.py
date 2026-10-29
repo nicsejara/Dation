@@ -161,7 +161,7 @@ class UltimateCaseSetupTests(unittest.IsolatedAsyncioTestCase):
         measurements=[]
         for width in [1440,390]:
             await self.page.set_viewport_size({'width':width,'height':1000})
-            first=self.page.locator('.ultimate-foundation header button');await first.focus();count=0
+            first=self.page.locator('.ultimate-foundation header button');await first.scroll_into_view_if_needed();await first.focus();count=0
             while count<80:
                 await self.page.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))')
                 # Viewport scrolling rounds to whole pixels; DOM rectangles retain fractions.

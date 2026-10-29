@@ -1157,7 +1157,9 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(self.requests),count)
 
     async def phase6_open(self,view,node=None):
-        if view in ('inicio','logistics-overview','logistics-data'):
+        if view=='logistics-data':
+            await self.open(view,node)
+        elif view in ('inicio','logistics-overview'):
             await self.page.goto(f'http://127.0.0.1:{self.port}/app?view={view}')
             await self.page.locator('.view.is-active').wait_for()
         else:

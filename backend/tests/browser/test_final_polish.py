@@ -1,5 +1,6 @@
 """Final polish acceptance checks against real assets and isolated API fixtures."""
 import unittest
+from playwright.async_api import expect
 import test_saga3_ui as saga3
 
 WIDTHS = ((1440,900),(1280,800),(1024,768),(768,1024),(375,812),(320,640))
@@ -54,7 +55,7 @@ class FinalPolishTests(unittest.IsolatedAsyncioTestCase):
             await self.page.goto(f'http://127.0.0.1:{self.b.port}/app/ddas/logistics')
             hero=self.page.locator('.dda-landing__hero');await hero.wait_for()
             self.assertEqual(await hero.locator('.dda-landing__emblem').count(),0)
-            self.assertEqual(await hero.locator('h1>span').inner_text(),'con mejor análisis.')
+            await expect(hero.locator('h1>span')).to_have_text('con mejor análisis.')
             self.assertEqual(await hero.locator('.dda-landing__flow-node small').all_inner_texts(),['ENTRADA','INTELIGENCIA','DECISIÓN'])
             self.assertEqual(await hero.get_by_role('button').count(),2)
             self.assertTrue(await hero.get_by_role('button',name='Comenzar',exact=False).is_visible())
