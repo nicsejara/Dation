@@ -35,9 +35,14 @@ async def main():
   async with page.expect_response(lambda response:'/api/platform/onboarding/explore' in response.url and response.status==200):
    await page.locator('#home-open-logistics').click()
   progress=await page.evaluate("async()=>{const {api}=await import('/static/js/dispatch/shared.mjs');return await api('/api/platform/onboarding');}");explored_at=progress['explored_at'];assert explored_at
-  await page.locator('[data-start-new-decision]').click();await page.locator('#dispatch-data-root').get_by_role('button',name='Usar datos de ejemplo',exact=True).click();await page.wait_for_function("window.DationDispatch.getWorkspace().orders?.is_sample&&window.DationDispatch.getWorkspace().fleet?.is_sample")
-  await page.locator('[data-demo-context]').wait_for();assert await page.evaluate('window.dationGetCurrentView()')=='logistics-data'
-  await page.locator('#dispatch-data-root .d-workflow-action-bar button').first.wait_for()
+  caps=await page.evaluate("async()=>{const {api}=await import('/static/js/dispatch/shared.mjs');return await api('/api/platform/ultimate-foundation/capabilities');}")
+  assert not caps['can_create_case']
+  await page.locator('[data-start-new-decision][disabled]').wait_for()
+  assert await page.locator('input[type=file]').count()==0
+  # Seed the supported demo API as fixture data; new planning never opens
+  # the retired upload-first surface or silently converts legacy CSV schemas.
+  demo=await page.evaluate("async()=>{const {post}=await import('/static/js/dispatch/shared.mjs');return await post('/api/platform/onboarding/demo',{});}")
+  assert demo['contains_demo_data']
   await page.locator('.nav [data-platform-view=platform-home]').click();await home.get_by_role('heading',name='Accesos rápidos').wait_for();assert await home.locator('[data-onboarding-step]').count()==0
   await home.get_by_role('link',name='Explorar DDA',exact=True).click();assert urlsplit(page.url).path=='/app';assert await page.evaluate('document.activeElement.id')=='dation-dda-title'
   await page.locator('.nav [data-platform-view=platform-home]').click();await page.reload();await home.get_by_role('heading',name='Accesos rápidos').wait_for();assert await home.locator('.d-onboarding').count()==0

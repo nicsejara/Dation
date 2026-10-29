@@ -64,6 +64,15 @@ async def journey():
             assert not await page.locator('[data-open-decision-map]').is_disabled()
             await ui.checkpoint('overview')
             await page.locator('[data-start-new-decision]').click()
+            await page.locator('[data-ultimate-ready=true]').wait_for()
+            assert await page.locator('input[type=file]').count()==0
+            assert await page.get_by_role('group',name='01 Logistics Model',exact=True).count()==1
+            assert await page.get_by_role('group',name='02 Data Contract',exact=True).count()==1
+            # Continue the historical engine regression on its existing Case.
+            legacy_case=os.environ['DATION_E2E_LEGACY_CASE']
+            await page.goto(base+'/app?view=logistics-data&case_id='+legacy_case)
+            for kind in ('orders','fleet'):
+                await page.locator('[data-kind="'+kind+'"] .dispatch-pro-file-actions .is-danger').click()
             await page.wait_for_selector('[data-kind="orders"] input[type=file]',state='attached')
             next_button=page.locator('.dispatch-pro-next-button')
             await next_button.wait_for(state='visible')
@@ -96,6 +105,7 @@ async def journey():
             # A validated case is durable and selectable before its first run.
             initial=await page.evaluate('window.DationDispatch.getWorkspace().decisionCase')
             assert initial['persisted']
+            assert initial['id']==legacy_case
             persisted=await api_get(context,base+'/api/decision-cases/'+initial['id'])
             assert persisted.status==200,{'status':persisted.status,'body':(await persisted.text())[:2000],'case_id':initial['id']}
             assert (await persisted.json())['decision_case']['inputs']==initial['inputs']
@@ -304,7 +314,8 @@ async def journey():
             assert await page.locator('.dispatch-case-selector').count()==0
             await page.evaluate("window.dationNavigate('logistics-overview')")
             await page.locator('[data-start-new-decision]').click()
-            await page.wait_for_selector('[data-kind="orders"] input[type=file]',state='attached')
+            await page.locator('[data-ultimate-ready=true]').wait_for()
+            assert await page.locator('input[type=file]').count()==0
             workspace=await page.evaluate('window.DationDispatch.getWorkspace()')
             assert all(workspace[key] is None for key in ('orders','decisionCase','run','activeNode'))
             assert 'case_id=' not in page.url
@@ -317,13 +328,13 @@ async def journey():
             report={'passed':True,'source_sha':subprocess.check_output(['git','rev-parse','HEAD'],cwd=Path(__file__).resolve().parents[3],text=True).strip(),
                 'ui':ui.report(),'inicio_to_overview':True,'approval_map_scheduling_configuration':True,
                 'disabled_upload_action_and_hover':True,'shared_workflow_visual_contract':True,
-                'review_keyboard_cancel_and_confirmation':True,'creation_from_files':True,'refresh_during_queue':True,'queued_before_worker_start':True,
+                'review_keyboard_cancel_and_confirmation':True,'legacy_case_rehydration':True,'context_first_entry':True,'refresh_during_queue':True,'queued_before_worker_start':True,
                 'assignment_and_scheduling_approved':True,'cold_link':True,'back_forward_refresh':True,
                 'idle_request_budget':True,'mobile_history':True,'export_has_records':True,
                 'comparative_reused_and_restored':True,'trip_detail_keyboard':True,'direct_next_configuration':True,
                 'comparative_close_reopen_without_post':True,'terminal_scheduling_reconfigured_as_new_run':True,
                 'failed_run_retained_unchanged':True,'map_toolbar_and_closed_contexts':True,
-                'overview_dual_cta_without_cases':True,'overview_single_case_center_to_map':True,
+                'overview_dual_cta_with_existing_case':True,'overview_single_case_center_to_map':True,
                 'new_decision_clears_context_and_preserves_history':True,
                 'javascript_errors':errors,'unexpected_http_errors':failed,
                 'expected_draft_hydration_misses':len(expected_draft_misses),'requests':len(requests)}
