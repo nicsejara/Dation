@@ -1,5 +1,27 @@
 # Domain model
 
+## Current Ultimate concepts
+
+See the [master baseline](MASTER_DEVELOPMENT_BASELINE.md) and
+[current architecture](architecture.md). These concepts coexist with retained
+compatibility contracts:
+
+| Concept | Current meaning / authority |
+|---|---|
+| Logistics Model / version | Versioned operating model, dimensions and policies used by a Case. |
+| Ultimate Decision Case | Operational context tied to model/version, planning horizon, Case policy, graph and owners. |
+| Progressive Data Pack / version | Published, versioned `transport_demand` and `transport_resources` inputs and canonical read-set identity. A Run pins its input version. |
+| D1 / D2 | `logistics_assignment` produces Transport Plan; `logistics_scheduling` produces Day Scheduling from approved D1 without reassigning it. |
+| Result Package | Published `DecisionResultPackageV1`, bound to runtime identity, input/result fingerprints, immutable artifacts and evidence. |
+| Approval Copilot | `decision_context_v1` and published references for explanation; it cannot optimize or approve. |
+
+Preserve the release/workspace/pilot gates. Known schemas do not imply an enabled
+runtime. The following table and preparation rules describe the legacy
+Orders/Fleet contract, including its immutable dataset-pair behavior and future
+D3 placeholder; they do not define an active third Ultimate engine.
+
+## Orders/Fleet compatibility concepts
+
 | Concept | Meaning / authority |
 |---|---|
 | DDA | Decision Data Asset: a repeatable domain decision chain. Logistics is active; future DDAs remain disabled. Registry: `backend/app/static/contracts/foundation-v2.json`. |

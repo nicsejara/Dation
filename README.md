@@ -1,9 +1,14 @@
-# Dation
+# Dation — Decision Intelligence
 
-Dation is an experimental **Decision Intelligence** platform built around
+Dation is a **Decision Intelligence** platform built around
 **Decision Data Assets (DDA)**: repeatable and auditable decision processes
 that combine structured data, deterministic analytics, configurable priorities
 and human validation.
+
+Start with the [master development baseline](docs/MASTER_DEVELOPMENT_BASELINE.md).
+The current `main` is the development source of truth. The
+[repository hygiene report](docs/FINAL_REPOSITORY_HYGIENE_REPORT.md) records branch
+classification, retained unique work and environment cleanup actions.
 
 ## Access and workspaces
 
@@ -11,7 +16,32 @@ The platform uses Supabase Auth (email/password, confirmation and recovery), wor
 
 The backend keeps refresh tokens HttpOnly, validates asymmetric JWTs and scopes service-key queries/RPCs/Storage by workspace. Browser code never receives the service key. Production migrations require the controlled backup/drain/deploy/admissions sequence; do not run them during normal setup.
 
-## Current MVP
+## Current Ultimate MVP
+
+```text
+DATA → ENGINE → RESULT → EVIDENCE → IA → HUMAN APPROVAL
+```
+
+Logistics Models and their versions define the operating context. A Decision Case
+pins its model, progressive Data Pack version and policy. Published inputs feed
+deterministic Runs and immutable Result Packages:
+
+| Decision | Node ID | Engine / version | Result schema |
+|---|---|---|---|
+| D1 · Transport Plan | `logistics_assignment` | `transport_plan` / `2.0.0` | `transport_plan_v1` / 1 |
+| D2 · Day Scheduling | `logistics_scheduling` | `day_scheduling` / `2.0.0` | `day_scheduling_v1` / 1 |
+
+D2 consumes the approved D1 result and preserves its trips, allocations and
+resources. The frontend presents persisted results; the Approval Copilot explains
+published evidence through `decision_context_v1`. Neither recalculates decisions.
+Runtime admission follows the existing SQL release/workspace/pilot gates; a known
+schema or engine identity alone does not establish availability.
+
+`assignment_v1`, `scheduling_v1`, `dispatch_v2`, Orders/Fleet adapters and their
+readers remain compatibility paths. The earlier three-step chain below describes
+that historical implementation, not an additional active Ultimate decision.
+
+### Historical Orders/Fleet chain
 
 The first active domain is **DDA Logística**. Its data layer is now organized as a progressive **Logistics Data Pack**:
 
@@ -35,11 +65,11 @@ Fleet V3 contains **one row per real truck**. There is no user-facing pool conce
 
 Phase 4 activates the second engine in the chain. Assignment 1.0.0 still decides **what vehicle carries what load** without dates. Once a human approves that result, Scheduling 1.0.0 consumes the immutable `scheduling_input_v1` handoff and decides **when each approved trip can run**, respecting ready dates, vehicle availability and non-overlapping round-trip occupancy. Scheduling emits `final_assignment_input_v1` for Decision 03. Dispatch 2.2 remains readable for historical runs.
 
-## Current versions
+## Compatibility versions
 
 - Workspace / API: **1.0.0**
-- Assignment engine: **1.0.0** (`assignment_v1`, trips/cost/own-fleet/CO₂, non-temporal)
-- Scheduling engine: **1.0.0** (`scheduling_v1`, fixed Assignment + temporal sequencing + optional SLA)
+- Legacy Assignment engine: **1.0.0** (`assignment_v1`, non-temporal)
+- Legacy Scheduling engine: **1.0.0** (`scheduling_v1`, fixed Assignment + temporal sequencing)
 - Historical Dispatch engine: **2.2.0** (`dispatch_v2`, temporal) retained for prior runs; engine **0.2.0** also retained
 - Frontend: HTML + CSS + vanilla JavaScript
 - Runtime: Google Cloud Run
@@ -84,13 +114,23 @@ Runtime secrets remain in Google Secret Manager / Cloud Run.
 
 ## Architecture and verification
 
-Start with [the current architecture](docs/architecture.md),
+Current documentation: [master baseline](docs/MASTER_DEVELOPMENT_BASELINE.md),
+[architecture](docs/architecture.md),
 [domain model](docs/domain-model.md), [component map](docs/component-map.md),
 [navigation](docs/navigation.md) and [Decision Runs](docs/decision-runs.md).
 [Foundation stabilization](docs/foundation-refactor-summary.md) records the baseline,
-validation commands, compatibility boundaries and intentionally retained debt.
+validation commands, compatibility boundaries and intentionally retained debt at
+that historical foundation milestone. Execution reports under
+`docs/execution/ultimate/t0` through `t12` are historical evidence; their original
+PASS/HOLD statements describe their recorded commits and are preserved unchanged.
 
-Run Python and Node regressions from `backend/`:
+Normal production delivery is `main → Cloud Build → Artifact Registry → Cloud Run
+worker → Cloud Run API`. GitHub Actions runs CI separately. See
+[deployment](backend/DEPLOYMENT.md). Normal setup does not replay migrations or
+use manual GCP OAuth tokens.
+
+For ordinary changes, run tests for the affected component. The following full
+regression commands are available from `backend/` when their scope is justified:
 
 ```sh
 python -m unittest discover -s tests -v

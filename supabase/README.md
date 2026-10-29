@@ -1,5 +1,48 @@
 # Esquema de aplicación
 
+## CURRENT DOCUMENTATION — Ultimate
+
+El directorio `migrations/` conserva **41 migraciones**, con versiones y contenidos
+distintos, desde `20261001004934_dispatch_v1.sql` hasta
+`20261029040212_ultimate_pilot_cohort.sql`. El orden es el timestamp del nombre;
+no renumerar, combinar, renombrar ni reparar migraciones ya aplicadas.
+
+El arranque y el desarrollo normal no ejecutan SQL productivo. Esta ejecución de
+hygiene revisa archivos, no consulta ni modifica Supabase productivo. El documento
+maestro de la tarea declara el esquema productivo ya migrado; esa declaración no
+se convierte aquí en una nueva certificación del catálogo remoto.
+
+Para reconstrucción aislada o una instalación nueva autorizada, el orden utilizado
+por `backend/tests/e2e/sandbox.py` es: infraestructura de prueba, baseline capturado
+`baseline/20261010100000_public_schema.sql`, y **todas** las migraciones posteriores
+a `20261010100000`, en orden. La infraestructura Auth/Storage de prueba no sustituye
+los servicios administrados de un proyecto real. El baseline no se vuelve a
+aplicar sobre producción existente.
+
+Inventario local de los upgrades posteriores al baseline, sin ejecutar SQL:
+
+```sh
+python - <<'PY'
+from pathlib import Path
+for path in sorted(Path('supabase/migrations').glob('*.sql')):
+    if path.name[:14] > '20261010100000':
+        print(path.name)
+PY
+```
+
+Las migraciones posteriores incluyen Auth/tenancy, plataforma, ownership y Case
+attributes, foundation Ultimate, artifacts, modelos, Data Pack progresivo, grafo,
+publicación de resultados, Day Scheduling, consumidores/Copilot y cohorte de
+piloto. La disponibilidad sigue gobernada por los gates existentes; el hygiene no
+cambia flags, datos, usuarios ni Storage.
+
+Contexto vigente: [master baseline](../docs/MASTER_DEVELOPMENT_BASELINE.md).
+Los apartados siguientes conservan instrucciones históricas de upgrades concretos;
+sus listas parciales de Fases 3–7 no constituyen el orden completo de instalación
+Ultimate ni una instrucción de repetirlas sobre producción.
+
+## HISTORICAL SCHEMA NOTES — Fase 3 y upgrades incrementales
+
 El baseline `baseline/20261010100000_public_schema.sql` captura el catálogo real
 del proyecto `gijiinufjjurgfeehufj` al cierre de la Fase 3 (2026-10-10): siete
 tablas, trece funciones, columnas/defaults, constraints/FKs, índices, triggers,

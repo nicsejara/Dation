@@ -1,5 +1,10 @@
 # Dation Platform MVP v1
 
+> **HISTORICAL EXECUTION EVIDENCE.** Este índice pertenece al roadmap Platform MVP
+> anterior a Ultimate. Sus menciones de «estado actual», Basic y fases pendientes
+> describen aquella entrega. Contexto actual: [master baseline](../MASTER_DEVELOPMENT_BASELINE.md)
+> y [arquitectura](../architecture.md). No ejecutar automáticamente sus fases.
+
 Estado actual: Fases 2–3 publicadas (Auth, tenancy y shell) y Fase 4 implementada (Workspace Home). Consultar el [estado vigente](IMPLEMENTATION_STATUS.md) y el [alcance/gate de Home](12-phase4-workspace-home.md). El resto de este documento conserva la auditoría histórica de Fases 0–1; sus referencias al acceso Basic y siguientes fases describen aquella base, no el estado actual.
 
 Fase 0 auditada y Fase 1 implementada. Fecha de referencia del usuario: 2026-10-17, `America/Buenos_Aires`. El catálogo conserva su timestamp UTC de captura. Base funcional auditada: `22f1187451429c8e98dfcb9874f89b974500cb35` (`main`, PR #72). Fase 0: commit `2f82015`, PR #73 integrada con CI verde. No se implementan fases futuras.
