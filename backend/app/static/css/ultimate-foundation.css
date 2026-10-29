@@ -22,3 +22,13 @@
 .ultimate-entry { margin-block:var(--space-5); padding:var(--space-4); }
 .ultimate-entry .platform-actions { display:flex; flex-wrap:wrap; gap:var(--space-3); }
 @media(max-width:700px) { .ultimate-foundation { padding:var(--space-4); } .ultimate-foundation .ultimate-grid { grid-template-columns:minmax(0,1fr); } .ultimate-foundation .ultimate-section { padding:var(--space-4); } }
+
+/* Initial planning composes the existing controls on one continuous page. */
+.ultimate-planning-model > div,.ultimate-grid > .ultimate-contracts { grid-column:1/-1; min-inline-size:0; }
+.ultimate-contracts,.ultimate-contract { display:grid; gap:var(--space-3); min-inline-size:0; }
+.ultimate-contracts .dispatch-table-wrap { max-inline-size:100%; overflow:auto; }
+.ultimate-contracts table { width:100%; }
+.ultimate-contracts td { overflow-wrap:anywhere; }
+[data-planning-case] { display:grid; gap:var(--space-4); min-inline-size:0; }
+
+.ultimate-case-fields { border:0; margin:0; padding:0; min-inline-size:0; }
