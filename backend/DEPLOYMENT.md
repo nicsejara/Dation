@@ -1,4 +1,64 @@
-# Despliegue de Assignment 1.0.0 + Scheduling 1.0.0
+# Despliegue de Dation Ultimate MVP
+
+## CURRENT DOCUMENTATION
+
+Fuente de desarrollo: `nicsejara/Dation`, `main`. Contexto mínimo:
+[Master Development Baseline](../docs/MASTER_DEVELOPMENT_BASELINE.md).
+
+```text
+GitHub main
+→ Google Cloud Build (Dockerfile raíz)
+→ Artifact Registry
+→ Cloud Run Worker
+→ Cloud Run API
+```
+
+La integración de Cloud Build administra el trigger fuera de este repositorio.
+`.github/workflows/backend-tests.yml` ejecuta CI, no despliega producción. API y
+worker comparten la imagen; la API se publica después del worker. El Dockerfile
+usa Python 3.13, dependencias con hashes y usuario sin privilegios. Incluye
+`sample_data/v3` y `sample_data/onboarding-v1`.
+
+El check de Google Cloud Build de `3e8712962ba7b444f47b44d5afa9887f4c2e4a10`
+confirma el build `609cb976-22f2-4c4b-8d86-e4ccfe8507db`: pasos `Dockerfile`,
+`Push`, `Worker` y `Deploy` exitosos. Esta evidencia identifica ese build; no
+reemplaza la consulta del check del siguiente commit que se publique.
+
+D1 usa `transport_plan` 2.0.0 / `transport_plan_v1`; D2 usa `day_scheduling`
+2.0.0 / `day_scheduling_v1`. Los lectores `assignment_v1`, `scheduling_v1` y
+`dispatch_v2` se conservan para compatibilidad. Los gates SQL de release,
+workspace y piloto siguen siendo la autoridad de admisión.
+
+### Configuración y operación normal
+
+- Runtime: `SUPABASE_URL`, `SUPABASE_SECRET_KEY`, `SUPABASE_INPUT_BUCKET`.
+- Explicación con proveedor real: `LLM_API_KEY` y opciones `LLM_PROVIDER`,
+  `LLM_MODEL`, `LLM_BASE_URL`, según el proveedor configurado.
+- Auth: Supabase Auth y Bearer por usuario; el Basic compartido está retirado.
+  `DATION_ACCESS_PASSWORD` queda como configuración legacy sin uso en Auth actual.
+- Las credenciales productivas permanecen en Secret Manager / Cloud Run.
+- `GCP_ACCESS_TOKEN` y `GCP_ROLLOUT_ACCESS_TOKEN` son credenciales operativas
+  temporales de Codex, no dependencias del pipeline normal.
+- No ejecutar `scripts/deploy_production_phase3.py` para publicar cambios normales.
+  Es una herramienta histórica que depende de un token GCP manual.
+
+El arranque no aplica SQL. Producción existente no debe repetir el baseline ni
+migraciones ya aplicadas. El inventario completo y el orden vigente están en
+[supabase/README.md](../supabase/README.md). Cambios de esquema, flags, IAM,
+backups y operaciones de rollout requieren una tarea con ese alcance.
+
+Para un cambio documental, comprobar enlaces, paths y diff; para un cambio de
+código, ejecutar tests del componente afectado. Tras integrar a `main`, observar
+los checks del SHA exacto. Un commit de hygiene acepta el deployment automático
+habitual; no requiere operaciones GCP manuales adicionales.
+
+## HISTORICAL DEPLOYMENT NOTES — pre-Ultimate
+
+Lo que sigue conserva el runbook incremental anterior de Assignment/Scheduling
+1.0.0. Sus versiones, secuencias SQL y smoke tests describen aquellas fases.
+No ejecutarlos como checklist del estado actual ni como setup normal.
+
+### Despliegue histórico de Assignment 1.0.0 + Scheduling 1.0.0
 
 API esperada: **1.0.0**. Motor Assignment activo: **1.0.0** (`assignment_v1`). Motor Scheduling activo: **1.0.0** (`scheduling_v1`). Motor Dispatch histórico: **2.2.0** (`dispatch_v2`). Motor histórico anterior: **0.2.0**. Runtime: Python **3.13**, OR-Tools **9.15.6755**.
 

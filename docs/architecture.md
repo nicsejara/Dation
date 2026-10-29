@@ -4,6 +4,48 @@ Dation serves native HTML/CSS/ES modules from FastAPI, backed by Supabase Auth,
 tenant-scoped Postgres/Storage and a durable Cloud Run worker. The deterministic
 engines produce immutable results; dashboards and AI explain that evidence.
 
+## Current Ultimate architecture
+
+The [master baseline](MASTER_DEVELOPMENT_BASELINE.md) is the short development
+entrypoint. Current Ultimate execution follows:
+
+```text
+Logistics Model/version + Case policy + published Data Pack version
+  → frozen input context → durable worker → deterministic D1/D2
+  → Result Package + immutable artifacts + evidence
+  → result consumers / decision_context_v1 → human review and approval
+```
+
+D1 is Transport Plan (`logistics_assignment`, `transport_plan_v1`). D2 is Day
+Scheduling (`logistics_scheduling`, `day_scheduling_v1`), preserving approved D1
+trips, allocations and resources. Model versions, read sets, policies and result
+fingerprints remain bound to the admitted Run. Existing SQL release/workspace/pilot
+gates determine actual admission; runtime registry identities alone are not a
+capability declaration.
+
+| Responsibility | Current canonical path under `backend/app/` |
+|---|---|
+| Logistics domain and input contracts | `domain/logistics/`, `models/ultimate_foundation.py`, `models/ultimate_data_pack.py` |
+| Case/Model context and progressive Data Pack | `services/logistics_model_service.py`, `services/case_data_pack_service.py` |
+| Ultimate APIs | `platform/ultimate_routes.py`, `ultimate_data_routes.py`, `ultimate_graph_routes.py` |
+| Admission / worker producer | `services/ultimate_run_service.py`, `results/registry.py` |
+| D1 / D2 | `engines/assignment/transport_plan.py`, `transport_policy_result.py`; `engines/scheduling/day_scheduling.py` |
+| Result Package / artifacts | `services/result_package_service.py`, `result_artifact_service.py`; `results/` |
+| Consumers / reference-bound Copilot | `services/result_consumer_service.py`, `ultimate_decision_context.py` |
+| Case setup / data / graph UI | `static/js/dispatch/cases/ultimate-case-setup.mjs`, `upload/ultimate-case-data.mjs`, `cases/ultimate-decision-map.mjs`, `navigation/ultimate-graph.mjs` |
+| Result UI | `static/js/dispatch/results/` |
+
+Production delivery is `main → Cloud Build → Artifact Registry → Cloud Run worker
+→ Cloud Run API`; GitHub Actions is separate CI. See [deployment](../backend/DEPLOYMENT.md).
+
+## Compatibility architecture
+
+The foundation responsibility map below remains relevant to the retained
+Orders/Fleet, `assignment_v1`, `scheduling_v1` and historical Dispatch paths.
+Its immutable dataset-pair and non-temporal Assignment descriptions belong to
+those contracts. Ultimate uses the versioned model/pack and Result Package flow
+above; do not substitute a legacy payload for a current result schema.
+
 ## Find a responsibility
 
 Paths are relative to `backend/`.
