@@ -43,6 +43,25 @@ async def list_models(ctx,**options):return await call(ctx,'model_list',options)
 async def get_model(ctx,model_id):return await call(ctx,'model_get',{'model_id':str(model_id)})
 
 
+async def preview_contracts(ctx,payload):
+    """Read-only preview using the same compiler as Case ingestion; no new schema store."""
+    from app.domain.logistics.data_contracts import compile_contract,ENTITIES
+    caps=await capabilities(ctx)
+    if not caps.get('enabled') or not caps.get('can_create_case'):
+        raise HTTPException(403,'La configuración inicial no está habilitada para este acceso.')
+    provisional=payload.configuration is not None
+    if provisional:
+        config,hash_=configuration_snapshot(payload.configuration)
+        # Internal compiler identity only, never a published Model/version reference.
+        version={'id':str(uuid5(UUID(int=0),hash_)),'config_jsonb':config,'config_hash':hash_}
+    else:
+        data=await get_model(ctx,payload.model_id)
+        if data['model']['status']!='active':raise HTTPException(409,'El Model está archivado.')
+        version=next((v for v in data['versions'] if v['id']==str(payload.version_id)),None)
+        if version is None:raise HTTPException(404,'La versión publicada no pertenece al Model.')
+    return provisional,{entity:compile_contract(version,entity) for entity in ENTITIES}
+
+
 async def create_model(ctx,payload):
     config,hash_=configuration_snapshot(payload.configuration)
     body=payload.model_dump(mode='json',exclude={'configuration'})

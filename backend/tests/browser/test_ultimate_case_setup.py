@@ -3,6 +3,7 @@ import json
 import os
 from pathlib import Path
 import select
+import shutil
 import subprocess
 import unittest
 from uuid import uuid4
@@ -11,6 +12,8 @@ from playwright.async_api import async_playwright
 
 ROOT=Path(__file__).resolve().parents[2]
 REPO=ROOT.parent
+RUNTIME_PYTHON=os.getenv('DATION_RUNTIME_PYTHON') or (str(REPO/'.venv/bin/python') if (REPO/'.venv/bin/python').exists() else shutil.which('python'))
+CHROMIUM_EXECUTABLE=os.getenv('CHROMIUM_EXECUTABLE') or ('/usr/bin/chromium' if Path('/usr/bin/chromium').exists() else None)
 ADMIN='10000000-0000-4000-8000-000000000001'
 OUT=Path(os.environ.get('DATION_T3_BROWSER_ARTIFACTS','/tmp/dation-t3-browser'))
 CONFIG=dict(version=1,operating_role='SHIPPER',transport_pattern='DIRECT',allowed_sources=['OWN','EXTERNAL'],active_dimensions=['pallets'],primary_dimension='pallets',split_permitted=False,homogeneous_loads_declared=False,currency_policy=dict(currency='ARS',minor_units=2,rounding='ROUND_HALF_UP'),own_cost_model='OWN_OPERATING_CYCLE',external_cost_models=['PER_TRIP','PER_KM'],per_km_billing_bases=['ONE_WAY','ROUND_TRIP'])
@@ -25,7 +28,7 @@ class UltimateCaseSetupTests(unittest.IsolatedAsyncioTestCase):
         for key in ['SUPABASE_URL','SUPABASE_SECRET_KEY','SUPABASE_ACCESS_TOKEN','LLM_API_KEY','LLM_BASE_URL','GCP_ACCESS_TOKEN']:env[key]=''
         for key in ['DOCKER_HOST','DOCKER_CONTEXT','DOCKER_TLS','DOCKER_TLS_VERIFY','DOCKER_CERT_PATH']:env.pop(key,None)
         env.update(PYTHONDONTWRITEBYTECODE='1',DOCKER_HOST='unix:///var/run/docker.sock')
-        cls.fixture=subprocess.Popen([str(REPO/'.venv/bin/python'),'-B',str(ROOT/'tests/e2e/ultimate_setup_fixture.py')],cwd=ROOT,env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=cls.fixture_log,text=True)
+        cls.fixture=subprocess.Popen([RUNTIME_PYTHON,'-B',str(ROOT/'tests/e2e/ultimate_setup_fixture.py')],cwd=ROOT,env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=cls.fixture_log,text=True)
         if not select.select([cls.fixture.stdout],[],[],60)[0]:
             cls.fixture.terminate();cls.fixture.wait(10);raise RuntimeError('Owned W3 API fixture did not become ready')
         line=cls.fixture.stdout.readline()
@@ -40,7 +43,7 @@ class UltimateCaseSetupTests(unittest.IsolatedAsyncioTestCase):
         cls.fixture.stdout.close();cls.fixture_log.close()
         if cls.fixture.returncode:raise AssertionError('W3 fixture cleanup failed')
     async def asyncSetUp(self):
-        self.pw=await async_playwright().start();self.browser=await self.pw.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
+        self.pw=await async_playwright().start();self.browser=await self.pw.chromium.launch(executable_path=CHROMIUM_EXECUTABLE,headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
         self.context=await self.browser.new_context(viewport={'width':1440,'height':1000},reduced_motion='reduce')
         await self.login(self.context)
         self.page=await self.context.new_page();self.page.set_default_timeout(12000)
@@ -84,11 +87,11 @@ class UltimateCaseSetupTests(unittest.IsolatedAsyncioTestCase):
         await self.page.get_by_role('button',name='Crear Case con este Model',exact=True).click()
         await self.page.locator('[data-ultimate-ready="true"] form').wait_for()
         await self.page.get_by_label('Nombre del Case',exact=True).fill('Semana 45 · Operación Buenos Aires')
-        version=self.page.get_by_label('Model Version',exact=True);await version.locator('option').nth(1).wait_for(state='attached');await version.select_option(index=1)
+        version=self.page.get_by_label('Model Version',exact=True);await version.locator('option').first.wait_for(state='attached');await version.select_option(index=0)
         await self.page.get_by_label('Inicio de planificación',exact=True).fill('2026-11-02');await self.page.get_by_label('Inicio de planificación',exact=True).press('Tab')
         await self.page.get_by_label('Fin de planificación',exact=True).fill('2026-11-08')
         await self.page.get_by_label('Decision Owner inicial (D1 y D2)',exact=True).select_option(ADMIN)
-        await self.page.get_by_role('button',name='Crear Case',exact=True).click()
+        await self.page.get_by_role('button',name='Crear Decision Case',exact=True).click()
         await self.page.locator('[data-graph-ready="true"]').wait_for();await self.page.get_by_role('button',name='Contexto del Case',exact=True).click()
         await self.page.get_by_role('button',name='Guardar contexto',exact=True).wait_for();await self.page.get_by_role('heading',name='Contexto guardado',exact=True).wait_for()
         cid=await self.page.evaluate('new URL(location.href).searchParams.get("case_id")');self.assertTrue(cid)
@@ -158,10 +161,11 @@ class UltimateCaseSetupTests(unittest.IsolatedAsyncioTestCase):
         measurements=[]
         for width in [1440,390]:
             await self.page.set_viewport_size({'width':width,'height':1000})
-            first=self.page.locator('.ultimate-foundation header button');await first.focus();count=0
+            first=self.page.locator('.ultimate-foundation header button');await first.scroll_into_view_if_needed();await first.focus();count=0
             while count<80:
                 await self.page.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))')
-                data=await self.page.evaluate('''()=>{const n=document.activeElement,b=n.getBoundingClientRect(),hit=document.elementFromPoint(b.x+b.width/2,b.y+b.height/2),c=getComputedStyle(n);return {inForm:!!n.closest('.ultimate-foundation'),name:n.name||n.textContent.slice(0,60),tag:n.tagName,rect:b.toJSON(),scroll:scrollY,hit:hit?.className,visible:b.top>=0&&b.bottom<=innerHeight,reachable:hit===n||n.contains(hit),outline:parseFloat(c.outlineWidth),label:n.labels?[...n.labels].map(x=>x.textContent).join(''):null}}''')
+                # Viewport scrolling rounds to whole pixels; DOM rectangles retain fractions.
+                data=await self.page.evaluate('''()=>{const n=document.activeElement,b=n.getBoundingClientRect(),hit=document.elementFromPoint(b.x+b.width/2,b.y+b.height/2),c=getComputedStyle(n);return {inForm:!!n.closest('.ultimate-foundation'),name:n.name||n.textContent.slice(0,60),tag:n.tagName,rect:b.toJSON(),scroll:scrollY,hit:hit?.className,visible:b.top>=-1&&b.bottom<=innerHeight+1,reachable:hit===n||n.contains(hit),outline:parseFloat(c.outlineWidth),label:n.labels?[...n.labels].map(x=>x.textContent).join(''):null}}''')
                 if not data['inForm']:break
                 (OUT/'keyboard-focus-latest.json').write_text(json.dumps({'width':width,**data},indent=2))
                 self.assertTrue(data['visible'] and data['reachable'],data)

@@ -52,6 +52,13 @@ export async function mountUltimateGraph(root,{route,navigate,onContext}){
     mountResponsibilitySelector(owner,{caseId:route.caseId,stageKey:node.id,snapshot:data.responsibilities,onSaved:map});
     for(const b of host.querySelectorAll('[data-map-action]'))scope.listen(b,'click',()=>follow(node.primary_action.target));
     const extra=el('div',undefined,'t5-node-extra');
+    if(node.id==='logistics_assignment'){
+     const readiness=el('section',undefined,'d-card t5-context');readiness.setAttribute('aria-label','Preparación de Transport Plan');
+     for(const [slot,label]of [['transport_demand','Órdenes / Demanda'],['transport_resources','Flota / Recursos']])readiness.append(el('p',label+': '+(node.requirements.some(r=>r.slot===slot)?'Pendiente de completar':node.read_set[slot]?'Publicado':'Pendiente'),'d-body'));
+     readiness.append(el('p','Configuración: '+(node.actions.configure.allowed?'Disponible':'Revisá los requisitos del Case'),'d-metadata'),el('p','Decisión: '+graphStateUi(node.node_state).label,'d-metadata'));
+     const dataTarget=()=>navigate('logistics-case-data',{caseId:route.caseId,nodeId:null,runId:null});
+     readiness.append(button('Cargar nuevos datos',dataTarget),button('Reutilizar inputs compatibles',dataTarget));extra.append(readiness);
+    }
     const reasons=node.actions.configure.reasons||[];if(reasons.length)extra.append(el('p',reasons.includes('DATA_OWNER_REQUIRED')?'Asigná un Data Owner activo en este Map.':reasons.includes('DECISION_OWNER_REQUIRED')?'Asigná un Decision Owner activo en este Map.':'Acceso de sólo lectura para esta decisión.','d-metadata'));
     extra.append(button('Historial de '+node.label,()=>history(node,extra,0)));host.append(extra);
     if(index<data.graph.nodes.length-1){const edge=el('div','↓','t5-edge');edge.setAttribute('aria-hidden','true');list.append(edge);}

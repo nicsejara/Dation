@@ -14,6 +14,7 @@ import importlib.util
 from urllib.parse import parse_qs, urlparse
 
 from playwright.async_api import async_playwright, Error as PlaywrightError
+from test_ultimate_case_setup import CONFIG
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = json.loads((Path(__file__).parent / "fixtures.json").read_text())
@@ -184,6 +185,17 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         u = urlparse(request.url)
         path, query, method = u.path, parse_qs(u.query), request.method
         self.requests.append((method, path))
+        if path=='/api/platform/ultimate-foundation/capabilities':
+            enabled=any(d['dda_id']=='logistics' and d['status']=='enabled' for d in self.ddas)
+            await route.fulfill(json={'enabled':enabled,'can_create_case':enabled and self.access_role!='viewer','can_manage_models':enabled and self.access_role=='admin','can_assign':self.access_role=='admin'});return
+        model={'id':'00000000-0000-4000-8000-000000000101','name':'Synthetic published Model','status':'active','description':None,'revision':1}
+        version={'id':'00000000-0000-4000-8000-000000000102','version':1,'config_jsonb':CONFIG}
+        if path=='/api/platform/logistics-models':
+            await route.fulfill(json={'items':[{**model,'versions':[version]}],'total':1});return
+        if path=='/api/platform/logistics-models/'+model['id']:
+            await route.fulfill(json={'model':model,'versions':[version]});return
+        if path=='/api/platform/logistics-models/contract-preview':
+            await route.fulfill(json={'provisional':False,'contracts':{entity:{'fields':[]} for entity in ('transport_demand','transport_resources')}});return
         if path.startswith('/api/platform/decisions/') and path.endswith('/attributes') and method=='PUT':
             cid=path.split('/')[4];body=request.post_data_json
             bundle=self.hydrated() if cid==self.case['id'] else self.other_cases[cid]
@@ -486,6 +498,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
     async def wait_for_app(self):
         # Template controls may exist before boot has loaded the workspace API.
         await self.page.wait_for_function("window.DationDispatch && !document.documentElement.classList.contains('d-session-loading')")
+        await self.page.wait_for_function("Boolean(document.querySelector('[data-start-new-decision]')?.title)")
 
     async def nav(self, view):
         await self.wait_for_app()
@@ -572,12 +585,12 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.case,before)
         self.assertFalse(any(m=='POST' and p=='/api/runs' for m,p in self.requests))
 
-    async def test_new_decision_goes_to_empty_data_without_losing_existing_case(self):
+    async def test_new_decision_goes_to_planning_without_losing_existing_case(self):
         await self.dashboard();before=copy.deepcopy(self.case)
         await self.page.locator('.sidebar .asset-item[data-view=logistics-overview]').click()
         await self.page.locator('[data-start-new-decision]').click()
-        await self.page.wait_for_selector('[data-kind=orders] input[type=file]',state='attached')
-        self.assertIn('view=logistics-data',self.page.url)
+        await self.page.locator('[data-ultimate-ready=true]').wait_for();self.assertEqual(await self.page.locator('input[type=file]').count(),0)
+        self.assertIn('/app/ddas/logistics/case',self.page.url)
         self.assertEqual(await self.page.evaluate('window.DationDispatch.getWorkspace().orders'),None)
         self.assertEqual(self.case,before)
         await self.page.go_back();await self.page.locator('.dda-landing__hero').wait_for()
@@ -656,8 +669,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await center.click();await self.page.locator('[data-platform-decisions] .center-empty').wait_for()
         self.assertEqual(parse_qs(urlparse(self.page.url).query).get('center_dda'),['logistics'])
         self.assertEqual(await self.page.locator('.dispatch-case-selector').count(),0)
-        await self.page.go_back();await start.click();await self.page.locator('[data-kind=orders] input[type=file]').wait_for(state='attached')
-        self.assertIn('view=logistics-data',self.page.url);self.assertEqual(self.execution_bodies,[])
+        await self.page.go_back();await start.click();await self.page.locator('[data-ultimate-ready=true]').wait_for();self.assertEqual(await self.page.locator('input[type=file]').count(),0)
+        self.assertIn('/app/ddas/logistics/case',self.page.url);self.assertEqual(self.execution_bodies,[])
 
     async def test_overview_map_with_active_case_and_multiple_cases_uses_existing_selector(self):
         other=self.second_case();await self.open();await self.nav('logistics-overview')
@@ -694,11 +707,11 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.page.evaluate('''()=>{const start=window.DationDispatch.startNewDecision;window.__starts=0;
           window.DationDispatch.startNewDecision=()=>{window.__starts++;return start();};}''')
         await self.page.locator('[data-start-new-decision]').click()
-        await self.page.locator('[data-kind=orders] input[type=file]').wait_for(state='attached')
+        await self.page.locator('[data-ultimate-ready=true]').wait_for();self.assertEqual(await self.page.locator('input[type=file]').count(),0)
         state=await self.page.evaluate('window.DationDispatch.getWorkspace()')
         self.assertEqual(await self.page.evaluate('window.__starts'),1)
         for key in ('orders','decisionCase','run','activeNode'):self.assertIsNone(state[key])
-        self.assertNotIn('case_id=',self.page.url);self.assertIn('view=logistics-data',self.page.url)
+        self.assertNotIn('case_id=',self.page.url);self.assertIn('/app/ddas/logistics/case',self.page.url)
         self.assertEqual(self.case,before)
         self.assertFalse(any(m=='POST' and p=='/api/runs' for m,p in self.requests))
         drafts=await self.page.evaluate("JSON.parse(sessionStorage.getItem('dation.dispatch.drafts.v1'))")
@@ -1144,7 +1157,9 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(self.requests),count)
 
     async def phase6_open(self,view,node=None):
-        if view in ('inicio','logistics-overview','logistics-data'):
+        if view=='logistics-data':
+            await self.open(view,node)
+        elif view in ('inicio','logistics-overview'):
             await self.page.goto(f'http://127.0.0.1:{self.port}/app?view={view}')
             await self.page.locator('.view.is-active').wait_for()
         else:
@@ -1905,7 +1920,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                               ("logistics-map",None),("logistics-config","logistics_scheduling"),
                               ("logistics-config","logistics_assignment")):
                 if view in ("inicio","logistics-overview","logistics-data"):
-                    await self.page.goto(f"http://127.0.0.1:{self.port}/app?view={view}")
+                    await self.page.goto(f"http://127.0.0.1:{self.port}/app?view={view}"+("&case_id="+self.case["id"] if view=="logistics-data" else ""))
                 else:
                     await self.open(view,node)
                 hero=self.page.locator(".view.is-active .platform-home__header" if view=="inicio" else ".view.is-active .d-page-hero")
@@ -1949,6 +1964,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.page.goto(f"http://127.0.0.1:{self.port}/app?view=logistics-overview")
         primary=self.page.locator("[data-start-new-decision]")
         await primary.wait_for(state="visible")
+        await self.wait_for_app()
         await self.page.mouse.move(0,0)
         await primary.focus()
         self.assertTrue(await primary.evaluate("el=>el.matches(':focus-visible')"))
@@ -2010,7 +2026,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             await self.page.set_viewport_size({"width": width, "height": 844})
             for view in ("inicio", "logistics-overview"):
                 with self.subTest(width=width, view=view):
-                    await self.page.goto(f"http://127.0.0.1:{self.port}/app?view={view}")
+                    await self.page.goto(f"http://127.0.0.1:{self.port}/app?view={view}"+("&case_id="+self.case["id"] if view=="logistics-data" else ""))
                     await self.page.locator(".view.is-active h1").wait_for(state="visible")
                     await self.page.locator(".view.is-active").evaluate("el=>el.scrollIntoView({block:'start',behavior:'instant'})")
                     metrics = await self.page.evaluate(audit)
@@ -2262,6 +2278,17 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             await card.locator("[data-mode=reuse]").click()
             await card.get_by_role("button", name="Usar esta carga", exact=True).click()
 
+    async def open_legacy_data(self, empty=False):
+        # Historical uploads remain Case-bound. A bare data URL starts Saga 01.
+        if empty:
+            self.f['case_row']['attributes_applied_at']=None
+            self.workflows[self.case['id']]=self.workflow_fixture(self.case['id'],prepared=False)
+        await self.open('logistics-data')
+        if empty:
+            for kind in ('orders','fleet'):
+                await self.page.locator(f'[data-kind={kind}] .dispatch-pro-file-actions .is-danger').click()
+            await self.page.locator('[data-kind=fleet] .dispatch-pro-dropzone').wait_for()
+
     async def assign_data_responsible(self):
         form=self.page.locator('[data-case-identity]')
         if not await form.get_by_label('Nombre del Case',exact=True).input_value():
@@ -2280,7 +2307,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.page.add_init_script("sessionStorage.clear()")
         for width in (1440, 1280, 1024, 768, 390):
             await self.page.set_viewport_size({"width": width, "height": 844})
-            await self.page.goto(f"http://127.0.0.1:{self.port}/app?view=logistics-data")
+            await self.open_legacy_data(empty=True)
             await self.page.locator("[data-kind=fleet] .dispatch-pro-dropzone").wait_for(state="visible")
             bar = self.page.locator(".d-workflow-action-bar")
             self.assertEqual(await bar.count(), 1)
@@ -2313,13 +2340,14 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                     await last.focus()
                     control, footer = await last.bounding_box(), await bar.bounding_box()
                     self.assertLessEqual(control["y"] + control["height"], footer["y"])
-            self.assertGreaterEqual(self.requests.count(("POST", "/api/decision-cases")),1)
+            self.assertEqual(self.requests.count(("POST", "/api/decision-cases")),0)
+            self.assertEqual(await self.page.evaluate('window.DationDispatch.getWorkspace().decisionCase.id'),self.case['id'])
         self.assertEqual(self.execution_bodies, [])
 
     async def test_data_pack_invalid_file_focus_busy_cancel_and_service_unavailable(self):
         audit = (Path(__file__).parent / "theme_audit.js").read_text()
         await self.page.emulate_media(reduced_motion="reduce")
-        await self.page.goto(f"http://127.0.0.1:{self.port}/app?view=logistics-data")
+        await self.open_legacy_data(empty=True)
         file = self.page.locator("[data-kind=orders] input[type=file]")
         await file.wait_for(state="attached")
         await file.set_input_files({"name":"bad.txt", "mimeType":"text/plain", "buffer":b"bad"})
@@ -2369,7 +2397,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         profile["counts"]["warnings"] = 1
         profile["warnings"] = [{"code":"EXTRA_COLUMN", "message":"Columna opcional adicional"}]
         await self.page.emulate_media(reduced_motion="reduce")
-        await self.page.goto(f"http://127.0.0.1:{self.port}/app?view=logistics-data")
+        await self.open_legacy_data(empty=True)
         await self.page.locator("[data-kind=fleet] input[type=file]").wait_for(state="attached")
         await self.upload_reuse_pair()
         await self.page.locator(".d-workflow-action-bar[data-state=error]").wait_for(state="visible")
@@ -2395,7 +2423,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(await drawer.get_attribute("aria-labelledby"), "dispatch-previous-title")
         await self.page.keyboard.press("Escape")
         self.assertTrue(await fleet.locator(".dispatch-pro-view-all").evaluate("el=>el===document.activeElement"))
-        self.assertEqual(self.requests.count(("POST", "/api/decision-cases")),1)
+        self.assertEqual(self.requests.count(("POST", "/api/decision-cases")),0)
+        self.assertEqual(await self.page.evaluate('window.DationDispatch.getWorkspace().decisionCase.id'),self.case['id'])
 
     async def test_data_pack_context_is_dark_with_native_disclosure_in_map_and_configs(self):
         audit = (Path(__file__).parent / "theme_audit.js").read_text()
@@ -2559,24 +2588,23 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.open_legacy_case_picker();self.assertIn('No pudimos cargar los casos.',await dialog.inner_text());self.assertEqual(self.page.url,url)
         await self.page.keyboard.press('Escape');self.assertTrue(await self.page.locator('[data-config-context] summary').evaluate('el=>el===document.activeElement'))
 
-    async def test_case_ux_first_pack_is_persisted_before_execution_without_transition_notice(self):
+    async def test_existing_legacy_pack_is_persisted_before_execution_without_transition_notice(self):
         await self.mock_recent_case_switcher()
-        await self.page.goto(f'http://127.0.0.1:{self.port}/app?view=logistics-data')
+        await self.open_legacy_data()
         await self.page.wait_for_function('Boolean(window.DationDispatch)')
-        await self.page.evaluate('inputs=>window.DationDispatch.startNewDecision(inputs)',list(self.f['datasets'].values()))
         root=self.page.locator('#dispatch-data-root')
         await root.locator('[data-workflow-responsibility]').wait_for()
         self.assertEqual(self.requests.count(('POST','/api/decision-cases')),0)
-        await self.assign_data_responsible()
+        self.assertEqual(await self.page.evaluate('window.DationDispatch.getWorkspace().decisionCase.id'),self.case['id'])
         cid=await self.page.evaluate('window.DationDispatch.getWorkspace().decisionCase.id')
         await root.get_by_role('button',name='Seleccioná tu decisión',exact=True).click()
-        await self.page.locator('[data-config-context]').wait_for()
+        await self.page.locator('[data-map-node=logistics_assignment]').first.wait_for()
         state=await self.page.evaluate('window.DationDispatch.getWorkspace()')
         self.assertTrue(state['decisionCase']['persisted'])
         self.assertEqual(state['decisionCase']['id'],cid)
         self.assertIn('case_id='+cid,self.page.url)
         self.assertEqual(await self.page.locator('[data-case-transition]').count(),0)
-        self.assertEqual(self.requests.count(('POST','/api/decision-cases')),1)
+        self.assertEqual(self.requests.count(('POST','/api/decision-cases')),0)
         self.assertEqual(self.execution_bodies,[])
         await self.open_legacy_case_picker()
         self.assertEqual(await self.page.locator('.dispatch-case-selector .is-current').count(),1)

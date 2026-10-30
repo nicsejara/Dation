@@ -152,9 +152,11 @@ class WorkflowContextTests(unittest.IsolatedAsyncioTestCase):
         await self.page.get_by_role('button',name='Guardar contraseña',exact=True).click();await self.page.wait_for_url('**/login?password=updated')
         await self.page.get_by_role('status').get_by_text('Tu contraseña fue actualizada.',exact=False).wait_for()
 
-    async def test_data_gate_registers_only_on_assignment_and_opens_the_same_case_map(self):
-        await self.page.goto(f'http://127.0.0.1:{self.b.port}/app?view=logistics-data');await self.b.wait_for_app()
-        await self.page.evaluate('inputs=>window.DationDispatch.startNewDecision(inputs)',list(self.b.f['datasets'].values()))
+    async def test_existing_legacy_data_gate_applies_owner_and_opens_the_same_case_map(self):
+        self.b.f['case_row']['attributes_applied_at']=None
+        self.snapshot['attributes_applied']=False
+        self.snapshot['stages']['data_owner'].update(owner=None,owner_eligible=False)
+        await self.b.open('logistics-data');await self.b.wait_for_app()
         root=self.page.locator('#dispatch-data-root');await root.locator('[data-case-identity]').wait_for()
         next_button=root.get_by_role('button',name='Seleccioná tu decisión',exact=True)
         self.assertTrue(await next_button.is_disabled())
@@ -162,7 +164,7 @@ class WorkflowContextTests(unittest.IsolatedAsyncioTestCase):
         await self.b.assign_data_responsible()
         await self.page.wait_for_function("!document.querySelector('#dispatch-data-root .d-workflow-action-bar button').disabled")
         self.assertEqual(self.people_queries[0]['responsibility'],['data_owner'])
-        self.assertEqual(sum(method=='POST' and path=='/api/decision-cases' for method,path in self.b.requests),1)
+        self.assertEqual(sum(method=='POST' and path=='/api/decision-cases' for method,path in self.b.requests),0)
         self.assertEqual(len(self.attribute_requests),1)
         cid=await self.page.evaluate('window.DationDispatch.getWorkspace().decisionCase.id')
         await next_button.click();await self.page.locator('[data-map-node=logistics_assignment]').first.wait_for()
@@ -190,10 +192,12 @@ class WorkflowContextTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(set(writes[0]['business_roles']),{'data_owner','decision_owner'})
         self.assertNotIn('business_role',writes[0]);self.assertEqual(writes[0]['expected_updated_at'],'2026-10-21T00:00:00Z')
 
-    async def test_operator_registers_a_pending_data_case_and_refreshes_admin_assignment(self):
+    async def test_operator_applies_existing_legacy_context_and_refreshes_admin_assignment(self):
         self.b.access_role='operator';self.snapshot['can_assign']=False
-        await self.page.goto(f'http://127.0.0.1:{self.b.port}/app?view=logistics-data');await self.b.wait_for_app()
-        await self.page.evaluate('inputs=>window.DationDispatch.startNewDecision(inputs)',list(self.b.f['datasets'].values()))
+        self.b.f['case_row']['attributes_applied_at']=None
+        self.snapshot['attributes_applied']=False
+        self.snapshot['stages']['data_owner'].update(owner=None,owner_eligible=False)
+        await self.b.open('logistics-data');await self.b.wait_for_app()
         form=self.page.locator('[data-case-identity]');await form.wait_for()
         self.assertEqual(await form.get_by_label('Data Owner',exact=True).count(),0)
         await form.get_by_label('Nombre del Case',exact=True).fill('SEMANA 43')
@@ -201,7 +205,7 @@ class WorkflowContextTests(unittest.IsolatedAsyncioTestCase):
         await form.get_by_role('button',name='Aplicar',exact=True).click()
         await form.get_by_text('Atributos y Data Owner aplicados.',exact=True).wait_for()
         cid=await self.page.evaluate('window.DationDispatch.getWorkspace().decisionCase.id')
-        self.assertEqual(sum(m=='POST' and p=='/api/decision-cases' for m,p in self.b.requests),1)
+        self.assertEqual(sum(m=='POST' and p=='/api/decision-cases' for m,p in self.b.requests),0)
         self.assertTrue(await self.page.locator('.d-workflow-action-bar button').is_disabled())
         self.b.workflows[cid]['stages']['data_owner'].update(owner=self.person,owner_eligible=True)
         await self.page.reload();await self.b.wait_for_app();await form.wait_for()
@@ -271,8 +275,11 @@ class WorkflowContextTests(unittest.IsolatedAsyncioTestCase):
             await self.page.get_by_text('Tu rol permite consultar, pero no ejecutar decisiones.',exact=True).first.wait_for()
         self.assertEqual(self.b.execution_bodies,[])
 
-    async def test_data_roles_exist_before_csv_and_stay_below_compatibility(self):
-        await self.page.goto(f'http://127.0.0.1:{self.b.port}/app?view=logistics-data')
+    async def test_existing_legacy_data_roles_remain_in_case_identity(self):
+        self.b.f['case_row']['attributes_applied_at']=None
+        self.snapshot['attributes_applied']=False
+        self.snapshot['stages']['data_owner'].update(owner=None,owner_eligible=False)
+        await self.b.open('logistics-data')
         form=self.page.locator('[data-case-identity]');owner=form.get_by_label('Data Owner',exact=True)
         await owner.locator('option[value="'+self.person['id']+'"]').wait_for(state='attached')
         self.assertEqual(await self.page.locator('[data-workflow-responsibility=data_owner]').count(),1)
@@ -285,10 +292,12 @@ class WorkflowContextTests(unittest.IsolatedAsyncioTestCase):
         await form.get_by_role('button',name='Aplicar',exact=True).click()
         await form.get_by_text('Atributos y Data Owner aplicados.',exact=True).wait_for()
         self.assertEqual(sum(m=='POST' and p=='/api/decision-cases' for m,p in self.b.requests),0)
-        self.assertTrue(await self.page.locator('.d-workflow-action-bar button').is_disabled())
-        await self.b.upload_reuse_pair()
+        self.assertFalse(await self.page.locator('.d-workflow-action-bar button').is_disabled())
+        await self.page.reload();await form.wait_for()
+        await owner.locator('option[value="'+self.person['id']+'"]').wait_for(state='attached')
+        self.assertEqual(await owner.input_value(),self.person['id'])
         await self.page.wait_for_function("document.querySelector('#dispatch-data-root .d-workflow-action-bar button')?.disabled===false")
-        self.assertEqual(sum(m=='POST' and p=='/api/decision-cases' for m,p in self.b.requests),1)
+        self.assertEqual(sum(m=='POST' and p=='/api/decision-cases' for m,p in self.b.requests),0)
         self.assertEqual(len(self.attribute_requests),1)
 
     async def test_dda_navigation_resolves_canonical_runs_without_losing_context(self):

@@ -25,8 +25,7 @@ async def main():
   await page.locator('[data-platform-decisions] .center-drawer:visible').get_by_role('heading',name='Cadena de decisiones').wait_for()
   assert 'center_case_id='+os.environ['DATION_HUB_CASE'] in page.url
   await page.go_back();await root.get_by_role('heading',name='Información del dataset',exact=True).wait_for()
-  await page.evaluate("window.dationNavigate('logistics-overview')")
-  await page.locator('[data-start-new-decision]').click()
+  await page.evaluate("id=>window.DationDispatch.openCase(id,'logistics-data')",os.environ['DATION_HUB_CASE'])
   await page.locator('[data-kind=orders] input[type=file]').set_input_files(str(INPUT))
   await page.wait_for_function("window.DationDispatch.getWorkspace().orders?.original_filename==='datos ñ.csv'")
   dataset=await page.evaluate('window.DationDispatch.getWorkspace().orders.id')
