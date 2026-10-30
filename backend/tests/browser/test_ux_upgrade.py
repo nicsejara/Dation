@@ -167,8 +167,20 @@ class UXUpgradeTests(unittest.IsolatedAsyncioTestCase):
             if status == 401:
                 await expect(incoming).to_be_hidden()
             else:
-                await expect(incoming).to_contain_text('administrador' if status == 403 else 'guardado')
-                text = await incoming.inner_text()
+                expected = 'administrador' if status == 403 else 'guardado'
+                # Keep the same completed, visible render for every assertion;
+                # Team can replace its incoming node during initial mounting.
+                observed = await self.page.wait_for_function("""expected => {
+                    const incoming = document.querySelector('.team-incoming');
+                    const team = incoming?.closest('[data-platform-team]');
+                    if (!incoming || team?.hasAttribute('aria-busy') ||
+                        incoming.hasAttribute('aria-busy') || incoming.hidden ||
+                        !incoming.getClientRects().length ||
+                        getComputedStyle(incoming).visibility !== 'visible') return false;
+                    const text = incoming.innerText;
+                    return text.includes(expected) ? text : false;
+                }""", arg=expected)
+                text = await observed.json_value()
                 self.assertNotIn('JSON', text)
                 self.assertNotIn('Unexpected', text)
                 self.assertNotIn('<html>', text)
