@@ -2959,6 +2959,13 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         for width in (1440,1280,1024,768,390):
             await self.page.set_viewport_size({'width':width,'height':1000})
             await self.page.emulate_media(reduced_motion='reduce' if width==390 else 'no-preference')
+            # The floating bar inherits measurements published by the live
+            # view's resize handler; wait for this viewport before probing it.
+            await self.page.wait_for_function('''()=>{
+                const root=document.querySelector('#dispatch-data-root'),r=root.getBoundingClientRect(),s=getComputedStyle(root);
+                return r.width>0&&parseFloat(s.getPropertyValue('--workflow-bar-width'))===r.width
+                    &&parseFloat(s.getPropertyValue('--workflow-bar-left'))===r.left;
+            }''')
             result=await self.page.evaluate('''async()=>{
                 const {createWorkflowActionBar}=await import('/static/js/dispatch/workflow-action-bar.mjs');
                 let continued=0,corrected=0;
@@ -2990,14 +2997,18 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                 button.focus();
                 const focused=document.activeElement===button;
                 const fits=bar.getBoundingClientRect().right<=innerWidth;
+                const root=document.querySelector('#dispatch-data-root');
+                const geometry={bar:bar.getBoundingClientRect().toJSON(),root:root.getBoundingClientRect().toJSON(),
+                    layoutWidth:getComputedStyle(root).getPropertyValue('--workflow-bar-width'),
+                    layoutLeft:getComputedStyle(root).getPropertyValue('--workflow-bar-left'),viewport:innerWidth};
                 bar.remove();
-                return {snapshots,continued,corrected,wrapsWithoutClipping,focused,fits};
+                return {snapshots,continued,corrected,wrapsWithoutClipping,focused,fits,geometry};
             }''')
             self.assertEqual(result['continued'],2)
             self.assertEqual(result['corrected'],1)
             self.assertTrue(result['wrapsWithoutClipping'])
             self.assertTrue(result['focused'])
-            self.assertTrue(result['fits'])
+            self.assertTrue(result['fits'],result['geometry'])
             self.assertEqual([s['disabled'] for s in result['snapshots']],[True,False,True,False,False])
             self.assertEqual([s['busy'] for s in result['snapshots']],['false','false','true','false','false'])
             self.assertFalse(result['snapshots'][3]['primary'],'Corrective actions keep their secondary role')

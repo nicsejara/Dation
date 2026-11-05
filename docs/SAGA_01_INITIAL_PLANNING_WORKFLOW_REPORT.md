@@ -274,6 +274,31 @@ python tests/e2e/run_suite.py
 DATION_T11_R_IMAGE=dation-ci-compatibility:test python tests/e2e/run_suite.py --module test_ultimate_scale
 ```
 
+Run [41970234194](https://github.com/nicsejara/Dation/actions/runs/41970234194)
+at `617d578` again passed 693 Python and 153 Node tests, but found a different
+browser race in `test_workflow_primitives_preserve_action_identity_states_and_token_overrides`.
+Its strict viewport-fit assertion failed; image, SQL and E2E were consequently
+skipped. The failure reproduced locally, including three failures in five
+diagnostic repetitions. At a 1280 px viewport the root was 984 px wide, while
+its inherited `--workflow-bar-width` still held 1144 px from the previous
+1440 px viewport. The test had measured before the live resize handler's update.
+
+The test now waits until the root's published width and left position exactly
+match its current bounding rectangle before constructing the primitive probe.
+The original strict fit, clipping, action identity, sizing, state and token
+assertions remain intact; geometry is included in future failure diagnostics.
+No product CSS or layout implementation changed.
+After the correction, five consecutive executions of the failing method and
+the two adjacent bar-sizing/progressive-action tests passed: seven executions
+of three methods in 89.482 seconds. The focused command is:
+
+```sh
+PYTHONPATH=tests/browser .browser-venv/bin/python -m unittest \
+  test_navigation.NavigationTests.test_workflow_primitives_preserve_action_identity_states_and_token_overrides \
+  test_navigation.NavigationTests.test_workflow_bars_equalize_context_and_keep_a_wider_primary_action \
+  test_navigation.NavigationTests.test_workflow_progressive_actions_share_styles_arrow_and_keyboard_focus -v
+```
+
 Current full validation and the integrated SHA are
 authoritative in [PR #103 checks](https://github.com/nicsejara/Dation/pull/103/checks).
 Merge remains conditional on all required checks and repository protections.
