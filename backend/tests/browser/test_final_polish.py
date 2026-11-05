@@ -185,6 +185,7 @@ class FinalPolishTests(unittest.IsolatedAsyncioTestCase):
     async def test_final_polish_stress_at_data_boundary_with_dev_only_toggle(self):
         import copy,json,os
         from pathlib import Path
+        from urllib.parse import parse_qs,urlsplit
         fixture=json.loads((Path(__file__).parent/'fixtures/final-polish-stress.json').read_text())
         original=copy.deepcopy(self.b.runs)
         async def mode_changed(mode):
@@ -201,9 +202,16 @@ class FinalPolishTests(unittest.IsolatedAsyncioTestCase):
                 self.b.chat_history=[{'id':'stress-message','role':'assistant','content':text}]
         await self.page.expose_function('uxStressSetMode',mode_changed)
         await self.b.context.add_init_script((Path(__file__).parent/'fixtures/ux-upgrade-stress-toggle.js').read_text())
+        async def select_mode(label,mode,kind):
+            await self.page.get_by_role('button',name=label,exact=True).click()
+            # The QA control awaits its Python binding before location.assign.
+            # Finish that navigation before inspecting or opening another Run.
+            await self.page.wait_for_url(lambda url:parse_qs(urlsplit(url).query).get('ux_stress')==[mode])
+            await self.b.wait_for_app()
+            await self.page.locator('.assignment-dashboard-v2' if kind=='assignment' else '.dispatch-scheduling-dashboard').wait_for()
         for kind in ('assignment','scheduling'):
             await self.b.open('decision-dashboard','logistics_'+kind,self.b.f['ids'][kind])
-            await self.page.get_by_role('button',name='Worst case',exact=True).click()
+            await select_mode('Worst case','worst',kind)
             for width,height in WIDTHS:
                 await self.page.set_viewport_size({'width':width,'height':height})
                 await self.page.locator('.decision-intelligence').wait_for()
@@ -222,5 +230,5 @@ class FinalPolishTests(unittest.IsolatedAsyncioTestCase):
                     await self.page.screenshot(path=str(Path(directory)/f'polish-{kind}-{width}-worst.png'))
                 await self.page.keyboard.press('Escape')
                 await self.page.locator('[data-ai-collapse]').click()
-            await self.page.get_by_role('button',name='Demo data',exact=True).click()
+            await select_mode('Demo data','demo',kind)
         self.assertEqual(self.b.execution_bodies,[])

@@ -1,6 +1,11 @@
 # Saga 01 — Initial Planning Workflow
 
-Status: **READY TO INTEGRATE**.
+Status: **IMPLEMENTATION COMPLETE — NOT DEPLOYED**.
+
+Integration and current required-check status are tracked in
+[PR #103](https://github.com/nicsejara/Dation/pull/103).
+GCP Billing for `dation-510100` is intentionally disabled; production is not
+updated or validated by this report.
 
 Base: `nicsejara/Dation`, `main` at
 `3e8712962ba7b444f47b44d5afa9887f4c2e4a10`.
@@ -112,7 +117,9 @@ Case/node/Run identity. D2 retains its approved-D1 dependency.
 
 ## 7. Validation
 
-All final focal checks passed; no tests were skipped.
+The following records implementation-time focal checks, not the final complete
+CI result. All of those focal checks passed; no tests were skipped. The resume
+validation and deployment hold are recorded in section 11 and the PR checks.
 
 | Check / command from `backend/` | Result |
 |---|---|
@@ -163,4 +170,46 @@ Supabase operations, token changes or manual deployment were performed.
 
 ## 10. Final status
 
-**READY TO INTEGRATE**.
+**IMPLEMENTATION COMPLETE — NOT DEPLOYED**.
+
+## 11. CI resumption and deployment hold — 2026-11-05
+
+At resumption, PR #103 was open and mergeable at
+`a97b5ac9e667dc581443549765c33f1e270ef675`, with the same `main` base recorded
+above. The latest run, [40978859262](https://github.com/nicsejara/Dation/actions/runs/40978859262),
+passed the automated stage but failed one of 298 browser tests:
+`test_final_polish_stress_at_data_boundary_with_dev_only_toggle`, with
+`Page.goto: net::ERR_ABORTED` while opening D2. PostgreSQL and E2E were skipped;
+the original 65 focal checks were not a substitute for these missing gates.
+
+The QA-only toggle awaits a Python binding and then calls `location.assign`.
+The test previously continued directly into another dashboard navigation. It
+now waits for the requested `ux_stress` URL, application readiness and the
+matching D1/D2 dashboard after each mode change. No exception is suppressed,
+business assertion relaxed or arbitrary delay added. The unmodified focal test
+passed locally once, so the intermittent CI abort was not reproduced locally;
+the correction follows its exact failed call sequence and fixture source.
+
+On resumption, the complete `test_final_polish` file passed (9 tests), as did
+the frontend/landing/Saga contract suites (38 tests), the three focused Node
+navigation contracts and all eight Saga 01 browser scenarios over owned
+API/SQL/Storage fixtures. These are 58 focal checks, not a completed full CI.
+
+Reproduction commands from `backend/`:
+
+```sh
+PYTHONPATH=tests/browser .browser-venv/bin/python -m unittest test_final_polish -v
+PYTHONPATH=tests ../.venv/bin/python -m unittest test_frontend_contract test_landing_navigation_contract test_saga01_planning -v
+node --test tests/test_ultimate_case_navigation.mjs tests/test_ultimate_data_navigation.mjs tests/test_ultimate_graph_navigation.mjs
+PYTHONPATH=tests/browser .browser-venv/bin/python -m unittest test_saga01_planning -v
+```
+
+Current full validation and the integrated SHA are
+authoritative in [PR #103 checks](https://github.com/nicsejara/Dation/pull/103/checks).
+Merge remains conditional on all required checks and repository protections.
+
+No Billing activation, manual Cloud Build, Artifact Registry publication,
+Cloud Run deployment/configuration change or production test is authorized or
+performed. An automatic GCP trigger caused by a merge must be reported
+separately; a Billing failure must not be retried or hidden. Supabase production
+is untouched. Scale-to-zero infrastructure changes belong to a separate saga.
