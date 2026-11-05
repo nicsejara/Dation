@@ -47,7 +47,15 @@ async def main():
   await root.locator('[data-dataset-open="'+dataset+'"]').click()
   await root.get_by_role('heading',name='Información del dataset',exact=True).wait_for()
   for width in (1440,1280,1024,768,390):
-   await page.set_viewport_size({'width':width,'height':1000});await page.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))')
+   await page.set_viewport_size({'width':width,'height':1000})
+   # Viewport metrics can update before the table's responsive styles apply.
+   # Synchronize the CSS mode, then independently audit actual page overflow.
+   await page.wait_for_function('''width=>{
+    const table=document.querySelector('[data-platform-data] .hub-table');
+    const style=table&&getComputedStyle(table),mobile=width<768;
+    return innerWidth===width&&matchMedia('(width: '+width+'px)').matches
+     &&style?.display===(mobile?'block':'table')&&(!mobile||style.minWidth==='0px');
+   }''',arg=width)
    probe=await page.evaluate(theme)
    if (probe['overflow'] or probe['failures']) and artifacts:
     geometry=await page.evaluate('''() => {
@@ -55,7 +63,9 @@ async def main():
       tag:el.tagName,classes:typeof el.className==='string'?el.className:'',
       x:r.x,right:r.right,width:r.width,scrollWidth:el.scrollWidth,clientWidth:el.clientWidth,
       overflowX:s.overflowX,position:s.position,minWidth:s.minWidth,display:s.display};};
-     return {innerWidth,documentWidth:document.documentElement.scrollWidth,
+     return {innerWidth,clientWidth:document.documentElement.clientWidth,
+      visualWidth:visualViewport.width,documentWidth:document.documentElement.scrollWidth,
+      mobile:matchMedia('(max-width:767px)').matches,wide:matchMedia('(min-width:1100px)').matches,
       activeElement:document.activeElement?.outerHTML.slice(0,300),
       hub:[...document.querySelectorAll('.hub-layout,.hub-portfolio,.hub-drawer,.hub-drawer__body,.hub-table-scroll,.hub-table,.hub-kpis,.hub-search')].map(rect),
       outside:[...document.querySelectorAll('body *')].filter(el=>{
@@ -115,7 +125,19 @@ async def main():
   await mutate('Eliminar definitivamente','Eliminar definitivamente','delete')
   await page.wait_for_function("!new URL(location.href).searchParams.has('dataset_id')")
   assert case_rows=={cid:(await read_api('/api/decision-cases/'+cid))['case'] for cid in case_rows}
-  await page.reload();await root.get_by_role('table').wait_for();assert errors==[],errors
+  await page.reload()
+  try:await root.get_by_role('table').wait_for()
+  except Exception:
+   if artifacts:
+    state=await page.evaluate('''()=>({url:location.href,readyState:document.readyState,
+     activeView:document.querySelector('.view.is-active')?.id,
+     text:document.querySelector('[data-platform-data]')?.textContent.slice(0,4000),
+     tables:[...document.querySelectorAll('[data-platform-data] table')].map(el=>({role:el.getAttribute('role'),
+      display:getComputedStyle(el).display,width:el.getBoundingClientRect().width,height:el.getBoundingClientRect().height}))})''')
+    (artifacts/'reload-failure.json').write_text(json.dumps({'state':state,'errors':errors},indent=2))
+    await page.screenshot(path=str(artifacts/'reload-failure.png'),full_page=True)
+   raise
+  assert errors==[],errors
   await browser.close()
  print(json.dumps({'passed':True,'dda_upload':True,'dda_dataset_id':dda_dataset,'fork_case_id':fork,'referenced_delete_blocked':True,
   'case_rows_unchanged':True,'preview':True,'download_bytes':True,'decision_center_lineage':True,'safe_delete':True,'restore':True,'viewports':[1440,1280,1024,768,390]}))
