@@ -59,12 +59,6 @@ jobs:
             node --input-type=module --check < "$file"
           done
 
-      - name: Check Data Hub mutation flow with CI Chromium
-        working-directory: backend
-        env:
-          DATION_E2E_ARTIFACTS: ${{ runner.temp }}/dation-e2e-artifacts
-        run: python tests/e2e/run_suite.py --module test_data_hub
-
       - name: Run automated tests
         working-directory: backend
         run: |

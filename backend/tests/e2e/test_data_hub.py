@@ -136,14 +136,26 @@ class DataHubTests(unittest.TestCase):
   rows[0]['order_id']='HUB-UPLOAD-'+str(uuid4());rows[0]['product']='<img src=x onerror=window.__bad=1>'
   stream=io.StringIO();writer=csv.DictWriter(stream,fieldnames=reader.fieldnames,delimiter=';',lineterminator='\n');writer.writeheader();writer.writerows(rows)
   path=self.s.directory/'datos ñ.csv';path.write_text(stream.getvalue())
-  before=self.s.sql('SELECT md5(string_agg(to_jsonb(c)::text,\'\' ORDER BY id)) FROM decision_cases c;')
+  unused_rows=[dict(row) for row in rows];unused_rows[0].update(order_id='HUB-DELETE-'+str(uuid4()),product='Sin referencias')
+  unused_csv=io.StringIO();writer=csv.DictWriter(unused_csv,fieldnames=reader.fieldnames,delimiter=';',lineterminator='\n');writer.writeheader();writer.writerows(unused_rows)
+  unused=self.checked(self.a.post('/api/platform/data/datasets/upload',params={'dataset_type':'orders'},files={'file':('unused.csv',unused_csv.getvalue().encode(),'text/csv')}))['dataset']
+  before=self.s.sql(f"SELECT to_jsonb(c)::text FROM decision_cases c WHERE id='{case}';")
   root=Path(__file__).resolve().parents[2]
   result=subprocess.run([os.getenv('DATION_BROWSER_PYTHON',str(root/'.browser-venv/bin/python')),str(root/'tests/e2e/data_hub_journey.py')],cwd=root,
-   env={**self.s.env,'DATION_E2E_URL':self.s.api_url,'DATION_HUB_CASE':case,'DATION_HUB_ORDERS':orders['id'],'DATION_HUB_INPUT':str(path)},capture_output=True,text=True,timeout=150)
+   env={**self.s.env,'DATION_E2E_URL':self.s.api_url,'DATION_HUB_CASE':case,'DATION_HUB_ORDERS':orders['id'],'DATION_HUB_UNUSED':unused['id'],'DATION_HUB_INPUT':str(path)},capture_output=True,text=True,timeout=150)
   self.assertEqual(result.returncode,0,result.stdout+result.stderr)
-  self.assertEqual(self.s.sql('SELECT md5(string_agg(to_jsonb(c)::text,\'\' ORDER BY id)) FROM decision_cases c;'),before)
-  self.assertEqual(self.s.sql('SELECT count(*) FROM datasets;'),'2')
+  report=json.loads(result.stdout.splitlines()[-1]);self.assertTrue(report['case_rows_unchanged']);self.assertTrue(report['referenced_delete_blocked'])
+  self.assertNotEqual(report['fork_case_id'],case)
+  self.assertEqual(self.s.sql(f"SELECT to_jsonb(c)::text FROM decision_cases c WHERE id='{case}';"),before)
+  self.assertEqual(self.s.sql('SELECT count(*) FROM decision_cases;'),'2')
+  fork=self.checked(self.a.get('/api/decision-cases/'+report['fork_case_id']))
+  self.assertEqual(fork['orders']['id'],report['dda_dataset_id']);self.assertEqual(fork['fleet']['id'],fleet['id'])
+  self.assertEqual(self.s.sql('SELECT count(*) FROM datasets;'),'3')
   self.assertTrue(self.file(orders).is_file());self.assertTrue(self.file(fleet).is_file())
+  self.assertFalse(self.file(unused).exists())
+  self.checked(self.a.delete('/api/platform/data/datasets/'+report['dda_dataset_id']),409)
+  referenced=self.checked(self.s.db.get('datasets',params={'id':'eq.'+report['dda_dataset_id']}))[0]
+  self.assertTrue(self.file(referenced).is_file())
   self.assertEqual(self.s.sql("SELECT count(*) FROM dation_private.dataset_deletions WHERE status='completed';"),'1')
 
  def test_07_failed_upload_cleanup_is_tracked_and_workspace_authorized(self):

@@ -367,6 +367,44 @@ now records actual menu state and, on failure, API deletion permissions and
 drawer contents before re-raising. This is diagnostic coverage, not a claimed
 resolution or a replacement for complete green CI.
 
+The diagnostic run [42032521022](https://github.com/nicsejara/Dation/actions/runs/42032521022)
+at `183fc31` reproduced the remaining failure in its early Data Hub check.
+The menu was open (`aria-expanded=true`) and contained Download/Restore;
+the drawer explicitly reported a Decision Case reference. Deletion was
+correctly unavailable. This ruled out the earlier closed-menu explanation.
+The browser-version difference was incidental to a timing-dependent fixture.
+
+The legacy DDA's canonical preflight forks a persisted Case when its Data Pack
+changes. The old journey waited only for the uploaded filename, then navigated
+away before awaiting fork persistence. That could cancel the in-flight
+preflight locally; CI completed the fork and correctly protected its dataset.
+The corrected journey waits for the persisted fork and matching route, verifies
+the dataset reference, and asserts that deletion is absent from its open menu
+and rejected by the API. An independently uploaded, unused dataset exercises
+safe deletion through the real UI, confirmation, storage and deletion ledger.
+
+Case preservation is explicit: the original raw SQL row remains identical,
+both original/fork rows are snapshotted before and after library operations,
+exactly two Cases exist, and the fork must bind the replacement orders and
+original fleet. Original/referenced bytes remain; only the unused bytes and
+row are removed. The earlier all-Cases-set digest across DDA replacement was
+an invalid assumption because that operation intentionally creates a fork.
+The revised assertions preserve row immutability during library operations
+and add the required fork/reference checks; no lineage protection is weakened.
+
+The corrected scenario passed locally in 59.798 seconds. The complete Data Hub
+class plus the existing Saga 3 and Case Preparation fork contracts passed:
+13 methods in 149.841 seconds, with no skips or failures. All five viewport,
+contrast, XSS, CSV-download and archive/restore assertions remain. The temporary
+early diagnostic stage is removed; Data Hub remains mandatory in full E2E.
+No product code or test timeout changed. Focused command:
+
+```sh
+python tests/e2e/run_suite.py --module test_data_hub \
+  --module test_saga3.Saga3Tests.test_attributes_keep_case_but_different_data_pack_forks_idempotently \
+  --module test_case_preparation.CasePreparationTests.test_data_pack_changes_fork_while_preserving_original_people_and_runs
+```
+
 Current full validation and the integrated SHA are
 authoritative in [PR #103 checks](https://github.com/nicsejara/Dation/pull/103/checks).
 Merge remains conditional on all required checks and repository protections.
