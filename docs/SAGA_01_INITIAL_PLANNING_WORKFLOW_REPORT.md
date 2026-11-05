@@ -299,6 +299,29 @@ PYTHONPATH=tests/browser .browser-venv/bin/python -m unittest \
   test_navigation.NavigationTests.test_workflow_progressive_actions_share_styles_arrow_and_keyboard_focus -v
 ```
 
+Run [41974345011](https://github.com/nicsejara/Dation/actions/runs/41974345011)
+at `486337d` passed 693 Python and 153 Node tests and the corrected resize test.
+Its only browser error was preparation for
+`test_d1_v2_table_focus_reveals_partially_clipped_trip_control`: Playwright's
+`later.scroll_into_view_if_needed()` timed out waiting for element stability
+before reaching the focus assertions. The isolated test and three unchanged
+local repetitions passed, so that CI timeout was not reproduced locally.
+
+The test now waits for visible controls, clears the previous focus and performs
+an instant DOM scroll for its setup. The first row starts at internal scroll
+position zero for the horizontal probe; the fourth-row vertical probe keeps
+its original clipping/reset/focus checks. All visibility, horizontal/vertical
+bounds, unchanged page/internal scroll, reproduced clipping and no-business-write
+assertions are preserved. Three corrected repetitions and the adjacent
+low-viewport keyboard test passed: four executions of two methods in 29.092
+seconds. No timeout was increased and no product code changed. Focused command:
+
+```sh
+PYTHONPATH=tests/browser .browser-venv/bin/python -m unittest \
+  test_navigation.NavigationTests.test_d1_v2_table_focus_reveals_partially_clipped_trip_control \
+  test_navigation.NavigationTests.test_d1_v2_essential_and_advanced_fit_low_viewports_and_keyboard -v
+```
+
 Current full validation and the integrated SHA are
 authoritative in [PR #103 checks](https://github.com/nicsejara/Dation/pull/103/checks).
 Merge remains conditional on all required checks and repository protections.

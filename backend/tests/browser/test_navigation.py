@@ -3424,7 +3424,12 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         for width,height in ((1280,800),(800,800),(390,844),(390,300)):
             await self.page.set_viewport_size({'width':width,'height':height})
             button=self.page.locator('[data-trip-detail-button]').first
-            await button.scroll_into_view_if_needed()
+            # Prepare the viewport explicitly; focus-driven reveal is tested below.
+            await button.wait_for(state='visible')
+            await button.evaluate('''button=>{
+                document.activeElement?.blur();button.scrollIntoView({behavior:'instant',block:'center',inline:'nearest'});
+                button.closest('.assignment-evidence__table-wrap').scrollTop=0;
+            }''')
             result=await button.evaluate('''button=>{
                 const wrap=button.closest('.assignment-evidence__table-wrap');
                 button.blur();wrap.scrollLeft=0;
@@ -3442,7 +3447,8 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(result['top'],result['before']['top']);self.assertEqual(result['pageY'],result['before']['pageY'])
             if result['clipped']:self.assertGreater(result['left'],result['before']['left'])
             later=self.page.locator('[data-trip-detail-button]').nth(3)
-            await later.scroll_into_view_if_needed()
+            await later.wait_for(state='visible')
+            await later.evaluate("button=>{document.activeElement?.blur();button.scrollIntoView({behavior:'instant',block:'center',inline:'nearest'});}")
             vertical=await later.evaluate('''button=>{
                 button.blur();const wrap=button.closest('.assignment-evidence__table-wrap');wrap.scrollTop=0;
                 const before=button.getBoundingClientRect(),edge=wrap.getBoundingClientRect(),pageY=scrollY;
