@@ -49,7 +49,22 @@ async def main():
   for width in (1440,1280,1024,768,390):
    await page.set_viewport_size({'width':width,'height':1000});await page.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))')
    probe=await page.evaluate(theme)
-   if (probe['overflow'] or probe['failures']) and artifacts:await page.screenshot(path=str(artifacts/f'dataset-failure-{width}.png'),full_page=True)
+   if (probe['overflow'] or probe['failures']) and artifacts:
+    geometry=await page.evaluate('''() => {
+     const rect=el=>{const r=el.getBoundingClientRect(),s=getComputedStyle(el);return {
+      tag:el.tagName,classes:typeof el.className==='string'?el.className:'',
+      x:r.x,right:r.right,width:r.width,scrollWidth:el.scrollWidth,clientWidth:el.clientWidth,
+      overflowX:s.overflowX,position:s.position,minWidth:s.minWidth,display:s.display};};
+     return {innerWidth,documentWidth:document.documentElement.scrollWidth,
+      activeElement:document.activeElement?.outerHTML.slice(0,300),
+      hub:[...document.querySelectorAll('.hub-layout,.hub-portfolio,.hub-drawer,.hub-drawer__body,.hub-table-scroll,.hub-table,.hub-kpis,.hub-search')].map(rect),
+      outside:[...document.querySelectorAll('body *')].filter(el=>{
+       const r=el.getBoundingClientRect();return r.width&&r.height&&(r.right>innerWidth||r.left<0);
+      }).slice(0,80).map(el=>({...rect(el),text:el.textContent.slice(0,100),
+       parents:[...function*(node){for(let n=node.parentElement;n;n=n.parentElement)yield rect(n);}(el)]}))};
+    }''')
+    (artifacts/f'dataset-failure-{width}.json').write_text(json.dumps({'probe':probe,'geometry':geometry},indent=2))
+    await page.screenshot(path=str(artifacts/f'dataset-failure-{width}.png'),full_page=True)
    assert not probe['overflow'] and not probe['failures'],(width,probe)
    if artifacts:await page.screenshot(path=str(artifacts/f'dataset-{width}.png'),full_page=True)
   await root.locator('summary',has_text='Vista previa').click()
