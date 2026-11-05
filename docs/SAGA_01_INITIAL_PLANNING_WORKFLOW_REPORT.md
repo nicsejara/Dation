@@ -204,6 +204,76 @@ node --test tests/test_ultimate_case_navigation.mjs tests/test_ultimate_data_nav
 PYTHONPATH=tests/browser .browser-venv/bin/python -m unittest test_saga01_planning -v
 ```
 
+The next complete run, [41962512563](https://github.com/nicsejara/Dation/actions/runs/41962512563)
+at `b8dad5c`, passed 693 Python tests, 153 Node tests and all 298 browser tests.
+It then exposed previously skipped SQL harness failures: the CI container lacked
+the ownership labels required by the fixtures; mutable `sys.path` let an E2E
+module shadow the same-named SQL pilot module; and the restore test could
+snapshot the legacy tenant before its asynchronous reconciliation completed.
+E2E was still skipped in that run. This was a new downstream blocker, not a
+recurrence of the dashboard navigation error.
+
+The CI fixture now creates its own labelled T2/T11 PostgreSQL container and
+selects every SQL test module by its `tests.integration` name. Pilot helper
+imports use that same namespace. Ownership guards remain unchanged. Restore
+waits for the legacy tenant's reconciliation queue to drain before taking the
+comparison snapshot, retaining the complete cross-tenant and catalog assertions.
+The intermittent digest difference did not reproduce in the local pre-fix run;
+that run instead reached the missing compatibility image prerequisite.
+
+CI now builds an explicitly local Docker image from the checked-out source for
+the existing legacy/Ultimate compatibility rehearsal. It also installs the
+hash-locked Playwright dependencies in the backend interpreter used by E2E;
+the pilot browser test uses the executable resolved by its owned fixture.
+The E2E scale rehearsal explicitly selects that same local image through
+`DATION_T11_R_IMAGE`, instead of relying on a historical, unprovisioned tag.
+No image is published, and this local fixture build is not Cloud Build or a
+Cloud Run deployment. The qualified SQL runner discovers 168 tests, and the
+E2E runner discovers 121, with no import errors.
+The job budget is 75 minutes: the observed automated/browser stages already
+take about 30 minutes, SQL takes five minutes locally, and E2E exceeds twenty
+minutes locally. This leaves room for the complete gates. No check is removed
+or weakened to fit the previous 45-minute budget.
+
+The complete local SQL suite passed all 168 tests in 306.202 seconds, including
+ownership enforcement, rollout authority, restore, cross-tenant preservation
+and actual compatibility-image API/worker operations. The workflow's qualified
+module runner selects those same test IDs. Its invocation from `backend/` is:
+
+```sh
+# DATION_SQL_TEST_CONTAINER must identify the owned, labelled disposable fixture;
+# DATION_T11_CANDIDATE_IMAGE must identify the local compatibility image.
+PYTHONPATH=tests/integration python - <<'PY'
+from pathlib import Path
+import subprocess, sys
+modules = ['tests.integration.' + p.stem for p in sorted(Path('tests/integration').glob('test_*.py'))]
+raise SystemExit(subprocess.call([sys.executable, '-m', 'unittest', *modules, '-v']))
+PY
+```
+
+The first full local E2E run executed 121 tests in 1305.820 seconds: 120 passed,
+with no skipped tests or failed assertions. The remaining scale test had two
+subtest errors because `dation-certification:t11-r-under-test` was not present;
+Docker could not pull that unpublished historical tag. This is the missing
+image prerequisite corrected by the explicit CI image selection above.
+The targeted rerun then exposed a workspace-specific launcher permission:
+source files here are mode `0600`, whereas the image correctly runs as UID
+65532. The fixture now mounts a read-only `0444` copy from its owned temporary
+directory. It does not change repository permissions, image user, CPU/memory
+limits, the 90-second execution budget or expected result assertions.
+With both prerequisites corrected, the targeted scale test passed in 230.326
+seconds, including both cold-first-job repetitions. Admission-to-completion
+times were 71.026 and 72.902 seconds; execution times were 69.126 and 70.830
+seconds, with peak memory 762327040 and 762425344 bytes under the original
+1 GiB limit. The full run's 120 passing methods and this targeted passing
+method cover all 121 E2E cases locally; the complete remote job remains the
+integration gate. Commands from `backend/`, with locked test dependencies:
+
+```sh
+python tests/e2e/run_suite.py
+DATION_T11_R_IMAGE=dation-ci-compatibility:test python tests/e2e/run_suite.py --module test_ultimate_scale
+```
+
 Current full validation and the integrated SHA are
 authoritative in [PR #103 checks](https://github.com/nicsejara/Dation/pull/103/checks).
 Merge remains conditional on all required checks and repository protections.

@@ -83,7 +83,7 @@ class UltimatePilotCohortE2E(unittest.TestCase):
 
     def test_05_real_browser_localstorage_and_query_cannot_activate_unenrolled_workspace(self):
         with sync_playwright() as pw:
-            browser=pw.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
+            browser=pw.chromium.launch(executable_path=self.s.env.get('CHROMIUM_EXECUTABLE'),headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
             try:
                 context=browser.new_context()
                 login=context.request.post(self.s.api_url+'/auth/login',headers={'Origin':self.s.api_url},data={'email':'user-2@example.test','password':'dispatch-e2e-private'})

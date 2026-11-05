@@ -60,6 +60,10 @@ class UltimateRestoreTests(unittest.TestCase):
             s.start_worker()
             with httpx.Client(base_url=s.api_url,headers={'Authorization':'Bearer '+s.user_tokens[USER_B]},trust_env=False,timeout=45) as other:
                 legacy=legacy_case(s,other)
+            # Approval enqueues an asynchronous legacy projection update. Let
+            # the worker acknowledge it before freezing the untouched tenant.
+            wait_for(lambda:s.sql("SELECT count(*) FROM decision_case_reconciliations WHERE workspace_id='"+s.workspace_b+"';")=='0',
+                'legacy tenant reconciliation before restore snapshot')
             other_before=rows_digest(s,s.workspace_b)
             catalog_before=effective_catalog(s,CATALOG_SQL)
             marker=mark_testing_workspace(s,s.workspace_a)

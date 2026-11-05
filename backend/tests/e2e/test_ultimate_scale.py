@@ -70,10 +70,14 @@ class UltimateScaleRehearsalTests(unittest.TestCase):
                     files={'file':('scale.csv',stream.getvalue().encode(),'text/csv')}))
                 ok(api.post(base+'/data/publish',json={'publication_id':str(uuid4()),'expected_revision':state['pack']['revision'],'selection':[{'slot_key':entity,'upload_id':uploaded['id']}]}))
             name=s.identifier+'-scale-worker';s.containers.append(name);worker_port=port();env=s.directory/'scale-worker.env';image_env(s,env,worker_port)
+            # The image runs as UID 65532; workspace source may be mode 0600.
+            # Mount a readable disposable copy, without changing source permissions.
+            launcher=s.directory/'ultimate_scale_worker.py'
+            launcher.write_bytes((BACKEND/'tests/e2e/ultimate_scale_worker.py').read_bytes());launcher.chmod(0o444)
             startup=time.perf_counter()
             s.docker('run','-d','--name',name,'--label','dation.qa.execution=T11-R','--label','dation.qa.owner=codex-dation',
                 '--network','host','--memory','1g','--cpus','2','--read-only','--tmpfs','/tmp','--env-file',str(env),
-                '--mount','type=bind,src='+str(BACKEND/'tests/e2e/ultimate_scale_worker.py')+',dst=/qa/ultimate_scale_worker.py,readonly',IMAGE,'python','/qa/ultimate_scale_worker.py')
+                '--mount','type=bind,src='+str(launcher)+',dst=/qa/ultimate_scale_worker.py,readonly',IMAGE,'python','/qa/ultimate_scale_worker.py')
             try:wait_for(lambda:s.reachable('http://127.0.0.1:'+str(worker_port)+'/'),'cold owned image worker',timeout=45)
             except BaseException:
                 logs=subprocess.run(['docker','--host=unix:///var/run/docker.sock','logs',name],capture_output=True,text=True,check=True)
