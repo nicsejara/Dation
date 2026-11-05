@@ -405,6 +405,32 @@ python tests/e2e/run_suite.py --module test_data_hub \
   --module test_case_preparation.CasePreparationTests.test_data_pack_changes_fork_while_preserving_original_people_and_runs
 ```
 
+Run [42035328146](https://github.com/nicsejara/Dation/actions/runs/42035328146)
+at `f8350da` passed 693 Python and 153 Node tests. Its 298 browser methods
+had one error: the final-approval journey waited for `is_disabled()` on the
+approval button after the approved state had already removed that button.
+The existing unique-approval contract explicitly expects that removal.
+
+The fixture now holds the approval response behind an explicit asyncio event.
+The journey first verifies disabled and `aria-busy=true` while that response
+is pending, releases it in `finally`, then verifies the approved badge,
+detached/absent approval button, exactly one approval request, approved hero
+and continuation to scheduling. No product code, retry or timeout changed.
+Three repetitions of the corrected journey plus unique approval, failure/retry
+and infeasible/missing-metrics coverage passed: six executions in 51.482
+seconds, with no skips or failures. Earlier local attempts encountered QA
+fixture startup and initial-page-load timeouts; they are not counted as
+successful validation. Focused command, with the first method repeated three
+times for the recorded run:
+
+```sh
+PYTHONPATH=tests/browser .browser-venv/bin/python -m unittest \
+  test_navigation.NavigationTests.test_d1_v2_final_approval_updates_hero_and_continues_to_scheduling \
+  test_navigation.NavigationTests.test_toolbar_approval_is_unique_direct_and_preserves_continuation \
+  test_navigation.NavigationTests.test_toolbar_approval_error_restores_button_and_can_retry_once \
+  test_navigation.NavigationTests.test_d1_v2_infeasible_and_missing_metrics_remain_explicit -v
+```
+
 Current full validation and the integrated SHA are
 authoritative in [PR #103 checks](https://github.com/nicsejara/Dation/pull/103/checks).
 Merge remains conditional on all required checks and repository protections.

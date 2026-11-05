@@ -355,6 +355,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             if status >= 400: data = {"detail":"Lost response after acceptance"}
         elif path == "/api/runs": data = {"items":list(self.runs.values())}
         elif path.endswith("/approve"):
+            if getattr(self,'approval_gate',None):await self.approval_gate.wait()
             self.approval_calls+=1
             if self.approval_fail_once and self.approval_calls==1:
                 status,data=503,{'detail':'Fallo sintético de aprobación'}
@@ -3379,10 +3380,18 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(await self.page.locator('.assignment-comparison__metric.is-improvement').count(),0)
 
     async def test_d1_v2_final_approval_updates_hero_and_continues_to_scheduling(self):
-        self.review_assignment();await self.dashboard()
-        await self.page.locator('[data-approve-toolbar]').click()
+        self.review_assignment();self.approval_gate=asyncio.Event();await self.dashboard()
+        button=self.page.locator('[data-approve-toolbar]')
+        try:
+            async with self.page.expect_request('**/api/runs/'+self.f['ids']['assignment']+'/approve'):
+                await button.click()
+            self.assertTrue(await button.is_disabled())
+            self.assertEqual(await button.get_attribute('aria-busy'),'true')
+        finally:self.approval_gate.set()
         await self.page.wait_for_function("document.querySelector('[data-status-badge]').textContent==='Aprobada'")
-        self.assertEqual(self.approval_calls,1);self.assertTrue(await self.page.locator('[data-approve-toolbar]').is_disabled())
+        await button.wait_for(state='detached')
+        self.assertEqual(self.approval_calls,1)
+        self.assertEqual(await self.page.locator('[data-approve-toolbar]').count(),0)
         self.assertIn('Decisión aprobada',await self.page.locator('[data-assignment-hero-status]').inner_text())
         await self.page.locator('[data-after-approve]').wait_for(state='visible')
         await self.page.locator('[data-after-approve]').click()
