@@ -120,6 +120,16 @@ class Sandbox:
             'DATION_ACCESS_PASSWORD':PASSWORD,'LLM_API_KEY':'','LLM_BASE_URL':'','GCP_ACCESS_TOKEN':'',
             'SUPABASE_ACCESS_TOKEN':'','NO_PROXY':'127.0.0.1,localhost',
             'DATION_E2E_AUTH':str(self.directory),'DATION_E2E_STORAGE':str(self.storage),'DATION_E2E_REST':self.rest_url,'DATION_MAX_QUEUED_RUNS':'32'}
+        if not self.env.get('CHROMIUM_EXECUTABLE'):
+            executable=shutil.which('chromium')
+            browser_python=os.getenv('DATION_BROWSER_PYTHON',str(ROOT/'.browser-venv/bin/python'))
+            if not executable and Path(browser_python).is_file():
+                resolved=subprocess.run([browser_python,'-c',
+                    'from playwright.sync_api import sync_playwright\nwith sync_playwright() as p: print(p.chromium.executable_path)'],
+                    env=self.env,capture_output=True,text=True,timeout=15)
+                candidate=resolved.stdout.strip()
+                if resolved.returncode==0 and Path(candidate).is_file():executable=candidate
+            if executable:self.env['CHROMIUM_EXECUTABLE']=executable
         self.user_tokens={uid:user_token(self.auth_key,self.env['SUPABASE_URL'],uid) for uid in (USER_A,USER_B,VIEWER,DISABLED)}
         self.http=httpx.Client(trust_env=False,timeout=30)
         wait_for(lambda:self.reachable(self.rest_url+'/',{'Authorization':'Bearer '+self.token}), 'authorized PostgREST catalog')

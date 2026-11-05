@@ -1,5 +1,6 @@
 """Final polish acceptance checks against real assets and isolated API fixtures."""
 import unittest
+from playwright.async_api import expect
 import test_saga3_ui as saga3
 
 WIDTHS = ((1440,900),(1280,800),(1024,768),(768,1024),(375,812),(320,640))
@@ -54,10 +55,10 @@ class FinalPolishTests(unittest.IsolatedAsyncioTestCase):
             await self.page.goto(f'http://127.0.0.1:{self.b.port}/app/ddas/logistics')
             hero=self.page.locator('.dda-landing__hero');await hero.wait_for()
             self.assertEqual(await hero.locator('.dda-landing__emblem').count(),0)
-            self.assertEqual(await hero.locator('h1>span').inner_text(),'con mejor análisis.')
+            await expect(hero.locator('h1>span')).to_have_text('con mejor análisis.')
             self.assertEqual(await hero.locator('.dda-landing__flow-node small').all_inner_texts(),['ENTRADA','INTELIGENCIA','DECISIÓN'])
             self.assertEqual(await hero.get_by_role('button').count(),2)
-            self.assertTrue(await hero.get_by_role('button',name='Iniciar nuevo Decision Case',exact=False).is_visible())
+            self.assertTrue(await hero.get_by_role('button',name='Comenzar',exact=False).is_visible())
             self.assertTrue(await hero.get_by_role('button',name='Ver mis casos de Logística',exact=False).is_visible())
             if width>700:
                 await self.page.wait_for_function('document.querySelector(".dda-landing__hero-art")?.naturalWidth>0')
@@ -184,6 +185,7 @@ class FinalPolishTests(unittest.IsolatedAsyncioTestCase):
     async def test_final_polish_stress_at_data_boundary_with_dev_only_toggle(self):
         import copy,json,os
         from pathlib import Path
+        from urllib.parse import parse_qs,urlsplit
         fixture=json.loads((Path(__file__).parent/'fixtures/final-polish-stress.json').read_text())
         original=copy.deepcopy(self.b.runs)
         async def mode_changed(mode):
@@ -200,9 +202,16 @@ class FinalPolishTests(unittest.IsolatedAsyncioTestCase):
                 self.b.chat_history=[{'id':'stress-message','role':'assistant','content':text}]
         await self.page.expose_function('uxStressSetMode',mode_changed)
         await self.b.context.add_init_script((Path(__file__).parent/'fixtures/ux-upgrade-stress-toggle.js').read_text())
+        async def select_mode(label,mode,kind):
+            await self.page.get_by_role('button',name=label,exact=True).click()
+            # The QA control awaits its Python binding before location.assign.
+            # Finish that navigation before inspecting or opening another Run.
+            await self.page.wait_for_url(lambda url:parse_qs(urlsplit(url).query).get('ux_stress')==[mode])
+            await self.b.wait_for_app()
+            await self.page.locator('.assignment-dashboard-v2' if kind=='assignment' else '.dispatch-scheduling-dashboard').wait_for()
         for kind in ('assignment','scheduling'):
             await self.b.open('decision-dashboard','logistics_'+kind,self.b.f['ids'][kind])
-            await self.page.get_by_role('button',name='Worst case',exact=True).click()
+            await select_mode('Worst case','worst',kind)
             for width,height in WIDTHS:
                 await self.page.set_viewport_size({'width':width,'height':height})
                 await self.page.locator('.decision-intelligence').wait_for()
@@ -221,5 +230,5 @@ class FinalPolishTests(unittest.IsolatedAsyncioTestCase):
                     await self.page.screenshot(path=str(Path(directory)/f'polish-{kind}-{width}-worst.png'))
                 await self.page.keyboard.press('Escape')
                 await self.page.locator('[data-ai-collapse]').click()
-            await self.page.get_by_role('button',name='Demo data',exact=True).click()
+            await select_mode('Demo data','demo',kind)
         self.assertEqual(self.b.execution_bodies,[])

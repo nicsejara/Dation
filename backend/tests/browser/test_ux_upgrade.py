@@ -3,6 +3,7 @@ import unittest
 import copy
 import json
 from pathlib import Path
+from playwright.async_api import expect
 import test_saga3_ui as saga3
 
 
@@ -158,14 +159,28 @@ class UXUpgradeTests(unittest.IsolatedAsyncioTestCase):
         base = f'http://127.0.0.1:{self.b.port}/app/team'
         for status in (503, 403, 401):
             scenario['status'] = status
-            await self.page.goto(base)
+            async with self.page.expect_response(lambda response:response.url.endswith('/auth/invitations')) as pending:
+                await self.page.goto(base)
+            self.assertEqual((await pending.value).status,status)
             incoming = self.page.locator('.team-incoming')
             await incoming.wait_for(state='attached')
-            await self.page.wait_for_function('!document.querySelector(".team-incoming").hasAttribute("aria-busy")')
             if status == 401:
-                self.assertTrue(await incoming.is_hidden())
+                await expect(incoming).to_be_hidden()
             else:
-                text = await incoming.inner_text()
+                expected = 'administrador' if status == 403 else 'guardado'
+                # Keep the same completed, visible render for every assertion;
+                # Team can replace its incoming node during initial mounting.
+                observed = await self.page.wait_for_function("""expected => {
+                    const incoming = document.querySelector('.team-incoming');
+                    const team = incoming?.closest('[data-platform-team]');
+                    if (!incoming || team?.hasAttribute('aria-busy') ||
+                        incoming.hasAttribute('aria-busy') || incoming.hidden ||
+                        !incoming.getClientRects().length ||
+                        getComputedStyle(incoming).visibility !== 'visible') return false;
+                    const text = incoming.innerText;
+                    return text.includes(expected) ? text : false;
+                }""", arg=expected)
+                text = await observed.json_value()
                 self.assertNotIn('JSON', text)
                 self.assertNotIn('Unexpected', text)
                 self.assertNotIn('<html>', text)

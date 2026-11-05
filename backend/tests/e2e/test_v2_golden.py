@@ -60,16 +60,18 @@ class GoldenWorkflowTests(unittest.TestCase):
         return cid,datasets
 
     def test_distinct_people_complete_the_golden_workflow_and_cross_surface_matrix(self):
+        case,_=self.create_case(STEWARD)
         inputs=self.s.directory/'golden-inputs';inputs.mkdir()
         for kind in ('orders','fleet'):(inputs/(kind+'.csv')).write_bytes(csv_input(kind))
         self.s.start_worker()
-        environment={**self.s.env,'DATION_E2E_URL':self.s.api_url,'DATION_E2E_INPUTS':str(inputs)}
+        environment={**self.s.env,'DATION_E2E_URL':self.s.api_url,'DATION_E2E_INPUTS':str(inputs),'DATION_GOLDEN_LEGACY_CASE':case}
         artifact=os.getenv('DATION_E2E_ARTIFACTS')
         if artifact:environment['DATION_E2E_ARTIFACTS']=str(Path(artifact)/'golden-v2')
         result=subprocess.run([os.getenv('DATION_BROWSER_PYTHON',str(ROOT/'.browser-venv/bin/python')),str(ROOT/'tests/e2e/golden_journey.py')],cwd=ROOT,env=environment,text=True,capture_output=True,timeout=300)
         if result.returncode:self.s.diagnostics('golden-v2')
         self.assertEqual(result.returncode,0,result.stdout+result.stderr)
         report=json.loads(result.stdout.strip().splitlines()[-1]);self.assertTrue(report['passed'])
+        self.assertEqual(report['case_id'],case)
         case=report['case_id'];ids=report['runs']
         snapshot=self.checked(self.s.api_client.get(f'/api/platform/decisions/{case}/responsibilities'))
         self.assertEqual(snapshot['stages']['data_owner']['owner']['id'],STEWARD)

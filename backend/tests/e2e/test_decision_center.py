@@ -3,7 +3,7 @@ import json,os,subprocess,unittest
 from pathlib import Path
 from uuid import uuid4
 import httpx
-from sandbox import Sandbox
+from sandbox import Sandbox,wait_for
 from auth_fixture import USER_A,USER_B,VIEWER
 import test_workflow as workflow
 
@@ -155,6 +155,8 @@ class DecisionCenterTests(unittest.TestCase):
   self.assertEqual(detail['nodes'][0]['latest_objective']['id'],'min_cost');self.assertEqual(detail['nodes'][0]['latest_run']['id'],replacement)
   result=portfolio();self.assertEqual(result['summary'],{'active_cases':27,'in_review':1,'pending_approval':1,'approved':0})
   self.approve(replacement,case);self.assertEqual(portfolio()['summary']['approved'],1);self.assertFalse(self.center(case)['nodes'][1]['approval_current'])
+  wait_for(lambda:self.s.sql(f"SELECT count(*) FROM decision_case_reconciliations WHERE case_id='{case}';")=='0',
+   'portfolio reconciliation before archive version snapshot')
   self.checked(self.a.patch('/api/platform/decisions/'+case,json={'expected_updated_at':self.center(case)['updated_at'],'archived':True}))
   self.assertEqual(portfolio()['summary'],{'active_cases':26,'in_review':0,'pending_approval':0,'approved':0})
   for credential in [self.s.anon_token,self.s.user_tokens[USER_A]]:

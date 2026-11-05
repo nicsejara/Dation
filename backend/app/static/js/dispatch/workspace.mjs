@@ -282,18 +282,17 @@ function decisionContext(nodeId){
   });
 }
 function navigate(view,options={}){persist();window.dationSetDataReady(ready());return navigateResource(view,options);}
-async function startNewDecision(inputs=[]){
+async function startNewDecision(){
   if(!currentLogisticsEnabled())return navigateResource('inicio');
   transitionCaseId=null;
   saveDraft();
   resetAssignmentConfiguration();
   Object.assign(state,{caseIdentity:null,identityDirty:false,dataOwnerDraft:null,attributesApplied:false,appliedPreparation:null,forkedFrom:null,orders:null,fleet:null,decisionCase:null,workflow:null,caseContext:null,run:null,activeNode:null,
     preflight:null,configPreview:null,configured:false,decisions:{},schedulingUseDueDates:true});
-  if(Array.isArray(inputs))for(const dataset of inputs){if(['orders','fleet'].includes(dataset?.dataset_type))state[dataset.dataset_type]=dataset;}
   decisionContext(null);
   window.dationSetDataReady(false);
   persist();
-  return navigateResource('logistics-data',{caseId:null,nodeId:null,runId:null});
+  return navigateResource('logistics-case-setup',{caseId:null,nodeId:null,runId:null});
 }
 
 async function dashboardContinuation(run,nodeId,generation){
@@ -850,6 +849,7 @@ async function hydrateCase(caseId,generation=routeGeneration,expectedInputs=null
 }
 async function navigateResource(view,options={}){
   if(options.history!==false&&window.dationUltimateCanLeave&&!window.dationUltimateCanLeave())return;
+  if(view==='logistics-data'&&!options.caseId&&(options.caseId===null||!state.decisionCase?.id))return navigateResource('logistics-case-setup',{...options,caseId:null,nodeId:null,runId:null,history:true,replace:true});
   if(view==='inicio')view='platform-home';
   if(logisticsView(view)&&!currentLogisticsEnabled()){
     return navigateResource('inicio',{replace:true,caseId:null,nodeId:null});

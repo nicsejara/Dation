@@ -6,7 +6,7 @@ from playwright.async_api import async_playwright
 import test_ultimate_case_setup as t3
 
 ROOT=Path(__file__).resolve().parents[2];REPO=ROOT.parent
-OUT=Path(os.getenv('DATION_T10_BROWSER_ARTIFACTS','/workspace/work/dation-t10/w10'))
+OUT=Path(os.getenv('DATION_T10_BROWSER_ARTIFACTS','/tmp/dation-t10-browser'))
 
 class UltimateResultConsumerTests(unittest.IsolatedAsyncioTestCase):
     login=t3.UltimateCaseSetupTests.login
@@ -19,7 +19,7 @@ class UltimateResultConsumerTests(unittest.IsolatedAsyncioTestCase):
         for key in ['SUPABASE_URL','SUPABASE_SECRET_KEY','SUPABASE_ACCESS_TOKEN','LLM_API_KEY','LLM_BASE_URL','GCP_ACCESS_TOKEN']:env[key]=''
         for key in ['DOCKER_HOST','DOCKER_CONTEXT','DOCKER_TLS','DOCKER_TLS_VERIFY','DOCKER_CERT_PATH']:env.pop(key,None)
         env.update(PYTHONDONTWRITEBYTECODE='1',DOCKER_HOST='unix:///var/run/docker.sock',PYTHONPATH=str(ROOT))
-        cls.fixture=subprocess.Popen([str(REPO/'.venv/bin/python'),'-B',str(ROOT/'tests/e2e/ultimate_consumer_fixture.py')],cwd=ROOT,env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=cls.fixture_log,text=True)
+        cls.fixture=subprocess.Popen([t3.RUNTIME_PYTHON,'-B',str(ROOT/'tests/e2e/ultimate_consumer_fixture.py')],cwd=ROOT,env=env,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=cls.fixture_log,text=True)
         if not select.select([cls.fixture.stdout],[],[],60)[0]:cls.fixture.terminate();cls.fixture.wait(10);raise RuntimeError('Owned T10 fixture timeout')
         line=cls.fixture.stdout.readline()
         if not line:raise RuntimeError('Owned T10 fixture failed: '+(OUT/'fixture.log').read_text()[-4000:])
@@ -27,7 +27,7 @@ class UltimateResultConsumerTests(unittest.IsolatedAsyncioTestCase):
         (OUT/'owned-fixture.json').write_text(json.dumps({k:cls.f[k] for k in ['api_url','baseline_url','control_dir','pg_container','database']},indent=2))
     tearDownClass=classmethod(t3.UltimateCaseSetupTests.tearDownClass.__func__)
     async def asyncSetUp(self):
-        self.pw=await async_playwright().start();self.browser=await self.pw.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
+        self.pw=await async_playwright().start();self.browser=await self.pw.chromium.launch(executable_path=t3.CHROMIUM_EXECUTABLE,headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
         self.context=await self.browser.new_context(viewport={'width':1440,'height':900},reduced_motion='reduce');await self.login(self.context)
         self.page=await self.context.new_page();self.page.set_default_timeout(15000);self.errors=[];self.requests=[]
         self.page.on('pageerror',lambda e:self.errors.append(str(e)));self.page.on('request',lambda r:self.requests.append(urlparse(r.url).path))

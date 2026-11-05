@@ -23,7 +23,7 @@ THEME=(Path(__file__).parents[1]/'browser/theme_audit.js').read_text()
 
 
 async def main():
-    errors=[];requests=[];surfaces=set();probes=[];runs={};evidence={};run_history=[];case=None
+    errors=[];requests=[];surfaces=set();probes=[];runs={};evidence={};run_history=[];case=os.environ['DATION_GOLDEN_LEGACY_CASE']
     if ARTIFACT:ARTIFACT.mkdir(parents=True,exist_ok=True)
     async with async_playwright() as pw:
         browser=await pw.chromium.launch(executable_path=os.getenv('CHROMIUM_EXECUTABLE') or '/usr/bin/chromium',headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
@@ -122,7 +122,9 @@ async def main():
             await steward.locator('[data-platform-home] .platform-home__hero-actions a').first.click()
             await steward.locator('[data-dda-id=logistics]').wait_for()
             await steward.locator('#home-open-logistics').click()
-            await steward.locator('[data-start-new-decision]').click()
+            # Distinct-role legacy execution uses a previously created Case.
+            # Saga 01's new-Case contract is covered by the owned planning flow.
+            await steward.goto(target('logistics-data'))
             await steward.get_by_label('Nombre del Case',exact=True).fill('SEMANA 43')
             await steward.get_by_label('Categoría',exact=True).select_option('weekly')
             for kind in ('orders','fleet'):

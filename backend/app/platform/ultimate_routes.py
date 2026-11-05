@@ -3,7 +3,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Query
 from app.auth import require_upload_access
 from app.platform.entitlements import require_dda
-from app.models.ultimate_foundation import ModelCreate,ModelUpdate,ModelPublish,UltimateCaseCreate,UltimateCaseUpdate
+from app.models.ultimate_foundation import ModelCreate,ModelUpdate,ModelPublish,ModelContractPreview,UltimateCaseCreate,UltimateCaseUpdate
 from app.services import logistics_model_service as service
 
 router=APIRouter()
@@ -21,6 +21,20 @@ async def models(q:str=Query('',max_length=120),include_archived:bool=False,limi
 @router.post('/logistics-models')
 async def create_model(payload:ModelCreate,ctx=Depends(require_upload_access)):
     return await service.create_model(logistics(ctx),payload)
+
+@router.post('/logistics-models/contract-preview')
+async def contract_preview(payload:ModelContractPreview,ctx=Depends(require_upload_access)):
+    provisional,contracts=await service.preview_contracts(logistics(ctx),payload)
+    return {'provisional':provisional,'contracts':{entity:contract.model_dump(mode='json',exclude={'model_version_id','contract_hash'} if provisional else set()) for entity,contract in contracts.items()}}
+
+@router.post('/logistics-models/contract-preview/templates/{entity}')
+async def preview_template(entity:str,payload:ModelContractPreview,ctx=Depends(require_upload_access)):
+    from fastapi import HTTPException
+    from fastapi.responses import Response
+    from app.domain.logistics.data_contracts import ENTITIES,template_csv
+    if entity not in ENTITIES:raise HTTPException(404,'Template no disponible.')
+    _,contracts=await service.preview_contracts(logistics(ctx),payload)
+    return Response(template_csv(contracts[entity]),media_type='text/csv; charset=utf-8',headers={'Content-Disposition':f'attachment; filename="{entity}.csv"'})
 
 @router.get('/logistics-models/{model_id}')
 async def model(model_id:UUID,ctx=Depends(require_upload_access)):

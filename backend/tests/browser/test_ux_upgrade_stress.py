@@ -111,15 +111,23 @@ class UXStressTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result[0][0],'0 kg');self.assertEqual(result[-1][0],'—')
 
     async def test_route_change_during_loading_does_not_reopen_team(self):
+        started,release,finished=asyncio.Event(),asyncio.Event(),asyncio.Event()
         async def delayed(route):
-            await asyncio.sleep(.4)
-            try: await route.fulfill(json={'members':[],'invitations':[],'total':0,'invitation_total':0})
+            started.set()
+            try:
+                await release.wait()
+                await route.fulfill(json={'members':[],'invitations':[],'total':0,'invitation_total':0})
             except Exception: pass  # Request abort is the expected outcome after disposal.
+            finally:finished.set()
         await self.b.context.route('**/api/platform/team?**', delayed)
-        await self.page.goto(f'http://127.0.0.1:{self.b.port}/app/team')
-        await self.page.locator('[data-platform-team] .d-loading').wait_for()
-        await self.page.evaluate("window.dationNavigate('settings')")
-        await self.page.locator('.workspace-settings__tabs').wait_for()
-        await self.page.wait_for_timeout(500)
+        try:
+            await self.page.goto(f'http://127.0.0.1:{self.b.port}/app/team',wait_until='domcontentloaded')
+            await asyncio.wait_for(started.wait(),6)
+            await self.page.locator('[data-platform-team] .d-loading').wait_for()
+            await self.page.evaluate("window.dationNavigate('settings')")
+            await self.page.locator('.workspace-settings__tabs').wait_for()
+        finally:release.set()
+        await asyncio.wait_for(finished.wait(),6)
+        await self.page.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))')
         self.assertEqual(await self.page.evaluate('window.dationGetCurrentView()'),'settings')
         self.assertEqual(await self.page.locator('dialog[open]').count(),0)

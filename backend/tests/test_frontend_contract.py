@@ -1876,7 +1876,7 @@ class FrontendContractTests(
             "DDA LOGÍSTICA · PLANIFICACIÓN DE DESPACHOS",
             "Tus despachos,<span>con mejor análisis.</span>",
             "Compará alternativas y revisá la evidencia antes de aprobar.",
-            "Iniciar nuevo Decision Case",
+            "Comenzar",
             "ENTRADA",
             "Tus órdenes y tu flota",
             "INTELIGENCIA",
@@ -1885,12 +1885,13 @@ class FrontendContractTests(
             "Aprobás con recomendación y evidencia.",
             "De tus datos a una decisión, en 4 pasos.",
             "Cada decisión se arma en un",
-            "Dation valida y arma el caso",
+            "Definí tu planificación",
+            "Completá los datos del caso",
             "Elegí tu prioridad",
             "Aprobá y exportá",
             "Lo hacés vos",
             "Lo hace Dation",
-            "Empezás con el núcleo mínimo de datos.",
+            "Primero definís el contexto; después aportás los datos y ejecutás.",
             "Objetivos según la decisión y los datos.",
             "Tu mapa de decisiones, desbloqueado paso a paso.",
             "Un DDA no resuelve una sola decisión: resuelve una cadena.",
@@ -1914,6 +1915,8 @@ class FrontendContractTests(
             )
 
         for forbidden in (
+            "Iniciar nuevo Decision Case",
+            "<h3>Cargá tus datos</h3>",
             "¿Listo para tomar tu primera decisión?",
             "dda-landing__final",
             "dda-landing__progress",
@@ -1939,9 +1942,20 @@ class FrontendContractTests(
                 overview,
             )
 
-        self.assertIn(
-            'data-start-new-decision',
+        start_button = re.search(
+            r'<button\b[^>]*\bid="start-logistics-decision"[^>]*>.*?</button>',
             overview,
+            re.DOTALL,
+        )
+        self.assertIsNotNone(start_button)
+        self.assertRegex(
+            start_button.group(),
+            r'<button\b[^>]*\bdata-start-new-decision(?:\s|>)',
+        )
+        self.assertIn("Comenzar", start_button.group())
+        self.assertLess(
+            overview.index("<h3>Definí tu planificación</h3>"),
+            overview.index("<h3>Completá los datos del caso</h3>"),
         )
         self.assertIn(
             'data-variables-inline',

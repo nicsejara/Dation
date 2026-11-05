@@ -69,6 +69,21 @@ class ModelPublish(ContractModel):
     expected_revision: int = Field(strict=True,ge=1)
 
 
+class ModelContractPreview(ContractModel):
+    configuration: LogisticsModelConfigurationV1 | None = None
+    model_id: UUID | None = None
+    version_id: UUID | None = None
+
+    @model_validator(mode='after')
+    def one_source(self):
+        if self.configuration is not None:
+            if self.model_id is not None or self.version_id is not None:
+                raise ValueError('Elegí una configuración o una versión publicada.')
+        elif self.model_id is None or self.version_id is None:
+            raise ValueError('Seleccioná el Model y su versión publicada.')
+        return self
+
+
 class UltimateCaseCreate(Horizon):
     id: UUID
     name: str = Field(min_length=1,max_length=120)

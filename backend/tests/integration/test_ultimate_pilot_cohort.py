@@ -1,8 +1,8 @@
 """T12-R: real SQL rollout authority; no math, no production configuration."""
 import json
 import unittest
-import test_ultimate_case_models as cases
-from test_ultimate_case_models import ADMIN,OTHER,OPERATOR,VIEWER
+from tests.integration import test_ultimate_case_models as cases
+from tests.integration.test_ultimate_case_models import ADMIN,OTHER,OPERATOR,VIEWER
 
 
 class UltimatePilotCohortSQLTests(unittest.TestCase):

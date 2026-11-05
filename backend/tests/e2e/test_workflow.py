@@ -366,6 +366,13 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(outcome.returncode,0,outcome.stdout+outcome.stderr)
 
     def browser_journey(self,scenario,viewport):
+        # Replay a historical Case through the legacy engine/UI. New entries
+        # separately assert Saga 01's context-first route in the owned cohort.
+        previous_release=json.loads(self.s.sql('SELECT row_to_json(p) FROM dation_private.platform_release p;'))
+        self.prepare_case_workflow=False
+        try:legacy_case,_,_=self.case()
+        finally:self.prepare_case_workflow=True
+        self.s.sql(f"INSERT INTO dation_private.ultimate_pilot_workspaces(workspace_id,enabled) VALUES('{self.s.workspace_a}',true) ON CONFLICT(workspace_id) DO UPDATE SET enabled=true; UPDATE dation_private.platform_release SET ultimate_foundation_enabled=true,ultimate_pilot_enabled=true;")
         self.s.stop(self.s.worker)
         worker_start=self.s.storage/'start-browser-worker'
         worker_start.unlink(missing_ok=True)
@@ -381,6 +388,7 @@ class WorkflowTests(unittest.TestCase):
         inputs=self.s.directory/'inputs';inputs.mkdir(exist_ok=True)
         for kind in ('orders','fleet'):(inputs/(kind+'.csv')).write_bytes(csv_input(kind))
         env={**self.s.env,'DATION_E2E_URL':self.s.api_url,'DATION_E2E_INPUTS':str(inputs),
+             'DATION_E2E_LEGACY_CASE':legacy_case,
              'DATION_E2E_VIEWPORT':json.dumps(viewport)}
         if artifacts:=os.getenv('DATION_E2E_ARTIFACTS'):
             env['DATION_E2E_ARTIFACTS']=str(Path(artifacts)/scenario)
@@ -391,11 +399,13 @@ class WorkflowTests(unittest.TestCase):
                 text=True,capture_output=True,timeout=180)
         finally:
             finished.set();coordinator.join();worker_start.unlink(missing_ok=True)
+            foundation=str(previous_release['ultimate_foundation_enabled']).lower();pilot=str(previous_release['ultimate_pilot_enabled']).lower()
+            self.s.sql(f"UPDATE dation_private.platform_release SET ultimate_foundation_enabled={foundation},ultimate_pilot_enabled={pilot}; DELETE FROM dation_private.ultimate_pilot_workspaces WHERE workspace_id='{self.s.workspace_a}';")
         self.assertEqual(startup_errors,[])
         self.assertEqual(result.returncode,0,result.stdout+result.stderr)
         report=json.loads(result.stdout.strip().splitlines()[-1])
         self.assertTrue(report['passed']);self.assertEqual(report['javascript_errors'],[])
-        self.assertTrue(report['creation_from_files']);self.assertTrue(report['refresh_during_queue'])
+        self.assertTrue(report['legacy_case_rehydration']);self.assertTrue(report['context_first_entry']);self.assertTrue(report['refresh_during_queue'])
         self.assertTrue(report['queued_before_worker_start']);self.assertIsNotNone(self.s.worker)
         self.assertTrue(report['inicio_to_overview']);self.assertTrue(report['approval_map_scheduling_configuration'])
         self.assertTrue(report['shared_workflow_visual_contract']);self.assertTrue(report['review_keyboard_cancel_and_confirmation'])
