@@ -44,7 +44,18 @@ async def main():
   saved=await pending.value;assert Path(await saved.path()).read_bytes()==INPUT.read_bytes()
   async def menu(label):
    await drawer.get_by_role('button',name='Acciones de ',exact=False).click()
-   await drawer.get_by_role('menuitem',name=label,exact=True).click()
+   if label=='Eliminar definitivamente':
+    print('HUB_MENU_STATE='+json.dumps(await drawer.evaluate('''el=>({expanded:el.querySelector('[aria-haspopup=menu]')?.getAttribute('aria-expanded'),
+      items:[...el.querySelectorAll('[role=menuitem]')].map(n=>({text:n.textContent,visible:n.getClientRects().length>0&&getComputedStyle(n).visibility!=='hidden'})),
+      fields:[...el.querySelectorAll('.hub-field')].map(n=>n.textContent)})''')),flush=True)
+   try:await drawer.get_by_role('menuitem',name=label,exact=True).click()
+   except Exception:
+    response=await page.request.get(BASE+'/api/platform/data/datasets/'+dataset);detail=await response.json()
+    print('HUB_ACTION_FAILURE='+json.dumps({'label':label,'status':response.status,
+     'can_delete':detail.get('can_delete'),'referenced':detail.get('referenced'),'used_in':detail.get('used_in'),
+     'dataset':{k:detail.get('dataset',{}).get(k) for k in ['id','archived_at','is_default','case_count','run_count']},
+     'drawer':await drawer.inner_text()}),flush=True)
+    raise
   async def mutate(label,title,operation,state=None):
    await menu(label)
    dialog=page.get_by_role('dialog',name=title,exact=True)

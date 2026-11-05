@@ -351,6 +351,22 @@ python tests/e2e/run_suite.py \
   --module test_decision_center.DecisionCenterTests.test_04_portfolio_summary_is_global_actionable_and_read_only
 ```
 
+Run [42023551070](https://github.com/nicsejara/Dation/actions/runs/42023551070)
+at `46f1eeb` passed Python/Node/browser/SQL and 120 of 121 E2E methods.
+The Decision Center correction passed; only the Data Hub delete-menu lookup
+still failed. Therefore the dialog synchronization alone did not resolve that
+remaining CI failure. The complete Data Hub class passed locally (11 methods,
+71.297 seconds), so an isolated-method recheck is insufficient evidence here.
+
+The local fixture uses system Chromium 151, whereas the pinned Playwright
+package selects Chrome for Testing 153 (revision 1243) in CI. Installing that
+revision locally was blocked by the environment's CDN policy. A focused Data
+Hub check is temporarily placed before the long regression stages in the same
+CI job, preserving every full-suite stage and the failing-job gate. The journey
+now records actual menu state and, on failure, API deletion permissions and
+drawer contents before re-raising. This is diagnostic coverage, not a claimed
+resolution or a replacement for complete green CI.
+
 Current full validation and the integrated SHA are
 authoritative in [PR #103 checks](https://github.com/nicsejara/Dation/pull/103/checks).
 Merge remains conditional on all required checks and repository protections.
