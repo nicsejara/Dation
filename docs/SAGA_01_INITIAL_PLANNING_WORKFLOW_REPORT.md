@@ -322,6 +322,35 @@ PYTHONPATH=tests/browser .browser-venv/bin/python -m unittest \
   test_navigation.NavigationTests.test_d1_v2_essential_and_advanced_fit_low_viewports_and_keyboard -v
 ```
 
+Run [41978123202](https://github.com/nicsejara/Dation/actions/runs/41978123202)
+at `73ce773` passed 693 Python, 153 Node, 298 browser and 168 SQL tests,
+including all browser synchronization corrections and the compatibility image.
+E2E executed all 121 methods with no skips: 119 passed, including both scale
+repetitions, and two failed. Data Hub timed out selecting its delete menu item
+after archive/restore/archive. Decision Center received an optimistic-version
+conflict when archiving immediately after approval while the worker could
+still reconcile that Case. Both methods passed unchanged in a focused local
+run (75.316 seconds), so the two CI failures were not reproduced locally.
+
+The Data Hub journey now synchronizes each real mutation with its successful
+HTTP response, native dialog close event, detached confirmation dialog and
+refreshed drawer state before the next action. It still performs the actual
+menu and confirmation clicks and verifies original CSV bytes, safe deletion
+and lineage preservation. Decision Center waits for the Case-specific
+reconciliation outbox acknowledgment before reading the version for its
+archive request. The expected HTTP 200, CAS behavior and portfolio assertions
+remain unchanged; no 409 retry or business-operation retry was added.
+
+The corrected pair passed twice locally: two methods in 67.101 seconds and
+the same two in 62.477 seconds, with no failures, errors or skips. Product
+code, production infrastructure and test timeouts are unchanged. Command:
+
+```sh
+python tests/e2e/run_suite.py \
+  --module test_data_hub.DataHubTests.test_06_real_browser_dda_upload_library_lineage_download_and_safe_delete \
+  --module test_decision_center.DecisionCenterTests.test_04_portfolio_summary_is_global_actionable_and_read_only
+```
+
 Current full validation and the integrated SHA are
 authoritative in [PR #103 checks](https://github.com/nicsejara/Dation/pull/103/checks).
 Merge remains conditional on all required checks and repository protections.

@@ -45,13 +45,23 @@ async def main():
   async def menu(label):
    await drawer.get_by_role('button',name='Acciones de ',exact=False).click()
    await drawer.get_by_role('menuitem',name=label,exact=True).click()
-  await menu('Archivar');await page.get_by_role('dialog',name='Archivar dataset',exact=True).get_by_role('button',name='Archivar dataset',exact=True).click()
-  await drawer.get_by_text('Archivado',exact=True).first.wait_for()
-  await menu('Restaurar');await page.get_by_role('dialog',name='Restaurar dataset',exact=True).get_by_role('button',name='Restaurar dataset',exact=True).click()
-  await drawer.get_by_text('Activo',exact=True).first.wait_for()
-  await menu('Archivar');await page.get_by_role('dialog',name='Archivar dataset',exact=True).get_by_role('button',name='Archivar dataset',exact=True).click()
-  await drawer.get_by_text('Archivado',exact=True).first.wait_for()
-  await menu('Eliminar definitivamente');await page.get_by_role('dialog',name='Eliminar definitivamente',exact=True).get_by_role('button',name='Eliminar definitivamente',exact=True).click()
+  async def mutate(label,title,operation,state=None):
+   await menu(label)
+   dialog=page.get_by_role('dialog',name=title,exact=True)
+   # Native dialog close/focus events may run after its DOM is removed.
+   await dialog.evaluate("dialog=>{window.__hubMutationClosed=new Promise(resolve=>dialog.addEventListener('close',()=>resolve(true),{once:true}));}")
+   path='/api/platform/data/datasets/'+dataset+('' if operation=='delete' else '/'+operation)
+   method='DELETE' if operation=='delete' else 'POST'
+   async with page.expect_response(lambda response:response.request.method==method and urlsplit(response.url).path==path) as pending:
+    await dialog.get_by_role('button',name=title,exact=True).click()
+   response=await pending.value;assert response.ok,(response.status,await response.text())
+   await page.evaluate('window.__hubMutationClosed')
+   await dialog.wait_for(state='detached')
+   if state:await drawer.locator('.hub-drawer__body:not([aria-busy])').get_by_text(state,exact=True).first.wait_for()
+  await mutate('Archivar','Archivar dataset','archive','Archivado')
+  await mutate('Restaurar','Restaurar dataset','unarchive','Activo')
+  await mutate('Archivar','Archivar dataset','archive','Archivado')
+  await mutate('Eliminar definitivamente','Eliminar definitivamente','delete')
   await page.wait_for_function("!new URL(location.href).searchParams.has('dataset_id')")
   await page.reload();await root.get_by_role('table').wait_for();assert errors==[],errors
   await browser.close()
