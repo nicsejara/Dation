@@ -1,4 +1,4 @@
-name: Extract Data Hub evidence
+name: Focused Data Hub responsive validation
 
 on:
   push:
@@ -7,28 +7,44 @@ on:
 
 permissions:
   contents: read
-  actions: read
 
 jobs:
-  evidence:
+  data-hub:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 15
+    env:
+      SUPABASE_URL: ''
+      SUPABASE_SECRET_KEY: ''
+      LLM_API_KEY: ''
+      DATION_ACCESS_PASSWORD: dispatch-e2e-private
+      DATION_E2E_ARTIFACTS: ${{ runner.temp }}/data-hub-focused
     steps:
-      - name: Read original main diagnostics
-        uses: actions/download-artifact@v4
+      - name: Checkout candidate
+        uses: actions/checkout@v4
         with:
-          name: dation-e2e-diagnostics
-          run-id: 42052751164
-          github-token: ${{ github.token }}
-          path: ${{ runner.temp }}/original-diagnostics
-      - name: List evidence paths
-        run: find "$RUNNER_TEMP/original-diagnostics" -type f -printf '%P\n'
-      - name: Save original Data Hub screenshots and summaries
+          ref: 9340da9244b31b48023d70f6bf62a7529fbfe2a8
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install pinned backend and browser dependencies
+        working-directory: backend
+        run: |
+          python -m pip install --require-hashes -r requirements.txt -r requirements-browser.txt
+          python -m pip check
+          python -m playwright install --with-deps chromium
+      - name: Repeat only the affected real browser journey
+        working-directory: backend
+        run: |
+          export DATION_BROWSER_PYTHON="$pythonLocation/bin/python"
+          python tests/e2e/run_suite.py \
+            --module test_data_hub.DataHubTests.test_06_real_browser_dda_upload_library_lineage_download_and_safe_delete \
+            --module test_data_hub.DataHubTests.test_06_real_browser_dda_upload_library_lineage_download_and_safe_delete \
+            --module test_data_hub.DataHubTests.test_06_real_browser_dda_upload_library_lineage_download_and_safe_delete
+      - name: Save focused evidence
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: original-main-data-hub-evidence
-          path: |
-            ${{ runner.temp }}/original-diagnostics/**/data-hub/**
-            ${{ runner.temp }}/original-diagnostics/*.json
+          name: data-hub-focused-evidence
+          path: ${{ runner.temp }}/data-hub-focused
           if-no-files-found: error
           retention-days: 7
