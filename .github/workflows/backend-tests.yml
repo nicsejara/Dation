@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        source: [92656a1c8c94ae1181a18c47ddd681eaa313f92b, c1c33dc96bdfc239226c6b7b1121cb87972821c7]
+        source: [1585915bd498cd09b1ceb10632c66bc087620e86, 0f7ad2b324c6b142da5e7201a1eda536bd15ca60]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -30,19 +30,6 @@ jobs:
           python -m venv .browser-venv
           .browser-venv/bin/pip install --require-hashes -r requirements-browser.txt
           .browser-venv/bin/playwright install --with-deps chromium
-      - name: Read previous synthetic observations
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh run download 42227888412 -n 'browser-evidence-${{ matrix.source }}' -D /tmp/previous-observations
-          python - <<'PY2'
-          import json
-          from pathlib import Path
-          d=json.loads(Path('/tmp/previous-observations/result.json').read_text())
-          print('PREVIOUS_FOCAL_RESULT', d['tests'],len(d['failures']))
-          for o in d['observations'][:8]:
-              print(json.dumps({'test':o['test'],'browser':o['browser'],'observed':o['observed'],'before':{'width':o['before']['width'],'scroll':o['before']['scroll'],'html':o['before']['html']},'after':{'width':o['after_two_frames']['width'],'scroll':o['after_two_frames']['scroll']}}))
-          PY2
       - name: Observe unchanged focal assertions
         working-directory: backend
         env:
