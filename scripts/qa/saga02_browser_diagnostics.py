@@ -15,6 +15,7 @@ async def capture(page,reason,observed):
     await page.evaluate('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))')
     after=await page.evaluate(SNAPSHOT)
     key=str(len(records));record={**current,'reason':reason,'observed':observed,'before':before,'after_two_frames':after}
+    print('BROWSER_OBSERVATION='+json.dumps(record),flush=True)
     records.append(record);(OUT/'observations.json').write_text(json.dumps(records,indent=2))
     if reason!='overflow' or observed:
         await page.screenshot(path=str(OUT/(key+'.png')),full_page=True)
@@ -28,11 +29,13 @@ Locator.all_inner_texts=observed_texts
 def instrument(cls):
     original=cls.asyncSetUp
     async def setup(self):
-        await original(self);page=self.page;current.clear();current.update(test=self.id(),page=page,browser=self.b.browser.version)
+        await original(self);page=self.page;current.clear();current.update(test=self.id(),page=page,browser=self.b.browser.version,cpu_rate=getattr(self,'cpu_rate',1))
+        session=await self.b.context.new_cdp_session(page)
+        await session.send('Emulation.setCPUThrottlingRate',{'rate':getattr(self,'cpu_rate',1)})
         evaluate=page.evaluate
         async def observed_evaluate(expression,*args,**kwargs):
             value=await evaluate(expression,*args,**kwargs)
-            if expression=='document.documentElement.scrollWidth>innerWidth':
+            if expression=='document.documentElement.scrollWidth>innerWidth' and value:
                 await capture(page,'overflow',value)
             return value
         page.evaluate=observed_evaluate
@@ -51,10 +54,12 @@ async def capture(page,reason,observed):
 
 instrument(c1.FinalPolishTests);instrument(f3.RunLineagePolishTests)
 suite=unittest.TestSuite()
-for _ in range(6):
-    suite.addTest(c1.FinalPolishTests('test_c1_overview_hero_has_local_art_process_and_unchanged_actions'))
-    suite.addTest(f3.RunLineagePolishTests('test_f3_case_flow_keeps_steps_without_decorative_truck'))
+for rate in (1,2):
+    for _ in range(4):
+        for cls,name in [(c1.FinalPolishTests,'test_c1_overview_hero_has_local_art_process_and_unchanged_actions'),(f3.RunLineagePolishTests,'test_f3_case_flow_keeps_steps_without_decorative_truck')]:
+            case=cls(name);case.cpu_rate=rate;suite.addTest(case)
 result=unittest.TextTestRunner(verbosity=2).run(suite)
 (OUT/'result.json').write_text(json.dumps({'source':os.environ['SOURCE_REF'],'run':os.environ.get('GITHUB_RUN_ID'),'tests':result.testsRun,
  'failures':[{'test':str(t),'trace':v} for t,v in result.failures+result.errors],'observations':records},indent=2))
+print('BROWSER_DIAGNOSTIC_RESULT='+json.dumps({'source':os.environ['SOURCE_REF'],'tests':result.testsRun,'failures':len(result.failures),'errors':len(result.errors)}),flush=True)
 sys.exit(not result.wasSuccessful())
