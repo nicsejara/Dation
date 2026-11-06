@@ -55,10 +55,11 @@ class FinalPolishTests(unittest.IsolatedAsyncioTestCase):
             await self.page.goto(f'http://127.0.0.1:{self.b.port}/app/ddas/logistics')
             # The template exists before authenticated boot commits the active view.
             await self.b.wait_for_app()
-            await self.page.evaluate('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))')
             hero=self.page.locator('.dda-landing__hero');await hero.wait_for()
             self.assertEqual(await hero.locator('.dda-landing__emblem').count(),0)
             await expect(hero.locator('h1>span')).to_have_text('con mejor análisis.')
+            # Visibility propagates after boot; assert rendered text, not just DOM content.
+            await expect(hero.locator('.dda-landing__flow-node small')).to_have_text(['ENTRADA','INTELIGENCIA','DECISIÓN'],use_inner_text=True)
             self.assertEqual(await hero.locator('.dda-landing__flow-node small').all_inner_texts(),['ENTRADA','INTELIGENCIA','DECISIÓN'])
             self.assertEqual(await hero.get_by_role('button').count(),2)
             self.assertTrue(await hero.get_by_role('button',name='Comenzar',exact=False).is_visible())
