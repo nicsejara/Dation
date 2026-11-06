@@ -13,6 +13,23 @@ async def operational_snapshot():
     except (httpx.HTTPError, TimeoutError):
         event('readiness_unavailable', outcome='database_unavailable')
         return {'ready': False, 'database': 'unavailable', 'alerts': ['database_unavailable']}
+    from app.services import execution_dispatch as activation
+    if activation.jobs_mode():
+        try:
+            policy=await activation.runtime_rpc('policy')
+            outbox=await activation.runtime_rpc('snapshot')
+            provider_ready=await activation.transport().healthy()
+        except (httpx.HTTPError,TimeoutError,activation.DispatchConfigurationError,ValueError):
+            policy={};outbox={};provider_ready=False
+        ready=all(policy.get(k) for k in ('enabled','admissions_open','recovery_fresh','dispatch_budget_available')) and provider_ready
+        alerts=[]
+        if not ready:alerts.append('activation_unavailable')
+        if outbox.get('dead'):alerts.append('execution_dead_letter')
+        if outbox.get('expired_leases'):alerts.append('expired_leases')
+        if outbox.get('oldest_pending_seconds',0)>900:alerts.append('execution_wait_over_recovery_interval')
+        return {**snapshot,'ready':ready,'database':'available','alerts':alerts,
+                'execution_mode':'jobs','activation_ready':provider_ready,'outbox':outbox,'recovery':policy,
+                'worker_freshness_seconds':None}
     healthy = snapshot['workers']['healthy'] > 0
     queue, repair = snapshot['queue'], snapshot['reconciliation']
     alerts = []

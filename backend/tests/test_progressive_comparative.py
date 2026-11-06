@@ -1,5 +1,6 @@
 """Business immutability and trusted-input comparative generation."""
 import copy
+import os
 import json
 from pathlib import Path
 import unittest
@@ -59,6 +60,8 @@ class ProgressiveEngineTests(unittest.TestCase):
 
 
 class ProgressiveServiceTests(unittest.IsolatedAsyncioTestCase):
+    def setUp(self):
+        mode=patch.dict(os.environ,{"DATION_EXECUTION_MODE":"legacy"});mode.start();self.addCleanup(mode.stop)
     def base(self,depth='essential'):
         row=json.loads((Path(__file__).parent/'browser/fixtures.json').read_text())['runs']['assignment']
         row['id']=str(uuid4());row['result_json']['analysis']['depth']=depth

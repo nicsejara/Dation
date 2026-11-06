@@ -45,6 +45,8 @@ async def platform_call(name, body):
         if response.status_code >= 400:
             raise_workflow_conflict(response)
             code = response.json().get("code")
+            if name=="platform_ultimate_execution" and body.get("operation")=="admit" and code=="53300":
+                raise HTTPException(429,"La cola está llena. Reintentá con el mismo ID.",headers={"Retry-After":"5"})
             if code == "42501":
                 raise HTTPException(403, "No tenés acceso activo a este workspace.")
             if code == "22023":
