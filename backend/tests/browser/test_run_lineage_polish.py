@@ -50,6 +50,9 @@ class RunLineagePolishTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(await panel.locator('.dispatch-pro-how-node small').all_inner_texts(),['1 · ELEGÍ','2 · CONFIGURÁ','3 · APROBÁ'])
         for w,h in WIDTHS:
             await self.page.set_viewport_size({'width':w,'height':h})
+            # Measure responsive geometry after the requested viewport is painted.
+            await self.page.wait_for_function('size=>innerWidth===size.width&&innerHeight===size.height',arg={'width':w,'height':h})
+            await self.page.evaluate('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))')
             self.assertFalse(await self.page.evaluate('document.documentElement.scrollWidth>innerWidth'))
 
     async def test_f4_warning_has_equal_canonical_actions_keyboard_and_cleanup(self):

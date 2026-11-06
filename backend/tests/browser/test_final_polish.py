@@ -53,6 +53,9 @@ class FinalPolishTests(unittest.IsolatedAsyncioTestCase):
         for width,height in WIDTHS:
             await self.page.set_viewport_size({'width':width,'height':height})
             await self.page.goto(f'http://127.0.0.1:{self.b.port}/app/ddas/logistics')
+            # The template exists before authenticated boot commits the active view.
+            await self.b.wait_for_app()
+            await self.page.evaluate('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))')
             hero=self.page.locator('.dda-landing__hero');await hero.wait_for()
             self.assertEqual(await hero.locator('.dda-landing__emblem').count(),0)
             await expect(hero.locator('h1>span')).to_have_text('con mejor análisis.')
