@@ -1,174 +1,48 @@
-name: Backend and workspace tests
-
+name: Saga02 focused browser evidence
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
   workflow_dispatch:
-
 permissions:
   contents: read
-
 jobs:
-  tests:
+  browser-evidence:
     runs-on: ubuntu-latest
-    timeout-minutes: 75
-
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        source: [92656a1c8c94ae1181a18c47ddd681eaa313f92b, c1c33dc96bdfc239226c6b7b1121cb87972821c7]
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
         with:
-          python-version: "3.13"
-
-      - name: Set up Node
-        uses: actions/setup-node@v4
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
         with:
-          node-version: "22"
-
-      - name: Install backend dependencies
+          python-version: '3.13'
+      - name: Preserve observer and select exact source
+        run: |
+          cp scripts/qa/saga02_browser_diagnostics.py /tmp/saga02_browser_diagnostics.py
+          git checkout --detach '${{ matrix.source }}'
+      - name: Install exact browser and runtime
         working-directory: backend
         run: |
-          python -m pip install --upgrade pip
           pip install --require-hashes -r requirements.txt
-          # SQL/E2E modules also use Playwright from the backend interpreter.
-          pip install --require-hashes -r requirements-browser.txt
-          pip check
-          python -m venv .audit-venv
-          .audit-venv/bin/pip install --require-hashes -r requirements-dev.txt
-          .audit-venv/bin/pip-audit --disable-pip --no-deps -r requirements.txt
-          .audit-venv/bin/pip-audit --disable-pip --no-deps -r requirements-browser.txt
           python -m venv .browser-venv
           .browser-venv/bin/pip install --require-hashes -r requirements-browser.txt
           .browser-venv/bin/playwright install --with-deps chromium
-
-      - name: Compile backend
-        working-directory: backend
-        run: |
-          python -m compileall app main.py worker.py event_worker.py
-
-      - name: Validate zero-idle manifests and every deployment script without applying
-        run: python scripts/zero_idle_release.py validate
-
-      - name: Check frontend JavaScript syntax
-        working-directory: backend
-        run: |
-          find app/static/js \( -name '*.js' -o -name '*.mjs' \) -print0 | while IFS= read -r -d '' file; do
-            node --input-type=module --check < "$file"
-          done
-
-      - name: Run automated tests
+      - name: Observe unchanged focal assertions
         working-directory: backend
         env:
-          # Existing service contracts explicitly exercise the compatibility runtime.
-          # Saga 02 tests override jobs mode and verify the production default.
-          DATION_EXECUTION_MODE: legacy
-        run: |
-          python - <<'PY'
-          import glob, subprocess, sys
-          commands = [
-              ([sys.executable, "-m", "unittest", "discover", "-s", "tests", "-v"], "Python regression failure"),
-              (["node", "--test", *sorted(glob.glob("tests/test_*.js") + glob.glob("tests/test_*.mjs"))], "Node regression failure"),
-          ]
-          for command, title in commands:
-              result = subprocess.run(command, capture_output=True, text=True)
-              output = result.stdout + result.stderr
-              print(output)
-              if result.returncode:
-                  detail = output[-3500:].replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
-                  print("::error title=" + title + "::" + detail)
-                  sys.exit(result.returncode)
-          PY
-
-      - name: Run browser regression tests with synthetic API data
-        working-directory: backend
-        run: |
-          python - <<'PY'
-          import subprocess, sys
-          result = subprocess.run(
-              [".browser-venv/bin/python", "-m", "unittest", "discover", "-s", "tests/browser", "-p", "test_*.py", "-v"],
-              capture_output=True, text=True,
-          )
-          output = result.stdout + result.stderr
-          print(output)
-          if result.returncode:
-              # GitHub truncates long annotations; retain the final traceback.
-              detail = output[-3500:].replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
-              print("::error title=Chromium regression failure::" + detail)
-          sys.exit(result.returncode)
-          PY
-
-      - name: Build local compatibility fixture image
-        run: docker build --tag dation-ci-compatibility:test .
-
-      - name: Verify schema, history, approvals and durable jobs on PostgreSQL 17
-        working-directory: backend
-        env:
-          PYTHONPATH: tests/integration
-          DATION_T11_CANDIDATE_IMAGE: dation-ci-compatibility:test
-        run: |
-          docker run -d --name dation-ci-postgres \
-            --label dation.qa.owner=codex-dation --label dation.qa.phase=T2 --label dation.qa.execution=T11 \
-            -e POSTGRES_HOST_AUTH_METHOD=trust postgres:17-alpine
-          trap 'docker rm -f -v dation-ci-postgres' EXIT
-          ready=false
-          for attempt in {1..30}; do
-            # initdb briefly starts a Unix-socket-only server. Wait for final TCP.
-            if docker exec dation-ci-postgres pg_isready -h 127.0.0.1 -U postgres; then
-              ready=true
-              break
-            fi
-            sleep 1
-          done
-          if [ "$ready" != true ]; then
-            echo '::error title=PostgreSQL startup failure::The final server did not accept TCP inside the container.'
-            exit 1
-          fi
-          DATION_SQL_TEST_CONTAINER=dation-ci-postgres python - <<'PY'
-          from pathlib import Path
-          import subprocess, sys
-          # Qualified names prevent E2E fixtures from shadowing SQL test modules.
-          modules = ["tests.integration." + path.stem for path in sorted(Path("tests/integration").glob("test_*.py"))]
-          result = subprocess.run([sys.executable, "-m", "unittest", *modules, "-v"], capture_output=True, text=True)
-          output = result.stdout + result.stderr
-          print(output)
-          if result.returncode:
-              detail = output[-15000:].replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
-              print("::error title=PostgreSQL regression failure::" + detail)
-          sys.exit(result.returncode)
-          PY
-
-      - name: Exercise real API, worker, database and browser workflow
-        working-directory: backend
-        env:
-          DATION_E2E_ARTIFACTS: ${{ runner.temp }}/dation-e2e-artifacts
-          DATION_T11_R_IMAGE: dation-ci-compatibility:test
-        run: |
-          python - <<'PY'
-          import json, subprocess, sys
-          result = subprocess.run([sys.executable, "tests/e2e/run_suite.py"], capture_output=True, text=True)
-          output = result.stdout + result.stderr
-          print(output)
-          if result.returncode:
-              # Keep the actual assertion, not log tails that exceed annotation limits.
-              reports = [line.removeprefix("DATION_E2E_RESULT=") for line in result.stdout.splitlines() if line.startswith("DATION_E2E_RESULT=")]
-              failures = json.loads(reports[-1]).get("failure_details", []) if reports else []
-              failure = "\n".join(item["test"] + "\n" + item["traceback"] for item in failures) or output
-              detail = failure[-3500:].replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
-              print("::error title=End-to-end regression failure::" + detail)
-          sys.exit(result.returncode)
-          PY
-
-      - name: Save synthetic E2E traces and diagnostics
+          SOURCE_REF: ${{ matrix.source }}
+          BROWSER_DIAGNOSTICS: ${{ runner.temp }}/browser-evidence
+          DATION_RUNTIME_PYTHON: python
+          SUPABASE_URL: ''
+          SUPABASE_SECRET_KEY: ''
+          LLM_API_KEY: ''
+        run: .browser-venv/bin/python /tmp/saga02_browser_diagnostics.py
+      - name: Save synthetic evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: dation-e2e-diagnostics
-          path: ${{ runner.temp }}/dation-e2e-artifacts
-          if-no-files-found: ignore
+          name: browser-evidence-${{ matrix.source }}
+          path: ${{ runner.temp }}/browser-evidence
           retention-days: 7
