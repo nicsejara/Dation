@@ -13,14 +13,12 @@ from uuid import UUID
 import httpx
 from fastapi import HTTPException
 from app.config import SUPABASE_URL
+from app.cloud_identity import PROJECT, REGION, JOBS, validate_environment
 from app.platform.context import current, is_infrastructure
 from app.platform.identity import headers
 from app.services.http_service import http_client
 from app.observability import event, metrics
 
-PROJECT, REGION = 'dation-510100', 'us-west1'
-JOBS = {kind:f'projects/{PROJECT}/locations/{REGION}/jobs/'+name for kind,name in
-        [('compute','dation-executor'),('control','dation-recovery')]}
 _override = ContextVar('execution_dispatch_transport', default=None)
 
 
@@ -66,10 +64,11 @@ class GoogleJobsTransport:
     def __init__(self):
         if os.getenv('DATION_CLOUD_EXECUTION_ENABLED','false')!='true':
             raise DispatchConfigurationError('Cloud execution is disabled')
-        if os.getenv('DATION_CLOUD_PROJECT',PROJECT)!=PROJECT:
-            raise DispatchConfigurationError('Unexpected cloud project')
-        self.resources={key:os.getenv('DATION_'+key.upper()+'_JOB','') for key in JOBS}
-        if self.resources!=JOBS:raise DispatchConfigurationError('Unverified Job resource configuration')
+        try:
+            validate_environment(os.environ)
+        except ValueError as exc:
+            raise DispatchConfigurationError(str(exc)) from exc
+        self.resources=dict(JOBS)
 
     async def _token(self,client):
         # Managed service identity only; no forwarded user token/static data key.

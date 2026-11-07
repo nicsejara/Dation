@@ -1,5 +1,11 @@
 # Release y rollback: permiso económico separado
 
+> Histórico de Saga 02. Para la activación vigente usar
+> [Runtime V2](../runtime-v2/activation-runbook.md): proyecto nuevo aislado;
+> el proyecto anterior no se modifica ni se elimina su worker. El propietario
+> dispensó el backup restaurable de datos operativos de prueba en DDA Free.
+> Los pasos antiguos de neutralización/backup no son gates de Runtime V2.
+
 Estado actual: **MERGE_BLOCKED_DEPLOY_TRIGGER**, Billing OFF por instrucción,
 **UNVERIFIED_LIVE** por las lecturas 401. Ningún paso productivo de este runbook
 fue ejecutado. El SHA base es `92656a1c8c94ae1181a18c47ddd681eaa313f92b`.

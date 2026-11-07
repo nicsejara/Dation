@@ -1,5 +1,10 @@
 # Saga 02 — validación y estado de entrega
 
+> Evidencia histórica de Saga 02, integrada en #105. La adaptación vigente al
+> proyecto nuevo y sus gates se documentan en [Runtime V2](../runtime-v2/README.md).
+> No ejecutar pasos del proyecto anterior; la dispensa de backup de DDA Free
+> está registrada en el runbook nuevo, sin modificar esta evidencia histórica.
+
 Baseline `main` / `origin/main`: **92656a1c8c94ae1181a18c47ddd681eaa313f92b**,
 posterior a #103 y #104. Branch `feat/saga02-zero-idle-runtime`.
 No hay despliegue ni autorización de merge: **MERGE_BLOCKED_DEPLOY_TRIGGER**.

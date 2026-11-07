@@ -1,0 +1,409 @@
+{
+  "service": {
+    "name": "projects/dation-runtime-v2-2026/locations/us-west1/services/dation-core",
+    "template": {
+      "serviceAccount": "dation-runtime@dation-runtime-v2-2026.iam.gserviceaccount.com",
+      "scaling": {
+        "minInstanceCount": 0,
+        "maxInstanceCount": 2
+      },
+      "maxInstanceRequestConcurrency": 8,
+      "timeout": "300s",
+      "containers": [
+        {
+          "name": "runtime",
+          "image": "REQUIRES_REVIEWED_IMAGE_DIGEST",
+          "env": [
+            {
+              "name": "DATION_EXECUTION_MODE",
+              "value": "jobs"
+            },
+            {
+              "name": "DATION_CLOUD_EXECUTION_ENABLED",
+              "value": "false"
+            },
+            {
+              "name": "DATION_CLOUD_PROJECT",
+              "value": "dation-runtime-v2-2026"
+            },
+            {
+              "name": "DATION_COMPUTE_JOB",
+              "value": "projects/dation-runtime-v2-2026/locations/us-west1/jobs/dation-executor"
+            },
+            {
+              "name": "DATION_CONTROL_JOB",
+              "value": "projects/dation-runtime-v2-2026/locations/us-west1/jobs/dation-recovery"
+            },
+            {
+              "name": "DATION_CLOUD_PROJECT_NUMBER",
+              "value": "332279365872"
+            },
+            {
+              "name": "DATION_CLOUD_REGION",
+              "value": "us-west1"
+            },
+            {
+              "name": "SUPABASE_URL",
+              "value": "https://gijiinufjjurgfeehufj.supabase.co"
+            },
+            {
+              "name": "SUPABASE_INPUT_BUCKET",
+              "value": "dda-inputs"
+            },
+            {
+              "name": "DATION_RELEASE_SHA",
+              "value": "REQUIRES_EXACT_VALIDATED_SHA"
+            },
+            {
+              "name": "SUPABASE_SECRET_KEY",
+              "valueSource": {
+                "secretKeyRef": {
+                  "secret": "dation-supabase-secret",
+                  "version": "1"
+                }
+              }
+            },
+            {
+              "name": "DATION_ACCESS_PASSWORD",
+              "valueSource": {
+                "secretKeyRef": {
+                  "secret": "dation-access-password",
+                  "version": "1"
+                }
+              }
+            }
+          ],
+          "command": [
+            "sh",
+            "-c"
+          ],
+          "args": [
+            "exec uvicorn main:app --host 0.0.0.0 --port \"${PORT:-8080}\""
+          ],
+          "resources": {
+            "limits": {
+              "cpu": "1",
+              "memory": "512Mi"
+            },
+            "cpuIdle": true
+          }
+        }
+      ]
+    }
+  },
+  "jobs": [
+    {
+      "name": "projects/dation-runtime-v2-2026/locations/us-west1/jobs/dation-executor",
+      "template": {
+        "taskCount": 1,
+        "parallelism": 1,
+        "template": {
+          "serviceAccount": "dation-runtime@dation-runtime-v2-2026.iam.gserviceaccount.com",
+          "maxRetries": 0,
+          "timeout": "1800s",
+          "containers": [
+            {
+              "name": "runtime",
+              "image": "REQUIRES_REVIEWED_IMAGE_DIGEST",
+              "env": [
+                {
+                  "name": "DATION_EXECUTION_MODE",
+                  "value": "jobs"
+                },
+                {
+                  "name": "DATION_CLOUD_EXECUTION_ENABLED",
+                  "value": "false"
+                },
+                {
+                  "name": "DATION_CLOUD_PROJECT",
+                  "value": "dation-runtime-v2-2026"
+                },
+                {
+                  "name": "DATION_COMPUTE_JOB",
+                  "value": "projects/dation-runtime-v2-2026/locations/us-west1/jobs/dation-executor"
+                },
+                {
+                  "name": "DATION_CONTROL_JOB",
+                  "value": "projects/dation-runtime-v2-2026/locations/us-west1/jobs/dation-recovery"
+                },
+                {
+                  "name": "DATION_CLOUD_PROJECT_NUMBER",
+                  "value": "332279365872"
+                },
+                {
+                  "name": "DATION_CLOUD_REGION",
+                  "value": "us-west1"
+                },
+                {
+                  "name": "SUPABASE_URL",
+                  "value": "https://gijiinufjjurgfeehufj.supabase.co"
+                },
+                {
+                  "name": "SUPABASE_INPUT_BUCKET",
+                  "value": "dda-inputs"
+                },
+                {
+                  "name": "DATION_RELEASE_SHA",
+                  "value": "REQUIRES_EXACT_VALIDATED_SHA"
+                },
+                {
+                  "name": "SUPABASE_SECRET_KEY",
+                  "valueSource": {
+                    "secretKeyRef": {
+                      "secret": "dation-supabase-secret",
+                      "version": "1"
+                    }
+                  }
+                },
+                {
+                  "name": "DATION_ACCESS_PASSWORD",
+                  "valueSource": {
+                    "secretKeyRef": {
+                      "secret": "dation-access-password",
+                      "version": "1"
+                    }
+                  }
+                }
+              ],
+              "command": [
+                "python",
+                "event_worker.py"
+              ],
+              "args": [],
+              "resources": {
+                "limits": {
+                  "cpu": "1",
+                  "memory": "1Gi"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "projects/dation-runtime-v2-2026/locations/us-west1/jobs/dation-recovery",
+      "template": {
+        "taskCount": 1,
+        "parallelism": 1,
+        "template": {
+          "serviceAccount": "dation-runtime@dation-runtime-v2-2026.iam.gserviceaccount.com",
+          "maxRetries": 0,
+          "timeout": "120s",
+          "containers": [
+            {
+              "name": "runtime",
+              "image": "REQUIRES_REVIEWED_IMAGE_DIGEST",
+              "env": [
+                {
+                  "name": "DATION_EXECUTION_MODE",
+                  "value": "jobs"
+                },
+                {
+                  "name": "DATION_CLOUD_EXECUTION_ENABLED",
+                  "value": "false"
+                },
+                {
+                  "name": "DATION_CLOUD_PROJECT",
+                  "value": "dation-runtime-v2-2026"
+                },
+                {
+                  "name": "DATION_COMPUTE_JOB",
+                  "value": "projects/dation-runtime-v2-2026/locations/us-west1/jobs/dation-executor"
+                },
+                {
+                  "name": "DATION_CONTROL_JOB",
+                  "value": "projects/dation-runtime-v2-2026/locations/us-west1/jobs/dation-recovery"
+                },
+                {
+                  "name": "DATION_CLOUD_PROJECT_NUMBER",
+                  "value": "332279365872"
+                },
+                {
+                  "name": "DATION_CLOUD_REGION",
+                  "value": "us-west1"
+                },
+                {
+                  "name": "SUPABASE_URL",
+                  "value": "https://gijiinufjjurgfeehufj.supabase.co"
+                },
+                {
+                  "name": "SUPABASE_INPUT_BUCKET",
+                  "value": "dda-inputs"
+                },
+                {
+                  "name": "DATION_RELEASE_SHA",
+                  "value": "REQUIRES_EXACT_VALIDATED_SHA"
+                },
+                {
+                  "name": "SUPABASE_SECRET_KEY",
+                  "valueSource": {
+                    "secretKeyRef": {
+                      "secret": "dation-supabase-secret",
+                      "version": "1"
+                    }
+                  }
+                },
+                {
+                  "name": "DATION_ACCESS_PASSWORD",
+                  "valueSource": {
+                    "secretKeyRef": {
+                      "secret": "dation-access-password",
+                      "version": "1"
+                    }
+                  }
+                }
+              ],
+              "command": [
+                "python",
+                "event_worker.py"
+              ],
+              "args": [
+                "--recover"
+              ],
+              "resources": {
+                "limits": {
+                  "cpu": "1",
+                  "memory": "512Mi"
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "service_accounts": [
+    {
+      "parent": "projects/dation-runtime-v2-2026",
+      "accountId": "dation-runtime",
+      "serviceAccount": {
+        "displayName": "Dation finite runtime"
+      }
+    },
+    {
+      "parent": "projects/dation-runtime-v2-2026",
+      "accountId": "dation-scheduler",
+      "serviceAccount": {
+        "displayName": "Dation recovery scheduler"
+      }
+    }
+  ],
+  "iam": {
+    "custom_role": {
+      "parent": "projects/dation-runtime-v2-2026",
+      "roleId": "dationFiniteJobDispatcher",
+      "role": {
+        "title": "Dation finite Jobs dispatcher",
+        "stage": "GA",
+        "includedPermissions": [
+          "run.jobs.get",
+          "run.jobs.run",
+          "run.jobs.runWithOverrides"
+        ]
+      }
+    },
+    "bindings": [
+      {
+        "resource": "projects/dation-runtime-v2-2026/locations/us-west1/jobs/dation-executor",
+        "role": "projects/dation-runtime-v2-2026/roles/dationFiniteJobDispatcher",
+        "members": [
+          "serviceAccount:dation-runtime@dation-runtime-v2-2026.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "resource": "projects/dation-runtime-v2-2026/locations/us-west1/jobs/dation-recovery",
+        "role": "projects/dation-runtime-v2-2026/roles/dationFiniteJobDispatcher",
+        "members": [
+          "serviceAccount:dation-runtime@dation-runtime-v2-2026.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "resource": "projects/dation-runtime-v2-2026/locations/us-west1/jobs/dation-recovery",
+        "role": "roles/run.invoker",
+        "members": [
+          "serviceAccount:dation-scheduler@dation-runtime-v2-2026.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "resource": "projects/dation-runtime-v2-2026/secrets/dation-access-password",
+        "role": "roles/secretmanager.secretAccessor",
+        "members": [
+          "serviceAccount:dation-runtime@dation-runtime-v2-2026.iam.gserviceaccount.com"
+        ]
+      },
+      {
+        "resource": "projects/dation-runtime-v2-2026/secrets/dation-supabase-secret",
+        "role": "roles/secretmanager.secretAccessor",
+        "members": [
+          "serviceAccount:dation-runtime@dation-runtime-v2-2026.iam.gserviceaccount.com"
+        ]
+      }
+    ],
+    "policy_updates": "Read policy, preserve bindings, merge reviewed delta with etag"
+  },
+  "secret_manager": {
+    "create_proposals": [
+      {
+        "parent": "projects/dation-runtime-v2-2026",
+        "secretId": "dation-access-password",
+        "secret": {
+          "replication": {
+            "automatic": {}
+          }
+        }
+      },
+      {
+        "parent": "projects/dation-runtime-v2-2026",
+        "secretId": "dation-supabase-secret",
+        "secret": {
+          "replication": {
+            "automatic": {}
+          }
+        }
+      }
+    ],
+    "version_references": {
+      "SUPABASE_SECRET_KEY": {
+        "secret": "dation-supabase-secret",
+        "version": "1"
+      },
+      "DATION_ACCESS_PASSWORD": {
+        "secret": "dation-access-password",
+        "version": "1"
+      }
+    },
+    "values_included": false,
+    "versions_created": false
+  },
+  "scheduler": {
+    "enabled": false,
+    "create_by_default": false,
+    "desired_initial_state": "PAUSED",
+    "creation_requires_explicit_go": true,
+    "request": {
+      "name": "projects/dation-runtime-v2-2026/locations/us-west1/jobs/dation-recovery-every-15m",
+      "schedule": "*/15 * * * *",
+      "timeZone": "Etc/UTC",
+      "attemptDeadline": "30s",
+      "retryConfig": {
+        "retryCount": 0
+      },
+      "httpTarget": {
+        "uri": "https://run.googleapis.com/v2/projects/dation-runtime-v2-2026/locations/us-west1/jobs/dation-recovery:run",
+        "httpMethod": "POST",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": "e30=",
+        "oauthToken": {
+          "serviceAccountEmail": "dation-scheduler@dation-runtime-v2-2026.iam.gserviceaccount.com",
+          "scope": "https://www.googleapis.com/auth/cloud-platform"
+        }
+      }
+    },
+    "warning": "Create may start scheduling immediately; never create then pause without activation GO"
+  },
+  "scheduler_created": false,
+  "mutation_performed": false
+}

@@ -14,6 +14,7 @@ from time import perf_counter
 from uuid import UUID, uuid4
 
 from starlette.responses import JSONResponse
+from app.cloud_identity import PROJECT
 
 context = ContextVar('dation_observability', default={})
 component = 'api'
@@ -90,8 +91,8 @@ class JSONFormatter(logging.Formatter):
                 data[key] = value
         if record.exc_info and record.exc_info[0]:
             data['error_type'] = record.exc_info[0].__name__
-        project = os.getenv('GOOGLE_CLOUD_PROJECT', 'dation-510100')
-        if data.get('trace_id') and re.fullmatch('[a-z][a-z0-9-]{4,62}', project):
+        project = os.getenv('GOOGLE_CLOUD_PROJECT', PROJECT)
+        if data.get('trace_id') and project == PROJECT:
             data['logging.googleapis.com/trace'] = 'projects/'+project+'/traces/'+data['trace_id']
             data['logging.googleapis.com/spanId'] = data.get('span_id')
         # Unstructured third-party messages/exception text are intentionally excluded.
