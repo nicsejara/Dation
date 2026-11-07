@@ -1,5 +1,10 @@
 # Estado de implementación · Platform MVP v1
 
+> **HISTORICAL EXECUTION EVIDENCE.** Registro de la saga Platform MVP v1, conservado
+> sin reescribir sus resultados. «Estado vigente» y «pendiente» se refieren a su
+> fecha de referencia, no al `main` Ultimate actual. Ver el
+> [master baseline](../MASTER_DEVELOPMENT_BASELINE.md).
+
 Fecha de referencia: 2026-10-18 (`America/Buenos_Aires`). Fuente de requisitos: `PROMPT_MAESTRO_SUPER_PRO_Dation_Platform_MVP_v1.md` adjunto por el usuario. El roadmap contiene Fases 0–12; este registro pertenece a esa saga, no a las anteriores sagas UX/D1/D2.
 
 ## Estado vigente

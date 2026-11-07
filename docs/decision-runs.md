@@ -1,5 +1,32 @@
 # Decision Runs, approval and invalidation
 
+## Current Ultimate Runs
+
+An Ultimate Run pins the Case's Logistics Model/version, published Data Pack
+version, read set, Case/node policies and context hash. Admission and the private
+worker adapter live in `backend/app/services/ultimate_run_service.py`; exact
+runtime identities are resolved through `backend/app/results/registry.py`.
+
+D1 publishes `transport_plan_v1`; D2 publishes `day_scheduling_v1` bound to the
+approved source Run and result fingerprint. D2 preserves D1 trips, allocations
+and resources. Packages, artifacts and evidence are read through
+`result_package_service.py`, `result_artifact_service.py` and
+`result_consumer_service.py`; `ultimate_decision_context.py` supplies the
+reference-bound Approval Copilot. These service paths are under
+`backend/app/services/`.
+
+Existing SQL release/workspace/pilot gates govern admission and approval. The
+public runtime catalog deliberately retains its availability distinction; do not
+change it merely because an Ultimate schema is known. See the
+[master baseline](MASTER_DEVELOPMENT_BASELINE.md) and [architecture](architecture.md).
+
+## Retained Orders/Fleet Run contract
+
+The following documents the compatible `assignment_v1` / `scheduling_v1` flow and
+its immutable dataset-pair behavior. Its safeguards remain meaningful for those
+Runs; the Ultimate versioned input/package contract above governs new Ultimate
+execution.
+
 One Case/Decision supports multiple Runs. A rerun is a new admitted intention,
 not a new Case. The queue fingerprints the request and resolves an idempotent
 `run_id` replay before mutable upstream checks. Replaying the same intention must

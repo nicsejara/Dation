@@ -3,6 +3,23 @@
 Paths below are relative to `backend/app/static/js/dispatch` unless qualified.
 The frontend uses render/mount functions, native elements and ES modules.
 
+## Current Ultimate surfaces
+
+| Surface | Canonical location relative to the path above |
+|---|---|
+| Case setup | `cases/ultimate-case-setup.mjs` |
+| Progressive Case Data | `upload/ultimate-case-data.mjs` |
+| Decision graph / map | `navigation/ultimate-graph.mjs`, `cases/ultimate-decision-map.mjs` |
+| Result Package presentation | `results/mount.mjs`, `results/dashboard.mjs`, `results/package.mjs`, `results/details.mjs`, `results/visuals.mjs` |
+
+These consume the authoritative Ultimate APIs and published packages described in
+[architecture](architecture.md). The remaining foundation map describes shared
+primitives and compatibility surfaces; its historical Orders/Fleet and
+Assignment/Scheduling 1.0 descriptions do not replace the current Result Package
+contracts. Development entrypoint: [master baseline](MASTER_DEVELOPMENT_BASELINE.md).
+
+## Foundation and compatibility surfaces
+
 | Component | Purpose / main inputs | Location | Used by / why not duplicate |
 |---|---|---|---|
 | Workflow Hero | metadata, title, description, optional decision panel | `decision-config-ui.mjs::decisionHero` | Data, Map, D1/D2 Config; common escaping and hierarchy |
