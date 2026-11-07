@@ -11,13 +11,16 @@ from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
-PROJECT, NUMBER, REGION, SERVICE = 'dation-510100', '469052310590', 'us-west1', 'dation-core'
+sys.path.insert(0, str(ROOT/'backend'))
+from app.cloud_identity import PROJECT, PROJECT_NUMBER as NUMBER, REGION, SERVICE
 WORKER = 'dation-core-worker'
 
 
 def run_request(method, path, environment, body=None):
     if method != "GET":
         raise RuntimeError("Historical deployment writes disabled; use zero_idle_release.py.")
+    if path not in {f'projects/{PROJECT}/locations/{REGION}/services/{name}' for name in (SERVICE,WORKER)}:
+        raise RuntimeError('Historical diagnostics cannot target another project or region.')
     # Read-only historical diagnostics.
     token = environment.get('GCP_ACCESS_TOKEN')
     if not token:

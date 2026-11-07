@@ -6,17 +6,28 @@ import json
 from pathlib import Path
 import re
 import subprocess
+import sys
 
 ROOT=Path(__file__).resolve().parents[1]
 DEFAULT=ROOT/'infra/zero-idle/release.json'
-PROJECT='dation-510100'
+sys.path.insert(0, str(ROOT/'backend'))
+from app.cloud_identity import (PROJECT, PROJECT_NUMBER, REGION, SERVICE, JOBS,
+    validate_environment, validate_account, validate_image)
 
 
 def validate(plan):
-    if (plan['project'],plan['project_number'],plan['region'])!=(PROJECT,'469052310590','us-west1'):
+    if (plan['project'],plan['project_number'],plan['region'])!=(PROJECT,PROJECT_NUMBER,REGION):
         raise ValueError('Project/region mismatch')
+    if plan['billing_policy']!='OFF_UNTIL_EXPLICIT_OWNER_GO':raise ValueError('Billing must remain OFF')
+    validate_environment(plan['environment'])
+    validate_account(plan['service_account']);validate_account(plan['scheduler_service_account'])
+    if plan['service_account']==plan['scheduler_service_account']:raise ValueError('Scheduler identity must be separate')
+    validate_image(plan['image'])
+    if plan['release_sha']!='REQUIRES_EXACT_VALIDATED_SHA' and not re.fullmatch('[0-9a-f]{40}',plan['release_sha']):
+        raise ValueError('Exact release SHA required')
     if plan['merge_gate']!='MERGE_BLOCKED_DEPLOY_TRIGGER':raise ValueError('Remote trigger authorization is unverified')
     api=plan['api']
+    if api['name']!=SERVICE:raise ValueError('Unexpected API target')
     if api['min_instances']!=0 or not api['cpu_idle'] or not 1<=api['max_instances']<=2:
         raise ValueError('API must scale to zero with request CPU and max 2 instances')
     if api['cpu']!='1' or api['memory']!='512Mi' or not 1<=api['concurrency']<=8:
@@ -33,14 +44,14 @@ def validate(plan):
         raise ValueError('Offline plan must leave cloud execution disabled')
     if any(k.startswith('DATION_TEST_') or k=='DATION_DISPATCH_FAKE_URL' for k in env):raise ValueError('Test transport forbidden')
     for key,name in [('compute','dation-executor'),('control','dation-recovery')]:
-        if plan[key]['name']!=name or env.get('DATION_'+key.upper()+'_JOB')!=f'projects/{PROJECT}/locations/us-west1/jobs/{name}':
+        if plan[key]['name']!=name or env.get('DATION_'+key.upper()+'_JOB')!=JOBS[key]:
             raise ValueError('Unexpected Job target')
     if any('KEY' in k or 'TOKEN' in k or 'PASSWORD' in k for k in env):raise ValueError('Embedded credentials forbidden')
     for name,ref in plan['secret_references'].items():
         if set(ref)!={'secret','version'} or not re.fullmatch('[a-zA-Z0-9_-]+',ref['secret']) or not re.fullmatch('[1-9][0-9]*',ref['version']):
             raise ValueError('Only pinned Secret Manager references allowed')
     schedule=plan['recovery_schedule']
-    if schedule['create_by_default'] or schedule['enabled'] or schedule['schedule']!='*/15 * * * *':
+    if schedule['create_by_default'] or schedule['enabled'] or schedule['schedule']!='*/15 * * * *' or schedule['time_zone']!='Etc/UTC' or schedule['target']!=plan['control']['name']:
         raise ValueError('Scheduling requires a separate future authorization')
     return plan
 
@@ -74,21 +85,63 @@ def manifest(plan):
     """Cloud Run v2 resource bodies, references only. Does not send requests."""
     validate(plan)
     env=[{'name':k,'value':v} for k,v in plan['environment'].items()]
+    env.append({'name':'DATION_RELEASE_SHA','value':plan['release_sha']})
     env += [{'name':k,'valueSource':{'secretKeyRef':v}} for k,v in plan['secret_references'].items()]
     common={'name':'runtime','image':plan['image'],'env':env}
-    api=plan['api'];service={'name':f'projects/{PROJECT}/locations/us-west1/services/'+api['name'],
+    api=plan['api'];service={'name':f'projects/{PROJECT}/locations/{REGION}/services/'+api['name'],
         'template':{'serviceAccount':plan['service_account'],'scaling':{'minInstanceCount':0,'maxInstanceCount':api['max_instances']},
             'maxInstanceRequestConcurrency':api['concurrency'],'timeout':str(api['timeout_seconds'])+'s',
             'containers':[{**copy.deepcopy(common),'command':['sh','-c'],'args':['exec uvicorn main:app --host 0.0.0.0 --port "${PORT:-8080}"'],
                 'resources':{'limits':{'cpu':'1','memory':'512Mi'},'cpuIdle':True}}]}}
     jobs=[]
     for key in ['compute','control']:
-        j=plan[key];jobs.append({'name':f'projects/{PROJECT}/locations/us-west1/jobs/'+j['name'],
+        j=plan[key];jobs.append({'name':JOBS[key],
             'template':{'taskCount':1,'parallelism':1,'template':{'serviceAccount':plan['service_account'],
                 'maxRetries':0,'timeout':str(j['timeout_seconds'])+'s',
                 'containers':[{**copy.deepcopy(common),'command':j['command'],'args':j['args'],
                     'resources':{'limits':{'cpu':j['cpu'],'memory':j['memory']}}}]}}})
-    return {'service':service,'jobs':jobs,'scheduler_created':False,'mutation_performed':False}
+    return {'service':service,'jobs':jobs,**supporting_manifests(plan),
+        'scheduler_created':False,'mutation_performed':False}
+
+
+def supporting_manifests(plan):
+    """Reviewable create/binding proposals; never read or write a cloud resource."""
+    runtime=plan['service_account'];scheduler=plan['scheduler_service_account']
+    role=f'projects/{PROJECT}/roles/dationFiniteJobDispatcher'
+    secrets=sorted({ref['secret'] for ref in plan['secret_references'].values()})
+    bindings=[{'resource':resource,'role':role,'members':['serviceAccount:'+runtime]}
+              for resource in JOBS.values()]
+    bindings.append({'resource':JOBS['control'],'role':'roles/run.invoker',
+                     'members':['serviceAccount:'+scheduler]})
+    bindings += [{'resource':f'projects/{PROJECT}/secrets/'+name,
+                  'role':'roles/secretmanager.secretAccessor','members':['serviceAccount:'+runtime]}
+                 for name in secrets]
+    accounts=[]
+    for email,title in [(runtime,'Dation finite runtime'),(scheduler,'Dation recovery scheduler')]:
+        accounts.append({'parent':f'projects/{PROJECT}','accountId':email.split('@')[0],
+                         'serviceAccount':{'displayName':title}})
+    schedule=plan['recovery_schedule']
+    return {
+        'service_accounts':accounts,
+        'iam':{'custom_role':{'parent':f'projects/{PROJECT}','roleId':'dationFiniteJobDispatcher',
+            'role':{'title':'Dation finite Jobs dispatcher','stage':'GA',
+                    'includedPermissions':['run.jobs.get','run.jobs.run','run.jobs.runWithOverrides']}},
+            'bindings':bindings,'policy_updates':'Read policy, preserve bindings, merge reviewed delta with etag'},
+        'secret_manager':{'create_proposals':[{'parent':f'projects/{PROJECT}','secretId':name,
+            'secret':{'replication':{'automatic':{}}}} for name in secrets],
+            'version_references':copy.deepcopy(plan['secret_references']),
+            'values_included':False,'versions_created':False},
+        'scheduler':{'enabled':False,'create_by_default':False,'desired_initial_state':'PAUSED',
+            'creation_requires_explicit_go':True,
+            'request':{'name':f'projects/{PROJECT}/locations/{REGION}/jobs/dation-recovery-every-15m',
+                'schedule':schedule['schedule'],'timeZone':schedule['time_zone'],
+                'attemptDeadline':'30s','retryConfig':{'retryCount':0},
+                'httpTarget':{'uri':'https://run.googleapis.com/v2/'+JOBS['control']+':run',
+                    'httpMethod':'POST','headers':{'Content-Type':'application/json'},'body':'e30=',
+                    'oauthToken':{'serviceAccountEmail':scheduler,
+                                 'scope':'https://www.googleapis.com/auth/cloud-platform'}}},
+            'warning':'Create may start scheduling immediately; never create then pause without activation GO'},
+    }
 
 
 def apply_gate(plan,owner_go):

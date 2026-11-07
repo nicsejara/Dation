@@ -11,6 +11,7 @@ import httpx
 from fastapi import HTTPException
 from platform_fixtures import TenantTestCase
 from app.services import execution_dispatch as runtime,operations_service
+from app.cloud_identity import environment, PROJECT, REGION
 import event_worker
 
 class ExecutionDispatchTests(TenantTestCase):
@@ -38,13 +39,54 @@ class ExecutionDispatchTests(TenantTestCase):
         self.assertEqual(rpc.await_args_list[1].args[0],'defer')
         self.assertEqual(rpc.await_args_list[1].args[1]['delivery_token'],identity['delivery_token'])
     async def test_google_transport_requires_exact_resources_and_managed_identity(self):
-        with patch.dict(os.environ,{'DATION_CLOUD_EXECUTION_ENABLED':'true','DATION_COMPUTE_JOB':runtime.JOBS['compute'],'DATION_CONTROL_JOB':runtime.JOBS['control']}):
+        with patch.dict(os.environ,{**environment(),'DATION_CLOUD_EXECUTION_ENABLED':'true'}):
             provider=runtime.GoogleJobsTransport()
             with patch.dict(os.environ,{'DATION_CLOUD_PROJECT':'other-project'}):
                 with self.assertRaises(runtime.DispatchConfigurationError):runtime.GoogleJobsTransport()
             client=AsyncMock();client.get.return_value=httpx.Response(200,json={'access_token':'synthetic'},request=httpx.Request('GET','http://metadata.google.internal'))
             self.assertEqual(await provider._token(client),'synthetic')
             self.assertEqual(client.get.call_args.kwargs['headers'],{'Metadata-Flavor':'Google'})
+    async def test_missing_or_cross_project_config_fails_before_reservation_or_cloud(self):
+        valid={**environment(),'DATION_CLOUD_EXECUTION_ENABLED':'true'}
+        invalid=[]
+        for key in environment():
+            missing=dict(valid);missing.pop(key);invalid.append(missing)
+        for key,value in [('DATION_CLOUD_PROJECT','dation-510100'),
+                          ('DATION_CLOUD_PROJECT_NUMBER','469052310590'),
+                          ('DATION_CLOUD_REGION','us-central1'),
+                          ('DATION_CONTROL_JOB','projects/other-project/locations/us-west1/jobs/dation-recovery')]:
+            invalid.append({**valid,key:value})
+        for values in invalid:
+            with self.subTest(values=values),patch.dict(os.environ,values,clear=True), \
+                 patch.object(runtime,'runtime_rpc',AsyncMock()) as rpc,patch.object(runtime,'http_client') as cloud:
+                with self.assertRaises(runtime.DispatchConfigurationError):await runtime.publish_pending()
+                rpc.assert_not_awaited();cloud.assert_not_called()
+    async def test_provider_and_iam_requests_are_scoped_to_v2_for_every_work_kind(self):
+        client=AsyncMock()
+        client.get.return_value=httpx.Response(200,json={'access_token':'synthetic'},request=httpx.Request('GET','http://metadata.google.internal'))
+        operation=f'projects/{PROJECT}/locations/{REGION}/operations/owned'
+        client.post.return_value=httpx.Response(200,json={'name':operation},request=httpx.Request('POST','https://run.googleapis.com'))
+        @asynccontextmanager
+        async def owned_client():yield client
+        with patch.dict(os.environ,{**environment(),'DATION_CLOUD_EXECUTION_ENABLED':'true'}),patch.object(runtime,'http_client',owned_client):
+            provider=runtime.GoogleJobsTransport()
+            for kind,target in [('dispatch','compute'),('comparative','compute'),('reconciliation','control')]:
+                intent={'id':str(uuid4()),'delivery_token':str(uuid4()),'kind':kind}
+                self.assertEqual(await provider.dispatch(intent),operation)
+                call=client.post.call_args
+                self.assertEqual(call.args[0],'https://run.googleapis.com/v2/'+runtime.JOBS[target]+':run')
+                overrides=call.kwargs['json']['overrides']
+                self.assertEqual(overrides,{'taskCount':1,'containerOverrides':[{'name':'runtime','args':['--intent-id',intent['id'],'--delivery-token',intent['delivery_token']]}]})
+            client.get.side_effect=[client.get.return_value,*[
+                httpx.Response(200,json={'name':resource},request=httpx.Request('GET','https://run.googleapis.com')) for resource in runtime.JOBS.values()]]
+            client.post.side_effect=[httpx.Response(200,json={'permissions':['run.jobs.run','run.jobs.runWithOverrides']},request=httpx.Request('POST','https://run.googleapis.com')) for _ in runtime.JOBS]
+            client.post.reset_mock()
+            self.assertTrue(await provider.healthy())
+            self.assertEqual([c.args[0] for c in client.post.call_args_list],['https://run.googleapis.com/v2/'+resource+':testIamPermissions' for resource in runtime.JOBS.values()])
+            client.post.side_effect=None
+            client.get.side_effect=None
+            client.post.return_value=httpx.Response(200,json={'name':'projects/dation-510100/locations/us-west1/operations/retired'},request=httpx.Request('POST','https://run.googleapis.com'))
+            with self.assertRaises(runtime.DispatchConfigurationError):await provider.dispatch(intent)
     async def test_fake_transport_rejects_remote_hosts_and_cloud_runtime(self):
         for url in ['https://127.0.0.1','http://localhost','http://example.com','http://127.0.0.1/other']:
             with self.assertRaises(runtime.DispatchConfigurationError):runtime.LoopbackJobsTransport(url)

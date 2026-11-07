@@ -54,14 +54,7 @@ def apply(directory,email):
  print('Both migrations applied atomically. Legacy ownership bound; existing evidence unchanged; new Auth admissions CLOSED.')
 
 def auth_config():
- origin='https://dation-core-469052310590.us-west1.run.app'
- body={'site_url':origin+'/app','uri_allow_list':','.join([origin+'/auth/callback',origin+'/auth/callback/recovery']),
-       'password_min_length':10,'jwt_exp':900}
- request=Request(f'https://api.supabase.com/v1/projects/{REF}/config/auth',method='PATCH',
-  headers={'Authorization':'Bearer '+os.environ['SUPABASE_ACCESS_TOKEN'],'Content-Type':'application/json'},data=json.dumps(body).encode())
- with urlopen(request,timeout=30) as response:result=json.load(response)
- if any(result.get(key)!=value for key,value in body.items()):raise RuntimeError('Auth redirect configuration was not confirmed.')
- print('Production HTTPS callbacks and password/session policy configured. No email sent; delivery must be checked during user registration.')
+ raise RuntimeError('Legacy Auth mutation disabled; review the actual Runtime V2 HTTPS URI and callbacks under a separate GO.')
 
 def activate(directory,grants_directory):
  checked_backup(directory)
