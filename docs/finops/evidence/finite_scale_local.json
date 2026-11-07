@@ -1,0 +1,59 @@
+{
+  "scope": "FINITE_1CPU_1GIB_500_50_31",
+  "elapsed_seconds": 88.14001884398749,
+  "existing_90_second_gate_pass": true,
+  "trip_count": 128,
+  "status": "FEASIBLE",
+  "artifacts": 83,
+  "production_touched": false,
+  "measurements": [
+    {
+      "timestamp": "2026-11-06T03:11:46.404852+00:00",
+      "severity": "INFO",
+      "component": "finite-worker",
+      "event": "finite_execution_start",
+      "logger": "dation",
+      "revision": "local",
+      "kind": "dispatch",
+      "generation": 1,
+      "retry_count": 0,
+      "queue_wait_ms": 13028.805,
+      "dispatch_delay_ms": 26.449,
+      "worker_cold_start_ms": 786.4370989846066
+    },
+    {
+      "timestamp": "2026-11-06T03:12:23.665606+00:00",
+      "severity": "INFO",
+      "component": "finite-worker",
+      "event": "solver_finished",
+      "logger": "dation",
+      "revision": "local",
+      "solver_execution_ms": 35328.798653994454
+    },
+    {
+      "timestamp": "2026-11-06T03:13:00.239789+00:00",
+      "severity": "INFO",
+      "component": "finite-worker",
+      "event": "result_persisted",
+      "logger": "dation",
+      "revision": "local",
+      "result_persist_ms": 36573.967080999864
+    },
+    {
+      "timestamp": "2026-11-06T03:13:00.537430+00:00",
+      "severity": "INFO",
+      "component": "finite-worker",
+      "event": "finite_execution_exit",
+      "logger": "dation",
+      "revision": "local",
+      "kind": "dispatch",
+      "total_wall_ms": 73296.84029298369,
+      "child_exit": 0,
+      "cpu_seconds": 73.689413,
+      "gib_seconds": 73.29685543599771,
+      "cgroup_peak_bytes": 800210944,
+      "child_peak_rss_kib": 801872,
+      "parent_peak_rss_kib": 52736
+    }
+  ]
+}

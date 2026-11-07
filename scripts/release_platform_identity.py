@@ -76,6 +76,7 @@ def activate(directory,grants_directory):
  print('Service table privileges restored to their captured values; Auth admissions OPEN. Rollback to a non-tenant API is now forbidden.')
 
 def main():
+ raise RuntimeError("Legacy production cutover disabled. Follow docs/finops/03_deploy_and_rollback_runbook.md.")
  p=argparse.ArgumentParser();p.add_argument('action',choices=['freeze','apply','auth-config','activate']);p.add_argument('--backup',type=Path);p.add_argument('--grants',type=Path);p.add_argument('--legacy-owner');args=p.parse_args()
  if args.action=='freeze':freeze(args.grants)
  elif args.action=='apply':apply(args.backup,args.legacy_owner or '')

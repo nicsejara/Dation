@@ -18,6 +18,8 @@ from app.services import decision_case_service as cases
 from app.services import dispatch_service as dispatch
 from app.services.run_service import get_dataset, get_run
 
+from app.services import execution_dispatch as activation
+
 log = logging.getLogger(__name__)
 
 
@@ -63,7 +65,9 @@ async def enqueue(orders_id, fleet_id, configuration, options, run_id, decision_
         if not run:
             raise RuntimeError("Falta la corrida registrada por la cola.")
         event("dispatch_replayed", node_id=node)
+        await activation.nudge("dispatch",run_id)
         return run
+    await activation.ensure_admission()
     if decision_case:
         await cases.ensure_case(decision_case["case_id"],orders_id,fleet_id)
         if node in cases.UPSTREAM_NODE:
@@ -96,20 +100,23 @@ async def enqueue(orders_id, fleet_id, configuration, options, run_id, decision_
     if not rows:
         raise RuntimeError("La cola no devolvió la corrida aceptada.")
     event("dispatch_admitted", node_id=node, stage="queued")
+    await activation.nudge("dispatch",run_id)
     return rows[0]
 
 
 async def cancel(run_id):
     rows = await dispatch.db("POST","rpc/cancel_dispatch_job",body={"target_run_id":run_id})
     if not rows: raise LookupError("No se encontró una ejecución recuperable con ese ID.")
+    if rows[0].get("decision_case_id"):
+        await activation.nudge("reconciliation",rows[0]["decision_case_id"])
     return rows[0]
 
 
-async def reconcile_cases(limit=10):
+async def reconcile_cases(limit=10, *, case_id=None, acknowledge=None):
     now = datetime.now(timezone.utc)
-    tasks = await dispatch.db("GET","decision_case_reconciliations",params={
-        "select":"*","available_at":f"lte.{now.isoformat()}","order":"available_at.asc","limit":str(limit),
-    }) or []
+    params={"select":"*","available_at":f"lte.{now.isoformat()}","order":"available_at.asc","limit":str(limit)}
+    if case_id:params["case_id"]="eq."+str(case_id)
+    tasks = await dispatch.db("GET","decision_case_reconciliations",params=params) or []
     for task in tasks:
         case_id, version = task["case_id"], task["version"]
         try:
@@ -121,7 +128,12 @@ async def reconcile_cases(limit=10):
                     # identifies that cohort before making any projection write.
                     if str(exc)!='El cache Ultimate no se actualiza mediante el workflow legacy.':raise
             with bind(job_context(task)):
-                await dispatch.db("POST","rpc/ack_case_reconciliation",body={"target_case_id":case_id,"observed_version":version})
+                if acknowledge:
+                    accepted=await acknowledge(task)
+                    if accepted is not True:
+                        event("case_reconciliation_fenced",case_id=case_id,version=version)
+                        continue
+                else:await dispatch.db("POST","rpc/ack_case_reconciliation",body={"target_case_id":case_id,"observed_version":version})
             event("case_reconciled", case_id=case_id, version=version)
         except (httpx.HTTPError,ValueError,LookupError):
             attempts = task["attempts"] + 1

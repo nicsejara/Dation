@@ -115,7 +115,7 @@ class Sandbox:
             '-e','PGRST_DB_ANON_ROLE=anon','-e','PGRST_JWT_SECRET='+json.dumps(public),POSTGREST)
         binding=self.docker('port',self.rest_container,'3000/tcp')
         self.rest_url='http://'+binding
-        self.env={**os.environ,'SUPABASE_URL':fixture_url,
+        self.env={**os.environ,'DATION_EXECUTION_MODE':'legacy','SUPABASE_URL':fixture_url,
             'SUPABASE_SECRET_KEY':self.token,'SUPABASE_INPUT_BUCKET':'dda-inputs',
             'DATION_ACCESS_PASSWORD':PASSWORD,'LLM_API_KEY':'','LLM_BASE_URL':'','GCP_ACCESS_TOKEN':'',
             'SUPABASE_ACCESS_TOKEN':'','NO_PROXY':'127.0.0.1,localhost',

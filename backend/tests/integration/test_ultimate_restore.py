@@ -48,7 +48,7 @@ def legacy_case(s,client):
 def image_env(s,path,service_port):
     # Only synthetic loopback credentials; never inherit production variables.
     values={name:s.env[name] for name in ['SUPABASE_URL','SUPABASE_SECRET_KEY','SUPABASE_INPUT_BUCKET','DATION_ACCESS_PASSWORD']}
-    values.update(PORT=str(service_port),PYTHONDONTWRITEBYTECODE='1',SUPABASE_ACCESS_TOKEN='',
+    values.update(DATION_EXECUTION_MODE='legacy',PORT=str(service_port),PYTHONDONTWRITEBYTECODE='1',SUPABASE_ACCESS_TOKEN='',
         GCP_ACCESS_TOKEN='',LLM_API_KEY='',LLM_BASE_URL='',NO_PROXY='127.0.0.1,localhost')
     path.write_text('\n'.join(k+'='+v for k,v in values.items())+'\n');path.chmod(0o600)
 

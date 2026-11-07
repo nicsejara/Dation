@@ -20,8 +20,11 @@ component = 'api'
 FIELDS = {'analysis_id', 'request_id', 'trace_id', 'span_id', 'run_id', 'case_id', 'node_id',
           'attempt', 'version', 'stage', 'outcome', 'status_code', 'route', 'method',
           'duration_ms', 'wait_ms', 'dependency', 'error_type', 'prompt_version',
-          'input_tokens', 'output_tokens', 'total_tokens', 'turn_id'}
-IDENTITIES = {'analysis_id', 'request_id', 'run_id', 'case_id', 'turn_id'}
+          'input_tokens', 'output_tokens', 'total_tokens', 'turn_id',
+          'intent_id','kind','generation','retry_count','provider_wall_ms','dispatch_delay_ms','queue_wait_ms',
+          'worker_cold_start_ms','api_cold_start_ms','solver_execution_ms','result_persist_ms','total_wall_ms',
+          'cpu_seconds','gib_seconds','cgroup_peak_bytes','child_exit','child_peak_rss_kib','parent_peak_rss_kib'}
+IDENTITIES = {'analysis_id', 'request_id', 'run_id', 'case_id', 'turn_id', 'intent_id'}
 BUCKETS = (.01, .05, .1, .25, .5, 1, 2.5, 5, 10, 30, 60, 120)
 
 
@@ -67,6 +70,8 @@ class JSONFormatter(logging.Formatter):
         revision = os.getenv('K_REVISION', 'local')
         if re.fullmatch('[a-zA-Z0-9-]{1,100}', revision):
             data['revision'] = revision
+        sha=os.getenv('DATION_RELEASE_SHA','')
+        if re.fullmatch('[0-9a-f]{40}',sha):data['release_sha']=sha
         values = {**context.get(), **getattr(record, 'telemetry', {})}
         for key, value in values.items():
             if key not in FIELDS or value is None:

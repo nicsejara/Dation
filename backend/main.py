@@ -1,3 +1,5 @@
+from time import perf_counter
+_API_BOOT=perf_counter()
 from contextlib import asynccontextmanager
 import json
 from pathlib import Path
@@ -58,6 +60,8 @@ MODULE_REDIRECTS = json.loads((STATIC_DIR / 'contracts/foundation-module-redirec
 @asynccontextmanager
 async def lifespan(app):
     configure_logging("api")
+    from app.observability import event
+    event("api_started",api_cold_start_ms=(perf_counter()-_API_BOOT)*1000)
     async with http_pool():
         yield
 

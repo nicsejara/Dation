@@ -59,6 +59,8 @@ async def approve(ctx,run_id,case_id,node_id,fingerprint):
     await artifacts.verify_all(package,data['artifacts'])
     result=await call(ctx,'approve',run_id=str(run_id),case_id=str(case_id),node_id=node_id,result_fingerprint=fingerprint,
         verified_manifest_hash=content_sha256(canonical_bytes(package.artifact_manifest.artifacts)))
+    from app.services.execution_dispatch import nudge
+    await nudge('reconciliation',case_id)
     return {'id':str(run_id),'result_fingerprint':fingerprint,'approved_at':result['run']['approved_at'],'approved_by':result['run']['approved_by'],'approved_by_user_id':result['run']['approved_by_user_id']}
 
 

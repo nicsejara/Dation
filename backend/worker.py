@@ -30,6 +30,8 @@ async def health_handler(reader, writer):
 
 
 async def main():
+    if os.getenv("DATION_EXECUTION_MODE") != "legacy":
+        raise RuntimeError("Resident worker disabled; use event_worker.py for finite execution.")
     async with http_pool():
         with worker_infrastructure():
             await run_worker()

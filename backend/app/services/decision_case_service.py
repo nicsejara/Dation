@@ -353,6 +353,8 @@ async def approve_run_version(
         raise
     if not rows:
         raise ValueError("No se pudo persistir la aprobación de la corrida.")
+    from app.services.execution_dispatch import nudge
+    await nudge("reconciliation",case_id)
     return rows[0]
 
 

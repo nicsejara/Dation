@@ -1,0 +1,18 @@
+{
+  "dation-core": {
+    "state": "UNVERIFIED_LIVE",
+    "http_status": 401
+  },
+  "dation-core-worker": {
+    "state": "UNVERIFIED_LIVE",
+    "http_status": 401
+  },
+  "triggers-us-west1": {
+    "state": "UNVERIFIED_LIVE",
+    "http_status": 401
+  },
+  "triggers-global": {
+    "state": "UNVERIFIED_LIVE",
+    "http_status": 401
+  }
+}

@@ -69,11 +69,18 @@ async def get_analysis(run_id):
 
 
 async def generate_analysis(run_id, *, retry=False):
+    from app.services import execution_dispatch as activation
     run = await base_run(run_id)
     identify(run_id=run_id, case_id=run.get('decision_case_id'))
     result = run['result_json']
     if result.get('analysis', {}).get('depth') in ('comparative','deep') and references_available(result):
         return await get_analysis(run_id)
+    if activation.jobs_mode():
+        existing=await get_analysis(run_id)
+        if existing.get('id') and (existing['status'] in {'queued','running','completed'} or not retry):
+            await activation.nudge('comparative',existing['id'])
+            return existing
+        if not references_available(result):await activation.ensure_admission()
     configuration = {key:value for key,value in result['configuration'].items() if key!='options'}
     options = {**result['configuration']['options'], 'analysis_depth':'comparative'}
     request = {'base_run_id':run_id,'configuration':configuration,'options':options,
@@ -100,6 +107,7 @@ async def generate_analysis(run_id, *, retry=False):
         raise
     if not rows: raise RuntimeError('No se pudo registrar el análisis comparativo.')
     event('comparative_admitted', analysis_id=rows[0]['id'], stage=rows[0]['status'])
+    if rows[0]['status']=='queued':await activation.nudge('comparative',rows[0]['id'])
     return public_artifact(rows[0])
 
 

@@ -50,7 +50,10 @@ jobs:
       - name: Compile backend
         working-directory: backend
         run: |
-          python -m compileall app main.py worker.py
+          python -m compileall app main.py worker.py event_worker.py
+
+      - name: Validate zero-idle manifests and every deployment script without applying
+        run: python scripts/zero_idle_release.py validate
 
       - name: Check frontend JavaScript syntax
         working-directory: backend
@@ -61,6 +64,10 @@ jobs:
 
       - name: Run automated tests
         working-directory: backend
+        env:
+          # Existing service contracts explicitly exercise the compatibility runtime.
+          # Saga 02 tests override jobs mode and verify the production default.
+          DATION_EXECUTION_MODE: legacy
         run: |
           python - <<'PY'
           import glob, subprocess, sys

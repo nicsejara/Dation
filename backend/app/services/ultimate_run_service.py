@@ -1,5 +1,8 @@
 """T8 admission and worker adapter. Mathematical production remains T7 only."""
 import asyncio,json
+from time import perf_counter
+from app.observability import event
+from app.services import execution_dispatch as activation
 from datetime import datetime,timezone
 from uuid import UUID
 from fastapi import HTTPException
@@ -84,7 +87,10 @@ async def verify_inputs(entry_refs):
 async def enqueue(ctx,payload,run_id):
     request=payload.model_dump(mode='python')
     replay=await call(ctx,'replay',case_id=str(payload.case_id),run_id=str(run_id),client_request=request)
-    if replay['replayed']:return replay['run']
+    if replay['replayed']:
+        await activation.nudge('dispatch',run_id)
+        return replay['run']
+    await activation.ensure_admission()
     raw=await call(ctx,'state',case_id=str(payload.case_id),node_id=payload.node_id,source_transport_plan=payload.source_transport_plan)
     model,frozen,refs=pinned_context(raw,payload.node_policy)
     from app.engines.scheduling.day_scheduling import IDENTITY as D2
@@ -107,6 +113,7 @@ async def enqueue(ctx,payload,run_id):
     reads=read_identity(definition,raw['case'],raw['entries'],upstream,node_policy=policy_hash(frozen.node_policy))
     body=await call(ctx,'admit',run_id=str(run_id),case_id=str(payload.case_id),client_request=request,input=input_,entries=refs,
         dataset_id=next(r['dataset_id'] for r in refs if r['slot_key']=='transport_demand'),graph_snapshot={'definition_hash':definition_hash(),'read_set':reads})
+    await activation.nudge('dispatch',run_id)
     return body['run']
 
 
@@ -132,7 +139,10 @@ async def execute_job(job,progress=None):
         recovered=await artifacts.verify_all(prepared['publication']['package'],prepared['artifacts'],missing=True)
         if recovered:return (await call(ctx,'finish',**lease,result_fingerprint=prepared['publication']['result_fingerprint'],verified_manifest_hash=prepared['publication']['manifest_hash']))['run']
     producer=resolve_worker_producer(request)
+    solver_started=perf_counter()
     result=await asyncio.to_thread(producer,input_)
+    event("solver_finished",solver_execution_ms=(perf_counter()-solver_started)*1000,run_id=job["run_id"])
+    persist_started=perf_counter()
     from app.results.assembler import assemble
     bundle=await asyncio.to_thread(assemble,result,input_.context)
     if progress:progress('publishing')
@@ -144,4 +154,6 @@ async def execute_job(job,progress=None):
         await artifacts.upload(ref,artifact.content)
     await artifacts.verify_all(reserved['package'],reserved['artifacts'])
     manifest_hash=content_sha256(canonical_bytes(bundle.package.artifact_manifest.artifacts))
-    return (await call(ctx,'finish',**lease,result_fingerprint=bundle.package.fingerprints.result_fingerprint,verified_manifest_hash=manifest_hash))['run']
+    finished=(await call(ctx,'finish',**lease,result_fingerprint=bundle.package.fingerprints.result_fingerprint,verified_manifest_hash=manifest_hash))['run']
+    event('result_persisted',result_persist_ms=(perf_counter()-persist_started)*1000,run_id=job['run_id'])
+    return finished

@@ -1,0 +1,16 @@
+{
+  "project": "dation-510100",
+  "project_number": "469052310590",
+  "region": "us-west1",
+  "billing_policy": "OFF_UNTIL_EXPLICIT_OWNER_GO",
+  "merge_gate": "MERGE_BLOCKED_DEPLOY_TRIGGER",
+  "image": "REQUIRES_REVIEWED_IMAGE_DIGEST",
+  "release_sha": "REQUIRES_EXACT_VALIDATED_SHA",
+  "service_account": "REQUIRES_VERIFIED_RUNTIME_SERVICE_ACCOUNT",
+  "secret_references": {},
+  "api": {"name":"dation-core","min_instances":0,"max_instances":2,"cpu_idle":true,"cpu":"1","memory":"512Mi","concurrency":8,"timeout_seconds":300},
+  "compute": {"name":"dation-executor","cpu":"1","memory":"1Gi","task_count":1,"parallelism":1,"max_retries":0,"timeout_seconds":1800,"command":["python","event_worker.py"],"args":[]},
+  "control": {"name":"dation-recovery","cpu":"1","memory":"512Mi","task_count":1,"parallelism":1,"max_retries":0,"timeout_seconds":120,"command":["python","event_worker.py"],"args":["--recover"]},
+  "environment": {"DATION_EXECUTION_MODE":"jobs","DATION_CLOUD_EXECUTION_ENABLED":"false","DATION_CLOUD_PROJECT":"dation-510100","DATION_COMPUTE_JOB":"projects/dation-510100/locations/us-west1/jobs/dation-executor","DATION_CONTROL_JOB":"projects/dation-510100/locations/us-west1/jobs/dation-recovery"},
+  "recovery_schedule": {"create_by_default":false,"schedule":"*/15 * * * *","time_zone":"Etc/UTC","target":"dation-recovery","authentication":"OAuth managed dedicated service account","enabled":false}
+}
