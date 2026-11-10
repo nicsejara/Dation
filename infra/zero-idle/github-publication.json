@@ -1,0 +1,16 @@
+{
+  "repository": "nicsejara/Dation",
+  "repository_id": "1114679650",
+  "repository_owner_id": "249153366",
+  "application_sha": "792470ff8cce54cb32b81240b206fdbcb7078ea2",
+  "workflow_file": "runtime-v2-publish.yml",
+  "workflow_ref": "nicsejara/Dation/.github/workflows/runtime-v2-publish.yml@refs/heads/main",
+  "ref": "refs/heads/main",
+  "event": "workflow_dispatch",
+  "pool_id": "dation-github-publish",
+  "provider_id": "github-main-manual",
+  "publisher_account_id": "dation-image-builder",
+  "registry_repository": "dation-runtime",
+  "image_name": "dation-core",
+  "build_step_name": "Build validated source once"
+}
