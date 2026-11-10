@@ -1,0 +1,100 @@
+name: Runtime V2 - manual Gate C image publication
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_publish:
+        description: Publish only validated SHA 792470ff to Runtime V2; no deployment
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: runtime-v2-gate-c-792470ff
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.repository == 'nicsejara/Dation' && inputs.confirm_publish
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      actions: read
+      id-token: write
+    steps:
+      - name: Set isolated runner paths
+        run: |
+          echo "OUT=$RUNNER_TEMP/dation-gate-c" >> "$GITHUB_ENV"
+          echo "DOCKER_CONFIG=$RUNNER_TEMP/dation-gate-c-auth" >> "$GITHUB_ENV"
+
+      - name: Checkout reviewed publication controls
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          path: control
+          persist-credentials: false
+
+      - name: Verify trusted manual context
+        id: guard
+        run: python3 control/scripts/runtime_v2_publication.py guard --output "$OUT"
+
+      - name: Checkout exact validated application
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: 792470ff8cce54cb32b81240b206fdbcb7078ea2
+          path: application
+          persist-credentials: false
+
+      - name: Authenticate short-lived OIDC identity
+        id: auth
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
+        with:
+          workload_identity_provider: ${{ steps.guard.outputs.provider }}
+          audience: ${{ steps.guard.outputs.audience }}
+          service_account: ${{ steps.guard.outputs.service_account }}
+          token_format: access_token
+          access_token_lifetime: 1800s
+          create_credentials_file: false
+          export_environment_variables: false
+
+      - name: Check immutable image and prior build history
+        id: preflight
+        env:
+          DATION_PUBLISH_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
+          GH_TOKEN: ${{ github.token }}
+        run: python3 control/scripts/runtime_v2_publication.py preflight --source "$GITHUB_WORKSPACE/application" --output "$OUT"
+
+      - name: Build validated source once
+        if: steps.preflight.outputs.build_required == 'true'
+        timeout-minutes: 20
+        run: python3 control/scripts/runtime_v2_publication.py build --source "$GITHUB_WORKSPACE/application" --output "$OUT"
+
+      - name: Verify AMD64, locked dependencies and imports
+        timeout-minutes: 3
+        run: python3 control/scripts/runtime_v2_publication.py verify --source "$GITHUB_WORKSPACE/application" --output "$OUT"
+
+      - name: Publish immutable image and record Gate C
+        timeout-minutes: 8
+        env:
+          DATION_PUBLISH_ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
+        run: python3 control/scripts/runtime_v2_publication.py publish --source "$GITHUB_WORKSPACE/application" --output "$OUT"
+
+      - name: Attach sanitized Gate C receipt and manifests
+        if: always() && steps.guard.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: gate-c-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/dation-gate-c/GATE_C_RECEIPT.json
+            ${{ runner.temp }}/dation-gate-c/GATE_C_STATUS.json
+            ${{ runner.temp }}/dation-gate-c/manifests/
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Remove ephemeral registry credentials
+        if: always()
+        run: rm -rf -- "$DOCKER_CONFIG"
