@@ -86,6 +86,9 @@ class UltimateCaseSetupTests(unittest.IsolatedAsyncioTestCase):
         await self.page.get_by_text('Versión 1',exact=True).wait_for()
         await self.page.get_by_role('button',name='Crear Case con este Model',exact=True).click()
         await self.page.locator('[data-ultimate-ready="true"] form').wait_for()
+        await self.page.get_by_role('heading',name='Core Configuration',exact=True).wait_for()
+        self.assertEqual(await self.page.locator('details.ultimate-disclosure').count(),3)
+        self.assertEqual(await self.page.locator('.ultimate-disclosure__title').all_text_contents(),['01 Logistics Model','02 Data Contract','03 Decision Case'])
         await self.page.get_by_label('Nombre del Case',exact=True).fill('Semana 45 · Operación Buenos Aires')
         version=self.page.get_by_label('Model Version',exact=True);await version.locator('option').first.wait_for(state='attached');await version.select_option(index=0)
         await self.page.get_by_label('Inicio de planificación',exact=True).fill('2026-11-02');await self.page.get_by_label('Inicio de planificación',exact=True).press('Tab')
@@ -161,7 +164,7 @@ class UltimateCaseSetupTests(unittest.IsolatedAsyncioTestCase):
         measurements=[]
         for width in [1440,390]:
             await self.page.set_viewport_size({'width':width,'height':1000})
-            first=self.page.locator('.ultimate-foundation header button');await first.scroll_into_view_if_needed();await first.focus();count=0
+            first=self.page.locator('.ultimate-disclosure > summary').first;await first.scroll_into_view_if_needed();await first.focus();count=0
             while count<80:
                 await self.page.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))')
                 # Viewport scrolling rounds to whole pixels; DOM rectangles retain fractions.

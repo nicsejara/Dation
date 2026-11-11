@@ -1,11 +1,11 @@
 import {api,post,download} from '../shared.mjs';
-import {el,button,field,section} from './forms.mjs';
+import {el,button,field,collapsibleSection} from './forms.mjs';
 import {mountModelFields,defaultConfiguration} from './model-fields.mjs';
 
 // Compose the existing Model editor with the server's ingestion contract compiler.
 export async function mountPlanningModel(form,scope,{draft={},modelId='',canManage,onChange=()=>{}}){
- const modelBlock=section(form,'01 Logistics Model','Definí cómo opera tu logística o reutilizá una versión publicada.'),controls=el('div',undefined,'ultimate-actions'),editor=el('div');modelBlock.classList.add('ultimate-planning-model');modelBlock.append(controls,editor);
- const contractBlock=section(form,'02 Data Contract','Revisá la estructura requerida. Los archivos operativos se cargan desde el Decision Graph.'),contractStatus=el('p','Seleccioná o configurá un Model.','d-metadata'),contractRows=el('div',undefined,'ultimate-contracts'),retry=button('Reintentar Data Contract',()=>preview());retry.hidden=true;contractStatus.role='status';contractBlock.append(contractStatus,retry,contractRows);
+ const modelPanel=collapsibleSection(form,'01 Logistics Model','Seleccioná una versión publicada o configurá un modelo nuevo sin salir de esta pantalla.',{open:true,initialStatus:'Por configurar'}),modelBlock=modelPanel.body,controls=el('div',undefined,'ultimate-actions'),editor=el('div');modelBlock.classList.add('ultimate-planning-model');modelBlock.append(controls,editor);
+ const contractPanel=collapsibleSection(form,'02 Data Contract','Revisá las variables y descargá las plantillas derivadas del Logistics Model. Los datos se cargan luego desde el Decision Graph.',{initialStatus:'Pendiente'}),contractBlock=contractPanel.body,contractStatus=el('p','Seleccioná o configurá un Model.','d-metadata'),contractRows=el('div',undefined,'ultimate-contracts'),retry=button('Reintentar Data Contract',()=>preview());retry.hidden=true;contractStatus.role='status';contractBlock.append(contractStatus,retry,contractRows);
  const state={mode:draft.mode||'existing',model_id:draft.model_id||modelId,version_id:draft.version_id||'',new_model:draft.new_model||{id:crypto.randomUUID(),name:'',description:'',status:'active',expected_revision:1,configuration:defaultConfiguration(window.dationSession.identity.workspace.currency)},intent:draft.intent||null,locked:!!draft.locked};
  let fields=null,selected=null,selector=null,version=null,ready=false,generation=0,renderGeneration=0,timer=null,previewBody=null;
  scope.own(()=>clearTimeout(timer));
@@ -28,7 +28,7 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
   }
  }
  async function preview(){
-  const own=++generation;ready=false;previewBody=null;retry.hidden=true;contractRows.replaceChildren();contractStatus.textContent='Resolviendo Data Contract…';contractStatus.role='status';onChange();
+  const own=++generation;ready=false;previewBody=null;retry.hidden=true;contractRows.replaceChildren();contractPanel.setStatus('Validando','pending');contractStatus.textContent='Resolviendo Data Contract…';contractStatus.role='status';onChange();
   try{
    if(state.mode==='new'){
     if(!canManage)throw new Error('Un Admin debe crear y publicar el primer Logistics Model.');
@@ -36,13 +36,13 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
     previewBody={configuration:fields.read().configuration};
    }else{if(!state.version_id)throw new Error('Elegí un Model y una versión publicada.');previewBody={model_id:state.model_id,version_id:state.version_id};}
    const data=await post('/api/platform/logistics-models/contract-preview',previewBody,{signal:scope.signal});if(!scope.active||own!==generation)return;
-   renderContract(data);ready=true;onChange();
-  }catch(error){if(scope.active&&own===generation){contractStatus.textContent=error.message;contractStatus.role='alert';retry.hidden=false;onChange();}}
+   renderContract(data);ready=true;modelPanel.setStatus('Configurado','complete');contractPanel.setStatus('Validado','complete');onChange();
+  }catch(error){if(scope.active&&own===generation){contractStatus.textContent=error.message;contractStatus.role='alert';contractPanel.setStatus('Revisar contrato','warning');retry.hidden=false;onChange();}}
  }
  async function render(){
   const own=++renderGeneration;
-  generation++;clearTimeout(timer);ready=false;onChange();editor.replaceChildren();controls.replaceChildren();
-  if(models.length){controls.append(button('Usar Model publicado',()=>changeMode('existing')));if(canManage)controls.append(button('Crear nuevo Logistics Model',()=>changeMode('new')));}
+  generation++;clearTimeout(timer);ready=false;modelPanel.setStatus('Por configurar','pending');contractPanel.setStatus('Pendiente','pending');onChange();editor.replaceChildren();controls.replaceChildren();
+  if(models.length){const existing=button('Seleccionar modelo existente',()=>changeMode('existing'));existing.setAttribute('aria-pressed',String(state.mode==='existing'));controls.append(existing);if(canManage){const create=button('Configurar modelo nuevo',()=>changeMode('new'));create.setAttribute('aria-pressed',String(state.mode==='new'));controls.append(create);}}
   if(state.mode==='new'){
    editor.append(el('h3','Crear nuevo Logistics Model','d-section-title'));
    fields=mountModelFields(editor,scope,state.new_model);const status=editor.querySelector('[name=model_status]');status.closest('.d-field').hidden=true;
@@ -60,7 +60,7 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
   for(const b of controls.querySelectorAll('button'))b.disabled=!!state.intent||!!state.locked;
   await preview();
  }
- function fail(error){if(scope.active){ready=false;contractStatus.textContent=error.message;contractStatus.role='alert';onChange();}}
+ function fail(error){if(scope.active){ready=false;contractStatus.textContent=error.message;contractStatus.role='alert';contractPanel.setStatus('Revisar contrato','warning');onChange();}}
  function changeMode(mode){if(state.intent||state.locked)return;if(state.mode==='new'&&fields)state.new_model=fields.read();state.mode=mode;state.version_id='';render().catch(fail);}
  // Invalidate a preview immediately; responses from older configurations never unlock Case creation.
  scope.listen(editor,'input',event=>{if(state.mode!=='new'||state.intent)return;if(['model_name','model_description','model_status'].includes(event.target.name)){onChange();return;}generation++;ready=false;onChange();clearTimeout(timer);timer=setTimeout(()=>preview(),250);});
