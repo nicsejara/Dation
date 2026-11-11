@@ -28,7 +28,7 @@ class AttributesBeforeCSVTests(unittest.IsolatedAsyncioTestCase):
     async def new_form(self):
         await self.open('/app/ddas/logistics/case')
         if await self.page.get_by_label('Logistics Model',exact=True).count():
-            await self.page.get_by_role('button',name='Crear nuevo Logistics Model',exact=True).click()
+            await self.page.get_by_role('button',name='Configurar modelo nuevo',exact=True).click()
         await expect(self.page.get_by_role('button',name='Crear Decision Case',exact=True)).to_be_enabled(timeout=30000)
         self.writes=[]
         self.page.on('request',lambda r:self.writes.append(r.post_data_json) if r.method=='POST' and urlparse(r.url).path in ('/api/platform/logistics-models','/api/platform/logistics-cases') else None)
