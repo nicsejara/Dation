@@ -387,12 +387,30 @@ def gate_d(manifests, economic):
     return url
 
 
+def wait_public_access(url):
+    # A newly read-back IAM binding can precede data-plane propagation.
+    # Retry only platform403 on /health while that exact public API binding exists.
+    deadline = time.monotonic() + 180
+    while True:
+        status, headers, body = web_request(url, '/health')
+        if status == 200:
+            need(json.loads(body).get('status') == 'healthy', 'Unexpected public health response')
+            return
+        need(status == 403 and 'text/html' in headers.get('Content-Type','') and
+            'roles/run.invoker' in grant_roles(policy(SERVICE),'allUsers'),
+            'Public endpoint failed outside the verified IAM propagation condition')
+        need(time.monotonic() < deadline, 'Public IAM still not propagated after180s; no broader permissions')
+        print('Waiting for verified API IAM binding to propagate (platform403); no other retries',flush=True)
+        time.sleep(5)
+
+
 def public_api(url):
     # This Gate E substep is authorized only after the Gate D receipt exists.
     need(load('GATE_D_RECEIPT.json'), 'Gate D receipt missing')
     save('public-grant-started.json',{'url':url,'at':now(),'image':IMAGE})
     changed = bind(SERVICE,'roles/run.invoker','allUsers')
     try:
+        wait_public_access(url)
         checks = verify_web(url)
         receipt = {'phase':'E','status':'PARTIAL','milestone':'GO_E_PUBLIC_API_AUTH_CHECKED',
             'url':url,'web_url':url + '/app','image_digest':IMAGE,'checks':checks,

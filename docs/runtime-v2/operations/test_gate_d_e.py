@@ -95,8 +95,15 @@ class Tests(unittest.TestCase):
   bind.assert_not_called()
  def test_failed_public_probe_rolls_back_only_its_new_public_binding(self):
   p.save('GATE_D_RECEIPT.json',{'status':'PASS'})
-  with mock.patch.object(p,'bind',return_value=True) as bind,mock.patch.object(p,'verify_web',side_effect=RuntimeError('probe failed')),self.assertRaises(RuntimeError):p.public_api('https://example.run.app')
+  with mock.patch.object(p,'bind',return_value=True) as bind,mock.patch.object(p,'wait_public_access'),mock.patch.object(p,'verify_web',side_effect=RuntimeError('probe failed')),self.assertRaises(RuntimeError):p.public_api('https://example.run.app')
   self.assertEqual(bind.call_args_list,[mock.call(p.SERVICE,'roles/run.invoker','allUsers'),mock.call(p.SERVICE,'roles/run.invoker','allUsers',remove=True)])
+ def test_only_verified_platform403_propagation_can_be_retried(self):
+  public={'bindings':[{'role':'roles/run.invoker','members':['allUsers']}]}
+  with mock.patch.object(p,'web_request',side_effect=[(403,{'Content-Type':'text/html'},b'Google platform denied'),(200,{},b'{"status":"healthy"}')]) as request,mock.patch.object(p,'policy',return_value=public),mock.patch.object(p.time,'sleep') as sleep:
+   p.wait_public_access('https://example.run.app')
+  self.assertEqual(request.call_count,2);sleep.assert_called_once_with(5)
+  with mock.patch.object(p,'web_request',return_value=(401,{'Content-Type':'application/json'},b'{}')),mock.patch.object(p.time,'sleep') as sleep,self.assertRaises(RuntimeError):p.wait_public_access('https://example.run.app')
+  sleep.assert_not_called()
  def test_missing_go_does_nothing(self):
   with mock.patch.dict(os.environ,{'DATION_GO_WEB':''}),mock.patch.object(p,'gc') as gc,self.assertRaisesRegex(RuntimeError,'GO WEB'):p.main()
   gc.assert_not_called()
