@@ -15,6 +15,21 @@ export function field(parent,label,{name,type='text',value='',options,required=f
  host.append(caption,input,hint,error);parent.append(host);return input;
 }
 export function section(form,title,copy){const node=el('fieldset',undefined,'d-card ultimate-section'),legend=el('legend',title,'d-card-title');node.append(legend);if(copy)node.append(el('p',copy,'d-metadata'));const body=el('div',undefined,'ultimate-grid');node.append(body);form.append(node);return body;}
+
+/** Native, independently collapsible workflow block. All inputs remain in the
+ * same form so validation/drafts/Case creation keep their existing contracts. */
+export function collapsibleSection(parent,title,copy,{open=false,initialStatus='Pendiente'}={}){
+ const details=el('details',undefined,'d-card ultimate-disclosure');details.open=open;
+ const summary=el('summary',undefined,'ultimate-disclosure__summary');
+ const heading=el('span',title,'ultimate-disclosure__title'),status=el('span',initialStatus,'ultimate-disclosure__status'),chevron=el('span',undefined,'ultimate-disclosure__chevron');
+ status.dataset.state='pending';status.setAttribute('aria-live','polite');chevron.setAttribute('aria-hidden','true');
+ summary.append(heading,status,chevron);
+ const content=el('div',undefined,'ultimate-disclosure__content');
+ if(copy)content.append(el('p',copy,'d-metadata'));
+ const body=el('div',undefined,'ultimate-grid');content.append(body);details.append(summary,content);parent.append(details);
+ return {details,body,setStatus(label,state='pending'){status.textContent=label;status.dataset.state=state;}};
+}
+
 export function choices(parent,title,name,options,values){
  const box=el('fieldset',undefined,'ultimate-choices');box.append(el('legend',title,'d-field__label'));
  for(const [v,text]of options){const label=el('label',undefined,'d-choice'),input=el('input',undefined,'d-check');input.type='checkbox';input.name=name;input.value=v;input.checked=values.includes(v);label.append(input,el('span',text,'d-choice__copy'));box.append(label);}

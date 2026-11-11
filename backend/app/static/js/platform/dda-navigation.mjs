@@ -16,7 +16,7 @@ export function renderDdaNavigation(root,{view,route,workspace={}}){
  ];
  if(view==='logistics-models')entries.push({label:'Logistics Models',target:null,state:'current'});
  else if(view==='logistics-case-data')entries.push({label:ultimate?.label||'Decision Case',target:{view:'logistics-map',caseId:route.caseId,nodeId:null,runId:null},state:'available'},{label:'Datos del Case',target:null,state:'current'});
- else if(view==='logistics-case-setup')entries.push({label:ultimate?.label||(route.caseId?'Contexto del Case':'Nuevo Case'),target:null,state:'current'});
+ else if(view==='logistics-case-setup')entries.push({label:'Core Configuration',target:null,state:'current'});
  else if(route.caseId){
   entries.push({label:ultimate?.label||workspace.caseContext?.label||currentCase?.label||'Decision Case',target:{view:'logistics-map',caseId:route.caseId,nodeId:null,runId:null},state:view==='logistics-map'?'current':'available'});
  }else if(view==='logistics-data'){
