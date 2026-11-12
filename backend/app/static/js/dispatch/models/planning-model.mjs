@@ -37,7 +37,7 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
    }else{if(!state.version_id)throw new Error('Elegí un Model y una versión publicada.');previewBody={model_id:state.model_id,version_id:state.version_id};}
    const data=await post('/api/platform/logistics-models/contract-preview',previewBody,{signal:scope.signal});if(!scope.active||own!==generation)return;
    renderContract(data);ready=true;modelPanel.setStatus('Configurado','complete');contractPanel.setStatus('Validado','complete');onChange();
-  }catch(error){if(scope.active&&own===generation){contractStatus.textContent=error.message;contractStatus.role='alert';contractPanel.setStatus('Revisar contrato','warning');retry.hidden=false;onChange();}}
+  }catch(error){if(scope.active&&own===generation){contractStatus.textContent=error.message;contractStatus.role='alert';contractPanel.setStatus('Revisar contrato','warning');contractPanel.details.open=true;retry.hidden=false;onChange();}}
  }
  async function render(){
   const own=++renderGeneration;
@@ -60,7 +60,7 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
   for(const b of controls.querySelectorAll('button'))b.disabled=!!state.intent||!!state.locked;
   await preview();
  }
- function fail(error){if(scope.active){ready=false;contractStatus.textContent=error.message;contractStatus.role='alert';contractPanel.setStatus('Revisar contrato','warning');onChange();}}
+ function fail(error){if(scope.active){ready=false;contractStatus.textContent=error.message;contractStatus.role='alert';contractPanel.setStatus('Revisar contrato','warning');contractPanel.details.open=true;onChange();}}
  function changeMode(mode){if(state.intent||state.locked)return;if(state.mode==='new'&&fields)state.new_model=fields.read();state.mode=mode;state.version_id='';render().catch(fail);}
  // Invalidate a preview immediately; responses from older configurations never unlock Case creation.
  scope.listen(editor,'input',event=>{if(state.mode!=='new'||state.intent)return;if(['model_name','model_description','model_status'].includes(event.target.name)){onChange();return;}generation++;ready=false;onChange();clearTimeout(timer);timer=setTimeout(()=>preview(),250);});

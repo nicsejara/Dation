@@ -66,8 +66,14 @@ async def journey():
             await page.locator('[data-start-new-decision]').click()
             await page.locator('[data-ultimate-ready=true]').wait_for()
             assert await page.locator('input[type=file]').count()==0
-            assert await page.get_by_role('group',name='01 Logistics Model',exact=True).count()==1
-            assert await page.get_by_role('group',name='02 Data Contract',exact=True).count()==1
+            # Core Configuration uses native disclosure panels instead of fieldsets.
+            panels=page.locator('details.ultimate-disclosure')
+            assert await panels.count()==3
+            assert await panels.locator('summary .ultimate-disclosure__title').all_text_contents()==[
+                '01 Logistics Model','02 Data Contract','03 Decision Case']
+            assert await panels.nth(0).get_attribute('open') is not None
+            assert await panels.nth(1).get_attribute('open') is None
+            assert await panels.nth(2).get_attribute('open') is not None
             # Continue the historical engine regression on its existing Case.
             legacy_case=os.environ['DATION_E2E_LEGACY_CASE']
             await page.goto(base+'/app?view=logistics-data&case_id='+legacy_case)

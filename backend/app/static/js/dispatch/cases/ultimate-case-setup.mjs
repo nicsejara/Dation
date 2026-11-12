@@ -50,7 +50,15 @@ export async function mountCaseSetup(root,{route,navigate,onContext}){
    owners:Object.fromEntries(['logistics_assignment','logistics_scheduling'].map(id=>[id,{id:current?.responsibilities.stages[id].owner?.id||'',updated_at:current?.responsibilities.stages[id].updated_at||null}])),policy_values:policyInputValues(policy),planning_model:saved?.planning_model||null};
   const draft=saved||initial,editable=fresh||current.permissions.can_edit,mathEditable=fresh||current.permissions.can_edit_mathematical,canAssign=fresh?caps.can_assign:current.permissions.can_assign;
   root.replaceChildren();const header=pageHeader(root,'Core Configuration',fresh?'Configurá los tres bloques para crear el Case. Los datos operativos se gestionan después en el Decision Graph.':'Revisá el Logistics Model y el Data Contract, o editá la información permitida del Decision Case.');
-  if(row)header.append(button('Volver al Decision Graph',()=>navigate('logistics-map',{caseId:row.id,nodeId:null,runId:null})));
+  if(row){
+   header.append(button('Volver al Decision Graph',()=>navigate('logistics-map',{caseId:row.id,nodeId:null,runId:null})));
+   // Keep the existing, recoverable Case Data route until the graph modal replaces it.
+   try{
+    const inputs=await api('/api/platform/logistics-cases/'+row.id+'/data',{signal:scope.signal});
+    if(scope.active&&(inputs.enabled||inputs.entries.length))
+     header.append(button('Administrar datos del Case',()=>navigate('logistics-case-data',{caseId:row.id,nodeId:null,runId:null})));
+   }catch(error){if(error.name==='AbortError')throw error;}
+  }
   let savedCard=null;
   if(row){savedCard=el('section',undefined,'d-card ultimate-saved-context');savedCard.append(el('h2','Contexto guardado','d-card-title'),el('p','Versión '+current.model_version.version+' de '+current.model.name+' · '+row.planning_start+' a '+row.planning_end,'d-body'),el('p','Data Pack inicial: '+(current.entry_count?'datos vinculados':'sin archivos')+'. El contexto se conserva al recargar.','d-metadata'));
    if(row.context_frozen_at)savedCard.append(el('p','El horizonte y la política quedaron congelados con la primera admisión. El nombre, la descripción y los responsables conservan sus reglas de edición.','d-body'));}

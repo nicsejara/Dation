@@ -45,6 +45,7 @@ class Saga01PlanningTests(unittest.IsolatedAsyncioTestCase):
         await self.page.get_by_label('Nombre del Model',exact=True).fill('Operación inicial')
         await self.fill_case()
         self.assertEqual(await self.page.locator('input[type=file]').count(),0)
+        await self.page.locator('details.ultimate-disclosure').nth(1).locator('summary').click()
         await expect(self.page.get_by_role('heading',name='Órdenes / Demanda · Requerido',exact=True)).to_be_visible()
         cid=await self.create();context=await self.api('GET','/api/platform/logistics-cases/'+cid+'/context')
         self.assertEqual(context['model']['name'],'Operación inicial');self.assertEqual(context['model_version']['version'],1);self.assertEqual(context['entry_count'],0)
@@ -56,6 +57,7 @@ class Saga01PlanningTests(unittest.IsolatedAsyncioTestCase):
         await self.open('/app/ddas/logistics/case?model_id='+mid)
         await expect(self.page.get_by_label('Model Version',exact=True)).to_have_value(v['version']['id'])
         self.assertTrue(await self.page.get_by_label('Operating Role',exact=True).is_disabled())
+        await self.page.locator('details.ultimate-disclosure').nth(1).locator('summary').click()
         async with self.page.expect_download() as event:await self.page.get_by_role('button',name='Descargar template de Órdenes / Demanda',exact=True).click()
         download=await event.value;self.assertTrue(download.suggested_filename.endswith('.csv'))
         await self.fill_case();cid=await self.create()
@@ -65,7 +67,7 @@ class Saga01PlanningTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_03_new_model_with_existing_models_and_required_validation(self):
         await self.model();await self.open('/app/ddas/logistics/case')
-        await self.page.get_by_role('button',name='Crear nuevo Logistics Model',exact=True).click()
+        await self.page.get_by_role('button',name='Configurar modelo nuevo',exact=True).click()
         await expect(self.page.get_by_role('button',name='Crear Decision Case',exact=True)).to_be_enabled()
         await self.page.get_by_role('button',name='Crear Decision Case',exact=True).click()
         await expect(self.page.locator('.ultimate-errors')).to_be_visible()
@@ -74,7 +76,7 @@ class Saga01PlanningTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_04_failed_case_creation_recovers_without_duplicate_model_or_version(self):
         await self.model()
-        await self.open('/app/ddas/logistics/case');await self.page.get_by_role('button',name='Crear nuevo Logistics Model',exact=True).click()
+        await self.open('/app/ddas/logistics/case');await self.page.get_by_role('button',name='Configurar modelo nuevo',exact=True).click()
         name='Intento recuperable '+str(uuid4())[:8]
         await self.page.get_by_label('Nombre del Model',exact=True).fill(name);await self.fill_case()
         async def fail(route):await route.fulfill(status=503,json={'detail':'Fallo sintético al guardar Case'})
@@ -104,8 +106,9 @@ class Saga01PlanningTests(unittest.IsolatedAsyncioTestCase):
     async def test_06_mobile_contract_preview_race_and_legacy_entry(self):
         await self.model()
         await self.page.set_viewport_size({'width':390,'height':844});await self.open('/app/ddas/logistics/data')
-        self.assertIn('/case',self.page.url);await self.page.get_by_role('button',name='Crear nuevo Logistics Model',exact=True).click()
+        self.assertIn('/case',self.page.url);await self.page.get_by_role('button',name='Configurar modelo nuevo',exact=True).click()
         await self.page.get_by_role('checkbox',name='Peso (kg)',exact=True).check()
+        await self.page.locator('details.ultimate-disclosure').nth(1).locator('summary').click()
         await expect(self.page.get_by_role('cell',name='demand_weight_kg',exact=True)).to_be_visible()
         await self.page.get_by_role('checkbox',name='Peso (kg)',exact=True).uncheck()
         await expect(self.page.get_by_role('cell',name='demand_weight_kg',exact=True)).to_have_count(0)
