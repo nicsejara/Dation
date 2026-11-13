@@ -149,6 +149,15 @@ class TransportAndWorkflowTests(unittest.TestCase):
  def test_readonly_identity_job_never_patches(self):
   with mock.patch.object(common,'request') as request,self.assertRaises(RuntimeError):common.CloudRun('fixture',read_only=True).api(method='PATCH',body={'name':common.RESOURCE,'etag':'x','traffic':[]},query='traffic')
   request.assert_not_called()
+ def test_revision_paths_cannot_escape_service_or_inject_queries(self):
+  for suffix in ('../other','dation-core-test/../../jobs/other','dation-core-test?fields=other','dation-core-test:run'):
+   with self.subTest(suffix=suffix),mock.patch.object(common,'request') as request,self.assertRaises(RuntimeError):
+    common.CloudRun('fixture').api(common.RESOURCE+'/revisions/'+suffix)
+   request.assert_not_called()
+   with self.assertRaises(RuntimeError):release.revision_id(common.RESOURCE+'/revisions/'+suffix)
+ def test_codeowners_protects_the_shared_publisher_project_identity(self):
+  self.assertIn('/backend/app/cloud_identity.py',common.POLICY['required_codeowner_paths'])
+  self.assertIn('/backend/app/cloud_identity.py @nicsejara',(ROOT/'.github/CODEOWNERS').read_text())
  def test_registry_conflicting_digest_is_denied(self):
   value={'version':'projects/'+common.PROJECT+'/locations/us-west1/repositories/dation-runtime/packages/dation-core/versions/sha256:'+'f'*64}
   with mock.patch.object(common,'request',return_value=value),self.assertRaisesRegex(RuntimeError,'tag differs'):common.CloudRun('fixture').registry(APP,IMAGE)

@@ -154,7 +154,8 @@ class CloudRun:
         self.token = token if token is not None else os.environ['DATION_DEPLOY_TOKEN']
         self.read_only = read_only
     def api(self, resource=RESOURCE, method='GET', body=None, query='', missing=False):
-        require(resource == RESOURCE or resource.startswith(RESOURCE + '/revisions/') or resource in (RESOURCE + ':getIamPolicy', RESOURCE + ':testIamPermissions'), 'only the existing API service/revision can be accessed')
+        exact_revision = re.fullmatch(re.escape(RESOURCE + '/revisions/' + POLICY['service'] + '-') + r'[a-z0-9-]+', resource)
+        require(resource == RESOURCE or exact_revision or resource in (RESOURCE + ':getIamPolicy', RESOURCE + ':testIamPermissions'), 'only the existing API service/revision can be accessed')
         probe = method=='POST' and resource==RESOURCE+':testIamPermissions' and body=={'permissions':POLICY['service_permissions']}
         require(probe or method == 'GET' or method == 'PATCH' and resource == RESOURCE and not self.read_only and query in ('template,traffic','traffic'), 'Cloud Run mutation outside approved scope')
         url = 'https://run.googleapis.com/v2/' + resource

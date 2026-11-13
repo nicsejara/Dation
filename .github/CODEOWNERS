@@ -10,3 +10,4 @@
 /Dockerfile @nicsejara
 /.dockerignore @nicsejara
 /backend/requirements* @nicsejara
+/backend/app/cloud_identity.py @nicsejara

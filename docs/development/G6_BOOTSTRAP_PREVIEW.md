@@ -5,7 +5,7 @@ plan fue aplicado. Automatización productiva deshabilitada. Proyecto único:
 `dation-runtime-v2-2026` / `332279365872`, región `us-west1`.
 
 Plan SHA-256: `042f6a60d77ed59ddef567120971b49130d6564eace8252138d4e610a4648c6f`.
-Política SHA-256: `8a85c8fabec653f1d95aa1bf00b35950304021e47639c7cad342bd9257f2b9a2`.
+Política SHA-256: `a4f013513f58f75697f9cb4176022f3f0b2cabac6d42439301022b1616e9c0ad`.
 Recalcular con el script de preview y `sha256sum` desde el candidato revisado;
 un cambio de cualquiera de esos planes exige nueva revisión.
 

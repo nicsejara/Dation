@@ -40,7 +40,7 @@
     "backend/tests/browser/test_ultimate_navigation.py",
     "backend/tests/browser/test_ultimate_case_data.py"
   ],
-  "required_codeowner_paths": ["/.github/", "/scripts/ci/", "/scripts/release/", "/scripts/runtime_v2_publication.py", "/infra/", "/tests/operations/", "/tests/impact-map.json", "/Dockerfile", "/.dockerignore", "/backend/requirements*"],
+  "required_codeowner_paths": ["/.github/", "/scripts/ci/", "/scripts/release/", "/scripts/runtime_v2_publication.py", "/infra/", "/tests/operations/", "/tests/impact-map.json", "/Dockerfile", "/.dockerignore", "/backend/requirements*", "/backend/app/cloud_identity.py"],
   "default_enabled": false,
   "retention_days": 90
 }

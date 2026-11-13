@@ -38,7 +38,8 @@ def revision_id(name):
     if isinstance(name,str) and name.startswith(POLICY['service']+'-') and '/' not in name:
         name=RESOURCE+'/revisions/'+name
     prefix=RESOURCE+'/revisions/'
-    require(isinstance(name,str) and name.startswith(prefix) and name[len(prefix):].startswith(POLICY['service']+'-'), 'revision is outside this service')
+    import re
+    require(isinstance(name,str) and name.startswith(prefix) and re.fullmatch(re.escape(POLICY['service']+'-')+r'[a-z0-9-]+',name[len(prefix):]), 'revision is outside this service')
     return name[len(prefix):]
 
 
