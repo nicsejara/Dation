@@ -17,6 +17,9 @@ un cambio de cualquiera de esos planes exige nueva revisión.
 - Lectura GCP de dation-core: HTTP401 UNAUTHENTICATED,
   `ACCESS_TOKEN_TYPE_UNSUPPORTED`. IAM actual, revisión/digest activos, flags y
   configuración live siguen **sin verificación nueva**. No es prueba de ausencia.
+- Environments de GitHub: lista vacía. Lectura de variables del repositorio: HTTP403
+  `Resource not accessible by integration`; valores actuales no verificados. El
+  propio R4 se rechaza por scope aunque una variable existiera.
 - No se repitieron Gate A/B ni inventario general. No se hicieron escrituras GCP,
   Supabase ni activación de variables/environments productivos.
 
@@ -36,7 +39,9 @@ no recibe permiso de despliegue.
 Custom role: exclusivamente `run.services.get`, `run.services.update`,
 `run.services.getIamPolicy`, `run.revisions.get`. No create/delete, setIamPolicy,
 run.jobs.*, secretAccessor, actAs sobre otras cuentas, Owner, Editor, Token Creator,
-roles de proyecto ni permiso de ejecutar Jobs. Se consulta servicio/revisión,
+roles de proyecto ni permiso de ejecutar Jobs. IAM `run.services.update` permite
+cambiar más que la imagen dentro de ese servicio; la restricción de imagen/tráfico
+y configuración preservada es del código protegido, no un campo de IAM. Se consulta servicio/revisión,
 no operaciones a nivel proyecto. El rol se define en el proyecto pero **se asigna
 sólo al servicio**. Lectura Registry es metadata/contenido de la imagen, no secretos.
 
@@ -109,6 +114,21 @@ fallo es NO-GO. No se hace deploy para probar permisos.
 La política y el baseline son guardas adicionales. Un baseline más nuevo no permite
 colar un backend pendiente: también se compara con el commit OCI realmente activo.
 No usar `792470...` ni PR113 como estado desplegado sin lectura real.
+
+## Baseline de imagen antes de los pilotos
+
+El FULL del candidato inicial detectó en el baseline `opentelemetry-api 1.45.1`,
+CVE-2026-126360. Se corrige exclusivamente a 1.45.2 con hashes oficiales; no se
+modifica FastAPI, motores ni otro paquete. Esto cambia `backend/requirements.txt`:
+la política acumulativa lo rechaza correctamente en un futuro R1/R2 mientras la
+imagen activa conserve la dependencia anterior.
+
+Antes del primer piloto, hace falta un GO puntual para una publicación/despliegue
+manual del SHA R4 revisado con esa corrección, usando el publicador y fallback
+existentes y sin ejecución de Jobs. Ese release inicial está **fuera de esta
+activación automática**. Luego el preflight debe comprobar el nuevo OCI baseline;
+recién entonces fijar `DATION_UX_BASELINE_SHA` a ese commit real. No aprobar un
+baseline ficticio ni quitar requirements de la guarda para evitar ese paso.
 
 ## Cierre del bootstrap
 

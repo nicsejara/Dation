@@ -20,7 +20,15 @@ smoke503, limpieza de tag, rollback seguro y negativa ante despliegue ajeno.
 También simula el bootstrap exacto e idempotente, preservando otros miembros IAM.
 Todas son simulaciones sin llamadas GCP ni credenciales reales.
 
-Resultados locales y runs FAST/FULL del candidato se registran en el PR. La
+Resultados locales: **93 tests de operaciones PASS**, actionlint 1.7.12 PASS,
+static checks y manifiestos PASS sobre el primer candidato `abab18d7`.
+Primer run PR #114: `43521227358`: impact/FAST PASS; FULL falló antes de tests por
+CVE-2026-126360 en opentelemetry-api1.45.1, una dependencia preexistente. Corrección
+mínima en esta misma rama: 1.45.2 con hashes PyPI, sin excluir vulnerabilidades.
+Este cambio necesita un release manual inicial autorizado antes de los pilotos
+para que el delta de runtime posterior sea estrictamente UX.
+
+Resultados finales y runs FAST/FULL del candidato estable se registran en el PR. La
 medición hasta CI verde se completa con timestamps reales de Actions; no confundir
 la duración de un test local con la latencia completa de implementación y CI.
 
