@@ -1,0 +1,170 @@
+name: Dation G6 controlled operations
+run-name: G6 ${{ inputs.operation }} / source ${{ inputs.source_run }}
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Preflight reads only; recovery/rollback require explicit owner request
+        type: choice
+        required: true
+        options: [preflight, recover, rollback]
+      source_run:
+        description: Verified source G6 run ID for recover/rollback; empty for preflight
+        type: string
+        required: false
+      confirmation:
+        description: RECOVER_SAME_RELEASE or ROLLBACK_100 when explicitly authorized
+        type: string
+        required: false
+permissions:
+  contents: read
+concurrency:
+  group: dation-core-ux-release
+  cancel-in-progress: false
+env:
+  DATION_UX_BOOTSTRAP_APPROVED: ${{ vars.DATION_UX_BOOTSTRAP_APPROVED }}
+  DATION_UX_POLICY_SHA256: ${{ vars.DATION_UX_POLICY_SHA256 }}
+  DATION_UX_OPERATION: ${{ inputs.operation }}
+  DATION_SOURCE_RUN: ${{ inputs.source_run }}
+  DATION_CONFIRMATION: ${{ inputs.confirmation }}
+jobs:
+  controlled:
+    if: github.repository == 'nicsejara/Dation' && github.ref == 'refs/heads/main' && vars.DATION_UX_BOOTSTRAP_APPROVED == 'true'
+    environment: ux-mvp-auto
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    permissions:
+      contents: read
+      checks: read
+      actions: read
+      pull-requests: read
+      id-token: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Isolate ephemeral Registry authentication
+        run: echo "DOCKER_CONFIG=$RUNNER_TEMP/g6-registry-auth" >> "$GITHUB_ENV"
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify trusted manual context and approved controls before OIDC
+        run: python3 scripts/release/g6_orchestrator.py ops-guard --out "$RUNNER_TEMP/g6"
+      - name: Restore immutable source checkpoints
+        if: inputs.operation != 'preflight'
+        run: python3 scripts/release/g6_release.py restore --source-run "$DATION_SOURCE_RUN" --out "$RUNNER_TEMP/g6"
+      - name: Collect existing correlated publisher without another dispatch
+        if: inputs.operation == 'recover'
+        run: python3 scripts/release/g6_orchestrator.py collect --out "$RUNNER_TEMP/g6"
+      - name: Persist source plan for an auditable recovery chain
+        if: inputs.operation != 'preflight'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: g6-plan-${{ github.run_id }}
+          path: ${{ runner.temp }}/g6/plan.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Persist verified publication source
+        if: inputs.operation != 'preflight'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: g6-publication-${{ github.run_id }}
+          path: ${{ runner.temp }}/g6/publication.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Persist original prepare snapshot before any recovery write
+        if: inputs.operation != 'preflight'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: g6-snapshot-${{ github.run_id }}
+          path: ${{ runner.temp }}/g6/snapshot.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Authenticate dedicated deployer without permanent credentials
+        id: auth
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
+        with:
+          workload_identity_provider: projects/332279365872/locations/global/workloadIdentityPools/dation-github-ux/providers/github-main-ux
+          audience: https://iam.googleapis.com/projects/332279365872/locations/global/workloadIdentityPools/dation-github-ux/providers/github-main-ux
+          service_account: dation-ux-deployer@dation-runtime-v2-2026.iam.gserviceaccount.com
+          token_format: access_token
+          access_token_lifetime: 1800s
+          create_credentials_file: false
+          export_environment_variables: false
+      - name: Read-only bootstrap identity proof
+        if: inputs.operation == 'preflight'
+        env:
+          DATION_DEPLOY_TOKEN: ${{ steps.auth.outputs.access_token }}
+        run: python3 scripts/release/g6_release.py preflight --out "$RUNNER_TEMP/g6"
+      - name: Authorized exact rollback with drift protection
+        if: inputs.operation == 'rollback'
+        env:
+          DATION_DEPLOY_TOKEN: ${{ steps.auth.outputs.access_token }}
+        run: python3 scripts/release/g6_release.py rollback --confirm "$DATION_CONFIRMATION" --out "$RUNNER_TEMP/g6"
+      - name: Inspect interrupted release without adopting another revision
+        id: recovery
+        if: inputs.operation == 'recover'
+        env:
+          DATION_DEPLOY_TOKEN: ${{ steps.auth.outputs.access_token }}
+        run: python3 scripts/release/g6_release.py inspect-recovery --out "$RUNNER_TEMP/g6"
+      - name: Reconcile interrupted completed promotion without a traffic write
+        if: inputs.operation == 'recover' && steps.recovery.outputs.already_promoted == 'true'
+        env:
+          DATION_DEPLOY_TOKEN: ${{ steps.auth.outputs.access_token }}
+        run: python3 scripts/release/g6_release.py recover-promoted --confirm "$DATION_CONFIRMATION" --out "$RUNNER_TEMP/g6"
+      - name: Recover existing candidate only, never redeploy missing revision
+        if: inputs.operation == 'recover' && steps.recovery.outputs.already_promoted == 'false'
+        env:
+          DATION_DEPLOY_TOKEN: ${{ steps.auth.outputs.access_token }}
+        run: python3 scripts/release/g6_release.py prepare --out "$RUNNER_TEMP/g6"
+      - name: Persist recovered preparation
+        if: inputs.operation == 'recover' && steps.recovery.outputs.already_promoted == 'false'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: g6-prepared-${{ github.run_id }}
+          path: ${{ runner.temp }}/g6/prepared.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Recheck exact candidate health
+        if: inputs.operation == 'recover' && steps.recovery.outputs.already_promoted == 'false'
+        env:
+          DATION_DEPLOY_TOKEN: ${{ steps.auth.outputs.access_token }}
+        run: python3 scripts/release/g6_release.py smoke --out "$RUNNER_TEMP/g6"
+      - name: Persist recovered health proof
+        if: inputs.operation == 'recover' && steps.recovery.outputs.already_promoted == 'false'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: g6-smoke-${{ github.run_id }}
+          path: ${{ runner.temp }}/g6/smoke.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Revalidate current main and recover promotion intent
+        if: inputs.operation == 'recover' && steps.recovery.outputs.already_promoted == 'false'
+        env:
+          DATION_DEPLOY_TOKEN: ${{ steps.auth.outputs.access_token }}
+        run: python3 scripts/release/g6_release.py promotion-intent --out "$RUNNER_TEMP/g6"
+      - name: Persist recovered promotion intent before traffic write
+        if: inputs.operation == 'recover'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: g6-promotion-intent-${{ github.run_id }}
+          path: ${{ runner.temp }}/g6/promotion-intent.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Complete exact recovered promotion and guarded rollback
+        if: inputs.operation == 'recover' && steps.recovery.outputs.already_promoted == 'false'
+        env:
+          DATION_DEPLOY_TOKEN: ${{ steps.auth.outputs.access_token }}
+        run: python3 scripts/release/g6_release.py promote --out "$RUNNER_TEMP/g6"
+      - name: Persist operation result without changing prior receipts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: g6-release-${{ github.run_id }}
+          path: ${{ runner.temp }}/g6/G6_RELEASE_RECEIPT.json
+          retention-days: 90
+          if-no-files-found: warn
+      - name: Remove ephemeral Registry access token
+        if: always()
+        run: rm -rf -- "$DOCKER_CONFIG"

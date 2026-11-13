@@ -84,6 +84,12 @@ def guard_context(env=os.environ):
         'GITHUB_RUN_ATTEMPT': '1'}
     require(all(env.get(k) == v for k, v in expected.items()), 'Only first-attempt manual publication from the trusted main workflow is allowed')
     require(re.fullmatch(r'[0-9]+', env.get('GITHUB_RUN_ID', '')), 'Missing Actions run identity')
+    request_id = env.get('DATION_PUBLISH_REQUEST_ID', '')
+    if request_id:
+        require(bool(re.fullmatch(r'g6-[0-9]+', request_id)) and
+            env.get('DATION_UX_AUTODEPLOY_ENABLED') == 'true' and
+            env.get('DATION_UX_BOOTSTRAP_APPROVED') == 'true' and SOURCE_SHA == env.get('GITHUB_SHA'),
+            'Automatic publication requires approved G6, enabled switch and current control/application SHA')
 
 
 def command(*args, timeout=120, secret_input=None):
@@ -184,7 +190,7 @@ def require_no_previous_build():
             if int(run['id']) >= run_id:
                 continue
             title = run.get('display_title')
-            if title != expected_title:
+            if title != expected_title and not (isinstance(title, str) and title.startswith(expected_title + ' / g6-')):
                 require(title or run.get('head_sha') != control_sha,
                     'Unidentifiable earlier dispatch of these release controls')
                 continue
@@ -242,8 +248,9 @@ def validate_green_source(source):
         result['total_count'] == len(checks) and result['total_count'] <= 100,
         'Incomplete check-run evidence for selected SHA')
     matching = [c for c in checks if c.get('name') == 'required-gate' and
-                c.get('head_sha') == SOURCE_SHA and c.get('status') == 'completed']
-    require(bool(matching) and max(matching,key=lambda check: int(check.get('id',0))).get('conclusion') == 'success',
+                c.get('head_sha') == SOURCE_SHA]
+    newest = max(matching,key=lambda check: int(check.get('id',0))) if matching else {}
+    require(newest.get('status') == 'completed' and newest.get('conclusion') == 'success',
         'Most recent required-gate on exact application SHA is not successful')
 
 def preflight(source, output):
@@ -352,6 +359,7 @@ def publish(source, output):
         'architecture': 'amd64', 'image_id': state['image_id'], 'image_size_bytes': state['size_bytes'],
         'source_dockerfile_sha256': state['source_dockerfile_sha256'], 'control_sha': os.environ['GITHUB_SHA'], 'workflow_sha': os.environ['GITHUB_SHA'],
         'workflow_ref': os.environ['GITHUB_WORKFLOW_REF'], 'run_id': os.environ['GITHUB_RUN_ID'],
+        'request_id': os.environ.get('DATION_PUBLISH_REQUEST_ID') or None,
         'run_url': 'https://github.com/nicsejara/Dation/actions/runs/' + os.environ['GITHUB_RUN_ID'],
         'publisher_account': ACCOUNT, 'identity_provider': PROVIDER, 'authentication': 'OIDC WIF, short-lived SA token',
         'built_this_run': state['build_required'], 'dependencies_verified': True, 'imports_verified': True,

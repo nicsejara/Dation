@@ -44,6 +44,21 @@ class PublicationTests(unittest.TestCase):
             changed = dict(CONTEXT); changed[key] = 'untrusted'
             with self.subTest(claim=key), self.assertRaises(RuntimeError):p.guard_context(changed)
 
+    def test_g6_request_requires_approved_switch_and_current_control_sha(self):
+        env={**CONTEXT,'GITHUB_SHA':p.SOURCE_SHA,'DATION_PUBLISH_REQUEST_ID':'g6-501',
+            'DATION_UX_AUTODEPLOY_ENABLED':'true','DATION_UX_BOOTSTRAP_APPROVED':'true'}
+        p.guard_context(env)
+        for change in ({'DATION_UX_AUTODEPLOY_ENABLED':''},{'DATION_UX_BOOTSTRAP_APPROVED':'false'},
+                       {'GITHUB_SHA':'b'*40},{'DATION_PUBLISH_REQUEST_ID':'untrusted'}):
+            with self.subTest(change=change),self.assertRaises(RuntimeError):p.guard_context({**env,**change})
+
+    def test_build_once_history_recognizes_g6_correlation_titles(self):
+        runs={'workflow_runs':[{'id':99,'status':'completed','head_sha':'c'*40,
+            'display_title':'Publish Dation '+p.SOURCE_SHA+' / g6-501'}]}
+        jobs={'total_count':1,'jobs':[{'conclusion':'success','steps':[{'name':p.TRUST['build_step_name'],'conclusion':'success'}]}]}
+        with mock.patch.dict(os.environ,{**CONTEXT,'GITHUB_SHA':'c'*40}),mock.patch.object(p,'api',side_effect=[runs,jobs]),self.assertRaisesRegex(RuntimeError,'previous build'):
+            p.require_no_previous_build()
+
     def test_wif_numeric_subject_and_exact_claims(self):
         plan = p.wif_plan()
         self.assertEqual(plan['attribute_mapping'], {'google.subject': 'assertion.repository_id'})
@@ -289,7 +304,7 @@ class PublicationTests(unittest.TestCase):
         self.assertEqual(build['timeout-minutes'],'20');self.assertNotIn('DATION_PUBLISH_ACCESS_TOKEN',build.get('env',{}))
         app=next(s for s in job['steps'] if s.get('with',{}).get('path')=='application')
         self.assertEqual(app['with']['ref'], '$'+'{{ inputs.application_sha }}')
-        self.assertEqual(w['run-name'], 'Publish Dation '+'$'+'{{ inputs.application_sha }}')
+        self.assertEqual(w['run-name'], 'Publish Dation '+'$'+"{{ inputs.application_sha }}"+'$'+"{{ inputs.request_id && format(' / {0}', inputs.request_id) || '' }}")
         self.assertEqual(job['env']['DATION_APPLICATION_SHA'], '$'+'{{ inputs.application_sha }}')
         self.assertEqual(w['concurrency']['group'], 'runtime-v2-registry-publication')
         artifact=next(s for s in job['steps'] if s.get('uses','').startswith('actions/upload-artifact@'))
@@ -304,6 +319,15 @@ class PublicationTests(unittest.TestCase):
         with mock.patch.dict(os.environ,{'GITHUB_WORKSPACE':str(self.output),'GITHUB_SHA':'c'*40}), \
              mock.patch.object(p,'command',side_effect=['c'*40,'','',p.SOURCE_SHA]), \
              mock.patch.object(p,'api',return_value=good):
+            p.validate_green_source(self.output)
+
+    def test_new_pending_gate_does_not_reuse_older_green(self):
+        checks={'total_count':2,'check_runs':[
+            {'id':1,'name':'required-gate','head_sha':p.SOURCE_SHA,'status':'completed','conclusion':'success'},
+            {'id':2,'name':'required-gate','head_sha':p.SOURCE_SHA,'status':'queued','conclusion':None}]}
+        with mock.patch.dict(os.environ,{'GITHUB_WORKSPACE':str(self.output),'GITHUB_SHA':'c'*40}), \
+             mock.patch.object(p,'command',side_effect=['c'*40,'','',p.SOURCE_SHA]), \
+             mock.patch.object(p,'api',return_value=checks),self.assertRaisesRegex(RuntimeError,'exact application SHA'):
             p.validate_green_source(self.output)
         bad={'total_count':1,'check_runs':[{'name':'required-gate','head_sha':'b'*40,
               'status':'completed','conclusion':'success'}]}
