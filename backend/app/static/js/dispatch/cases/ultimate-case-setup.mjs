@@ -63,7 +63,7 @@ export async function mountCaseSetup(root,{route,navigate,onContext}){
   if(row){savedCard=el('section',undefined,'d-card ultimate-saved-context');savedCard.append(el('h2','Contexto guardado','d-card-title'),el('p','Versión '+current.model_version.version+' de '+current.model.name+' · '+row.planning_start+' a '+row.planning_end,'d-body'),el('p','Data Pack inicial: '+(current.entry_count?'datos vinculados':'sin archivos')+'. El contexto se conserva al recargar.','d-metadata'));
    if(row.context_frozen_at)savedCard.append(el('p','El horizonte y la política quedaron congelados con la primera admisión. El nombre, la descripción y los responsables conservan sus reglas de edición.','d-body'));}
   let planningModel=null,initialized=false,creationIntent=draft.creation_intent||null;
-  const kit=mountForm(root,scope,{initial,store,submitLabel:fresh?'Crear Decision Case':'Guardar contexto',onReload:()=>navigate('logistics-case-setup',{caseId:route.caseId,replace:true}),onSave:async value=>{
+  const kit=mountForm(root,scope,{initial,store,submitLabel:fresh?'Finalizar configuración':'Guardar contexto',onReload:()=>navigate('logistics-case-setup',{caseId:route.caseId,replace:true}),onSave:async value=>{
    let result;
    if(fresh){
     creationIntent||={id:value.id,name:value.name,description:value.description||null,planning_start:value.planning_start,planning_end:value.planning_end,horizon_type:value.horizon_type,operating_mode:value.operating_mode,case_policy:policyUI.read(),decision_owner_user_id:canAssign?value.decision_owner_user_id||null:null};

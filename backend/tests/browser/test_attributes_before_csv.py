@@ -29,14 +29,14 @@ class AttributesBeforeCSVTests(unittest.IsolatedAsyncioTestCase):
         await self.open('/app/ddas/logistics/case')
         if await self.page.get_by_label('Logistics Model',exact=True).count():
             await self.page.get_by_role('button',name='Configurar modelo nuevo',exact=True).click()
-        await expect(self.page.get_by_role('button',name='Crear Decision Case',exact=True)).to_be_enabled(timeout=30000)
+        await expect(self.page.get_by_role('button',name='Finalizar configuración',exact=True)).to_be_enabled(timeout=30000)
         self.writes=[]
         self.page.on('request',lambda r:self.writes.append(r.post_data_json) if r.method=='POST' and urlparse(r.url).path in ('/api/platform/logistics-models','/api/platform/logistics-cases') else None)
         return self.page.locator('.ultimate-foundation form')
 
     async def test_1_context_is_validated_before_creation_without_operational_files(self):
         form=await self.new_form()
-        await self.page.get_by_role('button',name='Crear Decision Case',exact=True).click()
+        await self.page.get_by_role('button',name='Finalizar configuración',exact=True).click()
         await expect(form.locator('.ultimate-errors')).to_be_visible()
         await self.page.get_by_label('Nombre del Model',exact=True).fill('Preparación antes de datos')
         await self.fill_case('SEMANA 43')
@@ -61,7 +61,7 @@ class AttributesBeforeCSVTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(await self.page.get_by_label('Decision Owner inicial (D1 y D2)',exact=True).input_value(),setup.ADMIN)
         self.assertEqual(self.writes,[]);self.assertEqual(await self.page.locator('input[type=file]').count(),0)
         await self.page.get_by_label('Decision Owner inicial (D1 y D2)',exact=True).select_option('')
-        await self.page.get_by_role('button',name='Crear Decision Case',exact=True).click()
+        await self.page.get_by_role('button',name='Finalizar configuración',exact=True).click()
         await expect(self.page.locator('.ultimate-errors')).to_be_visible();self.assertEqual(self.writes,[])
 
     async def test_3_created_case_without_csv_keeps_d1_data_required_and_d2_locked(self):
