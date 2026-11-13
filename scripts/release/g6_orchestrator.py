@@ -118,9 +118,29 @@ def restore(gh, run_id, out):
     return plan
 
 
+def finalize(out, outcome):
+    """Persist early failures too; never infer live traffic after an interrupted write."""
+    def read(name):
+        path=out/name
+        return json.loads(path.read_text()) if path.is_file() else {}
+    prior=read('G6_RELEASE_RECEIPT.json')
+    if prior.get('status') in ('ACTIVATED','FAILED_ROLLED_BACK','FAILED_PREPARED_CLEANED','ROLLED_BACK','READ_ONLY_IDENTITY_VERIFIED'):
+        return prior
+    plan=read('plan.json');pub=read('publication.json');snap=read('snapshot.json');prepared=read('prepared.json')
+    result={**prior,'status':'FAILED','reason':prior.get('reason') or 'Job '+outcome+'; inspect exact failing step and immutable checkpoints',
+        'release_id':plan.get('release_id'),'APPLICATION_SHA':plan.get('application_sha'),
+        'CI_PASS':plan.get('status')=='ELIGIBLE','PUBLISH_PASS':pub.get('status')=='PUBLISH_PASS',
+        'IMAGE_DIGEST':pub.get('image_digest'),'READY_REVISION':prepared.get('new_revision'),
+        'TRAFFIC':'UNVERIFIED_CHECK_LIVE' if snap else 0,'HEALTH_PASS':False,
+        'ROLLBACK_REVISION':snap.get('old_revision'),'url':snap.get('url'),
+        'operation_run_id':os.environ.get('GITHUB_RUN_ID'),'jobs_executed':0,'apply_unlocked':False}
+    write(out/'G6_RELEASE_RECEIPT.json',result)
+    return result
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('phase',choices=('preflight','claim','publish','restore','collect','verify','ops-guard'))
+    parser.add_argument('phase',choices=('preflight','claim','publish','restore','collect','verify','ops-guard','finalize'))
     parser.add_argument('--out',required=True,type=Path)
     parser.add_argument('--source-run')
     args=parser.parse_args();os.umask(0o077);args.out.mkdir(parents=True,exist_ok=True)
@@ -128,6 +148,7 @@ def main():
         mode='auto' if os.environ.get('GITHUB_EVENT_NAME')=='workflow_run' else 'ops'
         context(mode)
         require(scope.git('rev-parse','HEAD')==os.environ['GITHUB_SHA'], 'checked-out controls differ from workflow SHA')
+        if args.phase=='finalize':finalize(args.out,os.environ.get('DATION_JOB_STATUS','unknown'));return
         gh=GitHub()
         if args.phase=='ops-guard':
             require(mode=='ops' and os.environ.get('DATION_UX_OPERATION') in ('preflight','recover','rollback'), 'invalid manual operation')

@@ -157,6 +157,11 @@ jobs:
         env:
           DATION_DEPLOY_TOKEN: ${{ steps.auth.outputs.access_token }}
         run: python3 scripts/release/g6_release.py promote --out "$RUNNER_TEMP/g6"
+      - name: Finalize early operation failure without cloud access
+        if: always()
+        env:
+          DATION_JOB_STATUS: ${{ job.status }}
+        run: python3 scripts/release/g6_orchestrator.py finalize --out "$RUNNER_TEMP/g6"
       - name: Persist operation result without changing prior receipts
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

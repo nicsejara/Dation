@@ -90,6 +90,19 @@ jobs:
           path: ${{ runner.temp }}/g6/publication.json
           retention-days: 90
           if-no-files-found: error
+      - name: Record publication failure without any cloud identity
+        if: always() && (failure() || cancelled())
+        env:
+          DATION_JOB_STATUS: ${{ job.status }}
+        run: python3 scripts/release/g6_orchestrator.py finalize --out "$RUNNER_TEMP/g6"
+      - name: Persist publication failure receipt
+        if: always() && (failure() || cancelled())
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: g6-release-${{ github.run_id }}
+          path: ${{ runner.temp }}/g6/G6_RELEASE_RECEIPT.json
+          retention-days: 90
+          if-no-files-found: warn
   deployment:
     needs: [eligibility, publication]
     if: needs.eligibility.outputs.eligible == 'true' && needs.publication.result == 'success' && vars.DATION_UX_BOOTSTRAP_APPROVED == 'true' && vars.DATION_UX_AUTODEPLOY_ENABLED == 'true'
@@ -175,6 +188,11 @@ jobs:
         env:
           DATION_DEPLOY_TOKEN: ${{ steps.auth.outputs.access_token }}
         run: python3 scripts/release/g6_release.py promote --out "$RUNNER_TEMP/g6"
+      - name: Finalize early failure without assuming traffic state
+        if: always()
+        env:
+          DATION_JOB_STATUS: ${{ job.status }}
+        run: python3 scripts/release/g6_orchestrator.py finalize --out "$RUNNER_TEMP/g6"
       - name: Persist final release or failure receipt
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

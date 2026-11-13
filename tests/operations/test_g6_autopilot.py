@@ -262,6 +262,21 @@ class OrchestrationTests(unittest.TestCase):
   gh,run=self.publisher()
   with mock.patch.dict(os.environ,self.env):orchestrator.dispatch_collect(gh,plan(),self.out,allow_dispatch=False)
   gh.api.assert_not_called()
+ def test_early_failure_receipt_never_claims_publication_or_deployment(self):
+  common.write(self.out/'plan.json',plan())
+  result=orchestrator.finalize(self.out,'failure')
+  self.assertEqual(result['status'],'FAILED');self.assertFalse(result['PUBLISH_PASS']);self.assertFalse(result['HEALTH_PASS'])
+  self.assertEqual(result['TRAFFIC'],0)
+ def test_interrupted_write_receipt_marks_live_traffic_unverified(self):
+  common.write(self.out/'plan.json',plan());common.write(self.out/'publication.json',publication())
+  common.write(self.out/'snapshot.json',{'old_revision':OLD})
+  result=orchestrator.finalize(self.out,'cancelled')
+  self.assertTrue(result['PUBLISH_PASS']);self.assertEqual(result['TRAFFIC'],'UNVERIFIED_CHECK_LIVE')
+  self.assertFalse(result['HEALTH_PASS'])
+ def test_finalization_preserves_verified_activation_or_safe_rollback(self):
+  for status in ('ACTIVATED','FAILED_ROLLED_BACK','FAILED_PREPARED_CLEANED','READ_ONLY_IDENTITY_VERIFIED'):
+   prior={'status':status,'evidence':'immutable'};common.write(self.out/'G6_RELEASE_RECEIPT.json',prior)
+   self.assertEqual(orchestrator.finalize(self.out,'failure'),prior)
  def test_ambiguous_child_or_wrong_receipt_never_authorizes_deploy(self):
   for key,value in [('sha',BASE),('request_id','g6-other'),('image_digest',common.REGISTRY+':mutable'),('imports_verified',False)]:
    gh,run=self.publisher({key:value})
