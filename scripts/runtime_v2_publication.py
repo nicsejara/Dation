@@ -19,7 +19,7 @@ sys.path.insert(0, str(ROOT / 'backend'))
 from app.cloud_identity import PROJECT, PROJECT_NUMBER, REGION
 
 TRUST = json.loads((ROOT / 'infra/zero-idle/github-publication.json').read_text())
-SOURCE_SHA = '792470ff8cce54cb32b81240b206fdbcb7078ea2'
+SOURCE_SHA = '413a581d005c1d0de2ae659eb62dc1dce63c4a5c'
 HOST = REGION + '-docker.pkg.dev'
 REPOSITORY = f'projects/{PROJECT}/locations/{REGION}/repositories/dation-runtime'
 PACKAGE = REPOSITORY + '/packages/dation-core'
@@ -167,19 +167,11 @@ def tag_digest():
     return parse_version(tag.get('version'))
 
 
-def candidate_versions():
-    result = ar('GET', PACKAGE + '/versions?pageSize=2', absent=True)
-    if result is None:
-        return []
-    versions = result.get('versions', [])
-    require(isinstance(versions, list) and len(versions) <= 1 and not result.get('nextPageToken'),
-        'Multiple existing image versions require inspection; no new build')
-    return [parse_version(version.get('name')) for version in versions]
-
-
 def require_no_previous_build():
-    """Actions step history is a durable build-attempt marker, beyond runner lifetime."""
+    """Build-once guard scoped to the exact release-control commit, not prior releases."""
     run_id = int(os.environ['GITHUB_RUN_ID'])
+    control_sha = os.environ['GITHUB_SHA']
+    require(bool(re.fullmatch(r'[0-9a-f]{40}', control_sha)), 'Missing exact release-control SHA')
     base = 'https://api.github.com/repos/nicsejara/Dation/actions/'
     for page in range(1, 11):
         result = api('GET', base + f'workflows/runtime-v2-publish.yml/runs?event=workflow_dispatch&per_page=100&page={page}', github=True)
@@ -188,7 +180,14 @@ def require_no_previous_build():
         for run in runs:
             if int(run['id']) >= run_id:
                 continue
-            require(run.get('status') == 'completed', 'Earlier manual publication is unresolved')
+            # A prior release of a DIFFERENT validated SHA must never block
+            # this release. A repeat dispatch of these exact release controls
+            # still enforces the original build-once guard.
+            require(bool(re.fullmatch(r'[0-9a-f]{40}', str(run.get('head_sha','')))),
+                'Prior manual release has no verifiable control SHA')
+            if run['head_sha'] != control_sha:
+                continue
+            require(run.get('status') == 'completed', 'Earlier manual publication of this release is unresolved')
             jobs = api('GET', base + f'runs/{run["id"]}/jobs?filter=all&per_page=100', github=True)
             require(isinstance(jobs.get('jobs'), list) and isinstance(jobs.get('total_count'), int) and
                 jobs['total_count'] == len(jobs['jobs']) and jobs['total_count'] <= 100, 'Actions job history incomplete')
@@ -233,10 +232,9 @@ def preflight(source, output):
     require(repository.get('vulnerabilityScanningConfig', {}).get('enablementConfig') != 'ENABLED', 'Scanning enabled: unreviewed cost')
     rights = ar('POST', REPOSITORY + ':testIamPermissions', body={'permissions': sorted(PERMISSIONS)})
     require(set(rights.get('permissions', [])) == PERMISSIONS, 'Publisher lacks repository-scoped permissions; no broader IAM fallback')
+    # Only an exact immutable SHA tag identifies this release.
+    # The repository intentionally retains previous releases for rollback.
     digest = tag_digest()
-    if digest is None:
-        versions = candidate_versions()
-        digest = versions[0] if versions else None
     if digest is None:
         require_no_previous_build()
     else:
@@ -311,7 +309,7 @@ def publish(source, output):
     login(); crane = install_crane(output)
     digest = state['digest']
     if state['build_required']:
-        require(tag_digest() is None and not candidate_versions(), 'An image appeared during the build; no unexpected publication')
+        require(tag_digest() is None, 'Exact SHA tag appeared during the build; no unexpected publication')
         archive = output / 'image.tar'
         command('docker', 'save', '--output', archive, state['image_id'], timeout=120)
         digest = command(crane, 'digest', '--tarball', archive, timeout=180)

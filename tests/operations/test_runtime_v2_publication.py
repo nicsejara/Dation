@@ -182,29 +182,50 @@ class PublicationTests(unittest.TestCase):
         with mock.patch.object(p,'ar',return_value={'name':p.PACKAGE+'/tags/other','version':p.PACKAGE+'/versions/'+DIGEST}):
             with self.assertRaisesRegex(RuntimeError,'exact tag'):p.tag_digest()
 
-    def test_multiple_existing_versions_block_new_build(self):
-        for response in [{'versions':[{},{}]}, {'versions':[],'nextPageToken':'more'}, {'versions':'ambiguous'}]:
-            with mock.patch.object(p,'ar',return_value=response),self.assertRaises(RuntimeError):p.candidate_versions()
+    def test_prior_images_do_not_block_new_exact_sha_release(self):
+        with mock.patch.object(p,'source_check'),mock.patch.object(p,'tag_digest',return_value=None), \
+             mock.patch.object(p,'require_no_previous_build') as history, \
+             mock.patch.object(p,'digest_file',return_value='checksum'), \
+             mock.patch.object(p,'outputs'),mock.patch.object(p,'ar',side_effect=[
+                 {'name':p.REPOSITORY,'format':'DOCKER'},
+                 {'permissions':sorted(p.PERMISSIONS)}]) as registry:
+            p.preflight(ROOT,self.output)
+        history.assert_called_once()
+        self.assertEqual(registry.call_count,2)
+        self.assertTrue(json.loads((self.output/'state.json').read_text())['build_required'])
 
     def history(self, step, *, previous_status='completed', total=1):
-        runs={'workflow_runs':[{'id':99,'status':previous_status},{'id':100,'status':'in_progress'}]}
+        runs={'workflow_runs':[{'id':99,'status':previous_status,'head_sha':'c'*40},{'id':100,'status':'in_progress','head_sha':'c'*40}]}
         jobs={'total_count':total,'jobs':[{'conclusion':'failure','steps':step}]}
         return mock.patch.object(p,'api',side_effect=[runs,jobs])
 
     def test_history_allows_auth_failure_before_build(self):
-        with mock.patch.dict(os.environ,CONTEXT),self.history([{'name':p.TRUST['build_step_name'],'conclusion':'skipped'}]):p.require_no_previous_build()
+        with mock.patch.dict(os.environ,{**CONTEXT,'GITHUB_SHA':'c'*40}),self.history([{'name':p.TRUST['build_step_name'],'conclusion':'skipped'}]):p.require_no_previous_build()
 
     def test_any_previous_build_attempt_blocks_another_build(self):
         for conclusion in ('success','failure','cancelled',None):
-            with self.subTest(conclusion=conclusion),mock.patch.dict(os.environ,CONTEXT),self.history([{'name':p.TRUST['build_step_name'],'conclusion':conclusion}]):
+            with self.subTest(conclusion=conclusion),mock.patch.dict(os.environ,{**CONTEXT,'GITHUB_SHA':'c'*40}),self.history([{'name':p.TRUST['build_step_name'],'conclusion':conclusion}]):
                 with self.assertRaisesRegex(RuntimeError,'previous build'):p.require_no_previous_build()
 
     def test_unresolved_previous_run_blocks_build(self):
-        with mock.patch.dict(os.environ,CONTEXT),mock.patch.object(p,'api',return_value={'workflow_runs':[{'id':99,'status':'in_progress'}]}):
+        with mock.patch.dict(os.environ,{**CONTEXT,'GITHUB_SHA':'c'*40}),mock.patch.object(p,'api',return_value={'workflow_runs':[{'id':99,'status':'in_progress','head_sha':'c'*40}]}):
             with self.assertRaisesRegex(RuntimeError,'unresolved'):p.require_no_previous_build()
 
+    def test_previous_other_release_does_not_block_build(self):
+        with mock.patch.dict(os.environ,{**CONTEXT,'GITHUB_SHA':'c'*40}), \
+             mock.patch.object(p,'api',return_value={'workflow_runs':[{
+                 'id':99,'status':'completed','head_sha':'d'*40}]}) as history:
+            p.require_no_previous_build()
+        history.assert_called_once()
+
+    def test_missing_prior_control_identity_is_not_assumed_safe(self):
+        with mock.patch.dict(os.environ,{**CONTEXT,'GITHUB_SHA':'c'*40}), \
+             mock.patch.object(p,'api',return_value={'workflow_runs':[{
+                 'id':99,'status':'completed'}]}),self.assertRaisesRegex(RuntimeError,'control SHA'):
+            p.require_no_previous_build()
+
     def test_incomplete_history_cannot_clear_build_marker(self):
-        with mock.patch.dict(os.environ,CONTEXT),self.history([],total=101):
+        with mock.patch.dict(os.environ,{**CONTEXT,'GITHUB_SHA':'c'*40}),self.history([],total=101):
             with self.assertRaisesRegex(RuntimeError,'history incomplete'):p.require_no_previous_build()
 
     def test_no_tag_overwrite_when_existing_digest_differs(self):

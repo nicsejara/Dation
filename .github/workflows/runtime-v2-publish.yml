@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       confirm_publish:
-        description: Publish only validated SHA 792470ff to Runtime V2; no deployment
+        description: Publish validated Core Configuration image; no Cloud Run deploy
         required: true
         default: false
         type: boolean
@@ -13,7 +13,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: runtime-v2-gate-c-792470ff
+  group: runtime-v2-gate-c-413a581d
   cancel-in-progress: false
 
 jobs:
@@ -45,7 +45,7 @@ jobs:
       - name: Checkout exact validated application
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          ref: 792470ff8cce54cb32b81240b206fdbcb7078ea2
+          ref: 413a581d005c1d0de2ae659eb62dc1dce63c4a5c
           path: application
           persist-credentials: false
 
