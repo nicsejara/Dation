@@ -6,6 +6,7 @@ import importlib.util
 import io
 import json
 import os
+os.environ.setdefault('DATION_APPLICATION_SHA', 'a'*40)
 from pathlib import Path
 import re
 import tempfile
@@ -23,7 +24,7 @@ CONTEXT = {'GITHUB_ACTIONS': 'true', 'GITHUB_REPOSITORY': 'nicsejara/Dation',
     'GITHUB_REPOSITORY_ID': '1114679650', 'GITHUB_REPOSITORY_OWNER_ID': '249153366',
     'GITHUB_REF': 'refs/heads/main', 'GITHUB_EVENT_NAME': 'workflow_dispatch',
     'GITHUB_WORKFLOW_REF': 'nicsejara/Dation/.github/workflows/runtime-v2-publish.yml@refs/heads/main',
-    'GITHUB_RUN_ATTEMPT': '1', 'GITHUB_RUN_ID': '100'}
+    'GITHUB_RUN_ATTEMPT': '1', 'GITHUB_RUN_ID': '100', 'DATION_APPLICATION_SHA': 'a'*40}
 
 
 def wif_block():
@@ -185,6 +186,7 @@ class PublicationTests(unittest.TestCase):
     def test_prior_images_do_not_block_new_exact_sha_release(self):
         with mock.patch.object(p,'source_check'),mock.patch.object(p,'tag_digest',return_value=None), \
              mock.patch.object(p,'require_no_previous_build') as history, \
+             mock.patch.object(p,'validate_green_source'), \
              mock.patch.object(p,'digest_file',return_value='checksum'), \
              mock.patch.object(p,'outputs'),mock.patch.object(p,'ar',side_effect=[
                  {'name':p.REPOSITORY,'format':'DOCKER'},
@@ -195,7 +197,7 @@ class PublicationTests(unittest.TestCase):
         self.assertTrue(json.loads((self.output/'state.json').read_text())['build_required'])
 
     def history(self, step, *, previous_status='completed', total=1):
-        runs={'workflow_runs':[{'id':99,'status':previous_status,'head_sha':'c'*40},{'id':100,'status':'in_progress','head_sha':'c'*40}]}
+        runs={'workflow_runs':[{'id':99,'status':previous_status,'head_sha':'c'*40,'display_title':'Publish Dation '+p.SOURCE_SHA},{'id':100,'status':'in_progress','head_sha':'c'*40}]}
         jobs={'total_count':total,'jobs':[{'conclusion':'failure','steps':step}]}
         return mock.patch.object(p,'api',side_effect=[runs,jobs])
 
@@ -208,20 +210,20 @@ class PublicationTests(unittest.TestCase):
                 with self.assertRaisesRegex(RuntimeError,'previous build'):p.require_no_previous_build()
 
     def test_unresolved_previous_run_blocks_build(self):
-        with mock.patch.dict(os.environ,{**CONTEXT,'GITHUB_SHA':'c'*40}),mock.patch.object(p,'api',return_value={'workflow_runs':[{'id':99,'status':'in_progress','head_sha':'c'*40}]}):
+        with mock.patch.dict(os.environ,{**CONTEXT,'GITHUB_SHA':'c'*40}),mock.patch.object(p,'api',return_value={'workflow_runs':[{'id':99,'status':'in_progress','head_sha':'c'*40,'display_title':'Publish Dation '+p.SOURCE_SHA}]}):
             with self.assertRaisesRegex(RuntimeError,'unresolved'):p.require_no_previous_build()
 
     def test_previous_other_release_does_not_block_build(self):
         with mock.patch.dict(os.environ,{**CONTEXT,'GITHUB_SHA':'c'*40}), \
              mock.patch.object(p,'api',return_value={'workflow_runs':[{
-                 'id':99,'status':'completed','head_sha':'d'*40}]}) as history:
+                 'id':99,'status':'completed','head_sha':'d'*40,'display_title':'Publish Dation '+'b'*40}]}) as history:
             p.require_no_previous_build()
         history.assert_called_once()
 
     def test_missing_prior_control_identity_is_not_assumed_safe(self):
         with mock.patch.dict(os.environ,{**CONTEXT,'GITHUB_SHA':'c'*40}), \
              mock.patch.object(p,'api',return_value={'workflow_runs':[{
-                 'id':99,'status':'completed'}]}),self.assertRaisesRegex(RuntimeError,'control SHA'):
+                 'id':99,'status':'completed','head_sha':'c'*40}]}),self.assertRaisesRegex(RuntimeError,'Unidentifiable'):
             p.require_no_previous_build()
 
     def test_incomplete_history_cannot_clear_build_marker(self):
@@ -271,7 +273,8 @@ class PublicationTests(unittest.TestCase):
 
     def test_source_sha_and_credentials_outside_build_context(self):
         source=Path(os.environ['DATION_TEST_VALIDATED_SOURCE'])
-        with mock.patch.dict(os.environ,{'DOCKER_CONFIG':str(self.output/'auth')}):p.source_check(source,self.output)
+        with mock.patch.dict(os.environ,{'DOCKER_CONFIG':str(self.output/'auth')}),\
+             mock.patch.object(p,'command',side_effect=[p.SOURCE_SHA,'']):p.source_check(source,self.output)
         with mock.patch.dict(os.environ,{'DOCKER_CONFIG':str(source/'unsafe-auth')}):
             with self.assertRaisesRegex(RuntimeError,'credentials'):p.source_check(source,self.output)
 
@@ -279,17 +282,36 @@ class PublicationTests(unittest.TestCase):
         w=yaml.load((ROOT/'.github/workflows/runtime-v2-publish.yml').read_text(),Loader=yaml.BaseLoader)
         self.assertEqual(set(w['on']),{'workflow_dispatch'})
         self.assertEqual(w['concurrency']['cancel-in-progress'],'false')
-        job=w['jobs']['publish'];self.assertEqual(job['permissions'],{'contents':'read','actions':'read','id-token':'write'})
+        job=w['jobs']['publish'];self.assertEqual(job['permissions'],{'contents':'read','actions':'read','checks':'read','id-token':'write'})
         auth=next(s for s in job['steps'] if s.get('id')=='auth')
         self.assertEqual(auth['with']['create_credentials_file'],'false');self.assertEqual(auth['with']['access_token_lifetime'],'1800s')
         build=next(s for s in job['steps'] if s['name']==p.TRUST['build_step_name'])
         self.assertEqual(build['timeout-minutes'],'20');self.assertNotIn('DATION_PUBLISH_ACCESS_TOKEN',build.get('env',{}))
         app=next(s for s in job['steps'] if s.get('with',{}).get('path')=='application')
-        self.assertEqual(app['with']['ref'],p.SOURCE_SHA)
+        self.assertEqual(app['with']['ref'], '$'+'{{ inputs.application_sha }}')
+        self.assertEqual(w['run-name'], 'Publish Dation '+'$'+'{{ inputs.application_sha }}')
+        self.assertEqual(job['env']['DATION_APPLICATION_SHA'], '$'+'{{ inputs.application_sha }}')
+        self.assertEqual(w['concurrency']['group'], 'runtime-v2-registry-publication')
         artifact=next(s for s in job['steps'] if s.get('uses','').startswith('actions/upload-artifact@'))
         self.assertNotIn('**',artifact['with']['path']);self.assertNotIn('auth',artifact['with']['path'])
         for step in job['steps']:
             if 'uses' in step:self.assertRegex(step['uses'],r'@[0-9a-f]{40}$')
+
+
+    def test_exact_sha_green_gate_is_required(self):
+        good={'total_count':1,'check_runs':[{'name':'required-gate','head_sha':p.SOURCE_SHA,
+              'status':'completed','conclusion':'success'}]}
+        with mock.patch.dict(os.environ,{'GITHUB_WORKSPACE':str(self.output),'GITHUB_SHA':'c'*40}), \
+             mock.patch.object(p,'command',side_effect=['c'*40,'','',p.SOURCE_SHA]), \
+             mock.patch.object(p,'api',return_value=good):
+            p.validate_green_source(self.output)
+        bad={'total_count':1,'check_runs':[{'name':'required-gate','head_sha':'b'*40,
+              'status':'completed','conclusion':'success'}]}
+        with mock.patch.dict(os.environ,{'GITHUB_WORKSPACE':str(self.output),'GITHUB_SHA':'c'*40}), \
+             mock.patch.object(p,'command',side_effect=['c'*40,'','',p.SOURCE_SHA]), \
+             mock.patch.object(p,'api',return_value=bad), \
+             self.assertRaisesRegex(RuntimeError,'exact application SHA'):
+            p.validate_green_source(self.output)
 
     def test_publication_code_has_no_deploy_iam_or_cloud_build_commands(self):
         tree=ast.parse((ROOT/'scripts/runtime_v2_publication.py').read_text())

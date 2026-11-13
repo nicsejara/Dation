@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "default_browser_tests": [
+    "test_saga01_planning.Saga01PlanningTests.test_01_first_time_landing_model_contract_case_graph"
+  ],
+  "browser_suites": [
+    {
+      "name": "core-configuration",
+      "paths": [
+        "backend/app/static/js/dispatch/cases/",
+        "backend/app/static/js/dispatch/models/",
+        "backend/app/static/css/ultimate-foundation.css",
+        "backend/tests/browser/test_saga01_planning.py",
+        "backend/tests/browser/test_ultimate_case_setup.py",
+        "backend/tests/browser/test_attributes_before_csv.py"
+      ],
+      "tests": [
+        "test_saga01_planning.Saga01PlanningTests.test_01_first_time_landing_model_contract_case_graph",
+        "test_saga01_planning.Saga01PlanningTests.test_02_recurrent_version_is_not_mutated_and_contract_templates_match",
+        "test_saga01_planning.Saga01PlanningTests.test_07_contract_failure_blocks_setup_and_can_be_retried",
+        "test_attributes_before_csv.AttributesBeforeCSVTests.test_2_draft_context_and_owner_survive_reload_without_creating_objects"
+      ]
+    },
+    {
+      "name": "decision-graph",
+      "paths": [
+        "backend/app/static/js/dispatch/navigation/",
+        "backend/app/static/js/dispatch/upload/",
+        "backend/tests/browser/test_ultimate_navigation.py",
+        "backend/tests/browser/test_ultimate_case_data.py"
+      ],
+      "tests": [
+        "test_saga01_planning.Saga01PlanningTests.test_05_graph_data_upload_reuse_and_existing_case_navigation",
+        "test_attributes_before_csv.AttributesBeforeCSVTests.test_3_created_case_without_csv_keeps_d1_data_required_and_d2_locked"
+      ]
+    }
+  ]
+}

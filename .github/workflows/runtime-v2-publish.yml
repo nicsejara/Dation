@@ -1,10 +1,15 @@
 name: Runtime V2 - manual Gate C image publication
+run-name: Publish Dation ${{ inputs.application_sha }}
 
 on:
   workflow_dispatch:
     inputs:
+      application_sha:
+        description: Full validated application SHA (40 hexadecimal characters)
+        required: true
+        type: string
       confirm_publish:
-        description: Publish validated Core Configuration image; no Cloud Run deploy
+        description: Publish this SHA only; Cloud Run remains unchanged
         required: true
         default: false
         type: boolean
@@ -13,7 +18,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: runtime-v2-gate-c-413a581d
+  group: runtime-v2-registry-publication
   cancel-in-progress: false
 
 jobs:
@@ -21,9 +26,12 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && github.repository == 'nicsejara/Dation' && inputs.confirm_publish
     runs-on: ubuntu-24.04
     timeout-minutes: 30
+    env:
+      DATION_APPLICATION_SHA: ${{ inputs.application_sha }}
     permissions:
       contents: read
       actions: read
+      checks: read
       id-token: write
     steps:
       - name: Set isolated runner paths
@@ -35,6 +43,7 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           ref: ${{ github.sha }}
+          fetch-depth: 0
           path: control
           persist-credentials: false
 
@@ -45,7 +54,7 @@ jobs:
       - name: Checkout exact validated application
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          ref: 413a581d005c1d0de2ae659eb62dc1dce63c4a5c
+          ref: ${{ inputs.application_sha }}
           path: application
           persist-credentials: false
 
