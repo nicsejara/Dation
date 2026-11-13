@@ -12,7 +12,8 @@
         "backend/app/static/css/ultimate-foundation.css",
         "backend/tests/browser/test_saga01_planning.py",
         "backend/tests/browser/test_ultimate_case_setup.py",
-        "backend/tests/browser/test_attributes_before_csv.py"
+        "backend/tests/browser/test_attributes_before_csv.py",
+        "backend/app/static/js/dispatch/workspace.mjs"
       ],
       "tests": [
         "test_saga01_planning.Saga01PlanningTests.test_01_first_time_landing_model_contract_case_graph",
@@ -27,7 +28,9 @@
         "backend/app/static/js/dispatch/navigation/",
         "backend/app/static/js/dispatch/upload/",
         "backend/tests/browser/test_ultimate_navigation.py",
-        "backend/tests/browser/test_ultimate_case_data.py"
+        "backend/tests/browser/test_ultimate_case_data.py",
+        "backend/app/static/js/dispatch/workspace.mjs",
+        "backend/app/static/js/dispatch/cases/ultimate-decision-map.mjs"
       ],
       "tests": [
         "test_saga01_planning.Saga01PlanningTests.test_05_graph_data_upload_reuse_and_existing_case_navigation",

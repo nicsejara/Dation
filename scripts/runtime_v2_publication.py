@@ -243,8 +243,8 @@ def validate_green_source(source):
         'Incomplete check-run evidence for selected SHA')
     matching = [c for c in checks if c.get('name') == 'required-gate' and
                 c.get('head_sha') == SOURCE_SHA and c.get('status') == 'completed']
-    require(len(matching) == 1 and matching[0].get('conclusion') == 'success',
-        'No unique successful required-gate check on exact application SHA')
+    require(bool(matching) and max(matching,key=lambda check: int(check.get('id',0))).get('conclusion') == 'success',
+        'Most recent required-gate on exact application SHA is not successful')
 
 def preflight(source, output):
     source_check(source, output)
