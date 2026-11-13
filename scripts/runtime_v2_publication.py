@@ -19,7 +19,7 @@ sys.path.insert(0, str(ROOT / 'backend'))
 from app.cloud_identity import PROJECT, PROJECT_NUMBER, REGION
 
 TRUST = json.loads((ROOT / 'infra/zero-idle/github-publication.json').read_text())
-SOURCE_SHA = '413a581d005c1d0de2ae659eb62dc1dce63c4a5c'
+SOURCE_SHA = os.environ.get('DATION_APPLICATION_SHA','')
 HOST = REGION + '-docker.pkg.dev'
 REPOSITORY = f'projects/{PROJECT}/locations/{REGION}/repositories/dation-runtime'
 PACKAGE = REPOSITORY + '/packages/dation-core'
@@ -73,7 +73,10 @@ def outputs(**values):
 
 
 def guard_context(env=os.environ):
-    require(TRUST['application_sha'] == SOURCE_SHA, 'Unreviewed application SHA')
+    require(TRUST['application_sha_source'] == 'workflow_dispatch.application_sha',
+        'Expected workflow-dispatch SHA input')
+    require(bool(re.fullmatch(r'[0-9a-f]{40}', SOURCE_SHA)) and env.get('DATION_APPLICATION_SHA') == SOURCE_SHA,
+        'Missing or invalid exact application SHA')
     expected = {'GITHUB_ACTIONS': 'true', 'GITHUB_REPOSITORY': 'nicsejara/Dation',
         'GITHUB_REPOSITORY_ID': '1114679650', 'GITHUB_REPOSITORY_OWNER_ID': '249153366',
         'GITHUB_REF': 'refs/heads/main', 'GITHUB_EVENT_NAME': 'workflow_dispatch',
@@ -168,10 +171,10 @@ def tag_digest():
 
 
 def require_no_previous_build():
-    """Build-once guard scoped to the exact release-control commit, not prior releases."""
+    """Build-once guard for the exact application SHA across control revisions."""
     run_id = int(os.environ['GITHUB_RUN_ID'])
     control_sha = os.environ['GITHUB_SHA']
-    require(bool(re.fullmatch(r'[0-9a-f]{40}', control_sha)), 'Missing exact release-control SHA')
+    expected_title = 'Publish Dation ' + SOURCE_SHA
     base = 'https://api.github.com/repos/nicsejara/Dation/actions/'
     for page in range(1, 11):
         result = api('GET', base + f'workflows/runtime-v2-publish.yml/runs?event=workflow_dispatch&per_page=100&page={page}', github=True)
@@ -180,14 +183,12 @@ def require_no_previous_build():
         for run in runs:
             if int(run['id']) >= run_id:
                 continue
-            # A prior release of a DIFFERENT validated SHA must never block
-            # this release. A repeat dispatch of these exact release controls
-            # still enforces the original build-once guard.
-            require(bool(re.fullmatch(r'[0-9a-f]{40}', str(run.get('head_sha','')))),
-                'Prior manual release has no verifiable control SHA')
-            if run['head_sha'] != control_sha:
+            title = run.get('display_title')
+            if title != expected_title:
+                require(title or run.get('head_sha') != control_sha,
+                    'Unidentifiable earlier dispatch of these release controls')
                 continue
-            require(run.get('status') == 'completed', 'Earlier manual publication of this release is unresolved')
+            require(run.get('status') == 'completed', 'Earlier manual publication of this SHA is unresolved')
             jobs = api('GET', base + f'runs/{run["id"]}/jobs?filter=all&per_page=100', github=True)
             require(isinstance(jobs.get('jobs'), list) and isinstance(jobs.get('total_count'), int) and
                 jobs['total_count'] == len(jobs['jobs']) and jobs['total_count'] <= 100, 'Actions job history incomplete')
@@ -224,8 +225,30 @@ def login():
         secret_input=os.environ['DATION_PUBLISH_ACCESS_TOKEN'] + '\n')
 
 
+
+def validate_green_source(source):
+    """Require exact ancestor of the trusted main control SHA and same-SHA gate."""
+    control = Path(os.environ['GITHUB_WORKSPACE']) / 'control'
+    require(command('git', '-C', control, 'rev-parse', 'HEAD') == os.environ['GITHUB_SHA'],
+        'Release controls differ from trusted dispatch commit')
+    command('git', '-C', control, 'cat-file', '-e', SOURCE_SHA + '^{commit}')
+    command('git', '-C', control, 'merge-base', '--is-ancestor', SOURCE_SHA, 'HEAD')
+    require(command('git', '-C', source, 'rev-parse', 'HEAD') == SOURCE_SHA,
+        'Checkout SHA differs from requested application')
+    url = 'https://api.github.com/repos/nicsejara/Dation/commits/' + SOURCE_SHA + '/check-runs?per_page=100'
+    result = api('GET', url, github=True)
+    checks = result.get('check_runs', [])
+    require(isinstance(checks, list) and isinstance(result.get('total_count'), int) and
+        result['total_count'] == len(checks) and result['total_count'] <= 100,
+        'Incomplete check-run evidence for selected SHA')
+    matching = [c for c in checks if c.get('name') == 'required-gate' and
+                c.get('head_sha') == SOURCE_SHA and c.get('status') == 'completed']
+    require(bool(matching) and max(matching,key=lambda check: int(check.get('id',0))).get('conclusion') == 'success',
+        'Most recent required-gate on exact application SHA is not successful')
+
 def preflight(source, output):
     source_check(source, output)
+    validate_green_source(source)
     repository = ar('GET', REPOSITORY)
     require(canonical_resource(repository.get('name')) == REPOSITORY and repository.get('format') == 'DOCKER' and
         repository.get('mode') in (None, 'STANDARD_REPOSITORY'), 'Unexpected Registry identity/type')
@@ -327,7 +350,7 @@ def publish(source, output):
     receipt = {'phase': 'C', 'status': 'PASS', 'milestone': 'GO_C_IMAGE_PUBLISHED', 'project': PROJECT,
         'project_number': PROJECT_NUMBER, 'region': REGION, 'sha': SOURCE_SHA, 'image_digest': pinned,
         'architecture': 'amd64', 'image_id': state['image_id'], 'image_size_bytes': state['size_bytes'],
-        'source_dockerfile_sha256': state['source_dockerfile_sha256'], 'workflow_sha': os.environ['GITHUB_SHA'],
+        'source_dockerfile_sha256': state['source_dockerfile_sha256'], 'control_sha': os.environ['GITHUB_SHA'], 'workflow_sha': os.environ['GITHUB_SHA'],
         'workflow_ref': os.environ['GITHUB_WORKFLOW_REF'], 'run_id': os.environ['GITHUB_RUN_ID'],
         'run_url': 'https://github.com/nicsejara/Dation/actions/runs/' + os.environ['GITHUB_RUN_ID'],
         'publisher_account': ACCOUNT, 'identity_provider': PROVIDER, 'authentication': 'OIDC WIF, short-lived SA token',

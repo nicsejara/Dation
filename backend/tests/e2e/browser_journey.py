@@ -67,8 +67,11 @@ async def journey():
             await page.locator('[data-ultimate-ready=true]').wait_for()
             assert await page.locator('input[type=file]').count()==0
             # Core Configuration uses native disclosure panels instead of fieldsets.
-            panels=page.locator('details.ultimate-disclosure')
+            panels=page.locator('details[data-dation-test^="core-"]')
             assert await panels.count()==3
+            assert await page.locator('[data-dation-test="core-model"]').count()==1
+            assert await page.locator('[data-dation-test="core-contract"]').count()==1
+            assert await page.locator('[data-dation-test="core-case"]').count()==1
             assert await panels.locator('summary .ultimate-disclosure__title').all_text_contents()==[
                 '01 Logistics Model','02 Data Contract','03 Decision Case']
             assert await panels.nth(0).get_attribute('open') is not None

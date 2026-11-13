@@ -2,7 +2,7 @@
   "repository": "nicsejara/Dation",
   "repository_id": "1114679650",
   "repository_owner_id": "249153366",
-  "application_sha": "413a581d005c1d0de2ae659eb62dc1dce63c4a5c",
+  "application_sha_source": "workflow_dispatch.application_sha",
   "workflow_file": "runtime-v2-publish.yml",
   "workflow_ref": "nicsejara/Dation/.github/workflows/runtime-v2-publish.yml@refs/heads/main",
   "ref": "refs/heads/main",

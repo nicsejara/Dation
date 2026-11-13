@@ -88,6 +88,9 @@ export async function mountCaseSetup(root,{route,navigate,onContext}){
   const existingModelPanel=!fresh?collapsibleSection(form,'01 Logistics Model','Modelo y versión publicada vinculados a este Case. No pueden reemplazarse desde la edición.',{initialStatus:'Publicado'}):null;
   const existingContractPanel=!fresh?collapsibleSection(form,'02 Data Contract','Esquema vigente de las entradas de Demanda y Recursos.',{initialStatus:'Cargando'}):null;
   const casePanel=collapsibleSection(form,'03 Decision Case','Definí o revisá la identidad, el horizonte y las reglas de este Case.',{open:true,initialStatus:fresh?'Por completar':'Guardado'});
+  casePanel.details.dataset.dationTest='core-case';
+  if(existingModelPanel)existingModelPanel.details.dataset.dationTest='core-model';
+  if(existingContractPanel)existingContractPanel.details.dataset.dationTest='core-contract';
   const caseRoot=el('fieldset',undefined,'ultimate-case-fields');caseRoot.dataset.planningCase='';casePanel.body.append(caseRoot);
   if(savedCard)caseRoot.append(savedCard);
   const identity=section(caseRoot,'Identidad del Case'),name=field(identity,'Nombre del Case',{name:'case_name',value:draft.name,required:true,maxLength:120}),description=field(identity,'Descripción (opcional)',{name:'case_description',type:'textarea',value:draft.description,maxLength:1000});
