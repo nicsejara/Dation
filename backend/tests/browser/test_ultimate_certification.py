@@ -84,7 +84,7 @@ class UltimateCertificationTests(unittest.IsolatedAsyncioTestCase):
         await self.page.get_by_label('Inicio de planificación',exact=True).fill('2026-11-02');await self.page.get_by_label('Inicio de planificación',exact=True).press('Tab')
         await self.page.get_by_label('Fin de planificación',exact=True).fill('2026-11-08')
         await self.page.get_by_label('Decision Owner inicial (D1 y D2)',exact=True).select_option(setup.ADMIN)
-        await self.page.get_by_role('button',name='Crear Decision Case',exact=True).click();await self.page.locator('[data-graph-ready=true]').wait_for()
+        await self.page.get_by_role('button',name='Finalizar configuración',exact=True).click();await self.page.locator('[data-graph-ready=true]').wait_for()
         cid=parse_qs(urlparse(self.page.url).query)['case_id'][0]
         await expect(self.page.locator('[data-graph-node=logistics_assignment]')).to_have_attribute('data-node-state','DATA_REQUIRED')
         await self.page.get_by_role('button',name='Seleccionar responsable',exact=True).click()

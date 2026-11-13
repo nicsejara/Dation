@@ -32,7 +32,7 @@ class Saga01PlanningTests(unittest.IsolatedAsyncioTestCase):
         await self.page.get_by_label('Decision Owner inicial (D1 y D2)',exact=True).select_option(t3.ADMIN)
 
     async def create(self):
-        await self.page.get_by_role('button',name='Crear Decision Case',exact=True).click()
+        await self.page.get_by_role('button',name='Finalizar configuración',exact=True).click()
         await self.page.locator('[data-graph-ready=true]').wait_for(timeout=30000)
         return await self.page.evaluate('new URL(location.href).searchParams.get("case_id")')
 
@@ -68,8 +68,8 @@ class Saga01PlanningTests(unittest.IsolatedAsyncioTestCase):
     async def test_03_new_model_with_existing_models_and_required_validation(self):
         await self.model();await self.open('/app/ddas/logistics/case')
         await self.page.get_by_role('button',name='Configurar modelo nuevo',exact=True).click()
-        await expect(self.page.get_by_role('button',name='Crear Decision Case',exact=True)).to_be_enabled()
-        await self.page.get_by_role('button',name='Crear Decision Case',exact=True).click()
+        await expect(self.page.get_by_role('button',name='Finalizar configuración',exact=True)).to_be_enabled()
+        await self.page.get_by_role('button',name='Finalizar configuración',exact=True).click()
         await expect(self.page.locator('.ultimate-errors')).to_be_visible()
         await self.page.get_by_label('Nombre del Model',exact=True).fill('Otra operación '+str(uuid4())[:8]);await self.fill_case();cid=await self.create()
         context=await self.api('GET','/api/platform/logistics-cases/'+cid+'/context');self.assertTrue(context['model']['name'].startswith('Otra operación'))
@@ -81,7 +81,7 @@ class Saga01PlanningTests(unittest.IsolatedAsyncioTestCase):
         await self.page.get_by_label('Nombre del Model',exact=True).fill(name);await self.fill_case()
         async def fail(route):await route.fulfill(status=503,json={'detail':'Fallo sintético al guardar Case'})
         await self.page.route('**/api/platform/logistics-cases',fail)
-        await self.page.get_by_role('button',name='Crear Decision Case',exact=True).click()
+        await self.page.get_by_role('button',name='Finalizar configuración',exact=True).click()
         await self.page.get_by_text('Crear Decision Case: Fallo sintético al guardar Case',exact=True).wait_for()
         self.assertNotIn('/decisions',self.page.url)
         await self.page.unroute('**/api/platform/logistics-cases',fail)
@@ -120,12 +120,12 @@ class Saga01PlanningTests(unittest.IsolatedAsyncioTestCase):
         async def unavailable(route):await route.fulfill(status=503,json={'detail':'Contrato temporalmente no disponible'})
         await self.page.route('**/api/platform/logistics-models/contract-preview',unavailable)
         await self.open('/app/ddas/logistics/case')
-        self.assertTrue(await self.page.get_by_role('button',name='Crear Decision Case',exact=True).is_disabled())
+        self.assertTrue(await self.page.get_by_role('button',name='Finalizar configuración',exact=True).is_disabled())
         self.assertTrue(await self.page.get_by_label('Nombre del Case',exact=True).is_disabled())
         await self.page.get_by_text('Contrato temporalmente no disponible',exact=True).wait_for()
         await self.page.unroute('**/api/platform/logistics-models/contract-preview',unavailable)
         await self.page.get_by_role('button',name='Reintentar Data Contract',exact=True).click()
-        await expect(self.page.get_by_role('button',name='Crear Decision Case',exact=True)).to_be_enabled()
+        await expect(self.page.get_by_role('button',name='Finalizar configuración',exact=True)).to_be_enabled()
         self.assertEqual(await self.page.locator('input[type=file]').count(),0)
 
     async def test_08_new_planning_from_data_hub_also_starts_with_context(self):
