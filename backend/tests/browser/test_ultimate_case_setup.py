@@ -91,7 +91,7 @@ class UltimateCaseSetupTests(unittest.IsolatedAsyncioTestCase):
         await self.page.locator('[data-ultimate-ready="true"] form').wait_for()
         await self.page.get_by_role('heading',name='Core Configuration',exact=True).wait_for()
         self.assertEqual(await self.page.locator('details.ultimate-disclosure').count(),3)
-        self.assertEqual(await self.page.locator('.ultimate-disclosure__title').all_text_contents(),['01. Logistics Model','02 Data Contract','03 Decision Case'])
+        self.assertEqual(await self.page.locator('.ultimate-disclosure__title').all_text_contents(),['01. Logistics Model','02. Data Contract','03 Decision Case'])
         self.assertEqual(await self.page.locator('[data-dation-test="core-model"]').count(),1)
         self.assertEqual(await self.page.locator('[data-dation-test="core-contract"]').count(),1)
         self.assertEqual(await self.page.locator('[data-dation-test="core-case"]').count(),1)
