@@ -3703,8 +3703,15 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(self.execution_bodies,[])
             await self.open('decision-dashboard','logistics_'+kind,run['id'])
             approve=self.page.locator('[data-approve-toolbar]');await approve.click()
-            await self.page.wait_for_function("label=>{const b=document.querySelector('[data-approve-toolbar]');return b?.disabled&&b.textContent.includes(label)}",arg='Planificación aprobada' if kind=='scheduling' else 'Decisión aprobada')
-            self.assertIn('Planificación aprobada' if kind=='scheduling' else 'Decisión aprobada',await approve.inner_text())
+            # onApprovalComplete re-renders the approved dashboard and removes
+            # the approve button; its disabled success label is only transient.
+            await self.page.wait_for_function("expected=>window.DationDispatch.getWorkspace().decisionCase.nodes[expected.node].approved_run_id===expected.run",arg={'node':'logistics_'+kind,'run':run['id']})
+            await approve.wait_for(state='detached')
+            self.assertEqual(await approve.count(),0)
+            self.assertEqual(await self.page.locator('[data-status-badge]').inner_text(),'Aprobada')
+            status=self.page.locator('[data-scheduling-hero-status]' if kind=='scheduling' else '[data-assignment-hero-status]')
+            self.assertIn('Planificación aprobada' if kind=='scheduling' else 'Decisión aprobada',await status.inner_text())
+            await self.page.locator('[data-after-approve]').wait_for(state='visible')
             actual=await self.page.evaluate('window.DationDispatch.getWorkspace().run.result_json.scenarios.selected')
             self.assertEqual(actual,selected)
         self.assertEqual(self.approval_calls,2);self.assertEqual(self.execution_bodies,[]);self.assertEqual(self.explain_calls,0);self.assertEqual(self.comparative_posts,0)
