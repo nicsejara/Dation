@@ -5,6 +5,7 @@ from pathlib import Path
 from playwright.async_api import expect
 import test_ultimate_case_setup as t3
 import test_ultimate_case_data as t4
+from wizard_helpers import publish_model,select_model,show_case
 
 
 class Saga01PlanningTests(unittest.IsolatedAsyncioTestCase):
@@ -25,6 +26,7 @@ class Saga01PlanningTests(unittest.IsolatedAsyncioTestCase):
     upload_api=t4.UltimateCaseDataTests.upload_api
 
     async def fill_case(self,name='Planificación Saga 01'):
+        await show_case(self.page)
         await self.page.get_by_label('Nombre del Case',exact=True).fill(name)
         await self.page.get_by_label('Inicio de planificación',exact=True).fill('2026-11-02')
         await self.page.get_by_label('Inicio de planificación',exact=True).press('Tab')
@@ -42,11 +44,11 @@ class Saga01PlanningTests(unittest.IsolatedAsyncioTestCase):
         await self.page.get_by_role('button',name='Comenzar',exact=False).click()
         await self.page.locator('[data-ultimate-ready=true]').wait_for()
         self.assertEqual(await self.page.get_by_label('Logistics Model',exact=True).count(),0)
-        await self.page.get_by_label('Nombre del Model',exact=True).fill('Operación inicial')
-        await self.fill_case()
+        await publish_model(self.page,'Operación inicial')
         self.assertEqual(await self.page.locator('input[type=file]').count(),0)
-        await self.page.locator('details.ultimate-disclosure').nth(1).locator('summary').click()
+        await self.page.locator('[data-dation-test=core-step-2]').click()
         await expect(self.page.get_by_role('heading',name='Órdenes / Demanda · Requerido',exact=True)).to_be_visible()
+        await self.fill_case()
         cid=await self.create();context=await self.api('GET','/api/platform/logistics-cases/'+cid+'/context')
         self.assertEqual(context['model']['name'],'Operación inicial');self.assertEqual(context['model_version']['version'],1);self.assertEqual(context['entry_count'],0)
         await expect(self.page.locator('[data-graph-node=logistics_assignment]')).to_have_attribute('data-node-state','DATA_REQUIRED')
@@ -55,9 +57,10 @@ class Saga01PlanningTests(unittest.IsolatedAsyncioTestCase):
     async def test_02_recurrent_version_is_not_mutated_and_contract_templates_match(self):
         m,v=await self.model();mid=m['model']['id'];before=await self.api('GET','/api/platform/logistics-models/'+mid)
         await self.open('/app/ddas/logistics/case?model_id='+mid)
-        await expect(self.page.get_by_label('Model Version',exact=True)).to_have_value(v['version']['id'])
-        self.assertTrue(await self.page.get_by_label('Operating Role',exact=True).is_disabled())
-        await self.page.locator('details.ultimate-disclosure').nth(1).locator('summary').click()
+        await select_model(self.page,mid,v['version']['id'])
+        await self.page.locator('[data-dation-test=core-step-1]').click()
+        self.assertTrue(await self.page.get_by_label('Rol operativo',exact=True).is_disabled())
+        await self.page.locator('[data-dation-test=core-step-2]').click()
         async with self.page.expect_download() as event:await self.page.get_by_role('button',name='Descargar template de Órdenes / Demanda',exact=True).click()
         download=await event.value;self.assertTrue(download.suggested_filename.endswith('.csv'))
         await self.fill_case();cid=await self.create()
@@ -67,18 +70,16 @@ class Saga01PlanningTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_03_new_model_with_existing_models_and_required_validation(self):
         await self.model();await self.open('/app/ddas/logistics/case')
-        await self.page.get_by_role('button',name='Configurar modelo nuevo',exact=True).click()
-        await expect(self.page.get_by_role('button',name='Finalizar configuración',exact=True)).to_be_enabled()
-        await self.page.get_by_role('button',name='Finalizar configuración',exact=True).click()
-        await expect(self.page.locator('.ultimate-errors')).to_be_visible()
-        await self.page.get_by_label('Nombre del Model',exact=True).fill('Otra operación '+str(uuid4())[:8]);await self.fill_case();cid=await self.create()
+        await expect(self.page.get_by_role('button',name='Crear y seleccionar modelo',exact=True)).to_be_disabled()
+        await expect(self.page.locator('[data-dation-test=core-step-3]')).to_be_disabled()
+        await publish_model(self.page,'Otra operación '+str(uuid4())[:8]);await self.fill_case();cid=await self.create()
         context=await self.api('GET','/api/platform/logistics-cases/'+cid+'/context');self.assertTrue(context['model']['name'].startswith('Otra operación'))
 
     async def test_04_failed_case_creation_recovers_without_duplicate_model_or_version(self):
         await self.model()
-        await self.open('/app/ddas/logistics/case');await self.page.get_by_role('button',name='Configurar modelo nuevo',exact=True).click()
+        await self.open('/app/ddas/logistics/case')
         name='Intento recuperable '+str(uuid4())[:8]
-        await self.page.get_by_label('Nombre del Model',exact=True).fill(name);await self.fill_case()
+        await publish_model(self.page,name);await self.fill_case()
         async def fail(route):await route.fulfill(status=503,json={'detail':'Fallo sintético al guardar Case'})
         await self.page.route('**/api/platform/logistics-cases',fail)
         await self.page.get_by_role('button',name='Finalizar configuración',exact=True).click()
@@ -86,6 +87,7 @@ class Saga01PlanningTests(unittest.IsolatedAsyncioTestCase):
         self.assertNotIn('/decisions',self.page.url)
         await self.page.unroute('**/api/platform/logistics-cases',fail)
         self.page.on('dialog',lambda dialog:dialog.accept());await self.page.reload();await self.page.locator('[data-ultimate-ready=true]').wait_for()
+        await show_case(self.page)
         cid=await self.create();models=await self.api('GET','/api/platform/logistics-models?q='+name)
         self.assertEqual(models['total'],1);self.assertEqual(len(models['items'][0]['versions']),1)
         context=await self.api('GET','/api/platform/logistics-cases/'+cid+'/context');self.assertEqual(context['model']['id'],models['items'][0]['id'])
@@ -106,12 +108,10 @@ class Saga01PlanningTests(unittest.IsolatedAsyncioTestCase):
     async def test_06_mobile_contract_preview_race_and_legacy_entry(self):
         await self.model()
         await self.page.set_viewport_size({'width':390,'height':844});await self.open('/app/ddas/logistics/data')
-        self.assertIn('/case',self.page.url);await self.page.get_by_role('button',name='Configurar modelo nuevo',exact=True).click()
+        self.assertIn('/case',self.page.url)
         await self.page.get_by_role('checkbox',name='Peso (kg)',exact=True).check()
-        await self.page.locator('details.ultimate-disclosure').nth(1).locator('summary').click()
+        await publish_model(self.page,'Contrato móvil')
         await expect(self.page.get_by_role('cell',name='demand_weight_kg',exact=True)).to_be_visible()
-        await self.page.get_by_role('checkbox',name='Peso (kg)',exact=True).uncheck()
-        await expect(self.page.get_by_role('cell',name='demand_weight_kg',exact=True)).to_have_count(0)
         self.assertLessEqual(await self.page.evaluate('document.documentElement.scrollWidth'),391)
         self.assertEqual(await self.page.locator('input[type=file]').count(),0)
 
@@ -120,11 +120,14 @@ class Saga01PlanningTests(unittest.IsolatedAsyncioTestCase):
         async def unavailable(route):await route.fulfill(status=503,json={'detail':'Contrato temporalmente no disponible'})
         await self.page.route('**/api/platform/logistics-models/contract-preview',unavailable)
         await self.open('/app/ddas/logistics/case')
-        self.assertTrue(await self.page.get_by_role('button',name='Finalizar configuración',exact=True).is_disabled())
+        self.assertTrue(await self.page.locator('.ultimate-footer button[type=submit]').is_disabled())
+        await expect(self.page.locator('[data-dation-test=core-step-3]')).to_be_disabled()
         self.assertTrue(await self.page.get_by_label('Nombre del Case',exact=True).is_disabled())
-        await self.page.get_by_text('Contrato temporalmente no disponible',exact=True).wait_for()
+        await expect(self.page.locator('[data-dation-test=model-feedback]')).to_have_text('Contrato temporalmente no disponible')
         await self.page.unroute('**/api/platform/logistics-models/contract-preview',unavailable)
         await self.page.get_by_role('button',name='Reintentar Data Contract',exact=True).click()
+        await publish_model(self.page,'Contrato recuperado')
+        await show_case(self.page)
         await expect(self.page.get_by_role('button',name='Finalizar configuración',exact=True)).to_be_enabled()
         self.assertEqual(await self.page.locator('input[type=file]').count(),0)
 

@@ -1,0 +1,582 @@
+[
+  {
+    "width": 1536,
+    "scroll": 1536,
+    "controls": [
+      {
+        "name": "Seleccionar modelo existente",
+        "left": 989.40625,
+        "right": 1232.203125
+      },
+      {
+        "name": "model_name",
+        "left": 837.421875,
+        "right": 1139.703125
+      },
+      {
+        "name": "model_description",
+        "left": 837.421875,
+        "right": 1464
+      },
+      {
+        "name": "operating_role",
+        "left": 837.421875,
+        "right": 1139.703125
+      },
+      {
+        "name": "transport_pattern",
+        "left": 1161.703125,
+        "right": 1463.984375
+      },
+      {
+        "name": "sources",
+        "left": 837.421875,
+        "right": 857.421875
+      },
+      {
+        "name": "sources",
+        "left": 924.109375,
+        "right": 944.109375
+      },
+      {
+        "name": "dimensions",
+        "left": 1053.609375,
+        "right": 1073.609375
+      },
+      {
+        "name": "dimensions",
+        "left": 1135.640625,
+        "right": 1155.640625
+      },
+      {
+        "name": "dimensions",
+        "left": 1233,
+        "right": 1253
+      },
+      {
+        "name": "dimensions",
+        "left": 1351.03125,
+        "right": 1371.03125
+      },
+      {
+        "name": "primary_dimension",
+        "left": 837.421875,
+        "right": 1031.609375
+      },
+      {
+        "name": "split",
+        "left": 1053.609375,
+        "right": 1073.609375
+      },
+      {
+        "name": "homogeneous",
+        "left": 1269.796875,
+        "right": 1289.796875
+      },
+      {
+        "name": "currency",
+        "left": 837.421875,
+        "right": 1139.703125
+      },
+      {
+        "name": "minor_units",
+        "left": 1161.703125,
+        "right": 1463.984375
+      },
+      {
+        "name": "own_cost",
+        "left": 837.421875,
+        "right": 1031.609375
+      },
+      {
+        "name": "external_costs",
+        "left": 1053.609375,
+        "right": 1073.609375
+      },
+      {
+        "name": "external_costs",
+        "left": 1053.609375,
+        "right": 1073.609375
+      },
+      {
+        "name": "billing",
+        "left": 1269.796875,
+        "right": 1289.796875
+      },
+      {
+        "name": "billing",
+        "left": 1359.171875,
+        "right": 1379.171875
+      },
+      {
+        "name": "Crear y seleccionar modelo",
+        "left": 1205.0625,
+        "right": 1479
+      }
+    ]
+  },
+  {
+    "width": 1024,
+    "scroll": 1024,
+    "controls": [
+      {
+        "name": "Seleccionar modelo existente",
+        "left": 705.203125,
+        "right": 948
+      },
+      {
+        "name": "model_name",
+        "left": 512.828125,
+        "right": 721.40625
+      },
+      {
+        "name": "model_description",
+        "left": 512.828125,
+        "right": 952
+      },
+      {
+        "name": "operating_role",
+        "left": 512.828125,
+        "right": 721.40625
+      },
+      {
+        "name": "transport_pattern",
+        "left": 743.40625,
+        "right": 952
+      },
+      {
+        "name": "sources",
+        "left": 512.828125,
+        "right": 532.828125
+      },
+      {
+        "name": "sources",
+        "left": 599.515625,
+        "right": 619.515625
+      },
+      {
+        "name": "dimensions",
+        "left": 743.40625,
+        "right": 763.40625
+      },
+      {
+        "name": "dimensions",
+        "left": 825.4375,
+        "right": 845.4375
+      },
+      {
+        "name": "dimensions",
+        "left": 743.40625,
+        "right": 763.40625
+      },
+      {
+        "name": "dimensions",
+        "left": 861.4375,
+        "right": 881.4375
+      },
+      {
+        "name": "primary_dimension",
+        "left": 512.828125,
+        "right": 721.40625
+      },
+      {
+        "name": "split",
+        "left": 743.40625,
+        "right": 763.40625
+      },
+      {
+        "name": "homogeneous",
+        "left": 512.828125,
+        "right": 532.828125
+      },
+      {
+        "name": "currency",
+        "left": 512.828125,
+        "right": 721.40625
+      },
+      {
+        "name": "minor_units",
+        "left": 743.40625,
+        "right": 952
+      },
+      {
+        "name": "own_cost",
+        "left": 512.828125,
+        "right": 721.40625
+      },
+      {
+        "name": "external_costs",
+        "left": 743.40625,
+        "right": 763.40625
+      },
+      {
+        "name": "external_costs",
+        "left": 836.09375,
+        "right": 856.09375
+      },
+      {
+        "name": "billing",
+        "left": 512.828125,
+        "right": 532.828125
+      },
+      {
+        "name": "billing",
+        "left": 602.203125,
+        "right": 622.203125
+      },
+      {
+        "name": "Crear y seleccionar modelo",
+        "left": 693.0625,
+        "right": 967
+      }
+    ]
+  },
+  {
+    "width": 768,
+    "scroll": 768,
+    "controls": [
+      {
+        "name": "Seleccionar modelo existente",
+        "left": 449.203125,
+        "right": 692
+      },
+      {
+        "name": "model_name",
+        "left": 480,
+        "right": 577
+      },
+      {
+        "name": "model_description",
+        "left": 480,
+        "right": 696
+      },
+      {
+        "name": "operating_role",
+        "left": 480,
+        "right": 577
+      },
+      {
+        "name": "transport_pattern",
+        "left": 599,
+        "right": 696
+      },
+      {
+        "name": "sources",
+        "left": 480,
+        "right": 500
+      },
+      {
+        "name": "sources",
+        "left": 480,
+        "right": 500
+      },
+      {
+        "name": "dimensions",
+        "left": 599,
+        "right": 619
+      },
+      {
+        "name": "dimensions",
+        "left": 599,
+        "right": 619
+      },
+      {
+        "name": "dimensions",
+        "left": 599,
+        "right": 619
+      },
+      {
+        "name": "dimensions",
+        "left": 599,
+        "right": 619
+      },
+      {
+        "name": "primary_dimension",
+        "left": 480,
+        "right": 577
+      },
+      {
+        "name": "split",
+        "left": 599,
+        "right": 619
+      },
+      {
+        "name": "homogeneous",
+        "left": 480,
+        "right": 500
+      },
+      {
+        "name": "currency",
+        "left": 480,
+        "right": 577
+      },
+      {
+        "name": "minor_units",
+        "left": 599,
+        "right": 696
+      },
+      {
+        "name": "own_cost",
+        "left": 480,
+        "right": 577
+      },
+      {
+        "name": "external_costs",
+        "left": 599,
+        "right": 619
+      },
+      {
+        "name": "external_costs",
+        "left": 599,
+        "right": 619
+      },
+      {
+        "name": "billing",
+        "left": 480,
+        "right": 500
+      },
+      {
+        "name": "billing",
+        "left": 480,
+        "right": 500
+      },
+      {
+        "name": "Crear y seleccionar modelo",
+        "left": 275,
+        "right": 548.9375
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "scroll": 390,
+    "controls": [
+      {
+        "name": "Seleccionar modelo existente",
+        "left": 106,
+        "right": 344
+      },
+      {
+        "name": "model_name",
+        "left": 108,
+        "right": 342
+      },
+      {
+        "name": "model_description",
+        "left": 108,
+        "right": 342
+      },
+      {
+        "name": "operating_role",
+        "left": 108,
+        "right": 342
+      },
+      {
+        "name": "transport_pattern",
+        "left": 108,
+        "right": 342
+      },
+      {
+        "name": "sources",
+        "left": 108,
+        "right": 128
+      },
+      {
+        "name": "sources",
+        "left": 194.6875,
+        "right": 214.6875
+      },
+      {
+        "name": "dimensions",
+        "left": 108,
+        "right": 128
+      },
+      {
+        "name": "dimensions",
+        "left": 190.03125,
+        "right": 210.03125
+      },
+      {
+        "name": "dimensions",
+        "left": 108,
+        "right": 128
+      },
+      {
+        "name": "dimensions",
+        "left": 226.03125,
+        "right": 246.03125
+      },
+      {
+        "name": "primary_dimension",
+        "left": 108,
+        "right": 342
+      },
+      {
+        "name": "split",
+        "left": 108,
+        "right": 128
+      },
+      {
+        "name": "homogeneous",
+        "left": 108,
+        "right": 128
+      },
+      {
+        "name": "currency",
+        "left": 108,
+        "right": 342
+      },
+      {
+        "name": "minor_units",
+        "left": 108,
+        "right": 342
+      },
+      {
+        "name": "own_cost",
+        "left": 108,
+        "right": 342
+      },
+      {
+        "name": "external_costs",
+        "left": 108,
+        "right": 128
+      },
+      {
+        "name": "external_costs",
+        "left": 200.6875,
+        "right": 220.6875
+      },
+      {
+        "name": "billing",
+        "left": 108,
+        "right": 128
+      },
+      {
+        "name": "billing",
+        "left": 197.375,
+        "right": 217.375
+      },
+      {
+        "name": "Crear y seleccionar modelo",
+        "left": 93,
+        "right": 357
+      }
+    ]
+  },
+  {
+    "width": 320,
+    "scroll": 320,
+    "controls": [
+      {
+        "name": "Seleccionar modelo existente",
+        "left": 106,
+        "right": 274
+      },
+      {
+        "name": "model_name",
+        "left": 108,
+        "right": 272
+      },
+      {
+        "name": "model_description",
+        "left": 108,
+        "right": 272
+      },
+      {
+        "name": "operating_role",
+        "left": 108,
+        "right": 272
+      },
+      {
+        "name": "transport_pattern",
+        "left": 108,
+        "right": 272
+      },
+      {
+        "name": "sources",
+        "left": 108,
+        "right": 128
+      },
+      {
+        "name": "sources",
+        "left": 108,
+        "right": 128
+      },
+      {
+        "name": "dimensions",
+        "left": 108,
+        "right": 128
+      },
+      {
+        "name": "dimensions",
+        "left": 108,
+        "right": 128
+      },
+      {
+        "name": "dimensions",
+        "left": 108,
+        "right": 128
+      },
+      {
+        "name": "dimensions",
+        "left": 108,
+        "right": 128
+      },
+      {
+        "name": "primary_dimension",
+        "left": 108,
+        "right": 272
+      },
+      {
+        "name": "split",
+        "left": 108,
+        "right": 128
+      },
+      {
+        "name": "homogeneous",
+        "left": 108,
+        "right": 128
+      },
+      {
+        "name": "currency",
+        "left": 108,
+        "right": 272
+      },
+      {
+        "name": "minor_units",
+        "left": 108,
+        "right": 272
+      },
+      {
+        "name": "own_cost",
+        "left": 108,
+        "right": 272
+      },
+      {
+        "name": "external_costs",
+        "left": 108,
+        "right": 128
+      },
+      {
+        "name": "external_costs",
+        "left": 108,
+        "right": 128
+      },
+      {
+        "name": "billing",
+        "left": 108,
+        "right": 128
+      },
+      {
+        "name": "billing",
+        "left": 108,
+        "right": 128
+      },
+      {
+        "name": "Crear y seleccionar modelo",
+        "left": 93,
+        "right": 287
+      }
+    ]
+  }
+]

@@ -5,6 +5,7 @@ from playwright.async_api import expect
 import test_saga01_planning as saga
 import test_ultimate_case_setup as setup
 import test_ultimate_case_data as data
+from wizard_helpers import publish_model,show_case
 
 
 class AttributesBeforeCSVTests(unittest.IsolatedAsyncioTestCase):
@@ -27,23 +28,23 @@ class AttributesBeforeCSVTests(unittest.IsolatedAsyncioTestCase):
 
     async def new_form(self):
         await self.open('/app/ddas/logistics/case')
-        if await self.page.get_by_label('Logistics Model',exact=True).count():
-            await self.page.get_by_role('button',name='Configurar modelo nuevo',exact=True).click()
-        await expect(self.page.get_by_role('button',name='Finalizar configuración',exact=True)).to_be_enabled(timeout=30000)
+        await expect(self.page.get_by_role('button',name='Crear y seleccionar modelo',exact=True)).to_be_disabled()
         self.writes=[]
         self.page.on('request',lambda r:self.writes.append(r.post_data_json) if r.method=='POST' and urlparse(r.url).path in ('/api/platform/logistics-models','/api/platform/logistics-cases') else None)
         return self.page.locator('.ultimate-foundation form')
 
     async def test_1_context_is_validated_before_creation_without_operational_files(self):
         form=await self.new_form()
+        self.assertEqual(self.writes,[])
+        await publish_model(self.page,'Preparación antes de datos')
+        await show_case(self.page)
         await self.page.get_by_role('button',name='Finalizar configuración',exact=True).click()
         await expect(form.locator('.ultimate-errors')).to_be_visible()
-        await self.page.get_by_label('Nombre del Model',exact=True).fill('Preparación antes de datos')
         await self.fill_case('SEMANA 43')
         await self.page.get_by_label('Descripción (opcional)',exact=True).fill('Contexto antes de los archivos.')
         self.assertEqual(await self.page.locator('input[type=file]').count(),0)
         self.assertEqual(await self.page.get_by_label('Decision Owner inicial (D1 y D2)',exact=True).input_value(),setup.ADMIN)
-        self.assertEqual(self.writes,[])
+        self.assertEqual(len(self.writes),1)
         self.assertIsNone(await self.page.evaluate('window.DationDispatch.getWorkspace().decisionCase'))
         cid=await self.create();context=await self.api('GET','/api/platform/logistics-cases/'+cid+'/context')
         self.assertEqual(context['case']['label'],'SEMANA 43');self.assertEqual(context['entry_count'],0)
@@ -51,18 +52,24 @@ class AttributesBeforeCSVTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_2_draft_context_and_owner_survive_reload_without_creating_objects(self):
         await self.new_form()
-        await self.page.get_by_label('Nombre del Model',exact=True).fill('Borrador antes de datos')
+        await self.page.get_by_label('Nombre del modelo *',exact=True).fill('Borrador antes de datos')
+        self.page.on('dialog',lambda dialog:dialog.accept())
+        await self.page.reload();await self.page.locator('[data-ultimate-ready=true]').wait_for()
+        self.assertEqual(await self.page.get_by_label('Nombre del modelo *',exact=True).input_value(),'Borrador antes de datos')
+        self.assertEqual(self.writes,[])
+        await publish_model(self.page)
+        self.assertEqual(len(self.writes),1)
         await self.fill_case('SEMANA 44')
         await self.page.get_by_label('Descripción (opcional)',exact=True).fill('Preparado antes de los CSV.')
         await self.page.reload();await self.page.locator('[data-ultimate-ready=true]').wait_for()
-        self.assertEqual(await self.page.get_by_label('Nombre del Model',exact=True).input_value(),'Borrador antes de datos')
+        await show_case(self.page)
         self.assertEqual(await self.page.get_by_label('Nombre del Case',exact=True).input_value(),'SEMANA 44')
         self.assertEqual(await self.page.get_by_label('Descripción (opcional)',exact=True).input_value(),'Preparado antes de los CSV.')
         self.assertEqual(await self.page.get_by_label('Decision Owner inicial (D1 y D2)',exact=True).input_value(),setup.ADMIN)
-        self.assertEqual(self.writes,[]);self.assertEqual(await self.page.locator('input[type=file]').count(),0)
+        self.assertEqual(len(self.writes),1);self.assertEqual(await self.page.locator('input[type=file]').count(),0)
         await self.page.get_by_label('Decision Owner inicial (D1 y D2)',exact=True).select_option('')
         await self.page.get_by_role('button',name='Finalizar configuración',exact=True).click()
-        await expect(self.page.locator('.ultimate-errors')).to_be_visible();self.assertEqual(self.writes,[])
+        await expect(self.page.locator('.ultimate-errors')).to_be_visible();self.assertEqual(len(self.writes),1)
 
     async def test_3_created_case_without_csv_keeps_d1_data_required_and_d2_locked(self):
         _,_,case=await self.case();cid=case['case']['id']
