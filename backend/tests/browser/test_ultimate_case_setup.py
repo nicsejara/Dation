@@ -91,7 +91,7 @@ class UltimateCaseSetupTests(unittest.IsolatedAsyncioTestCase):
         await self.page.locator('[data-ultimate-ready="true"] form').wait_for()
         await self.page.get_by_role('heading',name='Core Configuration',exact=True).wait_for()
         self.assertEqual(await self.page.locator('details.ultimate-disclosure').count(),3)
-        self.assertEqual(await self.page.locator('.ultimate-disclosure__title').all_text_contents(),['01. Logistics Model','02. Data Contract','03 Decision Case'])
+        self.assertEqual(await self.page.locator('.ultimate-disclosure__title').all_text_contents(),['01. Logistics Model','02. Data Contract','03. Decision Case'])
         self.assertEqual(await self.page.locator('[data-dation-test="core-model"]').count(),1)
         self.assertEqual(await self.page.locator('[data-dation-test="core-contract"]').count(),1)
         self.assertEqual(await self.page.locator('[data-dation-test="core-case"]').count(),1)
@@ -116,11 +116,11 @@ class UltimateCaseSetupTests(unittest.IsolatedAsyncioTestCase):
         (OUT/'durable-context.json').write_text(json.dumps({'case_id':cid,'entry_count':after['entry_count'],'hash_stable':True,'no_csv':True},indent=2))
     async def test_02_validation_dirty_reload_and_cas_preserve_draft(self):
         _,_,c=await self.case();cid=c['case']['id'];await self.open('/app/ddas/logistics/case?case_id='+cid)
-        await self.page.get_by_label('Objetivo global',exact=True).select_option('CUSTOM');await self.page.locator('.ultimate-policy summary').click()
+        await self.page.get_by_role('radio',name='Personalizado',exact=True).check()
         await self.page.get_by_label('Costo (%)',exact=True).fill('10');await self.page.get_by_role('button',name='Guardar contexto',exact=True).click()
-        await self.page.get_by_role('link',name='Las preferencias deben sumar 100 %.').wait_for();self.assertTrue(await self.page.locator('.ultimate-errors').evaluate('n=>n===document.activeElement'))
+        await self.page.get_by_role('link',name='Las preferencias deben sumar 100 %.').wait_for();self.assertEqual(await self.page.evaluate('document.activeElement.name'),'weight_COST')
         await self.page.get_by_role('link',name='Las preferencias deben sumar 100 %.').click();self.assertEqual(await self.page.evaluate('document.activeElement.name'),'weight_COST')
-        await self.page.get_by_label('Objetivo global',exact=True).select_option('MINIMIZE_COST')
+        await self.page.get_by_role('radio',name='Minimizar costo',exact=True).check()
         await self.page.get_by_label('Nombre del Case',exact=True).fill('Mi borrador pendiente')
         self.page.on('dialog',lambda dialog:dialog.accept())
         await self.page.reload();await self.page.locator('[data-ultimate-ready="true"]').wait_for();self.assertEqual(await self.page.get_by_label('Nombre del Case',exact=True).input_value(),'Mi borrador pendiente')
@@ -142,7 +142,7 @@ class UltimateCaseSetupTests(unittest.IsolatedAsyncioTestCase):
         m,v=await self.model(long_name[:120]);await self.open('/app/ddas/logistics/case?model_id='+m['model']['id'])
         await select_model(self.page,m['model']['id'],v['version']['id']);await show_case(self.page)
         await self.page.get_by_label('Nombre del Case',exact=True).fill(long_name[:120]);await self.page.get_by_label('Descripción (opcional)',exact=True).fill(('Planificación operativa ñ · '*50)[:1000])
-        await self.page.get_by_label('Objetivo global',exact=True).select_option('CUSTOM');await self.page.locator('.ultimate-policy summary').click()
+        await self.page.get_by_role('radio',name='Personalizado',exact=True).check()
         measurements=[]
         for width in [1440,1280,1024,768,390,320]:
             await self.page.set_viewport_size({'width':width,'height':1000});await self.page.evaluate('scrollTo(0,0)');await self.page.screenshot(path=str(OUT/f'case-stress-{width}.png'),full_page=True,animations='disabled')
@@ -169,7 +169,7 @@ class UltimateCaseSetupTests(unittest.IsolatedAsyncioTestCase):
     async def test_06_keyboard_focus_contrast_and_labels(self):
         m,v=await self.model();await self.open('/app/ddas/logistics/case?model_id='+m['model']['id'])
         await select_model(self.page,m['model']['id'],v['version']['id']);await show_case(self.page)
-        await self.page.get_by_label('Objetivo global',exact=True).select_option('CUSTOM');await self.page.locator('.ultimate-policy summary').click()
+        await self.page.get_by_role('radio',name='Personalizado',exact=True).check()
         audit=(ROOT/'tests/browser/theme_audit.js').read_text();contrast=await self.page.evaluate(audit,'.ultimate-foundation')
         (OUT/'case-contrast.json').write_text(json.dumps(contrast,indent=2));self.assertGreater(contrast['textCount'],20);self.assertEqual(contrast['failures'],[])
         measurements=[]

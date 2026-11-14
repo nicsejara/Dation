@@ -1,0 +1,9 @@
+test_01_incomplete_progress_summary_and_informative_flow (test_decision_case_wizard.DecisionCaseWizardTests.test_01_incomplete_progress_summary_and_informative_flow) ... ok
+test_10_visual_states_responsive_keyboard_and_draft_navigation (test_decision_case_wizard.DecisionCaseWizardTests.test_10_visual_states_responsive_keyboard_and_draft_navigation) ... ok
+test_04_case_selector_escape_switch_and_history_navigation (test_ultimate_navigation.UltimateNavigationTests.test_04_case_selector_escape_switch_and_history_navigation) ... ok
+test_08_cross_document_return_and_persisted_pageshow_restore_context (test_ultimate_navigation.UltimateNavigationTests.test_08_cross_document_return_and_persisted_pageshow_restore_context) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 38.103s
+
+OK
