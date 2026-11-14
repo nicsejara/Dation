@@ -71,7 +71,7 @@ export function mountForm(root,scope,{initial,store,onSave,onReload,submitLabel=
  const beforeUnload=e=>{if(dirty){e.preventDefault();e.returnValue='';}};scope.listen(window,'beforeunload',beforeUnload);
  const leave=()=>!dirty||window.confirm('Tenés cambios sin guardar. El borrador se conservará en este navegador. ¿Querés salir?');
  window.dationUltimateCanLeave=leave;scope.own(()=>{if(window.dationUltimateCanLeave===leave)delete window.dationUltimateCanLeave;});
- return {form,footer,status,submit,conflict,setCollector(fn,validate=()=>({})){collect=fn;check=validate;dirty=draftSignature(collect())!==clean;},finish(){form.append(footer);},markSaved(){store?.clear();dirty=false;clean=draftSignature(collect());},get dirty(){return dirty;},showErrors};
+ return {form,footer,status,submit,conflict,setCollector(fn,validate=()=>({})){collect=fn;check=validate;dirty=draftSignature(collect())!==clean;},finish(){form.append(footer);},markSaved(){store?.clear();dirty=false;clean=draftSignature(collect());},get dirty(){return dirty;},saveDraft,showErrors};
 }
 
 export function confirmAction(root,scope,title,copy,action='Confirmar'){

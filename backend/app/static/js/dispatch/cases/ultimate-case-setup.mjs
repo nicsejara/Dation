@@ -6,6 +6,7 @@ import {el,button,field,section,collapsibleSection,pageHeader,draftStore,mountFo
 import {mountPolicy,policyInputValues} from '../models/policy.mjs';
 import {ROLES,DIMENSIONS} from '../models/model-fields.mjs';
 import {mountPlanningModel} from '../models/planning-model.mjs';
+import {mountSetupSteps} from '../models/wizard-ui.mjs';
 import {horizonEnd} from '../models/setup-values.mjs';
 
 
@@ -39,7 +40,7 @@ function showPublishedContracts(host,caseId,contracts,scope){
 export async function mountCaseSetup(root,{route,navigate,onContext}){
  delete root.dataset.ultimateReady;
  const scope=scopeFor(root);await ensureStylesheet('ultimate-foundation-styles','/static/css/ultimate-foundation.css','t3-v1');if(!scope.active)return;
- root.className='dispatch d-platform ultimate-foundation';root.append(loadingState('Recuperando contexto del Case…'));
+ root.className='dispatch d-platform ultimate-foundation ultimate-core-setup';root.append(loadingState('Recuperando contexto del Case…'));
  try{
   const fresh=!route.caseId,[caps,current]=await Promise.all([api('/api/platform/ultimate-foundation/capabilities',{signal:scope.signal}),fresh?Promise.resolve(null):api('/api/platform/logistics-cases/'+route.caseId+'/context',{signal:scope.signal})]);
   if(!scope.active)return;if(fresh&&!caps.can_create_case)throw Object.assign(new Error('La creación de Cases no está disponible para este acceso.'),{status:403});
@@ -62,7 +63,7 @@ export async function mountCaseSetup(root,{route,navigate,onContext}){
   let savedCard=null;
   if(row){savedCard=el('section',undefined,'d-card ultimate-saved-context');savedCard.append(el('h2','Contexto guardado','d-card-title'),el('p','Versión '+current.model_version.version+' de '+current.model.name+' · '+row.planning_start+' a '+row.planning_end,'d-body'),el('p','Data Pack inicial: '+(current.entry_count?'datos vinculados':'sin archivos')+'. El contexto se conserva al recargar.','d-metadata'));
    if(row.context_frozen_at)savedCard.append(el('p','El horizonte y la política quedaron congelados con la primera admisión. El nombre, la descripción y los responsables conservan sus reglas de edición.','d-body'));}
-  let planningModel=null,initialized=false,creationIntent=draft.creation_intent||null;
+  let planningModel=null,steps=null,initialized=false,creationIntent=draft.creation_intent||null;
   const kit=mountForm(root,scope,{initial,store,submitLabel:fresh?'Finalizar configuración':'Guardar contexto',onReload:()=>navigate('logistics-case-setup',{caseId:route.caseId,replace:true}),onSave:async value=>{
    let result;
    if(fresh){
@@ -81,7 +82,7 @@ export async function mountCaseSetup(root,{route,navigate,onContext}){
    kit.markSaved();if(scope.active){onContext?.(result);await navigate(fresh?'logistics-map':'logistics-case-setup',{caseId:result.case.id,nodeId:null,runId:null,replace:true});}
   }});
   const form=kit.form;form.inert=true;form.setAttribute('aria-busy','true');
-  if(fresh)planningModel=await mountPlanningModel(form,scope,{draft:draft.planning_model||{},modelId:draft.model_id,canManage:caps.can_manage_models,onChange:()=>{if(initialized)reflect();}});
+  if(fresh)planningModel=await mountPlanningModel(form,scope,{draft:draft.planning_model||{},modelId:draft.model_id,canManage:caps.can_manage_models,onChange:()=>{if(initialized){reflect();kit.saveDraft();}},persist:()=>{if(initialized)store.write(collect());},onSelected:()=>steps?.show(1,true)});
   if(!scope.active)return;
   // Existing Cases keep a read-only Model/Contract summary; a published
   // Model Version is immutable once linked to a Case.
@@ -133,14 +134,14 @@ export async function mountCaseSetup(root,{route,navigate,onContext}){
   kit.setCollector(collect,()=>{const errors={...(mathEditable?policyUI.validate():{}),...(planningModel?.validate()||{})};if(start.value&&end.value&&start.value>end.value)errors.planning_end='La fecha de fin debe ser igual o posterior a la de inicio.';if(fresh&&canAssign&&!owners.initial.value)errors.decision_owner_user_id='Elegí un Decision Owner activo y elegible.';return errors;});
   const review=el('section',undefined,'d-card ultimate-section');review.setAttribute('aria-label','Resumen de planificación');if(fresh)casePanel.body.append(review);
   function reflect(){
-   if(!fresh){casePanel.setStatus(kit.dirty?'Cambios pendientes':'Guardado',kit.dirty?'pending':'complete');return;}
+   if(!fresh){casePanel.setStatus(kit.dirty?'Cambios pendientes':'Guardado',kit.dirty?'pending':'complete');steps?.update();return;}
    const complete=!!(name.value.trim()&&start.value&&end.value&&start.value<=end.value&&planningModel?.ready);
-   casePanel.setStatus(complete?'Listo para crear':'Por completar',complete?'complete':'pending');
+   casePanel.setStatus(complete?'Listo para crear':'Por completar',complete?'complete':'pending');steps?.update();
    caseRoot.disabled=!!creationIntent||!planningModel.ready;kit.submit.disabled=!planningModel.ready;
    review.replaceChildren(el('h2','Resumen de planificación','d-card-title'),el('p',planningModel.summary(),'d-body'),el('p','Data Contract: Órdenes / Demanda + Flota / Recursos','d-body'),el('p',(name.value||'Nombre del Case pendiente')+' · '+(start.value||'Inicio pendiente')+' a '+(end.value||'Fin pendiente'),'d-body'),el('p','Objetivo: '+form.elements.primary_goal.selectedOptions[0].textContent,'d-body'),el('p','D1 · Transport Plan → aprobación → D2 · Day Scheduling','d-metadata'));
   }
   initialized=true;scope.listen(form,'input',reflect);scope.listen(form,'change',reflect);reflect();
-  kit.finish();if(!editable){for(const control of form.querySelectorAll('input,select,textarea,button'))control.disabled=true;kit.status.textContent='Contexto de sólo lectura.';}
+  kit.finish();steps=mountSetupSteps(form,[planningModel?.modelPanel.details||existingModelPanel.details,planningModel?.contractPanel.details||existingContractPanel.details,casePanel.details],{fresh,available:index=>!fresh||index===0||(index===1?planningModel.selected:planningModel.ready)});steps.workspace.append(kit.footer);if(!editable){for(const control of form.querySelectorAll('input,select,textarea,button:not(.core-wizard-steps > button)'))control.disabled=true;kit.status.textContent='Contexto de sólo lectura.';}
   if(saved)kit.status.textContent='Borrador recuperado. La versión guardada se mantiene hasta que apliques los cambios.';
   if(!fresh){
    await models();
@@ -149,6 +150,6 @@ export async function mountCaseSetup(root,{route,navigate,onContext}){
     showPublishedContracts(existingContractPanel.body,route.caseId,data.contracts,scope);existingContractPanel.setStatus('Vigente','complete');
    }catch(error){if(error.name==='AbortError')throw error;existingContractPanel.body.append(el('p','No se pudo cargar la vista del contrato: '+error.message,'d-metadata'));existingContractPanel.setStatus('Revisar','warning');}
   }
-  if(!scope.active)return;form.inert=false;form.removeAttribute('aria-busy');if(!saved)kit.markSaved();root.dataset.ultimateReady='true';
+  if(!scope.active)return;form.inert=false;form.removeAttribute('aria-busy');if(!saved)kit.markSaved();steps.update();root.dataset.ultimateReady='true';
  }catch(error){if(scope.active)errorBox(root,error,()=>navigate('logistics-case-setup',{caseId:route.caseId,modelId:route.modelId,replace:true}));}
 }

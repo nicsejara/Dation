@@ -9,6 +9,7 @@ import unittest
 from uuid import uuid4
 
 from playwright.async_api import async_playwright
+from wizard_helpers import select_model,show_case
 
 ROOT=Path(__file__).resolve().parents[2]
 REPO=ROOT.parent
@@ -84,11 +85,13 @@ class UltimateCaseSetupTests(unittest.IsolatedAsyncioTestCase):
         await self.page.keyboard.press('Escape');await dialog.wait_for(state='detached');self.assertTrue(await trigger.evaluate('n=>n===document.activeElement'))
         await trigger.click();await dialog.get_by_role('button',name='Publicar versión',exact=True).click()
         await self.page.get_by_text('Versión 1',exact=True).wait_for()
+        mid=await self.page.evaluate('new URL(location.href).searchParams.get("model_id")')
+        published=await self.api('GET','/api/platform/logistics-models/'+mid)
         await self.page.get_by_role('button',name='Crear Case con este Model',exact=True).click()
         await self.page.locator('[data-ultimate-ready="true"] form').wait_for()
         await self.page.get_by_role('heading',name='Core Configuration',exact=True).wait_for()
         self.assertEqual(await self.page.locator('details.ultimate-disclosure').count(),3)
-        self.assertEqual(await self.page.locator('.ultimate-disclosure__title').all_text_contents(),['01 Logistics Model','02 Data Contract','03 Decision Case'])
+        self.assertEqual(await self.page.locator('.ultimate-disclosure__title').all_text_contents(),['01. Logistics Model','02 Data Contract','03 Decision Case'])
         self.assertEqual(await self.page.locator('[data-dation-test="core-model"]').count(),1)
         self.assertEqual(await self.page.locator('[data-dation-test="core-contract"]').count(),1)
         self.assertEqual(await self.page.locator('[data-dation-test="core-case"]').count(),1)
@@ -96,8 +99,8 @@ class UltimateCaseSetupTests(unittest.IsolatedAsyncioTestCase):
         await self.page.locator('details.ultimate-disclosure').nth(0).locator('summary').click()
         self.assertEqual(await self.page.locator('details.ultimate-disclosure[open]').count(),1)
         await self.page.locator('details.ultimate-disclosure').nth(0).locator('summary').click()
+        await select_model(self.page,mid,published['versions'][0]['id']);await show_case(self.page)
         await self.page.get_by_label('Nombre del Case',exact=True).fill('Semana 45 · Operación Buenos Aires')
-        version=self.page.get_by_label('Model Version',exact=True);await version.locator('option').first.wait_for(state='attached');await version.select_option(index=0)
         await self.page.get_by_label('Inicio de planificación',exact=True).fill('2026-11-02');await self.page.get_by_label('Inicio de planificación',exact=True).press('Tab')
         await self.page.get_by_label('Fin de planificación',exact=True).fill('2026-11-08')
         await self.page.get_by_label('Decision Owner inicial (D1 y D2)',exact=True).select_option(ADMIN)
@@ -137,8 +140,8 @@ class UltimateCaseSetupTests(unittest.IsolatedAsyncioTestCase):
     async def test_04_responsive_stress_zoom_touch_and_native_controls(self):
         long_name='Operación de distribución interregional · '+('área metropolitana y centros de consolidación · '*3)
         m,v=await self.model(long_name[:120]);await self.open('/app/ddas/logistics/case?model_id='+m['model']['id'])
+        await select_model(self.page,m['model']['id'],v['version']['id']);await show_case(self.page)
         await self.page.get_by_label('Nombre del Case',exact=True).fill(long_name[:120]);await self.page.get_by_label('Descripción (opcional)',exact=True).fill(('Planificación operativa ñ · '*50)[:1000])
-        await self.page.get_by_label('Model Version',exact=True).select_option(v['version']['id'])
         await self.page.get_by_label('Objetivo global',exact=True).select_option('CUSTOM');await self.page.locator('.ultimate-policy summary').click()
         measurements=[]
         for width in [1440,1280,1024,768,390,320]:
@@ -165,13 +168,14 @@ class UltimateCaseSetupTests(unittest.IsolatedAsyncioTestCase):
         home=await self.api('GET','/api/platform/home');(OUT/'home-context-routing.json').write_text(json.dumps({'ultimate_case':cid,'legacy_link_recovers_context':True,'home_keys':list(home)},indent=2))
     async def test_06_keyboard_focus_contrast_and_labels(self):
         m,v=await self.model();await self.open('/app/ddas/logistics/case?model_id='+m['model']['id'])
+        await select_model(self.page,m['model']['id'],v['version']['id']);await show_case(self.page)
         await self.page.get_by_label('Objetivo global',exact=True).select_option('CUSTOM');await self.page.locator('.ultimate-policy summary').click()
         audit=(ROOT/'tests/browser/theme_audit.js').read_text();contrast=await self.page.evaluate(audit,'.ultimate-foundation')
         (OUT/'case-contrast.json').write_text(json.dumps(contrast,indent=2));self.assertGreater(contrast['textCount'],20);self.assertEqual(contrast['failures'],[])
         measurements=[]
         for width in [1440,390]:
             await self.page.set_viewport_size({'width':width,'height':1000})
-            first=self.page.locator('.ultimate-disclosure > summary').first;await first.scroll_into_view_if_needed();await first.focus();count=0
+            first=self.page.locator('[data-dation-test=core-case] > summary');await first.scroll_into_view_if_needed();await first.focus();count=0
             while count<80:
                 await self.page.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))')
                 # Viewport scrolling rounds to whole pixels; DOM rectangles retain fractions.

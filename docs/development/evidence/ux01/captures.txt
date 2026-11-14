@@ -1,0 +1,6 @@
+test_01_real_progress_validation_and_responsive_mockup (test_logistics_model_wizard.LogisticsModelWizardTests.test_01_real_progress_validation_and_responsive_mockup) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 17.402s
+
+OK

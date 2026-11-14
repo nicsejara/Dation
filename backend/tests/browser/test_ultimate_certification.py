@@ -10,6 +10,7 @@ from urllib.parse import urlparse,parse_qs
 
 from playwright.async_api import async_playwright,expect
 import test_ultimate_case_setup as setup
+from wizard_helpers import select_model,show_case
 import test_ultimate_case_data as data
 
 BACKEND=Path(__file__).resolve().parents[2];REPO=BACKEND.parent
@@ -77,10 +78,12 @@ class UltimateCertificationTests(unittest.IsolatedAsyncioTestCase):
         await self.page.get_by_role('button',name='Publicar nueva versión',exact=True).click()
         await self.page.get_by_role('dialog').get_by_role('button',name='Publicar versión',exact=True).click()
         await self.page.get_by_text('Versión 1',exact=True).wait_for()
+        mid=await self.page.evaluate('new URL(location.href).searchParams.get("model_id")')
+        version_id=(await self.api('GET','/api/platform/logistics-models/'+mid))['versions'][0]['id']
         await self.page.get_by_role('button',name='Crear Case con este Model',exact=True).click()
-        await self.page.locator('.ultimate-foundation[data-ultimate-ready=true] input[name=case_name]').wait_for()
+        await self.page.locator('.ultimate-foundation[data-ultimate-ready=true]').wait_for()
+        await select_model(self.page,mid,version_id);await show_case(self.page)
         await self.page.get_by_label('Nombre del Case',exact=True).fill('T11 · Semana desde cero')
-        version=self.page.get_by_label('Model Version',exact=True);await version.locator('option').first.wait_for(state='attached');await version.select_option(index=0)
         await self.page.get_by_label('Inicio de planificación',exact=True).fill('2026-11-02');await self.page.get_by_label('Inicio de planificación',exact=True).press('Tab')
         await self.page.get_by_label('Fin de planificación',exact=True).fill('2026-11-08')
         await self.page.get_by_label('Decision Owner inicial (D1 y D2)',exact=True).select_option(setup.ADMIN)
