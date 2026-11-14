@@ -1,0 +1,8 @@
+test_04_download_error_is_local_and_double_click_does_not_duplicate (test_data_contract_wizard.DataContractWizardTests.test_04_download_error_is_local_and_double_click_does_not_duplicate) ... ok
+test_06_unknown_metadata_is_literal_safe_and_preserved (test_data_contract_wizard.DataContractWizardTests.test_06_unknown_metadata_is_literal_safe_and_preserved) ... ok
+test_08_visual_responsive_focus_and_contrast (test_data_contract_wizard.DataContractWizardTests.test_08_visual_responsive_focus_and_contrast) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 22.961s
+
+OK
