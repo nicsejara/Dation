@@ -173,7 +173,7 @@ class LogisticsModelWizardTests(unittest.IsolatedAsyncioTestCase):
         release.set();await asyncio.wait_for(completed.wait(),12);await self.page.unroute('**/api/platform/logistics-models/contract-preview',slow)
         await publish_model(self.page)
         await expect(self.page.get_by_role('cell',name='demand_weight_kg',exact=True)).to_have_count(0)
-        self.assertEqual(await self.page.locator('[data-dation-test=core-contract] .ultimate-disclosure__status').text_content(),'Validado')
+        self.assertEqual(await self.page.locator('[data-dation-test=core-contract] .ultimate-disclosure__status').text_content(),'Estructura lista')
 
     async def test_07_no_model_permissions_cannot_publish_but_can_reuse(self):
         m,v=await self.model();writes=self.track_writes()

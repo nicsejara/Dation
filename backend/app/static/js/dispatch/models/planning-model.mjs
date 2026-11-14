@@ -1,10 +1,11 @@
-import {api,post,download} from '../shared.mjs';
+import {api,post} from '../shared.mjs';
 import {mountDialog} from '../../platform/components.mjs';
 import {el,button,field,collapsibleSection} from './forms.mjs';
 import {mountModelFields,defaultConfiguration} from './model-fields.mjs';
 import {wizardIcon} from './wizard-ui.mjs';
+import {mountDataContractView} from './data-contract-view.mjs';
 
-export async function mountPlanningModel(form,scope,{draft={},modelId='',canManage,onChange=()=>{},persist=()=>{},onSelected=()=>{}}){
+export async function mountPlanningModel(form,scope,{draft={},modelId='',canManage,onChange=()=>{},persist=()=>{},onSelected=()=>{},onContinue=()=>{}}){
  const modelPanel=collapsibleSection(form,'01. Logistics Model','Definí la lógica operativa base del modelo logístico que vas a usar en este Case.',{open:true,initialStatus:'En configuración'}),modelBlock=modelPanel.body;
  modelPanel.details.dataset.dationTest='core-model';modelPanel.details.dataset.modelState='LOADING';modelPanel.setStatus('Cargando');modelPanel.details.classList.add('model-wizard');modelBlock.classList.add('ultimate-planning-model');modelBlock.hidden=true;
  const summary=modelPanel.details.querySelector('summary'),tile=el('span',undefined,'model-wizard-tile'),heading=el('span',undefined,'model-wizard-heading');tile.append(wizardIcon('layers'));heading.append(summary.querySelector('.ultimate-disclosure__title'),modelBlock.previousElementSibling);summary.prepend(tile,heading);
@@ -12,8 +13,8 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
  const editor=el('div'),feedback=el('p','','model-wizard-feedback'),footer=el('footer',undefined,'model-wizard-footer'),progress=el('div',undefined,'model-wizard-progress'),ring=el('span',undefined,'model-wizard-ring'),progressText=el('div'),count=el('p','','d-metadata'),create=button('',publish,'primary');
  feedback.role='status';feedback.setAttribute('aria-live','polite');feedback.dataset.dationTest='model-feedback';progress.dataset.dationTest='model-progress';progress.role='status';progressText.append(el('strong','Configuración del modelo'),count);ring.setAttribute('aria-hidden','true');progress.append(ring,progressText);footer.append(progress,create);modelBlock.append(intro,editor,feedback,footer);
  create.dataset.dationTest='model-create';const createCaption=el('span','Crear y seleccionar modelo');create.append(wizardIcon('check'),createCaption);
- const contractPanel=collapsibleSection(form,'02 Data Contract','Revisá las variables y descargá las plantillas derivadas del Logistics Model. Los datos se cargan luego desde el Decision Graph.',{initialStatus:'Pendiente'}),contractBlock=contractPanel.body,contractStatus=el('p','Seleccioná o configurá un Model.','d-metadata'),contractRows=el('div',undefined,'ultimate-contracts'),retry=button('Reintentar Data Contract',()=>preview()),modelRetry=button('Reintentar Data Contract',async()=>{if(state.mode==='existing'&&!isSelected()){await render().catch(fail);if(ready)onSelected();}else await preview();});
- retry.hidden=modelRetry.hidden=true;contractStatus.role='status';contractBlock.append(contractStatus,retry,contractRows);feedback.after(modelRetry);contractPanel.details.dataset.dationTest='core-contract';
+ const contractPanel=collapsibleSection(form,'02. Data Contract','Dation genera automáticamente la estructura de datos requerida a partir del Logistics Model seleccionado. Descargá las plantillas y consultá sus campos y reglas antes de cargar los datos en el Decision Graph.',{initialStatus:'Pendiente'}),contractView=mountDataContractView(contractPanel,scope,{retry:()=>preview(),onContinue}),contractStatus=contractView.status,retry=contractView.retry,modelRetry=button('Reintentar Data Contract',async()=>{if(state.mode==='existing'&&!isSelected()){await render().catch(fail);if(ready)onSelected();}else await preview();});
+ retry.hidden=modelRetry.hidden=true;feedback.after(modelRetry);contractPanel.details.dataset.dationTest='core-contract';
  const newDraft=()=>({id:crypto.randomUUID(),name:'',description:'',status:'active',expected_revision:1,configuration:defaultConfiguration(window.dationSession.identity.workspace.currency)});
  const state={mode:draft.mode||'new',model_id:draft.model_id||modelId,version_id:draft.version_id||'',new_model:draft.new_model||newDraft(),intent:draft.intent||null,locked:!!draft.locked};
  // An old draft may contain an acknowledged version without its selection flag.
@@ -41,22 +42,10 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
   feedback.textContent=message||(!canManage?'Necesitás permiso de administración para crear un modelo.':'');feedback.hidden=!feedback.textContent;
   modelRetry.hidden=(state.mode!=='new'&&isSelected())||!previewFailed||busy||pending();modelRetry.textContent=state.mode==='existing'&&!isSelected()?'Reintentar selección del modelo':'Reintentar Data Contract';
   const another=editor.querySelector('[data-model-new]');if(another)another.disabled=busy||state.locked;retry.hidden=state.mode==='new'||!previewFailed;
- }
- function renderContract(data){
-  contractRows.replaceChildren();
-  contractStatus.textContent=data.provisional?'Vista previa preparatoria. Publicá y seleccioná el modelo para confirmar su contrato.':'Contrato de la versión publicada seleccionada.';
-  for(const [entity,label]of [['transport_demand','Órdenes / Demanda'],['transport_resources','Flota / Recursos']]){
-   const c=data.contracts[entity],part=el('section',undefined,'ultimate-contract');part.append(el('h3',label+' · Requerido','d-card-title'));
-   const wrap=el('div',undefined,'dispatch-table-wrap');wrap.tabIndex=0;wrap.role='region';wrap.setAttribute('aria-label','Data Contract · '+label);
-   const table=el('table'),head=el('thead'),titles=el('tr');for(const name of ['Campo canónico','Tipo / unidad','Requisito y validación']){const th=el('th',name);th.scope='col';titles.append(th);}head.append(titles);table.append(head);const body=el('tbody');
-   for(const f of c.fields){const row=el('tr');for(const value of [f.public_header,f.type+(f.unit?' · '+f.unit:''),(f.nullable?'Admite vacío':'Requerido')+(Object.keys(f.applies_when).length?' cuando '+JSON.stringify(f.applies_when):'')+' · '+JSON.stringify(f.validation)])row.append(el('td',value));body.append(row);}table.append(body);wrap.append(table);part.append(wrap);
-   const source=structuredClone(previewBody),template=button('Descargar template de '+label,async()=>{
-    try{const response=await fetch('/api/platform/logistics-models/contract-preview/templates/'+entity,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(source),signal:scope.signal});if(!response.ok)throw new Error('No se pudo descargar el template. Volvé a resolver el contrato.');download(entity+'.csv',await response.text(),'text/csv;charset=utf-8');}catch(error){if(scope.active){contractStatus.textContent=error.message;contractStatus.role='alert';}}
-   });part.append(template);contractRows.append(part);
-  }
+  contractView.setState({ready,compiled,pending:previewPending,failed:previewFailed,selected:isSelected(),provisional:state.mode==='new'});
  }
  async function preview(){
-  clearTimeout(timer);const own=++generation;compiled=ready=previewPending=false;previewFailed=false;previewBody=null;contractRows.replaceChildren();contractPanel.setStatus('Validando','pending');contractStatus.textContent='Resolviendo Data Contract…';contractStatus.role='status';changed();
+  clearTimeout(timer);const own=++generation;compiled=ready=previewPending=false;previewFailed=false;previewBody=null;contractView.invalidate();contractPanel.setStatus('Validando','pending');contractStatus.textContent='Resolviendo Data Contract…';contractStatus.role='status';changed();
   try{
    if(state.mode==='new'){
     if(!canManage){contractPanel.setStatus('Pendiente','pending');return;}
@@ -66,13 +55,13 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
    previewPending=true;changed();const source=structuredClone(previewBody),data=await post('/api/platform/logistics-models/contract-preview',source,{signal:scope.signal});if(!scope.active||own!==generation)return;
    previewPending=false;
    if(data.provisional!== (state.mode==='new'))throw new Error('El contrato no corresponde a la versión seleccionada.');
-   renderContract(data);compiled=true;ready=isSelected();previewFailed=false;
-   contractPanel.setStatus(ready?'Validado':'Vista previa',ready?'complete':'pending');if(!pending())message='';changed();
+   contractView.render(data,previewBody);compiled=true;ready=isSelected();previewFailed=false;
+   contractPanel.setStatus(ready?'Estructura lista':'Vista previa',ready?'complete':'pending');if(!pending())message='';changed();
   }catch(error){if(scope.active&&own===generation){previewPending=false;previewFailed=true;contractStatus.textContent=error.message;contractStatus.role='alert';contractPanel.setStatus('Revisar contrato','warning');message=error.message;feedback.role='alert';changed();}}
  }
  let previewBody=null;
  async function render(){
-  const own=++renderGeneration;generation++;clearTimeout(timer);compiled=ready=false;editor.replaceChildren();
+  const own=++renderGeneration;generation++;clearTimeout(timer);compiled=ready=false;contractView.invalidate();editor.replaceChildren();
   if(state.mode==='new'){
    fields=mountModelFields(editor,scope,state.new_model,{wizard:true});
    if(pending()||!canManage||state.locked)fields.lock();

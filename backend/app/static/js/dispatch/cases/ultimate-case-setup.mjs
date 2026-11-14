@@ -82,7 +82,7 @@ export async function mountCaseSetup(root,{route,navigate,onContext}){
    kit.markSaved();if(scope.active){onContext?.(result);await navigate(fresh?'logistics-map':'logistics-case-setup',{caseId:result.case.id,nodeId:null,runId:null,replace:true});}
   }});
   const form=kit.form;form.inert=true;form.setAttribute('aria-busy','true');
-  if(fresh)planningModel=await mountPlanningModel(form,scope,{draft:draft.planning_model||{},modelId:draft.model_id,canManage:caps.can_manage_models,onChange:()=>{if(initialized){reflect();kit.saveDraft();}},persist:()=>{if(initialized)store.write(collect());},onSelected:()=>steps?.show(1,true)});
+  if(fresh)planningModel=await mountPlanningModel(form,scope,{draft:draft.planning_model||{},modelId:draft.model_id,canManage:caps.can_manage_models,onChange:()=>{if(initialized){reflect();kit.saveDraft();}},persist:()=>{if(initialized)store.write(collect());},onSelected:()=>steps?.show(1,true),onContinue:()=>steps?.show(2,true)});
   if(!scope.active)return;
   // Existing Cases keep a read-only Model/Contract summary; a published
   // Model Version is immutable once linked to a Case.

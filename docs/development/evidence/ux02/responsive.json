@@ -1,0 +1,232 @@
+[
+  {
+    "expanded": false,
+    "width": 1536,
+    "scroll": 1536,
+    "cards": [
+      {
+        "width": 474,
+        "height": 276.09375,
+        "action": 432,
+        "expected": 432,
+        "left": 540,
+        "right": 972
+      },
+      {
+        "width": 474,
+        "height": 276.09375,
+        "action": 432,
+        "expected": 432,
+        "left": 1032,
+        "right": 1464
+      }
+    ]
+  },
+  {
+    "expanded": true,
+    "width": 1536,
+    "scroll": 1536,
+    "cards": [
+      {
+        "width": 474,
+        "height": 673.28125,
+        "action": 432,
+        "expected": 432,
+        "left": 540,
+        "right": 972
+      },
+      {
+        "width": 474,
+        "height": 276.09375,
+        "action": 432,
+        "expected": 432,
+        "left": 1032,
+        "right": 1464
+      }
+    ]
+  },
+  {
+    "expanded": false,
+    "width": 1024,
+    "scroll": 1024,
+    "cards": [
+      {
+        "width": 343,
+        "height": 297.09375,
+        "action": 301,
+        "expected": 301,
+        "left": 290,
+        "right": 591
+      },
+      {
+        "width": 343,
+        "height": 318.09375,
+        "action": 301,
+        "expected": 301,
+        "left": 651,
+        "right": 952
+      }
+    ]
+  },
+  {
+    "expanded": true,
+    "width": 1024,
+    "scroll": 1024,
+    "cards": [
+      {
+        "width": 343,
+        "height": 694.28125,
+        "action": 301,
+        "expected": 301,
+        "left": 290,
+        "right": 591
+      },
+      {
+        "width": 343,
+        "height": 318.09375,
+        "action": 301,
+        "expected": 301,
+        "left": 651,
+        "right": 952
+      }
+    ]
+  },
+  {
+    "expanded": false,
+    "width": 768,
+    "scroll": 768,
+    "cards": [
+      {
+        "width": 622,
+        "height": 276.09375,
+        "action": 580,
+        "expected": 580,
+        "left": 130,
+        "right": 710
+      },
+      {
+        "width": 622,
+        "height": 276.09375,
+        "action": 580,
+        "expected": 580,
+        "left": 130,
+        "right": 710
+      }
+    ]
+  },
+  {
+    "expanded": true,
+    "width": 768,
+    "scroll": 768,
+    "cards": [
+      {
+        "width": 622,
+        "height": 673.28125,
+        "action": 580,
+        "expected": 580,
+        "left": 130,
+        "right": 710
+      },
+      {
+        "width": 622,
+        "height": 276.09375,
+        "action": 580,
+        "expected": 580,
+        "left": 130,
+        "right": 710
+      }
+    ]
+  },
+  {
+    "expanded": false,
+    "width": 390,
+    "scroll": 390,
+    "cards": [
+      {
+        "width": 272,
+        "height": 329.484375,
+        "action": 238,
+        "expected": 238,
+        "left": 106,
+        "right": 344
+      },
+      {
+        "width": 272,
+        "height": 329.484375,
+        "action": 238,
+        "expected": 238,
+        "left": 106,
+        "right": 344
+      }
+    ]
+  },
+  {
+    "expanded": true,
+    "width": 390,
+    "scroll": 390,
+    "cards": [
+      {
+        "width": 272,
+        "height": 726.671875,
+        "action": 238,
+        "expected": 238,
+        "left": 106,
+        "right": 344
+      },
+      {
+        "width": 272,
+        "height": 329.484375,
+        "action": 238,
+        "expected": 238,
+        "left": 106,
+        "right": 344
+      }
+    ]
+  },
+  {
+    "expanded": false,
+    "width": 320,
+    "scroll": 320,
+    "cards": [
+      {
+        "width": 202,
+        "height": 427.546875,
+        "action": 168,
+        "expected": 168,
+        "left": 106,
+        "right": 274
+      },
+      {
+        "width": 202,
+        "height": 447.046875,
+        "action": 168,
+        "expected": 168,
+        "left": 106,
+        "right": 274
+      }
+    ]
+  },
+  {
+    "expanded": true,
+    "width": 320,
+    "scroll": 320,
+    "cards": [
+      {
+        "width": 202,
+        "height": 843.921875,
+        "action": 168,
+        "expected": 168,
+        "left": 106,
+        "right": 274
+      },
+      {
+        "width": 202,
+        "height": 447.046875,
+        "action": 168,
+        "expected": 168,
+        "left": 106,
+        "right": 274
+      }
+    ]
+  }
+]
