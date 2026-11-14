@@ -1,0 +1,607 @@
+[
+  {
+    "width": 1536,
+    "scroll": 1536,
+    "controls": [
+      {
+        "name": "case_name",
+        "left": 842.546875,
+        "right": 1145.265625
+      },
+      {
+        "name": "case_description",
+        "left": 1163.265625,
+        "right": 1465.984375
+      },
+      {
+        "name": "primary_goal",
+        "left": 1012.6875,
+        "right": 1030.6875
+      },
+      {
+        "name": "primary_goal",
+        "left": 1223.828125,
+        "right": 1241.828125
+      },
+      {
+        "name": "primary_goal",
+        "left": 1434.96875,
+        "right": 1452.96875
+      },
+      {
+        "name": "primary_goal",
+        "left": 1012.6875,
+        "right": 1030.6875
+      },
+      {
+        "name": "primary_goal",
+        "left": 1223.828125,
+        "right": 1241.828125
+      },
+      {
+        "name": "primary_goal",
+        "left": 1434.96875,
+        "right": 1452.96875
+      },
+      {
+        "name": "enable_MINIMUM_DEMAND_COVERAGE",
+        "left": 855.546875,
+        "right": 875.546875
+      },
+      {
+        "name": "guard_MINIMUM_DEMAND_COVERAGE",
+        "left": 855.546875,
+        "right": 1146.265625
+      },
+      {
+        "name": "enable_CRITICAL_DEMAND_COVERAGE",
+        "left": 1162.265625,
+        "right": 1182.265625
+      },
+      {
+        "name": "guard_CRITICAL_DEMAND_COVERAGE",
+        "left": 1162.265625,
+        "right": 1452.984375
+      },
+      {
+        "name": "enable_MAXIMUM_EXTERNAL_SHARE",
+        "left": 855.546875,
+        "right": 875.546875
+      },
+      {
+        "name": "guard_MAXIMUM_EXTERNAL_SHARE",
+        "left": 855.546875,
+        "right": 1146.265625
+      },
+      {
+        "name": "enable_MINIMUM_OWN_SHARE",
+        "left": 1162.265625,
+        "right": 1182.265625
+      },
+      {
+        "name": "guard_MINIMUM_OWN_SHARE",
+        "left": 1162.265625,
+        "right": 1452.984375
+      },
+      {
+        "name": "operating_mode",
+        "left": 962.90625,
+        "right": 980.90625
+      },
+      {
+        "name": "operating_mode",
+        "left": 1120.265625,
+        "right": 1138.265625
+      },
+      {
+        "name": "horizon_type",
+        "left": 1161.265625,
+        "right": 1465.984375
+      },
+      {
+        "name": "planning_start",
+        "left": 842.546875,
+        "right": 1147.265625
+      },
+      {
+        "name": "planning_end",
+        "left": 1161.265625,
+        "right": 1465.984375
+      },
+      {
+        "name": "decision_owner_user_id",
+        "left": 842.546875,
+        "right": 1145.265625
+      },
+      {
+        "name": "",
+        "left": 1270.8125,
+        "right": 1481
+      }
+    ]
+  },
+  {
+    "width": 1024,
+    "scroll": 1024,
+    "controls": [
+      {
+        "name": "case_name",
+        "left": 491.140625,
+        "right": 713.5625
+      },
+      {
+        "name": "case_description",
+        "left": 731.5625,
+        "right": 954
+      },
+      {
+        "name": "primary_goal",
+        "left": 686.5625,
+        "right": 704.5625
+      },
+      {
+        "name": "primary_goal",
+        "left": 923,
+        "right": 941
+      },
+      {
+        "name": "primary_goal",
+        "left": 686.5625,
+        "right": 704.5625
+      },
+      {
+        "name": "primary_goal",
+        "left": 923,
+        "right": 941
+      },
+      {
+        "name": "primary_goal",
+        "left": 686.5625,
+        "right": 704.5625
+      },
+      {
+        "name": "primary_goal",
+        "left": 923,
+        "right": 941
+      },
+      {
+        "name": "enable_MINIMUM_DEMAND_COVERAGE",
+        "left": 504.140625,
+        "right": 524.140625
+      },
+      {
+        "name": "guard_MINIMUM_DEMAND_COVERAGE",
+        "left": 504.140625,
+        "right": 714.5625
+      },
+      {
+        "name": "enable_CRITICAL_DEMAND_COVERAGE",
+        "left": 730.5625,
+        "right": 750.5625
+      },
+      {
+        "name": "guard_CRITICAL_DEMAND_COVERAGE",
+        "left": 730.5625,
+        "right": 941
+      },
+      {
+        "name": "enable_MAXIMUM_EXTERNAL_SHARE",
+        "left": 504.140625,
+        "right": 524.140625
+      },
+      {
+        "name": "guard_MAXIMUM_EXTERNAL_SHARE",
+        "left": 504.140625,
+        "right": 714.5625
+      },
+      {
+        "name": "enable_MINIMUM_OWN_SHARE",
+        "left": 730.5625,
+        "right": 750.5625
+      },
+      {
+        "name": "guard_MINIMUM_OWN_SHARE",
+        "left": 730.5625,
+        "right": 941
+      },
+      {
+        "name": "operating_mode",
+        "left": 566.34375,
+        "right": 584.34375
+      },
+      {
+        "name": "operating_mode",
+        "left": 682.5625,
+        "right": 700.5625
+      },
+      {
+        "name": "horizon_type",
+        "left": 731.5625,
+        "right": 954
+      },
+      {
+        "name": "planning_start",
+        "left": 491.140625,
+        "right": 713.5625
+      },
+      {
+        "name": "planning_end",
+        "left": 731.5625,
+        "right": 954
+      },
+      {
+        "name": "decision_owner_user_id",
+        "left": 491.140625,
+        "right": 713.5625
+      },
+      {
+        "name": "",
+        "left": 758.8125,
+        "right": 969
+      }
+    ]
+  },
+  {
+    "width": 768,
+    "scroll": 768,
+    "controls": [
+      {
+        "name": "case_name",
+        "left": 476,
+        "right": 578
+      },
+      {
+        "name": "case_description",
+        "left": 596,
+        "right": 698
+      },
+      {
+        "name": "primary_goal",
+        "left": 551,
+        "right": 569
+      },
+      {
+        "name": "primary_goal",
+        "left": 667,
+        "right": 685
+      },
+      {
+        "name": "primary_goal",
+        "left": 551,
+        "right": 569
+      },
+      {
+        "name": "primary_goal",
+        "left": 667,
+        "right": 685
+      },
+      {
+        "name": "primary_goal",
+        "left": 551,
+        "right": 569
+      },
+      {
+        "name": "primary_goal",
+        "left": 667,
+        "right": 685
+      },
+      {
+        "name": "enable_MINIMUM_DEMAND_COVERAGE",
+        "left": 489,
+        "right": 509
+      },
+      {
+        "name": "guard_MINIMUM_DEMAND_COVERAGE",
+        "left": 489,
+        "right": 579
+      },
+      {
+        "name": "enable_CRITICAL_DEMAND_COVERAGE",
+        "left": 595,
+        "right": 615
+      },
+      {
+        "name": "guard_CRITICAL_DEMAND_COVERAGE",
+        "left": 595,
+        "right": 685
+      },
+      {
+        "name": "enable_MAXIMUM_EXTERNAL_SHARE",
+        "left": 489,
+        "right": 509
+      },
+      {
+        "name": "guard_MAXIMUM_EXTERNAL_SHARE",
+        "left": 489,
+        "right": 579
+      },
+      {
+        "name": "enable_MINIMUM_OWN_SHARE",
+        "left": 595,
+        "right": 615
+      },
+      {
+        "name": "guard_MINIMUM_OWN_SHARE",
+        "left": 595,
+        "right": 685
+      },
+      {
+        "name": "operating_mode",
+        "left": 499,
+        "right": 517
+      },
+      {
+        "name": "operating_mode",
+        "left": 555,
+        "right": 573
+      },
+      {
+        "name": "horizon_type",
+        "left": 596,
+        "right": 698
+      },
+      {
+        "name": "planning_start",
+        "left": 476,
+        "right": 578
+      },
+      {
+        "name": "planning_end",
+        "left": 596,
+        "right": 698
+      },
+      {
+        "name": "decision_owner_user_id",
+        "left": 476,
+        "right": 578
+      },
+      {
+        "name": "",
+        "left": 502.8125,
+        "right": 713
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "scroll": 390,
+    "controls": [
+      {
+        "name": "case_name",
+        "left": 106,
+        "right": 344
+      },
+      {
+        "name": "case_description",
+        "left": 106,
+        "right": 344
+      },
+      {
+        "name": "primary_goal",
+        "left": 313,
+        "right": 331
+      },
+      {
+        "name": "primary_goal",
+        "left": 313,
+        "right": 331
+      },
+      {
+        "name": "primary_goal",
+        "left": 313,
+        "right": 331
+      },
+      {
+        "name": "primary_goal",
+        "left": 313,
+        "right": 331
+      },
+      {
+        "name": "primary_goal",
+        "left": 313,
+        "right": 331
+      },
+      {
+        "name": "primary_goal",
+        "left": 313,
+        "right": 331
+      },
+      {
+        "name": "enable_MINIMUM_DEMAND_COVERAGE",
+        "left": 119,
+        "right": 139
+      },
+      {
+        "name": "guard_MINIMUM_DEMAND_COVERAGE",
+        "left": 119,
+        "right": 331
+      },
+      {
+        "name": "enable_CRITICAL_DEMAND_COVERAGE",
+        "left": 119,
+        "right": 139
+      },
+      {
+        "name": "guard_CRITICAL_DEMAND_COVERAGE",
+        "left": 119,
+        "right": 331
+      },
+      {
+        "name": "enable_MAXIMUM_EXTERNAL_SHARE",
+        "left": 119,
+        "right": 139
+      },
+      {
+        "name": "guard_MAXIMUM_EXTERNAL_SHARE",
+        "left": 119,
+        "right": 331
+      },
+      {
+        "name": "enable_MINIMUM_OWN_SHARE",
+        "left": 119,
+        "right": 139
+      },
+      {
+        "name": "guard_MINIMUM_OWN_SHARE",
+        "left": 119,
+        "right": 331
+      },
+      {
+        "name": "operating_mode",
+        "left": 193,
+        "right": 211
+      },
+      {
+        "name": "operating_mode",
+        "left": 317,
+        "right": 335
+      },
+      {
+        "name": "horizon_type",
+        "left": 106,
+        "right": 344
+      },
+      {
+        "name": "planning_start",
+        "left": 106,
+        "right": 344
+      },
+      {
+        "name": "planning_end",
+        "left": 106,
+        "right": 344
+      },
+      {
+        "name": "decision_owner_user_id",
+        "left": 106,
+        "right": 344
+      },
+      {
+        "name": "",
+        "left": 93,
+        "right": 357
+      }
+    ]
+  },
+  {
+    "width": 320,
+    "scroll": 320,
+    "controls": [
+      {
+        "name": "case_name",
+        "left": 106,
+        "right": 274
+      },
+      {
+        "name": "case_description",
+        "left": 106,
+        "right": 274
+      },
+      {
+        "name": "primary_goal",
+        "left": 243,
+        "right": 261
+      },
+      {
+        "name": "primary_goal",
+        "left": 243,
+        "right": 261
+      },
+      {
+        "name": "primary_goal",
+        "left": 243,
+        "right": 261
+      },
+      {
+        "name": "primary_goal",
+        "left": 243,
+        "right": 261
+      },
+      {
+        "name": "primary_goal",
+        "left": 243,
+        "right": 261
+      },
+      {
+        "name": "primary_goal",
+        "left": 243,
+        "right": 261
+      },
+      {
+        "name": "enable_MINIMUM_DEMAND_COVERAGE",
+        "left": 119,
+        "right": 139
+      },
+      {
+        "name": "guard_MINIMUM_DEMAND_COVERAGE",
+        "left": 119,
+        "right": 261
+      },
+      {
+        "name": "enable_CRITICAL_DEMAND_COVERAGE",
+        "left": 119,
+        "right": 139
+      },
+      {
+        "name": "guard_CRITICAL_DEMAND_COVERAGE",
+        "left": 119,
+        "right": 261
+      },
+      {
+        "name": "enable_MAXIMUM_EXTERNAL_SHARE",
+        "left": 119,
+        "right": 139
+      },
+      {
+        "name": "guard_MAXIMUM_EXTERNAL_SHARE",
+        "left": 119,
+        "right": 261
+      },
+      {
+        "name": "enable_MINIMUM_OWN_SHARE",
+        "left": 119,
+        "right": 139
+      },
+      {
+        "name": "guard_MINIMUM_OWN_SHARE",
+        "left": 119,
+        "right": 261
+      },
+      {
+        "name": "operating_mode",
+        "left": 247,
+        "right": 265
+      },
+      {
+        "name": "operating_mode",
+        "left": 247,
+        "right": 265
+      },
+      {
+        "name": "horizon_type",
+        "left": 106,
+        "right": 274
+      },
+      {
+        "name": "planning_start",
+        "left": 106,
+        "right": 274
+      },
+      {
+        "name": "planning_end",
+        "left": 106,
+        "right": 274
+      },
+      {
+        "name": "decision_owner_user_id",
+        "left": 106,
+        "right": 274
+      },
+      {
+        "name": "",
+        "left": 93,
+        "right": 287
+      }
+    ]
+  }
+]

@@ -42,26 +42,27 @@ export function draftStore(kind,id='new'){
  return {read(){try{return JSON.parse(sessionStorage.getItem(key)||'null');}catch{return null;}},write(value){try{sessionStorage.setItem(key,JSON.stringify(value));}catch{}},clear(){try{sessionStorage.removeItem(key);}catch{}}};
 }
 
-export function mountForm(root,scope,{initial,store,onSave,onReload,submitLabel='Guardar cambios'}){
+export function mountForm(root,scope,{initial,store,onSave,onReload,submitLabel='Guardar cambios',focusFirstError=false}){
  const form=el('form',undefined,'ultimate-form');form.noValidate=true;form.setAttribute('aria-label',submitLabel);
  const errors=el('div',undefined,'ultimate-errors');errors.hidden=true;errors.role='alert';errors.tabIndex=-1;form.append(errors);root.append(form);
  const footer=el('footer',undefined,'d-card ultimate-footer'),status=el('p','Sin cambios pendientes.','d-metadata');status.role='status';status.setAttribute('aria-live','polite');
  const submit=el('button',submitLabel,'d-button d-button--primary');submit.type='submit';footer.append(status,submit);
  let collect=()=>initial,check=()=>({}),busy=false,clean=draftSignature(initial),dirty=false;
  const saveDraft=()=>{const value=collect();dirty=draftSignature(value)!==clean;if(dirty)store?.write(value);else store?.clear();status.textContent=dirty?'Cambios sin guardar. El borrador se conserva en este navegador.':'Sin cambios pendientes.';};
+ const controlFor=name=>{const control=form.elements.namedItem(name);return control?.focus?control:control?.[0];};
  const inline=(name,message)=>{const input=form.elements.namedItem(name);const error=form.querySelector('[data-error-for="'+name+'"]');if(error)error.textContent=message||'';if(input?.setAttribute){if(message){input.setAttribute('aria-invalid','true');const details=input.closest('details');if(details)details.open=true;}else input.removeAttribute('aria-invalid');}};
  const showErrors=values=>{
   for(const item of form.querySelectorAll('[data-error-for]'))inline(item.dataset.errorFor,'');
   errors.replaceChildren();const entries=Object.entries(values).filter(([,v])=>v);errors.hidden=!entries.length;
-  if(entries.length){errors.append(el('h2','Revisá estos campos','d-card-title'));for(const [name,message]of entries){inline(name,message);const link=el('a',message);link.href='#ultimate-'+name;link.addEventListener('click',e=>{e.preventDefault();form.elements.namedItem(name)?.focus?.();});errors.append(link);}errors.focus();}
+  if(entries.length){errors.append(el('h2','Revisá estos campos','d-card-title'));for(const [name,message]of entries){inline(name,message);const link=el('a',message);link.href='#ultimate-'+name;link.addEventListener('click',e=>{e.preventDefault();(controlFor(name)||errors).focus();});errors.append(link);}if(focusFirstError)(controlFor(entries[0][0])||errors).focus();else errors.focus();}
  };
  const conflict=message=>{status.textContent=message;status.role='alert';if(onReload&&!footer.querySelector('[data-conflict-reload]')){const b=button('Descartar borrador y recargar',async()=>{if(await confirmAction(root,scope,'Descartar el borrador','Se cargarán los datos guardados. Tus cambios pendientes se descartarán.','Descartar y recargar')){store?.clear();dirty=false;await onReload();}});b.dataset.conflictReload='true';footer.append(b);}};
  scope.listen(form,'input',saveDraft);scope.listen(form,'change',saveDraft);
  scope.listen(form,'focusout',event=>{const n=event.target;if(n.matches?.('input,select,textarea'))inline(n.name,n.validity.valid?'':n.validationMessage);});
+ const validation=()=>{const values={};for(const n of form.querySelectorAll('input,select,textarea'))if(!n.disabled&&!n.validity.valid)values[n.name]=n.validationMessage;return Object.assign(values,check());};
  scope.listen(form,'submit',async event=>{
   event.preventDefault();if(busy)return;
-  const values={};for(const n of form.querySelectorAll('input,select,textarea'))if(!n.disabled&&!n.validity.valid)values[n.name]=n.validationMessage;
-  Object.assign(values,check());showErrors(values);if(Object.values(values).some(Boolean))return;
+  const values=validation();showErrors(values);if(Object.values(values).some(Boolean))return;
   busy=true;submit.disabled=true;submit.setAttribute('aria-busy','true');status.textContent='Guardando…';
   try{await onSave(collect());if(scope.active){store?.clear();dirty=false;clean=draftSignature(collect());status.textContent='Cambios guardados.';}}
   catch(error){if(scope.active){status.textContent=error.status===409?'La versión guardada cambió. Tu borrador se conserva; revisá la versión actual antes de reintentar.':error.message;status.role='alert';
@@ -71,7 +72,7 @@ export function mountForm(root,scope,{initial,store,onSave,onReload,submitLabel=
  const beforeUnload=e=>{if(dirty){e.preventDefault();e.returnValue='';}};scope.listen(window,'beforeunload',beforeUnload);
  const leave=()=>!dirty||window.confirm('Tenés cambios sin guardar. El borrador se conservará en este navegador. ¿Querés salir?');
  window.dationUltimateCanLeave=leave;scope.own(()=>{if(window.dationUltimateCanLeave===leave)delete window.dationUltimateCanLeave;});
- return {form,footer,status,submit,conflict,setCollector(fn,validate=()=>({})){collect=fn;check=validate;dirty=draftSignature(collect())!==clean;},finish(){form.append(footer);},markSaved(){store?.clear();dirty=false;clean=draftSignature(collect());},get dirty(){return dirty;},saveDraft,showErrors};
+ return {form,footer,status,submit,conflict,setCollector(fn,validate=()=>({})){collect=fn;check=validate;dirty=draftSignature(collect())!==clean;},finish(){form.append(footer);},markSaved(){store?.clear();dirty=false;clean=draftSignature(collect());},get dirty(){return dirty;},get busy(){return busy;},validation,saveDraft,showErrors};
 }
 
 export function confirmAction(root,scope,title,copy,action='Confirmar'){
