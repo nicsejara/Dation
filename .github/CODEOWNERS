@@ -1,0 +1,13 @@
+# G6 critical controls. Effective main ruleset must require code-owner review.
+# Product R1/R2 paths deliberately have no repetitive code-owner requirement.
+/.github/ @nicsejara
+/scripts/ci/ @nicsejara
+/scripts/release/ @nicsejara
+/scripts/runtime_v2_publication.py @nicsejara
+/infra/ @nicsejara
+/tests/operations/ @nicsejara
+/tests/impact-map.json @nicsejara
+/Dockerfile @nicsejara
+/.dockerignore @nicsejara
+/backend/requirements* @nicsejara
+/backend/app/cloud_identity.py @nicsejara

@@ -1,0 +1,208 @@
+name: Dation G6 UX autorelease
+run-name: G6 UX ${{ github.event.workflow_run.head_sha }}
+on:
+  workflow_run:
+    workflows: [Dation FAST gate]
+    types: [completed]
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: dation-core-ux-release
+  cancel-in-progress: false
+env:
+  DATION_UX_AUTODEPLOY_ENABLED: ${{ vars.DATION_UX_AUTODEPLOY_ENABLED }}
+  DATION_UX_BOOTSTRAP_APPROVED: ${{ vars.DATION_UX_BOOTSTRAP_APPROVED }}
+  DATION_UX_POLICY_SHA256: ${{ vars.DATION_UX_POLICY_SHA256 }}
+  DATION_UX_BASELINE_SHA: ${{ vars.DATION_UX_BASELINE_SHA }}
+jobs:
+  eligibility:
+    if: github.repository == 'nicsejara/Dation' && github.event.workflow_run.event == 'push' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.head_repository.id == 1114679650
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read
+      checks: read
+      pull-requests: read
+    outputs:
+      eligible: ${{ steps.scope.outputs.eligible }}
+    steps:
+      - name: Isolate ephemeral Registry authentication
+        run: echo "DOCKER_CONFIG=$RUNNER_TEMP/g6-registry-auth" >> "$GITHUB_ENV"
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify source gate, main, diff, policy and kill switch
+        id: scope
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/release/g6_orchestrator.py preflight --out "$RUNNER_TEMP/g6"
+      - name: Persist immutable eligibility or precise skip receipt
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: g6-plan-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/g6/plan.json
+            ${{ runner.temp }}/g6/G6_RELEASE_RECEIPT.json
+          retention-days: 90
+          if-no-files-found: error
+  publication:
+    needs: eligibility
+    if: needs.eligibility.outputs.eligible == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    permissions:
+      contents: read
+      actions: write
+      checks: read
+      pull-requests: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Isolate ephemeral Registry authentication
+        run: echo "DOCKER_CONFIG=$RUNNER_TEMP/g6-registry-auth" >> "$GITHUB_ENV"
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Restore verified plan
+        run: python3 scripts/release/g6_orchestrator.py restore --out "$RUNNER_TEMP/g6"
+      - name: Claim one publication dispatch
+        run: python3 scripts/release/g6_orchestrator.py claim --out "$RUNNER_TEMP/g6"
+      - name: Persist claim before dispatch
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: g6-publish-claim-${{ github.run_id }}
+          path: ${{ runner.temp }}/g6/publish-claim.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Dispatch existing publisher once and verify correlated receipt
+        run: python3 scripts/release/g6_orchestrator.py publish --out "$RUNNER_TEMP/g6"
+      - name: Persist verified publication
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: g6-publication-${{ github.run_id }}
+          path: ${{ runner.temp }}/g6/publication.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Record publication failure without any cloud identity
+        if: always() && (failure() || cancelled())
+        env:
+          DATION_JOB_STATUS: ${{ job.status }}
+        run: python3 scripts/release/g6_orchestrator.py finalize --out "$RUNNER_TEMP/g6"
+      - name: Persist publication failure receipt
+        if: always() && (failure() || cancelled())
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: g6-release-${{ github.run_id }}
+          path: ${{ runner.temp }}/g6/G6_RELEASE_RECEIPT.json
+          retention-days: 90
+          if-no-files-found: warn
+  deployment:
+    needs: [eligibility, publication]
+    if: needs.eligibility.outputs.eligible == 'true' && needs.publication.result == 'success' && vars.DATION_UX_BOOTSTRAP_APPROVED == 'true' && vars.DATION_UX_AUTODEPLOY_ENABLED == 'true'
+    environment: ux-mvp-auto
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      actions: read
+      checks: read
+      pull-requests: read
+      id-token: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Isolate ephemeral Registry authentication
+        run: echo "DOCKER_CONFIG=$RUNNER_TEMP/g6-registry-auth" >> "$GITHUB_ENV"
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Restore verified Actions state
+        run: python3 scripts/release/g6_release.py restore --out "$RUNNER_TEMP/g6"
+      - name: Recheck current main before OIDC
+        run: python3 scripts/release/g6_orchestrator.py verify --out "$RUNNER_TEMP/g6"
+      - name: Authenticate dedicated service-scoped deployer
+        id: auth
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
+        with:
+          workload_identity_provider: projects/332279365872/locations/global/workloadIdentityPools/dation-github-ux/providers/github-main-ux
+          audience: https://iam.googleapis.com/projects/332279365872/locations/global/workloadIdentityPools/dation-github-ux/providers/github-main-ux
+          service_account: dation-ux-deployer@dation-runtime-v2-2026.iam.gserviceaccount.com
+          token_format: access_token
+          access_token_lifetime: 1800s
+          create_credentials_file: false
+          export_environment_variables: false
+      - name: Snapshot live config, IAM, active release and rollback
+        env:
+          DATION_DEPLOY_TOKEN: ${{ steps.auth.outputs.access_token }}
+        run: python3 scripts/release/g6_release.py snapshot --out "$RUNNER_TEMP/g6"
+      - name: Persist snapshot before preparing a revision
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: g6-snapshot-${{ github.run_id }}
+          path: ${{ runner.temp }}/g6/snapshot.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Prepare exact revision with zero default traffic
+        env:
+          DATION_DEPLOY_TOKEN: ${{ steps.auth.outputs.access_token }}
+        run: python3 scripts/release/g6_release.py prepare --out "$RUNNER_TEMP/g6"
+      - name: Persist prepared revision identity
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: g6-prepared-${{ github.run_id }}
+          path: ${{ runner.temp }}/g6/prepared.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Smoke exact candidate URL at zero default traffic
+        env:
+          DATION_DEPLOY_TOKEN: ${{ steps.auth.outputs.access_token }}
+        run: python3 scripts/release/g6_release.py smoke --out "$RUNNER_TEMP/g6"
+      - name: Persist candidate HTTP proof
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: g6-smoke-${{ github.run_id }}
+          path: ${{ runner.temp }}/g6/smoke.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Recheck HEAD, config, ownership and CAS before promotion
+        env:
+          DATION_DEPLOY_TOKEN: ${{ steps.auth.outputs.access_token }}
+        run: python3 scripts/release/g6_release.py promotion-intent --out "$RUNNER_TEMP/g6"
+      - name: Persist promotion intent before moving traffic
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: g6-promotion-intent-${{ github.run_id }}
+          path: ${{ runner.temp }}/g6/promotion-intent.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Promote exact revision, post-health and conditional rollback
+        env:
+          DATION_DEPLOY_TOKEN: ${{ steps.auth.outputs.access_token }}
+        run: python3 scripts/release/g6_release.py promote --out "$RUNNER_TEMP/g6"
+      - name: Finalize early failure without assuming traffic state
+        if: always()
+        env:
+          DATION_JOB_STATUS: ${{ job.status }}
+        run: python3 scripts/release/g6_orchestrator.py finalize --out "$RUNNER_TEMP/g6"
+      - name: Persist final release or failure receipt
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: g6-release-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/g6/G6_RELEASE_RECEIPT.json
+            ${{ runner.temp }}/g6/promoted.json
+          retention-days: 90
+          if-no-files-found: warn
+      - name: Remove ephemeral Registry access token
+        if: always()
+        run: rm -rf -- "$DOCKER_CONFIG"

@@ -1,5 +1,5 @@
 name: Runtime V2 - manual Gate C image publication
-run-name: Publish Dation ${{ inputs.application_sha }}
+run-name: Publish Dation ${{ inputs.application_sha }}${{ inputs.request_id && format(' / {0}', inputs.request_id) || '' }}
 
 on:
   workflow_dispatch:
@@ -7,6 +7,11 @@ on:
       application_sha:
         description: Full validated application SHA (40 hexadecimal characters)
         required: true
+        type: string
+      request_id:
+        description: Optional G6 correlation ID; empty preserves manual publication
+        required: false
+        default: ''
         type: string
       confirm_publish:
         description: Publish this SHA only; Cloud Run remains unchanged
@@ -28,6 +33,9 @@ jobs:
     timeout-minutes: 30
     env:
       DATION_APPLICATION_SHA: ${{ inputs.application_sha }}
+      DATION_PUBLISH_REQUEST_ID: ${{ inputs.request_id }}
+      DATION_UX_AUTODEPLOY_ENABLED: ${{ vars.DATION_UX_AUTODEPLOY_ENABLED }}
+      DATION_UX_BOOTSTRAP_APPROVED: ${{ vars.DATION_UX_BOOTSTRAP_APPROVED }}
     permissions:
       contents: read
       actions: read
