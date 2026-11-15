@@ -23,7 +23,7 @@ Los fixtures comprueban identidad de contenedores propios y eliminan credenciale
 
 ## Pruebas y capturas
 
-`T01`–`T12`: `JourneyNavigationTests`. `W01`–`W15`: UX04, incluido Engine08. `G01`–`G09`: UX05. `L01`–`L10`: navegación histórica OFF. `U`:19 pruebas nuevas puras +4 de serialización existentes. Controles Core responsive/zoom/touch/AA, Saga01 y borradores complementan la regresión UX01–05; FULL completa se exige por clasificación real R3, sin modificar guards/workflows.
+`T01`–`T13`: `JourneyNavigationTests`. `W01`–`W15`: UX04, incluido Engine08. `G01`–`G09`: UX05. `L01`–`L10`: navegación histórica OFF. `U`:19 pruebas nuevas puras +4 de serialización existentes. Controles Core responsive/zoom/touch/AA, Saga01 y borradores complementan la regresión UX01–05; FULL completa se exige por clasificación real R3, sin modificar guards/workflows.
 
 Evidencia en [evidence](evidence/): capturas reales de Core01/02/03 y Graph/Configuration/Dashboard a1536/1280/1024/768/390/320. Las vistas ON afirman exactamente tres botones de etapa en Studio, cero edición lateral y ubicación activa sin re-navegar. Graph mantiene una acción de edición canónica. `geometry.json` mide controles y sus contenedores, solapes entre controles, título/retorno, ausencia de barra redundante y overflow. `contrast.json` audita texto/controles con umbral AA, incluidos gradientes. Los PNG son del navegador de fixtures, no mockups ni producción.
 
@@ -49,7 +49,7 @@ PASS aquí refiere a las pruebas locales identificadas. AC36 exige además el re
 |12|T07 y owners: CTA existentes, sin nuevo Continuar|PASS|
 |13|T01/T07: aria-current y activo no-op|PASS|
 |14|T01: misma identidad DOM03→02→01→02→03|PASS|
-|15|T05/T07/W04: deep link y refresh preservan paso/Case|PASS|
+|15|T05/T07/T13/W04: deep link y refresh preservan paso/Case|PASS|
 |16|T01/T03/T11/L03: Back/Forward, cancelación y gates cambiados|PASS|
 |17|W02/T03: Graph→Core02 mismo Case sin runs|PASS|
 |18|T01/T07/W02: Graph→Core03|PASS|
@@ -57,7 +57,7 @@ PASS aquí refiere a las pruebas locales identificadas. AC36 exige además el re
 |20|T05/T12/W03: derivación y original sin cambios|PASS|
 |21|T05/T12/W09: parent/preparationId/refresh/replay|PASS|
 |22|T02/T05: Graph del Case original exacto|PASS|
-|23|T06/W08: Dashboard con Case/Node/Run exactos|PASS|
+|23|T06/T13/W08: Dashboard con Case/Node/Run exactos|PASS|
 |24|T06/U:404, mismatch y origen incompleto sin latest|PASS|
 |25|T06/T07: Config Anterior→Graph del mismo Case|PASS|
 |26|W08/U: Dashboard actual→Config; histórico/readonly→Graph|PASS|
@@ -90,6 +90,8 @@ PASS aquí refiere a las pruebas locales identificadas. AC36 exige además el re
 - Dos arranques locales aislados (touch Core e histórico OFF) mostraron la pantalla genérica de boot, antes de montar navegación. No se reprodujeron al repetir focalmente, sin cambios de código ni de esperas; la traza de consola/red del histórico quedó vacía. Causa inicial no confirmada: no se etiqueta como defecto funcional ni como infraestructura demostrada. El cierre exige su pasada final y FULL del candidato.
 
 - El fixture de roles combinaba una aprobación vigente y otro candidato de error activo; una tentativa directa de cierre fue rechazada por token cambiado. No se alteró el guard ni se agregó retry. El cohort archivado usa ahora un Case independiente close-ready y el flujo UI canónico; W08 y G03 mantienen las assertions de cierre. Se separan las cohortes de Dashboard fallido y Case archivado; no se simula archivado por SQL ni se omite la confirmación/token del cierre real.
+
+- Recuperación heredada: los callbacks de reload409 y retry503 reconstruían Core con sólo caseId/modelId y perdían origen/Run/preparación. T13 lo reprodujo y ahora verifica ambos retornos exactos. Se preserva la ruta validada en ambos callbacks; modo OFF conserva su comportamiento. La CI43773832833 del SHA3efdec22 fue cancelada antes de terminar por ese hallazgo; el PR registra la nueva CI completa del candidato corregido.
 
 ## Riesgos y límites
 

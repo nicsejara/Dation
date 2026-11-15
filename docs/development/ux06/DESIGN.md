@@ -10,6 +10,7 @@ Revisión productiva00015-gap, Journey ON y motores OFF: informados por el propi
 |---|---|---|---|
 |Volver al Graph grande + Administrar datos + Cancelar|ultimate-case-setup; navigate/editSource/returnFromCore|Core02 autocircular; Cancelar markSaved elimina borrador; origen duplicado|Un retorno compacto por whitelist y guard existente, sin marcar guardado|
 |Rail Core|wizard-ui.mountSetupSteps|show revela paneles; actual dispara onStep/replaceState de nuevo|Mismo form, no-op activo, Anterior en footer real, paso/URL sincronizados|
+|Recuperar409/503|ultimate-case-setup onReload/errorBox retry|Al descartar draft se perdían origen, Run y preparación|Preservar ruta validada; no confundir descarte de valores con contexto de navegación|
 |Back/Forward|workspace.restoreResource|history:false omite guard y remonta todo Core, pudiendo perder CSV|Restaurar paso compatible en form montado; salida protegida con índice de HistoryAPI del router existente|
 |Editar Decision Case lateral|navigation.mountStudioRail showEdit=true|Graph llama false, Config/Dashboard no; CTA redundante|Eliminar rama de dominio del owner común; exactamente04/05/06|
 |Editar Case funcional|UX05 command-toolbar/command-center|Core03 + origin canónico|Conservar única acción principal de Graph; breadcrumb Core permite edición contextual desde Studio|

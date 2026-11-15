@@ -1,0 +1,2 @@
+STATIC_OK backend/app/static/js/dispatch/cases/ultimate-case-setup.mjs
+STATIC_OK backend/tests/browser/test_journey_navigation_ux06.py
