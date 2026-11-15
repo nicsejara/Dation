@@ -84,3 +84,9 @@ FULL y flags OFF son obligatorios antes de revisión final. El resultado de CI, 
 ## Control final de CSV local sin guardar
 
 W14 reprodujo un defecto antes de integrar: saltar por el rail a Core03 con un CSV sólo local permitía crear el Case antes de resolver la selección. La validación compartida ahora bloquea ese submit antes de congelar la intención; conserva archivo y campos y recupera el progreso al guardar. W14 PASS (18,271 s), con flujos normal y sin datos también PASS en la tanda focal de tres. La CI del candidato anterior se canceló para evitar completar FULL sobre un SHA sustituido; el nuevo candidato requiere nuevamente su gate FAST/FULL completo. No se debilitaron assertions.
+
+## Corrección focal de expectativa histórica de E2E
+
+La ejecución FULL [43658139128](https://github.com/nicsejara/Dation/actions/runs/43658139128) aprobó Python, Node, los 344 tests de navegador, Docker y los 192 tests SQL. El último recorrido E2E falló en dos casos (`test_workflow` desktop/mobile), ambos en la misma comparación exacta de los títulos de Core. El test esperaba `01 Logistics Model`/`02 Data Contract`/`03 Decision Case`, mientras que el main inicial ya genera `01. Logistics Model`/`02. Data Contract`/`03. Decision Case`.
+
+Se reprodujeron los dos fallos en un checkout aislado de `4b66044806f93535a363ad8829c8eb003644958e`: misma línea 75, mismos dos fallos, sin errores de infraestructura. Es una expectativa obsoleta preexistente, no una regresión de UX04. Se actualizan sólo los tres textos esperados, conservando igualdad exacta, paneles, visibilidad, creación/ejecución/aprobación/navegación y los controles de seguridad del recorrido completo. Ambos E2E PASS (87,161 s) sobre la rama corregida. [Recibo focal baseline/corrección](evidence/workflow-labels.json). El producto no cambia con esta corrección; el nuevo SHA debe obtener FAST/FULL/required-gate terminales antes de cerrar la entrega.
