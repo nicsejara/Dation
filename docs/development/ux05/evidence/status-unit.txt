@@ -1,0 +1,23 @@
+✔ READY remains pending without granting execution (1.157992ms)
+✔ DATA_REQUIRED remains pending without granting execution (1.169629ms)
+✔ IN_PROGRESS remains pending without granting execution (0.111385ms)
+✔ COMPLETED remains pending without granting execution (0.078776ms)
+✔ UNKNOWN remains pending without granting execution (0.12161ms)
+✔ LOCKED is visually blocked without changing applicability (0.107889ms)
+✔ COMING_SOON is visually blocked without changing applicability (0.083564ms)
+✔ NOT_APPLICABLE is visually blocked without changing applicability (0.086898ms)
+✔ approval requires current server state and identity; permissions do not redefine it (0.193977ms)
+✔ dependency activation needs the exact approved upstream (0.602411ms)
+✔ targets fail closed across cases, nodes, views and absent run identities (1.278831ms)
+✔ result CTA preserves exact run and new run only returns to configuration (0.453951ms)
+✔ stale/errors remain historical reads and viewer receives no approval affordance (0.145445ms)
+✔ archived and inapplicable nodes never expose a new execution (0.149381ms)
+✔ action kinds require canonical view and blocked states keep history-only affordances (0.19595ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 14.667858
