@@ -58,10 +58,10 @@ export function mountDecisionCenter(root,getIdentity){
  function maintenance(c){
   const wrap=el('div',undefined,'center-maintenance'),trigger=button('',()=>{}),panel=el('div',undefined,'center-maintenance__menu');trigger.className='d-button d-button--ghost center-icon-button';trigger.append(icon('moreHorizontal'));trigger.setAttribute('aria-label','Acciones de '+c.friendly_id);panel.role='menu';
   const add=(text,fn)=>{const b=button(text,fn);b.role='menuitem';panel.append(b);};
-  if(writable())add('Editar nombre',()=>actions.edit(c));
+  if(writable())add(c.unified_journey_enabled?'Editar Decision Case':'Editar nombre',()=>c.unified_journey_enabled?window.DationDispatch.openCore(c.id,{coreStep:3,returnView:'platform-decisions',returnCenter:route}):actions.edit(c));
   add('Copiar ID',async()=>{try{await navigator.clipboard.writeText(c.friendly_id);notice='ID copiado.';}catch{notice='No se pudo copiar el ID. Podés seleccionarlo en el detalle.';}showNotice();});
   if(writable())add(c.status==='archived'?'Restaurar':'Archivar',()=>actions.edit(c,true));
-  wrap.append(trigger,panel);const menu=mountDropdown({trigger,panel});return {node:wrap,dispose:()=>menu.dispose()};
+  if(c.journey_lifecycle?.closed_at&&c.status==='archived')wrap.prepend(el('span','Cerrado por finalización','d-metadata'));else if(c.unified_journey_enabled&&c.status==='archived')wrap.prepend(el('span','Archivado sin cierre guiado','d-metadata'));wrap.append(trigger,panel);const menu=mountDropdown({trigger,panel});return {node:wrap,dispose:()=>menu.dispose()};
  }
  function pager(total,offset,change){const nav=el('nav',undefined,'center-pagination');nav.setAttribute('aria-label','Paginación');const prev=button('Anterior',()=>change(Math.max(0,offset-size))),next=button('Siguiente',()=>change(offset+size));prev.disabled=offset===0;next.disabled=offset+size>=total;nav.append(prev,el('span',total?`${Math.min(offset+1,total)}–${Math.min(offset+size,total)} de ${total}`:'0 resultados','d-metadata'),next);return nav;}
  function loading(target,drawer=false){target.setAttribute('aria-busy','true');const block=loadingState(drawer?'Cargando caso…':'Cargando Decision Center…',{rows:drawer?4:6});block.classList.add('center-loading');if(drawer)block.classList.add('center-loading--drawer');target.replaceChildren(block);}

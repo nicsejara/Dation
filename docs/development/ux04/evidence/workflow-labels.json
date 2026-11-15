@@ -1,0 +1,57 @@
+{
+  "baseline_sha": "4b66044806f93535a363ad8829c8eb003644958e",
+  "failed_ci_run": 43658139128,
+  "classification": "PREEXISTING_OBSOLETE_EXPECTATION",
+  "product_changed": false,
+  "file": "backend/tests/e2e/browser_journey.py",
+  "old_expected": [
+    "01 Logistics Model",
+    "02 Data Contract",
+    "03 Decision Case"
+  ],
+  "baseline_exact_titles": [
+    "01. Logistics Model",
+    "02. Data Contract",
+    "03. Decision Case"
+  ],
+  "baseline": {
+    "passed": false,
+    "tests": 2,
+    "failures": [
+      "test_workflow.WorkflowTests.test_browser_complete_workflow_at_mobile_width",
+      "test_workflow.WorkflowTests.test_browser_creation_execution_approval_navigation_and_mobile_history"
+    ],
+    "errors": [],
+    "skipped": [],
+    "scope": "FOCUSED_RECHECK",
+    "selected_modules": [
+      "test_workflow.WorkflowTests.test_browser_complete_workflow_at_mobile_width",
+      "test_workflow.WorkflowTests.test_browser_creation_execution_approval_navigation_and_mobile_history"
+    ],
+    "failure_details": [
+      {
+        "test": "test_workflow.WorkflowTests.test_browser_complete_workflow_at_mobile_width",
+        "traceback": "Traceback (most recent call last):\n  File \"/workspace/work/dation-ux04-baseline-qa/backend/tests/e2e/test_workflow.py\", line 320, in test_browser_complete_workflow_at_mobile_width\n    self.browser_journey('mobile',{'width':390,'height':844})\n    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/work/dation-ux04-baseline-qa/backend/tests/e2e/test_workflow.py\", line 405, in browser_journey\n    self.assertEqual(result.returncode,0,result.stdout+result.stderr)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 1 != 0 : Traceback (most recent call last):\n  File \"/workspace/work/dation-ux04-baseline-qa/backend/tests/e2e/browser_journey.py\", line 366, in <module>\n    asyncio.run(journey())\n    ~~~~~~~~~~~^^^^^^^^^^^\n  File \"/usr/lib/python3.13/asyncio/runners.py\", line 195, in run\n    return runner.run(main)\n           ~~~~~~~~~~^^^^^^\n  File \"/usr/lib/python3.13/asyncio/runners.py\", line 118, in run\n    return self._loop.run_until_complete(task)\n           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^\n  File \"/usr/lib/python3.13/asyncio/base_events.py\", line 725, in run_until_complete\n    return future.result()\n           ~~~~~~~~~~~~~^^\n  File \"/workspace/work/dation-ux04-baseline-qa/backend/tests/e2e/browser_journey.py\", line 75, in journey\n    assert await panels.locator('summary .ultimate-disclosure__title').all_text_contents()==[\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        '01 Logistics Model','02 Data Contract','03 Decision Case']\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n\n"
+      },
+      {
+        "test": "test_workflow.WorkflowTests.test_browser_creation_execution_approval_navigation_and_mobile_history",
+        "traceback": "Traceback (most recent call last):\n  File \"/workspace/work/dation-ux04-baseline-qa/backend/tests/e2e/test_workflow.py\", line 317, in test_browser_creation_execution_approval_navigation_and_mobile_history\n    self.browser_journey('desktop',{'width':1440,'height':1000})\n    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/work/dation-ux04-baseline-qa/backend/tests/e2e/test_workflow.py\", line 405, in browser_journey\n    self.assertEqual(result.returncode,0,result.stdout+result.stderr)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 1 != 0 : Traceback (most recent call last):\n  File \"/workspace/work/dation-ux04-baseline-qa/backend/tests/e2e/browser_journey.py\", line 366, in <module>\n    asyncio.run(journey())\n    ~~~~~~~~~~~^^^^^^^^^^^\n  File \"/usr/lib/python3.13/asyncio/runners.py\", line 195, in run\n    return runner.run(main)\n           ~~~~~~~~~~^^^^^^\n  File \"/usr/lib/python3.13/asyncio/runners.py\", line 118, in run\n    return self._loop.run_until_complete(task)\n           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^\n  File \"/usr/lib/python3.13/asyncio/base_events.py\", line 725, in run_until_complete\n    return future.result()\n           ~~~~~~~~~~~~~^^\n  File \"/workspace/work/dation-ux04-baseline-qa/backend/tests/e2e/browser_journey.py\", line 75, in journey\n    assert await panels.locator('summary .ultimate-disclosure__title').all_text_contents()==[\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        '01 Logistics Model','02 Data Contract','03 Decision Case']\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n\n"
+      }
+    ]
+  },
+  "corrected": {
+    "passed": true,
+    "tests": 2,
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "scope": "FOCUSED_RECHECK",
+    "selected_modules": [
+      "test_workflow.WorkflowTests.test_browser_complete_workflow_at_mobile_width",
+      "test_workflow.WorkflowTests.test_browser_creation_execution_approval_navigation_and_mobile_history"
+    ],
+    "failure_details": []
+  },
+  "corrected_seconds": 87.161,
+  "production_operations": false
+}

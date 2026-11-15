@@ -73,7 +73,7 @@ async def journey():
             assert await page.locator('[data-dation-test="core-contract"]').count()==1
             assert await page.locator('[data-dation-test="core-case"]').count()==1
             assert await panels.locator('summary .ultimate-disclosure__title').all_text_contents()==[
-                '01 Logistics Model','02 Data Contract','03 Decision Case']
+                '01. Logistics Model','02. Data Contract','03. Decision Case']
             assert await panels.nth(0).get_attribute('open') is not None
             assert await panels.nth(1).get_attribute('open') is None
             assert await panels.nth(2).get_attribute('open') is not None

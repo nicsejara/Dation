@@ -1,0 +1,13 @@
+✔ backend/tests/test_case_navigation.mjs (108.000284ms)
+✔ backend/tests/test_journey_routes.mjs (60.740233ms)
+✔ backend/tests/test_ultimate_case_navigation.mjs (59.725503ms)
+✔ backend/tests/test_ultimate_data_navigation.mjs (56.197499ms)
+✔ backend/tests/test_ultimate_graph_navigation.mjs (68.990828ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 365.493676

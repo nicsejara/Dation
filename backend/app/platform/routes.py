@@ -14,6 +14,8 @@ from app.platform.ultimate_routes import router as ultimate_router
 from app.platform.ultimate_data_routes import router as ultimate_data_router
 from app.platform.ultimate_graph_routes import router as ultimate_graph_router
 
+from app.platform.decision_journey_routes import router as journey_router
+
 router=APIRouter(prefix='/api/platform')
 router.include_router(data_router)
 router.include_router(decision_router)
@@ -24,6 +26,7 @@ router.include_router(onboarding_router)
 router.include_router(ultimate_router)
 router.include_router(ultimate_data_router)
 router.include_router(ultimate_graph_router)
+router.include_router(journey_router)
 
 @router.get('/home')
 async def get_home(ctx=Depends(require_upload_access)):

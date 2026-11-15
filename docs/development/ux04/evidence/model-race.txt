@@ -1,0 +1,7 @@
+test_13_late_validation_cannot_mix_model_versions (test_unified_decision_journey.UnifiedDecisionJourneyTests.test_13_late_validation_cannot_mix_model_versions) ... Executing <Task pending name='Task-11' coro=<UnifiedDecisionJourneyTests.asyncTearDown() running at /workspace/work/dation-ux04/backend/tests/browser/test_unified_decision_journey.py:31> wait_for=<Future pending cb=[Task.task_wakeup()] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:448> cb=[_run_until_complete_cb() at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/playwright/_impl/_connection.py:264] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:100> took 0.184 seconds
+ok
+
+----------------------------------------------------------------------
+Ran 1 test in 16.041s
+
+OK

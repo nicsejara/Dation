@@ -8,19 +8,26 @@ export function wizardIcon(kind){
 }
 
 // One mounted form; changing steps only reveals the existing panels.
-export function mountSetupSteps(form,panels,{fresh,available}){
+export function mountSetupSteps(form,panels,{fresh,available,unified=false,initialStep=null,onStep=()=>{}}){
  form.classList.add('core-wizard');
  const nav=el('nav',undefined,'core-wizard-steps');nav.setAttribute('aria-label','Etapas de Core Configuration');nav.dataset.dationTest='core-steps';
  const workspace=el('div',undefined,'core-wizard-workspace');form.append(nav,workspace);
- const steps=[['Logistics Model','Modelo operativo'],['Data Contract','Datos y estructura'],['Decision Case','Caso y alcance']];
- let active=fresh?0:2;
+ const steps=unified?[['Logistics Model','Modelo operativo'],['Data Contract & Preparation','Estructura y preparación de datos'],['Decision Case','Objetivo y alcance de la decisión']]:[['Logistics Model','Modelo operativo'],['Data Contract','Datos y estructura'],['Decision Case','Caso y alcance']];
+ let active=initialStep?initialStep-1:fresh?0:2;
  const controls=steps.map(([label,copy],i)=>{
   const action=button('',()=>show(i,true)),number=el('span',String(i+1),'core-step-number'),text=el('span',undefined,'core-step-copy'),status=el('span','','core-step-status');
   text.append(el('strong',label),el('span',copy),status);action.append(number,text);action.dataset.dationTest='core-step-'+(i+1);action.setAttribute('aria-controls','core-wizard-panel-'+i);nav.append(action);
   const panel=panels[i];panel.id='core-wizard-panel-'+i;workspace.append(panel);return {action,status};
  });
  function update(){for(const [i,{action,status}]of controls.entries()){action.disabled=!available(i);if(i===active)action.setAttribute('aria-current','step');else action.removeAttribute('aria-current');status.textContent=!available(i)?'Pendiente de modelo':panels[i].querySelector('.ultimate-disclosure__status')?.textContent||'';}}
- function show(index,focus=false){if(!available(index))return;active=index;panels.forEach((panel,i)=>{panel.hidden=i!==index;if(i===index)panel.open=true;});form.dataset.activeStep=String(index+1);const footer=form.querySelector('.ultimate-footer');if(footer)footer.hidden=index!==2;update();if(focus)panels[index].querySelector('summary').focus();}
+ function show(index,focus=false){if(!available(index))return;active=index;panels.forEach((panel,i)=>{panel.hidden=i!==index;if(i===index)panel.open=true;});form.dataset.activeStep=String(index+1);const footer=form.querySelector('.ultimate-footer');if(footer)footer.hidden=index!==2;update();onStep(index);if(focus)panels[index].querySelector(unified?'header':'summary')?.focus();}
  show(active);
  return {show,update,workspace,get active(){return active;}};
+}
+
+// Remove the redundant principal disclosure semantically; inner details stay native.
+export function flattenCorePanel(panel){
+ const old=panel.details,next=document.createElement('section');for(const a of old.attributes)if(a.name!=='open')next.setAttribute(a.name,a.value);
+ const summary=old.querySelector(':scope > summary'),header=document.createElement('header');header.className=summary.className;header.tabIndex=-1;
+ summary.querySelector('.ultimate-disclosure__chevron')?.remove();while(summary.firstChild)header.append(summary.firstChild);summary.remove();next.append(header);while(old.firstChild)next.append(old.firstChild);old.replaceWith(next);panel.details=next;
 }

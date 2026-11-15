@@ -3,7 +3,8 @@ import {api,post,errorBox} from '../shared.mjs';
 import {scopeFor,createScope} from '../lifecycle.mjs';
 import {ensureStylesheet,ensureDecisionCaseStyles} from '../styles.mjs';
 import {loadingState} from '../../platform/components.mjs';
-import {el,button} from '../models/forms.mjs';
+import {journeyEnabled,editSource,origin,mountStudioRail} from '../journey/navigation.mjs';
+import {el,button,confirmAction} from '../models/forms.mjs';
 import {heroMarkup,graphNodeMarkup} from './decision-map.mjs';
 import {graphStateUi,graphTarget} from '../navigation/ultimate-graph.mjs';
 import {openCaseSelector} from '../traceability-ui.mjs';
@@ -12,7 +13,7 @@ import {mountResponsibilitySelector} from './workflow-responsibility.mjs';
 export async function mountUltimateGraph(root,{route,navigate,onContext}){
  const scope=scopeFor(root);root.append(loadingState('Recuperando mapa de decisiones…'));
  let pickerVersion=0,activePicker=null;const historyVersions=new Map();
- const follow=t=>{const target=graphTarget(t);return target&&navigate(target.view,target);};
+ const follow=async t=>{const target=graphTarget(t);if(!target)return;if(target.view==='logistics-case-data'&&window.dationUnifiedJourney)return editSource(root,scope,route,navigate);return navigate(target.view,target);};
  try{
   await ensureDecisionCaseStyles();await ensureStylesheet('ultimate-graph-styles','/static/css/ultimate-graph.css','t5-v1');
   const base='/api/platform/logistics-cases/'+route.caseId,query=new URLSearchParams();
@@ -20,14 +21,17 @@ export async function mountUltimateGraph(root,{route,navigate,onContext}){
   let data=await api(base+'/graph?'+query,{signal:scope.signal});if(!scope.active)return;
   const selected=()=>data.graph.nodes.find(n=>n.id===route.nodeId);
   if(route.view==='logistics-config'&&selected()?.actions.configure.allowed){data=await api(base+'/graph/config/'+route.nodeId,{signal:scope.signal});if(!scope.active)return;}
+  const unified=await journeyEnabled(scope);const journey=unified?await api(base+'/journey',{signal:scope.signal}):null;
   onContext?.(data.case,data.graph);
   root.className='dispatch dispatch-upload-pro dispatch-decision-map dispatch-decision-map--premium dispatch-decision-map--case-v2 ultimate-graph-view';root.innerHTML=heroMarkup(data.case);
   const actions=el('div',undefined,'t5-actions'),context=el('section',undefined,'d-card t5-context');
   const map=()=>navigate('logistics-map',{caseId:route.caseId,nodeId:null,runId:null});
-  actions.append(button('Mapa de decisiones',map),button('Datos del Case',()=>navigate('logistics-case-data',{caseId:route.caseId,nodeId:null,runId:null})),button('Contexto del Case',()=>navigate('logistics-case-setup',{caseId:route.caseId,nodeId:null,runId:null})));
+  const editCase=()=>navigate('logistics-case-setup',{caseId:route.caseId,coreStep:3,...origin(route)});
+  actions.append(button('Mapa de decisiones',map),button(unified?'Editar datos de origen':'Datos del Case',()=>unified?editSource(root,scope,route,navigate):navigate('logistics-case-data',{caseId:route.caseId,nodeId:null,runId:null})),button(unified?'Editar Decision Case':'Contexto del Case',editCase));
+  if(unified){const list=[...actions.querySelectorAll('button')];list[1].disabled=!journey.can_prepare;list[2].disabled=!journey.can_edit_context;}
   const choose=button('Seleccionar Decision Case',()=>picker(0,choose));actions.append(choose);root.append(actions);
   context.append(el('h2',data.case.label,'d-card-title'),el('p',data.model.name+' · '+data.case.planning_start+' a '+data.case.planning_end,'d-body'),el('p','Pack versión '+data.pack_version.version+' · '+data.graph.approved_count+' de '+data.graph.nodes.length+' decisiones aprobadas.','d-metadata'));root.append(context);
-  if(route.view==='logistics-map'){
+  if(route.view==='logistics-map'&&!unified){
    const owner=el('div');context.append(owner);mountResponsibilitySelector(owner,{caseId:route.caseId,stageKey:'data_owner',snapshot:data.responsibilities,onSaved:map});
   }
   if(data.case.status==='archived')root.append(el('p','Case archivado. El historial permanece disponible en modo de lectura.','t5-readonly'));
@@ -57,9 +61,9 @@ export async function mountUltimateGraph(root,{route,navigate,onContext}){
      for(const [slot,label]of [['transport_demand','Órdenes / Demanda'],['transport_resources','Flota / Recursos']])readiness.append(el('p',label+': '+(node.requirements.some(r=>r.slot===slot)?'Pendiente de completar':node.read_set[slot]?'Publicado':'Pendiente'),'d-body'));
      readiness.append(el('p','Configuración: '+(node.actions.configure.allowed?'Disponible':'Revisá los requisitos del Case'),'d-metadata'),el('p','Decisión: '+graphStateUi(node.node_state).label,'d-metadata'));
      const dataTarget=()=>navigate('logistics-case-data',{caseId:route.caseId,nodeId:null,runId:null});
-     readiness.append(button('Cargar nuevos datos',dataTarget),button('Reutilizar inputs compatibles',dataTarget));extra.append(readiness);
+     if(unified)readiness.append(button(node.node_state==='DATA_REQUIRED'?'Preparar datos':'Editar datos de origen',()=>editSource(root,scope,route,navigate)));else readiness.append(button('Cargar nuevos datos',dataTarget),button('Reutilizar inputs compatibles',dataTarget));extra.append(readiness);
     }
-    const reasons=node.actions.configure.reasons||[];if(reasons.length)extra.append(el('p',reasons.includes('DATA_OWNER_REQUIRED')?'Asigná un Data Owner activo en este Map.':reasons.includes('DECISION_OWNER_REQUIRED')?'Asigná un Decision Owner activo en este Map.':'Acceso de sólo lectura para esta decisión.','d-metadata'));
+    const reasons=node.actions.configure.reasons||[];if(reasons.length)extra.append(el('p',reasons.includes('DATA_OWNER_REQUIRED')?unified?'Asigná un Data Owner activo desde Core paso 02.':'Asigná un Data Owner activo en este Map.':reasons.includes('DECISION_OWNER_REQUIRED')?'Asigná un Decision Owner activo en este Map.':'Acceso de sólo lectura para esta decisión.','d-metadata'));
     extra.append(button('Historial de '+node.label,()=>history(node,extra,0)));host.append(extra);
     if(index<data.graph.nodes.length-1){const edge=el('div','↓','t5-edge');edge.setAttribute('aria-hidden','true');list.append(edge);}
    }
@@ -120,6 +124,17 @@ export async function mountUltimateGraph(root,{route,navigate,onContext}){
     if(!data.items.length)section.append(el('p','Todavía no hay corridas registradas.','d-metadata'));
     const paging=el('div',undefined,'t5-actions'),back=button('Corridas anteriores',()=>history(node,parent,offset+25)),previous=button('Volver a corridas recientes',()=>history(node,parent,offset-25));back.disabled=offset+25>=data.total;previous.disabled=offset===0;paging.append(previous,back);section.append(paging);
    }catch(error){if(scope.active)parent.append(el('p',error.message,'d-body'));}
+  }
+  if(unified){
+   await ensureStylesheet('ultimate-foundation-styles','/static/css/ultimate-foundation.css','t3-v1');
+   const pack=await api(base+'/data',{signal:scope.signal});if(!scope.active)return;
+   context.append(el('h3','Data Pack publicado'),el('p','Versión '+pack.version.version+' · '+pack.version.created_at+' · '+(pack.entries.length?pack.entries.map(e=>(e.slot_key==='transport_demand'?'Demanda':'Recursos')+': '+e.record_count+' filas').join(' · '):'Sin archivos publicados'),'d-metadata'),el('p','Data Owner: '+(data.responsibilities.stages.data_owner?.owner?.name||'Pendiente'),'d-metadata'));
+   for(const b of root.querySelectorAll('[data-map-action=data]'))b.textContent='Preparar datos';
+   if(route.view==='logistics-map'){
+    const close=button('Cerrar Decision Case',async()=>{if(!await confirmAction(root,scope,'Cerrar Decision Case','Se conservarán el Case, sus corridas, aprobaciones y datos. El servidor volverá a verificar su vigencia y que no haya trabajo pendiente.','Cerrar Decision Case'))return;close.disabled=true;try{await post(base+'/close',{token:journey.token},{signal:scope.signal});navigate('platform-decisions',{caseId:null,nodeId:null,runId:null});}catch(e){context.append(el('p',e.message,'d-field__error'));close.disabled=false;}});
+    close.disabled=!journey.can_close;close.title=journey.reason||'Cierre explícito con historial conservado';context.append(close);if(journey.reason)context.append(el('p',journey.reason,'d-metadata'));if(journey.lifecycle?.closed_at)context.append(el('p','Cerrado por finalización · '+journey.lifecycle.closed_at,'d-metadata'));
+   }
+   mountStudioRail(root,scope,{route,data,navigate,onEdit:journey.can_edit_context?editCase:null});
   }
   root.dataset.ultimateReady='true';root.dataset.graphReady='true';
  }catch(error){if(scope.active)errorBox(root,error,()=>navigate('logistics-map',{caseId:route.caseId,nodeId:null,runId:null,replace:true}));}

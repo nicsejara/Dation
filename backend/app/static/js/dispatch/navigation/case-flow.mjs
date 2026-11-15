@@ -41,7 +41,10 @@ export function revealCurrentStep(root){
  root.scrollLeft+=offset-(root.clientWidth-step.offsetWidth)/2;
 }
 export function renderCaseFlow(root,{view,route,state={}}){
- const visible=[...views,'logistics-case-data'].includes(view);
+ const unified=!!globalThis.window?.dationUnifiedJourney;
+ const visible=!unified&&[...views,'logistics-case-data'].includes(view);
+ root.parentElement.querySelector('.journey-current-step')?.remove();
+ root.classList.remove('journey-six-steps');
  root.parentElement.hidden=!visible;
  if(!visible){root.replaceChildren();signatures.delete(root);return;}
  const steps=caseFlowSteps(view,route,state),signature=JSON.stringify(steps);
@@ -65,3 +68,5 @@ export function mountDecisionViews(root,{state,nodeId,view}){
   bindDecisionRail(host,{onOpenNode:id=>{const target=resolveDecisionDestination(id,current.nodes[id],view,{decisionCase:current,workflow:state.workflow});if(target)open({...target,caseId:current.id,nodeId:id,runId:target.run_id});}});
  }
 }
+
+if(typeof window!=='undefined')window.addEventListener?.('dation:core-step',()=>{window.dationRenderContextNavigation?.();window.dationRenderCaseFlow?.('logistics-case-setup');});

@@ -55,7 +55,12 @@ async def enrich_center(ctx,items):
         async with semaphore:
             raw=await snapshot(ctx,item['id']);data=project(raw)
             return center_item(item,{**data,'runs':raw['runs']})
-    return await asyncio.gather(*(enrich(item) for item in items))
+    result=await asyncio.gather(*(enrich(item) for item in items))
+    from app.services import decision_journey_service as journey
+    if await journey.capabilities(ctx):
+        events=await journey.call(ctx,'lifecycles',case_ids=[item['id'] for item in result if item.get('workflow_version')==2])
+        result=[{**item,'unified_journey_enabled':True,'journey_lifecycle':events.get(item['id'])} if item.get('workflow_version')==2 else item for item in result]
+    return result
 
 async def case_context(ctx,case_id):
     from app.services.logistics_model_service import enrich_context

@@ -1,6 +1,6 @@
 // T4 composes the existing upload cards and validation drawer. No graph states.
 import {api,errorBox,download} from '../shared.mjs';
-import {scopeFor} from '../lifecycle.mjs';
+import {scopeFor,createScope} from '../lifecycle.mjs';
 import {ensureStylesheet} from '../styles.mjs';
 import {loadingState,mountDialog} from '../../platform/components.mjs';
 import {el,button,pageHeader,draftStore,confirmAction} from '../models/forms.mjs';
@@ -9,12 +9,12 @@ import {createValidationDrawer} from './validation-report.mjs';
 
 const ENTITIES=[['transport_demand','Demanda','orders'],['transport_resources','Recursos','fleet']];
 
-async function request(path,options={}){
+export async function request(path,options={}){
  let response;try{response=await fetch(path,options);}catch(e){if(e.name==='AbortError')throw e;throw Object.assign(new Error('No se confirmó la operación. Conservá el CSV y recuperá el candidato.'),{status:503});}
  const data=await response.json();if(!response.ok)throw Object.assign(new Error(typeof data.detail==='string'?data.detail:'Revisá las filas y columnas indicadas.'),{status:response.status,report:data.detail?.errors?data.detail:null});return data;
 }
 
-function previewTable(parent,records,label){
+export function previewTable(parent,records,label){
  if(!records?.length){parent.append(el('p','Sin filas para mostrar.','d-metadata'));return;}
  const wrap=el('div',undefined,'dispatch-table-wrap');wrap.tabIndex=0;wrap.role='region';wrap.setAttribute('aria-label',label);
  const table=el('table'),head=el('thead'),titles=el('tr'),columns=Object.keys(records[0]);
@@ -28,22 +28,22 @@ function showContract(root,scope,contract,source){
  for(const f of contract.fields){const tr=el('tr');for(const value of [f.public_header,f.type+(f.unit?' · '+f.unit:''),Object.keys(f.applies_when).length?JSON.stringify(f.applies_when):'Todas las filas',(f.nullable?'Puede ser desconocido / vacío. ':'Requerido. ')+JSON.stringify(f.validation)+' · '+f.examples.join(', ')])tr.append(el('td',value));rows.append(tr);}table.append(rows);wrap.append(table);body.append(wrap);const actions=el('div',undefined,'d-modal__actions'),close=button('Cerrar',()=>mounted.close());actions.append(close);dialog.append(body,actions);root.append(dialog);const mounted=mountDialog({dialog,initialFocus:close});dialog.addEventListener('close',()=>{mounted.dispose();dialog.remove();source?.focus();},{once:true});scope.own(()=>{mounted.dispose();dialog.remove();});mounted.open();
 }
 
-export async function mountCaseData(root,{route,navigate,onContext}){
- delete root.dataset.ultimateReady;const scope=scopeFor(root);root.className='dispatch dispatch-upload-pro d-platform ultimate-foundation ultimate-case-data';root.append(loadingState('Recuperando Data Pack…'));
+export async function mountCaseData(root,{route,navigate,onContext,embedded=false,guarded=false}){
+ delete root.dataset.ultimateReady;delete root.dataset.packReady;root.inert=true;const scope=embedded?createScope(root):scopeFor(root);root.className='dispatch dispatch-upload-pro d-platform ultimate-foundation ultimate-case-data';root.append(loadingState('Recuperando Data Pack…'));
  if(!route.caseId){errorBox(root,Object.assign(new Error('Elegí un Case para administrar sus datos.'),{status:404}),()=>navigate('logistics-case-setup',{caseId:null}));return;}
  try{
   await ensureStylesheet('ultimate-foundation-styles','/static/css/ultimate-foundation.css','t3-v1');await ensureStylesheet('ultimate-case-data-styles','/static/css/ultimate-case-data.css','t4-v1');
   const base='/api/platform/logistics-cases/'+route.caseId+'/data',data=await api(base,{signal:scope.signal});if(!scope.active)return;
   const graphData=await api('/api/platform/logistics-cases/'+route.caseId+'/graph',{signal:scope.signal});if(!scope.active)return;onContext?.(data.case,graphData.graph);
   const store=draftStore('pack',route.caseId),draft=store.read()||{selection:{},uploadIntents:{},publication:null};draft.selection||={};draft.uploadIntents||={};const save=()=>store.write(draft);
-  root.replaceChildren();const header=pageHeader(root,'Datos del Case',data.case.label+' · '+data.case.planning_start+' a '+data.case.planning_end);header.append(button('Contexto del Case',()=>navigate('logistics-case-setup',{caseId:route.caseId})));
+  root.replaceChildren();const header=embedded?el('div'):pageHeader(root,'Datos del Case',data.case.label+' · '+data.case.planning_start+' a '+data.case.planning_end);if(embedded){root.append(header);header.hidden=true;}header.append(button('Contexto del Case',()=>navigate('logistics-case-setup',{caseId:route.caseId})));
   header.append(button('Volver al Decision Map',()=>navigate('logistics-map',{caseId:route.caseId,nodeId:null,runId:null})));
   const message=el('p','Validar o guardar un candidato no cambia el Pack publicado.','d-metadata');message.dataset.packMessage='';message.role='status';root.append(message);
   const current=el('section',undefined,'d-card t4-current'),headline=el('h2','Pack · versión '+data.version.version,'d-card-title');headline.dataset.packCurrentVersion=String(data.version.version);current.append(headline,el('p','Revisión '+data.pack.revision+' · '+(data.entries.length?data.entries.length+' entradas publicadas':'Pack inicial vacío')+'. El Case existe aunque todavía no tenga archivos.','d-body'),el('p','Volvé al Decision Map para revisar los requisitos y la disponibilidad de cada decisión después de publicar los datos.','d-metadata'));
   if(!data.can_edit)current.append(el('p','Publicación cerrada o acceso de sólo lectura. Los snapshots existentes se conservan.','d-body'));root.append(current);
   const validationDrawer=createValidationDrawer(scope),slots=el('div',undefined,'t4-slots');root.append(slots);const pendingFiles=new Set();
-  const leave=()=>!pendingFiles.size||window.confirm('Tenés un archivo seleccionado sin guardar como candidato. Conservá el CSV antes de salir.');window.dationUltimateCanLeave=leave;scope.own(()=>{if(window.dationUltimateCanLeave===leave)delete window.dationUltimateCanLeave;});scope.listen(window,'beforeunload',e=>{if(pendingFiles.size){e.preventDefault();e.returnValue='';}});
-  const reload=()=>navigate('logistics-case-data',{caseId:route.caseId,replace:true});
+  const earlierLeave=embedded?window.dationUltimateCanLeave:null;const leave=()=>!pendingFiles.size||window.confirm('Tenés un archivo seleccionado sin guardar como candidato. Conservá el CSV antes de salir.');const combinedLeave=()=>leave()&&(!earlierLeave||earlierLeave());window.dationUltimateCanLeave=combinedLeave;scope.own(()=>{if(window.dationUltimateCanLeave===combinedLeave){if(earlierLeave)window.dationUltimateCanLeave=earlierLeave;else delete window.dationUltimateCanLeave;}});scope.listen(window,'beforeunload',e=>{if(pendingFiles.size){e.preventDefault();e.returnValue='';}});
+  const reload=()=>embedded?mountCaseData(root,{route,navigate,onContext,embedded,guarded}):navigate('logistics-case-data',{caseId:route.caseId,replace:true});
   function tell(error){if(!scope.active)return;message.textContent=error.message;message.role='alert';}
   const publishArea=el('section',undefined,'d-card t4-publish');let publicationBusy=false;
   const selections=el('p',undefined,'d-body'),publish=button('Publicar versión del Pack',()=>publishSelection(),'primary');
@@ -53,7 +53,7 @@ export async function mountCaseData(root,{route,navigate,onContext}){
    try{
     if(!recover&&!await confirmAction(root,scope,'Publicar Data Pack','Se creará una versión inmutable con el manifest completo. Los snapshots anteriores se conservan.','Publicar Pack'))return;
     const body=draft.publication||{publication_id:crypto.randomUUID(),expected_revision:data.pack.revision,selection:Object.values(draft.selection)};
-    draft.publication=body;save();const result=await request(base+'/publish',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:scope.signal});
+    draft.publication=body;save();const result=await request(guarded?'/api/platform/logistics-cases/'+route.caseId+'/journey/publish':base+'/publish',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:scope.signal});
     if(!scope.active)return;draft.publication=null;draft.selection={};save();await reload();
    }catch(error){if(scope.active){tell(error);if(error.status===409){const review=button('Recargar Pack y revisar',()=>{draft.publication=null;save();reload();});publishArea.append(review);}else message.textContent='No se confirmó la publicación. Recuperá la misma intención antes de publicar otra versión.';}}
    finally{publicationBusy=false;if(scope.active)reflectSelection();}
@@ -105,6 +105,6 @@ export async function mountCaseData(root,{route,navigate,onContext}){
   const history=el('section',undefined,'d-card t4-history');history.append(el('h2','Historial del Pack','d-card-title'));let historyOffset=0;
   const historyRows=el('div'),historyNext=button('Versiones anteriores',async()=>{try{historyOffset+=20;const older=await api(base+'?offset='+historyOffset,{signal:scope.signal});if(scope.active)renderHistory(older.history,older.history_total);}catch(error){tell(error);}});history.append(historyRows,historyNext);root.append(history);
   function renderHistory(versions,total){historyRows.replaceChildren();for(const v of versions){const row=el('div',undefined,'t4-history-row');row.append(el('span','Versión '+v.version+(v.id===data.version.id?' · vigente':''),'d-body'),button('Ver manifest de versión '+v.version,async()=>{try{const value=await api(base+'/versions/'+v.id,{signal:scope.signal});if(!scope.active)return;const details=el('section',undefined,'d-card t4-manifest');details.append(el('h3','Manifest de versión '+v.version,'d-card-title'));for(const entry of value.entries)details.append(el('p',entry.slot_key+' · '+entry.record_count+' filas · '+entry.canonical_sha256,'d-id'));if(!value.entries.length)details.append(el('p','Manifest vacío inicial.','d-body'));history.append(details);}catch(error){tell(error);}}));historyRows.append(row);}historyNext.disabled=historyOffset+20>=total;}renderHistory(data.history,data.history_total);
-  root.dataset.ultimateReady='true';
- }catch(error){if(scope.active)errorBox(root,error,()=>navigate('logistics-case-data',{caseId:route.caseId,replace:true}));}
+  root.inert=false;if(embedded)root.dataset.packReady='true';else root.dataset.ultimateReady='true';
+ }catch(error){root.inert=false;if(scope.active)errorBox(root,error,()=>navigate('logistics-case-data',{caseId:route.caseId,replace:true}));}
 }

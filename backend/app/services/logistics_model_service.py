@@ -34,7 +34,9 @@ async def call(ctx,operation,arguments=None):
         'actor_user_id':ctx.user_id,'operation':operation,'arguments':arguments or {}})
 
 
-async def capabilities(ctx):return await call(ctx,'capabilities')
+async def capabilities(ctx):
+    from app.services.decision_journey_service import capabilities as journey_capabilities
+    return {**await call(ctx,'capabilities'),'unified_journey_enabled':await journey_capabilities(ctx)}
 
 
 async def list_models(ctx,**options):return await call(ctx,'model_list',options)

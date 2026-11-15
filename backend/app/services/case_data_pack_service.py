@@ -146,7 +146,7 @@ async def upload(ctx,case_id,entity,contents,filename,upload_id,expected):
     return await recover(ctx,case_id,upload_id)
 
 
-async def publication(ctx,case_id,payload):
+async def publication(ctx,case_id,payload,*,guarded=False):
     body=payload.model_dump(mode='json',exclude_none=True);body['selection'].sort(key=lambda item:item['slot_key'])
     intent=snapshot_hash('ultimate_pack_publication_intent_v1',{'actor':ctx.user_id,'case_id':str(case_id),**body})
     replay=await call(ctx,'replay',case_id=str(case_id),publication_id=body['publication_id'],intent_hash=intent)
@@ -161,7 +161,12 @@ async def publication(ctx,case_id,payload):
     version_id=uuid5(UUID(body['publication_id']),'pack-version-v1')
     semantic_entries=[{k:e[k] for k in ['slot_key','dataset_id','contract_id','contract_hash','raw_sha256','canonical_sha256','normalizer_version','normalized_bucket','normalized_path','record_count']} for e in entries]
     manifest={'version':plan['next_version'],'workspace_id':ctx.workspace_id,'case_id':str(case_id),'pack_id':plan['pack']['id'],'pack_version_id':str(version_id),'entries':semantic_entries}
-    return await call(ctx,'publish',**body,case_id=str(case_id),intent_hash=intent,contracts=contracts,entries=entries,
+    async def commit(**arguments):
+        if guarded:
+            from app.services.decision_journey_service import call as journey_call
+            return await journey_call(ctx,'guarded_publish',case_id=str(case_id),publication_arguments=arguments)
+        return await call(ctx,'publish',**arguments)
+    return await commit(**body,case_id=str(case_id),intent_hash=intent,contracts=contracts,entries=entries,
         expected_current_version_id=plan['pack']['current_version_id'],version_id=str(version_id),
         manifest_hash=snapshot_hash('case_data_pack_manifest_v1',manifest),contract_set_hash=snapshot_hash('case_data_pack_contract_set_v1',[(e['slot_key'],e['contract_hash']) for e in entries]))
 

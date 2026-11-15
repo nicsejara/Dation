@@ -93,6 +93,7 @@ export function mountPlatformShell(){
   if(ddaView){
    try{renderDdaNavigation(contextNav,{view,route:readResource(location.href),workspace:window.DationDispatch?.getWorkspace?.()});}catch{}
   }else{breadcrumb.replaceChildren(node('span',labels[view]||(view==='traceability'?'Historial y evidencia':'Dation')));}
+  if(window.dationUnifiedJourney)window.dationRenderCaseFlow?.(view);
  }
  window.dationRenderContextNavigation=updateNavigation;
  window.dationRenderCaseFlow=view=>{try{renderCaseFlow(document.querySelector('#dda-workspace-nav'),{view,route:readResource(location.href),state:window.DationDispatch?.getWorkspace?.()});}catch{}};

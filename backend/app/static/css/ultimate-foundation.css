@@ -363,3 +363,35 @@
  .decision-case-choices[data-dation-test=case-choices-operating_mode] .decision-case-choice { padding:8px; gap:6px; }
  .decision-case-choices[data-dation-test=case-choices-operating_mode] .decision-case-choice > span { overflow-wrap:normal; }
 }
+
+/* UX04: opt-in Core + Studio composition; existing runtime and legacy shells remain. */
+.unified-journey .ultimate-disclosure>header { display:flex;align-items:flex-start;gap:var(--space-4);padding:var(--space-5);border-bottom:1px solid var(--color-border); }
+.unified-journey .ultimate-disclosure>header:focus { outline:2px solid var(--color-text-accent);outline-offset:-3px; }
+.unified-journey .ultimate-disclosure>header .ultimate-disclosure__status { margin-inline-start:auto; }
+.unified-journey .journey-preparation { display:grid;gap:var(--space-4);min-width:0;grid-column:1/-1; }
+.unified-journey .journey-data-owner { padding:var(--space-5);display:grid;gap:var(--space-3); }
+.unified-journey .journey-upload { display:grid;gap:var(--space-3);min-width:0; }
+.unified-journey .journey-upload .dispatch-pro-dropzone { min-height:160px;padding:var(--space-4); }
+.unified-journey .journey-upload :is(svg,.dispatch-pro-icon) { width:24px;height:24px; }
+.unified-journey .journey-upload-actions { display:flex;flex-wrap:wrap;gap:var(--space-2); }
+.unified-journey .journey-upload-actions>button { flex:1 1 180px;white-space:normal; }
+.unified-journey .journey-validation { min-width:0;overflow:hidden;display:grid;gap:var(--space-3); }
+.unified-journey .journey-validation .dispatch-table-wrap { max-width:100%;max-height:280px;overflow:auto; }
+.unified-journey .journey-validation table { width:max-content;min-width:100%; }
+.unified-journey .data-contract-footer { grid-template-columns:minmax(0,1fr) auto; }
+.unified-journey .data-contract-footer>[data-journey-next] { grid-column:2; }
+.unified-journey .data-contract-footer>[data-journey-skip] { grid-column:1;grid-row:2;justify-self:start; }
+.unified-journey .data-contract-footer>[data-dation-test=contract-continue] { display:none; }
+.journey-studio-layout { display:grid;grid-template-columns:210px minmax(0,1fr);gap:var(--space-5);align-items:start;min-width:0; }
+.journey-studio-rail { display:grid;gap:var(--space-3);position:sticky;top:var(--space-5);min-width:0; }
+.journey-studio-rail h2 { font-size:1.25rem; }
+.journey-studio-rail>button { display:grid;grid-template-columns:30px minmax(0,1fr);gap:var(--space-2);padding:var(--space-3);text-align:left;white-space:normal; }
+.journey-studio-rail>button>small { grid-column:2; }
+.journey-studio-rail>button[aria-current] { border-color:var(--color-text-accent);background:color-mix(in srgb,var(--color-text-accent) 10%,var(--color-surface)); }
+.journey-studio-content { min-width:0; }
+.journey-studio .t5-context { overflow-wrap:anywhere; }
+@media(max-width:1100px){.journey-studio-layout{grid-template-columns:minmax(0,1fr)}.journey-studio-rail{position:static;grid-template-columns:repeat(3,minmax(0,1fr))}.journey-studio-rail>:is(h2,p){grid-column:1/-1}.journey-studio-rail>button{grid-template-columns:minmax(0,1fr)}.journey-studio-rail>button>small{grid-column:1}.journey-studio-rail .core-step-number{display:none}}
+@media(max-width:700px){.unified-journey .data-contract-footer{grid-template-columns:minmax(0,1fr)}.unified-journey .data-contract-footer>:is([data-journey-next],[data-journey-skip]){grid-column:1;grid-row:auto;width:100%}.unified-journey .ultimate-disclosure>header{flex-wrap:wrap}.journey-studio-rail>button{padding:8px;font-size:.75rem}}
+.dda-navigation[data-levels="4"] ol { grid-template-columns:repeat(4,minmax(0,1fr)); }
+.journey-studio-rail>button.journey-studio-edit { display:flex;width:100%;justify-content:center;text-align:center; }
+.unified-journey .journey-existing-preparation { grid-template-columns:minmax(0,1fr); }
