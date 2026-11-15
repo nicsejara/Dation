@@ -2,7 +2,7 @@
 import {api,post,esc,errorBox} from '../shared.mjs';
 import {scopeFor} from '../lifecycle.mjs';
 import {graphTarget,graphStateUi} from '../navigation/ultimate-graph.mjs';
-import {journeyEnabled,origin,mountStudioRail} from '../journey/navigation.mjs';
+import {journeyEnabled,mountStudioRail,mountStudioPrevious} from '../journey/navigation.mjs';
 import {ensureStylesheet} from '../styles.mjs';
 import {render as dashboard} from '../dashboard.mjs';
 
@@ -25,7 +25,7 @@ export async function mountUltimateResult(root,{route,navigate,onContext}){
       root.className='dispatch';root.dataset.graphHistoricalRun=run.id;root.dataset.graphReady='true';
       root.innerHTML='<section class="dispatch-panel" data-result-pending><h1>Corrida '+esc(run.id)+'</h1><p role="status">'+esc(run.status)+'</p><p>'+esc(run.error_message||'El resultado publicado todavía no está disponible.')+'</p>'
         +(run.upstream_run_id?'<p>Transport Plan fuente: '+esc(run.upstream_run_id)+'</p>':'')+'<button type="button" class="d-button d-button--secondary" data-refresh-result>Actualizar</button> <button type="button" class="d-button d-button--secondary" data-result-map>Mapa de decisiones</button></section>';
-      scope.listen(root.querySelector('[data-refresh-result]'),'click',refresh);scope.listen(root.querySelector('[data-result-map]'),'click',()=>follow(data.graph.resume));
+      scope.listen(root.querySelector('[data-refresh-result]'),'click',refresh);if(unified){root.querySelector('[data-result-map]').remove();await ensureStylesheet('ultimate-foundation-styles','/static/css/ultimate-foundation.css','t3-v1');if(!scope.active)return;mountStudioPrevious(root,scope,{route,data,navigate});mountStudioRail(root,scope,{route,data,navigate});}else scope.listen(root.querySelector('[data-result-map]'),'click',()=>follow(data.graph.resume));
       let attempts=0;
       async function poll(){try{const current=await api('/api/runs/'+encodeURIComponent(run.id),{signal:scope.signal});if(!scope.active)return;
         if(current.status!==run.status||current.result_json)return refresh();
@@ -50,6 +50,6 @@ export async function mountUltimateResult(root,{route,navigate,onContext}){
       onContinue:async()=>follow((await graph()).graph.resume),
     });
     renderedScope=scopeFor(root);await pending;
-    if(renderedScope.active){if(unified){await ensureStylesheet('ultimate-foundation-styles','/static/css/ultimate-foundation.css','t3-v1');mountStudioRail(root,renderedScope,{route,data,navigate,onEdit:()=>navigate('logistics-case-setup',{caseId:route.caseId,coreStep:3,...origin(route)})});}root.dataset.graphHistoricalRun=run.id;root.dataset.graphReady='true';}
+    if(renderedScope.active){if(unified){await ensureStylesheet('ultimate-foundation-styles','/static/css/ultimate-foundation.css','t3-v1');mountStudioPrevious(root,renderedScope,{route,data,navigate});mountStudioRail(root,renderedScope,{route,data,navigate});}root.dataset.graphHistoricalRun=run.id;root.dataset.graphReady='true';}
   }catch(error){if((renderedScope||scope).active)errorBox(root,error,()=>navigate('decision-dashboard',{...route,replace:true}));}
 }

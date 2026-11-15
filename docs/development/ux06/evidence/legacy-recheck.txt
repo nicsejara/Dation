@@ -1,0 +1,7 @@
+test_03_history_new_run_back_forward_reload_keep_case_node_and_run (test_ultimate_navigation.UltimateNavigationTests.test_03_history_new_run_back_forward_reload_keep_case_node_and_run) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 38.886s
+
+OK
+LEGACY_DIAGNOSTIC={"events": [], "url": "http://127.0.0.1:46949/app/ddas/logistics/configure?view=logistics-config&case_id=e65325c6-1011-4e62-9c3d-2daf0e0f6344&node_id=logistics_assignment", "body": "Saltar al contenido principal\nDation\nDecision Intelligence\nInicio\nDecision Intelligence\nDecision Center\nDatos\nDatos\nWorkspace\nEquipo\nConfiguraci\u00f3n\n\nDecision Data Assets\n\nDDA Log\u00edstica\nMC\nMi cuenta\nDation\nDecision Data Assets\nDDA Log\u00edstica\nDistribuci\u00f3n metropolitana \u2014 C\u00f3rdoba / S\u00e3o Paulo \u00b7 Reposici\u00f3n"}

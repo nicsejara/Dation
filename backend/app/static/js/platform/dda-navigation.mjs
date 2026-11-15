@@ -6,7 +6,7 @@ const rendered=new WeakMap();
 export function renderDdaNavigation(root,{view,route,workspace={}}){
  const currentCase=workspace.decisionCase?.id===route.caseId?workspace.decisionCase:null;
  const ultimate=workspace.ultimateCaseContext?.id===route.caseId?workspace.ultimateCaseContext:null;
- const signature=JSON.stringify([view,route.caseId,workspace.caseContext?.label,currentCase?.label,ultimate?.label,!!window.dationUnifiedJourney]);
+ const signature=JSON.stringify([view,route.caseId,route.nodeId,route.runId,workspace.caseContext?.label,currentCase?.label,ultimate?.label,!!window.dationUnifiedJourney]);
  if(rendered.get(root)===signature&&root.firstElementChild?.tagName==='OL')return;
  rendered.set(root,signature);root.replaceChildren();root.classList.add('dda-navigation');root.setAttribute('aria-label','Navegación del DDA');
  const list=document.createElement('ol');root.append(list);
@@ -25,13 +25,13 @@ export function renderDdaNavigation(root,{view,route,workspace={}}){
  }
  root.dataset.levels=String(entries.length);list.style.setProperty('--context-levels',entries.length);
  for(const entry of entries){
-  const item=document.createElement('li'),control=document.createElement(entry.target?'a':'span');
+  const target=entry.state==='current'&&window.dationUnifiedJourney?null:entry.target,item=document.createElement('li'),control=document.createElement(target?'a':'span');
   control.className='dda-navigation__step';control.dataset.state=entry.state;
   const label=document.createElement('span');label.textContent=entry.label;control.append(label);control.title=entry.label;
   if(entry.state==='completed')control.prepend(document.createTextNode('✓ '));
   if(entry.state==='current')control.setAttribute('aria-current','step');
-  if(!entry.target){control.setAttribute('aria-disabled','true');control.title='Completá la etapa anterior para habilitar esta decisión.';}
-  else{
+  if(!target&&entry.state!=='current'){control.setAttribute('aria-disabled','true');control.title='Completá la etapa anterior para habilitar esta decisión.';}
+  else if(target){
    const url=resourceUrl(location.href,entry.target);if(entry.target.view==='platform-home')url.hash='dation-dda-title';control.href=url;
    control.addEventListener('click',event=>{
     if(event.button||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;

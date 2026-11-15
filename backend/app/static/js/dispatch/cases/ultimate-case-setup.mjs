@@ -11,7 +11,8 @@ import {mountSetupSteps,flattenCorePanel} from '../models/wizard-ui.mjs';
 import {mountCorePreparation} from '../upload/core-preparation.mjs';
 import {mountCaseData} from '../upload/ultimate-case-data.mjs';
 import {mountResponsibilitySelector} from './workflow-responsibility.mjs';
-import {editSource,returnFromCore,origin} from '../journey/navigation.mjs';
+import {editSource,returnFromCore,mountCoreReturn,origin} from '../journey/navigation.mjs';
+import {sameCoreJourney,coreSourceRoute} from '../journey/targets.mjs';
 import {horizonEnd} from '../models/setup-values.mjs';
 
 
@@ -60,7 +61,7 @@ export async function mountCaseSetup(root,{route,navigate,onContext}){
   const preparationDraft=saved?.preparation||{id:route.preparationId||null,version_id:parent?.model_version.id||null};
   const draft=saved||initial,editable=fresh||current.permissions.can_edit,mathEditable=fresh||(current.permissions.can_edit_mathematical&&!row.context_frozen_at),canAssign=fresh?caps.can_assign:current.permissions.can_assign;
   root.replaceChildren();const header=pageHeader(root,'Core Configuration',fresh?'Configurá los tres bloques para crear el Case. Los datos operativos se gestionan después en el Decision Graph.':'Revisá el Logistics Model y el Data Contract, o editá la información permitida del Decision Case.');
-  if(row){
+  if(row&&!unified){
    header.append(button('Volver al Decision Graph',()=>navigate('logistics-map',{caseId:row.id,nodeId:null,runId:null})));
    // Keep the existing, recoverable Case Data route until the graph modal replaces it.
    try{
@@ -88,7 +89,7 @@ export async function mountCaseSetup(root,{route,navigate,onContext}){
     if(canAssign)body.owner_updates=Object.entries(value.owners).filter(([id,o])=>o.id!==(current.responsibilities.stages[id].owner?.id||'')).map(([id,o])=>({node_id:id,owner_user_id:o.id||null,expected_updated_at:o.updated_at}));
     result=await api('/api/platform/logistics-cases/'+row.id+'/context',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:scope.signal});
    }
-   kit.markSaved();if(scope.active){onContext?.(result);if(unified&&!fresh)return returnFromCore(route,navigate,scope);await navigate(fresh?'logistics-map':'logistics-case-setup',{caseId:result.case.id,nodeId:null,runId:null,replace:true});}
+   kit.markSaved();if(scope.active){onContext?.(result);if(unified&&!fresh)return returnFromCore(route,navigate,scope,{root});await navigate(fresh?'logistics-map':'logistics-case-setup',{caseId:result.case.id,nodeId:null,runId:null,replace:true});}
   }});
   const form=kit.form;form.inert=true;form.setAttribute('aria-busy','true');
   const preparationRoot=unified&&fresh?el('section',undefined,'journey-preparation'):null;
@@ -162,14 +163,18 @@ export async function mountCaseSetup(root,{route,navigate,onContext}){
   }
   initialized=true;scope.listen(form,'input',reflect);scope.listen(form,'change',reflect);reflect();
   if(unified)for(const panel of [planningModel?.modelPanel||existingModelPanel,planningModel?.contractPanel||existingContractPanel,casePanel])flattenCorePanel(panel);
-  kit.finish();steps=mountSetupSteps(form,[planningModel?.modelPanel.details||existingModelPanel.details,planningModel?.contractPanel.details||existingContractPanel.details,casePanel.details],{fresh,unified,initialStep:unified?route.coreStep:null,onStep:index=>{if(unified){window.dationJourneyProgress={step:index+1,modelReady:planningModel?.ready||!!current?.model_version.id,dataReady:preparation?.snapshot?.uploads.filter(u=>u.selected&&u.ready).length===2||current?.entry_count===2};const stepUrl=new URL(location.href);stepUrl.searchParams.set('core_step',index+1);history.replaceState(null,'',stepUrl);window.dispatchEvent(new CustomEvent('dation:core-step',{detail:{step:index+1,caseId:route.caseId}}));}},available:index=>!fresh||index===0||(index===1?planningModel.selected:planningModel.ready)});steps.workspace.append(kit.footer);if(!editable){for(const control of form.querySelectorAll('input,select,textarea,button:not(.core-wizard-steps > button)'))control.disabled=true;kit.status.textContent='Contexto de sólo lectura.';}
+  kit.finish();steps=mountSetupSteps(form,[planningModel?.modelPanel.details||existingModelPanel.details,planningModel?.contractPanel.details||existingContractPanel.details,casePanel.details],{fresh,unified,initialStep:unified?route.coreStep:null,onExit:target=>navigate(target.view,target),onStep:(index,meta)=>{if(unified){window.dationJourneyProgress={step:index+1,modelReady:planningModel?.ready||!!current?.model_version.id,dataReady:preparation?.snapshot?.uploads.filter(u=>u.selected&&u.ready).length===2||current?.entry_count===2};route.coreStep=index+1;window.dationSetCoreStep?.(index+1,meta);window.dispatchEvent(new CustomEvent('dation:core-step',{detail:{step:index+1,caseId:route.caseId}}));}},available:index=>!fresh||index===0||(index===1?planningModel.selected:planningModel.ready)});steps.workspace.append(kit.footer);if(!editable){for(const control of form.querySelectorAll('input,select,textarea,button:not(.core-wizard-steps > button):not([data-journey-previous])'))control.disabled=true;kit.status.textContent='Contexto de sólo lectura.';}
   if(saved)kit.status.textContent='Borrador recuperado. La versión guardada se mantiene hasta que apliques los cambios.';
   if(unified){
    header.querySelector('.d-page-description').textContent='Configurá el modelo, prepará los datos y definí tu Case. Las decisiones se ejecutan después desde Decision Studio.';
    root.classList.add('unified-journey','dispatch-upload-pro');
-   if(parent){header.append(el('p','Nuevo Case derivado de '+parent.case.label+'. Se conserva el original, sus corridas y aprobaciones.','d-metadata'),button('Cancelar y conservar borrador derivado',async()=>{if(!await confirmAction(root,scope,'Volver al Case original','El borrador y los candidatos guardados se conservan. Los archivos locales sin guardar deben guardarse o quitarse antes de salir.','Conservar borrador y volver'))return;store.write(collect());await returnFromCore({...route,caseId:route.parentCaseId},navigate,scope);}));}
-   if(row&&editable)existingModelPanel.body.append(button('Crear un Case con otra Model Version',()=>editSource(root,scope,{...route,view:route.returnView||'logistics-map',nodeId:route.returnNode,runId:route.returnRun},navigate,{forceDerive:true})));
-   if(row){header.append(button('Cancelar y volver al origen',()=>{kit.markSaved();returnFromCore(route,navigate,scope);}));if(!mathEditable&&editable)horizon.append(button('Crear nuevo Case a partir de este',()=>editSource(root,scope,{...route,view:route.returnView||'logistics-map',nodeId:route.returnNode,runId:route.returnRun},navigate)));}
+   if(parent)header.append(el('p','Nuevo Case derivado de '+parent.case.label+'. Se conserva el original, sus corridas y aprobaciones. El borrador derivado se conserva en este navegador.','d-metadata'));
+   if(row||parent||route.returnView)mountCoreReturn(header,root,scope,{route,navigate,beforeReturn:()=>{if(kit.dirty||parent)store.write(collect());}});
+   const localNavigation={matches:target=>scope.active&&sameCoreJourney(route,target),restore:target=>{if(!localNavigation.matches(target))return false;const wanted=(target.coreStep||1)-1;steps.show(wanted,true,{history:'none'});if(steps.active!==wanted){steps.show(steps.active,true,{history:'replace',force:true});let note=header.querySelector('[data-journey-navigation-note]');if(!note){note=el('p','','d-metadata');note.dataset.journeyNavigationNote='';note.role='status';header.querySelector('.d-page-header__copy').append(note);}note.textContent='La etapa anterior requiere una versión de modelo seleccionada y su contrato válido. Se conserva el borrador en la etapa disponible.';}return true;}};
+   scope.listen(window,'dation:core-step',()=>header.querySelector('[data-journey-navigation-note]')?.remove());
+   window.dationCoreNavigation=localNavigation;scope.own(()=>{if(window.dationCoreNavigation===localNavigation)delete window.dationCoreNavigation;});
+   if(row&&editable)existingModelPanel.body.append(button('Crear un Case con otra Model Version',()=>editSource(root,scope,coreSourceRoute(route),navigate,{forceDerive:true})));
+   if(row){if(!mathEditable&&editable)horizon.append(button('Crear nuevo Case a partir de este',()=>editSource(root,scope,coreSourceRoute(route),navigate)));}
   }
   if(!fresh){
    await models();
@@ -179,7 +184,7 @@ export async function mountCaseSetup(root,{route,navigate,onContext}){
      existingContractPanel.body.classList.add('journey-existing-preparation');
      const journey=await api('/api/platform/logistics-cases/'+route.caseId+'/journey',{signal:scope.signal});
      existingContractPanel.details.querySelector('.ultimate-disclosure__title').textContent='02 · Data Contract & Preparation';
-     if(journey.has_runs){showPublishedContracts(existingContractPanel.body,route.caseId,data.contracts,scope);existingContractPanel.body.append(el('p','Los datos del Case con corridas se consultan sin reemplazar su historial.','d-metadata'),button('Editar datos de origen',()=>editSource(root,scope,{...route,view:'logistics-map'},navigate)));}
+     if(journey.has_runs){showPublishedContracts(existingContractPanel.body,route.caseId,data.contracts,scope);existingContractPanel.body.append(el('p','Los datos del Case con corridas se consultan sin reemplazar su historial.','d-metadata'),button('Editar datos de origen',()=>editSource(root,scope,coreSourceRoute(route),navigate)));}
      else{const host=el('div');existingContractPanel.body.append(host);scope.own(()=>disposeScope(host));await mountCaseData(host,{route,navigate,embedded:true,guarded:true});}
      const ownerHost=el('section');existingContractPanel.body.append(ownerHost);const ownerWidget=mountResponsibilitySelector(ownerHost,{caseId:route.caseId,stageKey:'data_owner',snapshot:current.responsibilities});scope.own(()=>ownerWidget.dispose());
     }else showPublishedContracts(existingContractPanel.body,route.caseId,data.contracts,scope);existingContractPanel.setStatus('Vigente','complete');existingContractsReady=!!(data.contracts?.transport_demand&&data.contracts?.transport_resources);

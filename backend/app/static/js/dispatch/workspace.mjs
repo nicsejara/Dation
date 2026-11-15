@@ -847,6 +847,17 @@ async function hydrateCase(caseId,generation=routeGeneration,expectedInputs=null
   state.caseVersion=item.case.updated_at;
   state.orders=item.orders;state.fleet=item.fleet;state.decisionCase={...item.decision_case,status:item.case.status,label:item.case.label,category:item.case.category,description:item.case.description,attributes_applied_at:item.case.attributes_applied_at,collaboration:item.collaboration,persisted:true};state.workflow=item.workflow_responsibilities||null;state.caseContext=caseContext({...item.case,context:item.context});persist();return item;
 }
+// Keep browser history in the existing router; local Core restoration keeps its form.
+let journeyHistoryIndex=Number.isSafeInteger(history.state?.dationJourneyIndex)?history.state.dationJourneyIndex:0,revertingCoreHistory=false;
+function writeResourceHistory(next,{replace=false}={}){
+ history.replaceState({...history.state,dationJourneyIndex:journeyHistoryIndex},'',location.href);
+ if(!replace)journeyHistoryIndex++;
+ history[replace?'replaceState':'pushState']({dationJourneyIndex:journeyHistoryIndex},'',resourceUrl(location.href,next));
+}
+window.dationSetCoreStep=(step,{history:mode='push'}={})=>{
+ if(resource?.view!=='logistics-case-setup'||![1,2,3].includes(step))return;
+ const next={...resource,coreStep:step};if(mode!=='none')writeResourceHistory(next,{replace:mode==='replace'});resource=next;
+};
 async function navigateResource(view,options={}){
   if(options.history!==false&&window.dationUltimateCanLeave&&!window.dationUltimateCanLeave())return;
   if(view==='logistics-data'&&!options.caseId&&(options.caseId===null||!state.decisionCase?.id))return navigateResource('logistics-case-setup',{...options,caseId:null,nodeId:null,runId:null,history:true,replace:true});
@@ -861,13 +872,13 @@ async function navigateResource(view,options={}){
   if(publicView==='logistics-case-setup')for(const key of ['coreStep','preparationId','parentCaseId','returnView','returnNode','returnRun','returnCenter'])next[key]=options[key]||null;
   saveDraft();routeController?.abort();routeController=new AbortController();const generation=++routeGeneration;
   runPolling.stop();pollGeneration++;
-  for(const root of Object.values(roots)){disposeScope(root);root.replaceChildren();root.className='dispatch';delete root.dataset.ultimateReady;delete root.dataset.graphReady;}
+  for(const root of Object.values(roots)){disposeScope(root);root.replaceChildren();root.className='dispatch';delete root.dataset.ultimateReady;delete root.dataset.graphReady;delete root.dataset.ux05Ready;}
   state.ultimateGraph=null;
   resource=next;
   if(publicView==='platform-data')next.hub=options.hub||{};
   if(publicView==='platform-decisions')next.center=options.center||{};
   if(publicView==='settings')next.settingsTab=options.settingsTab||'general';
-  if(options.history!==false){const url=resourceUrl(location.href,next);history[options.replace?'replaceState':'pushState'](null,'',url);}
+  if(options.history!==false)writeResourceHistory(next,{replace:!!options.replace});
   state.activeNode=next.nodeId||null;decisionContext(state.activeNode);persist();
   document.body.classList.toggle('dispatch-result',publicView==='decision-dashboard');
   renderView(aliases[publicView]||publicView);
@@ -939,7 +950,15 @@ window.DationDispatch.reuseHubData=inputs=>startNewDecision(inputs);
 mountFoundationEntry();
 document.body.classList.add('dispatch-enabled');
 mountTraceability();
-async function restoreResource(){try{const target=readResource(location.href);await navigateResource(target.view,{...target,history:false});}catch(error){if(location.pathname.replace(/\/$/,'')==='/app/settings')return navigateResource('settings',{history:false,settingsTab:'general',caseId:null,nodeId:null});if(location.pathname.replace(/\/$/,'')==='/app/data')return navigateResource('platform-data',{history:false,caseId:null,nodeId:null});if(location.pathname.replace(/\/$/,'')==='/app/decisions')return navigateResource('platform-decisions',{history:false,caseId:null,nodeId:null});document.body.classList.add('dispatch-result');renderView('decision-dashboard');roots.dashboard.hidden=false;errorBox(roots.dashboard,Object.assign(error,{kind:'navigation',actionLabel:'Volver al Data Pack'}),()=>navigate('logistics-data'));}}
+async function restoreResource(event){try{
+ if(event?.type==='popstate'&&revertingCoreHistory){revertingCoreHistory=false;return;}
+ const target=readResource(location.href),targetIndex=Number.isSafeInteger(history.state?.dationJourneyIndex)?history.state.dationJourneyIndex:journeyHistoryIndex;
+ if(event?.type==='popstate'&&window.dationCoreNavigation?.matches(target)){journeyHistoryIndex=targetIndex;resource=target;window.dationCoreNavigation.restore(target);return;}
+ if(event?.type==='popstate'&&window.dationCoreNavigation&&window.dationUltimateCanLeave&&!window.dationUltimateCanLeave()){
+  const delta=journeyHistoryIndex-targetIndex;if(delta){revertingCoreHistory=true;history.go(delta);}else history.replaceState({dationJourneyIndex:journeyHistoryIndex},'',resourceUrl(location.href,resource));return;
+ }
+ if(event?.type==='popstate')journeyHistoryIndex=targetIndex;
+ await navigateResource(target.view,{...target,history:false});}catch(error){if(location.pathname.replace(/\/$/,'')==='/app/settings')return navigateResource('settings',{history:false,settingsTab:'general',caseId:null,nodeId:null});if(location.pathname.replace(/\/$/,'')==='/app/data')return navigateResource('platform-data',{history:false,caseId:null,nodeId:null});if(location.pathname.replace(/\/$/,'')==='/app/decisions')return navigateResource('platform-decisions',{history:false,caseId:null,nodeId:null});document.body.classList.add('dispatch-result');renderView('decision-dashboard');roots.dashboard.hidden=false;errorBox(roots.dashboard,Object.assign(error,{kind:'navigation',actionLabel:'Volver al Data Pack'}),()=>navigate('logistics-data'));}}
 window.addEventListener('popstate',restoreResource);
 window.addEventListener('dation:identity',()=>{if(!currentLogisticsEnabled()&&logisticsView(window.dationGetCurrentView?.()))navigateResource('inicio',{replace:true,caseId:null,nodeId:null});});
 window.addEventListener('pagehide',()=>{routeController?.abort();routeGeneration++;pollGeneration++;runPolling.stop();for(const root of Object.values(roots))disposeScope(root);});

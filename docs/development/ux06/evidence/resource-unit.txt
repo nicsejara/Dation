@@ -1,0 +1,12 @@
+✔ Core03 canonical historical return roundtrips without external URLs (2.296064ms)
+✔ Derived Core02 has no Case identity until finalization (0.564375ms)
+✔ Return routes and identities fail closed (0.772002ms)
+✔ Decision Center filters roundtrip through allowlisted return state (1.830827ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 18.065719

@@ -1,4 +1,5 @@
 import {el,button} from './forms.mjs';
+import {corePrevious} from '../journey/targets.mjs';
 
 // Local line icons; decorative because every action/section has a visible label.
 export function wizardIcon(kind){
@@ -8,7 +9,7 @@ export function wizardIcon(kind){
 }
 
 // One mounted form; changing steps only reveals the existing panels.
-export function mountSetupSteps(form,panels,{fresh,available,unified=false,initialStep=null,onStep=()=>{}}){
+export function mountSetupSteps(form,panels,{fresh,available,unified=false,initialStep=null,onStep=()=>{},onExit=()=>{}}){
  form.classList.add('core-wizard');
  const nav=el('nav',undefined,'core-wizard-steps');nav.setAttribute('aria-label','Etapas de Core Configuration');nav.dataset.dationTest='core-steps';
  const workspace=el('div',undefined,'core-wizard-workspace');form.append(nav,workspace);
@@ -19,9 +20,14 @@ export function mountSetupSteps(form,panels,{fresh,available,unified=false,initi
   text.append(el('strong',label),el('span',copy),status);action.append(number,text);action.dataset.dationTest='core-step-'+(i+1);action.setAttribute('aria-controls','core-wizard-panel-'+i);nav.append(action);
   const panel=panels[i];panel.id='core-wizard-panel-'+i;workspace.append(panel);return {action,status};
  });
- function update(){for(const [i,{action,status}]of controls.entries()){action.disabled=!available(i);if(i===active)action.setAttribute('aria-current','step');else action.removeAttribute('aria-current');status.textContent=!available(i)?'Pendiente de modelo':panels[i].querySelector('.ultimate-disclosure__status')?.textContent||'';}}
- function show(index,focus=false){if(!available(index))return;active=index;panels.forEach((panel,i)=>{panel.hidden=i!==index;if(i===index)panel.open=true;});form.dataset.activeStep=String(index+1);const footer=form.querySelector('.ultimate-footer');if(footer)footer.hidden=index!==2;update();onStep(index);if(focus)panels[index].querySelector(unified?'header':'summary')?.focus();}
- show(active);
+ function update(){for(const [i,{action,status}]of controls.entries()){action.disabled=!available(i);if(i===active){action.setAttribute('aria-current','step');action.tabIndex=unified?-1:0;}else{action.removeAttribute('aria-current');action.tabIndex=0;}status.textContent=!available(i)?'Pendiente de modelo':panels[i].querySelector('.ultimate-disclosure__status')?.textContent||'';}}
+ function show(index,focus=false,{history='push',force=false}={}){if(!available(index)||unified&&!force&&index===active)return;active=index;panels.forEach((panel,i)=>{panel.hidden=i!==index;if(i===index)panel.open=true;});form.dataset.activeStep=String(index+1);const footer=form.querySelector('.ultimate-footer');if(footer)footer.hidden=index!==2;update();onStep(index,{history});if(focus)panels[index].querySelector(unified?'header':'summary')?.focus();}
+ if(unified)panels.forEach((panel,index)=>{
+  const intent=corePrevious(index+1),previous=button('← Anterior · '+intent.label,()=>intent.local?show(intent.step-1,true):onExit(intent.target));previous.dataset.journeyPrevious='';
+  let footer=index===2?form.querySelector('.ultimate-footer'):panel.querySelector('.model-wizard-footer,.data-contract-footer');
+  if(!footer){footer=el('footer',undefined,'journey-sequential-footer');panel.append(footer);}footer.classList.add('journey-step-footer');footer.prepend(previous);
+ });
+ if(!available(active))active=0;show(active,false,{history:'replace',force:true});
  return {show,update,workspace,get active(){return active;}};
 }
 

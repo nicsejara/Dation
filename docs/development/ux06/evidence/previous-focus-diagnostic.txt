@@ -1,0 +1,67 @@
+test_01_local_previous_preserves_form_and_has_no_writes_or_self_navigation (test_journey_navigation_ux06.JourneyNavigationTests.test_01_local_previous_preserves_form_and_has_no_writes_or_self_navigation) ... FAIL
+Executing <Task pending name='Task-6' coro=<UnifiedDecisionJourneyTests.asyncTearDown() running at /workspace/work/dation-ux06/backend/tests/browser/test_unified_decision_journey.py:33> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.202 seconds
+
+======================================================================
+FAIL: test_01_local_previous_preserves_form_and_has_no_writes_or_self_navigation (test_journey_navigation_ux06.JourneyNavigationTests.test_01_local_previous_preserves_form_and_has_no_writes_or_self_navigation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/usr/lib/python3.13/asyncio/base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/workspace/work/dation-ux06/backend/tests/browser/test_journey_navigation_ux06.py", line 53, in test_01_local_previous_preserves_form_and_has_no_writes_or_self_navigation
+    await self.previous();print('NAV_DIAGNOSTIC='+json.dumps(await self.page.evaluate('window.__ux06_events')));await self.ready(2);await self.previous();await self.ready(1);await self.page.locator('[data-dation-test=core-step-2]').click();await self.page.locator('[data-dation-test=core-step-3]').click();await self.ready(3)
+                                                                                                                ^^^^^^^^^^^^^^^^^^^
+  File "/workspace/work/dation-ux06/backend/tests/browser/test_journey_navigation_ux06.py", line 31, in ready
+    await self.page.locator('.ultimate-core-setup[data-ultimate-ready=true]').wait_for();await expect(self.page.locator('.core-wizard')).to_have_attribute('data-active-step',str(step))
+                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_generated.py", line 22206, in to_have_attribute
+    await self._impl_obj.to_have_attribute(
+    ...<4 lines>...
+    )
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_assertions.py", line 349, in to_have_attribute
+    await self._expect_impl(
+    ...<7 lines>...
+    )
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_assertions.py", line 128, in _expect_impl
+    _record_soft_or_raise(
+    ~~~~~~~~~~~~~~~~~~~~~^
+        AssertionError(
+        ^^^^^^^^^^^^^^^
+    ...<2 lines>...
+        self._is_soft,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_assertions.py", line 60, in _record_soft_or_raise
+    raise error
+AssertionError: Locator expected to have attribute '2'
+Actual value: 3 
+Call log:
+  - Expect "to_have_attribute" locator(".core-wizard") with timeout 5000ms
+  - waiting for locator(".core-wizard")
+    14 × locator resolved to <form novalidate="" data-active-step="3" aria-label="Guardar contexto" class="ultimate-form core-wizard">…</form>
+       - unexpected value "3"
+
+Aria snapshot:
+- form "Guardar contexto":
+  - navigation "Etapas de Core Configuration"
+  - text: 03. Decision Case
+  - paragraph: Definí qué querés optimizar, en qué horizonte y bajo qué condiciones se ejecutará este Case.
+  - text: Cambios pendientes
+  - complementary
+  - group
+  - button "← Anterior · Data Contract & Preparation"
+  - strong: Configuración del Decision Case
+  - paragraph: Revisá los datos permitidos antes de guardar.
+  - paragraph: 4 de 5 condiciones completas
+  - status: Cambios sin guardar. El borrador se conserva en este navegador.
+  - button "Guardar contexto"
+
+----------------------------------------------------------------------
+Ran 1 test in 23.182s
+
+FAILED (failures=1)
+NAV_DIAGNOSTIC=[{"type": "pointerdown", "text": "\u2190 Anterior \u00b7 Data Contract & Preparation", "target": null, "step": "3"}, {"type": "focusout", "text": "", "target": "\u2190 Anterior \u00b7 Data Contract & Preparation", "step": "3"}, {"type": "pointerup", "text": "\u2190 Anterior \u00b7 Data Contract & PreparationConfiguraci\u00f3n del Decision CaseRevis\u00e1 lo", "target": null, "step": "3"}, {"type": "click", "text": "\u2190 Anterior \u00b7 Data Contract & PreparationConfiguraci\u00f3n del Decision CaseRevis\u00e1 lo", "target": null, "step": "3"}]
