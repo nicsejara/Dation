@@ -9,6 +9,7 @@ import test_saga01_planning as saga
 import test_ultimate_navigation as nav
 from wizard_helpers import select_model
 OUT=Path('/tmp/dation-ux04-browser')
+NAV_MEASUREMENTS=[]
 class UnifiedDecisionJourneyTests(unittest.IsolatedAsyncioTestCase):
     @classmethod
     def setUpClass(cls):
@@ -47,8 +48,41 @@ class UnifiedDecisionJourneyTests(unittest.IsolatedAsyncioTestCase):
     case=setup.UltimateCaseSetupTests.case
     open=setup.UltimateCaseSetupTests.open
     fill_case=saga.Saga01PlanningTests.fill_case
+    async def assert_journey_navigation(self):
+        view=await self.page.evaluate('window.dationGetCurrentView()')
+        core=view=='logistics-case-setup'
+        self.assertIn(view,['logistics-case-setup','logistics-map','logistics-config','decision-dashboard'])
+        global_nav=self.page.locator('#journey-nav')
+        await expect(global_nav.locator('li .dda-navigation__step > span')).to_have_text([
+            'Decision Data Assets','DDA Logística','Core Configuration','Decision Studio'])
+        await expect(global_nav.locator('[aria-current=step]')).to_have_text('Core Configuration' if core else 'Decision Studio')
+        shell=self.page.locator('#dda-workspace-nav-shell')
+        await expect(shell).to_be_hidden()
+        self.assertEqual(await self.page.locator('#dda-workspace-nav > *').count(),0)
+        self.assertEqual(await self.page.locator('.journey-current-step,.journey-six-steps').count(),0)
+        self.assertNotRegex(await self.page.locator('body').inner_text(),r'\bPaso\s+\d+\s+de\s+6\b')
+        rail=self.page.locator('.core-wizard-steps:visible' if core else '.journey-studio-rail:visible')
+        await expect(rail).to_be_visible()
+        buttons=rail.locator(':scope > button' if core else ':scope > button:has(.core-step-number)')
+        await expect(buttons).to_have_count(3)
+        labels=['Logistics Model','Data Contract & Preparation','Decision Case'] if core else ['Decision Graph','Decision Configuration','Decision Dashboard']
+        await expect(buttons.locator('strong')).to_have_text(labels)
+        current=int(await self.page.locator('.core-wizard:visible').get_attribute('data-active-step'))-1 if core else ['logistics-map','logistics-config','decision-dashboard'].index(view)
+        await expect(rail.locator('[aria-current=step] strong')).to_have_text(labels[current])
+        layout=await shell.evaluate('''s=>({width:innerWidth,shellHeight:s.getBoundingClientRect().height,navHeight:s.firstElementChild.getBoundingClientRect().height,display:getComputedStyle(s).display,overflow:document.documentElement.scrollWidth>innerWidth})''')
+        self.assertEqual(layout['shellHeight'],0,layout);self.assertEqual(layout['navHeight'],0,layout);self.assertEqual(layout['display'],'none',layout);self.assertFalse(layout['overflow'],layout)
+        layout.update(view=view,step=current+1,buttons=await buttons.evaluate_all('els=>els.map(b=>({label:b.querySelector("strong").textContent,disabled:b.disabled,current:b.getAttribute("aria-current")}))'))
+        NAV_MEASUREMENTS.append(layout);(OUT/'navigation-layout.json').write_text(json.dumps(NAV_MEASUREMENTS,indent=2))
+        return layout
+    async def check_navigation_sizes(self,prefix=None):
+        before=(await self.assert_journey_navigation())['buttons']
+        for width in [1536,1024,768,390,320]:
+            await self.page.set_viewport_size({'width':width,'height':960});await self.page.evaluate('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))')
+            self.assertEqual((await self.assert_journey_navigation())['buttons'],before)
+            if prefix and width in [1024,390]:await self.capture(path=str(OUT/(prefix+'-'+str(width)+'.png')),full_page=True,animations='disabled')
+        await self.page.set_viewport_size({'width':1536,'height':960});await self.page.evaluate('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))')
     async def capture(self,**options):
-        await self.page.mouse.move(0,0);await self.page.evaluate('document.activeElement?.blur();window.scrollTo(0,0)');await self.page.evaluate('new Promise(requestAnimationFrame)');return await self.page.screenshot(**options)
+        await self.page.mouse.move(0,0);await self.page.evaluate('document.activeElement?.blur();window.scrollTo(0,0)');await self.page.evaluate('new Promise(requestAnimationFrame)');await self.assert_journey_navigation();return await self.page.screenshot(**options)
     async def selected(self):
         m,v=await self.model('Operación UX04');await self.page.goto(self.base+'/app/ddas/logistics',wait_until='domcontentloaded');await self.page.get_by_role('button',name='Comenzar',exact=True).click();await self.page.locator('.ultimate-foundation[data-ultimate-ready=true]').wait_for();await select_model(self.page,m['model']['id'],v['version']['id']);await expect(self.page.locator('[data-journey-skip]')).to_be_enabled();return m,v
     async def attach(self,entity):
@@ -88,9 +122,9 @@ class UnifiedDecisionJourneyTests(unittest.IsolatedAsyncioTestCase):
         self.m,self.v=await self.selected();await self.page.set_viewport_size({'width':1536,'height':960});await self.capture(path=str(OUT/'core02-empty-1536.png'),full_page=True,animations='disabled');await self.attach('transport_demand');await self.attach('transport_resources');await self.capture(path=str(OUT/'core02-valid-1536.png'),full_page=True,animations='disabled')
         measurements=[]
         for width in [1536,1024,768,390,320]:
-            await self.page.set_viewport_size({'width':width,'height':960});await self.page.evaluate('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))');measurements.append(await self.page.evaluate("""()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,overflow:document.documentElement.scrollWidth>innerWidth})"""));self.assertFalse(measurements[-1]['overflow'],measurements[-1])
-            if width==390:await self.capture(path=str(OUT/'core02-valid-390.png'),full_page=True,animations='disabled')
-        (OUT/'responsive.json').write_text(json.dumps(measurements,indent=2));await self.page.set_viewport_size({'width':1536,'height':960});await self.page.locator('[data-dation-test=core-step-1]').click();await self.capture(path=str(OUT/'core01-1536.png'),full_page=True,animations='disabled');await self.page.locator('[data-dation-test=core-step-3]').click();await self.fill_case('Visual UX04');await self.capture(path=str(OUT/'core03-1536.png'),full_page=True,animations='disabled');await self.page.get_by_role('button',name='Finalizar configuración',exact=True).click();await self.page.locator('[data-graph-ready=true]').wait_for();await self.capture(path=str(OUT/'studio-graph-1536.png'),full_page=True,animations='disabled');await expect(self.page.get_by_role('button',name='Cerrar Decision Case',exact=True)).to_be_disabled();await self.page.set_viewport_size({'width':390,'height':960});await self.page.evaluate('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))');overflow=await self.page.evaluate("""()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,nodes:[...document.querySelectorAll('body *')].filter(n=>n.getBoundingClientRect().right>innerWidth+1).slice(0,30).map(n=>({tag:n.tagName,class:n.className,width:n.getBoundingClientRect().width,right:n.getBoundingClientRect().right,display:getComputedStyle(n).display,parent:n.parentElement?.outerHTML.slice(0,800),ancestors:[n.parentElement,n.parentElement?.parentElement,n.parentElement?.parentElement?.parentElement,n.parentElement?.parentElement?.parentElement?.parentElement,n.parentElement?.parentElement?.parentElement?.parentElement?.parentElement,n.parentElement?.parentElement?.parentElement?.parentElement?.parentElement?.parentElement].filter(Boolean).map(p=>({tag:p.tagName,class:p.className,display:getComputedStyle(p).display,columns:getComputedStyle(p).gridTemplateColumns,x:p.getBoundingClientRect().x,width:p.getBoundingClientRect().width}))}))})""");(OUT/'studio-overflow.json').write_text(json.dumps(overflow,indent=2));self.assertFalse(overflow['scroll']>overflow['width'],overflow);await self.capture(path=str(OUT/'studio-graph-390.png'),full_page=True,animations='disabled')
+            await self.page.set_viewport_size({'width':width,'height':960});await self.page.evaluate('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))');await self.assert_journey_navigation();measurements.append(await self.page.evaluate("""()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,overflow:document.documentElement.scrollWidth>innerWidth})"""));self.assertFalse(measurements[-1]['overflow'],measurements[-1])
+            if width in [1024,390]:await self.capture(path=str(OUT/('core02-valid-'+str(width)+'.png')),full_page=True,animations='disabled')
+        (OUT/'responsive.json').write_text(json.dumps(measurements,indent=2));await self.page.set_viewport_size({'width':1536,'height':960});await self.page.locator('[data-dation-test=core-step-1]').click();await self.capture(path=str(OUT/'core01-1536.png'),full_page=True,animations='disabled');await self.check_navigation_sizes('core01');await self.page.locator('[data-dation-test=core-step-3]').click();await self.fill_case('Visual UX04');await self.capture(path=str(OUT/'core03-1536.png'),full_page=True,animations='disabled');await self.check_navigation_sizes('core03');await self.page.get_by_role('button',name='Finalizar configuración',exact=True).click();await self.page.locator('[data-graph-ready=true]').wait_for();await self.capture(path=str(OUT/'studio-graph-1536.png'),full_page=True,animations='disabled');await expect(self.page.get_by_role('button',name='Cerrar Decision Case',exact=True)).to_be_disabled();await self.check_navigation_sizes('studio-graph');await self.page.set_viewport_size({'width':390,'height':960});await self.page.evaluate('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))');overflow=await self.page.evaluate("""()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,nodes:[...document.querySelectorAll('body *')].filter(n=>n.getBoundingClientRect().right>innerWidth+1).slice(0,30).map(n=>({tag:n.tagName,class:n.className,width:n.getBoundingClientRect().width,right:n.getBoundingClientRect().right,display:getComputedStyle(n).display,parent:n.parentElement?.outerHTML.slice(0,800),ancestors:[n.parentElement,n.parentElement?.parentElement,n.parentElement?.parentElement?.parentElement,n.parentElement?.parentElement?.parentElement?.parentElement,n.parentElement?.parentElement?.parentElement?.parentElement?.parentElement,n.parentElement?.parentElement?.parentElement?.parentElement?.parentElement?.parentElement].filter(Boolean).map(p=>({tag:p.tagName,class:p.className,display:getComputedStyle(p).display,columns:getComputedStyle(p).gridTemplateColumns,x:p.getBoundingClientRect().x,width:p.getBoundingClientRect().width}))}))})""");(OUT/'studio-overflow.json').write_text(json.dumps(overflow,indent=2));self.assertFalse(overflow['scroll']>overflow['width'],overflow);await self.capture(path=str(OUT/'studio-graph-390.png'),full_page=True,animations='disabled')
 
     async def test_09_finalize_storage_failure_reload_recovers_same_case(self):
         self.m,self.v=await self.selected();await self.attach('transport_demand');await self.attach('transport_resources');await self.page.locator('[data-journey-next]').click();await self.fill_case('Reintento durable UX04');(self.control/'fail-t4-publish').touch();await self.page.get_by_role('button',name='Finalizar configuración',exact=True).click();await expect(self.page.locator('.ultimate-footer [role=alert]')).to_be_visible();self.assertIn('/case?',self.page.url);rows=json.loads(self.sql("SELECT jsonb_agg(creation_body->>'id') FROM dation_private.journey_preparations WHERE status='FINALIZING';"));self.assertEqual(len(rows),1);cid=rows[0]
@@ -117,9 +151,25 @@ class UnifiedDecisionJourneyTests(unittest.IsolatedAsyncioTestCase):
     async def test_14_unsaved_local_csv_blocks_case_creation_without_freezing_intent(self):
         self.m,self.v=await self.selected();response=await self.request('POST','/api/platform/logistics-models/contract-preview/templates/transport_demand',{'model_id':self.m['model']['id'],'version_id':self.v['version']['id']});raw=await response.body();host=self.page.locator('[data-preparation-entity=transport_demand]');await host.locator('input[type=file]').set_input_files({'name':'local-only.csv','mimeType':'text/csv','buffer':raw});await expect(host.get_by_role('button',name='Guardar candidato de Órdenes / Demanda',exact=True)).to_be_enabled();before=self.sql('SELECT count(*) FROM decision_cases;');await self.page.locator('[data-dation-test=core-step-3]').click();await self.fill_case('No perder selección local');self.page.on('dialog',lambda d:asyncio.create_task(d.dismiss()));await self.page.get_by_role('button',name='Finalizar configuración',exact=True).click();await self.page.wait_for_function("()=>!document.querySelector('.ultimate-footer button[type=submit]')?.hasAttribute('aria-busy')");self.assertEqual(self.sql('SELECT count(*) FROM decision_cases;'),before);await expect(self.page.get_by_label('Nombre del Case',exact=True)).to_be_enabled();await expect(self.page.locator('.ultimate-errors')).to_contain_text('Guardá o quitá los CSV locales');await self.page.locator('[data-dation-test=core-step-2]').click();await expect(host.get_by_role('button',name='Guardar candidato de Órdenes / Demanda',exact=True)).to_be_enabled();await host.get_by_role('button',name='Guardar candidato de Órdenes / Demanda',exact=True).click();await expect(host).to_contain_text('Candidato guardado · no publicado');await self.page.locator('[data-dation-test=core-step-3]').click();await expect(self.page.locator('.decision-case-footer')).to_have_attribute('data-case-ready','true')
 
+    async def test_15_navigation_has_only_global_and_internal_rails_and_restores_legacy(self):
+        await self.page.goto(self.base+'/app/ddas/logistics/case',wait_until='domcontentloaded');await self.page.locator('[data-ultimate-ready=true]').wait_for()
+        await self.check_navigation_sizes()
+        await expect(self.page.locator('[data-dation-test=core-step-2]')).to_be_disabled();await expect(self.page.locator('[data-dation-test=core-step-3]')).to_be_disabled()
+        _,_,c=await self.case();cid=c['case']['id'];await self.open_map(cid);await self.assert_journey_navigation()
+        rail=self.page.locator('.journey-studio-rail:visible');await expect(rail.get_by_role('button',name='Decision Configuration',exact=False)).to_be_disabled();await expect(rail.get_by_role('button',name='Decision Dashboard',exact=False)).to_be_disabled()
+        # Reuse the same DOM twice to exercise signature cleanup and historical guards.
+        for _ in range(2):
+            await self.page.evaluate("window.dationUnifiedJourney=false;window.dationRenderCaseFlow('logistics-map')")
+            await expect(self.page.locator('#dda-workspace-nav-shell')).to_be_visible();await expect(self.page.locator('#dda-workspace-nav > button')).to_have_count(4)
+            await expect(self.page.locator('#dda-workspace-nav [data-step="2"]')).to_have_attribute('aria-current','step');await expect(self.page.locator('#dda-workspace-nav [data-step="3"]')).to_be_disabled();await expect(self.page.locator('#dda-workspace-nav [data-step="4"]')).to_be_disabled()
+            await self.page.evaluate("window.dationUnifiedJourney=true;window.dationRenderCaseFlow('logistics-map')");await self.assert_journey_navigation()
+        await self.page.reload();await self.page.locator('[data-graph-ready=true]').wait_for();await self.assert_journey_navigation()
+
 
 class JourneyEngineTests(unittest.IsolatedAsyncioTestCase):
     capture=UnifiedDecisionJourneyTests.capture
+    assert_journey_navigation=UnifiedDecisionJourneyTests.assert_journey_navigation
+    check_navigation_sizes=UnifiedDecisionJourneyTests.check_navigation_sizes
     fixture_name='journey_result_fixture.py'
     setUpClass=classmethod(UnifiedDecisionJourneyTests.setUpClass.__func__)
     tearDownClass=classmethod(setup.UltimateCaseSetupTests.tearDownClass.__func__)
@@ -133,6 +183,7 @@ class JourneyEngineTests(unittest.IsolatedAsyncioTestCase):
     template=pack.UltimateCaseDataTests.template
     owner=nav.UltimateNavigationTests.owner
     async def test_08_real_d1_d2_approval_returns_graph_and_exact_dashboard_origin(self):
+        await self.page.set_viewport_size({'width':1536,'height':960})
         _,_,c=await self.case();cid=c['case']['id'];await self.owner(cid)
         session=await self.context.request.post(self.base+'/auth/session',headers={'Origin':self.base});token=(await session.json())['access_token']
         for entity in ['transport_demand','transport_resources']:
@@ -141,18 +192,29 @@ class JourneyEngineTests(unittest.IsolatedAsyncioTestCase):
         await self.page.goto(self.base+'/app/ddas/logistics/decisions?case_id='+cid,wait_until='domcontentloaded');await self.page.locator('[data-graph-ready=true]').wait_for()
         approved=[]
         for node in ['logistics_assignment','logistics_scheduling']:
-            await self.page.locator('[data-graph-node='+node+'] [data-map-action]').first.click();await self.page.locator('[data-graph-config='+node+']').wait_for();await expect(self.page.get_by_role('button',name='Ejecutar decisión',exact=True)).to_be_enabled();await self.capture(path=str(OUT/(node+'-configuration-1536.png')),full_page=True,animations='disabled');await self.page.get_by_role('button',name='Ejecutar decisión',exact=True).click();await self.page.locator('.ultimate-results [data-chart] svg').wait_for(timeout=45000);await self.page.locator('.journey-studio-rail').wait_for();dashboard_url=self.page.url
+            await self.page.locator('[data-graph-node='+node+'] [data-map-action]').first.click();await self.page.locator('[data-graph-config='+node+']').wait_for();await expect(self.page.get_by_role('button',name='Ejecutar decisión',exact=True)).to_be_enabled();await self.capture(path=str(OUT/(node+'-configuration-1536.png')),full_page=True,animations='disabled');await self.check_navigation_sizes(node+'-configuration');await self.page.get_by_role('button',name='Ejecutar decisión',exact=True).click();await self.page.locator('.ultimate-results [data-chart] svg').wait_for(timeout=45000);await self.page.locator('.journey-studio-rail').wait_for();dashboard_url=self.page.url
             if node=='logistics_assignment':
                 await self.page.get_by_role('button',name='Editar Decision Case',exact=True).click();await self.page.locator('[data-ultimate-ready=true]').wait_for();await self.page.reload();await self.page.locator('[data-ultimate-ready=true]').wait_for();await self.page.get_by_label('Nombre del Case',exact=True).fill('Origen histórico exacto');await self.page.get_by_role('button',name='Guardar contexto',exact=True).click();await self.page.locator('.ultimate-results [data-chart] svg').wait_for();self.assertEqual(self.page.url,dashboard_url)
             await self.capture(path=str(OUT/(node+'-dashboard-1536.png')),full_page=True,animations='disabled');
             for width in [1024,768,390,320]:
-                await self.page.set_viewport_size({'width':width,'height':960});await self.page.evaluate('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))');self.assertFalse(await self.page.evaluate('document.documentElement.scrollWidth>innerWidth'),{'node':node,'width':width})
-                if width==390:await self.capture(path=str(OUT/(node+'-dashboard-390.png')),full_page=True,animations='disabled')
+                await self.page.set_viewport_size({'width':width,'height':960});await self.page.evaluate('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))');await self.assert_journey_navigation();self.assertFalse(await self.page.evaluate('document.documentElement.scrollWidth>innerWidth'),{'node':node,'width':width})
+                if width in [1024,390]:await self.capture(path=str(OUT/(node+'-dashboard-'+str(width)+'.png')),full_page=True,animations='disabled')
             await self.page.set_viewport_size({'width':1536,'height':960});await self.page.locator('[data-check-review]').click();await expect(self.page.locator('[data-approve-package]')).to_be_enabled();if_lost=node=='logistics_assignment'
+            approval_events=[]
+            def approval_request(request):
+                if '/graph?' in request.url:approval_events.append({'request':request.url.split('/api/',1)[-1]})
+            def approval_response(response):
+                if '/graph?' in response.url:approval_events.append({'response':response.status,'url':response.url.split('/api/',1)[-1]})
+            self.page.on('request',approval_request);self.page.on('response',approval_response)
+            await self.page.evaluate('''async()=>{const {scopeFor}=await import('/static/js/dispatch/lifecycle.mjs');window.__approvalScope=scopeFor(document.querySelector('.ultimate-results'));window.__approvalDisposals=[];window.__approvalScope.signal.addEventListener('abort',()=>window.__approvalDisposals.push(new Error('scope disposed').stack));}''')
             if if_lost:
                 async def lost(route):
-                    response=await route.fetch();self.assertTrue(response.ok);await route.abort('failed')
+                    approval_events.append('intercepted');response=await route.fetch();approval_events.append({'status':response.status});self.assertTrue(response.ok);await route.abort('failed');approval_events.append('response_lost')
                 await self.page.route('**/api/runs/*/approve',lost,times=1)
-            await self.page.locator('[data-approve-package]').click();await self.page.wait_for_url('**/decisions?**',timeout=30000);await self.page.locator('[data-graph-ready=true]').wait_for();g=await self.api('GET','/api/platform/logistics-cases/'+cid+'/graph');n=next(n for n in g['graph']['nodes'] if n['id']==node);self.assertEqual(n['node_state'],'APPROVED');approved.append(n['approved_run_id'])
+            await self.page.locator('[data-approve-package]').click()
+            try:await self.page.wait_for_url('**/decisions?**',timeout=30000)
+            except Exception:
+                print('APPROVAL_NAV_DIAGNOSTIC='+json.dumps({'node':node,'events':approval_events,'url':self.page.url,'unified':await self.page.evaluate('window.dationUnifiedJourney'),'feedback':await self.page.locator('[data-review-feedback]').all_text_contents(),'scope':await self.page.evaluate('({active:window.__approvalScope.active,disposals:window.__approvalDisposals})'),'graph':await self.api('GET','/api/platform/logistics-cases/'+cid+'/graph')}));raise
+            await self.page.locator('[data-graph-ready=true]').wait_for();g=await self.api('GET','/api/platform/logistics-cases/'+cid+'/graph');n=next(n for n in g['graph']['nodes'] if n['id']==node);self.assertEqual(n['node_state'],'APPROVED');approved.append(n['approved_run_id'])
             if node=='logistics_assignment':self.assertEqual(g['graph']['nodes'][1]['node_state'],'READY')
         self.assertNotEqual(*approved);await expect(self.page.get_by_role('button',name='Cerrar Decision Case',exact=True)).to_be_enabled();await self.capture(path=str(OUT/'studio-closure-ready-1536.png'),full_page=True,animations='disabled');await self.page.get_by_role('button',name='Cerrar Decision Case',exact=True).click();await self.page.get_by_role('dialog').get_by_role('button',name='Cerrar Decision Case',exact=True).click();await self.page.wait_for_url('**/app/decisions?**');state=await self.api('GET','/api/platform/logistics-cases/'+cid+'/journey');self.assertIsNotNone(state['lifecycle']['closed_at'])

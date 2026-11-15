@@ -1,4 +1,3 @@
-import {renderJourneyProgress} from '../journey/progress.mjs';
 import {resolveNodeDestination,resolveDecisionDestination} from './decision-target.mjs';
 import {DECISION_META} from '../decision-ui.mjs';
 import {decisionRail,bindDecisionRail} from './decision-nav.mjs';
@@ -43,12 +42,11 @@ export function revealCurrentStep(root){
 }
 export function renderCaseFlow(root,{view,route,state={}}){
  const unified=!!globalThis.window?.dationUnifiedJourney;
- const visible=[...views,'logistics-case-data',...(unified?['logistics-case-setup']:[])].includes(view);
+ const visible=!unified&&[...views,'logistics-case-data'].includes(view);
+ root.parentElement.querySelector('.journey-current-step')?.remove();
+ root.classList.remove('journey-six-steps');
  root.parentElement.hidden=!visible;
  if(!visible){root.replaceChildren();signatures.delete(root);return;}
- root.parentElement.querySelector('.journey-current-step')?.remove();
- if(unified){renderJourneyProgress(root,{view,route,state});return;}
- root.classList.remove('journey-six-steps');
  const steps=caseFlowSteps(view,route,state),signature=JSON.stringify(steps);
  if(signatures.get(root)===signature&&root.children.length)return;
  signatures.set(root,signature);root.replaceChildren();

@@ -1,0 +1,8 @@
+Navigation-only follow-up to candidate 4287d868.
+25 unique browser/E2E cases covered: 15 Unified Journey and 10 historical navigation.
+Initial combined run: 24 PASS, 1 timeout in W08 lost approval response; no product change made to approval.
+Diagnostic: intercepted approval returned HTTP 200, response deliberately lost; server Graph showed D1 APPROVED/CURRENT. Timeout cause not attributed.
+After final timeout: W08 PASS (30.930s), then W08 twice consecutively PASS (46.601s total), with the original 30s navigation deadline and all assertions intact.
+Final Core/Graph W07 + W15 PASS (28.715s).
+Five Node navigation files PASS; static and diff checks PASS.
+All screenshots are real local fixture captures. No production operations.

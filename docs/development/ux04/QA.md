@@ -8,9 +8,9 @@ Pruebas exclusivamente en sandbox sintético local: FastAPI real, PostgreSQL17/P
 - **G1:** staging privado por actor/workspace/version, CAS, TTL/cotas, cleanup y finalización recuperable; migración aditiva OFF. 24 tests de integración PASS.
 - **G2:** contratos UX02 + tarjetas de CSV/errores/advertencias/preview/candidatos; Data Owner provisional; continuar con dos datos o sin datos; candidatos guardados recuperables y selección de preparación propia.
 - **G3:** creación y publicación canónicas idempotentes, intención durable, mismo Case ante falla o respuesta perdida; consulta del Graph antes de navegar.
-- **G4:** cuatro niveles + seis hitos contextuales; rail único en Core sin accordions principales; internos conservados. Studio Graph/Configuration/Dashboard; retornos serializados y validados.
+- **G4:** una barra global de cuatro niveles y un rail interno de tres pasos por contexto (Core o Studio), sin segunda barra horizontal ni «Paso X de 6». Core sin accordions principales; internos conservados. Studio Graph/Configuration/Dashboard; retornos serializados y validados.
 - **G5:** derivación sin mutar original, linaje persistente, edición administrativa contextual, aprobación confirmada/lost-response→Graph y cierre explícito bajo CAS/auditoría. Archivado anterior conserva su semántica.
-- **G6:** 14 E2E nuevos únicos (tanda estable de 12 y controles focales de respuesta tardía y archivos locales sin guardar), 51 regresiones UX01/02/03/setup/navegación, Node de rutas y estáticos. FAST/FULL/required-gate se registran en el PR con su resultado terminal y SHA; no se crean commits sólo para actualizar tiempos de CI.
+- **G6:** 15 E2E nuevos únicos (incluyen respuesta tardía, archivos locales sin guardar y composición de navegación con restauración histórica), 51 regresiones UX01/02/03/setup/navegación, Node de rutas y estáticos. FAST/FULL/required-gate se registran en el PR con su resultado terminal y SHA; no se crean commits sólo para actualizar tiempos de CI.
 - **G7:** PR abierto/revisión y [activación MANUAL](ACTIVATION.md); ninguna operación productiva realizada.
 
 ## Matriz AC-01–34
@@ -61,15 +61,16 @@ Las dos imágenes del paquete son referencias estéticas; el documento manda sob
 
 | Estado | Archivo |
 | --- | --- |
-| Core01 | [Desktop](evidence/core01-1536.png) |
+| Core01 | [Desktop](evidence/core01-1536.png) · [Tablet](evidence/core01-1024.png) · [Móvil](evidence/core01-390.png) |
 | Core02 vacío | [Desktop](evidence/core02-empty-1536.png) |
-| Core02 dos candidatos | [Desktop](evidence/core02-valid-1536.png) · [Móvil](evidence/core02-valid-390.png) |
+| Core02 dos candidatos | [Desktop](evidence/core02-valid-1536.png) · [Tablet](evidence/core02-valid-1024.png) · [Móvil](evidence/core02-valid-390.png) |
 | Core02 advertencia real | [Desktop](evidence/core02-warning-1536.png) |
-| Core03 | [Desktop](evidence/core03-1536.png) |
-| Graph | [Desktop](evidence/studio-graph-1536.png) · [Móvil](evidence/studio-graph-390.png) |
-| Config D1/D2 | [D1](evidence/logistics_assignment-configuration-1536.png) · [D2](evidence/logistics_scheduling-configuration-1536.png) |
-| Dashboard D1 | [Desktop](evidence/logistics_assignment-dashboard-1536.png) · [Móvil](evidence/logistics_assignment-dashboard-390.png) |
-| Dashboard D2 | [Desktop](evidence/logistics_scheduling-dashboard-1536.png) · [Móvil](evidence/logistics_scheduling-dashboard-390.png) |
+| Core03 | [Desktop](evidence/core03-1536.png) · [Tablet](evidence/core03-1024.png) · [Móvil](evidence/core03-390.png) |
+| Graph | [Desktop](evidence/studio-graph-1536.png) · [Tablet](evidence/studio-graph-1024.png) · [Móvil](evidence/studio-graph-390.png) |
+| Config D1 | [Desktop](evidence/logistics_assignment-configuration-1536.png) · [Tablet](evidence/logistics_assignment-configuration-1024.png) · [Móvil](evidence/logistics_assignment-configuration-390.png) |
+| Config D2 | [Desktop](evidence/logistics_scheduling-configuration-1536.png) · [Tablet](evidence/logistics_scheduling-configuration-1024.png) · [Móvil](evidence/logistics_scheduling-configuration-390.png) |
+| Dashboard D1 | [Desktop](evidence/logistics_assignment-dashboard-1536.png) · [Tablet](evidence/logistics_assignment-dashboard-1024.png) · [Móvil](evidence/logistics_assignment-dashboard-390.png) |
+| Dashboard D2 | [Desktop](evidence/logistics_scheduling-dashboard-1536.png) · [Tablet](evidence/logistics_scheduling-dashboard-1024.png) · [Móvil](evidence/logistics_scheduling-dashboard-390.png) |
 | Cierre habilitado | [Desktop](evidence/studio-closure-ready-1536.png) |
 | Derivación | [Core02](evidence/derivation.png) |
 
@@ -90,3 +91,13 @@ W14 reprodujo un defecto antes de integrar: saltar por el rail a Core03 con un C
 La ejecución FULL [43658139128](https://github.com/nicsejara/Dation/actions/runs/43658139128) aprobó Python, Node, los 344 tests de navegador, Docker y los 192 tests SQL. El último recorrido E2E falló en dos casos (`test_workflow` desktop/mobile), ambos en la misma comparación exacta de los títulos de Core. El test esperaba `01 Logistics Model`/`02 Data Contract`/`03 Decision Case`, mientras que el main inicial ya genera `01. Logistics Model`/`02. Data Contract`/`03. Decision Case`.
 
 Se reprodujeron los dos fallos en un checkout aislado de `4b66044806f93535a363ad8829c8eb003644958e`: misma línea 75, mismos dos fallos, sin errores de infraestructura. Es una expectativa obsoleta preexistente, no una regresión de UX04. Se actualizan sólo los tres textos esperados, conservando igualdad exacta, paneles, visibilidad, creación/ejecución/aprobación/navegación y los controles de seguridad del recorrido completo. Ambos E2E PASS (87,161 s) sobre la rama corregida. [Recibo focal baseline/corrección](evidence/workflow-labels.json). El producto no cambia con esta corrección; el nuevo SHA debe obtener FAST/FULL/required-gate terminales antes de cerrar la entrega.
+
+## Ajuste visual de navegación sobre el candidato 4287d868
+
+Por instrucción del propietario, se retira únicamente el renderer horizontal de seis pasos, su estado «Paso X de 6» y sus estilos exclusivos. `renderCaseFlow` oculta completamente `#dda-workspace-nav-shell` en Unified Journey, vacía sus hijos y limpia el cache; el renderer histórico de cuatro pasos mantiene destinos, permisos y bloqueos cuando Unified Journey está OFF. La actualización de contexto vuelve a sincronizar ese contenedor después de resolver el flag en una entrada directa a Studio, evitando una franja vacía. La barra global y los rails internos no cambian sus componentes ni reglas.
+
+W15 reproduce el defecto antes del ajuste y exige después: cuatro niveles globales con su estado activo exacto; tres pasos internos con estado activo correcto; ausencia de botones, texto, separadores y caja residual de la barra eliminada; restauración histórica sobre el mismo DOM, repetida dos veces; entrada directa y recarga de Graph. W07/W08 verifican también Core, Config y Dashboard en 1536/1024/768/390/320 px, sin overflow y con idénticos estados y permisos al cambiar de ancho. Todas las capturas comprueban esa composición antes de guardarse. [Mediciones de navegación](evidence/navigation-layout.json) · [Resultado focal](evidence/navigation-focal.txt).
+
+Alcance exclusivo de presentación: sin cambios a Data Preparation, contratos de Case/Graph, configuración, resultados, backend, API, motores, persistencia o migración SQL. El delta visual corresponde a R2; el PR acumulado conserva R3 y sus gates FAST/FULL obligatorios, sin modificar el clasificador. No merge ni operación productiva.
+
+Validación local del ajuste: 25 escenarios únicos cubiertos (15 Journey y 10 navegación histórica). La tanda combinada tuvo 24 PASS y un timeout W08 de respuesta perdida; el diagnóstico focal confirmó HTTP200 de aprobación y D1 APPROVED/CURRENT en el servidor, sin atribuir una causa al timeout ni cambiar el producto. Después del último timeout, W08 pasó tres veces consecutivas (30,930 s y dos casos en 46,601 s), conservando assertions y espera de navegación de 30 s. W07/W15 finales PASS (28,715 s), cinco archivos Node PASS. Las capturas de Config comienzan explícitamente en 1536 px para que el nombre del archivo coincida con el viewport real. La CI del SHA definitivo sigue siendo obligatoria; el resultado terminal se registra en el PR.

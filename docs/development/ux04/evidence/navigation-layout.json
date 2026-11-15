@@ -1,0 +1,975 @@
+{
+  "scope": "local_synthetic_fixture",
+  "viewports": [
+    1536,
+    1024,
+    768,
+    390,
+    320
+  ],
+  "layout_samples": [
+    {
+      "width": 1536,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "logistics-config",
+      "step": 2,
+      "buttons": [
+        {
+          "label": "Decision Graph",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Decision Configuration",
+          "disabled": false,
+          "current": "step"
+        },
+        {
+          "label": "Decision Dashboard",
+          "disabled": true,
+          "current": null
+        }
+      ]
+    },
+    {
+      "width": 1024,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "logistics-config",
+      "step": 2,
+      "buttons": [
+        {
+          "label": "Decision Graph",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Decision Configuration",
+          "disabled": false,
+          "current": "step"
+        },
+        {
+          "label": "Decision Dashboard",
+          "disabled": true,
+          "current": null
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "logistics-config",
+      "step": 2,
+      "buttons": [
+        {
+          "label": "Decision Graph",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Decision Configuration",
+          "disabled": false,
+          "current": "step"
+        },
+        {
+          "label": "Decision Dashboard",
+          "disabled": true,
+          "current": null
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "logistics-config",
+      "step": 2,
+      "buttons": [
+        {
+          "label": "Decision Graph",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Decision Configuration",
+          "disabled": false,
+          "current": "step"
+        },
+        {
+          "label": "Decision Dashboard",
+          "disabled": true,
+          "current": null
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "logistics-config",
+      "step": 2,
+      "buttons": [
+        {
+          "label": "Decision Graph",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Decision Configuration",
+          "disabled": false,
+          "current": "step"
+        },
+        {
+          "label": "Decision Dashboard",
+          "disabled": true,
+          "current": null
+        }
+      ]
+    },
+    {
+      "width": 1536,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "decision-dashboard",
+      "step": 3,
+      "buttons": [
+        {
+          "label": "Decision Graph",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Decision Configuration",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Decision Dashboard",
+          "disabled": false,
+          "current": "step"
+        }
+      ]
+    },
+    {
+      "width": 1024,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "decision-dashboard",
+      "step": 3,
+      "buttons": [
+        {
+          "label": "Decision Graph",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Decision Configuration",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Decision Dashboard",
+          "disabled": false,
+          "current": "step"
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "decision-dashboard",
+      "step": 3,
+      "buttons": [
+        {
+          "label": "Decision Graph",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Decision Configuration",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Decision Dashboard",
+          "disabled": false,
+          "current": "step"
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "decision-dashboard",
+      "step": 3,
+      "buttons": [
+        {
+          "label": "Decision Graph",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Decision Configuration",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Decision Dashboard",
+          "disabled": false,
+          "current": "step"
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "decision-dashboard",
+      "step": 3,
+      "buttons": [
+        {
+          "label": "Decision Graph",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Decision Configuration",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Decision Dashboard",
+          "disabled": false,
+          "current": "step"
+        }
+      ]
+    },
+    {
+      "width": 1536,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "logistics-map",
+      "step": 1,
+      "buttons": [
+        {
+          "label": "Decision Graph",
+          "disabled": false,
+          "current": "step"
+        },
+        {
+          "label": "Decision Configuration",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Decision Dashboard",
+          "disabled": false,
+          "current": null
+        }
+      ]
+    },
+    {
+      "width": 1536,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "logistics-case-setup",
+      "step": 2,
+      "buttons": [
+        {
+          "label": "Logistics Model",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Data Contract & Preparation",
+          "disabled": false,
+          "current": "step"
+        },
+        {
+          "label": "Decision Case",
+          "disabled": false,
+          "current": null
+        }
+      ]
+    },
+    {
+      "width": 1024,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "logistics-case-setup",
+      "step": 2,
+      "buttons": [
+        {
+          "label": "Logistics Model",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Data Contract & Preparation",
+          "disabled": false,
+          "current": "step"
+        },
+        {
+          "label": "Decision Case",
+          "disabled": false,
+          "current": null
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "logistics-case-setup",
+      "step": 2,
+      "buttons": [
+        {
+          "label": "Logistics Model",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Data Contract & Preparation",
+          "disabled": false,
+          "current": "step"
+        },
+        {
+          "label": "Decision Case",
+          "disabled": false,
+          "current": null
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "logistics-case-setup",
+      "step": 2,
+      "buttons": [
+        {
+          "label": "Logistics Model",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Data Contract & Preparation",
+          "disabled": false,
+          "current": "step"
+        },
+        {
+          "label": "Decision Case",
+          "disabled": false,
+          "current": null
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "logistics-case-setup",
+      "step": 2,
+      "buttons": [
+        {
+          "label": "Logistics Model",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Data Contract & Preparation",
+          "disabled": false,
+          "current": "step"
+        },
+        {
+          "label": "Decision Case",
+          "disabled": false,
+          "current": null
+        }
+      ]
+    },
+    {
+      "width": 1536,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "logistics-case-setup",
+      "step": 1,
+      "buttons": [
+        {
+          "label": "Logistics Model",
+          "disabled": false,
+          "current": "step"
+        },
+        {
+          "label": "Data Contract & Preparation",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Decision Case",
+          "disabled": false,
+          "current": null
+        }
+      ]
+    },
+    {
+      "width": 1024,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "logistics-case-setup",
+      "step": 1,
+      "buttons": [
+        {
+          "label": "Logistics Model",
+          "disabled": false,
+          "current": "step"
+        },
+        {
+          "label": "Data Contract & Preparation",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Decision Case",
+          "disabled": false,
+          "current": null
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "logistics-case-setup",
+      "step": 1,
+      "buttons": [
+        {
+          "label": "Logistics Model",
+          "disabled": false,
+          "current": "step"
+        },
+        {
+          "label": "Data Contract & Preparation",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Decision Case",
+          "disabled": false,
+          "current": null
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "logistics-case-setup",
+      "step": 1,
+      "buttons": [
+        {
+          "label": "Logistics Model",
+          "disabled": false,
+          "current": "step"
+        },
+        {
+          "label": "Data Contract & Preparation",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Decision Case",
+          "disabled": false,
+          "current": null
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "logistics-case-setup",
+      "step": 1,
+      "buttons": [
+        {
+          "label": "Logistics Model",
+          "disabled": false,
+          "current": "step"
+        },
+        {
+          "label": "Data Contract & Preparation",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Decision Case",
+          "disabled": false,
+          "current": null
+        }
+      ]
+    },
+    {
+      "width": 1536,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "logistics-case-setup",
+      "step": 3,
+      "buttons": [
+        {
+          "label": "Logistics Model",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Data Contract & Preparation",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Decision Case",
+          "disabled": false,
+          "current": "step"
+        }
+      ]
+    },
+    {
+      "width": 1024,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "logistics-case-setup",
+      "step": 3,
+      "buttons": [
+        {
+          "label": "Logistics Model",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Data Contract & Preparation",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Decision Case",
+          "disabled": false,
+          "current": "step"
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "logistics-case-setup",
+      "step": 3,
+      "buttons": [
+        {
+          "label": "Logistics Model",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Data Contract & Preparation",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Decision Case",
+          "disabled": false,
+          "current": "step"
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "logistics-case-setup",
+      "step": 3,
+      "buttons": [
+        {
+          "label": "Logistics Model",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Data Contract & Preparation",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Decision Case",
+          "disabled": false,
+          "current": "step"
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "logistics-case-setup",
+      "step": 3,
+      "buttons": [
+        {
+          "label": "Logistics Model",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Data Contract & Preparation",
+          "disabled": false,
+          "current": null
+        },
+        {
+          "label": "Decision Case",
+          "disabled": false,
+          "current": "step"
+        }
+      ]
+    },
+    {
+      "width": 1536,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "logistics-map",
+      "step": 1,
+      "buttons": [
+        {
+          "label": "Decision Graph",
+          "disabled": false,
+          "current": "step"
+        },
+        {
+          "label": "Decision Configuration",
+          "disabled": true,
+          "current": null
+        },
+        {
+          "label": "Decision Dashboard",
+          "disabled": true,
+          "current": null
+        }
+      ]
+    },
+    {
+      "width": 1024,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "logistics-map",
+      "step": 1,
+      "buttons": [
+        {
+          "label": "Decision Graph",
+          "disabled": false,
+          "current": "step"
+        },
+        {
+          "label": "Decision Configuration",
+          "disabled": true,
+          "current": null
+        },
+        {
+          "label": "Decision Dashboard",
+          "disabled": true,
+          "current": null
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "logistics-map",
+      "step": 1,
+      "buttons": [
+        {
+          "label": "Decision Graph",
+          "disabled": false,
+          "current": "step"
+        },
+        {
+          "label": "Decision Configuration",
+          "disabled": true,
+          "current": null
+        },
+        {
+          "label": "Decision Dashboard",
+          "disabled": true,
+          "current": null
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "logistics-map",
+      "step": 1,
+      "buttons": [
+        {
+          "label": "Decision Graph",
+          "disabled": false,
+          "current": "step"
+        },
+        {
+          "label": "Decision Configuration",
+          "disabled": true,
+          "current": null
+        },
+        {
+          "label": "Decision Dashboard",
+          "disabled": true,
+          "current": null
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "logistics-map",
+      "step": 1,
+      "buttons": [
+        {
+          "label": "Decision Graph",
+          "disabled": false,
+          "current": "step"
+        },
+        {
+          "label": "Decision Configuration",
+          "disabled": true,
+          "current": null
+        },
+        {
+          "label": "Decision Dashboard",
+          "disabled": true,
+          "current": null
+        }
+      ]
+    },
+    {
+      "width": 1440,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "logistics-case-setup",
+      "step": 1,
+      "buttons": [
+        {
+          "label": "Logistics Model",
+          "disabled": false,
+          "current": "step"
+        },
+        {
+          "label": "Data Contract & Preparation",
+          "disabled": true,
+          "current": null
+        },
+        {
+          "label": "Decision Case",
+          "disabled": true,
+          "current": null
+        }
+      ]
+    },
+    {
+      "width": 1536,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "logistics-case-setup",
+      "step": 1,
+      "buttons": [
+        {
+          "label": "Logistics Model",
+          "disabled": false,
+          "current": "step"
+        },
+        {
+          "label": "Data Contract & Preparation",
+          "disabled": true,
+          "current": null
+        },
+        {
+          "label": "Decision Case",
+          "disabled": true,
+          "current": null
+        }
+      ]
+    },
+    {
+      "width": 1024,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "logistics-case-setup",
+      "step": 1,
+      "buttons": [
+        {
+          "label": "Logistics Model",
+          "disabled": false,
+          "current": "step"
+        },
+        {
+          "label": "Data Contract & Preparation",
+          "disabled": true,
+          "current": null
+        },
+        {
+          "label": "Decision Case",
+          "disabled": true,
+          "current": null
+        }
+      ]
+    },
+    {
+      "width": 768,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "logistics-case-setup",
+      "step": 1,
+      "buttons": [
+        {
+          "label": "Logistics Model",
+          "disabled": false,
+          "current": "step"
+        },
+        {
+          "label": "Data Contract & Preparation",
+          "disabled": true,
+          "current": null
+        },
+        {
+          "label": "Decision Case",
+          "disabled": true,
+          "current": null
+        }
+      ]
+    },
+    {
+      "width": 390,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "logistics-case-setup",
+      "step": 1,
+      "buttons": [
+        {
+          "label": "Logistics Model",
+          "disabled": false,
+          "current": "step"
+        },
+        {
+          "label": "Data Contract & Preparation",
+          "disabled": true,
+          "current": null
+        },
+        {
+          "label": "Decision Case",
+          "disabled": true,
+          "current": null
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "shellHeight": 0,
+      "navHeight": 0,
+      "display": "none",
+      "overflow": false,
+      "view": "logistics-case-setup",
+      "step": 1,
+      "buttons": [
+        {
+          "label": "Logistics Model",
+          "disabled": false,
+          "current": "step"
+        },
+        {
+          "label": "Data Contract & Preparation",
+          "disabled": true,
+          "current": null
+        },
+        {
+          "label": "Decision Case",
+          "disabled": true,
+          "current": null
+        }
+      ]
+    }
+  ],
+  "samples_before_deduplication": 113
+}
