@@ -10,7 +10,7 @@ Pruebas exclusivamente en sandbox sintético local: FastAPI real, PostgreSQL17/P
 - **G3:** creación y publicación canónicas idempotentes, intención durable, mismo Case ante falla o respuesta perdida; consulta del Graph antes de navegar.
 - **G4:** cuatro niveles + seis hitos contextuales; rail único en Core sin accordions principales; internos conservados. Studio Graph/Configuration/Dashboard; retornos serializados y validados.
 - **G5:** derivación sin mutar original, linaje persistente, edición administrativa contextual, aprobación confirmada/lost-response→Graph y cierre explícito bajo CAS/auditoría. Archivado anterior conserva su semántica.
-- **G6:** 13 E2E nuevos únicos (tanda estable de 12 y control focal de respuesta tardía), 51 regresiones UX01/02/03/setup/navegación, Node de rutas y estáticos. FAST/FULL/required-gate se registran en el PR con su resultado terminal y SHA; no se crean commits sólo para actualizar tiempos de CI.
+- **G6:** 14 E2E nuevos únicos (tanda estable de 12 y controles focales de respuesta tardía y archivos locales sin guardar), 51 regresiones UX01/02/03/setup/navegación, Node de rutas y estáticos. FAST/FULL/required-gate se registran en el PR con su resultado terminal y SHA; no se crean commits sólo para actualizar tiempos de CI.
 - **G7:** PR abierto/revisión y [activación MANUAL](ACTIVATION.md); ninguna operación productiva realizada.
 
 ## Matriz AC-01–34
@@ -24,14 +24,14 @@ Pruebas exclusivamente en sandbox sintético local: FastAPI real, PostgreSQL17/P
 | 02 Modelo nuevo | PASS | Reg Logistics Model12 + W01 contratos/version real seleccionada; publicación canónica intacta |
 | 03 Modelo reutilizado | PASS | W01/03/11, B01: versión exacta ligada al stage, readonly vinculada al Case |
 | 04 Templates | PASS | Reg Data Contract10 + W01/12: descargas reales; compilador/headers sin cambios |
-| 05 CSV faltante | PASS | W02, B05: continuar vacío → DATA_REQUIRED y Core02 del mismo Case |
+| 05 CSV faltante | PASS | W02/14, B05: continuar vacío → DATA_REQUIRED y Core02 del mismo Case |
 | 06 CSV inválido | PASS | W06, B02/13: detalle real, sin candidato/bytes válidos ni Case residual |
 | 07 Advertencias | PASS | W12: UNKNOWN_COST real, detalle, candidato guardado sin publicación |
 | 08 Dos CSV válidos | PASS | W01, B01/04: stage privado de ambas entidades sin crear Case anticipado |
 | 09 Refresh/logout/aislamiento | PASS | W01/09: refresh y reanudación; B03: otro actor/workspace/viewer no obtiene stage; drafts existentes se aíslan por identidad, auth/logout en FULL |
 | 10 Cambio de Model | PASS | W11/13 + B01/09/21; versiones y hashes canónicos comprobados; nueva preparación no mezcla contratos; generación invalida respuestas anteriores |
 | 11 Data Owner | PASS | W01: intención elegible + asignación efectiva; B04/17: permiso/elegibilidad revalidados |
-| 12 Finalizar Core03 | PASS | W01, B04/05: Case/Pack/Graph reales, sin autoejecución |
+| 12 Finalizar Core03 | PASS | W01/14, B04/05: Case/Pack/Graph reales, sin autoejecución |
 | 13 Falla después de Case | PASS | W09, B06/13: FINALIZING durable, mismo Case, recuperación explícita |
 | 14 Respuesta perdida | PASS | B07/14: publicación UUID estable y una única versión; W09 recarga y recuperación |
 | 15 D1 sin datos | PASS | W02 → Core02, conserva case_id, no ingesta en Graph |
@@ -80,3 +80,7 @@ No se retocan screenshots. Se capturan desde scroll0, con fuentes/estilos del pr
 Storage es un servidor privado de contrato del sandbox, no Supabase productivo. Algunos escenarios de congelamiento/NOT_APPLICABLE usan fixtures explícitas de metadata; W08 ejecuta y aprueba D1/D2 reales de principio a fin localmente. Los tests de roles modifican sólo identidades sintéticas y las restauran. Las pruebas no prueban IAM real, cuota de Storage del proyecto ni activación del schema; eso pertenece al GO manual.
 
 FULL y flags OFF son obligatorios antes de revisión final. El resultado de CI, SHA y duración final se publican en la descripción del único PR. No se declara PROD_READY.
+
+## Control final de CSV local sin guardar
+
+W14 reprodujo un defecto antes de integrar: saltar por el rail a Core03 con un CSV sólo local permitía crear el Case antes de resolver la selección. La validación compartida ahora bloquea ese submit antes de congelar la intención; conserva archivo y campos y recupera el progreso al guardar. W14 PASS (18,271 s), con flujos normal y sin datos también PASS en la tanda focal de tres. La CI del candidato anterior se canceló para evitar completar FULL sobre un SHA sustituido; el nuevo candidato requiere nuevamente su gate FAST/FULL completo. No se debilitaron assertions.
