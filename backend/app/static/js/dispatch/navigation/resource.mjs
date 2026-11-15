@@ -25,11 +25,19 @@ export function readResource(url){
     resource.modelId=q.get('model_id');
     if(resource.modelId&&!UUID.test(resource.modelId)&&!(resource.view==='logistics-models'&&resource.modelId==='new'))throw new Error('El Model del enlace no es válido.');
   }
+  if(resource.view==='logistics-case-setup'){
+    resource.coreStep=q.has('core_step')?Number(q.get('core_step')):null;
+    if(resource.coreStep!==null&&![1,2,3].includes(resource.coreStep))throw new Error('Paso de Core inválido.');
+    for(const [key,param]of [['preparationId','preparation_id'],['parentCaseId','parent_case_id'],['returnRun','return_run']]){resource[key]=q.get(param);if(resource[key]&&!UUID.test(resource[key]))throw new Error('Identidad de preparación/retorno inválida.');}
+    resource.returnView=q.get('return_view');if(resource.returnView&&!['logistics-map','logistics-config','decision-dashboard','platform-decisions'].includes(resource.returnView))throw new Error('Retorno fuera de la navegación permitida.');
+    if(q.has('return_center')){const c=new URL('http://localhost/app/decisions');c.search=q.get('return_center');resource.returnCenter=readCenterResource(c);}
+    resource.returnNode=q.get('return_node');if(resource.returnNode&&!NODES.includes(resource.returnNode))throw new Error('Decisión de retorno inválida.');
+  }
   return resource;
 }
 export function resourceUrl(url,resource){
   const next=new URL(url,'http://localhost');
-  for(const key of ['view','case_id','node_id','run_id','dda','settings_tab','model_id',...HUB_KEYS,...CENTER_KEYS])next.searchParams.delete(key);
+  for(const key of ['view','case_id','node_id','run_id','dda','settings_tab','model_id','core_step','preparation_id','parent_case_id','return_view','return_node','return_run','return_center',...HUB_KEYS,...CENTER_KEYS])next.searchParams.delete(key);
   next.pathname=PLATFORM_PATHS[resource.view]||'/app';
   next.searchParams.set('view',resource.view);
   if(resource.caseId&&['overview','logistics-overview','logistics-data','logistics-map','logistics-config','decision-dashboard','traceability','library','logistics-case-setup','logistics-case-data'].includes(resource.view))next.searchParams.set('case_id',resource.caseId);
@@ -39,6 +47,8 @@ export function resourceUrl(url,resource){
   if(resource.view==='platform-data')writeHubResource(next,resource.hub);
   if(resource.view==='platform-decisions')writeCenterResource(next,resource.center);
   if(resource.view==='settings')writeSettingsTab(next,resource.settingsTab);
+  if(resource.view==='logistics-case-setup')for(const [key,param]of [['coreStep','core_step'],['preparationId','preparation_id'],['parentCaseId','parent_case_id'],['returnView','return_view'],['returnNode','return_node'],['returnRun','return_run']])if(resource[key])next.searchParams.set(param,resource[key]);
+  if(resource.view==='logistics-case-setup'&&resource.returnCenter){const c=new URL('http://localhost');writeCenterResource(c,resource.returnCenter);next.searchParams.set('return_center',c.search);}
   return next;
 }
 export function runDecisionState(run,decisionCase,nodeId){

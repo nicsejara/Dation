@@ -8,6 +8,8 @@ class JourneySandbox(GraphSandbox):
     def start(self):
         super().start()
         self.sql('UPDATE dation_private.platform_release SET unified_journey_enabled=true;')
+        from auth_fixture import USER_A
+        self.sql(f"SELECT platform_set_member_responsibilities('{self.workspace_a}','{USER_A}','{USER_A}',(SELECT updated_at FROM workspace_members WHERE workspace_id='{self.workspace_a}' AND user_id='{USER_A}'),ARRAY['data_steward','data_owner','decision_owner','approver']);")
 if __name__=='__main__':
     with JourneySandbox() as s:
         print(json.dumps({'api_url':s.api_url,'control_dir':str(s.storage),'pg_container':s.pg,'database':s.database}),flush=True)

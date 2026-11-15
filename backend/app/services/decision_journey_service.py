@@ -29,7 +29,7 @@ def public(data):
     s=data['session'];uploads=[]
     for u in data['uploads']:
         m=u['metadata'];uploads.append({k:u[k] for k in ('id','entity','ready','selected')}|{'filename':m['filename'],'raw_sha256':m['raw_sha256'],'contract_hash':m['contract_hash'],'report':m['report']})
-    return {'session':{k:s[k] for k in ('id','revision','status','model_version_id','parent_case_id','case_id','expires_at','data_owner_user_id')},'uploads':uploads,'contracts':{e:c.model_dump(mode='json') for e,c in contracts(data).items()}}
+    return {'session':{**{k:s[k] for k in ('id','revision','status','model_version_id','parent_case_id','case_id','expires_at','data_owner_user_id')},'creation_intent':s['creation_body']},'uploads':uploads,'contracts':{e:c.model_dump(mode='json') for e,c in contracts(data).items()}}
 
 async def create(ctx,payload):return public(await call(ctx,'create',**payload.model_dump(mode='json')))
 
@@ -44,13 +44,14 @@ def paths(data,u):
     base=f"{data['session']['workspace_id']}/preparations/{data['session']['id']}/{u['id']}"
     return base+'/input.csv',base+'/normalized/snapshot.json'
 
-async def upload(ctx,pid,entity,raw,filename,uid,expected,revision):
+async def upload(ctx,pid,entity,raw,filename,uid,expected,revision,*,source_dataset_id=None):
     data=await state(ctx,pid);contract=contracts(data)[entity];packs.checked_hash(contract,expected)
     try:n=normalize_input(raw,contract)
     except InputValidationError as error:raise HTTPException(422,error.report) from None
     metadata={'filename':PurePosixPath((filename or entity+'.csv').replace('\\','/')).name[:120],
       'raw_sha256':n['raw_sha256'],'raw_size':len(raw),'canonical_sha256':n['canonical_sha256'],'normalized_size':n['normalized_size'],
       'bucket':SUPABASE_INPUT_BUCKET,'contract_hash':contract.contract_hash,'report':n['report']}
+    if source_dataset_id:metadata['source_dataset_id']=str(source_dataset_id)
     intent=models.snapshot_hash('journey_upload_v1',{'actor':ctx.user_id,'entity':entity,'metadata':metadata})
     data=await call(ctx,'upload_prepare',preparation_id=str(pid),upload_id=str(uid),entity=entity,metadata=metadata,intent_hash=intent,expected_revision=revision)
     u=data['upload'];a,b=paths(data,u)
@@ -129,3 +130,17 @@ async def close(ctx,cid,token):
     if not result['can_close'] or token!=data['token']:raise HTTPException(409,result['reason'] or 'El Case cambió. Actualizá el Graph.')
     await call(ctx,'close',case_id=str(cid),token=token,eligible=True)
     return (await case_state(ctx,cid))[1]
+
+
+async def compatible(ctx,pid,entity):
+    data=await state(ctx,pid);contract=contracts(data)[entity]
+    return await call(ctx,'compatible',preparation_id=str(pid),entity=entity,contract_hash=contract.contract_hash)
+
+async def reuse(ctx,pid,entity,payload):
+    data=await state(ctx,pid);contract=contracts(data)[entity]
+    source=await call(ctx,'reuse_plan',preparation_id=str(pid),entity=entity,dataset_id=str(payload.dataset_id),contract_hash=contract.contract_hash)
+    await packs.private_bucket(source['storage_bucket'])
+    raw=await packs.read_object(source['storage_bucket'],source['storage_path'],source['raw_sha256'],source['raw_size'])
+    await packs.read_object(source['normalized_bucket'],source['normalized_path'],source['canonical_sha256'],source['normalized_size'])
+    uid=uuid5(UUID(str(pid)),entity+':'+str(payload.dataset_id))
+    return await upload(ctx,pid,entity,raw,'reused-'+entity+'.csv',uid,contract.contract_hash,payload.expected_revision,source_dataset_id=payload.dataset_id)

@@ -858,6 +858,7 @@ async function navigateResource(view,options={}){
   const publicView=Object.entries(aliases).find(([,value])=>value===view)?.[0]||view;
   const next={view:publicView,caseId:!['logistics-data','logistics-map','logistics-config','decision-dashboard','logistics-case-setup','logistics-case-data'].includes(publicView)?null:['logistics-case-setup','logistics-case-data'].includes(publicView)?(options.caseId||null):options.caseId===undefined?state.decisionCase?.id||state.ultimateCaseContext?.id||null:options.caseId,nodeId:options.nodeId===undefined?state.activeNode:options.nodeId,runId:options.runId||(publicView==='decision-dashboard'?state.run?.id||resource?.runId:null)};
   if(['logistics-models','logistics-case-setup'].includes(publicView))next.modelId=options.modelId||null;
+  if(publicView==='logistics-case-setup')for(const key of ['coreStep','preparationId','parentCaseId','returnView','returnNode','returnRun','returnCenter'])next[key]=options[key]||null;
   saveDraft();routeController?.abort();routeController=new AbortController();const generation=++routeGeneration;
   runPolling.stop();pollGeneration++;
   for(const root of Object.values(roots)){disposeScope(root);root.replaceChildren();root.className='dispatch';delete root.dataset.ultimateReady;delete root.dataset.graphReady;}
@@ -877,13 +878,15 @@ async function navigateResource(view,options={}){
   createScope(root);
   try{
     if(publicView==='logistics-case-data'){
+      const {journeyEnabled}=await import('./journey/navigation.mjs');
+      if(await journeyEnabled(scopeFor(root)))return navigateResource('logistics-case-setup',{caseId:next.caseId,coreStep:2,replace:true});
       const {mountCaseData}=await import('./upload/ultimate-case-data.mjs');
       if(generation===routeGeneration)await mountCaseData(root,{route:next,navigate:navigateResource,onContext:(row,graph)=>{if(generation!==routeGeneration)return;state.ultimateCaseContext=row;state.ultimateGraph=graph;window.dationRenderContextNavigation?.();}});
       return;
     }
     if(publicView==='logistics-models'||publicView==='logistics-case-setup'){
       if(publicView==='logistics-models'){const {mountModels}=await import('./models/index.mjs');if(generation===routeGeneration)await mountModels(root,{route:next,navigate:navigateResource});}
-      else{const {mountCaseSetup}=await import('./cases/ultimate-case-setup.mjs');if(generation===routeGeneration)await mountCaseSetup(root,{route:next,navigate:navigateResource,onContext:result=>{state.ultimateCaseContext=result.case;window.dationRenderContextNavigation?.();}});}
+      else{const {mountCaseSetup}=await import('./cases/ultimate-case-setup.mjs');if(generation===routeGeneration)await mountCaseSetup(root,{route:next,navigate:navigateResource,onContext:result=>{state.ultimateCaseContext=result.case;state.ultimateGraph=result.graph||null;window.dationRenderContextNavigation?.();}});}
       if(generation===routeGeneration)window.dationRenderContextNavigation?.();return;
     }
     if(next.caseId){try{
@@ -942,3 +945,5 @@ window.addEventListener('dation:identity',()=>{if(!currentLogisticsEnabled()&&lo
 window.addEventListener('pagehide',()=>{routeController?.abort();routeGeneration++;pollGeneration++;runPolling.stop();for(const root of Object.values(roots))disposeScope(root);});
 window.addEventListener('pageshow',event=>{if(event.persisted)restoreResource();});
 restoreResource();
+
+window.DationDispatch.openCore=(caseId,options={})=>navigateResource('logistics-case-setup',{...options,caseId});

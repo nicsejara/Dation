@@ -3,7 +3,7 @@ from uuid import UUID
 from fastapi import APIRouter,Depends,File,UploadFile,Query
 from app.platform.ultimate_data_routes import access,contents
 from app.models.ultimate_data_pack import Entity,PackPublication
-from app.models.decision_journey import PreparationCreate,PreparationRevision,PreparationOwner,PreparationFinalize,CaseClose
+from app.models.decision_journey import PreparationCreate,PreparationRevision,PreparationOwner,PreparationFinalize,PreparationReuse,CaseClose
 from app.services import decision_journey_service as service
 router=APIRouter()
 @router.get('/data-preparations')
@@ -36,3 +36,8 @@ async def publish_guarded(cid:UUID,payload:PackPublication,ctx=Depends(access)):
     from app.services.case_data_pack_service import publication
     await service.call(ctx,'case_state',case_id=str(cid))
     return await publication(ctx,cid,payload,guarded=True)
+
+@router.get('/data-preparations/{pid}/reuse/{entity}')
+async def compatible(pid:UUID,entity:Entity,ctx=Depends(access)):return await service.compatible(ctx,pid,entity)
+@router.post('/data-preparations/{pid}/reuse/{entity}')
+async def reuse(pid:UUID,entity:Entity,payload:PreparationReuse,ctx=Depends(access)):return await service.reuse(ctx,pid,entity,payload)

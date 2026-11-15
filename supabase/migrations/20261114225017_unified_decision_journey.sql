@@ -37,13 +37,22 @@ CREATE TABLE dation_private.journey_case_events (
  FOREIGN KEY(workspace_id,parent_case_id) REFERENCES public.decision_cases(workspace_id,id),
  FOREIGN KEY(workspace_id,closed_by) REFERENCES public.workspace_members(workspace_id,user_id)
 );
+CREATE FUNCTION dation_private.journey_pending_work(wid uuid,cid uuid) RETURNS boolean
+LANGUAGE sql STABLE SET search_path=pg_catalog AS $$
+ SELECT EXISTS(SELECT 1 FROM public.decision_runs r WHERE r.workspace_id=wid AND r.decision_case_id=cid AND r.status IN('queued','running'))
+ OR EXISTS(SELECT 1 FROM public.dispatch_run_jobs j JOIN public.decision_runs r ON r.workspace_id=j.workspace_id AND r.id=j.run_id WHERE r.workspace_id=wid AND r.decision_case_id=cid AND j.state IN('queued','running'))
+ OR EXISTS(SELECT 1 FROM public.decision_comparative_analyses a JOIN public.decision_runs r ON r.workspace_id=a.workspace_id AND r.id=a.base_run_id WHERE r.workspace_id=wid AND r.decision_case_id=cid AND a.status IN('queued','running'))
+ OR EXISTS(SELECT 1 FROM dation_private.ultimate_input_uploads u WHERE u.workspace_id=wid AND u.case_id=cid AND u.status IN('PREPARED','READY')
+  AND NOT EXISTS(SELECT 1 FROM public.case_data_packs p JOIN public.case_data_pack_entries e ON e.workspace_id=p.workspace_id AND e.pack_version_id=p.current_version_id WHERE p.workspace_id=wid AND p.case_id=cid AND e.dataset_id=u.dataset_id));
+$$;
+REVOKE ALL ON FUNCTION dation_private.journey_pending_work(uuid,uuid) FROM PUBLIC,anon,authenticated,service_role;
 CREATE FUNCTION public.platform_decision_journey(target_workspace_id uuid,actor_user_id uuid,operation text,arguments jsonb DEFAULT '{}')
 RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog AS $$
 DECLARE role_name text; s dation_private.journey_preparations; u dation_private.journey_uploads;
  c public.decision_cases; raw jsonb; owner_id uuid; chosen uuid; result jsonb; enabled boolean;
 BEGIN
  role_name=dation_private.data_actor(target_workspace_id,actor_user_id);
- IF operation IS NULL OR operation NOT IN('capabilities','create','get','list','owner','upload_prepare','upload_get','upload_ready','unselect','begin','finish','cleanup','cleanup_done','case_state','close','guarded_publish','lifecycles')
+ IF operation IS NULL OR operation NOT IN('capabilities','create','get','list','owner','upload_prepare','upload_get','upload_ready','compatible','reuse_plan','unselect','begin','finish','cleanup','cleanup_done','case_state','close','guarded_publish','lifecycles')
  OR jsonb_typeof(arguments) IS DISTINCT FROM 'object' OR octet_length(arguments::text)>524288 THEN RAISE EXCEPTION 'Invalid journey operation' USING ERRCODE='22023'; END IF;
  SELECT unified_journey_enabled AND ultimate_foundation_enabled AND ultimate_data_pack_enabled INTO enabled FROM dation_private.platform_release WHERE singleton;
  IF operation='capabilities' THEN RETURN jsonb_build_object('enabled',coalesce(enabled,false)); END IF;
@@ -51,20 +60,27 @@ BEGIN
  IF NOT EXISTS(SELECT 1 FROM public.workspace_ddas WHERE workspace_id=target_workspace_id AND dda_id='logistics' AND status='enabled') THEN RAISE EXCEPTION 'DDA denied' USING ERRCODE='42501'; END IF;
  -- Same lock order as admission, Pack, context and responsibilities. CAS spans all mutations.
  PERFORM 1 FROM public.workspaces WHERE id=target_workspace_id FOR UPDATE;
- IF operation IN('case_state','close','guarded_publish','lifecycles') THEN
+ IF operation='lifecycles' THEN
+  IF jsonb_typeof(arguments->'case_ids') IS DISTINCT FROM 'array' OR jsonb_array_length(arguments->'case_ids')>50 THEN RAISE EXCEPTION 'Invalid lifecycle batch' USING ERRCODE='22023'; END IF;
+  RETURN coalesce((SELECT jsonb_object_agg(e.case_id::text,to_jsonb(e)) FROM dation_private.journey_case_events e WHERE e.workspace_id=target_workspace_id AND e.case_id::text IN(SELECT jsonb_array_elements_text(arguments->'case_ids'))),'{}');
+ END IF;
+ IF operation='guarded_publish' THEN
+  PERFORM dation_private.data_actor(target_workspace_id,actor_user_id,true);
+  IF EXISTS(SELECT 1 FROM public.decision_runs WHERE workspace_id=target_workspace_id AND decision_case_id=(arguments->>'case_id')::uuid) THEN RAISE EXCEPTION 'Run admitted: derive a new Case before changing inputs' USING ERRCODE='55006'; END IF;
+  RETURN public.platform_ultimate_data_pack(target_workspace_id,actor_user_id,'publish',arguments->'publication_arguments');
+ END IF;
+ IF operation IN('case_state','close') THEN
   SELECT * INTO c FROM public.decision_cases WHERE workspace_id=target_workspace_id AND id=(arguments->>'case_id')::uuid AND workflow_version=2 FOR UPDATE;
   IF NOT FOUND THEN RAISE EXCEPTION 'Case not found' USING ERRCODE='P0002'; END IF;
   raw=public.platform_ultimate_graph(target_workspace_id,actor_user_id,c.id);
   result=jsonb_build_object('snapshot',raw,'token',md5(raw::text),'has_runs',EXISTS(SELECT 1 FROM public.decision_runs WHERE workspace_id=target_workspace_id AND decision_case_id=c.id),
-   'pending_work',EXISTS(SELECT 1 FROM public.decision_runs r WHERE r.workspace_id=target_workspace_id AND r.decision_case_id=c.id AND r.status IN('queued','running')) OR EXISTS(SELECT 1 FROM dation_private.ultimate_input_uploads pending_upload WHERE pending_upload.workspace_id=target_workspace_id AND pending_upload.case_id=c.id AND pending_upload.status IN('PREPARED','READY') AND NOT EXISTS(SELECT 1 FROM public.case_data_packs p JOIN public.case_data_pack_entries e ON e.workspace_id=p.workspace_id AND e.pack_version_id=p.current_version_id WHERE p.workspace_id=target_workspace_id AND p.case_id=c.id AND e.dataset_id=pending_upload.dataset_id)),
+   'pending_work',dation_private.journey_pending_work(target_workspace_id,c.id),
    'lifecycle',(SELECT to_jsonb(e) FROM dation_private.journey_case_events e WHERE e.workspace_id=target_workspace_id AND e.case_id=c.id));
   IF operation='case_state' THEN RETURN result; END IF;
   PERFORM dation_private.data_actor(target_workspace_id,actor_user_id,true);
-  IF EXISTS(SELECT 1 FROM dation_private.journey_case_events WHERE workspace_id=target_workspace_id AND case_id=c.id AND closed_at IS NOT NULL) THEN RETURN result; END IF;
+  IF EXISTS(SELECT 1 FROM dation_private.journey_case_events WHERE workspace_id=target_workspace_id AND case_id=c.id AND closed_at IS NOT NULL) AND c.status='archived' THEN RETURN result; END IF;
   IF c.status='archived' OR arguments->>'token' IS DISTINCT FROM result->>'token' OR arguments->>'eligible' IS DISTINCT FROM 'true'
-   OR EXISTS(SELECT 1 FROM public.decision_runs WHERE workspace_id=target_workspace_id AND decision_case_id=c.id AND status IN('queued','running'))
-   OR EXISTS(SELECT 1 FROM dation_private.ultimate_input_uploads pending_upload WHERE pending_upload.workspace_id=target_workspace_id AND pending_upload.case_id=c.id AND pending_upload.status IN('PREPARED','READY')
-    AND NOT EXISTS(SELECT 1 FROM public.case_data_packs p JOIN public.case_data_pack_entries e ON e.workspace_id=p.workspace_id AND e.pack_version_id=p.current_version_id WHERE p.workspace_id=target_workspace_id AND p.case_id=c.id AND e.dataset_id=pending_upload.dataset_id))
+   OR dation_private.journey_pending_work(target_workspace_id,c.id)
   THEN RAISE EXCEPTION 'Case changed or has pending work; close denied' USING ERRCODE='55006'; END IF;
   PERFORM set_config('dation.workspace_id',target_workspace_id::text,true);PERFORM set_config('dation.actor_user_id',actor_user_id::text,true);
   UPDATE public.decision_cases SET status='archived',archived_at=clock_timestamp(),updated_at=clock_timestamp() WHERE workspace_id=target_workspace_id AND id=c.id;
@@ -95,6 +111,7 @@ BEGIN
   SELECT * INTO s FROM dation_private.journey_preparations WHERE workspace_id=target_workspace_id AND created_by=actor_user_id AND id=(arguments->>'preparation_id')::uuid FOR UPDATE;
   IF NOT FOUND THEN RAISE EXCEPTION 'Preparation not found' USING ERRCODE='P0002'; END IF;
  END IF;
+ IF operation IN('cleanup','cleanup_done') THEN PERFORM dation_private.data_actor(target_workspace_id,actor_user_id,true); END IF;
  IF operation='cleanup' THEN
   IF s.status IN('DRAFT','VALIDATED') AND s.expires_at<=now() THEN UPDATE dation_private.journey_preparations SET status='EXPIRED' WHERE id=s.id RETURNING * INTO s; END IF;
   IF s.status NOT IN('EXPIRED','CONSUMED') THEN RAISE EXCEPTION 'Preparation still in use' USING ERRCODE='55006'; END IF;
@@ -104,11 +121,12 @@ BEGIN
   IF s.status NOT IN('EXPIRED','CONSUMED') THEN RAISE EXCEPTION 'Preparation still in use' USING ERRCODE='55006'; END IF;
   UPDATE dation_private.journey_uploads SET cleaned=true WHERE preparation_id=s.id AND id=(arguments->>'upload_id')::uuid; RETURN '{}';
  END IF;
- IF s.status='EXPIRED' OR s.status IN('DRAFT','VALIDATED') AND s.expires_at<=now() THEN RAISE EXCEPTION 'Preparation expired' USING ERRCODE='55006'; END IF;
+ IF s.status IN('DRAFT','VALIDATED') AND s.expires_at<=now() THEN UPDATE dation_private.journey_preparations SET status='EXPIRED' WHERE id=s.id RETURNING * INTO s; END IF;
+ IF s.status='EXPIRED' AND operation NOT IN('get','create') THEN RAISE EXCEPTION 'Preparation expired' USING ERRCODE='55006'; END IF;
  IF operation NOT IN('get','create') THEN PERFORM dation_private.data_actor(target_workspace_id,actor_user_id,true); END IF;
  IF operation='begin' AND s.creation_hash IS NOT NULL THEN
   IF s.creation_hash IS DISTINCT FROM arguments->>'creation_hash' THEN RAISE EXCEPTION 'Frozen creation intent changed' USING ERRCODE='55006'; END IF;
- ELSIF operation NOT IN('get','create','upload_get','finish') THEN
+ ELSIF operation NOT IN('get','create','upload_get','compatible','reuse_plan','finish') THEN
   IF s.status IN('FINALIZING','CONSUMED') OR s.revision IS DISTINCT FROM (arguments->>'expected_revision')::bigint THEN RAISE EXCEPTION 'Preparation changed; reload its revision' USING ERRCODE='55006'; END IF;
   IF operation='owner' THEN
    owner_id=(arguments->>'data_owner_user_id')::uuid;
@@ -138,6 +156,16 @@ BEGIN
    IF s.model_version_id IS DISTINCT FROM (arguments#>>'{creation_body,logistics_model_version_id}')::uuid THEN RAISE EXCEPTION 'Model Version changed' USING ERRCODE='55006'; END IF;
    UPDATE dation_private.journey_preparations SET creation_body=arguments->'creation_body',creation_hash=arguments->>'creation_hash',status='FINALIZING',revision=revision+1,updated_at=clock_timestamp() WHERE id=s.id RETURNING * INTO s;
   ELSE RAISE EXCEPTION 'Invalid mutation' USING ERRCODE='22023'; END IF;
+ END IF;
+ IF operation IN('compatible','reuse_plan') THEN
+  PERFORM dation_private.data_actor(target_workspace_id,actor_user_id,true);
+  IF s.status NOT IN('DRAFT','VALIDATED') THEN RAISE EXCEPTION 'Preparation frozen' USING ERRCODE='55006'; END IF;
+  IF operation='compatible' THEN
+   RETURN jsonb_build_object('items',coalesce((SELECT jsonb_agg(to_jsonb(x)) FROM (SELECT d.id,d.original_filename,d.row_count FROM public.datasets d JOIN dation_private.ultimate_input_objects o ON o.workspace_id=d.workspace_id AND o.dataset_id=d.id WHERE d.workspace_id=target_workspace_id AND o.model_version_id=s.model_version_id AND d.dataset_type=arguments->>'entity' AND d.data_contract_hash=arguments->>'contract_hash' AND d.archived_at IS NULL AND d.deletion_requested_at IS NULL ORDER BY d.created_at DESC,d.id LIMIT 25) x),'[]'));
+  END IF;
+  result=dation_private.t4_entry(target_workspace_id,arguments->>'entity',(arguments->>'dataset_id')::uuid);
+  IF result IS NULL OR result->>'contract_hash' IS DISTINCT FROM arguments->>'contract_hash' OR NOT EXISTS(SELECT 1 FROM dation_private.ultimate_input_objects o JOIN public.datasets d ON d.workspace_id=o.workspace_id AND d.id=o.dataset_id WHERE o.workspace_id=target_workspace_id AND o.dataset_id=(arguments->>'dataset_id')::uuid AND o.model_version_id=s.model_version_id AND d.archived_at IS NULL AND d.deletion_requested_at IS NULL) THEN RAISE EXCEPTION 'Compatible source not found' USING ERRCODE='P0002'; END IF;
+  RETURN result;
  END IF;
  IF operation='upload_get' THEN
   SELECT * INTO u FROM dation_private.journey_uploads WHERE preparation_id=s.id AND id=(arguments->>'upload_id')::uuid;

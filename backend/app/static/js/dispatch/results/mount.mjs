@@ -2,6 +2,8 @@
 import {api,post,esc,errorBox} from '../shared.mjs';
 import {scopeFor} from '../lifecycle.mjs';
 import {graphTarget,graphStateUi} from '../navigation/ultimate-graph.mjs';
+import {journeyEnabled,origin,mountStudioRail} from '../journey/navigation.mjs';
+import {ensureStylesheet} from '../styles.mjs';
 import {render as dashboard} from '../dashboard.mjs';
 
 export async function mountUltimateResult(root,{route,navigate,onContext}){
@@ -13,6 +15,7 @@ export async function mountUltimateResult(root,{route,navigate,onContext}){
   const follow=target=>{const t=graphTarget(target);if(!t)throw new Error('Destino no disponible');return navigate(t.view,t);};
   try{
     const data=await graph();if(!scope.active)return;
+    const unified=await journeyEnabled(scope);
     if(data.selected_run?.id!==route.runId||data.selected_run.node_id!==route.nodeId)throw new Error('La corrida no pertenece a este Case y decisión.');
     onContext?.(data.case,data.graph);
     const run=await api('/api/runs/'+encodeURIComponent(route.runId),{signal:scope.signal});if(!scope.active)return;
@@ -41,12 +44,12 @@ export async function mountUltimateResult(root,{route,navigate,onContext}){
       return follow(node.actions.new_run.target);
     },{railMarkup,status:run.superseded_at?'superseded':run.approved_at?'approved':'review',activeNode:route.nodeId,
       onOpenNode:async id=>{const current=await graph(),node=current.graph.nodes.find(n=>n.id===id);if(node?.primary_action?.allowed)return follow(node.primary_action.target);},
-      onRefresh:refresh,onApprove:()=>post('/api/runs/'+encodeURIComponent(run.id)+'/approve',{case_id:route.caseId,node_id:route.nodeId,expected_result_fingerprint:run.result_fingerprint}),
-      onApprovalComplete:refresh,
+      onRefresh:refresh,onApprove:async()=>{try{return await post('/api/runs/'+encodeURIComponent(run.id)+'/approve',{case_id:route.caseId,node_id:route.nodeId,expected_result_fingerprint:run.result_fingerprint});}catch(e){if(!unified)throw e;const checked=await graph(),node=checked.graph.nodes.find(n=>n.id===route.nodeId);if(checked.selected_run?.approved_at&&node?.approved_run_id===run.id&&node.freshness==='CURRENT')return checked.selected_run;throw e;}},
+      onApprovalComplete:unified?async()=>{const checked=await graph();if(!checked.selected_run?.approved_at)throw new Error('La aprobación todavía no está confirmada.');return navigate('logistics-map',{caseId:route.caseId,nodeId:null,runId:null});}:refresh,
       getContinuation:async()=>run.approved_at?{target:graphTarget(data.graph.resume),label:'Mapa de decisiones',state:'available'}:null,
       onContinue:async()=>follow((await graph()).graph.resume),
     });
     renderedScope=scopeFor(root);await pending;
-    if(renderedScope.active){root.dataset.graphHistoricalRun=run.id;root.dataset.graphReady='true';}
+    if(renderedScope.active){if(unified){await ensureStylesheet('ultimate-foundation-styles','/static/css/ultimate-foundation.css','t3-v1');mountStudioRail(root,renderedScope,{route,data,navigate,onEdit:()=>navigate('logistics-case-setup',{caseId:route.caseId,coreStep:3,...origin(route)})});}root.dataset.graphHistoricalRun=run.id;root.dataset.graphReady='true';}
   }catch(error){if((renderedScope||scope).active)errorBox(root,error,()=>navigate('decision-dashboard',{...route,replace:true}));}
 }

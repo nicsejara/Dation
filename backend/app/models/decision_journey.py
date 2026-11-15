@@ -20,3 +20,6 @@ class PreparationFinalize(PreparationRevision):
 
 class CaseClose(ContractModel):
     token: str = Field(pattern=r'^[0-9a-f]{32}$')
+
+class PreparationReuse(PreparationRevision):
+    dataset_id: UUID

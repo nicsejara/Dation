@@ -41,7 +41,7 @@ function disclosure(label,cls){
  const details=el('details',undefined,cls),summary=el('summary',undefined,'data-contract-toggle'),chevron=el('span',undefined,'data-contract-chevron');chevron.setAttribute('aria-hidden','true');summary.append(chevron,el('span',label));details.append(summary);return details;
 }
 
-export function mountDataContractView(panel,scope,{retry:retryPreview,onContinue}){
+export function mountDataContractView(panel,scope,{retry:retryPreview,onContinue,onContracts}){
  const {body,details}=panel;details.classList.add('data-contract-step');body.classList.add('data-contract-body');
  const summary=details.querySelector('summary'),tile=el('span',undefined,'data-contract-tile'),heading=el('span',undefined,'data-contract-heading');tile.append(icon('database'));heading.append(summary.querySelector('.ultimate-disclosure__title'),body.previousElementSibling);summary.prepend(tile,heading);
  const status=el('p','Terminá Logistics Model para preparar la estructura de datos.','data-contract-status'),retry=button('Reintentar Data Contract',retryPreview),grid=el('div',undefined,'data-contract-grid'),info=el('aside',undefined,'data-contract-info'),infoText=el('div');
@@ -72,7 +72,7 @@ export function mountDataContractView(panel,scope,{retry:retryPreview,onContinue
    for(const f of contract.fields){const row=el('tr'),key=el('td'),condition=el('td');key.append(el('code',f.public_header));condition.append(el('span',fieldCondition(f),'data-contract-condition'));row.append(key,el('td',fieldDescription(f)),condition);tbody.append(row);}table.append(tbody);wrap.append(table);
    const technical=disclosure('Especificación técnica','data-contract-technical'),spec=el('pre',JSON.stringify(contract,null,2));spec.tabIndex=0;spec.role='region';spec.setAttribute('aria-label','Especificación técnica de '+label);technical.append(spec);fields.append(wrap,technical);card.append(header,badges,action,error,fields);fragment.append(card);cards.push({action,get busy(){return busy;}});
   }
-  grid.replaceChildren(fragment);hasPair=true;status.textContent=data.provisional?'Vista previa preparatoria. Publicá y seleccioná el modelo para confirmar su estructura.':'Estructura generada para la versión publicada seleccionada.';status.role='status';
+  grid.replaceChildren(fragment);onContracts?.(data,snapshot,{grid,footer,next,copy});hasPair=true;status.textContent=data.provisional?'Vista previa preparatoria. Publicá y seleccioná el modelo para confirmar su estructura.':'Estructura generada para la versión publicada seleccionada.';status.role='status';
  }
  function setState({ready,compiled,pending,failed,selected,provisional}){
   if(!compiled&&hasPair)invalidate();
