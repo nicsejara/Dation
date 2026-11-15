@@ -1169,6 +1169,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         # Auth now gates asynchronous module mounting. Inspect the committed AX tree
         # after the browser has painted the resolved shell and its controls.
         await self.page.wait_for_function("!document.documentElement.classList.contains('d-session-loading')")
+        if view=='logistics-data':await self.page.locator('#dispatch-data-root.is-enhanced').wait_for()
         await self.page.evaluate("new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))")
 
     async def test_phase6_all_pages_have_dark_contrast_accessible_names_and_no_overflow(self):
@@ -1186,8 +1187,32 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                 controls=[item for item in tree['nodes'] if not item.get('ignored') and item.get('role',{}).get('value') in ('button','link','textbox','searchbox','combobox','slider','checkbox','radio','tab','progressbar')]
                 self.assertTrue(controls)
                 missing=[item.get('role') for item in controls if not item.get('name',{}).get('value','').strip()]
+                if missing:
+                    details=[]
+                    for item in controls:
+                        if item.get('name',{}).get('value','').strip():continue
+                        try:html=await session.send('DOM.getOuterHTML',{'backendNodeId':item['backendDOMNodeId']}) if item.get('backendDOMNodeId') else {}
+                        except PlaywrightError as error:html={'outerHTML':'AX DOM node unavailable: '+str(error)}
+                        details.append({'ax':item,'html':html.get('outerHTML','')[:1800]})
+                    print('AX_NAME_DIAGNOSTIC='+json.dumps({'view':view,'node':node,'width':width,'unified':await self.page.evaluate('window.dationUnifiedJourney??null'),'controls':details}))
                 self.assertEqual(missing,[],(view,node,width,missing,await self.page.evaluate("[...document.querySelectorAll('button,[role=button]')].filter(n=>n.getClientRects().length&&!n.textContent.trim()&&!n.getAttribute('aria-label')).map(n=>n.outerHTML.slice(0,400))")))
         self.assertFalse(any(m=='POST' and p=='/api/runs' for m,p in self.requests))
+
+    async def test_phase6_data_audit_waits_for_completed_upload_mount(self):
+        entered=asyncio.Event();release=asyncio.Event()
+        async def hold_contract(route):
+            entered.set();await release.wait();await self.route_api(route)
+        await self.page.route('**/api/dispatch/contracts',hold_contract,times=1)
+        opening=asyncio.create_task(self.phase6_open('logistics-data'))
+        try:
+            await asyncio.wait_for(entered.wait(),30)
+            await self.page.wait_for_function("window.DationDispatch?.getWorkspace().decisionCase?.persisted&&!document.documentElement.classList.contains('d-session-loading')")
+            await self.page.evaluate('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>requestAnimationFrame(resolve))))')
+            self.assertFalse(opening.done(),'The audit must wait for the actual upload mount, not only workspace hydration.')
+            self.assertFalse(await self.page.locator('#dispatch-data-root').evaluate("root=>root.classList.contains('is-enhanced')"))
+        finally:
+            release.set();await opening
+        self.assertTrue(await self.page.locator('#dispatch-data-root').evaluate("root=>root.classList.contains('is-enhanced')"))
 
     async def test_phase6_tab_and_reverse_tab_keep_focus_visible_below_sticky_layers(self):
         audit=(Path(__file__).parent/'focus_audit.js').read_text()

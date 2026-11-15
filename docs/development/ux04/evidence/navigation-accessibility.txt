@@ -1,0 +1,8 @@
+test_phase6_data_audit_waits_for_completed_upload_mount (test_navigation.NavigationTests.test_phase6_data_audit_waits_for_completed_upload_mount) ... ok
+test_phase6_all_pages_have_dark_contrast_accessible_names_and_no_overflow (test_navigation.NavigationTests.test_phase6_all_pages_have_dark_contrast_accessible_names_and_no_overflow) ... ok
+test_phase6_tab_and_reverse_tab_keep_focus_visible_below_sticky_layers (test_navigation.NavigationTests.test_phase6_tab_and_reverse_tab_keep_focus_visible_below_sticky_layers) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 57.214s
+
+OK

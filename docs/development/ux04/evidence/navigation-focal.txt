@@ -6,3 +6,8 @@ After final timeout: W08 PASS (30.930s), then W08 twice consecutively PASS (46.6
 Final Core/Graph W07 + W15 PASS (28.715s).
 Five Node navigation files PASS; static and diff checks PASS.
 All screenshots are real local fixture captures. No production operations.
+
+Follow-up CI 43670637981: Journey/W08 PASS; one historical AX audit failure.
+Controlled old-helper regression RED; semantic mount barrier plus full AX audit and focus checks: 3 PASS, 57.214s.
+28 unique focal scenarios total; repeated stability runs are not added to this count.
+No product code changed after visual candidate 984f012.
