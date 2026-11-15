@@ -55,11 +55,12 @@
 @media(max-width:700px){.ultimate-foundation .ultimate-disclosure > summary,.ultimate-foundation .ultimate-disclosure__content { padding:var(--space-4); }.ultimate-foundation .ultimate-disclosure__status { font-size:.75rem; max-inline-size:46%; }}
 
 /* UX 01: scoped wizard shell; the existing Contract and Case controls stay intact. */
-.ultimate-core-setup { max-inline-size:1560px; gap:20px; padding:0; }
+.ultimate-core-setup,.journey-studio { --context-rail:216px;--context-gap:20px;--context-max:1560px; }
+.ultimate-core-setup { max-inline-size:var(--context-max); gap:20px; padding:0; }
 .ultimate-core-setup.d-platform .d-page-header { margin:0; padding:0 0 16px; }
 .ultimate-core-setup.d-platform .d-page-description { max-inline-size:none; }
 .ultimate-core-setup .d-page-title { font-size:clamp(28px,2.4vw,36px); }
-.ultimate-core-setup .core-wizard { display:grid; grid-template-columns:216px minmax(0,1fr); gap:20px; align-items:start; }
+.ultimate-core-setup .core-wizard { display:grid; grid-template-columns:var(--context-rail) minmax(0,1fr); gap:var(--context-gap); align-items:start; }
 .core-wizard > .ultimate-errors { grid-column:1/-1; }
 .core-wizard-steps { display:grid; gap:14px; position:sticky; top:24px; padding-block:18px; }
 .ultimate-core-setup.d-platform .core-wizard-steps > .d-button { position:relative; display:flex; align-items:center; justify-content:start; gap:12px; min-inline-size:0; padding:14px; white-space:normal; text-align:start; border:1px solid transparent; border-radius:10px; background:transparent; }
@@ -382,7 +383,8 @@
 .unified-journey .data-contract-footer>[data-journey-next] { grid-column:2; }
 .unified-journey .data-contract-footer>[data-journey-skip] { grid-column:1;grid-row:2;justify-self:start; }
 .unified-journey .data-contract-footer>[data-dation-test=contract-continue] { display:none; }
-.journey-studio-layout { display:grid;grid-template-columns:210px minmax(0,1fr);gap:var(--space-5);align-items:start;min-width:0; }
+.journey-studio { max-inline-size:var(--context-max); }
+.journey-studio-layout { display:grid;grid-template-columns:var(--context-rail) minmax(0,1fr);gap:var(--context-gap);align-items:start;min-width:0; }
 .journey-studio-rail { display:grid;gap:var(--space-3);position:sticky;top:var(--space-5);min-width:0; }
 .journey-studio-rail h2 { font-size:1.25rem; }
 .journey-studio-rail>button { display:grid;grid-template-columns:30px minmax(0,1fr);gap:var(--space-2);padding:var(--space-3);text-align:left;white-space:normal; }
@@ -390,7 +392,7 @@
 .journey-studio-rail>button[aria-current] { border-color:var(--color-text-accent);background:color-mix(in srgb,var(--color-text-accent) 10%,var(--color-surface)); }
 .journey-studio-content { min-width:0; }
 .journey-studio .t5-context { overflow-wrap:anywhere; }
-@media(max-width:1100px){.journey-studio-layout{grid-template-columns:minmax(0,1fr)}.journey-studio-rail{position:static;grid-template-columns:repeat(3,minmax(0,1fr))}.journey-studio-rail>:is(h2,p){grid-column:1/-1}.journey-studio-rail>button{grid-template-columns:minmax(0,1fr)}.journey-studio-rail>button>small{grid-column:1}.journey-studio-rail .core-step-number{display:none}}
+@media(max-width:1199px){.journey-studio-layout{grid-template-columns:minmax(0,1fr);gap:16px}.journey-studio-rail{position:static;grid-template-columns:repeat(3,minmax(0,1fr))}.journey-studio-rail>:is(h2,p){grid-column:1/-1}.journey-studio-rail>button{grid-template-columns:minmax(0,1fr)}.journey-studio-rail>button>small{grid-column:1}.journey-studio-rail .core-step-number{display:none}}
 @media(max-width:700px){.unified-journey .data-contract-footer{grid-template-columns:minmax(0,1fr)}.unified-journey .data-contract-footer>:is([data-journey-next],[data-journey-skip]){grid-column:1;grid-row:auto;width:100%}.unified-journey .ultimate-disclosure>header{flex-wrap:wrap}.journey-studio-rail>button{padding:8px;font-size:.75rem}}
 .dda-navigation[data-levels="4"] ol { grid-template-columns:repeat(4,minmax(0,1fr)); }
 .journey-studio-rail>button.journey-studio-edit { display:flex;width:100%;justify-content:center;text-align:center; }

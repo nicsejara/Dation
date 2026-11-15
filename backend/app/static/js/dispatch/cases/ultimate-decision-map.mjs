@@ -11,6 +11,7 @@ import {openCaseSelector} from '../traceability-ui.mjs';
 import {mountResponsibilitySelector} from './workflow-responsibility.mjs';
 
 export async function mountUltimateGraph(root,{route,navigate,onContext}){
+ if(route.view==='logistics-map'){delete root.dataset.graphReady;delete root.dataset.ultimateReady;delete root.dataset.ux05Ready;}
  const scope=scopeFor(root);root.append(loadingState('Recuperando mapa de decisiones…'));
  let pickerVersion=0,activePicker=null;const historyVersions=new Map();
  const follow=async t=>{const target=graphTarget(t);if(!target)return;if(target.view==='logistics-case-data'&&window.dationUnifiedJourney)return editSource(root,scope,route,navigate);return navigate(target.view,target);};
@@ -23,6 +24,11 @@ export async function mountUltimateGraph(root,{route,navigate,onContext}){
   if(route.view==='logistics-config'&&selected()?.actions.configure.allowed){data=await api(base+'/graph/config/'+route.nodeId,{signal:scope.signal});if(!scope.active)return;}
   const unified=await journeyEnabled(scope);const journey=unified?await api(base+'/journey',{signal:scope.signal}):null;
   onContext?.(data.case,data.graph);
+  if(unified&&route.view==='logistics-map'){
+   await ensureStylesheet('ultimate-foundation-styles','/static/css/ultimate-foundation.css','t3-v1');if(!scope.active)return;
+   const {mountCommandCenter}=await import('../graph-ux05/command-center.mjs');if(!scope.active)return;
+   await mountCommandCenter(root,{scope,route,data,journey,navigate,onContext});return;
+  }
   root.className='dispatch dispatch-upload-pro dispatch-decision-map dispatch-decision-map--premium dispatch-decision-map--case-v2 ultimate-graph-view';root.innerHTML=heroMarkup(data.case);
   const actions=el('div',undefined,'t5-actions'),context=el('section',undefined,'d-card t5-context');
   const map=()=>navigate('logistics-map',{caseId:route.caseId,nodeId:null,runId:null});

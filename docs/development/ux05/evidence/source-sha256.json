@@ -1,0 +1,16 @@
+{
+  "backend/app/static/css/ultimate-foundation.css": "30e43023a540779c089b73120305a0b05cb26783651936e136cd8f63949a2287",
+  "backend/app/static/css/ultimate-graph.css": "03ea53d9c2afae216c48a49432acd77179e87ce292001ace7d70a014a0535941",
+  "backend/app/static/js/dispatch/cases/ultimate-decision-map.mjs": "35c3c827af56f3e42d3ae1f9860aad3914c4944456540d7a80dcf74a464e9535",
+  "backend/app/static/js/dispatch/graph-ux05/command-center.mjs": "d1d67e06d79eef56457d0cb59e9baf3e80f089c03910a2b2d5a8ff42dbf68476",
+  "backend/app/static/js/dispatch/graph-ux05/command-toolbar.mjs": "6d7ade512b2419d698958858746376b40ac9dbfecc736852c89756c703ba563b",
+  "backend/app/static/js/dispatch/graph-ux05/core-summary.mjs": "c4dfe3ad13a43379c285f3227ff49ad04d32c27267fb70eef34f4e760a84632f",
+  "backend/app/static/js/dispatch/graph-ux05/decision-popover.mjs": "5887292bbe682ab2a14ecf23ab85aa6812aefa60f8ff910bf7dce7b766168578",
+  "backend/app/static/js/dispatch/graph-ux05/node-graph.mjs": "da18e3732cdcc96dbdccd9db58c65479119fe0d23e1de2f787f54b674b8d64d5",
+  "backend/app/static/js/dispatch/graph-ux05/status-presentation.mjs": "3872567e6f8b3946de8978bf93626b0046d12376699d994e99aedcea6a912779",
+  "backend/app/static/js/dispatch/journey/navigation.mjs": "c71badaedbdcffd388d165aa3ef10bff8360cc76a3d0cf717b679e7904bedd9c",
+  "backend/tests/browser/test_decision_graph_ux05.py": "4ff128755f75c4cb12a243f63cbc71fa32263bfab741bb509250cbc22ce5485d",
+  "backend/tests/browser/test_unified_decision_journey.py": "e2342a8977b95332e1fdbaf1bc8802085193ecda9b9575270585d860fb059294",
+  "backend/tests/e2e/ultimate_graph_state.py": "53389d3a120b4e273f4217503858f55597a076e073a47205f9d06ca79b5e06f8",
+  "backend/tests/test_graph_ux05.mjs": "75fe4974e81f0b789d2a47fed6099a08277cb930d427b99a44369f20ca4417c7"
+}
