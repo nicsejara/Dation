@@ -2,6 +2,7 @@
 import asyncio,json,unittest
 from pathlib import Path
 from urllib.parse import parse_qs,urlparse
+from uuid import UUID
 from playwright.async_api import expect, Error as PlaywrightError
 import test_unified_decision_journey as journey
 import test_ultimate_case_setup as setup
@@ -131,7 +132,28 @@ class JourneyNavigationTests(unittest.IsolatedAsyncioTestCase):
         m,v=await self.model();await self.page.goto(self.base+'/app/ddas/logistics/case',wait_until='domcontentloaded');await self.ready(1);await select_model(self.page,m['model']['id'],v['version']['id']);await self.ready(2);await self.page.locator('[data-journey-skip]').click();await self.ready(3);await self.page.get_by_label('Nombre del Case',exact=True).fill('Preservar ante cambio de modelo');await self.previous();await self.previous();await self.ready(1);await self.page.evaluate('window.__ux06_fresh=document.querySelector(".core-wizard")');await self.page.get_by_role('button',name='Crear otro modelo',exact=True).click();await expect(self.page.locator('[data-dation-test=core-step-2]')).to_be_disabled();await self.page.go_back();await self.ready(1);self.assertEqual(parse_qs(urlparse(self.page.url).query)['core_step'],['1']);self.assertTrue(await self.page.evaluate('window.__ux06_fresh===document.querySelector(".core-wizard")'));await expect(self.page.get_by_label('Nombre del Case',exact=True)).to_have_value('Preservar ante cambio de modelo');await expect(self.page.locator('[data-journey-navigation-note]')).to_contain_text('Se conserva el borrador')
 
     async def test_12_deriving_from_frozen_core_preserves_dashboard_parent_run(self):
-        _,_,c=await self.case();cid=c['case']['id'];await self.full(cid);rid=await self.install(cid,status='error');await self.page.goto(self.base+'/app/ddas/logistics/dashboard?case_id='+cid+'&node_id=logistics_assignment&run_id='+rid,wait_until='domcontentloaded');await self.page.locator('[data-result-pending]').wait_for();await self.page.locator('#journey-nav').get_by_role('link',name='Core Configuration',exact=True).click();await self.ready(3);await self.previous();await self.ready(2);await self.page.locator('.journey-existing-preparation').get_by_role('button',name='Editar datos de origen',exact=True).click();await self.page.get_by_role('dialog').get_by_role('button',name='Preparar nuevo Decision Case',exact=True).click();await self.ready(2);q=parse_qs(urlparse(self.page.url).query);self.assertEqual(q['parent_case_id'],[cid]);self.assertEqual(q['return_run'],[rid]);await expect(self.page.locator('.journey-return-link')).to_contain_text('Dashboard');await self.shot('derived-dashboard-origin');await self.page.locator('.journey-return-link').click();await self.page.locator('[data-result-pending]').wait_for();q=parse_qs(urlparse(self.page.url).query);self.assertEqual(q['case_id'],[cid]);self.assertEqual(q['run_id'],[rid]);self.assertEqual(q['node_id'],['logistics_assignment'])
+        _,_,c=await self.case();cid=c['case']['id'];await self.full(cid);rid=await self.install(cid,status='error')
+        await self.page.goto(self.base+'/app/ddas/logistics/dashboard?case_id='+cid+'&node_id=logistics_assignment&run_id='+rid,wait_until='domcontentloaded')
+        await self.page.locator('[data-result-pending]').wait_for()
+        await self.page.locator('#journey-nav').get_by_role('link',name='Core Configuration',exact=True).click();await self.ready(3)
+        await self.previous();await self.ready(2)
+        previous_form=await self.page.locator('.core-wizard').element_handle()
+        await self.page.locator('.journey-existing-preparation').get_by_role('button',name='Editar datos de origen',exact=True).click()
+        await self.page.get_by_role('dialog').get_by_role('button',name='Preparar nuevo Decision Case',exact=True).click()
+        # The old form is already ready at step02. The dialog's asynchronous
+        # close must first navigate to the derived resource and replace that form.
+        await self.page.wait_for_url(lambda url:'parent_case_id' in parse_qs(urlparse(str(url)).query))
+        await self.page.wait_for_function('previous=>!previous.isConnected',arg=previous_form)
+        await self.ready(2)
+        q=parse_qs(urlparse(self.page.url).query)
+        self.assertEqual(q['parent_case_id'],[cid]);self.assertEqual(q['return_run'],[rid])
+        self.assertEqual(str(UUID(q['preparation_id'][0])),q['preparation_id'][0])
+        self.assertNotIn('case_id',q);self.assertEqual(q['return_node'],['logistics_assignment'])
+        self.assertEqual(q['return_view'],['decision-dashboard'])
+        await expect(self.page.locator('.journey-return-link')).to_contain_text('Dashboard')
+        await self.shot('derived-dashboard-origin');await self.page.locator('.journey-return-link').click()
+        await self.page.locator('[data-result-pending]').wait_for();q=parse_qs(urlparse(self.page.url).query)
+        self.assertEqual(q['case_id'],[cid]);self.assertEqual(q['run_id'],[rid]);self.assertEqual(q['node_id'],['logistics_assignment'])
     async def test_13_conflict_reload_discards_draft_without_discarding_dashboard_origin(self):
         _,_,c=await self.case();cid=c['case']['id'];await self.full(cid);rid=await self.install(cid,status='error');await self.page.goto(self.base+'/app/ddas/logistics/dashboard?case_id='+cid+'&node_id=logistics_assignment&run_id='+rid,wait_until='domcontentloaded');await self.page.locator('[data-result-pending]').wait_for();await self.page.locator('#journey-nav').get_by_role('link',name='Core Configuration',exact=True).click();await self.ready(3);await self.page.get_by_label('Nombre del Case',exact=True).fill('Cambio descartado explícitamente');await self.page.route('**/api/platform/logistics-cases/'+cid+'/context',lambda r:r.fulfill(status=409,json={'detail':'El Case fue actualizado por otra persona.'}),times=1);await self.page.get_by_role('button',name='Guardar contexto',exact=True).click();await self.page.locator('[data-conflict-reload]').click();await self.page.get_by_role('dialog').get_by_role('button',name='Descartar y recargar',exact=True).click();await self.ready(3);await expect(self.page.locator('.journey-return-link')).to_contain_text('Dashboard');q=parse_qs(urlparse(self.page.url).query);self.assertEqual(q['return_run'],[rid]);await expect(self.page.get_by_label('Nombre del Case',exact=True)).to_have_value(c['case']['label']);await self.page.locator('.journey-return-link').click();await self.page.locator('[data-result-pending]').wait_for();self.assertIn('run_id='+rid,self.page.url)
         await self.page.route('**/api/platform/logistics-cases/'+cid+'/context',lambda r:r.fulfill(status=503,json={'detail':'Contexto temporalmente no disponible.'}),times=1);await self.page.locator('#journey-nav').get_by_role('link',name='Core Configuration',exact=True).click();await self.page.get_by_role('button',name='Reintentar',exact=True).click();await self.ready(3);await expect(self.page.locator('.journey-return-link')).to_contain_text('Dashboard');q=parse_qs(urlparse(self.page.url).query);self.assertEqual(q['return_run'],[rid])

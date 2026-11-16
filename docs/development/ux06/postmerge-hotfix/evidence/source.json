@@ -1,0 +1,7 @@
+{
+  "baseline": "32559265531b7af8f6c161da0e8844e691172c4e",
+  "application_git_tree": "446ea3f3ae18c90b16d8a95ea197d5433ed3b64f",
+  "test_file": "backend/tests/browser/test_journey_navigation_ux06.py",
+  "test_sha256": "c91b6396fe5730b5297eed8479604c430c0c93dc40b851c0aa130948ca71aee7",
+  "ci_terminal": "See PR for exact candidate checks; no CI inferred from local runs."
+}

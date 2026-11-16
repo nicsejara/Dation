@@ -1,0 +1,10 @@
+test_12_deriving_from_frozen_core_preserves_dashboard_parent_run (test_journey_navigation_ux06.JourneyNavigationTests.test_12_deriving_from_frozen_core_preserves_dashboard_parent_run) ... URL_GATE_BLOCKED={"url": "http://127.0.0.1:33253/app/ddas/logistics/case?view=logistics-case-setup&case_id=061eeb7e-709c-46e3-a786-c814660a4b5c&core_step=2&return_view=decision-dashboard&return_node=logistics_assignment&return_run=e286a0d8-0325-462d-a846-5f7ae775421d", "old_connected": true, "ready": "true", "step": "2"}
+MOUNT_GATE_BLOCKED={"url": "http://127.0.0.1:33253/app/ddas/logistics/case?view=logistics-case-setup&core_step=2&preparation_id=22533b67-2fde-4880-ad98-599c51e2f7cd&parent_case_id=061eeb7e-709c-46e3-a786-c814660a4b5c&return_view=decision-dashboard&return_node=logistics_assignment&return_run=e286a0d8-0325-462d-a846-5f7ae775421d", "old_connected": false, "ready": null}
+NEW_FORM_READY={"url": "http://127.0.0.1:33253/app/ddas/logistics/case?view=logistics-case-setup&core_step=2&preparation_id=22533b67-2fde-4880-ad98-599c51e2f7cd&parent_case_id=061eeb7e-709c-46e3-a786-c814660a4b5c&return_view=decision-dashboard&return_node=logistics_assignment&return_run=e286a0d8-0325-462d-a846-5f7ae775421d", "ready": "true", "new_form": true}
+Executing <Task pending name='Task-20' coro=<UnifiedDecisionJourneyTests.asyncTearDown() running at /workspace/work/dation-ux06-postmerge-hotfix/backend/tests/browser/test_unified_decision_journey.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.199 seconds
+ok
+
+----------------------------------------------------------------------
+Ran 1 test in 24.640s
+
+OK

@@ -1,0 +1,53 @@
+test_05_derived_parent_and_preparation_identity_survive_previous_and_return (test_journey_navigation_ux06.JourneyNavigationTests.test_05_derived_parent_and_preparation_identity_survive_previous_and_return) ... Executing <Task pending name='Task-11' coro=<UnifiedDecisionJourneyTests.asyncTearDown() running at /workspace/work/dation-ux06-postmerge-hotfix/backend/tests/browser/test_unified_decision_journey.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.256 seconds
+ok
+test_13_conflict_reload_discards_draft_without_discarding_dashboard_origin (test_journey_navigation_ux06.JourneyNavigationTests.test_13_conflict_reload_discards_draft_without_discarding_dashboard_origin) ... ERROR
+Executing <Task pending name='Task-26' coro=<UnifiedDecisionJourneyTests.asyncTearDown() running at /workspace/work/dation-ux06-postmerge-hotfix/backend/tests/browser/test_unified_decision_journey.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.318 seconds
+test_03_derivation_cancel_confirm_and_original_immutable (test_unified_decision_journey.UnifiedDecisionJourneyTests.test_03_derivation_cancel_confirm_and_original_immutable) ... Executing <Task finished name='Task-36' coro=<UnifiedDecisionJourneyTests.test_03_derivation_cancel_confirm_and_original_immutable() done, defined at /workspace/work/dation-ux06-postmerge-hotfix/backend/tests/browser/test_unified_decision_journey.py:110> result=None created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.122 seconds
+Executing <Task pending name='Task-41' coro=<UnifiedDecisionJourneyTests.asyncTearDown() running at /workspace/work/dation-ux06-postmerge-hotfix/backend/tests/browser/test_unified_decision_journey.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.292 seconds
+ok
+test_04_frozen_context_and_historical_return_survive_reload (test_unified_decision_journey.UnifiedDecisionJourneyTests.test_04_frozen_context_and_historical_return_survive_reload) ... Executing <Task pending name='Task-56' coro=<UnifiedDecisionJourneyTests.asyncTearDown() running at /workspace/work/dation-ux06-postmerge-hotfix/backend/tests/browser/test_unified_decision_journey.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.275 seconds
+ok
+test_11_model_change_requires_derivation_without_mutating_existing_binding (test_unified_decision_journey.UnifiedDecisionJourneyTests.test_11_model_change_requires_derivation_without_mutating_existing_binding) ... Executing <Task finished name='Task-66' coro=<UnifiedDecisionJourneyTests.test_11_model_change_requires_derivation_without_mutating_existing_binding() done, defined at /workspace/work/dation-ux06-postmerge-hotfix/backend/tests/browser/test_unified_decision_journey.py:137> result=None created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.152 seconds
+Executing <Task pending name='Task-67' coro=<UnifiedDecisionJourneyTests.asyncTearDown() running at /workspace/work/dation-ux06-postmerge-hotfix/backend/tests/browser/test_unified_decision_journey.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.291 seconds
+ok
+
+======================================================================
+ERROR: test_13_conflict_reload_discards_draft_without_discarding_dashboard_origin (test_journey_navigation_ux06.JourneyNavigationTests.test_13_conflict_reload_discards_draft_without_discarding_dashboard_origin)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/usr/lib/python3.13/asyncio/base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/workspace/work/dation-ux06-postmerge-hotfix/backend/tests/browser/test_journey_navigation_ux06.py", line 158, in test_13_conflict_reload_discards_draft_without_discarding_dashboard_origin
+    _,_,c=await self.case();cid=c['case']['id'];await self.full(cid);rid=await self.install(cid,status='error');await self.page.goto(self.base+'/app/ddas/logistics/dashboard?case_id='+cid+'&node_id=logistics_assignment&run_id='+rid,wait_until='domcontentloaded');await self.page.locator('[data-result-pending]').wait_for();await self.page.locator('#journey-nav').get_by_role('link',name='Core Configuration',exact=True).click();await self.ready(3);await self.page.get_by_label('Nombre del Case',exact=True).fill('Cambio descartado explícitamente');await self.page.route('**/api/platform/logistics-cases/'+cid+'/context',lambda r:r.fulfill(status=409,json={'detail':'El Case fue actualizado por otra persona.'}),times=1);await self.page.get_by_role('button',name='Guardar contexto',exact=True).click();await self.page.locator('[data-conflict-reload]').click();await self.page.get_by_role('dialog').get_by_role('button',name='Descartar y recargar',exact=True).click();await self.ready(3);await expect(self.page.locator('.journey-return-link')).to_contain_text('Dashboard');q=parse_qs(urlparse(self.page.url).query);self.assertEqual(q['return_run'],[rid]);await expect(self.page.get_by_label('Nombre del Case',exact=True)).to_have_value(c['case']['label']);await self.page.locator('.journey-return-link').click();await self.page.locator('[data-result-pending]').wait_for();self.assertIn('run_id='+rid,self.page.url)
+                                                                                                                                                                                                                                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_generated.py", line 20672, in wait_for
+    await self._impl_obj.wait_for(timeout=to_milliseconds(timeout), state=state)
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_locator.py", line 752, in wait_for
+    await self._frame.wait_for_selector(
+        self._selector, strict=True, timeout=timeout, state=state
+    )
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_frame.py", line 395, in wait_for_selector
+    await self._channel.send(
+        "waitForSelector", self._timeout, locals_to_params(locals())
+    )
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py", line 76, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py", line 632, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.TimeoutError: Locator.wait_for: Timeout 12000ms exceeded.
+Call log:
+  - waiting for locator("[data-result-pending]") to be visible
+
+
+----------------------------------------------------------------------
+Ran 5 tests in 71.895s
+
+FAILED (errors=1)

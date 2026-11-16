@@ -1,0 +1,27 @@
+✔ previous is local03→02→01 and exits01 to overview without creating an identity (2.949172ms)
+✔ origin logistics-map preserves canonical identities and names (0.275638ms)
+✔ origin logistics-config preserves canonical identities and names (0.090874ms)
+✔ origin decision-dashboard preserves canonical identities and names (0.071075ms)
+✔ origin platform-decisions preserves canonical identities and names (0.084385ms)
+✔ creation has no invented Graph and derivation returns to parent (0.166717ms)
+✔ exact historical Dashboard is preserved independently of current graph run (0.256179ms)
+✔ inaccessible or mismatched missing returns explicit same-Case fallback, never latest (0.245322ms)
+✔ inaccessible or mismatched case returns explicit same-Case fallback, never latest (0.107189ms)
+✔ inaccessible or mismatched node returns explicit same-Case fallback, never latest (0.175901ms)
+✔ inaccessible or mismatched run returns explicit same-Case fallback, never latest (0.089903ms)
+✔ configuration return needs exact allowed server target (0.185484ms)
+✔ local steps share a form only within the same Case, preparation and origin (0.179395ms)
+✔ Core step and exact return survive URL roundtrip (2.407571ms)
+✔ Dashboard previous reaches configuration only for the exact current accessible run (0.29754ms)
+✔ configuration previous always goes to its own Graph (0.119657ms)
+✔ incomplete origins produce a safe href even when opened in a new tab (0.261236ms)
+✔ Center return preserves all allowlisted filters rather than choosing a Case or Run (0.150453ms)
+✔ deriving inside Core keeps the original Dashboard or Center, not Core or latest (0.130092ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 19
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 18.535566
