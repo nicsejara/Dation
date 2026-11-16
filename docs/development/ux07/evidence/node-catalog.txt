@@ -1,0 +1,13 @@
+✔ only the available logistics capability has a destination (1.722013ms)
+✔ filters group real capabilities into the requested operational areas (0.352475ms)
+✔ portfolio totals and filtering grow with the registry without fixed card counts (0.242658ms)
+✔ workspace entitlement cannot activate an unavailable product or another workspace (0.291162ms)
+✔ all existing business route aliases require Logistics; platform screens remain accessible (0.245543ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 12.631377

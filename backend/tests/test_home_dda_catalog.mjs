@@ -1,11 +1,15 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {DDA_CATALOG,DDA_CATEGORIES,catalogCounts,filterCatalog,catalogAccess} from '../app/static/js/home-dda-catalog.mjs';
+import {DDA_CATALOG,HOME_DDA_CATALOG,DDA_CATEGORIES,catalogCounts,filterCatalog,catalogAccess} from '../app/static/js/home-dda-catalog.mjs';
 import {ddaEnabled,logisticsView} from '../app/static/js/platform/entitlements.mjs';
 
 test('only the available logistics capability has a destination',()=>{
-  assert.deepEqual(catalogCounts(),{available:1,comingSoon:6});
+  assert.deepEqual(catalogCounts(),{available:1,comingSoon:5});
   assert.equal(new Set(DDA_CATALOG.map(item=>item.id)).size,7);
+  assert.equal(HOME_DDA_CATALOG.length,6);
+  assert.ok(DDA_CATALOG.some(item=>item.id==='demand'));
+  assert.equal(HOME_DDA_CATALOG.some(item=>item.id==='demand'),false);
+  assert.deepEqual(catalogCounts(DDA_CATALOG),{available:1,comingSoon:6});
   assert.deepEqual(DDA_CATALOG.filter(item=>item.status==='available').map(item=>item.targetView),['logistics-overview']);
   for(const item of DDA_CATALOG.filter(item=>item.status==='coming-soon'))assert.equal(item.targetView,undefined);
   for(const item of DDA_CATALOG){
@@ -15,11 +19,12 @@ test('only the available logistics capability has a destination',()=>{
 });
 
 test('filters group real capabilities into the requested operational areas',()=>{
-  const expected={all:['logistics','production','inventory','demand','procurement','maintenance','pricing'],
+  const expected={all:['logistics','production','inventory','procurement','maintenance','pricing'],
     'supply-chain':['logistics','inventory'],operations:['procurement'],production:['production'],
-    commercial:['demand','pricing'],assets:['maintenance']};
+    commercial:['pricing'],assets:['maintenance']};
   for(const [category,ids] of Object.entries(expected))assert.deepEqual(filterCatalog(category).map(item=>item.id),ids);
   assert.deepEqual(filterCatalog('unknown'),[]);
+  assert.deepEqual(filterCatalog('assets',HOME_DDA_CATALOG.filter(x=>x.id!=='maintenance')),[]);
 });
 
 test('portfolio totals and filtering grow with the registry without fixed card counts',()=>{

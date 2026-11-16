@@ -664,7 +664,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(await self.page.locator('.dda-landing button').count(),2)
         start=self.page.locator('[data-start-new-decision]');center=self.page.locator('[data-open-decision-map]')
         self.assertFalse(await start.is_disabled());self.assertFalse(await center.is_disabled())
-        self.assertEqual(await self.page.get_by_role('button',name='Ver mis casos de Logística',exact=True).count(),1)
+        self.assertEqual(await self.page.get_by_role('button',name='Ir al Decision Center',exact=True).count(),1)
         self.assertEqual(await self.page.locator('[data-go-data],[data-go-map],[data-go-home],.dda-landing__mobile-primary').count(),0)
         await self.page.set_viewport_size({'width':390,'height':844});self.assertTrue(await start.is_visible());self.assertTrue(await center.is_visible())
         await center.click();await self.page.locator('[data-platform-decisions] .center-empty').wait_for()
@@ -2082,16 +2082,16 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         await self.page.locator('[data-dda-filter=all]').wait_for()
         await self.page.wait_for_load_state('networkidle')
         root=self.page.locator('[data-home-dda-catalog]')
-        self.assertEqual(await root.locator('[data-dda-id]').count(),7)
+        self.assertEqual(await root.locator('[data-dda-id]').count(),6)
         self.assertEqual(await root.locator('[data-dda-status=available]').count(),1)
-        self.assertEqual(await root.locator('[data-dda-status=coming-soon]').count(),6)
-        self.assertEqual(await root.locator('[data-dda-counts]').inner_text(),'1 disponible · 6 próximos')
+        self.assertEqual(await root.locator('[data-dda-status=coming-soon]').count(),5)
+        self.assertEqual(await root.locator('[data-dda-counts]').inner_text(),'1 disponible · 5 próximos')
         before=await self.page.evaluate('JSON.stringify(window.DationDispatch.getWorkspace())')
         await self.page.evaluate("window.__homeButton=document.getElementById('home-open-logistics')")
         requests=len(self.requests)
-        expected={'all':['logistics','production','inventory','demand','procurement','maintenance','pricing'],
+        expected={'all':['logistics','production','inventory','procurement','maintenance','pricing'],
             'supply-chain':['logistics','inventory'],'production':['production'],'operations':['procurement'],
-            'commercial':['demand','pricing'],'assets':['maintenance']}
+            'commercial':['pricing'],'assets':['maintenance']}
         for category,ids in expected.items():
             button=root.locator('[data-dda-filter="'+category+'"]')
             await button.focus();await self.page.keyboard.press('Enter')

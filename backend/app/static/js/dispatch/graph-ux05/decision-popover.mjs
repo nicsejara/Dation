@@ -8,7 +8,7 @@ export function contextualPanel(slot,parent,{trigger,title,onClose,id='ux05-deci
  panel.id=id;heading.id=id+'-title';heading.tabIndex=-1;panel.setAttribute('role','dialog');panel.setAttribute('aria-labelledby',heading.id);
  trigger?.setAttribute('aria-expanded','true');trigger?.setAttribute('aria-controls',id);
  const close=({restoreFocus=true}={})=>{if(!scope.active)return;scope.dispose();slot.replaceChildren();trigger?.setAttribute('aria-expanded','false');onClose?.();if(restoreFocus&&trigger?.isConnected)trigger.focus();};
- const dismiss=button('×',()=>close());dismiss.className='ux05-panel-close';dismiss.setAttribute('aria-label','Cerrar panel');panel.append(heading,dismiss);slot.replaceChildren(panel);
+ const dismiss=button('',()=>close());dismiss.className='ux05-panel-close';dismiss.setAttribute('aria-label','Cerrar panel');dismiss.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg>';panel.append(heading,dismiss);slot.replaceChildren(panel);
  scope.listen(document,'keydown',event=>{if(event.key==='Escape'){event.preventDefault();close();}});
  scope.listen(document,'pointerdown',event=>{if(!panel.contains(event.target)&&!trigger?.contains(event.target)&&!event.target.closest('.ux05-node-button'))close({restoreFocus:false});});
  scope.own(()=>trigger?.setAttribute('aria-expanded','false'));

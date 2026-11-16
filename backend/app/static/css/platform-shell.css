@@ -9,17 +9,17 @@
 
 .platform-breadcrumb[hidden]{display:none}
 
-.dda-navigation{min-width:0}.dda-navigation ol{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px;margin:0;padding:0;list-style:none;width:100%}.dda-navigation li{display:flex;min-width:0}.dda-navigation__step{display:flex;align-items:center;justify-content:center;box-sizing:border-box;min-height:44px;max-width:100%;padding:10px 14px;border:1px solid var(--color-border);border-radius:var(--radius-control);background:var(--color-surface);color:var(--color-text-secondary);font:600 12px/1.5 var(--font-sans);text-decoration:none;overflow-wrap:anywhere}.dda-navigation__step[data-state=current]{border-color:var(--color-text-accent);color:var(--color-text);box-shadow:inset 0 0 0 1px var(--color-text-accent)}.dda-navigation__step[data-state=completed]{color:var(--color-success)}.dda-navigation__step[data-state=locked]{color:var(--color-text-muted);border-style:dashed}.dda-navigation a:hover{background:var(--color-surface-raised)}.dda-navigation a:focus-visible{outline:3px solid var(--color-focus);outline-offset:3px}
+.dda-navigation{min-width:0}.dda-navigation ol{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:stretch;gap:24px;margin:0;padding:0;list-style:none;width:100%}.dda-navigation li{display:flex;min-width:0}.dda-navigation__step{display:flex;align-items:center;justify-content:center;box-sizing:border-box;min-height:44px;max-width:100%;padding:10px 14px;border:1px solid var(--color-border);border-radius:var(--radius-control);background:var(--color-surface);color:var(--color-text-secondary);font:600 12px/1.5 var(--font-sans);text-decoration:none;overflow-wrap:anywhere}.dda-navigation__step[data-state=current]{border-color:var(--color-text-accent);color:var(--color-text);box-shadow:inset 0 0 0 1px var(--color-text-accent)}.dda-navigation__step[data-state=completed]{color:var(--color-success)}.dda-navigation__step[data-state=locked]{color:var(--color-text-muted);border-style:dashed}.dda-navigation a:hover{background:var(--color-surface-raised)}.dda-navigation a:focus-visible{outline:3px solid var(--color-focus);outline-offset:3px}
 
 .dda-navigation__step,.dda-workspace-step,.dispatch-decision-tab{min-height:48px;border-radius:var(--radius-control);box-sizing:border-box}
 
-/* Three equal context levels; separators convey depth without changing pill width. */
-.journey-nav.dda-navigation{width:100%;box-sizing:border-box;overflow:visible}
-.dda-navigation ol{display:grid;grid-template-columns:repeat(var(--context-levels,3),minmax(0,1fr));gap:24px}
+/* Stable Journey slots; legacy three-level navigation retains its layout. */
+.journey-nav.dda-navigation{width:100%;box-sizing:border-box;overflow:visible;container:dda-context / inline-size}
+.dda-navigation[data-levels="3"] ol{grid-template-columns:minmax(0,.85fr) minmax(0,.85fr) minmax(0,1.3fr)}
 .dda-navigation li{position:relative}
 .dda-navigation li:not(:last-child)::after{content:'›';position:absolute;right:-17px;top:50%;transform:translateY(-50%);color:var(--color-text-muted);font-size:20px;pointer-events:none}
-.dda-navigation__step{width:100%;height:44px;min-width:0;gap:8px}
-.dda-navigation__step>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dda-navigation__step{width:100%;min-height:48px;min-width:0;gap:8px}
+.dda-navigation__step>span{white-space:normal;overflow-wrap:anywhere;line-height:1.4}
 @media(max-width:600px){.dda-navigation ol{gap:16px}.dda-navigation li:not(:last-child)::after{right:-12px;font-size:16px}.dda-navigation__step{padding:8px;font-size:12px}}
 
 .d-skip-link{position:fixed;inset:8px auto auto 8px;z-index:11000;transform:translateY(-160%);padding:12px 16px;border-radius:var(--radius-control);background:var(--color-action-primary-bg);color:var(--color-action-primary-text);font:600 14px/1.4 var(--font-sans)}
@@ -55,7 +55,6 @@
 /* Same context destinations and Case Flow, expressed as a connected working sequence. */
 .dda-navigation__step{justify-content:flex-start;border:0;border-bottom:1px solid transparent;border-radius:0;background:transparent;box-shadow:none;font-weight:500}
 .dda-navigation__step[data-state=current]{border-color:var(--color-text-accent);box-shadow:none}
-.dda-navigation ol{grid-template-columns:minmax(0,.85fr) minmax(0,.85fr) minmax(0,1.3fr)}
 .dda-workspace-nav-shell{backdrop-filter:none}
 .dda-workspace-step,.dda-workspace-step.is-current{border-radius:0;background:transparent;box-shadow:none;border-bottom:2px solid transparent}
 .dda-workspace-step.is-current{border-bottom-color:var(--color-text-accent)}
@@ -64,3 +63,10 @@
 .platform-profile-form{max-width:680px;padding:24px;background:var(--color-surface);border-radius:var(--radius-md)}
 .platform-profile-form .d-field{gap:8px}
 .platform-profile-form .d-button{margin-top:8px}
+
+/* The Home placeholder owns no separate bar; other views retain it. */
+.topbar--journey[data-home-context-hidden]{display:none}
+@container dda-context (max-width:600px){
+ .dda-navigation ol{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 20px}
+ .dda-navigation li:nth-child(2n)::after{display:none}
+}

@@ -3,7 +3,7 @@ import {corePrevious} from '../journey/targets.mjs';
 
 // Local line icons; decorative because every action/section has a visible label.
 export function wizardIcon(kind){
- const paths={layers:['M12 3 2 8l10 5 10-5-10-5Z','m2 12 10 5 10-5','m2 17 10 5 10-5'],identity:['m12 3 9 5v9l-9 5-9-5V8l9-5Z','m3 8 9 5 9-5','M12 13v9','m7 6 10 5v6'],resources:['M3 5h12v12H3z','M15 10h4l3 4v3h-7','M6 20a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z','M18 20a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z'],costs:['M14 3c4 0 7 1 7 3s-3 3-7 3-7-1-7-3 3-3 7-3Z','M7 6v5c0 2 3 3 7 3s7-1 7-3V6','M10 12c-4 0-8 1-8 3s4 3 8 3 8-1 8-3','M2 15v4c0 2 4 3 8 3s8-1 8-3v-5'],database:['M12 3C6 3 3 5 3 7s3 4 9 4 9-2 9-4-3-4-9-4Z','M3 7v10c0 2 3 4 9 4s9-2 9-4V7','M3 12c0 2 3 4 9 4s9-2 9-4'],folder:['M3 6h7l2 2h9v12H3V6Z'],check:['m5 12 4 4L19 6']};
+ const paths={back:['M19 12H5','m11 6-6 6 6 6'],layers:['M12 3 2 8l10 5 10-5-10-5Z','m2 12 10 5 10-5','m2 17 10 5 10-5'],identity:['m12 3 9 5v9l-9 5-9-5V8l9-5Z','m3 8 9 5 9-5','M12 13v9','m7 6 10 5v6'],resources:['M3 5h12v12H3z','M15 10h4l3 4v3h-7','M6 20a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z','M18 20a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z'],costs:['M14 3c4 0 7 1 7 3s-3 3-7 3-7-1-7-3 3-3 7-3Z','M7 6v5c0 2 3 3 7 3s7-1 7-3V6','M10 12c-4 0-8 1-8 3s4 3 8 3 8-1 8-3','M2 15v4c0 2 4 3 8 3s8-1 8-3v-5'],database:['M12 3C6 3 3 5 3 7s3 4 9 4 9-2 9-4-3-4-9-4Z','M3 7v10c0 2 3 4 9 4s9-2 9-4V7','M3 12c0 2 3 4 9 4s9-2 9-4'],folder:['M3 6h7l2 2h9v12H3V6Z'],check:['m5 12 4 4L19 6']};
  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('fill','none');svg.setAttribute('stroke','currentColor');svg.setAttribute('stroke-width','1.7');svg.setAttribute('stroke-linecap','round');svg.setAttribute('stroke-linejoin','round');svg.setAttribute('aria-hidden','true');svg.classList.add('model-wizard-icon');
  for(const d of paths[kind]||paths.layers){const path=document.createElementNS(svg.namespaceURI,'path');path.setAttribute('d',d);svg.append(path);}return svg;
 }
@@ -23,9 +23,17 @@ export function mountSetupSteps(form,panels,{fresh,available,unified=false,initi
  function update(){for(const [i,{action,status}]of controls.entries()){action.disabled=!available(i);if(i===active){action.setAttribute('aria-current','step');action.tabIndex=unified?-1:0;}else{action.removeAttribute('aria-current');action.tabIndex=0;}status.textContent=!available(i)?'Pendiente de modelo':panels[i].querySelector('.ultimate-disclosure__status')?.textContent||'';}}
  function show(index,focus=false,{history='push',force=false}={}){if(!available(index)||unified&&!force&&index===active)return;active=index;panels.forEach((panel,i)=>{panel.hidden=i!==index;if(i===index)panel.open=true;});form.dataset.activeStep=String(index+1);const footer=form.querySelector('.ultimate-footer');if(footer)footer.hidden=index!==2;update();onStep(index,{history});if(focus)panels[index].querySelector(unified?'header':'summary')?.focus();}
  if(unified)panels.forEach((panel,index)=>{
-  const intent=corePrevious(index+1),previous=button('← Anterior · '+intent.label,()=>intent.local?show(intent.step-1,true):onExit(intent.target));previous.dataset.journeyPrevious='';
+  const header=panel.querySelector(':scope > header');header.classList.add('journey-step-header');
+  let heading=header.querySelector('.model-wizard-heading,.data-contract-heading,.decision-case-heading');
+  if(!heading){heading=el('span',undefined,'journey-step-heading');heading.append(header.querySelector('.ultimate-disclosure__title'));const copy=panel.querySelector('.ultimate-disclosure__content > p.d-metadata');if(copy)heading.append(copy);const tile=el('span',undefined,'journey-step-tile');tile.append(wizardIcon(index===0?'layers':'database'));header.prepend(tile,heading);}
+  heading.classList.add('journey-step-heading');header.querySelector('.model-wizard-tile,.data-contract-tile,.decision-case-tile')?.classList.add('journey-step-tile');
+  const intent=corePrevious(index+1),previous=button('',()=>intent.local?show(intent.step-1,true):onExit(intent.target));previous.dataset.journeyPrevious='';previous.setAttribute('aria-label','Volver a '+intent.label);previous.title='Volver a '+intent.label;previous.append(wizardIcon('back'));
   let footer=index===2?form.querySelector('.ultimate-footer'):panel.querySelector('.model-wizard-footer,.data-contract-footer');
-  if(!footer){footer=el('footer',undefined,'journey-sequential-footer');panel.append(footer);}footer.classList.add('journey-step-footer');footer.prepend(previous);
+  if(!footer){footer=el('footer',undefined,'journey-sequential-footer');panel.append(footer);}
+  if(index<2)panel.append(footer);
+  const actions=el('div',undefined,'journey-step-actions');for(const action of footer.querySelectorAll(':scope > button'))actions.append(action);
+  const feedback=panel.querySelector('.model-wizard-feedback');if(feedback)footer.append(feedback);
+  footer.classList.add('journey-step-footer');footer.prepend(previous);footer.append(actions);
  });
  if(!available(active))active=0;show(active,false,{history:'replace',force:true});
  return {show,update,workspace,get active(){return active;}};
