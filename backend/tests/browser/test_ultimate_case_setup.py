@@ -149,6 +149,9 @@ class UltimateCaseSetupTests(unittest.IsolatedAsyncioTestCase):
             data=await self.page.evaluate('''()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,root:document.querySelector('.ultimate-foundation').getBoundingClientRect().toJSON(),controls:[...document.querySelectorAll('.ultimate-foundation input,.ultimate-foundation select,.ultimate-foundation textarea,.ultimate-foundation button')].filter(n=>n.getClientRects().length).map(n=>({name:n.name||n.textContent,height:n.getBoundingClientRect().height,right:n.getBoundingClientRect().right,left:n.getBoundingClientRect().left}))})''')
             self.assertLessEqual(data['scroll'],width+1);self.assertTrue(all(x['right']<=width+1 and x['left']>=0 for x in data['controls']),data);measurements.append(data)
         await self.page.set_viewport_size({'width':1440,'height':1000});await self.page.evaluate('document.documentElement.style.zoom="2"')
+        # CSS zoom invalidates layout asynchronously: measure the rendered state,
+        # rather than accidentally passing on the preceding 100% layout.
+        await self.page.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))')
         self.assertLessEqual(await self.page.evaluate('document.documentElement.scrollWidth'),1441);await self.page.screenshot(path=str(OUT/'case-zoom200.png'),full_page=True)
         self.assertTrue(await self.page.evaluate('matchMedia("(prefers-reduced-motion:reduce)").matches'))
         await self.page.evaluate('document.documentElement.style.zoom="1"')

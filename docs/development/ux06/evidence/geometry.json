@@ -970,45 +970,45 @@
         "label": "\u2190 Anterior \u00b7 Data Contract & Preparation",
         "rect": {
           "x": 113,
-          "y": 2242.140625,
+          "y": 3115.765625,
           "width": 254.34375,
           "height": 44,
-          "top": 2242.140625,
+          "top": 3115.765625,
           "right": 367.34375,
-          "bottom": 2286.140625,
+          "bottom": 3159.765625,
           "left": 113
         },
         "container": {
           "x": 90,
-          "y": 386.125,
+          "y": 402.53125,
           "width": 660,
-          "height": 2033.015625,
-          "top": 386.125,
+          "height": 2864.484375,
+          "top": 402.53125,
           "right": 750,
-          "bottom": 2419.140625,
+          "bottom": 3267.015625,
           "left": 90
         }
       },
       {
         "label": "Guardar contexto",
         "rect": {
-          "x": 555.96875,
-          "y": 2241.015625,
-          "width": 171.03125,
+          "x": 113,
+          "y": 3171.765625,
+          "width": 614,
           "height": 46.25,
-          "top": 2241.015625,
+          "top": 3171.765625,
           "right": 727,
-          "bottom": 2287.265625,
-          "left": 555.96875
+          "bottom": 3218.015625,
+          "left": 113
         },
         "container": {
           "x": 90,
-          "y": 386.125,
+          "y": 402.53125,
           "width": 660,
-          "height": 2033.015625,
-          "top": 386.125,
+          "height": 2864.484375,
+          "top": 402.53125,
           "right": 750,
-          "bottom": 2419.140625,
+          "bottom": 3267.015625,
           "left": 90
         }
       }
@@ -1067,22 +1067,22 @@
         "label": "\u2190 Anterior \u00b7 Logistics Model",
         "rect": {
           "x": 91,
-          "y": 3464.234375,
+          "y": 3492.640625,
           "width": 178.484375,
           "height": 44,
-          "top": 3464.234375,
+          "top": 3492.640625,
           "right": 269.484375,
-          "bottom": 3508.234375,
+          "bottom": 3536.640625,
           "left": 91
         },
         "container": {
           "x": 90,
-          "y": 386.125,
+          "y": 402.53125,
           "width": 660,
-          "height": 3141.109375,
-          "top": 386.125,
+          "height": 3153.109375,
+          "top": 402.53125,
           "right": 750,
-          "bottom": 3527.234375,
+          "bottom": 3555.640625,
           "left": 90
         }
       }
@@ -1118,22 +1118,22 @@
         "label": "\u2190 Volver al Decision Graph",
         "rect": {
           "x": 580.453125,
-          "y": 21,
+          "y": -7,
           "width": 169.546875,
           "height": 44,
-          "top": 21,
+          "top": -7,
           "right": 750,
-          "bottom": 65,
+          "bottom": 37,
           "left": 580.453125
         },
         "container": {
           "x": 90,
-          "y": 21,
+          "y": -7,
           "width": 660,
           "height": 128.171875,
-          "top": 21,
+          "top": -7,
           "right": 750,
-          "bottom": 149.171875,
+          "bottom": 121.171875,
           "left": 90
         }
       },
@@ -1141,44 +1141,44 @@
         "label": "\u2190 Anterior \u00b7 DDA Log\u00edstica",
         "rect": {
           "x": 91,
-          "y": 864.90625,
+          "y": 865.3125,
           "width": 168.609375,
           "height": 44,
-          "top": 864.90625,
+          "top": 865.3125,
           "right": 259.609375,
-          "bottom": 908.90625,
+          "bottom": 909.3125,
           "left": 91
         },
         "container": {
           "x": 90,
-          "y": 310.125,
+          "y": 298.53125,
           "width": 660,
-          "height": 617.78125,
-          "top": 310.125,
+          "height": 629.78125,
+          "top": 298.53125,
           "right": 750,
-          "bottom": 927.90625,
+          "bottom": 928.3125,
           "left": 90
         }
       }
     ],
     "heading": {
       "x": 90,
-      "y": 44.390625,
+      "y": 16.390625,
       "width": 474.453125,
       "height": 35,
-      "top": 44.390625,
+      "top": 16.390625,
       "right": 564.453125,
-      "bottom": 79.390625,
+      "bottom": 51.390625,
       "left": 90
     },
     "origin": {
       "x": 580.453125,
-      "y": 21,
+      "y": -7,
       "width": 169.546875,
       "height": 44,
-      "top": 21,
+      "top": -7,
       "right": 750,
-      "bottom": 65,
+      "bottom": 37,
       "left": 580.453125
     },
     "scenario": "core1"
@@ -2056,5 +2056,250 @@
     "heading": null,
     "origin": null,
     "scenario": "dashboard-pending"
+  },
+  {
+    "width": 1440,
+    "scroll": 1440,
+    "client": 1440,
+    "controls": [
+      {
+        "label": "\u2190 Volver al Decision Graph",
+        "rect": {
+          "x": 1036.921875,
+          "y": 194,
+          "width": 339.078125,
+          "height": 88,
+          "top": 194,
+          "right": 1376,
+          "bottom": 282,
+          "left": 1036.921875
+        },
+        "container": {
+          "x": 528,
+          "y": 194,
+          "width": 848,
+          "height": 448.796875,
+          "top": 194,
+          "right": 1376,
+          "bottom": 642.796875,
+          "left": 528
+        }
+      },
+      {
+        "label": "\u2190 Anterior \u00b7 Data Contract & Preparation",
+        "rect": {
+          "x": 574,
+          "y": 6902.96875,
+          "width": 508.671875,
+          "height": 88,
+          "top": 6902.96875,
+          "right": 1082.671875,
+          "bottom": 6990.96875,
+          "left": 574
+        },
+        "container": {
+          "x": 528,
+          "y": 1073.140625,
+          "width": 848,
+          "height": 6132.328125,
+          "top": 1073.140625,
+          "right": 1376,
+          "bottom": 7205.46875,
+          "left": 528
+        }
+      },
+      {
+        "label": "Guardar contexto",
+        "rect": {
+          "x": 574,
+          "y": 7014.96875,
+          "width": 756,
+          "height": 92.5,
+          "top": 7014.96875,
+          "right": 1330,
+          "bottom": 7107.46875,
+          "left": 574
+        },
+        "container": {
+          "x": 528,
+          "y": 1073.140625,
+          "width": 848,
+          "height": 6132.328125,
+          "top": 1073.140625,
+          "right": 1376,
+          "bottom": 7205.46875,
+          "left": 528
+        }
+      }
+    ],
+    "heading": {
+      "x": 528,
+      "y": 240.796875,
+      "width": 476.921875,
+      "height": 172.8125,
+      "top": 240.796875,
+      "right": 1004.921875,
+      "bottom": 413.609375,
+      "left": 528
+    },
+    "origin": {
+      "x": 1036.921875,
+      "y": 194,
+      "width": 339.078125,
+      "height": 88,
+      "top": 194,
+      "right": 1376,
+      "bottom": 282,
+      "left": 1036.921875
+    },
+    "scenario": "core3-zoom200"
+  },
+  {
+    "width": 1440,
+    "scroll": 1440,
+    "client": 1440,
+    "controls": [
+      {
+        "label": "\u2190 Volver al Decision Graph",
+        "rect": {
+          "x": 1036.921875,
+          "y": -465,
+          "width": 339.078125,
+          "height": 88,
+          "top": -465,
+          "right": 1376,
+          "bottom": -377,
+          "left": 1036.921875
+        },
+        "container": {
+          "x": 528,
+          "y": -465,
+          "width": 848,
+          "height": 448.796875,
+          "top": -465,
+          "right": 1376,
+          "bottom": -16.203125,
+          "left": 528
+        }
+      },
+      {
+        "label": "\u2190 Anterior \u00b7 Logistics Model",
+        "rect": {
+          "x": 530,
+          "y": 7249.90625,
+          "width": 356.953125,
+          "height": 88,
+          "top": 7249.90625,
+          "right": 886.953125,
+          "bottom": 7337.90625,
+          "left": 530
+        },
+        "container": {
+          "x": 528,
+          "y": 414.140625,
+          "width": 848,
+          "height": 6961.765625,
+          "top": 414.140625,
+          "right": 1376,
+          "bottom": 7375.90625,
+          "left": 528
+        }
+      }
+    ],
+    "heading": {
+      "x": 528,
+      "y": -418.203125,
+      "width": 476.921875,
+      "height": 172.8125,
+      "top": -418.203125,
+      "right": 1004.921875,
+      "bottom": -245.390625,
+      "left": 528
+    },
+    "origin": {
+      "x": 1036.921875,
+      "y": -465,
+      "width": 339.078125,
+      "height": 88,
+      "top": -465,
+      "right": 1376,
+      "bottom": -377,
+      "left": 1036.921875
+    },
+    "scenario": "core2-zoom200"
+  },
+  {
+    "width": 1440,
+    "scroll": 1440,
+    "client": 1440,
+    "controls": [
+      {
+        "label": "\u2190 Volver al Decision Graph",
+        "rect": {
+          "x": 1036.921875,
+          "y": -465,
+          "width": 339.078125,
+          "height": 88,
+          "top": -465,
+          "right": 1376,
+          "bottom": -377,
+          "left": 1036.921875
+        },
+        "container": {
+          "x": 528,
+          "y": -465,
+          "width": 848,
+          "height": 448.796875,
+          "top": -465,
+          "right": 1376,
+          "bottom": -16.203125,
+          "left": 528
+        }
+      },
+      {
+        "label": "\u2190 Anterior \u00b7 DDA Log\u00edstica",
+        "rect": {
+          "x": 530,
+          "y": 1645.921875,
+          "width": 337.203125,
+          "height": 88,
+          "top": 1645.921875,
+          "right": 867.203125,
+          "bottom": 1733.921875,
+          "left": 530
+        },
+        "container": {
+          "x": 528,
+          "y": 414.140625,
+          "width": 848,
+          "height": 1357.78125,
+          "top": 414.140625,
+          "right": 1376,
+          "bottom": 1771.921875,
+          "left": 528
+        }
+      }
+    ],
+    "heading": {
+      "x": 528,
+      "y": -418.203125,
+      "width": 476.921875,
+      "height": 172.8125,
+      "top": -418.203125,
+      "right": 1004.921875,
+      "bottom": -245.390625,
+      "left": 528
+    },
+    "origin": {
+      "x": 1036.921875,
+      "y": -465,
+      "width": 339.078125,
+      "height": 88,
+      "top": -465,
+      "right": 1376,
+      "bottom": -377,
+      "left": 1036.921875
+    },
+    "scenario": "core1-zoom200"
   }
 ]

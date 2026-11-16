@@ -30,6 +30,7 @@ Origen: whitelist Graph/Config/Dashboard/Center existente, parentCaseId para der
 2. Run histórico cambiado: resolver puro y revalidación de origen; tests de identidad/fallback sin latest.
 3. Derivación pierde padre/intención: conservar route/preparationId/journal; pruebas de refresh y retorno al padre.
 4. Rail limpio pierde acceso: Graph mantiene CTA y breadcrumb permite Core03; pruebas de las tres vistas, viewer/archivado y modo OFF.
-5. Footer altera gating: reubicar CTA existentes conservando sus handlers; Anterior type=button fuera de fieldsets readonly; seis anchos/AA y regresión UX01–05.
+5. Zoom CSS conserva media queries desktop: reflow por contenedor Core, con prueba ON/OFF a200% y medición tras render; el límite de overflow permanece intacto.
+6. Footer altera gating: reubicar CTA existentes conservando sus handlers; Anterior type=button fuera de fieldsets readonly; seis anchos/AA y regresión UX01–05.
 
 Sin backend de aplicación, API, SQL, motores, flags, dependencias, workflows ni infraestructura nuevos. FULL obligatorio en el candidato estable por clasificador vigente; no cambiarlo para evitar tests. G7 acaba con un único PR abierto, no merge ni publicación/despliegue.

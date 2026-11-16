@@ -1,0 +1,7 @@
+test_14_rendered_zoom_reflow_keeps_core_steps_and_controls_contained (test_journey_navigation_ux06.JourneyNavigationTests.test_14_rendered_zoom_reflow_keeps_core_steps_and_controls_contained) ... Executing <Task pending name='Task-6' coro=<UnifiedDecisionJourneyTests.asyncTearDown() running at /workspace/work/dation-ux06/backend/tests/browser/test_unified_decision_journey.py:33> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.148 seconds
+ok
+
+----------------------------------------------------------------------
+Ran 1 test in 18.778s
+
+OK

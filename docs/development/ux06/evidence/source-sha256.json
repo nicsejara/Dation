@@ -1,5 +1,5 @@
 {
-  "backend/app/static/css/ultimate-foundation.css": "afe3f63fa565797befa2ca7b55fa9f2832f051d9e7da11b69d54d4a5e479a086",
+  "backend/app/static/css/ultimate-foundation.css": "f999a0c50e23f887981129f3c2445fb5eb7e021aa7ea46904ce610620022a945",
   "backend/app/static/js/dispatch/cases/ultimate-case-setup.mjs": "f73691cdf465e59fba92ba9035700b670b465f5184821b51b62322096799de20",
   "backend/app/static/js/dispatch/cases/ultimate-decision-map.mjs": "aec88ccc07f8c2e151550986c486e356e52f81c15f9c9cdb2baef825e922e25d",
   "backend/app/static/js/dispatch/graph-ux05/command-center.mjs": "0001191f09771736335a90181ab393f1e3cad505e5a37f300df22ce8d80b754a",
@@ -10,7 +10,8 @@
   "backend/app/static/js/dispatch/results/mount.mjs": "4583120830395c29eeb801a981119bbb4ffe1caaed8a189295930d461056cd7f",
   "backend/app/static/js/dispatch/workspace.mjs": "8245121396ac8b88065f04b9960c1c806cbe97024f7f7b48d2a8d5a497286357",
   "backend/app/static/js/platform/dda-navigation.mjs": "faa80820067ff04b8ba5bd56cb43625de8521a551259cf04c92757ee7722c9ec",
-  "backend/tests/browser/test_journey_navigation_ux06.py": "18e2ad77fa8a8d2ec6e921ce5d789564669cb72cb1391ea72368817c72b90ee4",
+  "backend/tests/browser/test_journey_navigation_ux06.py": "52ee512a53c5201d1c005b9fbc9565a30db669adb02579a9e8d003010136eea5",
+  "backend/tests/browser/test_ultimate_case_setup.py": "d63bae7d56a99d8bfeb12d7edd0186f049647e8ea19bf7209a54efac24033555",
   "backend/tests/browser/test_unified_decision_journey.py": "c5a6c5265362b25d3c7661ce5a44cc003cd5a8442c4315016ca7a5b57611418a",
   "backend/tests/test_journey_navigation_ux06.mjs": "2ea8ae71e6e3186ca6adb3af7a3fe00402bb57051b92e53675de0b502e638d16"
 }

@@ -23,7 +23,7 @@ Los fixtures comprueban identidad de contenedores propios y eliminan credenciale
 
 ## Pruebas y capturas
 
-`T01`–`T13`: `JourneyNavigationTests`. `W01`–`W15`: UX04, incluido Engine08. `G01`–`G09`: UX05. `L01`–`L10`: navegación histórica OFF. `U`:19 pruebas nuevas puras +4 de serialización existentes. Controles Core responsive/zoom/touch/AA, Saga01 y borradores complementan la regresión UX01–05; FULL completa se exige por clasificación real R3, sin modificar guards/workflows.
+`T01`–`T14`: `JourneyNavigationTests`. `W01`–`W15`: UX04, incluido Engine08. `G01`–`G09`: UX05. `L01`–`L10`: navegación histórica OFF. `U`:19 pruebas nuevas puras +4 de serialización existentes. Controles Core responsive/zoom/touch/AA, Saga01 y borradores complementan la regresión UX01–05; FULL completa se exige por clasificación real R3, sin modificar guards/workflows.
 
 Evidencia en [evidence](evidence/): capturas reales de Core01/02/03 y Graph/Configuration/Dashboard a1536/1280/1024/768/390/320. Las vistas ON afirman exactamente tres botones de etapa en Studio, cero edición lateral y ubicación activa sin re-navegar. Graph mantiene una acción de edición canónica. `geometry.json` mide controles y sus contenedores, solapes entre controles, título/retorno, ausencia de barra redundante y overflow. `contrast.json` audita texto/controles con umbral AA, incluidos gradientes. Los PNG son del navegador de fixtures, no mockups ni producción.
 
@@ -67,8 +67,8 @@ PASS aquí refiere a las pruebas locales identificadas. AC36 exige además el re
 |30|T02/T03/T04/W14: no autosave ni pérdida silenciosa CSV|PASS|
 |31|T09/G06/G09/W13/L07: scope y respuesta tardía|PASS|
 |32|L01–10/W15: renderer y navegación OFF|PASS|
-|33|T07: seis anchos, contención/solapes/overflow|PASS|
-|34|T07/T10/Core06: AA, foco, teclado, nombres|PASS|
+|33|T07/T14: seis anchos y zoom200, contención/solapes/overflow|PASS|
+|34|T07/T10/T14/Core06: AA, foco, teclado, nombres|PASS|
 |35|Diff: sólo frontend/tests/docs; sin backend/SQL/infra/guards|PASS|
 |36|Único PR abierto, SHA/CI terminal y rollback|Ver cierre del PR|
 |37|T06/T07/T08/W08: exactamente04/05/06 y sin CTA lateral|PASS|
@@ -92,6 +92,8 @@ PASS aquí refiere a las pruebas locales identificadas. AC36 exige además el re
 - El fixture de roles combinaba una aprobación vigente y otro candidato de error activo; una tentativa directa de cierre fue rechazada por token cambiado. No se alteró el guard ni se agregó retry. El cohort archivado usa ahora un Case independiente close-ready y el flujo UI canónico; W08 y G03 mantienen las assertions de cierre. Se separan las cohortes de Dashboard fallido y Case archivado; no se simula archivado por SQL ni se omite la confirmación/token del cierre real.
 
 - Recuperación heredada: los callbacks de reload409 y retry503 reconstruían Core con sólo caseId/modelId y perdían origen/Run/preparación. T13 lo reprodujo y ahora verifica ambos retornos exactos. Se preserva la ruta validada en ambos callbacks; modo OFF conserva su comportamiento. La CI43773832833 del SHA3efdec22 fue cancelada antes de terminar por ese hallazgo; el PR registra la nueva CI completa del candidato corregido.
+
+- CI43776605265 pasó los 13 casos UX06 y falló únicamente Core04 al medir1690px a zoom200. El baseline intacto b9c9967 reproduce exactamente1690px con Chromium153.0.8010.12 y CPU4x. No es una regresión UX06. CSS zoom deja las media queries de viewport en1440px pero reduce el contenedor Core a424px: el rail216px comprimía el workspace a188px. Capturas anteriores de pruebas que figuraban PASS también medían1690px: la assertion podía leer el layout anterior al zoom. Se mantiene el límite1441 y se mide después de dos frames de render, sin sleeps ni retry. La corrección usa el ancho del contenedor Core para reflow de rail, tarjetas y footer; T14 comprueba los tres pasos ON, formulario/Case idénticos, contención, contraste y progreso legible. Core04 cubre OFF, touch y controles nativos. Los diagnósticos baseline/final conservan resultados fallidos y corregidos.
 
 ## Riesgos y límites
 

@@ -250,5 +250,26 @@
     "textCount": 11,
     "minimumContrast": 5.429139914708745,
     "failures": []
+  },
+  {
+    "width": 1440,
+    "scenario": "core3-zoom200",
+    "textCount": 94,
+    "minimumContrast": 5.429139914708745,
+    "failures": []
+  },
+  {
+    "width": 1440,
+    "scenario": "core2-zoom200",
+    "textCount": 85,
+    "minimumContrast": 5.429139914708745,
+    "failures": []
+  },
+  {
+    "width": 1440,
+    "scenario": "core1-zoom200",
+    "textCount": 27,
+    "minimumContrast": 6.161887829123643,
+    "failures": []
   }
 ]

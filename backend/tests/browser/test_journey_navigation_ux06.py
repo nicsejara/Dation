@@ -123,3 +123,17 @@ class JourneyNavigationTests(unittest.IsolatedAsyncioTestCase):
     async def test_13_conflict_reload_discards_draft_without_discarding_dashboard_origin(self):
         _,_,c=await self.case();cid=c['case']['id'];await self.full(cid);rid=await self.install(cid,status='error');await self.page.goto(self.base+'/app/ddas/logistics/dashboard?case_id='+cid+'&node_id=logistics_assignment&run_id='+rid,wait_until='domcontentloaded');await self.page.locator('[data-result-pending]').wait_for();await self.page.locator('#journey-nav').get_by_role('link',name='Core Configuration',exact=True).click();await self.ready(3);await self.page.get_by_label('Nombre del Case',exact=True).fill('Cambio descartado explícitamente');await self.page.route('**/api/platform/logistics-cases/'+cid+'/context',lambda r:r.fulfill(status=409,json={'detail':'El Case fue actualizado por otra persona.'}),times=1);await self.page.get_by_role('button',name='Guardar contexto',exact=True).click();await self.page.locator('[data-conflict-reload]').click();await self.page.get_by_role('dialog').get_by_role('button',name='Descartar y recargar',exact=True).click();await self.ready(3);await expect(self.page.locator('.journey-return-link')).to_contain_text('Dashboard');q=parse_qs(urlparse(self.page.url).query);self.assertEqual(q['return_run'],[rid]);await expect(self.page.get_by_label('Nombre del Case',exact=True)).to_have_value(c['case']['label']);await self.page.locator('.journey-return-link').click();await self.page.locator('[data-result-pending]').wait_for();self.assertIn('run_id='+rid,self.page.url)
         await self.page.route('**/api/platform/logistics-cases/'+cid+'/context',lambda r:r.fulfill(status=503,json={'detail':'Contexto temporalmente no disponible.'}),times=1);await self.page.locator('#journey-nav').get_by_role('link',name='Core Configuration',exact=True).click();await self.page.get_by_role('button',name='Reintentar',exact=True).click();await self.ready(3);await expect(self.page.locator('.journey-return-link')).to_contain_text('Dashboard');q=parse_qs(urlparse(self.page.url).query);self.assertEqual(q['return_run'],[rid])
+    async def test_14_rendered_zoom_reflow_keeps_core_steps_and_controls_contained(self):
+        _,_,c=await self.case();cid=c['case']['id'];await self.full(cid);await self.graph(cid)
+        await self.page.get_by_role('button',name='Editar Decision Case',exact=True).click();await self.ready(3)
+        form=await self.page.locator('.ultimate-form').element_handle()
+        await self.page.evaluate('document.documentElement.style.zoom="2"')
+        for step in [3,2,1]:
+            await self.page.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))')
+            await self.ready(step);await self.measure('core'+str(step)+'-zoom200');await self.shot('core'+str(step)+'-zoom200')
+            if step==3:
+                progress=self.page.locator('.decision-case-progress:visible')
+                self.assertGreater((await progress.bounding_box())['width'],200,'The Case footer progress must remain readable at 200% zoom')
+            self.assertTrue(await form.evaluate('n=>n.isConnected&&n===document.querySelector(".ultimate-form")'))
+            self.assertEqual(parse_qs(urlparse(self.page.url).query)['case_id'],[cid])
+            if step>1:await self.previous()
