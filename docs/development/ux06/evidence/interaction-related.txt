@@ -1,0 +1,61 @@
+test_06_studio_rail_previous_exact_dashboard_origin_and_explicit_fallback (test_journey_navigation_ux06.JourneyNavigationTests.test_06_studio_rail_previous_exact_dashboard_origin_and_explicit_fallback) ... Executing <Task pending name='Task-14' coro=<UnifiedDecisionJourneyTests.asyncTearDown() running at /workspace/work/dation-ux06/backend/tests/browser/test_unified_decision_journey.py:33> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.162 seconds
+ok
+test_08_viewer_archived_rails_and_readonly_previous_remain_available (test_journey_navigation_ux06.JourneyNavigationTests.test_08_viewer_archived_rails_and_readonly_previous_remain_available) ... ERROR
+Executing <Task pending name='Task-29' coro=<UnifiedDecisionJourneyTests.asyncTearDown() running at /workspace/work/dation-ux06/backend/tests/browser/test_unified_decision_journey.py:33> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.178 seconds
+test_06_responsive_native_states_keyboard_zoom_and_contrast (test_ultimate_navigation.UltimateNavigationTests.test_06_responsive_native_states_keyboard_zoom_and_contrast) ... ok
+
+======================================================================
+ERROR: test_08_viewer_archived_rails_and_readonly_previous_remain_available (test_journey_navigation_ux06.JourneyNavigationTests.test_08_viewer_archived_rails_and_readonly_previous_remain_available)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/usr/lib/python3.13/asyncio/base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/workspace/work/dation-ux06/backend/tests/browser/test_journey_navigation_ux06.py", line 106, in test_08_viewer_archived_rails_and_readonly_previous_remain_available
+    await self.graph(cid);await self.rail();await expect(page.get_by_role('button',name='Editar Decision Case',exact=True)).to_be_disabled();await page.locator('#journey-nav').get_by_role('link',name='Core Configuration',exact=True).click();await self.ready(3);await expect(page.get_by_label('Nombre del Case',exact=True)).to_be_disabled();await expect(page.locator('[data-journey-previous]:visible')).to_be_enabled();await self.previous();await self.ready(2);await self.previous();await self.ready(1);await page.locator('.journey-return-link').click();await page.locator('[data-ux05-ready=true]').wait_for();await page.goto(self.base+'/app/ddas/logistics/configure?case_id='+cid+'&node_id=logistics_assignment',wait_until='domcontentloaded');await page.locator('[data-graph-config]').wait_for();await self.rail();await expect(page.get_by_role('button',name='Ejecutar decisión',exact=True)).to_be_disabled();await self.previous();await page.locator('[data-ux05-ready=true]').wait_for();await page.goto(self.base+'/app/ddas/logistics/dashboard?case_id='+cid+'&node_id=logistics_assignment&run_id='+rid,wait_until='domcontentloaded');await page.locator('[data-result-pending]').wait_for();await self.rail();await expect(page.locator('[data-journey-previous]')).to_contain_text('Decision Graph');await self.shot('viewer-dashboard-390')
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ^^^^^^^^^^^^^^^^^
+  File "/workspace/work/dation-ux06/backend/tests/browser/test_journey_navigation_ux06.py", line 40, in rail
+    await current.click()
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_generated.py", line 18058, in click
+    await self._impl_obj.click(
+    ...<11 lines>...
+    )
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_locator.py", line 165, in click
+    return await self._frame._click(self._selector, strict=True, **params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_frame.py", line 594, in _click
+    await self._channel.send("click", self._timeout, locals_to_params(locals()))
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py", line 76, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py", line 632, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.TimeoutError: Locator.click: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator(".journey-studio-rail").locator("[aria-current=step]")
+    - locator resolved to <button disabled type="button" tabindex="-1" aria-current="step" class="d-button d-button--secondary" data-journey-stage="logistics-config" title="Revisá los requisitos de la decisión en Graph.">…</button>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is not enabled
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is not enabled
+    - retrying click action
+      - waiting 100ms
+    58 × waiting for element to be visible, enabled and stable
+       - element is not enabled
+     - retrying click action
+       - waiting 500ms
+
+
+----------------------------------------------------------------------
+Ran 3 tests in 78.306s
+
+FAILED (errors=1)

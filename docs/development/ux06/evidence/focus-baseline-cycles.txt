@@ -1,0 +1,48 @@
+test_diagnostic_focus_cycles (test_ultimate_navigation.UltimateNavigationTests.test_diagnostic_focus_cycles) ... CYCLE={"cycle": 0, "top": 421.96875, "bottom": 461.96875, "scrollY": 0, "width": 390, "zoom": "1", "hit": "Mapa de decisiones"}
+CYCLE={"cycle": 1, "top": -1328.03125, "bottom": -1288.03125, "scrollY": 1750, "width": 390, "zoom": "1", "hit": null}
+CYCLE={"cycle": 2, "top": 421.96875, "bottom": 461.96875, "scrollY": 0, "width": 390, "zoom": "1", "hit": "Mapa de decisiones"}
+CYCLE={"cycle": 3, "top": 421.96875, "bottom": 461.96875, "scrollY": 0, "width": 390, "zoom": "1", "hit": "Mapa de decisiones"}
+CYCLE={"cycle": 4, "top": -1328.03125, "bottom": -1288.03125, "scrollY": 1750, "width": 390, "zoom": "1", "hit": null}
+CYCLE={"cycle": 5, "top": 421.96875, "bottom": 461.96875, "scrollY": 0, "width": 390, "zoom": "1", "hit": "Mapa de decisiones"}
+CYCLE={"cycle": 6, "top": -1328.03125, "bottom": -1288.03125, "scrollY": 1750, "width": 390, "zoom": "1", "hit": null}
+CYCLE={"cycle": 7, "top": -1328.03125, "bottom": -1288.03125, "scrollY": 1750, "width": 390, "zoom": "1", "hit": null}
+CYCLE={"cycle": 8, "top": 421.96875, "bottom": 461.96875, "scrollY": 0, "width": 390, "zoom": "1", "hit": "Mapa de decisiones"}
+CYCLE={"cycle": 9, "top": 421.96875, "bottom": 461.96875, "scrollY": 0, "width": 390, "zoom": "1", "hit": "Mapa de decisiones"}
+CYCLE={"cycle": 10, "top": 421.96875, "bottom": 461.96875, "scrollY": 0, "width": 390, "zoom": "1", "hit": "Mapa de decisiones"}
+CYCLE={"cycle": 11, "top": 421.96875, "bottom": 461.96875, "scrollY": 0, "width": 390, "zoom": "1", "hit": "Mapa de decisiones"}
+CYCLE={"cycle": 12, "top": -1328.03125, "bottom": -1288.03125, "scrollY": 1750, "width": 390, "zoom": "1", "hit": null}
+CYCLE={"cycle": 13, "top": 421.96875, "bottom": 461.96875, "scrollY": 0, "width": 390, "zoom": "1", "hit": "Mapa de decisiones"}
+CYCLE={"cycle": 14, "top": -1328.03125, "bottom": -1288.03125, "scrollY": 1750, "width": 390, "zoom": "1", "hit": null}
+CYCLE={"cycle": 15, "top": -1328.03125, "bottom": -1288.03125, "scrollY": 1750, "width": 390, "zoom": "1", "hit": null}
+CYCLE={"cycle": 16, "top": 421.96875, "bottom": 461.96875, "scrollY": 0, "width": 390, "zoom": "1", "hit": "Mapa de decisiones"}
+CYCLE={"cycle": 17, "top": 421.96875, "bottom": 461.96875, "scrollY": 0, "width": 390, "zoom": "1", "hit": "Mapa de decisiones"}
+CYCLE={"cycle": 18, "top": 421.96875, "bottom": 461.96875, "scrollY": 0, "width": 390, "zoom": "1", "hit": "Mapa de decisiones"}
+CYCLE={"cycle": 19, "top": -1328.03125, "bottom": -1288.03125, "scrollY": 1750, "width": 390, "zoom": "1", "hit": null}
+FOCUS_SAMPLES=[{"phase": "focus-event", "top": 421.96875, "scrollY": 0, "width": 390, "zoom": "1"}, {"phase": "rendered", "top": 421.96875, "scrollY": 0, "width": 390, "zoom": "1"}, {"phase": "focus-event", "top": 440.0625, "scrollY": 4079, "width": 390, "zoom": "2"}, {"phase": "rendered", "top": -1328.03125, "scrollY": 1750, "width": 390, "zoom": "1"}, {"phase": "focus-event", "top": 421.96875, "scrollY": 0, "width": 390, "zoom": "1"}, {"phase": "rendered", "top": 421.96875, "scrollY": 0, "width": 390, "zoom": "1"}, {"phase": "focus-event", "top": 421.96875, "scrollY": 0, "width": 390, "zoom": "1"}, {"phase": "rendered", "top": 421.96875, "scrollY": 0, "width": 390, "zoom": "1"}, {"phase": "focus-event", "top": 440.0625, "scrollY": 4079, "width": 390, "zoom": "2"}, {"phase": "rendered", "top": -1328.03125, "scrollY": 1750, "width": 390, "zoom": "1"}, {"phase": "focus-event", "top": 421.96875, "scrollY": 0, "width": 390, "zoom": "1"}, {"phase": "rendered", "top": 421.96875, "scrollY": 0, "width": 390, "zoom": "1"}, {"phase": "focus-event", "top": 440.0625, "scrollY": 4079, "width": 390, "zoom": "2"}, {"phase": "rendered", "top": -1328.03125, "scrollY": 1750, "width": 390, "zoom": "1"}, {"phase": "focus-event", "top": 320.0625, "scrollY": 4199, "width": 390, "zoom": "2"}, {"phase": "rendered", "top": -1328.03125, "scrollY": 1750, "width": 390, "zoom": "1"}, {"phase": "focus-event", "top": 421.96875, "scrollY": 0, "width": 390, "zoom": "1"}, {"phase": "rendered", "top": 421.96875, "scrollY": 0, "width": 390, "zoom": "1"}, {"phase": "focus-event", "top": 421.96875, "scrollY": 0, "width": 390, "zoom": "1"}, {"phase": "rendered", "top": 421.96875, "scrollY": 0, "width": 390, "zoom": "1"}, {"phase": "focus-event", "top": 721.53125, "scrollY": 0, "width": 390, "zoom": "1"}, {"phase": "rendered", "top": 421.96875, "scrollY": 0, "width": 390, "zoom": "1"}, {"phase": "focus-event", "top": 421.96875, "scrollY": 0, "width": 390, "zoom": "1"}, {"phase": "rendered", "top": 421.96875, "scrollY": 0, "width": 390, "zoom": "1"}, {"phase": "focus-event", "top": 440.0625, "scrollY": 4079, "width": 390, "zoom": "2"}, {"phase": "rendered", "top": -1328.03125, "scrollY": 1750, "width": 390, "zoom": "1"}, {"phase": "focus-event", "top": 421.96875, "scrollY": 0, "width": 390, "zoom": "1"}, {"phase": "rendered", "top": 421.96875, "scrollY": 0, "width": 390, "zoom": "1"}, {"phase": "focus-event", "top": 440.0625, "scrollY": 4079, "width": 390, "zoom": "2"}, {"phase": "rendered", "top": -1328.03125, "scrollY": 1750, "width": 390, "zoom": "1"}, {"phase": "focus-event", "top": 320.0625, "scrollY": 4199, "width": 390, "zoom": "2"}, {"phase": "rendered", "top": -1328.03125, "scrollY": 1750, "width": 390, "zoom": "1"}, {"phase": "focus-event", "top": 421.96875, "scrollY": 0, "width": 390, "zoom": "1"}, {"phase": "rendered", "top": 421.96875, "scrollY": 0, "width": 390, "zoom": "1"}, {"phase": "focus-event", "top": 721.53125, "scrollY": 0, "width": 390, "zoom": "1"}, {"phase": "rendered", "top": 421.96875, "scrollY": 0, "width": 390, "zoom": "1"}, {"phase": "focus-event", "top": 421.96875, "scrollY": 0, "width": 390, "zoom": "1"}, {"phase": "rendered", "top": 421.96875, "scrollY": 0, "width": 390, "zoom": "1"}, {"phase": "focus-event", "top": 440.0625, "scrollY": 4079, "width": 390, "zoom": "2"}, {"phase": "rendered", "top": -1328.03125, "scrollY": 1750, "width": 390, "zoom": "1"}]
+FAIL
+
+======================================================================
+FAIL: test_diagnostic_focus_cycles (test_ultimate_navigation.UltimateNavigationTests.test_diagnostic_focus_cycles)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/usr/lib/python3.13/asyncio/base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/tmp/dation_ux06_focus_cycles.py", line 19, in cycles
+    self.assertEqual(failures,[])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+AssertionError: Lists differ: [{'top': -1328.03125, 'bottom': -1288.0312[769 chars]one}] != []
+
+First list contains 8 additional elements.
+First extra element 0:
+{'top': -1328.03125, 'bottom': -1288.03125, 'scrollY': 1750, 'width': 390, 'zoom': '1', 'hit': None}
+
+Diff is 1005 characters long. Set self.maxDiff to None to see it.
+
+----------------------------------------------------------------------
+Ran 1 test in 20.359s
+
+FAILED (failures=1)

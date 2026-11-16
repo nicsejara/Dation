@@ -32,7 +32,19 @@ class JourneyNavigationTests(unittest.IsolatedAsyncioTestCase):
     async def previous(self):
         await self.page.locator('[data-journey-previous]:visible').click()
     async def rail(self):
-        rail=self.page.locator('.journey-studio-rail');await expect(rail).to_be_visible();await expect(rail.locator('button')).to_have_count(3);await expect(rail.get_by_role('button',name='Editar Decision Case',exact=True)).to_have_count(0);await expect(rail.locator('button > strong')).to_have_text(['Decision Graph','Decision Configuration','Decision Dashboard']);await expect(rail.locator('[aria-current=step]')).to_have_count(1);url=self.page.url;await rail.locator('[aria-current=step]').click(force=True);self.assertEqual(self.page.url,url)
+        rail=self.page.locator('.journey-studio-rail');await expect(rail).to_be_visible();await expect(rail.locator('button')).to_have_count(3);await expect(rail.get_by_role('button',name='Editar Decision Case',exact=True)).to_have_count(0);await expect(rail.locator('button > strong')).to_have_text(['Decision Graph','Decision Configuration','Decision Dashboard']);await expect(rail.locator('[aria-current=step]')).to_have_count(1)
+        current=rail.locator('[aria-current=step]');url=self.page.url
+        # A normal click checks stability after resize; force bypasses that check
+        # and can hit the adjacent stage while the responsive rail is moving.
+        await expect(current).to_have_attribute('tabindex','-1')
+        if await current.is_enabled():
+            await current.evaluate("n=>{window.__ux06ActiveStageHit=false;n.addEventListener('pointerdown',()=>{window.__ux06ActiveStageHit=true},{once:true})}")
+            await current.click()
+            self.assertTrue(await self.page.evaluate('window.__ux06ActiveStageHit'))
+        else:
+            # Readonly Configuration retains its disabled permission indicator.
+            await expect(current).to_be_disabled()
+        self.assertEqual(self.page.url,url)
     async def shot(self,name):
         await self.page.mouse.move(0,0);await self.page.evaluate('document.activeElement?.blur();scrollTo(0,0)');await self.page.screenshot(path=str(OUT/(name+'.png')),full_page=True,animations='disabled')
     async def measure(self,tag):

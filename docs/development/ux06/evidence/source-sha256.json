@@ -10,8 +10,9 @@
   "backend/app/static/js/dispatch/results/mount.mjs": "4583120830395c29eeb801a981119bbb4ffe1caaed8a189295930d461056cd7f",
   "backend/app/static/js/dispatch/workspace.mjs": "8245121396ac8b88065f04b9960c1c806cbe97024f7f7b48d2a8d5a497286357",
   "backend/app/static/js/platform/dda-navigation.mjs": "faa80820067ff04b8ba5bd56cb43625de8521a551259cf04c92757ee7722c9ec",
-  "backend/tests/browser/test_journey_navigation_ux06.py": "52ee512a53c5201d1c005b9fbc9565a30db669adb02579a9e8d003010136eea5",
+  "backend/tests/browser/test_journey_navigation_ux06.py": "eab03fdcc2f83ab402f6cbb79c3240392019662aee67261e49685426fc2ebcdb",
   "backend/tests/browser/test_ultimate_case_setup.py": "d63bae7d56a99d8bfeb12d7edd0186f049647e8ea19bf7209a54efac24033555",
+  "backend/tests/browser/test_ultimate_navigation.py": "e487e3a2bfae9b1af1e7dc093bb0dc89d99856b8c297b5a2af137f33f40d80d2",
   "backend/tests/browser/test_unified_decision_journey.py": "c5a6c5265362b25d3c7661ce5a44cc003cd5a8442c4315016ca7a5b57611418a",
   "backend/tests/test_journey_navigation_ux06.mjs": "2ea8ae71e6e3186ca6adb3af7a3fe00402bb57051b92e53675de0b502e638d16"
 }
