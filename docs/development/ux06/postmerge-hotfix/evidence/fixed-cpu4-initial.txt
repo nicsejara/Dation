@@ -1,0 +1,60 @@
+test_12_deriving_from_frozen_core_preserves_dashboard_parent_run (test_journey_navigation_ux06.JourneyNavigationTests.test_12_deriving_from_frozen_core_preserves_dashboard_parent_run) ... Executing <Task pending name='Task-11' coro=<UnifiedDecisionJourneyTests.asyncTearDown() running at /workspace/work/dation-ux06-postmerge-hotfix/backend/tests/browser/test_unified_decision_journey.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.344 seconds
+ok
+test_12_deriving_from_frozen_core_preserves_dashboard_parent_run (test_journey_navigation_ux06.JourneyNavigationTests.test_12_deriving_from_frozen_core_preserves_dashboard_parent_run) ... Executing <Task pending name='Task-27' coro=<UnifiedDecisionJourneyTests.asyncTearDown() running at /workspace/work/dation-ux06-postmerge-hotfix/backend/tests/browser/test_unified_decision_journey.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.288 seconds
+ok
+test_12_deriving_from_frozen_core_preserves_dashboard_parent_run (test_journey_navigation_ux06.JourneyNavigationTests.test_12_deriving_from_frozen_core_preserves_dashboard_parent_run) ... Executing <Task pending name='Task-43' coro=<UnifiedDecisionJourneyTests.asyncTearDown() running at /workspace/work/dation-ux06-postmerge-hotfix/backend/tests/browser/test_unified_decision_journey.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.324 seconds
+ok
+test_12_deriving_from_frozen_core_preserves_dashboard_parent_run (test_journey_navigation_ux06.JourneyNavigationTests.test_12_deriving_from_frozen_core_preserves_dashboard_parent_run) ... Executing <Task pending name='Task-59' coro=<UnifiedDecisionJourneyTests.asyncTearDown() running at /workspace/work/dation-ux06-postmerge-hotfix/backend/tests/browser/test_unified_decision_journey.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.343 seconds
+ok
+test_12_deriving_from_frozen_core_preserves_dashboard_parent_run (test_journey_navigation_ux06.JourneyNavigationTests.test_12_deriving_from_frozen_core_preserves_dashboard_parent_run) ... ERROR
+Executing <Task pending name='Task-74' coro=<UnifiedDecisionJourneyTests.asyncTearDown() running at /workspace/work/dation-ux06-postmerge-hotfix/backend/tests/browser/test_unified_decision_journey.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.215 seconds
+test_12_deriving_from_frozen_core_preserves_dashboard_parent_run (test_journey_navigation_ux06.JourneyNavigationTests.test_12_deriving_from_frozen_core_preserves_dashboard_parent_run) ... Executing <Task pending name='Task-90' coro=<UnifiedDecisionJourneyTests.asyncTearDown() running at /workspace/work/dation-ux06-postmerge-hotfix/backend/tests/browser/test_unified_decision_journey.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.213 seconds
+ok
+test_12_deriving_from_frozen_core_preserves_dashboard_parent_run (test_journey_navigation_ux06.JourneyNavigationTests.test_12_deriving_from_frozen_core_preserves_dashboard_parent_run) ... Executing <Task pending name='Task-106' coro=<UnifiedDecisionJourneyTests.asyncTearDown() running at /workspace/work/dation-ux06-postmerge-hotfix/backend/tests/browser/test_unified_decision_journey.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.213 seconds
+ok
+test_12_deriving_from_frozen_core_preserves_dashboard_parent_run (test_journey_navigation_ux06.JourneyNavigationTests.test_12_deriving_from_frozen_core_preserves_dashboard_parent_run) ... Executing <Task pending name='Task-122' coro=<UnifiedDecisionJourneyTests.asyncTearDown() running at /workspace/work/dation-ux06-postmerge-hotfix/backend/tests/browser/test_unified_decision_journey.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.209 seconds
+ok
+test_12_deriving_from_frozen_core_preserves_dashboard_parent_run (test_journey_navigation_ux06.JourneyNavigationTests.test_12_deriving_from_frozen_core_preserves_dashboard_parent_run) ... Executing <Task pending name='Task-138' coro=<UnifiedDecisionJourneyTests.asyncTearDown() running at /workspace/work/dation-ux06-postmerge-hotfix/backend/tests/browser/test_unified_decision_journey.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.174 seconds
+ok
+test_12_deriving_from_frozen_core_preserves_dashboard_parent_run (test_journey_navigation_ux06.JourneyNavigationTests.test_12_deriving_from_frozen_core_preserves_dashboard_parent_run) ... Executing <Task pending name='Task-154' coro=<UnifiedDecisionJourneyTests.asyncTearDown() running at /workspace/work/dation-ux06-postmerge-hotfix/backend/tests/browser/test_unified_decision_journey.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.183 seconds
+ok
+
+======================================================================
+ERROR: test_12_deriving_from_frozen_core_preserves_dashboard_parent_run (test_journey_navigation_ux06.JourneyNavigationTests.test_12_deriving_from_frozen_core_preserves_dashboard_parent_run)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/usr/lib/python3.13/asyncio/base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/workspace/work/dation-ux06-postmerge-hotfix/backend/tests/browser/test_journey_navigation_ux06.py", line 137, in test_12_deriving_from_frozen_core_preserves_dashboard_parent_run
+    await self.page.locator('[data-result-pending]').wait_for()
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_generated.py", line 20672, in wait_for
+    await self._impl_obj.wait_for(timeout=to_milliseconds(timeout), state=state)
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_locator.py", line 752, in wait_for
+    await self._frame.wait_for_selector(
+        self._selector, strict=True, timeout=timeout, state=state
+    )
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_frame.py", line 395, in wait_for_selector
+    await self._channel.send(
+        "waitForSelector", self._timeout, locals_to_params(locals())
+    )
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py", line 76, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py", line 632, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.TimeoutError: Locator.wait_for: Timeout 12000ms exceeded.
+Call log:
+  - waiting for locator("[data-result-pending]") to be visible
+
+
+----------------------------------------------------------------------
+Ran 10 tests in 98.038s
+
+FAILED (errors=1)
