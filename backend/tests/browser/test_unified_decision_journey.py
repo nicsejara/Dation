@@ -65,6 +65,8 @@ class UnifiedDecisionJourneyTests(unittest.IsolatedAsyncioTestCase):
         await expect(rail).to_be_visible()
         buttons=rail.locator(':scope > button' if core else ':scope > button:has(.core-step-number)')
         await expect(buttons).to_have_count(3)
+        if not core:
+            await expect(rail.locator(':scope > button')).to_have_count(3);await expect(rail.get_by_role('button',name='Editar Decision Case',exact=True)).to_have_count(0)
         labels=['Logistics Model','Data Contract & Preparation','Decision Case'] if core else ['Decision Graph','Decision Configuration','Decision Dashboard']
         await expect(buttons.locator('strong')).to_have_text(labels)
         current=int(await self.page.locator('.core-wizard:visible').get_attribute('data-active-step'))-1 if core else ['logistics-map','logistics-config','decision-dashboard'].index(view)
@@ -194,7 +196,9 @@ class JourneyEngineTests(unittest.IsolatedAsyncioTestCase):
         for node in ['logistics_assignment','logistics_scheduling']:
             await self.page.locator('[data-ux05-node='+node+']').click();await self.page.locator('.ux05-panel').get_by_role('button',name='Configurar y ejecutar',exact=True).click();await self.page.locator('[data-graph-config='+node+']').wait_for();await expect(self.page.get_by_role('button',name='Ejecutar decisión',exact=True)).to_be_enabled();await self.capture(path=str(OUT/(node+'-configuration-1536.png')),full_page=True,animations='disabled');await self.check_navigation_sizes(node+'-configuration');await self.page.get_by_role('button',name='Ejecutar decisión',exact=True).click();await self.page.locator('.ultimate-results [data-chart] svg').wait_for(timeout=45000);await self.page.locator('.journey-studio-rail').wait_for();dashboard_url=self.page.url
             if node=='logistics_assignment':
-                await self.page.get_by_role('button',name='Editar Decision Case',exact=True).click();await self.page.locator('[data-ultimate-ready=true]').wait_for();await self.page.reload();await self.page.locator('[data-ultimate-ready=true]').wait_for();await self.page.get_by_label('Nombre del Case',exact=True).fill('Origen histórico exacto');await self.page.get_by_role('button',name='Guardar contexto',exact=True).click();await self.page.locator('.ultimate-results [data-chart] svg').wait_for();self.assertEqual(self.page.url,dashboard_url)
+                await self.page.locator('#journey-nav').get_by_role('link',name='Core Configuration',exact=True).click();await self.page.locator('[data-ultimate-ready=true]').wait_for();await self.page.reload();await self.page.locator('[data-ultimate-ready=true]').wait_for();await self.page.get_by_label('Nombre del Case',exact=True).fill('Origen histórico exacto');await self.page.get_by_role('button',name='Guardar contexto',exact=True).click();await self.page.locator('.ultimate-results [data-chart] svg').wait_for();self.assertEqual(self.page.url,dashboard_url)
+            if node=='logistics_assignment':
+                await self.page.locator('[data-journey-previous]').click();await self.page.locator('[data-graph-config=logistics_assignment]').wait_for();self.assertIn('case_id='+cid,self.page.url);await self.page.locator('[data-journey-stage=decision-dashboard]').click();await self.page.locator('.ultimate-results [data-chart] svg').wait_for();self.assertEqual(self.page.url,dashboard_url)
             await self.capture(path=str(OUT/(node+'-dashboard-1536.png')),full_page=True,animations='disabled');
             for width in [1024,768,390,320]:
                 await self.page.set_viewport_size({'width':width,'height':960});await self.page.evaluate('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))');await self.assert_journey_navigation();self.assertFalse(await self.page.evaluate('document.documentElement.scrollWidth>innerWidth'),{'node':node,'width':width})

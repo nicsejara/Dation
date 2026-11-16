@@ -93,7 +93,7 @@ export async function mountCommandCenter(root,{scope,route,data,journey,navigate
   const keep=selected;viewScope?.dispose();panelView=null;root.replaceChildren();root.className='dispatch ultimate-graph-view ux05-command-center';
   pageHeader(root,'Decision Studio','Supervisá el estado del Case, navegá las decisiones y accedé a su configuración y análisis.');
   const body=el('div');root.append(body);viewScope=createScope(body);scope.own(()=>viewScope?.dispose());
-  const content=mountStudioRail(body,viewScope,{route,data,navigate,showHeading:false,showEdit:false});
+  const content=mountStudioRail(body,viewScope,{route,data,navigate,showHeading:false});
   const toolbar=el('section',undefined,'ux05-case-toolbar');toolbar.setAttribute('aria-label','Control del Decision Case');content.append(toolbar);
   renderToolbar(toolbar,{data,journey,pack},{choose:()=>choose(),setChoose:b=>{chooseTrigger=b;},editSource:()=>editSource(root,scope,route,navigate),editCase:()=>navigate('logistics-case-setup',{caseId:route.caseId,coreStep:3,...origin(route)}),summary:event=>summary(event.currentTarget),close:closeCase});
   notice=el('div',undefined,'ux05-notice');content.append(notice);

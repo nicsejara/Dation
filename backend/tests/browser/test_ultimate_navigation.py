@@ -119,7 +119,12 @@ class UltimateNavigationTests(unittest.IsolatedAsyncioTestCase):
         for width in [1440,1280,1024,768,390,320]:
             await self.page.set_viewport_size({'width':width,'height':1000});await self.page.screenshot(path=str(OUT/f'map-{width}.png'),full_page=True,animations='disabled');m=await self.page.evaluate('({width:innerWidth,scroll:document.documentElement.scrollWidth})');self.assertLessEqual(m['scroll'],width+1,m);metrics.append(m)
         await self.page.set_viewport_size({'width':1440,'height':1000});await self.page.evaluate('document.documentElement.style.zoom="2"');self.assertLessEqual(await self.page.evaluate('document.documentElement.scrollWidth'),1441);await self.page.screenshot(path=str(OUT/'map-zoom200.png'),full_page=True);await self.page.evaluate('document.documentElement.style.zoom="1"');self.assertTrue(await self.page.evaluate('matchMedia("(prefers-reduced-motion:reduce)").matches'))
-        await self.page.set_viewport_size({'width':390,'height':1000});await self.page.get_by_role('button',name='Mapa de decisiones',exact=True).focus();focus=[]
+        await self.page.set_viewport_size({'width':390,'height':1000})
+        # Focus must use the rendered 100% mobile geometry, not the previous
+        # zoomed screenshot's layout. Preserve every subsequent Tab/hit assertion.
+        await self.page.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))')
+        self.assertEqual(await self.page.evaluate('getComputedStyle(document.documentElement).zoom'),'1')
+        await self.page.get_by_role('button',name='Mapa de decisiones',exact=True).focus();focus=[]
         for _ in range(35):
             await self.page.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))');m=await self.page.evaluate('''()=>{const n=document.activeElement,b=n.getBoundingClientRect(),hit=document.elementFromPoint(b.x+b.width/2,b.y+b.height/2);return {inside:!!n.closest('.ultimate-graph-view'),name:n.textContent.slice(0,60),hit:hit===n||n.contains(hit),top:b.top,bottom:b.bottom}}''')
             if not m['inside']:break

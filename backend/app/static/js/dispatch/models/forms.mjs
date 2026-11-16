@@ -58,7 +58,7 @@ export function mountForm(root,scope,{initial,store,onSave,onReload,submitLabel=
  };
  const conflict=message=>{status.textContent=message;status.role='alert';if(onReload&&!footer.querySelector('[data-conflict-reload]')){const b=button('Descartar borrador y recargar',async()=>{if(await confirmAction(root,scope,'Descartar el borrador','Se cargarán los datos guardados. Tus cambios pendientes se descartarán.','Descartar y recargar')){store?.clear();dirty=false;await onReload();}});b.dataset.conflictReload='true';footer.append(b);}};
  scope.listen(form,'input',saveDraft);scope.listen(form,'change',saveDraft);
- scope.listen(form,'focusout',event=>{const n=event.target;if(n.matches?.('input,select,textarea'))inline(n.name,n.validity.valid?'':n.validationMessage);});
+ scope.listen(form,'focusout',event=>{if(event.relatedTarget?.closest('[data-journey-previous]'))return;const n=event.target;if(n.matches?.('input,select,textarea'))inline(n.name,n.validity.valid?'':n.validationMessage);});
  const validation=()=>{const values={};for(const n of form.querySelectorAll('input,select,textarea'))if(!n.disabled&&!n.validity.valid)values[n.name]=n.validationMessage;return Object.assign(values,check());};
  scope.listen(form,'submit',async event=>{
   event.preventDefault();if(busy)return;

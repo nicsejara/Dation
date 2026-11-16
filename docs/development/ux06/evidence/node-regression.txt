@@ -1,0 +1,17 @@
+✔ backend/tests/test_case_navigation.mjs (77.157011ms)
+✔ backend/tests/test_center_resource.mjs (61.831903ms)
+✔ backend/tests/test_home_dda_catalog.mjs (74.443383ms)
+✔ backend/tests/test_lifecycle.mjs (95.114918ms)
+✔ backend/tests/test_navigation.mjs (85.169278ms)
+✔ backend/tests/test_ultimate_case_navigation.mjs (69.88197ms)
+✔ backend/tests/test_ultimate_data_navigation.mjs (84.098148ms)
+✔ backend/tests/test_ultimate_graph_navigation.mjs (57.928734ms)
+✔ backend/tests/test_ultimate_result_consumers.mjs (137.234074ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 754.18116
