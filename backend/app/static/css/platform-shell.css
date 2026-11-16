@@ -16,6 +16,8 @@
 /* Stable Journey slots; legacy three-level navigation retains its layout. */
 .journey-nav.dda-navigation{width:100%;box-sizing:border-box;overflow:visible;container:dda-context / inline-size}
 .dda-navigation[data-levels="3"] ol{grid-template-columns:minmax(0,.85fr) minmax(0,.85fr) minmax(0,1.3fr)}
+.dda-navigation[data-levels="3"] .dda-navigation__step{block-size:48px}
+.dda-navigation[data-levels="3"] .dda-navigation__step>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dda-navigation li{position:relative}
 .dda-navigation li:not(:last-child)::after{content:'›';position:absolute;right:-17px;top:50%;transform:translateY(-50%);color:var(--color-text-muted);font-size:20px;pointer-events:none}
 .dda-navigation__step{width:100%;min-height:48px;min-width:0;gap:8px}

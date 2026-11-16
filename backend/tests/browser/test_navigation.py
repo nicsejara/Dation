@@ -1973,7 +1973,9 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                     if view not in ("inicio","logistics-overview"):self.assertEqual(metrics["minHeight"],0)
                     self.assertGreaterEqual(metrics["padding"],16)
                     self.assertEqual(metrics["radius"],16 if view in ('inicio','logistics-overview') else 0)
-                    self.assertTrue(28<=metrics["title"]<=40)
+                    if view=='logistics-overview':
+                        self.assertAlmostEqual(metrics["title"],max(32,min(width*.038,48)),delta=.1)
+                    else:self.assertTrue(28<=metrics["title"]<=40)
                     if metrics["workspace"]:self.assertEqual(metrics["workspace"],"rgba(0, 0, 0, 0)")
                     if metrics["current"]:self.assertEqual(metrics["current"],"rgb(243, 248, 250)")
                     self.assertTrue(all(cursor=="default" for cursor in metrics["disabledCursors"]))
@@ -2264,7 +2266,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
         active = self.page.locator("#home-open-logistics")
         await active.wait_for(state="visible")
         inactive = self.page.locator(".d-home__asset--coming-soon")
-        self.assertEqual(await inactive.count(), 6)
+        self.assertEqual(await inactive.count(), 5)
         for card in await inactive.all():
             self.assertEqual(await card.get_attribute("aria-disabled"), "true")
             self.assertEqual(await card.evaluate("el=>el.tagName"), "ARTICLE")

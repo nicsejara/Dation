@@ -1,6 +1,6 @@
 {
   "baseline": "0e5e7c93e942822aaf8a38d1c60fd7db332b9f5d",
-  "browser_unique_pass": 50,
+  "browser_unique_pass": 53,
   "browser_tests": [
     "test_data_contract_wizard.DataContractWizardTests.test_03_single_independent_toggles_human_conditions_and_lossless_technical",
     "test_data_contract_wizard.DataContractWizardTests.test_08_visual_responsive_focus_and_contrast",
@@ -42,6 +42,8 @@
     "test_logistics_model_wizard.LogisticsModelWizardTests.test_11_sidebar_keeps_case_inputs_and_keyboard_picker_focus",
     "test_navigation.NavigationTests.test_catalog_entitlements_cover_deep_links_revocation_and_reenable",
     "test_navigation.NavigationTests.test_catalog_fallback_keeps_disabled_entitlement_closed",
+    "test_navigation.NavigationTests.test_dark_shell_and_heroes_survive_responsive_and_warm_navigation",
+    "test_navigation.NavigationTests.test_home_card_keyboard_and_informational_overview_with_native_faq",
     "test_navigation.NavigationTests.test_home_catalog_filters_preserve_navigation_and_workspace",
     "test_navigation.NavigationTests.test_home_catalog_keeps_a_usable_fallback_without_its_module",
     "test_navigation.NavigationTests.test_home_catalog_responsive_accessible_and_honest_states",
@@ -51,7 +53,8 @@
     "test_unified_decision_journey.UnifiedDecisionJourneyTests.test_15_navigation_has_only_global_and_internal_rails_and_restores_legacy",
     "test_visual_refinement_ux07.HomeRefinementTests.test_01_six_visible_cards_filters_entitlement_and_home_bar",
     "test_visual_refinement_ux07.HomeRefinementTests.test_02_landing_equivalent_actions_preserve_filtered_center",
-    "test_visual_refinement_ux07.JourneyRefinementTests.test_03_real_publish_prepare_finalize_geometry_and_local_toggle"
+    "test_visual_refinement_ux07.JourneyRefinementTests.test_03_real_publish_prepare_finalize_geometry_and_local_toggle",
+    "test_workflow_context.WorkflowContextTests.test_dashboard_trace_shares_the_copy_row_and_context_pills_are_equal"
   ],
   "runs": [
     {
@@ -83,6 +86,12 @@
       "summary": "Ran 3 tests in 25.338s",
       "result": "PASS",
       "coverage": "Landing font actual 32\u201348px at six widths, shared hero geometry and original art/actions"
+    },
+    {
+      "log": "ux07-ci-fixes-focal.log",
+      "summary": "Ran 4 tests in 36.589s",
+      "result": "PASS",
+      "classification": "Three obsolete visual subtest expectations (hero 2, Home 1); one real legacy three-level nav CSS compatibility regression restored without changing its assertions."
     }
   ],
   "node_pass": 20,
@@ -102,7 +111,7 @@
   "source_sha256": {
     "backend/app/static/css/dda-logistics-landing.css": "c831c6ecea846a1c8a67e3cdd609f2ab6d65aa593a24a3d9ea96b2a50abc2a60",
     "backend/app/static/css/home-dda.css": "a83e5e3e21d124f995ae56e4d31bd781e8cfa984965af5cd0544a96bcc91c483",
-    "backend/app/static/css/platform-shell.css": "69c0e343966d4f5ca979ba7458703b4871d85f9ab298955d42065c6a00b4fe6f",
+    "backend/app/static/css/platform-shell.css": "6bb2b6290821f8b09c99cddd65b35c74fa36ac1de0942e705551bab1f66b6818",
     "backend/app/static/css/ultimate-foundation.css": "a446e10fcb0c3d665d1fe416532d2f9dea39619f8fa10f90bb5316267ddf6b57",
     "backend/app/static/css/ultimate-graph.css": "39ddbd400ea9b4526cfbdd74581940a7b9888896edbe58b22c4ebc86cdd02bcd",
     "backend/app/static/js/dispatch/cases/ultimate-case-setup.mjs": "8671d01f54f7df6d6c75040d3ece97d162a21e3102aa72294ea5e6071b9db3ec",
@@ -119,15 +128,33 @@
     "backend/tests/browser/test_final_polish.py": "5014377e73a0ebeddc337bcc16a6f2288c5368eabf5ea73905310af2a8334482",
     "backend/tests/browser/test_home_hero.py": "98cd36a65e28c869830a438453804bac56a470a62628fe2f4b7a0413cbce6f44",
     "backend/tests/browser/test_journey_navigation_ux06.py": "d3fa5ac86cafc6ef7520a311c7407d81f4816881edab1121986537cda43f3118",
-    "backend/tests/browser/test_navigation.py": "4725d87f0984ed1aa345e69abf54bc5fe72309b263220feca5cc6a22cd57bf27",
+    "backend/tests/browser/test_navigation.py": "f420c5d3964fe5ef63362779fc37ae046d1705ed2dee451d47554536464a56d4",
     "backend/tests/browser/wizard_helpers.py": "d260e416fcd4b225d86181bb657f583a5be21abd0b23a774835c8708595e90e7",
     "backend/tests/test_home_dda_catalog.mjs": "8c6a686781199bb573121c36fbf9b6be2a744ae4e176a58b138dee808477ad08",
     "backend/tests/browser/test_visual_refinement_ux07.py": "d04df925e860aa3d0572a3e6b0c32694909211f0bcccad25573a018414ef955b"
   },
-  "previous_ci": {
-    "run": 43971848532,
-    "conclusion": "cancelled",
-    "reason": "Final visual review found the Landing H1 remained at 36px; correct scoped selector and computed-size assertion before completing integral CI."
-  },
-  "geometry_collection": "40 scenarios; unaffected Home/Core/Graph retained, six Landing measurements and screenshots replaced after the focal hero correction."
+  "geometry_collection": "40 scenarios; unaffected Home/Core/Graph retained, six Landing measurements and screenshots replaced after the focal hero correction.",
+  "ci_history": [
+    {
+      "run": 43971848532,
+      "conclusion": "cancelled",
+      "reason": "Final visual review found the Landing H1 remained at 36px; correct scoped selector and computed-size assertion before completing integral CI."
+    },
+    {
+      "run": 43972861422,
+      "sha": "cb8455bd8a0e68dd371161b2c38d6664d0d66941",
+      "conclusion": "failure",
+      "passed_before_browser": {
+        "release_operations": 98,
+        "python": 721,
+        "node": 191
+      },
+      "browser": {
+        "tests": 372,
+        "failures": 4,
+        "affected_methods": 3
+      },
+      "classification": "Approved hero scale and Home count: obsolete expectations; legacy three-level nav height: scoped CSS compatibility defect. Four focal cases passed after minimal correction."
+    }
+  ]
 }
