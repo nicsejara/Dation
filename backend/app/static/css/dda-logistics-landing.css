@@ -101,7 +101,7 @@
 /* DDA cover: editorial explanation beside the real decision chain. */
 .dda-landing{gap:40px}
 .dda-landing__hero{position:relative;isolation:isolate;overflow:hidden;grid-template-columns:minmax(0,1fr);gap:28px;padding:32px;min-height:420px;border:0;border-left:2px solid var(--color-brand);border-radius:0 var(--radius-lg) var(--radius-lg) 0}
-.dda-landing__hero h1{font-size:clamp(32px,3.8vw,48px);line-height:1.15;max-width:20ch;font-weight:650}
+.dda-landing .dda-landing__hero h1{font-size:clamp(32px,3.8vw,48px);line-height:1.15;max-width:20ch;font-weight:650}
 .dda-landing__eyebrow,.dda-landing__section-eyebrow{text-transform:none;font-weight:500;font-size:12px;letter-spacing:.02em;color:var(--color-text-muted)}
 .dda-landing__flow-node{padding:16px;border:0;border-right:1px solid var(--color-border);border-radius:0;background:none}
 .dda-landing__flow-node:last-child{border-right:0}

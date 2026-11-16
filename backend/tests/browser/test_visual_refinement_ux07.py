@@ -70,6 +70,8 @@ class HomeRefinementTests(unittest.IsolatedAsyncioTestCase):
         await expect(self.page.locator('#journey-nav li')).to_have_count(2)
         for width in WIDTHS:
             await self.page.set_viewport_size({'width':width,'height':1000});await document_geometry(self,self.page,'landing-'+str(width))
+            title=await self.page.locator('.dda-landing__hero h1').evaluate('n=>parseFloat(getComputedStyle(n).fontSize)')
+            self.assertAlmostEqual(title,max(32,min(width*.038,48)),delta=.1)
             buttons=await self.page.locator('.dda-landing__hero-actions button').evaluate_all('ns=>ns.map(n=>n.getBoundingClientRect().toJSON())')
             self.assertEqual(len(buttons),2);self.assertAlmostEqual(buttons[0]['width'],buttons[1]['width'],delta=1);self.assertAlmostEqual(buttons[0]['height'],buttons[1]['height'],delta=1)
             if width in [1536,390]:await capture(self.page,'landing-'+str(width))

@@ -79,10 +79,10 @@
       "excluded_obsolete_expectation": null
     },
     {
-      "log": "ux07-evidence-final.log",
-      "summary": "Ran 3 tests in 28.451s",
+      "log": "ux07-hero-correction.log",
+      "summary": "Ran 3 tests in 25.338s",
       "result": "PASS",
-      "excluded_obsolete_expectation": null
+      "coverage": "Landing font actual 32\u201348px at six widths, shared hero geometry and original art/actions"
     }
   ],
   "node_pass": 20,
@@ -100,7 +100,7 @@
     320
   ],
   "source_sha256": {
-    "backend/app/static/css/dda-logistics-landing.css": "e2a4199b38a757f03e0ed6599566ccb1fe424fe629afe9cd627a3f2e9c8cc40f",
+    "backend/app/static/css/dda-logistics-landing.css": "c831c6ecea846a1c8a67e3cdd609f2ab6d65aa593a24a3d9ea96b2a50abc2a60",
     "backend/app/static/css/home-dda.css": "a83e5e3e21d124f995ae56e4d31bd781e8cfa984965af5cd0544a96bcc91c483",
     "backend/app/static/css/platform-shell.css": "69c0e343966d4f5ca979ba7458703b4871d85f9ab298955d42065c6a00b4fe6f",
     "backend/app/static/css/ultimate-foundation.css": "a446e10fcb0c3d665d1fe416532d2f9dea39619f8fa10f90bb5316267ddf6b57",
@@ -122,6 +122,12 @@
     "backend/tests/browser/test_navigation.py": "4725d87f0984ed1aa345e69abf54bc5fe72309b263220feca5cc6a22cd57bf27",
     "backend/tests/browser/wizard_helpers.py": "d260e416fcd4b225d86181bb657f583a5be21abd0b23a774835c8708595e90e7",
     "backend/tests/test_home_dda_catalog.mjs": "8c6a686781199bb573121c36fbf9b6be2a744ae4e176a58b138dee808477ad08",
-    "backend/tests/browser/test_visual_refinement_ux07.py": "bffa28e4324328a98791b7de5e02401807c2a8b21bac58d87fdc1a39b71c8b8f"
-  }
+    "backend/tests/browser/test_visual_refinement_ux07.py": "d04df925e860aa3d0572a3e6b0c32694909211f0bcccad25573a018414ef955b"
+  },
+  "previous_ci": {
+    "run": 43971848532,
+    "conclusion": "cancelled",
+    "reason": "Final visual review found the Landing H1 remained at 36px; correct scoped selector and computed-size assertion before completing integral CI."
+  },
+  "geometry_collection": "40 scenarios; unaffected Home/Core/Graph retained, six Landing measurements and screenshots replaced after the focal hero correction."
 }
