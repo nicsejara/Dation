@@ -1,0 +1,528 @@
+[
+  {
+    "viewport": {
+      "width": 1536,
+      "height": 900
+    },
+    "footer": {
+      "x": 501,
+      "y": 699.046875,
+      "width": 1002,
+      "height": 128
+    },
+    "feedback": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "owner": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "close": null,
+    "scrollWidth": 1536,
+    "scene": "core1-1536",
+    "sha": "d2abe7f69e411fece0f44207fb720c2c682666da"
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "footer": {
+      "x": 77,
+      "y": 2924.921875,
+      "width": 296,
+      "height": 157.390625
+    },
+    "feedback": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "owner": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "close": null,
+    "scrollWidth": 390,
+    "scene": "core1-390",
+    "sha": "d2abe7f69e411fece0f44207fb720c2c682666da"
+  },
+  {
+    "viewport": {
+      "width": 1536,
+      "height": 900
+    },
+    "footer": {
+      "x": 501,
+      "y": 1628.484375,
+      "width": 1002,
+      "height": 128
+    },
+    "feedback": null,
+    "owner": {
+      "x": 519,
+      "y": 1452.484375,
+      "width": 966,
+      "height": 176
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "close": null,
+    "scrollWidth": 1536,
+    "scene": "contract-fields-1536",
+    "sha": "d2abe7f69e411fece0f44207fb720c2c682666da"
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "footer": {
+      "x": 77,
+      "y": 3766.671875,
+      "width": 296,
+      "height": 232
+    },
+    "feedback": null,
+    "owner": {
+      "x": 89,
+      "y": 3503.40625,
+      "width": 272,
+      "height": 263.265625
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "close": null,
+    "scrollWidth": 390,
+    "scene": "contract-fields-390",
+    "sha": "d2abe7f69e411fece0f44207fb720c2c682666da"
+  },
+  {
+    "viewport": {
+      "width": 1536,
+      "height": 900
+    },
+    "footer": {
+      "x": 501,
+      "y": 699.484375,
+      "width": 1002,
+      "height": 128
+    },
+    "feedback": null,
+    "owner": {
+      "x": 519,
+      "y": 523.484375,
+      "width": 966,
+      "height": 176
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "close": null,
+    "scrollWidth": 1536,
+    "scene": "core2-1536",
+    "sha": "d2abe7f69e411fece0f44207fb720c2c682666da"
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "footer": {
+      "x": 77,
+      "y": 3410.671875,
+      "width": 296,
+      "height": 232
+    },
+    "feedback": null,
+    "owner": {
+      "x": 89,
+      "y": 3147.40625,
+      "width": 272,
+      "height": 263.265625
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "close": null,
+    "scrollWidth": 390,
+    "scene": "core2-390",
+    "sha": "d2abe7f69e411fece0f44207fb720c2c682666da"
+  },
+  {
+    "viewport": {
+      "width": 1536,
+      "height": 900
+    },
+    "footer": {
+      "x": 501,
+      "y": 699.25,
+      "width": 1002,
+      "height": 128
+    },
+    "feedback": {
+      "x": 585,
+      "y": 790,
+      "width": 896,
+      "height": 20
+    },
+    "owner": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "close": null,
+    "scrollWidth": 1536,
+    "scene": "core3-1536",
+    "sha": "d2abe7f69e411fece0f44207fb720c2c682666da"
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "footer": {
+      "x": 77,
+      "y": 3610.578125,
+      "width": 296,
+      "height": 195.78125
+    },
+    "feedback": {
+      "x": 93,
+      "y": 3752.359375,
+      "width": 264,
+      "height": 36
+    },
+    "owner": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "close": null,
+    "scrollWidth": 390,
+    "scene": "core3-390",
+    "sha": "d2abe7f69e411fece0f44207fb720c2c682666da"
+  },
+  {
+    "viewport": {
+      "width": 1536,
+      "height": 900
+    },
+    "footer": null,
+    "feedback": null,
+    "owner": null,
+    "caseStatus": {
+      "x": 1071.078125,
+      "y": 293.96875,
+      "width": 87.375,
+      "height": 30
+    },
+    "caseColumn": {
+      "x": 1071.078125,
+      "y": 293.96875,
+      "width": 186.453125,
+      "height": 30
+    },
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "close": null,
+    "scrollWidth": 1536,
+    "scene": "graph-closed-1536",
+    "sha": "d2abe7f69e411fece0f44207fb720c2c682666da"
+  },
+  {
+    "viewport": {
+      "width": 1536,
+      "height": 900
+    },
+    "footer": null,
+    "feedback": null,
+    "owner": null,
+    "caseStatus": {
+      "x": 1071.078125,
+      "y": -218.03125,
+      "width": 87.375,
+      "height": 30
+    },
+    "caseColumn": {
+      "x": 1071.078125,
+      "y": -218.03125,
+      "width": 186.453125,
+      "height": 30
+    },
+    "header": {
+      "x": 523,
+      "y": 449.4375,
+      "width": 910,
+      "height": 92.34375
+    },
+    "state": {
+      "x": 1148.828125,
+      "y": 449.4375,
+      "width": 151.765625,
+      "height": 71.34375
+    },
+    "output": {
+      "x": 1318.59375,
+      "y": 449.4375,
+      "width": 114.40625,
+      "height": 71.34375
+    },
+    "badge": {
+      "x": 1148.828125,
+      "y": 468.03125,
+      "width": 102.984375,
+      "height": 28.25
+    },
+    "close": {
+      "x": 1447,
+      "y": 439.4375,
+      "width": 44,
+      "height": 44
+    },
+    "scrollWidth": 1536,
+    "scene": "graph-d1-1536",
+    "sha": "d2abe7f69e411fece0f44207fb720c2c682666da"
+  },
+  {
+    "viewport": {
+      "width": 1536,
+      "height": 900
+    },
+    "footer": null,
+    "feedback": null,
+    "owner": null,
+    "caseStatus": {
+      "x": 1071.078125,
+      "y": -195.03125,
+      "width": 87.375,
+      "height": 30
+    },
+    "caseColumn": {
+      "x": 1071.078125,
+      "y": -195.03125,
+      "width": 186.453125,
+      "height": 30
+    },
+    "header": {
+      "x": 523,
+      "y": 472.4375,
+      "width": 910,
+      "height": 92.34375
+    },
+    "state": {
+      "x": 1051.6875,
+      "y": 472.4375,
+      "width": 204.53125,
+      "height": 71.34375
+    },
+    "output": {
+      "x": 1274.21875,
+      "y": 472.4375,
+      "width": 158.78125,
+      "height": 71.34375
+    },
+    "badge": {
+      "x": 1051.6875,
+      "y": 491.03125,
+      "width": 109.46875,
+      "height": 28.25
+    },
+    "close": {
+      "x": 1447,
+      "y": 462.4375,
+      "width": 44,
+      "height": 44
+    },
+    "scrollWidth": 1536,
+    "scene": "graph-open-1536",
+    "sha": "d2abe7f69e411fece0f44207fb720c2c682666da"
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "footer": null,
+    "feedback": null,
+    "owner": null,
+    "caseStatus": {
+      "x": 253,
+      "y": 929.65625,
+      "width": 87.375,
+      "height": 30
+    },
+    "caseColumn": {
+      "x": 253,
+      "y": 929.65625,
+      "width": 98,
+      "height": 30
+    },
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "close": null,
+    "scrollWidth": 390,
+    "scene": "graph-closed-390",
+    "sha": "d2abe7f69e411fece0f44207fb720c2c682666da"
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "footer": null,
+    "feedback": null,
+    "owner": null,
+    "caseStatus": {
+      "x": 253,
+      "y": -1231.34375,
+      "width": 87.375,
+      "height": 30
+    },
+    "caseColumn": {
+      "x": 253,
+      "y": -1231.34375,
+      "width": 98,
+      "height": 30
+    },
+    "header": {
+      "x": 95,
+      "y": 349.34375,
+      "width": 260,
+      "height": 320.6875
+    },
+    "state": {
+      "x": 95,
+      "y": 519.40625,
+      "width": 151.765625,
+      "height": 71.34375
+    },
+    "output": {
+      "x": 95,
+      "y": 608.75,
+      "width": 114.40625,
+      "height": 40.28125
+    },
+    "badge": {
+      "x": 95,
+      "y": 538,
+      "width": 102.984375,
+      "height": 28.25
+    },
+    "close": {
+      "x": 317,
+      "y": 343.34375,
+      "width": 44,
+      "height": 44
+    },
+    "scrollWidth": 390,
+    "scene": "graph-d1-390",
+    "sha": "d2abe7f69e411fece0f44207fb720c2c682666da"
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "footer": null,
+    "feedback": null,
+    "owner": null,
+    "caseStatus": {
+      "x": 253,
+      "y": -1231.34375,
+      "width": 87.375,
+      "height": 30
+    },
+    "caseColumn": {
+      "x": 253,
+      "y": -1231.34375,
+      "width": 98,
+      "height": 30
+    },
+    "header": {
+      "x": 95,
+      "y": 349.34375,
+      "width": 260,
+      "height": 320.6875
+    },
+    "state": {
+      "x": 95,
+      "y": 519.40625,
+      "width": 204.53125,
+      "height": 71.34375
+    },
+    "output": {
+      "x": 95,
+      "y": 608.75,
+      "width": 158.78125,
+      "height": 40.28125
+    },
+    "badge": {
+      "x": 95,
+      "y": 538,
+      "width": 109.46875,
+      "height": 28.25
+    },
+    "close": {
+      "x": 317,
+      "y": 343.34375,
+      "width": 44,
+      "height": 44
+    },
+    "scrollWidth": 390,
+    "scene": "graph-open-390",
+    "sha": "d2abe7f69e411fece0f44207fb720c2c682666da"
+  }
+]

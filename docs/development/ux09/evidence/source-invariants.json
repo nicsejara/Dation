@@ -1,0 +1,19 @@
+{
+  "baseline_sha": "d2abe7f69e411fece0f44207fb720c2c682666da",
+  "byte_identical": {
+    "backend/app/static/js/dispatch/graph-ux05/command-center.mjs": true,
+    "backend/app/static/js/dispatch/graph-ux05/node-graph.mjs": true,
+    "backend/app/static/js/dispatch/graph-ux05/status-presentation.mjs": true,
+    "backend/app/static/js/dispatch/graph-ux05/command-toolbar.mjs": true,
+    ".ux05-graph {": true,
+    "@container decision-graph (max-width:679px){": true
+  },
+  "application_files_sha256": {
+    "backend/app/static/css/ultimate-foundation.css": "ff73f0bb784fcf0a3056043bdbab254cd05be7911c51ffc0f1133805cb83d764",
+    "backend/app/static/css/ultimate-graph.css": "03ee2514edb9ec3fc1a14264221c412026862f5bc4393ade9d71f48e07a685aa",
+    "backend/app/static/js/dispatch/graph-ux05/decision-popover.mjs": "e7813c09d96ea2e4d39e3dcac58815c28993efc3d4d1bf0644ae5a5bb0547af9",
+    "backend/app/static/js/dispatch/models/forms.mjs": "e487251d2b597821bc80cbcbcd32f31853625876efc7639bd38a9ea87431797f",
+    "backend/app/static/js/dispatch/models/wizard-ui.mjs": "bca604c688e7291d08b64b4c4d3cac74b75ea9219fde035e5f9ef5f1b04015e8",
+    "backend/app/static/js/dispatch/upload/core-preparation.mjs": "4aac95eed935488c63325fa9cf13ce1469a99d30d56d863b9474ff9408f91450"
+  }
+}

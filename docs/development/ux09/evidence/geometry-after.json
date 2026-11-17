@@ -1,0 +1,7313 @@
+[
+  {
+    "viewport": {
+      "width": 1536,
+      "height": 900
+    },
+    "footer": {
+      "x": 501,
+      "y": 1099.046875,
+      "width": 1002,
+      "height": 96
+    },
+    "footerRows": "71px",
+    "context": {
+      "x": 938.875,
+      "y": 1112.046875,
+      "width": 347.875,
+      "height": 71
+    },
+    "contextBorders": [
+      "1px",
+      "1px"
+    ],
+    "feedback": "",
+    "previous": {
+      "x": 523,
+      "y": 1125.546875,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 579,
+      "y": 1125.53125,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Guardar y continuar",
+        "rect": {
+          "x": 1298.75,
+          "y": 1125.546875,
+          "width": 182.25,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "icon": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "title": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        }
+      },
+      {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "icon": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "title": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 1536,
+    "client": 1536,
+    "scene": "core01-zero-1536",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 1536,
+      "height": 900
+    },
+    "footer": {
+      "x": 501,
+      "y": 1058.046875,
+      "width": 1002,
+      "height": 96
+    },
+    "footerRows": "71px",
+    "context": {
+      "x": 938.875,
+      "y": 1071.046875,
+      "width": 347.875,
+      "height": 71
+    },
+    "contextBorders": [
+      "1px",
+      "1px"
+    ],
+    "feedback": "",
+    "previous": {
+      "x": 523,
+      "y": 1084.546875,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 579,
+      "y": 1084.53125,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Guardar y continuar",
+        "rect": {
+          "x": 1298.75,
+          "y": 1084.546875,
+          "width": 182.25,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "icon": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "title": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        }
+      },
+      {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "icon": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "title": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 1536,
+    "client": 1536,
+    "scene": "core01-partial-1536",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 1536,
+      "height": 900
+    },
+    "footer": {
+      "x": 501,
+      "y": 1051.046875,
+      "width": 1002,
+      "height": 96
+    },
+    "footerRows": "71px",
+    "context": {
+      "x": 938.875,
+      "y": 1064.046875,
+      "width": 347.875,
+      "height": 71
+    },
+    "contextBorders": [
+      "1px",
+      "1px"
+    ],
+    "feedback": "",
+    "previous": {
+      "x": 523,
+      "y": 1077.546875,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 579,
+      "y": 1077.53125,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Guardar y continuar",
+        "rect": {
+          "x": 1298.75,
+          "y": 1077.546875,
+          "width": 182.25,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "icon": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "title": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        }
+      },
+      {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "icon": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "title": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 1536,
+    "client": 1536,
+    "scene": "core01-ready-1536",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "footer": {
+      "x": 501,
+      "y": 1359.375,
+      "width": 746,
+      "height": 96
+    },
+    "footerRows": "71px",
+    "context": {
+      "x": 810.875,
+      "y": 1372.375,
+      "width": 219.875,
+      "height": 71
+    },
+    "contextBorders": [
+      "1px",
+      "1px"
+    ],
+    "feedback": "",
+    "previous": {
+      "x": 523,
+      "y": 1385.875,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 579,
+      "y": 1385.875,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Guardar y continuar",
+        "rect": {
+          "x": 1042.75,
+          "y": 1385.875,
+          "width": 182.25,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "icon": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "title": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        }
+      },
+      {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "icon": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "title": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 1280,
+    "client": 1280,
+    "scene": "core01-ready-1280",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 1024,
+      "height": 768
+    },
+    "footer": {
+      "x": 251,
+      "y": 1655.328125,
+      "width": 740,
+      "height": 96
+    },
+    "footerRows": "71px",
+    "context": {
+      "x": 557.875,
+      "y": 1668.328125,
+      "width": 216.875,
+      "height": 71
+    },
+    "contextBorders": [
+      "1px",
+      "1px"
+    ],
+    "feedback": "",
+    "previous": {
+      "x": 273,
+      "y": 1681.828125,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 329,
+      "y": 1681.828125,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Guardar y continuar",
+        "rect": {
+          "x": 786.75,
+          "y": 1681.828125,
+          "width": 182.25,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "icon": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "title": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        }
+      },
+      {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "icon": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "title": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 1024,
+    "client": 1024,
+    "scene": "core01-ready-1024",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 768,
+      "height": 900
+    },
+    "footer": {
+      "x": 91,
+      "y": 1719.90625,
+      "width": 658,
+      "height": 125.390625
+    },
+    "footerRows": "44.3906px 44px",
+    "context": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "contextBorders": [
+      "0px",
+      "0px"
+    ],
+    "feedback": "",
+    "previous": {
+      "x": 107,
+      "y": 1789.296875,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 107,
+      "y": 1733.09375,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Guardar y continuar",
+        "rect": {
+          "x": 163,
+          "y": 1789.296875,
+          "width": 570,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "icon": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "title": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        }
+      },
+      {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "icon": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "title": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 768,
+    "client": 768,
+    "scene": "core01-ready-768",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "footer": {
+      "x": 77,
+      "y": 2924.921875,
+      "width": 296,
+      "height": 125.390625
+    },
+    "footerRows": "44.3906px 44px",
+    "context": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "contextBorders": [
+      "0px",
+      "0px"
+    ],
+    "feedback": "",
+    "previous": {
+      "x": 93,
+      "y": 2994.3125,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 93,
+      "y": 2938.109375,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Guardar y continuar",
+        "rect": {
+          "x": 149,
+          "y": 2994.3125,
+          "width": 208,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "icon": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "title": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        }
+      },
+      {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "icon": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "title": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 390,
+    "client": 390,
+    "scene": "core01-ready-390",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 740
+    },
+    "footer": {
+      "x": 77,
+      "y": 3489.21875,
+      "width": 226,
+      "height": 180.15625
+    },
+    "footerRows": "84.7812px 58.375px",
+    "context": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "contextBorders": [
+      "0px",
+      "0px"
+    ],
+    "feedback": "",
+    "previous": {
+      "x": 93,
+      "y": 3606.1875,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 93,
+      "y": 3522.609375,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Guardar y continuar",
+        "rect": {
+          "x": 149,
+          "y": 3599,
+          "width": 138,
+          "height": 58.375
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "icon": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "title": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        }
+      },
+      {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "icon": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "title": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 320,
+    "client": 320,
+    "scene": "core01-ready-320",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 1536,
+      "height": 900
+    },
+    "footer": {
+      "x": 501,
+      "y": 1426.578125,
+      "width": 1002,
+      "height": 96
+    },
+    "footerRows": "71px",
+    "context": {
+      "x": 870.765625,
+      "y": 1439.578125,
+      "width": 279.78125,
+      "height": 71
+    },
+    "contextBorders": [
+      "1px",
+      "1px"
+    ],
+    "feedback": "Preparación pendiente · podés continuar sin datos",
+    "previous": {
+      "x": 523,
+      "y": 1453.078125,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 579,
+      "y": 1453.078125,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Continuar sin datos",
+        "rect": {
+          "x": 1162.546875,
+          "y": 1453.078125,
+          "width": 152.0625,
+          "height": 44
+        }
+      },
+      {
+        "text": "Continuar con datos",
+        "rect": {
+          "x": 1324.609375,
+          "y": 1453.078125,
+          "width": 156.390625,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 519,
+          "y": 1186.8125,
+          "width": 633.328125,
+          "height": 217.765625
+        },
+        "icon": {
+          "x": 538,
+          "y": 1205.8125,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 602,
+          "y": 1207.8125,
+          "width": 188.46875,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 829.46875,
+          "y": 1230.3125,
+          "width": 303.84375,
+          "height": 40
+        }
+      },
+      {
+        "rect": {
+          "x": 1168.328125,
+          "y": 1186.8125,
+          "width": 316.65625,
+          "height": 217.765625
+        },
+        "icon": {
+          "x": 1187.328125,
+          "y": 1205.8125,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 1251.328125,
+          "y": 1207.8125,
+          "width": 214.65625,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 519,
+      "y": 1186.8125,
+      "width": 966,
+      "height": 217.765625
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 1536,
+    "client": 1536,
+    "scene": "core02-empty-1536",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "footer": {
+      "x": 501,
+      "y": 1570.25,
+      "width": 746,
+      "height": 96
+    },
+    "footerRows": "71px",
+    "context": {
+      "x": 781,
+      "y": 1583.25,
+      "width": 113.546875,
+      "height": 71
+    },
+    "contextBorders": [
+      "1px",
+      "1px"
+    ],
+    "feedback": "Preparación pendiente · podés continuar sin datos",
+    "previous": {
+      "x": 523,
+      "y": 1596.75,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 579,
+      "y": 1596.75,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Continuar sin datos",
+        "rect": {
+          "x": 906.546875,
+          "y": 1596.75,
+          "width": 152.0625,
+          "height": 44
+        }
+      },
+      {
+        "text": "Continuar con datos",
+        "rect": {
+          "x": 1068.609375,
+          "y": 1596.75,
+          "width": 156.390625,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 519,
+          "y": 1270.484375,
+          "width": 462.65625,
+          "height": 277.765625
+        },
+        "icon": {
+          "x": 538,
+          "y": 1289.484375,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 538,
+          "y": 1351.484375,
+          "width": 173.625,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 748.625,
+          "y": 1313.984375,
+          "width": 214.015625,
+          "height": 40
+        }
+      },
+      {
+        "rect": {
+          "x": 997.65625,
+          "y": 1270.484375,
+          "width": 231.328125,
+          "height": 277.765625
+        },
+        "icon": {
+          "x": 1016.65625,
+          "y": 1289.484375,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 1016.65625,
+          "y": 1351.484375,
+          "width": 193.328125,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 519,
+      "y": 1270.484375,
+      "width": 710,
+      "height": 277.765625
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 1280,
+    "client": 1280,
+    "scene": "core02-empty-1280",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 1024,
+      "height": 768
+    },
+    "footer": {
+      "x": 251,
+      "y": 1782.984375,
+      "width": 740,
+      "height": 111.953125
+    },
+    "footerRows": "86.9531px",
+    "context": {
+      "x": 531,
+      "y": 1795.984375,
+      "width": 107.546875,
+      "height": 86.953125
+    },
+    "contextBorders": [
+      "1px",
+      "1px"
+    ],
+    "feedback": "Preparación pendiente · podés continuar sin datos",
+    "previous": {
+      "x": 273,
+      "y": 1817.453125,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 329,
+      "y": 1817.453125,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Continuar sin datos",
+        "rect": {
+          "x": 650.546875,
+          "y": 1817.453125,
+          "width": 152.0625,
+          "height": 44
+        }
+      },
+      {
+        "text": "Continuar con datos",
+        "rect": {
+          "x": 812.609375,
+          "y": 1817.453125,
+          "width": 156.390625,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 269,
+          "y": 1483.21875,
+          "width": 458.65625,
+          "height": 277.765625
+        },
+        "icon": {
+          "x": 288,
+          "y": 1502.21875,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 288,
+          "y": 1564.21875,
+          "width": 171.71875,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 496.71875,
+          "y": 1526.71875,
+          "width": 211.9375,
+          "height": 40
+        }
+      },
+      {
+        "rect": {
+          "x": 743.65625,
+          "y": 1483.21875,
+          "width": 229.328125,
+          "height": 277.765625
+        },
+        "icon": {
+          "x": 762.65625,
+          "y": 1502.21875,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 762.65625,
+          "y": 1564.21875,
+          "width": 191.328125,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 269,
+      "y": 1483.21875,
+      "width": 704,
+      "height": 277.765625
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 1024,
+    "client": 1024,
+    "scene": "core02-empty-1024",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 768,
+      "height": 900
+    },
+    "footer": {
+      "x": 91,
+      "y": 2471.515625,
+      "width": 658,
+      "height": 230.390625
+    },
+    "footerRows": "44px 39.3906px 98px",
+    "context": {
+      "x": 107,
+      "y": 2540.515625,
+      "width": 626,
+      "height": 39.390625
+    },
+    "contextBorders": [
+      "0px",
+      "0px"
+    ],
+    "feedback": "Preparación pendiente · podés continuar sin datos",
+    "previous": {
+      "x": 107,
+      "y": 2618.90625,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 107,
+      "y": 2484.515625,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Continuar sin datos",
+        "rect": {
+          "x": 163,
+          "y": 2591.90625,
+          "width": 570,
+          "height": 44
+        }
+      },
+      {
+        "text": "Continuar con datos",
+        "rect": {
+          "x": 163,
+          "y": 2645.90625,
+          "width": 570,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 109,
+          "y": 2062.859375,
+          "width": 622,
+          "height": 190.078125
+        },
+        "icon": {
+          "x": 128,
+          "y": 2081.859375,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 188,
+          "y": 2083.859375,
+          "width": 198.796875,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 128,
+          "y": 2188.9375,
+          "width": 584,
+          "height": 40
+        }
+      },
+      {
+        "rect": {
+          "x": 109,
+          "y": 2268.9375,
+          "width": 622,
+          "height": 180.578125
+        },
+        "icon": {
+          "x": 128,
+          "y": 2287.9375,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 188,
+          "y": 2289.9375,
+          "width": 331.515625,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 109,
+      "y": 2062.859375,
+      "width": 622,
+      "height": 386.65625
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 768,
+    "client": 768,
+    "scene": "core02-empty-768",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "footer": {
+      "x": 77,
+      "y": 3220.71875,
+      "width": 296,
+      "height": 247.78125
+    },
+    "footerRows": "44px 56.7812px 98px",
+    "context": {
+      "x": 93,
+      "y": 3289.71875,
+      "width": 264,
+      "height": 56.78125
+    },
+    "contextBorders": [
+      "0px",
+      "0px"
+    ],
+    "feedback": "Preparación pendiente · podés continuar sin datos",
+    "previous": {
+      "x": 93,
+      "y": 3385.5,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 93,
+      "y": 3233.71875,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Continuar sin datos",
+        "rect": {
+          "x": 149,
+          "y": 3358.5,
+          "width": 208,
+          "height": 44
+        }
+      },
+      {
+        "text": "Continuar con datos",
+        "rect": {
+          "x": 149,
+          "y": 3412.5,
+          "width": 208,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 89,
+          "y": 2736.5,
+          "width": 272,
+          "height": 209.265625
+        },
+        "icon": {
+          "x": 108,
+          "y": 2755.5,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 168,
+          "y": 2757.5,
+          "width": 174,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 108,
+          "y": 2881.765625,
+          "width": 234,
+          "height": 40
+        }
+      },
+      {
+        "rect": {
+          "x": 89,
+          "y": 2961.765625,
+          "width": 272,
+          "height": 236.953125
+        },
+        "icon": {
+          "x": 108,
+          "y": 2980.765625,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 168,
+          "y": 2982.765625,
+          "width": 174,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 89,
+      "y": 2736.5,
+      "width": 272,
+      "height": 462.21875
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 390,
+    "client": 390,
+    "scene": "core02-empty-390",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 740
+    },
+    "footer": {
+      "x": 77,
+      "y": 3832.28125,
+      "width": 226,
+      "height": 276.53125
+    },
+    "footerRows": "44px 56.7812px 126.75px",
+    "context": {
+      "x": 93,
+      "y": 3901.28125,
+      "width": 194,
+      "height": 56.78125
+    },
+    "contextBorders": [
+      "0px",
+      "0px"
+    ],
+    "feedback": "Preparación pendiente · podés continuar sin datos",
+    "previous": {
+      "x": 93,
+      "y": 4011.4375,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 93,
+      "y": 3845.28125,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Continuar sin datos",
+        "rect": {
+          "x": 149,
+          "y": 3970.0625,
+          "width": 138,
+          "height": 58.375
+        }
+      },
+      {
+        "text": "Continuar con datos",
+        "rect": {
+          "x": 149,
+          "y": 4038.4375,
+          "width": 138,
+          "height": 58.375
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 89,
+          "y": 3246.90625,
+          "width": 202,
+          "height": 250.84375
+        },
+        "icon": {
+          "x": 108,
+          "y": 3265.90625,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 168,
+          "y": 3267.90625,
+          "width": 104,
+          "height": 44.78125
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 108,
+          "y": 3433.75,
+          "width": 164,
+          "height": 40
+        }
+      },
+      {
+        "rect": {
+          "x": 89,
+          "y": 3513.75,
+          "width": 202,
+          "height": 296.53125
+        },
+        "icon": {
+          "x": 108,
+          "y": 3532.75,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 168,
+          "y": 3534.75,
+          "width": 104,
+          "height": 44.78125
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 89,
+      "y": 3246.90625,
+      "width": 202,
+      "height": 563.375
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 320,
+    "client": 320,
+    "scene": "core02-empty-320",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 1536,
+      "height": 900
+    },
+    "footer": {
+      "x": 501,
+      "y": 848.25,
+      "width": 1002,
+      "height": 96
+    },
+    "footerRows": "71px",
+    "context": {
+      "x": 870.765625,
+      "y": 861.25,
+      "width": 279.78125,
+      "height": 71
+    },
+    "contextBorders": [
+      "1px",
+      "1px"
+    ],
+    "feedback": "Falta Flota",
+    "previous": {
+      "x": 523,
+      "y": 874.75,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 579,
+      "y": 874.75,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Continuar sin datos",
+        "rect": {
+          "x": 1162.546875,
+          "y": 874.75,
+          "width": 152.0625,
+          "height": 44
+        }
+      },
+      {
+        "text": "Continuar con datos",
+        "rect": {
+          "x": 1324.609375,
+          "y": 874.75,
+          "width": 156.390625,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 519,
+          "y": 608.484375,
+          "width": 633.328125,
+          "height": 217.765625
+        },
+        "icon": {
+          "x": 538,
+          "y": 627.484375,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 602,
+          "y": 629.484375,
+          "width": 188.46875,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 829.46875,
+          "y": 651.984375,
+          "width": 303.84375,
+          "height": 40
+        }
+      },
+      {
+        "rect": {
+          "x": 1168.328125,
+          "y": 608.484375,
+          "width": 316.65625,
+          "height": 217.765625
+        },
+        "icon": {
+          "x": 1187.328125,
+          "y": 627.484375,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 1251.328125,
+          "y": 629.484375,
+          "width": 214.65625,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 519,
+      "y": 608.484375,
+      "width": 966,
+      "height": 217.765625
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 1536,
+    "client": 1536,
+    "scene": "core02-one-candidate-1536",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 1536,
+      "height": 900
+    },
+    "footer": {
+      "x": 501,
+      "y": 848.25,
+      "width": 1002,
+      "height": 96
+    },
+    "footerRows": "71px",
+    "context": {
+      "x": 870.765625,
+      "y": 861.25,
+      "width": 279.78125,
+      "height": 71
+    },
+    "contextBorders": [
+      "1px",
+      "1px"
+    ],
+    "feedback": "2 archivos validados · publicación al finalizar el Case",
+    "previous": {
+      "x": 523,
+      "y": 874.75,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 579,
+      "y": 874.75,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Continuar sin datos",
+        "rect": {
+          "x": 1162.546875,
+          "y": 874.75,
+          "width": 152.0625,
+          "height": 44
+        }
+      },
+      {
+        "text": "Continuar con datos",
+        "rect": {
+          "x": 1324.609375,
+          "y": 874.75,
+          "width": 156.390625,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 519,
+          "y": 608.484375,
+          "width": 633.328125,
+          "height": 217.765625
+        },
+        "icon": {
+          "x": 538,
+          "y": 627.484375,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 602,
+          "y": 629.484375,
+          "width": 188.46875,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 829.46875,
+          "y": 651.984375,
+          "width": 303.84375,
+          "height": 40
+        }
+      },
+      {
+        "rect": {
+          "x": 1168.328125,
+          "y": 608.484375,
+          "width": 316.65625,
+          "height": 217.765625
+        },
+        "icon": {
+          "x": 1187.328125,
+          "y": 627.484375,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 1251.328125,
+          "y": 629.484375,
+          "width": 214.65625,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 519,
+      "y": 608.484375,
+      "width": 966,
+      "height": 217.765625
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 1536,
+    "client": 1536,
+    "scene": "core02-validated-1536",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "footer": {
+      "x": 501,
+      "y": 1730.921875,
+      "width": 746,
+      "height": 96
+    },
+    "footerRows": "71px",
+    "context": {
+      "x": 781,
+      "y": 1743.921875,
+      "width": 113.546875,
+      "height": 71
+    },
+    "contextBorders": [
+      "1px",
+      "1px"
+    ],
+    "feedback": "2 archivos validados · publicación al finalizar el Case",
+    "previous": {
+      "x": 523,
+      "y": 1757.421875,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 579,
+      "y": 1757.421875,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Continuar sin datos",
+        "rect": {
+          "x": 906.546875,
+          "y": 1757.421875,
+          "width": 152.0625,
+          "height": 44
+        }
+      },
+      {
+        "text": "Continuar con datos",
+        "rect": {
+          "x": 1068.609375,
+          "y": 1757.421875,
+          "width": 156.390625,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 519,
+          "y": 1431.15625,
+          "width": 462.65625,
+          "height": 277.765625
+        },
+        "icon": {
+          "x": 538,
+          "y": 1450.15625,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 538,
+          "y": 1512.15625,
+          "width": 173.625,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 748.625,
+          "y": 1474.65625,
+          "width": 214.015625,
+          "height": 40
+        }
+      },
+      {
+        "rect": {
+          "x": 997.65625,
+          "y": 1431.15625,
+          "width": 231.328125,
+          "height": 277.765625
+        },
+        "icon": {
+          "x": 1016.65625,
+          "y": 1450.15625,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 1016.65625,
+          "y": 1512.15625,
+          "width": 193.328125,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 519,
+      "y": 1431.15625,
+      "width": 710,
+      "height": 277.765625
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 1280,
+    "client": 1280,
+    "scene": "core02-validated-1280",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 1024,
+      "height": 768
+    },
+    "footer": {
+      "x": 251,
+      "y": 1943.65625,
+      "width": 740,
+      "height": 111.953125
+    },
+    "footerRows": "86.9531px",
+    "context": {
+      "x": 531,
+      "y": 1956.65625,
+      "width": 107.546875,
+      "height": 86.953125
+    },
+    "contextBorders": [
+      "1px",
+      "1px"
+    ],
+    "feedback": "2 archivos validados · publicación al finalizar el Case",
+    "previous": {
+      "x": 273,
+      "y": 1978.125,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 329,
+      "y": 1978.125,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Continuar sin datos",
+        "rect": {
+          "x": 650.546875,
+          "y": 1978.125,
+          "width": 152.0625,
+          "height": 44
+        }
+      },
+      {
+        "text": "Continuar con datos",
+        "rect": {
+          "x": 812.609375,
+          "y": 1978.125,
+          "width": 156.390625,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 269,
+          "y": 1643.890625,
+          "width": 458.65625,
+          "height": 277.765625
+        },
+        "icon": {
+          "x": 288,
+          "y": 1662.890625,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 288,
+          "y": 1724.890625,
+          "width": 171.71875,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 496.71875,
+          "y": 1687.390625,
+          "width": 211.9375,
+          "height": 40
+        }
+      },
+      {
+        "rect": {
+          "x": 743.65625,
+          "y": 1643.890625,
+          "width": 229.328125,
+          "height": 277.765625
+        },
+        "icon": {
+          "x": 762.65625,
+          "y": 1662.890625,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 762.65625,
+          "y": 1724.890625,
+          "width": 191.328125,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 269,
+      "y": 1643.890625,
+      "width": 704,
+      "height": 277.765625
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 1024,
+    "client": 1024,
+    "scene": "core02-validated-1024",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 768,
+      "height": 900
+    },
+    "footer": {
+      "x": 91,
+      "y": 2792.859375,
+      "width": 658,
+      "height": 230.390625
+    },
+    "footerRows": "44px 39.3906px 98px",
+    "context": {
+      "x": 107,
+      "y": 2861.859375,
+      "width": 626,
+      "height": 39.390625
+    },
+    "contextBorders": [
+      "0px",
+      "0px"
+    ],
+    "feedback": "2 archivos validados · publicación al finalizar el Case",
+    "previous": {
+      "x": 107,
+      "y": 2940.25,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 107,
+      "y": 2805.859375,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Continuar sin datos",
+        "rect": {
+          "x": 163,
+          "y": 2913.25,
+          "width": 570,
+          "height": 44
+        }
+      },
+      {
+        "text": "Continuar con datos",
+        "rect": {
+          "x": 163,
+          "y": 2967.25,
+          "width": 570,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 109,
+          "y": 2384.203125,
+          "width": 622,
+          "height": 190.078125
+        },
+        "icon": {
+          "x": 128,
+          "y": 2403.203125,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 188,
+          "y": 2405.203125,
+          "width": 198.796875,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 128,
+          "y": 2510.28125,
+          "width": 584,
+          "height": 40
+        }
+      },
+      {
+        "rect": {
+          "x": 109,
+          "y": 2590.28125,
+          "width": 622,
+          "height": 180.578125
+        },
+        "icon": {
+          "x": 128,
+          "y": 2609.28125,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 188,
+          "y": 2611.28125,
+          "width": 331.515625,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 109,
+      "y": 2384.203125,
+      "width": 622,
+      "height": 386.65625
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 768,
+    "client": 768,
+    "scene": "core02-validated-768",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "footer": {
+      "x": 77,
+      "y": 3631.625,
+      "width": 296,
+      "height": 247.78125
+    },
+    "footerRows": "44px 56.7812px 98px",
+    "context": {
+      "x": 93,
+      "y": 3700.625,
+      "width": 264,
+      "height": 56.78125
+    },
+    "contextBorders": [
+      "0px",
+      "0px"
+    ],
+    "feedback": "2 archivos validados · publicación al finalizar el Case",
+    "previous": {
+      "x": 93,
+      "y": 3796.40625,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 93,
+      "y": 3644.625,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Continuar sin datos",
+        "rect": {
+          "x": 149,
+          "y": 3769.40625,
+          "width": 208,
+          "height": 44
+        }
+      },
+      {
+        "text": "Continuar con datos",
+        "rect": {
+          "x": 149,
+          "y": 3823.40625,
+          "width": 208,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 89,
+          "y": 3147.40625,
+          "width": 272,
+          "height": 209.265625
+        },
+        "icon": {
+          "x": 108,
+          "y": 3166.40625,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 168,
+          "y": 3168.40625,
+          "width": 174,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 108,
+          "y": 3292.671875,
+          "width": 234,
+          "height": 40
+        }
+      },
+      {
+        "rect": {
+          "x": 89,
+          "y": 3372.671875,
+          "width": 272,
+          "height": 236.953125
+        },
+        "icon": {
+          "x": 108,
+          "y": 3391.671875,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 168,
+          "y": 3393.671875,
+          "width": 174,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 89,
+      "y": 3147.40625,
+      "width": 272,
+      "height": 462.21875
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 390,
+    "client": 390,
+    "scene": "core02-validated-390",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 740
+    },
+    "footer": {
+      "x": 77,
+      "y": 4326.96875,
+      "width": 226,
+      "height": 276.53125
+    },
+    "footerRows": "44px 56.7812px 126.75px",
+    "context": {
+      "x": 93,
+      "y": 4395.96875,
+      "width": 194,
+      "height": 56.78125
+    },
+    "contextBorders": [
+      "0px",
+      "0px"
+    ],
+    "feedback": "2 archivos validados · publicación al finalizar el Case",
+    "previous": {
+      "x": 93,
+      "y": 4506.125,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 93,
+      "y": 4339.96875,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Continuar sin datos",
+        "rect": {
+          "x": 149,
+          "y": 4464.75,
+          "width": 138,
+          "height": 58.375
+        }
+      },
+      {
+        "text": "Continuar con datos",
+        "rect": {
+          "x": 149,
+          "y": 4533.125,
+          "width": 138,
+          "height": 58.375
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 89,
+          "y": 3741.59375,
+          "width": 202,
+          "height": 250.84375
+        },
+        "icon": {
+          "x": 108,
+          "y": 3760.59375,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 168,
+          "y": 3762.59375,
+          "width": 104,
+          "height": 44.78125
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 108,
+          "y": 3928.4375,
+          "width": 164,
+          "height": 40
+        }
+      },
+      {
+        "rect": {
+          "x": 89,
+          "y": 4008.4375,
+          "width": 202,
+          "height": 296.53125
+        },
+        "icon": {
+          "x": 108,
+          "y": 4027.4375,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 168,
+          "y": 4029.4375,
+          "width": 104,
+          "height": 44.78125
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 89,
+      "y": 3741.59375,
+      "width": 202,
+      "height": 563.375
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 320,
+    "client": 320,
+    "scene": "core02-validated-320",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 1536,
+      "height": 900
+    },
+    "footer": {
+      "x": 501,
+      "y": 1556.25,
+      "width": 1002,
+      "height": 96
+    },
+    "footerRows": "71px",
+    "context": {
+      "x": 943.84375,
+      "y": 1569.25,
+      "width": 352.859375,
+      "height": 71
+    },
+    "contextBorders": [
+      "1px",
+      "1px"
+    ],
+    "feedback": "Cambios sin guardar. El borrador se conserva en este navegador.",
+    "previous": {
+      "x": 523,
+      "y": 1582.75,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 579,
+      "y": 1582.734375,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Finalizar configuración",
+        "rect": {
+          "x": 1308.703125,
+          "y": 1582.75,
+          "width": 172.296875,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "icon": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "title": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        }
+      },
+      {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "icon": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "title": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 1536,
+    "client": 1536,
+    "scene": "core03-partial-1536",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 1536,
+      "height": 900
+    },
+    "footer": {
+      "x": 501,
+      "y": 979.84375,
+      "width": 1002,
+      "height": 96
+    },
+    "footerRows": "71px",
+    "context": {
+      "x": 943.84375,
+      "y": 992.84375,
+      "width": 352.859375,
+      "height": 71
+    },
+    "contextBorders": [
+      "1px",
+      "1px"
+    ],
+    "feedback": "Cambios sin guardar. El borrador se conserva en este navegador.",
+    "previous": {
+      "x": 523,
+      "y": 1006.34375,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 579,
+      "y": 1006.328125,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Finalizar configuración",
+        "rect": {
+          "x": 1308.703125,
+          "y": 1006.34375,
+          "width": 172.296875,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "icon": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "title": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        }
+      },
+      {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "icon": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "title": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 1536,
+    "client": 1536,
+    "scene": "core03-ready-1536",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "footer": {
+      "x": 501,
+      "y": 1803.15625,
+      "width": 746,
+      "height": 96
+    },
+    "footerRows": "71px",
+    "context": {
+      "x": 815.84375,
+      "y": 1816.15625,
+      "width": 224.859375,
+      "height": 71
+    },
+    "contextBorders": [
+      "1px",
+      "1px"
+    ],
+    "feedback": "Cambios sin guardar. El borrador se conserva en este navegador.",
+    "previous": {
+      "x": 523,
+      "y": 1829.65625,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 579,
+      "y": 1829.65625,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Finalizar configuración",
+        "rect": {
+          "x": 1052.703125,
+          "y": 1829.65625,
+          "width": 172.296875,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "icon": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "title": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        }
+      },
+      {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "icon": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "title": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 1280,
+    "client": 1280,
+    "scene": "core03-ready-1280",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 1024,
+      "height": 768
+    },
+    "footer": {
+      "x": 251,
+      "y": 2015.890625,
+      "width": 740,
+      "height": 96
+    },
+    "footerRows": "71px",
+    "context": {
+      "x": 562.84375,
+      "y": 2028.890625,
+      "width": 221.859375,
+      "height": 71
+    },
+    "contextBorders": [
+      "1px",
+      "1px"
+    ],
+    "feedback": "Cambios sin guardar. El borrador se conserva en este navegador.",
+    "previous": {
+      "x": 273,
+      "y": 2042.390625,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 329,
+      "y": 2042.390625,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Finalizar configuración",
+        "rect": {
+          "x": 796.703125,
+          "y": 2042.390625,
+          "width": 172.296875,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "icon": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "title": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        }
+      },
+      {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "icon": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "title": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 1024,
+    "client": 1024,
+    "scene": "core03-ready-1024",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 768,
+      "height": 900
+    },
+    "footer": {
+      "x": 91,
+      "y": 2883.34375,
+      "width": 658,
+      "height": 176.78125
+    },
+    "footerRows": "44.3906px 39.3906px 44px",
+    "context": {
+      "x": 107,
+      "y": 2952.734375,
+      "width": 626,
+      "height": 39.390625
+    },
+    "contextBorders": [
+      "0px",
+      "0px"
+    ],
+    "feedback": "Cambios sin guardar. El borrador se conserva en este navegador.",
+    "previous": {
+      "x": 107,
+      "y": 3004.125,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 107,
+      "y": 2896.53125,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Finalizar configuración",
+        "rect": {
+          "x": 163,
+          "y": 3004.125,
+          "width": 570,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "icon": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "title": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        }
+      },
+      {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "icon": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "title": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 768,
+    "client": 768,
+    "scene": "core03-ready-768",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "footer": {
+      "x": 77,
+      "y": 3610.578125,
+      "width": 296,
+      "height": 216.5625
+    },
+    "footerRows": "66.7812px 56.7812px 44px",
+    "context": {
+      "x": 93,
+      "y": 3702.359375,
+      "width": 264,
+      "height": 56.78125
+    },
+    "contextBorders": [
+      "0px",
+      "0px"
+    ],
+    "feedback": "Cambios sin guardar. El borrador se conserva en este navegador.",
+    "previous": {
+      "x": 93,
+      "y": 3771.140625,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 93,
+      "y": 3634.96875,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Finalizar configuración",
+        "rect": {
+          "x": 149,
+          "y": 3771.140625,
+          "width": 208,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "icon": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "title": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        }
+      },
+      {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "icon": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "title": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 390,
+    "client": 390,
+    "scene": "core03-ready-390",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 740
+    },
+    "footer": {
+      "x": 77,
+      "y": 4174.078125,
+      "width": 226,
+      "height": 248.9375
+    },
+    "footerRows": "84.7812px 56.7812px 58.375px",
+    "context": {
+      "x": 93,
+      "y": 4283.859375,
+      "width": 194,
+      "height": 56.78125
+    },
+    "contextBorders": [
+      "0px",
+      "0px"
+    ],
+    "feedback": "Cambios sin guardar. El borrador se conserva en este navegador.",
+    "previous": {
+      "x": 93,
+      "y": 4359.828125,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 93,
+      "y": 4207.46875,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Finalizar configuración",
+        "rect": {
+          "x": 149,
+          "y": 4352.640625,
+          "width": 138,
+          "height": 58.375
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "icon": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "title": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        }
+      },
+      {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "icon": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "title": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 320,
+    "client": 320,
+    "scene": "core03-ready-320",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 1536,
+      "height": 900
+    },
+    "footer": null,
+    "footerRows": null,
+    "context": null,
+    "contextBorders": null,
+    "feedback": null,
+    "previous": null,
+    "ring": null,
+    "actions": [],
+    "cards": [],
+    "row": null,
+    "caseStatus": {
+      "x": 1071.078125,
+      "y": 293.96875,
+      "width": 186.453125,
+      "height": 36
+    },
+    "caseColumn": {
+      "x": 1071.078125,
+      "y": 293.96875,
+      "width": 186.453125,
+      "height": 36
+    },
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [
+      {
+        "x": 500,
+        "y": 575.90625,
+        "width": 220,
+        "height": 220
+      },
+      {
+        "x": 892,
+        "y": 575.90625,
+        "width": 220,
+        "height": 220
+      },
+      {
+        "x": 1284,
+        "y": 575.90625,
+        "width": 220,
+        "height": 220
+      }
+    ],
+    "scroll": 1536,
+    "client": 1536,
+    "scene": "case-header-1536",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 1536,
+      "height": 900
+    },
+    "footer": null,
+    "footerRows": null,
+    "context": null,
+    "contextBorders": null,
+    "feedback": null,
+    "previous": null,
+    "ring": null,
+    "actions": [],
+    "cards": [],
+    "row": null,
+    "caseStatus": {
+      "x": 1071.078125,
+      "y": -258.03125,
+      "width": 186.453125,
+      "height": 36
+    },
+    "caseColumn": {
+      "x": 1071.078125,
+      "y": -258.03125,
+      "width": 186.453125,
+      "height": 36
+    },
+    "header": {
+      "x": 523,
+      "y": 441.9375,
+      "width": 958,
+      "height": 109.09375
+    },
+    "state": {
+      "x": 1005,
+      "y": 441.9375,
+      "width": 200,
+      "height": 88.09375
+    },
+    "output": {
+      "x": 1221,
+      "y": 441.9375,
+      "width": 200,
+      "height": 88.09375
+    },
+    "badge": {
+      "x": 1022,
+      "y": 465.53125,
+      "width": 183,
+      "height": 40
+    },
+    "outputBox": {
+      "x": 1238,
+      "y": 465.53125,
+      "width": 183,
+      "height": 40
+    },
+    "close": {
+      "x": 1437,
+      "y": 441.9375,
+      "width": 44,
+      "height": 44
+    },
+    "circles": [
+      {
+        "x": 500,
+        "y": 23.90625,
+        "width": 220,
+        "height": 220
+      },
+      {
+        "x": 892,
+        "y": 23.90625,
+        "width": 220,
+        "height": 220
+      },
+      {
+        "x": 1284,
+        "y": 23.90625,
+        "width": 220,
+        "height": 220
+      }
+    ],
+    "scroll": 1536,
+    "client": 1536,
+    "scene": "graph-d1-1536",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 1536,
+      "height": 900
+    },
+    "footer": null,
+    "footerRows": null,
+    "context": null,
+    "contextBorders": null,
+    "feedback": null,
+    "previous": null,
+    "ring": null,
+    "actions": [],
+    "cards": [],
+    "row": null,
+    "caseStatus": {
+      "x": 1071.078125,
+      "y": -264.03125,
+      "width": 186.453125,
+      "height": 36
+    },
+    "caseColumn": {
+      "x": 1071.078125,
+      "y": -264.03125,
+      "width": 186.453125,
+      "height": 36
+    },
+    "header": {
+      "x": 523,
+      "y": 435.9375,
+      "width": 958,
+      "height": 128.59375
+    },
+    "state": {
+      "x": 1005,
+      "y": 435.9375,
+      "width": 200,
+      "height": 107.59375
+    },
+    "output": {
+      "x": 1221,
+      "y": 435.9375,
+      "width": 200,
+      "height": 107.59375
+    },
+    "badge": {
+      "x": 1022,
+      "y": 459.53125,
+      "width": 183,
+      "height": 40
+    },
+    "outputBox": {
+      "x": 1238,
+      "y": 459.53125,
+      "width": 183,
+      "height": 40
+    },
+    "close": {
+      "x": 1437,
+      "y": 435.9375,
+      "width": 44,
+      "height": 44
+    },
+    "circles": [
+      {
+        "x": 500,
+        "y": 17.90625,
+        "width": 220,
+        "height": 220
+      },
+      {
+        "x": 892,
+        "y": 17.90625,
+        "width": 220,
+        "height": 220
+      },
+      {
+        "x": 1284,
+        "y": 17.90625,
+        "width": 220,
+        "height": 220
+      }
+    ],
+    "scroll": 1536,
+    "client": 1536,
+    "scene": "graph-d2-1536",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "footer": null,
+    "footerRows": null,
+    "context": null,
+    "contextBorders": null,
+    "feedback": null,
+    "previous": null,
+    "ring": null,
+    "actions": [],
+    "cards": [],
+    "row": null,
+    "caseStatus": {
+      "x": 523,
+      "y": 380.140625,
+      "width": 342,
+      "height": 36
+    },
+    "caseColumn": {
+      "x": 523,
+      "y": 380.140625,
+      "width": 342,
+      "height": 36
+    },
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [
+      {
+        "x": 500,
+        "y": 650.828125,
+        "width": 176,
+        "height": 176
+      },
+      {
+        "x": 786,
+        "y": 650.828125,
+        "width": 176,
+        "height": 176
+      },
+      {
+        "x": 1072,
+        "y": 650.828125,
+        "width": 176,
+        "height": 176
+      }
+    ],
+    "scroll": 1280,
+    "client": 1280,
+    "scene": "case-header-1280",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "footer": null,
+    "footerRows": null,
+    "context": null,
+    "contextBorders": null,
+    "feedback": null,
+    "previous": null,
+    "ring": null,
+    "actions": [],
+    "cards": [],
+    "row": null,
+    "caseStatus": {
+      "x": 523,
+      "y": -281.859375,
+      "width": 342,
+      "height": 36
+    },
+    "caseColumn": {
+      "x": 523,
+      "y": -281.859375,
+      "width": 342,
+      "height": 36
+    },
+    "header": {
+      "x": 523,
+      "y": 371.265625,
+      "width": 702,
+      "height": 127.0625
+    },
+    "state": {
+      "x": 749,
+      "y": 371.265625,
+      "width": 200,
+      "height": 106.0625
+    },
+    "output": {
+      "x": 965,
+      "y": 371.265625,
+      "width": 200,
+      "height": 106.0625
+    },
+    "badge": {
+      "x": 766,
+      "y": 394.859375,
+      "width": 183,
+      "height": 40
+    },
+    "outputBox": {
+      "x": 982,
+      "y": 394.859375,
+      "width": 183,
+      "height": 40
+    },
+    "close": {
+      "x": 1181,
+      "y": 371.265625,
+      "width": 44,
+      "height": 44
+    },
+    "circles": [
+      {
+        "x": 500,
+        "y": -11.171875,
+        "width": 176,
+        "height": 176
+      },
+      {
+        "x": 786,
+        "y": -11.171875,
+        "width": 176,
+        "height": 176
+      },
+      {
+        "x": 1072,
+        "y": -11.171875,
+        "width": 176,
+        "height": 176
+      }
+    ],
+    "scroll": 1280,
+    "client": 1280,
+    "scene": "graph-d1-1280",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "footer": null,
+    "footerRows": null,
+    "context": null,
+    "contextBorders": null,
+    "feedback": null,
+    "previous": null,
+    "ring": null,
+    "actions": [],
+    "cards": [],
+    "row": null,
+    "caseStatus": {
+      "x": 523,
+      "y": 90.140625,
+      "width": 342,
+      "height": 36
+    },
+    "caseColumn": {
+      "x": 523,
+      "y": 90.140625,
+      "width": 342,
+      "height": 36
+    },
+    "header": {
+      "x": 523,
+      "y": 743.265625,
+      "width": 702,
+      "height": 148.5
+    },
+    "state": {
+      "x": 749,
+      "y": 743.265625,
+      "width": 200,
+      "height": 127.5
+    },
+    "output": {
+      "x": 965,
+      "y": 743.265625,
+      "width": 200,
+      "height": 127.5
+    },
+    "badge": {
+      "x": 766,
+      "y": 766.859375,
+      "width": 183,
+      "height": 40
+    },
+    "outputBox": {
+      "x": 982,
+      "y": 766.859375,
+      "width": 183,
+      "height": 40
+    },
+    "close": {
+      "x": 1181,
+      "y": 743.265625,
+      "width": 44,
+      "height": 44
+    },
+    "circles": [
+      {
+        "x": 500,
+        "y": 360.828125,
+        "width": 176,
+        "height": 176
+      },
+      {
+        "x": 786,
+        "y": 360.828125,
+        "width": 176,
+        "height": 176
+      },
+      {
+        "x": 1072,
+        "y": 360.828125,
+        "width": 176,
+        "height": 176
+      }
+    ],
+    "scroll": 1280,
+    "client": 1280,
+    "scene": "graph-d2-1280",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 1024,
+      "height": 768
+    },
+    "footer": null,
+    "footerRows": null,
+    "context": null,
+    "contextBorders": null,
+    "feedback": null,
+    "previous": null,
+    "ring": null,
+    "actions": [],
+    "cards": [],
+    "row": null,
+    "caseStatus": {
+      "x": 273,
+      "y": 316.875,
+      "width": 339,
+      "height": 36
+    },
+    "caseColumn": {
+      "x": 273,
+      "y": 316.875,
+      "width": 339,
+      "height": 36
+    },
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [
+      {
+        "x": 250,
+        "y": 577.328125,
+        "width": 176,
+        "height": 176
+      },
+      {
+        "x": 533,
+        "y": 577.328125,
+        "width": 176,
+        "height": 176
+      },
+      {
+        "x": 816,
+        "y": 577.328125,
+        "width": 176,
+        "height": 176
+      }
+    ],
+    "scroll": 1024,
+    "client": 1024,
+    "scene": "case-header-1024",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 1024,
+      "height": 768
+    },
+    "footer": null,
+    "footerRows": null,
+    "context": null,
+    "contextBorders": null,
+    "feedback": null,
+    "previous": null,
+    "ring": null,
+    "actions": [],
+    "cards": [],
+    "row": null,
+    "caseStatus": {
+      "x": 273,
+      "y": -302.125,
+      "width": 339,
+      "height": 36
+    },
+    "caseColumn": {
+      "x": 273,
+      "y": -302.125,
+      "width": 339,
+      "height": 36
+    },
+    "header": {
+      "x": 273,
+      "y": 340.765625,
+      "width": 696,
+      "height": 155.65625
+    },
+    "state": {
+      "x": 493,
+      "y": 340.765625,
+      "width": 200,
+      "height": 134.65625
+    },
+    "output": {
+      "x": 709,
+      "y": 340.765625,
+      "width": 200,
+      "height": 134.65625
+    },
+    "badge": {
+      "x": 510,
+      "y": 364.359375,
+      "width": 183,
+      "height": 40
+    },
+    "outputBox": {
+      "x": 726,
+      "y": 364.359375,
+      "width": 183,
+      "height": 40
+    },
+    "close": {
+      "x": 925,
+      "y": 340.765625,
+      "width": 44,
+      "height": 44
+    },
+    "circles": [
+      {
+        "x": 250,
+        "y": -41.671875,
+        "width": 176,
+        "height": 176
+      },
+      {
+        "x": 533,
+        "y": -41.671875,
+        "width": 176,
+        "height": 176
+      },
+      {
+        "x": 816,
+        "y": -41.671875,
+        "width": 176,
+        "height": 176
+      }
+    ],
+    "scroll": 1024,
+    "client": 1024,
+    "scene": "graph-d1-1024",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 1024,
+      "height": 768
+    },
+    "footer": null,
+    "footerRows": null,
+    "context": null,
+    "contextBorders": null,
+    "feedback": null,
+    "previous": null,
+    "ring": null,
+    "actions": [],
+    "cards": [],
+    "row": null,
+    "caseStatus": {
+      "x": 273,
+      "y": 67.875,
+      "width": 339,
+      "height": 36
+    },
+    "caseColumn": {
+      "x": 273,
+      "y": 67.875,
+      "width": 339,
+      "height": 36
+    },
+    "header": {
+      "x": 273,
+      "y": 710.765625,
+      "width": 696,
+      "height": 148.5
+    },
+    "state": {
+      "x": 493,
+      "y": 710.765625,
+      "width": 200,
+      "height": 127.5
+    },
+    "output": {
+      "x": 709,
+      "y": 710.765625,
+      "width": 200,
+      "height": 127.5
+    },
+    "badge": {
+      "x": 510,
+      "y": 734.359375,
+      "width": 183,
+      "height": 40
+    },
+    "outputBox": {
+      "x": 726,
+      "y": 734.359375,
+      "width": 183,
+      "height": 40
+    },
+    "close": {
+      "x": 925,
+      "y": 710.765625,
+      "width": 44,
+      "height": 44
+    },
+    "circles": [
+      {
+        "x": 250,
+        "y": 328.328125,
+        "width": 176,
+        "height": 176
+      },
+      {
+        "x": 533,
+        "y": 328.328125,
+        "width": 176,
+        "height": 176
+      },
+      {
+        "x": 816,
+        "y": 328.328125,
+        "width": 176,
+        "height": 176
+      }
+    ],
+    "scroll": 1024,
+    "client": 1024,
+    "scene": "graph-d2-1024",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 768,
+      "height": 900
+    },
+    "footer": null,
+    "footerRows": null,
+    "context": null,
+    "contextBorders": null,
+    "feedback": null,
+    "previous": null,
+    "ring": null,
+    "actions": [],
+    "cards": [],
+    "row": null,
+    "caseStatus": {
+      "x": 113,
+      "y": -6.53125,
+      "width": 298,
+      "height": 36
+    },
+    "caseColumn": {
+      "x": 113,
+      "y": -6.53125,
+      "width": 298,
+      "height": 36
+    },
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [
+      {
+        "x": 310,
+        "y": 255.6875,
+        "width": 220,
+        "height": 220
+      },
+      {
+        "x": 310,
+        "y": 567.6875,
+        "width": 220,
+        "height": 220
+      },
+      {
+        "x": 310,
+        "y": 879.6875,
+        "width": 220,
+        "height": 220
+      }
+    ],
+    "scroll": 768,
+    "client": 768,
+    "scene": "case-header-768",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 768,
+      "height": 900
+    },
+    "footer": null,
+    "footerRows": null,
+    "context": null,
+    "contextBorders": null,
+    "feedback": null,
+    "previous": null,
+    "ring": null,
+    "actions": [],
+    "cards": [],
+    "row": null,
+    "caseStatus": {
+      "x": 113,
+      "y": -854.53125,
+      "width": 298,
+      "height": 36
+    },
+    "caseColumn": {
+      "x": 113,
+      "y": -854.53125,
+      "width": 298,
+      "height": 36
+    },
+    "header": {
+      "x": 113,
+      "y": 436.125,
+      "width": 614,
+      "height": 194.125
+    },
+    "state": {
+      "x": 113,
+      "y": 508.15625,
+      "width": 299,
+      "height": 101.09375
+    },
+    "output": {
+      "x": 428,
+      "y": 508.15625,
+      "width": 299,
+      "height": 101.09375
+    },
+    "badge": {
+      "x": 113,
+      "y": 544.75,
+      "width": 299,
+      "height": 40
+    },
+    "outputBox": {
+      "x": 428,
+      "y": 544.75,
+      "width": 299,
+      "height": 40
+    },
+    "close": {
+      "x": 683,
+      "y": 436.125,
+      "width": 44,
+      "height": 44
+    },
+    "circles": [
+      {
+        "x": 310,
+        "y": -592.3125,
+        "width": 220,
+        "height": 220
+      },
+      {
+        "x": 310,
+        "y": -280.3125,
+        "width": 220,
+        "height": 220
+      },
+      {
+        "x": 310,
+        "y": 31.6875,
+        "width": 220,
+        "height": 220
+      }
+    ],
+    "scroll": 768,
+    "client": 768,
+    "scene": "graph-d1-768",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 768,
+      "height": 900
+    },
+    "footer": null,
+    "footerRows": null,
+    "context": null,
+    "contextBorders": null,
+    "feedback": null,
+    "previous": null,
+    "ring": null,
+    "actions": [],
+    "cards": [],
+    "row": null,
+    "caseStatus": {
+      "x": 113,
+      "y": -854.53125,
+      "width": 298,
+      "height": 36
+    },
+    "caseColumn": {
+      "x": 113,
+      "y": -854.53125,
+      "width": 298,
+      "height": 36
+    },
+    "header": {
+      "x": 113,
+      "y": 436.125,
+      "width": 614,
+      "height": 194.125
+    },
+    "state": {
+      "x": 113,
+      "y": 508.15625,
+      "width": 299,
+      "height": 101.09375
+    },
+    "output": {
+      "x": 428,
+      "y": 508.15625,
+      "width": 299,
+      "height": 101.09375
+    },
+    "badge": {
+      "x": 113,
+      "y": 544.75,
+      "width": 299,
+      "height": 40
+    },
+    "outputBox": {
+      "x": 428,
+      "y": 544.75,
+      "width": 299,
+      "height": 40
+    },
+    "close": {
+      "x": 683,
+      "y": 436.125,
+      "width": 44,
+      "height": 44
+    },
+    "circles": [
+      {
+        "x": 310,
+        "y": -592.3125,
+        "width": 220,
+        "height": 220
+      },
+      {
+        "x": 310,
+        "y": -280.3125,
+        "width": 220,
+        "height": 220
+      },
+      {
+        "x": 310,
+        "y": 31.6875,
+        "width": 220,
+        "height": 220
+      }
+    ],
+    "scroll": 768,
+    "client": 768,
+    "scene": "graph-d2-768",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "footer": null,
+    "footerRows": null,
+    "context": null,
+    "contextBorders": null,
+    "feedback": null,
+    "previous": null,
+    "ring": null,
+    "actions": [],
+    "cards": [],
+    "row": null,
+    "caseStatus": {
+      "x": 253,
+      "y": -70.84375,
+      "width": 98,
+      "height": 36
+    },
+    "caseColumn": {
+      "x": 253,
+      "y": -70.84375,
+      "width": 98,
+      "height": 36
+    },
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [
+      {
+        "x": 115,
+        "y": 485.40625,
+        "width": 220,
+        "height": 220
+      },
+      {
+        "x": 115,
+        "y": 797.40625,
+        "width": 220,
+        "height": 220
+      },
+      {
+        "x": 115,
+        "y": 1109.40625,
+        "width": 220,
+        "height": 220
+      }
+    ],
+    "scroll": 390,
+    "client": 390,
+    "scene": "case-header-390",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "footer": null,
+    "footerRows": null,
+    "context": null,
+    "contextBorders": null,
+    "feedback": null,
+    "previous": null,
+    "ring": null,
+    "actions": [],
+    "cards": [],
+    "row": null,
+    "caseStatus": {
+      "x": 253,
+      "y": -1201.84375,
+      "width": 98,
+      "height": 36
+    },
+    "caseColumn": {
+      "x": 253,
+      "y": -1201.84375,
+      "width": 98,
+      "height": 36
+    },
+    "header": {
+      "x": 95,
+      "y": 378.84375,
+      "width": 260,
+      "height": 365.34375
+    },
+    "state": {
+      "x": 95,
+      "y": 529.5,
+      "width": 260,
+      "height": 101.09375
+    },
+    "output": {
+      "x": 95,
+      "y": 646.59375,
+      "width": 260,
+      "height": 76.59375
+    },
+    "badge": {
+      "x": 95,
+      "y": 566.09375,
+      "width": 260,
+      "height": 40
+    },
+    "outputBox": {
+      "x": 95,
+      "y": 683.1875,
+      "width": 260,
+      "height": 40
+    },
+    "close": {
+      "x": 311,
+      "y": 378.84375,
+      "width": 44,
+      "height": 44
+    },
+    "circles": [
+      {
+        "x": 115,
+        "y": -645.59375,
+        "width": 220,
+        "height": 220
+      },
+      {
+        "x": 115,
+        "y": -333.59375,
+        "width": 220,
+        "height": 220
+      },
+      {
+        "x": 115,
+        "y": -21.59375,
+        "width": 220,
+        "height": 220
+      }
+    ],
+    "scroll": 390,
+    "client": 390,
+    "scene": "graph-d1-390",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "footer": null,
+    "footerRows": null,
+    "context": null,
+    "contextBorders": null,
+    "feedback": null,
+    "previous": null,
+    "ring": null,
+    "actions": [],
+    "cards": [],
+    "row": null,
+    "caseStatus": {
+      "x": 253,
+      "y": -1186.84375,
+      "width": 98,
+      "height": 36
+    },
+    "caseColumn": {
+      "x": 253,
+      "y": -1186.84375,
+      "width": 98,
+      "height": 36
+    },
+    "header": {
+      "x": 95,
+      "y": 393.84375,
+      "width": 260,
+      "height": 358.1875
+    },
+    "state": {
+      "x": 95,
+      "y": 537.34375,
+      "width": 260,
+      "height": 101.09375
+    },
+    "output": {
+      "x": 95,
+      "y": 654.4375,
+      "width": 260,
+      "height": 76.59375
+    },
+    "badge": {
+      "x": 95,
+      "y": 573.9375,
+      "width": 260,
+      "height": 40
+    },
+    "outputBox": {
+      "x": 95,
+      "y": 691.03125,
+      "width": 260,
+      "height": 40
+    },
+    "close": {
+      "x": 311,
+      "y": 393.84375,
+      "width": 44,
+      "height": 44
+    },
+    "circles": [
+      {
+        "x": 115,
+        "y": -630.59375,
+        "width": 220,
+        "height": 220
+      },
+      {
+        "x": 115,
+        "y": -318.59375,
+        "width": 220,
+        "height": 220
+      },
+      {
+        "x": 115,
+        "y": -6.59375,
+        "width": 220,
+        "height": 220
+      }
+    ],
+    "scroll": 390,
+    "client": 390,
+    "scene": "graph-d2-390",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 740
+    },
+    "footer": null,
+    "footerRows": null,
+    "context": null,
+    "contextBorders": null,
+    "feedback": null,
+    "previous": null,
+    "ring": null,
+    "actions": [],
+    "cards": [],
+    "row": null,
+    "caseStatus": {
+      "x": 218,
+      "y": -631.15625,
+      "width": 63,
+      "height": 66
+    },
+    "caseColumn": {
+      "x": 218,
+      "y": -631.15625,
+      "width": 63,
+      "height": 66
+    },
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [
+      {
+        "x": 80,
+        "y": -0.03125,
+        "width": 220,
+        "height": 220
+      },
+      {
+        "x": 80,
+        "y": 325.5625,
+        "width": 220,
+        "height": 220
+      },
+      {
+        "x": 80,
+        "y": 651.15625,
+        "width": 220,
+        "height": 220
+      }
+    ],
+    "scroll": 320,
+    "client": 320,
+    "scene": "case-header-320",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 740
+    },
+    "footer": null,
+    "footerRows": null,
+    "context": null,
+    "contextBorders": null,
+    "feedback": null,
+    "previous": null,
+    "ring": null,
+    "actions": [],
+    "cards": [],
+    "row": null,
+    "caseStatus": {
+      "x": 218,
+      "y": -1405.15625,
+      "width": 63,
+      "height": 66
+    },
+    "caseColumn": {
+      "x": 218,
+      "y": -1405.15625,
+      "width": 63,
+      "height": 66
+    },
+    "header": {
+      "x": 95,
+      "y": 312.625,
+      "width": 190,
+      "height": 436.8125
+    },
+    "state": {
+      "x": 95,
+      "y": 534.75,
+      "width": 190,
+      "height": 101.09375
+    },
+    "output": {
+      "x": 95,
+      "y": 651.84375,
+      "width": 190,
+      "height": 76.59375
+    },
+    "badge": {
+      "x": 95,
+      "y": 571.34375,
+      "width": 190,
+      "height": 40
+    },
+    "outputBox": {
+      "x": 95,
+      "y": 688.4375,
+      "width": 190,
+      "height": 40
+    },
+    "close": {
+      "x": 241,
+      "y": 312.625,
+      "width": 44,
+      "height": 44
+    },
+    "circles": [
+      {
+        "x": 80,
+        "y": -774.03125,
+        "width": 220,
+        "height": 220
+      },
+      {
+        "x": 80,
+        "y": -448.4375,
+        "width": 220,
+        "height": 220
+      },
+      {
+        "x": 80,
+        "y": -122.84375,
+        "width": 220,
+        "height": 220
+      }
+    ],
+    "scroll": 320,
+    "client": 320,
+    "scene": "graph-d1-320",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 740
+    },
+    "footer": null,
+    "footerRows": null,
+    "context": null,
+    "contextBorders": null,
+    "feedback": null,
+    "previous": null,
+    "ring": null,
+    "actions": [],
+    "cards": [],
+    "row": null,
+    "caseStatus": {
+      "x": 218,
+      "y": -1405.15625,
+      "width": 63,
+      "height": 66
+    },
+    "caseColumn": {
+      "x": 218,
+      "y": -1405.15625,
+      "width": 63,
+      "height": 66
+    },
+    "header": {
+      "x": 95,
+      "y": 312.625,
+      "width": 190,
+      "height": 477.75
+    },
+    "state": {
+      "x": 95,
+      "y": 556.1875,
+      "width": 190,
+      "height": 120.59375
+    },
+    "output": {
+      "x": 95,
+      "y": 692.78125,
+      "width": 190,
+      "height": 76.59375
+    },
+    "badge": {
+      "x": 95,
+      "y": 592.78125,
+      "width": 190,
+      "height": 40
+    },
+    "outputBox": {
+      "x": 95,
+      "y": 729.375,
+      "width": 190,
+      "height": 40
+    },
+    "close": {
+      "x": 241,
+      "y": 312.625,
+      "width": 44,
+      "height": 44
+    },
+    "circles": [
+      {
+        "x": 80,
+        "y": -774.03125,
+        "width": 220,
+        "height": 220
+      },
+      {
+        "x": 80,
+        "y": -448.4375,
+        "width": 220,
+        "height": 220
+      },
+      {
+        "x": 80,
+        "y": -122.84375,
+        "width": 220,
+        "height": 220
+      }
+    ],
+    "scroll": 320,
+    "client": 320,
+    "scene": "graph-d2-320",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "footer": null,
+    "footerRows": null,
+    "context": null,
+    "contextBorders": null,
+    "feedback": null,
+    "previous": null,
+    "ring": null,
+    "actions": [],
+    "cards": [],
+    "row": null,
+    "caseStatus": {
+      "x": 574,
+      "y": -2585.671875,
+      "width": 360,
+      "height": 72
+    },
+    "caseColumn": {
+      "x": 574,
+      "y": -2585.671875,
+      "width": 360,
+      "height": 72
+    },
+    "header": {
+      "x": 574,
+      "y": 421.1875,
+      "width": 756,
+      "height": 470.15625
+    },
+    "state": {
+      "x": 574,
+      "y": 608.15625,
+      "width": 362,
+      "height": 241.1875
+    },
+    "output": {
+      "x": 968,
+      "y": 608.15625,
+      "width": 362,
+      "height": 241.1875
+    },
+    "badge": {
+      "x": 574,
+      "y": 681.34375,
+      "width": 362,
+      "height": 80
+    },
+    "outputBox": {
+      "x": 968,
+      "y": 681.34375,
+      "width": 362,
+      "height": 80
+    },
+    "close": {
+      "x": 1242,
+      "y": 421.1875,
+      "width": 88,
+      "height": 88
+    },
+    "circles": [
+      {
+        "x": 732,
+        "y": -1635.703125,
+        "width": 440,
+        "height": 440
+      },
+      {
+        "x": 732,
+        "y": -1011.703125,
+        "width": 440,
+        "height": 440
+      },
+      {
+        "x": 732,
+        "y": -387.703125,
+        "width": 440,
+        "height": 440
+      }
+    ],
+    "scroll": 1440,
+    "client": 1440,
+    "scene": "graph-zoom200",
+    "test": "test_01_complete_journey_precision_and_stable_node_tracks"
+  },
+  {
+    "viewport": {
+      "width": 1536,
+      "height": 900
+    },
+    "footer": {
+      "x": 501,
+      "y": 1426.578125,
+      "width": 1002,
+      "height": 96
+    },
+    "footerRows": "71px",
+    "context": {
+      "x": 870.765625,
+      "y": 1439.578125,
+      "width": 279.78125,
+      "height": 71
+    },
+    "contextBorders": [
+      "1px",
+      "1px"
+    ],
+    "feedback": "Preparación pendiente · podés continuar sin datos",
+    "previous": {
+      "x": 523,
+      "y": 1453.078125,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 579,
+      "y": 1453.078125,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Continuar sin datos",
+        "rect": {
+          "x": 1162.546875,
+          "y": 1453.078125,
+          "width": 152.0625,
+          "height": 44
+        }
+      },
+      {
+        "text": "Continuar con datos",
+        "rect": {
+          "x": 1324.609375,
+          "y": 1453.078125,
+          "width": 156.390625,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 519,
+          "y": 1186.8125,
+          "width": 633.328125,
+          "height": 217.765625
+        },
+        "icon": {
+          "x": 538,
+          "y": 1205.8125,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 602,
+          "y": 1207.8125,
+          "width": 188.46875,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 829.46875,
+          "y": 1230.3125,
+          "width": 303.84375,
+          "height": 40
+        }
+      },
+      {
+        "rect": {
+          "x": 1168.328125,
+          "y": 1186.8125,
+          "width": 316.65625,
+          "height": 217.765625
+        },
+        "icon": {
+          "x": 1187.328125,
+          "y": 1205.8125,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 1251.328125,
+          "y": 1207.8125,
+          "width": 214.65625,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 519,
+      "y": 1186.8125,
+      "width": 966,
+      "height": 217.765625
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 1536,
+    "client": 1536,
+    "scene": "data-sessions-empty-1536",
+    "test": "test_02_sessions_availability_errors_recovery_and_pending_files"
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "footer": {
+      "x": 77,
+      "y": 3220.71875,
+      "width": 296,
+      "height": 247.78125
+    },
+    "footerRows": "44px 56.7812px 98px",
+    "context": {
+      "x": 93,
+      "y": 3289.71875,
+      "width": 264,
+      "height": 56.78125
+    },
+    "contextBorders": [
+      "0px",
+      "0px"
+    ],
+    "feedback": "Preparación pendiente · podés continuar sin datos",
+    "previous": {
+      "x": 93,
+      "y": 3385.5,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 93,
+      "y": 3233.71875,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Continuar sin datos",
+        "rect": {
+          "x": 149,
+          "y": 3358.5,
+          "width": 208,
+          "height": 44
+        }
+      },
+      {
+        "text": "Continuar con datos",
+        "rect": {
+          "x": 149,
+          "y": 3412.5,
+          "width": 208,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 89,
+          "y": 2736.5,
+          "width": 272,
+          "height": 209.265625
+        },
+        "icon": {
+          "x": 108,
+          "y": 2755.5,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 168,
+          "y": 2757.5,
+          "width": 174,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 108,
+          "y": 2881.765625,
+          "width": 234,
+          "height": 40
+        }
+      },
+      {
+        "rect": {
+          "x": 89,
+          "y": 2961.765625,
+          "width": 272,
+          "height": 236.953125
+        },
+        "icon": {
+          "x": 108,
+          "y": 2980.765625,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 168,
+          "y": 2982.765625,
+          "width": 174,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 89,
+      "y": 2736.5,
+      "width": 272,
+      "height": 462.21875
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 390,
+    "client": 390,
+    "scene": "data-sessions-empty-390",
+    "test": "test_02_sessions_availability_errors_recovery_and_pending_files"
+  },
+  {
+    "viewport": {
+      "width": 1536,
+      "height": 900
+    },
+    "footer": {
+      "x": 501,
+      "y": 778.578125,
+      "width": 1002,
+      "height": 96
+    },
+    "footerRows": "71px",
+    "context": {
+      "x": 870.765625,
+      "y": 791.578125,
+      "width": 279.78125,
+      "height": 71
+    },
+    "contextBorders": [
+      "1px",
+      "1px"
+    ],
+    "feedback": "Preparación pendiente · podés continuar sin datos",
+    "previous": {
+      "x": 523,
+      "y": 805.078125,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 579,
+      "y": 805.078125,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Continuar sin datos",
+        "rect": {
+          "x": 1162.546875,
+          "y": 805.078125,
+          "width": 152.0625,
+          "height": 44
+        }
+      },
+      {
+        "text": "Continuar con datos",
+        "rect": {
+          "x": 1324.609375,
+          "y": 805.078125,
+          "width": 156.390625,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 519,
+          "y": 508.8125,
+          "width": 633.328125,
+          "height": 247.765625
+        },
+        "icon": {
+          "x": 538,
+          "y": 527.8125,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 602,
+          "y": 529.8125,
+          "width": 188.46875,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 829.46875,
+          "y": 552.3125,
+          "width": 303.84375,
+          "height": 40
+        }
+      },
+      {
+        "rect": {
+          "x": 1168.328125,
+          "y": 508.8125,
+          "width": 316.65625,
+          "height": 247.765625
+        },
+        "icon": {
+          "x": 1187.328125,
+          "y": 527.8125,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 1251.328125,
+          "y": 529.8125,
+          "width": 214.65625,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 519,
+      "y": 508.8125,
+      "width": 966,
+      "height": 247.765625
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 1536,
+    "client": 1536,
+    "scene": "data-sessions-available-1536",
+    "test": "test_02_sessions_availability_errors_recovery_and_pending_files"
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "footer": {
+      "x": 77,
+      "y": 570.71875,
+      "width": 296,
+      "height": 247.78125
+    },
+    "footerRows": "44px 56.7812px 98px",
+    "context": {
+      "x": 93,
+      "y": 639.71875,
+      "width": 264,
+      "height": 56.78125
+    },
+    "contextBorders": [
+      "0px",
+      "0px"
+    ],
+    "feedback": "Preparación pendiente · podés continuar sin datos",
+    "previous": {
+      "x": 93,
+      "y": 735.5,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 93,
+      "y": 583.71875,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Continuar sin datos",
+        "rect": {
+          "x": 149,
+          "y": 708.5,
+          "width": 208,
+          "height": 44
+        }
+      },
+      {
+        "text": "Continuar con datos",
+        "rect": {
+          "x": 149,
+          "y": 762.5,
+          "width": 208,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 89,
+          "y": 56.5,
+          "width": 272,
+          "height": 209.265625
+        },
+        "icon": {
+          "x": 108,
+          "y": 75.5,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 168,
+          "y": 77.5,
+          "width": 174,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 108,
+          "y": 201.765625,
+          "width": 234,
+          "height": 40
+        }
+      },
+      {
+        "rect": {
+          "x": 89,
+          "y": 281.765625,
+          "width": 272,
+          "height": 266.953125
+        },
+        "icon": {
+          "x": 108,
+          "y": 300.765625,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 168,
+          "y": 302.765625,
+          "width": 174,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 89,
+      "y": 56.5,
+      "width": 272,
+      "height": 492.21875
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 390,
+    "client": 390,
+    "scene": "data-sessions-available-390",
+    "test": "test_02_sessions_availability_errors_recovery_and_pending_files"
+  },
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "footer": {
+      "x": 501,
+      "y": 830.75,
+      "width": 906,
+      "height": 96
+    },
+    "footerRows": "71px",
+    "context": {
+      "x": 899.8125,
+      "y": 843.75,
+      "width": 308.828125,
+      "height": 71
+    },
+    "contextBorders": [
+      "1px",
+      "1px"
+    ],
+    "feedback": "Guardando…",
+    "previous": {
+      "x": 523,
+      "y": 857.25,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 579,
+      "y": 857.234375,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Guardar contexto",
+        "rect": {
+          "x": 1220.640625,
+          "y": 857.25,
+          "width": 164.359375,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [],
+    "row": null,
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 1440,
+    "client": 1440,
+    "scene": "footer-saving-1536"
+  },
+  {
+    "viewport": {
+      "width": 1536,
+      "height": 900
+    },
+    "footer": {
+      "x": 501,
+      "y": 773.625,
+      "width": 1002,
+      "height": 181.515625
+    },
+    "footerRows": "156.516px",
+    "context": {
+      "x": 960.8125,
+      "y": 786.625,
+      "width": 369.828125,
+      "height": 156.515625
+    },
+    "contextBorders": [
+      "1px",
+      "1px"
+    ],
+    "feedback": "La operación no pudo confirmarse. El borrador se conserva y puede revisarse antes de reintentar. El borrador se conserva y puede revisarse antes de reintentar. El borrador se conserva y puede revisarse antes de reintentar. El borrador se conserva y puede revisarse antes de reintentar. El borrador se conserva y puede revisarse antes de reintentar. El borrador se conserva y puede revisarse antes de reintentar. El borrador se conserva y puede revisarse antes de reintentar. El borrador se conserva y puede revisarse antes de reintentar. ",
+    "previous": {
+      "x": 523,
+      "y": 842.875,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 579,
+      "y": 842.875,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Guardar contexto",
+        "rect": {
+          "x": 1342.640625,
+          "y": 842.875,
+          "width": 138.359375,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [],
+    "row": null,
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 1536,
+    "client": 1536,
+    "scene": "footer-error-503-1536"
+  },
+  {
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "footer": {
+      "x": 501,
+      "y": 1961.9375,
+      "width": 746,
+      "height": 285.859375
+    },
+    "footerRows": "260.859px",
+    "context": {
+      "x": 832.8125,
+      "y": 1974.9375,
+      "width": 241.828125,
+      "height": 260.859375
+    },
+    "contextBorders": [
+      "1px",
+      "1px"
+    ],
+    "feedback": "La operación no pudo confirmarse. El borrador se conserva y puede revisarse antes de reintentar. El borrador se conserva y puede revisarse antes de reintentar. El borrador se conserva y puede revisarse antes de reintentar. El borrador se conserva y puede revisarse antes de reintentar. El borrador se conserva y puede revisarse antes de reintentar. El borrador se conserva y puede revisarse antes de reintentar. El borrador se conserva y puede revisarse antes de reintentar. El borrador se conserva y puede revisarse antes de reintentar. ",
+    "previous": {
+      "x": 523,
+      "y": 2083.359375,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 579,
+      "y": 2083.359375,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Guardar contexto",
+        "rect": {
+          "x": 1086.640625,
+          "y": 2083.359375,
+          "width": 138.359375,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [],
+    "row": null,
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 1280,
+    "client": 1280,
+    "scene": "footer-error-503-1280"
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "footer": {
+      "x": 77,
+      "y": 3965.25,
+      "width": 296,
+      "height": 390.46875
+    },
+    "footerRows": "66.7812px 230.688px 44px",
+    "context": {
+      "x": 93,
+      "y": 4057.03125,
+      "width": 264,
+      "height": 230.6875
+    },
+    "contextBorders": [
+      "0px",
+      "0px"
+    ],
+    "feedback": "La operación no pudo confirmarse. El borrador se conserva y puede revisarse antes de reintentar. El borrador se conserva y puede revisarse antes de reintentar. El borrador se conserva y puede revisarse antes de reintentar. El borrador se conserva y puede revisarse antes de reintentar. El borrador se conserva y puede revisarse antes de reintentar. El borrador se conserva y puede revisarse antes de reintentar. El borrador se conserva y puede revisarse antes de reintentar. El borrador se conserva y puede revisarse antes de reintentar. ",
+    "previous": {
+      "x": 93,
+      "y": 4299.71875,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 93,
+      "y": 3989.640625,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Guardar contexto",
+        "rect": {
+          "x": 149,
+          "y": 4299.71875,
+          "width": 208,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [],
+    "row": null,
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 390,
+    "client": 390,
+    "scene": "footer-error-503-390"
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 740
+    },
+    "footer": {
+      "x": 77,
+      "y": 4620.234375,
+      "width": 226,
+      "height": 509.796875
+    },
+    "footerRows": "84.7812px 317.641px 58.375px",
+    "context": {
+      "x": 93,
+      "y": 4730.015625,
+      "width": 194,
+      "height": 317.640625
+    },
+    "contextBorders": [
+      "0px",
+      "0px"
+    ],
+    "feedback": "La operación no pudo confirmarse. El borrador se conserva y puede revisarse antes de reintentar. El borrador se conserva y puede revisarse antes de reintentar. El borrador se conserva y puede revisarse antes de reintentar. El borrador se conserva y puede revisarse antes de reintentar. El borrador se conserva y puede revisarse antes de reintentar. El borrador se conserva y puede revisarse antes de reintentar. El borrador se conserva y puede revisarse antes de reintentar. El borrador se conserva y puede revisarse antes de reintentar. ",
+    "previous": {
+      "x": 93,
+      "y": 5066.84375,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 93,
+      "y": 4653.625,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Guardar contexto",
+        "rect": {
+          "x": 149,
+          "y": 5059.65625,
+          "width": 138,
+          "height": 58.375
+        }
+      }
+    ],
+    "cards": [],
+    "row": null,
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 320,
+    "client": 320,
+    "scene": "footer-error-503-320"
+  },
+  {
+    "viewport": {
+      "width": 1536,
+      "height": 900
+    },
+    "footer": {
+      "x": 501,
+      "y": 741.625,
+      "width": 1002,
+      "height": 107.78125
+    },
+    "footerRows": "82.7812px",
+    "context": {
+      "x": 960.8125,
+      "y": 754.625,
+      "width": 369.828125,
+      "height": 82.78125
+    },
+    "contextBorders": [
+      "1px",
+      "1px"
+    ],
+    "feedback": "La versión guardada cambió. Tu borrador se conserva; revisá la versión actual antes de reintentar.Descartar borrador y recargar",
+    "previous": {
+      "x": 523,
+      "y": 774.015625,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 579,
+      "y": 774,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Guardar contexto",
+        "rect": {
+          "x": 1342.640625,
+          "y": 774.015625,
+          "width": 138.359375,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [],
+    "row": null,
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 1536,
+    "client": 1536,
+    "scene": "footer-error-409-1536"
+  },
+  {
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "footer": {
+      "x": 501,
+      "y": 1961.9375,
+      "width": 746,
+      "height": 138.265625
+    },
+    "footerRows": "113.266px",
+    "context": {
+      "x": 832.8125,
+      "y": 1974.9375,
+      "width": 241.828125,
+      "height": 113.265625
+    },
+    "contextBorders": [
+      "1px",
+      "1px"
+    ],
+    "feedback": "La versión guardada cambió. Tu borrador se conserva; revisá la versión actual antes de reintentar.Descartar borrador y recargar",
+    "previous": {
+      "x": 523,
+      "y": 2009.5625,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 579,
+      "y": 2009.5625,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Guardar contexto",
+        "rect": {
+          "x": 1086.640625,
+          "y": 2009.5625,
+          "width": 138.359375,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [],
+    "row": null,
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 1280,
+    "client": 1280,
+    "scene": "footer-error-409-1280"
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "footer": {
+      "x": 77,
+      "y": 3965.25,
+      "width": 296,
+      "height": 281.953125
+    },
+    "footerRows": "66.7812px 122.172px 44px",
+    "context": {
+      "x": 93,
+      "y": 4057.03125,
+      "width": 264,
+      "height": 122.171875
+    },
+    "contextBorders": [
+      "0px",
+      "0px"
+    ],
+    "feedback": "La versión guardada cambió. Tu borrador se conserva; revisá la versión actual antes de reintentar.Descartar borrador y recargar",
+    "previous": {
+      "x": 93,
+      "y": 4191.203125,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 93,
+      "y": 3989.640625,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Guardar contexto",
+        "rect": {
+          "x": 149,
+          "y": 4191.203125,
+          "width": 208,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [],
+    "row": null,
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 390,
+    "client": 390,
+    "scene": "footer-error-409-390"
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 740
+    },
+    "footer": {
+      "x": 77,
+      "y": 4620.234375,
+      "width": 226,
+      "height": 327.421875
+    },
+    "footerRows": "84.7812px 135.266px 58.375px",
+    "context": {
+      "x": 93,
+      "y": 4730.015625,
+      "width": 194,
+      "height": 135.265625
+    },
+    "contextBorders": [
+      "0px",
+      "0px"
+    ],
+    "feedback": "La versión guardada cambió. Tu borrador se conserva; revisá la versión actual antes de reintentar.Descartar borrador y recargar",
+    "previous": {
+      "x": 93,
+      "y": 4884.46875,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 93,
+      "y": 4653.625,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Guardar contexto",
+        "rect": {
+          "x": 149,
+          "y": 4877.28125,
+          "width": 138,
+          "height": 58.375
+        }
+      }
+    ],
+    "cards": [],
+    "row": null,
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 320,
+    "client": 320,
+    "scene": "footer-error-409-320"
+  },
+  {
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "footer": {
+      "x": 501,
+      "y": 1798.75,
+      "width": 906,
+      "height": 96
+    },
+    "footerRows": "71px",
+    "context": {
+      "x": 912.8125,
+      "y": 1811.75,
+      "width": 321.828125,
+      "height": 71
+    },
+    "contextBorders": [
+      "1px",
+      "1px"
+    ],
+    "feedback": "Sin cambios pendientes.",
+    "previous": {
+      "x": 523,
+      "y": 1825.25,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 579,
+      "y": 1825.234375,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Guardar contexto",
+        "rect": {
+          "x": 1246.640625,
+          "y": 1825.25,
+          "width": 138.359375,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [],
+    "row": null,
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 1440,
+    "client": 1440,
+    "scene": "footer-zoom200"
+  },
+  {
+    "viewport": {
+      "width": 1536,
+      "height": 900
+    },
+    "footer": null,
+    "footerRows": null,
+    "context": null,
+    "contextBorders": null,
+    "feedback": null,
+    "previous": null,
+    "ring": null,
+    "actions": [],
+    "cards": [],
+    "row": null,
+    "caseStatus": {
+      "x": 1071.078125,
+      "y": -232.03125,
+      "width": 186.453125,
+      "height": 36
+    },
+    "caseColumn": {
+      "x": 1071.078125,
+      "y": -232.03125,
+      "width": 186.453125,
+      "height": 36
+    },
+    "header": {
+      "x": 523,
+      "y": 435.4375,
+      "width": 958,
+      "height": 304.09375
+    },
+    "state": {
+      "x": 1005,
+      "y": 435.4375,
+      "width": 200,
+      "height": 283.09375
+    },
+    "output": {
+      "x": 1221,
+      "y": 435.4375,
+      "width": 200,
+      "height": 283.09375
+    },
+    "badge": {
+      "x": 1022,
+      "y": 459.03125,
+      "width": 183,
+      "height": 40
+    },
+    "outputBox": {
+      "x": 1238,
+      "y": 459.03125,
+      "width": 183,
+      "height": 40
+    },
+    "close": {
+      "x": 1437,
+      "y": 435.4375,
+      "width": 44,
+      "height": 44
+    },
+    "circles": [
+      {
+        "x": 500,
+        "y": 17.40625,
+        "width": 220,
+        "height": 220
+      },
+      {
+        "x": 892,
+        "y": 17.40625,
+        "width": 220,
+        "height": 220
+      },
+      {
+        "x": 1284,
+        "y": 17.40625,
+        "width": 220,
+        "height": 220
+      }
+    ],
+    "scroll": 1536,
+    "client": 1536,
+    "scene": "graph-long-label-1536"
+  },
+  {
+    "viewport": {
+      "width": 1280,
+      "height": 800
+    },
+    "footer": null,
+    "footerRows": null,
+    "context": null,
+    "contextBorders": null,
+    "feedback": null,
+    "previous": null,
+    "ring": null,
+    "actions": [],
+    "cards": [],
+    "row": null,
+    "caseStatus": {
+      "x": 523,
+      "y": -281.859375,
+      "width": 342,
+      "height": 36
+    },
+    "caseColumn": {
+      "x": 523,
+      "y": -281.859375,
+      "width": 342,
+      "height": 36
+    },
+    "header": {
+      "x": 523,
+      "y": 371.265625,
+      "width": 702,
+      "height": 304.09375
+    },
+    "state": {
+      "x": 749,
+      "y": 371.265625,
+      "width": 200,
+      "height": 283.09375
+    },
+    "output": {
+      "x": 965,
+      "y": 371.265625,
+      "width": 200,
+      "height": 283.09375
+    },
+    "badge": {
+      "x": 766,
+      "y": 394.859375,
+      "width": 183,
+      "height": 40
+    },
+    "outputBox": {
+      "x": 982,
+      "y": 394.859375,
+      "width": 183,
+      "height": 40
+    },
+    "close": {
+      "x": 1181,
+      "y": 371.265625,
+      "width": 44,
+      "height": 44
+    },
+    "circles": [
+      {
+        "x": 500,
+        "y": -11.171875,
+        "width": 176,
+        "height": 176
+      },
+      {
+        "x": 786,
+        "y": -11.171875,
+        "width": 176,
+        "height": 176
+      },
+      {
+        "x": 1072,
+        "y": -11.171875,
+        "width": 176,
+        "height": 176
+      }
+    ],
+    "scroll": 1280,
+    "client": 1280,
+    "scene": "graph-long-label-1280"
+  },
+  {
+    "viewport": {
+      "width": 1024,
+      "height": 768
+    },
+    "footer": null,
+    "footerRows": null,
+    "context": null,
+    "contextBorders": null,
+    "feedback": null,
+    "previous": null,
+    "ring": null,
+    "actions": [],
+    "cards": [],
+    "row": null,
+    "caseStatus": {
+      "x": 273,
+      "y": 38.875,
+      "width": 339,
+      "height": 36
+    },
+    "caseColumn": {
+      "x": 273,
+      "y": 38.875,
+      "width": 339,
+      "height": 36
+    },
+    "header": {
+      "x": 273,
+      "y": 681.765625,
+      "width": 696,
+      "height": 327.21875
+    },
+    "state": {
+      "x": 493,
+      "y": 681.765625,
+      "width": 200,
+      "height": 306.21875
+    },
+    "output": {
+      "x": 709,
+      "y": 681.765625,
+      "width": 200,
+      "height": 306.21875
+    },
+    "badge": {
+      "x": 510,
+      "y": 705.359375,
+      "width": 183,
+      "height": 40
+    },
+    "outputBox": {
+      "x": 726,
+      "y": 705.359375,
+      "width": 183,
+      "height": 40
+    },
+    "close": {
+      "x": 925,
+      "y": 681.765625,
+      "width": 44,
+      "height": 44
+    },
+    "circles": [
+      {
+        "x": 250,
+        "y": 299.328125,
+        "width": 176,
+        "height": 176
+      },
+      {
+        "x": 533,
+        "y": 299.328125,
+        "width": 176,
+        "height": 176
+      },
+      {
+        "x": 816,
+        "y": 299.328125,
+        "width": 176,
+        "height": 176
+      }
+    ],
+    "scroll": 1024,
+    "client": 1024,
+    "scene": "graph-long-label-1024"
+  },
+  {
+    "viewport": {
+      "width": 768,
+      "height": 900
+    },
+    "footer": null,
+    "footerRows": null,
+    "context": null,
+    "contextBorders": null,
+    "feedback": null,
+    "previous": null,
+    "ring": null,
+    "actions": [],
+    "cards": [],
+    "row": null,
+    "caseStatus": {
+      "x": 113,
+      "y": -854.53125,
+      "width": 298,
+      "height": 36
+    },
+    "caseColumn": {
+      "x": 113,
+      "y": -854.53125,
+      "width": 298,
+      "height": 36
+    },
+    "header": {
+      "x": 113,
+      "y": 436.125,
+      "width": 614,
+      "height": 339.71875
+    },
+    "state": {
+      "x": 113,
+      "y": 536.75,
+      "width": 299,
+      "height": 218.09375
+    },
+    "output": {
+      "x": 428,
+      "y": 536.75,
+      "width": 299,
+      "height": 218.09375
+    },
+    "badge": {
+      "x": 113,
+      "y": 573.34375,
+      "width": 299,
+      "height": 40
+    },
+    "outputBox": {
+      "x": 428,
+      "y": 573.34375,
+      "width": 299,
+      "height": 40
+    },
+    "close": {
+      "x": 683,
+      "y": 436.125,
+      "width": 44,
+      "height": 44
+    },
+    "circles": [
+      {
+        "x": 310,
+        "y": -592.3125,
+        "width": 220,
+        "height": 220
+      },
+      {
+        "x": 310,
+        "y": -280.3125,
+        "width": 220,
+        "height": 220
+      },
+      {
+        "x": 310,
+        "y": 31.6875,
+        "width": 220,
+        "height": 220
+      }
+    ],
+    "scroll": 768,
+    "client": 768,
+    "scene": "graph-long-label-768"
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "footer": null,
+    "footerRows": null,
+    "context": null,
+    "contextBorders": null,
+    "feedback": null,
+    "previous": null,
+    "ring": null,
+    "actions": [],
+    "cards": [],
+    "row": null,
+    "caseStatus": {
+      "x": 253,
+      "y": -1201.34375,
+      "width": 98,
+      "height": 36
+    },
+    "caseColumn": {
+      "x": 253,
+      "y": -1201.34375,
+      "width": 98,
+      "height": 36
+    },
+    "header": {
+      "x": 95,
+      "y": 379.34375,
+      "width": 260,
+      "height": 673.40625
+    },
+    "state": {
+      "x": 95,
+      "y": 701.5625,
+      "width": 260,
+      "height": 237.59375
+    },
+    "output": {
+      "x": 95,
+      "y": 955.15625,
+      "width": 260,
+      "height": 76.59375
+    },
+    "badge": {
+      "x": 95,
+      "y": 738.15625,
+      "width": 260,
+      "height": 40
+    },
+    "outputBox": {
+      "x": 95,
+      "y": 991.75,
+      "width": 260,
+      "height": 40
+    },
+    "close": {
+      "x": 311,
+      "y": 379.34375,
+      "width": 44,
+      "height": 44
+    },
+    "circles": [
+      {
+        "x": 115,
+        "y": -645.09375,
+        "width": 220,
+        "height": 220
+      },
+      {
+        "x": 115,
+        "y": -333.09375,
+        "width": 220,
+        "height": 220
+      },
+      {
+        "x": 115,
+        "y": -21.09375,
+        "width": 220,
+        "height": 220
+      }
+    ],
+    "scroll": 390,
+    "client": 390,
+    "scene": "graph-long-label-390"
+  },
+  {
+    "viewport": {
+      "width": 320,
+      "height": 740
+    },
+    "footer": null,
+    "footerRows": null,
+    "context": null,
+    "contextBorders": null,
+    "feedback": null,
+    "previous": null,
+    "ring": null,
+    "actions": [],
+    "cards": [],
+    "row": null,
+    "caseStatus": {
+      "x": 218,
+      "y": -1405.15625,
+      "width": 63,
+      "height": 66
+    },
+    "caseColumn": {
+      "x": 218,
+      "y": -1405.15625,
+      "width": 63,
+      "height": 66
+    },
+    "header": {
+      "x": 95,
+      "y": 312.625,
+      "width": 190,
+      "height": 1003.53125
+    },
+    "state": {
+      "x": 95,
+      "y": 906.46875,
+      "width": 190,
+      "height": 296.09375
+    },
+    "output": {
+      "x": 95,
+      "y": 1218.5625,
+      "width": 190,
+      "height": 76.59375
+    },
+    "badge": {
+      "x": 95,
+      "y": 943.0625,
+      "width": 190,
+      "height": 40
+    },
+    "outputBox": {
+      "x": 95,
+      "y": 1255.15625,
+      "width": 190,
+      "height": 40
+    },
+    "close": {
+      "x": 241,
+      "y": 312.625,
+      "width": 44,
+      "height": 44
+    },
+    "circles": [
+      {
+        "x": 80,
+        "y": -774.03125,
+        "width": 220,
+        "height": 220
+      },
+      {
+        "x": 80,
+        "y": -448.4375,
+        "width": 220,
+        "height": 220
+      },
+      {
+        "x": 80,
+        "y": -122.84375,
+        "width": 220,
+        "height": 220
+      }
+    ],
+    "scroll": 320,
+    "client": 320,
+    "scene": "graph-long-label-320"
+  },
+  {
+    "viewport": {
+      "width": 1536,
+      "height": 900
+    },
+    "footer": {
+      "x": 501,
+      "y": 788.953125,
+      "width": 1002,
+      "height": 96
+    },
+    "footerRows": "71px",
+    "context": {
+      "x": 870.765625,
+      "y": 801.953125,
+      "width": 279.78125,
+      "height": 71
+    },
+    "contextBorders": [
+      "1px",
+      "1px"
+    ],
+    "feedback": "Preparación pendiente · podés continuar sin datos",
+    "previous": {
+      "x": 523,
+      "y": 815.453125,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 579,
+      "y": 815.453125,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Continuar sin datos",
+        "rect": {
+          "x": 1162.546875,
+          "y": 815.453125,
+          "width": 152.0625,
+          "height": 44
+        }
+      },
+      {
+        "text": "Continuar con datos",
+        "rect": {
+          "x": 1324.609375,
+          "y": 815.453125,
+          "width": 156.390625,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 519,
+          "y": 508.8125,
+          "width": 633.328125,
+          "height": 258.140625
+        },
+        "icon": {
+          "x": 538,
+          "y": 527.8125,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 602,
+          "y": 529.8125,
+          "width": 188.46875,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 829.46875,
+          "y": 552.3125,
+          "width": 303.84375,
+          "height": 40
+        }
+      },
+      {
+        "rect": {
+          "x": 1168.328125,
+          "y": 508.8125,
+          "width": 316.65625,
+          "height": 258.140625
+        },
+        "icon": {
+          "x": 1187.328125,
+          "y": 527.8125,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 1251.328125,
+          "y": 529.8125,
+          "width": 214.65625,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 519,
+      "y": 508.8125,
+      "width": 966,
+      "height": 258.140625
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 1536,
+    "client": 1536,
+    "scene": "data-sessions-frozen-recovery-1536"
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "footer": {
+      "x": 77,
+      "y": 3261.09375,
+      "width": 296,
+      "height": 247.78125
+    },
+    "footerRows": "44px 56.7812px 98px",
+    "context": {
+      "x": 93,
+      "y": 3330.09375,
+      "width": 264,
+      "height": 56.78125
+    },
+    "contextBorders": [
+      "0px",
+      "0px"
+    ],
+    "feedback": "Preparación pendiente · podés continuar sin datos",
+    "previous": {
+      "x": 93,
+      "y": 3425.875,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 93,
+      "y": 3274.09375,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Continuar sin datos",
+        "rect": {
+          "x": 149,
+          "y": 3398.875,
+          "width": 208,
+          "height": 44
+        }
+      },
+      {
+        "text": "Continuar con datos",
+        "rect": {
+          "x": 149,
+          "y": 3452.875,
+          "width": 208,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 89,
+          "y": 2736.5,
+          "width": 272,
+          "height": 209.265625
+        },
+        "icon": {
+          "x": 108,
+          "y": 2755.5,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 168,
+          "y": 2757.5,
+          "width": 174,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 108,
+          "y": 2881.765625,
+          "width": 234,
+          "height": 40
+        }
+      },
+      {
+        "rect": {
+          "x": 89,
+          "y": 2961.765625,
+          "width": 272,
+          "height": 277.328125
+        },
+        "icon": {
+          "x": 108,
+          "y": 2980.765625,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 168,
+          "y": 2982.765625,
+          "width": 174,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 89,
+      "y": 2736.5,
+      "width": 272,
+      "height": 502.59375
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 390,
+    "client": 390,
+    "scene": "data-sessions-frozen-recovery-390"
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "footer": {
+      "x": 77,
+      "y": 588.71875,
+      "width": 296,
+      "height": 247.78125
+    },
+    "footerRows": "44px 56.7812px 98px",
+    "context": {
+      "x": 93,
+      "y": 657.71875,
+      "width": 264,
+      "height": 56.78125
+    },
+    "contextBorders": [
+      "0px",
+      "0px"
+    ],
+    "feedback": "Preparación pendiente · podés continuar sin datos",
+    "previous": {
+      "x": 93,
+      "y": 753.5,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 93,
+      "y": 601.71875,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Continuar sin datos",
+        "rect": {
+          "x": 149,
+          "y": 726.5,
+          "width": 208,
+          "height": 44
+        }
+      },
+      {
+        "text": "Continuar con datos",
+        "rect": {
+          "x": 149,
+          "y": 780.5,
+          "width": 208,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 89,
+          "y": 56.5,
+          "width": 272,
+          "height": 209.265625
+        },
+        "icon": {
+          "x": 108,
+          "y": 75.5,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 168,
+          "y": 77.5,
+          "width": 174,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 108,
+          "y": 201.765625,
+          "width": 234,
+          "height": 40
+        }
+      },
+      {
+        "rect": {
+          "x": 89,
+          "y": 281.765625,
+          "width": 272,
+          "height": 284.953125
+        },
+        "icon": {
+          "x": 108,
+          "y": 300.765625,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 168,
+          "y": 302.765625,
+          "width": 174,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 89,
+      "y": 56.5,
+      "width": 272,
+      "height": 510.21875
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 390,
+    "client": 390,
+    "scene": "data-sessions-error-403-390",
+    "test": "test_02_sessions_availability_errors_recovery_and_pending_files"
+  },
+  {
+    "viewport": {
+      "width": 1536,
+      "height": 900
+    },
+    "footer": {
+      "x": 501,
+      "y": 730.578125,
+      "width": 1002,
+      "height": 96
+    },
+    "footerRows": "71px",
+    "context": {
+      "x": 870.765625,
+      "y": 743.578125,
+      "width": 279.78125,
+      "height": 71
+    },
+    "contextBorders": [
+      "1px",
+      "1px"
+    ],
+    "feedback": "Preparación pendiente · podés continuar sin datos",
+    "previous": {
+      "x": 523,
+      "y": 757.078125,
+      "width": 44,
+      "height": 44
+    },
+    "ring": {
+      "x": 579,
+      "y": 757.078125,
+      "width": 44,
+      "height": 44
+    },
+    "actions": [
+      {
+        "text": "Continuar sin datos",
+        "rect": {
+          "x": 1162.546875,
+          "y": 757.078125,
+          "width": 152.0625,
+          "height": 44
+        }
+      },
+      {
+        "text": "Continuar con datos",
+        "rect": {
+          "x": 1324.609375,
+          "y": 757.078125,
+          "width": 156.390625,
+          "height": 44
+        }
+      }
+    ],
+    "cards": [
+      {
+        "rect": {
+          "x": 519,
+          "y": 442.8125,
+          "width": 633.328125,
+          "height": 265.765625
+        },
+        "icon": {
+          "x": 538,
+          "y": 461.8125,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 602,
+          "y": 463.8125,
+          "width": 188.46875,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": {
+          "x": 829.46875,
+          "y": 486.3125,
+          "width": 303.84375,
+          "height": 40
+        }
+      },
+      {
+        "rect": {
+          "x": 1168.328125,
+          "y": 442.8125,
+          "width": 316.65625,
+          "height": 265.765625
+        },
+        "icon": {
+          "x": 1187.328125,
+          "y": 461.8125,
+          "width": 48,
+          "height": 48
+        },
+        "title": {
+          "x": 1251.328125,
+          "y": 463.8125,
+          "width": 214.65625,
+          "height": 22.390625
+        },
+        "font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "copyFont": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "padding": "18px",
+        "radius": "11px",
+        "border": "1px solid rgba(145, 189, 199, 0.28)",
+        "select": null
+      }
+    ],
+    "row": {
+      "x": 519,
+      "y": 442.8125,
+      "width": 966,
+      "height": 265.765625
+    },
+    "caseStatus": null,
+    "caseColumn": null,
+    "header": null,
+    "state": null,
+    "output": null,
+    "badge": null,
+    "outputBox": null,
+    "close": null,
+    "circles": [],
+    "scroll": 1536,
+    "client": 1536,
+    "scene": "data-sessions-error-503-1536",
+    "test": "test_02_sessions_availability_errors_recovery_and_pending_files"
+  }
+]

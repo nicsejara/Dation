@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "tests": 2,
+  "failures": [],
+  "errors": [],
+  "skipped": [],
+  "passed_ids": [
+    "test_workflow.WorkflowTests.test_browser_complete_workflow_at_mobile_width",
+    "test_workflow.WorkflowTests.test_browser_creation_execution_approval_navigation_and_mobile_history"
+  ],
+  "scope": "FOCUSED_RECHECK",
+  "selected_modules": [
+    "test_workflow.WorkflowTests.test_browser_complete_workflow_at_mobile_width",
+    "test_workflow.WorkflowTests.test_browser_creation_execution_approval_navigation_and_mobile_history"
+  ],
+  "failure_details": [],
+  "duration_seconds": 85.651,
+  "environment": "Local isolated API/PostgreSQL/storage/worker/browser, no production"
+}

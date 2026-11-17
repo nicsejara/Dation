@@ -14,20 +14,78 @@ function preparationLabel(item){
 
 export function mountCorePreparation(root,scope,{canAssign,draft,onDraft,onContinue,onRecovered,parentCaseId=null}){
  const status=el('p','Seleccioná una Model Version publicada para preparar datos.','journey-preparation-status');status.role='status';status.setAttribute('aria-live','polite');root.append(status);
- const ownerControls=decisionCard(root,'Responsable de datos','Gestiona la preparación de los datos.','people'),ownerArea=ownerControls.parentElement;ownerArea.classList.add('journey-data-owner','core-owner-card');ownerArea.dataset.dationTest='preparation-owner-card';
+ const ownerRow=el('div',undefined,'journey-session-row');root.append(ownerRow);
+ const ownerControls=decisionCard(ownerRow,'Responsable de datos','Gestiona la preparación de los datos.','people'),ownerArea=ownerControls.parentElement;ownerArea.classList.add('journey-data-owner','core-owner-card');ownerArea.dataset.dationTest='preparation-owner-card';
  const owner=field(ownerControls,'Data Owner',{name:'preparation_data_owner',options:[['','Sin asignar']],value:''});owner.disabled=true;if(!canAssign)ownerControls.append(el('p','Un Admin debe asignar el Data Owner. Podés preparar datos sin esa asignación.','d-field__help'));
- const alternatives=el('div',undefined,'core-owner-alternatives');ownerControls.append(alternatives);
+ const alternatives=decisionCard(ownerRow,'Data Sessions','Retomá sesiones de carga anteriores de este Logistics Model.','layers');
+ alternatives.parentElement.classList.add('core-owner-card','core-sessions-card');alternatives.parentElement.dataset.dationTest='preparation-sessions-card';alternatives.classList.add('core-owner-alternatives');
+ const availability=el('p','Seleccioná una versión publicada para consultar sesiones.','d-metadata');availability.role='status';availability.setAttribute('aria-live','polite');availability.id='journey-session-availability';alternatives.append(availability);
  const pending=new Set(),drawer=createValidationDrawer(scope);let data=null,source=null,generation=0,busy=false,errorMessage='',readyPromise=Promise.resolve(),footer=null,controls=[];
  const previousLeave=window.dationUltimateCanLeave;const leave=()=>!pending.size||window.confirm('Hay CSV seleccionados sin guardar. Se perderá la selección local al salir. Los candidatos guardados se conservan.');
  const compositeLeave=()=>leave()&&(!previousLeave||previousLeave());window.dationUltimateCanLeave=compositeLeave;scope.own(()=>{if(window.dationUltimateCanLeave===compositeLeave)delete window.dationUltimateCanLeave;generation++;});scope.listen(window,'beforeunload',e=>{if(pending.size){e.preventDefault();e.returnValue='';}});
- const resume=button('Otras preparaciones',async()=>{
-  if(pending.size){tell(new Error('Guardá o quitá los archivos locales antes de cambiar de preparación.'));return;}
-  if(data?.session.creation_intent){tell(new Error('Recuperá la creación congelada antes de cambiar de preparación.'));return;}
-  try{const list=await json('/api/platform/data-preparations'),choices=el('div',undefined,'journey-resume-list');for(const item of list.items.filter(s=>s.model_version_id===draft.version_id&&(s.parent_case_id||null)===parentCaseId)){if(item.id===data?.session.id)continue;const choose=button(preparationLabel(item),async()=>{draft.id=item.id;draft.version_id=item.model_version_id;onDraft();await refresh();choices.remove();});choose.dataset.preparationId=item.id;choices.append(choose);}if(!choices.children.length){const empty=el('p','No hay otras preparaciones vigentes para esta versión y origen.','d-metadata');empty.role='status';choices.append(empty);}root.querySelector('.journey-resume-list')?.remove();alternatives.append(choices);}catch(e){tell(e);}
- });alternatives.append(resume);
+ // List is actor/workspace scoped, at most 10 entries, with at most 5 active
+ // preparations. DRAFT/VALIDATED resume uploads; FINALIZING resumes the frozen
+ // creation intent (the server permits recovery even past its expiry).
+ let sessionEpoch=0,sessionController=null,sessionKey=null,sessionPhase='idle',sessionItems=[],pickerOpen=false,switching=false;
+ const lookupKey=()=>data&&[data.session.id,data.session.model_version_id,data.session.revision,parentCaseId||''].join(':');
+ const compatible=item=>item&&item.id!==data?.session.id&&item.model_version_id===data?.session.model_version_id&&(item.parent_case_id||null)===parentCaseId&&(item.status==='FINALIZING'||['DRAFT','VALIDATED'].includes(item.status)&&Date.parse(item.expires_at)>Date.now());
+ const resume=button('Ver sesiones',()=>{
+  if(!canSwitch())return;
+  pickerOpen=true;void lookupSessions(true);
+ });resume.disabled=true;resume.setAttribute('aria-describedby',availability.id);resume.setAttribute('aria-expanded','false');
+ const retrySessions=button('Reintentar sesiones',()=>{void lookupSessions(true);});retrySessions.hidden=true;alternatives.append(resume,retrySessions);
+ scope.own(()=>{sessionEpoch++;sessionController?.abort();});
+ scope.listen(window,'focus',()=>{if(!busy&&!switching&&data)void lookupSessions(true);});
+ function canSwitch(){
+  if(pending.size){tell(new Error('Guardá o quitá los archivos locales antes de cambiar de preparación.'));return false;}
+  if(data?.session.creation_intent){tell(new Error('Recuperá la creación congelada antes de cambiar de preparación.'));return false;}
+  return !busy&&!switching;
+ }
+ function sessionsUI(){
+  availability.role=sessionPhase==='error'?'alert':'status';retrySessions.hidden=sessionPhase!=='error';
+  resume.disabled=sessionPhase!=='ready'||!sessionItems.length||busy||switching;
+  if(!alternatives.querySelector('.journey-resume-list'))resume.removeAttribute('aria-controls');
+  resume.setAttribute('aria-busy',String(sessionPhase==='loading'||switching));resume.setAttribute('aria-expanded',String(pickerOpen&&!!alternatives.querySelector('.journey-resume-list')));
+ }
+ function sessionError(error){sessionPhase='error';sessionItems=[];availability.textContent='No se pudieron verificar sesiones. '+error.message;alternatives.querySelector('.journey-resume-list')?.remove();sessionsUI();}
+ async function lookupSessions(force=false){
+  if(!scope.active||busy||!data||source?.data.provisional)return;
+  if(data.session.model_version_id!==source?.snapshot.version_id){sessionPhase='idle';sessionItems=[];availability.textContent='Confirmá la versión actual para consultar sus sesiones.';sessionsUI();return;}
+  const key=lookupKey();if(!force&&key===sessionKey)return;
+  sessionController?.abort();sessionController=new AbortController();const own=++sessionEpoch;sessionKey=key;sessionPhase='loading';sessionItems=[];
+  availability.textContent='Consultando sesiones de esta versión…';alternatives.querySelector('.journey-resume-list')?.remove();sessionsUI();
+  try{
+   const list=await json('/api/platform/data-preparations',{signal:sessionController.signal});
+   if(!scope.active||own!==sessionEpoch||key!==lookupKey())return;
+   if(!Array.isArray(list?.items)||list.items.some(item=>!item||typeof item.id!=='string'||typeof item.model_version_id!=='string'||typeof item.status!=='string'||!Number.isInteger(item.revision)||!Number.isFinite(Date.parse(item.expires_at))||!Number.isFinite(Date.parse(item.updated_at))||(item.parent_case_id!==null&&typeof item.parent_case_id!=='string'))||new Set(list.items.map(item=>item.id)).size!==list.items.length)throw new Error('La respuesta de sesiones no es válida.');
+   sessionItems=list.items.filter(compatible);sessionPhase='ready';availability.textContent=sessionItems.length?sessionItems.length+' '+(sessionItems.length===1?'sesión disponible':'sesiones disponibles'):'No hay otras sesiones disponibles para esta versión y origen.';
+   if(pickerOpen)renderSessions(key);sessionsUI();
+  }catch(error){if(scope.active&&own===sessionEpoch&&key===lookupKey())sessionError(error);}
+ }
+ function renderSessions(key){
+  const choices=el('div',undefined,'journey-resume-list');choices.id='journey-session-picker';choices.setAttribute('role','group');choices.setAttribute('aria-label','Sesiones compatibles');resume.setAttribute('aria-controls',choices.id);
+  for(const item of sessionItems){const choose=button(preparationLabel(item),()=>{const previous=readyPromise,attempt=selectSession(item,key);readyPromise=attempt;void attempt.catch(()=>{}).finally(()=>{if(readyPromise===attempt)readyPromise=previous;});});choose.dataset.preparationId=item.id;choices.append(choose);}
+  if(!choices.children.length){const empty=el('p','No hay otras sesiones disponibles para esta versión y origen.','d-metadata');empty.role='status';choices.append(empty);}
+  alternatives.append(choices);
+ }
+ async function selectSession(item,key){
+  if(!canSwitch()||key!==lookupKey()||!compatible(item))return;
+  const own=sessionEpoch,selectionGeneration=generation,ownerSessionId=data.session.id,ownerWasDisabled=owner.disabled;switching=true;busy=true;owner.disabled=true;reflect();sessionsUI();for(const b of alternatives.querySelectorAll('.journey-resume-list button'))b.disabled=true;
+  try{
+   // Recheck this selected resource, not every list item, before changing draft.
+   const current=await json('/api/platform/data-preparations/'+item.id);
+   if(!scope.active||own!==sessionEpoch)return;
+   if(key!==lookupKey())throw new Error('La preparación actual cambió. Volvé a elegir la sesión.');
+   if(current?.session?.id!==item.id||!compatible(current.session)||(current.session.status==='FINALIZING'?!current.session.creation_intent:!!current.session.creation_intent))throw new Error('La sesión ya no está disponible. Actualizá la lista.');
+   if(pending.size||data?.session.creation_intent){switching=false;canSwitch();return;}
+   draft.id=item.id;draft.version_id=item.model_version_id;onDraft();pickerOpen=false;const recovery=refresh(),recoveryGeneration=generation;await recovery;
+   if(scope.active&&generation===recoveryGeneration&&(data?.session.id!==item.id||errorMessage))throw new Error(errorMessage||'No se confirmó la sesión elegida.');
+  }catch(error){if(scope.active){if(own===sessionEpoch)sessionError(error);throw error;}}
+  finally{switching=false;if(scope.active){if(selectionGeneration===generation){busy=false;if(data?.session.id===ownerSessionId&&draft.id===ownerSessionId)owner.disabled=ownerWasDisabled;reflect();}sessionsUI();}}
+ }
  const base=()=>'/api/platform/data-preparations/'+data.session.id;
  const saved=()=>{if(data){draft.id=data.session.id;draft.version_id=data.session.model_version_id;onDraft();}};
- function reflect(){if(!scope.active)return;const n=data?.uploads.filter(u=>u.selected&&u.ready).length||0;status.textContent=errorMessage|| (busy?'Recuperando preparación privada…':n+' de 2 candidatos guardados y validados. '+(pending.size?'Hay archivos locales sin guardar. ':'')+'Todavía no están publicados.');if(footer){footer.next.disabled=!!errorMessage||busy||n!==2||!!pending.size;footer.skip.disabled=!!errorMessage||busy;footer.copy.textContent=n===2?'2 archivos validados · publicación al finalizar el Case':n===1?'Falta '+(data.uploads.some(u=>u.entity==='transport_demand'&&u.selected)?'Flota':'Demanda'):'Preparación pendiente · podés continuar sin datos';}}
+ function reflect(){if(!scope.active)return;const n=data?.uploads.filter(u=>u.selected&&u.ready).length||0;status.textContent=errorMessage|| (busy?'Recuperando preparación privada…':n+' de 2 candidatos guardados y validados. '+(pending.size?'Hay archivos locales sin guardar. ':'')+'Todavía no están publicados.');if(footer){footer.next.disabled=!!errorMessage||busy||n!==2||!!pending.size;footer.skip.disabled=!!errorMessage||busy;footer.copy.textContent=n===2?'2 archivos validados · publicación al finalizar el Case':n===1?'Falta '+(data.uploads.some(u=>u.entity==='transport_demand'&&u.selected)?'Flota':'Demanda'):'Preparación pendiente · podés continuar sin datos';}if(!busy&&data)void lookupSessions();}
  function tell(e){errorMessage=e.message;status.textContent=e.message;status.role='alert';}
  async function json(path,options){return api(path,{...options,signal:options?.signal||scope.signal});}
  async function renderUploads(grid,own){
@@ -53,8 +111,8 @@ export function mountCorePreparation(root,scope,{canAssign,draft,onDraft,onConti
  }
  async function refresh(){if(!source)return;await resolve(source.data,source.snapshot,source.ui);}
  async function resolve(pair,snapshot,ui){
-  const own=++generation;source={data:pair,snapshot,ui};footer=ui;busy=true;errorMessage='';reflect();root.hidden=pair.provisional;
-  if(pair.provisional){busy=false;return;}
+  const own=++generation;sessionEpoch++;sessionController?.abort();sessionKey=null;sessionItems=[];sessionPhase='idle';pickerOpen=false;availability.textContent='Recuperando sesión actual…';alternatives.querySelector('.journey-resume-list')?.remove();source={data:pair,snapshot,ui};footer=ui;busy=true;errorMessage='';reflect();root.hidden=pair.provisional;sessionsUI();
+  if(pair.provisional){busy=false;availability.textContent='Seleccioná una versión publicada para consultar sesiones.';sessionsUI();return;}
   try{
    if(draft.id&&draft.version_id!==snapshot.version_id){
     const okay=await confirmAction(root,scope,'Cambió la Model Version','Los candidatos guardados de la preparación anterior se conservan en privado. Los archivos locales sin guardar deberán volver a adjuntarse. ¿Preparar archivos para esta versión?','Preparar esta versión');if(!okay)throw new Error('Se conserva la preparación anterior. Volvé a seleccionar su Model Version para retomarla.');pending.clear();draft.id=null;

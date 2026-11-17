@@ -1,0 +1,17 @@
+{
+  "static": "PASS",
+  "diff_check": "PASS",
+  "risk": "R2",
+  "requires_full": false,
+  "browser_tests": [
+    "test_attributes_before_csv.AttributesBeforeCSVTests.test_2_draft_context_and_owner_survive_reload_without_creating_objects",
+    "test_attributes_before_csv.AttributesBeforeCSVTests.test_3_created_case_without_csv_keeps_d1_data_required_and_d2_locked",
+    "test_saga01_planning.Saga01PlanningTests.test_01_first_time_landing_model_contract_case_graph",
+    "test_saga01_planning.Saga01PlanningTests.test_02_recurrent_version_is_not_mutated_and_contract_templates_match",
+    "test_saga01_planning.Saga01PlanningTests.test_05_graph_data_upload_reuse_and_existing_case_navigation",
+    "test_saga01_planning.Saga01PlanningTests.test_07_contract_failure_blocks_setup_and_can_be_retried"
+  ],
+  "application_file_count": 6,
+  "browser_test_file_count": 2,
+  "scope": "Only frontend/browser tests/docs; classifier/workflows unchanged"
+}
