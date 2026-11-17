@@ -28,9 +28,9 @@ class HomeHeroTests(unittest.IsolatedAsyncioTestCase):
             await self.page.set_viewport_size({'width':width,'height':height})
             self.assertEqual(await hero.locator('.platform-home__eyebrow').inner_text(),'DATION · DECISION INTELLIGENCE')
             self.assertEqual(' '.join((await hero.locator('h1').inner_text()).split()),'De tus datos a decisiones que podés explicar y repetir.')
-            self.assertEqual(await hero.locator('.d-page-description').inner_text(),'Dation combina datos, reglas y motores de decisión para que cada análisis tenga contexto, evidencia y trazabilidad.')
-            self.assertEqual(await hero.locator('.platform-home__chain strong').all_inner_texts(),['Data Pack','Decision Case','Decision Run'])
-            self.assertEqual(await hero.locator('.platform-home__chain li>span').all_inner_texts(),['Datos y contexto de la decisión','Objetivo, reglas y responsables','Alternativas, evidencia y aprobación'])
+            self.assertEqual(await hero.locator('.d-page-description').inner_text(),'Configurá modelos y casos, conectá decisiones y analizá resultados con trazabilidad.')
+            self.assertEqual(await hero.locator('.platform-home__chain strong').all_inner_texts(),['LOGISTICS MODEL','DECISION CASE','DECISION GRAPH'])
+            self.assertEqual(await hero.locator('.platform-home__chain li>div>span').all_inner_texts(),['Modelo operativo y reglas.','Objetivo, horizonte y responsables.','Decisiones conectadas y trazables.'])
             self.assertEqual(await hero.locator('.platform-home__chain a,.platform-home__chain button').count(),0)
             image=hero.locator('img');self.assertEqual(await image.get_attribute('alt'),'')
             self.assertEqual(await image.get_attribute('width'),'724');self.assertEqual(await image.get_attribute('height'),'543')
@@ -63,8 +63,8 @@ class HomeHeroTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(await self.page.evaluate('location.pathname'),'/app')
         self.assertFalse(any(m=='POST' and p in ('/api/runs','/api/decision-cases') for m,p in self.b.requests))
 
-    async def test_h6_greeting_keeps_workspace_timezone_identity_updates_and_fallback(self):
-        for timestamp,timezone,expected in [('2026-10-24T02:00:00Z','America/Argentina/Buenos_Aires','Buenas noches'),('2026-10-24T14:00:00Z','UTC','Buenas tardes'),('2026-10-24T03:00:00Z','UTC','Buenos días')]:
+    async def test_h6_welcome_keeps_identity_updates_and_fallback(self):
+        for timestamp,timezone,expected in [('2026-10-24T02:00:00Z','America/Argentina/Buenos_Aires','Bienvenido'),('2026-10-24T14:00:00Z','UTC','Bienvenido'),('2026-10-24T03:00:00Z','UTC','Bienvenido')]:
             await self.page.clock.set_fixed_time(datetime.datetime.fromisoformat(timestamp.replace('Z','+00:00')))
             self.b.workspace_settings['workspace']['timezone']=timezone
             await self.open_home()
@@ -72,7 +72,7 @@ class HomeHeroTests(unittest.IsolatedAsyncioTestCase):
         await self.page.evaluate("window.dationSession.identity.profile.first_name=\"Seán O'Brien-Ó Súilleabháin\";dispatchEvent(new Event('dation:identity'))")
         self.assertIn("Seán O'Brien-Ó Súilleabháin",await self.page.locator('.platform-home__greeting').inner_text())
         await self.page.evaluate("window.dationSession.identity.profile.first_name='';dispatchEvent(new Event('dation:identity'))")
-        self.assertEqual(await self.page.locator('.platform-home__greeting').inner_text(),'Buenos días')
+        self.assertEqual(await self.page.locator('.platform-home__greeting').inner_text(),'Bienvenido')
         self.assertEqual(self.b.execution_bodies,[])
 
     async def test_h5_zoom_200_percent_keeps_hero_ctas_visible_with_keyboard(self):
@@ -136,7 +136,8 @@ class HomeHeroTests(unittest.IsolatedAsyncioTestCase):
             self.assertAlmostEqual(primary['width'],secondary['width'],delta=.1)
             self.assertAlmostEqual(primary['height'],secondary['height'],delta=.1)
             self.assertGreaterEqual(reference['width'],44)  # Comenzar has its own text width; preserve touch size and ink checks.
-            self.assertEqual(reference['height'],48)  # UX07 landing actions have a shared 48px target; Home retains its own primitive.
+            self.assertGreaterEqual(reference['height'],44)  # Labels may wrap at narrow widths; the shared minimum remains 44px.
+            self.assertAlmostEqual(primary['height'],reference['height'],delta=.1)
             for key in ('padding','radius','font','weight','line'):
                 self.assertEqual(primary[key],secondary[key],(width,key))
                 self.assertEqual(primary[key],reference[key],(width,key))

@@ -1974,7 +1974,7 @@ class NavigationTests(unittest.IsolatedAsyncioTestCase):
                     self.assertGreaterEqual(metrics["padding"],16)
                     self.assertEqual(metrics["radius"],16 if view in ('inicio','logistics-overview') else 0)
                     if view=='logistics-overview':
-                        self.assertAlmostEqual(metrics["title"],max(32,min(width*.038,48)),delta=.1)
+                        self.assertAlmostEqual(metrics["title"],max(28,min(width*.026,38)),delta=.1)
                     else:self.assertTrue(28<=metrics["title"]<=40)
                     if metrics["workspace"]:self.assertEqual(metrics["workspace"],"rgba(0, 0, 0, 0)")
                     if metrics["current"]:self.assertEqual(metrics["current"],"rgb(243, 248, 250)")

@@ -1,0 +1,830 @@
+[
+  {
+    "width": 1536,
+    "path": "/app",
+    "hero": {
+      "x": 264,
+      "y": 36,
+      "width": 1240,
+      "height": 480,
+      "top": 36,
+      "right": 1504,
+      "bottom": 516,
+      "left": 264
+    },
+    "title": {
+      "x": 289,
+      "y": 130,
+      "width": 627.953125,
+      "height": 88.15625,
+      "top": 130,
+      "right": 916.953125,
+      "bottom": 218.15625,
+      "left": 289
+    },
+    "text": "De tus datos a decisiones que pod\u00e9s\nexplicar y repetir.",
+    "font": "38px",
+    "greeting": "Buenas tardes, Synthetic",
+    "panel": {
+      "x": 289,
+      "y": 414,
+      "width": 1190,
+      "height": 77,
+      "top": 414,
+      "right": 1479,
+      "bottom": 491,
+      "left": 289
+    },
+    "art": {
+      "x": 932.953125,
+      "y": 61,
+      "width": 546.046875,
+      "height": 329,
+      "top": 61,
+      "right": 1479,
+      "bottom": 390,
+      "left": 932.953125
+    },
+    "buttons": [
+      {
+        "x": 289,
+        "y": 293.34375,
+        "width": 228,
+        "height": 40,
+        "top": 293.34375,
+        "right": 517,
+        "bottom": 333.34375,
+        "left": 289
+      },
+      {
+        "x": 525,
+        "y": 293.34375,
+        "width": 228,
+        "height": 40,
+        "top": 293.34375,
+        "right": 753,
+        "bottom": 333.34375,
+        "left": 525
+      }
+    ]
+  },
+  {
+    "width": 1536,
+    "path": "/app/ddas/logistics",
+    "hero": {
+      "x": 264,
+      "y": 97,
+      "width": 1240,
+      "height": 480,
+      "top": 97,
+      "right": 1504,
+      "bottom": 577,
+      "left": 264
+    },
+    "title": {
+      "x": 289,
+      "y": 149,
+      "width": 533.90625,
+      "height": 110.375,
+      "top": 149,
+      "right": 822.90625,
+      "bottom": 259.375,
+      "left": 289
+    },
+    "text": "Tus despachos,\ncon mejor an\u00e1lisis.",
+    "font": "48px",
+    "greeting": null,
+    "panel": {
+      "x": 289,
+      "y": 475,
+      "width": 1190,
+      "height": 77,
+      "top": 475,
+      "right": 1479,
+      "bottom": 552,
+      "left": 289
+    },
+    "art": {
+      "x": 932.953125,
+      "y": 122,
+      "width": 546.046875,
+      "height": 329,
+      "top": 122,
+      "right": 1479,
+      "bottom": 451,
+      "left": 932.953125
+    },
+    "buttons": [
+      {
+        "x": 289,
+        "y": 309.0625,
+        "width": 234,
+        "height": 48,
+        "top": 309.0625,
+        "right": 523,
+        "bottom": 357.0625,
+        "left": 289
+      },
+      {
+        "x": 535,
+        "y": 309.0625,
+        "width": 234,
+        "height": 48,
+        "top": 309.0625,
+        "right": 769,
+        "bottom": 357.0625,
+        "left": 535
+      }
+    ]
+  },
+  {
+    "width": 1280,
+    "path": "/app",
+    "hero": {
+      "x": 264,
+      "y": 36,
+      "width": 984,
+      "height": 480,
+      "top": 36,
+      "right": 1248,
+      "bottom": 516,
+      "left": 264
+    },
+    "title": {
+      "x": 289,
+      "y": 130,
+      "width": 491.015625,
+      "height": 115.78125,
+      "top": 130,
+      "right": 780.015625,
+      "bottom": 245.78125,
+      "left": 289
+    },
+    "text": "De tus datos a decisiones que pod\u00e9s\nexplicar y repetir.",
+    "font": "33.28px",
+    "greeting": "Buenas tardes, Synthetic",
+    "panel": {
+      "x": 289,
+      "y": 414,
+      "width": 933.984375,
+      "height": 77,
+      "top": 414,
+      "right": 1222.984375,
+      "bottom": 491,
+      "left": 289
+    },
+    "art": {
+      "x": 796.015625,
+      "y": 61,
+      "width": 426.96875,
+      "height": 329,
+      "top": 61,
+      "right": 1222.984375,
+      "bottom": 390,
+      "left": 796.015625
+    },
+    "buttons": [
+      {
+        "x": 289,
+        "y": 320.96875,
+        "width": 228,
+        "height": 40,
+        "top": 320.96875,
+        "right": 517,
+        "bottom": 360.96875,
+        "left": 289
+      },
+      {
+        "x": 525,
+        "y": 320.96875,
+        "width": 228,
+        "height": 40,
+        "top": 320.96875,
+        "right": 753,
+        "bottom": 360.96875,
+        "left": 525
+      }
+    ]
+  },
+  {
+    "width": 1280,
+    "path": "/app/ddas/logistics",
+    "hero": {
+      "x": 264,
+      "y": 97,
+      "width": 984,
+      "height": 480,
+      "top": 97,
+      "right": 1248,
+      "bottom": 577,
+      "left": 264
+    },
+    "title": {
+      "x": 289,
+      "y": 149,
+      "width": 491.015625,
+      "height": 110.375,
+      "top": 149,
+      "right": 780.015625,
+      "bottom": 259.375,
+      "left": 289
+    },
+    "text": "Tus despachos,\ncon mejor an\u00e1lisis.",
+    "font": "48px",
+    "greeting": null,
+    "panel": {
+      "x": 289,
+      "y": 475,
+      "width": 933.984375,
+      "height": 77,
+      "top": 475,
+      "right": 1222.984375,
+      "bottom": 552,
+      "left": 289
+    },
+    "art": {
+      "x": 796.015625,
+      "y": 122,
+      "width": 426.96875,
+      "height": 329,
+      "top": 122,
+      "right": 1222.984375,
+      "bottom": 451,
+      "left": 796.015625
+    },
+    "buttons": [
+      {
+        "x": 289,
+        "y": 309.0625,
+        "width": 234,
+        "height": 48,
+        "top": 309.0625,
+        "right": 523,
+        "bottom": 357.0625,
+        "left": 289
+      },
+      {
+        "x": 535,
+        "y": 309.0625,
+        "width": 234,
+        "height": 48,
+        "top": 309.0625,
+        "right": 769,
+        "bottom": 357.0625,
+        "left": 535
+      }
+    ]
+  },
+  {
+    "width": 1024,
+    "path": "/app",
+    "hero": {
+      "x": 250,
+      "y": 36,
+      "width": 742,
+      "height": 560,
+      "top": 36,
+      "right": 992,
+      "bottom": 596,
+      "left": 250
+    },
+    "title": {
+      "x": 275,
+      "y": 130,
+      "width": 392.921875,
+      "height": 97.40625,
+      "top": 130,
+      "right": 667.921875,
+      "bottom": 227.40625,
+      "left": 275
+    },
+    "text": "De tus datos a decisiones que pod\u00e9s\nexplicar y repetir.",
+    "font": "28px",
+    "greeting": "Buenas tardes, Synthetic",
+    "panel": {
+      "x": 275,
+      "y": 474.5,
+      "width": 692,
+      "height": 96.5,
+      "top": 474.5,
+      "right": 967,
+      "bottom": 571,
+      "left": 275
+    },
+    "art": {
+      "x": 675.921875,
+      "y": 61,
+      "width": 291.078125,
+      "height": 389.5,
+      "top": 61,
+      "right": 967,
+      "bottom": 450.5,
+      "left": 675.921875
+    },
+    "buttons": [
+      {
+        "x": 275,
+        "y": 328.1875,
+        "width": 228,
+        "height": 40,
+        "top": 328.1875,
+        "right": 503,
+        "bottom": 368.1875,
+        "left": 275
+      },
+      {
+        "x": 275,
+        "y": 376.1875,
+        "width": 228,
+        "height": 40,
+        "top": 376.1875,
+        "right": 503,
+        "bottom": 416.1875,
+        "left": 275
+      }
+    ]
+  },
+  {
+    "width": 1024,
+    "path": "/app/ddas/logistics",
+    "hero": {
+      "x": 250,
+      "y": 97,
+      "width": 742,
+      "height": 560,
+      "top": 97,
+      "right": 992,
+      "bottom": 657,
+      "left": 250
+    },
+    "title": {
+      "x": 275,
+      "y": 149,
+      "width": 392.921875,
+      "height": 89.46875,
+      "top": 149,
+      "right": 667.921875,
+      "bottom": 238.46875,
+      "left": 275
+    },
+    "text": "Tus despachos,\ncon mejor an\u00e1lisis.",
+    "font": "38.912px",
+    "greeting": null,
+    "panel": {
+      "x": 275,
+      "y": 535.5,
+      "width": 692,
+      "height": 96.5,
+      "top": 535.5,
+      "right": 967,
+      "bottom": 632,
+      "left": 275
+    },
+    "art": {
+      "x": 675.921875,
+      "y": 122,
+      "width": 291.078125,
+      "height": 389.5,
+      "top": 122,
+      "right": 967,
+      "bottom": 511.5,
+      "left": 675.921875
+    },
+    "buttons": [
+      {
+        "x": 275,
+        "y": 288.15625,
+        "width": 190.453125,
+        "height": 48,
+        "top": 288.15625,
+        "right": 465.453125,
+        "bottom": 336.15625,
+        "left": 275
+      },
+      {
+        "x": 477.453125,
+        "y": 288.15625,
+        "width": 190.46875,
+        "height": 48,
+        "top": 288.15625,
+        "right": 667.921875,
+        "bottom": 336.15625,
+        "left": 477.453125
+      }
+    ]
+  },
+  {
+    "width": 768,
+    "path": "/app",
+    "hero": {
+      "x": 90,
+      "y": 36,
+      "width": 660,
+      "height": 560,
+      "top": 36,
+      "right": 750,
+      "bottom": 596,
+      "left": 90
+    },
+    "title": {
+      "x": 115,
+      "y": 130,
+      "width": 345.828125,
+      "height": 97.40625,
+      "top": 130,
+      "right": 460.828125,
+      "bottom": 227.40625,
+      "left": 115
+    },
+    "text": "De tus datos a decisiones que pod\u00e9s\nexplicar y repetir.",
+    "font": "28px",
+    "greeting": "Buenas tardes, Synthetic",
+    "panel": {
+      "x": 115,
+      "y": 474.5,
+      "width": 610,
+      "height": 96.5,
+      "top": 474.5,
+      "right": 725,
+      "bottom": 571,
+      "left": 115
+    },
+    "art": {
+      "x": 468.828125,
+      "y": 61,
+      "width": 256.171875,
+      "height": 389.5,
+      "top": 61,
+      "right": 725,
+      "bottom": 450.5,
+      "left": 468.828125
+    },
+    "buttons": [
+      {
+        "x": 115,
+        "y": 328.1875,
+        "width": 228,
+        "height": 40,
+        "top": 328.1875,
+        "right": 343,
+        "bottom": 368.1875,
+        "left": 115
+      },
+      {
+        "x": 115,
+        "y": 376.1875,
+        "width": 228,
+        "height": 40,
+        "top": 376.1875,
+        "right": 343,
+        "bottom": 416.1875,
+        "left": 115
+      }
+    ]
+  },
+  {
+    "width": 768,
+    "path": "/app/ddas/logistics",
+    "hero": {
+      "x": 90,
+      "y": 103.59375,
+      "width": 660,
+      "height": 560,
+      "top": 103.59375,
+      "right": 750,
+      "bottom": 663.59375,
+      "left": 90
+    },
+    "title": {
+      "x": 115,
+      "y": 155.59375,
+      "width": 345.828125,
+      "height": 73.59375,
+      "top": 155.59375,
+      "right": 460.828125,
+      "bottom": 229.1875,
+      "left": 115
+    },
+    "text": "Tus despachos,\ncon mejor an\u00e1lisis.",
+    "font": "32px",
+    "greeting": null,
+    "panel": {
+      "x": 115,
+      "y": 522.59375,
+      "width": 610,
+      "height": 116,
+      "top": 522.59375,
+      "right": 725,
+      "bottom": 638.59375,
+      "left": 115
+    },
+    "art": {
+      "x": 468.828125,
+      "y": 128.59375,
+      "width": 256.171875,
+      "height": 370,
+      "top": 128.59375,
+      "right": 725,
+      "bottom": 498.59375,
+      "left": 468.828125
+    },
+    "buttons": [
+      {
+        "x": 115,
+        "y": 300.5625,
+        "width": 166.90625,
+        "height": 48,
+        "top": 300.5625,
+        "right": 281.90625,
+        "bottom": 348.5625,
+        "left": 115
+      },
+      {
+        "x": 293.90625,
+        "y": 300.5625,
+        "width": 166.921875,
+        "height": 48,
+        "top": 300.5625,
+        "right": 460.828125,
+        "bottom": 348.5625,
+        "left": 293.90625
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "path": "/app",
+    "hero": {
+      "x": 76,
+      "y": 36,
+      "width": 298,
+      "height": 684.25,
+      "top": 36,
+      "right": 374,
+      "bottom": 720.25,
+      "left": 76
+    },
+    "title": {
+      "x": 97,
+      "y": 126,
+      "width": 256,
+      "height": 129.875,
+      "top": 126,
+      "right": 353,
+      "bottom": 255.875,
+      "left": 97
+    },
+    "text": "De tus datos a decisiones que pod\u00e9s\nexplicar y repetir.",
+    "font": "28px",
+    "greeting": "Buenas tardes, Synthetic",
+    "panel": {
+      "x": 97,
+      "y": 494.25,
+      "width": 256,
+      "height": 205,
+      "top": 494.25,
+      "right": 353,
+      "bottom": 699.25,
+      "left": 97
+    },
+    "art": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0,
+      "top": 0,
+      "right": 0,
+      "bottom": 0,
+      "left": 0
+    },
+    "buttons": [
+      {
+        "x": 97,
+        "y": 382.25,
+        "width": 256,
+        "height": 40,
+        "top": 382.25,
+        "right": 353,
+        "bottom": 422.25,
+        "left": 97
+      },
+      {
+        "x": 97,
+        "y": 430.25,
+        "width": 256,
+        "height": 40,
+        "top": 430.25,
+        "right": 353,
+        "bottom": 470.25,
+        "left": 97
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "path": "/app/ddas/logistics",
+    "hero": {
+      "x": 76,
+      "y": 97,
+      "width": 298,
+      "height": 645.765625,
+      "top": 97,
+      "right": 374,
+      "bottom": 742.765625,
+      "left": 76
+    },
+    "title": {
+      "x": 97,
+      "y": 164,
+      "width": 256,
+      "height": 110.390625,
+      "top": 164,
+      "right": 353,
+      "bottom": 274.390625,
+      "left": 97
+    },
+    "text": "Tus despachos,\ncon mejor an\u00e1lisis.",
+    "font": "32px",
+    "greeting": null,
+    "panel": {
+      "x": 97,
+      "y": 477.765625,
+      "width": 256,
+      "height": 244,
+      "top": 477.765625,
+      "right": 353,
+      "bottom": 721.765625,
+      "left": 97
+    },
+    "art": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0,
+      "top": 0,
+      "right": 0,
+      "bottom": 0,
+      "left": 0
+    },
+    "buttons": [
+      {
+        "x": 97,
+        "y": 345.765625,
+        "width": 256,
+        "height": 48,
+        "top": 345.765625,
+        "right": 353,
+        "bottom": 393.765625,
+        "left": 97
+      },
+      {
+        "x": 97,
+        "y": 405.765625,
+        "width": 256,
+        "height": 48,
+        "top": 405.765625,
+        "right": 353,
+        "bottom": 453.765625,
+        "left": 97
+      }
+    ]
+  },
+  {
+    "width": 320,
+    "path": "/app",
+    "hero": {
+      "x": 76,
+      "y": 36,
+      "width": 228,
+      "height": 845.8125,
+      "top": 36,
+      "right": 304,
+      "bottom": 881.8125,
+      "left": 76
+    },
+    "title": {
+      "x": 97,
+      "y": 171,
+      "width": 186,
+      "height": 162.34375,
+      "top": 171,
+      "right": 283,
+      "bottom": 333.34375,
+      "left": 97
+    },
+    "text": "De tus datos a decisiones que pod\u00e9s\nexplicar y repetir.",
+    "font": "28px",
+    "greeting": "Buenas tardes, Synthetic",
+    "panel": {
+      "x": 97,
+      "y": 597.3125,
+      "width": 186,
+      "height": 263.5,
+      "top": 597.3125,
+      "right": 283,
+      "bottom": 860.8125,
+      "left": 97
+    },
+    "art": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0,
+      "top": 0,
+      "right": 0,
+      "bottom": 0,
+      "left": 0
+    },
+    "buttons": [
+      {
+        "x": 97,
+        "y": 485.3125,
+        "width": 186,
+        "height": 40,
+        "top": 485.3125,
+        "right": 283,
+        "bottom": 525.3125,
+        "left": 97
+      },
+      {
+        "x": 97,
+        "y": 533.3125,
+        "width": 186,
+        "height": 40,
+        "top": 533.3125,
+        "right": 283,
+        "bottom": 573.3125,
+        "left": 97
+      }
+    ]
+  },
+  {
+    "width": 320,
+    "path": "/app/ddas/logistics",
+    "hero": {
+      "x": 76,
+      "y": 99.59375,
+      "width": 228,
+      "height": 781.75,
+      "top": 99.59375,
+      "right": 304,
+      "bottom": 881.34375,
+      "left": 76
+    },
+    "title": {
+      "x": 97,
+      "y": 185.59375,
+      "width": 186,
+      "height": 147.1875,
+      "top": 185.59375,
+      "right": 283,
+      "bottom": 332.78125,
+      "left": 97
+    },
+    "text": "Tus despachos,\ncon mejor an\u00e1lisis.",
+    "font": "32px",
+    "greeting": null,
+    "panel": {
+      "x": 97,
+      "y": 557.84375,
+      "width": 186,
+      "height": 302.5,
+      "top": 557.84375,
+      "right": 283,
+      "bottom": 860.34375,
+      "left": 97
+    },
+    "art": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0,
+      "top": 0,
+      "right": 0,
+      "bottom": 0,
+      "left": 0
+    },
+    "buttons": [
+      {
+        "x": 97,
+        "y": 425.84375,
+        "width": 186,
+        "height": 48,
+        "top": 425.84375,
+        "right": 283,
+        "bottom": 473.84375,
+        "left": 97
+      },
+      {
+        "x": 97,
+        "y": 485.84375,
+        "width": 186,
+        "height": 48,
+        "top": 485.84375,
+        "right": 283,
+        "bottom": 533.84375,
+        "left": 97
+      }
+    ]
+  }
+]

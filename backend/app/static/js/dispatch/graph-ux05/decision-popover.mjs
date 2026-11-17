@@ -2,6 +2,7 @@ import {el,button} from '../models/forms.mjs';
 import {createScope} from '../lifecycle.mjs';
 import {mountResponsibilitySelector} from '../cases/workflow-responsibility.mjs';
 import {visualState,requirements,possibleActions} from './status-presentation.mjs';
+import {decisionIcon} from '../cases/decision-case-ui.mjs';
 
 export function contextualPanel(slot,parent,{trigger,title,onClose,id='ux05-decision-panel'}){
  const scope=createScope(slot),panel=el('section',undefined,'ux05-panel'),heading=el('h2',title);parent.own(()=>scope.dispose());
@@ -16,17 +17,21 @@ export function contextualPanel(slot,parent,{trigger,title,onClose,id='ux05-deci
 }
 export function decisionContent(panel,node,{data,journey,scope,onAction,onHistory,onPrepare,onOwnerSaved,ownerDraft}){
  const state=visualState(node),grid=el('div',undefined,'ux05-panel-grid'),info=el('section'),owner=el('section',undefined,'ux05-owner'),actions=el('section',undefined,'ux05-possible-actions');
- info.append(el('h3','Información general'),el('span',state.label,'ux05-status'),el('p',state.detail,'ux05-secondary'),el('p',node.question));
- const io=el('dl');for(const [label,value]of [['Entradas',node.id==='logistics_assignment'?'Demanda + Flota':'Plan de transporte aprobado de D1 + horizonte'],['Salida',(node.outputs||[]).length?(node.id==='logistics_assignment'?'Plan de transporte':'Calendario de despachos'):'Sin salida informada']]){io.append(el('dt',label),el('dd',value));}info.append(io);
- const reasons=requirements(node);if(reasons.length){const ul=el('ul',undefined,'ux05-requirements');for(const r of reasons)ul.append(el('li',r));info.append(ul);}
+ const output=(node.outputs||[]).length?(node.id==='logistics_assignment'?'Plan de transporte':'Calendario de despachos'):'Sin salida informada';
+ const heading=panel.querySelector(':scope > h2'),header=el('header',undefined,'ux08-node-header'),identity=el('div',undefined,'ux08-node-identity'),tile=el('span',undefined,'ux08-node-tile'),copy=el('div'),meta=el('dl',undefined,'ux08-node-meta'),badge=el('span',state.label,'ux05-status ux08-panel-state');badge.dataset.tone=state.tone;tile.append(decisionIcon(node.id==='logistics_assignment'?'resources':'calendar'));copy.append(heading,el('p',node.id==='logistics_assignment'?'Asigná demanda a recursos y viajes.':'Programá los viajes del plan de transporte aprobado.','ux05-secondary'));identity.append(tile,copy);
+ for(const [label,value]of [['Estado',badge],['Salida',output]]){const fact=el('div'),dd=el('dd');if(typeof value==='string')dd.textContent=value;else{dd.append(value,el('small',state.detail,'ux08-state-detail'));}fact.append(el('dt',label),dd);meta.append(fact);}header.append(identity,meta);panel.prepend(header);
+ const infoTitle=el('h3','Información general');infoTitle.prepend(decisionIcon('review'));info.append(infoTitle,el('p',node.question,'ux08-node-question'));
+ const io=el('dl',undefined,'ux08-node-io');io.append(el('dt','Entradas'),el('dd',node.id==='logistics_assignment'?'Demanda + Flota':'Plan de transporte aprobado de D1 + horizonte'));info.append(io);
+ const reasons=requirements(node);if(reasons.length){const label=el('h4','Requisitos'),ul=el('ul',undefined,'ux05-requirements');for(const r of reasons)ul.append(el('li',r));info.append(label,ul);}
  owner.setAttribute('aria-label','Decision Owner');owner.append(el('h3','Decision Owner'));const selector=el('div');owner.append(selector);
  const snapshot=data.case.status==='archived'?{...data.responsibilities,can_assign:false}:data.responsibilities;
  const child=mountResponsibilitySelector(selector,{caseId:data.case.id,stageKey:node.id,snapshot,draft:ownerDraft,onSaved:onOwnerSaved});scope.own(()=>child.dispose());
- actions.append(el('h3','Acciones posibles'));const stage=data.responsibilities?.stages?.[node.id],choices=possibleActions(node,data.case.id,{archived:data.case.status==='archived',canApprove:!!stage?.can_approve});
- if(choices.primary){const a=choices.primary;const b=button(a.label,()=>onAction(a),'primary');b.dataset.ux05Action=a.kind;b.dataset.mapAction=a.kind;actions.append(b);}
+ actions.append(el('h3','Acciones posibles'));const stage=data.responsibilities?.stages?.[node.id],choices=possibleActions(node,data.case.id,{archived:data.case.status==='archived',canApprove:!!stage?.can_approve});let primary=null;
+ if(choices.primary){const a=choices.primary;const b=button(a.label,()=>onAction(a),'primary');b.dataset.ux05Action=a.kind;b.dataset.mapAction=a.kind;primary=b;}
  for(const a of choices.secondary){const b=button(a.label,()=>onAction(a));b.dataset.ux05Action=a.kind;actions.append(b);}
- if(!choices.primary)actions.append(el('p',state.detail+'. '+(reasons.join(' ')||'Revisá los requisitos del Graph.'),'d-metadata'));
- if(node.actions?.data?.allowed&&journey.can_prepare&&data.case.status!=='archived')actions.append(button('Preparar datos',onPrepare));
+ if(!choices.primary)actions.append(el('p','Revisá los requisitos del Graph.','d-metadata'));
+ if(node.actions?.data?.allowed&&journey.can_prepare&&data.case.status!=='archived'){const prepare=button('Preparar datos',onPrepare,choices.primary?'secondary':'primary');if(choices.primary)actions.append(prepare);else primary=prepare;}
  if(node.history_count>0){const b=button('Ver historial',()=>onHistory());b.dataset.ux05History='';actions.append(b);}
+ if(primary){primary.classList.add('ux08-panel-primary');actions.append(primary);}
  grid.append(info,owner,actions);panel.append(grid);
 }

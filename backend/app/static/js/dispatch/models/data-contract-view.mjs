@@ -10,12 +10,16 @@ for(const [dimension,label]of [['pallets','pallets'],['weight_kg','peso (kg)'],[
  DESCRIPTIONS['demand_'+dimension]='Demanda expresada en '+label;DESCRIPTIONS['guaranteed_'+dimension]='Capacidad garantizada en '+label;DESCRIPTIONS['maximum_'+dimension]='Capacidad máxima en '+label;
 }
 export const fieldDescription=field=>Object.hasOwn(DESCRIPTIONS,field.public_header)?DESCRIPTIONS[field.public_header]:'Campo «'+field.public_header+'» del contrato seleccionado';
+function literalCondition(value){
+ if(Array.isArray(value))return value.map(literalCondition).join(', ');
+ if(value&&typeof value==='object')return Object.entries(value).map(([key,item])=>key+': '+literalCondition(item)).join('; ');
+ return String(value);
+}
 export function fieldCondition(field){
  const conditions=Object.entries(field.applies_when),base=field.nullable?'Opcional':'Requerido';
  if(!conditions.length)return base;
  const phrases={source:{OWN:'el recurso es propio',EXTERNAL:'el recurso es externo'},cost_model:{PER_TRIP:'la tarifa es por viaje',PER_KM:'la tarifa es por kilómetro'}};
- const readable=conditions.map(([key,value])=>typeof value==='string'&&Object.hasOwn(phrases,key)&&Object.hasOwn(phrases[key],value)?phrases[key][value]:null);
- if(readable.some(value=>!value))return base+' según condición técnica';
+ const readable=conditions.map(([key,value])=>typeof value==='string'&&Object.hasOwn(phrases,key)&&Object.hasOwn(phrases[key],value)?phrases[key][value]:key+': '+literalCondition(value));
  return base+(field.nullable?' · Aplica cuando ':' cuando ')+readable.join(' y ');
 }
 
@@ -69,8 +73,9 @@ export function mountDataContractView(panel,scope,{retry:retryPreview,onContinue
    const error=el('p','','data-contract-error');error.role='alert';error.hidden=true;
    const fields=disclosure('Campos y reglas','data-contract-fields'),wrap=el('div',undefined,'data-contract-table-wrap');fields.dataset.dationTest='contract-fields-'+entity;wrap.tabIndex=0;wrap.role='region';wrap.setAttribute('aria-label','Campos y reglas de '+label);
    const table=el('table'),thead=el('thead'),titles=el('tr');for(const label of ['Campo','Descripción','Condición']){const th=el('th',label);th.scope='col';titles.append(th);}thead.append(titles);table.append(thead);const tbody=el('tbody');
-   for(const f of contract.fields){const row=el('tr'),key=el('td'),condition=el('td');key.append(el('code',f.public_header));condition.append(el('span',fieldCondition(f),'data-contract-condition'));row.append(key,el('td',fieldDescription(f)),condition);tbody.append(row);}table.append(tbody);wrap.append(table);
-   const technical=disclosure('Especificación técnica','data-contract-technical'),spec=el('pre',JSON.stringify(contract,null,2));spec.tabIndex=0;spec.role='region';spec.setAttribute('aria-label','Especificación técnica de '+label);technical.append(spec);fields.append(wrap,technical);card.append(header,badges,action,error,fields);fragment.append(card);cards.push({action,get busy(){return busy;}});
+   table.setAttribute('role','table');thead.setAttribute('role','rowgroup');titles.setAttribute('role','row');tbody.setAttribute('role','rowgroup');for(const th of titles.children)th.setAttribute('role','columnheader');
+   for(const f of contract.fields){const row=el('tr'),key=el('td'),condition=el('td'),base=f.nullable?'Opcional':'Requerido',message=fieldCondition(f);key.append(el('code',f.public_header));condition.append(el('span',base,'data-contract-condition'));if(message!==base)condition.append(el('small',message.slice(base.length),'data-contract-condition-detail'));row.append(key,el('td',fieldDescription(f)),condition);row.setAttribute('role','row');for(const cell of row.children)cell.setAttribute('role','cell');tbody.append(row);}table.append(tbody);wrap.append(table);
+   fields.append(wrap);card.append(header,badges,action,error,fields);fragment.append(card);cards.push({action,get busy(){return busy;}});
   }
   grid.replaceChildren(fragment);onContracts?.(data,snapshot,{grid,footer,next,copy});hasPair=true;status.textContent=data.provisional?'Vista previa preparatoria. Publicá y seleccioná el modelo para confirmar su estructura.':'Estructura generada para la versión publicada seleccionada.';status.role='status';
  }

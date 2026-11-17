@@ -1,0 +1,453 @@
+{
+  "baseline": "d813c4841a87a30634aeaa9127ae4aea5aeb1933",
+  "browser_attempts": [
+    {
+      "log": "ux08-regression",
+      "count": 60,
+      "seconds": 513.836,
+      "cases": [
+        {
+          "id": "test_premium_refinement_ux08.HeroRefinementTests.test_01_common_hero_geometry_and_real_identity",
+          "result": "ok"
+        },
+        {
+          "id": "test_premium_refinement_ux08.JourneyRefinementTests.test_03_real_publish_prepare_finalize_geometry_and_local_toggle",
+          "result": "FAIL"
+        },
+        {
+          "id": "test_premium_refinement_ux08.JourneyRefinementTests.test_04_contextual_loading_and_safe_human_preparation_picker",
+          "result": "ok"
+        },
+        {
+          "id": "test_home_hero.HomeHeroTests.test_alignment_matches_logistics_frame_and_control_geometry",
+          "result": "ok"
+        },
+        {
+          "id": "test_home_hero.HomeHeroTests.test_art_is_small_and_reserves_geometry_and_content_survives_failure",
+          "result": "ok"
+        },
+        {
+          "id": "test_home_hero.HomeHeroTests.test_h1_h3_h4_h5_copy_network_band_and_reflow",
+          "result": "ok"
+        },
+        {
+          "id": "test_home_hero.HomeHeroTests.test_h2_catalog_center_keyboard_and_history_use_existing_navigation",
+          "result": "ok"
+        },
+        {
+          "id": "test_home_hero.HomeHeroTests.test_h5_zoom_200_percent_keeps_hero_ctas_visible_with_keyboard",
+          "result": "ok"
+        },
+        {
+          "id": "test_home_hero.HomeHeroTests.test_h6_welcome_keeps_identity_updates_and_fallback",
+          "result": "ok"
+        },
+        {
+          "id": "test_data_contract_wizard.DataContractWizardTests.test_01_create_publish_contract_continue_and_case_without_download",
+          "result": "ok"
+        },
+        {
+          "id": "test_data_contract_wizard.DataContractWizardTests.test_02_both_csvs_preserve_bytes_headers_source_and_immutable_version",
+          "result": "ERROR"
+        },
+        {
+          "id": "test_data_contract_wizard.DataContractWizardTests.test_03_single_independent_toggles_human_conditions_and_lossless_contracts",
+          "result": "ok"
+        },
+        {
+          "id": "test_data_contract_wizard.DataContractWizardTests.test_04_download_error_is_local_and_double_click_does_not_duplicate",
+          "result": "ok"
+        },
+        {
+          "id": "test_data_contract_wizard.DataContractWizardTests.test_05_partial_mismatched_timeout_and_503_never_mark_ready",
+          "result": "ok"
+        },
+        {
+          "id": "test_data_contract_wizard.DataContractWizardTests.test_06_unknown_metadata_is_literal_safe_and_preserved",
+          "result": "ok"
+        },
+        {
+          "id": "test_data_contract_wizard.DataContractWizardTests.test_07_existing_case_uses_unchanged_contracts_and_downloads",
+          "result": "ok"
+        },
+        {
+          "id": "test_data_contract_wizard.DataContractWizardTests.test_08_visual_responsive_focus_and_contrast",
+          "result": "ok"
+        },
+        {
+          "id": "test_data_contract_wizard.DataContractWizardTests.test_09_late_preview_never_replaces_the_current_version",
+          "result": "ok"
+        },
+        {
+          "id": "test_data_contract_wizard.DataContractWizardTests.test_10_download_from_previous_version_is_discarded_after_switch",
+          "result": "ok"
+        },
+        {
+          "id": "test_decision_graph_ux05.CommandCenterTests.test_01_default_panel_summary_and_six_width_containment",
+          "result": "ok"
+        },
+        {
+          "id": "test_decision_graph_ux05.CommandCenterTests.test_02_owner_reconciles_locked_and_ready_actions_without_execution",
+          "result": "ok"
+        },
+        {
+          "id": "test_decision_graph_ux05.CommandCenterTests.test_03_approved_not_applicable_close_and_archived_readonly",
+          "result": "ok"
+        },
+        {
+          "id": "test_decision_graph_ux05.CommandCenterTests.test_04_history_pages_and_case_selector_keep_exact_identities",
+          "result": "ok"
+        },
+        {
+          "id": "test_decision_graph_ux05.CommandCenterTests.test_05_viewer_keeps_approved_visual_state_and_readonly_owner",
+          "result": "ok"
+        },
+        {
+          "id": "test_decision_graph_ux05.CommandCenterTests.test_06_keyboard_switch_outside_close_and_cancel_late_action",
+          "result": "ok"
+        },
+        {
+          "id": "test_decision_graph_ux05.CommandCenterTests.test_07_strict_contrast_accessible_names_and_retry",
+          "result": "ok"
+        },
+        {
+          "id": "test_decision_graph_ux05.CommandCenterTests.test_08_current_approved_upstream_and_stale_error_queued_presentations",
+          "result": "FAIL"
+        },
+        {
+          "id": "test_decision_graph_ux05.CommandCenterTests.test_09_pack_read_failure_is_explicit_and_case_switch_cancels_late_picker",
+          "result": "ok"
+        },
+        {
+          "id": "test_journey_navigation_ux06.JourneyNavigationTests.test_01_local_previous_preserves_form_and_has_no_writes_or_self_navigation",
+          "result": "ok"
+        },
+        {
+          "id": "test_journey_navigation_ux06.JourneyNavigationTests.test_02_context_return_preserves_unsaved_draft_and_actual_server_case",
+          "result": "ok"
+        },
+        {
+          "id": "test_journey_navigation_ux06.JourneyNavigationTests.test_03_local_csv_survives_steps_and_canceled_browser_back",
+          "result": "ok"
+        },
+        {
+          "id": "test_journey_navigation_ux06.JourneyNavigationTests.test_04_fresh_previous_protects_draft_without_creating_case",
+          "result": "ok"
+        },
+        {
+          "id": "test_journey_navigation_ux06.JourneyNavigationTests.test_05_derived_parent_and_preparation_identity_survive_previous_and_return",
+          "result": "ok"
+        },
+        {
+          "id": "test_journey_navigation_ux06.JourneyNavigationTests.test_06_studio_rail_previous_exact_dashboard_origin_and_explicit_fallback",
+          "result": "ok"
+        },
+        {
+          "id": "test_journey_navigation_ux06.JourneyNavigationTests.test_07_six_width_headers_footers_and_all_studio_rails",
+          "result": "ok"
+        },
+        {
+          "id": "test_journey_navigation_ux06.JourneyNavigationTests.test_08_viewer_archived_rails_and_readonly_previous_remain_available",
+          "result": "ok"
+        },
+        {
+          "id": "test_journey_navigation_ux06.JourneyNavigationTests.test_09_late_context_return_is_canceled_by_local_previous",
+          "result": "ok"
+        },
+        {
+          "id": "test_journey_navigation_ux06.JourneyNavigationTests.test_10_center_filters_and_configuration_origin_roundtrip_without_latest",
+          "result": "ok"
+        },
+        {
+          "id": "test_journey_navigation_ux06.JourneyNavigationTests.test_11_back_to_a_step_that_lost_its_model_gate_keeps_actual_step_and_draft",
+          "result": "ok"
+        },
+        {
+          "id": "test_journey_navigation_ux06.JourneyNavigationTests.test_12_deriving_from_frozen_core_preserves_dashboard_parent_run",
+          "result": "ok"
+        },
+        {
+          "id": "test_journey_navigation_ux06.JourneyNavigationTests.test_13_conflict_reload_discards_draft_without_discarding_dashboard_origin",
+          "result": "ok"
+        },
+        {
+          "id": "test_journey_navigation_ux06.JourneyNavigationTests.test_14_rendered_zoom_reflow_keeps_core_steps_and_controls_contained",
+          "result": "ok"
+        },
+        {
+          "id": "test_unified_decision_journey.JourneyEngineTests.test_08_real_d1_d2_approval_returns_graph_and_exact_dashboard_origin",
+          "result": "ok"
+        },
+        {
+          "id": "test_unified_decision_journey.UnifiedDecisionJourneyTests.test_01_pre_case_two_uploads_refresh_and_finalize",
+          "result": "ok"
+        },
+        {
+          "id": "test_unified_decision_journey.UnifiedDecisionJourneyTests.test_02_skip_empty_graph_prepare_same_case_and_edit_return",
+          "result": "ok"
+        },
+        {
+          "id": "test_unified_decision_journey.UnifiedDecisionJourneyTests.test_03_derivation_cancel_confirm_and_original_immutable",
+          "result": "ok"
+        },
+        {
+          "id": "test_unified_decision_journey.UnifiedDecisionJourneyTests.test_04_frozen_context_and_historical_return_survive_reload",
+          "result": "ok"
+        },
+        {
+          "id": "test_unified_decision_journey.UnifiedDecisionJourneyTests.test_05_close_not_applicable_revalidates_and_returns_center",
+          "result": "ok"
+        },
+        {
+          "id": "test_unified_decision_journey.UnifiedDecisionJourneyTests.test_06_invalid_csv_has_real_report_and_no_false_candidate",
+          "result": "ok"
+        },
+        {
+          "id": "test_unified_decision_journey.UnifiedDecisionJourneyTests.test_07_screenshots_core_studio_responsive_and_pending_closure",
+          "result": "ok"
+        },
+        {
+          "id": "test_unified_decision_journey.UnifiedDecisionJourneyTests.test_09_finalize_storage_failure_reload_recovers_same_case",
+          "result": "ok"
+        },
+        {
+          "id": "test_unified_decision_journey.UnifiedDecisionJourneyTests.test_10_expired_preparation_cleanup_starts_new_stage_without_case",
+          "result": "ok"
+        },
+        {
+          "id": "test_unified_decision_journey.UnifiedDecisionJourneyTests.test_11_model_change_requires_derivation_without_mutating_existing_binding",
+          "result": "ok"
+        },
+        {
+          "id": "test_unified_decision_journey.UnifiedDecisionJourneyTests.test_12_real_warning_stays_candidate_not_published",
+          "result": "ok"
+        },
+        {
+          "id": "test_unified_decision_journey.UnifiedDecisionJourneyTests.test_13_late_validation_cannot_mix_model_versions",
+          "result": "ok"
+        },
+        {
+          "id": "test_unified_decision_journey.UnifiedDecisionJourneyTests.test_14_unsaved_local_csv_blocks_case_creation_without_freezing_intent",
+          "result": "ok"
+        },
+        {
+          "id": "test_unified_decision_journey.UnifiedDecisionJourneyTests.test_15_navigation_has_only_global_and_internal_rails_and_restores_legacy",
+          "result": "ok"
+        },
+        {
+          "id": "test_visual_refinement_ux07.HomeRefinementTests.test_01_six_visible_cards_filters_entitlement_and_home_bar",
+          "result": "ok"
+        },
+        {
+          "id": "test_visual_refinement_ux07.HomeRefinementTests.test_02_landing_equivalent_actions_preserve_filtered_center",
+          "result": "ok"
+        },
+        {
+          "id": "test_visual_refinement_ux07.JourneyRefinementTests.test_03_real_publish_prepare_finalize_geometry_and_local_toggle",
+          "result": "ok"
+        }
+      ]
+    },
+    {
+      "log": "ux08-final-contracts",
+      "count": 7,
+      "seconds": 97.043,
+      "cases": [
+        {
+          "id": "test_premium_refinement_ux08.HeroRefinementTests.test_01_common_hero_geometry_and_real_identity",
+          "result": "ok"
+        },
+        {
+          "id": "test_premium_refinement_ux08.JourneyRefinementTests.test_03_real_publish_prepare_finalize_geometry_and_local_toggle",
+          "result": "ok"
+        },
+        {
+          "id": "test_premium_refinement_ux08.JourneyRefinementTests.test_04_contextual_loading_and_safe_human_preparation_picker",
+          "result": "ok"
+        },
+        {
+          "id": "test_decision_case_wizard.DecisionCaseWizardTests.test_05_no_assign_permission_allows_pending_owner_without_inventing_one",
+          "result": "ok"
+        },
+        {
+          "id": "test_decision_case_wizard.DecisionCaseWizardTests.test_06_no_eligible_owner_blocks_readiness_and_submission",
+          "result": "ok"
+        },
+        {
+          "id": "test_decision_case_wizard.DecisionCaseWizardTests.test_07_existing_case_patch_keeps_revision_version_and_stage_owners",
+          "result": "ok"
+        },
+        {
+          "id": "test_decision_case_wizard.DecisionCaseWizardTests.test_08_frozen_and_viewer_contexts_keep_protected_fields_disabled",
+          "result": "ok"
+        }
+      ]
+    },
+    {
+      "log": "ux08-candidate-tests",
+      "count": 11,
+      "seconds": 136.564,
+      "cases": [
+        {
+          "id": "test_data_contract_wizard.DataContractWizardTests.test_02_both_csvs_preserve_bytes_headers_source_and_immutable_version",
+          "result": "ok"
+        },
+        {
+          "id": "test_decision_graph_ux05.CommandCenterTests.test_08_current_approved_upstream_and_stale_error_queued_presentations",
+          "result": "ok"
+        },
+        {
+          "id": "test_premium_refinement_ux08.HeroRefinementTests.test_01_common_hero_geometry_and_real_identity",
+          "result": "ok"
+        },
+        {
+          "id": "test_premium_refinement_ux08.JourneyRefinementTests.test_03_real_publish_prepare_finalize_geometry_and_local_toggle",
+          "result": "ok"
+        },
+        {
+          "id": "test_premium_refinement_ux08.JourneyRefinementTests.test_04_contextual_loading_and_safe_human_preparation_picker",
+          "result": "ok"
+        },
+        {
+          "id": "test_saga01_planning.Saga01PlanningTests.test_01_first_time_landing_model_contract_case_graph",
+          "result": "ok"
+        },
+        {
+          "id": "test_saga01_planning.Saga01PlanningTests.test_02_recurrent_version_is_not_mutated_and_contract_templates_match",
+          "result": "ok"
+        },
+        {
+          "id": "test_saga01_planning.Saga01PlanningTests.test_05_graph_data_upload_reuse_and_existing_case_navigation",
+          "result": "ok"
+        },
+        {
+          "id": "test_saga01_planning.Saga01PlanningTests.test_07_contract_failure_blocks_setup_and_can_be_retried",
+          "result": "ok"
+        },
+        {
+          "id": "test_attributes_before_csv.AttributesBeforeCSVTests.test_2_draft_context_and_owner_survive_reload_without_creating_objects",
+          "result": "ok"
+        },
+        {
+          "id": "test_attributes_before_csv.AttributesBeforeCSVTests.test_3_created_case_without_csv_keeps_d1_data_required_and_d2_locked",
+          "result": "ok"
+        }
+      ]
+    }
+  ],
+  "latest_browser_verdicts": {
+    "test_premium_refinement_ux08.HeroRefinementTests.test_01_common_hero_geometry_and_real_identity": "ok",
+    "test_premium_refinement_ux08.JourneyRefinementTests.test_03_real_publish_prepare_finalize_geometry_and_local_toggle": "ok",
+    "test_premium_refinement_ux08.JourneyRefinementTests.test_04_contextual_loading_and_safe_human_preparation_picker": "ok",
+    "test_home_hero.HomeHeroTests.test_alignment_matches_logistics_frame_and_control_geometry": "ok",
+    "test_home_hero.HomeHeroTests.test_art_is_small_and_reserves_geometry_and_content_survives_failure": "ok",
+    "test_home_hero.HomeHeroTests.test_h1_h3_h4_h5_copy_network_band_and_reflow": "ok",
+    "test_home_hero.HomeHeroTests.test_h2_catalog_center_keyboard_and_history_use_existing_navigation": "ok",
+    "test_home_hero.HomeHeroTests.test_h5_zoom_200_percent_keeps_hero_ctas_visible_with_keyboard": "ok",
+    "test_home_hero.HomeHeroTests.test_h6_welcome_keeps_identity_updates_and_fallback": "ok",
+    "test_data_contract_wizard.DataContractWizardTests.test_01_create_publish_contract_continue_and_case_without_download": "ok",
+    "test_data_contract_wizard.DataContractWizardTests.test_02_both_csvs_preserve_bytes_headers_source_and_immutable_version": "ok",
+    "test_data_contract_wizard.DataContractWizardTests.test_03_single_independent_toggles_human_conditions_and_lossless_contracts": "ok",
+    "test_data_contract_wizard.DataContractWizardTests.test_04_download_error_is_local_and_double_click_does_not_duplicate": "ok",
+    "test_data_contract_wizard.DataContractWizardTests.test_05_partial_mismatched_timeout_and_503_never_mark_ready": "ok",
+    "test_data_contract_wizard.DataContractWizardTests.test_06_unknown_metadata_is_literal_safe_and_preserved": "ok",
+    "test_data_contract_wizard.DataContractWizardTests.test_07_existing_case_uses_unchanged_contracts_and_downloads": "ok",
+    "test_data_contract_wizard.DataContractWizardTests.test_08_visual_responsive_focus_and_contrast": "ok",
+    "test_data_contract_wizard.DataContractWizardTests.test_09_late_preview_never_replaces_the_current_version": "ok",
+    "test_data_contract_wizard.DataContractWizardTests.test_10_download_from_previous_version_is_discarded_after_switch": "ok",
+    "test_decision_graph_ux05.CommandCenterTests.test_01_default_panel_summary_and_six_width_containment": "ok",
+    "test_decision_graph_ux05.CommandCenterTests.test_02_owner_reconciles_locked_and_ready_actions_without_execution": "ok",
+    "test_decision_graph_ux05.CommandCenterTests.test_03_approved_not_applicable_close_and_archived_readonly": "ok",
+    "test_decision_graph_ux05.CommandCenterTests.test_04_history_pages_and_case_selector_keep_exact_identities": "ok",
+    "test_decision_graph_ux05.CommandCenterTests.test_05_viewer_keeps_approved_visual_state_and_readonly_owner": "ok",
+    "test_decision_graph_ux05.CommandCenterTests.test_06_keyboard_switch_outside_close_and_cancel_late_action": "ok",
+    "test_decision_graph_ux05.CommandCenterTests.test_07_strict_contrast_accessible_names_and_retry": "ok",
+    "test_decision_graph_ux05.CommandCenterTests.test_08_current_approved_upstream_and_stale_error_queued_presentations": "ok",
+    "test_decision_graph_ux05.CommandCenterTests.test_09_pack_read_failure_is_explicit_and_case_switch_cancels_late_picker": "ok",
+    "test_journey_navigation_ux06.JourneyNavigationTests.test_01_local_previous_preserves_form_and_has_no_writes_or_self_navigation": "ok",
+    "test_journey_navigation_ux06.JourneyNavigationTests.test_02_context_return_preserves_unsaved_draft_and_actual_server_case": "ok",
+    "test_journey_navigation_ux06.JourneyNavigationTests.test_03_local_csv_survives_steps_and_canceled_browser_back": "ok",
+    "test_journey_navigation_ux06.JourneyNavigationTests.test_04_fresh_previous_protects_draft_without_creating_case": "ok",
+    "test_journey_navigation_ux06.JourneyNavigationTests.test_05_derived_parent_and_preparation_identity_survive_previous_and_return": "ok",
+    "test_journey_navigation_ux06.JourneyNavigationTests.test_06_studio_rail_previous_exact_dashboard_origin_and_explicit_fallback": "ok",
+    "test_journey_navigation_ux06.JourneyNavigationTests.test_07_six_width_headers_footers_and_all_studio_rails": "ok",
+    "test_journey_navigation_ux06.JourneyNavigationTests.test_08_viewer_archived_rails_and_readonly_previous_remain_available": "ok",
+    "test_journey_navigation_ux06.JourneyNavigationTests.test_09_late_context_return_is_canceled_by_local_previous": "ok",
+    "test_journey_navigation_ux06.JourneyNavigationTests.test_10_center_filters_and_configuration_origin_roundtrip_without_latest": "ok",
+    "test_journey_navigation_ux06.JourneyNavigationTests.test_11_back_to_a_step_that_lost_its_model_gate_keeps_actual_step_and_draft": "ok",
+    "test_journey_navigation_ux06.JourneyNavigationTests.test_12_deriving_from_frozen_core_preserves_dashboard_parent_run": "ok",
+    "test_journey_navigation_ux06.JourneyNavigationTests.test_13_conflict_reload_discards_draft_without_discarding_dashboard_origin": "ok",
+    "test_journey_navigation_ux06.JourneyNavigationTests.test_14_rendered_zoom_reflow_keeps_core_steps_and_controls_contained": "ok",
+    "test_unified_decision_journey.JourneyEngineTests.test_08_real_d1_d2_approval_returns_graph_and_exact_dashboard_origin": "ok",
+    "test_unified_decision_journey.UnifiedDecisionJourneyTests.test_01_pre_case_two_uploads_refresh_and_finalize": "ok",
+    "test_unified_decision_journey.UnifiedDecisionJourneyTests.test_02_skip_empty_graph_prepare_same_case_and_edit_return": "ok",
+    "test_unified_decision_journey.UnifiedDecisionJourneyTests.test_03_derivation_cancel_confirm_and_original_immutable": "ok",
+    "test_unified_decision_journey.UnifiedDecisionJourneyTests.test_04_frozen_context_and_historical_return_survive_reload": "ok",
+    "test_unified_decision_journey.UnifiedDecisionJourneyTests.test_05_close_not_applicable_revalidates_and_returns_center": "ok",
+    "test_unified_decision_journey.UnifiedDecisionJourneyTests.test_06_invalid_csv_has_real_report_and_no_false_candidate": "ok",
+    "test_unified_decision_journey.UnifiedDecisionJourneyTests.test_07_screenshots_core_studio_responsive_and_pending_closure": "ok",
+    "test_unified_decision_journey.UnifiedDecisionJourneyTests.test_09_finalize_storage_failure_reload_recovers_same_case": "ok",
+    "test_unified_decision_journey.UnifiedDecisionJourneyTests.test_10_expired_preparation_cleanup_starts_new_stage_without_case": "ok",
+    "test_unified_decision_journey.UnifiedDecisionJourneyTests.test_11_model_change_requires_derivation_without_mutating_existing_binding": "ok",
+    "test_unified_decision_journey.UnifiedDecisionJourneyTests.test_12_real_warning_stays_candidate_not_published": "ok",
+    "test_unified_decision_journey.UnifiedDecisionJourneyTests.test_13_late_validation_cannot_mix_model_versions": "ok",
+    "test_unified_decision_journey.UnifiedDecisionJourneyTests.test_14_unsaved_local_csv_blocks_case_creation_without_freezing_intent": "ok",
+    "test_unified_decision_journey.UnifiedDecisionJourneyTests.test_15_navigation_has_only_global_and_internal_rails_and_restores_legacy": "ok",
+    "test_visual_refinement_ux07.HomeRefinementTests.test_01_six_visible_cards_filters_entitlement_and_home_bar": "ok",
+    "test_visual_refinement_ux07.HomeRefinementTests.test_02_landing_equivalent_actions_preserve_filtered_center": "ok",
+    "test_visual_refinement_ux07.JourneyRefinementTests.test_03_real_publish_prepare_finalize_geometry_and_local_toggle": "ok",
+    "test_decision_case_wizard.DecisionCaseWizardTests.test_05_no_assign_permission_allows_pending_owner_without_inventing_one": "ok",
+    "test_decision_case_wizard.DecisionCaseWizardTests.test_06_no_eligible_owner_blocks_readiness_and_submission": "ok",
+    "test_decision_case_wizard.DecisionCaseWizardTests.test_07_existing_case_patch_keeps_revision_version_and_stage_owners": "ok",
+    "test_decision_case_wizard.DecisionCaseWizardTests.test_08_frozen_and_viewer_contexts_keep_protected_fields_disabled": "ok",
+    "test_saga01_planning.Saga01PlanningTests.test_01_first_time_landing_model_contract_case_graph": "ok",
+    "test_saga01_planning.Saga01PlanningTests.test_02_recurrent_version_is_not_mutated_and_contract_templates_match": "ok",
+    "test_saga01_planning.Saga01PlanningTests.test_05_graph_data_upload_reuse_and_existing_case_navigation": "ok",
+    "test_saga01_planning.Saga01PlanningTests.test_07_contract_failure_blocks_setup_and_can_be_retried": "ok",
+    "test_attributes_before_csv.AttributesBeforeCSVTests.test_2_draft_context_and_owner_survive_reload_without_creating_objects": "ok",
+    "test_attributes_before_csv.AttributesBeforeCSVTests.test_3_created_case_without_csv_keeps_d1_data_required_and_d2_locked": "ok"
+  },
+  "node": {
+    "graph": 15,
+    "navigation": 19,
+    "catalog": 5,
+    "result": "PASS",
+    "commands": [
+      "node backend/tests/test_graph_ux05.mjs",
+      "node backend/tests/test_journey_navigation_ux06.mjs",
+      "node backend/tests/test_home_dda_catalog.mjs"
+    ]
+  },
+  "impact_classifier": {
+    "tests": 7,
+    "result": "PASS",
+    "risk": "R2",
+    "requires_full": false
+  },
+  "e2e": {
+    "desktop": {
+      "result": "PASS",
+      "source": "first focused run"
+    },
+    "mobile": {
+      "result": "PASS",
+      "seconds": 54.078,
+      "source": "isolated focused reproduction; unchanged test/waits"
+    },
+    "initial_mobile_failure": "cold dashboard mount timeout; no console or failed request recorded; not reproduced in isolation; no product change or added wait"
+  },
+  "ci": "Result terminal is recorded in the pull request checks for the candidate SHA.",
+  "final_home_recheck": {
+    "count": 6,
+    "seconds": 28.992,
+    "result": "PASS",
+    "assertion": "Same real CTA height between pages at every width, including mobile"
+  },
+  "source_invariants": {
+    "node_graph": "byte-identical to baseline",
+    "command_center": "byte-identical to baseline",
+    "status_presentation": "byte-identical to baseline",
+    "node_sizes_distances_connectors_desktop_and_mobile_css": "byte-identical to baseline",
+    "no_backend_sql_engines_workflows_infra_changes": true
+  }
+}

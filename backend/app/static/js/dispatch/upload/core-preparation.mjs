@@ -4,19 +4,27 @@ import {el,button,field,confirmAction} from '../models/forms.mjs';
 import {request as inputRequest,previewTable} from './ultimate-case-data.mjs';
 import {createDropCard} from './dropcard.mjs';
 import {createValidationDrawer} from './validation-report.mjs';
+import {decisionCard} from '../cases/decision-case-ui.mjs';
+
+function preparationLabel(item){
+ const states={DRAFT:'Borrador',VALIDATED:'Datos validados',FINALIZING:'Creación pendiente',CONSUMED:'Case creado',EXPIRED:'Vencida'};
+ let date='Fecha no disponible';try{const value=new Date(item.updated_at);if(!Number.isNaN(value.getTime()))date=new Intl.DateTimeFormat('es-AR',{dateStyle:'medium',timeStyle:'short',timeZone:window.dationSession?.identity?.workspace?.timezone}).format(value);}catch{}
+ return date+' · '+(states[item.status]||'Preparación guardada');
+}
 
 export function mountCorePreparation(root,scope,{canAssign,draft,onDraft,onContinue,onRecovered,parentCaseId=null}){
  const status=el('p','Seleccioná una Model Version publicada para preparar datos.','journey-preparation-status');status.role='status';status.setAttribute('aria-live','polite');root.append(status);
- const ownerArea=el('section',undefined,'d-card journey-data-owner'),ownerTitle=el('h3','Responsable de datos · Data Owner');ownerArea.append(ownerTitle,el('p','La selección es una intención; se asigna al crear el Case, si conserva su elegibilidad. No es requisito para publicar.','d-metadata'));
- const owner=field(ownerArea,'Data Owner',{name:'preparation_data_owner',options:[['','Sin asignar']],value:''});owner.disabled=true;if(!canAssign)ownerArea.append(el('p','Un Admin debe asignar el Data Owner. Podés preparar datos sin esa asignación.','d-metadata'));root.append(ownerArea);
+ const ownerControls=decisionCard(root,'Responsable de datos','Gestiona la preparación de los datos.','people'),ownerArea=ownerControls.parentElement;ownerArea.classList.add('journey-data-owner','core-owner-card');ownerArea.dataset.dationTest='preparation-owner-card';
+ const owner=field(ownerControls,'Data Owner',{name:'preparation_data_owner',options:[['','Sin asignar']],value:''});owner.disabled=true;if(!canAssign)ownerControls.append(el('p','Un Admin debe asignar el Data Owner. Podés preparar datos sin esa asignación.','d-field__help'));
+ const alternatives=el('div',undefined,'core-owner-alternatives');ownerControls.append(alternatives);
  const pending=new Set(),drawer=createValidationDrawer(scope);let data=null,source=null,generation=0,busy=false,errorMessage='',readyPromise=Promise.resolve(),footer=null,controls=[];
  const previousLeave=window.dationUltimateCanLeave;const leave=()=>!pending.size||window.confirm('Hay CSV seleccionados sin guardar. Se perderá la selección local al salir. Los candidatos guardados se conservan.');
  const compositeLeave=()=>leave()&&(!previousLeave||previousLeave());window.dationUltimateCanLeave=compositeLeave;scope.own(()=>{if(window.dationUltimateCanLeave===compositeLeave)delete window.dationUltimateCanLeave;generation++;});scope.listen(window,'beforeunload',e=>{if(pending.size){e.preventDefault();e.returnValue='';}});
- const resume=button('Retomar preparación guardada',async()=>{
+ const resume=button('Otras preparaciones',async()=>{
   if(pending.size){tell(new Error('Guardá o quitá los archivos locales antes de cambiar de preparación.'));return;}
   if(data?.session.creation_intent){tell(new Error('Recuperá la creación congelada antes de cambiar de preparación.'));return;}
-  try{const list=await json('/api/platform/data-preparations'),choices=el('div',undefined,'journey-resume-list');for(const item of list.items.filter(s=>s.model_version_id===draft.version_id&&(s.parent_case_id||null)===parentCaseId))choices.append(button(item.id.slice(0,8)+' · '+item.status+' · '+item.updated_at,async()=>{draft.id=item.id;draft.version_id=item.model_version_id;onDraft();await refresh();choices.remove();}));if(!choices.children.length)choices.append(el('p','No hay otras preparaciones vigentes para esta versión y origen.','d-metadata'));root.querySelector('.journey-resume-list')?.remove();root.append(choices);}catch(e){tell(e);}
- });root.append(resume);
+  try{const list=await json('/api/platform/data-preparations'),choices=el('div',undefined,'journey-resume-list');for(const item of list.items.filter(s=>s.model_version_id===draft.version_id&&(s.parent_case_id||null)===parentCaseId)){if(item.id===data?.session.id)continue;const choose=button(preparationLabel(item),async()=>{draft.id=item.id;draft.version_id=item.model_version_id;onDraft();await refresh();choices.remove();});choose.dataset.preparationId=item.id;choices.append(choose);}if(!choices.children.length){const empty=el('p','No hay otras preparaciones vigentes para esta versión y origen.','d-metadata');empty.role='status';choices.append(empty);}root.querySelector('.journey-resume-list')?.remove();alternatives.append(choices);}catch(e){tell(e);}
+ });alternatives.append(resume);
  const base=()=>'/api/platform/data-preparations/'+data.session.id;
  const saved=()=>{if(data){draft.id=data.session.id;draft.version_id=data.session.model_version_id;onDraft();}};
  function reflect(){if(!scope.active)return;const n=data?.uploads.filter(u=>u.selected&&u.ready).length||0;status.textContent=errorMessage|| (busy?'Recuperando preparación privada…':n+' de 2 candidatos guardados y validados. '+(pending.size?'Hay archivos locales sin guardar. ':'')+'Todavía no están publicados.');if(footer){footer.next.disabled=!!errorMessage||busy||n!==2||!!pending.size;footer.skip.disabled=!!errorMessage||busy;footer.copy.textContent=n===2?'2 archivos validados · publicación al finalizar el Case':n===1?'Falta '+(data.uploads.some(u=>u.entity==='transport_demand'&&u.selected)?'Flota':'Demanda'):'Preparación pendiente · podés continuar sin datos';}}
