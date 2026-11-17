@@ -131,7 +131,8 @@
     "backend/tests/browser/test_navigation.py": "f420c5d3964fe5ef63362779fc37ae046d1705ed2dee451d47554536464a56d4",
     "backend/tests/browser/wizard_helpers.py": "d260e416fcd4b225d86181bb657f583a5be21abd0b23a774835c8708595e90e7",
     "backend/tests/test_home_dda_catalog.mjs": "8c6a686781199bb573121c36fbf9b6be2a744ae4e176a58b138dee808477ad08",
-    "backend/tests/browser/test_visual_refinement_ux07.py": "d04df925e860aa3d0572a3e6b0c32694909211f0bcccad25573a018414ef955b"
+    "backend/tests/browser/test_visual_refinement_ux07.py": "d04df925e860aa3d0572a3e6b0c32694909211f0bcccad25573a018414ef955b",
+    "backend/tests/e2e/browser_journey.py": "093b049207bde9d642cbe8e02d87a67310292917b34b005afea8db62ee941190"
   },
   "geometry_collection": "40 scenarios; unaffected Home/Core/Graph retained, six Landing measurements and screenshots replaced after the focal hero correction.",
   "ci_history": [
@@ -155,6 +156,26 @@
         "affected_methods": 3
       },
       "classification": "Approved hero scale and Home count: obsolete expectations; legacy three-level nav height: scoped CSS compatibility defect. Four focal cases passed after minimal correction."
+    },
+    {
+      "run": 43979546905,
+      "sha": "c190d05414eecbc782f699143e381dd148fe2a94",
+      "conclusion": "failure",
+      "passed": {
+        "release_operations": 98,
+        "python": 721,
+        "node": 191,
+        "browser": 372,
+        "postgres": 192
+      },
+      "e2e": {
+        "tests": 134,
+        "failures": 2,
+        "classification": "Both browser journeys stopped at obsolete Home count==7; approved Home has six. No product defect."
+      },
+      "focal_recheck": "Desktop and mobile real end-to-end journeys PASS after count==6 plus exact six IDs; all business assertions retained."
     }
-  ]
+  ],
+  "e2e_focal_pass": 2,
+  "e2e_results": "e2e-results.json"
 }
