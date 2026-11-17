@@ -46,7 +46,7 @@ function showPublishedContracts(host,caseId,contracts,scope){
 export async function mountCaseSetup(root,{route,navigate,onContext}){
  delete root.dataset.ultimateReady;
  const scope=scopeFor(root);await ensureStylesheet('ultimate-foundation-styles','/static/css/ultimate-foundation.css','t3-v1');if(!scope.active)return;
- root.className='dispatch d-platform ultimate-foundation ultimate-core-setup';root.append(loadingState('Recuperando contexto del Case…'));
+ root.className='dispatch d-platform ultimate-foundation ultimate-core-setup';root.append(loadingState(route.caseId?'Recuperando contexto del Case…':'Inicializando Core Configuration…'));
  try{
   const fresh=!route.caseId,[caps,current]=await Promise.all([api('/api/platform/ultimate-foundation/capabilities',{signal:scope.signal}),fresh?Promise.resolve(null):api('/api/platform/logistics-cases/'+route.caseId+'/context',{signal:scope.signal})]);
   if(!scope.active)return;if(fresh&&!caps.can_create_case)throw Object.assign(new Error('La creación de Cases no está disponible para este acceso.'),{status:403});
@@ -95,7 +95,7 @@ export async function mountCaseSetup(root,{route,navigate,onContext}){
   const preparationRoot=unified&&fresh?el('section',undefined,'journey-preparation'):null;
   if(preparationRoot)preparation=mountCorePreparation(preparationRoot,scope,{canAssign:caps.can_assign,draft:preparationDraft,parentCaseId:route.parentCaseId||null,onRecovered:result=>{kit.markSaved();onContext?.(result);navigate('logistics-map',{caseId:result.case.id,nodeId:null,runId:null,replace:true});},onDraft:()=>{if(initialized){store.write(collect());reflect();}},onContinue:()=>steps?.show(2,true)});
   if(fresh)planningModel=await mountPlanningModel(form,scope,{draft:draft.planning_model||{},modelId:draft.model_id,canManage:caps.can_manage_models,unified,onChange:()=>{if(initialized){reflect();kit.saveDraft();}},persist:()=>{if(initialized)store.write(collect());},onSelected:()=>steps?.show(1,true),onContinue:()=>steps?.show(2,true),onContracts:unified?(...args)=>preparation.attach(...args):undefined});
-  if(unified&&planningModel){planningModel.contractPanel.body.insertBefore(preparationRoot,planningModel.contractPanel.body.querySelector('.data-contract-footer'));const p=planningModel.contractPanel;p.details.querySelector('.data-contract-heading .d-metadata').textContent='Dation genera la estructura exacta que necesitan tus datos. Descargá las plantillas, completalas con tu operación y validalas antes de definir el Decision Case.';p.details.querySelector('.ultimate-disclosure__title').textContent='02 · Data Contract & Preparation';const info=p.body.querySelector('.data-contract-info');if(info)info.textContent='D1 · Transport Plan asigna órdenes a recursos y viajes. D2 · Day Scheduling programa los viajes aprobados de D1. Cargá y validá tus CSV aquí antes de definir el Case.';}
+  if(unified&&planningModel){planningModel.contractPanel.body.insertBefore(preparationRoot,planningModel.contractPanel.body.querySelector('.data-contract-footer'));const p=planningModel.contractPanel;p.details.querySelector('.data-contract-heading .d-metadata').textContent='Dation genera la estructura exacta que necesitan tus datos. Descargá las plantillas, completalas con tu operación y validalas antes de definir el Decision Case.';p.details.querySelector('.ultimate-disclosure__title').textContent='02 · Data Contract & Preparation';p.body.querySelector('.data-contract-info')?.remove();}
   if(!scope.active)return;
   // Existing Cases keep a read-only Model/Contract summary; a published
   // Model Version is immutable once linked to a Case.
@@ -136,7 +136,8 @@ export async function mountCaseSetup(root,{route,navigate,onContext}){
   horizon.append(el('p','Fechas inclusivas. El horizonte ofrece un punto de partida; se guardan las fechas concretas.','d-field__help'));
   for(const [input,label]of [[start,'Inicio'],[end,'Fin']]){input.setAttribute('aria-label',input.labels[0].textContent);input.labels[0].textContent=label;}
   if(!mathEditable)horizon.append(el('p',row?.context_frozen_at?'El horizonte, la modalidad y la política están congelados con la primera admisión.':'No tenés permiso para editar la modalidad, el horizonte ni la política.','d-field__help'));
-  const ownersGroup=decisionCard(caseRoot,'Responsable de la decisión','Asigná el owner que tendrá responsabilidad sobre este Case.','people');ownersGroup.append(el('p','La asignación usa las responsabilidades vigentes del Equipo. Sólo un Admin puede cambiar responsables.','d-field__help'));
+  const ownersGroup=decisionCard(caseRoot,'Responsable de la decisión','Asume la responsabilidad del Case.','people');ownersGroup.parentElement.classList.add('core-owner-card');
+  const ownerHelp=el('p','Elegí una persona con responsabilidad vigente de Decision Owner.','d-field__help');ownerHelp.hidden=!canAssign;ownersGroup.append(ownerHelp);
   const owners={};
   if(fresh)owners.initial=field(ownersGroup,'Decision Owner inicial (D1 y D2)',{name:'decision_owner_user_id',options:[['','Elegí un Decision Owner']],value:draft.decision_owner_user_id,required:canAssign});
   else for(const [id,label]of [['logistics_assignment','Decision Owner · Asignación de carga'],['logistics_scheduling','Decision Owner · Planificación de despachos']])owners[id]=field(ownersGroup,label,{name:'owner_'+id,options:[['','Sin asignar']],value:draft.owners[id].id});

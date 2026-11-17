@@ -1,0 +1,508 @@
+[
+  {
+    "width": 1536,
+    "scroll": 1536,
+    "client": 1536,
+    "scenario": ".platform-home__header-1536",
+    "contrast": {
+      "textCount": 66,
+      "minimumContrast": 4.531024205669996,
+      "failures": []
+    }
+  },
+  {
+    "width": 1536,
+    "scroll": 1536,
+    "client": 1536,
+    "scenario": ".dda-landing__hero-1536",
+    "contrast": {
+      "textCount": 103,
+      "minimumContrast": 5.743091435903668,
+      "failures": []
+    }
+  },
+  {
+    "width": 1280,
+    "scroll": 1280,
+    "client": 1280,
+    "scenario": ".platform-home__header-1280",
+    "contrast": {
+      "textCount": 66,
+      "minimumContrast": 4.531024205669996,
+      "failures": []
+    }
+  },
+  {
+    "width": 1280,
+    "scroll": 1280,
+    "client": 1280,
+    "scenario": ".dda-landing__hero-1280",
+    "contrast": {
+      "textCount": 103,
+      "minimumContrast": 5.743091435903668,
+      "failures": []
+    }
+  },
+  {
+    "width": 1024,
+    "scroll": 1024,
+    "client": 1024,
+    "scenario": ".platform-home__header-1024",
+    "contrast": {
+      "textCount": 66,
+      "minimumContrast": 4.531024205669996,
+      "failures": []
+    }
+  },
+  {
+    "width": 1024,
+    "scroll": 1024,
+    "client": 1024,
+    "scenario": ".dda-landing__hero-1024",
+    "contrast": {
+      "textCount": 103,
+      "minimumContrast": 5.743091435903668,
+      "failures": []
+    }
+  },
+  {
+    "width": 768,
+    "scroll": 768,
+    "client": 768,
+    "scenario": ".platform-home__header-768",
+    "contrast": {
+      "textCount": 66,
+      "minimumContrast": 4.531024205669996,
+      "failures": []
+    }
+  },
+  {
+    "width": 768,
+    "scroll": 768,
+    "client": 768,
+    "scenario": ".dda-landing__hero-768",
+    "contrast": {
+      "textCount": 103,
+      "minimumContrast": 5.743091435903668,
+      "failures": []
+    }
+  },
+  {
+    "width": 390,
+    "scroll": 390,
+    "client": 390,
+    "scenario": ".platform-home__header-390",
+    "contrast": {
+      "textCount": 66,
+      "minimumContrast": 4.531024205669996,
+      "failures": []
+    }
+  },
+  {
+    "width": 390,
+    "scroll": 390,
+    "client": 390,
+    "scenario": ".dda-landing__hero-390",
+    "contrast": {
+      "textCount": 103,
+      "minimumContrast": 5.743091435903668,
+      "failures": []
+    }
+  },
+  {
+    "width": 320,
+    "scroll": 320,
+    "client": 320,
+    "scenario": ".platform-home__header-320",
+    "contrast": {
+      "textCount": 66,
+      "minimumContrast": 4.531024205669996,
+      "failures": []
+    }
+  },
+  {
+    "width": 320,
+    "scroll": 320,
+    "client": 320,
+    "scenario": ".dda-landing__hero-320",
+    "contrast": {
+      "textCount": 103,
+      "minimumContrast": 5.743091435903668,
+      "failures": []
+    }
+  },
+  {
+    "width": 1536,
+    "scroll": 1536,
+    "client": 1536,
+    "scenario": "core1-1536",
+    "contrast": {
+      "textCount": 59,
+      "minimumContrast": 4.926760688731778,
+      "failures": []
+    }
+  },
+  {
+    "width": 1280,
+    "scroll": 1280,
+    "client": 1280,
+    "scenario": "core1-1280",
+    "contrast": {
+      "textCount": 59,
+      "minimumContrast": 4.926760688731778,
+      "failures": []
+    }
+  },
+  {
+    "width": 1024,
+    "scroll": 1024,
+    "client": 1024,
+    "scenario": "core1-1024",
+    "contrast": {
+      "textCount": 59,
+      "minimumContrast": 4.926760688731778,
+      "failures": []
+    }
+  },
+  {
+    "width": 768,
+    "scroll": 768,
+    "client": 768,
+    "scenario": "core1-768",
+    "contrast": {
+      "textCount": 59,
+      "minimumContrast": 4.926760688731778,
+      "failures": []
+    }
+  },
+  {
+    "width": 390,
+    "scroll": 390,
+    "client": 390,
+    "scenario": "core1-390",
+    "contrast": {
+      "textCount": 59,
+      "minimumContrast": 4.926760688731778,
+      "failures": []
+    }
+  },
+  {
+    "width": 320,
+    "scroll": 320,
+    "client": 320,
+    "scenario": "core1-320",
+    "contrast": {
+      "textCount": 59,
+      "minimumContrast": 4.926760688731778,
+      "failures": []
+    }
+  },
+  {
+    "width": 1536,
+    "scroll": 1536,
+    "client": 1536,
+    "scenario": "core2-1536",
+    "contrast": {
+      "textCount": 62,
+      "minimumContrast": 5.429139914708745,
+      "failures": []
+    }
+  },
+  {
+    "width": 1280,
+    "scroll": 1280,
+    "client": 1280,
+    "scenario": "core2-1280",
+    "contrast": {
+      "textCount": 62,
+      "minimumContrast": 5.429139914708745,
+      "failures": []
+    }
+  },
+  {
+    "width": 1024,
+    "scroll": 1024,
+    "client": 1024,
+    "scenario": "core2-1024",
+    "contrast": {
+      "textCount": 62,
+      "minimumContrast": 5.429139914708745,
+      "failures": []
+    }
+  },
+  {
+    "width": 768,
+    "scroll": 768,
+    "client": 768,
+    "scenario": "core2-768",
+    "contrast": {
+      "textCount": 62,
+      "minimumContrast": 5.429139914708745,
+      "failures": []
+    }
+  },
+  {
+    "width": 390,
+    "scroll": 390,
+    "client": 390,
+    "scenario": "core2-390",
+    "contrast": {
+      "textCount": 62,
+      "minimumContrast": 5.429139914708745,
+      "failures": []
+    }
+  },
+  {
+    "width": 320,
+    "scroll": 320,
+    "client": 320,
+    "scenario": "core2-320",
+    "contrast": {
+      "textCount": 62,
+      "minimumContrast": 5.429139914708745,
+      "failures": []
+    }
+  },
+  {
+    "width": 1536,
+    "scroll": 1536,
+    "client": 1536,
+    "scenario": "core3-1536",
+    "contrast": {
+      "textCount": 86,
+      "minimumContrast": 5.429139914708745,
+      "failures": []
+    }
+  },
+  {
+    "width": 1280,
+    "scroll": 1280,
+    "client": 1280,
+    "scenario": "core3-1280",
+    "contrast": {
+      "textCount": 86,
+      "minimumContrast": 5.429139914708745,
+      "failures": []
+    }
+  },
+  {
+    "width": 1024,
+    "scroll": 1024,
+    "client": 1024,
+    "scenario": "core3-1024",
+    "contrast": {
+      "textCount": 86,
+      "minimumContrast": 5.429139914708745,
+      "failures": []
+    }
+  },
+  {
+    "width": 768,
+    "scroll": 768,
+    "client": 768,
+    "scenario": "core3-768",
+    "contrast": {
+      "textCount": 86,
+      "minimumContrast": 5.429139914708745,
+      "failures": []
+    }
+  },
+  {
+    "width": 390,
+    "scroll": 390,
+    "client": 390,
+    "scenario": "core3-390",
+    "contrast": {
+      "textCount": 86,
+      "minimumContrast": 5.429139914708745,
+      "failures": []
+    }
+  },
+  {
+    "width": 320,
+    "scroll": 320,
+    "client": 320,
+    "scenario": "core3-320",
+    "contrast": {
+      "textCount": 86,
+      "minimumContrast": 5.429139914708745,
+      "failures": []
+    }
+  },
+  {
+    "width": 1536,
+    "scroll": 1536,
+    "client": 1536,
+    "scenario": "core3-zoom200",
+    "contrast": {
+      "textCount": 86,
+      "minimumContrast": 5.429139914708745,
+      "failures": []
+    }
+  },
+  {
+    "width": 1536,
+    "scroll": 1536,
+    "client": 1536,
+    "scenario": "core2-zoom200",
+    "contrast": {
+      "textCount": 62,
+      "minimumContrast": 5.429139914708745,
+      "failures": []
+    }
+  },
+  {
+    "width": 1536,
+    "scroll": 1536,
+    "client": 1536,
+    "scenario": "core1-zoom200",
+    "contrast": {
+      "textCount": 62,
+      "minimumContrast": 4.926760688731778,
+      "failures": []
+    }
+  },
+  {
+    "width": 1536,
+    "scroll": 1536,
+    "client": 1536,
+    "scenario": "graph-1536",
+    "contrast": {
+      "textCount": 33,
+      "minimumContrast": 5.429139914708745,
+      "failures": []
+    }
+  },
+  {
+    "width": 1536,
+    "scroll": 1536,
+    "client": 1536,
+    "scenario": "graph-open-1536",
+    "contrast": {
+      "textCount": 50,
+      "minimumContrast": 5.429139914708745,
+      "failures": []
+    }
+  },
+  {
+    "width": 1280,
+    "scroll": 1280,
+    "client": 1280,
+    "scenario": "graph-1280",
+    "contrast": {
+      "textCount": 33,
+      "minimumContrast": 5.429139914708745,
+      "failures": []
+    }
+  },
+  {
+    "width": 1280,
+    "scroll": 1280,
+    "client": 1280,
+    "scenario": "graph-open-1280",
+    "contrast": {
+      "textCount": 50,
+      "minimumContrast": 5.429139914708745,
+      "failures": []
+    }
+  },
+  {
+    "width": 1024,
+    "scroll": 1024,
+    "client": 1024,
+    "scenario": "graph-1024",
+    "contrast": {
+      "textCount": 33,
+      "minimumContrast": 5.429139914708745,
+      "failures": []
+    }
+  },
+  {
+    "width": 1024,
+    "scroll": 1024,
+    "client": 1024,
+    "scenario": "graph-open-1024",
+    "contrast": {
+      "textCount": 50,
+      "minimumContrast": 5.429139914708745,
+      "failures": []
+    }
+  },
+  {
+    "width": 768,
+    "scroll": 768,
+    "client": 768,
+    "scenario": "graph-768",
+    "contrast": {
+      "textCount": 33,
+      "minimumContrast": 5.429139914708745,
+      "failures": []
+    }
+  },
+  {
+    "width": 768,
+    "scroll": 768,
+    "client": 768,
+    "scenario": "graph-open-768",
+    "contrast": {
+      "textCount": 50,
+      "minimumContrast": 5.429139914708745,
+      "failures": []
+    }
+  },
+  {
+    "width": 390,
+    "scroll": 390,
+    "client": 390,
+    "scenario": "graph-390",
+    "contrast": {
+      "textCount": 33,
+      "minimumContrast": 5.429139914708745,
+      "failures": []
+    }
+  },
+  {
+    "width": 390,
+    "scroll": 390,
+    "client": 390,
+    "scenario": "graph-open-390",
+    "contrast": {
+      "textCount": 50,
+      "minimumContrast": 5.429139914708745,
+      "failures": []
+    }
+  },
+  {
+    "width": 320,
+    "scroll": 320,
+    "client": 320,
+    "scenario": "graph-320",
+    "contrast": {
+      "textCount": 33,
+      "minimumContrast": 5.429139914708745,
+      "failures": []
+    }
+  },
+  {
+    "width": 320,
+    "scroll": 320,
+    "client": 320,
+    "scenario": "graph-open-320",
+    "contrast": {
+      "textCount": 50,
+      "minimumContrast": 5.429139914708745,
+      "failures": []
+    }
+  },
+  {
+    "width": 1440,
+    "scroll": 1440,
+    "client": 1440,
+    "scenario": "graph-zoom200",
+    "contrast": {
+      "textCount": 33,
+      "minimumContrast": 5.429139914708745,
+      "failures": []
+    }
+  }
+]

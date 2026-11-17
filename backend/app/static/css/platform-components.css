@@ -240,20 +240,31 @@
   border:1px solid var(--color-border);border-radius:var(--product-hero-radius);
   background:var(--color-surface-subtle);overflow:hidden;
 }
-.d-product-hero>.d-product-hero__copy{grid-column:1;grid-row:1;align-self:start;min-width:0;max-width:none}
+.d-product-hero>.d-product-hero__copy{grid-column:1;grid-row:1;align-self:start;display:grid;gap:12px;min-width:0;max-width:none}
+/* UX08: one inner contract; the existing outer frame and illustrations stay intact. */
+.product-hero-topline{display:flex;align-items:baseline;justify-content:space-between;gap:8px;min-block-size:18px;min-inline-size:0}
+.product-hero-topline :is(.platform-home__eyebrow,.dda-landing__eyebrow){margin:0;color:var(--color-text-muted);font:600 11px/1.5 var(--font-sans);letter-spacing:.07em}
+.d-platform .platform-home__header.d-product-hero .d-page-title,.dda-landing .dda-landing__hero h1{margin:0;min-block-size:3.48em;font:700 clamp(28px,2.6vw,38px)/1.16 var(--font-sans);letter-spacing:-.03em;max-inline-size:none;text-wrap:balance}
+.d-platform .platform-home__header.d-product-hero .d-page-description,.dda-landing .dda-landing__hero-lead{margin:0;min-block-size:3.2em;max-inline-size:none;color:var(--color-text-secondary);font:400 14px/1.6 var(--font-sans)}
+.d-product-hero :is(.platform-home__hero-actions,.dda-landing__hero-actions){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:1fr;gap:12px;align-items:stretch;inline-size:min(100%,480px);max-inline-size:none;margin:0}
+.d-platform .platform-home__hero-actions .platform-hero-cta.d-button:not(.d-button--workflow),.dda-landing .dda-landing__hero-actions>.d-button{--platform-button-height:44px;box-sizing:border-box;inline-size:100%;min-inline-size:0;min-block-size:44px;padding:10px 16px;border-radius:var(--radius-control);gap:8px;justify-content:center;font:600 13px/1.4 var(--font-sans);white-space:normal}
+
 .d-product-hero>.d-product-hero__art{position:relative;inset:auto;z-index:0;grid-column:2;grid-row:1;align-self:stretch;display:block;min-width:0;min-height:0;pointer-events:none}
 .d-product-hero__art img{position:absolute;inset:0;display:block;inline-size:100%;block-size:100%;object-fit:contain;object-position:center}
 .d-product-hero>.d-product-hero__panel{position:relative;z-index:1;grid-column:1/-1;grid-row:2;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;min-width:0;margin:0;padding:0;list-style:none;border:1px solid var(--color-border);border-radius:var(--radius-md);background:color-mix(in srgb,var(--color-bg) 94%,transparent);overflow:hidden}
-.d-product-hero__panel>.d-product-hero__step{min-width:0;align-content:start;padding:var(--space-4);border:0;border-inline-end:1px solid var(--color-border);border-radius:0;background:transparent}
+.d-product-hero__panel>.d-product-hero__step{display:grid;grid-template-columns:20px minmax(0,1fr);gap:12px;min-width:0;align-content:start;padding:var(--space-4);border:0;border-inline-end:1px solid var(--color-border);border-radius:0;background:transparent}
 .d-product-hero__panel>.d-product-hero__step:last-child{border:0}
 .d-product-hero__panel .d-product-hero__label{display:block;margin:0;color:var(--color-text);font-size:13px;font-weight:600;line-height:1.5;letter-spacing:0}
 .d-product-hero__panel .d-product-hero__detail{display:block;margin:4px 0 0;color:var(--color-text-secondary);font-size:13px;font-weight:400;line-height:1.5;overflow-wrap:anywhere}
-.platform-home__chain .d-product-hero__detail{margin:0}
+.d-product-hero__panel>.d-product-hero__step>div{min-inline-size:0}
 @media(max-width:1100px){
   .d-product-hero{--product-hero-height:560px}
   .d-product-hero.d-page-hero,.d-platform .platform-entry-hero.d-product-hero{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);column-gap:var(--space-2)}
 }
 @media(max-width:700px){
+  .product-hero-topline{flex-wrap:wrap}
+  .d-platform .platform-home__header.d-product-hero .d-page-title,.dda-landing .dda-landing__hero h1{min-block-size:0}
+  .d-product-hero :is(.platform-home__hero-actions,.dda-landing__hero-actions){grid-template-columns:minmax(0,1fr)}
   .d-product-hero{--product-hero-height:0px;--product-hero-padding:var(--space-5)}
   .d-product-hero.d-page-hero,.d-platform .platform-entry-hero.d-product-hero{grid-template-columns:minmax(0,1fr)}
   .d-product-hero>.d-product-hero__art{display:none}

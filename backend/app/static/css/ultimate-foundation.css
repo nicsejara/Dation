@@ -197,22 +197,24 @@
 .ultimate-core-setup.d-platform .data-contract-download { inline-size:100%; min-block-size:48px; display:flex; align-items:center; justify-content:center; gap:12px; font-size:16px; padding:10px 14px; }
 .ultimate-core-setup .data-contract-download svg { inline-size:24px; block-size:24px; }
 .data-contract-step .data-contract-error { margin:0; font-size:13px; line-height:1.5; }
-.data-contract-fields,.data-contract-technical { min-inline-size:0; }
+.data-contract-fields { min-inline-size:0; }
 .data-contract-toggle { display:flex; align-items:center; gap:12px; padding:10px 12px; list-style:none; border:1px solid var(--color-border-strong); border-radius:8px; cursor:pointer; font-size:14px; font-weight:600; color:var(--color-text); }
 .data-contract-toggle::-webkit-details-marker { display:none; }
 .data-contract-chevron { inline-size:7px; block-size:7px; border-block-end:2px solid currentColor; border-inline-end:2px solid currentColor; transform:rotate(-45deg); flex-shrink:0; margin-inline:2px 4px; }
-.data-contract-fields[open] > summary .data-contract-chevron,.data-contract-technical[open] > summary .data-contract-chevron { transform:rotate(45deg); }
+.data-contract-fields[open] > summary .data-contract-chevron { transform:rotate(45deg); }
 .data-contract-fields[open] > summary { border-color:transparent; border-block-start-color:var(--color-border-strong); border-radius:0; padding-inline:2px; }
 .data-contract-table-wrap { max-inline-size:100%; min-inline-size:0; max-block-size:340px; overflow:auto; border:1px solid var(--color-border); border-radius:8px; margin-block:4px 12px; }
-.data-contract-table-wrap table { inline-size:100%; min-inline-size:420px; border-collapse:collapse; table-layout:fixed; font-size:12px; line-height:1.5; }
+.data-contract-table-wrap table { display:grid;grid-template-columns:31% 37% 32%;inline-size:100%;min-inline-size:420px;border-collapse:collapse;font-size:12px;line-height:1.5; }
+.data-contract-table-wrap :is(thead,tbody) { display:grid;grid-column:1/-1;grid-template-columns:subgrid; }
+.data-contract-table-wrap tbody { grid-auto-rows:1fr; }
+.data-contract-table-wrap tr { display:grid;grid-column:1/-1;grid-template-columns:subgrid; }
+.data-contract-table-wrap thead { position:sticky;inset-block-start:0;z-index:1; }
 .data-contract-table-wrap th { position:sticky; inset-block-start:0; padding:10px 12px; background:var(--color-surface-strong); color:var(--color-text); text-align:start; z-index:1; }
-.data-contract-table-wrap th:nth-child(1) { inline-size:36%; }
-.data-contract-table-wrap th:nth-child(2) { inline-size:40%; }
-.data-contract-table-wrap td { padding:9px 10px; border-block-end:1px solid var(--color-border); vertical-align:top; color:var(--color-text-secondary); overflow-wrap:anywhere; }
+.data-contract-table-wrap td { padding:9px 10px; border-block-end:1px solid var(--color-border); vertical-align:middle; color:var(--color-text-secondary); overflow-wrap:anywhere;min-inline-size:0;align-content:center; }
 .data-contract-table-wrap code { color:var(--color-text); font-size:11px; }
-.data-contract-condition { display:inline-block; padding:2px 7px; border-radius:7px; color:var(--color-text-accent); background:color-mix(in srgb,var(--color-text-accent) 9%,var(--color-surface)); }
-.data-contract-technical > summary { font-size:12px; }
-.data-contract-technical pre { box-sizing:border-box; max-inline-size:100%; max-block-size:340px; overflow:auto; padding:12px; border:1px solid var(--color-border); border-radius:8px; background:var(--color-bg); color:var(--color-text-secondary); font-size:11px; line-height:1.6; white-space:pre; }
+.data-contract-condition { display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;min-inline-size:78px;min-block-size:24px;padding:2px 7px; border-radius:7px; color:var(--color-text-accent); background:color-mix(in srgb,var(--color-text-accent) 9%,var(--color-surface)); }
+.data-contract-condition-detail { display:block;line-height:1.5;font-size:12px;margin-block-start:5px; }
+@media(max-width:700px){.data-contract-table-wrap tbody{grid-auto-rows:auto}}
 .data-contract-info { display:flex; gap:18px; align-items:start; padding:18px 20px; border:1px solid var(--color-border-strong); border-radius:10px; background:color-mix(in srgb,var(--color-text-accent) 5%,var(--color-surface)); }
 .data-contract-info > svg { color:var(--color-text-accent); }
 .data-contract-info > div { display:grid; gap:6px; min-inline-size:0; }
@@ -246,7 +248,9 @@
  .data-contract-card__header h3 { font-size:19px; }
  .data-contract-tile { inline-size:46px; block-size:46px; }
  .data-contract-step .data-contract-description { font-size:13px; }
- .data-contract-info { padding:16px; gap:12px; }
+ .data-contract-condition-detail { display:block;line-height:1.5;font-size:12px;margin-block-start:5px; }
+@media(max-width:700px){.data-contract-table-wrap tbody{grid-auto-rows:auto}}
+.data-contract-info { padding:16px; gap:12px; }
  .data-contract-info > svg { inline-size:24px; block-size:24px; }
  .data-contract-footer { margin-inline:-12px; padding:18px 16px; }
  .data-contract-footer > .d-button { inline-size:100%; justify-content:center; }
@@ -456,18 +460,20 @@
 :is(.ultimate-core-setup.unified-journey,.ux05-command-center) .d-eyebrow { margin:0;color:var(--color-text-muted);font:500 var(--platform-type-eyebrow)/1.4 var(--font-sans);letter-spacing:.02em;text-transform:none; }
 :is(.ultimate-core-setup.unified-journey,.ux05-command-center) .d-page-title { margin:0;font-size:clamp(28px,2.4vw,36px);line-height:1.2; }
 :is(.ultimate-core-setup.unified-journey,.ux05-command-center) .d-page-description { margin:0;max-inline-size:none;color:var(--color-text-secondary);font:400 var(--platform-type-description)/var(--platform-line-body) var(--font-sans); }
-.unified-journey .journey-step-header { display:grid;grid-template-columns:64px minmax(0,1fr) auto;align-items:center;gap:16px;min-block-size:176px;padding:20px 22px;box-sizing:border-box; }
+.unified-journey .ultimate-disclosure>.journey-step-header { display:grid;grid-template-columns:64px minmax(0,1fr) auto;align-items:center;gap:16px;min-block-size:176px;padding:20px 22px;box-sizing:border-box; }
 .unified-journey .journey-step-tile { display:grid;place-items:center;inline-size:64px;block-size:64px;border-radius:10px;flex-shrink:0;color:var(--color-text-accent);background:color-mix(in srgb,var(--color-text-accent) 10%,var(--color-surface)); }
 .unified-journey .journey-step-tile svg { inline-size:28px;block-size:28px; }
 .unified-journey .journey-step-heading { display:grid;gap:6px;min-inline-size:0;flex-basis:auto; }
 .unified-journey .journey-step-heading .ultimate-disclosure__title { font-size:22px;line-height:1.25;min-block-size:55px;display:flex;align-items:center; }
 .unified-journey .journey-step-heading>p { margin:0;font-size:13px;line-height:1.5;min-block-size:59px;color:var(--color-text-secondary); }
-.unified-journey .journey-step-header .ultimate-disclosure__status { margin:0;max-inline-size:144px;align-self:start;justify-self:end;white-space:normal; }
+.unified-journey .ultimate-disclosure>.journey-step-header .ultimate-disclosure__status { display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;inline-size:180px;min-inline-size:0;max-inline-size:100%;min-block-size:36px;margin:0;padding:7px 10px;border:1px solid var(--color-border-strong);border-radius:8px;background:var(--color-surface-raised);font-size:12px;line-height:1.4;font-weight:600;text-align:center;align-self:start;justify-self:end;white-space:normal; }
+.unified-journey .ultimate-disclosure>.journey-step-header .ultimate-disclosure__status[data-state=ready] { border-color:color-mix(in srgb,var(--color-success) 45%,var(--color-border));background:color-mix(in srgb,var(--color-success) 8%,var(--color-surface)); }
+.unified-journey .ultimate-disclosure>.journey-step-header .ultimate-disclosure__status[data-state=error] { border-color:color-mix(in srgb,var(--color-danger) 45%,var(--color-border));background:color-mix(in srgb,var(--color-danger) 8%,var(--color-surface)); }
 
 .unified-journey .journey-step-footer {
- --step-progress-size:44px;display:grid;grid-template-columns:44px minmax(0,1fr) minmax(220px,34%);
- grid-template-rows:minmax(96px,auto) minmax(20px,auto);align-items:center;gap:8px 18px;
- inline-size:100%;min-inline-size:0;min-block-size:164px;margin:0;padding:18px 22px;box-sizing:border-box;
+ --step-progress-size:44px;display:grid;grid-template-columns:44px minmax(0,1fr) auto;
+ grid-template-rows:minmax(64px,auto) minmax(20px,auto);align-items:center;gap:6px 18px;
+ inline-size:100%;min-inline-size:0;min-block-size:128px;margin:0;padding:16px 22px;box-sizing:border-box;
  background:var(--color-surface-raised);border-block-start:1px solid var(--color-border);border-radius:0 0 12px 12px;
 }
 .unified-journey.d-platform .journey-step-footer>[data-journey-previous] { grid-column:1;grid-row:1;display:grid;place-items:center;inline-size:44px;block-size:44px;min-block-size:44px;padding:0;border:1px solid var(--color-control-border);border-radius:9px;background:var(--color-surface);color:var(--color-text); }
@@ -476,8 +482,8 @@
 .unified-journey :is(.model-wizard-ring,.data-contract-ring,.decision-case-ring) { inline-size:var(--step-progress-size,44px);block-size:var(--step-progress-size,44px);box-sizing:border-box;flex:0 0 var(--step-progress-size,44px); }
 .unified-journey .journey-step-footer :is(.model-wizard-progress,.data-contract-progress,.decision-case-progress)>div { min-inline-size:0; }
 .unified-journey .journey-step-footer :is(strong,p) { overflow-wrap:anywhere; }
-.unified-journey .journey-step-actions { grid-column:3;grid-row:1;display:grid;gap:8px;min-inline-size:0; }
-.unified-journey.d-platform .journey-step-footer .journey-step-actions>button { inline-size:100%;min-block-size:44px;padding:10px 14px;font-size:14px;line-height:1.4;justify-content:center;white-space:normal; }
+.unified-journey .journey-step-actions { grid-column:3;grid-row:1;display:flex;align-items:center;gap:10px;min-inline-size:0; }
+.unified-journey.d-platform .journey-step-footer .journey-step-actions>button { inline-size:auto;min-inline-size:0;min-block-size:44px;padding:10px 14px;font-size:13px;line-height:1.4;justify-content:center;white-space:normal; }
 .unified-journey .journey-step-footer>p[role] { grid-column:2/-1;grid-row:2;margin:0;min-block-size:20px;font-size:12px; }
 .unified-journey .journey-step-footer>p[role]:empty { display:none; }
 @media(max-width:1199px){
@@ -488,18 +494,21 @@
 }
 @container core-setup (max-width:700px){
  .journey-context-return { margin-inline-start:0;max-inline-size:100%; }
- .unified-journey .journey-step-header { grid-template-columns:48px minmax(0,1fr);gap:12px;min-block-size:144px;padding:16px; }
+ .unified-journey .ultimate-disclosure>.journey-step-header { grid-template-columns:48px minmax(0,1fr);gap:12px;min-block-size:144px;padding:16px; }
  .unified-journey .journey-step-tile { inline-size:48px;block-size:48px; }
  .unified-journey .journey-step-heading .ultimate-disclosure__title { min-block-size:0;font-size:20px; }
  .unified-journey .journey-step-heading>p { min-block-size:0; }
- .unified-journey .journey-step-header .ultimate-disclosure__status { grid-column:2;justify-self:start; }
+ .unified-journey .ultimate-disclosure>.journey-step-header .ultimate-disclosure__status { grid-column:2;justify-self:start; }
  .unified-journey .journey-step-footer { grid-template-columns:44px minmax(0,1fr);grid-template-rows:auto auto minmax(20px,auto);padding:18px 16px; }
  .unified-journey .journey-step-footer>:is(.model-wizard-progress,.data-contract-progress,.decision-case-progress) { grid-column:1/-1;grid-row:1; }
  .unified-journey.d-platform .journey-step-footer>[data-journey-previous] { grid-column:1;grid-row:2; }
- .unified-journey .journey-step-actions { grid-column:2;grid-row:2; }
+ .unified-journey .journey-step-actions { grid-column:2;grid-row:2;flex-direction:column;align-items:stretch; }
  .unified-journey .journey-step-footer>p[role] { grid-column:1/-1;grid-row:3; }
 }
 
+.unified-journey .model-wizard-footer { margin-block-start:18px; }
+.unified-journey .decision-case-progress p:not([data-dation-test=case-progress]) { display:none; }
+.unified-journey .journey-step-footer { border-inline:0;border-block-end:0; }
 .unified-journey .data-contract-ring { border-width:6px; }
 .unified-journey .journey-step-footer :is(.model-wizard-progress,.data-contract-progress,.decision-case-progress) strong { font-size:15px;line-height:1.4;font-weight:650; }
 .unified-journey .journey-step-footer :is(.model-wizard-progress,.data-contract-progress,.decision-case-progress) p { font-size:12px;line-height:1.5;margin:4px 0 0; }
@@ -507,4 +516,24 @@
 /* Narrow rails stack the same three cards rather than breaking stage names into fragments. */
 @container stage-layout (max-width:440px){
  .unified-journey .core-wizard,.journey-studio-layout { --stage-columns:minmax(0,1fr);--stage-card-columns:var(--stage-badge-size) minmax(0,1fr);--stage-card-height:128px;--stage-card-padding:12px;--stage-copy-size:14px;--stage-lines:block; }
+}
+
+/* UX08: the same visual owner card; each owner keeps its existing assignment logic. */
+.ultimate-core-setup .core-owner-card { box-sizing:border-box;min-block-size:176px;padding:18px;gap:24px;grid-template-columns:minmax(230px,32%) minmax(0,1fr); }
+.ultimate-core-setup .core-owner-card .decision-case-rail h3 { margin:2px 0 6px;font-size:16px;line-height:1.4; }
+.ultimate-core-setup .core-owner-card .decision-case-rail p { margin:0;font-size:12px;line-height:1.6;color:var(--color-text-secondary); }
+.ultimate-core-setup .core-owner-card .decision-case-tile { inline-size:48px;block-size:48px;flex:0 0 48px; }
+.ultimate-core-setup .core-owner-card .decision-case-controls { align-content:start;gap:8px 18px; }
+.ultimate-core-setup .journey-data-owner .d-field,.ultimate-core-setup .core-owner-card .decision-case-controls>.d-field:only-of-type,.ultimate-core-setup .core-owner-card .core-owner-alternatives { grid-column:1/-1; }
+.ultimate-core-setup .core-owner-card .d-field { min-inline-size:0;gap:5px; }
+.ultimate-core-setup .core-owner-card select { inline-size:100%;min-block-size:40px;font-size:13px; }
+.ultimate-core-setup .core-owner-card .d-field__help { margin:0;font-size:12px;line-height:1.5; }
+.core-owner-alternatives { display:grid;justify-items:start;gap:8px;min-inline-size:0; }
+.ultimate-core-setup .core-owner-alternatives>button { min-block-size:44px;padding:6px 0;font-size:12px;border-color:transparent;background:transparent;color:var(--color-text-accent); }
+.core-owner-alternatives .journey-resume-list { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;inline-size:100%; }
+.core-owner-alternatives .journey-resume-list button { min-inline-size:0;white-space:normal;font-size:12px; }
+@container core-setup (max-width:700px){
+ .ultimate-core-setup .core-owner-card { grid-template-columns:minmax(0,1fr); }
+ .core-owner-card .decision-case-rail { border-inline-end:0;border-block-end:1px solid var(--color-border);padding:0 0 14px; }
+ .core-owner-alternatives .journey-resume-list { grid-template-columns:minmax(0,1fr); }
 }

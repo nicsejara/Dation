@@ -44,6 +44,20 @@ class DataContractWizardTests(unittest.IsolatedAsyncioTestCase):
     def action(self,entity):return self.card(entity).get_by_role('button',name='Descargar template de '+('Órdenes / Demanda' if entity==DEMAND else 'Flota / Recursos'),exact=True)
     def next(self):return self.page.get_by_role('button',name='Continuar a Decision Case',exact=True)
 
+    async def retained_contracts(self,contracts,source):
+        # Render the actual compiler response frozen, with the existing callback.
+        # The technical payload must survive without exposing raw JSON in the UI.
+        return await self.page.evaluate("""async({contracts,source})=>{
+            const {mountDataContractView}=await import('/static/js/dispatch/models/data-contract-view.mjs');
+            const {collapsibleSection}=await import('/static/js/dispatch/models/forms.mjs');
+            const {createScope}=await import('/static/js/dispatch/lifecycle.mjs');
+            const host=document.createElement('div'),scope=createScope(host);
+            const freeze=n=>{if(n&&typeof n==='object'){Object.values(n).forEach(freeze);Object.freeze(n);}return n;};
+            const pair=freeze({contracts,provisional:false});let retained;
+            const view=mountDataContractView(collapsibleSection(host,'Contrato','Descripción'),scope,{onContracts:data=>retained=structuredClone(data.contracts)});
+            view.render(pair,source);scope.dispose();return retained;
+        }""",{'contracts':contracts,'source':source})
+
     async def selected(self):
         m,v=await self.model();await self.open('/app/ddas/logistics/case')
         await select_model(self.page,m['model']['id'],v['version']['id'])
@@ -93,7 +107,7 @@ class DataContractWizardTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(await self.api('GET','/api/platform/logistics-models/'+m['model']['id']),before)
         await expect(self.next()).to_be_enabled()
 
-    async def test_03_single_independent_toggles_human_conditions_and_lossless_technical(self):
+    async def test_03_single_independent_toggles_human_conditions_and_lossless_contracts(self):
         _,_,source=await self.selected();contracts=(await self.api('POST','/api/platform/logistics-models/contract-preview',source))['contracts']
         count=len(self.calls);other=await self.card(RESOURCES).bounding_box()
         for entity in [DEMAND,RESOURCES]:
@@ -109,11 +123,8 @@ class DataContractWizardTests(unittest.IsolatedAsyncioTestCase):
         for key,condition in [('resource_id','Requerido'),('base_origin_id','Requerido cuando el recurso es propio'),('maximum_pallets','Opcional'),('trip_rate','Opcional · Aplica cuando el recurso es externo y la tarifa es por viaje')]:
             row=self.fields(RESOURCES).get_by_role('row').filter(has=self.page.get_by_role('cell',name=key,exact=True))
             self.assertEqual(await row.locator('td').nth(2).text_content(),condition)
-        for entity in [DEMAND,RESOURCES]:
-            technical=self.fields(entity).locator('.data-contract-technical')
-            self.assertFalse(await technical.evaluate('n=>n.open'))
-            await technical.locator('> summary').click()
-            self.assertEqual(json.loads(await technical.locator('pre').text_content()),contracts[entity])
+        self.assertEqual(await self.page.locator('.data-contract-technical,.data-contract-fields pre').count(),0)
+        self.assertEqual(await self.retained_contracts(contracts,source),contracts)
         self.assertEqual(len(self.calls),count)
 
     async def test_04_download_error_is_local_and_double_click_does_not_duplicate(self):
@@ -173,14 +184,17 @@ class DataContractWizardTests(unittest.IsolatedAsyncioTestCase):
         await self.fields(DEMAND).locator('> summary').click()
         row=self.fields(DEMAND).get_by_role('row').filter(has=self.page.get_by_role('cell',name=unknown,exact=True))
         self.assertEqual(await row.locator('td').nth(1).text_content(),'Campo «'+unknown+'» del contrato seleccionado')
-        self.assertEqual(await row.locator('td').nth(2).text_content(),'Requerido según condición técnica')
+        self.assertEqual(await row.locator('td').nth(2).text_content(),'Requerido cuando future_condition: any: x, y')
         self.assertFalse(await self.page.evaluate('!!window.contractInjected'));self.assertEqual(await self.card(DEMAND).locator('img,script').count(),0)
-        await self.fields(DEMAND).locator('.data-contract-technical > summary').click()
-        spec=json.loads(await self.fields(DEMAND).locator('pre').text_content())
+        self.assertEqual(await self.page.locator('.data-contract-technical,.data-contract-fields pre').count(),0)
+        source={'model_id':m['model']['id'],'version_id':v['version']['id']}
+        contracts=(await self.api('POST','/api/platform/logistics-models/contract-preview',source))['contracts']
+        contracts[DEMAND]['fields'].append(dict(contracts[DEMAND]['fields'][0],public_header=unknown,semantic_key='future_field',nullable=False,applies_when={'future_condition':{'any':['x','y']}},validation={'future_rule':{'minimum':0,'pattern':'<script>exact</script>'}}))
+        spec=(await self.retained_contracts(contracts,source))[DEMAND]
         self.assertEqual(spec['fields'][-1]['applies_when'],{'future_condition':{'any':['x','y']}})
         self.assertEqual(spec['fields'][-1]['validation'],{'future_rule':{'minimum':0,'pattern':'<script>exact</script>'}})
         result=await self.page.evaluate("""async()=>{const m=await import('/static/js/dispatch/models/data-contract-view.mjs');return [m.fieldDescription({public_header:'__proto__'}),m.fieldCondition({nullable:true,applies_when:{source:'UNKNOWN'}}),m.fieldCondition({nullable:false,applies_when:{cost_model:'PER_KM'}})];}""")
-        self.assertEqual(result,['Campo «__proto__» del contrato seleccionado','Opcional según condición técnica','Requerido cuando la tarifa es por kilómetro'])
+        self.assertEqual(result,['Campo «__proto__» del contrato seleccionado','Opcional · Aplica cuando source: UNKNOWN','Requerido cuando la tarifa es por kilómetro'])
 
     async def test_07_existing_case_uses_unchanged_contracts_and_downloads(self):
         _,_,case=await self.case();cid=case['case']['id'];before=await self.api('GET','/api/platform/logistics-cases/'+cid+'/context')
@@ -251,8 +265,9 @@ class DataContractWizardTests(unittest.IsolatedAsyncioTestCase):
         await self.page.evaluate('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))')
         await expect(self.next()).to_be_enabled();await self.fields(DEMAND).locator('> summary').click()
         self.assertNotIn('demand_weight_kg',await self.fields(DEMAND).locator('tbody td:first-child').all_text_contents())
-        await self.fields(DEMAND).locator('.data-contract-technical > summary').click()
-        self.assertEqual(json.loads(await self.fields(DEMAND).locator('pre').text_content())['model_version_id'],source['version_id'])
+        self.assertEqual(await self.page.locator('.data-contract-technical,.data-contract-fields pre').count(),0)
+        await self.download(DEMAND)
+        self.assertEqual([body for method,path,body in self.calls if '/templates/'+DEMAND in path][-1],source)
 
     async def test_10_download_from_previous_version_is_discarded_after_switch(self):
         a,av=await self.model();b,bv=await self.weight_model();await self.open('/app/ddas/logistics/case')
