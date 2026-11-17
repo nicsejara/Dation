@@ -32,8 +32,12 @@ export function mountSetupSteps(form,panels,{fresh,available,unified=false,initi
   if(!footer){footer=el('footer',undefined,'journey-sequential-footer');panel.append(footer);}
   if(index<2)panel.append(footer);
   const actions=el('div',undefined,'journey-step-actions');for(const action of footer.querySelectorAll(':scope > button'))actions.append(action);
-  const feedback=panel.querySelector('.model-wizard-feedback');if(feedback)footer.append(feedback);
-  footer.classList.add('journey-step-footer');footer.prepend(previous);footer.append(actions);
+  const context=el('div',undefined,'journey-step-context');
+  for(const note of footer.querySelectorAll(':scope > p[role]'))context.append(note);
+  const feedback=panel.querySelector('.model-wizard-feedback');if(feedback)context.append(feedback);
+  // Move the existing live preparation copy, keeping its update reference intact.
+  if(index===1){const copy=footer.querySelector('.data-contract-progress .d-metadata');if(copy)context.append(copy);}
+  footer.classList.add('journey-step-footer');footer.prepend(previous);footer.append(context,actions);
  });
  if(!available(active))active=0;show(active,false,{history:'replace',force:true});
  return {show,update,workspace,get active(){return active;}};

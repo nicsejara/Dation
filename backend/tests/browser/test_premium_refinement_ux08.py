@@ -116,7 +116,7 @@ class JourneyRefinementTests(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(round(d['ring']['width']),44);self.assertEqual(round(d['ring']['height']),44)
                 self.assertLess(max(c['height'] for c in d['cards'])-min(c['height'] for c in d['cards']),2,d)
                 if step in [2,3]:
-                    owner=self.page.locator('[data-dation-test=core-'+{2:'contract',3:'case'}[step]+'] .core-owner-card')
+                    owner=self.page.locator('[data-dation-test=preparation-owner-card]' if step==2 else '[data-dation-test=core-case] .core-owner-card')
                     owner_metrics.append(await owner.evaluate("""(n,meta)=>{const r=x=>x.getBoundingClientRect().toJSON();return {...meta,card:r(n),rail:r(n.querySelector('.decision-case-rail')),select:r(n.querySelector('select')),label:getComputedStyle(n.querySelector('label')).fontSize}}""",{'step':step,'width':width}))
                 metrics.append(d)
                 if width in [1536,390]:await capture(self.page,'core'+str(step)+'-'+str(width))
@@ -134,7 +134,7 @@ class JourneyRefinementTests(unittest.IsolatedAsyncioTestCase):
         await expect(self.page.locator('[data-journey-next]')).to_be_disabled();await expect(self.page.locator('[data-journey-skip]')).to_have_text('Continuar sin datos')
         await self.attach('transport_demand');await self.attach('transport_resources');await expect(self.page.locator('[data-journey-next]')).to_be_enabled()
         await expect(self.page.locator('[data-dation-test=preparation-owner-card]')).to_contain_text('Responsable de datos')
-        await expect(self.page.get_by_role('button',name='Otras preparaciones',exact=True)).to_be_visible()
+        await expect(self.page.get_by_role('button',name='Ver sesiones',exact=True)).to_be_visible()
         await expect(self.page.locator('.data-contract-info,.data-contract-technical')).to_have_count(0)
         await self.page.locator('[data-dation-test=contract-fields-transport_resources] > summary').click()
         table_metrics=[]
@@ -153,9 +153,9 @@ class JourneyRefinementTests(unittest.IsolatedAsyncioTestCase):
         for width in [1536,1280]:
             owners=[o for o in owner_metrics if o['width']==width]
             self.assertEqual(len(owners),2)
-            for key in ['card','rail','select']:
-                self.assertAlmostEqual(owners[0][key]['width'],owners[1][key]['width'],delta=1,msg=owners)
-                self.assertAlmostEqual(owners[0][key]['height'],owners[1][key]['height'],delta=1,msg=owners)
+            # UX09 narrows Data Owner to 2/3; the control/type family is preserved.
+            self.assertAlmostEqual(owners[0]['card']['width'],(owners[1]['card']['width']-16)*2/3,delta=1,msg=owners)
+            self.assertAlmostEqual(owners[0]['select']['height'],owners[1]['select']['height'],delta=1,msg=owners)
             self.assertEqual(owners[0]['label'],owners[1]['label'])
             ds=[m for m in metrics if m['width']==width]
             self.assertLess(max(m['header']['height'] for m in ds)-min(m['header']['height'] for m in ds),2,ds)
@@ -230,15 +230,17 @@ class JourneyRefinementTests(unittest.IsolatedAsyncioTestCase):
         await self.page.goto(self.base+'/app/ddas/logistics/case',wait_until='domcontentloaded')
         await self.ready(1);await select_model(self.page,m['model']['id'],v['version']['id']);await self.ready(2)
         await expect(self.page.locator('[data-journey-skip]')).to_be_enabled()
-        picker=self.page.get_by_role('button',name='Otras preparaciones',exact=True)
-        await picker.click();await expect(self.page.locator('.journey-resume-list button')).to_have_count(0)
-        await expect(self.page.locator('.journey-resume-list')).to_contain_text('No hay otras preparaciones')
+        picker=self.page.get_by_role('button',name='Ver sesiones',exact=True)
+        await expect(self.page.locator('#journey-session-availability')).to_contain_text('No hay otras sesiones')
+        await expect(picker).to_be_disabled()
         alternate=str(uuid4());await self.api('POST','/api/platform/data-preparations',{'id':alternate,'model_version_id':v['version']['id']})
+        await self.page.evaluate("dispatchEvent(new Event('focus'))");await expect(self.page.locator('#journey-session-availability')).to_have_text('1 sesión disponible')
         await picker.click();await expect(self.page.locator('.journey-resume-list button')).to_have_count(1)
         for parent in [None]:
             await self.api('POST','/api/platform/data-preparations',{'id':str(uuid4()),'model_version_id':v['version']['id'],'parent_case_id':parent})
         other,other_version=await self.model('Versión incompatible UX08')
         await self.api('POST','/api/platform/data-preparations',{'id':str(uuid4()),'model_version_id':other_version['version']['id']})
+        await self.page.evaluate("dispatchEvent(new Event('focus'))");await expect(self.page.locator('#journey-session-availability')).to_have_text('2 sesiones disponibles')
         await picker.click();await expect(self.page.locator('.journey-resume-list button')).to_have_count(2)
         labels=await self.page.locator('.journey-resume-list button').all_text_contents()
         self.assertTrue(all('Borrador' in label and '2026-' not in label for label in labels),labels)
@@ -248,6 +250,7 @@ class JourneyRefinementTests(unittest.IsolatedAsyncioTestCase):
         async with self.page.expect_response(lambda r:r.request.method=='PUT' and '/'+alternate+'/owner' in r.url) as response:
             await self.page.get_by_label('Data Owner',exact=True).select_option(ux06.setup.ADMIN)
         self.assertTrue((await response.value).ok)
+        await expect(self.page.locator('#journey-session-availability')).not_to_contain_text('Consultando')
         raw=await self.request('POST','/api/platform/logistics-models/contract-preview/templates/transport_demand',{'model_id':m['model']['id'],'version_id':v['version']['id']})
         host=self.page.locator('[data-preparation-entity=transport_demand]')
         await host.locator('input[type=file]').set_input_files({'name':'pending.csv','mimeType':'text/csv','buffer':await raw.body()})

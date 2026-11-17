@@ -1,0 +1,291 @@
+{
+  "baseline_sha": "d2abe7f69e411fece0f44207fb720c2c682666da",
+  "unit": "CSS px",
+  "normal_footers": [
+    {
+      "step": 1,
+      "viewport": 1536,
+      "before_height": 128,
+      "after_height": 96,
+      "width": 1002,
+      "rows": "71px",
+      "previous": {
+        "x": 523,
+        "y": 1077.546875,
+        "width": 44,
+        "height": 44
+      },
+      "ring": {
+        "x": 579,
+        "y": 1077.53125,
+        "width": 44,
+        "height": 44
+      }
+    },
+    {
+      "step": 2,
+      "viewport": 1536,
+      "before_height": 128,
+      "after_height": 96,
+      "width": 1002,
+      "rows": "71px",
+      "previous": {
+        "x": 523,
+        "y": 874.75,
+        "width": 44,
+        "height": 44
+      },
+      "ring": {
+        "x": 579,
+        "y": 874.75,
+        "width": 44,
+        "height": 44
+      }
+    },
+    {
+      "step": 3,
+      "viewport": 1536,
+      "before_height": 128,
+      "after_height": 96,
+      "width": 1002,
+      "rows": "71px",
+      "previous": {
+        "x": 523,
+        "y": 1006.34375,
+        "width": 44,
+        "height": 44
+      },
+      "ring": {
+        "x": 579,
+        "y": 1006.328125,
+        "width": 44,
+        "height": 44
+      }
+    },
+    {
+      "step": 1,
+      "viewport": 1280,
+      "before_height": null,
+      "after_height": 96,
+      "width": 746,
+      "rows": "71px",
+      "previous": {
+        "x": 523,
+        "y": 1385.875,
+        "width": 44,
+        "height": 44
+      },
+      "ring": {
+        "x": 579,
+        "y": 1385.875,
+        "width": 44,
+        "height": 44
+      }
+    },
+    {
+      "step": 2,
+      "viewport": 1280,
+      "before_height": null,
+      "after_height": 96,
+      "width": 746,
+      "rows": "71px",
+      "previous": {
+        "x": 523,
+        "y": 1757.421875,
+        "width": 44,
+        "height": 44
+      },
+      "ring": {
+        "x": 579,
+        "y": 1757.421875,
+        "width": 44,
+        "height": 44
+      }
+    },
+    {
+      "step": 3,
+      "viewport": 1280,
+      "before_height": null,
+      "after_height": 96,
+      "width": 746,
+      "rows": "71px",
+      "previous": {
+        "x": 523,
+        "y": 1829.65625,
+        "width": 44,
+        "height": 44
+      },
+      "ring": {
+        "x": 579,
+        "y": 1829.65625,
+        "width": 44,
+        "height": 44
+      }
+    }
+  ],
+  "cards": [
+    {
+      "viewport": 1536,
+      "owner": {
+        "x": 519,
+        "y": 608.484375,
+        "width": 633.328125,
+        "height": 217.765625
+      },
+      "sessions": {
+        "x": 1168.328125,
+        "y": 608.484375,
+        "width": 316.65625,
+        "height": 217.765625
+      },
+      "owner_width_fraction": 0.6666721492129805,
+      "footer_gap": 22.0,
+      "select_height": 40,
+      "padding": "18px",
+      "radius": "11px",
+      "header_font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+      "copy_font": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif"
+    },
+    {
+      "viewport": 1280,
+      "owner": {
+        "x": 519,
+        "y": 1431.15625,
+        "width": 462.65625,
+        "height": 277.765625
+      },
+      "sessions": {
+        "x": 997.65625,
+        "y": 1431.15625,
+        "width": 231.328125,
+        "height": 277.765625
+      },
+      "owner_width_fraction": 0.6666666666666666,
+      "footer_gap": 22.0,
+      "select_height": 40,
+      "padding": "18px",
+      "radius": "11px",
+      "header_font": "700 16px / 22.4px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+      "copy_font": "12px / 19.2px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif"
+    }
+  ],
+  "node_tracks": [
+    {
+      "node": "d1",
+      "viewport": 1536,
+      "state": {
+        "x": 1005,
+        "width": 200,
+        "height": 88.09375
+      },
+      "output": {
+        "x": 1221,
+        "width": 200,
+        "height": 88.09375
+      },
+      "badge": {
+        "x": 1022,
+        "width": 183,
+        "height": 40
+      },
+      "outputBox": {
+        "x": 1238,
+        "width": 183,
+        "height": 40
+      },
+      "close": {
+        "x": 1437,
+        "width": 44,
+        "height": 44
+      }
+    },
+    {
+      "node": "d2",
+      "viewport": 1536,
+      "state": {
+        "x": 1005,
+        "width": 200,
+        "height": 107.59375
+      },
+      "output": {
+        "x": 1221,
+        "width": 200,
+        "height": 107.59375
+      },
+      "badge": {
+        "x": 1022,
+        "width": 183,
+        "height": 40
+      },
+      "outputBox": {
+        "x": 1238,
+        "width": 183,
+        "height": 40
+      },
+      "close": {
+        "x": 1437,
+        "width": 44,
+        "height": 44
+      }
+    },
+    {
+      "node": "d1",
+      "viewport": 1280,
+      "state": {
+        "x": 749,
+        "width": 200,
+        "height": 106.0625
+      },
+      "output": {
+        "x": 965,
+        "width": 200,
+        "height": 106.0625
+      },
+      "badge": {
+        "x": 766,
+        "width": 183,
+        "height": 40
+      },
+      "outputBox": {
+        "x": 982,
+        "width": 183,
+        "height": 40
+      },
+      "close": {
+        "x": 1181,
+        "width": 44,
+        "height": 44
+      }
+    },
+    {
+      "node": "d2",
+      "viewport": 1280,
+      "state": {
+        "x": 749,
+        "width": 200,
+        "height": 127.5
+      },
+      "output": {
+        "x": 965,
+        "width": 200,
+        "height": 127.5
+      },
+      "badge": {
+        "x": 766,
+        "width": 183,
+        "height": 40
+      },
+      "outputBox": {
+        "x": 982,
+        "width": 183,
+        "height": 40
+      },
+      "close": {
+        "x": 1181,
+        "width": 44,
+        "height": 44
+      }
+    }
+  ],
+  "scope": "Isolated browser fixtures; no production reads or writes"
+}

@@ -1,0 +1,53 @@
+{
+  "pr": 125,
+  "url": "https://github.com/nicsejara/Dation/pull/125",
+  "code_sha": "c71956da186f9231e3bc0c52a4dd70fe918838fe",
+  "baseline_sha": "d2abe7f69e411fece0f44207fb720c2c682666da",
+  "run_id": 44189125144,
+  "run_url": "https://github.com/nicsejara/Dation/actions/runs/44189125144",
+  "status": "completed",
+  "conclusion": "success",
+  "started_at": "2026-11-17T22:20:44Z",
+  "completed_at": "2026-11-17T22:23:42Z",
+  "synthetic_pr_merge_sha": "ae0f32794636e2b6413597e3a96d0f0593ffbda5",
+  "risk": "R2",
+  "requires_full": false,
+  "jobs": [
+    {
+      "name": "impact",
+      "id": 134413489965,
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "fast",
+      "id": 134413686431,
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "full",
+      "id": 134413690113,
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "name": "required-gate",
+      "id": 134415099803,
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "classifier_tests": 7,
+  "browser_smokes": 6,
+  "browser_smoke_seconds": 59.734,
+  "pr_state": {
+    "state": "open",
+    "draft": false,
+    "merged": false,
+    "mergeable": true,
+    "mergeable_state": "clean",
+    "auto_merge": null
+  },
+  "note": "Terminal CI for the implementation commit. The subsequent documentation-only commit records this receipt; its final required-gate and SHA remain available in PR checks and the PR closure report. Application hashes are recorded separately."
+}
