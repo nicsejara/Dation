@@ -4,10 +4,11 @@ from typing import Literal
 from uuid import UUID
 import unicodedata
 
-from pydantic import AwareDatetime, Field, StrictBool, field_validator, model_validator
+from pydantic import AwareDatetime, Field, StrictBool, TypeAdapter, field_validator, model_validator
 from app.domain.logistics.base import ContractModel, DecisionDate, Dimension, ResourceSource
 from app.domain.logistics.contracts import CasePolicy, Horizon, LogisticsModelVersion
 from app.domain.logistics.units import CurrencyPolicy
+from app.domain.logistics.cargo import CargoConfiguration
 
 HorizonType = Literal['DAILY','WEEKLY','MONTHLY','CUSTOM']
 OperatingMode = Literal['OPERATIONAL','SIMULATION']
@@ -47,11 +48,42 @@ class LogisticsModelConfigurationV1(ContractModel):
         return self
 
 
+class LogisticsModelConfigurationV2(LogisticsModelConfigurationV1):
+    """Explicit opt-in; v1 storage and mathematical semantics are unchanged."""
+    version: Literal[2] = 2
+    consolidation_permitted: StrictBool = True
+    resource_categories: tuple[str, ...] = Field(default=(), max_length=20)
+    cargo: CargoConfiguration
+
+    @model_validator(mode='after')
+    def cargo_contract(self):
+        from app.domain.logistics.physical import normalize_catalog
+        if self.split_permitted != (self.cargo.split_policy != 'INDIVISIBLE'):
+            raise ValueError('Fraccionamiento de modelo y política de carga contradictorios.')
+        if self.homogeneous_loads_declared != (self.cargo.compatibility_policy == 'UNIFORM_DECLARED'):
+            raise ValueError('La declaración de compatibilidad debe ser explícita y coherente.')
+        if len(self.resource_categories) != len(set(self.resource_categories)):
+            raise ValueError('No repitas categorías de recursos.')
+        from app.domain.logistics.base import Identifier
+        for category in self.resource_categories:TypeAdapter(Identifier).validate_python(category)
+        catalog=normalize_catalog(self.cargo,self.active_dimensions)
+        if any(getattr(p.coefficients,self.primary_dimension) <= 0 for p in catalog.values()):
+            raise ValueError('Cada presentación necesita una cantidad positiva en la dimensión principal.')
+        return self
+
+
+LogisticsModelConfiguration = LogisticsModelConfigurationV1 | LogisticsModelConfigurationV2
+
+
+def parse_configuration(value):
+    return TypeAdapter(LogisticsModelConfiguration).validate_python(value)
+
+
 class ModelCreate(ContractModel):
     id: UUID
     name: str = Field(min_length=1,max_length=120)
     description: str | None = Field(default=None,max_length=1000)
-    configuration: LogisticsModelConfigurationV1
+    configuration: LogisticsModelConfiguration
     _text=field_validator('name','description')(clean_text)
 
 
@@ -60,7 +92,7 @@ class ModelUpdate(ContractModel):
     name: str = Field(min_length=1,max_length=120)
     description: str | None = Field(default=None,max_length=1000)
     status: Literal['active','archived'] = 'active'
-    configuration: LogisticsModelConfigurationV1
+    configuration: LogisticsModelConfiguration
     _text=field_validator('name','description')(clean_text)
 
 
@@ -70,7 +102,7 @@ class ModelPublish(ContractModel):
 
 
 class ModelContractPreview(ContractModel):
-    configuration: LogisticsModelConfigurationV1 | None = None
+    configuration: LogisticsModelConfiguration | None = None
     model_id: UUID | None = None
     version_id: UUID | None = None
 
