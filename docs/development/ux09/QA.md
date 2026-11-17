@@ -2,7 +2,7 @@
 
 Baseline: `d2abe7f69e411fece0f44207fb720c2c682666da`, UX08 preservada. [Implementación y rollback](IMPLEMENTATION.md). [59 criterios](ACCEPTANCE_MATRIX.csv).
 
-Este primer snapshot registra PASS locales; GATE06 (CI remota) y GATE08 (PR) se completan después de comprobar GitHub. No se declara CI_GREEN anticipadamente. El SHA validado y el run final se publican también en el único PR, para no hacer un commit autorreferencial con su propio hash.
+Los **59 criterios están PASS**, con evidencia por fila. El código `c71956da186f9231e3bc0c52a4dd70fe918838fe` obtuvo [CI GREEN 44189125144](https://github.com/nicsejara/Dation/actions/runs/44189125144) y el [PR #125](https://github.com/nicsejara/Dation/pull/125) se verificó abierto, sin conflictos ni auto-merge. Este commit sólo agrega el recibo documental: el resultado terminal del SHA final se informa en los checks y la descripción del mismo PR, sin un commit autorreferencial con su propio hash.
 
 ## Evidencias reales
 
@@ -72,4 +72,4 @@ UX09 T01 comprueba geometría/creación/Graph; T02 disponibilidad, selección, p
 
 ## CI e integración
 
-El clasificador vigente determina **R2**, `requires_full=false`: se exige impact + FAST + required-gate. No se alteró el clasificador ni los workflows y no se ejecuta FULL adicional sin exigencia. El registro remoto terminal se añadirá tras la primera ejecución real del PR. No merge, publicación de imagen, despliegue ni promoción.
+El clasificador vigente determina **R2**, `requires_full=false`: se exige impact + FAST + required-gate. No se alteró el clasificador ni los workflows y no se ejecuta FULL adicional sin exigencia. [Recibo remoto](evidence/github-validation.json): impact success, fast success, full skipped, required-gate success; siete pruebas del clasificador y seis smokes (59,734 s) aprobados. El workflow prueba el merge sintético del PR; el recibo distingue ese SHA del HEAD de código. El último commit es documental y conserva los seis hashes de aplicación verificados; sus checks finales se consultan en PR #125. No merge, publicación de imagen, despliegue ni promoción.
