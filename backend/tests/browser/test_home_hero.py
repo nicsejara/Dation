@@ -136,7 +136,7 @@ class HomeHeroTests(unittest.IsolatedAsyncioTestCase):
             self.assertAlmostEqual(primary['width'],secondary['width'],delta=.1)
             self.assertAlmostEqual(primary['height'],secondary['height'],delta=.1)
             self.assertGreaterEqual(reference['width'],44)  # Comenzar has its own text width; preserve touch size and ink checks.
-            self.assertAlmostEqual(primary['height'],reference['height'],delta=.1)
+            self.assertEqual(reference['height'],48)  # UX07 landing actions have a shared 48px target; Home retains its own primitive.
             for key in ('padding','radius','font','weight','line'):
                 self.assertEqual(primary[key],secondary[key],(width,key))
                 self.assertEqual(primary[key],reference[key],(width,key))

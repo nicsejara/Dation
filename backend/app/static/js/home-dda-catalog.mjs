@@ -3,6 +3,8 @@ import {ddaEnabled} from './platform/entitlements.mjs';
 
 import {DDA_CATEGORIES,DDA_CATALOG} from './platform/dda-catalog.mjs';
 export {DDA_CATEGORIES,DDA_CATALOG};
+// Home presentation only; the shared product registry retains Demand.
+export const HOME_DDA_CATALOG=Object.freeze(DDA_CATALOG.filter(item=>item.id!=='demand'));
 
 const ICONS=Object.freeze({
   inventory:'<path d="m3 7 9-5 9 5v10l-9 5-9-5Z"/><path d="m3 7 9 5 9-5M12 12v10M7.5 4.5l9 5"/>',
@@ -14,12 +16,12 @@ const ICONS=Object.freeze({
 const arrow='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"/></svg>';
 const ASSET_ICONS=Object.freeze({logistics:'/static/assets/dda-logistics.svg'});
 
-export function catalogCounts(catalog=DDA_CATALOG){
+export function catalogCounts(catalog=HOME_DDA_CATALOG){
   return {available:catalog.filter(item=>item.status==='available').length,
     comingSoon:catalog.filter(item=>item.status==='coming-soon').length};
 }
 
-export function filterCatalog(category='all',catalog=DDA_CATALOG){
+export function filterCatalog(category='all',catalog=HOME_DDA_CATALOG){
   return catalog.filter(item=>category==='all'||item.category===category);
 }
 
@@ -70,8 +72,8 @@ export function mountHomeCatalog(root){
   let selected='all';
   function render(){
     const identity=window.dationSession?.identity,template=document.createElement('template');
-    template.innerHTML=DDA_CATALOG.map(item=>assetCard(item,identity)).join('');grid.replaceChildren(template.content);
-    const {available,comingSoon}=catalogCounts(),enabled=DDA_CATALOG.filter(item=>catalogAccess(item,identity)==='enabled').length;
+    template.innerHTML=HOME_DDA_CATALOG.map(item=>assetCard(item,identity)).join('');grid.replaceChildren(template.content);
+    const {available,comingSoon}=catalogCounts(),enabled=HOME_DDA_CATALOG.filter(item=>catalogAccess(item,identity)==='enabled').length;
     counts.textContent=enabled+' '+(enabled===1?'disponible':'disponibles')+' · '+comingSoon+' '+(comingSoon===1?'próximo':'próximos')+(available>enabled?' · '+(available-enabled)+' no habilitado':'');
     select(selected);
   }

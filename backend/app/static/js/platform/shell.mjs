@@ -89,6 +89,7 @@ export function mountPlatformShell(){
   const ddaView=view?.startsWith('logistics-')||view==='decision-dashboard';
   breadcrumb.hidden=true;
   const contextNav=document.querySelector('#journey-nav');
+  contextNav.closest('.topbar').toggleAttribute('data-home-context-hidden',view==='platform-home');
   if(!ddaView){const title=node('span',labels[view]||(view==='traceability'?'Historial y evidencia':'Dation'),'journey-step journey-step--title is-current');document.querySelector('#journey-nav').replaceChildren(title);}
   if(ddaView){
    try{renderDdaNavigation(contextNav,{view,route:readResource(location.href),workspace:window.DationDispatch?.getWorkspace?.()});}catch{}

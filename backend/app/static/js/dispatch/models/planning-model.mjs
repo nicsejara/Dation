@@ -5,14 +5,14 @@ import {mountModelFields,defaultConfiguration} from './model-fields.mjs';
 import {wizardIcon} from './wizard-ui.mjs';
 import {mountDataContractView} from './data-contract-view.mjs';
 
-export async function mountPlanningModel(form,scope,{draft={},modelId='',canManage,onChange=()=>{},persist=()=>{},onSelected=()=>{},onContinue=()=>{},onContracts}){
+export async function mountPlanningModel(form,scope,{draft={},modelId='',canManage,unified=false,onChange=()=>{},persist=()=>{},onSelected=()=>{},onContinue=()=>{},onContracts}){
  const modelPanel=collapsibleSection(form,'01. Logistics Model','Definí la lógica operativa base del modelo logístico que vas a usar en este Case.',{open:true,initialStatus:'En configuración'}),modelBlock=modelPanel.body;
  modelPanel.details.dataset.dationTest='core-model';modelPanel.details.dataset.modelState='LOADING';modelPanel.setStatus('Cargando');modelPanel.details.classList.add('model-wizard');modelBlock.classList.add('ultimate-planning-model');modelBlock.hidden=true;
  const summary=modelPanel.details.querySelector('summary'),tile=el('span',undefined,'model-wizard-tile'),heading=el('span',undefined,'model-wizard-heading');tile.append(wizardIcon('layers'));heading.append(summary.querySelector('.ultimate-disclosure__title'),modelBlock.previousElementSibling);summary.prepend(tile,heading);
  const intro=el('div',undefined,'model-wizard-intro'),reuse=button('',openPicker),catalogHint=el('p',undefined,'d-metadata'),introIcon=wizardIcon('database');reuse.append(wizardIcon('folder'),el('span','Seleccionar modelo existente'));reuse.dataset.dationTest='model-reuse';intro.append(introIcon,el('strong','Creá un nuevo modelo operativo o reutilizá uno ya publicado.'),reuse,catalogHint);
  const editor=el('div'),feedback=el('p','','model-wizard-feedback'),footer=el('footer',undefined,'model-wizard-footer'),progress=el('div',undefined,'model-wizard-progress'),ring=el('span',undefined,'model-wizard-ring'),progressText=el('div'),count=el('p','','d-metadata'),create=button('',publish,'primary');
  feedback.role='status';feedback.setAttribute('aria-live','polite');feedback.dataset.dationTest='model-feedback';progress.dataset.dationTest='model-progress';progress.role='status';progressText.append(el('strong','Configuración del modelo'),count);ring.setAttribute('aria-hidden','true');progress.append(ring,progressText);footer.append(progress,create);modelBlock.append(intro,editor,feedback,footer);
- create.dataset.dationTest='model-create';const createCaption=el('span','Crear y seleccionar modelo');create.append(wizardIcon('check'),createCaption);
+ create.dataset.dationTest='model-create';const createLabel=unified?'Guardar y continuar':'Crear y seleccionar modelo',createCaption=el('span',createLabel);create.append(wizardIcon('check'),createCaption);
  const contractPanel=collapsibleSection(form,'02. Data Contract','Dation genera automáticamente la estructura de datos requerida a partir del Logistics Model seleccionado. Descargá las plantillas y consultá sus campos y reglas antes de cargar los datos en el Decision Graph.',{initialStatus:'Pendiente'}),contractView=mountDataContractView(contractPanel,scope,{retry:()=>preview(),onContinue,onContracts}),contractStatus=contractView.status,retry=contractView.retry,modelRetry=button('Reintentar Data Contract',async()=>{if(state.mode==='existing'&&!isSelected()){await render().catch(fail);if(ready)onSelected();}else await preview();});
  retry.hidden=modelRetry.hidden=true;feedback.after(modelRetry);contractPanel.details.dataset.dationTest='core-contract';
  const newDraft=()=>({id:crypto.randomUUID(),name:'',description:'',status:'active',expected_revision:1,configuration:defaultConfiguration(window.dationSession.identity.workspace.currency)});
@@ -38,7 +38,7 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
   reuse.setAttribute('aria-describedby','model-catalog-hint');catalogHint.id='model-catalog-hint';
   create.hidden=selectedVersion||!canManage;
   create.disabled=busy||(state.locked&&!pending())||(!pending()&&(!compiled||complete!==3));create.setAttribute('aria-busy',String(busy));
-  const caption=busy?'Creando modelo…':pending()?'Reintentar publicación pendiente':'Crear y seleccionar modelo';if(createCaption.textContent!==caption)createCaption.textContent=caption;
+  const caption=busy?'Creando modelo…':pending()?'Reintentar publicación pendiente':createLabel;if(createCaption.textContent!==caption)createCaption.textContent=caption;
   feedback.textContent=message||(!canManage?'Necesitás permiso de administración para crear un modelo.':'');feedback.hidden=!feedback.textContent;
   modelRetry.hidden=(state.mode!=='new'&&isSelected())||!previewFailed||busy||pending();modelRetry.textContent=state.mode==='existing'&&!isSelected()?'Reintentar selección del modelo':'Reintentar Data Contract';
   const another=editor.querySelector('[data-model-new]');if(another)another.disabled=busy||state.locked;retry.hidden=state.mode==='new'||!previewFailed;

@@ -30,6 +30,7 @@ export async function mountCommandCenter(root,{scope,route,data,journey,navigate
  function openNode(id){
   cancelPicker();
   const node=data.graph.nodes.find(n=>n.id===id&&n.implemented&&IMPLEMENTED.has(n.id));if(!node)return;
+  if(selected===id&&panelView?.scope.active){clearPanel({restoreFocus:true});return;}
   clearPanel();selected=id;
   const trigger=buttons.get(id);panelView=contextualPanel(slot,viewScope,{trigger,title:(id==='logistics_assignment'?'D1':'D2')+' · '+node.label,onClose:()=>{selected=null;panelView=null;}});
   const align=()=>{if(!panelView?.scope.active||selected!==id)return;const a=trigger.getBoundingClientRect(),b=slot.getBoundingClientRect();panelView.panel.style.setProperty('--ux05-caret',Math.max(24,Math.min(b.width-24,a.left+a.width/2-b.left))+'px');};panelView.scope.observe(new ResizeObserver(align),slot);align();

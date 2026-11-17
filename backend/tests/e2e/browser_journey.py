@@ -51,7 +51,9 @@ async def journey():
             await page.goto(base+'/app?view=inicio',wait_until='domcontentloaded')
             await page.locator('#home-open-logistics').wait_for(state='visible')
             await page.locator('[data-dda-filter=all]').wait_for()
-            assert await page.locator('[data-dda-id]').count()==7
+            assert await page.locator('[data-dda-id]').count()==6
+            assert await page.locator('[data-dda-id]').evaluate_all('nodes=>nodes.map(n=>n.dataset.ddaId)')==[
+                'logistics','production','inventory','procurement','maintenance','pricing']
             assert await page.locator('[data-dda-status=coming-soon] button,[data-dda-status=coming-soon] a').count()==0
             await page.locator('[data-dda-filter=supply-chain]').click()
             assert await page.locator('[data-dda-id]:not([hidden])').count()==2

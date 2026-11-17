@@ -1,0 +1,181 @@
+{
+  "baseline": "0e5e7c93e942822aaf8a38d1c60fd7db332b9f5d",
+  "browser_unique_pass": 53,
+  "browser_tests": [
+    "test_data_contract_wizard.DataContractWizardTests.test_03_single_independent_toggles_human_conditions_and_lossless_technical",
+    "test_data_contract_wizard.DataContractWizardTests.test_08_visual_responsive_focus_and_contrast",
+    "test_decision_case_wizard.DecisionCaseWizardTests.test_07_existing_case_patch_keeps_revision_version_and_stage_owners",
+    "test_decision_case_wizard.DecisionCaseWizardTests.test_08_frozen_and_viewer_contexts_keep_protected_fields_disabled",
+    "test_decision_graph_ux05.CommandCenterTests.test_01_default_panel_summary_and_six_width_containment",
+    "test_decision_graph_ux05.CommandCenterTests.test_02_owner_reconciles_locked_and_ready_actions_without_execution",
+    "test_decision_graph_ux05.CommandCenterTests.test_03_approved_not_applicable_close_and_archived_readonly",
+    "test_decision_graph_ux05.CommandCenterTests.test_04_history_pages_and_case_selector_keep_exact_identities",
+    "test_decision_graph_ux05.CommandCenterTests.test_05_viewer_keeps_approved_visual_state_and_readonly_owner",
+    "test_decision_graph_ux05.CommandCenterTests.test_06_keyboard_switch_outside_close_and_cancel_late_action",
+    "test_decision_graph_ux05.CommandCenterTests.test_07_strict_contrast_accessible_names_and_retry",
+    "test_decision_graph_ux05.CommandCenterTests.test_08_current_approved_upstream_and_stale_error_queued_presentations",
+    "test_decision_graph_ux05.CommandCenterTests.test_09_pack_read_failure_is_explicit_and_case_switch_cancels_late_picker",
+    "test_final_polish.FinalPolishTests.test_c1_overview_hero_has_local_art_process_and_unchanged_actions",
+    "test_home_hero.HomeHeroTests.test_alignment_matches_logistics_frame_and_control_geometry",
+    "test_home_hero.HomeHeroTests.test_art_is_small_and_reserves_geometry_and_content_survives_failure",
+    "test_home_hero.HomeHeroTests.test_h1_h3_h4_h5_copy_network_band_and_reflow",
+    "test_home_hero.HomeHeroTests.test_h2_catalog_center_keyboard_and_history_use_existing_navigation",
+    "test_home_hero.HomeHeroTests.test_h5_zoom_200_percent_keeps_hero_ctas_visible_with_keyboard",
+    "test_home_hero.HomeHeroTests.test_h6_greeting_keeps_workspace_timezone_identity_updates_and_fallback",
+    "test_journey_navigation_ux06.JourneyNavigationTests.test_01_local_previous_preserves_form_and_has_no_writes_or_self_navigation",
+    "test_journey_navigation_ux06.JourneyNavigationTests.test_02_context_return_preserves_unsaved_draft_and_actual_server_case",
+    "test_journey_navigation_ux06.JourneyNavigationTests.test_03_local_csv_survives_steps_and_canceled_browser_back",
+    "test_journey_navigation_ux06.JourneyNavigationTests.test_04_fresh_previous_protects_draft_without_creating_case",
+    "test_journey_navigation_ux06.JourneyNavigationTests.test_05_derived_parent_and_preparation_identity_survive_previous_and_return",
+    "test_journey_navigation_ux06.JourneyNavigationTests.test_06_studio_rail_previous_exact_dashboard_origin_and_explicit_fallback",
+    "test_journey_navigation_ux06.JourneyNavigationTests.test_07_six_width_headers_footers_and_all_studio_rails",
+    "test_journey_navigation_ux06.JourneyNavigationTests.test_08_viewer_archived_rails_and_readonly_previous_remain_available",
+    "test_journey_navigation_ux06.JourneyNavigationTests.test_09_late_context_return_is_canceled_by_local_previous",
+    "test_journey_navigation_ux06.JourneyNavigationTests.test_10_center_filters_and_configuration_origin_roundtrip_without_latest",
+    "test_journey_navigation_ux06.JourneyNavigationTests.test_11_back_to_a_step_that_lost_its_model_gate_keeps_actual_step_and_draft",
+    "test_journey_navigation_ux06.JourneyNavigationTests.test_12_deriving_from_frozen_core_preserves_dashboard_parent_run",
+    "test_journey_navigation_ux06.JourneyNavigationTests.test_13_conflict_reload_discards_draft_without_discarding_dashboard_origin",
+    "test_journey_navigation_ux06.JourneyNavigationTests.test_14_rendered_zoom_reflow_keeps_core_steps_and_controls_contained",
+    "test_logistics_model_wizard.LogisticsModelWizardTests.test_02_reuse_cancel_keeps_draft_and_defaults_to_new",
+    "test_logistics_model_wizard.LogisticsModelWizardTests.test_04_version_failure_refresh_and_same_intent_recovery",
+    "test_logistics_model_wizard.LogisticsModelWizardTests.test_10_confirmed_publication_failed_selection_can_be_recovered",
+    "test_logistics_model_wizard.LogisticsModelWizardTests.test_11_sidebar_keeps_case_inputs_and_keyboard_picker_focus",
+    "test_navigation.NavigationTests.test_catalog_entitlements_cover_deep_links_revocation_and_reenable",
+    "test_navigation.NavigationTests.test_catalog_fallback_keeps_disabled_entitlement_closed",
+    "test_navigation.NavigationTests.test_dark_shell_and_heroes_survive_responsive_and_warm_navigation",
+    "test_navigation.NavigationTests.test_home_card_keyboard_and_informational_overview_with_native_faq",
+    "test_navigation.NavigationTests.test_home_catalog_filters_preserve_navigation_and_workspace",
+    "test_navigation.NavigationTests.test_home_catalog_keeps_a_usable_fallback_without_its_module",
+    "test_navigation.NavigationTests.test_home_catalog_responsive_accessible_and_honest_states",
+    "test_unified_decision_journey.UnifiedDecisionJourneyTests.test_01_pre_case_two_uploads_refresh_and_finalize",
+    "test_unified_decision_journey.UnifiedDecisionJourneyTests.test_02_skip_empty_graph_prepare_same_case_and_edit_return",
+    "test_unified_decision_journey.UnifiedDecisionJourneyTests.test_14_unsaved_local_csv_blocks_case_creation_without_freezing_intent",
+    "test_unified_decision_journey.UnifiedDecisionJourneyTests.test_15_navigation_has_only_global_and_internal_rails_and_restores_legacy",
+    "test_visual_refinement_ux07.HomeRefinementTests.test_01_six_visible_cards_filters_entitlement_and_home_bar",
+    "test_visual_refinement_ux07.HomeRefinementTests.test_02_landing_equivalent_actions_preserve_filtered_center",
+    "test_visual_refinement_ux07.JourneyRefinementTests.test_03_real_publish_prepare_finalize_geometry_and_local_toggle",
+    "test_workflow_context.WorkflowContextTests.test_dashboard_trace_shares_the_copy_row_and_context_pills_are_equal"
+  ],
+  "runs": [
+    {
+      "log": "ux07-focal-journey-graph.log",
+      "summary": "Ran 26 tests in 199.866s",
+      "result": "PASS",
+      "excluded_obsolete_expectation": null
+    },
+    {
+      "log": "ux07-focal-home-landing.log",
+      "summary": "Ran 12 tests in 46.535s",
+      "result": "PASS",
+      "excluded_obsolete_expectation": "test_alignment_matches_logistics_frame_and_control_geometry"
+    },
+    {
+      "log": "ux07-home-alignment.log",
+      "summary": "Ran 1 test in 17.307s",
+      "result": "PASS",
+      "excluded_obsolete_expectation": null
+    },
+    {
+      "log": "ux07-focal-final.log",
+      "summary": "Ran 17 tests in 154.891s",
+      "result": "PASS",
+      "excluded_obsolete_expectation": null
+    },
+    {
+      "log": "ux07-hero-correction.log",
+      "summary": "Ran 3 tests in 25.338s",
+      "result": "PASS",
+      "coverage": "Landing font actual 32\u201348px at six widths, shared hero geometry and original art/actions"
+    },
+    {
+      "log": "ux07-ci-fixes-focal.log",
+      "summary": "Ran 4 tests in 36.589s",
+      "result": "PASS",
+      "classification": "Three obsolete visual subtest expectations (hero 2, Home 1); one real legacy three-level nav CSS compatibility regression restored without changing its assertions."
+    }
+  ],
+  "node_pass": 20,
+  "node_files": [
+    "test_home_dda_catalog.mjs",
+    "test_graph_ux05.mjs"
+  ],
+  "chromium": "153.0.8010.12 headless shell",
+  "widths": [
+    1536,
+    1280,
+    1024,
+    768,
+    390,
+    320
+  ],
+  "source_sha256": {
+    "backend/app/static/css/dda-logistics-landing.css": "c831c6ecea846a1c8a67e3cdd609f2ab6d65aa593a24a3d9ea96b2a50abc2a60",
+    "backend/app/static/css/home-dda.css": "a83e5e3e21d124f995ae56e4d31bd781e8cfa984965af5cd0544a96bcc91c483",
+    "backend/app/static/css/platform-shell.css": "6bb2b6290821f8b09c99cddd65b35c74fa36ac1de0942e705551bab1f66b6818",
+    "backend/app/static/css/ultimate-foundation.css": "a446e10fcb0c3d665d1fe416532d2f9dea39619f8fa10f90bb5316267ddf6b57",
+    "backend/app/static/css/ultimate-graph.css": "39ddbd400ea9b4526cfbdd74581940a7b9888896edbe58b22c4ebc86cdd02bcd",
+    "backend/app/static/js/dispatch/cases/ultimate-case-setup.mjs": "8671d01f54f7df6d6c75040d3ece97d162a21e3102aa72294ea5e6071b9db3ec",
+    "backend/app/static/js/dispatch/graph-ux05/command-center.mjs": "45c3c70acbb962bf99e8e3759f53d2b8467eff0d2e9d965403c441fe3b9774ef",
+    "backend/app/static/js/dispatch/graph-ux05/decision-popover.mjs": "1758a50a92f6e76716191dd9011e3d903c76796348b2198cc30424b11b8e6113",
+    "backend/app/static/js/dispatch/graph-ux05/node-graph.mjs": "ecda5a9bdfeb27b188e3c33a5244e45ca2bd3fc9d335bc6d17d61489c6587129",
+    "backend/app/static/js/dispatch/journey/navigation.mjs": "ec57b4770dd4de667890ceecf599504b656e7f9802858f454146a957f66015bc",
+    "backend/app/static/js/dispatch/models/planning-model.mjs": "2230391e5355d03cf0e4b51f781ef7141784ef4014ab4b6f10140ab6d334bad1",
+    "backend/app/static/js/dispatch/models/wizard-ui.mjs": "fd10824ed63617e985d5df83c5b7e6915ff8448e878aeb6097c4caab528c7748",
+    "backend/app/static/js/dispatch/upload/core-preparation.mjs": "1f009b46120e478298be8d8eb7134c10f2ef37226a2b0b83eb326e94e026e7ba",
+    "backend/app/static/js/home-dda-catalog.mjs": "d72f172949c6189bda08771d316d1d68713ea0281a2c044ada8f688765210cd0",
+    "backend/app/static/js/platform/shell.mjs": "b9384e97ff26434d68046c621cd7c9c3de38c6c5605fbf0ecb59dfcfc027c407",
+    "backend/app/templates/app.html": "0066e2217c40684fe6b1f86bb84e6b4ac07a9ab16b681758243f648aae2c55e1",
+    "backend/tests/browser/test_final_polish.py": "5014377e73a0ebeddc337bcc16a6f2288c5368eabf5ea73905310af2a8334482",
+    "backend/tests/browser/test_home_hero.py": "98cd36a65e28c869830a438453804bac56a470a62628fe2f4b7a0413cbce6f44",
+    "backend/tests/browser/test_journey_navigation_ux06.py": "d3fa5ac86cafc6ef7520a311c7407d81f4816881edab1121986537cda43f3118",
+    "backend/tests/browser/test_navigation.py": "f420c5d3964fe5ef63362779fc37ae046d1705ed2dee451d47554536464a56d4",
+    "backend/tests/browser/wizard_helpers.py": "d260e416fcd4b225d86181bb657f583a5be21abd0b23a774835c8708595e90e7",
+    "backend/tests/test_home_dda_catalog.mjs": "8c6a686781199bb573121c36fbf9b6be2a744ae4e176a58b138dee808477ad08",
+    "backend/tests/browser/test_visual_refinement_ux07.py": "d04df925e860aa3d0572a3e6b0c32694909211f0bcccad25573a018414ef955b",
+    "backend/tests/e2e/browser_journey.py": "093b049207bde9d642cbe8e02d87a67310292917b34b005afea8db62ee941190"
+  },
+  "geometry_collection": "40 scenarios; unaffected Home/Core/Graph retained, six Landing measurements and screenshots replaced after the focal hero correction.",
+  "ci_history": [
+    {
+      "run": 43971848532,
+      "conclusion": "cancelled",
+      "reason": "Final visual review found the Landing H1 remained at 36px; correct scoped selector and computed-size assertion before completing integral CI."
+    },
+    {
+      "run": 43972861422,
+      "sha": "cb8455bd8a0e68dd371161b2c38d6664d0d66941",
+      "conclusion": "failure",
+      "passed_before_browser": {
+        "release_operations": 98,
+        "python": 721,
+        "node": 191
+      },
+      "browser": {
+        "tests": 372,
+        "failures": 4,
+        "affected_methods": 3
+      },
+      "classification": "Approved hero scale and Home count: obsolete expectations; legacy three-level nav height: scoped CSS compatibility defect. Four focal cases passed after minimal correction."
+    },
+    {
+      "run": 43979546905,
+      "sha": "c190d05414eecbc782f699143e381dd148fe2a94",
+      "conclusion": "failure",
+      "passed": {
+        "release_operations": 98,
+        "python": 721,
+        "node": 191,
+        "browser": 372,
+        "postgres": 192
+      },
+      "e2e": {
+        "tests": 134,
+        "failures": 2,
+        "classification": "Both browser journeys stopped at obsolete Home count==7; approved Home has six. No product defect."
+      },
+      "focal_recheck": "Desktop and mobile real end-to-end journeys PASS after count==6 plus exact six IDs; all business assertions retained."
+    }
+  ],
+  "e2e_focal_pass": 2,
+  "e2e_results": "e2e-results.json"
+}

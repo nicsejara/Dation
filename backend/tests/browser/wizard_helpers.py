@@ -5,7 +5,8 @@ from playwright.async_api import expect
 async def publish_model(page, name=None):
     if name is not None:
         await page.get_by_label('Nombre del modelo *', exact=True).fill(name)
-    action=page.get_by_role('button',name='Crear y seleccionar modelo',exact=True)
+    unified=await page.locator('.unified-journey').count()>0
+    action=page.get_by_role('button',name='Guardar y continuar' if unified else 'Crear y seleccionar modelo',exact=True)
     await expect(action).to_be_enabled()
     await action.click()
     await expect(page.locator('[data-dation-test=core-step-2]')).to_have_attribute('aria-current','step')

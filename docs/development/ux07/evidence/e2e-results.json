@@ -1,0 +1,60 @@
+{
+  "scope": "owned loopback API, PostgreSQL/PostgREST, Storage fixture, worker and Chromium; no production",
+  "suite": {
+    "passed": true,
+    "tests": 2,
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "passed_ids": [
+      "test_workflow.WorkflowTests.test_browser_complete_workflow_at_mobile_width",
+      "test_workflow.WorkflowTests.test_browser_creation_execution_approval_navigation_and_mobile_history"
+    ],
+    "scope": "FOCUSED_RECHECK",
+    "selected_modules": [
+      "test_workflow.WorkflowTests.test_browser_complete_workflow_at_mobile_width",
+      "test_workflow.WorkflowTests.test_browser_creation_execution_approval_navigation_and_mobile_history"
+    ],
+    "failure_details": []
+  },
+  "journeys": {
+    "desktop": {
+      "passed": true,
+      "source_sha": "c190d05414eecbc782f699143e381dd148fe2a94",
+      "assignment_and_scheduling_approved": true,
+      "cold_link": true,
+      "back_forward_refresh": true,
+      "idle_request_budget": true,
+      "mobile_history": true,
+      "export_has_records": true,
+      "failed_run_retained_unchanged": true,
+      "javascript_errors": [],
+      "unexpected_http_errors": [],
+      "context_first_entry": true,
+      "checkpoints": 19,
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      }
+    },
+    "mobile": {
+      "passed": true,
+      "source_sha": "c190d05414eecbc782f699143e381dd148fe2a94",
+      "assignment_and_scheduling_approved": true,
+      "cold_link": true,
+      "back_forward_refresh": true,
+      "idle_request_budget": true,
+      "mobile_history": true,
+      "export_has_records": true,
+      "failed_run_retained_unchanged": true,
+      "javascript_errors": [],
+      "unexpected_http_errors": [],
+      "context_first_entry": true,
+      "checkpoints": 19,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      }
+    }
+  }
+}
