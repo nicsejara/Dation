@@ -1,6 +1,6 @@
-# G4/G5 — diseño acordado de ejecución v2 (pendiente de implementar/verificar)
+# G4/G5 — diseño acordado de ejecución v2 (implementado; validación focal G4/G5)
 
-Esta nota concreta la decisión técnica G0; no declara un solver implementado.
+Esta nota concreta la decisión técnica G0. Las pruebas y límites verificados están registrados en GATES.md.
 
 - Mantener los DTO `Demand`, `TransportResource` y bytes/hashes v1 sin cambios. Introducir un `CatalogDemand(Demand)` con líneas pequeñas (line_id, presentation_id, quantity, compatibility_groups), validado contra el catálogo completo del snapshot. Las demandas de v1 siguen usando el DTO anterior, sin campos nuevos nulos.
 - Snapshot de modelo v2: subclase de `LogisticsModelVersion` con `configuration: LogisticsModelConfigurationV2` tipada. Verificar coherencia con las propiedades base y hash canónico de configuración. El contexto matemático sigue fijando model_hash y Pack/read-set; en catálogo incorpora el slot order_lines. El RPC debe comparar la configuración completa con el JSONB publicado; no admitir una proyección incompleta de un modelo v2.

@@ -25,6 +25,12 @@ def compatible(order, resource, model):
         return False
     if resource.source == 'OWN' and resource.base_origin_id != order.origin_id:
         return False
+    cfg=getattr(model,'configuration',None)
+    if cfg is not None:
+        if cfg.resource_categories and getattr(resource,'resource_category',None) not in cfg.resource_categories:return False
+        if hasattr(order,'lines'):
+            choices=[set(line.compatibility_groups).issubset(resource.compatibility_groups) if line.compatibility_groups else model.homogeneous_loads_declared for line in order.lines]
+            return any(choices) if order.split_allowed and model.split_permitted else all(choices)
     if order.compatibility_groups:
         return set(order.compatibility_groups).issubset(resource.compatibility_groups)
     return model.homogeneous_loads_declared
@@ -44,9 +50,15 @@ class Slot:
     start: object
     fractions: dict
     distance: object
+    line_variables: object = None
+    line_quantums: object = None
+    line_values: object = None
 
 
 def solve_structural(request, policy_search=None):
+    if getattr(request.model,'configuration',None) is not None:
+        from .cargo_model import solve_cargo
+        return solve_cargo(request,policy_search)
     orders = sorted(request.demands, key=lambda o:o.order_id)
     resources = sorted(request.resources, key=lambda r:r.resource_id)
     dims, options = request.model.active_dimensions, request.options

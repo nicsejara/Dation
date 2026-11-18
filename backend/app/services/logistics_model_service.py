@@ -2,7 +2,7 @@
 from uuid import UUID, uuid5
 from fastapi import HTTPException
 
-from app.models.ultimate_foundation import LogisticsModelConfigurationV1, PlanningContextV1, parse_configuration
+from app.models.ultimate_foundation import LogisticsModelConfigurationV1, PlanningContextV1, parse_configuration, LogisticsModelSnapshotV2
 from app.domain.logistics.contracts import LogisticsModelVersion, Demand, TransportResource
 from app.results.canonical import canonical_bytes, canonical_tree, content_sha256, policy_hash
 from app.platform.identity import platform_call
@@ -123,7 +123,9 @@ async def create_case(ctx,payload):
 def enrich_context(result):
     row=result['case'];version=result['model_version'];pack=result['pack'];pv=result['pack_version']
     config=parse_configuration(version['config_jsonb'])
-    model=LogisticsModelVersion(workspace_id=row['workspace_id'],model_id=version['model_id'],version_id=version['id'],
+    model_class=LogisticsModelSnapshotV2 if config.version==2 else LogisticsModelVersion
+    extra={'configuration':config} if config.version==2 else {}
+    model=model_class(**extra,workspace_id=row['workspace_id'],model_id=version['model_id'],version_id=version['id'],
         version=version['version'],operating_role=config.operating_role,transport_pattern=config.transport_pattern,
         allowed_sources=config.allowed_sources,active_dimensions=config.active_dimensions,primary_dimension=config.primary_dimension,
         homogeneous_loads_declared=config.homogeneous_loads_declared,split_permitted=config.split_permitted,

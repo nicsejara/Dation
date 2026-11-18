@@ -25,8 +25,10 @@ def input_requirements(definition, model, entries, policy):
 
 def read_identity(definition, context, entries, nodes, node_policy=None):
     indexed={e['slot_key']:e for e in entries};result={}
-    for key in definition.read_set:
-        if key in ('transport_demand','transport_resources','scheduling_enrichment'):
+    keys=definition.read_set
+    if definition.id=='logistics_assignment' and 'order_lines' in indexed:keys=(*keys,'order_lines')
+    for key in keys:
+        if key in ('transport_demand','transport_resources','order_lines','scheduling_enrichment'):
             item=indexed.get(key);result[key]=None if item is None else {k:item[k] for k in ('canonical_sha256','contract_hash','normalizer_version')}
         elif key=='model':result[key]=context['logistics_model_version_id']
         elif key=='horizon':result[key]=[context['planning_start'],context['planning_end']]

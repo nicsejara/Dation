@@ -106,7 +106,7 @@ def run_day_scheduling(input_,*,deterministic_budget=2.0):
     core=c.EngineCoreResult(result_schema='day_scheduling_v1',decision=c.Decision(node_id='logistics_scheduling',decision_type='DAY_SCHEDULING',decision_label='Day Scheduling',run_id=request.run_id),
         context=context,engine=c.EngineHeader(engine_name=IDENTITY.engine_name,engine_version=IDENTITY.engine_version,runtime_profile=IDENTITY.runtime_profile,solver='OR_TOOLS_CP_SAT',solver_status=status,result_generated_at=request.result_generated_at),
         input_context_hash=input_hash,feasibility=c.Feasibility(solution_found=usable,policy_feasible=policy_ok if known else None,hard_constraints_satisfied=policy_ok if known else None,full_demand_coverage=None),
-        metrics=schedule_metrics(rows),schedule=c.DaySchedule(trips=tuple(rows)),source_transport_plan=request.source_transport_plan)
+        metrics=schedule_metrics(rows),schedule=c.DaySchedule(cargo=source.transport_plan.cargo,trips=tuple(rows)),source_transport_plan=request.source_transport_plan)
     entities.append(c.EntityEvidence(entity_type='CASE',entity_id=str(context.case_id),facts={
         'strict_on_time_ratio':rounded(core.metrics.service_level.on_time,len(rows)),'margin_known_count':sum(t.schedule_margin_days is not None for t in rows),
         'source_run_id':str(request.source_transport_plan.run_id),'upstream_result_fingerprint':request.source_transport_plan.result_fingerprint},reason_refs=()))

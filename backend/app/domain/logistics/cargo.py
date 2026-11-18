@@ -89,6 +89,7 @@ class LoadPresentation(ContractModel):
             if any(c.quantity != c.quantity.to_integral_value() for c in self.components):raise ValueError('Una presentación prearmada contiene unidades enteras de producto.')
         elif self.quantity_unit == 'presentation' or self.logistic_unit_id or len(self.components) != 1:
             raise ValueError('El granel continuo usa una medida física, un material y ninguna unidad logística anidada.')
+        elif self.components[0].quantity!=1:raise ValueError('El granel continuo declara un material por unidad física; no contiene bultos anidados.')
         return self
 
 
@@ -123,6 +124,7 @@ class CargoConfiguration(ContractModel):
         for presentation in self.presentations:
             if presentation.logistic_unit_id and presentation.logistic_unit_id not in units:raise ValueError('La presentación refiere una unidad logística inexistente.')
             if any(c.product_id not in products for c in presentation.components):raise ValueError('La presentación refiere un producto inexistente.')
+            if presentation.quantity_kind=='CONTINUOUS' and any(products[c.product_id].units_per_package!=1 for c in presentation.components):raise ValueError('El granel continuo no usa unidades por bulto.')
             if self.split_policy == 'DISCRETE' and presentation.quantity_kind != 'DISCRETE':raise ValueError('El fraccionamiento discreto no admite granel continuo.')
             groups=[products[c.product_id].compatibility_groups for c in presentation.components]
             if self.compatibility_policy == 'CATEGORIZED' and any(not g for g in groups):raise ValueError('Declarar categorías de compatibilidad para cada producto utilizado.')

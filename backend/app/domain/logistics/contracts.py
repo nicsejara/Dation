@@ -145,7 +145,7 @@ class TransportResource(ContractModel):
 
 
 class SemanticInput(ContractModel):
-    slot: Literal["transport_demand", "transport_resources", "scheduling_enrichment"]
+    slot: Literal["transport_demand", "transport_resources", "order_lines", "scheduling_enrichment"]
     canonical_sha256: SHA256
     contract_hash: SHA256
     normalizer_version: Identifier

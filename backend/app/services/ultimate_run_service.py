@@ -15,6 +15,7 @@ from app.domain.logistics.units import QuantityVector
 from app.results.canonical import canonical_tree,input_context_hash,policy_hash,content_sha256,canonical_bytes,core_result_fingerprint
 from app.results.registry import resolve_persisted_runtime,resolve_test_policy,resolve_worker_producer
 from app.engines.assignment.transport_plan import IDENTITY
+from app.engines.assignment.cargo_inputs import IDENTITY as CARGO_IDENTITY,demands_from_records
 from app.engines.assignment.transport_contracts import TransportPlanInput
 from app.services.logistics_model_service import enrich_context
 from app.services import case_data_pack_service as inputs
@@ -29,7 +30,8 @@ def pinned_context(raw,node_policy=None):
     policy=NodePolicy.model_validate(node_policy or row['case_policy_jsonb'])
     from app.domain.logistics.contracts import CasePolicy
     policy.validate_case_policy(CasePolicy.model_validate(row['case_policy_jsonb']))
-    refs=[e for e in raw['pinned_entries'] if e['slot_key'] in ('transport_demand','transport_resources')]
+    from app.domain.logistics.data_contracts import entities_for
+    refs=[e for e in raw['pinned_entries'] if e['slot_key'] in entities_for(raw['model_version'])]
     context=FrozenCaseContext(workspace_id=row['workspace_id'],case_id=row['id'],case_name=row['label'],
         operating_role=model['operating_role'],logistics_model_id=model['model_id'],logistics_model_version_id=model['version_id'],logistics_model_version=model['version'],
         data_pack_version_id=pv['id'],data_pack_version=pv['version'],model_hash=model['configuration_hash'],pack_manifest_hash=pv['manifest_hash'],
@@ -43,7 +45,7 @@ async def configuration(ctx,case_id,node_id='logistics_assignment'):
     raw=await call(ctx,'state',case_id=str(case_id),node_id=node_id)
     try:model,frozen,refs=pinned_context(raw)
     except ValueError:raise HTTPException(409,'Completá y publicá los inputs del Case antes de ejecutar.') from None
-    source=None;identity=IDENTITY
+    source=None;identity=CARGO_IDENTITY if model.get('configuration',{}).get('version')==2 else IDENTITY
     if node_id=='logistics_scheduling':
         from app.engines.scheduling.day_scheduling import IDENTITY as D2
         identity=D2;source={'run_id':raw['source_run']['id'],'result_fingerprint':raw['source_run']['result_fingerprint']}
@@ -94,7 +96,7 @@ async def enqueue(ctx,payload,run_id):
     raw=await call(ctx,'state',case_id=str(payload.case_id),node_id=payload.node_id,source_transport_plan=payload.source_transport_plan)
     model,frozen,refs=pinned_context(raw,payload.node_policy)
     from app.engines.scheduling.day_scheduling import IDENTITY as D2
-    identity=IDENTITY if payload.node_id=='logistics_assignment' else D2
+    identity=(CARGO_IDENTITY if model.get('configuration',{}).get('version')==2 else IDENTITY) if payload.node_id=='logistics_assignment' else D2
     if input_context_hash(frozen,identity,payload.source_transport_plan)!=payload.expected_context_hash or frozen.logistics_model_version_id!=payload.model_version_id or frozen.data_pack_version_id!=payload.data_pack_version_id:
         raise HTTPException(409,'El contexto cambió. Recuperá la configuración antes de crear otra intención.')
     definition=next(d for d in DEFINITIONS if d.id==payload.node_id)
@@ -103,7 +105,7 @@ async def enqueue(ctx,payload,run_id):
     upstream={}
     if payload.node_id=='logistics_assignment':
         records=await verify_inputs(refs)
-        input_=TransportPlanInput(model=model,context=frozen,demands=records['transport_demand'],resources=records['transport_resources'],run_id=run_id,result_generated_at=datetime.now(timezone.utc))
+        input_=TransportPlanInput(model=model,context=frozen,demands=demands_from_records(model,records) if identity==CARGO_IDENTITY else records['transport_demand'],resources=records['transport_resources'],run_id=run_id,result_generated_at=datetime.now(timezone.utc))
     else:
         from app.engines.scheduling.day_contracts import DaySchedulingInput
         core,evidence,summary=await source_facts(raw['source_run']['result_json'],raw['source_artifacts'])
@@ -122,7 +124,7 @@ async def execute_job(job,progress=None):
     ctx=current();request=job['request_json']
     registration=resolve_persisted_runtime(request)
     from app.engines.scheduling.day_scheduling import IDENTITY as D2
-    if registration.identity not in (IDENTITY,D2):raise ValueError('Unsupported Ultimate job runtime identity')
+    if registration.identity not in (IDENTITY,CARGO_IDENTITY,D2):raise ValueError('Unsupported Ultimate job runtime identity')
     if registration.identity==D2:
         from app.engines.scheduling.day_contracts import DaySchedulingInput
         input_=DaySchedulingInput.model_validate(request['input'])
@@ -130,9 +132,11 @@ async def execute_job(job,progress=None):
         if canonical_bytes((source,evidence,summary))!=canonical_bytes((input_.source_core,input_.source_evidence,input_.input_summary)):raise ValueError('Published upstream differs from frozen D2 input')
     else:input_=TransportPlanInput.model_validate(request['input'])
     if str(input_.run_id)!=job['run_id'] or str(input_.context.workspace_id)!=ctx.workspace_id:raise ValueError('Worker input binding mismatch')
-    if registration.identity==IDENTITY:
+    if registration.identity in (IDENTITY,CARGO_IDENTITY):
         records=await verify_inputs(request['entries'])
-        if canonical_bytes(input_.demands)!=canonical_bytes(records['transport_demand']) or canonical_bytes(input_.resources)!=canonical_bytes(records['transport_resources']):raise ValueError('Pinned input records changed')
+        expected_demands=demands_from_records(input_.model,records) if registration.identity==CARGO_IDENTITY else records['transport_demand']
+        if (getattr(input_.model,'configuration',None) is not None)!=(registration.identity==CARGO_IDENTITY):raise ValueError('Worker model/runtime mismatch')
+        if canonical_bytes(input_.demands)!=canonical_bytes(expected_demands) or canonical_bytes(input_.resources)!=canonical_bytes(records['transport_resources']):raise ValueError('Pinned input records changed')
     lease={'run_id':job['run_id'],'worker_token':job['lease_token']}
     prepared=await call(ctx,'prepared',**lease)
     if prepared['publication'] is not None:

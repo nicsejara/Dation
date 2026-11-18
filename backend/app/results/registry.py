@@ -55,6 +55,7 @@ RUNTIMES = (
     RuntimeRegistration('logistics-scheduling-engine', '1.0.0', None, 'scheduling_v1', 1, 'logistics_scheduling', True, True),
     RuntimeRegistration('logistics-dispatch-engine', '2.2.0', None, 'dispatch_v2', 2, None, True, True),
     RuntimeRegistration('transport_plan', '2.0.0', 'transport_plan_v1', 'transport_plan_v1', 1, 'logistics_assignment', False, False),
+    RuntimeRegistration('transport_plan', '3.0.0', 'transport_plan_cargo_v2', 'transport_plan_v1', 1, 'logistics_assignment', False, False),
     RuntimeRegistration('day_scheduling', '2.0.0', 'day_scheduling_v1', 'day_scheduling_v1', 1, 'logistics_scheduling', False, False),
 )
 
@@ -66,6 +67,9 @@ def resolve_test_core(identity):
     phases are complete. Matching only a node or schema is insufficient.
     """
     entry = resolve_runtime(identity)
+    if entry.identity == RuntimeIdentity(engine_name='transport_plan',engine_version='3.0.0',runtime_profile='transport_plan_cargo_v2',result_schema='transport_plan_v1',result_schema_version=1):
+        from app.engines.assignment.cargo_inputs import run_cargo_core
+        return run_cargo_core
     if entry.identity != RuntimeIdentity(engine_name='transport_plan',engine_version='2.0.0',
             runtime_profile='transport_plan_v1',result_schema='transport_plan_v1',result_schema_version=1):
         raise RuntimeUnavailable('No test Core producer for this exact identity')
@@ -75,7 +79,11 @@ def resolve_test_core(identity):
 
 def resolve_test_policy(identity):
     """T7 producer remains test-only; public availability is unchanged."""
-    resolve_test_core(identity)
+    entry=resolve_runtime(identity)
+    resolve_test_core(entry.identity)
+    if entry.identity.engine_version=='3.0.0':
+        from app.engines.assignment.cargo_inputs import run_cargo_policy
+        return run_cargo_policy
     from app.engines.assignment.transport_policy_result import run_transport_policy
     return run_transport_policy
 

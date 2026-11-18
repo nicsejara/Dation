@@ -1,0 +1,54 @@
+{
+  "scope": "local CP-SAT, alternative_budget=0; tracemalloc enabled, no network",
+  "baseline": "f7fb4be3aa750b1c609a3579fd35e9180b40a9c9",
+  "results": [
+    {
+      "orders": 1,
+      "lines": 1,
+      "elapsed_seconds": 0.0899,
+      "python_peak_bytes": 475845,
+      "rss_peak_kib": 119412,
+      "status": "OPTIMAL",
+      "assigned": "1.000",
+      "slots": 1,
+      "variables": 6,
+      "limits": []
+    },
+    {
+      "orders": 10,
+      "lines": 10,
+      "elapsed_seconds": 0.2358,
+      "python_peak_bytes": 615046,
+      "rss_peak_kib": 122356,
+      "status": "OPTIMAL",
+      "assigned": "10.000",
+      "slots": 10,
+      "variables": 420,
+      "limits": []
+    },
+    {
+      "orders": 100,
+      "lines": 100,
+      "elapsed_seconds": 2.6241,
+      "python_peak_bytes": 4818010,
+      "rss_peak_kib": 147308,
+      "status": "OPTIMAL",
+      "assigned": "100.000",
+      "slots": 12,
+      "variables": 4824,
+      "limits": []
+    },
+    {
+      "orders": 250,
+      "lines": 250,
+      "elapsed_seconds": 8.8894,
+      "python_peak_bytes": 11890410,
+      "rss_peak_kib": 182336,
+      "status": "OPTIMAL",
+      "assigned": "250.000",
+      "slots": 12,
+      "variables": 12024,
+      "limits": []
+    }
+  ]
+}

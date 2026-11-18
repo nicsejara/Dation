@@ -9,6 +9,8 @@ from app.domain.logistics.base import ContractModel
 from app.domain.logistics.contracts import Demand, TransportResource, LogisticsModelVersion, FrozenCaseContext
 from app.domain.logistics.units import QUANTITY_SCALES, scaled_integer
 from app.domain.logistics.units import QuantityVector
+from app.domain.logistics.cargo_execution import CatalogDemand,CategorizedTransportResource
+from app.models.ultimate_foundation import LogisticsModelSnapshotV2
 from app.results.contracts import EngineOutput, DemandResolution, ResourceUsage
 from app.engines.common.day_resource_feasibility import FeasibilityCertificate
 
@@ -22,13 +24,13 @@ class TransportPlanOptions(ContractModel):
 
 
 class TransportPlanInput(ContractModel):
-    model: LogisticsModelVersion
+    model: LogisticsModelSnapshotV2 | LogisticsModelVersion
     context: FrozenCaseContext
     # Agreed MVP input envelope. Search remains bounded independently by slots,
     # variables and deterministic budgets; larger input never implies a claim
     # of exhaustive candidates or full coverage.
-    demands: tuple[Demand, ...] = Field(max_length=500)
-    resources: tuple[TransportResource, ...] = Field(max_length=50)
+    demands: tuple[CatalogDemand | Demand, ...] = Field(max_length=500)
+    resources: tuple[CategorizedTransportResource | TransportResource, ...] = Field(max_length=50)
     run_id: UUID
     result_generated_at: AwareDatetime
     options: TransportPlanOptions = Field(default_factory=TransportPlanOptions)
@@ -38,8 +40,14 @@ class TransportPlanInput(ContractModel):
         m, c = self.model, self.context
         if (m.workspace_id,m.model_id,m.version_id,m.version,m.configuration_hash,m.currency_policy,m.primary_dimension,set(m.active_dimensions)) != (c.workspace_id,c.logistics_model_id,c.logistics_model_version_id,c.logistics_model_version,c.model_hash,c.currency_policy,c.primary_dimension,set(c.active_dimensions)):
             raise ValueError('Model and Frozen Case context do not match')
-        if {x.slot for x in c.read_set} != {'transport_demand','transport_resources'}:
-            raise ValueError('D1 requires the two explicit T1 semantic inputs')
+        cfg=getattr(m,'configuration',None)
+        catalog=cfg is not None and cfg.cargo.input_mode=='catalog'
+        expected={'transport_demand','transport_resources'}|({'order_lines'} if catalog else set())
+        if {x.slot for x in c.read_set} != expected:
+            raise ValueError('D1 catálogo requiere los tres inputs semánticos fijados.' if catalog else 'D1 requires the two explicit T1 semantic inputs')
+        if cfg is not None:
+            from .cargo_inputs import validate_cargo_input
+            validate_cargo_input(self)
         for rows, key in [(self.demands,'order_id'),(self.resources,'resource_id')]:
             if len({getattr(row,key) for row in rows}) != len(rows):
                 raise ValueError('Duplicate '+key)
@@ -67,7 +75,7 @@ class TransportPlanInput(ContractModel):
 
 
 class SearchTrace(ContractModel):
-    version: Literal['D1_STRUCTURAL_FRACTION_COVERAGE_V1','D1_POLICY_V1'] = 'D1_STRUCTURAL_FRACTION_COVERAGE_V1'
+    version: Literal['D1_STRUCTURAL_FRACTION_COVERAGE_V1','D1_POLICY_V1','D1_CARGO_POLICY_V2','D1_CARGO_STRUCTURAL_V2'] = 'D1_STRUCTURAL_FRACTION_COVERAGE_V1'
     native_statuses: tuple[str,...]
     solver_version: str
     seed: int

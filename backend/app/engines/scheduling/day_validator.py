@@ -12,6 +12,7 @@ def certify_schedule(result):
     c.EngineOutput.model_validate(result.output);c.validate_schedule_source(source,core,request.source_transport_plan.result_fingerprint)
     original={t.trip_id:t for t in source.transport_plan.trips};rows={t.trip_id:t for t in core.schedule.trips};resources={r.resource_id:r for r in request.resources}
     require(core.context==request.context,'Frozen context changed')
+    require(core.schedule.cargo==source.transport_plan.cargo,'D2 changed fixed D1 cargo quantities/provenance')
     for tid,t in rows.items():
         s=original[tid];estimate=TransitEstimator.estimate(s.distance_km,t.resource_source)
         require((t.ready_date,t.delivery_due_date,t.outbound_days,t.cycle_days)==(s.ready_date,s.delivery_due_date,estimate.outbound_days,estimate.cycle_days),'Source windows/Transit changed')

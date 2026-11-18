@@ -31,11 +31,22 @@ def _certify(request,result):
     def rounded(n,d,scale=4):
         return None if not d else (Decimal(n)/Decimal(d)).quantize(Decimal(1).scaleb(-scale),rounding=ROUND_HALF_UP)
     m,context=request.model,request.context
+    cfg=getattr(m,'configuration',None)
+    catalog=cfg is not None and cfg.cargo.input_mode=='catalog'
+    def eligible_pair(o,r):
+        if r.source not in m.allowed_sources or (o.origin_id,o.destination_id) not in r.lanes or (r.source=='OWN' and r.base_origin_id!=o.origin_id):return False
+        if cfg is not None and cfg.resource_categories and getattr(r,'resource_category',None) not in cfg.resource_categories:return False
+        if catalog:
+            choices=[set(line.compatibility_groups).issubset(r.compatibility_groups) if line.compatibility_groups else m.homogeneous_loads_declared for line in o.lines]
+            return any(choices) if o.split_allowed and m.split_permitted else all(choices)
+        return set(o.compatibility_groups).issubset(r.compatibility_groups) if o.compatibility_groups else m.homogeneous_loads_declared
     core,evidence=result.output.core,result.output.evidence
     check(core.context==context and core.decision.run_id==request.run_id,'Pinned context/Run changed')
-    check(core.engine.engine_name=='transport_plan' and core.engine.engine_version=='2.0.0' and core.engine.runtime_profile=='transport_plan_v1','Wrong runtime identity')
+    check(core.engine.engine_name=='transport_plan' and core.engine.engine_version==('3.0.0' if cfg is not None else '2.0.0') and core.engine.runtime_profile==('transport_plan_cargo_v2' if cfg is not None else 'transport_plan_v1'),'Wrong runtime identity')
     check(core.feasibility.policy_feasible is None,'T6 cannot certify T7 policy')
     check(evidence.core_result_fingerprint==core_result_fingerprint(core),'Core fingerprint changed')
+    from .cargo_validator import certify_cargo
+    certify_cargo(request,core.transport_plan)
     trips=core.transport_plan.trips
     dims=m.active_dimensions
     orders={o.order_id:o for o in request.demands}
@@ -60,23 +71,23 @@ def _certify(request,result):
             check(allocation.order_id in orders,'Unknown Order reference')
             order=orders[allocation.order_id];rows.append(order)
             check((trip.origin_id,trip.destination_id,trip.distance_km)==(order.origin_id,order.destination_id,order.distance_km),'Route/distance modified')
-            check(set(order.compatibility_groups).issubset(resource.compatibility_groups) if order.compatibility_groups else m.homogeneous_loads_declared,'Incompatible resource/cargo')
+            if not catalog:check(eligible_pair(order,resource),'Incompatible resource/cargo')
             fraction=None
             for d in dims:
                 q,load=getattr(order.requested,d),getattr(allocation.load,d)
                 check(load is not None,'Missing active dimension')
                 if q:
                     current=Fraction(load)/Fraction(q)
-                    check(fraction is None or current==fraction,'Split vector loses proportionality')
-                    fraction=current
+                    if not catalog:check(fraction is None or current==fraction,'Split vector loses proportionality')
+                    if not catalog or d==m.primary_dimension:fraction=current
                 else:check(load==0,'Demand created in a zero dimension')
                 totals[order.order_id][d]+=load
             check(fraction is not None and 0<fraction<=1,'Invalid allocation fraction')
             check(allocation.allocation_fraction==rounded(fraction.numerator,fraction.denominator,6),'Fraction display differs from exact vector')
             if not(order.split_allowed and m.split_permitted):
-                check(fraction==1,'Non-split demand divided')
+                check(fraction==1 and all(getattr(allocation.load,d)==getattr(order.requested,d) for d in dims),'Non-split demand divided')
             refs[order.order_id].append(trip.trip_id)
-        check(len({tuple(sorted(o.compatibility_groups)) for o in rows})==1,'Unsafe heterogeneous consolidation')
+        if cfg is None:check(len({tuple(sorted(o.compatibility_groups)) for o in rows})==1,'Unsafe heterogeneous consolidation')
         check(trip.ready_date==max(o.ready_date for o in rows) and trip.delivery_due_date==min(o.delivery_due_date for o in rows),'Trip window modified')
         for d in Dimension:
             if d not in dims:
@@ -182,7 +193,7 @@ def _certify(request,result):
         check(key not in pair_evidence,'Duplicate candidate pair evidence')
         pair_evidence[key]=constraint
         rejected=[]
-        eligible=r.source in m.allowed_sources and (o.origin_id,o.destination_id) in r.lanes and (r.source!='OWN' or r.base_origin_id==o.origin_id) and (set(o.compatibility_groups).issubset(r.compatibility_groups) if o.compatibility_groups else m.homogeneous_loads_declared)
+        eligible=eligible_pair(o,r)
         if not eligible:rejected.append('RESOURCE_INCOMPATIBLE')
         first=max(context.planning_start,o.ready_date).toordinal()
         last=min(context.planning_end.toordinal(),o.delivery_due_date.toordinal()-TransitEstimator.estimate(o.distance_km,r.source).outbound_days+1)
@@ -213,16 +224,16 @@ def _certify(request,result):
             else:check(f['services_used']==len(per_resource[r.resource_id])==r.services_available,'False service saturation')
         elif reason.code=='NO_COMPATIBLE_RESOURCE':
             o=orders[reason.entity_id]
-            eligible=[r for r in resources.values() if r.source in m.allowed_sources and (o.origin_id,o.destination_id) in r.lanes and (r.source!='OWN' or r.base_origin_id==o.origin_id) and (set(o.compatibility_groups).issubset(r.compatibility_groups) if o.compatibility_groups else m.homogeneous_loads_declared)]
+            eligible=[r for r in resources.values() if eligible_pair(o,r)]
             check(not eligible and f['certificate_ref'] in constraint_ids,'False compatibility exhaustion')
         elif reason.code=='NON_SPLIT_EXCEEDS_GUARANTEED_CAPACITY':
             o=orders[reason.entity_id]
             check(not(o.split_allowed and m.split_permitted) and f['requested']==getattr(o.requested,f['dimension']),'False non-split proof')
-            eligible=[r for r in resources.values() if r.source in m.allowed_sources and (o.origin_id,o.destination_id) in r.lanes and (r.source!='OWN' or r.base_origin_id==o.origin_id) and (set(o.compatibility_groups).issubset(r.compatibility_groups) if o.compatibility_groups else m.homogeneous_loads_declared)]
+            eligible=[r for r in resources.values() if eligible_pair(o,r)]
             check(bool(eligible) and max(getattr(r.guaranteed_capacity,f['dimension']) for r in eligible)==f['maximum_guaranteed_capacity'],'Non-split bound omitted resource')
         elif reason.code=='DATE_WINDOW_INCOMPATIBLE':
             o=orders[reason.entity_id]
-            eligible=[r for r in resources.values() if r.source in m.allowed_sources and (o.origin_id,o.destination_id) in r.lanes and (r.source!='OWN' or r.base_origin_id==o.origin_id) and (set(o.compatibility_groups).issubset(r.compatibility_groups) if o.compatibility_groups else m.homogeneous_loads_declared)]
+            eligible=[r for r in resources.values() if eligible_pair(o,r)]
             latest=[min(context.planning_end.toordinal(),o.delivery_due_date.toordinal()-TransitEstimator.estimate(o.distance_km,r.source).outbound_days+1) for r in eligible]
             check(bool(latest) and f['earliest_dispatch']==max(context.planning_start,o.ready_date) and f['latest_dispatch'].toordinal()==max(latest) and f['earliest_dispatch']>f['latest_dispatch'],'Invalid date contradiction')
         else:

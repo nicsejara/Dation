@@ -35,6 +35,7 @@ def vector(values):
 
 def run_transport_plan(request):
     request = TransportPlanInput.model_validate(request)
+    if getattr(request.model,'configuration',None) is not None:raise ValueError('V2 requiere el perfil transport_plan_cargo_v2.')
     with localcontext() as ctx:
         ctx.prec = 60
         return _run(request)
@@ -56,17 +57,27 @@ def _build_structural_plan(request, policy_search=None):
     """
     orders, denominators, slots, selected, trace = solve_structural(request,policy_search)
     dims, context = request.model.active_dimensions, request.context
+    cfg=getattr(request.model,'configuration',None);identity=IDENTITY;physical=None
+    if cfg is not None:
+        from .cargo_inputs import IDENTITY as CARGO_IDENTITY
+        from app.domain.logistics.physical import normalize_catalog
+        identity=CARGO_IDENTITY;physical=normalize_catalog(cfg.cargo,dims)
     staged = []
     if selected is not None:
         for slot, values in zip(slots,selected):
-            allocations = []
-            for i,numerator in sorted(values.items()):
-                if not numerator:
-                    continue
-                denominator, units = denominators[i]
-                load = vector({d:Decimal(units[d]*numerator).scaleb(-QUANTITY_SCALES[d]) for d in dims})
-                allocations.append(c.Allocation(order_id=orders[i].order_id,
-                    allocation_fraction=ratio(numerator,denominator,6),load=load))
+            line_rows=[]
+            if cfg is not None:
+                from .cargo_result import allocations_for_slot
+                allocations,line_rows=allocations_for_slot(request,orders,slot,physical)
+            else:
+                allocations = []
+                for i,numerator in sorted(values.items()):
+                    if not numerator:
+                        continue
+                    denominator, units = denominators[i]
+                    load = vector({d:Decimal(units[d]*numerator).scaleb(-QUANTITY_SCALES[d]) for d in dims})
+                    allocations.append(c.Allocation(order_id=orders[i].order_id,
+                        allocation_fraction=ratio(numerator,denominator,6),load=load))
             if not allocations:
                 continue
             rows = [o for o in orders if o.order_id in {a.order_id for a in allocations}]
@@ -78,12 +89,13 @@ def _build_structural_plan(request, policy_search=None):
                 utilization=c.UtilizationVector(**{d:ratio(getattr(load,d),getattr(cap,d)) for d in dims}),
                 estimated_cost=None,ready_date=max(o.ready_date for o in rows),
                 delivery_due_date=min(o.delivery_due_date for o in rows))
-            staged.append((canonical_bytes(data),data))
-    trips, repeated = [], Counter()
-    for key,data in sorted(staged,key=lambda pair:pair[0]):
+            staged.append((canonical_bytes([data,line_rows]) if line_rows else canonical_bytes(data),data,line_rows))
+    trips, repeated, cargo_allocations = [], Counter(), []
+    for key,data,line_rows in sorted(staged,key=lambda pair:pair[0]):
         digest = hashlib.sha256(key).hexdigest()[:24]
         repeated[digest] += 1
-        trips.append(c.Trip(trip_id=f'TP-{digest}-{repeated[digest]}',**data))
+        trip=c.Trip(trip_id=f'TP-{digest}-{repeated[digest]}',**data);trips.append(trip)
+        cargo_allocations.extend(c.CargoAllocation(trip_id=trip.trip_id,**line) for line in line_rows)
     temporal = day_resource_feasibility([
         FixedTrip(trip_id=t.trip_id,resource_id=t.resource_id,distance_km=t.distance_km,
             ready_date=t.ready_date,delivery_due_date=t.delivery_due_date) for t in trips
@@ -93,7 +105,7 @@ def _build_structural_plan(request, policy_search=None):
         raise EngineCertificationError('D1 candidate and independent fixed-trip kernel disagree')
     usable = selected is not None and temporal.status == 'FEASIBLE'
     if not usable:
-        trips = []
+        trips = [];cargo_allocations=[]
         if temporal.status == 'FEASIBLE':
             temporal = FeasibilityCertificate(status='UNKNOWN',native_status='NOT_RUN',cause='NO_STRUCTURAL_INCUMBENT')
     # A CP optimum for the restricted structural model is not a certificate of
@@ -237,12 +249,16 @@ def _build_structural_plan(request, policy_search=None):
         capacity_utilization=dict(primary_dimension=primary,weighted_ratio=ratio(sum((getattr(t.total_load,primary) for t in trips),Decimal(0)),sum((getattr(t.guaranteed_capacity,primary) for t in trips),Decimal(0)))),
         resource_mix=dict(own_trip_ratio=ratio(own,len(trips)),external_trip_ratio=ratio(len(trips)-own,len(trips))),resources_used=len({t.resource_id for t in trips}),
         coverage_by_priority=[dict(priority=p,coverage_ratio=ratio(*coverage[p])) for p in Priority])
+    cargo=None
+    if cfg is not None:
+        from .cargo_result import cargo_detail
+        cargo=cargo_detail(request,cargo_allocations)
     core=c.EngineCoreResult(result_schema='transport_plan_v1',decision=c.Decision(node_id='logistics_assignment',decision_type='TRANSPORT_PLAN',decision_label='Transport Plan',run_id=request.run_id),
-        context=context,engine=c.EngineHeader(engine_name=IDENTITY.engine_name,engine_version=IDENTITY.engine_version,runtime_profile=IDENTITY.runtime_profile,
-            solver='OR_TOOLS_CP_SAT',solver_status=status,result_generated_at=request.result_generated_at),input_context_hash=input_context_hash(context,IDENTITY),
+        context=context,engine=c.EngineHeader(engine_name=identity.engine_name,engine_version=identity.engine_version,runtime_profile=identity.runtime_profile,
+            solver='OR_TOOLS_CP_SAT',solver_status=status,result_generated_at=request.result_generated_at),input_context_hash=input_context_hash(context,identity),
         feasibility=c.Feasibility(solution_found=usable,policy_feasible=None,hard_constraints_satisfied=True if usable else None,
             full_demand_coverage=not any(getattr(gap,d)>0 for d in dims) if usable else None),metrics=metrics,
-        transport_plan=c.TransportPlan(trips=tuple(trips),unassigned_demand=tuple(o for o in resolutions if o.status!='COVERED'),capacity_gap=gap if any(getattr(gap,d)>0 for d in dims) else None))
+        transport_plan=c.TransportPlan(cargo=cargo,trips=tuple(trips),unassigned_demand=tuple(o for o in resolutions if o.status!='COVERED'),capacity_gap=gap if any(getattr(gap,d)>0 for d in dims) else None))
     solver=dict(status=status,objective_value=None,best_bound=None,certificate=c.SolverCertificate(kind='FEASIBILITY' if usable else 'INFEASIBILITY',evidence_ref=cert_ref) if usable or status=='INFEASIBLE' else None)
     evidence=dict(result_schema='transport_plan_v1',workspace_id=context.workspace_id,run_id=request.run_id,input_context_hash=core.input_context_hash,
         core_result_fingerprint=core_result_fingerprint(core),policy=c.PolicyEvidence(case_goal=context.case_policy.primary_goal,effective_node_policy=context.node_policy.primary_goal,

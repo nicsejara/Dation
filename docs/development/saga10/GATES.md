@@ -8,8 +8,8 @@ La saga no está terminada. Este registro se actualiza al completar gates; los f
 | G1 | PASS focal | Dominio inmutable, SQL aditivo; seis escenarios de persistencia con último resultado PASS |
 | G2 | PASS focal | 29 pruebas dominio + compatibilidad v1; ejemplos A/B y 100 propiedades con semilla |
 | G3 | PASS focal | 67 unit tests, ocho escenarios de catálogo y 24 regresiones Journey v1 |
-| G4 | PENDIENTE | Adaptación D1 por líneas + oracle/benchmark |
-| G5 | PENDIENTE | Handoff D1→D2 inmutable |
+| G4 | PASS focal | 13 pruebas D1 v2 + oracle, 147 regresiones, SQL/worker y benchmark |
+| G5 | PASS focal | Dos pruebas de handoff/artifacts + ciclo API/worker/aprobación/D2 |
 | G6 | PENDIENTE | Wizard cinco bloques y navegador |
 | G7 | PENDIENTE | Studio/exports compatibles |
 | G8 | PENDIENTE | Matriz industria y regresión integrada |
@@ -52,3 +52,24 @@ Comandos desde backend:
 - `python -m unittest -v tests.integration.test_decision_journey`: **24 PASS**, 30,141 s.
 
 Se evitó revalidar el catálogo entero una vez por cada presentación: normalize_catalog valida una vez y normaliza sus presentaciones ya comprobadas. El wrapper público individual sigue validando que la presentación pertenezca al catálogo. La procedencia distingue valores declarados de fuentes derivadas. Sin efectos en v1.
+
+
+## G4 y G5
+
+Perfil exacto D1 `transport_plan/3.0.0 — transport_plan_cargo_v2`, registro público inactivo. CP-SAT asigna quanta enteros por línea/presentación, con suma primaria para la jerarquía de objetivos vigente; capacidades de todas las dimensiones, costos, guardrails, fechas y ciclos OWN conservados. Una orden indivisible lleva todas sus líneas completas a un Trip o ninguna. Consolidación y compatibilidad de co-carga son controles independientes. Los límites de 500 líneas, candidatos, variables y restricciones rechazan el exceso explícitamente; no se truncan candidatos para afirmar OPTIMAL. La precisión histórica de la fracción primaria puede excluir asignaciones diminutas: se informa `CARGO_FRACTION_DISPLAY_LIMIT` y se retira la certificación de óptimo completo. El detalle físico nunca se reconstruye de esa fracción.
+
+Extensión opcional `cargo_assignment_v2` tipada: asignaciones, productos y resolución requested/assigned/unserved por línea, fijadas por hash de catálogo. None se omite: los bytes históricos y sus golden fingerprints siguen iguales. El certificador independiente no importa generador CP ni extracción; reconcilia física, líneas, enteros, conservación, co-carga y agregados. Las comparaciones económicas consideran las líneas realmente transportadas. La metadata estática JSON de contratos se regeneró para exponer la extensión aditiva, sin modificar el ABI anterior.
+
+Admisión, hash, read-set y worker se atan al snapshot completo y al tercer slot; SQL conserva las identidades v1 y admite exactamente el perfil nuevo. El primer ciclo local detectó `ultimate_run_context` limitado a 2.0.0; el constraint aditivo mantiene todos sus controles y agrega la identidad 3.0.0 sólo para D1. La fachada conserva el contrato de worker sin actor mediante su lease; los flags v2 se vuelven a comprobar antes de producir/preparar. No hay cambios de leases, cancelación, replays ni activación productiva.
+
+D2 conserva el certificado cargo exacto de D1 aprobado, Trip IDs, recursos y cantidades. El hash SQL de Core coincide con Python para la extensión. Se verificaron publicación real privada, aprobación humana, ausencia de modificación del padre y resultado D2.
+
+Resultados:
+- `tests.test_saga10_assignment` **13 PASS**, incluyendo nueve combinaciones de oracle exhaustivo independiente, todas las metas, ejemplos A/B, discrete/direct/bulk, capacidad de peso y mutantes re-firmados.
+- Regresión `tests.test_transport_plan_core tests.test_transport_plan_policies tests.test_ultimate_contracts tests.test_day_scheduling_core` más las primeras once de Saga10: **147 PASS**, 4,036 s.
+- `tests.test_saga10_assignment tests.test_saga10_scheduling tests.test_transport_result_package tests.test_day_result_package`: **53 PASS**, 3,081 s.
+- `tests.integration.test_saga10_persistence tests.integration.test_saga10_catalog_pack`: **14 PASS**, 36,301 s con la migración G4 incluida.
+- `tests.integration.test_saga10_execution`: **3 PASS**, 18,969 s, PostgreSQL/PostgREST/Storage y worker exclusivamente locales; sólo esa base efímera habilita los flags para comprobar ejecución.
+- Benchmark local con tracemalloc: 1/10/100/250 órdenes/líneas, todas OPTIMAL, 0,0899/0,2358/2,6241/8,8894 s; 6/420/4.824/12.024 variables; RSS máximo acumulado 182.336 KiB. Referencia G0 no equivalente en física: 250 órdenes proporcionales, 6,8462 s/6.024 variables/140.784 KiB. El incremento corresponde a variables de integridad por línea y certificados; no se declara paridad exacta ni costo productivo medido.
+
+La migración G4 fue generada con CLI y validada/reaplicada localmente. Ninguna migración se aplicó a Supabase real.

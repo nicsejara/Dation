@@ -126,6 +126,13 @@ def input_context_hash(context, runtime_identity, upstream=None):
     return _hash('INPUT_CONTEXT', input_context_projection(context, runtime_identity, upstream))
 
 
+def _cargo_projection(detail):
+    if detail is None:return None
+    return dict(detail,
+        allocations=sorted((dict(row,products=sorted(row['products'],key=lambda item:item['product_id'])) for row in detail['allocations']),key=lambda row:(row['trip_id'],row['order_id'],row['line_id'])),
+        lines=sorted(detail['lines'],key=lambda row:(row['order_id'],row['line_id'])))
+
+
 def core_projection(core):
     value = _data(core)
     engine = dict(value['engine'])
@@ -137,9 +144,11 @@ def core_projection(core):
         transport['trips'] = sorted((dict(trip, orders=sorted(trip['orders'], key=lambda a:a['order_id']),
             reason_codes=sorted(trip['reason_codes'])) for trip in transport['trips']), key=lambda trip:trip['trip_id'])
         transport['unassigned_demand'] = sorted(transport['unassigned_demand'], key=lambda order:order['order_id'])
+    if transport is not None and 'cargo' in transport:transport['cargo']=_cargo_projection(transport['cargo'])
     schedule = value.get('schedule')
     if schedule is not None:
         schedule = dict(schedule, trips=sorted(schedule['trips'], key=lambda trip:trip['trip_id']))
+    if schedule is not None and 'cargo' in schedule:schedule['cargo']=_cargo_projection(schedule['cargo'])
     metrics = dict(value['metrics'])
     if 'coverage_by_priority' in metrics:
         metrics['coverage_by_priority'] = sorted(metrics['coverage_by_priority'], key=lambda item:item['priority'])

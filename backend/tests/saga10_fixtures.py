@@ -24,3 +24,36 @@ def bulk_config(density='850',unit='m3'):
     value['cargo']={'input_mode':'catalog','profile':'LIQUID_BULK','split_policy':'CONTINUOUS','compatibility_policy':'UNIFORM_DECLARED','products':[product],
       'presentations':[{'presentation_id':'BULK','label':'Granel explícito','quantity_kind':'CONTINUOUS','quantity_unit':unit,'components':[{'product_id':'LIQUID','quantity':'1'}]}]}
     return value
+
+
+def cargo_request(configuration=None, specifications=None, resources=None, *, options=None, goal='MINIMIZE_COST', guards=()):
+    """Pinned synthetic v2 boundary. No CSV or database mutation."""
+    from decimal import Decimal
+    from uuid import uuid5
+    from app.domain.logistics.physical import normalize_catalog, line_load
+    from app.services.logistics_model_service import configuration_snapshot
+    from app.engines.assignment.transport_contracts import TransportPlanInput
+    from tests.test_transport_plan_core import request, order, resource
+    cfg, digest = configuration_snapshot(configuration or catalog_config())
+    data = request().model_dump(mode='python'); model = data['model']; context = data['context']
+    for key in ('operating_role','transport_pattern','primary_dimension','active_dimensions','allowed_sources','homogeneous_loads_declared','split_permitted','currency_policy'):
+        model[key]=cfg[key]
+    model.update(configuration=cfg,configuration_hash=digest,contract_registry_version='SAGA10_DOMAIN_V2')
+    context.update(model_hash=digest,active_dimensions=cfg['active_dimensions'],primary_dimension=cfg['primary_dimension'],operating_role=cfg['operating_role'],currency_policy=cfg['currency_policy'])
+    context['case_policy']=context['node_policy']={'primary_goal':goal,'guardrails':list(guards)}
+    context['read_set']=[{**x,'normalizer_version':'DATION_CARGO_INPUT_NORMALIZER_V2'} for x in context['read_set']]
+    demands=[]
+    if cfg['cargo']['input_mode']=='catalog':
+        context['read_set'].append(dict(slot='order_lines',canonical_sha256='8'*64,contract_hash='9'*64,normalizer_version='DATION_CARGO_INPUT_NORMALIZER_V2'))
+        physical=normalize_catalog(cfg['cargo'],cfg['active_dimensions'])
+        specifications=specifications if specifications is not None else [('O1', [('PAL-JUICE','5'),('PAL-WATER','4'),('PAL-SODA','3')], True)]
+        for oid,lines,split in specifications:
+            vector={d:Decimal(0) for d in cfg['active_dimensions']};groups=set();details=[]
+            for pid,quantity in lines:
+                p=physical[pid];q=Decimal(quantity);load=line_load(p,q);groups.update(p.compatibility_groups)
+                for d in vector:vector[d]+=getattr(load,d)
+                details.append(dict(line_id=str(uuid5(model['version_id'],oid+'\x00'+pid)),presentation_id=pid,quantity=q,compatibility_groups=p.compatibility_groups))
+            demands.append(order(oid,split=split,requested=vector,compatibility_groups=sorted(groups),lines=details))
+    else:demands=specifications if specifications is not None else [order(pallets='3',split=cfg['split_permitted'])]
+    data.update(model=model,context=context,demands=demands,resources=resources if resources is not None else [resource(cap='26',services=1,guaranteed_capacity={d:{'pallets':'26','weight_kg':'30000','volume_m3':'60','units':'30000'}[d] for d in cfg['active_dimensions']})],options=options or {})
+    return TransportPlanInput.model_validate(data)

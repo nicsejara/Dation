@@ -79,6 +79,21 @@ def parse_configuration(value):
     return TypeAdapter(LogisticsModelConfiguration).validate_python(value)
 
 
+class LogisticsModelSnapshotV2(LogisticsModelVersion):
+    configuration: LogisticsModelConfigurationV2
+
+    @model_validator(mode='after')
+    def exact_published_configuration(self):
+        from app.results.canonical import canonical_bytes,content_sha256
+        c=self.configuration
+        expected=content_sha256(canonical_bytes({'canonical_version':'DATION_CANONICAL_V1','kind':'logistics_model_configuration_v2','value':c}))
+        if self.configuration_hash!=expected or self.contract_registry_version!='SAGA10_DOMAIN_V2':
+            raise ValueError('El catálogo no coincide con el hash/versionado publicado.')
+        for key in ['operating_role','transport_pattern','primary_dimension','active_dimensions','allowed_sources','homogeneous_loads_declared','split_permitted','currency_policy']:
+            if getattr(self,key)!=getattr(c,key):raise ValueError('La proyección del modelo no coincide con su configuración: '+key)
+        return self
+
+
 class ModelCreate(ContractModel):
     id: UUID
     name: str = Field(min_length=1,max_length=120)
@@ -164,7 +179,7 @@ class PlanningContextV1(Horizon):
     case_id: UUID
     operating_mode: OperatingMode
     horizon_type: HorizonType | None
-    model: LogisticsModelVersion
+    model: LogisticsModelSnapshotV2 | LogisticsModelVersion
     case_policy: CasePolicy
     case_policy_hash: str = Field(pattern=r'^[0-9a-f]{64}$')
     graph_definition_version: str

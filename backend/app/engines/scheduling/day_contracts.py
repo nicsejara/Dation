@@ -5,16 +5,18 @@ from uuid import UUID
 from pydantic import AwareDatetime,StrictBool,model_validator
 from app.domain.logistics.base import ContractModel
 from app.domain.logistics.contracts import FrozenCaseContext,LogisticsModelVersion,TransportResource
+from app.models.ultimate_foundation import LogisticsModelSnapshotV2
+from app.domain.logistics.cargo_execution import CategorizedTransportResource
 from app.results import contracts as c
 from app.results.canonical import core_result_fingerprint
 
 class DaySchedulingInput(ContractModel):
-    model: LogisticsModelVersion
+    model: LogisticsModelSnapshotV2 | LogisticsModelVersion
     context: FrozenCaseContext
     source_core: c.EngineCoreResult
     source_evidence: c.EngineEvidence
     source_transport_plan: c.ResultBinding
-    resources: tuple[TransportResource,...]
+    resources: tuple[CategorizedTransportResource | TransportResource,...]
     input_summary: c.InputSummary
     run_id: UUID
     result_generated_at: AwareDatetime
@@ -29,6 +31,10 @@ class DaySchedulingInput(ContractModel):
             raise ValueError('D2 requires a distinct exact D1 Core/Run')
         if (s.context.workspace_id,s.context.case_id,s.context.logistics_model_version_id,s.context.model_hash,s.context.planning_start,s.context.planning_end)!=(self.context.workspace_id,self.context.case_id,self.context.logistics_model_version_id,self.context.model_hash,self.context.planning_start,self.context.planning_end):
             raise ValueError('Cross-Case/model/horizon handoff')
+        if self.model.configuration_hash!=self.context.model_hash or self.model.version_id!=self.context.logistics_model_version_id:
+            raise ValueError('D2 model/context mismatch')
+        cfg=getattr(self.model,'configuration',None)
+        if (cfg is not None and cfg.cargo.input_mode=='catalog') != (s.transport_plan.cargo is not None):raise ValueError('D2 requires the exact catalog line certificate')
         by_id={r.resource_id:r for r in self.resources}
         if len(by_id)!=len(self.resources):raise ValueError('Duplicate source resource')
         for t in s.transport_plan.trips:
