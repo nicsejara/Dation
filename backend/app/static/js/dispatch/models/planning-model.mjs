@@ -41,8 +41,8 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
  const readDraft=()=>({...state,new_model:state.mode==='new'&&fields&&!pending()?fields.read():state.new_model});
  const changed=()=>{sync();onChange();};
  function sync(){
-  const valid=fields?.sectionValidity()||[false,false,false],complete=valid.filter(Boolean).length;
-  ring.style.setProperty('--model-progress',String(complete/valid.length*100)+'%');count.textContent=complete+' de '+valid.length+' secciones completas';
+  const valid=fields?.sectionValidity()||[false,false,false],progress=fields?.sectionCompletion?.()||valid,complete=progress.filter(Boolean).length;
+  ring.style.setProperty('--model-progress',String(complete/valid.length*100)+'%');count.textContent=complete+' de '+valid.length+(fields?.sectionCompletion?' secciones revisadas':' secciones completas');
   const selectedVersion=isSelected();
   modelPanel.setStatus(selectedVersion?'Configurado':!canManage?'Sólo lectura':previewFailed||pending()&&!busy?'Revisar configuración':'En configuración',selectedVersion?'complete':previewFailed?'warning':'pending');
   modelPanel.details.dataset.modelState=busy?'NEW_PUBLISHING':pickerOpen?'REUSE_PICKER':selectedVersion?'MODEL_SELECTED':!canManage?'READ_ONLY':previewFailed||pending()?'ERROR_RECOVERABLE':previewPending?'NEW_VALIDATING':compiled&&complete===valid.length?'NEW_READY_TO_CREATE':'NEW_EDITING';
@@ -50,7 +50,7 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
   catalogHint.textContent=!canManage?'Un Admin debe crear y publicar modelos. Podés reutilizar una versión disponible.':models.length?'También podés reutilizar una versión ya publicada.':'Todavía no hay modelos publicados para reutilizar.';
   reuse.setAttribute('aria-describedby','model-catalog-hint');catalogHint.id='model-catalog-hint';
   create.hidden=selectedVersion||!canManage;
-  create.disabled=busy||(state.locked&&!pending())||(!pending()&&(!compiled||complete!==valid.length));create.setAttribute('aria-busy',String(busy));
+  create.disabled=busy||(state.locked&&!pending())||(!pending()&&(!compiled||complete!==valid.length||fields?.canPublish&&!fields.canPublish()));create.setAttribute('aria-busy',String(busy));
   const caption=busy?'Creando modelo…':pending()?'Reintentar publicación pendiente':createLabel;if(createCaption.textContent!==caption)createCaption.textContent=caption;
   feedback.textContent=message||(!canManage?'Necesitás permiso de administración para crear un modelo.':'');feedback.hidden=!feedback.textContent;
   modelRetry.hidden=(state.mode!=='new'&&isSelected())||!previewFailed||busy||pending();modelRetry.textContent=state.mode==='existing'&&!isSelected()?'Reintentar selección del modelo':'Reintentar Data Contract';
@@ -84,7 +84,7 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
    const chosen=detail.versions.find(v=>v.id===state.version_id);if(detail.model.status!=='active'||!chosen)throw new Error('La versión publicada ya no está disponible. Elegí otra versión.');selected=detail;if(!models.some(m=>m.id===detail.model.id))models.push({...detail.model,versions:detail.versions});
    const selectedSummary=el('div',undefined,'model-wizard-selection'),text=el('div');text.append(el('h3',detail.model.name),el('p',chosen.config_jsonb.version===2?'Modelo publicado seleccionado':'Modelo seleccionado · Versión '+chosen.version,'d-metadata'));
    const another=button('Crear otro modelo',()=>{if(busy||pending()||state.locked)return;state.mode='new';state.model_id='';state.version_id='';state.intent=null;selected=null;message='';render().catch(fail);changed();});another.dataset.modelNew='';another.hidden=!canManage;another.disabled=state.locked||busy;selectedSummary.append(text,another);editor.append(selectedSummary);
-   fields=mountModelFields(editor,scope,{...detail.model,configuration:chosen.config_jsonb},{wizard:true,version:chosen.version});fields.lock();
+   fields=mountModelFields(editor,scope,{...detail.model,configuration:chosen.config_jsonb},{wizard:true,version:chosen.version});fields.lock({published:true});
   }
   changed();await preview();
  }
@@ -117,7 +117,7 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
   if(busy||(state.locked&&!pending())||!canManage||isSelected())return;
   if(!pending()){
    const errors=fields.showErrors();if(Object.keys(errors).length){message=Object.values(errors).join(' ');feedback.role='alert';sync();editor.querySelector('[aria-invalid=true]')?.focus();return;}
-   if(!compiled)return;
+   if(!compiled||fields.canPublish&&!fields.canPublish())return;
    state.new_model=fields.read();const value=state.new_model;
    state.intent={model_id:value.id,version_id:crypto.randomUUID(),body:{id:value.id,name:value.name,description:value.description||null,configuration:value.configuration},revision:null};
   }
@@ -140,10 +140,11 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
  const edit=event=>{
   if(state.mode!=='new'||pending()||state.locked)return;
   fields.showErrors();
-  if(!['model_name','model_description','model_status'].includes(event.target.name)){generation++;compiled=ready=previewPending=false;clearTimeout(timer);timer=setTimeout(()=>preview(),250);}
+  if(!['model_name','model_description','model_status'].includes(event.target.name)){fields.invalidateCompiled?.();generation++;compiled=ready=previewPending=false;clearTimeout(timer);timer=setTimeout(()=>preview(),250);}
   changed();
  };
  scope.listen(editor,'input',edit);scope.listen(editor,'change',edit);
+ scope.listen(editor,'model-review',changed);
  await render().catch(fail);modelBlock.hidden=false;
  return {
   modelPanel,contractPanel,draft:readDraft,

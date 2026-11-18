@@ -1,0 +1,74 @@
+{
+  "baseline": "8aa07f5ddad315d6e704b5fcfec77ebc0f101a8a",
+  "branch": "feat/saga10-5-logistics-guided-ux",
+  "kind": "actual owned browser fixtures, not production or reference artwork",
+  "files": [
+    {
+      "name": "actual-five-headers-1536.png",
+      "bytes": 168963,
+      "sha256": "c20e68a520ed17b1f149bed00149c94a22ffbed8a33f63c3c642efcdc141b263",
+      "captured_at_utc": "2026-11-18T22:18:02.096413+00:00"
+    },
+    {
+      "name": "actual-mode-products-composition-1536.png",
+      "bytes": 487498,
+      "sha256": "859caf452e24545fd49f94d7279dcbf18ac217b26f154e7aa6593827e58068f5",
+      "captured_at_utc": "2026-11-18T22:18:00.072660+00:00"
+    },
+    {
+      "name": "actual-mode-products-composition-320.png",
+      "bytes": 468000,
+      "sha256": "ad52e7bbd484f59047a3cb5da1e10598e06d5bc03266295f7da9d7ae35472bf7",
+      "captured_at_utc": "2026-11-18T22:18:00.842282+00:00"
+    },
+    {
+      "name": "actual-mode-products-composition-390.png",
+      "bytes": 454929,
+      "sha256": "89a40a260c109067992949c7b1b95f0ab39ff02e7b3f4afc02245f694b1f9f88",
+      "captured_at_utc": "2026-11-18T22:18:00.556891+00:00"
+    },
+    {
+      "name": "actual-profile-support-1536.png",
+      "bytes": 449771,
+      "sha256": "fcdecfaeb419292739d0aab6eb20478995475dea241966512bb3a46005d6a851",
+      "captured_at_utc": "2026-11-18T22:17:58.552738+00:00"
+    },
+    {
+      "name": "actual-profile-support-320.png",
+      "bytes": 431984,
+      "sha256": "59454fbfde20ff87953e998945ff3b07a989daefd2311e88f5adf584738bd9e5",
+      "captured_at_utc": "2026-11-18T22:17:59.328170+00:00"
+    },
+    {
+      "name": "actual-profile-support-390.png",
+      "bytes": 420595,
+      "sha256": "543b5ad3c6fd256388ebb9ec3a20ec0fb3e291dc7563d30abec93f21aac46a70",
+      "captured_at_utc": "2026-11-18T22:17:59.094597+00:00"
+    },
+    {
+      "name": "actual-review-1536.png",
+      "bytes": 296500,
+      "sha256": "11156c1e433e16495d4e9904313dbff6ec4c6e1f2a70a3559ae4d3edbe170e71",
+      "captured_at_utc": "2026-11-18T22:18:01.316740+00:00"
+    },
+    {
+      "name": "actual-review-320.png",
+      "bytes": 271659,
+      "sha256": "f12e68f34c19b9a341a06052958c394b1bfb442033c4153c25b9e0c9c016923a",
+      "captured_at_utc": "2026-11-18T22:18:01.869934+00:00"
+    },
+    {
+      "name": "actual-review-390.png",
+      "bytes": 262861,
+      "sha256": "9d21ef43c2653268896f7fe6eebdb4861161429efde6009ed3fdf0a582e215d3",
+      "captured_at_utc": "2026-11-18T22:18:01.682541+00:00"
+    },
+    {
+      "name": "geometry-and-contrast.json",
+      "bytes": 3283,
+      "sha256": "ebe3ce73cd4ccfc7e93fd630a81e28ab8d1701a95ef44c11dc162500bf89c150",
+      "captured_at_utc": "2026-11-18T22:18:01.870514+00:00"
+    }
+  ],
+  "frontend_runtime_sha256": "f6028e954045bad5b2b9785c3634fae718d788013ce9b62512467aad2f17d764"
+}
