@@ -129,3 +129,33 @@ class Saga10AssignmentTests(unittest.TestCase):
             for trip in core.transport_plan.trips:
                 self.assertEqual(trip.estimated_cost.amount,trip.distance_km*2 if trip.resource_source=='OWN' else 100)
             self.assertEqual(sum(row.quantity for row in core.transport_plan.cargo.allocations),12)
+
+    def test_direct_multicategory_load_needs_explicit_coload_pair(self):
+        from pydantic import ValidationError
+        cfg=direct_config()
+        with self.assertRaises(ValidationError):cargo_request(cfg,[order(split=False,compatibility_groups=['FOOD','CHEMICAL'])],[resource(compatibility_groups=['FOOD','CHEMICAL'])])
+        cfg['cargo']['co_load_pairs']=[['FOOD','CHEMICAL']]
+        result=solve(cargo_request(cfg,[order(pallets='1',split=False,compatibility_groups=['FOOD','CHEMICAL'])],[resource(compatibility_groups=['FOOD','CHEMICAL'])]))
+        self.assertEqual(result.output.core.metrics.demand_coverage.assigned,1)
+
+    def test_v1_runtime_cannot_silently_accept_v2_line_dtos(self):
+        from pydantic import ValidationError
+        from tests.test_transport_plan_core import request
+        from app.engines.assignment.transport_contracts import TransportPlanInput
+        old=request().model_dump();new=cargo_request().demands[0].model_dump()
+        # Preserve the v1 physical vector/context while adding a v2-only line.
+        old['demands'][0]['lines']=new['lines']
+        with self.assertRaises(ValidationError):TransportPlanInput.model_validate(old)
+
+    def test_CUSTOM_preferences_and_hard_guards_keep_same_policy_hierarchy(self):
+        req=cargo_request(resources=[truck('EXT'),truck('OWN',source='OWN',operating_cost_per_km='1')]).model_dump()
+        policy={'primary_goal':'CUSTOM','preferences':[{'kind':'COST','weight':'.5'},{'kind':'TRIPS','weight':'.5'}],
+            'guardrails':[{'kind':'MINIMUM_DEMAND_COVERAGE','limit':'1'},{'kind':'MINIMUM_OWN_SHARE','limit':'.5'},{'kind':'MAXIMUM_EXTERNAL_SHARE','limit':'.5'}]}
+        req['context']['case_policy']=req['context']['node_policy']=policy
+        core=solve(req).output.core
+        self.assertEqual(core.metrics.demand_coverage.assigned,12);self.assertGreaterEqual(core.metrics.resource_mix.own_trip_ratio,D('.5'))
+        self.assertLessEqual(core.metrics.resource_mix.external_trip_ratio,D('.5'))
+        cfg=catalog_config();cfg['active_dimensions']=['pallets']
+        req=cargo_request(cfg,[('HIGH',[('PAL-JUICE','3')],True),('MED',[('PAL-WATER','3')],True)],[resource(cap='5',services=1)]).model_dump()
+        req['demands'][0]['priority']='HIGH'
+        result=solve(req);self.assertEqual({r.order_id:r.assigned.pallets for r in result.demand_resolution},{'HIGH':3,'MED':2})

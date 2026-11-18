@@ -32,6 +32,15 @@ ALTER TABLE public.decision_runs ADD CONSTRAINT ultimate_run_context CHECK(CASE 
  AND ((node_id='logistics_assignment' AND schema_version='transport_plan_v1' AND engine_name='transport_plan')
  OR (node_id='logistics_scheduling' AND schema_version='day_scheduling_v1' AND engine_name='day_scheduling')) END);
 
+-- D2 graph availability must not bypass the independent cargo rollout gate.
+DO $$ DECLARE source text; old text='SELECT ultimate_admissions_enabled AND ultimate_scheduling_admissions_enabled AND dation_private.ultimate_pilot_allows(target_workspace_id) FROM dation_private.platform_release WHERE singleton'; BEGIN
+ source=pg_get_functiondef('public.platform_ultimate_graph(uuid,uuid,uuid,text,text,uuid,integer,integer)'::regprocedure);
+ IF strpos(source,'saga10_optimization_enabled')=0 THEN
+  IF strpos(source,old)=0 THEN RAISE EXCEPTION 'Unexpected scheduling capability projection'; END IF;
+  EXECUTE replace(source,old,'SELECT ultimate_admissions_enabled AND ultimate_scheduling_admissions_enabled AND dation_private.ultimate_pilot_allows(target_workspace_id) AND (body#>>''{model_version,config_jsonb,version}''<>''2'' OR (saga10_schema_enabled AND saga10_optimization_enabled)) FROM dation_private.platform_release WHERE singleton');
+ END IF;
+END $$;
+
 -- Workers authenticate through their live lease; keep the original NULL-actor
 -- restriction for these three operations instead of invoking team_actor(NULL).
 CREATE OR REPLACE FUNCTION public.platform_ultimate_execution(target_workspace_id uuid,actor_user_id uuid,operation text,arguments jsonb DEFAULT '{}')

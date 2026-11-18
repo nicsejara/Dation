@@ -8,12 +8,15 @@ from datetime import date
 from typing import Literal
 
 from ortools.sat.python import cp_model
-from pydantic import Field
+from pydantic import Field,TypeAdapter
 
 from app.domain.logistics.base import ContractModel, DecisionDate, Identifier, Positive
 from app.domain.logistics.contracts import Horizon, TransportResource
+from app.domain.logistics.cargo_execution import CategorizedTransportResource
 from app.domain.logistics.transit import TransitEstimator
 
+
+_RESOURCE_ADAPTER=TypeAdapter(CategorizedTransportResource | TransportResource)
 
 class FixedTrip(ContractModel):
     trip_id: Identifier
@@ -53,7 +56,7 @@ def dispatch_window(trip, resource, horizon):
 def day_resource_feasibility(trips, resources, horizon, *, deterministic_budget=2.0, select_earliest=False):
     horizon = Horizon.model_validate(horizon)
     trips = tuple(FixedTrip.model_validate(t) for t in trips)
-    resources = tuple(TransportResource.model_validate(r) for r in resources)
+    resources = tuple(_RESOURCE_ADAPTER.validate_python(r) for r in resources)
     if len({t.trip_id for t in trips}) != len(trips) or len({r.resource_id for r in resources}) != len(resources):
         raise ValueError('Duplicate fixed Trip/resource IDs')
     if len(trips) > 256 or len(resources) > 50 or (horizon.planning_end-horizon.planning_start).days > 365:

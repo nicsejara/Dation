@@ -19,9 +19,9 @@ def allocations_for_slot(request,orders,slot,physical=None):
             presentation=catalog[quantum.presentation_id];quantity=Decimal(n)*quantum.step;portions=[]
             for part in presentation.composition:
                 product=products[part['product_id']];bulk=presentation.quantity_kind=='CONTINUOUS'
-                portions.append(c.CargoProductPortion(product_id=product.product_id,quantity=part['quantity']*quantity,unit_label=presentation.quantity_unit if bulk else product.unit_label,
+                portions.append(c.CargoProductPortion(product_id=product.product_id,product_name=product.name,quantity=part['quantity']*quantity,unit_label=presentation.quantity_unit if bulk else product.unit_label,
                     product_units=None if bulk else part['product_units']*quantity))
-            lines.append({'order_id':order.order_id,'line_id':quantum.line_id,'presentation_id':quantum.presentation_id,'quantity':quantity,'quantity_unit':presentation.quantity_unit,'load':load,'products':tuple(sorted(portions,key=lambda p:p.product_id))})
+            lines.append({'order_id':order.order_id,'line_id':quantum.line_id,'presentation_id':quantum.presentation_id,'presentation_label':next(p.label for p in cfg.cargo.presentations if p.presentation_id==quantum.presentation_id),'quantity':quantity,'quantity_unit':presentation.quantity_unit,'load':load,'products':tuple(sorted(portions,key=lambda p:p.product_id))})
     by_id={o.order_id:o for o in orders};allocations=[]
     for oid,values in sorted(totals.items()):
         allocations.append(c.Allocation(order_id=oid,allocation_fraction=ratio(values[primary],getattr(by_id[oid].requested,primary),6),load=QuantityVector(**values)))
@@ -37,7 +37,7 @@ def cargo_detail(request,allocations):
     for order in sorted(request.demands,key=lambda o:o.order_id):
         for line in sorted(order.lines,key=lambda l:l.line_id):
             p=catalog[line.presentation_id];assigned=amounts[line.line_id]
-            resolutions.append(c.CargoLineResolution(order_id=order.order_id,line_id=line.line_id,presentation_id=line.presentation_id,quantity_kind=p.quantity_kind,quantity_unit=p.quantity_unit,
+            resolutions.append(c.CargoLineResolution(order_id=order.order_id,line_id=line.line_id,presentation_id=line.presentation_id,presentation_label=next(p.label for p in cfg.cargo.presentations if p.presentation_id==line.presentation_id),quantity_kind=p.quantity_kind,quantity_unit=p.quantity_unit,
                 requested=line.quantity,assigned=assigned,unserved=line.quantity-assigned))
     return c.CargoPlanDetail(catalog_hash=content_sha256(canonical_bytes(catalog)),allocations=tuple(sorted(allocations,key=lambda a:(a.trip_id,a.order_id,a.line_id))),lines=tuple(resolutions))
 

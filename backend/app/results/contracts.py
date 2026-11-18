@@ -246,6 +246,7 @@ class ResourceTimeline(ContractModel):
 
 class CargoProductPortion(ContractModel):
     product_id: Identifier
+    product_name: str = Field(min_length=1,max_length=120)
     quantity: Positive
     unit_label: str = Field(min_length=1,max_length=40)
     product_units: NonNegative | None
@@ -256,6 +257,7 @@ class CargoAllocation(ContractModel):
     order_id: Identifier
     line_id: Identifier
     presentation_id: Identifier
+    presentation_label: str = Field(min_length=1,max_length=120)
     quantity: Positive
     quantity_unit: Literal['presentation','kg','t','m3','l']
     load: QuantityVector
@@ -266,6 +268,7 @@ class CargoLineResolution(ContractModel):
     order_id: Identifier
     line_id: Identifier
     presentation_id: Identifier
+    presentation_label: str = Field(min_length=1,max_length=120)
     quantity_kind: Literal['DISCRETE','CONTINUOUS']
     quantity_unit: Literal['presentation','kg','t','m3','l']
     requested: Positive
@@ -707,7 +710,7 @@ class AlternativeDescriptor(ContractModel):
 class ExportDescriptor(ContractModel):
     available: StrictBool
     type: Literal["TRANSPORT_PLAN", "DAY_SCHEDULE", "DECISION_RESULT_PACKAGE"]
-    granularity: Literal["TRIP_ORDER", "TRIP", "PACKAGE"]
+    granularity: Literal["TRIP_ORDER", "TRIP_ORDER_LINE", "TRIP", "PACKAGE"]
     cost_scope: Literal["TRIP_ONCE"] | None = None
     rows: Delivery[dict[str, FactValue]] | None = None
 

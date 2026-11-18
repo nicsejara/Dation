@@ -2,10 +2,17 @@ import {el,button} from './forms.mjs';
 import {download} from '../shared.mjs';
 import {wizardIcon} from './wizard-ui.mjs';
 
-const ENTITIES=[['transport_demand','Órdenes / Demanda','Plantilla con los envíos u órdenes que Dation tendrá en cuenta al generar recomendaciones.','document'],['transport_resources','Flota / Recursos','Plantilla con los recursos propios o externos, sus capacidades, disponibilidad y condiciones de costo.','resources']];
+const ENTITIES=[['transport_demand','Órdenes / Demanda','Plantilla con los envíos u órdenes que Dation tendrá en cuenta al generar recomendaciones.','document'],['order_lines','Líneas de órdenes','Cantidades por orden y presentación del catálogo publicado. No requiere un archivo adicional de productos.','document'],['transport_resources','Flota / Recursos','Plantilla con los recursos propios o externos, sus capacidades, disponibilidad y condiciones de costo.','resources']];
+export function contractEntities(data){
+ const declared=data?.contracts?.transport_demand?.rules?.required_entities;
+ const expected=declared||['transport_demand','transport_resources'];
+ const allowed=['transport_demand','order_lines','transport_resources'];
+ if(!Array.isArray(expected)||!expected.includes('transport_demand')||!expected.includes('transport_resources')||new Set(expected).size!==expected.length||expected.some(e=>!allowed.includes(e)))throw new Error('El conjunto de contratos recibido es inválido.');
+ return ENTITIES.filter(([entity])=>expected.includes(entity));
+}
 // Presentation-only catalogue of exact public headers from the current compiler.
 // Unknown headers remain literal; this catalogue never generates or alters CSV.
-const DESCRIPTIONS={order_id:'Identificador único de la orden',origin_id:'Origen del envío',destination_id:'Destino del envío',distance_km:'Distancia entre origen y destino',ready_date:'Fecha en la que el envío está listo',delivery_due_date:'Fecha límite de entrega',priority:'Prioridad de la orden',split_allowed:'Permiso de fraccionamiento de la orden',resource_id:'Identificador único del recurso',source:'Recurso propio o externo',lanes:'Trayectos de origen y destino admitidos',units_available:'Unidades propias disponibles',base_origin_id:'Origen base del recurso propio',operating_cost_per_km:'Costo operativo por kilómetro',services_available:'Servicios externos disponibles',availability_source:'Origen de la disponibilidad declarada',cost_model:'Modalidad de tarifa del recurso externo',trip_rate:'Tarifa por viaje',per_km_rate:'Tarifa por kilómetro',billing_basis:'Base de facturación por kilómetro',compatibility_groups:'Grupos de compatibilidad declarados'};
+const DESCRIPTIONS={presentation_id:'Presentación del catálogo publicado',quantity:'Cantidad en la unidad de la presentación; las unidades discretas requieren enteros',resource_category:'Categoría declarada del recurso',order_id:'Identificador único de la orden',origin_id:'Origen del envío',destination_id:'Destino del envío',distance_km:'Distancia entre origen y destino',ready_date:'Fecha en la que el envío está listo',delivery_due_date:'Fecha límite de entrega',priority:'Prioridad de la orden',split_allowed:'Permiso de fraccionamiento de la orden',resource_id:'Identificador único del recurso',source:'Recurso propio o externo',lanes:'Trayectos de origen y destino admitidos',units_available:'Unidades propias disponibles',base_origin_id:'Origen base del recurso propio',operating_cost_per_km:'Costo operativo por kilómetro',services_available:'Servicios externos disponibles',availability_source:'Origen de la disponibilidad declarada',cost_model:'Modalidad de tarifa del recurso externo',trip_rate:'Tarifa por viaje',per_km_rate:'Tarifa por kilómetro',billing_basis:'Base de facturación por kilómetro',compatibility_groups:'Grupos de compatibilidad declarados'};
 for(const [dimension,label]of [['pallets','pallets'],['weight_kg','peso (kg)'],['volume_m3','volumen (m³)'],['units','unidades']]){
  DESCRIPTIONS['demand_'+dimension]='Demanda expresada en '+label;DESCRIPTIONS['guaranteed_'+dimension]='Capacidad garantizada en '+label;DESCRIPTIONS['maximum_'+dimension]='Capacidad máxima en '+label;
 }
@@ -26,9 +33,12 @@ export function fieldCondition(field){
 // Structural validation of the response, not a second contract compiler.
 export function assertContractPair(data,source){
  const contracts=data?.contracts;
- if(typeof data?.provisional!=='boolean'||data.provisional!==!source.version_id||!contracts||Object.keys(contracts).length!==2)throw new Error('No se recibieron ambos contratos completos para el modelo seleccionado. Reintentá Data Contract.');
- for(const [entity]of ENTITIES){
+ if(source.configuration?.version===2){const expected=source.configuration.cargo?.input_mode==='catalog'?3:2;if(contractEntities(data).length!==expected)throw new Error('Los archivos no corresponden al modo de carga seleccionado.');}
+ if(typeof data?.provisional!=='boolean'||data.provisional!==!source.version_id||!contracts||Object.keys(contracts).length!==contractEntities(data).length)throw new Error('No se recibieron ambos contratos completos para el modelo seleccionado. Reintentá Data Contract.');
+ for(const [entity]of contractEntities(data)){
   const c=contracts[entity];
+  if(contractEntities(data).some(([e])=>e==='order_lines')&&c?.registry_version!=='SAGA10_DOMAIN_V2')throw new Error('Las líneas requieren contratos v2 completos.');
+  if(c?.registry_version==='SAGA10_DOMAIN_V2'&&JSON.stringify([...(c.rules?.required_entities||[])].sort())!==JSON.stringify(contractEntities(data).map(([e])=>e).sort()))throw new Error('Los contratos v2 no coinciden en sus entidades requeridas.');
   // Provisional responses intentionally omit the published version/hash.
   if(c?.semantic_entity!==entity||!Array.isArray(c.fields)||!c.fields.length||!c.rules||typeof c.rules!=='object'||Array.isArray(c.rules)||(!data.provisional&&(c.model_version_id!==source.version_id||typeof c.contract_hash!=='string'||!c.contract_hash)))throw new Error('El contrato no corresponde a la versión seleccionada. Reintentá Data Contract.');
   for(const f of c.fields)if(typeof f.public_header!=='string'||!f.public_header||typeof f.nullable!=='boolean'||typeof f.type!=='string'||!f.applies_when||Array.isArray(f.applies_when)||typeof f.applies_when!=='object'||!f.validation||Array.isArray(f.validation)||typeof f.validation!=='object')throw new Error('El contrato contiene campos incompletos. Reintentá Data Contract.');
@@ -58,7 +68,7 @@ export function mountDataContractView(panel,scope,{retry:retryPreview,onContinue
  scope.own(invalidate);
  function render(data,source){
   assertContractPair(data,source);invalidate();const own=generation,fragment=document.createDocumentFragment(),snapshot=structuredClone(source);
-  for(const [entity,label,description,kind]of ENTITIES){
+  for(const [entity,label,description,kind]of contractEntities(data)){
    const contract=data.contracts[entity],card=el('section',undefined,'data-contract-card'),header=el('header',undefined,'data-contract-card__header'),tile=el('span',undefined,'data-contract-tile'),heading=el('div'),name=el('h3',label),badges=el('div',undefined,'data-contract-badges');
    card.dataset.dationTest='contract-card-'+entity;tile.append(icon(kind));name.id='contract-title-'+entity;card.setAttribute('aria-labelledby',name.id);heading.append(name,el('p',description,'data-contract-description'));header.append(tile,heading);badges.append(el('span','CSV'),el('span',data.provisional?'Vista previa provisional':'Estructura generada desde Logistics Model'));
    const caption=el('span','Descargar template'),action=button('',async()=>{
@@ -77,7 +87,7 @@ export function mountDataContractView(panel,scope,{retry:retryPreview,onContinue
    for(const f of contract.fields){const row=el('tr'),key=el('td'),condition=el('td'),base=f.nullable?'Opcional':'Requerido',message=fieldCondition(f);key.append(el('code',f.public_header));condition.append(el('span',base,'data-contract-condition'));if(message!==base)condition.append(el('small',message.slice(base.length),'data-contract-condition-detail'));row.append(key,el('td',fieldDescription(f)),condition);row.setAttribute('role','row');for(const cell of row.children)cell.setAttribute('role','cell');tbody.append(row);}table.append(tbody);wrap.append(table);
    fields.append(wrap);card.append(header,badges,action,error,fields);fragment.append(card);cards.push({action,get busy(){return busy;}});
   }
-  grid.replaceChildren(fragment);onContracts?.(data,snapshot,{grid,footer,next,copy});hasPair=true;status.textContent=data.provisional?'Vista previa preparatoria. Publicá y seleccioná el modelo para confirmar su estructura.':'Estructura generada para la versión publicada seleccionada.';status.role='status';
+  grid.dataset.contractCount=String(cards.length);grid.replaceChildren(fragment);onContracts?.(data,snapshot,{grid,footer,next,copy});hasPair=true;status.textContent=data.provisional?'Vista previa preparatoria. Publicá y seleccioná el modelo para confirmar su estructura.':'Estructura generada para la versión publicada seleccionada.';status.role='status';
  }
  function setState({ready,compiled,pending,failed,selected,provisional}){
   if(!compiled&&hasPair)invalidate();
@@ -86,7 +96,7 @@ export function mountDataContractView(panel,scope,{retry:retryPreview,onContinue
   for(const c of cards)c.action.disabled=c.busy||!compiled||pending||failed;
   details.dataset.contractState=complete?'READY':failed?'ERROR':pending?'LOADING':compiled&&provisional?'PROVISIONAL':'PENDING';
   title.textContent=complete?'Estructura de datos lista':failed?'Revisar estructura de datos':pending?'Preparando estructura de datos':provisional&&compiled?'Vista previa preparatoria':'Estructura de datos pendiente';
-  copy.textContent=complete?'2 contratos generados para el modelo seleccionado':failed?'Reintentá Data Contract para poder continuar.':pending?'Resolviendo los contratos del modelo…':provisional&&compiled?'Publicá y seleccioná el modelo para confirmar su estructura.':'Terminá Logistics Model para continuar.';
+  copy.textContent=complete?cards.length+' contratos generados para el modelo seleccionado':failed?'Reintentá Data Contract para poder continuar.':pending?'Resolviendo los contratos del modelo…':provisional&&compiled?'Publicá y seleccioná el modelo para confirmar su estructura.':'Terminá Logistics Model para continuar.';
  }
  return {status,retry,render,invalidate,setState};
 }

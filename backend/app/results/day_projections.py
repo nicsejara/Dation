@@ -34,6 +34,11 @@ def trip_facts(result):
     return tuple(sorted(values,key=lambda r:r.entity_id))
 
 def day_export_rows(core):
+    if core.schedule.cargo is not None:
+        from .cargo_projections import line_fields
+        trips={t.trip_id:t for t in core.schedule.trips}
+        return tuple({**trips[line.trip_id].model_dump(),**line_fields(line),**{'load_'+d:getattr(line.load,d) for d in core.context.active_dimensions},
+            'source_run_id':str(core.source_transport_plan.run_id),'upstream_result_fingerprint':core.source_transport_plan.result_fingerprint} for line in core.schedule.cargo.allocations)
     return tuple({**t.model_dump(exclude={'reason_codes'}),'reason_codes':t.reason_codes,
         'source_run_id':str(core.source_transport_plan.run_id),'upstream_result_fingerprint':core.source_transport_plan.result_fingerprint} for t in core.schedule.trips)
 

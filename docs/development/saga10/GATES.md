@@ -8,12 +8,12 @@ La saga no está terminada. Este registro se actualiza al completar gates; los f
 | G1 | PASS focal | Dominio inmutable, SQL aditivo; seis escenarios de persistencia con último resultado PASS |
 | G2 | PASS focal | 29 pruebas dominio + compatibilidad v1; ejemplos A/B y 100 propiedades con semilla |
 | G3 | PASS focal | 67 unit tests, ocho escenarios de catálogo y 24 regresiones Journey v1 |
-| G4 | PASS focal | 13 pruebas D1 v2 + oracle, 147 regresiones, SQL/worker y benchmark |
+| G4 | PASS focal | 16 pruebas D1 v2 + oracle, regresiones, SQL/worker y benchmark |
 | G5 | PASS focal | Dos pruebas de handoff/artifacts + ciclo API/worker/aprobación/D2 |
-| G6 | PENDIENTE | Wizard cinco bloques y navegador |
-| G7 | PENDIENTE | Studio/exports compatibles |
-| G8 | PENDIENTE | Matriz industria y regresión integrada |
-| G9 | PENDIENTE | CI requerida, PR y plan de activación/rollback |
+| G6 | PASS focal | Cuatro E2E Saga10 + UX09; CPU lenta y navegador v1 |
+| G7 | PASS focal | Detalle cargo, CSV por línea, linaje y Data Hub; 3 escenarios API/worker PASS |
+| G8 | PASS focal; CI integral pendiente | 13 desafíos industriales, benchmarks y regresión transversal |
+| G9 | PENDIENTE de CI/PR | Plan ROLLOUT y matriz ACCEPTANCE preparados; no merge/deploy |
 
 ## G1
 
@@ -73,3 +73,35 @@ Resultados:
 - Benchmark local con tracemalloc: 1/10/100/250 órdenes/líneas, todas OPTIMAL, 0,0899/0,2358/2,6241/8,8894 s; 6/420/4.824/12.024 variables; RSS máximo acumulado 182.336 KiB. Referencia G0 no equivalente en física: 250 órdenes proporcionales, 6,8462 s/6.024 variables/140.784 KiB. El incremento corresponde a variables de integridad por línea y certificados; no se declara paridad exacta ni costo productivo medido.
 
 La migración G4 fue generada con CLI y validada/reaplicada localmente. Ninguna migración se aplicó a Supabase real.
+
+
+## G6–G8 — implementación y evidencia intermedia
+
+Cinco tarjetas nativas dentro de Core01, sin rutas nuevas. UI v2 opt-in con flag; los modelos publicados v1 mantienen su renderer/identidad. No se muestran controles de versión del wizard nuevo. Producto inicial sólo al elegir catálogo, unidades compartidas y CRUD de presentaciones simples/mixtas; controles referenciados bloquean eliminación, componentes y cantidades tienen validación real. Directo omite todo catálogo del payload. El compiler valida y muestra coeficientes/fuentes, sin fórmulas divergentes en JavaScript. Condicionales de fuentes/tarifas/km y perfil como sugerencia explícita.
+
+Data Contract, preparación, resumen, lectura del Case y requisitos de Studio reconocen dos o tres entidades. La validación cruzada usa revisión/modelo/hashes normalizados públicos, no rutas privadas; toda respuesta obsoleta o mal ligada se rechaza. La primera prueba detectó que la proyección pública no exponía el hash canónico: se agregó sólo para catálogo. Otro ensayo detectó que el selector de Data Owner modificaba la revisión mientras Continuar podía seguir habilitado; se bloquea la transición durante ese guardado y se exige una nueva prueba de la revisión correcta. No se aumentaron esperas ni se agregaron retries/sleeps para ocultarlo.
+
+G7 conserva datasets de resultados históricos y agrega un detalle `cargo` sólo en resultados catálogo. D1/D2 CSV usan `TRIP_ORDER_LINE`, cantidades y productos copiados del certificado; D1 reconoce costo Trip una sola vez. Etiquetas del snapshot también se certifican. Data Hub usa el mismo snapshot normalizado y mantiene el bloqueo de borrado de entradas referenciadas. El kernel temporal acepta el DTO categorizado completo; no pierde sus metadatos ni cambia los ciclos.
+
+Resultados focales acumulados, sin sumar repeticiones como cobertura nueva:
+- Última tanda amplia de motores/contratos: **167 PASS**, 6,059 s; luego dos guards adicionales de v1/multicategoría: `test_saga10_assignment` **15 PASS**, 1,871 s.
+- `test_saga10_result_consumers` + industrias: **16 escenarios únicos** (una tanda anterior ejecutó además dos pruebas importadas redundantes; importación corregida).
+- Casos industriales: doce sectores y negativo literal; limitaciones expresas para intradía/multistop/hazmat/temperatura/amarre.
+- Integración SQL/API: **41 PASS**, 106,385 s — persistence6, catálogo8, ejecución3, Journey24. Incluye las cuatro migraciones.
+- Sintaxis frontend: **135 módulos PASS**. Node: **27 archivos/suites PASS**, 3,919 s.
+- Navegador: cuatro pruebas Saga10 con edición/cálculos/mixta, proof cruzado y modo directo; las últimas únicas fueron PASS antes de la ampliación transversal. La ampliación halló la carrera del guardado de owner, corregida como se describe arriba; su verificación bajo CPU lenta y la regresión UX09/UX06/v1 se registran al finalizar. Un arranque de fixture histórico quedó en bootstrap sin error JS; se investiga focalmente con traza, sin atribuir causa no demostrada.
+
+No se habilitaron flags ni motores reales. La CI completa se reserva para el candidato estable; los resultados terminales se enlazarán desde el PR.
+
+
+## Cierre focal del candidato (antes de la CI requerida)
+
+- `tests.test_saga10_assignment`: **16 PASS**, 1,299 s; incluye CUSTOM, guardrails, prioridad, v1/DTO v2 y categorías directas.
+- `test_saga10_wizard` + UX09 T01: **5 PASS**, 64,047 s. Capturas reales de ocho escenas escritorio/móvil y cuatro archivos de geometría en `evidence/`; todos los controles sin overflow en cinco anchos, contraste comprobado por `theme_audit.js`.
+- Journey catálogo T02 repetido **3/3 PASS bajo CPU4× lenta**, 57,378 s. El test ahora comprueba delta de Cases y versión exacta, permitiendo repetirlo sin asumir una base vacía ni debilitar el control de creación única.
+- Prueba de proof cruzado T04 **PASS**, 18,630 s: respuesta vieja después de nueva revisión y respuesta200 con hash incorrecto no habilitan un estado inválido. Se corrigió el harness para esperar la entrega de la respuesta interceptada antes de quitar el route; sin sleeps.
+- Logistics Model v1 T01 focal **PASS**, 23,242 s, con traza de red sin errores HTTP ni JS. El timeout de bootstrap de una tanda previa no se reprodujo; no se modificó Auth ni se atribuyó una causa sin evidencia. UX06 T12 y UX09 T01 también tuvieron último resultado PASS en la regresión transversal. FULL CI será la validación final sobre el SHA del PR.
+- Compilación Python, sintaxis JS/Node y `git diff --check` PASS. `zero_idle_release.py validate` PASS, `mutation_performed=false`; no apply ni comandos cloud.
+- Benchmark final reproducible: `DATION_EXECUTION_MODE=legacy PYTHONPATH=backend python -m tests.benchmarks.saga10`. Python3.13.5 / OR-Tools9.15.6755; source digest de todos los archivos Python de backend en `g8-benchmark.json`. Para1/10/100/250 órdenes y líneas: OPTIMAL en0,1043/0,2266/2,4834/8,4629 s; límites vacíos, objetivo y best_bound coinciden; RSS pico acumulado185.612KiB. Comparación G0 y presupuestos en G4. No es un benchmark productivo ni un SLA.
+
+G9 técnico: matriz de40 criterios, diccionario, decisiones, restricciones y procedimiento manual/rollback preparados. El PR y sus checks terminales se deben revisar externamente en GitHub; este archivo no declara una CI verde antes de su ejecución. No habrá merge ni despliegue como parte del cierre.

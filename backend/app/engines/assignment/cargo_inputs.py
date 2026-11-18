@@ -30,6 +30,7 @@ def validate_cargo_input(request):
                 raise ValueError('La demanda agregada difiere de sus líneas físicas.')
         else:
             if isinstance(order,CatalogDemand):raise ValueError('Datos directos no mezclan líneas catálogo.')
+            if not cfg.cargo.can_co_load(order.compatibility_groups,order.compatibility_groups):raise ValueError('Las categorías de la carga directa requieren autorización explícita de co-carga.')
             for d in ('pallets','units'):
                 amount=getattr(order.requested,d)
                 if amount is not None and amount!=amount.to_integral_value():raise ValueError('V2 no divide objetos físicos en fracciones.')

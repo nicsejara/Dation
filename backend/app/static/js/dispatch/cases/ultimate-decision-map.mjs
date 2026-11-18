@@ -64,7 +64,7 @@ export async function mountUltimateGraph(root,{route,navigate,onContext}){
     const extra=el('div',undefined,'t5-node-extra');
     if(node.id==='logistics_assignment'){
      const readiness=el('section',undefined,'d-card t5-context');readiness.setAttribute('aria-label','Preparación de Transport Plan');
-     for(const [slot,label]of [['transport_demand','Órdenes / Demanda'],['transport_resources','Flota / Recursos']])readiness.append(el('p',label+': '+(node.requirements.some(r=>r.slot===slot)?'Pendiente de completar':node.read_set[slot]?'Publicado':'Pendiente'),'d-body'));
+     for(const [slot,label]of [['transport_demand','Órdenes / Demanda'],...(node.requirements.some(r=>r.slot==='order_lines')||Object.hasOwn(node.read_set,'order_lines')?[['order_lines','Líneas de órdenes']]:[]),['transport_resources','Flota / Recursos']])readiness.append(el('p',label+': '+(node.requirements.some(r=>r.slot===slot)?'Pendiente de completar':node.read_set[slot]?'Publicado':'Pendiente'),'d-body'));
      readiness.append(el('p','Configuración: '+(node.actions.configure.allowed?'Disponible':'Revisá los requisitos del Case'),'d-metadata'),el('p','Decisión: '+graphStateUi(node.node_state).label,'d-metadata'));
      const dataTarget=()=>navigate('logistics-case-data',{caseId:route.caseId,nodeId:null,runId:null});
      if(unified)readiness.append(button(node.node_state==='DATA_REQUIRED'?'Preparar datos':'Editar datos de origen',()=>editSource(root,scope,route,navigate)));else readiness.append(button('Cargar nuevos datos',dataTarget),button('Reutilizar inputs compatibles',dataTarget));extra.append(readiness);

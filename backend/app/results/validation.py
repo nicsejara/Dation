@@ -28,6 +28,7 @@ def _validate_plan(plan):
     require(core.result_schema=='transport_plan_v1','Unsupported Core schema')
     original=plan.structural.output.core
     require(core.context==original.context,'Frozen context changed')
+    require(core.transport_plan.cargo==original.transport_plan.cargo,'Certified cargo changed during assembly')
     trips=core.transport_plan.trips
     resource_facts={e.entity_id:e.facts for e in output.evidence.entities if e.entity_type=='RESOURCE'}
     require(len(trips)==len(original.transport_plan.trips),'Assembly input changed Trips')
@@ -198,7 +199,11 @@ def _validate_bundle(bundle):
     same(rows(package.transport_plan.trips),sorted(core.transport_plan.trips,key=lambda t:t.trip_id),'Published Trips differ')
     same(rows(package.transport_plan.unassigned_demand),core.transport_plan.unassigned_demand,'Published residual differs')
     details={d.dataset_id:d for d in package.details}
-    require(set(details)=={'plan','demand','resources','alternatives','exceptions','evidence'},'Missing/unknown D1 detail dataset')
+    require(set(details)==({'plan','demand','resources','alternatives','exceptions','evidence'}|({'cargo'} if core.transport_plan.cargo is not None else set())),'Missing/unknown D1 detail dataset')
+    if core.transport_plan.cargo is not None:
+        from .cargo_projections import cargo_rows
+        same(rows(details['cargo'].data),cargo_rows(core.transport_plan.cargo),'Cargo details differ from certified lines')
+        require(package.exports.csv.granularity=='TRIP_ORDER_LINE','Cargo export granularity differs')
     same(rows(details['plan'].data),sorted(core.transport_plan.trips,key=lambda t:t.trip_id),'Plan detail differs')
     same(rows(details['resources'].data),plan.resource_usage,'Resource details differ')
     same(rows(details['demand'].data),[e for e in evidence.entities if e.entity_type=='ORDER'],'Demand details differ')
@@ -235,19 +240,35 @@ def _validate_bundle(bundle):
     require(package.exports.csv.available==core.feasibility.solution_found,'Unusable result exposes a plan CSV')
     require(package.exports.csv.available or package.exports.csv.rows is None,'Unusable CSV has fake empty rows')
     export=rows(package.exports.csv.rows) if package.exports.csv.available else []
-    allocations={(t.trip_id,a.order_id):(t,a) for t in core.transport_plan.trips for a in t.orders}
-    require(len(export)==len(allocations) and {(r['trip_id'],r['order_id']) for r in export}==set(allocations),'Export allocation set differs')
-    recognized=Decimal(0)
-    for row in export:
-        trip,a=allocations[row['trip_id'],row['order_id']]
-        first=min(v.order_id for v in trip.orders)==a.order_id
-        expected_cost=trip.estimated_cost.amount if first and trip.estimated_cost else None
-        require((Decimal(row['estimated_cost']) if row['estimated_cost'] is not None else None)==expected_cost,'Export duplicates/changes Trip cost')
-        if expected_cost is not None:recognized+=expected_cost
-        require(row['resource_id']==trip.resource_id and Decimal(row['allocation_fraction'])==a.allocation_fraction,'Export resource/fraction differs')
-        require((row['origin_id'],row['destination_id'],row['resource_source'],Decimal(row['distance_km']))==(trip.origin_id,trip.destination_id,trip.resource_source,trip.distance_km),'Export route differs')
-        for d in core.context.active_dimensions:require(Decimal(row['load_'+d])==getattr(a.load,d),'Export load differs')
-    if core.metrics.total_cost:require(recognized==core.metrics.total_cost.amount,'Export cost sum differs')
+    if core.transport_plan.cargo is not None:
+        detail=core.transport_plan.cargo;by_line={(a.trip_id,a.line_id):a for a in detail.allocations};trip_map={t.trip_id:t for t in core.transport_plan.trips}
+        require(len(export)==len(by_line) and {(row['trip_id'],row['line_id']) for row in export}==set(by_line),'Cargo export line set differs')
+        seen=set();recognized=Decimal(0)
+        for row in export:
+            a=by_line[row['trip_id'],row['line_id']];trip=trip_map[a.trip_id]
+            require((row['order_id'],row['presentation_id'],row['presentation_label'],Decimal(row['quantity']),row['quantity_unit'])==(a.order_id,a.presentation_id,a.presentation_label,a.quantity,a.quantity_unit),'Cargo export identities/quantities differ')
+            require(row['products_json']==canonical_bytes(a.products).decode(),'Cargo export products differ')
+            expected_cost=trip.estimated_cost.amount if trip.trip_id not in seen and trip.estimated_cost else None
+            require((Decimal(row['estimated_cost']) if row['estimated_cost'] is not None else None)==expected_cost,'Cargo export duplicates/changes Trip cost')
+            if expected_cost is not None:recognized+=expected_cost
+            require((row['origin_id'],row['destination_id'],row['resource_source'],row['resource_id'],Decimal(row['distance_km']))==(trip.origin_id,trip.destination_id,trip.resource_source,trip.resource_id,trip.distance_km),'Cargo export route differs')
+            for d in core.context.active_dimensions:require(Decimal(row['load_'+d])==getattr(a.load,d),'Cargo export physical load differs')
+            seen.add(trip.trip_id)
+        if core.metrics.total_cost:require(recognized==core.metrics.total_cost.amount,'Cargo export cost sum differs')
+    else:
+        allocations={(t.trip_id,a.order_id):(t,a) for t in core.transport_plan.trips for a in t.orders}
+        require(len(export)==len(allocations) and {(r['trip_id'],r['order_id']) for r in export}==set(allocations),'Export allocation set differs')
+        recognized=Decimal(0)
+        for row in export:
+            trip,a=allocations[row['trip_id'],row['order_id']]
+            first=min(v.order_id for v in trip.orders)==a.order_id
+            expected_cost=trip.estimated_cost.amount if first and trip.estimated_cost else None
+            require((Decimal(row['estimated_cost']) if row['estimated_cost'] is not None else None)==expected_cost,'Export duplicates/changes Trip cost')
+            if expected_cost is not None:recognized+=expected_cost
+            require(row['resource_id']==trip.resource_id and Decimal(row['allocation_fraction'])==a.allocation_fraction,'Export resource/fraction differs')
+            require((row['origin_id'],row['destination_id'],row['resource_source'],Decimal(row['distance_km']))==(trip.origin_id,trip.destination_id,trip.resource_source,trip.distance_km),'Export route differs')
+            for d in core.context.active_dimensions:require(Decimal(row['load_'+d])==getattr(a.load,d),'Export load differs')
+        if core.metrics.total_cost:require(recognized==core.metrics.total_cost.amount,'Export cost sum differs')
     same(package.metrics,core.metrics,'Package metrics changed')
     expected_summary={'trip_count':core.metrics.trip_count,'assigned':core.metrics.demand_coverage.assigned,
         'residual':core.metrics.demand_coverage.unassigned,'coverage_ratio':core.metrics.demand_coverage.ratio,

@@ -699,6 +699,12 @@
           "title": "Presentation Id",
           "type": "string"
         },
+        "presentation_label": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Presentation Label",
+          "type": "string"
+        },
         "products": {
           "items": {
             "$ref": "#/$defs/CargoProductPortion"
@@ -741,6 +747,7 @@
         "order_id",
         "line_id",
         "presentation_id",
+        "presentation_label",
         "quantity",
         "quantity_unit",
         "load",
@@ -778,6 +785,12 @@
         "presentation_id": {
           "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
           "title": "Presentation Id",
+          "type": "string"
+        },
+        "presentation_label": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Presentation Label",
           "type": "string"
         },
         "quantity_kind": {
@@ -830,6 +843,7 @@
         "order_id",
         "line_id",
         "presentation_id",
+        "presentation_label",
         "quantity_kind",
         "quantity_unit",
         "requested",
@@ -884,6 +898,12 @@
           "title": "Product Id",
           "type": "string"
         },
+        "product_name": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Product Name",
+          "type": "string"
+        },
         "product_units": {
           "anyOf": [
             {
@@ -926,6 +946,7 @@
       },
       "required": [
         "product_id",
+        "product_name",
         "quantity",
         "unit_label",
         "product_units"
@@ -2820,6 +2841,7 @@
         "granularity": {
           "enum": [
             "TRIP_ORDER",
+            "TRIP_ORDER_LINE",
             "TRIP",
             "PACKAGE"
           ],

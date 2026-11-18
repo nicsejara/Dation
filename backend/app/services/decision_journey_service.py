@@ -30,9 +30,9 @@ def contract_of(data,entity):
     return compile_contract(data['model_version'],entity)
 
 def public(data):
-    s=data['session'];uploads=[]
+    s=data['session'];uploads=[];catalog='order_lines' in entities_for(data['model_version'])
     for u in data['uploads']:
-        m=u['metadata'];uploads.append({k:u[k] for k in ('id','entity','ready','selected')}|{'filename':m['filename'],'raw_sha256':m['raw_sha256'],'contract_hash':m['contract_hash'],'report':m['report']})
+        m=u['metadata'];uploads.append({k:u[k] for k in ('id','entity','ready','selected')}|{'filename':m['filename'],'raw_sha256':m['raw_sha256'],'contract_hash':m['contract_hash'],'report':m['report']}|({'canonical_sha256':m['canonical_sha256']} if catalog else {}))
     result = {'session':{**{k:s[k] for k in ('id','revision','status','model_version_id','parent_case_id','case_id','expires_at','data_owner_user_id')},'creation_intent':s['creation_body']},'uploads':uploads,'contracts':{e:c.model_dump(mode='json') for e,c in contracts(data).items()}}
     if 'order_lines' in result['contracts']:result['bundle_validation_required']=True
     return result

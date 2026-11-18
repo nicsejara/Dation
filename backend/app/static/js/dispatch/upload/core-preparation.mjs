@@ -4,6 +4,7 @@ import {el,button,field,confirmAction} from '../models/forms.mjs';
 import {request as inputRequest,previewTable} from './ultimate-case-data.mjs';
 import {createDropCard} from './dropcard.mjs';
 import {createValidationDrawer} from './validation-report.mjs';
+import {contractEntities} from '../models/data-contract-view.mjs';
 import {decisionCard} from '../cases/decision-case-ui.mjs';
 
 function preparationLabel(item){
@@ -20,7 +21,7 @@ export function mountCorePreparation(root,scope,{canAssign,draft,onDraft,onConti
  const alternatives=decisionCard(ownerRow,'Data Sessions','Retomá sesiones de carga anteriores de este Logistics Model.','layers');
  alternatives.parentElement.classList.add('core-owner-card','core-sessions-card');alternatives.parentElement.dataset.dationTest='preparation-sessions-card';alternatives.classList.add('core-owner-alternatives');
  const availability=el('p','Seleccioná una versión publicada para consultar sesiones.','d-metadata');availability.role='status';availability.setAttribute('aria-live','polite');availability.id='journey-session-availability';alternatives.append(availability);
- const pending=new Set(),drawer=createValidationDrawer(scope);let data=null,source=null,generation=0,busy=false,errorMessage='',readyPromise=Promise.resolve(),footer=null,controls=[];
+ const pending=new Set(),drawer=createValidationDrawer(scope);let data=null,source=null,generation=0,busy=false,errorMessage='',readyPromise=Promise.resolve(),footer=null,controls=[],ownerSaving=false;
  const previousLeave=window.dationUltimateCanLeave;const leave=()=>!pending.size||window.confirm('Hay CSV seleccionados sin guardar. Se perderá la selección local al salir. Los candidatos guardados se conservan.');
  const compositeLeave=()=>leave()&&(!previousLeave||previousLeave());window.dationUltimateCanLeave=compositeLeave;scope.own(()=>{if(window.dationUltimateCanLeave===compositeLeave)delete window.dationUltimateCanLeave;generation++;});scope.listen(window,'beforeunload',e=>{if(pending.size){e.preventDefault();e.returnValue='';}});
  // List is actor/workspace scoped, at most 10 entries, with at most 5 active
@@ -85,15 +86,46 @@ export function mountCorePreparation(root,scope,{canAssign,draft,onDraft,onConti
  }
  const base=()=>'/api/platform/data-preparations/'+data.session.id;
  const saved=()=>{if(data){draft.id=data.session.id;draft.version_id=data.session.model_version_id;onDraft();}};
- function reflect(){if(!scope.active)return;const n=data?.uploads.filter(u=>u.selected&&u.ready).length||0;status.textContent=errorMessage|| (busy?'Recuperando preparación privada…':n+' de 2 candidatos guardados y validados. '+(pending.size?'Hay archivos locales sin guardar. ':'')+'Todavía no están publicados.');if(footer){footer.next.disabled=!!errorMessage||busy||n!==2||!!pending.size;footer.skip.disabled=!!errorMessage||busy;footer.copy.textContent=n===2?'2 archivos validados · publicación al finalizar el Case':n===1?'Falta '+(data.uploads.some(u=>u.entity==='transport_demand'&&u.selected)?'Flota':'Demanda'):'Preparación pendiente · podés continuar sin datos';}if(!busy&&data)void lookupSessions();}
+ let bundleProof=null,bundleAttempt=null,bundleChecking=false,bundleError='';
+ const entities=()=>contractEntities(data||source?.data||{});
+ const bundleKey=()=>data&&[generation,data.session.id,data.session.revision,data.session.model_version_id,...data.uploads.filter(u=>u.selected&&u.ready).map(u=>u.entity+':'+u.canonical_sha256).sort()].join(':');
+ const bundleRetry=button('Revalidar relaciones entre archivos',()=>{bundleAttempt=null;bundleError='';reflect();});bundleRetry.hidden=true;status.after(bundleRetry);
+ async function checkBundle(key){
+  bundleAttempt=key;bundleChecking=true;bundleError='';bundleProof=null;
+  try{
+   const result=await inputRequest(base()+'/validate-bundle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({expected_revision:data.session.revision}),signal:scope.signal});
+   if(!scope.active||key!==bundleKey())return;
+   const selected=data.uploads.filter(u=>u.selected&&u.ready),hashes=result.normalized_hashes;
+   if(result.valid!==true||result.preparation_id!==data.session.id||result.expected_revision!==data.session.revision||result.model_version_id!==data.session.model_version_id||!hashes||Object.keys(hashes).length!==selected.length||selected.some(u=>hashes[u.entity]!==u.canonical_sha256))throw new Error('La validación cruzada no corresponde a esta preparación.');
+   bundleProof=key;
+  }catch(e){if(scope.active&&key===bundleKey())bundleError=e.report?.errors?.map(row=>row.message).filter(Boolean).join(' ')||e.message;}
+  finally{bundleChecking=false;if(scope.active)reflect();}
+ }
+ function reflect(){
+  if(!scope.active)return;
+  const n=data?.uploads.filter(u=>u.selected&&u.ready).length||0,total=entities().length;
+  const needsBundle=!!data?.bundle_validation_required,key=bundleKey(),verified=!needsBundle||bundleProof===key;
+  if(needsBundle&&!busy&&!ownerSaving&&!pending.size&&n===total&&bundleAttempt!==key){void checkBundle(key);}
+  status.role=errorMessage||bundleError?'alert':'status';
+  status.textContent=errorMessage||bundleError||(busy?'Recuperando preparación privada…':n+' de '+total+' candidatos guardados y validados. '+(bundleChecking?'Comprobando relaciones entre órdenes y líneas. ':needsBundle&&!verified&&n===total?'Relaciones pendientes de verificación. ':'')+(pending.size?'Hay archivos locales sin guardar. ':'')+'Todavía no están publicados.');
+  bundleRetry.hidden=!bundleError||busy||bundleChecking;bundleRetry.disabled=bundleChecking;
+  if(footer){
+   footer.next.disabled=!!errorMessage||busy||ownerSaving||n!==total||!!pending.size||!verified;
+   footer.skip.disabled=!!errorMessage||busy||ownerSaving;
+   const missing=entities().filter(([entity])=>!data?.uploads.some(u=>u.entity===entity&&u.selected&&u.ready)).map(([,label])=>label);
+   footer.copy.textContent=n===total?(verified?total+' archivos validados · publicación al finalizar el Case':'Relaciones entre archivos pendientes de validación'):n?'Falta '+missing.join(' y '):'Preparación pendiente · podés continuar sin datos';
+  }
+  if(!busy&&data)void lookupSessions();
+ }
+
  function tell(e){errorMessage=e.message;status.textContent=e.message;status.role='alert';}
  async function json(path,options){return api(path,{...options,signal:options?.signal||scope.signal});}
  async function renderUploads(grid,own){
   controls=[];const accept=value=>{if(!scope.active||own!==generation)return false;data=value;return true;};
-  for(const [entity,label,kind]of [['transport_demand','Órdenes / Demanda','orders'],['transport_resources','Flota / Recursos','fleet']]){
+  for(const [entity,label]of entities()){
    const card=grid.querySelector('[data-dation-test=contract-card-'+entity+']');if(!card)continue;card.querySelector('.journey-upload')?.remove();
    const contract=data.contracts[entity],host=el('section',undefined,'journey-upload');host.dataset.preparationEntity=entity;card.append(host);
-   const ref=createDropCard(kind,{columns:contract.fields.map(f=>({required:!f.nullable}))});ref.dropStrong.textContent='Arrastrá el CSV de '+label;ref.drop.setAttribute('aria-label','Elegir CSV de '+label);ref.file.setAttribute('aria-label','CSV de '+label);ref.file.dataset.journeyFile=entity;
+   const ref=createDropCard(entity==='transport_resources'?'fleet':'orders',{columns:contract.fields.map(f=>({required:!f.nullable}))});ref.dropStrong.textContent='Arrastrá el CSV de '+label;ref.drop.setAttribute('aria-label','Elegir CSV de '+label);ref.file.setAttribute('aria-label','CSV de '+label);ref.file.dataset.journeyFile=entity;
    host.append(ref.drop,ref.file,ref.filePanel,ref.validationBody,ref.cancelUpload);ref.cancelUpload.hidden=true;ref.validationBody.classList.add('journey-validation');
    let file=null,report=null,requestVersion=0,uploadId=null,working=false,controller=null;
    const row=el('div',undefined,'journey-upload-actions'),save=button('Guardar candidato de '+label,store,'primary'),remove=button('Quitar selección',async()=>{if(working)return;requestVersion++;file=null;report=null;pending.delete(entity);ref.file.value='';ref.filePanel.hidden=true;if(data.uploads.some(u=>u.entity===entity&&u.selected)){try{const nextData=await post(base()+'/unselect/'+entity,{expected_revision:data.session.revision},{signal:scope.signal});if(!accept(nextData))return;}catch(e){if(!scope.active||own!==generation)return;tell(e);return;}}ref.validationBody.replaceChildren(el('p','La selección fue retirada. Los snapshots publicados no cambian.'));sync();reflect();});row.append(save,remove);host.append(row);
@@ -128,9 +160,9 @@ export function mountCorePreparation(root,scope,{canAssign,draft,onDraft,onConti
    if(canAssign){const people=[];let offset=0,total=0;do{const p=await json('/api/platform/team?'+new URLSearchParams({candidates:'true',responsibility:'data_owner',limit:50,offset}));people.push(...p.members);total=p.total;offset+=50;if(!p.members.length&&offset<total)throw new Error('El Equipo cambió. Reintentá la preparación.');}while(offset<total);if(!scope.active||own!==generation)return;owner.replaceChildren(new Option('Sin asignar',''),...people.map(p=>new Option(p.name+' · '+p.email,p.user_id)));owner.value=data.session.data_owner_user_id||'';owner.disabled=data.session.status==='FINALIZING'||data.session.status==='CONSUMED';}
   }catch(e){if(scope.active&&own===generation)tell(e);}finally{if(scope.active&&own===generation){busy=false;reflect();}}
  }
- scope.listen(owner,'change',async()=>{const own=generation;owner.disabled=true;try{const resolved=await json(base()+'/owner',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({expected_revision:data.session.revision,data_owner_user_id:owner.value||null})});if(!scope.active||own!==generation)return;data=resolved;saved();reflect();}catch(e){tell(e);}finally{if(scope.active&&own===generation)owner.disabled=!canAssign||!!data?.session.creation_intent;}});
+ scope.listen(owner,'change',async()=>{const own=generation;owner.disabled=true;ownerSaving=true;reflect();try{const resolved=await json(base()+'/owner',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({expected_revision:data.session.revision,data_owner_user_id:owner.value||null})});if(!scope.active||own!==generation)return;data=resolved;saved();reflect();}catch(e){tell(e);}finally{ownerSaving=false;if(scope.active&&own===generation){owner.disabled=!canAssign||!!data?.session.creation_intent;reflect();}}});
  return {attach(pair,snapshot,{grid,footer:area,next,copy}){
-  next.hidden=true;let c=area.querySelector('[data-journey-next]'),skip=area.querySelector('[data-journey-skip]');if(!c){c=button('Continuar con datos',()=>{if(!c.disabled)onContinue();},'primary');c.dataset.journeyNext='';skip=button('Continuar sin datos',async()=>{if(pending.size&&!await confirmAction(root,scope,'Continuar sin cargar datos','La selección local se perderá. Los candidatos guardados se conservan, sin publicarse.','Continuar sin datos'))return;try{await readyPromise;for(const entity of ['transport_demand','transport_resources'])if(data?.uploads.some(u=>u.entity===entity&&u.selected))data=await post(base()+'/unselect/'+entity,{expected_revision:data.session.revision},{signal:scope.signal});pending.clear();reflect();onContinue();}catch(e){tell(e);}});skip.dataset.journeySkip='';(area.querySelector('.journey-step-actions')||area).append(skip,c);}
+  next.hidden=true;let c=area.querySelector('[data-journey-next]'),skip=area.querySelector('[data-journey-skip]');if(!c){c=button('Continuar con datos',()=>{if(!c.disabled)onContinue();},'primary');c.dataset.journeyNext='';skip=button('Continuar sin datos',async()=>{if(pending.size&&!await confirmAction(root,scope,'Continuar sin cargar datos','La selección local se perderá. Los candidatos guardados se conservan, sin publicarse.','Continuar sin datos'))return;try{await readyPromise;for(const [entity]of entities())if(data?.uploads.some(u=>u.entity===entity&&u.selected))data=await post(base()+'/unselect/'+entity,{expected_revision:data.session.revision},{signal:scope.signal});pending.clear();reflect();onContinue();}catch(e){tell(e);}});skip.dataset.journeySkip='';(area.querySelector('.journey-step-actions')||area).append(skip,c);}
   readyPromise=resolve(pair,snapshot,{grid,next:c,skip,copy});return readyPromise;
- },async finalize(body){await readyPromise;if(!data)throw new Error('La preparación no está confirmada. Volvé al paso 02.');const result=await post(base()+'/finalize',{expected_revision:data.session.revision,case:body},{signal:scope.signal});data=result.preparation;return result.context;},get snapshot(){return data;},get pending(){return pending.size>0;}};
+ },async finalize(body){await readyPromise;if(!data)throw new Error('La preparación no está confirmada. Volvé al paso 02.');const result=await post(base()+'/finalize',{expected_revision:data.session.revision,case:body},{signal:scope.signal});data=result.preparation;return result.context;},get validated(){return !ownerSaving&&!!data&&data.uploads.filter(u=>u.selected&&u.ready).length===entities().length&&!pending.size&&(!data.bundle_validation_required||bundleProof===bundleKey());},get snapshot(){return data;},get pending(){return pending.size>0;}};
 }

@@ -1,0 +1,32 @@
+[
+  {
+    "width": 1536,
+    "scroll": 1536,
+    "client": 1536,
+    "controls": []
+  },
+  {
+    "width": 1024,
+    "scroll": 1024,
+    "client": 1024,
+    "controls": []
+  },
+  {
+    "width": 768,
+    "scroll": 768,
+    "client": 768,
+    "controls": []
+  },
+  {
+    "width": 390,
+    "scroll": 390,
+    "client": 390,
+    "controls": []
+  },
+  {
+    "width": 320,
+    "scroll": 320,
+    "client": 320,
+    "controls": []
+  }
+]

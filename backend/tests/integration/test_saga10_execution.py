@@ -1,5 +1,5 @@
 """Real isolated API/PostgreSQL/Storage/worker D1 -> human approval -> D2."""
-import json,sys,unittest
+import csv,io,json,sys,unittest
 from pathlib import Path
 from uuid import uuid4
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'e2e'))
@@ -47,6 +47,13 @@ class Saga10ExecutionTests(unittest.TestCase):
         self.assertEqual((job['engine_version'],job['runtime_profile']),('3.0.0','transport_plan_cargo_v2'))
         self.assertEqual(len(job['entries']),3);self.assertEqual(len(job['input']['demands'][0]['lines']),1)
         self.s.start_worker();done=wait_run(self.s,rid)
+        cargo=ok(endpoint(self.s,rid,'details/cargo'));self.assertEqual(cargo['rows'][0]['facts']['assigned'],'20')
+        csv_response=endpoint(self.s,rid,'decision-export');self.assertTrue(csv_response.is_success,csv_response.text)
+        export=list(csv.DictReader(io.StringIO(csv_response.content.decode('utf-8-sig'))));self.assertEqual(sum(float(r['quantity']) for r in export),20)
+        state=ok(a.get('/api/platform/logistics-cases/'+cid+'/data'));dataset=next(e['dataset_id'] for e in state['entries'] if e['slot_key']=='order_lines')
+        preview=ok(a.get('/api/platform/data/datasets/'+dataset+'/preview'));self.assertIn('presentation_id',preview['columns'])
+        ok(a.post('/api/platform/data/datasets/'+dataset+'/archive'));self.assertEqual(a.delete('/api/platform/data/datasets/'+dataset).status_code,409)
+
         self.assertEqual(done['result_json']['metrics']['demand_coverage']['assigned'],'20')
         self.assertEqual(ok(endpoint(self.s,rid,'approval-review'))['approval_overlay']['approval_allowed'],True)
         ok(approval(self.s,cid,rid));before=row(self.s,rid)
@@ -66,6 +73,7 @@ class Saga10ExecutionTests(unittest.TestCase):
         self.s.sql('UPDATE dation_private.platform_release SET saga10_optimization_enabled=false;')
         try:
             ctx=ok(self.s.api_client.get('/api/platform/logistics-cases/'+cid+'/run-context'));self.assertFalse(ctx['admission_available'])
+            graph=ok(self.s.api_client.get('/api/platform/logistics-cases/'+cid+'/graph'))['graph'];self.assertFalse(graph['nodes'][1]['runtime_available'])
             _,_,response=submit(self.s,cid);self.assertEqual(response.status_code,403,response.text)
             # Preserve worker's NULL actor contract, but reject this closed v2
             # before producing or publishing any result.

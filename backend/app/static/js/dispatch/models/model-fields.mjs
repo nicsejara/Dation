@@ -1,3 +1,4 @@
+import {mountModelFieldsV2} from './model-fields-v2.mjs';
 import {el,field,section,choices} from './forms.mjs';
 import {wizardIcon} from './wizard-ui.mjs';
 export const ROLES=[['SHIPPER','Generador de carga'],['LOGISTICS_PROVIDER','Proveedor logístico'],['HYBRID','Operación híbrida']];
@@ -6,7 +7,10 @@ export const defaultConfiguration=currency=>({version:1,operating_role:'SHIPPER'
  active_dimensions:['pallets'],primary_dimension:'pallets',split_permitted:false,homogeneous_loads_declared:false,
  currency_policy:{currency:currency||'ARS',minor_units:2,rounding:'ROUND_HALF_UP'},own_cost_model:'OWN_OPERATING_CYCLE',external_cost_models:['PER_TRIP','PER_KM'],per_km_billing_bases:['ONE_WAY','ROUND_TRIP']});
 
+export const defaultConfigurationV2=currency=>({...defaultConfiguration(currency),version:2,consolidation_permitted:true,resource_categories:[],cargo:{profile:'PALLETIZED',input_mode:'direct',split_policy:'INDIVISIBLE',compatibility_policy:'CATEGORIZED',co_load_pairs:[],products:[],logistic_units:[],presentations:[]}});
+
 export function mountModelFields(form,scope,draft,{wizard=false,version=1}={}){
+ if(draft.configuration.version===2)return mountModelFieldsV2(form,scope,draft);
  const host=el('div',undefined,wizard?'model-wizard-cards':'');form.append(host);
  const card=(title,copy,kind)=>{
   if(!wizard)return section(host,title,kind==='identity'?undefined:copy);

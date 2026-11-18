@@ -42,6 +42,7 @@ def certify_cargo(request, plan):
             order, line = inputs[row.line_id]
             check(row.order_id == order.order_id and row.presentation_id == line.presentation_id, 'Line identity changed')
             check(row.order_id in {a.order_id for a in trips[row.trip_id].orders}, 'Cargo not represented by Trip allocation')
+            check(row.presentation_label == next(p.label for p in cfg.cargo.presentations if p.presentation_id == line.presentation_id), 'Presentation label changed')
             physical = catalog[line.presentation_id]
             check(row.quantity_unit == physical.quantity_unit, 'Line quantity unit changed')
             expected = line_load(physical, row.quantity)
@@ -52,6 +53,7 @@ def certify_cargo(request, plan):
             for part in physical.composition:
                 product = products[part['product_id']]
                 continuous = physical.quantity_kind == 'CONTINUOUS'
+                check(product.product_name == source_products[product.product_id].name, 'Product name changed')
                 check(product.quantity == part['quantity'] * row.quantity, 'Product quantity changed')
                 check(product.product_units == (None if continuous else part['product_units'] * row.quantity), 'Product units changed')
                 check(product.unit_label == (physical.quantity_unit if continuous else source_products[product.product_id].unit_label), 'Product unit label changed')
@@ -62,6 +64,7 @@ def certify_cargo(request, plan):
             trip_groups[row.trip_id].append(line.compatibility_groups)
         for lid, (order, line) in inputs.items():
             summary = summaries[lid]
+            check(summary.presentation_label == next(p.label for p in cfg.cargo.presentations if p.presentation_id == line.presentation_id), 'Resolution label changed')
             physical = catalog[line.presentation_id]
             check((summary.order_id, summary.presentation_id, summary.quantity_kind, summary.quantity_unit) ==
                   (order.order_id, line.presentation_id, physical.quantity_kind, physical.quantity_unit), 'Line resolution identity differs')
@@ -95,5 +98,5 @@ def certify_cargo(request, plan):
             check(set(tags).issubset(resource.compatibility_groups) if tags else cfg.homogeneous_loads_declared, 'Ineligible line/resource')
         if cfg.cargo.compatibility_policy == 'CATEGORIZED':
             pairs = {frozenset(pair) for pair in cfg.cargo.co_load_pairs}
-            for left, right in combinations(groups, 2):
+            for left, right in (*((g,g) for g in groups), *combinations(groups, 2)):
                 check(bool(left) and bool(right) and all(a == b or frozenset((a, b)) in pairs for a in left for b in right), 'Incompatible co-loaded cargo')

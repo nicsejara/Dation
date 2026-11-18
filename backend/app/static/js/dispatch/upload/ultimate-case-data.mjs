@@ -7,7 +7,8 @@ import {el,button,pageHeader,draftStore,confirmAction} from '../models/forms.mjs
 import {createDropCard} from './dropcard.mjs';
 import {createValidationDrawer} from './validation-report.mjs';
 
-const ENTITIES=[['transport_demand','Demanda','orders'],['transport_resources','Recursos','fleet']];
+const ENTITY_OPTIONS=[['transport_demand','Demanda','orders'],['order_lines','Líneas de órdenes','orders'],['transport_resources','Recursos','fleet']];
+const entities=data=>ENTITY_OPTIONS.filter(([entity])=>Object.hasOwn(data.contracts,entity));
 
 export async function request(path,options={}){
  let response;try{response=await fetch(path,options);}catch(e){if(e.name==='AbortError')throw e;throw Object.assign(new Error('No se confirmó la operación. Conservá el CSV y recuperá el candidato.'),{status:503});}
@@ -58,7 +59,7 @@ export async function mountCaseData(root,{route,navigate,onContext,embedded=fals
    }catch(error){if(scope.active){tell(error);if(error.status===409){const review=button('Recargar Pack y revisar',()=>{draft.publication=null;save();reload();});publishArea.append(review);}else message.textContent='No se confirmó la publicación. Recuperá la misma intención antes de publicar otra versión.';}}
    finally{publicationBusy=false;if(scope.active)reflectSelection();}
   }
-  for(const [entity,label,visualKind]of ENTITIES){
+  for(const [entity,label,visualKind]of entities(data)){
    const contract=data.contracts[entity],published=data.entries.find(e=>e.slot_key===entity),format={columns:contract.fields.map(f=>({name:f.public_header,required:!f.nullable,type:f.type,rule:JSON.stringify(f.validation),example:f.examples[0]}))};
    const ref=createDropCard(visualKind,format),host=el('section',undefined,'t4-slot');host.dataset.t4Slot=entity;host.append(ref.card);slots.append(host);
    ref.card.querySelector('h3').textContent=label;ref.card.querySelector('.dispatch-pro-file-copy p').textContent=entity==='transport_demand'?'Órdenes pseudonimizadas, rutas, fechas y cantidades activas del Model.':'Recursos propios o externos, capacidades garantizadas, disponibilidad y tarifas explícitas.';

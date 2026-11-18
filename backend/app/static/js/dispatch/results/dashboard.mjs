@@ -21,7 +21,8 @@ export async function render(root,run,onRerun,caseActions={}){
   const safeActions={...caseActions,onApprove:undefined};
   const {toolbar,drawer}=renderDashboardToolbar(run,safeActions,{placement:'hero'});
   const tabs=scheduling?['schedule','trips','resources','service','exceptions','evidence']:['plan','demand','resources','alternatives','exceptions','evidence'];
-  const labels={plan:'Plan',demand:'Demand',resources:'Resources',alternatives:'Alternatives',exceptions:'Exceptions',evidence:'Evidence',schedule:'Schedule',trips:'Trips',service:'Service'};
+  if(p.details.some(d=>d.dataset_id==='cargo'))tabs.push('cargo');
+  const labels={cargo:'Carga por línea',plan:'Plan',demand:'Demand',resources:'Resources',alternatives:'Alternatives',exceptions:'Exceptions',evidence:'Evidence',schedule:'Schedule',trips:'Trips',service:'Service'};
   const m=p.metrics,summary=p.summary.facts;
   const recommendation=scheduling?display(m.scheduled_trips.scheduled)+' de '+display(m.scheduled_trips.total)+' viajes aprobados programados.':
     'Cubrir '+display(m.demand_coverage.assigned)+' '+p.context.primary_dimension+' mediante '+display(m.trip_count)+' viajes y '+display(m.resources_used)+' recursos.';

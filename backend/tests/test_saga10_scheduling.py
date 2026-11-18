@@ -13,14 +13,16 @@ from tests.saga10_fixtures import cargo_request
 from tests.test_saga10_assignment import truck
 
 
+def make_request():
+    req=cargo_request(resources=[truck(pallets='6',services=2)])
+    result=run_cargo_policy(req,alternative_budget=0)
+    package=assemble(result).package
+    return DaySchedulingInput(model=req.model,context=req.context,source_core=result.recommended.output.core,
+        source_evidence=result.recommended.output.evidence,source_transport_plan={'run_id':req.run_id,'result_fingerprint':package.fingerprints.result_fingerprint},
+        resources=req.resources,input_summary=result.recommended.input_summary,run_id=uuid4(),result_generated_at=req.result_generated_at)
+
 class Saga10SchedulingTests(unittest.TestCase):
-    def source(self):
-        req=cargo_request(resources=[truck(pallets='6',services=2)])
-        result=run_cargo_policy(req,alternative_budget=0)
-        package=assemble(result).package
-        return DaySchedulingInput(model=req.model,context=req.context,source_core=result.recommended.output.core,
-            source_evidence=result.recommended.output.evidence,source_transport_plan={'run_id':req.run_id,'result_fingerprint':package.fingerprints.result_fingerprint},
-            resources=req.resources,input_summary=result.recommended.input_summary,run_id=uuid4(),result_generated_at=req.result_generated_at)
+    source=staticmethod(make_request)
 
     def test_exact_two_trip_handoff_and_artifacts(self):
         request=self.source();before=canonical_bytes(request.source_core)

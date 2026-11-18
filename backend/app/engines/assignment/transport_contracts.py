@@ -45,6 +45,8 @@ class TransportPlanInput(ContractModel):
         expected={'transport_demand','transport_resources'}|({'order_lines'} if catalog else set())
         if {x.slot for x in c.read_set} != expected:
             raise ValueError('D1 catálogo requiere los tres inputs semánticos fijados.' if catalog else 'D1 requires the two explicit T1 semantic inputs')
+        if cfg is None and (any(isinstance(o,CatalogDemand) for o in self.demands) or any(isinstance(r,CategorizedTransportResource) for r in self.resources)):
+            raise ValueError('Los inputs v1 no admiten líneas ni categorías del dominio v2.')
         if cfg is not None:
             from .cargo_inputs import validate_cargo_input
             validate_cargo_input(self)
