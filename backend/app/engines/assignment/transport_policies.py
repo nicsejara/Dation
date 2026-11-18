@@ -120,6 +120,9 @@ class PolicySearch:
             self.stages.append((label,native,value,value if status==cp_model.OPTIMAL else None))
             self.final_value=value
             selected=[{i:solver.value(x) for i,x in s.fractions.items()} if solver.value(s.present) else {} for s in slots]
+            for slot in slots:
+                if slot.line_variables is not None:
+                    slot.line_values={key:solver.value(variable) for key,variable in slot.line_variables.items()} if solver.value(slot.present) else {}
             if status!=cp_model.OPTIMAL:
                 limits.append('POLICY_STAGE_UNPROVEN');break
             if not isinstance(objective,int):model.add(objective==value)

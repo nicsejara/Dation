@@ -33,6 +33,7 @@ def _check(request,result):
     require(core.context==old.context and core.input_context_hash==old.input_context_hash,'Context changed')
     require(evidence.core_result_fingerprint==core_result_fingerprint(core),'Policy fingerprint differs')
     require(result.residuals==result.structural.residuals,'Policy changed residual')
+    require(core.transport_plan.cargo==old.transport_plan.cargo,'Policy changed cargo assignments')
     resources={r.resource_id:r for r in request.resources}
     expected=[]
     require(len(core.transport_plan.trips)==len(old.transport_plan.trips),'Policy wrapper changed Trip count')
@@ -88,7 +89,13 @@ def _check(request,result):
         for resource in (resources.values() if trip.trip_id not in comparisons else []):
             if resource.source not in request.model.allowed_sources or (trip.origin_id,trip.destination_id) not in resource.lanes:continue
             if resource.source=='OWN' and resource.base_origin_id!=trip.origin_id:continue
-            if any(not set(o.compatibility_groups).issubset(resource.compatibility_groups) for o in orders):continue
+            cfg=getattr(request.model,'configuration',None)
+            if core.transport_plan.cargo is None:tags={g for o in orders for g in o.compatibility_groups}
+            else:
+                selected={line.line_id for line in core.transport_plan.cargo.allocations if line.trip_id==trip.trip_id}
+                tags={g for o in request.demands for line in o.lines if line.line_id in selected for g in line.compatibility_groups}
+            if not tags.issubset(resource.compatibility_groups):continue
+            if cfg is not None and cfg.resource_categories and getattr(resource,'resource_category',None) not in cfg.resource_categories:continue
             if any(getattr(trip.total_load,d)>getattr(resource.guaranteed_capacity,d) for d in request.model.active_dimensions):continue
             certificate=day_resource_feasibility([FixedTrip(trip_id=t.trip_id,resource_id=resource.resource_id if t.trip_id==trip.trip_id else t.resource_id,
                 distance_km=t.distance_km,ready_date=t.ready_date,delivery_due_date=t.delivery_due_date) for t in trips],request.resources,

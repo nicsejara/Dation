@@ -1,11 +1,11 @@
 """Private pre-Case saga. Reuses canonical compiler, normalizer and Pack service."""
-import os
+import os,json
 from pathlib import PurePosixPath
 from uuid import UUID,uuid5
 from fastapi import HTTPException
 from app.platform.identity import platform_call,headers
 from app.services import case_data_pack_service as packs,logistics_model_service as models,decision_graph_service as graphs
-from app.domain.logistics.data_contracts import compile_contract,ENTITIES,MAX_BYTES
+from app.domain.logistics.data_contracts import compile_contract,ENTITIES,entities_for,MAX_BYTES
 from app.domain.logistics.normalizers import normalize_input,InputValidationError
 from app.models.ultimate_foundation import UltimateCaseCreate
 from app.models.ultimate_data_pack import PackPublication
@@ -23,18 +23,24 @@ async def capabilities(ctx):return bool(enabled() and (await call(ctx,'capabilit
 
 async def state(ctx,pid):return await call(ctx,'get',preparation_id=str(pid))
 
-def contracts(data):return {e:compile_contract(data['model_version'],e) for e in ENTITIES}
+def contracts(data):return {e:compile_contract(data['model_version'],e) for e in entities_for(data['model_version'])}
+
+def contract_of(data,entity):
+    if entity not in entities_for(data['model_version']):raise HTTPException(404,'El modelo no utiliza ese archivo.')
+    return compile_contract(data['model_version'],entity)
 
 def public(data):
-    s=data['session'];uploads=[]
+    s=data['session'];uploads=[];catalog='order_lines' in entities_for(data['model_version'])
     for u in data['uploads']:
-        m=u['metadata'];uploads.append({k:u[k] for k in ('id','entity','ready','selected')}|{'filename':m['filename'],'raw_sha256':m['raw_sha256'],'contract_hash':m['contract_hash'],'report':m['report']})
-    return {'session':{**{k:s[k] for k in ('id','revision','status','model_version_id','parent_case_id','case_id','expires_at','data_owner_user_id')},'creation_intent':s['creation_body']},'uploads':uploads,'contracts':{e:c.model_dump(mode='json') for e,c in contracts(data).items()}}
+        m=u['metadata'];uploads.append({k:u[k] for k in ('id','entity','ready','selected')}|{'filename':m['filename'],'raw_sha256':m['raw_sha256'],'contract_hash':m['contract_hash'],'report':m['report']}|({'canonical_sha256':m['canonical_sha256']} if catalog else {}))
+    result = {'session':{**{k:s[k] for k in ('id','revision','status','model_version_id','parent_case_id','case_id','expires_at','data_owner_user_id')},'creation_intent':s['creation_body']},'uploads':uploads,'contracts':{e:c.model_dump(mode='json') for e,c in contracts(data).items()}}
+    if 'order_lines' in result['contracts']:result['bundle_validation_required']=True
+    return result
 
 async def create(ctx,payload):return public(await call(ctx,'create',**payload.model_dump(mode='json')))
 
 async def validate(ctx,pid,entity,raw,expected):
-    data=await state(ctx,pid);contract=contracts(data)[entity];packs.checked_hash(contract,expected)
+    data=await state(ctx,pid);contract=contract_of(data,entity);packs.checked_hash(contract,expected)
     if data['session']['status'] not in ('DRAFT','VALIDATED'):raise HTTPException(409,'La preparación ya tiene una intención de creación congelada.')
     try:return normalize_input(raw,contract)['report']
     except InputValidationError as error:raise HTTPException(422,error.report) from None
@@ -45,7 +51,7 @@ def paths(data,u):
     return base+'/input.csv',base+'/normalized/snapshot.json'
 
 async def upload(ctx,pid,entity,raw,filename,uid,expected,revision,*,source_dataset_id=None):
-    data=await state(ctx,pid);contract=contracts(data)[entity];packs.checked_hash(contract,expected)
+    data=await state(ctx,pid);contract=contract_of(data,entity);packs.checked_hash(contract,expected)
     try:n=normalize_input(raw,contract)
     except InputValidationError as error:raise HTTPException(422,error.report) from None
     metadata={'filename':PurePosixPath((filename or entity+'.csv').replace('\\','/')).name[:120],
@@ -86,7 +92,7 @@ async def cleanup(ctx,pid):
 async def finalize(ctx,pid,payload):
     data=await state(ctx,pid);s=data['session'];body=payload.case.model_dump(mode='json')
     # Read/validate all selected private snapshots BEFORE freezing/creating a Case.
-    selected=[u for u in data['uploads'] if u['selected']];verified=[]
+    selected=[u for u in data['uploads'] if u['selected']];verified=[];records={}
     if s['status']!='CONSUMED':
         for u in selected:
             if not u['ready']:raise HTTPException(409,'Recuperá los candidatos pendientes antes de finalizar.')
@@ -98,6 +104,11 @@ async def finalize(ctx,pid,payload):
             except InputValidationError:raise HTTPException(409,'El candidato dejó de cumplir su contrato.') from None
             if normalized['canonical_sha256']!=m['canonical_sha256']:raise HTTPException(409,'La interpretación del candidato cambió; no se creó un Case.')
             verified.append((u,raw))
+            if 'order_lines' in entities_for(data['model_version']):records[u['entity']]=json.loads(normalized['bytes'])['records']
+    if 'order_lines' in contracts(data) and s['status']!='CONSUMED':
+        from app.domain.logistics.normalizers_v2 import combine_catalog
+        try:combine_catalog(records,contracts(data)['transport_demand'])
+        except InputValidationError as error:raise HTTPException(422,error.report) from None
     data=await call(ctx,'begin',preparation_id=str(pid),expected_revision=payload.expected_revision,creation_body=body,creation_hash=models.snapshot_hash('journey_case_creation_v1',body))
     s=data['session'];cid=body['id']
     if s['status']!='CONSUMED':
@@ -133,14 +144,38 @@ async def close(ctx,cid,token):
 
 
 async def compatible(ctx,pid,entity):
-    data=await state(ctx,pid);contract=contracts(data)[entity]
+    data=await state(ctx,pid);contract=contract_of(data,entity)
     return await call(ctx,'compatible',preparation_id=str(pid),entity=entity,contract_hash=contract.contract_hash)
 
 async def reuse(ctx,pid,entity,payload):
-    data=await state(ctx,pid);contract=contracts(data)[entity]
+    data=await state(ctx,pid);contract=contract_of(data,entity)
     source=await call(ctx,'reuse_plan',preparation_id=str(pid),entity=entity,dataset_id=str(payload.dataset_id),contract_hash=contract.contract_hash)
     await packs.private_bucket(source['storage_bucket'])
     raw=await packs.read_object(source['storage_bucket'],source['storage_path'],source['raw_sha256'],source['raw_size'])
     await packs.read_object(source['normalized_bucket'],source['normalized_path'],source['canonical_sha256'],source['normalized_size'])
     uid=uuid5(UUID(str(pid)),entity+':'+str(payload.dataset_id))
     return await upload(ctx,pid,entity,raw,'reused-'+entity+'.csv',uid,contract.contract_hash,payload.expected_revision,source_dataset_id=payload.dataset_id)
+
+
+async def validate_bundle(ctx,pid,payload):
+    data=await state(ctx,pid);s=data['session'];compiled=contracts(data)
+    if s['revision']!=payload.expected_revision:raise HTTPException(409,'La preparación cambió; volvé a validar sus archivos.')
+    records={};hashes={}
+    for upload in data['uploads']:
+        if not upload['selected']:continue
+        if not upload['ready']:raise HTTPException(409,'Recuperá primero los candidatos pendientes.')
+        metadata=upload['metadata'];contract=compiled[upload['entity']];packs.checked_hash(contract,metadata['contract_hash']);_,path=paths(data,upload)
+        raw=await packs.read_object(metadata['bucket'],path,metadata['canonical_sha256'],metadata['normalized_size'])
+        normalized=json.loads(raw)
+        if normalized['model_version_id']!=s['model_version_id'] or normalized['contract_hash']!=contract.contract_hash or normalized['normalizer_version']!=contract.normalizer_version:
+            raise HTTPException(409,'El candidato no coincide con el snapshot publicado.')
+        records[upload['entity']]=normalized['records'];hashes[upload['entity']]=metadata['canonical_sha256']
+    if 'order_lines' in compiled:
+        from app.domain.logistics.normalizers_v2 import combine_catalog
+        try:combine_catalog(records,compiled['transport_demand'])
+        except InputValidationError as error:raise HTTPException(422,error.report) from None
+    latest=await state(ctx,pid)
+    if latest['session']['revision']!=s['revision']:raise HTTPException(409,'La preparación cambió durante la validación.')
+    return {'valid':True,'preparation_id':str(pid),'expected_revision':s['revision'],'model_version_id':s['model_version_id'],'normalized_hashes':hashes,
+        'order_count':len(records.get('transport_demand',[])),'line_count':len(records.get('order_lines',[])),
+        'solver_admission_supported':len(records.get('transport_demand',[]))<=500 and len(records.get('order_lines',[]))<=500}

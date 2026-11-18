@@ -2,7 +2,7 @@
 from uuid import UUID, uuid5
 from fastapi import HTTPException
 
-from app.models.ultimate_foundation import LogisticsModelConfigurationV1, PlanningContextV1
+from app.models.ultimate_foundation import LogisticsModelConfigurationV1, PlanningContextV1, parse_configuration, LogisticsModelSnapshotV2
 from app.domain.logistics.contracts import LogisticsModelVersion, Demand, TransportResource
 from app.results.canonical import canonical_bytes, canonical_tree, content_sha256, policy_hash
 from app.platform.identity import platform_call
@@ -16,16 +16,20 @@ def snapshot_hash(kind,value):
 
 
 def configuration_snapshot(config):
-    value=canonical_tree(LogisticsModelConfigurationV1.model_validate(config))
-    return value,snapshot_hash('logistics_model_configuration_v1',value)
+    value=canonical_tree(parse_configuration(config))
+    return value,snapshot_hash('logistics_model_configuration_v'+str(value['version']),value)
 
 
-def contract_reference(configuration_hash):
+def contract_reference(configuration_hash,configuration=None):
     """References the static T1 domain ABI; does not compile CSV/slot contracts."""
     value={'schema_version':'ultimate_model_domain_reference_v1','registry_version':CONTRACT_REGISTRY_VERSION,
         'configuration_hash':configuration_hash,'domain_schema_sha256':{
             'Demand':content_sha256(canonical_bytes(Demand.model_json_schema())),
             'TransportResource':content_sha256(canonical_bytes(TransportResource.model_json_schema()))}}
+    if configuration and configuration.get('version')==2:
+        from app.domain.logistics.cargo import CargoConfiguration
+        value['registry_version']='SAGA10_DOMAIN_V2'
+        value['domain_schema_sha256']['CargoConfiguration']=content_sha256(canonical_bytes(CargoConfiguration.model_json_schema()))
     return value,snapshot_hash('ultimate_model_domain_reference_v1',value)
 
 
@@ -39,6 +43,11 @@ async def capabilities(ctx):
     return {**await call(ctx,'capabilities'),'unified_journey_enabled':await journey_capabilities(ctx)}
 
 
+async def require_schema(ctx,config):
+    if config.get('version')==2 and not (await capabilities(ctx)).get('saga10_schema_enabled',False):
+        raise HTTPException(409,'Logistics Model 2.0 permanece cerrado hasta autorizar su esquema. Se conserva la configuración anterior.')
+
+
 async def list_models(ctx,**options):return await call(ctx,'model_list',options)
 
 
@@ -47,12 +56,14 @@ async def get_model(ctx,model_id):return await call(ctx,'model_get',{'model_id':
 
 async def preview_contracts(ctx,payload):
     """Read-only preview using the same compiler as Case ingestion; no new schema store."""
-    from app.domain.logistics.data_contracts import compile_contract,ENTITIES
+    from app.domain.logistics.data_contracts import compile_contract,entities_for
     caps=await capabilities(ctx)
     if not caps.get('enabled') or not caps.get('can_create_case'):
         raise HTTPException(403,'La configuración inicial no está habilitada para este acceso.')
     provisional=payload.configuration is not None
     if provisional:
+        if payload.configuration.version==2 and not caps.get('saga10_schema_enabled',False):
+            raise HTTPException(409,'La vista previa de Logistics Model 2.0 requiere habilitar su esquema.')
         config,hash_=configuration_snapshot(payload.configuration)
         # Internal compiler identity only, never a published Model/version reference.
         version={'id':str(uuid5(UUID(int=0),hash_)),'config_jsonb':config,'config_hash':hash_}
@@ -61,11 +72,12 @@ async def preview_contracts(ctx,payload):
         if data['model']['status']!='active':raise HTTPException(409,'El Model está archivado.')
         version=next((v for v in data['versions'] if v['id']==str(payload.version_id)),None)
         if version is None:raise HTTPException(404,'La versión publicada no pertenece al Model.')
-    return provisional,{entity:compile_contract(version,entity) for entity in ENTITIES}
+    return provisional,{entity:compile_contract(version,entity) for entity in entities_for(version)}
 
 
 async def create_model(ctx,payload):
     config,hash_=configuration_snapshot(payload.configuration)
+    await require_schema(ctx,config)
     body=payload.model_dump(mode='json',exclude={'configuration'})
     return await call(ctx,'model_create',{**body,'configuration':config,'configuration_hash':hash_,
         'creation_intent_hash':snapshot_hash('model_creation_intent_v1',{'actor':ctx.user_id,**body,'configuration':config})})
@@ -73,6 +85,7 @@ async def create_model(ctx,payload):
 
 async def update_model(ctx,model_id,payload):
     config,hash_=configuration_snapshot(payload.configuration)
+    await require_schema(ctx,config)
     return await call(ctx,'model_update',{'model_id':str(model_id),**payload.model_dump(mode='json',exclude={'configuration'}),
         'configuration':config,'configuration_hash':hash_})
 
@@ -84,7 +97,8 @@ async def publish_model(ctx,model_id,payload):
     if existing:
         return await call(ctx,'model_publish',{'model_id':str(model_id),**payload.model_dump(mode='json')})
     config,hash_=configuration_snapshot(model['model']['draft_config_jsonb'])
-    descriptor,contract_hash=contract_reference(hash_)
+    await require_schema(ctx,config)
+    descriptor,contract_hash=contract_reference(hash_,config)
     return await call(ctx,'model_publish',{'model_id':str(model_id),**payload.model_dump(mode='json'),
         'configuration_hash':hash_,'contract_descriptor':descriptor,'contract_hash':contract_hash})
 
@@ -108,8 +122,10 @@ async def create_case(ctx,payload):
 
 def enrich_context(result):
     row=result['case'];version=result['model_version'];pack=result['pack'];pv=result['pack_version']
-    config=LogisticsModelConfigurationV1.model_validate(version['config_jsonb'])
-    model=LogisticsModelVersion(workspace_id=row['workspace_id'],model_id=version['model_id'],version_id=version['id'],
+    config=parse_configuration(version['config_jsonb'])
+    model_class=LogisticsModelSnapshotV2 if config.version==2 else LogisticsModelVersion
+    extra={'configuration':config} if config.version==2 else {}
+    model=model_class(**extra,workspace_id=row['workspace_id'],model_id=version['model_id'],version_id=version['id'],
         version=version['version'],operating_role=config.operating_role,transport_pattern=config.transport_pattern,
         allowed_sources=config.allowed_sources,active_dimensions=config.active_dimensions,primary_dimension=config.primary_dimension,
         homogeneous_loads_declared=config.homogeneous_loads_declared,split_permitted=config.split_permitted,

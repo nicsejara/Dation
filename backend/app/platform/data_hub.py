@@ -48,7 +48,7 @@ async def active_dataset(ctx,dataset_id):
 
 async def preview(ctx,dataset_id,limit=25,offset=0):
     row=await active_dataset(ctx,dataset_id)
-    if row.get('dataset_type') in {'transport_demand','transport_resources'}:
+    if row.get('dataset_type') in {'transport_demand','transport_resources','order_lines'}:
         from app.services.case_data_pack_service import normalized_preview
         data=await normalized_preview(ctx,dataset_id,limit,offset)
         # Data Hub keeps its existing table contract; the source is the verified
@@ -118,7 +118,7 @@ async def discard_upload(ctx,operation_id):
 
 async def archive_input(ctx,dataset_id,archived):
     row=await active_dataset(ctx,dataset_id)
-    if row.get('dataset_type') in {'transport_demand','transport_resources'}:
+    if row.get('dataset_type') in {'transport_demand','transport_resources','order_lines'}:
         from app.services.case_data_pack_service import call
         return await call(ctx,'dataset_archive',dataset_id=str(dataset_id),archived=archived)
     await dispatch.archive_dataset(str(dataset_id),archived)

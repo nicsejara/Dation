@@ -553,3 +553,37 @@
  .unified-journey .journey-session-row { grid-template-columns:minmax(0,1fr); }
  .ultimate-core-setup .journey-session-row>.core-owner-card { grid-template-columns:minmax(0,1fr);min-block-size:0; }
 }
+
+/* Saga 10 uses the existing Core shell and controls, with five native cards. */
+.model-wizard-v2 { display:grid; gap:12px; min-inline-size:0; }
+.model-wizard-v2 .model-v2-block { margin:0; overflow:clip; }
+.model-wizard-v2 .ultimate-disclosure__summary { min-block-size:66px; padding:16px 20px; gap:16px; }
+.model-wizard-v2 .ultimate-disclosure__title { font-size:16px; }
+.model-wizard-v2 .ultimate-disclosure__status { max-inline-size:220px; white-space:normal; text-align:end; }
+.model-wizard-v2 .ultimate-disclosure__content { padding:0 20px 20px; }
+.model-wizard-v2 :is(.model-v2-catalogue,.model-v2-physical,.model-v2-summary,.cargo-group,.cargo-composition,.cargo-advanced,.d-field__help) { grid-column:1/-1; min-inline-size:0; }
+.model-wizard-v2 .cargo-editor { display:grid; gap:22px; }
+.model-wizard-v2 .cargo-group > h3 { font-size:15px; margin:0 0 12px; }
+.model-wizard-v2 .cargo-group > button { margin-block-start:12px; }
+.model-wizard-v2 .cargo-entry { padding:16px; margin-block:12px; border:1px solid var(--color-border); border-radius:10px; background:var(--color-surface); min-inline-size:0; }
+.model-wizard-v2 .cargo-entry > header { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-block-end:16px; }
+.model-wizard-v2 .cargo-entry h4 { margin:0; font-size:14px; }
+.model-wizard-v2 .cargo-composition h5 { font-size:13px; margin-block:4px 12px; }
+.model-wizard-v2 .cargo-composition > .ultimate-grid { margin-block-end:12px; }
+.model-wizard-v2 .cargo-advanced { padding-block:8px; border-block-start:1px solid var(--color-border); }
+.model-wizard-v2 .cargo-advanced > summary { color:var(--color-text-secondary); cursor:pointer; padding-block:8px; font-size:13px; }
+.model-wizard-v2 .cargo-advanced[open] > .ultimate-grid { padding-block:12px 4px; }
+.model-wizard-v2 .model-v2-summary { padding:18px 20px; border:1px solid var(--color-border); border-radius:10px; background:var(--color-surface-raised); font-size:13px; line-height:1.6; }
+.model-wizard-v2 .model-v2-physical { font-size:13px; color:var(--color-text-secondary); }
+.model-wizard-v2 .model-v2-physical small { display:block; margin-block-start:6px; }
+.model-wizard-v2 :is(p,small,.d-field__help) { overflow-wrap:anywhere; }
+@media(max-width:700px) {
+ .model-wizard-v2 .ultimate-disclosure__summary { padding:14px; flex-wrap:wrap; }
+ .model-wizard-v2 .ultimate-disclosure__status { max-inline-size:none; text-align:start; font-size:11px; }
+ .model-wizard-v2 .ultimate-disclosure__content { padding-inline:14px; }
+ .model-wizard-v2 .cargo-entry { padding:12px; }
+ .model-wizard-v2 .cargo-entry > header { align-items:start; flex-wrap:wrap; }
+ .model-wizard-v2 button { max-inline-size:100%; white-space:normal; }
+}
+
+@media(min-width:1280px) { .data-contract-grid[data-contract-count="3"] { grid-template-columns:repeat(3,minmax(0,1fr)); } }

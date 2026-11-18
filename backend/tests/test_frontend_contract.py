@@ -1873,9 +1873,9 @@ class FrontendContractTests(
         )[0]
 
         for copy in (
-            "DDA LOGÍSTICA · PLANIFICACIÓN DE DESPACHOS",
+            '<span class="dda-landing__eyebrow">DDA LOGÍSTICA</span>',
             "Tus despachos,<span>con mejor análisis.</span>",
-            "Compará alternativas y revisá la evidencia antes de aprobar.",
+            "Configurá tus despachos, compará alternativas y revisá resultados antes de aprobar.",
             "Comenzar",
             "ENTRADA",
             "Tus órdenes y tu flota",

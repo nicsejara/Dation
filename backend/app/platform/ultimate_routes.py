@@ -31,9 +31,10 @@ async def contract_preview(payload:ModelContractPreview,ctx=Depends(require_uplo
 async def preview_template(entity:str,payload:ModelContractPreview,ctx=Depends(require_upload_access)):
     from fastapi import HTTPException
     from fastapi.responses import Response
-    from app.domain.logistics.data_contracts import ENTITIES,template_csv
-    if entity not in ENTITIES:raise HTTPException(404,'Template no disponible.')
+    from app.domain.logistics.data_contracts import ALL_ENTITIES,template_csv
+    if entity not in ALL_ENTITIES:raise HTTPException(404,'Template no disponible.')
     _,contracts=await service.preview_contracts(logistics(ctx),payload)
+    if entity not in contracts:raise HTTPException(404,'El modelo no utiliza ese archivo.')
     return Response(template_csv(contracts[entity]),media_type='text/csv; charset=utf-8',headers={'Content-Disposition':f'attachment; filename="{entity}.csv"'})
 
 @router.get('/logistics-models/{model_id}')

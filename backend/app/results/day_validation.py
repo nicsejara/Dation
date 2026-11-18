@@ -27,12 +27,16 @@ def validate_day_bundle(bundle):
         require(bool(parts),'Missing '+name);h=json.loads(parts[0].content)
         return rows(c.ReferenceDataset(dataset_id=name,row_schema=h['row_schema'],row_count=h['total_rows'],artifacts=tuple(a.reference for a in parts)))
     same(named('core'),[core],'Core changed');same(rows(package.schedule.trips),core.schedule.trips,'Schedule changed')
-    details={d.dataset_id:d for d in package.details};require(set(details)=={'schedule','trips','resources','service','exceptions','evidence'},'Missing six D2 datasets')
+    details={d.dataset_id:d for d in package.details};require(set(details)==({'schedule','trips','resources','service','exceptions','evidence'}|({'cargo'} if core.schedule.cargo is not None else set())),'Missing six D2 datasets')
+    if core.schedule.cargo is not None:
+        from .cargo_projections import cargo_rows
+        same(rows(details['cargo'].data),cargo_rows(core.schedule.cargo),'Cargo details changed')
+        require(package.exports.csv.granularity=='TRIP_ORDER_LINE','Cargo export granularity differs')
     for key,expected in [('schedule',core.schedule.trips),('trips',trip_facts(result)),('resources',result.resource_timeline),('service',result.service_analysis),('evidence',evidence.entities)]:same(rows(details[key].data),expected,key+' differs')
     visual=package.primary_visual.projection
     if isinstance(visual,c.ReferenceDataset):visual=c.GanttProjection.model_validate(rows(visual)[0])
     same(visual,day_gantt(result),'Gantt dates/occupancy changed');same(rows(package.exports.csv.rows),day_export_rows(core),'CSV rows changed')
-    require(len(rows(package.exports.csv.rows))==len(result.source.source_core.transport_plan.trips),'CSV omits source Trips')
+    require(({row['trip_id'] for row in rows(package.exports.csv.rows)}=={t.trip_id for t in result.source.source_core.transport_plan.trips}),'CSV omits source Trips')
     same(package.metrics,core.metrics,'Metric changed');same(package.summary,day_summary(result),'Summary changed')
     same(rows(package.evidence.reason_emissions),evidence.reasons,'Reason changed')
     restored=reassemble_evidence(named('engine-evidence'))

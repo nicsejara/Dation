@@ -1,0 +1,70 @@
+{
+  "sha": "f7fb4be3aa750b1c609a3579fd35e9180b40a9c9",
+  "scope": "local isolated deterministic baseline; RSS cumulative process high-water mark",
+  "cases": [
+    {
+      "orders": 1,
+      "seconds": 0.06970748699677642,
+      "python_peak_bytes": 316752,
+      "process_peak_rss_kib": 100848,
+      "status": "OPTIMAL",
+      "assigned": "1.000",
+      "slots": 12,
+      "variables": 48,
+      "limits": [],
+      "native_statuses": [
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL"
+      ]
+    },
+    {
+      "orders": 10,
+      "seconds": 0.1436105439934181,
+      "python_peak_bytes": 436833,
+      "process_peak_rss_kib": 102768,
+      "status": "OPTIMAL",
+      "assigned": "10.000",
+      "slots": 12,
+      "variables": 264,
+      "limits": [],
+      "native_statuses": [
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL"
+      ]
+    },
+    {
+      "orders": 100,
+      "seconds": 1.839677366995602,
+      "python_peak_bytes": 2739190,
+      "process_peak_rss_kib": 116256,
+      "status": "OPTIMAL",
+      "assigned": "100.000",
+      "slots": 12,
+      "variables": 2424,
+      "limits": [],
+      "native_statuses": [
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL"
+      ]
+    },
+    {
+      "orders": 250,
+      "seconds": 6.846175279992167,
+      "python_peak_bytes": 6392264,
+      "process_peak_rss_kib": 140784,
+      "status": "OPTIMAL",
+      "assigned": "250.000",
+      "slots": 12,
+      "variables": 6024,
+      "limits": [],
+      "native_statuses": [
+        "OPTIMAL",
+        "OPTIMAL",
+        "OPTIMAL"
+      ]
+    }
+  ]
+}

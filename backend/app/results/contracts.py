@@ -244,14 +244,55 @@ class ResourceTimeline(ContractModel):
         return self
 
 
+class CargoProductPortion(ContractModel):
+    product_id: Identifier
+    product_name: str = Field(min_length=1,max_length=120)
+    quantity: Positive
+    unit_label: str = Field(min_length=1,max_length=40)
+    product_units: NonNegative | None
+
+
+class CargoAllocation(ContractModel):
+    trip_id: Identifier
+    order_id: Identifier
+    line_id: Identifier
+    presentation_id: Identifier
+    presentation_label: str = Field(min_length=1,max_length=120)
+    quantity: Positive
+    quantity_unit: Literal['presentation','kg','t','m3','l']
+    load: QuantityVector
+    products: tuple[CargoProductPortion,...]
+
+
+class CargoLineResolution(ContractModel):
+    order_id: Identifier
+    line_id: Identifier
+    presentation_id: Identifier
+    presentation_label: str = Field(min_length=1,max_length=120)
+    quantity_kind: Literal['DISCRETE','CONTINUOUS']
+    quantity_unit: Literal['presentation','kg','t','m3','l']
+    requested: Positive
+    assigned: NonNegative
+    unserved: NonNegative
+
+
+class CargoPlanDetail(ContractModel):
+    schema_version: Literal['cargo_assignment_v2'] = 'cargo_assignment_v2'
+    catalog_hash: SHA256
+    allocations: tuple[CargoAllocation,...]
+    lines: tuple[CargoLineResolution,...]
+
+
 class TransportPlan(ContractModel):
     trips: tuple[Trip, ...]
     unassigned_demand: tuple[DemandResolution, ...]
     capacity_gap: QuantityVector | None
+    cargo: CargoPlanDetail | None = Field(default=None,exclude_if=lambda value:value is None)
 
 
 class DaySchedule(ContractModel):
     trips: tuple[ScheduleTrip, ...]
+    cargo: CargoPlanDetail | None = Field(default=None,exclude_if=lambda value:value is None)
 
 
 class EngineCoreResult(ContractModel):
@@ -669,7 +710,7 @@ class AlternativeDescriptor(ContractModel):
 class ExportDescriptor(ContractModel):
     available: StrictBool
     type: Literal["TRANSPORT_PLAN", "DAY_SCHEDULE", "DECISION_RESULT_PACKAGE"]
-    granularity: Literal["TRIP_ORDER", "TRIP", "PACKAGE"]
+    granularity: Literal["TRIP_ORDER", "TRIP_ORDER_LINE", "TRIP", "PACKAGE"]
     cost_scope: Literal["TRIP_ONCE"] | None = None
     rows: Delivery[dict[str, FactValue]] | None = None
 
@@ -1042,6 +1083,8 @@ def validate_schedule_source(source: EngineCoreResult, child: EngineCoreResult, 
     current = {t.trip_id: (t.resource_id, t.resource_source) for t in child.schedule.trips}
     if previous != current:
         raise ValueError("D2 must preserve all Trip IDs and resource assignments")
+    if source.transport_plan.cargo != child.schedule.cargo:
+        raise ValueError("D2 must preserve the complete D1 cargo line certificate")
     return True
 
 

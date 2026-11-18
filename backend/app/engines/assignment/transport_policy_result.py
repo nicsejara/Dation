@@ -44,6 +44,11 @@ def plan_signature(plan):
 
 def run_transport_policy(request, *, alternative_budget=3):
     request=TransportPlanInput.model_validate(request)
+    if getattr(request.model,'configuration',None) is not None:raise ValueError('V2 requiere el perfil transport_plan_cargo_v2.')
+    return _run_policy(request,alternative_budget=alternative_budget)
+
+
+def _run_policy(request, *, alternative_budget=3):
     if type(alternative_budget) is not int or not 0<=alternative_budget<=3:raise ValueError('Alternative budget 0..3 required')
     with localcontext() as ctx:
         ctx.prec=60
@@ -133,7 +138,10 @@ def _produce(request,goal=None,model_budget=None,kernel_budget=Decimal(1),compar
                 rows=[o for o in request.demands if o.order_id in {a.order_id for a in trip.orders}]
                 if resource.source not in request.model.allowed_sources or (trip.origin_id,trip.destination_id) not in resource.lanes:continue
                 if resource.source=='OWN' and resource.base_origin_id!=trip.origin_id:continue
-                if any(not set(o.compatibility_groups).issubset(resource.compatibility_groups) for o in rows):continue
+                from .cargo_result import trip_groups
+                if not trip_groups(request,trip,old.core.transport_plan.cargo).issubset(resource.compatibility_groups):continue
+                cfg=getattr(request.model,'configuration',None)
+                if cfg is not None and cfg.resource_categories and getattr(resource,'resource_category',None) not in cfg.resource_categories:continue
                 if any(getattr(trip.total_load,d)>getattr(resource.guaranteed_capacity,d) for d in request.model.active_dimensions):continue
                 if (resource.units_available if resource.source=='OWN' else resource.services_available) is None:
                     comparison_complete=False;continue
@@ -172,7 +180,7 @@ def _produce(request,goal=None,model_budget=None,kernel_budget=Decimal(1),compar
     core=c.EngineCoreResult.model_validate({**old.core.model_dump(),'engine':{**old.core.engine.model_dump(),'solver_status':status},
         'feasibility':dict(solution_found=usable,policy_feasible=True if usable else False if infeasible else None,
             hard_constraints_satisfied=True if usable else False if infeasible else None,full_demand_coverage=old.core.feasibility.full_demand_coverage),
-        'metrics':metrics,'transport_plan':dict(trips=trips,unassigned_demand=tuple(o for o in resolutions if o.status!='COVERED'),capacity_gap=old.core.transport_plan.capacity_gap)})
+        'metrics':metrics,'transport_plan':dict(cargo=old.core.transport_plan.cargo,trips=trips,unassigned_demand=tuple(o for o in resolutions if o.status!='COVERED'),capacity_gap=old.core.transport_plan.capacity_gap)})
     goal_stage=next(((value,bound) for label,_,value,bound in search.stages if label==(goal or request.context.node_policy.primary_goal)),(None,None))
     solver=c.SolverEvidence(status=status,objective_value=Decimal(goal_stage[0]) if goal_stage[0] is not None else None,best_bound=Decimal(goal_stage[1]) if optimal and goal_stage[1] is not None else None,
         certificate=c.SolverCertificate(kind='GLOBAL_OPTIMUM' if optimal else 'FEASIBILITY' if usable else 'INFEASIBILITY',evidence_ref=proof_id) if optimal or usable or infeasible else None)

@@ -678,6 +678,282 @@
       "title": "CandidateSummary",
       "type": "object"
     },
+    "CargoAllocation": {
+      "additionalProperties": false,
+      "properties": {
+        "line_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Line Id",
+          "type": "string"
+        },
+        "load": {
+          "$ref": "#/$defs/QuantityVector"
+        },
+        "order_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Order Id",
+          "type": "string"
+        },
+        "presentation_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Presentation Id",
+          "type": "string"
+        },
+        "presentation_label": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Presentation Label",
+          "type": "string"
+        },
+        "products": {
+          "items": {
+            "$ref": "#/$defs/CargoProductPortion"
+          },
+          "title": "Products",
+          "type": "array"
+        },
+        "quantity": {
+          "anyOf": [
+            {
+              "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "format": "exact-decimal",
+          "title": "Quantity"
+        },
+        "quantity_unit": {
+          "enum": [
+            "presentation",
+            "kg",
+            "t",
+            "m3",
+            "l"
+          ],
+          "title": "Quantity Unit",
+          "type": "string"
+        },
+        "trip_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Trip Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "trip_id",
+        "order_id",
+        "line_id",
+        "presentation_id",
+        "presentation_label",
+        "quantity",
+        "quantity_unit",
+        "load",
+        "products"
+      ],
+      "title": "CargoAllocation",
+      "type": "object"
+    },
+    "CargoLineResolution": {
+      "additionalProperties": false,
+      "properties": {
+        "assigned": {
+          "anyOf": [
+            {
+              "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "format": "exact-decimal",
+          "title": "Assigned"
+        },
+        "line_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Line Id",
+          "type": "string"
+        },
+        "order_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Order Id",
+          "type": "string"
+        },
+        "presentation_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Presentation Id",
+          "type": "string"
+        },
+        "presentation_label": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Presentation Label",
+          "type": "string"
+        },
+        "quantity_kind": {
+          "enum": [
+            "DISCRETE",
+            "CONTINUOUS"
+          ],
+          "title": "Quantity Kind",
+          "type": "string"
+        },
+        "quantity_unit": {
+          "enum": [
+            "presentation",
+            "kg",
+            "t",
+            "m3",
+            "l"
+          ],
+          "title": "Quantity Unit",
+          "type": "string"
+        },
+        "requested": {
+          "anyOf": [
+            {
+              "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "format": "exact-decimal",
+          "title": "Requested"
+        },
+        "unserved": {
+          "anyOf": [
+            {
+              "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "format": "exact-decimal",
+          "title": "Unserved"
+        }
+      },
+      "required": [
+        "order_id",
+        "line_id",
+        "presentation_id",
+        "presentation_label",
+        "quantity_kind",
+        "quantity_unit",
+        "requested",
+        "assigned",
+        "unserved"
+      ],
+      "title": "CargoLineResolution",
+      "type": "object"
+    },
+    "CargoPlanDetail": {
+      "additionalProperties": false,
+      "properties": {
+        "allocations": {
+          "items": {
+            "$ref": "#/$defs/CargoAllocation"
+          },
+          "title": "Allocations",
+          "type": "array"
+        },
+        "catalog_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Catalog Hash",
+          "type": "string"
+        },
+        "lines": {
+          "items": {
+            "$ref": "#/$defs/CargoLineResolution"
+          },
+          "title": "Lines",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "cargo_assignment_v2",
+          "default": "cargo_assignment_v2",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "catalog_hash",
+        "allocations",
+        "lines"
+      ],
+      "title": "CargoPlanDetail",
+      "type": "object"
+    },
+    "CargoProductPortion": {
+      "additionalProperties": false,
+      "properties": {
+        "product_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+          "title": "Product Id",
+          "type": "string"
+        },
+        "product_name": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Product Name",
+          "type": "string"
+        },
+        "product_units": {
+          "anyOf": [
+            {
+              "anyOf": [
+                {
+                  "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "format": "exact-decimal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Product Units"
+        },
+        "quantity": {
+          "anyOf": [
+            {
+              "pattern": "^[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?$",
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "format": "exact-decimal",
+          "title": "Quantity"
+        },
+        "unit_label": {
+          "maxLength": 40,
+          "minLength": 1,
+          "title": "Unit Label",
+          "type": "string"
+        }
+      },
+      "required": [
+        "product_id",
+        "product_name",
+        "quantity",
+        "unit_label",
+        "product_units"
+      ],
+      "title": "CargoProductPortion",
+      "type": "object"
+    },
     "CasePolicy": {
       "additionalProperties": false,
       "properties": {
@@ -892,6 +1168,17 @@
     "DaySchedule": {
       "additionalProperties": false,
       "properties": {
+        "cargo": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CargoPlanDetail"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
         "trips": {
           "items": {
             "$ref": "#/$defs/ScheduleTrip"
@@ -2554,6 +2841,7 @@
         "granularity": {
           "enum": [
             "TRIP_ORDER",
+            "TRIP_ORDER_LINE",
             "TRIP",
             "PACKAGE"
           ],
@@ -5580,6 +5868,7 @@
           "enum": [
             "transport_demand",
             "transport_resources",
+            "order_lines",
             "scheduling_enrichment"
           ],
           "title": "Slot",
@@ -5820,6 +6109,17 @@
               "type": "null"
             }
           ]
+        },
+        "cargo": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CargoPlanDetail"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         },
         "trips": {
           "items": {
@@ -7497,6 +7797,16 @@
       "result_schema": "transport_plan_v1",
       "result_schema_version": 1,
       "runtime_profile": "transport_plan_v1"
+    },
+    {
+      "available": false,
+      "engine_name": "transport_plan",
+      "engine_version": "3.0.0",
+      "implemented": false,
+      "node_id": "logistics_assignment",
+      "result_schema": "transport_plan_v1",
+      "result_schema_version": 1,
+      "runtime_profile": "transport_plan_cargo_v2"
     },
     {
       "available": false,

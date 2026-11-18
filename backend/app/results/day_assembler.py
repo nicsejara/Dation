@@ -37,12 +37,15 @@ def assemble_day(result,frozen_context=None,versions=None):
         descriptor('service','SERVICE',service,[('trip_id','ID',None),('margin_days','COUNT','calendar_days'),('status','STATUS',None)],('trip_id',)),
         descriptor('exceptions','EVIDENCE',ex_data,[('entity_id','ID',None),('facts.code','STATUS',None)],('entity_id',)),
         descriptor('evidence','EVIDENCE',entities,[('entity_type','TEXT',None),('entity_id','ID',None)],('entity_type','entity_id')))
+    if core.schedule.cargo is not None:
+        from .cargo_projections import cargo_descriptor
+        details=(*details,cargo_descriptor(builder,core.schedule.cargo))
     # Service order is certified by the engine, independent of its primary key.
     details=tuple(d.model_copy(update={'stable_order':('margin_days','trip_id')}) if d.dataset_id=='service' else d for d in details)
     fields=dict(result_schema='day_scheduling_v1',result_schema_version=1,package_version=1,assembler_version=ASSEMBLER_VERSION,decision=core.decision,context=core.context,engine=core.engine,
         feasibility=core.feasibility,transport_plan=None,schedule=c.PublishedSchedule(trips=schedule),source_transport_plan=core.source_transport_plan,summary=summary,metrics=core.metrics,
         primary_visual=c.PrimaryVisual(type='DAY_GANTT',projection=visual_data),details=details,alternatives=(),alternatives_state='NOT_COMPUTED',exceptions=exceptions,assumptions=assumptions,
-        evidence=evidence_summary,approval_review=review,exports=c.Exports.model_validate({'csv':{'available':True,'type':'DAY_SCHEDULE','granularity':'TRIP','rows':export},'json':{'available':True,'type':'DECISION_RESULT_PACKAGE','granularity':'PACKAGE'}}),
+        evidence=evidence_summary,approval_review=review,exports=c.Exports.model_validate({'csv':{'available':True,'type':'DAY_SCHEDULE','granularity':'TRIP_ORDER_LINE' if core.schedule.cargo is not None else 'TRIP','rows':export},'json':{'available':True,'type':'DECISION_RESULT_PACKAGE','granularity':'PACKAGE'}}),
         ai_context=c.AIContextReference(base_context=ai),artifact_manifest=c.ArtifactManifest(artifacts=tuple(p.reference for p in builder.parts)),
         fingerprints={'canonical_version':'DATION_CANONICAL_V1','input_context_hash':core.input_context_hash,'core_result_fingerprint':core_result_fingerprint(core),'model_version':core.context.logistics_model_version,
             'data_pack_version':core.context.data_pack_version,'case_policy_hash':policy_hash(core.context.case_policy),'node_policy_hash':policy_hash(core.context.node_policy),'contract_hash':core.context.contract_hash,

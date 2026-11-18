@@ -1,21 +1,34 @@
 import {api,post} from '../shared.mjs';
 import {mountDialog} from '../../platform/components.mjs';
 import {el,button,field,collapsibleSection} from './forms.mjs';
-import {mountModelFields,defaultConfiguration} from './model-fields.mjs';
+import {mountModelFields,defaultConfiguration,defaultConfigurationV2} from './model-fields.mjs';
 import {wizardIcon} from './wizard-ui.mjs';
 import {mountDataContractView} from './data-contract-view.mjs';
 
-export async function mountPlanningModel(form,scope,{draft={},modelId='',canManage,unified=false,onChange=()=>{},persist=()=>{},onSelected=()=>{},onContinue=()=>{},onContracts}){
+// Keep v1 recovery copy unchanged. V2 physical validation is structured by
+// FastAPI; preserve its relevant business messages instead of hiding the cause.
+async function previewV2Draft(configuration,signal){
+ const response=await fetch('/api/platform/logistics-models/contract-preview',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({configuration}),signal});
+ const data=await response.json();
+ if(!response.ok){
+  const details=Array.isArray(data.errors)?data.errors.map(e=>({loc:[e.field],msg:e.message})):Array.isArray(data.detail)?data.detail:[],v2=details.filter(e=>e.loc?.some(key=>String(key).includes('LogisticsModelConfigurationV2'))),selected=v2.length?v2:details;
+  const message=selected.map(e=>String(e.msg||'').replace(/^Value error, /,'')).filter(Boolean).join(' ');
+  throw Object.assign(new Error(message||(typeof data.detail==='string'?data.detail:'Revisá las propiedades físicas del modelo.')),{status:response.status});
+ }
+ return data;
+}
+
+export async function mountPlanningModel(form,scope,{draft={},modelId='',canManage,saga10=false,unified=false,onChange=()=>{},persist=()=>{},onSelected=()=>{},onContinue=()=>{},onContracts}){
  const modelPanel=collapsibleSection(form,'01. Logistics Model','Definí la lógica operativa base del modelo logístico que vas a usar en este Case.',{open:true,initialStatus:'En configuración'}),modelBlock=modelPanel.body;
  modelPanel.details.dataset.dationTest='core-model';modelPanel.details.dataset.modelState='LOADING';modelPanel.setStatus('Cargando');modelPanel.details.classList.add('model-wizard');modelBlock.classList.add('ultimate-planning-model');modelBlock.hidden=true;
  const summary=modelPanel.details.querySelector('summary'),tile=el('span',undefined,'model-wizard-tile'),heading=el('span',undefined,'model-wizard-heading');tile.append(wizardIcon('layers'));heading.append(summary.querySelector('.ultimate-disclosure__title'),modelBlock.previousElementSibling);summary.prepend(tile,heading);
  const intro=el('div',undefined,'model-wizard-intro'),reuse=button('',openPicker),catalogHint=el('p',undefined,'d-metadata'),introIcon=wizardIcon('database');reuse.append(wizardIcon('folder'),el('span','Seleccionar modelo existente'));reuse.dataset.dationTest='model-reuse';intro.append(introIcon,el('strong','Creá un nuevo modelo operativo o reutilizá uno ya publicado.'),reuse,catalogHint);
  const editor=el('div'),feedback=el('p','','model-wizard-feedback'),footer=el('footer',undefined,'model-wizard-footer'),progress=el('div',undefined,'model-wizard-progress'),ring=el('span',undefined,'model-wizard-ring'),progressText=el('div'),count=el('p','','d-metadata'),create=button('',publish,'primary');
  feedback.role='status';feedback.setAttribute('aria-live','polite');feedback.dataset.dationTest='model-feedback';progress.dataset.dationTest='model-progress';progress.role='status';progressText.append(el('strong','Configuración del modelo'),count);ring.setAttribute('aria-hidden','true');progress.append(ring,progressText);footer.append(progress,create);modelBlock.append(intro,editor,feedback,footer);
- create.dataset.dationTest='model-create';const createLabel=unified?'Guardar y continuar':'Crear y seleccionar modelo',createCaption=el('span',createLabel);create.append(wizardIcon('check'),createCaption);
+ feedback.id='model-create-feedback';create.setAttribute('aria-describedby',feedback.id);create.dataset.dationTest='model-create';const createLabel=unified?'Guardar y continuar':'Crear y seleccionar modelo',createCaption=el('span',createLabel);create.append(wizardIcon('check'),createCaption);
  const contractPanel=collapsibleSection(form,'02. Data Contract','Dation genera automáticamente la estructura de datos requerida a partir del Logistics Model seleccionado. Descargá las plantillas y consultá sus campos y reglas antes de cargar los datos en el Decision Graph.',{initialStatus:'Pendiente'}),contractView=mountDataContractView(contractPanel,scope,{retry:()=>preview(),onContinue,onContracts}),contractStatus=contractView.status,retry=contractView.retry,modelRetry=button('Reintentar Data Contract',async()=>{if(state.mode==='existing'&&!isSelected()){await render().catch(fail);if(ready)onSelected();}else await preview();});
  retry.hidden=modelRetry.hidden=true;feedback.after(modelRetry);contractPanel.details.dataset.dationTest='core-contract';
- const newDraft=()=>({id:crypto.randomUUID(),name:'',description:'',status:'active',expected_revision:1,configuration:defaultConfiguration(window.dationSession.identity.workspace.currency)});
+ const newDraft=()=>({id:crypto.randomUUID(),name:'',description:'',status:'active',expected_revision:1,configuration:(saga10?defaultConfigurationV2:defaultConfiguration)(window.dationSession.identity.workspace.currency)});
  const state={mode:draft.mode||'new',model_id:draft.model_id||modelId,version_id:draft.version_id||'',new_model:draft.new_model||newDraft(),intent:draft.intent||null,locked:!!draft.locked};
  // An old draft may contain an acknowledged version without its selection flag.
  if(state.intent&&state.version_id===state.intent.version_id){state.mode='existing';state.model_id=state.intent.model_id;state.intent.published=true;}
@@ -29,15 +42,15 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
  const changed=()=>{sync();onChange();};
  function sync(){
   const valid=fields?.sectionValidity()||[false,false,false],complete=valid.filter(Boolean).length;
-  ring.style.setProperty('--model-progress',String(complete/3*100)+'%');count.textContent=complete+' de 3 secciones completas';
+  ring.style.setProperty('--model-progress',String(complete/valid.length*100)+'%');count.textContent=complete+' de '+valid.length+' secciones completas';
   const selectedVersion=isSelected();
   modelPanel.setStatus(selectedVersion?'Configurado':!canManage?'Sólo lectura':previewFailed||pending()&&!busy?'Revisar configuración':'En configuración',selectedVersion?'complete':previewFailed?'warning':'pending');
-  modelPanel.details.dataset.modelState=busy?'NEW_PUBLISHING':pickerOpen?'REUSE_PICKER':selectedVersion?'MODEL_SELECTED':!canManage?'READ_ONLY':previewFailed||pending()?'ERROR_RECOVERABLE':previewPending?'NEW_VALIDATING':compiled&&complete===3?'NEW_READY_TO_CREATE':'NEW_EDITING';
+  modelPanel.details.dataset.modelState=busy?'NEW_PUBLISHING':pickerOpen?'REUSE_PICKER':selectedVersion?'MODEL_SELECTED':!canManage?'READ_ONLY':previewFailed||pending()?'ERROR_RECOVERABLE':previewPending?'NEW_VALIDATING':compiled&&complete===valid.length?'NEW_READY_TO_CREATE':'NEW_EDITING';
   reuse.disabled=!models.length||busy||pending()||state.locked;
   catalogHint.textContent=!canManage?'Un Admin debe crear y publicar modelos. Podés reutilizar una versión disponible.':models.length?'También podés reutilizar una versión ya publicada.':'Todavía no hay modelos publicados para reutilizar.';
   reuse.setAttribute('aria-describedby','model-catalog-hint');catalogHint.id='model-catalog-hint';
   create.hidden=selectedVersion||!canManage;
-  create.disabled=busy||(state.locked&&!pending())||(!pending()&&(!compiled||complete!==3));create.setAttribute('aria-busy',String(busy));
+  create.disabled=busy||(state.locked&&!pending())||(!pending()&&(!compiled||complete!==valid.length));create.setAttribute('aria-busy',String(busy));
   const caption=busy?'Creando modelo…':pending()?'Reintentar publicación pendiente':createLabel;if(createCaption.textContent!==caption)createCaption.textContent=caption;
   feedback.textContent=message||(!canManage?'Necesitás permiso de administración para crear un modelo.':'');feedback.hidden=!feedback.textContent;
   modelRetry.hidden=(state.mode!=='new'&&isSelected())||!previewFailed||busy||pending();modelRetry.textContent=state.mode==='existing'&&!isSelected()?'Reintentar selección del modelo':'Reintentar Data Contract';
@@ -52,14 +65,14 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
     if(!fields.sectionValidity().slice(1).every(Boolean)){contractPanel.setStatus('Pendiente','pending');contractStatus.textContent='Revisá la operación y las reglas de costo del modelo.';return;}
     previewBody={configuration:fields.read().configuration};
    }else{if(!isSelected())throw new Error('Elegí un Model y una versión publicada.');previewBody={model_id:state.model_id,version_id:state.version_id};}
-   previewPending=true;changed();const source=structuredClone(previewBody),data=await post('/api/platform/logistics-models/contract-preview',source,{signal:scope.signal});if(!scope.active||own!==generation)return;
+   previewPending=true;changed();const source=structuredClone(previewBody),data=source.configuration?.version===2?await previewV2Draft(source.configuration,scope.signal):await post('/api/platform/logistics-models/contract-preview',source,{signal:scope.signal});if(!scope.active||own!==generation)return;
    previewPending=false;
    if(data.provisional!== (state.mode==='new'))throw new Error('El contrato no corresponde a la versión seleccionada.');
-   contractView.render(data,previewBody);compiled=true;ready=isSelected();previewFailed=false;
+   contractCount=Object.keys(data.contracts).length;fields?.setCompiled?.(data);contractView.render(data,previewBody);compiled=true;ready=isSelected();previewFailed=false;
    contractPanel.setStatus(ready?'Estructura lista':'Vista previa',ready?'complete':'pending');if(!pending())message='';changed();
-  }catch(error){if(scope.active&&own===generation){previewPending=false;previewFailed=true;contractStatus.textContent=error.message;contractStatus.role='alert';contractPanel.setStatus('Revisar contrato','warning');message=error.message;feedback.role='alert';changed();}}
+  }catch(error){if(scope.active&&own===generation){previewPending=false;previewFailed=true;fields?.showServerError?.(error.message);contractStatus.textContent=error.message;contractStatus.role='alert';contractPanel.setStatus('Revisar contrato','warning');message=error.message;feedback.role='alert';changed();}}
  }
- let previewBody=null;
+ let previewBody=null;let contractCount=0;
  async function render(){
   const own=++renderGeneration;generation++;clearTimeout(timer);compiled=ready=false;contractView.invalidate();editor.replaceChildren();
   if(state.mode==='new'){
@@ -69,7 +82,7 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
   }else{
    let detail;try{detail=await api('/api/platform/logistics-models/'+state.model_id,{signal:scope.signal});}catch(error){if(own!==renderGeneration)return;throw error;}if(!scope.active||own!==renderGeneration)return;
    const chosen=detail.versions.find(v=>v.id===state.version_id);if(detail.model.status!=='active'||!chosen)throw new Error('La versión publicada ya no está disponible. Elegí otra versión.');selected=detail;if(!models.some(m=>m.id===detail.model.id))models.push({...detail.model,versions:detail.versions});
-   const selectedSummary=el('div',undefined,'model-wizard-selection'),text=el('div');text.append(el('h3',detail.model.name),el('p','Modelo seleccionado · Versión '+chosen.version,'d-metadata'));
+   const selectedSummary=el('div',undefined,'model-wizard-selection'),text=el('div');text.append(el('h3',detail.model.name),el('p',chosen.config_jsonb.version===2?'Modelo publicado seleccionado':'Modelo seleccionado · Versión '+chosen.version,'d-metadata'));
    const another=button('Crear otro modelo',()=>{if(busy||pending()||state.locked)return;state.mode='new';state.model_id='';state.version_id='';state.intent=null;selected=null;message='';render().catch(fail);changed();});another.dataset.modelNew='';another.hidden=!canManage;another.disabled=state.locked||busy;selectedSummary.append(text,another);editor.append(selectedSummary);
    fields=mountModelFields(editor,scope,{...detail.model,configuration:chosen.config_jsonb},{wizard:true,version:chosen.version});fields.lock();
   }
@@ -81,7 +94,7 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
   if(state.mode==='new'&&fields)state.new_model=fields.read();
   const dialog=el('dialog',undefined,'d-modal model-wizard-picker'),body=el('div',undefined,'d-modal__body'),actions=el('div',undefined,'d-modal__actions'),title=el('h2','Seleccionar modelo existente','d-modal__title'),hint=el('p','Elegí una versión publicada. Su configuración se conserva sin modificaciones.','d-metadata');
   title.id='model-picker-title';dialog.setAttribute('aria-labelledby',title.id);dialog.dataset.dationTest='model-picker';body.append(title,hint);
-  const model=field(body,'Logistics Model',{name:'reuse_model',options:[['','Elegí un modelo'],...models.map(m=>[m.id,m.name])],value:''}),description=el('p','','d-metadata'),version=field(body,'Model Version',{name:'reuse_version',options:[['','Elegí una versión publicada']],value:''}),error=el('p','','d-field__error');error.role='alert';body.append(description,error);
+  const model=field(body,'Logistics Model',{name:'reuse_model',options:[['','Elegí un modelo'],...models.map(m=>[m.id,m.name])],value:''}),description=el('p','','d-metadata'),version=field(body,'Model Version',{name:'reuse_version',options:[['','Elegí una versión publicada']],value:''}),error=el('p','','d-field__error');error.role='alert';body.append(description,error);if(saga10){version.closest('.d-field').hidden=true;hint.textContent='Elegí un modelo publicado. Se selecciona su última publicación verificada.';}
   let detail=null,request=0,choosing=false;
   const cancel=button('Cancelar',()=>mounted.close()),confirm=button('Seleccionar esta versión',async()=>{
    if(choosing||!detail||!version.value)return;choosing=true;confirm.disabled=true;
@@ -94,7 +107,7 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
   const mounted=mountDialog({dialog,trigger:reuse,initialFocus:model});
   scope.listen(model,'change',async()=>{
    const own=++request;detail=null;confirm.disabled=true;version.replaceChildren();description.textContent='';error.textContent='';if(!model.value)return;
-   try{const data=await api('/api/platform/logistics-models/'+model.value,{signal:scope.signal});if(!scope.active||!dialog.open||own!==request)return;if(data.model.status!=='active'||!data.versions.length)throw new Error('No hay versiones publicadas disponibles.');detail=data;description.textContent=data.model.description||'Sin descripción.';for(const v of data.versions){const o=el('option','Versión '+v.version);o.value=v.id;version.append(o);}confirm.disabled=false;}catch(e){if(scope.active&&dialog.open&&own===request)error.textContent=e.message;}
+   try{const data=await api('/api/platform/logistics-models/'+model.value,{signal:scope.signal});if(!scope.active||!dialog.open||own!==request)return;if(data.model.status!=='active'||!data.versions.length)throw new Error('No hay versiones publicadas disponibles.');detail=data;description.textContent=data.model.description||'Sin descripción.';for(const v of [...data.versions].sort((a,b)=>b.version-a.version)){const o=el('option','Versión '+v.version);o.value=v.id;version.append(o);}if(saga10)version.value=[...data.versions].sort((a,b)=>b.version-a.version)[0].id;confirm.disabled=false;}catch(e){if(scope.active&&dialog.open&&own===request)error.textContent=e.message;}
   });
   dialog.addEventListener('close',()=>{request++;pickerOpen=false;mounted.dispose();dialog.remove();sync();},{once:true});scope.own(()=>{mounted.dispose();dialog.remove();});mounted.open();
  }
@@ -136,7 +149,7 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
   modelPanel,contractPanel,draft:readDraft,
   read:()=>({model_id:state.mode==='new'?state.intent?.model_id||state.new_model.id:state.model_id,version_id:state.version_id}),
   summary:()=>isSelected()?selected.model.name+' · versión '+selected.versions.find(v=>v.id===state.version_id).version:state.mode==='existing'?'Modelo publicado pendiente de verificación':(fields?.read().name||'Nuevo Model')+' · sin publicar',
-  get ready(){return ready;},get selected(){return isSelected();},
+  get ready(){return ready;},get contractCount(){return contractCount;},get selected(){return isSelected();},
   validate(){return ready?{}:{model_version_id:'Completá el Model y esperá la resolución válida del Data Contract.'};},
   async ensurePublished(save){
    // Legacy callers retain the same entry point; the wizard publishes explicitly.

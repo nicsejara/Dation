@@ -145,6 +145,9 @@ def _assemble(result,frozen_context,versions):
         descriptor('alternatives','EVIDENCE',alt_data,[('entity_id','ID',None),('facts.total_cost','MONEY',currency)],('entity_id',)),
         descriptor('exceptions','EVIDENCE',exception_data,[('entity_id','ID',None),('facts.code','STATUS',None)],('facts.exception_id',)),
         descriptor('evidence','EVIDENCE',entity_data,[('entity_type','TEXT',None),('entity_id','ID',None)],('entity_type','entity_id')))
+    if core.transport_plan.cargo is not None:
+        from .cargo_projections import cargo_descriptor
+        details=(*details,cargo_descriptor(builder,core.transport_plan.cargo))
     analysis=c.EntityEvidence(entity_type='CASE',entity_id=str(core.context.case_id),facts={'alternatives_status':result.alternatives_status,
         'materiality_version':'D1_MATERIALITY_V1','materiality_rule':'DIFFERENT_RESOURCE_OR_ALLOCATIONS','max_alternatives':3,
         'exploration_scope':'BOUNDED_POLICY_SET_V1','explored_goals':result.explored_goals},reason_refs=())
@@ -163,7 +166,7 @@ def _assemble(result,frozen_context,versions):
         schedule=None,source_transport_plan=None,summary=executive,metrics=core.metrics,primary_visual=c.PrimaryVisual(type='SANKEY',projection=visual_data),
         details=details,alternatives=tuple(alternatives),alternatives_state='COMPUTED' if alternatives else 'COMPUTED_NONE' if result.alternatives_status=='NO_MATERIAL_ALTERNATIVE' else 'NOT_COMPUTED',
         exceptions=exceptions,assumptions=assumptions,evidence=evidence_summary,approval_review=review,
-        exports=c.Exports.model_validate({'csv':dict(available=core.feasibility.solution_found,type='TRANSPORT_PLAN',granularity='TRIP_ORDER',cost_scope='TRIP_ONCE',rows=export),
+        exports=c.Exports.model_validate({'csv':dict(available=core.feasibility.solution_found,type='TRANSPORT_PLAN',granularity='TRIP_ORDER_LINE' if core.transport_plan.cargo is not None else 'TRIP_ORDER',cost_scope='TRIP_ONCE',rows=export),
             'json':dict(available=True,type='DECISION_RESULT_PACKAGE',granularity='PACKAGE')}),ai_context=c.AIContextReference(base_context=ai),
         artifact_manifest=c.ArtifactManifest(artifacts=tuple(p.reference for p in builder.parts)),fingerprints=fingerprints)
     # Canonicalize the typed draft as a mapping; no model_construct or public
