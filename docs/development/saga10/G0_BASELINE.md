@@ -73,3 +73,5 @@ No se toma `engines/logistics/engine.py` ni el Assignment CSV histórico como el
 - Envelope vigente: 500 órdenes, 50 recursos, <=256 slots y <=30.000 variables; defaults 128/20.000, presupuestos deterministas y pared ya acotados. V2 deberá acotar líneas/variables separadamente y fallar explícitamente si excede su presupuesto.
 
 G0: **PASS** como diseño técnico compatible dentro del alcance autorizado. G1–G9 siguen pendientes hasta implementar y verificar sus evidencias. No hay decisión de producto crítica sin resolver identificada; si aparece se elevará antes de ampliar semántica.
+
+Ampliación localizada del mapa al conectar G3: Data Hub (`platform/data_hub.py`, `static/js/platform/data-hub.mjs`, `data-presentation.mjs`) también consume dataset_type. Su reconocimiento de OrderLines y descarga se comprobará en G7; no es una nueva auditoría ni un rediseño. La extensión de resultados por línea propuesta en D1_V2_DESIGN.md evita alterar Allocation/Trip v1; ausencia de la extensión debe conservar los bytes históricos.

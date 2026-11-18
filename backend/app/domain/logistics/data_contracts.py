@@ -13,13 +13,14 @@ from app.results.canonical import canonical_bytes, content_sha256
 REGISTRY_VERSION='ULTIMATE_DOMAIN_V1'
 NORMALIZER_VERSION='DATION_INPUT_NORMALIZER_V1'
 ENTITIES=('transport_demand','transport_resources')
+ALL_ENTITIES=('transport_demand','order_lines','transport_resources')
 MAX_BYTES=10*1024*1024
 MAX_ROWS=10000
 
 
 class SemanticField(ContractModel):
     semantic_key: str
-    semantic_entity: Literal['transport_demand','transport_resources']
+    semantic_entity: Literal['transport_demand','transport_resources','order_lines']
     type: Literal['IDENTIFIER','DECIMAL','INTEGER','DATE','BOOLEAN','ENUM','ID_LIST','LANES']
     unit: str | None
     required_for: tuple[str,...]
@@ -38,14 +39,26 @@ class DataContract(ContractModel):
     registry_version: str
     model_version_id: UUID
     configuration_hash: SHA256
-    semantic_entity: Literal['transport_demand','transport_resources']
+    semantic_entity: Literal['transport_demand','transport_resources','order_lines']
     fields: tuple[SemanticField,...]
     rules: dict
     normalizer_version: str = NORMALIZER_VERSION
     contract_hash: SHA256
 
 
-def compile_contract(model_version,semantic_entity,registry_version=REGISTRY_VERSION):
+def entities_for(model_version):
+    config=model_version.get('config_jsonb',model_version)
+    return ALL_ENTITIES if config.get('version')==2 and config.get('cargo',{}).get('input_mode')=='catalog' else ENTITIES
+
+
+def compile_contract(model_version,semantic_entity,registry_version=None):
+    if model_version['config_jsonb'].get('version',1)==2:
+        from .data_contracts_v2 import compile_v2
+        return compile_v2(model_version,semantic_entity,registry_version)
+    return _compile_contract_v1(model_version,semantic_entity,REGISTRY_VERSION if registry_version is None else registry_version)
+
+
+def _compile_contract_v1(model_version,semantic_entity,registry_version=REGISTRY_VERSION):
     """The argument is a persisted published Version, never a browser schema."""
     if semantic_entity not in ENTITIES or registry_version!=REGISTRY_VERSION:raise ValueError('Unknown semantic entity/registry')
     if model_version.get('contract_registry_version',registry_version)!=registry_version:raise ValueError('Published Model uses an unsupported registry')
@@ -92,6 +105,9 @@ def compile_contract(model_version,semantic_entity,registry_version=REGISTRY_VER
 
 def template_csv(contract):
     """Five operational examples, generated from the descriptor's own fields."""
+    if contract.registry_version=='SAGA10_DOMAIN_V2':
+        from .data_contracts_v2 import template_v2
+        return template_v2(contract)
     out=io.StringIO(newline='');writer=csv.writer(out,lineterminator='\n');writer.writerow([f.public_header for f in contract.fields])
     model=contract.rules['model']
     for index in range(5):

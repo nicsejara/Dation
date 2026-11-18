@@ -22,6 +22,14 @@ class InputValidationError(ValueError):
 
 
 def normalize_input(contents,contract):
+    contract=DataContract.model_validate(contract)
+    if contract.registry_version=='SAGA10_DOMAIN_V2':
+        from .normalizers_v2 import normalize_v2
+        return normalize_v2(contents,contract)
+    return _normalize_v1(contents,contract)
+
+
+def _normalize_v1(contents,contract):
     contract=DataContract.model_validate(contract);errors=[];warnings=[];records=[];assumptions=[];seen=set()
     def problem(code,row,column,message,**extra):return dict(code=code,row=row,column=column,message=message,hint='Usá el template de esta Model Version y revisá la regla del campo.',**extra)
     def fail(code,message,column=None):raise InputValidationError({'valid':False,'errors':[problem(code,1,column,message)],'warnings':[],'counts':{'errors':1,'warnings':0}})

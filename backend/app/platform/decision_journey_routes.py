@@ -24,6 +24,8 @@ async def recover(pid:UUID,uid:UUID,ctx=Depends(access)):return await service.re
 async def unselect(pid:UUID,entity:Entity,payload:PreparationRevision,ctx=Depends(access)):return service.public(await service.call(ctx,'unselect',preparation_id=str(pid),entity=entity,expected_revision=payload.expected_revision))
 @router.post('/data-preparations/{pid}/finalize')
 async def finalize(pid:UUID,payload:PreparationFinalize,ctx=Depends(access)):return await service.finalize(ctx,pid,payload)
+@router.post('/data-preparations/{pid}/validate-bundle')
+async def validate_bundle(pid:UUID,payload:PreparationRevision,ctx=Depends(access)):return await service.validate_bundle(ctx,pid,payload)
 @router.post('/data-preparations/{pid}/cleanup')
 async def cleanup(pid:UUID,ctx=Depends(access)):return await service.cleanup(ctx,pid)
 @router.get('/logistics-cases/{cid}/journey')

@@ -7,7 +7,7 @@ La saga no está terminada. Este registro se actualiza al completar gates; los f
 | G0 | PASS | G0_BASELINE.md; 125 unit tests + Journey UX09 + benchmark |
 | G1 | PASS focal | Dominio inmutable, SQL aditivo; seis escenarios de persistencia con último resultado PASS |
 | G2 | PASS focal | 29 pruebas dominio + compatibilidad v1; ejemplos A/B y 100 propiedades con semilla |
-| G3 | PENDIENTE | Compiler, CSV y publicación cruzada |
+| G3 | PASS focal | 67 unit tests, ocho escenarios de catálogo y 24 regresiones Journey v1 |
 | G4 | PENDIENTE | Adaptación D1 por líneas + oracle/benchmark |
 | G5 | PENDIENTE | Handoff D1→D2 inmutable |
 | G6 | PENDIENTE | Wizard cinco bloques y navegador |
@@ -34,3 +34,21 @@ Proveniencia y ROUND_HALF_UP quedan en el snapshot normalizado. Se deriva y decl
 Comando: `DATION_EXECUTION_MODE=legacy python -m unittest -v tests.test_saga10_domain_physical tests.test_ultimate_case_models` desde backend — **29 PASS**, 0,104 s. Incluye 12 pruebas Saga10 con 100 propiedades de conservación/escalado/permutación, catálogo compartido y snapshots anteriores intactos. Ejemplos: 12 pallets = 13.140 kg / 27,24 m³; 20 pallets de jugo = 19.700 kg / 19.200 unidades / 43,2 m³.
 
 Los gates PASS focales se revalidarán por las regresiones y la CI final. Ninguna declaración aquí equivale a un despliegue o habilitación productiva.
+
+
+## G3
+
+Nuevo compiler/normalizer v2, aislados del camino v1, con entidades dinámicas: v1/directo conserva transport_demand + transport_resources; catálogo agrega order_lines. Templates, campos, enums, condiciones, catálogo físico y preview provienen del mismo descriptor. Sin cuarto Products.csv ni overrides ambiguos. El paquete conceptual usa Orders/Fleet: se mantienen los nombres semánticos y headers reales del repositorio, incluida distance_km necesaria para costos/ciclos.
+
+IDs de línea deterministas por publicación/orden/presentación. Se rechazan referencias desconocidas, pares semánticos duplicados, fracciones discretas y mezcla de cantidades directas/líneas. Lectura CSV incremental, hasta 10 MB y 10.000 filas; límite de admisión separado de 500 órdenes/500 líneas. Granel conserva su incremento físico representable.
+
+SQL aditivo `20261117235546_saga10_catalog_data_contracts.sql` amplía checks de tipos/slots transaccionalmente y agrega un índice parcial sólo para líneas. Conserva el índice anterior y las reglas RLS/CAS/immutability. Los RPC preservados se extienden con anclas exactas y fallan si diverge el baseline; las fachadas restringen OrderLines a modelos catálogo v2 y mantienen esquema/optimización cerrados. Reaplicación local probada sin cambiar flags.
+
+La validación de filas es distinta de la de relaciones: validate-bundle lee snapshots privados verificados y devuelve una prueba ligada a revisión/IDs/hashes; no escribe nada. Finalize vuelve a verificar antes de congelar/crear, y publication revalida antes de mover el Pack. Órdenes y líneas son atómicas; un Case vacío o sólo Flota sigue incompleto y permitido, con requisitos explícitos. Recuperación publica los tres archivos una sola vez. El frontend se conectará a este resultado en G6; el estado SQL VALIDATED por sí solo no autoriza una comprobación cruzada ficticia.
+
+Comandos desde backend:
+- `python -m unittest -v tests.test_saga10_domain_physical tests.test_saga10_data_contracts tests.test_ultimate_data_contracts tests.test_ultimate_case_models`: **67 PASS**, 0,667 s.
+- `python -m unittest -v tests.integration.test_saga10_catalog_pack`: **8 PASS**, 21,190 s; incluye v1 sin tercer slot, snapshot incompatible, no creación ante huérfanas, publicación/recovery/idempotencia y flags cerrados.
+- `python -m unittest -v tests.integration.test_decision_journey`: **24 PASS**, 30,141 s.
+
+Se evitó revalidar el catálogo entero una vez por cada presentación: normalize_catalog valida una vez y normaliza sus presentaciones ya comprobadas. El wrapper público individual sigue validando que la presentación pertenezca al catálogo. La procedencia distingue valores declarados de fuentes derivadas. Sin efectos en v1.

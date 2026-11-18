@@ -10,7 +10,7 @@ from app.config import SUPABASE_URL,SUPABASE_INPUT_BUCKET
 from app.platform.identity import platform_call,headers
 from app.services.http_service import http_client
 from app.services.logistics_model_service import snapshot_hash
-from app.domain.logistics.data_contracts import compile_contract,ENTITIES,MAX_BYTES,NORMALIZER_VERSION
+from app.domain.logistics.data_contracts import compile_contract,ENTITIES,entities_for,MAX_BYTES,NORMALIZER_VERSION
 from app.domain.logistics.normalizers import normalize_input,InputValidationError
 from app.results.canonical import content_sha256
 
@@ -32,14 +32,16 @@ def public_entry(entry):
 
 async def context(ctx,case_id,offset=0):
     value=await state(ctx,case_id,offset);result={k:value[k] for k in ['case','pack','version','history','history_total','enabled','can_edit','runtime_execution_available']}
-    contracts={entity:compile_contract(value['model_version'],entity).model_dump(mode='json') for entity in ENTITIES}
+    entities=entities_for(value['model_version'])
+    contracts={entity:compile_contract(value['model_version'],entity).model_dump(mode='json') for entity in entities}
     result.update(contracts=contracts,entries=[public_entry(x) for x in value['entries']],uploads=[public_upload(j) for j in value['uploads']],history_offset=offset,
-        inputs_available={entity:any(e['slot_key']==entity for e in value['entries']) for entity in ENTITIES},decision_readiness=None)
+        inputs_available={entity:any(e['slot_key']==entity for e in value['entries']) for entity in entities},decision_readiness=None)
     return result
 
 
 async def contract_for(ctx,case_id,entity):
     data=await state(ctx,case_id)
+    if entity not in entities_for(data['model_version']):raise HTTPException(404,'El modelo no utiliza ese archivo.')
     return compile_contract(data['model_version'],entity)
 
 
@@ -135,7 +137,7 @@ async def upload(ctx,case_id,entity,contents,filename,upload_id,expected):
     except InputValidationError as error:raise HTTPException(422,error.report) from None
     name=PurePosixPath((filename or entity+'.csv').replace('\\','/')).name[:120]
     profile={k:v for k,v in normalized['report'].items() if k not in ('preview','summary')}
-    body=dict(case_id=str(case_id),upload_id=str(upload_id),entity=entity,contract_id=contract.contract_id,contract_hash=contract.contract_hash,normalizer_version=NORMALIZER_VERSION,
+    body=dict(case_id=str(case_id),upload_id=str(upload_id),entity=entity,contract_id=contract.contract_id,contract_hash=contract.contract_hash,normalizer_version=contract.normalizer_version,
         raw_sha256=normalized['raw_sha256'],canonical_sha256=normalized['canonical_sha256'],raw_size=len(contents),normalized_size=normalized['normalized_size'],record_count=normalized['record_count'],column_count=len(contract.fields),filename=name,storage_bucket=SUPABASE_INPUT_BUCKET,profile=profile,summary=normalized['report']['summary'])
     intent=snapshot_hash('ultimate_upload_intent_v1',{'actor':ctx.user_id,**body})
     j=await call(ctx,'prepare',**body,intent_hash=intent)
@@ -151,13 +153,19 @@ async def publication(ctx,case_id,payload,*,guarded=False):
     intent=snapshot_hash('ultimate_pack_publication_intent_v1',{'actor':ctx.user_id,'case_id':str(case_id),**body})
     replay=await call(ctx,'replay',case_id=str(case_id),publication_id=body['publication_id'],intent_hash=intent)
     if replay['replayed']:return replay
-    current=await state(ctx,case_id);contracts={e:compile_contract(current['model_version'],e).contract_hash for e in ENTITIES}
+    current=await state(ctx,case_id);contracts={e:compile_contract(current['model_version'],e).contract_hash for e in entities_for(current['model_version'])}
     plan=await call(ctx,'plan',case_id=str(case_id),selection=body['selection'],contracts=contracts)
     entries=plan['entries']
+    records={}
     for entry in entries:
         await private_bucket(entry['storage_bucket'])
         await read_object(entry['storage_bucket'],entry['storage_path'],entry['raw_sha256'],entry['raw_size'])
-        await read_object(entry['normalized_bucket'],entry['normalized_path'],entry['canonical_sha256'],entry['normalized_size'])
+        normalized=await read_object(entry['normalized_bucket'],entry['normalized_path'],entry['canonical_sha256'],entry['normalized_size'])
+        if 'order_lines' in contracts:records[entry['slot_key']]=json.loads(normalized)['records']
+    if 'order_lines' in contracts:
+        from app.domain.logistics.normalizers_v2 import combine_catalog
+        try:combine_catalog(records,compile_contract(current['model_version'],'transport_demand'))
+        except InputValidationError as error:raise HTTPException(422,error.report) from None
     version_id=uuid5(UUID(body['publication_id']),'pack-version-v1')
     semantic_entries=[{k:e[k] for k in ['slot_key','dataset_id','contract_id','contract_hash','raw_sha256','canonical_sha256','normalizer_version','normalized_bucket','normalized_path','record_count']} for e in entries]
     manifest={'version':plan['next_version'],'workspace_id':ctx.workspace_id,'case_id':str(case_id),'pack_id':plan['pack']['id'],'pack_version_id':str(version_id),'entries':semantic_entries}

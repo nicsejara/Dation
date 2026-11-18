@@ -56,7 +56,7 @@ async def get_model(ctx,model_id):return await call(ctx,'model_get',{'model_id':
 
 async def preview_contracts(ctx,payload):
     """Read-only preview using the same compiler as Case ingestion; no new schema store."""
-    from app.domain.logistics.data_contracts import compile_contract,ENTITIES
+    from app.domain.logistics.data_contracts import compile_contract,entities_for
     caps=await capabilities(ctx)
     if not caps.get('enabled') or not caps.get('can_create_case'):
         raise HTTPException(403,'La configuración inicial no está habilitada para este acceso.')
@@ -72,7 +72,7 @@ async def preview_contracts(ctx,payload):
         if data['model']['status']!='active':raise HTTPException(409,'El Model está archivado.')
         version=next((v for v in data['versions'] if v['id']==str(payload.version_id)),None)
         if version is None:raise HTTPException(404,'La versión publicada no pertenece al Model.')
-    return provisional,{entity:compile_contract(version,entity) for entity in ENTITIES}
+    return provisional,{entity:compile_contract(version,entity) for entity in entities_for(version)}
 
 
 async def create_model(ctx,payload):

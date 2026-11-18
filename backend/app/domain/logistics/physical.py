@@ -5,7 +5,7 @@ Loaded exterior volume is a scalar envelope, never a 3D packing certificate.
 from decimal import Decimal, localcontext, ROUND_HALF_UP
 from math import gcd, lcm
 from .base import ContractModel, Identifier, Positive
-from .cargo import CargoConfiguration
+from .cargo import CargoConfiguration,LoadPresentation
 from .units import QuantityVector, QUANTITY_SCALES, scaled_integer
 
 
@@ -33,7 +33,12 @@ def rounded(value,dimension):
 
 
 def normalize_presentation(cargo,presentation,dimensions):
-    cargo=CargoConfiguration.model_validate(cargo)
+    cargo=CargoConfiguration.model_validate(cargo);presentation=LoadPresentation.model_validate(presentation)
+    if not any(p==presentation for p in cargo.presentations):raise ValueError('La presentación no pertenece al catálogo validado.')
+    return _normalize_validated(cargo,presentation,dimensions)
+
+
+def _normalize_validated(cargo,presentation,dimensions):
     with localcontext() as ctx:
         ctx.prec=60
         products={p.product_id:p for p in cargo.products};units={u.logistic_unit_id:u for u in cargo.logistic_units}
@@ -92,12 +97,12 @@ def normalize_presentation(cargo,presentation,dimensions):
         increment=Decimal(1) if presentation.quantity_kind=='DISCRETE' else Decimal(step)/1000
         return PhysicalPresentation(presentation_id=presentation.presentation_id,quantity_kind=presentation.quantity_kind,quantity_unit=presentation.quantity_unit,
             coefficients=coefficients,allocation_increment=increment,compatibility_groups=tuple(sorted(groups)),composition=tuple(parts),
-            provenance={'rounding':'ROUND_HALF_UP','scales':{d:QUANTITY_SCALES[d] for d in dimensions},'sources':sources,'tare_weight_kg':tare,'geometry':'SCALAR_EXTERIOR_ONLY_NOT_PACKING'})
+            provenance={'rounding':'ROUND_HALF_UP','scales':{d:QUANTITY_SCALES[d] for d in dimensions},'sources':sources,'declared_weight_kg':kg(presentation.gross_mass) if presentation.gross_mass else None,'declared_volume_m3':m3(presentation.external_volume) if presentation.external_volume else None,'explicit_density_kg_per_m3':density,'tare_weight_kg':tare,'geometry':'SCALAR_EXTERIOR_ONLY_NOT_PACKING'})
 
 
 def normalize_catalog(cargo,dimensions):
     cargo=CargoConfiguration.model_validate(cargo)
-    return {p.presentation_id:normalize_presentation(cargo,p,dimensions) for p in cargo.presentations}
+    return {p.presentation_id:_normalize_validated(cargo,p,dimensions) for p in cargo.presentations}
 
 
 def line_load(presentation,quantity):

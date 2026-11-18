@@ -4,7 +4,7 @@ from uuid import UUID
 from pydantic import Field,model_validator
 from app.domain.logistics.base import ContractModel
 
-Entity=Literal['transport_demand','transport_resources']
+Entity=Literal['transport_demand','transport_resources','order_lines']
 
 class SlotSelection(ContractModel):
     slot_key: Entity
@@ -18,7 +18,7 @@ class SlotSelection(ContractModel):
 class PackPublication(ContractModel):
     publication_id: UUID
     expected_revision: int=Field(strict=True,ge=1)
-    selection: tuple[SlotSelection,...]=Field(min_length=1,max_length=2)
+    selection: tuple[SlotSelection,...]=Field(min_length=1,max_length=3)
     @model_validator(mode='after')
     def unique_slots(self):
         if len({s.slot_key for s in self.selection})!=len(self.selection):raise ValueError('Una selección por slot.')
