@@ -71,6 +71,12 @@ class Saga10WizardTests(unittest.IsolatedAsyncioTestCase):
         await wizard.get_by_label('Compatibilidad de carga',exact=True).select_option('UNIFORM_DECLARED');await wizard.get_by_label('Fraccionamiento',exact=True).select_option('DISCRETE')
         await expect(self.page.locator('[data-dation-test=model-create]')).to_be_enabled()
         preview=wizard.locator('[data-dation-test=cargo-physical-preview]');await expect(preview).to_contain_text('985');await expect(preview).to_contain_text('2.16');await expect(preview).to_contain_text('960')
+        declared=presentation.locator('details').filter(has=self.page.get_by_text('Peso bruto cargado declarado (opcional si se deriva)',exact=True));await declared.locator('summary').click()
+        await declared.get_by_label('Valor',exact=True).fill('500')
+        await expect(self.page.locator('[data-dation-test=model-create]')).to_be_disabled();await expect(preview).to_contain_text('contradice')
+        await expect(preview).to_have_attribute('role','alert')
+        await declared.get_by_label('Valor',exact=True).fill('')
+        await expect(self.page.locator('[data-dation-test=model-create]')).to_be_enabled();await expect(preview).to_have_attribute('role','status')
         await expect(unit.get_by_role('button',name='Eliminar',exact=True)).to_be_disabled();await expect(product.get_by_role('button',name='Eliminar',exact=True)).to_be_disabled()
         # A product may have several presentations, and one presentation may
         # contain several products; the shared unit keeps the same stable ID.

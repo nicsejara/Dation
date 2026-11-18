@@ -80,77 +80,77 @@
         "right": 1443
       },
       {
-        "name": "cargo_name_f-632f97e2-73e6-401c-90bf-d4018daf68de",
+        "name": "cargo_name_f-6478a929-cd3f-455a-9d56-aa70b75282d1",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_code_f-fa5b765e-61ed-49cd-9435-3ea6fca9f199",
+        "name": "cargo_code_f-883d0126-5f12-4c4c-8852-6c06510a176a",
         "left": 1010,
         "right": 1443
       },
       {
-        "name": "cargo_category_f-32513af1-b916-4034-8ba2-e861323577e0",
+        "name": "cargo_category_f-606962a4-0230-4a63-96f9-71ecdbe71510",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_unit_label_f-ea128b8c-633a-4676-9c17-0a0b4f0ee432",
+        "name": "cargo_unit_label_f-89d8f0ef-021d-4916-946a-3c8e8733a719",
         "left": 1010,
         "right": 1443
       },
       {
-        "name": "cargo_units_per_package_f-71ac0c9c-2abb-41af-b914-b7b1b0e14369",
+        "name": "cargo_units_per_package_f-97786778-9684-4995-b3b5-ba1d934c778e",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo__tags_f-46a0fc8f-0d55-40cf-88c2-e032f8782c58",
+        "name": "cargo__tags_f-d4337ee5-9112-4ad4-bdca-0b614a822670",
         "left": 1010,
         "right": 1443
       },
       {
-        "name": "cargo_value_f-8b0d45ab-020a-45db-87b4-7b8cfe235b4c",
+        "name": "cargo_value_f-25e5ca93-b04b-48ab-b643-1728d335ec72",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_unit_f-32c5c2a1-041c-43b9-b0ae-6733d3cab481",
+        "name": "cargo_unit_f-d58f35ab-82df-4076-bbfa-cea46ef94185",
         "left": 1010,
         "right": 1443
       },
       {
-        "name": "cargo_value_f-b33683b4-f3e7-45da-a272-7ebc49ccd5ba",
+        "name": "cargo_value_f-3e678add-ad92-4ffc-a068-79c9813c6f06",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_unit_f-92b447d0-8d2a-4312-94dc-c92f44770faf",
+        "name": "cargo_unit_f-d847b4a8-c846-4392-8ea7-d4f845364bd8",
         "left": 1010,
         "right": 1443
       },
       {
-        "name": "cargo_length_f-2bcf55ed-d386-4b4a-aa62-0fe4471026ed",
+        "name": "cargo_length_f-19319023-9571-47f8-85fa-edcdecf85c7e",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_width_f-4f053f99-2c13-4a67-82de-1f1d690b580b",
+        "name": "cargo_width_f-0cb12e27-312a-4da0-a2f1-e4a925f69150",
         "left": 1010,
         "right": 1443
       },
       {
-        "name": "cargo_height_f-d43a2db9-c0d9-4e53-9843-e7154ab2751a",
+        "name": "cargo_height_f-d00612d7-182d-49f9-a8e1-59d49b12ed06",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_unit_f-43d8fa06-7f54-4218-8119-5239ae4006be",
+        "name": "cargo_unit_f-494751ae-462c-47b5-bb6b-5486bd155bda",
         "left": 1010,
         "right": 1443
       },
       {
-        "name": "cargo_density_kg_per_m3_f-ba0c83c7-ce2b-461a-ab16-740a212266e2",
+        "name": "cargo_density_kg_per_m3_f-d97bc3ee-fc0f-405e-8d66-b73f94d36443",
         "left": 561,
         "right": 994
       },
@@ -160,77 +160,77 @@
         "right": 1443
       },
       {
-        "name": "cargo_name_f-5f7debd3-b347-475f-a851-aa7df1a2a495",
+        "name": "cargo_name_f-51a57b1e-04a1-4066-a6ac-6bd46d939b14",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_code_f-fc5d06ad-12a7-4e7b-9aac-0d53d4bfcdb7",
+        "name": "cargo_code_f-6de4be58-3651-4ecc-a621-014fed99103e",
         "left": 1010,
         "right": 1443
       },
       {
-        "name": "cargo_category_f-9771a43c-8dff-4ae5-a715-ccffc37a0350",
+        "name": "cargo_category_f-aee195ea-e25a-4d13-a4c2-e399532ae128",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_unit_label_f-dff5b467-1a01-49cd-889b-10ce31de50fe",
+        "name": "cargo_unit_label_f-eb2853bc-6c55-4653-9534-4048eb15fe43",
         "left": 1010,
         "right": 1443
       },
       {
-        "name": "cargo_units_per_package_f-b5f2a162-9673-450b-bdfd-70df02b85169",
+        "name": "cargo_units_per_package_f-ce84a748-cbc4-4a0d-8c68-9b459eeabe18",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo__tags_f-cb1f4cb8-cddc-4c03-8773-f53e396ca3d9",
+        "name": "cargo__tags_f-b4fc5bce-9108-4ce7-8347-fdb8071101d6",
         "left": 1010,
         "right": 1443
       },
       {
-        "name": "cargo_value_f-8e081a57-c756-4ce9-9ff5-ddf551385f65",
+        "name": "cargo_value_f-bc1ce38c-1b2f-4e5f-b531-c99037640c48",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_unit_f-c089f4ca-849c-45bc-86f3-fa7e53355169",
+        "name": "cargo_unit_f-ddf84682-59e9-4cfe-8798-fba50ea8121e",
         "left": 1010,
         "right": 1443
       },
       {
-        "name": "cargo_value_f-d4910f13-7d95-43df-ac19-0579b8c9b204",
+        "name": "cargo_value_f-b471e147-79f4-41a1-a9a7-777ea1ce873b",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_unit_f-ee5ed0e5-797e-4161-b318-38a0c46d4056",
+        "name": "cargo_unit_f-2252fb59-63e0-45d5-9ee4-554aff7e6756",
         "left": 1010,
         "right": 1443
       },
       {
-        "name": "cargo_length_f-13b2941a-cf96-454e-94a1-a6563058ef57",
+        "name": "cargo_length_f-8995fc78-badc-44a8-b263-f9b58123b8a3",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_width_f-5f9eaab9-7377-4fe5-9586-f102cf7822e3",
+        "name": "cargo_width_f-ffc519e4-2dc9-4337-b91c-2ce5c314bd81",
         "left": 1010,
         "right": 1443
       },
       {
-        "name": "cargo_height_f-ef0faedf-61fe-400e-889d-7800b94588f6",
+        "name": "cargo_height_f-d0e21f10-fa11-486a-8b13-b9078824e98b",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_unit_f-e8d22db8-b2a8-4bc9-861f-8da731725a1c",
+        "name": "cargo_unit_f-9f34f5ca-f79b-4613-a9ab-b30d8781bba1",
         "left": 1010,
         "right": 1443
       },
       {
-        "name": "cargo_density_kg_per_m3_f-4c307aa2-9036-4969-add0-df414a61a9b5",
+        "name": "cargo_density_kg_per_m3_f-d4aa141f-4814-40aa-8ee7-d25b471fa617",
         "left": 561,
         "right": 994
       },
@@ -245,47 +245,47 @@
         "right": 1443
       },
       {
-        "name": "cargo_label_f-fd25c67e-3533-44f8-b9be-08c037a11388",
+        "name": "cargo_label_f-49a690c2-0031-40aa-8aa9-5b24118a1d11",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_type_f-a2577ca2-c577-46dd-8a17-7b756babef81",
+        "name": "cargo_type_f-a0d0e153-d986-4282-ae15-35b4830868cf",
         "left": 1010,
         "right": 1443
       },
       {
-        "name": "cargo_length_f-718b6eaf-05a9-4742-a8cd-2c90de9c8b4f",
+        "name": "cargo_length_f-59368131-7190-4093-9fe0-4cba78613e65",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_width_f-21e9272c-d30f-4010-a4e0-1224fe85fb19",
+        "name": "cargo_width_f-097eaf72-db05-47e2-ba33-474afd1ffa79",
         "left": 1010,
         "right": 1443
       },
       {
-        "name": "cargo_height_f-cfd62da7-9c52-4df2-a851-86e3b025b683",
+        "name": "cargo_height_f-0fedb3c5-b77a-4c24-8459-b631f1ecb067",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_unit_f-863cf244-d5d3-4e45-9d27-8e165ea1a930",
+        "name": "cargo_unit_f-44fd9448-6c49-4608-bab1-cbc49e868119",
         "left": 1010,
         "right": 1443
       },
       {
-        "name": "cargo_value_f-b2455c70-419d-4763-8d24-8a31c4ee38c5",
+        "name": "cargo_value_f-be8aaa62-e409-4ad2-86c2-53dba46ef5a8",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_unit_f-d8ab7e5b-d64f-4734-9214-6ebd99888dec",
+        "name": "cargo_unit_f-ed8af5ce-54a1-47d3-810c-a425b156abf1",
         "left": 1010,
         "right": 1443
       },
       {
-        "name": "cargo_structural_limit_kg_f-a7aeb1b3-9cfb-4637-a184-03e7479438a4",
+        "name": "cargo_structural_limit_kg_f-a64c0c13-d60d-40ec-917b-67a529a5f450",
         "left": 561,
         "right": 994
       },
@@ -300,32 +300,32 @@
         "right": 1443
       },
       {
-        "name": "cargo_label_f-97f265a3-02ab-41a4-aa1a-a672cd35b212",
+        "name": "cargo_label_f-d865ae55-a03d-442c-ba3f-3481b68ea909",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_quantity_kind_f-94edf35d-c491-4c6c-a930-5a0aecef771f",
+        "name": "cargo_quantity_kind_f-35c10267-f2f4-4fa1-bf7d-cf83adb51c38",
         "left": 1010,
         "right": 1443
       },
       {
-        "name": "cargo_quantity_unit_f-a8d8c981-f98f-4f20-a7d0-3f3cf5245d6d",
+        "name": "cargo_quantity_unit_f-caa7c2ef-9a99-45db-bc4a-16b1673fc80b",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_logistic_unit_id_f-92a44004-e499-4d21-b4e3-ec5257822e43",
+        "name": "cargo_logistic_unit_id_f-558b9db3-1a01-48e0-bcff-b4024887835a",
         "left": 1010,
         "right": 1443
       },
       {
-        "name": "cargo_product_id_f-5147a0d4-2aa5-4c1d-8ea3-30747a589e14",
+        "name": "cargo_product_id_f-81f5e2f3-ad8a-4077-8aa2-54cb9e251ba2",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_quantity_f-4b3eba15-f706-4e18-8bbe-8b2b7ee6e883",
+        "name": "cargo_quantity_f-6180995d-694b-4d6e-b2c8-b7b14cc5c853",
         "left": 1010,
         "right": 1443
       },
@@ -335,12 +335,12 @@
         "right": 994
       },
       {
-        "name": "cargo_product_id_f-ac182a78-5079-4d40-9b4b-5262fd3f9c0a",
+        "name": "cargo_product_id_f-065901b0-66e4-4cd4-865c-1b666dbbc66e",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_quantity_f-f17a83b4-bd45-4333-bd4a-591631471fc8",
+        "name": "cargo_quantity_f-7d639988-bc8b-47eb-b4ec-87a6ef9c84df",
         "left": 1010,
         "right": 1443
       },
@@ -355,67 +355,67 @@
         "right": 878.921875
       },
       {
-        "name": "cargo_length_f-c22b18d8-c3bd-4a75-abd8-9efe2e3e1587",
+        "name": "cargo_length_f-691d7c06-8577-428e-915c-8f9a11bd4f2f",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_width_f-2986afb8-a0ab-4e7d-bd00-c0b10c020589",
+        "name": "cargo_width_f-df25c09d-ea05-4396-87fe-45a2135b70a5",
         "left": 1010,
         "right": 1443
       },
       {
-        "name": "cargo_height_f-a4d80ccb-fe6f-4da8-b7e9-b7775edd5935",
+        "name": "cargo_height_f-a6235cc5-bebc-4ec1-8c4f-986fd02f357e",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_unit_f-99795bd4-f780-4834-bf30-e087fff9e080",
+        "name": "cargo_unit_f-948944b1-8741-4186-8e71-b77693d422de",
         "left": 1010,
         "right": 1443
       },
       {
-        "name": "cargo_value_f-b10928aa-7284-4e45-b7dc-9a2869b0258c",
+        "name": "cargo_value_f-a73dfba0-8017-4781-ab0b-04f9d184a832",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_unit_f-9d8e0b3d-4738-4cc4-be2d-aea6b7892b0d",
+        "name": "cargo_unit_f-1b7daf8a-dbab-4185-bd07-74e72e4ded03",
         "left": 1010,
         "right": 1443
       },
       {
-        "name": "cargo_value_f-57f605cc-e510-42af-b781-855410f10990",
+        "name": "cargo_value_f-d3de2b48-ba2f-4759-a70b-b053d62a9699",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_unit_f-70e489ae-84a0-45ed-bd51-3db3338d6890",
+        "name": "cargo_unit_f-f238ed39-564d-47c7-8a90-5010e06a716a",
         "left": 1010,
         "right": 1443
       },
       {
-        "name": "cargo_density_kg_per_m3_f-7e3a3dc1-7b96-440f-ad00-a8f60da729c4",
+        "name": "cargo_density_kg_per_m3_f-7a6480cd-be1d-42be-bd34-c23acdb2b5d3",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_value_f-90e2f9f3-4b81-462a-8f46-3369350ee9c4",
+        "name": "cargo_value_f-e7bae3fe-ec31-44d9-a65f-e45980ad5755",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_unit_f-e0272921-c06c-4553-b5d2-4f3075ac6fe4",
+        "name": "cargo_unit_f-b8f17f9f-aafb-4e3c-928f-ca3a38a5bedd",
         "left": 1010,
         "right": 1443
       },
       {
-        "name": "cargo_orientation_metadata_f-beea2b53-4387-42fd-9f3d-b1e4405a9dd6",
+        "name": "cargo_orientation_metadata_f-bf0e706a-4832-4261-872e-01ef1fe1ce9a",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo__stackable_f-88521d92-fd08-4725-945a-faf4b2713015",
+        "name": "cargo__stackable_f-acec1b9b-35f1-4f35-bd42-a97f11f21eb1",
         "left": 1010,
         "right": 1443
       },
@@ -425,32 +425,32 @@
         "right": 1443
       },
       {
-        "name": "cargo_label_f-fab95922-89e4-4806-b375-3d8a38951cf9",
+        "name": "cargo_label_f-6ffc173f-8759-467e-a2d0-02c6066e4071",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_quantity_kind_f-0b96293b-e3a1-43f9-81c8-5d1d45082b65",
+        "name": "cargo_quantity_kind_f-1891b48e-3158-4b71-9f63-daa255b03f38",
         "left": 1010,
         "right": 1443
       },
       {
-        "name": "cargo_quantity_unit_f-3c66a21d-90e5-4158-b737-c1659f0aa2d9",
+        "name": "cargo_quantity_unit_f-a259d774-9f14-481c-ba22-9c6d8b9be1ad",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_logistic_unit_id_f-640e8b96-ff23-4277-9362-0d90bee3e9e5",
+        "name": "cargo_logistic_unit_id_f-d19e0ab6-9288-4445-9bab-7c16b620cf0c",
         "left": 1010,
         "right": 1443
       },
       {
-        "name": "cargo_product_id_f-f4001c60-d3e1-41c0-972e-3e814f5d44f3",
+        "name": "cargo_product_id_f-bcc6918c-8117-4c51-bc5b-acfef6527921",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_quantity_f-7e83bc59-abbb-49e2-80bd-10c76dbe6e45",
+        "name": "cargo_quantity_f-321ca8b2-0ef0-46e3-b342-cfc58a108b3e",
         "left": 1010,
         "right": 1443
       },
@@ -465,67 +465,67 @@
         "right": 878.921875
       },
       {
-        "name": "cargo_length_f-f70170fd-7049-4104-ab53-a6fa7f234486",
+        "name": "cargo_length_f-505a12f7-2447-4374-bf05-af11e7ccda5c",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_width_f-19df6f19-2ced-4fe1-8515-6ad3b2b27bd1",
+        "name": "cargo_width_f-2d46bc05-15fc-42a0-9a63-d8b0f078a053",
         "left": 1010,
         "right": 1443
       },
       {
-        "name": "cargo_height_f-40705b3d-5de3-4837-b23c-bf0a5acedcc0",
+        "name": "cargo_height_f-d6def255-680b-4366-b296-1ad2eb4a412e",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_unit_f-a021a79d-6a52-4081-b105-28daaa8358fb",
+        "name": "cargo_unit_f-9e695634-dedc-462b-88d8-ac0452eb0419",
         "left": 1010,
         "right": 1443
       },
       {
-        "name": "cargo_value_f-1c317086-2409-47aa-a985-3f9926980cb3",
+        "name": "cargo_value_f-c0c45f26-3938-4000-9939-7c074066acc9",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_unit_f-9df4e7f8-9f2f-40c5-bcb3-7a5945f0a89e",
+        "name": "cargo_unit_f-1c30aac0-d36a-4a58-87b4-53814ccccaa6",
         "left": 1010,
         "right": 1443
       },
       {
-        "name": "cargo_value_f-71179f98-5cd3-43e0-9a9f-8d7b4b04a397",
+        "name": "cargo_value_f-56bc40e3-8614-465f-8222-ead9c0557d63",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_unit_f-2d600016-d2b7-423b-9762-f43a68986d5f",
+        "name": "cargo_unit_f-3cedc4c4-665d-4228-aebd-bd0c4cdd740b",
         "left": 1010,
         "right": 1443
       },
       {
-        "name": "cargo_density_kg_per_m3_f-03a1f055-75d5-4ff3-a03b-f8b89686333e",
+        "name": "cargo_density_kg_per_m3_f-8ea882b9-8648-4e02-b53e-dd00caeeb1a7",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_value_f-30501c92-fc0c-4cff-b8e7-6a90eb73e9fb",
+        "name": "cargo_value_f-a1e58f80-d20e-44e7-8577-9e730e8fce23",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo_unit_f-00eb65cb-3500-47b4-ad2f-ae84b7e126b4",
+        "name": "cargo_unit_f-6373daec-783e-4d0e-9c17-6d68ce12ee3c",
         "left": 1010,
         "right": 1443
       },
       {
-        "name": "cargo_orientation_metadata_f-ccbd5386-87a0-4d2b-9eeb-1f8981846277",
+        "name": "cargo_orientation_metadata_f-9d177aee-07f8-4741-85de-0364f4f15c37",
         "left": 561,
         "right": 994
       },
       {
-        "name": "cargo__stackable_f-b96f6d94-da04-4eee-a834-f243a0ba6b2a",
+        "name": "cargo__stackable_f-027bd73a-5915-48fb-ac63-1b4fcc3f0baf",
         "left": 1010,
         "right": 1443
       },
@@ -687,77 +687,77 @@
         "right": 931
       },
       {
-        "name": "cargo_name_f-632f97e2-73e6-401c-90bf-d4018daf68de",
+        "name": "cargo_name_f-6478a929-cd3f-455a-9d56-aa70b75282d1",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_code_f-fa5b765e-61ed-49cd-9435-3ea6fca9f199",
+        "name": "cargo_code_f-883d0126-5f12-4c4c-8852-6c06510a176a",
         "left": 629,
         "right": 931
       },
       {
-        "name": "cargo_category_f-32513af1-b916-4034-8ba2-e861323577e0",
+        "name": "cargo_category_f-606962a4-0230-4a63-96f9-71ecdbe71510",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_unit_label_f-ea128b8c-633a-4676-9c17-0a0b4f0ee432",
+        "name": "cargo_unit_label_f-89d8f0ef-021d-4916-946a-3c8e8733a719",
         "left": 629,
         "right": 931
       },
       {
-        "name": "cargo_units_per_package_f-71ac0c9c-2abb-41af-b914-b7b1b0e14369",
+        "name": "cargo_units_per_package_f-97786778-9684-4995-b3b5-ba1d934c778e",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo__tags_f-46a0fc8f-0d55-40cf-88c2-e032f8782c58",
+        "name": "cargo__tags_f-d4337ee5-9112-4ad4-bdca-0b614a822670",
         "left": 629,
         "right": 931
       },
       {
-        "name": "cargo_value_f-8b0d45ab-020a-45db-87b4-7b8cfe235b4c",
+        "name": "cargo_value_f-25e5ca93-b04b-48ab-b643-1728d335ec72",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_unit_f-32c5c2a1-041c-43b9-b0ae-6733d3cab481",
+        "name": "cargo_unit_f-d58f35ab-82df-4076-bbfa-cea46ef94185",
         "left": 629,
         "right": 931
       },
       {
-        "name": "cargo_value_f-b33683b4-f3e7-45da-a272-7ebc49ccd5ba",
+        "name": "cargo_value_f-3e678add-ad92-4ffc-a068-79c9813c6f06",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_unit_f-92b447d0-8d2a-4312-94dc-c92f44770faf",
+        "name": "cargo_unit_f-d847b4a8-c846-4392-8ea7-d4f845364bd8",
         "left": 629,
         "right": 931
       },
       {
-        "name": "cargo_length_f-2bcf55ed-d386-4b4a-aa62-0fe4471026ed",
+        "name": "cargo_length_f-19319023-9571-47f8-85fa-edcdecf85c7e",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_width_f-4f053f99-2c13-4a67-82de-1f1d690b580b",
+        "name": "cargo_width_f-0cb12e27-312a-4da0-a2f1-e4a925f69150",
         "left": 629,
         "right": 931
       },
       {
-        "name": "cargo_height_f-d43a2db9-c0d9-4e53-9843-e7154ab2751a",
+        "name": "cargo_height_f-d00612d7-182d-49f9-a8e1-59d49b12ed06",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_unit_f-43d8fa06-7f54-4218-8119-5239ae4006be",
+        "name": "cargo_unit_f-494751ae-462c-47b5-bb6b-5486bd155bda",
         "left": 629,
         "right": 931
       },
       {
-        "name": "cargo_density_kg_per_m3_f-ba0c83c7-ce2b-461a-ab16-740a212266e2",
+        "name": "cargo_density_kg_per_m3_f-d97bc3ee-fc0f-405e-8d66-b73f94d36443",
         "left": 311,
         "right": 613
       },
@@ -767,77 +767,77 @@
         "right": 931
       },
       {
-        "name": "cargo_name_f-5f7debd3-b347-475f-a851-aa7df1a2a495",
+        "name": "cargo_name_f-51a57b1e-04a1-4066-a6ac-6bd46d939b14",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_code_f-fc5d06ad-12a7-4e7b-9aac-0d53d4bfcdb7",
+        "name": "cargo_code_f-6de4be58-3651-4ecc-a621-014fed99103e",
         "left": 629,
         "right": 931
       },
       {
-        "name": "cargo_category_f-9771a43c-8dff-4ae5-a715-ccffc37a0350",
+        "name": "cargo_category_f-aee195ea-e25a-4d13-a4c2-e399532ae128",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_unit_label_f-dff5b467-1a01-49cd-889b-10ce31de50fe",
+        "name": "cargo_unit_label_f-eb2853bc-6c55-4653-9534-4048eb15fe43",
         "left": 629,
         "right": 931
       },
       {
-        "name": "cargo_units_per_package_f-b5f2a162-9673-450b-bdfd-70df02b85169",
+        "name": "cargo_units_per_package_f-ce84a748-cbc4-4a0d-8c68-9b459eeabe18",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo__tags_f-cb1f4cb8-cddc-4c03-8773-f53e396ca3d9",
+        "name": "cargo__tags_f-b4fc5bce-9108-4ce7-8347-fdb8071101d6",
         "left": 629,
         "right": 931
       },
       {
-        "name": "cargo_value_f-8e081a57-c756-4ce9-9ff5-ddf551385f65",
+        "name": "cargo_value_f-bc1ce38c-1b2f-4e5f-b531-c99037640c48",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_unit_f-c089f4ca-849c-45bc-86f3-fa7e53355169",
+        "name": "cargo_unit_f-ddf84682-59e9-4cfe-8798-fba50ea8121e",
         "left": 629,
         "right": 931
       },
       {
-        "name": "cargo_value_f-d4910f13-7d95-43df-ac19-0579b8c9b204",
+        "name": "cargo_value_f-b471e147-79f4-41a1-a9a7-777ea1ce873b",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_unit_f-ee5ed0e5-797e-4161-b318-38a0c46d4056",
+        "name": "cargo_unit_f-2252fb59-63e0-45d5-9ee4-554aff7e6756",
         "left": 629,
         "right": 931
       },
       {
-        "name": "cargo_length_f-13b2941a-cf96-454e-94a1-a6563058ef57",
+        "name": "cargo_length_f-8995fc78-badc-44a8-b263-f9b58123b8a3",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_width_f-5f9eaab9-7377-4fe5-9586-f102cf7822e3",
+        "name": "cargo_width_f-ffc519e4-2dc9-4337-b91c-2ce5c314bd81",
         "left": 629,
         "right": 931
       },
       {
-        "name": "cargo_height_f-ef0faedf-61fe-400e-889d-7800b94588f6",
+        "name": "cargo_height_f-d0e21f10-fa11-486a-8b13-b9078824e98b",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_unit_f-e8d22db8-b2a8-4bc9-861f-8da731725a1c",
+        "name": "cargo_unit_f-9f34f5ca-f79b-4613-a9ab-b30d8781bba1",
         "left": 629,
         "right": 931
       },
       {
-        "name": "cargo_density_kg_per_m3_f-4c307aa2-9036-4969-add0-df414a61a9b5",
+        "name": "cargo_density_kg_per_m3_f-d4aa141f-4814-40aa-8ee7-d25b471fa617",
         "left": 311,
         "right": 613
       },
@@ -852,47 +852,47 @@
         "right": 931
       },
       {
-        "name": "cargo_label_f-fd25c67e-3533-44f8-b9be-08c037a11388",
+        "name": "cargo_label_f-49a690c2-0031-40aa-8aa9-5b24118a1d11",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_type_f-a2577ca2-c577-46dd-8a17-7b756babef81",
+        "name": "cargo_type_f-a0d0e153-d986-4282-ae15-35b4830868cf",
         "left": 629,
         "right": 931
       },
       {
-        "name": "cargo_length_f-718b6eaf-05a9-4742-a8cd-2c90de9c8b4f",
+        "name": "cargo_length_f-59368131-7190-4093-9fe0-4cba78613e65",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_width_f-21e9272c-d30f-4010-a4e0-1224fe85fb19",
+        "name": "cargo_width_f-097eaf72-db05-47e2-ba33-474afd1ffa79",
         "left": 629,
         "right": 931
       },
       {
-        "name": "cargo_height_f-cfd62da7-9c52-4df2-a851-86e3b025b683",
+        "name": "cargo_height_f-0fedb3c5-b77a-4c24-8459-b631f1ecb067",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_unit_f-863cf244-d5d3-4e45-9d27-8e165ea1a930",
+        "name": "cargo_unit_f-44fd9448-6c49-4608-bab1-cbc49e868119",
         "left": 629,
         "right": 931
       },
       {
-        "name": "cargo_value_f-b2455c70-419d-4763-8d24-8a31c4ee38c5",
+        "name": "cargo_value_f-be8aaa62-e409-4ad2-86c2-53dba46ef5a8",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_unit_f-d8ab7e5b-d64f-4734-9214-6ebd99888dec",
+        "name": "cargo_unit_f-ed8af5ce-54a1-47d3-810c-a425b156abf1",
         "left": 629,
         "right": 931
       },
       {
-        "name": "cargo_structural_limit_kg_f-a7aeb1b3-9cfb-4637-a184-03e7479438a4",
+        "name": "cargo_structural_limit_kg_f-a64c0c13-d60d-40ec-917b-67a529a5f450",
         "left": 311,
         "right": 613
       },
@@ -907,32 +907,32 @@
         "right": 931
       },
       {
-        "name": "cargo_label_f-97f265a3-02ab-41a4-aa1a-a672cd35b212",
+        "name": "cargo_label_f-d865ae55-a03d-442c-ba3f-3481b68ea909",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_quantity_kind_f-94edf35d-c491-4c6c-a930-5a0aecef771f",
+        "name": "cargo_quantity_kind_f-35c10267-f2f4-4fa1-bf7d-cf83adb51c38",
         "left": 629,
         "right": 931
       },
       {
-        "name": "cargo_quantity_unit_f-a8d8c981-f98f-4f20-a7d0-3f3cf5245d6d",
+        "name": "cargo_quantity_unit_f-caa7c2ef-9a99-45db-bc4a-16b1673fc80b",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_logistic_unit_id_f-92a44004-e499-4d21-b4e3-ec5257822e43",
+        "name": "cargo_logistic_unit_id_f-558b9db3-1a01-48e0-bcff-b4024887835a",
         "left": 629,
         "right": 931
       },
       {
-        "name": "cargo_product_id_f-5147a0d4-2aa5-4c1d-8ea3-30747a589e14",
+        "name": "cargo_product_id_f-81f5e2f3-ad8a-4077-8aa2-54cb9e251ba2",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_quantity_f-4b3eba15-f706-4e18-8bbe-8b2b7ee6e883",
+        "name": "cargo_quantity_f-6180995d-694b-4d6e-b2c8-b7b14cc5c853",
         "left": 629,
         "right": 931
       },
@@ -942,12 +942,12 @@
         "right": 613
       },
       {
-        "name": "cargo_product_id_f-ac182a78-5079-4d40-9b4b-5262fd3f9c0a",
+        "name": "cargo_product_id_f-065901b0-66e4-4cd4-865c-1b666dbbc66e",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_quantity_f-f17a83b4-bd45-4333-bd4a-591631471fc8",
+        "name": "cargo_quantity_f-7d639988-bc8b-47eb-b4ec-87a6ef9c84df",
         "left": 629,
         "right": 931
       },
@@ -962,67 +962,67 @@
         "right": 628.921875
       },
       {
-        "name": "cargo_length_f-c22b18d8-c3bd-4a75-abd8-9efe2e3e1587",
+        "name": "cargo_length_f-691d7c06-8577-428e-915c-8f9a11bd4f2f",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_width_f-2986afb8-a0ab-4e7d-bd00-c0b10c020589",
+        "name": "cargo_width_f-df25c09d-ea05-4396-87fe-45a2135b70a5",
         "left": 629,
         "right": 931
       },
       {
-        "name": "cargo_height_f-a4d80ccb-fe6f-4da8-b7e9-b7775edd5935",
+        "name": "cargo_height_f-a6235cc5-bebc-4ec1-8c4f-986fd02f357e",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_unit_f-99795bd4-f780-4834-bf30-e087fff9e080",
+        "name": "cargo_unit_f-948944b1-8741-4186-8e71-b77693d422de",
         "left": 629,
         "right": 931
       },
       {
-        "name": "cargo_value_f-b10928aa-7284-4e45-b7dc-9a2869b0258c",
+        "name": "cargo_value_f-a73dfba0-8017-4781-ab0b-04f9d184a832",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_unit_f-9d8e0b3d-4738-4cc4-be2d-aea6b7892b0d",
+        "name": "cargo_unit_f-1b7daf8a-dbab-4185-bd07-74e72e4ded03",
         "left": 629,
         "right": 931
       },
       {
-        "name": "cargo_value_f-57f605cc-e510-42af-b781-855410f10990",
+        "name": "cargo_value_f-d3de2b48-ba2f-4759-a70b-b053d62a9699",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_unit_f-70e489ae-84a0-45ed-bd51-3db3338d6890",
+        "name": "cargo_unit_f-f238ed39-564d-47c7-8a90-5010e06a716a",
         "left": 629,
         "right": 931
       },
       {
-        "name": "cargo_density_kg_per_m3_f-7e3a3dc1-7b96-440f-ad00-a8f60da729c4",
+        "name": "cargo_density_kg_per_m3_f-7a6480cd-be1d-42be-bd34-c23acdb2b5d3",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_value_f-90e2f9f3-4b81-462a-8f46-3369350ee9c4",
+        "name": "cargo_value_f-e7bae3fe-ec31-44d9-a65f-e45980ad5755",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_unit_f-e0272921-c06c-4553-b5d2-4f3075ac6fe4",
+        "name": "cargo_unit_f-b8f17f9f-aafb-4e3c-928f-ca3a38a5bedd",
         "left": 629,
         "right": 931
       },
       {
-        "name": "cargo_orientation_metadata_f-beea2b53-4387-42fd-9f3d-b1e4405a9dd6",
+        "name": "cargo_orientation_metadata_f-bf0e706a-4832-4261-872e-01ef1fe1ce9a",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo__stackable_f-88521d92-fd08-4725-945a-faf4b2713015",
+        "name": "cargo__stackable_f-acec1b9b-35f1-4f35-bd42-a97f11f21eb1",
         "left": 629,
         "right": 931
       },
@@ -1032,32 +1032,32 @@
         "right": 931
       },
       {
-        "name": "cargo_label_f-fab95922-89e4-4806-b375-3d8a38951cf9",
+        "name": "cargo_label_f-6ffc173f-8759-467e-a2d0-02c6066e4071",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_quantity_kind_f-0b96293b-e3a1-43f9-81c8-5d1d45082b65",
+        "name": "cargo_quantity_kind_f-1891b48e-3158-4b71-9f63-daa255b03f38",
         "left": 629,
         "right": 931
       },
       {
-        "name": "cargo_quantity_unit_f-3c66a21d-90e5-4158-b737-c1659f0aa2d9",
+        "name": "cargo_quantity_unit_f-a259d774-9f14-481c-ba22-9c6d8b9be1ad",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_logistic_unit_id_f-640e8b96-ff23-4277-9362-0d90bee3e9e5",
+        "name": "cargo_logistic_unit_id_f-d19e0ab6-9288-4445-9bab-7c16b620cf0c",
         "left": 629,
         "right": 931
       },
       {
-        "name": "cargo_product_id_f-f4001c60-d3e1-41c0-972e-3e814f5d44f3",
+        "name": "cargo_product_id_f-bcc6918c-8117-4c51-bc5b-acfef6527921",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_quantity_f-7e83bc59-abbb-49e2-80bd-10c76dbe6e45",
+        "name": "cargo_quantity_f-321ca8b2-0ef0-46e3-b342-cfc58a108b3e",
         "left": 629,
         "right": 931
       },
@@ -1072,67 +1072,67 @@
         "right": 628.921875
       },
       {
-        "name": "cargo_length_f-f70170fd-7049-4104-ab53-a6fa7f234486",
+        "name": "cargo_length_f-505a12f7-2447-4374-bf05-af11e7ccda5c",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_width_f-19df6f19-2ced-4fe1-8515-6ad3b2b27bd1",
+        "name": "cargo_width_f-2d46bc05-15fc-42a0-9a63-d8b0f078a053",
         "left": 629,
         "right": 931
       },
       {
-        "name": "cargo_height_f-40705b3d-5de3-4837-b23c-bf0a5acedcc0",
+        "name": "cargo_height_f-d6def255-680b-4366-b296-1ad2eb4a412e",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_unit_f-a021a79d-6a52-4081-b105-28daaa8358fb",
+        "name": "cargo_unit_f-9e695634-dedc-462b-88d8-ac0452eb0419",
         "left": 629,
         "right": 931
       },
       {
-        "name": "cargo_value_f-1c317086-2409-47aa-a985-3f9926980cb3",
+        "name": "cargo_value_f-c0c45f26-3938-4000-9939-7c074066acc9",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_unit_f-9df4e7f8-9f2f-40c5-bcb3-7a5945f0a89e",
+        "name": "cargo_unit_f-1c30aac0-d36a-4a58-87b4-53814ccccaa6",
         "left": 629,
         "right": 931
       },
       {
-        "name": "cargo_value_f-71179f98-5cd3-43e0-9a9f-8d7b4b04a397",
+        "name": "cargo_value_f-56bc40e3-8614-465f-8222-ead9c0557d63",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_unit_f-2d600016-d2b7-423b-9762-f43a68986d5f",
+        "name": "cargo_unit_f-3cedc4c4-665d-4228-aebd-bd0c4cdd740b",
         "left": 629,
         "right": 931
       },
       {
-        "name": "cargo_density_kg_per_m3_f-03a1f055-75d5-4ff3-a03b-f8b89686333e",
+        "name": "cargo_density_kg_per_m3_f-8ea882b9-8648-4e02-b53e-dd00caeeb1a7",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_value_f-30501c92-fc0c-4cff-b8e7-6a90eb73e9fb",
+        "name": "cargo_value_f-a1e58f80-d20e-44e7-8577-9e730e8fce23",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo_unit_f-00eb65cb-3500-47b4-ad2f-ae84b7e126b4",
+        "name": "cargo_unit_f-6373daec-783e-4d0e-9c17-6d68ce12ee3c",
         "left": 629,
         "right": 931
       },
       {
-        "name": "cargo_orientation_metadata_f-ccbd5386-87a0-4d2b-9eeb-1f8981846277",
+        "name": "cargo_orientation_metadata_f-9d177aee-07f8-4741-85de-0364f4f15c37",
         "left": 311,
         "right": 613
       },
       {
-        "name": "cargo__stackable_f-b96f6d94-da04-4eee-a834-f243a0ba6b2a",
+        "name": "cargo__stackable_f-027bd73a-5915-48fb-ac63-1b4fcc3f0baf",
         "left": 629,
         "right": 931
       },
@@ -1294,77 +1294,77 @@
         "right": 689
       },
       {
-        "name": "cargo_name_f-632f97e2-73e6-401c-90bf-d4018daf68de",
+        "name": "cargo_name_f-6478a929-cd3f-455a-9d56-aa70b75282d1",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_code_f-fa5b765e-61ed-49cd-9435-3ea6fca9f199",
+        "name": "cargo_code_f-883d0126-5f12-4c4c-8852-6c06510a176a",
         "left": 428,
         "right": 689
       },
       {
-        "name": "cargo_category_f-32513af1-b916-4034-8ba2-e861323577e0",
+        "name": "cargo_category_f-606962a4-0230-4a63-96f9-71ecdbe71510",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_unit_label_f-ea128b8c-633a-4676-9c17-0a0b4f0ee432",
+        "name": "cargo_unit_label_f-89d8f0ef-021d-4916-946a-3c8e8733a719",
         "left": 428,
         "right": 689
       },
       {
-        "name": "cargo_units_per_package_f-71ac0c9c-2abb-41af-b914-b7b1b0e14369",
+        "name": "cargo_units_per_package_f-97786778-9684-4995-b3b5-ba1d934c778e",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo__tags_f-46a0fc8f-0d55-40cf-88c2-e032f8782c58",
+        "name": "cargo__tags_f-d4337ee5-9112-4ad4-bdca-0b614a822670",
         "left": 428,
         "right": 689
       },
       {
-        "name": "cargo_value_f-8b0d45ab-020a-45db-87b4-7b8cfe235b4c",
+        "name": "cargo_value_f-25e5ca93-b04b-48ab-b643-1728d335ec72",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_unit_f-32c5c2a1-041c-43b9-b0ae-6733d3cab481",
+        "name": "cargo_unit_f-d58f35ab-82df-4076-bbfa-cea46ef94185",
         "left": 428,
         "right": 689
       },
       {
-        "name": "cargo_value_f-b33683b4-f3e7-45da-a272-7ebc49ccd5ba",
+        "name": "cargo_value_f-3e678add-ad92-4ffc-a068-79c9813c6f06",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_unit_f-92b447d0-8d2a-4312-94dc-c92f44770faf",
+        "name": "cargo_unit_f-d847b4a8-c846-4392-8ea7-d4f845364bd8",
         "left": 428,
         "right": 689
       },
       {
-        "name": "cargo_length_f-2bcf55ed-d386-4b4a-aa62-0fe4471026ed",
+        "name": "cargo_length_f-19319023-9571-47f8-85fa-edcdecf85c7e",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_width_f-4f053f99-2c13-4a67-82de-1f1d690b580b",
+        "name": "cargo_width_f-0cb12e27-312a-4da0-a2f1-e4a925f69150",
         "left": 428,
         "right": 689
       },
       {
-        "name": "cargo_height_f-d43a2db9-c0d9-4e53-9843-e7154ab2751a",
+        "name": "cargo_height_f-d00612d7-182d-49f9-a8e1-59d49b12ed06",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_unit_f-43d8fa06-7f54-4218-8119-5239ae4006be",
+        "name": "cargo_unit_f-494751ae-462c-47b5-bb6b-5486bd155bda",
         "left": 428,
         "right": 689
       },
       {
-        "name": "cargo_density_kg_per_m3_f-ba0c83c7-ce2b-461a-ab16-740a212266e2",
+        "name": "cargo_density_kg_per_m3_f-d97bc3ee-fc0f-405e-8d66-b73f94d36443",
         "left": 151,
         "right": 412
       },
@@ -1374,77 +1374,77 @@
         "right": 689
       },
       {
-        "name": "cargo_name_f-5f7debd3-b347-475f-a851-aa7df1a2a495",
+        "name": "cargo_name_f-51a57b1e-04a1-4066-a6ac-6bd46d939b14",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_code_f-fc5d06ad-12a7-4e7b-9aac-0d53d4bfcdb7",
+        "name": "cargo_code_f-6de4be58-3651-4ecc-a621-014fed99103e",
         "left": 428,
         "right": 689
       },
       {
-        "name": "cargo_category_f-9771a43c-8dff-4ae5-a715-ccffc37a0350",
+        "name": "cargo_category_f-aee195ea-e25a-4d13-a4c2-e399532ae128",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_unit_label_f-dff5b467-1a01-49cd-889b-10ce31de50fe",
+        "name": "cargo_unit_label_f-eb2853bc-6c55-4653-9534-4048eb15fe43",
         "left": 428,
         "right": 689
       },
       {
-        "name": "cargo_units_per_package_f-b5f2a162-9673-450b-bdfd-70df02b85169",
+        "name": "cargo_units_per_package_f-ce84a748-cbc4-4a0d-8c68-9b459eeabe18",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo__tags_f-cb1f4cb8-cddc-4c03-8773-f53e396ca3d9",
+        "name": "cargo__tags_f-b4fc5bce-9108-4ce7-8347-fdb8071101d6",
         "left": 428,
         "right": 689
       },
       {
-        "name": "cargo_value_f-8e081a57-c756-4ce9-9ff5-ddf551385f65",
+        "name": "cargo_value_f-bc1ce38c-1b2f-4e5f-b531-c99037640c48",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_unit_f-c089f4ca-849c-45bc-86f3-fa7e53355169",
+        "name": "cargo_unit_f-ddf84682-59e9-4cfe-8798-fba50ea8121e",
         "left": 428,
         "right": 689
       },
       {
-        "name": "cargo_value_f-d4910f13-7d95-43df-ac19-0579b8c9b204",
+        "name": "cargo_value_f-b471e147-79f4-41a1-a9a7-777ea1ce873b",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_unit_f-ee5ed0e5-797e-4161-b318-38a0c46d4056",
+        "name": "cargo_unit_f-2252fb59-63e0-45d5-9ee4-554aff7e6756",
         "left": 428,
         "right": 689
       },
       {
-        "name": "cargo_length_f-13b2941a-cf96-454e-94a1-a6563058ef57",
+        "name": "cargo_length_f-8995fc78-badc-44a8-b263-f9b58123b8a3",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_width_f-5f9eaab9-7377-4fe5-9586-f102cf7822e3",
+        "name": "cargo_width_f-ffc519e4-2dc9-4337-b91c-2ce5c314bd81",
         "left": 428,
         "right": 689
       },
       {
-        "name": "cargo_height_f-ef0faedf-61fe-400e-889d-7800b94588f6",
+        "name": "cargo_height_f-d0e21f10-fa11-486a-8b13-b9078824e98b",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_unit_f-e8d22db8-b2a8-4bc9-861f-8da731725a1c",
+        "name": "cargo_unit_f-9f34f5ca-f79b-4613-a9ab-b30d8781bba1",
         "left": 428,
         "right": 689
       },
       {
-        "name": "cargo_density_kg_per_m3_f-4c307aa2-9036-4969-add0-df414a61a9b5",
+        "name": "cargo_density_kg_per_m3_f-d4aa141f-4814-40aa-8ee7-d25b471fa617",
         "left": 151,
         "right": 412
       },
@@ -1459,47 +1459,47 @@
         "right": 689
       },
       {
-        "name": "cargo_label_f-fd25c67e-3533-44f8-b9be-08c037a11388",
+        "name": "cargo_label_f-49a690c2-0031-40aa-8aa9-5b24118a1d11",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_type_f-a2577ca2-c577-46dd-8a17-7b756babef81",
+        "name": "cargo_type_f-a0d0e153-d986-4282-ae15-35b4830868cf",
         "left": 428,
         "right": 689
       },
       {
-        "name": "cargo_length_f-718b6eaf-05a9-4742-a8cd-2c90de9c8b4f",
+        "name": "cargo_length_f-59368131-7190-4093-9fe0-4cba78613e65",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_width_f-21e9272c-d30f-4010-a4e0-1224fe85fb19",
+        "name": "cargo_width_f-097eaf72-db05-47e2-ba33-474afd1ffa79",
         "left": 428,
         "right": 689
       },
       {
-        "name": "cargo_height_f-cfd62da7-9c52-4df2-a851-86e3b025b683",
+        "name": "cargo_height_f-0fedb3c5-b77a-4c24-8459-b631f1ecb067",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_unit_f-863cf244-d5d3-4e45-9d27-8e165ea1a930",
+        "name": "cargo_unit_f-44fd9448-6c49-4608-bab1-cbc49e868119",
         "left": 428,
         "right": 689
       },
       {
-        "name": "cargo_value_f-b2455c70-419d-4763-8d24-8a31c4ee38c5",
+        "name": "cargo_value_f-be8aaa62-e409-4ad2-86c2-53dba46ef5a8",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_unit_f-d8ab7e5b-d64f-4734-9214-6ebd99888dec",
+        "name": "cargo_unit_f-ed8af5ce-54a1-47d3-810c-a425b156abf1",
         "left": 428,
         "right": 689
       },
       {
-        "name": "cargo_structural_limit_kg_f-a7aeb1b3-9cfb-4637-a184-03e7479438a4",
+        "name": "cargo_structural_limit_kg_f-a64c0c13-d60d-40ec-917b-67a529a5f450",
         "left": 151,
         "right": 412
       },
@@ -1514,32 +1514,32 @@
         "right": 689
       },
       {
-        "name": "cargo_label_f-97f265a3-02ab-41a4-aa1a-a672cd35b212",
+        "name": "cargo_label_f-d865ae55-a03d-442c-ba3f-3481b68ea909",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_quantity_kind_f-94edf35d-c491-4c6c-a930-5a0aecef771f",
+        "name": "cargo_quantity_kind_f-35c10267-f2f4-4fa1-bf7d-cf83adb51c38",
         "left": 428,
         "right": 689
       },
       {
-        "name": "cargo_quantity_unit_f-a8d8c981-f98f-4f20-a7d0-3f3cf5245d6d",
+        "name": "cargo_quantity_unit_f-caa7c2ef-9a99-45db-bc4a-16b1673fc80b",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_logistic_unit_id_f-92a44004-e499-4d21-b4e3-ec5257822e43",
+        "name": "cargo_logistic_unit_id_f-558b9db3-1a01-48e0-bcff-b4024887835a",
         "left": 428,
         "right": 689
       },
       {
-        "name": "cargo_product_id_f-5147a0d4-2aa5-4c1d-8ea3-30747a589e14",
+        "name": "cargo_product_id_f-81f5e2f3-ad8a-4077-8aa2-54cb9e251ba2",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_quantity_f-4b3eba15-f706-4e18-8bbe-8b2b7ee6e883",
+        "name": "cargo_quantity_f-6180995d-694b-4d6e-b2c8-b7b14cc5c853",
         "left": 428,
         "right": 689
       },
@@ -1549,12 +1549,12 @@
         "right": 412
       },
       {
-        "name": "cargo_product_id_f-ac182a78-5079-4d40-9b4b-5262fd3f9c0a",
+        "name": "cargo_product_id_f-065901b0-66e4-4cd4-865c-1b666dbbc66e",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_quantity_f-f17a83b4-bd45-4333-bd4a-591631471fc8",
+        "name": "cargo_quantity_f-7d639988-bc8b-47eb-b4ec-87a6ef9c84df",
         "left": 428,
         "right": 689
       },
@@ -1569,67 +1569,67 @@
         "right": 468.921875
       },
       {
-        "name": "cargo_length_f-c22b18d8-c3bd-4a75-abd8-9efe2e3e1587",
+        "name": "cargo_length_f-691d7c06-8577-428e-915c-8f9a11bd4f2f",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_width_f-2986afb8-a0ab-4e7d-bd00-c0b10c020589",
+        "name": "cargo_width_f-df25c09d-ea05-4396-87fe-45a2135b70a5",
         "left": 428,
         "right": 689
       },
       {
-        "name": "cargo_height_f-a4d80ccb-fe6f-4da8-b7e9-b7775edd5935",
+        "name": "cargo_height_f-a6235cc5-bebc-4ec1-8c4f-986fd02f357e",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_unit_f-99795bd4-f780-4834-bf30-e087fff9e080",
+        "name": "cargo_unit_f-948944b1-8741-4186-8e71-b77693d422de",
         "left": 428,
         "right": 689
       },
       {
-        "name": "cargo_value_f-b10928aa-7284-4e45-b7dc-9a2869b0258c",
+        "name": "cargo_value_f-a73dfba0-8017-4781-ab0b-04f9d184a832",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_unit_f-9d8e0b3d-4738-4cc4-be2d-aea6b7892b0d",
+        "name": "cargo_unit_f-1b7daf8a-dbab-4185-bd07-74e72e4ded03",
         "left": 428,
         "right": 689
       },
       {
-        "name": "cargo_value_f-57f605cc-e510-42af-b781-855410f10990",
+        "name": "cargo_value_f-d3de2b48-ba2f-4759-a70b-b053d62a9699",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_unit_f-70e489ae-84a0-45ed-bd51-3db3338d6890",
+        "name": "cargo_unit_f-f238ed39-564d-47c7-8a90-5010e06a716a",
         "left": 428,
         "right": 689
       },
       {
-        "name": "cargo_density_kg_per_m3_f-7e3a3dc1-7b96-440f-ad00-a8f60da729c4",
+        "name": "cargo_density_kg_per_m3_f-7a6480cd-be1d-42be-bd34-c23acdb2b5d3",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_value_f-90e2f9f3-4b81-462a-8f46-3369350ee9c4",
+        "name": "cargo_value_f-e7bae3fe-ec31-44d9-a65f-e45980ad5755",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_unit_f-e0272921-c06c-4553-b5d2-4f3075ac6fe4",
+        "name": "cargo_unit_f-b8f17f9f-aafb-4e3c-928f-ca3a38a5bedd",
         "left": 428,
         "right": 689
       },
       {
-        "name": "cargo_orientation_metadata_f-beea2b53-4387-42fd-9f3d-b1e4405a9dd6",
+        "name": "cargo_orientation_metadata_f-bf0e706a-4832-4261-872e-01ef1fe1ce9a",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo__stackable_f-88521d92-fd08-4725-945a-faf4b2713015",
+        "name": "cargo__stackable_f-acec1b9b-35f1-4f35-bd42-a97f11f21eb1",
         "left": 428,
         "right": 689
       },
@@ -1639,32 +1639,32 @@
         "right": 689
       },
       {
-        "name": "cargo_label_f-fab95922-89e4-4806-b375-3d8a38951cf9",
+        "name": "cargo_label_f-6ffc173f-8759-467e-a2d0-02c6066e4071",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_quantity_kind_f-0b96293b-e3a1-43f9-81c8-5d1d45082b65",
+        "name": "cargo_quantity_kind_f-1891b48e-3158-4b71-9f63-daa255b03f38",
         "left": 428,
         "right": 689
       },
       {
-        "name": "cargo_quantity_unit_f-3c66a21d-90e5-4158-b737-c1659f0aa2d9",
+        "name": "cargo_quantity_unit_f-a259d774-9f14-481c-ba22-9c6d8b9be1ad",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_logistic_unit_id_f-640e8b96-ff23-4277-9362-0d90bee3e9e5",
+        "name": "cargo_logistic_unit_id_f-d19e0ab6-9288-4445-9bab-7c16b620cf0c",
         "left": 428,
         "right": 689
       },
       {
-        "name": "cargo_product_id_f-f4001c60-d3e1-41c0-972e-3e814f5d44f3",
+        "name": "cargo_product_id_f-bcc6918c-8117-4c51-bc5b-acfef6527921",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_quantity_f-7e83bc59-abbb-49e2-80bd-10c76dbe6e45",
+        "name": "cargo_quantity_f-321ca8b2-0ef0-46e3-b342-cfc58a108b3e",
         "left": 428,
         "right": 689
       },
@@ -1679,67 +1679,67 @@
         "right": 468.921875
       },
       {
-        "name": "cargo_length_f-f70170fd-7049-4104-ab53-a6fa7f234486",
+        "name": "cargo_length_f-505a12f7-2447-4374-bf05-af11e7ccda5c",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_width_f-19df6f19-2ced-4fe1-8515-6ad3b2b27bd1",
+        "name": "cargo_width_f-2d46bc05-15fc-42a0-9a63-d8b0f078a053",
         "left": 428,
         "right": 689
       },
       {
-        "name": "cargo_height_f-40705b3d-5de3-4837-b23c-bf0a5acedcc0",
+        "name": "cargo_height_f-d6def255-680b-4366-b296-1ad2eb4a412e",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_unit_f-a021a79d-6a52-4081-b105-28daaa8358fb",
+        "name": "cargo_unit_f-9e695634-dedc-462b-88d8-ac0452eb0419",
         "left": 428,
         "right": 689
       },
       {
-        "name": "cargo_value_f-1c317086-2409-47aa-a985-3f9926980cb3",
+        "name": "cargo_value_f-c0c45f26-3938-4000-9939-7c074066acc9",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_unit_f-9df4e7f8-9f2f-40c5-bcb3-7a5945f0a89e",
+        "name": "cargo_unit_f-1c30aac0-d36a-4a58-87b4-53814ccccaa6",
         "left": 428,
         "right": 689
       },
       {
-        "name": "cargo_value_f-71179f98-5cd3-43e0-9a9f-8d7b4b04a397",
+        "name": "cargo_value_f-56bc40e3-8614-465f-8222-ead9c0557d63",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_unit_f-2d600016-d2b7-423b-9762-f43a68986d5f",
+        "name": "cargo_unit_f-3cedc4c4-665d-4228-aebd-bd0c4cdd740b",
         "left": 428,
         "right": 689
       },
       {
-        "name": "cargo_density_kg_per_m3_f-03a1f055-75d5-4ff3-a03b-f8b89686333e",
+        "name": "cargo_density_kg_per_m3_f-8ea882b9-8648-4e02-b53e-dd00caeeb1a7",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_value_f-30501c92-fc0c-4cff-b8e7-6a90eb73e9fb",
+        "name": "cargo_value_f-a1e58f80-d20e-44e7-8577-9e730e8fce23",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo_unit_f-00eb65cb-3500-47b4-ad2f-ae84b7e126b4",
+        "name": "cargo_unit_f-6373daec-783e-4d0e-9c17-6d68ce12ee3c",
         "left": 428,
         "right": 689
       },
       {
-        "name": "cargo_orientation_metadata_f-ccbd5386-87a0-4d2b-9eeb-1f8981846277",
+        "name": "cargo_orientation_metadata_f-9d177aee-07f8-4741-85de-0364f4f15c37",
         "left": 151,
         "right": 412
       },
       {
-        "name": "cargo__stackable_f-b96f6d94-da04-4eee-a834-f243a0ba6b2a",
+        "name": "cargo__stackable_f-027bd73a-5915-48fb-ac63-1b4fcc3f0baf",
         "left": 428,
         "right": 689
       },
@@ -1901,77 +1901,77 @@
         "right": 331
       },
       {
-        "name": "cargo_name_f-632f97e2-73e6-401c-90bf-d4018daf68de",
+        "name": "cargo_name_f-6478a929-cd3f-455a-9d56-aa70b75282d1",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_code_f-fa5b765e-61ed-49cd-9435-3ea6fca9f199",
+        "name": "cargo_code_f-883d0126-5f12-4c4c-8852-6c06510a176a",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_category_f-32513af1-b916-4034-8ba2-e861323577e0",
+        "name": "cargo_category_f-606962a4-0230-4a63-96f9-71ecdbe71510",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_unit_label_f-ea128b8c-633a-4676-9c17-0a0b4f0ee432",
+        "name": "cargo_unit_label_f-89d8f0ef-021d-4916-946a-3c8e8733a719",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_units_per_package_f-71ac0c9c-2abb-41af-b914-b7b1b0e14369",
+        "name": "cargo_units_per_package_f-97786778-9684-4995-b3b5-ba1d934c778e",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo__tags_f-46a0fc8f-0d55-40cf-88c2-e032f8782c58",
+        "name": "cargo__tags_f-d4337ee5-9112-4ad4-bdca-0b614a822670",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_value_f-8b0d45ab-020a-45db-87b4-7b8cfe235b4c",
+        "name": "cargo_value_f-25e5ca93-b04b-48ab-b643-1728d335ec72",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_unit_f-32c5c2a1-041c-43b9-b0ae-6733d3cab481",
+        "name": "cargo_unit_f-d58f35ab-82df-4076-bbfa-cea46ef94185",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_value_f-b33683b4-f3e7-45da-a272-7ebc49ccd5ba",
+        "name": "cargo_value_f-3e678add-ad92-4ffc-a068-79c9813c6f06",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_unit_f-92b447d0-8d2a-4312-94dc-c92f44770faf",
+        "name": "cargo_unit_f-d847b4a8-c846-4392-8ea7-d4f845364bd8",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_length_f-2bcf55ed-d386-4b4a-aa62-0fe4471026ed",
+        "name": "cargo_length_f-19319023-9571-47f8-85fa-edcdecf85c7e",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_width_f-4f053f99-2c13-4a67-82de-1f1d690b580b",
+        "name": "cargo_width_f-0cb12e27-312a-4da0-a2f1-e4a925f69150",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_height_f-d43a2db9-c0d9-4e53-9843-e7154ab2751a",
+        "name": "cargo_height_f-d00612d7-182d-49f9-a8e1-59d49b12ed06",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_unit_f-43d8fa06-7f54-4218-8119-5239ae4006be",
+        "name": "cargo_unit_f-494751ae-462c-47b5-bb6b-5486bd155bda",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_density_kg_per_m3_f-ba0c83c7-ce2b-461a-ab16-740a212266e2",
+        "name": "cargo_density_kg_per_m3_f-d97bc3ee-fc0f-405e-8d66-b73f94d36443",
         "left": 119,
         "right": 331
       },
@@ -1981,77 +1981,77 @@
         "right": 331
       },
       {
-        "name": "cargo_name_f-5f7debd3-b347-475f-a851-aa7df1a2a495",
+        "name": "cargo_name_f-51a57b1e-04a1-4066-a6ac-6bd46d939b14",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_code_f-fc5d06ad-12a7-4e7b-9aac-0d53d4bfcdb7",
+        "name": "cargo_code_f-6de4be58-3651-4ecc-a621-014fed99103e",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_category_f-9771a43c-8dff-4ae5-a715-ccffc37a0350",
+        "name": "cargo_category_f-aee195ea-e25a-4d13-a4c2-e399532ae128",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_unit_label_f-dff5b467-1a01-49cd-889b-10ce31de50fe",
+        "name": "cargo_unit_label_f-eb2853bc-6c55-4653-9534-4048eb15fe43",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_units_per_package_f-b5f2a162-9673-450b-bdfd-70df02b85169",
+        "name": "cargo_units_per_package_f-ce84a748-cbc4-4a0d-8c68-9b459eeabe18",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo__tags_f-cb1f4cb8-cddc-4c03-8773-f53e396ca3d9",
+        "name": "cargo__tags_f-b4fc5bce-9108-4ce7-8347-fdb8071101d6",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_value_f-8e081a57-c756-4ce9-9ff5-ddf551385f65",
+        "name": "cargo_value_f-bc1ce38c-1b2f-4e5f-b531-c99037640c48",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_unit_f-c089f4ca-849c-45bc-86f3-fa7e53355169",
+        "name": "cargo_unit_f-ddf84682-59e9-4cfe-8798-fba50ea8121e",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_value_f-d4910f13-7d95-43df-ac19-0579b8c9b204",
+        "name": "cargo_value_f-b471e147-79f4-41a1-a9a7-777ea1ce873b",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_unit_f-ee5ed0e5-797e-4161-b318-38a0c46d4056",
+        "name": "cargo_unit_f-2252fb59-63e0-45d5-9ee4-554aff7e6756",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_length_f-13b2941a-cf96-454e-94a1-a6563058ef57",
+        "name": "cargo_length_f-8995fc78-badc-44a8-b263-f9b58123b8a3",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_width_f-5f9eaab9-7377-4fe5-9586-f102cf7822e3",
+        "name": "cargo_width_f-ffc519e4-2dc9-4337-b91c-2ce5c314bd81",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_height_f-ef0faedf-61fe-400e-889d-7800b94588f6",
+        "name": "cargo_height_f-d0e21f10-fa11-486a-8b13-b9078824e98b",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_unit_f-e8d22db8-b2a8-4bc9-861f-8da731725a1c",
+        "name": "cargo_unit_f-9f34f5ca-f79b-4613-a9ab-b30d8781bba1",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_density_kg_per_m3_f-4c307aa2-9036-4969-add0-df414a61a9b5",
+        "name": "cargo_density_kg_per_m3_f-d4aa141f-4814-40aa-8ee7-d25b471fa617",
         "left": 119,
         "right": 331
       },
@@ -2066,47 +2066,47 @@
         "right": 204.296875
       },
       {
-        "name": "cargo_label_f-fd25c67e-3533-44f8-b9be-08c037a11388",
+        "name": "cargo_label_f-49a690c2-0031-40aa-8aa9-5b24118a1d11",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_type_f-a2577ca2-c577-46dd-8a17-7b756babef81",
+        "name": "cargo_type_f-a0d0e153-d986-4282-ae15-35b4830868cf",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_length_f-718b6eaf-05a9-4742-a8cd-2c90de9c8b4f",
+        "name": "cargo_length_f-59368131-7190-4093-9fe0-4cba78613e65",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_width_f-21e9272c-d30f-4010-a4e0-1224fe85fb19",
+        "name": "cargo_width_f-097eaf72-db05-47e2-ba33-474afd1ffa79",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_height_f-cfd62da7-9c52-4df2-a851-86e3b025b683",
+        "name": "cargo_height_f-0fedb3c5-b77a-4c24-8459-b631f1ecb067",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_unit_f-863cf244-d5d3-4e45-9d27-8e165ea1a930",
+        "name": "cargo_unit_f-44fd9448-6c49-4608-bab1-cbc49e868119",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_value_f-b2455c70-419d-4763-8d24-8a31c4ee38c5",
+        "name": "cargo_value_f-be8aaa62-e409-4ad2-86c2-53dba46ef5a8",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_unit_f-d8ab7e5b-d64f-4734-9214-6ebd99888dec",
+        "name": "cargo_unit_f-ed8af5ce-54a1-47d3-810c-a425b156abf1",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_structural_limit_kg_f-a7aeb1b3-9cfb-4637-a184-03e7479438a4",
+        "name": "cargo_structural_limit_kg_f-a64c0c13-d60d-40ec-917b-67a529a5f450",
         "left": 119,
         "right": 331
       },
@@ -2121,32 +2121,32 @@
         "right": 331
       },
       {
-        "name": "cargo_label_f-97f265a3-02ab-41a4-aa1a-a672cd35b212",
+        "name": "cargo_label_f-d865ae55-a03d-442c-ba3f-3481b68ea909",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_quantity_kind_f-94edf35d-c491-4c6c-a930-5a0aecef771f",
+        "name": "cargo_quantity_kind_f-35c10267-f2f4-4fa1-bf7d-cf83adb51c38",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_quantity_unit_f-a8d8c981-f98f-4f20-a7d0-3f3cf5245d6d",
+        "name": "cargo_quantity_unit_f-caa7c2ef-9a99-45db-bc4a-16b1673fc80b",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_logistic_unit_id_f-92a44004-e499-4d21-b4e3-ec5257822e43",
+        "name": "cargo_logistic_unit_id_f-558b9db3-1a01-48e0-bcff-b4024887835a",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_product_id_f-5147a0d4-2aa5-4c1d-8ea3-30747a589e14",
+        "name": "cargo_product_id_f-81f5e2f3-ad8a-4077-8aa2-54cb9e251ba2",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_quantity_f-4b3eba15-f706-4e18-8bbe-8b2b7ee6e883",
+        "name": "cargo_quantity_f-6180995d-694b-4d6e-b2c8-b7b14cc5c853",
         "left": 119,
         "right": 331
       },
@@ -2156,12 +2156,12 @@
         "right": 331
       },
       {
-        "name": "cargo_product_id_f-ac182a78-5079-4d40-9b4b-5262fd3f9c0a",
+        "name": "cargo_product_id_f-065901b0-66e4-4cd4-865c-1b666dbbc66e",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_quantity_f-f17a83b4-bd45-4333-bd4a-591631471fc8",
+        "name": "cargo_quantity_f-7d639988-bc8b-47eb-b4ec-87a6ef9c84df",
         "left": 119,
         "right": 331
       },
@@ -2176,67 +2176,67 @@
         "right": 331
       },
       {
-        "name": "cargo_length_f-c22b18d8-c3bd-4a75-abd8-9efe2e3e1587",
+        "name": "cargo_length_f-691d7c06-8577-428e-915c-8f9a11bd4f2f",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_width_f-2986afb8-a0ab-4e7d-bd00-c0b10c020589",
+        "name": "cargo_width_f-df25c09d-ea05-4396-87fe-45a2135b70a5",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_height_f-a4d80ccb-fe6f-4da8-b7e9-b7775edd5935",
+        "name": "cargo_height_f-a6235cc5-bebc-4ec1-8c4f-986fd02f357e",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_unit_f-99795bd4-f780-4834-bf30-e087fff9e080",
+        "name": "cargo_unit_f-948944b1-8741-4186-8e71-b77693d422de",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_value_f-b10928aa-7284-4e45-b7dc-9a2869b0258c",
+        "name": "cargo_value_f-a73dfba0-8017-4781-ab0b-04f9d184a832",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_unit_f-9d8e0b3d-4738-4cc4-be2d-aea6b7892b0d",
+        "name": "cargo_unit_f-1b7daf8a-dbab-4185-bd07-74e72e4ded03",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_value_f-57f605cc-e510-42af-b781-855410f10990",
+        "name": "cargo_value_f-d3de2b48-ba2f-4759-a70b-b053d62a9699",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_unit_f-70e489ae-84a0-45ed-bd51-3db3338d6890",
+        "name": "cargo_unit_f-f238ed39-564d-47c7-8a90-5010e06a716a",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_density_kg_per_m3_f-7e3a3dc1-7b96-440f-ad00-a8f60da729c4",
+        "name": "cargo_density_kg_per_m3_f-7a6480cd-be1d-42be-bd34-c23acdb2b5d3",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_value_f-90e2f9f3-4b81-462a-8f46-3369350ee9c4",
+        "name": "cargo_value_f-e7bae3fe-ec31-44d9-a65f-e45980ad5755",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_unit_f-e0272921-c06c-4553-b5d2-4f3075ac6fe4",
+        "name": "cargo_unit_f-b8f17f9f-aafb-4e3c-928f-ca3a38a5bedd",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_orientation_metadata_f-beea2b53-4387-42fd-9f3d-b1e4405a9dd6",
+        "name": "cargo_orientation_metadata_f-bf0e706a-4832-4261-872e-01ef1fe1ce9a",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo__stackable_f-88521d92-fd08-4725-945a-faf4b2713015",
+        "name": "cargo__stackable_f-acec1b9b-35f1-4f35-bd42-a97f11f21eb1",
         "left": 119,
         "right": 331
       },
@@ -2246,32 +2246,32 @@
         "right": 331
       },
       {
-        "name": "cargo_label_f-fab95922-89e4-4806-b375-3d8a38951cf9",
+        "name": "cargo_label_f-6ffc173f-8759-467e-a2d0-02c6066e4071",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_quantity_kind_f-0b96293b-e3a1-43f9-81c8-5d1d45082b65",
+        "name": "cargo_quantity_kind_f-1891b48e-3158-4b71-9f63-daa255b03f38",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_quantity_unit_f-3c66a21d-90e5-4158-b737-c1659f0aa2d9",
+        "name": "cargo_quantity_unit_f-a259d774-9f14-481c-ba22-9c6d8b9be1ad",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_logistic_unit_id_f-640e8b96-ff23-4277-9362-0d90bee3e9e5",
+        "name": "cargo_logistic_unit_id_f-d19e0ab6-9288-4445-9bab-7c16b620cf0c",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_product_id_f-f4001c60-d3e1-41c0-972e-3e814f5d44f3",
+        "name": "cargo_product_id_f-bcc6918c-8117-4c51-bc5b-acfef6527921",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_quantity_f-7e83bc59-abbb-49e2-80bd-10c76dbe6e45",
+        "name": "cargo_quantity_f-321ca8b2-0ef0-46e3-b342-cfc58a108b3e",
         "left": 119,
         "right": 331
       },
@@ -2286,67 +2286,67 @@
         "right": 331
       },
       {
-        "name": "cargo_length_f-f70170fd-7049-4104-ab53-a6fa7f234486",
+        "name": "cargo_length_f-505a12f7-2447-4374-bf05-af11e7ccda5c",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_width_f-19df6f19-2ced-4fe1-8515-6ad3b2b27bd1",
+        "name": "cargo_width_f-2d46bc05-15fc-42a0-9a63-d8b0f078a053",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_height_f-40705b3d-5de3-4837-b23c-bf0a5acedcc0",
+        "name": "cargo_height_f-d6def255-680b-4366-b296-1ad2eb4a412e",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_unit_f-a021a79d-6a52-4081-b105-28daaa8358fb",
+        "name": "cargo_unit_f-9e695634-dedc-462b-88d8-ac0452eb0419",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_value_f-1c317086-2409-47aa-a985-3f9926980cb3",
+        "name": "cargo_value_f-c0c45f26-3938-4000-9939-7c074066acc9",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_unit_f-9df4e7f8-9f2f-40c5-bcb3-7a5945f0a89e",
+        "name": "cargo_unit_f-1c30aac0-d36a-4a58-87b4-53814ccccaa6",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_value_f-71179f98-5cd3-43e0-9a9f-8d7b4b04a397",
+        "name": "cargo_value_f-56bc40e3-8614-465f-8222-ead9c0557d63",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_unit_f-2d600016-d2b7-423b-9762-f43a68986d5f",
+        "name": "cargo_unit_f-3cedc4c4-665d-4228-aebd-bd0c4cdd740b",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_density_kg_per_m3_f-03a1f055-75d5-4ff3-a03b-f8b89686333e",
+        "name": "cargo_density_kg_per_m3_f-8ea882b9-8648-4e02-b53e-dd00caeeb1a7",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_value_f-30501c92-fc0c-4cff-b8e7-6a90eb73e9fb",
+        "name": "cargo_value_f-a1e58f80-d20e-44e7-8577-9e730e8fce23",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_unit_f-00eb65cb-3500-47b4-ad2f-ae84b7e126b4",
+        "name": "cargo_unit_f-6373daec-783e-4d0e-9c17-6d68ce12ee3c",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo_orientation_metadata_f-ccbd5386-87a0-4d2b-9eeb-1f8981846277",
+        "name": "cargo_orientation_metadata_f-9d177aee-07f8-4741-85de-0364f4f15c37",
         "left": 119,
         "right": 331
       },
       {
-        "name": "cargo__stackable_f-b96f6d94-da04-4eee-a834-f243a0ba6b2a",
+        "name": "cargo__stackable_f-027bd73a-5915-48fb-ac63-1b4fcc3f0baf",
         "left": 119,
         "right": 331
       },
@@ -2508,77 +2508,77 @@
         "right": 204.296875
       },
       {
-        "name": "cargo_name_f-632f97e2-73e6-401c-90bf-d4018daf68de",
+        "name": "cargo_name_f-6478a929-cd3f-455a-9d56-aa70b75282d1",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_code_f-fa5b765e-61ed-49cd-9435-3ea6fca9f199",
+        "name": "cargo_code_f-883d0126-5f12-4c4c-8852-6c06510a176a",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_category_f-32513af1-b916-4034-8ba2-e861323577e0",
+        "name": "cargo_category_f-606962a4-0230-4a63-96f9-71ecdbe71510",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_unit_label_f-ea128b8c-633a-4676-9c17-0a0b4f0ee432",
+        "name": "cargo_unit_label_f-89d8f0ef-021d-4916-946a-3c8e8733a719",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_units_per_package_f-71ac0c9c-2abb-41af-b914-b7b1b0e14369",
+        "name": "cargo_units_per_package_f-97786778-9684-4995-b3b5-ba1d934c778e",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo__tags_f-46a0fc8f-0d55-40cf-88c2-e032f8782c58",
+        "name": "cargo__tags_f-d4337ee5-9112-4ad4-bdca-0b614a822670",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_value_f-8b0d45ab-020a-45db-87b4-7b8cfe235b4c",
+        "name": "cargo_value_f-25e5ca93-b04b-48ab-b643-1728d335ec72",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_unit_f-32c5c2a1-041c-43b9-b0ae-6733d3cab481",
+        "name": "cargo_unit_f-d58f35ab-82df-4076-bbfa-cea46ef94185",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_value_f-b33683b4-f3e7-45da-a272-7ebc49ccd5ba",
+        "name": "cargo_value_f-3e678add-ad92-4ffc-a068-79c9813c6f06",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_unit_f-92b447d0-8d2a-4312-94dc-c92f44770faf",
+        "name": "cargo_unit_f-d847b4a8-c846-4392-8ea7-d4f845364bd8",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_length_f-2bcf55ed-d386-4b4a-aa62-0fe4471026ed",
+        "name": "cargo_length_f-19319023-9571-47f8-85fa-edcdecf85c7e",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_width_f-4f053f99-2c13-4a67-82de-1f1d690b580b",
+        "name": "cargo_width_f-0cb12e27-312a-4da0-a2f1-e4a925f69150",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_height_f-d43a2db9-c0d9-4e53-9843-e7154ab2751a",
+        "name": "cargo_height_f-d00612d7-182d-49f9-a8e1-59d49b12ed06",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_unit_f-43d8fa06-7f54-4218-8119-5239ae4006be",
+        "name": "cargo_unit_f-494751ae-462c-47b5-bb6b-5486bd155bda",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_density_kg_per_m3_f-ba0c83c7-ce2b-461a-ab16-740a212266e2",
+        "name": "cargo_density_kg_per_m3_f-d97bc3ee-fc0f-405e-8d66-b73f94d36443",
         "left": 119,
         "right": 261
       },
@@ -2588,77 +2588,77 @@
         "right": 204.296875
       },
       {
-        "name": "cargo_name_f-5f7debd3-b347-475f-a851-aa7df1a2a495",
+        "name": "cargo_name_f-51a57b1e-04a1-4066-a6ac-6bd46d939b14",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_code_f-fc5d06ad-12a7-4e7b-9aac-0d53d4bfcdb7",
+        "name": "cargo_code_f-6de4be58-3651-4ecc-a621-014fed99103e",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_category_f-9771a43c-8dff-4ae5-a715-ccffc37a0350",
+        "name": "cargo_category_f-aee195ea-e25a-4d13-a4c2-e399532ae128",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_unit_label_f-dff5b467-1a01-49cd-889b-10ce31de50fe",
+        "name": "cargo_unit_label_f-eb2853bc-6c55-4653-9534-4048eb15fe43",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_units_per_package_f-b5f2a162-9673-450b-bdfd-70df02b85169",
+        "name": "cargo_units_per_package_f-ce84a748-cbc4-4a0d-8c68-9b459eeabe18",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo__tags_f-cb1f4cb8-cddc-4c03-8773-f53e396ca3d9",
+        "name": "cargo__tags_f-b4fc5bce-9108-4ce7-8347-fdb8071101d6",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_value_f-8e081a57-c756-4ce9-9ff5-ddf551385f65",
+        "name": "cargo_value_f-bc1ce38c-1b2f-4e5f-b531-c99037640c48",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_unit_f-c089f4ca-849c-45bc-86f3-fa7e53355169",
+        "name": "cargo_unit_f-ddf84682-59e9-4cfe-8798-fba50ea8121e",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_value_f-d4910f13-7d95-43df-ac19-0579b8c9b204",
+        "name": "cargo_value_f-b471e147-79f4-41a1-a9a7-777ea1ce873b",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_unit_f-ee5ed0e5-797e-4161-b318-38a0c46d4056",
+        "name": "cargo_unit_f-2252fb59-63e0-45d5-9ee4-554aff7e6756",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_length_f-13b2941a-cf96-454e-94a1-a6563058ef57",
+        "name": "cargo_length_f-8995fc78-badc-44a8-b263-f9b58123b8a3",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_width_f-5f9eaab9-7377-4fe5-9586-f102cf7822e3",
+        "name": "cargo_width_f-ffc519e4-2dc9-4337-b91c-2ce5c314bd81",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_height_f-ef0faedf-61fe-400e-889d-7800b94588f6",
+        "name": "cargo_height_f-d0e21f10-fa11-486a-8b13-b9078824e98b",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_unit_f-e8d22db8-b2a8-4bc9-861f-8da731725a1c",
+        "name": "cargo_unit_f-9f34f5ca-f79b-4613-a9ab-b30d8781bba1",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_density_kg_per_m3_f-4c307aa2-9036-4969-add0-df414a61a9b5",
+        "name": "cargo_density_kg_per_m3_f-d4aa141f-4814-40aa-8ee7-d25b471fa617",
         "left": 119,
         "right": 261
       },
@@ -2673,47 +2673,47 @@
         "right": 204.296875
       },
       {
-        "name": "cargo_label_f-fd25c67e-3533-44f8-b9be-08c037a11388",
+        "name": "cargo_label_f-49a690c2-0031-40aa-8aa9-5b24118a1d11",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_type_f-a2577ca2-c577-46dd-8a17-7b756babef81",
+        "name": "cargo_type_f-a0d0e153-d986-4282-ae15-35b4830868cf",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_length_f-718b6eaf-05a9-4742-a8cd-2c90de9c8b4f",
+        "name": "cargo_length_f-59368131-7190-4093-9fe0-4cba78613e65",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_width_f-21e9272c-d30f-4010-a4e0-1224fe85fb19",
+        "name": "cargo_width_f-097eaf72-db05-47e2-ba33-474afd1ffa79",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_height_f-cfd62da7-9c52-4df2-a851-86e3b025b683",
+        "name": "cargo_height_f-0fedb3c5-b77a-4c24-8459-b631f1ecb067",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_unit_f-863cf244-d5d3-4e45-9d27-8e165ea1a930",
+        "name": "cargo_unit_f-44fd9448-6c49-4608-bab1-cbc49e868119",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_value_f-b2455c70-419d-4763-8d24-8a31c4ee38c5",
+        "name": "cargo_value_f-be8aaa62-e409-4ad2-86c2-53dba46ef5a8",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_unit_f-d8ab7e5b-d64f-4734-9214-6ebd99888dec",
+        "name": "cargo_unit_f-ed8af5ce-54a1-47d3-810c-a425b156abf1",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_structural_limit_kg_f-a7aeb1b3-9cfb-4637-a184-03e7479438a4",
+        "name": "cargo_structural_limit_kg_f-a64c0c13-d60d-40ec-917b-67a529a5f450",
         "left": 119,
         "right": 261
       },
@@ -2728,32 +2728,32 @@
         "right": 204.296875
       },
       {
-        "name": "cargo_label_f-97f265a3-02ab-41a4-aa1a-a672cd35b212",
+        "name": "cargo_label_f-d865ae55-a03d-442c-ba3f-3481b68ea909",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_quantity_kind_f-94edf35d-c491-4c6c-a930-5a0aecef771f",
+        "name": "cargo_quantity_kind_f-35c10267-f2f4-4fa1-bf7d-cf83adb51c38",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_quantity_unit_f-a8d8c981-f98f-4f20-a7d0-3f3cf5245d6d",
+        "name": "cargo_quantity_unit_f-caa7c2ef-9a99-45db-bc4a-16b1673fc80b",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_logistic_unit_id_f-92a44004-e499-4d21-b4e3-ec5257822e43",
+        "name": "cargo_logistic_unit_id_f-558b9db3-1a01-48e0-bcff-b4024887835a",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_product_id_f-5147a0d4-2aa5-4c1d-8ea3-30747a589e14",
+        "name": "cargo_product_id_f-81f5e2f3-ad8a-4077-8aa2-54cb9e251ba2",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_quantity_f-4b3eba15-f706-4e18-8bbe-8b2b7ee6e883",
+        "name": "cargo_quantity_f-6180995d-694b-4d6e-b2c8-b7b14cc5c853",
         "left": 119,
         "right": 261
       },
@@ -2763,12 +2763,12 @@
         "right": 261
       },
       {
-        "name": "cargo_product_id_f-ac182a78-5079-4d40-9b4b-5262fd3f9c0a",
+        "name": "cargo_product_id_f-065901b0-66e4-4cd4-865c-1b666dbbc66e",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_quantity_f-f17a83b4-bd45-4333-bd4a-591631471fc8",
+        "name": "cargo_quantity_f-7d639988-bc8b-47eb-b4ec-87a6ef9c84df",
         "left": 119,
         "right": 261
       },
@@ -2783,67 +2783,67 @@
         "right": 261
       },
       {
-        "name": "cargo_length_f-c22b18d8-c3bd-4a75-abd8-9efe2e3e1587",
+        "name": "cargo_length_f-691d7c06-8577-428e-915c-8f9a11bd4f2f",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_width_f-2986afb8-a0ab-4e7d-bd00-c0b10c020589",
+        "name": "cargo_width_f-df25c09d-ea05-4396-87fe-45a2135b70a5",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_height_f-a4d80ccb-fe6f-4da8-b7e9-b7775edd5935",
+        "name": "cargo_height_f-a6235cc5-bebc-4ec1-8c4f-986fd02f357e",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_unit_f-99795bd4-f780-4834-bf30-e087fff9e080",
+        "name": "cargo_unit_f-948944b1-8741-4186-8e71-b77693d422de",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_value_f-b10928aa-7284-4e45-b7dc-9a2869b0258c",
+        "name": "cargo_value_f-a73dfba0-8017-4781-ab0b-04f9d184a832",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_unit_f-9d8e0b3d-4738-4cc4-be2d-aea6b7892b0d",
+        "name": "cargo_unit_f-1b7daf8a-dbab-4185-bd07-74e72e4ded03",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_value_f-57f605cc-e510-42af-b781-855410f10990",
+        "name": "cargo_value_f-d3de2b48-ba2f-4759-a70b-b053d62a9699",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_unit_f-70e489ae-84a0-45ed-bd51-3db3338d6890",
+        "name": "cargo_unit_f-f238ed39-564d-47c7-8a90-5010e06a716a",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_density_kg_per_m3_f-7e3a3dc1-7b96-440f-ad00-a8f60da729c4",
+        "name": "cargo_density_kg_per_m3_f-7a6480cd-be1d-42be-bd34-c23acdb2b5d3",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_value_f-90e2f9f3-4b81-462a-8f46-3369350ee9c4",
+        "name": "cargo_value_f-e7bae3fe-ec31-44d9-a65f-e45980ad5755",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_unit_f-e0272921-c06c-4553-b5d2-4f3075ac6fe4",
+        "name": "cargo_unit_f-b8f17f9f-aafb-4e3c-928f-ca3a38a5bedd",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_orientation_metadata_f-beea2b53-4387-42fd-9f3d-b1e4405a9dd6",
+        "name": "cargo_orientation_metadata_f-bf0e706a-4832-4261-872e-01ef1fe1ce9a",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo__stackable_f-88521d92-fd08-4725-945a-faf4b2713015",
+        "name": "cargo__stackable_f-acec1b9b-35f1-4f35-bd42-a97f11f21eb1",
         "left": 119,
         "right": 261
       },
@@ -2853,32 +2853,32 @@
         "right": 204.296875
       },
       {
-        "name": "cargo_label_f-fab95922-89e4-4806-b375-3d8a38951cf9",
+        "name": "cargo_label_f-6ffc173f-8759-467e-a2d0-02c6066e4071",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_quantity_kind_f-0b96293b-e3a1-43f9-81c8-5d1d45082b65",
+        "name": "cargo_quantity_kind_f-1891b48e-3158-4b71-9f63-daa255b03f38",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_quantity_unit_f-3c66a21d-90e5-4158-b737-c1659f0aa2d9",
+        "name": "cargo_quantity_unit_f-a259d774-9f14-481c-ba22-9c6d8b9be1ad",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_logistic_unit_id_f-640e8b96-ff23-4277-9362-0d90bee3e9e5",
+        "name": "cargo_logistic_unit_id_f-d19e0ab6-9288-4445-9bab-7c16b620cf0c",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_product_id_f-f4001c60-d3e1-41c0-972e-3e814f5d44f3",
+        "name": "cargo_product_id_f-bcc6918c-8117-4c51-bc5b-acfef6527921",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_quantity_f-7e83bc59-abbb-49e2-80bd-10c76dbe6e45",
+        "name": "cargo_quantity_f-321ca8b2-0ef0-46e3-b342-cfc58a108b3e",
         "left": 119,
         "right": 261
       },
@@ -2893,67 +2893,67 @@
         "right": 261
       },
       {
-        "name": "cargo_length_f-f70170fd-7049-4104-ab53-a6fa7f234486",
+        "name": "cargo_length_f-505a12f7-2447-4374-bf05-af11e7ccda5c",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_width_f-19df6f19-2ced-4fe1-8515-6ad3b2b27bd1",
+        "name": "cargo_width_f-2d46bc05-15fc-42a0-9a63-d8b0f078a053",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_height_f-40705b3d-5de3-4837-b23c-bf0a5acedcc0",
+        "name": "cargo_height_f-d6def255-680b-4366-b296-1ad2eb4a412e",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_unit_f-a021a79d-6a52-4081-b105-28daaa8358fb",
+        "name": "cargo_unit_f-9e695634-dedc-462b-88d8-ac0452eb0419",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_value_f-1c317086-2409-47aa-a985-3f9926980cb3",
+        "name": "cargo_value_f-c0c45f26-3938-4000-9939-7c074066acc9",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_unit_f-9df4e7f8-9f2f-40c5-bcb3-7a5945f0a89e",
+        "name": "cargo_unit_f-1c30aac0-d36a-4a58-87b4-53814ccccaa6",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_value_f-71179f98-5cd3-43e0-9a9f-8d7b4b04a397",
+        "name": "cargo_value_f-56bc40e3-8614-465f-8222-ead9c0557d63",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_unit_f-2d600016-d2b7-423b-9762-f43a68986d5f",
+        "name": "cargo_unit_f-3cedc4c4-665d-4228-aebd-bd0c4cdd740b",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_density_kg_per_m3_f-03a1f055-75d5-4ff3-a03b-f8b89686333e",
+        "name": "cargo_density_kg_per_m3_f-8ea882b9-8648-4e02-b53e-dd00caeeb1a7",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_value_f-30501c92-fc0c-4cff-b8e7-6a90eb73e9fb",
+        "name": "cargo_value_f-a1e58f80-d20e-44e7-8577-9e730e8fce23",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_unit_f-00eb65cb-3500-47b4-ad2f-ae84b7e126b4",
+        "name": "cargo_unit_f-6373daec-783e-4d0e-9c17-6d68ce12ee3c",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo_orientation_metadata_f-ccbd5386-87a0-4d2b-9eeb-1f8981846277",
+        "name": "cargo_orientation_metadata_f-9d177aee-07f8-4741-85de-0364f4f15c37",
         "left": 119,
         "right": 261
       },
       {
-        "name": "cargo__stackable_f-b96f6d94-da04-4eee-a834-f243a0ba6b2a",
+        "name": "cargo__stackable_f-027bd73a-5915-48fb-ac63-1b4fcc3f0baf",
         "left": 119,
         "right": 261
       },
