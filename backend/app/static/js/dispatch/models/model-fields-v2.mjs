@@ -1,68 +1,205 @@
-import {el,field,choices,button,collapsibleSection} from './forms.mjs';
+import {el,field,choices,button,confirmAction} from './forms.mjs';
 import {mountCargoEditor} from './cargo-editor.mjs';
+import {guidedBlock,guidedStep,radioCards,note,readout} from './guided-ui.mjs';
 
 const ROLES=[['SHIPPER','Generador de carga'],['LOGISTICS_PROVIDER','Proveedor logístico'],['HYBRID','Operación híbrida']];
 const DIMS=[['pallets','Pallets'],['weight_kg','Peso (kg)'],['volume_m3','Volumen (m³)'],['units','Unidades']];
-const PROFILES=[['PALLETIZED','Carga palletizada'],['PACKAGED','Bultos y cajas'],['DRY_BULK','Granel sólido'],['LIQUID_BULK','Granel líquido'],['SPECIALIZED','Carga especializada'],['MIXED','Operación mixta']];
+const PROFILES=[
+ ['PALLETIZED','Carga palletizada','Mercadería agrupada en pallets, ideal para distribución y operaciones de alto volumen.','pallet'],
+ ['PACKAGED','Cajas y bultos','Unidades sueltas (cajas, bultos o paquetes) sin palletizar.','box'],
+ ['DRY_BULK','Granel sólido','Productos a granel en estado sólido, como granos, minerales o polvos.','mound'],
+ ['LIQUID_BULK','Granel líquido','Productos a granel en estado líquido, como aceites o combustibles.','drop'],
+ ['SPECIALIZED','Carga especializada','Recursos o condiciones particulares, sujetos a verificación externa.','container'],
+ ['MIXED','Operación mixta','Combinación de distintos perfiles de carga dentro de una misma operación.','layers']
+];
 const CATEGORIES=[['GENERAL','Carga general'],['REFRIGERATED','Refrigerado'],['TANKER','Cisterna'],['BULK','Granel'],['FLATBED','Plataforma']];
-
+const PHYSICAL_SOURCES={COMPONENT_GROSS_PLUS_EXPLICIT_TARE:'componentes y tara declarados',DECLARED_GROSS_MASS:'peso bruto declarado',LOADED_EXTERIOR_DIMENSIONS:'dimensiones exteriores cargadas',DECLARED_EXTERIOR_VOLUME:'volumen exterior declarado',EXPLICIT_DENSITY_TIMES_VOLUME:'densidad explícita por volumen',MASS_OVER_EXPLICIT_DENSITY:'peso dividido por densidad explícita',EXPLICIT_QUANTITY_UNIT:'unidad física declarada'};
+const STEP_COPY=[
+ ['Perfil de carga','Seleccioná cómo se transporta habitualmente tu mercadería. Esto nos permite adaptar la configuración del modelo.'],
+ ['Unidad logística','Distinguí el soporte vacío de la presentación cargada. Las propiedades persistentes se configuran en Detallado.'],
+ ['Nivel de detalle','Elegí cuánta información querés modelar sobre la unidad de carga.'],
+ ['Productos','Registrá productos y sus propiedades físicas relevantes para la operación.'],
+ ['Productos y composición','Definí qué productos y cantidades contiene cada presentación de carga.'],
+ ['Capacidades y reglas','Configurá restricciones físicas, fraccionamiento y compatibilidad.'],
+ ['Revisar y validar','Comprobá el modelo y sus contratos antes de guardarlo.']
+];
 export function mountModelFieldsV2(form,scope,draft){
- const cfg=structuredClone(draft.configuration),host=el('div',undefined,'model-wizard-v2');host.dataset.dationTest='model-wizard-v2';form.append(host);
- const blocks=[['01. Identidad del modelo','Nombrá la operación y describí su alcance.'],['02. Operación logística','Transporte directo de origen a destino, con reglas explícitas de consolidación.'],['03. Carga y capacidad','Definí cantidades directas o un catálogo reutilizable de productos y presentaciones.'],['04. Recursos de transporte','Elegí fuentes y categorías de recursos admitidas.'],['05. Moneda y costos','Las tarifas reales se informan después con la flota. Un costo desconocido no equivale a cero.']].map(([title,copy],i)=>collapsibleSection(host,title,copy,{open:i===0}));
- blocks.forEach((b,i)=>{b.details.dataset.dationTest='model-v2-block-'+(i+1);b.details.classList.add('model-v2-block');});
+ const cfg=structuredClone(draft.configuration),saved=draft.guided_ux||{},confirmed={...(saved.confirmed||{})},subconfirmed={...(saved.subconfirmed||{})};
+ const host=el('div',undefined,'model-wizard-v2');host.dataset.dationTest='model-wizard-v2';form.append(host);
+ const definitions=[
+  ['Identidad del modelo','Definí un nombre y describí el alcance de este modelo logístico.','tag'],
+  ['Operación logística','Indicá tu rol y cómo se organizan los envíos y la consolidación de órdenes.','resources'],
+  ['Carga y capacidad','Configurá qué transportás, cómo se presenta la carga y qué capacidades se controlan.','pallet'],
+  ['Recursos de transporte','Definí recursos propios o externos y las categorías de vehículos admitidas.','resources'],
+  ['Moneda y costos','Seleccioná moneda y criterios de cálculo de los costos de transporte.','costs']
+ ];
+ const blocks=definitions.map(([title,copy,icon],i)=>guidedBlock(host,i+1,title,copy,icon,{open:saved.openBlocks?saved.openBlocks.includes(i+1):i===0}));
  const [identity,operation,cargo,resources,costs]=blocks.map(b=>b.body);
  const name=field(identity,'Nombre del modelo *',{name:'model_name',value:draft.name,required:true,maxLength:120}),description=field(identity,'Descripción del modelo (opcional)',{name:'model_description',type:'textarea',value:draft.description,maxLength:1000});
  const role=field(operation,'Rol operativo',{name:'operating_role',options:ROLES,value:cfg.operating_role});
  field(operation,'Patrón de transporte',{name:'transport_pattern',value:'Directo · origen a destino',readOnly:true,help:'No incluye rutas multiparada ni logística inversa.'});
  const consolidate=field(operation,'¿Varias órdenes pueden compartir viaje?',{name:'consolidation_permitted',options:[['yes','Sí, si cumplen compatibilidad y capacidades'],['no','No, una orden por viaje']],value:cfg.consolidation_permitted?'yes':'no'});
- const profile=field(cargo,'Perfil de carga',{name:'cargo_profile',options:PROFILES,value:cfg.cargo.profile}),mode=field(cargo,'Modo de ingreso',{name:'cargo_input_mode',options:[['direct','Datos directos · sin catálogo'],['catalog','Productos y presentaciones']],value:cfg.cargo.input_mode});
- const primary=field(cargo,'Dimensión principal de reporte',{name:'primary_dimension',options:DIMS,value:cfg.primary_dimension}),dimensions=choices(cargo,'Dimensiones de capacidad activas','dimensions',DIMS,cfg.active_dimensions);
- const split=field(cargo,'Fraccionamiento',{name:'cargo_split_policy',options:[['INDIVISIBLE','Orden completa indivisible'],['DISCRETE','Por unidades logísticas completas'],['CONTINUOUS','Granel divisible en incremento explícito']],value:cfg.cargo.split_policy});
- const compat=field(cargo,'Compatibilidad de carga',{name:'cargo_compatibility',options:[['UNIFORM_DECLARED','Uniforme declarada'],['CATEGORIZED','Por categorías explícitas']],value:cfg.cargo.compatibility_policy});
- const coLoad=field(cargo,'Pares de categorías que pueden compartir carga',{name:'cargo_co_load_pairs',type:'textarea',value:(cfg.cargo.co_load_pairs||[]).map(p=>p.join(' + ')).join('\n'),help:'Una pareja por línea: SECO + REFRIGERADO. Elegibilidad de recurso y co-carga se validan por separado.'});
- const suggestions=button('Aplicar sugerencia de dimensiones del perfil',()=>{const dims=['DRY_BULK','LIQUID_BULK'].includes(profile.value)?['weight_kg','volume_m3']:profile.value==='PACKAGED'?['units','weight_kg']:['pallets','weight_kg','volume_m3'];primary.value=dims[0];for(const n of cargo.querySelectorAll('[name=dimensions]'))n.checked=dims.includes(n.value);if(['DRY_BULK','LIQUID_BULK'].includes(profile.value))split.value='CONTINUOUS';suggestions.dispatchEvent(new Event('change',{bubbles:true}));});cargo.append(suggestions);
- const catalogue=el('div',undefined,'model-v2-catalogue');cargo.append(catalogue);
- const editor=mountCargoEditor(catalogue,scope,{products:cfg.cargo.products||[],logistic_units:cfg.cargo.logistic_units||[],presentations:cfg.cargo.presentations||[]});
- const physical=el('div',undefined,'model-v2-physical');physical.dataset.dationTest='cargo-physical-preview';physical.role='status';cargo.append(physical);
+ const steps=STEP_COPY.map(([title,copy],i)=>guidedStep(cargo,i+1,title,copy,{open:saved.openSteps?saved.openSteps.includes(i+1):i===0}));
+ const profile=radioCards(steps[0].body,'Perfil de carga','cargo_profile',PROFILES,cfg.cargo.profile),recommendation=note(steps[0].body,'');
+ const directGuide=el('div'),unitHost=el('div');steps[1].body.append(directGuide,unitHost);
+ note(directGuide,'En configuración básica, las cantidades de carga y capacidades se declaran en las plantillas de órdenes y recursos. No se guarda un soporte físico reutilizable.');
+ directGuide.append(button('Elegir nivel de detalle',()=>go(3)));
+ const mode=radioCards(steps[2].body,'Nivel de detalle','cargo_input_mode',[
+  ['direct','Configuración básica','Trabajá con cantidades de carga declaradas en tus plantillas, sin catálogo de productos.','box'],
+  ['catalog','Configuración detallada','Identificá productos, embalaje y cómo se combinan en presentaciones homogéneas o mixtas.','layers']
+ ],cfg.cargo.input_mode);mode.root.classList.add('guided-detail-options');
+ const modeNote=note(steps[2].body,''),na=note(steps[2].body,'Pasos4 y5 · No aplica: modo básico.');
+ const initial=saved.catalogue||{products:cfg.cargo.products||[],logistic_units:cfg.cargo.logistic_units||[],presentations:cfg.cargo.presentations||[]};
+ // This is local UI state only. collect().configuration excludes it in direct.
+ let editor;
+ const rules=steps[5].body;
+ const dimensions=choices(rules,'Dimensiones de capacidad activas','dimensions',DIMS,cfg.active_dimensions);
+ rules.append(el('p','Dation verifica simultáneamente todos los límites seleccionados. El volumen es escalar: no certifica encaje tridimensional.','d-field__help'));
+ const primary=field(rules,'Dimensión principal de reporte',{name:'primary_dimension',options:DIMS,value:cfg.primary_dimension,help:'Referencia para cantidades y determinados objetivos; los demás límites siguen activos.'});
+ const split=field(rules,'Fraccionamiento',{name:'cargo_split_policy',options:[['INDIVISIBLE','Orden completa en un viaje o no servida'],['DISCRETE','Cantidades discretas completas'],['CONTINUOUS','Granel por incremento físico']],value:cfg.cargo.split_policy});
+ const compat=field(rules,'Compatibilidad de carga',{name:'cargo_compatibility',options:[['UNIFORM_DECLARED','Uniforme declarada'],['CATEGORIZED','Por categorías explícitas']],value:cfg.cargo.compatibility_policy});
+ note(rules,'Que un recurso pueda transportar dos productos no significa que puedan viajar juntos. Elegibilidad del recurso y co-carga se configuran por separado.');
+ const pairsHost=el('section',undefined,'guided-pairs'),pairRows=el('div'),pairs=structuredClone(cfg.cargo.co_load_pairs||[]);pairsHost.append(el('h4','Pares autorizados para co-carga'),pairRows);rules.append(pairsHost);
+ const groups=el('datalist');groups.id='guided-compatibility-'+crypto.randomUUID();pairsHost.append(groups);
+ function renderPairs(){
+  pairRows.replaceChildren();
+  pairs.forEach((pair,index)=>{
+   const row=el('div',undefined,'guided-pair-row');pairRows.append(row);
+   pair.forEach((value,side)=>{const input=field(row,'Categoría '+(side===0?'A':'B'),{name:'cargo_pair_'+index+'_'+side,value,required:true});input.setAttribute('list',groups.id);scope.listen(input,'input',()=>{pair[side]=input.value.trim();});});
+   row.append(button('Quitar pareja',()=>{pairs.splice(index,1);renderPairs();host.dispatchEvent(new Event('change',{bubbles:true}));}));
+  });
+ }
+ const addPair=button('Agregar pareja de co-carga',()=>{if(pairs.length>=100)return;pairs.push(['','']);renderPairs();host.dispatchEvent(new Event('change',{bubbles:true}));pairRows.lastElementChild?.querySelector('input')?.focus();});pairsHost.append(addPair);renderPairs();
+ const suggestion=button('Aplicar sugerencia de dimensiones del perfil',async()=>{
+  const proposed=['DRY_BULK','LIQUID_BULK'].includes(profile.value)?['weight_kg','volume_m3']:profile.value==='PACKAGED'?['units','weight_kg']:['pallets','weight_kg'];
+  const proposedPrimary=proposed.includes(primary.value)?primary.value:proposed[0];
+  if(JSON.stringify(dimensions())!==JSON.stringify(proposed)&&!await confirmAction(host.closest('form'),scope,'Aplicar dimensiones sugeridas','Se reemplazarán las dimensiones activas por '+proposed.map(d=>DIMS.find(([id])=>id===d)[1]).join(' + ')+'. La principal será '+DIMS.find(([id])=>id===proposedPrimary)[1]+'. Las reglas de fraccionamiento no cambian.','Aplicar sugerencia'))return;
+  for(const n of rules.querySelectorAll('[name=dimensions]'))n.checked=proposed.includes(n.value);
+  primary.replaceChildren(...DIMS.filter(([v])=>proposed.includes(v)).map(([v,label])=>{const option=el('option',label);option.value=v;return option;}));
+  primary.value=proposedPrimary;host.dispatchEvent(new Event('change',{bubbles:true}));
+ });rules.append(suggestion);
+ const categoryHint=note(rules,'');
+ editor=mountCargoEditor({units:unitHost,products:steps[3].body,presentations:steps[4].body},scope,initial,{profile:()=>profile.value,categorized:()=>compat.value==='CATEGORIZED',ui:saved.selection||{},onNavigate:go});
+ const physical=el('div',undefined,'model-v2-physical');physical.dataset.dationTest='cargo-physical-preview';physical.role='status';steps[6].body.append(physical);
+ const reviewSummary=el('dl',undefined,'guided-review-summary');steps[6].body.append(reviewSummary);
+ const reviewLabel=el('label',undefined,'d-choice guided-review-confirm'),review=el('input',undefined,'d-check');review.type='checkbox';review.name='cargo_review';review.dataset.guidedUi='true';reviewLabel.append(review,el('span','Revisé la configuración y sus límites. Confirmar este borrador validado por Dation.'));steps[6].body.append(reviewLabel);
+ const cargoErrors=el('p',undefined,'d-field__error');cargoErrors.dataset.errorFor='cargo_catalog';cargoErrors.role='alert';steps[6].body.append(cargoErrors);
  const sources=choices(resources,'Fuentes de recursos','sources',[['OWN','Propios'],['EXTERNAL','Externos']],cfg.allowed_sources);
- const categories=choices(resources,'Categorías admitidas (opcional)','resource_categories',[...CATEGORIES,...cfg.resource_categories.filter(v=>!CATEGORIES.some(([key])=>key===v)).map(v=>[v,v])],cfg.resource_categories);
- resources.append(el('p','Refrigerado, cisterna y otras categorías son filtros declarados; no certifican temperatura, peligrosidad ni requisitos técnicos del vehículo.','d-field__help'));
+ const sourceError=el('p',undefined,'d-field__error');sourceError.dataset.modelErrorFor='sources';sourceError.id='guided-source-error-'+crypto.randomUUID();sourceError.role='alert';resources.append(sourceError);
+ for(const input of resources.querySelectorAll('[name=sources]'))input.setAttribute('aria-describedby',sourceError.id);
+ choices(resources,'Categorías admitidas (opcional)','resource_categories',[...CATEGORIES,...cfg.resource_categories.filter(v=>!CATEGORIES.some(([key])=>key===v)).map(v=>[v,v])],cfg.resource_categories);
+ const categoryValues=()=>[...resources.querySelectorAll('[name=resource_categories]:checked')].map(n=>n.value);
+ resources.append(el('p','Las categorías son filtros declarados: no certifican temperatura, peligrosidad ni condiciones técnicas.','d-field__help'));
  const currency=field(costs,'Moneda *',{name:'currency',value:cfg.currency_policy.currency,required:true,maxLength:3}),minor=field(costs,'Decimales monetarios',{name:'minor_units',options:Array.from({length:7},(_,i)=>[String(i),String(i)]),value:String(cfg.currency_policy.minor_units)});
  const own=field(costs,'Costo de recursos propios',{name:'own_cost',value:'Costo operativo por km · ciclo directo de ida y vuelta',readOnly:true});
  const external=choices(costs,'Tarifas externas permitidas','external_costs',[['PER_TRIP','Por viaje'],['PER_KM','Por kilómetro']],cfg.external_cost_models),billing=choices(costs,'Base de facturación por km','billing',[['ONE_WAY','Sólo ida'],['ROUND_TRIP','Ida y vuelta']],cfg.per_km_billing_bases);
- const summary=el('aside',undefined,'model-v2-summary');summary.dataset.dationTest='model-v2-summary';summary.role='status';host.append(summary);let locked=false;
- const pairs=()=>coLoad.value.split('\n').filter(s=>s.trim()).map(s=>s.split('+').map(v=>v.trim()));
- const collect=()=>({id:draft.id,expected_revision:draft.expected_revision,name:name.value.trim(),description:description.value.trim(),status:draft.status||'active',configuration:{version:2,operating_role:role.value,transport_pattern:'DIRECT',consolidation_permitted:consolidate.value==='yes',allowed_sources:sources(),resource_categories:categories(),active_dimensions:dimensions(),primary_dimension:primary.value,split_permitted:split.value!=='INDIVISIBLE',homogeneous_loads_declared:compat.value==='UNIFORM_DECLARED',currency_policy:{currency:currency.value.trim().toUpperCase(),minor_units:Number(minor.value),rounding:'ROUND_HALF_UP'},own_cost_model:'OWN_OPERATING_CYCLE',external_cost_models:sources().includes('EXTERNAL')?external():[],per_km_billing_bases:sources().includes('EXTERNAL')&&external().includes('PER_KM')?billing():[],cargo:{profile:profile.value,input_mode:mode.value,split_policy:split.value,compatibility_policy:compat.value,co_load_pairs:compat.value==='CATEGORIZED'?pairs():[],...(mode.value==='catalog'?editor.read():{products:[],logistic_units:[],presentations:[]})}}});
+ costs.append(el('p','Las tarifas reales se informan con la flota. Un costo desconocido no equivale a cero.','d-field__help'));
+ let locked=false,published=false,compiledKey=null,compiledData=null,serverError='',lastConfig='',previousMode=mode.value,activeStep=saved.activeStep||1;
+ const summary=el('aside',undefined,'model-v2-summary');summary.dataset.dationTest='model-v2-summary';host.append(summary);
+ const config=()=>({version:2,operating_role:role.value,transport_pattern:'DIRECT',consolidation_permitted:consolidate.value==='yes',allowed_sources:sources(),resource_categories:categoryValues(),active_dimensions:dimensions(),primary_dimension:primary.value,split_permitted:split.value!=='INDIVISIBLE',homogeneous_loads_declared:compat.value==='UNIFORM_DECLARED',currency_policy:{currency:currency.value.trim().toUpperCase(),minor_units:Number(minor.value),rounding:'ROUND_HALF_UP'},own_cost_model:'OWN_OPERATING_CYCLE',external_cost_models:sources().includes('EXTERNAL')?external():[],per_km_billing_bases:sources().includes('EXTERNAL')&&external().includes('PER_KM')?billing():[],cargo:{profile:profile.value,input_mode:mode.value,split_policy:split.value,compatibility_policy:compat.value,co_load_pairs:compat.value==='CATEGORIZED'?pairs:[],...(mode.value==='catalog'?editor.read():{products:[],logistic_units:[],presentations:[]})}});
+ const signature=()=>JSON.stringify(config());
+ const localSignatures=c=>[JSON.stringify([name.value,description.value]),JSON.stringify([c.operating_role,c.consolidation_permitted]),JSON.stringify(c),JSON.stringify([c.allowed_sources,c.resource_categories]),JSON.stringify([c.currency_policy,c.external_cost_models,c.per_km_billing_bases])];
+ function subSignatures(c){
+  return [c.cargo.profile,JSON.stringify([c.cargo.logistic_units,c.cargo.presentations.map(p=>[p.presentation_id,p.loaded_dimensions,p.gross_mass])]),c.cargo.input_mode,JSON.stringify(c.cargo.products),JSON.stringify([c.cargo.products,c.cargo.logistic_units,c.cargo.presentations]),JSON.stringify([c.active_dimensions,c.primary_dimension,c.cargo.split_policy,c.cargo.compatibility_policy,c.cargo.co_load_pairs]),JSON.stringify(c)];
+ }
+ const collect=()=>({id:draft.id,expected_revision:draft.expected_revision,name:name.value.trim(),description:description.value.trim(),status:draft.status||'active',configuration:config(),
+  guided_ux:{catalogue:editor.snapshot(),selection:editor.ui(),confirmed:{...confirmed},subconfirmed:{...subconfirmed},activeStep,openSteps:steps.flatMap((s,i)=>s.details.open?[i+1]:[]),openBlocks:blocks.flatMap((b,i)=>b.details.open?[i+1]:[])}});
  function validate(){
-  const value=collect(),c=value.configuration,e={};
-  if(!value.name)e.model_name='Ingresá el nombre del Logistics Model.';
-  if(!c.allowed_sources.length)e.operating_role='Elegí al menos una fuente de recursos.';
-  if(!c.active_dimensions.includes(c.primary_dimension))e.primary_dimension='La dimensión principal debe estar activa.';
+  const c=config(),e={};if(!name.value.trim())e.model_name='Ingresá el nombre del Logistics Model.';
+  if(!c.allowed_sources.length)e.sources='Elegí al menos una fuente de recursos.';
+  if(!c.active_dimensions.length||!c.active_dimensions.includes(c.primary_dimension))e.primary_dimension='La dimensión principal debe estar activa.';
   if(!/^[A-Z]{3}$/.test(c.currency_policy.currency))e.currency='Ingresá una moneda de tres letras, por ejemplo ARS.';
   if(c.allowed_sources.includes('EXTERNAL')&&!c.external_cost_models.length)e.own_cost='Elegí una tarifa externa permitida.';
   if(c.allowed_sources.includes('EXTERNAL')&&c.external_cost_models.includes('PER_KM')&&!c.per_km_billing_bases.length)e.own_cost='Elegí una base de facturación por kilómetro.';
-  if(c.cargo.co_load_pairs.some(p=>p.length!==2||p.some(v=>!v)))e.cargo_co_load_pairs='Ingresá exactamente dos categorías por pareja.';
-  if(c.cargo.input_mode==='catalog'&&(!c.cargo.products.length||!c.cargo.presentations.length))e.cargo_input_mode='Agregá al menos un producto y una presentación física.';
-  for(const n of host.querySelectorAll('input,select,textarea'))if(!n.disabled&&!n.validity.valid)e[n.name]=n.validationMessage;
+  if(c.cargo.co_load_pairs.some(p=>p.length!==2||p.some(v=>!v)))e.cargo_catalog='Ingresá exactamente dos categorías por pareja.';
+  if(c.cargo.input_mode==='catalog'){const message=editor.validate();if(message)e.cargo_catalog=message;}
+  for(const n of host.querySelectorAll('input,select,textarea'))if(!n.disabled&&!n.dataset.guidedUi&&!n.validity.valid)e[n.name]=n.validationMessage;
   return e;
  }
- const sectionValidity=()=>{const errors=validate();return blocks.map((b,i)=>!Object.keys(errors).some(key=>b.body.querySelector('[name="'+key+'"]'))&&(i!==3||sources().length>0));};
- const showErrors=()=>{const errors=validate();for(const box of host.querySelectorAll('[data-error-for]')){const msg=errors[box.dataset.errorFor]||'';box.textContent=msg;const control=host.querySelector('[name="'+box.dataset.errorFor+'"]');if(msg){control?.setAttribute('aria-invalid','true');control?.closest('details.model-v2-block')?.setAttribute('open','');}else control?.removeAttribute('aria-invalid');}return errors;};
- function sync(){
-  catalogue.hidden=mode.value!=='catalog';editor.setActive(!locked&&!catalogue.hidden);
-  coLoad.closest('.d-field').hidden=compat.value!=='CATEGORIZED';coLoad.disabled=locked||compat.value!=='CATEGORIZED';
-  const hasExternal=sources().includes('EXTERNAL'),hasOwn=sources().includes('OWN');
-  for(const n of costs.querySelectorAll('[name=external_costs]')){n.disabled=locked||!hasExternal;n.closest('fieldset').hidden=!hasExternal;}
-  for(const n of costs.querySelectorAll('[name=billing]')){n.disabled=locked||!hasExternal||!external().includes('PER_KM');n.closest('fieldset').hidden=!hasExternal||!external().includes('PER_KM');}
-  own.closest('.d-field').hidden=!hasOwn;
-  const c=collect().configuration,counts=c.cargo;summary.textContent=(PROFILES.find(p=>p[0]===profile.value)?.[1]||'Carga')+' · '+(mode.value==='direct'?'Datos directos · sin catálogo':counts.products.length+' productos · '+counts.logistic_units.length+' unidades compartidas · '+counts.presentations.length+' presentaciones')+' · '+DIMS.filter(([key])=>c.active_dimensions.includes(key)).map(([,label])=>label).join(' + ')+' · '+(split.selectedOptions[0]?.textContent||'');
-  const valid=sectionValidity();blocks.forEach((b,i)=>b.setStatus(valid[i]?'Datos completos':'En configuración',valid[i]?'pending':'warning'));
-  physical.textContent=mode.value==='catalog'?'Los valores físicos se muestran sólo después de validar el contrato.':'';
+ function sectionValidity(){
+  const errors=validate();return blocks.map((b,i)=>!Object.keys(errors).some(key=>b.body.querySelector('[name="'+CSS.escape(key)+'"]')||(i===2&&key==='cargo_catalog')||(i===3&&key==='sources')));
  }
- scope.listen(mode,'change',()=>{if(mode.value==='catalog')editor.seed();sync();});scope.listen(host,'input',sync);scope.listen(host,'change',sync);
- if(mode.value==='catalog')editor.seed();sync();
- return {read:collect,validate,sectionValidity,showErrors,showServerError(message){physical.textContent=message;physical.role='alert';},lock(){locked=true;editor.lock();for(const n of host.querySelectorAll('input,select,textarea,button'))n.disabled=true;},setCompiled(data){
-  physical.role='status';const valid=sectionValidity();blocks.forEach((b,i)=>b.setStatus(valid[i]?'Validado':'En configuración',valid[i]?'complete':'warning'));const catalogue=data?.contracts?.transport_demand?.rules?.catalog_snapshot;physical.replaceChildren();if(!catalogue||mode.value!=='catalog')return;
-  for(const [key,p]of Object.entries(catalogue)){const name=collect().configuration.cargo.presentations.find(p=>p.presentation_id===key)?.label||'Presentación';const row=el('p');row.append(el('strong',name+' · '),document.createTextNode(Object.entries(p.coefficients).filter(([,v])=>v!==null).map(([d,v])=>v+' '+(DIMS.find(([id])=>id===d)?.[1]||d)).join(' · ')));row.append(el('small','Incremento: '+p.allocation_increment+' '+p.quantity_unit+' · '+Object.entries(p.provenance.sources).map(([d,source])=>(DIMS.find(([id])=>id===d)?.[1]||d)+': '+({COMPONENT_GROSS_PLUS_EXPLICIT_TARE:'componentes y tara',DECLARED_GROSS_MASS:'declarado',LOADED_EXTERIOR_DIMENSIONS:'exterior cargado',DECLARED_EXTERIOR_VOLUME:'volumen declarado',EXPLICIT_DENSITY_TIMES_VOLUME:'densidad explícita × volumen',MASS_OVER_EXPLICIT_DENSITY:'peso / densidad explícita',EXPLICIT_QUANTITY_UNIT:'unidad física declarada'}[source]||source)).join(' · ')));physical.append(row);}
- }};
+ function sectionCompletion(){
+  const c=config(),keys=localSignatures(c),valid=sectionValidity();
+  return keys.map((key,i)=>valid[i]&&(published||confirmed[i]===key&&(i!==2||compiledKey===JSON.stringify(c))));
+ }
+ function showErrors(){
+  const errors=validate();
+  sourceError.textContent=errors.sources||'';
+  for(const input of resources.querySelectorAll('[name=sources]')){if(errors.sources)input.setAttribute('aria-invalid','true');else input.removeAttribute('aria-invalid');}
+  for(const box of host.querySelectorAll('[data-error-for]')){
+   const msg=errors[box.dataset.errorFor]||'';box.textContent=msg;const control=host.querySelector('[name="'+CSS.escape(box.dataset.errorFor)+'"]');
+   if(msg){control?.setAttribute('aria-invalid','true');control?.closest('details.model-v2-block')?.setAttribute('open','');}else control?.removeAttribute('aria-invalid');
+  }
+  return errors;
+ }
+ function reviewed(){host.dispatchEvent(new CustomEvent('model-review',{bubbles:true}));}
+ for(const index of [0,1,3,4]){
+  const confirm=button('Confirmar '+definitions[index][0].toLocaleLowerCase(),()=>{
+   const valid=sectionValidity();if(!valid[index]){showErrors();return;}
+   confirmed[index]=localSignatures(config())[index];sync();reviewed();
+  });confirm.dataset.confirmBlock=String(index+1);blocks[index].body.append(confirm);
+ }
+ const flowActions=el('div',undefined,'guided-flow-actions'),back=button('Volver',()=>go(previous(activeStep))),next=button('Continuar',()=>{
+  const errors=validate(),valid=activeStep===1||activeStep===3||activeStep===6&&!errors.primary_dimension&&!errors.cargo_catalog||[2,4,5].includes(activeStep)&&!errors.cargo_catalog;
+  if(valid)subconfirmed[activeStep-1]=subSignatures(config())[activeStep-1];go(following(activeStep));sync();reviewed();
+ });flowActions.append(back,next);cargo.append(flowActions);
+ function following(step){return mode.value==='direct'&&step===3?6:Math.min(7,step+1);}
+ function previous(step){return mode.value==='direct'&&step===6?3:Math.max(1,step-1);}
+ function go(step){
+  activeStep=step;for(const [i,s]of steps.entries())s.details.open=i===step-1;
+  const target=steps[step-1].details;target.querySelector('summary').focus();target.scrollIntoView({block:'nearest'});sync();
+ }
+ for(const [index,s]of steps.entries())scope.listen(s.details,'toggle',()=>{if(s.details.open){activeStep=index+1;updateFlow();}});
+ for(const [index,s]of steps.entries())scope.listen(s.body,'focusin',()=>{activeStep=index+1;updateFlow();});
+ for(const [index,s]of steps.entries())scope.listen(s.details.querySelector('summary'),'focusin',()=>{activeStep=index+1;updateFlow();});
+ function updateFlow(){back.disabled=activeStep===1;next.hidden=activeStep===7;next.textContent=activeStep===5?'Continuar a capacidades y reglas':'Continuar a '+STEP_COPY[following(activeStep)-1][0].toLocaleLowerCase();flowActions.dataset.activeCargoStep=String(activeStep);}
+ scope.listen(review,'input',e=>e.stopPropagation());scope.listen(review,'change',e=>{e.stopPropagation();if(review.checked&&compiledKey===signature())confirmed[2]=signature();else delete confirmed[2];sync();reviewed();});
+ function sync(){
+  const c=config(),key=JSON.stringify(c),keys=localSignatures(c),subs=subSignatures(c);
+  if(lastConfig&&key!==lastConfig){compiledKey=null;compiledData=null;serverError='';editor.invalidate();}lastConfig=key;
+  for(const i of Object.keys(confirmed))if(confirmed[i]!==keys[i])delete confirmed[i];
+  for(const i of Object.keys(subconfirmed))if(subconfirmed[i]!==subs[i])delete subconfirmed[i];
+  const catalog=mode.value==='catalog';unitHost.hidden=!catalog;directGuide.hidden=catalog;
+  steps[3].details.hidden=steps[4].details.hidden=!catalog;na.hidden=catalog;editor.setActive(catalog&&!locked);
+  recommendation.lastChild.textContent=profile.value==='PALLETIZED'?'Si transportás mercadería agrupada sobre pallets, elegí Carga palletizada. El perfil orienta la configuración; no certifica packing ni cambia el algoritmo.':'Elegiste '+(PROFILES.find(p=>p[0]===profile.value)?.[1]||'un perfil')+'. Conservamos los datos existentes; revisá las propiedades y reglas aplicables.';
+  modeNote.lastChild.textContent=catalog?'Configuración detallada: productos y composiciones con tres CSV, incluidos Líneas de órdenes.':'Configuración básica: dos CSV de Órdenes y Recursos, sin catálogo físico. Un catálogo anterior se conserva sólo como borrador en este navegador y no se publica.';
+  pairsHost.hidden=compat.value!=='CATEGORIZED';for(const n of pairsHost.querySelectorAll('input,button'))n.disabled=locked||pairsHost.hidden;addPair.disabled=locked||pairsHost.hidden||pairs.length>=100;
+  const knownGroups=[...new Set(editor.snapshot().products.flatMap(p=>p.compatibility_groups||[]))];groups.replaceChildren(...knownGroups.map(v=>{const n=el('option');n.value=v;return n;}));
+  categoryHint.hidden=compat.value!=='CATEGORIZED'||!catalog;categoryHint.lastChild.textContent='Cada producto utilizado necesita categorías de compatibilidad. Declaralas en Productos; no se elige uniformidad para omitir errores.';
+  const existingPrimary=primary.value,active=dimensions();primary.replaceChildren(...DIMS.filter(([v])=>active.includes(v)||v===existingPrimary).map(([v,label])=>{const n=el('option',label+(active.includes(v)?'':' · inactiva'));n.value=v;return n;}));primary.value=existingPrimary;
+  const hasExternal=sources().includes('EXTERNAL');for(const n of costs.querySelectorAll('[name=external_costs]')){n.disabled=locked||!hasExternal;n.closest('fieldset').hidden=!hasExternal;}
+  for(const n of costs.querySelectorAll('[name=billing]')){n.disabled=locked||!hasExternal||!external().includes('PER_KM');n.closest('fieldset').hidden=!hasExternal||!external().includes('PER_KM');}own.closest('.d-field').hidden=!sources().includes('OWN');
+  const complete=sectionCompletion();blocks.forEach((b,i)=>b.setStatus(complete[i]?'validado y revisado':i===2&&serverError?'revisá el error de validación':'pendiente de revisión',complete[i]?'complete':i===2&&serverError?'error':'pending'));
+  steps.forEach((s,i)=>{const local=subconfirmed[i]===subs[i]&&([0,2].includes(i)||compiledKey===key)&&!serverError,done=local||i===6&&complete[2];s.setStatus(done?'revisado':'pendiente de revisión',done?'complete':'pending');});
+  review.checked=complete[2];review.disabled=locked||compiledKey!==key||!sectionValidity().every(Boolean);
+  reviewSummary.replaceChildren();readout(reviewSummary,'Perfil',PROFILES.find(p=>p[0]===profile.value)?.[1]);readout(reviewSummary,'Modo',catalog?'Configuración detallada':'Configuración básica');
+  readout(reviewSummary,'Catálogo',catalog?c.cargo.products.length+' productos · '+c.cargo.logistic_units.length+' soportes · '+c.cargo.presentations.length+' presentaciones':'No aplica: cantidades desde CSV');
+  readout(reviewSummary,'Dimensiones activas',DIMS.filter(([v])=>active.includes(v)).map(([,s])=>s).join(' + ')||'Pendiente');
+  readout(reviewSummary,'Dimensión principal',DIMS.find(([v])=>v===primary.value)?.[1]);readout(reviewSummary,'Fraccionamiento',split.selectedOptions[0]?.textContent);readout(reviewSummary,'Compatibilidad',compat.selectedOptions[0]?.textContent);
+  readout(reviewSummary,'Recursos',sources().join(' + ')||'Pendiente');readout(reviewSummary,'Moneda',c.currency_policy.currency);
+  readout(reviewSummary,'Data Contract previsto',catalog?'3 CSV: Órdenes + Líneas de órdenes + Recursos':'2 CSV: Órdenes + Recursos',compiledKey===key?'Validado por Dation para este borrador':'Pendiente de validación vigente');
+  summary.textContent=(PROFILES.find(p=>p[0]===profile.value)?.[1]||'Carga')+' · '+(catalog?c.cargo.products.length+' productos · '+c.cargo.presentations.length+' presentaciones':'Datos directos · sin catálogo')+' · '+active.map(v=>DIMS.find(([id])=>id===v)[1]).join(' + ');
+  if(!compiledData&&!serverError){physical.role='status';physical.textContent='Las propiedades físicas se muestran después de validar el contrato actual con Dation.';}updateFlow();
+ }
+ scope.listen(mode.root,'input',e=>e.stopPropagation());scope.listen(mode.root,'change',async e=>{
+  e.stopPropagation();const nextMode=mode.value;mode.value=previousMode;
+  if(nextMode==='direct'&&editor.hasData()&&!await confirmAction(host.closest('form'),scope,'Pasar a configuración básica','El catálogo no se publicará. ¿Querés conservarlo como borrador de este navegador y continuar? Podés volver a Detallado.','Conservar y continuar'))return;
+  mode.value=previousMode=nextMode;sync();host.dispatchEvent(new Event('change',{bubbles:true}));
+ });
+ scope.listen(profile.root,'change',()=>editor.refreshProfile());scope.listen(compat,'change',()=>editor.refreshProfile());
+ scope.listen(host,'input',sync);scope.listen(host,'change',sync);sync();
+ return {read:collect,validate,sectionValidity,sectionCompletion,showErrors,canPublish:()=>!locked&&compiledKey===signature()&&sectionCompletion().every(Boolean),
+  invalidateCompiled(){compiledKey=null;compiledData=null;editor.invalidate();sync();},
+  showServerError(message){compiledKey=null;compiledData=null;serverError=message;physical.textContent=message;physical.role='alert';editor.showError(message);sync();},
+  lock({published:immutable=false}={}){locked=true;published=immutable;editor.lock();for(const n of host.querySelectorAll('input,select,textarea,button'))if(!n.dataset.guidedUi)n.disabled=true;sync();},
+  setCompiled(data){
+   compiledKey=signature();compiledData=data;serverError='';physical.replaceChildren();physical.role='status';const catalogue=data?.contracts?.transport_demand?.rules?.catalog_snapshot;editor.setCompiled(catalogue);
+   if(catalogue&&mode.value==='catalog')for(const [key,p]of Object.entries(catalogue)){
+    const label=config().cargo.presentations.find(v=>v.presentation_id===key)?.label||'Presentación',row=el('p');row.append(el('strong',label+' · '),document.createTextNode(Object.entries(p.coefficients).filter(([,v])=>v!==null).map(([d,v])=>v+' '+(DIMS.find(([id])=>id===d)?.[1]||d)).join(' · ')));
+    row.append(el('small','Incremento: '+p.allocation_increment+' '+(p.quantity_unit==='presentation'?'presentación completa':p.quantity_unit)+' · '+Object.entries(p.provenance.sources).map(([d,source])=>(DIMS.find(([id])=>id===d)?.[1]||d)+': '+(PHYSICAL_SOURCES[source]||source)).join(' · ')));physical.append(row);
+   }else physical.textContent='Cantidades directas: contrato de dos CSV validado para este borrador.';
+   sync();
+  }
+ };
 }
