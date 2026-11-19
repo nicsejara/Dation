@@ -4,6 +4,8 @@ from playwright.async_api import expect
 
 async def compatible(page):
     """Explicitly exercise historical contracts through their preserved editor."""
+    if await page.locator('[data-continue-compatible]').is_visible():
+        await page.locator('[data-continue-compatible]').click();return
     if not await page.locator('.model-wizard-pro').count():return
     await block(page,3)
     await page.locator('[data-editor-compatible]').click()

@@ -1,0 +1,3698 @@
+[
+  {
+    "recovered": false,
+    "width": 1536,
+    "control": "sources",
+    "value": "OWN",
+    "before": {
+      "scrollY": 477,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        false
+      ],
+      "focus": {
+        "name": null,
+        "tag": "SUMMARY",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 477,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        false
+      ],
+      "focus": {
+        "name": "sources",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 1536,
+    "control": "sources",
+    "value": "OWN",
+    "before": {
+      "scrollY": 1010,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        false
+      ],
+      "focus": {
+        "name": "sources",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 1010,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        false
+      ],
+      "focus": {
+        "name": "sources",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 1536,
+    "control": "sources",
+    "value": "EXTERNAL",
+    "before": {
+      "scrollY": 1010,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        false
+      ],
+      "focus": {
+        "name": "sources",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 1010,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        false
+      ],
+      "focus": {
+        "name": "sources",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 1536,
+    "control": "sources",
+    "value": "EXTERNAL",
+    "before": {
+      "scrollY": 1010,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        false
+      ],
+      "focus": {
+        "name": "sources",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 1010,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        false
+      ],
+      "focus": {
+        "name": "sources",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 1536,
+    "control": "resource_categories",
+    "value": "GENERAL",
+    "before": {
+      "scrollY": 1010,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        false
+      ],
+      "focus": {
+        "name": "sources",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 1010,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        false
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 1536,
+    "control": "resource_categories",
+    "value": "REFRIGERATED",
+    "before": {
+      "scrollY": 1010,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        false
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 1010,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        false
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 1536,
+    "control": "resource_categories",
+    "value": "TANKER",
+    "before": {
+      "scrollY": 1010,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        false
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 1010,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        false
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 1536,
+    "control": "resource_categories",
+    "value": "BULK",
+    "before": {
+      "scrollY": 1010,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        false
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 1010,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        false
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 1536,
+    "control": "resource_categories",
+    "value": "FLATBED",
+    "before": {
+      "scrollY": 1010,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        false
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 1010,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        false
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 1536,
+    "control": "currency",
+    "value": "USD",
+    "before": {
+      "scrollY": 1010,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": null,
+        "tag": "SUMMARY",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 1010,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "currency",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 1536,
+    "control": "currency",
+    "value": "EUR",
+    "before": {
+      "scrollY": 1010,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "currency",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 1010,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "currency",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 1536,
+    "control": "currency",
+    "value": "ARS",
+    "before": {
+      "scrollY": 1010,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "currency",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 1010,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "currency",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 1536,
+    "control": "external_costs",
+    "value": "PER_KM",
+    "before": {
+      "scrollY": 1673,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "currency",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 1673,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "external_costs",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 1536,
+    "control": "external_costs",
+    "value": "PER_KM",
+    "before": {
+      "scrollY": 1673,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "external_costs",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 1673,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "external_costs",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 1536,
+    "control": "external_costs",
+    "value": "PER_TRIP",
+    "before": {
+      "scrollY": 1673,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "external_costs",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 1673,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "external_costs",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 1536,
+    "control": "external_costs",
+    "value": "PER_TRIP",
+    "before": {
+      "scrollY": 1673,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "external_costs",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 1673,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "external_costs",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 1536,
+    "control": "billing",
+    "value": "ONE_WAY",
+    "before": {
+      "scrollY": 1673,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "external_costs",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 1673,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "billing",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 1536,
+    "control": "billing",
+    "value": "ONE_WAY",
+    "before": {
+      "scrollY": 1673,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "billing",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 1673,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "billing",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 1536,
+    "control": "billing",
+    "value": "ROUND_TRIP",
+    "before": {
+      "scrollY": 1673,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "billing",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 1673,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "billing",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 1536,
+    "control": "billing",
+    "value": "ROUND_TRIP",
+    "before": {
+      "scrollY": 1673,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "billing",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 1673,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "billing",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 1536,
+    "control": "operating_role",
+    "value": "HYBRID",
+    "before": {
+      "scrollY": 441,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": null,
+        "tag": "SUMMARY",
+        "block": "model-v2-block-2"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 441,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "operating_role",
+        "tag": "INPUT",
+        "block": "model-v2-block-2"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 1536,
+    "control": "consolidation_permitted",
+    "value": "no",
+    "before": {
+      "scrollY": 450,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "operating_role",
+        "tag": "INPUT",
+        "block": "model-v2-block-2"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 551,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "consolidation_permitted",
+        "tag": "INPUT",
+        "block": "model-v2-block-2"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 390,
+    "control": "sources",
+    "value": "OWN",
+    "before": {
+      "scrollY": 2928,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "consolidation_permitted",
+        "tag": "INPUT",
+        "block": "model-v2-block-2"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 2928,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "sources",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 390,
+    "control": "sources",
+    "value": "OWN",
+    "before": {
+      "scrollY": 2928,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "sources",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 2928,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "sources",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 390,
+    "control": "sources",
+    "value": "EXTERNAL",
+    "before": {
+      "scrollY": 2928,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "sources",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 2928,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "sources",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 390,
+    "control": "sources",
+    "value": "EXTERNAL",
+    "before": {
+      "scrollY": 2928,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "sources",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 2928,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "sources",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 390,
+    "control": "resource_categories",
+    "value": "GENERAL",
+    "before": {
+      "scrollY": 2928,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "sources",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 2928,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 390,
+    "control": "resource_categories",
+    "value": "REFRIGERATED",
+    "before": {
+      "scrollY": 2928,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 2995,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 390,
+    "control": "resource_categories",
+    "value": "TANKER",
+    "before": {
+      "scrollY": 2996,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 3099,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 390,
+    "control": "resource_categories",
+    "value": "BULK",
+    "before": {
+      "scrollY": 3100,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 3203,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 390,
+    "control": "resource_categories",
+    "value": "FLATBED",
+    "before": {
+      "scrollY": 3204,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 3307,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 390,
+    "control": "currency",
+    "value": "USD",
+    "before": {
+      "scrollY": 4320,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 4320,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "currency",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 390,
+    "control": "currency",
+    "value": "EUR",
+    "before": {
+      "scrollY": 4320,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "currency",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 4320,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "currency",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 390,
+    "control": "currency",
+    "value": "ARS",
+    "before": {
+      "scrollY": 4320,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "currency",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 4320,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "currency",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 390,
+    "control": "external_costs",
+    "value": "PER_KM",
+    "before": {
+      "scrollY": 5077,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "currency",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 5077,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "external_costs",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 390,
+    "control": "external_costs",
+    "value": "PER_KM",
+    "before": {
+      "scrollY": 5077,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "external_costs",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 5077,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "external_costs",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 390,
+    "control": "external_costs",
+    "value": "PER_TRIP",
+    "before": {
+      "scrollY": 5077,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "external_costs",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 5077,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "external_costs",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 390,
+    "control": "external_costs",
+    "value": "PER_TRIP",
+    "before": {
+      "scrollY": 5077,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "external_costs",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 5077,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "external_costs",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 390,
+    "control": "billing",
+    "value": "ONE_WAY",
+    "before": {
+      "scrollY": 5077,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "external_costs",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 5077,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "billing",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 390,
+    "control": "billing",
+    "value": "ONE_WAY",
+    "before": {
+      "scrollY": 5077,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "billing",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 5077,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "billing",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 390,
+    "control": "billing",
+    "value": "ROUND_TRIP",
+    "before": {
+      "scrollY": 5077,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "billing",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 5077,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "billing",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 390,
+    "control": "billing",
+    "value": "ROUND_TRIP",
+    "before": {
+      "scrollY": 5077,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "billing",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 5077,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "billing",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 390,
+    "control": "operating_role",
+    "value": "HYBRID",
+    "before": {
+      "scrollY": 1693,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "billing",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 1693,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "operating_role",
+        "tag": "INPUT",
+        "block": "model-v2-block-2"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": false,
+    "width": 390,
+    "control": "consolidation_permitted",
+    "value": "no",
+    "before": {
+      "scrollY": 2258,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "operating_role",
+        "tag": "INPUT",
+        "block": "model-v2-block-2"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 2258,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "consolidation_permitted",
+        "tag": "INPUT",
+        "block": "model-v2-block-2"
+      },
+      "invalid": [],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "recovered": true,
+    "width": 1536,
+    "control": "sources",
+    "value": "OWN",
+    "before": {
+      "scrollY": 1399,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": null,
+        "tag": "SUMMARY",
+        "block": "model-v2-block-3"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 1399,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "sources",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 1536,
+    "control": "sources",
+    "value": "OWN",
+    "before": {
+      "scrollY": 1399,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "sources",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 1399,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "sources",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 1536,
+    "control": "sources",
+    "value": "EXTERNAL",
+    "before": {
+      "scrollY": 1399,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "sources",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 1399,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "sources",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 1536,
+    "control": "sources",
+    "value": "EXTERNAL",
+    "before": {
+      "scrollY": 1399,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "sources",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 1399,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "sources",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 1536,
+    "control": "resource_categories",
+    "value": "GENERAL",
+    "before": {
+      "scrollY": 1399,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "sources",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 1399,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 1536,
+    "control": "resource_categories",
+    "value": "REFRIGERATED",
+    "before": {
+      "scrollY": 1399,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 1399,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 1536,
+    "control": "resource_categories",
+    "value": "TANKER",
+    "before": {
+      "scrollY": 1399,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 1399,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 1536,
+    "control": "resource_categories",
+    "value": "BULK",
+    "before": {
+      "scrollY": 1399,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 1399,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 1536,
+    "control": "resource_categories",
+    "value": "FLATBED",
+    "before": {
+      "scrollY": 1399,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 1399,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 1536,
+    "control": "currency",
+    "value": "USD",
+    "before": {
+      "scrollY": 2016,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 2016,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "currency",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 1536,
+    "control": "currency",
+    "value": "EUR",
+    "before": {
+      "scrollY": 2016,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "currency",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 2016,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "currency",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 1536,
+    "control": "currency",
+    "value": "ARS",
+    "before": {
+      "scrollY": 2016,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "currency",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 2016,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "currency",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 1536,
+    "control": "external_costs",
+    "value": "PER_KM",
+    "before": {
+      "scrollY": 2016,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "currency",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 2016,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "external_costs",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 1536,
+    "control": "external_costs",
+    "value": "PER_KM",
+    "before": {
+      "scrollY": 2016,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "external_costs",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 2016,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "external_costs",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 1536,
+    "control": "external_costs",
+    "value": "PER_TRIP",
+    "before": {
+      "scrollY": 2016,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "external_costs",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 2016,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "external_costs",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 1536,
+    "control": "external_costs",
+    "value": "PER_TRIP",
+    "before": {
+      "scrollY": 2016,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "external_costs",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 2016,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "external_costs",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 1536,
+    "control": "billing",
+    "value": "ONE_WAY",
+    "before": {
+      "scrollY": 2033,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "external_costs",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 2134,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "billing",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 1536,
+    "control": "billing",
+    "value": "ONE_WAY",
+    "before": {
+      "scrollY": 2134,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "billing",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 2134,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "billing",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 1536,
+    "control": "billing",
+    "value": "ROUND_TRIP",
+    "before": {
+      "scrollY": 2134,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "billing",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 2134,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "billing",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 1536,
+    "control": "billing",
+    "value": "ROUND_TRIP",
+    "before": {
+      "scrollY": 2134,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "billing",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 2134,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "billing",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 1536,
+    "control": "operating_role",
+    "value": "HYBRID",
+    "before": {
+      "scrollY": 574,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "billing",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 574,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "operating_role",
+        "tag": "INPUT",
+        "block": "model-v2-block-2"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 1536,
+    "control": "consolidation_permitted",
+    "value": "no",
+    "before": {
+      "scrollY": 574,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "operating_role",
+        "tag": "INPUT",
+        "block": "model-v2-block-2"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 574,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "consolidation_permitted",
+        "tag": "INPUT",
+        "block": "model-v2-block-2"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 390,
+    "control": "sources",
+    "value": "OWN",
+    "before": {
+      "scrollY": 2928,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "consolidation_permitted",
+        "tag": "INPUT",
+        "block": "model-v2-block-2"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 2928,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "sources",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 390,
+    "control": "sources",
+    "value": "OWN",
+    "before": {
+      "scrollY": 2928,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "sources",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 2928,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "sources",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 390,
+    "control": "sources",
+    "value": "EXTERNAL",
+    "before": {
+      "scrollY": 2928,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "sources",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 2928,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "sources",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 390,
+    "control": "sources",
+    "value": "EXTERNAL",
+    "before": {
+      "scrollY": 2928,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "sources",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 2928,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "sources",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 390,
+    "control": "resource_categories",
+    "value": "GENERAL",
+    "before": {
+      "scrollY": 2928,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "sources",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 2928,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 390,
+    "control": "resource_categories",
+    "value": "REFRIGERATED",
+    "before": {
+      "scrollY": 2928,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 2995,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 390,
+    "control": "resource_categories",
+    "value": "TANKER",
+    "before": {
+      "scrollY": 2996,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 3099,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 390,
+    "control": "resource_categories",
+    "value": "BULK",
+    "before": {
+      "scrollY": 3100,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 3203,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 390,
+    "control": "resource_categories",
+    "value": "FLATBED",
+    "before": {
+      "scrollY": 3204,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 3307,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 390,
+    "control": "currency",
+    "value": "USD",
+    "before": {
+      "scrollY": 4320,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 4320,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "currency",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 390,
+    "control": "currency",
+    "value": "EUR",
+    "before": {
+      "scrollY": 4320,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "currency",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 4320,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "currency",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 390,
+    "control": "currency",
+    "value": "ARS",
+    "before": {
+      "scrollY": 4320,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "currency",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 4320,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "currency",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 390,
+    "control": "external_costs",
+    "value": "PER_KM",
+    "before": {
+      "scrollY": 5077,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "currency",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 5077,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "external_costs",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 390,
+    "control": "external_costs",
+    "value": "PER_KM",
+    "before": {
+      "scrollY": 5077,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "external_costs",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 5077,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "external_costs",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 390,
+    "control": "external_costs",
+    "value": "PER_TRIP",
+    "before": {
+      "scrollY": 5077,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "external_costs",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 5077,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "external_costs",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 390,
+    "control": "external_costs",
+    "value": "PER_TRIP",
+    "before": {
+      "scrollY": 5077,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "external_costs",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 5077,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "external_costs",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 390,
+    "control": "billing",
+    "value": "ONE_WAY",
+    "before": {
+      "scrollY": 5077,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "external_costs",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 5077,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "billing",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 390,
+    "control": "billing",
+    "value": "ONE_WAY",
+    "before": {
+      "scrollY": 5077,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "billing",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 5077,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "billing",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 390,
+    "control": "billing",
+    "value": "ROUND_TRIP",
+    "before": {
+      "scrollY": 5077,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "billing",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 5077,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "billing",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 390,
+    "control": "billing",
+    "value": "ROUND_TRIP",
+    "before": {
+      "scrollY": 5077,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "billing",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 5077,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "billing",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 390,
+    "control": "operating_role",
+    "value": "HYBRID",
+    "before": {
+      "scrollY": 1693,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "billing",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 1693,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "operating_role",
+        "tag": "INPUT",
+        "block": "model-v2-block-2"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  },
+  {
+    "recovered": true,
+    "width": 390,
+    "control": "consolidation_permitted",
+    "value": "no",
+    "before": {
+      "scrollY": 2258,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "operating_role",
+        "tag": "INPUT",
+        "block": "model-v2-block-2"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    },
+    "after": {
+      "scrollY": 2258,
+      "open": [
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "consolidation_permitted",
+        "tag": "INPUT",
+        "block": "model-v2-block-2"
+      },
+      "invalid": [],
+      "steps": 0,
+      "legacy": 7
+    }
+  }
+]

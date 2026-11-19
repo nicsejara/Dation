@@ -1,4 +1,4 @@
-import {el,button} from './forms.mjs';
+import {el,button,field} from './forms.mjs';
 import {wizardIcon} from './wizard-ui.mjs';
 
 // Presentation helpers only. They never alter configuration or certify physics.
@@ -78,4 +78,9 @@ export function supportArt(type,{loaded=false}={}){
 export function infoCard(parent,title,value,copy,icon,{locked=false}={}){
  const card=el('section',undefined,'guided-info-card'),row=el('div',undefined,'guided-info-value'),text=el('div');
  text.append(el('strong',value),el('p',copy));row.append(wizardIcon(icon),text);if(locked)row.append(wizardIcon('lock'));card.append(el('h4',title),row);parent.append(card);return card;
+}
+
+// Model-only helper order. Other Core forms retain their current contracts.
+export function modelField(parent,label,options){
+ const input=field(parent,label,options),root=input.closest('.d-field'),hint=root.querySelector('.d-field__help');root.insertBefore(hint,input);return input;
 }

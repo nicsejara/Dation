@@ -793,3 +793,14 @@
 .model-wizard-v2 .guided-info-value > svg { inline-size:30px;block-size:30px;color:var(--color-text-accent);flex:none; }
 .model-wizard-v2 .guided-info-value > div { border-inline-start:1px solid var(--color-border-strong);padding-inline-start:16px;min-inline-size:0;flex:1; }
 .ultimate-foundation .model-wizard-v2 .guided-confirm-cta { font-size:12px;padding:8px 12px; }
+
+/* R3 model-only copy/helper and explicit editor selection; no Core route changes. */
+.model-wizard-intro-pro .model-wizard-intro-copy { min-inline-size:0; }
+.model-wizard-intro-pro .model-wizard-intro-copy > p { margin:6px 0 0;font-size:12px;line-height:1.5; }
+.model-wizard-intro-pro > .d-metadata:empty { display:none; }
+.model-editor-region { min-inline-size:0; }
+.model-wizard-v2 .d-field > .d-field__help:empty { display:none; }
+.model-wizard-v2.model-editor-choice button { min-block-size:44px; }
+.model-wizard-v2 [data-compatible-editor] { align-items:center;flex-wrap:wrap; }
+.model-wizard-v2 .guided-pro-step [name=cargo_profile] + svg { color:var(--color-text-accent); }
+.model-wizard-v2.model-editor-choice .ultimate-grid > button { grid-column:1/-1;min-block-size:48px;white-space:normal; }

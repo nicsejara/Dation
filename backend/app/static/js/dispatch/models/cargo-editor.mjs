@@ -1,6 +1,6 @@
-import {el,button,field,confirmAction} from './forms.mjs';
+import {el,button,confirmAction} from './forms.mjs';
 import {wizardIcon} from './wizard-ui.mjs';
-import {note,readout,palletArt,display,radioCards,supportArt} from './guided-ui.mjs';
+import {note,readout,palletArt,display,radioCards,supportArt,modelField as field} from './guided-ui.mjs';
 
 const TYPES=[['PALLET','Pallet'],['BOX','Caja'],['CRATE','Cajón'],['BIG_BAG','Big bag'],['OTHER','Otra unidad']];
 const id=p=>p+'-'+crypto.randomUUID(),copy=v=>structuredClone(v);
@@ -62,12 +62,13 @@ export function mountCargoEditor(places,scope,initial,{guided=false,profile=()=>
    render();notify();(guided?roots.units:roots[kind]).querySelector('button:not(:disabled)')?.focus();
   }
  }
- function picker(parent,label,options,value,select,kind){
-  const n=uiControl(field(parent,label,{name:'view_'+id('select'),options,value}));if(kind)n.dataset.catalogPicker=kind;
-  scope.listen(n,'change',()=>{select(n.value);render();});return n;
+ function picker(parent,label,options,value,select,kind,{mutates=false}={}){
+  const control=field(parent,label,{name:'view_'+id('select'),options,value}),n=mutates?control:uiControl(control);
+  if(mutates)scope.listen(n,'input',e=>e.stopPropagation());if(kind)n.dataset.catalogPicker=kind;
+  scope.listen(n,'change',e=>{if(mutates){e.stopPropagation();if(locked||!active)return;}select(n.value);render();if(mutates)notify();});return n;
  }
  function createPresentation(unit=null){
-  const bulk=['DRY_BULK','LIQUID_BULK'].includes(profile()),p={presentation_id:id('L'),label:'',quantity_kind:bulk?'CONTINUOUS':'DISCRETE',quantity_unit:bulk?'kg':'presentation',components:[{product_id:'',quantity:'1'}]};
+  const bulk=!guided&&['DRY_BULK','LIQUID_BULK'].includes(profile()),p={presentation_id:id('L'),label:'',quantity_kind:bulk?'CONTINUOUS':'DISCRETE',quantity_unit:bulk?'kg':'presentation',components:[{product_id:'',quantity:'1'}]};
   if(unit&&!bulk)p.logistic_unit_id=unit.logistic_unit_id;state.presentations.push(p);view.presentation=p.presentation_id;return p;
  }
  function loadedFields(parent,p){
@@ -226,7 +227,7 @@ export function mountCargoEditor(places,scope,initial,{guided=false,profile=()=>
   if(p){
    const row=el('div',undefined,'guided-toolbar');first.append(row);
    bind(row,'Nombre de la presentación *',p,'label',{required:true,maxLength:120});
-   picker(row,'Soporte compartido',[['','Seleccioná una unidad'],...state.logistic_units.map(v=>[v.logistic_unit_id,v.label||'Unidad sin nombre'])],p.logistic_unit_id||'',v=>{p.logistic_unit_id=v;view.unit=v;notify();},'logistic_units');
+   picker(row,'Soporte compartido',[['','Seleccioná una unidad'],...state.logistic_units.map(v=>[v.logistic_unit_id,v.label||'Unidad sin nombre'])],p.logistic_unit_id||'',v=>{p.logistic_unit_id=v;view.unit=v;},'logistic_units',{mutates:true});
    row.append(action('Duplicar presentación',()=>{const q=copy(p);q.presentation_id=id('L');q.label=unique(p.label,state.presentations,'label');state.presentations.push(q);view.presentation=q.presentation_id;render();notify();},{icon:'copy',blocked:()=>state.presentations.length>=200}),action('Eliminar presentación',()=>remove('presentations',p),{icon:'trash'}));
   }
   if(!u){note(first,'Agregá una unidad logística o seleccioná un soporte compartido. No se inventan productos ni propiedades físicas.');note(second,'Primero prepará una presentación con su unidad logística.');return;}
@@ -266,7 +267,7 @@ export function mountCargoEditor(places,scope,initial,{guided=false,profile=()=>
   if(!p){note(second,'Agregá una presentación homogénea para definir su contenido.');return;}
   const productTop=el('div',undefined,'guided-toolbar');second.append(productTop);
   const component=p.components[0];
-  picker(productTop,'Producto de esta presentación',[['','Seleccioná un producto'],...state.products.map(q=>[q.product_id,q.name||'Producto sin nombre'])],component?.product_id||'',v=>{component.product_id=v;notify();},'products');
+  picker(productTop,'Producto de esta presentación',[['','Seleccioná un producto'],...state.products.map(q=>[q.product_id,q.name||'Producto sin nombre'])],component?.product_id||'',v=>{component.product_id=v;},'products',{mutates:true});
   addControl(productTop,'Agregar producto',()=>{const q=productDraft();q.unit_label='caja';state.products.push(q);component.product_id=q.product_id;view.product=q.product_id;},100,()=>state.products.length);
   const product=state.products.find(q=>q.product_id===component?.product_id);
   if(!product){note(second,'Seleccioná un producto existente o agregá uno. Esta presentación tendrá un único producto.');return;}

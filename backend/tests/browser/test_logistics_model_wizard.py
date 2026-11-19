@@ -96,7 +96,9 @@ class LogisticsModelWizardTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(await self.page.get_by_label('Rol operativo',exact=True).is_disabled())
         await expect(self.page.locator('[data-dation-test=model-create]')).to_be_hidden()
         await self.page.get_by_role('button',name='Crear nuevo modelo',exact=True).click()
-        self.assertEqual(await self.page.get_by_label('Nombre del modelo *',exact=True).input_value(),'Mi borrador')
+        await self.page.get_by_role('dialog').get_by_role('button',name='Crear nuevo modelo',exact=True).click()
+        await expect(self.page.get_by_label('Nombre del modelo *',exact=True)).to_have_value('')
+        await expect(self.page.get_by_label('Rol operativo',exact=True)).to_have_value('SHIPPER')
         self.assertEqual(await self.api('GET','/api/platform/logistics-models/'+m['model']['id']),before);self.assertEqual(writes,[])
 
     async def test_03_double_submit_is_one_model_and_version_no_case(self):
