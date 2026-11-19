@@ -56,7 +56,7 @@ export function mountCargoGuidedEditor({units:one,products:two},scope,catalog,{u
    });card.disabled=locked;card.classList.add('r4-load-card');card.dataset.loadType=id;card.setAttribute('aria-pressed',String(s.form.target===id));
    card.append(supportArt(s.unit.type,{loaded:true}),el('strong','Tipo '+String(i+1).padStart(2,'0')+' · '+t.product.name),el('span',display(v.quantity)+' '+v.packageType+'s · '+display(st?.gross,'kg')+' · '+display(model.unitVolume(),'m³')),el('small',needsReview?'Revisar':'Guardado localmente'));
    const mark=el('span',undefined,'r4-load-status');statusCircle(mark,needsReview?'Requiere revisión':'Guardado localmente',needsReview?'pending':'complete');mark.classList.add('r4-load-status');card.append(mark);
-   card.title='Revisar '+t.product.name+' · '+(t.product.compatibility_groups||[]).join(', ');cards.append(card);
+   card.title=(locked?'Tipo de carga · ':'Revisar ')+t.product.name+' · '+(t.product.compatibility_groups||[]).join(', ');cards.append(card);
   }
  }
  function refresh(){
@@ -66,7 +66,7 @@ export function mountCargoGuidedEditor({units:one,products:two},scope,catalog,{u
   for(const n of Object.values(productControls))n.disabled=locked||full;
   unitControls.measure.closest('.d-field').hidden=irregular;unitDims.hidden=irregular;
   save.textContent=s.form.target?'Actualizar tipo de carga':'Guardar tipo de carga';save.disabled=locked||busy||full||!!s.form.target&&!model.dirty()||!s.form.target&&s.savedTypes.length>0&&!model.dirty();save.setAttribute('aria-busy',String(busy));
-  limit.hidden=!full;limit.textContent=full?'Ya configuraste dos tipos de carga. Seleccioná una tarjeta inferior para revisar o actualizar uno.':'';
+  limit.hidden=!locked&&!full;limit.textContent=locked?'Configuración de solo lectura. Los tipos de carga se conservan sin cambios.':full?'Ya configuraste dos tipos de carga. Seleccioná una tarjeta inferior para revisar o actualizar uno.':'';
   for(const [key,label]of [['length','Largo'],['width','Ancho'],['height','Alto']])productControls[key].closest('.d-field').querySelector('label').textContent=label+' de '+s.form.values.packageType+' ('+s.form.values.unit+') *';
   if(showErrors)paint(model.formErrors());summarize();renderHistory();
  }

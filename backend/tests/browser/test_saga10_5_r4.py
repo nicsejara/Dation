@@ -121,6 +121,7 @@ class R4Tests(fixture.R4Browser):
   for i in range(3):
    await self.page.get_by_role('button',name='Editar datos de origen',exact=True).click();await self.ready(2);await self.page.locator('[data-dation-test=core-step-1]').click();await self.ready(1);await blocks.block(self.page,3)
    await expect(self.page.locator('[data-pro-step]')).to_have_count(3);await expect(self.page.locator('[data-cargo-step]')).to_have_count(0);await expect(self.page.locator('.model-wizard-v2 input:enabled,.model-wizard-v2 select:enabled,.model-wizard-v2 [data-save-load-type]:enabled')).to_have_count(0)
+   await expect(self.page.locator('[data-pro-step="2"]')).to_contain_text('Configuración de solo lectura. Los tipos de carga se conservan sin cambios.');self.assertNotIn('Seleccioná una tarjeta inferior',await self.page.locator('[data-pro-step="2"]').text_content())
    await self.page.screenshot(path=str(OUT/f'published-review-return-{i}.png'),full_page=True,animations='disabled')
    current=await self.api('GET','/api/platform/logistics-models/'+mid);self.assertEqual(current,original)
    await self.page.locator('.journey-return-link').click();await self.page.locator('[data-ux05-ready=true]').wait_for();self.assertEqual(parse_qs(urlparse(self.page.url).query)['case_id'],[cid])
