@@ -82,7 +82,7 @@ class R4Tests(fixture.R4Browser):
    self.assertEqual([p['presentation_id'] for p in (await self.draft())['configuration']['cargo']['presentations']],ids)
   await first.locator('[name=unit_measure]').select_option('m')
   for key,value in [('unit_length','1.2'),('unit_width','1'),('unit_height','1.5')]:await first.locator('[name='+key+']').fill(value)
-  await expect(first.locator('[data-cargo-metric=volume]')).to_contain_text('1,8 m³');self.assertEqual(self.errors,[])
+  await expect(first.locator('[data-cargo-metric=volume]')).to_contain_text('1,80 m³');self.assertEqual(self.errors,[])
  async def test_05_reset_discard_refresh_and_pending_publication(self):
   await self.start();await self.fill(two=True);await self.confirm();before=await self.stored()
   await self.page.get_by_role('button',name='Crear nuevo modelo',exact=True).click();await self.page.get_by_role('dialog').get_by_role('button',name='Cancelar',exact=True).click();self.assertEqual((await self.stored())['value'],before['value'])

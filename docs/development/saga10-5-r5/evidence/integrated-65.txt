@@ -1,0 +1,375 @@
+test_01_complete_forms_exact_shared_geometry_and_a11y (test_saga10_5_r5.R5Tests.test_01_complete_forms_exact_shared_geometry_and_a11y) ... Executing <Task finished name='Task-1' coro=<Saga10WizardTests.asyncSetUp() done, defined at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:24> result=None created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.113 seconds
+Executing <Task pending name='Task-6' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.244 seconds
+ok
+test_02_five_types_ten_assets_history_and_no_requests_per_keystroke (test_saga10_5_r5.R5Tests.test_02_five_types_ten_assets_history_and_no_requests_per_keystroke) ... Executing <Task pending name='Task-17' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.231 seconds
+ok
+test_03_progressive_guidance_history_and_stable_ids (test_saga10_5_r5.R5Tests.test_03_progressive_guidance_history_and_stable_ids) ... Executing <Task pending name='Task-28' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.225 seconds
+ok
+test_04_historical_incomplete_human_readonly_no_preview_or_xss (test_saga10_5_r5.R5Tests.test_04_historical_incomplete_human_readonly_no_preview_or_xss) ... Executing <Task pending name='Task-39' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.235 seconds
+ok
+test_05_missing_asset_fallback_and_incognito_draft_isolation (test_saga10_5_r5.R5Tests.test_05_missing_asset_fallback_and_incognito_draft_isolation) ... Executing <Task pending name='Task-56' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.246 seconds
+ok
+test_06_measure_selector_keeps_physical_volume (test_saga10_5_r5.R5Tests.test_06_measure_selector_keeps_physical_volume) ... Executing <Task pending name='Task-67' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.228 seconds
+ok
+test_01_progressive_one_two_edit_and_shared_physics (test_saga10_5_r4.R4Tests.test_01_progressive_one_two_edit_and_shared_physics) ... Executing <Task pending name='Task-79' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.233 seconds
+ok
+test_02_errors_unsaved_buffer_discard_and_double_click (test_saga10_5_r4.R4Tests.test_02_errors_unsaved_buffer_discard_and_double_click) ... Executing <Task pending name='Task-90' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.335 seconds
+ok
+test_03_all_five_confirmation_cycles_and_dependencies (test_saga10_5_r4.R4Tests.test_03_all_five_confirmation_cycles_and_dependencies) ... Executing <Task pending name='Task-101' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.230 seconds
+ok
+test_04_five_units_metre_volume_and_cancel_safe (test_saga10_5_r4.R4Tests.test_04_five_units_metre_volume_and_cancel_safe) ... Executing <Task pending name='Task-112' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.208 seconds
+ok
+test_05_reset_discard_refresh_and_pending_publication (test_saga10_5_r4.R4Tests.test_05_reset_discard_refresh_and_pending_publication) ... Executing <Task pending name='Task-127' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.234 seconds
+ok
+test_06_stale_preview_error_retry_no_local_publication (test_saga10_5_r4.R4Tests.test_06_stale_preview_error_retry_no_local_publication) ... Executing <Task pending name='Task-147' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.238 seconds
+ok
+test_07_three_csv_case_graph_review_three_returns_and_new (test_saga10_5_r4.R4Tests.test_07_three_csv_case_graph_review_three_returns_and_new) ... Executing <Task pending name='Task-154' coro=<Connection.run() running at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:356> created at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_context_manager.py:37> took 0.336 seconds
+Executing <Task finished name='Task-157' coro=<R4Tests.test_07_three_csv_case_graph_review_three_returns_and_new() done, defined at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_5_r4.py:110> result=None created at /usr/lib/python3.13/asyncio/runners.py:100> took 1.015 seconds
+Executing <Task pending name='Task-159' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.222 seconds
+ok
+test_08_legacy_contracts_preserved_without_catalog_manager (test_saga10_5_r4.R4Tests.test_08_legacy_contracts_preserved_without_catalog_manager) ... Executing <Task pending name='Task-169' coro=<R4Tests.test_08_legacy_contracts_preserved_without_catalog_manager() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_5_r4.py:144> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.432 seconds
+Executing <Task pending name='Task-170' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.253 seconds
+ok
+test_09_dom_inventory_responsive_geometry_accessibility_and_screenshots (test_saga10_5_r4.R4Tests.test_09_dom_inventory_responsive_geometry_accessibility_and_screenshots) ... Executing <Task pending name='Task-181' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.259 seconds
+ok
+test_10_dimensions_primary_split_and_independent_publication (test_saga10_5_r4.R4Tests.test_10_dimensions_primary_split_and_independent_publication) ... Executing <Task pending name='Task-193' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.235 seconds
+ok
+test_11_incompatible_draft_and_recovery_checkpoint (test_saga10_5_r4.R4Tests.test_11_incompatible_draft_and_recovery_checkpoint) ... Executing <Task finished name='Task-199' coro=<Saga10WizardTests.asyncSetUp() done, defined at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:24> result=None created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.178 seconds
+Executing <Task pending name='Task-200' coro=<Connection.run() running at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:356> created at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_context_manager.py:37> took 0.108 seconds
+Executing <Task pending name='Task-204' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.238 seconds
+ok
+test_12_new_from_published_preserves_identity (test_saga10_5_r4.R4Tests.test_12_new_from_published_preserves_identity) ... Executing <Task pending name='Task-216' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.262 seconds
+ok
+test_13_legacy_direct_uses_two_csv_without_dummy_catalog (test_saga10_5_r4.R4Tests.test_13_legacy_direct_uses_two_csv_without_dummy_catalog) ... Executing <Task pending name='Task-226' coro=<R4Tests.test_13_legacy_direct_uses_two_csv_without_dummy_catalog() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_5_r4.py:205> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.317 seconds
+Executing <Task pending name='Task-227' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.212 seconds
+ok
+test_14_real_progressive_visual_states (test_saga10_5_r4.R4Tests.test_14_real_progressive_visual_states) ... Executing <Task pending name='Task-238' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.230 seconds
+ok
+test_01_navigation_does_not_expand_incomplete_cargo (test_saga10_5_r3.R3Tests.test_01_navigation_does_not_expand_incomplete_cargo) ... Executing <Task finished name='Task-244' coro=<Saga10WizardTests.asyncSetUp() done, defined at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:24> result=None created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.115 seconds
+Executing <Task pending name='Task-249' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.219 seconds
+ok
+test_02_new_model_resets_real_draft_and_cancel_preserves_it (test_saga10_5_r3.R3Tests.test_02_new_model_resets_real_draft_and_cancel_preserves_it) ... Executing <Task pending name='Task-260' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.256 seconds
+ok
+test_03_recovered_homogeneous_draft_is_not_trapped_by_edition (test_saga10_5_r3.R3Tests.test_03_recovered_homogeneous_draft_is_not_trapped_by_edition) ... Executing <Task finished name='Task-266' coro=<Saga10WizardTests.asyncSetUp() done, defined at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:24> result=None created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.109 seconds
+Executing <Task pending name='Task-267' coro=<Connection.run() running at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:356> created at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_context_manager.py:37> took 0.314 seconds
+Executing <Task pending name='Task-271' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.310 seconds
+ok
+test_04_direct_choice_and_recoverable_checkpoint (test_saga10_5_r3.R3Tests.test_04_direct_choice_and_recoverable_checkpoint) ... Executing <Task finished name='Task-277' coro=<Saga10WizardTests.asyncSetUp() done, defined at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:24> result=None created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.197 seconds
+Executing <Task pending name='Task-282' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.261 seconds
+ok
+test_05_local_errors_stay_local_and_global_errors_are_deliberate (test_saga10_5_r3.R3Tests.test_05_local_errors_stay_local_and_global_errors_are_deliberate) ... Executing <Task pending name='Task-293' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.348 seconds
+ok
+test_06_profiles_are_selectable_and_bulk_profile_stays_discrete (test_saga10_5_r3.R3Tests.test_06_profiles_are_selectable_and_bulk_profile_stays_discrete) ... Executing <Task pending name='Task-304' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.238 seconds
+ok
+test_07_new_from_published_is_independent_and_empty (test_saga10_5_r3.R3Tests.test_07_new_from_published_is_independent_and_empty) ... Executing <Task pending name='Task-316' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.302 seconds
+ok
+test_08_visual_contract_and_model_only_helpers (test_saga10_5_r3.R3Tests.test_08_visual_contract_and_model_only_helpers) ... Executing <Task pending name='Task-327' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.248 seconds
+ok
+test_09_pending_publication_blocks_reset_and_reuses_intent (test_saga10_5_r3.R3Tests.test_09_pending_publication_blocks_reset_and_reuses_intent) ... Executing <Task pending name='Task-334' coro=<Connection.run() running at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:356> created at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_context_manager.py:37> took 0.385 seconds
+Executing <Task pending name='Task-342' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.226 seconds
+ok
+test_01_direct_review_is_explicit_and_resets (test_saga10_5_guided.Saga10GuidedTests.test_01_direct_review_is_explicit_and_resets) ... Executing <Task pending name='Task-352' coro=<Saga10GuidedTests.test_01_direct_review_is_explicit_and_resets() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_5_guided.py:29> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.423 seconds
+Executing <Task pending name='Task-353' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.268 seconds
+ok
+test_02_mixed_catalog_correct_physics_and_shared_unit (test_saga10_5_guided.Saga10GuidedTests.test_02_mixed_catalog_correct_physics_and_shared_unit) ... Executing <Task pending name='Task-363' coro=<Saga10GuidedTests.test_02_mixed_catalog_correct_physics_and_shared_unit() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_5_guided.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.543 seconds
+Executing <Task pending name='Task-364' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.251 seconds
+ok
+test_03_profiles_and_legacy_draft_survive_reload (test_saga10_5_guided.Saga10GuidedTests.test_03_profiles_and_legacy_draft_survive_reload) ... Executing <Task pending name='Task-374' coro=<Saga10GuidedTests.test_03_profiles_and_legacy_draft_survive_reload() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_5_guided.py:34> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.342 seconds
+FAIL
+Executing <Task pending name='Task-375' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.243 seconds
+test_04_products_codes_and_reference_integrity (test_saga10_5_guided.Saga10GuidedTests.test_04_products_codes_and_reference_integrity) ... Executing <Task finished name='Task-381' coro=<Saga10WizardTests.asyncSetUp() done, defined at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:24> result=None created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.105 seconds
+Executing <Task pending name='Task-385' coro=<Saga10GuidedTests.test_04_products_codes_and_reference_integrity() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_5_guided.py:38> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.356 seconds
+Executing <Task pending name='Task-386' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.233 seconds
+ok
+test_05_partial_dimensions_unknown_mass_and_contradiction (test_saga10_5_guided.Saga10GuidedTests.test_05_partial_dimensions_unknown_mass_and_contradiction) ... Executing <Task pending name='Task-396' coro=<Saga10GuidedTests.test_05_partial_dimensions_unknown_mass_and_contradiction() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_5_guided.py:47> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.311 seconds
+Executing <Task pending name='Task-397' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.236 seconds
+ok
+test_06_stale_preview_never_reenables_publish (test_saga10_5_guided.Saga10GuidedTests.test_06_stale_preview_never_reenables_publish) ... Executing <Task pending name='Task-417' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.255 seconds
+ok
+test_07_bulk_uses_explicit_density_without_required_pallet (test_saga10_5_guided.Saga10GuidedTests.test_07_bulk_uses_explicit_density_without_required_pallet) ... Executing <Task pending name='Task-427' coro=<Saga10GuidedTests.test_07_bulk_uses_explicit_density_without_required_pallet() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_5_guided.py:51> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.323 seconds
+Executing <Task pending name='Task-428' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.235 seconds
+ok
+test_08_preview_failure_preserves_values_and_retries (test_saga10_5_guided.Saga10GuidedTests.test_08_preview_failure_preserves_values_and_retries) ... Executing <Task pending name='Task-442' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.228 seconds
+ok
+test_09_component_limits_with_public_initial_dto (test_saga10_5_guided.Saga10GuidedTests.test_09_component_limits_with_public_initial_dto) ... Executing <Task pending name='Task-452' coro=<Saga10GuidedTests.test_09_component_limits_with_public_initial_dto() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_5_guided.py:57> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.482 seconds
+Executing <Task pending name='Task-452' coro=<Saga10GuidedTests.test_09_component_limits_with_public_initial_dto() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_5_guided.py:57> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.144 seconds
+Executing <Task pending name='Task-453' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.250 seconds
+ok
+test_10_primary_coload_currency_and_commercial_counts_preserved (test_saga10_5_guided.Saga10GuidedTests.test_10_primary_coload_currency_and_commercial_counts_preserved) ... Executing <Task finished name='Task-459' coro=<Saga10WizardTests.asyncSetUp() done, defined at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:24> result=None created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.116 seconds
+Executing <Task pending name='Task-463' coro=<Saga10GuidedTests.test_10_primary_coload_currency_and_commercial_counts_preserved() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_5_guided.py:62> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.348 seconds
+Executing <Task pending name='Task-464' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.238 seconds
+ok
+test_11_missing_sources_has_inline_accessible_error (test_saga10_5_guided.Saga10GuidedTests.test_11_missing_sources_has_inline_accessible_error) ... Executing <Task pending name='Task-475' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.235 seconds
+ok
+test_12_declared_physics_is_not_labelled_as_calculated (test_saga10_5_guided.Saga10GuidedTests.test_12_declared_physics_is_not_labelled_as_calculated) ... Executing <Task pending name='Task-485' coro=<Saga10GuidedTests.test_12_declared_physics_is_not_labelled_as_calculated() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_5_guided.py:68> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.280 seconds
+Executing <Task pending name='Task-486' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.232 seconds
+ok
+test_01_homogeneous_physics_contract_and_explicit_confirmation (test_saga10_5_ultimate.UltimateProTests.test_01_homogeneous_physics_contract_and_explicit_confirmation) ... Executing <Task finished name='Task-492' coro=<Saga10WizardTests.asyncSetUp() done, defined at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:24> result=None created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.105 seconds
+Executing <Task pending name='Task-498' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.210 seconds
+ok
+test_02_roles_sources_cost_dependencies_and_currency (test_saga10_5_ultimate.UltimateProTests.test_02_roles_sources_cost_dependencies_and_currency) ... Executing <Task pending name='Task-505' coro=<Connection.run() running at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:356> created at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_context_manager.py:37> took 0.165 seconds
+Executing <Task pending name='Task-510' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.235 seconds
+ok
+test_03_five_types_cancel_and_big_bag_without_fake_geometry (test_saga10_5_ultimate.UltimateProTests.test_03_five_types_cancel_and_big_bag_without_fake_geometry) ... Executing <Task pending name='Task-521' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.310 seconds
+ok
+test_04_shared_support_two_homogeneous_presentations_and_reload (test_saga10_5_ultimate.UltimateProTests.test_04_shared_support_two_homogeneous_presentations_and_reload) ... Executing <Task pending name='Task-533' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.213 seconds
+ok
+test_05_real_geometry_a11y_and_screenshots (test_saga10_5_ultimate.UltimateProTests.test_05_real_geometry_a11y_and_screenshots) ... Executing <Task pending name='Task-544' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.239 seconds
+ok
+test_06_stale_preview_retry_and_local_cta_never_publish (test_saga10_5_ultimate.UltimateProTests.test_06_stale_preview_retry_and_local_cta_never_publish) ... Executing <Task pending name='Task-564' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.240 seconds
+ok
+test_07_dimensions_split_and_confirmation_invalidation (test_saga10_5_ultimate.UltimateProTests.test_07_dimensions_split_and_confirmation_invalidation) ... Executing <Task pending name='Task-576' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.237 seconds
+ok
+test_08_legacy_mixed_currency_and_commercial_counts_are_not_converted (test_saga10_5_ultimate.UltimateProTests.test_08_legacy_mixed_currency_and_commercial_counts_are_not_converted) ... Executing <Task pending name='Task-586' coro=<UltimateProTests.test_08_legacy_mixed_currency_and_commercial_counts_are_not_converted() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_5_ultimate.py:43> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.379 seconds
+Executing <Task pending name='Task-583' coro=<Connection.run() running at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:356> created at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_context_manager.py:37> took 0.238 seconds
+Executing <Task pending name='Task-587' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.264 seconds
+ok
+test_01_real_catalog_editor_physics_publish_and_responsive (test_saga10_wizard.Saga10WizardTests.test_01_real_catalog_editor_physics_publish_and_responsive) ... Executing <Task pending name='Task-599' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.228 seconds
+ok
+test_02_three_csv_cross_file_error_repair_reload_and_case (test_saga10_wizard.Saga10WizardTests.test_02_three_csv_cross_file_error_repair_reload_and_case) ... Executing <Task pending name='Task-609' coro=<Saga10WizardTests.test_02_three_csv_cross_file_error_repair_reload_and_case() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:75> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.103 seconds
+Executing <Task pending name='Task-609' coro=<Saga10WizardTests.test_02_three_csv_cross_file_error_repair_reload_and_case() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:90> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.132 seconds
+Executing <Task pending name='Task-610' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.215 seconds
+ok
+test_03_direct_mode_has_no_dummy_catalog_and_conditional_costs (test_saga10_wizard.Saga10WizardTests.test_03_direct_mode_has_no_dummy_catalog_and_conditional_costs) ... Executing <Task pending name='Task-620' coro=<Saga10WizardTests.test_03_direct_mode_has_no_dummy_catalog_and_conditional_costs() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:97> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.330 seconds
+Executing <Task pending name='Task-621' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.224 seconds
+ok
+test_04_stale_or_mismatched_bundle_proof_never_unlocks_data (test_saga10_wizard.Saga10WizardTests.test_04_stale_or_mismatched_bundle_proof_never_unlocks_data) ... Executing <Task pending name='Task-641' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.228 seconds
+ok
+test_01_real_progress_validation_and_responsive_mockup (test_logistics_model_wizard.LogisticsModelWizardTests.test_01_real_progress_validation_and_responsive_mockup) ... ok
+test_02_reuse_cancel_keeps_draft_and_defaults_to_new (test_logistics_model_wizard.LogisticsModelWizardTests.test_02_reuse_cancel_keeps_draft_and_defaults_to_new) ... ok
+test_03_double_submit_is_one_model_and_version_no_case (test_logistics_model_wizard.LogisticsModelWizardTests.test_03_double_submit_is_one_model_and_version_no_case) ... ok
+test_04_version_failure_refresh_and_same_intent_recovery (test_logistics_model_wizard.LogisticsModelWizardTests.test_04_version_failure_refresh_and_same_intent_recovery) ... Executing <Handle SubprocessStreamProtocol.pipe_data_received(1, b'\xac\x03\x0...fdc63aeda"}}}') created at /usr/lib/python3.13/asyncio/base_subprocess.py:221> took 0.264 seconds
+ok
+test_05_lost_publication_ack_replays_exact_version (test_logistics_model_wizard.LogisticsModelWizardTests.test_05_lost_publication_ack_replays_exact_version) ... ok
+test_06_stale_preview_cannot_enable_publication_or_leak_contract (test_logistics_model_wizard.LogisticsModelWizardTests.test_06_stale_preview_cannot_enable_publication_or_leak_contract) ... ok
+test_07_no_model_permissions_cannot_publish_but_can_reuse (test_logistics_model_wizard.LogisticsModelWizardTests.test_07_no_model_permissions_cannot_publish_but_can_reuse) ... ok
+test_08_new_model_after_publication_keeps_old_version_immutable (test_logistics_model_wizard.LogisticsModelWizardTests.test_08_new_model_after_publication_keeps_old_version_immutable) ... ok
+test_09_lost_create_ack_recovers_same_model_identity (test_logistics_model_wizard.LogisticsModelWizardTests.test_09_lost_create_ack_recovers_same_model_identity) ... ok
+test_10_confirmed_publication_failed_selection_can_be_recovered (test_logistics_model_wizard.LogisticsModelWizardTests.test_10_confirmed_publication_failed_selection_can_be_recovered) ... ok
+test_11_sidebar_keeps_case_inputs_and_keyboard_picker_focus (test_logistics_model_wizard.LogisticsModelWizardTests.test_11_sidebar_keeps_case_inputs_and_keyboard_picker_focus) ... ok
+test_12_unavailable_version_never_selects_another_by_default (test_logistics_model_wizard.LogisticsModelWizardTests.test_12_unavailable_version_never_selects_another_by_default) ... ok
+
+======================================================================
+FAIL: test_03_profiles_and_legacy_draft_survive_reload (test_saga10_5_guided.Saga10GuidedTests.test_03_profiles_and_legacy_draft_survive_reload)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/usr/lib/python3.13/asyncio/base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_5_guided.py", line 34, in test_03_profiles_and_legacy_draft_survive_reload
+    c=await self.config();c['cargo']['profile']='MIXED';await self.component(c);await expect(self.page.locator('[data-historical-review]')).to_contain_text('MIXED')
+                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_generated.py", line 22119, in to_contain_text
+    await self._impl_obj.to_contain_text(
+    ...<4 lines>...
+    )
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_assertions.py", line 303, in to_contain_text
+    await self._expect_impl(
+    ...<9 lines>...
+    )
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_assertions.py", line 128, in _expect_impl
+    _record_soft_or_raise(
+    ~~~~~~~~~~~~~~~~~~~~~^
+        AssertionError(
+        ^^^^^^^^^^^^^^^
+    ...<2 lines>...
+        self._is_soft,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_assertions.py", line 60, in _record_soft_or_raise
+    raise error
+AssertionError: Locator expected to contain text 'MIXED'
+Actual value: 01. Identidad del modeloConsulta del modelo · solo lectura✓Nombre del modeloHistórico íntegroDescripciónDato no definido02. Operación logísticaConsulta del modelo · solo lectura✓Rol de la empresaGenerador de cargaPatrón de transporteDirecto · Origen a destinoConsolidación de órdenesPermitida según compatibilidad03. Carga y capacidadConsulta del modelo · solo lectura✓El contrato utiliza dimensiones históricas que deben conservarse.Se conserva el contrato original. Esta vista permite consultarlo; para una configuración diferente utilizá Crear nuevo modelo.Paso 1 de 3Unidades logísticas del modeloCaracterísticas declaradas del contrato original.Unidades logísticasPallet compartidoReferencia: PALLET-STDTipoPalletTara25 kgDimensiones del soporte vacío120 × 100 × 15 cmLímite estructuralDato no definidoPaso 2 de 3Productos y tipos de cargaSe conservan todas las cargas, sus cantidades y sus referencias.Productos declaradosJugoReferencia: JUICEBultocajaUnidades por bulto12Peso bruto por bulto12 kgPeso neto declaradoDato no definidoDimensiones del bultoDato no definidoDensidad declaradaSin densidad declaradaCategorías de compatibilidadSin valores declaradosCódigoDato no definidoCategoríaDato no definidoAguaReferencia: WATERBultocajaUnidades por bulto12Peso bruto por bulto15 kgPeso neto declaradoDato no definidoDimensiones del bultoDato no definidoDensidad declaradaSin densidad declaradaCategorías de compatibilidadSin valores declaradosCódigoDato no definidoCategoríaDato no definidoGaseosaReferencia: SODABultocajaUnidades por bulto12Peso bruto por bulto13.5 kgPeso neto declaradoDato no definidoDimensiones del bultoDato no definidoDensidad declaradaSin densidad declaradaCategorías de compatibilidadSin valores declaradosCódigoDato no definidoCategoríaDato no definidoTipos de carga del contratoJugo palletizadoReferencia: PAL-JUICEUnidad logísticaPallet compartidoNaturaleza de la cantidadDato no definidoUnidad de cantidadDato no definidoDimensiones exteriores cargadas120 × 100 × 180 cmVolumen exterior declaradoDato no definidoPeso bruto declarado985 kgTara adicionalDato no definidoComponente 1Jugo · Cantidad: 80Agua palletizadoReferencia: PAL-WATERUnidad logísticaPallet compartidoNaturaleza de la cantidadDato no definidoUnidad de cantidadDato no definidoDimensiones exteriores cargadas120 × 100 × 200 cmVolumen exterior declaradoDato no definidoPeso bruto declarado1225 kgTara adicionalDato no definidoComponente 1Agua · Cantidad: 80Gaseosa palletizadoReferencia: PAL-SODAUnidad logísticaPallet compartidoNaturaleza de la cantidadDato no definidoUnidad de cantidadDato no definidoDimensiones exteriores cargadas120 × 100 × 190 cmVolumen exterior declaradoDato no definidoPeso bruto declarado1105 kgTara adicionalDato no definidoComponente 1Gaseosa · Cantidad: 80Paso 3 de 3Restricciones físicas y reglasReglas originales, sin reinterpretar su significado.Perfil de cargaOperación mixtaEntrada de datosCatálogo físico · tres archivosCapacidades controladasPallets · Peso (kg) · Volumen (m³) · UnidadesReferencia de reportePalletsFraccionamiento de órdenesDistribución en unidades completas, con permiso de la ordenCompatibilidad entre productosUniformidad declarada en el contrato originalPares de co-carga autorizadosSin pares adicionales autorizados04. Recursos de transporteConsulta del modelo · solo lectura✓Origen de los recursosFlota propia · Transporte tercerizadoCategorías de vehículosSin valores declarados05. Moneda y costosConsulta del modelo · solo lectura✓MonedaARSDecimales monetarios2RedondeoRedondeo a la mitad hacia arribaCosto de flota propiaCosto operativo del ciclo propioTarifas externasTarifa por viaje · Tarifa por kilómetroDistancias facturablesSólo ida · Ida y vuelta 
+Call log:
+  - Expect "to_contain_text" locator("[data-historical-review]") with timeout 5000ms
+  - waiting for locator("[data-historical-review]")
+    14 × locator resolved to <div data-historical-review="" class="model-wizard-v2 model-wizard-pro">…</div>
+       - unexpected value "01. Identidad del modeloConsulta del modelo · solo lectura✓Nombre del modeloHistórico íntegroDescripciónDato no definido02. Operación logísticaConsulta del modelo · solo lectura✓Rol de la empresaGenerador de cargaPatrón de transporteDirecto · Origen a destinoConsolidación de órdenesPermitida según compatibilidad03. Carga y capacidadConsulta del modelo · solo lectura✓El contrato utiliza dimensiones históricas que deben conservarse.Se conserva el contrato original. Esta vista permite consultarlo; para una configuración diferente utilizá Crear nuevo modelo.Paso 1 de 3Unidades logísticas del modeloCaracterísticas declaradas del contrato original.Unidades logísticasPallet compartidoReferencia: PALLET-STDTipoPalletTara25 kgDimensiones del soporte vacío120 × 100 × 15 cmLímite estructuralDato no definidoPaso 2 de 3Productos y tipos de cargaSe conservan todas las cargas, sus cantidades y sus referencias.Productos declaradosJugoReferencia: JUICEBultocajaUnidades por bulto12Peso bruto por bulto12 kgPeso neto declaradoDato no definidoDimensiones del bultoDato no definidoDensidad declaradaSin densidad declaradaCategorías de compatibilidadSin valores declaradosCódigoDato no definidoCategoríaDato no definidoAguaReferencia: WATERBultocajaUnidades por bulto12Peso bruto por bulto15 kgPeso neto declaradoDato no definidoDimensiones del bultoDato no definidoDensidad declaradaSin densidad declaradaCategorías de compatibilidadSin valores declaradosCódigoDato no definidoCategoríaDato no definidoGaseosaReferencia: SODABultocajaUnidades por bulto12Peso bruto por bulto13.5 kgPeso neto declaradoDato no definidoDimensiones del bultoDato no definidoDensidad declaradaSin densidad declaradaCategorías de compatibilidadSin valores declaradosCódigoDato no definidoCategoríaDato no definidoTipos de carga del contratoJugo palletizadoReferencia: PAL-JUICEUnidad logísticaPallet compartidoNaturaleza de la cantidadDato no definidoUnidad de cantidadDato no definidoDimensiones exteriores cargadas120 × 100 × 180 cmVolumen exterior declaradoDato no definidoPeso bruto declarado985 kgTara adicionalDato no definidoComponente 1Jugo · Cantidad: 80Agua palletizadoReferencia: PAL-WATERUnidad logísticaPallet compartidoNaturaleza de la cantidadDato no definidoUnidad de cantidadDato no definidoDimensiones exteriores cargadas120 × 100 × 200 cmVolumen exterior declaradoDato no definidoPeso bruto declarado1225 kgTara adicionalDato no definidoComponente 1Agua · Cantidad: 80Gaseosa palletizadoReferencia: PAL-SODAUnidad logísticaPallet compartidoNaturaleza de la cantidadDato no definidoUnidad de cantidadDato no definidoDimensiones exteriores cargadas120 × 100 × 190 cmVolumen exterior declaradoDato no definidoPeso bruto declarado1105 kgTara adicionalDato no definidoComponente 1Gaseosa · Cantidad: 80Paso 3 de 3Restricciones físicas y reglasReglas originales, sin reinterpretar su significado.Perfil de cargaOperación mixtaEntrada de datosCatálogo físico · tres archivosCapacidades controladasPallets · Peso (kg) · Volumen (m³) · UnidadesReferencia de reportePalletsFraccionamiento de órdenesDistribución en unidades completas, con permiso de la ordenCompatibilidad entre productosUniformidad declarada en el contrato originalPares de co-carga autorizadosSin pares adicionales autorizados04. Recursos de transporteConsulta del modelo · solo lectura✓Origen de los recursosFlota propia · Transporte tercerizadoCategorías de vehículosSin valores declarados05. Moneda y costosConsulta del modelo · solo lectura✓MonedaARSDecimales monetarios2RedondeoRedondeo a la mitad hacia arribaCosto de flota propiaCosto operativo del ciclo propioTarifas externasTarifa por viaje · Tarifa por kilómetroDistancias facturablesSólo ida · Ida y vuelta"
+
+Aria snapshot:
+- group:
+  - text: 01. Identidad del modelo Consulta del modelo · solo lectura
+  - 'img "Identidad del modelo: publicado · solo lectura"': ✓
+- group:
+  - text: 02. Operación logística Consulta del modelo · solo lectura
+  - 'img "Operación logística: publicado · solo lectura"': ✓
+- group:
+  - text: 03. Carga y capacidad Consulta del modelo · solo lectura
+  - 'img "Carga y capacidad: publicado · solo lectura"': ✓
+  - paragraph: El contrato utiliza dimensiones históricas que deben conservarse.
+  - paragraph: Se conserva el contrato original. Esta vista permite consultarlo; para una configuración diferente utilizá Crear nuevo modelo.
+  - text: Paso 1 de 3
+  - heading "Unidades logísticas del modelo" [level=4]
+  - paragraph: Características declaradas del contrato original.
+  - heading "Unidades logísticas" [level=5]
+  - region "Unidades logísticas":
+    - article:
+      - heading "Pallet compartido" [level=6]
+      - paragraph: "Referencia: PALLET-STD"
+      - term: Tipo
+      - definition: Pallet
+      - term: Tara
+      - definition: 25 kg
+      - term: Dimensiones del soporte vacío
+      - definition: 120 × 100 × 15 cm
+      - term: Límite estructural
+      - definition: Dato no definido
+  - text: Paso 2 de 3
+  - heading "Productos y tipos de carga" [level=4]
+  - paragraph: Se conservan todas las cargas, sus cantidades y sus referencias.
+  - heading "Productos declarados" [level=5]
+  - region "Productos declarados":
+    - article:
+      - heading "Jugo" [level=6]
+      - paragraph: "Referencia: JUICE"
+      - term: Bulto
+      - definition: caja
+      - term: Unidades por bulto
+      - definition: "12"
+      - term: Peso bruto por bulto
+      - definition: 12 kg
+      - term: Peso neto declarado
+      - definition: Dato no definido
+      - term: Dimensiones del bulto
+      - definition: Dato no definido
+      - term: Densidad declarada
+      - definition: Sin densidad declarada
+      - term: Categorías de compatibilidad
+      - definition: Sin valores declarados
+      - term: Código
+      - definition: Dato no definido
+      - term: Categoría
+      - definition: Dato no definido
+    - article:
+      - heading "Agua" [level=6]
+      - paragraph: "Referencia: WATER"
+      - term: Bulto
+      - definition: caja
+      - term: Unidades por bulto
+      - definition: "12"
+      - term: Peso bruto por bulto
+      - definition: 15 kg
+      - term: Peso neto declarado
+      - definition: Dato no definido
+      - term: Dimensiones del bulto
+      - definition: Dato no definido
+      - term: Densidad declarada
+      - definition: Sin densidad declarada
+      - term: Categorías de compatibilidad
+      - definition: Sin valores declarados
+      - term: Código
+      - definition: Dato no definido
+      - term: Categoría
+      - definition: Dato no definido
+    - article:
+      - heading "Gaseosa" [level=6]
+      - paragraph: "Referencia: SODA"
+      - term: Bulto
+      - definition: caja
+      - term: Unidades por bulto
+      - definition: "12"
+      - term: Peso bruto por bulto
+      - definition: 13.5 kg
+      - term: Peso neto declarado
+      - definition: Dato no definido
+      - term: Dimensiones del bulto
+      - definition: Dato no definido
+      - term: Densidad declarada
+      - definition: Sin densidad declarada
+      - term: Categorías de compatibilidad
+      - definition: Sin valores declarados
+      - term: Código
+      - definition: Dato no definido
+      - term: Categoría
+      - definition: Dato no definido
+  - heading "Tipos de carga del contrato" [level=5]
+  - region "Tipos de carga del contrato":
+    - article:
+      - heading "Jugo palletizado" [level=6]
+      - paragraph: "Referencia: PAL-JUICE"
+      - term: Unidad logística
+      - definition: Pallet compartido
+      - term: Naturaleza de la cantidad
+      - definition: Dato no definido
+      - term: Unidad de cantidad
+      - definition: Dato no definido
+      - term: Dimensiones exteriores cargadas
+      - definition: 120 × 100 × 180 cm
+      - term: Volumen exterior declarado
+      - definition: Dato no definido
+      - term: Peso bruto declarado
+      - definition: 985 kg
+      - term: Tara adicional
+      - definition: Dato no definido
+      - term: Componente 1
+      - definition: "Jugo · Cantidad: 80"
+    - article:
+      - heading "Agua palletizado" [level=6]
+      - paragraph: "Referencia: PAL-WATER"
+      - term: Unidad logística
+      - definition: Pallet compartido
+      - term: Naturaleza de la cantidad
+      - definition: Dato no definido
+      - term: Unidad de cantidad
+      - definition: Dato no definido
+      - term: Dimensiones exteriores cargadas
+      - definition: 120 × 100 × 200 cm
+      - term: Volumen exterior declarado
+      - definition: Dato no definido
+      - term: Peso bruto declarado
+      - definition: 1225 kg
+      - term: Tara adicional
+      - definition: Dato no definido
+      - term: Componente 1
+      - definition: "Agua · Cantidad: 80"
+    - article:
+      - heading "Gaseosa palletizado" [level=6]
+      - paragraph: "Referencia: PAL-SODA"
+      - term: Unidad logística
+      - definition: Pallet compartido
+      - term: Naturaleza de la cantidad
+      - definition: Dato no definido
+      - term: Unidad de cantidad
+      - definition: Dato no definido
+      - term: Dimensiones exteriores cargadas
+      - definition: 120 × 100 × 190 cm
+      - term: Volumen exterior declarado
+      - definition: Dato no definido
+      - term: Peso bruto declarado
+      - definition: 1105 kg
+      - term: Tara adicional
+      - definition: Dato no definido
+      - term: Componente 1
+      - definition: "Gaseosa · Cantidad: 80"
+  - text: Paso 3 de 3
+  - heading "Restricciones físicas y reglas" [level=4]
+  - paragraph: Reglas originales, sin reinterpretar su significado.
+  - term: Perfil de carga
+  - definition: Operación mixta
+  - term: Entrada de datos
+  - definition: Catálogo físico · tres archivos
+  - term: Capacidades controladas
+  - definition: Pallets · Peso (kg) · Volumen (m³) · Unidades
+  - term: Referencia de reporte
+  - definition: Pallets
+  - term: Fraccionamiento de órdenes
+  - definition: Distribución en unidades completas, con permiso de la orden
+  - term: Compatibilidad entre productos
+  - definition: Uniformidad declarada en el contrato original
+  - term: Pares de co-carga autorizados
+  - definition: Sin pares adicionales autorizados
+- group:
+  - text: 04. Recursos de transporte Consulta del modelo · solo lectura
+  - 'img "Recursos de transporte: publicado · solo lectura"': ✓
+- group:
+  - text: 05. Moneda y costos Consulta del modelo · solo lectura
+  - 'img "Moneda y costos: publicado · solo lectura"': ✓
+
+----------------------------------------------------------------------
+Ran 65 tests in 423.442s
+
+FAILED (failures=1)

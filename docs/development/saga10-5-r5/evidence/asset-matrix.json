@@ -1,0 +1,37 @@
+[
+  {
+    "type": "PALLET",
+    "empty": "PASS",
+    "loaded": "PASS",
+    "history": "PASS",
+    "asset_requests_per_input": 0
+  },
+  {
+    "type": "BOX",
+    "empty": "PASS",
+    "loaded": "PASS",
+    "history": "PASS",
+    "asset_requests_per_input": 0
+  },
+  {
+    "type": "CRATE",
+    "empty": "PASS",
+    "loaded": "PASS",
+    "history": "PASS",
+    "asset_requests_per_input": 0
+  },
+  {
+    "type": "BIG_BAG",
+    "empty": "PASS",
+    "loaded": "PASS",
+    "history": "PASS",
+    "asset_requests_per_input": 0
+  },
+  {
+    "type": "OTHER",
+    "empty": "PASS",
+    "loaded": "PASS",
+    "history": "PASS",
+    "asset_requests_per_input": 0
+  }
+]

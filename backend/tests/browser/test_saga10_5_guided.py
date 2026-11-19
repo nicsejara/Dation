@@ -31,7 +31,7 @@ class Saga10GuidedTests(r4.R4Browser):
   c=await self.config();g=c['cargo'];g['products']=[{'product_id':k,'name':k,'unit_label':'sobre','units_per_package':216,'gross_mass':{'value':mass,'unit':'kg'}} for k,mass in [('NAR','8'),('MAN','10'),('DUR','6')]];g['presentations']=g['presentations'][:1];p=g['presentations'][0];p.pop('gross_mass',None);p['components']=[{'product_id':k,'quantity':q} for k,q in [('NAR','32'),('MAN','24'),('DUR','24')]];p['loaded_dimensions']['height']='150'
   m,v=await self.historical(c);preview=await self.api('POST','/api/platform/logistics-models/contract-preview',{'model_id':m['model']['id'],'version_id':v['version']['id']});physical=preview['contracts']['transport_demand']['rules']['catalog_snapshot'][p['presentation_id']];self.assertEqual(physical['coefficients']['weight_kg'],'665');self.assertEqual(physical['coefficients']['volume_m3'],'1.8');self.assertEqual(len(v['version']['config_jsonb']['cargo']['presentations'][0]['components']),3)
  async def test_03_profiles_and_legacy_draft_survive_reload(self):
-  c=await self.config();c['cargo']['profile']='MIXED';await self.component(c);await expect(self.page.locator('[data-historical-review]')).to_contain_text('MIXED')
+  c=await self.config();c['cargo']['profile']='MIXED';await self.component(c);await expect(self.page.locator('[data-historical-review]')).to_contain_text('Operación mixta')
   for profile in ['PALLETIZED','PACKAGED','DRY_BULK','LIQUID_BULK','SPECIALIZED','MIXED']:
    value=deepcopy(c);value['cargo']['profile']=profile;result=await self.component(value);self.assertEqual(result['configuration']['cargo']['profile'],profile)
  async def test_04_products_codes_and_reference_integrity(self):

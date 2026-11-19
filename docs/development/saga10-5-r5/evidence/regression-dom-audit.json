@@ -1,0 +1,27 @@
+{
+  "deny": [
+    "Presentaci\u00f3n activa",
+    "Soporte compartido",
+    "Agregar presentaci\u00f3n",
+    "Agregar unidad log\u00edstica",
+    "Agregar producto",
+    "Duplicar",
+    "Eliminar presentaci\u00f3n",
+    "Eliminar producto",
+    "Eliminar unidad",
+    "Nombre de la presentaci\u00f3n",
+    "Perfil de carga",
+    "Configuraci\u00f3n avanzada compatible",
+    "Compatibilidad y co-carga avanzadas",
+    "Dimensi\u00f3n principal de reporte",
+    "Aplicar sugerencia",
+    "Continuar"
+  ],
+  "absent": true,
+  "steps": 3,
+  "unit_radios": 5,
+  "capacity_checks": 2,
+  "internal_cta": 1,
+  "footer_cta": 1,
+  "history_cards": 2
+}

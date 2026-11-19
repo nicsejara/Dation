@@ -1,0 +1,62 @@
+[
+  {
+    "name": "pallet-empty.webp",
+    "transfer": 7674,
+    "encoded": 7374,
+    "duration_ms": 11.400000005960464
+  },
+  {
+    "name": "box-empty.webp",
+    "transfer": 4714,
+    "encoded": 4414,
+    "duration_ms": 13
+  },
+  {
+    "name": "big_bag-empty.webp",
+    "transfer": 7258,
+    "encoded": 6958,
+    "duration_ms": 10.5
+  },
+  {
+    "name": "crate-empty.webp",
+    "transfer": 6166,
+    "encoded": 5866,
+    "duration_ms": 22.5
+  },
+  {
+    "name": "other-empty.webp",
+    "transfer": 6352,
+    "encoded": 6052,
+    "duration_ms": 22.700000017881393
+  },
+  {
+    "name": "pallet-loaded.webp",
+    "transfer": 8600,
+    "encoded": 8300,
+    "duration_ms": 22.900000005960464
+  },
+  {
+    "name": "box-loaded.webp",
+    "transfer": 5722,
+    "encoded": 5422,
+    "duration_ms": 3.2000000178813934
+  },
+  {
+    "name": "crate-loaded.webp",
+    "transfer": 7936,
+    "encoded": 7636,
+    "duration_ms": 5.300000011920929
+  },
+  {
+    "name": "big_bag-loaded.webp",
+    "transfer": 9198,
+    "encoded": 8898,
+    "duration_ms": 2.699999988079071
+  },
+  {
+    "name": "other-loaded.webp",
+    "transfer": 8536,
+    "encoded": 8236,
+    "duration_ms": 8.300000011920929
+  }
+]

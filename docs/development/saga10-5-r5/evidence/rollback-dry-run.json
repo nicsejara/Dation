@@ -1,0 +1,30 @@
+{
+  "result": "PASS",
+  "base": "9f466b505ee2b852a5c83e240b6871778c81a380",
+  "runtime_files": 17,
+  "paths": [
+    "backend/app/static/css/ultimate-foundation.css",
+    "backend/app/static/img/logistics/r5/big_bag-empty.webp",
+    "backend/app/static/img/logistics/r5/big_bag-loaded.webp",
+    "backend/app/static/img/logistics/r5/box-empty.webp",
+    "backend/app/static/img/logistics/r5/box-loaded.webp",
+    "backend/app/static/img/logistics/r5/crate-empty.webp",
+    "backend/app/static/img/logistics/r5/crate-loaded.webp",
+    "backend/app/static/img/logistics/r5/other-empty.webp",
+    "backend/app/static/img/logistics/r5/other-loaded.webp",
+    "backend/app/static/img/logistics/r5/pallet-empty.webp",
+    "backend/app/static/img/logistics/r5/pallet-loaded.webp",
+    "backend/app/static/js/dispatch/models/cargo-guided-editor.mjs",
+    "backend/app/static/js/dispatch/models/cargo-presentation-ui.mjs",
+    "backend/app/static/js/dispatch/models/cargo-presentation-values.mjs",
+    "backend/app/static/js/dispatch/models/model-fields-v2.mjs",
+    "backend/app/static/js/dispatch/models/model-historical-view.mjs",
+    "backend/app/static/js/dispatch/models/planning-model.mjs"
+  ],
+  "patch_sha256": "31dd42265b8cc8e26a2972c90706b497c632c8829c146edb50cedfa28aea9979",
+  "forward_apply": "PASS",
+  "candidate_bytes_match": "PASS",
+  "reverse_apply": "PASS",
+  "restored_base_clean": "PASS",
+  "production_operations": 0
+}
