@@ -1,0 +1,463 @@
+test_01_navigation_does_not_expand_incomplete_cargo (test_saga10_5_r3.R3Tests.test_01_navigation_does_not_expand_incomplete_cargo) ... Executing <Task finished name='Task-1' coro=<Saga10WizardTests.asyncSetUp() done, defined at /workspace/work/dation-saga10-5-r3/backend/tests/browser/test_saga10_wizard.py:24> result=None created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.134 seconds
+FAIL
+Executing <Task pending name='Task-6' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r3/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.211 seconds
+test_02_new_model_resets_real_draft_and_cancel_preserves_it (test_saga10_5_r3.R3Tests.test_02_new_model_resets_real_draft_and_cancel_preserves_it) ... FAIL
+Executing <Task pending name='Task-17' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r3/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.226 seconds
+test_03_recovered_homogeneous_draft_is_not_trapped_by_edition (test_saga10_5_r3.R3Tests.test_03_recovered_homogeneous_draft_is_not_trapped_by_edition) ... FAIL
+Executing <Task pending name='Task-28' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r3/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.222 seconds
+
+======================================================================
+FAIL: test_01_navigation_does_not_expand_incomplete_cargo (test_saga10_5_r3.R3Tests.test_01_navigation_does_not_expand_incomplete_cargo)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/usr/lib/python3.13/asyncio/base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/workspace/work/dation-saga10-5-r3/backend/tests/browser/test_saga10_5_r3.py", line 30, in test_01_navigation_does_not_expand_incomplete_cargo
+    self.assertEqual(after['open'][2],before['open'][2],records)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True != False : [{'control': 'sources', 'before': {'scrollY': 422, 'open': [True, False, False, True, False], 'focus': {'name': None, 'tag': 'SUMMARY', 'block': 'model-v2-block-4'}, 'invalid': ['cargo_label_f-8f796a32-e315-46e4-b8a0-26d1095213f1', 'cargo_label_f-e41213b8-e97c-41fc-96f0-99f1f6c4adca', 'cargo_value_f-b8937d2f-c23d-4170-b662-fe1c845fce8b', 'cargo_length_f-5a26eae9-8ef0-48ec-bd88-70632f264371', 'cargo_width_f-93776c68-4f97-4c1e-b89f-984ac891bc50', 'cargo_height_f-91ddaf5e-95dd-4d55-9912-99723ffc2977'], 'steps': 3, 'legacy': 0}, 'after': {'scrollY': 981, 'open': [True, False, True, True, False], 'focus': {'name': 'sources', 'tag': 'INPUT', 'block': 'model-v2-block-4'}, 'invalid': ['cargo_label_f-8f796a32-e315-46e4-b8a0-26d1095213f1', 'cargo_label_f-e41213b8-e97c-41fc-96f0-99f1f6c4adca', 'cargo_value_f-b8937d2f-c23d-4170-b662-fe1c845fce8b', 'cargo_length_f-5a26eae9-8ef0-48ec-bd88-70632f264371', 'cargo_width_f-93776c68-4f97-4c1e-b89f-984ac891bc50', 'cargo_height_f-91ddaf5e-95dd-4d55-9912-99723ffc2977'], 'steps': 3, 'legacy': 0}}]
+
+======================================================================
+FAIL: test_02_new_model_resets_real_draft_and_cancel_preserves_it (test_saga10_5_r3.R3Tests.test_02_new_model_resets_real_draft_and_cancel_preserves_it)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/usr/lib/python3.13/asyncio/base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/workspace/work/dation-saga10-5-r3/backend/tests/browser/test_saga10_5_r3.py", line 35, in test_02_new_model_resets_real_draft_and_cancel_preserves_it
+    dialog=self.page.get_by_role('dialog');await expect(dialog).to_be_visible()
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_generated.py", line 23368, in to_be_visible
+    await self._impl_obj.to_be_visible(
+        visible=visible, timeout=to_milliseconds(timeout)
+    )
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_assertions.py", line 852, in to_be_visible
+    await self._expect_impl(
+    ...<5 lines>...
+    )
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_assertions.py", line 128, in _expect_impl
+    _record_soft_or_raise(
+    ~~~~~~~~~~~~~~~~~~~~~^
+        AssertionError(
+        ^^^^^^^^^^^^^^^
+    ...<2 lines>...
+        self._is_soft,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_assertions.py", line 60, in _record_soft_or_raise
+    raise error
+AssertionError: Locator expected to be visible
+Actual value: None
+Error: element(s) not found 
+Call log:
+  - Expect "to_be_visible" get_by_role("dialog") with timeout 5000ms
+  - waiting for get_by_role("dialog")
+
+Aria snapshot:
+- link "Saltar al contenido principal":
+  - /url: "#main-content"
+- complementary:
+  - strong: Dation
+  - text: Decision Intelligence
+  - navigation "Navegación principal":
+    - link "Inicio":
+      - /url: /app
+    - text: Decision Intelligence
+    - link "Decision Center":
+      - /url: /app/decisions
+    - text: Datos
+    - link "Datos":
+      - /url: /app/data
+    - text: Workspace
+    - link "Equipo":
+      - /url: /app/team
+    - link "Configuración":
+      - /url: /app/settings
+  - paragraph: Decision Data Assets
+  - button "DDA Logística":
+    - strong: DDA Logística
+  - button "Abrir menú de usuario":
+    - strong: Mi cuenta
+    - text: Dation
+- main:
+  - navigation "Navegación del DDA":
+    - list:
+      - listitem:
+        - link "Decision Data Assets":
+          - /url: http://127.0.0.1:35285/app?view=platform-home#dation-dda-title
+        - text: ›
+      - listitem:
+        - link "DDA Logística":
+          - /url: http://127.0.0.1:35285/app/ddas/logistics?view=logistics-overview
+        - text: ›
+      - listitem: Core Configuration ›
+      - listitem: Decision Studio
+  - paragraph: DDA Logística
+  - heading "Core Configuration" [level=1]
+  - paragraph: Configurá el modelo, prepará los datos y definí tu Case. Las decisiones se ejecutan después desde Decision Studio.
+  - form "Finalizar configuración":
+    - navigation "Etapas de Core Configuration":
+      - button "1 Logistics Model Modelo operativo En configuración":
+        - text: "1"
+        - strong: Logistics Model
+        - text: Modelo operativo En configuración
+      - button "2 Data Contract & Preparation Estructura y preparación de datos Pendiente de modelo" [disabled]:
+        - text: "2"
+        - strong: Data Contract & Preparation
+        - text: Estructura y preparación de datos Pendiente de modelo
+      - button "3 Decision Case Objetivo y alcance de la decisión Pendiente de modelo" [disabled]:
+        - text: "3"
+        - strong: Decision Case
+        - text: Objetivo y alcance de la decisión Pendiente de modelo
+    - text: 01. Logistics Model
+    - paragraph: Definí la lógica operativa base del modelo logístico que vas a usar en este Case.
+    - text: En configuración
+    - strong: Creá un nuevo modelo operativo o reutilizá uno ya publicado.
+    - button "Seleccionar modelo existente" [disabled]
+    - button "Crear nuevo modelo"
+    - paragraph: Todavía no hay modelos publicados para reutilizar.
+    - group:
+      - text: 01. Identidad del modelo Definí un nombre y describí el alcance de este modelo logístico.
+      - 'img "Identidad del modelo: validado y revisado"': ✓
+      - text: Nombre del modelo *
+      - textbox "Nombre del modelo *": QA Logistics Orange
+      - paragraph: Asigná un nombre que identifique esta operación logística.
+      - text: Descripción del modelo (opcional)
+      - textbox "Descripción del modelo (opcional)":
+        - /placeholder: "Ej.: Distribución regional de bebidas con flota propia y tercerizada."
+      - paragraph: Describí brevemente el alcance, el tipo de operación y sus principales características.
+      - button "Confirmar identidad del modelo"
+    - group:
+      - text: 02. Operación logística Definí el rol de tu empresa y cómo se organizan los viajes y la consolidación de órdenes.
+      - 'img "Operación logística: validado y revisado"': ✓
+      - group "¿Cuál es el rol de tu empresa en la operación?":
+        - text: ¿Cuál es el rol de tu empresa en la operación?
+        - radio "Generador de carga Despachás mercadería propia, usando transporte propio o contratado." [checked]
+        - strong: Generador de carga
+        - text: Despachás mercadería propia, usando transporte propio o contratado.
+        - radio "Proveedor logístico Transportás mercadería o gestionás servicios logísticos para otras empresas."
+        - strong: Proveedor logístico
+        - text: Transportás mercadería o gestionás servicios logísticos para otras empresas.
+        - radio "Operación híbrida Combinás la generación de carga con servicios logísticos a terceros."
+        - strong: Operación híbrida
+        - text: Combinás la generación de carga con servicios logísticos a terceros.
+      - paragraph: Seleccioná cómo participa tu empresa en la logística de transporte.
+      - heading "Patrón de transporte" [level=4]
+      - strong: Directo · Origen a destino
+      - paragraph: Los viajes conectan un origen con un destino. No se planifican rutas multiparada ni logística inversa.
+      - group "¿Cómo querés organizar las órdenes en los viajes?":
+        - text: ¿Cómo querés organizar las órdenes en los viajes?
+        - radio "Permitir consolidación Un viaje puede incluir varias órdenes compatibles, respetando rutas y capacidades." [checked]
+        - strong: Permitir consolidación
+        - text: Un viaje puede incluir varias órdenes compatibles, respetando rutas y capacidades.
+        - radio "Mantener órdenes separadas Cada viaje transporta mercadería de una única orden."
+        - strong: Mantener órdenes separadas
+        - text: Cada viaje transporta mercadería de una única orden.
+      - paragraph: Permitir consolidación no obliga a unir órdenes. Dation evalúa si compartir viaje es compatible y conveniente según las capacidades y restricciones configuradas.
+      - button "Confirmar operación logística"
+    - group:
+      - text: 03. Carga y capacidad Configurá qué transportás, cómo se presenta la carga y qué capacidades se controlan.
+      - 'img "Carga y capacidad: validado y revisado"': ✓
+      - text: Paso 1 de 3
+      - heading "Definir la unidad logística" [level=4]
+      - paragraph: Primero definí cómo se despacha la mercadería y las dimensiones exteriores de la unidad cargada.
+      - text: Presentación activa
+      - combobox "Presentación activa":
+        - option "Seleccioná una presentación"
+        - option "Presentación naranja" [selected]
+      - button "Agregar presentación homogénea"
+      - button "Agregar unidad logística"
+      - text: Nombre de la presentación *
+      - textbox "Nombre de la presentación *": Presentación naranja
+      - text: Soporte compartido
+      - combobox "Soporte compartido":
+        - option "Seleccioná una unidad"
+        - option "Pallet estándar" [selected]
+      - button "Duplicar presentación"
+      - button "Eliminar presentación"
+      - group "¿Cómo se despacha tu mercadería?":
+        - text: ¿Cómo se despacha tu mercadería?
+        - radio "Pallet Mercadería agrupada sobre pallet." [checked]
+        - strong: Pallet
+        - text: Mercadería agrupada sobre pallet.
+        - radio "Caja Unidad transportada en cajas individuales."
+        - strong: Caja
+        - text: Unidad transportada en cajas individuales.
+        - radio "Cajón Carga despachada en cajones o bins."
+        - strong: Cajón
+        - text: Carga despachada en cajones o bins.
+        - radio "Big bag Carga contenida en big bags flexibles."
+        - strong: Big bag
+        - text: Carga contenida en big bags flexibles.
+        - radio "Otra unidad Configuración personalizada."
+        - strong: Otra unidad
+        - text: Configuración personalizada.
+      - text: Nombre de la unidad *
+      - textbox "Nombre de la unidad *": Pallet estándar
+      - text: Tara del soporte (kg) *
+      - spinbutton "Tara del soporte (kg) *": "25"
+      - paragraph: Peso del soporte vacío. Declarar cero sólo si corresponde.
+      - group: Volumen exterior declarado (opcional)
+      - group "Dimensiones de la unidad cargada":
+        - text: Dimensiones de la unidad cargada Largo cargado
+        - spinbutton "Largo cargado": "120"
+        - paragraph: Los tres ejes completos o ninguno.
+        - text: Ancho cargado
+        - spinbutton "Ancho cargado": "100"
+        - paragraph: Los tres ejes completos o ninguno.
+        - text: Alto cargado
+        - spinbutton "Alto cargado": "150"
+        - paragraph: Los tres ejes completos o ninguno.
+        - text: Unidad
+        - combobox "Unidad":
+          - option "cm" [selected]
+          - option "m"
+      - group: Datos avanzados del soporte vacío
+      - complementary:
+        - heading "Resumen de la unidad" [level=4]
+        - term: Tipo
+        - definition: Pallet
+        - term: Tara
+        - definition: 25 kg Soporte vacío; se suma una sola vez
+        - term: Volumen exterior cargado
+        - definition: 1,8 m³ Vista preliminar · exterior, no packing
+      - paragraph: Estas medidas representan la unidad cargada. No se guardan como dimensiones del soporte vacío. La composición se declara en el paso 2.
+      - text: Paso 2 de 3
+      - heading "Definir qué contiene esta unidad" [level=4]
+      - paragraph: Declarás un producto por presentación homogénea y cuántos bultos la componen.
+      - text: Producto de esta presentación
+      - combobox "Producto de esta presentación":
+        - option "Seleccioná un producto"
+        - option "Jugo de naranja" [selected]
+      - button "Agregar producto"
+      - text: Nombre del producto *
+      - textbox "Nombre del producto *": Jugo de naranja
+      - text: Tipo de bulto
+      - combobox "Tipo de bulto":
+        - option "Caja" [selected]
+        - option "Saco"
+        - option "Bolsa"
+        - option "Fardo"
+        - option "Bulto"
+        - option "Otra"
+      - group "Peso bruto por bulto *":
+        - text: Peso bruto por bulto * Valor
+        - spinbutton "Valor": "8"
+        - text: Unidad
+        - combobox "Unidad":
+          - option "kg" [selected]
+          - option "t"
+      - group "Dimensiones del bulto (informativas)":
+        - text: Dimensiones del bulto (informativas) Largo del bulto
+        - spinbutton "Largo del bulto": "30"
+        - paragraph: Los tres ejes completos o ninguno.
+        - text: Ancho del bulto
+        - spinbutton "Ancho del bulto": "20"
+        - paragraph: Los tres ejes completos o ninguno.
+        - text: Alto del bulto
+        - spinbutton "Alto del bulto": "30"
+        - paragraph: Los tres ejes completos o ninguno.
+        - text: Unidad
+        - combobox "Unidad":
+          - option "cm" [selected]
+          - option "m"
+      - text: Bultos por unidad logística *
+      - spinbutton "Bultos por unidad logística *": "80"
+      - button "Duplicar producto"
+      - button "Eliminar producto. Producto referenciado por una presentación. Reasignalo antes de eliminarlo." [disabled]: Eliminar producto
+      - group:
+        - text: Datos avanzados del producto y la presentación Categorías de compatibilidad (separadas por coma)
+        - textbox "Categorías de compatibilidad (separadas por coma)": SECO
+        - paragraph: Requeridas si la política es Por categorías explícitas; homogeneidad no autoriza co-carga.
+        - text: Código (opcional)
+        - textbox "Código (opcional)"
+        - group: Peso bruto cargado declarado (opcional si se deriva)
+        - group: Tara adicional explícita
+      - paragraph: "Volumen por bulto: 0,018 m³ · Informativo; no sustituye el volumen exterior ni calcula cuántos bultos entran."
+      - complementary:
+        - heading "Resumen de la composición" [level=4]
+        - term: Soporte
+        - definition: Pallet estándar
+        - term: Tara del soporte
+        - definition: 25 kg Declarado
+        - term: Límite estructural
+        - definition: Sin declarar No es capacidad del vehículo
+        - term: Presentación
+        - definition: Presentación naranja
+        - term: Exterior cargado
+        - definition: 120 × 100 × 150 cm
+        - term: Volumen exterior cargado
+        - definition: 1,8 m³ Calculado · validado por Dation
+        - term: Productos
+        - definition: "1"
+        - term: Cantidad de bultos
+        - definition: 80 Por cantidad, no ocupación
+        - term: Peso bruto de componentes
+        - definition: 640 kg Composición declarada
+        - term: Peso bruto total
+        - definition: 665 kg Calculado · validado por Dation
+        - term: Tara adicional
+        - definition: 0 kg Si existe, se suma una sola vez
+        - term: Incremento de asignación
+        - definition: 1 presentation Validado por Dation
+        - paragraph: "Ilustración orientativa. El volumen es exterior y escalar: no certifica packing3D ni apilado."
+      - paragraph: Un producto por presentación homogénea. Podés crear otras presentaciones y compartir el mismo soporte; no se infiere una distribución física de los bultos.
+      - text: Paso 3 de 3
+      - heading "Restricciones físicas y reglas" [level=4]
+      - paragraph: Definí qué límites físicos controlará Dation y qué reglas se aplican a las órdenes.
+      - group "¿Qué restricciones físicas debe controlar Dation?":
+        - text: ¿Qué restricciones físicas debe controlar Dation?
+        - checkbox "Peso máximo Controla que el peso total no supere la capacidad del vehículo." [checked]
+        - strong: Peso máximo
+        - text: Controla que el peso total no supere la capacidad del vehículo.
+        - checkbox "Volumen máximo Controla que el volumen total no supere la capacidad del vehículo." [checked]
+        - strong: Volumen máximo
+        - text: Controla que el volumen total no supere la capacidad del vehículo.
+      - paragraph: "Dation verifica simultáneamente todos los límites seleccionados. El volumen es escalar: no certifica encaje tridimensional."
+      - group "¿Qué reglas se aplican a las órdenes?":
+        - text: ¿Qué reglas se aplican a las órdenes?
+        - radio "Orden sin fraccionamiento La orden completa se asigna a un único viaje o queda sin servir." [checked]
+        - strong: Orden sin fraccionamiento
+        - text: La orden completa se asigna a un único viaje o queda sin servir.
+        - radio "Fraccionable por unidades completas La orden puede repartirse entre viajes con presentaciones completas si permite fraccionamiento."
+        - strong: Fraccionable por unidades completas
+        - text: La orden puede repartirse entre viajes con presentaciones completas si permite fraccionamiento.
+      - group: Compatibilidad y co-carga avanzadas
+      - status:
+        - paragraph:
+          - strong: Presentación naranja ·
+          - text: "665 Peso (kg) · 1.8 Volumen (m³) Incremento: 1 presentación completa · Volumen (m³): dimensiones exteriores cargadas · Peso (kg): componentes y tara declarados"
+      - paragraph: Las líneas de órdenes cuentan presentaciones completas, no kilogramos ni bultos interiores. La referencia técnica de reporte será peso si está activo; de lo contrario, volumen.
+      - paragraph: "Esta versión guiada admite presentaciones homogéneas: un producto por presentación. Las composiciones mixtas existentes se conservan en el editor compatible. El volumen es exterior y escalar: no certifica packing 3D ni apilado."
+      - button "Configuración avanzada compatible"
+      - button "Confirmar carga y capacidad"
+    - group:
+      - text: 04. Recursos de transporte Definí qué recursos puede utilizar tu operación y qué categorías de vehículos se admiten.
+      - 'img "Recursos de transporte: validado y revisado"': ✓
+      - group "¿De dónde provienen tus recursos de transporte?":
+        - text: ¿De dónde provienen tus recursos de transporte?
+        - checkbox "Flota propia Vehículos administrados por tu empresa, con disponibilidad y costos operativos propios." [checked]
+        - strong: Flota propia
+        - text: Vehículos administrados por tu empresa, con disponibilidad y costos operativos propios.
+        - checkbox "Transporte tercerizado Servicios contratados a operadores externos, con disponibilidad y tarifas declaradas." [checked]
+        - strong: Transporte tercerizado
+        - text: Servicios contratados a operadores externos, con disponibilidad y tarifas declaradas.
+      - group "¿Qué categorías de vehículos admite tu operación?":
+        - text: ¿Qué categorías de vehículos admite tu operación?
+        - checkbox "Carga general Vehículos estándar para carga seca y operaciones generales."
+        - strong: Carga general
+        - text: Vehículos estándar para carga seca y operaciones generales.
+        - checkbox "Refrigerado Recursos con control térmico declarado para mercadería sensible."
+        - strong: Refrigerado
+        - text: Recursos con control térmico declarado para mercadería sensible.
+        - checkbox "Cisterna Vehículos preparados para líquidos o cargas transportadas en tanque."
+        - strong: Cisterna
+        - text: Vehículos preparados para líquidos o cargas transportadas en tanque.
+        - checkbox "Granel Recursos orientados a materiales sueltos o a granel."
+        - strong: Granel
+        - text: Recursos orientados a materiales sueltos o a granel.
+        - checkbox "Plataforma Vehículos abiertos para cargas sobredimensionadas o especiales."
+        - strong: Plataforma
+        - text: Vehículos abiertos para cargas sobredimensionadas o especiales.
+      - paragraph: "Si no seleccionás categorías, Dation no aplicará un filtro global por tipo de vehículo. Las demás condiciones de compatibilidad y capacidad seguirán vigentes. Las categorías son filtros declarados: no certifican temperatura, peligrosidad ni condiciones técnicas."
+      - button "Confirmar recursos de transporte"
+    - group:
+      - text: 05. Moneda y costos Seleccioná la moneda y las reglas de cálculo de los costos de transporte.
+      - 'img "Moneda y costos: validado y revisado"': ✓
+      - group "¿En qué moneda opera tu modelo logístico?":
+        - text: ¿En qué moneda opera tu modelo logístico?
+        - radio "ARS · $ Peso argentino" [checked]
+        - strong: ARS · $
+        - text: Peso argentino
+        - radio "USD · US$ Dólar estadounidense"
+        - strong: USD · US$
+        - text: Dólar estadounidense
+        - radio "EUR · € Euro"
+        - strong: EUR · €
+        - text: Euro
+      - paragraph: "Moneda seleccionada: ARS. Los costos deben ingresarse en esta moneda; Dation no convierte divisas automáticamente."
+      - heading "¿Cómo se calculan los costos de tu flota propia?" [level=4]
+      - strong: Costo operativo por kilómetro
+      - paragraph: Dation considera la distancia de ida y regreso y el costo operativo declarado para cada recurso. Método establecido; el importe se informa posteriormente en los datos de flota.
+      - group "¿Qué modalidades de tarifas externas utiliza tu operación?":
+        - text: ¿Qué modalidades de tarifas externas utiliza tu operación?
+        - checkbox "Tarifa por viaje El transportista cobra un importe fijo por cada viaje realizado, independientemente de cómo se calcule la distancia." [checked]
+        - strong: Tarifa por viaje
+        - text: El transportista cobra un importe fijo por cada viaje realizado, independientemente de cómo se calcule la distancia.
+        - checkbox "Tarifa por kilómetro El transportista cobra en función de la distancia facturable y de la tarifa por kilómetro acordada." [checked]
+        - strong: Tarifa por kilómetro
+        - text: El transportista cobra en función de la distancia facturable y de la tarifa por kilómetro acordada.
+      - group "¿Qué distancia pueden facturar los transportistas externos?":
+        - text: ¿Qué distancia pueden facturar los transportistas externos?
+        - checkbox "Sólo ida Se factura la distancia desde el origen hasta el destino." [checked]
+        - strong: Sólo ida
+        - text: Se factura la distancia desde el origen hasta el destino.
+        - checkbox "Ida y vuelta Se factura la distancia de ida más el regreso considerado." [checked]
+        - strong: Ida y vuelta
+        - text: Se factura la distancia de ida más el regreso considerado.
+      - paragraph: Podés admitir ambas bases; cada recurso utiliza su modalidad, no ambas a la vez. Para 100 km de ida, se facturan 100 km en Sólo ida o 200 km en Ida y vuelta, según el modelo actual.
+      - group: Configuración monetaria avanzada
+      - paragraph: En este bloque definís las reglas de cálculo admitidas. Las tarifas y costos reales se informan posteriormente al cargar los recursos de transporte. Un costo desconocido no se interpreta como cero.
+      - button "Confirmar moneda y costos"
+    - complementary: Catálogo homogéneo · 1 productos · 1 presentaciones · Peso (kg) + Volumen (m³)
+    - button "Volver a DDA Logística"
+    - status:
+      - strong: Configuración del modelo
+      - paragraph: 5 de 5 secciones revisadas
+    - button "Guardar y continuar"
+- status
+
+======================================================================
+FAIL: test_03_recovered_homogeneous_draft_is_not_trapped_by_edition (test_saga10_5_r3.R3Tests.test_03_recovered_homogeneous_draft_is_not_trapped_by_edition)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/usr/lib/python3.13/asyncio/base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/workspace/work/dation-saga10-5-r3/backend/tests/browser/test_saga10_5_r3.py", line 53, in test_03_recovered_homogeneous_draft_is_not_trapped_by_edition
+    await expect(self.page.locator('[data-pro-step]')).to_have_count(3);await expect(self.page.locator('[data-cargo-step]')).to_have_count(0)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_generated.py", line 22452, in to_have_count
+    await self._impl_obj.to_have_count(
+        count=count, timeout=to_milliseconds(timeout)
+    )
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_assertions.py", line 465, in to_have_count
+    await self._expect_impl(
+    ...<5 lines>...
+    )
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_assertions.py", line 128, in _expect_impl
+    _record_soft_or_raise(
+    ~~~~~~~~~~~~~~~~~~~~~^
+        AssertionError(
+        ^^^^^^^^^^^^^^^
+    ...<2 lines>...
+        self._is_soft,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_assertions.py", line 60, in _record_soft_or_raise
+    raise error
+AssertionError: Locator expected to have count '3'
+Actual value: 0 
+Call log:
+  - Expect "to_have_count" locator("[data-pro-step]") with timeout 5000ms
+  - waiting for locator("[data-pro-step]")
+    14 × locator resolved to 0 elements
+       - unexpected value "0"
+
+
+----------------------------------------------------------------------
+Ran 3 tests in 36.820s
+
+FAILED (failures=3)
