@@ -1,0 +1,16 @@
+{
+  "backend/app/static/js/dispatch/models/data-contract-view.mjs": "e616de40c45e11a73d1d4ce1cf6853ab84f839a9ea202d9b8689dff56d1328a1",
+  "backend/app/static/js/dispatch/models/guided-ui.mjs": "27fe49549633fcbb7a14557cfbdd42f179b298371c8640fcb92c66ee92210916",
+  "backend/app/static/js/dispatch/models/entry.mjs": "427f4c7bdf2cb77ff8566f328d717ab6757d83848f4e13be9755bbf03d5d44ff",
+  "backend/app/static/js/dispatch/models/model-fields-v2.mjs": "7b009c038db2dc79b746f1e87f7ba1b1f225e2b3524ab2f8f206a571ebaa1553",
+  "backend/app/static/js/dispatch/models/model-editor-mode.mjs": "a1de0bbaa14d64a4f13ef6f088b9194893ba4111a84ea8315305ab01db14ce7a",
+  "backend/app/static/js/dispatch/models/cargo-editor.mjs": "9b7d9dcc3aa4204fd9bd508d6708c8021c9b7e7ea823c8c4c1b7d24298f5a286",
+  "backend/app/static/js/dispatch/models/setup-values.mjs": "390c80f20e3f55065ac814b3e29ed9c38462ec92fb29b65d2dda125add31cbc0",
+  "backend/app/static/js/dispatch/models/index.mjs": "08508d057dfc82bb8bbbf95883b60828ce5e31166c83527909ddae70f3c7a52c",
+  "backend/app/static/js/dispatch/models/model-fields.mjs": "7265a0275c22f45a0e1ad2c2f9584a4349b30ce086213a76bf692cc5f7c9d61b",
+  "backend/app/static/js/dispatch/models/forms.mjs": "e487251d2b597821bc80cbcbcd32f31853625876efc7639bd38a9ea87431797f",
+  "backend/app/static/js/dispatch/models/policy.mjs": "4d946233ce9ca6d59a9d49047c09460d9dbccaee49bf17cd2a1599820ae07bbb",
+  "backend/app/static/js/dispatch/models/planning-model.mjs": "b157a552938e042e79b3e9a742f90376e22933f3f6476242dcb28ae7e68e9a06",
+  "backend/app/static/js/dispatch/models/wizard-ui.mjs": "d73b47f8efdfba124d4e695ad2280c4f2cb2b735c8a701ec7b33c3677e09535f",
+  "backend/app/static/css/ultimate-foundation.css": "0033367589c97f1ae516350432f11c539e6c2acbcbcb20658cd9da1a59afadcd"
+}

@@ -800,6 +800,7 @@
 .model-wizard-intro-pro > .d-metadata:empty { display:none; }
 .model-editor-region { min-inline-size:0; }
 .model-wizard-v2 .d-field > .d-field__help:empty { display:none; }
-.model-wizard-v2 .model-editor-choice button { min-block-size:44px; }
+.model-wizard-v2.model-editor-choice button { min-block-size:44px; }
 .model-wizard-v2 [data-compatible-editor] { align-items:center;flex-wrap:wrap; }
 .model-wizard-v2 .guided-pro-step [name=cargo_profile] + svg { color:var(--color-text-accent); }
+.model-wizard-v2.model-editor-choice .ultimate-grid > button { grid-column:1/-1;min-block-size:48px;white-space:normal; }

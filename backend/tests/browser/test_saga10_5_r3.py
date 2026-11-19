@@ -64,7 +64,9 @@ class R3Tests(unittest.IsolatedAsyncioTestCase):
         await self.start();stored=await self.stored();v=stored['value'];d=v['planning_model']['new_model'];d['name']='Directo recuperado';c=d['configuration'];c['active_dimensions']=['pallets'];c['primary_dimension']='pallets';c['cargo']['input_mode']='direct';d['guided_ux']={'edition':'compatible','confirmed':{}}
         original=json.loads(json.dumps(c));await self.page.evaluate('v=>sessionStorage.setItem(v.key,JSON.stringify(v.value))',stored)
         await self.page.reload();await self.ready(1);await expect(self.page.locator('[data-continue-compatible]')).to_be_visible();await expect(self.page.locator('[data-cargo-step]')).to_have_count(0)
+        await self.page.evaluate('scrollTo(0,0)');await self.page.screenshot(path=str(OUT/'explicit-choice.png'),full_page=True)
         await self.page.locator('[data-continue-compatible]').click();await expect(self.page.locator('[data-compatible-editor]')).to_be_visible();await expect(self.page.locator('[data-cargo-step]')).to_have_count(7)
+        await self.page.evaluate('scrollTo(0,0)');await self.page.screenshot(path=str(OUT/'explicit-compatible.png'),full_page=True)
         self.assertEqual((await self.stored())['value']['planning_model']['new_model']['configuration'],original)
         await legacy.confirm(self.page);await expect(self.page.locator('[data-dation-test=model-create]')).to_be_enabled()
         # Reload original unaccepted draft: new guided is a separate, confirmed choice.
@@ -72,7 +74,10 @@ class R3Tests(unittest.IsolatedAsyncioTestCase):
         await self.page.locator('[data-new-guided]').click();await self.page.get_by_role('dialog').get_by_role('button',name='Crear nuevo modelo',exact=True).click()
         await expect(self.page.locator('[data-pro-step]')).to_have_count(3)
         data=(await self.stored())['value']['planning_model'];self.assertEqual(data['recovery']['configuration'],original);self.assertEqual(data['new_model']['configuration']['cargo']['products'],[])
-        await self.page.reload();await self.ready(1);await self.page.get_by_role('button',name='Restaurar borrador anterior',exact=True).click()
+        await self.page.reload();await self.ready(1)
+        await self.page.get_by_role('button',name='Crear nuevo modelo',exact=True).click();await expect(self.page.get_by_role('dialog')).to_be_visible()
+        await self.page.get_by_role('dialog').get_by_role('button',name='Cancelar',exact=True).click();self.assertEqual((await self.stored())['value']['planning_model']['recovery']['configuration'],original)
+        await self.page.get_by_role('button',name='Restaurar borrador anterior',exact=True).click()
         await expect(self.page.locator('[data-continue-compatible]')).to_be_visible();self.assertEqual((await self.stored())['value']['planning_model']['new_model']['configuration'],original)
     async def test_05_local_errors_stay_local_and_global_errors_are_deliberate(self):
         await self.start();await self.page.locator('[data-dation-test=model-v2-block-3]>summary').click()
@@ -97,6 +102,10 @@ class R3Tests(unittest.IsolatedAsyncioTestCase):
         await first.locator('label').filter(has=self.page.locator('[name=cargo_profile][value=DRY_BULK]')).click()
         await first.get_by_role('button',name='Agregar presentación homogénea',exact=True).click()
         cargo=(await self.stored())['value']['planning_model']['new_model']['configuration']['cargo'];self.assertEqual(cargo['presentations'][-1]['quantity_kind'],'DISCRETE');self.assertEqual(cargo['presentations'][-1]['logistic_unit_id'],before['logistic_units'][0]['logistic_unit_id'])
+        third=self.page.locator('[data-pro-step="3"]')
+        for value in ['weight_kg','volume_m3']:await third.locator('label').filter(has=self.page.locator('[name=dimensions][value='+value+']')).click()
+        await self.page.reload();await self.ready(1);await expect(self.page.locator('[data-pro-step]')).to_have_count(3)
+        self.assertEqual((await self.stored())['value']['planning_model']['new_model']['configuration']['active_dimensions'],[])
     async def test_07_new_from_published_is_independent_and_empty(self):
         await self.start();await self.fill();cfg=await self.publish();data=await self.stored();m=data['value']['planning_model']['model_id'];old=await self.api('GET','/api/platform/logistics-models/'+m)
         await self.page.locator('[data-dation-test=core-step-1]').click();await self.ready(1);await self.page.get_by_role('button',name='Crear nuevo modelo',exact=True).click()
@@ -114,3 +123,16 @@ class R3Tests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(await self.page.locator('.model-wizard-top-actions>button').count(),2)
         self.assertEqual(await self.page.get_by_text('También podés reutilizar una versión ya publicada.',exact=True).count(),0)
         await self.page.emulate_media(reduced_motion='reduce');self.assertEqual(await self.page.locator('.guided-radio-card').first.evaluate('n=>getComputedStyle(n).transitionDuration'),'0s')
+    async def test_09_pending_publication_blocks_reset_and_reuses_intent(self):
+        await self.start();await self.fill();await self.confirm()
+        await self.page.route('**/api/platform/logistics-models/*/versions',lambda route:route.fulfill(status=503,json={'detail':'QA retry publication'}),times=1)
+        await self.page.locator('[data-dation-test=model-create]').click()
+        await expect(self.page.locator('[data-dation-test=model-feedback]')).to_contain_text('QA retry publication')
+        await expect(self.page.get_by_role('button',name='Crear nuevo modelo',exact=True)).to_be_disabled()
+        before=(await self.stored())['value']['planning_model']['intent'];await self.page.reload();await self.ready(1)
+        await expect(self.page.get_by_role('button',name='Crear nuevo modelo',exact=True)).to_be_disabled()
+        await self.page.locator('[data-dation-test=model-create]').click();await self.ready(2)
+        requests=[(m,u) for m,u in self.operations if m=='POST' and (u.endswith('/logistics-models') or u.endswith('/versions'))]
+        self.assertEqual(sum(u.endswith('/logistics-models') for _,u in requests),1)
+        self.assertEqual(sum(u.endswith('/versions') for _,u in requests),2)
+        after=(await self.stored())['value']['planning_model'];self.assertEqual(after['model_id'],before['model_id']);self.assertEqual(after['version_id'],before['version_id'])

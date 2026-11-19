@@ -3,15 +3,14 @@ import {guidedBlock,note} from './guided-ui.mjs';
 
 // UI assessment only: never normalize business data or infer a physical catalog.
 export function assessGuidedDraft(draft){
- const c=draft.configuration,g=c.cargo,u=draft.guided_ux||{},catalog=u.catalogue||g;
+ const c=draft.configuration,g=c.cargo,u=draft.guided_ux||{},catalog=u.catalogue||g,editing=u.edition==='ultimate'||u.origin==='new-guided';
  const no=reason=>({representable:false,reason});
  if(g.input_mode!=='catalog')return no('Configuración directa: dos CSV, sin catálogo físico.');
- if(!c.active_dimensions.length||c.active_dimensions.some(d=>!['weight_kg','volume_m3'].includes(d)))return no('Las dimensiones actuales incluyen límites que la vista guiada no puede reinterpretar.');
+ if(!c.active_dimensions.length&&!editing||c.active_dimensions.some(d=>!['weight_kg','volume_m3'].includes(d)))return no('Las dimensiones actuales incluyen límites que la vista guiada no puede reinterpretar.');
  const primary=c.active_dimensions.includes('weight_kg')?'weight_kg':'volume_m3';
  if(c.primary_dimension!==primary)return no('La dimensión principal actual se conserva; cambiarla requiere una decisión explícita en el editor compatible.');
  if(!['INDIVISIBLE','DISCRETE'].includes(g.split_policy))return no('El granel continuo conserva su unidad física y su contrato en el editor compatible.');
  const products=catalog.products||[],units=catalog.logistic_units||[],presentations=catalog.presentations||[];
- const editing=u.edition==='ultimate'||u.origin==='new-guided';
  if(!products.length&&!presentations.length&&!units.length)return editing?{representable:true,reason:'Borrador guiado nuevo, todavía sin catálogo.'}:no('El catálogo anterior está incompleto. Elegí cómo continuar sin inventar datos.');
  if(!editing&&(!products.length||!presentations.length))return no('El catálogo recuperado todavía no contiene productos y presentaciones representables.');
  if(products.some(p=>Number(p.units_per_package??1)!==1))return no('El catálogo contiene unidades comerciales adicionales por bulto que deben conservarse.');

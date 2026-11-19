@@ -107,7 +107,7 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
   resetting=true;sync();
   try{
    const previous=state.mode==='new'&&fields?fields.read():state.new_model;
-   const discard=(state.mode==='new'||!state.intent?.published)&&meaningful(previous);
+   const discard=!!state.recovery||(state.mode==='new'||!state.intent?.published)&&meaningful(previous);
    if(discard&&!await confirmAction(form,scope,'Crear nuevo modelo',preserveDraft?'La nueva configuración usa tres CSV. Se conservará una copia recuperable del borrador anterior y se iniciará uno vacío.':'Se descartará este borrador sin publicar, incluidos sus configuraciones y confirmaciones. Los modelos publicados no cambian.','Crear nuevo modelo'))return;
    if(!scope.active||busy||pending()||state.locked)return;
    generation++;renderGeneration++;clearTimeout(timer);fields=null;

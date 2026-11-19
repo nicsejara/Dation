@@ -1,0 +1,38 @@
+{
+  "baseline_sha": "1a1e39e365676972fb26a0c30a797d56a134ca97",
+  "started_utc": "2026-11-19T14:31:07Z",
+  "contracts": {
+    "passed": 70,
+    "seconds": 1.548
+  },
+  "classifier": {
+    "passed": 7
+  },
+  "regression": {
+    "tests": 44,
+    "passed": 42,
+    "failed": 2,
+    "seconds": 288.277,
+    "failures": "R3 checkpoint fresh comparison and Ultimate published-input expectation; both fixed and revalidated."
+  },
+  "focused_final": {
+    "passed": 10,
+    "seconds": 85.814
+  },
+  "visual_checkpoint_closeout": {
+    "passed": 2,
+    "seconds": 31.549
+  },
+  "browser_distinct_local_pass": 45,
+  "navigation_interactions": 88,
+  "acceptance": {
+    "R3": 35,
+    "historical": 103,
+    "ci": "Exact-SHA outcome recorded in PR after terminal checks"
+  },
+  "production": {
+    "merged": false,
+    "deployed": false,
+    "mutated": false
+  }
+}

@@ -189,7 +189,7 @@ print('D1_WEIGHT_PRIMARY_NO_HIDDEN_PALLETS_AND_SPLIT_PASS')
             heading=await self.page.locator('[name=model_name]').evaluate("n=>{const s=getComputedStyle(n.closest('.d-field').querySelector('label'),'::after');return {width:s.width,height:s.height}}")
             self.assertEqual(heading,{'width':'44px','height':'2px'})
             geometry.append(metrics)
-            if width in [1536,390,320]:
+            if width in [1536,1024,768,390,320]:
                 for i in range(1,6):
                     for j in range(1,6):
                         node=self.page.locator('[data-dation-test=model-v2-block-'+str(j)+']')

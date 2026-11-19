@@ -1,0 +1,161 @@
+[
+  {
+    "control": "sources",
+    "before": {
+      "scrollY": 422,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        false
+      ],
+      "focus": {
+        "name": null,
+        "tag": "SUMMARY",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [
+        "cargo_label_f-b7431c97-62c3-46ff-b435-1b871f9d0298",
+        "cargo_label_f-940fb881-da20-4b0d-8789-7f866f907824",
+        "cargo_value_f-1eb307e5-17fd-4ce1-b0fa-267abbd5749d",
+        "cargo_length_f-fcd66442-f356-4f8f-af62-d46e28a8bf66",
+        "cargo_width_f-fdf52ace-c94e-4c69-8c95-29a7d04cde9a",
+        "cargo_height_f-84d4076b-c14c-4602-a89c-322fd30f1d1f"
+      ],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 981,
+      "open": [
+        true,
+        false,
+        true,
+        true,
+        false
+      ],
+      "focus": {
+        "name": "sources",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [
+        "cargo_label_f-b7431c97-62c3-46ff-b435-1b871f9d0298",
+        "cargo_label_f-940fb881-da20-4b0d-8789-7f866f907824",
+        "cargo_value_f-1eb307e5-17fd-4ce1-b0fa-267abbd5749d",
+        "cargo_length_f-fcd66442-f356-4f8f-af62-d46e28a8bf66",
+        "cargo_width_f-fdf52ace-c94e-4c69-8c95-29a7d04cde9a",
+        "cargo_height_f-84d4076b-c14c-4602-a89c-322fd30f1d1f"
+      ],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "control": "resource_categories",
+    "before": {
+      "scrollY": 836,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        false
+      ],
+      "focus": {
+        "name": null,
+        "tag": "SUMMARY",
+        "block": "model-v2-block-3"
+      },
+      "invalid": [
+        "cargo_label_f-b7431c97-62c3-46ff-b435-1b871f9d0298",
+        "cargo_label_f-940fb881-da20-4b0d-8789-7f866f907824",
+        "cargo_value_f-1eb307e5-17fd-4ce1-b0fa-267abbd5749d",
+        "cargo_length_f-fcd66442-f356-4f8f-af62-d46e28a8bf66",
+        "cargo_width_f-fdf52ace-c94e-4c69-8c95-29a7d04cde9a",
+        "cargo_height_f-84d4076b-c14c-4602-a89c-322fd30f1d1f"
+      ],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 836,
+      "open": [
+        true,
+        false,
+        true,
+        true,
+        false
+      ],
+      "focus": {
+        "name": "resource_categories",
+        "tag": "INPUT",
+        "block": "model-v2-block-4"
+      },
+      "invalid": [
+        "cargo_label_f-b7431c97-62c3-46ff-b435-1b871f9d0298",
+        "cargo_label_f-940fb881-da20-4b0d-8789-7f866f907824",
+        "cargo_value_f-1eb307e5-17fd-4ce1-b0fa-267abbd5749d",
+        "cargo_length_f-fcd66442-f356-4f8f-af62-d46e28a8bf66",
+        "cargo_width_f-fdf52ace-c94e-4c69-8c95-29a7d04cde9a",
+        "cargo_height_f-84d4076b-c14c-4602-a89c-322fd30f1d1f"
+      ],
+      "steps": 3,
+      "legacy": 0
+    }
+  },
+  {
+    "control": "currency",
+    "before": {
+      "scrollY": 964,
+      "open": [
+        true,
+        false,
+        false,
+        true,
+        true
+      ],
+      "focus": {
+        "name": null,
+        "tag": "SUMMARY",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [
+        "cargo_label_f-b7431c97-62c3-46ff-b435-1b871f9d0298",
+        "cargo_label_f-940fb881-da20-4b0d-8789-7f866f907824",
+        "cargo_value_f-1eb307e5-17fd-4ce1-b0fa-267abbd5749d",
+        "cargo_length_f-fcd66442-f356-4f8f-af62-d46e28a8bf66",
+        "cargo_width_f-fdf52ace-c94e-4c69-8c95-29a7d04cde9a",
+        "cargo_height_f-84d4076b-c14c-4602-a89c-322fd30f1d1f"
+      ],
+      "steps": 3,
+      "legacy": 0
+    },
+    "after": {
+      "scrollY": 1033,
+      "open": [
+        true,
+        false,
+        true,
+        true,
+        true
+      ],
+      "focus": {
+        "name": "currency",
+        "tag": "INPUT",
+        "block": "model-v2-block-5"
+      },
+      "invalid": [
+        "cargo_label_f-b7431c97-62c3-46ff-b435-1b871f9d0298",
+        "cargo_label_f-940fb881-da20-4b0d-8789-7f866f907824",
+        "cargo_value_f-1eb307e5-17fd-4ce1-b0fa-267abbd5749d",
+        "cargo_length_f-fcd66442-f356-4f8f-af62-d46e28a8bf66",
+        "cargo_width_f-fdf52ace-c94e-4c69-8c95-29a7d04cde9a",
+        "cargo_height_f-84d4076b-c14c-4602-a89c-322fd30f1d1f"
+      ],
+      "steps": 3,
+      "legacy": 0
+    }
+  }
+]
