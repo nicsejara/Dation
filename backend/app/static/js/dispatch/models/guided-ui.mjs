@@ -71,8 +71,9 @@ export function stepPanel(parent,index,title,copy){
 export function supportArt(type,{loaded=false}={}){
  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 220 155');svg.setAttribute('aria-hidden','true');svg.dataset.supportArt=loaded?'loaded':'empty';svg.dataset.unitType=type;svg.classList.add('guided-support-art');
  const base=type==='PALLET'?'<path d="m23 107 82-36 92 38-83 38Z m-91-26 91 40 83-38M34 102l90 39m-64-51 91 38m-63-51 90 39M24 108v13m90 15v13m82-40v13"/>':type==='BIG_BAG'?'<path d="M65 42q-12 25-18 67-4 26 62 26t62-26q-6-42-18-67ZM65 43V20q12-12 21 0v20m46 0V20q12-12 21 0v23"/>':type==='OTHER'?'<path d="m45 57 65-30 65 30-65 30Zm0 25 65 30 65-30m-130 25 65 30 65-30"/>':'<path d="m48 45 61-27 65 28v66l-64 29-62-29Zm0 0 62 29 64-28m-64 28v67"/>';
- const cargo=loaded&&type==='PALLET'?'<path d="m46 62 60-27 64 28v44l-60 28-64-29Zm0 0 64 28 60-27m-60 27v45m-45-65v43m25-32v43m40-43v44m22-54v43"/>':'';
- svg.innerHTML='<g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">'+base+cargo+'</g>';return svg;
+ // Decorative empty/loaded states; never an inferred packing arrangement.
+ const cargo=!loaded?'':type==='PALLET'?'<path d="m46 62 60-27 64 28v44l-60 28-64-29Zm0 0 64 28 60-27m-60 27v45m-45-65v43m25-32v43m40-43v44m22-54v43"/>':type==='BIG_BAG'?'<path d="M60 58q48 26 100 0M68 80q40 20 84 0M64 102q44 22 92 0"/>':type==='OTHER'?'<path d="m70 35 39-18 40 18v25l-40 18-39-18Zm0 0 39 18 40-18m-40 18v25"/>':'<path d="m59 65 47 21 55-25m-55 25v42m-31-54v38m53-48v43"/>';
+ svg.innerHTML='<g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">'+base+(type==='CRATE'?'<path d="M60 52v64m17-57v64m61-62v64m19-73v63"/>':'')+cargo+'</g>';return svg;
 }
 
 export function infoCard(parent,title,value,copy,icon,{locked=false}={}){

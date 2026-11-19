@@ -1,0 +1,39 @@
+{
+  "ctas": [
+    {
+      "block": "1",
+      "disabled": false
+    },
+    {
+      "block": "2",
+      "disabled": false
+    },
+    {
+      "block": "3",
+      "disabled": false
+    },
+    {
+      "block": "4",
+      "disabled": false
+    },
+    {
+      "block": "5",
+      "disabled": false
+    }
+  ],
+  "profile": 6,
+  "legacyActions": [
+    "Agregar presentaci\u00f3n homog\u00e9nea",
+    "Agregar unidad log\u00edstica",
+    "Duplicar presentaci\u00f3n",
+    "Eliminar presentaci\u00f3n",
+    "Duplicar unidad",
+    "Eliminar unidad",
+    "Agregar producto",
+    "Duplicar producto",
+    "Eliminar producto",
+    "Agregar pareja de co-carga",
+    "Configuraci\u00f3n avanzada compatible"
+  ],
+  "steps": 3
+}

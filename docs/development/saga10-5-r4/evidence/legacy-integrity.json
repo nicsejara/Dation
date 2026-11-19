@@ -1,0 +1,20 @@
+[
+  {
+    "case": 0,
+    "sha256": "28caa71ce3615cc74144a0fb3092e509e5ead888f64ddda53e04fe4df198d683",
+    "products": 0,
+    "presentations": 0
+  },
+  {
+    "case": 1,
+    "sha256": "bbe93026b1fa329e3b1a49331ad6980fdf5329612d6b22d8d78eee5383c80bcc",
+    "products": 3,
+    "presentations": 3
+  },
+  {
+    "case": 2,
+    "sha256": "02853ac2a0be1d6e629cd6010c1e702c5db446c6321866cdc479d8d6ab11c930",
+    "products": 1,
+    "presentations": 1
+  }
+]

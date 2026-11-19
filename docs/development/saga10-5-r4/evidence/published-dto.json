@@ -1,0 +1,158 @@
+{
+  "cargo": {
+    "profile": "PALLETIZED",
+    "products": [
+      {
+        "code": null,
+        "name": "Vino Malbec",
+        "category": null,
+        "net_mass": null,
+        "dimensions": {
+          "unit": "cm",
+          "width": "30",
+          "height": "25",
+          "length": "30"
+        },
+        "gross_mass": {
+          "unit": "kg",
+          "value": "12"
+        },
+        "product_id": "dff8b2f7-2723-4d26-865e-4e4371b200c3",
+        "unit_label": "caja",
+        "density_kg_per_m3": null,
+        "units_per_package": 1,
+        "compatibility_groups": [
+          "LOAD_dff8b2f727234d26865e4e4371b200c3"
+        ]
+      },
+      {
+        "code": null,
+        "name": "Aceite de oliva",
+        "category": null,
+        "net_mass": null,
+        "dimensions": {
+          "unit": "cm",
+          "width": "20",
+          "height": "30",
+          "length": "30"
+        },
+        "gross_mass": {
+          "unit": "kg",
+          "value": "8"
+        },
+        "product_id": "d6c4d525-774c-4572-b7a6-0a5c2c33c33a",
+        "unit_label": "caja",
+        "density_kg_per_m3": null,
+        "units_per_package": 1,
+        "compatibility_groups": [
+          "LOAD_d6c4d525774c4572b7a60a5c2c33c33a"
+        ]
+      }
+    ],
+    "input_mode": "catalog",
+    "split_policy": "INDIVISIBLE",
+    "co_load_pairs": [],
+    "presentations": [
+      {
+        "label": "Pallet de Vino Malbec",
+        "components": [
+          {
+            "quantity": "60",
+            "product_id": "dff8b2f7-2723-4d26-865e-4e4371b200c3"
+          }
+        ],
+        "gross_mass": null,
+        "quantity_kind": "DISCRETE",
+        "quantity_unit": "presentation",
+        "external_volume": null,
+        "extra_tare_mass": {
+          "unit": "kg",
+          "value": "0"
+        },
+        "presentation_id": "8425d5a1-26f2-470e-8855-0fdb22ed1edd",
+        "logistic_unit_id": "8da9cbf8-ce65-4d39-b3c7-d7faa05b37fb",
+        "density_kg_per_m3": null,
+        "loaded_dimensions": {
+          "unit": "cm",
+          "width": "100",
+          "height": "150",
+          "length": "120"
+        },
+        "stackable_metadata": null,
+        "orientation_metadata": null
+      },
+      {
+        "label": "Pallet de Aceite de oliva",
+        "components": [
+          {
+            "quantity": "80",
+            "product_id": "d6c4d525-774c-4572-b7a6-0a5c2c33c33a"
+          }
+        ],
+        "gross_mass": null,
+        "quantity_kind": "DISCRETE",
+        "quantity_unit": "presentation",
+        "external_volume": null,
+        "extra_tare_mass": {
+          "unit": "kg",
+          "value": "0"
+        },
+        "presentation_id": "f4b87afd-2def-4db2-91f4-e5d636594539",
+        "logistic_unit_id": "8da9cbf8-ce65-4d39-b3c7-d7faa05b37fb",
+        "density_kg_per_m3": null,
+        "loaded_dimensions": {
+          "unit": "cm",
+          "width": "100",
+          "height": "150",
+          "length": "120"
+        },
+        "stackable_metadata": null,
+        "orientation_metadata": null
+      }
+    ],
+    "logistic_units": [
+      {
+        "type": "PALLET",
+        "label": "Pallet est\u00e1ndar",
+        "tare_mass": {
+          "unit": "kg",
+          "value": "25"
+        },
+        "empty_dimensions": null,
+        "logistic_unit_id": "8da9cbf8-ce65-4d39-b3c7-d7faa05b37fb",
+        "structural_limit_kg": null
+      }
+    ],
+    "compatibility_policy": "CATEGORIZED"
+  },
+  "version": 2,
+  "operating_role": "SHIPPER",
+  "own_cost_model": "OWN_OPERATING_CYCLE",
+  "allowed_sources": [
+    "OWN",
+    "EXTERNAL"
+  ],
+  "currency_policy": {
+    "currency": "ARS",
+    "rounding": "ROUND_HALF_UP",
+    "minor_units": 2
+  },
+  "split_permitted": false,
+  "active_dimensions": [
+    "weight_kg",
+    "volume_m3"
+  ],
+  "primary_dimension": "weight_kg",
+  "transport_pattern": "DIRECT",
+  "resource_categories": [],
+  "external_cost_models": [
+    "PER_TRIP",
+    "PER_KM"
+  ],
+  "per_km_billing_bases": [
+    "ONE_WAY",
+    "ROUND_TRIP"
+  ],
+  "consolidation_permitted": true,
+  "homogeneous_loads_declared": false
+}

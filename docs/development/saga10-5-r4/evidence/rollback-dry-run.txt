@@ -1,0 +1,2 @@
+PASS: reverse candidate 8b6b26d663c2f9621ac79a1bbac9a837a5536835 to baseline 797f9fc49b497fb6d266621926cdffbe03640e77; git diff --exit-code baseline clean. Forward apply restores candidate exactly. Temporary worktree removed. No production operations.
+Final runtime patch SHA-256 8443838371a9675cd9dfb699523bba9968789103fdff840f8b52e49824e7130e: forward application matches all seven final source files; reverse returns exactly to baseline. PASS.
