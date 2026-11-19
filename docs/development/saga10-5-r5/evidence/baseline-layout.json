@@ -1,0 +1,94 @@
+[
+  {
+    "width": 1440,
+    "steps": [
+      {
+        "summary": 314.296875,
+        "metric": {
+          "width": 219.859375,
+          "height": 106.171875,
+          "left": 235.84375,
+          "right": 0
+        }
+      },
+      {
+        "summary": 314.296875,
+        "metric": {
+          "width": 219.84375,
+          "height": 64.796875,
+          "left": 0,
+          "right": 235.859375
+        }
+      }
+    ]
+  },
+  {
+    "width": 1280,
+    "steps": [
+      {
+        "summary": 248.984375,
+        "metric": {
+          "width": 172.515625,
+          "height": 106.171875,
+          "left": 188.5,
+          "right": 0
+        }
+      },
+      {
+        "summary": 248.984375,
+        "metric": {
+          "width": 172.5,
+          "height": 66.78125,
+          "left": 0,
+          "right": 188.515625
+        }
+      }
+    ]
+  },
+  {
+    "width": 768,
+    "steps": [
+      {
+        "summary": 354,
+        "metric": {
+          "width": 169,
+          "height": 106.171875,
+          "left": 185,
+          "right": 0
+        }
+      },
+      {
+        "summary": 354,
+        "metric": {
+          "width": 169,
+          "height": 66.78125,
+          "left": 0,
+          "right": 185
+        }
+      }
+    ]
+  },
+  {
+    "width": 375,
+    "steps": [
+      {
+        "summary": 201,
+        "metric": {
+          "width": 201,
+          "height": 44.390625,
+          "left": 0,
+          "right": 0
+        }
+      },
+      {
+        "summary": 201,
+        "metric": {
+          "width": 201,
+          "height": 44.390625,
+          "left": 0,
+          "right": 0
+        }
+      }
+    ]
+  }
+]

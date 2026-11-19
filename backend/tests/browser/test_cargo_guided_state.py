@@ -36,3 +36,12 @@ console.log(JSON.stringify({before,changed,checks:'ATOMIC_SAVE_MAX_TWO_STABLE_ID
   # Backend dependencies may be installed only in the runtime venv. Keep this
   # pure test runnable by the browser runner; integration is asserted separately.
   self.assertEqual(value['before']['presentations'][0]['loaded_dimensions']['height'],'150')
+ def test_r5_display_units_keep_exact_decimal_magnitude(self):
+  result=subprocess.run(['node','--input-type=module','-'],cwd=ROOT,input=r'''
+import assert from 'node:assert/strict';
+import {dimensionInUnit as cv,volumeNumber} from './backend/app/static/js/dispatch/models/cargo-presentation-values.mjs';
+for(const [v,a,b,want]of [['120','cm','m','1.2'],['1.2','m','cm','120'],['0.00120','m','cm','0.12'],['1e2','cm','m','1'],['0.000000000000001','m','cm','0.0000000000001'],['','cm','m',''],['-1.25','m','cm','-125']])assert.equal(cv(v,a,b),want);
+assert.equal(volumeNumber(1.8),'1,80');assert.equal(volumeNumber(0.0225),'0,0225');
+console.log('EXACT_DECIMAL_UI_CONVERSION_AND_DISPLAY_PASS');
+''',text=True,capture_output=True)
+  self.assertEqual(result.returncode,0,result.stderr)

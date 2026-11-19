@@ -71,6 +71,7 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
   try{
    if(state.mode==='new'){
     if(!canManage){contractPanel.setStatus('Pendiente','pending');return;}
+    if(fields.historical){contractPanel.setStatus('Consulta histórica','pending');contractStatus.textContent='Esta configuración anterior se conserva en solo lectura. Creá un modelo nuevo para preparar otro Data Contract.';return;}
     if(!fields.sectionValidity().slice(1).every(Boolean)){contractPanel.setStatus('Pendiente','pending');contractStatus.textContent='Revisá la operación y las reglas de costo del modelo.';return;}
     previewBody={configuration:fields.read().configuration};
    }else{if(!isSelected())throw new Error('Elegí un Model y una versión publicada.');previewBody={model_id:state.model_id,version_id:state.version_id};}

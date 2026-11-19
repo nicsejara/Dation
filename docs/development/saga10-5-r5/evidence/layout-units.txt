@@ -1,0 +1,10 @@
+test_01_complete_forms_exact_shared_geometry_and_a11y (test_saga10_5_r5.R5Tests.test_01_complete_forms_exact_shared_geometry_and_a11y) ... Executing <Task finished name='Task-1' coro=<Saga10WizardTests.asyncSetUp() done, defined at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:24> result=None created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.124 seconds
+Executing <Task pending name='Task-6' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.214 seconds
+ok
+test_06_measure_selector_keeps_physical_volume (test_saga10_5_r5.R5Tests.test_06_measure_selector_keeps_physical_volume) ... Executing <Task pending name='Task-17' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.210 seconds
+ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 20.448s
+
+OK

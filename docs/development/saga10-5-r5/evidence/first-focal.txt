@@ -1,0 +1,81 @@
+test_01_complete_forms_exact_shared_geometry_and_a11y (test_saga10_5_r5.R5Tests.test_01_complete_forms_exact_shared_geometry_and_a11y) ... Executing <Task finished name='Task-1' coro=<Saga10WizardTests.asyncSetUp() done, defined at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:24> result=None created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.105 seconds
+FAIL
+Executing <Task pending name='Task-6' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.222 seconds
+test_02_five_types_ten_assets_history_and_no_requests_per_keystroke (test_saga10_5_r5.R5Tests.test_02_five_types_ten_assets_history_and_no_requests_per_keystroke) ... Executing <Task pending name='Task-17' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.222 seconds
+ok
+test_03_progressive_guidance_history_and_stable_ids (test_saga10_5_r5.R5Tests.test_03_progressive_guidance_history_and_stable_ids) ... Executing <Task finished name='Task-23' coro=<Saga10WizardTests.asyncSetUp() done, defined at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:24> result=None created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.128 seconds
+Executing <Task pending name='Task-28' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.222 seconds
+ok
+test_04_historical_incomplete_human_readonly_no_preview_or_xss (test_saga10_5_r5.R5Tests.test_04_historical_incomplete_human_readonly_no_preview_or_xss) ... Executing <Task pending name='Task-39' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.251 seconds
+ok
+test_05_missing_asset_fallback_and_incognito_draft_isolation (test_saga10_5_r5.R5Tests.test_05_missing_asset_fallback_and_incognito_draft_isolation) ... Executing <Task pending name='Task-56' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.216 seconds
+ok
+test_06_measure_selector_keeps_physical_volume (test_saga10_5_r5.R5Tests.test_06_measure_selector_keeps_physical_volume) ... FAIL
+Executing <Task pending name='Task-67' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.239 seconds
+
+======================================================================
+FAIL: test_01_complete_forms_exact_shared_geometry_and_a11y (test_saga10_5_r5.R5Tests.test_01_complete_forms_exact_shared_geometry_and_a11y)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/usr/lib/python3.13/asyncio/base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_5_r5.py", line 18, in test_01_complete_forms_exact_shared_geometry_and_a11y
+    self.assertFalse(data['overflow'],data);a,b=data['steps'];self.assertAlmostEqual(a['summary']['width'],b['summary']['width'],delta=.5);self.assertEqual(a['summary']['padding'],b['summary']['padding']);self.assertEqual(a['summary']['offset'],b['summary']['offset'])
+                                                                                                                                                                                                             ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 435.96875 != 489.96875
+
+======================================================================
+FAIL: test_06_measure_selector_keeps_physical_volume (test_saga10_5_r5.R5Tests.test_06_measure_selector_keeps_physical_volume)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/usr/lib/python3.13/asyncio/base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/workspace/work/dation-saga10-5-r5/backend/tests/browser/test_saga10_5_r5.py", line 57, in test_06_measure_selector_keeps_physical_volume
+    await self.page.locator('[name=unit_measure]').select_option('m');await expect(self.page.locator('[data-cargo-metric=volume]')).to_have_attribute('data-value','1.8');await expect(self.page.locator('[name=unit_length]')).to_have_value('1.2');after=(await self.draft())['configuration']['cargo']['presentations'][0];self.assertEqual(after['presentation_id'],before['presentation_id']);self.assertEqual(after['loaded_dimensions']['unit'],'m')
+                                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/async_api/_generated.py", line 22206, in to_have_attribute
+    await self._impl_obj.to_have_attribute(
+    ...<4 lines>...
+    )
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_assertions.py", line 349, in to_have_attribute
+    await self._expect_impl(
+    ...<7 lines>...
+    )
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_assertions.py", line 128, in _expect_impl
+    _record_soft_or_raise(
+    ~~~~~~~~~~~~~~~~~~~~~^
+        AssertionError(
+        ^^^^^^^^^^^^^^^
+    ...<2 lines>...
+        self._is_soft,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  File "/workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_assertions.py", line 60, in _record_soft_or_raise
+    raise error
+AssertionError: Locator expected to have attribute '1.8'
+Actual value: 1800000 
+Call log:
+  - Expect "to_have_attribute" locator("[data-cargo-metric=volume]") with timeout 5000ms
+  - waiting for locator("[data-cargo-metric=volume]")
+    14 × locator resolved to <output aria-live="off" data-pending="false" data-value="1800000" class="r5-volume-card" data-cargo-metric="volume" aria-labelledby="r5-volume-f1ae1949-31d5-43b4-9fba-39b0c0861ccf">…</output>
+       - unexpected value "1800000"
+
+Aria snapshot:
+- status "Volumen exterior calculado":
+  - text: Volumen exterior calculado
+  - strong: 1.800.000,00
+  - text: m³ Calculado con largo × ancho × alto exterior.
+
+----------------------------------------------------------------------
+Ran 6 tests in 44.017s
+
+FAILED (failures=2)

@@ -1,0 +1,111 @@
+id,area,requisito,critico,resultado,evidencia,test_ref,observaciones
+R5-BASE-01,BASE,Verificar HEAD main y PR130 antes de modificar,SEGUN IMPACTO,PASS,G0.md,G0 / git,main y PR130 verificados antes de editar
+R5-BASE-02,BASE,No cambiar contratos ni motor D1/D2,SI,PASS,ARCHITECTURE.md; evidence/contracts-75.txt,diff / contratos75,Sin mutaciones productivas ni cambios backend/infra
+R5-BASE-03,BASE,Un único PR sin merge,SEGUN IMPACTO,PASS,Reporte de integración del PR,PR asociado a feat/saga10-5-r5-premium-ux,"Entrega final comprueba PR único abierto, no merged, sin auto-merge"
+R5-BASE-04,BASE,No deploy ni billing/infra,SI,PASS,ARCHITECTURE.md; evidence/contracts-75.txt,diff / contratos75,Sin mutaciones productivas ni cambios backend/infra
+R5-BASE-05,BASE,"Capturas anteriores conservadas como evidencia, no normativa",SEGUN IMPACTO,PASS,evidence/baseline-layout.json; evidence/before-1440.png,G0 navegador,Capturas reales baseline separadas de referencias aprobadas
+R5-P1_UX-01,P1_UX,Tres pasos B03 visibles sin acordeones internos,SEGUN IMPACTO,PASS,evidence/regression-dom-audit.json; evidence/integrated-65.txt,R4.T09,
+R5-P1_UX-02,P1_UX,Selector B03 muestra exactamente 5 unidades,SEGUN IMPACTO,PASS,evidence/regression-dom-audit.json; evidence/integrated-65.txt,R4.T09,
+R5-P1_UX-03,P1_UX,Título Tipo de unidad logística y copy debajo,SEGUN IMPACTO,PASS,evidence/paired-complete-1440.png; evidence/addendum-geometry.json; evidence/final-focal-7.txt,R5.T01 + inspección visual,
+R5-P1_UX-04,P1_UX,Título Dimensiones de la unidad cargada y copy debajo,SEGUN IMPACTO,PASS,evidence/paired-complete-1440.png; evidence/addendum-geometry.json; evidence/final-focal-7.txt,R5.T01 + inspección visual,
+R5-P1_UX-05,P1_UX,Separador visual limpio entre A/B,SEGUN IMPACTO,PASS,evidence/paired-complete-1440.png; evidence/addendum-geometry.json; evidence/final-focal-7.txt,R5.T01 + inspección visual,
+R5-P1_UX-06,P1_UX,Las etiquetas de campos usan acento sutil sin decorar exceso,SEGUN IMPACTO,PASS,evidence/paired-complete-1440.png; evidence/addendum-geometry.json; evidence/final-focal-7.txt,R5.T01 + inspección visual,
+R5-P1_UX-07,P1_UX,Los cinco tipos cambian el render del resumen,SEGUN IMPACTO,PASS,evidence/asset-matrix.json; evidence/unit-*.png; evidence/final-focal-7.txt,R5.T02,
+R5-P1_UX-08,P1_UX,Pallet vacío 3D correcto,SEGUN IMPACTO,PASS,evidence/asset-matrix.json; evidence/unit-*.png; evidence/final-focal-7.txt,R5.T02,
+R5-P1_UX-09,P1_UX,Caja vacía 3D correcta,SEGUN IMPACTO,PASS,evidence/asset-matrix.json; evidence/unit-*.png; evidence/final-focal-7.txt,R5.T02,
+R5-P1_UX-10,P1_UX,Cajón vacío 3D correcto,SEGUN IMPACTO,PASS,evidence/asset-matrix.json; evidence/unit-*.png; evidence/final-focal-7.txt,R5.T02,
+R5-P1_UX-11,P1_UX,Big bag vacío 3D correcto,SEGUN IMPACTO,PASS,evidence/asset-matrix.json; evidence/unit-*.png; evidence/final-focal-7.txt,R5.T02,
+R5-P1_UX-12,P1_UX,Otra unidad vacía 3D correcta,SEGUN IMPACTO,PASS,evidence/asset-matrix.json; evidence/unit-*.png; evidence/final-focal-7.txt,R5.T02,
+R5-P1_UX-13,P1_UX,Panel resumen legible cuando no hay datos,SEGUN IMPACTO,PASS,evidence/empty-1440.png; evidence/pending-tare-2.txt,R5.T03,"Sin datos: pendiente, no se fabrica cero"
+R5-P1_UX-14,P1_UX,Tarjeta premium Volumen exterior calculado,SEGUN IMPACTO,PASS,evidence/paired-complete-1440.png; evidence/addendum-geometry.json; evidence/final-focal-7.txt,R5.T01 + inspección visual,
+R5-P1_UX-15,P1_UX,Volumen sin datos muestra pendiente (no 0),SEGUN IMPACTO,PASS,evidence/empty-1440.png; evidence/pending-tare-2.txt,R5.T03,"Sin datos: pendiente, no se fabrica cero"
+R5-P1_UX-16,P1_UX,Pallet 120×100×150cm=1.80m³,SEGUN IMPACTO,PASS,evidence/final-focal-7.txt; evidence/pending-tare-2.txt,"R5.T01,T06",
+R5-P1_UX-17,P1_UX,Cambiar a 160cm=1.92m³,SEGUN IMPACTO,PASS,evidence/integrated-65.txt; evidence/pure-state-2.txt,R4.T01 + estado puro,"Ambas presentaciones actualizadas a 1,92 m³"
+R5-P1_UX-18,P1_UX,Tara cero sólo si explícita,SEGUN IMPACTO,PASS,evidence/pending-tare-2.txt,R5.T06,Tara vacía → Sin declarar; cero explícito → 720 kg
+R5-P1_UX-19,P1_UX,No se agrega botón Agregar unidad,SI,PASS,evidence/regression-dom-audit.json; evidence/integrated-65.txt,R4.T09,
+R5-P2_UX-01,P2_UX,Producto y tipo de bulto jerarquizados,SI,PASS,evidence/paired-complete-1440.png; evidence/addendum-geometry.json,R5.T01 + inspección visual,
+R5-P2_UX-02,P2_UX,Dimensiones y peso del bulto jerarquizados,SI,PASS,evidence/paired-complete-1440.png; evidence/addendum-geometry.json,R5.T01 + inspección visual,
+R5-P2_UX-03,P2_UX,Volumen por bulto en tarjeta premium equivalente,SI,PASS,evidence/paired-complete-1440.png; evidence/addendum-geometry.json,R5.T01 + inspección visual,
+R5-P2_UX-04,P2_UX,Caja 30×30×25cm=0.0225m³,SI,PASS,evidence/final-focal-7.txt; evidence/integrated-65.txt; evidence/regression-published-dto.json,"R5.T01,T03 / R4.T01",
+R5-P2_UX-05,P2_UX,Caja 30×20×30cm=0.018m³,SI,PASS,evidence/integrated-65.txt,R4.T01,"0,018 m³ es informativo y no sustituye el volumen exterior"
+R5-P2_UX-06,P2_UX,Pallet cargado 3D correcto,SI,PASS,evidence/asset-matrix.json; evidence/final-focal-7.txt,R5.T02,
+R5-P2_UX-07,P2_UX,Caja cargada 3D correcta,SI,PASS,evidence/asset-matrix.json; evidence/final-focal-7.txt,R5.T02,
+R5-P2_UX-08,P2_UX,Cajón cargado 3D correcto,SI,PASS,evidence/asset-matrix.json; evidence/final-focal-7.txt,R5.T02,
+R5-P2_UX-09,P2_UX,Big bag cargado 3D correcto,SI,PASS,evidence/asset-matrix.json; evidence/final-focal-7.txt,R5.T02,
+R5-P2_UX-10,P2_UX,Otra unidad cargada 3D correcta,SI,PASS,evidence/asset-matrix.json; evidence/final-focal-7.txt,R5.T02,
+R5-P2_UX-11,P2_UX,Volumen de caja no sustituye volumen exterior,SI,PASS,evidence/final-focal-7.txt; evidence/integrated-65.txt; evidence/regression-published-dto.json,"R5.T01,T03 / R4.T01",
+R5-P2_UX-12,P2_UX,Resumen cargado peso 60×12+25=745kg,SI,PASS,evidence/final-focal-7.txt; evidence/integrated-65.txt; evidence/regression-published-dto.json,"R5.T01,T03 / R4.T01",
+R5-P2_UX-13,P2_UX,Resumen cargado peso 80×8+25=665kg,SI,PASS,evidence/final-focal-7.txt; evidence/integrated-65.txt; evidence/regression-published-dto.json,"R5.T01,T03 / R4.T01",
+R5-P2_UX-14,P2_UX,Resumen lado derecho equivalente Paso1,SI,PASS,evidence/paired-complete-1440.png; evidence/addendum-geometry.json,R5.T01 + inspección visual,
+R5-P2_UX-15,P2_UX,Guardar tipo de carga permanece único CTA interno,SI,PASS,evidence/regression-dom-audit.json; evidence/regression-geometry.json; evidence/integrated-65.txt,R4.T09,
+R5-P2_UX-16,P2_UX,Guardar tipo no publica,SI,PASS,evidence/one-saved-1440.png; evidence/two-saved-375.png; evidence/final-focal-7.txt; evidence/pending-tare-2.txt,R5.T03,
+R5-P2_UX-17,P2_UX,Guardar 1 limpia formulario,SI,PASS,evidence/one-saved-1440.png; evidence/two-saved-375.png; evidence/final-focal-7.txt; evidence/pending-tare-2.txt,R5.T03,
+R5-P2_UX-18,P2_UX,Mensaje orienta cargar segundo tipo,SI,PASS,evidence/one-saved-1440.png; evidence/two-saved-375.png; evidence/final-focal-7.txt; evidence/pending-tare-2.txt,R5.T03,
+R5-P2_UX-19,P2_UX,Historial aparece BAJO formulario,SI,PASS,evidence/regression-dom-audit.json; evidence/regression-geometry.json; evidence/integrated-65.txt,R4.T09,
+R5-P2_UX-20,P2_UX,Título Tipos de carga registrados,SI,PASS,evidence/one-saved-1440.png; evidence/two-saved-375.png; evidence/final-focal-7.txt; evidence/pending-tare-2.txt,R5.T03,
+R5-P2_UX-21,P2_UX,Subtexto del historial aclaratorio,SI,PASS,evidence/one-saved-1440.png; evidence/two-saved-375.png; evidence/final-focal-7.txt; evidence/pending-tare-2.txt,R5.T03,
+R5-P2_UX-22,P2_UX,Tarjeta historial contiene arte cargado miniatura,SI,PASS,evidence/asset-matrix.json; evidence/final-focal-7.txt,R5.T02,
+R5-P2_UX-23,P2_UX,Tarjeta historial contiene ordinal nombre y 3 métricas,SI,PASS,evidence/one-saved-1440.png; evidence/two-saved-375.png; evidence/final-focal-7.txt; evidence/pending-tare-2.txt,R5.T03,
+R5-P2_UX-24,P2_UX,Tarjeta historial muestra estado guardado/revisar,SI,PASS,evidence/one-saved-1440.png; evidence/two-saved-375.png; evidence/final-focal-7.txt; evidence/pending-tare-2.txt,R5.T03,
+R5-P2_UX-25,P2_UX,Tarjeta historial clic/teclado habilita editar,SI,PASS,evidence/one-saved-1440.png; evidence/two-saved-375.png; evidence/final-focal-7.txt; evidence/pending-tare-2.txt,R5.T03,
+R5-P2_UX-26,P2_UX,Editar no crea nuevos IDs,SI,PASS,evidence/one-saved-1440.png; evidence/two-saved-375.png; evidence/final-focal-7.txt; evidence/pending-tare-2.txt,R5.T03,
+R5-P2_UX-27,P2_UX,Actualizar CTA disabled si no hay cambios,SI,PASS,evidence/one-saved-1440.png; evidence/two-saved-375.png; evidence/final-focal-7.txt; evidence/pending-tare-2.txt,R5.T03,
+R5-P2_UX-28,P2_UX,Dirty habilita CTA actualización,SI,PASS,evidence/one-saved-1440.png; evidence/two-saved-375.png; evidence/final-focal-7.txt; evidence/pending-tare-2.txt,R5.T03,
+R5-P2_UX-29,P2_UX,Doble click guardar no duplica,SI,PASS,evidence/integrated-65.txt,R4.T02,Guardado inválido conserva buffer; doble click no duplica; dirty bloquea confirmar
+R5-P2_UX-30,P2_UX,Límite 2 tipos controlado,SI,PASS,evidence/one-saved-1440.png; evidence/two-saved-375.png; evidence/final-focal-7.txt; evidence/pending-tare-2.txt,R5.T03,
+R5-P2_UX-31,P2_UX,Mensaje 2 de 2 y ruta de edición,SI,PASS,evidence/one-saved-1440.png; evidence/two-saved-375.png; evidence/final-focal-7.txt; evidence/pending-tare-2.txt,R5.T03,
+R5-P2_UX-32,P2_UX,No agregar botón + tipo ni gestor catálogo,SI,PASS,evidence/regression-dom-audit.json; evidence/regression-geometry.json; evidence/integrated-65.txt,R4.T09,
+R5-P2_UX-33,P2_UX,Error de guardado no limpia datos,SI,PASS,evidence/integrated-65.txt,R4.T02,Guardado inválido conserva buffer; doble click no duplica; dirty bloquea confirmar
+R5-P2_UX-34,P2_UX,Guardar B03 no deja segundo sucio sin revisar,SI,PASS,evidence/integrated-65.txt,R4.T02,Guardado inválido conserva buffer; doble click no duplica; dirty bloquea confirmar
+R5-P3_CTA-01,P3_CTA,Peso y volumen siguen disponibles,SEGUN IMPACTO,PASS,evidence/integrated-65.txt; evidence/regression-d1-and-contract.txt,R4.T10 + D1/contratos,
+R5-P3_CTA-02,P3_CTA,Dividir se refiere a orden completa,SEGUN IMPACTO,PASS,evidence/integrated-65.txt; evidence/regression-d1-and-contract.txt,R4.T10 + D1/contratos,
+R5-P3_CTA-03,P3_CTA,No dividir un pallet físico,SI,PASS,evidence/regression-d1-and-contract.txt,R4.T07 / D1 real del fixture,Orden divisible distribuye unidades completas 6+4; indivisible queda sin servir si no cabe
+R5-P3_CTA-04,P3_CTA,D1 primaria válida e invisible,SEGUN IMPACTO,PASS,evidence/integrated-65.txt; evidence/regression-d1-and-contract.txt,R4.T10 + D1/contratos,
+R5-P3_CTA-05,P3_CTA,Bandas info no duplicadas,SEGUN IMPACTO,PASS,evidence/regression-dom-audit.json; evidence/regression-geometry.json; evidence/integrated-65.txt,R4.T09,
+R5-P3_CTA-06,P3_CTA,B03 confirmar exige preview vigente,SEGUN IMPACTO,PASS,evidence/integrated-65.txt,"R4.T03,T06 / R3.T09","Preview vigente, error recuperable y protección de doble submit originales"
+R5-P3_CTA-07,P3_CTA,B01 CTA disabled grisado y check verde,SEGUN IMPACTO,PASS,evidence/regression-cta-states.json; evidence/integrated-65.txt,R4.T03,"Cinco CTA nativos disabled, firma vigente y reactivación por cambios; checks completos"
+R5-P3_CTA-08,P3_CTA,B02 CTA disabled grisado y check verde,SEGUN IMPACTO,PASS,evidence/regression-cta-states.json; evidence/integrated-65.txt,R4.T03,"Cinco CTA nativos disabled, firma vigente y reactivación por cambios; checks completos"
+R5-P3_CTA-09,P3_CTA,B03 CTA disabled grisado y check verde,SEGUN IMPACTO,PASS,evidence/regression-cta-states.json; evidence/integrated-65.txt,R4.T03,"Cinco CTA nativos disabled, firma vigente y reactivación por cambios; checks completos"
+R5-P3_CTA-10,P3_CTA,B04 CTA disabled grisado y check verde,SEGUN IMPACTO,PASS,evidence/regression-cta-states.json; evidence/integrated-65.txt,R4.T03,"Cinco CTA nativos disabled, firma vigente y reactivación por cambios; checks completos"
+R5-P3_CTA-11,P3_CTA,B05 CTA disabled grisado y check verde,SEGUN IMPACTO,PASS,evidence/regression-cta-states.json; evidence/integrated-65.txt,R4.T03,"Cinco CTA nativos disabled, firma vigente y reactivación por cambios; checks completos"
+R5-P3_CTA-12,P3_CTA,Cambios relevantes reactivan CTAs,SEGUN IMPACTO,PASS,evidence/regression-cta-states.json; evidence/integrated-65.txt,R4.T03,"Cinco CTA nativos disabled, firma vigente y reactivación por cambios; checks completos"
+R5-P3_CTA-13,P3_CTA,Firma idéntica puede mantener confirmado,SEGUN IMPACTO,PASS,evidence/regression-cta-states.json; evidence/integrated-65.txt,R4.T03,"Cinco CTA nativos disabled, firma vigente y reactivación por cambios; checks completos"
+R5-P3_CTA-14,P3_CTA,No dobles submits en validación asíncrona,SI,PASS,evidence/integrated-65.txt,"R4.T03,T06 / R3.T09","Preview vigente, error recuperable y protección de doble submit originales"
+R5-P3_CTA-15,P3_CTA,Geometría uniforme entre 5 CTA,SEGUN IMPACTO,PASS,evidence/regression-dom-audit.json; evidence/regression-geometry.json; evidence/integrated-65.txt,R4.T09,
+R5-ESTADO-01,ESTADO,B04 fuente no hace saltar a B03,SI,PASS,evidence/integrated-65.txt,R3.T01,Foco/open/scroll no saltan hacia B03
+R5-ESTADO-02,ESTADO,B04 categoría no hace saltar a B03,SI,PASS,evidence/integrated-65.txt,R3.T01,Foco/open/scroll no saltan hacia B03
+R5-ESTADO-03,ESTADO,B05 moneda no hace saltar a B03,SI,PASS,evidence/integrated-65.txt,R3.T01,Foco/open/scroll no saltan hacia B03
+R5-ESTADO-04,ESTADO,B05 tarifas no hacen saltar a B03,SI,PASS,evidence/integrated-65.txt,R3.T01,Foco/open/scroll no saltan hacia B03
+R5-ESTADO-05,ESTADO,Crear nuevo modelo limpia datos/IDs/checks,SI,PASS,evidence/integrated-65.txt,"R4.T05,T12",
+R5-ESTADO-06,ESTADO,Recarga mantiene tipos y estado de formulario,SI,PASS,evidence/integrated-65.txt,"R4.T01,T02",Se conserva catálogo guardado y buffer pendiente
+R5-ESTADO-07,ESTADO,Incógnito inicia borrador independiente,SI,PASS,evidence/final-focal-7.txt,R5.T05,"Contexto incógnito aislado, sin leer ni borrar datos reales"
+R5-ESTADO-08,ESTADO,Desde Decision Graph vuelve read-only publicado,SI,PASS,evidence/regression-published-review-return-2.png; evidence/regression-legacy-integrity.json; evidence/integrated-65.txt,"R4.T07,T08,T13","Tres retornos Graph, comparación API íntegra y cero POST de publicación"
+R5-ESTADO-09,ESTADO,Histórico incompleto muestra resumen humano,SI,PASS,evidence/historical-incomplete-1440.png; evidence/historical-metadata.txt; evidence/final-focal-7.txt; evidence/regression-legacy-integrity.json,"R5.T04 / R4.T08,T11 / Guided.T03","Snapshot original íntegro; resumen humano en español, sin JSON/edición ni preview de draft incompleto"
+R5-ESTADO-10,ESTADO,No JSON crudo como UI primaria,SI,PASS,evidence/historical-incomplete-1440.png; evidence/historical-metadata.txt; evidence/final-focal-7.txt; evidence/regression-legacy-integrity.json,"R5.T04 / R4.T08,T11 / Guided.T03","Snapshot original íntegro; resumen humano en español, sin JSON/edición ni preview de draft incompleto"
+R5-ESTADO-11,ESTADO,Histórico conserva payload original,SI,PASS,evidence/historical-incomplete-1440.png; evidence/historical-metadata.txt; evidence/final-focal-7.txt; evidence/regression-legacy-integrity.json,"R5.T04 / R4.T08,T11 / Guided.T03","Snapshot original íntegro; resumen humano en español, sin JSON/edición ni preview de draft incompleto"
+R5-ESTADO-12,ESTADO,Un published no se modifica por UX,SI,PASS,evidence/regression-published-review-return-2.png; evidence/regression-legacy-integrity.json; evidence/integrated-65.txt,"R4.T07,T08,T13","Tres retornos Graph, comparación API íntegra y cero POST de publicación"
+R5-ESTADO-13,ESTADO,Cambio de tara recalcula ambos tipos,SI,PASS,evidence/integrated-65.txt,R4.T01,"30 kg → 750/670 kg; 160 cm → 1,92 m³ en ambos tipos"
+R5-ESTADO-14,ESTADO,Cambio altura sincroniza ambas presentaciones,SI,PASS,evidence/integrated-65.txt,R4.T01,"30 kg → 750/670 kg; 160 cm → 1,92 m³ en ambos tipos"
+R5-VISUAL_ART-01,VISUAL_ART,Fichero assets mapea 5×2 sin URL externa,SEGUN IMPACTO,PASS,ASSETS.json; evidence/asset-matrix.json; evidence/final-focal-7.txt,R5.T02 + SHA activos,
+R5-VISUAL_ART-02,VISUAL_ART,Lazy/estático sin request por tecla,SEGUN IMPACTO,PASS,evidence/asset-network.json; evidence/asset-matrix.json; ASSETS.md,R5.T02,"Cero requests por input; lazy, decode async, recursos locales"
+R5-VISUAL_ART-03,VISUAL_ART,Alt/aria correctos o decorativos,SEGUN IMPACTO,PASS,evidence/a11y-1440.json; evidence/final-focal-7.txt,"DOM + R5.T01,T02",Decoración alt vacío/aria-hidden; tipo y métricas se leen en texto
+R5-VISUAL_ART-04,VISUAL_ART,Fallback para asset faltante,SEGUN IMPACTO,PASS,evidence/asset-fallback-1440.png; evidence/final-focal-7.txt,R5.T05,404 deliberado muestra SVG local y conserva cálculo/guardado
+R5-VISUAL_ART-05,VISUAL_ART,No jump de layout al cambiar unidad,SI,PASS,evidence/final-focal-7.txt; evidence/unit-*.png,R5.T02,Dimensiones de marcos idénticas al cambiar los cinco tipos
+R5-VISUAL_ART-06,VISUAL_ART,Responsive 375px sin overflow,SEGUN IMPACTO,PASS,evidence/addendum-geometry.json; evidence/paired-complete-*.png,R5.T01,"375/768/1280/1440 px, formularios completos, sin overflow"
+R5-VISUAL_ART-07,VISUAL_ART,Responsive 768px coherente,SEGUN IMPACTO,PASS,evidence/addendum-geometry.json; evidence/paired-complete-*.png,R5.T01,"375/768/1280/1440 px, formularios completos, sin overflow"
+R5-VISUAL_ART-08,VISUAL_ART,Desktop 1280 y 1440 comparable,SEGUN IMPACTO,PASS,evidence/addendum-geometry.json; evidence/paired-complete-*.png,R5.T01,"375/768/1280/1440 px, formularios completos, sin overflow"
+R5-VISUAL_ART-09,VISUAL_ART,Contrast ratio y focus visible,SEGUN IMPACTO,PASS,evidence/integrated-65.txt; evidence/a11y-*.json; evidence/final-focal-7.txt,"R4.T09 + R5.T01,T03","Auditoría de contraste/overflow, teclado Enter/Space y reduced-motion"
+R5-VISUAL_ART-10,VISUAL_ART,Reduced motion respetado,SEGUN IMPACTO,PASS,evidence/integrated-65.txt; evidence/a11y-*.json; evidence/final-focal-7.txt,"R4.T09 + R5.T01,T03","Auditoría de contraste/overflow, teclado Enter/Space y reduced-motion"
+R5-VISUAL_ART-11,VISUAL_ART,Ilustración no afirma packing real,SEGUN IMPACTO,PASS,evidence/paired-complete-1440.png; ARCHITECTURE.md,DOM R5 + R4.T09,"Arte decorativo estático, disclaimer explícito de no packing/apilado"
+R5-VISUAL_ART-12,VISUAL_ART,No fonts externas empaquetadas,SI,PASS,ASSETS.json; evidence/asset-matrix.json; evidence/final-focal-7.txt,R5.T02 + SHA activos,
+R5-VISUAL_ART-13,VISUAL_ART,No imágenes externas/stock,SI,PASS,ASSETS.json; evidence/asset-matrix.json; evidence/final-focal-7.txt,R5.T02 + SHA activos,
+R5-CONTRATO-01,CONTRATO,1 unidad lógica compartida por 2 presentaciones,SI,PASS,evidence/regression-published-dto.json; evidence/integrated-65.txt; evidence/pure-state-2.txt,R4.T01 + R5.T03 / estado puro,
+R5-CONTRATO-02,CONTRATO,1 producto por presentación,SI,PASS,evidence/regression-published-dto.json; evidence/integrated-65.txt; evidence/pure-state-2.txt,R4.T01 + R5.T03 / estado puro,
+R5-CONTRATO-03,CONTRATO,IDs de producto/presentación estables,SI,PASS,evidence/regression-published-dto.json; evidence/integrated-65.txt; evidence/pure-state-2.txt,R4.T01 + R5.T03 / estado puro,
+R5-CONTRATO-04,CONTRATO,Data Contract mantiene 3 CSV,SI,PASS,evidence/regression-d1-and-contract.txt; evidence/contracts-75.txt; evidence/integrated-65.txt,"R4.T07,T10 + contratos75","DTO realmente publicado y normalizado en fixture, no contrato sintético distinto"
+R5-CONTRATO-05,CONTRATO,Líneas usan presentation_id y quantity,SI,PASS,evidence/regression-d1-and-contract.txt; evidence/contracts-75.txt; evidence/integrated-65.txt,"R4.T07,T10 + contratos75","DTO realmente publicado y normalizado en fixture, no contrato sintético distinto"
+R5-CONTRATO-06,CONTRATO,Política co-load no cambia silenciosamente,SI,PASS,evidence/regression-d1-and-contract.txt; evidence/contracts-75.txt; evidence/integrated-65.txt,"R4.T07,T10 + contratos75","DTO realmente publicado y normalizado en fixture, no contrato sintético distinto"
+R5-CONTRATO-07,CONTRATO,Separación orden indivisible vs discreta preservada,SI,PASS,evidence/regression-d1-and-contract.txt; evidence/contracts-75.txt; evidence/integrated-65.txt,"R4.T07,T10 + contratos75","DTO realmente publicado y normalizado en fixture, no contrato sintético distinto"
+R5-CONTRATO-08,CONTRATO,Pruebas E2E sin modificar datos reales,SI,PASS,README.md; evidence/integrated-65.txt,Fixtures SQL/API/browser locales,Base y API propias; no acceso productivo ni activación de flags
+R5-CONTRATO-09,CONTRATO,No tercer tipo en nuevo guiado,SI,PASS,evidence/regression-published-dto.json; evidence/integrated-65.txt; evidence/pure-state-2.txt,R4.T01 + R5.T03 / estado puro,
+R5-CONTRATO-10,CONTRATO,No botón Presentación activa / Soporte compartido,SI,PASS,evidence/regression-dom-audit.json; evidence/integrated-65.txt,R4.T09,

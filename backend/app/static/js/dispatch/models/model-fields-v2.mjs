@@ -1,28 +1,14 @@
 import {el} from './forms.mjs';
+import {mountHistorical} from './model-historical-view.mjs';
 import {assessCargoDraft,fingerprint} from './cargo-guided-state.mjs';
 import {mountCargoGuidedEditor} from './cargo-guided-editor.mjs';
 import {guidedBlock,radioCards,checkboxCards,confirmFooter,stepPanel,modelField as field,note,readout} from './guided-ui.mjs';
 const DIMS=[['weight_kg','Peso (kg)'],['volume_m3','Volumen (m³)']];
 const CATEGORIES=[['GENERAL','Carga general'],['REFRIGERATED','Refrigerado'],['TANKER','Cisterna'],['BULK','Granel'],['FLATBED','Plataforma']];
 export function mountModelFieldsV2(form,scope,draft,{published=false}={}){
- const assessment=assessCargoDraft(draft);
+ let assessment;try{assessment=assessCargoDraft(draft);}catch{assessment={representable:false,reason:'Esta configuración anterior requiere una consulta sin conversión.'};}
  if(!assessment.representable)return mountHistorical(form,draft,assessment,published);
  return mountFields(form,scope,draft,{published});
-}
-function mountHistorical(form,draft,assessment,published){
- const original=structuredClone(draft),c=original.configuration,g=c.cargo,host=el('div',undefined,'model-wizard-v2 model-wizard-pro');host.dataset.historicalReview='';form.append(host);
- const defs=[['Identidad del modelo','tag',{name:draft.name,description:draft.description}],['Operación logística','resources',{operating_role:c.operating_role,transport_pattern:c.transport_pattern,consolidation_permitted:c.consolidation_permitted}],['Carga y capacidad','pallet',null],['Recursos de transporte','resources',{allowed_sources:c.allowed_sources,resource_categories:c.resource_categories}],['Moneda y costos','costs',{currency_policy:c.currency_policy,own_cost_model:c.own_cost_model,external_cost_models:c.external_cost_models,per_km_billing_bases:c.per_km_billing_bases}]];
- const json=(parent,value)=>{const data=el('pre',JSON.stringify(value,null,2),'r4-contract-readonly');data.tabIndex=0;data.setAttribute('role','region');data.setAttribute('aria-label','Datos íntegros del contrato original');parent.append(data);};
- for(const [i,[title,icon,value]]of defs.entries()){
-  const b=guidedBlock(host,i+1,title,'Consulta de contrato original · solo lectura',icon,{open:i===2});if(published)b.setStatus('publicado · solo lectura','complete');
-  if(i===2){note(b.body,assessment.reason+' No se modifican sus datos. Para una configuración distinta utilizá Crear nuevo modelo.');
-   const one=stepPanel(b.body,1,'Unidad logística original','Se conservan todas las unidades históricas.');json(one.body,g.logistic_units);
-   const two=stepPanel(b.body,2,'Tipos de carga originales','Se conservan todos los productos, componentes e identificadores.');json(two.body,{products:g.products,presentations:g.presentations});if(!published&&draft.guided_ux?.catalogue&&fingerprint(draft.guided_ux.catalogue)!==fingerprint({products:g.products,logistic_units:g.logistic_units,presentations:g.presentations})){note(two.body,'Datos de borrador recuperados, todavía sin publicar.');json(two.body,draft.guided_ux.catalogue);}
-   const three=stepPanel(b.body,3,'Restricciones y reglas originales','El contrato conserva su semántica física.');json(three.body,{...c,cargo:{profile:g.profile,input_mode:g.input_mode,split_policy:g.split_policy,compatibility_policy:g.compatibility_policy,co_load_pairs:g.co_load_pairs},currency_policy:undefined});
-  }else json(b.body,value);
- }
- const valid=()=>Object.fromEntries(published?[]:[['cargo_catalog','Este contrato se conserva en consulta. Creá un modelo nuevo para editar sin convertir el histórico.']]);
- return {read:()=>structuredClone(original),validate:valid,sectionValidity:()=>[true,true,true,true,true],sectionCompletion:()=>Array(5).fill(published),canPublish:()=>false,showErrors:valid,showSectionErrors:valid,refreshErrors(){},invalidateCompiled(){},showServerError(){},setCompiled(){},lock(){}};
 }
 function mountFields(form,scope,draft,{published:immutable=false}){
  const cfg=structuredClone(draft.configuration),saved=draft.guided_ux||{},confirmed=saved.r4?{...(saved.confirmed||{})}:{};
@@ -51,9 +37,9 @@ function mountFields(form,scope,draft,{published:immutable=false}){
  ],cfg.consolidation_permitted?'yes':'no');consolidate.root.classList.add('guided-two-columns');
  note(operation,'Permitir consolidación no obliga a unir órdenes. Dation evalúa si compartir viaje es compatible y conveniente según las capacidades y restricciones configuradas.');
  const steps=[
-  ['Definir la unidad logística','Primero definí cómo se despacha la mercadería y las dimensiones generales de la unidad que viaja en el transporte.'],
+  ['Definir la unidad logística','Primero definí cómo se despacha la mercadería y las dimensiones exteriores de la unidad que viaja en el transporte.'],
   ['Definir qué contiene esta unidad','Definí el producto, el tipo de bulto y cuántos bultos conforman cada unidad logística.'],
-  ['Restricciones físicas y reglas','Definí qué límites físicos controlará Dation y cómo pueden distribuirse las órdenes entre viajes.']
+  ['Restricciones físicas y reglas','Definí qué límites físicos se controlan y cómo pueden repartirse las órdenes.']
  ].map(([title,copy],i)=>stepPanel(cargo,i+1,title,copy));
  const editor=mountCargoGuidedEditor({units:steps[0].body,products:steps[1].body},scope,saved.catalogue||cfg.cargo,{ui:saved.r4?.cargo||{},profile:cfg.cargo.profile});
  const rules=steps[2].body,ruleGrid=el('div',undefined,'r4-rule-grid'),capacity=el('div'),orderRule=el('div');ruleGrid.append(capacity,orderRule);rules.append(ruleGrid);
@@ -64,9 +50,11 @@ function mountFields(form,scope,draft,{published:immutable=false}){
  ['INDIVISIBLE','No, la orden debe viajar completa','Todas las unidades de la orden se asignan a un único viaje. Si no hay capacidad suficiente, queda sin servir.','box'],
  ['DISCRETE','Sí, puede dividirse entre viajes','Las unidades completas de una orden pueden asignarse a diferentes viajes, respetando capacidades y restricciones.','layers']
  ],cfg.cargo.split_policy);split.root.classList.add('guided-two-columns');
+ capacity.querySelector('fieldset').insertBefore(el('p','Definí qué límites del transporte se validarán al asignar esta carga a los vehículos.','d-field__help'),dimensions.root.querySelector('.guided-radio-grid'));
+ split.root.insertBefore(el('p','Una orden puede contener varias unidades logísticas. Indicá si deben viajar juntas o si pueden repartirse entre distintos viajes.','d-field__help'),split.root.querySelector('.guided-radio-grid'));
  const orderNote=note(rules,'');orderNote.dataset.orderUnitNote='';
- note(rules,'Cada tipo de carga contiene un único producto por unidad logística. Podés configurar hasta dos tipos, sin mezclar productos dentro de un mismo pallet.');
- note(rules,'Dation calcula peso y volumen para controlar las capacidades declaradas. No certifica el acomodamiento tridimensional ni el apilado físico.');
+ note(rules,'Cada tipo contiene un solo producto por unidad logística; hasta dos tipos por modelo guiado.');
+ note(rules,'El volumen exterior es orientativo para capacidad; Dation no certifica packing 3D ni apilado.');
  const physical=el('div',undefined,'model-v2-physical');physical.dataset.dationTest='cargo-physical-preview';physical.role='status';rules.append(physical);
  const cargoErrors=el('p',undefined,'d-field__error');cargoErrors.dataset.errorFor='cargo_catalog';cargoErrors.role='alert';rules.append(cargoErrors);
  const sources=checkboxCards(resources,'¿De dónde provienen tus recursos de transporte?','sources',[
@@ -151,7 +139,7 @@ function mountFields(form,scope,draft,{published:immutable=false}){
   const complete=sectionCompletion();blocks.forEach((b,i)=>b.setStatus(published?'publicado · solo lectura':complete[i]?'validado y revisado':i===2&&serverError?'revisá el error de validación':'pendiente de revisión',complete[i]?'complete':i===2&&serverError?'error':'pending'));
   ctas.forEach((cta,i)=>{cta.disabled=locked||complete[i]||i===2&&compiledKey!==key&&!serverError&&sectionValidity().every(Boolean);cta.setAttribute('aria-disabled',String(cta.disabled));cta.dataset.confirmationState=published?'readonly':complete[i]?'confirmed':'pending';});
   ctas[2].dataset.previewCurrent=String(compiledKey===key);ctas[2].setAttribute('aria-busy',String(!locked&&compiledKey!==key&&!serverError&&sectionValidity().every(Boolean)));
-  orderNote.lastChild.textContent='Unidad logística informada en órdenes: '+editor.unitName()+'. En Líneas de órdenes, Dation identifica cada tipo de carga y la cantidad de unidades completas solicitadas.';
+  orderNote.lastChild.textContent='Unidad utilizada en órdenes: '+editor.unitName()+'. La plantilla de Líneas de órdenes identifica el tipo de carga y la cantidad de unidades completas.';
   currencyNote.lastChild.textContent='Moneda seleccionada: '+currency.value+'. Los costos deben ingresarse en esta moneda; Dation no convierte divisas automáticamente.';
   summary.textContent='Carga homogénea · '+c.cargo.presentations.length+' tipos · '+activeDimensions().map(v=>DIMS.find(([id])=>id===v)[1]).join(' + ');
   if(!compiledData&&!serverError){physical.role='status';physical.textContent='Las propiedades físicas se muestran después de validar el contrato actual con Dation.';}

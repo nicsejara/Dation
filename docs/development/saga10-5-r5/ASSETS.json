@@ -1,0 +1,86 @@
+{
+  "provenance": "User-supplied R5 package; new illustrations generated for that package, no third-party stock or fonts. WebP files copied byte-for-byte.",
+  "total_bytes": 69156,
+  "assets": [
+    {
+      "type": "PALLET",
+      "state": "empty",
+      "path": "backend/app/static/img/logistics/r5/pallet-empty.webp",
+      "bytes": 7374,
+      "sha256": "54d229cb628bd211e4981d55161799ae3f6ddc980a4f9fe4dbf28c0165d52f14",
+      "source": "03_VISUALES/assets/empty/pallet.webp"
+    },
+    {
+      "type": "PALLET",
+      "state": "loaded",
+      "path": "backend/app/static/img/logistics/r5/pallet-loaded.webp",
+      "bytes": 8300,
+      "sha256": "5b3bb8de204b14a84d5fb23bc1fc87ecb7beb2bc031ced8c5517ca85e361e377",
+      "source": "03_VISUALES/assets/loaded/pallet.webp"
+    },
+    {
+      "type": "BOX",
+      "state": "empty",
+      "path": "backend/app/static/img/logistics/r5/box-empty.webp",
+      "bytes": 4414,
+      "sha256": "8d36dfc223347164979f5163bfc70c4a000aaa4abe96a5544606a6a5f399dca8",
+      "source": "03_VISUALES/assets/empty/caja.webp"
+    },
+    {
+      "type": "BOX",
+      "state": "loaded",
+      "path": "backend/app/static/img/logistics/r5/box-loaded.webp",
+      "bytes": 5422,
+      "sha256": "e03e37d58868d84f5e7f119cca470b1bafe92eeab8502efe8f49a1508360a7f3",
+      "source": "03_VISUALES/assets/loaded/caja.webp"
+    },
+    {
+      "type": "CRATE",
+      "state": "empty",
+      "path": "backend/app/static/img/logistics/r5/crate-empty.webp",
+      "bytes": 5866,
+      "sha256": "31ad3a932e9a388bb8f36b5da4ce491beea53888f50a4b0ea52534f7df073526",
+      "source": "03_VISUALES/assets/empty/cajon.webp"
+    },
+    {
+      "type": "CRATE",
+      "state": "loaded",
+      "path": "backend/app/static/img/logistics/r5/crate-loaded.webp",
+      "bytes": 7636,
+      "sha256": "8367d1a02356121d7e122c73e2c0f0941923cf19b7e54105997bfaef85960279",
+      "source": "03_VISUALES/assets/loaded/cajon.webp"
+    },
+    {
+      "type": "BIG_BAG",
+      "state": "empty",
+      "path": "backend/app/static/img/logistics/r5/big_bag-empty.webp",
+      "bytes": 6958,
+      "sha256": "54e94b82a14f8fe5b9d75b19c1ef1fa84b0a048d0c73e13139176b7d6be77b3b",
+      "source": "03_VISUALES/assets/empty/bigbag.webp"
+    },
+    {
+      "type": "BIG_BAG",
+      "state": "loaded",
+      "path": "backend/app/static/img/logistics/r5/big_bag-loaded.webp",
+      "bytes": 8898,
+      "sha256": "a3efc1f80d7814efb67e9a26acaff3d5a06b3a47516fcc2a6bf1dbf4de7f996d",
+      "source": "03_VISUALES/assets/loaded/bigbag.webp"
+    },
+    {
+      "type": "OTHER",
+      "state": "empty",
+      "path": "backend/app/static/img/logistics/r5/other-empty.webp",
+      "bytes": 6052,
+      "sha256": "ae8022515d42b9341f29cbda8f674948dfad1b7841424e6e7855e91c21698704",
+      "source": "03_VISUALES/assets/empty/otra_unidad.webp"
+    },
+    {
+      "type": "OTHER",
+      "state": "loaded",
+      "path": "backend/app/static/img/logistics/r5/other-loaded.webp",
+      "bytes": 8236,
+      "sha256": "662e98b938cdbbd29163243f5193e20525d0d0b3592f9e62b56aa4f7db1ee0aa",
+      "source": "03_VISUALES/assets/loaded/otra_unidad.webp"
+    }
+  ]
+}
