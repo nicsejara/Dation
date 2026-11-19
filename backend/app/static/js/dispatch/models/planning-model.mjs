@@ -97,7 +97,7 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
  function fail(error){if(!scope.active)return;ready=compiled=false;previewFailed=true;message=error.message;feedback.role='alert';changed();}
  function startNew(){
   if(!canManage||busy||pending()||state.locked)return;
-  if(state.mode==='new'){editor.querySelector('[name=model_name]')?.focus();return;}
+  if(state.mode==='new'){const input=editor.querySelector('[name=model_name]');input?.closest('details')?.setAttribute('open','');input?.focus();return;}
   state.mode='new';state.model_id='';state.version_id='';state.intent=null;selected=null;message='';render().then(persist).catch(fail);changed();
  }
  async function openPicker(){

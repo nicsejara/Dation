@@ -1,0 +1,8 @@
+test_06_stale_preview_retry_and_local_cta_never_publish (test_saga10_5_ultimate.UltimateProTests.test_06_stale_preview_retry_and_local_cta_never_publish) ... Executing <Task finished name='Task-1' coro=<Saga10WizardTests.asyncSetUp() done, defined at /workspace/work/dation-saga10-5-r2/backend/tests/browser/test_saga10_wizard.py:24> result=None created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.115 seconds
+Executing <Task pending name='Task-18' coro=<Saga10WizardTests.asyncTearDown() running at /workspace/work/dation-saga10-5-r2/backend/tests/browser/test_saga10_wizard.py:32> wait_for=<Future pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/base_events.py:459> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181, ProtocolCallback.__init__.<locals>.cb() at /workspace/Dation/backend/.browser-venv/lib/python3.13/site-packages/playwright/_impl/_connection.py:264] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.234 seconds
+ok
+
+----------------------------------------------------------------------
+Ran 1 test in 19.254s
+
+OK

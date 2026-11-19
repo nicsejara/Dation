@@ -208,7 +208,10 @@ print('D1_WEIGHT_PRIMARY_NO_HIDDEN_PALLETS_AND_SPLIT_PASS')
         await self.start();first,second=await self.fill();await self.confirm()
         writes=[];previews=[]
         self.page.on('request',lambda r:writes.append(r.url) if r.method=='POST' and ('/versions' in r.url or r.url.endswith('/logistics-models')) else None)
-        name=self.page.get_by_label('Nombre del modelo *',exact=True);await name.press('Enter');self.assertEqual(writes,[])
+        identity=await legacy.block(self.page,1);await identity.locator('>summary').click()
+        await self.page.get_by_role('button',name='Crear nuevo modelo',exact=True).click()
+        name=self.page.get_by_label('Nombre del modelo *',exact=True);await expect(name).to_be_focused();await expect(name).to_have_value('QA Logistics Orange')
+        await name.press('Enter');self.assertEqual(writes,[])
         entered=asyncio.Event();release=asyncio.Event()
         async def hold(route):
             body=route.request.post_data_json

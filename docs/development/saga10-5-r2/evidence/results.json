@@ -45,5 +45,23 @@
     "seconds": 26.493,
     "evidence": "visual-final.txt",
     "reason": "Type-neutral composition summary, no inherited pallet label for BIG_BAG/OTHER. Refreshed all screenshots after this copy-only correction."
+  },
+  "cta_closeout": {
+    "passed": 1,
+    "seconds": 19.254,
+    "evidence": "cta-final.txt",
+    "reason": "Create New opens collapsed Identity and focuses retained draft; no writes, stale/503/double-click protections still pass."
+  },
+  "final_geometry": {
+    "passed": 1,
+    "seconds": 22.171,
+    "evidence": "geometry-final.txt",
+    "widths": [
+      1536,
+      1024,
+      768,
+      390,
+      320
+    ]
   }
 }
