@@ -1,0 +1,107 @@
+{
+  "cargo": {
+    "profile": "PALLETIZED",
+    "products": [
+      {
+        "code": null,
+        "name": "Jugo de naranja",
+        "category": null,
+        "net_mass": null,
+        "dimensions": {
+          "unit": "cm",
+          "width": "20",
+          "height": "30",
+          "length": "30"
+        },
+        "gross_mass": {
+          "unit": "kg",
+          "value": "8"
+        },
+        "product_id": "P-bd11337d-66ea-49e5-be60-d43c31924c03",
+        "unit_label": "caja",
+        "density_kg_per_m3": null,
+        "units_per_package": 1,
+        "compatibility_groups": [
+          "SECO"
+        ]
+      }
+    ],
+    "input_mode": "catalog",
+    "split_policy": "INDIVISIBLE",
+    "co_load_pairs": [],
+    "presentations": [
+      {
+        "label": "Presentaci\u00f3n naranja",
+        "components": [
+          {
+            "quantity": "80",
+            "product_id": "P-bd11337d-66ea-49e5-be60-d43c31924c03"
+          }
+        ],
+        "gross_mass": null,
+        "quantity_kind": "DISCRETE",
+        "quantity_unit": "presentation",
+        "external_volume": null,
+        "extra_tare_mass": {
+          "unit": "kg",
+          "value": "0"
+        },
+        "presentation_id": "L-cd37df9b-03c8-4529-b9b0-25573df8a355",
+        "logistic_unit_id": "U-8ef3df6f-65a8-4b13-9bec-18cded069768",
+        "density_kg_per_m3": null,
+        "loaded_dimensions": {
+          "unit": "cm",
+          "width": "100",
+          "height": "150",
+          "length": "120"
+        },
+        "stackable_metadata": null,
+        "orientation_metadata": null
+      }
+    ],
+    "logistic_units": [
+      {
+        "type": "PALLET",
+        "label": "Pallet est\u00e1ndar",
+        "tare_mass": {
+          "unit": "kg",
+          "value": "25"
+        },
+        "empty_dimensions": null,
+        "logistic_unit_id": "U-8ef3df6f-65a8-4b13-9bec-18cded069768",
+        "structural_limit_kg": null
+      }
+    ],
+    "compatibility_policy": "CATEGORIZED"
+  },
+  "version": 2,
+  "operating_role": "SHIPPER",
+  "own_cost_model": "OWN_OPERATING_CYCLE",
+  "allowed_sources": [
+    "OWN",
+    "EXTERNAL"
+  ],
+  "currency_policy": {
+    "currency": "ARS",
+    "rounding": "ROUND_HALF_UP",
+    "minor_units": 2
+  },
+  "split_permitted": false,
+  "active_dimensions": [
+    "weight_kg",
+    "volume_m3"
+  ],
+  "primary_dimension": "weight_kg",
+  "transport_pattern": "DIRECT",
+  "resource_categories": [],
+  "external_cost_models": [
+    "PER_TRIP",
+    "PER_KM"
+  ],
+  "per_km_billing_bases": [
+    "ONE_WAY",
+    "ROUND_TRIP"
+  ],
+  "consolidation_permitted": true,
+  "homogeneous_loads_declared": false
+}

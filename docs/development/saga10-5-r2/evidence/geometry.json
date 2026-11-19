@@ -1,0 +1,402 @@
+[
+  {
+    "width": 1536,
+    "scrollWidth": 1536,
+    "ctas": [
+      {
+        "width": 272,
+        "height": 48,
+        "rightGap": 16,
+        "padding": "8px 12px",
+        "border": "1px",
+        "radius": "8px",
+        "font": "600 12px / 15.6px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "iconWidth": 18
+      },
+      {
+        "width": 272,
+        "height": 48,
+        "rightGap": 16,
+        "padding": "8px 12px",
+        "border": "1px",
+        "radius": "8px",
+        "font": "600 12px / 15.6px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "iconWidth": 18
+      },
+      {
+        "width": 272,
+        "height": 48,
+        "rightGap": 16,
+        "padding": "8px 12px",
+        "border": "1px",
+        "radius": "8px",
+        "font": "600 12px / 15.6px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "iconWidth": 18
+      },
+      {
+        "width": 272,
+        "height": 48,
+        "rightGap": 16,
+        "padding": "8px 12px",
+        "border": "1px",
+        "radius": "8px",
+        "font": "600 12px / 15.6px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "iconWidth": 18
+      },
+      {
+        "width": 272,
+        "height": 48,
+        "rightGap": 16,
+        "padding": "8px 12px",
+        "border": "1px",
+        "radius": "8px",
+        "font": "600 12px / 15.6px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "iconWidth": 18
+      }
+    ],
+    "toolbar": [
+      {
+        "width": 270,
+        "height": 48
+      },
+      {
+        "width": 270,
+        "height": 48
+      }
+    ],
+    "categoryTops": [
+      814.625,
+      814.625,
+      814.625,
+      814.625,
+      814.625
+    ],
+    "typeTops": [
+      -2395.359375,
+      -2395.359375,
+      -2395.359375,
+      -2395.359375,
+      -2395.359375
+    ]
+  },
+  {
+    "width": 1024,
+    "scrollWidth": 1024,
+    "ctas": [
+      {
+        "width": 272,
+        "height": 48,
+        "rightGap": 16,
+        "padding": "8px 12px",
+        "border": "1px",
+        "radius": "8px",
+        "font": "600 12px / 15.6px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "iconWidth": 18
+      },
+      {
+        "width": 272,
+        "height": 48,
+        "rightGap": 16,
+        "padding": "8px 12px",
+        "border": "1px",
+        "radius": "8px",
+        "font": "600 12px / 15.6px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "iconWidth": 18
+      },
+      {
+        "width": 272,
+        "height": 48,
+        "rightGap": 16,
+        "padding": "8px 12px",
+        "border": "1px",
+        "radius": "8px",
+        "font": "600 12px / 15.6px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "iconWidth": 18
+      },
+      {
+        "width": 272,
+        "height": 48,
+        "rightGap": 16,
+        "padding": "8px 12px",
+        "border": "1px",
+        "radius": "8px",
+        "font": "600 12px / 15.6px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "iconWidth": 18
+      },
+      {
+        "width": 272,
+        "height": 48,
+        "rightGap": 16,
+        "padding": "8px 12px",
+        "border": "1px",
+        "radius": "8px",
+        "font": "600 12px / 15.6px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "iconWidth": 18
+      }
+    ],
+    "toolbar": [
+      {
+        "width": 321,
+        "height": 48
+      },
+      {
+        "width": 321,
+        "height": 48
+      }
+    ],
+    "categoryTops": [
+      804.234375,
+      804.234375,
+      804.234375,
+      936.234375,
+      936.234375
+    ],
+    "typeTops": [
+      -3889.984375,
+      -3889.984375,
+      -3889.984375,
+      -3757.984375,
+      -3757.984375
+    ]
+  },
+  {
+    "width": 768,
+    "scrollWidth": 768,
+    "ctas": [
+      {
+        "width": 272,
+        "height": 48,
+        "rightGap": 16,
+        "padding": "8px 12px",
+        "border": "1px",
+        "radius": "8px",
+        "font": "600 12px / 15.6px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "iconWidth": 18
+      },
+      {
+        "width": 272,
+        "height": 48,
+        "rightGap": 16,
+        "padding": "8px 12px",
+        "border": "1px",
+        "radius": "8px",
+        "font": "600 12px / 15.6px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "iconWidth": 18
+      },
+      {
+        "width": 272,
+        "height": 48,
+        "rightGap": 16,
+        "padding": "8px 12px",
+        "border": "1px",
+        "radius": "8px",
+        "font": "600 12px / 15.6px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "iconWidth": 18
+      },
+      {
+        "width": 272,
+        "height": 48,
+        "rightGap": 16,
+        "padding": "8px 12px",
+        "border": "1px",
+        "radius": "8px",
+        "font": "600 12px / 15.6px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "iconWidth": 18
+      },
+      {
+        "width": 272,
+        "height": 48,
+        "rightGap": 16,
+        "padding": "8px 12px",
+        "border": "1px",
+        "radius": "8px",
+        "font": "600 12px / 15.6px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "iconWidth": 18
+      }
+    ],
+    "toolbar": [
+      {
+        "width": 280,
+        "height": 48
+      },
+      {
+        "width": 280,
+        "height": 48
+      }
+    ],
+    "categoryTops": [
+      -149.421875,
+      -149.421875,
+      -149.421875,
+      -17.421875,
+      -17.421875
+    ],
+    "typeTops": [
+      -4968.859375,
+      -4968.859375,
+      -4968.859375,
+      -4836.859375,
+      -4836.859375
+    ]
+  },
+  {
+    "width": 390,
+    "scrollWidth": 390,
+    "ctas": [
+      {
+        "width": 254,
+        "height": 48,
+        "rightGap": 10,
+        "padding": "8px 12px",
+        "border": "1px",
+        "radius": "8px",
+        "font": "600 12px / 15.6px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "iconWidth": 18
+      },
+      {
+        "width": 254,
+        "height": 48,
+        "rightGap": 10,
+        "padding": "8px 12px",
+        "border": "1px",
+        "radius": "8px",
+        "font": "600 12px / 15.6px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "iconWidth": 18
+      },
+      {
+        "width": 254,
+        "height": 48,
+        "rightGap": 10,
+        "padding": "8px 12px",
+        "border": "1px",
+        "radius": "8px",
+        "font": "600 12px / 15.6px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "iconWidth": 18
+      },
+      {
+        "width": 254,
+        "height": 48,
+        "rightGap": 10,
+        "padding": "8px 12px",
+        "border": "1px",
+        "radius": "8px",
+        "font": "600 12px / 15.6px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "iconWidth": 18
+      },
+      {
+        "width": 254,
+        "height": 48,
+        "rightGap": 10,
+        "padding": "8px 12px",
+        "border": "1px",
+        "radius": "8px",
+        "font": "600 12px / 15.6px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "iconWidth": 18
+      }
+    ],
+    "toolbar": [
+      {
+        "width": 246,
+        "height": 48
+      },
+      {
+        "width": 246,
+        "height": 48
+      }
+    ],
+    "categoryTops": [
+      3527.9375,
+      3631.9375,
+      3735.9375,
+      3839.9375,
+      3943.9375
+    ],
+    "typeTops": [
+      -3687.953125,
+      -3583.953125,
+      -3479.953125,
+      -3375.953125,
+      -3271.953125
+    ]
+  },
+  {
+    "width": 320,
+    "scrollWidth": 320,
+    "ctas": [
+      {
+        "width": 184,
+        "height": 48,
+        "rightGap": 10,
+        "padding": "8px 12px",
+        "border": "1px",
+        "radius": "8px",
+        "font": "600 12px / 15.6px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "iconWidth": 18
+      },
+      {
+        "width": 184,
+        "height": 48,
+        "rightGap": 10,
+        "padding": "8px 12px",
+        "border": "1px",
+        "radius": "8px",
+        "font": "600 12px / 15.6px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "iconWidth": 18
+      },
+      {
+        "width": 184,
+        "height": 48,
+        "rightGap": 10,
+        "padding": "8px 12px",
+        "border": "1px",
+        "radius": "8px",
+        "font": "600 12px / 15.6px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "iconWidth": 18
+      },
+      {
+        "width": 184,
+        "height": 48,
+        "rightGap": 10,
+        "padding": "8px 12px",
+        "border": "1px",
+        "radius": "8px",
+        "font": "600 12px / 15.6px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "iconWidth": 18
+      },
+      {
+        "width": 184,
+        "height": 48,
+        "rightGap": 10,
+        "padding": "8px 12px",
+        "border": "1px",
+        "radius": "8px",
+        "font": "600 12px / 15.6px Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "iconWidth": 18
+      }
+    ],
+    "toolbar": [
+      {
+        "width": 176,
+        "height": 48
+      },
+      {
+        "width": 176,
+        "height": 48
+      }
+    ],
+    "categoryTops": [
+      1261,
+      1365,
+      1484.140625,
+      1603.28125,
+      1707.28125
+    ],
+    "typeTops": [
+      -7343.046875,
+      -7239.046875,
+      -7135.046875,
+      -7031.046875,
+      -6927.046875
+    ]
+  }
+]

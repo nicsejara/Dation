@@ -2,12 +2,27 @@
 import re
 from playwright.async_api import expect
 
+async def compatible(page):
+    """Explicitly exercise historical contracts through their preserved editor."""
+    if not await page.locator('.model-wizard-pro').count():return
+    await block(page,3)
+    await page.locator('[data-editor-compatible]').click()
+    await page.get_by_role('dialog').get_by_role('button',name='Abrir editor compatible',exact=True).click()
+    await expect(page.locator('.model-wizard-pro')).to_have_count(0)
+    node=await step(page,3)
+    await node.locator('label').filter(has=page.locator('[name=cargo_input_mode][value=direct]')).click()
+    node=await step(page,6)
+    for value in ['weight_kg','volume_m3']:await node.locator('[name=dimensions][value="'+value+'"]').uncheck()
+    await node.locator('[name=dimensions][value=pallets]').check()
+    await node.locator('[name=primary_dimension]').select_option('pallets')
+
 async def block(page,index):
     node=page.locator('[data-dation-test=model-v2-block-'+str(index)+']')
     if await node.get_attribute('open') is None:await node.locator('>summary').click()
     return node
 
 async def step(page,index):
+    await compatible(page)
     await block(page,3);node=page.locator('[data-cargo-step="'+str(index)+'"]')
     if await node.get_attribute('open') is None:await node.locator('>summary').click()
     return node
@@ -54,6 +69,7 @@ async def presentation(page,name,unit_id,parts,*,loaded=('120','100','150')):
     return key
 
 async def confirm(page):
+    await compatible(page)
     for index in [1,2,4,5]:
         node=await block(page,index);await node.locator('[data-confirm-block="'+str(index)+'"]').click()
     await step(page,7);checkbox=page.get_by_role('checkbox',name=re.compile('Revisé la configuración'))

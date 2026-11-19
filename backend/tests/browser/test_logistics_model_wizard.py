@@ -95,7 +95,7 @@ class LogisticsModelWizardTests(unittest.IsolatedAsyncioTestCase):
         await expect(self.page.get_by_text('Modelo seleccionado · Versión 1',exact=True)).to_be_visible()
         self.assertTrue(await self.page.get_by_label('Rol operativo',exact=True).is_disabled())
         await expect(self.page.locator('[data-dation-test=model-create]')).to_be_hidden()
-        await self.page.get_by_role('button',name='Crear otro modelo',exact=True).click()
+        await self.page.get_by_role('button',name='Crear nuevo modelo',exact=True).click()
         self.assertEqual(await self.page.get_by_label('Nombre del modelo *',exact=True).input_value(),'Mi borrador')
         self.assertEqual(await self.api('GET','/api/platform/logistics-models/'+m['model']['id']),before);self.assertEqual(writes,[])
 
@@ -190,7 +190,7 @@ class LogisticsModelWizardTests(unittest.IsolatedAsyncioTestCase):
     async def test_08_new_model_after_publication_keeps_old_version_immutable(self):
         await self.open('/app/ddas/logistics/case');writes=self.track_writes();await publish_model(self.page,'Primero '+str(uuid4())[:8])
         first=await self.api('GET','/api/platform/logistics-models/'+writes[0][1]['id'])
-        await self.page.locator('[data-dation-test=core-step-1]').click();await self.page.get_by_role('button',name='Crear otro modelo',exact=True).click()
+        await self.page.locator('[data-dation-test=core-step-1]').click();await self.page.get_by_role('button',name='Crear nuevo modelo',exact=True).click()
         await self.page.get_by_label('Rol operativo',exact=True).select_option('HYBRID');await publish_model(self.page,'Segundo '+str(uuid4())[:8])
         self.assertEqual(len(writes),4);self.assertNotEqual(writes[0][1]['id'],writes[2][1]['id'])
         self.assertEqual(await self.api('GET','/api/platform/logistics-models/'+first['model']['id']),first)

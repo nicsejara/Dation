@@ -1,0 +1,67 @@
+{
+  "baseline": "e2407985612dc8d4a01b847f242e8a9a996b84a4",
+  "started_at": "2026-11-19T00:29:32-03:00",
+  "units": {
+    "passed": 70,
+    "seconds": 1.771,
+    "evidence": "unit.txt"
+  },
+  "legacy_browser": {
+    "passed": 28,
+    "seconds": 184.095,
+    "evidence": "legacy-browser.txt"
+  },
+  "ultimate_browser": {
+    "methods_passed": 8,
+    "seconds": 53.713,
+    "unittest_selection_errors": 1,
+    "selection_error": "Nonexistent ninth historical test selector; correct method separately passed. No product error in eight Ultimate methods.",
+    "evidence": "ultimate-browser.txt"
+  },
+  "transverse": {
+    "passed": 5,
+    "evidence": "integration-browser.txt",
+    "note": "Integration log includes earlier Ultimate07 detached-container error, fixed and validated by final Ultimate suite."
+  },
+  "retry_regression": {
+    "evidence": "retry-regression.txt",
+    "passed": 1
+  },
+  "impact": {
+    "risk": "R2",
+    "requires_full": false,
+    "classifier_changed": false
+  },
+  "production": {
+    "merged": false,
+    "published": false,
+    "deployed": false,
+    "supabase_changed": false,
+    "engines_enabled": false
+  },
+  "ci": "Exact candidate run/checks recorded in PR after completion",
+  "visual_closeout": {
+    "passed": 2,
+    "seconds": 26.493,
+    "evidence": "visual-final.txt",
+    "reason": "Type-neutral composition summary, no inherited pallet label for BIG_BAG/OTHER. Refreshed all screenshots after this copy-only correction."
+  },
+  "cta_closeout": {
+    "passed": 1,
+    "seconds": 19.254,
+    "evidence": "cta-final.txt",
+    "reason": "Create New opens collapsed Identity and focuses retained draft; no writes, stale/503/double-click protections still pass."
+  },
+  "final_geometry": {
+    "passed": 1,
+    "seconds": 22.171,
+    "evidence": "geometry-final.txt",
+    "widths": [
+      1536,
+      1024,
+      768,
+      390,
+      320
+    ]
+  }
+}
