@@ -13,7 +13,7 @@ Implementación frontend completa desde `797f9fc49b497fb6d266621926cdffbe03640e7
 | G4 | PASS | R4 T07: DTO real publicado → 3 CSV → D1; [GAP-01 conservador](ARCHITECTURE.md) |
 | G5 | PASS | R4 T03/T05/T06/T07/T11/T12, R3 T01/T05/T09 |
 | G6 | PASS local | [74 criterios](ACCEPTANCE.md), [capturas](VISUALS.md), pruebas detalladas debajo |
-| G7 | Preparado | PR/HEAD y resultado CI terminal registrados en la descripción del PR |
+| G7 | PR preparado | PR/HEAD y resultado CI terminal registrados en la descripción del PR |
 
 ## Cambios y propósito
 
@@ -31,7 +31,8 @@ Implementación frontend completa desde `797f9fc49b497fb6d266621926cdffbe03640e7
 - Verificación final: 27 browser PASS (148.557 s): 13 R4, dos correcciones focales y 12 del wizard V1. Tres comprobaciones adicionales de firmas/teclado/gráficos/capturas PASS (28.540 s), más captura final de ocho estados PASS (18.158 s).
 - 70 contratos originales PASS (1.604 s); cinco regresiones D2/consumidores PASS (0.504 s); siete pruebas del clasificador PASS. Test puro Node/Python de estado/mapeo PASS, incluidos IDs inconsistentes fail-closed.
 - Los escenarios anteriores se ejecutan también mediante helpers compartidos; no representan necesariamente cobertura distinta. [Migración de pruebas](TEST_MIGRATION.md).
-- CI obligatoria: clasificación real y FAST/FULL/required-gate terminal en el PR. No se altera el clasificador ni se omiten gates para reducir pruebas.
+- Rollback inverso y reaplicación PASS en worktree temporal: ambos árboles coinciden exactamente; evidencia `rollback-dry-run.txt`.
+- CI obligatoria: clasificación real R2, FAST requerido, FULL no requerido. Clasificación completa en `classification.json`. Estado CI terminal y FAST/FULL/required-gate terminal en el PR. No se altera el clasificador ni se omiten gates para reducir pruebas.
 
 ## Límites explícitos
 
