@@ -22,13 +22,19 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
  const modelPanel=collapsibleSection(form,'01. Logistics Model','Definí la lógica operativa base del modelo logístico que vas a usar en este Case.',{open:true,initialStatus:'En configuración'}),modelBlock=modelPanel.body;
  modelPanel.details.dataset.dationTest='core-model';modelPanel.details.dataset.modelState='LOADING';modelPanel.setStatus('Cargando');modelPanel.details.classList.add('model-wizard');modelBlock.classList.add('ultimate-planning-model');modelBlock.hidden=true;
  const summary=modelPanel.details.querySelector('summary'),tile=el('span',undefined,'model-wizard-tile'),heading=el('span',undefined,'model-wizard-heading');tile.append(wizardIcon('layers'));heading.append(summary.querySelector('.ultimate-disclosure__title'),modelBlock.previousElementSibling);summary.prepend(tile,heading);
- const intro=el('div',undefined,'model-wizard-intro'),reuse=button('',openPicker),catalogHint=el('p',undefined,'d-metadata'),introIcon=wizardIcon('database');reuse.append(wizardIcon('folder'),el('span','Seleccionar modelo existente'));reuse.dataset.dationTest='model-reuse';intro.append(introIcon,el('strong','Creá un nuevo modelo operativo o reutilizá uno ya publicado.'),reuse,catalogHint);
+ const intro=el('div',undefined,'model-wizard-intro'),reuse=button('',openPicker),catalogHint=el('p',undefined,'d-metadata'),introIcon=wizardIcon('database');reuse.append(wizardIcon('folder'),el('span','Seleccionar modelo existente'));reuse.dataset.dationTest='model-reuse';const newModel=button('',startNew,'primary');newModel.append(wizardIcon('plus'),el('span','Crear nuevo modelo'));newModel.dataset.modelNew='';const toolbar=el('div',undefined,'model-wizard-top-actions');toolbar.append(reuse,newModel);intro.classList.add('model-wizard-intro-pro');intro.append(introIcon,el('strong','Creá un nuevo modelo operativo o reutilizá uno ya publicado.'),toolbar,catalogHint);
  const editor=el('div'),feedback=el('p','','model-wizard-feedback'),footer=el('footer',undefined,'model-wizard-footer'),progress=el('div',undefined,'model-wizard-progress'),ring=el('span',undefined,'model-wizard-ring'),progressText=el('div'),count=el('p','','d-metadata'),create=button('',publish,'primary');
  feedback.role='status';feedback.setAttribute('aria-live','polite');feedback.dataset.dationTest='model-feedback';progress.dataset.dationTest='model-progress';progress.role='status';progressText.append(el('strong','Configuración del modelo'),count);ring.setAttribute('aria-hidden','true');progress.append(ring,progressText);footer.append(progress,create);modelBlock.append(intro,editor,feedback,footer);
  feedback.id='model-create-feedback';create.setAttribute('aria-describedby',feedback.id);create.dataset.dationTest='model-create';const createLabel=unified?'Guardar y continuar':'Crear y seleccionar modelo',createCaption=el('span',createLabel);create.append(wizardIcon('check'),createCaption);
- const contractPanel=collapsibleSection(form,'02. Data Contract','Dation genera automáticamente la estructura de datos requerida a partir del Logistics Model seleccionado. Descargá las plantillas y consultá sus campos y reglas antes de cargar los datos en el Decision Graph.',{initialStatus:'Pendiente'}),contractView=mountDataContractView(contractPanel,scope,{retry:()=>preview(),onContinue,onContracts}),contractStatus=contractView.status,retry=contractView.retry,modelRetry=button('Reintentar Data Contract',async()=>{if(state.mode==='existing'&&!isSelected()){await render().catch(fail);if(ready)onSelected();}else await preview();});
+ const contractPanel=collapsibleSection(form,'02. Data Contract','Dation genera automáticamente la estructura de datos requerida a partir del Logistics Model seleccionado. Descargá las plantillas y consultá sus campos y reglas antes de cargar los datos en el Decision Graph.',{initialStatus:'Pendiente'}),contractView=mountDataContractView(contractPanel,scope,{retry:()=>preview({focusError:true}),onContinue,onContracts}),contractStatus=contractView.status,retry=contractView.retry,modelRetry=button('Reintentar Data Contract',async()=>{if(state.mode==='existing'&&!isSelected()){await render().catch(fail);if(ready)onSelected();}else await preview({focusError:true});});
  retry.hidden=modelRetry.hidden=true;feedback.after(modelRetry);contractPanel.details.dataset.dationTest='core-contract';
- const newDraft=()=>({id:crypto.randomUUID(),name:'',description:'',status:'active',expected_revision:1,configuration:(saga10?defaultConfigurationV2:defaultConfiguration)(window.dationSession.identity.workspace.currency)});
+ const newDraft=()=>{
+  const configuration=(saga10?defaultConfigurationV2:defaultConfiguration)(window.dationSession.identity.workspace.currency);
+  // Only brand-new UI drafts use the homogeneous route. Saved and published
+  // configurations retain their original mode, dimensions and physical units.
+  if(saga10){if(!['ARS','USD','EUR'].includes(configuration.currency_policy.currency))configuration.currency_policy.currency='ARS';configuration.active_dimensions=['weight_kg','volume_m3'];configuration.primary_dimension='weight_kg';configuration.cargo.input_mode='catalog';}
+  return {id:crypto.randomUUID(),name:'',description:'',status:'active',expected_revision:1,configuration,...(saga10?{guided_ux:{edition:'ultimate'}}:{})};
+ };
  const state={mode:draft.mode||'new',model_id:draft.model_id||modelId,version_id:draft.version_id||'',new_model:draft.new_model||newDraft(),intent:draft.intent||null,locked:!!draft.locked};
  // An old draft may contain an acknowledged version without its selection flag.
  if(state.intent&&state.version_id===state.intent.version_id){state.mode='existing';state.model_id=state.intent.model_id;state.intent.published=true;}
@@ -54,10 +60,10 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
   const caption=busy?'Creando modelo…':pending()?'Reintentar publicación pendiente':createLabel;if(createCaption.textContent!==caption)createCaption.textContent=caption;
   feedback.textContent=message||(!canManage?'Necesitás permiso de administración para crear un modelo.':'');feedback.hidden=!feedback.textContent;
   modelRetry.hidden=(state.mode!=='new'&&isSelected())||!previewFailed||busy||pending();modelRetry.textContent=state.mode==='existing'&&!isSelected()?'Reintentar selección del modelo':'Reintentar Data Contract';
-  const another=editor.querySelector('[data-model-new]');if(another)another.disabled=busy||state.locked;retry.hidden=state.mode==='new'||!previewFailed;
+  newModel.hidden=!canManage;newModel.disabled=busy||pending()||state.locked;retry.hidden=state.mode==='new'||!previewFailed;
   contractView.setState({ready,compiled,pending:previewPending,failed:previewFailed,selected:isSelected(),provisional:state.mode==='new'});
  }
- async function preview(){
+ async function preview({focusError=false}={}){
   clearTimeout(timer);const own=++generation;compiled=ready=previewPending=false;previewFailed=false;previewBody=null;contractView.invalidate();contractPanel.setStatus('Validando','pending');contractStatus.textContent='Resolviendo Data Contract…';contractStatus.role='status';changed();
   try{
    if(state.mode==='new'){
@@ -70,7 +76,7 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
    if(data.provisional!== (state.mode==='new'))throw new Error('El contrato no corresponde a la versión seleccionada.');
    contractCount=Object.keys(data.contracts).length;fields?.setCompiled?.(data);contractView.render(data,previewBody);compiled=true;ready=isSelected();previewFailed=false;
    contractPanel.setStatus(ready?'Estructura lista':'Vista previa',ready?'complete':'pending');if(!pending())message='';changed();
-  }catch(error){if(scope.active&&own===generation){previewPending=false;previewFailed=true;fields?.showServerError?.(error.message);contractStatus.textContent=error.message;contractStatus.role='alert';contractPanel.setStatus('Revisar contrato','warning');message=error.message;feedback.role='alert';changed();}}
+  }catch(error){if(scope.active&&own===generation){previewPending=false;previewFailed=true;fields?.showServerError?.(error.message,{focus:focusError});contractStatus.textContent=error.message;contractStatus.role='alert';contractPanel.setStatus('Revisar contrato','warning');message=error.message;feedback.role='alert';changed();}}
  }
  let previewBody=null;let contractCount=0;
  async function render(){
@@ -83,12 +89,17 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
    let detail;try{detail=await api('/api/platform/logistics-models/'+state.model_id,{signal:scope.signal});}catch(error){if(own!==renderGeneration)return;throw error;}if(!scope.active||own!==renderGeneration)return;
    const chosen=detail.versions.find(v=>v.id===state.version_id);if(detail.model.status!=='active'||!chosen)throw new Error('La versión publicada ya no está disponible. Elegí otra versión.');selected=detail;if(!models.some(m=>m.id===detail.model.id))models.push({...detail.model,versions:detail.versions});
    const selectedSummary=el('div',undefined,'model-wizard-selection'),text=el('div');text.append(el('h3',detail.model.name),el('p',chosen.config_jsonb.version===2?'Modelo publicado seleccionado':'Modelo seleccionado · Versión '+chosen.version,'d-metadata'));
-   const another=button('Crear otro modelo',()=>{if(busy||pending()||state.locked)return;state.mode='new';state.model_id='';state.version_id='';state.intent=null;selected=null;message='';render().catch(fail);changed();});another.dataset.modelNew='';another.hidden=!canManage;another.disabled=state.locked||busy;selectedSummary.append(text,another);editor.append(selectedSummary);
+   selectedSummary.append(text);editor.append(selectedSummary);
    fields=mountModelFields(editor,scope,{...detail.model,configuration:chosen.config_jsonb},{wizard:true,version:chosen.version});fields.lock({published:true});
   }
   changed();await preview();
  }
  function fail(error){if(!scope.active)return;ready=compiled=false;previewFailed=true;message=error.message;feedback.role='alert';changed();}
+ function startNew(){
+  if(!canManage||busy||pending()||state.locked)return;
+  if(state.mode==='new'){editor.querySelector('[name=model_name]')?.focus();return;}
+  state.mode='new';state.model_id='';state.version_id='';state.intent=null;selected=null;message='';render().then(persist).catch(fail);changed();
+ }
  async function openPicker(){
   if(reuse.disabled)return;pickerOpen=true;sync();
   if(state.mode==='new'&&fields)state.new_model=fields.read();
@@ -143,8 +154,13 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
   if(!['model_name','model_description','model_status'].includes(event.target.name)){fields.invalidateCompiled?.();generation++;compiled=ready=previewPending=false;clearTimeout(timer);timer=setTimeout(()=>preview(),250);}
   changed();
  };
+ scope.listen(editor,'keydown',event=>{if(event.key==='Enter'&&event.target.matches('input:not([type=checkbox]):not([type=radio])'))event.preventDefault();});
  scope.listen(editor,'input',edit);scope.listen(editor,'change',edit);
  scope.listen(editor,'model-review',changed);
+ scope.listen(editor,'model-editor-mode',event=>{
+  if(state.mode!=='new'||busy||pending()||state.locked||!canManage)return;
+  state.new_model=event.detail;render().then(persist).catch(fail);
+ });
  await render().catch(fail);modelBlock.hidden=false;
  return {
   modelPanel,contractPanel,draft:readDraft,

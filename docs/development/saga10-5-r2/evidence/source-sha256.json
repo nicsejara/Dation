@@ -1,0 +1,16 @@
+{
+  "backend/app/static/js/dispatch/models/data-contract-view.mjs": "e616de40c45e11a73d1d4ce1cf6853ab84f839a9ea202d9b8689dff56d1328a1",
+  "backend/app/static/js/dispatch/models/guided-ui.mjs": "ec8afe5ba71fbea224ba5a12c8db125ef21825c6cfb07d3f66ae7f5188d4e41b",
+  "backend/app/static/js/dispatch/models/entry.mjs": "427f4c7bdf2cb77ff8566f328d717ab6757d83848f4e13be9755bbf03d5d44ff",
+  "backend/app/static/js/dispatch/models/model-fields-v2.mjs": "031424f6aa7bbdd7489502b87daee81feb37daaccd1130afe47a53d79d83a6f2",
+  "backend/app/static/js/dispatch/models/cargo-editor.mjs": "40b703a96ca9ea4961204ba6d26a0460c630c75c45c0f5751b5a209e093e9cf0",
+  "backend/app/static/js/dispatch/models/setup-values.mjs": "390c80f20e3f55065ac814b3e29ed9c38462ec92fb29b65d2dda125add31cbc0",
+  "backend/app/static/js/dispatch/models/index.mjs": "08508d057dfc82bb8bbbf95883b60828ce5e31166c83527909ddae70f3c7a52c",
+  "backend/app/static/js/dispatch/models/model-fields.mjs": "5b5b2e21d8cefe73dece0b3b6d4d77e21334c88ed0d4616d3f2a26c971a53b3c",
+  "backend/app/static/js/dispatch/models/forms.mjs": "e487251d2b597821bc80cbcbcd32f31853625876efc7639bd38a9ea87431797f",
+  "backend/app/static/js/dispatch/models/policy.mjs": "4d946233ce9ca6d59a9d49047c09460d9dbccaee49bf17cd2a1599820ae07bbb",
+  "backend/app/static/js/dispatch/models/planning-model.mjs": "0e9e7bb69c7b356823654e2558b7b4060e0248a9fe78f6740a7e6ef0274f760a",
+  "backend/app/static/js/dispatch/models/wizard-ui.mjs": "d73b47f8efdfba124d4e695ad2280c4f2cb2b735c8a701ec7b33c3677e09535f",
+  "backend/app/static/css/ultimate-foundation.css": "d32e78d8329207702457efbae75fb95890abf6e6cb8d2ad5d8b5e74b82b62568",
+  "note": "Screenshots from real local owned API/browser fixtures; final Git SHA and CI in PR. No image edits."
+}

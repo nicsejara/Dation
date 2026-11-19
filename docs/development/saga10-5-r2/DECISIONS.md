@@ -1,0 +1,18 @@
+# Domain decisions and limitations
+
+| Requirement / gap | Existing contract and safe implementation | Evidence / future work |
+|---|---|---|
+| Primary dimension required | New guided models use active weight first, otherwise active volume. No hidden pallets/units. None selected blocks validation. Existing primary/dimensions stay in compatible editor. | Ultimate tests 01/07; published DTO; finite D1 test with weight+volume capacities only. |
+| Package type has no DTO field | Uses Product.unit_label with units_per_package=1 for new packages. No bulto_type, SKU seed or nested packaging added. Historical 216-unit packages stay unchanged in compatible editor. | Ultimate 01; previous guided tests 02/03/10. |
+| Direct mode has no catalog | Explicit compatible route retains direct input and two CSV. It retains catalog draft locally when switching, but sends empty catalog arrays. | Saga10 wizard test03 / guided test03. |
+| Homogeneous and compatibility | Exactly one product per new guided presentation, independent of CATEGORIZED/UNIFORM_DECLARED and co-load pairs. Default remains CATEGORIZED: the user must declare real groups in advanced product data. | Ultimate 01/04; guided test10; server compiler. |
+| Shared product edits | When several presentations use a product, its editable properties are locked in this view. Explicit duplication creates a new ID and unique code before editing. Support changes remain shared and explicitly declared. | Ultimate 07/04; catalog reference protections. |
+| Big bag vs continuous | BIG_BAG uses a discrete support, explicit tare and declared exterior volume. Previously declared dimensions remain accessible and must be reconciled explicitly. Continuous bulk remains available in compatible editor, without nested support. | Ultimate 03; guided test07. |
+| Mixed historical presentations | Preserve every component, commercial count, ID, declared gross mass and physical data. No auto-conversion to homogeneous, even if a UI draft marker is inconsistent. | Edition guard in model-fields-v2; old guided/wizard regressions. |
+| Preview authority | Single parent debounced preview and generation guard retained. Local CTA reads its current validated signature; it neither fetches again nor publishes. | Ultimate 06; old stale/503 tests. |
+| New currency default | New draft uses workspace currency if ARS/USD/EUR, otherwise explicit ARS default. Existing currencies and precision are preserved, with an additional historical option when necessary. No FX. | New-draft initialization; currency card construction; legacy checks. |
+| Physical quantities | Bulto dimensions are informational, loaded dimensions describe the exterior, support empty dimensions are separate, and tare is added once. No packing/stacking certification or auto-filling quantities. | Ultimate 01, backend physical tests unchanged. |
+| Catalog limits / deletion | Existing server limits 100 products / 50 supports / 200 presentations / 30 historical components retained. Guided creation permits one component. Orphan catalog entries and advanced metadata remain manageable in compatible editor; referenced items cannot be deleted. | Prior guided tests 04/09/10; Ultimate 07. |
+| Review-only reverse journey | Designed only. Current Core step navigation retains the selected version and current draft. No new review route or Edit Configuration affordance. | FUTURE_REVIEW_ONLY.md; Ultimate 04; Saga01 recurrent-version tests. |
+
+No backend, schema, API, engine, production flag, workflow, policy, dependency or infrastructure change. Finite D1 runs exist only inside isolated tests and do not activate engines. Legacy editor is deliberately retained instead of reinterpreting published business semantics.
