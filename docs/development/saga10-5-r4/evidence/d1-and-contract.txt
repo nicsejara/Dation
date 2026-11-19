@@ -1,0 +1,28 @@
+{
+  "physics": [
+    "745 kg / 1.8 m3",
+    "665 kg / 1.8 m3"
+  ],
+  "csv": [
+    "transport_demand",
+    "order_lines",
+    "transport_resources"
+  ],
+  "mixed_aggregate": [
+    "11440 kg",
+    "28.8 m3"
+  ],
+  "indivisible": "unserved",
+  "discrete_quantities": [
+    "4",
+    "6"
+  ],
+  "order_split_false": "unserved",
+  "distinct_types_same_order_indivisible": "unserved",
+  "distinct_types_discrete": "two trips",
+  "separate_orders": "two trips",
+  "explicit_pair": "one trip",
+  "same_group": "one trip",
+  "missing_group": "rejected",
+  "production_execution": false
+}

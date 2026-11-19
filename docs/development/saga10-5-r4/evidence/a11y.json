@@ -1,0 +1,57 @@
+[
+  {
+    "width": 1536,
+    "textCount": 184,
+    "minimumContrast": 5.429139914708745,
+    "failures": [],
+    "hero": null,
+    "overflow": false,
+    "legacyBoundary": false,
+    "scheme": "dark",
+    "cards": []
+  },
+  {
+    "width": 1024,
+    "textCount": 184,
+    "minimumContrast": 5.429139914708745,
+    "failures": [],
+    "hero": null,
+    "overflow": false,
+    "legacyBoundary": false,
+    "scheme": "dark",
+    "cards": []
+  },
+  {
+    "width": 768,
+    "textCount": 184,
+    "minimumContrast": 5.429139914708745,
+    "failures": [],
+    "hero": null,
+    "overflow": false,
+    "legacyBoundary": false,
+    "scheme": "dark",
+    "cards": []
+  },
+  {
+    "width": 390,
+    "textCount": 184,
+    "minimumContrast": 5.429139914708745,
+    "failures": [],
+    "hero": null,
+    "overflow": false,
+    "legacyBoundary": false,
+    "scheme": "dark",
+    "cards": []
+  },
+  {
+    "width": 320,
+    "textCount": 184,
+    "minimumContrast": 5.429139914708745,
+    "failures": [],
+    "hero": null,
+    "overflow": false,
+    "legacyBoundary": false,
+    "scheme": "dark",
+    "cards": []
+  }
+]

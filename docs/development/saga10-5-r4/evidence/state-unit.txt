@@ -1,0 +1,6 @@
+test_mapping_transactions_and_identity (test_cargo_guided_state.CargoGuidedStateTests.test_mapping_transactions_and_identity) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.073s
+
+OK

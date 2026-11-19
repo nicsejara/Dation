@@ -2,6 +2,7 @@ import {api,post} from '../shared.mjs';
 import {mountDialog} from '../../platform/components.mjs';
 import {el,button,field,collapsibleSection,confirmAction} from './forms.mjs';
 import {mountModelFields,defaultConfiguration,defaultConfigurationV2} from './model-fields.mjs';
+import {emptyProduct,fingerprint} from './cargo-guided-state.mjs';
 import {draftSignature} from './setup-values.mjs';
 import {wizardIcon} from './wizard-ui.mjs';
 import {mountDataContractView} from './data-contract-view.mjs';
@@ -39,7 +40,7 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
  const state={mode:draft.mode||'new',model_id:draft.model_id||modelId,version_id:draft.version_id||'',new_model:draft.new_model||newDraft(),intent:draft.intent||null,locked:!!draft.locked,recovery:draft.recovery||null};
  // An old draft may contain an acknowledged version without its selection flag.
  if(state.intent&&state.version_id===state.intent.version_id){state.mode='existing';state.model_id=state.intent.model_id;state.intent.published=true;}
- let fields=null,selected=null,compiled=false,ready=false,generation=0,renderGeneration=0,timer=null,busy=false,pickerOpen=false,previewPending=false,message='',previewFailed=false,resetting=false,lastEdit='';
+ let fields=null,selected=null,compiled=false,ready=false,generation=0,renderGeneration=0,timer=null,busy=false,pickerOpen=false,previewPending=false,message='',previewFailed=false,resetting=false,lastEdit='',lastConfiguration='';
  const models=[];let offset=0,total=0;
  do{const page=await api('/api/platform/logistics-models?'+new URLSearchParams({limit:50,offset}),{signal:scope.signal});if(!scope.active)return;models.push(...page.items.filter(m=>m.status==='active'&&m.versions.length));offset+=50;total=page.total;if(offset<total&&!page.items.length)throw new Error('La lista de Models cambió. Recargá la configuración.');}while(offset<total);
  scope.own(()=>{generation++;clearTimeout(timer);});
@@ -95,12 +96,12 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
    selectedSummary.append(text);editor.append(selectedSummary);
    fields=mountModelFields(editor,scope,{...detail.model,configuration:chosen.config_jsonb},{wizard:true,version:chosen.version,published:true});fields.lock({published:true});
   }
-  changed();await preview();
+  lastConfiguration=fingerprint(fields.read().configuration);changed();await preview();
  }
  function fail(error){if(!scope.active)return;ready=compiled=false;previewFailed=true;message=error.message;feedback.role='alert';changed();}
  function meaningful(value){
   const clean=newDraft(),ui=value.guided_ux||{};
-  return !!(value.name?.trim()||value.description?.trim()||Object.keys(ui.confirmed||{}).length||draftSignature(value.configuration)!==draftSignature(clean.configuration)||Object.values(ui.catalogue||{}).some(v=>Array.isArray(v)&&v.length));
+  return !!(ui.r4?.cargo?.form&&fingerprint(ui.r4.cargo.form.values)!==fingerprint(emptyProduct())||value.name?.trim()||value.description?.trim()||Object.keys(ui.confirmed||{}).length||draftSignature(value.configuration)!==draftSignature(clean.configuration)||Object.values(ui.catalogue||{}).some(v=>Array.isArray(v)&&v.length));
  }
  async function startNew({preserveDraft=false}={}){
   if(!canManage||busy||pending()||state.locked||resetting)return;
@@ -167,7 +168,8 @@ export async function mountPlanningModel(form,scope,{draft={},modelId='',canMana
  const edit=event=>{
   if(state.mode!=='new'||pending()||state.locked)return;
   const key=JSON.stringify(fields.read());if(key===lastEdit)return;lastEdit=key;fields.refreshErrors?.();
-  if(!['model_name','model_description','model_status'].includes(event.target.name)){fields.invalidateCompiled?.();generation++;compiled=ready=previewPending=false;clearTimeout(timer);timer=setTimeout(()=>preview(),250);}
+  const configuration=fingerprint(fields.read().configuration);
+  if(configuration!==lastConfiguration){lastConfiguration=configuration;fields.invalidateCompiled?.();generation++;compiled=ready=previewPending=false;clearTimeout(timer);timer=setTimeout(()=>preview(),250);}
   changed();
  };
  scope.listen(editor,'keydown',event=>{if(event.key==='Enter'&&event.target.matches('input:not([type=checkbox]):not([type=radio])'))event.preventDefault();});

@@ -6,6 +6,7 @@ import {el,button,field,section,collapsibleSection,pageHeader,draftStore,mountFo
 import {decisionCard,decisionChoices,decorateDecisionCase,mountCaseReview,decorateCaseFooter} from './decision-case-ui.mjs';
 import {mountPolicy,policyInputValues,GOALS} from '../models/policy.mjs';
 import {ROLES,DIMENSIONS} from '../models/model-fields.mjs';
+import {mountModelFieldsV2} from '../models/model-fields-v2.mjs';
 import {mountPlanningModel} from '../models/planning-model.mjs';
 import {mountSetupSteps,flattenCorePanel} from '../models/wizard-ui.mjs';
 import {mountCorePreparation} from '../upload/core-preparation.mjs';
@@ -109,7 +110,11 @@ export async function mountCaseSetup(root,{route,navigate,onContext}){
   if(savedCard)caseRoot.append(savedCard);
   const identity=decisionCard(caseRoot,'Identidad del Case','Definí un nombre y una descripción para identificar este Case.','document'),name=field(identity,'Nombre del Case',{name:'case_name',value:draft.name,required:true,maxLength:120}),description=field(identity,'Descripción (opcional)',{name:'case_description',type:'textarea',value:draft.description,maxLength:1000});
   let modelSelect,versionSelect,models;
-  if(!fresh){
+  if(!fresh&&caps.saga10_ui_enabled&&current.model_version.config_jsonb.version===2){
+   // Review the exact pinned version; never instantiate a new planning draft.
+   const review=mountModelFieldsV2(existingModelPanel.body,scope,{...current.model,configuration:current.model_version.config_jsonb},{published:true});review.lock({published:true});
+   modelSelect={value:current.model.id};versionSelect={value:current.model_version.id};models=async()=>{};
+  }else if(!fresh){
   const modelGroup=section(existingModelPanel.body,'Model y versión publicada','La versión elegida queda ligada al Case y no puede reemplazarse después de crear el contexto.');
   let selectedModel=current?.model.id||draft.model_id,selectedVersion=draft.logistics_model_version_id,modelsGeneration=0;
   const modelSearch=field(modelGroup,'Buscar Model por nombre',{name:'case_model_search',type:'search',maxLength:120});modelSelect=field(modelGroup,'Logistics Model',{name:'model_id',options:[['','Elegí un Model']],required:true});versionSelect=field(modelGroup,'Model Version',{name:'model_version_id',options:[['','Elegí una versión publicada']],required:true});
